@@ -4,11 +4,11 @@
 
 This repos contains code to launch an AWS Lex Bot to capture natural language questions typed or spoken, using the Lex Web-UI client, and return the most relevant answer obtained by searching all QnA documents using the AWS Elasticsearch service.  
 
-This repo contains the source code and development enviroment. You can use this to extend or customize the QnABot for your own purposes.
+This repo contains the source code and development environment. You can use this to extend or customize the QnABot for your own purposes.
 
 ### Prerequisites
 
-- runing linux 
+- running Linux 
 - installed node and npm 6> 
 - clone this repo
 - set up an aws account. [instructions](https://aws.amazon.com/free/?sc_channel=PS&sc_campaign=acquisition_US&sc_publisher=google&sc_medium=cloud_computing_b&sc_content=aws_account_bmm_control_q32016&sc_detail=%2Baws%20%2Baccount&sc_category=cloud_computing&sc_segment=102882724242&sc_matchtype=b&sc_country=US&s_kwcid=AL!4422!3!102882724242!b!!g!!%2Baws%20%2Baccount&ef_id=WS3s1AAAAJur-Oj2:20170825145941:s)
@@ -23,7 +23,7 @@ npm install
 ```shell
 npm run stack dev/bootstrap up
 ```
-Will launch a cloudformation template to create an S3 bucket to be used for lambda code and cloudformation templates.
+Will launch a Cloudformation template to create an S3 bucket to be used for lambda code and Cloudformation templates.
 ```shell
 npm run upload
 ```
@@ -38,7 +38,7 @@ Will launch the Master templating creating all resources
 ```shell
 npm run dev-up
 ```
-Launches a cloudformation template that creates an number of AWS resources used for testing and development. Templates in the templates/test folder and lambda function tests use exported variables from this template.
+Launches a Cloudformation template that creates an number of AWS resources used for testing and development. Templates in the templates/test folder and lambda function tests use exported variables from this template.
 ```shell
 npm run server 
 ```
@@ -87,7 +87,7 @@ npm run server
 
 QnA documents must be formatted as JSON objects, with one file containing a JSON list of QnA documents. Here's an example of a simple QnA document:
 
-'''json 
+```json 
 {
    "qna": [
       {
@@ -103,7 +103,7 @@ QnA documents must be formatted as JSON objects, with one file containing a JSON
       }
   ]
 }
-'''
+```
 Each QnA object has current 3 fields:
 - qid: a unique identifier
 - q: a list of questions (one or more)
