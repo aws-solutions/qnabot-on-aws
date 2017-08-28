@@ -1,0 +1,23 @@
+{
+  "Resources": {
+    "ES":{
+        "Type" : "AWS::CloudFormation::Stack",
+        "Properties" : {
+            "TemplateURL" : {"Fn::Join":["/",[
+                "https://s3.amazonaws.com",
+                {"Fn::ImportValue":"QNA-BOOTSTRAP-BUCKET"},
+                {"Fn::ImportValue":"QNA-BOOTSTRAP-PREFIX"},
+                "templates/es.json"
+            ]]},
+            "Parameters":{
+                "BootstrapBucket":{"Fn::ImportValue":"QNA-BOOTSTRAP-BUCKET"},
+                "BootstrapPrefix":{"Fn::ImportValue":"QNA-BOOTSTRAP-PREFIX"}
+            }
+        }
+    }
+  },
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "Test of the variable lambda function",
+  "Outputs":{
+  }
+}

@@ -1,0 +1,128 @@
+{
+  "Resources": {
+    "Alexa":{
+      "Type" : "AWS::Lambda::Permission",
+      "Properties" : {
+        "Action" : "lambda:InvokeFunction",
+        "FunctionName" : {"Fn::GetAtt":["lambda","Arn"]},
+        "Principal" : "alexa-appkit.amazon.com"
+      }
+    },
+    "lambda": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Code": {
+          "S3Bucket": {"Ref":"BootstrapBucket"},
+          "S3Key": {"Fn::Join":["",[
+            {"Ref":"BootstrapPrefix"},
+            "/lambda/handler.zip"
+          ]]}
+        },
+        "Environment": {
+          "Variables": {
+            "REGION": {"Ref": "AWS::Region"},
+            "ES_ADDRESS": {"Ref": "Address"},
+            "ES_TYPE":{"Ref": "Type"},
+            "ES_INDEX":{"Ref": "Index"},
+            "EMPTYMESSAGE":{"Ref": "EmptyMessage"},
+            "ERRORMESSAGE":{"Ref": "ErrorMessage"}
+          }
+        },
+        "Handler": "index.handler",
+        "MemorySize": "128",
+        "Role": {
+          "Fn::GetAtt": [
+            "LambdaRole",
+            "Arn"
+          ]
+        },
+        "Runtime": "nodejs6.10",
+        "Timeout": 10
+      }
+    },
+    "ElasticSearchAccessPolicy": {
+      "Type": "AWS::IAM::ManagedPolicy",
+      "Properties": {
+        "PolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Action": [
+                "es:*"
+              ],
+              "Resource":{"Fn::Join":["/",[
+                {"Ref": "DomainArn"},
+                "*"
+              ]]}
+            }
+          ]
+        },
+        "Roles": [
+          {
+            "Ref": "LambdaRole"
+          }
+        ]
+      }
+    },
+    "LambdaRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "lambda.amazonaws.com"
+              },
+              "Action": "sts:AssumeRole"
+            }
+          ]
+        },
+        "Path": "/",
+        "ManagedPolicyArns": [
+          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ]
+      }
+    }
+  },
+  "Conditions": {},
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "lambda function to fulfill Lex Intent",
+  "Mappings": {},
+  "Outputs": {
+    "Arn": {
+      "Value": {"Fn::GetAtt": ["lambda","Arn"]}
+    },
+    "Name":{
+      "Value":{"Ref":"lambda"}
+    }
+  },
+  "Parameters": {
+    "Address": {
+      "Type": "String"
+    },
+    "DomainArn": {
+      "Type": "String"
+    },
+    "BootstrapBucket":{
+      "Type":"String"
+    },
+    "BootstrapPrefix":{
+      "Type":"String"
+    },
+    "Index":{
+      "Type":"String"
+    },
+    "Type":{
+      "Type":"String"
+    },
+    "ErrorMessage":{
+      "Type":"String"
+    },
+    "EmptyMessage":{
+      "Type":"String"
+    }
+  }
+}

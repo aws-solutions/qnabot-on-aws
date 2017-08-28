@@ -1,0 +1,30 @@
+{
+    "type":"object",
+    "properties":{
+        "attachmentLinkUrl":{
+            "type":"string"
+        },
+        "buttons":{
+            "type":"array",
+            "items":{
+                "type":"object",
+                "properties":{
+                    "text":{"type":"string"}, 
+                    "value":{"type":"string"}
+                },
+                "require":["text","value"],
+                "additionalProperties":false
+            }
+        },
+        "imageUrl":{
+            "type":"string"
+        },
+        "subTitle":{
+            "type":"string"
+        },
+        "title":{
+            "type":"string"
+        }
+    },
+    "additionalProperties":false
+}

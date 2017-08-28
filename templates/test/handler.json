@@ -1,0 +1,35 @@
+{
+  "Resources": {
+    "Handler":{
+        "Type" : "AWS::CloudFormation::Stack",
+        "Properties" : {
+            "TemplateURL" : {"Fn::Join":["/",[
+                "https://s3.amazonaws.com",
+                {"Fn::ImportValue":"QNA-BOOTSTRAP-BUCKET"},
+                {"Fn::ImportValue":"QNA-BOOTSTRAP-PREFIX"},
+                "templates/handler.json"
+            ]]},
+            "Parameters":{
+                "Address":{"Fn::ImportValue":"QNA-DEV-ED-ADDRESS"},
+                "DomainArn":{"Fn::ImportValue":"QNA-DEV-ED-ARN"},
+                "Index": {"Fn::ImportValue":"QNA-DEV-HANDLER-INDEX"},
+                "Type": {"Fn::ImportValue":"QNA-DEV-HANDLER-TYPE"},
+                "Intent": {"Fn::ImportValue":"QNA-DEV-HANDLER-INTENT"},
+                "Bot": {"Fn::ImportValue":"QNA-DEV-HANDLER-BOT"},
+                "PoolId": {"Fn::ImportValue":"QNA-DEV-HANDLER-IDPOOL"},
+                "BootstrapBucket":{"Fn::ImportValue":"QNA-BOOTSTRAP-BUCKET"},
+                "BootstrapPrefix":{"Fn::ImportValue":"QNA-BOOTSTRAP-PREFIX"},
+                "ErrorMessage":"error",
+                "EmptyMessage":"empty",
+                "PoolId":{"Fn::ImportValue":"QNA-DEV-HANDLER-IDPOOL"},
+                "ClientId":{"Fn::ImportValue":"QNA-DEV-HANDLER-CLIENT"},
+                "UserPool":{"Fn::ImportValue":"QNA-DEV-HANDLER-USERPOOL"},
+            }
+        }
+    }
+  },
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "Test of the variable lambda function",
+  "Outputs":{
+  }
+}

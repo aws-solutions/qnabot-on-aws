@@ -1,0 +1,57 @@
+{
+  "Conditions": {},
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "A static website hosted from s3",
+  "Mappings": {},
+  "Outputs": {
+    "Role": {
+      "Value": {
+        "Ref": "Role"
+      }
+    },
+    "RoleArn": {
+      "Value": {
+        "Fn::GetAtt": [
+          "Role",
+          "Arn"
+        ]
+      }
+    }
+  },
+  "Parameters": {
+    "SourcePolicy": {
+      "Type": "String"
+    },
+    "DestPolicy": {
+      "Type": "String"
+    }
+  },
+  "Resources": {
+    "Role": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "s3.amazonaws.com"
+              },
+              "Action": "sts:AssumeRole"
+            }
+          ]
+        },
+        "Path": "/",
+        "ManagedPolicyArns": [
+          {
+            "Ref": "SourcePolicy"
+          },
+          {
+            "Ref": "DestPolicy"
+          }
+        ]
+      }
+    }
+  }
+}

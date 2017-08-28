@@ -1,0 +1,38 @@
+Description: >
+  This template creates ElasticSearch Cluster 
+
+Resources:
+  ElasticsearchDomain:
+    Type: 'AWS::Elasticsearch::Domain'
+    Properties:
+      AccessPolicies:
+        Version: '2012-10-17'
+        Statement:
+        - Sid: 'EnforceAuth'
+          Principal:
+            AWS: !Sub "arn:aws:iam::${AWS::AccountId}:root"
+          Effect: 'Allow'
+          Action: 'es:*'
+          Resource: '*'
+      ElasticsearchClusterConfig:
+        DedicatedMasterEnabled: false
+        InstanceCount: 1
+        InstanceType: t2.small.elasticsearch
+        ZoneAwarenessEnabled: 'false'
+      EBSOptions:
+        EBSEnabled: true
+        VolumeSize: 10
+        VolumeType: 'gp2'
+      ElasticsearchVersion: '5.1'
+      SnapshotOptions:
+        AutomatedSnapshotStartHour: '0'
+      AdvancedOptions:
+        rest.action.multi.allow_explicit_index: 'true'
+
+Outputs:
+  ESArn:
+    Value: !GetAtt ElasticsearchDomain.DomainArn
+  ESAddress:
+    Value: !GetAtt ElasticsearchDomain.DomainEndpoint
+  ESDomain:
+    Value: !Ref ElasticsearchDomain

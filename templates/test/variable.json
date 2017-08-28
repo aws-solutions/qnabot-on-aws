@@ -1,0 +1,25 @@
+{
+  "Resources": {
+    "lambda":{
+        "Type" : "AWS::CloudFormation::Stack",
+        "Properties" : {
+            "TemplateURL" : {"Fn::Join":["/",[
+                "https://s3.amazonaws.com",
+                {"Fn::ImportValue":"QNA-BOOTSTRAP-BUCKET"},
+                "templates/cfn-variable.json"
+            ]]},
+            "Parameters":{}
+        }
+    },
+    "variable":{
+        "Type": "Custom::Variable",
+        "Properties": {
+            "ServiceToken": { "Fn::GetAtt" : ["lambda", "Outputs.Arn"] },
+            "var":"a"
+        }
+    }
+  },
+  "Conditions": {},
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "Test of the variable lambda function",
+}

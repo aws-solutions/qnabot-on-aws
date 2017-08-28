@@ -1,0 +1,123 @@
+{
+  "Resources": {
+    "Check":{
+        "Type" : "AWS::Route53::HealthCheck",
+        "Properties" : {
+            "HealthCheckConfig":{
+                "FailureThreshold" : "5",
+                "FullyQualifiedDomainName" : {"Fn::GetAtt":["Bucket","DomainName"]},
+                "ResourcePath" : "/health.html",
+                "Type" : "HTTP"
+            }
+        }
+    },
+    "Alarm":{
+       "Type" : "AWS::CloudWatch::Alarm",
+       "Properties" : {
+          "Namespace" : "AWS/Route53",
+          "MetricName" : "HealthCheckStatus",
+          "Dimensions" : [{
+            "Name":"HealthCheckId",
+            "Value":{"Ref":"Check"}
+          }],
+          "ComparisonOperator" : "LessThanThreshold",
+          "Period" : 360,
+          "EvaluationPeriods" : 2,
+          "Statistic" : "Average",
+          "Threshold" : ".95",
+          "Unit" : "Count"
+       }
+    },
+    "Bucket":{
+        "Type" : "AWS::S3::Bucket",
+        "DeletionPolicy":"Delete",
+        "Properties" : {
+            "WebsiteConfiguration":{
+                "IndexDocument":"index.html"
+            }
+        }
+    },
+    "BucketPolicy":{
+        "Type" : "AWS::S3::BucketPolicy",
+        "Properties" : {
+            "Bucket" : {"Ref":"Bucket"},
+            "PolicyDocument" : {
+                "Version":"2012-10-17",
+                "Statement":[{
+                    "Sid":"PublicReadForGetBucketObjects",
+                    "Effect":"Allow",
+                    "Principal": "*",
+                    "Action":["s3:GetObject"],
+                    "Resource":[
+                        {"Fn::Join":["",[
+                            "arn:aws:s3:::",{"Ref":"Bucket"},"/*"
+                        ]]},
+                        {"Fn::Join":["",[
+                            "arn:aws:s3:::",{"Ref":"Bucket"}
+                        ]]}
+                    ]
+                }]
+            }
+        }
+    },
+    "Util":{
+        "Type" : "AWS::CloudFormation::Stack",
+        "Properties" : {
+            "TemplateURL" : {"Fn::Join":["/",[
+                "https://s3.amazonaws.com",
+                {"Ref":"BootstrapBucket"},
+                {"Ref":"BootstrapPrefix"},
+                "templates/cfn-s3.json"
+            ]]},
+            "Parameters":{
+                "DstBucket":{"Ref":"Bucket"},
+                "BootstrapBucket":{"Ref":"BootstrapBucket"},
+                "BootstrapPrefix":{"Ref":"BootstrapPrefix"}
+            }
+        }
+    },
+    "Clear":{
+        "Type": "Custom::Clear",
+        "Properties": {
+            "ServiceToken": { "Fn::GetAtt" : ["Util", "Outputs.clearArn"] },
+            "Bucket":{"Ref":"Bucket"}
+        }
+    },
+    "Unzip":{
+        "Type": "Custom::Unzip",
+        "Properties": {
+            "ServiceToken": { "Fn::GetAtt" : ["Util", "Outputs.unzipArn"] },
+            "SrcBucket":{"Ref":"BootstrapBucket"},
+            "SrcKey":{"Fn::Join":["",[
+                {"Ref":"BootstrapPrefix"},
+                "/website.zip"
+            ]]},
+            "DstBucket":{"Ref":"Bucket"},
+            "DstPrefix":""
+        },
+        "DependsOn":"Clear"
+    }
+  },
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "Creates the admin UI website. ",
+  "Parameters":{
+    "BootstrapBucket":{
+        "Type":"String"
+    },
+    "BootstrapPrefix":{
+        "Type":"String"
+    }
+
+  },
+  "Outputs":{
+    "URL":{
+        "Value" : {"Fn::GetAtt":["Bucket","DomainName"]}
+    },  
+    "Bucket":{
+        "Value":{"Ref":"Bucket"}
+    },
+    "Check":{
+        "Value":{"Ref":"Check"}
+    }
+  }
+}

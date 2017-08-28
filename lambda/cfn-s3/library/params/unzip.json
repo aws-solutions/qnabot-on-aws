@@ -1,0 +1,6 @@
+{
+    "SrcBucket":"jmc-sa-website",
+    "SrcKey":"file.zip",
+    "DstBucket":"jmc-sa-website",
+    "DstPrefix":"zip/"
+}

@@ -1,0 +1,164 @@
+{
+  "Resources": {
+    "vpc": {
+      "Type": "AWS::CloudFormation::Stack",
+      "Properties": {
+        "TemplateURL": {
+          "Fn::Join": [
+            "/",
+            [
+              "https://s3.amazonaws.com",
+              {
+                "Fn::ImportValue": "AssetBucket"
+              },
+              {
+                "Fn::ImportValue": "TemplateLibrary"
+              },
+              "vpc.template"
+            ]
+          ]
+        }
+      }
+    },
+    "DB": {
+      "Type": "AWS::CloudFormation::Stack",
+      "Properties": {
+        "TemplateURL": {
+          "Fn::Join": [
+            "/",
+            [
+              "https://s3.amazonaws.com",
+              {
+                "Fn::ImportValue": "AssetBucket"
+              },
+              {
+                "Fn::ImportValue": "TemplateLibrary"
+              },
+              "rds.template"
+            ]
+          ]
+        },
+        "Parameters": {
+          "VPC": {
+            "Fn::GetAtt": [
+              "vpc",
+              "Outputs.VPC"
+            ]
+          },
+          "Subnet1": {
+            "Fn::GetAtt": [
+              "vpc",
+              "Outputs.subnetPrivate1"
+            ]
+          },
+          "Subnet2": {
+            "Fn::GetAtt": [
+              "vpc",
+              "Outputs.subnetPrivate2"
+            ]
+          },
+          "ClientSG": {
+            "Ref": "ClientSG"
+          },
+          "MasterPassword": {
+            "Ref": "MasterPassword"
+          }
+        }
+      }
+    },
+    "ClientSG": {
+      "Type": "AWS::EC2::SecurityGroup",
+      "Properties": {
+        "GroupDescription": "webserver security group",
+        "SecurityGroupIngress": [],
+        "VpcId": {
+          "Fn::GetAtt": [
+            "vpc",
+            "Outputs.VPC"
+          ]
+        }
+      }
+    },
+    "Bucket": {
+      "Type": "AWS::S3::Bucket",
+      "DeletionPolicy": "Delete",
+      "Properties": {}
+    },
+    "Util": {
+      "Type": "AWS::CloudFormation::Stack",
+      "Properties": {
+        "TemplateURL": {
+          "Fn::Join": [
+            "/",
+            [
+              "https://s3.amazonaws.com",
+              {
+                "Fn::ImportValue": "AssetBucket"
+              },
+              {
+                "Fn::ImportValue": "TemplateLibrary"
+              },
+              "cf-s3-util.template"
+            ]
+          ]
+        },
+        "Parameters": {}
+      }
+    },
+    "Clear": {
+      "Type": "Custom::Clear",
+      "Properties": {
+        "ServiceToken": {
+          "Fn::GetAtt": [
+            "Util",
+            "Outputs.clearArn"
+          ]
+        },
+        "Bucket": {
+          "Ref": "Bucket"
+        }
+      }
+    }
+  },
+  "Conditions": {},
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "A static website hosted from s3",
+  "Mappings": {},
+  "Outputs": {
+    "EndpointAddress": {
+      "Value": {
+        "Fn::GetAtt": [
+          "DB",
+          "Outputs.EndpointAddress"
+        ]
+      }
+    },
+    "EndpointPort": {
+      "Value": {
+        "Fn::GetAtt": [
+          "DB",
+          "Outputs.EndpointPort"
+        ]
+      }
+    },
+    "DB": {
+      "Value": {
+        "Fn::GetAtt": [
+          "DB",
+          "Outputs.DB"
+        ]
+      }
+    },
+    "Bucket": {
+      "Value": {
+        "Ref": "Bucket"
+      }
+    }
+  },
+  "Parameters": {
+    "MasterPassword": {
+      "Type": "String",
+      "NoEcho": true
+    }
+  }
+}

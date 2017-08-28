@@ -1,0 +1,25 @@
+{
+  "name": "lambda-decimate",
+  "version": "1.0.0",
+  "description": "",
+  "main": "handler.js",
+  "scripts": {
+    "test": "nodeunit ./test/index.js",
+    "unit": "nodeunit ./test/index.js -t"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "aws-sdk": "^2.72.0",
+    "bluebird": "^3.5.0",
+    "chalk": "^1.1.3",
+    "dynamodb-mutex": "^1.3.4",
+    "elasticsearch": "^13.0.1",
+    "http-aws-es": "^1.1.3",
+    "jsonschema": "^1.1.1",
+    "optimist": "^0.6.1"
+  },
+  "devDependencies": {
+    "nodeunit": "^0.11.1"
+  }
+}

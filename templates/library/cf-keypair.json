@@ -1,0 +1,243 @@
+{
+  "Resources": {
+    "lambda": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Code": {
+          "S3Bucket": {
+            "Fn::ImportValue": "AssetBucket"
+          },
+          "S3Key": {
+            "Fn::Join": [
+              "/",
+              [
+                {
+                  "Fn::ImportValue": "LambdaLibrary"
+                },
+                "cf-keypair.zip"
+              ]
+            ]
+          }
+        },
+        "Environment": {
+          "Variables": {
+            "REGION": {
+              "Ref": "AWS::Region"
+            }
+          }
+        },
+        "Handler": "handler.handler",
+        "MemorySize": "128",
+        "Role": {
+          "Fn::GetAtt": [
+            "LambdaRole",
+            "Arn"
+          ]
+        },
+        "Runtime": "nodejs6.10",
+        "Timeout": 10
+      }
+    },
+    "KeyPair": {
+      "Type": "Custom::KeyPair",
+      "Properties": {
+        "ServiceToken": {
+          "Fn::GetAtt": [
+            "lambda",
+            "Arn"
+          ]
+        },
+        "Bucket": {
+          "Fn::GetAtt": [
+            "Bucket",
+            "Outputs.Bucket"
+          ]
+        },
+        "User": "john"
+      }
+    },
+    "KeyPairPolicy": {
+      "Type": "AWS::IAM::ManagedPolicy",
+      "Properties": {
+        "PolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Action": [
+                "iam:DeleteSSHPublicKey",
+                "iam:UploadSSHPublicKey",
+                "ec2:ImportKeyPair",
+                "ec2:DeleteKeyPair"
+              ],
+              "Resource": [
+                "*"
+              ]
+            }
+          ]
+        }
+      }
+    },
+    "ReadPolicy": {
+      "Type": "AWS::IAM::ManagedPolicy",
+      "Properties": {
+        "PolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Action": [
+                "s3:GetObject"
+              ],
+              "Resource": [
+                {
+                  "Fn::Join": [
+                    "",
+                    [
+                      {
+                        "Fn::GetAtt": [
+                          "Bucket",
+                          "Outputs.BucketArn"
+                        ]
+                      },
+                      "/*"
+                    ]
+                  ]
+                },
+                {
+                  "Fn::GetAtt": [
+                    "Bucket",
+                    "Outputs.BucketArn"
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    "WritePolicy": {
+      "Type": "AWS::IAM::ManagedPolicy",
+      "Properties": {
+        "PolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Action": [
+                "s3:GetObject",
+                "s3:PutObject"
+              ],
+              "Resource": [
+                {
+                  "Fn::Join": [
+                    "",
+                    [
+                      {
+                        "Fn::GetAtt": [
+                          "Bucket",
+                          "Outputs.BucketArn"
+                        ]
+                      },
+                      "/*"
+                    ]
+                  ]
+                },
+                {
+                  "Fn::GetAtt": [
+                    "Bucket",
+                    "Outputs.BucketArn"
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    "LambdaRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "lambda.amazonaws.com"
+              },
+              "Action": "sts:AssumeRole"
+            }
+          ]
+        },
+        "Path": "/",
+        "ManagedPolicyArns": [
+          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
+          {
+            "Ref": "WritePolicy"
+          },
+          {
+            "Ref": "KeyPairPolicy"
+          }
+        ]
+      }
+    },
+    "Bucket": {
+      "Type": "AWS::CloudFormation::Stack",
+      "Properties": {
+        "TemplateURL": {
+          "Fn::Join": [
+            "/",
+            [
+              "https://s3.amazonaws.com",
+              {
+                "Fn::ImportValue": "AssetBucket"
+              },
+              {
+                "Fn::ImportValue": "TemplateLibrary"
+              },
+              "cf-s3-tmp.template"
+            ]
+          ]
+        },
+        "Parameters": {}
+      }
+    }
+  },
+  "Conditions": {},
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "lambda function to build a lambda function",
+  "Mappings": {},
+  "Outputs": {
+    "Bucket": {
+      "Value": {
+        "Fn::GetAtt": [
+          "Bucket",
+          "Outputs.Bucket"
+        ]
+      }
+    },
+    "PrivateKey": {
+      "Value": {
+        "Fn::GetAtt": [
+          "KeyPair",
+          "PrivateKey"
+        ]
+      }
+    },
+    "KeyName": {
+      "Value": {
+        "Fn::GetAtt": [
+          "KeyPair",
+          "KeyName"
+        ]
+      }
+    },
+    "AccessPolicy": {
+      "Value": {
+        "Ref": "ReadPolicy"
+      }
+    }
+  },
+  "Parameters": {}
+}

@@ -1,0 +1,40 @@
+.Qs {
+  .container {
+    display:flex; 
+    margin:10px 0px 10px 0px;
+    position:relative;
+
+    .question-trash {
+      background-color:$controls-color;
+      margin:auto 5px auto -1*$QA-padding;
+      padding:5px;
+      position:absolute; 
+      box-shadow: 2px 0px 7px 0px;
+      border-radius:0px $border-radius $border-radius 0px;
+      white-space:nowrap;
+      overflow:hidden;
+      transition:width .1s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      .fa-icon {
+        width:25px;
+        height:25px;
+      }
+    }
+    .opened {
+      width:190px; 
+      .workspace {
+        margin-left:40px;
+      }
+    }
+
+    .closed {
+      width:45px;
+      .workspace {
+        margin-left:10px;
+      }
+    }
+    .text-input {
+      flex:1;
+    }
+  }
+}
+

@@ -1,0 +1,135 @@
+{
+  "Resources": {
+    "lambda": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Code": {
+          "S3Bucket": {
+            "Fn::ImportValue": "AssetBucket"
+          },
+          "S3Key": {
+            "Fn::Join": [
+              "/",
+              [
+                {
+                  "Fn::ImportValue": "LambdaLibrary"
+                },
+                "cf-sql.zip"
+              ]
+            ]
+          }
+        },
+        "Environment": {
+          "Variables": {
+            "REGION": {
+              "Ref": "AWS::Region"
+            }
+          }
+        },
+        "Handler": "handler.handler",
+        "MemorySize": "128",
+        "Role": {
+          "Fn::GetAtt": [
+            "Role",
+            "Arn"
+          ]
+        },
+        "Runtime": "nodejs6.10",
+        "Timeout": 10,
+        "VpcConfig": {
+          "SecurityGroupIds": [
+            {
+              "Ref": "SG"
+            }
+          ],
+          "SubnetIds": [
+            {
+              "Ref": "subnet"
+            }
+          ]
+        }
+      }
+    },
+    "Role": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "lambda.amazonaws.com"
+              },
+              "Action": "sts:AssumeRole"
+            }
+          ]
+        },
+        "Path": "/",
+        "ManagedPolicyArns": [
+          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
+          "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole",
+          "arn:aws:iam::aws:policy/service-role/AWSLambdaENIManagementAccess"
+        ]
+      }
+    },
+    "DBSGIngress": {
+      "Type": "AWS::RDS::DBSecurityGroupIngress",
+      "Properties": {
+        "DBSecurityGroupName": {
+          "Ref": "DBSG"
+        },
+        "EC2SecurityGroupId": {
+          "Ref": "SG"
+        }
+      }
+    },
+    "SG": {
+      "Type": "AWS::EC2::SecurityGroup",
+      "Properties": {
+        "GroupDescription": "Lambda security group",
+        "SecurityGroupIngress": [],
+        "VpcId": {
+          "Ref": "VPC"
+        }
+      }
+    }
+  },
+  "Conditions": {},
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "lambda function to build a lambda function",
+  "Mappings": {},
+  "Outputs": {
+    "Arn": {
+      "Value": {
+        "Fn::GetAtt": [
+          "lambda",
+          "Arn"
+        ]
+      }
+    }
+  },
+  "Parameters": {
+    "DBEndpoint": {
+      "Type": "String"
+    },
+    "DBPort": {
+      "Type": "String"
+    },
+    "DBUser": {
+      "Type": "String"
+    },
+    "DBPassword": {
+      "Type": "String"
+    },
+    "DBSG": {
+      "Type": "String"
+    },
+    "VPC": {
+      "Type": "String"
+    },
+    "subnet": {
+      "Type": "String"
+    }
+  }
+}

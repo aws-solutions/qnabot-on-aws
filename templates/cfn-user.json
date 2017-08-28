@@ -1,0 +1,109 @@
+{
+  "Resources": {
+    "lambda": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Code": {
+          "S3Bucket": {"Ref":"BootstrapBucket"},
+          "S3Key": {"Fn::Join":["",[
+            {"Ref":"BootstrapPrefix"},
+            "/lambda/cfn-user.zip"
+          ]]}
+        },
+        "Environment": {
+          "Variables": {
+            "REGION": {"Ref": "AWS::Region"},
+            "POOLID":{"Ref": "PoolId"},
+            "CLIENT":{"Ref": "ClientId"},
+            "USERPOOL":{"Ref": "UserPool"}
+          }
+        },
+        "Handler": "index.handler",
+        "MemorySize": "128",
+        "Role": {
+          "Fn::GetAtt": [
+            "Role",
+            "Arn"
+          ]
+        },
+        "Runtime": "nodejs6.10",
+        "Timeout": 60
+      }
+    },
+    "Policy": {
+      "Type": "AWS::IAM::ManagedPolicy",
+      "Properties": {
+        "PolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Action": [
+                "cognito-idp:AdminCreateUser",
+                "cognito-idp:AdminDeleteUser",
+                "cognito-idp:AdminInitiateAuth",
+                "cognito-idp:AdminRespondToAuthChallenge"
+              ],
+              "Resource": [{"Fn::Sub":"arn:aws:cognito-idp:${AWS::Region}:${AWS::AccountId}:userpool/${UserPool}"}]
+            }
+          ]
+        }
+      }
+    },
+    "Role": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "lambda.amazonaws.com"
+              },
+              "Action": "sts:AssumeRole"
+            }
+          ]
+        },
+        "Path": "/",
+        "ManagedPolicyArns": [
+          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
+          {
+            "Ref": "Policy"
+          }
+        ]
+      }
+    }
+  },
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "lambda function to create admin user in Cognito and set password",
+  "Mappings": {},
+  "Outputs": {
+    "Arn": {
+      "Value": {
+        "Fn::GetAtt": [
+          "lambda",
+          "Arn"
+        ]
+      }
+    }
+  },
+  "Parameters": {
+    "ClientId": {
+      "Type": "String"
+    },
+    "PoolId": {
+      "Type": "String"
+    },
+    "UserPool":{
+        "Type":"String"
+    },
+    "BootstrapBucket":{
+        "Type":"String"
+    },
+    "BootstrapPrefix":{
+        "Type":"String"
+    }
+
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "Resources": {
+    "Util":{
+        "Type" : "AWS::CloudFormation::Stack",
+        "Properties" : {
+            "TemplateURL" : {"Fn::Join":["/",[
+                "https://s3.amazonaws.com",
+                {"Fn::ImportValue":"QNA-BOOTSTRAP-BUCKET"},
+                {"Fn::ImportValue":"QNA-BOOTSTRAP-PREFIX"},
+                "templates/cfn-es.json"
+            ]]},
+            "Parameters":{
+                "Arn":{"Fn::ImportValue":"QNA-DEV-ED-ARN"},
+                "BootstrapBucket":{"Fn::ImportValue":"QNA-BOOTSTRAP-BUCKET"},
+                "BootstrapPrefix":{"Fn::ImportValue":"QNA-BOOTSTRAP-PREFIX"}
+            }
+        }
+    },
+    "EsInit":{
+        "Type": "Custom::EsInit",
+        "Properties": {
+            "ServiceToken": { "Fn::GetAtt" : ["Util", "Outputs.Arn"] },
+            "Address":{"Fn::ImportValue":"QNA-DEV-ED-ADDRESS"},
+            "Index":{"Ref":"AWS::StackName"},
+            "Type":"test"
+        }
+    }
+  },
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "Test of the variable lambda function",
+}

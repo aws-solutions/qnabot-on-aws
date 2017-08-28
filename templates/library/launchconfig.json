@@ -1,0 +1,490 @@
+{
+  "Conditions": {},
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "A Demonstration of Three Teir nodejs application",
+  "Mappings": {},
+  "Outputs": {
+    "SG": {
+      "Value": {
+        "Ref": "SG"
+      }
+    },
+    "LaunchConfig": {
+      "Value": {
+        "Ref": "LaunchConfig"
+      }
+    },
+    "Role": {
+      "Value": {
+        "Ref": "ServerRole"
+      }
+    }
+  },
+  "Parameters": {
+    "VPC": {
+      "Type": "String"
+    },
+    "ServerInstance": {
+      "Type": "String"
+    },
+    "ApplicationConfig": {
+      "Type": "String"
+    }
+  },
+  "Resources": {
+    "Logs": {
+      "Type": "AWS::Logs::LogGroup",
+      "DeletionPolicy": "Delete",
+      "Properties": {
+        "RetentionInDays": 1
+      }
+    },
+    "CloudWatchMetricPut": {
+      "Type": "AWS::IAM::ManagedPolicy",
+      "Properties": {
+        "PolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Sid": "CloudWatchLogsPolicy",
+              "Effect": "Allow",
+              "Action": [
+                "cloudwatch:PutMetricData",
+                "cloudwatch:GetMetricStatistics",
+                "cloudwatch:ListMetrics",
+                "ec2:DescribeTags"
+              ],
+              "Resource": [
+                "*"
+              ]
+            }
+          ]
+        }
+      }
+    },
+    "ServerRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "ec2.amazonaws.com"
+                ]
+              },
+              "Action": [
+                "sts:AssumeRole"
+              ]
+            }
+          ]
+        },
+        "Path": "/",
+        "ManagedPolicyArns": [
+          "arn:aws:iam::aws:policy/CloudWatchLogsFullAccess",
+          "arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforAWSCodeDeploy",
+          {
+            "Ref": "CloudWatchMetricPut"
+          }
+        ]
+      }
+    },
+    "ServerProfile": {
+      "Type": "AWS::IAM::InstanceProfile",
+      "Properties": {
+        "Path": "/",
+        "Roles": [
+          {
+            "Ref": "ServerRole"
+          }
+        ]
+      }
+    },
+    "LaunchConfig": {
+      "Type": "AWS::AutoScaling::LaunchConfiguration",
+      "Metadata": {
+        "AWS::CloudFormation::Init": {
+          "config": {
+            "services": {
+              "sysvint": {
+                "codedeploy-agent": {
+                  "enabled": "true",
+                  "ensureRunning": "true"
+                },
+                "cfn-hup": {
+                  "enabled": "true",
+                  "ensureRunning": "true",
+                  "files": [
+                    "/etc/cfn/cfn-hup.conf",
+                    "/etc/cfn/hooks.d/cfn-auto-reloader.conf"
+                  ]
+                }
+              }
+            },
+            "files": {
+              "/etc/cfn/cfn-hup.conf": {
+                "content": {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "[main]\n",
+                      "stack=",
+                      {
+                        "Ref": "AWS::StackId"
+                      },
+                      "\n",
+                      "region=",
+                      {
+                        "Ref": "AWS::Region"
+                      },
+                      "\n",
+                      "interval=1"
+                    ]
+                  ]
+                },
+                "mode": "000400",
+                "owner": "root",
+                "group": "root"
+              },
+              "/etc/cfn/hooks.d/cfn-auto-reloader.conf": {
+                "content": {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "[cfn-auto-reloader-hook]\n",
+                      "triggers=post.update\n",
+                      "path=Resources.LaunchConfig.Metadata.AWS::CloudFormation::Init\n",
+                      "action=/opt/aws/bin/cfn-init -s",
+                      {
+                        "Ref": "AWS::StackName"
+                      },
+                      "-r LaunchConfig",
+                      "\n"
+                    ]
+                  ]
+                },
+                "mode": "000400",
+                "owner": "root",
+                "group": "root"
+              },
+              "/etc/application.json": {
+                "content": {
+                  "Ref": "ApplicationConfig"
+                },
+                "mode": "000400",
+                "owner": "root",
+                "group": "root"
+              },
+              "/etc/awslogs/config/stdout.conf": {
+                "content": {
+                  "Fn::Join": [
+                    "\n",
+                    [
+                      "[/var/log/server/stdout.log]",
+                      "file = /var/log/server/stdout.log",
+                      {
+                        "Fn::Join": [
+                          "",
+                          [
+                            "log_group_name = ",
+                            {
+                              "Ref": "Logs"
+                            }
+                          ]
+                        ]
+                      },
+                      "log_stream_name = {instance_id}/stdout.log"
+                    ]
+                  ]
+                },
+                "mode": "000400",
+                "owner": "root",
+                "group": "root"
+              },
+              "/etc/awslogs/config/stderr.conf": {
+                "content": {
+                  "Fn::Join": [
+                    "\n",
+                    [
+                      "[/var/log/server/stderr.log]",
+                      "file = /var/log/server/stderr.log",
+                      {
+                        "Fn::Join": [
+                          "",
+                          [
+                            "log_group_name = ",
+                            {
+                              "Ref": "Logs"
+                            }
+                          ]
+                        ]
+                      },
+                      "log_stream_name = {instance_id}/stderr.log"
+                    ]
+                  ]
+                },
+                "mode": "000400",
+                "owner": "root",
+                "group": "root"
+              },
+              "/etc/awslogs/config/forever.conf": {
+                "content": {
+                  "Fn::Join": [
+                    "\n",
+                    [
+                      "[/var/log/server/forever.log]",
+                      "file = /var/log/server/forever.log",
+                      {
+                        "Fn::Join": [
+                          "",
+                          [
+                            "log_group_name = ",
+                            {
+                              "Ref": "Logs"
+                            }
+                          ]
+                        ]
+                      },
+                      "log_stream_name = {instance_id}/forever.log"
+                    ]
+                  ]
+                },
+                "mode": "000400",
+                "owner": "root",
+                "group": "root"
+              },
+              "/etc/awslogs/config/userdata.conf": {
+                "content": {
+                  "Fn::Join": [
+                    "\n",
+                    [
+                      "[/var/log/cloud-init-output.log]",
+                      "file = /var/log/cloud-init-output.log",
+                      {
+                        "Fn::Join": [
+                          "",
+                          [
+                            "log_group_name = ",
+                            {
+                              "Ref": "Logs"
+                            }
+                          ]
+                        ]
+                      },
+                      "log_stream_name ={instance_id}/cloud-init-output.log"
+                    ]
+                  ]
+                },
+                "mode": "000400",
+                "owner": "root",
+                "group": "root"
+              },
+              "/etc/awslogs/config/codedeploy.conf": {
+                "content": {
+                  "Fn::Join": [
+                    "\n",
+                    [
+                      "[/var/log/codedeploy.log]",
+                      "file = /var/log/aws/codedeploy-agent/codedeploy-agent.log",
+                      {
+                        "Fn::Join": [
+                          "",
+                          [
+                            "log_group_name = ",
+                            {
+                              "Ref": "Logs"
+                            }
+                          ]
+                        ]
+                      },
+                      "log_stream_name = {instance_id}/codedeploy.log",
+                      "datetime_format = %Y-%m-%d %H:%M:%S"
+                    ]
+                  ]
+                },
+                "mode": "000400",
+                "owner": "root",
+                "group": "root"
+              },
+              "/etc/awslogs/config/codedeploy-updater.conf": {
+                "content": {
+                  "Fn::Join": [
+                    "\n",
+                    [
+                      "[/var/log/codedeploy-updater.log]",
+                      "file = /tmp/codedeploy-agent.update.log",
+                      {
+                        "Fn::Join": [
+                          "",
+                          [
+                            "log_group_name = ",
+                            {
+                              "Ref": "Logs"
+                            }
+                          ]
+                        ]
+                      },
+                      "log_stream_name = {instance_id}/codedeploy-updater.log"
+                    ]
+                  ]
+                },
+                "mode": "000400",
+                "owner": "root",
+                "group": "root"
+              },
+              "/etc/awslogs/config/codedeploy-deployment.conf": {
+                "content": {
+                  "Fn::Join": [
+                    "\n",
+                    [
+                      "[/var/log/codedeploy-deployment.log]",
+                      "file = /opt/codedeploy-agent/deployment-root/deployment-logs/codedeploy-agent-deployments.log",
+                      {
+                        "Fn::Join": [
+                          "",
+                          [
+                            "log_group_name = ",
+                            {
+                              "Ref": "Logs"
+                            }
+                          ]
+                        ]
+                      },
+                      "log_stream_name = {instance_id}/codedeploy-deployment.log"
+                    ]
+                  ]
+                },
+                "mode": "000400",
+                "owner": "root",
+                "group": "root"
+              },
+              "/etc/awslogs/config/cron.conf": {
+                "content": {
+                  "Fn::Join": [
+                    "\n",
+                    [
+                      "[/var/log/cron]",
+                      "file = /var/log/cron",
+                      {
+                        "Fn::Join": [
+                          "",
+                          [
+                            "log_group_name = ",
+                            {
+                              "Ref": "Logs"
+                            }
+                          ]
+                        ]
+                      },
+                      "log_stream_name = {instance_id}/cron.log"
+                    ]
+                  ]
+                },
+                "mode": "000400",
+                "owner": "root",
+                "group": "root"
+              }
+            }
+          }
+        }
+      },
+      "Properties": {
+        "ImageId": {
+          "Fn::ImportValue": "AMI"
+        },
+        "InstanceType": {
+          "Ref": "ServerInstance"
+        },
+        "SecurityGroups": [
+          {
+            "Ref": "SG"
+          }
+        ],
+        "IamInstanceProfile": {
+          "Ref": "ServerProfile"
+        },
+        "UserData": {
+          "Fn::Base64": {
+            "Fn::Join": [
+              "\n",
+              [
+                "#!/bin/bash -xe",
+                "yum update -y",
+                "yum install -y awslogs",
+                "service awslogs start",
+                "chkconfig awslogs on",
+                {
+                  "Fn::Join": [
+                    " ",
+                    [
+                      "/opt/aws/bin/cfn-init -s",
+                      {
+                        "Ref": "AWS::StackName"
+                      },
+                      "-r LaunchConfig"
+                    ]
+                  ]
+                },
+                "cd /home/ec2-user/",
+                "yum install perl-Switch perl-DateTime perl-Sys-Syslog perl-LWP-Protocol-https -y",
+                "curl http://aws-cloudwatch.s3.amazonaws.com/downloads/CloudWatchMonitoringScripts-1.2.1.zip -O",
+                "unzip CloudWatchMonitoringScripts-1.2.1.zip",
+                "rm CloudWatchMonitoringScripts-1.2.1.zip",
+                "cd aws-scripts-mon",
+                "chmod +x ./mon-put-instance-data.pl",
+                "./mon-put-instance-data.pl --mem-util --mem-used --mem-avail --verify --verbose",
+                "./mon-put-instance-data.pl --mem-util --mem-used --mem-avail --verbose",
+                {
+                  "Fn::Join": [
+                    " ",
+                    [
+                      "echo '",
+                      "* * * * *",
+                      "root",
+                      "/home/ec2-user/aws-scripts-mon/mon-put-instance-data.pl",
+                      "--mem-util",
+                      "--mem-used",
+                      "--mem-avail",
+                      "--from-cron",
+                      "--auto-scaling",
+                      "' >> /etc/crontab"
+                    ]
+                  ]
+                },
+                "cat /etc/crontab",
+                "cd /home/ec2-user/",
+                "curl --silent --location https://rpm.nodesource.com/setup_6.x | bash -",
+                "yum install -y nodejs",
+                {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "wget https://aws-codedeploy-",
+                      {
+                        "Ref": "AWS::Region"
+                      },
+                      ".s3.amazonaws.com/latest/install"
+                    ]
+                  ]
+                },
+                "/bin/chmod +x install",
+                "./install auto"
+              ]
+            ]
+          }
+        }
+      }
+    },
+    "SG": {
+      "Type": "AWS::EC2::SecurityGroup",
+      "Properties": {
+        "GroupDescription": "webserver security group",
+        "SecurityGroupIngress": [],
+        "VpcId": {
+          "Ref": "VPC"
+        }
+      }
+    }
+  }
+}

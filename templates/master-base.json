@@ -1,0 +1,317 @@
+{
+  "Parameters":{
+    "BootstrapPrefix":{
+        "Type":"String",
+        "Default":""
+    },
+    "BootstrapBucket":{
+        "Type":"String"
+    },
+    "AdminPassword":{
+        "Type":"String",
+        "AllowedPattern":"(?=.{8,})(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[a-z])(?=.*\\p{Punct}).*",
+        "ConstraintDescription":"Password must have a length of at least 8, contain upper case, lower case, numbers, and special characters.",
+        "NoEcho":true
+    }
+  },
+  "Resources": {
+    "Variable":{
+        "Type" : "AWS::Lambda::Function",
+        "Properties" : {
+            "Code" :{
+                "S3Bucket": {"Ref":"BootstrapBucket"},
+                "S3Key":{"Fn::Join":["",[
+                    {"Ref":"BootstrapPrefix"},
+                    "/lambda/cfn-variable.zip"
+                ]]}
+            },
+            "Environment" :{
+                "Variables":{
+                    "REGION":{"Ref":"AWS::Region"}
+                }
+            },
+            "Handler" : "index.handler",
+            "MemorySize" : "128",
+            "Role" : {"Fn::GetAtt":["VariableRole","Arn"]},
+            "Runtime" : "nodejs6.10",
+            "Timeout" : 10
+        }
+    },
+    "VariableRole" : {
+        "Type"  : "AWS::IAM::Role",
+        "Properties" : {
+            "AssumeRolePolicyDocument" : {
+                "Version": "2012-10-17",
+                "Statement": [{
+                    "Effect": "Allow",
+                    "Principal": {
+                        "Service": "lambda.amazonaws.com"
+                    },
+                    "Action": "sts:AssumeRole"
+                }]       
+            },
+            "Path" : "/",
+            "ManagedPolicyArns":[
+                "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+            ]
+        }
+    },
+    "domain":{
+        "Type" : "AWS::CloudFormation::Stack",
+        "Properties" : {
+            "TemplateURL" : {"Fn::Join":["/",[
+                "https://s3.amazonaws.com",
+                {"Ref":"BootstrapBucket"},
+                {"Ref":"BootstrapPrefix"},
+                "templates/domain.yml"
+            ]]},
+            "Parameters":{}
+        }
+    },
+    "es":{
+        "Type" : "AWS::CloudFormation::Stack",
+        "Properties" : {
+            "TemplateURL" : {"Fn::Join":["/",[
+                "https://s3.amazonaws.com",
+                {"Ref":"BootstrapBucket"},
+                {"Ref":"BootstrapPrefix"},
+                "templates/es.json"
+            ]]},
+            "Parameters":{
+                "BootstrapBucket":{"Ref":"BootstrapBucket"},
+                "BootstrapPrefix":{"Ref":"BootstrapPrefix"},
+                "Address":{ "Fn::GetAtt" : ["domain", "Outputs.ESAddress"] },
+                "Arn":{ "Fn::GetAtt" : ["domain", "Outputs.ESArn"] }
+            }
+        }
+    },
+    "var":{
+        "Type": "Custom::Variable",
+        "Properties": {
+            "ServiceToken": { "Fn::GetAtt" : ["Variable", "Arn"] },
+            "Address":{ "Fn::GetAtt" : ["domain", "Outputs.ESAddress"] },
+            "DomainArn":{ "Fn::GetAtt" : ["domain", "Outputs.ESArn"] },
+            "Index":{"Fn::GetAtt":["es","Outputs.Index"]},
+            "Type":{"Fn::GetAtt":["es","Outputs.Type"]},
+            "ErrorMessage":"",
+            "EmptyMessage":""
+        }
+    },
+    "Fulfilment":{
+        "Type" : "AWS::CloudFormation::Stack",
+        "Properties" : {
+            "TemplateURL" : {"Fn::Join":["/",[
+                "https://s3.amazonaws.com",
+                {"Ref":"BootstrapBucket"},
+                {"Ref":"BootstrapPrefix"},
+                "templates/fulfilment.json"
+            ]]},
+            "Parameters":{
+                "Address":{ "Fn::GetAtt" : ["var", "Address"] },
+                "DomainArn":{ "Fn::GetAtt" : ["var", "DomainArn"] },
+                "BootstrapBucket":{"Ref":"BootstrapBucket"},
+                "BootstrapPrefix":{"Ref":"BootstrapPrefix"},
+                "Type":{ "Fn::GetAtt" : ["var", "Type"] },
+                "Index":{ "Fn::GetAtt" : ["var", "Index"] },
+                "EmptyMessage":{ "Fn::GetAtt" : ["var", "ErrorMessage"] },
+                "ErrorMessage":{ "Fn::GetAtt" : ["var", "EmptyMessage"] }
+            }
+        }
+    },
+    "Cognito":{
+        "Type" : "AWS::CloudFormation::Stack",
+        "Properties" : {
+            "TemplateURL" : {"Fn::Join":["/",[
+                "https://s3.amazonaws.com",
+                {"Ref":"BootstrapBucket"},
+                {"Ref":"BootstrapPrefix"},
+                "templates/cognito.json"
+            ]]},
+            "Parameters":{
+                "Password":{"Ref":"AdminPassword"},
+                "BootstrapPrefix":{"Ref":"BootstrapPrefix"},
+                "BootstrapBucket":{"Ref":"BootstrapBucket"}
+            }
+        }
+    },
+    "QnABot":{
+        "Type" : "AWS::CloudFormation::Stack",
+        "Properties" : {
+            "TemplateURL" : {"Fn::Join":["/",[
+                "https://s3.amazonaws.com",
+                {"Ref":"BootstrapBucket"},
+                {"Ref":"BootstrapPrefix"},
+                "templates/lex.json"
+            ]]},
+            "Parameters":{
+                "Arn":{ "Fn::GetAtt" : ["Fulfilment", "Outputs.Arn"] },
+                "BootstrapBucket":{"Ref":"BootstrapBucket"},
+                "BootstrapPrefix":{"Ref":"BootstrapPrefix"},
+                "Role":{"Fn::GetAtt":["Cognito","Outputs.UnauthenticatedRole"]}
+            }
+        }
+    },
+    "Handler":{
+        "Type" : "AWS::CloudFormation::Stack",
+        "Properties" : {
+            "TemplateURL" : {"Fn::Join":["/",[
+                "https://s3.amazonaws.com",
+                {"Ref":"BootstrapBucket"},
+                {"Ref":"BootstrapPrefix"},
+                "templates/handler.json"
+            ]]},
+            "Parameters":{
+                "BootstrapBucket":{"Ref":"BootstrapBucket"},
+                "BootstrapPrefix":{"Ref":"BootstrapPrefix"},
+                "Address":{"Fn::GetAtt":["var","Address"]},
+                "DomainArn":{"Fn::GetAtt":["var","DomainArn"]},
+                "Index": {"Fn::GetAtt":["var","Index"]},
+                "Type":{"Fn::GetAtt":["var","Type"]},
+                "ErrorMessage":{"Fn::GetAtt":["var","ErrorMessage"]},
+                "EmptyMessage":{"Fn::GetAtt":["var","EmptyMessage"]},
+                "Bot":{"Fn::GetAtt":["QnABot","Outputs.Bot"]},
+                "Intent":{"Fn::GetAtt":["QnABot","Outputs.Intent"]},
+                "SlotType":{"Fn::GetAtt":["QnABot","Outputs.SlotType"]}
+            }
+        }
+    },
+    "Health":{
+        "Type" : "AWS::CloudFormation::Stack",
+        "Properties" : {
+            "TemplateURL" : {"Fn::Join":["/",[
+                "https://s3.amazonaws.com",
+                {"Ref":"BootstrapBucket"},
+                {"Ref":"BootstrapPrefix"},
+                "templates/handler.json"
+            ]]},
+            "Parameters":{
+                "BootstrapBucket":{"Ref":"BootstrapBucket"},
+                "BootstrapPrefix":{"Ref":"BootstrapPrefix"},
+                "Address":{"Fn::GetAtt":["var","Address"]},
+                "DomainArn":{"Fn::GetAtt":["var","DomainArn"]},
+                "Index": {"Fn::GetAtt":["var","Index"]},
+                "Type":{"Fn::GetAtt":["var","Type"]},
+                "Intent":"" ,
+                "Bot":{"Fn::GetAtt":["QnABot","Outputs.Bot"]},
+                "ErrorMessage":{"Fn::GetAtt":["var","ErrorMessage"]},
+                "EmptyMessage":{"Fn::GetAtt":["var","EmptyMessage"]}
+            }
+        }
+    },
+    "api":{
+        "Type" : "AWS::CloudFormation::Stack",
+        "Properties" : {
+            "TemplateURL" : {"Fn::Join":["/",[
+                "https://s3.amazonaws.com",
+                {"Ref":"BootstrapBucket"},
+                {"Ref":"BootstrapPrefix"},
+                "templates/api.json"
+            ]]},
+            "Parameters":{
+                "HealthArn":{"Fn::GetAtt":["Health","Outputs.Arn"]},
+                "HandlerArn":{"Fn::GetAtt":["Handler","Outputs.Arn"]},
+                "UserPoolArn":{"Fn::GetAtt":["Cognito","Outputs.UserPoolArn"]},
+                "Role":{"Fn::GetAtt":["Cognito","Outputs.AuthenticatedRole"]},
+                "Botname":{"Fn::GetAtt":["QnABot","Outputs.Bot"]},
+                "PoolId": {"Fn::GetAtt":["Cognito","Outputs.PoolId"]},
+                "ClientId":{"Fn::GetAtt":["Cognito","Outputs.Client"]},
+                "UserPool":{"Fn::GetAtt":["Cognito","Outputs.UserPool"]},
+                "Id":{"Ref":"AWS::StackName"},
+                "FulfilmentArn":{ "Fn::GetAtt" : ["Fulfilment", "Outputs.Arn"] },
+                "Utterances":{"Fn::Join":["\n",[
+                    "uterances.1",
+                    "uterances.2"
+                ]]}
+            }
+        }
+    },
+    "adminUI":{
+        "Type" : "AWS::CloudFormation::Stack",
+        "Properties" : {
+            "TemplateURL" : {"Fn::Join":["/",[
+                "https://s3.amazonaws.com",
+                {"Ref":"BootstrapBucket"},
+                {"Ref":"BootstrapPrefix"},
+                "templates/qna-admin-ui.json"
+            ]]},
+            "Parameters":{
+                "BootstrapPrefix":{"Ref":"BootstrapPrefix"},
+                "BootstrapBucket":{"Ref":"BootstrapBucket"}
+            }
+        }
+    },
+    "distribution":{
+        "Type" : "AWS::CloudFormation::Stack",
+        "Properties" : {
+            "TemplateURL" : {"Fn::Join":["/",[
+                "https://s3.amazonaws.com",
+                {"Ref":"BootstrapBucket"},
+                {"Ref":"BootstrapPrefix"},
+                "templates/distribution.json"
+            ]]},
+            "Parameters":{
+                "StaticUrl": {"Fn::GetAtt":["adminUI","Outputs.URL"]},
+                "DynamicUrl": {"Fn::GetAtt":["api","Outputs.URL"]}
+            }
+        }
+    },
+    "dashboard":{
+        "Type" : "AWS::CloudFormation::Stack",
+        "Properties" : {
+            "TemplateURL" : {"Fn::Join":["/",[
+                "https://s3.amazonaws.com",
+                {"Ref":"BootstrapBucket"},
+                {"Ref":"BootstrapPrefix"},
+                "templates/dashboard.json"
+            ]]},
+            "Parameters":{
+                "Name":{"Ref":"AWS::StackName"},
+                "APIGateWay":{"Fn::GetAtt":["api","Outputs.Name"]},
+                "ESDomain":{"Fn::GetAtt":["domain","Outputs.ESDomain"]},
+                "Distribution":{"Fn::GetAtt":["distribution","Outputs.Id"]},
+                "BotName":{"Fn::GetAtt":["QnABot","Outputs.Bot"]},
+                "AdminLambda":{"Fn::GetAtt":["Handler","Outputs.Name"]},
+                "FulfilmentLambda":{"Fn::GetAtt":["Fulfilment","Outputs.Name"]},
+                "AdminBucketHealthCheck":{"Fn::GetAtt":["adminUI","Outputs.Check"]},
+                "CloudFrontAPIHealth":{"Fn::GetAtt":["distribution","Outputs.DynamicCheck"]},
+                "CloudFrontAdminHealth":{"Fn::GetAtt":["distribution","Outputs.StaticCheck"]}
+            }
+        }
+    }
+  },
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "QnABot with admin and client websites",
+  "Outputs":{
+    "AdminBucket":{
+        "Value":{"Fn::GetAtt":["adminUI","Outputs.Bucket"]}
+    },
+    "BotName":{
+        "Value":{"Fn::GetAtt":["QnABot","Outputs.Bot"]}
+    },
+    "HandlerArn":{
+        "Value":{"Fn::GetAtt":["Handler","Outputs.Arn"]}
+    },
+    "HealthArn":{
+        "Value":{"Fn::GetAtt":["Health","Outputs.Arn"]}
+    },
+    "FulfilmentArn":{
+        "Value":{"Fn::GetAtt":["Fulfilment","Outputs.Arn"]}
+    },
+    "ContentDesignerURL":{
+        "Value":{"Fn::GetAtt":["distribution","Outputs.DesignerURL"]}
+    },
+    "ClientURL":{
+        "Value":{"Fn::GetAtt":["distribution","Outputs.ClientURL"]}
+    },
+    "ApiURL":{
+        "Value": {"Fn::GetAtt":["api","Outputs.URL"]}
+    },
+    "DashboardUrl":{
+        "Value":{"Fn::Join":["",[
+            "https://console.aws.amazon.com/cloudwatch/home?",
+            "region=",{"Ref":"AWS::Region"},
+            "#dashboards:name=",{"Fn::GetAtt":["dashboard","Outputs.name"]}
+        ]]}
+    }
+  }
+}

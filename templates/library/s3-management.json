@@ -1,0 +1,108 @@
+{
+  "Resources": {
+    "Analytics": {
+      "Type": "Custom::Analytics",
+      "Properties": {
+        "ServiceToken": {
+          "Ref": "AnalyticsArn"
+        },
+        "Bucket": {
+          "Ref": "Bucket"
+        },
+        "AnalyticsConfiguration": {
+          "StorageClassAnalysis": {
+            "DataExport": {
+              "Destination": {
+                "S3BucketDestination": {
+                  "Bucket": {
+                    "Fn::ImportValue": "LogBucketArn"
+                  },
+                  "Format": "CSV",
+                  "Prefix": {
+                    "Fn::ImportValue": "S3Analytics"
+                  }
+                }
+              },
+              "OutputSchemaVersion": "V_1"
+            }
+          }
+        }
+      }
+    },
+    "Metrics": {
+      "Type": "Custom::Metrics",
+      "Properties": {
+        "ServiceToken": {
+          "Ref": "MetricsArn"
+        },
+        "Bucket": {
+          "Ref": "Bucket"
+        },
+        "MetricsConfiguration": {}
+      }
+    },
+    "Logging": {
+      "Type": "Custom::Logging",
+      "Properties": {
+        "ServiceToken": {
+          "Ref": "LoggingArn"
+        },
+        "Bucket": {
+          "Ref": "Bucket"
+        },
+        "MetricsConfiguration": {}
+      }
+    },
+    "Inventory": {
+      "Type": "Custom::Inventory",
+      "Properties": {
+        "ServiceToken": {
+          "Ref": "InventoryArn"
+        },
+        "Bucket": {
+          "Ref": "Bucket"
+        },
+        "InventoryConfiguration": {
+          "Destination": {
+            "S3BucketDestination": {
+              "Bucket": {
+                "Fn::ImportValue": "LogBucketArn"
+              },
+              "Format": "CSV",
+              "Prefix": {
+                "Fn::ImportValue": "S3AccessLogs"
+              }
+            }
+          },
+          "IncludedObjectVersions": "All",
+          "IsEnabled": true,
+          "Schedule": {
+            "Frequency": "Daily"
+          }
+        }
+      }
+    }
+  },
+  "Conditions": {},
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "lambda function to build a lambda function",
+  "Mappings": {},
+  "Outputs": {},
+  "Parameters": {
+    "Bucket": {
+      "Type": "String"
+    },
+    "InventoryArn": {
+      "Type": "String"
+    },
+    "MetricsArn": {
+      "Type": "String"
+    },
+    "LoggingArn": {
+      "Type": "String"
+    },
+    "AnalyticsArn": {
+      "Type": "String"
+    }
+  }
+}

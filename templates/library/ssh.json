@@ -1,0 +1,466 @@
+{
+  "Resources": {
+    "keypair": {
+      "Type": "AWS::CloudFormation::Stack",
+      "Properties": {
+        "TemplateURL": {
+          "Fn::Join": [
+            "/",
+            [
+              "https://s3.amazonaws.com",
+              {
+                "Fn::ImportValue": "AssetBucket"
+              },
+              {
+                "Fn::ImportValue": "TemplateLibrary"
+              },
+              "keypair.template"
+            ]
+          ]
+        },
+        "Parameters": {}
+      }
+    },
+    "Logs": {
+      "Type": "AWS::Logs::LogGroup",
+      "Properties": {
+        "RetentionInDays": 1
+      }
+    },
+    "CloudWatchMetricPut": {
+      "Type": "AWS::IAM::ManagedPolicy",
+      "Properties": {
+        "PolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Sid": "CloudWatchLogsPolicy",
+              "Effect": "Allow",
+              "Action": [
+                "cloudwatch:PutMetricData",
+                "cloudwatch:GetMetricStatistics",
+                "cloudwatch:ListMetrics",
+                "ec2:DescribeTags"
+              ],
+              "Resource": [
+                "*"
+              ]
+            }
+          ]
+        }
+      }
+    },
+    "Role": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "ec2.amazonaws.com"
+                ]
+              },
+              "Action": [
+                "sts:AssumeRole"
+              ]
+            }
+          ]
+        },
+        "Path": "/",
+        "ManagedPolicyArns": [
+          "arn:aws:iam::aws:policy/CloudWatchLogsFullAccess",
+          "arn:aws:iam::aws:policy/AWSCodeCommitPowerUser",
+          {
+            "Ref": "CloudWatchMetricPut"
+          },
+          "arn:aws:iam::aws:policy/AdministratorAccess"
+        ]
+      }
+    },
+    "Profile": {
+      "Type": "AWS::IAM::InstanceProfile",
+      "Properties": {
+        "Path": "/",
+        "Roles": [
+          {
+            "Ref": "Role"
+          }
+        ]
+      }
+    },
+    "Instance": {
+      "Type": "AWS::EC2::Instance",
+      "CreationPolicy": {
+        "ResourceSignal": {
+          "Count": "1",
+          "Timeout": "PT10M"
+        }
+      },
+      "Metadata": {
+        "AWS::CloudFormation::Init": {
+          "config": {
+            "files": {
+              "/etc/awslogs/config/userdata.conf": {
+                "content": {
+                  "Fn::Join": [
+                    "\n",
+                    [
+                      "[/var/log/cloud-init-output.log]",
+                      "file = /var/log/cloud-init-output.log",
+                      {
+                        "Fn::Join": [
+                          "",
+                          [
+                            "log_group_name = ",
+                            {
+                              "Ref": "Logs"
+                            }
+                          ]
+                        ]
+                      },
+                      "log_stream_name ={instance_id}/cloud-init-output.log"
+                    ]
+                  ]
+                },
+                "mode": "000400",
+                "owner": "root",
+                "group": "root"
+              }
+            }
+          }
+        }
+      },
+      "Properties": {
+        "IamInstanceProfile": {
+          "Ref": "Profile"
+        },
+        "ImageId": {
+          "Ref": "AMI"
+        },
+        "InstanceType": {
+          "Ref": "InstanceType"
+        },
+        "KeyName": {
+          "Fn::GetAtt": [
+            "keypair",
+            "Outputs.Id"
+          ]
+        },
+        "SecurityGroupIds": [
+          {
+            "Ref": "SG"
+          }
+        ],
+        "SubnetId": {
+          "Ref": "subnet"
+        },
+        "UserData": {
+          "Fn::Base64": {
+            "Fn::Join": [
+              "\n",
+              [
+                "#!/bin/bash -xe",
+                "yum update -y",
+                "yum install -y awslogs git tmux",
+                "service awslogs start",
+                "chkconfig awslogs on",
+                {
+                  "Fn::Join": [
+                    " ",
+                    [
+                      "/opt/aws/bin/cfn-init -s",
+                      {
+                        "Ref": "AWS::StackName"
+                      },
+                      "-r Instance"
+                    ]
+                  ]
+                },
+                {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "USER=",
+                      {
+                        "Ref": "User"
+                      }
+                    ]
+                  ]
+                },
+                "cd /home/$USER/",
+                "yum install perl-Switch perl-DateTime perl-Sys-Syslog perl-LWP-Protocol-https -y",
+                "curl http://aws-cloudwatch.s3.amazonaws.com/downloads/CloudWatchMonitoringScripts-1.2.1.zip -O",
+                "unzip CloudWatchMonitoringScripts-1.2.1.zip",
+                "rm CloudWatchMonitoringScripts-1.2.1.zip",
+                "cd aws-scripts-mon",
+                "chmod +x ./mon-put-instance-data.pl",
+                "./mon-put-instance-data.pl --mem-util --mem-used --mem-avail --verify --verbose",
+                "./mon-put-instance-data.pl --mem-util --mem-used --mem-avail --verbose",
+                {
+                  "Fn::Join": [
+                    " ",
+                    [
+                      "echo '",
+                      "* * * * *",
+                      "root",
+                      "/home/$USER/aws-scripts-mon/mon-put-instance-data.pl",
+                      "--mem-util",
+                      "--mem-used",
+                      "--mem-avail",
+                      "--from-cron",
+                      "--auto-scaling",
+                      "' >> /etc/crontab"
+                    ]
+                  ]
+                },
+                "cat /etc/crontab",
+                "cd /home/$USER/",
+                "curl --silent --location https://rpm.nodesource.com/setup_6.x | bash -",
+                "yum install -y nodejs",
+                {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "wget https://aws-codedeploy-",
+                      {
+                        "Ref": "AWS::Region"
+                      },
+                      ".s3.amazonaws.com/latest/install"
+                    ]
+                  ]
+                },
+                "/bin/chmod +x install",
+                "./install auto",
+                "export HOME=/home/$USER",
+                "git config --global credential.helper \"!aws codecommit credential-helper $@\"",
+                "git config --global credential.UseHttpPath true",
+                "git config --global url.\"https://\".insteadOf ssh://",
+                "cd /home/$USER",
+                "mkdir tmp -p",
+                "cd tmp",
+                "git clone ssh://git-codecommit.us-east-1.amazonaws.com/v1/repos/dotfiles",
+                "cd dotfiles",
+                "./INSTALL.sh -d /home/$USER",
+                "chown -R $USER:$USER /home/$USER",
+                "cd /opt",
+                "wget https://rpm.nodesource.com/setup_6.x",
+                "sudo bash ./setup_6.x",
+                "sudo yum install -y nodejs",
+                "cd /root",
+                {
+                  "Ref": "UserData"
+                },
+                {
+                  "Fn::Join": [
+                    " ",
+                    [
+                      "/opt/aws/bin/cfn-signal -e 0 --stack ",
+                      {
+                        "Ref": "AWS::StackName"
+                      },
+                      " --resource Instance ",
+                      " --region ",
+                      {
+                        "Ref": "AWS::Region"
+                      }
+                    ]
+                  ]
+                }
+              ]
+            ]
+          }
+        }
+      }
+    },
+    "SG": {
+      "Type": "AWS::EC2::SecurityGroup",
+      "Properties": {
+        "GroupDescription": "webserver security group",
+        "SecurityGroupIngress": [
+          {
+            "CidrIp": "0.0.0.0/0",
+            "FromPort": "22",
+            "ToPort": "22",
+            "IpProtocol": "tcp"
+          }
+        ],
+        "VpcId": {
+          "Ref": "VPC"
+        }
+      }
+    },
+    "sshUtil": {
+      "Type": "AWS::CloudFormation::Stack",
+      "Properties": {
+        "TemplateURL": {
+          "Fn::Join": [
+            "/",
+            [
+              "https://s3.amazonaws.com",
+              {
+                "Fn::ImportValue": "AssetBucket"
+              },
+              {
+                "Fn::ImportValue": "TemplateLibrary"
+              },
+              "cf-ssh.template"
+            ]
+          ]
+        },
+        "Parameters": {
+          "ReadPolicy": {
+            "Fn::GetAtt": [
+              "keypair",
+              "Outputs.accessPolicy"
+            ]
+          }
+        }
+      }
+    },
+    "ssh": {
+      "Type": "Custom::ssh",
+      "Properties": {
+        "ServiceToken": {
+          "Fn::GetAtt": [
+            "sshUtil",
+            "Outputs.Arn"
+          ]
+        },
+        "Script": {
+          "Fn::Join": [
+            "\n",
+            [
+              "set -x",
+              "mkdir tmp -p",
+              "cd tmp",
+              "aws configure set s3.signature_version s3v4",
+              {
+                "Fn::Sub": [
+                  "aws s3 cp s3://${BUCKET}/${KEY} .",
+                  {
+                    "BUCKET": {
+                      "Fn::GetAtt": [
+                        "keypair",
+                        "Outputs.Bucket"
+                      ]
+                    },
+                    "KEY": {
+                      "Fn::GetAtt": [
+                        "keypair",
+                        "Outputs.installScript"
+                      ]
+                    }
+                  }
+                ]
+              },
+              "chmod +x ./install.sh",
+              "./install.sh",
+              "cd ~/tmp",
+              "mkdir ~/.npm-global",
+              "npm config set prefix '~/.npm-global'",
+              "export PATH=~/.npm-global/bin:$PATH",
+              "echo 'export PATH=~/.npm-global/bin:$PATH' >> ~/.bashrc",
+              "npm install -g git+ssh://git-codecommit.us-east-1.amazonaws.com/v1/repos/aws-tools"
+            ]
+          ]
+        },
+        "Address": {
+          "Fn::GetAtt": [
+            "Instance",
+            "PublicIp"
+          ]
+        },
+        "PrivateKeyBucket": {
+          "Fn::GetAtt": [
+            "keypair",
+            "Outputs.Bucket"
+          ]
+        },
+        "PrivateKey": {
+          "Fn::GetAtt": [
+            "keypair",
+            "Outputs.privateKey"
+          ]
+        },
+        "UserName": {
+          "Ref": "User"
+        }
+      }
+    }
+  },
+  "Conditions": {},
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "A Demonstration of Three Teir nodejs application",
+  "Mappings": {},
+  "Outputs": {
+    "Address": {
+      "Value": {
+        "Fn::GetAtt": [
+          "Instance",
+          "PublicIp"
+        ]
+      }
+    },
+    "InstanceID": {
+      "Value": {
+        "Ref": "Instance"
+      }
+    },
+    "PrivateKeyBucket": {
+      "Value": {
+        "Fn::GetAtt": [
+          "keypair",
+          "Outputs.Bucket"
+        ]
+      }
+    },
+    "PrivateKey": {
+      "Value": {
+        "Fn::GetAtt": [
+          "keypair",
+          "Outputs.privateKey"
+        ]
+      }
+    },
+    "SG": {
+      "Value": {
+        "Ref": "SG"
+      }
+    },
+    "Role": {
+      "Value": {
+        "Ref": "Role"
+      }
+    },
+    "User": {
+      "Value": {
+        "Ref": "User"
+      }
+    }
+  },
+  "Parameters": {
+    "VPC": {
+      "Type": "String"
+    },
+    "subnet": {
+      "Type": "String"
+    },
+    "AMI": {
+      "Type": "String"
+    },
+    "InstanceType": {
+      "Type": "String",
+      "Default": "t2.nano"
+    },
+    "UserData": {
+      "Type": "String",
+      "Default": ""
+    },
+    "User": {
+      "Type": "String",
+      "Default": "ec2-user"
+    }
+  }
+}

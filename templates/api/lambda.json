@@ -1,0 +1,22 @@
+{
+"InvokePermissionHandler": {
+  "Type": "AWS::Lambda::Permission",
+  "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+      "Ref": "HandlerArn"
+    },
+    "Principal": "apigateway.amazonaws.com"
+  }
+},
+"InvokePermissionHealth": {
+  "Type": "AWS::Lambda::Permission",
+  "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+      "Ref": "HealthArn"
+    },
+    "Principal": "apigateway.amazonaws.com"
+  }
+}
+}    

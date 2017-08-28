@@ -1,0 +1,18 @@
+{
+    "Bucket":"jmc-sa-website",
+    "AnalyticsConfiguration": {
+        "StorageClassAnalysis": { 
+          "DataExport": {
+            "Destination": { 
+              "S3BucketDestination": {
+                "Bucket": "arn:aws:s3:::jmc-sa-test", 
+                "Format": "CSV", 
+                "Prefix": "analyticstest"
+              }
+            },
+            "OutputSchemaVersion": "V_1"
+          }
+        }
+    }
+}
+

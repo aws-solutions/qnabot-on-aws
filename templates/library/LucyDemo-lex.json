@@ -1,0 +1,221 @@
+{
+  "Resources": {
+    "cognito": {
+      "Type": "AWS::CloudFormation::Stack",
+      "Properties": {
+        "TemplateURL": {
+          "Fn::Join": [
+            "/",
+            [
+              "https://s3.amazonaws.com",
+              {
+                "Fn::ImportValue": "AssetBucket"
+              },
+              {
+                "Fn::ImportValue": "TemplateLibrary"
+              },
+              "cognito-tmp.template"
+            ]
+          ]
+        },
+        "Parameters": {
+          "Role": {
+            "Fn::GetAtt": [
+              "Role",
+              "Arn"
+            ]
+          }
+        }
+      }
+    },
+    "InvokePermission": {
+      "Type": "AWS::Lambda::Permission",
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "FunctionName": {
+          "Ref": "Arn"
+        },
+        "Principal": "lex.amazonaws.com"
+      }
+    },
+    "Lex": {
+      "Type": "AWS::CloudFormation::Stack",
+      "Properties": {
+        "TemplateURL": {
+          "Fn::Join": [
+            "/",
+            [
+              "https://s3.amazonaws.com",
+              {
+                "Fn::ImportValue": "AssetBucket"
+              },
+              {
+                "Fn::ImportValue": "TemplateLibrary"
+              },
+              "cf-lex.template"
+            ]
+          ]
+        },
+        "Parameters": {}
+      }
+    },
+    "Intent": {
+      "Type": "Custom::Intent",
+      "Properties": {
+        "ServiceToken": {
+          "Fn::GetAtt": [
+            "Lex",
+            "Outputs.intentArn"
+          ]
+        },
+        "sampleUtterances": [
+          "hello World"
+        ],
+        "slots": [],
+        "fulfillmentActivity": {
+          "type": "CodeHook",
+          "codeHook": {
+            "uri": {
+              "Ref": "Arn"
+            },
+            "messageVersion": "1.0"
+          }
+        }
+      },
+      "DependsOn": "InvokePermission"
+    },
+    "Bot": {
+      "Type": "Custom::Bot",
+      "Properties": {
+        "ServiceToken": {
+          "Fn::GetAtt": [
+            "Lex",
+            "Outputs.botArn"
+          ]
+        },
+        "locale": "en-US",
+        "voiceId": "Gwyneth",
+        "childDirected": false,
+        "intents": [
+          {
+            "intentName": {
+              "Ref": "Intent"
+            },
+            "intentVersion": "$LATEST"
+          }
+        ],
+        "clarificationPrompt": {
+          "maxAttempts": 1,
+          "messages": [
+            {
+              "content": "Who?",
+              "contentType": "PlainText"
+            }
+          ]
+        },
+        "abortStatement": {
+          "messages": [
+            {
+              "content": "GoodBye",
+              "contentType": "PlainText"
+            }
+          ]
+        }
+      }
+    },
+    "Alias": {
+      "Type": "Custom::Alias",
+      "Properties": {
+        "ServiceToken": {
+          "Fn::GetAtt": [
+            "Lex",
+            "Outputs.aliasArn"
+          ]
+        },
+        "botName": {
+          "Ref": "Bot"
+        },
+        "botVersion": "$LATEST"
+      },
+      "DependsOn": "Bot"
+    },
+    "LexPolicy": {
+      "Type": "AWS::IAM::ManagedPolicy",
+      "Properties": {
+        "PolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Action": [
+                "lex:PostContent",
+                "lex:PostText"
+              ],
+              "Resource": [
+                "*"
+              ]
+            }
+          ]
+        }
+      }
+    },
+    "Role": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Sid": "",
+              "Effect": "Allow",
+              "Principal": {
+                "Federated": "cognito-identity.amazonaws.com"
+              },
+              "Action": "sts:AssumeRoleWithWebIdentity"
+            }
+          ]
+        },
+        "Path": "/",
+        "ManagedPolicyArns": [
+          {
+            "Ref": "LexPolicy"
+          }
+        ]
+      }
+    }
+  },
+  "Conditions": {},
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "lambda function to build a lambda function",
+  "Mappings": {},
+  "Outputs": {
+    "IdPool": {
+      "Value": {
+        "Fn::GetAtt": [
+          "cognito",
+          "Outputs.IdPool"
+        ]
+      }
+    },
+    "BotName": {
+      "Value": {
+        "Ref": "Bot"
+      }
+    },
+    "BotAlias": {
+      "Value": {
+        "Ref": "Alias"
+      }
+    },
+    "Intent": {
+      "Value": {
+        "Ref": "Intent"
+      }
+    }
+  },
+  "Parameters": {
+    "Arn": {
+      "Type": "String"
+    }
+  }
+}

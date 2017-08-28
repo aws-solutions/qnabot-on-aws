@@ -1,0 +1,69 @@
+{
+"API": {
+  "Type": "AWS::ApiGateway::RestApi",
+  "Properties": {
+    "Name": {"Ref": "AWS::StackName"},
+    "Description":"An Api interface for the admin actions on the QNA bot"
+  },
+  "DependsOn": ["InvokePermissionHealth","InvokePermissionHandler"]
+},
+"Deployment": {
+  "Type": "AWS::ApiGateway::Deployment",
+  "Properties": {
+    "RestApiId": {
+      "Ref": "API"
+    }
+  },
+  "DependsOn": [
+    "infoGet",
+    "RootOptions",
+    "RootPut",
+    "RootPost",
+    "RootGet",
+    "SearchOptions",
+    "SearchGet",
+    "QuestionOptions",
+    "QuestionHead",
+    "QuestionPut",
+    "QuestionDelete",
+    "BotPost",
+    "BotOptions",
+    "BotGetStatus",
+    "BotStatusOptions",
+    "BotGet",
+    "clientGet",
+    "HealthGet"
+  ]
+},
+"Stage": {
+  "Type": "AWS::ApiGateway::Stage",
+  "Properties": {
+    "DeploymentId": {
+      "Ref": "Deployment"
+    },
+    "RestApiId": {
+      "Ref": "API"
+    },
+    "StageName": "api",
+    "MethodSettings": [
+      {
+        "DataTraceEnabled": true,
+        "HttpMethod": "*",
+        "LoggingLevel": "INFO",
+        "ResourcePath": "/*"
+      }
+    ]
+  }
+},
+"ApiGatewayAccount": {
+  "Type": "AWS::ApiGateway::Account",
+  "Properties": {
+    "CloudWatchRoleArn": {
+      "Fn::GetAtt": [
+        "ApiGatewayCloudWatchLogsRole",
+        "Arn"
+      ]
+    }
+  }
+}
+}

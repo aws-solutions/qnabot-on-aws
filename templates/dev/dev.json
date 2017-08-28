@@ -1,0 +1,42 @@
+{
+  "Resources": {
+    "Bucket":{
+        "Type" : "AWS::CloudFormation::Stack",
+        "Properties" : {
+            "TemplateURL" : {"Fn::Join":["/",[
+                "https://s3.amazonaws.com",
+                {"Fn::ImportValue":"QNA-BOOTSTRAP-BUCKET"},
+                "templates/dev/bucket.json"
+            ]]},
+            "Parameters":{}
+        }
+    },
+    "ES":{
+        "Type" : "AWS::CloudFormation::Stack",
+        "Properties" : {
+            "TemplateURL" : {"Fn::Join":["/",[
+                "https://s3.amazonaws.com",
+                {"Fn::ImportValue":"QNA-BOOTSTRAP-BUCKET"},
+                "templates/dev/es.json"
+            ]]},
+            "Parameters":{}
+        }
+    },
+    "Handler":{
+        "Type" : "AWS::CloudFormation::Stack",
+        "Properties" : {
+            "TemplateURL" : {"Fn::Join":["/",[
+                "https://s3.amazonaws.com",
+                {"Fn::ImportValue":"QNA-BOOTSTRAP-BUCKET"},
+                "templates/dev/handler.json"
+            ]]},
+            "Parameters":{}
+        },
+        "DependsOn":"ES"
+    }
+  },
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "Test of the variable lambda function",
+  "Outputs":{
+  }
+}

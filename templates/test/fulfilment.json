@@ -1,0 +1,25 @@
+{
+  "Resources": {
+    "Handler":{
+        "Type" : "AWS::CloudFormation::Stack",
+        "Properties" : {
+            "TemplateURL" : {"Fn::Join":["/",[
+                "https://s3.amazonaws.com",
+                {"Fn::ImportValue":"QNA-BOOTSTRAP-BUCKET"},
+                {"Fn::ImportValue":"QNA-BOOTSTRAP-PREFIX"},
+                "templates/fulfilment.json"
+            ]]},
+            "Parameters":{
+                "Address":{"Fn::ImportValue":"QNA-DEV-ED-ADDRESS"},
+                "DomainArn":{"Fn::ImportValue":"QNA-DEV-ED-ARN"},
+                "BootstrapPrefix":{"Fn::ImportValue":"QNA-BOOTSTRAP-PREFIX"},
+                "BootstrapBucket":{"Fn::ImportValue":"QNA-BOOTSTRAP-BUCKET"}
+            }
+        }
+    }
+  },
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "Test of the variable lambda function",
+  "Outputs":{
+  }
+}

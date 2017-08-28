@@ -1,0 +1,268 @@
+{
+"RootOptions":{
+  "Type": "AWS::ApiGateway::Method",
+  "Properties": {
+    "AuthorizationType": "NONE",
+    "HttpMethod": "OPTIONS",
+    "Integration": {
+      "Type": "MOCK",
+      "IntegrationResponses": [{
+        "ResponseParameters":{
+            "method.response.header.Access-Control-Allow-Headers": "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'",
+            "method.response.header.Access-Control-Allow-Methods":"'GET,POST,PUT,OPTIONS'",
+            "method.response.header.Access-Control-Allow-Origin": "'*'"
+        },
+        "ResponseTemplates":{
+            "application/json":""
+        },
+        "StatusCode":"200"
+      }],
+      "RequestTemplates": {
+        "application/json":"{\"statusCode\": 200}"
+      }
+    },
+    "ResourceId": {
+      "Fn::GetAtt": [
+        "API",
+        "RootResourceId"
+      ]
+    },
+    "MethodResponses": [
+      {
+        "StatusCode": 200,
+        "ResponseParameters":{
+            "method.response.header.Access-Control-Allow-Headers":true,
+            "method.response.header.Access-Control-Allow-Methods":true,
+            "method.response.header.Access-Control-Allow-Origin": true
+
+        }
+      },
+      {
+        "StatusCode": 400
+      }
+    ],
+    "RestApiId": {
+      "Ref": "API"
+    }
+  }
+},
+"RootPut": {
+  "Type": "AWS::ApiGateway::Method",
+  "Properties": {
+    "AuthorizationType": "AWS_IAM",
+    "HttpMethod": "PUT",
+    "Integration": {
+      "Type": "AWS",
+      "Credentials": {
+        "Fn::GetAtt": [
+          "ApiGatewayRole",
+          "Arn"
+        ]
+      },
+      "IntegrationHttpMethod": "POST",
+      "Uri": {
+        "Fn::Join": [
+          "",
+          [
+            "arn:aws:apigateway:",
+            {
+              "Ref": "AWS::Region"
+            },
+            ":lambda:path/2015-03-31/functions/",
+            {"Ref": "HandlerArn"},
+            "/invocations"
+          ]
+        ]
+      },
+      "IntegrationResponses": [
+        {
+            "ResponseParameters":{
+                "method.response.header.Access-Control-Allow-Origin": "'*'"
+            },
+            "StatusCode": 200
+        },
+        {
+          "StatusCode": 400
+        }
+      ],
+      "RequestTemplates": {
+        "application/json": {
+          "Fn::Join": [
+            "",
+            [
+              "{",
+              "\"Command\":\"ADD\",",
+              "\"Body\":$input.body",
+              "}"
+            ]
+          ]
+        }
+      }
+    },
+    "ResourceId": {
+      "Fn::GetAtt": [
+        "API",
+        "RootResourceId"
+      ]
+    },
+    "MethodResponses": [
+      {
+        "ResponseParameters":{
+            "method.response.header.Access-Control-Allow-Origin": true
+        },
+        "StatusCode": 200
+      },
+      {
+        "StatusCode": 400
+      }
+    ],
+    "RestApiId": {
+      "Ref": "API"
+    }
+  }
+},
+"RootGet": {
+  "Type": "AWS::ApiGateway::Method",
+  "Properties": {
+    "AuthorizationType": "AWS_IAM",
+    "HttpMethod": "GET",
+    "Integration": {
+      "Type": "AWS",
+      "IntegrationHttpMethod": "POST",
+      "Uri": {
+        "Fn::Join": [
+          "",
+          [
+            "arn:aws:apigateway:",
+            {
+              "Ref": "AWS::Region"
+            },
+            ":lambda:path/2015-03-31/functions/",
+            {"Ref": "HandlerArn"},
+            "/invocations"
+          ]
+        ]
+      },
+      "IntegrationResponses": [
+        {
+          "StatusCode": 200,
+            "ResponseParameters":{
+                "method.response.header.Access-Control-Allow-Origin": "'*'"
+            }
+        }
+      ],
+      "RequestTemplates": {
+        "application/json": {
+          "Fn::Join": [
+            "",
+            [
+              "#if($input.params('from') == 'all')",
+                "{\"Command\":\"EXPORT\"}",
+              "#else",  
+                  "{",
+                  "\"Command\":\"LIST\",",
+                  "\"From\":\"$input.params('from')\",",
+                  "\"Filter\":\"$input.params('filter')\",",
+                  "\"Perpage\":\"$input.params('perpage')\"",
+                  "}",
+              "#end"
+            ]
+          ]
+        }
+      }
+    },
+    "ResourceId": {
+      "Fn::GetAtt": [
+        "API",
+        "RootResourceId"
+      ]
+    },
+    "RequestParameters": {
+      "method.request.querystring.from": false,
+      "method.request.querystring.perpage": false,
+      "method.request.querystring.filter": false
+    },
+    "MethodResponses": [
+      {
+        "StatusCode": 200,
+        "ResponseParameters":{
+            "method.response.header.Access-Control-Allow-Headers":true,
+            "method.response.header.Access-Control-Allow-Methods":true,
+            "method.response.header.Access-Control-Allow-Origin": true
+        }
+      },
+      {
+        "StatusCode": 400
+      }
+    ],
+    "RestApiId": {
+      "Ref": "API"
+    }
+  }
+},
+"RootPost": {
+  "Type": "AWS::ApiGateway::Method",
+  "Properties": {
+    "AuthorizationType": "AWS_IAM",
+    "HttpMethod": "POST",
+    "Integration": {
+      "Type": "AWS",
+      "IntegrationHttpMethod": "POST",
+      "Uri": {
+        "Fn::Join": [
+          "",
+          [
+            "arn:aws:apigateway:",
+            {
+              "Ref": "AWS::Region"
+            },
+            ":lambda:path/2015-03-31/functions/",
+            {"Ref": "HandlerArn"},
+            "/invocations"
+          ]
+        ]
+      },
+      "IntegrationResponses": [
+        {
+            "ResponseParameters":{
+                "method.response.header.Access-Control-Allow-Origin": "'*'"
+            },
+            "StatusCode": 200
+        }
+      ],
+      "RequestTemplates": {
+        "application/json": {
+          "Fn::Join": [
+            "",
+            [
+              "{",
+              "\"Command\":\"SAVE\"",
+              "}"
+            ]
+          ]
+        }
+      }
+    },
+    "ResourceId": {
+      "Fn::GetAtt": [
+        "API",
+        "RootResourceId"
+      ]
+    },
+    "MethodResponses": [
+      {
+        "ResponseParameters":{
+            "method.response.header.Access-Control-Allow-Origin": true
+        },
+        "StatusCode": 200
+      },
+      {
+        "StatusCode": 400
+      }
+    ],
+    "RestApiId": {
+      "Ref": "API"
+    }
+  }
+}
+}

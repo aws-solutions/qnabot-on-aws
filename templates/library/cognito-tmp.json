@@ -1,0 +1,40 @@
+{
+  "Resources": {
+    "IdPool": {
+      "Type": "AWS::Cognito::IdentityPool",
+      "Properties": {
+        "IdentityPoolName": "UserPool",
+        "AllowUnauthenticatedIdentities": true
+      }
+    },
+    "RoleAttachment": {
+      "Type": "AWS::Cognito::IdentityPoolRoleAttachment",
+      "Properties": {
+        "IdentityPoolId": {
+          "Ref": "IdPool"
+        },
+        "Roles": {
+          "unauthenticated": {
+            "Ref": "Role"
+          }
+        }
+      }
+    }
+  },
+  "Conditions": {},
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "A Demonstration of Three Teir nodejs application",
+  "Mappings": {},
+  "Outputs": {
+    "IdPool": {
+      "Value": {
+        "Ref": "IdPool"
+      }
+    }
+  },
+  "Parameters": {
+    "Role": {
+      "Type": "String"
+    }
+  }
+}

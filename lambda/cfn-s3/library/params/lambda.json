@@ -1,0 +1,11 @@
+{
+    "NotificationConfiguration": { 
+        "LambdaFunctionConfigurations": [{
+			"Events": [ 
+			   "s3:ObjectCreated:*"
+			],
+			"LambdaFunctionArn":"" 
+		}]
+    }
+}
+

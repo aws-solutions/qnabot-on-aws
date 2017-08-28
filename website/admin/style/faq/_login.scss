@@ -1,0 +1,33 @@
+#login {
+  @include panel();
+  position:absolute;
+  transform:translate(-50%,-50%);
+  top:50%;
+  left:50%;
+  width:50%;
+  
+  h2 {
+    text-align:center;
+  }
+
+  #loginPage {
+    display:flex; 
+  }
+  .login-spinner{
+    font-size:.4em;
+  }
+  form {
+    flex:1;
+  }
+  #Logo {
+    flex:1;
+  }
+  label {
+    display:inline-block;
+    width:100%;
+  }
+  button {
+    width:100%;
+  }
+}   
+  

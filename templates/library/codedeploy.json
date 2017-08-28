@@ -1,0 +1,96 @@
+{
+  "Conditions": {},
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "A Demonstration of Three Teir nodejs application",
+  "Mappings": {},
+  "Outputs": {
+    "app": {
+      "Value": {
+        "Ref": "app"
+      }
+    },
+    "group": {
+      "Value": {
+        "Ref": "group"
+      }
+    }
+  },
+  "Parameters": {
+    "ProjectName": {
+      "Type": "String"
+    },
+    "AutoScaling": {
+      "Type": "String"
+    }
+  },
+  "Resources": {
+    "app": {
+      "Type": "AWS::CodeDeploy::Application",
+      "Properties": {}
+    },
+    "group": {
+      "Type": "AWS::CodeDeploy::DeploymentGroup",
+      "Properties": {
+        "ApplicationName": {
+          "Ref": "app"
+        },
+        "AutoScalingGroups": [
+          {
+            "Ref": "AutoScaling"
+          }
+        ],
+        "DeploymentConfigName": "CodeDeployDefault.AllAtOnce",
+        "ServiceRoleArn": {
+          "Fn::GetAtt": [
+            "CodeDeployRole",
+            "Arn"
+          ]
+        },
+        "Deployment": {
+          "Revision": {
+            "RevisionType": "S3",
+            "S3Location": {
+              "Key": {
+                "Fn::Join": [
+                  "/",
+                  [
+                    {
+                      "Ref": "ProjectName"
+                    },
+                    "revisions.zip"
+                  ]
+                ]
+              },
+              "Bucket": {
+                "Fn::ImportValue": "AssetBucket"
+              },
+              "BundleType": "zip"
+            }
+          }
+        }
+      }
+    },
+    "CodeDeployRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Sid": "",
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "codedeploy.amazonaws.com"
+                ]
+              },
+              "Action": "sts:AssumeRole"
+            }
+          ]
+        },
+        "ManagedPolicyArns": [
+          "arn:aws:iam::aws:policy/service-role/AWSCodeDeployRole"
+        ]
+      }
+    }
+  }
+}

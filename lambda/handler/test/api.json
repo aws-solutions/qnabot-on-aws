@@ -1,0 +1,12 @@
+{
+    "resource": "Resource path",
+    "path": "Path parameter",
+    "httpMethod": "Incoming request's method name",
+    "headers": {},
+    "queryStringParameters": {},
+    "pathParameters":  {},
+    "stageVariables": {},
+    "requestContext": {},
+    "body": "{}",
+    "isBase64Encoded":false
+}

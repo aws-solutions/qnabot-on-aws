@@ -1,0 +1,400 @@
+{
+  "Resources": {
+    "Project": {
+      "Type": "AWS::CodeBuild::Project",
+      "Properties": {
+        "Artifacts": {
+          "Packaging": "NONE",
+          "Type": "S3",
+          "Location": {
+            "Fn::GetAtt": [
+              "Bucket",
+              "Outputs.Bucket"
+            ]
+          },
+          "NamespaceType": "NONE",
+          "Path": "",
+          "Name": "website"
+        },
+        "Environment": {
+          "ComputeType": "BUILD_GENERAL1_SMALL",
+          "Image": "aws/codebuild/eb-nodejs-6.10.0-amazonlinux-64:4.0.0",
+          "Type": "LINUX_CONTAINER"
+        },
+        "Name": {
+          "Ref": "AWS::StackName"
+        },
+        "ServiceRole": {
+          "Fn::GetAtt": [
+            "build",
+            "Outputs.Role"
+          ]
+        },
+        "Source": {
+          "Location": {
+            "Fn::GetAtt": [
+              "variable",
+              "Source"
+            ]
+          },
+          "Type": "S3"
+        },
+        "TimeoutInMinutes": 10
+      }
+    },
+    "Build": {
+      "Type": "Custom::Build",
+      "Properties": {
+        "ServiceToken": {
+          "Fn::GetAtt": [
+            "build",
+            "Outputs.Arn"
+          ]
+        },
+        "projectName": {
+          "Ref": "Project"
+        },
+        "environmentVariablesOverride": [
+          {
+            "name": "IDPOOL",
+            "value": {
+              "Ref": "IdPool"
+            }
+          },
+          {
+            "name": "BOTNAME",
+            "value": {
+              "Ref": "BotName"
+            }
+          },
+          {
+            "name": "BOTALIAS",
+            "value": {
+              "Ref": "BotAlias"
+            }
+          }
+        ]
+      },
+      "DependsOn": [
+        "Project",
+        "ReadPolicy",
+        "GitPolicy"
+      ]
+    },
+    "Bucket": {
+      "Type": "AWS::CloudFormation::Stack",
+      "Properties": {
+        "TemplateURL": {
+          "Fn::Join": [
+            "/",
+            [
+              "https://s3.amazonaws.com",
+              {
+                "Fn::ImportValue": "AssetBucket"
+              },
+              {
+                "Fn::ImportValue": "TemplateLibrary"
+              },
+              "cf-s3-tmp.template"
+            ]
+          ]
+        }
+      }
+    },
+    "ReadPolicy": {
+      "Type": "AWS::IAM::ManagedPolicy",
+      "Properties": {
+        "PolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Action": [
+                "s3:getObject",
+                "s3:getObjectVersion"
+              ],
+              "Resource": [
+                {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:aws:s3:::",
+                      {
+                        "Fn::GetAtt": [
+                          "variable",
+                          "Source"
+                        ]
+                      }
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "Effect": "Allow",
+              "Action": [
+                "s3:put*",
+                "s3:get*"
+              ],
+              "Resource": [
+                {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:aws:s3:::",
+                      {
+                        "Fn::GetAtt": [
+                          "Bucket",
+                          "Outputs.Bucket"
+                        ]
+                      }
+                    ]
+                  ]
+                },
+                {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:aws:s3:::",
+                      {
+                        "Fn::GetAtt": [
+                          "Bucket",
+                          "Outputs.Bucket"
+                        ]
+                      },
+                      "/*"
+                    ]
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "Roles": [
+          {
+            "Fn::GetAtt": [
+              "build",
+              "Outputs.Role"
+            ]
+          }
+        ]
+      }
+    },
+    "GitPolicy": {
+      "Type": "AWS::IAM::ManagedPolicy",
+      "Properties": {
+        "PolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Action": [
+                "codecommit:BatchGetRepositories",
+                "codecommit:Get*",
+                "codecommit:GitPull",
+                "codecommit:List*"
+              ],
+              "Resource": "*"
+            }
+          ]
+        },
+        "Roles": [
+          {
+            "Fn::GetAtt": [
+              "build",
+              "Outputs.Role"
+            ]
+          }
+        ]
+      }
+    },
+    "build": {
+      "Type": "AWS::CloudFormation::Stack",
+      "Properties": {
+        "TemplateURL": {
+          "Fn::Join": [
+            "/",
+            [
+              "https://s3.amazonaws.com",
+              {
+                "Fn::ImportValue": "AssetBucket"
+              },
+              {
+                "Fn::ImportValue": "TemplateLibrary"
+              },
+              "cf-build.template"
+            ]
+          ]
+        },
+        "Parameters": {}
+      }
+    },
+    "Variable": {
+      "Type": "AWS::CloudFormation::Stack",
+      "Properties": {
+        "TemplateURL": {
+          "Fn::Join": [
+            "/",
+            [
+              "https://s3.amazonaws.com",
+              {
+                "Fn::ImportValue": "AssetBucket"
+              },
+              {
+                "Fn::ImportValue": "TemplateLibrary"
+              },
+              "cf-variable.template"
+            ]
+          ]
+        },
+        "Parameters": {}
+      }
+    },
+    "variable": {
+      "Type": "Custom::Variable",
+      "Properties": {
+        "ServiceToken": {
+          "Fn::GetAtt": [
+            "Variable",
+            "Outputs.Arn"
+          ]
+        },
+        "Source": {
+          "Fn::Join": [
+            "/",
+            [
+              {
+                "Fn::ImportValue": "AssetBucket"
+              },
+              {
+                "Fn::ImportValue": "ProjectLibrary"
+              },
+              "LucyDemoSite.zip"
+            ]
+          ]
+        }
+      }
+    },
+    "WebsiteBucket": {
+      "Type": "AWS::CloudFormation::Stack",
+      "Properties": {
+        "TemplateURL": {
+          "Fn::Join": [
+            "/",
+            [
+              "https://s3.amazonaws.com",
+              {
+                "Fn::ImportValue": "AssetBucket"
+              },
+              {
+                "Fn::ImportValue": "TemplateLibrary"
+              },
+              "s3website.template"
+            ]
+          ]
+        }
+      }
+    },
+    "Util": {
+      "Type": "AWS::CloudFormation::Stack",
+      "Properties": {
+        "TemplateURL": {
+          "Fn::Join": [
+            "/",
+            [
+              "https://s3.amazonaws.com",
+              {
+                "Fn::ImportValue": "AssetBucket"
+              },
+              {
+                "Fn::ImportValue": "TemplateLibrary"
+              },
+              "cf-s3-util.template"
+            ]
+          ]
+        },
+        "Parameters": {
+          "BucketArn": {
+            "Fn::Join": [
+              "",
+              [
+                "arn:aws:s3:::",
+                {
+                  "Fn::GetAtt": [
+                    "WebsiteBucket",
+                    "Outputs.WebsiteBucket"
+                  ]
+                }
+              ]
+            ]
+          },
+          "SrcBucket": {
+            "Fn::GetAtt": [
+              "Bucket",
+              "Outputs.Bucket"
+            ]
+          }
+        }
+      }
+    },
+    "Unzip": {
+      "Type": "Custom::Unzip",
+      "Properties": {
+        "ServiceToken": {
+          "Fn::GetAtt": [
+            "Util",
+            "Outputs.unzipArn"
+          ]
+        },
+        "SrcBucket": {
+          "Fn::GetAtt": [
+            "Bucket",
+            "Outputs.Bucket"
+          ]
+        },
+        "SrcKey": "website/artifacts/website.zip",
+        "DstBucket": {
+          "Fn::GetAtt": [
+            "WebsiteBucket",
+            "Outputs.WebsiteBucket"
+          ]
+        },
+        "DstPrefix": ""
+      },
+      "DependsOn": "Build"
+    }
+  },
+  "Conditions": {},
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "A static website hosted from s3",
+  "Mappings": {},
+  "Outputs": {
+    "WebsiteBucket": {
+      "Value": {
+        "Fn::GetAtt": [
+          "WebsiteBucket",
+          "Outputs.WebsiteBucket"
+        ]
+      }
+    },
+    "WebsiteUrl": {
+      "Value": {
+        "Fn::GetAtt": [
+          "WebsiteBucket",
+          "Outputs.WebsiteUrl"
+        ]
+      }
+    }
+  },
+  "Parameters": {
+    "IdPool": {
+      "Type": "String"
+    },
+    "BotName": {
+      "Type": "String"
+    },
+    "BotAlias": {
+      "Type": "String"
+    }
+  }
+}

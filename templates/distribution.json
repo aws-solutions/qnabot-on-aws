@@ -1,0 +1,230 @@
+{
+  "Conditions": {},
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "Creates a Cloudfront distribution that connects/delivers the Admin website and ApiGateway endpoints.",
+  "Mappings": {},
+  "Outputs": {
+    "DesignerURL": {"Value":{"Fn::Join":["",[
+        "https://",
+        {"Fn::GetAtt": ["DesignerDistribution","DomainName"]}
+    ]]}},
+    "ClientURL": {"Value":{"Fn::Join":["",[
+        "https://",
+        {"Fn::GetAtt": ["ClientDistribution","DomainName"]},
+        "/client.html"
+    ]]}},
+    "Id":{"Value":{"Ref":"DesignerDistribution"}},
+    "StaticCheck":{"Value":{"Ref":"StaticCheck"}},
+    "DynamicCheck":{"Value":{"Ref":"DynamicCheck"}}
+  },
+  "Parameters": {
+    "StaticUrl": {
+      "Type": "String"
+    },
+    "DynamicUrl": {
+      "Type": "String"
+    }
+  },
+  "Resources": {
+    "ClientDistribution": {
+      "Type": "AWS::CloudFront::Distribution",
+      "Properties": {
+        "DistributionConfig": {
+          "Origins": [
+            {
+              "DomainName": {
+                "Ref": "StaticUrl"
+              },
+              "Id": "static",
+              "S3OriginConfig": {}
+            },
+            {
+              "DomainName": {
+                "Ref": "DynamicUrl"
+              },
+              "Id": "dynamic",
+              "CustomOriginConfig": {
+                "HTTPPort": 443,
+                "OriginProtocolPolicy": "https-only"
+              }
+            }
+          ],
+          "CacheBehaviors": [
+            {
+              "AllowedMethods": [
+                "HEAD",
+                "DELETE",
+                "POST",
+                "GET",
+                "OPTIONS",
+                "PUT",
+                "PATCH"
+              ],
+              "CachedMethods": [
+                "HEAD",
+                "GET"
+              ],
+              "Compress": true,
+              "MaxTTL": 30,
+              "DefaultTTL": 2,
+              "MinTTL": 1,
+              "PathPattern": "/api/*",
+              "TargetOriginId": "dynamic",
+              "ViewerProtocolPolicy": "redirect-to-https",
+              "ForwardedValues": {
+                "QueryString": true,
+                "Headers":["Authorization"]
+              }
+            }
+          ],
+          "DefaultRootObject": "index.html",
+          "DefaultCacheBehavior": {
+            "Compress": true,
+            "DefaultTTL": 6,
+            "ForwardedValues": {
+              "QueryString": false
+            },
+            "MaxTTL": 7,
+            "MinTTL": 5,
+            "TargetOriginId": "static",
+            "ViewerProtocolPolicy": "redirect-to-https"
+          },
+          "Enabled": true
+        }
+      }
+    },
+    "DesignerDistribution": {
+      "Type": "AWS::CloudFront::Distribution",
+      "Properties": {
+        "DistributionConfig": {
+          "Origins": [
+            {
+              "DomainName": {
+                "Ref": "StaticUrl"
+              },
+              "Id": "static",
+              "S3OriginConfig": {}
+            },
+            {
+              "DomainName": {
+                "Ref": "DynamicUrl"
+              },
+              "Id": "dynamic",
+              "CustomOriginConfig": {
+                "HTTPPort": 443,
+                "OriginProtocolPolicy": "https-only"
+              }
+            }
+          ],
+          "CacheBehaviors": [
+            {
+              "AllowedMethods": [
+                "HEAD",
+                "DELETE",
+                "POST",
+                "GET",
+                "OPTIONS",
+                "PUT",
+                "PATCH"
+              ],
+              "CachedMethods": [
+                "HEAD",
+                "GET"
+              ],
+              "Compress": true,
+              "MaxTTL": 30,
+              "DefaultTTL": 2,
+              "MinTTL": 1,
+              "PathPattern": "/api/*",
+              "TargetOriginId": "dynamic",
+              "ViewerProtocolPolicy": "redirect-to-https",
+              "ForwardedValues": {
+                "QueryString": true,
+                "Headers":["Authorization"]
+              }
+            }
+          ],
+          "DefaultRootObject": "index.html",
+          "DefaultCacheBehavior": {
+            "Compress": true,
+            "DefaultTTL": 6,
+            "ForwardedValues": {
+              "QueryString": false
+            },
+            "MaxTTL": 7,
+            "MinTTL": 5,
+            "TargetOriginId": "static",
+            "ViewerProtocolPolicy": "redirect-to-https"
+          },
+          "Enabled": true
+        }
+      }
+    },
+    "StaticCheck": {
+      "Type": "AWS::Route53::HealthCheck",
+      "Properties": {
+        "HealthCheckConfig": {
+          "FailureThreshold": 2,
+          "FullyQualifiedDomainName": {"Fn::GetAtt": ["DesignerDistribution","DomainName"]},
+          "Port": 443,
+          "ResourcePath": "/health.html",
+          "Type": "HTTPS"
+        }
+      }
+    },
+    "DynamicCheck": {
+      "Type": "AWS::Route53::HealthCheck",
+      "Properties": {
+        "HealthCheckConfig": {
+          "FailureThreshold": 2,
+          "FullyQualifiedDomainName": {"Fn::GetAtt": ["DesignerDistribution","DomainName"]},
+          "Port": 443,
+          "ResourcePath": "/api/health",
+          "Type": "HTTPS"
+        }
+      }
+    },
+    "StaticAlarm": {
+      "Type": "AWS::CloudWatch::Alarm",
+      "Properties": {
+        "Namespace": "AWS/Route53",
+        "MetricName": "HealthCheckStatus",
+        "Dimensions": [
+          {
+            "Name": "HealthCheckId",
+            "Value": {
+              "Ref": "StaticCheck"
+            }
+          }
+        ],
+        "ComparisonOperator": "LessThanThreshold",
+        "Period": 360,
+        "EvaluationPeriods": 2,
+        "Statistic": "Average",
+        "Threshold": ".95",
+        "Unit": "Count"
+      }
+    },
+    "DynamicAlarm": {
+      "Type": "AWS::CloudWatch::Alarm",
+      "Properties": {
+        "Namespace": "AWS/Route53",
+        "MetricName": "HealthCheckStatus",
+        "Dimensions": [
+          {
+            "Name": "HealthCheckId",
+            "Value": {
+              "Ref": "DynamicCheck"
+            }
+          }
+        ],
+        "ComparisonOperator": "LessThanThreshold",
+        "Period": 360,
+        "EvaluationPeriods": 2,
+        "Statistic": "Average",
+        "Threshold": ".95",
+        "Unit": "Count"
+      }
+    }
+  }
+}

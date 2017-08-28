@@ -1,0 +1,158 @@
+{
+    "widgets": [
+        {
+            "type": "metric",
+            "x": 0,
+            "y": 0,
+            "width": 6,
+            "height": 6,
+            "properties": {
+                "view": "timeSeries",
+                "stacked": false,
+                "metrics": [
+                    [ "AWS/ApiGateway", "Latency", "ApiName", "${APIGateWay}" ],
+                    [ ".", "4XXError", ".", ".", { "yAxis": "right" } ]
+                ],
+                "region": "${AWS::Region}",
+                "title": "API GateWay Latency,Errors"
+            }
+        },
+        {
+            "type": "metric",
+            "x": 12,
+            "y": 0,
+            "width": 6,
+            "height": 6,
+            "properties": {
+                "view": "timeSeries",
+                "stacked": false,
+                "metrics": [
+                    [ "AWS/ES", "FreeStorageSpace", "DomainName", "${ESDomain}", "ClientId", "${AWS::AccountId}", { "period": 60 } ],
+                    [ ".", "SearchableDocuments", ".", ".", ".", ".", { "yAxis": "right", "period": 60 } ]
+                ],
+                "region": "${AWS::Region}",
+                "title": "ElasticSearch Documents/FreeSpace"
+            }
+        },
+        {
+            "type": "metric",
+            "x": 6,
+            "y": 0,
+            "width": 6,
+            "height": 6,
+            "properties": {
+                "view": "timeSeries",
+                "stacked": false,
+                "metrics": [
+                    [ "AWS/CloudFront", "Requests", "Region", "Global", "DistributionId", "${Distribution}" ],
+                    [ ".", "BytesDownloaded", ".", ".", ".", ".", { "yAxis": "right" } ]
+                ],
+                "region": "${AWS::Region}",
+                "title": "CloudFront Request/BytesDownloaded"
+            }
+        },
+        {
+            "type": "metric",
+            "x": 18,
+            "y": 0,
+            "width": 6,
+            "height": 6,
+            "properties": {
+                "view": "timeSeries",
+                "stacked": false,
+                "metrics": [
+                    [ "AWS/Lex", "MissedUtteranceCount", "BotVersion", "$LATEST", "Operation", "PostText", "BotName", "${BotName}" ],
+                    [ ".", "RuntimeSucessfulRequestLatency", ".", ".", ".", ".", ".", ".", { "yAxis": "right" } ],
+                    [ ".", "RuntimeRequestCount", ".", ".", ".", ".", ".", "." ]
+                ],
+                "region": "${AWS::Region}",
+                "title": "Lex Utterances/Latency"
+            }
+        },
+        {
+            "type": "metric",
+            "x": 0,
+            "y": 6,
+            "width": 6,
+            "height": 6,
+            "properties": {
+                "view": "timeSeries",
+                "stacked": false,
+                "metrics": [
+                    [ "AWS/Lambda", "Errors", "FunctionName", "${AdminLambda}", { "stat": "Sum" } ],
+                    [ ".", "Invocations", ".", ".", { "stat": "Sum" } ],
+                    [ ".", "Duration", ".", ".", { "yAxis": "right" } ],
+                    [ ".", "Throttles", ".", ".", { "stat": "Sum" } ]
+                ],
+                "region": "${AWS::Region}",
+                "title": "Admin Lambda",
+                "period": 300
+            }
+        },
+        {
+            "type": "metric",
+            "x": 6,
+            "y": 6,
+            "width": 6,
+            "height": 6,
+            "properties": {
+                "view": "timeSeries",
+                "stacked": false,
+                "metrics": [
+                    [ "AWS/Lambda", "Throttles", "FunctionName", "${FulfilmentLambda}", { "stat": "Sum" } ],
+                    [ ".", "Errors", ".", ".", { "stat": "Sum" } ],
+                    [ ".", "Invocations", ".", ".", { "stat": "Sum" } ],
+                    [ ".", "Duration", ".", ".", { "yAxis": "right" } ]
+                ],
+                "region": "${AWS::Region}",
+                "title": "Fulfilment Lambda",
+                "period": 300
+            }
+        },
+        {
+            "type": "metric",
+            "x": 18,
+            "y": 9,
+            "width": 6,
+            "height": 3,
+            "properties": {
+                "view": "singleValue",
+                "metrics": [
+                    [ "AWS/Route53", "HealthCheckPercentageHealthy", "HealthCheckId", "${AdminBucketHealthCheck}" ]
+                ],
+                "region": "${AWS::Region}",
+                "title": "AdminBucket /health.html"
+            }
+        },
+        {
+            "type": "metric",
+            "x": 12,
+            "y": 6,
+            "width": 6,
+            "height": 3,
+            "properties": {
+                "view": "singleValue",
+                "metrics": [
+                    [ "AWS/Route53", "HealthCheckPercentageHealthy", "HealthCheckId", "${CloudFrontAPIHealth}" ]
+                ],
+                "region": "${AWS::Region}",
+                "title": "Cloudfront /api/health"
+            }
+        },
+        {
+            "type": "metric",
+            "x": 18,
+            "y": 6,
+            "width": 6,
+            "height": 3,
+            "properties": {
+                "view": "singleValue",
+                "metrics": [
+                    [ "AWS/Route53", "HealthCheckPercentageHealthy", "HealthCheckId", "${CloudFrontAdminHealth}" ]
+                ],
+                "region": "${AWS::Region}",
+                "title": "CloudFront /health.html"
+            }
+        }
+    ]
+}

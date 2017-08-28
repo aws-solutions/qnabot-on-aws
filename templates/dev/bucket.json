@@ -1,0 +1,24 @@
+{
+  "Resources": {
+    "Bucket": {
+      "Type": "AWS::S3::Bucket",
+      "DeletionPolicy": "Delete",
+      "Properties": {}
+    }  
+  },
+  "Conditions": {},
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "",
+  "Mappings": {},
+  "Outputs": {
+    "Bucket": {
+      "Value": {
+        "Ref": "Bucket"
+      },
+      "Export":{
+        "Name":"QNA-DEV-BUCKET"
+      }
+    }
+  },
+  "Parameters": {}
+}

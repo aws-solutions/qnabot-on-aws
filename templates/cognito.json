@@ -1,0 +1,184 @@
+{
+  "Resources": {
+    "CFNUser":{
+        "Type" : "AWS::CloudFormation::Stack",
+        "Properties" : {
+            "TemplateURL" : {"Fn::Join":["/",[
+                "https://s3.amazonaws.com",
+                {"Ref":"BootstrapBucket"},
+                {"Ref":"BootstrapPrefix"},
+                "templates/cfn-user.json"
+            ]]},
+            "Parameters":{
+                "BootstrapBucket":{"Ref":"BootstrapBucket"},
+                "BootstrapPrefix":{"Ref":"BootstrapPrefix"},
+                "ClientId":{"Ref":"Client"},
+                "PoolId":{"Ref":"IdPool"},
+                "UserPool":{"Ref":"UserPool"}
+            }
+        }
+    },
+    "User":{
+        "Type": "Custom::CognitoUser",
+        "Properties": {
+            "ServiceToken": { "Fn::GetAtt" : ["CFNUser", "Outputs.Arn"] },
+            "password":{"Ref":"Password"}
+        }
+    },
+    "IdPool": {
+      "Type": "AWS::Cognito::IdentityPool",
+      "Properties": {
+        "IdentityPoolName": "UserPool",
+        "AllowUnauthenticatedIdentities": true,
+        "CognitoIdentityProviders": [
+          {
+            "ClientId": {
+              "Ref": "Client"
+            },
+            "ProviderName": {
+              "Fn::GetAtt": [
+                "UserPool",
+                "ProviderName"
+              ]
+            },
+            "ServerSideTokenCheck": true
+          }
+        ]
+      }
+    },
+    "RoleAttachment": {
+      "Type": "AWS::Cognito::IdentityPoolRoleAttachment",
+      "Properties": {
+        "IdentityPoolId": {
+          "Ref": "IdPool"
+        },
+        "Roles": {
+          "authenticated": {"Fn::GetAtt":["AuthenticatedRole","Arn"]},
+          "unauthenticated":{"Fn::GetAtt":["UnauthenticatedRole","Arn"]} 
+        }
+      }
+    },
+    "UserPool": {
+      "Type": "AWS::Cognito::UserPool",
+      "Properties": {
+        "UserPoolName": {
+          "Fn::Join": [
+            "-",
+            [
+              "UserPool",
+              {
+                "Ref": "AWS::StackName"
+              }
+            ]
+          ]
+        }
+      }
+    },
+    "Client": {
+      "Type": "AWS::Cognito::UserPoolClient",
+      "Properties": {
+        "ClientName": {
+          "Fn::Join": [
+            "-",
+            [
+              "UserPool",
+              {
+                "Ref": "AWS::StackName"
+              }
+            ]
+          ]
+        },
+        "GenerateSecret": false,
+        "ExplicitAuthFlows":["ADMIN_NO_SRP_AUTH"],
+        "UserPoolId": {
+          "Ref": "UserPool"
+        }
+      }
+    },
+    "AuthenticatedRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": {
+                    "Federated": "cognito-identity.amazonaws.com"
+              },
+              "Action": "sts:AssumeRoleWithWebIdentity"
+            }
+          ]
+        },
+        "Path": "/",
+        "ManagedPolicyArns": [
+          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ]
+      }
+    },
+    "UnauthenticatedRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": {
+                    "Federated": "cognito-identity.amazonaws.com"
+              },
+              "Action": "sts:AssumeRoleWithWebIdentity"
+            }
+          ]
+        },
+        "Path": "/",
+        "ManagedPolicyArns": [
+          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ]
+      }
+    }
+  },
+  "Conditions": {},
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "Creates a Cognito IdPool and UserPool to authenicate the admin user. An unauthenticated role is provide that has access to the lex runtime apis. The authenticated role provides access the the apigateway methods that edit the elasticsearch cluster",
+  "Mappings": {},
+  "Outputs": {
+    "PoolId":{
+      "Value":{"Ref":"IdPool"}
+    },
+    "UserPool":{
+      "Value":{"Ref":"UserPool"}
+    },
+    "UserPoolArn":{
+      "Value":{"Fn::GetAtt":["UserPool","Arn"]}
+    },
+    "AuthenticatedRoleArn": {
+      "Value": {"Fn::GetAtt":["AuthenticatedRole","Arn"]}
+    },
+    "UnauthenticatedRoleArn": {
+      "Value": {"Fn::GetAtt":["UnauthenticatedRole","Arn"]}
+    },
+    "AuthenticatedRole": {
+      "Value":{"Ref":"AuthenticatedRole"} 
+    },
+    "UnauthenticatedRole": {
+      "Value":{"Ref":"UnauthenticatedRole"} 
+    },
+    "Client":{
+      "Value":{"Ref":"Client"} 
+    }
+  },
+  "Parameters": {
+    "Password":{
+        "Type":"String",
+        "NoEcho":true
+    },
+    "BootstrapBucket":{
+        "Type":"String"
+    },
+    "BootstrapPrefix":{
+        "Type":"String"
+    }
+
+  }
+}

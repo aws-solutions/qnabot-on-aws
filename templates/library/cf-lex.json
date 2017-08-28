@@ -1,0 +1,371 @@
+{
+  "Conditions": {},
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "lambda function to build a lambda function",
+  "Mappings": {},
+  "Outputs": {
+    "slotTypeArn": {
+      "Value": {
+        "Fn::GetAtt": [
+          "slotType",
+          "Arn"
+        ]
+      }
+    },
+    "intentArn": {
+      "Value": {
+        "Fn::GetAtt": [
+          "intent",
+          "Arn"
+        ]
+      }
+    },
+    "aliasArn": {
+      "Value": {
+        "Fn::GetAtt": [
+          "alias",
+          "Arn"
+        ]
+      }
+    },
+    "botArn": {
+      "Value": {
+        "Fn::GetAtt": [
+          "bot",
+          "Arn"
+        ]
+      }
+    }
+  },
+  "Parameters": {},
+  "Resources": {
+    "slotType": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Code": {
+          "S3Bucket": {
+            "Fn::ImportValue": "AssetBucket"
+          },
+          "S3Key": {
+            "Fn::Join": [
+              "/",
+              [
+                {
+                  "Fn::ImportValue": "LambdaLibrary"
+                },
+                "cf-lex-slotType.zip"
+              ]
+            ]
+          }
+        },
+        "Environment": {
+          "Variables": {
+            "REGION": {
+              "Ref": "AWS::Region"
+            }
+          }
+        },
+        "Handler": "handler.handler",
+        "MemorySize": "128",
+        "Role": {
+          "Fn::GetAtt": [
+            "slotTypeRole",
+            "Arn"
+          ]
+        },
+        "Runtime": "nodejs6.10",
+        "Timeout": 10
+      }
+    },
+    "intent": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Code": {
+          "S3Bucket": {
+            "Fn::ImportValue": "AssetBucket"
+          },
+          "S3Key": {
+            "Fn::Join": [
+              "/",
+              [
+                {
+                  "Fn::ImportValue": "LambdaLibrary"
+                },
+                "cf-lex-intent.zip"
+              ]
+            ]
+          }
+        },
+        "Environment": {
+          "Variables": {
+            "REGION": {
+              "Ref": "AWS::Region"
+            }
+          }
+        },
+        "Handler": "handler.handler",
+        "MemorySize": "128",
+        "Role": {
+          "Fn::GetAtt": [
+            "intentRole",
+            "Arn"
+          ]
+        },
+        "Runtime": "nodejs6.10",
+        "Timeout": 10
+      }
+    },
+    "bot": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Code": {
+          "S3Bucket": {
+            "Fn::ImportValue": "AssetBucket"
+          },
+          "S3Key": {
+            "Fn::Join": [
+              "/",
+              [
+                {
+                  "Fn::ImportValue": "LambdaLibrary"
+                },
+                "cf-lex-bot.zip"
+              ]
+            ]
+          }
+        },
+        "Environment": {
+          "Variables": {
+            "REGION": {
+              "Ref": "AWS::Region"
+            }
+          }
+        },
+        "Handler": "handler.handler",
+        "MemorySize": "128",
+        "Role": {
+          "Fn::GetAtt": [
+            "botRole",
+            "Arn"
+          ]
+        },
+        "Runtime": "nodejs6.10",
+        "Timeout": 10
+      }
+    },
+    "alias": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Code": {
+          "S3Bucket": {
+            "Fn::ImportValue": "AssetBucket"
+          },
+          "S3Key": {
+            "Fn::Join": [
+              "/",
+              [
+                {
+                  "Fn::ImportValue": "LambdaLibrary"
+                },
+                "cf-lex-alias.zip"
+              ]
+            ]
+          }
+        },
+        "Environment": {
+          "Variables": {
+            "REGION": {
+              "Ref": "AWS::Region"
+            }
+          }
+        },
+        "Handler": "handler.handler",
+        "MemorySize": "128",
+        "Role": {
+          "Fn::GetAtt": [
+            "aliasRole",
+            "Arn"
+          ]
+        },
+        "Runtime": "nodejs6.10",
+        "Timeout": 10
+      }
+    },
+    "slotTypePolicy": {
+      "Type": "AWS::IAM::ManagedPolicy",
+      "Properties": {
+        "PolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Action": [
+                "lex:PutSlotType",
+                "lex:DeleteSlotType"
+              ],
+              "Resource": [
+                "*"
+              ]
+            }
+          ]
+        }
+      }
+    },
+    "intentPolicy": {
+      "Type": "AWS::IAM::ManagedPolicy",
+      "Properties": {
+        "PolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Action": [
+                "lex:PutIntent",
+                "lex:DeleteIntent"
+              ],
+              "Resource": [
+                "*"
+              ]
+            }
+          ]
+        }
+      }
+    },
+    "botPolicy": {
+      "Type": "AWS::IAM::ManagedPolicy",
+      "Properties": {
+        "PolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Action": [
+                "lex:PutBot",
+                "lex:DeleteBot"
+              ],
+              "Resource": [
+                "*"
+              ]
+            }
+          ]
+        }
+      }
+    },
+    "aliasPolicy": {
+      "Type": "AWS::IAM::ManagedPolicy",
+      "Properties": {
+        "PolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Action": [
+                "lex:PutBotAlias",
+                "lex:DeleteBotAlias"
+              ],
+              "Resource": [
+                "*"
+              ]
+            }
+          ]
+        }
+      }
+    },
+    "slotTypeRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "lambda.amazonaws.com"
+              },
+              "Action": "sts:AssumeRole"
+            }
+          ]
+        },
+        "Path": "/",
+        "ManagedPolicyArns": [
+          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
+          {
+            "Ref": "slotTypePolicy"
+          }
+        ]
+      }
+    },
+    "intentRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "lambda.amazonaws.com"
+              },
+              "Action": "sts:AssumeRole"
+            }
+          ]
+        },
+        "Path": "/",
+        "ManagedPolicyArns": [
+          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
+          {
+            "Ref": "intentPolicy"
+          }
+        ]
+      }
+    },
+    "botRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "lambda.amazonaws.com"
+              },
+              "Action": "sts:AssumeRole"
+            }
+          ]
+        },
+        "Path": "/",
+        "ManagedPolicyArns": [
+          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
+          {
+            "Ref": "botPolicy"
+          }
+        ]
+      }
+    },
+    "aliasRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "lambda.amazonaws.com"
+              },
+              "Action": "sts:AssumeRole"
+            }
+          ]
+        },
+        "Path": "/",
+        "ManagedPolicyArns": [
+          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
+          {
+            "Ref": "aliasPolicy"
+          }
+        ]
+      }
+    }
+  }
+}

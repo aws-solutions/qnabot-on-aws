@@ -1,0 +1,255 @@
+{
+  "Resources": {
+    "Project": {
+      "Type": "AWS::CodeBuild::Project",
+      "Properties": {
+        "Artifacts": {
+          "Type": "NO_ARTIFACTS"
+        },
+        "Environment": {
+          "ComputeType": "BUILD_GENERAL1_SMALL",
+          "Image": "aws/codebuild/eb-nodejs-6.10.0-amazonlinux-64:4.0.0",
+          "Type": "LINUX_CONTAINER"
+        },
+        "Name": {
+          "Ref": "AWS::StackName"
+        },
+        "ServiceRole": {
+          "Fn::GetAtt": [
+            "build",
+            "Outputs.Role"
+          ]
+        },
+        "Source": {
+          "Location": {
+            "Fn::GetAtt": [
+              "variable",
+              "Source"
+            ]
+          },
+          "Type": "S3"
+        },
+        "TimeoutInMinutes": 10
+      }
+    },
+    "Build": {
+      "Type": "Custom::Build",
+      "Properties": {
+        "ServiceToken": {
+          "Fn::GetAtt": [
+            "build",
+            "Outputs.Arn"
+          ]
+        },
+        "projectName": {
+          "Ref": "Project"
+        },
+        "environmentVariablesOverride": [
+          {
+            "name": "ADDRESS",
+            "value": {
+              "Ref": "Address"
+            }
+          },
+          {
+            "name": "REGION",
+            "value": {
+              "Ref": "AWS::Region"
+            }
+          },
+          {
+            "name": "INDEX",
+            "value": {
+              "Ref": "Index"
+            }
+          },
+          {
+            "name": "TYPE",
+            "value": {
+              "Ref": "Type"
+            }
+          }
+        ]
+      },
+      "DependsOn": [
+        "Project",
+        "ReadPolicy",
+        "GitPolicy"
+      ]
+    },
+    "ReadPolicy": {
+      "Type": "AWS::IAM::ManagedPolicy",
+      "Properties": {
+        "PolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Action": [
+                "s3:getObject",
+                "s3:getObjectVersion"
+              ],
+              "Resource": [
+                {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:aws:s3:::",
+                      {
+                        "Fn::GetAtt": [
+                          "variable",
+                          "Source"
+                        ]
+                      }
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "Effect": "Allow",
+              "Action": [
+                "es:*"
+              ],
+              "Resource": [
+                {
+                  "Fn::Join": [
+                    "/",
+                    [
+                      {
+                        "Ref": "Arn"
+                      },
+                      "*"
+                    ]
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "Roles": [
+          {
+            "Fn::GetAtt": [
+              "build",
+              "Outputs.Role"
+            ]
+          }
+        ]
+      }
+    },
+    "GitPolicy": {
+      "Type": "AWS::IAM::ManagedPolicy",
+      "Properties": {
+        "PolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Action": [
+                "codecommit:BatchGetRepositories",
+                "codecommit:Get*",
+                "codecommit:GitPull",
+                "codecommit:List*"
+              ],
+              "Resource": "*"
+            }
+          ]
+        },
+        "Roles": [
+          {
+            "Fn::GetAtt": [
+              "build",
+              "Outputs.Role"
+            ]
+          }
+        ]
+      }
+    },
+    "build": {
+      "Type": "AWS::CloudFormation::Stack",
+      "Properties": {
+        "TemplateURL": {
+          "Fn::Join": [
+            "/",
+            [
+              "https://s3.amazonaws.com",
+              {
+                "Fn::ImportValue": "AssetBucket"
+              },
+              {
+                "Fn::ImportValue": "TemplateLibrary"
+              },
+              "cf-build.template"
+            ]
+          ]
+        },
+        "Parameters": {}
+      }
+    },
+    "Variable": {
+      "Type": "AWS::CloudFormation::Stack",
+      "Properties": {
+        "TemplateURL": {
+          "Fn::Join": [
+            "/",
+            [
+              "https://s3.amazonaws.com",
+              {
+                "Fn::ImportValue": "AssetBucket"
+              },
+              {
+                "Fn::ImportValue": "TemplateLibrary"
+              },
+              "cf-variable.template"
+            ]
+          ]
+        },
+        "Parameters": {}
+      }
+    },
+    "variable": {
+      "Type": "Custom::Variable",
+      "Properties": {
+        "ServiceToken": {
+          "Fn::GetAtt": [
+            "Variable",
+            "Outputs.Arn"
+          ]
+        },
+        "Source": {
+          "Fn::Join": [
+            "/",
+            [
+              {
+                "Fn::ImportValue": "AssetBucket"
+              },
+              {
+                "Fn::ImportValue": "ProjectLibrary"
+              },
+              "LucyDemoESInit.zip"
+            ]
+          ]
+        }
+      }
+    }
+  },
+  "Conditions": {},
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "A Demonstration of Three Teir nodejs application",
+  "Mappings": {},
+  "Outputs": {},
+  "Parameters": {
+    "Address": {
+      "Type": "String"
+    },
+    "Arn": {
+      "Type": "String"
+    },
+    "Index": {
+      "Type": "String"
+    },
+    "Type": {
+      "Type": "String"
+    }
+  }
+}

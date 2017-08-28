@@ -1,0 +1,109 @@
+{
+  "Resources": {
+    "IdPool": {
+      "Type": "AWS::Cognito::IdentityPool",
+      "Properties": {
+        "IdentityPoolName": "UserPool",
+        "AllowUnauthenticatedIdentities": true,
+        "CognitoIdentityProviders": [
+          {
+            "ClientId": {
+              "Ref": "Client"
+            },
+            "ProviderName": {
+              "Fn::GetAtt": [
+                "UserPool",
+                "ProviderName"
+              ]
+            },
+            "ServerSideTokenCheck": true
+          }
+        ]
+      }
+    },
+    "RoleAttachment": {
+      "Type": "AWS::Cognito::IdentityPoolRoleAttachment",
+      "Properties": {
+        "IdentityPoolId": {
+          "Ref": "IdPool"
+        },
+        "Roles": {
+          "authenticated": {
+            "Ref": "AuthenticatedRole"
+          },
+          "unauthenticated": {
+            "Ref": "UnauthenticatedRole"
+          }
+        }
+      }
+    },
+    "UserPool": {
+      "Type": "AWS::Cognito::UserPool",
+      "Properties": {
+        "UserPoolName": {
+          "Fn::Join": [
+            "-",
+            [
+              "UserPool",
+              {
+                "Ref": "AWS::StackName"
+              }
+            ]
+          ]
+        }
+      }
+    },
+    "Client": {
+      "Type": "AWS::Cognito::UserPoolClient",
+      "Properties": {
+        "ClientName": {
+          "Fn::Join": [
+            "-",
+            [
+              "UserPool",
+              {
+                "Ref": "AWS::StackName"
+              }
+            ]
+          ]
+        },
+        "GenerateSecret": true,
+        "UserPoolId": {
+          "Ref": "UserPool"
+        }
+      }
+    },
+    "User": {
+      "Type": "AWS::Cognito::UserPoolUser",
+      "Properties": {
+        "Username": {
+          "Fn::Join": [
+            "-",
+            [
+              "user",
+              {
+                "Ref": "AWS::StackName"
+              }
+            ]
+          ]
+        },
+        "UserPoolId": {
+          "Ref": "UserPool"
+        }
+      }
+    }
+  },
+  "Conditions": {},
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "A Demonstration of Three Teir nodejs application",
+  "Mappings": {},
+  "Outputs": {},
+  "Parameters": {
+    "AuthenticatedRole": {
+      "Type": "String"
+    },
+    "UnauthenticatedRole": {
+      "Type": "String"
+    }
+  }
+}

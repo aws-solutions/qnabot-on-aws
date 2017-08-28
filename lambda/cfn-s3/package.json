@@ -1,0 +1,18 @@
+{
+  "name": "lambda-cf-s3-util",
+  "version": "1.0.0",
+  "description": "",
+  "main": "handler.js",
+  "scripts": {
+    "test": "nodeunit library/test.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "aws-sdk": "^2.43.0",
+    "bluebird": "^3.5.0",
+    "cfn-lambda": "^0.8.3",
+    "jszip": "^3.1.3",
+    "nodeunit": "^0.11.1"
+  }
+}
