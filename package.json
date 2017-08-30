@@ -19,7 +19,7 @@
     "stack": "./bin/launch.sh",
     "upload": "make upload -j 4",
     "server": "./website/admin/config/server.js",
-    "dev-up": "npm run stack test/dev up",
+    "dev-up": "npm run stack dev/dev up",
     "up": "npm run upload && npm run stack test/master up",
     "lambda-update": "make lambda && ./bin/update-lambda.sh",
     "admin-update": "npm run build && ./bin/update-admin.sh",
