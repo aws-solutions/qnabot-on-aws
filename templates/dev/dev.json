@@ -6,6 +6,7 @@
             "TemplateURL" : {"Fn::Join":["/",[
                 "https://s3.amazonaws.com",
                 {"Fn::ImportValue":"QNA-BOOTSTRAP-BUCKET"},
+                {"Fn::ImportValue":"QNA-BOOTSTRAP-PREFIX"},
                 "templates/dev/bucket.json"
             ]]},
             "Parameters":{}
@@ -17,6 +18,7 @@
             "TemplateURL" : {"Fn::Join":["/",[
                 "https://s3.amazonaws.com",
                 {"Fn::ImportValue":"QNA-BOOTSTRAP-BUCKET"},
+                {"Fn::ImportValue":"QNA-BOOTSTRAP-PREFIX"},
                 "templates/dev/es.json"
             ]]},
             "Parameters":{}
@@ -28,6 +30,7 @@
             "TemplateURL" : {"Fn::Join":["/",[
                 "https://s3.amazonaws.com",
                 {"Fn::ImportValue":"QNA-BOOTSTRAP-BUCKET"},
+                {"Fn::ImportValue":"QNA-BOOTSTRAP-PREFIX"},
                 "templates/dev/handler.json"
             ]]},
             "Parameters":{}

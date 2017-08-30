@@ -6,10 +6,12 @@
             "TemplateURL" : {"Fn::Join":["/",[
                 "https://s3.amazonaws.com",
                 {"Fn::ImportValue":"QNA-BOOTSTRAP-BUCKET"},
+                {"Fn::ImportValue":"QNA-BOOTSTRAP-PREFIX"},
                 "templates/cognito.json"
             ]]},
             "Parameters":{
                 "BootstrapBucket": {"Fn::ImportValue":"QNA-BOOTSTRAP-BUCKET"},
+                "BootstrapPrefix": {"Fn::ImportValue":"QNA-BOOTSTRAP-PREFIX"},
                 "Password":"123$dDadadfasdf"
             }
         }
@@ -39,10 +41,12 @@
             "TemplateURL" : {"Fn::Join":["/",[
                 "https://s3.amazonaws.com",
                 {"Fn::ImportValue":"QNA-BOOTSTRAP-BUCKET"},
+                {"Fn::ImportValue":"QNA-BOOTSTRAP-PREFIX"},
                 "templates/cfn-es.json"
             ]]},
             "Parameters":{
                 "Arn":{"Fn::ImportValue":"QNA-DEV-ED-ARN"},
+                "BootstrapPrefix": {"Fn::ImportValue":"QNA-BOOTSTRAP-PREFIX"},
                 "BootstrapBucket":{"Fn::ImportValue":"QNA-BOOTSTRAP-BUCKET"}
             }
         }
@@ -62,9 +66,11 @@
             "TemplateURL" : {"Fn::Join":["/",[
                 "https://s3.amazonaws.com",
                 {"Fn::ImportValue":"QNA-BOOTSTRAP-BUCKET"},
+                {"Fn::ImportValue":"QNA-BOOTSTRAP-PREFIX"},
                 "templates/cfn-lex.json"
             ]]},
             "Parameters":{
+                "BootstrapPrefix": {"Fn::ImportValue":"QNA-BOOTSTRAP-PREFIX"},
                 "BootstrapBucket":{"Fn::ImportValue":"QNA-BOOTSTRAP-BUCKET"}
             }
         }
