@@ -6,11 +6,11 @@ This repo contains code to launch an AWS Lex Bot to capture natural language que
 
 ### Prerequisites
 
-- running Linux 
-- installed node and npm 6> [instructions](https://nodejs.org/en/download/)
-- cloned this repo
-- set up an aws account. [instructions](https://aws.amazon.com/free/?sc_channel=PS&sc_campaign=acquisition_US&sc_publisher=google&sc_medium=cloud_computing_b&sc_content=aws_account_bmm_control_q32016&sc_detail=%2Baws%20%2Baccount&sc_category=cloud_computing&sc_segment=102882724242&sc_matchtype=b&sc_country=US&s_kwcid=AL!4422!3!102882724242!b!!g!!%2Baws%20%2Baccount&ef_id=WS3s1AAAAJur-Oj2:20170825145941:s)
-- configure aws cli and local credentials. [instructions](http://docs.aws.amazon.com/cli/latest/userguide/cli-chap-welcome.html)
+- Running Linux 
+- Installed node and npm 6> [instructions](https://nodejs.org/en/download/)
+- Cloned this repo
+- Set up an aws account. [instructions](https://aws.amazon.com/free/?sc_channel=PS&sc_campaign=acquisition_US&sc_publisher=google&sc_medium=cloud_computing_b&sc_content=aws_account_bmm_control_q32016&sc_detail=%2Baws%20%2Baccount&sc_category=cloud_computing&sc_segment=102882724242&sc_matchtype=b&sc_country=US&s_kwcid=AL!4422!3!102882724242!b!!g!!%2Baws%20%2Baccount&ef_id=WS3s1AAAAJur-Oj2:20170825145941:s)
+- Configured aws cli and local credentials. [instructions](http://docs.aws.amazon.com/cli/latest/userguide/cli-chap-welcome.html)
 - Lex is currently only supported in us-east-1
 
 ## Getting Started
@@ -67,12 +67,12 @@ npm run check test/es.json
 ### Lambda Functions
 Lambda functions are found in the /lambda directory.
 #### Running the tests
-each lambda directory has its own test that depend on the dev enroment being set up. 
+Each lambda directory has its own test that depend on the dev enroment being set up. 
 
 ### Web interface
-the Designer Ui and client Ui code is in the /website/admin directory. 
+The Designer Ui and client Ui code is in the /website/admin directory. 
 #### Running the tests
-test for the website are in the /website/admin/test. A dev server can be setup by calling 
+the Test for the website are in the /website/admin/test. A dev server can be setup by calling:
 ```shell
 npm run server
 ```
@@ -103,9 +103,9 @@ QnA documents must be formatted as JSON objects, with one file containing a JSON
 }
 ```
 Each QnA object has current 3 fields:
-- qid: a unique identifier
-- q: a list of questions (one or more)
-- a: the text to be returned as the answer when this document is the most relevant
+- qid: A unique identifier
+- q: A list of questions (one or more)
+- a: The text to be returned as the answer when this document is the most relevant
   
 You can associate multiple questions with the same answer, allowing this answer to be retrieved if the user asks the question using different terms and key words. NOTE: the questions don;t have to match exactly how the user will ask the question, but the closer the match the more likely that the right answer will be returned when elastic search tries to find the best match to the user's question..
 
