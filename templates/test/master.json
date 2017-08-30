@@ -1,0 +1,38 @@
+{
+  "Resources": {
+    "master":{
+        "Type" : "AWS::CloudFormation::Stack",
+        "Properties" : {
+            "TemplateURL" : {"Fn::Join":["/",[
+                "https://s3.amazonaws.com",
+                {"Fn::ImportValue":"QNA-BOOTSTRAP-BUCKET"},
+                {"Fn::ImportValue":"QNA-BOOTSTRAP-PREFIX"},
+                "templates/master.json"
+            ]]},
+            "Parameters":{
+                "BootstrapBucket":{"Fn::ImportValue":"QNA-BOOTSTRAP-BUCKET"},
+                "BootstrapPrefix":{"Fn::ImportValue":"QNA-BOOTSTRAP-PREFIX"},
+                "AdminPassword":"123$dDadadfasdf"
+            }
+        }
+    }
+  },
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "Test of the variable lambda function",
+  "Outputs":{
+    "DesignerURL":{
+        "Value":{"Fn::Join":["",[
+            {"Fn::GetAtt":["master","Outputs.ContentDesignerURL"]}
+        ]]}
+    },
+    "AdminBucket":{
+        "Value":{"Fn::GetAtt":["master","Outputs.AdminBucket"]}
+    },
+    "HandlerArn":{
+        "Value":{"Fn::GetAtt":["master","Outputs.HandlerArn"]}
+    },
+    "FulfilmentArn":{
+        "Value":{"Fn::GetAtt":["master","Outputs.FulfilmentArn"]}
+    }
+  }
+}

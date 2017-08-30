@@ -1,0 +1,83 @@
+{
+  "Resources": {
+    "UserPool": {
+      "Type": "AWS::Cognito::UserPool",
+      "Properties": {
+        "UserPoolName": {
+          "Fn::Join": [
+            "-",
+            [
+              "UserPool",
+              {
+                "Ref": "AWS::StackName"
+              }
+            ]
+          ]
+        }
+      }
+    },
+    "api":{
+        "Type" : "AWS::CloudFormation::Stack",
+        "Properties" : {
+            "TemplateURL" : {"Fn::Join":["/",[
+                "https://s3.amazonaws.com",
+                {"Fn::ImportValue":"QNA-BOOTSTRAP-BUCKET"},
+                {"Fn::ImportValue":"QNA-BOOTSTRAP-PREFIX"},
+                "templates/api.json"
+            ]]},
+            "Parameters":{
+                "HandlerArn":{"Fn::GetAtt":["lambda","Arn"]},
+                "HealthArn":{"Fn::GetAtt":["lambda","Arn"]},
+                "UserPoolArn":{"Fn::GetAtt":["UserPool","Arn"]},
+                "Role":{"Ref":"Role"},
+                "Utterances":"ad",
+                "FulfilmentArn":"ad"
+            }
+        }
+    },
+	"lambda": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Handler": "index.handler",
+        "Role":{"Fn::GetAtt":["Role","Arn"]},
+        "Code": {
+          "ZipFile": {
+            "Fn::Join": [
+              "\n",
+              [
+                "exports.handler = function(event, context,cb) {",
+                "  console.log(event);",
+                "  cb(null)",
+                "};"
+              ]
+            ]
+          }
+        },
+        "Runtime": "nodejs4.3"
+      }
+    },
+    "Role": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "lambda.amazonaws.com"
+              },
+              "Action": "sts:AssumeRole"
+            }
+          ]
+        },
+        "Path": "/",
+        "ManagedPolicyArns": [
+          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ]
+      }
+    }
+  },
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "Test of the variable lambda function"
+}
