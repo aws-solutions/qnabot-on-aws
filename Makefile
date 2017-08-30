@@ -1,5 +1,5 @@
-BUCKET=$(shell bin/exports.js | $(npm bin)/jq --raw-output '."QNA-BOOTSTRAP-BUCKET"')
-PREFIX=$(shell node -e "console.log(JSON.stringify(require('./config')))" | $(npm bin)/jq --raw-output '."publicPrefix"')
+BUCKET=$(shell bin/exports.js | $(shell npm bin)/jq --raw-output '."QNA-BOOTSTRAP-BUCKET"')
+PREFIX=$(shell node -e "console.log(JSON.stringify(require('./config')))" | $(shell npm bin)/jq --raw-output '."publicPrefix"')
 .PHONY: lambda templates upload
 prefix:
 	echo "$(PREFIX)"
