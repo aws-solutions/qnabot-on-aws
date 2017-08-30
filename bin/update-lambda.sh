@@ -9,7 +9,7 @@ set -x
 update(){
     echo "updating $1"
     aws lambda update-function-code     \
-        --function-name $(echo $OUTPUT | jq --raw-output ".$1Arn") \
+        --function-name $(echo $OUTPUT | $(npm bin)/jq --raw-output ".$1Arn") \
         --zip-file $ZIP
 }
 

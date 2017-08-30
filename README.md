@@ -2,21 +2,19 @@
 
 > Build A Bot to answer questions. 
 
-This repos contains code to launch an AWS Lex Bot to capture natural language questions typed or spoken, using the Lex Web-UI client, and return the most relevant answer obtained by searching all QnA documents using the AWS Elasticsearch service.  
-
-This repo contains the source code and development environment. You can use this to extend or customize the QnABot for your own purposes.
+This repo contains code to launch an AWS Lex Bot to capture natural language questions typed or spoken, using the Lex Web-UI client, and return the most relevant answer obtained by searching all QnA documents using the AWS Elasticsearch service. You can use this repo to extend or customize the QnABot for your own purposes.
 
 ### Prerequisites
 
 - running Linux 
-- installed node and npm 6> 
-- clone this repo
+- installed node and npm 6> [instructions](https://nodejs.org/en/download/)
+- cloned this repo
 - set up an aws account. [instructions](https://aws.amazon.com/free/?sc_channel=PS&sc_campaign=acquisition_US&sc_publisher=google&sc_medium=cloud_computing_b&sc_content=aws_account_bmm_control_q32016&sc_detail=%2Baws%20%2Baccount&sc_category=cloud_computing&sc_segment=102882724242&sc_matchtype=b&sc_country=US&s_kwcid=AL!4422!3!102882724242!b!!g!!%2Baws%20%2Baccount&ef_id=WS3s1AAAAJur-Oj2:20170825145941:s)
 - configure aws cli and local credentials. [instructions](http://docs.aws.amazon.com/cli/latest/userguide/cli-chap-welcome.html)
 - Lex is currently only supported in us-east-1
 
 ## Getting Started
-all script descriptions are found in /docs/scripts.md
+All script descriptions are found in /docs/scripts.md
 ```shell
 npm install 
 ```
@@ -27,11 +25,11 @@ Will launch a Cloudformation template to create an S3 bucket to be used for lamb
 ```shell
 npm run upload
 ```
-Will build all assets and upload to the S3 bootstrap bucket
+Will build all assets and upload to the S3 bootstrap bucket.
 ```shell
 npm run stack test/master up
 ```
-Will launch the Master templating creating all resources
+Will launch the Master templating creating all resources.
 
 ### Dev environment 
 
@@ -49,11 +47,11 @@ Runs a local development server of the Designer UI.
 The templates are found in the /templates directory. Master-base.json is the entry point and the other templates and nested under Master-base.json. 
 
 #### Running the tests
-To test the templates first launch the dev templates.
+To test the templates first launch the dev templates,
 ```shell
 npm run dev-up
 ```
-and run a test template with
+and run a test template with.
 ```shell
 npm run stack test/{template-name-without-.json}
 ```
