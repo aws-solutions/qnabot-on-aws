@@ -17,7 +17,7 @@
     "run": "./bin/run.js",
     "check": "./bin/check.sh",
     "stack": "./bin/launch.sh",
-    "upload": "make upload -j 4",
+    "upload": "npm run build; make upload -j 4",
     "server": "./website/admin/config/server.js",
     "dev-up": "npm run stack dev/dev up",
     "up": "npm run upload && npm run stack test/master up",
