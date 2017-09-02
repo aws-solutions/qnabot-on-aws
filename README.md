@@ -7,7 +7,7 @@ This repo contains code to launch an AWS Lex Bot to capture natural language que
 ### Prerequisites
 
 - Running Linux 
-- Installed node and npm 6> [instructions](https://nodejs.org/en/download/)
+- Installed npm 3> and node 6> [instructions](https://nodejs.org/en/download/)
 - Cloned this repo
 - Set up an aws account. [instructions](https://aws.amazon.com/free/?sc_channel=PS&sc_campaign=acquisition_US&sc_publisher=google&sc_medium=cloud_computing_b&sc_content=aws_account_bmm_control_q32016&sc_detail=%2Baws%20%2Baccount&sc_category=cloud_computing&sc_segment=102882724242&sc_matchtype=b&sc_country=US&s_kwcid=AL!4422!3!102882724242!b!!g!!%2Baws%20%2Baccount&ef_id=WS3s1AAAAJur-Oj2:20170825145941:s)
 - Configured aws cli and local credentials. [instructions](http://docs.aws.amazon.com/cli/latest/userguide/cli-chap-welcome.html)
@@ -21,11 +21,11 @@ npm install
 ```shell
 npm run stack dev/bootstrap up
 ```
-Will launch a Cloudformation template to create an S3 bucket to be used for lambda code and Cloudformation templates.
+Will launch a Cloudformation template to create an S3 bucket to be used for lambda code and Cloudformation templates. After the template has complete run, 
 ```shell
 npm run upload
 ```
-Will build all assets and upload to the S3 bootstrap bucket.
+to build all assets and upload to the S3 bootstrap bucket.
 ```shell
 npm run stack test/master up
 ```

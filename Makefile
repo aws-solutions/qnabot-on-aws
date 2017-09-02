@@ -48,7 +48,7 @@ $(VARIABLE)/node_modules:$(VARIABLE)/package.json
 build/lambda/cfn-variable.zip:build $(VARIABLE)/node_modules $(VARIABLE_FILES)
 	./bin/lambda.sh cfn-variable
 
-lambda:build/lambda/cfn-lex.zip  build/lambda/cfn-s3.zip build/lambda/cfn-es.zip build/lambda/handler.zip build/lambda/cfn-user.zip build/lambda/cfn-variable.zip
+lambda:build/lambda/cfn-lex.zip  build/lambda/cfn-s3.zip build/lambda/cfn-es.zip build/lambda/handler.zip build/lambda/cfn-user.zip build/lambda/cfn-variable.zip build
 
 templates/master.json:templates/master-base.json
 	./bin/master.js
@@ -65,15 +65,15 @@ templates/api.json:templates/api/*
 build/templates:templates/*.json templates/*.yml templates/master.json templates/dev/*.json 
 	rm -rf ./build/templates/* ; cp -r ./templates/* ./build/templates
 
-templates:build build/templates templates/api.json templates/lex.json templates/dashboard.json templates/master.json
+templates:build build/templates templates/api.json templates/lex.json templates/dashboard.json templates/master.json build
 
-website:website/admin/assets  website/admin/config website/admin/js website/admin/style website/admin/entry.js  website/admin/html/*
+website:website/admin/assets  website/admin/config website/admin/js website/admin/style website/admin/entry.js  website/admin/html/* build
 	node_modules/.bin/webpack --config ./website/admin/config/webpack.config.js
 
-samples:docs/blog-samples.json
+samples:docs/blog-samples.json build
 	cp docs/blog-samples.json build/documents
 
-upload: templates lambda website
+upload: templates lambda website build
 	aws s3 sync build s3://$(BUCKET)/$(PREFIX) --delete
 
 
