@@ -36,12 +36,12 @@ Will launch the Master templating creating all resources.
 ```shell
 npm run dev-up
 ```
-Launches a Cloudformation template that creates an number of AWS resources used for testing and development. Templates in the templates/test folder and lambda function tests use exported variables from this template.
+Launches a Cloudformation template that creates an number of AWS resources used for testing and development. When the template is done being created the you can test the other templates, lambda functions, and website.
+
+To run a local development server of the Designer UI.
 ```shell
 npm run server 
 ```
-Runs a local development server of the Designer UI.
-
 ## Components
 ### Cloudformation Templates
 The templates are found in the /templates directory. Master-base.json is the entry point and the other templates and nested under Master-base.json. 
