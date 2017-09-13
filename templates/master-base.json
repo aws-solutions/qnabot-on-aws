@@ -288,6 +288,9 @@
     "BotName":{
         "Value":{"Fn::GetAtt":["QnABot","Outputs.Bot"]}
     },
+    "IntentName":{
+        "Value":{"Fn::GetAtt":["QnABot","Outputs.Intent"]}
+    },
     "HandlerArn":{
         "Value":{"Fn::GetAtt":["Handler","Outputs.Arn"]}
     },
