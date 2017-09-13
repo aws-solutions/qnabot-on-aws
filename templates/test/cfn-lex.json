@@ -5,8 +5,8 @@
         "Properties" : {
             "TemplateURL" : {"Fn::Join":["/",[
                 "https://s3.amazonaws.com",
-                {"Fn::ImportValue":"QNA-BOOTSTRAP-PREFIX"},
                 {"Fn::ImportValue":"QNA-BOOTSTRAP-BUCKET"},
+                {"Fn::ImportValue":"QNA-BOOTSTRAP-PREFIX"},
                 "templates/cfn-lex.json"
             ]]},
             "Parameters":{
