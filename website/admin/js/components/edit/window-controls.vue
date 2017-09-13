@@ -114,8 +114,7 @@ module.exports={
       var self=this
       if(this.qa.qid.text){
         self.qa.deleting=true
-        var index=this.$store.state.QAs.indexOf(this.qa)
-        this.$store.dispatch('removeQA',{index,qid:this.qa.qid.text})
+        this.$store.dispatch('removeQA',{qid:this.qa.qid.text})
         .catch(self.error('could not delete'))
         .finally(()=>self.qa.deleting=false)
       }else{

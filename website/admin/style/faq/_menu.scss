@@ -8,6 +8,18 @@ $id-font-size:20px;
   }
   .alexaModal {
     height:100%;
+    h3 {
+      text-align:center;
+      margin-top:20px;
+      margin-bottom:0px;
+    }
+    p {
+      padding-top:10px;
+    }
+    ol {
+      list-style-type:decimal;
+      padding-left:20px;
+    }
     .modal-card {
       overflow-y:scroll;
       margin:0px;
