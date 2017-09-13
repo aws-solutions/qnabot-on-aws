@@ -204,7 +204,11 @@ module.exports={
         var reader = new FileReader();
         action=new Promise(function(res,rej){
           reader.onload = function(e) { 
-            res(JSON.parse(e.srcElement.result))
+            try {
+              res(JSON.parse(e.srcElement.result))
+            } catch(e) {
+              rej("invalid JSON")
+            }
           };
           reader.readAsText(file);
         })

@@ -94,7 +94,7 @@ module.exports={
     },
     build(context){
         return context.state.client.build()
-        .delay(2000)
+        .delay(10*1000)
         .then(function(){
             return new Promise(function(res,rej){
                 var next=function(count){
