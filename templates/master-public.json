@@ -611,6 +611,14 @@
  "AWSTemplateFormatVersion": "2010-09-09",
  "Description": "QnABot with admin and client websites",
  "Outputs": {
+  "IntentName": {
+   "Value": {
+    "Fn::GetAtt": [
+     "QnABot",
+     "Outputs.Intent"
+    ]
+   }
+  },
   "ContentDesignerURL": {
    "Value": {
     "Fn::GetAtt": [

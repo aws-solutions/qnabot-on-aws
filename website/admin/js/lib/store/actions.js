@@ -88,14 +88,11 @@ module.exports={
             qid=>context.state.client.remove(qid)
          )
         .then(function(){
-            var Ids=new Set(context.state.selectIds.slice())
-            for(var qid of Ids){
-                var index=context.state.QAs.findIndex(qa=>qa.qid.text===qid)
-                context.commit('delQA',index)
-            }
+            context.commit("clearQA")
             return self.dispatch('get',context.state.page.current)
         })
         .tapCatch(e=>console.log('Error:',e))
+        .tapCatch(()=>context.commit('startLoading'))
         .catchThrow('Failed to remove')     
     },
     build(context){

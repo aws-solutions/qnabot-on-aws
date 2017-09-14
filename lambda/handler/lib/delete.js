@@ -34,6 +34,7 @@ module.exports=function(params,es){
         return es.delete({
             index: process.env.ES_INDEX,
             type: process.env.ES_TYPE,
+            refresh:"true",
             id:params.Id
         })
     })
