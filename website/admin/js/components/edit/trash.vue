@@ -1,7 +1,9 @@
 <template>
   <span class='trash' v-on:click.stop="next">
     <span class="icon"> 
-      <icon v-show="!check && !loading" name="trash" v-tooltip="tooltip" ></icon>
+      <icon v-show="!check && !loading" name="trash" v-tooltip="tooltip" 
+        tabindex='-1'
+      ></icon>
       <icon v-show="loading" name="spinner" class="fa-pulse"></icon>
     </span>
     <span class="text">

@@ -33,8 +33,8 @@
         </li>
       </ul>
       <div class="addQuestion tab" v-bind:class="{hidden:!qa.edit}">
-        <button class='add' v-on:click="add()">
-          <icon name='plus' v-tooltip="'add'"></icon>
+        <button class='add' v-on:click="add()" tabindex='-1'>
+          <icon name='plus' v-tooltip="'add'" tabindex='-1'></icon>
         </button>
       </div>
       <hr>

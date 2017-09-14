@@ -10,11 +10,13 @@
       v-on:click.native.stop="save"
       v-show="qa.edit && qa.open && !loading"
       v-tooltip="'save'"
+      tabindex='-1'
     ></icon>
     <icon name="ban" 
       v-on:click.native.stop="cancel"
       v-show="qa.edit && qa.open && !loading"
       v-tooltip="'cancel'"
+      tabindex='-1'
     ></icon>
     <icon v-show="loading" name="spinner" class="fa-pulse"></icon>
     <trash 
@@ -23,6 +25,7 @@
       v-on:close="opened=false"
       v-bind:loading="qa.deleting"
       v-show="!loading && qa.open"
+      tabindex='-1'
     ></trash>   
   </div>
 </template>
