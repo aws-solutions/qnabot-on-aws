@@ -45,7 +45,7 @@ Lambda functions are found in the /lambda directory.
 The Designer Ui and client Ui code is in the /website/admin directory. 
 
 ## Development 
-The following will launch a cloudformation template to create AWS resources in your account that are used in the Lambda, Cloudformation, and WebUi tests. Once the template has complete you can run start test locally:
+The following will launch a Cloudformation template to create AWS resources in your account that are used in the Lambda, Cloudformation, and WebUi tests. Once the template has complete you can run start test locally:
 ```shell
 npm run dev-up
 ```
@@ -60,7 +60,7 @@ You also can check a template's syntax with:
 ```shell
 npm run check {template's directory relative to /templates}/{template name with .json or .yaml}
 ```
-eg.
+Eg.
 ```shell
 npm run check test/es.json
 ```
