@@ -1,40 +1,55 @@
 # npm scripts
-helper scripts run via npm run script-name scripts-args
+The following are helper scripts run via: 
+```shell
+npm run script-name scripts-args
+```
 
-## check
-Runs a validation check against a cloudformation template. to check a template called example.json in the templates folder run:  
-    npm run check example.json  
-or for a script in the test directory  
-    npm run check test/example.json  
+## Check Cloudformation Syntax
+Runs a validation check against a cloudformation template. For example,to check a template called example.json in the templates folder run:  
+```shell
+npm run check example.json  
+```
 
-## stack
-manages cloudformation stacks for a template name example.json in the template directory  
-    launch stack - npm run stack example up  
-    update stack - npm run stack exampe update  
-    delete stack - npm run stack example down  
+or for a script in the test directory:
+```shell
+npm run check test/example.json  
+```
 
-## Create dev bootstrap bucket
-npm run stack dev/bootstrap up  
+## Launch Cloudformation stacks
+Manage cloudformation stacks for templates in the template directory. 
+Eg. For a template with path templates/example.json:
+```shell
+npm run stack example up #launch a stack
+npm run stack exampe update #update a stack
+npm run stack example down #delete a stack 
+```
 
-## upload
-Builds  all artifacts and uploads to dev-bootstrap bucket  
+## Build and Upload
+To build all artifacts and upload to dev-bootstrap bucket:
+```shell
 npm run upload  
+```
 
-## up
-builds artifacts, uploads artifacts, and launches master template  
-npm run up  
-
-## lambda-update
-Builds all lambdas and updates the handler&fullfilment functions in the launched master template   
+## Update Lambda Functions
+To build all lambdas and update the handler & fulfillment functions in templates/test/master.json template:
+```shell
 npm run lambda-update  
+```
 
 ## admin-update
-Builds website and uploads to the master-website bucket  
+To build designer UI website and upload to the template/test/master.json:
+```shell
+npm run admin-update
+```
 
-# set up commands  
+# Bootstrap Commands
+To Bring up a full development environment from a fresh clone:
+```shell
 npm install  
-npm install --global jq-cli-wrapper  
-npm run stack dev/bootstrap up   #might fail on first run, just rerun  
--when stack is complete  
+npm run stack dev/bootstrap up     
+```
+When the dev/bootstrap stack has completed run:
+```shell
 npm run up   
+```
 
