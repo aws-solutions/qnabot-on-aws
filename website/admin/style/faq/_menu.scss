@@ -8,10 +8,18 @@ $id-font-size:20px;
   }
   .alexaModal {
     height:100%;
-    h3 {
+    blockquote {
+      h4 h3, {
+        margin:0;
+      }
+    }
+    h2{
       text-align:center;
-      margin-top:20px;
-      margin-bottom:0px;
+      margin:0;
+    }
+    h3 {
+      margin:0px;
+      font-size:1.25em;
     }
     p {
       padding-top:10px;
