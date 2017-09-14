@@ -1,61 +1,62 @@
 # A Question and Answer Bot Using Amazon Lex and Alexa
 
-> Build A Bot to answer questions. 
+> Build a chat bot to answer questions. 
 
-This repo contains code to launch an AWS Lex Bot to capture natural language questions typed or spoken, using the Lex Web-UI client, and return the most relevant answer obtained by searching all QnA documents using the AWS Elasticsearch service. You can use this repo to extend or customize the QnABot for your own purposes.
+This repository contains code to launch an AWS Lex Bot to capture natural language questions typed or spoken, using the Lex Web-UI client, and return the most relevant answer obtained by searching all QnA documents using the AWS Elasticsearch service. You can use this repository to extend or customize the QnABot for your own purposes.
 
 ### Prerequisites
 
 - Running Linux 
 - Installed npm 3> and node 6> [instructions](https://nodejs.org/en/download/)
-- Cloned this repo
-- Set up an aws account. [instructions](https://aws.amazon.com/free/?sc_channel=PS&sc_campaign=acquisition_US&sc_publisher=google&sc_medium=cloud_computing_b&sc_content=aws_account_bmm_control_q32016&sc_detail=%2Baws%20%2Baccount&sc_category=cloud_computing&sc_segment=102882724242&sc_matchtype=b&sc_country=US&s_kwcid=AL!4422!3!102882724242!b!!g!!%2Baws%20%2Baccount&ef_id=WS3s1AAAAJur-Oj2:20170825145941:s)
-- Configured aws cli and local credentials. [instructions](http://docs.aws.amazon.com/cli/latest/userguide/cli-chap-welcome.html)
-- Lex is currently only supported in us-east-1
+- Clone this repo.
+- Set up an AWS account. [instructions](https://AWS.amazon.com/free/?sc_channel=PS&sc_campaign=acquisition_US&sc_publisher=google&sc_medium=cloud_computing_b&sc_content=AWS_account_bmm_control_q32016&sc_detail=%2BAWS%20%2Baccount&sc_category=cloud_computing&sc_segment=102882724242&sc_matchtype=b&sc_country=US&s_kwcid=AL!4422!3!102882724242!b!!g!!%2BAWS%20%2Baccount&ef_id=WS3s1AAAAJur-Oj2:20170825145941:s)
+- Configure AWS CLI and local credentials. [instructions](http://docs.AWS.amazon.com/cli/latest/userguide/cli-chap-welcome.html)
+- Lex is currently only supported in the us-east-1 region.
 
 ## Getting Started
-All script descriptions are found in /docs/scripts.md
+All script descriptions are found in /docs/scripts.md  
+Fist, install all prerequisites:
 ```shell
 npm install 
 ```
+Next, launch a Cloudformation template to create the S3 bucket to be used for lambda code and Cloudformation templates. Wait for this template to complete (you can watch progress from the [AWS Cloudformation console](https://console.AWS.amazon.com/cloudformation/home)) After the template has complete run:
 ```shell
 npm run stack dev/bootstrap up
 ```
-Will launch a Cloudformation template to create an S3 bucket to be used for lambda code and Cloudformation templates. After the template has complete run, 
+
+Next, build all assets and upload to the S3 bucket created in the previous step:
 ```shell
 npm run upload
 ```
-to build all assets and upload to the S3 bootstrap bucket.
+
+Finally, launch template to deploy the QnA bot in your AWS account. When the stack has complete you will be able to log into the Designer ui (The URL is an output of the template) with the password set in "templates/test/master.json":
 ```shell
 npm run stack test/master up
 ```
-Will launch the Master templating creating all resources.
 
-### Dev environment 
-
-```shell
-npm run dev-up
-```
-Launches a Cloudformation template that creates an number of AWS resources used for testing and development. When the template is done being created the you can test the other templates, lambda functions, and website.
-
-To run a local development server of the Designer UI.
-```shell
-npm run server 
-```
 ## Components
 ### Cloudformation Templates
 The templates are found in the /templates directory. Master-base.json is the entry point and the other templates and nested under Master-base.json. 
 
-#### Running the tests
-To test the templates first launch the dev templates,
+### Lambda Functions
+Lambda functions are found in the /lambda directory.
+
+### Web interface
+The Designer Ui and client Ui code is in the /website/admin directory. 
+
+## Development 
+The following will launch a cloudformation template to create AWS resources in your account that are used in the Lambda, Cloudformation, and WebUi tests. Once the template has complete you can run start test locally:
 ```shell
 npm run dev-up
 ```
-and run a test template with.
+
+#### Cloudformation tests
+The Cloudformation test templates are in the templates/test folder.to run a test template with:
 ```shell
 npm run stack test/{template-name-without-.json}
 ```
-You can check a tempate's syntax with 
+
+You also can check a template's syntax with:
 ```shell
 npm run check {template's directory relative to /templates}/{template name with .json or .yaml}
 ```
@@ -64,24 +65,20 @@ eg.
 npm run check test/es.json
 ```
 
-### Lambda Functions
-Lambda functions are found in the /lambda directory.
-#### Running the tests
-Each lambda directory has its own test that depend on the dev enroment being set up. 
+#### Running Lambda Function tests
+Each lambda directory has its own test that can be run with the following command in the lambda function direction:
+```shell
+npm run test
+```
 
-### Web interface
-The Designer Ui and client Ui code is in the /website/admin directory. 
-#### Running the tests
-the Test for the website are in the /website/admin/test. A dev server can be setup by calling:
+#### Testing Designer UI
+the Test for the website are in the /website/admin/test. A development server can be setup by calling:
 ```shell
 npm run server
 ```
+You can view this local Designer UI at [http://localhost:8000](http://localhost:8000)
 
-## Deployment
-### API Endpoints
-/website/mock contains a server that mocks the ApiGateway behavior for the dev server.
-
-### Preparing QnA documents
+## Preparing QnA documents
 
 QnA documents must be formatted as JSON objects, with one file containing a JSON list of QnA documents. Here's an example of a simple QnA document:
 
