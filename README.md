@@ -19,7 +19,8 @@ Fist, install all prerequisites:
 ```shell
 npm install 
 ```
-Next, launch a Cloudformation template to create the S3 bucket to be used for lambda code and Cloudformation templates. Wait for this template to complete (you can watch progress from the [AWS Cloudformation console](https://console.AWS.amazon.com/cloudformation/home)) After the template has complete run:
+Next, launch a Cloudformation template to create the S3 bucket to be used for lambda code and Cloudformation templates. Wait for this template to complete (you can watch progress from the [AWS Cloudformation console](https://console.AWS.amazon.com/cloudformation/home))  
+After the template has complete run:
 ```shell
 npm run stack dev/bootstrap up
 ```
@@ -29,54 +30,20 @@ Next, build all assets and upload to the S3 bucket created in the previous step:
 npm run upload
 ```
 
-Finally, launch template to deploy the QnA bot in your AWS account. When the stack has complete you will be able to log into the Designer ui (The URL is an output of the template) with the password set in "templates/test/master.json":
+Finally, launch template to deploy the QnA bot in your AWS account. When the stack has completed you will be able to log into the Designer ui (The URL is an output of the template) with the password set in "templates/test/master.json":
 ```shell
 npm run stack test/master up
 ```
 
 ## Components
 ### Cloudformation Templates
-The templates are found in the /templates directory. Master-base.json is the entry point and the other templates and nested under Master-base.json. 
+The templates are found in the /templates directory. Master-base.json is the entry point and the other templates and nested in Master-base.json. 
 
 ### Lambda Functions
 Lambda functions are found in the /lambda directory.
 
 ### Web interface
 The Designer Ui and client Ui code is in the /website/admin directory. 
-
-## Development 
-The following will launch a Cloudformation template to create AWS resources in your account that are used in the Lambda, Cloudformation, and WebUi tests. Once the template has complete you can run start test locally:
-```shell
-npm run dev-up
-```
-
-#### Cloudformation tests
-The Cloudformation test templates are in the templates/test folder.to run a test template with:
-```shell
-npm run stack test/{template-name-without-.json}
-```
-
-You also can check a template's syntax with:
-```shell
-npm run check {template's directory relative to /templates}/{template name with .json or .yaml}
-```
-Eg.
-```shell
-npm run check test/es.json
-```
-
-#### Running Lambda Function tests
-Each lambda directory has its own test that can be run with the following command in the lambda function direction:
-```shell
-npm run test
-```
-
-#### Testing Designer UI
-the Test for the website are in the /website/admin/test. A development server can be setup by calling:
-```shell
-npm run server
-```
-You can view this local Designer UI at [http://localhost:8000](http://localhost:8000)
 
 ## Preparing QnA documents
 
@@ -104,9 +71,44 @@ Each QnA object has current 3 fields:
 - q: A list of questions (one or more)
 - a: The text to be returned as the answer when this document is the most relevant
   
-You can associate multiple questions with the same answer, allowing this answer to be retrieved if the user asks the question using different terms and key words. NOTE: the questions don;t have to match exactly how the user will ask the question, but the closer the match the more likely that the right answer will be returned when elastic search tries to find the best match to the user's question..
+You can associate multiple questions with the same answer, allowing this answer to be retrieved if the user asks the question using different terms and key words. NOTE: the questions don;t have to match exactly how the user will ask the question, but the closer the match the more likely that the right answer will be returned when elastic search tries to find the best match to the user's question..  
 
-Keep the answer text short and succinct. Long answers might be fine for a FAQ website, but are not suitable for a chat bot.
+Keep the answer text short and succinct. Long answers might be fine for a FAQ website, but are not suitable for a chat bot.  
+
+## Development 
+The following will launch a Cloudformation template to create AWS resources in your account that are used in the Lambda, Cloudformation, and WebUi tests. 
+```shell
+npm run dev-up
+```
+Once the template has complete you can run start test locally.
+
+#### Cloudformation tests
+The Cloudformation test templates are in the templates/test folder. Run a template test with:
+```shell
+npm run stack test/{template-name-without-.json}
+```
+
+You also can check a template's syntax with:
+```shell
+npm run check {template's directory relative to /templates}/{template name with .json or .yaml}
+```
+Eg.
+```shell
+npm run check test/es.json
+```
+
+#### Running Lambda Function tests
+Each lambda directory has its own test that can be run with the following command in the lambda function directory:
+```shell
+npm run test
+```
+
+#### Testing Designer UI
+The Test for the website are in the /website/admin/test. A development server can be setup by calling:
+```shell
+npm run server
+```
+You can view this local Designer UI at [http://localhost:8000](http://localhost:8000)
 
 ## Built With
 
