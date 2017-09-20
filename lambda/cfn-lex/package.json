@@ -4,8 +4,7 @@
   "description": "",
   "main": "handler.js",
   "scripts": {
-    "test": "nodeunit library/test.js",
-    "unit": "nodeunit library/test.js -t"
+    "test": "echo 'test not configured for this lambda'"
   },
   "author": "",
   "license": "ISC",

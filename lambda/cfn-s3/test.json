@@ -1,9 +1,0 @@
-{
-  "StackId": "stackid",
-  "ResponseURL": "http://pre-signed-S3-url-for-response",
-  "ResourceProperties": {},
-  "RequestType": "Create",
-  "ResourceType": "Custom::SQL",
-  "RequestId": "unique id for this create request",
-  "LogicalResourceId": "MyTestResource"
-}
