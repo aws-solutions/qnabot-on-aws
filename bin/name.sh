@@ -4,7 +4,6 @@ NAME=$(echo $1 | rev | cut -d'/' -f1 | rev)
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 if [ ! -e $DIR/.inc ];then
-    echo "Creating .inc rile"
     echo "{}" > $DIR/.inc 
 fi
 
