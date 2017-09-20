@@ -1,4 +1,4 @@
-# A Question and Answer Bot Using Amazon Lex and Alexa
+# A Question and Answer Bot Using Amazon Lex and Amazon Alexa
 
 > Build a chat bot to answer questions. 
 
@@ -10,7 +10,7 @@ To customize the QnABot use the following instructions to set up a local dev env
 ## Prerequisites
 
 - Run Linux. (tested on Amazon Linux)
-- Install npm >3 and node 6. ([instructions](https://nodejs.org/en/download/))
+- Install npm >3 and node >6. ([instructions](https://nodejs.org/en/download/))
 - Clone this repo.
 - Set up an AWS account. ([instructions](https://AWS.amazon.com/free/?sc_channel=PS&sc_campaign=acquisition_US&sc_publisher=google&sc_medium=cloud_computing_b&sc_content=AWS_account_bmm_control_q32016&sc_detail=%2BAWS%20%2Baccount&sc_category=cloud_computing&sc_segment=102882724242&sc_matchtype=b&sc_country=US&s_kwcid=AL!4422!3!102882724242!b!!g!!%2BAWS%20%2Baccount&ef_id=WS3s1AAAAJur-Oj2:20170825145941:s))
 - Configure AWS CLI and local credentials. ([instructions](http://docs.AWS.amazon.com/cli/latest/userguide/cli-chap-welcome.html))  
@@ -74,7 +74,7 @@ npm run check {template's directory relative to /templates}/{template-name}
 ```
 
 ### Running Lambda Function tests
-Each lambda directory has its own test that can be run with the following command in the lambda function directory:
+Each lambda directory has its own tests that can be run by executing the following command in that directory:
 ```shell
 npm run test
 ```
