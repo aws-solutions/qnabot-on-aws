@@ -57,7 +57,7 @@ exports.success=function(message,params){
                   "type": "PlainText",
                   "text": message.msg
               },
-              "shouldEndSession": true,
+              "shouldEndSession": false,
               card:{
                 type:"Standard",
                 title:message.question,
