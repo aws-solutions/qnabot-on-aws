@@ -11,15 +11,13 @@ BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied. See the
 License for the specific language governing permissions and limitations under the License.
 */
 
-exports.SEARCH=require('./search.js')
-exports.LIST=require('./list.js')
-exports.ADD=require('./add.js')
-exports.DELETE=require('./delete.js')
-exports.PING=require('./ping.js')
-exports.CHECK=require('./check.js')
-exports.EXPORT=require('./export.js')
-exports.BOT_INFO=require('./bot-info.js')
-exports.BOT_STATUS=require('./bot-status.js')
-exports.SAVE=require('./save.js')
-exports.BUILD=require('./build.js')
-exports.ALEXA=require('./alexa.js')
+var Promise=require('bluebird')
+
+module.exports=function(params,es){
+    if(params.Type==="start"){
+        return Promise.resolve({msg:"Please ask a question"})
+    }else if(params.Type==="end"){
+        return Promise.resolve({msg:""})
+    }
+}
+

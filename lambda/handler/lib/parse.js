@@ -28,10 +28,24 @@ module.exports=function(event){
     }else if(event.request){
         console.log("Processing as ALEXA")
         process.env.TYPE="ALEXA"
-        out={
-            Command:"SEARCH",
-            Query:event.request.intent.slots.QnA_slot.value,
-            Session:event.session.attributes
+        if(event.request.type=='IntentRequest'){
+            out={
+                Command:"SEARCH",
+                Query:event.request.intent.slots.QnA_slot.value,
+                Session:event.session.attributes
+            }
+        }else if(event.request.type=='LaunchRequest'){
+            out={
+                Command:"ALEXA",
+                Type:"start"
+            }
+        }else if(event.request.type=='SessionEndedRequest'){
+            out={
+                Command:"ALEXA",
+                Type:"end"
+            }
+        }else{
+            throw {message:"Invalid Alexa event object"}
         }
     }else{
         console.log("Processing as API")
@@ -42,7 +56,6 @@ module.exports=function(event){
     var v=validator.validate(out, schema)
     assert(v.valid,"Invalid config:"+v.errors)
     return out
-
 }
 
 

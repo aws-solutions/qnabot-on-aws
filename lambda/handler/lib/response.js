@@ -45,7 +45,7 @@ exports.error=function(err,params){
 }
 
 exports.success=function(message,params){
-    console.log(process.env.TYPE)
+    console.log(process.env.TYPE,message)
     if(process.env.TYPE==="API"){
         return message
     }else if(process.env.TYPE==="ALEXA"){

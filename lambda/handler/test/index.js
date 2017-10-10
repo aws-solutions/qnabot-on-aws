@@ -73,9 +73,19 @@ module.exports={
         var params=require('./params/lex.json') 
         run(params,test)
     },
-    alexa:function(test){
-        var params=require('./params/alexa.json') 
-        run(params,test)
+    alexa:{
+        intent:function(test){
+            var params=require('./params/alexa-intent.json') 
+            run(params,test)
+        },
+        start:function(test){
+            var params=require('./params/alexa-start.json') 
+            run(params,test)
+        },
+        end:function(test){
+            var params=require('./params/alexa-end.json') 
+            run(params,test)
+        }
     },
     search:function(test){
         var params={
