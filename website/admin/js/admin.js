@@ -16,6 +16,7 @@ Promise.config({
     warnings:false
 })
 var Vue=require('vue')
+var bowser=require('bowser')
 
 var Router=require('vue-router').default
 var Vuex=require('vuex').default
@@ -39,12 +40,15 @@ Vue.use(Router)
 
 var lib=require('./lib')
 
-document.addEventListener('DOMContentLoaded', function(){
+document.addEventListener('DOMContentLoaded',function(){
+    if( !bowser.chrome && !bowser.firefox ){
+        alert("Warning: Unsupported Browser, please use Chrome or Firefox")
+    }
+    init()
+})
+function init(){
+
     var router=new Router(lib.router)
-
-    
-    
-
     var store=lib.store
     Vue.component('icon',require('vue-awesome'))
     var App=new Vue({
@@ -94,4 +98,4 @@ document.addEventListener('DOMContentLoaded', function(){
    
     store.state.modal=App.$modal
     router.onReady(()=>App.$mount('#App'))
-})
+}

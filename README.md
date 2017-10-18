@@ -86,6 +86,12 @@ npm run server
 ```
 You can view this local Designer UI at [http://localhost:8000](http://localhost:8000)
 
+### Designer UI Compatibility 
+Currently the only browsers supported are:  
+    Chrome  
+    FireFox  
+We are currently working on adding Microsoft Edge support.  
+
 ## Built With
 
 * [Vue](https://vuejs.org/) 
