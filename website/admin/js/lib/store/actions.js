@@ -325,12 +325,14 @@ module.exports={
       context.commit('startLoading')
       var index=context.state.QAs.findIndex(qa=>qa.qid.text===qid)
       console.log(index,qid)
-     if(index>0){
+      if(index>=0){
           return context.state.client.remove(qid)
           .then(()=>context.commit('delQA',index))
           .tapCatch(e=>console.log('Error:',e))
           .catchThrow('Failed to remove')
+          .finally(()=>context.commit('stopLoading'))
       }else{
+        context.commit('stopLoading')
         return Promise.resolve()
       } 
     },
