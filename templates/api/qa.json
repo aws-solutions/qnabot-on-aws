@@ -100,7 +100,7 @@
             [
               "{",
               "\"Command\":\"CHECK\",",
-              "\"Id\":\"$input.params('Id')\"",
+              "\"Id\":\"$util.urlDecode($input.params('Id'))\"",
               "}"
             ]
           ]
@@ -228,7 +228,7 @@
             [
               "{",
               "\"Command\":\"DELETE\",",
-              "\"Id\":\"$input.params('Id')\"",
+              "\"Id\":\"$util.urlDecode($input.params('Id'))\"",
               "}"
             ]
           ]
