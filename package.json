@@ -2,11 +2,18 @@
   "name": "aws-ai-qna-bot",
   "version": "1.0.0",
   "engines": {
-    "node": ">=6.10.0"
+    "node": ">=6.4.0",
+    "npm":">=5.0.0"
   },
   "os": [
     "darwin",
     "linux"
+  ],
+  "keywords":[
+    "aws",
+    "lex",
+    "chatbot",
+    "QnA"
   ],
   "description": "An Amazon Lex powered Question and Answer (QnA) Bot ====================================================",
   "scripts": {
@@ -27,14 +34,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/rstrahan/aws-ai-qna-bot.git"
+    "url": "git+https://github.com/awslabs/aws-ai-qna-bot.git"
   },
-  "author": "",
-  "license": "ISC",
+  "author": "AWS",
+  "license": "SEE LICENSE IN LICENSE",
   "bugs": {
-    "url": "https://github.com/rstrahan/aws-ai-qna-bot/issues"
+    "url": "https://github.com/awslabs/aws-ai-qna-bot/issues"
   },
-  "homepage": "https://github.com/rstrahan/aws-ai-qna-bot#readme",
+  "homepage": "https://github.com/awslabs/aws-ai-qna-bot#readme",
   "dependencies": {
     "ajax-promise": "^0.8.1",
     "amazon-cognito-identity-js": "^1.19.0",
