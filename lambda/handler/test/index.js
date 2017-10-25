@@ -12,6 +12,7 @@ License for the specific language governing permissions and limitations under th
 */
 
 var lambda=require('../bin/lambda.js')
+var response=require('../lib/response')
 var path=require('path')
 var api_params=require('./params/api.json')
 
@@ -22,6 +23,28 @@ var run=function(params,test){
         .error(test.ifError)
         .catch(test.ifError)
         .finally(test.done)
+}
+
+var runResponse=function(params, msg, type, test, successmatch, position, successmsgmatch){
+  const origType = process.env.TYPE
+  process.env.TYPE=type
+  try {
+    let resp = response.success(msg, params)
+    process.env.TYPE = origType
+    if (origType) {
+      test.equal(process.env.TYPE, origType, 'Could not reset process TYPE parameter, expected ' + origType + ' found ' + process.env.TYPE)
+    }
+    if (successmatch) {
+      test.deepEqual(resp.dialogAction.responseCard.genericAttachments[position], successmatch, 'link not parsed correctly')
+    }
+    if (successmsgmatch) {
+      test.deepEqual(resp.dialogAction.message, successmsgmatch, 'link not parsed correctly')
+    }
+  } catch (ex) {
+    test.ifError()
+  } finally {
+    test.done()
+  }
 }
 
 module.exports={
@@ -143,7 +166,144 @@ module.exports={
             Command:"PING"
         }
         run(params,test)
+    },
+
+  /* http in markdown */
+    linkParsing1:function(test){
+        var params={
+            Session: {}
+        }
+        var msg={
+            msg: 'If the Training Center or Instructor has listed its skill sessions in our system, you will be able to search and reserve that class online. You may also have to call the Training Center or visit the Training Center\'s website to inquire about costs and availability, and to register and pay for the class. This is because AHA Training Centers are independent businesses that have entered into an agreement with the AHA to provide CPR and first aid training using our current curricula and products. [Find a Course](http://cpr.heart.org/AHAECC/CPRAndECC/FindACourse/UCM_473162_Find-A-Course.jsp) this is a test',
+            question: 'how do i find a course',
+            r: {
+              title: 'Your source for training',
+              imageUrl: 'https://s3.amazonaws.com/aha-sprint-artifacts/banner_kit.jpg'
+            }
+        }
+        var matchObj={
+          title: 'Find a Course',
+          subTitle: 'http://cpr.heart.org/AHAECC/CPRAndECC/FindACourse/UCM_473162_Find-A-Course.jsp',
+          attachmentLinkUrl: 'http://cpr.heart.org/AHAECC/CPRAndECC/FindACourse/UCM_473162_Find-A-Course.jsp'
+        }
+        var matchMessage={
+            contentType: "PlainText",
+            content: 'If the Training Center or Instructor has listed its skill sessions in our system, you will be able to search and reserve that class online. You may also have to call the Training Center or visit the Training Center\'s website to inquire about costs and availability, and to register and pay for the class. This is because AHA Training Centers are independent businesses that have entered into an agreement with the AHA to provide CPR and first aid training using our current curricula and products.   this is a test'
+        }
+
+      runResponse(params, msg, 'LEX', test, matchObj, 1, matchMessage)
+    },
+
+  /* https in markdown */
+    linkParsing2:function(test){
+    var params={
+      Session: {}
     }
+    var msg={
+      msg: 'If the Training Center or Instructor has listed its skill sessions in our system, you will be able to search and reserve that class online. You may also have to call the Training Center or visit the Training Center\'s website to inquire about costs and availability, and to register and pay for the class. This is because AHA Training Centers are independent businesses that have entered into an agreement with the AHA to provide CPR and first aid training using our current curricula and products. [Find a Course](https://cpr.heart.org/AHAECC/CPRAndECC/FindACourse/UCM_473162_Find-A-Course.jsp) this is a test',
+      question: 'how do i find a course',
+      r: {
+        title: 'Your source for training',
+        imageUrl: 'https://s3.amazonaws.com/aha-sprint-artifacts/banner_kit.jpg'
+      }
+    }
+    var matchObj={
+      title: 'Find a Course',
+      subTitle: 'https://cpr.heart.org/AHAECC/CPRAndECC/FindACourse/UCM_473162_Find-A-Course.jsp',
+      attachmentLinkUrl: 'https://cpr.heart.org/AHAECC/CPRAndECC/FindACourse/UCM_473162_Find-A-Course.jsp'
+    }
+    var matchMessage={
+        contentType: "PlainText",
+        content: 'If the Training Center or Instructor has listed its skill sessions in our system, you will be able to search and reserve that class online. You may also have to call the Training Center or visit the Training Center\'s website to inquire about costs and availability, and to register and pay for the class. This is because AHA Training Centers are independent businesses that have entered into an agreement with the AHA to provide CPR and first aid training using our current curricula and products.   this is a test'
+    }
+    runResponse(params, msg, 'LEX', test, matchObj, 1, matchMessage)
+    },
+
+  /* ftp in markdown */
+  linkParsing3:function(test){
+    var params={
+      Session: {}
+    }
+    var msg={
+      msg: 'If the Training Center or Instructor has listed its skill sessions in our system, you will be able to search and reserve that class online. You may also have to call the Training Center or visit the Training Center\'s website to inquire about costs and availability, and to register and pay for the class. This is because AHA Training Centers are independent businesses that have entered into an agreement with the AHA to provide CPR and first aid training using our current curricula and products. [Find a Course](ftp://cpr.heart.org/AHAECC/CPRAndECC/FindACourse/UCM_473162_Find-A-Course.jsp) this is a test',
+      question: 'how do i find a course',
+      r: {
+        title: 'Your source for training',
+        imageUrl: 'https://s3.amazonaws.com/aha-sprint-artifacts/banner_kit.jpg'
+      }
+    }
+    var matchObj={
+      title: 'Find a Course',
+      subTitle: 'ftp://cpr.heart.org/AHAECC/CPRAndECC/FindACourse/UCM_473162_Find-A-Course.jsp',
+      attachmentLinkUrl: 'ftp://cpr.heart.org/AHAECC/CPRAndECC/FindACourse/UCM_473162_Find-A-Course.jsp'
+    }
+    var matchMessage={
+      contentType: "PlainText",
+      content: 'If the Training Center or Instructor has listed its skill sessions in our system, you will be able to search and reserve that class online. You may also have to call the Training Center or visit the Training Center\'s website to inquire about costs and availability, and to register and pay for the class. This is because AHA Training Centers are independent businesses that have entered into an agreement with the AHA to provide CPR and first aid training using our current curricula and products.   this is a test'
+    }
+
+    runResponse(params, msg, 'LEX', test, matchObj, 1, matchMessage)
+  },
+
+  /* no image reference which changes position of attachmentLinkUrl */
+  linkParsing4:function(test){
+    var params={
+      Session: {}
+    }
+    var msg={
+      msg: 'If the Training Center or Instructor has listed its skill sessions in our system, you will be able to search and reserve that class online. You may also have to call the Training Center or visit the Training Center\'s website to inquire about costs and availability, and to register and pay for the class. This is because AHA Training Centers are independent businesses that have entered into an agreement with the AHA to provide CPR and first aid training using our current curricula and products. [Find a Course](http://cpr.heart.org/AHAECC/CPRAndECC/FindACourse/UCM_473162_Find-A-Course.jsp) this is a test',
+      question: 'how do i find a course',
+    }
+    var matchObj={
+      title: 'Find a Course',
+      subTitle: 'http://cpr.heart.org/AHAECC/CPRAndECC/FindACourse/UCM_473162_Find-A-Course.jsp',
+      attachmentLinkUrl: 'http://cpr.heart.org/AHAECC/CPRAndECC/FindACourse/UCM_473162_Find-A-Course.jsp'
+    }
+    var matchMessage={
+      contentType: "PlainText",
+      content: 'If the Training Center or Instructor has listed its skill sessions in our system, you will be able to search and reserve that class online. You may also have to call the Training Center or visit the Training Center\'s website to inquire about costs and availability, and to register and pay for the class. This is because AHA Training Centers are independent businesses that have entered into an agreement with the AHA to provide CPR and first aid training using our current curricula and products.   this is a test'
+    }
+    runResponse(params, msg, 'LEX', test, matchObj, 0, matchMessage)
+  },
+
+  /* not using markdown syntax*/
+  linkParsing5:function(test){
+    var params={
+      Session: {}
+    }
+    var msg={
+      msg: 'If the Training Center or Instructor has listed its skill sessions in our system, you will be able to search and reserve that class online. You may also have to call the Training Center or visit the Training Center\'s website to inquire about costs and availability, and to register and pay for the class. This is because AHA Training Centers are independent businesses that have entered into an agreement with the AHA to provide CPR and first aid training using our current curricula and products. http://cpr.heart.org/AHAECC/CPRAndECC/FindACourse/UCM_473162_Find-A-Course.jsp this is a test',
+      question: 'how do i find a course',
+    }
+    var matchObj={
+      title: 'Additional Information',
+      subTitle: 'http://cpr.heart.org/AHAECC/CPRAndECC/FindACourse/UCM_473162_Find-A-Course.jsp',
+      attachmentLinkUrl: 'http://cpr.heart.org/AHAECC/CPRAndECC/FindACourse/UCM_473162_Find-A-Course.jsp'
+    }
+    var matchMessage={
+      contentType: "PlainText",
+      content: 'If the Training Center or Instructor has listed its skill sessions in our system, you will be able to search and reserve that class online. You may also have to call the Training Center or visit the Training Center\'s website to inquire about costs and availability, and to register and pay for the class. This is because AHA Training Centers are independent businesses that have entered into an agreement with the AHA to provide CPR and first aid training using our current curricula and products.   this is a test'
+    }
+    runResponse(params, msg, 'LEX', test, matchObj, 0, matchMessage)
+  },
+
+  /* no links in message */
+  linkParsing6:function(test){
+    var params={
+      Session: {}
+    }
+    var msg={
+      msg: 'If the Training Center or Instructor has listed its skill sessions in our system, you will be able to search and reserve that class online. You may also have to call the Training Center or visit the Training Center\'s website to inquire about costs and availability, and to register and pay for the class. This is because AHA Training Centers are independent businesses that have entered into an agreement with the AHA to provide CPR and first aid training using our current curricula and products.',
+      question: 'how do i find a course',
+    }
+    var matchObj=undefined
+    var matchMessage={
+      contentType: "PlainText",
+      content: 'If the Training Center or Instructor has listed its skill sessions in our system, you will be able to search and reserve that class online. You may also have to call the Training Center or visit the Training Center\'s website to inquire about costs and availability, and to register and pay for the class. This is because AHA Training Centers are independent businesses that have entered into an agreement with the AHA to provide CPR and first aid training using our current curricula and products.'
+    }
+    runResponse(params, msg, 'LEX', test, matchObj, 0, matchMessage)
+  }
+
 }
 
 
