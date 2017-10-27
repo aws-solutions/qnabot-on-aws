@@ -183,7 +183,6 @@ module.exports={
         }
         var matchObj={
           title: 'Find a Course',
-          subTitle: 'http://cpr.heart.org/AHAECC/CPRAndECC/FindACourse/UCM_473162_Find-A-Course.jsp',
           attachmentLinkUrl: 'http://cpr.heart.org/AHAECC/CPRAndECC/FindACourse/UCM_473162_Find-A-Course.jsp'
         }
         var matchMessage={
@@ -209,7 +208,6 @@ module.exports={
     }
     var matchObj={
       title: 'Find a Course',
-      subTitle: 'https://cpr.heart.org/AHAECC/CPRAndECC/FindACourse/UCM_473162_Find-A-Course.jsp',
       attachmentLinkUrl: 'https://cpr.heart.org/AHAECC/CPRAndECC/FindACourse/UCM_473162_Find-A-Course.jsp'
     }
     var matchMessage={
@@ -234,7 +232,6 @@ module.exports={
     }
     var matchObj={
       title: 'Find a Course',
-      subTitle: 'ftp://cpr.heart.org/AHAECC/CPRAndECC/FindACourse/UCM_473162_Find-A-Course.jsp',
       attachmentLinkUrl: 'ftp://cpr.heart.org/AHAECC/CPRAndECC/FindACourse/UCM_473162_Find-A-Course.jsp'
     }
     var matchMessage={
@@ -256,7 +253,6 @@ module.exports={
     }
     var matchObj={
       title: 'Find a Course',
-      subTitle: 'http://cpr.heart.org/AHAECC/CPRAndECC/FindACourse/UCM_473162_Find-A-Course.jsp',
       attachmentLinkUrl: 'http://cpr.heart.org/AHAECC/CPRAndECC/FindACourse/UCM_473162_Find-A-Course.jsp'
     }
     var matchMessage={
@@ -277,7 +273,6 @@ module.exports={
     }
     var matchObj={
       title: 'Additional Information',
-      subTitle: 'http://cpr.heart.org/AHAECC/CPRAndECC/FindACourse/UCM_473162_Find-A-Course.jsp',
       attachmentLinkUrl: 'http://cpr.heart.org/AHAECC/CPRAndECC/FindACourse/UCM_473162_Find-A-Course.jsp'
     }
     var matchMessage={
@@ -302,7 +297,27 @@ module.exports={
       content: 'If the Training Center or Instructor has listed its skill sessions in our system, you will be able to search and reserve that class online. You may also have to call the Training Center or visit the Training Center\'s website to inquire about costs and availability, and to register and pay for the class. This is because AHA Training Centers are independent businesses that have entered into an agreement with the AHA to provide CPR and first aid training using our current curricula and products.'
     }
     runResponse(params, msg, 'LEX', test, matchObj, 0, matchMessage)
-  }
+  },
+
+  /* title and url exceed 80 characters */
+  linkParsing7:function(test){
+    var params={
+      Session: {}
+    }
+    var msg={
+      msg: 'If the Training Center or Instructor has listed its skill sessions in our system, you will be able to search and reserve that class online. You may also have to call the Training Center or visit the Training Center\'s website to inquire about costs and availability, and to register and pay for the class. This is because AHA Training Centers are independent businesses that have entered into an agreement with the AHA to provide CPR and first aid training using our current curricula and products. [012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789](http://7890123456789012345678901234567890123456789012345678901234567890123456789cpr.heart.org/AHAECC/CPRAndECC/FindACourse/UCM_473162_Find-A-Course.jsp) this is a test',
+      question: 'how do i find a course',
+    }
+    var matchObj={
+      title:    '01234567890123456789012345678901234567890123456789012345678901234567890123456789',
+      attachmentLinkUrl: 'http://7890123456789012345678901234567890123456789012345678901234567890123456789cpr.heart.org/AHAECC/CPRAndECC/FindACourse/UCM_473162_Find-A-Course.jsp'
+    }
+    var matchMessage={
+      contentType: "PlainText",
+      content: 'If the Training Center or Instructor has listed its skill sessions in our system, you will be able to search and reserve that class online. You may also have to call the Training Center or visit the Training Center\'s website to inquire about costs and availability, and to register and pay for the class. This is because AHA Training Centers are independent businesses that have entered into an agreement with the AHA to provide CPR and first aid training using our current curricula and products.   this is a test'
+    }
+    runResponse(params, msg, 'LEX', test, matchObj, 0, matchMessage)
+  },
 
 }
 

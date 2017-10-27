@@ -51,7 +51,6 @@ function parseLinks(msg){
     for (i = 0; i < mlink1.length; i++) {
       const obj = {
         "title": "Additional Information",
-        "subTitle": mlink1[i],
         "attachmentLinkUrl": mlink1[i]
       }
       mlink[mlink.length] = obj
@@ -62,9 +61,11 @@ function parseLinks(msg){
       let t = matchTitle(mlink2[i])
       let url = matchLink(mlink2[i])
       let title = t[0].substr(1, t[0].length - 2)
+      if (title.length>80) {
+        title = title.substr(0,80)
+      }
       const obj = {
         "title": title,
-        "subTitle": url[0].substr(0, url[0].length),
         "attachmentLinkUrl": url[0].substr(0, url[0].length)
       }
       mlink[mlink.length] = obj
