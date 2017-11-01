@@ -159,7 +159,9 @@ exports.success=function(message,params){
           }
         }
       }
-
+      if (message.t) { //set topic context session attribute
+        out['sessionAttributes']['TopicContext']=message.t
+      }
       if (message.r &&
         Object.keys(message.r).length>0 &&
         Object.keys(message.r).map(x=>message.r[x].length>0).indexOf(false)===-1) {
