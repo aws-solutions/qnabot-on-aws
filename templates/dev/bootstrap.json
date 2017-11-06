@@ -33,7 +33,7 @@
   },
   "Conditions": {},
   "AWSTemplateFormatVersion": "2010-09-09",
-  "Description": "lambda function to build a lambda function",
+  "Description": "Bootstrap bucket for QnABot assets",
   "Mappings": {},
   "Outputs": {
     "Bucket": {
