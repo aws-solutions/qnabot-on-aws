@@ -49,6 +49,11 @@ Lambda functions are found in the /lambda directory.
 ### Web interface
 The Designer UI and client UI code is in the /website/admin directory. 
 
+### Embeddeding URLs as answer content
+Answers to questions may include links to other websites. To efficiently support URLs as part of an answer, Markdown 
+syntax should be used to represent these links. For example, a reference to www.amazon.com 
+should be formatted as \[Amazon\]\(http://www.amazon.com\). http, https, and ftp are supported protocols.
+
 ## Running Tests
 The following will launch a CloudFormation template to create AWS resources in your account that are used in the Lambda, CloudFormation, and WebUI tests. 
 ```shell
