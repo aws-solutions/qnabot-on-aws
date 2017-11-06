@@ -28,6 +28,7 @@ const extractSass = new ExtractTextPlugin({
 module.exports={
     entry:{
         main:"./website/admin/entry.js",
+        check:"./website/admin/js/browser-check.js",
         client:"./website/admin/js/client.js",
         test:"./website/admin/js/test.js"
     },
@@ -68,13 +69,13 @@ module.exports={
             template:'./website/admin/html/admin.ejs',
             favicon:"./website/admin/assets/favicon.gif",
             filename:'index.html',
-            chunks:["main"]
+            chunks:["main","check"]
         }),
         new HtmlWebpackPlugin({
             template:'./website/admin/html/test.ejs',
             filename:'test.html',
             favicon:"./website/admin/assets/favicon.gif",
-            chunks:["main","test"]
+            chunks:["main","test","check"]
         }),
         new HtmlWebpackPlugin({
             template:'./website/admin/html/client.ejs',
@@ -103,6 +104,13 @@ module.exports={
             test: /\.vue$/,
             loader: 'vue-loader',
             options: {}
+          },
+          {
+            test: /\.js$/,
+            loader: 'babel-loader',
+            options:{
+                presets:["es2015-ie"]
+            }
           },
           { 
             test: /\.(png|woff|woff2|eot|ttf|svg)$/, 

@@ -3,13 +3,13 @@
   "version": "1.0.0",
   "engines": {
     "node": ">=6.4.0",
-    "npm":">=5.0.0"
+    "npm": ">=5.0.0"
   },
   "os": [
     "darwin",
     "linux"
   ],
-  "keywords":[
+  "keywords": [
     "aws",
     "lex",
     "chatbot",
@@ -50,6 +50,10 @@
     "aws-lex-web-ui": "github:awslabs/aws-lex-web-ui",
     "aws-sdk": "^2.92.0",
     "aws4": "^1.6.0",
+    "babel-core": "^6.26.0",
+    "babel-loader": "^7.1.2",
+    "babel-preset-env": "^1.6.1",
+    "babel-preset-es2015-ie": "^6.7.0",
     "bluebird": "^3.5.0",
     "body-parser": "^1.17.2",
     "bowser": "^1.8.0",
