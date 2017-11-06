@@ -147,7 +147,7 @@ module.exports=class {
         .get("data")
         .catch(reason("Failed to add")) 
     }
-    update(Id,questions,anwser,qid,card){
+    update(Id,questions,anwser,qid,card,topic){
         card.imageUrl=card.imageUrl.trim() 
         var self=this
         self.cache.clear()
@@ -159,7 +159,8 @@ module.exports=class {
                 qid:qid,
                 q:questions || [],
                 a:anwser,
-                r:card
+                r:card,
+                t:topic
             }],
             {}
         )))

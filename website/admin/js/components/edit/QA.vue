@@ -50,6 +50,18 @@
         </text-input>   
       </div>
       <hr>
+      <h6>Topic:</h6>
+      <div class="A">
+        <text-input 
+          validators="optional"
+          v-bind:field="this.qa.topic"
+          v-bind:name="'t.'+this.index"
+          v-bind:edit="this.qa.edit"
+          placeholder="Type Topic here"
+          prefix="">
+        </text-input>   
+      </div>
+      <hr>
       <h6>Attachment:</h6>
       <attachment v-bind:qa="this.qa"></attachment>
       </text-input>   
@@ -156,7 +168,8 @@ module.exports={
                     check(self.qa.answer),
                     check(self.qa.qid),
                     check(self.qa.card.imageUrl),
-                    check(self.qa.card.title)
+                    check(self.qa.card.title),
+                    check(self.qa.topic)
                     ]).includes(false)
         if(dirty){
           self.error('please save or cancel your edits')(null)

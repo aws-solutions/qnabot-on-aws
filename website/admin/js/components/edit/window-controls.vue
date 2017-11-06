@@ -79,6 +79,7 @@ module.exports={
         })
         save(this.qa.answer)
         this.qa.questions.forEach(save)
+        save(this.qa.topic)
             
         var id_update=this.qa.qid.text===this.qa.qid.tmp
         if(id_update){

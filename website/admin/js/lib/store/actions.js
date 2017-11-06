@@ -42,6 +42,10 @@ var parse=function(item,context){
         tmp:item.body.r.imageUrl ||""
       }
     },
+    topic:{
+        text:item.body.t || "",
+        tmp:item.body.t || ""
+    },
     questions:item.body.q.map(Q=>({text:Q,tmp:Q})),
     open:false,
     edit:false,
@@ -281,7 +285,8 @@ module.exports={
             qa.questions.map(x=>x.text),
             qa.answer.text,
             qa.qid.text,
-            JSON.parse(qa.card.text))
+            JSON.parse(qa.card.text),
+            qa.topic.text)
         .tapCatch(e=>console.log('Error:',e))
         .catchThrow('Failed to update')
     },
@@ -296,6 +301,7 @@ module.exports={
             answer:{text:"",tmp:""},
             questions:[{text:"",tmp:""}],
             qid:{text:"",tmp:""},
+            t:{text:"",tmp:""},
             card:{
                 text:JSON.stringify({}),
                 title:{
