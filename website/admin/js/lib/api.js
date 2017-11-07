@@ -196,17 +196,18 @@ module.exports=class {
         .get("data")
         .catch(reason("Failed to get status")) 
     }
-    search(question){
+    search(question,topic){
         var self=this
         var key=JSON.stringify(arguments)
     
         if(self.cache.has(key)){
             return Promise.resolve(self.cache.get(key))
         }else{
+            console.log(question,topic)
             return self.ready
             .then(()=>self.check_refresh())
             .then(()=>Promise.resolve(self.client.searchGet(
-                {query:question,from:0},{},{}
+                {query:question,topic:topic,from:0},{},{}
             )))
             .get("data")
             .tap(data=>self.cache.set(key,data))

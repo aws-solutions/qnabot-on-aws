@@ -238,10 +238,10 @@ module.exports={
         .tapCatch(e=>console.log('Error:',e))
         .catchThrow('Error: please check URL and source CORS configuration')
     },
-    search(context,{query}){
+    search(context,{query,topic}){
       context.commit('clearQA')
       context.commit('startLoading')
-      return load.bind(context)(context.state.client.search(query))
+      return load.bind(context)(context.state.client.search(query,topic))
       .tapCatch(e=>console.log('Error:',e))
       .catchThrow('Failed to search')
     },
