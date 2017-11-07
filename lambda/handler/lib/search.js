@@ -21,10 +21,22 @@ module.exports=function(params,es){
         size:size,
         from:index || 0,
         query: {
-            multi_match: {
-                query:params.Query,
-                fields : ["q^2","a"]
-            }
+          bool: {
+            should: [
+              {
+	            multi_match: {
+	                query: (params.Session.TopicContext) ? params.Session.TopicContext : "",
+	                fields : ["t"]
+	            }
+	          },
+	          {                  
+	            multi_match: {
+	                query:params.Query,
+	                fields : ["q^2","a"]
+	            }
+	          }
+	        ]
+	      }
         }
     }
 
@@ -58,7 +70,8 @@ module.exports=function(params,es){
                 return  {
                     'msg':results.qa[0].body.a,
                     'question':params.Query,
-                    'r':results.qa[0].body.r 
+                    'r':results.qa[0].body.r,
+                    't':results.qa[0].body.t
                 }
             }else{
                 return  {
