@@ -105,13 +105,6 @@ module.exports={
             loader: 'vue-loader',
             options: {}
           },
-          {
-            test: /\.js$/,
-            loader: 'babel-loader',
-            options:{
-                presets:["es2015-ie"]
-            }
-          },
           { 
             test: /\.(png|woff|woff2|eot|ttf|svg)$/, 
             loader: 'url-loader?limit=100000' 

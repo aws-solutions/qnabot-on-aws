@@ -156,6 +156,8 @@ module.exports={
         self.buildSuccess=false
         self.importExportModal=false
         self.buildModal=false
+        document.getElementById('upload-file').val=''
+        self.$validator.errors.clear()
         self.$store.commit('setError',reason || error)
       }
     },
@@ -195,6 +197,8 @@ module.exports={
     upload:function(x){
       var self=this 
       var action
+
+      
       if(self.url){
         self.importingUrl=true
         action=self.$store.dispatch('upload',{url:self.url})
