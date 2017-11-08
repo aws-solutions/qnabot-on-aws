@@ -301,7 +301,7 @@ module.exports={
             answer:{text:"",tmp:""},
             questions:[{text:"",tmp:""}],
             qid:{text:"",tmp:""},
-            t:{text:"",tmp:""},
+            topic:{text:"",tmp:""},
             card:{
                 text:JSON.stringify({}),
                 title:{
