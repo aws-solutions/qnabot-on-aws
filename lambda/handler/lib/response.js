@@ -193,6 +193,8 @@ exports.success=function(message,params){
         out['sessionAttributes']['appContext'] = JSON.stringify({
           responseCard: out.dialogAction.responseCard
         })
+      } else {
+        delete out['sessionAttributes']['appContext']
       }
         return out
     }
