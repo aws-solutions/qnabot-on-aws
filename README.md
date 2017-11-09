@@ -18,7 +18,7 @@ To customize the QnABot use the following instructions to set up a local dev env
 Note: Lex is currently only supported in the us-east-1 region.
 
 ## Getting Started
-Fiuit, install all prerequisites:
+First, install all prerequisites:
 ```shell
 npm install 
 ```
