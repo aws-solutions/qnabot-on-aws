@@ -100,7 +100,7 @@
               "{",
               "\"Command\":\"SEARCH\",",
               "\"Query\":\"$input.params('query')\",",
-              "\"From\":\"$input.params('from')\"",
+              "\"From\":\"$input.params('from')\",",
               "\"Topic\":\"$input.params('topic')\"",
               "}"
             ]
@@ -110,7 +110,8 @@
     },
     "RequestParameters": {
       "method.request.querystring.query": true,
-      "method.request.querystring.from": false
+      "method.request.querystring.from": false,
+      "method.request.querystring.topic": true
     },
     "ResourceId": {"Ref": "Search"},
     "MethodResponses": [
