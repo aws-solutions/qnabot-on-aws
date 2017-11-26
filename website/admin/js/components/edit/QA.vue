@@ -49,22 +49,29 @@
           prefix="">
         </text-input>   
       </div>
-      <hr>
-      <h6>Topic:</h6>
-      <div class="A">
-        <text-input 
-          validators="optional"
-          v-bind:field="this.qa.topic"
-          v-bind:name="'t.'+this.index"
-          v-bind:edit="this.qa.edit"
-          placeholder="Type Topic here"
-          prefix="">
+      <hr>          
+      <div @click="toggleAdvanced" class="toggle-advanced">
+        <icon name="caret-down" v-show="advanced"></icon>
+        <icon name="caret-up" v-show="!advanced"></icon>
+        <h6>Advanced</h6>
+      </div>
+      <div class="advanced" v-show="advanced">
+        <h6>Topic:</h6>
+        <div class="A">
+          <text-input 
+            validators="optional"
+            v-bind:field="this.qa.topic"
+            v-bind:name="'t.'+this.index"
+            v-bind:edit="this.qa.edit"
+            placeholder="Type Topic here"
+            prefix="">
+          </text-input>   
+        </div>
+        <hr>
+        <h6>Attachment:</h6>
+        <attachment v-bind:qa="this.qa"></attachment>
         </text-input>   
       </div>
-      <hr>
-      <h6>Attachment:</h6>
-      <attachment v-bind:qa="this.qa"></attachment>
-      </text-input>   
     </div>
   </div>
 </template>
@@ -88,7 +95,9 @@ var Promise=require('bluebird')
 
 module.exports={
   props:['scoreShow','index'],
-  data:()=>{return {}},
+  data:()=>{return {
+    advanced:false
+  }},
   components:{
     'id':require('./Id.vue'),
     'trash':require('./trash.vue'),
@@ -135,7 +144,6 @@ module.exports={
       console.log('selected')
     },
     open:function(toggle,event){
-      console.log(event)
       var self=this
 
       if(event.shiftKey){
@@ -180,16 +188,32 @@ module.exports={
               qa.edit=false
             }
           })
-          if(toggle){
-            self.qa.open=!self.qa.open
-          }else{
-            self.qa.open=true
-          }
+          self.qa.open=toggle ? !self.qa.open : true
+          //self.advanced=false
           if(!self.qa.open) self.qa.edit=false
           if(self.qa.open) self.$store.commit('select',self.qa)
         }
       }
+    },
+    toggleAdvanced:function(event){
+      this.advanced=!this.advanced
     }
   }
 }
 </script>
+<style lang='scss' scoped>
+  .toggle-advanced {
+    display:flex;
+    position:relative;
+    cursor:pointer;  
+    h6 {
+      padding:10px 20px;
+    }
+    svg {
+      position:absolute;
+      top:25%;
+      transform:translateY(-50%)
+    }
+  }
+</style>
+

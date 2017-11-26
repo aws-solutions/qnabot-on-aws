@@ -45,7 +45,11 @@ module.exports={
     },
     unselectAll(store){
         store.selectIds=[]
-        store.QAs.forEach(qa=>qa.select=false)
+        store.QAs.forEach(function(qa){
+            if(qa.select){
+                qa.select=false
+            }
+        })
     },
     
     setFilter(store,query){

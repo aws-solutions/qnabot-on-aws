@@ -72,7 +72,6 @@ function init(){
                 var card=JSON.parse(value)
                 var v =new  (require('jsonschema').Validator)();
                 var valid=v.validate(card,require('./lib/card-schema')).valid
-                console.log(v)
                 return valid
             } catch(e){
                 return false
