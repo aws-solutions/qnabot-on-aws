@@ -10,7 +10,7 @@ or in the "license" file accompanying this file. This file is distributed on an 
 BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied. See the
 License for the specific language governing permissions and limitations under the License.
 */
-
+var _=require('lodash')
 const replaceTxt = ' '
 
 function matchTitle(msg){
@@ -139,6 +139,11 @@ exports.success=function(message,params){
             }
         }
       }
+      if (message.t) { //set topic context session attribute
+        _.set(out,'sessionAttributes.TopicContext',message.t)
+      } else if(_.get(out,"sessionAttributes.TopicContext")){
+        delete out.sessionAttributes.TopicContext
+      }
       if(message.r && message.r.imageUrl){
           out.response.card.image={largeImageUrl:message.r.imageUrl}
       }
@@ -160,10 +165,11 @@ exports.success=function(message,params){
         }
       }
       if (message.t) { //set topic context session attribute
-        out['sessionAttributes']['TopicContext']=message.t
-      } else {
+        _.set(out,'sessionAttributes.TopicContext',message.t)
+      } else if(_.get(out,"sessionAttributes.TopicContext")){
         delete out.sessionAttributes.TopicContext
       }
+      
       if (message.r &&
         Object.keys(message.r).length>0 &&
         Object.keys(message.r).map(x=>message.r[x].length>0).indexOf(false)===-1) {
