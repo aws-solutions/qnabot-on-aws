@@ -15,6 +15,15 @@
         v-bind:loading="loading"
         label="test"></spin-button>
     </div>
+    <div class="search-input search-bar topic">
+      <div class="prefix">Topic: </div>
+      <input 
+        v-model="topic"
+        type="text" 
+        name="topic"
+        placeholder="Type your question topic here." 
+        v-on:keyup.enter.stop="search">
+    </div>
     <div class="error" v-show="invalid">
       <p>Please, type in a question</p>
     </div>
@@ -41,6 +50,7 @@ module.exports={
   data:function(){
     return {
       query:"",
+      topic:"",
       found:false,
       loading:false
     }
@@ -67,7 +77,10 @@ module.exports={
       
       if(!this.invalid){
         self.loading=true
-        this.$store.dispatch('search',{query:this.query})
+        this.$store.dispatch('search',{
+          query:this.query,
+          topic:this.topic
+        })
         .catch(self.error('Could not perform test'))
         .finally(()=>self.loading=false)
       }

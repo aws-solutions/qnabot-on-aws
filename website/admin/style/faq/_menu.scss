@@ -138,6 +138,8 @@ $id-font-size:20px;
     }
     .search-input {
       display:flex;
+      margin:10px 0px;
+
       .prefix {
         margin:auto;
         padding:6px;
@@ -156,6 +158,12 @@ $id-font-size:20px;
         border-width:$filter-border-width;
         border-radius:0px $border-radius $border-radius 0px;
       }
+      &.topic {
+        width:50%;
+        input {
+          border-radius:0px $border-radius $border-radius 0px;
+        }
+       }
     }
   }
   .buttons {

@@ -7,6 +7,17 @@
       "Statement": [
         {
           "Effect": "Allow",
+          "Action": [
+            "lex:PostContent",
+            "lex:PostText",
+            "polly:SynthesizeSpeech"
+          ],
+          "Resource": [
+            "*"
+          ]
+        },
+        {
+          "Effect": "Allow",
           "Action": [   
             "execute-api:*"
           ],

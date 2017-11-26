@@ -8,6 +8,9 @@
         "Query":{
             "type":"string"
         },
+        "Topic":{
+            "type":"string"
+        },
         "From":{
             "type":["integer","string"]
         },

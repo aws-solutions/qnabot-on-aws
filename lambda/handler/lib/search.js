@@ -10,21 +10,33 @@ or in the "license" file accompanying this file. This file is distributed on an 
 BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied. See the
 License for the specific language governing permissions and limitations under the License.
 */
-
+var _=require('lodash')
 var size=10
 
 module.exports=function(params,es){
     var index=parseInt(params.From)*size
     console.log(index)
-
+    
     var body={
         size:size,
         from:index || 0,
         query: {
-            multi_match: {
-                query:params.Query,
-                fields : ["q^2","a"]
-            }
+          bool: {
+            should: [
+              {
+	            multi_match: {
+	                query: _.get(params,"Session.TopicContext") || params.Topic || "",
+	                fields : ["t"]
+	            }
+	          },
+	          {                  
+	            multi_match: {
+	                query:params.Query,
+	                fields : ["q^2","a"]
+	            }
+	          }
+	        ]
+	      }
         }
     }
 
@@ -58,7 +70,8 @@ module.exports=function(params,es){
                 return  {
                     'msg':results.qa[0].body.a,
                     'question':params.Query,
-                    'r':results.qa[0].body.r 
+                    'r':results.qa[0].body.r,
+                    't':results.qa[0].body.t
                 }
             }else{
                 return  {
