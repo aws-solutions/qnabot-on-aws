@@ -161,6 +161,8 @@ exports.success=function(message,params){
       }
       if (message.t) { //set topic context session attribute
         out['sessionAttributes']['TopicContext']=message.t
+      } else {
+        delete out.sessionAttributes.TopicContext
       }
       if (message.r &&
         Object.keys(message.r).length>0 &&
