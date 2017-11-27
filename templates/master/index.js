@@ -1,0 +1,54 @@
+module.exports={
+  "Parameters":{
+    "BootstrapPrefix":{
+        "Type":"String",
+        "Default":""
+    },
+    "BootstrapBucket":{
+        "Type":"String"
+    },
+    "Email":{
+        "Type":"String"
+    },
+    "Username":{
+        "Type":"String",
+        "Default":"Admin"
+    }
+  },
+  "Resources":Object.assign(
+    require('./stacks'),
+    require('./var')
+  ),
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "QnABot with admin and client websites",
+  "Outputs":{
+    "DesignerBucket":{
+        "Value":{"Fn::GetAtt":["api","Outputs.Bucket"]}
+    },
+    "BotName":{
+        "Value":{"Fn::GetAtt":["QnABot","Outputs.Bot"]}
+    },
+    "IntentName":{
+        "Value":{"Fn::GetAtt":["QnABot","Outputs.Intent"]}
+    },
+    "HandlerArn":{
+        "Value":{"Fn::GetAtt":["QnABot","Outputs.HandlerArn"]}
+    },
+    "ContentDesignerLogin":{
+        "Value":{"Fn::GetAtt":["api","Outputs.DesignerLogin"]}
+    },
+    "ClientURL":{
+        "Value":{"Fn::GetAtt":["api","Outputs.ClientLogin"]}
+    },
+    "ClientLogin":{
+        "Value":{"Fn::GetAtt":["api","Outputs.ClientUrl"]}
+    },
+    "DashboardUrl":{
+        "Value":{"Fn::Join":["",[
+            "https://console.aws.amazon.com/cloudwatch/home?",
+            "region=",{"Ref":"AWS::Region"},
+            "#dashboards:name=",{"Fn::GetAtt":["dashboard","Outputs.name"]}
+        ]]}
+    }
+  }
+}

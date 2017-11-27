@@ -1,0 +1,10 @@
+#if($input.params('from') == 'all')
+    {"Command":"EXPORT"}
+#else
+{
+    "Command":"LIST",,
+    "From":"$input.params('from')",,
+    "Filter":"$input.params('filter')",,
+    "Perpage":"$input.params('perpage')",
+}
+#end

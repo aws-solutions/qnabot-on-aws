@@ -29,21 +29,16 @@ module.exports=function(event){
     .get('Exports')
     .each(exp=>exports[exp.Name]=exp.Value)
     .then(function(){
-        process.env.LEX_SLOTTYPE=exports["QNA-DEV-HANDLER-SLOTTYPE"]
-        process.env.LEX_INTENT=exports["QNA-DEV-HANDLER-INTENT"]
-        process.env.LEX_BOT=exports["QNA-DEV-HANDLER-BOT"]
-        process.env.ES_ADDRESS=exports["QNA-DEV-ED-ADDRESS"]
-        process.env.ES_INDEX=exports["QNA-DEV-HANDLER-INDEX"]
-        process.env.ES_TYPE=exports["QNA-DEV-HANDLER-TYPE"]
+        process.env.LEX_SLOTTYPE=exports["QNA-DEV-SLOTTYPE"]
+        process.env.LEX_INTENT=exports["QNA-DEV-INTENT"]
+        process.env.LEX_BOT=exports["QNA-DEV-BOT"]
+        process.env.ES_ADDRESS=exports["QNA-DEV-ES-ADDRESS"]
+        process.env.ES_INDEX=exports["QNA-DEV-INDEX"]
+        process.env.ES_TYPE=exports["QNA-DEV-TYPE"]
         process.env.AWS_ACCESS_KEY_ID=aws.config.credentials.accessKeyId
         process.env.AWS_SECRET_ACCESS_KEY=aws.config.credentials.secretAccessKey
-        process.env.REGION='us-east-1'
         process.env.ERRORMESSAGE="error"
         process.env.EMPTYMESSAGE="empty"
-        process.env.IMAGE_BUCKET=exports["QNA-DEV-BUCKET"]
-        process.env.POOLID=exports["QNA-DEV-HANDLER-IDPOOL"]
-        process.env.CLIENTID=exports["QNA-DEV-HANDLER-CLIENT"]
-        process.env.USERPOOL=exports["QNA-DEV-HANDLER-USERPOOL"]
     })
     .then(()=>run(require('../index.js').handler,event))
     .return(true)

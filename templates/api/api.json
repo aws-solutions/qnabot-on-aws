@@ -16,6 +16,9 @@
     },
     "ClientUrl": {
       "Value": {"Fn::GetAtt":["Urls","Client"]}
+    },
+    "ApiId":{
+      "Value": {"Ref":"API"}
     }
   },
   "Parameters": {

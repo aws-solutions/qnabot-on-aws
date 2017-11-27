@@ -1,7 +1,0 @@
-{
-    "Bucket": {
-      "Type": "AWS::S3::Bucket",
-      "DeletionPolicy": "Delete",
-      "Properties": {}
-    }  
-}

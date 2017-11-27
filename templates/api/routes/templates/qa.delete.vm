@@ -1,0 +1,5 @@
+{
+    "Command":"DELETE",
+    "ID":"$util.urlDecode($input.params('Id'))",
+    "intent":"$stageVariables.Intent"
+}

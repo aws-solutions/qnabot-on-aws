@@ -1,0 +1,4 @@
+{
+    "Command":"ADD",
+    "Body":"$input.body"
+}

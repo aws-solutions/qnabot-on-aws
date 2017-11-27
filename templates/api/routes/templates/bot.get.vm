@@ -1,0 +1,6 @@
+{
+    "Command":"BOT_INFO",
+    "botname":"$stageVariables.BotName"
+}                
+                
+
