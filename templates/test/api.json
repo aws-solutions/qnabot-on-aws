@@ -1,21 +1,5 @@
 {
   "Resources": {
-    "UserPool": {
-      "Type": "AWS::Cognito::UserPool",
-      "Properties": {
-        "UserPoolName": {
-          "Fn::Join": [
-            "-",
-            [
-              "UserPool",
-              {
-                "Ref": "AWS::StackName"
-              }
-            ]
-          ]
-        }
-      }
-    },
     "api":{
         "Type" : "AWS::CloudFormation::Stack",
         "Properties" : {
@@ -26,10 +10,12 @@
                 "templates/api.json"
             ]]},
             "Parameters":{
+                "BootstrapBucket":{"Fn::ImportValue":"QNA-BOOTSTRAP-BUCKET"},
+                "BootstrapPrefix":{"Fn::ImportValue":"QNA-BOOTSTRAP-PREFIX"},
                 "HandlerArn":{"Fn::GetAtt":["lambda","Arn"]},
                 "HealthArn":{"Fn::GetAtt":["lambda","Arn"]},
-                "UserPoolArn":{"Fn::GetAtt":["UserPool","Arn"]},
-                "Role":{"Ref":"Role"},
+                "Botname":"bot",
+                "Email":"jcalho@amazon.com",
                 "Utterances":"ad",
                 "FulfilmentArn":"ad"
             }

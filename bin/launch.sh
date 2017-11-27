@@ -40,6 +40,10 @@ case $2 in
     "down")
         down
         ;;
+    "restart")
+        down
+        up
+        ;;
     *)
         echo "unkown"
         ;;

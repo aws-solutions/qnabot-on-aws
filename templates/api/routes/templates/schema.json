@@ -1,0 +1,24 @@
+{
+    "type":"object",
+    "properties":{
+        "Command":{
+            "type":"string",
+            "enum":["LIST","SEARCH","ADD","DELETE","EDIT","SAVE","PING","CHECK","EXPORT","BOT_INFO","BUILD","BOT_STATUS","UPDATE","ALEXA"]
+        },
+        "Query":{
+            "type":"string"
+        },
+        "Topic":{
+            "type":"string"
+        },
+        "From":{
+            "type":["integer","string"]
+        },
+        "Filter":{
+            "type":"string"
+        },
+        "Id":{
+            "type":"string"
+        }
+    }
+}

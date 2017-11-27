@@ -1,0 +1,10 @@
+{
+    "region":"$stageVariables.Region",
+    "BotName":"$stageVariables.BotName",
+    "PoolId":"$stageVariables.IdPool",
+    "ClientId":"$stageVariables.ClientId",
+    "UserPool":"$stageVariables.UserPool",
+    "Id":"$stageVariables.Id",
+    "apiUrl":"https://${context.apiId}.execute-api.${stageVariables.Region}.amazonaws.com/api"
+}
+

@@ -1,11 +1,55 @@
 {
-"Policy": {
+"CFNLambdaPolicy":{
+  "Type": "AWS::IAM::ManagedPolicy",
+  "Properties": {
+    "Roles":[{"Ref":"CFNLambdaRole"}],
+    "PolicyDocument": {
+      "Version": "2012-10-17",
+      "Statement": [{
+          "Effect": "Allow",
+          "Action": [
+            "s3:DeleteObject",
+            "s3:ListBucket"
+          ],
+          "Resource": {"Fn::Join":["",[
+            "arn:aws:s3:::",
+            {"Ref": "Bucket"},
+            "*"
+          ]]}
+        },
+        {
+          "Effect": "Allow",
+          "Action": [
+            "s3:GetObject"
+          ],
+          "Resource": [{"Fn::Join":["",[
+                "arn:aws:s3:::",
+                {"Ref": "BootstrapBucket"},"/*"
+            ]]}
+          ]
+        },
+        {
+          "Effect": "Allow",
+          "Action": [
+            "s3:PutObject"
+          ],
+          "Resource": [{"Fn::Join":["",[
+                "arn:aws:s3:::",
+                {"Ref": "Bucket"},
+                "*"
+            ]]}
+          ]
+        }
+      ]
+    }
+  }
+},
+"LexAccessPolicy":{
   "Type": "AWS::IAM::ManagedPolicy",
   "Properties": {
     "PolicyDocument": {
       "Version": "2012-10-17",
-      "Statement": [
-        {
+      "Statement": [{
           "Effect": "Allow",
           "Action": [
             "lex:PostContent",
@@ -15,8 +59,17 @@
           "Resource": [
             "*"
           ]
-        },
-        {
+        }]
+    },
+    "Roles":[{"Ref":"AuthenticatedRole"},{"Ref":"UnauthenticatedRole"}]
+  }
+},
+"Policy": {
+  "Type": "AWS::IAM::ManagedPolicy",
+  "Properties": {
+    "PolicyDocument": {
+      "Version": "2012-10-17",
+      "Statement": [{
           "Effect": "Allow",
           "Action": [   
             "execute-api:*"
@@ -27,7 +80,7 @@
         }
       ]
     },
-    "Roles":[{"Ref":"Role"}]
+    "Roles":[{"Ref":"AuthenticatedRole"}]
   }
 },
 "ApiGatewayCloudWatchLogsRole": {

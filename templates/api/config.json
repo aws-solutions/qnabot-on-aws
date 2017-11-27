@@ -45,14 +45,21 @@
       "Ref": "API"
     },
     "StageName": "api",
-    "MethodSettings": [
-      {
+    "MethodSettings": [{
         "DataTraceEnabled": true,
         "HttpMethod": "*",
         "LoggingLevel": "INFO",
         "ResourcePath": "/*"
-      }
-    ]
+    }],
+    "Variables":{
+        "Region":{"Ref":"AWS::Region"},
+        "AccountId":{"Ref":"AWS::AccountId"},
+        "IdPool":{"Ref":"IdPool"},
+        "ClientId":{"Ref":"Client"},
+        "UserPool":{"Ref":"UserPool"},
+        "Id":{"Ref":"Id"},
+        "BotName":{"Ref":"Botname"}
+    }
   }
 },
 "ApiGatewayAccount": {

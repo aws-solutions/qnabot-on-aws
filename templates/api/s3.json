@@ -1,0 +1,56 @@
+{
+    "Bucket":{
+        "Type" : "AWS::S3::Bucket",
+        "DeletionPolicy":"Delete",
+        "Properties" : {
+            "WebsiteConfiguration":{
+                "IndexDocument":"index.html"
+            }
+        }
+    },
+    "BucketPolicy":{
+        "Type" : "AWS::S3::BucketPolicy",
+        "Properties" : {
+            "Bucket" : {"Ref":"Bucket"},
+            "PolicyDocument" : {
+                "Version":"2012-10-17",
+                "Statement":[{
+                    "Sid":"PublicReadForGetBucketObjects",
+                    "Effect":"Allow",
+                    "Principal": "*",
+                    "Action":["s3:GetObject"],
+                    "Resource":[
+                        {"Fn::Join":["",[
+                            "arn:aws:s3:::",{"Ref":"Bucket"},"/*"
+                        ]]},
+                        {"Fn::Join":["",[
+                            "arn:aws:s3:::",{"Ref":"Bucket"}
+                        ]]}
+                    ]
+                }]
+            }
+        }
+    },
+    "Clear":{
+        "Type": "Custom::S3Clear",
+        "DependsOn":["CFNLambdaPolicy"],
+        "Properties": {
+            "ServiceToken": { "Fn::GetAtt" : ["CFNLambda", "Arn"] },
+            "Bucket":{"Ref":"Bucket"}
+        }
+    },
+    "Unzip":{
+        "Type": "Custom::S3Unzip",
+        "DependsOn":["CFNLambdaPolicy"],
+        "Properties": {
+            "ServiceToken": { "Fn::GetAtt" : ["CFNLambda", "Arn"] },
+            "SrcBucket":{"Ref":"BootstrapBucket"},
+            "Key":{"Fn::Join":["",[
+                {"Ref":"BootstrapPrefix"},
+                "/website.zip"
+            ]]},
+            "DstBucket":{"Ref":"Bucket"}
+        },
+        "DependsOn":"Clear"
+    }
+}

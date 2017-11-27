@@ -1,0 +1,81 @@
+{
+    "User":{
+        "Type" : "AWS::Cognito::UserPoolUser",
+        "Properties" : {
+            "DesiredDeliveryMediums":["EMAIL"],
+            "UserAttributes":[{
+                "Name":"email",
+                "Value":{"Ref":"Email"}
+            }],
+            "Username":{"Ref":"Username"},
+            "UserPoolId":{"Ref":"UserPool"}
+        }
+    },
+    "IdPool": {
+      "Type": "AWS::Cognito::IdentityPool",
+      "Properties": {
+        "IdentityPoolName": "UserPool",
+        "AllowUnauthenticatedIdentities": true,
+        "CognitoIdentityProviders": [
+          {
+            "ClientId": {
+              "Ref": "Client"
+            },
+            "ProviderName": {
+              "Fn::GetAtt": [
+                "UserPool",
+                "ProviderName"
+              ]
+            },
+            "ServerSideTokenCheck": true
+          }
+        ]
+      }
+    },
+    "RoleAttachment": {
+      "Type": "AWS::Cognito::IdentityPoolRoleAttachment",
+      "Properties": {
+        "IdentityPoolId": {
+          "Ref": "IdPool"
+        },
+        "Roles": {
+          "authenticated": {"Fn::GetAtt":["AuthenticatedRole","Arn"]},
+          "unauthenticated":{"Fn::GetAtt":["UnauthenticatedRole","Arn"]} 
+        }
+      }
+    },
+    "UserPool": {
+      "Type": "AWS::Cognito::UserPool",
+      "Properties": {
+        "UserPoolName": {
+          "Fn::Join": [
+            "-",
+            [
+              "UserPool",
+              {
+                "Ref": "AWS::StackName"
+              }
+            ]
+          ]
+        }
+      }
+    },
+    "Client": {
+      "Type": "AWS::Cognito::UserPoolClient",
+      "Properties": {
+        "ClientName": {
+          "Fn::Join": [
+            "-",
+            [
+              "UserPool",
+              {
+                "Ref": "AWS::StackName"
+              }
+            ]
+          ]
+        },
+        "GenerateSecret": false,
+        "UserPoolId": {"Ref": "UserPool"}
+      }
+    }
+}

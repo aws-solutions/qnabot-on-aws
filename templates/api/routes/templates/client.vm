@@ -1,0 +1,18 @@
+{
+"iframeOrigin":"",
+"aws":{
+    "cognitoPoolId":"$stageVariables.PoolId",
+    "region":"$stageVariables.Region"
+},
+"iframeConfig":{
+    "lex":{
+        "sessionAttributes":{},
+        "botName":"$stageVariables.BotName",
+        "pageTitle":"QnA Bot",
+        "toolbarTitle":"QnA Bot"
+    },
+    "recorder":{
+        "preset":"speech_recognition"
+    }
+}}
+    

@@ -24,32 +24,38 @@
     },
     "Name":{
       "Value":{"Ref":"AWS::StackName"}
+    },
+    "PoolId":{
+      "Value":{"Ref":"IdPool"}
+    },
+    "UserPool":{
+      "Value":{"Ref":"UserPool"}
+    },
+    "UserPoolArn":{
+      "Value":{"Fn::GetAtt":["UserPool","Arn"]}
+    },
+    "AuthenticatedRoleArn": {
+      "Value": {"Fn::GetAtt":["AuthenticatedRole","Arn"]}
+    },
+    "UnauthenticatedRoleArn": {
+      "Value": {"Fn::GetAtt":["UnauthenticatedRole","Arn"]}
+    },
+    "AuthenticatedRole": {
+      "Value":{"Ref":"AuthenticatedRole"} 
+    },
+    "UnauthenticatedRole": {
+      "Value":{"Ref":"UnauthenticatedRole"} 
+    },
+    "Client":{
+      "Value":{"Ref":"Client"} 
     }
   },
   "Parameters": {
-    "UserPoolArn":{
-      "Type": "String"
-    },
     "HandlerArn": {
       "Type": "String"
     },
     "HealthArn": {
       "Type": "String"
-    },
-    "Role":{
-      "Type": "String"
-    },
-    "PoolId":{
-      "Type":"String",
-      "Default": "NONE"
-    },
-    "ClientId":{
-      "Type":"String",
-      "Default": "NONE"
-    },
-    "UserPool":{
-      "Type":"String",
-      "Default": "NONE"
     },
     "Botname":{
       "Type": "String",
@@ -64,6 +70,19 @@
     },
     "FulfilmentArn":{
       "Type": "String"
+    },
+    "Username":{
+        "Type":"String",
+        "Default":"Admin"
+    },
+    "Email":{
+      "Type": "String"
+    },
+    "BootstrapBucket":{
+        "Type":"String"
+    },
+    "BootstrapPrefix":{
+        "Type":"String"
     }
   }
 }
