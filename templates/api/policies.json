@@ -5,7 +5,27 @@
     "Roles":[{"Ref":"CFNLambdaRole"}],
     "PolicyDocument": {
       "Version": "2012-10-17",
-      "Statement": [{
+      "Statement": [
+        {
+          "Effect": "Allow",
+          "Action": [   
+            "cognito-identity:SetIdentityPoolRoles",
+            "cognito-identity:GetIdentityPoolRoles",
+            "iam:PassRole"
+          ],
+          "Resource": ["*"]
+        },
+        {
+          "Effect": "Allow",
+          "Action": [
+            "cognito-idp:UpdateUserPoolClient",
+            "cognito-idp:CreateUserPoolDomain",
+            "cognito-idp:DeleteUserPoolDomain",
+            "cognito-idp:SetUICustomization"
+          ],
+          "Resource": ["*"]
+        },
+        {
           "Effect": "Allow",
           "Action": [
             "s3:DeleteObject",
@@ -53,7 +73,16 @@
           "Effect": "Allow",
           "Action": [
             "lex:PostContent",
-            "lex:PostText",
+            "lex:PostText"
+          ],
+          "Resource": [{"Fn::Join":["",[
+                "arn:aws:lex:",{"Ref":"AWS::Region"},":",
+                {"Ref":"AWS::AccountId"},":bot:",
+                {"Ref":"Botname"},":*"
+            ]]}]
+        },{
+          "Effect": "Allow",
+          "Action": [
             "polly:SynthesizeSpeech"
           ],
           "Resource": [
@@ -61,10 +90,12 @@
           ]
         }]
     },
-    "Roles":[{"Ref":"AuthenticatedRole"},{"Ref":"UnauthenticatedRole"}]
+    "Roles":[{"Ref":"AdminRole"},
+        {"Ref":"UnauthenticatedRole"},
+        {"Ref":"UserRole"}]
   }
 },
-"Policy": {
+"AdminPolicy": {
   "Type": "AWS::IAM::ManagedPolicy",
   "Properties": {
     "PolicyDocument": {
@@ -80,7 +111,7 @@
         }
       ]
     },
-    "Roles":[{"Ref":"AuthenticatedRole"}]
+    "Roles":[{"Ref":"AdminRole"}]
   }
 },
 "ApiGatewayCloudWatchLogsRole": {

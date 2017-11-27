@@ -13,8 +13,8 @@ module.exports=class CognitoUser extends require('./base') {
         return cognito.updateUserPoolClient({
             ClientId:params.ClientId,
             UserPoolId:params.UserPool,
-            CallbackURLs:params.LoginCallbackUrl,
-            LogoutURLs:params.LogoutCallbackUrl,
+            CallbackURLs:params.LoginCallbackUrls,
+            LogoutURLs:params.LogoutCallbackUrls,
             ExplicitAuthFlows:["ADMIN_NO_SRP_AUTH"],
             RefreshTokenValidity:1,
             SupportedIdentityProviders:['COGNITO'],

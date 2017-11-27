@@ -10,7 +10,7 @@ module.exports=class CognitoUser extends require('./base') {
     Create(params,reply){
         var loginUrl=[
             "https://",
-            domain,
+            params.Domain,
             ".auth.",
             process.env.AWS_REGION,
             ".amazoncognito.com",
@@ -19,11 +19,11 @@ module.exports=class CognitoUser extends require('./base') {
             "client_id=",params.ClientId
         ].join("")
 
-        reply(null,domain,{
+        reply(null,params.Domain,{
             loginUrl,
             logoutUrl:[
                 "https://",
-                domain,
+                params.Domain,
                 ".auth.",
                 process.env.AWS_REGION,
                 ".amazoncognito.com",

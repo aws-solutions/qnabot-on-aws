@@ -22,7 +22,8 @@ base.Resources=Object.assign(
     require('./roles'),
     require('./cognito'),
     require('./cfn'),
-    require('./s3')
+    require('./s3'),
+    require('./var')
 )
 
 module.exports=base

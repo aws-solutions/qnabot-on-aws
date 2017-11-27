@@ -1,12 +1,13 @@
 BUCKET=$(shell bin/exports.js | $(shell npm bin)/jq --raw-output '."QNA-BOOTSTRAP-BUCKET"')
 PREFIX=$(shell node -e "console.log(JSON.stringify(require('./config')))" | $(shell npm bin)/jq --raw-output '."publicPrefix"')
+LAMBDAS=$(shell for l in $$(ls ./lambda | grep -v util);do echo lambda/$$l;done)
+
 .PHONY: lambda templates upload
 prefix:
 	echo "$(PREFIX)"
 
 build:
-	mkdir -p build; mkdir -p build/lambda; mkdir -p build/templates;mkdir -p build/documents
-LAMBDAS=$(shell for l in $$(ls ./lambda | grep -v util);do echo lambda/$$l;done)
+	mkdir -p build; mkdir -p build/lambda; mkdir -p build/templates/test;mkdir -p build/templates;mkdir -p build/documents
 
 lambda: $(LAMBDAS)
 	for l in $^; do \
@@ -14,22 +15,27 @@ lambda: $(LAMBDAS)
 		cd ../..;	\
 	done;			
 
-templates/master.json:templates/master-base.json
-	./bin/master.js
-
-templates/dashboard.json:templates/dashboard-base.json templates/dashboard-body.json
-	./bin/dashboard.js
-
-templates/lex.json:templates/lex-base.json
-	./bin/lex.js
-
-templates/api.json:templates/api/*
+build/templates/handler.json:templates/handler.json
+	./bin/build.js handler
+build/templates/fulfilment.json:templates/fulfilment.json
+	./bin/build.js fulfilment
+build/templates/api.json:templates/api/*
 	./bin/build.js api
+build/templates/domain.json:templates/domain.js
+	./bin/build.js domain
+build/templates/es.json:templates/es/*
+	./bin/build.js es
+build/templates/lex.json:templates/lex/*
+	./bin/build.js lex
+build/templates/dashboard.json:templates/dashboard/*
+	./bin/build.js dashboard
+build/templates/master.json:templates/master/*
+	./bin/build.js master
+build/templates/public.json:templates/public.js
+	./bin/build.js public
 
-build/templates:templates/*.json templates/*.yml templates/master.json templates/dev/*.json 
-	rm -rf ./build/templates/* ; cp -r ./templates/* ./build/templates
+templates:build build/templates/handler.json build/templates/fulfilment.json build/templates/api.json build/templates/domain.json build/templates/es.json build/templates/lex.json build/templates/dashboard.json build/templates/master.json build/templates/public.json 
 
-templates:build build/templates templates/api.json templates/lex.json templates/dashboard.json templates/master.json build
 
 website:website/admin/assets  website/admin/config website/admin/js website/admin/style website/admin/entry.js  website/admin/html/* build
 	node_modules/.bin/webpack --config ./website/admin/config/webpack.config.js

@@ -12,11 +12,11 @@ var fs = require('fs');
 var name=process.argv[2]
 var mainfile=__dirname+'/../templates/'+name
 var testfile=__dirname+'/../templates/'+name+'/test.js'
-var mainoutput=__dirname+'/../build/templates/'+name+'.json'
-var testoutput=__dirname+'/../build/templates/'+name+'-test.json'
+var mainoutput=__dirname+'/../build/templates/'+name
+var testoutput=__dirname+'/../build/templates/test/'+name
 
 
-Promise.resolve(require(mainfile+'/index'))
+Promise.resolve(require(mainfile))
 .then(function(result){
     var template=JSON.stringify(result)
     create(template,name,mainoutput)
@@ -37,9 +37,12 @@ function create(temp,name,output){
     }).promise()
     .tap(()=>console.log(chalk.green(name+" is valid")))
     .catch(error=>console.log(chalk.red(name+" failed:"+error)))
-    .tap(()=>console.log("writting to "+output))
-    .tap(()=>fs.writeFileAsync(output,temp))
-
+    .tap(()=>console.log("writting to "+output+'.json'))
+    .tap(()=>console.log("writting to "+output+'.min.json'))
+    .then(()=>Promise.join( 
+        fs.writeFileAsync(output+'.json',stringify(JSON.parse(temp))),
+        fs.writeFileAsync(output+'.min.json',temp)
+    ))
     .tap(()=>console.log('finished building '+name))
 }
 

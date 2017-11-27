@@ -14,13 +14,5 @@ License for the specific language governing permissions and limitations under th
 module.exports={
     "region":"us-east-1",
     "publicBucket":"aws-bigdata-blog",
-    "publicPrefix":"artifacts/aws-ai-qna-bot",
-    "Lex":{
-        "ErrorMessage":"Sadly I encountered an error when searching for your answer. Please ask me again later.",
-        "EmptyMessage":"You stumped me! Sadly I don't know how to answer your question.",
-        "voiceId":"Joanna",
-        "Clarification":"Sorry, can you please repeat that?",
-        "Abort":"Sorry, can you please repeat that?",
-        "SlotUterances":require('./lambda/handler/lib/default-utterances')
-    }
+    "publicPrefix":"artifacts/aws-ai-qna-bot"
 }

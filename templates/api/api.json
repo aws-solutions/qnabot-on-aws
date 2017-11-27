@@ -5,49 +5,23 @@
   "Description": "Creates and api interface for the admin ui. Handler is the main lambda and the Health lambda is connected to the health endpoint. the keeps the health endpoint logs from flooding the main lambdas logs",
   "Mappings": {},
   "Outputs": {
-    "URL": {
-      "Value": {"Fn::Join": ["",[
-            {"Ref": "API"},
-            ".execute-api.",
-            {"Ref": "AWS::Region"},
-            ".amazonaws.com"
-      ]]}
+    "Bucket":{
+      "Value":{"Ref":"Bucket"}
     },
-    "Stage": {
-      "Value": "api"
+    "DesignerLogin": {
+      "Value": {"Fn::GetAtt":["DesignerLogin","loginUrl"]}
     },
-    "Id":{
-      "Value":{"Ref":"API"}
+    "ClientLogin": {
+      "Value": {"Fn::GetAtt":["ClientLogin","loginUrl"]}
+    },
+    "ClientUrl": {
+      "Value": {"Fn::GetAtt":["Urls","Client"]}
     },
     "RootId":{
       "Value":{"Fn::GetAtt": ["API","RootResourceId"]}
     },
     "Name":{
       "Value":{"Ref":"AWS::StackName"}
-    },
-    "PoolId":{
-      "Value":{"Ref":"IdPool"}
-    },
-    "UserPool":{
-      "Value":{"Ref":"UserPool"}
-    },
-    "UserPoolArn":{
-      "Value":{"Fn::GetAtt":["UserPool","Arn"]}
-    },
-    "AuthenticatedRoleArn": {
-      "Value": {"Fn::GetAtt":["AuthenticatedRole","Arn"]}
-    },
-    "UnauthenticatedRoleArn": {
-      "Value": {"Fn::GetAtt":["UnauthenticatedRole","Arn"]}
-    },
-    "AuthenticatedRole": {
-      "Value":{"Ref":"AuthenticatedRole"} 
-    },
-    "UnauthenticatedRole": {
-      "Value":{"Ref":"UnauthenticatedRole"} 
-    },
-    "Client":{
-      "Value":{"Ref":"Client"} 
     }
   },
   "Parameters": {

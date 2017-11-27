@@ -44,7 +44,7 @@
     "RestApiId": {
       "Ref": "API"
     },
-    "StageName": "api",
+    "StageName": {"Fn::GetAtt":["StageName","Name"]},
     "MethodSettings": [{
         "DataTraceEnabled": true,
         "HttpMethod": "*",

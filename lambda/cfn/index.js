@@ -8,10 +8,10 @@ exports.handler=function(event,context,cb){
 
 var targets={
     CognitoUser:require('./lib/CognitoUser'),
-    CognitoUrl:require('./lib/CognitoUrl'),
     CognitoRole:require('./lib/CognitoRole'),
     CognitoLogin:require('./lib/CognitoLogin'),
     CognitoDomain:require('./lib/CognitoDomain'),
+    CognitoUrl:require('./lib/CognitoUrl'),
     CloudDir:require('./lib/CloudDir'),
     CloudDirObject:require('./lib/CloudDirObject'),
     CloudDirIndex:require('./lib/CloudDirIndex'),
