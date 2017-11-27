@@ -21,7 +21,10 @@ module.exports=function(params,es){
         return lambda.invoke({
             FunctionName:process.env.AWS_LAMBDA_FUNCTION_NAME,
             Payload:JSON.stringify({
-                "Command":"BUILD"
+                "Command":"BUILD",
+                "botname":params.botname,
+                "slottype":params.slottype,
+                "intent":params.intent
             }),
             InvocationType:"Event"
         }).promise()

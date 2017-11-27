@@ -6,10 +6,13 @@ module.exports={
         "UserPool":"User-adada",
         "ApiUrl":"url",
         "BotName":"bot",
+        "SlotType":"slot",
+        "Intent":"intent",
         "Id":"id"
     },
     util:{
-        parseJson:JSON.parse
+        parseJson:JSON.parse,
+        urlDecode:x=>x
     },
     context:{
         "apiId":"id" 

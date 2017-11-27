@@ -44,7 +44,7 @@ var run=function(fnc,params){
 
 module.exports=function(params,es){ 
     return run('getBot',{
-        name:process.env.LEX_BOT,
+        name:params.botname,
         versionOrAlias:"$LATEST"
     }).get('status')
 }

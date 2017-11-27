@@ -5,7 +5,6 @@ module.exports=Object.assign(
     require('./info'),
     require('./qa'),
     require('./root'),
-    require('./search'),
     require('./proxy')
 )
 

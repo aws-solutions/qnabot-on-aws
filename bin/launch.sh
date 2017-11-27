@@ -1,7 +1,7 @@
 #! /bin/bash
 
 STACK=$1
-TEMP=templates/$STACK.json
+TEMP=build/templates/$STACK.json
 NAME=$(echo $1 | rev | cut -d'/' -f1 | rev)
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 

@@ -4,19 +4,20 @@ var cfExports=require('../../bin/exports')
 
 var setup=cfExports.then(function(exports){
     var param={
-        IdentityPoolId:exports["ENVOY-IDPOOL"],
-        Roles:{'authenticated':"arn:aws:iam::613341023709:role/ENVOY-dev-environment-35-Cognito-AuthenticatedRole-CUKIABDAZHA5"},
+        UserPool:exports["QNA-DEV-USERPOOL"],
+        Client:exports["QNA-DEV-CLIENT"],
+        IdentityPoolId:exports["QNA-DEV-IDPOOL"],
+        Roles:{'authenticated':exports["QNA-DEV-ROLE-ARN"]},
         RoleMappings:[{
-            ClientId:exports["ENVOY-CLIENTID"],
-            UserPool:exports["ENVOY-USERPOOL"],
+            ClientId:exports["QNA-DEV-CLIENT"],
+            UserPool:exports["QNA-DEV-USERPOOL"],
             Type:"Rules",
             AmbiguousRoleResolution:"Deny",
             RulesConfiguration:{Rules:[{
                 Claim:"Cognito:Group",
                 MatchType:"Equals",
                 Value:"Admin",
-                //RoleARN:exports["ENVOY-ROLE-ARN"]
-                RoleARN:"arn:aws:iam::613341023709:role/ENVOY-dev-environment-35-Cognito-AuthenticatedRole-CUKIABDAZHA5"
+                RoleARN:exports["QNA-DEV-ROLE-ARN"]
             }]}
         }]
     }

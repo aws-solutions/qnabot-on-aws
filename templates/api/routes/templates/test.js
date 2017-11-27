@@ -2,17 +2,50 @@ var fs=require('fs')
 var Velocity=require('velocity')
 
 module.exports={
-    health:{
-        get:function(test){
-            run("health",{},test)
+    health:test=>run("health",{},test),
+    info:test=>run("info",{},test),
+    client:test=>run("client",{},test),
+    bot:{
+        get:test=>run("bot.get",{},test),
+        post:test=>run("bot.post",{},test),
+        status:test=>run("bot.status",{},test)
+    },
+    qa:{
+        head:test=>run("qa.head",{
+            input:{
+                params:()=>'id'
+            }
+        },test),
+        delete:test=>run("qa.delete",{
+            input:{
+                params:()=>'id'
+            }
+        },test),
+        put:test=>run("qa.put",{
+            input:{
+                body:'{}'
+            }
+        },test)
+    },
+    root:{
+        list:test=>run("qa.put",{
+            input:{
+                body:'{}',
+                params:()=>'all'
+            }
+        },test),
+        export:test=>run("qa.put",{
+            input:{
+                body:'{}',
+                params:()=>'notall'
+            }
+        },test)
+    },
+    search:test=>run("search.get",{
+        input:{
+            params:()=>'param'
         }
-    },
-    info:function(test){
-        run("info",{},test)
-    },
-    client:function(test){
-        run("client",{},test)
-    }
+    },test)
 
 }
 

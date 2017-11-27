@@ -14,14 +14,14 @@ License for the specific language governing permissions and limitations under th
 var Promise=require('bluebird')
 var aws=require('./aws')
 
-var lex=new aws.LexModelBuildingService({
-    params:{
-        name:process.env.LEX_INTENT,
-        version:"$LATEST"
-    }
-})
-
 module.exports=function(params,es){
+    var lex=new aws.LexModelBuildingService({
+        params:{
+            name:params.intent,
+            version:"$LATEST"
+        }
+    })
+
     var get=es.get({
         index: process.env.ES_INDEX,
         type: process.env.ES_TYPE,

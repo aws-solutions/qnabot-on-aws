@@ -17,7 +17,7 @@ module.exports=function(params){
                 "arn:aws:apigateway:",
                 {"Ref": "AWS::Region"},
                 ":lambda:path/2015-03-31/functions/",
-                params.lambda || {"Fn::GetAtt":["Lambda","Arn"]},
+                {"Ref":"HandlerArn"},
                 "/invocations"
             ]]
           },

@@ -3,10 +3,9 @@ var Promise=require('bluebird')
 var cfExports=require('../../bin/exports')
 
 var setup=cfExports.then(function(exports){
-    process.env.USERPOOL=exports["ENVOY-COGNITO-USERPOOL"]
-    process.env.CLIENT=exports["ENVOY-COGNITO-CLIENT"]
-    
     var param={
+        UserPool:exports["QNA-DEV-USERPOOL"],
+        Client:exports["QNA-DEV-CLIENT"],
         LoginRedirectUrl:"https://exampe.com",
         LogoutRedirectUrl:"https://exampe.com" 
     }

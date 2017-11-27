@@ -8,9 +8,9 @@ var JSZip = require("jszip");
 var setup=cfExports.then(function(exports){
     var zip=new JSZip()
     var param={
-        SrcBucket:exports["ENVOY-SOURCE-BUCKET"],
+        SrcBucket:exports["QNA-DEV-BUCKET"],
         Key:"test.zip",
-        DstBucket:exports["ENVOY-DESTINATION-BUCKET"]
+        DstBucket:exports["QNA-DEV-BUCKET"]
     }
     
     zip.file('hello.txt',"hello world")

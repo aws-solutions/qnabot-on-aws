@@ -6,14 +6,14 @@ var cfExports=require('../../bin/exports')
 
 var setup=cfExports.tap(function(exports){
     return s3.putObject({
-        Bucket:exports["ENVOY-DESTINATION-BUCKET"],
+        Bucket:exports["QNA-DEV-BUCKET"],
         Key:"DeleteMe",
         Body:"Please no!!!"
     }).promise().delay(2000)
 })
 .then(function(exports){
     return {
-        Bucket:exports["ENVOY-DESTINATION-BUCKET"]
+        Bucket:exports["QNA-DEV-BUCKET"]
     }
 })
 

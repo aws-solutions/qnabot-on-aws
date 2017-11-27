@@ -1,43 +1,12 @@
 {
-  "Resources": {
-    "Domain":{
-        "Type" : "AWS::Elasticsearch::Domain",
-        "Properties" : {
-            "ElasticsearchClusterConfig":{
-                "DedicatedMasterEnabled" : false,
-                "InstanceCount" : 1,
-                "InstanceType" : "t2.small.elasticsearch",
-                "ZoneAwarenessEnabled" : false
-            },
-            "EBSOptions":{
-                "EBSEnabled" : true,
-                "VolumeSize" : 10,
-                "VolumeType" : "gp2"
-            },
-            "ElasticsearchVersion":"5.1",
-            "AdvancedOptions":{
-                "rest.action.multi.allow_explicit_index":true
-            }
+    "EsInit":{
+        "Type": "Custom::EsInit",
+        "Properties": {
+            "ServiceToken": { "Fn::GetAtt" : ["CFNLambda", "Arn"] },
+            "Address":{"Fn::GetAtt":["Domain","DomainEndpoint"]},
+            "Index":{"Ref":"AWS::StackName"},
+            "Type":"test"
         }
     }
-  },
-  "Conditions": {},
-  "AWSTemplateFormatVersion": "2010-09-09",
-  "Description": "lambda function to build a lambda function",
-  "Mappings": {},
-  "Outputs": {
-    "Address":{
-        "Value":{"Fn::GetAtt":["Domain","DomainEndpoint"]},
-        "Export":{
-            "Name":"QNA-DEV-ED-ADDRESS"
-        }
-    },
-    "Arn":{
-        "Value":{"Fn::GetAtt":["Domain","DomainArn"]},
-        "Export":{
-            "Name":"QNA-DEV-ED-ARN"
-        }
-    }
-  },
-  "Parameters": {}
 }
+

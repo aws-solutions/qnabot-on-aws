@@ -13,8 +13,11 @@
     "axios": "^0.16.2",
     "cfn-lambda": "^2.1.1",
     "cfn-response": "^1.0.1",
+    "elasticsearch": "^14.0.0",
+    "http-aws-es": "^4.0.0",
     "jsonwebtoken": "^8.0.1",
     "jszip": "^3.1.4",
+    "lodash": "^4.17.4",
     "nodeunit": "^0.11.1"
   }
 }

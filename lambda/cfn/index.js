@@ -1,5 +1,6 @@
 var cfnLambda=require('cfn-lambda')
 var response=require('./lib/util/response')
+var _=require('lodash')
 
 exports.handler=function(event,context,cb){
     console.log(event)
@@ -7,26 +8,25 @@ exports.handler=function(event,context,cb){
 }
 
 var targets={
-    CognitoUser:require('./lib/CognitoUser'),
     CognitoRole:require('./lib/CognitoRole'),
     CognitoLogin:require('./lib/CognitoLogin'),
     CognitoDomain:require('./lib/CognitoDomain'),
     CognitoUrl:require('./lib/CognitoUrl'),
-    CloudDir:require('./lib/CloudDir'),
-    CloudDirObject:require('./lib/CloudDirObject'),
-    CloudDirIndex:require('./lib/CloudDirIndex'),
     S3Clear:require('./lib/S3Clear'),
     S3Unzip:require('./lib/S3Unzip'),
-    Registration:require('./lib/Register'),
-    Token:require('./lib/Token'),
-    TokenDecode:require('./lib/TokenDecode'),
-    Random:require('./lib/Random'),
-    Variable:require('./lib/Variable')
+    Variable:require('./lib/Variable'),
+    EsInit:require('./lib/es')
 }
+var Lex=require('./lib/lex')
 
 function dispatch(event,context,cb){
     var type=event.ResourceType.match(/Custom::(.*)/)
-    if(targets[type[1]]){
+    var Lextype=event.ResourceType.match(/Custom::Lex(Bot|Alias|SlotType|Intent)/)
+    if(_.get(Lextype,1)==='Alias') Lextype[1]='BotAlias'
+    
+    if(Lextype){ 
+        cfnLambda(new Lex(Lextype[1]))(event,context,cb)
+    }else if(targets[type[1]]){
         return cfnLambda(new targets[type[1]])(event,context,cb)
     }else{
         response.send({

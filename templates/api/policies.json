@@ -189,8 +189,7 @@
                 "lambda:InvokeFunction"
               ],
               "Resource": [
-                {"Ref": "HandlerArn"},
-                {"Ref": "HealthArn"}
+                {"Ref": "HandlerArn"}
               ]
             }
           ]

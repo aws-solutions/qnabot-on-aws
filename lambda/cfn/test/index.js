@@ -11,11 +11,12 @@ module.exports={
         server.close()
         cb()
     },
+    lex:require('./lex'),
+    es:function(test){
+        lifecycle(require('./params/es'),test)
+    },
     role:function(test){
         lifecycle(require('./params/role'),test)
-    },
-    user:function(test){
-        lifecycle(require('./params/user'),test)
     },
     clear:function(test){
         lifecycle(require('./params/s3-clear'),test)
@@ -23,23 +24,11 @@ module.exports={
     unzip:function(test){
         lifecycle(require('./params/s3-unzip'),test)
     },
-    register:function(test){
-        lifecycle(require('./params/register'),test)
-    },
-    tokenDecode:function(test){
-        lifecycle(require('./params/tokenDecode'),test)
-    },
-    token:function(test){
-        lifecycle(require('./params/token'),test)
-    },
     login:function(test){
         lifecycle(require('./params/login'),test)
     },
     variable:function(test){
         lifecycle(require('./params/var'),test)
-    },
-    random:function(test){
-        lifecycle(require('./params/random'),test)
     },
     domain:function(test){
         lifecycle_chain(
@@ -48,29 +37,8 @@ module.exports={
             test
         )
     },
-    domain:function(test){
-        lifecycle_chain(
-            require('../lib/CognitoUrl'), 
-            require('./params/url'), 
-            test
-        )
-    },
-    clouddir:function(test){
-        lifecycle(require('./params/clouddir'),test)
-    },
-    clouddirObject:function(test){
-        lifecycle_chain(
-            require('../lib/ClouddirObject'), 
-            require('./params/clouddirObject'), 
-            test
-        )
-    },
-    clouddirIndex:function(test){
-        lifecycle_chain(
-            require('../lib/ClouddirIndex'), 
-            require('./params/clouddirIndex'), 
-            test
-        )
+    url:function(test){
+        lifecycle(require('./params/url'),test)
     }
 }
 

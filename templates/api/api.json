@@ -16,33 +16,26 @@
     },
     "ClientUrl": {
       "Value": {"Fn::GetAtt":["Urls","Client"]}
-    },
-    "RootId":{
-      "Value":{"Fn::GetAtt": ["API","RootResourceId"]}
-    },
-    "Name":{
-      "Value":{"Ref":"AWS::StackName"}
     }
   },
   "Parameters": {
     "HandlerArn": {
       "Type": "String"
     },
-    "HealthArn": {
+    "Botname":{
       "Type": "String"
     },
-    "Botname":{
-      "Type": "String",
-      "Default": "NONE"
+    "SlotType":{
+      "Type": "String"
+    },
+    "Intent":{
+      "Type": "String"
     },
     "Id":{
       "Type":"String",
       "Default":"QnA Bot"
     },
     "Utterances":{
-      "Type": "String"
-    },
-    "FulfilmentArn":{
       "Type": "String"
     },
     "Username":{

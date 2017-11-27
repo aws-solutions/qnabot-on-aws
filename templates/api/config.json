@@ -5,7 +5,7 @@
     "Name": {"Ref": "AWS::StackName"},
     "Description":"An Api interface for the admin actions on the QNA bot"
   },
-  "DependsOn": ["InvokePermissionHealth","InvokePermissionHandler"]
+  "DependsOn": ["InvokePermissionHandler"]
 },
 "Deployment": {
   "Type": "AWS::ApiGateway::Deployment",
@@ -16,20 +16,15 @@
   },
   "DependsOn": [
     "infoGet",
-    "RootOptions",
     "RootPut",
     "RootPost",
     "RootGet",
-    "SearchOptions",
-    "SearchGet",
-    "QuestionOptions",
+    "QuestionsGet",
     "QuestionHead",
     "QuestionPut",
     "QuestionDelete",
     "BotPost",
-    "BotOptions",
     "BotGetStatus",
-    "BotStatusOptions",
     "BotGet",
     "clientGet",
     "HealthGet"
@@ -58,7 +53,9 @@
         "ClientId":{"Ref":"Client"},
         "UserPool":{"Ref":"UserPool"},
         "Id":{"Ref":"Id"},
-        "BotName":{"Ref":"Botname"}
+        "BotName":{"Ref":"Botname"},
+        "SlotType":{"Ref":"SlotType"},
+        "Intent":{"Ref":"Intent"}
     }
   }
 },

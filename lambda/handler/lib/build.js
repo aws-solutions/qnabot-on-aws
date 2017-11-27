@@ -45,15 +45,15 @@ var run=function(fnc,params){
 module.exports=function(params,es){ 
     var utterances=getUtterances(params,es).get('utterances')
     var slottype=run("getSlotType",{
-        name:process.env.LEX_SLOTTYPE,
+        name:params.slottype,
         version:"$LATEST"
     })
     var intent=run("getIntent",{
-        name:process.env.LEX_INTENT,
+        name:params.intent,
         version:"$LATEST"
     })
     var bot=run('getBot',{
-        name:process.env.LEX_BOT,
+        name:params.botname,
         versionOrAlias:"$LATEST"
     })
     .tap(console.log)
@@ -69,7 +69,7 @@ module.exports=function(params,es){
     })
     .then(function(checksum){
         return run('createSlotTypeVersion',{
-            name:process.env.LEX_SLOTTYPE,
+            name:params.slottype,
             checksum
         }).get('version')
     })
@@ -86,7 +86,7 @@ module.exports=function(params,es){
     })
     .then(function(checksum){
         return run('createIntentVersion',{
-            name:process.env.LEX_INTENT,
+            name:params.intent,
             checksum
         }).get('version')
     })
@@ -104,17 +104,17 @@ module.exports=function(params,es){
     })
     .then(function(checksum){
         return run('createBotVersion',{
-            name:process.env.LEX_BOT
+            name:params.botname
         }).tap(console.log)
     })
     .then(function(version){
         return run('getBotVersions',{
-            name:process.env.LEX_BOT
+            name:params.botname
         }).get('bots')
         .filter(type=>["$LATEST",version].indexOf(type.version)===-1)
         .map(function(x){
             return run('deleteBotVersion',{
-                name:process.env.LEX_BOT,
+                name:params.botname,
                 version:x.version 
             })
         })
@@ -122,12 +122,12 @@ module.exports=function(params,es){
     .then(function(){
         return intent_version.then(function(version){
             return run('getIntentVersions',{
-                name:process.env.LEX_INTENT,
+                name:params.intent,
             }).get('intents')
             .filter(type=>["$LATEST",version].indexOf(type.version)===-1)
             .map(function(x){
                 return run('deleteIntentVersion',{
-                    name:process.env.LEX_INTENT,
+                    name:params.intent,
                     version:x.version 
                 })
             })
@@ -137,12 +137,12 @@ module.exports=function(params,es){
         return slottype_version.then(function(version){
             console.log("version",version)
             return run('getSlotTypeVersions',{
-                name:process.env.LEX_SLOTTYPE
+                name:params.slottype
             }).get('slotTypes')
             .filter(type=>["$LATEST",version].indexOf(type.version)===-1)
             .map(function(x){
                 return run('deleteSlotTypeVersion',{
-                    name:process.env.LEX_SLOTTYPE,
+                    name:params.slottype,
                     version:x.version 
                 })
             })
