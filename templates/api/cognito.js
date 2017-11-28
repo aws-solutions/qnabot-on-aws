@@ -1,3 +1,4 @@
+var fs=require('fs')
 module.exports={
     "CognitoDomain":{
         "Type": "Custom::CognitoDomain",
@@ -84,6 +85,7 @@ module.exports={
     },
     "RoleAttachment": {
         "Type": "Custom::CognitoRole",
+        "DependsOn":["CFNLambdaPolicy"],
         "Properties": {
             "ServiceToken": { "Fn::GetAtt" : ["CFNLambda", "Arn"] },
             "IdentityPoolId":{"Ref":"IdPool"},
@@ -113,17 +115,15 @@ module.exports={
     "UserPool": {
       "Type": "AWS::Cognito::UserPool",
       "Properties": {
-        "UserPoolName": {
-          "Fn::Join": [
-            "-",
-            [
-              "UserPool",
-              {
-                "Ref": "AWS::StackName"
-              }
-            ]
-          ]
-        }
+        "UserPoolName": {"Fn::Join": ["-",["UserPool",{"Ref": "AWS::StackName"}]]},
+        "AdminCreateUserConfig":{
+           "AllowAdminCreateUserOnly":true,
+           "InviteMessageTemplate":{
+                "EmailMessage":{"Fn::Sub":fs.readFileSync(__dirname+'/invite.txt','utf8')},
+                "EmailSubject":"Welcome to QnABot!"
+           }
+        },
+        "AliasAttributes":["email"]
       }
     },
     "Client": {

@@ -20,7 +20,7 @@
     "test-unit": "./node_modules/karma/bin/karma start website/admin/test/unit/karma.conf.js",
     "test-e2e-local": "export URL=http://localhost:8000 && cd website/admin/test/e2e && ./runner.sh ",
     "test-e2e-remote": "export URL=$(./bin/URL.sh) && cd website/admin/test/e2e && ./runner.sh ",
-    "build": "make website -B",
+    "build": "make website",
     "run": "./bin/run.js",
     "check": "./bin/check.sh",
     "stack": "./bin/launch.sh",

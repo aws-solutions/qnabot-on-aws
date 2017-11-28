@@ -22,7 +22,7 @@ module.exports={
         "APIGateWay":{"Fn::GetAtt":["api","Outputs.ApiId"]},
         "ESDomain":{"Fn::ImportValue":"QNA-DEV-ES-NAME"},
         "BotName":{"Fn::GetAtt":["QnABot","Outputs.Bot"]},
-        "Handler":{"Fn::GetAtt":["QnABot","Outputs.HandlerArn"]}
+        "HandlerLambda":{"Fn::GetAtt":["QnABot","Outputs.HandlerName"]}
     })
   },
   "AWSTemplateFormatVersion": "2010-09-09",

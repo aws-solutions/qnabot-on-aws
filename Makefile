@@ -24,12 +24,13 @@ build/templates/dev/cognito.json:templates/dev/cognito.js
 	./bin/build.js dev/cognito
 build/templates/dev/es.json:templates/dev/es.js
 	./bin/build.js dev/es
+build/templates/dev/master.json:templates/dev/master.js
+	./bin/build.js dev/master
 
 build/templates/api.json:templates/api/*
 	./bin/build.js api
-build/templates/domain.json:templates/domain.js
+build/templates/domain.json:templates/domain/*
 	./bin/build.js domain
-
 build/templates/es.json:templates/es/*
 	./bin/build.js es
 build/templates/lex.json:templates/lex/*
@@ -43,7 +44,7 @@ build/templates/public.json:templates/public.js
 build/templates/bootstrap.json:templates/bootstrap.json
 	./bin/build.js bootstrap
 
-templates:build build/templates/api.json build/templates/domain.json build/templates/es.json build/templates/lex.json build/templates/dashboard.json build/templates/master.json build/templates/public.json build/templates/dev.json build/templates/bootstrap.json build/templates/dev/domain.json build/templates/dev/cognito.json build/templates/dev/bucket.json build/templates/dev/lex.json build/templates/dev/es.json
+templates:build build/templates/api.json build/templates/domain.json build/templates/es.json build/templates/lex.json build/templates/dashboard.json build/templates/master.json build/templates/public.json build/templates/dev.json build/templates/bootstrap.json build/templates/dev/domain.json build/templates/dev/cognito.json build/templates/dev/bucket.json build/templates/dev/lex.json build/templates/dev/es.json build/templates/dev/master.json
 
 website:website/admin/assets  website/admin/config website/admin/js website/admin/style website/admin/entry.js  website/admin/html/* build
 	node_modules/.bin/webpack --config ./website/admin/config/webpack.config.js

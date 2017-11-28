@@ -5,7 +5,7 @@ module.exports={
         "Type" : "AWS::CloudWatch::Dashboard",
         "Properties" : {
             "DashboardName" : {"Ref":"Name"},
-            "DashboardBody" : JSON.stringify(require('./body'))
+            "DashboardBody" : {"Fn::Sub":JSON.stringify(require('./body'))}
         }
     }
   },
@@ -13,8 +13,12 @@ module.exports={
   "Description": "Creates a Cloudwatch Dashboard",
   "Mappings": {},
   "Outputs": {
-    "name":{
-        "Value":{"Ref":"dashboard"}
+    "Url":{
+        "Value":{"Fn::Join":["",[
+            "https://console.aws.amazon.com/cloudwatch/home?",
+            "region=",{"Ref":"AWS::Region"},
+            "#dashboards:name=",{"Ref":"dashboard"}
+        ]]}
     }
   },
   "Parameters": {
@@ -22,7 +26,9 @@ module.exports={
     "APIGateWay":{"Type":"String"},
     "ESDomain":{"Type":"String"},
     "BotName":{"Type":"String"},
-    "HandlerLambda":{"Type":"String"}
+    "HandlerLambda":{"Type":"String"},
+    "BootstrapBucket":{"Type":"String"},
+    "BootstrapPrefix":{"Type":"String"}
   }
 }
 

@@ -1,7 +1,15 @@
 module.exports={
-   "Description": "This template creates ElasticSearch Cluster\n",
-   "Resources": {
-      "ElasticsearchDomain": {
+    "EsInit":{
+        "Type": "Custom::EsInit",
+        "DependsOn":["ReadPolicy"],
+        "Properties": {
+            "ServiceToken": { "Fn::GetAtt" : ["CFNLambda", "Arn"] },
+            "Address":{"Fn::GetAtt":["ElasticsearchDomain","DomainEndpoint"]},
+            "Index":"qna-index",
+            "Type":"qna"
+        }
+    },
+    "ElasticsearchDomain": {
          "Type": "AWS::Elasticsearch::Domain",
          "Properties": {
             "AccessPolicies": {
@@ -38,16 +46,4 @@ module.exports={
             }
          }
       }
-   },
-   "Outputs": {
-      "ESArn": {
-         "Value": {"Fn::GetAtt":["ElasticsearchDomain","DomainArn"]}
-      },
-      "ESAddress": {
-         "Value": {"Fn::GetAtt":["ElasticsearchDomain","DomainEndpoint"]}
-      },
-      "ESDomain": {
-         "Value": {"Ref":"ElasticsearchDomain"}
-      }
-   }
 }

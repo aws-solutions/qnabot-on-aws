@@ -90,9 +90,11 @@
           ]
         }]
     },
-    "Roles":[{"Ref":"AdminRole"},
-        {"Ref":"UnauthenticatedRole"},
-        {"Ref":"UserRole"}]
+    "Roles":{"Fn::If":[
+        "Public",
+        [{"Ref":"AdminRole"},{"Ref":"UnauthenticatedRole"},{"Ref":"UserRole"}],
+        [{"Ref":"AdminRole"},{"Ref":"UserRole"}]
+    ]}
   }
 },
 "AdminPolicy": {

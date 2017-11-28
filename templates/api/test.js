@@ -7,7 +7,8 @@ module.exports={
         "SlotType":"slot",
         "Intent":"intent",
         "Email":"jcalho@amazon.com",
-        "Utterances":"ad"
+        "Utterances":"ad",
+        "PublicOrPrivate":"PRIVATE"
     }),
 	"lambda": {
       "Type": "AWS::Lambda::Function",
