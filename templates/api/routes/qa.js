@@ -9,7 +9,7 @@ module.exports={
     method:"get",
     template:fs.readFileSync(__dirname+'/templates/search.get.vm','utf8'),
     resource:{"Ref":"Questions"},
-    RequestParameters:{
+    parameterLocations:{
       "method.request.querystring.query": true,
       "method.request.querystring.from": false,
       "method.request.querystring.topic": true
@@ -21,7 +21,7 @@ module.exports={
     method:"head",
     template:fs.readFileSync(__dirname+'/templates/qa.head.vm','utf8'),
     resource:{"Ref":"Question"},
-    RequestParameters:{
+    parameterLocations:{
       "method.request.path.Id": true
     }
 }),
@@ -36,7 +36,7 @@ module.exports={
     method:"delete",
     template:fs.readFileSync(__dirname+'/templates/qa.delete.vm','utf8'),
     resource:{"Ref":"Question"},
-    RequestParameters:{
+    parameterLocations:{
       "method.request.path.Id": true
     }
 })

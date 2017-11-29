@@ -14,7 +14,5 @@ update(){
 }
 
 update Handler &
-#update Health &
-update Fulfilment &
 
 wait

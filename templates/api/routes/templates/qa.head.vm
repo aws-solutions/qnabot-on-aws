@@ -1,4 +1,4 @@
 {
     "Command":"CHECK",
-    "ID":"$util.urlDecode($input.params('Id'))"
+    "ID":"$util.urlDecode($input.params('ID'))"
 }

@@ -15,7 +15,7 @@ module.exports={
     method:"get",
     template:fs.readFileSync(__dirname+'/templates/root.get.vm','utf8'),
     resource:{"Fn::GetAtt": ["API","RootResourceId"]},
-    RequestParameters:{
+    parameterLocations:{
       "method.request.querystring.from": false,
       "method.request.querystring.perpage": false,
       "method.request.querystring.filter": false

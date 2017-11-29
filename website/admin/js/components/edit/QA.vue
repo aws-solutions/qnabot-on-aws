@@ -110,7 +110,10 @@ module.exports={
     ]),
     {
     qa:function(){
-      return this.$store.getters.QAlist[this.index]
+      return this.$store.getters['data/QAlist'][this.index]
+    },
+    qalist:function(){
+      return this.$store.getters['data/QAlist']
     }
     }
   ),
@@ -124,12 +127,12 @@ module.exports={
     },
     add:function(){
       var self=this
-      return this.$store.dispatch('add',{qa:this.qa})
+      return this.$store.dispatch('data/add',{qa:this.qa})
       .catch(self.error('Unable to Add'))
     },
     update:function(){
       var self=this
-      this.$store.dispatch('update',{qa:this.qa})
+      this.$store.dispatch('data/update',{qa:this.qa})
       .catch(self.error('Unable to Update'))
     },
     checkOpen:function(){
@@ -137,7 +140,7 @@ module.exports={
     },
     removeQ:function(index){
       var self=this
-      return this.$store.dispatch('removeQ',{index:index,item:this.qa})
+      return this.$store.dispatch('data/removeQ',{index:index,item:this.qa})
       .catch(self.error('Unable to Remove'))
     },
     select:function(){
@@ -147,29 +150,24 @@ module.exports={
       var self=this
 
       if(event.shiftKey){
-        var stop=self.$store.getters.QAlist.indexOf(self.qa)+1
-        var start=self.$store.getters.QAlist.length-
-          self.$store.getters.QAlist
-            .reverse()
-            .findIndex(qa=>qa.select)-1
-        console.log(start,stop)
+        var stop=self.qalist.indexOf(self.qa)+1
+        var start=self.qalist.length-self.qalist.reverse().findIndex(qa=>qa.select)-1
+        
         if(start>-1 && start<stop){
-          self.$store.getters.QAlist.slice(
-            start,
-            stop)
+          self.qalist.slice(start,stop)
           .forEach(function(qa){
             qa.open=false
             qa.edit=false
             qa.select=false
-            self.$store.commit('select',qa)
+            self.$store.commit('data/select',qa)
           })
         }else{
-          self.$store.commit('select',self.qa)
+          self.$store.commit('data/select',self.qa)
         }
       }else if(event.metaKey){
-        self.$store.commit('select',self.qa)
+        self.$store.commit('data/select',self.qa)
       }else{
-        self.$store.commit('unselectAll')
+        self.$store.commit('data/unselectAll')
         var check=el=>el.text===el.tmp
         var dirty=self.qa.questions.map(check).concat([
                     Boolean(self.qa.qid),
@@ -182,7 +180,7 @@ module.exports={
         if(dirty){
           self.error('please save or cancel your edits')(null)
         }else{
-          this.$store.state.QAs.forEach(function(qa){
+          this.$store.state.data.QAs.forEach(function(qa){
             if(qa!==self.qa){
               qa.open=false 
               qa.edit=false
@@ -191,7 +189,7 @@ module.exports={
           self.qa.open=toggle ? !self.qa.open : true
           //self.advanced=false
           if(!self.qa.open) self.qa.edit=false
-          if(self.qa.open) self.$store.commit('select',self.qa)
+          if(self.qa.open) self.$store.commit('data/select',self.qa)
         }
       }
     },

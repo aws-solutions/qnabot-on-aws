@@ -1,7 +1,7 @@
 <template>
   <nav>
       <div class='links'>
-          <span class="id" >{{$store.state.client.Id}}</span>
+          <span class="id" >{{$store.state.user.name}}</span>
           <router-link  to="/logout" v-show="authenticated"><span id="logout" >Log Out</span></router-link>
       </div>
       <div v-bind:class="{spinnerActive:loading}" class='spinner' ></div>
@@ -28,11 +28,11 @@ var Vuex=require('vuex')
 module.exports={
   computed:Object.assign(Vuex.mapState([
       'loading'
-  ]),
-  Vuex.mapGetters([
-      'authenticated'
-  ])
-  ),
+  ]),{
+    authenticated:function(){
+      return this.$store.state.user.loggedin
+    }
+  }),
   data:()=>({})
 }
 </script>

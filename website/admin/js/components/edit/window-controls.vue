@@ -85,11 +85,11 @@ module.exports={
         var id_update=this.qa.qid.text===this.qa.qid.tmp
         if(id_update){
           save(this.qa.qid)
-          return this.$store.dispatch('update',{qa:this.qa})
+          return this.$store.dispatch('data/update',{qa:this.qa})
             .tap(()=>self.loading=false)
             .catch(self.error('could not update'))
         }else{
-          return this.$store.dispatch('changeId',{
+          return this.$store.dispatch('data/changeId',{
             qa:this.qa,
             New:this.qa.qid.tmp
           })
@@ -112,19 +112,19 @@ module.exports={
       }else{
         console.log(this.qa)
         
-        this.$store.commit('delQA',index)
+        this.$store.commit('data/delQA',index)
       }
     },
     rm:function(){
       var self=this
       if(this.qa.qid.text){
         self.qa.deleting=true
-        this.$store.dispatch('removeQA',{qid:this.qa.qid.text})
+        this.$store.dispatch('data/removeQA',{qid:this.qa.qid.text})
         .catch(self.error('could not delete'))
         .finally(()=>self.qa.deleting=false)
       }else{
         var index=this.$store.state.QAs.indexOf(this.qa)
-        this.$store.commit('delQA',index)
+        this.$store.commit('data/delQA',index)
       }
     }
   }

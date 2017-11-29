@@ -88,7 +88,7 @@ module.exports={
     check:function(test){
         var params={
             Command:"CHECK",
-            Id:"someting"
+            ID:"someting"
         }
         run(params,test)
     },
@@ -156,7 +156,7 @@ module.exports={
     rm:function(test){
         var params={
             Command:"DELETE",
-            Id:"test"
+            ID:"test"
         }
         run(params,test)
     },

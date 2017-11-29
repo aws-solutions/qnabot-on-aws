@@ -8,6 +8,7 @@ module.exports={
         "BotName":"bot",
         "SlotType":"slot",
         "Intent":"intent",
+        "LambdaArn":"ar",
         "Id":"id"
     },
     util:{

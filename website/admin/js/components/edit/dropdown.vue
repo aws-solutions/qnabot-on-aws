@@ -1,8 +1,8 @@
 <template>
   <button class="dropdown" v-on:click="open=!open">
     <span class="dropdown-title" >
-      <i class="fa fa-caret-down" v-show="open"></i>
-      <i class="fa fa-caret-right" v-show="!open"></i>
+      <icon name="caret-down" v-show="open"></icon>
+      <icon name="caret-right" v-show="!open"></icon>
       <span>{{title1}}/<wbr>{{title2}}</span>
     </span>
     <div class="dropdown-content" v-bind:class="{open:open}">

@@ -5,11 +5,11 @@
     <div class="label label-score"> 
       <trash 
         v-on:delete="rm"
-        v-show="$store.state.selectIds.length > 1 "
+        v-show="$store.state.data.selectIds.length > 1 "
         v-bind:loading="deleting"
         tooltip="Delete Selected"
       ></trash>
-      <span v-show="$store.state.mode==='test'">Score</span>
+      <span v-show="$store.state.page.mode==='test'">Score</span>
     </div>
   </div></li>
 </template>
@@ -57,8 +57,8 @@ module.exports={
     rm:function(){
       var self=this
       self.deleting=true
-      return this.$store.dispatch('deleteSelected') 
-        .then(()=>self.$store.commit('unselectAll'))
+      return this.$store.dispatch('data/deleteSelected') 
+        .then(()=>self.$store.commit('data/unselectAll'))
         .catch(this.error('Unable to Delete Selected'))
         .finally(()=>self.deleting=false)
     } 

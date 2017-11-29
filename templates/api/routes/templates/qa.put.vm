@@ -1,4 +1,4 @@
 {
     "Command":"ADD",
-    "Body":"$input.body"
+    "Body":$input.body
 }

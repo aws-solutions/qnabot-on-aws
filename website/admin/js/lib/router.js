@@ -12,41 +12,20 @@ License for the specific language governing permissions and limitations under th
 */
 
 var components=require('./../components')
-var auth=require('./auth.js')
 var store=require('./store')
 
-function requireAuth (to, from, next) {
-    if (!store.getters.authenticated) {
-        next({
-            path: '/login',
-            query: { redirect: to.fullPath }
-        })
-    } else {
-        next()
-    }
-}
-
-function logOut(to,from,next){
-    auth.logOut()
-    next({
-        path: '/login'
-    })
-}
 module.exports={
     base:'/',
     routes:[
-        {   path:'/',
+        {   path:'/edit',
             component:components.edit
         },
-        {   path:'/logout',
-            component:{template:""},
-            beforeEnter:logOut
+        {   path:'/loading',
+            component:require('../components/loading.vue')
         },
-        {   path:'/login',
-            component:components.login
-        },
-        {   path:'*',
-            redirect:'/'
+        {
+            path:'/error',
+            template:"<p>error</p>"
         }
     ]
 }

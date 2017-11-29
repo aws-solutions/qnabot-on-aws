@@ -22,9 +22,10 @@ module.exports=function(params){
             ]]
           },
           "IntegrationResponses": [
-            {"StatusCode": params.defaultResponse || 200}
+            {"StatusCode": params.defaultResponse || 200},
+            {"SelectionPattern":".*error.*","StatusCode": 404}
           ],
-          "RequestParameters":params.parametetNames,
+          "RequestParameters":params.parameterNames,
           "RequestTemplates": {
             "application/json":params.template 
           }

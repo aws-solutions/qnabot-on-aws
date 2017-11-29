@@ -3,7 +3,9 @@
     v-on:click="click"
     v-bind:class="{down:down}">
       <span v-show="!loading">{{label}}</span>
-      <span v-show="loading"><i class="fa fa-spinner fa-pulse fa-3x fa-fw"></i></span>
+      <span v-show="loading">
+        <icon name="spinner" class="fa-pulse fa-3x fa-fw"></icon>
+      </span>
   </button>
 </template>
 

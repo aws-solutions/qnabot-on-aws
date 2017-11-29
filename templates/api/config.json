@@ -57,7 +57,8 @@
         "Id":{"Ref":"Id"},
         "BotName":{"Ref":"Botname"},
         "SlotType":{"Ref":"SlotType"},
-        "Intent":{"Ref":"Intent"}
+        "Intent":{"Ref":"Intent"},
+        "LambdaArn":{"Ref":"HandlerArn"}
     }
   }
 },

@@ -27,7 +27,7 @@
       </div>
       <div class="info" >
         <span class="score"
-        v-show="this.$store.state.mode==='test' && !qa.edit && !qa.open"
+        v-show="this.$store.state.page.mode==='test' && !qa.edit && !qa.open"
         >{{this.qa.score}}</span>
       </div>
     </div>

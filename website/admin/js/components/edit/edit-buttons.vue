@@ -1,10 +1,10 @@
 <template>
   <div class='edit-controls'>
     <span class='hint--top' aria-label='save' v-show="save && !load">
-      <i v-on:click.stop="$emit('save')" class="fa fa-floppy-o" aria-hidden="true"></i>
+      <icon name="floppy-o" v-on:click.stop="$emit('save')"></icon>
     </span>
     <span v-show="load">
-      <i class="fa fa-spinner fa-pulse fa-3x fa-fw"></i>
+      <icon name="spinner" class="fa-pulse fa-3x fa-fw"></icon>
     </span>
   </div>
 </template>

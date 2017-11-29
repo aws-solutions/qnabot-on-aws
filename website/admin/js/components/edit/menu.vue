@@ -3,10 +3,10 @@
     <div id='tabs'>
       <div class="tab" 
         v-bind:class="{active:mode==='questions',inactive:mode!=='questions'}"
-        v-on:click="$store.dispatch('setMode','questions')"><h1>Questions</h1></div>
+        v-on:click="$store.dispatch('page/setMode','questions')"><h1>Questions</h1></div>
       <div class="tab" 
         v-bind:class="{active:mode==='test',inactive:mode!=='test'}"
-        v-on:click="$store.dispatch('setMode','test')"><h1>Test</h1></div>
+        v-on:click="$store.dispatch('page/setMode','test')"><h1>Test</h1></div>
     </div>
     <div class="controls">
       <div v-show="mode==='questions'">
@@ -139,14 +139,17 @@ module.exports={
     'spin-button':require('./spinner-button.vue'),
     dropdown:require('./dropdown.vue')
   },
-  computed:Object.assign({},
-    Vuex.mapState(["mode","selectIds"]),
-    {
+  computed:{
+      mode:function(){
+        return this.$store.state.page.mode
+      },
+      selectIds:function(){
+        return this.$store.state.data.selectIds
+      },
       importing:function(){
         return this.importingLocal || this.importingUrl
       }
-    }
-  ),
+  },
   methods:{
     error:function(reason){
       var self=this
@@ -163,7 +166,7 @@ module.exports={
     },
     add:function(){
       var self=this
-      return this.$store.dispatch('add')
+      return this.$store.dispatch('data/add')
       .catch(self.error('failed to add'))
     },
     close:function(){
@@ -175,7 +178,7 @@ module.exports={
       var self=this
       self.building=true
       self.buildModal=true
-      self.$store.dispatch('build')
+      self.$store.dispatch('data/build')
       .then(function(){
         self.building=false
         self.buildSuccess=true
@@ -201,7 +204,7 @@ module.exports={
       
       if(self.url){
         self.importingUrl=true
-        action=self.$store.dispatch('upload',{url:self.url})
+        action=self.$store.dispatch('data/upload',{url:self.url})
       }else if(!this.$validator.errors.has('file')){
         self.importingLocal=true
         var file=x.srcElement.files[0]
@@ -217,7 +220,7 @@ module.exports={
           reader.readAsText(file);
         })
         .then(function(data){
-            return self.$store.dispatch('upload',{data})
+            return self.$store.dispatch('data/upload',{data})
         })
       }else{
         action=Promise.reject('invalid file')
@@ -242,7 +245,7 @@ module.exports={
     downloadAll:function(){
       var self=this
       self.exportingAll=true
-      this.$store.dispatch('download')
+      this.$store.dispatch('data/download')
       .then(blob=>Promise.resolve(saveAs(blob,"qna.json")))
       .catch(self.error('failed to Download All'))
       .finally(()=>self.exportingAll=false)
@@ -250,7 +253,7 @@ module.exports={
     downloadLocal:function(){
       var self=this
       self.exportingLocal=true
-      this.$store.dispatch('downloadLocal')
+      this.$store.dispatch('data/downloadLocal')
       .then(blob=>Promise.resolve(saveAs(blob,"qna.json")))
       .catch(self.error('failed to Download Local'))
       .finally(()=>self.exportingLocal=false)
@@ -258,7 +261,7 @@ module.exports={
     downloadSelected:function(){
       var self=this
       self.exportingSelect=true
-      this.$store.dispatch('downloadSelect')
+      this.$store.dispatch('data/downloadSelect')
       .then(blob=>Promise.resolve(saveAs(blob,"qna.json")))
       .catch(self.error('failed to Download Local'))
       .finally(()=>self.exportingSelect=false)

@@ -1,10 +1,3 @@
-<template>
-  <span class='login-spinner'>
-    <i class="fa fa-spinner fa-pulse fa-3x fa-fw"></i>
-  </span>
-</template>
-
-<script>
 /*
 Copyright 2017-2017 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 
@@ -18,7 +11,8 @@ BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied. See the
 License for the specific language governing permissions and limitations under the License.
 */
 
+var Promise=require('bluebird')
+
 module.exports={
-  data:()=>({})
+    
 }
-</script>

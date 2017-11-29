@@ -63,9 +63,9 @@ module.exports={
     refresh:function(){
       var self=this
       self.query=""
-      self.$store.commit('clearQA')
-      self.$store.commit('clearFilter')
-      return self.$store.dispatch('get',0)
+      self.$store.commit('data/clearQA')
+      self.$store.commit('data/clearFilter')
+      return self.$store.dispatch('data/get',0)
       .catch(self.error('failed to refresh'))
     },   
     search:function(){
@@ -74,7 +74,10 @@ module.exports={
       if(!this.invalid){
         self.searching=true
         if(self.query){
-          return self.$store.dispatch('setFilter',self.query+'.*')
+          self.$store.commit('data/setFilter',self.query+'.*')
+          self.$store.commit('data/clearQA')
+          
+          return self.$store.dispatch('data/get',0)
           .catch(self.error('failed to search'))
           .finally(()=>self.searching=false)
         }else{

@@ -16,8 +16,15 @@ var ArchivePlugin = require('webpack-archive-plugin');
 var CopyWebpackPlugin = require('copy-webpack-plugin');
 var HtmlWebpackPlugin = require('html-webpack-plugin');
 var UglifyJSPlugin = require('uglifyjs-webpack-plugin');
+var LodashModuleReplacementPlugin = require('lodash-webpack-plugin');
 var FaviconPlugin=require('favicons-webpack-plugin')
-
+var S3Plugin = require('webpack-s3-plugin')
+var ProgressBarPlugin = require('progress-bar-webpack-plugin');
+var BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
+var webpack=require('webpack')
+var _=require('lodash')
+var aws=require('aws-sdk')
+var config=require('../../../config')
 const ExtractTextPlugin = require("extract-text-webpack-plugin");
 
 const extractSass = new ExtractTextPlugin({
@@ -25,39 +32,40 @@ const extractSass = new ExtractTextPlugin({
     disable: process.env.NODE_ENV === "development"
 });
 
-module.exports={
+module.exports = require('../../../bin/exports')(config.region).then(function(result){
+    return {
+    watch: process.env.WATCH ? true : false,
+    watchOptions:{
+        aggregateTimeout:500
+    },
     entry:{
         main:"./website/admin/entry.js",
         check:"./website/admin/js/browser-check.js",
         client:"./website/admin/js/client.js",
-        test:"./website/admin/js/test.js"
+        test:"./website/admin/js/test.js",
+        vendor:["bluebird","lodash","vue","aws-sdk"]
     },
     output:{
         path:path.join(__dirname,'../build'),
         filename:"[name].js",
-        chunkFilename: '[name]-[chunkhash].js', 
+        chunkFilename: '[name].js', 
     },
-    plugins:[
+    plugins:_.compact([
+        process.env.WATCH ? new BundleAnalyzerPlugin() : null,
+        process.env.UPLOAD ? new S3Plugin({
+            s3Options: {
+                accessKeyId:aws.config.credentials.accesskeyId,
+                secretAccessKey:aws.config.credentials.secretAccessKey,
+                region:config.region
+            },
+            s3UploadOptions:{
+                Bucket:result["QNA-DEV-WEB-BUCKET"]
+            }
+        }) : null,
+        new ProgressBarPlugin(),
         new ArchivePlugin({
             output:"build/website",
             format:"zip"
-        }),
-        new FaviconPlugin({
-            logo:'./website/admin/assets/robot.png',
-            prefix:'assets/favicon/',
-            title:'QnABot Designer',
-            icons:{
-                android: false,
-                appleIcon: false,
-                appleStartup: false,
-                coast: false,
-                favicons: true,
-                firefox: false,
-                opengraph: false,
-                twitter: false,
-                yandex: false,
-                windows: false
-            }
         }),
         extractSass,
         new CopyWebpackPlugin([{from:'./website/admin/assets',to:"assets"}]),
@@ -67,14 +75,12 @@ module.exports={
         }]),
         new HtmlWebpackPlugin({
             template:'./website/admin/html/admin.ejs',
-            favicon:"./website/admin/assets/favicon.gif",
             filename:'index.html',
             chunks:["main","check"]
         }),
         new HtmlWebpackPlugin({
             template:'./website/admin/html/test.ejs',
             filename:'test.html',
-            favicon:"./website/admin/assets/favicon.gif",
             chunks:["main","test","check"]
         }),
         new HtmlWebpackPlugin({
@@ -87,11 +93,12 @@ module.exports={
             templateContent:"ok\n",
             inject:false
         })
-    ],
+    ]),
     resolve:{
         alias:{
             vue$:'vue/dist/vue.js',
-            handlebars: 'handlebars/dist/handlebars.min.js'
+            handlebars: 'handlebars/dist/handlebars.min.js',
+            querystring: 'querystring-browser'
         }
     },
     module: {
@@ -129,5 +136,5 @@ module.exports={
           }
         ]
     }
-
-}
+    }
+})

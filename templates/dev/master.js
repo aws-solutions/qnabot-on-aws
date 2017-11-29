@@ -14,7 +14,14 @@ module.exports={
         "Export":{
             "Name":"QNA-DEV-WEB-BUCKET"
         }
+    },
+    "HandlerArn":{
+        "Value":{"Fn::GetAtt":["master","Outputs.HandlerArn"]},
+        "Export":{
+            "Name":"QNA-DEV-HANDLER-ARN"
+        }
     }
+
   },
   "AWSTemplateFormatVersion": "2010-09-09",
   "Description": "Development QnABot master template"

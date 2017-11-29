@@ -11,5 +11,4 @@ BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied. See the
 License for the specific language governing permissions and limitations under the License.
 */
 
-exports.login=require('./login/index.vue')
 exports.edit=require('./edit/index.vue')

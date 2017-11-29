@@ -17,13 +17,11 @@ var Promise=require('bluebird')
 module.exports=function(params,es){
     var index=parseInt(params.From)*size
     console.log(index)
-    
-    
 
     return es.exists({
         index: process.env.ES_INDEX,
         type: process.env.ES_TYPE,
-        id:params.Id
+        id:params.ID
     })
     .tap(console.log)
     .then(val=> val ? Promise.resolve() : Promise.reject('Error'))

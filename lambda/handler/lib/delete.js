@@ -15,61 +15,23 @@ var Promise=require('bluebird')
 var aws=require('./aws')
 
 module.exports=function(params,es){
-    var lex=new aws.LexModelBuildingService({
-        params:{
-            name:params.intent,
-            version:"$LATEST"
-        }
-    })
 
-    var get=es.get({
+    return es.delete({
         index: process.env.ES_INDEX,
         type: process.env.ES_TYPE,
-        id:params.Id
-    })
-    .tap(console.log)
-    .catch(()=>false)
-
-    var ES=get.then(function(){
-        return es.delete({
-            index: process.env.ES_INDEX,
-            type: process.env.ES_TYPE,
-            refresh:"true",
-            id:params.Id
-        })
+        refresh:"true",
+        id:params.ID
     })
     .catch(function(err){
+        console.log(err)
         if(!err.body.found){
             return Promise.resolve("success")
         }else{
             return Promise.reject(err)
         }
     })
-    /*
-    var mutex=lock()    
-    var LEX=Promise.join(
-        lex.getIntent().promise().tap(console.log),
-        get,
-        mutex
-    )
-    .spread(function(result,info){
-        if(!info)return "done"
-        
-        var old=info._source.q
-        var new_uterances=result.sampleUtterances.filter(ut=>!old.includes(ut))
-        result.sampleUtterances=new_uterances
-        
-        delete result.lastUpdatedDate
-        delete result.createdDate
-        delete result.version
-        
-        return lex.putIntent(result).promise()
-    })
     .tap(console.log)
-    .finally(()=>mutex.then(unlock=>unlock()))
-    */   
-    return Promise.join(ES,Promise.resolve()).tap(console.log)
-        .return('success')
+    .return('success')
 }
 
 

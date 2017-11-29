@@ -1,10 +1,6 @@
-<template>
-  <div class='edit-spinner'>
-    <i 
-      v-show="this.$store.state.loading &&  $store.state.QAs.length===0" 
-      class="fa fa-spinner fa-pulse fa-3x fa-fw">
-    </i>
-  </div>
+<template lang='pug'>
+  .edit-spinner
+    icon(name="spinner" class="fa fa-pulse fa-3x fa-fw" v-show="loading")
 </template>
 
 <script>

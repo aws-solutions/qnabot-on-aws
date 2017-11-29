@@ -40,10 +40,11 @@ module.exports={
     Vuex.mapState([
         'QAs',"page"
     ]),
-    Vuex.mapGetters([
-        'pages'
-    ]),
-    {pageArray:function(){
+    {
+    pages:function(){
+      return this.$store.getters['user/pages']
+    },
+    pageArray:function(){
       var page=this.$store.state.page.current
       if(this.pages<this.view){
         return range(0,this.pages)

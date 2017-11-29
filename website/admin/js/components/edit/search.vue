@@ -77,7 +77,7 @@ module.exports={
       
       if(!this.invalid){
         self.loading=true
-        this.$store.dispatch('search',{
+        this.$store.dispatch('data/search',{
           query:this.query,
           topic:this.topic
         })

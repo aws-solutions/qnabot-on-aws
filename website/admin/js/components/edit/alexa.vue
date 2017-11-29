@@ -1,5 +1,5 @@
-<template>
-  <div id="alexa" v-html="text"></div>
+<template lang='pug'>
+  div(id="alexa" v-html="text")
 </template>
 
 <script>
@@ -28,7 +28,7 @@ module.exports={
       visible:false,
       clipboard:new clipboard('.clip',{
         text:function(){
-          return self.$store.state.bot.slotutterances.join('\n')
+          return self.$store.state.bot.utterances.join('\n')
         }
       })
     }
@@ -49,7 +49,7 @@ module.exports={
     }
   ),
   created:function(){
-    this.$store.dispatch('botinfo').catch(()=>null) 
+    this.$store.dispatch('data/botinfo').catch(()=>null) 
   },
   methods:{
   } 

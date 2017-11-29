@@ -1,23 +1,20 @@
 <template>
   <section>
     <qna-nav></qna-nav>
-    <div class='spinner' v-show="!authenticated">
-      <i class="fa fa-spinner fa-pulse fa-3x fa-fw"></i>
-    </div>
     <spinner loading="true" v-if="!authenticated"></spinner>
     <section id="edit" v-if="authenticated">
       <main-menu ></main-menu>
-      <spinner v-bind:loading="loading"></spinner>
+      <spinner v-bind:loading="$store.state.api.loading"></spinner>
       <ul class="QAs" v-show="QAlist.length>0">
         <labels></labels>
-        <li v-for="index in Math.min(page.perpage,QAlist.length)">
+        <li v-for="index in Math.min(perpage,QAlist.length)">
           <QA 
             v-bind:scoreShow='scoreShow' 
             v-bind:index='index-1'
             ></QA>
         </li>
       </ul>
-      <div id="empty" v-show="QAlist.length===0 && !$store.state.loading">No items returned</div>
+      <div id="empty" v-show="QAlist.length===0 && !$store.state.api.loading">No items returned</div>
       <paginate v-show="pages>1" ></paginate>
     </section>
   </section>
@@ -39,12 +36,12 @@ License for the specific language governing permissions and limitations under th
 
 var Vuex=require('vuex')
 var Promise=require('bluebird')
-var auth=require('../../lib/auth.js')
 
 module.exports={
   data:function(){
     return {
       loading:false,
+      loaded:false,
       scoreShow:false,
       timer:null,
       timeout:1000*60*45
@@ -58,21 +55,25 @@ module.exports={
     'qna-nav':require('./nav.vue'),
     "labels":require('./labels.vue')
   },
-  computed:Object.assign({},
-    Vuex.mapState([
-        'loaded','page'
-    ]),
-    Vuex.mapGetters([
-      'pages','QAlist','authenticated'
-    ])
-  ),
-  created:function(){
+  computed:{
+    QAlist:function(){
+      return this.$store.getters["data/QAlist"]
+    },
+    perpage:function(){
+      return this.$store.state.page.perpage
+    },
+    pages:function(){
+      return this.$store.getters["page/pages"]
+    },
+    authenticated:function(){
+      return this.$store.state.user.loggedin
+    }
+  },
+  mounted:function(){
     var self=this
-    if(!self.authenticated){
-      auth.getCurrent()
-      .then(function(result){
-        result ? self.init() : self.$router.replace('/login')
-      })
+    console.log(self)
+    if(!self.$store.state.user.loggedin){
+      self.$router.replace('/error')
     }else{
       self.init() 
     }
@@ -104,14 +105,12 @@ module.exports={
       document.onkeypress =self.resetTimer;
       self.resetTimer()
       if(!self.loaded){
-        self.$store.commit('startLoading')
         self.loading=true
 
-        return self.$store.dispatch('get',0)
+        return self.$store.dispatch('data/get',0)
         .catch(self.error('failed to load QnA'))
         .finally(function(){
           self.loading=false
-          self.$store.commit('stopLoading')
         })
       }
     }

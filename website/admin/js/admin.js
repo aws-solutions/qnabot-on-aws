@@ -18,6 +18,7 @@ Promise.config({
 var Vue=require('vue')
 
 var Router=require('vue-router').default
+var sync=require('vuex-router-sync').sync
 var Vuex=require('vuex').default
 var VueTyperPlugin = require('vue-typer').default
 var Idle=require('idle-js')
@@ -36,21 +37,25 @@ Vue.use(tooltip,{defaultClass:"tooltip",defaultDelay:500})
 Vue.use(VueTyperPlugin)
 Vue.use(Vuex)
 Vue.use(Router)
+Vue.component('icon',require('vue-awesome'))
+
 
 var lib=require('./lib')
-
 document.addEventListener('DOMContentLoaded',init)
 
 function init(){
 
     var router=new Router(lib.router)
     var store=lib.store
-    Vue.component('icon',require('vue-awesome'))
+    sync(store,router)
+    store.commit('user/captureHash')
+    router.replace('/loading')
+
     var App=new Vue({
         router,
         store,
         computed:Vuex.mapState([
-            'loggedIn','loading','error'
+            'loading','error'
         ]),
         template:`
             <main id="App">
@@ -71,7 +76,7 @@ function init(){
             try {
                 var card=JSON.parse(value)
                 var v =new  (require('jsonschema').Validator)();
-                var valid=v.validate(card,require('./lib/card-schema')).valid
+                var valid=v.validate(card,require('./lib/store/api/card-schema')).valid
                 return valid
             } catch(e){
                 return false

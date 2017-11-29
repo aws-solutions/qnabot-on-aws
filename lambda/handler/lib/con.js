@@ -17,13 +17,15 @@ var myCredentials = new AWS.EnvironmentCredentials('AWS');
 
 module.exports=function(){
     return require('elasticsearch').Client({
+        requestTimeout:10*1000,
+        pingTimeout:10*1000,
         hosts: process.env.ES_ADDRESS,
         connectionClass: require('http-aws-es'),
         defer: function () {
             return Promise.defer();
         },
         amazonES: {
-            region: process.env.REGION,
+            region: process.env.AWS_REGION,
             credentials: myCredentials
         }
     })

@@ -16,8 +16,8 @@ License for the specific language governing permissions and limitations under th
 var aws=require('aws-sdk')
 var Promise=require('bluebird')
 aws.config.setPromisesDependency(Promise)
-
-module.exports=function(region='us-east-1'){
+var config=require('../config')
+module.exports=function(region=config.region){
     aws.config.region=region
     var cf=new aws.CloudFormation()
 

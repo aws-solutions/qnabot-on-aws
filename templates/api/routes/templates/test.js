@@ -28,6 +28,12 @@ module.exports={
         },test)
     },
     root:{
+        get:test=>run("root.get",{
+            input:{
+                body:'{}',
+                params:()=>'1'
+            }
+        },test),
         list:test=>run("qa.put",{
             input:{
                 body:'{}',

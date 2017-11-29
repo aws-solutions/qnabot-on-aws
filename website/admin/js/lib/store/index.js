@@ -16,32 +16,17 @@ var Vuex=require('vuex')
 
 module.exports=new Vuex.Store({
     state:{
-        loggedIn:false,
-        loading:false,
-        QAs:[],
-        results:[],
-        client:{},
-        username:"user",
-        loaded:0,
-        filter:{
-            query:null
-        },
-        mode:"questions",
-        page:{
-            current:0,
-            perpage:15,
-            total:0
-        },
-        bot:{
-            botname:"<i class='fa fa-spinner fa-pulse'></i>",
-            slotutterances:[],
-            lambdaArn:"<i class='fa fa-spinner fa-pulse'></i>",
-            lambdaName:"<i class='fa fa-spinner fa-pulse'></i>"
-        },
-        error:null,
-        selectIds:[]
+        info:{},
+        bot:{},
+        error:""
     },
     mutations:require('./mutations'),
     getters:require('./getters'),
-    actions:require('./actions')
+    actions:require('./actions'),
+    modules:{
+        user:require('./user'),
+        api:require('./api'),
+        data:require('./data'),
+        page:require('./page')
+    }
 })
