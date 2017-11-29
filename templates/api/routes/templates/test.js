@@ -1,4 +1,5 @@
 var fs=require('fs')
+process.argv.push('--debug')
 var Velocity=require('velocity')
 
 module.exports={
@@ -31,34 +32,52 @@ module.exports={
         get:test=>run("root.get",{
             input:{
                 body:'{}',
-                params:()=>'1'
+                params:name=>{return {
+                    from:"all",
+                    filter:"",
+                    query:"",
+                    perpage:""
+                }[name]}
             }
         },test),
-        list:test=>run("qa.put",{
+        list:test=>run("root.get",{
             input:{
                 body:'{}',
-                params:()=>'all'
+                params:name=>{return {
+                    from:"",
+                    filter:"filter",
+                    query:"",
+                    perpage:""
+                }[name]}
             }
         },test),
-        export:test=>run("qa.put",{
+        import:test=>run("qa.put",{
             input:{
                 body:'{}',
                 params:()=>'notall'
             }
+        },test),
+        search:test=>run("root.get",{
+            input:{
+                body:'{}',
+                params:name=>{return {
+                    from:"",
+                    filter:"",
+                    query:"search",
+                    perpage:"",
+                    topic:""
+                }[name] }
+            }
         },test)
-    },
-    search:test=>run("search.get",{
-        input:{
-            params:()=>'param'
-        }
-    },test)
-
+    }
 }
 
 function run(name,context,test){
     var temp=new Velocity.Engine({
-        template:"./"+name+".vm"
+        template:"./"+name+".vm",
+        debug:true
     })
+    
     var result=temp.render(Object.assign(require("./context.js"),context))
     console.log(result)
     try {

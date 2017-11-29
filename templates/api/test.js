@@ -8,7 +8,8 @@ module.exports={
         "Intent":"intent",
         "Email":"jcalho@amazon.com",
         "Utterances":"ad",
-        "PublicOrPrivate":"PRIVATE"
+        "PublicOrPrivate":"PRIVATE",
+        "ApprovedDomain":"amazon.com"
     }),
 	"lambda": {
       "Type": "AWS::Lambda::Function",

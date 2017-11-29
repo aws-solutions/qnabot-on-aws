@@ -17,6 +17,10 @@ var Vue=require('vue')
 var Vuex=require('vuex').default
 var Vuetify=require('vuetify').default
 var style=require('aws-lex-web-ui/dist/lex-web-ui.css')
+var Auth=require('./lib/client-auth')
+var tooltip=require('v-tooltip')
+
+Vue.use(tooltip,{defaultClass:"tooltip",defaultDelay:500})
 Vue.use(Vuex)
 Vue.use(Vuetify);
 
@@ -37,19 +41,32 @@ var config = {
   recorder:{}
 }
 document.addEventListener('DOMContentLoaded', function(){
-    Promise.resolve(axios.get('/api/client')).get('data')
+    var Config=Promise.resolve(axios.get('/api/client')).get('data')
     .tap(console.log)
     .then(function(result){
         config.cognito.poolId=result.aws.cognitoPoolId
         config.lex.botName=result.iframeConfig.lex.botName
         config.ui.pageTitle=result.iframeConfig.lex.pageTitle
+        return config
         console.log(config) 
+    }) 
+
+    Promise.join(Config,Auth())
+    .spread(function(config,auth){
         
-        var LexWebUi=require('aws-lex-web-ui/dist/lex-web-ui.js').Loader
-        const lexWebUi = new LexWebUi(config)
+        var LexWebUi=require('aws-lex-web-ui/dist/lex-web-ui.js')
+        var store=new Vuex.Store(LexWebUi.Store)
+    
+        Vue.use(LexWebUi.Plugin,{
+            config,
+            awsConfig:auth.config,
+            lexRuntimeClient:auth.lex,
+            pollyClient:auth.polly
+        })
+
         var App=new Vue({
-            template:'<client/>',
-            store:lexWebUi.store,
+            template:'<lex-web-ui/>',
+            store:store,
             components:{
                 client:require('./components/client/index.vue')
             }

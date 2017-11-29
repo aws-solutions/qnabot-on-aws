@@ -21,8 +21,6 @@ License for the specific language governing permissions and limitations under th
 
 module.exports={
   data:()=>{return {}},
-  components:{
-    lorem:require('./lorem.vue')
-  }
+  components:{}
 }
 </script>

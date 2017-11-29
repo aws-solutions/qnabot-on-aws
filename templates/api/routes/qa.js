@@ -7,12 +7,13 @@ module.exports={
 "QuestionsGet":lambda({
     authorization:"AWS_IAM",
     method:"get",
-    template:fs.readFileSync(__dirname+'/templates/search.get.vm','utf8'),
+    template:fs.readFileSync(__dirname+'/templates/root.get.vm','utf8'),
     resource:{"Ref":"Questions"},
     parameterLocations:{
-      "method.request.querystring.query": true,
+      "method.request.querystring.query": false,
+      "method.request.querystring.topic": false,
       "method.request.querystring.from": false,
-      "method.request.querystring.topic": true
+      "method.request.querystring.filter":false
     }
 }),
 "Question": resource('{ID}',{"Ref":"Questions"}),

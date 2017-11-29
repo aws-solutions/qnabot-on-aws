@@ -5,7 +5,8 @@ module.exports={
         Email:'jcalho@amazon.com',
         BootstrapBucket:{"Fn::ImportValue":"QNA-BOOTSTRAP-BUCKET"},
         BootstrapPrefix:{"Fn::ImportValue":"QNA-BOOTSTRAP-PREFIX"},
-        PublicOrPrivate:"PRIVATE"
+        PublicOrPrivate:"PRIVATE",
+        ApprovedDomain:"amazon.com"
     })
   },
   "Outputs":{

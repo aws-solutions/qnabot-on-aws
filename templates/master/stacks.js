@@ -18,6 +18,7 @@ module.exports={
         "Username":{"Ref":"Username"},
         "Email":{"Ref":"Email"},
         "PublicOrPrivate":{"Ref":"PublicOrPrivate"},
+        "ApprovedDomain":{"Ref":"ApprovedDomain"},
         "Utterances":{"Fn::Join":["\n",
             require('../../lambda/handler/lib/default-utterances')
         ]}

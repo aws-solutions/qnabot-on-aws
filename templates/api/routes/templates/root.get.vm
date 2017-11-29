@@ -1,5 +1,16 @@
 #if($input.params('from') == 'all')
-    {"Command":"EXPORT"}
+{   
+    "Command":"EXPORT",
+    "Filter":"$input.params('filter')",
+    "Query":"$input.params('query')"
+}
+#elseif(! $input.params('query') == '' )
+{
+    "Command":"SEARCH",
+    "Query":"$input.params('query')",
+    "From":"$input.params('from')",
+    "Topic":"$input.params('topic')"
+}
 #else
 {
     "Command":"LIST",

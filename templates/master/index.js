@@ -17,13 +17,20 @@ module.exports={
     },
     "Username":{
         "Type":"String",
+        "Description":"Administrator username",
         "Default":"Admin"
     },
     "PublicOrPrivate":{
         "Type":"String",
-        "Description":"Where access to the QnABot should be publicly available or restricted to users in QnABot UserPool",
+        "Description":"(optional) Whether access to the QnABot should be publicly available or restricted to users in QnABot UserPool. Allowed values are PUBLIC or PRIVATE",
         "AllowedPattern":"(PUBLIC|PRIVATE)",
+        "Default":"PUBLIC",
         "ConstraintDescription":"Allowed Values are PUBLIC or PRIVATE"
+    },
+    "ApprovedDomain":{
+        "Type":"String",
+        "Description":"(optional) If QnABot is private, restrict user sign up to users whos email domain matches this domain. eg. amazon.com",
+        "Default":"NONE"
     }
   },
   "Resources":Object.assign(
@@ -58,6 +65,24 @@ module.exports={
     },
     "UserPoolUrl":{
         "Value":{"Fn::GetAtt":["api","Outputs.UserPoolUrl"]}
+    }
+  },
+  "Metadata" : {
+    "AWS::CloudFormation::Interface" : {
+        "ParameterGroups" : [
+            {
+                "Label":"Bootstrap Configuration",
+                "Parameters":["BootstrapBucket","BootstrapPrefix"]
+            },
+            {
+                "Label":"Administrator Configuration",
+                "Parameters":["Email","Username"]
+            },
+            {
+                "Label":"Security",
+                "Parameters":["PublicOrPrivate","ApprovedDomain"]
+            }
+        ]
     }
   }
 }

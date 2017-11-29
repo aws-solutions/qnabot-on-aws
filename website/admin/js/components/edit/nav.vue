@@ -2,7 +2,6 @@
   <nav>
       <div class='links'>
           <span class="id" >{{$store.state.user.name}}</span>
-          <router-link  to="/logout" v-show="authenticated"><span id="logout" >Log Out</span></router-link>
       </div>
       <div v-bind:class="{spinnerActive:loading}" class='spinner' ></div>
   </nav>

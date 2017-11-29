@@ -67,6 +67,9 @@ module.exports = require('../../../bin/exports')(config.region).then(function(re
             output:"build/website",
             format:"zip"
         }),
+        new webpack.optimize.CommonsChunkPlugin({
+            name:'vendor'
+        }),
         extractSass,
         new CopyWebpackPlugin([{from:'./website/admin/assets',to:"assets"}]),
         new CopyWebpackPlugin([{
@@ -76,7 +79,7 @@ module.exports = require('../../../bin/exports')(config.region).then(function(re
         new HtmlWebpackPlugin({
             template:'./website/admin/html/admin.ejs',
             filename:'index.html',
-            chunks:["main","check"]
+            chunks:["main","check","vendor"]
         }),
         new HtmlWebpackPlugin({
             template:'./website/admin/html/test.ejs',
@@ -86,7 +89,7 @@ module.exports = require('../../../bin/exports')(config.region).then(function(re
         new HtmlWebpackPlugin({
             template:'./website/admin/html/client.ejs',
             filename:'client.html',
-            inject:false
+            chunks:["client","vendor"]
         }),
         new HtmlWebpackPlugin({
             filename:"health.html",

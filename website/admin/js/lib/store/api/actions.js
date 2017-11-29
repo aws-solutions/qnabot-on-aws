@@ -69,7 +69,7 @@ module.exports={
     },
     bulk(context,body){
         return context.dispatch('_request',{
-            url:'/',
+            url:'/questions',
             method:'put',
             body:body.qna,
             reason:"Failed to Bulk upload"
@@ -77,7 +77,7 @@ module.exports={
     },
     list(context,opts){
         return context.dispatch('_request',{
-            url:'/?'+query({
+            url:'/questions?'+query({
                 page:opts.page || 0,
                 filter:opts.filter || "",
                 perpage:opts.perpage || 10

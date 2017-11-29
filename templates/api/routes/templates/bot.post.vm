@@ -1,6 +1,6 @@
 {
     "Command":"SAVE",
     "botname":"$stageVariables.BotName",
-    "slotype":"$stageVariables.SlotType",
+    "slottype":"$stageVariables.SlotType",
     "intent":"$stageVariables.Intent"
 }  

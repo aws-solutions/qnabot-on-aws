@@ -1,3 +1,3 @@
 #! /bin/bash
 
-$(npm bin)/nodeunit ./test.js
+$(npm bin)/nodeunit ./test.js -f "root - $1"

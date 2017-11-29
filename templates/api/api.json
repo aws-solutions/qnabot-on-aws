@@ -43,6 +43,10 @@
       "AllowedPattern":"(PUBLIC|PRIVATE)",
       "ConstraintDescription":"Allowed Values are PUBLIC or PRIVATE"
     },
+    "ApprovedDomain":{
+      "Type":"String",
+      "Default":"NONE"
+    },
     "HandlerArn": {
       "Type": "String"
     },
@@ -77,7 +81,10 @@
     }
   },
   "Conditions":{
-    "Public":{"Fn::Equals":[{"Ref":"PublicOrPrivate"},"PUBLIC"]}
+    "Public":{"Fn::Equals":[{"Ref":"PublicOrPrivate"},"PUBLIC"]},
+    "Domain":{"Fn::Not":[
+        {"Fn::Equals":[{"Ref":"ApprovedDomain"},"NONE"]}
+    ]}
   }
 }
 

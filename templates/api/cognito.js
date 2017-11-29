@@ -44,6 +44,7 @@ module.exports={
     },
     "User":{
         "Type" : "AWS::Cognito::UserPoolUser",
+        "DependsOn":["SignupPermision","MessagePermision"],
         "Properties" : {
             "DesiredDeliveryMediums":["EMAIL"],
             "UserAttributes":[{
@@ -97,17 +98,12 @@ module.exports={
                 "ClientId":{"Ref":"Client"},
                 "UserPool":{"Ref":"UserPool"},
                 "Type":"Rules",
-                "AmbiguousRoleResolution":"Deny",
+                "AmbiguousRoleResolution":"AuthenticatedRole",
                 "RulesConfiguration":{"Rules":[{
                     "Claim":"cognito:groups",
                     "MatchType":"Contains",
                     "Value":"Admin",
                     "RoleARN":{"Fn::GetAtt":["AdminRole","Arn"]}
-                },{
-                    "Claim":"cognito:groups",
-                    "MatchType":"Contains",
-                    "Value":"User",
-                    "RoleARN":{"Fn::GetAtt":["UserRole","Arn"]}
                 }]}
             }]
         }
@@ -117,14 +113,24 @@ module.exports={
       "Properties": {
         "UserPoolName": {"Fn::Join": ["-",["UserPool",{"Ref": "AWS::StackName"}]]},
         "AdminCreateUserConfig":{
-           "AllowAdminCreateUserOnly":true,
+           "AllowAdminCreateUserOnly":false,
            "InviteMessageTemplate":{
                 "EmailMessage":{"Fn::Sub":fs.readFileSync(__dirname+'/invite.txt','utf8')},
                 "EmailSubject":"Welcome to QnABot!"
            }
         },
-        "AliasAttributes":["email"]
-      }
+        "AliasAttributes":["email"],
+        "AutoVerifiedAttributes":["email"],
+        "Schema":[{
+            "Required":true,
+            "Name":"email",
+            "AttributeDataType":"String"
+        }],
+        "LambdaConfig":{
+            "CustomMessage":{"Fn::GetAtt":["MessageLambda","Arn"]},
+            "PreSignUp":{"Fn::GetAtt":["SignupLambda","Arn"]}
+        }
+    }
     },
     "Client": {
       "Type": "AWS::Cognito::UserPoolClient",
