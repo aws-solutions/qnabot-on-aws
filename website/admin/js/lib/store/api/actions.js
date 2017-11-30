@@ -99,7 +99,7 @@ module.exports={
         return context.dispatch('update',payload)
     },
     update(context,payload){
-        payload.card.imageUrl=payload.card.imageUrl.trim() 
+        payload.r.imageUrl=payload.r.imageUrl.trim() 
         return context.dispatch('_request',{
             url:'/questions/'+payload.qid,
             method:'put',

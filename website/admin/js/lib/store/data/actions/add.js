@@ -47,7 +47,7 @@ module.exports={
             qid:qa.qid.text,
             q:qa.questions.map(x=>x.text),
             a:qa.answer.text,
-            card:JSON.parse(qa.card.text),
+            r:JSON.parse(qa.card.text),
             t:qa.topic.text
         })
     },
