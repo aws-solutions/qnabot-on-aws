@@ -27,11 +27,11 @@ function replaceLink(msg){
 }
 
 function matchMDLink(msg){
-  return msg.match(/\[([^\]]*)]\((?:https?|ftp):\/\/[\S]+(?=\))/gm)
+  return msg.match(/\[([^\]]*)]\((.*)\)/gm)
 }
 
 function replaceMDLink(msg){
-  return msg.replace(/\[([^\]]*)]\((?:https?|ftp):[^)]*\)/gm, replaceTxt)
+  return msg.replace(/\[([^\]]*)]\((.*)\)/gm, replaceTxt)
 }
 
 function parseLinks(msg){

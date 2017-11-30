@@ -16,6 +16,12 @@ module.exports={
       "method.request.querystring.filter":false
     }
 }),
+"QuestionsPut":lambda({
+    authorization:"AWS_IAM",
+    method:"put",
+    template:fs.readFileSync(__dirname+'/templates/qa.put.vm','utf8'),
+    resource:{"Ref":"Questions"}
+}),
 "Question": resource('{ID}',{"Ref":"Questions"}),
 "QuestionHead":lambda({
     authorization:"AWS_IAM",

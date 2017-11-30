@@ -1,13 +1,15 @@
-module.exports={
+var exp=require('../../bin/exports')
+module.exports=exp().then(function(vars){
+var base={
   "Parameters":{
     "BootstrapPrefix":{
         "Type":"String",
-        "Description":"Path to QnABot assets in the BoostrapBucket",
+        "Description":"Path to QnABot assets in the BoostrapBucket (DO NOT CHANGE)",
         "Default":""
     },
     "BootstrapBucket":{
         "Type":"String",
-        "Description":"AWS S3 bucket where assets are stored"
+        "Description":"AWS S3 bucket where assets are stored (DO NOT CHANGE)"
     },
     "Email":{
         "Type":"String",
@@ -52,13 +54,16 @@ module.exports={
         "Value":{"Fn::GetAtt":["QnABot","Outputs.HandlerArn"]}
     },
     "ContentDesignerLogin":{
-        "Value":{"Fn::GetAtt":["api","Outputs.DesignerLogin"]}
+        "Value":{"Fn::GetAtt":["api","Outputs.DesignerLogin"]},
+        "Description":"Url to login to the QnABot Designer Ui to edit and create questions for your bot"
     },
     "ClientURL":{
-        "Value":{"Fn::GetAtt":["api","Outputs.ClientLogin"]}
+        "Value":{"Fn::GetAtt":["api","Outputs.ClientLogin"]},
+        "Description":"If your bot is PRIVATE then this is the url your users will use to interact with your bot. This is also the registration url for new users"
     },
     "ClientLogin":{
-        "Value":{"Fn::GetAtt":["api","Outputs.ClientUrl"]}
+        "Value":{"Fn::GetAtt":["api","Outputs.ClientUrl"]},
+        "Description":"If your bot is PUBLIC then this is the login your users will use to interact with your bot"
     },
     "DashboardUrl":{
         "Value":{"Fn::GetAtt":["dashboard","Outputs.Url"]}
@@ -86,3 +91,9 @@ module.exports={
     }
   }
 }
+    
+    base.Parameters.BootstrapBucket.Default=vars["QNA-BOOTSTRAP-BUCKET"]
+    base.Parameters.BootstrapPrefix.Default=vars["QNA-BOOTSTRAP-PREFIX"]
+    
+    return base
+})

@@ -2,8 +2,8 @@ var stack=require('../util').stacktest
 module.exports={
   "Resources": {
     "QnABot":stack('lex',{
-        "Address":{"Fn::ImportValue":"QNA-DEV-ED-ADDRESS"},
-        "DomainArn":{"Fn::ImportValue":"QNA-DEV-ED-ARN"},
+        "Address":{"Fn::ImportValue":"QNA-DEV-ES-ADDRESS"},
+        "DomainArn":{"Fn::ImportValue":"QNA-DEV-ES-ARN"},
         "Type":"test-type",
         "Index":"test-index",
         "EmptyMessage":"test",

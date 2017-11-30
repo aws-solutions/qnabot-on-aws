@@ -28,7 +28,7 @@
         "Timeout": 10
       }
     },
-    "slotTypePolicy": {
+    "CFNPolicy": {
       "Type": "AWS::IAM::ManagedPolicy",
       "Properties": {
         "PolicyDocument": {
@@ -38,74 +38,11 @@
               "Effect": "Allow",
               "Action": [
                 "lex:PutSlotType",
-                "lex:DeleteSlotType"
-              ],
-              "Resource": [
-                "*"
-              ]
-            }
-          ]
-        }
-      }
-    },
-    "intentPolicy": {
-      "Type": "AWS::IAM::ManagedPolicy",
-      "Properties": {
-        "PolicyDocument": {
-          "Version": "2012-10-17",
-          "Statement": [
-            {
-              "Effect": "Allow",
-              "Action": [
+                "lex:DeleteSlotType",
                 "lex:PutIntent",
-                "lex:DeleteIntent"
-              ],
-              "Resource": [
-                "*"
-              ]
-            }
-          ]
-        }
-      }
-    },
-    "botPolicy": {
-      "Type": "AWS::IAM::ManagedPolicy",
-      "Properties": {
-        "PolicyDocument": {
-          "Version": "2012-10-17",
-          "Statement": [
-            {
-              "Effect": "Allow",
-              "Action": [
+                "lex:DeleteIntent",
                 "lex:PutBot",
-                "lex:DeleteBot"
-              ],
-              "Resource": [
-                "*"
-              ]
-            },
-            {
-              "Effect": "Allow",
-              "Action": [
-                "iam:CreateServiceLinkedRole"
-              ],
-              "Resource": [
-                "*"
-              ]
-            }
-          ]
-        }
-      }
-    },
-    "aliasPolicy": {
-      "Type": "AWS::IAM::ManagedPolicy",
-      "Properties": {
-        "PolicyDocument": {
-          "Version": "2012-10-17",
-          "Statement": [
-            {
-              "Effect": "Allow",
-              "Action": [
+                "lex:DeleteBot",
                 "lex:PutBotAlias",
                 "lex:DeleteBotAlias"
               ],
@@ -135,10 +72,7 @@
         "Path": "/",
         "ManagedPolicyArns": [
           "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
-          {"Ref": "slotTypePolicy"},
-          {"Ref": "intentPolicy"},
-          {"Ref": "botPolicy"},
-          {"Ref": "aliasPolicy"}
+          {"Ref": "CFNPolicy"}
         ]
       }
     }

@@ -17,24 +17,22 @@ var fs=Promise.promisifyAll(require('fs'))
 var path=require('path')
 
 var config=require('../config')
-var base=require('./master')
+module.exports=Promise.resolve(require('./master')).then(function(base){
+    delete base.Outputs.AdminBucket
+    delete base.Outputs.BotName
+    delete base.Outputs.HandlerArn
+    delete base.Outputs.HealthArn
+    delete base.Outputs.FulfilmentArn
+    delete base.Outputs.ApiURL
+    delete base.Parameters.BootstrapBucket
+    delete base.Parameters.BootstrapPrefix
 
-delete base.Outputs.AdminBucket
-delete base.Outputs.BotName
-delete base.Outputs.HandlerArn
-delete base.Outputs.HealthArn
-delete base.Outputs.FulfilmentArn
-delete base.Outputs.ApiURL
-delete base.Parameters.BootstrapBucket
-delete base.Parameters.BootstrapPrefix
+    var out=JSON.stringify(base).replace(
+        /{"Ref":"BootstrapBucket"}/g,
+        '"'+config.publicBucket+'"')
 
-var out=JSON.stringify(base).replace(
-    /{"Ref":"BootstrapBucket"}/g,
-    '"'+config.publicBucket+'"')
-
-out=out.replace(
-    /{"Ref":"BootstrapPrefix"}/g,
-    '"'+config.publicPrefix+'"')
-
-module.exports=JSON.parse(out)
-
+    out=out.replace(
+        /{"Ref":"BootstrapPrefix"}/g,
+        '"'+config.publicPrefix+'"')
+    return JSON.parse(out)
+})

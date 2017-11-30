@@ -4,7 +4,7 @@
     <spinner loading="true" v-if="!authenticated"></spinner>
     <section id="edit" v-if="authenticated">
       <main-menu ></main-menu>
-      <spinner v-bind:loading="$store.state.api.loading"></spinner>
+      <spinner v-bind:loading="$store.state.api.loading && QAlist.length===0"></spinner>
       <ul class="QAs" v-show="QAlist.length>0">
         <labels></labels>
         <li v-for="index in Math.min(perpage,QAlist.length)">

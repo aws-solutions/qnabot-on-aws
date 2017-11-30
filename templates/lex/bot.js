@@ -1,4 +1,5 @@
 var config=require('./config')
+
 module.exports={
     "QNAInvokePermission": {
       "Type": "AWS::Lambda::Permission",
@@ -12,7 +13,7 @@ module.exports={
         "Type": "Custom::LexSlotType",
         "Properties": {
             "ServiceToken": { "Fn::GetAtt" : ["CFNLambda", "Arn"] },
-            "enumerationValues": config.SlotUtterances
+            "enumerationValues": config.utterances.map(x=>{return {value:x}})
         }
     },
     "QNAIntent": {

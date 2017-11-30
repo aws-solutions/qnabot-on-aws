@@ -9,6 +9,13 @@ module.exports={
   "Description": "creates Lex QnABot",
   "Mappings": {},
   "Outputs": {
+    "BotConsoleUrl":{
+      "Value":{"Fn::Join":["",[
+        "https://console.aws.amazon.com/lex/home?",
+        "region=",{"Ref":"AWS::Region"},
+        "#bot-editor:bot=",{"Ref":"Bot"}
+      ]]}
+    },
     "Bot": {
       "Value": {
         "Ref": "Bot"

@@ -15,5 +15,5 @@ module.exports={
     "voiceId":"Joanna",
     "Clarification":"Sorry, can you please repeat that?",
     "Abort":"Sorry, can you please repeat that?",
-    "SlotUterances":require('../../lambda/handler/lib/default-utterances')
+    "utterances":require('../../lambda/handler/lib/default-utterances')
 }

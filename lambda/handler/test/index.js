@@ -174,7 +174,7 @@ module.exports={
             Session: {}
         }
         var msg={
-            msg: 'If the Training Center or Instructor has listed its skill sessions in our system, you will be able to search and reserve that class online. You may also have to call the Training Center or visit the Training Center\'s website to inquire about costs and availability, and to register and pay for the class. This is because AHA Training Centers are independent businesses that have entered into an agreement with the AHA to provide CPR and first aid training using our current curricula and products. [Find a Course](http://cpr.heart.org/AHAECC/CPRAndECC/FindACourse/UCM_473162_Find-A-Course.jsp) this is a test',
+            msg: 'If the Training Center or Instructor has listed its skill sessions in our system, you will be able to search and reserve that class online. You may also have to call the Training Center or visit the Training Center\'s website to inquire about costs and availability, and to register and pay for the class. This is because AHA Training Centers are independent businesses that have entered into an agreement with the AHA to provide CPR and first aid training using our current curricula and products. [Find a Course](cpr.heart.org/AHAECC/CPRAndECC/FindACourse/UCM_473162_Find-A-Course.jsp) this is a test',
             question: 'how do i find a course',
             r: {
               title: 'Your source for training',

@@ -4,7 +4,7 @@
     "Filter":"$input.params('filter')",
     "Query":"$input.params('query')"
 }
-#elseif(! $input.params('query') == '' )
+#elseif($input.params('query').length()>0)
 {
     "Command":"SEARCH",
     "Query":"$input.params('query')",
