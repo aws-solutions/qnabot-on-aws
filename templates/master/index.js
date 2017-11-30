@@ -93,8 +93,8 @@ var base={
   }
 }
     
-    base.Parameters.BootstrapBucket.Default=vars["QNA-BOOTSTRAP-BUCKET"]
-    base.Parameters.BootstrapPrefix.Default=vars["QNA-BOOTSTRAP-PREFIX"]
+    base.Parameters.BootstrapBucket.Default=vars["QNA-BOOTSTRAP-BUCKET"] || ""
+    base.Parameters.BootstrapPrefix.Default=vars["QNA-BOOTSTRAP-PREFIX"] || ""
     
     return base
 })

@@ -17,6 +17,8 @@ var chalk=require('chalk')
 var path=require('path')
 var mock=require('./mock')
 var context={}
+process.env.AWS_PROFILE=require('../config').profile
+process.env.AWS_DEFAULT_REGION=require('../config').profile
 
 context.callbackWaitsForEmptyEventLoop = true;
 context.functionName = '';

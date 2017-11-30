@@ -1,4 +1,7 @@
 #! /bin/bash
+__dirname="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+export AWS_PROFILE=$(node -e "console.log(JSON.stringify(require('$__dirname'+'/../config')))" | $(npm bin)/jq --raw-output ".profile")
+export AWS_DEFAULT_REGION=$(node -e "console.log(JSON.stringify(require('$__dirname'+'/../config')))" | $(npm bin)/jq --raw-output ".region")
 
 NAME=$(echo $1 | rev | cut -d'/' -f1 | rev)
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"

@@ -10,6 +10,9 @@ or in the "license" file accompanying this file. This file is distributed on an 
 BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied. See the
 License for the specific language governing permissions and limitations under the License.
 */
+var config=require('../../../config')
+process.env.AWS_PROFILE=config.profile
+process.env.AWS_DEFAULT_REGION=config.profile
 
 var path=require('path')
 var ArchivePlugin = require('webpack-archive-plugin');
@@ -24,7 +27,6 @@ var BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlug
 var webpack=require('webpack')
 var _=require('lodash')
 var aws=require('aws-sdk')
-var config=require('../../../config')
 const ExtractTextPlugin = require("extract-text-webpack-plugin");
 
 const extractSass = new ExtractTextPlugin({

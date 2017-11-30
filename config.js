@@ -13,6 +13,7 @@ License for the specific language governing permissions and limitations under th
 
 module.exports={
     "region":"us-east-1",
+    "profile":"burner-1",
     "publicBucket":"aws-bigdata-blog",
-    "publicPrefix":"artifacts/aws-ai-qna-bot"
+    "publicPrefix":"artifacts/aws-ai-qna-bot",
 }

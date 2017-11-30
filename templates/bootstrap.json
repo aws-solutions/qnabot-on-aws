@@ -5,30 +5,31 @@
       "Properties": {}
     },
     "ReadPolicy":{
-    "Type" : "AWS::S3::BucketPolicy",
-    "Properties" : {
-        "Bucket" : {"Ref":"Bucket"},
-        "PolicyDocument" : {
-            "Version":"2012-10-17",
-            "Statement":[{
-                "Sid":"PublicReadForGetBucketObjects",
-                "Effect":"Allow",
-                "Principal":["*"],
-                "Action":["s3:Get*","s3:List*"],
-                "Resource":[
-                    {"Fn::Join":["",[
-                        "arn:aws:s3:::",
-                        {"Ref":"Bucket"},
-                        "/*"
-                    ]]},
-                    {"Fn::Join":["",[
-                        "arn:aws:s3:::",
-                        {"Ref":"Bucket"}
-                    ]]}
-                ]
-            }]
+        "Type" : "AWS::S3::BucketPolicy",
+        "Condition":"Public",
+        "Properties" : {
+            "Bucket" : {"Ref":"Bucket"},
+            "PolicyDocument" : {
+                "Version":"2012-10-17",
+                "Statement":[{
+                    "Sid":"PublicReadForGetBucketObjects",
+                    "Effect":"Allow",
+                    "Principal":"*",
+                    "Action":["s3:Get*","s3:List*"],
+                    "Resource":[
+                        {"Fn::Join":["",[
+                            "arn:aws:s3:::",
+                            {"Ref":"Bucket"},
+                            "/*"
+                        ]]},
+                        {"Fn::Join":["",[
+                            "arn:aws:s3:::",
+                            {"Ref":"Bucket"}
+                        ]]}
+                    ]
+                }]
+            }
         }
-    }
     }
   },
   "Conditions": {},
@@ -45,11 +46,21 @@
       }
     },
     "Prefix": {
-      "Value": "artifacts/aws-ai-qna-bot",
+      "Value": "dev",
       "Export":{
         "Name":"QNA-BOOTSTRAP-PREFIX"
       }
     }
   },
-  "Parameters": {}
+  "Parameters": {
+    "Public":{
+        "Type":"String",
+        "Default":"PRIVATE"
+    }
+  },
+  "Conditions":{
+    "Public":{"Fn::Equals":[{"Ref":"Public"},"PUBLIC"]}
+  }
 }
+
+

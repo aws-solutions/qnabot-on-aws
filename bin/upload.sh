@@ -1,22 +1,16 @@
 #! /bin/bash
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+__dirname="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+export AWS_PROFILE=$(node -e "console.log(JSON.stringify(require('$__dirname'+'/../config')))" | $(npm bin)/jq --raw-output ".profile")
+export AWS_DEFAULT_REGION=$(node -e "console.log(JSON.stringify(require('$__dirname'+'/../config')))" | $(npm bin)/jq --raw-output ".region")
 
-BUCKET=$(./bin/exports.js | $(npm bin)/jq --raw-output '."QNA-BOOTSTRAP-BUCKET"')
-PREFIX=$(node -e "console.log(JSON.stringify(require('./config')))" | $(npm bin)/jq --raw-output '."publicPrefix"')
+
+BUCKET=$($__dirname/exports.js | $(npm bin)/jq --raw-output '."QNA-BOOTSTRAP-BUCKET"')
+PREFIX=$($__dirname/exports.js | $(npm bin)/jq --raw-output '."QNA-BOOTSTRAP-PREFIX"')
 BLUE=$(tput setaf 4)
 RESET=$(tput sgr0)
 echo bootstrap bucket is $BLUE$BUCKET/$PREFIX$RESET
 
-cfn(){
-    aws s3 sync ./templates s3://$BUCKET/$PREFIX/templates/    \
-        --exclude '*'       \
-        --delete            \
-        --include '*.json'  
-}
+aws s3 sync $__dirname/../build/ s3://$BUCKET/$PREFIX/ --delete  
 
-cfn &
-for LAMBDA in $DIR/../lambda/*;do
-    $DIR/lambda.sh $(basename $LAMBDA) &
-done
 
-wait

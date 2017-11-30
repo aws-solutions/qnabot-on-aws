@@ -1,10 +1,11 @@
 BUCKET=$(shell bin/exports.js | $(shell npm bin)/jq --raw-output '."QNA-BOOTSTRAP-BUCKET"')
-PREFIX=$(shell node -e "console.log(JSON.stringify(require('./config')))" | $(shell npm bin)/jq --raw-output '."publicPrefix"')
+PREFIX=$(shell bin/exports.js | $(shell npm bin)/jq --raw-output '."QNA-BOOTSTRAP-PREFIX"')
+
 LAMBDAS=$(shell for l in $$(ls ./lambda | grep -v util);do echo lambda/$$l;done)
 
 .PHONY: lambda templates upload
 prefix:
-	echo "$(PREFIX)"
+	echo "$(BUCKET)"
 
 build:
 	mkdir -p build; mkdir -p build/lambda; mkdir -p build/templates/test;mkdir -p build/templates;mkdir -p build/documents; mkdir -p build/templates/dev
@@ -53,6 +54,6 @@ samples:docs/blog-samples.json build
 	cp docs/blog-samples.json build/documents
 
 upload: templates lambda website build
-	aws s3 sync build s3://$(BUCKET)/$(PREFIX) --delete
+	./bin/upload.sh
 
 

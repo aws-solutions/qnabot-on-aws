@@ -1,6 +1,8 @@
 #! /usr/bin/env node
 var Promise=require('bluebird')
 var fs=Promise.promisifyAll(require('fs'))
+process.env.AWS_PROFILE=require('../config').profile
+process.env.AWS_DEFAULT_REGION=require('../config').profile
 var aws=require('aws-sdk')
 var chalk=require('chalk')
 aws.config.setPromisesDependency(Promise)
@@ -14,7 +16,6 @@ var mainfile=__dirname+'/../templates/'+name
 var testfile=__dirname+'/../templates/'+name+'/test.js'
 var mainoutput=__dirname+'/../build/templates/'+name
 var testoutput=__dirname+'/../build/templates/test/'+name
-
 
 Promise.resolve(require(mainfile))
 .then(function(result){

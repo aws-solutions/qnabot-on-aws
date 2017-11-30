@@ -13,6 +13,8 @@ License for the specific language governing permissions and limitations under th
 */
 
 
+process.env.AWS_PROFILE=require('../config').profile
+process.env.AWS_DEFAULT_REGION=require('../config').profile
 var aws=require('aws-sdk')
 var Promise=require('bluebird')
 aws.config.setPromisesDependency(Promise)
