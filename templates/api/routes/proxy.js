@@ -22,7 +22,12 @@ module.exports={
             "integration.request.path.proxy":"method.request.path.proxy"
           },
           "IntegrationResponses": [
-            {"StatusCode":200},
+            {
+                "StatusCode":200,
+                "ResponseParameters":{
+                    "method.response.header.content-type":"integration.response.header.Content-Type"
+                }
+            },
           ]
         },
         "RequestParameters":{
@@ -30,7 +35,12 @@ module.exports={
         },
         "ResourceId": {"Ref": "Proxy"},
         "MethodResponses": [
-          {"StatusCode": 200},
+          {
+            "StatusCode": 200,
+            "ResponseParameters":{
+                "method.response.header.content-type":false
+            }
+          },
           {"StatusCode": 400}
         ],
         "RestApiId": {"Ref": "API"}

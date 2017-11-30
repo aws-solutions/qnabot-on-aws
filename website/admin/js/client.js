@@ -66,10 +66,7 @@ document.addEventListener('DOMContentLoaded', function(){
 
         var App=new Vue({
             template:'<lex-web-ui/>',
-            store:store,
-            components:{
-                client:require('./components/client/index.vue')
-            }
+            store:store
         })
         App.$mount('#App')
     })

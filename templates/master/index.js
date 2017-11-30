@@ -69,7 +69,8 @@ var base={
         "Value":{"Fn::GetAtt":["dashboard","Outputs.Url"]}
     },
     "UserPoolUrl":{
-        "Value":{"Fn::GetAtt":["api","Outputs.UserPoolUrl"]}
+        "Value":{"Fn::GetAtt":["api","Outputs.UserPoolUrl"]},
+        "Description":"Where you will manage users for your QnABot."
     }
   },
   "Metadata" : {
