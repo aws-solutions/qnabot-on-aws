@@ -13,7 +13,7 @@ var base={
     },
     "Email":{
         "Type":"String",
-        "Description":"Email address for the admin user. Will be used for loging in and for setting the admin password.",
+        "Description":"Email address for the admin user. Will be used for loging in and for setting the admin password. This email will receive the temporary password for the admin user.",
         "AllowedPattern":".+\@.+\..+",
         "ConstraintDescription":"Must be valid email address eg. johndoe@example.com"
     },
