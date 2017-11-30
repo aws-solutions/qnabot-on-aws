@@ -1,8 +1,6 @@
 <template>
   <div id="paginate">
-    <i class="fa fa-angle-double-left" aria-hidden="true" v-on:click="first"></i>
-    <i class="fa fa-angle-left" aria-hidden="true" v-on:click="prev"></i>
-    <span v-show="this.page.current > this.view/2" >...</span>
+    
     <ul>
       <li v-for="index in pageArray" 
         v-bind:class="{active:isActive(index)}"
@@ -10,9 +8,7 @@
         {{index}}
       </li>
     </ul>
-    <span v-show="this.pages-this.page.current > this.view/2+1" >...</span>
-    <i class="fa fa-angle-right" aria-hidden="true" v-on:click="next"></i>
-    <i class="fa fa-angle-double-right" aria-hidden="true" v-on:click="last"></i>
+    
     <span class="count">{{page.total}} Documents</span>
   </div>
 </template>
@@ -36,23 +32,17 @@ var range=require('range').range
 
 module.exports={
   props:[],
-  computed:Object.assign(
-    Vuex.mapState([
-        'QAs',"page"
-    ]),
-    {
+  computed:{
+    page:function(){
+      return this.$store.state.page
+    },
     pages:function(){
-      return this.$store.getters['user/pages']
+      return this.$store.state.page.total/this.view 
     },
     pageArray:function(){
-      var page=this.$store.state.page.current
-      if(this.pages<this.view){
-        return range(0,this.pages)
-      }else{
-        return range(Math.max(0,page-this.view/2),Math.min(this.pages,page+this.view/2+1))
-      }
-    }}
-  ),
+      return range(0,this.pages-1)
+    }
+  },
   data:()=>({
     view:10 
   }),
@@ -69,7 +59,7 @@ module.exports={
     },
     go(index){
       var self=this
-      this.$store.dispatch('goToPage',index)
+      this.$store.dispatch('page/goToPage',index)
       .catch(self.error("Could not go to page"))
     },
     first(){
@@ -77,12 +67,12 @@ module.exports={
     },
     next(){
       var self=this
-      this.$store.dispatch('nextPage')
+      this.$store.dispatch('page/nextPage')
       .catch(self.error("Could not go to page"))
     },
     prev(){
       var self=this
-      this.$store.dispatch('previousPage')
+      this.$store.dispatch('page/previousPage')
       .catch(self.error("Could not go to page"))
     },
     last(){

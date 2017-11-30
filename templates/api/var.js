@@ -8,8 +8,7 @@ module.exports={
             {"Ref": "API"},
             ".execute-api.",
             {"Ref": "AWS::Region"},
-            ".amazonaws.com/",
-            {"Fn::GetAtt":["StageName","Name"]}
+            ".amazonaws.com/prod"
         ]]}
     }
 },
@@ -25,13 +24,6 @@ module.exports={
             {"Fn::GetAtt":["ApiUrl","Name"]},
             "/static/client.html"
         ]]}
-    }
-},
-"StageName":{
-    "Type": "Custom::Variable",
-    "Properties": {
-        "ServiceToken": { "Fn::GetAtt" : ["CFNLambda", "Arn"] },
-        "Name":"api"
     }
 }
 }

@@ -100,6 +100,7 @@
     "optimist": "^0.6.1",
     "progress-bar-webpack-plugin": "^1.10.0",
     "pug": "^2.0.0-rc.4",
+    "pug-loader": "^2.3.0",
     "query-string": "^4.3.4",
     "querystring": "^0.2.0",
     "querystring-browser": "^1.0.4",

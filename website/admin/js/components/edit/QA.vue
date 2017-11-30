@@ -33,7 +33,7 @@
         </li>
       </ul>
       <div class="addQuestion tab" v-bind:class="{hidden:!qa.edit}">
-        <button class='add' v-on:click="add()" tabindex='-1'>
+        <button class='add' v-on:click.stop="add()" tabindex='-1'>
           <icon name='plus' v-tooltip="'add'" tabindex='-1'></icon>
         </button>
       </div>
@@ -50,7 +50,7 @@
         </text-input>   
       </div>
       <hr>          
-      <div @click="toggleAdvanced" class="toggle-advanced">
+      <div @click.stop="toggleAdvanced" class="toggle-advanced">
         <icon name="caret-down" v-show="advanced"></icon>
         <icon name="caret-up" v-show="!advanced"></icon>
         <h6>Advanced</h6>

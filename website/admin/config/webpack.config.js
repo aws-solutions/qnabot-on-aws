@@ -79,7 +79,7 @@ module.exports = require('../../../bin/exports')(config.region).then(function(re
             to:"wav-worker.js"
         }]),
         new HtmlWebpackPlugin({
-            template:'./website/admin/html/admin.ejs',
+            template:'./website/admin/html/admin.pug',
             filename:'index.html',
             chunks:["main","check","vendor"]
         }),
@@ -89,7 +89,7 @@ module.exports = require('../../../bin/exports')(config.region).then(function(re
             chunks:["main","test","check"]
         }),
         new HtmlWebpackPlugin({
-            template:'./website/admin/html/client.ejs',
+            template:'./website/admin/html/client.pug',
             filename:'client.html',
             chunks:["client","vendor"]
         }),
@@ -125,6 +125,10 @@ module.exports = require('../../../bin/exports')(config.region).then(function(re
           { 
             test: /\.(png|woff|woff2|eot|ttf|svg)$/, 
             loader: 'url-loader?limit=100000' 
+          },
+          {
+            test: /\.pug$/,
+            loader: 'pug-loader'
           },
           {
             test: /\.css$/,

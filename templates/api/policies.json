@@ -97,7 +97,7 @@
             "execute-api:*"
           ],
           "Resource": [{"Fn::Sub":
-            "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${API}/api/*/*"
+            "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${API}/*/*/*"
             }]
         }
       ]

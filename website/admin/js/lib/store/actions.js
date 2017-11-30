@@ -17,9 +17,15 @@ var vue=require('vue')
 
 module.exports={
     bootstrap:function(context){
-        return Promise.resolve(axios.get('/api/info'))
+        return Promise.resolve(axios.head(window.location.href))
         .then(function(result){
-            context.commit('info',result.data) 
+            var stage=result.headers['api-stage']
+            return Promise.resolve(axios.get(`/${stage}/info`))
+            .get('data')
+            .then(x=>Object.assign(x,{stage})) 
+        })
+        .then(function(result){
+            context.commit('info',result) 
         })
     }
 }

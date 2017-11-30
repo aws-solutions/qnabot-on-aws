@@ -78,7 +78,7 @@ module.exports={
     list(context,opts){
         return context.dispatch('_request',{
             url:'/questions?'+query({
-                page:opts.page || 0,
+                from:opts.page || 0,
                 filter:opts.filter || "",
                 perpage:opts.perpage || 10
             }),
@@ -99,7 +99,10 @@ module.exports={
         return context.dispatch('update',payload)
     },
     update(context,payload){
-        payload.r.imageUrl=payload.r.imageUrl.trim() 
+        console.log(payload)
+        payload.card.imageUrl=payload.card.imageUrl.trim() 
+        payload.r=payload.card
+        delete payload.card
         return context.dispatch('_request',{
             url:'/questions/'+payload.qid,
             method:'put',

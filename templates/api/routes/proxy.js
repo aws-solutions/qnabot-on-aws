@@ -1,45 +1,72 @@
 var fs=require('fs')
+var resource=require('./util/resource')
+var _=require('lodash')
 
 module.exports={
-    "Static": require('./util/resource')('static'),
-    "Proxy": require('./util/resource')('{proxy+}',{"Ref":"Static"}),
-    "ProxyAny":{
+    "Static": resource('static'),
+    "Proxy": resource('{proxy+}',{"Ref":"Static"}),
+    "ProxyAnyGet":proxy({
+        resource:{"Ref": "Proxy"},
+        method:"get",
+        path:"/{proxy}",
+        requestParams:{
+            "integration.request.path.proxy":"method.request.path.proxy"
+        },
+        responseParameters:{
+            "method.response.header.api-stage":"context.stage"
+        }
+    }),
+    "ProxyAnyHead":proxy({
+        resource:{"Ref": "Proxy"},
+        method:"head",
+        path:"/{proxy}",
+        requestParams:{
+            "integration.request.path.proxy":"method.request.path.proxy"
+        },
+        responseParameters:{
+            "method.response.header.api-stage":"context.stage"
+        }
+    })
+}
+
+function proxy(opts){
+    return {
       "Type": "AWS::ApiGateway::Method",
       "Properties": {
         "AuthorizationType": "NONE",
-        "HttpMethod": "GET",
+        "HttpMethod":opts.method.toUpperCase(),
         "Integration": {
           "Type": "AWS",
-          "IntegrationHttpMethod":"GET",
+          "IntegrationHttpMethod":opts.method.toUpperCase(),
           "Credentials":{"Fn::GetAtt":["S3AccessRole","Arn"]},
           "Uri": {"Fn::Join": ["",[
                 "arn:aws:apigateway:",
                 {"Ref": "AWS::Region"},
                 ":s3:path/",{"Ref":"Bucket"},
-                "/{proxy}"
+                opts.path
           ]]},
-          "RequestParameters":{
-            "integration.request.path.proxy":"method.request.path.proxy"
-          },
+          "RequestParameters":opts.requestParams || {},
           "IntegrationResponses": [
             {
                 "StatusCode":200,
-                "ResponseParameters":{
+                "ResponseParameters":Object.assign({
                     "method.response.header.content-type":"integration.response.header.Content-Type"
-                }
+                },
+                opts.responseParameters)
             },
           ]
         },
         "RequestParameters":{
             "method.request.path.proxy":false
         },
-        "ResourceId": {"Ref": "Proxy"},
+        "ResourceId":opts.resource,
         "MethodResponses": [
           {
             "StatusCode": 200,
-            "ResponseParameters":{
+            "ResponseParameters":Object.assign({
                 "method.response.header.content-type":false
-            }
+            },
+            _.mapValues(opts.responseParameters || {},x=>false))
           },
           {"StatusCode": 400}
         ],
@@ -47,5 +74,3 @@ module.exports={
       }
     }
 }
-
-
