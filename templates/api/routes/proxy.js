@@ -7,16 +7,23 @@ module.exports={
       "Type": "AWS::ApiGateway::Method",
       "Properties": {
         "AuthorizationType": "NONE",
-        "HttpMethod": "ANY",
+        "HttpMethod": "GET",
         "Integration": {
-          "IntegrationHttpMethod":"ANY",
-          "Type": "HTTP_PROXY",
-          "Uri":{"Fn::Join":["",[
-            "http://",{"Ref":"Bucket"},".s3.amazonaws.com/{proxy}"
+          "Type": "AWS",
+          "IntegrationHttpMethod":"GET",
+          "Credentials":{"Fn::GetAtt":["S3AccessRole","Arn"]},
+          "Uri": {"Fn::Join": ["",[
+                "arn:aws:apigateway:",
+                {"Ref": "AWS::Region"},
+                ":s3:path/",{"Ref":"Bucket"},
+                "/{proxy}"
           ]]},
           "RequestParameters":{
             "integration.request.path.proxy":"method.request.path.proxy"
-          }
+          },
+          "IntegrationResponses": [
+            {"StatusCode":200},
+          ]
         },
         "RequestParameters":{
             "method.request.path.proxy":false

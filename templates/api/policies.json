@@ -29,6 +29,7 @@
           "Effect": "Allow",
           "Action": [
             "s3:DeleteObject",
+            "s3:PutObject",
             "s3:ListBucket"
           ],
           "Resource": {"Fn::Join":["",[
@@ -45,18 +46,6 @@
           "Resource": [{"Fn::Join":["",[
                 "arn:aws:s3:::",
                 {"Ref": "BootstrapBucket"},"/*"
-            ]]}
-          ]
-        },
-        {
-          "Effect": "Allow",
-          "Action": [
-            "s3:PutObject"
-          ],
-          "Resource": [{"Fn::Join":["",[
-                "arn:aws:s3:::",
-                {"Ref": "Bucket"},
-                "*"
             ]]}
           ]
         }

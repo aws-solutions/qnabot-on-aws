@@ -8,29 +8,6 @@
             }
         }
     },
-    "BucketPolicy":{
-        "Type" : "AWS::S3::BucketPolicy",
-        "Properties" : {
-            "Bucket" : {"Ref":"Bucket"},
-            "PolicyDocument" : {
-                "Version":"2012-10-17",
-                "Statement":[{
-                    "Sid":"PublicReadForGetBucketObjects",
-                    "Effect":"Allow",
-                    "Principal": "*",
-                    "Action":["s3:GetObject"],
-                    "Resource":[
-                        {"Fn::Join":["",[
-                            "arn:aws:s3:::",{"Ref":"Bucket"},"/*"
-                        ]]},
-                        {"Fn::Join":["",[
-                            "arn:aws:s3:::",{"Ref":"Bucket"}
-                        ]]}
-                    ]
-                }]
-            }
-        }
-    },
     "Clear":{
         "Type": "Custom::S3Clear",
         "DependsOn":["CFNLambdaPolicy"],
@@ -52,5 +29,43 @@
             "DstBucket":{"Ref":"Bucket"}
         },
         "DependsOn":"Clear"
+    },
+    "S3AccessRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+				"Effect": "Allow",
+				"Principal": {
+					"Service": "apigateway.amazonaws.com"
+				},
+				"Action": "sts:AssumeRole"
+            }
+          ]
+        },
+        "Path": "/",
+        "ManagedPolicyArns": [{"Ref":"S3AccessPolicy"}]
+      }
+    },
+    "S3AccessPolicy":{
+      "Type": "AWS::IAM::ManagedPolicy",
+      "Properties": {
+        "PolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [{
+              "Effect": "Allow",
+              "Action": [
+                "s3:GetObject"
+              ],
+              "Resource": [{"Fn::Join":["",[
+                    "arn:aws:s3:::",
+                    {"Ref": "Bucket"},"/*"
+                ]]}
+              ]
+            }]
+        }
+      }
     }
 }
