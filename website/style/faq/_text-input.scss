@@ -1,0 +1,60 @@
+$id-font-size:20px; 
+
+
+.clickable {
+  cursor:pointer;
+}
+
+.text-input {
+  
+  .workspace {
+    display:flex;
+    margin:5px 0px 5px 0px;
+    .text {
+      width:100%;
+      display:flex;
+      textarea {
+        margin:0px;
+        width:100%;
+        padding:0px 0px 0px 5px;
+      },
+      .prefix {
+        padding-right:5px;
+      }
+      .field-text {
+        padding:0px 0px 0px 5px;
+        white-space:pre-wrap;
+      }
+
+    }
+    
+    .save {
+      display:inline-block;
+      margin:auto -1*$QA-padding auto auto;
+      border-radius:10px 0px 0px 10px;
+      transition:width .1s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+  }
+}
+.opened .save {
+  box-shadow:$panel-shadow;
+  padding:5px;
+  width:30px;
+}
+
+.closed .save {
+  width:0px;
+}
+.A .text-input .workspace .text {
+  .prefix {
+    margin:auto;
+  }
+  .field-text {
+    padding:10px;
+  }
+  textarea{
+    padding:10px;
+  }
+}
+

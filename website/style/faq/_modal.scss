@@ -1,0 +1,31 @@
+#App {
+  .modal {
+    position:absolute;
+    top:0;
+    right:0;
+    background-color:rgba(0, 0, 0, 0.2);
+    z-index:1;
+    height:100vh;
+    width:100vw;
+    label {
+      margin:0;
+    }
+    .modal-card {
+      position:absolute;
+      top:50%;
+      text-align:center;
+      transform:translateY(-50%);
+      right:25%;
+      width:50%;
+      z-index:2;
+      background-color:white;
+      padding:10px;
+      border-radius:$border-radius;
+    }
+  }
+  
+}
+
+.id {
+  color:$action-color;
+}

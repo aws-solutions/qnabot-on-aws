@@ -1,0 +1,26 @@
+#paginate {
+  @include panel();
+  text-align:center;
+  display:flex;
+  align-items: center;
+  justify-content: center;
+  position:relative;
+  .fa {
+    padding:0px 10px;
+  }
+  ul {
+    li {
+      padding:0px 3px 0px 3px;
+      float:left;
+      cursor:pointer; 
+    }
+    .active {
+      text-decoration:underline;
+    }
+  }
+
+  .count {
+    position:absolute;
+    right:10px;
+  }
+}

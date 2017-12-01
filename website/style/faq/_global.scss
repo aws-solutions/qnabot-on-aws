@@ -1,0 +1,23 @@
+body {
+  margin:0;
+  line-height:normal;
+}
+main#App {
+  margin:0;
+  padding-bottom:20px;
+  position:inherit;
+  input {
+    border-color:black;
+  }
+  .spinner .fa {
+    position:absolute;
+    top:50%;
+    right:50%;
+  }
+} 
+.error {
+  text-align:center;
+  color:$alert-color;
+}
+
+

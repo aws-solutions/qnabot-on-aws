@@ -16,8 +16,8 @@ var Promise=require('bluebird')
 var fs=Promise.promisifyAll(require('fs'))
 var path=require('path')
 
-var config=require('../config')
-module.exports=Promise.resolve(require('./master')).then(function(base){
+var config=require('../../config')
+module.exports=Promise.resolve(require('../master')).then(function(base){
     delete base.Outputs.AdminBucket
     delete base.Outputs.BotName
     delete base.Outputs.HandlerArn

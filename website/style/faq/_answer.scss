@@ -1,0 +1,28 @@
+.A {
+  display:flex;
+  
+  .answer-controls {
+    background-color:$controls-color;
+    margin:auto 5px auto -1*$QA-padding;
+    padding:5px;
+    
+    box-shadow: 2px 0px 7px 0px;
+    border-radius:0px $border-radius $border-radius 0px;
+  }
+  .text-input {
+    flex:1;
+    .workspace .text {
+      .prefix {
+        margin:0;
+        padding:0px
+      }
+      .field-text {
+        padding:5px;
+        flex:100
+      }
+      textarea{
+        padding:10px;
+      }
+    }
+  }
+}

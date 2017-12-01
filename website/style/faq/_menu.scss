@@ -1,0 +1,242 @@
+$id-font-size:20px; 
+  
+#main-menu {
+  @include panel();
+  padding:0px;
+  hr {
+    margin:8px;
+  }
+  .alexaModal {
+    height:100%;
+    blockquote {
+      h4 h3, {
+        margin:0;
+      }
+    }
+    h2{
+      text-align:center;
+      margin:0;
+    }
+    h3 {
+      margin:0px;
+      font-size:1.25em;
+    }
+    p {
+      padding-top:10px;
+    }
+    ol {
+      list-style-type:decimal;
+      padding-left:20px;
+    }
+    .modal-card {
+      overflow-y:scroll;
+      margin:0px;
+      text-align:left;
+      transform:none;
+      top:5%;
+      height:90%;
+      width:80%;
+      right:10%;
+      button {
+        width:100%;
+      }
+      #alexa {
+        button.clip {
+          width:auto;
+        }
+      }
+    }
+  }
+  #tabs {
+    display:flex;
+    text-align:center;
+    .tab {
+      border-width:0px 1px 2px 1px;
+      margin:0px;
+      flex:1;
+      padding:5px;
+      &:hover {
+        color:$primary-color;
+        cursor:pointer;
+      }
+      border-style:solid;
+      h1 {
+        text-align:center;
+        margin:0px;
+        font-size:1.5em;
+      }
+    }
+    .tab.active, .tab.active:first-child,.tab.active:last-child{
+      border-width:0;
+      &:hover {
+        cursor:initial;
+        color:initial;
+      }
+      
+    }
+    .tab:first-child{
+      border-radius:$panel-border-radius 0px 0px 0px;
+      border-width:0px 2px 2px 0px;
+    }
+    .tab:last-child{
+      border-radius:0px $panel-border-radius 0px 0px;
+      border-width:0px 0px 2px 2px;
+    }
+    .tab.inactive {
+      background-color:shade($panel-color,10%);
+    }
+    .tab.inactive:first-child{
+      border-bottom-right-radius:$panel-border-radius;
+      box-shadow:inset -1px -2px 2px
+    }
+    .tab.inactive:last-child{
+      border-bottom-left-radius:$panel-border-radius;
+      box-shadow:inset 1px -2px 2px
+    }
+
+  }
+  .controls {
+    padding:10px;
+    $filter-border-width:1px;
+    .filter-input {
+      display:flex;
+      .prefix {
+        flex:1;
+        margin:auto;
+        padding:6px;
+        border-style:solid;
+        border-width:$filter-border-width;
+        border-radius:$border-radius 0px 0px $border-radius;
+      }
+      input{
+        border-radius:0px;
+        box-shadow:none;
+        height:34px;
+      }
+      .input-container {
+        flex:10;
+        position:relative;
+
+        .fa-icon {
+          position:absolute;
+          top:25%;
+          right:10px;
+          cursor:pointer;
+        }
+      }
+      button {
+        flex:1;
+        margin:0;
+        box-shadow:none;
+        border-style:solid;
+        border-width:$filter-border-width;
+        border-radius:0px $border-radius $border-radius 0px;
+        .fa {
+          font-size:20px;
+        }
+      }
+    }
+    .search-input {
+      display:flex;
+      margin:10px 0px;
+
+      .prefix {
+        margin:auto;
+        padding:6px;
+        border-style:solid;
+        border-width:$filter-border-width;
+        border-radius:$border-radius 0px 0px $border-radius;
+      }
+      input{
+        border-radius:0px;
+        box-shadow:none;
+      }
+      button {
+        margin:0;
+        box-shadow:none;
+        border-style:solid;
+        border-width:$filter-border-width;
+        border-radius:0px $border-radius $border-radius 0px;
+      }
+      &.topic {
+        width:50%;
+        input {
+          border-radius:0px $border-radius $border-radius 0px;
+        }
+       }
+    }
+  }
+  .buttons {
+    display:flex;
+    box-shadow:0px 0px 4px 0px;
+    border-radius:10px;
+    margin:10px 0px;
+    #alexa-build {
+      flex:.5;
+    }
+    #build-button {
+      flex:.5;
+    }
+    button {
+      box-shadow:none;
+      border-radius:0;
+      margin:0;
+      border-style:solid;
+      border-width:1px;
+      &:hover {
+        background-color:shade($controls-color,10%);
+        border-color:black;
+      }
+    }
+    button:first-child {
+      border-radius:$border-radius 0px 0px $border-radius;
+    }
+    button:last-child {
+      border-radius:0px $border-radius $border-radius 0px;
+    }
+  }
+  button.dropdown {
+    position:relative;
+    &:hover {
+      color:inherit;
+    }
+    .material-icons {
+      font-size:1em;
+    }
+    .dropdown-content {
+      overflow:hidden;
+      position:absolute;
+      height:0px;
+      z-index:1;
+      left:0;
+      width:100%;
+      border-radius:0px 0px $border-radius $border-radius;
+      border-style:solid;
+      border-width:0px;
+
+      .button:hover{
+        background-color:shade($controls-color,20%);
+        color:$primary-color;
+      }
+      .button:last-child {
+        border-radius:0px 0px $border-radius $border-radius;
+      }
+      transition:height .25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    .dropdown-content.open {
+      border-width:0px 1px 1px 1px;
+    }
+  }
+  button.dropdown.four .dropdown-content.open {
+      height:5.5em;
+  }
+  button.dropdown.five .dropdown-content.open {
+      height:7em;
+  }
+  button.dropdown#lex-alexa .dropdown-content.open {
+      height:3em;
+  }
+}
+
+
+
