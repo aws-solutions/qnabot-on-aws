@@ -37,10 +37,10 @@ module.exports={
       return this.$store.state.page
     },
     pages:function(){
-      return this.$store.state.page.total/this.view 
+      return this.$store.state.page.total/this.$store.state.page.perpage
     },
     pageArray:function(){
-      return range(0,this.pages-1)
+      return range(0,this.pages)
     }
   },
   data:()=>({

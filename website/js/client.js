@@ -55,12 +55,16 @@ document.addEventListener('DOMContentLoaded', function(){
         console.log(config) 
     }) 
 
-    Promise.join(Config,Auth())
-    .spread(function(config,auth){
+    Promise.join(
+        Config,
+        Auth(),
+        System.import(/* webpackChunkName: "client-page" */'./Client.vue')
+    )
+    .spread(function(config,auth,app){
         
         var LexWebUi=require('aws-lex-web-ui/dist/lex-web-ui.js')
         var store=new Vuex.Store(LexWebUi.Store)
-    
+   
         Vue.use(LexWebUi.Plugin,{
             config,
             awsConfig:auth.config,
@@ -69,7 +73,7 @@ document.addEventListener('DOMContentLoaded', function(){
         })
 
         var App=new Vue({
-            template:'<lex-web-ui/>',
+            render:h=>h(app),
             store:store
         })
         App.$mount('#App')

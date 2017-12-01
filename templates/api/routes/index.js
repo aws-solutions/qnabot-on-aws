@@ -4,7 +4,6 @@ module.exports=Object.assign(
     require('./health'),
     require('./info'),
     require('./qa'),
-    require('./root'),
     require('./proxy'),
     require('./login')
 )

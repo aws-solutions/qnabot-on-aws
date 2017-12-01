@@ -22,10 +22,6 @@ module.exports={
         },
         {   path:'/loading',
             component:require('../components/loading.vue')
-        },
-        {
-            path:'/error',
-            template:"<p>error</p>"
         }
     ]
 }

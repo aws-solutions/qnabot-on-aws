@@ -1,3 +1,13 @@
+<template lang='pug'>
+  main(id="App")
+    router-view
+    .modal(v-show="error")
+      .modal-card
+        p {{error}}
+        button(@click="$store.commit('clearError')" )
+</template>
+
+<script>
 /*
 Copyright 2017-2017 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 
@@ -11,11 +21,20 @@ BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied. See the
 License for the specific language governing permissions and limitations under the License.
 */
 
+var Vuex=require('vuex')
 var Promise=require('bluebird')
-var aws=require('aws-sdk')
 
-aws.config.setPromisesDependency(Promise)
-aws.config.region=process.env.AWS_REGION || 'us-east-1'
-aws.config.signatureVersion='v4'
+module.exports={
+  data:()=>{return {}},
+  components:{},
+  computed:{
+    error:function(){
+      return this.$store.state.error
+    }
+  },
+  created:function(){},
+  methods:{}
+}
+</script>
 
-module.exports=aws
+

@@ -19,16 +19,13 @@
   "scripts": {
     "test-unit": "./node_modules/karma/bin/karma start website/test/unit/karma.conf.js",
     "test-e2e-remote": "export URL=$(./bin/URL.sh) && cd website/test/e2e && ./runner.sh ",
-    "build": "make website",
-    "run": "./bin/run.js",
     "check": "./bin/check.sh",
     "stack": "./bin/launch.sh",
     "upload": "make upload -j 4",
     "dev-up": "npm run stack dev/dev up",
     "up": "npm run upload && npm run stack test/master up",
     "lambda-update": "make lambda && ./bin/update-lambda.sh",
-    "admin-update": "npm run build && ./bin/update-admin.sh",
-    "websync": "export WATCH=true; export UPLOAD=true; make website -B"
+    "admin-update": "npm run build && ./bin/update-admin.sh"
   },
   "repository": {
     "type": "git",
@@ -136,6 +133,7 @@
     "webpack-archive-plugin": "^3.0.0",
     "webpack-bundle-analyzer": "^2.9.1",
     "webpack-dev-server": "^2.6.1",
+    "webpack-merge": "^4.1.1",
     "webpack-s3-plugin": "^1.0.0-rc.0"
   },
   "devDependencies": {

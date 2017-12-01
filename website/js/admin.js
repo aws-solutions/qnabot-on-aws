@@ -44,57 +44,22 @@ var lib=require('./lib')
 document.addEventListener('DOMContentLoaded',init)
 
 function init(){
-
     var router=new Router(lib.router)
     var store=lib.store
     sync(store,router)
     store.commit('user/captureHash')
     router.replace('/loading')
 
-    var App=new Vue({
-        router,
-        store,
-        computed:Vuex.mapState([
-            'loading','error'
-        ]),
-        template:`
-            <main id="App">
-                <router-view ></router-view>
-                <div class="modal" v-show="error">
-                  <div class="modal-card">
-                      <p>{{error}}</p>
-                      <button @click="$store.commit('clearError')" >Close</button>
-                  </div>
-                </div>
-            </main>
-        `
+    System.import(/* webpackChunkName: "admin-page" */'./admin.vue')
+    .then(function(app){
+        var App=new Vue({
+            router,
+            store,
+            render:h=>h(app)
+        })
+        
+        require('./lib/validator')(App)        
+        store.state.modal=App.$modal
+        router.onReady(()=>App.$mount('#App'))
     })
-    
-    App.$validator.extend('json', {
-        getMessage: field => 'invalid json',
-        validate: function(value){
-            try {
-                var card=JSON.parse(value)
-                var v =new  (require('jsonschema').Validator)();
-                var valid=v.validate(card,require('./lib/store/api/card-schema')).valid
-                return valid
-            } catch(e){
-                return false
-            }
-        }
-    });
-    
-    App.$validator.extend('optional', {
-        getMessage: field => 'invalid characters',
-        validate: function(value){
-            try {
-                return value.match(/.*/) ? true : false
-            } catch(e){
-                return false
-            }
-        }
-    });
-   
-    store.state.modal=App.$modal
-    router.onReady(()=>App.$mount('#App'))
 }
