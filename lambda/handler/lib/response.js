@@ -96,9 +96,9 @@ exports.error=function(err,params){
           }
       }
 
-    }else{
+    }else{ //lex
         return {
-            sessionAttributes: params.Session,
+            sessionAttributes: params.Session || {},
             dialogAction: {
                 type: "Close",
                 fulfillmentState:"Failed",
@@ -149,7 +149,7 @@ exports.success=function(message,params){
     } else { //lex
       const links = parseLinks(message.msg)
       var out = {
-        sessionAttributes: params.Session,
+        sessionAttributes: params.Session || {},
         dialogAction: {
           type: "Close",
           fulfillmentState: "Fulfilled",
@@ -199,4 +199,3 @@ exports.success=function(message,params){
         return out
     }
 }
-
