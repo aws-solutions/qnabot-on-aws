@@ -155,7 +155,7 @@ exports.success=function(message,params){
           fulfillmentState: "Fulfilled",
           message: {
             contentType: "PlainText",
-            content: links.text
+            content: (params.Session ? links.text : links.text + ' ' + links.mlink.map(function(elem) { return elem.attachmentLinkUrl }).join(' '))
           }
         }
       }
