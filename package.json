@@ -17,20 +17,17 @@
   ],
   "description": "An Amazon Lex powered Question and Answer (QnA) Bot ====================================================",
   "scripts": {
-    "test-unit": "./node_modules/karma/bin/karma start website/admin/test/unit/karma.conf.js",
-    "test-e2e-local": "export URL=http://localhost:8000 && cd website/admin/test/e2e && ./runner.sh ",
-    "test-e2e-remote": "export URL=$(./bin/URL.sh) && cd website/admin/test/e2e && ./runner.sh ",
+    "test-unit": "./node_modules/karma/bin/karma start website/test/unit/karma.conf.js",
+    "test-e2e-remote": "export URL=$(./bin/URL.sh) && cd website/test/e2e && ./runner.sh ",
     "build": "make website",
     "run": "./bin/run.js",
     "check": "./bin/check.sh",
     "stack": "./bin/launch.sh",
     "upload": "make upload -j 4",
-    "server": "./website/admin/config/server.js",
     "dev-up": "npm run stack dev/dev up",
     "up": "npm run upload && npm run stack test/master up",
     "lambda-update": "make lambda && ./bin/update-lambda.sh",
     "admin-update": "npm run build && ./bin/update-admin.sh",
-    "public": "npm run upload && ./bin/update-public.sh",
     "websync": "export WATCH=true; export UPLOAD=true; make website -B"
   },
   "repository": {

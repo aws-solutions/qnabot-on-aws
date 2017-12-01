@@ -14,7 +14,7 @@
                 "Statement":[{
                     "Sid":"PublicReadForGetBucketObjects",
                     "Effect":"Allow",
-                    "Principal":"*",
+                    "Principal":{"AWS":"*"},
                     "Action":["s3:Get*","s3:List*"],
                     "Resource":[
                         {"Fn::Join":["",[

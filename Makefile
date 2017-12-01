@@ -15,6 +15,7 @@ lambda: $(LAMBDAS)
 		cd $$l && make; \
 		cd ../..;	\
 	done;			
+
 build/templates/dev/domain.json:templates/dev/domain.js
 	./bin/build.js dev/domain
 build/templates/dev/bucket.json:templates/dev/bucket.js
@@ -47,8 +48,8 @@ build/templates/bootstrap.json:templates/bootstrap.json
 
 templates:build build/templates/api.json build/templates/domain.json build/templates/es.json build/templates/lex.json build/templates/dashboard.json build/templates/master.json build/templates/public.json build/templates/dev.json build/templates/bootstrap.json build/templates/dev/domain.json build/templates/dev/cognito.json build/templates/dev/bucket.json build/templates/dev/lex.json build/templates/dev/es.json build/templates/dev/master.json
 
-website:website/admin/assets  website/admin/config website/admin/js website/admin/style website/admin/entry.js  website/admin/html/* build
-	node_modules/.bin/webpack --config ./website/admin/config/webpack.config.js
+website:website/assets  website/config website/js website/style website/entry.js  website/html/* build
+	node_modules/.bin/webpack --config ./website/config/webpack.config.js
 
 samples:docs/blog-samples.json build
 	cp docs/blog-samples.json build/documents
