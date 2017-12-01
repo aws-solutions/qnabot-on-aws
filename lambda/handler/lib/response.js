@@ -148,6 +148,9 @@ exports.success=function(message,params){
       return out
     } else { //lex
       const links = parseLinks(message.msg)
+      if (params.Channel && params.Channel == 'Facebook') {
+        links.text += ' ' + links.mlink.map(function(elem) { return elem.attachmentLinkUrl }).join(' ')
+      }
       var out = {
         sessionAttributes: params.Session || {},
         dialogAction: {
@@ -155,7 +158,7 @@ exports.success=function(message,params){
           fulfillmentState: "Fulfilled",
           message: {
             contentType: "PlainText",
-            content: (params.Session ? links.text : links.text + ' ' + links.mlink.map(function(elem) { return elem.attachmentLinkUrl }).join(' '))
+            content: links.text
           }
         }
       }
