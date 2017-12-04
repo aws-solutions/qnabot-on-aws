@@ -14,7 +14,7 @@ License for the specific language governing permissions and limitations under th
 var Promise=require('bluebird')
 var aws=require('./aws')
 var lex=new aws.LexModelBuildingService()
-var getUtterances=require('./bot-info')
+var getUtterances=require('./utterances')
 
 var run=function(fnc,params){
     console.log(fnc+':request:'+JSON.stringify(params,null,3))
@@ -43,7 +43,7 @@ var run=function(fnc,params){
 }
 
 module.exports=function(params,es){ 
-    var utterances=getUtterances(params,es).get('utterances')
+    var utterances=getUtterances(params,es)
     var slottype=run("getSlotType",{
         name:params.slottype,
         version:"$LATEST"

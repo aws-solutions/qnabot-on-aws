@@ -11,12 +11,19 @@ BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied. See the
 License for the specific language governing permissions and limitations under the License.
 */
 
+var set=require('vue').set
 module.exports={
     captureHash:function(state){
         state.hash=location.hash.substring(1)
     },
     info:function(state,payload){
         state.info=payload
+    },
+    bot:function(state,payload){
+        state.bot=payload
+    },
+    utterances:function(state,payload){
+        state.bot.utterances=payload
     },
     setBotInfo(store,data){
         data.lambdaName=data.lambdaArn.match(/arn:aws:lambda:.*:.*:function:(.*)/)[1]

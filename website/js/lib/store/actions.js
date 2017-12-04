@@ -20,7 +20,7 @@ module.exports={
         return Promise.resolve(axios.head(window.location.href))
         .then(function(result){
             var stage=result.headers['api-stage']
-            return Promise.resolve(axios.get(`/${stage}/info`))
+            return Promise.resolve(axios.get(`/${stage}`))
             .get('data')
             .then(x=>Object.assign(x,{stage})) 
         })

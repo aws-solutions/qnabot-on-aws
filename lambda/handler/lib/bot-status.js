@@ -14,7 +14,6 @@ License for the specific language governing permissions and limitations under th
 var Promise=require('bluebird')
 var aws=require('./aws')
 var lex=new aws.LexModelBuildingService()
-var getUtterances=require('./bot-info')
 
 var run=function(fnc,params){
     console.log(fnc+':request:'+JSON.stringify(params,null,3))
@@ -46,7 +45,7 @@ module.exports=function(params,es){
     return run('getBot',{
         name:params.botname,
         versionOrAlias:"$LATEST"
-    }).get('status')
+    })
 }
 
 

@@ -1,6 +1,0 @@
-{
-    "Command":"SEARCH",
-    "Query":"$input.params('query')",
-    "From":"$input.params('from')",
-    "Topic":"$input.params('topic')"
-}

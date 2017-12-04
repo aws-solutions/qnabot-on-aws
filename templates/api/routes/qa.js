@@ -7,7 +7,7 @@ module.exports={
 "QuestionsGet":lambda({
     authorization:"AWS_IAM",
     method:"get",
-    template:fs.readFileSync(__dirname+'/templates/root.get.vm','utf8'),
+    template:fs.readFileSync(__dirname+'/templates/qa.get.vm','utf8'),
     resource:{"Ref":"Questions"},
     parameterLocations:{
       "method.request.querystring.query": false,

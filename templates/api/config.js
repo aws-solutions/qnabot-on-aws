@@ -17,16 +17,15 @@ module.exports={
   "DependsOn": [
     "ClientLoginResourceGet",
     "DesignerLoginResourceGet",
-    "infoGet",
     "QuestionsGet",
     "QuestionsPut",
     "QuestionHead",
     "QuestionPut",
     "QuestionDelete",
     "BotPost",
-    "BotGetStatus",
     "BotGet",
-    "clientGet",
+    "UtterancesGet",
+    "rootGet",
     "HealthGet",
     "ProxyAnyGet",
     "ProxyAnyHead"

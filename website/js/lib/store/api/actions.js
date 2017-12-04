@@ -25,7 +25,7 @@ var reason=function(r){
 }
 module.exports={
     _request(context,opts){
-        var url=Url.parse(context.rootState.info.apiUrl+opts.url)
+        var url=Url.parse(opts.url)
         var request={
             host:url.hostname,
             method:opts.method.toUpperCase(),
@@ -62,14 +62,21 @@ module.exports={
     },
     botinfo(context){
         return context.dispatch('_request',{
-            url:'/bot',
+            url:context.rootState.info._links.bot.href,
+            method:'get',
+            reason:"Failed to get BotInfo"
+        })
+    },
+    utterances(context){
+        return context.dispatch('_request',{
+            url:context.rootState.bot._links.utterances.href,
             method:'get',
             reason:"Failed to get BotInfo"
         })
     },
     bulk(context,body){
         return context.dispatch('_request',{
-            url:'/questions',
+            url:context.rootState.info._links.questions.href,
             method:'put',
             body:body.qna,
             reason:"Failed to Bulk upload"
@@ -77,7 +84,7 @@ module.exports={
     },
     list(context,opts){
         return context.dispatch('_request',{
-            url:'/questions?'+query({
+            url:context.rootState.info._links.questions.href+'?'+query({
                 from:opts.page || 0,
                 filter:opts.filter || "",
                 perpage:opts.perpage || 10
@@ -88,7 +95,7 @@ module.exports={
     },
     check(context,qid){
         return context.dispatch('_request',{
-            url:'/questions/'+qid,
+            url:context.rootState.info._links.questions.href+'/'+qid,
             method:'head',
             reason:qid+' does not exists'
         })
@@ -104,7 +111,7 @@ module.exports={
         payload.r=payload.card
         delete payload.card
         return context.dispatch('_request',{
-            url:'/questions/'+payload.qid,
+            url:context.rootState.info._links.questions.href+'/'+payload.qid,
             method:'put',
             body:[payload],
             reason:'failed to update'
@@ -112,14 +119,14 @@ module.exports={
     },
     remove(context,qid){
         return context.dispatch('_request',{
-            url:'/questions/'+qid,
+            url:context.rootState.info._links.questions.href+'/'+qid,
             method:'delete',
             reason:'failed to delete'
         })
     },
     build(context){
         return context.dispatch('_request',{
-            url:'/bot',
+            url:context.rootState.info._links.bot.href,
             method:'post',
             body:{},
             reason:'failed to build'
@@ -127,14 +134,14 @@ module.exports={
     },
     status(context){
         return context.dispatch('_request',{
-            url:'/bot/status',
+            url:context.rootState.info._links.bot.href,
             method:'get',
             reason:'failed to get status'
         })
     },
     search(context,opts){
         return context.dispatch('_request',{
-            url:'/questions?'+query({
+            url:context.rootState.info._links.questions.href+'?'+query({
                 query:opts.query,
                 topic:opts.topic || "",
                 from:opts.from || 0

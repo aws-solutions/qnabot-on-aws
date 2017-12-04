@@ -1,4 +1,0 @@
-{
-    "Command":"BOT_STATUS",
-    "botname":"$stageVariables.BotName"
-}

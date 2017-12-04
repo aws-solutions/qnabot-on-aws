@@ -32,7 +32,7 @@ var config = {
     reInitSessionAttributesOnRestart: false
   },
   ui:{
-    pageTitle:"QnA bot Client",
+    pageTitle:"QnABot Client",
     toolbarColor:"cyan",
     toolbarTitle:"QnABot",
     toolbarLogo:null,
@@ -44,13 +44,12 @@ document.addEventListener('DOMContentLoaded', function(){
     var Config=Promise.resolve(axios.head(window.location.href))
     .then(function(result){
         var stage=result.headers['api-stage']
-        return Promise.resolve(axios.get(`/${stage}/client`)).get('data')
+        return Promise.resolve(axios.get(`/${stage}`)).get('data')
     })
     .tap(console.log)
     .then(function(result){
-        config.cognito.poolId=result.aws.cognitoPoolId
-        config.lex.botName=result.iframeConfig.lex.botName
-        config.ui.pageTitle=result.iframeConfig.lex.pageTitle
+        config.cognito.poolId=result.PoolId
+        config.lex.botName=result.BotName
         return config
         console.log(config) 
     }) 
@@ -64,7 +63,10 @@ document.addEventListener('DOMContentLoaded', function(){
         
         var LexWebUi=require('aws-lex-web-ui/dist/lex-web-ui.js')
         var store=new Vuex.Store(LexWebUi.Store)
-   
+        if(auth.username){
+            config.ui.toolbarTitle+=":"+auth.username
+        }
+        console.log(config)
         Vue.use(LexWebUi.Plugin,{
             config,
             awsConfig:auth.config,

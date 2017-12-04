@@ -5,7 +5,6 @@ var Velocity=require('velocity')
 module.exports={
     health:test=>run("health",{},test),
     info:test=>run("info",{},test),
-    client:test=>run("client",{},test),
     bot:{
         get:test=>run("bot.get",{},test),
         post:test=>run("bot.post",{},test),

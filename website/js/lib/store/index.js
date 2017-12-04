@@ -17,7 +17,9 @@ var Vuex=require('vuex')
 module.exports=new Vuex.Store({
     state:{
         info:{},
-        bot:{},
+        bot:{
+            utterances:[] 
+        },
         error:""
     },
     mutations:require('./mutations'),

@@ -1,7 +1,6 @@
 {
-    "Command":"BOT_INFO",
-    "botname":"$stageVariables.BotName",
-    "lambdaArn":"$stageVariables.LambdaArn"
+    "Command":"BOT_STATUS",
+    "botname":"$stageVariables.BotName"
 }                
                 
 

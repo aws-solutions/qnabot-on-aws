@@ -1,8 +1,7 @@
 var fs=require('fs')
 
 module.exports={
-    "Info": require('./util/resource')('info'),
-    "infoGet":{
+    "rootGet":{
       "Type": "AWS::ApiGateway::Method",
       "Properties": {
         "AuthorizationType": "NONE",
@@ -22,12 +21,9 @@ module.exports={
             "application/json":"{\"statusCode\": 200}"
           }
         },
-        "ResourceId": {"Ref": "Info"},
-        "MethodResponses": [
-          {"StatusCode": 200},
-          {"StatusCode": 400}
-        ],
-        "RestApiId": {"Ref": "API"}
+        "ResourceId": {"Fn::GetAtt": ["API","RootResourceId"]},
+        "MethodResponses": [{"StatusCode": 200}],
+        "RestApiId":{"Ref":"API"} 
       }
     }
 }

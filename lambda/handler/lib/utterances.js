@@ -20,13 +20,7 @@ module.exports=function(params,es){
         var tmp=dump.qa.map(qa=>qa.q)
         var tmp=[].concat.apply([],tmp)
         tmp=tmp.concat(require('./default-utterances.js'))
-        return {
-            utterances:tmp.filter(
-                (val,index)=>tmp.indexOf(val)===index 
-            ),
-            botname:params.botname,
-            lambdaArn:params.lambdaArn
-        }
+        return tmp.filter((val,index)=>tmp.indexOf(val)===index)
     })
 }
 

@@ -16,11 +16,11 @@ var argv=require('optimist').argv
 var chalk=require('chalk')
 var Promise=require('bluebird')
 var run=require('../../../bin/run.js')
-
+var config=require('../../../config')
 var fs=Promise.promisifyAll(require('fs'))
 var aws=require('aws-sdk')
 aws.config.setPromisesDependency(Promise)
-aws.config.region='us-east-1'
+aws.config.region=config.region
 var cf=new aws.CloudFormation()
 var exports={}
 
@@ -37,6 +37,7 @@ module.exports=function(event){
         process.env.ES_TYPE=exports["QNA-DEV-TYPE"]
         process.env.AWS_ACCESS_KEY_ID=aws.config.credentials.accessKeyId
         process.env.AWS_SECRET_ACCESS_KEY=aws.config.credentials.secretAccessKey
+        process.env.AWS_REGION=config.region
         process.env.ERRORMESSAGE="error"
         process.env.EMPTYMESSAGE="empty"
     })

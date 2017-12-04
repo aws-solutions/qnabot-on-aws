@@ -21,7 +21,13 @@ module.exports={
     botinfo(context){
         return api(context,'botinfo')
         .then(function(data){
-            context.commit('setBotInfo',data,{root:true})
+            context.commit('bot',data,{root:true})
+        })
+        .then(function(data){
+            return api(context,'utterances')
+        })
+        .then(function(data){
+            context.commit('utterances',data,{root:true})
         })
         .tapCatch(e=>console.log('Error:',e))
         .catchThrow('Failed get BotInfo')

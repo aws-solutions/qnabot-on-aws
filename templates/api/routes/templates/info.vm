@@ -1,3 +1,5 @@
+#set ( $root="https://${context.apiId}.execute-api.${stageVariables.Region}.amazonaws.com/${context.stage}")
+
 {
     "region":"$stageVariables.Region",
     "BotName":"$stageVariables.BotName",
@@ -5,6 +7,16 @@
     "ClientId":"$stageVariables.ClientId",
     "UserPool":"$stageVariables.UserPool",
     "Id":"$stageVariables.Id",
-    "apiUrl":"https://${context.apiId}.execute-api.${stageVariables.Region}.amazonaws.com/${context.stage}"
+    "_links":{
+        "root":{
+            "href":"$root"
+        },
+        "questions":{
+            "href":"$root/questions"
+        },
+        "bot":{
+            "href":"$root/bot"
+        }
+    }
 }
 

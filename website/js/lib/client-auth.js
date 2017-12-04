@@ -9,7 +9,7 @@ module.exports=function(){
     return Promise.resolve(axios.head(window.location.href))
     .then(function(result){
         var stage=result.headers['api-stage']
-        return Promise.resolve(axios.get(`/${stage}/info`)).get('data')
+        return Promise.resolve(axios.get(`/${stage}`)).get('data')
     })
     .then(function(info){
         var hash=window.location.hash.slice(1)
@@ -17,7 +17,7 @@ module.exports=function(){
         aws.config.region=info.region
         if(params.id_token){
             var token=jwt.decode(params.id_token)
-            
+            console.log(token)            
             var Logins={}
             Logins[[
                 'cognito-idp.',
@@ -31,20 +31,25 @@ module.exports=function(){
                 RoleSessionName:token["cognito:username"],
                 Logins:Logins
             })
+            var username=token["cognito:username"]
         }else{
             var credentials=new aws.CognitoIdentityCredentials({
                 IdentityPoolId:info.PoolId
             })
         }
         credentials.clearCachedId() 
-        return Promise.resolve(credentials.getPromise()).return(credentials)
+        return Promise.resolve(credentials.getPromise()).return({
+            credentials,
+            username
+        })
     })
-    .then(function(credentials){
-        aws.config.credentials=credentials
+    .then(function(result){
+        aws.config.credentials=result.credentials
         return {
             config:aws.config,
             lex:new aws.LexRuntime(),
-            polly:new aws.Polly()
+            polly:new aws.Polly(),
+            username:result.username
         }
     })
 }

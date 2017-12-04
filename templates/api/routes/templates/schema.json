@@ -3,7 +3,7 @@
     "properties":{
         "Command":{
             "type":"string",
-            "enum":["LIST","SEARCH","ADD","DELETE","EDIT","SAVE","PING","CHECK","EXPORT","BOT_INFO","BUILD","BOT_STATUS","UPDATE","ALEXA"]
+            "enum":["LIST","SEARCH","ADD","DELETE","EDIT","SAVE","PING","CHECK","EXPORT","BOT_INFO","BUILD","BOT_STATUS","UPDATE","ALEXA","UTTERANCES"]
         },
         "Query":{
             "type":"string"

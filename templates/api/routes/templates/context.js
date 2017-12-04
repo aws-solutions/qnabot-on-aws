@@ -16,6 +16,7 @@ module.exports={
         urlDecode:x=>x
     },
     context:{
-        "apiId":"id" 
+        "apiId":"id",
+        "stage":"prod"
     }
 }

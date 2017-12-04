@@ -1,6 +1,7 @@
 var clean=require('clean-deep')
 var fs=require('fs')
 var templates=__dirname+'/../templates'
+var _=require('lodash')
 
 module.exports=function(params){
     return clean({
@@ -22,7 +23,13 @@ module.exports=function(params){
             ]]
           },
           "IntegrationResponses": [
-            {"StatusCode": params.defaultResponse || 200},
+            {   
+                "StatusCode": params.defaultResponse || 200,
+                "ResponseParameters":params.responseParameters,
+                "ResponseTemplates":{
+                    "application/json":params.responseTemplate
+                }
+            },
             {"SelectionPattern":".*error.*","StatusCode": 404}
           ],
           "RequestParameters":params.parameterNames,
@@ -36,9 +43,9 @@ module.exports=function(params){
         "MethodResponses": [
           {
             "StatusCode": params.defaultResponse || 200,
-            "ResponseParameters":{
+            "ResponseParameters":Object.assign({
                 "method.response.header.date":true
-            }
+            },_.mapValues(params.responseParameters,x=>false))
           },
           {
             "StatusCode": 404

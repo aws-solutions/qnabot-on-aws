@@ -50,15 +50,15 @@ var runResponse=function(params, msg, type, test, successmatch, position, succes
 module.exports={
     bot_status:function(test){
         var params={
-            Command:"BOT_STATUS"
+            Command:"BOT_STATUS",
+            botname:"bot"
         }
         run(params,test)
     },
-    bot_info:function(test){
+    utterances:function(test){
         var params={
-            Command:"BOT_INFO",
-            botname:"bot",
-            lambdaArn:"arn"
+            Command:"UTTERANCES",
+            botname:"bot"
         }
         run(params,test)
     },

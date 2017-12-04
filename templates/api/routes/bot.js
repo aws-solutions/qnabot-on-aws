@@ -4,7 +4,7 @@ var fs=require('fs')
 
 module.exports={
 "Bot": resource('bot'),
-"BotStatus": resource('status',{"Ref":"Bot"}),
+"UtterancesApi": resource('utterances',{"Ref":"Bot"}),
 "BotPost":lambda({
     authorization:"AWS_IAM",
     method:"post",
@@ -15,12 +15,15 @@ module.exports={
     authorization:"AWS_IAM",
     method:"get",
     template:fs.readFileSync(__dirname+'/templates/bot.get.vm','utf8'),
-    resource:{"Ref":"Bot"}
+    resource:{"Ref":"Bot"},
+    responseTemplate:fs.readFileSync(__dirname+'/templates/bot.get.resp.vm','utf8')
 }),
-"BotGetStatus":lambda({
+"UtterancesGet":lambda({
     authorization:"AWS_IAM",
     method:"get",
-    template:fs.readFileSync(__dirname+'/templates/bot.status.vm','utf8'),
-    resource:{"Ref":"BotStatus"}
+    template:fs.readFileSync(__dirname+'/templates/utterance.get.vm','utf8'),
+    resource:{"Ref":"UtterancesApi"}
 })
 }
+
+
