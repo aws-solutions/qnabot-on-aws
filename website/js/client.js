@@ -57,7 +57,7 @@ document.addEventListener('DOMContentLoaded', function(){
     Promise.join(
         Config,
         Auth(),
-        System.import(/* webpackChunkName: "client-page" */'./Client.vue')
+        System.import(/* webpackChunkName: "client-page" */'./client.vue')
     )
     .spread(function(config,auth,app){
         
