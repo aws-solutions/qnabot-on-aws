@@ -24,7 +24,7 @@ module.exports=function(event){
             Command:"SEARCH",
             Query:event.inputTranscript,
             Session:event.sessionAttributes,
-            Channel: (event.requestAttributes.hasOwnProperty('x-amz-lex:channel-type') ? event.requestAttributes['x-amz-lex:channel-type'] : null)
+            Channel: (event.requestAttributes && event.requestAttributes.hasOwnProperty('x-amz-lex:channel-type') ? event.requestAttributes['x-amz-lex:channel-type'] : null)
         }
     }else if(event.request){
         console.log("Processing as ALEXA")
