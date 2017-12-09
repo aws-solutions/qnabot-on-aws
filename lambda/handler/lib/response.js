@@ -96,9 +96,9 @@ exports.error=function(err,params){
           }
       }
 
-    }else{
+    }else{ //lex
         return {
-            sessionAttributes: params.Session,
+            sessionAttributes: params.Session || {},
             dialogAction: {
                 type: "Close",
                 fulfillmentState:"Failed",
@@ -148,8 +148,11 @@ exports.success=function(message,params){
       return out
     } else { //lex
       const links = parseLinks(message.msg)
+      if (params.Channel && params.Channel == 'Facebook') {
+        links.text += ' ' + links.mlink.map(function(elem) { return elem.attachmentLinkUrl }).join(' ')
+      }
       var out = {
-        sessionAttributes: params.Session,
+        sessionAttributes: params.Session || {},
         dialogAction: {
           type: "Close",
           fulfillmentState: "Fulfilled",
@@ -199,4 +202,3 @@ exports.success=function(message,params){
         return out
     }
 }
-

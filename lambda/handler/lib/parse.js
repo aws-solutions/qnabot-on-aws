@@ -24,6 +24,7 @@ module.exports=function(event){
             Command:"SEARCH",
             Query:event.inputTranscript,
             Session:event.sessionAttributes,
+            Channel: (event.requestAttributes && event.requestAttributes.hasOwnProperty('x-amz-lex:channel-type') ? event.requestAttributes['x-amz-lex:channel-type'] : null)
         }
     }else if(event.request){
         console.log("Processing as ALEXA")
@@ -52,12 +53,8 @@ module.exports=function(event){
         process.env.TYPE="API"
         out=event
     }
-    
+
     var v=validator.validate(out, schema)
     assert(v.valid,"Invalid config:"+v.errors)
     return out
 }
-
-
-
-
