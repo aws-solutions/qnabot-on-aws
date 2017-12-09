@@ -12,6 +12,7 @@ License for the specific language governing permissions and limitations under th
 */
 
 var Promise=require('bluebird')
+var style=require('../../node_modules/vuetify/dist/vuetify.min.css')
 Promise.config({
     warnings:false
 })
@@ -20,10 +21,9 @@ var Vue=require('vue')
 var Router=require('vue-router').default
 var sync=require('vuex-router-sync').sync
 var Vuex=require('vuex').default
-var VueTyperPlugin = require('vue-typer').default
+var vuetify=require('vuetify').default
 var Idle=require('idle-js')
 var validate=require('vee-validate')
-var tooltip=require('v-tooltip')
 
 Vue.use(validate,{
     classNames:{
@@ -33,11 +33,9 @@ Vue.use(validate,{
     events:"input|blur|focus"
 })
 
-Vue.use(tooltip,{defaultClass:"tooltip",defaultDelay:500})
-Vue.use(VueTyperPlugin)
 Vue.use(Vuex)
 Vue.use(Router)
-Vue.component('icon',require('vue-awesome'))
+Vue.use(vuetify)
 
 
 var lib=require('./lib')

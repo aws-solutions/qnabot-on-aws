@@ -16,6 +16,12 @@
         },
         "bot":{
             "href":"$root/bot"
+        },
+        "DesignerLogin":{
+            "href":"$stageVariables.DesignerLoginUrl"
+        },
+        "ClientLogin":{
+            "href":"$stageVariables.ClientLoginUrl"
         }
     }
 }

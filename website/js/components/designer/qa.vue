@@ -1,6 +1,19 @@
 <template lang='pug'>
-  v-card
-    v-progress-linear(indeterminate)
+  v-card(flat class="pl-3")
+    v-card-text
+      .title Questions
+        v-list(dense)
+          v-list-tile(v-for="q in data.q")
+            v-list-tile-content {{q}}
+      .title Answer
+      p(class="pl-3") {{data.a}}
+      span(v-if="data.t")
+        .title Topic
+        p(class="pl-3") {{data.t}}
+      span(v-if="data.r.imageUrl")
+        .title ResponseCard
+        p(class="pl-3") title: {{data.r.title}}
+        p(class="pl-3") url: {{data.r.imageUrl}}
 </template>
 
 <script>
@@ -19,21 +32,18 @@ License for the specific language governing permissions and limitations under th
 
 var Vuex=require('vuex')
 var Promise=require('bluebird')
-
+var _=require('lodash')
 module.exports={
-  data:function(){
-    return {}
-  },
+  props:['data'],
+  data:()=>{return {
+    advanced:false
+  }},
   components:{
   },
-  created:function(){
-    var self=this
-    this.$store.dispatch('bootstrap')
-    .then(()=>self.$store.dispatch('user/login'))
-    .then(()=>self.$router.replace('/edit'))
-    .catch(()=>self.$router.replace('/error'))
+  computed:{
   },
-  methods:{
-  }
+  methods:{}
 }
 </script>
+
+

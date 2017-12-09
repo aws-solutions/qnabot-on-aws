@@ -18,7 +18,7 @@ module.exports=function(params,es){
     console.log(index)
     
     var body={
-        size:size,
+        size:params.Perpage || size,
         from:index || 0,
         query: {
           bool: {

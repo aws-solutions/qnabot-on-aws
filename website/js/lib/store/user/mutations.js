@@ -14,6 +14,7 @@ var _=require('lodash')
 var query=require('query-string')
 var jwt=require('jsonwebtoken')
 var set=require('vue').set
+
 module.exports={
     captureHash:function(state){
         set(state,'hash',location.hash.substring(2))
@@ -29,11 +30,9 @@ module.exports={
             var token=jwt.decode(params.id_token)
             console.log(token)
             
-            _.assign(state,{
-                name:token["cognito:username"],
-                groups:token["cognito:groups"],
-                token:params.id_token
-            })
+            set(state,'name',token["cognito:username"])
+            set(state,'groups',token["cognito:groups"])
+            set(state,'token',params.id_token)
             
             state.Logins={}
             state.Logins[[

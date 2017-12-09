@@ -32,25 +32,30 @@ module.exports={
         .tapCatch(e=>console.log('Error:',e))
         .catchThrow('Failed get BotInfo')
     },
-    search(context,{query,topic}){
-      context.commit('clearQA')
-      return util.load.bind(context)(api(context,'search',{
-            query,topic 
-      })).tapCatch(e=>console.log('Error:',e))
-      .catchThrow('Failed to search')
-    },
-    get(context,page){
-        return api(context,'list',{
-            page,
-            filter:context.state.filter.query,
+    search(context,opts){
+        _.defaults(opts,{
+            query:opts.query,
+            topic:opts.topic,
             perpage:context.rootState.page.perpage
         })
+        return api(context,'search',opts)
+        .tap(()=>context.commit('clearQA'))
         .tap(x=>console.log("results",x))
-        .tap(result=>{
-            return context.state.QAs=context.state.QAs
-                        .concat(result.qa.map(x=>util.parse(x,context)))
-            }
-        )
+        .tap(result=>context.state.QAs=result.qa.map(x=>util.parse(x,context)))
+        .tap(result=>context.commit('page/setTotal',result.total,{root:true}))
+        .then(result=>result.qa.length)
+        .tapCatch(e=>console.log('Error:',e))
+        .catchThrow('Failed to get')
+    },
+    get(context,opts){
+        _.defaults(opts,{
+            filter:context.state.filter,
+            perpage:context.rootState.page.perpage
+        })
+        return api(context,'list',opts)
+        .tap(()=>context.commit('clearQA'))
+        .tap(x=>console.log("results",x))
+        .tap(result=>context.state.QAs=result.qa.map(x=>util.parse(x,context)))
         .tap(result=>context.commit('page/setTotal',result.total,{root:true}))
         .then(result=>result.qa.length)
         .tapCatch(e=>console.log('Error:',e))
@@ -61,7 +66,7 @@ module.exports={
          
         return new Promise(function(resolve,reject){
             var next=function(index){
-                return context.dispatch('get',index)
+                return context.dispatch('get',{page:index})
                     .then(count=>count < 1 ? resolve() : next(++index))
                     .error(err=>reject(err))
             }

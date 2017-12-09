@@ -12,8 +12,4 @@ License for the specific language governing permissions and limitations under th
 */
 
 var js=require('./js/admin.js')
-var css=require('./style/style.scss')
-var Hint=require('hint.css')
-var hint=require('hint.css/hint.css')
-
 

@@ -22,9 +22,7 @@ module.exports={
         results:[],
         client:{},
         loaded:0,
-        filter:{
-            query:null
-        },
+        filter:"",
         mode:"questions",
         page:{
             current:0,

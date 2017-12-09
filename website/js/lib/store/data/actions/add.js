@@ -42,41 +42,22 @@ module.exports={
         })
         .tapCatch(util.handle.bind(context)('Failed to Build'))
     },
-    update(context,{qa}){
+    update(context,qa){
         return api(context,'update',{
-            qid:qa.qid.text,
-            q:qa.questions.map(x=>x.text),
-            a:qa.answer.text,
-            r:JSON.parse(qa.card.text),
-            t:qa.topic.text
+            qid:qa.qid,
+            q:qa.q,
+            a:qa.a,
+            t:qa.t,
+            r:qa.r
         })
     },
-    add(context,input){
-      if(input){
-        input.qa.questions.push({text:"",tmp:""})
-      }else{
-        context.commit('page/incrementTotal',null,{root:true})
-        context.commit('addQA',{
-            answer:{text:"",tmp:""},
-            questions:[{text:"",tmp:""}],
-            qid:{text:"",tmp:""},
-            topic:{text:"",tmp:""},
-            card:{
-                text:JSON.stringify({}),
-                title:{
-                    text:"",
-                    tmp:""
-                },
-                imageUrl:{
-                    text:"",
-                    tmp:""
-                }
-            },
-            open:true,
-            edit:true,
-            score:0
+    add(context,qa){
+        return api(context,'update',{
+            qid:qa.qid,
+            q:[].concat(qa.q),
+            a:qa.a
         })
-      }
+        .tap(()=>context.commit('page/incrementTotal',null,{root:true}))
     },
     changeId(context,{qa,New}){
         return api(context,'check',New)

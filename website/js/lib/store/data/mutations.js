@@ -35,22 +35,8 @@ module.exports={
             return true
         }
     },
-    select(store,qa){
-        qa.select=!qa.select
-        if(qa.select){ 
-            store.selectIds.push(qa.qid.text)
-        }else{
-            var index=store.selectIds.indexOf(qa.qid.text)
-            store.selectIds.splice(index,1)
-        }
-    },
-    unselectAll(store){
-        store.selectIds=[]
-        store.QAs.forEach(function(qa){
-            if(qa.select){
-                qa.select=false
-            }
-        })
+    selectAll(store,value){
+        store.QAs.map(x=>x.select=value)
     },
     setFilter(store,query){
         store.filter.query=query
@@ -59,11 +45,11 @@ module.exports={
         store.filter.query=null
     },
     addQA(state,qa){
+        set(qa,'selected',false)
         state.QAs.unshift(qa)
     },
-    delQA(state,index){
-        var index_select=state.selectIds.indexOf(state.QAs[index].qid.text)
-        state.selectIds.splice(index_select,1)
+    delQA(state,QA){
+        var index=state.QAs.findIndex(qa=>qa.qid===QA.qid)
         state.QAs.splice(index,1)
     },
     clearQA(state){

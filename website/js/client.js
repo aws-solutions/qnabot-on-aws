@@ -18,9 +18,7 @@ var Vuex=require('vuex').default
 var Vuetify=require('vuetify').default
 var style=require('aws-lex-web-ui/dist/lex-web-ui.css')
 var Auth=require('./lib/client-auth')
-var tooltip=require('v-tooltip')
 
-Vue.use(tooltip,{defaultClass:"tooltip",defaultDelay:500})
 Vue.use(Vuex)
 Vue.use(Vuetify);
 
@@ -57,7 +55,7 @@ document.addEventListener('DOMContentLoaded', function(){
     Promise.join(
         Config,
         Auth(),
-        System.import(/* webpackChunkName: "client-page" */'./Client.vue')
+        System.import(/* webpackChunkName: "client-page" */'./client.vue')
     )
     .spread(function(config,auth,app){
         

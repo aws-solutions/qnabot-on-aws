@@ -30,13 +30,7 @@ module.exports=function(params,es){
         }
     )
     .tap(x=>console.log("es-response:",x))
-    .map(function(es_response){
-        return {
-            id:es_response._id,
-            version:es_response._version,
-            created:es_response.created
-        }
-    })
+    .return(params.Body)
 }
 
 

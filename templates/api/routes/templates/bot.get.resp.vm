@@ -1,10 +1,9 @@
 #set ( $root="https://${context.apiId}.execute-api.${stageVariables.Region}.amazonaws.com/${context.stage}")
+#set($inputRoot = $input.path('$'))
 
 {
-#foreach($name in $params.integration.response.body)
-    "$paramName" : "$util.escapeJavaScript($params.get($paramName))",
-#end
     "lambdaArn":"$stageVariables.LambdaArn",
+    "status":"$inputRoot.status",
     "botname":"$stageVariables.BotName",
     "_links":{
         "utterances":{

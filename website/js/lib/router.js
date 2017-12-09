@@ -17,8 +17,14 @@ var store=require('./store')
 module.exports={
     base:'/',
     routes:[
+        {   path:'/alexa',
+            component:require('../components/alexa/index.vue')
+        },
+        {   path:'/import-export',
+            component:require('../components/import-export.vue')
+        },
         {   path:'/edit',
-            component:components.edit
+            component:require('../components/designer/index.vue')
         },
         {   path:'/loading',
             component:require('../components/loading.vue')

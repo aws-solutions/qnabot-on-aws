@@ -73,7 +73,15 @@ function stage(name){
             "BotName":{"Ref":"Botname"},
             "SlotType":{"Ref":"SlotType"},
             "Intent":{"Ref":"Intent"},
-            "LambdaArn":{"Ref":"HandlerArn"}
+            "LambdaArn":{"Ref":"HandlerArn"},
+            "DesignerLoginUrl":{"Fn::Join":["",[
+                {"Fn::GetAtt":["ApiUrl","Name"]},
+                "/pages/designer"
+              ]]},
+            "ClientLoginUrl":{"Fn::Join":["",[
+                {"Fn::GetAtt":["ApiUrl","Name"]},
+                "/pages/client"
+              ]]}
         }
       }
     }

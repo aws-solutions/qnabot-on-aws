@@ -33,7 +33,7 @@ module.exports = require('../../bin/exports')(config.region).then(function(resul
         check:"./js/browser-check.js",
         client:"./js/client.js",
         test:"./js/test.js",
-        vendor:["bluebird","lodash","vue","aws-sdk"]
+        vendor:["aws-sdk"]
     },
     output:{
         path:path.join(__dirname,'../build'),
@@ -42,7 +42,8 @@ module.exports = require('../../bin/exports')(config.region).then(function(resul
     },
     plugins:_.compact([
         new webpack.optimize.CommonsChunkPlugin({
-            name:'vendor'
+            name:'vendor',
+            minChunks:2
         }),
         extractSass,
         new CopyWebpackPlugin([{from:'./assets',to:"assets"}]),

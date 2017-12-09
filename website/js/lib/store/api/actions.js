@@ -11,7 +11,7 @@ BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied. See the
 License for the specific language governing permissions and limitations under the License.
 */
 var query=require('query-string').stringify
-
+var _=require('lodash')
 var Promise=require('bluebird')
 var axios=require('axios')
 var Url=require('url')
@@ -56,9 +56,18 @@ module.exports={
 
             return Promise.resolve(axios(signed))
         })
+        .catch(x=>x.response.status===403,function(){
+            console.log("UnAuth Error") 
+            var login=_.get(context,"rootState.info._links.DesignerLogin.href")
+            console.log(login)
+            if(login){
+                var result=window.confirm("You need to be logged in to use this page. click ok to be redirected to the login page") 
+                if(result) window.window.location.href=login
+            }
+            return Promise.reject()
+        })
         .get('data')
         .tap(()=>context.commit('loading',false))
-        .catch(reason(opts.reason || "Request Failed")) 
     },
     botinfo(context){
         return context.dispatch('_request',{
@@ -86,7 +95,7 @@ module.exports={
         return context.dispatch('_request',{
             url:context.rootState.info._links.questions.href+'?'+query({
                 from:opts.page || 0,
-                filter:opts.filter || "",
+                filter:opts.filter ? opts.filter+".*" : "",
                 perpage:opts.perpage || 10
             }),
             method:'get',
@@ -99,17 +108,13 @@ module.exports={
             method:'head',
             reason:qid+' does not exists'
         })
-        .then(()=>false)
-        .catch(()=>true)
+        .then(()=>true)
+        .catch(()=>false)
     },
     add(context,payload){
         return context.dispatch('update',payload)
     },
     update(context,payload){
-        console.log(payload)
-        payload.card.imageUrl=payload.card.imageUrl.trim() 
-        payload.r=payload.card
-        delete payload.card
         return context.dispatch('_request',{
             url:context.rootState.info._links.questions.href+'/'+payload.qid,
             method:'put',

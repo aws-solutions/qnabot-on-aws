@@ -18,7 +18,7 @@ var aws=require('aws-sdk')
 module.exports={
     login:function(context){
         context.commit('token',context.rootState) 
-        AWS.config.region=context.rootState.info.region
+        aws.config.region=context.rootState.info.region
          
         var credentials=new aws.CognitoIdentityCredentials({
             IdentityPoolId:context.rootState.info.PoolId,

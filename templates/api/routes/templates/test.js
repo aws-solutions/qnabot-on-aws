@@ -8,7 +8,6 @@ module.exports={
     bot:{
         get:test=>run("bot.get",{},test),
         post:test=>run("bot.post",{},test),
-        status:test=>run("bot.status",{},test)
     },
     qa:{
         head:test=>run("qa.head",{
@@ -28,7 +27,7 @@ module.exports={
         },test)
     },
     root:{
-        get:test=>run("root.get",{
+        get:test=>run("qa.get",{
             input:{
                 body:'{}',
                 params:name=>{return {
@@ -39,7 +38,7 @@ module.exports={
                 }[name]}
             }
         },test),
-        list:test=>run("root.get",{
+        list:test=>run("qa.get",{
             input:{
                 body:'{}',
                 params:name=>{return {
@@ -56,7 +55,7 @@ module.exports={
                 params:()=>'notall'
             }
         },test),
-        search:test=>run("root.get",{
+        search:test=>run("qa.get",{
             input:{
                 body:'{}',
                 params:name=>{return {

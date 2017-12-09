@@ -1,21 +1,22 @@
 #if($input.params('from') == 'all')
 {   
     "Command":"EXPORT",
-    "Filter":"$input.params('filter')",
-    "Query":"$input.params('query')"
+    "Filter":"$util.urlDecode($input.params('filter'))",
+    "Query":"$util.urlDecode($input.params('query'))"
 }
 #elseif($input.params('query').length()>0)
 {
     "Command":"SEARCH",
-    "Query":"$input.params('query')",
+    "Query":"$util.urlDecode($input.params('query'))",
     "From":"$input.params('from')",
-    "Topic":"$input.params('topic')"
+    "Topic":"$util.urlDecode($input.params('topic'))",
+    "Perpage":"$input.params('perpage')"
 }
 #else
 {
     "Command":"LIST",
     "From":"$input.params('from')",
-    "Filter":"$input.params('filter')",
+    "Filter":"$util.urlDecode($input.params('filter'))",
     "Perpage":"$input.params('perpage')"
 }
 #end

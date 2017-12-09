@@ -18,32 +18,18 @@ var util=require('./util')
 var api=util.api
 
 module.exports={
-    deleteSelected(context){
-        var self=this
-        return Promise.map(
-            context.state.selectIds,
-            qid=>api(context,'remove',qid)
-         )
-        .then(function(){
-            context.commit("clearQA")
-            context.commit('page/setTotal',0,{root:true})
-            return self.dispatch('get',context.rootState.page.current)
-        })
-        .tapCatch(e=>console.log('Error:',e))
-        .catchThrow('Failed to remove')     
-    },
     removeQ(context,{index,item}){
       item.questions.splice(index,1)
       context.dispatch('update',{qa:item})
       .tapCatch(e=>console.log('Error:',e))
       .catchThrow('Failed to remove')
     },
-    removeQA(context,{qid}){
-      var index=context.state.QAs.findIndex(qa=>qa.qid.text===qid)
+    removeQA(context,QA){
+      var index=context.state.QAs.findIndex(qa=>qa.qid===QA.qid)
       if(index>=0){
-          return api(context,'remove',qid)
-          .then(()=>context.commit('delQA',index))
-          .then(()=>context.commit('page/incrementTotal',null,{root:true}))
+          return api(context,'remove',QA.qid)
+          .then(()=>context.commit('delQA',QA))
+          .then(()=>context.commit('page/decrementTotal',null,{root:true}))
           .tapCatch(e=>console.log('Error:',e))
           .catchThrow('Failed to remove')
       }else{

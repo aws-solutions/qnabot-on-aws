@@ -1,3 +1,3 @@
 #! /bin/bash
 
-$(npm bin)/nodeunit ./test.js  -t info
+$(npm bin)/nodeunit ./test.js  

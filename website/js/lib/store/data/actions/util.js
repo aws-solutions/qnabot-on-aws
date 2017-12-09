@@ -14,48 +14,23 @@ License for the specific language governing permissions and limitations under th
 var Promise=require('bluebird')
 var validator = new (require('jsonschema').Validator)();
 var axios=require('axios')
+var _=require('lodash')
 
 exports.api=function(context,name,args){
     return context.dispatch('api/'+name,args,{root:true})
 }
 exports.parse=function(item,context){
-  if(!item.body.r){
-    item.body.r={
-        title:"",
-        imageUrl:""
-    }
-  }
-  return {
-    qid:{
-      text:item.body.qid,
-      tmp:item.body.qid
-    },
-    answer:{
-      text:item.body.a,
-      tmp:item.body.a
-    },
-    card:{
-      text:JSON.stringify(item.body.r,null,4) ||"",
-      title:{
-        text:item.body.r.title ||"",
-        tmp:item.body.r.title ||""
-      },
-      imageUrl:{
-        text:item.body.r.imageUrl ||"",
-        tmp:item.body.r.imageUrl ||""
-      }
-    },
-    topic:{
-        text:item.body.t || "",
-        tmp:item.body.t || ""
-    },
-    questions:item.body.q.map(Q=>({text:Q,tmp:Q})),
-    open:false,
-    edit:false,
-    select:context.state.selectIds.includes(item.body.qid),
-    deleting:false,
-    score:item.score || 0 
-  }
+    console.log(item)
+    item.body.score=item.score || 0
+    _.defaults(item.body,{
+        t:'',
+        r:{
+            title:"",
+            imageUrl:""
+        },
+        select:false
+    })
+    return item.body
 }
 
 exports.handle=function(reason){
