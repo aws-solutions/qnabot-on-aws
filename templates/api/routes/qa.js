@@ -13,7 +13,8 @@ module.exports={
       "method.request.querystring.query": false,
       "method.request.querystring.topic": false,
       "method.request.querystring.from": false,
-      "method.request.querystring.filter":false
+      "method.request.querystring.filter":false,
+      "method.request.querystring.order":false
     }
 }),
 "QuestionsPut":lambda({

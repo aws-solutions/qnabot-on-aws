@@ -36,7 +36,7 @@ module.exports={
         _.defaults(opts,{
             query:opts.query,
             topic:opts.topic,
-            perpage:context.rootState.page.perpage
+            perpage:opts.perpage
         })
         return api(context,'search',opts)
         .tap(()=>context.commit('clearQA'))
@@ -50,7 +50,8 @@ module.exports={
     get(context,opts){
         _.defaults(opts,{
             filter:context.state.filter,
-            perpage:context.rootState.page.perpage
+            order:opts.order || 'asc',
+            perpage:opts.perpage
         })
         return api(context,'list',opts)
         .tap(()=>context.commit('clearQA'))

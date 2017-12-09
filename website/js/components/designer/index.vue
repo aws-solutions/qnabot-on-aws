@@ -16,6 +16,7 @@
       :items="QAs"
       :search="search"
       :pagination.sync="pagination"
+      :total-items="$store.state.page.total"
       :loading="$store.state.api.loading"
       v-model="selected"
       select-all
@@ -27,7 +28,11 @@
             v-checkbox(:indeterminate="QAs.length===0" v-model='selectAll')
           th.shrink(v-if="tab==='test'") score
           th.text-xs-left( v-for="header in props.headers" 
-            :key='header.text') {{header.text}}
+            :key='header.text'
+            :class="['column sortable', pagination.descending ? 'desc' : 'asc', header.value === pagination.sortBy ? 'active' : '']"
+            @click="changeSort(header.value)") 
+              v-icon(v-if="tab==='questions'") arrow_upward
+              span {{header.text}}
       template(slot='items' slot-scope='props')
         tr( v-on:click="props.expanded = !props.expanded")
           td.shrink(v-on:click.stop="")
@@ -72,12 +77,14 @@ module.exports={
     selectAll:false,
     pagination:{
       page:1,
-      rowsPerPage:10
+      rowsPerPage:10,
+      sortBy:'qid'
     },
     headers:[{
       text:'qid',
       value:'qid',
-      align:'left'
+      align:'left',
+      sortable:true
     },
     {
       text:'question',
@@ -111,8 +118,8 @@ module.exports={
         this.pagination.descending=false
       }
     },
-    pagination:function(){
-      return this.get()      
+    pagination:function(event){
+      return this.get(event)      
     },
     selectAll:function(value){
       console.log('value')
@@ -120,15 +127,23 @@ module.exports={
     }
   },
   methods:{
-    get:function(){
+    get:function(event){
       return this.$store.dispatch('data/get',{
         page:event.page-1,
-        perpage:event.rowsPerPage
+        perpage:event.rowsPerPage,
+        order:event.descending ? 'desc' : 'asc'
       }) 
-      .then(()=>this.pagination.totalItems=this.$store.state.page.total)
     },
-    rm:function(qa){
-       
+    changeSort (column) {
+      if(this.tab==='questions'){
+        if (this.pagination.sortBy === column) {
+          this.pagination.descending = !this.pagination.descending
+        } else {
+          this.pagination.sortBy = column
+          this.pagination.descending = false
+        }
+        this.get(this.pagination)
+      }
     },
     edit:console.log
   }

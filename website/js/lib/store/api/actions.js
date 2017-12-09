@@ -96,6 +96,7 @@ module.exports={
             url:context.rootState.info._links.questions.href+'?'+query({
                 from:opts.page || 0,
                 filter:opts.filter ? opts.filter+".*" : "",
+                order:opts.order,
                 perpage:opts.perpage || 10
             }),
             method:'get',

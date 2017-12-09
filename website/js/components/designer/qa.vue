@@ -3,7 +3,7 @@
     v-card-text
       .title Questions
         v-list(dense)
-          v-list-tile(v-for="q in data.q")
+          v-list-tile(v-for="(q,index) in data.q" :key="index")
             v-list-tile-content {{q}}
       .title Answer
       p(class="pl-3") {{data.a}}

@@ -17,6 +17,7 @@
     "Command":"LIST",
     "From":"$input.params('from')",
     "Filter":"$util.urlDecode($input.params('filter'))",
+    "Order":"$input.params('order')",
     "Perpage":"$input.params('perpage')"
 }
 #end

@@ -27,12 +27,12 @@ module.exports=function(params,es){
             },
             sort:{
                 qid:{
-                    order:"asc"
+                    order:params.Order==="desc" ? "desc" : "asc"
                 }
             }
         }
     }
-
+    
     if(params.Filter){
         query.body.query={
             bool:{
