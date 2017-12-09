@@ -18,6 +18,7 @@
       :pagination.sync="pagination"
       :total-items="$store.state.page.total"
       :loading="$store.state.api.loading"
+      :rows-per-page-items="perpage"
       v-model="selected"
       select-all
       item-key="qid"
@@ -75,6 +76,9 @@ module.exports={
     search:'',
     selected:[],
     selectAll:false,
+    perpage:[
+      "5","10","15"
+    ],
     pagination:{
       page:1,
       rowsPerPage:10,

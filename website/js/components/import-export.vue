@@ -4,33 +4,43 @@
       v-layout(column)
         v-flex
           h4 Import
-          v-text-field(name="url" label="url" id="url" clearable )
-          v-btn(@click="dialog=true") url
-          v-btn(@click="dialog=true") file
+          v-text-field(name="url" label="url" id="url" clearable v-model="url")
+          v-btn(@click="dialog=true" v-if="url.length>0") from url
+          v-btn(@click="dialog=true" v-if="url.length===0") from file
         v-divider
         v-flex(row)
           h4 export
-          v-text-field(name="filter" label="filter" id="filter" clearable )
-          v-btn(@click="download" flat ) filtered 
-          v-btn(@click="download" flat ) all
+          v-text-field(name="filter" label="filter" id="filter" clearable v-model="filter")
+          v-text-field(name="filename" label="filename" id="filename" clearable v-model="filename")
+          v-btn(@click="download") export
     v-dialog(v-model="loading" persistent)
       v-card
         v-card-title Loading
         v-card-text
-          v-progress-linear(indeterminate)
+          span(v-if="error" class='error--text') Error: {{error}} 
+          span(v-if="success") {{success}} 
+          v-progress-linear( v-if="!error && !success" indeterminate)
+        v-card-actions
+          v-btn(v-if="error || success" @click='loading=false') close
     v-dialog(v-model="dialog")
       v-card
         v-card-title Confirm
-        v-card-text are you sure?
+        v-card-text 
+          span(v-if="url.length>0") are you sure you want to import from {{url}}?
+          span(v-if="url.length===0") are you sure you want to import?
         v-card-actions
           v-spacer
-          input(type="file" 
-              ref="file"
-              id="file"
-              style="display:none;" 
-              v-on:change="upload")
-          v-btn(@click="dialog=false" flat ) cancel
-          v-btn(@click="$refs.file.click()" flat ) continue
+          span(v-if="url.length>0")
+            v-btn(@click="dialog=false" flat ) cancel
+            v-btn(@click="upload('url')" flat ) continue
+          span(v-if="url.length===0")
+            input(type="file" 
+                ref="file"
+                id="file"
+                style="display:none;" 
+                v-on:change="upload('file')")
+            v-btn(@click="dialog=false" flat ) cancel
+            v-btn(@click="$refs.file.click()" flat ) continue
 </template>
 
 <script>
@@ -49,12 +59,19 @@ License for the specific language governing permissions and limitations under th
 
 var Vuex=require('vuex')
 var Promise=require('bluebird')
+var saveAs=require('file-saver').saveAs
+var axios=require('axios')
 
 module.exports={
   data:function(){
     return {
       dialog:false,
-      loading:false
+      loading:false,
+      url:"",
+      error:"",
+      success:'',
+      filter:"",
+      filename:"qna.json"
     }
   },
   components:{
@@ -63,15 +80,56 @@ module.exports={
     download:function(){
       var self=this
       this.loading=true
-      setTimeout(()=>self.loading=false,5000)
+      this.$store.dispatch('api/list',{
+        perpage:'all',
+        filter:this.filter
+      })
+      .then(function(result){
+        var blob = new Blob(
+          [JSON.stringify({qna:result.qa},null,3)], 
+          {type: "text/plain;charset=utf-8"}
+        );
+        return Promise.resolve(saveAs(blob,self.filename || "qna.json"))
+      })
+      .then(()=>self.loading=false)
     },
-    upload:function(){
+    upload:function(event){
       var self=this
-      console.log(this.$refs)
-      console.log('upload')
       this.dialog=false
       this.loading=true
-      setTimeout(()=>self.loading=false,5000)
+      new Promise(function(res,rej){
+        if(event==='file'){
+          console.log(self.$refs)
+          var reader = new FileReader();
+          reader.onload = function(e) { 
+            try {
+              res(JSON.parse(e.srcElement.result))
+            } catch(e) {
+              rej("invalid JSON")
+            }
+          };
+          reader.readAsText(self.$refs.file.files[0]);
+        }else if(event==='url'){
+          Promise.resolve(axios.get(self.url))
+          .then(x=>res(x.data))
+          .catch(x=>rej({
+            status:x.response.status,
+            message:x.response.data
+          }))
+        }else{
+          rej('error: invalid type')
+        }
+      })
+      .then(function(data){
+        console.log(data)
+        if(data.qna){
+          return self.$store.dispatch('api/bulk',data)
+        }else{
+          return Promise.reject('Invalid File')
+        }
+      })
+      .then(()=>self.success="success!")
+      .catch(error=>self.error=error)
     }
   }
 }

@@ -1,4 +1,4 @@
-#if($input.params('from') == 'all')
+#if($input.params('perpage') == 'all')
 {   
     "Command":"EXPORT",
     "Filter":"$util.urlDecode($input.params('filter'))",

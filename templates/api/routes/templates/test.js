@@ -31,10 +31,10 @@ module.exports={
             input:{
                 body:'{}',
                 params:name=>{return {
-                    from:"all",
+                    from:"",
                     filter:"",
                     query:"",
-                    perpage:""
+                    perpage:"all"
                 }[name]}
             }
         },test),

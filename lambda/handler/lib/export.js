@@ -14,14 +14,25 @@ License for the specific language governing permissions and limitations under th
 var Promise=require('bluebird')
 
 module.exports=function(params,es){
-    return es.search({
+    var query={
         index: process.env.ES_INDEX,
         type: process.env.ES_TYPE,
         scroll:'10s',
         body: {
             query: {match_all: {}}
         }
-    })
+    }
+    if(params.Filter){
+        query.body.query={
+            bool:{
+                must:{match_all:{}},
+                filter:{regexp:{
+                    "qid":params.Filter
+                }}
+            }
+        }
+    }
+    return es.search(query)
     .tap(re=>console.log(JSON.stringify(re,null,2)))
     .then(function(init_results){
         var scroll_id=init_results._scroll_id
