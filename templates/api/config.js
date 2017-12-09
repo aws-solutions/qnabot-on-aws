@@ -84,5 +84,13 @@ function stage(name){
               ]]}
         }
       }
+    },
+    "DocumentationVersion": {
+        "Type": "AWS::ApiGateway::DocumentationVersion",
+        "Properties": {
+            "Description":"",
+            "DocumentationVersion":"1.0",
+            "RestApiId": {"Ref": "API"}
+        },
     }
 }
