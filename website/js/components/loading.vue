@@ -1,6 +1,6 @@
 <template lang='pug'>
   v-card
-    v-progress-linear(indeterminate)
+    v-progress-linear(indeterminate color="cyan")
 </template>
 
 <script>

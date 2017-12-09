@@ -1,18 +1,24 @@
 <template lang='pug'>
-  v-card
-    v-container
-      v-layout(column)
-        v-flex
-          h4 Import
-          v-text-field(name="url" label="url" id="url" clearable v-model="url")
-          v-btn(@click="dialog=true" v-if="url.length>0") from url
-          v-btn(@click="dialog=true" v-if="url.length===0") from file
-        v-divider
-        v-flex(row)
-          h4 export
-          v-text-field(name="filter" label="filter" id="filter" clearable v-model="filter")
-          v-text-field(name="filename" label="filename" id="filename" clearable v-model="filename")
-          v-btn(@click="download") export
+  v-container(column grid-list-md)
+    v-layout(row)
+      v-flex
+        v-card
+          v-card-title.headline Import
+          v-card-text
+            v-text-field(name="url" label="Type here to import from url" id="url" clearable v-model="url")
+          v-card-actions
+            v-spacer
+            v-btn(@click="dialog=true" v-if="url.length>0") from url
+            v-btn(@click="dialog=true" v-if="url.length===0") from file
+      v-flex
+        v-card
+          v-card-title.headline Export
+          v-card-text 
+            v-text-field(name="filter" label="filter export by qid prefix" id="filter" clearable v-model="filter")
+            v-text-field(name="filename" label="filename" id="filename" clearable v-model="filename")
+          v-card-actions
+            v-spacer
+            v-btn(@click="download") export
     v-dialog(v-model="loading" persistent)
       v-card
         v-card-title Loading
@@ -21,6 +27,7 @@
           span(v-if="success") {{success}} 
           v-progress-linear( v-if="!error && !success" indeterminate)
         v-card-actions
+          v-spacer
           v-btn(v-if="error || success" @click='loading=false') close
     v-dialog(v-model="dialog")
       v-card

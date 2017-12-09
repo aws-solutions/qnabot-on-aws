@@ -2,12 +2,12 @@
   v-card.root-card
     v-tabs(v-model="tab")
       v-tabs-bar(:v-model="active" class="cyan" light)
-        v-tabs-item(ripple href="#questions" ) questions
-        v-tabs-item(ripple href="#test") simulate
-        v-tabs-slider
+        v-tabs-item.title(ripple href="#questions") Questions
+        v-tabs-item.title(ripple href="#test") Simulate
+        v-tabs-slider(color="black")
       v-tabs-items
         v-tabs-content(id="questions")
-          questions(@filter="get")
+          questions(@filter="get(pagination)")
         v-tabs-content(id="test")
           test
     v-divider
@@ -25,10 +25,10 @@
     )
       template(slot='headers' slot-scope='props')
         tr
-          th.shrink
-            v-checkbox(:indeterminate="QAs.length===0" v-model='selectAll')
-          th.shrink(v-if="tab==='test'") score
-          th.text-xs-left( v-for="header in props.headers" 
+          th.shrink(v-if="tab==='questions'")
+            v-checkbox(:indeterminate="QAs.length===0" v-model='selectAll' tabindex='-1')
+          th.shrink.title(v-if="tab==='test'") score
+          th.text-xs-left.title( v-for="header in props.headers" 
             :key='header.text'
             :class="['column sortable', pagination.descending ? 'desc' : 'asc', header.value === pagination.sortBy ? 'active' : '']"
             @click="changeSort(header.value)") 
@@ -36,10 +36,10 @@
               span {{header.text}}
       template(slot='items' slot-scope='props')
         tr( v-on:click="props.expanded = !props.expanded")
-          td.shrink(v-on:click.stop="")
-            v-checkbox(v-model="props.item.select")
-          td.text-xs-left.shrink.cyan--text(v-if="tab==='test'") {{props.item.score}}
-          td.text-xs-left.shrink {{props.item.qid}}
+          td.shrink(v-on:click.stop="" v-if="tab==='questions'")
+            v-checkbox(v-model="props.item.select" tabindex='-1')
+          td.text-xs-left.shrink.cyan--text.title(v-if="tab==='test'") {{props.item.score}}
+          td.text-xs-left.shrink.title {{props.item.qid}}
           td.text-xs-left {{props.item.q[0]}}
           span.buttons
             edit(:data="props.item" @click.native.stop="")
@@ -138,7 +138,7 @@ module.exports={
         order:event.descending ? 'desc' : 'asc'
       }) 
     },
-    changeSort (column) {
+    changeSort:_.debounce(function(column) {
       if(this.tab==='questions'){
         if (this.pagination.sortBy === column) {
           this.pagination.descending = !this.pagination.descending
@@ -148,13 +148,19 @@ module.exports={
         }
         this.get(this.pagination)
       }
-    },
+    },500),
     edit:console.log
   }
 }
 </script>
-
+<style lang='scss'>
+  .tabs__item {
+    color:white !important; 
+  }
+  
+</style>
 <style lang='scss' scoped>
+  
   .shrink {
     width:10%;
   }
@@ -164,6 +170,11 @@ module.exports={
   }
   .icon {
     cursor:pointer;
+  }
+  .datatable thead th.title {
+    .icon {
+      font-size:inherit;
+    }
   }
   .buttons {
     position:absolute;

@@ -1,19 +1,24 @@
 <template lang='pug'>
   v-card(flat class="pl-3")
     v-card-text
-      .title Questions
-        v-list(dense)
-          v-list-tile(v-for="(q,index) in data.q" :key="index")
-            v-list-tile-content {{q}}
-      .title Answer
-      p(class="pl-3") {{data.a}}
-      span(v-if="data.t")
-        .title Topic
-        p(class="pl-3") {{data.t}}
-      span(v-if="data.r.imageUrl")
-        .title ResponseCard
-        p(class="pl-3") title: {{data.r.title}}
-        p(class="pl-3") url: {{data.r.imageUrl}}
+      v-container
+        v-layout(row)
+          v-flex(xs6)
+            .title Questions
+              v-list(dense)
+                v-list-tile(v-for="(q,index) in data.q" :key="index")
+                  v-list-tile-content {{q}}
+          v-flex(xs6)
+            .title Answer
+            p(class="pl-3") {{data.a}}
+        v-layout(column)
+          span(v-if="data.t")
+            .title Topic
+            p(class="pl-3") {{data.t}}
+          span(v-if="data.r.imageUrl")
+            .title ResponseCard
+            p(class="pl-3") title: {{data.r.title}}
+            p(class="pl-3") url: {{data.r.imageUrl}}
 </template>
 
 <script>

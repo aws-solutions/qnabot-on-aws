@@ -6,7 +6,7 @@
         v-card-text
           v-subheader.error--text(v-if='error') {{error}}
           v-subheader.success--text(v-if='success') {{success}}
-          v-progress-linear(v-if='!error && !success' indeterminate)
+          v-progress-linear(v-if='!error && !success' indeterminate color="cyan")
         v-card-actions
           v-spacer
             v-btn(@click='cancel' flat) close
@@ -15,7 +15,7 @@
         v-icon edit
       v-card
         v-card-title(primary-title)
-          .headline Update 
+          .headline Update: {{data.qid}}
         v-card-text
           form
             v-text-field(
@@ -37,7 +37,16 @@
                 )
                 v-btn(icon @click.native="rmQ(index)" v-if="tmp.q.length>1")
                   v-icon delete
-            v-btn(@click="tmp.q.push('')") add question
+              li
+                v-text-field(
+                  name='question',label='Add a new question',id='q' 
+                  v-model='scratch.question'
+                  v-validate="'max:140'"
+                  :error-messages="errors.collect('q-scratch')" auto-grow 
+                  data-vv-name="q-scratch",
+                  :counter='140'
+                )
+                v-btn(@click.native="addQ" ) save question
             v-text-field(
               name='answer',label='answer',id='a' required textarea v-model='tmp.a'
               v-validate="'required'"
@@ -49,20 +58,20 @@
               :error-messages="errors.collect('t')"
               data-vv-name="t",
             )
-            v-subheader.title ResponseCard
-            v-text-field(
-              name='card-title',label='Response Card Title',id='rt' v-model='tmp.r.title'
-              :error-messages="errors.collect('rt')"
-              data-vv-name="rt",
-            )
-            v-text-field(
-              name='card-url',label='Response Image Url',id='ru' v-model='tmp.r.imageUrl'
-              :error-messages="errors.collect('ru')"
-              data-vv-name="ru",
-            ) 
+            .subheading ResponseCard
+            div(class="pl-3")
+              v-text-field(
+                name='card-title',label='Response Card Title',id='rt' v-model='tmp.r.title'
+                :error-messages="errors.collect('rt')"
+                data-vv-name="rt"
+              )
+              v-text-field(
+                name='card-url',label='Response Image Url',id='ru' v-model='tmp.r.imageUrl'
+                :error-messages="errors.collect('ru')"
+                data-vv-name="ru"
+              ) 
           small *indicates required field
           v-subheader.error--text(v-if='error') {{error}}
-          
         v-card-actions
           v-spacer
           v-btn(@click='cancel') Cancel
@@ -95,6 +104,9 @@ module.exports={
       success:'',
       dialog:false,
       loading:false,
+      scratch:{
+        question:""
+      },
       tmp:{
         qid:"",
         q:[],
@@ -113,6 +125,7 @@ module.exports={
     },
     refresh:function(){
       this.tmp=_.cloneDeep(this.data)
+      console.log(this)
     },
     update:function(){
       var self=this
@@ -143,6 +156,10 @@ module.exports={
     rmQ:function(index){
       console.log(index)
       this.tmp.q.splice(index,1)
+    },
+    addQ:function(){
+      this.tmp.q.push(this.scratch.question)
+      this.scratch.question=''
     }
   }
 }

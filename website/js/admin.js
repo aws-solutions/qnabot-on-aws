@@ -12,7 +12,6 @@ License for the specific language governing permissions and limitations under th
 */
 
 var Promise=require('bluebird')
-var style=require('../../node_modules/vuetify/dist/vuetify.min.css')
 Promise.config({
     warnings:false
 })
@@ -35,8 +34,18 @@ Vue.use(validate,{
 
 Vue.use(Vuex)
 Vue.use(Router)
-Vue.use(vuetify)
-
+Vue.use(vuetify,{
+    theme:{
+        primary: '#fff',
+        secondary: '#424242',
+        accent: '#82B1FF',
+        error: '#FF5252',
+        info: '#2196F3',
+        success: '#4CAF50',
+        warning: '#FFC107'
+    }
+})
+var style=require('../../node_modules/vuetify/dist/vuetify.min.css')
 
 var lib=require('./lib')
 document.addEventListener('DOMContentLoaded',init)

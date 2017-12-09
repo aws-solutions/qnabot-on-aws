@@ -7,15 +7,16 @@
           label="Filter items by ID prefix" 
           v-model="$store.state.data.filter"
           @input="filter"
+          @keyup.enter="emit"
           id="filter"
           clearable 
         )
       v-flex(xs6)
-        v-btn(@click='emit') 
+        v-btn(@click='emit' class="ma-2" ) 
           span(v-if="$store.state.data.filter.length===0") Refresh
           span(v-if="$store.state.data.filter.length!==0") Filter
-        add
-        delete
+        add(class="ma-2")
+        delete(class="ma-2")
 </template>
 
 <script>
@@ -35,6 +36,7 @@ License for the specific language governing permissions and limitations under th
 var Vuex=require('vuex')
 var saveAs=require('file-saver').saveAs
 var Promise=require('bluebird')
+var _=require('lodash')
 
 module.exports={
   data:function(){
@@ -51,9 +53,9 @@ module.exports={
     filter:function(event){
       this.$store.state.data.filter=event|| ""
     },
-    emit:function(){
+    emit:_.debounce(function(){
       this.$emit('filter')
-    }
+    },500,{leading:true,trailing:false})
   }
 }
 </script>

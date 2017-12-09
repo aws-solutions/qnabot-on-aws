@@ -22,8 +22,7 @@ var _=require('lodash')
 const ExtractTextPlugin = require("extract-text-webpack-plugin");
 
 const extractSass = new ExtractTextPlugin({
-    filename: "[name].css",
-    disable: process.env.NODE_ENV === "development"
+    filename: "[name].css"
 });
 
 module.exports = require('../../bin/exports')(config.region).then(function(result){

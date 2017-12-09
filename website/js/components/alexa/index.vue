@@ -1,47 +1,35 @@
 <template lang='pug'>
-  v-card
-    v-card-title 
-      h3 Alexa Instructions
-    v-card-text
-      v-stepper(v-model="step")
-        v-stepper-header
-          v-stepper-step(step='1' :complete="step>1") setup
-          v-stepper-step(step='2' :complete="step>2") developer console
-          v-stepper-step(step='3' :complete="step>3") create skill
-          v-stepper-step(step='4' :complete="step>3") test
-        v-stepper-items
-          v-stepper-content(step='1')
-            p Sign into the 
-              a(href="https://developer.amazon.com/home.html"  target="_blank") Amazon Developer Console
-            v-btn(@click="step++") next
-          v-stepper-content(step='2')
-            p Choose 'ALEXA' from the toolbar
-            p choose the 'Get Started' button for 'Alexa Skills Kit'      
-            p Choose 'Add a New Skill'
-            v-btn(@click="step++") next
-            v-btn(@click="step--") back
-          v-stepper-content(step='3')
-            p Create a new skill using the following information:
-            ol
-              li Skill Name:`QnA Bot`
-              li Invocation Name:`q and a`
-              li Intent Schema: 
-                v-btn copy to clipboard
-              li Custom Slot Type:`EXAMPLE_QUESTIONS`  
-              li Sample Utterances:`Qna_intent {QnA_slot}`
-                v-btn copy to clipboard
-              li Endpoint:Choose "AWS Lambda ARN"
-              li Lambda Arn: {{$store.state.bot.lambdaArn}}
-              li choose all other defaults 
-            v-btn(@click="step++") next
-            v-btn(@click="step--") back
-          v-stepper-content(step='4')
-            p 
-              span go to 
-              a(href="https://echosim.io/"  target="_blank") echosim.io 
-              span say "alexa ask QnA"
-            v-btn(@click="step--") back
-      div(id="alexa" v-html="text")
+  v-container(grid-list-md)
+    v-layout(column )
+      v-flex
+        v-card
+          v-card-title 
+            h3 Alexa Instructions
+          v-card-text(class="pa-0")
+            v-stepper(v-model="stepNumber" class="elevation-0")
+              v-stepper-header
+                v-stepper-step(
+                  v-for="(step,index) in steps"
+                  :key="index"
+                  :step="index+1"
+                  :complete="stepNumber>index") {{step.title}}
+              v-stepper-items
+                v-stepper-content(
+                  v-for="(step,index) in steps"
+                  :key="index"
+                  :step="index+1")
+                  v-card
+                    v-card-text
+                      span(v-html="step.text")
+                    v-card-actions
+                      v-btn(v-for="(y,x) in step.buttons"
+                        :id="y.id"
+                        :key="x"
+                        :loading="y.loading"
+                        @click="copy(y)") {{y.text}}
+                      v-spacer
+                      v-btn(@click="stepNumber--" v-if="index>0" ) back
+                      v-btn(@click="stepNumber++" v-if="index+1<steps.length") next
 </template>
 
 <script>
@@ -61,20 +49,36 @@ License for the specific language governing permissions and limitations under th
 var Vuex=require('vuex')
 var Promise=require('bluebird')
 var markdown=require('marked')
+var renderer=new markdown.Renderer()
+renderer.link=function(href,title,text){
+  return `<a href="${href}" title="${title}" target="_blank">${text}</a>` 
+}
 var handlebars=require('handlebars')
 var clipboard=require('clipboard')
+var _=require('lodash')
 
 module.exports={
   data:function(){
     var self=this
     return {
       visible:false,
-      step:0,
-      clipboard:new clipboard('.clip',{
+      stepNumber:1,
+      utterances:new clipboard('#Utterances',{
         text:function(){
           return self.$store.state.bot.utterances.join('\n')
         }
-      })
+      }),
+      schema:new clipboard('#IntentSchema',{
+        text:function(){
+          return JSON.stringify(require('./schema'))
+        }
+      }),
+      arn:new clipboard('#LambdaArn',{
+        text:function(){
+          return self.$store.state.bot.lambdaArn
+        }
+      }),
+      stepsRaw:require('./steps.js')
     }
   },
   components:{
@@ -86,15 +90,27 @@ module.exports={
     {invalid:function(){
       return this.$validator.errors.has('filter')
     },
-    text:function(){
-      var temp=handlebars.compile(require('./alexa.md'))
-      return markdown(temp(this.$store.state))
+    steps:function(){
+      var self=this
+      return _.map(this.stepsRaw,function(x){ 
+        var temp=handlebars.compile(x.text)
+        return {
+          title:x.title,
+          text:markdown(temp(self.$store.state.bot),{renderer}),
+          buttons:x.buttons
+        }}
+      )
     }
     }
   ),
   created:function(){
     this.$store.dispatch('data/botinfo').catch(()=>null) 
   },
-  methods:{} 
+  methods:{
+    copy:function(btn){
+      btn.loading=true
+      setTimeout(()=>btn.loading=false,1000)
+    }
+  } 
 }
 </script>

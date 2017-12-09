@@ -7,6 +7,7 @@
           label="type your question here" 
           id="query"
           v-model="query"
+          @keyup.enter="simulate"
           clearable 
         )
     v-layout(row)
@@ -16,6 +17,7 @@
           label="topic context" 
           id="topic"
           v-model="topic"
+          @keyup.enter="simulate"
           clearable 
         )
       v-flex(xs5)
@@ -39,6 +41,7 @@ License for the specific language governing permissions and limitations under th
 var Vuex=require('vuex')
 var saveAs=require('file-saver').saveAs
 var Promise=require('bluebird')
+var _=require('lodash')
 
 module.exports={
   data:function(){
@@ -51,12 +54,12 @@ module.exports={
   },
   computed:{},
   methods:{
-    simulate:function(){
+    simulate:_.debounce(function(){
       return this.$store.dispatch('data/search',{
         query:this.query,
         topic:this.topic
       })
-    }
+    },500,{trailing:false,leading:true})
   }
 }
 </script>
