@@ -19,23 +19,31 @@ var api=util.api
 
 module.exports={
     build(context){
-        return api(context,'build')
-        .delay(10*1000)
+        return api(context,'botinfo')
+        .then(function(result){
+            if(result.status==='READY'){
+                return api(context,'build')
+            }else if(result.status==='BUILDING'){
+                return 
+            }else {
+                return Promise.reject("cannot build, bot in state "+result.status)
+            }
+        })
+        .delay(5*1000)
         .then(function(){
             return new Promise(function(res,rej){
                 var next=function(count){
-                    api(context,'status')
-                    .tap(console.log)
+                    api(context,'botinfo').get('status')
                     .then(function(stat){
-                        console.log("tries:"+count)
                         if(stat==="READY"){
                             res()
                         }else if(stat==="BUILDING"){
-                            count>0 ? setTimeout(()=>next(--count),1000) : rej("TimeOut")
+                            count>0 ? setTimeout(()=>next(--count),1000) : rej(" build timed out")
                         }else{
-                            rej("Error:"+stat.error)
+                            rej("build failed, bot in state "+stat.error)
                         }
                     })
+                    .catch(rej)
                 }
                 next(100)
             })

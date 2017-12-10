@@ -107,6 +107,10 @@ module.exports = require('../../bin/exports')(config.region).then(function(resul
             use: ['style-loader','css-loader']
           },
           {
+            test: /\.styl$/,
+            use: ['style-loader','css-loader','stylus-loader']
+          },
+          {
             test: /\.scss$/,
             use: extractSass.extract({
                 use:[

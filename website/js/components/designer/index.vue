@@ -1,10 +1,10 @@
 <template lang='pug'>
   v-card.root-card
     v-tabs(v-model="tab")
-      v-tabs-bar(:v-model="active" class="cyan" light)
+      v-tabs-bar(:v-model="active" class="primary" light)
         v-tabs-item.title(ripple href="#questions") Questions
         v-tabs-item.title(ripple href="#test") Simulate
-        v-tabs-slider(color="black")
+        v-tabs-slider(color="accent")
       v-tabs-items
         v-tabs-content(id="questions")
           questions(@filter="get(pagination)")
@@ -17,7 +17,7 @@
       :search="search"
       :pagination.sync="pagination"
       :total-items="$store.state.page.total"
-      :loading="$store.state.api.loading"
+      :loading="loading"
       :rows-per-page-items="perpage"
       v-model="selected"
       select-all
@@ -38,7 +38,7 @@
         tr( v-on:click="props.expanded = !props.expanded")
           td.shrink(v-on:click.stop="" v-if="tab==='questions'")
             v-checkbox(v-model="props.item.select" tabindex='-1')
-          td.text-xs-left.shrink.cyan--text.title(v-if="tab==='test'") {{props.item.score}}
+          td.text-xs-left.shrink.primary--text.title(v-if="tab==='test'") {{props.item.score}}
           td.text-xs-left.shrink.title {{props.item.qid}}
           td.text-xs-left {{props.item.q[0]}}
           span.buttons
@@ -105,7 +105,7 @@ module.exports={
   },
   computed:{
     loading:function(){
-      return this.$store.state.api.loading
+      return this.$store.state.api.loading 
     },
     QAs:function(){
       return this.$store.state.data.QAs
@@ -148,7 +148,7 @@ module.exports={
         }
         this.get(this.pagination)
       }
-    },500),
+    },500,{trailing:false,leading:true}),
     edit:console.log
   }
 }

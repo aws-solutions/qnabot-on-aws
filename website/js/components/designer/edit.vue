@@ -6,7 +6,7 @@
         v-card-text
           v-subheader.error--text(v-if='error') {{error}}
           v-subheader.success--text(v-if='success') {{success}}
-          v-progress-linear(v-if='!error && !success' indeterminate color="cyan")
+          v-progress-linear(v-if='!error && !success' indeterminate)
         v-card-actions
           v-spacer
             v-btn(@click='cancel' flat) close

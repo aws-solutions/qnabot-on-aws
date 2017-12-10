@@ -8,11 +8,13 @@
           v-card-text(class="pa-0")
             v-stepper(v-model="stepNumber" class="elevation-0")
               v-stepper-header
-                v-stepper-step(
-                  v-for="(step,index) in steps"
-                  :key="index"
-                  :step="index+1"
-                  :complete="stepNumber>index") {{step.title}}
+                template(v-for="(step,index) in steps")
+                  v-divider(v-if='index>0')
+                  v-stepper-step(
+                    :key="index"
+                    :step="index+1"
+                    :complete="stepNumber>index") {{step.title}}
+                      small(v-if="step.optional") optional
               v-stepper-items
                 v-stepper-content(
                   v-for="(step,index) in steps"
@@ -94,12 +96,10 @@ module.exports={
       var self=this
       return _.map(this.stepsRaw,function(x){ 
         var temp=handlebars.compile(x.text)
-        return {
-          title:x.title,
-          text:markdown(temp(self.$store.state.bot),{renderer}),
-          buttons:x.buttons
-        }}
-      )
+        var y=Object.assign({},x)
+        y.text=markdown(temp(self.$store.state.bot),{renderer})
+        return y
+      })
     }
     }
   ),

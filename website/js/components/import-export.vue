@@ -68,12 +68,15 @@ var Vuex=require('vuex')
 var Promise=require('bluebird')
 var saveAs=require('file-saver').saveAs
 var axios=require('axios')
+var _=require('lodash')
 
 module.exports={
   data:function(){
+    var self=this
     return {
       dialog:false,
       loading:false,
+      testing:false,
       url:"",
       error:"",
       success:'',
@@ -137,7 +140,7 @@ module.exports={
       })
       .then(()=>self.success="success!")
       .catch(error=>self.error=error)
-    }
+    },
   }
 }
 </script>

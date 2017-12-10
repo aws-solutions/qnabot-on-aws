@@ -110,6 +110,8 @@
     "sass-loader": "^6.0.6",
     "selenium-server": "^3.4.0",
     "style-loader": "^0.18.2",
+    "stylus": "^0.54.5",
+    "stylus-loader": "^3.0.1",
     "uglifyjs-webpack-plugin": "^0.4.6",
     "urlcode-json": "0.0.5",
     "v-tooltip": "^2.0.0-beta.8",

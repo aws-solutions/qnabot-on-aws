@@ -34,18 +34,8 @@ Vue.use(validate,{
 
 Vue.use(Vuex)
 Vue.use(Router)
-Vue.use(vuetify,{
-    theme:{
-        primary: '#fff',
-        secondary: '#424242',
-        accent: '#82B1FF',
-        error: '#FF5252',
-        info: '#2196F3',
-        success: '#4CAF50',
-        warning: '#FFC107'
-    }
-})
-var style=require('../../node_modules/vuetify/dist/vuetify.min.css')
+Vue.use(vuetify)
+var style=require('../style/app.styl')
 
 var lib=require('./lib')
 document.addEventListener('DOMContentLoaded',init)

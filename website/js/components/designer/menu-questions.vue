@@ -1,22 +1,30 @@
 <template lang="pug">
   v-container(fluid)
     v-layout(row)
-      v-flex(xs6)
+      v-flex(xs6 column)
         v-text-field(
           name="filter" 
           label="Filter items by ID prefix" 
           v-model="$store.state.data.filter"
           @input="filter"
-          @keyup.enter="emit"
+          @keyup.enter="emit" 
           id="filter"
           clearable 
         )
-      v-flex(xs6)
         v-btn(@click='emit' class="ma-2" ) 
           span(v-if="$store.state.data.filter.length===0") Refresh
           span(v-if="$store.state.data.filter.length!==0") Filter
+      v-flex(xs6)
         add(class="ma-2")
         delete(class="ma-2")
+        v-btn(:loading="building" :disabled="building" @click="build") Rebuild Bot
+    v-dialog(v-if="error")
+      v-card
+        v-card-title.headling Error
+        v-card-text.error--text {{Error}}
+        v-card-actions
+          v-spacer
+          v-btn.lighten-3(@click="error=''" :class="{ teal: success}" ) close
 </template>
 
 <script>
@@ -41,7 +49,10 @@ var _=require('lodash')
 module.exports={
   data:function(){
     return {
-      dialog:false 
+      dialog:false,
+      building:false,
+      success:false,
+      error:''
     }
   },
   components:{
@@ -55,7 +66,19 @@ module.exports={
     },
     emit:_.debounce(function(){
       this.$emit('filter')
-    },500,{leading:true,trailing:false})
+    },500,{leading:true,trailing:false}),
+    build:function(){
+      var self=this
+      this.building=true
+      
+      this.$store.dispatch('data/build')
+      .then(function(){
+        self.success=true
+        setTimeout(()=>self.success=false,2000)
+      })
+      .catch(e=>self.error=e)
+      .then(()=>self.building=false)
+    }
   }
 }
 </script>

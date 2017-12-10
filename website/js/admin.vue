@@ -9,7 +9,7 @@
       v-list(dense three-line subheader)
         v-list-tile(v-for="page in pages" @click="" :href="page.href") 
           v-list-tile-avatar
-            v-icon(color="cyan") {{page.icon}}
+            v-icon(color="primary") {{page.icon}}
           v-list-tile-content
             v-list-tile-title {{page.title}}
             v-list-tile-sub-title {{page.subTitle}}

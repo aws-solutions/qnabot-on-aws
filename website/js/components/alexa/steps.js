@@ -43,6 +43,7 @@ choose all other defaults
 },
 {
     title:"Publishing",
+    optional:true,
     text:`
 If you want to publish your QnA skill, see [Submitting an Alexa Skill for Certification](https://developer.amazon.com/public/solutions/alexa/alexa-skills-kit/docs/publishing-an-alexa-skill)
 
