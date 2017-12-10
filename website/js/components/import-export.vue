@@ -112,11 +112,12 @@ module.exports={
         if(event==='file'){
           console.log(self.$refs)
           var reader = new FileReader();
-          reader.onload = function(e) { 
+          reader.onload = function(e){ 
             try {
               res(JSON.parse(e.srcElement.result))
             } catch(e) {
-              rej("invalid JSON")
+              console.log(e)
+              rej("invalid JSON:"+e)
             }
           };
           reader.readAsText(self.$refs.file.files[0]);
@@ -132,7 +133,6 @@ module.exports={
         }
       })
       .then(function(data){
-        console.log(data)
         if(data.qna){
           return self.$store.dispatch('api/bulk',data)
         }else{

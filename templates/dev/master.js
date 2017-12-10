@@ -1,8 +1,9 @@
 var stack=require('../util').stacktest
+var config=require('../../config')
 module.exports={
   "Resources": {
     "master":stack('master',{
-        Email:'jcalho@amazon.com',
+        Email:config.devEmail,
         BootstrapBucket:{"Fn::ImportValue":"QNA-BOOTSTRAP-BUCKET"},
         BootstrapPrefix:{"Fn::ImportValue":"QNA-BOOTSTRAP-PREFIX"},
         PublicOrPrivate:"PRIVATE",

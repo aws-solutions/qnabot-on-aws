@@ -16,4 +16,5 @@ module.exports={
     "profile":"default",
     "publicBucket":"aws-bigdata-blog",
     "publicPrefix":"artifacts/aws-ai-qna-bot",
+    "devEmail":""
 }

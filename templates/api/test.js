@@ -1,4 +1,6 @@
 var stack=require('../util').stacktest
+var config=require('../../config')
+
 module.exports={
   "Resources": {
     "api":stack('api',{
@@ -6,7 +8,7 @@ module.exports={
         "Botname":"bot",
         "SlotType":"slot",
         "Intent":"intent",
-        "Email":"jcalho@amazon.com",
+        "Email":config.devEmail,
         "Utterances":"ad",
         "PublicOrPrivate":"PRIVATE",
         "ApprovedDomain":"amazon.com"

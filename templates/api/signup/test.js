@@ -3,7 +3,7 @@ process.env.APPROVED_DOMAIN='amazon.com'
 handler({
     request:{
         userAttributes:{
-            email:"jcalho@amazon.com"
+            email:"example@amazon.com"
         },
         codeParameter:'asdf4ds'
     },

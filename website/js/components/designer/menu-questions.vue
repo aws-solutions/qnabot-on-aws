@@ -2,7 +2,7 @@
   v-container(fluid)
     v-layout(column)
       v-flex
-        v-conatiner
+        v-container
           v-layout(row)
             v-flex(xs12)
               v-text-field(

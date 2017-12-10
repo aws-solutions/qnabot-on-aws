@@ -1,4 +1,5 @@
 var stack=require('../util').stacktest
+var config=require('../../config')
 module.exports={
   "Resources": {
     "QnABot":stack('lex',{
@@ -14,7 +15,7 @@ module.exports={
         "Botname":"bot",
         "SlotType":"slot",
         "Intent":"intent",
-        "Email":"jcalho@amazon.com",
+        "Email":config.devEmail,
         "Utterances":"ad"
     }),
     "dashboard":stack('dashboard',{
