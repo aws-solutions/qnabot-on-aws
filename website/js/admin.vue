@@ -46,29 +46,9 @@ var Vuex=require('vuex')
 var Promise=require('bluebird')
 var _=require('lodash')
 module.exports={
-  data:()=>{return {
-    drawer:false,
-    pages:[{
-      title:"Edit",
-      subTitle:"edit questions and simulate responses",
-      icon:"mode_edit",
-      href:"#/edit"
-    },{
-      title:"Alexa",
-      subTitle:"instructions for setting up an Alexa Skill",
-      icon:"chat_bubble",
-      href:"#/alexa"
-    },{
-      title:"Import/Export",
-      subTitle:"import saved questions or download backups",
-      icon:"import_export",
-      href:"#import-export"
-    },{
-      title:"QnABot Client",
-      subTitle:"Use QnABot to interact with your bot in the browser",
-      icon:"chat",
-      href:"client"
-    }]
+  data:()=>{
+    return {
+    drawer:false
   }},
   components:{},
   computed:{
@@ -83,6 +63,29 @@ module.exports={
     },
     client:function(){
       return _.get(this,"$store.state.info._links.ClientLogin.href")
+    },
+    pages:function(){
+      return [{
+        title:"Edit",
+        subTitle:"edit questions and simulate responses",
+        icon:"mode_edit",
+        href:"#/edit"
+      },{
+        title:"Alexa",
+        subTitle:"instructions for setting up an Alexa Skill",
+        icon:"chat_bubble",
+        href:"#/alexa"
+      },{
+        title:"Import/Export",
+        subTitle:"import saved questions or download backups",
+        icon:"import_export",
+        href:"#import-export"
+      },{
+        title:"QnABot Client",
+        subTitle:"Use QnABot to interact with your bot in the browser",
+        icon:"chat",
+        href:_.get(this,"$store.state.info._links.ClientLogin.href")
+      }]
     }
   },
   created:function(){},

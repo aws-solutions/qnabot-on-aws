@@ -1,6 +1,8 @@
 LAMBDAS=$(shell for l in $$(ls ./lambda | grep -v util);do echo lambda/$$l;done)
 TEMPLATES=$(shell for l in $$(ls ./templates | grep -v util);do echo templates/$$l;done)
 
+All: templates lambda website build
+
 build:
 	mkdir -p build; mkdir -p build/lambda; mkdir -p build/templates/test;mkdir -p build/templates;mkdir -p build/documents; mkdir -p build/templates/dev
 

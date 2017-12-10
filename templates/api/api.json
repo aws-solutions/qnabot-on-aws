@@ -21,14 +21,14 @@
         "/pages/designer"
       ]]}
     },
-    "ClientLogin": {
-      "Value":{"Fn::Join":["",[
-        {"Fn::GetAtt":["ApiUrl","Name"]},
-        "/pages/client"
-      ]]} 
-    },
     "ClientUrl": {
-      "Value": {"Fn::GetAtt":["Urls","Client"]}
+        "Value":{"Fn::If":["Public",
+            {"Fn::GetAtt":["Urls","Client"]},
+            {"Fn::Join":["",[
+                {"Fn::GetAtt":["ApiUrl","Name"]},
+                "/pages/client"
+            ]]}
+        ]}
     },
     "ApiId":{
       "Value": {"Ref":"API"}

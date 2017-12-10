@@ -6,8 +6,7 @@ module.exports={
         Email:config.devEmail,
         BootstrapBucket:{"Fn::ImportValue":"QNA-BOOTSTRAP-BUCKET"},
         BootstrapPrefix:{"Fn::ImportValue":"QNA-BOOTSTRAP-PREFIX"},
-        PublicOrPrivate:"PRIVATE",
-        ApprovedDomain:"amazon.com"
+        PublicOrPrivate:"PUBLIC"
     })
   },
   "Outputs":{

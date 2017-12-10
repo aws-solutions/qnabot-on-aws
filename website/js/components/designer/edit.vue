@@ -135,22 +135,21 @@ module.exports={
       return Promise.resolve((function(){
         if(self.data.qid!==self.tmp.qid){
           return self.$store.dispatch('api/check',self.tmp.qid)
-        }else{
-          Promise.resolve(false)
+          .then(x=> x ? Promise.reject("Question with that ID already Exists") : null )
+          .then(()=>self.$store.dispatch('api/remove',self.data.qid))
         }
       })())
-      .then(function(exists){
-        if(exists){
+      .then(function(){
+        return self.$store.dispatch('data/update',self.tmp)
+        .then(function(result){
+          Object.assign(self.data,self.tmp)
+          self.success="!success"
+        })
+      })
+      .catch(function(error){
           self.dialog=true
           self.loading=false
-          self.error="Question with that ID already Exists"
-        }else{
-          return self.$store.dispatch('data/update',self.tmp)
-          .then(function(result){
-            Object.assign(self.data,self.tmp)
-            self.success="!success"
-          })
-        }
+          self.error=error
       })
     },
     rmQ:function(index){

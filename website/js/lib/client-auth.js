@@ -40,7 +40,8 @@ module.exports=function(){
         credentials.clearCachedId() 
         return Promise.resolve(credentials.getPromise()).return({
             credentials,
-            username
+            username,
+            Login:_.get(info,"_links.ClientLogin.href")
         })
     })
     .then(function(result){
@@ -49,7 +50,9 @@ module.exports=function(){
             config:aws.config,
             lex:new aws.LexRuntime(),
             polly:new aws.Polly(),
-            username:result.username
+            username:result.username,
+            Login:result.Login
         }
     })
+    .catch(console.log)
 }

@@ -1,5 +1,12 @@
 <template lang='pug'>
-  lex-web-ui
+  div
+    v-toolbar(color="cyan")
+      v-toolbar-title {{title}}
+      v-spacer
+      v-toolbar-items
+        v-btn(flat :href="$store.state.Login" 
+          v-if="$store.state.Login && $store.state.username") LogOut
+    lex-web-ui
 </template>
 
 <script>
@@ -22,9 +29,18 @@ var Promise=require('bluebird')
 module.exports={
   data:()=>{return {}},
   components:{},
-  computed:{},
+  computed:{
+    title:function(){
+      var name=this.$store.state.Username
+      return name ? 'QnABot: '+name : "QnABot"
+    }
+  },
   methods:{}
 }
 </script>
 
-
+<style lang='scss'>
+  #lex-web > nav {
+    display:none;
+  }
+</style>

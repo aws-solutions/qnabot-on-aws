@@ -46,6 +46,7 @@ module.exports={
 },
 "DocumentationVersion": {
     "Type": "AWS::ApiGateway::DocumentationVersion",
+    "DependsOn":["BotDoc"],
     "Properties": {
         "Description":"",
         "DocumentationVersion":"1.0",
@@ -86,10 +87,14 @@ function stage(name){
                 {"Fn::GetAtt":["ApiUrl","Name"]},
                 "/pages/designer"
               ]]},
-            "ClientLoginUrl":{"Fn::Join":["",[
-                {"Fn::GetAtt":["ApiUrl","Name"]},
-                "/pages/client"
-              ]]}
+            "ClientLoginUrl":{"Fn::If":[
+                "Public",
+                {"Fn::GetAtt":["Urls","Client"]},
+                {"Fn::Join":["",[
+                    {"Fn::GetAtt":["ApiUrl","Name"]},
+                    "/pages/client"
+                ]]}
+            ]}
         }
       }
     }

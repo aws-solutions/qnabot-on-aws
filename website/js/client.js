@@ -64,7 +64,8 @@ document.addEventListener('DOMContentLoaded', function(){
         if(auth.username){
             config.ui.toolbarTitle+=":"+auth.username
         }
-        console.log(config)
+        store.state.Login=auth.Login
+        store.state.Username=auth.username
         Vue.use(LexWebUi.Plugin,{
             config,
             awsConfig:auth.config,

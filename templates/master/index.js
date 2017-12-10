@@ -59,11 +59,7 @@ var base={
     },
     "ClientURL":{
         "Value":{"Fn::GetAtt":["api","Outputs.ClientUrl"]},
-        "Description":"If your bot is PUBLIC then this is the login your users will use to interact with your bot"
-    },
-    "ClientLogin":{
-        "Value":{"Fn::GetAtt":["api","Outputs.ClientLogin"]},
-        "Description":"If your bot is PRIVATE then this is the url your users will use to interact with your bot. This is also the registration url for new users"
+        "Description":"Where you can go to interact with your bot"
     },
     "DashboardUrl":{
         "Value":{"Fn::GetAtt":["dashboard","Outputs.Url"]}

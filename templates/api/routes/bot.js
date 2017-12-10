@@ -23,7 +23,20 @@ module.exports={
     method:"get",
     template:fs.readFileSync(__dirname+'/templates/utterance.get.vm','utf8'),
     resource:{"Ref":"UtterancesApi"}
-})
+}),
+"BotDoc":{
+    "Type" : "AWS::ApiGateway::DocumentationPart",
+    "Properties" : {
+        "Location" : {
+            "Type":"RESOURCE",
+            "Path":"/bot"
+        },
+        "Properties" :JSON.stringify({
+           description:""  
+        }),
+        "RestApiId" : {"Ref":"API"}
+    }
+}
 }
 
 

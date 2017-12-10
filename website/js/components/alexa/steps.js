@@ -16,6 +16,7 @@ Create a new skill using the following information:
 
 | Name | Value |
 |------|-------|
+| Skill Type | Customer Interaction Model |
 | Skill Name | <kbd>QnA Bot</kbd> |
 | Invocation Name | <kbd>q and a</kbd> |
 | Intent Schema |  copy and paste from button below |
