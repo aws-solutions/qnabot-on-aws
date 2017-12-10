@@ -81,7 +81,7 @@ module.exports={
       error:"",
       success:'',
       filter:"",
-      filename:"qna.json"
+      filename:"qna"
     }
   },
   components:{
@@ -99,7 +99,8 @@ module.exports={
           [JSON.stringify({qna:result.qa},null,3)], 
           {type: "text/plain;charset=utf-8"}
         );
-        return Promise.resolve(saveAs(blob,self.filename || "qna.json"))
+        var name=self.filename || 'qna'
+        return Promise.resolve(saveAs(blob,name+'.json'))
       })
       .then(()=>self.loading=false)
     },

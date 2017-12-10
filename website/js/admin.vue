@@ -20,7 +20,7 @@
       v-toolbar-items
         v-btn(flat 
           :href="login" 
-          v-if="login") LoutOut
+          v-if="login") LogOut
     v-container(fluid)
       v-layout(column)
         v-flex

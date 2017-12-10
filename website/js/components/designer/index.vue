@@ -26,18 +26,20 @@
       template(slot='headers' slot-scope='props')
         tr
           th.shrink(v-if="tab==='questions'")
-            v-checkbox(:indeterminate="QAs.length===0" v-model='selectAll' tabindex='-1')
+            v-checkbox(:indeterminate="QAs.length===0" v-model='selectAll' tabindex='-1'
+              color="primary" 
+            )
           th.shrink.title(v-if="tab==='test'") score
           th.text-xs-left.title( v-for="header in props.headers" 
             :key='header.text'
-            :class="['column sortable', pagination.descending ? 'desc' : 'asc', header.value === pagination.sortBy ? 'active' : '']"
-            @click="changeSort(header.value)") 
-              v-icon(v-if="tab==='questions'") arrow_upward
+            :class="['column', header.sortable ? 'sortable' : '', pagination.descending ? 'desc' : 'asc', header.value === pagination.sortBy ? 'active' : '']"
+            @click="header.sortable ? changeSort(header.value) : null") 
+              v-icon(v-if="tab==='questions' && header.sortable") arrow_upward
               span {{header.text}}
       template(slot='items' slot-scope='props')
         tr( v-on:click="props.expanded = !props.expanded")
           td.shrink(v-on:click.stop="" v-if="tab==='questions'")
-            v-checkbox(v-model="props.item.select" tabindex='-1')
+            v-checkbox(v-model="props.item.select" tabindex='-1' color="primary" )
           td.text-xs-left.shrink.primary--text.title(v-if="tab==='test'") {{props.item.score}}
           td.text-xs-left.shrink.title {{props.item.qid}}
           td.text-xs-left {{props.item.q[0]}}

@@ -1,20 +1,25 @@
 <template lang="pug">
   v-container(fluid)
-    v-layout(row)
-      v-flex(xs6 column)
-        v-text-field(
-          name="filter" 
-          label="Filter items by ID prefix" 
-          v-model="$store.state.data.filter"
-          @input="filter"
-          @keyup.enter="emit" 
-          id="filter"
-          clearable 
-        )
-        v-btn(@click='emit' class="ma-2" ) 
-          span(v-if="$store.state.data.filter.length===0") Refresh
-          span(v-if="$store.state.data.filter.length!==0") Filter
-      v-flex(xs6)
+    v-layout(column)
+      v-flex
+        v-conatiner
+          v-layout(row)
+            v-flex(xs12)
+              v-text-field(
+                name="filter" 
+                label="Filter items by ID prefix" 
+                v-model="$store.state.data.filter"
+                @input="filter"
+                @keyup.enter="emit" 
+                id="filter"
+                clearable 
+              )
+            v-flex
+              v-btn(@click='emit' class="ma-2" id="refresh") 
+                span(v-if="$store.state.data.filter.length===0") Refresh
+                span(v-if="$store.state.data.filter.length!==0") Filter
+      v-flex(text-xs-right)
+        v-spacer
         add(class="ma-2")
         delete(class="ma-2")
         v-btn(:loading="building" :disabled="building" @click="build") Rebuild Bot
@@ -82,3 +87,9 @@ module.exports={
   }
 }
 </script>
+
+<style lang='scss' scoped>
+  #refresh {
+    flex:0; 
+  }
+</style>
