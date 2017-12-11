@@ -31,7 +31,7 @@ Configure the config with your information.
 
 Next, use the following command to launch a CloudFormation template to create the S3 bucket to be used for lambda code and CloudFormation templates. Wait for this template to complete (you can watch progress from the [AWS CloudFormation console](https://console.AWS.amazon.com/cloudformation/home))  
 ```shell
-make templates; npm run stack dev/bootstrap up
+npm run bootstrap
 ```
 
 After the template has launched, use the following command to build all assets and upload to the S3 bucket created in the previous step:

@@ -22,6 +22,7 @@
     "check": "./bin/check.sh",
     "stack": "./bin/launch.sh",
     "upload": "make upload -j 4",
+    "bootstrap":"make templates && npm run dev/bootstrap up",
     "dev-up": "npm run stack dev/dev up",
     "up": "npm run upload && npm run stack test/master up",
     "lambda-update": "make lambda && ./bin/update-lambda.sh",
