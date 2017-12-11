@@ -13,7 +13,7 @@ See the "Getting Started" to launch your own QnABot,
 - Install npm >3 and node >6. ([instructions](https://nodejs.org/en/download/))
 - Clone this repo.
 - Set up an AWS account. ([instructions](https://AWS.amazon.com/free/?sc_channel=PS&sc_campaign=acquisition_US&sc_publisher=google&sc_medium=cloud_computing_b&sc_content=AWS_account_bmm_control_q32016&sc_detail=%2BAWS%20%2Baccount&sc_category=cloud_computing&sc_segment=102882724242&sc_matchtype=b&sc_country=US&s_kwcid=AL!4422!3!102882724242!b!!g!!%2BAWS%20%2Baccount&ef_id=WS3s1AAAAJur-Oj2:20170825145941:s))
-- Configure AWS CLI and local credentials. ([instructions](http://docs.AWS.amazon.com/cli/latest/userguide/cli-chap-welcome.html))  
+- Configure AWS CLI and a local credentials file. ([instructions](http://docs.AWS.amazon.com/cli/latest/userguide/cli-chap-welcome.html))  
 
 Note: Lex is currently only supported in the us-east-1 and eu-west-1 regions.
 
@@ -28,6 +28,12 @@ Next, set up your configuration file:
 make config.js
 ```
 now edit config.js with you information.
+
+| param | description | 
+|-------|-------------|
+|region | the AWS region to launch stacks in |
+|profile| the AWS credentials profile to use |
+|devEmail(required) | the email to use when creating admin users in automated stack launches |
 
 Next, use the following command to launch a CloudFormation template to create the S3 bucket to be used for lambda code and CloudFormation templates. Wait for this template to complete (you can watch progress from the [AWS CloudFormation console](https://console.AWS.amazon.com/cloudformation/home))  
 ```shell
