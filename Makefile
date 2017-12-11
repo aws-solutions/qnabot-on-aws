@@ -8,6 +8,9 @@ build:
 
 .PHONY: lambda templates upload website
 
+config.js:
+	cp config.js.example config.js
+
 lambda: $(LAMBDAS) build
 	for l in $^; do \
 		cd $$l && make; \

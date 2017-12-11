@@ -23,11 +23,11 @@ First, install all prerequisites:
 npm install 
 ```
 
-Next, copy the /config.json.example file to /config.json:
+Next, set up your configuration file:
 ```shell
-cp config.js.example config.js
+make config.js
 ```
-Configure the config with your information. 
+now edit config.js with you information.
 
 Next, use the following command to launch a CloudFormation template to create the S3 bucket to be used for lambda code and CloudFormation templates. Wait for this template to complete (you can watch progress from the [AWS CloudFormation console](https://console.AWS.amazon.com/cloudformation/home))  
 ```shell
