@@ -7,5 +7,5 @@ export AWS_DEFAULT_REGION=$(node -e "console.log(JSON.stringify(require('$__dirn
 
 TEMP=build/templates/$1
 aws cloudformation validate-template        \
-    --template-body file://$TEMP            \
+    --template-body file://$TEMP.json            \
     | $(npm bin)/jq
