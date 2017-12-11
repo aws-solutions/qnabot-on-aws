@@ -15,13 +15,20 @@ To customize the QnABot use the following instructions to set up a local dev env
 - Set up an AWS account. ([instructions](https://AWS.amazon.com/free/?sc_channel=PS&sc_campaign=acquisition_US&sc_publisher=google&sc_medium=cloud_computing_b&sc_content=AWS_account_bmm_control_q32016&sc_detail=%2BAWS%20%2Baccount&sc_category=cloud_computing&sc_segment=102882724242&sc_matchtype=b&sc_country=US&s_kwcid=AL!4422!3!102882724242!b!!g!!%2BAWS%20%2Baccount&ef_id=WS3s1AAAAJur-Oj2:20170825145941:s))
 - Configure AWS CLI and local credentials. ([instructions](http://docs.AWS.amazon.com/cli/latest/userguide/cli-chap-welcome.html))  
 
-Note: Lex is currently only supported in the us-east-1 region.
+Note: Lex is currently only supported in the us-east-1 and eu-west-1 regions.
 
 ## Getting Started
 Fiuit, install all prerequisites:
 ```shell
 npm install 
 ```
+
+Next, copy the /config.json.example file to /config.json:
+```shell
+cp config.js.example config.js
+```
+Configure the config with your information. 
+
 Next, use the following command to launch a CloudFormation template to create the S3 bucket to be used for lambda code and CloudFormation templates. Wait for this template to complete (you can watch progress from the [AWS CloudFormation console](https://console.AWS.amazon.com/cloudformation/home))  
 ```shell
 npm run stack dev/bootstrap up
@@ -41,26 +48,12 @@ All script descriptions are found in /docs/scripts.md
 
 ## Components
 ### CloudFormation Templates
-The templates are found in the /templates directory. The template master-base.json is the entry point and the other templates are nested in master-base.json. 
 
 ### Lambda Functions
-Lambda functions are found in the /lambda directory.
+Lambda functions are found in the /lambda directory. Refer to the README.md file in each directory for instructions on setting up a dev environment and testing. 
 
 ### Web interface
-The Designer UI and client UI code is in the /website/admin directory. 
-
-### Embeddeding URLs as answer content
-Answers to questions may include links to other websites. To efficiently support URLs as part of an answer, Markdown 
-syntax should be used to represent these links. For example, a reference to www.amazon.com 
-should be formatted as \[Amazon\]\(http://www.amazon.com\). http, https, and ftp are supported protocols.
-
-## Running Tests
-The following will launch a CloudFormation template to create AWS resources in your account that are used in the Lambda, CloudFormation, and WebUI tests. 
-```shell
-npm run dev-up
-```
-
-Once the template has completed you can run the tests in the following sections.
+The Designer UI and client UI code is in the /website directory. 
 
 ### CloudFormation tests
 The CloudFormation test templates are in the templates/test folder. Run a template test with:
@@ -75,21 +68,19 @@ npm run check test/es
 
 You also can check a template's syntax with:
 ```shell
-npm run check {template's directory relative to /templates}/{template-name}
-```
-
-### Running Lambda Function tests
-Each lambda directory has its own tests that can be run by executing the following command in that directory:
-```shell
-npm run test
+npm run check {template-name}
 ```
 
 ### Testing Designer UI
-The Test for the website are in the /website/admin/test. A development server can be setup by calling:
+Launch a development master stack:
 ```shell
-npm run server
+npm run stack dev/master up
 ```
-You can view this local Designer UI at [http://localhost:8000](http://localhost:8000)
+when that stack has finished run:
+```shell
+cd ./website ; make dev
+```
+this will launch a running webpack process that will watch for changes to files and upload the built websites to your running dev/master stack. 
 
 ### Designer UI Compatibility 
 Currently the only browsers supported are:  
