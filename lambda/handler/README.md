@@ -1,7 +1,7 @@
-#Handler Lambda
+# Handler Lambda
 This the lambda that backs ApiGateway and fulfills Lex and Alexa requests. 
 
-##Tests
+## Tests
 test are running using:
 ```shell
 npm test
@@ -11,7 +11,7 @@ or
 npm unit {{test-name}}
 ```
 
-#Required Templates and running test
+# Required Templates and running test
 The Following templates are required to run the tests:
 
 1. dev/domain
