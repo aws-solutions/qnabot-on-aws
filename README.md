@@ -55,7 +55,7 @@ The CloudFormation test templates are in the templates/test folder. The current 
 3. lex: create the Lex bot
 4. api: creates the ApiGateway and Cognito UserPool needed for the Designer/Client Ui
 5. dashboard: Creates an AWS CloudWatch dashboard to monitor the resources in the templates. 
-6. various templates in /templates/dev: need for local testing of the lambda functions. 
+6. various templates in /templates/dev: needed for local testing of the lambda functions. 
 
 Run a template test with:
 ```shell
@@ -94,7 +94,7 @@ cd ./website ; make dev
 ```
 this will launch a running webpack process that will watch for changes to files and upload the changes to your running dev/master stack. 
 
-### Designer UI Compatibility 
+#### Designer UI Compatibility 
 Currently the only browsers supported are:  
 - Chrome  
 - FireFox  
