@@ -73,7 +73,7 @@ module.exports={
       },{
         title:"Alexa",
         subTitle:"instructions for setting up an Alexa Skill",
-        icon:"chat_bubble",
+        icon:"info",
         href:"#/alexa"
       },{
         title:"Import/Export",
@@ -83,7 +83,7 @@ module.exports={
       },{
         title:"QnABot Client",
         subTitle:"Use QnABot to interact with your bot in the browser",
-        icon:"chat",
+        icon:"forum",
         href:_.get(this,"$store.state.info._links.ClientLogin.href")
       }]
     }

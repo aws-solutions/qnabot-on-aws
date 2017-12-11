@@ -1,32 +1,57 @@
 module.exports=[{
-    title:"setup",
+    title:"Signin/Signup",
     text:`
 Sign in or create an Amazon developer account at [Amazon Developer Console](https://developer.amazon.com/home.html) 
     `
 },{
-    title:"developer Console",
+    title:"Create Skill",
     text:`
+In the Amazon Developer Console 
 1. Choose <kbd>ALEXA</kbd> from the toolbar  
-1. choose the <kbd>Get Started</kbd> button for <kbd>Alexa Skills Kit</kbd>
-1. Choose <kbd>Add a New Skill</kbd>
+1. Under <kbd>Alexa Skills Kit</kbd> Click  <kbd>Get Started</kbd> 
+1. In the upper right hand corner click <kbd>Add a New Skill</kbd>
 `},{
-    title:"create Skill",
+    title:"Skill Information",
     text:`
 Create a new skill using the following information:  
 
 | Name | Value |
 |------|-------|
 | Skill Type | Customer Interaction Model |
+| Language | English (U.S.) |
 | Skill Name | <kbd>QnA Bot</kbd> |
 | Invocation Name | <kbd>q and a</kbd> |
+
+click Next
+`},
+{
+    title:"Interaction Model",
+    text:`
+Fill in the following information:
+
+| Name | Value |
+|------|-------|
 | Intent Schema |  copy and paste from button below |
 | Custom Slot Type | <kbd>EXAMPLE_QUESTIONS</kbd> |
-| Sample Utterances | <kbd>Qna_intent {QnA_slot}</kbd> |
 | Utterances |  copy and paste from button below |
+| Sample Utterances | <kbd>Qna_intent {QnA_slot}</kbd> |
+
+click Next
+`},
+{
+    title:"Configuration",
+    text:`
+Fill in the following information:
+
+| Name | Value |
+|------|-------|
+| Service Endpoint Type |  AWS Lambda ARN (Amazon Resource Name) |
 | Endpoint | Choose <kbd>AWS Lambda ARN</kbd> |
-| Lambda Arn |  copy and pase from button below | 
+| Lambda Arn |  copy and paste from button below | 
 
 choose all other defaults
+
+click next
 `,
     buttons:[{
         text:"Copy Intent Schema to clipBoard",
@@ -37,10 +62,27 @@ choose all other defaults
         id:"Utterances",
         loading:false
     },{
-        text:"Copy LambdaArn to clipBoard",
+        text:"Copy Lambda-Arn to clipBoard",
         id:"LambdaArn",
         loading:false
     }]
+},
+{
+    title:"Test",
+    optional:true,
+    text:`
+Congradulations! your skill is ready to be used. You will have to publish your skil inorder for people to use it outside of your account. 
+
+You can use this page to test your new alexa skill or use the following: 
+
+###### EchoSim
+You can use the convenient [echosim.io](https://echosim.io/) site to test your bot.
+
+###### Alexa Device 
+To access your unpublished skill, register your Alexa device to the same account as your Amazon Developer account. If you have a device that is not registered to the right account, you can re-register it by following these directions: [Registering an Alexa-enabled Device for Testing](https://developer.amazon.com/public/solutions/alexa/alexa-skills-kit/docs/testing-an-alexa-skill#h2_register)
+
+Ask questions in the form: *\"Alexa, ask Q and A, How do I use Q and A Bot?\"*  (Assuming your device wake word is 'Alexa')
+`
 },
 {
     title:"Publishing",
@@ -52,22 +94,10 @@ Otherwise skip this step. You will be able to access the QnA skill from Alexa de
 `},
 {
     title:"Privacy and Compliance",
+    optional:true,
     text:`
-Complete this page, indicating 'no' for the privacy questions, and check the export compliance agreement.
-`},
-{
-    title:"test",
-    text:`
-Save your skill and now you can test. 
+1. Choose 'no' for the privacy questions, 
+2. check the export compliance agreement.
+`}
 
-##### EchoSim
-You can use the convenient [echosim.io](https://echosim.io/) site to test your bot.
-
-##### Alexa Device 
-To access your unpublished skill, register your Alexa device to the same account as your Amazon Developer account. If you have a device that is not registered to the right account, you can re-register it by following these directions: [Registering an Alexa-enabled Device for Testing](https://developer.amazon.com/public/solutions/alexa/alexa-skills-kit/docs/testing-an-alexa-skill#h2_register)
-
-Ask questions in the form: *\"Alexa, ask Q and A, How do I use Q and A Bot?\"*  (Assuming your device wake word is 'Alexa')
-
-`
-}
 ]

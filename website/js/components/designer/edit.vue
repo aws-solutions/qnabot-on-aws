@@ -10,7 +10,7 @@
         v-card-actions
           v-spacer
             v-btn(@click='cancel' flat) close
-    v-dialog(persistent v-model='dialog' max-width="100%")
+    v-dialog(v-model='dialog' max-width="80%")
       v-btn(slot="activator" block icon="icon" @click="refresh") 
         v-icon edit
       v-card
@@ -107,6 +107,7 @@ module.exports={
       scratch:{
         question:""
       },
+      opened:false,
       tmp:{
         qid:"",
         q:[],
@@ -124,8 +125,10 @@ module.exports={
       this.loading=false
     },
     refresh:function(){
-      this.tmp=_.cloneDeep(this.data)
-      console.log(this)
+      if(!this.opened){
+        this.tmp=_.cloneDeep(this.data)
+        this.opened=true
+      }
     },
     update:function(){
       var self=this

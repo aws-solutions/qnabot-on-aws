@@ -22,6 +22,7 @@
                   :step="index+1")
                   v-card
                     v-card-text
+                      .headline.text-xs-center {{step.title}}
                       span(v-html="step.text")
                     v-card-actions
                       v-btn(v-for="(y,x) in step.buttons"
@@ -29,6 +30,7 @@
                         :key="x"
                         :loading="y.loading"
                         @click="copy(y)") {{y.text}}
+                    v-card-actions
                       v-spacer
                       v-btn(@click="stepNumber--" v-if="index>0" ) back
                       v-btn(@click="stepNumber++" v-if="index+1<steps.length") next
