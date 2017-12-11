@@ -3,9 +3,9 @@
 > Build a chat bot to answer questions. 
 
 ## Overview
-This repository contains code for the QnABot, described in the AWS AI blog post [“Creating a Question and Answer Bot with Amazon Lex and Amazon Alexa”](https://aws.amazon.com/blogs/ai/creating-a-question-and-answer-bot-with-amazon-lex-and-amazon-alexa/).  To launch the QnABot follow the instructions in the blog post.  
+This repository contains code for the QnABot, described in the AWS AI blog post [“Creating a Question and Answer Bot with Amazon Lex and Amazon Alexa”](https://aws.amazon.com/blogs/ai/creating-a-question-and-answer-bot-with-amazon-lex-and-amazon-alexa/).
 
-To customize the QnABot use the following instructions to set up a local dev environment. 
+See the "Getting Started" to launch your own QnABot,
 
 ## Prerequisites
 
@@ -18,7 +18,7 @@ To customize the QnABot use the following instructions to set up a local dev env
 Note: Lex is currently only supported in the us-east-1 and eu-west-1 regions.
 
 ## Getting Started
-Fiuit, install all prerequisites:
+First, install all prerequisites:
 ```shell
 npm install 
 ```
@@ -48,31 +48,43 @@ All script descriptions are found in /docs/scripts.md
 
 ## Components
 ### CloudFormation Templates
+The CloudFormation test templates are in the templates/test folder. The current templates are:
 
-### Lambda Functions
-Lambda functions are found in the /lambda directory. Refer to the README.md file in each directory for instructions on setting up a dev environment and testing. 
+1. Master and Public: these are the top level templates
+2. domain: creates and initializes the ElasticSearch cluster
+3. lex: create the Lex bot
+4. api: creates the ApiGateway and Cognito UserPool needed for the Designer/Client Ui
+5. dashboard: Creates an AWS CloudWatch dashboard to monitor the resources in the templates. 
+6. various templates in /templates/dev: need for local testing of the lambda functions. 
 
-### Web interface
-The Designer UI and client UI code is in the /website directory. 
-
-### CloudFormation tests
-The CloudFormation test templates are in the templates/test folder. Run a template test with:
+Run a template test with:
 ```shell
 npm run stack test/{template-name}
 ```
 
-For example, if you want to launch a template with filename "es.json" run the following command:
+For example, if you want to test the domain template run:
 ```shell
-npm run check test/es
+npm run check test/domain
 ```
 
 You also can check a template's syntax with:
 ```shell
 npm run check {template-name}
 ```
+ex. 
+```shell
+npm run check domain
+```
 
-### Testing Designer UI
-Launch a development master stack:
+### Lambda Functions
+Lambda functions are found in the /lambda directory. Refer to the README.md file in each directory for instructions on setting up a dev environment and testing. 
+[Handler](lambda/handler/README.md)
+[CFN](lambda/handler/README.md)
+
+### Web Interface
+The Designer UI and client UI code is in the /website directory. 
+
+To Test the web ui, Launch a development master stack:
 ```shell
 npm run stack dev/master up
 ```
@@ -80,12 +92,12 @@ when that stack has finished run:
 ```shell
 cd ./website ; make dev
 ```
-this will launch a running webpack process that will watch for changes to files and upload the built websites to your running dev/master stack. 
+this will launch a running webpack process that will watch for changes to files and upload the changes to your running dev/master stack. 
 
 ### Designer UI Compatibility 
 Currently the only browsers supported are:  
-    Chrome  
-    FireFox  
+- Chrome  
+- FireFox  
 We are currently working on adding Microsoft Edge support.  
 
 ## Built With
