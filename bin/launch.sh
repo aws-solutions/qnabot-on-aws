@@ -13,7 +13,7 @@ name () {
 }
 
 up(){ 
-    ./bin/check.sh $STACK.json 
+    ./bin/check.sh $STACK 
     aws cloudformation create-stack             \
         --stack-name $(name inc)                \
         --capabilities "CAPABILITY_NAMED_IAM"   \
@@ -22,7 +22,7 @@ up(){
 }
 
 update(){ 
-    ./bin/check.sh $STACK.json
+    ./bin/check.sh $STACK
     aws cloudformation update-stack             \
         --stack-name $(name)                    \
         --capabilities "CAPABILITY_NAMED_IAM"   \

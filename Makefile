@@ -8,20 +8,20 @@ build:
 
 .PHONY: lambda templates upload website
 
-lambda: $(LAMBDAS)
+lambda: $(LAMBDAS) build
 	for l in $^; do \
 		cd $$l && make; \
 		cd ../..;	\
 	done;			
 
-templates: $(TEMPLATES)
+templates: $(TEMPLATES) build
 	for l in $^; do \
 		cd $$l && make; \
 		cd ../..;	\
 	done;			
 
 
-website:
+website: build
 	cd ./website; make 
 
 samples:docs/blog-samples.json build
