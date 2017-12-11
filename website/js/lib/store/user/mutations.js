@@ -33,7 +33,12 @@ module.exports={
             set(state,'name',token["cognito:username"])
             set(state,'groups',token["cognito:groups"])
             set(state,'token',params.id_token)
-            
+            console.log('auth',state.groups) 
+            if(!state.groups || !state.groups.includes('Admins')){
+                var login=_.get(rootState,"info._links.DesignerLogin.href")
+                window.alert("You must be an administrative user to view this page") 
+                window.window.location.href=login
+            }
             state.Logins={}
             state.Logins[[
                 'cognito-idp.',

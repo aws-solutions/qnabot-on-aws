@@ -43,6 +43,12 @@
       "AllowedPattern":"(PUBLIC|PRIVATE)",
       "ConstraintDescription":"Allowed Values are PUBLIC or PRIVATE"
     },
+    "AllowUserSignUp":{
+      "Type":"String",
+      "AllowedPattern":"(FALSE|TRUE)",
+      "ConstraintDescription":"Allowed Values are FALSE or TRUE",
+      "Default":"FALSE"
+    },
     "ApprovedDomain":{
       "Type":"String",
       "Default":"NONE"
@@ -82,6 +88,7 @@
   },
   "Conditions":{
     "Public":{"Fn::Equals":[{"Ref":"PublicOrPrivate"},"PUBLIC"]},
+    "SignUp":{"Fn::Equals":[{"Ref":"AllowUserSignUp"},"TRUE"]},
     "Domain":{"Fn::Not":[
         {"Fn::Equals":[{"Ref":"ApprovedDomain"},"NONE"]}
     ]}

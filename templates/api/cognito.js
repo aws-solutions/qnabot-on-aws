@@ -8,18 +8,30 @@ module.exports={
             "UserPool":{"Ref":"UserPool"}
         }
     },
-    "CognitoLogin":{
+    "CognitoLoginClient":{
         "Type": "Custom::CognitoLogin",
         "DependsOn":["CFNLambdaPolicy"],
         "Properties": {
             "ServiceToken": { "Fn::GetAtt" : ["CFNLambda", "Arn"] },
             "UserPool":{"Ref":"UserPool"},
-            "ClientId":{"Ref":"Client"},
+            "ClientId":{"Ref":"ClientClient"},
             "LoginCallbackUrls":[
-                {"Fn::GetAtt":["Urls","Designer"]},
                 {"Fn::GetAtt":["Urls","Client"]}
             ],
-            "CSS":require('./style')
+            "CSS":require('./style').client
+        }
+    },
+    "CognitoLoginDesigner":{
+        "Type": "Custom::CognitoLogin",
+        "DependsOn":["CFNLambdaPolicy"],
+        "Properties": {
+            "ServiceToken": { "Fn::GetAtt" : ["CFNLambda", "Arn"] },
+            "UserPool":{"Ref":"UserPool"},
+            "ClientId":{"Ref":"ClientDesigner"},
+            "LoginCallbackUrls":[
+                {"Fn::GetAtt":["Urls","Designer"]},
+            ],
+            "CSS":require('./style').designer
         }
     },
     "DesignerLogin":{
@@ -27,7 +39,7 @@ module.exports={
         "DependsOn":["CFNLambdaPolicy"],
         "Properties": {
             "ServiceToken": { "Fn::GetAtt" : ["CFNLambda", "Arn"] },
-            "ClientId":{"Ref":"Client"},
+            "ClientId":{"Ref":"ClientDesigner"},
             "Domain":{"Ref":"CognitoDomain"},
             "LoginRedirectUrl":{"Fn::GetAtt":["Urls","Designer"]}
         }
@@ -37,7 +49,7 @@ module.exports={
         "DependsOn":["CFNLambdaPolicy"],
         "Properties": {
             "ServiceToken": { "Fn::GetAtt" : ["CFNLambda", "Arn"] },
-            "ClientId":{"Ref":"Client"},
+            "ClientId":{"Ref":"ClientClient"},
             "Domain":{"Ref":"CognitoDomain"},
             "LoginRedirectUrl":{"Fn::GetAtt":["Urls","Client"]}
         }
@@ -68,17 +80,13 @@ module.exports={
       "Properties": {
         "IdentityPoolName": "UserPool",
         "AllowUnauthenticatedIdentities": true,
-        "CognitoIdentityProviders": [
-          {
-            "ClientId": {
-              "Ref": "Client"
-            },
-            "ProviderName": {
-              "Fn::GetAtt": [
-                "UserPool",
-                "ProviderName"
-              ]
-            },
+        "CognitoIdentityProviders": [{
+            "ClientId": {"Ref": "ClientDesigner"},
+            "ProviderName": {"Fn::GetAtt": ["UserPool","ProviderName"]},
+            "ServerSideTokenCheck": true
+          },{
+            "ClientId": {"Ref": "ClientClient"},
+            "ProviderName": {"Fn::GetAtt": ["UserPool","ProviderName"]},
             "ServerSideTokenCheck": true
           }
         ]
@@ -95,10 +103,21 @@ module.exports={
                 "unauthenticated":{"Fn::GetAtt":["UnauthenticatedRole","Arn"]} 
             },
             "RoleMappings":[{
-                "ClientId":{"Ref":"Client"},
+                "ClientId":{"Ref":"ClientClient"},
                 "UserPool":{"Ref":"UserPool"},
                 "Type":"Rules",
                 "AmbiguousRoleResolution":"AuthenticatedRole",
+                "RulesConfiguration":{"Rules":[{
+                    "Claim":"cognito:groups",
+                    "MatchType":"Contains",
+                    "Value":"Admin",
+                    "RoleARN":{"Fn::GetAtt":["UserRole","Arn"]}
+                }]}
+            },{
+                "ClientId":{"Ref":"ClientDesigner"},
+                "UserPool":{"Ref":"UserPool"},
+                "Type":"Rules",
+                "AmbiguousRoleResolution":"Deny",
                 "RulesConfiguration":{"Rules":[{
                     "Claim":"cognito:groups",
                     "MatchType":"Contains",
@@ -113,7 +132,11 @@ module.exports={
       "Properties": {
         "UserPoolName": {"Fn::Join": ["-",["UserPool",{"Ref": "AWS::StackName"}]]},
         "AdminCreateUserConfig":{
-           "AllowAdminCreateUserOnly":false,
+           "AllowAdminCreateUserOnly":{"Fn::If":[
+                "SignUp",
+                false,
+                true
+            ]},
            "InviteMessageTemplate":{
                 "EmailMessage":{"Fn::Sub":fs.readFileSync(__dirname+'/invite.txt','utf8')},
                 "EmailSubject":"Welcome to QnABot!"
@@ -132,20 +155,26 @@ module.exports={
         }
     }
     },
-    "Client": {
+    "ClientDesigner": {
       "Type": "AWS::Cognito::UserPoolClient",
       "Properties": {
-        "ClientName": {
-          "Fn::Join": [
-            "-",
-            [
-              "UserPool",
-              {
-                "Ref": "AWS::StackName"
-              }
-            ]
-          ]
-        },
+        "ClientName": {"Fn::Join": ["-",[
+            "UserPool",
+            {"Ref": "AWS::StackName"},
+            "designer"
+        ]]},
+        "GenerateSecret": false,
+        "UserPoolId": {"Ref": "UserPool"}
+      }
+    },
+    "ClientClient": {
+      "Type": "AWS::Cognito::UserPoolClient",
+      "Properties": {
+        "ClientName": {"Fn::Join": ["-",[
+            "UserPool",
+            {"Ref": "AWS::StackName"},
+            "client"
+        ]]},
         "GenerateSecret": false,
         "UserPoolId": {"Ref": "UserPool"}
       }

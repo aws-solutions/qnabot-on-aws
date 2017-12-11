@@ -2,11 +2,18 @@
 var sass=require('node-sass')
 var fs=require('fs')
 
-var style=sass.renderSync({
-    data:fs.readFileSync(__dirname+'/css.scss','utf8'),
+var client=sass.renderSync({
+    data:fs.readFileSync(__dirname+'/client.scss','utf8'),
     outputStyle:"compressed"
 }).css.toString()
 
-fs.writeFileSync(__dirname+"/custom-css.css",style)
-module.exports=style
+var designer=sass.renderSync({
+    data:fs.readFileSync(__dirname+'/designer.scss','utf8'),
+    outputStyle:"compressed"
+}).css.toString()
+
+module.exports={
+    client,
+    designer
+}
     

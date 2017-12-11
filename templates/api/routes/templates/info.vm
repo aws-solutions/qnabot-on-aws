@@ -4,7 +4,8 @@
     "region":"$stageVariables.Region",
     "BotName":"$stageVariables.BotName",
     "PoolId":"$stageVariables.IdPool",
-    "ClientId":"$stageVariables.ClientId",
+    "ClientIdClient":"$stageVariables.ClientIdClient",
+    "ClientIdDesigner":"$stageVariables.ClientIdDesigner",
     "UserPool":"$stageVariables.UserPool",
     "Id":"$stageVariables.Id",
     "_links":{
