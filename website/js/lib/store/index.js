@@ -20,6 +20,7 @@ module.exports=new Vuex.Store({
         bot:{
             utterances:[] 
         },
+        alexa:{},
         error:""
     },
     mutations:require('./mutations'),

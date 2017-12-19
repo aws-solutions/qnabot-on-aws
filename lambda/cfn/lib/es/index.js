@@ -49,7 +49,7 @@ module.exports=class clear {
             .catch(err=>reply(err))
 
         }else{
-            reply(null,params.Index+'-'+params.Type)
+            reply(null,params.Index+'-'+params.Name)
         }
     }
     

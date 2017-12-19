@@ -1,24 +1,27 @@
 <template lang="pug">
   span
     span(v-if="schema.type==='string' && !empty")
-      v-container.pa-0
+      v-container.pa-0.fluid
         v-layout(:row="row" :column="column")
           v-flex
             .title {{schema.title}}
             span.pl-3 {{value}} 
     span(v-if="schema.type==='array' && !empty")
-      v-container
+      v-container.fluid.pa-0
         v-layout(:row="row" :column="column" )
           v-flex
-            .title {{schema.title}}
+            //.title {{schema.title}}
             display(  
               v-for="(item,index) in value" :key="index"
               :schema="schema.items"
               :value="item" )
     span(v-if="schema.type==='object' && !empty")
-      v-container
+      v-container.fluid
         v-layout(:row="row" :column="column")
-          v-flex(v-for="(property,key) in schema.properties" :key="key" v-if="value[key]")
+          v-flex(v-for="(property,key) in schema.properties" 
+            style="flex:1;"
+            :key="key" 
+            v-if="value[key]")
             .title {{schema.title}}
             display(  
               :name="key"

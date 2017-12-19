@@ -15,8 +15,8 @@
       :counter="schema.maxLength"
     )
     div(v-if="schema.type==='array'")
-      .title {{schema.title}}
-      .subheading {{schema.description}}
+      .subheading {{schema.title}}
+      span {{schema.description}}
       ul
         li.d-flex(v-for="(item,index) in value" :key="index")
           schema-input(
@@ -30,19 +30,10 @@
           )
           v-btn.delete(icon @click.native='remove' tabindex='-1')
             v-icon delete
-        li.d-flex
-          schema-input(
-            ref="scratch"
-            :schema="schema.items" 
-            v-model="scratch"
-            :name="name+'-scratch'"
-            :required="required && value && value.length===0"
-            @update:valid="isValid"
-          )
-          v-btn.add(@click.native='add' tabindex='-1') save question
+      v-btn.block(@click.native='add' tabindex='-1') add question
     div(v-if="schema.type==='object'")
-      .title {{schema.title}}
-      .subheading {{schema.description}}
+      .subheading {{schema.title}}
+      span {{schema.description}}
       ul
         li(v-for="(property,index) in properties" :key="index")
           schema-input(
@@ -83,7 +74,6 @@ module.exports={
   data:function(){
     var self=this
     return {
-      scratch:"",
       valid:true,
       local:this.value,
       rules:{
@@ -101,6 +91,9 @@ module.exports={
   watch:{
     local:function(v){
       this.$emit('input',v.trim ? v.trim() : v)
+    },
+    value:function(v){
+      this.local=v
     }
   },
   computed:{
@@ -137,8 +130,7 @@ module.exports={
       this.value.splice(index,1)
     },
     add:function(){
-      this.value.push(this.scratch)
-      this.$refs.scratch.reset()
+      this.value.push(empty(this.schema))
     },
     reset:function(){
       this.local=empty(this.schema)

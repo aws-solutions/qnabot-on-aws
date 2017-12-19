@@ -5,15 +5,16 @@ module.exports={
             properties:{
                 qid:{
                     type:"string",
-                    title:"Question ID",
-                    description:"The unique ID for this question",
+                    title:"Item ID",
+                    description:"Assign a unique identifier for this item",
                     maxLength:100
                 },
                 q:{
                     title:"Questions",
-                    description:"questions to ask",
+                    description:"Enter one or more questions that a user might ask",
                     type:"array",
                     items:{
+                        title:"Question",
                         type:"string",
                         maxLength:140
                     }
@@ -21,17 +22,17 @@ module.exports={
                 a:{
                     type:"string",
                     title:"Anwser",
-                    description:"The answer or response for this question",
+                    description:"Enter the answer you want to be returned when user asks one of the above questions",
                     maxLength:8000,
                 },
                 t:{
                     type:"string",
-                    description:"The topics of this question",
+                    description:"Assign a topic to this item, to support follow up questions on the same topic.",
                     title:"Topic"
                 },
                 r:{
                     title:"Response card",
-                    description:"The media rich response card",
+                    description:"Attach images to your answer",
                     type:"object",
                     properties:{
                         title:{
@@ -57,7 +58,7 @@ module.exports={
                 },
                 l:{
                     type:"string",
-                    description:"The lambda Arn used to dynamicaly alter anwser",
+                    description:"Enter the ARN of your lambda function to dynamically create or modify answers, or to redirect to a different question.",
                     title:"Lambda Hook"
                 }
             },

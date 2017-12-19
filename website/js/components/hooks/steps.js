@@ -7,8 +7,8 @@ module.exports=[{
 Create a lambda function with a name that starts with "qna"  
 
 for example:  
-- qna-extra-special  
-- qna-secret-sauce  
+- qnaExtraSpecial  
+- qnaSecretSauce  
 ...
     `
 },{

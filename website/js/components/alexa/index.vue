@@ -57,6 +57,10 @@ var renderer=new markdown.Renderer()
 renderer.link=function(href,title,text){
   return `<a href="${href}" title="${title}" target="_blank">${text}</a>` 
 }
+renderer.table=function(header,body){
+  return `<table class="pure-table"><thead>${header}</thead><tbody>${body}</tbody></table>`
+}
+
 var handlebars=require('handlebars')
 var clipboard=require('clipboard')
 var _=require('lodash')
@@ -74,7 +78,7 @@ module.exports={
       }),
       schema:new clipboard('#IntentSchema',{
         text:function(){
-          return JSON.stringify($store.state.bot.alexa.schema)
+          return JSON.stringify(self.$store.state.bot.alexa.schema)
         }
       }),
       arn:new clipboard('#LambdaArn',{

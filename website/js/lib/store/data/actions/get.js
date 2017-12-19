@@ -55,7 +55,7 @@ module.exports={
         .tapCatch(e=>console.log('Error:',e))
         .catchThrow('Failed to get')
     },
-    get(context,opts){
+    get(context,opts={}){
         _.defaults(opts,{
             filter:context.state.filter,
             order:opts.order || 'asc',

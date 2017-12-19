@@ -92,6 +92,7 @@ function stage(name){
             "ESEndpoint":{"Ref":"ESAddress"},
             "ESIndex":{"Ref":"ESIndex"},
             "ESType": {"Ref":"ESType"},
+            "LambdaArn":{"Ref":"HandlerArn"},
             "DesignerLoginUrl":{"Fn::Join":["",[
                 {"Fn::GetAtt":["ApiUrl","Name"]},
                 "/pages/designer"

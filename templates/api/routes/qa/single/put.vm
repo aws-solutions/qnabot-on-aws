@@ -3,7 +3,7 @@
 {
     "endpoint":"$stageVariables.ESEndpoint",
     "method":"PUT",
-    "path":"/$stageVariables.ESIndex/$stageVariables.ESType/$input.params('ID')",
+    "path":"/$stageVariables.ESIndex/$stageVariables.ESType/$input.params('ID')?refresh=wait_for",
     "body":{
         #foreach($paramName in $inputRoot.keySet())
             #if( $paramName == 'q')

@@ -19,7 +19,8 @@
           .headline Update: {{data.qid}}
         v-card-text
           form
-            schema-input(
+            schema-input( 
+              v-if="dialog"
               v-model="tmp"
               :valid.sync="valid"
               :schema="schema"

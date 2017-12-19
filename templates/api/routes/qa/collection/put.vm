@@ -1,7 +1,7 @@
 {
     "endpoint":"$stageVariables.ESEndpoint",
     "method":"POST",
-    "path":"/_bulk",
+    "path":"/_bulk?refresh=wait_for",
     "body":[#foreach( $doc in $input.path('$') )
         {"index":{
             "_index":"$stageVariables.ESIndex",

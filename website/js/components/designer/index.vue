@@ -61,7 +61,10 @@
             b {{props.item.qid}}
           td.text-xs-left.title {{props.item.q[0]}}
           span.buttons
-            edit(:data.sync="props.item" @click.native.stop="")
+            edit(
+              :data.sync="props.item" 
+              @click.native.stop=""
+            )
             delete( :data="props.item" @click.native.stop="")
       template(slot="no-data")
         v-alert( :value="true" color="error" icon="warning")
@@ -151,6 +154,11 @@ module.exports={
       }else{
         this.pagination.sortBy='qid'
         this.pagination.descending=false
+        return this.$store.dispatch('data/get',{
+          page:this.pagination.page-1,
+          perpage:this.pagination.rowsPerPage,
+          order:this.pagination.descending ? 'desc' : 'asc'
+        }) 
       }
     },
     pagination:function(event){

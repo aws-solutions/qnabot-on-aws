@@ -14,7 +14,7 @@
       v-btn(slot="activator" @click='reset') Add
       v-card
         v-card-title(primary-title)
-          .headline Add new question
+          .headline {{title}}
         v-card-text
           v-form
             schema-input( 
@@ -54,6 +54,7 @@ module.exports={
   $validates:true,
   data:function(){
     return {
+      title:"Add New Item",
       error:'',
       success:'',
       dialog:false,

@@ -14,7 +14,7 @@
         }
     }
 #else
-    "path":"/$stageVariables.ESIndex/$stageVariables.ESType/_bulk",
+    "path":"/$stageVariables.ESIndex/$stageVariables.ESType/_bulk?refresh=wait_for",
     "body":[
         #foreach($qid in $input.path('$.list'))
         { "delete":{
