@@ -43,19 +43,18 @@ function create(temp,name,output){
         .tap(env=>{
             if(!env["QNA-DEV-BUCKET"]){
                 console.log("Launch dev/bucket to have scratch space for large template")
+            }else{
+                return s3.putObject({
+                    Bucket:env["QNA-DEV-BUCKET"],
+                    Key:"scratch/"+name+".json",
+                    Body:temp
+                }).promise()
+                .tap(()=>console.log(chalk.green(`uploaded to s3:${env["QNA-DEV-BUCKET"]}/scratch/${name}.json`)))
+                .then(()=>cf.validateTemplate({
+                TemplateURL:`http://s3.amazonaws.com/${env["QNA-DEV-BUCKET"]}/scratch/${name}.json`
+                }).promise())
             }
         })
-        .tap(env=>
-            s3.putObject({
-                Bucket:env["QNA-DEV-BUCKET"],
-                Key:"scratch/"+name+".json",
-                Body:temp
-            }).promise()
-        )
-        .tap(env=>console.log(chalk.green(`uploaded to s3:${env["QNA-DEV-BUCKET"]}/scratch/${name}.json`)))
-        .then(env=>cf.validateTemplate({
-            TemplateURL:`http://s3.amazonaws.com/${env["QNA-DEV-BUCKET"]}/scratch/${name}.json`
-        }).promise())
     }
 
     return val
