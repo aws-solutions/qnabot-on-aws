@@ -1,0 +1,9 @@
+{
+    "fnc":"getBot",
+    "params":{
+        "name":"$stageVariables.BotName",
+        "versionOrAlias":"\$LATEST"
+    }
+}                
+               
+

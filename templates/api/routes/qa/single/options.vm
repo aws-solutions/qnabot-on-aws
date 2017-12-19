@@ -1,0 +1,6 @@
+{
+    "endpoint":"https://$stageVariables.ESEndpoint",
+    "method":"GET",
+    "path":"/$stageVariables.ESIndex/_mapping/$stageVariables.ESType"
+}
+

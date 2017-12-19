@@ -167,26 +167,7 @@
           ]
         }
       ]
-    },
-    "Policies": [
-      {
-        "PolicyName": "ApiGatewayLogsPolicy",
-        "PolicyDocument": {
-          "Version": "2012-10-17",
-          "Statement": [
-            {
-              "Effect": "Allow",
-              "Action": [
-                "lambda:InvokeFunction"
-              ],
-              "Resource": [
-                {"Ref": "HandlerArn"}
-              ]
-            }
-          ]
-        }
-      }
-    ]
+    }
   }
 }
 }

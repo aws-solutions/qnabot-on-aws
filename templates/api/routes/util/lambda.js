@@ -18,20 +18,21 @@ module.exports=function(params){
                 "arn:aws:apigateway:",
                 {"Ref": "AWS::Region"},
                 ":lambda:path/2015-03-31/functions/",
-                {"Ref":"HandlerArn"},
+                params.lambda || {"Ref":"HandlerArn"},
                 "/invocations"
             ]]
           },
-          "IntegrationResponses": [
-            {   
+          "IntegrationResponses": _.concat({   
                 "StatusCode": params.defaultResponse || 200,
                 "ResponseParameters":params.responseParameters,
                 "ResponseTemplates":{
                     "application/json":params.responseTemplate
                 }
-            },
-            {"SelectionPattern":".*error.*","StatusCode": 404}
-          ],
+            },params.errors || {   
+                "SelectionPattern":params.errorMessage || "Error:.*",
+                "StatusCode": params.errorCode || 500
+          })
+          ,
           "RequestParameters":params.parameterNames,
           "RequestTemplates": {
             "application/json":params.template 

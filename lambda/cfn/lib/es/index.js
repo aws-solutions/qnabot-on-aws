@@ -20,7 +20,7 @@ var equal=require('deep-equal')
 var convert=function(params){
     var rep=function(el){return el.toLowerCase()}
     params.Index=rep(params.Index)
-    params.Type=rep(params.Type)
+    params.Name=rep(params.Name)
     return params
 }
 
@@ -28,8 +28,12 @@ module.exports=class clear {
     Create(params,reply){
         var param=convert(params)
          
-        create(param.Index,param.Type,param.Address)
-        .then(()=>reply(null,param.Index+'-'+param.Type,param))
+        create(
+            param.Index,
+            param.Type,
+            param.Name,
+            param.Address
+        ).then(()=>reply(null,param.Index+'-'+param.Name,param))
         .error(err=>reply(err))
         .catch(err=>reply(err))
     }
@@ -38,9 +42,9 @@ module.exports=class clear {
         if(equal(params,oldparams)){
             var param=convert(params)
             
-            rm(oldparams.Index,oldparams.Type,oldparams.Address)
+            rm(oldparams.Index,oldparams.Type,parmas.Name,oldparams.Address)
             .then(()=>create(param.Index,param.Type,params.Address))
-            .then(()=>reply(null,params.Index+'-'+params.Type,param))
+            .then(()=>reply(null,params.Index+'-'+params.Name,param))
             .error(err=>reply(err))
             .catch(err=>reply(err))
 

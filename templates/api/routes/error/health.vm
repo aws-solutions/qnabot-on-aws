@@ -1,0 +1,6 @@
+{
+    "endpoint":"$stageVariables.ESEndpoint",
+    "method":"GET",
+    "path":"/_cluster/health"
+}
+

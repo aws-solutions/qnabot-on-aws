@@ -5,7 +5,7 @@ module.exports={
     "Name": {"Ref": "AWS::StackName"},
     "Description":"An Api interface for the admin actions on the QNA bot"
   },
-  "DependsOn": ["InvokePermissionHandler"]
+  "DependsOn": ["InvokePermissionESProxy","InvokePermissionLexProxy","InvokePermissionLexBuild","InvokePermissionSchema"]
 },
 "Deployment": {
   "Type": "AWS::ApiGateway::Deployment",
@@ -17,11 +17,17 @@ module.exports={
   "DependsOn": [
     "ClientLoginResourceGet",
     "DesignerLoginResourceGet",
+    "AlexaSchema",
+    "HooksGet",
+    "HooksPut",
+    "HooksOptions",
     "QuestionsGet",
     "QuestionsPut",
     "QuestionHead",
     "QuestionPut",
+    "QuestionsOptions",
     "QuestionDelete",
+    "QuestionsDelete",
     "BotPost",
     "BotGet",
     "UtterancesGet",
@@ -83,7 +89,9 @@ function stage(name){
             "BotName":{"Ref":"Botname"},
             "SlotType":{"Ref":"SlotType"},
             "Intent":{"Ref":"Intent"},
-            "LambdaArn":{"Ref":"HandlerArn"},
+            "ESEndpoint":{"Ref":"ESAddress"},
+            "ESIndex":{"Ref":"ESIndex"},
+            "ESType": {"Ref":"ESType"},
             "DesignerLoginUrl":{"Fn::Join":["",[
                 {"Fn::GetAtt":["ApiUrl","Name"]},
                 "/pages/designer"

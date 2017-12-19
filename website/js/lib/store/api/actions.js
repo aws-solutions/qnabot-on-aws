@@ -66,8 +66,13 @@ module.exports={
             }
             return Promise.reject()
         })
+        .catch(error=>Promise.reject({
+            response:error.response.data,
+            status:error.response.status
+        }))
         .get('data')
         .tap(()=>context.commit('loading',false))
+        .tapCatch(()=>context.commit('loading',false))
     },
     botinfo(context){
         return context.dispatch('_request',{
@@ -81,6 +86,20 @@ module.exports={
             url:context.rootState.bot._links.utterances.href,
             method:'get',
             reason:"Failed to get BotInfo"
+        })
+    },
+    alexa(context){
+        return context.dispatch('_request',{
+            url:context.rootState.bot._links.alexa.href,
+            method:'get',
+            reason:"Failed to get Alexa info"
+        })
+    },
+    schema(context,body){
+        return context.dispatch('_request',{
+            url:context.rootState.info._links.questions.href,
+            method:'options',
+            reason:"Failed to get qa options"
         })
     },
     bulk(context,body){
@@ -119,7 +138,7 @@ module.exports={
         return context.dispatch('_request',{
             url:context.rootState.info._links.questions.href+'/'+payload.qid,
             method:'put',
-            body:[payload],
+            body:payload,
             reason:'failed to update'
         })
     },
@@ -128,6 +147,22 @@ module.exports={
             url:context.rootState.info._links.questions.href+'/'+qid,
             method:'delete',
             reason:'failed to delete'
+        })
+    },
+    removeBulk(context,list){
+        return context.dispatch('_request',{
+            url:context.rootState.info._links.questions.href,
+            method:'delete',
+            reason:'failed to delete',
+            body:{list:list}
+        })
+    },
+    removeQuery(context,query){
+        return context.dispatch('_request',{
+            url:context.rootState.info._links.questions.href,
+            method:'delete',
+            reason:'failed to delete',
+            body:{query:query}
         })
     },
     build(context){

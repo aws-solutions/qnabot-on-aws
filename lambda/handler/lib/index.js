@@ -12,14 +12,4 @@ License for the specific language governing permissions and limitations under th
 */
 
 exports.SEARCH=require('./search.js')
-exports.LIST=require('./list.js')
-exports.ADD=require('./add.js')
-exports.DELETE=require('./delete.js')
-exports.PING=require('./ping.js')
-exports.CHECK=require('./check.js')
-exports.EXPORT=require('./export.js')
-exports.UTTERANCES=require('./utterances.js')
-exports.BOT_STATUS=require('./bot-status.js')
-exports.SAVE=require('./save.js')
-exports.BUILD=require('./build.js')
 exports.ALEXA=require('./alexa.js')

@@ -4,10 +4,13 @@
       v-toolbar(flat)
         v-list
           v-list-tile
-            v-list-tile-title.title Pages
+            v-list-tile-title.title Tools
       v-divider
       v-list(dense three-line subheader)
-        v-list-tile(v-for="page in pages" @click="" :href="page.href") 
+        v-list-tile(v-for="(page,key) in pages" :key="key"
+          @click="" 
+          :href="page.href"
+          :target="page.target || '_self'") 
           v-list-tile-avatar
             v-icon(color="primary") {{page.icon}}
           v-list-tile-content
@@ -15,7 +18,10 @@
             v-list-tile-sub-title {{page.subTitle}}
     v-toolbar(app)
       v-toolbar-side-icon(@click.stop="drawer = !drawer")
-      v-toolbar-title Designer-UI: {{username}}
+      v-toolbar-title 
+        v-breadcrumbs
+          v-breadcrumbs-item(href='#/edit') QnABot-Designer-UI:{{$store.state.user.name}}
+          v-breadcrumbs-item {{page}}
       v-spacer
       v-toolbar-items
         v-btn(flat 
@@ -52,6 +58,9 @@ module.exports={
   }},
   components:{},
   computed:{
+    page:function(){
+      return _.get(this,'$store.state.route.name','')
+    },
     error:function(){
       return this.$store.state.error
     },
@@ -76,14 +85,25 @@ module.exports={
         icon:"info",
         href:"#/alexa"
       },{
-        title:"Import/Export",
-        subTitle:"import saved questions or download backups",
-        icon:"import_export",
-        href:"#import-export"
+        title:"Lambda Hooks",
+        subTitle:"Instructions for customizing QnABot behavior using AWS Lambda",
+        icon:"settings_input_component",
+        href:"#/hooks"
+      },{
+        title:"Import",
+        subTitle:"Import new questions",
+        icon:"cloud_upload",
+        href:"#import"
+      },{
+        title:"Export",
+        subTitle:"Download backups of your QnAs",
+        icon:"file_download",
+        href:"#export"
       },{
         title:"QnABot Client",
         subTitle:"Use QnABot to interact with your bot in the browser",
         icon:"forum",
+        target:'_blank',
         href:_.get(this,"$store.state.info._links.ClientLogin.href")
       }]
     }

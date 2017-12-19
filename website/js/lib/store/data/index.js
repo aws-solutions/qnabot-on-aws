@@ -17,26 +17,9 @@ var Vuex=require('vuex')
 module.exports={
     namespaced:true,
     state:{
-        loading:false,
         QAs:[],
-        results:[],
-        client:{},
-        loaded:0,
+        schema:{},
         filter:"",
-        mode:"questions",
-        page:{
-            current:0,
-            perpage:15,
-            total:0
-        },
-        bot:{
-            botname:"<i class='fa fa-spinner fa-pulse'></i>",
-            slotutterances:[],
-            lambdaArn:"<i class='fa fa-spinner fa-pulse'></i>",
-            lambdaName:"<i class='fa fa-spinner fa-pulse'></i>"
-        },
-        error:null,
-        selectIds:[]
     },
     mutations:require('./mutations'),
     getters:require('./getters'),

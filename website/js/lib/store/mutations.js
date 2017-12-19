@@ -25,6 +25,9 @@ module.exports={
     utterances:function(state,payload){
         state.bot.utterances=payload
     },
+    alexa:function(state,payload){
+        state.bot.alexa=payload
+    },
     setBotInfo(store,data){
         data.lambdaName=data.lambdaArn.match(/arn:aws:lambda:.*:.*:function:(.*)/)[1]
         store.bot=data

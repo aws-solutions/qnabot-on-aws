@@ -74,7 +74,7 @@ module.exports={
       }),
       schema:new clipboard('#IntentSchema',{
         text:function(){
-          return JSON.stringify(require('./schema'))
+          return JSON.stringify($store.state.bot.alexa.schema)
         }
       }),
       arn:new clipboard('#LambdaArn',{

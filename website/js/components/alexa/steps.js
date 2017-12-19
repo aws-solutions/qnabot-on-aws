@@ -7,9 +7,9 @@ Sign in or create an Amazon developer account at [Amazon Developer Console](http
     title:"Create Skill",
     text:`
 In the Amazon Developer Console 
-1. Choose <kbd>ALEXA</kbd> from the toolbar  
-1. Under <kbd>Alexa Skills Kit</kbd> Click  <kbd>Get Started</kbd> 
-1. In the upper right hand corner click <kbd>Add a New Skill</kbd>
+1. Choose ALEXA from the toolbar  
+1. Under Alexa Skills Kit Click  Get Started 
+1. In the upper right hand corner click Add a New Skill
 `},{
     title:"Skill Information",
     text:`
@@ -17,12 +17,12 @@ Create a new skill using the following information:
 
 | Name | Value |
 |------|-------|
-| Skill Type | Customer Interaction Model |
+| Skill Type | Custom Interaction Model |
 | Language | English (U.S.) |
-| Skill Name | <kbd>QnA Bot</kbd> |
-| Invocation Name | <kbd>q and a</kbd> |
+| Skill Name | QnA Bot |
+| Invocation Name | q and a |
 
-click Next
+click Save
 `},
 {
     title:"Interaction Model",
@@ -32,26 +32,11 @@ Fill in the following information:
 | Name | Value |
 |------|-------|
 | Intent Schema |  copy and paste from button below |
-| Custom Slot Type | <kbd>EXAMPLE_QUESTIONS</kbd> |
+| Custom Slot Type | EXAMPLE_QUESTIONS |
 | Utterances |  copy and paste from button below |
-| Sample Utterances | <kbd>Qna_intent {QnA_slot}</kbd> |
+| Sample Utterances | Qna_intent {QnA_slot} |
 
 click Next
-`},
-{
-    title:"Configuration",
-    text:`
-Fill in the following information:
-
-| Name | Value |
-|------|-------|
-| Service Endpoint Type |  AWS Lambda ARN (Amazon Resource Name) |
-| Endpoint | Choose <kbd>AWS Lambda ARN</kbd> |
-| Lambda Arn |  copy and paste from button below | 
-
-choose all other defaults
-
-click next
 `,
     buttons:[{
         text:"Copy Intent Schema to clipBoard",
@@ -61,9 +46,26 @@ click next
         text:"Copy utterances to clipBoad",
         id:"Utterances",
         loading:false
-    },{
-        text:"Copy Lambda-Arn to clipBoard",
-        id:"LambdaArn",
+    }]
+},
+{
+    title:"Configuration",
+    text:`
+Fill in the following information:
+
+| Name | Value |
+|------|-------|
+| Service Endpoint Type |  AWS Lambda ARN (Amazon Resource Name) |
+| Endpoint | Choose AWS Lambda ARN |
+| Lambda Arn |  copy and paste from button below | 
+
+choose all other defaults
+
+click next
+`,
+    buttons:[{
+        text:"Copy utterances to clipBoad",
+        id:"Utterances",
         loading:false
     }]
 },

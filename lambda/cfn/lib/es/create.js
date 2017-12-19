@@ -10,9 +10,10 @@ or in the "license" file accompanying this file. This file is distributed on an 
 BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied. See the
 License for the specific language governing permissions and limitations under the License.
 */
+var aws=require('aws-sdk')
+aws.config.region=process.env.AWS_REGION
 
-
-module.exports=function(index,type,address){
+module.exports=function(index,type,name,address){
     var con=(require('./con.js'))(address)
     
     return con.tap(function(es){
@@ -29,55 +30,21 @@ module.exports=function(index,type,address){
     .tap(function(es){
         return es.indices.existsType({
             index:index,
-            type:type
+            type:name
         })
         .tap(console.log)
         .tap(function(exists){ 
             var body={}
             if(!exists){
-                body[type]={
-                    properties:{
-                        qid:{type:"keyword"},
-                        q:{
-                            type:"text",
-                            analyzer:"english"
-                        },
-                        a:{
-                            type:"text",
-                            analyzer:"english"
-                        },
-                        r:{properties:{
-                            attachmentLinkUrl:{type:"keyword"},
-                            buttons:{properties:{
-                                text:{type:"text"},
-                                value:{type:"keyword"}
-                            }},
-                            imageUrl:{type:"keyword"},
-                            subTitle:{type:"text"},
-                            title:{type:"text"}
-                        }}
-                    }
-                }
                 return es.indices.putMapping({
-                    index:index,
-                    type:type,
-                    body:body
+                    index,
+                    type:name,
+                    body:JSON.parse(type)
                 })
             }
         })
+        .tapCatch(console.log)
         .tap(console.log)
     })
 }
-
-
-
-
-
-
-
-
-
-
-
-
 

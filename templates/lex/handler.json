@@ -14,7 +14,7 @@
           "S3Bucket": {"Ref":"BootstrapBucket"},
           "S3Key": {"Fn::Join":["",[
             {"Ref":"BootstrapPrefix"},
-            "/lambda/handler.zip"
+            "/lambda/fulfillment.zip"
           ]]}
         },
         "Environment": {
@@ -50,7 +50,7 @@
               "Action": [
                 "lambda:InvokeFunction"
               ],
-              "Resource": [{"Fn::GetAtt":["HandlerLambda","Arn"]}]
+              "Resource":"arn:aws:lambda:*:*:function:qna-*" 
             }]
         },
         "Roles": [{"Ref": "LambdaRole"}]

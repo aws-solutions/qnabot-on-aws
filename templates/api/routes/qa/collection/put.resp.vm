@@ -1,0 +1,15 @@
+#set($inputRoot = $input.path('$'))
+
+{
+    "errors":"$inputRoot.errors",
+    "results":[
+        #foreach( $item in $inputRoot.items)
+            {
+                #set($Idpath =  '$.items['+$foreach.index+'].index._id')
+                "qid":$input.json($Idpath),
+                "status":"$item.index.status"
+            }#if( $foreach.hasNext ),#end
+        #end
+    ]
+}
+

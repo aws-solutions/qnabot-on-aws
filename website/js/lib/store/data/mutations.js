@@ -39,14 +39,22 @@ module.exports={
         store.QAs.map(x=>x.select=value)
     },
     setFilter(store,query){
-        store.filter.query=query
+        store.filter=query
     },
     clearFilter(store){
-        store.filter.query=null
+        store.filter=null
     },
     addQA(state,qa){
         set(qa,'selected',false)
         state.QAs.unshift(qa)
+    },
+    schema(state,schema){
+        state.schema=schema
+        state.schema.properties.qid.propertyOrder=4
+        state.schema.properties.q.propertyOrder=3
+        state.schema.properties.a.propertyOrder=2
+        state.schema.properties.t.propertyOrder=1
+        state.schema.properties.r.propertyOrder=0
     },
     delQA(state,QA){
         var index=state.QAs.findIndex(qa=>qa.qid===QA.qid)

@@ -24,7 +24,10 @@ base.Resources=Object.assign(
     require('./cognito'),
     require('./cfn'),
     require('./s3'),
-    require('./var')
+    require('./var'),
+    require('./proxy-es'),
+    require('./proxy-lex'),
+    require('./lex-build')
 )
 
 module.exports=base

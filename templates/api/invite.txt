@@ -2,7 +2,7 @@
 <p>Welcome to QnABot, your temporary password is:
 <p>     {####} 
 <p>
-<p>Please go to the following like to log in and chat with the bot:
+<p>Please go to the following link to log in and chat with the bot:
 <p>     ${ApiUrl.Name}/pages/client
 <p>
 <p>Happy to help,

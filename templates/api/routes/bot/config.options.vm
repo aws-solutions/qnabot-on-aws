@@ -1,0 +1,17 @@
+{
+    "type":"object",
+    "properties":{
+        "preprocess":{
+            "title":"Preprocessing lambda",
+            "type":"string"
+        },
+        "response":{
+            "title":"Response processing lambda",
+            "type":"string"
+        },
+        "log":{
+            "title":"Logging lambda",
+            "type":"string"
+        }
+    }
+}

@@ -51,39 +51,10 @@ module.exports={
         .tapCatch(util.handle.bind(context)('Failed to Build'))
     },
     update(context,qa){
-        return api(context,'update',{
-            qid:qa.qid,
-            q:qa.q,
-            a:qa.a,
-            t:qa.t,
-            r:qa.r
-        })
+        return api(context,'update',_.omit(qa,['select','_score']))
     },
     add(context,qa){
-        return api(context,'update',{
-            qid:qa.qid,
-            q:[].concat(qa.q),
-            a:qa.a
-        })
+        return api(context,'update',qa)
         .tap(()=>context.commit('page/incrementTotal',null,{root:true}))
-    },
-    changeId(context,{qa,New}){
-        return api(context,'check',New)
-        .tap(console.log)
-        .then(val=>!val ? Promise.resolve() : Promise.reject('Id:'+New+' already exists'))
-        .then(function(){
-            var rm=qa.qid.text ? api(context,'remove',qa.qid.text) :Promise.resolve()
-            qa.qid.text=New
-            var add=api(context,'add',{
-                qid:qa.qid.text,
-                q:qa.questions.map(item=>item.text),
-                a:qa.answer.text,
-                card:JSON.parse(qa.card.text),
-                t:qa.topic.text
-            })
-            return Promise.join(rm,add)
-        })
-        .tapCatch(e=>console.log('Error:',e))
-        .catchThrow('Failed to change Id')
     }
 }

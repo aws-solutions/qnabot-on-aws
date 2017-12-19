@@ -81,7 +81,7 @@ module.exports = require('../../bin/exports')(config.region).then(function(resul
     module: {
         rules: [
           {
-            test: /\.md$/,
+            test: /\.(md|txt)$/,
             loader: 'raw-loader'
           },
           {

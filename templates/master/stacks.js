@@ -11,17 +11,18 @@ module.exports={
         "EmptyMessage":config.EmptyMessage
     }),
     "api":stack('api',{
-        "HandlerArn":get("QnABot","HandlerArn"),
         "Botname":  get("QnABot","Bot"),
         "SlotType": get("QnABot","SlotType"),
         "Intent":   get("QnABot","Intent"),
         "Username":{"Ref":"Username"},
         "Email":{"Ref":"Email"},
+        "HandlerArn":get("QnABot","HandlerArn"),
         "PublicOrPrivate":{"Ref":"PublicOrPrivate"},
         "ApprovedDomain":{"Ref":"ApprovedDomain"},
-        "Utterances":{"Fn::Join":["\n",
-            require('../../lambda/handler/lib/default-utterances')
-        ]}
+        "ESAddress":  get('domain','ESAddress'),
+        "ESDomainArn":get("domain","ESArn"),
+        "ESType":     get("domain","Type"),
+        "ESIndex":    get("domain","Index")
     }),
     "dashboard":stack('dashboard',{
         "Name":{"Ref":"AWS::StackName"},

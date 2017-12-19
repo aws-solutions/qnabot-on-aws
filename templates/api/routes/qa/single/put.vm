@@ -1,0 +1,25 @@
+#set($inputRoot = $input.path('$'))
+
+{
+    "endpoint":"$stageVariables.ESEndpoint",
+    "method":"PUT",
+    "path":"/$stageVariables.ESIndex/$stageVariables.ESType/$input.params('ID')",
+    "body":{
+        #foreach($paramName in $inputRoot.keySet())
+            #if( $paramName == 'q')
+                "questions":[
+                    #foreach( $q in $inputRoot.get($paramName))
+                        {"q":"$q"}
+                        #if($foreach.hasNext),#end
+                    #end
+                ]
+            #else
+                #set( $body =  '$.'+$paramName)
+                "$paramName" :$input.json($body) 
+            #end
+        #if($foreach.hasNext),#end
+        #end
+    }
+}
+
+

@@ -6,7 +6,8 @@ module.exports={
             "ServiceToken": { "Fn::GetAtt" : ["CFNLambda", "Arn"] },
             "Address":{"Fn::GetAtt":["ElasticsearchDomain","DomainEndpoint"]},
             "Index":"qna-index",
-            "Type":"qna"
+            "Name":"qna",
+            "Type":JSON.stringify(require('./schema'))
         }
     },
     "ElasticsearchDomain": {

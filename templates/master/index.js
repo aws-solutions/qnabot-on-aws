@@ -67,6 +67,15 @@ var base={
     "UserPoolUrl":{
         "Value":{"Fn::GetAtt":["api","Outputs.UserPoolUrl"]},
         "Description":"Where you will manage users for your QnABot."
+    },
+    "ElasticSearchEndpoint":{
+        "Value":{"Fn::GetAtt":["domain","Outputs.ESAddress"]}
+    },
+    "ElasticSearchIndex":{
+        "Value":{"Fn::GetAtt":["domain","Outputs.Type"]}
+    },
+    "ElasticSearchType":{
+        "Value":{"Fn::GetAtt":["domain","Outputs.Index"]}
     }
   },
   "Metadata" : {

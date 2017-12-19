@@ -53,9 +53,6 @@
       "Type":"String",
       "Default":"NONE"
     },
-    "HandlerArn": {
-      "Type": "String"
-    },
     "Botname":{
       "Type": "String"
     },
@@ -69,9 +66,6 @@
       "Type":"String",
       "Default":"QnA Bot"
     },
-    "Utterances":{
-      "Type": "String"
-    },
     "Username":{
         "Type":"String",
         "Default":"Admin"
@@ -84,6 +78,21 @@
     },
     "BootstrapPrefix":{
         "Type":"String"
+    },
+    "ESAddress": {
+      "Type": "String"
+    },
+    "ESDomainArn": {
+      "Type": "String"
+    },
+    "ESIndex": {
+      "Type": "String"
+    },
+    "ESType": {
+      "Type": "String"
+    },
+    "HandlerArn":{
+      "Type":"String"
     }
   },
   "Conditions":{

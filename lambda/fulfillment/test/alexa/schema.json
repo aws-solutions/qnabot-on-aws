@@ -1,0 +1,255 @@
+{
+	"$schema": "http://json-schema.org/schema#",
+	"title": "Alexa Skills Kit Response",
+	"id": "http://rajington.github.io/alexa-schemas/skills-kit/response.json",
+	"description": "The format of the response that your service returns. The service for an Alexa skill must send its response in JSON format. \nhttps://developer.amazon.com/public/solutions/alexa/alexa-skills-kit/docs/alexa-skills-kit-interface-reference#response-format",
+	"type": "object",
+	"required": [
+		"version",
+		"response"
+	],
+	"properties": {
+		"version": {
+			"title": "Version",
+			"description": "The version specifier for the request with the value defined as: \"1.0\".",
+			"type": "string",
+			"enum": [
+				"1.0"
+			]
+		},
+		"sessionAttributes": {
+			"title": "Session Attributes",
+			"description": "A map of key-value pairs. \nThe key is a string that represents the name of the attribute. Type: string. \nThe value is an object that represents the value of the attribute. Type: object.",
+			"type": "object",
+			"additionalProperties": true
+		},
+		"response": {
+			"title": "Response",
+			"description": "A response object that defines what to render to the user and whether to end the current session.",
+			"type": "object",
+			"required": [
+				"shouldEndSession"
+			],
+			"properties": {
+				"outputSpeech": {
+					"$ref": "#/definitions/OutputSpeech"
+				},
+				"card": {
+					"$ref": "#/definitions/Card"
+				},
+				"reprompt": {
+					"title": "Reprompt Speech",
+					"description": "The object containing the outputSpeech to use if a re-prompt is necessary. \nThis is used if the your service keeps the session open after sending the response, but the user does not respond with anything that maps to an intent defined in your voice interface while the audio stream is open. \nIf this is not set, the user is not re-prompted.",
+					"type": "object",
+					"required": [
+						"outputSpeech"
+					],
+					"properties": {
+						"outputSpeech": {
+							"$ref": "#/definitions/OutputSpeech"
+						}
+					}
+				},
+				"shouldEndSession": {
+					"title": "Should End Session",
+					"description": "A boolean value with true meaning that the session should end, or false if the session should remain active.",
+					"type": "boolean"
+				}
+			}
+		}
+	},
+	"definitions": {
+		"OutputSpeech": {
+			"title": "Output Speech Object",
+			"description": "This object is used for setting both the outputSpeech and the reprompt properties.",
+			"type": "object",
+			"required": [
+				"type"
+			],
+			"properties": {
+				"type": {
+					"title": "Type",
+					"description": "A string containing the type of output speech to render. Valid types are: \n\"PlainText\": Indicates that the output speech is defined as plain text. \n\"SSML\": Indicates that the output speech is text marked up with SSML.",
+					"type": "string",
+					"enum": [
+						"PlainText",
+						"SSML"
+					]
+				}
+			},
+			"oneOf": [
+				{
+					"$ref": "#/definitions/TextOutputSpeech"
+				},
+				{
+					"$ref": "#/definitions/SSMLOutputSpeech"
+				}
+			]
+		},
+		"TextOutputSpeech": {
+			"title": "Text Output Speech Object",
+			"description": "Output speech object for plain text.",
+			"type": "object",
+			"required": [
+				"type",
+				"text"
+			],
+			"properties": {
+				"type": {
+					"title": "Plain Text Type",
+					"description": "Indicates that the output speech is defined as plain text.",
+					"type": "string",
+					"enum": [
+						"PlainText"
+					]
+				},
+				"text": {
+					"title": "Plain Text Text",
+					"description": "A string containing the speech to render to the user. Use this when type is \"PlainText\"",
+					"type": "string",
+					"maxLength": 8000
+				}
+			}
+		},
+		"SSMLOutputSpeech": {
+			"title": "SSML Output Speech Object",
+			"description": "Output speech object for SSML.",
+			"type": "object",
+			"required": [
+				"type",
+				"ssml"
+			],
+			"properties": {
+				"type": {
+					"title": "SSML Text Type",
+					"description": "Indicates that the output speech is text marked up with SSML.",
+					"type": "string",
+					"enum": [
+						"SSML"
+					]
+				},
+				"ssml": {
+					"title": "SSML Text",
+					"description": "A string containing text marked up with SSML to render to the user.",
+					"type": "string",
+					"maxLength": 8000
+				}
+			}
+		},
+		"Card": {
+			"title": "Card",
+			"description": "The object containing a card to render to the Amazon Alexa App.",
+			"type": "object",
+			"required": [
+				"type"
+			],
+			"properties": {
+				"type": {
+					"title": "Card Type",
+					"description": "A string describing the type of card to render. Valid types are: \n\"Simple\": A card that contains a title and plain text content. \n\"Standard\": A card that contains a title, text content, and an image to display. \n\"LinkAccount\": a card that displays a link to an authorization URL that the user can use to link their Alexa account with a user in another system. See Linking an Alexa User with a User in Your System for details.",
+					"type": "string",
+					"enum": [
+						"Simple",
+						"Standard",
+						"LinkAccount"
+					]
+				}
+			},
+			"oneOf": [
+				{
+					"$ref": "#/definitions/SimpleCard"
+				},
+				{
+					"$ref": "#/definitions/StandardCard"
+				},
+				{
+					"$ref": "#/definitions/LinkAccountCard"
+				}
+			]
+		},
+		"SimpleCard": {
+			"title": "Simple Card",
+			"description": "A card that contains a title and plain text content.",
+			"type": "object",
+			"properties": {
+				"type": {
+					"title": "Card Type",
+					"type": "string",
+					"description": "A string describing the type of card to render.",
+					"enum": [
+						"Simple"
+					]
+				},
+				"title": {
+					"title": "Card Title",
+					"description": "A string containing the title of the card. (not applicable for cards of type LinkAccount).",
+					"type": "string"
+				},
+				"content": {
+					"title": "Card Content",
+					"description": "A string containing the contents of a Simple card (not applicable for cards of type Standard or LinkAccount).",
+					"type": "string"
+				}
+			}
+		},
+		"StandardCard": {
+			"title": "Standard Card",
+			"description": "A card that contains a title, text content, and an image to display.",
+			"type": "object",
+			"properties": {
+				"type": {
+					"title": "Card Type",
+					"type": "string",
+					"description": "A string describing the type of card to render.",
+					"enum": [
+						"Standard"
+					]
+				},
+				"title": {
+					"title": "Card Title",
+					"description": "A string containing the title of the card. (not applicable for cards of type LinkAccount).",
+					"type": "string"
+				},
+				"text": {
+					"title": "Card Text",
+					"description": "A string containing the text content for a Standard card (not applicable for cards of type Simple or LinkAccount)",
+					"type": "string"
+				},
+				"image": {
+					"title": "Card Images",
+					"description": "An image object that specifies the URLs for the image to display on a Standard card. Only applicable for Standard cards. \nYou can provide two URLs, for use on different sized screens.",
+					"type": "object",
+					"properties": {
+						"smallImageUrl": {
+							"title": "Small Image URL",
+							"description": "For use on smaller screens",
+							"type": "string",
+							"maxLength": 2000
+						},
+						"largeImageUrl": {
+							"title": "Large Image URL",
+							"description": "For use on larger screens",
+							"type": "string",
+							"maxLength": 2000
+						}
+					}
+				}
+			}
+		},
+		"LinkAccountCard": {
+			"title": "Link Account Card",
+			"description": "A card that displays a link to an authorization URL that the user can use to link their Alexa account with a user in another system. See Linking an Alexa User with a User in Your System for details.",
+			"type": "object",
+			"properties": {
+				"type": {
+					"title": "Card Type",
+					"type": "string",
+					"description": "A string describing the type of card to render.",
+					"enum": [
+						"LinkAccount"
+					]
+				}
+			}
+		}
+	}
+}

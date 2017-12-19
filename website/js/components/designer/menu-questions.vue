@@ -15,14 +15,15 @@
                 clearable 
               )
             v-flex
-              v-btn(@click='emit' class="ma-2" id="refresh") 
-                span(v-if="$store.state.data.filter.length===0") Refresh
-                span(v-if="$store.state.data.filter.length!==0") Filter
-      v-flex(text-xs-right)
-        v-spacer
-        add(class="ma-2")
-        delete(class="ma-2")
-        v-btn(:loading="building" :disabled="building" @click="build") Rebuild Bot
+              v-btn(@click='emit' class="ma-2 refresh" 
+                :disabled="$store.state.data.filter.length===0" 
+              ) 
+                span() Filter
+            v-flex
+              v-btn(@click='emit' class="ma-2 refresh" ) 
+                span Refresh
+            v-flex
+              add 
     v-dialog(v-if="error")
       v-card
         v-card-title.headling Error
@@ -89,7 +90,7 @@ module.exports={
 </script>
 
 <style lang='scss' scoped>
-  #refresh {
+  .refresh {
     flex:0; 
   }
 </style>

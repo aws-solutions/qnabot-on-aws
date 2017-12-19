@@ -1,0 +1,20 @@
+#set($inputRoot = $input.path('$'))
+#set($vars=[
+    {"name":"preprocess","value":$inputRoot.Environment.get('LAMBDA_PREPROCESS')},
+    {"name":"response","value":$inputRoot.Environment.get('LAMBDA_RESPONSE')},
+    {"name":"log","value":$inputRoot.Environment.get('LAMBDA_LOG')}
+])
+
+#if($inputRoot.Environment)
+{
+    #foreach($var in $vars)
+        #if($var.value)
+        "$var.name":"$var.value"#if( $foreach.hasNext ),#end
+        #else
+        "$var.name":""#if( $foreach.hasNext ),#end
+        #end
+    #end
+}
+#else
+{}
+#end

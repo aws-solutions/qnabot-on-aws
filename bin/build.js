@@ -8,9 +8,10 @@ var chalk=require('chalk')
 aws.config.setPromisesDependency(Promise)
 aws.config.region=require('../config').region
 var cf=new aws.CloudFormation()
+var s3=new aws.S3()
 var stringify=require("json-stringify-pretty-compact")
 var fs = require('fs');
-
+var envs=require('./exports')()
 var name=process.argv[2]
 var mainfile=__dirname+'/../templates/'+name
 var testfile=__dirname+'/../templates/'+name+'/test.js'
@@ -33,9 +34,31 @@ if (fs.existsSync(testfile)) {
 
 function create(temp,name,output){
     console.log('building '+name)
-    cf.validateTemplate({
-        TemplateBody:temp
-    }).promise()
+    if(temp.length < 51200 ){
+        var val=cf.validateTemplate({
+            TemplateBody:temp
+        }).promise()
+    }else{
+        var val=envs
+        .tap(env=>{
+            if(!env["QNA-DEV-BUCKET"]){
+                console.log("Launch dev/bucket to have scratch space for large template")
+            }
+        })
+        .tap(env=>
+            s3.putObject({
+                Bucket:env["QNA-DEV-BUCKET"],
+                Key:"scratch/"+name+".json",
+                Body:temp
+            }).promise()
+        )
+        .tap(env=>console.log(chalk.green(`uploaded to s3:${env["QNA-DEV-BUCKET"]}/scratch/${name}.json`)))
+        .then(env=>cf.validateTemplate({
+            TemplateURL:`http://s3.amazonaws.com/${env["QNA-DEV-BUCKET"]}/scratch/${name}.json`
+        }).promise())
+    }
+
+    return val
     .tap(()=>console.log(chalk.green(name+" is valid")))
     .catch(error=>console.log(chalk.red(name+" failed:"+error)))
     .tap(()=>console.log("writting to "+output+'.json'))

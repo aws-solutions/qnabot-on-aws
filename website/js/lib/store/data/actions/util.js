@@ -21,16 +21,18 @@ exports.api=function(context,name,args){
 }
 exports.parse=function(item,context){
     console.log(item)
-    item.body.score=item.score || 0
-    _.defaults(item.body,{
+    _.defaults(item,{
+        _score:0,
+        q:[],
         t:'',
         r:{
             title:"",
-            imageUrl:""
+            text:"",
+            url:""
         },
         select:false
     })
-    return item.body
+    return item
 }
 
 exports.handle=function(reason){

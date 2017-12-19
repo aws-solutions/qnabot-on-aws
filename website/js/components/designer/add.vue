@@ -11,30 +11,16 @@
           v-spacer
             v-btn(@click='cancel' flat) close
     v-dialog(persistent v-model='dialog' max-width='50%')
-      v-btn(slot="activator" block @click='reset') Add
+      v-btn(slot="activator" @click='reset') Add
       v-card
         v-card-title(primary-title)
           .headline Add new question
         v-card-text
           v-form
-            v-text-field(
-              name='qid' label='Question Id' id='qid' required v-model='data.qid'
-              v-validate="'required'"
-              :error-messages="errors.collect('qid')"
-              data-vv-name="qid",
-            )
-            v-text-field(
-              name='question',label='Question',id='q' required v-model='data.q'
-              v-validate="'required|max:140'"
-              :error-messages="errors.collect('q')"
-              data-vv-name="q",
-              :counter='140'
-            )
-            v-text-field(
-              name='answer',label='answer',id='a' required textarea v-model='data.a'
-              v-validate="'required|max:140'"
-              :error-messages="errors.collect('a')"
-              data-vv-name="a",
+            schema-input( 
+              v-model="data"
+              :valid.sync="valid"
+              :schema="schema" 
             )
           small *indicates required field
           v-subheader.error--text(v-if='error') {{error}}
@@ -62,6 +48,8 @@ var Vuex=require('vuex')
 var saveAs=require('file-saver').saveAs
 var Promise=require('bluebird')
 var _=require('lodash')
+var empty=require('./empty')
+
 module.exports={
   $validates:true,
   data:function(){
@@ -70,18 +58,16 @@ module.exports={
       success:'',
       dialog:false,
       loading:false,
-      data:{
-        qid:'',
-        q:'',
-        a:''
-      }
+      valid:false,
+      data:{}
     }
   },
   components:{
+    "schema-input":require('./input.vue')
   },
   computed:{
-    valid:function(){
-      return this.$validator.errors.items.length===0
+    schema:function(){
+      return this.$store.state.data.schema
     }
   },
   methods:{
@@ -91,13 +77,10 @@ module.exports={
       this.reset()
     },
     reset:function(){
-      console.log(this.data)
-      _.mapKeys(this.data,(v,k,obj)=>obj[k]='')
-      this.$validator.reset()
+      this.data=empty(this.schema)
     },
     add:function(){
       var self=this
-      this.$validator.validateAll()
 
       if(this.valid){
         this.loading=true
@@ -105,15 +88,17 @@ module.exports={
       
         return this.$store.dispatch('api/check',this.data.qid)
         .then(function(exists){
-          console.log(exists)
           if(exists){
             self.error='Question already exists'
             self.loading=false
             self.dialog=true
           }else{
-            return self.$store.dispatch('data/add',Object.assign({},self.data))
-            .tap(()=>self.success='Success!')
-            .map(x=>self.$store.commit('data/addQA',x))
+            return self.$store.dispatch('data/add',_.cloneDeep(self.data))
+            .then(function(){
+              self.success='Success!'
+              self.$store.commit('data/addQA',_.cloneDeep(self.data))
+              self.reset()
+            })
           }
         })
         .catch(error=>self.error=error)

@@ -21,8 +21,13 @@ module.exports={
         "Export":{
             "Name":"QNA-DEV-HANDLER-ARN"
         }
+    },
+    "ElasticSearchEndpoint":{
+        "Value":{"Fn::GetAtt":["master","Outputs.ElasticSearchEndpoint"]},
+        "Export":{
+            "Name":"QNA-DEV-MASTER-ES"
+        }
     }
-
   },
   "AWSTemplateFormatVersion": "2010-09-09",
   "Description": "Development QnABot master template"

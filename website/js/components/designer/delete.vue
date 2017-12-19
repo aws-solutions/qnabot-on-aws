@@ -3,26 +3,32 @@
     v-dialog(v-model="loading" persistent)
       v-card
         v-card-title(primary-title) Deleting 
-        v-card-text
+        v-card-text(v-if="!selectAll")
           ul
             li(v-for="qa in QAs") {{qa.qid}}
+        v-card-text
           v-subheader.error--text(v-if='error') {{error}}
           v-subheader.success--text(v-if='success') {{success}}
-          v-progress-linear(v-if='!error && !success' v-model='progress')
+          v-progress-linear(v-if='!error && !success' indeterminate)
         v-card-actions
           v-spacer
             v-btn(@click='cancel' flat) close
     v-dialog(persistent v-model='dialog' max-width='50%')
-      v-btn(slot="activator" block  :disabled="!(icon || show)" :icon="icon") 
-        span(v-if="!icon") Delete All
-        v-icon(v-if="icon") delete
+      v-btn(slot="activator" block  icon) 
+        v-icon delete
       v-card
         v-card-title(primary-title)
           .headline Delete Selection
         v-card-text
-          p Are you sure you want to delete the following:
-          ul
-            li(v-for="qa in QAs") {{qa.qid}}
+          span(v-if="!selectAll")
+            p Are you sure you want to delete the following QnAs:
+            ul
+              li(v-for="qa in QAs") {{qa.qid}}
+          span(v-if="selectAll && !filter")
+             p Are you sure you want to delete all QnAs
+          span(v-if="selectAll && filter")
+             p Are you sure you want to delete all QnAs with prefix: 
+             p {{filter}} 
         v-card-actions
           v-spacer
           v-btn(@click='cancel') Cancel
@@ -48,7 +54,7 @@ var saveAs=require('file-saver').saveAs
 var Promise=require('bluebird')
 var _=require('lodash')
 module.exports={
-  props:['data','icon'],
+  props:['data','selectAll','selected'],
   data:function(){
     return {
       error:'',
@@ -65,8 +71,8 @@ module.exports={
     QAs:function(){
       return this.data ? [this.data] : this.$store.state.data.QAs.filter(x=>x.select)
     },
-    show:function(){
-      return this.QAs.length>1
+    filter:function(){
+      return this.$store.state.data.filter
     }
   },
   methods:{
@@ -78,16 +84,29 @@ module.exports={
       var self=this
       self.loading=true
       self.dialog=false
-      self.total=self.QAs.length
-      self.progress=0
-      Promise.all(
-        this.QAs.map(x=>
-          self.$store.dispatch('data/removeQA',x)
-            .tap(()=>self.progress+=(100/self.total))
-        )
-      ) 
+      new Promise(function(res,rej){
+        if(self.selectAll){
+          return self.$store
+            .dispatch('data/removeFilter') 
+            .then(()=>self.selectAll=false)
+            .then(res).catch(rej)
+        } else { 
+          self.total=self.QAs.length
+          return new Promise(function(res,rej){
+            if(self.QAs.length===1){
+              self.$store.dispatch('data/removeQA',self.QAs[0])
+                .then(res).catch(rej)
+            }else{
+              self.$store.dispatch('data/removeQAs',self.QAs)
+                .then(res).catch(rej)
+            }
+          })
+          .then(res).catch(rej)
+        }
+      })
       .tap(()=>self.$store.commit('data/selectAll',false))
       .tap(()=>self.success='Success!')
+      .then(()=>self.loading=false) 
       .catch(error=>self.error=error)
     }
   }

@@ -21,11 +21,13 @@ module.exports={
     setTotal(store,total){
         store.total=total
     },
-    incrementTotal(store){
-        store.page++
+    incrementTotal(store,count){
+        var x= count || 1
+        store.page+=x
     },
-    decrementTotal(store){
-        store.page--
+    decrementTotal(store,count){
+        var x= count || 1
+        store.page-=x
     },
     toggleMode(store,mode){
         for(x in store.mode){

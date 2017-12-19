@@ -18,16 +18,24 @@ var util=require('./util')
 var api=util.api
 
 module.exports={
+    schema(context){
+        return api(context,'schema')
+        .then(x=>context.commit('schema',x))
+    },
     botinfo(context){
         return api(context,'botinfo')
         .then(function(data){
             context.commit('bot',data,{root:true})
         })
         .then(function(data){
-            return api(context,'utterances')
+            return Promise.join(
+                api(context,'utterances'),
+                api(context,'alexa')
+            )
         })
-        .then(function(data){
-            context.commit('utterances',data,{root:true})
+        .spread(function(utterances,alexa){
+            context.commit('utterances',utterances,{root:true})
+            context.commit('alexa',alexa,{root:true})
         })
         .tapCatch(e=>console.log('Error:',e))
         .catchThrow('Failed get BotInfo')

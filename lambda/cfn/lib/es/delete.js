@@ -12,7 +12,7 @@ License for the specific language governing permissions and limitations under th
 */
 
 
-module.exports=function(index,type,address){
+module.exports=function(index,type,name,address){
     var con=(require('./con.js'))(address)
     return con.tap(function(es){
         return es.indices.exists({

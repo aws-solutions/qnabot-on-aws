@@ -1,0 +1,10 @@
+#set($inputRoot = $input.path('$'))
+#set($Idpath =  '$._id')
+#set($Successpath =  '$._shards.successful')
+
+{
+    "result":"$inputRoot.result",
+    "id":$input.json($Idpath),
+    "success":$input.json($Successpath)
+}
+

@@ -11,71 +11,25 @@
           v-spacer
             v-btn(@click='cancel' flat) close
     v-dialog(v-model='dialog' max-width="80%")
-      v-btn(slot="activator" block icon="icon" @click="refresh") 
+      v-btn(v-if="!label" slot="activator" block icon="icon" @click="refresh") 
         v-icon edit
+      v-btn(v-if="label" slot="activator" @click="refresh") {{label}}
       v-card
         v-card-title(primary-title)
           .headline Update: {{data.qid}}
         v-card-text
           form
-            v-text-field(
-              name='qid' label='Question Id' id='qid' required v-model='tmp.qid'
-              v-validate="'required'"
-              :error-messages="errors.collect('qid')"
-              data-vv-name="qid",
+            schema-input(
+              v-model="tmp"
+              :valid.sync="valid"
+              :schema="schema"
             )
-            ul
-              li(v-for="(q,index) in tmp.q")
-                v-text-field(
-                  name='question',label='Question',id='q' 
-                  :required="tmp.q.length===1" v-model='tmp.q[index]'
-                  v-validate="'required|max:140'"
-                  :error-messages="errors.collect('q'+index)"
-                  auto-grow 
-                  :data-vv-name="q+index",
-                  :counter='140'
-                )
-                v-btn(icon @click.native="rmQ(index)" v-if="tmp.q.length>1")
-                  v-icon delete
-              li
-                v-text-field(
-                  name='question',label='Add a new question',id='q' 
-                  v-model='scratch.question'
-                  v-validate="'max:140'"
-                  :error-messages="errors.collect('q-scratch')" auto-grow 
-                  data-vv-name="q-scratch",
-                  :counter='140'
-                )
-                v-btn(@click.native="addQ" ) save question
-            v-text-field(
-              name='answer',label='answer',id='a' required textarea v-model='tmp.a'
-              v-validate="'required'"
-              :error-messages="errors.collect('a')"
-              data-vv-name="a",
-            )
-            v-text-field(
-              name='topic',label='topic',id='t' v-model='tmp.t'
-              :error-messages="errors.collect('t')"
-              data-vv-name="t",
-            )
-            .subheading ResponseCard
-            div(class="pl-3")
-              v-text-field(
-                name='card-title',label='Response Card Title',id='rt' v-model='tmp.r.title'
-                :error-messages="errors.collect('rt')"
-                data-vv-name="rt"
-              )
-              v-text-field(
-                name='card-url',label='Response Image Url',id='ru' v-model='tmp.r.imageUrl'
-                :error-messages="errors.collect('ru')"
-                data-vv-name="ru"
-              ) 
           small *indicates required field
           v-subheader.error--text(v-if='error') {{error}}
         v-card-actions
           v-spacer
           v-btn(@click='cancel') Cancel
-          v-btn(@click='update') Update
+          v-btn(@click='update' :disabled="!valid") Update
 </template>
 
 <script>
@@ -96,28 +50,28 @@ var Vuex=require('vuex')
 var saveAs=require('file-saver').saveAs
 var Promise=require('bluebird')
 var _=require('lodash')
+var empty=require('./empty')
+
 module.exports={
-  props:['data'],
+  props:['data','label'],
   data:function(){
     return {
       error:'',
       success:'',
       dialog:false,
       loading:false,
-      scratch:{
-        question:""
-      },
       opened:false,
-      tmp:{
-        qid:"",
-        q:[],
-        a:"",
-        t:"",
-        r:{}
-      }
+      valid:true,
+      tmp:{}
     }
   },
   components:{
+    "schema-input":require('./input.vue')
+  },
+  computed:{
+    schema:function(){
+      return this.$store.state.data.schema
+    }
   },
   methods:{
     cancel:function(){
@@ -126,42 +80,37 @@ module.exports={
     },
     refresh:function(){
       if(!this.opened){
-        this.tmp=_.cloneDeep(this.data)
+        this.tmp=_.merge(empty(this.schema),_.cloneDeep(this.data))
         this.opened=true
       }
     },
     update:function(){
       var self=this
-      self.loading=true
-      self.dialog=false
+      if(this.valid){
+        self.loading=true
+        self.dialog=false
 
-      return Promise.resolve((function(){
-        if(self.data.qid!==self.tmp.qid){
-          return self.$store.dispatch('api/check',self.tmp.qid)
-          .then(x=> x ? Promise.reject("Question with that ID already Exists") : null )
-          .then(()=>self.$store.dispatch('api/remove',self.data.qid))
-        }
-      })())
-      .then(function(){
-        return self.$store.dispatch('data/update',self.tmp)
-        .then(function(result){
-          Object.assign(self.data,self.tmp)
-          self.success="!success"
+        return Promise.resolve((function(){
+          if(self.data.qid!==self.tmp.qid){
+            return self.$store.dispatch('api/check',self.tmp.qid)
+            .then(x=> x ? Promise.reject("Question with that ID already Exists") : null )
+            .then(()=>self.$store.dispatch('api/remove',self.data.qid))
+          }
+        })())
+        .then(function(){
+          return self.$store.dispatch('data/update',self.tmp)
+          .then(function(result){
+            self.$emit('update:data',_.cloneDeep(self.tmp))
+            self.success="!success"
+          })
         })
-      })
-      .catch(function(error){
-          self.dialog=true
-          self.loading=false
-          self.error=error
-      })
-    },
-    rmQ:function(index){
-      console.log(index)
-      this.tmp.q.splice(index,1)
-    },
-    addQ:function(){
-      this.tmp.q.push(this.scratch.question)
-      this.scratch.question=''
+        .catch(function(error){
+            self.dialog=true
+            self.loading=false
+            console.log(error)
+            self.error=error
+        })
+      }
     }
   }
 }

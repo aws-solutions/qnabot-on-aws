@@ -26,7 +26,7 @@ module.exports={
             "Value":{"Fn::GetAtt":["EsInit","Index"]}
         },
         "Type":{
-            "Value":{"Fn::GetAtt":["EsInit","Type"]}
+            "Value":{"Fn::GetAtt":["EsInit","Name"]}
         }
     }
 }
