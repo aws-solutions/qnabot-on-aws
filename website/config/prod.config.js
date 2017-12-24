@@ -14,7 +14,7 @@ var ArchivePlugin = require('webpack-archive-plugin');
 module.exports = {
     resolve:{
         alias:{
-            vue$:'vue/dist/vue.runtime.min.js'
+            vue$:'vue/dist/vue.js'
         }
     },
     plugins:[
