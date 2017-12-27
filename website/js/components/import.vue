@@ -3,26 +3,12 @@
     v-layout(column)
       v-flex
         v-card
-          v-card-title.headline Import From Url
-          v-card-text(v-if="!dialog.url")
-            v-text-field(name="url" label="Type here to import from url" id="url" clearable v-model="url")
-          v-card-text(v-if="dialog.url")
-            p Warning, This will over write existing files
-          v-card-actions(v-if="!dialog.url")
-            v-spacer
-            v-btn(@click="dialog.url=true") from url
-          v-card-actions(v-if="dialog.url")
-            v-spacer
-            v-btn(@click="dialog.url=false") cancel
-            v-btn(@click="Geturl") continue
-      v-flex
-        v-card
           v-card-title.headline Import From File
           v-card-text(v-if="dialog.file")
-            p Warning, This will over write existing files
+            p Warning, This will over write existing QnAs 
           v-card-actions(v-if="!dialog.file")
             v-spacer
-            v-btn(@click="dialog.file=true") from file
+            v-btn(@click="dialog.file=true") choose file
           v-card-actions(v-if="dialog.file")
             v-spacer
             input(
@@ -33,6 +19,20 @@
               ref="file"
             )
             v-btn(@click="dialog.file=false") cancel
+      v-flex
+        v-card
+          v-card-title.headline Import From Url
+          v-card-text(v-if="!dialog.url")
+            v-text-field(name="url" label="Type here to import from url" id="url" clearable v-model="url")
+          v-card-text(v-if="dialog.url")
+            p Warning, This will over write existing QnAs
+          v-card-actions(v-if="!dialog.url")
+            v-spacer
+            v-btn(@click="dialog.url=true") from url
+          v-card-actions(v-if="dialog.url")
+            v-spacer
+            v-btn(@click="dialog.url=false") cancel
+            v-btn(@click="Geturl") continue
     v-dialog(v-model="loading" persistent)
       v-card
         v-card-title Loading

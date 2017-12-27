@@ -59,7 +59,7 @@ module.exports={
       success:'',
       filter:"",
       filename:{
-        all:'qna',
+        all:'qna.json',
         filter:"qna",
         prefix:"qna",
         tmp:""
@@ -69,7 +69,11 @@ module.exports={
   computed:{
     filtername:{
       get:function(){
-        return this.filename.prefix+'-'+this.filter
+        if(this.filter){
+          return this.filename.prefix+'-'+this.filter+'.json'
+        }else{
+          return this.filename.prefix+'.json'
+        }
       },
       set:function(val){
         this.tmp=val
@@ -94,7 +98,7 @@ module.exports={
           {type: "text/plain;charset=utf-8"}
         );
         var name=filename || 'qna'
-        return Promise.resolve(saveAs(blob,name+'.json'))
+        return Promise.resolve(saveAs(blob,name))
       })
       .then(()=>self.loading=false)
       .catch(err=>this.error=err)
