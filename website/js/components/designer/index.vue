@@ -47,7 +47,7 @@
             @click="header.sortable ? changeSort(header.value) : null") 
               v-icon(v-if="tab==='questions' && header.sortable") arrow_upward
               span {{header.text}}
-          span.buttons
+          th.d-flex.pa-0
             span(v-if="selectAll | selectedMultiple")
               delete(:selectAll="selectAll" :selected="selected")
       template(slot='items' slot-scope='props')
@@ -60,7 +60,7 @@
           td.text-xs-left.shrink.title 
             b {{props.item.qid}}
           td.text-xs-left.title {{props.item.q[0]}}
-          span.buttons
+          td.d-flex.pa-0.pr-1
             edit(
               :data.sync="props.item" 
               @click.native.stop=""
