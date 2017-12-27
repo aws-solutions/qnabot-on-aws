@@ -59,6 +59,7 @@ module.exports={
       success:'',
       filter:"",
       filename:{
+        all:'qna',
         filter:"qna",
         prefix:"qna",
         tmp:""
@@ -82,12 +83,14 @@ module.exports={
       var self=this
       this.loading=true
       this.$store.dispatch('api/list',{
-        perpage:'all',
+        perpage:'1000',
         filter:this.filter
       })
       .then(function(result){
         var blob = new Blob(
-          [JSON.stringify({qna:result.qa},null,3)], 
+          [JSON.stringify({
+            qna:result.qa.map(x=>_.pickBy(_.omit(x,['_score'])))
+          },null,3)], 
           {type: "text/plain;charset=utf-8"}
         );
         var name=filename || 'qna'
