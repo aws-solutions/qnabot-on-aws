@@ -107,6 +107,6 @@ function Respond(message){
 }
 
 function isCard(card){
-    return card.title && card.text && card.url
+    return card.send
 }
 

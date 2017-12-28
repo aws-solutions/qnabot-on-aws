@@ -17,7 +17,6 @@ var _=require('lodash')
 
 module.exports=function(params){
     var es=con(params.address)
-
     return es.search({
         index: params.index,
         type: params.type,
@@ -28,8 +27,7 @@ module.exports=function(params){
     })
     .then(function(results){
         var scroll_id=results._scroll_id
-        var results=results.hits.hits
-
+        var out=results.hits.hits
         return new Promise(function(resolve,reject){
             var next=function(){
                 es.scroll({
@@ -38,8 +36,8 @@ module.exports=function(params){
                 })
                 .then(function(scroll_results){
                     var hits=scroll_results.hits.hits
-                    hits.forEach(x=>results.push(x))
-                    hits.length ? next() : resolve(results)
+                    hits.forEach(x=>out.push(x))
+                    hits.length ? next() : resolve(out)
                 })
                 .catch(reject)
             }
@@ -47,7 +45,9 @@ module.exports=function(params){
         })
     })
     .then(function(result){
-        return _.compact(_.uniq(_.flatten(result.map(qa=>qa._source.q))))
+        return _.compact(_.uniq(_.flatten(result
+            .map(qa=>qa._source.questions.map(y=>y.q))
+        )))
     })
 }
 

@@ -19,10 +19,13 @@ var _=require('lodash')
 var run=require('./run')
 
 module.exports=function(utterances,slottype){
-    slottype.enumerationValues=_.uniq(_.concat(
+    console.log("utterances="+utterances)
+    slottype.enumerationValues=_.uniqBy(_.concat(
         slottype.enumerationValues,
         utterances.map(x=>{return {value:x}})
-    )).slice(0,10000)
+    ),
+    x=>x.value
+    ).slice(0,10000)
 
     delete slottype.lastUpdatedDate
     delete slottype.createdDate

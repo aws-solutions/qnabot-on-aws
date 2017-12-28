@@ -37,23 +37,30 @@ module.exports=function(params){
         name:params.botname,
         versionOrAlias:"$LATEST"
     })
-    
+    var clean_intent=null
+    var clean_slottype=null
     return Promise.join(utterances,slottype)
         .tap(x=>console.log("--------------rebuilding slot"))
         .spread(Slot)
 
         .tap(x=>console.log("--------------rebuilding Intent"))
-        .then(slot_version=>Promise.join(slot_version,intent))
+        .then(slot_version=>{
+            clean_slottype=()=>clean.intent(params.intent,slot_version)
+            return Promise.join(slot_version,intent)
+        })
         .spread(Intent)
 
         .tap(x=>console.log("--------------rebuilding Bot"))
-        .then(intent_version=>Promise.join(intent_version,bot))
+        .then(intent_version=>{
+            clean_intent=()=>clean.slot(params.slottype,version)
+            return Promise.join(intent_version,bot)
+        })
         .spread(Bot)
 
         .tap(x=>console.log("--------------deleting old"))
         .then(version=>clean.bot(params.botname,version))
-        .then(version=>clean.intent(params.intent,version))
-        .then(version=>clean.slot(params.slottype,version))
+        .then(clean_intent)
+        .then(clean_slottype)
         .tapCatch(console.log)
 }
 
