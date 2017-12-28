@@ -56,7 +56,6 @@ module.exports={
 
             return Promise.resolve(axios(signed))
         })
-        .get('data')
         .catch(x=>x.response.status===403,function(){
             console.log("UnAuth Error") 
             var login=_.get(context,"rootState.info._links.DesignerLogin.href")
@@ -67,6 +66,7 @@ module.exports={
             }
             return Promise.reject()
         })
+        .get('data')
         .catch(error=>Promise.reject({
             response:error.response.data,
             status:error.response.status

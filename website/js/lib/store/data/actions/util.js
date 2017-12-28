@@ -20,7 +20,6 @@ exports.api=function(context,name,args){
     return context.dispatch('api/'+name,args,{root:true})
 }
 exports.parse=function(item,context){
-    console.log(item)
     _.defaults(item,{
         _score:0,
         q:[],

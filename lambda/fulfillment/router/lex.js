@@ -31,10 +31,16 @@ exports.assemble=function(response){
             } : null
         })
     }
+    console.log(response.card)
+    if(isCard(response.card)){
+        out.sessionAttributes.appContext=JSON.stringify({
+            responseCard:out.dialogAction.responseCard
+        })
+    }
     console.log("Lex response:",JSON.stringify(out,null,2))
     return out
 }
 
 function isCard(card){
-    return card.title && card.text && card.url
+    return card.send 
 }

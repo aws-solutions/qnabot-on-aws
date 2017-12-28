@@ -29,7 +29,13 @@ module.exports=function(req,res){
         res.result=result.hits.hits
         res.type="PlainText"
         res.message=_.get(result,"hits.hits[0]._source.a",process.env.EMPTYMESSAGE)
-
+        var card=_.get(result,"hits.hits[0]._source.r") 
+        if(card){
+            res.card.send=true
+            res.card.title=_.get(card,'title')
+            res.card.text=_.get(card,'text')
+            res.card.url=_.get(card,'url')
+        }
         res.session.previous={
             qid:_.get(result,"hits.hits[0]._source.qid"),
             a:_.get(result,"hits.hits[0]._source.a"),

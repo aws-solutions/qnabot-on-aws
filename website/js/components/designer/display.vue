@@ -18,11 +18,11 @@
     span(v-if="schema.type==='object' && !empty")
       v-container.fluid
         v-layout(:row="row" :column="column")
-          v-flex(v-for="(property,key) in schema.properties" 
+          .title {{schema.title}}
+          v-flex.pl-3(v-for="(property,key) in schema.properties" 
             style="flex:1;"
             :key="key" 
             v-if="value[key]")
-            .title {{schema.title}}
             display(  
               :name="key"
               column
