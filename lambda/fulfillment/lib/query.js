@@ -30,7 +30,7 @@ module.exports=function(req,res){
         res.type="PlainText"
         res.message=_.get(result,"hits.hits[0]._source.a",process.env.EMPTYMESSAGE)
         var card=_.get(result,"hits.hits[0]._source.r") 
-        if(card){
+        if(_.get(card,'title')){
             res.card.send=true
             res.card.title=_.get(card,'title')
             res.card.text=_.get(card,'text')

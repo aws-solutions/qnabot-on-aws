@@ -36,6 +36,8 @@ exports.assemble=function(response){
         out.sessionAttributes.appContext=JSON.stringify({
             responseCard:out.dialogAction.responseCard
         })
+    }else{
+        delete out.sessionAttributes.appContext
     }
     console.log("Lex response:",JSON.stringify(out,null,2))
     return out
