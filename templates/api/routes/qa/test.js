@@ -6,11 +6,11 @@ var input=require('../util/temp-test').input
 module.exports={
     single:{
         head:{
-            send:test=>run("single/head",static(),test),
-            resp:test=>run("single/head.resp",static(),test)
+            send:test=>run(__dirname+'/'+"single/head",static(),test),
+            resp:test=>run(__dirname+'/'+"single/head.resp",static(),test)
         },
         delete:{
-            send:test=>run("single/delete",static(),test),
+            send:test=>run(__dirname+'/'+"single/delete",static(),test),
             resp:function(test){
                 var body={
                     "_shards":{
@@ -19,7 +19,7 @@ module.exports={
                     "_id":2,
                     result:"delete"
                 }
-                run("single/delete.resp",input(body),test)
+                run(__dirname+'/'+"single/delete.resp",input(body),test)
             }
         },
         put:{
@@ -31,7 +31,7 @@ module.exports={
                         title:""
                     }
                 }
-                run("single/put",input(body),test)
+                run(__dirname+'/'+"single/put",input(body),test)
             },
             resp:function(test){
                 var body={
@@ -41,26 +41,26 @@ module.exports={
                     "_id":2,
                     result:"created"
                 }
-                run("single/put.resp",input(body),test)
+                run(__dirname+'/'+"single/put.resp",input(body),test)
             }
         }
     },
     collection:{
         options:{
             send:function(test){
-                run("single/options",input({}),test)
+                run(__dirname+'/'+"single/options",input({}),test)
             }
         },
         delete:{
             sendQuery:function(test){
                 var body={query:".*"}
-                run("collection/delete",input(body),test)
+                run(__dirname+'/'+"collection/delete",input(body),test)
             },
             sendList:function(test){
                 var body={list:["ad","Ad"]}
-                run("collection/delete",input(body),test)
+                run(__dirname+'/'+"collection/delete",input(body),test)
             },
-            resp:test=>run("collection/delete.resp",input({
+            resp:test=>run(__dirname+'/'+"collection/delete.resp",input({
                 deleted:100
             }),test),
         },
@@ -81,14 +81,14 @@ module.exports={
                         }
                     }]
                 }
-                run("collection/put.resp",input(body),test)
+                run(__dirname+'/'+"collection/put.resp",input(body),test)
             },
             send:function(test){
                 var body=[{qid:3,a:1},{qid:2,a:2}]
-                run("collection/put",input(body),test)
+                run(__dirname+'/'+"collection/put",input(body),test)
             }
         },
-        get:test=>run("single/get",{
+        get:test=>run(__dirname+'/'+"single/get",{
             input:{
                 body:'{}',
                 params:name=>{return {
@@ -99,7 +99,7 @@ module.exports={
                 }[name]}
             }
         },test),
-        list:test=>run("single/get",{
+        list:test=>run(__dirname+'/'+"single/get",{
             input:{
                 body:'{}',
                 params:name=>{return {
@@ -110,7 +110,7 @@ module.exports={
                 }[name]}
             }
         },test),
-        search:test=>run("single/get",{
+        search:test=>run(__dirname+'/'+"single/get",{
             input:{
                 body:'{}',
                 params:name=>{return {
@@ -149,9 +149,9 @@ module.exports={
                     }]
                 }
             }
-            run("single/get.resp",input(body),test)
+            run(__dirname+'/'+"single/get.resp",input(body),test)
         },
-        import:test=>run("single/put",{
+        import:test=>run(__dirname+'/'+"single/put",{
             input:{
                 body:'{}',
                 json:()=>'{}',

@@ -6,7 +6,7 @@ var run=require('../util/temp-test').run
 var input=require('../util/temp-test').input
 
 module.exports={
-    info:test=>run("info",{},test),
+    info:test=>run(__dirname+'/'+"info",{},test),
 }
 
 

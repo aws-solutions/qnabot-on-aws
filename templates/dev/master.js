@@ -22,10 +22,28 @@ module.exports={
             "Name":"QNA-DEV-HANDLER-ARN"
         }
     },
+    "BotName":{
+        "Value":{"Fn::GetAtt":["master","Outputs.BotName"]},
+        "Export":{
+            "Name":"QNA-DEV-BOT-NAME"
+        }
+    },
+    "BotAlias":{
+        "Value":{"Fn::GetAtt":["master","Outputs.BotAlias"]},
+        "Export":{
+            "Name":"QNA-DEV-BOT-ALIAS"
+        }
+    },
     "ElasticSearchEndpoint":{
         "Value":{"Fn::GetAtt":["master","Outputs.ElasticSearchEndpoint"]},
         "Export":{
             "Name":"QNA-DEV-MASTER-ES"
+        }
+    },
+    "ApiEndpoint":{
+        "Value":{"Fn::GetAtt":["master","Outputs.ApiEndpoint"]},
+        "Export":{
+            "Name":"QNA-DEV-MASTER-API"
         }
     }
   },

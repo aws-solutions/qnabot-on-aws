@@ -15,6 +15,9 @@
     "Bucket":{
       "Value":{"Ref":"Bucket"}
     },
+    "Endpoint":{
+      "Value":{"Fn::GetAtt":["ApiUrl","Name"]}
+    },
     "DesignerLogin": {
       "Value":{"Fn::Join":["",[
         {"Fn::GetAtt":["ApiUrl","Name"]},

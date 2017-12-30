@@ -3,7 +3,7 @@ exports.parse=function(event){
     var out={
         _type:"ALEXA",
         original:event,
-        session:_.get(event,'session.attributes',{}),
+        session:_.get(event,'session.attributes',{}) || {},
         channel:null,
     }
 

@@ -47,6 +47,9 @@ var base={
     "BotName":{
         "Value":{"Fn::GetAtt":["QnABot","Outputs.Bot"]}
     },
+    "BotAlias":{
+        "Value":{"Fn::GetAtt":["QnABot","Outputs.BotAlias"]}
+    },
     "IntentName":{
         "Value":{"Fn::GetAtt":["QnABot","Outputs.Intent"]}
     },
@@ -70,6 +73,9 @@ var base={
     },
     "ElasticSearchEndpoint":{
         "Value":{"Fn::GetAtt":["domain","Outputs.ESAddress"]}
+    },
+    "ApiEndpoint":{
+        "Value":{"Fn::GetAtt":["api","Outputs.Endpoint"]}
     },
     "ElasticSearchIndex":{
         "Value":{"Fn::GetAtt":["domain","Outputs.Type"]}

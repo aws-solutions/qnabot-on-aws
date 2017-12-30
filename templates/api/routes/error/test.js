@@ -6,9 +6,8 @@ var run=require('../util/temp-test').run
 var input=require('../util/temp-test').input
 
 module.exports={
-    health:{
-        get:test=>run("health",{},test),
-        resp:test=>run("health.resp",{},test),
+    error:{
+        get:test=>run(__dirname+'/'+"error",{},test),
     }
 }
 

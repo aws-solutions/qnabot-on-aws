@@ -50,7 +50,10 @@
               "Action": [
                 "lambda:InvokeFunction"
               ],
-              "Resource":"arn:aws:lambda:*:*:function:qna-*" 
+              "Resource":[
+                "arn:aws:lambda:*:*:function:qna-*",
+                "arn:aws:lambda:*:*:function:QNA-*"
+              ]
             }]
         },
         "Roles": [{"Ref": "LambdaRole"}]

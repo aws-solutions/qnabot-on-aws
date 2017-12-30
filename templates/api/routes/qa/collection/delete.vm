@@ -2,7 +2,7 @@
     "endpoint":"$stageVariables.ESEndpoint",
     "method":"POST",
 #if($input.path('$.query').length()!=0)
-    "path":"/$stageVariables.ESIndex/$stageVariables.ESType/_delete_by_query",
+    "path":"/$stageVariables.ESIndex/$stageVariables.ESType/_delete_by_query?refresh=wait_for",
     "body":{
         "query":{
             "bool":{

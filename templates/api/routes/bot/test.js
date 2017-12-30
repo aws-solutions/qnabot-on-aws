@@ -6,9 +6,9 @@ var run=require('../util/temp-test').run
 var input=require('../util/temp-test').input
 
 module.exports={
-    alexa:test=>run("alexa",{},test),
-    get:test=>run("get",{},test),
-    getresp:test=>run("get.resp",input({
+    alexa:test=>run(__dirname+"/alexa",{},test),
+    get:test=>run(__dirname+"/get",{},test),
+    getresp:test=>run(__dirname+'/'+"get.resp",input({
         status:'BUILDING',
         abortStatement:{
             messages:[
@@ -23,27 +23,27 @@ module.exports={
             ]
         }
     }),test),
-    post:test=>run("post",{},test),
-    resp:test=>run("post.resp",{},test),
+    post:test=>run(__dirname+'/'+"post",{},test),
+    resp:test=>run(__dirname+'/'+"post.resp",{},test),
     lambda:{
-        getEmpty:test=>run("config.get",input({
+        getEmpty:test=>run(__dirname+'/'+"config.get",input({
             "Environment":null
         }),test),
-        get:test=>run("config.get",input({
+        get:test=>run(__dirname+'/'+"config.get",input({
             "Environment":{
                 LAMBDA_PREPROCESS:"arn",
                 dontshow:""
             }
         }),test),
-        put:test=>run("config.put",input({
+        put:test=>run(__dirname+'/'+"config.put",input({
             preprocess:"ar",
             log:"ad"
         }),test),
-        options:test=>run("config.options",{},test)
+        options:test=>run(__dirname+'/'+"config.options",{},test)
     },
     utterance:{
-        get:test=>run("utterance.get",{},test),
-        resp:test=>run("utterance.get.resp",{
+        get:test=>run(__dirname+'/'+"utterance.get",{},test),
+        resp:test=>run(__dirname+'/'+"utterance.get.resp",{
             input:{path:function(){
                 return { enumerationValues:[
                     {value:"thin, or thin"},

@@ -30,11 +30,17 @@ module.exports=function(req,res){
         res.type="PlainText"
         res.message=_.get(result,"hits.hits[0]._source.a",process.env.EMPTYMESSAGE)
         var card=_.get(result,"hits.hits[0]._source.r") 
+
         if(_.get(card,'title')){
             res.card.send=true
             res.card.title=_.get(card,'title')
             res.card.text=_.get(card,'text')
             res.card.url=_.get(card,'url')
+        }
+        if(_.get(result,"hits.hits[0]._source.t")){
+            res.session.topic=_.get(result,"hits.hits[0]._source.t")
+        }else{
+            delete res.session.topic
         }
         res.session.previous={
             qid:_.get(result,"hits.hits[0]._source.qid"),

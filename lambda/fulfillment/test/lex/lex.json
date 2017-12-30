@@ -17,9 +17,6 @@
   "inputTranscript": "help",
   "invocationSource": "FulfillmentCodeHook or DialogCodeHook",
   "outputDialogMode": "Text or Voice, based on ContentType request header in runtime API request",
-  "messageVersion": "1.0",
-  "sessionAttributes": { 
-     "key1": "value1",
-     "key2": "value2"
-  }
+  "messageVersion": "1.0"
+  
 }

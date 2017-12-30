@@ -3,7 +3,7 @@ exports.parse=function(event){
     return {
         _type:"LEX",
         question:_.get(event,'inputTranscript'),
-        session:_.get(event,'sessionAttributes',{}),
+        session:_.get(event,'sessionAttributes',{}) || {},
         channel:_.get(event,"requestAttributes.'x-amz-lex:channel-type'")
     }
 }

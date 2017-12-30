@@ -4,7 +4,7 @@ var JSONPath = require('JSONPath');
 
 exports.run=function(name,context,test){
     var temp=new Velocity.Engine({
-        template:"./"+name+".vm",
+        template:name+".vm",
         debug:true
     })
     
