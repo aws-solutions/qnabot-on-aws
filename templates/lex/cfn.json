@@ -33,8 +33,7 @@
       "Properties": {
         "PolicyDocument": {
           "Version": "2012-10-17",
-          "Statement": [
-            {
+          "Statement": [{
               "Effect": "Allow",
               "Action": [
                 "lex:PutSlotType",
@@ -49,6 +48,13 @@
               "Resource": [
                 "*"
               ]
+            },{
+              "Effect": "Allow",
+              "Action": [
+                "s3:Get*",
+                "s3:Head*"
+              ],
+              "Resource":{"Fn::Sub":"arn:aws:s3:::${BootstrapBucket}*"}
             }
           ]
         }

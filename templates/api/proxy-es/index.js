@@ -8,7 +8,7 @@ module.exports={
             "ZipFile":fs.readFileSync(__dirname+'/handler.js','utf8')
         },
         "Handler": "index.handler",
-        "MemorySize": "128",
+        "MemorySize": "256",
         "Role": {"Fn::GetAtt": ["ESProxyLambdaRole","Arn"]},
         "Runtime": "nodejs6.10",
         "Timeout": 300

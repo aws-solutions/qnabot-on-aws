@@ -4,7 +4,11 @@ module.exports={
     "Bucket": {
       "Type": "AWS::S3::Bucket",
       "DeletionPolicy": "Delete",
-      "Properties": {}
+      "Properties": {
+        "VersioningConfiguration":{
+            "Status":"Enabled"
+        }
+      }
     }  
    },
    "Outputs": {

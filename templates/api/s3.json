@@ -65,10 +65,17 @@
               "Action": [
                 "s3:GetObject"
               ],
-              "Resource": [{"Fn::Join":["",[
-                    "arn:aws:s3:::",
-                    {"Ref": "Bucket"},"/*"
-                ]]}
+              "Resource": [
+                {"Fn::Sub":"arn:aws:s3:::${ImportBucket}/*"},
+                {"Fn::Sub":"arn:aws:s3:::${Bucket}/*"}
+              ]
+            },{
+              "Effect": "Allow",
+              "Action": [
+                "s3:DeleteObject"
+              ],
+              "Resource": [
+                {"Fn::Sub":"arn:aws:s3:::${ImportBucket}/*"}
               ]
             }]
         }

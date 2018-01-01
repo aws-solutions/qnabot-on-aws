@@ -13,6 +13,8 @@ exports.handler = (event, context, callback) => {
     if(event.body){
         if(Array.isArray(event.body)){
             req.body=event.body.map(JSON.stringify).join('\n')+'\n'
+        }else if(typeof event.body === "string"){
+            req.body=event.body  
         }else{
             req.body = JSON.stringify(event.body)
         }

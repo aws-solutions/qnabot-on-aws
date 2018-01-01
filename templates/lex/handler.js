@@ -1,4 +1,4 @@
-{
+module.exports={
     "Alexa":{
       "Type" : "AWS::Lambda::Permission",
       "Properties" : {
@@ -7,15 +7,22 @@
         "Principal" : "alexa-appkit.amazon.com"
       }
     },
+    "HandlerCodeVersion":{
+        "Type": "Custom::S3Version",
+        "Properties": {
+            "ServiceToken": { "Fn::GetAtt" : ["CFNLambda", "Arn"] },
+            "Bucket": {"Ref":"BootstrapBucket"},
+            "Key": {"Fn::Sub":"${BootstrapPrefix}/lambda/fulfillment.zip"},
+            "BuildDate":(new Date()).toISOString()
+        }
+    },
     "HandlerLambda": {
       "Type": "AWS::Lambda::Function",
       "Properties": {
         "Code": {
-          "S3Bucket": {"Ref":"BootstrapBucket"},
-          "S3Key": {"Fn::Join":["",[
-            {"Ref":"BootstrapPrefix"},
-            "/lambda/fulfillment.zip"
-          ]]}
+            "S3Bucket": {"Ref":"BootstrapBucket"},
+            "S3Key": {"Fn::Sub":"${BootstrapPrefix}/lambda/fulfillment.zip"},
+            "S3ObjectVersion":{"Ref":"HandlerCodeVersion"}
         },
         "Environment": {
           "Variables": {

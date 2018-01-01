@@ -21,6 +21,9 @@ module.exports={
     clear:function(test){
         lifecycle(require('./params/s3-clear'),test)
     },
+    version:function(test){
+        lifecycle(require('./params/s3-version'),test)
+    },
     unzip:function(test){
         lifecycle(require('./params/s3-unzip'),test)
     },

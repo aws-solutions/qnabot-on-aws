@@ -2,7 +2,11 @@
   "Resources": {
     "Bucket": {
       "Type": "AWS::S3::Bucket",
-      "Properties": {}
+      "Properties": {
+        "VersioningConfiguration":{
+            "Status":"Enabled"
+        }
+      }
     },
     "ReadPolicy":{
         "Type" : "AWS::S3::BucketPolicy",
@@ -46,7 +50,7 @@
       }
     },
     "Prefix": {
-      "Value": "dev",
+      "Value": "artifacts/aws-ai-qna-bot",
       "Export":{
         "Name":"QNA-BOOTSTRAP-PREFIX"
       }

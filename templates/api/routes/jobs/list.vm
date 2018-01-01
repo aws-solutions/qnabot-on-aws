@@ -1,0 +1,10 @@
+#set ( $root="https://${context.apiId}.execute-api.${stagevariables.Region}.amazonaws.com/${context.stage}")
+
+{
+    "bucket":"$stageVariables.ImportBucket",
+    "prefix":"status/",
+    "perpage":"$input.params('perpage')",
+    "token":"$input.params('token')",
+    "root":"$root"
+}
+

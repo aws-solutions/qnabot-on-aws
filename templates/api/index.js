@@ -15,6 +15,7 @@ License for the specific language governing permissions and limitations under th
 var base=require('./api.json')
 
 base.Resources=Object.assign(
+    require('./import'),
     require('./signup'),
     require('./config'),
     require('./routes'),

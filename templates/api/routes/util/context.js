@@ -12,6 +12,7 @@ module.exports={
         "ESEndpoint":"test",
         "ESIndex":"index",
         "ESType":"type",
+        "ImportBucket":"import",
         "Id":"id"
     },
     util:{

@@ -1,15 +1,23 @@
 var fs=require('fs')
 
 module.exports={
+    "LexBuildCodeVersion":{
+        "Type": "Custom::S3Version",
+        "DependsOn":["CFNLambdaPolicy"],
+        "Properties": {
+            "ServiceToken": { "Fn::GetAtt" : ["CFNLambda", "Arn"] },
+            "Bucket": {"Ref":"BootstrapBucket"},
+            "Key": {"Fn::Sub":"${BootstrapPrefix}/lambda/lex-build.zip"},
+            "BuildDate":(new Date()).toISOString()
+        }
+    },
     "LexBuildLambda": {
       "Type": "AWS::Lambda::Function",
       "Properties": {
         "Code": {
-          "S3Bucket": {"Ref":"BootstrapBucket"},
-          "S3Key": {"Fn::Join":["",[
-            {"Ref":"BootstrapPrefix"},
-            "/lambda/lex-build.zip"
-          ]]}
+            "S3Bucket": {"Ref":"BootstrapBucket"},
+            "S3Key": {"Fn::Sub":"${BootstrapPrefix}/lambda/lex-build.zip"},
+            "S3ObjectVersion":{"Ref":"LexBuildCodeVersion"}
         },
         "Handler": "index.handler",
         "MemorySize": "128",

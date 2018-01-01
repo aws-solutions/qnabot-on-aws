@@ -55,6 +55,7 @@ module.exports=class clear {
     
     Delete(ID,params,reply){
         rm(params.Index,params.Type,params.Address)
+        .catch(()=>null)
         .then(()=>reply(null,params.Index+'-'+params.Type))
         .error(err=>reply(err))
         .catch(err=>reply(err))

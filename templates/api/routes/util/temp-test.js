@@ -24,6 +24,7 @@ exports.run=function(name,context,test){
 exports.input=function(body){
         return {
             input:{
+                params:(x)=>body[x],
                 path:(x)=>{
                     return JSONPath({json:body,path:x})[0]
                 },

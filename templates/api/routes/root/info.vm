@@ -1,4 +1,4 @@
-#set ( $root="https://${context.apiId}.execute-api.${stageVariables.Region}.amazonaws.com/${context.stage}")
+#set ( $root="https://${context.apiId}.execute-api.${stagevariables.Region}.amazonaws.com/${context.stage}")
 
 {
     "region":"$stageVariables.Region",
@@ -17,6 +17,9 @@
         },
         "bot":{
             "href":"$root/bot"
+        },
+        "jobs":{
+            "href":"$root/jobs"
         },
         "DesignerLogin":{
             "href":"$stageVariables.DesignerLoginUrl"

@@ -1,0 +1,141 @@
+var Promise=require('bluebird')
+var aws=require("aws-sdk")
+aws.config.setPromisesDependency(Promise)
+aws.config.region=process.env.AWS_REGION
+
+var s3=new aws.S3()
+var lambda=new aws.Lambda()
+var stride=parseInt(process.env.STRIDE)
+
+exports.step=function(event,context,cb){
+    console.log("step")
+    console.log("Request",JSON.stringify(event,null,2))
+    var progress
+    s3.getObject({
+        Bucket:event.Records[0].s3.bucket.name,
+        Key:event.Records[0].s3.object.key
+    }).promise()
+    .then(x=>JSON.parse(x.Body.toString()))
+    .then(function(config){
+        console.log("Config:",JSON.stringify(config,null,2))
+        if(config.status==="InProgress"){
+            return s3.getObject({
+                Bucket:config.bucket,
+                Key:config.key,
+                VersionId:config.version,
+                Range:`bytes=${config.start}-${config.end}`
+            }).promise()
+            .then(function(result){
+                config.buffer+=result.Body.toString()
+                
+                var objects=config.buffer.split(/\n/)
+                try {
+                    JSON.parse(objects[objects.length-1])
+                    config.buffer=""
+                } catch(e){
+                    config.buffer=objects.pop()
+                }
+                config.count+=objects.length
+                var out=[] 
+                objects.forEach(x=>{
+                    try{
+                        var obj=JSON.parse(x)
+                        obj.questions=obj.q.map(x=>{return {q:x}})
+                        delete obj.q
+                        out.push(JSON.stringify({
+                            index:{
+                                "_index":process.env.ES_INDEX,
+                                "_type":process.env.ES_TYPE,
+                                "_id":obj.qid
+                            }
+                        }))
+                        out.push(JSON.stringify(obj))
+                    } catch(e){
+                        console.log(e,x)
+                    }
+                })
+                console.log(result.ContentRange)
+                tmp=result.ContentRange.match(/bytes (.*)-(.*)\/(.*)/)
+                progress=(parseInt(tmp[2])+1)/parseInt(tmp[3])
+
+                return out.join('\n')+'\n'
+            })
+            .then(function(result){
+                var body={
+                    endpoint:process.env.ES_ENDPOINT,
+                    method:"POST",
+                    path:"/_bulk",
+                    body:result
+                }
+                
+                return lambda.invoke({
+                    FunctionName:process.env.ES_PROXY,
+                    Payload:JSON.stringify(body)
+                }).promise()
+                .tap(console.log)
+            })
+            .then(()=>{
+                config.start+=(config.stride+1)
+                config.end+=config.stride
+                config.progress=progress
+                config.time.rounds+=1
+                
+                if(config.progress>=1){
+                    config.status="Complete"
+                    config.time.end=(new Date()).toISOString()
+                }
+            
+                console.log("EndConfig:",JSON.stringify(config,null,2))
+                return s3.putObject({
+                    Bucket:event.Records[0].s3.bucket.name,
+                    Key:event.Records[0].s3.object.key,
+                    Body:JSON.stringify(config)
+                }).promise()
+                .then(()=>cb(null))
+            })
+            .catch(error=>{
+                console.log(error)
+                config.status="Error"
+                config.message=error
+                return s3.putObject({
+                    Bucket:event.Records[0].s3.bucket.name,
+                    Key:event.Records[0].s3.object.key,
+                    Body:JSON.stringify(config)
+                }).promise()
+                .then(()=>cb(error))
+            })
+        }
+    })
+    .catch(cb)
+}
+
+exports.start=function(event,context,cb){
+    console.log("starting")
+    console.log("Request",JSON.stringify(event,null,2))
+
+    var config={
+        stride,
+        start:0,
+        end:stride,
+        buffer:"",
+        count:0,
+        progress:0,
+        time:{
+            rounds:0,
+            start:(new Date()).toISOString()
+        },
+        status:"InProgress",
+        bucket:event.Records[0].s3.bucket.name,
+        key:event.Records[0].s3.object.key,
+        version:event.Records[0].s3.object.versionId
+    }
+
+    s3.putObject({
+        Bucket:event.Records[0].s3.bucket.name,
+        Key:"status/"+event.Records[0].s3.object.key.split('/').pop(),
+        Body:JSON.stringify(config)
+    }).promise()
+    .then(x=>cb(null))
+    .catch(cb)
+}
+

@@ -13,6 +13,8 @@ var targets={
     CognitoDomain:require('./lib/CognitoDomain'),
     CognitoUrl:require('./lib/CognitoUrl'),
     S3Clear:require('./lib/S3Clear'),
+    S3Version:require('./lib/S3Version'),
+    S3Lambda:require('./lib/S3Lambda'),
     S3Unzip:require('./lib/S3Unzip'),
     Variable:require('./lib/Variable'),
     EsInit:require('./lib/es')

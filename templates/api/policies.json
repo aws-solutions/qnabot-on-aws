@@ -28,25 +28,12 @@
         {
           "Effect": "Allow",
           "Action": [
-            "s3:DeleteObject",
-            "s3:PutObject",
-            "s3:ListBucket"
+            "s3:*"
           ],
-          "Resource": {"Fn::Join":["",[
-            "arn:aws:s3:::",
-            {"Ref": "Bucket"},
-            "*"
-          ]]}
-        },
-        {
-          "Effect": "Allow",
-          "Action": [
-            "s3:GetObject"
-          ],
-          "Resource": [{"Fn::Join":["",[
-                "arn:aws:s3:::",
-                {"Ref": "BootstrapBucket"},"/*"
-            ]]}
+          "Resource":[
+            {"Fn::Sub":"arn:aws:s3:::${Bucket}*"},
+            {"Fn::Sub":"arn:aws:s3:::${BootstrapBucket}*"},
+            {"Fn::Sub":"arn:aws:s3:::${ImportBucket}*"}
           ]
         }
       ]
@@ -98,6 +85,14 @@
           ],
           "Resource": [{"Fn::Sub":
             "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${API}/*/*/*"
+            }]
+        },{
+          "Effect": "Allow",
+          "Action": [   
+            "s3:PutObject"
+          ],
+          "Resource": [{"Fn::Sub":
+            "arn:aws:s3:::${ImportBucket}/data*"
             }]
         }
       ]

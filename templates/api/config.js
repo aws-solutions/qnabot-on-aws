@@ -5,7 +5,7 @@ module.exports={
     "Name": {"Ref": "AWS::StackName"},
     "Description":"An Api interface for the admin actions on the QNA bot"
   },
-  "DependsOn": ["InvokePermissionESProxy","InvokePermissionLexProxy","InvokePermissionLexBuild","InvokePermissionSchema"]
+  "DependsOn": ["InvokePermissionESProxy","InvokePermissionLexProxy","InvokePermissionLexBuild","InvokePermissionSchema","InvokePermissionS3List", ]
 },
 "Deployment": {
   "Type": "AWS::ApiGateway::Deployment",
@@ -34,7 +34,11 @@ module.exports={
     "rootGet",
     "HealthGet",
     "ProxyAnyGet",
-    "ProxyAnyHead"
+    "ProxyAnyHead",
+    "JobsGet",
+    "importsList",
+    "importGet",
+    "importDelete"
   ]
 },
 "Stage":stage('prod'),
@@ -93,6 +97,7 @@ function stage(name){
             "ESIndex":{"Ref":"ESIndex"},
             "ESType": {"Ref":"ESType"},
             "LambdaArn":{"Ref":"HandlerArn"},
+            "ImportBucket":{"Ref":"ImportBucket"},
             "DesignerLoginUrl":{"Fn::Join":["",[
                 {"Fn::GetAtt":["ApiUrl","Name"]},
                 "/pages/designer"
