@@ -41,8 +41,7 @@
                   ],
                   "Resource": ["*"]
                 }]
-            },
-            "Roles":[{"Ref":"Role"}]
+            }
         }
     },
     "Role": {
@@ -62,7 +61,8 @@
         },
         "Path": "/",
         "ManagedPolicyArns": [
-          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
+          {"Ref":"Policy"}
         ]
       }
     }

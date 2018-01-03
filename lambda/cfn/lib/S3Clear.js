@@ -6,14 +6,17 @@ module.exports=class CognitoUser extends require('./base') {
         super()
     }
     Delete(ID,params,reply){
-        s3.listObjects({
+        s3.listObjectVersions({
             Bucket:params.Bucket,
             Prefix:params.Prefix
         }).promise()
         .log("Files")
-        .get("Contents")
+        .get("Versions")
         .then(function(files){
-            return files.map(file=>{return {Key:file.Key}  })
+            return files.map(file=>{return {
+                Key:file.Key,
+                VersionId:file.VersionId
+            }  })
         })
         .log("going to delete")
         .then(function(keys){

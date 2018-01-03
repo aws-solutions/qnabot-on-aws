@@ -55,10 +55,7 @@ module.exports={
   "Type": "AWS::ApiGateway::Account",
   "Properties": {
     "CloudWatchRoleArn": {
-      "Fn::GetAtt": [
-        "ApiGatewayCloudWatchLogsRole",
-        "Arn"
-      ]
+      "Fn::GetAtt": ["ApiGatewayCloudWatchLogsRole","Arn"]
     }
   }
 },
