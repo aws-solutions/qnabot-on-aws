@@ -26,18 +26,21 @@ fi
 make templates
 npm run stack dev/bootstrap up w
 
-npm run stack dev/api up w &&
-npm run stack dev/bucket up w &&
-npm run stack dev/cfn up w &&
-npm run stack dev/cognito up w &&
-npm run stack dev/domain up w &&
-npm run stack dev/lambda up w &&
-npm run stack dev/lex up w &&
+npm run stack dev/api up w &
+npm run stack dev/bucket up w &
+npm run stack dev/cognito up w &
+npm run stack dev/domain up w &
+npm run stack dev/lambda up w &
+npm run stack dev/lex up w &
 wait
 
 $(npm bin)/nodeunit lambda/test
 
+npm run upload
 npm run stack dev/master up w
-
+if [ $? -ne 0 ]; then
+    echo "failed to launch master stack"
+    exit 1
+fi
 $(npm bin)/nodeunit templates/api/unit 
 $(npm bin)/nodeunit website/test
