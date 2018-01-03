@@ -10,7 +10,7 @@ fi
 if $(aws s3 ls); then
     echo "aws cli configured"
 else
-    echo "configureing aws cli"
+    echo "configuring aws cli"
     role_name=$( curl -s http://169.254.169.254/latest/meta-data/iam/security-credentials/ )
     if [ -z "$role_name" ]; then
         echo "please attach role to ec2 instance"
@@ -25,6 +25,11 @@ fi
 
 make templates
 npm run stack dev/bootstrap up w
+
+if [ $? -ne 0 ]; then
+    echo "failed to create bootstrap bucket"
+    exit 1
+fi
 
 npm run stack dev/api up w &
 npm run stack dev/bucket up w &
