@@ -84,8 +84,10 @@ npm run check domain
 
 ### Lambda Functions
 Lambda functions are found in the /lambda directory. Refer to the README.md file in each directory for instructions on setting up a dev environment and testing. 
-[Handler](lambda/handler/README.md)
+[Fulfillment](lambda/fulfillment/README.md)
 [CFN](lambda/handler/README.md)
+[Lex-Build](lambda/lex-build/README.md)
+[Import](lambda/import/README.md)
 
 ### Web Interface
 The Designer UI and client UI code is in the /website directory. 

@@ -21,11 +21,7 @@
     "stack": "./bin/launch.sh",
     "upload": "make upload -j 4",
     "bootstrap": "make templates && npm run stack dev/bootstrap up",
-    "dev-up": "npm run stack dev/dev up",
-    "up": "npm run upload && npm run stack test/master up",
-    "lambda-update": "make lambda && ./bin/update-lambda.sh",
-    "admin-update": "npm run build && ./bin/update-admin.sh",
-    "test":"cd ./bin && ./test.sh"
+    "up": "npm run upload && npm run stack dev/master up"
   },
   "repository": {
     "type": "git",

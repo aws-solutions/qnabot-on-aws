@@ -8,8 +8,8 @@ build:
 
 .PHONY: lambda templates upload website
 
-config.js:
-	cp config.js.example config.js
+config.json:
+	node config.js.example > config.json
 
 lambda: $(LAMBDAS) build
 	for l in $^; do \

@@ -2,7 +2,7 @@
 This Lambda is responsible for create the customer resources in the CloudFormation templates. /lib contains the code for individual resources types which are choosen by the "ResourceType" parameter of the request. 
 
 ## Tests
-test are running using:
+test are run using:
 ```shell
 npm test
 ```

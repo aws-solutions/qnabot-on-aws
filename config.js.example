@@ -20,7 +20,7 @@ module.exports={
 }
 
 if (require.main === module) {
-    module.exports.devEmail=process.argv[2]
+    module.exports.devEmail=process.argv[2] || "user@example.com"
     module.exports.region=process.argv[3] || "us-east-1"
     console.log(JSON.stringify(module.exports,null,2))
 }

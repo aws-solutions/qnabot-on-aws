@@ -1,5 +1,5 @@
-# Handler Lambda
-This the lambda that backs ApiGateway and fulfills Lex and Alexa requests. 
+# Lex-Build Lambda
+Rebuilds AWS Lex Bot
 
 ## Tests
 test are running using:
@@ -15,7 +15,6 @@ npm unit {{test-name}}
 The Following templates are required to run the tests:
 
 1. dev/domain
-1. dev/es
 1. dev/lex
 
 launch with:

@@ -2,7 +2,7 @@
 This the lambda that backs ApiGateway and fulfills Lex and Alexa requests. 
 
 ## Tests
-test are running using:
+test are run using:
 ```shell
 npm test
 ```
