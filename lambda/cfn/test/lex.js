@@ -12,7 +12,7 @@ License for the specific language governing permissions and limitations under th
 */
 
 process.env.REGION='us-east-1'
-var lex=require('./index.js')
+var lex=require('../lib/lex')
 var Promise=require('bluebird')
 
 var run=function(type,update){

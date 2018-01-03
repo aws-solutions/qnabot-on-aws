@@ -7,42 +7,50 @@ module.exports={
   },
   "DependsOn": ["InvokePermissionESProxy","InvokePermissionLexProxy","InvokePermissionLexBuild","InvokePermissionSchema","InvokePermissionS3List", ]
 },
-"Deployment": {
-  "Type": "AWS::ApiGateway::Deployment",
-  "Properties": {
-    "RestApiId": {
-      "Ref": "API"
+"ApiCompression":{
+    "Type": "Custom::ApiCompression",
+    "Properties": {
+        "ServiceToken": { "Fn::GetAtt" : ["CFNLambda", "Arn"] },
+        "restApiId": {"Ref": "API"},
+        "value":"500000"
     }
-  },
-  "DependsOn": [
-    "ClientLoginResourceGet",
-    "DesignerLoginResourceGet",
-    "AlexaSchema",
-    "HooksGet",
-    "HooksPut",
-    "HooksOptions",
-    "QuestionsGet",
-    "QuestionsPut",
-    "QuestionHead",
-    "QuestionPut",
-    "QuestionsOptions",
-    "QuestionDelete",
-    "QuestionsDelete",
-    "BotPost",
-    "BotGet",
-    "UtterancesGet",
-    "rootGet",
-    "HealthGet",
-    "ProxyAnyGet",
-    "ProxyAnyHead",
-    "JobsGet",
-    "importsList",
-    "importGet",
-    "importDelete"
-  ]
+},
+"Deployment":{
+    "Type": "Custom::ApiDeployment",
+    "Properties": {
+        "ServiceToken": { "Fn::GetAtt" : ["CFNLambda", "Arn"] },
+        "restApiId": {"Ref": "API"},
+        "buildDate":new Date(),
+        "stage":"prod"
+    },
+    "DependsOn": [
+        "ClientLoginResourceGet",
+        "DesignerLoginResourceGet",
+        "AlexaSchema",
+        "HooksGet",
+        "HooksPut",
+        "HooksOptions",
+        "QuestionsGet",
+        "QuestionsPut",
+        "QuestionHead",
+        "QuestionPut",
+        "QuestionsOptions",
+        "QuestionDelete",
+        "QuestionsDelete",
+        "BotPost",
+        "BotGet",
+        "UtterancesGet",
+        "rootGet",
+        "HealthGet",
+        "ProxyAnyGet",
+        "ProxyAnyHead",
+        "JobsGet",
+        "importsList",
+        "importGet",
+        "importDelete"
+    ]
 },
 "Stage":stage('prod'),
-"DevStage":stage('dev'),
 "ApiGatewayAccount": {
   "Type": "AWS::ApiGateway::Account",
   "Properties": {

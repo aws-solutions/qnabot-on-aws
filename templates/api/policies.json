@@ -9,6 +9,13 @@
         {
           "Effect": "Allow",
           "Action": [   
+            "apigateway:*"
+          ],
+          "Resource": ["*"]
+        },
+        {
+          "Effect": "Allow",
+          "Action": [   
             "cognito-identity:SetIdentityPoolRoles",
             "cognito-identity:GetIdentityPoolRoles",
             "iam:PassRole"

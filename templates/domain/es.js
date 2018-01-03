@@ -29,9 +29,9 @@ module.exports={
             },
             "ElasticsearchClusterConfig": {
                "DedicatedMasterEnabled": false,
-               "InstanceCount": 1,
+               "InstanceCount": 2,
                "InstanceType": "t2.small.elasticsearch",
-               "ZoneAwarenessEnabled": "false"
+               "ZoneAwarenessEnabled": "true"
             },
             "EBSOptions": {
                "EBSEnabled": true,

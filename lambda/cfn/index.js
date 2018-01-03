@@ -17,7 +17,9 @@ var targets={
     S3Lambda:require('./lib/S3Lambda'),
     S3Unzip:require('./lib/S3Unzip'),
     Variable:require('./lib/Variable'),
-    EsInit:require('./lib/es')
+    EsInit:require('./lib/es'),
+    ApiCompression:require('./lib/ApiCompression'),
+    ApiDeployment:require('./lib/ApiDeployment')
 }
 var Lex=require('./lib/lex')
 

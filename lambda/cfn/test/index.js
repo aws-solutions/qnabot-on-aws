@@ -1,6 +1,8 @@
 var lambda=require('../bin/lambda.js')
 var mock=require('../bin/mock')
 var Promise=require('bluebird')
+var aws=require('../lib/util/aws')
+var api=new aws.APIGateway()
 var server
 module.exports={
     setUp:function(cb){
@@ -10,6 +12,43 @@ module.exports={
     tearDown:function(cb){
         server.close()
         cb()
+    },
+    api:{
+        tearDown:function(cb){
+            setTimeout(()=>cb(),2000)
+        },
+        compress:function(test){
+            lifecycle(require('./params/api.compress'),test)
+        },
+        deploy:function(test){
+            var lib=require('../lib/ApiDeployment')
+            var params=require('./params/api.deploy')
+            var tmp=Promise.promisifyAll(new lib())
+            var oldId
+            Promise.join(
+                params.create(),
+                params.update(),
+                params.delete()
+            ).spread(function(c,u,d){
+                return tmp.CreateAsync(c.ResourceProperties).delay(1000)
+                .tap(test.ok)
+                .log("Create Complete")
+                .tap(id=>oldId=id)
+                .then(id=>tmp.UpdateAsync(id,
+                    c.ResourceProperties,
+                    u.ResourceProperties
+                ).delay(1000))
+                .log("Update Complete")
+                .tap(test.ok)
+                .then(id=>tmp.DeleteAsync(oldId,u.ResourceProperties).delay(1000))
+                .log("Delete Complete")
+                .tap(test.ok)
+            })
+            .catch(test.error)
+            .finally(test.done)
+
+            
+        }
     },
     lex:require('./lex'),
     es:function(test){

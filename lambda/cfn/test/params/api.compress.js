@@ -10,12 +10,23 @@ or in the "license" file accompanying this file. This file is distributed on an 
 BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied. See the
 License for the specific language governing permissions and limitations under the License.
 */
-
+var base=require('./base')
 var Promise=require('bluebird')
-var aws=require('aws-sdk')
+var aws=require('../../lib/util/aws')
+var s3=new aws.S3()
+var cfExports=require('../../bin/exports')
 
-aws.config.setPromisesDependency(Promise)
-aws.config.region=process.env.AWS_REGION || 'us-east-1'
-aws.config.signatureVersion='v4'
+var setup=cfExports.then(function(exports){
+    return {
+        restApiId:exports["QNA-DEV-API"],
+        value:"0"
+    }
+})
 
-module.exports=aws
+exports.create=()=>params("Create")
+exports.update=()=>params("Update")
+exports.delete=()=>params("Delete")
+
+function params(stage){
+    return setup.then(param=>base("ApiCompression",stage,param))
+}

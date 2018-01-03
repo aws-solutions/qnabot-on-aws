@@ -18,3 +18,8 @@ module.exports={
     "publicPrefix":"artifacts/aws-ai-qna-bot",
     "devEmail":""
 }
+
+if (require.main === module) {
+    module.exports.devEmail=process.argv[2]
+    console.log(module.exports)
+}

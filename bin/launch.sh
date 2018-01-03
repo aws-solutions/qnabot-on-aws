@@ -4,6 +4,7 @@ export AWS_PROFILE=$(node -e "console.log(JSON.stringify(require('$__dirname'+'/
 export AWS_DEFAULT_REGION=$(node -e "console.log(JSON.stringify(require('$__dirname'+'/../config')))" | $(npm bin)/jq --raw-output ".region")
 
 STACK=$1
+WAIT=$3
 TEMP=build/templates/$STACK.json
 NAME=$(echo $1 | rev | cut -d'/' -f1 | rev)
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
@@ -19,6 +20,11 @@ up(){
         --capabilities "CAPABILITY_NAMED_IAM"   \
         --disable-rollback                      \
         --template-body file://$TEMP
+
+    if [ -n $WAIT ]; then
+        echo "Waiting for stack $STACK:$(name) to be created"
+        aws cloudformation wait stack-create-complete --stack-name $(name)
+    fi
 }
 
 update(){ 
@@ -26,7 +32,12 @@ update(){
     aws cloudformation update-stack             \
         --stack-name $(name)                    \
         --capabilities "CAPABILITY_NAMED_IAM"   \
-        --template-body file://$TEMP
+        --template-body file://$TEMP            
+     
+    if [ -n $WAIT ]; then
+        echo "Waiting fro stack $STACK:$(name) to be updated"
+        aws cloudformation wait stack-update-complete --stack-name $(name)
+    fi
 }
 
 down(){ 

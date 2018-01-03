@@ -56,8 +56,11 @@ module.exports={
 
             return Promise.resolve(axios(signed))
         })
-        .catch(x=>x.response.status===403,function(){
+        .get('data')
+        .tap(()=>context.commit('loading',false))
+        .tapCatch(x=>x.response.status===403,function(){
             console.log("UnAuth Error") 
+            context.commit('loading',false)
             var login=_.get(context,"rootState.info._links.DesignerLogin.href")
             console.log(login)
             if(login){
@@ -66,13 +69,10 @@ module.exports={
             }
             return Promise.reject()
         })
-        .get('data')
         .catch(error=>Promise.reject({
             response:error.response.data,
             status:error.response.status
         }))
-        .tap(()=>context.commit('loading',false))
-        .tapCatch(()=>context.commit('loading',false))
     },
     botinfo(context){
         return context.dispatch('_request',{
@@ -104,10 +104,17 @@ module.exports={
     },
     bulk(context,body){
         return context.dispatch('_request',{
-            url:context.rootState.info._links.questions.href,
-            method:'put',
-            body:body.qna,
-            reason:"Failed to Bulk upload"
+            url:context.rootState.info._links.jobs.href,
+            method:'get',
+            reason:"Failed to get BotInfo"
+        })
+        .then(function(results){
+            return context.dispatch('_request',{
+                url:context.rootState.info._links.questions.href,
+                method:'put',
+                body:body.qna,
+                reason:"Failed to Bulk upload"
+            })
         })
     },
     list(context,opts){
