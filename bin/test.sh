@@ -2,13 +2,17 @@
 
 cd ..
 if [ ! -f ./config.js ]; then 
-    node config.js.example john@example.com >> config.json
+    node config.js.example john@example.com > config.json
 fi
 
 if $(aws s3 ls); then
     echo "aws cli configured"
 else
+    echo "configureing aws cli"
     role_name=$( curl -s http://169.254.169.254/latest/meta-data/iam/security-credentials/ )
+    if [ -z "$role_name" ]; then
+        echo "please attach role to ec2 instance"
+    fi
     creds=$(curl -s http://169.254.169.254/latest/meta-data/iam/security-credentials/${role_name})
     profile=$(cat config.json | $(npm bin)/jq --raw-output ".profile")
     region=$(cat config.json | $(npm bin)/jq --raw-output ".region")

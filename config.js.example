@@ -21,5 +21,5 @@ module.exports={
 
 if (require.main === module) {
     module.exports.devEmail=process.argv[2]
-    console.log(module.exports)
+    console.log(JSON.stringify(module.exports,null,2))
 }
