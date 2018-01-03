@@ -30,6 +30,7 @@ if [ $? -ne 0 ]; then
     echo "failed to create bootstrap bucket"
     exit 1
 fi
+npm run upload
 
 npm run stack dev/api up w &
 npm run stack dev/bucket up w &
@@ -41,7 +42,6 @@ wait
 
 $(npm bin)/nodeunit lambda/test
 
-npm run upload
 npm run stack dev/master up w
 if [ $? -ne 0 ]; then
     echo "failed to launch master stack"
