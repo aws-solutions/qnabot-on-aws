@@ -20,10 +20,23 @@ up(){
         --stack-name $(name inc)                \
         --capabilities "CAPABILITY_NAMED_IAM"   \
         --disable-rollback                      \
-        --template-body file://$TEMP
+        --template-body file://$TEMP            \
+    | $(npm bin)/jq --raw-output ".StackId"     
 
     if [ -n "$WAIT" ]; then
         $DIR/wait.js $(name) 
+    fi
+}
+
+make-sure (){
+    EXISTS=$()
+    RESULT=$?
+    if aws cloudformation describe-stacks --stack-name $(name) > /dev/null; then
+        echo "$(name) exists"
+        exit 0
+    else 
+        echo "$(name) does not exists, creating now"
+        up
     fi
 }
 
@@ -32,7 +45,8 @@ update(){
     aws cloudformation update-stack             \
         --stack-name $(name)                    \
         --capabilities "CAPABILITY_NAMED_IAM"   \
-        --template-body file://$TEMP            
+        --template-body file://$TEMP            \
+    | $(npm bin)/jq --raw-output ".StackId"     
     
     if [ -n "$WAIT" ]; then
         $DIR/wait.js $(name) 
@@ -40,7 +54,8 @@ update(){
 }
 
 down(){ 
-    aws cloudformation delete-stack --stack-name $(name)
+    aws cloudformation delete-stack --stack-name $(name)    \
+    | $(npm bin)/jq --raw-output ".StackId"     
 }
 instructions (){
     echo "Use this command to managed stacks"
@@ -70,6 +85,9 @@ case $OP in
     "restart")
         down
         up
+        ;;
+    "make-sure")
+        make-sure
         ;;
     *)
         instructions

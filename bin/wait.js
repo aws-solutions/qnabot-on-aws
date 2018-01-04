@@ -44,9 +44,12 @@ new Promise(function(res,rej){
                 setTimeout(()=>next(),5000)
             }else{
                 spinner.fail(status)
-                rej(status)
+                process.exit(1)
             }
         })
-        .catch(error=>spinner.fail(error.message))
+        .catch(error=>{
+            spinner.fail(error.message)
+            process.exit(1)
+        })
     }
 })

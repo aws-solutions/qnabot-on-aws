@@ -20,8 +20,8 @@
     "check": "./bin/check.sh",
     "stack": "./bin/launch.sh",
     "upload": "make upload -j 4",
-    "bootstrap": "make templates && npm run stack dev/bootstrap up wait",
-    "up": "npm run upload && npm run stack dev/master up wait"
+    "bootstrap": "make templates && npm run stack dev/bootstrap up wait && npm run upload",
+    "up": "npm run stack dev/master up wait"
   },
   "repository": {
     "type": "git",

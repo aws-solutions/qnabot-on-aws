@@ -40,14 +40,9 @@ Next, use the following command to launch a CloudFormation template to create th
 npm run bootstrap
 ```
 
-After the template has launched, use the following command to build all assets and upload to the S3 bucket created in the previous step:
+Finally, use the following command to launch template to deploy the QnA bot in your AWS account. When the stack has completed you will be able to log into the Designer UI (The URL is an output of the template). A temporary password to the email in your config.json:
 ```shell
-npm run upload
-```
-
-Finally, use the following command to launch template to deploy the QnA bot in your AWS account. When the stack has completed you will be able to log into the Designer UI (The URL is an output of the template) with the password set in "templates/test/master.json":
-```shell
-npm run stack test/master up
+npm run up
 ```
 
 All script descriptions are found in /docs/scripts.md  
@@ -65,7 +60,7 @@ The CloudFormation test templates are in the templates/test folder. The current 
 
 Run a template test with:
 ```shell
-npm run stack test/{template-name}
+npm run stack test/{template-name} wait
 ```
 
 For example, if you want to test the domain template run:

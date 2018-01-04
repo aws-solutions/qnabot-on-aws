@@ -7,7 +7,7 @@ module.exports={
     head404:function(test){    
         env.then(function(envs){
         handler({
-            endpoint:envs["QNA-DEV-ES-ADDRESS"],
+            endpoint:envs["QNA-DEV-MASTER-ES"],
             method:'HEAD',
             path:"/test/test/test",
         },{},function(error,result){

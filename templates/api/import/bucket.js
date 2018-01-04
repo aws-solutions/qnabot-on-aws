@@ -13,7 +13,7 @@ module.exports={
             }
         }
     },
-    "Clear":{
+    "ImportClear":{
         "Type": "Custom::S3Clear",
         "DependsOn":["CFNLambdaPolicy"],
         "Properties": {
