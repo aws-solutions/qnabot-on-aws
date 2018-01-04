@@ -26,12 +26,15 @@ module.exports=function run(fnc,params){
             .then(res)
             .catch(function(err){
                 console.log(fnc+':'+err.code)
+                var retry = err.retryDelay || 5
+                console.log("retry in "+retry)
+
                 if(err.code==="ConflictException"){
-                    count===0 ? rej("Error") : setTimeout(()=>next(--count),500)
+                    count===0 ? rej("Error") : setTimeout(()=>next(--count),retry*1000)
                 }else if(err.code==="ResourceInUseException"){
-                    count===0 ? rej("Error") : setTimeout(()=>next(--count),500)
+                    count===0 ? rej("Error") : setTimeout(()=>next(--count),retry*1000)
                 }else if(err.code==="LimitExceededException"){
-                    setTimeout(()=>next(count),4000)
+                    setTimeout(()=>next(count),retry*1000)
                 }else{
                     rej(err.code+':'+err.message)
                 }

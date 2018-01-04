@@ -4,6 +4,7 @@ export AWS_PROFILE=$(node -e "console.log(JSON.stringify(require('$__dirname'+'/
 export AWS_DEFAULT_REGION=$(node -e "console.log(JSON.stringify(require('$__dirname'+'/../config')))" | $(npm bin)/jq --raw-output ".region")
 
 STACK=$1
+OP=$2
 WAIT=$3
 TEMP=build/templates/$STACK.json
 NAME=$(echo $1 | rev | cut -d'/' -f1 | rev)
@@ -21,9 +22,8 @@ up(){
         --disable-rollback                      \
         --template-body file://$TEMP
 
-    if [ -n $WAIT ]; then
-        echo "Waiting for stack $STACK:$(name) to be created"
-        aws cloudformation wait stack-create-complete --stack-name $(name)
+    if [ -n "$WAIT" ]; then
+        $DIR/wait.js $(name) 
     fi
 }
 
@@ -33,18 +33,31 @@ update(){
         --stack-name $(name)                    \
         --capabilities "CAPABILITY_NAMED_IAM"   \
         --template-body file://$TEMP            
-     
-    if [ -n $WAIT ]; then
-        echo "Waiting fro stack $STACK:$(name) to be updated"
-        aws cloudformation wait stack-update-complete --stack-name $(name)
+    
+    if [ -n "$WAIT" ]; then
+        $DIR/wait.js $(name) 
     fi
 }
 
 down(){ 
     aws cloudformation delete-stack --stack-name $(name)
 }
+instructions (){
+    echo "Use this command to managed stacks"
+    echo ""
+    echo "syntax:"
+    echo "  npm run stack {template} {op} {wait}"
+    echo "Where:"
+    echo "  template= path of template relative to /build/templates"
+    echo "  op= up|update|down|restart"
+    echo "  wait= optional param to wait for action to complete"
+}
 
-case $2 in 
+if [ "$STACK" == "--help" ]; then
+    instructions
+fi
+
+case $OP in 
     "update")
         update
         ;;
@@ -59,7 +72,7 @@ case $2 in
         up
         ;;
     *)
-        echo "unkown"
+        instructions
         ;;
 esac
 

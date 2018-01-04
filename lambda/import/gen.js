@@ -16,11 +16,13 @@ var s3=new aws.S3({
 var count=10000
 var data=range(0,count).map(qna).join('\n')
 
-module.exports=env.then(envs=>s3.putObject({
-    Bucket:envs["QNA-DEV-BUCKET"],
-    Key:"import/bulk-test",
-    Body:data
-}).promise())
+module.exports=function(){
+    return env.then(envs=>s3.putObject({
+        Bucket:envs["QNA-DEV-BUCKET"],
+        Key:"import/bulk-test",
+        Body:data
+    }).promise())
+}
 
 function qna(index){
     return JSON.stringify({

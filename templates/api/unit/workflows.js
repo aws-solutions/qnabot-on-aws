@@ -189,18 +189,18 @@ module.exports={
         }).promise())
         .tap(function(info){
             return new Promise(function(res,rej){
-                function next(count){
-                    console.log("tries left:"+count)
-                    if(count>0){
+                function next(i){
+                    console.log("tries left:"+i)
+                    if(i>0){
                         api({
                             path:"jobs/imports",
                             method:"GET"
                         })
                         .tap(x=>console.log(JSON.stringify(x,null,2)))
                         .then(x=>x.jobs.map(y=>y.id).includes(name) ? 
-                            setTimeout(()=>next(--count),2000) : res(x) )
+                            setTimeout(()=>next(--i),2000) : res(x) )
                         .catch(x=>x.statusCode===404,
-                            ()=>setTimeout(()=>next(--count),2000))
+                            ()=>setTimeout(()=>next(--i),2000))
                         .catch(rej)
                     }else{
                         rej("timeout")
@@ -211,18 +211,19 @@ module.exports={
         })
         .then(function(info){
             return new Promise(function(res,rej){
-                function next(count){
-                    console.log("tries left:"+count)
-                    if(count>0){
+                function next(i){
+                    console.log("tries left:"+i)
+                    if(i>0){
                         api({
                             path:"jobs/imports/"+name,
                             method:"GET"
                         })
                         .tap(x=>console.log(JSON.stringify(x,null,2)))
+                        .tapCatch(console.log)
                         .then(x=>x.status==="InProgress" ? 
-                            setTimeout(()=>next(--count),2000) : res(x) )
-                        .catch(x=>x.statusCode===404,
-                            ()=>setTimeout(()=>next(--count),2000))
+                            setTimeout(()=>next(--i),2000) : res(x) )
+                        .catch(x=>x.response.status===404,
+                            ()=>setTimeout(()=>next(--i),2000))
                         .catch(rej)
                     }else{
                         rej("timeout")
@@ -232,7 +233,10 @@ module.exports={
             })
         })
         .tap(console.log)
-        .then(x=>test.equal(x.status,"Complete"))
+        .tap(x=>{
+            test.equal(x.status,"Complete")
+            test.equal(x.count,count)
+        })
         .then(()=>api({
             path:"jobs/imports/"+name,
             method:"DELETE"

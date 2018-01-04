@@ -14,6 +14,7 @@ var aws=require('aws-sdk')
 aws.config.region=process.env.AWS_REGION
 
 module.exports=function(index,type,name,address){
+    console.log(address)
     var con=(require('./con.js'))(address)
     
     return con.tap(function(es){

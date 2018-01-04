@@ -6,15 +6,20 @@ aws.config.region=process.env.AWS_REGION
 var s3=new aws.S3()
 var lambda=new aws.Lambda()
 var stride=parseInt(process.env.STRIDE)
+var _=require('lodash')
 
 exports.step=function(event,context,cb){
     console.log("step")
     console.log("Request",JSON.stringify(event,null,2))
     var progress
-    s3.getObject({
+    s3.waitFor('objectExists',{
         Bucket:event.Records[0].s3.bucket.name,
         Key:event.Records[0].s3.object.key
     }).promise()
+    .then(()=>s3.getObject({
+        Bucket:event.Records[0].s3.bucket.name,
+        Key:event.Records[0].s3.object.key
+    }).promise())
     .then(x=>JSON.parse(x.Body.toString()))
     .then(function(config){
         console.log("Config:",JSON.stringify(config,null,2))
@@ -35,9 +40,8 @@ exports.step=function(event,context,cb){
                 } catch(e){
                     config.buffer=objects.pop()
                 }
-                config.count+=objects.length
                 var out=[] 
-                objects.forEach(x=>{
+                objects.filter(x=>x).forEach(x=>{
                     try{
                         var obj=JSON.parse(x)
                         obj.questions=obj.q.map(x=>{return {q:x}})
@@ -49,9 +53,11 @@ exports.step=function(event,context,cb){
                                 "_id":obj.qid
                             }
                         }))
+                        config.count+=1
                         out.push(JSON.stringify(obj))
                     } catch(e){
-                        console.log(e,x)
+                        config.failed+=1
+                        console.log("Failed to Parse:",e,x)
                     }
                 })
                 console.log(result.ContentRange)
@@ -73,10 +79,13 @@ exports.step=function(event,context,cb){
                     Payload:JSON.stringify(body)
                 }).promise()
                 .tap(console.log)
+                .then(x=>{
+                    config.EsErrors.push(JSON.parse(_.get(x,"Payload","{}")).errors)
+                })
             })
             .then(()=>{
-                config.start+=(config.stride+1)
-                config.end+=config.stride
+                config.start=(config.end+1)
+                config.end=config.start+config.stride
                 config.progress=progress
                 config.time.rounds+=1
                 
@@ -91,12 +100,12 @@ exports.step=function(event,context,cb){
                     Key:event.Records[0].s3.object.key,
                     Body:JSON.stringify(config)
                 }).promise()
-                .then(()=>cb(null))
+                .then(result=>cb(null))
             })
             .catch(error=>{
                 console.log(error)
                 config.status="Error"
-                config.message=error
+                config.message=JSON.stringify(error)
                 return s3.putObject({
                     Bucket:event.Records[0].s3.bucket.name,
                     Key:event.Records[0].s3.object.key,
@@ -119,7 +128,9 @@ exports.start=function(event,context,cb){
         end:stride,
         buffer:"",
         count:0,
+        failed:0,
         progress:0,
+        EsErrors:[],
         time:{
             rounds:0,
             start:(new Date()).toISOString()

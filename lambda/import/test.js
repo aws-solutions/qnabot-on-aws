@@ -14,7 +14,7 @@ var gen=require('./gen')
 
 module.exports={
     test:function(test){
-        gen.then(()=>env.tap(envs=>handler.startAsync({
+        gen().then(()=>env.tap(envs=>handler.startAsync({
             Records:[{
                 s3:{
                     object:{key:"import/bulk-test"},
@@ -22,11 +22,13 @@ module.exports={
                 }
             }]
         },null)))
+        .delay(1000)
         .tap(envs=>{
             process.env.ES_PROXY=envs["QNA-DEV-LAMBDA"]
             process.env.ES_TYPE="qna"
             process.env.ES_INDEX="qna"
         })
+        .delay(1000)
         .tap(envs=>handler.stepAsync({
             Records:[{
                 s3:{

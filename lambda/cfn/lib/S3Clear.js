@@ -10,7 +10,7 @@ module.exports=class CognitoUser extends require('./base') {
             Bucket:params.Bucket,
             Prefix:params.Prefix
         }).promise()
-        .log("Files")
+        .tap(x=>console.log("Files",x))
         .get("Versions")
         .then(function(files){
             return files.map(file=>{return {
@@ -18,7 +18,7 @@ module.exports=class CognitoUser extends require('./base') {
                 VersionId:file.VersionId
             }  })
         })
-        .log("going to delete")
+        .tap(x=>console.log("going to delete",x))
         .then(function(keys){
             if(keys.length>0){ 
                 return s3.deleteObjects({

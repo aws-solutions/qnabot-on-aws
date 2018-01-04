@@ -20,8 +20,8 @@
     "check": "./bin/check.sh",
     "stack": "./bin/launch.sh",
     "upload": "make upload -j 4",
-    "bootstrap": "make templates && npm run stack dev/bootstrap up",
-    "up": "npm run upload && npm run stack dev/master up"
+    "bootstrap": "make templates && npm run stack dev/bootstrap up wait",
+    "up": "npm run upload && npm run stack dev/master up wait"
   },
   "repository": {
     "type": "git",
@@ -93,6 +93,7 @@
     "node-sass": "^4.5.3",
     "nodeunit": "^0.11.1",
     "optimist": "^0.6.1",
+    "ora": "^1.3.0",
     "progress-bar-webpack-plugin": "^1.10.0",
     "pug": "^2.0.0-rc.4",
     "pug-loader": "^2.3.0",

@@ -120,7 +120,13 @@ function proxy(opts){
                 },
                 opts.responseParameters)
             },{
-                "StatusCode":404
+                "StatusCode":404,
+                "ResponseTemplates":{
+                    "application/xml":JSON.stringify({
+                        error:"Job not found"
+                    })
+                },
+                "SelectionPattern":"403"
             }
           ]
         },

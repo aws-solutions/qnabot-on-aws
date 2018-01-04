@@ -59,9 +59,9 @@ var run=function(fnc,params){
             .catch(function(err){
                 console.log(err.code)
                 if(err.code==="ConflictException"){
-                    count===10 ? rej("Error") : setTimeout(()=>next(++count),500)
+                    count===10 ? rej("Error") : setTimeout(()=>next(++count),5000)
                 }else if(err.code==="LimitExceededException"){
-                    setTimeout(()=>next(count),2000)
+                    setTimeout(()=>next(count),5000)
                 }else{
                     rej(err.code+':'+err.message)
                 }

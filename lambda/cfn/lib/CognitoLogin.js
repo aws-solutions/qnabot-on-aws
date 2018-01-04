@@ -22,11 +22,13 @@ module.exports=class CognitoUser extends require('./base') {
             AllowedOAuthScopes:['phone', 'email', 'openid', 'profile'],
             AllowedOAuthFlowsUserPoolClient:true
         }).promise()
-        .if((params.ImageBucket && params.ImageKey),function(){
-            return (new aws.S3()).getObject({
-                Bucket:params.ImageBucket,
-                Key:params.ImageKey
-            }).promise().get('content').then(x=>params.Image=x)
+        .then(function(){
+            if(params.ImageBucket && params.ImageKey){
+                return (new aws.S3()).getObject({
+                    Bucket:params.ImageBucket,
+                    Key:params.ImageKey
+                }).promise().get('content').then(x=>params.Image=x)
+            }
         })
         .then(function(){
             return cognito.setUICustomization({
