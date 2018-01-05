@@ -45,7 +45,7 @@
           v-bind:field="this.qa.answer"
           v-bind:name="'a.'+this.index"
           v-bind:edit="this.qa.edit"
-          placeholder="Type anwser here"
+          placeholder="Type answer here"
           prefix="">
         </text-input>   
       </div>
