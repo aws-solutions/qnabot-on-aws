@@ -1,17 +1,7 @@
 module.exports={
-    "EsInit":{
-        "Type": "Custom::EsInit",
-        "DependsOn":["ReadPolicy"],
-        "Properties": {
-            "ServiceToken": { "Fn::GetAtt" : ["CFNLambda", "Arn"] },
-            "Address":{"Fn::GetAtt":["ElasticsearchDomain","DomainEndpoint"]},
-            "Index":"qna-index",
-            "Name":"qna",
-            "Type":JSON.stringify(require('./schema'))
-        }
-    },
     "ElasticsearchDomain": {
          "Type": "AWS::Elasticsearch::Domain",
+         "Condition":"CreateDomain",
          "Properties": {
             "AccessPolicies": {
                "Version": "2012-10-17",

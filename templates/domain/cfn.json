@@ -9,13 +9,6 @@
             "/lambda/cfn.zip"
           ]]}
         },
-        "Environment": {
-          "Variables": {
-            "REGION": {
-              "Ref": "AWS::Region"
-            }
-          }
-        },
         "Handler": "index.handler",
         "MemorySize": "128",
         "Role": {
@@ -34,18 +27,29 @@
             "PolicyDocument":{
                 "Version": "2012-10-17",
                 "Statement": [{
+                      "Effect": "Allow",
+                      "Action": [
+                        "s3:*"
+                      ],
+                      "Resource":[
+                        {"Fn::Sub":"arn:aws:s3:::${BootstrapBucket}*"}
+                      ]
+                    },{
                   "Effect": "Allow",
                   "Action": [
                     "es:*"
                   ],
                   "Resource": [{"Fn::Join":["/",[
-                        {"Fn::GetAtt":["ElasticsearchDomain","DomainArn"]},
+                        {"Fn::If":[
+                            "CreateDomain",
+                            {"Fn::GetAtt":["ElasticsearchDomain","DomainArn"]},
+                            {"Ref":"ElasticSearchArn"}
+                        ]},
                         "*"
                     ]]}
                     ]
                 }]
-            },
-            "Roles":[{"Ref":"Role"}]
+            }
         }
     },
     "Role": {
@@ -65,7 +69,8 @@
         },
         "Path": "/",
         "ManagedPolicyArns": [
-          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
+          {"Ref":"ReadPolicy"}
         ]
       }
     }

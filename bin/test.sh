@@ -25,7 +25,7 @@ aws configure set aws_session_token $( echo $creds | $(npm bin)/jq --raw-output 
 aws configure set $PROFILE.region $region
 
 make templates
-npm run stack dev/bootstrap up w
+npm run stack dev/bootstrap up
 
 if [ $? -ne 0 ]; then
     echo "failed to create bootstrap bucket"
@@ -33,7 +33,7 @@ if [ $? -ne 0 ]; then
 fi
 npm run upload
 
-npm run stack dev/master up w
+npm run stack dev/master up
 
 if [ $? -ne 0 ]; then
     echo "failed to launch master stack"
@@ -48,5 +48,6 @@ $(npm bin)/nodeunit website/test
 ./lambda/fulfillment/test/setup.sh
 ./lambda/import/test/setup.sh
 ./lambda/lex-build/test/setup.sh
+./lambda/proxy-es/test/setup.sh
 
 $(npm bin)/nodeunit ./lambda/test.js

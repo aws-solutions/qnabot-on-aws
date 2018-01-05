@@ -23,7 +23,7 @@ up(){
         --template-body file://$TEMP            \
     | $(npm bin)/jq --raw-output ".StackId"     
 
-    if [ -n "$WAIT" ]; then
+    if [ -z "$WAIT" ]; then
         $DIR/wait.js $(name) 
     fi
 }
@@ -48,7 +48,7 @@ update(){
         --template-body file://$TEMP            \
     | $(npm bin)/jq --raw-output ".StackId"     
     
-    if [ -n "$WAIT" ]; then
+    if [ -z "$WAIT" ]; then
         $DIR/wait.js $(name) 
     fi
 }

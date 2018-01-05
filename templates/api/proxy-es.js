@@ -1,11 +1,21 @@
-var fs=require('fs')
-
 module.exports={
+    "ESProxyCodeVersion":{
+        "Type": "Custom::S3Version",
+        "DependsOn":["CFNLambdaPolicy"],
+        "Properties": {
+            "ServiceToken": { "Fn::GetAtt" : ["CFNLambda", "Arn"] },
+            "Bucket": {"Ref":"BootstrapBucket"},
+            "Key": {"Fn::Sub":"${BootstrapPrefix}/lambda/proxy-es.zip"},
+            "BuildDate":(new Date()).toISOString()
+        }
+    },
     "ESProxyLambda": {
       "Type": "AWS::Lambda::Function",
       "Properties": {
         "Code": {
-            "ZipFile":fs.readFileSync(__dirname+'/handler.js','utf8')
+            "S3Bucket": {"Ref":"BootstrapBucket"},
+            "S3Key": {"Fn::Sub":"${BootstrapPrefix}/lambda/proxy-es.zip"},
+            "S3ObjectVersion":{"Ref":"ESProxyCodeVersion"}
         },
         "Handler": "index.handler",
         "MemorySize": "256",

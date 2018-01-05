@@ -32,7 +32,6 @@ new Promise(function(res,rej){
                 "DELETE_COMPLETE"
             ].includes(status)){
                 spinner.succeed(status) 
-                res()
             }else if([
                 "UPDATE_IN_PROGRESS",
                 "UPDATE_ROLLBACK_COMPLETE_CLEANUP_IN_PROGRESS",
@@ -40,16 +39,15 @@ new Promise(function(res,rej){
                 "ROLLBACK_IN_PROGRESS",
                 "DELETE_IN_PROGRESS",
                 "CREATE_IN_PROGRESS"
-            ]){
+            ].includes(status)){
                 setTimeout(()=>next(),5000)
             }else{
                 spinner.fail(status)
-                process.exit(1)
             }
         })
         .catch(error=>{
             spinner.fail(error.message)
-            process.exit(1)
+            rej(error)
         })
     }
 })
