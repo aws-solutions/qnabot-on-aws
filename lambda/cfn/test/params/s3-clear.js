@@ -3,13 +3,16 @@ var Promise=require('bluebird')
 var aws=require('../../lib/util/aws')
 var s3=new aws.S3()
 var cfExports=require('../../bin/exports')
+var range=require('range').range
 
 var setup=cfExports.tap(function(exports){
-    return s3.putObject({
-        Bucket:exports["QNA-DEV-BUCKET"],
-        Key:"DeleteMe",
-        Body:"Please no!!!"
-    }).promise().delay(2000)
+    return Promise.all(range(2000).map(x=>{
+        return s3.putObject({
+            Bucket:exports["QNA-DEV-BUCKET"],
+            Key:"DeleteMe-"+x,
+            Body:"Please no!!!-"+x
+        }).promise()
+    })).delay(2000)
 })
 .then(function(exports){
     return {

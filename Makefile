@@ -6,7 +6,7 @@ All: templates lambda website build
 build:
 	mkdir -p build; mkdir -p build/lambda; mkdir -p build/templates/test;mkdir -p build/templates;mkdir -p build/documents; mkdir -p build/templates/dev
 
-.PHONY: lambda templates upload website
+.PHONY: lambda templates upload website test
 
 config.json:
 	node config.js.example > config.json
@@ -33,4 +33,6 @@ samples:docs/blog-samples.json build
 upload: templates lambda website build
 	./bin/upload.sh
 
+test:
+	./bin/test.sh
 

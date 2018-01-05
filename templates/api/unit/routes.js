@@ -19,38 +19,42 @@ var api=require('./util').api
 
 module.exports={
     root:{
-        get:test=>run({
-            path:"",
-            method:"get"
-        },test)
+        get:test=>{
+            api({
+                path:"/",
+                method:"get"
+            })
+            .tap(console.log)
+            .tap(test.ok)
+            .then(function(result){
+                return Promise.all(_.values(result._links).map(x=>api({
+                    href:x.href,
+                    method:"get"
+                }).tap(test.ok).catch(test.ifError)
+                ))
+            })
+            .catch(test.ifError)
+            .finally(()=>test.done())
+        }
     },
     bot:{
-        get:test=>run({
-            path:"bot",
-            method:"get"
-        },test),
-        alexa:{
-            get:test=>run({
-                path:"bot/alexa",
+        get:test=>{
+            api({
+                path:"bot",
                 method:"get"
-            },test)
-        },
-        hooks:{
-            get:test=>run({
-                path:"bot/hooks",
-                method:"get"
-            },test),
-            options:test=>run({
-                path:"bot/hooks",
-                method:"options"
-            },test)
-        },
-        utterances:{
-            get:test=>run({
-                path:"bot/utterances",
-                method:"get"
-            },test)
-        }
+            })
+            .tap(console.log)
+            .tap(test.ok)
+            .then(function(result){
+                return Promise.all(_.values(result._links).map(x=>api({
+                    href:x.href,
+                    method:"get"
+                }).tap(test.ok).catch(test.ifError)
+                ))
+            })
+            .catch(test.ifError)
+            .finally(()=>test.done())
+        } 
     },
     health:{
         get:test=>run({
@@ -101,10 +105,23 @@ module.exports={
         },test)
     },
     jobs:{
-        get:test=>run({
-            path:"jobs",
-            method:"get"
-        },test)
+        get:test=>{
+            api({
+                path:"/jobs",
+                method:"get"
+            })
+            .tap(console.log)
+            .tap(test.ok)
+            .then(function(result){
+                return Promise.all(_.values(result._links).map(x=>api({
+                    href:x.href,
+                    method:"get"
+                }).tap(test.ok).catch(test.ifError)
+                ))
+            })
+            .catch(test.ifError)
+            .finally(()=>test.done())
+        }
     }
 }
 

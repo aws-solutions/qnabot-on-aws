@@ -28,7 +28,7 @@ module.exports={
             path:"questions/"+id,
             method:"PUT",
             body:{
-                qid:"unit-test-.1",
+                qid:id,
                 q:["who am i"],
                 a:"i am the unit",
                 _trace:1
@@ -36,17 +36,7 @@ module.exports={
         }))
         .then(()=>exists(id,test,true))
         .then(()=>api({
-            path:"questions/unit-test.1",
-            method:"PUT",
-            body:{
-                qid:"unit-test.1",
-                q:["who am i"],
-                a:"i am the unit",
-                _trace:2
-            }
-        }))
-        .then(()=>api({
-            path:"questions/unit-test.1",
+            path:"questions/"+id,
             method:"DELETE"
         }))
         .then(()=>exists(id,test,false))

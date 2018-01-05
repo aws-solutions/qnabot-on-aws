@@ -36,12 +36,30 @@ module.exports={
         this.lex.postText({
             inputText:"hello"
         }).promise()
+        .tap(x=>test.ok(x.sessionAttributes.previous))
+        .then(console.log)
+        .finally(test.done)
+    },
+    miss:function(test){
+        this.lex.postText({
+            inputText:"zzzzzzzzzzzzzzzzzzz"
+        }).promise()
+        .tap(x=>test.equal(x.dialogState,"ElicitIntent"))
+        .then(console.log)
+        .finally(test.done)
+    },
+    empty:function(test){
+        this.lex.postText({
+            inputText:"help"
+        }).promise()
+        .tap(x=>test.equal(x.dialogState,"Fulfilled"))
         .then(console.log)
         .finally(test.done)
     },
     card:function(test){
         var self=this
         var id="unit-test.1"
+        var id2="unit-test.2"
         api({
             path:"questions/"+id,
             method:"PUT",
@@ -56,14 +74,34 @@ module.exports={
                 }
             }
         })
+        .then(()=>api({
+            path:"questions/"+id2,
+            method:"PUT",
+            body:{
+                qid:id,
+                q:["who are you"],
+                a:"you are the test"
+            }
+        }))
         .then(()=>self.lex.postText({
             inputText:"who am i"
         }).promise())
+        .tap(x=>test.ok(x.responseCard))
+        .then(console.log)
+        .then(()=>self.lex.postText({
+            inputText:"who are you"
+        }).promise())
+        .tap(x=>test.ok(!x.responseCard))
         .then(console.log)
         .then(()=>api({
             path:"questions/unit-test.1",
             method:"DELETE"
         }))
+        .then(()=>api({
+            path:"questions/unit-test.2",
+            method:"DELETE"
+        }))
+        .catch(test.ifError)
         .finally(()=>test.done())
     },
     topic:function(test){

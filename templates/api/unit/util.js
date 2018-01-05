@@ -34,7 +34,9 @@ exports.run=function(opts,test,not=true){
 exports.api=api
 function  api(opts){
     return env.then(function(envs){
-        var url=Url.parse(envs["QNA-DEV-MASTER-API"]+'/'+opts.path)
+        var href=opts.path ? envs["QNA-DEV-MASTER-API"]+'/'+opts.path : opts.href
+        console.log(opts)
+        var url=Url.parse(href)
         var request={
             host:url.hostname,
             method:opts.method.toUpperCase(),

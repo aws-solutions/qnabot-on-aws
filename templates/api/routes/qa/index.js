@@ -27,6 +27,7 @@ require('./schema'),{
     lambda:{"Fn::GetAtt":["ESProxyLambda","Arn"]},
     template:fs.readFileSync(__dirname+'/collection/delete.vm','utf8'),
     responseTemplate:fs.readFileSync(__dirname+'/collection/delete.resp.vm','utf8'),
+    defaultResponse:204,
     resource:{"Ref":"Questions"}
 }),
 "QuestionsPut":lambda({
@@ -35,7 +36,8 @@ require('./schema'),{
     lambda:{"Fn::GetAtt":["ESProxyLambda","Arn"]},
     template:fs.readFileSync(__dirname+'/collection/put.vm','utf8'),
     responseTemplate:fs.readFileSync(__dirname+'/collection/put.resp.vm','utf8'),
-    resource:{"Ref":"Questions"}
+    resource:{"Ref":"Questions"},
+    defaultResponse:201
 }),
 "Question": resource('{ID}',{"Ref":"Questions"}),
 "QuestionHead":lambda({
@@ -65,7 +67,8 @@ require('./schema'),{
     resource:{"Ref":"Question"},
     parameterLocations:{
       "method.request.path.Id": true
-    }
+    },
+    defaultResponse:201
 }),
 "QuestionsOptions":lambda({
     authorization:"AWS_IAM",
@@ -81,6 +84,7 @@ require('./schema'),{
     template:fs.readFileSync(__dirname+'/single/delete.vm','utf8'),
     responseTemplate:fs.readFileSync(__dirname+'/single/delete.resp.vm','utf8'),
     resource:{"Ref":"Question"},
+    defaultResponse:204,
     parameterLocations:{
       "method.request.path.Id": true
     }

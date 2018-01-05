@@ -1,4 +1,5 @@
 var aws=require('./util/aws')
+var Promise=require('bluebird')
 var s3=new aws.S3()
 
 module.exports=class CognitoUser extends require('./base') {
@@ -6,32 +7,39 @@ module.exports=class CognitoUser extends require('./base') {
         super()
     }
     Delete(ID,params,reply){
-        s3.listObjectVersions({
-            Bucket:params.Bucket,
-            Prefix:params.Prefix
-        }).promise()
-        .tap(x=>console.log("Files",x))
-        .get("Versions")
-        .then(function(files){
-            return files.map(file=>{return {
-                Key:file.Key,
-                VersionId:file.VersionId
-            }  })
-        })
-        .tap(x=>console.log("going to delete",x))
-        .then(function(keys){
-            if(keys.length>0){ 
-                return s3.deleteObjects({
+        new Promise(function(res,rej){
+            function next(){
+                s3.listObjectVersions({
                     Bucket:params.Bucket,
-                    Delete:{
-                        Objects:keys
-                    }
+                    Prefix:params.Prefix
                 }).promise()
-                .then(()=>reply(null,ID))
-                .error(err=>reply(err,ID))
-            }else{
-                reply(null,ID) 
+                .tap(x=>console.log("Files",x))
+                .get("Versions")
+                .then(function(files){
+                    return files.map(file=>{return {
+                        Key:file.Key,
+                        VersionId:file.VersionId
+                    }  })
+                })
+                .tap(x=>console.log("going to delete",x))
+                .then(function(keys){
+                    if(keys.length>0){ 
+                        return s3.deleteObjects({
+                            Bucket:params.Bucket,
+                            Delete:{
+                                Objects:keys
+                            }
+                        }).promise()
+                        .then(()=>next())
+                        .catch(rej)
+                    }else{
+                        res()
+                    }
+                })
             }
+            next()
         })
+        .then(()=>reply(null,ID))
+        .catch(reply)
     }   
 }

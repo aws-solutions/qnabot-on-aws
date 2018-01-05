@@ -12,29 +12,21 @@ var https_options = {
 var PORT = 8000;
 var HOST = 'localhost';
 app = express();
-var morgan=require('morgan')
-app.use(morgan(':method :url :status'))
+var bodyParser = require('body-parser')
 
-app.put('/', function (req, res) {
-    res.send()
-})
-app.put('/register', function (req, res) {
-    res.send(
-        {token:JWT.sign(
-            {
-                AccountId:12345,
-                ApiUrl:"https://localhost:8000/register"
-            },
-            null,
-            {algorithm:"none"}
-        )} 
-    )
-})
-app.delete('/register/:AccountId', function (req, res) {
-    res.send()
-})
+app.use(bodyParser.urlencoded({ extended: false }))
+app.use(bodyParser.json({type:()=>true}))
+var callback
+exports.register=function(fnc){
+    console.log("registered")
+    callback=fnc 
+}
+exports.server=function(test){
+    app.put('/*', function (req, res) {
+        callback(req.body.Status)
+        res.send()
+    })
 
-module.exports=function(){
     server = https.createServer(https_options, app).listen(PORT, HOST);
     console.log('HTTPS Server listening on %s:%s', HOST, PORT);
     return server

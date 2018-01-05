@@ -48,26 +48,32 @@ function clean(name){
     return out
 }
 
-var run=function(fnc,params){
-    console.log(fnc+':'+JSON.stringify(params,null,3))
+function run(fnc,params){
+    console.log(fnc+':request:'+JSON.stringify(params,null,3))
     return new Promise(function(res,rej){
         var next=function(count){
-            console.log("try:"+count)
-            lex[fnc](params).promise()
-            .tap(console.log)
+            console.log("tries-left:"+count)
+            var request=lex[fnc](params)
+            request.promise()
+            .tap(x=>console.log(fnc+':result:'+JSON.stringify(x,null,3)))
             .then(res)
             .catch(function(err){
-                console.log(err.code)
+                console.log(fnc+':'+err.code)
+                var retry = err.retryDelay || 5
+                console.log("retry in "+retry)
+
                 if(err.code==="ConflictException"){
-                    count===10 ? rej("Error") : setTimeout(()=>next(++count),5000)
+                    count===0 ? rej("Error") : setTimeout(()=>next(--count),retry*1000)
+                }else if(err.code==="ResourceInUseException"){
+                    count===0 ? rej("Error") : setTimeout(()=>next(--count),retry*1000)
                 }else if(err.code==="LimitExceededException"){
-                    setTimeout(()=>next(count),5000)
+                    setTimeout(()=>next(count),retry*1000)
                 }else{
                     rej(err.code+':'+err.message)
                 }
             })
         }
-        next(0)
+        next(200)
     })
 }
 

@@ -1,16 +1,16 @@
-var config=require('../../config')
+var config=require('../../../config')
 process.env.STRIDE="10000"
 process.env.AWS_PROFILE=config.profile
 process.env.AWS_DEFAULT_REGION=config.region
 process.env.AWS_REGION=config.region
 
-var env=require('../../bin/exports')()
+var env=require('../../../bin/exports')()
 var Promise=require('bluebird')
 var aws=require("aws-sdk")
 aws.config.region=config.region
 var fs=require('fs')
-var handler=Promise.promisifyAll(require('./index'),{multiArgs:true})
-var gen=require('./gen')
+var handler=Promise.promisifyAll(require('../index'),{multiArgs:true})
+var gen=require('../gen')
 
 module.exports={
     test:function(test){

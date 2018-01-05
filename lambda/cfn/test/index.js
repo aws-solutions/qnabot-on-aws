@@ -1,16 +1,14 @@
 var lambda=require('../bin/lambda.js')
+
 var mock=require('../bin/mock')
 var Promise=require('bluebird')
 var aws=require('../lib/util/aws')
 var api=new aws.APIGateway()
-var server
 module.exports={
     setUp:function(cb){
-        server=mock()
         cb()
     },
     tearDown:function(cb){
-        server.close()
         cb()
     },
     api:{
@@ -51,9 +49,6 @@ module.exports={
         }
     },
     lex:require('./lex'),
-    es:function(test){
-        lifecycle(require('./params/es'),test)
-    },
     role:function(test){
         lifecycle(require('./params/role'),test)
     },
@@ -85,10 +80,18 @@ module.exports={
 }
 
 function lifecycle(params,test){
-        return run(params.create,test)
-        .then(()=>run(params.update,test))
-        .then(()=>run(params.delete,test))
-        .finally(test.done)
+        test.expect(3)
+        mock.register(status=>test.equal(status,"SUCCESS"))
+        var ser=mock.server(test)
+
+        return lambda(params.create)
+        .then(()=>lambda(params.update))
+        .then(()=>lambda(params.delete))
+        .catch(test.ifError)
+        .finally(()=>{
+            ser.close()
+            test.done()
+        })
 }
 
 function lifecycle_chain(lib,params,test){
@@ -118,7 +121,5 @@ function lifecycle_chain(lib,params,test){
 
 function run(params,test){
     return lambda(params)
-        .tap(msg=>console.log(JSON.stringify(msg)))
         .tap(test.ok)
-        .catch(test.ifError)
 }
