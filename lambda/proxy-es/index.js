@@ -2,7 +2,6 @@ var Url=require('url')
 var Promise=require('bluebird')
 var cfnLambda=require('cfn-lambda')
 var request=require('./request')
-
 exports.handler = (event, context, callback) => {
     console.log('Received event:', JSON.stringify(event, null, 2));
 
@@ -11,12 +10,14 @@ exports.handler = (event, context, callback) => {
         method:event.method,
         body:event.body 
     })
+    .tap(x=>console.log(JSON.stringify(x)))
+    .tapCatch(x=>console.log(x))
     .then(result=>callback(null,result))
-    .catch(error=>callback({
+    .catch(error=>callback(JSON.stringify({
         status:error.response.status,
         message:error.response.statusText,
         body:error.response.data
-    }))
+    })))
 }
 
 exports.Create=function(params,reply){

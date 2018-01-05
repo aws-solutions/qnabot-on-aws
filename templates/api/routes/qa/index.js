@@ -42,8 +42,11 @@ require('./schema'),{
     authorization:"AWS_IAM",
     method:"head",
     errors:[{   
-        "SelectionPattern":"Error:404.*",
-        "StatusCode":404
+        "SelectionPattern":".*status\":404.*",
+        "StatusCode":404,
+        "ResponseTemplates":{
+            "application/json":fs.readFileSync(__dirname+"/../error/error.vm",'utf8')
+        }
     }],
     lambda:{"Fn::GetAtt":["ESProxyLambda","Arn"]},
     template:fs.readFileSync(__dirname+'/single/head.vm','utf8'),

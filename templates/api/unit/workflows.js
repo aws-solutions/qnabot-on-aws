@@ -170,6 +170,7 @@ module.exports={
                     query:".*test"
                 }
             }))
+            .catch(console.log)
             .finally(()=>test.done())
         }
     },

@@ -76,7 +76,11 @@ module.exports={
         head:test=>run({
             path:"static/index.html",
             method:"head"
-        },test)
+        },test),
+        error:test=>run({
+            path:"static/notHere.html",
+            method:"head"
+        },test,false)
     },
     qa:{
         list:test=>run({

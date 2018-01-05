@@ -15,6 +15,7 @@ module.exports={
         },{},function(error,result){
             test.ok(error)
             console.log("result:",JSON.stringify(result,null,2))
+            console.log("error:",error)
             test.done()
         })
         })

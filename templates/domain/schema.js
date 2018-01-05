@@ -97,6 +97,6 @@ module.exports={
         l:{
             type:"keyword"
         }
-    }}
+    }
 }
                 

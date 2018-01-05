@@ -53,7 +53,15 @@ function proxy(opts){
                     "method.response.header.content-type":"integration.response.header.Content-Type"
                 },
                 opts.responseParameters)
-            },
+            },{
+                "StatusCode":404,
+                "ResponseTemplates":{
+                    "application/xml":JSON.stringify({
+                        error:"Not found"
+                    })
+                },
+                "SelectionPattern":"403"
+            }
           ]
         },
         "RequestParameters":{
@@ -68,7 +76,8 @@ function proxy(opts){
             },
             _.mapValues(opts.responseParameters || {},x=>false))
           },
-          {"StatusCode": 400}
+          {"StatusCode": 400},
+          {"StatusCode": 404}
         ],
         "RestApiId": {"Ref": "API"}
       }

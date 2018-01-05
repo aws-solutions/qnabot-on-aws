@@ -1,6 +1,8 @@
+#set ($errorMessageObj = $util.parseJson($input.path('$.errorMessage')))
+
+
 {
-    "endpoint":"$stageVariables.ESEndpoint",
-    "method":"GET",
-    "path":"/_cluster/health"
+    "status":$errorMessageObj.status,
+    "message":"$errorMessageObj.message"
 }
 

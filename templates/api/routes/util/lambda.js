@@ -30,7 +30,10 @@ module.exports=function(params){
                 }
             },params.errors || {   
                 "SelectionPattern":params.errorMessage || "Error:.*",
-                "StatusCode": params.errorCode || 500
+                "StatusCode": params.errorCode || 500,
+                "ResponseTemplates":{
+                    "application/json":fs.readFileSync(__dirname+"/../error/error.vm",'utf8')
+                }
           })
           ,
           "RequestParameters":params.parameterNames,

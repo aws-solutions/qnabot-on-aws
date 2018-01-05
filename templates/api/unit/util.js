@@ -22,12 +22,13 @@ exports.exists=function(id,test,not=true){
     .then(()=>not ? test.ok(true) : test.ifError(true))
     .catch(()=>!not ? test.ok(true) : test.ifError(true))
 }
-exports.run=function(opts,test){
+exports.run=function(opts,test,not=true){
     return api(opts)
     .then(result=>{
         test.ok(opts.method.toUpperCase()==='HEAD' ? true : result)
     })
-    .catch(test.ifError)
+    .then(()=>not ? test.ok(true) : test.ifError(true))
+    .catch(()=>!not ? test.ok(true) : test.ifError(true))
     .finally(()=>test.done())
 }
 exports.api=api
