@@ -17,7 +17,9 @@ instructions (){
 }
 
 run (){
-    if [ -n "$BUCKET" ];then
+    if [ "$BUCKET" = "null" ];then
+        echo "Error, No Bootstrap Bucket. Ignore if you are just starting up the bootstrap bucket"
+    else
         FILE="http://s3.amazonaws.com/$BUCKET/$PREFIX/templates/$TEMPLATE.json"
         echo "Checking Syntax of template at:"
         echo "  $FILE"
@@ -31,8 +33,6 @@ run (){
             echo "Invalid Template"
             echo $OUT | $(npm bin)/jq
         fi
-    else
-        echo "Error, No Bootstrap Bucket. Ignore if you are just starting up the bootstrap bucket"
     fi
 }
 if [ -n "$1" ];then

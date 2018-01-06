@@ -31,7 +31,7 @@ up(){
 make-sure (){
     EXISTS=$()
     RESULT=$?
-    if aws cloudformation describe-stacks --stack-name $(name) > /dev/null; then
+    if aws cloudformation describe-stacks --stack-name $(name) > /dev/null 2>&1; then
         echo "$(name) exists"
         exit 0
     else 

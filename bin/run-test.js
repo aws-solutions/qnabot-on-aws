@@ -19,6 +19,7 @@ var reporter = require('./reporter');
 reporter.run([
     "../templates/api/unit/index.js",
     '../lambda/test.js',
+    "../website/test/index.js"
 ],null,null,log);
 
 

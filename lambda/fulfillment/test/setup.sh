@@ -1,9 +1,4 @@
 #! /bin/bash
 __dirname="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+$__dirname/../../../bin/cfn-depends.sh dev/domain
 
-echo "Checking for cloudformation dependencies"
-cd $__dirname/../../../
-npm run --silent stack dev/domain make-sure 
-
-echo "test ready. run tests with:"
-echo "  cd $__dirname & $(npm bin)/nodeunit index.js"

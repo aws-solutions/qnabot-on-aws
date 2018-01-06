@@ -5,13 +5,18 @@ export AWS_DEFAULT_REGION=$(node -e "console.log(JSON.stringify(require('$__dirn
 
 NAME=$(echo $1 | rev | cut -d'/' -f1 | rev)
 TYPE=$(echo $1 | rev | cut -d'/' -f2 | rev)
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-if [ ! -e $DIR/.inc ];then
-    echo "{}" > $DIR/.inc 
+if [ "$NAME" = "$TYPE" ]; then
+    FULL=$NAME
+else 
+    FULL=$TYPE-$NAME
 fi
 
-INC=$(cat $DIR/.inc)
+if [ ! -e $__dirname/.inc ];then
+    echo "{}" > $__dirname/.inc 
+fi
+
+INC=$(cat $__dirname/.inc)
 VALUE=$(echo $INC | $(npm bin)/jq --raw-output ".\"$NAME\"")
 
 if [ "$VALUE" = "null" ];then
@@ -21,12 +26,7 @@ fi
 if [ ! -z $2 ];then
     VALUE=$(($VALUE+1))
     NEW=$(echo $INC | $(npm bin)/jq ".\"$NAME\"=$VALUE")
-    echo $NEW > $DIR/.inc
+    echo $NEW > $__dirname/.inc
 fi
 
-if [ "$NAME" = "$TYPE" ]; then
-    echo QNA-$NAME-$VALUE
-else 
-    echo QNA-$TYPE-$NAME-$VALUE
-fi
-
+echo QNA-$FULL-$VALUE

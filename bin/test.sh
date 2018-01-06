@@ -35,26 +35,28 @@ if [ ! -f ./config.json ]; then
 fi
 
 cd $BASE & make templates
-npm run stack dev/bootstrap make-sure
+npm run --silent stack dev/bootstrap make-sure
 
 if [ $? -ne 0 ]; then
     echo "failed to create bootstrap bucket"
     exit 1
 fi
-npm run upload
+npm run --silent upload
 
-npm run stack dev/master make-sure  & 
-    $BASE/templates/api/unit/setup.sh       &
-    $BASE/lambda/cfn/test/setup.sh          & 
-    $BASE/lambda/fulfillment/test/setup.sh  &
-    $BASE/lambda/import/test/setup.sh       &
-    $BASE/lambda/lex-build/test/setup.sh    &
-    $BASE/lambda/proxy-es/test/setup.sh     &
-wait 
+$BASE/templates/api/unit/setup.sh       
+
+$BASE/lambda/cfn/test/setup.sh           
+$BASE/lambda/fulfillment/test/setup.sh  
+$BASE/lambda/import/test/setup.sh       
+$BASE/lambda/lex-build/test/setup.sh    
+$BASE/lambda/proxy-es/test/setup.sh     
+
+$BASE/website/test/setup.sh
+
 x=0
 while [ $x -le 4 ]; do
     echo "Run Number:$x"
-    ./run-test.js
+    $BASE/run-test.js
     x=$(( $x - 1 ))
 done
 

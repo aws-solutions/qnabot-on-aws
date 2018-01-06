@@ -68,12 +68,14 @@ function run(fnc,params){
                     count===0 ? rej("Error") : setTimeout(()=>next(--count),retry*1000)
                 }else if(err.code==="LimitExceededException"){
                     setTimeout(()=>next(count),retry*1000)
+                }else if(err.code==="AccessDeniedException"){
+                    setTimeout(()=>next(count),retry*1000)
                 }else{
                     rej(err.code+':'+err.message)
                 }
             })
         }
-        next(200)
+        next(10)
     })
 }
 
