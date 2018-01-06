@@ -1,7 +1,7 @@
 #! /usr/bin/env node
 var fs = require('fs');
 var util = require('util');
-var log_file = fs.createWriteStream(__dirname + '/debug.log', {flags : 'w'});
+var log_file = fs.createWriteStream(__dirname + '/debug.log', {flags : 'a'});
 var _log=console.log
 const stripAnsi = require('strip-ansi');
 
@@ -16,11 +16,7 @@ console.log=function(x){
 
 var reporter = require('./reporter');
 
-reporter.run([
-    "../templates/api/unit/index.js",
-    '../lambda/test.js',
-    "../website/test/index.js"
-],null,null,log);
+reporter.run([process.argv[2]],null,null,log);
 
 
 

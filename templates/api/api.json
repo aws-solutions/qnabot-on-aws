@@ -38,6 +38,9 @@
     },
     "UserPool":{
       "Value":{"Ref":"UserPool"}
+    },
+    "DesignerClientId":{
+      "Value":{"Ref":"ClientDesigner"}
     }
   },
   "Parameters": {

@@ -57,6 +57,7 @@ function  api(opts){
         delete request.headers["Content-Length"]        
         
         return Promise.resolve(axios(signed))
+        .tapCatch(console.log)
         .get('data')
         .tap(x=>console.log("response:",JSON.stringify(x,null,2)))
     })

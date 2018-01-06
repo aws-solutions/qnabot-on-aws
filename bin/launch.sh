@@ -56,6 +56,10 @@ update(){
 down(){ 
     aws cloudformation delete-stack --stack-name $(name)    \
     | $(npm bin)/jq --raw-output ".StackId"     
+    
+    if [ -z "$WAIT" ]; then
+        $DIR/wait.js $(name) 
+    fi
 }
 instructions (){
     echo "Use this command to managed stacks"

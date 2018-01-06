@@ -45,6 +45,18 @@ module.exports={
         "Export":{
             "Name":"QNA-DEV-MASTER-API"
         }
+    },
+    "UserPool":{
+        "Value":{"Fn::GetAtt":["master","Outputs.UserPool"]},
+        "Export":{
+            "Name":"QNA-DEV-MASTER-USERPOOL"
+        }
+    },
+    "DesignerClientId":{
+        "Value":{"Fn::GetAtt":["master","Outputs.DesignerClientId"]},
+        "Export":{
+            "Name":"QNA-DEV-MASTER-DESIGNER-CLIENT-ID"
+        }
     }
   },
   "AWSTemplateFormatVersion": "2010-09-09",

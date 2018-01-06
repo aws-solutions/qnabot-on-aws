@@ -82,6 +82,12 @@ var base={
     },
     "ElasticSearchType":{
         "Value":{"Fn::GetAtt":["domain","Outputs.Index"]}
+    },
+    "UserPool":{
+        "Value":{"Fn::GetAtt":["api","Outputs.UserPool"]}
+    },
+    "DesignerClientId":{
+        "Value":{"Fn::GetAtt":["api","Outputs.DesignerClientId"]}
     }
   },
   "Metadata" : {
