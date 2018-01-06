@@ -33,7 +33,8 @@ module.exports = require('../../bin/exports')(config.region).then(function(resul
     },
     output:{
         path:path.join(__dirname,'../test'),
-        filename:"index.js"
+        filename:"compiled.js",
+        libraryTarget:"commonjs2"
     },
     plugins:_.compact([
     ]),

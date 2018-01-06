@@ -11,5 +11,5 @@ build:
 	../node_modules/.bin/webpack --config ./config/webpack.config.js
 
 test:
-	../node_modules/.bin/webpack --config ./config/test.config.js
+	../node_modules/.bin/webpack --config ./config/test.config.js 
 
