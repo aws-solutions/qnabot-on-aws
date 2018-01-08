@@ -35,7 +35,7 @@ if [ ! -f ./config.json ]; then
 fi
 
 cd $BASE & make templates
-npm run --silent stack dev/bootstrap make-sure
+npm run --silent stack dev/bootstrap make-sure -- --no-check --no-interactive --verbose
 
 if [ $? -ne 0 ]; then
     echo "failed to create bootstrap bucket"

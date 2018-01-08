@@ -5,7 +5,6 @@ export AWS_DEFAULT_REGION=$(node -e "console.log(JSON.stringify(require('$__dirn
 
 NAME=$(echo $1 | rev | cut -d'/' -f1 | rev)
 TYPE=$(echo $1 | rev | cut -d'/' -f2 | rev)
-
 if [ "$NAME" = "$TYPE" ]; then
     FULL=$NAME
 else 
@@ -17,7 +16,7 @@ if [ ! -e $__dirname/.inc ];then
 fi
 
 INC=$(cat $__dirname/.inc)
-VALUE=$(echo $INC | $(npm bin)/jq --raw-output ".\"$NAME\"")
+VALUE=$(echo $INC | $(npm bin)/jq --raw-output ".\"$FULL\"")
 
 if [ "$VALUE" = "null" ];then
     VALUE=0
@@ -25,7 +24,7 @@ fi
 
 if [ ! -z $2 ];then
     VALUE=$(($VALUE+1))
-    NEW=$(echo $INC | $(npm bin)/jq ".\"$NAME\"=$VALUE")
+    NEW=$(echo $INC | $(npm bin)/jq ".\"$FULL\"=$VALUE")
     echo $NEW > $__dirname/.inc
 fi
 

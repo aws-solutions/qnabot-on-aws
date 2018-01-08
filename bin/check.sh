@@ -18,7 +18,7 @@ instructions (){
 
 run (){
     if [ "$BUCKET" = "null" ];then
-        echo "Error, No Bootstrap Bucket. Ignore if you are just starting up the bootstrap bucket"
+        echo "Error, No Bootstrap Bucket."
     else
         FILE="http://s3.amazonaws.com/$BUCKET/$PREFIX/templates/$TEMPLATE.json"
         echo "Checking Syntax of template at:"
