@@ -11,7 +11,7 @@ BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied. See the
 License for the specific language governing permissions and limitations under the License.
 */
 
-process.env.REGION='us-east-1'
+process.env.REGION=require('../../../config').region
 var lex=require('../lib/lex')
 var Promise=require('bluebird')
 
