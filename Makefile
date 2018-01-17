@@ -32,3 +32,6 @@ samples:docs/blog-samples.json build
 
 upload: templates lambda website build
 	./bin/upload.sh
+
+test: 
+	$(MAKE) -C test
