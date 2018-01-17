@@ -18,6 +18,9 @@
     "Endpoint":{
       "Value":{"Fn::GetAtt":["ApiUrl","Name"]}
     },
+    "ESProxyLambda":{
+        "Value":{"Fn::GetAtt":["ESProxyLambda","Arn"]}
+    },
     "DesignerLogin": {
       "Value":{"Fn::Join":["",[
         {"Fn::GetAtt":["ApiUrl","Name"]},

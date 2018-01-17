@@ -2,7 +2,7 @@ var Promise=require('./util/promise')
 var aws=require('./util/aws')
 var cognito=new aws.CognitoIdentity()
 
-module.exports=class CognitoUser extends require('./base') {
+module.exports=class CognitoRole extends require('./base') {
     constructor(){
         super()
     }

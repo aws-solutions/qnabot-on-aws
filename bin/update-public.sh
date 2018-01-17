@@ -1,13 +1,16 @@
 #! /bin/bash 
 __dirname="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-export AWS_PROFILE=$(node -e "console.log(JSON.stringify(require('$__dirname'+'/../config')))" | $(npm bin)/jq --raw-output ".profile")
-export AWS_DEFAULT_REGION=$(node -e "console.log(JSON.stringify(require('$__dirname'+'/../config')))" | $(npm bin)/jq --raw-output ".region")
+export AWS_PROFILE=$(node -e "console.log(require('$__dirname'+'/../config').profile)")
+export AWS_DEFAULT_REGION=$(node -e "console.log(require('$__dirname'+'/../config').region)")
 
-OUTPUT=$($__dirname/exports.js)
-DEVBUCKET=$(echo $OUTPUT | $(npm bin)/jq --raw-output '."QNA-BOOTSTRAP-BUCKET"')
+OUTPUT=$($__dirname/exports.js dev/bootstrap)
+DEVBUCKET=$( echo $OUTPUT | $__dirname/json.js Bucket)
+PREFIX=$( echo $OUTPUT | $__dirname/json.js Prefix)
+REGION=$AWS_DEFAULT_REGION
 
-PUBLICBUCKET=$(node -e "console.log(JSON.stringify(require('./config')))" | $(npm bin)/jq --raw-output '.publicBucket')
-PUBLICPREFIX=$(node -e "console.log(JSON.stringify(require('./config')))" | $(npm bin)/jq --raw-output '.publicPrefix')
+
+PUBLICBUCKET=$(node -e "console.log(require('$__dirname'+'/../config').publicBucket)")
+PUBLICPREFIX=$(node -e "console.log(require('$__dirname'+'/../config').publicPrefix)")
 
 if [ "$1" == "dryrun" ]; then
     echo "dry run"

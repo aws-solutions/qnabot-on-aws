@@ -10,66 +10,52 @@ aws.config.region=require('../config').region
 var cf=new aws.CloudFormation()
 var s3=new aws.S3()
 var stringify=require("json-stringify-pretty-compact")
+var check=require('./check')
 var fs = require('fs');
-var envs=require('./exports')()
-var name=process.argv[2]
-var mainfile=__dirname+'/../templates/'+name
-var testfile=__dirname+'/../templates/'+name+'/test.js'
-var mainoutput=__dirname+'/../build/templates/'+name
-var testoutput=__dirname+'/../build/templates/test/'+name
+var outputs=require('./exports')
 
-Promise.resolve(require(mainfile))
-.then(function(result){
-    var template=JSON.stringify(result)
-    create(template,name,mainoutput)
-})
+if(!module.parent){
+    var argv=require('commander')
+    var ran
+    var args=argv.version('1.0')
+        .name(process.argv[1].split('/').reverse()[0])
+        .option('--verbose',"silent")
+        .option('--stack <stack>',"stack to build")
+        .option('--input <input>',"input file")
+        .option('--output <output>',"output file")
+        .parse(process.argv)
 
-if (fs.existsSync(testfile)) {
-    Promise.resolve(require(testfile))
-    .then(function(result){
-        var testtemplate=JSON.stringify(result)
-        create(testtemplate,name+'-test',testoutput)
-    })
-}
-
-function create(temp,name,output){
-    console.log('building '+name)
-    if(temp.length < 51200 ){
-        var val=cf.validateTemplate({
-            TemplateBody:temp
-        }).promise()
-    }else{
-        var val=envs
-        .tap(env=>{
-            if(!env["QNA-DEV-BUCKET"]){
-                console.log("Launch dev/bucket to have scratch space for large template")
-            }else{
-                return s3.putObject({
-                    Bucket:env["QNA-DEV-BUCKET"],
-                    Key:"scratch/"+name+".json",
-                    Body:temp
-                }).promise()
-                .tap(()=>console.log(chalk.green(`uploaded to s3:${env["QNA-DEV-BUCKET"]}/scratch/${name}.json`)))
-                .then(()=>cf.validateTemplate({
-                TemplateURL:`http://s3.amazonaws.com/${env["QNA-DEV-BUCKET"]}/scratch/${name}.json`
-                }).promise())
-            }
+    if( args.stack || (args.input && args.output)){
+        create({
+            silent:!args.verbose,
+            input:args.input,
+            output:args.output,
+            stack:args.stack
         })
+    }else{
+        argv.outputHelp()
     }
-
-    return val
-    .tap(()=>console.log(chalk.green(name+" is valid")))
-    .catch(error=>console.log(chalk.red(name+" failed:"+error)))
-    .tap(()=>console.log("writting to "+output+'.json'))
-    .tap(()=>console.log("writting to "+output+'.min.json'))
-    .then(()=>Promise.join( 
-        fs.writeFileAsync(output+'.json',stringify(JSON.parse(temp))),
-        fs.writeFileAsync(output+'.min.json',temp)
-    ))
-    .tap(()=>console.log('finished building '+name))
+}
+module.exports=create
+function create(options){
+    var stack=options.stack
+    log('building '+(options.stack || options.input),stack,!options.silent)
+    var file=options.input || __dirname+'/../templates/'+stack
+    var output=options.output || `${__dirname}/../build/templates/${stack}.json`
+    
+    return Promise.resolve(require(file))
+    .then(x=> typeof x ==="object" ? JSON.stringify(x) : x)
+    .tap(()=>log("writting to "+output,!options.silent))
+    .then(temp=>fs.writeFileAsync(output,stringify(JSON.parse(temp))))
+    .then(()=>check(null,{file:output}))
+    .tap(()=>log(chalk.green(stack+" is valid"),!options.silent))
+    .tap(()=>log('finished building '+stack,!options.silent))
+    .catch(error=>log(chalk.red(stack+" failed:"+error),!options.silent))
 }
 
-
+function log(message,show){
+    if(show){console.log(message)}
+}
 
 
 

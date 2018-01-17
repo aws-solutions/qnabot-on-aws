@@ -2,18 +2,18 @@ var base=require('./base')
 var Promise=require('bluebird')
 var aws=require('../../lib/util/aws')
 var s3=new aws.S3()
-var cfExports=require('../../bin/exports')
+var outputs=require('../../../../bin/exports')
 
-var setup=cfExports.tap(function(exports){
+var setup=outputs('dev/bucket').tap(function(output){
     return s3.putObject({
-        Bucket:exports["QNA-DEV-BUCKET"],
+        Bucket:output.Bucket,
         Key:"VersionMe",
         Body:"Please no!!!"
     }).promise().delay(2000)
 })
-.then(function(exports){
+.then(function(output){
     return {
-        Bucket:exports["QNA-DEV-BUCKET"],
+        Bucket:output.Bucket,
         Key:"VersionMe"
     }
 })

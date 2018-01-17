@@ -25,8 +25,7 @@ const extractSass = new ExtractTextPlugin({
     filename: "[name].css"
 });
 
-module.exports = require('../../bin/exports')(config.region).then(function(result){
-    return {
+module.exports={
     entry:{
         main:"./entry.js",
         check:"./js/browser-check.js",
@@ -121,5 +120,4 @@ module.exports = require('../../bin/exports')(config.region).then(function(resul
           }
         ]
     }
-    }
-})
+}

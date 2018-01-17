@@ -3,7 +3,7 @@ var aws=require('./util/aws')
 var cognito=new aws.CognitoIdentityServiceProvider()
 var crypto=Promise.promisifyAll(require('crypto'))
 
-module.exports=class CognitoUser extends require('./base') {
+module.exports=class CognitoLogin extends require('./base') {
     constructor(){
         super()
     }

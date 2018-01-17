@@ -93,12 +93,12 @@ module.exports={
         title:"Import",
         subTitle:"Import new questions",
         icon:"cloud_upload",
-        href:"#import"
+        href:"#/import"
       },{
         title:"Export",
         subTitle:"Download backups of your QnAs",
         icon:"file_download",
-        href:"#export"
+        href:"#/export"
       },{
         title:"QnABot Client",
         subTitle:"Use QnABot to interact with your bot in the browser",

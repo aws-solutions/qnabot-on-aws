@@ -1,16 +1,16 @@
 var base=require('./base')
 var Promise=require('bluebird')
-var cfExports=require('../../bin/exports')
 var aws=require('../../lib/util/aws')
 var s3=new aws.S3()
 var JSZip = require("jszip");
+var outputs=require('../../../../bin/exports')
 
-var setup=cfExports.then(function(exports){
+var setup=outputs('dev/bucket').then(function(output){
     var zip=new JSZip()
     var param={
-        SrcBucket:exports["QNA-DEV-BUCKET"],
+        SrcBucket:output.Bucket,
         Key:"test.zip",
-        DstBucket:exports["QNA-DEV-BUCKET"]
+        DstBucket:output.Bucket
     }
     
     zip.file('hello.txt',"hello world")

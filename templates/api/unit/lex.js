@@ -12,7 +12,7 @@ var fs=require('fs')
 var aws=require('aws-sdk')
 aws.config.setPromisesDependency(Promise)
 aws.config.region=config.region
-var env=require('../../../bin/exports')()
+var outputs=require('../../../bin/exports')
 var exists=require('./util').exists
 var run=require('./util').run
 var api=require('./util').api
@@ -20,12 +20,12 @@ var api=require('./util').api
 module.exports={
     setUp:function(cb){
         var self=this
-        env.then(function(envs){
+        outputs('dev/master').then(function(output){
             self.lex=new aws.LexRuntime({
                 region:config.region,
                 params:{
-                    botAlias:envs["QNA-DEV-BOT-ALIAS"],
-                    botName:envs["QNA-DEV-BOT-NAME"],
+                    botAlias:output.BotAlias,
+                    botName:output.BotName,
                     userId:"test"
                 }
             })
@@ -148,22 +148,21 @@ module.exports={
         var lambda=new aws.Lambda({
             region:config.region
         })
-        var func=env.then(function(envs){
+        var func=outputs('dev/lambda').tap(function(output){
             return lambda.updateFunctionCode({
-                FunctionName:envs["QNA-DEV-LAMBDA"],
+                FunctionName:output.lambda,
                 Publish:true,
                 ZipFile:fs.readFileSync(__dirname+'/hook.zip')
             }).promise()
         })
-
-        var qa=env.then(envs=>api({
+        .then(output=>api({
             path:"questions",
             method:"PUT",
             body:[{
                 qid:id1,
                 q:["what do zombies eat","what do they eat"],
                 a:"zombies eat brains",
-                l:envs["QNA-DEV-LAMBDA"]
+                l:output.lambda
             }]
         }))
         .then(()=>self.lex.postText({

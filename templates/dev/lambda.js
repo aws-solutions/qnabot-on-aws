@@ -51,10 +51,7 @@ module.exports={
   },
    "Outputs": {
         "lambda":{
-            "Value":{"Fn::GetAtt":["Lambda","Arn"]},
-            "Export":{
-                "Name":"QNA-DEV-LAMBDA"
-            }
+            "Value":{"Fn::GetAtt":["Lambda","Arn"]}
         }
    }
 }

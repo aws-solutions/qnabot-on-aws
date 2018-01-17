@@ -4,7 +4,7 @@ var cfnLambda=require('cfn-lambda')
 var base=require('./base.js')
 var s3=new aws.S3()
 
-module.exports=class extends base{
+module.exports=class S3Lambda extends base{
     constructor(){
         super('BucketNotificationConfiguration')
     }

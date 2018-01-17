@@ -39,7 +39,9 @@ function js(name){
     Promise.join(source,license)
     .spread(function(file,license){
         var position=file[0].match('#!') ? 1 : 0
-        return fs.writeFileAsync(name,insert(file,license,position))
+        if(!source[position+1].match("Copyright 2017-2017")){
+            return fs.writeFileAsync(name,insert(file,license,position))
+        }
     })
 }
 function vue(name){
@@ -47,7 +49,9 @@ function vue(name){
     Promise.join(source,license)
     .spread(function(file,license){
         var position=file.findIndex(x=>x.match('<script>'))+1
-        return fs.writeFileAsync(name,insert(file,license,position))
+        if(!source[position+1].match("Copyright 2017-2017")){
+            return fs.writeFileAsync(name,insert(file,license,position))
+        }
     })
 }
 function insert(file,license,position){

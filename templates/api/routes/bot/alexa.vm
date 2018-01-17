@@ -7,9 +7,7 @@
             }],
         "intent": "Qna_intent"
         },
-        {"intent":"AMAZON.HelpIntent"},
         {"intent":"AMAZON.StopIntent"},
-        {"intent":"AMAZON.CancelIntent"},
-        {"intent":"AMAZON.RepeatIntent"}
+        {"intent":"AMAZON.CancelIntent"}
     ]
 }}

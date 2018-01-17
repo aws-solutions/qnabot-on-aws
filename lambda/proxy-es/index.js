@@ -1,7 +1,7 @@
 var Url=require('url')
 var Promise=require('bluebird')
 var cfnLambda=require('cfn-lambda')
-var request=require('./request')
+var request=require('./lib/request')
 exports.handler = (event, context, callback) => {
     console.log('Received event:', JSON.stringify(event, null, 2));
 

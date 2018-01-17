@@ -3,4 +3,4 @@ NAME=$(shell basename $(shell pwd))
 DST=../../build/templates/$(NAME).json
 
 $(DST):./*
-	 $(BUILD) $(NAME)
+	 $(BUILD) --stack $(NAME) --verbose

@@ -10,7 +10,7 @@ or in the "license" file accompanying this file. This file is distributed on an 
 BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied. See the
 License for the specific language governing permissions and limitations under the License.
 */
-var lambda=require('../bin/lambda.js')
+var lambda=require('./setup.js')
 var env=require('../../../bin/exports')()
 var Promise=require('bluebird')
 var _=require('lodash')
@@ -33,7 +33,7 @@ var run=function(params,schema,test){
         .catch(test.ifError)
         .finally(test.done)
 }
-var Router=new require('../router')
+var Router=new require('../lib/router')
 
 module.exports={
     router:{

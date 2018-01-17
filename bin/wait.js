@@ -7,46 +7,57 @@ var chalk=require('chalk')
 aws.config.setPromisesDependency(Promise)
 aws.config.region=require('../config').region
 var cf=new aws.CloudFormation()
-var StackName=process.argv[2]
-var show= process.argv[3]==="show" ? true : false
 const ora = require('ora');
+var name=require('./name')
 
-new Promise(function(res,rej){
-    console.log("Waiting on stack:"+StackName)
-    const spinner = new Spinner(show)
-    
-    next()
-    function next(){
-        cf.describeStacks({StackName}).promise()
-        .then(x=>x.Stacks[0].StackStatus)
-        .then(status=>{
-            spinner.update(status)
-            if([
-                "UPDATE_COMPLETE",
-                "CREATE_COMPLETE",
-                "UPDATE_ROLLBACK_COMPLETE",
-                "DELETE_COMPLETE"
-            ].includes(status)){
-                spinner.succeed(StackName+":"+status) 
-            }else if([
-                "UPDATE_IN_PROGRESS",
-                "UPDATE_ROLLBACK_COMPLETE_CLEANUP_IN_PROGRESS",
-                "UPDATE_COMPLETE_CLEANUP_IN_PROGRESS",
-                "UPDATE_ROLLBACK_IN_PROGRESS",
-                "ROLLBACK_IN_PROGRESS",
-                "DELETE_IN_PROGRESS",
-                "CREATE_IN_PROGRESS"
-            ].includes(status)){
-                setTimeout(()=>next(),5000)
-            }else{
-                spinner.fail(StackName+":"+status)
-            }
-        })
-        .catch(error=>{
-            spinner.fail(StackName+":"+error.message)
-        })
-    }
-})
+if (require.main === module) {
+    wait(process.argv[2],{show:process.argv[3]==="show" ? true : false})
+}
+module.exports=wait
+
+function wait(stackname,options){
+    var StackName=name(stackname,{})
+    return new Promise(function(res,rej){
+        if(options.show){console.log("Waiting on stack:"+StackName)}
+        const spinner = new Spinner(options.show)
+        next()
+        function next(){
+            cf.describeStacks({
+                StackName:options.Id || StackName
+            }).promise()
+            .then(x=>x.Stacks[0].StackStatus)
+            .then(status=>{
+                spinner.update(status)
+                if([
+                    "UPDATE_COMPLETE",
+                    "CREATE_COMPLETE",
+                    "UPDATE_ROLLBACK_COMPLETE",
+                    "DELETE_COMPLETE"
+                ].includes(status)){
+                    spinner.succeed(StackName+":"+status) 
+                    res()
+                }else if([
+                    "UPDATE_IN_PROGRESS",
+                    "UPDATE_ROLLBACK_COMPLETE_CLEANUP_IN_PROGRESS",
+                    "UPDATE_COMPLETE_CLEANUP_IN_PROGRESS",
+                    "UPDATE_ROLLBACK_IN_PROGRESS",
+                    "ROLLBACK_IN_PROGRESS",
+                    "DELETE_IN_PROGRESS",
+                    "CREATE_IN_PROGRESS"
+                ].includes(status)){
+                    setTimeout(()=>next(),5000)
+                }else{
+                    spinner.fail(StackName+":"+status)
+                    rej(status)
+                }
+            })
+            .tapCatch(error=>{
+                spinner.fail(StackName+":"+error.message)
+            })
+            .catch(rej)
+        }
+    })
+}
 
 function Spinner(show){
     if(show){
@@ -64,7 +75,7 @@ function Spinner(show){
 
     }else{
         this.update=()=>{}
-        this.succeed=console.log
-        this.fail=console.log
+        this.succeed=()=>{}
+        this.fail=()=>{}
     }
 }

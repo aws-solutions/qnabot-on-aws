@@ -1,14 +1,12 @@
 #! /bin/bash 
 __dirname="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-export AWS_PROFILE=$(node -e "console.log(JSON.stringify(require('$__dirname'+'/../config')))" | $(npm bin)/jq --raw-output ".profile")
-export AWS_DEFAULT_REGION=$(node -e "console.log(JSON.stringify(require('$__dirname'+'/../config')))" | $(npm bin)/jq --raw-output ".region")
+export AWS_PROFILE=$(node -e "console.log(require('$__dirname'+'/../config').profile)")
+export AWS_DEFAULT_REGION=$(node -e "console.log(require('$__dirname'+'/../config').region)")
 
-
-__dirname="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-OUTPUT=$($__dirname/exports.js)
-BUCKET=$( echo $OUTPUT | $(npm bin)/jq --raw-output '."QNA-BOOTSTRAP-BUCKET"')
-PREFIX=$( echo $OUTPUT | $(npm bin)/jq --raw-output '."QNA-BOOTSTRAP-PREFIX"')
-REGION='us-east-1'
+OUTPUT=$($__dirname/exports.js dev/bootstrap)
+BUCKET=$( echo $OUTPUT | $__dirname/json.js Bucket)
+PREFIX=$( echo $OUTPUT | $__dirname/json.js Prefix)
+REGION=$AWS_DEFAULT_REGION
 
 MASTER="http://s3.amazonaws.com/$BUCKET/$PREFIX/templates/master.min.json"
 PUBLIC="http://s3.amazonaws.com/$BUCKET/$PREFIX/templates/public.min.json"

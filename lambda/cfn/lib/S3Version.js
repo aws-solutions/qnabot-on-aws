@@ -7,7 +7,7 @@ var JSZip=require('jszip')
 JSZip.external.Promise = Promise;
 var jszip=new JSZip()
 
-module.exports=class CognitoUser extends require('./base') {
+module.exports=class S3Version extends require('./base') {
     constructor(){
         super()
     }

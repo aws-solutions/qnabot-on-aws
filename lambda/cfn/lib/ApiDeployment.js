@@ -3,7 +3,7 @@ var Promise=require('./util/promise')
 aws.config.maxRetries=10
 var api=new aws.APIGateway()
 var _=require('lodash')
-module.exports=class CognitoUser {
+module.exports=class ApiDeployment {
     Create(params,reply){
         run(()=>api.createDeployment(
                 _.omit(params,["buildDate","stage"])

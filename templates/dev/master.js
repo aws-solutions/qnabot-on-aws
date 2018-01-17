@@ -1,64 +1,18 @@
 var stack=require('../util').stacktest
+var Promise=require('bluebird')
 var config=require('../../config')
-module.exports={
-  "Resources": {
-    "master":stack('master',{
-        Email:config.devEmail,
-        BootstrapBucket:{"Fn::ImportValue":"QNA-BOOTSTRAP-BUCKET"},
-        BootstrapPrefix:{"Fn::ImportValue":"QNA-BOOTSTRAP-PREFIX"},
-        PublicOrPrivate:"PUBLIC"
-    })
-  },
-  "Outputs":{
-    "Bucket":{
-        "Value":{"Fn::GetAtt":["master","Outputs.DesignerBucket"]},
-        "Export":{
-            "Name":"QNA-DEV-WEB-BUCKET"
-        }
-    },
-    "HandlerArn":{
-        "Value":{"Fn::GetAtt":["master","Outputs.HandlerArn"]},
-        "Export":{
-            "Name":"QNA-DEV-HANDLER-ARN"
-        }
-    },
-    "BotName":{
-        "Value":{"Fn::GetAtt":["master","Outputs.BotName"]},
-        "Export":{
-            "Name":"QNA-DEV-BOT-NAME"
-        }
-    },
-    "BotAlias":{
-        "Value":{"Fn::GetAtt":["master","Outputs.BotAlias"]},
-        "Export":{
-            "Name":"QNA-DEV-BOT-ALIAS"
-        }
-    },
-    "ElasticSearchEndpoint":{
-        "Value":{"Fn::GetAtt":["master","Outputs.ElasticSearchEndpoint"]},
-        "Export":{
-            "Name":"QNA-DEV-MASTER-ES"
-        }
-    },
-    "ApiEndpoint":{
-        "Value":{"Fn::GetAtt":["master","Outputs.ApiEndpoint"]},
-        "Export":{
-            "Name":"QNA-DEV-MASTER-API"
-        }
-    },
-    "UserPool":{
-        "Value":{"Fn::GetAtt":["master","Outputs.UserPool"]},
-        "Export":{
-            "Name":"QNA-DEV-MASTER-USERPOOL"
-        }
-    },
-    "DesignerClientId":{
-        "Value":{"Fn::GetAtt":["master","Outputs.DesignerClientId"]},
-        "Export":{
-            "Name":"QNA-DEV-MASTER-DESIGNER-CLIENT-ID"
-        }
-    }
-  },
-  "AWSTemplateFormatVersion": "2010-09-09",
-  "Description": "Development QnABot master template"
-}
+var outputs=require('../../bin/exports')
+
+module.exports=Promise.join(
+    Promise.resolve(require('../master')),
+    outputs('dev/bootstrap')
+).spread(function(base,output){
+
+    base.Parameters.BootstrapBucket.Default=output.Bucket
+    base.Parameters.BootstrapPrefix.Default=output.Prefix
+    base.Parameters.Email.Default=config.devEmail
+
+    return base
+})
+
+

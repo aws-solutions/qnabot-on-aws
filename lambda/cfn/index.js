@@ -3,7 +3,6 @@ var response=require('./lib/util/response')
 var _=require('lodash')
 
 exports.handler=function(event,context,cb){
-    console.log(event)
     dispatch(event,context,cb)
 }
 
@@ -23,10 +22,11 @@ var targets={
 var Lex=require('./lib/lex')
 
 function dispatch(event,context,cb){
+    console.log("event",JSON.stringify(event,null,2))
     var type=event.ResourceType.match(/Custom::(.*)/)
     var Lextype=event.ResourceType.match(/Custom::Lex(Bot|Alias|SlotType|Intent)/)
     if(_.get(Lextype,1)==='Alias') Lextype[1]='BotAlias'
-    
+    console.log(targets[type[1]]) 
     if(Lextype){ 
         cfnLambda(new Lex(Lextype[1]))(event,context,cb)
     }else if(targets[type[1]]){

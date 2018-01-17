@@ -20,13 +20,13 @@ module.exports={
                     }
                 },
                 a:{
-                    type:"string",
+                    type:"text",
                     title:"Anwser",
                     description:"Enter the answer you want to be returned when user asks one of the above questions",
                     maxLength:8000,
                 },
                 t:{
-                    type:"string",
+                    type:"text",
                     description:"Assign a topic to this item, to support follow up questions on the same topic.",
                     title:"Topic"
                 },
@@ -36,19 +36,19 @@ module.exports={
                     type:"object",
                     properties:{
                         title:{
-                            type:"string",
+                            type:"text",
                             title:"Card Title",
                             description:"",
                             maxLength:100
                         },
                         text:{
-                            type:"string",
+                            type:"text",
                             title:"Card Text",
                             description:"",
                             maxLength:5000
                         },
                         url:{
-                            type:"string",
+                            type:"text",
                             description:"",
                             title:"Card Image Url",
                             format:'url',
@@ -73,7 +73,7 @@ module.exports={
             type:"nested",
             properties:{
                 q:{
-                    type:"string",
+                    type:"text",
                     analyzer:"english"
                 }
             }
@@ -83,9 +83,7 @@ module.exports={
             analyzer:"english"
         },
         t:{
-            type:'string',
-            norms:false,
-            analyzer:"whitespace" 
+            type:'text',analyzer:"whitespace" 
         },
         r:{
             properties:{

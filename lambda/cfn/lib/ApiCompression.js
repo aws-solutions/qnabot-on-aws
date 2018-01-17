@@ -1,7 +1,7 @@
 var aws=require('./util/aws')
 var api=new aws.APIGateway()
 
-module.exports=class CognitoUser {
+module.exports=class ApiCompression {
     Create(params,reply){
         api.updateRestApi({
             restApiId:params.restApiId,

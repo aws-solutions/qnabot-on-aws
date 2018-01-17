@@ -14,11 +14,11 @@ var base=require('./base')
 var Promise=require('bluebird')
 var aws=require('../../lib/util/aws')
 var s3=new aws.S3()
-var cfExports=require('../../bin/exports')
+var outputs=require('../../../../bin/exports')
 
-var setup=cfExports.then(function(exports){
+var setup=outputs('dev/api',{silent:false,wait:true}).then(function(output){    
     return {
-        restApiId:exports["QNA-DEV-API"],
+        restApiId:output.ApiId,
         value:"0"
     }
 })

@@ -1,5 +1,5 @@
 SOURCES:=$(shell find . -type f -not -path "./build/*")
-.PHONY: build test
+.PHONY: build test dev
 
 ../build/website.zip:$(SOURCES)
 	export NODE_ENV=prod; make build -B

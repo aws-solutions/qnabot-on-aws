@@ -2,30 +2,27 @@ BUILD=../../bin/build.js
 NAME=$(shell basename $(shell pwd))
 DST=../../build/templates/dev
 
-all:$(DST)/domain.json $(DST)/bucket.json $(DST)/lex.json $(DST)/cognito.json $(DST)/master.json  $(DST)/bootstrap.json $(DST)/lambda.json $(DST)/api.json
+all:$(DST)/domain.json $(DST)/bucket.json $(DST)/cognito.json $(DST)/master.json  $(DST)/bootstrap.json $(DST)/lambda.json $(DST)/api.json
 
-$(DST)/bootstrap.json:./bootstrap.json
-	 cp ./bootstrap.json $(DST)/bootstrap.json
+$(DST)/bootstrap.json:./bootstrap/*
+	 $(BUILD) --stack $(NAME)/bootstrap --verbose
 
 $(DST)/domain.json:./domain.*
-	 $(BUILD) $(NAME)/domain
+	 $(BUILD)  --stack $(NAME)/domain --verbose
 
 $(DST)/api.json:./api.*
-	 $(BUILD) $(NAME)/api
+	 $(BUILD) --stack  $(NAME)/api --verbose
 
 $(DST)/lambda.json:./lambda.*
-	 $(BUILD) $(NAME)/lambda
+	 $(BUILD) --stack  $(NAME)/lambda --verbose
 
 $(DST)/bucket.json:./bucket.*
-	 $(BUILD) $(NAME)/bucket
-
-$(DST)/lex.json:./lex.*
-	 $(BUILD) $(NAME)/lex
+	 $(BUILD) --stack  $(NAME)/bucket --verbose
 
 $(DST)/cognito.json:./cognito.*
-	 $(BUILD) $(NAME)/cognito
+	 $(BUILD) --stack  $(NAME)/cognito --verbose
 
-$(DST)/master.json:./master.*
-	 $(BUILD) $(NAME)/master
+$(DST)/master.json:./master.* ../master/*
+	 $(BUILD) --stack  $(NAME)/master --verbose
 
 

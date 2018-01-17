@@ -14,18 +14,19 @@ License for the specific language governing permissions and limitations under th
 
 var Promise=require('bluebird')
 var fs=Promise.promisifyAll(require('fs'))
+var _=require('lodash')
 var path=require('path')
 
 var config=require('../../config')
 module.exports=Promise.resolve(require('../master')).then(function(base){
-    delete base.Outputs.AdminBucket
-    delete base.Outputs.BotName
-    delete base.Outputs.HandlerArn
-    delete base.Outputs.HealthArn
-    delete base.Outputs.FulfilmentArn
-    delete base.Outputs.ApiURL
-    delete base.Parameters.BootstrapBucket
-    delete base.Parameters.BootstrapPrefix
+    base.Outputs=_.pick(base.Outputs,[
+        "ContentDesignerLogin",
+        "ClientURL",
+        "DashboardUrl",
+        "UserPoolUrl"
+    ])
+
+    base.Parameters=_.omit(base.Parameters,["BootstrapBucket","BootstrapPrefix"])
 
     var out=JSON.stringify(base).replace(
         /{"Ref":"BootstrapBucket"}/g,

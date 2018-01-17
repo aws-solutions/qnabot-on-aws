@@ -1,11 +1,11 @@
 var base=require('./base')
 var Promise=require('bluebird')
-var cfExports=require('../../bin/exports')
+var outputs=require('../../../../bin/exports')
 
-var setup=cfExports.then(function(exports){
+var setup=outputs('dev/cognito').then(function(output){
     var param={
-        UserPool:exports["QNA-DEV-USERPOOL"],
-        Client:exports["QNA-DEV-CLIENT"],
+        UserPool:output.UserPool,
+        Client:output.Client,
         LoginRedirectUrl:"https://exampe.com",
         LogoutRedirectUrl:"https://exampe.com" 
     }

@@ -1,2 +1,5 @@
 require('jsdom-global')()
-module.exports=require('./compiled')
+module.exports={
+    unit:require('./compiled'),
+    endtoend:require('./e2e')
+}

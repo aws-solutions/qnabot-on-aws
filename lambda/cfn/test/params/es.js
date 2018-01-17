@@ -14,11 +14,11 @@ var base=require('./base')
 var Promise=require('bluebird')
 var aws=require('../../lib/util/aws')
 var s3=new aws.S3()
-var cfExports=require('../../bin/exports')
+var outputs=require('../../../../bin/exports')
 
-var setup=cfExports.then(function(exports){
+var setup=outputs('dev/domain').then(function(output){
     return {
-        Address:exports["QNA-DEV-ES-ADDRESS"],
+        Address:output.Addresss,
         Index:'test-index',
         Name:'test-index-2',
         Type:{    

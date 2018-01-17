@@ -2,7 +2,7 @@ var aws=require('./util/aws')
 var Promise=require('bluebird')
 var s3=new aws.S3()
 
-module.exports=class CognitoUser extends require('./base') {
+module.exports=class S3Clear extends require('./base') {
     constructor(){
         super()
     }
@@ -12,9 +12,9 @@ module.exports=class CognitoUser extends require('./base') {
                 s3.listObjectVersions({
                     Bucket:params.Bucket,
                     Prefix:params.Prefix
-                }).promise()
+                }).promise().tap(console.log)
+                .then(x=>x.Versions.concat(x.DeleteMarkers))
                 .tap(x=>console.log("Files",x))
-                .get("Versions")
                 .then(function(files){
                     return files.map(file=>{return {
                         Key:file.Key,

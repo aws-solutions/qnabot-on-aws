@@ -7,7 +7,7 @@ var JSZip=require('jszip')
 JSZip.external.Promise = Promise;
 var jszip=new JSZip()
 
-module.exports=class CognitoUser extends require('./base') {
+module.exports=class S3Unzip extends require('./base') {
     constructor(){
         super()
     }
@@ -41,19 +41,7 @@ module.exports=class CognitoUser extends require('./base') {
     }
 
     Delete(ID,params,reply){
-        getFiles(params)
-        .then(function(files){
-            var param={
-                Bucket:params.DstBucket,
-                Delete:{
-                    Objects:files.map(file=>{return{Key:file}})
-                }
-            }
-            return s3.deleteObjects(param).promise()
-        })
-        .tap(console.log)
-        .then(()=>reply(null,ID,null) )
-        .catch(err=>reply(err,ID,null) )
+        reply(null,ID,null)
     }
 }
 

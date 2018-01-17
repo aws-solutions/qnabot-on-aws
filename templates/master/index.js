@@ -47,6 +47,9 @@ var base={
     "BotName":{
         "Value":{"Fn::GetAtt":["QnABot","Outputs.Bot"]}
     },
+    "SlotType":{
+        "Value":{"Fn::GetAtt":["QnABot","Outputs.SlotType"]}
+    },
     "BotAlias":{
         "Value":{"Fn::GetAtt":["QnABot","Outputs.BotAlias"]}
     },
@@ -71,8 +74,17 @@ var base={
         "Value":{"Fn::GetAtt":["api","Outputs.UserPoolUrl"]},
         "Description":"Where you will manage users for your QnABot."
     },
+    "ESProxyLambda":{
+        "Value":{"Fn::GetAtt":["api","Outputs.ESProxyLambda"]}
+    },
     "ElasticSearchEndpoint":{
         "Value":{"Fn::GetAtt":["domain","Outputs.ESAddress"]}
+    },
+    "ElasticSearchIndex":{
+        "Value":{"Fn::GetAtt":["domain","Outputs.Index"]}
+    },
+    "ElasticSearchType":{
+        "Value":{"Fn::GetAtt":["domain","Outputs.Type"]}
     },
     "ApiEndpoint":{
         "Value":{"Fn::GetAtt":["api","Outputs.Endpoint"]}

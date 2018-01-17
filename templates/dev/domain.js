@@ -1,40 +1,17 @@
 var stack=require('../util').stacktest
-module.exports={
-   "Description": "This template creates dev ElasticSearch Cluster",
-   "Resources": {
-        "Domain":stack('domain',{})
-   },
-   "Outputs": {
-        "Address":{
-            "Value":{"Fn::GetAtt":["Domain","Outputs.ESAddress"]},
-            "Export":{
-                "Name":"QNA-DEV-ES-ADDRESS"
-            }
-        },
-        "Arn":{
-            "Value":{"Fn::GetAtt":["Domain","Outputs.ESArn"]},
-            "Export":{
-                "Name":"QNA-DEV-ES-ARN"
-            }
-        },
-        "Name":{
-            "Value":{"Fn::GetAtt":["Domain","Outputs.ESDomain"]},
-            "Export":{
-                "Name":"QNA-DEV-ES-NAME"
-            }
-        },
-        "Type":{
-            "Value":{"Fn::GetAtt":["Domain","Outputs.Type"]},
-            "Export":{
-                "Name":"QNA-DEV-TYPE"
-            }
-        },
-        "Index":{
-            "Value":{"Fn::GetAtt":["Domain","Outputs.Index"]},
-            "Export":{
-                "Name":"QNA-DEV-INDEX"
-            }
-        }
 
-   }
-}
+var stack=require('../util').stacktest
+var Promise=require('bluebird')
+var config=require('../../config')
+var outputs=require('../../bin/exports')
+
+module.exports=Promise.join(
+    Promise.resolve(require('../domain')),
+    outputs('dev/bootstrap')
+).spread(function(base,output){
+    base.Parameters.BootstrapBucket.Default=output.Bucket
+    base.Parameters.BootstrapPrefix.Default=output.Prefix
+    return base
+})
+
+

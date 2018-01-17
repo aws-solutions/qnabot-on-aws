@@ -47,16 +47,10 @@ module.exports={
    },
    "Outputs": {
         "ApiId":{
-            "Value":{"Ref":"API"},
-            "Export":{
-                "Name":"QNA-DEV-API"
-            }
+            "Value":{"Ref":"API"}
         },
         "Stage":{
-            "Value":"test",
-            "Export":{
-                "Name":"QNA-DEV-API-STAGE"
-            }
+            "Value":"test"
         }
    }
 }

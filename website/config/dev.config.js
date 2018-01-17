@@ -19,7 +19,7 @@ var BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlug
 var _=require('lodash')
 var aws=require('aws-sdk')
 
-module.exports = require('../../bin/exports')(config.region).then(function(result){
+module.exports = require('../../bin/exports')('dev/bootstrap').then(function(result){
     return {
     watch: true,
     watchOptions:{
@@ -34,7 +34,7 @@ module.exports = require('../../bin/exports')(config.region).then(function(resul
                 region:config.region
             },
             s3UploadOptions:{
-                Bucket:result["QNA-DEV-WEB-BUCKET"]
+                Bucket:result.Bucket
             }
         }),
         new ProgressBarPlugin(),

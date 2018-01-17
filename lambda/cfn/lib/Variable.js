@@ -2,7 +2,7 @@ var Promise=require('./util/promise')
 var crypto=Promise.promisifyAll(require('crypto'))
 var response=require('cfn-response')
 
-module.exports=class CognitoUser extends require('./base') {
+module.exports=class Variable extends require('./base') {
     constructor(){
         super()
     }

@@ -1,23 +1,23 @@
 var base=require('./base')
 var Promise=require('bluebird')
-var cfExports=require('../../bin/exports')
+var outputs=require('../../../../bin/exports')
 
-var setup=cfExports.then(function(exports){
+var setup=outputs('dev/cognito').then(function(output){
     var param={
-        UserPool:exports["QNA-DEV-USERPOOL"],
-        Client:exports["QNA-DEV-CLIENT"],
-        IdentityPoolId:exports["QNA-DEV-IDPOOL"],
-        Roles:{'authenticated':exports["QNA-DEV-ROLE-ARN"]},
+        UserPool:output.UserPool,
+        Client:output.Client,
+        IdentityPoolId:output.IdPool,
+        Roles:{'authenticated':output.Role},
         RoleMappings:[{
-            ClientId:exports["QNA-DEV-CLIENT"],
-            UserPool:exports["QNA-DEV-USERPOOL"],
+            ClientId:output.Client,
+            UserPool:output.UserPool,
             Type:"Rules",
             AmbiguousRoleResolution:"Deny",
             RulesConfiguration:{Rules:[{
                 Claim:"Cognito:Group",
                 MatchType:"Equals",
                 Value:"Admin",
-                RoleARN:exports["QNA-DEV-ROLE-ARN"]
+                RoleARN:output.Role
             }]}
         }]
     }

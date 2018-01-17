@@ -6,7 +6,7 @@ exports.stack=function(name,parameters){
                 "https://s3.amazonaws.com",
                 {"Ref":"BootstrapBucket"},
                 {"Ref":"BootstrapPrefix"},
-                "templates/"+name+'.min.json'
+                "templates/"+name+'.json'
             ]]},
             "Parameters":Object.assign({
                 "BootstrapBucket":{"Ref":"BootstrapBucket"},

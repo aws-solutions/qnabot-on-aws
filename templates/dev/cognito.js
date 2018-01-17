@@ -65,24 +65,16 @@ module.exports={
    },
    "Outputs": {
         "IdPool":{
-            "Value":{"Ref":"IdPool"},
-            "Export":{
-                "Name":"QNA-DEV-IDPOOL"
-            }
+            "Value":{"Ref":"IdPool"}
         },
         "UserPool":{
-            "Value":{"Ref":"UserPool"},
-            "Export":{
-                "Name":"QNA-DEV-USERPOOL"
-            }
+            "Value":{"Ref":"UserPool"}
         },
         "Client":{
-            "Value":{"Ref":"Client"},
-            "Export":{"Name":"QNA-DEV-CLIENT"}
+            "Value":{"Ref":"Client"}
         },
         "Role":{
-            "Value":{"Fn::GetAtt":["Role","Arn"]},
-            "Export":{"Name":"QNA-DEV-ROLE-ARN"}
+            "Value":{"Fn::GetAtt":["Role","Arn"]}
         }
    }
 }

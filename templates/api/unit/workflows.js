@@ -13,7 +13,7 @@ var aws=require('aws-sdk')
 aws.config.setPromisesDependency(Promise)
 aws.config.region=config.region
 var s3=new aws.S3()
-var env=require('../../../bin/exports')()
+var outputs=require('../../../bin/exports')
 var exists=require('./util').exists
 var run=require('./util').run
 var api=require('./util').api

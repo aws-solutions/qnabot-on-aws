@@ -11,8 +11,9 @@ BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied. See the
 License for the specific language governing permissions and limitations under the License.
 */
 
-var lambda=require('../bin/lambda.js')
-var env=require('../../../bin/exports')()
+var lambda=require('./setup.js')
+var outputs=require('../../../bin/exports')
+var Promise=require('bluebird')
 var run=function(params,test){
     return lambda(params)
         .tap(msg=>console.log(JSON.stringify(msg)))
@@ -24,14 +25,15 @@ var run=function(params,test){
 
 module.exports={
     build:function(test){
-        env.then(function(envs){
+        outputs('dev/master',{wait:true})
+        .then(function(master){
             var params={
-                address:envs["QNA-DEV-ES-ADDRESS"],
-                index:envs["QNA-DEV-INDEX"],
-                type:envs["QNA-DEV-INDEX"],
-                botname:envs["QNA-DEV-BOT"],
-                slottype:envs["QNA-DEV-SLOTTYPE"],
-                intent:envs["QNA-DEV-INTENT"]
+                address:master.ElasticSearchEndpoint,
+                index:master.ElasticSearchIndex,
+                type:master.ElasticSearchType,
+                botname:master.BotName,
+                slottype:master.SlotType,
+                intent:master.IntentName
             }
             run(params,test)
         })

@@ -1,10 +1,10 @@
 var base=require('./base')
 var Promise=require('bluebird')
-var cfExports=require('../../bin/exports')
+var outputs=require('../../../../bin/exports')
 
-var setup=cfExports.then(function(exports){
-    process.env.USERPOOL=exports["QNA-COGNITO-USERPOOL"]
-    process.env.CLIENT=exports["QNA-COGNITO-CLIENT"]
+var setup=outputs('dev/cognito').then(function(output){
+    process.env.USERPOOL=output.UserPool
+    process.env.CLIENT=output.Client
     
     var param={
         LoginRedirectUrl:"https://exampe.com",

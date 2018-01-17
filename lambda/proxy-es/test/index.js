@@ -3,13 +3,13 @@ process.env.AWS_DEFAULT_REGION=require('../../../config').profile
 var handler=require('../index').handler
 var Promise=require('bluebird')
 var cfn=Promise.promisifyAll(require('../index'),{multiArgs:true})
-var env=require('../../../bin/exports')()
+var outputs=require('../../../bin/exports')
 
 module.exports={
     error:function(test){    
-        env.then(function(envs){
+        outputs('dev/master').then(function(output){
         handler({
-            endpoint:envs["QNA-DEV-MASTER-ES"],
+            endpoint:output.ElasticSearchEndpoint,
             method:'HEAD',
             path:"/test/test/test",
         },{},function(error,result){
@@ -21,9 +21,9 @@ module.exports={
         })
     },
     get:function(test){    
-        env.then(function(envs){
+        outputs('dev/master').then(function(output){
         handler({
-            endpoint:envs["QNA-DEV-MASTER-ES"],
+            endpoint:output.ElasticSearchEndpoint,
             method:'GET',
             path:"/",
         },{},function(error,result){
@@ -35,11 +35,11 @@ module.exports={
         })
     },
     post:function(test){
-        env.then(function(envs){
+        outputs('dev/master').then(function(output){
         handler({
-            endpoint:envs["QNA-DEV-MASTER-ES"],
+            endpoint:output.ElasticSearchEndpoint,
             method:'POST',
-            path:"/"+envs["QNA-DEV-INDEX"]+'/'+envs["QNA-DEV-TYPE"]+'/test',
+            path:"/"+output.ElasticSearchIndex+'/'+output.ElasticSearchType+'/test',
             body:{
                 qid:"test"
             }
@@ -52,20 +52,20 @@ module.exports={
         })
     },
     bulk:function(test){    
-        env.then(function(envs){
+        outputs('dev/master').then(function(output){
         handler({
-            endpoint:envs["QNA-DEV-ES-ADDRESS"],
+            endpoint:output.ElasticSearchEndpoint,
             method:'POST',
             path:"/_bulk",
             body:[
                 {delete:{
-                    _index:envs["QNA-DEV-INDEX"],
-                    _type:envs["QNA-DEV-TYPE"],
+                    _index:output.ElasticSearchIndex,
+                    _type:output.ElasticSearchType,
                     _id:"test-tmp.1"    
                 }},
                 {delete:{
-                    _index:envs["QNA-DEV-INDEX"],
-                    _type:envs["QNA-DEV-TYPE"],
+                    _index:output.ElasticSearchIndex,
+                    _type:output.ElasticSearchType,
                     _id:"test-tmp.2"    
                 }}
             ]
@@ -79,9 +79,9 @@ module.exports={
         })
     },
     create:function(test){  
-        env.then(function(envs){
+        outputs('dev/master').then(function(output){
             return cfn.CreateAsync({create:{ 
-                endpoint:envs["QNA-DEV-MASTER-ES"],
+                endpoint:output.ElasticSearchEndpoint,
                 method:'GET',
                 path:"/"
             }})
@@ -92,9 +92,9 @@ module.exports={
         .finally(test.done)
     },
     update:function(test){
-        env.then(function(envs){
+        outputs('dev/master').then(function(output){
             return cfn.UpdateAsync("",{create:{ 
-                endpoint:envs["QNA-DEV-MASTER-ES"],
+                endpoint:output.ElasticSearchEndpoint,
                 method:'GET',
                 path:"/"
             }},{})
@@ -105,9 +105,9 @@ module.exports={
         .finally(test.done)
     },
     delete:function(test){
-        env.then(function(envs){
+        outputs('dev/master').then(function(output){
             return cfn.DeleteAsync("",{delete:{ 
-                endpoint:envs["QNA-DEV-MASTER-ES"],
+                endpoint:output.ElasticSearchEndpoint,
                 method:'GET',
                 path:"/"
             }})

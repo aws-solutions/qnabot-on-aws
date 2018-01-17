@@ -45,8 +45,6 @@ Finally, use the following command to launch template to deploy the QnA bot in y
 npm run up
 ```
 
-All script descriptions are found in /docs/scripts.md  
-
 ## Components
 ### CloudFormation Templates
 The CloudFormation test templates are in the templates/test folder. The current templates are:
@@ -60,12 +58,17 @@ The CloudFormation test templates are in the templates/test folder. The current 
 
 Run a template test with:
 ```shell
-npm run stack test/{template-name} wait
+npm run stack test/{template-name}
 ```
 
 For example, if you want to test the domain template run:
 ```shell
-npm run check test/domain
+npm run stack test/domain
+```
+
+To understand the command more run: 
+```shell 
+npm run stack -h
 ```
 
 You also can check a template's syntax with:
@@ -75,6 +78,11 @@ npm run check {template-name}
 ex. 
 ```shell
 npm run check domain
+```
+
+To understand the command more run: 
+```shell 
+npm check stack -h
 ```
 
 ### Lambda Functions
