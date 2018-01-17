@@ -16,13 +16,29 @@ module.exports={
         .then(cb)
     },
     login:function(test){
-        outputs.then(function(output){
+        var self=this
+        console.log(self.password)
+        outputs.delay(2*2000).then(function(output){
             console.log(output.ContentDesignerLogin)
             return client.init()
             .url(output.ContentDesignerLogin)
-            .getUrl()
+            .getTitle().then(title=>test.equal(title,"Signin"))
+            .execute(function(username,password){
+                document.querySelector('#username').value=username
+                document.querySelector('#password').value=password
+                document.querySelector('input[name="signInSubmitButton"]').click()
+            },self.username,self.password)
+            .waitUntil(function(){
+                return this.getTitle().then(title=>{
+                    console.log(title)
+                    return title==="QnABot Designer"
+                })
+            },5000)
             .then(console.log)
-            .catch(console.log)
+            .catch(err=>{
+                console.log(err)
+                test.ifError(err)
+            })
         })
         .finally(test.done)
     },

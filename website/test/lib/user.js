@@ -73,7 +73,7 @@ exports.create=function(){
             })
             .return({
                 username:Username,
-                password
+                password:password+'1'
             })
         })
     })
