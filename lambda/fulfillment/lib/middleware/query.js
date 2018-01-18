@@ -18,6 +18,7 @@ var es=require('elasticsearch').Client({
 })
 
 module.exports=function(req,res){
+    console.log("ElasticSearch Query",JSON.stringify(req._query,null,2))
     return es.search({
         index: process.env.ES_INDEX,
         type: process.env.ES_TYPE,
