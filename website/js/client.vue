@@ -43,4 +43,7 @@ module.exports={
   #lex-web > nav {
     display:none;
   }
+  nav {
+    z-index:1;
+  }
 </style>
