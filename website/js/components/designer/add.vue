@@ -10,7 +10,7 @@
         v-card-actions
           v-spacer
             v-btn(@click='cancel' flat) close
-    v-dialog(persistent v-model='dialog' max-width='50%')
+    v-dialog(persistent v-model='dialog' max-width='50%' ref="dialog")
       v-btn(slot="activator" @click='reset') Add
       v-card
         v-card-title(primary-title)
@@ -78,7 +78,8 @@ module.exports={
       this.reset()
     },
     reset:function(){
-      this.data=empty(this.schema)
+      this.data=empty(this.schema) 
+      this.$refs.dialog.$refs.dialog.scrollTo(0,0)
     },
     add:function(){
       var self=this
