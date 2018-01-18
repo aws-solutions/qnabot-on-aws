@@ -68,7 +68,8 @@ module.exports={
   computed:{},
   methods:{
     filter:function(event){
-      this.$store.state.data.filter=event|| ""
+      this.$store.state.data.filter=event || ""
+      this.emit()
     },
     emit:_.debounce(function(){
       this.$emit('filter')
