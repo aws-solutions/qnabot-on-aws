@@ -22,7 +22,7 @@ Create a new skill using the following information:
 | Skill Name | QnA Bot |
 | Invocation Name | q and a |
 
-click Save then next.
+choose save then next
 `},
 {
     title:"Interaction Model",
@@ -36,7 +36,7 @@ Fill in the following information:
 | Utterances |  copy and paste from button below |
 | Sample Utterances | Qna_intent {QnA_slot} |
 
-click Save then next.
+choose save then next
 `,
     buttons:[{
         text:"Copy Intent Schema to clipBoard",
@@ -61,7 +61,7 @@ Fill in the following information:
 
 choose all other defaults
 
-click Save then next.
+choose save then next
 `,
     buttons:[{
         text:"Copy Lambda Arn to clipboard",
