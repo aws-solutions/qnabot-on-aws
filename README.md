@@ -25,7 +25,7 @@ npm install
 
 Next, set up your configuration file:
 ```shell
-make config.js
+make config.json
 ```
 now edit config.js with you information.
 
