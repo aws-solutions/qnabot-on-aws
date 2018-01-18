@@ -10,7 +10,7 @@ module.exports=class CognitoRole extends require('./base') {
         var RoleMappings={}
 
         params.RoleMappings.map(function(x){
-            var id="cognito-idp.us-east-1.amazonaws.com/"+x.UserPool+':'+x.ClientId
+            var id="cognito-idp."+(process.env.AWS_REGION || "us-east-1")+".amazonaws.com/"+x.UserPool+':'+x.ClientId
             delete x.ClientId
             delete x.UserPool
             RoleMappings[id]=x
