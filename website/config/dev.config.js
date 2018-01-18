@@ -19,7 +19,7 @@ var BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlug
 var _=require('lodash')
 var aws=require('aws-sdk')
 
-module.exports = require('../../bin/exports')('dev/bootstrap').then(function(result){
+module.exports = require('../../bin/exports')('dev/master').then(function(result){
     return {
     watch: true,
     watchOptions:{
@@ -34,7 +34,7 @@ module.exports = require('../../bin/exports')('dev/bootstrap').then(function(res
                 region:config.region
             },
             s3UploadOptions:{
-                Bucket:result.Bucket
+                Bucket:result.DesignerBucket
             }
         }),
         new ProgressBarPlugin(),

@@ -118,12 +118,13 @@ module.exports={
         })
     },
     list(context,opts){
+        var perpage=opts.perpage || 10
         return context.dispatch('_request',{
             url:context.rootState.info._links.questions.href+'?'+query({
-                from:opts.page || 0,
+                from:(opts.page || 0)*perpage,
                 filter:opts.filter ? opts.filter+".*" : "",
                 order:opts.order,
-                perpage:opts.perpage || 10
+                perpage
             }),
             method:'get',
             reason:"Failed to get page:"+opts.page
