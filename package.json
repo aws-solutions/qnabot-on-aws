@@ -17,6 +17,7 @@
   ],
   "description": "An Amazon Lex powered Question and Answer (QnA) Bot ====================================================",
   "scripts": {
+    "config":"make config.json",
     "check": "./bin/check.js",
     "stack": "./bin/launch.js",
     "upload": "make upload -j 4",

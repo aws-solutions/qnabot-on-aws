@@ -25,9 +25,9 @@ npm install
 
 Next, set up your configuration file:
 ```shell
-make config.js
+npm run config
 ```
-now edit config.js with you information.
+now edit config.json with you information.
 
 | param | description | 
 |-------|-------------|
@@ -35,7 +35,7 @@ now edit config.js with you information.
 |profile| the AWS credentials profile to use |
 |devEmail(required) | the email to use when creating admin users in automated stack launches |
 
-Next, use the following command to launch a CloudFormation template to create the S3 bucket to be used for lambda code and CloudFormation templates. Wait for this template to complete (you can watch progress from the [AWS CloudFormation console](https://console.AWS.amazon.com/cloudformation/home))  
+Next, use the following command to launch a CloudFormation template to create the S3 bucket to be used for lambda code and CloudFormation templates. Wait for this template to complete (you can watch progress from the command line or [AWS CloudFormation console](https://console.AWS.amazon.com/cloudformation/home))  
 ```shell
 npm run bootstrap
 ```

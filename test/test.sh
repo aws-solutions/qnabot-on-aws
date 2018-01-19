@@ -24,4 +24,5 @@ else
     exit 1
 fi
 
+npm run up
 
