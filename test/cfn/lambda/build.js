@@ -10,10 +10,10 @@ exports.build = function(event, context) {
     console.log(JSON.stringify(event,null,2))
     if(event.StackId){
         if(event.RequestType==="Create"){
-            cb.startBuild({
-                projectName:event.ResourceProperties.name,
-                sourceVersion:event.ResourceProperties.branch
-            }).promise()
+            var params=Object.assign({},event.ResourceProperties)
+            delete params.ServiceToken
+
+            cb.startBuild(params).promise()
             .then(x=>new Promise((res,rej)=>setTimeout(()=>res(x),10*1000)))
             .then(x=>{
                 return lambda.invoke({

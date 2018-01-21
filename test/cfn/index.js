@@ -130,7 +130,7 @@ module.exports=Promise.join(
             "DependsOn":["upload"],
             "Properties": {
                 "ServiceToken": { "Fn::GetAtt" : ["BuildLambda", "Arn"] },
-                "name":{"Ref":"ImageBuild"}
+                "projectName":{"Ref":"ImageBuild"}
             }
         },
         "test":{
@@ -138,8 +138,10 @@ module.exports=Promise.join(
             "DependsOn":["Build"],
             "Properties": {
                 "ServiceToken": { "Fn::GetAtt" : ["BuildLambda", "Arn"] },
-                "name":{"Ref":"testBuild"},
-                "branch":branch
+                "projectName":{"Ref":"testBuild"},
+                "sourceVersion":branch,
+                "buildspecOverride":fs.readFileSync(
+                    __dirname+'/config/buildspec.yml','utf-8')
             }
         },
         "ClearImageLambda":lambda("clearImage"),

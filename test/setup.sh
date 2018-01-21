@@ -5,7 +5,7 @@ SELENIUM_START=/opt/bin/entry_point.sh
 cd $BASE
 
 if [ -e $SELENIUM_START ]; then
-    $SELENIUM_START
+    $SELENIUM_START & 
 fi
     
 npm run --silent bootstrap
