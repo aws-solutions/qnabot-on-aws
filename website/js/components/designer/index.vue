@@ -52,7 +52,7 @@
               delete(:selectAll="selectAll" :selected="selected")
       template(slot='items' slot-scope='props')
         tr( 
-          v-on:click="props.expanded = !props.expanded"
+          v-on:click="expand(props)"
           :id="'qa-'+props.item.qid.replace('.','-')"
         )
           td.shrink(v-on:click.stop="" v-if="tab==='questions'")
@@ -195,6 +195,9 @@ module.exports={
       this.$store.commit('data/selectAll',value)
       this.selectAll=value
     },
+    expand:_.debounce(function(prop) {
+      prop.expanded = !prop.expanded
+    },100,{trailing:true,leading:false}),
     edit:console.log
   }
 }
