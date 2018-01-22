@@ -16,7 +16,7 @@
               )
             v-flex
               v-btn(@click='emit' class="ma-2 refresh" 
-                :disabled="$store.state.data.filter.length===0" 
+                :disabled="!$store.state.data.filter" 
               ) 
                 span() Filter
             v-flex
