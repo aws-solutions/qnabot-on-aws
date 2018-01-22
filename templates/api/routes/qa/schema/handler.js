@@ -17,6 +17,7 @@ exports.handler = (event, context, callback) => {
                     title:x
                 })
             delete out.properties.questions
+            test2string(out)
             callback(null,out)
         })
         .catch(callback)
@@ -24,7 +25,20 @@ exports.handler = (event, context, callback) => {
         callback(e)
     }
 }
+function test2string(obj){
+    console.log(obj) 
+    if(obj.type==="text"){
+        obj.type="string"
+    }
 
+    if(obj.properties){
+        Object.keys(obj.properties)
+        .map(x=>test2string(obj.properties[x]))
+    }
+    if(obj.items){
+        test2string(obj.items)
+    }
+}
 es = (event) => {
     return new Promise(function(res,rej){
         var endpoint =  new aws.Endpoint(event.endpoint);

@@ -84,24 +84,20 @@ module.exports={
       var self=this
       self.loading=true
       self.dialog=false
-      new Promise(function(res,rej){
+      return Promise.try(function(){
         if(self.selectAll){
           return self.$store
             .dispatch('data/removeFilter') 
             .then(()=>self.selectAll=false)
-            .then(res).catch(rej)
         } else { 
           self.total=self.QAs.length
-          return new Promise(function(res,rej){
-            if(self.QAs.length===1){
-              self.$store.dispatch('data/removeQA',self.QAs[0])
-                .then(res).catch(rej)
-            }else{
-              self.$store.dispatch('data/removeQAs',self.QAs)
-                .then(res).catch(rej)
-            }
+          return Promise.try(function(){
+              if(self.QAs.length===1){
+                return self.$store.dispatch('data/removeQA',self.QAs[0])
+              }else{
+                return self.$store.dispatch('data/removeQAs',self.QAs)
+              }
           })
-          .then(res).catch(rej)
         }
       })
       .tap(()=>self.$store.commit('data/selectAll',false))

@@ -28,7 +28,7 @@
             :name="name"
             @update:valid="isValid"
           )
-          v-btn.delete(icon @click.native='remove' tabindex='-1')
+          v-btn.delete(icon @click.native='remove(index)' tabindex='-1')
             v-icon delete
       v-btn.block(@click.native='add' tabindex='-1') add question
     div(v-if="schema.type==='object'")
@@ -78,7 +78,9 @@ module.exports={
       local:this.value,
       rules:{
         required:function(value){
-          return (self.required ? value.trim().length>0 : true)  || "Required"
+          return (self.required ? 
+            (value && value.trim ? value.trim().length>0 : false) 
+            : true)  || "Required"
         },
         schema:function(value){
           var validate=ajv.compile(self.schema || true)
