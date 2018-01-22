@@ -157,11 +157,7 @@ module.exports={
       }else{
         this.pagination.sortBy='qid'
         this.pagination.descending=false
-        return this.$store.dispatch('data/get',{
-          page:this.pagination.page-1,
-          perpage:this.pagination.rowsPerPage,
-          order:this.pagination.descending ? 'desc' : 'asc'
-        }) 
+        return this.get(this.pagination)
       }
     },
     pagination:function(event){
@@ -169,14 +165,14 @@ module.exports={
     }
   },
   methods:{
-    get:function(event){
+    get:_.debounce(function(event){
       this.selectAll=false
       return this.$store.dispatch('data/get',{
         page:event.page-1,
         perpage:event.rowsPerPage,
         order:event.descending ? 'desc' : 'asc'
       }) 
-    },
+    },100,{trailing:true,leading:false}),
     changeSort:_.debounce(function(column) {
       if(this.tab==='questions'){
         if (this.pagination.sortBy === column) {

@@ -23,6 +23,7 @@ var reason=function(r){
         Promise.reject(r)
     }
 }
+var failed=false
 module.exports={
     _request(context,opts){
         var url=Url.parse(opts.url)
@@ -61,12 +62,12 @@ module.exports={
             context.commit('loading',false)
             var login=_.get(context,"rootState.info._links.DesignerLogin.href")
             console.log(login)
-            if(login){
+            if(login && !failed){
+                failed=true
                 var result=window.confirm("You need to be logged in to use this page. click ok to be redirected to the login page") 
                 if(result) window.window.location.href=login
             }
         })
-        .tapCatch(console.log)
         .catch(error=>Promise.reject({
             response:error.response.data,
             status:error.response.status
