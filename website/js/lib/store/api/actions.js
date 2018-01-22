@@ -41,16 +41,14 @@ module.exports={
         context.commit('loading',true)
 
         var credentials=context.rootState.user.credentials
-        if(credentials.needsRefresh()){
-            var ready=credentials.refreshPromise()
-                .then(function(){
-                    console.log("credentials refreshed")
-                })
-        }else{
-            var ready=Promise.resolve(credentials)
-        }
-        return ready.then(function(creds){
-            var signed=sign(request,creds)        
+        
+        return Promise.try(function(){
+            if(credentials.needsRefresh()){
+                return credentials.refreshPromise()
+            }
+        })
+        .then(function(){
+            var signed=sign(request,credentials)        
             delete request.headers["Host"]
             delete request.headers["Content-Length"]        
 
@@ -67,8 +65,8 @@ module.exports={
                 var result=window.confirm("You need to be logged in to use this page. click ok to be redirected to the login page") 
                 if(result) window.window.location.href=login
             }
-            return Promise.reject()
         })
+        .tapCatch(console.log)
         .catch(error=>Promise.reject({
             response:error.response.data,
             status:error.response.status

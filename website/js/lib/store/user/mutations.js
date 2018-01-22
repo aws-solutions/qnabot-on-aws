@@ -26,32 +26,34 @@ module.exports={
     },
     token:function(state,rootState){
         try {
-            var params=query.parse(state.hash)
-            console.log(params)
-            if(params.id_token){
+            var id_token=window.sessionStorage.getItem('id_token')
+            
+            if(id_token){
+                var token=jwt.decode(id_token)
+            }else{
+                var params=query.parse(state.hash)
+                var id_token=params.id_token
                 var token=jwt.decode(params.id_token)
-                console.log(token)
-                
-                set(state,'name',token["cognito:username"])
-                set(state,'groups',token["cognito:groups"])
-                set(state,'token',params.id_token)
-                console.log('auth',state.groups) 
-                if(!state.groups || !state.groups.includes('Admins')){
-                    var login=_.get(rootState,"info._links.DesignerLogin.href")
-                    window.alert("You must be an administrative user to view this page") 
-                    window.window.location.href=login
-                }
-                state.Logins={}
-                state.Logins[[
-                    'cognito-idp.',
-                    rootState.info.region,
-                    '.amazonaws.com/',
-                    rootState.info.UserPool,
-                    ].join('')]=state.token
-            }else if(params.AccessKey){
-                set(state,'loggedin',true)
-                set(state,'credentials',new aws.Credentials(params))
+                window.sessionStorage.setItem('id_token',params.id_token)
             }
+            
+            set(state,'name',token["cognito:username"])
+            set(state,'groups',token["cognito:groups"])
+            set(state,'token',id_token)
+            console.log('auth',state.groups) 
+            if(!state.groups || !state.groups.includes('Admins')){
+                var login=_.get(rootState,"info._links.DesignerLogin.href")
+                window.alert("You must be an administrative user to view this page") 
+                window.window.location.href=login
+            }
+            state.Logins={}
+            state.Logins[[
+                'cognito-idp.',
+                rootState.info.region,
+                '.amazonaws.com/',
+                rootState.info.UserPool,
+                ].join('')]=state.token
+
         } catch(e){
             console.log(e)
             rootState.error="Missing or invalide Authentication token, please Login"

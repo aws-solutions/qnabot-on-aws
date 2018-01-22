@@ -29,7 +29,7 @@
       v-toolbar-items
         v-btn(flat 
           id="logout-button"
-          :href="login" 
+          @click="logout"
           v-if="login") LogOut
     v-container(fluid)
       v-layout(column)
@@ -113,7 +113,12 @@ module.exports={
     }
   },
   created:function(){},
-  methods:{}
+  methods:{
+    logout:function(){
+      this.$store.dispatch('user/logout')
+      window.location=this.login,2000
+    }
+  }
 }
 </script>
 
