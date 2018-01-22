@@ -27,8 +27,9 @@ module.exports={
     token:function(state,rootState){
         try {
             var id_token=window.sessionStorage.getItem('id_token')
+            console.log(typeof id_token)    
             
-            if(id_token){
+            if(id_token && id_token!=="undefined"){
                 var token=jwt.decode(id_token)
             }else{
                 var params=query.parse(state.hash)
