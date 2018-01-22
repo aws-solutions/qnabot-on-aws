@@ -1,5 +1,5 @@
 <template lang='pug'>
-  v-container(column grid-list-md)
+  v-container(column grid-list-md id="page-import")
     v-layout(column)
       v-flex
         v-card
@@ -8,7 +8,7 @@
             p Warning, This will over write existing QnAs 
           v-card-actions(v-if="!dialog.file")
             v-spacer
-            v-btn(@click="dialog.file=true") choose file
+            v-btn(@click="dialog.file=true" id="choose-file") choose file
           v-card-actions(v-if="dialog.file")
             v-spacer
             input(
@@ -34,15 +34,17 @@
             v-btn(@click="dialog.url=false") cancel
             v-btn(@click="Geturl") continue
     v-dialog(v-model="loading" persistent)
-      v-card
+      v-card( id="import-loading")
         v-card-title Loading
         v-card-text
-          span(v-if="error" class='error--text') Error: {{error}} 
-          span(v-if="success") {{success}} 
+          span(v-if="error" class='error--text' id="import-error") Error: {{error}} 
+          span(v-if="success" id="import-success") {{success}} 
           v-progress-linear( v-if="!error && !success" indeterminate)
         v-card-actions
           v-spacer
-          v-btn(v-if="error || success" @click='loading=false') close
+          v-btn(v-if="error || success" @click='loading=false'
+            id="import-close" 
+          ) close
 </template>
 
 <script>

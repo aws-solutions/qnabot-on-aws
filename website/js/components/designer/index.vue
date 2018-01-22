@@ -51,7 +51,10 @@
             span(v-if="selectAll | selectedMultiple")
               delete(:selectAll="selectAll" :selected="selected")
       template(slot='items' slot-scope='props')
-        tr( v-on:click="props.expanded = !props.expanded")
+        tr( 
+          v-on:click="props.expanded = !props.expanded"
+          :id="'qa-'+props.item.qid.replace('.','-')"
+        )
           td.shrink(v-on:click.stop="" v-if="tab==='questions'")
             v-checkbox(@change="checkSelect"
               v-model="props.item.select" tabindex='-1' color="primary" 

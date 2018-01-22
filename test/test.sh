@@ -5,12 +5,14 @@ cd $BASE
 
 echo "Testing Website"
 make -C $BASE/website test
-cd $BASE
+$BASE/website/test/bin/user --create
 if $__dirname/run.js $BASE/website/test/index.js website; then
     echo "Finished Testing Website"
 else
     exit 1
 fi
+$BASE/website/test/bin/user --delete
+
 echo "Testing Lambdas"
 if $__dirname/run.js $BASE/lambda/test.js lambdas; then
     echo "Finished Testing Lambdas"

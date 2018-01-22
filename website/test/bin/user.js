@@ -1,11 +1,28 @@
+#! /usr/bin/env node
 var aws=require('aws-sdk')
 var Promise=require('bluebird')
 var outputs=require('../../../bin/exports')
 var cdp=new aws.CognitoIdentityServiceProvider()
 var cognito = require('amazon-cognito-identity-js')
+var fs=require('fs')
 var faker=require('faker')
 
-exports.delete=function(name){
+if (require.main === module) {
+    console.log(process.argv)
+    if(process.argv[2]==="--create"){
+        create().then(function(config){
+            fs.writeFileSync(__dirname+'/../user-config.json',JSON.stringify(config))
+        })
+    }else if(process.argv[2]==="--delete"){
+        var user=require('../user-config.json')
+        rm(user.username)
+    }
+}
+
+exports.delete=rm
+exports.create=create
+
+function rm(name){
     return outputs('dev/master').then(function(output){
         return cdp.adminDeleteUser({
             UserPoolId:output.UserPool,
@@ -13,7 +30,8 @@ exports.delete=function(name){
         }).promise()
     })
 }
-exports.create=function(){
+
+function create(){
     return outputs('dev/master').then(function(output){
         var UserPoolId=output.UserPool
         var ClientId=output.DesignerClientId

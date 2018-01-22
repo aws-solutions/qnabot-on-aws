@@ -17,7 +17,10 @@
             v-list-tile-title {{page.title}}
             v-list-tile-sub-title {{page.subTitle}}
     v-toolbar(app)
-      v-toolbar-side-icon(@click.stop="drawer = !drawer")
+      v-toolbar-side-icon(
+        id="nav-open"
+        @click.stop="drawer = !drawer"
+      )
       v-toolbar-title 
         v-breadcrumbs
           v-breadcrumbs-item(href='#/edit') QnABot-Designer-UI:{{$store.state.user.name}}
@@ -25,6 +28,7 @@
       v-spacer
       v-toolbar-items
         v-btn(flat 
+          id="logout-button"
           :href="login" 
           v-if="login") LogOut
     v-container(fluid)
