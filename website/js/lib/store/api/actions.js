@@ -68,10 +68,14 @@ module.exports={
                 if(result) window.window.location.href=login
             }
         })
-        .catch(error=>error.response,error=>Promise.reject({
-            response:_.get(error,"response.data"),
-            status:_.get(error,"response.status")
-        }))
+        .catch(error=>error.response && error.response.status!==403,error=>{
+            var message={
+                response:_.get(error,"response.data"),
+                status:_.get(error,"response.status")
+            }
+            window.alert("Request Failed:"+JSON.stringify(message,null,2))
+            return Promise.reject(message)
+        })
     },
     botinfo(context){
         return context.dispatch('_request',{
