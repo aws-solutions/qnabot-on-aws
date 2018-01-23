@@ -30,6 +30,7 @@ module.exports={
                 test.ok(true)
             })
         },5000)
+        .end()
         .catch(err=>{
             console.log(err)
             test.ifError(err)
