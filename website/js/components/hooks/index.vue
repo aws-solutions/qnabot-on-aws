@@ -84,16 +84,7 @@ module.exports={
         'bot'
     ]),
     {
-    code:new clipboard('#code',{
-        text:function(){
-          return require('./code.txt')
-        }
-    }),
-    request:new clipboard('#request',{
-        text:function(){
-          return JSON.stringify(require('./example.json'),null,2)
-        }
-    }),
+    
     invalid:function(){
       return this.$validator.errors.has('filter')
     },
@@ -110,6 +101,16 @@ module.exports={
   ),
   created:function(){
     this.$store.dispatch('data/botinfo').catch(()=>null) 
+    var code=new clipboard('#code',{
+        text:function(){
+          return require('./code.txt')
+        }
+    })
+    var request=new clipboard('#request',{
+        text:function(){
+          return JSON.stringify(require('./example.json'),null,2)
+        }
+    })
   },
   methods:{
     copy:function(btn){

@@ -1,5 +1,5 @@
 module.exports={
-    setUp:function(cb){
+    /*setUp:function(cb){
         console.log("navigating to import screen")
         this.client=this.client
         .execute(function(){
@@ -44,5 +44,6 @@ module.exports={
         test.ok(true)
         this.client.then(()=>test.done())
     }
+    */
 }
         

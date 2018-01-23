@@ -4,8 +4,8 @@
       v-card-title.pa-0.cyan
         v-layout(row)
           v-tabs-bar(:v-model="active" class="primary" light)
-            v-tabs-item.title(ripple href="#questions") Questions
-            v-tabs-item.title(ripple href="#test") Test
+            v-tabs-item.title(ripple href="#questions" id="questions-tab") Questions
+            v-tabs-item.title(ripple href="#test" id="test-tab") Test
             v-tabs-slider(color="accent")
           v-spacer
           v-menu(bottom left)
