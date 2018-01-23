@@ -12,6 +12,9 @@ module.exports=(A)=>class auth extends A{
                 document.querySelector('#password').value=password
                 document.querySelector('input[name="signInSubmitButton"]').click()
             },user.username,user.password)
+            .waitUntil(function(){
+                return this.getUrl().then(x=>x.match(/.*#\/edit/))
+            },3000)
             
             return self.client
         })

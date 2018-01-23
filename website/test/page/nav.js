@@ -11,8 +11,11 @@ module.exports=(A)=>class Nav extends A{
             
             function handler(event){
                 if(event.propertyName==="transform"){
-                    event.target.removeEventListener(event.type, arguments.callee);
-                    event.target.addEventListener("transitionend",function(event2){
+                    event.target
+                    .removeEventListener(event.type, arguments.callee);
+
+                    event.target
+                    .addEventListener("transitionend",function(event2){
                         event2.target.removeEventListener(event2.type, arguments.callee);
                         done()
                     })
