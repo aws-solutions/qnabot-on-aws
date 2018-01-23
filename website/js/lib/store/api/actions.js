@@ -68,9 +68,9 @@ module.exports={
                 if(result) window.window.location.href=login
             }
         })
-        .catch(error=>Promise.reject({
-            response:error.response.data,
-            status:error.response.status
+        .catch(error=>error.response,error=>Promise.reject({
+            response:_.get(error,"response.data"),
+            status:_.get(error,"response.status")
         }))
     },
     botinfo(context){
