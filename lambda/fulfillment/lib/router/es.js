@@ -5,7 +5,7 @@ module.exports=function(request){
     return bodybuilder()
     .orQuery('nested',{
         path:'questions',
-        score_mode:'max',
+        score_mode:'sum',
         boost:2},
         q=>q.query('match','questions.q',request.question)
     )

@@ -16,7 +16,8 @@ module.exports={
     "profile":"default",
     "publicBucket":"aws-bigdata-blog",
     "publicPrefix":"artifacts/aws-ai-qna-bot",
-    "devEmail":""
+    "devEmail":"",
+    "namespace":"dev"
 }
 
 if (require.main === module) {

@@ -17,7 +17,10 @@
             v-list-tile-title {{page.title}}
             v-list-tile-sub-title {{page.subTitle}}
     v-toolbar(app)
-      v-toolbar-side-icon(@click.stop="drawer = !drawer")
+      v-toolbar-side-icon(
+        id="nav-open"
+        @click.stop="drawer = !drawer"
+      )
       v-toolbar-title 
         v-breadcrumbs
           v-breadcrumbs-item(href='#/edit') QnABot-Designer-UI:{{$store.state.user.name}}
@@ -25,7 +28,8 @@
       v-spacer
       v-toolbar-items
         v-btn(flat 
-          :href="login" 
+          id="logout-button"
+          @click="logout"
           v-if="login") LogOut
     v-container(fluid)
       v-layout(column)
@@ -109,7 +113,12 @@ module.exports={
     }
   },
   created:function(){},
-  methods:{}
+  methods:{
+    logout:function(){
+      this.$store.dispatch('user/logout')
+      window.location=this.login,2000
+    }
+  }
 }
 </script>
 

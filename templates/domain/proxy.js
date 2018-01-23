@@ -51,7 +51,7 @@ module.exports={
                 endpoint:{"Fn::GetAtt":["ESVar","ESAddress"]},
                 path:{"Fn::Sub":"/${Var.index}/_mapping/${Var.type}"},
                 method:"PUT",
-                body:require('./schema')
+                body:JSON.stringify(require('./schema'))
             }
         }
     }

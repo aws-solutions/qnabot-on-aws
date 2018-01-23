@@ -17,7 +17,7 @@ lambda: $(LAMBDAS) build
 	done;			
 
 bootstrap: build
-	$(MAKE) -C templates/dev
+	$(MAKE) ../../build/templates/dev/bootstrap.json -C templates/dev
 
 templates: $(TEMPLATES) build
 	for l in $(TEMPLATES); do	\
@@ -33,5 +33,5 @@ samples:docs/blog-samples.json build
 upload: templates lambda website build
 	./bin/upload.sh
 
-test: 
+test: build 
 	$(MAKE) -C test

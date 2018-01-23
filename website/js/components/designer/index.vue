@@ -51,7 +51,10 @@
             span(v-if="selectAll | selectedMultiple")
               delete(:selectAll="selectAll" :selected="selected")
       template(slot='items' slot-scope='props')
-        tr( v-on:click="props.expanded = !props.expanded")
+        tr( 
+          v-on:click="expand(props)"
+          :id="'qa-'+props.item.qid.replace('.','-')"
+        )
           td.shrink(v-on:click.stop="" v-if="tab==='questions'")
             v-checkbox(@change="checkSelect"
               v-model="props.item.select" tabindex='-1' color="primary" 
@@ -154,11 +157,7 @@ module.exports={
       }else{
         this.pagination.sortBy='qid'
         this.pagination.descending=false
-        return this.$store.dispatch('data/get',{
-          page:this.pagination.page-1,
-          perpage:this.pagination.rowsPerPage,
-          order:this.pagination.descending ? 'desc' : 'asc'
-        }) 
+        return this.get(this.pagination)
       }
     },
     pagination:function(event){
@@ -166,14 +165,14 @@ module.exports={
     }
   },
   methods:{
-    get:function(event){
+    get:_.debounce(function(event){
       this.selectAll=false
       return this.$store.dispatch('data/get',{
         page:event.page-1,
         perpage:event.rowsPerPage,
         order:event.descending ? 'desc' : 'asc'
       }) 
-    },
+    },100,{trailing:true,leading:false}),
     changeSort:_.debounce(function(column) {
       if(this.tab==='questions'){
         if (this.pagination.sortBy === column) {
@@ -192,6 +191,9 @@ module.exports={
       this.$store.commit('data/selectAll',value)
       this.selectAll=value
     },
+    expand:_.debounce(function(prop) {
+      prop.expanded = !prop.expanded
+    },100,{trailing:true,leading:false}),
     edit:console.log
   }
 }

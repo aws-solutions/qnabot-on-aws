@@ -16,6 +16,9 @@ var axios=require('axios')
 var aws=require('aws-sdk')
 
 module.exports={
+    logout:function(context){
+        window.sessionStorage.clear()
+    },
     login:function(context){
         context.commit('token',context.rootState) 
         aws.config.region=context.rootState.info.region

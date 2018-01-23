@@ -37,7 +37,7 @@
                     }},
                     {"nested":{  
                         "path":"questions",
-                        "score_mode":"max",
+                        "score_mode":"sum",
                         "boost":2,
                         "query":{  
                             "match":{  
