@@ -8,7 +8,6 @@ var fs=require('fs')
 var faker=require('faker')
 
 if (require.main === module) {
-    console.log(process.argv)
     if(process.argv[2]==="--create"){
         create().then(function(config){
             fs.writeFileSync(__dirname+'/../user-config.json',JSON.stringify(config))
