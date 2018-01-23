@@ -5,10 +5,10 @@
         v-card
           v-card-title.headline Import From File
           v-card-text(v-if="dialog.file")
-            p Warning, This will over write existing QnAs 
+            p {{importWarning}}  
           v-card-actions(v-if="!dialog.file")
             v-spacer
-            v-btn(@click="dialog.file=true" id="choose-file") choose file
+            v-btn(@click="dialog.file=true" id="choose-file") Start
           v-card-actions(v-if="dialog.file")
             v-spacer
             input(
@@ -18,7 +18,7 @@
               v-on:change="Getfile"
               ref="file"
             )
-            v-btn(@click="dialog.file=false") cancel
+            v-btn(@click="dialog.file=false") Cancel
       v-flex
         v-card
           v-card-title.headline Import From Url
@@ -28,7 +28,7 @@
             p Warning, This will over write existing QnAs
           v-card-actions(v-if="!dialog.url")
             v-spacer
-            v-btn(@click="dialog.url=true") from url
+            v-btn(@click="dialog.url=true") Start
           v-card-actions(v-if="dialog.url")
             v-spacer
             v-btn(@click="dialog.url=false") cancel
@@ -71,6 +71,7 @@ module.exports={
   data:function(){
     var self=this
     return {
+      importWarning:"Warning, This will over write existing QnAs with the same ID",
       dialog:{
         file:false,
         url:false
