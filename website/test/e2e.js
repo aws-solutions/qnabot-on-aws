@@ -1,9 +1,7 @@
-var outputs=require('../../bin/exports')('dev/master',{wait:true})
-var client = require('./browser')
-var user=require('./user-config')
+var Page = require('./page')
 
 module.exports={
-    workflows:{
+    /*workflows:{
         create:function(test){
             test.ok(true)
             this.client.then(()=>test.done())
@@ -20,21 +18,19 @@ module.exports={
         tearDown:function(cb){
             this.client.logout().end().then(()=>cb())
         }
-    },
-    login:function(test){
-        var self=this
-        return client.init().login().logout()
-        .waitUntil(function(){
-            return this.getTitle().then(title=>{
-                return title==="Signin"
-                test.ok(true)
-            })
-        },5000)
-        .end()
-        .catch(err=>{
-            console.log(err)
-            test.ifError(err)
-        })
-        .finally(test.done)
+    },*/
+    login:async function(test){
+        try {
+            var page=new Page()
+            await page.open()
+            await page.login()
+            await page.logout()
+            await page.waitTillTitle("Signin") 
+            await page.close().then(()=>test.done())
+        }catch(e){ 
+            test.ifError(e)
+            test.done()
+        }
     }
 }
+
