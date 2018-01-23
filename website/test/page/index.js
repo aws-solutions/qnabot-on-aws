@@ -2,7 +2,14 @@ var webdriverio = require('webdriverio');
 var Promise=require('bluebird')
 var _=require('lodash')
 var options = { 
-    desiredCapabilities: { browserName: 'chrome' } 
+    desiredCapabilities: { 
+        browserName: 'chrome',
+        chromeOptions:{
+            args:["allow-file-access-from-files",
+            "use-fake-device-for-media-stream",
+            "use-fake-ui-for-media-stream"]
+        }
+    } 
 };
 var client = webdriverio.remote(options);
 var requireDir = require('require-dir');

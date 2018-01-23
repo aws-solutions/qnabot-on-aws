@@ -1,5 +1,5 @@
 <template lang='pug'>
-  div
+  div(id="qna-client")
     v-toolbar(color="cyan")
       v-toolbar-title {{title}}
       v-spacer

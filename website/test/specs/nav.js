@@ -24,7 +24,6 @@ module.exports={
             await page.open()
             await page.login()
             await page.goToClient()
-            await page.waitTillTitle('QnABot Client')
             await page.close().then(()=>test.done())
         }catch(e){ 
             test.ifError(e)

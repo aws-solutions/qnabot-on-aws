@@ -12,8 +12,12 @@ module.exports=(A)=>class Nav extends A{
             function handler(event){
                 if(event.propertyName==="transform"){
                     event.target.removeEventListener(event.type, arguments.callee);
-                    document.querySelector(`a[href="#/${linkName}"]`).click()
-                    done()
+                    event.target.addEventListener("transitionend",function(event2){
+                        event2.target.removeEventListener(event2.type, arguments.callee);
+                        done()
+                    })
+                    
+                    document.querySelector(`#page-link-${linkName}`).click()
                 }
             }
         },name)
@@ -26,14 +30,16 @@ module.exports=(A)=>class Nav extends A{
         return this._goTo('export')
     }
     async goToEdit(){
-        this.client=await this._goToEdit('edit')
-        return client.waitTillVisible('#questions-tab')
+        await this._goTo('edit')
+        this.client=this.client.waitForVisible('#questions-tab')
             .click('#questions-tab')
+        return this.client
     }
     async goToTest(){
-        this.client=await this._goTo('edit')
-        return client.waitTillVisible('#test-tab')
+        await this._goTo('edit')
+        this.client=this.client.waitForVisible('#test-tab')
             .click('#test-tab')
+        return this.client
     }
     goToAlexa(){
         return this._goTo('alexa')
@@ -41,8 +47,33 @@ module.exports=(A)=>class Nav extends A{
     goToHooks(){
         return this._goTo('hooks')
     }
-    goToClient(){
-        return this._goTo('client')
+    async goToClient(){
+        this.client=this.client
+        .waitForVisible('#nav-open')
+        .executeAsync(function(done){
+            document.querySelector('.navigation-drawer')
+                .addEventListener("transitionend",handler)
+            document.getElementById('nav-open').click()
+            
+            function handler(event){
+                if(event.propertyName==="transform"){
+                    event.target.removeEventListener(event.type, arguments.callee);
+                    done()
+                }
+            }
+        })
+        .execute(function(){
+            document.getElementById('page-link-client').click()
+        })
+        .then(async function(){
+            var id=await this.getCurrentTabId()
+            var tabs=await this.getTabIds()
+
+            var tab=tabs.filter(x=>x!==id)[0]
+            return this.switchTab(tab)
+        })
+        .waitForVisible('#qna-client')
+        return Promise.resolve(this.client)
     }
 
 }

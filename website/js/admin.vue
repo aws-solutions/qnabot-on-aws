@@ -8,8 +8,9 @@
       v-divider
       v-list(dense three-line subheader)
         v-list-tile(v-for="(page,key) in pages" :key="key"
-          @click="" 
+          @click="drawer=false" 
           :href="page.href"
+          :id="'page-link-'+page.id"
           :target="page.target || '_self'") 
           v-list-tile-avatar
             v-icon(color="primary") {{page.icon}}
@@ -80,31 +81,37 @@ module.exports={
     pages:function(){
       return [{
         title:"Edit",
+        id:"edit",
         subTitle:"edit questions and simulate responses",
         icon:"mode_edit",
         href:"#/edit"
       },{
         title:"Alexa",
+        id:"alexa",
         subTitle:"instructions for setting up an Alexa Skill",
         icon:"info",
         href:"#/alexa"
       },{
         title:"Lambda Hooks",
+        id:"hooks",
         subTitle:"Instructions for customizing QnABot behavior using AWS Lambda",
         icon:"settings_input_component",
         href:"#/hooks"
       },{
         title:"Import",
+        id:"import",
         subTitle:"Import new questions",
         icon:"cloud_upload",
         href:"#/import"
       },{
         title:"Export",
+        id:"export",
         subTitle:"Download backups of your QnAs",
         icon:"file_download",
         href:"#/export"
       },{
         title:"QnABot Client",
+        id:"client",
         subTitle:"Use QnABot to interact with your bot in the browser",
         icon:"forum",
         target:'_blank',
