@@ -34,7 +34,7 @@ module.exports=class CognitoRole extends require('./base') {
         var ids={}
 
         ids=params.RoleMappings.map(function(x){
-            return "cognito-idp.us-east-1.amazonaws.com/"+x.UserPool+':'+x.ClientId
+            return "cognito-idp."+(process.env.AWS_REGION || "us-east-1")+".amazonaws.com/"+x.UserPool+':'+x.ClientId
         })
 
         cognito.getIdentityPoolRoles({
