@@ -64,30 +64,6 @@ module.exports={
                 deleted:100
             }),test),
         },
-        puts:{
-            resp:function(test){
-                var body={
-                    took:30,
-                    errors:false,
-                    items:[{
-                        index:{
-                            status:200,
-                            _id:1
-                        }
-                    },{
-                        index:{
-                            status:200,
-                            _id:2
-                        }
-                    }]
-                }
-                run(__dirname+'/'+"collection/put.resp",input(body),test)
-            },
-            send:function(test){
-                var body=[{qid:3,a:1},{qid:2,a:2}]
-                run(__dirname+'/'+"collection/put",input(body),test)
-            }
-        },
         get:test=>run(__dirname+'/'+"single/get",{
             input:{
                 body:'{}',

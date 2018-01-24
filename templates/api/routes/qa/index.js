@@ -30,15 +30,6 @@ require('./schema'),{
     defaultResponse:204,
     resource:{"Ref":"Questions"}
 }),
-"QuestionsPut":lambda({
-    authorization:"AWS_IAM",
-    method:"put",
-    lambda:{"Fn::GetAtt":["ESProxyLambda","Arn"]},
-    template:fs.readFileSync(__dirname+'/collection/put.vm','utf8'),
-    responseTemplate:fs.readFileSync(__dirname+'/collection/put.resp.vm','utf8'),
-    resource:{"Ref":"Questions"},
-    defaultResponse:201
-}),
 "Question": resource('{ID}',{"Ref":"Questions"}),
 "QuestionHead":lambda({
     authorization:"AWS_IAM",
