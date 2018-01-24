@@ -25,7 +25,9 @@ npm install
 
 Next, set up your configuration file:
 
+```shell
 npm run config
+```
 
 now edit config.json with you information.
 
