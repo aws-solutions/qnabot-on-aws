@@ -36,7 +36,7 @@
     )
       template(slot='headers' slot-scope='props')
         tr
-          th.shrink(v-if="tab==='questions'")
+          th.shrink(v-if="tab==='questions'" id="select-all")
             v-checkbox(:indeterminate="QAs.length===0" v-model='selectAll' tabindex='-1'
               color="primary" @change="toggleSelectAll"
             )
@@ -48,7 +48,7 @@
               v-icon(v-if="tab==='questions' && header.sortable") arrow_upward
               span {{header.text}}
           th.d-flex.pa-0
-            span(v-if="selectAll | selectedMultiple")
+            span(v-if="selectAll | selectedMultiple" id="delete-all")
               delete(:selectAll="selectAll" :selected="selected")
       template(slot='items' slot-scope='props')
         tr( 

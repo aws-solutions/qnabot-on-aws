@@ -36,6 +36,12 @@ class Page extends modules{
         this.client=this.client.log('browser').then(console.log)
         return this.client
     }
+    waitClick(selector){
+        this.client=this.client
+        .waitForVisible(selector)
+        .click(selector)
+        return Promise.resolve(this.client)
+    }
     waitTillTitle(title){
         this.client=this.client.waitUntil(function(){
             return this.getTitle().then(title_now=>{

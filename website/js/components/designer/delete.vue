@@ -1,14 +1,14 @@
 <template lang="pug">
   span(class="wrapper")
-    v-dialog(v-model="loading" persistent)
+    v-dialog(v-model="loading" persistent id="delete-loading")
       v-card
         v-card-title(primary-title) Deleting 
         v-card-text(v-if="!selectAll")
           ul
             li(v-for="qa in QAs") {{qa.qid}}
         v-card-text
-          v-subheader.error--text(v-if='error') {{error}}
-          v-subheader.success--text(v-if='success') {{success}}
+          v-subheader.error--text(v-if='error' id="delete-error") {{error}}
+          v-subheader.success--text(v-if='success' id="delete-success") {{success}}
           v-progress-linear(v-if='!error && !success' indeterminate)
         v-card-actions
           v-spacer
@@ -32,7 +32,7 @@
         v-card-actions
           v-spacer
           v-btn(@click='cancel') Cancel
-          v-btn(@click='rm') Delete
+          v-btn(@click='rm' id="confirm-delete") Delete
 </template>
 
 <script>

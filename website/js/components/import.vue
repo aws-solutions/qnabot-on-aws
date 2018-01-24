@@ -28,11 +28,11 @@
             p Warning, This will over write existing QnAs
           v-card-actions(v-if="!dialog.url")
             v-spacer
-            v-btn(@click="dialog.url=true") Start
+            v-btn(@click="dialog.url=true" id="import-url") Start
           v-card-actions(v-if="dialog.url")
             v-spacer
             v-btn(@click="dialog.url=false") cancel
-            v-btn(@click="Geturl") continue
+            v-btn(@click="Geturl" id="confirm-import-url") continue
     v-dialog(v-model="loading" persistent)
       v-card( id="import-loading")
         v-card-title Loading

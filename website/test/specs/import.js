@@ -2,34 +2,41 @@ var Page = require('../page')
 module.exports={
     file:async function(test){
         try {
-            var page=new Page()
-            await page.open()
-            await page.login()
+            var page=this.page
             await page.goToImport()
             await page.importFile(`${__dirname}/../../../docs/zombie.json`)
             await page.goToEdit()
-            await page.listQA().then(function(ids){
-                test.equal(ids.value.length,3) 
-            })
-            await page.close().then(()=>test.done())
+            var ids=await page.listQA()
+            test.equal(ids.value.length,3) 
+            
+            await page.deleteAll()
+            
+            var ids2=await page.listQA()
+            test.equal(ids2.value.length,0) 
+            test.done()
         }catch(e){ 
             test.ifError(e)
             test.done()
         }
-
-        /* 
-        .waitForVisible("tbody")
-        .waitForVisible("#qa-zombie-1")
-        .log("browser").then(
-            x=>console.log(
-            x.value
-            .filter(y=>y.source="console-api")
-            .map(y=>y.message)
-        )).then(()=>test.done())
-        .catch(console.log)*/
     },
-    url:function(test){
-        test.done()
+    url:async function(test){
+        try {
+            var page=this.page
+            await page.goToImport()
+            await page.importUrl("https://raw.githubusercontent.com/awslabs/aws-ai-qna-bot/master/docs/blog-samples.json")
+            await page.goToEdit()
+            var ids=await page.listQA()
+            test.equal(ids.value.length,8) 
+            
+            await page.deleteAll()
+            
+            var ids2=await page.listQA()
+            test.equal(ids2.value.length,0) 
+            test.done()
+        }catch(e){ 
+            test.ifError(e)
+            test.done()
+        }
     }
     
 }

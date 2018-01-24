@@ -8,7 +8,7 @@ module.exports=(A)=>class Add extends A{
             var list=document
                 .querySelectorAll('tbody tr:not(.datatable__expand-row)')
                 .forEach(x=>out.push(x.id.replace(/^qa-/,'')))
-            return out
+            return out.filter(x=>x)
         })
         return Promise.resolve(this.client)
     }

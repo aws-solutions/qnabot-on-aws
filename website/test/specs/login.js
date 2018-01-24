@@ -3,12 +3,10 @@ var Page = require('../page')
 module.exports={
     login:async function(test){
         try {
-            var page=new Page()
-            await page.open()
-            await page.login()
+            var page=this.page
             await page.logout()
             await page.waitTillTitle("Signin") 
-            await page.close().then(()=>test.done())
+            test.done()
         }catch(e){ 
             test.ifError(e)
             test.done()
@@ -16,11 +14,9 @@ module.exports={
     },
     refresh:async function(test){
         try {
-            var page=new Page()
-            await page.open()
-            await page.login()
+            var page=this.page
             await page.refresh()
-            await page.close().then(()=>test.done())
+            test.done()
         }catch(e){ 
             test.ifError(e)
             test.done()
