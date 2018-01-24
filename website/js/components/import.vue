@@ -38,15 +38,23 @@
             v-btn(@click="dialog.url=false") cancel
             v-btn(@click="Geturl" id="confirm-import-url") continue
       v-flex(v-if="jobs.length>0")
-        v-card
+        v-card(id="import-jobs")
           v-card-title.headline Import Jobs
           v-card-text
-            ul
-              li(v-for="job in jobs") 
-                span {{job.id}} {{job.count}} {{job.status}}
+            v-list
+              template(v-for="(job,index) in jobs")
+                v-list-tile(:id="'import-job-'+job.id" :data-status="job.status")
+                  v-list-tile-content 
+                    v-list-tile-title {{job.id}}: {{job.status}}
+                    v-list-tile-sub-title
+                      v-progress-linear(v-model="job.progress*100")
+                  v-list-tile-action
+                    v-btn(block icon @click="deleteJob(index)" :loading="job.loading") 
+                      v-icon delete
+                v-divider(v-if="index + 1 < jobs.length")
           v-card-actions
             v-spacer
-            v-btn(@click="refresh()") refresh
+            v-btn(@click="refresh()" id="import-job-refresh") refresh
     v-dialog(v-model="loading" persistent)
       v-card( id="import-loading")
         v-card-title Loading
@@ -104,15 +112,27 @@ module.exports={
     this.refresh()
   },
   methods:{
+    deleteJob:function(index){
+      var self=this
+      var job=this.jobs[index]
+      job.loading=true
+      this.$store.dispatch('api/deleteImport',job)
+      .then(()=>{
+        self.jobs.splice(index,1)
+      })
+      .catch(()=>{
+        job.loading=false
+      })
+    },
     refresh:function(index){
       var self=this
+      self.jobs=[]
       if(index===undefined){
         this.$store.dispatch('api/listImports')
         .then(result=>{
-          self.jobs=result.jobs 
-          self.jobs.forEach((job,index)=>{
+          result.jobs.forEach((job,index)=>{
             self.$store.dispatch('api/getImport',job)
-            .then(x=>self.jobs[index]=Object.assign({},job,x))
+            .then(x=>self.jobs.push(Object.assign(job,x)))
           })
         })
       }else{
@@ -156,22 +176,29 @@ module.exports={
         status:x.response.status,
         message:x.response.data
       }))
-      .then(data=>self.upload(data))
+      .then(data=>self.upload(data,"url-import"))
     },
     upload:function(data,name="import"){
       var self=this
+      var id=name.replace(' ' ,'-')
       new Promise(function(res,rej){
         if(data.qna){
           self.$store.dispatch('api/startImport',{
             qa:data.qna,
-            name:encodeURI(name)
+            name:id
           })
           .then(res).catch(rej)
         }else{
           rej('Invalid File')
         }
       })
-      .then(()=>self.success="success!")
+      .then(()=>{
+        return self.$store.dispatch('api/waitForImport',{id})
+      })
+      .then(()=>{
+        self.success="success!"
+        self.refresh()
+      })
       .tapCatch(console.log)
       .catch(error=>self.error=error)
     },

@@ -11,15 +11,13 @@ var _=require('lodash')
 exports.step=function(event,context,cb){
     console.log("step")
     console.log("Request",JSON.stringify(event,null,2))
+    var Bucket=event.Records[0].s3.bucket.name
+    var Key=decodeURI(event.Records[0].s3.object.key)
+    
     var progress
-    s3.waitFor('objectExists',{
-        Bucket:event.Records[0].s3.bucket.name,
-        Key:event.Records[0].s3.object.key
-    }).promise()
-    .then(()=>s3.getObject({
-        Bucket:event.Records[0].s3.bucket.name,
-        Key:event.Records[0].s3.object.key
-    }).promise())
+    console.log(Bucket,Key) 
+    s3.waitFor('objectExists',{Bucket,Key}).promise()
+    .then(()=>s3.getObject({Bucket,Key}).promise())
     .then(x=>JSON.parse(x.Body.toString()))
     .then(function(config){
         console.log("Config:",JSON.stringify(config,null,2))
@@ -96,8 +94,8 @@ exports.step=function(event,context,cb){
             
                 console.log("EndConfig:",JSON.stringify(config,null,2))
                 return s3.putObject({
-                    Bucket:event.Records[0].s3.bucket.name,
-                    Key:event.Records[0].s3.object.key,
+                    Bucket:Bucket,
+                    Key:Key,
                     Body:JSON.stringify(config)
                 }).promise()
                 .then(result=>cb(null))
@@ -107,8 +105,8 @@ exports.step=function(event,context,cb){
                 config.status="Error"
                 config.message=JSON.stringify(error)
                 return s3.putObject({
-                    Bucket:event.Records[0].s3.bucket.name,
-                    Key:event.Records[0].s3.object.key,
+                    Bucket:Bucket,
+                    Key:Key,
                     Body:JSON.stringify(config)
                 }).promise()
                 .then(()=>cb(error))
@@ -121,7 +119,9 @@ exports.step=function(event,context,cb){
 exports.start=function(event,context,cb){
     console.log("starting")
     console.log("Request",JSON.stringify(event,null,2))
-
+    var bucket=event.Records[0].s3.bucket.name
+    var key=decodeURI(event.Records[0].s3.object.key)
+    console.log(bucket,key)
     var config={
         stride,
         start:0,
@@ -136,14 +136,14 @@ exports.start=function(event,context,cb){
             start:(new Date()).toISOString()
         },
         status:"InProgress",
-        bucket:event.Records[0].s3.bucket.name,
-        key:event.Records[0].s3.object.key,
+        bucket,key,
         version:event.Records[0].s3.object.versionId
     }
-
+    var out_key="status/"+decodeURI(event.Records[0].s3.object.key.split('/').pop())
+    console.log(bucket,out_key) 
     s3.putObject({
-        Bucket:event.Records[0].s3.bucket.name,
-        Key:"status/"+event.Records[0].s3.object.key.split('/').pop(),
+        Bucket:bucket,
+        Key:out_key,
         Body:JSON.stringify(config)
     }).promise()
     .then(x=>cb(null))

@@ -40,6 +40,29 @@ module.exports={
             Body:opts.qa.map(JSON.stringify).join('\n')
         }).promise())
     },
+    waitForImport(context,opts){
+        return new Promise(function(res,rej){
+            next(10) 
+            
+            function next(count){
+                context.dispatch('_request',{
+                    url:context.rootState.info._links.jobs.href,
+                    method:'get'
+                })
+                .then(response=>context.dispatch('_request',{
+                    url:response._links.imports.href,
+                    method:'get'
+                }))
+                .then(result=>{
+                    if(result.jobs.map(x=>x.id).includes(opts.id)){
+                        res()
+                    }else{
+                        count>0 ? setTimeout(()=>next(--count),200) : rej("timeout")
+                    }
+                })
+            }
+        })
+    },
     listImports(context,opts){
         return context.dispatch('_request',{
             url:context.rootState.info._links.jobs.href,
