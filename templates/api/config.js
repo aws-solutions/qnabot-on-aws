@@ -31,7 +31,6 @@ module.exports={
         "HooksPut",
         "HooksOptions",
         "QuestionsGet",
-        "QuestionsPut",
         "QuestionHead",
         "QuestionPut",
         "QuestionsOptions",

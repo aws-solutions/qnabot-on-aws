@@ -10,6 +10,13 @@ module.exports={
             },
             "VersioningConfiguration":{
                 "Status":"Enabled"
+            },
+            "CorsConfiguration":{
+                CorsRules:[{
+                    AllowedHeaders:['*'],
+                    AllowedMethods:['PUT'],
+                    AllowedOrigins:['*']
+                }]
             }
         }
     },

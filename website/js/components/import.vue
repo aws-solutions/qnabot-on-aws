@@ -6,11 +6,6 @@
           v-card-title.headline Import From File
           v-card-text(v-if="dialog.file")
             p {{importWarning}}  
-          v-card-actions(v-if="!dialog.file")
-            v-spacer
-            v-btn(@click="dialog.file=true" id="choose-file") Start
-          v-card-actions(v-if="dialog.file")
-            v-spacer
             input(
               type="file" 
               name="file"
@@ -18,7 +13,15 @@
               v-on:change="Getfile"
               ref="file"
             )
-            v-btn(@click="dialog.file=false") Cancel
+          v-card-actions
+            v-spacer
+            v-btn(@click="dialog.file=true" 
+              id="choose-file"
+              v-if="!dialog.file"
+            ) Start
+            v-btn(@click="dialog.file=false"
+              v-if="dialog.file"
+            ) Cancel
       v-flex
         v-card
           v-card-title.headline Import From Url
@@ -28,11 +31,22 @@
             p Warning, This will over write existing QnAs
           v-card-actions(v-if="!dialog.url")
             v-spacer
-            v-btn(@click="dialog.url=true" id="import-url") Start
+            v-btn(@click="dialog.url=true" id="import-url" 
+              :disabled="!url || url.length===0") Start
           v-card-actions(v-if="dialog.url")
             v-spacer
             v-btn(@click="dialog.url=false") cancel
             v-btn(@click="Geturl" id="confirm-import-url") continue
+      v-flex(v-if="jobs.length>0")
+        v-card
+          v-card-title.headline Import Jobs
+          v-card-text
+            ul
+              li(v-for="job in jobs") 
+                span {{job.id}} {{job.count}} {{job.status}}
+          v-card-actions
+            v-spacer
+            v-btn(@click="refresh()") refresh
     v-dialog(v-model="loading" persistent)
       v-card( id="import-loading")
         v-card-title Loading
@@ -80,29 +94,56 @@ module.exports={
       testing:false,
       url:"",
       error:"",
-      success:''
+      success:'',
+      jobs:[]
     }
   },
   components:{
   },
+  created:function(){
+    this.refresh()
+  },
   methods:{
+    refresh:function(index){
+      var self=this
+      if(index===undefined){
+        this.$store.dispatch('api/listImports')
+        .then(result=>{
+          self.jobs=result.jobs 
+          self.jobs.forEach((job,index)=>{
+            self.$store.dispatch('api/getImport',job)
+            .then(x=>self.jobs[index]=Object.assign({},job,x))
+          })
+        })
+      }else{
+        this.$store.dispatch('api/getImport',this.jobs[index])
+      }
+    },
     Getfile:function(event){
       var self=this
       this.dialog.file=false
       this.loading=true
-      var reader = new FileReader();
-      new Promise(function(res,rej){
-        reader.onload = function(e){ 
-          try {
-            res(JSON.parse(e.srcElement.result))
-          } catch(e) {
-            console.log(e)
-            rej("invalid JSON:"+e)
-          }
-        };
-        reader.readAsText(self.$refs.file.files[0]);
+      var files_raw=self.$refs.file.files
+      var files=[]
+      for(i=0;i<files_raw.length;i++){
+        files.push(files_raw[i])
+      }
+      files.forEach(file=>{
+        var name=file.name
+        new Promise(function(res,rej){
+          var reader = new FileReader();
+          reader.onload = function(e){ 
+            try {
+              res(JSON.parse(e.srcElement.result))
+            } catch(e) {
+              console.log(e)
+              rej("invalid JSON:"+e)
+            }
+          };
+          reader.readAsText(file);
+        })
+        .then(data=>self.upload(data,name))
       })
-      .then(data=>self.upload(data))
     },
     Geturl:function(event){
       var self=this
@@ -111,17 +152,20 @@ module.exports={
 
       Promise.resolve(axios.get(self.url))
       .then(x=>x.data)
-      .catch(x=>{return {
+      .tapCatch(x=>self.error=JSON.stringify({
         status:x.response.status,
         message:x.response.data
-      }})
+      }))
       .then(data=>self.upload(data))
     },
-    upload:function(data){
+    upload:function(data,name="import"){
       var self=this
       new Promise(function(res,rej){
         if(data.qna){
-          self.$store.dispatch('api/bulk',data)
+          self.$store.dispatch('api/startImport',{
+            qa:data.qna,
+            name:encodeURI(name)
+          })
           .then(res).catch(rej)
         }else{
           rej('Invalid File')

@@ -23,8 +23,45 @@ var reason=function(r){
         Promise.reject(r)
     }
 }
+var aws=require('aws-sdk')
+
 var failed=false
 module.exports={
+    startImport(context,opts){
+        aws.config.credentials=context.rootState.user.credentials
+        var s3=new aws.S3({region:context.rootState.info.region})
+        return context.dispatch('_request',{
+            url:context.rootState.info._links.jobs.href,
+            method:'get'
+        })
+        .tap(response=>s3.putObject({
+            Bucket:response._links.imports.bucket,
+            Key:response._links.imports.uploadPrefix+opts.name,
+            Body:opts.qa.map(JSON.stringify).join('\n')
+        }).promise())
+    },
+    listImports(context,opts){
+        return context.dispatch('_request',{
+            url:context.rootState.info._links.jobs.href,
+            method:'get'
+        })
+        .then(response=>context.dispatch('_request',{
+            url:response._links.imports.href,
+            method:'get'
+        }))
+    },
+    getImport(context,opts){
+        return context.dispatch('_request',{
+            url:opts.href,
+            method:'get'
+        })
+    },
+    deleteImport(context,opts){
+        return context.dispatch('_request',{
+            url:opts.href,
+            method:'delete'
+        })
+    },
     _request(context,opts){
         var url=Url.parse(opts.url)
         var request={
@@ -68,7 +105,7 @@ module.exports={
                 if(result) window.window.location.href=login
             }
         })
-        .catch(error=>error.response && error.response.status!==403,error=>{
+        .tapCatch(error=>error.response && error.response.status!==403,error=>{
             var message={
                 response:_.get(error,"response.data"),
                 status:_.get(error,"response.status")
@@ -103,21 +140,6 @@ module.exports={
             url:context.rootState.info._links.questions.href,
             method:'options',
             reason:"Failed to get qa options"
-        })
-    },
-    bulk(context,body){
-        return context.dispatch('_request',{
-            url:context.rootState.info._links.jobs.href,
-            method:'get',
-            reason:"Failed to get BotInfo"
-        })
-        .then(function(results){
-            return context.dispatch('_request',{
-                url:context.rootState.info._links.questions.href,
-                method:'put',
-                body:body.qna,
-                reason:"Failed to Bulk upload"
-            })
         })
     },
     list(context,opts){
