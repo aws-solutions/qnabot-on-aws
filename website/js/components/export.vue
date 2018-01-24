@@ -8,7 +8,7 @@
             v-text-field(name="filename.all" label="filename" id="filename.all" clearable v-model="filename.all")
           v-card-actions
             v-spacer
-            v-btn(@click="download(filename.all)") export
+            v-btn(@click="download(filename.all)" id="export-all") export
       v-flex
         v-card
           v-card-title.headline Export Filtered
@@ -17,8 +17,8 @@
             v-text-field(name="filename.filter" label="filename" id="filename.filter" clearable v-model="filtername")
           v-card-actions
             v-spacer
-            v-btn(@click="download(filtername)") export
-    v-dialog(v-model="loading" persistent)
+            v-btn(@click="download(filtername)" id="export-filter") export
+    v-dialog(v-model="loading" persistent id="export-loading")
       v-card
         v-card-title Loading
         v-card-text
