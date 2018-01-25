@@ -54,8 +54,9 @@ module.exports={
                     method:'get'
                 }))
                 .then(result=>{
-                    if(result.jobs.map(x=>x.id).includes(opts.id)){
-                        res()
+                    var job=result.jobs.find(x=>x.id===opts.id)
+                    if(job){
+                        res(job)
                     }else{
                         count>0 ? setTimeout(()=>next(--count),200) : rej("timeout")
                     }

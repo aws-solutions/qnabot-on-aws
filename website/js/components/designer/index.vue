@@ -210,7 +210,6 @@ module.exports={
     width:10%;
   }
   .root-card {
-    max-width:900px;
     margin:auto;
   }
   .icon {

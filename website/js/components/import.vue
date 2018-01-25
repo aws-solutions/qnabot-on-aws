@@ -54,9 +54,6 @@
                     v-btn(fab block icon @click="deleteJob(index)" :loading="job.loading") 
                       v-icon delete
                 v-divider(v-if="index + 1 < jobs.length")
-          v-card-actions
-            v-spacer
-            v-btn(@click="refresh()" id="import-job-refresh") refresh
     v-dialog(v-model="loading" persistent)
       v-card( id="import-loading")
         v-card-title Loading
@@ -126,22 +123,35 @@ module.exports={
         job.loading=false
       })
     },
+    addJob:function(jobId){
+      var self=this
+      return this.$store.dispatch('api/getImport',jobId)
+      .then(result=>Object.assign(jobId,result))
+      .then(job=>{
+        self.jobs.splice(0,1,job)
+        
+        poll()
+        function poll(){
+          self.$store.dispatch('api/getImport',job)
+          .then(function(result){
+            Object.assign(job,result) 
+            if(result.status==="InProgress"){
+              setTimeout(()=>poll(),100)
+            }
+          })
+        }
+      })
+    },
     refresh:function(index){
       var self=this
       if(index===undefined){
         self.jobs=[]
-        this.$store.dispatch('api/listImports')
+        return this.$store.dispatch('api/listImports')
         .then(result=>{
           result.jobs.forEach((job,index)=>{
-            self.$store.dispatch('api/getImport',job)
-            .then(x=>self.jobs.push(Object.assign(job,x)))
+            return self.addJob(job)
           })
         })
-      }else{
-        this.jobs[index].refreshing=true
-        this.$store.dispatch('api/getImport',this.jobs[index])
-        .then(result=>self.jobs.$set(index,Object.assign(self.jobs[index],result)))
-        .finally(()=>self.jobs[index].refreshing=false)
       }
     },
     Getfile:function(event){
@@ -200,9 +210,9 @@ module.exports={
       .then(()=>{
         return self.$store.dispatch('api/waitForImport',{id})
       })
-      .then(()=>{
-        self.success="success!"
-        self.refresh()
+      .then(job=>{
+        self.success="Import Started!"
+        return self.addJob(job)
       })
       .tapCatch(console.log)
       .catch(error=>self.error=error)

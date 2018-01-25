@@ -17,7 +17,7 @@
           v-list-tile-content
             v-list-tile-title {{page.title}}
             v-list-tile-sub-title {{page.subTitle}}
-    v-toolbar(app)
+    v-toolbar(app fixed)
       v-toolbar-side-icon(
         id="nav-open"
         @click.stop="drawer = !drawer"
@@ -32,7 +32,7 @@
           id="logout-button"
           @click="logout"
           v-if="login") LogOut
-    v-container(fluid)
+    v-container(fluid id="workspace")
       v-layout(column)
         v-flex
           router-view
@@ -129,4 +129,9 @@ module.exports={
 }
 </script>
 
+<style lang='scss' scoped>
+  #workspace {
+    margin-top:60px;
+  }
+</style>
 
