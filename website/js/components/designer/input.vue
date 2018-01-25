@@ -70,7 +70,6 @@ var ajv=new Ajv()
 module.exports={
   props:["schema","value","required","name","index"],
   name:'schema-input',
-  $validates:true,
   data:function(){
     var self=this
     return {

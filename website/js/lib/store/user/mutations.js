@@ -27,13 +27,11 @@ module.exports={
     token:function(state,rootState){
         try {
             var id_token=window.sessionStorage.getItem('id_token')
-            console.log(typeof id_token)    
             
             if(id_token && id_token!=="undefined"){
                 var token=jwt.decode(id_token)
             }else{
                 var params=query.parse(state.hash)
-                console.log(params)
                 var id_token=params.id_token
                 var token=jwt.decode(params.id_token)
                 window.sessionStorage.setItem('id_token',params.id_token)
@@ -59,14 +57,11 @@ module.exports={
 
         } catch(e){
             console.log(e)
-            rootState.error="Missing or invalide Authentication token, please Login"
+            var result=window.confirm("Missing or invalid credentials:\n"+JSON.stringify(e,null,2))
         }
     },
     login(state){
         state.loggedIn=true
-    },
-    logout(state){
-        state.loggedIn=false
     },
     setId(state,Id){
         state.Id=Id

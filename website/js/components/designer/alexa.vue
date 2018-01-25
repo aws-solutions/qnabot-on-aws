@@ -33,7 +33,6 @@ var _=require('lodash')
 var clipboard=require('clipboard')
 
 module.exports={
-  $validates:true,
   data:function(){
     var self=this
     return {

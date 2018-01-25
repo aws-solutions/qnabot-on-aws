@@ -14,21 +14,33 @@ License for the specific language governing permissions and limitations under th
 var Promise=require('bluebird')
 var axios=require('axios')
 var aws=require('aws-sdk')
-
+var _=require('lodash')
+var set=require('vue').set
 module.exports={
     getCredentials:function(context){
         return Promise.try(function(){
-            if(context.state.credentials.needsRefresh()){
-                context.state.credentials=new aws.CognitoIdentityCredentials({
+            if(!_.get(context,'state.credentials')){
+                set(context.state,"credentials",new aws.CognitoIdentityCredentials({
                     IdentityPoolId:context.rootState.info.PoolId,
                     RoleSessionName:context.state.name,
                     Logins:context.state.Logins
-                })
-                return context.state.credentials.getPromise()
+                }))
+            }else if(context.state.credentials.needsRefresh()){
+                set(context.state,"credentials",new aws.CognitoIdentityCredentials({
+                    IdentityPoolId:context.rootState.info.PoolId,
+                    RoleSessionName:context.state.name,
+                    Logins:context.state.Logins
+                }))
             }
         })
+        .then(()=>context.state.credentials.getPromise())
+        .then(()=>context.state.credentials.getPromise())
         .then(()=>context.state.credentials)
-        .tapCatch(console.log)
+        .catch(x=>x.message.match('Token expired'),x=>{
+            return Promise.reject({
+                code:"CredentialTimeout"
+            })
+        })
     },
     logout:function(context){
         window.sessionStorage.clear()
@@ -36,18 +48,5 @@ module.exports={
     login:function(context){
         context.commit('token',context.rootState) 
         aws.config.region=context.rootState.info.region
-         
-        var credentials=new aws.CognitoIdentityCredentials({
-            IdentityPoolId:context.rootState.info.PoolId,
-            RoleSessionName:context.state.name,
-            Logins:context.state.Logins
-        })
-        credentials.clearCachedId() 
-
-        return Promise.delay(0)
-        .then(()=>credentials.getPromise())
-        .then(function(){
-            context.commit('credentials',credentials)
-        })
     }
 }

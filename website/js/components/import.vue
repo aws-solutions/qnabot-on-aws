@@ -44,12 +44,14 @@
             v-list
               template(v-for="(job,index) in jobs")
                 v-list-tile(:id="'import-job-'+job.id" :data-status="job.status")
-                  v-list-tile-content 
+                  v-list-tile-content.job-content
                     v-list-tile-title {{job.id}}: {{job.status}}
                     v-list-tile-sub-title
                       v-progress-linear(v-model="job.progress*100")
-                  v-list-tile-action
-                    v-btn(block icon @click="deleteJob(index)" :loading="job.loading") 
+                  v-list-tile-action.job-actions
+                    v-btn(fab block icon @click="refresh(index)" :loading="job.refreshing") 
+                      v-icon refresh
+                    v-btn(fab block icon @click="deleteJob(index)" :loading="job.loading") 
                       v-icon delete
                 v-divider(v-if="index + 1 < jobs.length")
           v-card-actions
@@ -126,8 +128,8 @@ module.exports={
     },
     refresh:function(index){
       var self=this
-      self.jobs=[]
       if(index===undefined){
+        self.jobs=[]
         this.$store.dispatch('api/listImports')
         .then(result=>{
           result.jobs.forEach((job,index)=>{
@@ -136,7 +138,10 @@ module.exports={
           })
         })
       }else{
+        this.jobs[index].refreshing=true
         this.$store.dispatch('api/getImport',this.jobs[index])
+        .then(result=>self.jobs.$set(index,Object.assign(self.jobs[index],result)))
+        .finally(()=>self.jobs[index].refreshing=false)
       }
     },
     Getfile:function(event){
@@ -205,3 +210,14 @@ module.exports={
   }
 }
 </script>
+
+<style lang='scss' scoped>
+  .job-content {
+    flex:1;
+  }
+
+  .job-actions {
+    flex:0;
+    flex-direction:row;
+  }
+</style>

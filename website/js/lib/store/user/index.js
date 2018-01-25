@@ -15,7 +15,6 @@ var Vuex=require('vuex')
 module.exports={
     namespaced: true,
     state:{
-        credentials:{},
         loggedin:false 
     },
     mutations:require('./mutations'),

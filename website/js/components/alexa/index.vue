@@ -95,9 +95,7 @@ module.exports={
     Vuex.mapState([
         'bot'
     ]),
-    {invalid:function(){
-      return this.$validator.errors.has('filter')
-    },
+    {
     steps:function(){
       var self=this
       return _.map(this.stepsRaw,function(x){ 

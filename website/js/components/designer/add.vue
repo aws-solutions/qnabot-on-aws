@@ -51,7 +51,6 @@ var _=require('lodash')
 var empty=require('./empty')
 
 module.exports={
-  $validates:true,
   data:function(){
     return {
       title:"Add New Item",

@@ -111,6 +111,7 @@ module.exports={
         })
         .get('data')
         .tap(()=>context.commit('loading',false))
+        .tapCatch(console.log)
         .tapCatch(x=>x.response.status===403,function(){
             console.log("UnAuth Error") 
             context.commit('loading',false)
@@ -122,16 +123,30 @@ module.exports={
                 if(result) window.window.location.href=login
             }
         })
+        .tapCatch(x=>x.code==="CredentialTimeout",function(){
+            context.commit('loading',false)
+            var login=_.get(context,"rootState.info._links.DesignerLogin.href")
+            if(login && !failed){
+                failed=true
+                var result=window.confirm("Your credentials have expired. Click ok to be redirected to the login page.") 
+                if(result){
+                    context.dispatch('user/logout',{},{root:true})
+                    window.window.location.href=login
+                }
+            }
+        })
         .tapCatch(error=>error.response && error.response.status!==403,error=>{
             var message={
                 response:_.get(error,"response.data"),
                 status:_.get(error,"response.status")
             }
-            window.alert("Request Failed:"+JSON.stringify(message,null,2))
+            window.alert("Request Failed: error response from endpoint")
+            console.log(JSON.stringify(message,null,2))
             return Promise.reject(message)
         })
-        .tapCatch(error=>!error.response,error=>{
-            window.alert("Request Failed:"+JSON.stringify(message,null,2))
+        .tapCatch(error=>!error.response && x.code!=="CredentialTimeout",error=>{
+            window.alert("Unknown Error")
+            console.log(JSON.stringify(error,null,2))
         })
     },
     botinfo(context){
