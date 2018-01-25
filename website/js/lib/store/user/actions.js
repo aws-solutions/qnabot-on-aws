@@ -16,6 +16,20 @@ var axios=require('axios')
 var aws=require('aws-sdk')
 
 module.exports={
+    getCredentials:function(context){
+        return Promise.try(function(){
+            if(context.state.credentials.needsRefresh()){
+                context.state.credentials=new aws.CognitoIdentityCredentials({
+                    IdentityPoolId:context.rootState.info.PoolId,
+                    RoleSessionName:context.state.name,
+                    Logins:context.state.Logins
+                })
+                return context.state.credentials.getPromise()
+            }
+        })
+        .then(()=>context.state.credentials)
+        .tapCatch(console.log)
+    },
     logout:function(context){
         window.sessionStorage.clear()
     },

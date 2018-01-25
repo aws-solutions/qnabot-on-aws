@@ -33,9 +33,11 @@ module.exports={
                 var token=jwt.decode(id_token)
             }else{
                 var params=query.parse(state.hash)
+                console.log(params)
                 var id_token=params.id_token
                 var token=jwt.decode(params.id_token)
                 window.sessionStorage.setItem('id_token',params.id_token)
+                window.sessionStorage.setItem('access_token',params.access_token)
             }
             
             set(state,'name',token["cognito:username"])

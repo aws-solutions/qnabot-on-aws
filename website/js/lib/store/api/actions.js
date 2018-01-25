@@ -101,14 +101,8 @@ module.exports={
         }
         context.commit('loading',true)
 
-        var credentials=context.rootState.user.credentials
-        
-        return Promise.try(function(){
-            if(credentials.needsRefresh()){
-                return credentials.refreshPromise()
-            }
-        })
-        .then(function(){
+        return context.dispatch('user/getCredentials',{},{root:true})
+        .then(function(credentials){
             var signed=sign(request,credentials)        
             delete request.headers["Host"]
             delete request.headers["Content-Length"]        
@@ -135,6 +129,9 @@ module.exports={
             }
             window.alert("Request Failed:"+JSON.stringify(message,null,2))
             return Promise.reject(message)
+        })
+        .tapCatch(error=>!error.response,error=>{
+            window.alert("Request Failed:"+JSON.stringify(message,null,2))
         })
     },
     botinfo(context){
