@@ -21,7 +21,7 @@ exports.parse=function(event){
             })
             break;
         case "IntentRequest":
-            out.question=_.get(event,'intents.slots.QnA_slot.value')
+            out.question=_.get(event,'request.intent.slots.QnA_slot.value')
             break;
         case "SessionEndedRequest":
             throw new End() 

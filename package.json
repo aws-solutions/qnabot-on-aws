@@ -5,7 +5,7 @@
     "node": ">=8.9.4",
     "npm": ">=5.0.0"
   },
-  "engineStrict":true,
+  "engineStrict": true,
   "os": [
     "darwin",
     "linux"
@@ -42,9 +42,11 @@
     "JSONPath": "^0.11.2",
     "ajax-promise": "^0.8.1",
     "ajv": "^5.5.2",
+    "alexa-sdk": "^1.0.25",
     "amazon-cognito-identity-js": "^1.31.0",
+    "ask-cli": "^1.0.0-beta.9",
     "autosize": "^3.0.21",
-    "aws-lex-web-ui": "github:awslabs/aws-lex-web-ui",
+    "aws-lex-web-ui": "git+https://github.com/awslabs/aws-lex-web-ui.git",
     "aws-sdk": "^2.186.0",
     "aws4": "^1.6.0",
     "axios": "^0.17.1",
