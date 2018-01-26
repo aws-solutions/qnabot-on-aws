@@ -102,7 +102,6 @@ module.exports={
       })
       .tap(()=>self.$store.commit('data/selectAll',false))
       .tap(()=>self.success='Success!')
-      .then(()=>self.loading=false) 
       .catch(error=>self.error=error)
     }
   }

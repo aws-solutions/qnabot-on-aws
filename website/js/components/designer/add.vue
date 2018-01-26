@@ -72,9 +72,9 @@ module.exports={
   },
   methods:{
     cancel:function(){
-      this.dialog=false
-      this.loading=false
       this.reset()
+      this.loading=false
+      this.dialog=false
     },
     reset:function(){
       this.data=empty(this.schema) 
@@ -94,6 +94,7 @@ module.exports={
             self.loading=false
             self.dialog=true
           }else{
+            self.$refs.dialog.$refs.dialog.scrollTo(0,0)
             return self.$store.dispatch('data/add',_.cloneDeep(self.data))
             .then(function(){
               self.success='Success!'

@@ -115,7 +115,7 @@ module.exports={
             var result=await axios(signed)
             return result.data
         }catch(e){
-            console.log(JSON.stringify(e,null,2))
+            console.log(JSON.stringify(_.get(e,"response",e),null,2))
             if(e.response){
                 var status=e.response.status
                 if(status===403){
@@ -127,17 +127,13 @@ module.exports={
                     }else{
                         throw e
                     }
-                }else if(status===404){
-                    if(!opts.ignore404){ 
-
-                    }
                 }else {
                     var message={
-                        response:_.get(error,"response.data"),
-                        status:_.get(error,"response.status")
+                        response:_.get(e,"response.data"),
+                        status:_.get(e,"response.status")
                     }
                     if(status===404 && opts.ignore404){
-                        return false
+                        throw "does-not-exist"
                     }else{
                         window.alert("Request Failed: error response from endpoint")
                         throw message
@@ -212,6 +208,8 @@ module.exports={
             ignore404:true
         })
         .then(()=>true)
+        .tapCatch(console.log)
+        .catch(x=>x==='does-not-exist',()=>false)
     },
     add(context,payload){
         return context.dispatch('update',payload)

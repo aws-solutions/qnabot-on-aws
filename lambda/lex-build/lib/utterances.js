@@ -53,9 +53,9 @@ module.exports=function(params){
     })
 
     var s3_utterances=s3.getObject({
-        Bucket:
-        Key:
-    }).promise()
+        Bucket:process.env.UTTERANCE_BUCKET,
+        Key:process.env.UTTERANCE_KEY
+    }).promise().tap(console.log).then(x=>JSON.parse(x.Body.toString()))
 
     return Promise.join(es_utterances,s3_utterances)
     .then(utterances=>_.compact(_.uniq(_.flatten(utterances))))

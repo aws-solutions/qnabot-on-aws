@@ -7,6 +7,6 @@ $(DST):./* ../../build/lambda/fulfillment.zip
 	 $(BUILD) --stack $(NAME) --verbose
 
 ../../build/lambda/fulfillment.zip:$(LAMBDA_DIR)/*
-	cd ../../lambda/fulfillment && make
+	make -C ../../lambda/fulfillment
 
 

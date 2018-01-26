@@ -128,7 +128,7 @@ module.exports={
       return this.$store.dispatch('api/getImport',jobId)
       .then(result=>Object.assign(jobId,result))
       .then(job=>{
-        self.jobs.splice(0,1,job)
+        self.jobs.splice(0,0,job)
         
         poll()
         function poll(){

@@ -15,13 +15,12 @@ var lambda=require('./setup.js')
 var outputs=require('../../../bin/exports')
 var Promise=require('bluebird')
 var run=function(params,test){
-    return lambda.then(fnc=>fnc(params)
+    return lambda(params)
         .tap(msg=>console.log(JSON.stringify(msg)))
         .tap(test.ok)
         .error(test.ifError)
         .catch(test.ifError)
         .finally(test.done)
-    )
 }
 
 module.exports={
