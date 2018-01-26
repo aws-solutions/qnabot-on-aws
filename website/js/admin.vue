@@ -18,7 +18,7 @@
             v-list-tile-title {{page.title}}
             v-list-tile-sub-title {{page.subTitle}}
     v-toolbar(app fixed)
-      v-toolbar-side-icon(
+      v-toolbar-side-icon.primary--text(
         id="nav-open"
         @click.stop="drawer = !drawer"
       )
