@@ -26,6 +26,9 @@
         },
         "ClientLogin":{
             "href":"$stageVariables.ClientLoginUrl"
+        },
+        "CognitoEndpoint":{
+            "href":"$stageVariables.CognitoEndpoint"
         }
     }
 }

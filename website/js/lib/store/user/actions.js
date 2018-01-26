@@ -13,40 +13,116 @@ License for the specific language governing permissions and limitations under th
 
 var Promise=require('bluebird')
 var axios=require('axios')
+var jwt=require('jsonwebtoken')
 var aws=require('aws-sdk')
 var _=require('lodash')
 var set=require('vue').set
+var query=require('query-string')
+
 module.exports={
-    getCredentials:function(context){
-        return Promise.try(function(){
-            if(!_.get(context,'state.credentials')){
-                set(context.state,"credentials",new aws.CognitoIdentityCredentials({
-                    IdentityPoolId:context.rootState.info.PoolId,
-                    RoleSessionName:context.state.name,
-                    Logins:context.state.Logins
-                }))
-            }else if(context.state.credentials.needsRefresh()){
-                set(context.state,"credentials",new aws.CognitoIdentityCredentials({
-                    IdentityPoolId:context.rootState.info.PoolId,
-                    RoleSessionName:context.state.name,
-                    Logins:context.state.Logins
-                }))
+    refreshTokens:async function(context){
+        var refresh_token=window.sessionStorage.getItem('refresh')
+        var endpoint=context.rootState.info._links.CognitoEndpoint.href
+        var clientId=context.rootState.info.ClientIdDesigner 
+
+        var tokens=await axios.post({
+            url:`${endpoint}/oauth2/token`,
+            headers:{
+                "Content-Type":'application/x-www-form-urlencoded'
+            },
+            params:{
+                grant_type:'refresh_token',
+                client_id:clientId,
+                refresh_token:refresh_token
             }
         })
-        .then(()=>context.state.credentials.getPromise())
-        .then(()=>context.state.credentials.getPromise())
-        .then(()=>context.state.credentials)
-        .catch(x=>x.message.match('Token expired'),x=>{
-            return Promise.reject({
-                code:"CredentialTimeout"
-            })
-        })
+
+        window.sessionStorage.setItem('id_token',tokens.data.id_token)
+        window.sessionStorage.setItem('access_token',tokens.data.access_token)
+        window.sessionStorage.setItem('refresh_token',tokens.data.refresh_token)
+        set(context.state,'token',tokens.data.id_token)
     },
+    getCredentials:Promise.method(async function(context){
+        try {
+            if(!_.get(context,'state.credentials')){
+                return await getCredentials(context)
+            }else if(context.state.credentials.needsRefresh()){
+                return await getCredentials(context)
+            }else{
+                return context.state.credentials
+            }
+        }catch(e){
+            console.log(e)
+            if(e.message.match('Token expired')){
+                await context.dispatch('refreshTokens')     
+                return await getCredentials(context)
+            }else{
+                throw e
+            }
+        }
+    }),
     logout:function(context){
         window.sessionStorage.clear()
     },
-    login:function(context){
-        context.commit('token',context.rootState) 
+    login:async function(context){
         aws.config.region=context.rootState.info.region
+        
+        var id_token=window.sessionStorage.getItem('id_token')
+            
+        if(id_token && id_token!=="undefined"){
+            var token=jwt.decode(id_token)
+            set(context.state,'token',id_token)
+        }else{
+            var code=query.parse(window.location.search).code
+            var token=jwt.decode(await getTokens(context,code))
+        }
+        
+        set(context.state,'name',token["cognito:username"])
+        set(context.state,'groups',token["cognito:groups"])
+        
+        if(!context.state.groups || !context.state.groups.includes('Admins')){
+            var login=_.get(context.rootState,"info._links.DesignerLogin.href")
+            window.alert("You must be an administrative user to view this page") 
+            window.window.location.href=login
+        }
     }
+}
+async function getCredentials(context){
+    var Logins={}
+    Logins[[
+        'cognito-idp.',
+        context.rootState.info.region,
+        '.amazonaws.com/',
+        context.rootState.info.UserPool,
+        ].join('')]=context.state.token
+    
+    set(context.state,"credentials",new aws.CognitoIdentityCredentials({
+        IdentityPoolId:context.rootState.info.PoolId,
+        RoleSessionName:context.state.name,
+        Logins
+    }))
+    await context.state.credentials.getPromise()
+    return context.state.credentials
+}
+async function getTokens(context,code){
+    var endpoint=context.rootState.info._links.CognitoEndpoint.href
+    var clientId=context.rootState.info.ClientIdDesigner 
+    var tokens=await axios({
+        method:'POST',
+        url:`${endpoint}/oauth2/token`,
+        headers:{
+            "Content-Type":'application/x-www-form-urlencoded'
+        },
+        data:query.stringify({
+            grant_type:'authorization_code',
+            client_id:clientId,
+            code:code,
+            redirect_uri:window.location.origin+window.location.pathname
+        })
+    })
+    window.sessionStorage.setItem('id_token',tokens.data.id_token)
+    window.sessionStorage.setItem('access_token',tokens.data.access_token)
+    window.sessionStorage.setItem('refresh_token',tokens.data.refresh_token)
+    set(context.state,'token',tokens.data.id_token)
+    return tokens.data.id_token 
 }

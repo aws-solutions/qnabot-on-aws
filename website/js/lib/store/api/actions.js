@@ -17,6 +17,9 @@ var axios=require('axios')
 var Url=require('url')
 var sign=require('aws4').sign
 var path=require('path')
+var Mutex=require('async-mutex').Mutex
+const mutex = new Mutex();
+
 var reason=function(r){
     return (err)=>{ 
         console.log(err)
@@ -86,7 +89,7 @@ module.exports={
             method:'delete'
         })
     },
-    _request(context,opts){
+    _request:Promise.method(async function(context,opts){
         var url=Url.parse(opts.url)
         var request={
             host:url.hostname,
@@ -101,55 +104,54 @@ module.exports={
             request.headers['content-type']='application/json'
         }
         context.commit('loading',true)
-
-        return context.dispatch('user/getCredentials',{},{root:true})
-        .then(function(credentials){
-            var signed=sign(request,credentials)        
-            delete request.headers["Host"]
-            delete request.headers["Content-Length"]        
-
-            return Promise.resolve(axios(signed))
+        var credentials=await mutex.runExclusive(async function(){
+            return context.dispatch('user/getCredentials',{},{root:true})
         })
-        .get('data')
-        .tap(()=>context.commit('loading',false))
-        .tapCatch(console.log)
-        .tapCatch(x=>x.response.status===403,function(){
-            console.log("UnAuth Error") 
-            context.commit('loading',false)
-            var login=_.get(context,"rootState.info._links.DesignerLogin.href")
-            console.log(login)
-            if(login && !failed){
-                failed=true
-                var result=window.confirm("You need to be logged in to use this page. click ok to be redirected to the login page") 
-                if(result) window.window.location.href=login
-            }
-        })
-        .tapCatch(x=>x.code==="CredentialTimeout",function(){
-            context.commit('loading',false)
-            var login=_.get(context,"rootState.info._links.DesignerLogin.href")
-            if(login && !failed){
-                failed=true
-                var result=window.confirm("Your credentials have expired. Click ok to be redirected to the login page.") 
-                if(result){
-                    context.dispatch('user/logout',{},{root:true})
-                    window.window.location.href=login
+        var signed=sign(request,credentials)        
+        delete request.headers["Host"]
+        delete request.headers["Content-Length"]        
+        
+        try{
+            var result=await axios(signed)
+            return result.data
+        }catch(e){
+            //console.log(JSON.stringify(e,null,2))
+            
+            if(e.response){
+                var status=e.response.status
+                if(status===403){
+                    var login=_.get(context,"rootState.info._links.DesignerLogin.href")
+                    if(login && !failed){
+                        failed=true
+                        var result=window.confirm("You need to be logged in to use this page. click ok to be redirected to the login page") 
+                        if(result) window.window.location.href=login
+                    }
+                }else{
+                    var message={
+                        response:_.get(error,"response.data"),
+                        status:_.get(error,"response.status")
+                    }
+                    window.alert("Request Failed: error response from endpoint")
+                    return message
                 }
+            }else if(e.code==="CredentialTimeout"){
+                var login=_.get(context,"rootState.info._links.DesignerLogin.href")
+                if(login && !failed){
+                    failed=true
+                    var result=window.confirm("Your credentials have expired. Click ok to be redirected to the login page.") 
+                    if(result){
+                        context.dispatch('user/logout',{},{root:true})
+                        window.window.location.href=login
+                    }
+                }
+            }else{
+                window.alert("Unknown Error")
+                //console.log(JSON.stringify(error,null,2))
             }
-        })
-        .tapCatch(error=>error.response && error.response.status!==403,error=>{
-            var message={
-                response:_.get(error,"response.data"),
-                status:_.get(error,"response.status")
-            }
-            window.alert("Request Failed: error response from endpoint")
-            console.log(JSON.stringify(message,null,2))
-            return Promise.reject(message)
-        })
-        .tapCatch(error=>!error.response && x.code!=="CredentialTimeout",error=>{
-            window.alert("Unknown Error")
-            console.log(JSON.stringify(error,null,2))
-        })
-    },
+        }finally{
+            context.commit('loading',false)
+        }
+    }),
     botinfo(context){
         return context.dispatch('_request',{
             url:context.rootState.info._links.bot.href,

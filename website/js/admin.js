@@ -45,7 +45,6 @@ function init(){
     var router=new Router(lib.router)
     var store=lib.store
     sync(store,router)
-    store.commit('user/captureHash')
     router.replace('/loading')
 
     System.import(/* webpackChunkName: "admin-page" */'./admin.vue')

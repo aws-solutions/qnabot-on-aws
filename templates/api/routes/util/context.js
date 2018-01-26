@@ -4,6 +4,7 @@ module.exports={
         "PoolId":"Pool-2121",
         "ClientId":"Client-adad",
         "UserPool":"User-adada",
+        "CognitoEndpoint":"www.example.com",
         "ApiUrl":"url",
         "BotName":"bot",
         "SlotType":"slot",

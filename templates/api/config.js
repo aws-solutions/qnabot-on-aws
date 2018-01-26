@@ -102,6 +102,7 @@ function stage(name){
             "ESType": {"Ref":"ESType"},
             "LambdaArn":{"Ref":"HandlerArn"},
             "ImportBucket":{"Ref":"ImportBucket"},
+            "CognitoEndpoint":{"Fn::GetAtt":["DesignerLogin","Domain"]},
             "DesignerLoginUrl":{"Fn::Join":["",[
                 {"Fn::GetAtt":["ApiUrl","Name"]},
                 "/pages/designer"

@@ -37,7 +37,7 @@ if(!module.parent){
     }
 }
 module.exports=create
-function create(options){
+async function create(options){
     var stack=options.stack
     log('building '+(options.stack || options.input),stack,!options.silent)
     var file=options.input || __dirname+'/../templates/'+stack

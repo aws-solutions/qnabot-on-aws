@@ -17,48 +17,9 @@ var set=require('vue').set
 var aws=require('aws-sdk')
 
 module.exports={
-    captureHash:function(state){
-        set(state,'hash',location.hash.substring(2))
-    },
     credentials:function(state,payload){
         set(state,'loggedin',true)
         set(state,'credentials',payload)
-    },
-    token:function(state,rootState){
-        try {
-            var id_token=window.sessionStorage.getItem('id_token')
-            
-            if(id_token && id_token!=="undefined"){
-                var token=jwt.decode(id_token)
-            }else{
-                var params=query.parse(state.hash)
-                var id_token=params.id_token
-                var token=jwt.decode(params.id_token)
-                window.sessionStorage.setItem('id_token',params.id_token)
-                window.sessionStorage.setItem('access_token',params.access_token)
-            }
-            
-            set(state,'name',token["cognito:username"])
-            set(state,'groups',token["cognito:groups"])
-            set(state,'token',id_token)
-            
-            if(!state.groups || !state.groups.includes('Admins')){
-                var login=_.get(rootState,"info._links.DesignerLogin.href")
-                window.alert("You must be an administrative user to view this page") 
-                window.window.location.href=login
-            }
-            state.Logins={}
-            state.Logins[[
-                'cognito-idp.',
-                rootState.info.region,
-                '.amazonaws.com/',
-                rootState.info.UserPool,
-                ].join('')]=state.token
-
-        } catch(e){
-            console.log(e)
-            var result=window.confirm("Missing or invalid credentials:\n"+JSON.stringify(e,null,2))
-        }
     },
     login(state){
         state.loggedIn=true

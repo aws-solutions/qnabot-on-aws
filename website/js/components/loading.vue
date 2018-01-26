@@ -31,6 +31,7 @@ module.exports={
     this.$store.dispatch('bootstrap')
     .then(()=>self.$store.dispatch('user/login'))
     .then(()=>self.$router.replace('/edit'))
+    .tapCatch(console.log)
     .catch(()=>self.$router.replace('/error'))
   },
   methods:{

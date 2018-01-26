@@ -144,10 +144,9 @@ module.exports={
       return this.QAs.map(x=>x.select).includes(true)
     }
   },
-  created:function(){
-    var self=this
-    return this.$store.dispatch('data/schema')
-      .then(()=>self.get(1))
+  created:async function(){
+    await this.$store.dispatch('data/schema')
+    await this.get(1)
   },
   watch:{
     tab:function(tab){
