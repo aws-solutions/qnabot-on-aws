@@ -103,7 +103,6 @@ module.exports={
             request.data=opts.body,
             request.headers['content-type']='application/json'
         }
-        context.commit('loading',true)
         var credentials=await mutex.runExclusive(async function(){
             return context.dispatch('user/getCredentials',{},{root:true})
         })
@@ -112,11 +111,11 @@ module.exports={
         delete request.headers["Content-Length"]        
         
         try{
+            context.commit('loading',true)
             var result=await axios(signed)
             return result.data
         }catch(e){
-            //console.log(JSON.stringify(e,null,2))
-            
+            console.log(JSON.stringify(e,null,2))
             if(e.response){
                 var status=e.response.status
                 if(status===403){
@@ -125,14 +124,24 @@ module.exports={
                         failed=true
                         var result=window.confirm("You need to be logged in to use this page. click ok to be redirected to the login page") 
                         if(result) window.window.location.href=login
+                    }else{
+                        throw e
                     }
-                }else{
+                }else if(status===404){
+                    if(!opts.ignore404){ 
+
+                    }
+                }else {
                     var message={
                         response:_.get(error,"response.data"),
                         status:_.get(error,"response.status")
                     }
-                    window.alert("Request Failed: error response from endpoint")
-                    return message
+                    if(status===404 && opts.ignore404){
+                        return false
+                    }else{
+                        window.alert("Request Failed: error response from endpoint")
+                        throw message
+                    }
                 }
             }else if(e.code==="CredentialTimeout"){
                 var login=_.get(context,"rootState.info._links.DesignerLogin.href")
@@ -142,11 +151,13 @@ module.exports={
                     if(result){
                         context.dispatch('user/logout',{},{root:true})
                         window.window.location.href=login
+                    }else{
+                        throw e
                     }
                 }
             }else{
                 window.alert("Unknown Error")
-                //console.log(JSON.stringify(error,null,2))
+                throw e
             }
         }finally{
             context.commit('loading',false)
@@ -197,10 +208,10 @@ module.exports={
         return context.dispatch('_request',{
             url:context.rootState.info._links.questions.href+'/'+qid,
             method:'head',
-            reason:qid+' does not exists'
+            reason:qid+' does not exists',
+            ignore404:true
         })
         .then(()=>true)
-        .catch(()=>false)
     },
     add(context,payload){
         return context.dispatch('update',payload)
