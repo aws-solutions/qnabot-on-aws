@@ -86,18 +86,6 @@ module.exports={
         icon:"mode_edit",
         href:"#/edit"
       },{
-        title:"Alexa",
-        id:"alexa",
-        subTitle:"instructions for setting up an Alexa Skill",
-        icon:"info",
-        href:"#/alexa"
-      },{
-        title:"Lambda Hooks",
-        id:"hooks",
-        subTitle:"Instructions for customizing QnABot behavior using AWS Lambda",
-        icon:"settings_input_component",
-        href:"#/hooks"
-      },{
         title:"Import",
         id:"import",
         subTitle:"Import new questions",
@@ -109,6 +97,18 @@ module.exports={
         subTitle:"Download backups of your QnAs",
         icon:"file_download",
         href:"#/export"
+      },{
+        title:"Alexa",
+        id:"alexa",
+        subTitle:"instructions for setting up an Alexa Skill",
+        icon:"info",
+        href:"#/alexa"
+      },{
+        title:"Lambda Hooks",
+        id:"hooks",
+        subTitle:"Instructions for customizing QnABot behavior using AWS Lambda",
+        icon:"settings_input_component",
+        href:"#/hooks"
       },{
         title:"QnABot Client",
         id:"client",

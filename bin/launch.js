@@ -29,6 +29,7 @@ if (require.main === module) {
         .option('-q --silent',"do output information")
         .option('--operation <op>',"the opteration to do")
         .option('--input <input>',"input template")
+        .option('--stack-name <StackName>',"stack name of the launched template")
         .option('--no-wait',"do not wait for stack to complete")
         .option('--no-interactive',"omit interactive elements of output (spinners etc.)")
         .on('--help',()=>{
@@ -81,67 +82,66 @@ if (require.main === module) {
         argv.outputHelp()
     }
 }
-function syntax(stack,options){
+async function syntax(stack,options){
     if(options.check){
-        return check(stack,options)
-        .tap(x=>log("Template Valid",options))
-        .tapCatch(x=>log(x.message,options))
+        try{
+            await check(stack,options)
+            log("Template Valid",options)
+        }catch(e){
+            log(e.message,options)
+        }
     }else{
         return Promise.resolve()
     }
 }
-function up(stack,options){
-    return build({
+async function up(stack,options){
+    await build({
         stack:stack,
         input:options.input,
         silent:options.silent
     })
-    .then(()=>{
-        var StackName=name(stack,{inc:true})
+    try {
+        var StackName=options.stackName ? options.stackName : name(stack,{inc:true})
         log(`launching stack:${stack}`,options)
         if(!options.dryRun){
             var template=fs.readFileSync(
                 `${__dirname}/../build/templates/${stack}.json`
             ,'utf-8')
             if(Buffer.byteLength(template)<51200){
-                var start=cf.createStack({
+                var create=await cf.createStack({
                     StackName,
                     Capabilities:["CAPABILITY_NAMED_IAM"],
                     DisableRollback:true,
                     TemplateBody:template
                 }).promise()
             }else{
-                var start=bootstrap().then(function(exp){
-                    var bucket=exp.Bucket
-                    var prefix=exp.Prefix
-                    var url=`http://s3.amazonaws.com/${bucket}/${prefix}/templates/${stack}.json`
-                    return s3.putObject({
-                        Bucket:bucket,
-                        Key:`${prefix}/templates/${stack}.json`,
-                        Body:template
-                    }).promise()
-                    .then(()=>cf.createStack({
-                        StackName,
-                        Capabilities:["CAPABILITY_NAMED_IAM"],
-                        DisableRollback:true,
-                        TemplateURL:url
-                    }).promise())
-                })
+                var exp=await bootstrap()
+                var bucket=exp.Bucket
+                var prefix=exp.Prefix
+                var url=`http://s3.amazonaws.com/${bucket}/${prefix}/templates/${stack}.json`
+                await s3.putObject({
+                    Bucket:bucket,
+                    Key:`${prefix}/templates/${stack}.json`,
+                    Body:template
+                }).promise()
+                var create=await cf.createStack({
+                    StackName,
+                    Capabilities:["CAPABILITY_NAMED_IAM"],
+                    DisableRollback:true,
+                    TemplateURL:url
+                }).promise()
             }
 
-            return start.then(x=>{  
-                log(`stackname: ${StackName}`,options)
-                log(`stackId: ${x.StackId}`,options)
-                if(options.wait){
-                    return wait(stack,{show:!options.silent})
-                }
-            })
+            log(`stackname: ${StackName}`,options)
+            log(`stackId: ${create.StackId}`,options)
+            if(options.wait){
+                return wait(stack,{show:!options.silent})
+            }
         }
-    })
-    .catch(x=>{
-        log("failed"+x,options)
+    }catch(e){
+        log("failed:"+e,options)
         process.exit(1)
-    })
+    }
 }
 function update(stack,options){
     return build({
@@ -150,7 +150,7 @@ function update(stack,options){
         silent:options.silent
     })
     .then(()=>{
-        var StackName=name(stack,{})
+        var StackName=options.stackName ? options.stackName : name(stack)
         log(`updating stack:${stack}`,options)
         if(!options.dryRun){
             var template=fs.readFileSync(
@@ -194,43 +194,50 @@ function update(stack,options){
         process.exit(1)
     })
 }
-function down(stack,options){
-    var StackName=name(stack,{})
+async function down(stack,options){
+    var StackName=options.stackName ? options.stackName : name(stack)
     log("terminating stack",options)
-    if(!options.dryRun){
-        return cf.describeStacks({
+    if(options.dryRun){
+        return 
+    }
+    try{
+        var down=await cf.describeStacks({
             StackName
         }).promise()
-        .then(x=>x.Stacks[0].StackId)
-        .tap(id=>cf.deleteStack({
+        var id=down.Stacks[0].StackId
+        await cf.deleteStack({
             StackName:id
-        }).promise())
-        .then(id=>{  
-            if(options.wait){
-                return wait(stack,{
-                    Id:id,
-                    show:options.interactive
-                })
-            }
-        })
-        .catch(x=>_.get(x,"message","").match(/.*does not exist$/),function(){})
-        .catch(x=>{
-            log(x,options)
+        }).promise()
+        if(options.wait){
+            return wait(stack,{
+                Id:id,
+                show:options.interactive
+            })
+        }
+    }catch(e){
+        console.log(e)
+        if(!_.get(e,"message","").match(/.*does not exist$/)){
+            log(e,options)
             process.exit(1)
-        })
+        }
     }
 }
 
-function sure(stack,options={}){
-    var StackName=name(stack)
+async function sure(stack,options={}){
+    var StackName=options.stackName ? options.stackName : name(stack)
     log(`making sure stack ${stack} is up`,options)
-    return cf.describeStacks({StackName}).promise()
-    .then(()=>wait(stack,{show:options.interactive && !options.silent}))
-    .then(x=>log(`${stack} is up as ${StackName}`,options))
-    .catch(x=>_.get(x,"message","").match(/.*does not exist$/),function(){
-        log("Stack does not exist",options)
-        return up(stack,options)
-    })
+    try{ 
+        await cf.describeStacks({StackName}).promise()
+        await wait(stack,{show:options.interactive && !options.silent})
+        log(`${stack} is up as ${StackName}`,options)
+    }catch(e){
+        if(_.get(e,"message","").match(/.*does not exist$/)){
+            log("Stack does not exist",options)
+            return up(stack,options)
+        }else{
+            throw e
+        }
+    }
 }
 
 function log(message,options){

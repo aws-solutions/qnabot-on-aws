@@ -3,8 +3,14 @@ module.exports={
     "Type": "Custom::Variable",
     "Properties": {
         "ServiceToken": { "Fn::GetAtt" : ["CFNLambda", "Arn"] },
-        "index":"qna",
-        "type":"qna"
+        "index":{
+            value:{"Ref":"AWS::StackName"},
+            op:"toLowerCase"
+        },
+        "type":{
+            value:{"Ref":"AWS::StackName"},
+            op:"toLowerCase"
+        }
     }
 },
 "ESVar":{

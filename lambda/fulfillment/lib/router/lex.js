@@ -25,8 +25,7 @@ exports.assemble=function(response){
                 contentType:"application/vnd.amazonaws.card.generic",
                 genericAttachments:[{
                     title:response.card.title,
-                    subTitle:response.card.text,
-                    imageUrl:response.card.url
+                    imageUrl:response.card.imageUrl
                 }]
             } : null
         })

@@ -41,13 +41,7 @@ module.exports={
                             description:"",
                             maxLength:100
                         },
-                        text:{
-                            type:"text",
-                            title:"Card Text",
-                            description:"",
-                            maxLength:5000
-                        },
-                        url:{
+                        imageUrl:{
                             type:"text",
                             description:"",
                             title:"Card Image Url",
@@ -87,8 +81,7 @@ module.exports={
         },
         r:{
             properties:{
-                url:{type:"keyword"},
-                text:{type:"text"},
+                imageUrl:{type:"keyword"},
                 title:{type:"text"}
             }
         },

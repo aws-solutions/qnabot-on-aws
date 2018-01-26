@@ -47,7 +47,7 @@ exports.parse=function(event){
                 response:{
                     outputSpeech:{
                         type:"PlainText",
-                        text:_.get(out,"session.previous.a","Sorry, i do not remober")
+                        text:_.get(out,"session.previous.a","Sorry, i do not remember")
                     },
                     shouldEndSession:false
                 }
@@ -78,13 +78,11 @@ exports.assemble=function(response){
                 ssml:response.type==='SSML' ? response.message : null,
             }),
             card:isCard(response.card) ? _.pickBy({
-                type:response.card.url ? "Simple" : "Standard",
+                type:response.card.imageUrl ? "Simple" : "Standard",
                 title:response.card.title,
-                content:response.card.url ? response.card.text : null,
-                text:response.card.url ? response.card.text : null,
-                image:response.card.url ? {
-                    smallImageUrl:response.card.url,
-                    largeImageUrl:response.card.url
+                image:response.card.imageUrl ? {
+                    smallImageUrl:response.card.imageUrl,
+                    largeImageUrl:response.card.imageUrl
                 } : null
             }) : null
         }),

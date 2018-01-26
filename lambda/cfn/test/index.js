@@ -59,7 +59,7 @@ module.exports={
     login:function(test){
         lifecycle(require('./params/login'),test)
     },
-    variable:function(test){
+    var:function(test){
         lifecycle(require('./params/var'),test)
     },
     domain:function(test){

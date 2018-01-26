@@ -6,5 +6,11 @@ exports.update=()=>params("Update")
 exports.delete=()=>params("Delete")
 
 function params(stage){
-    return base("Variable",stage,{Bytes:512})
+    return base("Variable",stage,{
+        Bytes:512,
+        name:{
+            value:"TEST",
+            op:"toLowerCase"
+        }
+    })
 }
