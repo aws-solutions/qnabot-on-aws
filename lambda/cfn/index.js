@@ -27,6 +27,7 @@ function dispatch(event,context,cb){
     var Lextype=event.ResourceType.match(/Custom::Lex(Bot|Alias|SlotType|Intent)/)
     if(_.get(Lextype,1)==='Alias') Lextype[1]='BotAlias'
     console.log(targets[type[1]]) 
+    
     if(Lextype){ 
         cfnLambda(new Lex(Lextype[1]))(event,context,cb)
     }else if(targets[type[1]]){
@@ -36,7 +37,7 @@ function dispatch(event,context,cb){
             event, 
             context, 
             reason:"Invalid resource type:"+event.ResourceType,
-            responseStatus:response.FAIL
+            responseStatus:response.FAILED
         })
         .then(()=>cb("Invalid resource type:"+event.ResourceType))
         .catch(cb)

@@ -20,11 +20,10 @@ var run=require('./run')
 
 module.exports=function(utterances,slottype){
     console.log("utterances="+utterances)
-    slottype.enumerationValues=_.uniqBy(_.concat(
-        slottype.enumerationValues,
+    
+    slottype.enumerationValues=_.uniqBy(
         utterances.map(x=>{return {value:x}})
-    ),
-    x=>x.value
+        ,x=>x.value
     ).slice(0,10000)
 
     delete slottype.lastUpdatedDate

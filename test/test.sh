@@ -3,6 +3,8 @@ __dirname="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 BASE=$__dirname/..
 cd $BASE
 
+npm run up
+
 echo "Testing Website"
 make -C $BASE/website test
 $BASE/website/test/bin/user.js --create
@@ -26,5 +28,4 @@ else
     exit 1
 fi
 
-npm run up
 

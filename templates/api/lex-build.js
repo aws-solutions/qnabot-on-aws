@@ -19,6 +19,12 @@ module.exports={
             "S3Key": {"Fn::Sub":"${BootstrapPrefix}/lambda/lex-build.zip"},
             "S3ObjectVersion":{"Ref":"LexBuildCodeVersion"}
         },
+        "Environment": {
+            "Variables": {
+                UTTERANCE_BUCKET:{"Ref":"AssetBucket"},
+                UTTERANCE_KEY:"default-utterances.json"
+            }
+        },
         "Handler": "index.handler",
         "MemorySize": "128",
         "Role": {"Fn::GetAtt": ["LexBuildLambdaRole","Arn"]},
@@ -41,6 +47,19 @@ module.exports={
             }
           ]
         },
+        "Policies":[{
+            PolicyName:"AssetBucketAccess",
+            PolicyDocument:{
+                "Version" : "2012-10-17",
+                "Statement": [ {
+                    "Effect": "Allow",
+                    "Action": ["s3:Get*"],
+                    "Resource":[
+                        {"Fn::Sub":"arn:aws:s3:::${AssetBucket}*"}
+                    ]
+                }]
+            }
+        }],
         "Path": "/",
         "ManagedPolicyArns": [
           "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",

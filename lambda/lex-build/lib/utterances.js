@@ -12,12 +12,14 @@ License for the specific language governing permissions and limitations under th
 */
 
 var Promise=require('bluebird')
+var aws=require('./aws')
+var s3=new aws.S3()
 var con=require('./con')
 var _=require('lodash')
 
 module.exports=function(params){
     var es=con(params.address)
-    return es.search({
+    var es_utterances=es.search({
         index: params.index,
         type: params.type,
         scroll:'10s',
@@ -49,5 +51,13 @@ module.exports=function(params){
             .map(qa=>qa._source.questions.map(y=>y.q))
         )))
     })
+
+    var s3_utterances=s3.getObject({
+        Bucket:
+        Key:
+    }).promise()
+
+    return Promise.join(es_utterances,s3_utterances)
+    .then(utterances=>_.compact(_.uniq(_.flatten(utterances))))
 }
 

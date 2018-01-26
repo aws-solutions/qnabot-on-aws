@@ -1,7 +1,7 @@
 LAMBDAS=$(shell for l in $$(ls ./lambda | grep -v test.js | grep -v README.md);do echo lambda/$$l;done)
 TEMPLATES=$(shell for l in $$(ls ./templates | grep -v util | grep -v README.md);do echo templates/$$l;done)
 
-All: templates lambda website build
+All: assets templates lambda website build
 
 build:
 	mkdir -p build; mkdir -p build/lambda; mkdir -p build/templates/test;mkdir -p build/templates;mkdir -p build/documents; mkdir -p build/templates/dev
@@ -27,10 +27,13 @@ templates: $(TEMPLATES) build
 website: build
 	$(MAKE) -C ./website
 
+assets: build 
+	$(MAKE) -C ./assets
+
 samples:docs/blog-samples.json build
 	cp docs/blog-samples.json build/documents
 
-upload: templates lambda website build
+upload: templates lambda website build assets
 	./bin/upload.sh
 
 test: build 

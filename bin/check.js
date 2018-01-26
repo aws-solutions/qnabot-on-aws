@@ -12,7 +12,7 @@ var s3=new aws.S3()
 var name=require('./name')
 var chalk=require('chalk')
 
-module.exports=run
+module.exports=Promise.method(run)
 
 if (require.main === module) {
     var argv=require('commander')
@@ -23,14 +23,15 @@ if (require.main === module) {
         .description("Check syntax of cloudformation templates")
         .usage("<stack> [options]")
         .option("--file <file>","absolute path to template file")
-        .action(function(stack,options){
+        .action(async function(stack,options){
             ran=true
-            run(stack,options)
-            .then(x=>console.log(`${stack} is Valid`))
-            .catch(x=>{
+            try{
+                var result=await run(stack,options)
+                console.log(`${stack} is Valid`)
+            }catch(e){
                 console.log("Invalid")
-                console.log(x.message)
-            })
+                console.log(e.message)
+            }
         })
         .parse(process.argv)
     if(!ran){
@@ -38,22 +39,23 @@ if (require.main === module) {
     }
 }
 
-function run(stack,options={}){
+async function run(stack,options={}){
     var name=stack || options.file.split('/')
         .reverse()
         .filter(x=>x)
         .slice(0,2)
         .reverse().join('-').split('.')[0]
     
-    var template=fs.readFileSync(options.file || `${__dirname}/../build/templates/${stack}.json`,'utf8')
+    var template=await fs.readFileSync(options.file || `${__dirname}/../build/templates/${stack}.json`,'utf8')
+
     if(Buffer.byteLength(template)>51200){
-        return bootstrap().then(function(exp){
-            var bucket=exp.Bucket
-            var prefix=exp.Prefix
-            var opts={
-                TemplateURL:`http://s3.amazonaws.com/${bucket}/${prefix}/templates/${name}.json`
-            }
-        })
+        var exp=await bootstrap()
+        var Bucket=exp.Bucket
+        var prefix=exp.Prefix
+        var Key=`${prefix}/templates/${stack}.json`
+        var TemplateURL=`http://s3.amazonaws.com/${Bucket}/${Key}`
+        await s3.putObject({Bucket,Key,Body:template}).promise()
+        return cf.validateTemplate({TemplateURL}).promise()
     }else{
         return cf.validateTemplate({
             TemplateBody:template
@@ -61,13 +63,13 @@ function run(stack,options={}){
     }
 }
 
-function bootstrap(){
+async function bootstrap(){
     var outputs={}
-    return cf.describeStacks({
+    var tmp=await cf.describeStacks({
         StackName:name("dev/bootstrap",{})
     }).promise()
-    .then(x=>x.Stacks[0].Outputs)
-    .map(x=>outputs[x.OutputKey]=x.OutputValue)
-    .return(outputs)
+    
+    tmp.Stacks[0].Outputs.forEach(x=>outputs[x.OutputKey]=x.OutputValue)
+    return outputs
 }
 

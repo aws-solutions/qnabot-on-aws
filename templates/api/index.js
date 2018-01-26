@@ -16,6 +16,7 @@ var base=require('./api.json')
 
 base.Resources=Object.assign(
     require('./import'),
+    require('./assets'),
     require('./signup'),
     require('./config'),
     require('./routes'),
