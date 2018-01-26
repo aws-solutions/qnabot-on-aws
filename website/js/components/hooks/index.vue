@@ -97,14 +97,19 @@ module.exports={
   ),
   created:function(){
     this.$store.dispatch('data/botinfo').catch(()=>null) 
-    var code=new clipboard('#code',{
+    var codeJS=new clipboard('#code-js',{
         text:function(){
-          return require('./code.txt')
+          return require('raw-loader!./code.js')
+        }
+    })
+    var codePY=new clipboard('#code-py',{
+        text:function(){
+          return require('raw-loader!./code.py')
         }
     })
     var request=new clipboard('#request',{
         text:function(){
-          return JSON.stringify(require('./example.json'),null,2)
+          return JSON.stringify(require('./example'),null,2)
         }
     })
   },

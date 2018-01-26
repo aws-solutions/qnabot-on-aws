@@ -103,14 +103,14 @@ module.exports={
             request.data=opts.body,
             request.headers['content-type']='application/json'
         }
-        var credentials=await mutex.runExclusive(async function(){
-            return context.dispatch('user/getCredentials',{},{root:true})
-        })
-        var signed=sign(request,credentials)        
-        delete request.headers["Host"]
-        delete request.headers["Content-Length"]        
-        
         try{
+            var credentials=await mutex.runExclusive(async function(){
+                return context.dispatch('user/getCredentials',{},{root:true})
+            })
+            var signed=sign(request,credentials)        
+            delete request.headers["Host"]
+            delete request.headers["Content-Length"]        
+        
             context.commit('loading',true)
             var result=await axios(signed)
             return result.data

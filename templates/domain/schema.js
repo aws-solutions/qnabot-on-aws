@@ -58,7 +58,7 @@ module.exports={
                 },
                 l:{
                     type:"string",
-                    description:"Enter the ARN of your lambda function to dynamically create or modify answers, or to redirect to a different question.",
+                    description:"Enter you lambda function name/ARN to dynamically create or modify answers, or to redirect to a different question.",
                     title:"Lambda Hook"
                 }
             },

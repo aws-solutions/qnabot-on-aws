@@ -1,11 +1,16 @@
-{
+var session={
+    previous:JSON.stringify({
+        qid:"test.1",
+        q:"help",
+        a:"ask a question"
+    })
+}
+
+module.exports={
   "req": {
     "_type": "LEX",
     "question": "help",
-    "session": {
-      "key1": "value1",
-      "key2": "value2"
-    },
+    "session": session,
     "_original": {
       "currentIntent": {
         "name": "intent-name",
@@ -24,10 +29,7 @@
       "invocationSource": "FulfillmentCodeHook or DialogCodeHook",
       "outputDialogMode": "Text or Voice, based on ContentType request header in runtime API request",
       "messageVersion": "1.0",
-      "sessionAttributes": {
-        "key1": "value1",
-        "key2": "value2"
-      }
+      "sessionAttributes":session 
     },
     "_query": {
       "from": 0,
@@ -75,6 +77,7 @@
       "text": "",
       "url": ""
     }
-  }
+  },
+  "response_type":"continue"
 }
 

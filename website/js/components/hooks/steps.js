@@ -1,41 +1,56 @@
 var stringify=require('json-stringify-pretty-compact')
-var example=stringify(require('./example'))
-var code=require('./code.txt')
+var example=stringify(require('./example.js'))
+var codeJS=require('raw-loader!./code.js')
+var codePY=require('raw-loader!./code.py')
+
 module.exports=[{
     title:"Create Lambda Function",
     text:`
-Create a lambda function with a name that starts with "qna"  
+1. Create a lambda function with a name that starts with "qna-", for example:  
 
-for example:  
-- qnaExtraSpecial  
-- qnaSecretSauce  
-...
+> qna-ExtraSpecial  
+> qna-SecretSauce  
+> ...
+
+2. Choose a runtime, our examples will use either nodejs or python. 
+3. For Role choose "create a customer role" and click allow
+4. click "Create Function"
     `
 },{
     title:"Write Code",
     text:`
-code must return its event object
-
 A minimal function would look like this
 
+##### node.js
 ~~~js
-${code}
-~~~
+${codeJS}
+~~~  
 
-The Event context has three properties
-1. \`req\` the normalized request object
-1. \`res\` the normalized response object (edit this to change the response)
+##### python
+~~~python
+${codePY}
+~~~  
 
+The event object has three properties
+1. \`event.req\` the normalized request object
+1. \`event.res\` the normalized response object (edit this to change the response)
+1. \`event.response_type\` sets how handler lambda should respond. Set to \`"redirect"\` and edit \`event.req\`, specifically the \`event.req._query\` field to have the handler redirect to a new ElasticSearch query.  
+
+The lambda handler must return the modified event object. 
 ~~~json 
 ${example}
 ~~~
 `,
     buttons:[{
-        text:"Copy Code",
-        id:"code",
+        text:"Copy node.js Code",
+        id:"code-js",
         loading:false
     },{
-        text:"Copy Example request",
+        text:"Copy python Code",
+        id:"code-py",
+        loading:false
+    },{
+        text:"Copy Example Event",
         id:"request",
         loading:false
     }]

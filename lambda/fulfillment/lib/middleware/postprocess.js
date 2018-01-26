@@ -4,7 +4,11 @@ var _=require('lodash')
 
 module.exports=function(req,res){
     var arn=_.get(res,"result[0]._source.l")
-    console.log("Lambda PostProcess Hooks:",JSON.stringify({req,res},null,2))
+    console.log("Lambda PostProcess Hooks:",JSON.stringify({
+        req,
+        res,
+        response_type:"continue"
+    },null,2))
     if(arn){
         return lambda.invoke({
             FunctionName:arn,
