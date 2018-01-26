@@ -68,26 +68,30 @@ exports.parse=function(event){
     }
     return out
 }
-exports.assemble=function(response){
+exports.assemble=function(request,response){
     return {
         version:'1.0',
-        response:_.merge(_.pickBy({
+        response:{
             outputSpeech:_.pickBy({
                 type:response.type,
                 text:response.type==='PlainText' ? response.message : null,
                 ssml:response.type==='SSML' ? response.message : null,
             }),
-            card:isCard(response.card) ? _.pickBy({
-                type:response.card.imageUrl ? "Simple" : "Standard",
-                title:response.card.title,
-                image:response.card.imageUrl ? {
+            card:response.card.imageUrl ? {
+                type:"Standard",
+                title:response.card.title || request.question,
+                text:response.message,
+                image:{
                     smallImageUrl:response.card.imageUrl,
                     largeImageUrl:response.card.imageUrl
-                } : null
-            }) : null
-        }),
-            {shouldEndSession:false}
-        ),
+                }
+            } : {
+                type:"Simple",
+                title:response.card.title || request.question,
+                content:response.message
+            },
+            shouldEndSession:false
+        },
         sessionAttributes:_.mapValues(
             _.get(response,'session',{}),
             x=>_.isString(x) ? x : JSON.stringify(x)

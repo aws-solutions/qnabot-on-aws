@@ -87,10 +87,10 @@ module.exports=class router {
             
             switch(type){
                 case 'LEX':
-                    var out=lex.assemble(response)
+                    var out=lex.assemble(request,response)
                     break;
                 case 'ALEXA':
-                    var out=alexa.assemble(response)
+                    var out=alexa.assemble(request,response)
                     break;
             }
            

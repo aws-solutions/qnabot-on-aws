@@ -7,7 +7,7 @@ exports.parse=function(event){
         channel:_.get(event,"requestAttributes.'x-amz-lex:channel-type'")
     }
 }
-exports.assemble=function(response){
+exports.assemble=function(request,response){
     var out={
         sessionAttributes:_.mapValues(
             _.get(response,'session',{}),
