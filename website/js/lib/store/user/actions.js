@@ -21,26 +21,37 @@ var query=require('query-string')
 
 module.exports={
     refreshTokens:async function(context){
-        var refresh_token=window.sessionStorage.getItem('refresh')
+        console.log("refreshing tokens")
+        var refresh_token=window.sessionStorage.getItem('refresh_token')
         var endpoint=context.rootState.info._links.CognitoEndpoint.href
         var clientId=context.rootState.info.ClientIdDesigner 
-
-        var tokens=await axios.post({
-            url:`${endpoint}/oauth2/token`,
-            headers:{
-                "Content-Type":'application/x-www-form-urlencoded'
-            },
-            params:{
-                grant_type:'refresh_token',
-                client_id:clientId,
-                refresh_token:refresh_token
+        
+        try {
+            var tokens=await axios({
+                method:"POST",
+                url:`${endpoint}/oauth2/token`,
+                headers:{
+                    "Content-Type":'application/x-www-form-urlencoded'
+                },
+                data:query.stringify({ 
+                    grant_type:'refresh_token',
+                    client_id:clientId,
+                    refresh_token:refresh_token
+                })
+            })
+            console.log("token",tokens)
+            window.sessionStorage.setItem('id_token',tokens.data.id_token)
+            window.sessionStorage.setItem('access_token',tokens.data.access_token)
+            window.sessionStorage.setItem('refresh_token',tokens.data.refresh_token)
+            set(context.state,'token',tokens.data.id_token)
+        }catch(e){
+            var login=_.get(context,"rootState.info._links.DesignerLogin.href")
+            var result=window.confirm("Your credentials have expired, please log back in. Click Ok to be redirected to the login page.") 
+            if(result){
+                context.dispatch('logout')  
+                window.window.location.href=login
             }
-        })
-
-        window.sessionStorage.setItem('id_token',tokens.data.id_token)
-        window.sessionStorage.setItem('access_token',tokens.data.access_token)
-        window.sessionStorage.setItem('refresh_token',tokens.data.refresh_token)
-        set(context.state,'token',tokens.data.id_token)
+        }
     },
     getCredentials:Promise.method(async function(context){
         try {
@@ -107,22 +118,31 @@ async function getCredentials(context){
 async function getTokens(context,code){
     var endpoint=context.rootState.info._links.CognitoEndpoint.href
     var clientId=context.rootState.info.ClientIdDesigner 
-    var tokens=await axios({
-        method:'POST',
-        url:`${endpoint}/oauth2/token`,
-        headers:{
-            "Content-Type":'application/x-www-form-urlencoded'
-        },
-        data:query.stringify({
-            grant_type:'authorization_code',
-            client_id:clientId,
-            code:code,
-            redirect_uri:window.location.origin+window.location.pathname
+    try {
+        var tokens=await axios({
+            method:'POST',
+            url:`${endpoint}/oauth2/token`,
+            headers:{
+                "Content-Type":'application/x-www-form-urlencoded'
+            },
+            data:query.stringify({
+                grant_type:'authorization_code',
+                client_id:clientId,
+                code:code,
+                redirect_uri:window.location.origin+window.location.pathname
+            })
         })
-    })
-    window.sessionStorage.setItem('id_token',tokens.data.id_token)
-    window.sessionStorage.setItem('access_token',tokens.data.access_token)
-    window.sessionStorage.setItem('refresh_token',tokens.data.refresh_token)
-    set(context.state,'token',tokens.data.id_token)
-    return tokens.data.id_token 
+        window.sessionStorage.setItem('id_token',tokens.data.id_token)
+        window.sessionStorage.setItem('access_token',tokens.data.access_token)
+        window.sessionStorage.setItem('refresh_token',tokens.data.refresh_token)
+        set(context.state,'token',tokens.data.id_token)
+        return tokens.data.id_token 
+    }catch(e){
+        var login=_.get(context,"rootState.info._links.DesignerLogin.href")
+        var result=window.confirm("Unable to fetch credentials, please log back in. Click Ok to be redirected to the login page.") 
+        if(result){
+            context.dispatch('logout')  
+            window.window.location.href=login
+        }
+    }
 }
