@@ -1,0 +1,10 @@
+#set ( $root="https://${context.apiId}.execute-api.${stageVariables.Region}.amazonaws.com/${context.stage}")
+
+{
+    "bucket":"$stageVariables.AssetBucket",
+    "prefix":"examples/documents/",
+    "perpage":"$input.params('perpage')",
+    "token":"$input.params('token')",
+    "root":"$root"
+}
+

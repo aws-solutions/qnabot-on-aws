@@ -3,21 +3,17 @@
     v-layout(column)
       v-flex
         v-card
-          v-card-title.headline Export All
+          v-card-title.display-1.pa-2 Export
           v-card-text 
-            v-text-field(name="filename.all" label="filename" id="filename.all" clearable v-model="filename.all")
+            v-text-field(name="filename" 
+              label="filename" 
+              id="filename" clearable v-model="filtername")
+            v-text-field(name="filter" 
+              label="(optional) filter export by qid prefix" 
+              id="filter" clearable v-model="filter")
           v-card-actions
             v-spacer
-            v-btn(@click="download(filename.all)" id="export-all") export
-      v-flex
-        v-card
-          v-card-title.headline Export Filtered
-          v-card-text 
-            v-text-field(name="filter" label="filter export by qid prefix" id="filter" clearable v-model="filter")
-            v-text-field(name="filename.filter" label="filename" id="filename.filter" clearable v-model="filtername")
-          v-card-actions
-            v-spacer
-            v-btn(@click="download(filtername)" id="export-filter") export
+            v-btn(@click="download(filtername)" id="export") export
     v-dialog(v-model="loading" persistent id="export-loading")
       v-card
         v-card-title Loading
@@ -82,6 +78,7 @@ module.exports={
   },
   components:{
   },
+  
   methods:{
     download:function(filename){
       var self=this

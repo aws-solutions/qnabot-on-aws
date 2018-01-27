@@ -21,6 +21,9 @@
         "jobs":{
             "href":"$root/jobs"
         },
+        "examples":{
+            "href":"$root/examples"
+        },
         "DesignerLogin":{
             "href":"$stageVariables.DesignerLoginUrl"
         },

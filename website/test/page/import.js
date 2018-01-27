@@ -3,7 +3,7 @@ var Promise=require('bluebird')
 module.exports=(A)=>class Import extends A{
     async importFile(file_path){
         var file=file_path.split('/').reverse()[0]
-        await this.waitClick('#choose-file')
+        
         this.client=this.client
         .waitForVisible('#upload-file')
         .chooseFile("#upload-file",file_path)

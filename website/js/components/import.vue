@@ -3,40 +3,30 @@
     v-layout(column)
       v-flex
         v-card
-          v-card-title.headline Import From File
-          v-card-text(v-if="dialog.file")
+          v-card-title.display-1.pa-2 Import
+          v-card-text
             p {{importWarning}}  
-            input(
-              type="file" 
-              name="file"
-              id="upload-file" 
-              v-on:change="Getfile"
-              ref="file"
-            )
-          v-card-actions
-            v-spacer
-            v-btn(@click="dialog.file=true" 
-              id="choose-file"
-              v-if="!dialog.file"
-            ) Start
-            v-btn(@click="dialog.file=false"
-              v-if="dialog.file"
-            ) Cancel
-      v-flex
-        v-card
-          v-card-title.headline Import From Url
-          v-card-text(v-if="!dialog.url")
-            v-text-field(name="url" label="Type here to import from url" id="url" clearable v-model="url")
-          v-card-text(v-if="dialog.url")
-            p Warning, This will over write existing QnAs
-          v-card-actions(v-if="!dialog.url")
-            v-spacer
-            v-btn(@click="dialog.url=true" id="import-url" 
-              :disabled="!url || url.length===0") Start
-          v-card-actions(v-if="dialog.url")
-            v-spacer
-            v-btn(@click="dialog.url=false") cancel
-            v-btn(@click="Geturl" id="confirm-import-url") continue
+            p.title From File
+            div.ml-4.mb-2
+              input(
+                type="file" 
+                name="file"
+                id="upload-file" 
+                v-on:change="Getfile"
+                ref="file"
+              )
+            p.title From url
+            div.d-flex.ml-4
+              v-text-field(name="url" label="Type here to import from url" id="url" clearable v-model="url")
+              v-btn(@click="Geturl" 
+                style="flex:0;"
+                :disabled="url.length===0"
+                id="confirm-import-url") import
+            p.title Examples/Demos
+            v-list.ml-4
+              v-list-tile(v-for="example in examples")
+                v-list-tile-content
+                  v-btn(@click="url=example.document.href") {{example.id}}
       v-flex(v-if="jobs.length>0")
         v-card(id="import-jobs")
           v-card-title.headline Import Jobs
@@ -49,8 +39,6 @@
                     v-list-tile-sub-title
                       v-progress-linear(v-model="job.progress*100")
                   v-list-tile-action.job-actions
-                    v-btn(fab block icon @click="refresh(index)" :loading="job.refreshing") 
-                      v-icon refresh
                     v-btn(fab block icon @click="deleteJob(index)" :loading="job.loading") 
                       v-icon delete
                 v-divider(v-if="index + 1 < jobs.length")
@@ -92,27 +80,27 @@ module.exports={
   data:function(){
     var self=this
     return {
-      importWarning:"Warning, This will over write existing QnAs with the same ID",
-      dialog:{
-        file:false,
-        url:false
-      },
+      importWarning:"Warning, Importing will over write existing QnAs with the same ID",
       loading:false,
       testing:false,
       url:"",
       error:"",
       success:'',
-      jobs:[]
+      jobs:[],
+      examples:[]
     }
   },
   components:{
   },
-  created:function(){
+  created:async function(){
     this.refresh()
+    var examples=await this.$store.dispatch('api/listExamples')
+    this.examples=examples.examples
   },
   methods:{
     deleteJob:function(index){
       var self=this
+      console.log(this.jobs,index)
       var job=this.jobs[index]
       job.loading=true
       this.$store.dispatch('api/deleteImport',job)
@@ -156,7 +144,6 @@ module.exports={
     },
     Getfile:function(event){
       var self=this
-      this.dialog.file=false
       this.loading=true
       var files_raw=self.$refs.file.files
       var files=[]
@@ -182,7 +169,6 @@ module.exports={
     },
     Geturl:function(event){
       var self=this
-      this.dialog.url=false
       this.loading=true
 
       Promise.resolve(axios.get(self.url))

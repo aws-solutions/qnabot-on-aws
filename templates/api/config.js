@@ -5,7 +5,7 @@ module.exports={
     "Name": {"Ref": "AWS::StackName"},
     "Description":"An Api interface for the admin actions on the QNA bot"
   },
-  "DependsOn": ["InvokePermissionESProxy","InvokePermissionLexProxy","InvokePermissionLexBuild","InvokePermissionSchema","InvokePermissionS3List", ]
+  "DependsOn": ["InvokePermissionESProxy","InvokePermissionLexProxy","InvokePermissionLexBuild","InvokePermissionSchema","InvokePermissionS3List", "InvokePermissionExampleList"]
 },
 "ApiCompression":{
     "Type": "Custom::ApiCompression",
@@ -27,6 +27,9 @@ module.exports={
         "ClientLoginResourceGet",
         "DesignerLoginResourceGet",
         "AlexaSchema",
+        "ExamplesList",
+        "ExampleGet",
+        "ExampleHead",
         "HooksGet",
         "HooksPut",
         "HooksOptions",
@@ -102,6 +105,7 @@ function stage(name){
             "ESType": {"Ref":"ESType"},
             "LambdaArn":{"Ref":"HandlerArn"},
             "ImportBucket":{"Ref":"ImportBucket"},
+            "AssetBucket":{"Ref":"AssetBucket"},
             "CognitoEndpoint":{"Fn::GetAtt":["DesignerLogin","Domain"]},
             "DesignerLoginUrl":{"Fn::Join":["",[
                 {"Fn::GetAtt":["ApiUrl","Name"]},

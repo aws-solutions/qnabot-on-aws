@@ -64,7 +64,7 @@ module.exports={
             }
         }catch(e){
             console.log(e)
-            if(e.message.match('Token expired')){
+            if(e.message.match('Token expired') || e.message.match('inactive')){
                 await context.dispatch('refreshTokens')     
                 return await getCredentials(context)
             }else{

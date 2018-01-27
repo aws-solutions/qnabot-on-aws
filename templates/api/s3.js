@@ -68,7 +68,8 @@ module.exports={
               ],
               "Resource": [
                 {"Fn::Sub":"arn:aws:s3:::${ImportBucket}/*"},
-                {"Fn::Sub":"arn:aws:s3:::${Bucket}/*"}
+                {"Fn::Sub":"arn:aws:s3:::${Bucket}/*"},
+                {"Fn::Sub":"arn:aws:s3:::${AssetBucket}/*"}
               ]
             },{
               "Effect": "Allow",

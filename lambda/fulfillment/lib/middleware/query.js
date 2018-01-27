@@ -35,8 +35,7 @@ module.exports=function(req,res){
         if(_.get(card,'title')){
             res.card.send=true
             res.card.title=_.get(card,'title')
-            res.card.text=_.get(card,'text')
-            res.card.url=_.get(card,'url')
+            res.card.imageUrl=_.get(card,'imageUrl')
         }
         if(_.get(result,"hits.hits[0]._source.t")){
             res.session.topic=_.get(result,"hits.hits[0]._source.t")

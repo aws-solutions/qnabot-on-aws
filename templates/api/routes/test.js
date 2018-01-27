@@ -3,5 +3,6 @@ module.exports={
     error:require('./error/test'),
     health:require('./health/test'),
     qa:require('./qa/test'),
-    root:require('./root/test')
+    root:require('./root/test'),
+    examples:require('./examples')
 }

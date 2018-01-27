@@ -5,7 +5,7 @@ var s3=new aws.S3()
 
 exports.handler = function(event, context) {
     console.log(JSON.stringify(event,null,2))
-    if(event.RequestType==="Create"){
+    if(event.RequestType!=="Delete"){
         s3.headObject({
             Bucket:event.ResourceProperties.Bucket,
             Key:event.ResourceProperties.Key

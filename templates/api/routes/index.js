@@ -5,6 +5,7 @@ module.exports=Object.assign(
     require('./qa'),
     require('./proxy'),
     require('./login'),
-    require('./jobs')
+    require('./jobs'),
+    require('./examples')
 )
 

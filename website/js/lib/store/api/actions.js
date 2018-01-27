@@ -30,6 +30,20 @@ var aws=require('aws-sdk')
 
 var failed=false
 module.exports={
+    listExamples(context){
+        return context.dispatch('_request',{
+            url:context.rootState.info._links.examples.href,
+            method:'get'
+        })
+    },
+    async getExampleDescription(context,example){
+        if(_.get(example,"description.href")){
+            return await context.dispatch('_request',{
+                url:example.description.href,
+                method:'get'
+            })
+        }
+    },
     startImport(context,opts){
         aws.config.credentials=context.rootState.user.credentials
         var s3=new aws.S3({region:context.rootState.info.region})
