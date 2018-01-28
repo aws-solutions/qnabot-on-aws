@@ -10,6 +10,8 @@ $(DST):./* ./routes/* ./routes/*/* ./signup/* ./style/*  $(LAMBDA) ../../build/a
 
 ../../build/assets.zip:../../assets/*
 	make -C  ../../assets
+$(LAMBDA_DST)/examples.zip:./examples/*
+	make -C ./examples
 
 $(LAMBDA_DST)/import.zip:$(LAMBDA_DIR)/import/*
 	make -C $(LAMBDA_DIR)/import 

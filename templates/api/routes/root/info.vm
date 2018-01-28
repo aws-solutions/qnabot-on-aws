@@ -22,7 +22,7 @@
             "href":"$root/jobs"
         },
         "examples":{
-            "href":"$root/examples"
+            "href":"$root/examples/documents"
         },
         "DesignerLogin":{
             "href":"$stageVariables.DesignerLoginUrl"

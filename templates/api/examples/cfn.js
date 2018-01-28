@@ -22,9 +22,10 @@ exports.handler = function(event, context,cb) {
                     Bucket:event.ResourceProperties.Bucket,
                     Key:`examples/documents/${name}`,
                     Body:text
-                }).promise().tap(console.log)
+                }).promise()
             }))
-            .then(()=>{
+            .then(result=>{
+                console.log(result)
                 if(event.ResponseURL){
                     response.send(event,context,response.SUCCESS)
                 }else{
@@ -33,13 +34,14 @@ exports.handler = function(event, context,cb) {
             })
             .catch(e=>{
                 console.log(e)
-                response.send(event, context, response.FAIL)
+                response.send(event, context, response.FAILED)
             })
         }else{
             response.send(event, context, response.SUCCESS)
         }
     }catch(e){
-        response.send(event, context, response.FAIL)
+        console.log(e)
+        response.send(event, context, response.FAILED)
     }
 }
 

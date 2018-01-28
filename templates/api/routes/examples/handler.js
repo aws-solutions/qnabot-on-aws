@@ -17,7 +17,7 @@ exports.handler = (event, context, callback) => {
             var key=value.Key.split('/').pop().split('.')
             var ext=key.length >1 ? key.pop() : 'txt'
             key=key[0]
-            var href=`${event.root}/examples/${key}.${ext}`
+            var href=`${event.root}/examples/documents/${key}.${ext}`
             if(!accum[key]){
                 accum[key]={id:key}
             }

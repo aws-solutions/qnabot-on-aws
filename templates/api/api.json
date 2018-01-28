@@ -102,11 +102,16 @@
     },
     "HandlerArn":{
       "Type":"String"
+    },
+    "BuildExamples":{
+      "Type":"String",
+      "Default":"TRUE"
     }
   },
   "Conditions":{
     "Public":{"Fn::Equals":[{"Ref":"PublicOrPrivate"},"PUBLIC"]},
     "SignUp":{"Fn::Equals":[{"Ref":"AllowUserSignUp"},"TRUE"]},
+    "BuildExamples":{"Fn::Equals":[{"Ref":"BuildExamples"},"TRUE"]},
     "Domain":{"Fn::Not":[
         {"Fn::Equals":[{"Ref":"ApprovedDomain"},"NONE"]}
     ]}

@@ -26,11 +26,9 @@ module.exports={
         },
         "Environment": {
           "Variables": {
-            "REGION":{"Ref":"AWS::REGION" },
             "ES_TYPE": {"Ref": "Type"},
             "ES_INDEX": {"Ref": "Index"},
             "ES_ADDRESS": {"Ref": "Address"},
-            "REGION": {"Ref": "AWS::Region"},
             "ERRORMESSAGE":{"Ref":"ErrorMessage"},
             "EMPTYMESSAGE":{"Ref":"EmptyMessage"}
           }

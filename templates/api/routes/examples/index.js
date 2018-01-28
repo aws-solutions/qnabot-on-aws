@@ -17,7 +17,19 @@ module.exports={
           "method.request.querystring.token":false
         }
     }),
-    "Example": resource('{proxy+}',{"Ref":"Examples"}),
+    "photos":resource('photos',{"Ref":"Examples"}),
+    "photo":resource('{proxy+}',{"Ref":"photos"}),
+    "photoGet":proxy({
+        resource:{"Ref": "Example"},
+        method:"get",
+        bucket:{"Ref":"AssetBucket"},
+        path:"/examples/photo/{proxy}",
+        requestParams:{
+            "integration.request.path.proxy":"method.request.path.proxy"
+        }
+    }),
+    "Documents":resource('documents',{"Ref":"Examples"}),
+    "Example": resource('{proxy+}',{"Ref":"Documents"}),
     "ExampleGet":proxy({
         resource:{"Ref": "Example"},
         method:"get",
