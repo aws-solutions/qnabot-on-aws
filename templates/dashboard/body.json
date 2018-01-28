@@ -62,13 +62,13 @@
                 "view": "timeSeries",
                 "stacked": false,
                 "metrics": [
-                    [ "AWS/Lambda", "Errors", "FunctionName", "${HandlerLambda}", { "stat": "Sum" } ],
+                    [ "AWS/Lambda", "Errors", "FunctionName", "${FulfillmentLambda}", { "stat": "Sum" } ],
                     [ ".", "Invocations", ".", ".", { "stat": "Sum" } ],
                     [ ".", "Duration", ".", ".", { "yAxis": "right" } ],
                     [ ".", "Throttles", ".", ".", { "stat": "Sum" } ]
                 ],
                 "region": "${AWS::Region}",
-                "title": "Handler Lambda",
+                "title": "Fulfillment Lambda",
                 "period": 300
             }
         }

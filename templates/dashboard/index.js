@@ -26,7 +26,7 @@ module.exports={
     "APIGateWay":{"Type":"String"},
     "ESDomain":{"Type":"String"},
     "BotName":{"Type":"String"},
-    "HandlerLambda":{"Type":"String"},
+    "FulfillmentLambda":{"Type":"String"},
     "BootstrapBucket":{"Type":"String"},
     "BootstrapPrefix":{"Type":"String"}
   }

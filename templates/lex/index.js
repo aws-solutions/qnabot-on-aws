@@ -2,7 +2,7 @@ module.exports={
   "Resources":Object.assign(
     require('./bot'),
     require('./cfn'),
-    require('./handler')
+    require('./fulfillment')
   ), 
   "Conditions": {},
   "AWSTemplateFormatVersion": "2010-09-09",
@@ -34,11 +34,11 @@ module.exports={
     "SlotType":{
         "Value":{"Ref":"QNASlot"}
     },
-    "HandlerArn":{
-        "Value":{"Fn::GetAtt":["HandlerLambda","Arn"]}
+    "FulfillmentArn":{
+        "Value":{"Fn::GetAtt":["FulfillmentLambda","Arn"]}
     },
-    "HandlerName":{
-        "Value":{"Ref":"HandlerLambda"}
+    "FulfillmentName":{
+        "Value":{"Ref":"FulfillmentLambda"}
     }
   }, 
   "Parameters": {

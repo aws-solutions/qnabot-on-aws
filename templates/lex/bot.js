@@ -5,7 +5,7 @@ module.exports={
       "Type": "AWS::Lambda::Permission",
       "Properties": {
         "Action": "lambda:InvokeFunction",
-        "FunctionName": {"Fn::GetAtt":["HandlerLambda","Arn"]},
+        "FunctionName": {"Fn::GetAtt":["FulfillmentLambda","Arn"]},
         "Principal": "lex.amazonaws.com"
       }
     },
@@ -35,7 +35,7 @@ module.exports={
         "fulfillmentActivity": {
           "type": "CodeHook",
           "codeHook": {
-            "uri": {"Fn::GetAtt":["HandlerLambda","Arn"]},
+            "uri": {"Fn::GetAtt":["FulfillmentLambda","Arn"]},
             "messageVersion": "1.0"
           }
         }

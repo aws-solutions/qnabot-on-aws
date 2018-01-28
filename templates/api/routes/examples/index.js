@@ -20,7 +20,7 @@ module.exports={
     "photos":resource('photos',{"Ref":"Examples"}),
     "photo":resource('{proxy+}',{"Ref":"photos"}),
     "photoGet":proxy({
-        resource:{"Ref": "Example"},
+        resource:{"Ref": "photo"},
         method:"get",
         bucket:{"Ref":"AssetBucket"},
         path:"/examples/photo/{proxy}",

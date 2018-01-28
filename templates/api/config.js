@@ -105,7 +105,7 @@ function stage(name){
             "ESEndpoint":{"Ref":"ESAddress"},
             "ESIndex":{"Ref":"ESIndex"},
             "ESType": {"Ref":"ESType"},
-            "LambdaArn":{"Ref":"HandlerArn"},
+            "LambdaArn":{"Ref":"FulfillmentArn"},
             "ImportBucket":{"Ref":"ImportBucket"},
             "AssetBucket":{"Ref":"AssetBucket"},
             "CognitoEndpoint":{"Fn::GetAtt":["DesignerLogin","Domain"]},

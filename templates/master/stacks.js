@@ -16,7 +16,7 @@ module.exports={
         "Intent":   get("QnABot","Intent"),
         "Username":{"Ref":"Username"},
         "Email":{"Ref":"Email"},
-        "HandlerArn":get("QnABot","HandlerArn"),
+        "FulfillmentArn":get("QnABot","FulfillmentArn"),
         "PublicOrPrivate":{"Ref":"PublicOrPrivate"},
         "ApprovedDomain":{"Ref":"ApprovedDomain"},
         "ESAddress":  get('domain','ESAddress'),
@@ -29,7 +29,7 @@ module.exports={
         "APIGateWay":   get('api','ApiId'),
         "ESDomain":     get('domain','ESDomain'),
         "BotName":      get("QnABot","Bot"),
-        "HandlerLambda":      get("QnABot","HandlerName")
+        "FulfillmentLambda":      get("QnABot","FulfillmentName")
     })
 }
 

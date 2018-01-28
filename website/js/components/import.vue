@@ -26,7 +26,10 @@
             v-list.ml-4
               v-list-tile(v-for="example in examples")
                 v-list-tile-content
-                  v-btn(@click="url=example.document.href") {{example.id}}
+                  v-btn(
+                    @click="url=example.document.href"
+                    :id="'example-'+example.id"
+                  ) {{example.id}}
       v-flex(v-if="jobs.length>0")
         v-card(id="import-jobs")
           v-card-title.headline Import Jobs

@@ -100,7 +100,7 @@
     "ESType": {
       "Type": "String"
     },
-    "HandlerArn":{
+    "FulfillmentArn":{
       "Type":"String"
     },
     "BuildExamples":{
