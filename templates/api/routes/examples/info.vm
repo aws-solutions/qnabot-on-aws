@@ -1,0 +1,13 @@
+#set ( $root="https://${context.apiId}.execute-api.${stageVariables.Region}.amazonaws.com/${context.stage}")
+
+{
+    "_links":{
+        "documents":{
+            "href":"$root/examples/documents"
+        },
+        "photos":{
+            "href":"$root/examples/photos"
+        }
+    }
+}
+

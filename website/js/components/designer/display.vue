@@ -5,7 +5,7 @@
         v-layout(:row="row" :column="column")
           v-flex
             .title {{schema.title}}
-            span.pl-3(:data-path="path") {{value}} 
+            span.pl-3( :data-path="path" ) {{value}} 
     span(v-if="schema.type==='array' && !empty")
       v-container.fluid.pa-0
         v-layout(:row="row" :column="column" )
@@ -14,8 +14,8 @@
             display(  
               v-for="(item,index) in value" :key="index"
               :schema="schema.items"
-              :value="item" )
-              :path="path+'['+index+']'"
+              :value="item" 
+              :path="path+'['+index+']'" )
     span(v-if="schema.type==='object' && !empty")
       v-container.fluid
         v-layout(:row="row" :column="column")

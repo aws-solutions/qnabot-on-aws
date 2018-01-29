@@ -42,34 +42,25 @@ module.exports=(A)=>class Import extends A{
         // })
     }
     async importExample(name){
-        //await this.client.execute(function(name){
-        //  document.getElementById(`example-${name}`).click()
-        //},name)
-        //.waitForVisible('#import-url')
-        //.click('#import-url')
-        //.waitForVisible('#confirm-import-url')
-        //.click('#confirm-import-url')
-        //.waitForVisible("#import-loading",3000)
-        //.waitForVisible("#import-success",10000)
-        //.execute(function(){
-        //    document.getElementById('import-close').click()
-        //})
-
-        //this.client=wait(this.client,"url-import")
-        //return Promise.resolve(this.client)
+        await this.client.waitForVisible(`#example-${name}`,2000)
+        await this.client.execute(function(name){
+          document.getElementById(`example-${name}`).click()
+        },name)
+        await this.client.waitForVisible('#import-url')
+        await this.client.click('#import-url')
+        await this.client.waitForVisible("#import-loading",3000)
+        await this.client.waitForVisible("#import-success",10000)
+        await this.client.execute(function(){
+            document.getElementById('import-close').click()
+        })
+        await wait(this.client,"url-import")
     }
 }
 
 function wait(client,name){
     return client.waitForVisible("#import-jobs",3000)
-    .waitForVisible("#import-job-refresh",3000)
-    .click("#import-job-refresh")
-    .waitForVisible("#import-jobs",3000)
     .waitUntil(function(){
         return this
-        .waitForVisible("#import-job-refresh",3000)
-        .click("#import-job-refresh")
-        .waitForVisible("#import-jobs",3000)
         .execute(function(filename){
             var job=document.getElementById("import-job-"+filename)
             return job ? job.dataset.status==="Complete" : false

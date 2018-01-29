@@ -9,7 +9,7 @@
             v-tabs-slider(color="accent")
           v-spacer
           v-menu(bottom left)
-            v-btn.white--text(icon slot="activator")
+            v-btn.white--text(icon slot="activator" id="edit-sub-menu")
               v-icon more_vert
             v-list
               v-list-tile
@@ -38,7 +38,7 @@
         tr
           th.shrink(v-if="tab==='questions'" id="select-all")
             v-checkbox(:indeterminate="QAs.length===0" v-model='selectAll' tabindex='-1'
-              color="primary" @change="toggleSelectAll"
+              color="primary" @change="toggleSelectAll" 
             )
           th.shrink.title(v-if="tab==='test'") score
           th.text-xs-left.title( v-for="header in props.headers" 

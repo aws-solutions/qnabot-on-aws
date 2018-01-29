@@ -42,7 +42,7 @@ module.exports={
         try {
             var page=this.page
             await page.goToImport()
-            await page.importExample("zombie.json")
+            await page.importExample("zombie")
             await page.goToEdit()
             var ids=await page.listQA()
             test.equal(ids.value.length,3) 

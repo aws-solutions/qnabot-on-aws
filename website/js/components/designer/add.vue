@@ -4,8 +4,8 @@
       v-card
         v-card-title(primary-title) Creating {{data.qid}}
         v-card-text
-          v-subheader.error--text(v-if='error') {{error}}
-          v-subheader.success--text(v-if='success') {{success}}
+          v-subheader.error--text(v-if='error' id="add-error") {{error}}
+          v-subheader.success--text(v-if='success' id="add-success") {{success}}
           v-progress-linear(v-if='!error && !success' indeterminate)
         v-card-actions
           v-spacer

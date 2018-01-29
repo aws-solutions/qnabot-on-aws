@@ -21,7 +21,7 @@
           clearable 
         )
       v-flex(xs5)
-        v-btn(@click="simulate") Search
+        v-btn(@click="simulate" id="query-test") Search
 </template>
 
 <script>

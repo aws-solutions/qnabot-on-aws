@@ -2,12 +2,13 @@ var Promise=require('bluebird')
 
 module.exports=(A)=>class Add extends A{
     async add(qa){
-        //await this.waitClick("#add-question-btn")
-        //await this.client.waitForVisible("#add-question-form")
-        //await set('add',qa,this.client) 
-        //await this.waitClick("#add-question-submit")
-        //await this.client.watiForVisible("#add-success")
-        //await this.waitClick('#add-close')
+        await this.waitClick("#add-question-btn")
+        await this.client.waitForVisible("#add-question-form")
+        await this._set('add',qa) 
+        await this.waitClick("#add-question-submit")
+        await this.client.waitForExist("#add-success",2000)
+        await this.waitClick('#add-close')
+        await this.exists(qa.qid)
     }
     async edit(qa){
         //await this.setFilter(id)
@@ -21,52 +22,54 @@ module.exports=(A)=>class Add extends A{
         //await this.waitClick('#edit-close')
     }
     async buildBot(){
-        //await this.waitClick("#lex-rebuild")
-        //await this.client.waitForVisible("#lex-success",60*1000)
-        //await this.waitClick("#lex-close")
+        await this.waitClick("#edit-sub-menu")
+        await this.waitClick("#lex-rebuild")
+        await this.client.waitForVisible("#lex-success",60*1000)
+        await this.waitClick("#lex-close")
     }
-}
+    async _set(path,object){
+        var client=this.client
+        var self=this
+        if(Array.isArray(object)){
+            var count=await client.execute(function(path,value){
+                var count=0
+                var nodes=document.querySelectorAll(`[data-path^="${path}["]`)
+                nodes.forEach(x=>{
+                    if(x.dataset.path.match(RegExp(`^${path}[\d+]$`))){
+                        count++
+                    }
+                })
+                return count 
+            },path,object)
 
-async function set(path,object,client){
-    if(Array.isArray(object)){
-        var count=await client.execute(function(path,value){
-            var count=0
-            var nodes=document.querySelector(`input[data-path^="${path}["]`)
-            nodes.forEach(x=>{
-                if(x.dataset['data-path'].match(RegExp(`^${path}[\d+]$`))){
-                    count++
+            if(count>object.length){
+                for(i=0;i<count-object.length;i++){ 
+                    await client.execute(function(path,done){
+                        document.querySelector(`[data-path="${path}-remove-0`)
+                        setTimeout(done,500)
+                    })
                 }
-            })
-            return count 
-        },path,object)
-
-        if(count>object.length){
-            for(i=0;i<count-object.length;i++){ 
-                await client.execute(function(path,done){
-                    document.querySelector(`[data-path="${path}-remove-0`)
-                    setTimeout(done,500)
-                })
+            }else if(count<object.length){
+                for(i=0;i<object.length-count;i++){ 
+                    await client.execute(function(path,done){
+                        document.querySelector(`[data-path="${path}-add`)
+                        setTimeout(done,500)
+                    })
+                }
             }
-        }else if(count<object.length){
-            for(i=0;i<object.length-count;i++){ 
-                await client.execute(function(path,done){
-                    document.querySelector(`[data-path="${path}-add`)
-                    setTimeout(done,500)
-                })
-            }
+            object.forEach((x,i)=>{
+                self._set(`${path}[${i}]`,x)
+            })   
+        }else if(typeof object==="object"){
+            Object.keys(object)
+                .forEach(key=>self._set(`${path}.${key}`,object[key]))
+        }else if(typeof object==="string"){
+            client.setValue(`[data-path="${path}"]`,object)
         }
-        object.forEach((x,i)=>{
-            set(`${path}[${i}]`,x)
-        })   
-    }else if(typeof object==="object"){
-        Object.keys(object)
-            .forEach(key=>set(`${path}.${key}`,object[key]))
-    }else if(typeof object==="string"){
-        client.execute(function(path,value){
-            document.querySelector(`input[data-path="${path}"]`).value=value
-        },path,object)
     }
 }
+
+
 
 
 

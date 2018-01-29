@@ -21,7 +21,7 @@
               v-btn(@click="Geturl" 
                 style="flex:0;"
                 :disabled="url.length===0"
-                id="confirm-import-url") import
+                id="import-url") import
             p.title Examples/Demos
             v-list.ml-4(id="examples")
               v-list-tile(v-for="example in examples")

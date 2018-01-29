@@ -12,7 +12,7 @@ module.exports=(A)=>class Add extends A{
             return self.listQA().then(x=>{
                 return x.value.length<1
             })
-        },2000,"qa were not cleared",100)
+        },5000,"qa were not cleared",100)
 
         return Promise.resolve(this.client)
     }

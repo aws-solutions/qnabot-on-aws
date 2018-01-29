@@ -17,13 +17,13 @@ module.exports=(A)=>class Get extends A{
         })
     }
     async exists(id){
-        //await this.setFilter(id)
-        //await this.client.waitUntil(function(){
-        //  this.execute(function(id){
-        //      return !!document.getElementById(`qa-${id}`)
-        //  },id)
-        //})
-        //await this.setFilter("")
+        await this.setFilter(id)
+        await this.client.waitUntil(function(){
+          this.execute(function(id){
+              return !!document.getElementById(`qa-${id}`)
+          },id)
+        })
+        await this.setFilter("")
     }
     async notExists(){
         //await this.setFilter(id)
@@ -36,9 +36,7 @@ module.exports=(A)=>class Get extends A{
 
     }
     async setFilter(text){
-        //await this.client.execute(function(text){
-        //  document.getElementById('#filter'`).value=text
-        //},text)
+        await this.client.setValue("#filter",text)
     }
     async get(id){
         //await this.setFilter(id)

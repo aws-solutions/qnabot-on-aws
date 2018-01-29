@@ -1,16 +1,16 @@
 <template lang='pug'>
   v-card(flat class="pa-0")
     display(
-      :schema="$store.state.data.schema",
-      :path:'data.qid+"-"'
+      :schema="$store.state.data.schema"
+      :path='data.qid+"-"'
       row
       v-model="topitems"
     )
     v-divider(v-if="extra")
     display(
       v-if="extra"
-      :schema="$store.state.data.schema",
-      :path:'data.qid+"-"'
+      :schema="$store.state.data.schema"
+      :path='data.qid+"-"'
       column
       v-model="bottomitems"
     )
