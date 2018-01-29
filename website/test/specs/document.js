@@ -8,11 +8,17 @@ module.exports={
                 q:['who','am'],
                 a:'the one'
             }
-            await this.page.add(data)
-            await this.page.refresh()
-            //var out=this.page.get(data.qid)
-            //test.deepEqual(data,out)
-            test.done()
+            try{
+                await this.page.add(data)
+                await this.page.refresh()
+                var out=await this.page.get(data.qid)
+                test.deepEqual(data,out)
+            }catch(e){
+                console.log(e)
+                test.ifError(e)
+            }finally{
+                test.done()
+            }
         }, 
         edit:async function(test){ 
             var data={

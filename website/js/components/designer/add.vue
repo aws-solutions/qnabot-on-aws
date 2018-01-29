@@ -81,33 +81,49 @@ module.exports={
       this.data=empty(this.schema) 
       this.$refs.dialog.$refs.dialog.scrollTo(0,0)
     },
-    add:function(){
+    add:async function(){
       var self=this
 
       if(this.valid){
         this.loading=true
         this.dialog=false
-      
-        return this.$store.dispatch('api/check',this.data.qid)
-        .then(function(exists){
+        try{ 
+          var exists=await this.$store.dispatch('api/check',this.data.qid)
           if(exists){
             self.error='Question already exists'
             self.loading=false
             self.dialog=true
           }else{
             self.$refs.dialog.$refs.dialog.scrollTo(0,0)
-            return self.$store.dispatch('data/add',_.cloneDeep(self.data))
-            .then(function(){
-              self.success='Success!'
-              self.$store.commit('data/addQA',_.cloneDeep(self.data))
-              self.reset()
-            })
+            var out=clean(_.cloneDeep(self.data))
+            console.log(out)
+            await self.$store.dispatch('data/add',out)
+            self.success='Success!'
+            self.$store.commit('data/addQA',_.cloneDeep(self.data))
+            self.reset()
           }
-        })
-        .catch(error=>self.error=error)
+        }catch(e){
+          self.error=e 
+        }
       }
     }
   }
+}
+function clean(data){
+  console.log(data)
+  try{
+    if(Array.isArray(data)){
+      data=_.compact(data)
+      data=_.forEach(data,clean)
+    }else if(typeof data==='object'){
+      data=_.pickBy(data,x=>x)
+      data=_.mapValues(data,clean)
+    }
+  }catch(e){
+    console.log(e)
+    throw e
+  }
+  return data
 }
 </script>
 

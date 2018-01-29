@@ -28,9 +28,11 @@ class Page extends modules{
     close(){
         return this.client.end()
     }
-    refresh(){
-        this.client=this.client.refresh()
-        return this.client
+    async refresh(){
+        await this.client.refresh()
+        await this.client.waitUntil(function(){
+            return this.getUrl().then(x=>x.match(/.*#\/edit/))
+        },10000)
     }
     log(){
         this.client=this.client.log('browser').then(console.log)
@@ -38,6 +40,8 @@ class Page extends modules{
     }
     async waitClick(selector){
         await this.client.waitForVisible(selector)
+        await this.client.scroll(selector)
+        await Promise.delay(500)
         await this.client.click(selector)
     }
     waitTillTitle(title){

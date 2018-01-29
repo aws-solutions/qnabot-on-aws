@@ -6,7 +6,7 @@ module.exports=(A)=>class Add extends A{
         await this.client.waitForVisible("#add-question-form")
         await this._set('add',qa) 
         await this.waitClick("#add-question-submit")
-        await this.client.waitForExist("#add-success",2000)
+        await this.client.waitForExist("#add-success",3000)
         await this.waitClick('#add-close')
         await this.exists(qa.qid)
     }
@@ -31,30 +31,30 @@ module.exports=(A)=>class Add extends A{
         var client=this.client
         var self=this
         if(Array.isArray(object)){
-            var count=await client.execute(function(path,value){
+            var count=(await client.execute(function(path,value){
                 var count=0
                 var nodes=document.querySelectorAll(`[data-path^="${path}["]`)
                 nodes.forEach(x=>{
-                    if(x.dataset.path.match(RegExp(`^${path}[\d+]$`))){
+                    if(x.dataset.path.match(RegExp(`^${path}[\\d+]$`))){
                         count++
                     }
                 })
                 return count 
-            },path,object)
-
+            },path,object)).value
+            console.log(path)
             if(count>object.length){
-                for(i=0;i<count-object.length;i++){ 
+                for(var i=0;i<count-object.length;i++){ 
                     await client.execute(function(path,done){
-                        document.querySelector(`[data-path="${path}-remove-0`)
+                        document.getElementById(`${path}-remove-0`).click()
                         setTimeout(done,500)
-                    })
+                    },path)
                 }
             }else if(count<object.length){
-                for(i=0;i<object.length-count;i++){ 
+                for(var i=0;i<object.length-count;i++){ 
                     await client.execute(function(path,done){
-                        document.querySelector(`[data-path="${path}-add`)
+                        document.getElementById(`${path}-add`).click()
                         setTimeout(done,500)
-                    })
+                    },path)
                 }
             }
             object.forEach((x,i)=>{

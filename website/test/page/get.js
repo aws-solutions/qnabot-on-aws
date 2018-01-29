@@ -3,9 +3,7 @@ var _=require('lodash')
 
 module.exports=(A)=>class Get extends A{
     async select(id){
-        //await this.client.execute(function(id){
-        //  document.getElementById(`qa-${id}-select`).click()
-        //},id)
+        await this.waitClick(`qa-${id}-select`)
     }
     async listQA(){
         return await this.client.execute(function(){
@@ -19,7 +17,7 @@ module.exports=(A)=>class Get extends A{
     async exists(id){
         await this.setFilter(id)
         await this.client.waitUntil(function(){
-          this.execute(function(id){
+          return this.execute(function(id){
               return !!document.getElementById(`qa-${id}`)
           },id)
         })
@@ -39,26 +37,34 @@ module.exports=(A)=>class Get extends A{
         await this.client.setValue("#filter",text)
     }
     async get(id){
-        //await this.setFilter(id)
-        //await this.client.waitUntil(async function(){
-        //  var count=await this.listQA()
-        //  return count.length===1
-        //},2000)
-        //var fields=await this.client.execute(funtion(id){
-        //  var out=[]
-        //  var nodes=document.querySelectorAll(`[data-path^="${id}-"]`)
-        //  nodes.forEach(function(node){
-        //      out.push({
-        //            path:node.dataset['data-path'].match(RegExp(`^${id}-(.*)`)[1],
-        //            value:node.innerText
-        //        })
-        //  })
-        //  return out
-        //},id)
-        //  var out={}
-        //  fields.map(x=>_.set(out,x.path,x.value))
-        //  await this.setFilter('')
-        //  return out
+        var self=this
+        await this.setFilter(id)
+        await this.client.waitUntil(async function(){
+          var result=await self.listQA()
+          return result.value.length===1
+        },10000)
+        await this.client.execute(function(id){
+            document.getElementById(id).click()
+        },id)
+        await Promise.delay(1500)
+        var fields=await this.client.execute(function(id){
+          var out=[]
+          var nodes=document.querySelectorAll(`[data-path^="${id}-"]`)
+          nodes.forEach(function(node){
+              out.push({
+                    path:node.dataset.path
+                        .match(RegExp(`^${id}-(.*)`))[1]
+                        .replace(/^\./,''),
+                    value:node.innerText
+                })
+          })
+          return out
+        },id)
+        console.log(fields)
+        var out={}
+        fields.value.map(x=>_.set(out,x.path,x.value))
+        await this.setFilter('')
+        return out
     }
     async test(text,topic){
         //await this.client.execute(function(text,topic){

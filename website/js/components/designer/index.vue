@@ -62,7 +62,7 @@
             )
           td.text-xs-left.shrink.primary--text.title(v-if="tab==='test'") {{props.item._score}}
           td.text-xs-left.shrink.title 
-            b {{props.item.qid}}
+            b(:id="props.item.qid") {{props.item.qid}}
           td.text-xs-left.title {{props.item.q[0]}}
           td.d-flex.pa-0.pr-1
             edit(

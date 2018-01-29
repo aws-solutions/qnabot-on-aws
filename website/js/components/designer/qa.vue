@@ -1,5 +1,6 @@
 <template lang='pug'>
   v-card(flat class="pa-0")
+    span(v-show="false" :data-path="data.qid+'-.qid'") {{data.qid}}
     display(
       :schema="$store.state.data.schema"
       :path='data.qid+"-"'

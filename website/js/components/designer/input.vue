@@ -138,7 +138,7 @@ module.exports={
       this.value.splice(index,1)
     },
     add:function(){
-      this.value.push(empty(this.schema))
+      this.value.push(empty(this.schema.items))
     },
     reset:function(){
       this.local=empty(this.schema)
