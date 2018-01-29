@@ -16,4 +16,13 @@ module.exports=(A)=>class Add extends A{
 
         return Promise.resolve(this.client)
     }
+    async deleteSelection(){
+        //await this.waitClick('#delete-all')
+    }
+    async deleteId(id){
+        //await this.client.execute(function(id){
+        //  document.getElementById(`qa-${id}-delete`).click()
+        //},did)
+        //await this.notExists(id)
+    }
 }

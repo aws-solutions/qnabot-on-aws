@@ -6,7 +6,7 @@ module.exports={
     "BinaryMediaTypes":["image/png","image/jpeg","image/svg+xml"],
     "Description":"An Api interface for the admin actions on the QNA bot"
   },
-  "DependsOn": ["InvokePermissionESProxy","InvokePermissionLexProxy","InvokePermissionLexBuild","InvokePermissionSchema","InvokePermissionS3List", "InvokePermissionExampleList"]
+  "DependsOn": ["InvokePermissionESProxy","InvokePermissionLexProxy","InvokePermissionLexBuild","InvokePermissionSchema","InvokePermissionS3List", "InvokePermissionExampleList","InvokePermissionExamplePhotoList"]
 },
 "ApiCompression":{
     "Type": "Custom::ApiCompression",
@@ -29,8 +29,9 @@ module.exports={
         "DesignerLoginResourceGet",
         "AlexaSchema",
         "photoGet",
-        "ExamplesList",
+        "DocumentsList",
         "ExampleGet",
+        "ExamplesGet",
         "ExampleHead",
         "HooksGet",
         "HooksPut",

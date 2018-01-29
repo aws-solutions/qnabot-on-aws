@@ -37,7 +37,26 @@ module.exports={
             test.ifError(e)
             test.done()
         }
+    },
+    examples:async function(test){
+        try {
+            var page=this.page
+            await page.goToImport()
+            await page.importExample("zombie.json")
+            await page.goToEdit()
+            var ids=await page.listQA()
+            test.equal(ids.value.length,3) 
+            
+            await page.deleteAll()
+            
+            var ids2=await page.listQA()
+            test.equal(ids2.value.length,0) 
+            test.done()
+        }catch(e){ 
+            test.ifError(e)
+            test.done()
+        }
+        test.done()
     }
-    
 }
         

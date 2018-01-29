@@ -13,7 +13,7 @@ module.exports=[{
 > ...
 
 2. Choose a runtime, our examples will use either nodejs or python. 
-3. For Role choose "create a customer role" and click allow
+3. For Role choose "create a custom role" and click allow
 4. click "Create Function"
     `
 },{
@@ -57,7 +57,7 @@ ${example}
 },{
     title:"Add/Edit Question",
     text:`
-For a new or existing question edit the Lambda field to contain the arn of your created lambda function
+For a new or existing question edit the Lambda field to contain the name or ARN of your created lambda function
 `
 },{
     title:"Test Question",

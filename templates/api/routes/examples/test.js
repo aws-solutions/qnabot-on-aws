@@ -10,10 +10,32 @@ module.exports={
         perpage:100,
         token:""
     }),test),
+    list:test=>run(__dirname+'/'+"photos",input({
+        perpage:100,
+        token:""
+    }),test),
     handler:async function(test){
         var output=await require('../../../../bin/exports')('dev/bucket')
         try{
-            require('./handler').handler({
+            require('./handler').documents({
+                bucket:output.Bucket,
+                prefix:"",
+                root:"example.com"
+            },{},function(err,result){
+                console.log(result)
+                test.ifError(err)
+                test.ok(result)
+                test.done()
+            })
+        }catch(e){
+            test.ifError(e)
+            test.done()
+        }
+    },
+    handlerPhoto:async function(test){
+        var output=await require('../../../../bin/exports')('dev/bucket')
+        try{
+            require('./handler').photos({
                 bucket:output.Bucket,
                 prefix:"",
                 root:"example.com"

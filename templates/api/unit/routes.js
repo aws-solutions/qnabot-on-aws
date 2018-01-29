@@ -103,6 +103,48 @@ module.exports={
             method:"options"
         },test)
     },
+    examples:{
+        documents:async test=>{
+            var exampleHrefs=await api({
+                path:"examples",
+                method:"get"
+            })
+           
+            var documents=await api({
+                href:exampleHrefs._links.documents.href,
+                method:"get"
+            })
+            await Promise.all(
+                documents.examples.map(x=>{
+                    return api({
+                        href:x.document.href,
+                        method:"get"
+                    })
+                })
+            )
+            test.done()    
+        },
+        photos:async test=>{
+            var exampleHrefs=await api({
+                path:"examples",
+                method:"get"
+            })
+           
+            var photos=await api({
+                href:exampleHrefs._links.photos.href,
+                method:"get"
+            })
+            await Promise.all(
+                photos.photos.map(href=>{
+                    return api({
+                        href,
+                        method:"get"
+                    })
+                })
+            )
+            test.done()    
+        }
+    },
     jobs:{
         get:test=>{
             api({

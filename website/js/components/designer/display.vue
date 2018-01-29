@@ -5,7 +5,7 @@
         v-layout(:row="row" :column="column")
           v-flex
             .title {{schema.title}}
-            span.pl-3 {{value}} 
+            span.pl-3(:data-path="path") {{value}} 
     span(v-if="schema.type==='array' && !empty")
       v-container.fluid.pa-0
         v-layout(:row="row" :column="column" )
@@ -15,6 +15,7 @@
               v-for="(item,index) in value" :key="index"
               :schema="schema.items"
               :value="item" )
+              :path="path+'['+index+']'"
     span(v-if="schema.type==='object' && !empty")
       v-container.fluid
         v-layout(:row="row" :column="column")
@@ -24,6 +25,7 @@
             :key="key" 
             v-if="value[key]")
             display(  
+              :path="path+'.'+key"
               :name="key"
               column
               :schema="schema.properties[key]"
@@ -53,7 +55,7 @@ var Ajv=require('ajv')
 var ajv=new Ajv()
 
 module.exports={
-  props:["schema","value","name","row","column"],
+  props:["schema","value","name","row","column","path"],
   name:'display',
   data:function(){
     return {}

@@ -6,29 +6,46 @@ var _=require('lodash')
 
 module.exports={
     "Examples": resource('examples'),
-    "ExamplesList":lambda({
+    "ExamplesGet":mock({
+        auth:'NONE',
+        method:"GET",
+        template:"examples/info",
+        resource:{"Ref":"Examples"}
+    }),
+    "photos":resource('photos',{"Ref":"Examples"}),
+    "photosList":lambda({
         authorization:"AWS_IAM",
         method:"get",
-        lambda:{"Fn::GetAtt":["ExampleS3ListLambda","Arn"]},
-        template:fs.readFileSync(__dirname+'/list.vm','utf8'),
-        resource:{"Ref":"Examples"},
+        lambda:{"Fn::GetAtt":["ExampleS3ListPhotoLambda","Arn"]},
+        template:fs.readFileSync(__dirname+'/photos.vm','utf8'),
+        resource:{"Ref":"photos"},
         parameterLocations:{
           "method.request.querystring.perpage":false,
           "method.request.querystring.token":false
         }
     }),
-    "photos":resource('photos',{"Ref":"Examples"}),
     "photo":resource('{proxy+}',{"Ref":"photos"}),
     "photoGet":proxy({
         resource:{"Ref": "photo"},
         method:"get",
         bucket:{"Ref":"AssetBucket"},
-        path:"/examples/photo/{proxy}",
+        path:"/examples/photos/{proxy}",
         requestParams:{
             "integration.request.path.proxy":"method.request.path.proxy"
         }
     }),
     "Documents":resource('documents',{"Ref":"Examples"}),
+    "DocumentsList":lambda({
+        authorization:"AWS_IAM",
+        method:"get",
+        lambda:{"Fn::GetAtt":["ExampleS3ListLambda","Arn"]},
+        template:fs.readFileSync(__dirname+'/list.vm','utf8'),
+        resource:{"Ref":"Documents"},
+        parameterLocations:{
+          "method.request.querystring.perpage":false,
+          "method.request.querystring.token":false
+        }
+    }),
     "Example": resource('{proxy+}',{"Ref":"Documents"}),
     "ExampleGet":proxy({
         resource:{"Ref": "Example"},
@@ -54,7 +71,20 @@ module.exports={
         "Code": {
             "ZipFile":fs.readFileSync(__dirname+'/handler.js','utf8')
         },
-        "Handler": "index.handler",
+        "Handler": "index.documents",
+        "MemorySize": "128",
+        "Role": {"Fn::GetAtt": ["S3ListLambdaRole","Arn"]},
+        "Runtime": "nodejs6.10",
+        "Timeout": 300
+      }
+    },
+    "ExampleS3ListPhotoLambda": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Code": {
+            "ZipFile":fs.readFileSync(__dirname+'/handler.js','utf8')
+        },
+        "Handler": "index.photos",
         "MemorySize": "128",
         "Role": {"Fn::GetAtt": ["S3ListLambdaRole","Arn"]},
         "Runtime": "nodejs6.10",
@@ -91,7 +121,7 @@ function proxy(opts){
                 "StatusCode":404,
                 "ResponseTemplates":{
                     "application/xml":JSON.stringify({
-                        error:"Job not found"
+                        error:opts.missingMessage || "Not Found"
                     })
                 },
                 "SelectionPattern":"403"

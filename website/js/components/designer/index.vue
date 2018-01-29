@@ -53,11 +53,12 @@
       template(slot='items' slot-scope='props')
         tr( 
           v-on:click="expand(props)"
-          :id="'qa-'+props.item.qid.replace('.','-')"
+          :id="'qa-'+props.item.qid"
         )
           td.shrink(v-on:click.stop="" v-if="tab==='questions'")
             v-checkbox(@change="checkSelect"
               v-model="props.item.select" tabindex='-1' color="primary" 
+              :id="'qa-'+props.item.qid+'-select'"
             )
           td.text-xs-left.shrink.primary--text.title(v-if="tab==='test'") {{props.item._score}}
           td.text-xs-left.shrink.title 
@@ -67,8 +68,12 @@
             edit(
               :data.sync="props.item" 
               @click.native.stop=""
+              :id="'qa-'+props.item.qid+'-edit'"
             )
-            delete( :data="props.item" @click.native.stop="")
+            delete( :data="props.item" 
+              @click.native.stop=""
+              :id="'qa-'+props.item.qid+'-delete'"
+            )
       template(slot="no-data")
         v-alert( :value="true" color="error" icon="warning")
             span Sorry, nothing to display here :(

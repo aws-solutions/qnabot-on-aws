@@ -23,10 +23,10 @@
                 :disabled="url.length===0"
                 id="confirm-import-url") import
             p.title Examples/Demos
-            v-list.ml-4
+            v-list.ml-4(id="examples")
               v-list-tile(v-for="example in examples")
                 v-list-tile-content
-                  v-btn(
+                  v-btn.example(
                     @click="url=example.document.href"
                     :id="'example-'+example.id"
                   ) {{example.id}}

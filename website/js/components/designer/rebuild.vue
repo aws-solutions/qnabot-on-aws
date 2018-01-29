@@ -1,19 +1,21 @@
 <template lang="pug">
   span(class="wrapper")
-    v-btn.block(:disabled="loading" @click="build" slot="activator" flat ) Lex Rebuild
+    v-btn.block(
+      :disabled="loading" @click="build" slot="activator" 
+      flat id="lex-rebuild") Lex Rebuild
     v-dialog(
       persistent
       v-model="snackbar"
     )
-      v-card
+      v-card(id="lex-loading")
         v-card-title(primary-title) Rebuilding 
         v-card-text
-          v-subheader.error--text(v-if='error') {{error}}
-          v-subheader.success--text(v-if='success') {{success}}
+          v-subheader.error--text(v-if='error' id="lex-error") {{error}}
+          v-subheader.success--text(v-if='success' id="lex-success") {{success}}
           v-progress-linear(v-if='!error && !success' indeterminate)
         v-card-actions
           v-spacer
-          v-btn(@click='cancel' flat) close
+          v-btn(@click='cancel' flat id="lex-close") close
 </template>
 
 <script>

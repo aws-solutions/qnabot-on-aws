@@ -10,6 +10,7 @@
       :rules='[rules.required,rules.schema]'
       :id='id' :data-vv-name='id'
       :textarea="schema.maxLength>'5001'"
+      :data-path="path"
       @update:error="setValid"
       auto-grow
       :counter="schema.maxLength"
@@ -26,11 +27,16 @@
             :index="index"
             :required="index===0"
             :name="name"
+            :path="path+'['+index+']'"
             @update:valid="isValid"
           )
-          v-btn.delete(icon @click.native='remove(index)' tabindex='-1')
+          v-btn.delete(icon @click.native='remove(index)' 
+            :id="path+'-remove-'+index"
+            tabindex='-1')
             v-icon delete
-      v-btn.block(@click.native='add' tabindex='-1') add question
+      v-btn.block(@click.native='add' tabindex='-1'
+        :id="path+'-add'"
+        ) add question
     div(v-if="schema.type==='object'")
       .subheading {{schema.title}}
       span {{schema.description}}
@@ -42,6 +48,7 @@
             :schema="property"
             :name="property.name"
             v-model="value[property.name]"
+            :path="path+'.'+property.name"
             @update:valid="isValid"
           )
 </template>
@@ -68,7 +75,7 @@ var Ajv=require('ajv')
 var ajv=new Ajv()
 
 module.exports={
-  props:["schema","value","required","name","index"],
+  props:["schema","value","required","name","index","path"],
   name:'schema-input',
   data:function(){
     var self=this

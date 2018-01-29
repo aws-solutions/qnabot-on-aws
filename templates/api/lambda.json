@@ -15,6 +15,14 @@
     "Principal": "apigateway.amazonaws.com"
   }
 },
+"InvokePermissionExamplePhotoList": {
+  "Type": "AWS::Lambda::Permission",
+  "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName":{"Fn::GetAtt":["ExampleS3ListPhotoLambda","Arn"]},
+    "Principal": "apigateway.amazonaws.com"
+  }
+},
 "InvokePermissionS3List": {
   "Type": "AWS::Lambda::Permission",
   "Properties": {

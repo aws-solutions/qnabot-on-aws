@@ -1,20 +1,26 @@
 <template lang="pug">
   span(class="wrapper")
     v-dialog(v-model="loading" persistent)
-      v-card
+      v-card(id="edit-loading")
         v-card-title(primary-title) Updating
         v-card-text
-          v-subheader.error--text(v-if='error') {{error}}
-          v-subheader.success--text(v-if='success') {{success}}
+          v-subheader.error--text(
+            v-if='error'
+            id="edit-error"
+          ) {{error}}
+          v-subheader.success--text(
+            v-if='success'
+            id="edit-success"
+          ) {{success}}
           v-progress-linear(v-if='!error && !success' indeterminate)
         v-card-actions
           v-spacer
-            v-btn(@click='cancel' flat) close
+            v-btn(@click='cancel' flat id="edit-close") close
     v-dialog(v-model='dialog' max-width="80%")
       v-btn(v-if="!label" slot="activator" block icon="icon" @click="refresh") 
         v-icon edit
       v-btn(v-if="label" slot="activator" @click="refresh") {{label}}
-      v-card
+      v-card(id="edit-form")
         v-card-title(primary-title)
           .headline Update: {{data.qid}}
         v-card-text
@@ -24,13 +30,14 @@
               v-model="tmp"
               :valid.sync="valid"
               :schema="schema"
+              path="edit"
             )
           small *indicates required field
           v-subheader.error--text(v-if='error') {{error}}
         v-card-actions
           v-spacer
-          v-btn(@click='cancel') Cancel
-          v-btn(@click='update' :disabled="!valid") Update
+          v-btn(@click='cancel' id="edit-cancel") Cancel
+          v-btn(@click='update' :disabled="!valid" id="edit-submit") Update
 </template>
 
 <script>

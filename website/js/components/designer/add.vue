@@ -9,10 +9,10 @@
           v-progress-linear(v-if='!error && !success' indeterminate)
         v-card-actions
           v-spacer
-            v-btn(@click='cancel' flat) close
+            v-btn(@click='cancel' flat id="add-close") close
     v-dialog(persistent v-model='dialog' max-width='50%' ref="dialog")
-      v-btn(slot="activator" @click='reset') Add
-      v-card
+      v-btn(slot="activator" @click='reset' id="add-question-btn") Add
+      v-card(id="add-question-form")
         v-card-title(primary-title)
           .headline {{title}}
         v-card-text
@@ -21,13 +21,14 @@
               v-model="data"
               :valid.sync="valid"
               :schema="schema" 
+              path="add"
             )
           small *indicates required field
           v-subheader.error--text(v-if='error') {{error}}
         v-card-actions
           v-spacer
-          v-btn(@click='cancel') Cancel
-          v-btn(@click='add' :disabled='!valid') Create
+          v-btn(@click='cancel' id="add-question-cancel") Cancel
+          v-btn(@click='add' :disabled='!valid' id="add-question-submit") Create
 </template>
 
 <script>

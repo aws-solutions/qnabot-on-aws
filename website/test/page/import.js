@@ -33,6 +33,31 @@ module.exports=(A)=>class Import extends A{
         this.client=wait(this.client,"url-import")
         return Promise.resolve(this.client)
     }
+    async listExamples(){
+        // await this.client.execute(function(){
+        //  var out=[]
+        //  var nodes=document.querySelectorAll('#examples [id^="example-"])
+        //  nodes.forEach(x=>out.push(x.id.match(/example-(.*)/)[1]))
+        //  return out
+        // })
+    }
+    async importExample(name){
+        //await this.client.execute(function(name){
+        //  document.getElementById(`example-${name}`).click()
+        //},name)
+        //.waitForVisible('#import-url')
+        //.click('#import-url')
+        //.waitForVisible('#confirm-import-url')
+        //.click('#confirm-import-url')
+        //.waitForVisible("#import-loading",3000)
+        //.waitForVisible("#import-success",10000)
+        //.execute(function(){
+        //    document.getElementById('import-close').click()
+        //})
+
+        //this.client=wait(this.client,"url-import")
+        //return Promise.resolve(this.client)
+    }
 }
 
 function wait(client,name){

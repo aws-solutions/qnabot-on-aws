@@ -56,8 +56,8 @@ var base={
     "IntentName":{
         "Value":{"Fn::GetAtt":["QnABot","Outputs.Intent"]}
     },
-    "HandlerArn":{
-        "Value":{"Fn::GetAtt":["QnABot","Outputs.HandlerArn"]}
+    "FulfillmentArn":{
+        "Value":{"Fn::GetAtt":["QnABot","Outputs.FulfillmentArn"]}
     },
     "ContentDesignerLogin":{
         "Value":{"Fn::GetAtt":["api","Outputs.DesignerLogin"]},

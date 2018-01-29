@@ -2,6 +2,7 @@
   v-card(flat class="pa-0")
     display(
       :schema="$store.state.data.schema",
+      :path:'data.qid+"-"'
       row
       v-model="topitems"
     )
@@ -9,6 +10,7 @@
     display(
       v-if="extra"
       :schema="$store.state.data.schema",
+      :path:'data.qid+"-"'
       column
       v-model="bottomitems"
     )
