@@ -35,11 +35,29 @@ var run=function(params,schema,test){
 var Router=new require('../lib/router')
 
 module.exports={
+    middleware:{
+        parse:test=>{
+            var event=require('./lex')
+            var middleware=require('../lib/middleware/parse')
+            var req={_event:event}
+            var res={}
+            var result=middleware(req,res)
+            console.log(res)
+            test.equal(typeof res.message,"string")
+            test.done()
+        },
+        preprocess:test=>test.done(), 
+        querySend:test=>test.done(), 
+        queryPost:test=>test.done(), 
+        hookSend:test=>test.done(), 
+        hookPost:test=>test.done(), 
+        assemble:test=>test.done() 
+    },
     router:{
         setUp:function(done){
             this.run=function(router,test){
                 return Promise.promisify(router.start)
-                .bind(router)(_.cloneDeep(require('./lex/lex')))
+                .bind(router)(_.cloneDeep(require('./lex')))
                 .then(test.ok)
                 .catch(test.ifError)
             }
@@ -56,10 +74,9 @@ module.exports={
             this.run(router,test)
             .finally(test.done)
         }
-
     },
     lex:function(test){
-        run(require('./lex/lex'),lexSchema,test)
+        run(require('./lex'),lexSchema,test)
     },
     alexa:{
         start:function(test){

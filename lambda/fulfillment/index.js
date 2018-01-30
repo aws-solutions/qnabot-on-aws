@@ -13,11 +13,13 @@ License for the specific language governing permissions and limitations under th
 var lib='./lib/middleware/'
 var router=new (require('./lib/router'))()
 
+router.add(require(lib+'parse'))
 router.add(require(lib+'preprocess'))
 router.add(require(lib+'query-send'))
 router.add(require(lib+'query-postprocess'))
 router.add(require(lib+'hook-send'))
 router.add(require(lib+'hook-postprocess'))
+router.add(require(lib+'assemble'))
 
 exports.handler=function(event,context,callback){
     router.start(event,callback)

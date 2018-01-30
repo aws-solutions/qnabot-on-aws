@@ -1,4 +1,4 @@
-{
+module.exports={
   "currentIntent": {
     "name": "intent-name",
     "slots": {
