@@ -43,10 +43,10 @@ module.exports=class router {
     }
     
     _walk(req,res,index){
-        console.log(index,this.middleware.length)
+        var self=this
         if(index>-1){
             Promise.resolve(this.middleware[index](req,res))
-            .then(()=>this._walk(req,res,--index))
+            .then(()=>res.send())
         }else{
             res.send()
         }
@@ -70,7 +70,7 @@ module.exports=class router {
     
     _response(type,request,callback){
         var response={
-            type:"plaintext",
+            type:"PlainText",
             message:"",
             session:_.cloneDeep(request.session),
             card:{
@@ -123,7 +123,10 @@ module.exports=class router {
             .catch(callback)
         }
 
-        response.redirect=(req,res)=>this._walk(req,res,self.middleware.length-1)
+        response.restart=(req,res)=>{
+            req.redirect=false
+            this._walk(req,res,this.middleware.length-1)
+        }
         return response
     }
 

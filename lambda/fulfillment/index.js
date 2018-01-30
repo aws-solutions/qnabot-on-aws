@@ -14,8 +14,10 @@ var lib='./lib/middleware/'
 var router=new (require('./lib/router'))()
 
 router.add(require(lib+'preprocess'))
-router.add(require(lib+'query'))
-router.add(require(lib+'postprocess'))
+router.add(require(lib+'query-send'))
+router.add(require(lib+'query-postprocess'))
+router.add(require(lib+'hook-send'))
+router.add(require(lib+'hook-postprocess'))
 
 exports.handler=function(event,context,callback){
     router.start(event,callback)

@@ -77,7 +77,6 @@ module.exports={
       "text": "",
       "url": ""
     }
-  },
-  "response_type":"continue"
+  }
 }
 

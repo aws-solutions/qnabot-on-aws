@@ -34,7 +34,6 @@ ${codePY}
 The event object has three properties
 1. \`event.req\` the normalized request object
 1. \`event.res\` the normalized response object (edit this to change the response)
-1. \`event.response_type\` sets how handler lambda should respond. Set to \`"redirect"\` and edit \`event.req\`, specifically the \`event.req._query\` field to have the handler redirect to a new ElasticSearch query.  
 
 The lambda handler must return the modified event object. 
 ~~~json 

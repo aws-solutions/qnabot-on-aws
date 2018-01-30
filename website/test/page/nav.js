@@ -75,7 +75,7 @@ module.exports=(A)=>class Nav extends A{
             var tab=tabs.filter(x=>x!==id)[0]
             return this.switchTab(tab)
         })
-        .waitForVisible('#qna-client',3000)
+        .waitForVisible('#qna-client',10000)
         return Promise.resolve(this.client)
     }
 

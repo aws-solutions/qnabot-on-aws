@@ -27,26 +27,7 @@ module.exports=function(req,res){
     })
     .tap(x=>console.log("ES result:"+JSON.stringify(x,null,2)))
     .then(function(result){
-        res.result=result.hits.hits
-        res.type="PlainText"
-        res.message=_.get(result,"hits.hits[0]._source.a",process.env.EMPTYMESSAGE)
-        var card=_.get(result,"hits.hits[0]._source.r") 
-
-        if(_.get(card,'title')){
-            res.card.send=true
-            res.card.title=_.get(card,'title')
-            res.card.imageUrl=_.get(card,'imageUrl')
-        }
-        if(_.get(result,"hits.hits[0]._source.t")){
-            res.session.topic=_.get(result,"hits.hits[0]._source.t")
-        }else{
-            delete res.session.topic
-        }
-        res.session.previous={
-            qid:_.get(result,"hits.hits[0]._source.qid"),
-            a:_.get(result,"hits.hits[0]._source.a"),
-            q:req.question
-        }
+        res.result=_.get(result,"hits.hits[0]._source")
     })
 }
 
