@@ -6,7 +6,7 @@
                 "help"
             ],
             "a": "Ask me a question!",
-            "l":"{{help}}"
+            "l":"{{hello}}"
         }
     ]
 }

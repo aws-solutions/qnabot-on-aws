@@ -22,7 +22,8 @@ module.exports=Object.assign(_.fromPairs(js.map(x=>[x.name,x.resource])),{
         ,{
             "ServiceToken": { "Fn::GetAtt" : ["ExampleWriteLambda", "Arn"] },
             "photos":{"Fn::Sub":"${ApiUrl.Name}/examples/photos"},
-            "Bucket": {"Ref":"AssetBucket"}
+            "Bucket": {"Ref":"AssetBucket"},
+            "version":{"Ref":"ExampleCodeVersion"}
         })
     },
     "ExampleCodeVersion":{
