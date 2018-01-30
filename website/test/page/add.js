@@ -11,15 +11,15 @@ module.exports=(A)=>class Add extends A{
         await this.exists(qa.qid)
     }
     async edit(qa){
-        //await this.setFilter(id)
-        //await this.client.execut(function(id){
-        //   document.getElementById(`qa-${id}-edit`).click() 
-        //},qa.qid)
-        //await this.client.waitForVisible("#edit-form")
-        //await set('edit',qa,this.client) 
-        //await this.client.click('#edit-submit')
-        //await this.client.watiForVisible("#edit-success")
-        //await this.waitClick('#edit-close')
+        await this.setFilter(id)
+        await this.client.execute(function(id){
+           document.getElementById(`qa-${id}-edit`).click() 
+        },qa.qid)
+        await this.client.waitForVisible("#edit-form")
+        await this._set('edit',qa) 
+        await this.client.click('#edit-submit')
+        await this.client.watiForVisible("#edit-success")
+        await this.waitClick('#edit-close')
     }
     async buildBot(){
         await this.waitClick("#edit-sub-menu")

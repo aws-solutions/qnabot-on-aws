@@ -3,7 +3,6 @@ module.exports={
   "Type": "AWS::ApiGateway::RestApi",
   "Properties": {
     "Name": {"Ref": "AWS::StackName"},
-    "BinaryMediaTypes":["image/png","image/jpeg","image/svg+xml"],
     "Description":"An Api interface for the admin actions on the QNA bot"
   },
   "DependsOn": ["InvokePermissionESProxy","InvokePermissionLexProxy","InvokePermissionLexBuild","InvokePermissionSchema","InvokePermissionS3List", "InvokePermissionExampleList","InvokePermissionExamplePhotoList"]

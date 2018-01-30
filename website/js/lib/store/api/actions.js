@@ -35,6 +35,17 @@ module.exports={
             url:context.rootState.info._links.examples.href,
             method:'get'
         })
+        .then(x=>{  
+            return Promise.all(x.examples.map(async example=>{
+                if(_.get(example,"description.href")){
+                    example.text=await context.dispatch('_request',{
+                        url:example.description.href,
+                        method:'get'
+                    })
+                }
+                return example
+            }))
+        })
     },
     async getExampleDescription(context,example){
         if(_.get(example,"description.href")){

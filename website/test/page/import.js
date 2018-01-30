@@ -42,6 +42,7 @@ module.exports=(A)=>class Import extends A{
         // })
     }
     async importExample(name){
+        await this.waitClick('#examples-open')
         await this.client.waitForVisible(`#example-${name}`,2000)
         await this.client.execute(function(name){
           document.getElementById(`example-${name}`).click()

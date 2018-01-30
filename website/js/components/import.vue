@@ -22,14 +22,6 @@
                 style="flex:0;"
                 :disabled="url.length===0"
                 id="import-url") import
-            p.title Examples/Demos
-            v-list.ml-4(id="examples")
-              v-list-tile(v-for="example in examples")
-                v-list-tile-content
-                  v-btn.example(
-                    @click="url=example.document.href"
-                    :id="'example-'+example.id"
-                  ) {{example.id}}
       v-flex(v-if="jobs.length>0")
         v-card(id="import-jobs")
           v-card-title.headline Import Jobs
@@ -45,6 +37,24 @@
                     v-btn(fab block icon @click="deleteJob(index)" :loading="job.loading") 
                       v-icon delete
                 v-divider(v-if="index + 1 < jobs.length")
+      v-flex
+        v-expansion-panel
+          v-expansion-panel-content
+            p.title(slot="header" id="examples-open") Examples/Demos
+            v-container(id="examples" grid-list-xl)
+              v-layout(row wrap)
+                v-flex(v-for="example in examples" xs12 sm6 md3)
+                  v-card.elevation-1(style="min-height:150px;")
+                    v-card-title
+                      h3.title {{example.id}}
+                    v-card-text.pa-0.pl-2
+                      p {{example.text}}
+                    v-card-actions.pa-0.pr-2.pb-2
+                      v-spacer
+                      v-btn.example(
+                        @click="url=example.document.href"
+                        :id="'example-'+example.id"
+                      ) Load
     v-dialog(v-model="loading" persistent)
       v-card( id="import-loading")
         v-card-title Loading
@@ -95,10 +105,12 @@ module.exports={
   },
   components:{
   },
+  computed:{
+  },
   created:async function(){
     this.refresh()
     var examples=await this.$store.dispatch('api/listExamples')
-    this.examples=examples.examples
+    this.examples=examples
   },
   methods:{
     deleteJob:function(index){

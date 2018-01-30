@@ -14,6 +14,19 @@ module.exports={
             "Bucket":{"Ref":"AssetBucket"}
         }
     },
+    "AssetZipVersion":{
+        "Condition":"BuildExamples",
+        "Type": "Custom::S3Version",
+        "Properties": {
+            "ServiceToken": { "Fn::GetAtt" : ["CFNLambda", "Arn"] },
+            "Bucket": {"Ref":"BootstrapBucket"},
+            "Key": {"Fn::Join":["",[
+                {"Ref":"BootstrapPrefix"},
+                "/assets.zip"
+            ]]},
+            "BuildDate":(new Date()).toISOString()
+        }
+    },
     "AssetUnzip":{
         "Type": "Custom::S3Unzip",
         "Condition":"BuildExamples",
@@ -26,7 +39,7 @@ module.exports={
                 "/assets.zip"
             ]]},
             "DstBucket":{"Ref":"AssetBucket"},
-            "buildDate":new Date()
+            "version":{"Ref":"AssetZipVersion"}
         }
     }
 }
