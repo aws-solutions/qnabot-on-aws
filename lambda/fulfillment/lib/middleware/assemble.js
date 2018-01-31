@@ -1,7 +1,6 @@
 var Promise=require('bluebird')
 var lex=require('./lex')
 var alexa=require('./alexa')
-var es=require('./es')
 var aws=require('../aws')
 var lambda= new aws.Lambda()
 var _=require('lodash')
@@ -33,5 +32,14 @@ module.exports=function response(req,res){
             })
         }
     })
-    .tap(()=>console.log("final:",JSON.stringify(out,null,2)))
+    .then(()=>{
+        switch(req._type){
+            case 'LEX':
+                res.out=lex.assemble(req,res)
+                break;
+            case 'ALEXA':
+                res.out=alexa.assemble(req,res)
+                break;
+        }
+    })
 }

@@ -19,15 +19,16 @@ var es=require('elasticsearch').Client({
 })
 
 module.exports=function(req,res){
+    console.log(req,res)
     req._query=bodybuilder()
     .orQuery('nested',{
         path:'questions',
         score_mode:'sum',
         boost:2},
-        q=>q.query('match','questions.q',request.question)
+        q=>q.query('match','questions.q',req.question)
     )
-    .orQuery('match','a',request.question)
-    .orQuery('match','t',_.get(request,'session.topic',''))
+    .orQuery('match','a',req.question)
+    .orQuery('match','t',_.get(req,'session.topic',''))
     .from(0)
     .size(1)
     .build()

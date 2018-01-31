@@ -9,10 +9,10 @@ module.exports=function(req,res){
 
     switch(req._type){
         case 'LEX':
-            Object.assign(res,lex.parse(req._event))
+            Object.assign(req,lex.parse(req._event))
             break;
         case 'ALEXA':
-            Object.assign(res,alexa.parse(req._event))
+            Object.assign(req,alexa.parse(req._event))
             break;
     }
 

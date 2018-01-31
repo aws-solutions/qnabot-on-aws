@@ -69,8 +69,7 @@ module.exports={
                 a:"i am the unit",
                 r:{
                     title:"test",
-                    text:"test",
-                    url:"https://dummyimage.com/600x400/000/fff.png&text=hello"
+                    imageUrl:"https://dummyimage.com/600x400/000/fff.png&text=hello"
                 }
             }
         })
@@ -78,7 +77,7 @@ module.exports={
             path:"questions/"+id2,
             method:"PUT",
             body:{
-                qid:id,
+                qid:id2,
                 q:["who are you"],
                 a:"you are the test"
             }
@@ -108,21 +107,28 @@ module.exports={
         var self=this
         var id1="unit-test.1"
         var id2="unit-test.2"
-        return api({
-            path:"questions",
-            method:"PUT",
-            body:[{
-                qid:id1,
-                q:["what do zombies eat","what do they eat"],
-                a:"zombies eat brains",
-                t:"zombies"
-            },{
-                qid:id2,
-                q:["what do humans eat","what do they eat"],
-                a:"humans eat food",
-                t:"humans"
-            }]
-        })
+        return Promise.join(
+            api({
+                path:`questions/${id1}`,
+                method:"PUT",
+                body:{
+                    qid:id1,
+                    q:["what do zombies eat","what do they eat"],
+                    a:"zombies eat brains",
+                    t:"zombies"
+                }
+            }),
+            api({
+                path:`questions/${id2}`,
+                method:"PUT",
+                body:{
+                    qid:id2,
+                    q:["what do humans eat","what do they eat"],
+                    a:"humans eat food",
+                    t:"humans"
+                }
+            })
+        )
         .then(()=>self.lex.postText({
             inputText:"what do zombies eat",
             sessionAttributes:{}
@@ -156,14 +162,14 @@ module.exports={
             }).promise()
         })
         .then(output=>api({
-            path:"questions",
+            path:`questions/${id1}`,
             method:"PUT",
-            body:[{
+            body:{
                 qid:id1,
                 q:["what do zombies eat","what do they eat"],
                 a:"zombies eat brains",
                 l:output.lambda
-            }]
+            }
         }))
         .then(()=>self.lex.postText({
             inputText:"what do zombies eat",
