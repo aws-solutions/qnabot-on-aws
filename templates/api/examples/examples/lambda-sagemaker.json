@@ -20,7 +20,7 @@
             "t": "lambda"
         },
         {
-            "qid": "aws.sagemaker.1",
+            "qid": "AWS.sagemaker.1",
             "q": [
                 "What is sagemaker",
                 "how does sagemaker work"
@@ -35,7 +35,7 @@
         {
             "qid": "aws.sagemaker.2",
             "q": [
-                "how does it cost",
+                "how much does it cost",
                 "how much does sagemaker cost"
             ],
             "a": "Pricing within Amazon SageMaker is broken down by on-demand ML instances, ML storage, and fees for data processing in notebooks and hosting instances.",
