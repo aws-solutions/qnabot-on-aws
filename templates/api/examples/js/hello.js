@@ -1,8 +1,7 @@
-var today = new Date()
-var curHr = today.getHours()
-
-
 exports.handler=function(event,context,cb){
+    var today = new Date()
+    var curHr = (today.getHours()-8+24)%24
+
     console.log(JSON.stringify(event,null,2))
     if (curHr < 12) {
         message="good morning, "

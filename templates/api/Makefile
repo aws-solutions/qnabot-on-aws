@@ -3,6 +3,7 @@ NAME=$(shell basename $(shell pwd))
 DST=../../build/templates/$(NAME).json
 LAMBDA_DIR=../../lambda
 LAMBDA_DST=../../build/lambda
+.PHONY: $(LAMBDA_DST)/examples.zip
 LAMBDA=$(LAMBDA_DST)/proxy-es.zip $(LAMBDA_DST)/import.zip $(LAMBDA_DST)/lex-build.zip 
 
 $(DST):./* ./routes/* ./routes/*/* ./signup/* ./style/*  $(LAMBDA) ../../build/assets.zip
@@ -10,7 +11,7 @@ $(DST):./* ./routes/* ./routes/*/* ./signup/* ./style/*  $(LAMBDA) ../../build/a
 
 ../../build/assets.zip:../../assets/*
 	make -C  ../../assets
-$(LAMBDA_DST)/examples.zip:./examples/*
+$(LAMBDA_DST)/examples.zip: 
 	make -C ./examples
 
 $(LAMBDA_DST)/import.zip:$(LAMBDA_DIR)/import/*

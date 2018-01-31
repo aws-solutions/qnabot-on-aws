@@ -1,0 +1,1 @@
+Ask what sagemaker and lambda are and what they cost. Uses topic memory for cost follow question, response card, and lambda hook.

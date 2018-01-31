@@ -34,7 +34,7 @@ module.exports={
           }
         },
         "Handler": "index.handler",
-        "MemorySize": "128",
+        "MemorySize": "1408",
         "Role": {
           "Fn::GetAtt": [
             "LambdaRole",

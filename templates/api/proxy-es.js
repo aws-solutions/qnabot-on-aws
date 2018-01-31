@@ -18,7 +18,7 @@ module.exports={
             "S3ObjectVersion":{"Ref":"ESProxyCodeVersion"}
         },
         "Handler": "index.handler",
-        "MemorySize": "256",
+        "MemorySize": "1408",
         "Role": {"Fn::GetAtt": ["ESProxyLambdaRole","Arn"]},
         "Runtime": "nodejs6.10",
         "Timeout": 300

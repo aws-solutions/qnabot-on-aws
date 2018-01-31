@@ -9,7 +9,7 @@ module.exports=function(req,res){
         res.type="PlainText"
         console.log(res.message)
         res.message=res.result.a
-        var card=res.result.r 
+        var card=_.get(res,"result.r.title") ? res.result.r : null
         
         if(card){
             res.card.send=true

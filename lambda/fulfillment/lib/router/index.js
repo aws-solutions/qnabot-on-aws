@@ -22,7 +22,7 @@ module.exports=class router {
         }catch(e){
             console.log("error",e)
             if(e.action==='END'){
-                callback(null,"END")
+                callback(null)
             }else if(e.action==="RESPOND"){
                 callback(null,e.message)
             }else{
