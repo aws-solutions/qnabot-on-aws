@@ -7,6 +7,7 @@ module.exports={
     templates:require('../routes/test'),
     routes:require('./routes'),
     workflows:require('./workflows'),
-    lex:require('./lex')
+    lex:require('./lex'),
+    examples:require('../examples/test')
 }
 

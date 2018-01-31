@@ -1,10 +1,10 @@
-var config=require('../../../config')
+var config=require('../../../../config')
 process.env.STRIDE="10000"
 process.env.AWS_PROFILE=config.profile
 process.env.AWS_DEFAULT_REGION=config.region
 process.env.AWS_REGION=config.region
 
-var outputs=require('../../../bin/exports')
+var outputs=require('../../../../bin/exports')
 var Promise=require('bluebird')
 var aws=require("aws-sdk")
 aws.config.region=config.region
