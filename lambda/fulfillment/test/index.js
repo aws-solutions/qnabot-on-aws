@@ -88,8 +88,10 @@ module.exports={
         cancel:function(test){
             run(require('./alexa/cancel'),alexaSchema,test)
         },
-        end:function(test){
-            run(require('./alexa/end'),ajv.compile({}),test)
+        end:async function(test){
+            var msg=await lambda(require('./alexa/end'))
+            test.ok(!msg)
+            test.done()
         }
     }
 }

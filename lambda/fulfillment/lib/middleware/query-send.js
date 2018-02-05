@@ -35,8 +35,8 @@ module.exports=function(req,res){
 
     console.log("ElasticSearch Query",JSON.stringify(req._query,null,2))
     return es.search({
-        index: process.env.ES_INDEX,
-        type: process.env.ES_TYPE,
+        index: req._info.es.index,
+        type: req._info.es.type,
         searchType:"dfs_query_then_fetch",
         body:req._query
     })
