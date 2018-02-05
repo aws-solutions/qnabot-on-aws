@@ -68,7 +68,7 @@ var base={
         "Description":"Where you can go to interact with your bot"
     },
     "DashboardUrl":{
-        "Value":{"Fn::GetAtt":["dashboard","Outputs.Url"]}
+        "Value":{"Fn::GetAtt":["api","Outputs.DashboardUrl"]}
     },
     "UserPoolUrl":{
         "Value":{"Fn::GetAtt":["api","Outputs.UserPoolUrl"]},

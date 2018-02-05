@@ -10,7 +10,7 @@
                 "view": "timeSeries",
                 "stacked": false,
                 "metrics": [
-                    [ "AWS/ApiGateway", "Latency", "ApiName", "${APIGateWay}" ],
+                    [ "AWS/ApiGateway", "Latency", "ApiName", "${AWS::StackName}" ],
                     [ ".", "4XXError", ".", ".", { "yAxis": "right" } ]
                 ],
                 "region": "${AWS::Region}",
@@ -44,7 +44,7 @@
                 "view": "timeSeries",
                 "stacked": false,
                 "metrics": [
-                    [ "AWS/Lex", "MissedUtteranceCount", "BotVersion", "$LATEST", "Operation", "PostText", "BotName", "${BotName}" ],
+                    [ "AWS/Lex", "MissedUtteranceCount", "BotVersion", "$LATEST", "Operation", "PostText", "BotName", "${Botname}" ],
                     [ ".", "RuntimeSucessfulRequestLatency", ".", ".", ".", ".", ".", ".", { "yAxis": "right" } ],
                     [ ".", "RuntimeRequestCount", ".", ".", ".", ".", ".", "." ]
                 ],
@@ -62,7 +62,7 @@
                 "view": "timeSeries",
                 "stacked": false,
                 "metrics": [
-                    [ "AWS/Lambda", "Errors", "FunctionName", "${FulfillmentLambda}", { "stat": "Sum" } ],
+                    [ "AWS/Lambda", "Errors", "FunctionName", "${FulfillmentName}", { "stat": "Sum" } ],
                     [ ".", "Invocations", ".", ".", { "stat": "Sum" } ],
                     [ ".", "Duration", ".", ".", { "yAxis": "right" } ],
                     [ ".", "Throttles", ".", ".", { "stat": "Sum" } ]
