@@ -33,7 +33,7 @@ module.exports={
                 type:master.ElasticsearchType,
                 botname:master.BotName,
                 slottype:master.SlotType,
-                intent:master.IntentName
+                intent:master.Intent
             }
             run(params,test)
         })

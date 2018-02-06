@@ -48,7 +48,7 @@ module.exports=function(params){
     })
     .then(function(result){
         return _.compact(_.uniq(_.flatten(result
-            .map(qa=>qa._source.questions.map(y=>y.q))
+            .map(qa=>qa._source.questions ? qa._source.questions.map(y=>y.q) : [])
         )))
     })
 
