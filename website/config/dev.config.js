@@ -34,7 +34,7 @@ module.exports = require('../../bin/exports')('dev/master').then(function(result
                 region:config.region
             },
             s3UploadOptions:{
-                Bucket:result.DesignerBucket
+                Bucket:result.Bucket
             }
         }),
         new ProgressBarPlugin(),

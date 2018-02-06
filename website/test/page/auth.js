@@ -6,7 +6,7 @@ module.exports=(A)=>class auth extends A{
     login(){
         var self=this
         return outputs.then(function(output){
-            self.client=self.client.url(output.ContentDesignerLogin)
+            self.client=self.client.url(output.DesignerLogin)
             .execute(function(username,password){
                 document.querySelector('#username').value=username
                 document.querySelector('#password').value=password

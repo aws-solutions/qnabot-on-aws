@@ -30,6 +30,7 @@
       :total-items="total"
       :loading="loading"
       :rows-per-page-items="perpage"
+      :class="empty"
       v-model="selected"
       select-all
       item-key="qid"
@@ -136,6 +137,9 @@ module.exports={
     alexa:require('./alexa.vue'),
   },
   computed:{
+    empty:function(){
+      return {empty:!this.total}
+    },
     loading:function(){
       return this.$store.state.api.loading 
     },
@@ -206,7 +210,9 @@ module.exports={
   .tabs__item {
     color:white !important; 
   }
-  
+  .empty .datatable__actions__pagination {
+    display:none;
+  }
 </style>
 <style lang='scss' scoped>
   

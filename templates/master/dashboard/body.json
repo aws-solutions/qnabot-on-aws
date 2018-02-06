@@ -1,0 +1,76 @@
+{
+    "widgets": [
+        {
+            "type": "metric",
+            "x": 0,
+            "y": 0,
+            "width": 6,
+            "height": 6,
+            "properties": {
+                "view": "timeSeries",
+                "stacked": false,
+                "metrics": [
+                    [ "AWS/ApiGateway", "Latency", "ApiName", "${AWS::StackName}" ],
+                    [ ".", "4XXError", ".", ".", { "yAxis": "right" } ]
+                ],
+                "region": "${AWS::Region}",
+                "title": "API GateWay Latency,Errors"
+            }
+        },
+        {
+            "type": "metric",
+            "x": 12,
+            "y": 0,
+            "width": 6,
+            "height": 6,
+            "properties": {
+                "view": "timeSeries",
+                "stacked": false,
+                "metrics": [
+                    [ "AWS/ES", "FreeStorageSpace", "DomainName", "${ESVar.ESDomain}", "ClientId", "${AWS::AccountId}", { "period": 60 } ],
+                    [ ".", "SearchableDocuments", ".", ".", ".", ".", { "yAxis": "right", "period": 60 } ]
+                ],
+                "region": "${AWS::Region}",
+                "title": "ElasticSearch Documents/FreeSpace"
+            }
+        },
+        {
+            "type": "metric",
+            "x": 18,
+            "y": 0,
+            "width": 6,
+            "height": 6,
+            "properties": {
+                "view": "timeSeries",
+                "stacked": false,
+                "metrics": [
+                    [ "AWS/Lex", "MissedUtteranceCount", "BotVersion", "$LATEST", "Operation", "PostText", "BotName", "${Bot}" ],
+                    [ ".", "RuntimeSucessfulRequestLatency", ".", ".", ".", ".", ".", ".", { "yAxis": "right" } ],
+                    [ ".", "RuntimeRequestCount", ".", ".", ".", ".", ".", "." ]
+                ],
+                "region": "${AWS::Region}",
+                "title": "Lex Utterances/Latency"
+            }
+        },
+        {
+            "type": "metric",
+            "x": 6,
+            "y": 0,
+            "width": 6,
+            "height": 6,
+            "properties": {
+                "view": "timeSeries",
+                "stacked": false,
+                "metrics": [
+                    [ "AWS/Lambda", "Errors", "FunctionName", "${FulfillmentLambda}", { "stat": "Sum" } ],
+                    [ ".", "Invocations", ".", ".", { "stat": "Sum" } ],
+                    [ ".", "Duration", ".", ".", { "yAxis": "right" } ],
+                    [ ".", "Throttles", ".", ".", { "stat": "Sum" } ]
+                ],
+                "region": "${AWS::Region}",
+                "title": "Fulfillment Lambda",
+                "period": 300
+            }
+        }
+    ]
+}

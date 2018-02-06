@@ -2,13 +2,10 @@ BUILD=../../bin/build.js
 NAME=$(shell basename $(shell pwd))
 DST=../../build/templates/dev
 
-all:$(DST)/domain.json $(DST)/bucket.json $(DST)/cognito.json $(DST)/master.json  $(DST)/bootstrap.json $(DST)/lambda.json $(DST)/api.json
+all:$(DST)/bucket.json $(DST)/cognito.json $(DST)/master.json  $(DST)/bootstrap.json $(DST)/lambda.json $(DST)/api.json
 
 $(DST)/bootstrap.json:./bootstrap/*
 	 $(BUILD) --stack $(NAME)/bootstrap --verbose
-
-$(DST)/domain.json:./domain.*
-	 $(BUILD)  --stack $(NAME)/domain --verbose
 
 $(DST)/api.json:./api.*
 	 $(BUILD) --stack  $(NAME)/api --verbose

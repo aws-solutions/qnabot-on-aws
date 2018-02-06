@@ -21,9 +21,14 @@ exports.handler = (event, context, callback) => {
 }
 
 exports.Create=function(params,reply){
-    exports.handler(params.create,null,function(err,data){
-        err ? reply(JSON.stringify(err)) : reply(null,"es")
-    })
+    try{
+        exports.handler(params.create,null,function(err,data){
+            err ? reply(JSON.stringify(err)) : reply(null,"es")
+        })
+    }catch(e){
+        console.log(e)
+        reply(e)
+    }
 }
 exports.Update=function(ID,params,oldparams,reply){
     exports.Create(params,reply) 

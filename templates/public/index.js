@@ -26,14 +26,40 @@ module.exports=Promise.resolve(require('../master')).then(function(base){
         "UserPoolUrl"
     ])
 
-    base.Parameters=_.omit(base.Parameters,["BootstrapBucket","BootstrapPrefix"])
-
+    base.Parameters=_.pick(base.Parameters,[
+        "Email",
+        "Username"
+    ])
+    base.Conditions.Public={"Fn::Equals":[true,true]}
+    base.Conditions.AdminSignUp={"Fn::Equals":[true,true]}
+    base.Conditions.Domain={"Fn::Equals":[true,false]}
+    base.Conditions.BuildExamples={"Fn::Equals":[true,true]}
+    base.Conditions.CreateDomain={"Fn::Equals":[true,true]}
+    base.Conditions.DontCreateDomain={"Fn::Equals":[true,false]}
+    
     var out=JSON.stringify(base).replace(
         /{"Ref":"BootstrapBucket"}/g,
         '"'+config.publicBucket+'"')
+    
+    out=out.replace(
+        /{"Ref":"ElasticsearchName"}/g,
+        '"EMPTY"')
+
+    out=out.replace(
+        /{"Ref":"ApprovedDomain"}/g,
+        '"EMPTY"')
+
+    out=out.replace(
+        /\${BootstrapPrefix}/g,
+        ''+config.publicPrefix+'')
+
+    out=out.replace(
+        /\${BootstrapBucket}/g,
+        ''+config.publicBucket+'')
 
     out=out.replace(
         /{"Ref":"BootstrapPrefix"}/g,
         '"'+config.publicPrefix+'"')
+
     return JSON.parse(out)
 })

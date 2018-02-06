@@ -145,17 +145,18 @@ class Lex {
     Delete(ID,params,reply){
         var arg={name:ID}
 
-        if(this.type==="BotAlias")arg.botName=params.botName
+        if(this.type==="BotAlias") arg.botName=params.botName
         
         return run(this.delete_method,arg)
         .then(msg=>reply(null,msg.name,null))
-        .error(function(error){
+        .catch(function(error){
+            console.log(error)
             if(error.indexOf("NotFoundException")!==-1){
                 reply(null,ID,null)
             }else{
                 reply(error)
             }
-        }).catch(reply)
+        })
     }
  }
 

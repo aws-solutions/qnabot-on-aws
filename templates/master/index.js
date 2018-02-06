@@ -1,129 +1,39 @@
-var exp=require('../../bin/exports')
-module.exports=exp().then(function(vars){
-var base={
-  "Parameters":{
-    "BootstrapPrefix":{
-        "Type":"String",
-        "Description":"Path to QnABot assets in the BoostrapBucket (DO NOT CHANGE)",
-        "Default":""
-    },
-    "BootstrapBucket":{
-        "Type":"String",
-        "Description":"AWS S3 bucket where assets are stored (DO NOT CHANGE)"
-    },
-    "Email":{
-        "Type":"String",
-        "Description":"Email address for the admin user. Will be used for loging in and for setting the admin password. This email will receive the temporary password for the admin user.",
-        "AllowedPattern":".+\@.+\..+",
-        "ConstraintDescription":"Must be valid email address eg. johndoe@example.com"
-    },
-    "Username":{
-        "Type":"String",
-        "Description":"Administrator username",
-        "Default":"Admin"
-    },
-    "PublicOrPrivate":{
-        "Type":"String",
-        "Description":"(optional) Whether access to the QnABot should be publicly available or restricted to users in QnABot UserPool. Allowed values are PUBLIC or PRIVATE",
-        "AllowedPattern":"(PUBLIC|PRIVATE)",
-        "Default":"PUBLIC",
-        "ConstraintDescription":"Allowed Values are PUBLIC or PRIVATE"
-    },
-    "ApprovedDomain":{
-        "Type":"String",
-        "Description":"(optional) If QnABot is private, restrict user sign up to users whos email domain matches this domain. eg. amazon.com",
-        "Default":"NONE"
-    }
-  },
-  "Resources":Object.assign(
-    require('./stacks')
-  ),
-  "AWSTemplateFormatVersion": "2010-09-09",
-  "Description": "QnABot with admin and client websites",
-  "Outputs":{
-    "DesignerBucket":{
-        "Value":{"Fn::GetAtt":["api","Outputs.Bucket"]}
-    },
-    "BotName":{
-        "Value":{"Fn::GetAtt":["QnABot","Outputs.Bot"]}
-    },
-    "SlotType":{
-        "Value":{"Fn::GetAtt":["QnABot","Outputs.SlotType"]}
-    },
-    "BotAlias":{
-        "Value":{"Fn::GetAtt":["QnABot","Outputs.BotAlias"]}
-    },
-    "IntentName":{
-        "Value":{"Fn::GetAtt":["QnABot","Outputs.Intent"]}
-    },
-    "FulfillmentArn":{
-        "Value":{"Fn::GetAtt":["QnABot","Outputs.FulfillmentArn"]}
-    },
-    "ContentDesignerLogin":{
-        "Value":{"Fn::GetAtt":["api","Outputs.DesignerLogin"]},
-        "Description":"Url to login to the QnABot Designer Ui to edit and create questions for your bot"
-    },
-    "ClientURL":{
-        "Value":{"Fn::GetAtt":["api","Outputs.ClientUrl"]},
-        "Description":"Where you can go to interact with your bot"
-    },
-    "DashboardUrl":{
-        "Value":{"Fn::GetAtt":["api","Outputs.DashboardUrl"]}
-    },
-    "UserPoolUrl":{
-        "Value":{"Fn::GetAtt":["api","Outputs.UserPoolUrl"]},
-        "Description":"Where you will manage users for your QnABot."
-    },
-    "ESProxyLambda":{
-        "Value":{"Fn::GetAtt":["api","Outputs.ESProxyLambda"]}
-    },
-    "ElasticSearchEndpoint":{
-        "Value":{"Fn::GetAtt":["domain","Outputs.ESAddress"]}
-    },
-    "ElasticSearchIndex":{
-        "Value":{"Fn::GetAtt":["domain","Outputs.Index"]}
-    },
-    "ElasticSearchType":{
-        "Value":{"Fn::GetAtt":["domain","Outputs.Type"]}
-    },
-    "ApiEndpoint":{
-        "Value":{"Fn::GetAtt":["api","Outputs.Endpoint"]}
-    },
-    "ElasticSearchIndex":{
-        "Value":{"Fn::GetAtt":["domain","Outputs.Type"]}
-    },
-    "ElasticSearchType":{
-        "Value":{"Fn::GetAtt":["domain","Outputs.Index"]}
-    },
-    "UserPool":{
-        "Value":{"Fn::GetAtt":["api","Outputs.UserPool"]}
-    },
-    "DesignerClientId":{
-        "Value":{"Fn::GetAtt":["api","Outputs.DesignerClientId"]}
-    }
-  },
-  "Metadata" : {
-    "AWS::CloudFormation::Interface" : {
-        "ParameterGroups" : [
-            {
-                "Label":"Bootstrap Configuration",
-                "Parameters":["BootstrapBucket","BootstrapPrefix"]
-            },
-            {
-                "Label":"Administrator Configuration",
-                "Parameters":["Email","Username"]
-            },
-            {
-                "Label":"Security",
-                "Parameters":["PublicOrPrivate","ApprovedDomain"]
-            }
-        ]
-    }
-  }
-}
-    
-    base.Parameters.BootstrapBucket.Default=vars["QNA-BOOTSTRAP-BUCKET"] || ""
-    base.Parameters.BootstrapPrefix.Default=vars["QNA-BOOTSTRAP-PREFIX"] || ""
-    
-    return base
-})
+#! /usr/bin/env node
+/*
+Copyright 2017-2017 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+
+Licensed under the Amazon Software License (the "License"). You may not use this file
+except in compliance with the License. A copy of the License is located at
+
+http://aws.amazon.com/asl/
+
+or in the "license" file accompanying this file. This file is distributed on an "AS IS"
+BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied. See the
+License for the specific language governing permissions and limitations under the License.
+*/
+
+var base=require('./api.json')
+
+base.Resources=Object.assign(
+    require('./elasticsearch'),
+    require('./dashboard'),
+    require('./lex'),
+    require('./examples'),
+    require('./import'),
+    require('./assets'),
+    require('./signup'),
+    require('./config'),
+    require('./routes'),
+    require('./lambda'),
+    require('./policies'),
+    require('./roles'),
+    require('./cognito'),
+    require('./cfn'),
+    require('./s3'),
+    require('./var'),
+    require('./proxy-es'),
+    require('./proxy-lex'),
+    require('./lex-build')
+)
+
+module.exports=base
