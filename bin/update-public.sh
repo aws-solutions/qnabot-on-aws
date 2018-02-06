@@ -14,11 +14,11 @@ PUBLICPREFIX=$(node -e "console.log(require('$__dirname'+'/../config').publicPre
 
 if [ "$1" == "--dryrun" ]; then
     echo "dry run"
-    aws s3 cp s3://$DEVBUCKET/$PUBLICPREFIX s3://$PUBLICBUCKET/$PUBLICPREFIX --recursive --dryrun --acl public-read
+    aws s3 cp s3://$DEVBUCKET/$PREFIX s3://$PUBLICBUCKET/$PUBLICPREFIX --recursive --dryrun --acl public-read
 fi
 
 if [ "$1" == "--run" ]; then
-    aws s3 cp s3://$DEVBUCKET/$PUBLICPREFIX s3://$PUBLICBUCKET/$PUBLICPREFIX --recursive --acl public-read
+    aws s3 cp s3://$DEVBUCKET/$PREFIX s3://$PUBLICBUCKET/$PUBLICPREFIX --recursive --acl public-read
 fi
 
 echo https://s3.amazonaws.com/$PUBLICBUCKET/$PUBLICPREFIX/templates/master.json
