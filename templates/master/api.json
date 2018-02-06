@@ -12,8 +12,11 @@
         "#bot-editor:bot=",{"Ref":"LexBot"}
       ]]}
     },
-    "Bot":{
+    "BotName":{
         "Value":{"Ref":"LexBot"}
+    },
+    "SlotType":{
+        "Value":{"Ref":"SlotType"}
     },
     "Intent":{
         "Value":{"Ref":"Intent"}

@@ -22,9 +22,9 @@ module.exports=function(event){
         outputs("dev/master",{wait:true}),
         outputs("dev/lambda",{wait:true})
     ).tap(console.log).spread(function(master,lambda){
-        process.env.ES_ADDRESS=master.ElasticSearchEndpoint
-        process.env.ES_INDEX=master.ElasticSearchIndex
-        process.env.ES_TYPE=master.ElasticSearchType
+        process.env.ES_ADDRESS=master.ElasticsearchEndpoint
+        process.env.ES_INDEX=master.ElasticsearchIndex
+        process.env.ES_TYPE=master.ElasticsearchType
 
         process.env.LAMBDA_PREPROCESS=lambda.lambda
         process.env.LAMBDA_POSTPROCESS=lambda.lambda

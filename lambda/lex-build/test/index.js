@@ -28,9 +28,9 @@ module.exports={
         outputs('dev/master',{wait:true})
         .then(function(master){
             var params={
-                address:master.ElasticSearchEndpoint,
-                index:master.ElasticSearchIndex,
-                type:master.ElasticSearchType,
+                address:master.ElasticsearchEndpoint,
+                index:master.ElasticsearchIndex,
+                type:master.ElasticsearchType,
                 botname:master.BotName,
                 slottype:master.SlotType,
                 intent:master.IntentName

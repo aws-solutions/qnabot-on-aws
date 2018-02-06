@@ -39,10 +39,20 @@ class Page extends modules{
         return this.client
     }
     async waitClick(selector){
-        await this.client.waitForVisible(selector)
-        await this.client.scroll(selector)
-        await Promise.delay(500)
-        await this.client.click(selector)
+        try{
+            await this.client.waitForVisible(selector)
+            await this.client.scroll(selector)
+            await Promise.delay(500)
+            await this.client.click(selector)
+        }catch(e){
+            if(e.message.match('is not clickable at point')){
+                await this.client.execute(function(id){
+                   document.querySelector(selector).click() 
+                },selector)
+            }else{
+                throw e
+            }
+        }
     }
     waitTillTitle(title){
         this.client=this.client.waitUntil(function(){

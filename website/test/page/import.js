@@ -66,5 +66,5 @@ function wait(client,name){
             var job=document.getElementById("import-job-"+filename)
             return job ? job.dataset.status==="Complete" : false
         },name).then(x=>x.value)
-    },2000,"timeout waiting for job completion",500)
+    },5000,"timeout waiting for job completion",500)
 }

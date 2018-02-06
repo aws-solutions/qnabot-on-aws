@@ -9,7 +9,7 @@ module.exports={
     error:function(test){    
         outputs('dev/master').then(function(output){
         handler({
-            endpoint:output.ElasticSearchEndpoint,
+            endpoint:output.ElasticsearchEndpoint,
             method:'HEAD',
             path:"/test/test/test",
         },{},function(error,result){
@@ -23,7 +23,7 @@ module.exports={
     get:function(test){    
         outputs('dev/master').then(function(output){
         handler({
-            endpoint:output.ElasticSearchEndpoint,
+            endpoint:output.ElasticsearchEndpoint,
             method:'GET',
             path:"/",
         },{},function(error,result){
@@ -37,9 +37,9 @@ module.exports={
     post:function(test){
         outputs('dev/master').then(function(output){
         handler({
-            endpoint:output.ElasticSearchEndpoint,
+            endpoint:output.ElasticsearchEndpoint,
             method:'POST',
-            path:"/"+output.ElasticSearchIndex+'/'+output.ElasticSearchType+'/test',
+            path:"/"+output.ElasticsearchIndex+'/'+output.ElasticsearchType+'/test',
             body:{
                 qid:"test"
             }
@@ -54,18 +54,18 @@ module.exports={
     bulk:function(test){    
         outputs('dev/master').then(function(output){
         handler({
-            endpoint:output.ElasticSearchEndpoint,
+            endpoint:output.ElasticsearchEndpoint,
             method:'POST',
             path:"/_bulk",
             body:[
                 {delete:{
-                    _index:output.ElasticSearchIndex,
-                    _type:output.ElasticSearchType,
+                    _index:output.ElasticsearchIndex,
+                    _type:output.ElasticsearchType,
                     _id:"test-tmp.1"    
                 }},
                 {delete:{
-                    _index:output.ElasticSearchIndex,
-                    _type:output.ElasticSearchType,
+                    _index:output.ElasticsearchIndex,
+                    _type:output.ElasticsearchType,
                     _id:"test-tmp.2"    
                 }}
             ]
@@ -81,7 +81,7 @@ module.exports={
     create:function(test){  
         outputs('dev/master').then(function(output){
             return cfn.CreateAsync({create:{ 
-                endpoint:output.ElasticSearchEndpoint,
+                endpoint:output.ElasticsearchEndpoint,
                 method:'GET',
                 path:"/"
             }})
@@ -94,7 +94,7 @@ module.exports={
     update:function(test){
         outputs('dev/master').then(function(output){
             return cfn.UpdateAsync("",{create:{ 
-                endpoint:output.ElasticSearchEndpoint,
+                endpoint:output.ElasticsearchEndpoint,
                 method:'GET',
                 path:"/"
             }},{})
@@ -107,7 +107,7 @@ module.exports={
     delete:function(test){
         outputs('dev/master').then(function(output){
             return cfn.DeleteAsync("",{delete:{ 
-                endpoint:output.ElasticSearchEndpoint,
+                endpoint:output.ElasticsearchEndpoint,
                 method:'GET',
                 path:"/"
             }})

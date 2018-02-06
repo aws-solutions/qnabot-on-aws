@@ -8,18 +8,15 @@ module.exports={
         done()
     },
     textResponse:async function(test){
-        await this.page.ask("what is a zombie")
-        var anwser=await this.page.getAnwser()
+        var anwser=await this.page.ask("what is a zombie")
 
-        test.ok(anwser.match('zombie'))
+        test.ok(anwser && anwser.match('zombie'))
         test.done()
     },
     cardResponse:async function(test){
         test.done()
     },
     tearDown:async function(done){
-        await this.page.goToEdit()
-        await this.page.deleteAll()
         done()
     }
 }

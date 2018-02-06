@@ -12,10 +12,12 @@ REGION=$AWS_DEFAULT_REGION
 PUBLICBUCKET=$(node -e "console.log(require('$__dirname'+'/../config').publicBucket)")
 PUBLICPREFIX=$(node -e "console.log(require('$__dirname'+'/../config').publicPrefix)")
 
-if [ "$1" == "dryrun" ]; then
+if [ "$1" == "--dryrun" ]; then
     echo "dry run"
     aws s3 cp s3://$DEVBUCKET/$PUBLICPREFIX s3://$PUBLICBUCKET/$PUBLICPREFIX --recursive --dryrun --acl public-read
-else
+fi
+
+if [ "$1" == "--run" ]; then
     aws s3 cp s3://$DEVBUCKET/$PUBLICPREFIX s3://$PUBLICBUCKET/$PUBLICPREFIX --recursive --acl public-read
 fi
 

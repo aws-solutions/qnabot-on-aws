@@ -10,13 +10,12 @@ module.exports=(A)=>class Add extends A{
         await this.waitClick('#add-close')
         await this.exists(qa.qid)
     }
-    async edit(qa){
+    async edit(id,qa){
         await this.setFilter(id)
-        await this.client.execute(function(id){
-           document.getElementById(`qa-${id}-edit`).click() 
-        },qa.qid)
+        await this.waitClick(`#qa-${id.replace('.','\\.')}-edit .btn` )
         await this.client.waitForVisible("#edit-form")
         await this._set('edit',qa) 
+        await this.client.debug()
         await this.client.click('#edit-submit')
         await this.client.watiForVisible("#edit-success")
         await this.waitClick('#edit-close')
@@ -30,6 +29,7 @@ module.exports=(A)=>class Add extends A{
     async _set(path,object){
         var client=this.client
         var self=this
+        console.log(path)
         if(Array.isArray(object)){
             var count=(await client.execute(function(path,value){
                 var count=0
@@ -41,7 +41,7 @@ module.exports=(A)=>class Add extends A{
                 })
                 return count 
             },path,object)).value
-            console.log(path)
+            console.log(path,count,object.length)
             if(count>object.length){
                 for(var i=0;i<count-object.length;i++){ 
                     await client.execute(function(path,done){

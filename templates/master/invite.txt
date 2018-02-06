@@ -2,8 +2,8 @@
 <p>Welcome to QnABot, your temporary password is:
 <p>     {####} 
 <p>
-<p>Please go to the following link to log in and chat with the bot:
-<p>     ${ApiUrl.Name}/pages/client
+<p>Please go to the following link to log in and start building your bot!
+<p>     ${ApiUrl.Name}/pages/designer
 <p>
 <p>Happy to help,
 <p>  QnABot

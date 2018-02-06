@@ -18,10 +18,10 @@ module.exports={
             outputs('dev/bucket').get('Bucket'),
             outputs('dev/master')
         )).tap(console.log).spread(function(bucket,master){
-            process.env.ES_ENDPOINT=master.ElasticSearchEndpoint
+            process.env.ES_ENDPOINT=master.ElasticsearchEndpoint
             process.env.ES_PROXY=master.ESProxyLambda
-            process.env.ES_TYPE=master.ElasticSearchType
-            process.env.ES_INDEX=master.ElasticSearchIndex
+            process.env.ES_TYPE=master.ElasticsearchType
+            process.env.ES_INDEX=master.ElasticsearchIndex
             
             return handler.startAsync({
                 Records:[{
