@@ -52,7 +52,6 @@ module.exports={
     },
     update(context,qa){
         return api(context,'update',_.omit(qa,['select','_score']))
-        .then(()=>context.dispatch('get',{}))
     },
     add(context,qa){
         return api(context,'update',qa)

@@ -15,9 +15,8 @@ module.exports=(A)=>class Add extends A{
         await this.waitClick(`#qa-${id.replace('.','\\.')}-edit .btn` )
         await this.client.waitForVisible("#edit-form")
         await this._set('edit',qa) 
-        await this.client.debug()
-        await this.client.click('#edit-submit')
-        await this.client.watiForVisible("#edit-success")
+        await this.waitClick('#edit-submit')
+        await this.client.waitForVisible("#edit-success")
         await this.waitClick('#edit-close')
     }
     async buildBot(){
@@ -41,30 +40,26 @@ module.exports=(A)=>class Add extends A{
                 })
                 return count 
             },path,object)).value
-            console.log(path,count,object.length)
             if(count>object.length){
                 for(var i=0;i<count-object.length;i++){ 
-                    await client.execute(function(path,done){
-                        document.getElementById(`${path}-remove-0`).click()
-                        setTimeout(done,500)
-                    },path)
+                    await this.waitClick(`#${path.replace('.','\\.')}-remove-0`)
+                    await Promise.delay(500)
                 }
             }else if(count<object.length){
                 for(var i=0;i<object.length-count;i++){ 
-                    await client.execute(function(path,done){
-                        document.getElementById(`${path}-add`).click()
-                        setTimeout(done,500)
-                    },path)
+                    await this.waitClick(`#${path.replace('.','\\.')}-add`)
+                    await Promise.delay(500)
                 }
             }
-            object.forEach((x,i)=>{
-                self._set(`${path}[${i}]`,x)
+            object.forEach(async (x,i)=>{
+                await self._set(`${path}[${i}]`,x)
             })   
         }else if(typeof object==="object"){
             Object.keys(object)
-                .forEach(key=>self._set(`${path}.${key}`,object[key]))
+                .forEach(async key=>await self._set(`${path}.${key}`,object[key]))
         }else if(typeof object==="string"){
-            client.setValue(`[data-path="${path}"]`,object)
+            await client.clearElement(`[data-path="${path}"]`)
+            await client.setValue(`[data-path="${path}"]`,object)
         }
     }
 }

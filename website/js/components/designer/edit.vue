@@ -15,7 +15,8 @@
           v-progress-linear(v-if='!error && !success' indeterminate)
         v-card-actions
           v-spacer
-            v-btn(@click='cancel' flat id="edit-close") close
+            v-btn(v-if="error" @click='cancel' flat id="edit-close") close
+            v-btn(v-if="success" @click='close' flat id="edit-close") close
     v-dialog(v-model='dialog' max-width="80%")
       v-btn(v-if="!label" slot="activator" block icon="icon" @click="refresh") 
         v-icon edit
@@ -86,38 +87,40 @@ module.exports={
       this.dialog=false
       this.loading=false
     },
+    close:function(){
+      this.cancel()
+      this.$store.dispatch('data/get')
+    },
     refresh:function(){
       if(!this.opened){
         this.tmp=_.merge(empty(this.schema),_.cloneDeep(this.data))
         this.opened=true
       }
     },
-    update:function(){
+    update:async function(){
       var self=this
       if(this.valid){
         self.loading=true
         self.dialog=false
-
-        return Promise.resolve((function(){
+        try{
           if(self.data.qid!==self.tmp.qid){
-            return self.$store.dispatch('api/check',self.tmp.qid)
-            .then(x=> x ? Promise.reject("Question with that ID already Exists") : null )
-            .then(()=>self.$store.dispatch('api/remove',self.data.qid))
+            var exists=await self.$store.dispatch('api/check',self.tmp.qid)
+            if(exists){
+              throw "Question with that ID already Exists"
+            }else{
+              await self.$store.dispatch('api/remove',self.data.qid)
+            }
           }
-        })())
-        .then(function(){
-          return self.$store.dispatch('data/update',self.tmp)
-          .then(function(result){
-            self.$emit('update:data',_.cloneDeep(self.tmp))
-            self.success="!success"
-          })
-        })
-        .catch(function(error){
-            self.dialog=true
-            self.loading=false
-            console.log(error)
-            self.error=error
-        })
+          
+          await self.$store.dispatch('data/update',self.tmp)
+          self.$emit('update:data',_.cloneDeep(self.tmp))
+          self.success="!success"
+        }catch(error){
+          self.dialog=true
+          self.loading=false
+          console.log(error)
+          self.error=error
+        }
       }
     }
   }
