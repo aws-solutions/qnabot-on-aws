@@ -1,3 +1,4 @@
+var lexConfig=require('./lex/config')
 module.exports={
     "ESProxyCodeVersion":{
         "Type": "Custom::S3Version",
@@ -16,6 +17,12 @@ module.exports={
             "S3Bucket": {"Ref":"BootstrapBucket"},
             "S3Key": {"Fn::Sub":"${BootstrapPrefix}/lambda/proxy-es.zip"},
             "S3ObjectVersion":{"Ref":"ESProxyCodeVersion"}
+        },
+        "Environment": {
+          "Variables": {
+            "ERRORMESSAGE":lexConfig.ErrorMessage,
+            "EMPTYMESSAGE":lexConfig.EmptyMessage
+          }
         },
         "Handler": "index.query",
         "MemorySize": "1408",

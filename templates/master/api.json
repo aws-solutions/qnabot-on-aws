@@ -38,7 +38,7 @@
     "Bucket":{
       "Value":{"Ref":"Bucket"}
     },
-    "Endpoint":{
+    "ApiEndpoint":{
       "Value":{"Fn::GetAtt":["ApiUrl","Name"]}
     },
     "ESProxyLambda":{

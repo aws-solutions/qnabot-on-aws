@@ -30,7 +30,7 @@ module.exports=function(req,res){
     })
     .then(function(result){
         console.log("ES result:"+JSON.stringify(result,null,2))
-        res.result=_.get(result,"hits.hits[0]._source",{})
+        res.result=_.get(result,"hits.hits[0]._source")
         if(res.result){ 
             res.type="PlainText"
             console.log(res.message)
@@ -54,5 +54,6 @@ module.exports=function(req,res){
             res.type="PlainText"
             res.message=process.env.EMPTYMESSAGE
         }
+        console.log("RESULT",req,res)
     })
 }

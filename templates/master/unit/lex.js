@@ -24,7 +24,7 @@ module.exports={
             self.lex=new aws.LexRuntime({
                 region:config.region,
                 params:{
-                    botAlias:output.BotAlias,
+                    botAlias:"$LATEST",
                     botName:output.BotName,
                     userId:"test"
                 }
@@ -36,8 +36,8 @@ module.exports={
         this.lex.postText({
             inputText:"hello"
         }).promise()
+        .tap(console.log)
         .tap(x=>test.ok(x.sessionAttributes.previous))
-        .then(console.log)
         .finally(test.done)
     },
     miss:function(test){
