@@ -10,16 +10,15 @@ or in the "license" file accompanying this file. This file is distributed on an 
 BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied. See the
 License for the specific language governing permissions and limitations under the License.
 */
-var lib='./lib/middleware/'
+var lib='./lib/middleware'
 var router=new (require('./lib/router'))()
-
-router.add(require(lib+'parse'))
-router.add(require(lib+'preprocess'))
-router.add(require(lib+'query-send'))
-router.add(require(lib+'query-postprocess'))
-router.add(require(lib+'hook-send'))
-router.add(require(lib+'hook-postprocess'))
-router.add(require(lib+'assemble'))
+var fs=require('fs')
+var middleware=fs.readdirSync(`${__dirname}/${lib}`)
+    .filter(name=>name.match(/\d*_.*\.js/))
+    .sort()
+    .forEach(name=>{
+        router.add(require(`${lib}/${name}`))
+    })
 
 exports.handler=function(event,context,callback){
     router.start(event,callback)

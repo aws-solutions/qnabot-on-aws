@@ -9,6 +9,21 @@ module.exports={
             "BuildDate":(new Date()).toISOString()
         }
     },
+    "ESQueryLambda": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Code": {
+            "S3Bucket": {"Ref":"BootstrapBucket"},
+            "S3Key": {"Fn::Sub":"${BootstrapPrefix}/lambda/proxy-es.zip"},
+            "S3ObjectVersion":{"Ref":"ESProxyCodeVersion"}
+        },
+        "Handler": "index.query",
+        "MemorySize": "1408",
+        "Role": {"Fn::GetAtt": ["ESProxyLambdaRole","Arn"]},
+        "Runtime": "nodejs6.10",
+        "Timeout": 300
+      }
+    },
     "ESProxyLambda": {
       "Type": "AWS::Lambda::Function",
       "Properties": {

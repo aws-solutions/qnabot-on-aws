@@ -38,7 +38,7 @@ module.exports={
     middleware:{
         parse:test=>{
             var event=require('./lex')
-            var middleware=require('../lib/middleware/parse')
+            var middleware=require('../lib/middleware/1_parse')
             var req={_event:event}
             var res={}
             var result=middleware(req,res)

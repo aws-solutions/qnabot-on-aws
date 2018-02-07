@@ -29,6 +29,8 @@ module.exports=function(event){
         process.env.LAMBDA_PREPROCESS=lambda.lambda
         process.env.LAMBDA_POSTPROCESS=lambda.lambda
         process.env.LAMBDA_RESPONSE=lambda.lambda
+        process.env.LAMBDA_RESPONSE=lambda.lambda
+        process.env.LAMBDA_DEFAULT_QUERY=lambda.lambda
         process.env.LAMBDA_LOG=lambda.lambda
 
         process.env.AWS_ACCESS_KEY_ID=aws.config.credentials.accessKeyId

@@ -6,6 +6,31 @@ var cfn=Promise.promisifyAll(require('../index'),{multiArgs:true})
 var outputs=require('../../../bin/exports')
 
 module.exports={
+    query:async function(test){
+        var info=await outputs('dev/master')
+        require('../index').query({
+            req:{
+                "question": "help",
+                session:{},
+                "_info":{
+                    es:{
+                        address:info.ElasticsearchEndpoint,
+                        index:info.ElasticsearchIndex,
+                        type:info.ElasticsearchType,
+                    }
+                }
+            },
+            res:{
+                session:{}
+            }
+        },{},function(error,result){
+            console.log("result:",JSON.stringify(result,null,2))
+            console.log("error:",error)
+            test.ok(result.req)
+            test.ok(result.res)
+            test.done()
+        })
+    },
     error:function(test){    
         outputs('dev/master').then(function(output){
         handler({
