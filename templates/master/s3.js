@@ -68,8 +68,17 @@ module.exports={
               ],
               "Resource": [
                 {"Fn::Sub":"arn:aws:s3:::${ImportBucket}/*"},
+                {"Fn::Sub":"arn:aws:s3:::${ExportBucket}/*"},
                 {"Fn::Sub":"arn:aws:s3:::${Bucket}/*"},
                 {"Fn::Sub":"arn:aws:s3:::${AssetBucket}/*"}
+              ]
+            },{
+              "Effect": "Allow",
+              "Action": [
+                "s3:PutObject"
+              ],
+              "Resource": [
+                {"Fn::Sub":"arn:aws:s3:::${ExportBucket}/*"},
               ]
             },{
               "Effect": "Allow",
@@ -77,7 +86,8 @@ module.exports={
                 "s3:DeleteObject"
               ],
               "Resource": [
-                {"Fn::Sub":"arn:aws:s3:::${ImportBucket}/*"}
+                {"Fn::Sub":"arn:aws:s3:::${ImportBucket}/*"},
+                {"Fn::Sub":"arn:aws:s3:::${ExportBucket}/*"}
               ]
             }]
         }

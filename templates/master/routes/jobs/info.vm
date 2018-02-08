@@ -9,10 +9,7 @@
             "statusPrefix":"Status/"
         },
         "exports":{
-            "href":"$root/jobs/exports",
-            "bucket":"$stageVariables.ExportBucket",
-            "uploadPrefix":"data/",
-            "statusPrefix":"Status/"
+            "href":"$root/jobs/exports"
         }
     }
 }

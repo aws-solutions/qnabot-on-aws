@@ -4,6 +4,6 @@
 {
     "bucket":"$stageVariables.ExportBucket",
     "prefix":"data/$input.params('proxy')",
-    "filter":"$inputRoot.filter"
+    "filter":"$inputRoot.get('filter')"
 }
 
