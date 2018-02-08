@@ -56,7 +56,7 @@ module.exports={
     },
     get(context,opts={}){
         _.defaults(opts,{
-            filter:context.state.filter,
+            filter:context.state.filter || '.*',
             order:opts.order || 'asc',
             perpage:opts.perpage
         })

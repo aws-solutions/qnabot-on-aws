@@ -47,7 +47,7 @@ class Page extends modules{
         }catch(e){
             if(e.message.match('is not clickable at point')){
                 await this.client.execute(function(id){
-                   document.querySelector(selector).click() 
+                   document.querySelector(id).click() 
                 },selector)
             }else{
                 throw e

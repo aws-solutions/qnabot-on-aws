@@ -15,8 +15,11 @@ module.exports=(A)=>class Add extends A{
         await this.waitClick(`#qa-${id.replace('.','\\.')}-edit .btn` )
         await this.client.waitForVisible("#edit-form")
         await this._set('edit',qa) 
-        await this.waitClick('#edit-submit')
-        await this.client.waitForVisible("#edit-success")
+        await this.client.debug()
+        await this.client.execute(function(id){
+           document.querySelector(id).click() 
+        },'#edit-submit')
+        await this.client.waitForVisible("#edit-success",10000)
         await this.waitClick('#edit-close')
     }
     async buildBot(){
@@ -28,7 +31,6 @@ module.exports=(A)=>class Add extends A{
     async _set(path,object){
         var client=this.client
         var self=this
-        console.log(path)
         if(Array.isArray(object)){
             var count=(await client.execute(function(path,value){
                 var count=0
@@ -40,6 +42,7 @@ module.exports=(A)=>class Add extends A{
                 })
                 return count 
             },path,object)).value
+
             if(count>object.length){
                 for(var i=0;i<count-object.length;i++){ 
                     await this.waitClick(`#${path.replace('.','\\.')}-remove-0`)
@@ -51,15 +54,20 @@ module.exports=(A)=>class Add extends A{
                     await Promise.delay(500)
                 }
             }
-            object.forEach(async (x,i)=>{
+            await Promise.all(object.map(async (x,i)=>{
                 await self._set(`${path}[${i}]`,x)
-            })   
+            }))
         }else if(typeof object==="object"){
-            Object.keys(object)
-                .forEach(async key=>await self._set(`${path}.${key}`,object[key]))
+            await Promise.all(Object.keys(object)
+                .map(async key=>await self._set(`${path}.${key}`,object[key])))
         }else if(typeof object==="string"){
-            await client.clearElement(`[data-path="${path}"]`)
+            var backspace=[]
+            var current=await client.getValue(`[data-path="${path}"]`)
+            for(var i=0;i<current.length;i++)backspace.push("\uE003")
+
+            await client.setValue(`[data-path="${path}"]`,backspace)
             await client.setValue(`[data-path="${path}"]`,object)
+            await client.setValue(`[data-path="${path}"]`,[" ","\uE003"])
         }
     }
 }
