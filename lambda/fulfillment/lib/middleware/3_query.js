@@ -15,7 +15,7 @@ module.exports=function(req,res){
     }).promise()
     .then(result=>{
         var parsed=JSON.parse(result.Payload)
-        _.merge(req,parsed.req)
-        _.merge(res,parsed.res)
+        req=parsed.req
+        res=parsed.res
     })
 }
