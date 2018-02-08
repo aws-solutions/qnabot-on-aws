@@ -65,7 +65,7 @@ module.exports={
         },
         empty:function(test){
             var router=new Router()
-            router.add((res,req)=>null)
+            router.add((res,req)=>{return {res,req:{out:true}}})
             this.run(router,test)
             .finally(test.done)
         },

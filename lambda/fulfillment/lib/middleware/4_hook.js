@@ -10,6 +10,7 @@ module.exports=function(req,res){
             res,
             response_type:"continue"
         },null,2))
+        console.log("Hook Invoking",arn)
         return lambda.invoke({
             FunctionName:arn,
             InvocationType:"RequestResponse",
@@ -17,9 +18,10 @@ module.exports=function(req,res){
         }).promise()
         .then(result=>{
             var parsed=JSON.parse(result.Payload)
-            _.merge(req,parsed.req)
-            _.merge(res,parsed.res)
-            res.redirect=result.response_type==="continue" ? false : true
+            console.log("Result",JSON.stringify(parsed,null,2))
+            return parsed
         })
+    }else{
+        return {req,res}
     }
 }

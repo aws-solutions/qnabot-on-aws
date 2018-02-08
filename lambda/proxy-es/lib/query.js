@@ -54,6 +54,6 @@ module.exports=function(req,res){
             res.type="PlainText"
             res.message=process.env.EMPTYMESSAGE
         }
-        console.log("RESULT",req,res)
+        console.log("RESULT",JSON.stringify(req),JSON.stringify(res))
     })
 }
