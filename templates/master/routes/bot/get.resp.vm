@@ -3,6 +3,7 @@
 
 {
     "lambdaArn":"$stageVariables.LambdaArn",
+    "lambdaRole":"$stageVariables.LambdaRole",
     "status":"$inputRoot.status",
     "botname":"$stageVariables.BotName",
     "messages":{

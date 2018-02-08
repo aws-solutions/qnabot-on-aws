@@ -83,6 +83,7 @@ module.exports={
     Vuex.mapState([
         'bot'
     ]),
+    
     {
     steps:function(){
       var self=this
@@ -97,6 +98,11 @@ module.exports={
   ),
   created:function(){
     this.$store.dispatch('data/botinfo').catch(()=>null) 
+    var role=new clipboard('#Role',{
+      text:function(){
+        return self.$store.state.bot.lambdaRole
+      }
+    })
     var codeJS=new clipboard('#code-js',{
         text:function(){
           return require('raw-loader!./code.js')

@@ -13,9 +13,14 @@ module.exports=[{
 > ...
 
 2. Choose a runtime, our examples will use either nodejs or python. 
-3. For Role choose "create a custom role" and click allow
+3. Click "Copy Lambda Role" below and paste into Role
 4. click "Create Function"
-    `
+    `,
+buttons:[{
+    text:"Copy Lambda Role",
+    id:"Role",
+    loading:false
+}]
 },{
     title:"Write Code",
     text:`
