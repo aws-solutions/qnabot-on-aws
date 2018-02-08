@@ -1,4 +1,3 @@
-LAMBDAS=$(shell for l in $$(ls ./lambda | grep -v test.js | grep -v README.md);do echo lambda/$$l;done)
 TEMPLATES=$(shell for l in $$(ls ./templates | grep -v util | grep -v README.md);do echo templates/$$l;done)
 
 All: assets templates lambda website build
@@ -11,10 +10,8 @@ build:
 config.json:
 	node bin/config.js > config.json
 
-lambda: $(LAMBDAS) build
-	for l in $(LAMBDAS); do \
-		$(MAKE) -C $$l;		\
-	done;			
+lambda:  build
+	make -C ./lambda
 
 bootstrap: build
 	$(MAKE) ../../build/templates/dev/bootstrap.json -C templates/dev

@@ -12,7 +12,48 @@ module.exports={
         template:"jobs/info",
         resource:{"Ref":"Jobs"}
     }),
+    "exports": resource('exports',{"Ref":"Jobs"}),
+    "exportsList":lambda({
+        authorization:"AWS_IAM",
+        method:"get",
+        lambda:{"Fn::GetAtt":["S3ListLambda","Arn"]},
+        template:fs.readFileSync(__dirname+'/list-export.vm','utf8'),
+        resource:{"Ref":"exports"},
+        parameterLocations:{
+          "method.request.querystring.perpage":false,
+          "method.request.querystring.token":false
+        }
+    }),
+    "export": resource('{proxy+}',{"Ref":"exports"}),
     "imports": resource('imports',{"Ref":"Jobs"}),
+    "exportPut":proxy({
+        resource:{"Ref": "export"},
+        method:"PUT",
+        bucket:{"Ref":"ExportBucket"},
+        path:"/status/{proxy}",
+        template:fs.readFileSync(`${__dirname}/export-start.vm`,'utf-8'),
+        requestParams:{
+            "integration.request.path.proxy":"method.request.path.proxy"
+        }
+    }),
+    "exportGet":proxy({
+        resource:{"Ref": "export"},
+        method:"GET",
+        bucket:{"Ref":"ExportBucket"},
+        path:"/status/{proxy}",
+        requestParams:{
+            "integration.request.path.proxy":"method.request.path.proxy"
+        }
+    }),
+    "exportDelete":proxy({
+        resource:{"Ref": "export"},
+        method:"delete",
+        bucket:{"Ref":"ExportBucket"},
+        path:"/status/{proxy}",
+        requestParams:{
+            "integration.request.path.proxy":"method.request.path.proxy"
+        }
+    }),
     "importsList":lambda({
         authorization:"AWS_IAM",
         method:"get",
@@ -101,7 +142,7 @@ function proxy(opts){
       "Properties": {
         "AuthorizationType": "NONE",
         "HttpMethod":opts.method.toUpperCase(),
-        "Integration": {
+        "Integration": _.pickBy({
           "Type": "AWS",
           "IntegrationHttpMethod":opts.method.toUpperCase(),
           "Credentials":{"Fn::GetAtt":["S3AccessRole","Arn"]},
@@ -112,6 +153,9 @@ function proxy(opts){
                 opts.path
           ]]},
           "RequestParameters":opts.requestParams || {},
+          "RequestTemplates": opts.template ? {
+                "application/json":opts.template 
+          }:null,
           "IntegrationResponses": [
             {
                 "StatusCode":200,
@@ -129,7 +173,7 @@ function proxy(opts){
                 "SelectionPattern":"403"
             }
           ]
-        },
+        }),
         "RequestParameters":{
             "method.request.path.proxy":false
         },

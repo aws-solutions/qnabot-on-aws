@@ -1,0 +1,9 @@
+#set ( $root="https://${context.apiId}.execute-api.${stageVariables.Region}.amazonaws.com/${context.stage}")
+#set($inputRoot = $input.path('$'))
+
+{
+    "bucket":"$stageVariables.ExportBucket",
+    "prefix":"data/$input.params('proxy')",
+    "filter":"$inputRoot.filter"
+}
+

@@ -106,6 +106,7 @@ function stage(name){
             "ESIndex":{"Fn::GetAtt":["Var","index"]},
             "ESType":{"Fn::GetAtt":["Var","type"]},
             "LambdaArn":{"Fn::GetAtt":["FulfillmentLambda","Arn"]},
+            "ExportBucket":{"Ref":"ExportBucket"},
             "ImportBucket":{"Ref":"ImportBucket"},
             "AssetBucket":{"Ref":"AssetBucket"},
             "CognitoEndpoint":{"Fn::GetAtt":["DesignerLogin","Domain"]},
