@@ -61,6 +61,13 @@ module.exports={
             "S3Key": {"Fn::Sub":"${BootstrapPrefix}/lambda/proxy-es.zip"},
             "S3ObjectVersion":{"Ref":"ESProxyCodeVersion"}
         },
+        "Environment": {
+          "Variables": {
+            ES_TYPE:{"Fn::GetAtt":["Var","type"]},
+            ES_INDEX:{"Fn::GetAtt":["Var","index"]},
+            ES_ADDRESS:{"Fn::GetAtt":["ESVar","ESAddress"]}
+          }
+        },
         "Handler": "index.handler",
         "MemorySize": "1408",
         "Role": {"Fn::GetAtt": ["ESProxyLambdaRole","Arn"]},

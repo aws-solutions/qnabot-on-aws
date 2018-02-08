@@ -21,9 +21,8 @@ module.exports=Object.assign(
             "S3ObjectVersion":{"Ref":"ExportCodeVersion"}
         },
         "Environment": {
-            "Variables": {
-                STRIDE:"1000000"
-            }
+            "Variables": {STRIDE:"1000000"},
+            ES_PROXY:{"Ref":"ESProxyLambda"},
         },
         "Handler": "index.start",
         "MemorySize": "128",
