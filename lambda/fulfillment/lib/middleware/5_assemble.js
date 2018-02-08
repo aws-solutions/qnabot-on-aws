@@ -41,5 +41,6 @@ module.exports=function response(req,res){
                 res.out=alexa.assemble(req,res)
                 break;
         }
+        return {req,res}
     })
 }

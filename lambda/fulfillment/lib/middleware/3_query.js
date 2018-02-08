@@ -8,6 +8,7 @@ module.exports=function(req,res){
         req,
         res
     },null,2))
+    console.log("Invokeing QueryLambda",arn)
     return lambda.invoke({
         FunctionName:arn,
         InvocationType:"RequestResponse",
@@ -15,7 +16,7 @@ module.exports=function(req,res){
     }).promise()
     .then(result=>{
         var parsed=JSON.parse(result.Payload)
-        req=parsed.req
-        res=parsed.res
+        console.log("Query Response",JSON.stringify(parsed))
+        return parsed
     })
 }

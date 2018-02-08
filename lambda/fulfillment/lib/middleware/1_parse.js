@@ -27,6 +27,7 @@ module.exports=function(req,res){
             url:""
         }
     })
+    return {req,res}
 }
 
 

@@ -35,7 +35,7 @@ module.exports=class router {
         var self=this
         if(this.middleware[index]){
             return Promise.resolve(this.middleware[index](req,res))
-            .then(()=>self._walk(req,res,++index))
+            .then(result=>self._walk(result.req,result.res,++index))
         }else{
             return Promise.resolve(_.get(res,"out",res))
         }
