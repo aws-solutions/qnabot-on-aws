@@ -116,37 +116,4 @@ exports.step=function(event,context,cb){
     .catch(cb)
 }
 
-exports.start=function(event,context,cb){
-    console.log("starting")
-    console.log("Request",JSON.stringify(event,null,2))
-    var bucket=event.Records[0].s3.bucket.name
-    var key=decodeURI(event.Records[0].s3.object.key)
-    console.log(bucket,key)
-    var config={
-        stride,
-        start:0,
-        end:stride,
-        buffer:"",
-        count:0,
-        failed:0,
-        progress:0,
-        EsErrors:[],
-        time:{
-            rounds:0,
-            start:(new Date()).toISOString()
-        },
-        status:"InProgress",
-        bucket,key,
-        version:event.Records[0].s3.object.versionId
-    }
-    var out_key="status/"+decodeURI(event.Records[0].s3.object.key.split('/').pop())
-    console.log(bucket,out_key) 
-    s3.putObject({
-        Bucket:bucket,
-        Key:out_key,
-        Body:JSON.stringify(config)
-    }).promise()
-    .then(x=>cb(null))
-    .catch(cb)
-}
 

@@ -32,6 +32,8 @@ module.exports={
             ES_INDEX:{"Fn::GetAtt":["Var","index"]},
             ES_ADDRESS:{"Fn::GetAtt":["ESVar","ESAddress"]},
             LAMBDA_DEFAULT_QUERY:{"Ref":"ESQueryLambda"},
+            ES_SERVICE_QID:{"Ref":"ESQidLambda"},
+            ES_SERVICE_PROXY:{"Ref":"ESProxyLambda"},
             "ERRORMESSAGE":config.ErrorMessage,
             "EMPTYMESSAGE":config.EmptyMessage
           }
@@ -55,7 +57,10 @@ module.exports={
               ],
               "Resource":[
                 "arn:aws:lambda:*:*:function:qna-*",
-                "arn:aws:lambda:*:*:function:QNA-*"
+                "arn:aws:lambda:*:*:function:QNA-*",
+                {"Fn::GetAtt":["ESQueryLambda","Arn"]},
+                {"Fn::GetAtt":["ESQidLambda","Arn"]},
+                {"Fn::GetAtt":["ESProxyLambda","Arn"]},
               ]
             }]
         },

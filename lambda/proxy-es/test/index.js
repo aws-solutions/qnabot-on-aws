@@ -6,6 +6,21 @@ var cfn=Promise.promisifyAll(require('../index'),{multiArgs:true})
 var outputs=require('../../../bin/exports')
 
 module.exports={
+    qid:async function(test){
+        var info=await outputs('dev/master')
+        process.env.ES_ADDRESS=info.ElasticsearchEndpoint
+        process.env.ES_INDEX=info.ElasticsearchIndex
+        process.env.ES_TYPE=info.ElasticsearchType
+
+        require('../index').qid({
+           qid:'test.1' 
+        },{},function(error,result){
+            console.log("result:",JSON.stringify(result,null,2))
+            console.log("error:",error)
+            test.ok(result)
+            test.done()
+        })
+    },
     query:async function(test){
         var info=await outputs('dev/master')
         require('../index').query({
