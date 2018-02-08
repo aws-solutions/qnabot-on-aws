@@ -11,6 +11,17 @@ module.exports={
     "_type": "LEX",
     "question": "help",
     "session": session,
+    "_info":{
+        "es":{
+            "address":"elastic search address",
+            "index":"QnABot index in elasticsearch",
+            "type":"QnABot type in elasticsearch",
+            service:{
+                qid:"Arn of ES qid lambda",
+                proxy:"Arn of ES proxy lambda"
+            }
+        }
+    },
     "_original": {
       "currentIntent": {
         "name": "intent-name",
@@ -31,38 +42,6 @@ module.exports={
       "messageVersion": "1.0",
       "sessionAttributes":session 
     },
-    "_query": {
-      "from": 0,
-      "size": 1,
-      "query": {
-        "bool": {
-          "should": [
-            {
-              "nested": {
-                "path": "questions",
-                "score_mode": "max",
-                "boost": 2,
-                "query": {
-                  "match": {
-                    "questions.q": "help"
-                  }
-                }
-              }
-            },
-            {
-              "match": {
-                "a": "help"
-              }
-            },
-            {
-              "match": {
-                "t": ""
-              }
-            }
-          ]
-        }
-      }
-    }
   },
   "res": {
     "type": "plaintext",

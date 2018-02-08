@@ -97,6 +97,7 @@ module.exports={
     }
   ),
   created:function(){
+    var self=this
     this.$store.dispatch('data/botinfo').catch(()=>null) 
     var role=new clipboard('#Role',{
       text:function(){

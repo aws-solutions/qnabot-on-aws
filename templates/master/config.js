@@ -51,7 +51,12 @@ module.exports={
         "JobsGet",
         "importsList",
         "importGet",
-        "importDelete"
+        "importDelete",
+        "exportsList",
+        "exportGet",
+        "exportDelete",
+        "exportPut"
+
     ]
 },
 "Stage":stage('prod'),
