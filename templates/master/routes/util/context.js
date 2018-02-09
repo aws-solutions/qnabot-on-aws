@@ -5,6 +5,7 @@ module.exports={
         "ClientId":"Client-adad",
         "UserPool":"User-adada",
         "CognitoEndpoint":"www.example.com",
+        "ESQidLambda":"lambda",
         "ApiUrl":"url",
         "BotName":"bot",
         "SlotType":"slot",

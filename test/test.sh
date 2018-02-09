@@ -22,7 +22,7 @@ else
     exit 1
 fi
 echo "Testing Api/Lex"
-if $__dirname/run.js $BASE/templates/api/unit/index.js master; then
+if $__dirname/run.js $BASE/templates/api/test/index.js master; then
     echo "Finished Testing Website"
 else
     exit 1

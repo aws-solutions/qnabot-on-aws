@@ -22,68 +22,34 @@ exports.step=function(event,context,cb){
     .then(function(config){
         console.log("Config:",JSON.stringify(config,null,2))
         if(config.status==="InProgress"){
-            return s3.getObject({
-                Bucket:config.bucket,
-                Key:config.key,
-                VersionId:config.version,
-                Range:`bytes=${config.start}-${config.end}`
-            }).promise()
-            .then(function(result){
-                config.buffer+=result.Body.toString()
-                
-                var objects=config.buffer.split(/\n/)
-                try {
-                    JSON.parse(objects[objects.length-1])
-                    config.buffer=""
-                } catch(e){
-                    config.buffer=objects.pop()
-                }
-                var out=[] 
-                objects.filter(x=>x).forEach(x=>{
-                    try{
-                        var obj=JSON.parse(x)
-                        obj.questions=obj.q.map(x=>{return {q:x}})
-                        delete obj.q
-                        out.push(JSON.stringify({
-                            index:{
-                                "_index":process.env.ES_INDEX,
-                                "_type":process.env.ES_TYPE,
-                                "_id":obj.qid
-                            }
-                        }))
-                        config.count+=1
-                        out.push(JSON.stringify(obj))
-                    } catch(e){
-                        config.failed+=1
-                        console.log("Failed to Parse:",e,x)
-                    }
-                })
-                console.log(result.ContentRange)
-                tmp=result.ContentRange.match(/bytes (.*)-(.*)\/(.*)/)
-                progress=(parseInt(tmp[2])+1)/parseInt(tmp[3])
+            var body={
+                endpoint:process.env.ES_ENDPOINT,
+                method:"POST",
+                path:config.scroll_id ? `_search/scroll` : `${config.index}/_search?scroll=1m`,
+                body:config.scroll_id ? {
+                    scroll:'1m',
+                    scroll_id:config.scroll_id
+                }: {
 
-                return out.join('\n')+'\n'
-            })
-            .then(function(result){
-                var body={
-                    endpoint:process.env.ES_ENDPOINT,
-                    method:"POST",
-                    path:"/_bulk",
-                    body:result
+
                 }
-                
-                return lambda.invoke({
-                    FunctionName:process.env.ES_PROXY,
-                    Payload:JSON.stringify(body)
-                }).promise()
-                .tap(console.log)
-                .then(x=>{
-                    config.EsErrors.push(JSON.parse(_.get(x,"Payload","{}")).errors)
-                })
+            }
+            
+            return lambda.invoke({
+                FunctionName:process.env.ES_PROXY,
+                Payload:JSON.stringify(body)
+            }).promise()
+            .tap(console.log).then(x=>x.hits.hits.map(x=>x._source))
+            .then(function(result){
+                if(result.length>0){
+                    //write to s3
+                }else{
+                    config.progress=1
+                    //finish multi part
+                }
             })
             .then(()=>{
-                config.start=(config.end+1)
-                config.end=config.start+config.stride
+                config.scroll_id=
                 config.progress=progress
                 config.time.rounds+=1
                 

@@ -12,25 +12,6 @@ module.exports=Object.assign(
             "BuildDate":(new Date()).toISOString()
         }
     },
-    "ExportStartLambda": {
-      "Type": "AWS::Lambda::Function",
-      "Properties": {
-        "Code": {
-            "S3Bucket": {"Ref":"BootstrapBucket"},
-            "S3Key": {"Fn::Sub":"${BootstrapPrefix}/lambda/export.zip"},
-            "S3ObjectVersion":{"Ref":"ExportCodeVersion"}
-        },
-        "Environment": {
-            "Variables": {STRIDE:"1000000"},
-            ES_PROXY:{"Ref":"ESProxyLambda"},
-        },
-        "Handler": "index.start",
-        "MemorySize": "128",
-        "Role": {"Fn::GetAtt": ["ExportRole","Arn"]},
-        "Runtime": "nodejs6.10",
-        "Timeout": 300
-      }
-    },
     "ExportStepLambda": {
       "Type": "AWS::Lambda::Function",
       "Properties": {

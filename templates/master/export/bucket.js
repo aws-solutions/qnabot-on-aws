@@ -36,13 +36,6 @@ module.exports={
             "Bucket":{"Ref":"ExportBucket"},
             NotificationConfiguration:{
                 LambdaFunctionConfigurations:[{
-                    LambdaFunctionArn:{"Fn::GetAtt":["ExportStartLambda","Arn"]},
-                    Events:["s3:ObjectCreated:*"],
-                    Filter:{Key:{FilterRules:[{
-                        Name:"prefix",
-                        Value:"data"
-                    }]}}
-                },{
                     LambdaFunctionArn:{"Fn::GetAtt":["ExportStepLambda","Arn"]},
                     Events:["s3:ObjectCreated:*"],
                     Filter:{Key:{FilterRules:[{
@@ -51,16 +44,6 @@ module.exports={
                     }]}}
                 }]
             }
-        }
-    },
-    "ExportStartPermission":{
-        "Type": "AWS::Lambda::Permission",
-        "Properties": {
-            "FunctionName":{"Fn::GetAtt":["ExportStartLambda","Arn"]},
-            "Action": "lambda:InvokeFunction",
-            "Principal": "s3.amazonaws.com",
-            "SourceAccount": {"Ref": "AWS::AccountId"},
-            "SourceArn":{"Fn::Sub":"arn:aws:s3:::${ExportBucket}"}
         }
     },
     "ExportStepPermission":{

@@ -32,6 +32,9 @@
         },
         "CognitoEndpoint":{
             "href":"$stageVariables.CognitoEndpoint"
+        },
+        "Services":{
+            "href":"$root/services"
         }
     }
 }

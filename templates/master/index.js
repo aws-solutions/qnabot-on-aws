@@ -24,7 +24,7 @@ base.Resources=Object.assign(
     require('./assets'),
     require('./signup'),
     require('./config'),
-    require('./routes'),
+    require('./routes').resources,
     require('./lambda'),
     require('./policies'),
     require('./roles'),

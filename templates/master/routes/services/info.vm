@@ -1,0 +1,7 @@
+{
+    "elasticsearch":{
+        "qid":"${stageVariables.ESQidLambda}",
+        "proxy":"${stageVariables.ESProxyLambda}"
+    }
+}
+
