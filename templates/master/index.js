@@ -1,40 +1,147 @@
-#! /usr/bin/env node
-/*
-Copyright 2017-2017 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+var fs=require('fs')
+var _=require('lodash')
 
-Licensed under the Amazon Software License (the "License"). You may not use this file
-except in compliance with the License. A copy of the License is located at
+var files=fs.readdirSync(`${__dirname}`)
+    .filter(x=>!x.match(/README.md|Makefile|index|test/))
+    .map(x=>require(`./${x}`))
 
-http://aws.amazon.com/asl/
+module.exports={
+  "Resources":_.assign.apply({},files),
+  "Conditions": {},
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "QnABot with admin and client websites",
+  "Mappings": {},
+  "Outputs": {
+    "BotConsoleUrl":{
+      "Value":{"Fn::Join":["",[
+        "https://console.aws.amazon.com/lex/home?",
+        "region=",{"Ref":"AWS::Region"},
+        "#bot-editor:bot=",{"Ref":"LexBot"}
+      ]]}
+    },
+    "BotName":{
+        "Value":{"Ref":"LexBot"}
+    },
+    "SlotType":{
+        "Value":{"Ref":"SlotType"}
+    },
+    "Intent":{
+        "Value":{"Ref":"Intent"}
+    },
+    "DashboardUrl":{
+        "Value":{"Fn::Join":["",[
+            "https://console.aws.amazon.com/cloudwatch/home?",
+            "region=",{"Ref":"AWS::Region"},
+            "#dashboards:name=",{"Ref":"dashboard"}
+        ]]}
+    },
+    "UserPoolUrl":{
+        "Value":{"Fn::Join":["",[
+            "https://console.aws.amazon.com/cognito/users/",
+            "?region=",{"Ref":"AWS::Region"},
+            "#/pool/",{"Ref":"UserPool"},"/details"
+        ]]}
+    },
+    "Bucket":{
+      "Value":{"Ref":"Bucket"}
+    },
+    "ApiEndpoint":{
+      "Value":{"Fn::GetAtt":["ApiUrl","Name"]}
+    },
+    "ESProxyLambda":{
+        "Value":{"Fn::GetAtt":["ESProxyLambda","Arn"]}
+    },
+    "DesignerLogin": {
+      "Value":{"Fn::Join":["",[
+        {"Fn::GetAtt":["ApiUrl","Name"]},
+        "/pages/designer"
+      ]]}
+    },
+    "ClientUrl": {
+        "Value":{"Fn::If":["Public",
+            {"Fn::GetAtt":["Urls","Client"]},
+            {"Fn::Join":["",[
+                {"Fn::GetAtt":["ApiUrl","Name"]},
+                "/pages/client"
+            ]]}
+        ]}
+    },
+    "ApiId":{
+      "Value": {"Ref":"API"}
+    },
+    "UserPool":{
+      "Value":{"Ref":"UserPool"}
+    },
+    "DesignerClientId":{
+      "Value":{"Ref":"ClientDesigner"}
+    },
+    "ElasticsearchEndpoint":{
+      "Value":{"Fn::GetAtt":["ESVar","ESAddress"]}
+    },
+    "ElasticsearchType":{
+      "Value":{"Fn::GetAtt":["Var","type"]}
+    },
+    "ElasticsearchIndex":{
+      "Value":{"Fn::GetAtt":["Var","index"]}
+    }
+  },
+  "Parameters": {
+    "ElasticsearchName":{
+        "Type":"String",
+        "Default":"EMPTY"
+    },
+    "AdminUserSignUp":{
+      "Type":"String",
+      "AllowedPattern":"(FALSE|TRUE)",
+      "ConstraintDescription":"Allowed Values are FALSE or TRUE",
+      "Default":"TRUE"
+    },
+    "PublicOrPrivate":{
+        "Type":"String",
+        "Description":"(optional) Whether access to the QnABot should be publicly available or restricted to users in QnABot UserPool. Allowed values are PUBLIC or PRIVATE",
+        "AllowedPattern":"(PUBLIC|PRIVATE)",
+        "Default":"PUBLIC",
+        "ConstraintDescription":"Allowed Values are PUBLIC or PRIVATE"
+    },
+    "ApprovedDomain":{
+        "Type":"String",
+        "Description":"(optional) If QnABot is private, restrict user sign up to users whos email domain matches this domain. eg. amazon.com",
+        "Default":"NONE"
+    },
+    "Email":{
+        "Type":"String",
+        "Description":"Email address for the admin user. Will be used for loging in and for setting the admin password. This email will receive the temporary password for the admin user.",
+        "AllowedPattern":".+\\@.+\\..+",
+        "ConstraintDescription":"Must be valid email address eg. johndoe@example.com",
+        "Default":"Johndoe@example.com"
+    },
+    "Username":{
+        "Type":"String",
+        "Description":"Administrator username",
+        "Default":"Admin"
+    },
+    "BootstrapBucket":{
+        "Type":"String"
+    },
+    "BootstrapPrefix":{
+        "Type":"String"
+    },
+    "BuildExamples":{
+      "Type":"String",
+      "Default":"TRUE"
+    }
+  },
+  "Conditions":{
+    "Public":{"Fn::Equals":[{"Ref":"PublicOrPrivate"},"PUBLIC"]},
+    "AdminSignUp":{"Fn::Equals":[{"Ref":"AdminUserSignUp"},"TRUE"]},
+    "Domain":{"Fn::Not":[{"Fn::Equals":[{"Ref":"ApprovedDomain"},"NONE"]}]},
+    "BuildExamples":{"Fn::Equals":[{"Ref":"BuildExamples"},"TRUE"]},
+    "CreateDomain":{"Fn::Equals":[{"Ref":"ElasticsearchName"},"EMPTY"]},
+    "DontCreateDomain":{"Fn::Not":[{"Fn::Equals":[{"Ref":"ElasticsearchName"},"EMPTY"]}]}
+  }
+}
 
-or in the "license" file accompanying this file. This file is distributed on an "AS IS"
-BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied. See the
-License for the specific language governing permissions and limitations under the License.
-*/
 
-var base=require('./api.json')
 
-base.Resources=Object.assign(
-    require('./export'),
-    require('./elasticsearch'),
-    require('./dashboard'),
-    require('./lex'),
-    require('./examples'),
-    require('./import'),
-    require('./assets'),
-    require('./signup'),
-    require('./config'),
-    require('./routes').resources,
-    require('./lambda'),
-    require('./policies'),
-    require('./roles'),
-    require('./cognito'),
-    require('./cfn'),
-    require('./s3'),
-    require('./var'),
-    require('./proxy-es'),
-    require('./proxy-lex'),
-    require('./lex-build')
-)
 
-module.exports=base
+

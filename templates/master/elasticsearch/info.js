@@ -19,7 +19,11 @@ module.exports={
         "MemorySize": "128",
         "Role": {"Fn::GetAtt": ["ESProxyLambdaRole","Arn"]},
         "Runtime": "nodejs6.10",
-        "Timeout": 300
+        "Timeout": 300,
+        "Tags":[{
+            Key:"Type",
+            Value:"CustomResource"
+        }]
       }
     }
 }

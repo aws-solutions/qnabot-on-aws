@@ -32,7 +32,11 @@ module.exports=Object.assign(
         "MemorySize": "320",
         "Role": {"Fn::GetAtt": ["ExportRole","Arn"]},
         "Runtime": "nodejs6.10",
-        "Timeout": 300
+        "Timeout": 300,
+        "Tags":[{
+            Key:"Type",
+            Value:"Export"
+        }]
       }
     },
     "ExportRole": {

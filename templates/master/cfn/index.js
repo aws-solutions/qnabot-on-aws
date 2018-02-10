@@ -11,7 +11,11 @@ module.exports={
         "MemorySize": "128",
         "Role": {"Fn::GetAtt": ["CFNLambdaRole","Arn"]},
         "Runtime": "nodejs6.10",
-        "Timeout": 60
+        "Timeout": 60,
+        "Tags":[{
+            Key:"Type",
+            Value:"CustomResource"
+        }]
       }
     },
     "CFNVersion":{
@@ -39,7 +43,11 @@ module.exports={
         "MemorySize": "128",
         "Role": {"Fn::GetAtt": ["CFNLambdaRole","Arn"]},
         "Runtime": "nodejs6.10",
-        "Timeout": 60
+        "Timeout": 60,
+        "Tags":[{
+            Key:"Type",
+            Value:"CustomResource"
+        }]
       }
     },
     

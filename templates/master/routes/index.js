@@ -1,5 +1,4 @@
-var _=require('lodash')
-exports.resources=Object.assign(
+module.exports=Object.assign(
     require('./bot'),
     require('./health'),
     require('./root'),
@@ -11,9 +10,4 @@ exports.resources=Object.assign(
     require('./services')
 )
 
-var out=[]
-_.forEach(exports.resources,(value,key)=>{
-    value.Type==='AWS::ApiGateway::Method' ? out.push(key) : null
-})
-exports.methods=out
 

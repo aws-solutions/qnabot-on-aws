@@ -54,6 +54,7 @@ async function run(stack,options={}){
         var prefix=exp.Prefix
         var Key=`${prefix}/templates/${stack}.json`
         var TemplateURL=`http://s3.amazonaws.com/${Bucket}/${Key}`
+        console.log(TemplateURL)
         await s3.putObject({Bucket,Key,Body:template}).promise()
         return cf.validateTemplate({TemplateURL}).promise()
     }else{

@@ -75,7 +75,11 @@ module.exports={
         "MemorySize": "128",
         "Role": {"Fn::GetAtt": ["S3ListLambdaRole","Arn"]},
         "Runtime": "nodejs6.10",
-        "Timeout": 300
+        "Timeout": 300,
+        "Tags":[{
+            Key:"Type",
+            Value:"Api"
+        }]
       }
     },
     "ExampleS3ListPhotoLambda": {
@@ -88,7 +92,11 @@ module.exports={
         "MemorySize": "128",
         "Role": {"Fn::GetAtt": ["S3ListLambdaRole","Arn"]},
         "Runtime": "nodejs6.10",
-        "Timeout": 300
+        "Timeout": 300,
+        "Tags":[{
+            Key:"Type",
+            Value:"Api"
+        }]
       }
     }
 }

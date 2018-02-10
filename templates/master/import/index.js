@@ -29,7 +29,11 @@ module.exports=Object.assign(
         "MemorySize": "128",
         "Role": {"Fn::GetAtt": ["ImportRole","Arn"]},
         "Runtime": "nodejs6.10",
-        "Timeout": 300
+        "Timeout": 300,
+        "Tags":[{
+            Key:"Type",
+            Value:"Import"
+        }]
       }
     },
     "ImportStepLambda": {
@@ -52,7 +56,11 @@ module.exports=Object.assign(
         "MemorySize": "320",
         "Role": {"Fn::GetAtt": ["ImportRole","Arn"]},
         "Runtime": "nodejs6.10",
-        "Timeout": 300
+        "Timeout": 300,
+        "Tags":[{
+            Key:"Type",
+            Value:"Import"
+        }]
       }
     },
     "ImportRole": {

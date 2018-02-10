@@ -4,7 +4,7 @@ DST=../../build/templates/$(NAME).json
 LAMBDA_DST=../../build/lambda
 .PHONY: $(LAMBDA_DST)/examples.zip lambda
 
-$(DST):./* ./routes/* ./routes/*/* ./signup/* ./style/* lambda 
+$(DST):./* ./routes/* ./routes/*/* ./signup/* ./cognito/style/* lambda 
 	 $(BUILD) --stack $(NAME) --verbose
 
 ../../build/assets.zip:../../assets/*

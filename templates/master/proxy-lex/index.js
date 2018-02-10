@@ -11,7 +11,11 @@ module.exports={
         "MemorySize": "128",
         "Role": {"Fn::GetAtt": ["LexProxyLambdaRole","Arn"]},
         "Runtime": "nodejs6.10",
-        "Timeout": 300
+        "Timeout": 300,
+        "Tags":[{
+            Key:"Type",
+            Value:"Api"
+        }]
       }
     },
     "LexProxyLambdaRole": {

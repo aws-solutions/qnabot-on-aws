@@ -43,7 +43,12 @@ module.exports={
           ]
         },
         "Runtime": "nodejs6.10",
-        "Timeout": 300
+        "Timeout": 300,
+        "Tags":[{
+            Key:"Type",
+            Value:"Cognito"
+        }]
+
       }
     },
     "SignupLambda": {
@@ -70,7 +75,11 @@ module.exports={
           ]
         },
         "Runtime": "nodejs6.10",
-        "Timeout": 300
+        "Timeout": 300,
+        "Tags":[{
+            Key:"Type",
+            Value:"Cognito"
+        }]
       }
     },
     "SignupLambdaRole": {

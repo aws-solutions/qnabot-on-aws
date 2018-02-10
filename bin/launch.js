@@ -167,6 +167,7 @@ function update(stack,options){
                     var bucket=exp.Bucket
                     var prefix=exp.Prefix
                     var url=`http://s3.amazonaws.com/${bucket}/${prefix}/templates/${stack}.json`
+                    console.log(url)
                     return s3.putObject({
                         Bucket:bucket,
                         Key:`${prefix}/templates/${stack}.json`,

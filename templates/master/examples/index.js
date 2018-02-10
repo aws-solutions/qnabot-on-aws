@@ -52,7 +52,11 @@ module.exports=Object.assign(_.fromPairs(js.map(x=>[x.name,x.resource])),{
         "MemorySize": "128",
         "Role": {"Fn::GetAtt": ["CFNLambdaRole","Arn"]},
         "Runtime": "nodejs6.10",
-        "Timeout": 300
+        "Timeout": 300,
+        "Tags":[{
+            Key:"Type",
+            Value:"CustomResource"
+        }]
       }
     },
     "ExampleLambdaRole":{
@@ -102,7 +106,11 @@ function jslambda(name){
         "MemorySize": "128",
         "Role": {"Fn::GetAtt": ["ExampleLambdaRole","Arn"]},
         "Runtime": "nodejs6.10",
-        "Timeout": 300
+        "Timeout": 300,
+        "Tags":[{
+            Key:"Type",
+            Value:"Example"
+        }]
       }
     }
 }

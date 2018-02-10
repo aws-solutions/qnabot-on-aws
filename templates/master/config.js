@@ -1,3 +1,9 @@
+var _=require('lodash')
+var methods=[]
+_.forEach(require('./routes'),(value,key)=>{
+    value.type==='AWS::ApiGateway::Method' ? methods.push(key) : null
+})
+    
 module.exports={
 "API": {
   "Type": "AWS::ApiGateway::RestApi",
@@ -23,7 +29,7 @@ module.exports={
         "buildDate":new Date(),
         "stage":"prod"
     },
-    "DependsOn":require('./routes').methods
+    "DependsOn":methods
 },
 "Stage":stage('prod'),
 "ApiGatewayAccount": {

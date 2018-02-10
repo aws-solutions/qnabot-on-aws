@@ -42,7 +42,11 @@ module.exports={
         "MemorySize": "1408",
         "Role": {"Fn::GetAtt": ["FulfillmentLambdaRole","Arn"]},
         "Runtime": "nodejs6.10",
-        "Timeout": 300
+        "Timeout": 300,
+        "Tags":[{
+            Key:"Type",
+            Value:"Fulfillment"
+        }]
       }
     },
     "InvokePolicy": {
