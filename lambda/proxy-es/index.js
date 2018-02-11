@@ -17,9 +17,10 @@ exports.handler = (event, context, callback) => {
     .tapCatch(x=>console.log(x))
     .then(result=>callback(null,result))
     .catch(error=>callback(JSON.stringify({
+        type:"[InternalServiceError]",
         status:error.response.status,
         message:error.response.statusText,
-        body:error.response.data
+        data:error.response.data
     })))
 }
 

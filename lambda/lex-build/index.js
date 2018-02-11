@@ -13,12 +13,15 @@ License for the specific language governing permissions and limitations under th
 
 var Promise=require('bluebird')
 var lib=require('./lib')
+var aws=require('./lib/aws')
+var lambda=new aws.Lambda()
+var lex=new aws.LexModelBuildingService()
 
 exports.handler=function(event,context,callback){
     console.log("Event:",JSON.stringify(event,null,2))
     
-    return lib(event).then(()=>callback(null,"success")).catch(callback)
+    return lib(event).then(()=>callback(null,"success"))
+        .catch(callback)
 }
-
 
 

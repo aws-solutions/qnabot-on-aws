@@ -3,7 +3,9 @@ var methods=[]
 _.forEach(require('./routes'),(value,key)=>{
     value.type==='AWS::ApiGateway::Method' ? methods.push(key) : null
 })
-    
+
+var permissions=_.keys(require('./lambda')).filter(x=>x.match(/^InvokePermission/))
+
 module.exports={
 "API": {
   "Type": "AWS::ApiGateway::RestApi",
@@ -11,7 +13,7 @@ module.exports={
     "Name": {"Ref": "AWS::StackName"},
     "Description":"An Api interface for the admin actions on the QNA bot"
   },
-  "DependsOn": ["InvokePermissionESProxy","InvokePermissionLexProxy","InvokePermissionLexBuild","InvokePermissionSchema","InvokePermissionS3List", "InvokePermissionExampleList","InvokePermissionExamplePhotoList"]
+  "DependsOn":permissions 
 },
 "ApiCompression":{
     "Type": "Custom::ApiCompression",

@@ -147,6 +147,9 @@ exports.start=function(event,context,cb){
         Body:JSON.stringify(config)
     }).promise()
     .then(x=>cb(null))
-    .catch(cb)
+    .catch(x=>cb(JSON.stringify({
+        type:"[InternalServiceError]",
+        data:x
+    })))
 }
 

@@ -28,14 +28,26 @@ module.exports=function(params){
                 "ResponseTemplates":{
                     "application/json":{"Fn::Sub":params.responseTemplate}
                 }
-            },params.errors || {   
-                "SelectionPattern":params.errorMessage || "Error:.*",
-                "StatusCode": params.errorCode || 500,
+            },{   
+                "SelectionPattern":".*[InternalServiceError].*",
+                "StatusCode": 500,
                 "ResponseTemplates":{
                     "application/json":fs.readFileSync(__dirname+"/../error/error.vm",'utf8')
                 }
-          })
-          ,
+            },{   
+                "SelectionPattern":".*[BadRequest].*",
+                "StatusCode": 400,
+                "ResponseTemplates":{
+                    "application/json":fs.readFileSync(__dirname+"/../error/error.vm",'utf8')
+                }
+            },{   
+                "SelectionPattern":".*[Conflict].*",
+                "StatusCode": 409,
+                "ResponseTemplates":{
+                    "application/json":fs.readFileSync(__dirname+"/../error/error.vm",'utf8')
+                }
+            }
+          ),
           "RequestParameters":params.parameterNames,
           "RequestTemplates": {
             "application/json":params.subTemplate ? 
@@ -65,15 +77,4 @@ module.exports=function(params){
     },{
         emptyStrings:false 
     })
-}
-function errorResponse(code){
-    return {
-        "StatusCode": code,
-        "SelectionPattern":'"httpCode":"'+code+'"',
-        "ResponseTemplates":{
-            "application/json":fs.readFileSync(
-                templates+'/response.fail.vm',"utf8"
-            )
-        }
-    }  
 }

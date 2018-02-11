@@ -4,7 +4,8 @@ aws.config.region=process.env.AWS_REGION
 exports.handler = (event, context, callback) => {
     console.log('Received event:', JSON.stringify(event, null, 2));
     try {
-        es(event).then(function(result){
+        es(event)
+        .then(function(result){
             var tmp1=result[Object.keys(result)[0]].mappings
             var schema=tmp1[Object.keys(tmp1)[0]]
             var out=schema._meta.schema
@@ -20,9 +21,15 @@ exports.handler = (event, context, callback) => {
             test2string(out)
             callback(null,out)
         })
-        .catch(callback)
+        .catch(x=>callback(JSON.stringify({
+            type:"[InternalServiceError]",
+            data:x
+        })))
     } catch(e){
-        callback(e)
+        callback(JSON.stringify({
+            type:"[InternalServiceError]",
+            data:e
+        }))
     }
 }
 function test2string(obj){

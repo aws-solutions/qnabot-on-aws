@@ -21,7 +21,10 @@ exports.handler = (event, context, callback) => {
             }})
         })
     })
-    .catch(callback)
+    .catch(e=>callback(JSON.stringify({
+        type:"[InternalServiceError]",
+        data:e
+    })))
 }
 
 

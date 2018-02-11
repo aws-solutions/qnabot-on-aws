@@ -22,9 +22,10 @@ exports.photos = (event, context, callback) => {
             photos
         })
     })
-    .catch(callback)
-
-
+    .catch(e=>callback(JSON.stringify({
+        type:"[InternalServiceError]",
+        data:e
+    })))
 }
 exports.documents = (event, context, callback) => {
     console.log('Received event:', JSON.stringify(event, null, 2));
@@ -58,7 +59,10 @@ exports.documents = (event, context, callback) => {
             examples:Object.keys(examples).map(x=>examples[x])
         })
     })
-    .catch(callback)
+    .catch(e=>callback(JSON.stringify({
+        type:"[InternalServiceError]",
+        data:e
+    })))
 }
 
 

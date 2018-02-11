@@ -36,6 +36,24 @@ module.exports={
         }]
       }
     },
+    "LexBuildInvokePolicy": {
+      "Type": "AWS::IAM::ManagedPolicy",
+      "Properties": {
+        "PolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [{
+              "Effect": "Allow",
+              "Action": [
+                "lambda:InvokeFunction"
+              ],
+              "Resource":[
+                {"Fn::GetAtt":["LexBuildLambda","Arn"]}
+              ]
+            }]
+        },
+        "Roles": [{"Ref": "LexBuildLambdaRole"}]
+      }
+    },
     "LexBuildLambdaRole": {
       "Type": "AWS::IAM::Role",
       "Properties": {
@@ -61,7 +79,7 @@ module.exports={
                     "Resource":[
                         {"Fn::Sub":"arn:aws:s3:::${AssetBucket}*"}
                     ]
-                }]
+                },]
             }
         }],
         "Path": "/",

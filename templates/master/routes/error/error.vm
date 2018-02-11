@@ -2,7 +2,8 @@
 
 
 {
-    "status":$errorMessageObj.status,
-    "message":"$errorMessageObj.message"
+    "type":$errorMessageObj.type,
+    "message":"$errorMessageObj.message",
+    "data":"$errorMessageObj.data"
 }
 
