@@ -1,7 +1,7 @@
 {
-    "endpoint":"$stageVariables.ESEndpoint",
+    "endpoint":"${ESVar.ESAddress}",
     "method":"DELETE",
-    "path":"/$stageVariables.ESIndex/$stageVariables.ESType/$util.urlDecode($input.params('ID'))?refresh=wait_for"
+    "path":"/${Var.type}/${Var.index}/$util.urlDecode($input.params('ID'))?refresh=wait_for"
 }
 
 

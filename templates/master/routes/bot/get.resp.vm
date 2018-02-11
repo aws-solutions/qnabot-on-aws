@@ -1,11 +1,11 @@
-#set ( $root="https://${context.apiId}.execute-api.${stageVariables.Region}.amazonaws.com/${context.stage}")
+#set ( $root="https://${!context.apiId}.execute-api.${!Region}.amazonaws.com/${!context.stage}")
 #set($inputRoot = $input.path('$'))
 
 {
-    "lambdaArn":"$stageVariables.LambdaArn",
-    "lambdaRole":"$stageVariables.LambdaRole",
+    "lambdaArn": "${FulfillmentLambda.Arn}",
+    "lambdaRole":"${FulfillmentLambdaRole}",
     "status":"$inputRoot.status",
-    "botname":"$stageVariables.BotName",
+    "botname":"${LexBot}",
     "messages":{
         "clarification":[
             #foreach($message in $input.path('$.clarificationPrompt.messages'))
@@ -24,9 +24,6 @@
         },
         "alexa":{
             "href":"$root/bot/alexa"
-        },
-        "hooks":{
-            "href":"$root/bot/hooks"
         }
     }
 }

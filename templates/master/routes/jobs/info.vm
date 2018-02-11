@@ -1,10 +1,10 @@
-#set ( $root="https://${context.apiId}.execute-api.${stageVariables.Region}.amazonaws.com/${context.stage}")
+#set ( $root="https://${!context.apiId}.execute-api.${AWS::Region}.amazonaws.com/${!context.stage}")
 
 {
     "_links":{
         "imports":{
             "href":"$root/jobs/imports",
-            "bucket":"$stageVariables.ImportBucket",
+            "bucket":"${ImportBucket}",
             "uploadPrefix":"data/",
             "statusPrefix":"Status/"
         },

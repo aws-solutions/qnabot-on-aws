@@ -26,11 +26,16 @@ module.exports={
             .tap(console.log)
             .tap(test.ok)
             .then(function(result){
-                return Promise.all(_.values(result._links).map(x=>api({
-                    href:x.href,
-                    method:"get"
-                }).tap(test.ok).catch(test.ifError)
-                ))
+                return Promise.all(_.values(result._links).map(x=>{
+                    return api({
+                        href:x.href,
+                        method:"get"
+                    })
+                    .tap(test.ok)
+                    .tapCatch(()=>console.log("error",x.href))
+                    .catch(test.ifError)
+                    
+                }))
             })
             .catch(test.ifError)
             .finally(()=>test.done())

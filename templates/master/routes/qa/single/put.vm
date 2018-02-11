@@ -1,9 +1,9 @@
 #set($inputRoot = $input.path('$'))
 
 {
-    "endpoint":"$stageVariables.ESEndpoint",
+    "endpoint":"${ESVar.ESAddress}",
     "method":"PUT",
-    "path":"/$stageVariables.ESIndex/$stageVariables.ESType/$input.params('ID')?refresh=wait_for",
+    "path":"/${Var.index}/${Var.type}/$input.params('ID')?refresh=wait_for",
     "body":{
         #foreach($paramName in $inputRoot.keySet())
             #if( $paramName == 'q')

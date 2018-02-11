@@ -9,7 +9,7 @@ module.exports={
     "JobsGet":mock({
         auth:'AWS_IAM',
         method:"GET",
-        template:"jobs/info",
+        subTemplate:"jobs/info",
         resource:{"Ref":"Jobs"}
     }),
     "exports": resource('exports',{"Ref":"Jobs"}),
@@ -17,7 +17,7 @@ module.exports={
         authorization:"AWS_IAM",
         method:"get",
         lambda:{"Fn::GetAtt":["S3ListLambda","Arn"]},
-        template:fs.readFileSync(__dirname+'/list-export.vm','utf8'),
+        subTemplate:fs.readFileSync(__dirname+'/list-export.vm','utf8'),
         resource:{"Ref":"exports"},
         parameterLocations:{
           "method.request.querystring.perpage":false,
@@ -31,7 +31,7 @@ module.exports={
         method:"PUT",
         bucket:{"Ref":"ExportBucket"},
         path:"/status/{proxy}",
-        template:fs.readFileSync(`${__dirname}/export-start.vm`,'utf-8'),
+        subTemplate:fs.readFileSync(`${__dirname}/export-start.vm`,'utf-8'),
         requestParams:{
             "integration.request.path.proxy":"method.request.path.proxy"
         }
@@ -58,7 +58,7 @@ module.exports={
         authorization:"AWS_IAM",
         method:"get",
         lambda:{"Fn::GetAtt":["S3ListLambda","Arn"]},
-        template:fs.readFileSync(__dirname+'/list.vm','utf8'),
+        subTemplate:fs.readFileSync(__dirname+'/list.vm','utf8'),
         resource:{"Ref":"imports"},
         parameterLocations:{
           "method.request.querystring.perpage":false,

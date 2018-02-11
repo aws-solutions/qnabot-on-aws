@@ -1,12 +1,12 @@
-#set ( $root="https://${context.apiId}.execute-api.${stageVariables.Region}.amazonaws.com/${context.stage}")
+#set ( $root="https://${!context.apiId}.execute-api.${!Region}.amazonaws.com/${!context.stage}")
 
 {
-    "region":"$stageVariables.Region",
-    "BotName":"$stageVariables.BotName",
-    "PoolId":"$stageVariables.IdPool",
-    "ClientIdClient":"$stageVariables.ClientIdClient",
-    "ClientIdDesigner":"$stageVariables.ClientIdDesigner",
-    "UserPool":"$stageVariables.UserPool",
+    "region":"${!Region}",
+    "BotName":"${LexBot}",
+    "PoolId":"${IdPool}",
+    "ClientIdClient":"${ClientClient}",
+    "ClientIdDesigner":"${ClientDesigner}",
+    "UserPool":"${UserPool}",
     "Id":"$stageVariables.Id",
     "_links":{
         "root":{

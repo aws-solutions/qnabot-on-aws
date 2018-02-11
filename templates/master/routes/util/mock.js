@@ -1,5 +1,5 @@
 var fs=require('fs')
-
+var _=require('lodash')
 module.exports=function(opts){
     return {
       "Type": "AWS::ApiGateway::Method",
@@ -10,7 +10,12 @@ module.exports=function(opts){
           "Type": "MOCK",
           "IntegrationResponses": [{
             "ResponseTemplates":{
-                "application/json":fs.readFileSync(
+                "application/json":opts.subTemplate ? 
+                {"Fn::Sub":fs.readFileSync(
+                    __dirname+"/../"+opts.subTemplate+".vm",
+                    "utf8"
+                )} :
+                fs.readFileSync(
                     __dirname+"/../"+opts.template+".vm",
                     "utf8"
                 )

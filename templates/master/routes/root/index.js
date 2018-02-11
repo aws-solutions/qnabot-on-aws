@@ -5,7 +5,7 @@ module.exports={
 "rootGet": mock({
     auth:'NONE',
     method:"GET",
-    template:"root/info",
+    subTemplate:"root/info",
     resource:{"Fn::GetAtt": ["API","RootResourceId"]}
 })
 }

@@ -1,8 +1,8 @@
 {
-    "botname":"$stageVariables.BotName",
-    "slottype":"$stageVariables.SlotType",
-    "intent":"$stageVariables.Intent",
-    "address":"$stageVariables.ESEndpoint",
-    "index":"$stageVariables.ESIndex",
-    "type":"$stageVariables.ESType"
+    "botname":"${LexBot}",
+    "slottype":"${SlotType}",
+    "intent":"${Intent}",
+    "address":"${ESVar.ESAddress}",
+    "index":"${Var.index}",
+    "type":"${Var.type}"
 }  

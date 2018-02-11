@@ -1,7 +1,7 @@
 {
     "fnc":"getSlotType",
     "params":{
-        "name":"$stageVariables.SlotType",
+        "name":"${SlotType}",
         "version":"\$LATEST"
     }
 }                

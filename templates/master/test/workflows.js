@@ -281,7 +281,7 @@ module.exports={
         },
     },
     import:function(test){
-        var count=100000
+        var count=20000
         var name=(new Date()).getTime()
         console.log(name)
         api({
@@ -356,11 +356,6 @@ module.exports={
             }
         }))
         .finally(()=>test.done())
-    },
-    hooks:{
-        //get 
-        //update
-        //replace
     }
 }
 

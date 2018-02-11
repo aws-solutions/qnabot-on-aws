@@ -1,7 +1,7 @@
 {
-    "endpoint":"$stageVariables.ESEndpoint",
+    "endpoint":"${ESVar.ESAddress}",
     "method":"HEAD",
-    "path":"/$stageVariables.ESIndex/$stageVariables.ESType/$util.urlDecode($input.params('ID'))"
+    "path":"/${Var.index}/${Var.type}/$util.urlDecode($input.params('ID'))"
 }
 
 

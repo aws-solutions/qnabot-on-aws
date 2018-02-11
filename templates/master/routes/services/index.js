@@ -7,7 +7,7 @@ module.exports={
     "ServicesGet":mock({
         auth:'AWS_IAM',
         method:"GET",
-        template:"services/info",
+        subTemplate:"services/info",
         resource:{"Ref":"Services"}
     })
 }

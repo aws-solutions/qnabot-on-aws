@@ -9,7 +9,7 @@ module.exports={
     "ExamplesGet":mock({
         auth:'NONE',
         method:"GET",
-        template:"examples/info",
+        subTemplate:"examples/info",
         resource:{"Ref":"Examples"}
     }),
     "photos":resource('photos',{"Ref":"Examples"}),
@@ -17,7 +17,7 @@ module.exports={
         authorization:"AWS_IAM",
         method:"get",
         lambda:{"Fn::GetAtt":["ExampleS3ListPhotoLambda","Arn"]},
-        template:fs.readFileSync(__dirname+'/photos.vm','utf8'),
+        subTemplate:fs.readFileSync(__dirname+'/photos.vm','utf8'),
         resource:{"Ref":"photos"},
         parameterLocations:{
           "method.request.querystring.perpage":false,
@@ -39,7 +39,7 @@ module.exports={
         authorization:"AWS_IAM",
         method:"get",
         lambda:{"Fn::GetAtt":["ExampleS3ListLambda","Arn"]},
-        template:fs.readFileSync(__dirname+'/list.vm','utf8'),
+        subTemplate:fs.readFileSync(__dirname+'/list.vm','utf8'),
         resource:{"Ref":"Documents"},
         parameterLocations:{
           "method.request.querystring.perpage":false,

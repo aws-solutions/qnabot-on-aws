@@ -11,9 +11,9 @@
 #end
 
 {
-    "endpoint":"$stageVariables.ESEndpoint",
+    "endpoint":"${ESVar.ESAddress}",
     "method":"POST",
-    "path":"/$stageVariables.ESIndex/$stageVariables.ESType/_search?search_type=dfs_query_then_fetch",
+    "path":"/${Var.index}/${Var.type}/_search?search_type=dfs_query_then_fetch",
     "body":{
         "size":"$perpage",
         "from":"$from",

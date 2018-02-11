@@ -9,7 +9,7 @@ require('./schema'),{
     authorization:"AWS_IAM",
     method:"get",
     lambda:{"Fn::GetAtt":["ESProxyLambda","Arn"]},
-    template:fs.readFileSync(__dirname+'/single/get.vm','utf8'),
+    subTemplate:fs.readFileSync(__dirname+'/single/get.vm','utf8'),
     responseTemplate:fs.readFileSync(__dirname+'/single/get.resp.vm','utf8'),
     resource:{"Ref":"Questions"},
     parameterLocations:{
@@ -25,7 +25,7 @@ require('./schema'),{
     authorization:"AWS_IAM",
     method:"delete",
     lambda:{"Fn::GetAtt":["ESProxyLambda","Arn"]},
-    template:fs.readFileSync(__dirname+'/collection/delete.vm','utf8'),
+    subTemplate:fs.readFileSync(__dirname+'/collection/delete.vm','utf8'),
     responseTemplate:fs.readFileSync(__dirname+'/collection/delete.resp.vm','utf8'),
     defaultResponse:204,
     resource:{"Ref":"Questions"}
@@ -42,7 +42,7 @@ require('./schema'),{
         }
     }],
     lambda:{"Fn::GetAtt":["ESProxyLambda","Arn"]},
-    template:fs.readFileSync(__dirname+'/single/head.vm','utf8'),
+    subTemplate:fs.readFileSync(__dirname+'/single/head.vm','utf8'),
     responseTemplate:fs.readFileSync(__dirname+'/single/head.resp.vm','utf8'),
     resource:{"Ref":"Question"},
     parameterLocations:{
@@ -53,7 +53,7 @@ require('./schema'),{
     authorization:"AWS_IAM",
     method:"put",
     lambda:{"Fn::GetAtt":["ESProxyLambda","Arn"]},
-    template:fs.readFileSync(__dirname+'/single/put.vm','utf8'),
+    subTemplate:fs.readFileSync(__dirname+'/single/put.vm','utf8'),
     responseTemplate:fs.readFileSync(__dirname+'/single/put.resp.vm','utf8'),
     resource:{"Ref":"Question"},
     parameterLocations:{
@@ -65,14 +65,14 @@ require('./schema'),{
     authorization:"AWS_IAM",
     method:"options",
     lambda:{"Fn::GetAtt":["SchemaLambda","Arn"]},
-    template:fs.readFileSync(__dirname+'/single/options.vm','utf8'),
+    subTemplate:fs.readFileSync(__dirname+'/single/options.vm','utf8'),
     resource:{"Ref":"Questions"}
 }),
 "QuestionDelete":lambda({
     authorization:"AWS_IAM",
     method:"delete",
     lambda:{"Fn::GetAtt":["ESProxyLambda","Arn"]},
-    template:fs.readFileSync(__dirname+'/single/delete.vm','utf8'),
+    subTemplate:fs.readFileSync(__dirname+'/single/delete.vm','utf8'),
     responseTemplate:fs.readFileSync(__dirname+'/single/delete.resp.vm','utf8'),
     resource:{"Ref":"Question"},
     defaultResponse:204,

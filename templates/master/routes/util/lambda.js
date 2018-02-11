@@ -26,7 +26,7 @@ module.exports=function(params){
                 "StatusCode": params.defaultResponse || 200,
                 "ResponseParameters":params.responseParameters,
                 "ResponseTemplates":{
-                    "application/json":params.responseTemplate
+                    "application/json":{"Fn::Sub":params.responseTemplate}
                 }
             },params.errors || {   
                 "SelectionPattern":params.errorMessage || "Error:.*",
@@ -38,7 +38,9 @@ module.exports=function(params){
           ,
           "RequestParameters":params.parameterNames,
           "RequestTemplates": {
-            "application/json":params.template 
+            "application/json":params.subTemplate ? 
+                {"Fn::Sub":params.subTemplate} :
+                params.template 
           }
         },
         "RequestModels":params.models,

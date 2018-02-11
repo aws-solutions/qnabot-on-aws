@@ -1,7 +1,7 @@
 {
     "fnc":"getBot",
     "params":{
-        "name":"$stageVariables.BotName",
+        "name":"${LexBot}",
         "versionOrAlias":"\$LATEST"
     }
 }                

@@ -1,8 +1,8 @@
 {
-    "endpoint":"$stageVariables.ESEndpoint",
+    "endpoint":"${ESVar.ESAddress}",
     "method":"POST",
 #if($input.path('$.query').length()!=0)
-    "path":"/$stageVariables.ESIndex/$stageVariables.ESType/_delete_by_query?refresh=wait_for",
+    "path":"/${Var.index}/${Var.type}/_delete_by_query?refresh=wait_for",
     "body":{
         "query":{
             "bool":{
@@ -14,12 +14,12 @@
         }
     }
 #else
-    "path":"/$stageVariables.ESIndex/$stageVariables.ESType/_bulk?refresh=wait_for",
+    "path":"/${Var.index}/${Var.type}/_bulk?refresh=wait_for",
     "body":[
         #foreach($qid in $input.path('$.list'))
         { "delete":{
-            "_index":"$stageVariables.ESIndex", 
-            "_type" :"$stageVariables.ESType",
+            "_index":"${Var.index}", 
+            "_type" :"${Var.type}",
             "_id" : "$qid" } }#if($foreach.hasNext),#end
         #end
     ]
