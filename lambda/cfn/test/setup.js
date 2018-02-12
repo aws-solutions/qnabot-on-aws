@@ -4,6 +4,7 @@ var chalk=require('chalk')
 var Promise=require('bluebird')
 var config=require('../../../config')
 
+var outputs=require('../../../bin/exports')
 var fs=Promise.promisifyAll(require('fs'))
 var aws=require('aws-sdk')
 aws.config.setPromisesDependency(Promise)
@@ -15,10 +16,13 @@ module.exports=function(event){
     process.env.AWS_REGION=config.region
 
     
-    return Promise.resolve(event).then(function(ev){
+    return Promise.join(
+        event,
+        outputs('dev/lambda') 
+    ).spread(function(ev,output){
         return new Promise(function(res,rej){
             require('../index.js').handler(ev,{
-                invokedFunctionArn:"arn:aws:lambda:us-east-1:111111111111:function:tmp",
+                invokedFunctionArn:output.lambda,
                 done:res
             })
         })

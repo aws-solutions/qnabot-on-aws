@@ -1,4 +1,4 @@
-var config=require('../../../config')
+var config=require('../../../../config')
 process.env.AWS_PROFILE=config.profile
 process.env.AWS_DEFAULT_REGION=config.region
 var query=require('query-string').stringify
@@ -13,10 +13,10 @@ var aws=require('aws-sdk')
 aws.config.setPromisesDependency(Promise)
 aws.config.region=config.region
 var s3=new aws.S3()
-var outputs=require('../../../bin/exports')
-var exists=require('./util').exists
-var run=require('./util').run
-var api=require('./util').api
+var outputs=require('../../../../bin/exports')
+var exists=require('./../util').exists
+var run=require('./../util').run
+var api=require('./../util').api
 var faker=require('faker').lorem
 var range=require('range').range
 
@@ -164,122 +164,7 @@ module.exports={
             .finally(()=>test.done())
         }
     },
-    export:{
-        setUp:function(done){
-            var count=10000
-            var name=(new Date()).getTime()
-            this.name=name
-            api({
-                path:"jobs",
-                method:"GET"
-            })
-            .then(x=>x._links.imports)
-            .tap(info=>s3.putObject({
-                Bucket:info.bucket,
-                Key:info.uploadPrefix+name,
-                Body:range(0,count).map(qna).join('\n')
-            }).promise())
-            .tap(function(info){
-                return new Promise(function(res,rej){
-                    function next(i){
-                        console.log("tries left:"+i)
-                        if(i>0){
-                            api({
-                                path:"jobs/imports",
-                                method:"GET"
-                            })
-                            .then(x=>x.jobs.map(y=>y.id).includes(name) ? 
-                                setTimeout(()=>next(--i),2000) : res(x) )
-                            .catch(x=>x.statusCode===404,
-                                ()=>setTimeout(()=>next(--i),2000))
-                            .catch(rej)
-                        }else{
-                            rej("timeout")
-                        }
-                    }
-                    next(100)
-                })
-            })
-            .then(function(info){
-                return new Promise(function(res,rej){
-                    function next(i){
-                        console.log("tries left:"+i)
-                        if(i>0){
-                            api({
-                                path:"jobs/imports/"+name,
-                                method:"GET"
-                            })
-                            .tapCatch(console.log)
-                            .then(x=>x.status==="InProgress" ? 
-                                setTimeout(()=>next(--i),2000) : res(x) )
-                            .catch(x=>x.response.status===404,
-                                ()=>setTimeout(()=>next(--i),2000))
-                            .catch(rej)
-                        }else{
-                            rej("timeout")
-                        }
-                    }
-                    next(100)
-                })
-            })
-            .finally(done)
-        },
-        all:async function(test){
-            var info=await api({
-                path:"jobs",
-                method:"GET"
-            })
-
-            var start=await api({
-                href:`${info._links.exports.href}/test-all`,
-                method:"PUT",
-                body:{}
-            })
-
-            var status=await api({
-                href:`${info._links.exports.href}/test-all`,
-                method:"GET",
-            })
-            var status=await api({
-                href:`${info._links.exports.href}/test-all`,
-                method:"DELETE",
-            })
-            console.log(status)
-            test.done()             
-        },
-        filter:async function(test){
-            var info=await api({
-                path:"jobs",
-                method:"GET"
-            })
-            var start=await api({
-                href:`${info._links.exports.href}/test-filter`,
-                method:"PUT",
-                body:{
-                    filter:"none.*" 
-                }
-            })
-            var status=await api({
-                href:`${info._links.exports.href}/test-filter`,
-                method:"DELETE",
-            })
-            test.done()             
-        },
-        tearDown:async function(done){
-            await api({
-                path:"jobs/imports/"+this.name,
-                method:"DELETE"
-            })
-            await api({
-                path:"questions",
-                method:"DELETE",
-                body:{
-                    query:"bulk-test.*"
-                }
-            })
-            done()
-        },
-    },
+    export:require('./export'),
     import:function(test){
         var count=20000
         var name=(new Date()).getTime()

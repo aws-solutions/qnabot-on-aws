@@ -9,7 +9,7 @@ var lambdas=[]
 _.forEach(_.assign.apply({},files),(value,key)=>{
     if(value.Type==='AWS::Lambda::Function'){
         var type=_.fromPairs(value.Properties.Tags.map(x=>[x.Key,x.Value])).Type
-        if(type==="Api"){
+        if(type==="Api" || type=="Service"){
             lambdas.push([
                 `InvokePermission${key}`,
                 permission(key)

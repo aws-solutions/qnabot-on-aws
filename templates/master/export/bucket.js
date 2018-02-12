@@ -6,6 +6,11 @@ module.exports={
                 Rules:[{
                     NoncurrentVersionExpirationInDays:1,
                     Status:"Enabled"
+                },{
+                    AbortIncompleteMultipartUpload:{
+                        DaysAfterInitiation:1
+                    },
+                    Status:"Enabled"
                 }]
             },
             "VersioningConfiguration":{

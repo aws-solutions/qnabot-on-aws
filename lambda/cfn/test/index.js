@@ -48,7 +48,7 @@ module.exports={
         lifecycle(require('./params/role'),test)
     },
     clear:function(test){
-        lifecycle(require('./params/s3-clear'),test)
+        lifecycle(require('./params/s3-clear'),test,2)
     },
     version:function(test){
         lifecycle(require('./params/s3-version'),test)
@@ -74,8 +74,8 @@ module.exports={
     }
 }
 
-function lifecycle(params,test){
-        test.expect(3)
+function lifecycle(params,test,expect=3){
+        test.expect(expect)
         mock.register(status=>test.equal(status,"SUCCESS"))
         var ser=mock.server(test)
 

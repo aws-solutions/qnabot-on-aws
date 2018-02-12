@@ -2,10 +2,11 @@ var Url=require('url')
 var Promise=require('bluebird')
 var cfnLambda=require('cfn-lambda')
 var request=require('./request')
+var handler=require('./handler')
 
 exports.Create=function(params,reply){
     try{
-        exports.handler(params.create,null,function(err,data){
+        handler(params.create,null,function(err,data){
             err ? reply(JSON.stringify(err)) : reply(null,"es")
         })
     }catch(e){
@@ -18,7 +19,7 @@ exports.Update=function(ID,params,oldparams,reply){
 }
 exports.Delete=function(ID,params,reply){
     if(params.delete){
-        exports.handler(params.delete,null,function(err,data){
+        handler(params.delete,null,function(err,data){
             err ? reply(JSON.stringify(err)) : reply(null,"es")
         })
     }else{

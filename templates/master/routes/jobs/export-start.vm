@@ -1,9 +1,13 @@
-#set ( $root="https://${!context.apiId}.execute-api.${AWS::Region}.amazonaws.com/${!context.stage}")
+#set ( $root="https://${!context.apiId}.execute-api.${!Region}.amazonaws.com/${!context.stage}")
 #set($inputRoot = $input.path('$'))
 
 {
     "bucket":"${ExportBucket}",
-    "prefix":"data/$input.params('proxy')",
-    "filter":"$inputRoot.get('filter')"
+    "index":"${Var.index}",
+    "type":"${Var.type}",
+    "config":"status/$input.params('proxy')",
+    "key":"data/$input.params('proxy')",
+    "filter":"$inputRoot.get('filter')",
+    "status":"Started"
 }
 

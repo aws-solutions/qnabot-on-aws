@@ -17,7 +17,7 @@ module.exports={
         authorization:"AWS_IAM",
         method:"get",
         lambda:{"Fn::GetAtt":["S3ListLambda","Arn"]},
-        subTemplate:fs.readFileSync(__dirname+'/list-export.vm','utf8'),
+        template:fs.readFileSync(__dirname+'/list-export.vm','utf8'),
         resource:{"Ref":"exports"},
         parameterLocations:{
           "method.request.querystring.perpage":false,
@@ -31,7 +31,7 @@ module.exports={
         method:"PUT",
         bucket:{"Ref":"ExportBucket"},
         path:"/status/{proxy}",
-        subTemplate:fs.readFileSync(`${__dirname}/export-start.vm`,'utf-8'),
+        template:fs.readFileSync(`${__dirname}/export-start.vm`,'utf-8'),
         requestParams:{
             "integration.request.path.proxy":"method.request.path.proxy"
         }
@@ -158,7 +158,7 @@ function proxy(opts){
           ]]},
           "RequestParameters":opts.requestParams || {},
           "RequestTemplates": opts.template ? {
-                "application/json":opts.template 
+                "application/json":{"Fn::Sub":opts.template }
           }:null,
           "IntegrationResponses": [
             {
