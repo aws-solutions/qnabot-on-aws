@@ -65,7 +65,7 @@ module.exports={
               ]
             }]
         },
-        "Roles": [{"Ref": "FulfillmentLambdaRole"}]
+        "Roles": [{"Ref": "CFNLambdaRole"}]
       }
     }   
 }

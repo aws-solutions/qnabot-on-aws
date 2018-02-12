@@ -7,7 +7,7 @@ module.exports={
     },
     "AssetClear":{
         "Type": "Custom::S3Clear",
-        "DependsOn":["CFNLambdaPolicy"],
+        "DependsOn":["CFNLambdaPolicy","CFNInvokePolicy"],
         "Condition":"BuildExamples",
         "Properties": {
             "ServiceToken": { "Fn::GetAtt" : ["CFNLambda", "Arn"] },
