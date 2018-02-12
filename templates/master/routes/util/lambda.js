@@ -46,6 +46,12 @@ module.exports=function(params){
                 "ResponseTemplates":{
                     "application/json":fs.readFileSync(__dirname+"/../error/error.vm",'utf8')
                 }
+            },{   
+                "SelectionPattern":".*[NotFound].*",
+                "StatusCode": 404,
+                "ResponseTemplates":{
+                    "application/json":fs.readFileSync(__dirname+"/../error/error.vm",'utf8')
+                }
             }
           ),
           "RequestParameters":params.parameterNames,

@@ -14,7 +14,7 @@ module.exports= (event, context, callback) => {
     .tapCatch(x=>console.log(x))
     .then(result=>callback(null,result))
     .catch(error=>callback(JSON.stringify({
-        type:"[InternalServiceError]",
+        type:error.response.status===404 ? "[NotFoud]" : "[InternalServiceError]",
         status:error.response.status,
         message:error.response.statusText,
         data:error.response.data
