@@ -1,4 +1,3 @@
-#set ( $root="https://${!context.apiId}.execute-api.${!Region}.amazonaws.com/${!context.stage}")
 #set($inputRoot = $input.path('$'))
 
 {

@@ -1,7 +1,7 @@
-#set ( $root="https://${!context.apiId}.execute-api.${!Region}.amazonaws.com/${!context.stage}")
+#set ( $root="https://${!context.apiId}.execute-api.${!stageVariables.Region}.amazonaws.com/${!context.stage}")
 
 {
-    "region":"${!Region}",
+    "region":"${!stageVariables.Region}",
     "BotName":"${LexBot}",
     "PoolId":"${IdPool}",
     "ClientIdClient":"${ClientClient}",
