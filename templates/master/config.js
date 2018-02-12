@@ -1,9 +1,8 @@
 var _=require('lodash')
 var methods=[]
 _.forEach(require('./routes'),(value,key)=>{
-    value.type==='AWS::ApiGateway::Method' ? methods.push(key) : null
+    value.Type==='AWS::ApiGateway::Method' ? methods.push(key) : null
 })
-
 var permissions=_.keys(require('./lambda')).filter(x=>x.match(/^InvokePermission/))
 
 module.exports={

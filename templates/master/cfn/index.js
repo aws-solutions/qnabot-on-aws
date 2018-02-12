@@ -50,5 +50,22 @@ module.exports={
         }]
       }
     },
-    
+    "CFNInvokePolicy": {
+      "Type": "AWS::IAM::ManagedPolicy",
+      "Properties": {
+        "PolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [{
+              "Effect": "Allow",
+              "Action": [
+                "lambda:InvokeFunction"
+              ],
+              "Resource":[
+                {"Fn::GetAtt":["CFNLambda","Arn"]},
+              ]
+            }]
+        },
+        "Roles": [{"Ref": "FulfillmentLambdaRole"}]
+      }
+    }   
 }
