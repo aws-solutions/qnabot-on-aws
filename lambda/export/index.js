@@ -9,26 +9,33 @@ var stride=parseInt(process.env.STRIDE)
 var _=require('lodash')
 var start=require('./lib/start')
 var step=require('./lib/step')
+var join=require('./lib/join')
+var clean=require('./lib/clean')
 
 exports.step=function(event,context,cb){
     console.log("step")
     console.log("Request",JSON.stringify(event,null,2))
     var Bucket=event.Records[0].s3.bucket.name
     var Key=decodeURI(event.Records[0].s3.object.key)
-    
+    var VersionId=_.get(event,"Records[0].s3.object.versionId")
     console.log(Bucket,Key) 
     
-    s3.waitFor('objectExists',{Bucket,Key}).promise()
-    .then(()=>s3.getObject({Bucket,Key}).promise())
+    s3.waitFor('objectExists',{Bucket,Key,VersionId}).promise()
+    .then(()=>s3.getObject({Bucket,Key,VersionId}).promise())
     .then(x=>JSON.parse(x.Body.toString()))
     .then(function(config){
-        if(config.status!=="Error" || config.status!=="Completed"){
+        if(config.status!=="Error" && config.status!=="Completed"){
             return Promise.try(function(){
                 console.log("Config:",JSON.stringify(config,null,2))
-                if(config.status==="InProgress"){
-                    return step(config)   
-                }else if(config.status==="Started"){
-                    return start(config)
+                switch(config.status){
+                    case 'Started':
+                        return start(config);
+                    case 'InProgress':
+                        return step(config);
+                    case "Join":
+                        return join(config);
+                    case "Clean":
+                        return clean(config);
                 }
             })
             .catch(error=>{

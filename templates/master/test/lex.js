@@ -32,13 +32,31 @@ module.exports={
         })
         .then(cb)
     },
-    ask:function(test){
-        this.lex.postText({
-            inputText:"hello"
-        }).promise()
-        .tap(console.log)
-        .tap(x=>test.ok(x.sessionAttributes.previous))
-        .finally(test.done)
+    ask:async function(test){
+        try{
+            await api({
+                path:"questions/test.1",
+                method:"PUT",
+                body:{
+                    qid:"test.1",
+                    q:["hello"],
+                    a:"i am the unit"
+                }
+            })
+            var response=await this.lex.postText({
+                inputText:"hello"
+            }).promise()
+            console.log(response)
+            test.ok(response.sessionAttributes.previous)
+        }catch(e){
+            test.ifError(e)
+        }finally{
+            await api({
+                path:"questions/test.1",
+                method:"DELETE"
+            })
+            test.done() 
+        }
     },
     miss:function(test){
         this.lex.postText({

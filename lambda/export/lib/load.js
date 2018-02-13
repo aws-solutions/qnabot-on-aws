@@ -17,7 +17,6 @@ module.exports=function(config,body){
     .tap(console.log)
     .then(function(result){
         config.scroll_id=result._scroll_id 
-        config.PartNumber++
         config.status="InProgress"
         
         var documents=_.get(result,"hits.hits",[])
@@ -31,23 +30,21 @@ module.exports=function(config,body){
                 }else{
                     return JSON.stringify(x._source)
                 }
-            }).join('\n')+'\n'
-            
-            return s3.uploadPart({
+            }).join('\n')
+            var key=`${config.tmp}/${config.parts.length+1}` 
+            return s3.putObject({
                 Body:body,
                 Bucket:config.bucket,
-                Key:config.key,
-                PartNumber:config.PartNumber,
-                UploadId:config.UploadId
+                Key:key
             }).promise()
             .then(upload_result=>{
-                config.parts=[{
-                    ETag:upload_result.ETag,
-                    PartNumber:config.PartNumber,
-                }]
+                config.parts.push({
+                    version:upload_result.VersionId,
+                    key:key
+                })
             })
         }else{
-            config.progress="Completed"
+            config.status="Join"
         }
     })
 }

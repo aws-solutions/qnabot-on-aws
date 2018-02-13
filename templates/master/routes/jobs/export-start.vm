@@ -5,6 +5,7 @@
     "index":"${Var.index}",
     "type":"${Var.type}",
     "config":"status/$input.params('proxy')",
+    "tmp":"tmp/$input.params('proxy')",
     "key":"data/$input.params('proxy')",
     "filter":"$inputRoot.get('filter')",
     "status":"Started"

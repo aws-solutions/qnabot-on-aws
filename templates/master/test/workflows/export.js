@@ -16,6 +16,7 @@ module.exports={
         var count=10000
         var name=(new Date()).getTime()
         this.name=name
+        this.count=count
         api({
             path:"jobs",
             method:"GET"
@@ -24,7 +25,7 @@ module.exports={
         .tap(info=>s3.putObject({
             Bucket:info.bucket,
             Key:info.uploadPrefix+name,
-            Body:range(0,count).map(qna).join('\n')
+            Body:range(0,count-1).map(qna).join('\n')
         }).promise())
         .tap(function(info){
             return new Promise(function(res,rej){
@@ -92,16 +93,26 @@ module.exports={
                     })
                     if(status.status==="Completed"){
                         res(status)
-                    }else if(status.status==="InProgress"){
-                        count>0 ? setTimeout(()=>next(--count),1000) : rej("timeout")
-                    }else if(status.status==="Started"){
-                        count>0 ? setTimeout(()=>next(--count),1000) : rej("timeout")
-                    }else{
+                    }else if(status.status==="Error"){
                         rej(status)
+                    }else{
+                        count>0 ? setTimeout(()=>next(--count),1000) : rej("timeout")
                     }
                 }
             })
-            console.log(completed)
+            var data=(await s3.getObject({
+                Bucket:completed.bucket,
+                Key:completed.key,
+            }).promise()).Body.toString().split('\n')
+            test.ok(data.length>=this.count)
+            data.forEach(x=>{
+                try{
+                    JSON.parse(x)
+                }catch(e){
+                    test.ifError(e)
+                    console.log(x)
+                }
+            })
         }catch(e){
             console.log(e)
             test.ifError(e)
@@ -124,7 +135,33 @@ module.exports={
                 filter:"none.*" 
             }
         })
-        var status=await api({
+        try{ 
+            var completed=await new Promise(async function(res,rej){
+                next(100)
+                async function next(count){
+                    var status=await api({
+                        href:`${info._links.exports.href}/test-filter`,
+                        method:"GET",
+                    })
+                    if(status.status==="Completed"){
+                        res(status)
+                    }else if(status.status==="Error"){
+                        rej(status)
+                    }else{
+                        count>0 ? setTimeout(()=>next(--count),1000) : rej("timeout")
+                    }
+                }
+            })
+            var data=(await s3.getObject({
+                Bucket:completed.bucket,
+                Key:completed.key,
+            }).promise()).Body.toString().split('\n')
+            test.equal(data.length,1)
+        }catch(e){
+            console.log(e)
+            test.ifError(e)
+        }
+        await api({
             href:`${info._links.exports.href}/test-filter`,
             method:"DELETE",
         })
