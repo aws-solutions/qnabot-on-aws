@@ -18,7 +18,9 @@ if [ "$1" == "--dryrun" ]; then
 fi
 
 if [ "$1" == "--run" ]; then
+    npm run upload
     aws s3 cp s3://$DEVBUCKET/$PREFIX s3://$PUBLICBUCKET/$PUBLICPREFIX --recursive --acl public-read
+    $__dirname/URL.sh
 fi
 
 echo https://s3.amazonaws.com/$PUBLICBUCKET/$PUBLICPREFIX/templates/master.json
