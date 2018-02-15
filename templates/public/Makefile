@@ -2,5 +2,5 @@ BUILD=../../bin/build.js
 NAME=$(shell basename $(shell pwd))
 DST=../../build/templates/$(NAME).json
 
-$(DST):./*
+$(DST):./* ../../config.json
 	 $(BUILD) --stack $(NAME) --verbose
