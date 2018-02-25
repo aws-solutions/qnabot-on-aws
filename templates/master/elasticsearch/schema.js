@@ -21,7 +21,7 @@ module.exports={
                 },
                 a:{
                     type:"text",
-                    title:"Anwser",
+                    title:"Answer",
                     description:"Enter the answer you want to be returned when user asks one of the above questions",
                     maxLength:8000,
                 },
