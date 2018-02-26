@@ -123,8 +123,12 @@ module.exports={
   methods:{
     logout:function(){
       this.$store.dispatch('user/logout')
-      window.location=this.login,2000
+      window.location=this.login
     }
+  },
+  onIdle:function(){
+    window.alert("Sorry, you are being logged out for being idle. Please log back in")
+    this.logout()
   }
 }
 </script>

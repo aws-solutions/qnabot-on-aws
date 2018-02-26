@@ -21,8 +21,11 @@ var Router=require('vue-router').default
 var sync=require('vuex-router-sync').sync
 var Vuex=require('vuex').default
 import Vuetify from 'vuetify'
+import IdleVue from 'idle-vue'
 var Idle=require('idle-js')
 var validate=require('vee-validate')
+
+
 
 Vue.use(validate,{
     classNames:{
@@ -56,13 +59,24 @@ function init(){
     var store=lib.store
     sync(store,router)
     router.replace('/loading')
-
+        
+    Vue.use(IdleVue, {
+        idleTime: 45*60*1000,
+        eventEmitter:new Vue(),
+        store:store,
+        startAtIdle:false
+    })
     System.import(/* webpackChunkName: "admin-page" */'./admin.vue')
     .then(function(app){
         var App=new Vue({
             router,
             store,
-            render:h=>h(app)
+            render:h=>h(app),
+            onIdle:function(){
+                window.alert("Sorry, you are being logged out for being idle. Please log back in")
+                this.$store.dispatch('user/logout')
+                window.location=this.login
+            }
         })
         
         require('./lib/validator')(App)        
