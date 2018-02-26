@@ -78,8 +78,7 @@
               :id="'qa-'+props.item.qid+'-delete'"
             )
       template(slot="no-data")
-        v-alert( :value="true" color="error" icon="warning")
-            span Sorry, nothing to display here :(
+        span Sorry, nothing to display here :(
       template(slot="expand" slot-scope='props')
         qa(:data="props.item")
 </template>
