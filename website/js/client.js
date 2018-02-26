@@ -15,7 +15,7 @@ var Promise=require('bluebird')
 var axios=require('axios')
 var Vue=require('vue')
 var Vuex=require('vuex').default
-var Vuetify=require('vuetify').default
+import Vuetify from 'vuetify'
 var style=require('aws-lex-web-ui/dist/lex-web-ui.css')
 var Auth=require('./lib/client-auth')
 

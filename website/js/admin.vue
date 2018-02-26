@@ -28,7 +28,7 @@
           v-breadcrumbs-item {{page}}
       v-spacer
       v-toolbar-items
-        v-btn(flat 
+        v-btn.primary--text(flat
           id="logout-button"
           @click="logout"
           v-if="login") LogOut

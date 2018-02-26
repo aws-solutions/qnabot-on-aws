@@ -20,7 +20,7 @@ var style=require('highlight.js/styles/solarized-light.css')
 var Router=require('vue-router').default
 var sync=require('vuex-router-sync').sync
 var Vuex=require('vuex').default
-var vuetify=require('vuetify').default
+import Vuetify from 'vuetify'
 var Idle=require('idle-js')
 var validate=require('vee-validate')
 
@@ -34,7 +34,17 @@ Vue.use(validate,{
 
 Vue.use(Vuex)
 Vue.use(Router)
-Vue.use(vuetify)
+Vue.use(Vuetify,{
+theme:{
+    primary: '#1fbcd3',
+    accent: '#ffbb00',
+    secondary: '#3157d5',
+    info: '#0D47A1',
+    warning: '#ffba21',
+    error: '#a71000',
+    success: '#1ddf48'
+}})
+    
 var style=require('../style/app.styl')
 
 var lib=require('./lib')

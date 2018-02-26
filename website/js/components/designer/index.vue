@@ -1,26 +1,27 @@
 <template lang='pug'>
   v-card.root-card
-    v-tabs(v-model="tab")
-      v-card-title.pa-0.cyan
-        v-layout(row)
-          v-tabs-bar(:v-model="active" class="primary" light)
-            v-tabs-item.title(ripple href="#questions" id="questions-tab") Questions
-            v-tabs-item.title(ripple href="#test" id="test-tab") Test
-            v-tabs-slider(color="accent")
-          v-spacer
-          v-menu(bottom left)
-            v-btn.white--text(icon slot="activator" id="edit-sub-menu")
-              v-icon more_vert
-            v-list
-              v-list-tile
-                alexa
-              v-list-tile
-                build
-      v-tabs-items
-        v-tabs-content(id="questions")
-          questions(@filter="get(pagination)")
-        v-tabs-content(id="test")
-          test
+    v-card-title.pa-0.cyan
+      v-layout(row)
+        v-tabs(
+          v-model="active" 
+          slide-color="accent"
+          color="primary" 
+          light
+        )
+          v-tab.title(ripple href="#questions" id="questions-tab") Questions
+          v-tab.title(ripple href="#test" id="test-tab") Test
+        v-spacer
+        v-menu(bottom left)
+          v-btn.white--text(icon slot="activator" id="edit-sub-menu")
+            v-icon more_vert
+          v-list
+            v-list-tile
+              alexa
+            v-list-tile
+              build
+    span
+      questions(@filter="get(pagination)" v-if="active==='questions'")
+      test(v-if="active==='test'")
     v-divider
     v-data-table(
       :headers="headers"

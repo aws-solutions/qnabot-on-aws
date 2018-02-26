@@ -1,6 +1,6 @@
 <template lang='pug'>
   div(id="qna-client")
-    v-toolbar(color="cyan")
+    v-toolbar(color="cyan" v-if="$store.state.username")
       v-toolbar-title {{title}}
       v-spacer
       v-toolbar-items
