@@ -89,7 +89,7 @@ module.exports={
     },
     close:function(){
       this.cancel()
-      this.$store.dispatch('data/get')
+      this.$emit('filter')
     },
     refresh:function(){
       if(!this.opened){

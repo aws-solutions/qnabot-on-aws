@@ -69,6 +69,7 @@
           td.d-flex.pa-0.pr-1
             edit(
               :data.sync="props.item" 
+              v-on:filter="get(pagination)"
               @click.native.stop=""
               :id="'qa-'+props.item.qid+'-edit'"
             )
