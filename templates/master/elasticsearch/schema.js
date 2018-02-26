@@ -38,12 +38,12 @@ module.exports={
                         title:{
                             type:"text",
                             title:"Card Title",
-                            description:"",
+                            description:"Required",
                             maxLength:100
                         },
                         imageUrl:{
                             type:"text",
-                            description:"",
+                            description:"Required",
                             title:"Card Image Url",
                             format:'url',
                             maxLength:2000
