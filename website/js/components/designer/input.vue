@@ -18,8 +18,8 @@
     div(v-if="schema.type==='array'")
       .subheading {{schema.title}}
       span {{schema.description}}
-      ul
-        li.d-flex(v-for="(item,index) in value" :key="index")
+      ul.pl-3
+        li(v-for="(item,index) in value" :key="index")
           schema-input(
             :ref="index"
             :schema="schema.items" 
@@ -28,6 +28,7 @@
             :required="index===0"
             :name="name"
             :path="path+'['+index+']'"
+            style="display:inline-block;width:80%"
             @update:valid="isValid"
           )
           v-btn.delete(icon @click.native='remove(index)' 
