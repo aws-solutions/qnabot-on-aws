@@ -4,6 +4,7 @@
     "bucket":"${ExportBucket}",
     "index":"${Var.index}",
     "type":"${Var.type}",
+    "id":"$input.params('proxy')",
     "config":"status/$input.params('proxy')",
     "tmp":"tmp/$input.params('proxy')",
     "key":"data/$input.params('proxy')",

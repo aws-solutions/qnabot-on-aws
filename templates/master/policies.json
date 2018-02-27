@@ -122,6 +122,14 @@
           "Resource": [{"Fn::Sub":
             "arn:aws:s3:::${ImportBucket}/data/*"
             }]
+        },{
+          "Effect": "Allow",
+          "Action": [   
+            "s3:GetObject"
+          ],
+          "Resource": [{"Fn::Sub":
+            "arn:aws:s3:::${ExportBucket}/data/*"
+            }]
         }
       ]
     },

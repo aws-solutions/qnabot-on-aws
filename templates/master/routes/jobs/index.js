@@ -17,7 +17,7 @@ module.exports={
         authorization:"AWS_IAM",
         method:"get",
         lambda:{"Fn::GetAtt":["S3ListLambda","Arn"]},
-        template:fs.readFileSync(__dirname+'/list-export.vm','utf8'),
+        subTemplate:fs.readFileSync(__dirname+'/list-export.vm','utf8'),
         resource:{"Ref":"exports"},
         parameterLocations:{
           "method.request.querystring.perpage":false,

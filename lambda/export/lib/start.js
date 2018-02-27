@@ -12,6 +12,7 @@ var load=require('./load')
 module.exports=function(config){
     console.log("Starting")
     config.status="InProgress"
+    config.startDate=(new Date()).toString()
     config.parts=[]
 
     return load(config,{

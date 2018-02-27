@@ -7,13 +7,33 @@
           v-card-text 
             v-text-field(name="filename" 
               label="filename" 
-              id="filename" clearable v-model="filtername")
+              id="filename" clearable v-model="filename")
             v-text-field(name="filter" 
               label="(optional) filter export by qid prefix" 
               id="filter" clearable v-model="filter")
           v-card-actions
             v-spacer
-            v-btn(@click="download(filtername)" id="export") export
+            v-btn(@click="start()" id="export") export
+      v-flex(v-if="exports.length>0")
+        v-card(id="export-jobs")
+          v-card-title.headline Exports
+          v-card-text
+            v-list
+              template(v-for="(job,index) in exports")
+                v-list-tile(:id="'export-job-'+job.id" :data-status="job.status")
+                  v-list-tile-content.job-content
+                    v-list-tile-title {{job.id}}: {{job.status}}
+                    v-list-tile-sub-title
+                      v-progress-linear(v-model="job.progress*100")
+                  v-list-tile-action.job-actions(
+                    style="flex-direction:row;"
+                  )
+                    v-btn(fab block icon @click="remove(index)") 
+                      v-icon delete
+                    v-btn(fab block icon @click="download(index)" :loading="job.loading") 
+                      v-icon file_download
+
+                v-divider(v-if="index + 1 < exports.length")
     v-dialog(v-model="loading" persistent id="export-loading")
       v-card
         v-card-title Loading
@@ -54,51 +74,64 @@ module.exports={
       error:"",
       success:'',
       filter:"",
-      filename:{
-        all:'qna.json',
-        filter:"qna",
-        prefix:"qna",
-        tmp:""
-      }
+      filename:"qna.json",
+      exports:[]
     }
   },
   computed:{
-    filtername:{
-      get:function(){
-        if(this.filter){
-          return this.filename.prefix+'-'+this.filter+'.json'
-        }else{
-          return this.filename.prefix+'.json'
-        }
-      },
-      set:function(val){
-        this.tmp=val
-      }
-    }
   },
-  components:{
+  components:{},
+  created:async function(){
+    this.refresh() 
   },
-  
   methods:{
-    download:function(filename){
+    refresh:async function(){
+      var self=this
+      var exports=await this.$store.dispatch('api/listExports')
+      this.exports=exports.jobs
+      this.exports.map(async (job,index,coll)=>{
+        var info=await this.$store.dispatch('api/getExport',job)
+        var out={}
+        Object.assign(out,coll[index],info)
+        coll.splice(index,1,out)
+        poll()
+        async function poll(){
+          var status=await self.$store.dispatch('api/getExport',job)
+          Object.assign(out,coll[index],status)
+          console.log(status.status)
+          if(status.status!=="Completed" && status.status!=="Error"){
+            setTimeout(()=>poll(),1000)
+          }
+        }
+      })
+    },
+    start:async function(){
       var self=this
       this.loading=true
-      this.$store.dispatch('api/list',{
-        perpage:'1000',
-        filter:this.filter
-      })
-      .then(function(result){
-        var blob = new Blob(
-          [JSON.stringify({
-            qna:result.qa.map(x=>_.pickBy(_.omit(x,['_score'])))
-          },null,3)], 
-          {type: "text/plain;charset=utf-8"}
-        );
-        var name=filename || 'qna'
-        return Promise.resolve(saveAs(blob,name))
-      })
-      .then(()=>self.loading=false)
-      .catch(err=>this.error=err)
+      try{
+        await this.$store.dispatch('api/startExport',{
+          name:this.filename,
+          filter:this.filter
+        })
+        await this.refresh()
+      }catch(e){
+        this.error=err
+      }finally{
+        self.loading=false
+      }
+    },
+    remove:async function(index){
+      await this.$store.dispatch('api/deleteExport',this.exports[index])
+      await this.refresh()
+    },
+    download:async function(index){
+      var raw=await this.$store.dispatch('api/downloadExport',this.exports[index])
+      var blob = new Blob(
+        [raw], 
+        {type: "text/plain;charset=utf-8"}
+      );
+      var name=this.exports[index].id
+      return Promise.resolve(saveAs(blob,name))
     }
   }
 }
