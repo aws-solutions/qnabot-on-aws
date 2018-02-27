@@ -22,7 +22,6 @@
     span
       questions(@filter="get(pagination)" v-if="active==='questions'")
       test(v-if="active==='test'")
-    v-divider
     v-data-table(
       :headers="headers"
       :items="QAs"
@@ -79,8 +78,6 @@
               @click.native.stop=""
               :id="'qa-'+props.item.qid+'-delete'"
             )
-      template(slot="no-data")
-        span Sorry, nothing to display here :(
       template(slot="expand" slot-scope='props')
         qa(:data="props.item")
 </template>
