@@ -1,0 +1,230 @@
+﻿{
+   "qna": [
+      {
+         "qid": "Color.1",
+         "a": "The Color Tour will take you through the Blue Room, the Green Room, and the Red Room. Hope you enjoy!",
+         "q": [
+            "Color.1",
+            "Color Tour",
+            "Let's start the color tour"
+         ]
+      },
+      {
+         "qid": "Color.2",
+         "a": "The blue and gold silk used for the walls and the curtains were added in 1952 and the chairs are part of the Bellangé suite. The Blue Room is located on the State Floor of the Executive Mansion. The oval parlor has been known as Blue Room since Martin Van Buren’s 1837 redecoration. The room is often used for receptions, photo opportunities, and during the holiday season is home to the official White House Christmas Tree.",
+         "r": {
+            "title": "The Blue Room",
+            "imageUrl": "https://s3.amazonaws.com/wwha-tour-assets/TourContent/8-BlueRoom/740.jpg"
+         },
+         "q": [
+            "Color.2",
+            "Blue Room",
+            "Let's go to the Blue Room",
+            "Show me the Blue Room",
+            "Take me to the Blue Room",
+            "Next the Blue Room"
+         ]
+      },
+      {
+         "a": "The Green Room, the first of the State Rooms to be named for the color of its textiles, is furnished in the late Federal style popular when the White House was first occupied. \n\nThe least formal of the state parlors, the Green Room provides a serene setting for small gatherings, interviews, teas, and social activities.",
+         "r": {
+            "title": "The Green Room",
+            "imageUrl": "https://s3.amazonaws.com/wwha-tour-assets/TourContent/7-GreenRoom/757.jpg"
+         },
+         "qid": "Color.3",
+         "q": [
+            "Color.3",
+            "Green Room",
+            "Let's go to the Green Room",
+            "Show me the Green Room",
+            "Take me to the Green Room",
+            "Next the Green Room"
+         ]
+      },
+      {
+         "qid": "Color.4",
+         "q": [
+            "Color.4",
+            "Red Room",
+            "Let's go to the Red Room",
+            "Show me the Red Room",
+            "Take me to the Red Room",
+            "Next the Red Room"
+         ],
+         "a": "The Red Room was the last of the state parlors to be named for a color, boldly decorated with red fabrics first in 1845, by James K. Polk. Today the furnishings are in the American \"Empire\" or\n\"Grecian\" style that was popular in the early nineteenth century.\n",
+         "t": "Red Room",
+         "r": {
+            "title": "The Red Room",
+            "imageUrl": "https://s3.amazonaws.com/wwha-tour-assets/TourContent/9-RedRoom/1662.jpg"
+         }
+      },
+      {
+         "qid": "Color.4.Sofa",
+         "q": [
+            "Color.4.Sofa",
+            "Sofa",
+            "Couch",
+            "Red Room Sofa",
+            "Tell me about the sofa",
+            "Tell me about the couch"
+         ],
+         "a": "This Grecian style sofa with gilded and scrolled arms and feet was made by an unknown New York cabinetmaker influenced by English Regency and French Empire forms. The sofa became part of the White House Collection in 1961.",
+         "t": "Red Room",
+         "r": {
+            "title": "The Red Room Sofa",
+            "imageUrl": "https://s3.amazonaws.com/wwha-tour-assets/TourContent/9-RedRoom/Objects/861.jpg"
+         }
+      },
+      {
+         "qid": "End",
+         "a": "Thank You for visiting the Whitehouse, we have reached the end of your tour. Feel free to retake the tour or take another one. \n Available tours include the Color Tour and the Regular Tour",
+         "q": [
+            "end"
+         ]
+      },
+      {
+         "qid": "NavigationList",
+         "a": "Welcome to the White House! Feel free to take the Color Tour or Regular Tour.",
+         "q": [
+            "Navigation List"
+         ]
+      },
+      {
+         "qid": "NextRoom",
+         "q": [
+            "Next Room",
+            "Next",
+            "Let's go to the Next Room"
+         ],
+         "a": "Unable to go to the next room...",
+         "r": {
+            "title": "",
+            "imageUrl": "",
+            "text": "",
+            "url": ""
+         },
+         "l": "qna-NextRoomMultiple"
+      },
+      {
+         "qid": "PreviousRoom",
+         "q": [
+            "Previous Room",
+            "Previous",
+            "Let's go to the Previous Room"
+         ],
+         "a": "Unable to go to the previous room...",
+         "r": {
+            "title": "",
+            "imageUrl": "",
+            "text": "",
+            "url": ""
+         },
+         "l": "qna-PreviousRoomMultiple"
+      },
+      {
+         "qid": "Regular.1",
+         "a": "The Regular Tour will take you through the China Room, State Dining Room,Library, Vermeil Room, and the Oval Office, enjoy!",
+         "q": [
+            "Regular.1",
+            "Let's start the regular tour",
+            "Regular Tour"
+         ]
+      },
+      {
+         "qid": "Regular.2",
+         "a": "Located on the Ground Floor, this room has been used since 1917 as exhibition space for White House ceramics, glass, and silver. The painting of First Lady Grace Coolidge has hung in the China Room since 1952.",
+         "r": {
+            "title": "The China Room",
+            "imageUrl": "https://s3.amazonaws.com/wwha-tour-assets/TourContent/3-ChinaRoom/9449.jpg"
+         },
+         "q": [
+            "Regular.2",
+            "China Room",
+            "Let's go to the China Room",
+            "Show me the China Room",
+            "Take me to the China Room",
+            "Next the China Room"
+         ]
+      },
+      {
+         "qid": "Regular.3",
+         "a": "The State Dining Room, the second largest room in the White House, is the setting for State Dinners, when a head of state is entertained, as well as for\n\"official dinners,\" when the guest of honor is prime minister, ambassador, or\nprivate citizen. ",
+         "r": {
+            "title": "The State Dining Room",
+            "imageUrl": "https://s3.amazonaws.com/wwha-tour-assets/TourContent/10-StateDiningRoom/1010.jpg"
+         },
+         "q": [
+            "Regular.3",
+            "State Dining Room",
+            "Let's go to the State Dining Room",
+            "Show me the State Dining Room",
+            "Take me to the State Dining Room",
+            "Next the State Dining Room"
+         ]
+      },
+      {
+         "a": "The Library is located on the Ground Floor of the White House. Although libraries have been a mainstay in the White House since the Millard Fillmore administration, it was not until 1935 that President Franklin D. Roosevelt formally designated a room for the library. The Library boasts thousands of books and the room occasionally serves as the backdrop for meetings, interviews, or televised speeches.",
+         "r": {
+            "title": "The Library",
+            "imageUrl": "https://s3.amazonaws.com/wwha-tour-assets/TourContent/1-Library/9444.jpg"
+         },
+         "qid": "Regular.4",
+         "q": [
+            "Regular.4",
+            "Library",
+            "Let's go to the Library",
+            "Show me the Library",
+            "Take me to the Library",
+            "Next the Library"
+         ]
+      },
+      {
+         "qid": "Regular.5",
+         "a": "The Vermeil Room, located on the Ground Floor of the Executive Mansion, houses the extensive collection of vermeil, or gilded silver, that was bequeathed by Margaret Thompson Biddle to the White House in 1957. First Lady Mamie Eisenhower was the first to display the newly acquired vermeil collection in the room and today the room also displays several portraits of first ladies of the twentieth century.",
+         "r": {
+            "title": "The Vermeil Room",
+            "imageUrl": "https://s3.amazonaws.com/wwha-tour-assets/TourContent/2-VermeilRoom/660.jpg"
+         },
+         "q": [
+            "Regular.5",
+            "Vermeil Room",
+            "Let's go to the Vermeil Room",
+            "Show me the Vermeil Room",
+            "Take me to the Vermeil Room",
+            "Next the Vermeil Room"
+         ]
+      },
+      {
+         "qid": "Regular.6",
+         "q": [
+            "Regular.6",
+            "Oval Office",
+            "Let's go to the Oval Office",
+            "Show me the Oval Office",
+            "Take me to the Oval Office",
+            "Next the Oval Office"
+         ],
+         "a": "Americans have developed a sentimental attachment to the Oval Office. Television broadcasts from the Oval Office, such as President Reagan's speech following the Challenger explosion, have left a lasting impressions in the minds of Americans. \n",
+         "t": "Oval Office",
+         "r": {
+            "title": "Oval Office",
+            "imageUrl": "https://s3.amazonaws.com/wwha-tour-assets/TourContent/OvalOffice/oval-office-c1996.jpg"
+         }
+      },
+      {
+         "qid": "Regular.6.Sofa",
+         "q": [
+            "Regular.6.Sofa",
+            "Sofa",
+            "oval office Sofa",
+            "Tell me about the sofa"
+         ],
+         "a": "Many presidents have used the Resolute Sofa in the Oval Office. It was made from the timbers of HMS Resolute, an abandoned British ship discovered by an American vessel and returned to the Queen of England. When the ship was retired, Queen Victoria commissioned the Sofa and presented to President Rutherford Hayes in 1880.",
+         "t": "Oval Office",
+         "r": {
+            "title": "The Resolute desk",
+            "imageUrl": "https://3ff009b6523c0c1f8b94-091582592a5f780b4bac3b68414d35fd.ssl.cf5.rackcdn.com/default/_superImage/President-Hayes-Desk.jpg"
+         }
+      }
+   ]
+}
