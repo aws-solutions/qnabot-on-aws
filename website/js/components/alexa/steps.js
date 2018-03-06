@@ -8,8 +8,8 @@ Sign in or create an Amazon developer account at [Amazon Developer Console](http
     text:`
 In the Amazon Developer Console 
 1. Choose ALEXA from the toolbar  
-1. Under Alexa Skills Kit Click  Get Started 
-1. In the upper right hand corner click Add a New Skill
+1. Under Alexa Skills Kit choose  Get Started 
+1. In the upper right hand corner choose Add a New Skill
 `},{
     title:"Skill Information",
     text:`
@@ -33,7 +33,7 @@ Fill in the following information:
 |------|-------|
 | Intent Schema |  copy and paste from button below |
 | Custom Slot Type | EXAMPLE_QUESTIONS |
-| Utterances |  copy and paste from button below |
+| Values |  copy and paste from button below |
 | Sample Utterances | Qna_intent {QnA_slot} |
 
 choose save then next

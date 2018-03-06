@@ -28,14 +28,14 @@ module.exports={
     "Intent":{
         "Value":{"Ref":"Intent"}
     },
-    "DashboardUrl":{
+    "DashboardURL":{
         "Value":{"Fn::Join":["",[
             "https://console.aws.amazon.com/cloudwatch/home?",
             "region=",{"Ref":"AWS::Region"},
             "#dashboards:name=",{"Ref":"dashboard"}
         ]]}
     },
-    "UserPoolUrl":{
+    "UserPoolURL":{
         "Value":{"Fn::Join":["",[
             "https://console.aws.amazon.com/cognito/users/",
             "?region=",{"Ref":"AWS::Region"},
@@ -51,13 +51,13 @@ module.exports={
     "ESProxyLambda":{
         "Value":{"Fn::GetAtt":["ESProxyLambda","Arn"]}
     },
-    "DesignerLogin": {
+    "ContentDesignerURL": {
       "Value":{"Fn::Join":["",[
         {"Fn::GetAtt":["ApiUrl","Name"]},
         "/pages/designer"
       ]]}
     },
-    "ClientUrl": {
+    "ClientURL": {
         "Value":{"Fn::If":["Public",
             {"Fn::GetAtt":["Urls","Client"]},
             {"Fn::Join":["",[

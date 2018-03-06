@@ -20,10 +20,10 @@ var path=require('path')
 var config=require('../../config')
 module.exports=Promise.resolve(require('../master')).then(function(base){
     base.Outputs=_.pick(base.Outputs,[
-        "ContentDesignerLogin",
+        "ContentDesignerURL",
         "ClientURL",
-        "DashboardUrl",
-        "UserPoolUrl"
+        "DashboardURL",
+        "UserPoolURL"
     ])
 
     base.Parameters=_.pick(base.Parameters,[

@@ -82,7 +82,7 @@ module.exports={
       return [{
         title:"Edit",
         id:"edit",
-        subTitle:"edit questions and simulate responses",
+        subTitle:"Edit questions and simulate responses",
         icon:"mode_edit",
         href:"#/edit"
       },{
@@ -100,7 +100,7 @@ module.exports={
       },{
         title:"Alexa",
         id:"alexa",
-        subTitle:"instructions for setting up an Alexa Skill",
+        subTitle:"Instructions for setting up an Alexa Skill",
         icon:"info",
         href:"#/alexa"
       },{
