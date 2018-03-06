@@ -30,7 +30,9 @@
                   )
                     v-btn(fab block icon @click="remove(index)") 
                       v-icon delete
-                    v-btn(fab block icon @click="download(index)" :loading="job.loading") 
+                    v-btn(fab block 
+                      v-show="job.status==='Completed'"
+                      icon @click="download(index)" :loading="job.loading") 
                       v-icon file_download
 
                 v-divider(v-if="index + 1 < exports.length")

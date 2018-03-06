@@ -60,11 +60,12 @@
         v-card-title Loading
         v-card-text
           span(v-if="error" class='error--text' id="import-error") Error: {{error}} 
-          span(v-if="success" id="import-success") {{success}} 
+          span(v-if="!error & success" id="import-success") {{success}} 
           v-progress-linear( v-if="!error && !success" indeterminate)
         v-card-actions
           v-spacer
-          v-btn(v-if="error || success" @click='loading=false'
+          v-btn(v-if="error || success" 
+            @click='close'
             id="import-close" 
           ) close
 </template>
@@ -113,6 +114,10 @@ module.exports={
     this.examples=examples
   },
   methods:{
+    close:function(){
+      this.loading=false
+      this.error=false
+    },
     deleteJob:function(index){
       var self=this
       console.log(this.jobs,index)
@@ -198,14 +203,15 @@ module.exports={
       var self=this
       var id=name.replace(' ' ,'-')
       new Promise(function(res,rej){
-        if(data.qna){
+        console.log(data)
+        if(data.qna.length){
           self.$store.dispatch('api/startImport',{
             qa:data.qna,
             name:id
           })
           .then(res).catch(rej)
         }else{
-          rej('Invalid File')
+          rej('Invalid or Empty File')
         }
       })
       .then(()=>{
