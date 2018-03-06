@@ -56,8 +56,7 @@ Fill in the following information:
 | Name | Value |
 |------|-------|
 | Service Endpoint Type |  AWS Lambda ARN (Amazon Resource Name) |
-| Endpoint | Choose AWS Lambda ARN |
-| Lambda Arn |  copy and paste from button below | 
+| Default |  copy and paste Lambda ARN from button below | 
 
 choose all other defaults
 
@@ -73,14 +72,14 @@ choose save then next
     title:"Test",
     optional:true,
     text:`
-Congradulations! your skill is ready to be used. You will have to publish your skil inorder for people to use it outside of your account. 
+Congratulations! Your skill is ready to be used. You will have to publish your skill in order for people to use it outside of your account. 
 
-You can use this page to test your new alexa skill or use the following: 
+You can use this page to test your new Alexa skill or use the following: 
 
-###### EchoSim
+### EchoSim
 You can use the convenient [echosim.io](https://echosim.io/) site to test your bot.
 
-###### Alexa Device 
+### Alexa Device 
 To access your unpublished skill, register your Alexa device to the same account as your Amazon Developer account. If you have a device that is not registered to the right account, you can re-register it by following these directions: [Registering an Alexa-enabled Device for Testing](https://developer.amazon.com/public/solutions/alexa/alexa-skills-kit/docs/testing-an-alexa-skill#h2_register)
 
 Ask questions in the form: *\"Alexa, ask Q and A, How do I use Q and A Bot?\"*  (Assuming your device wake word is 'Alexa')
