@@ -20,7 +20,9 @@ module.exports={
         state.info=payload
     },
     bot:function(state,payload){
+        var tmp=state.bot.utterances
         state.bot=payload
+        set(state.bot,"utterances",tmp)
     },
     utterances:function(state,payload){
         state.bot.utterances=payload

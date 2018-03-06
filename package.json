@@ -117,6 +117,7 @@
     "vee-validate": "^2.0.4",
     "velocity": "^0.7.2",
     "vue": "^2.5.13",
+    "vue-clipboard2": "0.0.9",
     "vue-hint.css": "0.0.2",
     "vue-loader": "^12.2.2",
     "vue-lorem-ipsum": "0.0.1",

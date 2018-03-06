@@ -6,6 +6,8 @@ Sign in or create an Amazon developer account at [Amazon Developer Console](http
 },{
     title:"Create Skill",
     text:`
+(Instructions do not apply to the new Alexa skills beta interface)
+
 In the Amazon Developer Console 
 1. Choose ALEXA from the toolbar  
 1. Under Alexa Skills Kit choose  Get Started 
