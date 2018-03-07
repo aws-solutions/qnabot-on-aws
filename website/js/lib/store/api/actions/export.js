@@ -39,7 +39,7 @@ module.exports={
         var result=await context.dispatch('_request',{
             url:`${info._links.exports.href}/${opts.name}`,
             method:'put',
-            body:opts.filter ? {filter:opts.filter} : {}
+            body:opts.filter ? {filter:`${opts.filter}.*`} : {}
         })
     },
     downloadExport:async function(context,opts){
