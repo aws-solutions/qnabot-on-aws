@@ -1,1 +1,1 @@
-Ask for brief descriptions of aws services
+Imports documents with brief descriptions of AWS services.

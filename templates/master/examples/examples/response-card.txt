@@ -1,1 +1,1 @@
-demos response card
+Imports a document with a response card.
