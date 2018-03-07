@@ -129,7 +129,7 @@ module.exports={
     download:async function(index){
       var raw=await this.$store.dispatch('api/downloadExport',this.exports[index])
       var blob = new Blob(
-        [raw], 
+        [JSON.stringify(JSON.parse(raw),null,2)], 
         {type: "text/plain;charset=utf-8"}
       );
       var name=this.exports[index].id
