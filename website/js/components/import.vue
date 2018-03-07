@@ -179,7 +179,10 @@ module.exports={
           var reader = new FileReader();
           reader.onload = function(e){ 
             try {
-              res(parseJson(e.srcElement.result))
+              res({
+                name:file.name,
+                data:parseJson(e.srcElement.result)
+              })
             } catch(e) {
               rej(e)
             }
@@ -187,7 +190,7 @@ module.exports={
           reader.readAsText(file);
         })
       }))
-      .map(data=>self.upload(data,name))
+      .map(result=>self.upload(result.data,result.name))
       .catch(e=>{
         console.log(e)
         self.error=e.message
@@ -196,6 +199,7 @@ module.exports={
     Geturl:function(event){
       var self=this
       this.loading=true
+      var name=(new URL(self.url)).pathname.split('/').reverse()[0]
 
       Promise.resolve(axios.get(self.url))
       .then(x=>x.data)
@@ -203,7 +207,7 @@ module.exports={
         status:x.response.status,
         message:x.response.data
       }))
-      .then(data=>self.upload(data,"url-import"))
+      .then(data=>self.upload(data,name))
     },
     upload:function(data,name="import"){
       var self=this
