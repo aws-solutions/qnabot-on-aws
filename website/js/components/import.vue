@@ -55,20 +55,6 @@
                         @click="importExample(example.document.href)"
                         :id="'example-'+example.id"
                       ) Load
-    v-dialog(v-model="loading" persistent)
-      v-card( id="import-loading")
-        v-card-title Loading
-        v-card-text
-          span(v-if="error" class='error--text' id="import-error") Error: 
-            pre {{error}} 
-          span(v-if="!error & success" id="import-success") {{success}} 
-          v-progress-linear( v-if="!error && !success" indeterminate)
-        v-card-actions
-          v-spacer
-          v-btn(v-if="error || success" 
-            @click='close'
-            id="import-close" 
-          ) close
 </template>
 
 <script>
@@ -140,22 +126,29 @@ module.exports={
     },
     addJob:function(jobId){
       var self=this
-      return this.$store.dispatch('api/getImport',jobId)
-      .then(result=>Object.assign(jobId,result))
-      .then(job=>{
-        self.jobs.splice(0,0,job)
-        
-        poll()
-        function poll(){
-          self.$store.dispatch('api/getImport',job)
-          .then(function(result){
-            Object.assign(job,result) 
-            if(result.status==="InProgress"){
-              setTimeout(()=>poll(),100)
-            }
-          })
+      if(typeof jobId === "object"){
+        var job=jobId
+      }else{
+        var job={
+          href:`${this.$store.state.info._links.jobs.href}/imports/${jobId}`,
+          id:jobId,
+          progess:0,
+          status:"Submitted"
         }
-      })
+      }
+      self.jobs.splice(0,0,job)
+      self.$store.dispatch("api/waitForImport",{id:jobId.id || jobId})
+      .then(()=>poll())
+      
+      function poll(){
+        self.$store.dispatch('api/getImport',job)
+        .then(function(result){
+          Object.assign(job,result) 
+          if(result.status==="InProgress"){
+            setTimeout(()=>poll(),100)
+          }
+        })
+      }
     },
     refresh:function(index){
       var self=this
@@ -223,17 +216,14 @@ module.exports={
             qa:data.qna,
             name:id
           })
-          .then(res).catch(rej)
+          .then(res)
+          .catch(rej)
         }else{
           rej('Invalid or Empty File')
         }
       })
       .then(()=>{
-        return self.$store.dispatch('api/waitForImport',{id})
-      })
-      .then(job=>{
-        self.success="Import Started!"
-        return self.addJob(job)
+        self.addJob(id)
       })
       .tapCatch(console.log)
       .catch(error=>self.error=error)

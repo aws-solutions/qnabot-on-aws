@@ -36,16 +36,6 @@
                       v-icon file_download
 
                 v-divider(v-if="index + 1 < exports.length")
-    v-dialog(v-model="loading" persistent id="export-loading")
-      v-card
-        v-card-title Loading
-        v-card-text
-          span(v-if="error" class='error--text') Error: {{error}} 
-          span(v-if="success") {{success}} 
-          v-progress-linear( v-if="!error && !success" indeterminate)
-        v-card-actions
-          v-spacer
-          v-btn(v-if="error || success" @click='loading=false') close
 </template>
 
 <script>
@@ -109,7 +99,6 @@ module.exports={
     },
     start:async function(){
       var self=this
-      this.loading=true
       try{
         await this.$store.dispatch('api/startExport',{
           name:this.filename,
@@ -119,7 +108,6 @@ module.exports={
       }catch(e){
         this.error=err
       }finally{
-        self.loading=false
       }
     },
     remove:async function(index){
