@@ -52,7 +52,7 @@
                     v-card-actions.pa-0.pr-2.pb-2
                       v-spacer
                       v-btn.example(
-                        @click="url=example.document.href"
+                        @click="importExample(example.document.href)"
                         :id="'example-'+example.id"
                       ) Load
     v-dialog(v-model="loading" persistent)
@@ -117,6 +117,10 @@ module.exports={
     this.examples=examples
   },
   methods:{
+    importExample:function(url){
+      this.url=url
+      this.Geturl()
+    },
     close:function(){
       this.loading=false
       this.error=false
