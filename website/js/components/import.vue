@@ -59,7 +59,8 @@
       v-card( id="import-loading")
         v-card-title Loading
         v-card-text
-          span(v-if="error" class='error--text' id="import-error") Error: {{error}} 
+          span(v-if="error" class='error--text' id="import-error") Error: 
+            pre {{error}} 
           span(v-if="!error & success" id="import-success") {{success}} 
           v-progress-linear( v-if="!error && !success" indeterminate)
         v-card-actions
@@ -88,6 +89,8 @@ var Vuex=require('vuex')
 var Promise=require('bluebird')
 var saveAs=require('file-saver').saveAs
 var axios=require('axios')
+const parseJson = require('json-parse-better-errors')
+
 var _=require('lodash')
 
 module.exports={
@@ -170,21 +173,24 @@ module.exports={
       for(i=0;i<files_raw.length;i++){
         files.push(files_raw[i])
       }
-      files.forEach(file=>{
+      Promise.all(files.map(file=>{
         var name=file.name
-        new Promise(function(res,rej){
+        return new Promise(function(res,rej){
           var reader = new FileReader();
           reader.onload = function(e){ 
             try {
-              res(JSON.parse(e.srcElement.result))
+              res(parseJson(e.srcElement.result))
             } catch(e) {
-              console.log(e)
-              rej("invalid JSON:"+e)
+              rej(e)
             }
           };
           reader.readAsText(file);
         })
-        .then(data=>self.upload(data,name))
+      }))
+      .map(data=>self.upload(data,name))
+      .catch(e=>{
+        console.log(e)
+        self.error=e.message
       })
     },
     Geturl:function(event){
