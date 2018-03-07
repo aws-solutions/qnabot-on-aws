@@ -36,7 +36,7 @@ ${codeJS}
 ${codePY}
 ~~~  
 
-The event object has three properties
+The event object has two properties
 1. \`event.req\` the normalized request object
 1. \`event.res\` the normalized response object (edit this to change the response)
 

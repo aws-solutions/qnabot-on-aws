@@ -114,7 +114,7 @@ module.exports={
           
           await self.$store.dispatch('data/update',self.tmp)
           self.$emit('update:data',_.cloneDeep(self.tmp))
-          self.success="!success"
+          self.success="success!"
         }catch(error){
           self.dialog=true
           self.loading=false

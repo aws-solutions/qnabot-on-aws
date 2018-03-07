@@ -25,7 +25,7 @@ Vue.use(Vuetify);
 var config = {
   cognito:{},
   lex: {
-    initialText:"",
+    initialText:"Ask a Question",
     initialSpeechInstruction:"",
     reInitSessionAttributesOnRestart: false
   },

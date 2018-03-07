@@ -69,9 +69,7 @@
       {
          "qid": "Admin.001",
          "q": [
-            "How do I modify Q and A Bot content",
-            "How can I edit items",
-            "I need to change some answers"
+            "How do I modify Q and A Bot content"
          ],
          "a": "Use the Content Designer Question and Test tools to find your existing documents and edit them directly in the console. You can also export existing documents as a JSON file, make changes to the file, and re-import.",
          "r": {
