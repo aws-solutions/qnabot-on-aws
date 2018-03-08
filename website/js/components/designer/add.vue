@@ -76,6 +76,7 @@ module.exports={
       this.reset()
       this.loading=false
       this.dialog=false
+      this.error=false
     },
     reset:function(){
       this.data=empty(this.schema) 
