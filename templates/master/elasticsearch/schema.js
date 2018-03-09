@@ -48,7 +48,8 @@ module.exports={
                             format:'url',
                             maxLength:2000
                         }
-                    }
+                    },
+                    required:["title","imageUrl"]
                 },
                 l:{
                     type:"string",
