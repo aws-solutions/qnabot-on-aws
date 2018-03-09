@@ -16,7 +16,7 @@
         v-card-title(primary-title)
           .headline {{title}}
         v-card-text
-          v-form
+          v-form(v-if="dialog")
             schema-input( 
               v-model="data"
               :valid.sync="valid"
