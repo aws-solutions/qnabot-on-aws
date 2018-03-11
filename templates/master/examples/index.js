@@ -12,8 +12,21 @@ var js=fs.readdirSync(`${__dirname}/js`)
     }
 })
 
+var py=fs.readdirSync(`${__dirname}/py`)
+.map(file=>{
+    var name=file.match(/(.*).py/)[1]
+    return {
+        name:`ExamplePYTHONLambda${name}`,
+        resource:pylambda(name),
+        id:name
+    }
+})
 
-module.exports=Object.assign(_.fromPairs(js.map(x=>[x.name,x.resource])),{
+
+module.exports=Object.assign(
+    _.fromPairs(js.map(x=>[x.name,x.resource])),
+    _.fromPairs(py.map(x=>[x.name,x.resource])),
+    {
     "LambdaHookExamples":{
         "Condition":"BuildExamples",
         "Type": "Custom::QnABotExamples",
@@ -106,6 +119,39 @@ function jslambda(name){
         "MemorySize": "128",
         "Role": {"Fn::GetAtt": ["ExampleLambdaRole","Arn"]},
         "Runtime": "nodejs6.10",
+        "Timeout": 300,
+        "Tags":[{
+            Key:"Type",
+            Value:"Example"
+        }]
+      }
+    }
+}
+function pylambda(name){
+    return {
+      "Type": "AWS::Lambda::Function",
+      "Condition":"BuildExamples",
+      "Properties": {
+        "Code": {
+            "S3Bucket": {"Ref":"BootstrapBucket"},
+            "S3Key": {"Fn::Join":["",[
+                {"Ref":"BootstrapPrefix"},
+                "/lambda/examples.zip"
+            ]]},
+            "S3ObjectVersion":{"Ref":"ExampleCodeVersion"}
+        },
+        "Environment": {
+          "Variables": {
+            "ES_TYPE": {"Fn::GetAtt":["Var","type"]},
+            "ES_INDEX": {"Fn::GetAtt":["Var","index"]},
+            "ES_ADDRESS": {"Fn::GetAtt":["ESVar","ESAddress"]},
+          }
+        },
+        "FunctionName":{"Fn::Sub":`qna-\${AWS::StackName}-${name}`},
+        "Handler":`py/${name}.handler`,
+        "MemorySize": "128",
+        "Role": {"Fn::GetAtt": ["ExampleLambdaRole","Arn"]},
+        "Runtime": "python3.6",
         "Timeout": 300,
         "Tags":[{
             Key:"Type",
