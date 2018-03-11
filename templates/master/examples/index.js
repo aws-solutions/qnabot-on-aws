@@ -114,7 +114,7 @@ function jslambda(name){
             "ES_ADDRESS": {"Fn::GetAtt":["ESVar","ESAddress"]},
           }
         },
-        "FunctionName":{"Fn::Sub":`qna-\${AWS::StackName}-${name}`},
+        "FunctionName":{"Fn::Sub":`qna-\${AWS::StackName}-${name}-JS`},
         "Handler":`js/${name}.handler`,
         "MemorySize": "128",
         "Role": {"Fn::GetAtt": ["ExampleLambdaRole","Arn"]},
@@ -147,7 +147,7 @@ function pylambda(name){
             "ES_ADDRESS": {"Fn::GetAtt":["ESVar","ESAddress"]},
           }
         },
-        "FunctionName":{"Fn::Sub":`qna-\${AWS::StackName}-${name}`},
+        "FunctionName":{"Fn::Sub":`qna-\${AWS::StackName}-${name}-PY`},
         "Handler":`py/${name}.handler`,
         "MemorySize": "128",
         "Role": {"Fn::GetAtt": ["ExampleLambdaRole","Arn"]},
