@@ -1,0 +1,29 @@
+{
+    "endpoint":"${ESVar.ESAddress}",
+    "method":"POST",
+#if($input.path('$.query').length()!=0)
+    "path":"/${Var.index}/${Var.type}/_delete_by_query?refresh=wait_for",
+    "body":{
+        "query":{
+            "bool":{
+                "must":{"match_all":{}},
+                "filter":{"regexp":{
+                    "qid":"$input.path('$.query')"
+                }}
+            }
+        }
+    }
+#else
+    "path":"/${Var.index}/${Var.type}/_bulk?refresh=wait_for",
+    "body":[
+        #foreach($qid in $input.path('$.list'))
+        { "delete":{
+            "_index":"${Var.index}", 
+            "_type" :"${Var.type}",
+            "_id" : "$qid" } }#if($foreach.hasNext),#end
+        #end
+    ]
+#end
+}
+
+

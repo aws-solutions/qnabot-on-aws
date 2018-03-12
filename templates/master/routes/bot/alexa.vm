@@ -1,0 +1,13 @@
+{
+"schema":{
+    "intents": [{
+        "slots": [{
+            "name": "QnA_slot",
+            "type": "EXAMPLE_QUESTIONS"
+            }],
+        "intent": "Qna_intent"
+        },
+        {"intent":"AMAZON.StopIntent"},
+        {"intent":"AMAZON.CancelIntent"}
+    ]
+}}

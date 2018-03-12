@@ -1,0 +1,4 @@
+{
+    "message":"success",
+    "count":"$input.path('$.deleted')"
+}

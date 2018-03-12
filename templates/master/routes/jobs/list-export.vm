@@ -1,0 +1,11 @@
+#set ( $root="https://${!context.apiId}.execute-api.${AWS::Region}.amazonaws.com/${!context.stage}")
+
+{
+    "bucket":"${ExportBucket}",
+    "prefix":"status/",
+    "perpage":"$input.params('perpage')",
+    "token":"$input.params('token')",
+    "type":"exports",
+    "root":"$root"
+}
+

@@ -1,0 +1,78 @@
+#if ( $input.params('perpage').length()==0 )
+    #set ( $perpage = 10 )
+#else
+    #set ( $perpage = $input.params('perpage') )
+#end
+
+#if ( $input.params('from').length()==0)
+    #set ( $from = 0 )
+#else
+    #set ( $from = $input.params('from') )
+#end
+
+{
+    "endpoint":"${ESVar.ESAddress}",
+    "method":"POST",
+    "path":"/${Var.index}/${Var.type}/_search?search_type=dfs_query_then_fetch",
+    "body":{
+        "size":"$perpage",
+        "from":"$from",
+        "query": {
+            #if($input.params('query').length()>0)
+                #if ( !$input.params('topic') )
+                    #set ( $topic = "" )
+                #else
+                    #set ( $topic = $util.urlDecode($input.params('topic')) )
+                #end
+
+            "bool": {
+                "should": [{
+                    "multi_match": {
+                        "query": "$util.urlDecode($input.params('query'))",
+                        "fields" : ["a"]
+                    }},
+                    {"multi_match": {
+                        "query": "$topic",
+                        "fields" : ["t"]
+                    }},
+                    {"nested":{  
+                        "path":"questions",
+                        "score_mode":"sum",
+                        "boost":2,
+                        "query":{  
+                            "match":{  
+                                "questions.q":"$util.urlDecode($input.params('query'))"
+                            }
+                        }
+                    }} 
+                ]
+            }
+            #end
+            #if($input.params('query').length()==0)
+            "bool":{
+                #if($input.params('filter').length()==0)
+                "must":{"match_all":{}}
+                #else
+                "filter":{"regexp":{
+                    "qid":"$util.urlDecode($input.params('filter'))"
+                }}
+                #end
+            }
+            #end
+        }
+        #if($input.params('query').length()==0)
+            #if ( $input.params('order').length()==0 )
+                #set ( $order = "asc" )
+            #else
+                #set ( $order = $input.params('order') )
+            #end
+
+        ,"sort":{
+            "qid":{
+                "order":"$order" 
+            }
+        }
+        #end
+    }
+}
+

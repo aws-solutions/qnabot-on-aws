@@ -1,0 +1,9 @@
+{
+    "Arn":"${LexBuildLambda.Arn}",
+    "botname":"${LexBot}",
+    "slottype":"${SlotType}",
+    "intent":"${Intent}",
+    "address":"${ESVar.ESAddress}",
+    "index":"${Var.index}",
+    "type":"${Var.type}"
+}  

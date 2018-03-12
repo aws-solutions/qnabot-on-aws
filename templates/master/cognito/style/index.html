@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+
+<head><head>
+    <link href="/bootstrap.min.css" rel="stylesheet"media="screen" />
+    <link href="/cognito-login.css" rel="stylesheet"media="screen" />
+    <link href="/custom-css.css" rel="stylesheet" media="screen" />
+    <title>Signin</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+</head></head>
+
+<body>
+    <div class="container">
+        <div class="modal-dialog">
+            <div class="modal-content background-customizable modal-content-mobile visible-xs visible-sm">
+                <div><div>
+                    <div class="banner-customizable">
+                        <center>
+                            
+                        </center>
+                    </div>
+                </div></div>
+                <div id="div-forms" class="modal-body">
+                    <div><div>
+    
+</div></div>
+                    <div>
+                        <div><div>
+    
+</div></div>
+                        <div><div>
+    
+</div></div>
+                        <div>
+                            
+                            <div><div>
+    
+        <Span class="textDescription-customizable ">Sign in with your username and password</Span>
+        <form action="/login?redirect_uri=https://localhost?login=&amp;response_type=code&amp;client_id=43b0siso9lvu76qkct29j564ie" method="POST" name="cognitoSignInForm"><input type="hidden" name="_csrf" value="6878d88c-dde2-4586-913e-ea1a8855f94b"/>
+            
+
+            
+            <label class="label-customizable">Username</label>
+            <br/>
+            <input id="username" name="username" type="text" class="form-control inputField-customizable"
+                   placeholder="Username"
+                   required>
+            <br/>
+            <label class="label-customizable">Password</label>
+            <br/>
+            <input id="password" name="password" type="password" class="form-control inputField-customizable"
+                   placeholder="Password"
+                   required>
+            <br/>
+            <a class="redirect-customizable" href="/forgotPassword?redirect_uri=https://localhost?login=&amp;response_type=code&amp;client_id=43b0siso9lvu76qkct29j564ie">Forgot your password?</a>
+            <input name="signInSubmitButton" type="Submit" value="Sign in"
+                   class="btn btn-primary submitButton-customizable"/>
+            <br/>
+            <div>
+                <p class="redirect-customizable"><span>Need an account? </span>&nbsp;<a
+                        href="/signup?redirect_uri=https://localhost?login=&amp;response_type=code&amp;client_id=43b0siso9lvu76qkct29j564ie">Sign up</a></p>
+            </div>
+        </form>
+    
+</div></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            
+
+            <div class="modal-content background-customizable modal-content-mobile visible-md visible-lg">
+                <div><div>
+                    <div class="banner-customizable">
+                        <center>
+                            
+                        </center>
+                    </div>
+                </div></div>
+                <div id="div-forms" class="modal-body">
+                    <div><div>
+    
+</div></div>
+                    <div>
+                        <div>
+                            <div><div>
+    
+</div></div>
+                            <div><div>
+    
+</div></div>
+                        </div>
+                        <div>
+                            <div><div>
+    
+        <Span class="textDescription-customizable ">Sign in with your username and password</Span>
+        <form action="/login?redirect_uri=https://localhost?login=&amp;response_type=code&amp;client_id=43b0siso9lvu76qkct29j564ie" method="POST" name="cognitoSignInForm"><input type="hidden" name="_csrf" value="6878d88c-dde2-4586-913e-ea1a8855f94b"/>
+            
+
+            
+            <label class="label-customizable">Username</label>
+            <br/>
+            <input id="username" name="username" type="text" class="form-control inputField-customizable"
+                   placeholder="Username"
+                   required>
+            <br/>
+            <label class="label-customizable">Password</label>
+            <br/>
+            <input id="password" name="password" type="password" class="form-control inputField-customizable"
+                   placeholder="Password"
+                   required>
+            <br/>
+            <a class="redirect-customizable" href="/forgotPassword?redirect_uri=https://localhost?login=&amp;response_type=code&amp;client_id=43b0siso9lvu76qkct29j564ie">Forgot your password?</a>
+            <input name="signInSubmitButton" type="Submit" value="Sign in"
+                   class="btn btn-primary submitButton-customizable"/>
+            <br/>
+            <div>
+                <p class="redirect-customizable"><span>Need an account? </span>&nbsp;<a
+                        href="/signup?redirect_uri=https://localhost?login=&amp;response_type=code&amp;client_id=43b0siso9lvu76qkct29j564ie">Sign up</a></p>
+            </div>
+        </form>
+    
+</div></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

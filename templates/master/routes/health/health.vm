@@ -1,0 +1,6 @@
+{
+    "endpoint":"${ESVar.ESAddress}",
+    "method":"GET",
+    "path":"/_cluster/health"
+}
+

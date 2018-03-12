@@ -1,0 +1,92 @@
+﻿{
+   "qna": [
+      {
+         "qid": "QnABot.002",
+         "q": [
+            "How do I use Q and A bot"
+         ],
+         "a": "Create and administer your questions and answers using the Q and A Bot Content Designer UI. End users ask questions using the Lex web UI which supports voice or chat, or using Alexa devices for hands free voice interaction. ",
+         "r": {
+            "title": "",
+            "imageUrl": ""
+         }
+      },
+      {
+         "qid": "Media.001",
+         "q": [
+            "How can I include pictures in Q and A Bot answers"
+         ],
+         "a": "Add an image attachment to the item using the Content Designer.",
+         "r": {
+            "title": "",
+            "imageUrl": ""
+         }
+      },
+      {
+         "q": [
+            "What is Q and A Bot"
+         ],
+         "a": "The Q and A Bot uses Amazon Lex and Alexa to provide a natural language interface for your FAQ knowledge base, so your users can just ask a question and get a quick and relevant answer.",
+         "r": {
+            "title": "",
+            "imageUrl": ""
+         },
+         "qid": "QnABot.001"
+      },
+      {
+         "qid": "Admin.002",
+         "q": [
+            "Can I backup Q and A Bot content"
+         ],
+         "a": "Yes. Use the Content Designer to export your content as a JSON file. Maintain this file in your version control system or S3 bucket. Use the Designer UI Import feature to restore content from the JSON file.",
+         "r": {
+            "title": "",
+            "imageUrl": ""
+         }
+      },
+      {
+         "qid": "Admin.003",
+         "q": [
+            "Can I import Q and A Bot content from a file"
+         ],
+         "a": "Yes, the Content Designer has an import function which lets you load items from a formatted JSON file. You can create JSON files using the Export feature, or you can write your own tools to create JSON files from existing content such as a website FAQ page.",
+         "r": {
+            "title": "",
+            "imageUrl": ""
+         }
+      },
+      {
+         "qid": "Admin.005",
+         "q": [
+            "How can I find specific Q and A items in the Designer UI"
+         ],
+         "a": "Use the Filter feature in the Questions tab to filter the items list based on the ID field. Or use the Test tab to list all the items that match a question.",
+         "r": {
+            "title": "",
+            "imageUrl": ""
+         }
+      },
+      {
+         "qid": "Admin.001",
+         "q": [
+            "How do I modify Q and A Bot content"
+         ],
+         "a": "Use the Content Designer Question and Test tools to find your existing documents and edit them directly in the console. You can also export existing documents as a JSON file, make changes to the file, and re-import.",
+         "r": {
+            "title": "",
+            "imageUrl": ""
+         }
+      },
+      {
+         "qid": "Admin.004",
+         "q": [
+            "How do I troubleshoot and fix problems with Q and A Bot."
+         ],
+         "a": "Use the Content Designer test tool to test a question, and check what items are returned, ranked in order of score. If the desired item does not have the highest score, then add the question to the item and run the test again. The desired item should now have the highest score. Take care not to create items with duplicate questions, to avoid unpredictable responses.",
+         "r": {
+            "title": "",
+            "imageUrl": ""
+         }
+      }
+   ]
+}

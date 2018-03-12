@@ -1,0 +1,1 @@
+Imports a document with a response card.

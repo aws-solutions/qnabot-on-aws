@@ -1,0 +1,1 @@
+Imports a single document with a hello greeting.

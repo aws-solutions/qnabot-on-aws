@@ -1,0 +1,161 @@
+{
+  "Description": "This template creates test infastructure for testing QnABot",
+  "Resources": {
+    "Repo": {"Type": "AWS::ECR::Repository", "Properties": {}},
+    "testBuilb": {
+      "Type": "AWS::CodeBuild::Project",
+      "Properties": {
+        "Artifacts": {"Type": "S3", "Location": {"Ref": "Bucket"}},
+        "Environment": {
+          "ComputeType": "BUILD_GENERAL1_LARGE",
+          "Image": {
+            "Fn::Sub": "${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/${Repo}:test"
+          },
+          "EnvironmentVariables": [
+            {
+              "Name": "CODEBUILD_SOURCE_VERSION",
+              "Value": "feature-remove-exports"
+            }
+          ],
+          "Type": "LINUX_CONTAINER"
+        },
+        "Name": {"Fn::Sub": "${AWS::StackName}-test-build"},
+        "ServiceRole": {"Ref": "ServiceRole"},
+        "Source": {
+          "Type": "GITHUB",
+          "Location": "https://github.com/awslabs/aws-ai-qna-bot.git",
+          "auth": {"type": "OATH"}
+        }
+      }
+    },
+    "ImageBuild": {
+      "Type": "AWS::CodeBuild::Project",
+      "Properties": {
+        "Artifacts": {"Type": "NO_ARTIFACTS"},
+        "Environment": {
+          "ComputeType": "BUILD_GENERAL1_LARGE",
+          "EnvironmentVariables": [
+            {"Name": "IMAGE_REPO_NAME", "Value": {"Ref": "Repo"}},
+            {"Name": "IMAGE_TAG", "Value": "test"},
+            {"Name": "AWS_DEFAULT_REGION", "Value": {"Ref": "AWS::Region"}},
+            {"Name": "AWS_ACCOUNT_ID", "Value": {"Ref": "AWS::AccountId"}}
+          ],
+          "Image": "ubuntu/docker/17.09.0",
+          "PrivilegedMode": true,
+          "Type": "LINUX_CONTAINER"
+        },
+        "Name": {"Fn::Sub": "${AWS::StackName}-test-image-build"},
+        "ServiceRole": {"Ref": "ServiceRole"},
+        "Source": {
+          "Type": "S3",
+          "Location": {"Fn::Sub": "${Bucket}/source.zip"}
+        }
+      }
+    },
+    "Bucket": {"Type": "AWS::S3::Bucket", "Properties": {}},
+    "Clear": {
+      "Type": "Custom::S3Clear",
+      "Properties": {
+        "ServiceToken": {"Fn::GetAtt": ["ClearLambda", "Arn"]},
+        "Bucket": {"Ref": "Bucket"}
+      }
+    },
+    "upload": {
+      "Type": "Custom::S3Upload",
+      "Properties": {
+        "ServiceToken": {"Fn::GetAtt": ["UploadLambda", "Arn"]},
+        "bucket": {"Ref": "Bucket"},
+        "key": "source.zip",
+        "body": "UEsDBAoAAAAAAAGbK0yFEUoNCwAAAAsAAAANAAAAYnVpbGRzcGVjLnltbGhlbGxvIHdvcmxkUEsDBAoAAAAAAAGbK0yFEUoNCwAAAAsAAAAKAAAARG9ja2VyZmlsZWhlbGxvIHdvcmxkUEsBAhQACgAAAAAAAZsrTIURSg0LAAAACwAAAA0AAAAAAAAAAAAAAAAAAAAAAGJ1aWxkc3BlYy55bWxQSwECFAAKAAAAAAABmytMhRFKDQsAAAALAAAACgAAAAAAAAAAAAAAAAA2AAAARG9ja2VyZmlsZVBLBQYAAAAAAgACAHMAAABpAAAAAAA="
+      }
+    },
+    "Build": {
+      "Type": "Custom::CodeBuildStart",
+      "Properties": {
+        "ServiceToken": {"Fn::GetAtt": ["BuildLambda", "Arn"]},
+        "name": {"Ref": "ImageBuild"}
+      }
+    },
+    "BuildLambda": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Code": {
+          "ZipFile": "var response = require('cfn-response')\nvar aws=require('aws-sdk')\naws.config.region=process.env.AWS_REGION\nvar cb=new aws.CodeBuild()\nvar s3=new aws.S3()\n\nexports.build = function(event, context) {\n    console.log(JSON.stringify(event,null,2))\n\n    if(event.RequestType===\"Create\"){\n        cb.startBuild({\n            projectName:event.ResourceProperties.name\n        }).promise()\n        .then(x=>response.send(event,context,response.SUCCESS))\n        .catch(x=>response.send(event,context,response.FAIL))\n    }else{\n        response.send(event, context, response.SUCCESS)\n    }\n}\n\nexports.zip = function(event, context) {\n    console.log(JSON.stringify(event,null,2))\n\n    if(event.RequestType===\"Create\"){\n        s3.putObject({\n            Bucket:event.ResourceProperties.bucket,\n            Key:event.ResourceProperties.key,\n            Body:new Buffer(event.ResourceProperties.body,\"base64\")\n        })\n        .then(x=>response.send(event,context,response.SUCCESS))\n        .catch(x=>response.send(event,context,response.FAIL))\n    }else{\n        response.send(event, context, response.SUCCESS)\n    }\n}\n\nexports.clear = function(event, context) {\n    console.log(JSON.stringify(event,null,2))\n\n    if(event.RequestType===\"Delete\"){\n        Delete(event.ResourceProperties)\n        .then(()=>response.send(event, context, response.SUCCESS))\n        .catch(x=>{\n            console.log(x)\n            response.send(event, context, response.FAILED)\n        })\n    }else{\n        response.send(event, context, response.SUCCESS)\n    }\n}\n\nfunction Delete(params){\n    return new Promise(function(res,rej){\n        function next(){\n            s3.listObjectVersions({\n                Bucket:params.Bucket\n            }).promise()\n            .then(x=>x.Versions.concat(x.DeleteMarkers))\n            .then(function(files){\n                return files.map(file=>{return {\n                    Key:file.Key,\n                    VersionId:file.VersionId\n                }  })\n            })\n            .then(function(keys){\n                console.log(\"going to delete\",keys)\n                if(keys.length>0){ \n                    return s3.deleteObjects({\n                        Bucket:params.Bucket,\n                        Delete:{\n                            Objects:keys\n                        }\n                    }).promise()\n                    .then(()=>next())\n                    .catch(rej)\n                }else{\n                    res()\n                }\n            })\n        }\n        next()\n    })\n}\n"
+        },
+        "Handler": "index.build",
+        "MemorySize": "128",
+        "Role": {"Fn::GetAtt": ["LambdaRole", "Arn"]},
+        "Runtime": "nodejs6.10",
+        "Timeout": 300
+      }
+    },
+    "UploadLambda": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Code": {
+          "ZipFile": "var response = require('cfn-response')\nvar aws=require('aws-sdk')\naws.config.region=process.env.AWS_REGION\nvar cb=new aws.CodeBuild()\nvar s3=new aws.S3()\n\nexports.build = function(event, context) {\n    console.log(JSON.stringify(event,null,2))\n\n    if(event.RequestType===\"Create\"){\n        cb.startBuild({\n            projectName:event.ResourceProperties.name\n        }).promise()\n        .then(x=>response.send(event,context,response.SUCCESS))\n        .catch(x=>response.send(event,context,response.FAIL))\n    }else{\n        response.send(event, context, response.SUCCESS)\n    }\n}\n\nexports.zip = function(event, context) {\n    console.log(JSON.stringify(event,null,2))\n\n    if(event.RequestType===\"Create\"){\n        s3.putObject({\n            Bucket:event.ResourceProperties.bucket,\n            Key:event.ResourceProperties.key,\n            Body:new Buffer(event.ResourceProperties.body,\"base64\")\n        })\n        .then(x=>response.send(event,context,response.SUCCESS))\n        .catch(x=>response.send(event,context,response.FAIL))\n    }else{\n        response.send(event, context, response.SUCCESS)\n    }\n}\n\nexports.clear = function(event, context) {\n    console.log(JSON.stringify(event,null,2))\n\n    if(event.RequestType===\"Delete\"){\n        Delete(event.ResourceProperties)\n        .then(()=>response.send(event, context, response.SUCCESS))\n        .catch(x=>{\n            console.log(x)\n            response.send(event, context, response.FAILED)\n        })\n    }else{\n        response.send(event, context, response.SUCCESS)\n    }\n}\n\nfunction Delete(params){\n    return new Promise(function(res,rej){\n        function next(){\n            s3.listObjectVersions({\n                Bucket:params.Bucket\n            }).promise()\n            .then(x=>x.Versions.concat(x.DeleteMarkers))\n            .then(function(files){\n                return files.map(file=>{return {\n                    Key:file.Key,\n                    VersionId:file.VersionId\n                }  })\n            })\n            .then(function(keys){\n                console.log(\"going to delete\",keys)\n                if(keys.length>0){ \n                    return s3.deleteObjects({\n                        Bucket:params.Bucket,\n                        Delete:{\n                            Objects:keys\n                        }\n                    }).promise()\n                    .then(()=>next())\n                    .catch(rej)\n                }else{\n                    res()\n                }\n            })\n        }\n        next()\n    })\n}\n"
+        },
+        "Handler": "index.zip",
+        "MemorySize": "128",
+        "Role": {"Fn::GetAtt": ["LambdaRole", "Arn"]},
+        "Runtime": "nodejs6.10",
+        "Timeout": 300
+      }
+    },
+    "ClearLambda": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Code": {
+          "ZipFile": "var response = require('cfn-response')\nvar aws=require('aws-sdk')\naws.config.region=process.env.AWS_REGION\nvar cb=new aws.CodeBuild()\nvar s3=new aws.S3()\n\nexports.build = function(event, context) {\n    console.log(JSON.stringify(event,null,2))\n\n    if(event.RequestType===\"Create\"){\n        cb.startBuild({\n            projectName:event.ResourceProperties.name\n        }).promise()\n        .then(x=>response.send(event,context,response.SUCCESS))\n        .catch(x=>response.send(event,context,response.FAIL))\n    }else{\n        response.send(event, context, response.SUCCESS)\n    }\n}\n\nexports.zip = function(event, context) {\n    console.log(JSON.stringify(event,null,2))\n\n    if(event.RequestType===\"Create\"){\n        s3.putObject({\n            Bucket:event.ResourceProperties.bucket,\n            Key:event.ResourceProperties.key,\n            Body:new Buffer(event.ResourceProperties.body,\"base64\")\n        })\n        .then(x=>response.send(event,context,response.SUCCESS))\n        .catch(x=>response.send(event,context,response.FAIL))\n    }else{\n        response.send(event, context, response.SUCCESS)\n    }\n}\n\nexports.clear = function(event, context) {\n    console.log(JSON.stringify(event,null,2))\n\n    if(event.RequestType===\"Delete\"){\n        Delete(event.ResourceProperties)\n        .then(()=>response.send(event, context, response.SUCCESS))\n        .catch(x=>{\n            console.log(x)\n            response.send(event, context, response.FAILED)\n        })\n    }else{\n        response.send(event, context, response.SUCCESS)\n    }\n}\n\nfunction Delete(params){\n    return new Promise(function(res,rej){\n        function next(){\n            s3.listObjectVersions({\n                Bucket:params.Bucket\n            }).promise()\n            .then(x=>x.Versions.concat(x.DeleteMarkers))\n            .then(function(files){\n                return files.map(file=>{return {\n                    Key:file.Key,\n                    VersionId:file.VersionId\n                }  })\n            })\n            .then(function(keys){\n                console.log(\"going to delete\",keys)\n                if(keys.length>0){ \n                    return s3.deleteObjects({\n                        Bucket:params.Bucket,\n                        Delete:{\n                            Objects:keys\n                        }\n                    }).promise()\n                    .then(()=>next())\n                    .catch(rej)\n                }else{\n                    res()\n                }\n            })\n        }\n        next()\n    })\n}\n"
+        },
+        "Handler": "index.clear",
+        "MemorySize": "128",
+        "Role": {"Fn::GetAtt": ["LambdaRole", "Arn"]},
+        "Runtime": "nodejs6.10",
+        "Timeout": 300
+      }
+    },
+    "ServiceRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": {"Service": "codebuild.amazonaws.com"},
+              "Action": "sts:AssumeRole"
+            }
+          ]
+        },
+        "Path": "/",
+        "ManagedPolicyArns": [
+          "arn:aws:iam::aws:policy/AmazonECS_FullAccess",
+          "arn:aws:iam::aws:policy/AmazonS3FullAccess"
+        ]
+      }
+    },
+    "LambdaRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": {"Service": "lambda.amazonaws.com"},
+              "Action": "sts:AssumeRole"
+            }
+          ]
+        },
+        "Path": "/",
+        "ManagedPolicyArns": [
+          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
+          "arn:aws:iam::aws:policy/AmazonECS_FullAccess",
+          "arn:aws:iam::aws:policy/AmazonS3FullAccess"
+        ]
+      }
+    }
+  },
+  "Outputs": {}
+}
