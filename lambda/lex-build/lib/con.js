@@ -20,7 +20,7 @@ module.exports=_.memoize(function(address){
     return require('elasticsearch').Client({
         requestTimeout:10*1000,
         pingTimeout:10*1000,
-        hosts:address,
+        hosts:process.env.ADDRESS,
         connectionClass: require('http-aws-es'),
         defer: function () {
             return Promise.defer();

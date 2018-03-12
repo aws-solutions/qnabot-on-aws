@@ -24,19 +24,20 @@ var run=function(params,test){
 }
 
 module.exports={
-    build:function(test){
-        outputs('dev/master',{wait:true})
-        .then(function(master){
-            var params={
-                address:master.ElasticsearchEndpoint,
-                index:master.ElasticsearchIndex,
-                type:master.ElasticsearchType,
-                botname:master.BotName,
-                slottype:master.SlotType,
-                intent:master.Intent
-            }
-            run(params,test)
-        })
+    build:async function(test){
+        var master=await outputs('dev/master',{wait:true})
+        var lambda=await outputs('dev/lambda',{wait:true})
+
+        process.env.POLL_LAMBDA=lambda.lambda
+        process.env.BOTNAME=master.BotName
+        process.env.SLOTTYPE=master.SlotType
+        process.env.INTENT=master.Intent
+        process.env.ADDRESS=master.ElasticsearchEndpoint
+        process.env.INDEX=master.ElasticsearchIndex
+        process.env.TYPE=master.ElasticsearchType
+       
+        var params={}
+        run(params,test)
     }
 }
 

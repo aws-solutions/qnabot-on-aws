@@ -84,7 +84,7 @@ module.exports={
     },
     add:async function(){
       var self=this
-
+      this.error=false
       if(this.valid){
         this.loading=true
         this.dialog=false

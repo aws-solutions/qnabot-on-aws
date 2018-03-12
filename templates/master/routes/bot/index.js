@@ -15,17 +15,15 @@ module.exports={
 "BotPost":lambda({
     authorization:"AWS_IAM",
     method:"post",
-    subTemplate:fs.readFileSync(__dirname+'/post.vm','utf8'),
-    lambda:{"Fn::GetAtt":["LexBuildLambda","Arn"]},
+    lambda:{"Fn::GetAtt":["LexBuildLambdaStart","Arn"]},
     resource:{"Ref":"Bot"},
-    parameterNames:{"integration.request.header.X-Amz-Invocation-Type":"'Event'"},
     responseTemplate:fs.readFileSync(__dirname+'/post.resp.vm','utf8')
 }),
 "BotGet":lambda({
     authorization:"AWS_IAM",
     method:"get",
     subTemplate:fs.readFileSync(__dirname+'/get.vm','utf8'),
-    lambda:{"Fn::GetAtt":["LexProxyLambda","Arn"]},
+    lambda:{"Fn::GetAtt":["LexStatusLambda","Arn"]},
     resource:{"Ref":"Bot"},
     responseTemplate:fs.readFileSync(__dirname+'/get.resp.vm','utf8')
 }),

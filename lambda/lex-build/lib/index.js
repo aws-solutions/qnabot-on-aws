@@ -21,46 +21,50 @@ var Slot=require('./slot')
 var Intent=require('./intent')
 var Bot=require('./bot')
 var clean=require('./delete')
+var status=require('./status')
+var wait=require('./wait')
 
 module.exports=function(params){ 
     var utterances=getUtterances(params)
     
     var slottype=run("getSlotType",{
-        name:params.slottype,
+        name:process.env.SLOTTYPE,
         version:"$LATEST"
     })
     var intent=run("getIntent",{
-        name:params.intent,
+        name:process.env.INTENT,
         version:"$LATEST"
     })
     var bot=run('getBot',{
-        name:params.botname,
+        name:process.env.BOTNAME,
         versionOrAlias:"$LATEST"
     })
     var clean_intent=null
     var clean_slottype=null
+
     return Promise.join(utterances,slottype)
-        .tap(x=>console.log("--------------rebuilding slot"))
+        .tap(status("Rebuilding Slot"))
         .spread(Slot)
 
-        .tap(x=>console.log("--------------rebuilding Intent"))
+        .tap(status("Rebuilding Intent"))
         .then(slot_version=>{
-            clean_slottype=()=>clean.intent(params.intent,slot_version)
+            clean_slottype=()=>clean.intent(process.env.INTENT,slot_version)
             return Promise.join(slot_version,intent)
         })
         .spread(Intent)
 
-        .tap(x=>console.log("--------------rebuilding Bot"))
+        .tap(status("Rebuild Bot"))
         .then(intent_version=>{
-            clean_intent=()=>clean.slot(params.slottype,version)
+            clean_intent=()=>clean.slot(process.env.SLOTTYPE,version)
             return Promise.join(intent_version,bot)
         })
         .spread(Bot)
-
-        .tap(x=>console.log("--------------deleting old"))
-        .then(version=>clean.bot(params.botname,version))
+        .delay(1000)
+        .then(()=>wait())
+        .then(version=>clean.bot(process.env.BOTNAME,version))
         .then(clean_intent)
         .then(clean_slottype)
         .tapCatch(console.log)
+        .catch(error=>status("Failed")(error.message))
 }
 

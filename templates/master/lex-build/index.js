@@ -1,6 +1,38 @@
 var fs=require('fs')
+var _=require('lodash')
 
 module.exports={
+    "LexBuildLambda":lambda({
+        "S3Bucket": {"Ref":"BootstrapBucket"},
+        "S3Key": {"Fn::Sub":"${BootstrapPrefix}/lambda/lex-build.zip"},
+        "S3ObjectVersion":{"Ref":"LexBuildCodeVersion"}
+    },{
+        UTTERANCE_BUCKET:{"Ref":"AssetBucket"},
+        POLL_LAMBDA:{"Fn::GetAtt":["LexBuildLambdaPoll","Arn"]},
+        STATUS_BUCKET:{"Ref":"BuildStatusBucket"},
+        STATUS_KEY:"status.json",
+        UTTERANCE_KEY:"default-utterances.json",
+        BOTNAME:{"Ref":"LexBot"},
+        SLOTTYPE:{"Ref":"SlotType"},
+        INTENT:{"Ref":"Intent"},
+        ADDRESS:{"Fn::GetAtt":["ESVar","ESAddress"]},
+        INDEX:{"Fn::GetAtt":["Var","index"]},
+        TYPE:{"Fn::GetAtt":["Var","type"]}
+    }),
+    "LexBuildLambdaStart":lambda({
+        "ZipFile":fs.readFileSync(__dirname+'/start.js','utf8')
+    },{
+        STATUS_BUCKET:{"Ref":"BuildStatusBucket"},
+        STATUS_KEY:"status.json",
+        BUILD_FUNCTION:{"Fn::GetAtt":["LexBuildLambda","Arn"]}
+    }),
+    "LexBuildLambdaPoll":lambda({
+        "ZipFile":fs.readFileSync(__dirname+'/poll.js','utf8')
+    },{
+        STATUS_KEY:"status.json",
+        STATUS_BUCKET:{"Ref":"BuildStatusBucket"},
+        BOT_NAME:{"Ref":"LexBot"},
+    }),
     "LexBuildCodeVersion":{
         "Type": "Custom::S3Version",
         "DependsOn":["CFNLambdaPolicy"],
@@ -10,32 +42,6 @@ module.exports={
             "Key": {"Fn::Sub":"${BootstrapPrefix}/lambda/lex-build.zip"},
             "BuildDate":(new Date()).toISOString()
         }
-    },
-    "LexBuildLambda": {
-      "Type": "AWS::Lambda::Function",
-      "Properties": {
-        "Code": {
-            "S3Bucket": {"Ref":"BootstrapBucket"},
-            "S3Key": {"Fn::Sub":"${BootstrapPrefix}/lambda/lex-build.zip"},
-            "S3ObjectVersion":{"Ref":"LexBuildCodeVersion"}
-        },
-        "Environment": {
-            "Variables": {
-                UTTERANCE_BUCKET:{"Ref":"AssetBucket"},
-                STAUTS_BUCKET:{"Ref":"BuildStatusBucket"},
-                UTTERANCE_KEY:"default-utterances.json"
-            }
-        },
-        "Handler": "index.handler",
-        "MemorySize": "128",
-        "Role": {"Fn::GetAtt": ["LexBuildLambdaRole","Arn"]},
-        "Runtime": "nodejs6.10",
-        "Timeout": 300,
-        "Tags":[{
-            Key:"Type",
-            Value:"Api"
-        }]
-      }
     },
     "LexBuildInvokePolicy": {
       "Type": "AWS::IAM::ManagedPolicy",
@@ -48,7 +54,8 @@ module.exports={
                 "lambda:InvokeFunction"
               ],
               "Resource":[
-                {"Fn::GetAtt":["LexBuildLambda","Arn"]}
+                {"Fn::GetAtt":["LexBuildLambda","Arn"]},
+                {"Fn::GetAtt":["LexBuildLambdaPoll","Arn"]}
               ]
             }]
         },
@@ -78,9 +85,16 @@ module.exports={
                     "Effect": "Allow",
                     "Action": ["s3:Get*"],
                     "Resource":[
-                        {"Fn::Sub":"arn:aws:s3:::${AssetBucket}*"}
+                        {"Fn::Sub":"arn:aws:s3:::${AssetBucket}*"},
+                        {"Fn::Sub":"arn:aws:s3:::${BuildStatusBucket}*"}
                     ]
-                },]
+                },{
+                    "Effect": "Allow",
+                    "Action": ["s3:Put*"],
+                    "Resource":[
+                        {"Fn::Sub":"arn:aws:s3:::${BuildStatusBucket}*"}
+                    ]
+                }]
             }
         }],
         "Path": "/",
@@ -120,3 +134,23 @@ module.exports={
     }
 }
 
+function lambda(code,variable={}){
+    return {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Code":code,
+        "Environment": {
+            "Variables":variable
+        },
+        "Handler": "index.handler",
+        "MemorySize": "128",
+        "Role": {"Fn::GetAtt": ["LexBuildLambdaRole","Arn"]},
+        "Runtime": "nodejs6.10",
+        "Timeout": 300,
+        "Tags":[{
+            Key:"Type",
+            Value:"Api"
+        }]
+      }
+    }
+}
