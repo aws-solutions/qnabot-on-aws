@@ -10,15 +10,6 @@ exports.handler = (event, context, callback) => {
             var schema=tmp1[Object.keys(tmp1)[0]]
             var out=schema._meta.schema
             
-            Object.keys(schema.properties)
-                .filter(x=>!['_meta','qid','a','q','r','l','t'].includes(x))
-                .filter(x=>!x.match(/_.*/))
-                .forEach(x=>out.properties[x]={
-                    type:"string",
-                    title:x
-                })
-            delete out.properties.questions
-            test2string(out)
             callback(null,out)
         })
         .catch(x=>callback(JSON.stringify({
