@@ -63,6 +63,7 @@
             {"Fn::Sub":"arn:aws:s3:::${BootstrapBucket}*"},
             {"Fn::Sub":"arn:aws:s3:::${ImportBucket}*"},
             {"Fn::Sub":"arn:aws:s3:::${ExportBucket}*"},
+            {"Fn::Sub":"arn:aws:s3:::${BuildStatusBucket}*"},
             {"Fn::Sub":"arn:aws:s3:::${AssetBucket}*"}
           ]
         }
@@ -121,6 +122,14 @@
           ],
           "Resource": [{"Fn::Sub":
             "arn:aws:s3:::${ImportBucket}/data/*"
+            }]
+        },{
+          "Effect": "Allow",
+          "Action": [   
+            "s3:GetObject"
+          ],
+          "Resource": [{"Fn::Sub":
+            "arn:aws:s3:::${ExportBucket}/data/*"
             }]
         }
       ]

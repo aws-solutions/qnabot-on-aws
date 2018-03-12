@@ -1,1 +1,1 @@
-Shows how to use the lambda hook function
+Imports item ‘Help’ which demonstrates using a Lambda hook function to prepend a dynamic greeting based on the time of day.

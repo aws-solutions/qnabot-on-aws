@@ -52,21 +52,9 @@
                     v-card-actions.pa-0.pr-2.pb-2
                       v-spacer
                       v-btn.example(
-                        @click="url=example.document.href"
+                        @click="importExample(example.document.href)"
                         :id="'example-'+example.id"
                       ) Load
-    v-dialog(v-model="loading" persistent)
-      v-card( id="import-loading")
-        v-card-title Loading
-        v-card-text
-          span(v-if="error" class='error--text' id="import-error") Error: {{error}} 
-          span(v-if="success" id="import-success") {{success}} 
-          v-progress-linear( v-if="!error && !success" indeterminate)
-        v-card-actions
-          v-spacer
-          v-btn(v-if="error || success" @click='loading=false'
-            id="import-close" 
-          ) close
 </template>
 
 <script>
@@ -87,6 +75,8 @@ var Vuex=require('vuex')
 var Promise=require('bluebird')
 var saveAs=require('file-saver').saveAs
 var axios=require('axios')
+const parseJson = require('json-parse-better-errors')
+
 var _=require('lodash')
 
 module.exports={
@@ -113,6 +103,14 @@ module.exports={
     this.examples=examples
   },
   methods:{
+    importExample:function(url){
+      this.url=url
+      this.Geturl()
+    },
+    close:function(){
+      this.loading=false
+      this.error=false
+    },
     deleteJob:function(index){
       var self=this
       console.log(this.jobs,index)
@@ -128,22 +126,29 @@ module.exports={
     },
     addJob:function(jobId){
       var self=this
-      return this.$store.dispatch('api/getImport',jobId)
-      .then(result=>Object.assign(jobId,result))
-      .then(job=>{
-        self.jobs.splice(0,0,job)
-        
-        poll()
-        function poll(){
-          self.$store.dispatch('api/getImport',job)
-          .then(function(result){
-            Object.assign(job,result) 
-            if(result.status==="InProgress"){
-              setTimeout(()=>poll(),100)
-            }
-          })
+      if(typeof jobId === "object"){
+        var job=jobId
+      }else{
+        var job={
+          href:`${this.$store.state.info._links.jobs.href}/imports/${jobId}`,
+          id:jobId,
+          progess:0,
+          status:"Submitted"
         }
-      })
+      }
+      self.jobs.splice(0,0,job)
+      self.$store.dispatch("api/waitForImport",{id:jobId.id || jobId})
+      .then(()=>poll())
+      
+      function poll(){
+        self.$store.dispatch('api/getImport',job)
+        .then(function(result){
+          Object.assign(job,result) 
+          if(result.status==="InProgress"){
+            setTimeout(()=>poll(),100)
+          }
+        })
+      }
     },
     refresh:function(index){
       var self=this
@@ -165,26 +170,33 @@ module.exports={
       for(i=0;i<files_raw.length;i++){
         files.push(files_raw[i])
       }
-      files.forEach(file=>{
+      Promise.all(files.map(file=>{
         var name=file.name
-        new Promise(function(res,rej){
+        return new Promise(function(res,rej){
           var reader = new FileReader();
           reader.onload = function(e){ 
             try {
-              res(JSON.parse(e.srcElement.result))
+              res({
+                name:file.name,
+                data:parseJson(e.srcElement.result)
+              })
             } catch(e) {
-              console.log(e)
-              rej("invalid JSON:"+e)
+              rej(e)
             }
           };
           reader.readAsText(file);
         })
-        .then(data=>self.upload(data,name))
+      }))
+      .map(result=>self.upload(result.data,result.name))
+      .catch(e=>{
+        console.log(e)
+        self.error=e.message
       })
     },
     Geturl:function(event){
       var self=this
       this.loading=true
+      var name=(new URL(self.url)).pathname.split('/').reverse()[0]
 
       Promise.resolve(axios.get(self.url))
       .then(x=>x.data)
@@ -192,28 +204,26 @@ module.exports={
         status:x.response.status,
         message:x.response.data
       }))
-      .then(data=>self.upload(data,"url-import"))
+      .then(data=>self.upload(data,name))
     },
     upload:function(data,name="import"){
       var self=this
       var id=name.replace(' ' ,'-')
       new Promise(function(res,rej){
-        if(data.qna){
+        console.log(data)
+        if(data.qna.length){
           self.$store.dispatch('api/startImport',{
             qa:data.qna,
             name:id
           })
-          .then(res).catch(rej)
+          .then(res)
+          .catch(rej)
         }else{
-          rej('Invalid File')
+          rej('Invalid or Empty File')
         }
       })
       .then(()=>{
-        return self.$store.dispatch('api/waitForImport',{id})
-      })
-      .then(job=>{
-        self.success="Import Started!"
-        return self.addJob(job)
+        self.addJob(id)
       })
       .tapCatch(console.log)
       .catch(error=>self.error=error)

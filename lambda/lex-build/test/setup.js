@@ -19,12 +19,19 @@ module.exports=Promise.method(async function(event){
     process.env.SALT='salt'
     var envs=await outputs('dev/bucket',{wait:true})
     process.env.UTTERANCE_BUCKET=envs.Bucket
+    process.env.STATUS_BUCKET=envs.Bucket
+    process.env.STATUS_KEY="status.json"
     process.env.UTTERANCE_KEY="utterances.json"
 
     await s3.putObject({
         Bucket:process.env.UTTERANCE_BUCKET,
         Key:process.env.UTTERANCE_KEY,
         Body:JSON.stringify(["a","b"])
+    }).promise()
+    await s3.putObject({
+        Bucket:process.env.STATUS_BUCKET,
+        Key:"status.json",
+        Body:JSON.stringify({})
     }).promise()
 
     await Promise.promisify(require('../index.js').handler)(event,{})

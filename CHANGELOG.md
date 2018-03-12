@@ -4,6 +4,9 @@
 - topic memory
 - lambda hooks
 - more integration tests
+- Cognito Hosted Login for Admin Screen
+- Improved Importing
+- Backups to s3
 
 ### removed
 - link parsing

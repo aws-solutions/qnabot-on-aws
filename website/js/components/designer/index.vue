@@ -22,7 +22,6 @@
     span
       questions(@filter="get(pagination)" v-if="active==='questions'")
       test(v-if="active==='test'")
-    v-divider
     v-data-table(
       :headers="headers"
       :items="QAs"
@@ -38,11 +37,13 @@
     )
       template(slot='headers' slot-scope='props')
         tr
-          th.shrink(v-if="tab==='questions'" id="select-all")
-            v-checkbox(:indeterminate="QAs.length===0" v-model='selectAll' tabindex='-1'
+          th.shrink(v-if="active==='questions'" id="select-all")
+            v-checkbox(
+              :indeterminate="QAs.length===0" v-model='selectAll' 
+              tabindex='-1'
               color="primary" @change="toggleSelectAll" 
             )
-          th.shrink.title(v-if="tab==='test'") score
+          th.shrink.title(v-if="active==='test'") score
           th.text-xs-left.title( v-for="header in props.headers" 
             :key='header.text'
             :class="['column', header.sortable ? 'sortable' : '', pagination.descending ? 'desc' : 'asc', header.value === pagination.sortBy ? 'active' : '']"
@@ -57,12 +58,12 @@
           v-on:click="expand(props)"
           :id="'qa-'+props.item.qid"
         )
-          td.shrink(v-on:click.stop="" v-if="tab==='questions'")
+          td.shrink(v-on:click.stop="" v-if="active==='questions'")
             v-checkbox(@change="checkSelect"
               v-model="props.item.select" tabindex='-1' color="primary" 
               :id="'qa-'+props.item.qid+'-select'"
             )
-          td.text-xs-left.shrink.primary--text.title(v-if="tab==='test'") {{props.item._score}}
+          td.text-xs-left.shrink.primary--text.title(v-if="active==='test'") {{props.item._score}}
           td.text-xs-left.shrink.title 
             b(:id="props.item.qid") {{props.item.qid}}
           td.text-xs-left.title {{props.item.q[0]}}
@@ -77,8 +78,6 @@
               @click.native.stop=""
               :id="'qa-'+props.item.qid+'-delete'"
             )
-      template(slot="no-data")
-        span Sorry, nothing to display here :(
       template(slot="expand" slot-scope='props')
         qa(:data="props.item")
 </template>

@@ -16,7 +16,7 @@
         v-card-title(primary-title)
           .headline {{title}}
         v-card-text
-          v-form
+          v-form(v-if="dialog")
             schema-input( 
               v-model="data"
               :valid.sync="valid"
@@ -76,6 +76,7 @@ module.exports={
       this.reset()
       this.loading=false
       this.dialog=false
+      this.error=false
     },
     reset:function(){
       this.data=empty(this.schema) 
@@ -83,7 +84,7 @@ module.exports={
     },
     add:async function(){
       var self=this
-
+      this.error=false
       if(this.valid){
         this.loading=true
         this.dialog=false

@@ -5,6 +5,7 @@
     "prefix":"status/",
     "perpage":"$input.params('perpage')",
     "token":"$input.params('token')",
+    "type":"imports",
     "root":"$root"
 }
 

@@ -13,7 +13,7 @@
             "qid": "AWS.AmazonEC2.2",
             "q": [
                 "how much does it cost",
-                "how much does ec2 cost",
+                "how much does ec2 cost"
             ],
             "a": "EC2 is billed by the second according to instance type.",
             "t": "AmazonEC2"

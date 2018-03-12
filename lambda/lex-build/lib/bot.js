@@ -35,5 +35,6 @@ module.exports=function(version,data){
             checksum
         })
     })
+    .get('version')
 }
 

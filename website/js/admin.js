@@ -24,6 +24,7 @@ import Vuetify from 'vuetify'
 import IdleVue from 'idle-vue'
 var Idle=require('idle-js')
 var validate=require('vee-validate')
+import VueClipboard from 'vue-clipboard2'
 
 
 
@@ -35,6 +36,7 @@ Vue.use(validate,{
     events:"input|blur|focus"
 })
 
+Vue.use(VueClipboard)
 Vue.use(Vuex)
 Vue.use(Router)
 Vue.use(Vuetify,{

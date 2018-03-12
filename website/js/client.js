@@ -26,7 +26,7 @@ var config = {
   cognito:{},
   lex: {
     initialText:"Ask a Question",
-    initialSpeechInstruction:"Speak a question to start",
+    initialSpeechInstruction:"",
     reInitSessionAttributesOnRestart: false
   },
   ui:{

@@ -1,7 +1,7 @@
 {
     "qna": [
         {
-            "qid": "aws.lambda.1",
+            "qid": "AWS.lambda.1",
             "q": [
                 "what is lambda",
                 "tell me about lambda"
@@ -11,7 +11,7 @@
             "l":"{{hello}}"
         },
         {
-            "qid": "aws.lambda.2",
+            "qid": "AWS.lambda.2",
             "q": [
                 "how much does it cost",
                 "how much does lambda cost"
@@ -33,7 +33,7 @@
             }
         },
         {
-            "qid": "aws.sagemaker.2",
+            "qid": "AWS.sagemaker.2",
             "q": [
                 "how much does it cost",
                 "how much does sagemaker cost"

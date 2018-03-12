@@ -8,7 +8,7 @@
       v-model="snackbar"
     )
       v-card(id="lex-loading")
-        v-card-title(primary-title) Rebuilding 
+        v-card-title(primary-title) Rebuilding  : {{status}}
         v-card-text
           v-subheader.error--text(v-if='error' id="lex-error") {{error}}
           v-subheader.success--text(v-if='success' id="lex-success") {{success}}
@@ -45,7 +45,11 @@ module.exports={
       error:''
     }
   },
-  computed:{},
+  computed:{
+    status:function(){
+      return _.get(this,"$store.state.bot.status","Ready")
+    }
+  },
   methods:{
     cancel:function(){
       var self=this

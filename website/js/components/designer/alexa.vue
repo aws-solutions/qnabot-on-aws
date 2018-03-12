@@ -1,13 +1,15 @@
 <template lang="pug">
   v-dialog(v-model='dialog' max-width='50%')
     v-btn.block(flat slot="activator" @click='open') Alexa Update
-    v-card
+    v-card(id="alexa-modal")
       v-card-title(primary-title)
         .headline Re-configure Alexa
       v-card-text
         p You only need to update the utterances of your alexa skill.
       v-card-actions
-        v-btn#utterances( :loading="loading" @click="copy()") Copy Utterances       
+        v-btn#Utterances( :loading="loading" @click="copy()"
+          v-clipboard:copy="text"
+        ) Copy Utterances       
       v-card-actions
         v-spacer
         v-btn(@click='close') Close
@@ -30,19 +32,13 @@ License for the specific language governing permissions and limitations under th
 var Vuex=require('vuex')
 var Promise=require('bluebird')
 var _=require('lodash')
-var clipboard=require('clipboard')
 
 module.exports={
   data:function(){
     var self=this
     return {
       dialog:false,
-      loading:false,
-      utterances:new clipboard('#Utterances',{
-        text:function(){
-          return self.$store.state.bot.utterances.join('\n')
-        }
-      })
+      loading:false
     }
   },
   components:{
@@ -51,7 +47,13 @@ module.exports={
   computed:{
     schema:function(){
       return this.$store.state.data.schema
+    },
+    text:function(){
+      return this.$store.state.bot.utterances.join('\n')
     }
+  },
+  created:function(){
+    this.$store.dispatch('data/botinfo').catch(()=>null) 
   },
   methods:{
     close:function(){

@@ -1,1 +1,1 @@
-{"status":"started"}
+{"token":"$input.path('$.token')"}

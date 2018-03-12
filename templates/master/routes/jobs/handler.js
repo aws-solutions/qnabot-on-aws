@@ -17,7 +17,7 @@ exports.handler = (event, context, callback) => {
             token:x.NextMarker,
             jobs:x.Contents.map(y=>{return {
                 id:y.Key.split('/').pop(),
-                href:event.root+"/jobs/imports/"+encodeURI(y.Key.split('/').pop())
+                href:`${event.root}/jobs/${event.type}/`+encodeURI(y.Key.split('/').pop())
             }})
         })
     })

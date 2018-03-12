@@ -5,7 +5,7 @@
         v-card-title(primary-title) Deleting 
         v-card-text(v-if="!selectAll")
           ul
-            li(v-for="qa in QAs") {{qa.qid}}
+            li(v-for="id in ids") {{id}}
         v-card-text
           v-subheader.error--text(v-if='error' id="delete-error") {{error}}
           v-subheader.success--text(v-if='success' id="delete-success") {{success}}
@@ -62,7 +62,8 @@ module.exports={
       dialog:false,
       loading:false,
       total:0,
-      progress:0
+      progress:0,
+      ids:[]
     }
   },
   components:{
@@ -83,6 +84,7 @@ module.exports={
     rm:function(){
       var self=this
       self.loading=true
+      this.ids=this.QAs.map(x=>x.qid)
       self.dialog=false
       return Promise.try(function(){
         if(self.selectAll){

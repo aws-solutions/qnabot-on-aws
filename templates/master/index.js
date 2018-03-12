@@ -28,14 +28,14 @@ module.exports={
     "Intent":{
         "Value":{"Ref":"Intent"}
     },
-    "DashboardUrl":{
+    "DashboardURL":{
         "Value":{"Fn::Join":["",[
             "https://console.aws.amazon.com/cloudwatch/home?",
             "region=",{"Ref":"AWS::Region"},
             "#dashboards:name=",{"Ref":"dashboard"}
         ]]}
     },
-    "UserPoolUrl":{
+    "UserPoolURL":{
         "Value":{"Fn::Join":["",[
             "https://console.aws.amazon.com/cognito/users/",
             "?region=",{"Ref":"AWS::Region"},
@@ -51,13 +51,13 @@ module.exports={
     "ESProxyLambda":{
         "Value":{"Fn::GetAtt":["ESProxyLambda","Arn"]}
     },
-    "DesignerLogin": {
+    "ContentDesignerURL": {
       "Value":{"Fn::Join":["",[
         {"Fn::GetAtt":["ApiUrl","Name"]},
         "/pages/designer"
       ]]}
     },
-    "ClientUrl": {
+    "ClientURL": {
         "Value":{"Fn::If":["Public",
             {"Fn::GetAtt":["Urls","Client"]},
             {"Fn::Join":["",[
@@ -112,8 +112,7 @@ module.exports={
         "Type":"String",
         "Description":"Email address for the admin user. Will be used for loging in and for setting the admin password. This email will receive the temporary password for the admin user.",
         "AllowedPattern":".+\\@.+\\..+",
-        "ConstraintDescription":"Must be valid email address eg. johndoe@example.com",
-        "Default":"Johndoe@example.com"
+        "ConstraintDescription":"Must be valid email address eg. johndoe@example.com"
     },
     "Username":{
         "Type":"String",
