@@ -12,6 +12,7 @@
         v-card-text
           v-subheader.error--text(v-if='error' id="lex-error") {{error}}
           v-subheader.success--text(v-if='success' id="lex-success") {{success}}
+          v-subheader.error--text(v-if='message' ) {{message}}
           v-progress-linear(v-if='!error && !success' indeterminate)
         v-card-actions
           v-spacer
@@ -48,6 +49,9 @@ module.exports={
   computed:{
     status:function(){
       return _.get(this,"$store.state.bot.status","Ready")
+    },
+    message:function(){
+      return _.get(this,"$store.state.bot.build.message")
     }
   },
   methods:{
@@ -63,7 +67,6 @@ module.exports={
       this.$store.dispatch('data/build')
       .then(function(){
         self.success=true
-        setTimeout(()=>self.cancel(),2000)
       })
       .catch(e=>self.error=e)
       .then(()=>self.loading=false)
