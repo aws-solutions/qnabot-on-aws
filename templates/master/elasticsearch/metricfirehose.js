@@ -14,7 +14,7 @@ module.exports={
                     "LogGroupName" : "/aws/kinesisfirehose/qna-feedback-metrics",
                     "LogStreamName" : "ElasticsearchDelivery"
                 },
-                "DomainARN" : {"Ref":"ElasticsearchDomain"},
+                "DomainARN" :{"Fn::GetAtt" : ["ElasticsearchDomain", "DomainArn"] },
                 "IndexName" : "metrics",
                 "IndexRotationPeriod" : "NoRotation",
                 "RetryOptions" : {
@@ -69,10 +69,37 @@ module.exports={
             ]
           },
           "Path": "/",
-          "ManagedPolicyArns": [
-            "arn:aws:iam::aws:policy/AmazonS3FullAccess",
-            "arn:aws:iam::aws:policy/AmazonESFullAccess"
-          ]
         }
+    },
+    "FirehosePutS3PutES":{
+      "Type" : "AWS::IAM::Policy",
+      "Properties" : { 
+        "PolicyDocument" : {
+          "Version": "2012-10-17",
+          "Statement": [
+              {
+                "Effect": "Allow",
+                "Action": [
+                  "s3:PutObject"
+                ],
+                "Resource": {
+                  "Fn::GetAtt": ["MetricsBucket", "Arn"]
+                }
+              },
+              {
+                "Effect": "Allow",
+                "Action": [
+                  "es:ESHttpPut",
+                  "es:ESHttpPost"
+                ],
+                "Resource": {
+                  "Fn::GetAtt" : ["ElasticsearchDomain", "DomainArn"]
+                }
+              }
+          ]
+        },
+        "PolicyName" : "PutQnAMetricsFirehose",
+        "Roles" : {"Ref":"ExampleLambdaRole"},
+      }
     }
 }

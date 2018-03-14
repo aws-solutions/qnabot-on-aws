@@ -7,7 +7,7 @@ import botocore.response as br
 import datetime
 
 
-def lambda_handler(event, context):
+def handler(event, context):
 
     #uncomment below if you want to see the JSON that is being passed to the Lambda Function
     # jsondump = json.dumps(event)
@@ -51,7 +51,7 @@ def lambda_handler(event, context):
     # if it is a valid response for feedback
     elif currentQid in validResponseQid:
         logFeedback(previousQid,previousQuestion,previousAnswer,validResponseQid.get(currentQid))
-        event["res"]["message"] = "Thank you, your feedback has been logged and will be looked at."
+        event["res"]["message"] = "Thank you, your feedback ,{0}, for the question ,{1}, has been logged and will be looked at.".format(validResponseQid.get(currentQid),previousQid)
         event["res"]["session"]["previous"] = {'qid': previousQid , 'a': previousAnswer,'q': previousQuestion}
         #set back to normal mode if in feedback mode
         event["res"]["session"].pop("queryLambda",None)
@@ -92,7 +92,7 @@ def logFeedback(qid,question,answer, feedback):
     jsondump=json.dumps(jsonData,ensure_ascii=False)
     client = boto3.client('firehose')
     response = client.put_record(
-        DeliveryStreamName='qna-feedback-metrics',
+        DeliveryStreamName=os.environ['FIREHOSE_NAME'],
         Record={
             'Data': jsondump
         }

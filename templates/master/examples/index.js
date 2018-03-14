@@ -111,6 +111,7 @@ function jslambda(name){
           "Variables": {
             "ES_TYPE": {"Fn::GetAtt":["Var","type"]},
             "ES_INDEX": {"Fn::GetAtt":["Var","index"]},
+            "FIREHOSE_NAME":{"Ref":"MetricFirehose"},
             "ES_ADDRESS": {"Fn::GetAtt":["ESVar","ESAddress"]},
           }
         },
@@ -144,6 +145,7 @@ function pylambda(name){
           "Variables": {
             "ES_TYPE": {"Fn::GetAtt":["Var","type"]},
             "ES_INDEX": {"Fn::GetAtt":["Var","index"]},
+            "FIREHOSE_NAME":{"Ref":"MetricFirehose"},
             "ES_ADDRESS": {"Fn::GetAtt":["ESVar","ESAddress"]},
           }
         },
