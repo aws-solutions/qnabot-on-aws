@@ -82,9 +82,9 @@ module.exports={
                 "Action": [
                   "s3:PutObject"
                 ],
-                "Resource": {
-                  "Fn::GetAtt": ["MetricsBucket", "Arn"]
-                }
+                "Resource": [
+                  {"Fn::GetAtt": ["MetricsBucket", "Arn"]}
+                ]
               },
               {
                 "Effect": "Allow",
@@ -92,9 +92,9 @@ module.exports={
                   "es:ESHttpPut",
                   "es:ESHttpPost"
                 ],
-                "Resource": {
-                  "Fn::GetAtt" : ["ElasticsearchDomain", "DomainArn"]
-                }
+                "Resource": [
+                  {"Fn::GetAtt" : ["ElasticsearchDomain", "DomainArn"]}
+                ]
               }
           ]
         },
