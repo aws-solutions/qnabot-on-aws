@@ -99,7 +99,7 @@ module.exports={
           ]
         },
         "PolicyName" : "PutQnAMetricsFirehose",
-        "Roles" : {"Ref":"ExampleLambdaRole"},
+        "Roles" : [{"Ref":"ExampleLambdaRole"}],
       }
     }
 }
