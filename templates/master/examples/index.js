@@ -8,7 +8,7 @@ var js=fs.readdirSync(`${__dirname}/js`)
     return {
         name:`ExampleJSLambda${name}`,
         resource:jslambda(name),
-        id:name
+        id:`${name}JS`
     }
 })
 
@@ -18,7 +18,7 @@ var py=fs.readdirSync(`${__dirname}/py`)
     return {
         name:`ExamplePYTHONLambda${name}`,
         resource:pylambda(name),
-        id:name
+        id:`${name}PY`
     }
 })
 
@@ -31,7 +31,8 @@ module.exports=Object.assign(
         "Condition":"BuildExamples",
         "Type": "Custom::QnABotExamples",
         "Properties": Object.assign(
-            _.fromPairs(js.map(x=>[x.id,{"Ref":x.name}]))
+            _.fromPairs(js.map(x=>[x.id,{"Ref":x.name}])),
+            _.fromPairs(py.map(x=>[x.id,{"Ref":x.name}]))
         ,{
             "ServiceToken": { "Fn::GetAtt" : ["ExampleWriteLambda", "Arn"] },
             "photos":{"Fn::Sub":"${ApiUrl.Name}/examples/photos"},
