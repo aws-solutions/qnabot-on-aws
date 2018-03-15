@@ -143,7 +143,8 @@ module.exports={
         "Schema":[{
             "Required":true,
             "Name":"email",
-            "AttributeDataType":"String"
+            "AttributeDataType":"String",
+            "Mutable":true
         }],
         "LambdaConfig":{
             "CustomMessage":{"Fn::GetAtt":["MessageLambda","Arn"]},

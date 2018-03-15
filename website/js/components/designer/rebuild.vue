@@ -11,7 +11,7 @@
         v-card-title(primary-title) Rebuilding  : {{status}}
         v-card-text
           v-subheader.error--text(v-if='error' id="lex-error") {{error}}
-          v-subheader.success--text(v-if='success' id="lex-success") {{success}}
+          v-subheader.success--text(v-if='success' id="lex-success") Success! 
           v-subheader.error--text(v-if='message' ) {{message}}
           v-progress-linear(v-if='!error && !success' indeterminate)
         v-card-actions
