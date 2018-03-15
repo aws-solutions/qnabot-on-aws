@@ -68,7 +68,6 @@ module.exports={
                 }   
             ]
           },
-          "Policies":["FirehosePutS3PutES"],
           "Path": "/"
         }
     },
