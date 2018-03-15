@@ -68,7 +68,8 @@ module.exports={
                 }   
             ]
           },
-          "Path": "/",
+          "Policies":["FirehosePutS3PutES"],
+          "Path": "/"
         }
     },
     "FirehosePutS3PutES":{
@@ -99,7 +100,7 @@ module.exports={
           ]
         },
         "PolicyName" : "PutQnAMetricsFirehose",
-        "Roles" : [{"Ref":"ExampleLambdaRole"}],
+        "Roles" : [{"Ref":"FirehoseESS3Role"}],
       }
     }
 }

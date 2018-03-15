@@ -92,6 +92,38 @@ module.exports=Object.assign(
         "ManagedPolicyArns": [
             "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"]
       }
+    },
+    "PushFirehoseExecuteQNALambda":{
+      "Type" : "AWS::IAM::Policy",
+      "Properties" : { 
+        "PolicyDocument" : {
+          "Version": "2012-10-17",
+          "Statement": [
+              {
+                "Effect": "Allow",
+                "Action": [
+                  "lambda:InvokeFunction"
+                ],
+                "Resource": [
+                  {"Fn::Join": ["",["arn:aws:lambda:",{ "Ref" : "AWS::Region" },":",{ "Ref" : "AWS::AccountId" },":function:qna-*"]]},
+                  {"Fn::Join": ["",["arn:aws:lambda:",{ "Ref" : "AWS::Region" },":",{ "Ref" : "AWS::AccountId" },":function:QNA-*"]]},
+                ]
+              },
+              {
+                "Effect": "Allow",
+                "Action": [
+                  "firehose:PutRecord",
+                  "firehose:PutRecordBatch"
+                ],
+                "Resource": [
+                  {"Fn::GetAtt" : ["MetricFirehose", "Arn"]}
+                ]
+              }
+          ]
+        },
+        "PolicyName" : "LambdaMetricFirehoseQNALambda",
+        "Roles" : [{"Ref":"ExampleLambdaRole"}],
+      }
     }
 })
 function jslambda(name){
