@@ -14,7 +14,7 @@ License for the specific language governing permissions and limitations under th
 var Promise=require('bluebird')
 var aws=require('./aws')
 var s3=new aws.S3()
-var con=require('./con')
+var con=require('./connection')
 var _=require('lodash')
 
 module.exports=function(params){

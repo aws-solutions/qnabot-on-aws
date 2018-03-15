@@ -46,14 +46,14 @@ module.exports=function(params){
         .tap(status("Rebuilding Slot"))
         .spread(Slot)
 
-        .tap(status("Rebuilding Intent"))
+        .tap(()=>status("Rebuilding Intent"))
         .then(slot_version=>{
             clean_slottype=()=>clean.intent(process.env.INTENT,slot_version)
             return Promise.join(slot_version,intent)
         })
         .spread(Intent)
 
-        .tap(status("Rebuild Bot"))
+        .tap(()=>status("Rebuild Bot"))
         .then(intent_version=>{
             clean_intent=()=>clean.slot(process.env.SLOTTYPE,version)
             return Promise.join(intent_version,bot)
@@ -65,6 +65,6 @@ module.exports=function(params){
         .then(clean_intent)
         .then(clean_slottype)
         .tapCatch(console.log)
-        .catch(error=>status("Failed")(error.message))
+        .catch(error=>status("Failed",error.message))
 }
 

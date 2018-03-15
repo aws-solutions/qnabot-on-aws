@@ -18,6 +18,8 @@ module.exports=new Vuex.Store({
     state:{
         info:{},
         bot:{
+            status:"",
+            message:"",
             utterances:[] 
         },
         alexa:{},

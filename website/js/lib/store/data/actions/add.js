@@ -37,23 +37,25 @@ module.exports={
                     api(context,'botinfo')
                     .then(function(info){
                         if(info.build.token===result.token){
+                            context.rootState.bot.status=info.build.status
+                            context.rootState.bot.message=info.build.message
                             if(info.build.status==="READY"){
-                                context.rootState.bot.status=info.build.status
                                 res()
                             }else if(info.build.status==="Failed"){
                                 rej("build failed:"+info.build.message)
                             }else{
-                                context.rootState.bot.status=info.build.status
-                                count>0 ? setTimeout(()=>next(--count),1000) : rej(" build timed out")
+                                count>0 ? setTimeout(()=>next(--count),1000) 
+                                    : rej(" build timed out")
                             }
                         }else{
                             context.rootState.bot.status="Waiting"
-                            count>0 ? setTimeout(()=>next(--count),1000) : rej(" build timed out")
+                            count>0 ? setTimeout(()=>next(--count),1000) 
+                                : rej(" build timed out")
                         }
                     })
                     .catch(rej)
                 }
-                next(100)
+                next(60*5)
             })
         })
         .tapCatch(util.handle.bind(context)('Failed to Build'))
