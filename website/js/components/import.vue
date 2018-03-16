@@ -178,7 +178,7 @@ module.exports={
             try {
               res({
                 name:file.name,
-                data:parseJson(e.srcElement.result)
+                data:parseJson(e.target.result)
               })
             } catch(e) {
               rej(e)

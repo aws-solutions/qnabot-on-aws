@@ -5,7 +5,7 @@ LAMBDA_DST=../../build/lambda
 .PHONY: $(LAMBDA_DST)/examples.zip lambda
 
 $(DST):./* ./routes/* ./routes/*/* ./signup/* ./cognito/style/* lambda  $(LAMBDA_DST)/examples.zip
-	 $(BUILD) --stack $(NAME) --verbose
+	 $(BUILD) --stack $(NAME) --verbose && $(BUILD) --stack public --verbose
 
 ../../build/assets.zip:../../assets/*
 	make -C  ../../assets
