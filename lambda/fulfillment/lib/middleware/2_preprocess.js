@@ -6,7 +6,7 @@ module.exports=function(req,res){
     console.log("pre")
     _.set(req,"_info.es.address",process.env.ES_ADDRESS)
     _.set(req,"_info.es.index",process.env.ES_INDEX)
-    _.set(req,"_info.es.type",process.env.ES_TYPE)
+    _.set(req,"_info.es.type",process.env.ES_QNA_TYPE)
     _.set(req,"_info.es.service.qid",process.env.ES_SERVICE_QID)
     _.set(req,"_info.es.service.proxy",process.env.ES_SERVICE_PROXY)
 

@@ -8,12 +8,10 @@ module.exports={
             op:"toLowerCase"
         },
         "QnAtype":{
-            value:"qna",
-            op:"toLowerCase"
+            value:"qna"
         },
-        "Quizeype":{
-            value:"quize",
-            op:"toLowerCase"
+        "QuizeType":{
+            value:"quize"
         }
     }
 },

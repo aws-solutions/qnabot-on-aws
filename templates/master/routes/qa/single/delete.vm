@@ -1,7 +1,7 @@
 {
     "endpoint":"${ESVar.ESAddress}",
     "method":"DELETE",
-    "path":"/${Var.type}/${Var.index}/$util.urlDecode($input.params('ID'))?refresh=wait_for"
+    "path":"/${Var.index}/$util.urlDecode($input.params('ID'))?refresh=wait_for"
 }
 
 

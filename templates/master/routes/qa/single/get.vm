@@ -13,7 +13,7 @@
 {
     "endpoint":"${ESVar.ESAddress}",
     "method":"POST",
-    "path":"/${Var.index}/${Var.type}/_search?search_type=dfs_query_then_fetch",
+    "path":"/${Var.index}/${Var.QnAType}/_search?search_type=dfs_query_then_fetch",
     "body":{
         "size":"$perpage",
         "from":"$from",

@@ -22,14 +22,14 @@ module.exports=function(config,body){
         var documents=_.get(result,"hits.hits",[])
         if(documents.length){
             var body=documents.map(x=>{
-                if(x._type===config.type){ 
-                    var out=x._source
+                var out=x._source
+                out.type=x._type
+                if(out.type==='qna'){ 
                     out.q=out.questions.map(y=>y.q)
                     delete out.questions
-                    return JSON.stringify(out)
                 }else{
-                    return JSON.stringify(x._source)
                 }
+                return JSON.stringify(out)
             }).join('\n')
             var key=`${config.tmp}/${config.parts.length+1}` 
             return s3.putObject({
