@@ -2,9 +2,9 @@ import json
 import boto3
 import os
 import botocore.response as br
+import string
 
-
-def lambda_handler(event,context):
+def handler(event,context):
     print(json.dumps(event,indent=4))
     client = boto3.client('lambda')
     
