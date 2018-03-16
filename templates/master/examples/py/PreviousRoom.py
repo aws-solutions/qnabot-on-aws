@@ -4,7 +4,7 @@ import boto3
 import os
 import botocore.response as br
 
-def lambda_handler(event, context):
+def handler(event, context):
 
     #uncomment below if you want to see the JSON that is being passed to the Lambda Function
     # jsondump = json.dumps(event)
@@ -40,28 +40,22 @@ def lambda_handler(event, context):
         )
         # Because the payload is of a streamable type object, we must explicitly read it
         response = json.loads(resp['Payload'].read())
-        print(json.dumps(response))
+        #Uncomment below to see the response
+        #print(json.dumps(response))
         #Update the result part of the Json to feature the new response
         event = updateResult(event,response)
         # modify the event to make the previous question the redirected question that was just asked instead of "Next Question"
         event["res"]["session"]["previous"] = {'qid': tempQid, 'a': response["a"],'q':tempQuestion}
-        # tempdump = json.dumps(event["res"]["session"]["previous"])
-        # print (tempdump)
-
-        
 
     else:
         #Decrement the room number by 1
         topicNumber = int(questionCheck) - 1
         splitQuestion[1] = str(int(questionCheck) - 1)
         changedQuestion= ".".join([splitQuestion[0],splitQuestion[1]])
-        # hardcoded number of rooms in tour using lambda environment variables
-        # We are using a format of '#.Start' for Document IDs for the sequence of rooms
-        # Decrement the # by 1 since we are going back room numbers
         if topicNumber > 0:
             tempQid = changedQuestion
             tempQuestion = changedQuestion.lower()
-        #Loop back to the last room of the tour if requested to go to the previous room on the first room
+        #Go to the list of the tours document that should be imported with the sample-whitehouse-tour example if requested to go to the previous room on the first room
         else:
             tempQid = "NavigationList"
             tempQuestion = ""
