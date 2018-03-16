@@ -39,6 +39,7 @@ module.exports={
         "DependsOn":["CFNLambdaPolicy"],
         "Properties": {
             "ServiceToken": { "Fn::GetAtt" : ["CFNLambda", "Arn"] },
+            "adad":"adaad",
             "ClientId":{"Ref":"ClientDesigner"},
             "Domain":{"Ref":"CognitoDomain"},
             "LoginRedirectUrl":{"Fn::GetAtt":["Urls","Designer"]}

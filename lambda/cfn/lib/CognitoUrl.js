@@ -7,6 +7,9 @@ module.exports=class CognitoUrl extends require('./base') {
     constructor(){
         super()
     }
+    Update(ID,params,oldparams,reply){
+        this.Create(params,reply)
+    }
     Create(params,reply){
         var Domain=[
             "https://",
