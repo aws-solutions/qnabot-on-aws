@@ -17,7 +17,11 @@ module.exports=class CognitoDomain extends require('./base') {
         .then(()=>reply(null,domain,{}))
         .catch(reply)
     }
-
+    
+    Update(ID,params,oldparams,reply){
+        this.Create(params,reply) 
+    }
+   
     Delete(ID,params,reply){
         cognito.deleteUserPoolDomain({
             Domain:ID,

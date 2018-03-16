@@ -17,6 +17,10 @@ module.exports=class Variable extends require('./base') {
         })
         reply(null,id(params),params)
     }
+    Update(ID,params,oldparams,reply){
+        this.Create(params,reply) 
+    }
+
 }
 
 function id(params){
