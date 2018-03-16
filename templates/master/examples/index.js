@@ -3,6 +3,7 @@ var _=require('lodash')
 var fs=require('fs')
 
 var js=fs.readdirSync(`${__dirname}/js`)
+.filter(x=>x.match(/(.*).js/))
 .map(file=>{
     var name=file.match(/(.*).js/)[1]
     return {
@@ -13,6 +14,7 @@ var js=fs.readdirSync(`${__dirname}/js`)
 })
 
 var py=fs.readdirSync(`${__dirname}/py`)
+.filter(x=>x.match(/(.*).py/))
 .map(file=>{
     var name=file.match(/(.*).py/)[1]
     return {
