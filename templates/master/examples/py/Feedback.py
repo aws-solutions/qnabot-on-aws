@@ -51,7 +51,7 @@ def handler(event, context):
     # if it is a valid response for feedback
     elif currentQid in validResponseQid:
         logFeedback(previousQid,previousQuestion,previousAnswer,validResponseQid.get(currentQid))
-        event["res"]["message"] = "Thank you, your feedback ,{0}, for the question ,{1}, has been logged and will be looked at.".format(validResponseQid.get(currentQid),previousQid)
+        event["res"]["message"] = "Thank you for leaving the feedback,{0}. Relevant information has been logged and will be looked at.".format(validResponseQid.get(currentQid))
         event["res"]["session"]["previous"] = {'qid': previousQid , 'a': previousAnswer,'q': previousQuestion}
         #set back to normal mode if in feedback mode
         event["res"]["session"].pop("queryLambda",None)
@@ -76,13 +76,12 @@ def handler(event, context):
         event["res"]["session"]["queryLambda"] = os.environ['AWS_LAMBDA_FUNCTION_NAME']
         #set the qid and question of the previous as if this question had never been asked
         event["res"]["session"]["previous"] = {'qid': previousQid , 'a': previousAnswer,'q': previousQuestion}
-        print (event["res"]["message"])
-    
     return event
 
 #logs feedback for the questions
 def logFeedback(qid,question,answer, feedback):
-    print("Qid:{0} \n with feedback {3} \n has received feedback{1}, \n for the question: {2}".format(qid,feedback,question,answer))
+    #uncomment below if you would like to see values passed in 
+    #print("Qid:{0} \n with feedback {3} \n has received feedback{1}, \n for the question: {2}".format(qid,feedback,question,answer))
     jsonData = {"qid":"{0}".format(qid),
         "utterance":"{0}".format(question),
         "answer":"{0}".format(answer),
@@ -97,5 +96,6 @@ def logFeedback(qid,question,answer, feedback):
             'Data': jsondump
         }
     )
-    print(response)
+    #uncomment below if you would like to see the response returned by the firehose stream
+    #print(response)
     
