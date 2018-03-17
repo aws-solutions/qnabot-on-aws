@@ -25,6 +25,18 @@ module.exports={
                     title:"Question",
                     description:"Enter the question a user is asked",
                     maxLength:8000,
+                },
+                next:{
+                    type:"string",
+                    title:"Next Question",
+                    description:"QID of the next question in the quize",
+                    maxLength:8000,
+                },
+                quize:{
+                    type:"string",
+                    title:"Quize Id",
+                    description:"Id of the quize this is question is a member of",
+                    maxLength:8000,
                 }
             },
             required:["qid","question","answers"]

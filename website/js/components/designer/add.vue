@@ -19,7 +19,6 @@
           .title document type
           v-radio-group(v-model="type" row)
             v-radio(v-for="t in types" :label='t' :value="t")
-          p {{schema.description}}
         v-card-text.pt-0
           v-form(v-if="dialog")
             schema-input( 
