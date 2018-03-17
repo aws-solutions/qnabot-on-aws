@@ -1,9 +1,9 @@
 #set($inputRoot = $input.path('$'))
 
 #if($input.json('$.type').length())
-    #set $type=$input.json('$.type')
+    #set($type=$inputRoot.type)
 #else
-    #set $type="qna"
+    #set($type="qna")
 #end
 
 {

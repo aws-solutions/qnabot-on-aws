@@ -1,6 +1,7 @@
 {
     "endpoint":"https://${ESVar.ESAddress}",
     "method":"GET",
-    "path":"/${Var.index}/_mapping"
+    "path":"/${Var.index}/_mapping",
+    "index":"${Var.index}"
 }
 

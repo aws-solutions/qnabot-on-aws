@@ -50,11 +50,12 @@ module.exports={
     },
     schema(state,schema){
         state.schema=schema
-        state.schema.properties.qid.propertyOrder=4
-        state.schema.properties.q.propertyOrder=3
-        state.schema.properties.a.propertyOrder=2
-        state.schema.properties.t.propertyOrder=1
-        state.schema.properties.r.propertyOrder=0
+         
+        state.schema.qna.properties.qid.propertyOrder=4
+        state.schema.qna.properties.q.propertyOrder=3
+        state.schema.qna.properties.a.propertyOrder=2
+        state.schema.qna.properties.t.propertyOrder=1
+        state.schema.qna.properties.r.propertyOrder=0
     },
     delQA(state,QA){
         var index=state.QAs.findIndex(qa=>qa.qid===QA.qid)

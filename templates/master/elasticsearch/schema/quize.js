@@ -2,6 +2,7 @@ module.exports={
     _meta:{
         schema:{
             type:"object",
+            description:"Quize documents",
             properties:{
                 qid:{
                     type:"string",
@@ -9,85 +10,37 @@ module.exports={
                     description:"Assign a unique identifier for this item",
                     maxLength:100
                 },
-                q:{
-                    title:"Questions",
-                    description:"Enter one or more questions that a user might ask",
+                answers:{
+                    title:"Answers",
+                    description:"Enter one or more answers",
                     type:"array",
                     items:{
-                        title:"Question",
+                        title:"Answer",
                         type:"string",
                         maxLength:140
                     }
                 },
-                a:{
-                    type:"text",
-                    title:"Answer",
-                    description:"Enter the answer you want to be returned when user asks one of the above questions",
-                    maxLength:8000,
-                },
-                t:{
-                    type:"text",
-                    description:"Assign a topic to this item, to support follow up questions on the same topic.",
-                    title:"Topic"
-                },
-                r:{
-                    title:"Response card",
-                    description:"Attach images to your answer",
-                    type:"object",
-                    properties:{
-                        title:{
-                            type:"text",
-                            title:"Card Title",
-                            description:"Required",
-                            maxLength:100
-                        },
-                        imageUrl:{
-                            type:"text",
-                            description:"Required",
-                            title:"Card Image Url",
-                            format:'url',
-                            maxLength:2000
-                        }
-                    },
-                    required:["title","imageUrl"]
-                },
-                l:{
+                question:{
                     type:"string",
-                    description:"Enter you lambda function name/ARN to dynamically create or modify answers, or to redirect to a different question.",
-                    title:"Lambda Hook"
+                    title:"Question",
+                    description:"Enter the question a user is asked",
+                    maxLength:8000,
                 }
             },
-            required:["qid","q","a"]
+            required:["qid","question","answers"]
         }
     },
     properties:{
         qid:{
             type:"keyword"
         },
-        questions:{
-            type:"nested",
-            properties:{
-                q:{
-                    type:"text",
-                    analyzer:"english"
-                }
-            }
-        },
-        a:{
-            type:"text",
+        question:{
+            type:"string",
             analyzer:"english"
         },
-        t:{
-            type:'text',analyzer:"whitespace" 
-        },
-        r:{
-            properties:{
-                imageUrl:{type:"keyword"},
-                title:{type:"text"}
-            }
-        },
-        l:{
-            type:"keyword"
+        answers:{
+            type:"text",
+            analyzer:"english"
         }
     }
 }

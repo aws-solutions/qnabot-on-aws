@@ -5,17 +5,23 @@ exports.handler = (event, context, callback) => {
     console.log('Received event:', JSON.stringify(event, null, 2));
     try {
         es(event)
-        .then(function(result){
-            var tmp1=result[Object.keys(result)[0]].mappings
-            var schema=tmp1[Object.keys(tmp1)[0]]
-            var out=schema._meta.schema
+        .then(function(result){ 
+            var index=result[event.index].mappings
+            var mappings=Object.keys(index)
+            var out={}
+            mappings.forEach(val=>{
+                out[val]=index[val]._meta.schema
+            })
             
             callback(null,out)
         })
-        .catch(x=>callback(JSON.stringify({
-            type:"[InternalServiceError]",
-            data:x
-        })))
+        .catch(x=>{
+            console.log(x)
+            callback(JSON.stringify({
+                type:"[InternalServiceError]",
+                data:x
+            }))
+        })
     } catch(e){
         callback(JSON.stringify({
             type:"[InternalServiceError]",

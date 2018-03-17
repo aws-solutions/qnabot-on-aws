@@ -7,12 +7,8 @@ module.exports={
             value:{"Ref":"AWS::StackName"},
             op:"toLowerCase"
         },
-        "QnAtype":{
-            value:"qna"
-        },
-        "QuizeType":{
-            value:"quize"
-        }
+        "QnAType":"qna",
+        "QuizeType":"quize"
     }
 },
 "ESVar":{

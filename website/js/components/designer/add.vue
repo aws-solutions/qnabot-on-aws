@@ -15,10 +15,15 @@
       v-card(id="add-question-form")
         v-card-title(primary-title)
           .headline {{title}}
-        v-card-text
+        v-card-text.pb-0
+          .title document type
+          v-radio-group(v-model="type" row)
+            v-radio(v-for="t in types" :label='t' :value="t")
+          p {{schema.description}}
+        v-card-text.pt-0
           v-form(v-if="dialog")
             schema-input( 
-              v-model="data"
+              v-model="data[type]"
               :valid.sync="valid"
               :schema="schema" 
               path="add"
@@ -57,6 +62,7 @@ module.exports={
       title:"Add New Item",
       error:'',
       success:'',
+      type:'qna',
       dialog:false,
       loading:false,
       valid:false,
@@ -67,8 +73,11 @@ module.exports={
     "schema-input":require('./input.vue')
   },
   computed:{
+    types:function(){
+      return Object.keys(this.$store.state.data.schema)
+    },
     schema:function(){
-      return this.$store.state.data.schema
+      return this.$store.state.data.schema[this.type]
     }
   },
   methods:{
@@ -79,24 +88,29 @@ module.exports={
       this.error=false
     },
     reset:function(){
-      this.data=empty(this.schema) 
+      this.data=_.mapValues(this.$store.state.data.schema,(value,key)=>{
+        return empty(value) 
+      }) 
       this.$refs.dialog.$refs.dialog.scrollTo(0,0)
     },
     add:async function(){
       var self=this
       this.error=false
+      var data=this.data[this.type]
+
       if(this.valid){
         this.loading=true
         this.dialog=false
         try{ 
-          var exists=await this.$store.dispatch('api/check',this.data.qid)
+          var exists=await this.$store.dispatch('api/check',data.qid)
           if(exists){
             self.error='Question already exists'
             self.loading=false
             self.dialog=true
           }else{
             self.$refs.dialog.$refs.dialog.scrollTo(0,0)
-            var out=clean(_.cloneDeep(self.data))
+            var out=clean(_.cloneDeep(data))
+            out.type=this.type
             console.log(out)
             await self.$store.dispatch('data/add',out)
             self.success='Success!'

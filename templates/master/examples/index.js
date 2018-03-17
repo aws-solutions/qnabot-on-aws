@@ -110,7 +110,8 @@ function jslambda(name){
         },
         "Environment": {
           "Variables": {
-            "ES_TYPE": {"Fn::GetAtt":["Var","type"]},
+            "ES_QNA_TYPE": {"Fn::GetAtt":["Var","QnAType"]},
+            "ES_QUIZE_TYPE": {"Fn::GetAtt":["Var","QuizeType"]},
             "ES_INDEX": {"Fn::GetAtt":["Var","index"]},
             "ES_ADDRESS": {"Fn::GetAtt":["ESVar","ESAddress"]},
           }
@@ -143,7 +144,8 @@ function pylambda(name){
         },
         "Environment": {
           "Variables": {
-            "ES_TYPE": {"Fn::GetAtt":["Var","type"]},
+            "ES_QNA_TYPE": {"Fn::GetAtt":["Var","QnAType"]},
+            "ES_QUIZE_TYPE": {"Fn::GetAtt":["Var","QuizeType"]},
             "ES_INDEX": {"Fn::GetAtt":["Var","index"]},
             "ES_ADDRESS": {"Fn::GetAtt":["ESVar","ESAddress"]},
           }

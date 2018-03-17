@@ -46,7 +46,6 @@ module.exports=Object.assign(
         },
         "Environment": {
             "Variables": {
-                ES_TYPE:{"Fn::GetAtt":["Var","type"]},
                 ES_INDEX:{"Fn::GetAtt":["Var","index"]},
                 ES_ENDPOINT:{"Fn::GetAtt":["ESVar","ESAddress"]},
                 ES_PROXY:{"Fn::GetAtt":["ESProxyLambda","Arn"]}

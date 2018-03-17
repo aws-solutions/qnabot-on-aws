@@ -78,8 +78,11 @@ module.exports={
     "schema-input":require('./input.vue')
   },
   computed:{
+    type:function(){
+      return this.data.type || 'qna'
+    },
     schema:function(){
-      return this.$store.state.data.schema
+      return this.$store.state.data.schema[this.type]
     }
   },
   methods:{
