@@ -38,7 +38,7 @@ module.exports={
                 },
                 next:{
                     title:"Next Questions",
-                    description:"Enter the QID of the next question in the quiz.  If this field is blank then the quiz will end after this question.  Be careful; if you set this field to an earlier question in the quiz, you might make your quiz loop forever, which would not be fun!  You can add more QIDs after the first, but they won't do anything at the moment.",
+                    description:"Enter the QID of the next question in the quiz into the first field.  If the first field is blank then the quiz will end after this question.  Be careful; if you set this field to an earlier question in the quiz, you might make your quiz loop forever, which would not be fun!  You can add more QIDs after the first, but they won't do anything at the moment.",
                     type:"array",
                     items:{
                         title:"nextQuestion",
@@ -50,7 +50,7 @@ module.exports={
                     type:"string",
                     title:"Quiz ID",
                     description:"ID of the quiz this question is a member of",
-                    maxLength:8000,
+                    maxLength:100,
                 }
             },
             required:["qid","question","incorrectAnswers","correctAnswers"]
