@@ -2,7 +2,7 @@ module.exports={
     _meta:{
         schema:{
             type:"object",
-            description:"Quize documents",
+            description:"Quiz documents",
             properties:{
                 qid:{
                     type:"string",
@@ -27,19 +27,23 @@ module.exports={
                     maxLength:8000,
                 },
                 next:{
-                    type:"string",
-                    title:"Next Question",
-                    description:"QID of the next question in the quize",
-                    maxLength:8000,
+                    title:"Next Questions",
+                    description:"array of QIDs of the possible next questions in the quiz",
+                    type:"array",
+                    items:{
+                        title:"nextQuestion",
+                        type:"string",
+                        maxLength:100
+                    }
                 },
-                quize:{
+                quiz:{
                     type:"string",
-                    title:"Quize Id",
-                    description:"Id of the quize this is question is a member of",
+                    title:"Quiz ID",
+                    description:"ID of the quiz this question is a member of",
                     maxLength:8000,
                 }
             },
-            required:["qid","question","answers"]
+            required:["qid","question","answers","next"]
         }
     },
     properties:{
