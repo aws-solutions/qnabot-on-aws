@@ -7,12 +7,12 @@ module.exports={
                 qid:{
                     type:"string",
                     title:"Item ID",
-                    description:"Assign a unique identifier for this item",
+                    description:"Assign a unique identifier for this item.",
                     maxLength:100
                 },
                 q:{
                     title:"Questions",
-                    description:"Enter one or more questions that a user might ask",
+                    description:"Enter one or more questions that a user might ask.",
                     type:"array",
                     items:{
                         title:"Question",
@@ -23,7 +23,7 @@ module.exports={
                 a:{
                     type:"string",
                     title:"Answer",
-                    description:"Enter the answer you want to be returned when user asks one of the above questions",
+                    description:"Enter the answer you want to be returned when the user asks one of the above questions.",
                     maxLength:8000,
                 },
                 t:{
@@ -54,7 +54,7 @@ module.exports={
                 },
                 l:{
                     type:"string",
-                    description:"Enter you lambda function name/ARN to dynamically create or modify answers, or to redirect to a different question.",
+                    description:"Enter your lambda function name/ARN to dynamically create or modify answers, or to redirect to a different question.",
                     title:"Lambda Hook"
                 }
             },
