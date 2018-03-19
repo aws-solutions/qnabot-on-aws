@@ -102,3 +102,4 @@ def updateResult(event, response):
         event["res"]["session"]["topic"] = response["t"]
     event["res"]["session"]["previous"] = json.dumps({'qid':response["qid"], 'a': response["a"], 'q':event["req"]["question"]})   
     return event
+
