@@ -1,12 +1,18 @@
 #set($inputRoot = $input.path('$'))
 
+#if($input.json('$.type').length())
+    #set($type=$inputRoot.type)
+#else
+    #set($type="qna")
+#end
+
 {
     "endpoint":"${ESVar.ESAddress}",
     "method":"PUT",
-    "path":"/${Var.index}/${Var.type}/$input.params('ID')?refresh=wait_for",
+    "path":"/${Var.index}/$type/$input.params('ID')?refresh=wait_for",
     "body":{
         #foreach($paramName in $inputRoot.keySet())
-            #if( $paramName == 'q')
+            #if( $paramName == 'q' && $type=="qna")
                 "questions":[
                     #foreach( $q in $inputRoot.get($paramName))
                         {"q":"$q"}

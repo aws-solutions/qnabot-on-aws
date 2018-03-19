@@ -21,7 +21,6 @@ module.exports=function(params){
     var es=con(params.address)
     var es_utterances=es.search({
         index:process.env.INDEX,
-        type: process.env.TYPE,
         scroll:'10s',
         body: {
             query: {match_all: {}}

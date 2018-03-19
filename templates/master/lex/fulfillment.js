@@ -28,7 +28,7 @@ module.exports={
         },
         "Environment": {
           "Variables": {
-            ES_TYPE:{"Fn::GetAtt":["Var","type"]},
+            ES_TYPE:{"Fn::GetAtt":["Var","QnAType"]},
             ES_INDEX:{"Fn::GetAtt":["Var","index"]},
             ES_ADDRESS:{"Fn::GetAtt":["ESVar","ESAddress"]},
             LAMBDA_DEFAULT_QUERY:{"Ref":"ESQueryLambda"},

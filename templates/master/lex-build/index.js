@@ -17,7 +17,6 @@ module.exports={
         INTENT:{"Ref":"Intent"},
         ADDRESS:{"Fn::GetAtt":["ESVar","ESAddress"]},
         INDEX:{"Fn::GetAtt":["Var","index"]},
-        TYPE:{"Fn::GetAtt":["Var","type"]}
     }),
     "LexBuildLambdaStart":lambda({
         "ZipFile":fs.readFileSync(__dirname+'/start.js','utf8')

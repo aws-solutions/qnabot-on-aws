@@ -37,16 +37,29 @@ module.exports={
             }
         }
     },
-    "Type":{
+    "QnAType":{
         "Type": "Custom::ESProxy",
         "DependsOn":["Index"],
         "Properties": {
             "ServiceToken": { "Fn::GetAtt" : ["ESCFNProxyLambda", "Arn"] },
             "create":{
                 endpoint:{"Fn::GetAtt":["ESVar","ESAddress"]},
-                path:{"Fn::Sub":"/${Var.index}/_mapping/${Var.type}"},
+                path:{"Fn::Sub":"/${Var.index}/_mapping/${Var.QnAType}"},
                 method:"PUT",
-                body:JSON.stringify(require('./schema'))
+                body:JSON.stringify(require('./schema/qna'))
+            }
+        }
+    },
+    "QuizeType":{
+        "Type": "Custom::ESProxy",
+        "DependsOn":["Index"],
+        "Properties": {
+            "ServiceToken": { "Fn::GetAtt" : ["ESCFNProxyLambda", "Arn"] },
+            "create":{
+                endpoint:{"Fn::GetAtt":["ESVar","ESAddress"]},
+                path:{"Fn::Sub":"/${Var.index}/_mapping/${Var.QuizeType}"},
+                method:"PUT",
+                body:JSON.stringify(require('./schema/quize'))
             }
         }
     }
