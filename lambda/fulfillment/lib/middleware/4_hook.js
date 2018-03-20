@@ -17,7 +17,7 @@ module.exports=function(req,res){
             Payload:JSON.stringify({req,res})
         }).promise()
         .then(result=>{
-            if(result.FunctionError){
+            if(!result.FunctionError){
                 var parsed=JSON.parse(result.Payload)
                 console.log("Result",JSON.stringify(parsed,null,2))
                 return parsed

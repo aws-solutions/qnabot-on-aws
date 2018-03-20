@@ -1,5 +1,6 @@
 var aws=require('../aws')
 var lambda= new aws.Lambda()
+var Promise=require('bluebird')
 var _=require('lodash')
 
 module.exports=function(req,res){
@@ -15,12 +16,18 @@ module.exports=function(req,res){
         Payload:JSON.stringify({req,res})
     }).promise()
     .then(result=>{
-        if(result.FunctionError){
-            var parsed=JSON.parse(result.Payload)
-            console.log("Query Response",JSON.stringify(parsed))
-            return parsed
+        console.log(result)
+        if(!result.FunctionError){
+            try{
+                var parsed=JSON.parse(result.Payload)
+                console.log("Query Response",JSON.stringify(parsed))
+                return parsed
+            }catch(e){
+                console.log(e)
+            }
         }else{
-            throw result.FunctionError
+            console.log(result.FunctionError)
+            return Promise.reject(result.FunctionError)
         }
     })
 }

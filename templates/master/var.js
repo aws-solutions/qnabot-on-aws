@@ -8,7 +8,7 @@ module.exports={
             op:"toLowerCase"
         },
         "QnAType":"qna",
-        "QuizeType":"quize"
+        "QuizType":"quiz"
     }
 },
 "ESVar":{

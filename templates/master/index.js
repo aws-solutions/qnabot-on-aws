@@ -81,8 +81,8 @@ module.exports={
     "ElasticsearchQnAType":{
       "Value":{"Fn::GetAtt":["Var","QnAType"]}
     },
-    "ElasticsearchQuizeType":{
-       "Value":{"Fn::GetAtt":["Var","QuizeType"]}
+    "ElasticsearchQuizType":{
+       "Value":{"Fn::GetAtt":["Var","QuizType"]}
     },
     "ElasticsearchIndex":{
       "Value":{"Fn::GetAtt":["Var","index"]}

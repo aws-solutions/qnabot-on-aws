@@ -145,7 +145,7 @@ function jslambda(name){
         "Environment": {
           "Variables": {
             "ES_QNA_TYPE": {"Fn::GetAtt":["Var","QnAType"]},
-            "ES_QUIZE_TYPE": {"Fn::GetAtt":["Var","QuizeType"]},
+            "ES_QUIZE_TYPE": {"Fn::GetAtt":["Var","QuizType"]},
             "ES_INDEX": {"Fn::GetAtt":["Var","index"]},
             "FIREHOSE_NAME":{"Ref":"MetricFirehose"},
             "ES_ADDRESS": {"Fn::GetAtt":["ESVar","ESAddress"]},
@@ -180,7 +180,7 @@ function pylambda(name){
         "Environment": {
           "Variables": {
             "ES_QNA_TYPE": {"Fn::GetAtt":["Var","QnAType"]},
-            "ES_QUIZE_TYPE": {"Fn::GetAtt":["Var","QuizeType"]},
+            "ES_QUIZE_TYPE": {"Fn::GetAtt":["Var","QuizType"]},
             "ES_INDEX": {"Fn::GetAtt":["Var","index"]},
             "FIREHOSE_NAME":{"Ref":"MetricFirehose"},
             "ES_ADDRESS": {"Fn::GetAtt":["ESVar","ESAddress"]},

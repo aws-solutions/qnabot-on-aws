@@ -50,14 +50,14 @@ module.exports={
             }
         }
     },
-    "QuizeType":{
+    "QuizType":{
         "Type": "Custom::ESProxy",
         "DependsOn":["Index"],
         "Properties": {
             "ServiceToken": { "Fn::GetAtt" : ["ESCFNProxyLambda", "Arn"] },
             "create":{
                 endpoint:{"Fn::GetAtt":["ESVar","ESAddress"]},
-                path:{"Fn::Sub":"/${Var.index}/_mapping/${Var.QuizeType}"},
+                path:{"Fn::Sub":"/${Var.index}/_mapping/${Var.QuizType}"},
                 method:"PUT",
                 body:JSON.stringify(require('./schema/quiz'))
             }
