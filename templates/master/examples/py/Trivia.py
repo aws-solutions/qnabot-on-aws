@@ -5,7 +5,11 @@ import botocore.response as br
 import string
 
 def handler(event,context):
-    print(json.dumps(event,indent=4))
+    
+    #uncomment below if you want to see the JSON that is being passed to the Lambda Function
+    jsondump = json.dumps(event)
+    print(jsondump)    
+    
     client = boto3.client('lambda')
     
     # initialize response message
