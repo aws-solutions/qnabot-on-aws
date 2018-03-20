@@ -59,7 +59,7 @@ module.exports={
                 endpoint:{"Fn::GetAtt":["ESVar","ESAddress"]},
                 path:{"Fn::Sub":"/${Var.index}/_mapping/${Var.QuizeType}"},
                 method:"PUT",
-                body:JSON.stringify(require('./schema/quize'))
+                body:JSON.stringify(require('./schema/quiz'))
             }
         }
     }

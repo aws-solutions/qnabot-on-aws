@@ -14,7 +14,7 @@ module.exports={
                     type:"string",
                     title:"Question",
                     description:"Enter a question that the bot will ask the user.",
-                    maxLength:8000,
+                    maxLength:140,
                 },
                 incorrectAnswers:{
                     title:"Incorrect Answers",
