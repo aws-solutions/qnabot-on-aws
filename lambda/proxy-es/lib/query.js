@@ -48,7 +48,8 @@ module.exports=function(req,res){
             res.session.previous={
                 qid:_.get(res.result,"qid"),
                 a:_.get(res.result,"a"),
-                q:req.question
+                q:req.question,
+                next:_.get(res.result,"next")
             }
         }else{
             res.type="PlainText"

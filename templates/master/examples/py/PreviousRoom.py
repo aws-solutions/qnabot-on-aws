@@ -7,8 +7,8 @@ import botocore.response as br
 def handler(event, context):
 
     #uncomment below if you want to see the JSON that is being passed to the Lambda Function
-    # jsondump = json.dumps(event)
-    # print(jsondump)
+    #jsondump = json.dumps(event)
+    #print(jsondump)
 
     qid = None
     try:
@@ -37,11 +37,17 @@ def handler(event, context):
                 # modify the event to make the previous question the redirected question that was just asked instead of "Next Question"
         else:
             #if unable to find anything, set the previous attribute back to the document qid that was previously returned
-            event["res"]["session"]["previous"] = {'qid': qid , 'a': stringToJson["a"],'q':stringToJson["q"]}
+            event["res"]["session"]["previous"]["qid"] = qid
+            event["res"]["session"]["previous"]["a"] = stringToJson["a"]
+            event["res"]["session"]["previous"]["q"] = stringToJson["q"]
+            event["res"]["session"]["previous"]["q"] = stringToJson["next"]
         #uncomment line below if you want to see the final JSON before it is returned to the client
         # print(json.dumps(event))
     else:
-        event["res"]["session"]["previous"] = {'qid': qid , 'a': stringToJson["a"],'q':stringToJson["q"]}
+        event["res"]["session"]["previous"]["qid"] = qid
+        event["res"]["session"]["previous"]["a"] = stringToJson["a"]
+        event["res"]["session"]["previous"]["q"] = stringToJson["q"]
+        event["res"]["session"]["previous"]["q"] = stringToJson["next"]
 
     return event
 
@@ -65,6 +71,9 @@ def updateResult(event, response):
                     event["res"]["card"]["imageUrl"] = card["imageUrl"]
     if 't' in response:
         event["res"]["session"]["topic"] = response["t"]
-    event["res"]["session"]["previous"] = json.dumps({'qid':response["qid"], 'a': response["a"], 'q':event["req"]["question"]})   
+    event["res"]["session"]["previous"]["qid"] = response["qid"]
+    event["res"]["session"]["previous"]["a"] = response["a"]
+    event["res"]["session"]["previous"]["q"] = event["req"]["question"]
+    event["res"]["session"]["previous"]["next"] = response["next"] 
     return event
 

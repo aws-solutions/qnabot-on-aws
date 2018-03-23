@@ -24,12 +24,14 @@ module.exports=function(event,context,callback){
             .from(0)
             .size(1)
             .build()
+            break;
         default:
             query=bodybuilder()
             .orQuery('match','qid',event.qid)
             .from(0)
             .size(1)
-            .build() 
+            .build()
+            break;
     }
     
     console.log("ElasticSearch Query",JSON.stringify(query,null,2))
