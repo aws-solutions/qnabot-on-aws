@@ -17,67 +17,32 @@ def handler(event, context):
         qid = stringToJson["qid"]
     except:
         #replace qid with the String 'Empty' if there is no previous questions that have been asked
-        qid = 'Empty'
-    #Since we start the document IDs of Rooms and room objects as IDENTIFIER.<N> or IDENTIFIER.<N>.OBJECTNAME
-    #if qid is not a digit or empty then we should enter the last room
-    splitQuestion = qid.split(".")
-    try:
-        # because our format is IDENTIFIER.<N> or IDENTIFIER.<N>.OBJECTNAME
-        questionCheck = splitQuestion[1]
-    except:
-        #using the word empty
-        questionCheck = "Empty"
-
+        qid = ""
     # if this the case, we aren't in any guided navigation sequence, so return the list of Guided Navigations Document   
-    if  questionCheck[0].isalpha():
-        tempQid = "NavigationList"
-        tempQuestion = ""
-        client = boto3.client('lambda')
-        resp = client.invoke(
-            FunctionName = event["req"]["_info"]["es"]["service"]["qid"],
-            Payload = json.dumps({'qid':tempQid}),
-            InvocationType = "RequestResponse"
-        )
-        # Because the payload is of a streamable type object, we must explicitly read it
-        response = json.loads(resp['Payload'].read())
-        #Uncomment below to see the response
-        #print(json.dumps(response))
-        #Update the result part of the Json to feature the new response
-        event = updateResult(event,response)
-        # modify the event to make the previous question the redirected question that was just asked instead of "Next Question"
-        event["res"]["session"]["previous"] = {'qid': tempQid, 'a': response["a"],'q':tempQuestion}
 
-    else:
-        #Decrement the room number by 1
-        topicNumber = int(questionCheck) - 1
-        splitQuestion[1] = str(int(questionCheck) - 1)
-        changedQuestion= ".".join([splitQuestion[0],splitQuestion[1]])
-        if topicNumber > 0:
-            tempQid = changedQuestion
-            tempQuestion = changedQuestion.lower()
-        #Go to the list of the tours document that should be imported with the sample-whitehouse-tour example if requested to go to the previous room on the first room
-        else:
-            tempQid = "NavigationList"
-            tempQuestion = ""
-
+    if qid != "":
         client = boto3.client('lambda')
         #Invoke the prepackaged function that Queries ElasticSearch using a document qid
         resp = client.invoke(
             FunctionName = event["req"]["_info"]["es"]["service"]["qid"],
-            Payload = json.dumps({'qid':tempQid}),
+            Payload = json.dumps({'qid':qid,'type':"next"}),
             InvocationType = "RequestResponse"
         )
         # Because the payload is of a streamable type object, we must explicitly read it and load JSON 
         response = json.loads(resp['Payload'].read())
         #uncomment below if you want to see the response 
         #print(json.dumps(response))
-        event = updateResult(event,response)
-        # modify the event to make the previous question the redirected question that was just asked instead of "Next Question"
-        event["res"]["session"]["previous"] = {'qid': tempQid , 'a': response["a"],'q':tempQuestion}
-        
+        if 'a' in response:
+            event = updateResult(event,response)
+                # modify the event to make the previous question the redirected question that was just asked instead of "Next Question"
+        else:
+            #if unable to find anything, set the previous attribute back to the document qid that was previously returned
+            event["res"]["session"]["previous"] = {'qid': qid , 'a': stringToJson["a"],'q':stringToJson["q"]}
         #uncomment line below if you want to see the final JSON before it is returned to the client
         # print(json.dumps(event))
-  
+    else:
+        event["res"]["session"]["previous"] = {'qid': qid , 'a': stringToJson["a"],'q':stringToJson["q"]}
+
     return event
 
 #update the event with the information from the new Query

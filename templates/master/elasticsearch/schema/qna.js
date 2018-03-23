@@ -31,6 +31,16 @@ module.exports={
                     description:"Assign a topic to this item, to support follow up questions on the same topic.",
                     title:"Topic"
                 },
+                next:{
+                    title:"Next Questions",
+                    description:"If applicable, enter the QID of the document(s) that is/are next in the sequence, otherwise leave blank. Be careful; if you set this field to an earlier document in the sequence, you might make your sequence loop forever, which would not be fun!  You can add more QIDs after the first, but they won't do anything at the moment.",
+                    type:"array",
+                    items:{
+                        title:"nextQuestion",
+                        type:"string",
+                        maxLength:100
+                    }
+                },
                 r:{
                     title:"Response card",
                     description:"Attach images to your answer",
