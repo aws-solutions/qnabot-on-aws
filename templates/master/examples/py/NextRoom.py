@@ -15,9 +15,8 @@ def handler(event, context):
     qid = stringToJson.get("qid","")
     nextDoc = stringToJson.get("next",[])
     
-
     if qid != "" and nextDoc:
-        #for not we only go to the first document in list of next documents
+        #for now we only go to the first document in list of next documents, change later when we add functionality for branching and converging paths
         response = qidLambda(event, nextDoc[0])
         #uncomment below if you want to see the response 
         #print(json.dumps(response))
