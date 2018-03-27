@@ -66,6 +66,16 @@ module.exports={
                     type:"string",
                     description:"Enter your lambda function name/ARN to dynamically create or modify answers, or to redirect to a different question.",
                     title:"Lambda Hook"
+                },
+                args:{
+                    title:"Lambda Hook Arguments",
+                    description:"If you named a lambda hook above and it requires additional information beyond what you've entered for this document, enter that information here.  These fields will not do anything unless the lambda hook you named has been coded to handle them specifically.",
+                    type:"array",
+                    items:{
+                        title:"Question",
+                        type:"string",
+                        maxLength:140
+                    }
                 }
             },
             required:["qid","q","a"]
