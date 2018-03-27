@@ -20,13 +20,13 @@ module.exports={
                     }
                 },
                 a:{
-                    type:"text",
+                    type:"string",
                     title:"Answer",
                     description:"Enter the answer you want to be returned when user asks one of the above questions",
                     maxLength:8000,
                 },
                 t:{
-                    type:"text",
+                    type:"string",
                     description:"Assign a topic to this item, to support follow up questions on the same topic.",
                     title:"Topic"
                 },
@@ -36,13 +36,13 @@ module.exports={
                     type:"object",
                     properties:{
                         title:{
-                            type:"text",
+                            type:"string",
                             title:"Card Title",
                             description:"Required",
                             maxLength:100
                         },
                         imageUrl:{
-                            type:"text",
+                            type:"string",
                             description:"Required",
                             title:"Card Image Url",
                             format:'url',
