@@ -61,10 +61,25 @@ module.exports={
         .tapCatch(util.handle.bind(context)('Failed to Build'))
     },
     update(context,qa){
-        return api(context,'update',_.omit(qa,['select','_score']))
+        return api(context,'update',clean(_.omit(qa,['select','_score'])))
     },
     add(context,qa){
-        return api(context,'update',qa)
+        return api(context,'update',clean(qa))
         .tap(()=>context.commit('page/incrementTotal',null,{root:true}))
+    }
+}
+function clean(obj){
+    if(typeof obj==="object"){
+        for (var key in obj){
+            obj[key]=clean(obj[key])
+        }
+    }else if(Array.isArray(obj)){
+        for( var i=0; i<obj.length; i++){
+            obj[i]=clean(obj[i])
+        }
+    }else if(obj.trim){
+        return obj.trim()
+    }else{
+        return obj
     }
 }
