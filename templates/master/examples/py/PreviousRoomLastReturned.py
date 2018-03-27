@@ -17,7 +17,7 @@ def handler(event, context):
     # check that we aren't calling this function before any document have been returned to the client
     if qid != "":
         #need to remove this function from the previous list
-        qid.pop()
+        print(qid.pop())
         client = boto3.client('lambda')
         #Invoke the prepackaged function that Queries ElasticSearch using a document qid
         resp = client.invoke(

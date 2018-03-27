@@ -45,18 +45,19 @@ module.exports=function(req,res){
 
             res.session.topic=_.get(res.result,"t")
             
-            var previousArray = _.get(JSON.parse(res.session.previous),"previous",[])
+            var previousArray = _.get(res.session.previous,"previous",[])
             //setting the max size to the previous array of 5 elements for now
             if(previousArray.length >=5){
                 previousArray.shift()
             }
             if(_.has(res.result, "next")){
+                previousArray.push(_.get(res.session.previous,"qid"))
                 res.session.previous={    
                     qid:_.get(res.result,"qid"),
                     a:_.get(res.result,"a"),
                     q:req.question,
                     next:res.result.next,
-                    previous: previousArray.push(_.get(res.result,"qid"))
+                    previous: previousArray
                 }
             }
             else{
@@ -64,7 +65,9 @@ module.exports=function(req,res){
                 res.session.previous.parent = _.get(JSON.parse(res.session.previous),"qid",false)
                 res.session.previous.qid =_.get(res.result,"qid")
                 res.session.previous.a = _.get(res.result,"a")
-                res.session.previous.q= req.question            
+                res.session.previous.q= req.question
+                previousArray.push(_.get(JSON.parse(res.session.previous),"qid"))
+                res.session.previous.previous= previousArray
             }
         }else{
             res.type="PlainText"

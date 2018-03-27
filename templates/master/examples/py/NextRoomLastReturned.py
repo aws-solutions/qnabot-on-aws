@@ -32,6 +32,7 @@ def handler(event, context):
             event["res"]["session"]["previous"]["q"] = stringToJson["q"]
             event["res"]["session"]["previous"]["next"] = stringToJson["next"]
             tempList = stringToJson["previous"]
+            print(tempList)
             tempList.pop()
             event["res"]["session"]["previous"]["previous"] = tempList
         #uncomment line below if you want to see the final JSON before it is returned to the client
@@ -43,6 +44,7 @@ def handler(event, context):
         event["res"]["session"]["previous"]["q"] = stringToJson["q"]
         event["res"]["session"]["previous"]["next"] = stringToJson["next"]
         tempList = stringToJson["previous"]
+        print(tempList)
         tempList.pop()
         event["res"]["session"]["previous"]["previous"] = tempList
 
@@ -85,9 +87,11 @@ def updateResult(event, response):
     event["res"]["session"]["previous"]["a"] = response["a"]
     event["res"]["session"]["previous"]["q"] = event["req"]["question"]
     event["res"]["session"]["previous"]["next"] = response["next"]
-    tempList= event["req"]["_event"]["sessionAttributes"]["previous"]["previous"]
+    stringToJson = json.loads(event["req"]["_event"]["sessionAttributes"]["previous"])
+    tempList= stringToJson["previous"]
+    print(tempList)
     tempList.pop()
-    tempList.append(response["qid"])
+    tempList.append(stringToJson["qid"])
     event["res"]["session"]["previous"]["previous"] = tempList
     return event
 
