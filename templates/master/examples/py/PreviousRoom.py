@@ -11,14 +11,12 @@ def handler(event, context):
     #print(jsondump)
 
     qid = None
-    try:
-        #get the Question ID (qid) of the previous document that was returned to the web client 
-        stringToJson = json.loads(event["req"]["_event"]["sessionAttributes"]["previous"])
-        qid = stringToJson["qid"]
-    except:
-        #replace qid with the String 'Empty' if there is no previous questions that have been asked
-        qid = ""
-    # if this the case, we aren't in any guided navigation sequence, so return the list of Guided Navigations Document   
+    stringToJson = json.loads(event["req"]["_event"]["sessionAttributes"]["previous"])
+    parent = stringToJson.get("parent",False)
+    if parent:
+        qid = stringToJson["parent"]
+    else:
+        qid = stringToJson.get("qid","")
 
     if qid != "":
         client = boto3.client('lambda')
