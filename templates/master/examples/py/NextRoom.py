@@ -10,7 +10,7 @@ def handler(event, context):
     # jsondump = json.dumps(event)
     # print(jsondump)
 
- 
+    #get the list of next documents
     stringToJson = json.loads(event["req"]["_event"]["sessionAttributes"]["previous"])
     qid = stringToJson.get("qid","")
     nextDoc = stringToJson.get("next",[])
@@ -26,7 +26,7 @@ def handler(event, context):
             event = updateResult(event,response)
                 # modify the event to make the previous question the redirected question that was just asked instead of "Next Question"
         else:
-            #if unable to find anything, set the previous attribute back to the document qid that was previously returned
+            #if unable to find anything, set the previous attribute back to the document qid that was previously returned,since we don't want this document to be in history
             event["res"]["session"]["previous"]["qid"] = qid
             event["res"]["session"]["previous"]["a"] = stringToJson["a"]
             event["res"]["session"]["previous"]["q"] = stringToJson["q"]
@@ -34,6 +34,7 @@ def handler(event, context):
         #uncomment line below if you want to see the final JSON before it is returned to the client
         # print(json.dumps(event))
     else:
+        # set the previous attribute back to the document qid that was previously returned, since we don't want this document to be in history
         event["res"]["session"]["previous"]["qid"] = qid
         event["res"]["session"]["previous"]["a"] = stringToJson["a"]
         event["res"]["session"]["previous"]["q"] = stringToJson["q"]
