@@ -11,15 +11,15 @@ def handler(event, context):
     #print(jsondump)
 
     qid = None
-    try:
-        #get the Question ID (qid) of the previous document that was returned to the web client 
-        stringToJson = json.loads(event["req"]["_event"]["sessionAttributes"]["previous"])
-        qid = stringToJson["qid"]
-    except:
-        #replace qid with the String 'Empty' if there is no previous questions that have been asked
-        qid = ""
-    # if this the case, we aren't in any guided navigation sequence, so return the list of Guided Navigations Document   
-
+    #Because "sub documents", like a sofa document that is connected to a room document, does not have a next, the in built query lambda attempts to figure out a parent document and will give the necessary information to perform room iteration
+    stringToJson = json.loads(event["req"]["_event"]["sessionAttributes"]["previous"])
+    hasParent = stringToJson.get("parent",False)
+    if hasParent:
+        qid = stringToJson["parent"]
+    else:
+        #CAlling previous on a "top level" document
+        qid = stringToJson.get("qid","")
+    # check that we aren't calling this function before any document have been returned to the client
     if qid != "":
         client = boto3.client('lambda')
         #Invoke the prepackaged function that Queries ElasticSearch using a document qid
@@ -36,18 +36,19 @@ def handler(event, context):
             event = updateResult(event,response)
                 # modify the event to make the previous question the redirected question that was just asked instead of "Next Question"
         else:
-            #if unable to find anything, set the previous attribute back to the document qid that was previously returned
+            #if unable to find anything, set the previous attribute back to the document qid that was previously returned, since we don't want this document to be in history
             event["res"]["session"]["previous"]["qid"] = qid
             event["res"]["session"]["previous"]["a"] = stringToJson["a"]
             event["res"]["session"]["previous"]["q"] = stringToJson["q"]
-            event["res"]["session"]["previous"]["q"] = stringToJson["next"]
+            event["res"]["session"]["previous"]["next"] = stringToJson["next"]
         #uncomment line below if you want to see the final JSON before it is returned to the client
         # print(json.dumps(event))
+    # set the previous attribute back to the document qid that was previously returned since we don't want this document to be in history
     else:
         event["res"]["session"]["previous"]["qid"] = qid
         event["res"]["session"]["previous"]["a"] = stringToJson["a"]
         event["res"]["session"]["previous"]["q"] = stringToJson["q"]
-        event["res"]["session"]["previous"]["q"] = stringToJson["next"]
+        event["res"]["session"]["previous"]["next"] = stringToJson["next"]
 
     return event
 
@@ -74,6 +75,6 @@ def updateResult(event, response):
     event["res"]["session"]["previous"]["qid"] = response["qid"]
     event["res"]["session"]["previous"]["a"] = response["a"]
     event["res"]["session"]["previous"]["q"] = event["req"]["question"]
-    event["res"]["session"]["previous"]["next"] = response["next"] 
+    event["res"]["session"]["previous"]["next"] = response["next"]
     return event
 

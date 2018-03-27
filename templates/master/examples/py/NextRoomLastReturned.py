@@ -31,6 +31,9 @@ def handler(event, context):
             event["res"]["session"]["previous"]["a"] = stringToJson["a"]
             event["res"]["session"]["previous"]["q"] = stringToJson["q"]
             event["res"]["session"]["previous"]["next"] = stringToJson["next"]
+            tempList = stringToJson["previous"]
+            tempList.pop()
+            event["res"]["session"]["previous"]["previous"] = tempList
         #uncomment line below if you want to see the final JSON before it is returned to the client
         # print(json.dumps(event))
     else:
@@ -39,6 +42,10 @@ def handler(event, context):
         event["res"]["session"]["previous"]["a"] = stringToJson["a"]
         event["res"]["session"]["previous"]["q"] = stringToJson["q"]
         event["res"]["session"]["previous"]["next"] = stringToJson["next"]
+        tempList = stringToJson["previous"]
+        tempList.pop()
+        event["res"]["session"]["previous"]["previous"] = tempList
+
     return event
 
 #Invoke the prepackaged function that Queries ElasticSearch using a document qid
@@ -77,6 +84,10 @@ def updateResult(event, response):
     event["res"]["session"]["previous"]["qid"] = response["qid"]
     event["res"]["session"]["previous"]["a"] = response["a"]
     event["res"]["session"]["previous"]["q"] = event["req"]["question"]
-    event["res"]["session"]["previous"]["next"] = response["next"] 
+    event["res"]["session"]["previous"]["next"] = response["next"]
+    tempList= event["req"]["_event"]["sessionAttributes"]["previous"]["previous"]
+    tempList.pop()
+    tempList.append(response["qid"])
+    event["res"]["session"]["previous"]["previous"] = tempList
     return event
 
