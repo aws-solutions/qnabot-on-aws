@@ -99,7 +99,7 @@ module.exports={
   components:{},
   watch:{
     local:function(v){
-      this.$emit('input',v.trim ? v.trim() : v)
+      this.$emit('input',v)
     },
     value:function(v){
       this.local=v
