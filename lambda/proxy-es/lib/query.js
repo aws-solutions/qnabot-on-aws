@@ -44,14 +44,19 @@ module.exports=function(req,res){
             }
 
             res.session.topic=_.get(res.result,"t")
-
-
+            
+            var previousArray = _.get(JSON.parse(res.session.previous),"previous",[])
+            //setting the max size to the previous array of 5 elements for now
+            if(previousArray.length >=5){
+                previousArray.shift()
+            }
             if(_.has(res.result, "next")){
                 res.session.previous={    
                     qid:_.get(res.result,"qid"),
                     a:_.get(res.result,"a"),
                     q:req.question,
-                    next:res.result.next
+                    next:res.result.next,
+                    previous: previousArray.push(_.get(res.result,"qid"))
                 }
             }
             else{
