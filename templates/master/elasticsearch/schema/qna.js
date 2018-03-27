@@ -72,7 +72,7 @@ module.exports={
                     description:"If you named a lambda hook above and it requires additional information beyond what you've entered for this document, enter that information here.  These fields will not do anything unless the lambda hook you named has been coded to handle them specifically.",
                     type:"array",
                     items:{
-                        title:"Question",
+                        title:"Argument",
                         type:"string",
                         maxLength:140
                     }
