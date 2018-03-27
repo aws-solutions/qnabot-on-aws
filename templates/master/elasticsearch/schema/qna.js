@@ -69,7 +69,7 @@ module.exports={
                 },
                 args:{
                     title:"Lambda Hook Arguments",
-                    description:"If you named a lambda hook above and it requires additional information beyond what you've entered for this document, enter that information here.  These fields will not do anything unless the lambda hook you named has been coded to handle them specifically.",
+                    description:"If you named a lambda hook above and it requires additional information beyond what you've entered for this document, enter that information here.  You should not add anything here unless the lambda hook you named has been specifically coded to handle it.",
                     type:"array",
                     items:{
                         title:"Argument",
