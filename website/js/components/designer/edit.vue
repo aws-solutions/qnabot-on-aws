@@ -25,14 +25,25 @@
         v-card-title(primary-title)
           .headline Update: {{data.qid}}
         v-card-text
-          form
+          v-form
             schema-input( 
               v-if="dialog"
               v-model="tmp"
               :valid.sync="valid"
               :schema="schema"
+              :pick="schema.required"
               path="edit"
             )
+            v-expansion-panel.elevation-0
+              v-expansion-panel-content( style="display:block")
+                div( slot="header") Advanced
+                schema-input( 
+                  v-model="data"
+                  :valid.sync="valid"
+                  :schema="schema" 
+                  :omit="schema.required"
+                  path="add"
+                )
           small *indicates required field
           v-subheader.error--text(v-if='error') {{error}}
         v-card-actions
