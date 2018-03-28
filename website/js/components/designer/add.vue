@@ -104,6 +104,7 @@ module.exports={
             self.reset()
           }
         }catch(e){
+          console.log(e)
           self.error=e 
         }
       }
