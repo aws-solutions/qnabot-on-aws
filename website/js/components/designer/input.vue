@@ -34,7 +34,7 @@
           v-btn.delete(icon @click.native='remove(index)' 
             :id="path+'-remove-'+index"
             tabindex='-1')
-            v-icon Delete
+            v-icon delete
       v-btn.block(@click.native='add' tabindex='-1'
         :id="path+'-add'"
         ) Add Item
