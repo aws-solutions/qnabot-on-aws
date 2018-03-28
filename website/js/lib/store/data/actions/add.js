@@ -73,6 +73,7 @@ function clean(obj){
         for (var key in obj){
             obj[key]=clean(obj[key])
         }
+        return obj
     }else if(Array.isArray(obj)){
         for( var i=0; i<obj.length; i++){
             obj[i]=clean(obj[i])
