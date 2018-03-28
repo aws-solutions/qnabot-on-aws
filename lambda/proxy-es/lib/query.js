@@ -44,22 +44,23 @@ module.exports=function(req,res){
             }
 
             res.session.topic=_.get(res.result,"t")
-
+            var previousArray = _.get(res.session.previous,"previous",[])
+            var hasPreviousQid = _.get(res.session.previous,"qid",false)
+            if(hasPreviousQid){
+                previousArray.push(hasPreviousQid)
+            }
+            if(previousArray.length > 5){
+                previousArray.shift()
+            }
 
             if(_.has(res.result, "next")){
                 res.session.previous={    
                     qid:_.get(res.result,"qid"),
                     a:_.get(res.result,"a"),
                     q:req.question,
-                    next:res.result.next
+                    next:_.get(res.result,"next",_.get(JSON.parse(res.session.previous),"next","")),
+                    previous:previousArray
                 }
-            }
-            else{
-                res.session.previous.next = _.get(JSON.parse(res.session.previous),"next","")
-                res.session.previous.parent = _.get(JSON.parse(res.session.previous),"qid",false)
-                res.session.previous.qid =_.get(res.result,"qid")
-                res.session.previous.a = _.get(res.result,"a")
-                res.session.previous.q= req.question            
             }
         }else{
             res.type="PlainText"

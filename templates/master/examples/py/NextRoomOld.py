@@ -17,7 +17,11 @@ def handler(event, context):
     
     if qid != "" and nextDoc:
         #for now we only go to the first document in list of next documents, change later when we add functionality for branching and converging paths
-        response = qidLambda(event, nextDoc[0])
+        if isinstance(nextDoc,list):
+            response = qidLambda(event, nextDoc[0])
+        else:
+            response = qidLambda(event, nextDoc)
+
         #uncomment below if you want to see the response 
         #print(json.dumps(response))
 
@@ -27,15 +31,12 @@ def handler(event, context):
                 # modify the event to make the previous question the redirected question that was just asked instead of "Next Question"
         else:
             #if unable to find anything, set the previous attribute back to the document qid that was previously returned,since we don't want this document to be in history
-            tempList = stringToJson["previous"]
-            event["res"]["session"]["previous"] ={"qid":qid,"a":stringToJson["a"],"q":stringToJson["q"],"next":stringToJson["next"],"previous":tempList}
+            event["res"]["session"]["previous"] ={"qid":qid,"a":stringToJson["a"],"q":stringToJson["q"],"next":stringToJson["next"]}
         #uncomment line below if you want to see the final JSON before it is returned to the client
         # print(json.dumps(event))
     else:
         # set the previous attribute back to the document qid that was previously returned, since we don't want this document to be in history
-        tempList = stringToJson["previous"]
-        event["res"]["session"]["previous"] ={"qid":qid,"a":stringToJson["a"],"q":stringToJson["q"],"next":stringToJson["next"],"previous":tempList}
-
+        event["res"]["session"]["previous"] ={"qid":qid,"a":stringToJson["a"],"q":stringToJson["q"],"next":stringToJson["next"]}
     return event
 
 #Invoke the prepackaged function that Queries ElasticSearch using a document qid
@@ -71,10 +72,6 @@ def updateResult(event, response):
                     event["res"]["card"]["imageUrl"] = card["imageUrl"]
     if 't' in response:
         event["res"]["session"]["topic"] = response["t"]
-   
-    stringToJson = json.loads(event["req"]["_event"]["sessionAttributes"]["previous"])
-    tempList= stringToJson["previous"]
-    print(tempList)
-    event["res"]["session"]["previous"] ={"qid":qid,"a":stringToJson["a"],"q":stringToJson["q"],"next":stringToJson["next"],"previous":tempList}
+    event["res"]["session"]["previous"] ={"qid":response["qid"],"a":response["a"],"q":event["req"]["question"],"next":response["next"] }
     return event
 
