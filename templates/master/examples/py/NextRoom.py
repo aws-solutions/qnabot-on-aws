@@ -79,12 +79,10 @@ def updateResult(event, response):
    
     stringToJson = json.loads(event["req"]["_event"]["sessionAttributes"]["previous"])
     tempList= stringToJson["previous"]
-    print(tempList)
     tempList.append(stringToJson["qid"])
     if len(tempList) > 10:
         #setting limit to 10 elements in previous stack since ,since lex has a max header size and we want to save that for other functions, same max size is set in the query lambda
         tempList.pop(0)
-    print(tempList)
     event["res"]["session"]["previous"] ={"qid":response["qid"],"a":stringToJson["a"],"q":stringToJson["q"],"next":response["next"],"previous":tempList}
     return event, event
 

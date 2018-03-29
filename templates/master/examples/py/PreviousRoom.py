@@ -69,10 +69,8 @@ def updateResult(event, response):
         event["res"]["session"]["topic"] = response["t"]
     stringToJson = json.loads(event["req"]["_event"]["sessionAttributes"]["previous"])
     tempList= stringToJson["previous"]
-    print(tempList)
-    #pop twice to remove this function name and previous function name from list
+    #pop to remove previous function name from list
     tempList.pop()
-    print(tempList)
     event["res"]["session"]["previous"] ={"qid":response["qid"],"a":response["a"],"q":event["req"]["question"],"next":response["next"],"previous":tempList}
 
     return event
