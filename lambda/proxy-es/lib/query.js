@@ -50,10 +50,11 @@ module.exports=function(req,res){
             }
             var previousArray = _.get(previousJson,"previous",[])
             var hasPreviousQid = _.get(previousJson,"qid",false)
-            if(hasPreviousQid){
+            // Only push the previous Document qid onto the stack if there is one and if it's not the same Document that was just called
+            if(hasPreviousQid && hasPreviousQid != _.get(res.result,"qid") && res.type == 'qna'){
                 previousArray.push(hasPreviousQid)
             }
-            if(previousArray.length > 5){
+            if(previousArray.length > 10){
                 previousArray.shift()
             }
 
