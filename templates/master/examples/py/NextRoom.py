@@ -84,5 +84,5 @@ def updateResult(event, response):
         #setting limit to 10 elements in previous stack since ,since lex has a max header size and we want to save that for other functions, same max size is set in the query lambda
         tempList.pop(0)
     event["res"]["session"]["previous"] ={"qid":response["qid"],"a":stringToJson["a"],"q":stringToJson["q"],"next":response["next"],"previous":tempList}
-    return event, event
+    return event
 
