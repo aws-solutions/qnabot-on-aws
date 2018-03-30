@@ -112,7 +112,9 @@ module.exports={
         return Object.keys(this.schema.properties)
         .filter(x=>Object.keys(self.value).includes(x))
         .filter(x=>this.pick ? this.pick.includes(x) : true) 
-        .filter(x=>this.omit ? !this.omit.includes(x) : true) 
+        .filter(x=>{
+          return this.omit ? !this.omit.includes(x) : true
+        }) 
         .map(function(x){
           var out=_.cloneDeep(self.schema.properties[x])
           out.name=x
