@@ -37,18 +37,13 @@ def handler(event, context):
                 # modify the event to make the previous question the redirected question that was just asked instead of "Next Question"
         else:
             #if unable to find anything, set the previous attribute back to the document qid that was previously returned, since we don't want this document to be in history
-            event["res"]["session"]["previous"]["qid"] = qid
-            event["res"]["session"]["previous"]["a"] = stringToJson["a"]
-            event["res"]["session"]["previous"]["q"] = stringToJson["q"]
-            event["res"]["session"]["previous"]["next"] = stringToJson["next"]
+            event["res"]["session"]["previous"] ={"qid":qid,"a":stringToJson["a"],"q":stringToJson["q"],"next":stringToJson["next"]}
+
         #uncomment line below if you want to see the final JSON before it is returned to the client
         # print(json.dumps(event))
     # set the previous attribute back to the document qid that was previously returned since we don't want this document to be in history
     else:
-        event["res"]["session"]["previous"]["qid"] = qid
-        event["res"]["session"]["previous"]["a"] = stringToJson["a"]
-        event["res"]["session"]["previous"]["q"] = stringToJson["q"]
-        event["res"]["session"]["previous"]["next"] = stringToJson["next"]
+        event["res"]["session"]["previous"] ={"qid":qid,"a":stringToJson["a"],"q":stringToJson["q"],"next":stringToJson["next"]}
 
     return event
 
@@ -72,9 +67,6 @@ def updateResult(event, response):
                     event["res"]["card"]["imageUrl"] = card["imageUrl"]
     if 't' in response:
         event["res"]["session"]["topic"] = response["t"]
-    event["res"]["session"]["previous"]["qid"] = response["qid"]
-    event["res"]["session"]["previous"]["a"] = response["a"]
-    event["res"]["session"]["previous"]["q"] = event["req"]["question"]
-    event["res"]["session"]["previous"]["next"] = response["next"]
+    event["res"]["session"]["previous"] ={"qid":response["qid"],"a":response["a"],"q":event["req"]["question"],"next":response["next"]}
     return event
 

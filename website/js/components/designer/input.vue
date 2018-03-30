@@ -37,7 +37,7 @@
             v-icon delete
       v-btn.block(@click.native='add' tabindex='-1'
         :id="path+'-add'"
-        ) add question
+        ) Add Item
     div(v-if="schema.type==='object'")
       .subheading {{schema.title}}
       span {{schema.description}}
@@ -99,7 +99,7 @@ module.exports={
   components:{},
   watch:{
     local:function(v){
-      this.$emit('input',v.trim ? v.trim() : v)
+      this.$emit('input',v)
     },
     value:function(v){
       this.local=v
