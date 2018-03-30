@@ -1,7 +1,7 @@
 {
   "qna": [
     {
-      "qid": "PreviousRoom",
+      "qid": "Previous",
       "a": "Unable to go to the previous room...",
       "r": {
         "title": "",
@@ -9,7 +9,8 @@
         "text": "",
         "url": ""
       },
-      "l": "{{PreviousRoomPY}}",
+      "type": "qna",
+      "l": "{{PreviousPY}}",
       "q": [
         "Previous Room",
         "Previous",
@@ -17,7 +18,7 @@
       ]
     },
     {
-      "qid": "NextRoom",
+      "qid": "Next",
       "a": "Unable to go to the next room...",
       "r": {
         "title": "",
@@ -25,7 +26,8 @@
         "text": "",
         "url": ""
       },
-      "l": "{{NextRoomPY}}",
+      "type": "qna",
+      "l": "{{NextPY}}",
       "q": [
         "Next Room",
         "Next",
@@ -36,6 +38,7 @@
       "qid": "Feedback",
       "a": "Unable to leave feedback at the moment...",
       "r": {},
+      "type": "qna",
       "l": "{{FeedbackPY}}",
       "q": [
         "Feedback",
@@ -48,6 +51,7 @@
     {
       "qid": "NavigationList",
       "a": "Welcome to the White House! Feel free to take the Color Tour or Regular Tour.",
+      "type": "qna",
       "q": [
         "Navigation List",
         "List of Tours",
@@ -58,6 +62,7 @@
     {
       "qid": "End of Tour",
       "a": "Thank You for visiting the Whitehouse, we have reached the end of your tour. Feel free to retake the tour or take another one. \n Available tours include the Color Tour and the Regular Tour",
+      "type": "qna",
       "q": [
         "end"
       ]
@@ -66,7 +71,7 @@
       "qid": "Regular Tour Introduction",
       "a": "The Regular Tour will take you through the China Room, State Dining Room,Library, Vermeil Room, and the Oval Office, enjoy!",
       "type": "qna",
-      "next":"China Room"
+      "next":"China Room",
       "q": [
         "Regular Tour Introduction",
         "Regular Tour",
@@ -80,9 +85,9 @@
         "title": "The China Room",
         "imageUrl": "https://s3.amazonaws.com/wwha-tour-assets/TourContent/3-ChinaRoom/9449.jpg"
       },
-      "t":"China Room"
+      "t":"China Room",
       "type": "qna",
-      "next":"State Dining Room"
+      "next":"State Dining Room",
       "q": [
         "China Room",
         "Let's go to the China Room",
@@ -98,9 +103,9 @@
         "title": "The State Dining Room",
         "imageUrl": "https://s3.amazonaws.com/wwha-tour-assets/TourContent/10-StateDiningRoom/1010.jpg"
       },
-      "t":"State Dining Room"
+      "t":"State Dining Room",
       "type": "qna",
-      "next":"Library"
+      "next":"Library",
       "q": [
         "State Dining Room",
         "Let's go to the State Dining Room",
@@ -116,9 +121,9 @@
         "title": "The Library",
         "imageUrl": "https://s3.amazonaws.com/wwha-tour-assets/TourContent/1-Library/9444.jpg"
       },
-      "t":"Library"
+      "t":"Library",
       "type": "qna",
-      "next":"Vermeil Room"
+      "next":"Vermeil Room",
       "q": [
         "Library",
         "Let's go to the Library",
@@ -134,9 +139,9 @@
         "title": "The Vermeil Room",
         "imageUrl": "https://s3.amazonaws.com/wwha-tour-assets/TourContent/2-VermeilRoom/660.jpg"
       },
-      "t":"Vermeil Room"
+      "t":"Vermeil Room",
       "type": "qna",
-      "next":"Oval Office"
+      "next":"Oval Office",
       "q": [
         "Vermeil Room",
         "Let's go to the Vermeil Room",
@@ -152,9 +157,9 @@
         "title": "Oval Office",
         "imageUrl": "https://s3.amazonaws.com/wwha-tour-assets/TourContent/OvalOffice/oval-office-c1996.jpg"
       },
-      "t":"Oval Office"
+      "t":"Oval Office",
       "type": "qna",
-      "next":"End of Tour"
+      "next":"End of Tour",
       "q": [
         "Oval Office",
         "Let's go to the Oval Office",
@@ -167,6 +172,7 @@
       "qid": "Oval Office Desk",
       "a": "Many presidents have used the Resolute Desk in the Oval Office. It was made from the timbers of HMS Resolute, an abandoned British ship discovered by an American vessel and returned to the Queen of England. When the ship was retired, Queen Victoria commissioned the desk and presented to President Rutherford Hayes in 1880.",
       "t": "Oval Office",
+      "type": "qna",
       "r": {
         "title": "The Resolute desk",
         "imageUrl": "https://3ff009b6523c0c1f8b94-091582592a5f780b4bac3b68414d35fd.ssl.cf5.rackcdn.com/default/_superImage/President-Hayes-Desk.jpg"
@@ -181,7 +187,7 @@
       "qid": "Color Tour Introduction",
       "a": "The Color Tour will take you through the Blue Room, the Green Room, and the Red Room. Hope you enjoy!",
       "type": "qna",
-      "next":"Blue Room"
+      "next":"Blue Room",
       "q": [
         "Color Tour Introduction",
         "Color Tour",
@@ -195,9 +201,9 @@
         "title": "The Blue Room",
         "imageUrl": "https://s3.amazonaws.com/wwha-tour-assets/TourContent/8-BlueRoom/740.jpg"
       },
-      "t":"Blue Room"
+      "t":"Blue Room",
       "type": "qna",
-      "next":"Green Room"
+      "next":"Green Room",
       "q": [
         "the blue room",
         "Blue Room",
@@ -214,9 +220,9 @@
         "title": "The Green Room",
         "imageUrl": "https://s3.amazonaws.com/wwha-tour-assets/TourContent/7-GreenRoom/757.jpg"
       },
-      "t":"Green Room"
+      "t":"Green Room",
       "type": "qna",
-      "next":"Red Room"
+      "next":"Red Room",
       "q": [
         "Green Room",
         "Let's go to the Green Room",
@@ -234,7 +240,7 @@
         "imageUrl": "https://s3.amazonaws.com/wwha-tour-assets/TourContent/9-RedRoom/1662.jpg"
       },
       "type": "qna",
-      "next":"End of Tour"
+      "next":"End of Tour",
       "q": [
         "Red Room",
         "Let's go to the Red Room",
@@ -247,6 +253,7 @@
       "qid": "Red Room Sofa",
       "a": "This Grecian style sofa with gilded and scrolled arms and feet was made by an unknown New York cabinetmaker influenced by English Regency and French Empire forms. The sofa became part of the White House Collection in 1961.",
       "t": "Red Room",
+      "type": "qna",
       "r": {
         "title": "The Red Room Sofa",
         "imageUrl": "https://s3.amazonaws.com/wwha-tour-assets/TourContent/9-RedRoom/Objects/861.jpg"
@@ -261,4 +268,3 @@
     }
   ]
 }
-
