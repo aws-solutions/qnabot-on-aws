@@ -80,6 +80,7 @@ module.exports={
     cancel:function(){
       this.dialog=false
       this.loading=false
+      this.error=false
     },
     rm:function(){
       var self=this
