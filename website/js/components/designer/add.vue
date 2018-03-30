@@ -25,8 +25,19 @@
               v-model="data[type]"
               :valid.sync="valid"
               :schema="schema" 
+              :pick="schema.required"
               path="add"
             )
+            v-expansion-panel.elevation-0
+              v-expansion-panel-content
+                div( slot="header") Advanced
+                schema-input( 
+                  v-model="data"
+                  :valid.sync="valid"
+                  :schema="schema" 
+                  :omit="schema.required"
+                  path="add"
+                )
           small *indicates required field
           v-subheader.error--text(v-if='error') {{error}}
         v-card-actions
