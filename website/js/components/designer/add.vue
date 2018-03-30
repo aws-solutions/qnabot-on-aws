@@ -25,8 +25,19 @@
               v-model="data[type]"
               :valid.sync="valid"
               :schema="schema" 
+              :pick="required"
               path="add"
             )
+            v-expansion-panel.elevation-0
+              v-expansion-panel-content
+                div( slot="header") Advanced
+                schema-input( 
+                  v-model="data[type]"
+                  :valid.sync="valid"
+                  :schema="schema" 
+                  :omit="required"
+                  path="add"
+                )
           small *indicates required field
           v-subheader.error--text(v-if='error') {{error}}
         v-card-actions
@@ -76,7 +87,10 @@ module.exports={
       return Object.keys(this.$store.state.data.schema)
     },
     schema:function(){
-      return this.$store.state.data.schema[this.type]
+      return _.get(this,`$store.state.data.schema[${this.type}]`,{type:"object"})
+    },
+    required:function(){
+      return _.get(this,'schema.required',[])
     }
   },
   methods:{
@@ -117,6 +131,7 @@ module.exports={
             self.reset()
           }
         }catch(e){
+          console.log(e)
           self.error=e 
         }
       }
