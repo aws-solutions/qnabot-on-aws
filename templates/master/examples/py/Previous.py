@@ -13,7 +13,12 @@ def handler(event, context):
     # check we aren't calling this function before any document have been returned to the client and that 
     try:
         #Because "sub documents", like a sofa document that is connected to a room document, does not have a next, the in built query lambda attempts to figure out a parent document and will give the necessary information to perform room iteration
-        stringToJson = json.loads(event["req"]["_event"]["sessionAttributes"]["previous"])
+        #for Lex
+        if "sessionAttributes" in event["req"]["_event"]:
+            stringToJson = json.loads(event["req"]["_event"]["sessionAttributes"]["previous"])
+        #for Alexa
+        else:
+            stringToJson = json.loads(event["req"]["_event"]["session"]["attributes"]["previous"])
     except KeyError as k:
         stringToJson = {}
     qidList = stringToJson.get("previous",[])
@@ -67,7 +72,12 @@ def updateResult(event, response):
                     event["res"]["card"]["imageUrl"] = card["imageUrl"]
     if 't' in response:
         event["res"]["session"]["topic"] = response["t"]
-    stringToJson = json.loads(event["req"]["_event"]["sessionAttributes"]["previous"])
+     #for Lex
+    if "sessionAttributes" in event["req"]["_event"]:
+        stringToJson = json.loads(event["req"]["_event"]["sessionAttributes"]["previous"])
+    #for Alexa
+    else:
+        stringToJson = json.loads(event["req"]["_event"]["session"]["attributes"]["previous"])
     tempList= stringToJson["previous"]
     #pop to remove previous function name from list
     tempList.pop()

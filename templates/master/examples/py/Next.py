@@ -12,7 +12,12 @@ def handler(event, context):
 
     try:
         #Because "sub documents", like a sofa document that is connected to a room document, does not have a next, the in built query lambda attempts to figure out a parent document and will give the necessary information to perform room iteration
-        stringToJson = json.loads(event["req"]["_event"]["sessionAttributes"]["previous"])
+        #for Lex
+        if "sessionAttributes" in event["req"]["_event"]:
+            stringToJson = json.loads(event["req"]["_event"]["sessionAttributes"]["previous"])
+        #for Alexa
+        else:
+            stringToJson = json.loads(event["req"]["_event"]["session"]["attributes"]["previous"])
         qid = stringToJson["qid"]
         nextDoc = stringToJson["next"]
     except KeyError as k:
@@ -77,7 +82,12 @@ def updateResult(event, response):
     if 't' in response:
         event["res"]["session"]["topic"] = response["t"]
    
-    stringToJson = json.loads(event["req"]["_event"]["sessionAttributes"]["previous"])
+     #for Lex
+    if "sessionAttributes" in event["req"]["_event"]:
+        stringToJson = json.loads(event["req"]["_event"]["sessionAttributes"]["previous"])
+    #for Alexa
+    else:
+        stringToJson = json.loads(event["req"]["_event"]["session"]["attributes"]["previous"])
     tempList= stringToJson["previous"]
     tempList.append(stringToJson["qid"])
     if len(tempList) > 10:
