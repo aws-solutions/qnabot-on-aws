@@ -81,7 +81,7 @@
     },
     {
       "qid": "Regular Tour Introduction",
-      "a": "The Regular Tour will take you through the China Room, State Dining Room,Library, Vermeil Room, and the Oval Office. In order to move between rooms, ask to go to the next room to go forwards a room, or ask to go the previous room to go back a room. Hope you enjoy!",
+      "a": "The Regular Tour will take you through the China Room, State Dining Room,Library, Vermeil Room, and the Oval Office. In order to move between rooms, ask to go to the next room to go forward a room, or ask to go the previous room to go back a room. Hope you enjoy!",
       "type": "qna",
       "next":"China Room",
       "q": [
@@ -262,7 +262,7 @@
     },
     {
       "qid": "Color Tour Introduction",
-      "a": "The Color Tour will take you through the Blue Room, the Green Room, and the Red Room.In order to move between rooms, ask to go to the next room to go forwards a room, or ask to go the previous room to go back a room. Hope you enjoy!",
+      "a": "The Color Tour will take you through the Blue Room, the Green Room, and the Red Room.In order to move between rooms, ask to go to the next room to go forward a room, or ask to go the previous room to go back a room. Hope you enjoy!",
       "type": "qna",
       "next":"Blue Room",
       "q": [
