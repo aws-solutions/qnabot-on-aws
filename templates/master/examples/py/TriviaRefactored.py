@@ -15,7 +15,7 @@ def handler(event,context):
     if ("quizBot" in event["res"]["session"]):
         # we're almost surely being called during a quiz after this function has already run if this is true
         
-        print("debugging quizbot session field: ")
+        print("Quizbot session field: ")
         print(event["res"]["session"]["quizBot"])
         
         # these lines get rid of that nasty string-formatted JSON and give us a dict instead
