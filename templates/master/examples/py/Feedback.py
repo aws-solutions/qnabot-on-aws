@@ -33,10 +33,18 @@ def handler(event, context):
         currentQid = event["req"]["question"].upper()
     try:
         #get the Question ID (qid) of the previous document that was returned to the web client 
-        stringToJson = json.loads(event["req"]["_event"]["sessionAttributes"]["previous"])
+         #for Lex
+        if "sessionAttributes" in event["req"]["_event"]:
+            stringToJson = json.loads(event["req"]["_event"]["sessionAttributes"]["previous"])
+        #for Alexa
+        else:
+            stringToJson = json.loads(event["req"]["_event"]["session"]["attributes"]["previous"])
         previousQid = stringToJson["qid"]
         previousQuestion = stringToJson["q"]
         previousAnswer = stringToJson["a"]
+        previousPrevious = stringToJson.get("previous",[])
+        previousNext = stringToJson.get("next","")
+
     except:
         #replace qid with the String '' if there is no previous questions that have been asked
         previousQid = ''
@@ -45,19 +53,19 @@ def handler(event, context):
         msg = "There is no question to leave feedback on, please ask a question before attempting to leave feedback"
         event["res"]["message"] = msg
         #set the previous qid to be '' so that this response is returned again if client attempts to leave feedback without askign another question again
-        event["res"]["session"]["previous"] = {'qid': '' , 'a': msg,'q':event["req"]["question"]}
+        event["res"]["session"]["previous"] = {'qid': '' , 'a': msg,'q':event["req"]["question"], "next":previousNext,"previous":previousPrevious}
         #set back to normal mode if in feedback mode
         event["res"]["session"].pop("queryLambda",None)
     # if it is a valid response for feedback
     elif currentQid in validResponseQid:
         logFeedback(previousQid,previousQuestion,previousAnswer,validResponseQid.get(currentQid))
         event["res"]["message"] = "Thank you for leaving the feedback,{0}. Relevant information has been logged and will be looked at.".format(validResponseQid.get(currentQid))
-        event["res"]["session"]["previous"] = {'qid': previousQid , 'a': previousAnswer,'q': previousQuestion}
+        event["res"]["session"]["previous"] = {'qid': previousQid , 'a': previousAnswer,'q': previousQuestion, "next":previousNext,"previous":previousPrevious}
         #set back to normal mode if in feedback mode
         event["res"]["session"].pop("queryLambda",None)
     elif currentQid in exitResponseQid:
         event["res"]["message"] = "Canceled Feedback"
-        event["res"]["session"]["previous"] = {'qid': previousQid , 'a': previousAnswer,'q':previousQuestion}
+        event["res"]["session"]["previous"] = {'qid': previousQid , 'a': previousAnswer,'q':previousQuestion, "next":previousNext,"previous":previousPrevious}
         #set back to normal mode if in feedback mode
         event["res"]["session"].pop("queryLambda",None)
     else:
@@ -71,11 +79,12 @@ def handler(event, context):
         for key,value in exitResponseQid.items():
             defaultResp.append('{0}. {1}'.format(key,value))
         #Send the the initial response for feedback options
-        event["res"]["message"] = '\n'.join(defaultResp)
+        tempAnswer = '\n'.join(defaultResp)
+        event["res"]["message"] = '<pre> {0} </pre>'.format(tempAnswer)
         #Make sure that the response triggers this lambda function by setting the session attribute
         event["res"]["session"]["queryLambda"] = os.environ['AWS_LAMBDA_FUNCTION_NAME']
         #set the qid and question of the previous as if this question had never been asked
-        event["res"]["session"]["previous"] = {'qid': previousQid , 'a': previousAnswer,'q': previousQuestion}
+        event["res"]["session"]["previous"] = {'qid': previousQid , 'a': previousAnswer,'q': previousQuestion, "next":previousNext,"previous":previousPrevious}
     return event
 
 #logs feedback for the questions
