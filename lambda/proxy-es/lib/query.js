@@ -44,29 +44,40 @@ module.exports=function(req,res){
             }
 
             res.session.topic=_.get(res.result,"t")
+            var navigationJson = _.get(res.session,"navigation",false)
+            if(navigationJson){
+                navigationJson= JSON.parse(res.session.navigation)
+            }
             var previousJson = _.get(res.session,"previous",false)
             if(previousJson){
                 previousJson= JSON.parse(res.session.previous)
             }
-            var previousArray = _.get(previousJson,"previous",[])
+            var previousArray = _.get(navigationJson,"previous",[])
             var hasPreviousQid = _.get(previousJson,"qid",false)
+            console.log("hasParent: " + _.get(navigationJson,"hasParent",true))
             // Only push the previous Document qid onto the stack if there is one and if it's not the same Document that was just called and its a qna type document
-            if(hasPreviousQid && hasPreviousQid != _.get(res.result,"qid") && req._info.es.type=='qna'){
+            if(hasPreviousQid && hasPreviousQid != _.get(res.result,"qid") && _.get(navigationJson,"hasParent",true) == false && req._info.es.type=='qna'){
                 previousArray.push(hasPreviousQid)
             }
             if(previousArray.length > 10){
                 previousArray.shift()
             }
-
-            if(_.has(res.result, "next")){
-                res.session.previous={    
-                    qid:_.get(res.result,"qid"),
-                    a:_.get(res.result,"a"),
-                    q:req.question,
-                    next:_.get(res.result,"next",_.get(previousJson,"next","")),
-                    previous:previousArray
-                }
+            var hasParent = true
+            if("next" in res.result){
+                hasParent = false
             }
+            
+            res.session.previous={    
+                qid:_.get(res.result,"qid"),
+                a:_.get(res.result,"a"),
+                q:req.question
+            }
+            res.session.navigation={
+                next:_.get(res.result,"next",_.get(navigationJson,"next","")),
+                previous:previousArray,
+                hasParent:hasParent
+            }
+            
         }else{
             res.type="PlainText"
             res.message=process.env.EMPTYMESSAGE

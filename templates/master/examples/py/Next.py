@@ -7,22 +7,25 @@ import botocore.response as br
 def handler(event, context):
 
     #uncomment below if you want to see the JSON that is being passed to the Lambda Function
-    # jsondump = json.dumps(event)
-    # print(jsondump)
+    jsondump = json.dumps(event)
+    print(jsondump)
 
     try:
         #Because "sub documents", like a sofa document that is connected to a room document, does not have a next, the in built query lambda attempts to figure out a parent document and will give the necessary information to perform room iteration
         #for Lex
         if "sessionAttributes" in event["req"]["_event"]:
-            stringToJson = json.loads(event["req"]["_event"]["sessionAttributes"]["previous"])
+            previousToJson = json.loads(event["req"]["_event"]["sessionAttributes"]["previous"])
+            navigationToJson = json.loads(event["req"]["_event"]["sessionAttributes"]["navigation"])
         #for Alexa
         else:
-            stringToJson = json.loads(event["req"]["_event"]["session"]["attributes"]["previous"])
-        qid = stringToJson["qid"]
-        nextDoc = stringToJson["next"]
+            previousToJson = json.loads(event["req"]["_event"]["session"]["attributes"]["previous"])
+            navigationToJson = json.loads(event["req"]["_event"]["session"]["attributes"]["navigation"])
+        qid = previousToJson["qid"]
+        nextDoc = navigationToJson["next"]
     except KeyError as k:
         # hit this case if user calls next on a client with no other answered phrases
         event["res"]["session"]["previous"]={}
+        event["res"]["session"]["navigation"]={}
         return event
     
     
@@ -40,8 +43,8 @@ def handler(event, context):
             # modify the event to make the previous question the redirected question that was just asked instead of "Next Question"
     else:
         #if unable to find anything, set the previous attribute back to the document qid that was previously returned,since we don't want this document to be in history
-        tempList = stringToJson["previous"]
-        event["res"]["session"]["previous"] ={"qid":qid,"a":stringToJson["a"],"q":stringToJson["q"],"next":stringToJson["next"],"previous":tempList}
+        event["res"]["session"]["previous"]={"qid":qid,"a":previousToJson["a"],"q":previousToJson["q"]}
+        event["res"]["session"]["navigation"]={"next":navigationToJson["next"],"previous":navigationToJson["previous"],"hasParent":navigationToJson["hasParent"]} 
     #uncomment line below if you want to see the final JSON before it is returned to the client
     # print(json.dumps(event))
 
@@ -58,7 +61,9 @@ def qidLambda(event,nextQid):
         InvocationType = "RequestResponse"
     )
     # Because the payload is of a streamable type object, we must explicitly read it and load JSON 
-    response = json.loads(resp['Payload'].read())
+    tempResponse = resp['Payload'].read()
+    print(tempResponse)
+    response = json.loads(tempResponse)
     return response
 
 #update the event with the information from the new Query
@@ -84,15 +89,20 @@ def updateResult(event, response):
    
      #for Lex
     if "sessionAttributes" in event["req"]["_event"]:
-        stringToJson = json.loads(event["req"]["_event"]["sessionAttributes"]["previous"])
+        previousToJson = json.loads(event["req"]["_event"]["sessionAttributes"]["previous"])
+        navigationToJson = json.loads(event["req"]["_event"]["sessionAttributes"]["navigation"])
     #for Alexa
     else:
-        stringToJson = json.loads(event["req"]["_event"]["session"]["attributes"]["previous"])
-    tempList= stringToJson["previous"]
-    tempList.append(stringToJson["qid"])
+        previousToJson = json.loads(event["req"]["_event"]["session"]["attributes"]["previous"])
+        navigationToJson = json.loads(event["req"]["_event"]["session"]["attributes"]["navigation"])
+    tempList= navigationToJson["previous"]
+    #only append to navigation list if top level document
+    if not navigationToJson["hasParent"]:
+        tempList.append(previousToJson["qid"])
     if len(tempList) > 10:
         #setting limit to 10 elements in previous stack since ,since lex has a max header size and we want to save that for other functions, same max size is set in the query lambda
         tempList.pop(0)
-    event["res"]["session"]["previous"] ={"qid":response["qid"],"a":stringToJson["a"],"q":stringToJson["q"],"next":response.get("next",""),"previous":tempList}
+    event["res"]["session"]["previous"] ={"qid":response["qid"],"a":previousToJson["a"],"q":previousToJson["q"]}
+    event["res"]["session"]["navigation"]={"next":response.get("next",""),"previous":tempList,"hasParent":navigationToJson["hasParent"]} 
     return event
 

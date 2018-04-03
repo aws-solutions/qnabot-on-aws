@@ -15,13 +15,13 @@ def handler(event, context):
         #Because "sub documents", like a sofa document that is connected to a room document, does not have a next, the in built query lambda attempts to figure out a parent document and will give the necessary information to perform room iteration
         #for Lex
         if "sessionAttributes" in event["req"]["_event"]:
-            stringToJson = json.loads(event["req"]["_event"]["sessionAttributes"]["previous"])
+            navigationToJson = json.loads(event["req"]["_event"]["sessionAttributes"]["navigation"])
         #for Alexa
         else:
-            stringToJson = json.loads(event["req"]["_event"]["session"]["attributes"]["previous"])
+            navigationToJson = json.loads(event["req"]["_event"]["session"]["attributes"]["navigation"])
     except KeyError as k:
-        stringToJson = {}
-    qidList = stringToJson.get("previous",[])
+        navigationToJson = {}
+    qidList = navigationToJson.get("previous",[])
     
     
     # check that there aren't any previous rooms to go to
@@ -42,13 +42,14 @@ def handler(event, context):
             event = updateResult(event,response)
                 # modify the event to make the previous question the redirected question that was just asked instead of "Next Question"
         else:
-            event["res"]["session"]["previous"] ={"qid":qidList,"a":stringToJson["a"],"q":stringToJson["q"],"next":stringToJson["next"],"previous":[]}
+            event["res"]["session"]["previous"] ={"qid":qidList,"a":navigationToJson["a"],"q":navigationToJson["q"]}
+            event["res"]["session"]["navigation"]={"next":navigationToJson["next"],"previous":[],"hasParent":navigationToJson["hasParent"]} 
 
         #uncomment line below if you want to see the final JSON before it is returned to the client
         # print(json.dumps(event))
     # set the previous attribute back to the document qid that was previously returned since we don't want this document to be in history
    # else:
-       # event["res"]["session"]["previous"] ={"qid":qidList,"a":stringToJson["a"],"q":stringToJson["q"],"next":stringToJson["next"],"previous":[]}
+       # event["res"]["session"]["previous"] ={"qid":qidList,"a":navigationToJson["a"],"q":navigationToJson["q"],"next":navigationToJson["next"],"previous":[]}
 
     return event
 
@@ -74,14 +75,15 @@ def updateResult(event, response):
         event["res"]["session"]["topic"] = response["t"]
      #for Lex
     if "sessionAttributes" in event["req"]["_event"]:
-        stringToJson = json.loads(event["req"]["_event"]["sessionAttributes"]["previous"])
+        navigationToJson = json.loads(event["req"]["_event"]["sessionAttributes"]["navigation"])
     #for Alexa
     else:
-        stringToJson = json.loads(event["req"]["_event"]["session"]["attributes"]["previous"])
-    tempList= stringToJson["previous"]
+        navigationToJson = json.loads(event["req"]["_event"]["session"]["attributes"]["navigation"])
+    tempList= navigationToJson["previous"]
     #pop to remove previous function name from list
     tempList.pop()
-    event["res"]["session"]["previous"] ={"qid":response["qid"],"a":response["a"],"q":event["req"]["question"],"next":response["next"],"previous":tempList}
+    event["res"]["session"]["previous"] ={"qid":response["qid"],"a":response["a"],"q":event["req"]["question"]}
+    event["res"]["session"]["navigation"]={"next":response["next"],"previous":tempList,"hasParent":navigationToJson["hasParent"]} 
 
     return event
 
