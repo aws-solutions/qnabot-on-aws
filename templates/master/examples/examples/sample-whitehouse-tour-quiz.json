@@ -1,0 +1,68 @@
+{
+  "qna": [
+    {
+      "qid": "EnterSampleQuiz",
+      "a": "Starting the sample quiz.  Good luck!",
+      "r": {},
+      "l": "qna-QNA-dev-dev-master-13-TriviaRefactored-PY",
+      "args": [
+        "sampleQuiz.1"
+      ],
+      "type": "qna",
+      "q": [
+        "I want to take the sample quiz.",
+        "Take the sample quiz.",
+        "Take the White House quiz."
+      ]
+    },
+    {
+      "qid": "sampleQuiz.1",
+      "question": "What has been exhibited in the China Room since 1917?",
+      "incorrectAnswers": [
+        "Artifacts from the War of 1812.",
+        "Furniture used during the Lincoln administration.",
+        "Engraved frames."
+      ],
+      "correctAnswers": [
+        "Ceramics, glass, and silver."
+      ],
+      "next": [
+        "sampleQuiz.2"
+      ],
+      "quiz": "sampleQuiz",
+      "type": "quiz"
+    },
+    {
+      "qid": "sampleQuiz.2",
+      "question": "Who designated a specific room to be the White House library?",
+      "incorrectAnswers": [
+        "Millard Fillmore.",
+        "James Madison.",
+        "James K. Polk"
+      ],
+      "correctAnswers": [
+        "Franklin D. Roosevelt"
+      ],
+      "next": [
+        "sampleQuiz.3"
+      ],
+      "quiz": "sampleQuiz",
+      "type": "quiz"
+    },
+    {
+      "qid": "sampleQuiz.3",
+      "question": "Who bequeathed the Vermeil Room's silver to the White House?",
+      "incorrectAnswers": [
+        "Queen Elizabeth II.",
+        "Benjamin Franklin.",
+        "James K. Polk."
+      ],
+      "correctAnswers": [
+        "Margaret Thompson Biddle."
+      ],
+      "next": [],
+      "quiz": "sampleQuiz",
+      "type": "quiz"
+    }
+  ]
+}
