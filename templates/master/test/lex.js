@@ -199,6 +199,169 @@ module.exports={
             method:"DELETE"
         }))
         .finally(()=>test.done())
+    },
+    // Guided Navigation tests
+    ask:async function(test){
+        try{
+            var args = await outputs('dev/master')
+            await
+            api({
+                path:"questions/navigation.1",
+                method:"PUT",
+                body:{
+                    qid:"Next",
+                    type: "qna",
+                    q:["Next"],
+                    a:"no next room",
+                    l: args.NextLambda
+                }
+            }),
+            api({
+                path:"questions/navigation.2",
+                method:"PUT",
+                body:{
+                    qid:"Previous",
+                    type: "qna",
+                    q:["Previous"],
+                    a:"no previous room",
+                    l: args.PreviousLambda
+                }
+            })
+            var response=await this.lex.postText({
+                inputText:"next"
+            }).promise()
+            console.log(response)
+            test.equal(response.message,"no next room")
+            response = await this.lex.postText({
+                inputText:"previous"
+            }).promise()
+            console.log(response)
+            test.equal(response.message,"no previous room")
+        }catch(e){
+            test.ifError(e)
+        }finally{
+
+        test.done() 
+        }
+    },
+     ask:async function(test){
+        try{
+            
+            await
+            api({
+                path:"questions/navigation.3",
+                method:"PUT",
+                body:{
+                    qid:"One",
+                    type: "qna",
+                    q:["One"],
+                    a:"One",
+                    next:"Two"
+                }
+            }),
+            api({
+                path:"questions/navigation.4",
+                method:"PUT",
+                body:{
+                    qid:"Two",
+                    type: "qna",
+                    q:["Two"],
+                    a:"Two",
+                    next:"Three"
+                }
+            }),
+            api({
+                path:"questions/navigation.5",
+                method:"PUT",
+                body:{
+                    qid:"Three",
+                    type: "qna",
+                    q:["Three"],
+                    a:"Three",
+                    next: "End"
+                }
+            }),
+            api({
+                path:"questions/navigation.6",
+                method:"PUT",
+                body:{
+                    qid:"End",
+                    type: "qna",
+                    q:["End"],
+                    a:"End",
+                }
+            })
+            
+            var response=await this.lex.postText({
+                inputText:"One"
+            }).promise()
+            console.log(response)
+            test.equal(response.message,"One")
+            response = await this.lex.postText({
+                inputText:"Two"
+            }).promise()
+            console.log(response)
+            test.equal(response.message,"Two")
+            response = await this.lex.postText({
+                inputText:"next"
+            }).promise()
+            console.log(response)
+            test.equal(response.message,"Three")
+            response = await this.lex.postText({
+                inputText:"previous"
+            }).promise()
+            console.log(response)
+            test.equal(response.message,"Two")
+            response = await this.lex.postText({
+                inputText:"End"
+            }).promise()
+            console.log(response)
+            test.equal(response.message,"End")
+            response = await this.lex.postText({
+                inputText:"next"
+            }).promise()
+            console.log(response)
+            test.equal(response.message,"Three")
+            response = await this.lex.postText({
+                inputText:"previous"
+            }).promise()
+            console.log(response)
+            test.equal(response.message,"Two")
+            response = await this.lex.postText({
+                inputText:"previous"
+            }).promise()
+            console.log(response)
+            test.equal(response.message,"One")
+        }catch(e){
+            test.ifError(e)
+        }finally{
+            await api({
+                path:"questions/navigation.1",
+                method:"DELETE"
+            }),
+            api({
+                path:"questions/navigation.2",
+                method:"DELETE"
+            })
+            api({
+                path:"questions/navigation.3",
+                method:"DELETE"
+            })
+            api({
+                path:"questions/navigation.4",
+                method:"DELETE"
+            })
+            api({
+                path:"questions/navigation.5",
+                method:"DELETE"
+            })
+            api({
+                path:"questions/navigation.6",
+                method:"DELETE"
+            })
+            test.done() 
+        }
     }
+    
 }
 

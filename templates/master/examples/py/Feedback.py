@@ -72,7 +72,7 @@ def handler(event, context):
             defaultResp.append('{0}. {1}'.format(key,value))
         #Send the the initial response for feedback options
         tempAnswer = '\n'.join(defaultResp)
-        event["res"]["message"] = '<pre> {0} </pre>'.format(tempAnswer)
+        event["res"]["message"] = '{0}'.format(tempAnswer)
         #Make sure that the response triggers this lambda function by setting the session attribute
         event["res"]["session"]["queryLambda"] = os.environ['AWS_LAMBDA_FUNCTION_NAME']
         #set the qid and question of the previous as if this question had never been asked
