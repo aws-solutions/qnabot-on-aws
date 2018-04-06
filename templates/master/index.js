@@ -88,10 +88,10 @@ module.exports={
       "Value":{"Fn::GetAtt":["Var","index"]}
     },
     "NextLambda":{
-      "Value":{"Fn::GetAtt":["Arn","ExamplePYTHONLambdaNext"]}
+      "Value":{"Fn::GetAtt":["ExamplePYTHONLambdaNext","Arn"]}
     },
     "PreviousLambda":{
-      "Value":{"Fn::GetAtt":["Arn","ExamplePYTHONLambdaPrevious"]}
+      "Value":{"Fn::GetAtt":["ExamplePYTHONLambdaPrevious", "Arn"]}
     }
   },
   "Parameters": {
