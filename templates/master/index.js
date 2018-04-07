@@ -12,6 +12,9 @@ module.exports={
   "Description": "QnABot with admin and client websites",
   "Mappings": {},
   "Outputs": {
+    "ImportBucket":{
+      "Value":{"Ref":"ImportBucket"}
+    },
     "BotConsoleUrl":{
       "Value":{"Fn::Join":["",[
         "https://console.aws.amazon.com/lex/home?",
