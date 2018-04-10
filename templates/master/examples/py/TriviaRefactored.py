@@ -142,9 +142,14 @@ def handler(event,context):
         questionsCorrectCount = event["res"]["session"].get("quizBot", {}).get("correctAnswerCount", -1)
         botResponse += "\n"
         if (questionsAnsweredCount != -1 and questionsCorrectCount != -1):
-            botResponse += "You got {0} questions correct out of ".format(questionsCorrectCount)
+            if (questionsCorrectCount != 1):
+                botResponse += "You got {0} questions correct out of ".format(questionsCorrectCount)
+            else:
+                botResponse += "You got {0} question correct out of ".format(questionsCorrectCount)
             botResponse += "{0}, with a score of ".format(questionsAnsweredCount)
             botResponse += "{0:.2f}%. ".format((questionsCorrectCount * 100.0)/(questionsAnsweredCount * 1.0))
+        else:
+            botResponse += "There was an error and the quiz could not be scored. "
         botResponse += "Thank you for taking the quiz! "
         event["res"]["session"].pop("quizBot", None)
         event["res"]["session"].pop("queryLambda", None)
