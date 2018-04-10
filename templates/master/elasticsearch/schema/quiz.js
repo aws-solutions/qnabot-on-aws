@@ -16,9 +16,19 @@ module.exports={
                     description:"Enter a question that the bot will ask the user.",
                     maxLength:140,
                 },
+                correctAnswers:{
+                    title:"Correct Answers",
+                    type:"array",
+                    description:"Enter correct answer options for this question.  Any of these options will be graded as correct if the user selects them.  These will be presented to the user in randomized order alongside the incorrect answer(s) you enter below.",
+                    items:{
+                        title:"Correct Answer",
+                        type:"string",
+                        maxLength:140
+                    }
+                },
                 incorrectAnswers:{
                     title:"Incorrect Answers",
-                    description:"Enter the incorrect answer options that the user will choose from.  These will be presented to the user alongside the correct answers you enter below.",
+                    description:"Enter incorrect answer options for this question.  These will be presented to the user in randomized order alongside the correct answer(s) you entered above.",
                     type:"array",
                     items:{
                         title:"Answer",
@@ -26,25 +36,36 @@ module.exports={
                         maxLength:140
                     }
                 },
-                correctAnswers:{
-                    title:"Correct Answers",
-                    type:"array",
-                    description:"Enter the answer options that the quiz should grade as correct if the user selects one of them.  These will be presented to the user alongside the incorrect answers you entered above.",
-                    items:{
-                        title:"Correct Answer",
-                        type:"string",
-                        maxLength:140
-                    }
-                },
                 next:{
                     title:"Next Questions",
-                    description:"Enter the QID of the next question in the quiz into the first field.  If the first field is blank then the quiz will end after this question.  Be careful; if you set this field to an earlier question in the quiz, you might make your quiz loop forever, which would not be fun!  You can add more QIDs after the first, but they won't do anything at the moment.",
+                    description:"Enter the QID of the next question in the quiz.  If the field is left blank then the quiz will end after this question.",
                     type:"array",
                     items:{
                         title:"nextQuestion",
                         type:"string",
                         maxLength:100
                     }
+                },
+                r:{
+                    title:"Response card",
+                    description:"Use these fields to attach images to your question.",
+                    type:"object",
+                    properties:{
+                        title:{
+                            type:"string",
+                            title:"Card Title",
+                            description:"Required",
+                            maxLength:100
+                        },
+                        imageUrl:{
+                            type:"string",
+                            description:"Required",
+                            title:"Card Image Url",
+                            format:'url',
+                            maxLength:2000
+                        }
+                    },
+                    required:["title","imageUrl"]
                 },
                 quiz:{
                     type:"string",
@@ -74,4 +95,3 @@ module.exports={
         }
     }
 }
-                
