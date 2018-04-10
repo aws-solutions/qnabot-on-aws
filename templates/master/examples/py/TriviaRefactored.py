@@ -57,7 +57,7 @@ def handler(event,context):
         print("Current document contents: ")
         print(json.dumps(currentDocumentContents))
         
-        # we don't want to ask a question that doesn't exist, but we can't exit the quiz during the last question because we still need to grade the last question
+        # we don't want to ask a question that doesn't exist, but we can't exit the quiz during the last question because we still need to grade the last question after asking it
         if (event["res"]["session"]["quizBot"]["current"]):
             # this is where the bot asks the question
             botResponse += "\n" + currentDocumentContents["question"] + " \n"
@@ -69,6 +69,25 @@ def handler(event,context):
                 botResponse += answerPair[0] + " \n"
                 if (answerPair[1]):
                     event["res"]["session"]["quizBot"]["correctAnswerIndices"].append(i)
+                    
+            # we need to set a flag to true and add relevant info to the event if the question contains a valid response card (a.k.a. an image attachment)
+            if ("r" in currentDocumentContents):
+                if ("title" in currentDocumentContents["r"]):
+                    if (currentDocumentContents["r"]["title"]):
+                        event["res"]["card"]["send"] = True
+                        event["res"]["card"]["title"] = currentDocumentContents["r"]["title"]
+                        print("Response card title: ")
+                        print(event["res"]["card"]["title"])
+                        try:
+                            event["res"]["card"]["text"] = currentDocumentContents["r"]["text"]
+                        except:
+                            event["res"]["card"]["text"] = ""
+                        print("Response card text: ")
+                        print(event["res"]["card"]["text"])
+                if ("imageUrl" in currentDocumentContents["r"]):
+                    event["res"]["card"]["imageUrl"] = currentDocumentContents["r"]["imageUrl"]
+                    print("Response card image URL: ")
+                    print(event["res"]["card"]["imageUrl"])
             
             event["res"]["session"]["quizBot"]["questionCount"] += 1
             event["res"]["session"]["queryLambda"] = os.environ['AWS_LAMBDA_FUNCTION_NAME']
