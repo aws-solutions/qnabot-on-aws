@@ -1,70 +1,27 @@
 module.exports=[{
     title:"Signin/Signup",
     text:`
-Sign in or create an Amazon developer account at [Amazon Developer Console](https://developer.amazon.com/home.html) 
-    `
+- create an Amazon developer account at [Amazon Developer Console](https://developer.amazon.com/home.html)
+    `,
+    image:"../images/alexa-01.png"
 },{
-    title:"Create Skill",
-    text:`
-(Instructions do not apply to the new Alexa skills beta interface)
-
-In the Amazon Developer Console 
-1. Choose ALEXA from the toolbar  
-1. Under Alexa Skills Kit choose  Get Started 
-1. In the upper right hand corner choose Add a New Skill
-`},{
-    title:"Skill Information",
-    text:`
-Create a new skill using the following information:  
-
-| Name | Value |
-|------|-------|
-| Skill Type | Custom Interaction Model |
-| Language | English (U.S.) |
-| Skill Name | QnA Bot |
-| Invocation Name | q and a |
-
-choose save then next
-`},
-{
-    title:"Interaction Model",
-    text:`
-Fill in the following information:
-
-| Name | Value |
-|------|-------|
-| Intent Schema |  copy and paste from button below |
-| Custom Slot Type | EXAMPLE_QUESTIONS |
-| Values |  copy and paste from button below |
-| Sample Utterances | Qna_intent {QnA_slot} |
-
-choose save then next
-`,
-    buttons:[{
-        text:"Copy Intent Schema to clipBoard",
-        id:"IntentSchema",
-        loading:false
-    },{
-        text:"Copy utterances to clipBoad",
-        id:"Utterances",
-        loading:false
-    }]
+    title:"Create Skill part 1",
+    test:" ",
+    image:"../images/alexa-02.png"
+},{
+    title:"Create Skill part 2",
+    test:" ",
+    image:"../images/alexa-03.png"
 },
 {
-    title:"Configuration",
-    text:`
-Fill in the following information:
-
-| Name | Value |
-|------|-------|
-| Service Endpoint Type |  AWS Lambda ARN (Amazon Resource Name) |
-| Default |  copy and paste Lambda ARN from button below | 
-
-choose all other defaults
-
-choose save then next
-`,
+    title:"Configure Skill",
+    test:" ",
+    image:"../images/alexa-04.png",
     buttons:[{
+        text:"Copy Schema to clipBoard",
+        id:"Schema",
+        loading:false
+    },{
         text:"Copy Lambda Arn to clipboard",
         id:"LambdaArn",
         loading:false
@@ -72,9 +29,9 @@ choose save then next
 },
 {
     title:"Test",
-    optional:true,
+    image:"../images/alexa-05.png",
     text:`
-Congratulations! Your skill is ready to be used. You will have to publish your skill in order for people to use it outside of your account. 
+Congratulations! After you enable testing your skill is ready to be used. You will have to publish your skill in order for people to use it outside of your account. 
 
 You can use this page to test your new Alexa skill or use the following: 
 
@@ -86,21 +43,5 @@ To access your unpublished skill, register your Alexa device to the same account
 
 Ask questions in the form: *\"Alexa, ask Q and A, How do I use Q and A Bot?\"*  (Assuming your device wake word is 'Alexa')
 `
-},
-{
-    title:"Publishing",
-    optional:true,
-    text:`
-If you want to publish your QnA skill, see [Submitting an Alexa Skill for Certification](https://developer.amazon.com/public/solutions/alexa/alexa-skills-kit/docs/publishing-an-alexa-skill)
-
-Otherwise skip this step. You will be able to access the QnA skill from Alexa devices registered to your own Amazon account."
-`},
-{
-    title:"Privacy and Compliance",
-    optional:true,
-    text:`
-1. Choose 'no' for the privacy questions, 
-2. check the export compliance agreement.
-`}
-
+}
 ]

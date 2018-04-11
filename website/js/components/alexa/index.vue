@@ -21,19 +21,31 @@
                   :key="index"
                   :step="index+1")
                   v-card
-                    v-card-text
-                      .headline.text-xs-center {{step.title}}
-                      span(v-html="step.text")
-                    v-card-actions
-                      v-btn(v-for="(y,x) in step.buttons"
-                        :id="y.id"
-                        :key="x"
-                        :loading="y.loading"
-                        @click="copy(y)") {{y.text}}
-                    v-card-actions
-                      v-spacer
-                      v-btn(@click="stepNumber--" v-if="index>0" ) back
-                      v-btn(@click="stepNumber++" v-if="index+1<steps.length") next
+                    v-container
+                      v-layout(column)
+                        v-flex(xs12)
+                          v-card-text
+                            .headline.text-xs-center {{step.title}}
+                            span(v-html="step.text")
+                          v-card-actions
+                            v-btn(v-for="(y,x) in step.buttons"
+                              :id="y.id"
+                              :key="x"
+                              :loading="y.loading"
+                              @click="copy(y)") {{y.text}}
+
+                        v-flex(xs12)
+                          img(
+                            :src="step.image"
+                            style="max-width:75%;display:block;margin:auto;"
+                            contain
+                            v-if="step.image"
+                          )
+                        v-flex(xs12)
+                          v-card-actions
+                            v-spacer
+                            v-btn(@click="stepNumber--" v-if="index>0" ) back
+                            v-btn(@click="stepNumber++" v-if="index+1<steps.length") next
 </template>
 
 <script>
@@ -71,14 +83,9 @@ module.exports={
     return {
       visible:false,
       stepNumber:1,
-      utterances:new clipboard('#Utterances',{
+      schema:new clipboard('#Schema',{
         text:function(){
-          return self.$store.state.bot.utterances.join('\n')
-        }
-      }),
-      schema:new clipboard('#IntentSchema',{
-        text:function(){
-          return JSON.stringify(self.$store.state.bot.alexa.schema)
+          return JSON.stringify(self.$store.state.bot.alexa)
         }
       }),
       arn:new clipboard('#LambdaArn',{
@@ -99,9 +106,11 @@ module.exports={
     steps:function(){
       var self=this
       return _.map(this.stepsRaw,function(x){ 
-        var temp=handlebars.compile(x.text)
         var y=Object.assign({},x)
-        y.text=markdown(temp(self.$store.state.bot),{renderer})
+        if(x.text){
+          var temp=handlebars.compile(x.text)
+          y.text=markdown(temp(self.$store.state.bot),{renderer})
+        }
         return y
       })
     }

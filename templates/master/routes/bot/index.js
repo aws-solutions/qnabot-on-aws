@@ -7,9 +7,12 @@ module.exports={
 "Bot": resource('bot'),
 "UtterancesApi": resource('utterances',{"Ref":"Bot"}),
 "AlexaApi": resource('alexa',{"Ref":"Bot"}),
-"AlexaSchema":mock({
-    method:"GET",
-    template:"bot/alexa",
+"AlexaSchema":lambda({
+    authorization:"AWS_IAM",
+    method:"get",
+    lambda:{"Fn::GetAtt":["LexProxyLambda","Arn"]},
+    subTemplate:fs.readFileSync(__dirname+'/utterance.get.vm','utf8'),
+    responseTemplate:fs.readFileSync(__dirname+'/alexa.vm','utf8'),
     resource:{"Ref":"AlexaApi"}
 }),
 "BotPost":lambda({
