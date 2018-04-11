@@ -126,6 +126,8 @@ def handler(event,context):
             Payload = json.dumps(event),
             InvocationType = "RequestResponse"
             )
+        # note that we're overwriting the entire event here.  we do this instead of updating fields individually to ensure that 
+        # TriviaRefactored doesn't return different formats in different cases
         event = json.loads(quizInitialResponse["Payload"].read())
         
         print("Exiting handler after quiz initialization, returning following event: ")
@@ -133,7 +135,7 @@ def handler(event,context):
         return event
         
     else:
-        # this lambda function is being called in a very unexpected fashion if we are here
+        # this lambda function is being called in a very unexpected fashion if we are here, so we just print some errors and exit
         
         print("TriviaRefactored error: this lambda function doesn't know how to handle the event it received.  Dumping pre-cleanup event: ")
         print(json.dumps(event))
@@ -144,6 +146,7 @@ def handler(event,context):
         return event
     
     if not quizShouldContinue(event):
+        # if the quiz shouldn't continue (i.e. it's over, or the user says "quit" or "exit") then we grade the quiz and clean up quiz-related session attributes
         questionsAnsweredCount = event["res"]["session"].get("quizBot", {}).get("questionCount", -1)
         questionsCorrectCount = event["res"]["session"].get("quizBot", {}).get("correctAnswerCount", -1)
         botResponse += "\n"
@@ -186,7 +189,6 @@ def quizShouldContinue(event):
     return checkResult
     
 # this function gets the name of the first question in the quiz from the lambda hook arguments
-# at some point it will need to be changed after we update the UI for better quiz-building
 def getFirstQuestionQid(event):
     firstQuestionQid = ""
     if (event["res"].get("result", {})):
