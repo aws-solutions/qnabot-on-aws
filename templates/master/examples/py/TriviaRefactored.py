@@ -11,20 +11,26 @@ def handler(event,context):
     
     botResponse = event["res"].get("message", "")
     
+    # these lines check for stringified JSON in the session attributes and convert it to dicts
+    # we do this to defensively drive around other functions stringifying fields when we don't expect it
+    for keyString in event["res"]["session"]:
+        if (isinstance(event["res"]["session"][keyString], str)):
+            try:
+                tempDict = json.loads(event["res"]["session"][keyString])
+                event["res"]["session"].pop(keyString, None)
+                event["res"]["session"][keyString] = tempDict
+                print("Converted following session field from stringified JSON to dict: ")
+                print(keyString)
+            except ValueError:
+                print("The following session attribute was a string, but not valid stringified JSON: ")
+                print(keyString)
+    
     nextQuestionQid = ""
     if ("quizBot" in event["res"]["session"]):
         # we're almost surely being called during a quiz after this function has already run if this is true
         
         print("Quizbot session field: ")
         print(event["res"]["session"]["quizBot"])
-        
-        # these lines get rid of that nasty string-formatted JSON and give us a dict instead
-        # we have to do this conditionally because the lex UI always turns dict fields into strings
-        # but this function isn't always being called by the lex UI
-        if (isinstance(event["res"]["session"]["quizBot"], str)):
-            quizBotDict = json.loads(event["res"]["session"]["quizBot"])
-            event["res"]["session"].pop("quizBot", None)
-            event["res"]["session"]["quizBot"] = quizBotDict
         
         if (event["res"]["session"]["quizBot"]["questionCount"] > 0):
             # if we're past the first question, the user has answered the previous question and we need to grade them
