@@ -7,7 +7,8 @@ module.exports=Object.assign(
     require('./login'),
     require('./jobs'),
     require('./examples'),
-    require('./services')
+    require('./services'),
+    require('./images')
 )
 
 

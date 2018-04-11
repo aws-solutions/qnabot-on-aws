@@ -1,13 +1,42 @@
+#set($inputRoot = $input.path('$'))
+#set($utterances = $inputRoot.enumerationValues)
+
 {
-"schema":{
-    "intents": [{
-        "slots": [{
-            "name": "QnA_slot",
-            "type": "EXAMPLE_QUESTIONS"
-            }],
-        "intent": "Qna_intent"
+  "interactionModel": {
+    "languageModel": {
+      "invocationName": "q and a",
+      "types": [
+        {
+          "name": "EXAMPLE_QUESTIONS",
+          "values": [
+            #foreach( $utterance in $utterances)
+                {"name":{
+                    "value":"$utterance.value" 
+                }}#if( $foreach.hasNext ),#end
+            #end
+          ]
+        }
+      ],
+      "intents": [
+        {
+          "slots": [
+            {
+              "name": "QnA_slot",
+              "type": "EXAMPLE_QUESTIONS"
+            }
+          ],
+          "name": "Qna_intent",
+          "samples": [
+            "{QnA_slot}"
+          ]
         },
-        {"intent":"AMAZON.StopIntent"},
-        {"intent":"AMAZON.CancelIntent"}
-    ]
-}}
+        {
+          "name": "AMAZON.StopIntent"
+        },
+        {
+          "name": "AMAZON.CancelIntent"
+        }
+      ]
+    }
+  }
+}

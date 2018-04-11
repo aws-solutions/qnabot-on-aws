@@ -12,6 +12,12 @@ module.exports={
   "Description": "QnABot with admin and client websites",
   "Mappings": {},
   "Outputs": {
+    "CognitoEndpoint":{
+        "Value":{"Fn::GetAtt":["DesignerLogin","Domain"]}
+    },
+    "UserRole":{
+      "Value":{"Ref":"UserRole"}
+    },
     "ImportBucket":{
       "Value":{"Ref":"ImportBucket"}
     },
@@ -48,11 +54,17 @@ module.exports={
     "Bucket":{
       "Value":{"Ref":"Bucket"}
     },
+    "IdPool":{
+      "Value":{"Ref":"IdPool"}
+    },
     "ApiEndpoint":{
       "Value":{"Fn::GetAtt":["ApiUrl","Name"]}
     },
     "ESProxyLambda":{
         "Value":{"Fn::GetAtt":["ESProxyLambda","Arn"]}
+    },
+    "CFNESProxyLambda":{
+        "Value":{ "Fn::GetAtt" : ["ESCFNProxyLambda", "Arn"]}
     },
     "ContentDesignerURL": {
       "Value":{"Fn::Join":["",[
@@ -77,6 +89,9 @@ module.exports={
     },
     "DesignerClientId":{
       "Value":{"Ref":"ClientDesigner"}
+    },
+    "ClientClientId":{
+      "Value":{"Ref":"ClientClient"}
     },
     "ElasticsearchEndpoint":{
       "Value":{"Fn::GetAtt":["ESVar","ESAddress"]}
