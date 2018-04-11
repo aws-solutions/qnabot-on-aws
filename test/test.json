@@ -23,7 +23,7 @@
         "ServiceRole": {"Ref": "ServiceRole"},
         "Source": {
           "Type": "GITHUB",
-          "Location": "https://github.com/awslabs/aws-ai-qna-bot.git",
+          "Location": "https://github.com/rstrahan/aws-ai-qna-bot-2.git",
           "auth": {"type": "OATH"}
         }
       }
