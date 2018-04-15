@@ -145,7 +145,7 @@ module.exports=Object.assign(
     },
     check(context,qid){
         return context.dispatch('_request',{
-            url:context.rootState.info._links.questions.href+'/'+qid,
+            url:`${context.rootState.info._links.questions.href}/${encodeURIComponent(qid)}`,
             method:'head',
             reason:qid+' does not exists',
             ignore404:true
@@ -159,7 +159,7 @@ module.exports=Object.assign(
     },
     update(context,payload){
         return context.dispatch('_request',{
-            url:context.rootState.info._links.questions.href+'/'+payload.qid,
+            url:`${context.rootState.info._links.questions.href}/${encodeURIComponent(payload.qid)}`,
             method:'put',
             body:payload,
             reason:'failed to update'
