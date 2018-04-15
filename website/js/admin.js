@@ -62,7 +62,7 @@ function init(){
     router.replace('/loading')
         
     Vue.use(IdleVue, {
-        idleTime: 10000,
+        idleTime: 45*60*1000,
         eventEmitter:new Vue(),
         store:store,
         startAtIdle:false
