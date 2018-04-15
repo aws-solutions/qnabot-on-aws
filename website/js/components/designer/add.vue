@@ -84,7 +84,7 @@ module.exports={
   },
   computed:{
     types:function(){
-      return Object.keys(this.$store.state.data.schema)
+      return Object.keys(this.$store.state.data.schema).sort()
     },
     schema:function(){
       return _.get(this,`$store.state.data.schema[${this.type}]`,{type:"object"})
