@@ -62,7 +62,9 @@ module.exports={
                             maxLength:2000
                         }
                     },
-                    required:["title","imageUrl"]
+                    dependencies:{
+                        title:["imageUrl"]
+                    }
                 },
                 l:{
                     type:"string",

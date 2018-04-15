@@ -88,7 +88,7 @@ exports.assemble=function(request,response){
                 }
             } : {
                 type:"Simple",
-                title:response.card.title || request.question,
+                title:response.card.title || request.question || "Image",
                 content:response.message
             },
             shouldEndSession:false

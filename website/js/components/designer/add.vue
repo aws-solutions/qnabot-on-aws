@@ -23,19 +23,21 @@
           v-form(v-if="dialog")
             schema-input( 
               v-model="data[type]"
-              :valid.sync="valid"
+              :valid.sync="valid.required"
               :schema="schema" 
               :pick="required"
               path="add"
+              ref="requiredInput"
             )
             v-expansion-panel.elevation-0
               v-expansion-panel-content
                 div( slot="header") Advanced
                 schema-input( 
                   v-model="data[type]"
-                  :valid.sync="valid"
+                  :valid.sync="valid.optional"
                   :schema="schema" 
                   :omit="required"
+                  ref="optionalInput"
                   path="add"
                 )
           small *indicates required field
@@ -65,6 +67,8 @@ var saveAs=require('file-saver').saveAs
 var Promise=require('bluebird')
 var _=require('lodash')
 var empty=require('./empty')
+var Ajv=require('ajv')
+var ajv=new Ajv()
 
 module.exports={
   data:function(){
@@ -75,7 +79,10 @@ module.exports={
       type:'qna',
       dialog:false,
       loading:false,
-      valid:false,
+      valid:{
+        required:false,
+        optional:false
+      },
       data:{}
     }
   },
@@ -106,12 +113,19 @@ module.exports={
       }) 
       this.$refs.dialog.$refs.dialog.scrollTo(0,0)
     },
+    validate:function(){
+      var data=this.data[this.type]
+      return !!validate(value) || validate.errors.map(x=>x.message).join('. ')
+    },
     add:async function(){
       var self=this
       this.error=false
-      var data=this.data[this.type]
+      var data=clean(_.cloneDeep(this.data[this.type]))
+      var validate=ajv.compile(this.schema || true)
+      console.log(data)
+      var valid=validate(data)
 
-      if(this.valid){
+      if(valid){
         this.loading=true
         this.dialog=false
         try{ 
@@ -122,37 +136,41 @@ module.exports={
             self.dialog=true
           }else{
             self.$refs.dialog.$refs.dialog.scrollTo(0,0)
-            var out=clean(_.cloneDeep(data))
-            out.type=this.type
-            console.log(out)
-            await self.$store.dispatch('data/add',out)
+            data.type=this.type
+            await self.$store.dispatch('data/add',data)
             self.success='Success!'
-            self.$store.commit('data/addQA',_.cloneDeep(self.data))
+            self.$store.commit('data/addQA',_.cloneDeep(data))
             self.reset()
           }
         }catch(e){
           console.log(e)
           self.error=e 
         }
+      }else{
+        this.error=validate.errors.map(x=>x.message).join('. ')
       }
     }
   }
 }
-function clean(data){
-  console.log(data)
-  try{
-    if(Array.isArray(data)){
-      data=_.compact(data)
-      data=_.forEach(data,clean)
-    }else if(typeof data==='object'){
-      data=_.pickBy(data,x=>x)
-      data=_.mapValues(data,clean)
+
+function clean(obj){
+    if(Array.isArray(obj)){
+        for( var i=0; i<obj.length; i++){
+            obj[i]=clean(obj[i])
+        }
+        var out=_.compact(obj)
+        return out.length ? out : null
+    }else if(typeof obj==="object"){
+        for (var key in obj){
+            obj[key]=clean(obj[key])
+        }
+        var out=_.pickBy(obj)
+        return _.keys(out).length ? out : null
+    }else if(obj.trim){
+        return obj.trim() || null
+    }else{
+        return obj
     }
-  }catch(e){
-    console.log(e)
-    throw e
-  }
-  return data
 }
 </script>
 
