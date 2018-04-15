@@ -63,7 +63,9 @@
               v-model="props.item.select" tabindex='-1' color="primary" 
               :id="'qa-'+props.item.qid+'-select'"
             )
-          td.text-xs-left.shrink.primary--text.title(v-if="active==='test'") {{props.item._score}}
+          td.text-xs-left.shrink.primary--text.title(
+            v-if="active==='test'"
+          ) {{props.item._score || '-'}}
           td.text-xs-left.shrink.title 
             b(:id="props.item.qid") {{props.item.qid}}
           td.text-xs-left.title {{props.item.type || 'qna'}}
