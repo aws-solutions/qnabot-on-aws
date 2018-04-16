@@ -40,21 +40,32 @@
       v-flex
         v-expansion-panel
           v-expansion-panel-content
-            p.title(slot="header" id="examples-open") Examples/Demos
-            v-container(id="examples" grid-list-xl)
-              v-layout(row wrap)
-                v-flex(v-for="example in examples" xs12 sm6 md3)
-                  v-card.elevation-1(style="min-height:150px;")
-                    v-card-title
-                      h3.title {{example.id}}
-                    v-card-text.pa-0.pl-2
-                      p {{example.text}}
-                    v-card-actions.pa-0.pr-2.pb-2
-                      v-spacer
-                      v-btn.example(
-                        @click="importExample(example.document.href)"
-                        :id="'example-'+example.id"
-                      ) Load
+            p.headline(slot="header" id="examples-open") Examples/Demos
+            v-list(two-line)
+              template(v-for="(example,index) in examples")
+                v-divider
+                v-list-tile
+                  v-list-title-avatar
+                    v-tooltip(bottom)
+                      span(
+                        slot="activator"
+                      )
+                        v-icon.pr-3 info 
+                      span.subheading {{example.text}}
+                  v-list-tile-content
+                    v-list-tile-title.title {{example.id}}
+                    v-tooltip(bottom)
+                      span(
+                        slot="activator"
+                      )
+                        v-list-tile-sub-title(
+                        ) {{example.text}}
+                      span.subheading {{example.text}}
+                  v-list-tile-action
+                    v-btn.example(
+                      @click="importExample(example.document.href)"
+                      :id="'example-'+example.id"
+                    ) Load
 </template>
 
 <script>
