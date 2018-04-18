@@ -16,14 +16,13 @@ def handler(event,context):
     for keyString in event["res"]["session"]:
         if (isinstance(event["res"]["session"][keyString], str)):
             try:
-                tempDict = json.loads(event["res"]["session"][keyString])
-                event["res"]["session"].pop(keyString, None)
-                event["res"]["session"][keyString] = tempDict
+                event["res"]["session"][keyString] = json.loads(event["res"]["session"][keyString])
                 print("Converted following session field from stringified JSON to dict: ")
                 print(keyString)
             except ValueError:
                 print("The following session attribute was a string, but not valid stringified JSON: ")
                 print(keyString)
+    
     
     nextQuestionQid = ""
     if ("quizBot" in event["res"]["session"]):

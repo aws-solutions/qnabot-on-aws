@@ -57,7 +57,12 @@ module.exports=function(req,res){
             console.log("hasParent: " + _.get(navigationJson,"hasParent",true))
             // Only push the previous Document qid onto the stack if there is one and if it's not the same Document that was just called and its a qna type document
             if(hasPreviousQid && hasPreviousQid != _.get(res.result,"qid") && _.get(navigationJson,"hasParent",true) == false && req._info.es.type=='qna'){
-                previousArray.push(hasPreviousQid)
+                if(previousArray.length == 0){
+                    previousArray.push(hasPreviousQid)
+                }
+                else if(previousArray[previousArray.length -1] != hasPreviousQid){
+                    previousArray.push(hasPreviousQid)
+                }
             }
             if(previousArray.length > 10){
                 previousArray.shift()
