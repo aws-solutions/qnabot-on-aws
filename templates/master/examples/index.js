@@ -96,7 +96,7 @@ module.exports=Object.assign(
             "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"]
       }
     },
-    "PushFirehoseExecuteQNALambda":{
+    "PushFeedbackFirehoseExecuteQNALambda":{
       "Type" : "AWS::IAM::Policy",
       "Properties" : { 
         "PolicyDocument" : {
@@ -119,12 +119,12 @@ module.exports=Object.assign(
                   "firehose:PutRecordBatch"
                 ],
                 "Resource": [
-                  {"Fn::GetAtt" : ["MetricFirehose", "Arn"]}
+                  {"Fn::GetAtt" : ["FeedbackFirehose", "Arn"]}
                 ]
               }
           ]
         },
-        "PolicyName" : "LambdaMetricFirehoseQNALambda",
+        "PolicyName" : "LambdaFeedbackFirehoseQNALambda",
         "Roles" : [{"Ref":"ExampleLambdaRole"}],
       }
     }
@@ -147,7 +147,7 @@ function jslambda(name){
             "ES_QNA_TYPE": {"Fn::GetAtt":["Var","QnAType"]},
             "ES_QUIZE_TYPE": {"Fn::GetAtt":["Var","QuizType"]},
             "ES_INDEX": {"Fn::GetAtt":["Var","index"]},
-            "FIREHOSE_NAME":{"Ref":"MetricFirehose"},
+            "FIREHOSE_NAME":{"Ref":"FeedbackFirehose"},
             "ES_ADDRESS": {"Fn::GetAtt":["ESVar","ESAddress"]},
           }
         },
@@ -182,7 +182,7 @@ function pylambda(name){
             "ES_QNA_TYPE": {"Fn::GetAtt":["Var","QnAType"]},
             "ES_QUIZE_TYPE": {"Fn::GetAtt":["Var","QuizType"]},
             "ES_INDEX": {"Fn::GetAtt":["Var","index"]},
-            "FIREHOSE_NAME":{"Ref":"MetricFirehose"},
+            "FIREHOSE_NAME":{"Ref":"FeedbackFirehose"},
             "ES_ADDRESS": {"Fn::GetAtt":["ESVar","ESAddress"]},
           }
         },

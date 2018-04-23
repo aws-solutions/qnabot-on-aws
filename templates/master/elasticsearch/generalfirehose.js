@@ -1,5 +1,5 @@
 module.exports={
-    "MetricFirehose": {
+    "GeneralFirehose": {
         "Type" : "AWS::KinesisFirehose::DeliveryStream",
         "Properties" : {
             "DeliveryStreamType" : "DirectPut",
@@ -10,7 +10,7 @@ module.exports={
                 },
                 "CloudWatchLoggingOptions" : {
                     "Enabled" : true,
-                    "LogGroupName" : "/aws/kinesisfirehose/qna-feedback-metrics",
+                    "LogGroupName" : "/aws/kinesisfirehose/qna-general-metrics",
                     "LogStreamName" : "ElasticsearchDelivery"
                 },
                 "DomainARN" :{"Fn::GetAtt" : ["ElasticsearchDomain", "DomainArn"] },
@@ -19,28 +19,28 @@ module.exports={
                 "RetryOptions" : {
                     "DurationInSeconds" : 300
                 },
-                "RoleARN" : {"Fn::GetAtt" : ["FirehoseESS3Role", "Arn"] },
+                "RoleARN" : {"Fn::GetAtt" : ["GeneralFirehoseESS3Role", "Arn"] },
                 "S3BackupMode" : "AllDocuments",
                 "S3Configuration" : 
                 {
-                    "BucketARN" : { "Fn::GetAtt" : [ "MetricsBucket", "Arn" ] },
+                    "BucketARN" : { "Fn::GetAtt" : [ "QNAGeneralMetricsBucket", "Arn" ] },
                     "BufferingHints" : {
                         "IntervalInSeconds" : 60,
                         "SizeInMBs" : 5
                     },
                     "CloudWatchLoggingOptions" : {
                         "Enabled" : true,
-                        "LogGroupName" : "/aws/kinesisfirehose/qna-feedback-metrics",
+                        "LogGroupName" : "/aws/kinesisfirehose/qna-general-metrics",
                         "LogStreamName" : "S3Delivery"
                     },
                     "CompressionFormat" : "UNCOMPRESSED",
-                    "RoleARN" : {"Fn::GetAtt" : ["FirehoseESS3Role", "Arn"] }
+                    "RoleARN" : {"Fn::GetAtt" : ["GeneralFirehoseESS3Role", "Arn"] }
                 },
-                "TypeName" : "feedback"
+                "TypeName" : "general"
             },
         }
     },
-    "MetricsBucket":{
+    "QNAGeneralMetricsBucket":{
         "Type" : "AWS::S3::Bucket",
         "DeletionPolicy":"Delete",
         "Properties" : {
@@ -52,7 +52,7 @@ module.exports={
             ]
         }
     },
-    "FirehoseESS3Role":{
+    "GeneralFirehoseESS3Role":{
         "Type": "AWS::IAM::Role",
         "Properties": {
           "AssumeRolePolicyDocument": {
@@ -84,8 +84,8 @@ module.exports={
                   "s3:PutObject"
                 ],
                 "Resource": [
-                  {"Fn::GetAtt": ["MetricsBucket", "Arn"]},
-                  {"Fn::Join":["",[{"Fn::GetAtt": ["MetricsBucket", "Arn"]},"/*"]]}
+                  {"Fn::GetAtt": ["QNAGeneralMetricsBucket", "Arn"]},
+                  {"Fn::Join":["",[{"Fn::GetAtt": ["QNAGeneralMetricsBucket", "Arn"]},"/*"]]}
                 ]
               },
               {
@@ -123,7 +123,7 @@ module.exports={
                 "Resource": [
                   {"Fn::Join":["",[{"Fn::GetAtt" : ["ElasticsearchDomain", "DomainArn"]},"/_all/_settings"]]},
                   {"Fn::Join":["",[{"Fn::GetAtt" : ["ElasticsearchDomain", "DomainArn"]},"/_cluster/stats"]]},
-                  {"Fn::Join":["",[{"Fn::GetAtt" : ["ElasticsearchDomain", "DomainArn"]},"/metrics*/_mapping/feedback"]]},
+                  {"Fn::Join":["",[{"Fn::GetAtt" : ["ElasticsearchDomain", "DomainArn"]},"/metrics*/_mapping/general"]]},
                   {"Fn::Join":["",[{"Fn::GetAtt" : ["ElasticsearchDomain", "DomainArn"]},"/_nodes"]]},
                   {"Fn::Join":["",[{"Fn::GetAtt" : ["ElasticsearchDomain", "DomainArn"]},"/_nodes/stats"]]},
                   {"Fn::Join":["",[{"Fn::GetAtt" : ["ElasticsearchDomain", "DomainArn"]},"/_nodes/*/stats"]]},
@@ -172,7 +172,7 @@ module.exports={
               }
             ]
           },
-          "PolicyName" : "PutQnAMetricsFirehose"
+          "PolicyName" : "PutQnAGeneralFirehose"
       }]
         }
     }

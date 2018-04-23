@@ -46,7 +46,13 @@ module.exports={
                             type:"string",
                             title:"Card Title",
                             description:"Required",
-                            maxLength:100
+                            maxLength:80
+                        },
+                        subTitle:{
+                            type:"string",
+                            title:"Card Subtitle",
+                            description:"Optional",
+                            maxLength:80
                         },
                         imageUrl:{
                             type:"string",

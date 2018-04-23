@@ -9,7 +9,7 @@ module.exports=function(req,res){
         req,
         res
     },null,2))
-    console.log("Invokeing QueryLambda",arn)
+    console.log("Invoking QueryLambda",arn)
     return lambda.invoke({
         FunctionName:arn,
         InvocationType:"RequestResponse",
