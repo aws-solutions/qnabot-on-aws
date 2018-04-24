@@ -35,6 +35,30 @@ module.exports={
         }]
       }
     },
+    "ESLoggingLambda": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Code": {
+            "S3Bucket": {"Ref":"BootstrapBucket"},
+            "S3Key": {"Fn::Sub":"${BootstrapPrefix}/lambda/proxy-es.zip"},
+            "S3ObjectVersion":{"Ref":"ESProxyCodeVersion"}
+        },
+        "Environment": {
+          "Variables": {
+            "FIREHOSE_NAME":{"Ref":"GeneralFirehose"},
+          }
+        },
+        "Handler": "index.logging",
+        "MemorySize": "1408",
+        "Role": {"Fn::GetAtt": ["ESLoggingLambdaRole","Arn"]},
+        "Runtime": "nodejs6.10",
+        "Timeout": 300,
+        "Tags":[{
+            Key:"Type",
+            Value:"Logging"
+        }]
+      }
+    },
     "ESQueryLambda": {
       "Type": "AWS::Lambda::Function",
       "Properties": {
@@ -47,7 +71,6 @@ module.exports={
           "Variables": {
             "ERRORMESSAGE":lexConfig.ErrorMessage,
             "EMPTYMESSAGE":lexConfig.EmptyMessage,
-            "FIREHOSE_NAME":{"Ref":"GeneralFirehose"},
           }
         },
         "Handler": "index.query",
@@ -110,6 +133,27 @@ module.exports={
         ]
       }
     },
+    "ESLoggingLambdaRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "lambda.amazonaws.com"
+              },
+              "Action": "sts:AssumeRole"
+            }
+          ]
+        },
+        "Path": "/",
+        "ManagedPolicyArns": [
+          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
+        ]
+      }
+    },
     "PushGeneralFirehoseExecuteQNALambda":{
       "Type" : "AWS::IAM::Policy",
       "Properties" : { 
@@ -139,7 +183,7 @@ module.exports={
           ]
         },
         "PolicyName" : "LambdaGeneralFirehoseQNALambda",
-        "Roles" : [{"Ref":"ESProxyLambdaRole"}],
+        "Roles" : [{"Ref":"ESLoggingLambdaRole"}],
       }
     },
     "EsPolicy": {

@@ -32,6 +32,7 @@ module.exports={
             ES_INDEX:{"Fn::GetAtt":["Var","index"]},
             ES_ADDRESS:{"Fn::GetAtt":["ESVar","ESAddress"]},
             LAMBDA_DEFAULT_QUERY:{"Ref":"ESQueryLambda"},
+            LAMBDA_LOG:{"Ref":"ESLoggingLambda"},
             ES_SERVICE_QID:{"Ref":"ESQidLambda"},
             ES_SERVICE_PROXY:{"Ref":"ESProxyLambda"},
             "ERRORMESSAGE":config.ErrorMessage,

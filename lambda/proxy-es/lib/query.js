@@ -83,35 +83,6 @@ module.exports=function(req,res){
                 previous:previousArray,
                 hasParent:hasParent
             }
-            
-            //data to send to general metrics logging
-            var date = new Date();
-            var now = date.toISOString();
-            var jsonData = {
-                qid:_.get(res.result,"qid"),
-                utterance:req.question,
-                answer:_.get(res.result,"a"),
-                topic:_.get(res.result,"t",""),
-                clientType:req._type,
-                datetime:now
-            }
-            // encode to base64 string to put into firehose
-            var objJsonStr = JSON.stringify(jsonData);
-            var objJsonB64 = Buffer.from(objJsonStr).toString("base64");
-            var firehose = new aws.Firehose()
-            
-            var params = {
-                  DeliveryStreamName: process.env.FIREHOSE_NAME, /* required */
-                  Record: { /* required */
-                    Data: objJsonB64 /* Strings will be Base-64 encoded on your behalf */ /* required */
-                }
-            }
-            
-            firehose.putRecord(params, function(err, data) {
-              if (err) console.log(err, err.stack); // an error occurred
-              else     console.log(data);           // successful response
-            })
-            
         }else{
             res.type="PlainText"
             res.message=process.env.EMPTYMESSAGE
