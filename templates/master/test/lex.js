@@ -206,23 +206,23 @@ module.exports = {
     ask: async function(test) {
         try {
             var args = await outputs('dev/master')
-            await
-            api({
+            
+            await api({
                     path: "questions/navigation.1",
                     method: "PUT",
                     body: {
-                        qid: "Next",
+                        qid: "navigation.1",
                         type: "qna",
                         q: ["Next"],
                         a: "no next room",
                         l: args.NextLambda
                     }
-                }),
-                api({
+                })
+            await  api({
                     path: "questions/navigation.2",
                     method: "PUT",
                     body: {
-                        qid: "Previous",
+                        qid: "navigation.2",
                         type: "qna",
                         q: ["Previous"],
                         a: "no previous room",
@@ -251,45 +251,46 @@ module.exports = {
     ask: async function(test) {
         try {
 
-            await
-            api({
-                    path: "questions/navigation.3",
-                    method: "PUT",
-                    body: {
-                        qid: "One",
-                        type: "qna",
-                        q: ["One"],
-                        a: "One",
-                        next: "Two"
-                    }
-                }),
-                api({
+            
+               await api({
+                        path: "questions/navigation.3",
+                        method: "PUT",
+                        body: {
+                            qid: "navigation.3",
+                            type: "qna",
+                            q: ["One"],
+                            a: "One",
+                            next: "questions/navigation.4"
+                        }
+                    })
+                
+               await api({
                     path: "questions/navigation.4",
                     method: "PUT",
                     body: {
-                        qid: "Two",
+                        qid: "navigation.4",
                         type: "qna",
                         q: ["Two"],
                         a: "Two",
-                        next: "Three"
+                        next: "questions/navigation.5"
                     }
-                }),
-                api({
+                })
+                await api({
                     path: "questions/navigation.5",
                     method: "PUT",
                     body: {
-                        qid: "Three",
+                        qid: "navigation.5",
                         type: "qna",
                         q: ["Three"],
                         a: "Three",
-                        next: "End"
+                        next: "questions/navigation.6"
                     }
-                }),
-                api({
+                })
+                await api({
                     path: "questions/navigation.6",
                     method: "PUT",
                     body: {
-                        qid: "End",
+                        qid: "navigation.6",
                         type: "qna",
                         q: ["End"],
                         a: "End",
@@ -345,26 +346,26 @@ module.exports = {
                     path: "questions/navigation.1",
                     method: "DELETE"
                 })
-                api({
+            await api({
                     path: "questions/navigation.2",
                     method: "DELETE"
                 })
-            api({
-                path: "questions/navigation.3",
-                method: "DELETE"
-            })
-            api({
-                path: "questions/navigation.4",
-                method: "DELETE"
-            })
-            api({
-                path: "questions/navigation.5",
-                method: "DELETE"
-            })
-            api({
-                path: "questions/navigation.6",
-                method: "DELETE"
-            })
+            await api({
+                    path: "questions/navigation.3",
+                    method: "DELETE"
+                })
+            await api({
+                    path: "questions/navigation.4",
+                    method: "DELETE"
+                })
+            await api({
+                    path: "questions/navigation.5",
+                    method: "DELETE"
+                })
+            await api({
+                    path: "questions/navigation.6",
+                    method: "DELETE"
+                })
             test.done()
         }
     }

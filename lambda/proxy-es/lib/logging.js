@@ -8,17 +8,22 @@ var myCredentials = new aws.EnvironmentCredentials('AWS');
 var request=require('./request')
 
 module.exports=function(req,res){
-    console.log(req,res)
+    console.log("RESULT",JSON.stringify(req),JSON.stringify(res))
             
     //data to send to general metrics logging
     var date = new Date()
     var now = date.toISOString()
+    // need to unwrap the request and response objects we actually want from the req object
+    var unwrappedReq =req.req
+    var unwrappedRes =req.res
     var jsonData = {
-        qid:_.get(res.result,"qid"),
-        utterance:req.question,
-        answer:_.get(res.message,"a"),
-        topic:_.get(res.result,"t",""),
-        clientType:req._type,
+        entireRequest:unwrappedReq,
+        entireResponse:unwrappedRes,
+        qid:_.get(unwrappedRes.result,"qid"),
+        utterance:unwrappedReq.question,
+        answer:_.get(unwrappedRes,"message"),
+        topic:_.get(unwrappedRes.result,"t",""),
+        clientType:unwrappedReq._type,
         datetime:now
     }
     // encode to base64 string to put into firehose
