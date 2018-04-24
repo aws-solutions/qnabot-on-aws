@@ -344,7 +344,7 @@ module.exports = {
             await api({
                     path: "questions/navigation.1",
                     method: "DELETE"
-                }),
+                })
                 api({
                     path: "questions/navigation.2",
                     method: "DELETE"
@@ -367,164 +367,164 @@ module.exports = {
             })
             test.done()
         }
-    },
-    // TriviaRefactored tests
-    ask: async function(test) {
-        try {
-            var args = await outputs('dev/master')
-            await
-            api({
-                    path: "questions/quizbot.1",
-                    method: "PUT",
-                    body: {
-                        "qid": "EnterSampleQuiz",
-                        "a": "Starting the sample quiz.  Good luck!",
-                        "r": {},
-                        "l": args.TriviaRefactoredLambda,
-                        "args": [
-                            "sampleQuiz.1"
-                        ],
-                        "type": "qna",
-                        "q": [
-                            "I want to take the sample quiz.",
-                            "Take the sample quiz.",
-                            "Take the White House quiz."
-                        ]
-                    }
-                }),
-                api({
-                    path: "questions/quizbot.2",
-                    method: "PUT",
-                    body: {
-                        "qid": "sampleQuiz.1",
-                        "question": "What has been exhibited in the China Room since 1917?",
-                        "correctAnswers": [
-                            "Ceramics, glass, and silver."
-                        ],
-                        "incorrectAnswers": [
-                            "Artifacts from the War of 1812.",
-                            "Furniture used during the Lincoln administration.",
-                            "Engraved frames."
-                        ],
-                        "next": [
-                            "sampleQuiz.2"
-                        ],
-                        "r": {
-                            "title": "China Room",
-                            "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/b/b2/WHchinaRoom.jpg",
-                            "text": "",
-                            "url": ""
-                        },
-                        "quiz": "sampleQuiz",
-                        "type": "quiz",
-                        "q": [],
-                        "t": ""
-                    }
-                }),
-                api({
-                    path: "questions/quizbot.3",
-                    method: "PUT",
-                    body: {
-                        "qid": "sampleQuiz.2",
-                        "question": "Who designated a specific room to be the White House library?",
-                        "incorrectAnswers": [
-                            "Millard Fillmore.",
-                            "James Madison.",
-                            "James K. Polk"
-                        ],
-                        "correctAnswers": [
-                            "Franklin D. Roosevelt"
-                        ],
-                        "next": [
-                            "sampleQuiz.3"
-                        ],
-                        "quiz": "sampleQuiz",
-                        "type": "quiz"
-                    }
-                }),
-                api({
-                    path: "questions/quizbot.4",
-                    method: "PUT",
-                    body: {
-                        "qid": "sampleQuiz.3",
-                        "question": "Who bequeathed the Vermeil Room's silver to the White House?",
-                        "correctAnswers": [
-                            "Margaret Thompson Biddle."
-                        ],
-                        "incorrectAnswers": [
-                            "Queen Elizabeth II.",
-                            "Benjamin Franklin.",
-                            "James K. Polk."
-                        ],
-                        "next": [],
-                        "r": {
-                            "title": "",
-                            "imageUrl": "",
-                            "text": "",
-                            "url": ""
-                        },
-                        "quiz": "sampleQuiz",
-                        "type": "quiz",
-                        "q": [],
-                        "t": ""
-                    }
-                });
-            var response = await this.lex.postText({
-                inputText: "Take the White House quiz."
-            }).promise();
-            console.log(response);
-            // we need to implement some extra logic here to handle the random ordering of possible answers
-            // note that i'm hard-coding info from the test documents above here, not pulling dynamically
-            // if you change the documents then you will also need to change the tests
-
-            // this regex split is meant to split at the start of each of the answers without discarding the answer letters
-            // e.g. it will match " A." but will only discard the leading space
-            var splitArray = response.message.split(/ (?=[A-Z]\.)/);
-
-            test.equal(splitArray[0], "Starting the sample quiz. Good luck! What has been exhibited in the China Room since 1917?");
-
-            // be sure to remember which of these is/are correct answers.  you need it for the next test.
-            var expectedAnswerArray = [
-                "Ceramics, glass, and silver.",
-                "Artifacts from the War of 1812.",
-                "Furniture used during the Lincoln administration.",
-                "Engraved frames."
-            ];
-            
-            var matchIndex;
-            for (var i = 1; i < splitArray.length; i++) {
-                // substring(3) because the first three characters will be e.g. "B. " and we can't know which letters will go with which answer options
-                matchIndex = expectedAnswerArray.indexOf(splitArray[i].substring(3));
-                if (matchIndex === -1) {
-                    // we didn't find the actual reponse in the expected answer array, so that's a paddlin
-                    test.fail('Did not find following string in expected answers: ' + splitArray[i].substring(3));
-                    break;
-                }
-            }
-
-        }
-        catch (e) {
-            test.ifError(e)
-        }
-        finally {
-            await api({
-                    path: "questions/quizbot.1",
-                    method: "DELETE"
-                }),
-                api({
-                    path: "questions/quizbot.2",
-                    method: "DELETE"
-                }),
-                api({
-                    path: "questions/quizbot.3",
-                    method: "DELETE"
-                }),
-                api({
-                    path: "questions/quizbot.4",
-                    method: "DELETE"
-                }),
-                test.done()
-        }
     }
+    // // TriviaRefactored tests
+    // ask: async function(test) {
+    //     try {
+    //         var args = await outputs('dev/master')
+    //         await
+    //         api({
+    //                 path: "questions/quizbot.1",
+    //                 method: "PUT",
+    //                 body: {
+    //                     "qid": "EnterSampleQuiz",
+    //                     "a": "Starting the sample quiz.  Good luck!",
+    //                     "r": {},
+    //                     "l": args.TriviaRefactoredLambda,
+    //                     "args": [
+    //                         "sampleQuiz.1"
+    //                     ],
+    //                     "type": "qna",
+    //                     "q": [
+    //                         "I want to take the sample quiz.",
+    //                         "Take the sample quiz.",
+    //                         "Take the White House quiz."
+    //                     ]
+    //                 }
+    //             }),
+    //             api({
+    //                 path: "questions/quizbot.2",
+    //                 method: "PUT",
+    //                 body: {
+    //                     "qid": "sampleQuiz.1",
+    //                     "question": "What has been exhibited in the China Room since 1917?",
+    //                     "correctAnswers": [
+    //                         "Ceramics, glass, and silver."
+    //                     ],
+    //                     "incorrectAnswers": [
+    //                         "Artifacts from the War of 1812.",
+    //                         "Furniture used during the Lincoln administration.",
+    //                         "Engraved frames."
+    //                     ],
+    //                     "next": [
+    //                         "sampleQuiz.2"
+    //                     ],
+    //                     "r": {
+    //                         "title": "China Room",
+    //                         "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/b/b2/WHchinaRoom.jpg",
+    //                         "text": "",
+    //                         "url": ""
+    //                     },
+    //                     "quiz": "sampleQuiz",
+    //                     "type": "quiz",
+    //                     "q": [],
+    //                     "t": ""
+    //                 }
+    //             }),
+    //             api({
+    //                 path: "questions/quizbot.3",
+    //                 method: "PUT",
+    //                 body: {
+    //                     "qid": "sampleQuiz.2",
+    //                     "question": "Who designated a specific room to be the White House library?",
+    //                     "incorrectAnswers": [
+    //                         "Millard Fillmore.",
+    //                         "James Madison.",
+    //                         "James K. Polk"
+    //                     ],
+    //                     "correctAnswers": [
+    //                         "Franklin D. Roosevelt"
+    //                     ],
+    //                     "next": [
+    //                         "sampleQuiz.3"
+    //                     ],
+    //                     "quiz": "sampleQuiz",
+    //                     "type": "quiz"
+    //                 }
+    //             }),
+    //             api({
+    //                 path: "questions/quizbot.4",
+    //                 method: "PUT",
+    //                 body: {
+    //                     "qid": "sampleQuiz.3",
+    //                     "question": "Who bequeathed the Vermeil Room's silver to the White House?",
+    //                     "correctAnswers": [
+    //                         "Margaret Thompson Biddle."
+    //                     ],
+    //                     "incorrectAnswers": [
+    //                         "Queen Elizabeth II.",
+    //                         "Benjamin Franklin.",
+    //                         "James K. Polk."
+    //                     ],
+    //                     "next": [],
+    //                     "r": {
+    //                         "title": "",
+    //                         "imageUrl": "",
+    //                         "text": "",
+    //                         "url": ""
+    //                     },
+    //                     "quiz": "sampleQuiz",
+    //                     "type": "quiz",
+    //                     "q": [],
+    //                     "t": ""
+    //                 }
+    //             });
+    //         var response = await this.lex.postText({
+    //             inputText: "Take the White House quiz."
+    //         }).promise();
+    //         console.log(response);
+    //         // we need to implement some extra logic here to handle the random ordering of possible answers
+    //         // note that i'm hard-coding info from the test documents above here, not pulling dynamically
+    //         // if you change the documents then you will also need to change the tests
+
+    //         // this regex split is meant to split at the start of each of the answers without discarding the answer letters
+    //         // e.g. it will match " A." but will only discard the leading space
+    //         var splitArray = response.message.split(/ (?=[A-Z]\.)/);
+
+    //         test.equal(splitArray[0], "Starting the sample quiz. Good luck! What has been exhibited in the China Room since 1917?");
+
+    //         // be sure to remember which of these is/are correct answers.  you need it for the next test.
+    //         var expectedAnswerArray = [
+    //             "Ceramics, glass, and silver.",
+    //             "Artifacts from the War of 1812.",
+    //             "Furniture used during the Lincoln administration.",
+    //             "Engraved frames."
+    //         ];
+            
+    //         var matchIndex;
+    //         for (var i = 1; i < splitArray.length; i++) {
+    //             // substring(3) because the first three characters will be e.g. "B. " and we can't know which letters will go with which answer options
+    //             matchIndex = expectedAnswerArray.indexOf(splitArray[i].substring(3));
+    //             if (matchIndex === -1) {
+    //                 // we didn't find the actual reponse in the expected answer array, so that's a paddlin
+    //                 test.fail('Did not find following string in expected answers: ' + splitArray[i].substring(3));
+    //                 break;
+    //             }
+    //         }
+
+    //     }
+    //     catch (e) {
+    //         test.ifError(e)
+    //     }
+    //     finally {
+    //         await api({
+    //                 path: "questions/quizbot.1",
+    //                 method: "DELETE"
+    //             }),
+    //             api({
+    //                 path: "questions/quizbot.2",
+    //                 method: "DELETE"
+    //             }),
+    //             api({
+    //                 path: "questions/quizbot.3",
+    //                 method: "DELETE"
+    //             }),
+    //             api({
+    //                 path: "questions/quizbot.4",
+    //                 method: "DELETE"
+    //             }),
+    //             test.done()
+    //     }
+    // }
 
 }
