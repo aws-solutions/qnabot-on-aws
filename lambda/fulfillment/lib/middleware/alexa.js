@@ -80,7 +80,8 @@ exports.assemble=function(request,response){
             card:response.card.imageUrl ? {
                 type:"Standard",
                 title:response.card.title || request.question,
-                text:response.message,
+                // if we have a subtitle we should add it to the response card test
+                text:_.has(response.card,'subTitle')? response.card.subTitle +"\n" + response.message:response.message,
                 image:{
                     smallImageUrl:response.card.imageUrl,
                     largeImageUrl:response.card.imageUrl
