@@ -20,7 +20,8 @@ module.exports=new Vuex.Store({
         bot:{
             status:"",
             message:"",
-            utterances:[] 
+            utterances:[],
+            alexa:{}
         },
         alexa:{},
         error:""
