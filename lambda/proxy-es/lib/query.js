@@ -6,9 +6,10 @@ var url=require('url')
 var _=require('lodash')
 var myCredentials = new aws.EnvironmentCredentials('AWS'); 
 var request=require('./request')
+var markdown=require('markdown').markdown
 
 module.exports=function(req,res){
-    console.log(req,res)
+    console.log(JSON.stringify({req,res},null,2))
     var query=bodybuilder()
     .orQuery('nested',{
         path:'questions',
@@ -31,10 +32,19 @@ module.exports=function(req,res){
     .then(function(result){
         console.log("ES result:"+JSON.stringify(result,null,2))
         res.result=_.get(result,"hits.hits[0]._source")
-        if(res.result){ 
+        if(res.result){
             res.type="PlainText"
-            console.log(res.message)
             res.message=res.result.a
+            _.set(res,"session.appContext.altMessages",
+                _.get(res,"result.alt",{})
+            )
+            if(req.outputDialogMode!=="Text"){
+                if(res.result.ssml){
+                    res.type="SSML"
+                    res.message=res.result.ssml
+                }
+            }
+            console.log(res.message)
             var card=_.get(res,"result.r.title") ? res.result.r : null
             
             if(card){

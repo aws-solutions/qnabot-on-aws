@@ -26,6 +26,24 @@ module.exports={
                     description:"Enter the answer you want to be returned when the user asks one of the above questions.",
                     maxLength:8000,
                 },
+                alt:{
+                    type:"object",
+                    description:"Alternate Answers",
+                    properties:{
+                        ssml:{
+                            type:"string",
+                            title:"SSML Answer",
+                            description:"Alternate SSML answer",
+                            maxLength:8000,
+                        },
+                        markdown:{
+                            type:"string",
+                            title:"Markdown Answer",
+                            description:"Alternate Markdown answer",
+                            maxLength:8000,
+                        },
+                    }
+                },
                 t:{
                     type:"string",
                     description:"Assign a topic to this item, to support follow up questions on the same topic.",

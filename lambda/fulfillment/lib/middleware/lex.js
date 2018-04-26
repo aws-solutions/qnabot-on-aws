@@ -9,10 +9,7 @@ exports.parse=function(event){
 }
 exports.assemble=function(request,response){
     var out={
-        sessionAttributes:_.mapValues(
-            _.get(response,'session',{}),
-            x=>_.isString(x) ? x : JSON.stringify(x)
-        ),
+        
         dialogAction:_.pickBy({
             type:"Close",
             fulfillmentState:"Fulfilled",
@@ -31,14 +28,18 @@ exports.assemble=function(request,response){
             } : null
         })
     }
-    console.log(response.card)
+    
     if(isCard(response.card)){
-        out.sessionAttributes.appContext=JSON.stringify({
-            responseCard:out.dialogAction.responseCard
-        })
-    }else{
-        delete out.sessionAttributes.appContext
+        _.set(response,
+            "session.appContext.responseCard",
+        out.dialogAction.responseCard)
     }
+
+    out.sessionAttributes=_.mapValues(
+        _.get(response,'session',{}),
+        x=>_.isString(x) ? x : JSON.stringify(x)
+    ) 
+    
     console.log("Lex response:",JSON.stringify(out,null,2))
     return out
 }

@@ -11,7 +11,6 @@ module.exports={
   "Properties": {
     "Name": {"Ref": "AWS::StackName"},
     "Description":"An Api interface for the admin actions on the QNA bot",
-    "BinaryMediaTypes":["image/png"]
   },
   "DependsOn":permissions 
 },

@@ -34,7 +34,8 @@ var config = {
     toolbarColor:"cyan",
     toolbarTitle:"QnABot",
     toolbarLogo:null,
-    pushInitialTextOnRestart:false
+    pushInitialTextOnRestart:false,
+    AllowSuperDangerousHTMLInMessage:true
   },
   recorder:{}
 }

@@ -3,6 +3,7 @@ var lex=require('./lex')
 var alexa=require('./alexa')
 var _=require('lodash')
 
+
 module.exports=function(req,res){
     req._type=req._event.version ? "ALEXA" : "LEX"
     console.log(req,res)
@@ -19,7 +20,7 @@ module.exports=function(req,res){
     Object.assign(res,{
         type:"PlainText",
         message:"",
-        session:_.cloneDeep(req.session),
+        session:_.omit(_.cloneDeep(req.session),["appContext"]),
         card:{
             send:false,
             title:"",

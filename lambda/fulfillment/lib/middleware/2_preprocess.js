@@ -9,7 +9,7 @@ module.exports=function(req,res){
     _.set(req,"_info.es.type",process.env.ES_TYPE)
     _.set(req,"_info.es.service.qid",process.env.ES_SERVICE_QID)
     _.set(req,"_info.es.service.proxy",process.env.ES_SERVICE_PROXY)
-
+    
     if(process.env.LAMBDA_PREPROCESS){
         return lambda.invoke({
             FunctionName:process.env.LAMBDA_PREPROCESS,
