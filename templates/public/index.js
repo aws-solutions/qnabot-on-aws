@@ -23,7 +23,9 @@ module.exports=Promise.resolve(require('../master')).then(function(base){
         "ContentDesignerURL",
         "ClientURL",
         "DashboardURL",
-        "UserPoolURL"
+        "UserPoolURL",
+        "BotName",
+        "Intent"
     ])
 
     base.Parameters=_.pick(base.Parameters,[
