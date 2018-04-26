@@ -38,7 +38,7 @@
               v-expansion-panel-content( style="display:block")
                 div( slot="header") Advanced
                 schema-input( 
-                  v-model="data"
+                  v-model="tmp"
                   :valid.sync="valid"
                   :schema="schema" 
                   :omit="schema.required"
