@@ -3,33 +3,39 @@ module.exports=[{
     text:`
 - create an Amazon developer account at [Amazon Developer Console](https://developer.amazon.com/home.html)
     `,
-    image:"../images/alexa-01.png"
+    image:"../images/alexa_sign-in.png"
 },{
     title:"Create Skill part 1",
     test:" ",
-    image:"../images/alexa-02.png"
+    image:"../images/alexa_create-skill.png"
 },{
     title:"Create Skill part 2",
     test:" ",
-    image:"../images/alexa-03.png"
+    image:"../images/alexa_select.png"
 },
 {
-    title:"Configure Skill",
+    title:"Configure Skill Lambda",
     test:" ",
-    image:"../images/alexa-04.png",
+    image:"../images/alexa_lambda-config.png",
     buttons:[{
-        text:"Copy Schema to clipBoard",
-        id:"Schema",
-        loading:false
-    },{
         text:"Copy Lambda Arn to clipboard",
         id:"LambdaArn",
         loading:false
     }]
 },
 {
+    title:"Configure Skill Schema",
+    test:" ",
+    image:"../images/alexa_schema-config.png",
+    buttons:[{
+        text:"Copy Schema to clipBoard",
+        id:"Schema",
+        loading:false
+    }]
+},
+{
     title:"Test",
-    image:"../images/alexa-05.png",
+    image:"../images/alexa_enable.png",
     text:`
 Congratulations! After you enable testing your skill is ready to be used. You will have to publish your skill in order for people to use it outside of your account. 
 

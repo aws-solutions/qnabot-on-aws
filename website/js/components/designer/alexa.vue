@@ -5,11 +5,17 @@
       v-card-title(primary-title)
         .headline Re-configure Alexa
       v-card-text
-        p You only need to update the utterances of your alexa skill.
+        p You only need to update the schema of your alexa skill.
       v-card-actions
-        v-btn#Utterances( :loading="loading" @click="copy()"
+        v-btn( :loading="loading"
           v-clipboard:copy="text"
-        ) Copy Utterances       
+          @click="copy"
+        ) Copy Schema
+        input(style="display:none"
+          type="text"
+          :value="text"
+          id="alexa-schema"
+        )
       v-card-actions
         v-spacer
         v-btn(@click='close') Close
@@ -42,14 +48,11 @@ module.exports={
     }
   },
   components:{
-    "schema-input":require('./input.vue')
   },
   computed:{
-    schema:function(){
-      return this.$store.state.data.schema
-    },
     text:function(){
-      return this.$store.state.bot.utterances.join('\n')
+      console.log(this.$store.state.bot)
+      return JSON.stringify(this.$store.state.bot.alexa,null,2)
     }
   },
   created:function(){
@@ -62,7 +65,7 @@ module.exports={
     open:function(){
       this.dialog=true
     },
-    copy:function(btn){
+    copy:function(){
       this.loading=true
       setTimeout(()=>this.loading=false,1000)
     }

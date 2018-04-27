@@ -22,30 +22,40 @@
                   :step="index+1")
                   v-card
                     v-container
-                      v-layout(column)
-                        v-flex(xs12)
-                          v-card-text
-                            .headline.text-xs-center {{step.title}}
-                            span(v-html="step.text")
-                          v-card-actions
-                            v-btn(v-for="(y,x) in step.buttons"
-                              :id="y.id"
-                              :key="x"
-                              :loading="y.loading"
-                              @click="copy(y)") {{y.text}}
+                      v-layout(row)
+                        v-flex(xs1)
+                          v-btn(
+                            @click="stepNumber--" v-if="index>0" 
+                            style="height:100%"
+                            left) 
+                            v-icon keyboard_arrow_left
+                        v-flex(xs10)
+                          v-container
+                            v-layout(column)
+                              v-flex(xs12)
+                                v-card-text
+                                  .headline.text-xs-center {{step.title}}
+                                  span(v-html="step.text")
+                                v-card-actions
+                                  v-btn(v-for="(y,x) in step.buttons"
+                                    :id="y.id"
+                                    :key="x"
+                                    :loading="y.loading"
+                                    @click="copy(y)") {{y.text}}
 
-                        v-flex(xs12)
-                          img(
-                            :src="step.image"
-                            style="max-width:75%;display:block;margin:auto;"
-                            contain
-                            v-if="step.image"
-                          )
-                        v-flex(xs12)
-                          v-card-actions
-                            v-spacer
-                            v-btn(@click="stepNumber--" v-if="index>0" ) back
-                            v-btn(@click="stepNumber++" v-if="index+1<steps.length") next
+                              v-flex(xs12)
+                                img(
+                                  :src="step.image"
+                                  style="max-width:75%;display:block;margin:auto;"
+                                  contain
+                                  v-if="step.image"
+                                )
+                        v-flex(xs1)
+                          v-btn(
+                            @click="stepNumber++" v-if="index+1<steps.length"
+                            style="height:100%"
+                            right) 
+                            v-icon keyboard_arrow_right
 </template>
 
 <script>
@@ -85,7 +95,7 @@ module.exports={
       stepNumber:1,
       schema:new clipboard('#Schema',{
         text:function(){
-          return JSON.stringify(self.$store.state.bot.alexa)
+          return JSON.stringify(self.$store.state.bot.alexa,null,2)
         }
       }),
       arn:new clipboard('#LambdaArn',{
