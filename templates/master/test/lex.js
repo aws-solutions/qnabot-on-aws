@@ -214,7 +214,7 @@ module.exports = {
                     body: {
                         qid: "navigation.1",
                         type: "qna",
-                        q: ["Next"],
+                        q: ["next"],
                         a: "no next room",
                         l: args.NextLambda
                     }
@@ -225,7 +225,7 @@ module.exports = {
                     body: {
                         qid: "navigation.2",
                         type: "qna",
-                        q: ["Previous"],
+                        q: ["previous"],
                         a: "no previous room",
                         l: args.PreviousLambda
                     }
