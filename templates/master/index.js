@@ -112,7 +112,7 @@ module.exports={
       "Value":{"Fn::GetAtt":["ExamplePYTHONLambdaPrevious", "Arn"]}
     },
     "TriviaRefactoredLambda":{
-      "Value":{"Fn::GetAtt":["ExamplePYTHONLambdaTriviaRefactored", "Arn"]}
+      "Value":{"Fn::GetAtt":["ExamplePYTHONLambdaQuiz", "Arn"]}
     }
   },
   "Parameters": {

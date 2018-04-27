@@ -71,6 +71,14 @@ def updateResult(event, response):
     event["res"]["result"] = response
     event["res"]["type"] = "PlainText"
     event["res"]["message"] = response["a"]
+    if "alt" in response:
+        event["res"]["session"]["appContext"]["altMessages"] = response["alt"]
+    else:
+        event["res"]["session"]["appContext"]["altMessages"] = {}
+    if event["req"]["outputDialogMode"]!="Text":
+        if "ssml" in response:
+            event["res"]["type"]="SSML"
+            event["res"]["message"]=response["ssml"]
     if "r" in response:
         card = response["r"]
         if 'title' in card:
