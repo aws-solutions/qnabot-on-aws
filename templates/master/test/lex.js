@@ -51,6 +51,7 @@ module.exports = {
         }
         catch (e) {
             test.ifError(e)
+            console.log(e)
         }
         finally {
             await api({
@@ -203,7 +204,7 @@ module.exports = {
             .finally(() => test.done())
     },
     // Guided Navigation tests
-    ask: async function(test) {
+    navigation1: async function(test) {
         try {
             var args = await outputs('dev/master')
             
@@ -244,14 +245,42 @@ module.exports = {
             test.ifError(e)
         }
         finally {
-
+            await api({
+                    path: "questions/navigation.1",
+                    method: "DELETE"
+                })
+            await api({
+                    path: "questions/navigation.2",
+                    method: "DELETE"
+                })
             test.done()
         }
     },
-    ask: async function(test) {
+    navigation2: async function(test) {
         try {
 
-            
+                await api({
+                        path: "questions/navigation.7",
+                        method: "PUT",
+                        body: {
+                            qid: "navigation.7",
+                            type: "qna",
+                            q: ["Next"],
+                            a: "no next room",
+                            l: args.NextLambda
+                        }
+                    })
+                await  api({
+                        path: "questions/navigation.8",
+                        method: "PUT",
+                        body: {
+                            qid: "navigation.8",
+                            type: "qna",
+                            q: ["Previous"],
+                            a: "no previous room",
+                            l: args.PreviousLambda
+                        }
+                    })
                await api({
                         path: "questions/navigation.3",
                         method: "PUT",
@@ -343,11 +372,11 @@ module.exports = {
         }
         finally {
             await api({
-                    path: "questions/navigation.1",
+                    path: "questions/navigation.7",
                     method: "DELETE"
                 })
             await api({
-                    path: "questions/navigation.2",
+                    path: "questions/navigation.8",
                     method: "DELETE"
                 })
             await api({
