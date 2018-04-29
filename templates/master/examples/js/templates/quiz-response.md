@@ -1,4 +1,4 @@
-{{#if correct}} __Correct__ answer! {{/if}}{{#if incorrect}} Sorry, that was __incorrect__. The Correct answers are{{#each correctAnswers}} __{{this}}__.{{/each}}{{/if}}  
+{{#if first}}{{{message}}}{{/if}}{{#if correct}} __Correct__ answer! {{/if}}{{#if incorrect}} Sorry, that was __incorrect__. The Correct answers are{{#each correctAnswers}} __{{this}}__.{{/each}}{{/if}}  
 {{#if question}} The {{#if first}}first{{else}}next{{/if}} question is: {{{question}}}  
 {{#each answers}}
 - {{{this.[2]}}}) {{{this.[0]}}}  

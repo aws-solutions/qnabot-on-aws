@@ -2,6 +2,7 @@ var _=require('lodash')
 var aws=require('aws-sdk')
 aws.config.region=process.env.AWS_REGION
 var lambda=new aws.Lambda()
+var kms=new aws.KMS()
 var handlebars = require('handlebars')
 var fs=require('fs')
 
@@ -15,17 +16,26 @@ var text=handlebars.compile(
 exports.handler=async function(event,context,callback){
     console.log(JSON.stringify(event,null,2))
     try{
-        if(!event.res.session.quizBot){
-            event.res.session.quizBot={
+        if(event.res.session.quizBot){
+            var decrypt=await kms.decrypt({
+                CiphertextBlob:Buffer.from(event.res.session.quizBot,'base64'),
+                EncryptionContext:{
+                    userId:event.req._event.userId
+                }
+            }).promise()
+            console.log(decrypt)
+            var quizBot=JSON.parse(decrypt.Plaintext.toString('utf8'))
+        }else{
+            var quizBot={
                 questionCount:0,
                 correctAnswerCount:0,
                 next:event.res.result.args[0],
                 originalDocumentQid:_.get(event,"res.session.previous.qid","")
             }
         }
-        var quizBot=event.res.session.quizBot
         var templateParams={
-            first:quizBot.questionCount===0
+            first:quizBot.questionCount===0,
+            message:_.get(event,"res.result.a")
         } 
         if(quizBot.questionCount>0){
             templateParams.correctAnswers=quizBot.correctAnswers
@@ -75,7 +85,17 @@ exports.handler=async function(event,context,callback){
             event.res.session.queryLambda=process.env.AWS_LAMBDA_FUNCTION_NAME
             quizBot.questionCount++
             quizBot.next=_.get(nextDocument,"next[0]",false)
-            
+          
+            var encrypt=await kms.encrypt({
+                KeyId:process.env.QUIZ_KMS_KEY,
+                Plaintext:JSON.stringify(quizBot),
+                EncryptionContext:{ 
+                    userId:event.req._event.userId
+                }
+            }).promise()
+            console.log(encrypt)
+
+            event.res.session.quizBot=encrypt.CiphertextBlob.toString('base64')
             if(_.get(nextDocument,"r.imageUrl")){
                 event.res.card=nextDocument.r
                 event.res.card.send=true
