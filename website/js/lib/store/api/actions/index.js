@@ -167,7 +167,7 @@ module.exports=Object.assign(
     },
     remove(context,qid){
         return context.dispatch('_request',{
-            url:context.rootState.info._links.questions.href+'/'+qid,
+            url:`${context.rootState.info._links.questions.href}/${encodeURIComponent(qid)}`,
             method:'delete',
             reason:'failed to delete'
         })

@@ -39,9 +39,9 @@ module.exports=function(req,res){
                 _.get(res,"result.alt",{})
             )
             if(req.outputDialogMode!=="Text"){
-                if(res.result.ssml){
+                if(_.get(res,"result.alt.ssml")){
                     res.type="SSML"
-                    res.message=res.result.ssml
+                    res.message=res.result.alt.ssml
                 }
             }
             console.log(res.message)

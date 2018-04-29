@@ -1,0 +1,24 @@
+{
+    "qna": [
+        {
+            "qid": "example.md.1",
+            "q": [
+                "show me markdown"
+            ],
+            "a": "i am just plain text",
+            "alt":{
+                "markdown":"this is __markdown__"
+            }
+        },
+        {
+            "qid": "example.ssml.1",
+            "q": [
+                "show me ssml"
+            ],
+            "a": "i am just plain text",
+            "alt":{
+                "ssml":"<speak>I am <break time=\"300ms\"/> SSML</speak>"
+            }
+        }
+    ] 
+}
