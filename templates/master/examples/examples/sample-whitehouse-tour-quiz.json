@@ -4,7 +4,7 @@
       "qid": "EnterSampleQuiz",
       "a": "Starting the sample quiz.  Good luck!",
       "r": {},
-      "l": "{{QuizPY}}",
+      "l": "{{QuizJS}}",
       "args": [
         "sampleQuiz.1"
       ],
@@ -46,12 +46,6 @@
       "next": [
         "sampleQuiz.4"
       ],
-      "r": {
-        "title": "",
-        "imageUrl": "",
-        "text": "",
-        "url": ""
-      },
       "quiz": "sampleQuiz",
       "type": "quiz",
       "q": [],
@@ -94,8 +88,6 @@
       "r": {
         "title": "China Room",
         "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/b/b2/WHchinaRoom.jpg",
-        "text": "",
-        "url": ""
       },
       "quiz": "sampleQuiz",
       "type": "quiz",

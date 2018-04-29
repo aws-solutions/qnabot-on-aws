@@ -1,0 +1,15 @@
+{{#if correct}}
+Correct answer!
+{{/if}}
+{{#if incorrect}}
+Sorry, that was incorrect. The Correct answers are{{#each correctAnswers}} {{this}}{{/each}}.
+{{/if}}
+{{#if question}}
+The {{#if first}}first{{else}}next{{/if}} question is: {{{question}}}
+    {{#each answers}}
+    {{{this.[2]}}}) {{{this.[0]}}}
+    {{/each}}
+{{/if}}
+{{#if finished}}
+You got {{totalCorrect}} questions correct out of {{totalQuestions}} with a score of {{score}}. Thank you for taking the quiz!
+{{/if}}
