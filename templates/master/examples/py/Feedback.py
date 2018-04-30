@@ -18,7 +18,7 @@ def handler(event, context):
     validResponseQid.update({'A':'The answer was a good response to your question.'})
     validResponseQid.update({'B':'The answer was a bad response to your question.'})
     validResponseQid.update({'C':'The answer is wrong or does not make sense.'})
-    validResponseQid.update({'D':'There is something else wrong with the answer'})
+    validResponseQid.update({'D':'There is something else wrong with the answer.'})
 
     #the Qid to exit feedback without leaving feedback
     exitResponseQid={'E':'Cancel leaving feedback'}
@@ -37,6 +37,7 @@ def handler(event, context):
         previousQid = stringToJson["qid"]
         previousQuestion = stringToJson["q"]
         previousAnswer = stringToJson["a"]
+        previousAlt = stringToJson["alt"]
     except:
         #replace qid with the String '' if there is no previous questions that have been asked
         previousQid = ''
@@ -50,7 +51,7 @@ def handler(event, context):
         event["res"]["session"].pop("queryLambda",None)
     # if it is a valid response for feedback
     elif currentQid in validResponseQid:
-        logFeedback(previousQid,previousQuestion,previousAnswer,validResponseQid.get(currentQid))
+        logFeedback(previousQid,previousQuestion,previousAnswer,previousAlt,validResponseQid.get(currentQid))
         event["res"]["message"] = "Thank you for leaving the feedback,{0}. Relevant information has been logged and will be looked at.".format(validResponseQid.get(currentQid))
         event["res"]["session"]["previous"] = {'qid': previousQid , 'a': previousAnswer,'q': previousQuestion}
         #set back to normal mode if in feedback mode
@@ -71,8 +72,10 @@ def handler(event, context):
         for key,value in exitResponseQid.items():
             defaultResp.append('{0}. {1}'.format(key,value))
         #Send the the initial response for feedback options
-        tempAnswer = '\n'.join(defaultResp)
-        event["res"]["message"] = '{0}'.format(tempAnswer)
+        tempAnswerNormal = '\n'.join(defaultResp)
+        tempAnswerMarkdown = '<br/>'.join(defaultResp)
+        event["res"]["message"] = '{0}'.format(tempAnswerNormal)
+        event["res"]["session"]["appContext"]["altMessages"] = '{0}'.format(tempAnswerMarkdown)
         #Make sure that the response triggers this lambda function by setting the session attribute
         event["res"]["session"]["queryLambda"] = os.environ['AWS_LAMBDA_FUNCTION_NAME']
         #set the qid and question of the previous as if this question had never been asked
@@ -80,12 +83,13 @@ def handler(event, context):
     return event
 
 #logs feedback for the questions
-def logFeedback(qid,question,answer, feedback):
+def logFeedback(qid,question,answer,markdown, feedback):
     #uncomment below if you would like to see values passed in 
     #print("Qid:{0} \n with feedback {3} \n has received feedback{1}, \n for the question: {2}".format(qid,feedback,question,answer))
     jsonData = {"qid":"{0}".format(qid),
         "utterance":"{0}".format(question),
         "answer":"{0}".format(answer),
+        "markdown":"{0}".format(markdown),
         "feedback":"{0}".format(feedback),
         "datetime":"{0}".format(datetime.datetime.now().isoformat())
     }

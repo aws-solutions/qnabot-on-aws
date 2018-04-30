@@ -71,11 +71,9 @@ def updateResult(event, response):
     event["res"]["result"] = response
     event["res"]["type"] = "PlainText"
     event["res"]["message"] = response["a"]
-    if "alt" in response:
-        event["res"]["session"]["appContext"]["altMessages"] = response["alt"]
-    else:
-        event["res"]["session"]["appContext"]["altMessages"] = {}
-    if event["req"]["outputDialogMode"]!="Text":
+    event["res"]["session"]["appContext"]["altMessages"] = response.get("alt",{})
+
+    if "outputDialogMode" in event["req"] and event["req"]["outputDialogMode"]!="Text":
         if "ssml" in response:
             event["res"]["type"]="SSML"
             event["res"]["message"]=response["ssml"]
@@ -115,7 +113,7 @@ def updateResult(event, response):
     if len(tempList) > 10:
         #setting limit to 10 elements in previous stack since ,since lex has a max header size and we want to save that for other functions, same max size is set in the query lambda
         tempList.pop(0)
-    event["res"]["session"]["previous"] ={"qid":response["qid"],"a":previousToJson["a"],"q":previousToJson["q"]}
+    event["res"]["session"]["previous"] ={"qid":response["qid"],"a":previousToJson["a"],"alt":previousToJson.get("alt",{}),"q":previousToJson["q"]}
     event["res"]["session"]["navigation"]={"next":response.get("next",""),"previous":tempList,"hasParent":False} 
     return event
 
