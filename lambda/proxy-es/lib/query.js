@@ -39,9 +39,9 @@ module.exports=function(req,res){
                 _.get(res,"result.alt",{})
             )
             if(req.outputDialogMode!=="Text"){
-                if(res.result.ssml){
+                if(_.get(res,"result.alt.ssml")){
                     res.type="SSML"
-                    res.message=res.result.ssml
+                    res.message=res.result.alt.ssml
                 }
             }
             console.log(res.message)
@@ -55,32 +55,18 @@ module.exports=function(req,res){
             }
 
             res.session.topic=_.get(res.result,"t")
-            var navigationJson = _.get(res.session,"navigation",false)
-            if(navigationJson){
-                navigationJson= JSON.parse(res.session.navigation)
-            }
-            var previousJson = _.get(res.session,"previous",false)
-            if(previousJson){
-                previousJson= JSON.parse(res.session.previous)
-            }
-            var previousArray = _.get(navigationJson,"previous",[])
-            var hasPreviousQid = _.get(previousJson,"qid",false)
-            console.log("hasParent: " + _.get(navigationJson,"hasParent",true))
-            // Only push the previous Document qid onto the stack if there is one and if it's not the same Document that was just called and its a qna type document
-            if(hasPreviousQid && hasPreviousQid != _.get(res.result,"qid") && _.get(navigationJson,"hasParent",true) == false && req._info.es.type=='qna'){
-                if(previousArray.length == 0){
-                    previousArray.push(hasPreviousQid)
-                }
-                else if(previousArray[previousArray.length -1] != hasPreviousQid){
-                    previousArray.push(hasPreviousQid)
-                }
-            }
-            if(previousArray.length > 10){
-                previousArray.shift()
-            }
-            var hasParent = true
-            if("next" in res.result){
-                hasParent = false
+            
+            var navigationJson = _.get(res,"session.navigation",false)
+            var previousQid = _.get(res,"session.previous.qid",false)
+            var previousArray  = _.get(res,"session.navigation.previous",[])
+            
+            if(
+                previousQid != _.get(res.result,"qid") && 
+                _.get(navigationJson,"hasParent",true) == false && 
+                req._info.es.type=='qna' &&
+                previousArray[0] != previousQid
+            ){
+                previousArray.unshift(previousQid)
             }
             
             res.session.previous={    
@@ -90,9 +76,12 @@ module.exports=function(req,res){
                 q:req.question
             }
             res.session.navigation={
-                next:_.get(res.result,"next",_.get(navigationJson,"next","")),
-                previous:previousArray,
-                hasParent:hasParent
+                next:_.get(res.result,
+                    "next",
+                    _.get(res,"session.navigation.next","")
+                ),
+                previous:previousArray.slice(0,11),
+                hasParent:res.result.next ? true : false
             }
         }else{
             res.type="PlainText"

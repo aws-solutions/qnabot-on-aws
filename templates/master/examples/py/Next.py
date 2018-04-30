@@ -101,19 +101,19 @@ def updateResult(event, response):
     else:
         previousToJson = json.loads(event["req"]["_event"]["session"]["attributes"]["previous"])
         navigationToJson = json.loads(event["req"]["_event"]["session"]["attributes"]["navigation"])
-    tempList= navigationToJson["previous"]
-    #only append to navigation list if top level document or not returning the same document from before(if a document points to itself as the next document)
-    if not navigationToJson["hasParent"]:
-        if(len(tempList) == 0):
-            tempList.append(previousToJson["qid"])
-        elif(tempList[-1] != previousToJson["qid"]):
-            print(tempList[-1])
-            print(previousToJson["qid"])
-            tempList.append(previousToJson["qid"])
-    if len(tempList) > 10:
-        #setting limit to 10 elements in previous stack since ,since lex has a max header size and we want to save that for other functions, same max size is set in the query lambda
-        tempList.pop(0)
+    # tempList= navigationToJson["previous"]
+    # #only append to navigation list if top level document or not returning the same document from before(if a document points to itself as the next document)
+    # if not navigationToJson["hasParent"]:
+    #     if(len(tempList) == 0):
+    #         tempList.append(previousToJson["qid"])
+    #     elif(tempList[-1] != previousToJson["qid"]):
+    #         print(tempList[-1])
+    #         print(previousToJson["qid"])
+    #         tempList.append(previousToJson["qid"])
+    # if len(tempList) > 10:
+    #     #setting limit to 10 elements in previous stack since ,since lex has a max header size and we want to save that for other functions, same max size is set in the query lambda
+    #     tempList.pop(0)
     event["res"]["session"]["previous"] ={"qid":response["qid"],"a":previousToJson["a"],"alt":previousToJson.get("alt",{}),"q":previousToJson["q"]}
-    event["res"]["session"]["navigation"]={"next":response.get("next",""),"previous":tempList,"hasParent":False} 
+    event["res"]["session"]["navigation"]={"next":response.get("next",""),"previous":navigationToJson["previous"],"hasParent":False} 
     return event
 

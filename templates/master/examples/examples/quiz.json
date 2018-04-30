@@ -4,7 +4,7 @@
       "qid": "StartQuiz",
       "a": "Starting the quiz.  Good luck!",
       "r": {},
-      "l": "{{QuizPY}}",
+      "l": "{{QuizJS}}",
       "args": [
         "Quiz.1"
       ],

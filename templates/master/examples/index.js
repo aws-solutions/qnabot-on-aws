@@ -29,6 +29,35 @@ module.exports=Object.assign(
     _.fromPairs(js.map(x=>[x.name,x.resource])),
     _.fromPairs(py.map(x=>[x.name,x.resource])),
     {
+    "QuizKey":{
+        "Type" : "AWS::KMS::Key",
+        "Properties":{
+			KeyPolicy:{
+				"Version": "2012-10-17",
+				"Id": "key-default-1",
+				"Statement": [
+					{
+					"Sid": "Allow administration of the key",
+					"Effect": "Allow",
+					"Principal": { "AWS": {"Ref":"AWS::AccountId"} },
+					"Action": [
+						"kms:*"
+					],
+					"Resource": "*"
+					},
+					{
+						"Sid": "Enable IAM User Permissions",
+						"Effect": "Allow",
+						"Principal": {"AWS": 
+                            {"Fn::Sub":"arn:aws:iam::${AWS::AccountId}:root"}
+						},
+						"Action": "kms:*",
+						"Resource": "*"
+					}
+				]
+			}                
+        }
+    },
     "LambdaHookExamples":{
         "Condition":"BuildExamples",
         "Type": "Custom::QnABotExamples",
@@ -98,6 +127,14 @@ module.exports=Object.assign(
           "Version": "2012-10-17",
             "Statement": [
                 {
+                    "Effect": "Allow",
+                    "Action": [
+						"kms:Encrypt",
+						"kms:Decrypt",
+					], 
+					"Resource":{"Fn::GetAtt":["QuizKey","Arn"]}
+                },
+                {
                   "Effect": "Allow",
                   "Action": [
                     "lambda:InvokeFunction"
@@ -145,13 +182,14 @@ function jslambda(name){
             "ES_INDEX": {"Fn::GetAtt":["Var","index"]},
             "FIREHOSE_NAME":{"Ref":"FeedbackFirehose"},
             "ES_ADDRESS": {"Fn::GetAtt":["ESVar","ESAddress"]},
+            "QUIZ_KMS_KEY":{"Ref":"QuizKey"}
           }
         },
         "FunctionName":{"Fn::Sub":`qna-\${AWS::StackName}-${name}-JS`},
         "Handler":`js/${name}.handler`,
         "MemorySize": "128",
         "Role": {"Fn::GetAtt": ["ExampleLambdaRole","Arn"]},
-        "Runtime": "nodejs6.10",
+        "Runtime": "nodejs8.10",
         "Timeout": 300,
         "Tags":[{
             Key:"Type",

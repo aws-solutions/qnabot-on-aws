@@ -80,7 +80,6 @@ exports.assemble=function(request,response){
             card:response.card.imageUrl ? {
                 type:"Standard",
                 title:response.card.title || request.question,
-                // if we have a subtitle we should add it to the response card text 
                 text:_.has(response.card,'subTitle')? response.card.subTitle +"\n\n" + response.message:response.message,
                 image:{
                     smallImageUrl:response.card.imageUrl,
@@ -93,10 +92,7 @@ exports.assemble=function(request,response){
             },
             shouldEndSession:false
         },
-        sessionAttributes:_.mapValues(
-            _.get(response,'session',{}),
-            x=>_.isString(x) ? x : JSON.stringify(x)
-        )
+        sessionAttributes:_.get(response,'session',{})
     }
 }
 

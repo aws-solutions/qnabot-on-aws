@@ -16,11 +16,18 @@ module.exports=function(req,res){
             Object.assign(req,alexa.parse(req._event))
             break;
     }
-
+    
     Object.assign(res,{
         type:"PlainText",
         message:"",
-        session:_.omit(_.cloneDeep(req.session),["appContext"]),
+        session:_.mapValues(_.omit(_.cloneDeep(req.session),["appContext"]),
+            x=>{
+                try {
+                    return JSON.parse(x)
+                } catch(e){
+                    return x
+                }
+            }),
         card:{
             send:false,
             title:"",

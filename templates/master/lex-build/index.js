@@ -17,7 +17,7 @@ module.exports={
         INTENT:{"Ref":"Intent"},
         ADDRESS:{"Fn::GetAtt":["ESVar","ESAddress"]},
         INDEX:{"Fn::GetAtt":["Var","index"]},
-    }),
+    },"nodejs8.10"),
     "LexBuildLambdaStart":lambda({
         "ZipFile":fs.readFileSync(__dirname+'/start.js','utf8')
     },{
@@ -133,7 +133,7 @@ module.exports={
     }
 }
 
-function lambda(code,variable={}){
+function lambda(code,variable={},runtime="nodejs6.10"){
     return {
       "Type": "AWS::Lambda::Function",
       "Properties": {
@@ -144,7 +144,7 @@ function lambda(code,variable={}){
         "Handler": "index.handler",
         "MemorySize": "128",
         "Role": {"Fn::GetAtt": ["LexBuildLambdaRole","Arn"]},
-        "Runtime": "nodejs6.10",
+        "Runtime":runtime,
         "Timeout": 300,
         "Tags":[{
             Key:"Type",

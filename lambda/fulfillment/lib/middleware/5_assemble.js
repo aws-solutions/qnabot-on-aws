@@ -33,6 +33,10 @@ module.exports=function response(req,res){
         }
     })
     .then(()=>{
+        res.session=_.mapValues(
+            _.get(res,'session',{}),
+            x=>_.isString(x) ? x : JSON.stringify(x)
+        )
         switch(req._type){
             case 'LEX':
                 res.out=lex.assemble(req,res)
