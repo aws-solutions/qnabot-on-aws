@@ -28,7 +28,7 @@ def handler(event, context):
     if len(qidList) > 0:
         client = boto3.client('lambda')
         #Invoke the prepackaged function that Queries ElasticSearch using a document qid
-        temp = qidList.shift()
+        temp = qidList.pop()
         resp = client.invoke(
             FunctionName = event["req"]["_info"]["es"]["service"]["qid"],
             Payload = json.dumps({'qid':temp,'type':"qid"}),
@@ -87,7 +87,7 @@ def updateResult(event, response):
         navigationToJson = json.loads(event["req"]["_event"]["session"]["attributes"]["navigation"])
     tempList= navigationToJson["previous"]
     #shift to remove previous function name from list
-    tempList.shift()
+    tempList.pop()
     event["res"]["session"]["previous"] ={"qid":response["qid"],"a":response["a"],"alt":response.get("alt",{}),"q":event["req"]["question"]}
     event["res"]["session"]["navigation"]={"next":response["next"],"previous":tempList,"hasParent":navigationToJson["hasParent"]} 
 

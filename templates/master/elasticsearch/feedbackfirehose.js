@@ -10,11 +10,11 @@ module.exports={
                 },
                 "CloudWatchLoggingOptions" : {
                     "Enabled" : true,
-                    "LogGroupName" : "/aws/kinesisfirehose/qna-feedback-metrics",
+                    "LogGroupName" : "/aws/kinesisfirehose/qna-feedback-feedback-metrics",
                     "LogStreamName" : "ElasticsearchDelivery"
                 },
                 "DomainARN" :{"Fn::GetAtt" : ["ElasticsearchDomain", "DomainArn"] },
-                "IndexName" : "metrics",
+                "IndexName" : "feedback-metrics",
                 "IndexRotationPeriod" : "NoRotation",
                 "RetryOptions" : {
                     "DurationInSeconds" : 300
@@ -30,7 +30,7 @@ module.exports={
                     },
                     "CloudWatchLoggingOptions" : {
                         "Enabled" : true,
-                        "LogGroupName" : "/aws/kinesisfirehose/qna-feedback-metrics",
+                        "LogGroupName" : "/aws/kinesisfirehose/qna-feedback-feedback-metrics",
                         "LogStreamName" : "S3Delivery"
                     },
                     "CompressionFormat" : "UNCOMPRESSED",
@@ -47,7 +47,7 @@ module.exports={
           "Tags" : [
               {
                 "Key" : "Use",
-                "Value" : "Metrics"
+                "Value" : "feedback-metrics"
               }
             ]
         }
@@ -123,12 +123,12 @@ module.exports={
                 "Resource": [
                   {"Fn::Join":["",[{"Fn::GetAtt" : ["ElasticsearchDomain", "DomainArn"]},"/_all/_settings"]]},
                   {"Fn::Join":["",[{"Fn::GetAtt" : ["ElasticsearchDomain", "DomainArn"]},"/_cluster/stats"]]},
-                  {"Fn::Join":["",[{"Fn::GetAtt" : ["ElasticsearchDomain", "DomainArn"]},"/metrics*/_mapping/feedback"]]},
+                  {"Fn::Join":["",[{"Fn::GetAtt" : ["ElasticsearchDomain", "DomainArn"]},"/feedback-metrics*/_mapping/feedback"]]},
                   {"Fn::Join":["",[{"Fn::GetAtt" : ["ElasticsearchDomain", "DomainArn"]},"/_nodes"]]},
                   {"Fn::Join":["",[{"Fn::GetAtt" : ["ElasticsearchDomain", "DomainArn"]},"/_nodes/stats"]]},
                   {"Fn::Join":["",[{"Fn::GetAtt" : ["ElasticsearchDomain", "DomainArn"]},"/_nodes/*/stats"]]},
                   {"Fn::Join":["",[{"Fn::GetAtt" : ["ElasticsearchDomain", "DomainArn"]},"/_stats"]]},
-                  {"Fn::Join":["",[{"Fn::GetAtt" : ["ElasticsearchDomain", "DomainArn"]},"/metrics*/_stats"]]}
+                  {"Fn::Join":["",[{"Fn::GetAtt" : ["ElasticsearchDomain", "DomainArn"]},"/feedback-metrics*/_stats"]]}
                 ]
               },
               {

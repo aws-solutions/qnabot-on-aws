@@ -63,12 +63,23 @@ module.exports=function(req,res){
             if(
                 previousQid != _.get(res.result,"qid") && 
                 _.get(navigationJson,"hasParent",true) == false && 
-                req._info.es.type=='qna' &&
-                previousArray[0] != previousQid
-            ){
-                previousArray.unshift(previousQid)
+                req._info.es.type=='qna')
+            {
+                if(previousArray.length == 0){
+                    previousArray.push(previousQid)
+                }
+                else if(previousArray[previousArray.length -1] != previousQid){
+                    previousArray.push(previousQid)
+                }
+                
             }
-            
+            if(previousArray.length > 10){
+                previousArray.shift()
+            }
+            var hasParent = true
+            if("next" in res.result){
+                hasParent = false
+            }
             res.session.previous={    
                 qid:_.get(res.result,"qid"),
                 a:_.get(res.result,"a"),
@@ -80,8 +91,8 @@ module.exports=function(req,res){
                     "next",
                     _.get(res,"session.navigation.next","")
                 ),
-                previous:previousArray.slice(0,11),
-                hasParent:res.result.next ? true : false
+                previous:previousArray,
+                hasParent:hasParent
             }
         }else{
             res.type="PlainText"

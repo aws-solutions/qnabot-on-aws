@@ -14,7 +14,7 @@ module.exports={
                     "LogStreamName" : "ElasticsearchDelivery"
                 },
                 "DomainARN" :{"Fn::GetAtt" : ["ElasticsearchDomain", "DomainArn"] },
-                "IndexName" : "metrics",
+                "IndexName" : "general-metrics",
                 "IndexRotationPeriod" : "NoRotation",
                 "RetryOptions" : {
                     "DurationInSeconds" : 300
@@ -123,12 +123,12 @@ module.exports={
                 "Resource": [
                   {"Fn::Join":["",[{"Fn::GetAtt" : ["ElasticsearchDomain", "DomainArn"]},"/_all/_settings"]]},
                   {"Fn::Join":["",[{"Fn::GetAtt" : ["ElasticsearchDomain", "DomainArn"]},"/_cluster/stats"]]},
-                  {"Fn::Join":["",[{"Fn::GetAtt" : ["ElasticsearchDomain", "DomainArn"]},"/metrics*/_mapping/general"]]},
+                  {"Fn::Join":["",[{"Fn::GetAtt" : ["ElasticsearchDomain", "DomainArn"]},"/general-metrics*/_mapping/general"]]},
                   {"Fn::Join":["",[{"Fn::GetAtt" : ["ElasticsearchDomain", "DomainArn"]},"/_nodes"]]},
                   {"Fn::Join":["",[{"Fn::GetAtt" : ["ElasticsearchDomain", "DomainArn"]},"/_nodes/stats"]]},
                   {"Fn::Join":["",[{"Fn::GetAtt" : ["ElasticsearchDomain", "DomainArn"]},"/_nodes/*/stats"]]},
                   {"Fn::Join":["",[{"Fn::GetAtt" : ["ElasticsearchDomain", "DomainArn"]},"/_stats"]]},
-                  {"Fn::Join":["",[{"Fn::GetAtt" : ["ElasticsearchDomain", "DomainArn"]},"/metrics*/_stats"]]}
+                  {"Fn::Join":["",[{"Fn::GetAtt" : ["ElasticsearchDomain", "DomainArn"]},"/general-metrics*/_stats"]]}
                 ]
               },
               {

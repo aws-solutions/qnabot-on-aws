@@ -3,6 +3,7 @@ import json
 import boto3
 import os
 import collections
+from collections import defaultdict
 import botocore.response as br
 import datetime
 
@@ -46,40 +47,46 @@ def handler(event, context):
         msg = "There is no question to leave feedback on, please ask a question before attempting to leave feedback"
         event["res"]["message"] = msg
         #set the previous qid to be '' so that this response is returned again if client attempts to leave feedback without askign another question again
-        event["res"]["session"]["previous"] = {'qid': '' , 'a': msg,'q':event["req"]["question"]}
+        event["res"]["session"]["previous"] = {'qid': '' , 'a': msg,'alt':msg,'q':event["req"]["question"]}
         #set back to normal mode if in feedback mode
         event["res"]["session"].pop("queryLambda",None)
     # if it is a valid response for feedback
     elif currentQid in validResponseQid:
         logFeedback(previousQid,previousQuestion,previousAnswer,previousAlt,validResponseQid.get(currentQid))
         event["res"]["message"] = "Thank you for leaving the feedback,{0}. Relevant information has been logged and will be looked at.".format(validResponseQid.get(currentQid))
-        event["res"]["session"]["previous"] = {'qid': previousQid , 'a': previousAnswer,'q': previousQuestion}
+        event["res"]["session"]["previous"] = {'qid': previousQid , 'a': previousAnswer, 'alt': previousAlt,'q': previousQuestion}
         #set back to normal mode if in feedback mode
         event["res"]["session"].pop("queryLambda",None)
     elif currentQid in exitResponseQid:
         event["res"]["message"] = "Canceled Feedback"
-        event["res"]["session"]["previous"] = {'qid': previousQid , 'a': previousAnswer,'q':previousQuestion}
+        event["res"]["session"]["previous"] = {'qid': previousQid , 'a': previousAnswer, 'alt': previousAlt,'q':previousQuestion}
         #set back to normal mode if in feedback mode
         event["res"]["session"].pop("queryLambda",None)
     else:
         defaultResp = [
             'What feedback would you like to leave for the question, "{0}" ?'.format(previousQuestion),
         ]
+        markdownResp = [
+            'What feedback would you like to leave for the question, _"{0}"_ ?\n'.format(previousQuestion),
+        ]
         #Append list of all valid responses
         for key,value in validResponseQid.items():
             defaultResp.append('{0}. {1}'.format(key,value))
+            markdownResp.append('__{0}.__ {1}  '.format(key,value))
+            
         #Append list of all exit responses
         for key,value in exitResponseQid.items():
             defaultResp.append('{0}. {1}'.format(key,value))
+            markdownResp.append('__{0}.__ {1}  '.format(key,value))
         #Send the the initial response for feedback options
         tempAnswerNormal = '\n'.join(defaultResp)
-        tempAnswerMarkdown = '<br/>'.join(defaultResp)
+        tempAnswerMarkdown = '\n'.join(markdownResp)
         event["res"]["message"] = '{0}'.format(tempAnswerNormal)
-        event["res"]["session"]["appContext"]["altMessages"] = '{0}'.format(tempAnswerMarkdown)
+        event["res"]["session"]["appContext"]={"altMessages":{"markdown":tempAnswerMarkdown}}
         #Make sure that the response triggers this lambda function by setting the session attribute
         event["res"]["session"]["queryLambda"] = os.environ['AWS_LAMBDA_FUNCTION_NAME']
         #set the qid and question of the previous as if this question had never been asked
-        event["res"]["session"]["previous"] = {'qid': previousQid , 'a': previousAnswer,'q': previousQuestion}
+        event["res"]["session"]["previous"] = {'qid': previousQid , 'a': previousAnswer, 'alt': previousAlt,'q': previousQuestion}
     return event
 
 #logs feedback for the questions
