@@ -258,6 +258,7 @@ module.exports = {
     },
     navigation2: async function(test) {
         try {
+            var args = await outputs('dev/master')
 
                 await api({
                         path: "questions/navigation.7",
