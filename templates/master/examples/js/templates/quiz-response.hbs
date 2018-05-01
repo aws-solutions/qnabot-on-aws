@@ -16,3 +16,9 @@ The {{#if first}}first{{else}}next{{/if}} question is: {{{question}}}
 {{#if finished}}
 You got {{totalCorrect}} questions correct out of {{totalQuestions}} with a score of {{score}}. Thank you for taking the quiz!
 {{/if}}
+{{#if exit}}
+Thank you for taking the quiz, now leaving.
+{{/if}}
+{{#if invalid}}
+Sorry that was an invalid response, the valid responses are{{#each answers}} {{this}}{{/each}}.
+{{/if}}

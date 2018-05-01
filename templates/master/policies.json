@@ -39,7 +39,8 @@
           "Action": [   
             "cognito-identity:SetIdentityPoolRoles",
             "cognito-identity:GetIdentityPoolRoles",
-            "iam:PassRole"
+            "iam:PassRole",
+            "iam:CreateServiceLinkedRole"
           ],
           "Resource": ["*"]
         },

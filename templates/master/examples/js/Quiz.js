@@ -39,7 +39,10 @@ exports.handler=async function(event,context,callback){
         } 
         if(quizBot.questionCount>0){
             templateParams.correctAnswers=quizBot.correctAnswers
-            if(isCorrect(event.req.question,quizBot.correctAnswers)){
+            if(isCorrect(event.req.question,
+                quizBot.correctAnswers,
+                quizBot.incorrectAnswers
+            )){
                 templateParams.correct=true
                 quizBot.correctAnswerCount++
             }else{
@@ -47,15 +50,6 @@ exports.handler=async function(event,context,callback){
             }
         }
         
-        if( !quizBot.next || ["QUIT","EXIT"].includes(standardize(quizBot.next)) ){
-            templateParams.finished=true
-            templateParams.totalCorrect=quizBot.correctAnswerCount
-            templateParams.totalQuestions=quizBot.questionCount
-            var score=quizBot.correctAnswerCount/quizBot.questionCount*100
-            templateParams.score=Math.round(score)
-            delete event.res.session.quizBot
-            delete event.res.session.queryLambda
-        }
         
         if(quizBot.next){
             result=await lambda.invoke({
@@ -81,6 +75,8 @@ exports.handler=async function(event,context,callback){
             
             quizBot.correctAnswers=templateParams.answers
                 .filter(x=>x[1]).map(x=>x[2])
+            quizBot.incorrectAnswers=templateParams.answers
+                .filter(x=>!x[1]).map(x=>x[2])
 
             event.res.session.queryLambda=process.env.AWS_LAMBDA_FUNCTION_NAME
             quizBot.questionCount++
@@ -100,28 +96,67 @@ exports.handler=async function(event,context,callback){
                 event.res.card=nextDocument.r
                 event.res.card.send=true
             }
+        }else{
+            templateParams.finished=true
+            templateParams.totalCorrect=quizBot.correctAnswerCount
+            templateParams.totalQuestions=quizBot.questionCount
+            var score=quizBot.correctAnswerCount/quizBot.questionCount*100
+            templateParams.score=Math.round(score)
+            clear(event)
         }
-
-        event.res.message=text(templateParams)
-            .replace(/\r?\n|\r/g, " ").replace(/ +(?= )/g,'');
-        _.set(event,
-            "res.session.appContext.altMessages.markdown",
-            markdown(templateParams)
-        )
-        
-        console.log(JSON.stringify(event,null,2))
-        callback(null,event)
+        render(event,templateParams)
     }catch(e){
-        console.log("Failed",e)
-        delete event.res.session.quizBot
-        delete event.res.session.queryLambda
-        event.message="Sorry, Failed to process quiz"
+        if(e==="exit"){
+            var params={
+                exit:true
+            }
+            clear(event)
+            render(event,params) 
+        }else if(e==="InvalidAnswer"){
+            var params={
+                invalid:true,
+                answers:quizBot.correctAnswers
+                    .concat(quizBot.incorrectAnswers)
+                    .sort()
+            }
+            render(event,params) 
+        }else{
+            console.log("Failed",e)
+            clear(event)
+            event.message="Sorry, Failed to process quiz"
+        }
+    }finally{
+        console.log(JSON.stringify(event,null,2))
         callback(null,event)
     }
 }
+function render(event,params){
+    event.res.message=text(params)
+        .replace(/\r?\n|\r/g, " ").replace(/ +(?= )/g,'');
+    _.set(event,
+        "res.session.appContext.altMessages.markdown",
+        markdown(params)
+    )
+}
 
-function isCorrect(response,list){
-    return list.includes(standardize(response))
+function clear(event){
+    delete event.res.session.quizBot
+    delete event.res.session.queryLambda
+}
+
+function isCorrect(response,correct,incorrect){
+    var response_standard=standardize(response)
+    if(["QUIT","EXIT"].includes(response_standard)){
+        throw "exit"
+    }else{
+        if(correct.includes(response_standard)){
+            return true
+        }else if(incorrect.includes(response_standard)){
+            return false
+        }else{
+            throw "InvalidAnswer"
+        }
+    }
 }
 
 function standardize(str){
