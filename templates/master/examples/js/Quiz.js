@@ -31,7 +31,6 @@ exports.handler=async function(event,context,callback){
                     userId:event.req._event.userId
                 }
             }).promise()
-            console.log(decrypt)
             var quizBot=JSON.parse(decrypt.Plaintext.toString('utf8'))
         }else{
             var quizBot={
@@ -41,25 +40,35 @@ exports.handler=async function(event,context,callback){
                 originalDocumentQid:_.get(event,"res.session.previous.qid","")
             }
         }
+        console.log(JSON.stringify(quizBot,null,2))
         var templateParams={
             first:quizBot.questionCount===0,
             message:_.get(event,"res.result.a")
         } 
-        if(quizBot.questionCount>0){
+        if(quizBot.prev){
+            prev=await lambda.invoke({
+                FunctionName:event.req._info.es.service.qid,
+                InvocationType:"RequestResponse",
+                Payload:JSON.stringify({qid:quizBot.prev})
+            }).promise()
+
+            prevDocument=JSON.parse(result.Payload)
+            console.log(JSON.stringify(nextDocument,null,2))
+            if(!prevDocument) throw `Next Document not Found:${quizBot.prev}`
+
             templateParams.correctAnswers=quizBot.correctAnswers
             if(isCorrect(event.req.question,
                 quizBot.correctAnswers,
                 quizBot.incorrectAnswers
             )){
                 templateParams.correct=true
-                templateParams.message=_.get(event,"res.result.responses.correct")
+                templateParams.message=_.get(prevDocument,"responses.correct")
                 quizBot.correctAnswerCount++
             }else{
                 templateParams.incorrect=true
-                templateParams.message=_.get(event,"res.result.responses.incorrect")
+                templateParams.message=_.get(prevDocument,"responses.incorrect")
             }
         }
-        
         
         if(quizBot.next){
             result=await lambda.invoke({
@@ -90,6 +99,7 @@ exports.handler=async function(event,context,callback){
 
             event.res.session.queryLambda=process.env.AWS_LAMBDA_FUNCTION_NAME
             quizBot.questionCount++
+            quizBot.prev=quizBot.next
             quizBot.next=_.get(nextDocument,"next[0]",false)
           
             var encrypt=await kms.encrypt({
@@ -110,8 +120,9 @@ exports.handler=async function(event,context,callback){
             templateParams.finished=true
             templateParams.totalCorrect=quizBot.correctAnswerCount
             templateParams.totalQuestions=quizBot.questionCount
-            templateParams.message=_.get(
-                event,"res.result.responses.end","Thank you for taking the quiz!")
+            templateParams.message=_.get(prevDocument,"responses.incorrect")
+            templateParams.endmessage=_.get(
+                prevDocument,"responses.end","Thank you for taking the quiz!")
             var score=quizBot.correctAnswerCount/quizBot.questionCount*100
             templateParams.score=Math.round(score)
             clear(event)
