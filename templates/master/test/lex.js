@@ -17,6 +17,9 @@ var exists = require('./util').exists
 var run = require('./util').run
 var api = require('./util').api
 
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
 module.exports = {
     setUp: function(cb) {
         var self = this
@@ -332,13 +335,16 @@ module.exports = {
                     }
                 })
             var sessionAttributes = {}
-            var response = await this.lex.postText({
+            var response
+            await sleep(100)
+            response = await this.lex.postText({
                 sessionAttributes:sessionAttributes,
                 inputText: "One"
             }).promise()
             console.log(response)
             sessionAttributes = response.sessionAttributes
             test.equal(response.message, "One")
+            await sleep(100)
             response = await this.lex.postText({
                 sessionAttributes:sessionAttributes,
                 inputText: "Two"
@@ -346,6 +352,7 @@ module.exports = {
             console.log(response)
             sessionAttributes = response.sessionAttributes
             test.equal(response.message, "Two")
+            await sleep(100)
             response = await this.lex.postText({
                 sessionAttributes:sessionAttributes,
                 inputText: "next"
@@ -353,6 +360,7 @@ module.exports = {
             console.log(response)
             sessionAttributes = response.sessionAttributes
             test.equal(response.message, "Three")
+            await sleep(100)
             response = await this.lex.postText({
                 sessionAttributes:sessionAttributes,
                 inputText: "previous"
@@ -360,6 +368,7 @@ module.exports = {
             console.log(response)
             sessionAttributes = response.sessionAttributes
             test.equal(response.message, "Two")
+            await sleep(100)
             response = await this.lex.postText({
                 sessionAttributes:sessionAttributes,
                 inputText: "End"
@@ -367,6 +376,7 @@ module.exports = {
             console.log(response)
             sessionAttributes = response.sessionAttributes
             test.equal(response.message, "End")
+            await sleep(100)
             response = await this.lex.postText({
                 sessionAttributes:sessionAttributes,
                 inputText: "next"
@@ -374,6 +384,7 @@ module.exports = {
             console.log(response)
             sessionAttributes = response.sessionAttributes
             test.equal(response.message, "Three")
+            await sleep(100)
             response = await this.lex.postText({
                 sessionAttributes:sessionAttributes,
                 inputText: "previous"
@@ -381,6 +392,7 @@ module.exports = {
             console.log(response)
             sessionAttributes = response.sessionAttributes
             test.equal(response.message, "Two")
+            await sleep(100)
             response = await this.lex.postText({
                 sessionAttributes:sessionAttributes,
                 inputText: "previous"
