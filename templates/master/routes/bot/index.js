@@ -12,10 +12,7 @@ module.exports={
     lambda:{"Fn::GetAtt":["UtteranceLambda","Arn"]},
     subTemplate:fs.readFileSync(__dirname+'/utterance.get.vm','utf8'),
     responseTemplate:fs.readFileSync(__dirname+'/alexa.vm','utf8'),
-    resource:{"Ref":"AlexaApi"},
-    parameterLocations:{
-      "method.request.querystring.export":true,
-    }
+    resource:{"Ref":"AlexaApi"}
 }),
 "BotPost":lambda({
     authorization:"AWS_IAM",

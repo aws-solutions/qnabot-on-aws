@@ -18,9 +18,9 @@ var _=require('lodash')
 module.exports=async function(event,context,callback){
     try{
         var info=await lex.getSlotType(event).promise()
-
+        console.log(JSON.stringify(info,null,2))
         return {utterances:_.uniqBy(_.flatten(info.enumerationValues
-            .map(x=>[x.value].concat(x.synonyms))),
+            .map(x=>[x.value].concat(x.synonyms || []))),
             x=>x.toUpperCase())}
     }catch(e){
         console.log(e)
