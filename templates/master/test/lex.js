@@ -348,7 +348,7 @@ module.exports = {
             console.log(response)
             sessionAttributes = response.sessionAttributes
             test.equal(response.message, "One")
-            await sleep(1000)
+            await sleep(2000)
             response = await this.lex.postText({
                 sessionAttributes:sessionAttributes,
                 inputText: "Two"
@@ -356,7 +356,7 @@ module.exports = {
             console.log(response)
             sessionAttributes = response.sessionAttributes
             test.equal(response.message, "Two")
-            await sleep(1000)
+            await sleep(2000)
             response = await this.lex.postText({
                 sessionAttributes:sessionAttributes,
                 inputText: "next"
@@ -364,7 +364,7 @@ module.exports = {
             console.log(response)
             sessionAttributes = response.sessionAttributes
             test.equal(response.message, "Three")
-            await sleep(1000)
+            await sleep(2000)
             response = await this.lex.postText({
                 sessionAttributes:sessionAttributes,
                 inputText: "previous"
@@ -372,7 +372,7 @@ module.exports = {
             console.log(response)
             sessionAttributes = response.sessionAttributes
             test.equal(response.message, "Two")
-            await sleep(1000)
+            await sleep(2000)
             response = await this.lex.postText({
                 sessionAttributes:sessionAttributes,
                 inputText: "End"
@@ -380,7 +380,7 @@ module.exports = {
             console.log(response)
             sessionAttributes = response.sessionAttributes
             test.equal(response.message, "End")
-            await sleep(1000)
+            await sleep(2000)
             response = await this.lex.postText({
                 sessionAttributes:sessionAttributes,
                 inputText: "next"
@@ -388,7 +388,7 @@ module.exports = {
             console.log(response)
             sessionAttributes = response.sessionAttributes
             test.equal(response.message, "Three")
-            await sleep(1000)
+            await sleep(2000)
             response = await this.lex.postText({
                 sessionAttributes:sessionAttributes,
                 inputText: "previous"
@@ -396,7 +396,7 @@ module.exports = {
             console.log(response)
             sessionAttributes = response.sessionAttributes
             test.equal(response.message, "Two")
-            await sleep(1000)
+            await sleep(2000)
             response = await this.lex.postText({
                 sessionAttributes:sessionAttributes,
                 inputText: "previous"
@@ -404,7 +404,7 @@ module.exports = {
             console.log(response)
             sessionAttributes = response.sessionAttributes
             test.equal(response.message, "One")
-            await sleep(1000)
+            await sleep(2000)
         }
         catch (e) {
             test.ifError(e)
@@ -472,7 +472,7 @@ module.exports = {
             console.log(response)
             sessionAttributes = response.sessionAttributes
             test.equal(response.message, "There is no question to leave feedback on, please ask a question before attempting to leave feedback")
-            await sleep(1000)
+            await sleep(2000)
             response = await this.lex.postText({
                 sessionAttributes:sessionAttributes,
                 inputText: "One"
@@ -480,7 +480,7 @@ module.exports = {
             console.log(response)
             sessionAttributes = response.sessionAttributes
             test.equal(response.message, "One")
-            await sleep(1000)
+            await sleep(2000)
             response = await this.lex.postText({
                 sessionAttributes:sessionAttributes,
                 inputText: "feedback"
@@ -488,7 +488,7 @@ module.exports = {
             console.log(response)
             sessionAttributes = response.sessionAttributes
             test.ok(true, response.message.includes("What feedback would you like to leave for the question, \"One\" ?"))
-            await sleep(1000)
+            await sleep(2000)
             response = await this.lex.postText({
                 sessionAttributes:sessionAttributes,
                 inputText: "goodbye"
@@ -496,7 +496,7 @@ module.exports = {
             console.log(response)
             sessionAttributes = response.sessionAttributes
             test.ok(true, response.message.includes("What feedback would you like to leave for the question, \"One\" ?"))
-            await sleep(1000)
+            await sleep(2000)
             response = await this.lex.postText({
                 sessionAttributes:sessionAttributes,
                 inputText: "a"
@@ -504,7 +504,7 @@ module.exports = {
             console.log(response)
             sessionAttributes = response.sessionAttributes
             test.ok(true, response.message.includes("Thank you for leaving the feedback"))
-            await sleep(1000)
+            await sleep(2000)
             response = await this.lex.postText({
                 sessionAttributes:sessionAttributes,
                 inputText: "feedback"
@@ -512,7 +512,7 @@ module.exports = {
             console.log(response)
             sessionAttributes = response.sessionAttributes
             test.ok(true, response.message.includes("What feedback would you like to leave for the question, \"One\" ?"))
-            await sleep(1000)
+            await sleep(2000)
             response = await this.lex.postText({
                 sessionAttributes:sessionAttributes,
                 inputText: "E"
@@ -520,7 +520,7 @@ module.exports = {
             console.log(response)
             sessionAttributes = response.sessionAttributes
             test.ok(true, response.message.includes("Canceled Feedback"))
-            await sleep(1000)
+            await sleep(2000)
         }
         catch (e) {
             test.ifError(e)
