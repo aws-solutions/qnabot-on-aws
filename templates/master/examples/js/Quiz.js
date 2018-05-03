@@ -52,9 +52,11 @@ exports.handler=async function(event,context,callback){
                 quizBot.incorrectAnswers
             )){
                 templateParams.correct=true
+                templateParams.message=_.get(event,"res.result.responses.correct")
                 quizBot.correctAnswerCount++
             }else{
                 templateParams.incorrect=true
+                templateParams.message=_.get(event,"res.result.responses.incorrect")
             }
         }
         
@@ -108,6 +110,8 @@ exports.handler=async function(event,context,callback){
             templateParams.finished=true
             templateParams.totalCorrect=quizBot.correctAnswerCount
             templateParams.totalQuestions=quizBot.questionCount
+            templateParams.message=_.get(
+                event,"res.result.responses.end","Thank you for taking the quiz!")
             var score=quizBot.correctAnswerCount/quizBot.questionCount*100
             templateParams.score=Math.round(score)
             clear(event)

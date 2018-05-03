@@ -2,10 +2,10 @@
 {{{message}}}
 {{/if}}
 {{#if correct}}
-Correct answer!
+Correct answer! {{message}}
 {{/if}}
 {{#if incorrect}}
-Sorry, that was incorrect. The correct {{#arrayPlural correctAnswers "answer is" "answers are" }}{{/arrayPlural}}{{#each correctAnswers}} {{this}}{{/each}}.
+Sorry, that was incorrect. The correct {{#arrayPlural correctAnswers "answer is" "answers are" }}{{/arrayPlural}}{{#each correctAnswers}} {{this}}{{/each}}. {{message}}
 {{/if}}
 {{#if question}}
 The {{#if first}}first{{else}}next{{/if}} question is: {{{question}}}
@@ -14,7 +14,7 @@ The {{#if first}}first{{else}}next{{/if}} question is: {{{question}}}
     {{/each}}
 {{/if}}
 {{#if finished}}
-You got {{totalCorrect}} questions correct out of {{totalQuestions}} with a score of {{score}}. Thank you for taking the quiz!
+You got {{totalCorrect}} questions correct out of {{totalQuestions}} with a score of {{score}}. {{message}}
 {{/if}}
 {{#if exit}}
 You have now exited the quiz. Ask for help for next steps.

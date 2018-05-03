@@ -36,6 +36,31 @@ module.exports={
                         maxLength:140
                     }
                 },
+                responses:{
+                    title:"Custom Responses",
+                    description:"Enter incorrect answer options for this question.  These will be presented to the user in randomized order alongside the correct answer(s) you entered above.",
+                    type:"object",
+                    properties:{
+                        correct:{
+                            title:"Correct Answer Response",
+                            description:"Response that will be returned to the user on a correct response.",
+                            type:"string",
+                            maxLength:140
+                        },
+                        incorrect:{
+                            title:"Incorrect Answer Response",
+                            description:"Response that will be returned to the user on a incorrect response.",
+                            type:"string",
+                            maxLength:140
+                        },
+                        end:{
+                            title:"End quiz Response",
+                            description:"Response that will be returned to the user end the end of the quiz",
+                            type:"string",
+                            maxLength:140
+                        }
+                    }
+                },
                 next:{
                     title:"Next Questions",
                     description:"Enter the QID of the next question in the quiz.  If the field is left blank then the quiz will end after this question.",
