@@ -487,7 +487,7 @@ module.exports = {
             }).promise()
             console.log(response)
             sessionAttributes = response.sessionAttributes
-            test.ok(true, response.message.includes("What feedback would you like to leave for the question, \"One\" ?"))
+            test.ok(response.message.includes("What feedback would you like to leave for the question, \"One\" ?"))
             await sleep(2000)
             response = await this.lex.postText({
                 sessionAttributes:sessionAttributes,
@@ -495,7 +495,7 @@ module.exports = {
             }).promise()
             console.log(response)
             sessionAttributes = response.sessionAttributes
-            test.ok(true, response.message.includes("What feedback would you like to leave for the question, \"One\" ?"))
+            test.ok(response.message.includes("What feedback would you like to leave for the question, \"One\" ?"))
             await sleep(2000)
             response = await this.lex.postText({
                 sessionAttributes:sessionAttributes,
@@ -503,7 +503,7 @@ module.exports = {
             }).promise()
             console.log(response)
             sessionAttributes = response.sessionAttributes
-            test.ok(true, response.message.includes("Thank you for leaving the feedback"))
+            test.ok(response.message.includes("Thank you for leaving the feedback"))
             await sleep(2000)
             response = await this.lex.postText({
                 sessionAttributes:sessionAttributes,
@@ -511,7 +511,7 @@ module.exports = {
             }).promise()
             console.log(response)
             sessionAttributes = response.sessionAttributes
-            test.ok(true, response.message.includes("What feedback would you like to leave for the question, \"One\" ?"))
+            test.ok(response.message.includes("What feedback would you like to leave for the question, \"One\" ?"))
             await sleep(2000)
             response = await this.lex.postText({
                 sessionAttributes:sessionAttributes,
@@ -519,7 +519,7 @@ module.exports = {
             }).promise()
             console.log(response)
             sessionAttributes = response.sessionAttributes
-            test.ok(true, response.message.includes("Canceled Feedback"))
+            test.ok(response.message.includes("Canceled Feedback"))
             await sleep(2000)
         }
         catch (e) {
