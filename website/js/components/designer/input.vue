@@ -37,7 +37,7 @@
             v-icon delete
       v-btn.block(@click.native='add' tabindex='-1'
         :id="path+'-add'"
-        ) Add Item
+        ) Add {{singularTitle}}
     div(v-if="schema.type==='object'")
       .subheading {{schema.title}}
       span {{schema.description}}
@@ -106,6 +106,15 @@ module.exports={
     }
   },
   computed:{
+    singularTitle:function(){
+      var title=this.schema.title
+      var length=title.length
+      if(["s","S"].includes(title[length-1])){
+        return title.slice(0,length-1)
+      }else{
+        return title
+      }
+    },
     properties:function(){
       var self=this
       if(this.schema.properties){ 
