@@ -3,10 +3,20 @@ exports.parse=function(event){
     return {
         _type:"LEX",
         question:_.get(event,'inputTranscript'),
-        session:_.get(event,'sessionAttributes',{}) || {},
+        session:_.mapValues(
+            _.get(event,'sessionAttributes',{}),
+            x=>{
+                try {
+                    return JSON.parse(x)
+                } catch(e){
+                    return x
+                }
+            }
+        ),
         channel:_.get(event,"requestAttributes.'x-amz-lex:channel-type'")
     }
 }
+
 exports.assemble=function(request,response){
     var out={
         sessionAttributes:_.get(response,'session',{}),
@@ -20,11 +30,11 @@ exports.assemble=function(request,response){
             responseCard:isCard(response.card) ? {
                 version:"1",
                 contentType:"application/vnd.amazonaws.card.generic",
-                genericAttachments:[{
-                    title:response.card.title,
-                    subTitle:_.get(response.card,'subTitle',undefined),
+                genericAttachments:[_.pickBy({
+                    title:_.get(response,"card.title","Image"),
+                    subTitle:_.get(response.card,'subTitle'),
                     imageUrl:response.card.imageUrl
-                }, _.negate(_.isUndefined)]
+                })]
             } : null
         })
     }

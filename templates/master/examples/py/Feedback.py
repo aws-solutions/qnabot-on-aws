@@ -50,39 +50,42 @@ def handler(event, context):
         event["res"]["session"]["previous"] = {'qid': '' , 'a': msg,'alt':msg,'q':event["req"]["question"]}
         #set back to normal mode if in feedback mode
         event["res"]["session"].pop("queryLambda",None)
-    # if it is a valid response for feedback
+    # if it is a valid response for leaving feedback
     elif currentQid in validResponseQid:
         logFeedback(previousQid,previousQuestion,previousAnswer,previousAlt,validResponseQid.get(currentQid))
         event["res"]["message"] = "Thank you for leaving the feedback,{0}. Relevant information has been logged and will be looked at.".format(validResponseQid.get(currentQid))
         event["res"]["session"]["previous"] = {'qid': previousQid , 'a': previousAnswer, 'alt': previousAlt,'q': previousQuestion}
         #set back to normal mode if in feedback mode
         event["res"]["session"].pop("queryLambda",None)
+    # if it is a valid exit response for feedback
     elif currentQid in exitResponseQid:
         event["res"]["message"] = "Canceled Feedback"
         event["res"]["session"]["previous"] = {'qid': previousQid , 'a': previousAnswer, 'alt': previousAlt,'q':previousQuestion}
         #set back to normal mode if in feedback mode
         event["res"]["session"].pop("queryLambda",None)
+    #Give feedback options upon first call of feedback function or invalid response    
     else:
         defaultResp = [
             'What feedback would you like to leave for the question, "{0}" ?'.format(previousQuestion),
         ]
-        markdownResp = [
-            'What feedback would you like to leave for the question, _"{0}"_ ?\n'.format(previousQuestion),
+        htmlResp = [
+            'What feedback would you like to leave for the question, <i>"{0}"</i> ?\n'.format(previousQuestion),
         ]
         #Append list of all valid responses
+        htmlResp.append('<ul style="list-style-type:none";>')
         for key,value in validResponseQid.items():
             defaultResp.append('{0}. {1}'.format(key,value))
-            markdownResp.append('__{0}.__ {1}  '.format(key,value))
+            htmlResp.append('<li><b>{0}.</b> {1}</li>'.format(key,value))
             
         #Append list of all exit responses
         for key,value in exitResponseQid.items():
             defaultResp.append('{0}. {1}'.format(key,value))
-            markdownResp.append('__{0}.__ {1}  '.format(key,value))
+            htmlResp.append('<li><b>{0}.</b> {1}</li>'.format(key,value))
         #Send the the initial response for feedback options
         tempAnswerNormal = '\n'.join(defaultResp)
-        tempAnswerMarkdown = '\n'.join(markdownResp)
+        tempAnswerHtml = '\n'.join(htmlResp)
         event["res"]["message"] = '{0}'.format(tempAnswerNormal)
-        event["res"]["session"]["appContext"]={"altMessages":{"markdown":tempAnswerMarkdown}}
+        event["res"]["session"]["appContext"]={"altMessages":{"html":tempAnswerHtml}}
         #Make sure that the response triggers this lambda function by setting the session attribute
         event["res"]["session"]["queryLambda"] = os.environ['AWS_LAMBDA_FUNCTION_NAME']
         #set the qid and question of the previous as if this question had never been asked
@@ -92,7 +95,6 @@ def handler(event, context):
 #logs feedback for the questions
 def logFeedback(qid,question,answer,markdown, feedback):
     #uncomment below if you would like to see values passed in 
-    #print("Qid:{0} \n with feedback {3} \n has received feedback{1}, \n for the question: {2}".format(qid,feedback,question,answer))
     jsonData = {"qid":"{0}".format(qid),
         "utterance":"{0}".format(question),
         "answer":"{0}".format(answer),

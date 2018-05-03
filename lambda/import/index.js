@@ -43,15 +43,15 @@ exports.step=function(event,context,cb){
                 .forEach(x=>{
                     try{
                         var obj=JSON.parse(x)
-                        var type=obj.type || 'qna'
-                        if(type==='qna'){
+                        obj.type=obj.type || 'qna'
+                        if(obj.type==='qna'){
                             obj.questions=obj.q.map(x=>{return {q:x}})
                             delete obj.q
                         }
                         out.push(JSON.stringify({
                             index:{
                                 "_index":process.env.ES_INDEX,
-                                "_type":type,
+                                "_type":obj.type,
                                 "_id":obj.qid
                             }
                         }))

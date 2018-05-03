@@ -3,7 +3,17 @@ exports.parse=function(event){
     var out={
         _type:"ALEXA",
         original:event,
-        session:_.get(event,'session.attributes',{}) || {},
+        session:_.mapValues(
+            _.get(event,'session.attributes',{}),
+            x=>{
+                try {
+                    return JSON.parse(x)
+                } catch(e){
+                    return x
+                }
+            }
+        ),
+
         channel:null,
     }
 

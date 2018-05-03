@@ -4,7 +4,6 @@ module.exports=Object.assign(
     require('./bucket'),{
     "ExportCodeVersion":{
         "Type": "Custom::S3Version",
-        "DependsOn":["CFNLambdaPolicy"],
         "Properties": {
             "ServiceToken": { "Fn::GetAtt" : ["CFNLambda", "Arn"] },
             "Bucket": {"Ref":"BootstrapBucket"},

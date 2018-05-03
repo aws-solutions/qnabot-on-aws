@@ -2,7 +2,6 @@ var fs=require('fs')
 module.exports={
     "CognitoDomain":{
         "Type": "Custom::CognitoDomain",
-        "DependsOn":["CFNLambdaPolicy"],
         "Properties": {
             "ServiceToken": { "Fn::GetAtt" : ["CFNLambda", "Arn"] },
             "UserPool":{"Ref":"UserPool"}
@@ -10,7 +9,6 @@ module.exports={
     },
     "CognitoLoginClient":{
         "Type": "Custom::CognitoLogin",
-        "DependsOn":["CFNLambdaPolicy"],
         "Properties": {
             "ServiceToken": { "Fn::GetAtt" : ["CFNLambda", "Arn"] },
             "UserPool":{"Ref":"UserPool"},
@@ -23,7 +21,6 @@ module.exports={
     },
     "CognitoLoginDesigner":{
         "Type": "Custom::CognitoLogin",
-        "DependsOn":["CFNLambdaPolicy"],
         "Properties": {
             "ServiceToken": { "Fn::GetAtt" : ["CFNLambda", "Arn"] },
             "UserPool":{"Ref":"UserPool"},
@@ -36,7 +33,6 @@ module.exports={
     },
     "DesignerLogin":{
         "Type": "Custom::CognitoUrl",
-        "DependsOn":["CFNLambdaPolicy"],
         "Properties": {
             "ServiceToken": { "Fn::GetAtt" : ["CFNLambda", "Arn"] },
             "adad":"adaad",
@@ -47,7 +43,6 @@ module.exports={
     },
     "ClientLogin":{
         "Type": "Custom::CognitoUrl",
-        "DependsOn":["CFNLambdaPolicy"],
         "Properties": {
             "ServiceToken": { "Fn::GetAtt" : ["CFNLambda", "Arn"] },
             "ClientId":{"Ref":"ClientClient"},
@@ -95,7 +90,6 @@ module.exports={
     },
     "RoleAttachment": {
         "Type": "Custom::CognitoRole",
-        "DependsOn":["CFNLambdaPolicy"],
         "Properties": {
             "ServiceToken": { "Fn::GetAtt" : ["CFNLambda", "Arn"] },
             "IdentityPoolId":{"Ref":"IdPool"},

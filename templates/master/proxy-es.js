@@ -2,7 +2,6 @@ var lexConfig=require('./lex/config')
 module.exports={
     "ESProxyCodeVersion":{
         "Type": "Custom::S3Version",
-        "DependsOn":["CFNLambdaPolicy"],
         "Properties": {
             "ServiceToken": { "Fn::GetAtt" : ["CFNLambda", "Arn"] },
             "Bucket": {"Ref":"BootstrapBucket"},

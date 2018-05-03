@@ -45,7 +45,7 @@
               template(v-for="(example,index) in examples")
                 v-divider
                 v-list-tile
-                  v-list-title-avatar
+                  v-list-tile-avatar
                     v-tooltip(bottom)
                       span(
                         slot="activator"

@@ -176,14 +176,23 @@ module.exports={
         return this.get(this.pagination)
       }
     },
-    pagination:function(event){
-      return this.get(event)      
+    "pagination.page":function(event){
+      return this.get(this.pagination)      
+    },
+    "pagination.descending":function(event){
+      return this.get(this.pagination)      
+    },
+    "pagination.rowsPerPage":function(event){
+      return this.get(this.pagination)      
+    },
+    "pagination.sortBy":function(event){
+      return this.get(this.pagination)      
     }
   },
   methods:{
-    get:_.debounce(function(event){
+    get:_.debounce(async function(event){
       this.selectAll=false
-      return this.$store.dispatch('data/get',{
+      await this.$store.dispatch('data/get',{
         page:event.page-1,
         perpage:event.rowsPerPage,
         order:event.descending ? 'desc' : 'asc'
