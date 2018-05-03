@@ -230,15 +230,20 @@ module.exports = {
                         l: args.PreviousLambda
                     }
                 })
+            var sessionAttributes = {}
             var response = await this.lex.postText({
+                sessionAttributes: sessionAttributes,
                 inputText: "next"
             }).promise()
             console.log(response)
+            sessionAttributes = response.sessionAttributes
             test.equal(response.message, "no next room")
             response = await this.lex.postText({
+                sessionAttributes: sessionAttributes,
                 inputText: "previous"
             }).promise()
             console.log(response)
+            sessionAttributes = response.sessionAttributes
             test.equal(response.message, "no previous room")
         }
         catch (e) {
