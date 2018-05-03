@@ -109,13 +109,6 @@ module.exports=Object.assign(
             reason:"Failed to get BotInfo"
         })
     },
-    utterances(context){
-        return context.dispatch('_request',{
-            url:context.rootState.bot._links.utterances.href,
-            method:'get',
-            reason:"Failed to get BotInfo"
-        })
-    },
     alexa(context){
         return context.dispatch('_request',{
             url:context.rootState.bot._links.alexa.href,

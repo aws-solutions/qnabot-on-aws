@@ -5,15 +5,17 @@ var fs=require('fs')
 var _=require('lodash')
 module.exports={
 "Bot": resource('bot'),
-"UtterancesApi": resource('utterances',{"Ref":"Bot"}),
 "AlexaApi": resource('alexa',{"Ref":"Bot"}),
 "AlexaSchema":lambda({
     authorization:"AWS_IAM",
     method:"get",
-    lambda:{"Fn::GetAtt":["LexProxyLambda","Arn"]},
+    lambda:{"Fn::GetAtt":["UtteranceLambda","Arn"]},
     subTemplate:fs.readFileSync(__dirname+'/utterance.get.vm','utf8'),
     responseTemplate:fs.readFileSync(__dirname+'/alexa.vm','utf8'),
-    resource:{"Ref":"AlexaApi"}
+    resource:{"Ref":"AlexaApi"},
+    parameterLocations:{
+      "method.request.querystring.export":true,
+    }
 }),
 "BotPost":lambda({
     authorization:"AWS_IAM",
@@ -29,14 +31,6 @@ module.exports={
     lambda:{"Fn::GetAtt":["LexStatusLambda","Arn"]},
     resource:{"Ref":"Bot"},
     responseTemplate:fs.readFileSync(__dirname+'/get.resp.vm','utf8')
-}),
-"UtterancesGet":lambda({
-    authorization:"AWS_IAM",
-    method:"get",
-    lambda:{"Fn::GetAtt":["LexProxyLambda","Arn"]},
-    subTemplate:fs.readFileSync(__dirname+'/utterance.get.vm','utf8'),
-    responseTemplate:fs.readFileSync(__dirname+'/utterance.get.resp.vm','utf8'),
-    resource:{"Ref":"UtterancesApi"}
 }),
 "BotDoc":{
     "Type" : "AWS::ApiGateway::DocumentationPart",

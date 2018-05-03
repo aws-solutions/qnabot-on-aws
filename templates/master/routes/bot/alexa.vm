@@ -1,5 +1,5 @@
 #set($inputRoot = $input.path('$'))
-#set($utterances = $inputRoot.enumerationValues)
+#set($utterances = $inputRoot.utterances)
 
 {
   "interactionModel": {
@@ -11,7 +11,7 @@
           "values": [
             #foreach( $utterance in $utterances)
                 {"name":{
-                    "value":"$utterance.value" 
+                    "value":"$utterance" 
                 }}#if( $foreach.hasNext ),#end
             #end
           ]
