@@ -394,30 +394,30 @@ module.exports = {
             test.ifError(e)
         }
         finally {
-            // await api({
-            //         path: "questions/navigation.7",
-            //         method: "DELETE"
-            //     })
-            // await api({
-            //         path: "questions/navigation.8",
-            //         method: "DELETE"
-            //     })
-            // await api({
-            //         path: "questions/navigation.3",
-            //         method: "DELETE"
-            //     })
-            // await api({
-            //         path: "questions/navigation.4",
-            //         method: "DELETE"
-            //     })
-            // await api({
-            //         path: "questions/navigation.5",
-            //         method: "DELETE"
-            //     })
-            // await api({
-            //         path: "questions/navigation.6",
-            //         method: "DELETE"
-            //     })
+            await api({
+                    path: "questions/navigation.7",
+                    method: "DELETE"
+                })
+            await api({
+                    path: "questions/navigation.8",
+                    method: "DELETE"
+                })
+            await api({
+                    path: "questions/navigation.3",
+                    method: "DELETE"
+                })
+            await api({
+                    path: "questions/navigation.4",
+                    method: "DELETE"
+                })
+            await api({
+                    path: "questions/navigation.5",
+                    method: "DELETE"
+                })
+            await api({
+                    path: "questions/navigation.6",
+                    method: "DELETE"
+                })
             test.done()
         }
     },
@@ -440,7 +440,7 @@ module.exports = {
                         path: "questions/feedback.2",
                         method: "PUT",
                         body: {
-                            qid: "",
+                            qid: "feedback.2",
                             type: "qna",
                             q: ["One"],
                             a: "One"
