@@ -17,8 +17,13 @@ var exists = require('./util').exists
 var run = require('./util').run
 var api = require('./util').api
 
-
+function sleep(ms){
+    return new Promise(resolve=>{
+        setTimeout(resolve,ms)
+    })
+}
 module.exports = {
+    
     setUp: function(cb) {
         var self = this
         outputs('dev/master').then(function(output) {
@@ -341,6 +346,7 @@ module.exports = {
             console.log(response)
             sessionAttributes = response.sessionAttributes
             test.equal(response.message, "One")
+            await sleep(5000)
             response = await this.lex.postText({
                 sessionAttributes:sessionAttributes,
                 inputText: "Two"
@@ -348,6 +354,7 @@ module.exports = {
             console.log(response)
             sessionAttributes = response.sessionAttributes
             test.equal(response.message, "Two")
+            await sleep(5000)
             response = await this.lex.postText({
                 sessionAttributes:sessionAttributes,
                 inputText: "next"
@@ -355,41 +362,130 @@ module.exports = {
             console.log(response)
             sessionAttributes = response.sessionAttributes
             test.equal(response.message, "Three")
+            await sleep(5000)
             response = await this.lex.postText({
                 sessionAttributes:sessionAttributes,
                 inputText: "previous"
             }).promise()
             console.log(response)
             sessionAttributes = response.sessionAttributes
-            // test.equal(response.message, "Two")
-            // response = await this.lex.postText({
-            //     sessionAttributes:sessionAttributes,
-            //     inputText: "End"
-            // }).promise()
-            // console.log(response)
-            // sessionAttributes = response.sessionAttributes
-            // test.equal(response.message, "End")
-            // response = await this.lex.postText({
-            //     sessionAttributes:sessionAttributes,
-            //     inputText: "next"
-            // }).promise()
-            // console.log(response)
-            // sessionAttributes = response.sessionAttributes
-            // test.equal(response.message, "Three")
-            // response = await this.lex.postText({
-            //     sessionAttributes:sessionAttributes,
-            //     inputText: "previous"
-            // }).promise()
-            // console.log(response)
-            // sessionAttributes = response.sessionAttributes
-            // test.equal(response.message, "Two")
-            // response = await this.lex.postText({
-            //     sessionAttributes:sessionAttributes,
-            //     inputText: "previous"
-            // }).promise()
-            // console.log(response)
-            // sessionAttributes = response.sessionAttributes
-            // test.equal(response.message, "One")
+            test.equal(response.message, "Two")
+            await sleep(5000)
+            response = await this.lex.postText({
+                sessionAttributes:sessionAttributes,
+                inputText: "End"
+            }).promise()
+            console.log(response)
+            sessionAttributes = response.sessionAttributes
+            test.equal(response.message, "End")
+            await sleep(5000)
+            response = await this.lex.postText({
+                sessionAttributes:sessionAttributes,
+                inputText: "next"
+            }).promise()
+            console.log(response)
+            sessionAttributes = response.sessionAttributes
+            test.equal(response.message, "Three")
+            await sleep(5000)
+            response = await this.lex.postText({
+                sessionAttributes:sessionAttributes,
+                inputText: "previous"
+            }).promise()
+            console.log(response)
+            sessionAttributes = response.sessionAttributes
+            test.equal(response.message, "Two")
+            await sleep(5000)
+            response = await this.lex.postText({
+                sessionAttributes:sessionAttributes,
+                inputText: "previous"
+            }).promise()
+            console.log(response)
+            sessionAttributes = response.sessionAttributes
+            test.equal(response.message, "One")
+        }
+        catch (e) {
+            test.ifError(e)
+        }
+        finally {
+            await api({
+                    path: "questions/navigation.7",
+                    method: "DELETE"
+                })
+            await api({
+                    path: "questions/navigation.8",
+                    method: "DELETE"
+                })
+            await api({
+                    path: "questions/navigation.3",
+                    method: "DELETE"
+                })
+            await api({
+                    path: "questions/navigation.4",
+                    method: "DELETE"
+                })
+            await api({
+                    path: "questions/navigation.5",
+                    method: "DELETE"
+                })
+            await api({
+                    path: "questions/navigation.6",
+                    method: "DELETE"
+                })
+            test.done()
+        }
+    },
+    feedback1: async function(test) {
+        try {
+            var args = await outputs('dev/master')
+
+                await api({
+                        path: "questions/feedback.1",
+                        method: "PUT",
+                        body: {
+                            qid: "feedback.1",
+                            type: "qna",
+                            q: ["feedback"],
+                            a: "unable to leave feedback",
+                            l: args.FeedbackLambda
+                        }
+                    })
+                await  api({
+                        path: "questions/feedback.2",
+                        method: "PUT",
+                        body: {
+                            qid: "",
+                            type: "qna",
+                            q: ["One"],
+                            a: "no previous room",
+                            l: args.PreviousLambda
+                        }
+                    })
+              
+            var sessionAttributes = {}
+            var response
+            response = await this.lex.postText({
+                sessionAttributes:sessionAttributes,
+                inputText: "One"
+            }).promise()
+            console.log(response)
+            sessionAttributes = response.sessionAttributes
+            test.equal(response.message, "One")
+            await sleep(5000)
+            response = await this.lex.postText({
+                sessionAttributes:sessionAttributes,
+                inputText: "Two"
+            }).promise()
+            console.log(response)
+            sessionAttributes = response.sessionAttributes
+            test.equal(response.message, "Two")
+            await sleep(5000)
+            response = await this.lex.postText({
+                sessionAttributes:sessionAttributes,
+                inputText: "next"
+            }).promise()
+            console.log(response)
+            sessionAttributes = response.sessionAttributes
+            test.equal(response.message, "Three")
         }
         catch (e) {
             test.ifError(e)
