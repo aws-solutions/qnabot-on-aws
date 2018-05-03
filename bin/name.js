@@ -37,7 +37,7 @@ function run(stack,options={}){
     }
     var stackname=stack.replace('/','-')
     var full=`${namespace}-${stackname}`
-    var path=`["${namespace}"].["${stackname}"]`
+    var path=`["${config.profile}"].["${namespace}"].["${stackname}"]`
 
     if(options.hasOwnProperty("set")){
         increment=options.set
@@ -58,7 +58,7 @@ function run(stack,options={}){
 
     function set(value){
         _.set(increments,path,parseInt(value))
-        fs.writeFileSync(__dirname+'/.inc.json',JSON.stringify(increments))
+        fs.writeFileSync(__dirname+'/.inc.json',JSON.stringify(increments,null,2))
     }
 }
 
