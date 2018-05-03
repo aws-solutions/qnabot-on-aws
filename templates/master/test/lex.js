@@ -394,33 +394,33 @@ module.exports = {
             test.ifError(e)
         }
         finally {
-            // await api({
-            //         path: "questions/navigation.7",
-            //         method: "DELETE"
-            //     })
-            // await api({
-            //         path: "questions/navigation.8",
-            //         method: "DELETE"
-            //     })
-            // await api({
-            //         path: "questions/navigation.3",
-            //         method: "DELETE"
-            //     })
-            // await api({
-            //         path: "questions/navigation.4",
-            //         method: "DELETE"
-            //     })
-            // await api({
-            //         path: "questions/navigation.5",
-            //         method: "DELETE"
-            //     })
-            // await api({
-            //         path: "questions/navigation.6",
-            //         method: "DELETE"
-            //     })
+            await api({
+                    path: "questions/navigation.7",
+                    method: "DELETE"
+                })
+            await api({
+                    path: "questions/navigation.8",
+                    method: "DELETE"
+                })
+            await api({
+                    path: "questions/navigation.3",
+                    method: "DELETE"
+                })
+            await api({
+                    path: "questions/navigation.4",
+                    method: "DELETE"
+                })
+            await api({
+                    path: "questions/navigation.5",
+                    method: "DELETE"
+                })
+            await api({
+                    path: "questions/navigation.6",
+                    method: "DELETE"
+                })
             test.done()
         }
-    }
+    },
     //feedback tests
     // feedback1: async function(test) {
     //     try {
@@ -522,7 +522,7 @@ module.exports = {
 
     //         test.done()
     //     }
-    }
+    // }
     // // TriviaRefactored tests
     // ask: async function(test) {
     //     try {
