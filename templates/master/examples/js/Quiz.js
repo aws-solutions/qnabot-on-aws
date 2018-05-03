@@ -6,6 +6,14 @@ var kms=new aws.KMS()
 var handlebars = require('handlebars')
 var fs=require('fs')
 
+handlebars.registerHelper('arrayPlural', function(array,singular, plural) {
+    if(array.length===1){
+        return singular
+    }else{
+        return plural
+    }
+})
+
 var markdown=handlebars.compile(
     fs.readFileSync(`${__dirname}/templates/quiz-response.md`,'utf-8')
 )
