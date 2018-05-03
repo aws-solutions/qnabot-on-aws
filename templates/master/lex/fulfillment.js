@@ -1,4 +1,9 @@
 var config=require('./config')
+var _=require('lodash')
+var example=require('../examples')
+var examples=_.fromPairs(_.toPairs(example)
+    .filter(x=>x[1].Type==="AWS::Lambda::Function")
+    .map(x=>[x[0],{"Fn::GetAtt":[x[0],"Arn"]}]))
 
 module.exports={
     "Alexa":{
@@ -27,7 +32,7 @@ module.exports={
             "S3ObjectVersion":{"Ref":"FulfillmentCodeVersion"}
         },
         "Environment": {
-          "Variables": {
+          "Variables": Object.assign({
             ES_TYPE:{"Fn::GetAtt":["Var","QnAType"]},
             ES_INDEX:{"Fn::GetAtt":["Var","index"]},
             ES_ADDRESS:{"Fn::GetAtt":["ESVar","ESAddress"]},
@@ -37,7 +42,7 @@ module.exports={
             ES_SERVICE_PROXY:{"Ref":"ESProxyLambda"},
             "ERRORMESSAGE":config.ErrorMessage,
             "EMPTYMESSAGE":config.EmptyMessage
-          }
+          },examples)
         },
         "Handler": "index.handler",
         "MemorySize": "1408",

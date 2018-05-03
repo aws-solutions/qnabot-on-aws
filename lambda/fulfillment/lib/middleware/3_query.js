@@ -2,9 +2,11 @@ var aws=require('../aws')
 var lambda= new aws.Lambda()
 var Promise=require('bluebird')
 var _=require('lodash')
+var util=require('./util')
 
 module.exports=function(req,res){
-    var arn=_.get(req,"session.queryLambda",process.env.LAMBDA_DEFAULT_QUERY)
+    var arn=util.getLambdaArn(
+        _.get(req,"session.queryLambda",process.env.LAMBDA_DEFAULT_QUERY))
     console.log("Lambda query:",JSON.stringify({
         req,
         res

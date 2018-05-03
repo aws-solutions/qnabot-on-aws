@@ -25,7 +25,7 @@ module.exports={
             UTTERANCE_KEY:"default-utterances.json",
           }
         },
-        "Handler": "index.qid",
+        "Handler": "index.utterances",
         "MemorySize": "1408",
         "Role": {"Fn::GetAtt": ["ESProxyLambdaRole","Arn"]},
         "Runtime": "nodejs8.10",
