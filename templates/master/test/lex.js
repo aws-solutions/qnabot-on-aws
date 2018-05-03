@@ -459,7 +459,7 @@ module.exports = {
                             qid: "",
                             type: "qna",
                             q: ["One"],
-                            a: "one"
+                            a: "One"
                         }
                     })
               
@@ -471,7 +471,7 @@ module.exports = {
             }).promise()
             console.log(response)
             sessionAttributes = response.sessionAttributes
-            test.equal(response.message, defaultResp)
+            test.equal(response.message, "There is no question to leave feedback on, please ask a question before attempting to leave feedback")
             await sleep(1000)
             response = await this.lex.postText({
                 sessionAttributes:sessionAttributes,
@@ -487,7 +487,7 @@ module.exports = {
             }).promise()
             console.log(response)
             sessionAttributes = response.sessionAttributes
-            test.ok(true, response.message.includes("One"))
+            test.ok(true, response.message.includes("What feedback would you like to leave for the question, \"One\" ?"))
             await sleep(1000)
             response = await this.lex.postText({
                 sessionAttributes:sessionAttributes,
@@ -495,7 +495,7 @@ module.exports = {
             }).promise()
             console.log(response)
             sessionAttributes = response.sessionAttributes
-            test.ok(true, response.message.includes("One"))
+            test.ok(true, response.message.includes("What feedback would you like to leave for the question, \"One\" ?"))
             await sleep(1000)
             response = await this.lex.postText({
                 sessionAttributes:sessionAttributes,
@@ -511,7 +511,7 @@ module.exports = {
             }).promise()
             console.log(response)
             sessionAttributes = response.sessionAttributes
-            test.ok(true, response.message.includes("One"))
+            test.ok(true, response.message.includes("What feedback would you like to leave for the question, \"One\" ?"))
             await sleep(1000)
             response = await this.lex.postText({
                 sessionAttributes:sessionAttributes,
