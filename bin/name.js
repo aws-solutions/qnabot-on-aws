@@ -29,34 +29,36 @@ if (require.main === module) {
 }
 
 function run(stack,options={}){
+    var namespace=options.namespace || config.namespace
     try {
         var increments=require('./.inc')
     } catch(e){
         var increments={}
     }
-    var full=[options.namespace].concat(stack.split('/')).filter(x=>x).join('-')
-    
+    var stackname=stack.replace('/','-')
+    var full=`${namespace}-${stackname}`
+    var path=`["${config.profile}"].["${namespace}"].["${stackname}"]`
+
     if(options.hasOwnProperty("set")){
         increment=options.set
-        increments[full]=increment
-        fs.writeFileSync(__dirname+'/.inc.json',JSON.stringify(increments))
+        set(increment)
     }else{
-        increment=increments[full] || 0
+        increment=_.get(increments,path,0)
     }
 
     if(options.inc){
-        increment++
-        increments[full]=increment
-        fs.writeFileSync(__dirname+'/.inc.json',JSON.stringify(increments))
+        set(++increment)
     }
+
     if(options.prefix){
-        return ['QNA',options.namespace || config.namespace]
-            .filter(x=>x)
-            .join('-') 
+        return `QNA-${full}`
     }else{
-        return ['QNA',options.namespace || config.namespace,full,increment]
-            .filter(x=>x)
-            .join('-') 
+        return `QNA-${full}-${increment}` 
+    }
+
+    function set(value){
+        _.set(increments,path,parseInt(value))
+        fs.writeFileSync(__dirname+'/.inc.json',JSON.stringify(increments,null,2))
     }
 }
 
