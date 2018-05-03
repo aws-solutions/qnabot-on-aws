@@ -336,7 +336,7 @@ module.exports = {
                 })
             var sessionAttributes = {}
             var response
-            await sleep(100)
+            await sleep(500)
             response = await this.lex.postText({
                 sessionAttributes:sessionAttributes,
                 inputText: "One"
@@ -344,7 +344,7 @@ module.exports = {
             console.log(response)
             sessionAttributes = response.sessionAttributes
             test.equal(response.message, "One")
-            await sleep(100)
+            await sleep(500)
             response = await this.lex.postText({
                 sessionAttributes:sessionAttributes,
                 inputText: "Two"
@@ -352,7 +352,7 @@ module.exports = {
             console.log(response)
             sessionAttributes = response.sessionAttributes
             test.equal(response.message, "Two")
-            await sleep(100)
+            await sleep(500)
             response = await this.lex.postText({
                 sessionAttributes:sessionAttributes,
                 inputText: "next"
@@ -360,7 +360,7 @@ module.exports = {
             console.log(response)
             sessionAttributes = response.sessionAttributes
             test.equal(response.message, "Three")
-            await sleep(100)
+            await sleep(500)
             response = await this.lex.postText({
                 sessionAttributes:sessionAttributes,
                 inputText: "previous"
@@ -368,7 +368,7 @@ module.exports = {
             console.log(response)
             sessionAttributes = response.sessionAttributes
             test.equal(response.message, "Two")
-            await sleep(100)
+            await sleep(500)
             response = await this.lex.postText({
                 sessionAttributes:sessionAttributes,
                 inputText: "End"
@@ -376,7 +376,7 @@ module.exports = {
             console.log(response)
             sessionAttributes = response.sessionAttributes
             test.equal(response.message, "End")
-            await sleep(100)
+            await sleep(500)
             response = await this.lex.postText({
                 sessionAttributes:sessionAttributes,
                 inputText: "next"
@@ -384,7 +384,7 @@ module.exports = {
             console.log(response)
             sessionAttributes = response.sessionAttributes
             test.equal(response.message, "Three")
-            await sleep(100)
+            await sleep(500)
             response = await this.lex.postText({
                 sessionAttributes:sessionAttributes,
                 inputText: "previous"
@@ -392,7 +392,7 @@ module.exports = {
             console.log(response)
             sessionAttributes = response.sessionAttributes
             test.equal(response.message, "Two")
-            await sleep(100)
+            await sleep(500)
             response = await this.lex.postText({
                 sessionAttributes:sessionAttributes,
                 inputText: "previous"
