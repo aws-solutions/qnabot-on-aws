@@ -52,6 +52,14 @@ module.exports={
             ]
         }
     },
+    "ClearFeedbackBucket":{
+        "Type": "Custom::S3Clear",
+        "DependsOn":["CFNInvokePolicy"],
+        "Properties": {
+            "ServiceToken": { "Fn::GetAtt" : ["CFNLambda", "Arn"] },
+            "Bucket":{"Ref":"QNAFeedbackBucket"}
+        }
+    },
     "FeedbackFirehoseESS3Role":{
         "Type": "AWS::IAM::Role",
         "Properties": {

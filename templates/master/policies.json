@@ -1,77 +1,4 @@
 {
-"CFNLambdaPolicy":{
-  "Type": "AWS::IAM::ManagedPolicy",
-  "Properties": {
-    "PolicyDocument": {
-      "Version": "2012-10-17",
-      "Statement": [{
-          "Effect": "Allow",
-          "Action": [
-            "es:*"
-          ],
-          "Resource":["*"]
-      },
-      {
-          "Effect": "Allow",
-          "Action": [
-            "lex:PutSlotType",
-            "lex:DeleteSlotType",
-            "lex:PutIntent",
-            "lex:DeleteIntent",
-            "lex:PutBot",
-            "lex:DeleteBot",
-            "lex:PutBotAlias",
-            "lex:DeleteBotAlias"
-          ],
-          "Resource": [
-            "*"
-          ]
-        },
-        {
-          "Effect": "Allow",
-          "Action": [   
-            "apigateway:*"
-          ],
-          "Resource": ["*"]
-        },
-        {
-          "Effect": "Allow",
-          "Action": [   
-            "cognito-identity:SetIdentityPoolRoles",
-            "cognito-identity:GetIdentityPoolRoles",
-            "iam:PassRole",
-            "iam:CreateServiceLinkedRole"
-          ],
-          "Resource": ["*"]
-        },
-        {
-          "Effect": "Allow",
-          "Action": [
-            "cognito-idp:UpdateUserPoolClient",
-            "cognito-idp:CreateUserPoolDomain",
-            "cognito-idp:DeleteUserPoolDomain",
-            "cognito-idp:SetUICustomization"
-          ],
-          "Resource": ["*"]
-        },
-        {
-          "Effect": "Allow",
-          "Action": [
-            "s3:*"
-          ],
-          "Resource":[
-            {"Fn::Sub":"arn:aws:s3:::${Bucket}*"},
-            {"Fn::Sub":"arn:aws:s3:::${BootstrapBucket}*"},
-            {"Fn::Sub":"arn:aws:s3:::${ImportBucket}*"},
-            {"Fn::Sub":"arn:aws:s3:::${ExportBucket}*"},
-            {"Fn::Sub":"arn:aws:s3:::${BuildStatusBucket}*"},
-            {"Fn::Sub":"arn:aws:s3:::${AssetBucket}*"}
-          ]
-        }
-      ]
-    }
-  }
-},
 "LexAccessPolicy":{
   "Type": "AWS::IAM::ManagedPolicy",
   "Properties": {
@@ -101,41 +28,6 @@
         [{"Ref":"AdminRole"},{"Ref":"UnauthenticatedRole"},{"Ref":"UserRole"}],
         [{"Ref":"AdminRole"},{"Ref":"UserRole"}]
     ]}
-  }
-},
-"AdminPolicy": {
-  "Type": "AWS::IAM::ManagedPolicy",
-  "Properties": {
-    "PolicyDocument": {
-      "Version": "2012-10-17",
-      "Statement": [{
-          "Effect": "Allow",
-          "Action": [   
-            "execute-api:*"
-          ],
-          "Resource": [{"Fn::Sub":
-            "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${API}/*/*/*"
-            }]
-        },{
-          "Effect": "Allow",
-          "Action": [   
-            "s3:PutObject"
-          ],
-          "Resource": [{"Fn::Sub":
-            "arn:aws:s3:::${ImportBucket}/data/*"
-            }]
-        },{
-          "Effect": "Allow",
-          "Action": [   
-            "s3:GetObject"
-          ],
-          "Resource": [{"Fn::Sub":
-            "arn:aws:s3:::${ExportBucket}/data/*"
-            }]
-        }
-      ]
-    },
-    "Roles":[{"Ref":"AdminRole"}]
   }
 },
 "ApiGatewayCloudWatchLogsRole": {

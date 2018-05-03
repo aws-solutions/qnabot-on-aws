@@ -20,7 +20,6 @@ module.exports={
     },
     "CFNVersion":{
         "Type": "Custom::S3Version",
-        "DependsOn":["CFNLambdaPolicy"],
         "Properties": {
             "ServiceToken": { "Fn::GetAtt" : ["VersionLambda", "Arn"] },
             "Bucket": {"Ref":"BootstrapBucket"},

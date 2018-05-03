@@ -34,7 +34,6 @@ module.exports={
     }),
     "LexBuildCodeVersion":{
         "Type": "Custom::S3Version",
-        "DependsOn":["CFNLambdaPolicy"],
         "Properties": {
             "ServiceToken": { "Fn::GetAtt" : ["CFNLambda", "Arn"] },
             "Bucket": {"Ref":"BootstrapBucket"},
@@ -125,7 +124,7 @@ module.exports={
     },
     "BuildStatusClear":{
         "Type": "Custom::S3Clear",
-        "DependsOn":["CFNLambdaPolicy","CFNInvokePolicy"],
+        "DependsOn":["CFNInvokePolicy"],
         "Properties": {
             "ServiceToken": { "Fn::GetAtt" : ["CFNLambda", "Arn"] },
             "Bucket":{"Ref":"BuildStatusBucket"}

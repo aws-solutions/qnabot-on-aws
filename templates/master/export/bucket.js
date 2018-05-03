@@ -27,7 +27,7 @@ module.exports={
     },
     "ExportClear":{
         "Type": "Custom::S3Clear",
-        "DependsOn":["CFNLambdaPolicy","CFNInvokePolicy"],
+        "DependsOn":["CFNInvokePolicy"],
         "Properties": {
             "ServiceToken": { "Fn::GetAtt" : ["CFNLambda", "Arn"] },
             "Bucket":{"Ref":"ExportBucket"}
@@ -35,7 +35,6 @@ module.exports={
     },
     "ExportTrigger":{
         "Type": "Custom::S3Lambda",
-        "DependsOn":["CFNLambdaPolicy"],
         "Properties": {
             "ServiceToken": { "Fn::GetAtt" : ["CFNLambda", "Arn"] },
             "Bucket":{"Ref":"ExportBucket"},
