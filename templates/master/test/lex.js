@@ -361,35 +361,35 @@ module.exports = {
             }).promise()
             console.log(response)
             sessionAttributes = response.sessionAttributes
-            test.equal(response.message, "Two")
-            response = await this.lex.postText({
-                sessionAttributes:sessionAttributes,
-                inputText: "End"
-            }).promise()
-            console.log(response)
-            sessionAttributes = response.sessionAttributes
-            test.equal(response.message, "End")
-            response = await this.lex.postText({
-                sessionAttributes:sessionAttributes,
-                inputText: "next"
-            }).promise()
-            console.log(response)
-            sessionAttributes = response.sessionAttributes
-            test.equal(response.message, "Three")
-            response = await this.lex.postText({
-                sessionAttributes:sessionAttributes,
-                inputText: "previous"
-            }).promise()
-            console.log(response)
-            sessionAttributes = response.sessionAttributes
-            test.equal(response.message, "Two")
-            response = await this.lex.postText({
-                sessionAttributes:sessionAttributes,
-                inputText: "previous"
-            }).promise()
-            console.log(response)
-            sessionAttributes = response.sessionAttributes
-            test.equal(response.message, "One")
+            // test.equal(response.message, "Two")
+            // response = await this.lex.postText({
+            //     sessionAttributes:sessionAttributes,
+            //     inputText: "End"
+            // }).promise()
+            // console.log(response)
+            // sessionAttributes = response.sessionAttributes
+            // test.equal(response.message, "End")
+            // response = await this.lex.postText({
+            //     sessionAttributes:sessionAttributes,
+            //     inputText: "next"
+            // }).promise()
+            // console.log(response)
+            // sessionAttributes = response.sessionAttributes
+            // test.equal(response.message, "Three")
+            // response = await this.lex.postText({
+            //     sessionAttributes:sessionAttributes,
+            //     inputText: "previous"
+            // }).promise()
+            // console.log(response)
+            // sessionAttributes = response.sessionAttributes
+            // test.equal(response.message, "Two")
+            // response = await this.lex.postText({
+            //     sessionAttributes:sessionAttributes,
+            //     inputText: "previous"
+            // }).promise()
+            // console.log(response)
+            // sessionAttributes = response.sessionAttributes
+            // test.equal(response.message, "One")
         }
         catch (e) {
             test.ifError(e)
