@@ -394,133 +394,134 @@ module.exports = {
             test.ifError(e)
         }
         finally {
-            await api({
-                    path: "questions/navigation.7",
-                    method: "DELETE"
-                })
-            await api({
-                    path: "questions/navigation.8",
-                    method: "DELETE"
-                })
-            await api({
-                    path: "questions/navigation.3",
-                    method: "DELETE"
-                })
-            await api({
-                    path: "questions/navigation.4",
-                    method: "DELETE"
-                })
-            await api({
-                    path: "questions/navigation.5",
-                    method: "DELETE"
-                })
-            await api({
-                    path: "questions/navigation.6",
-                    method: "DELETE"
-                })
+            // await api({
+            //         path: "questions/navigation.7",
+            //         method: "DELETE"
+            //     })
+            // await api({
+            //         path: "questions/navigation.8",
+            //         method: "DELETE"
+            //     })
+            // await api({
+            //         path: "questions/navigation.3",
+            //         method: "DELETE"
+            //     })
+            // await api({
+            //         path: "questions/navigation.4",
+            //         method: "DELETE"
+            //     })
+            // await api({
+            //         path: "questions/navigation.5",
+            //         method: "DELETE"
+            //     })
+            // await api({
+            //         path: "questions/navigation.6",
+            //         method: "DELETE"
+            //     })
             test.done()
         }
-    },
-    feedback1: async function(test) {
-        try {
-            var args = await outputs('dev/master')
-            var defaultResp = "unable to leave feedback"
-                await api({
-                        path: "questions/feedback.1",
-                        method: "PUT",
-                        body: {
-                            qid: "feedback.1",
-                            type: "qna",
-                            q: ["feedback"],
-                            a: defaultResp,
-                            l: args.FeedbackLambda
-                        }
-                    })
-                await  api({
-                        path: "questions/feedback.2",
-                        method: "PUT",
-                        body: {
-                            qid: "feedback.2",
-                            type: "qna",
-                            q: ["One"],
-                            a: "One"
-                        }
-                    })
+    }
+    //feedback tests
+    // feedback1: async function(test) {
+    //     try {
+    //         var args = await outputs('dev/master')
+    //         var defaultResp = "unable to leave feedback"
+    //             await api({
+    //                     path: "questions/feedback.1",
+    //                     method: "PUT",
+    //                     body: {
+    //                         qid: "feedback.1",
+    //                         type: "qna",
+    //                         q: ["feedback"],
+    //                         a: defaultResp,
+    //                         l: args.FeedbackLambda
+    //                     }
+    //                 })
+    //             await  api({
+    //                     path: "questions/feedback.2",
+    //                     method: "PUT",
+    //                     body: {
+    //                         qid: "feedback.2",
+    //                         type: "qna",
+    //                         q: ["One"],
+    //                         a: "One"
+    //                     }
+    //                 })
               
-            var sessionAttributes = {}
-            var response
-            response = await this.lex.postText({
-                sessionAttributes:sessionAttributes,
-                inputText: "feedback"
-            }).promise()
-            console.log(response)
-            sessionAttributes = response.sessionAttributes
-            test.equal(response.message, "There is no question to leave feedback on, please ask a question before attempting to leave feedback")
-            await sleep(2000)
-            response = await this.lex.postText({
-                sessionAttributes:sessionAttributes,
-                inputText: "One"
-            }).promise()
-            console.log(response)
-            sessionAttributes = response.sessionAttributes
-            test.equal(response.message, "One")
-            await sleep(2000)
-            response = await this.lex.postText({
-                sessionAttributes:sessionAttributes,
-                inputText: "feedback"
-            }).promise()
-            console.log(response)
-            sessionAttributes = response.sessionAttributes
-            test.ok(response.message.includes("What feedback would you like to leave for the question, \"One\" ?"))
-            await sleep(2000)
-            response = await this.lex.postText({
-                sessionAttributes:sessionAttributes,
-                inputText: "goodbye"
-            }).promise()
-            console.log(response)
-            sessionAttributes = response.sessionAttributes
-            test.ok(response.message.includes("What feedback would you like to leave for the question, \"One\" ?"))
-            await sleep(2000)
-            response = await this.lex.postText({
-                sessionAttributes:sessionAttributes,
-                inputText: "a"
-            }).promise()
-            console.log(response)
-            sessionAttributes = response.sessionAttributes
-            test.ok(response.message.includes("Thank you for leaving the feedback"))
-            await sleep(2000)
-            response = await this.lex.postText({
-                sessionAttributes:sessionAttributes,
-                inputText: "feedback"
-            }).promise()
-            console.log(response)
-            sessionAttributes = response.sessionAttributes
-            test.ok(response.message.includes("What feedback would you like to leave for the question, \"One\" ?"))
-            await sleep(2000)
-            response = await this.lex.postText({
-                sessionAttributes:sessionAttributes,
-                inputText: "E"
-            }).promise()
-            console.log(response)
-            sessionAttributes = response.sessionAttributes
-            test.ok(response.message.includes("Canceled Feedback"))
-            await sleep(2000)
-        }
-        catch (e) {
-            test.ifError(e)
-        }
-        finally {
-            await api({
-                    path: "questions/feedback.1",
-                    method: "DELETE"
-                })
-            await api({
-                    path: "questions/feedback.2",
-                    method: "DELETE"
-                })
+    //         var sessionAttributes = {}
+    //         var response
+    //         response = await this.lex.postText({
+    //             sessionAttributes:sessionAttributes,
+    //             inputText: "feedback"
+    //         }).promise()
+    //         console.log(response)
+    //         sessionAttributes = response.sessionAttributes
+    //         test.equal(response.message, "There is no question to leave feedback on, please ask a question before attempting to leave feedback")
+    //         await sleep(2000)
+    //         response = await this.lex.postText({
+    //             sessionAttributes:sessionAttributes,
+    //             inputText: "One"
+    //         }).promise()
+    //         console.log(response)
+    //         sessionAttributes = response.sessionAttributes
+    //         test.equal(response.message, "One")
+    //         await sleep(2000)
+    //         response = await this.lex.postText({
+    //             sessionAttributes:sessionAttributes,
+    //             inputText: "feedback"
+    //         }).promise()
+    //         console.log(response)
+    //         sessionAttributes = response.sessionAttributes
+    //         test.ok(response.message.includes("What feedback would you like to leave for the question, \"One\" ?"))
+    //         await sleep(2000)
+    //         response = await this.lex.postText({
+    //             sessionAttributes:sessionAttributes,
+    //             inputText: "goodbye"
+    //         }).promise()
+    //         console.log(response)
+    //         sessionAttributes = response.sessionAttributes
+    //         test.ok(response.message.includes("What feedback would you like to leave for the question, \"One\" ?"))
+    //         await sleep(2000)
+    //         response = await this.lex.postText({
+    //             sessionAttributes:sessionAttributes,
+    //             inputText: "a"
+    //         }).promise()
+    //         console.log(response)
+    //         sessionAttributes = response.sessionAttributes
+    //         test.ok(response.message.includes("Thank you for leaving the feedback"))
+    //         await sleep(2000)
+    //         response = await this.lex.postText({
+    //             sessionAttributes:sessionAttributes,
+    //             inputText: "feedback"
+    //         }).promise()
+    //         console.log(response)
+    //         sessionAttributes = response.sessionAttributes
+    //         test.ok(response.message.includes("What feedback would you like to leave for the question, \"One\" ?"))
+    //         await sleep(2000)
+    //         response = await this.lex.postText({
+    //             sessionAttributes:sessionAttributes,
+    //             inputText: "E"
+    //         }).promise()
+    //         console.log(response)
+    //         sessionAttributes = response.sessionAttributes
+    //         test.ok(response.message.includes("Canceled Feedback"))
+    //         await sleep(2000)
+    //     }
+    //     catch (e) {
+    //         test.ifError(e)
+    //     }
+    //     finally {
+    //         await api({
+    //                 path: "questions/feedback.1",
+    //                 method: "DELETE"
+    //             })
+    //         await api({
+    //                 path: "questions/feedback.2",
+    //                 method: "DELETE"
+    //             })
 
-            test.done()
-        }
+    //         test.done()
+    //     }
     }
     // // TriviaRefactored tests
     // ask: async function(test) {
