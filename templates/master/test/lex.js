@@ -296,7 +296,7 @@ module.exports = {
                             type: "qna",
                             q: ["One"],
                             a: "One",
-                            next: "questions/navigation.4"
+                            next: "navigation.4"
                         }
                     })
                 
@@ -308,7 +308,7 @@ module.exports = {
                         type: "qna",
                         q: ["Two"],
                         a: "Two",
-                        next: "questions/navigation.5"
+                        next: "navigation.5"
                     }
                 })
                 await api({
@@ -319,7 +319,7 @@ module.exports = {
                         type: "qna",
                         q: ["Three"],
                         a: "Three",
-                        next: "questions/navigation.6"
+                        next: "navigation.6"
                     }
                 })
                 await api({
@@ -395,30 +395,30 @@ module.exports = {
             test.ifError(e)
         }
         finally {
-            // await api({
-            //         path: "questions/navigation.7",
-            //         method: "DELETE"
-            //     })
-            // await api({
-            //         path: "questions/navigation.8",
-            //         method: "DELETE"
-            //     })
-            // await api({
-            //         path: "questions/navigation.3",
-            //         method: "DELETE"
-            //     })
-            // await api({
-            //         path: "questions/navigation.4",
-            //         method: "DELETE"
-            //     })
-            // await api({
-            //         path: "questions/navigation.5",
-            //         method: "DELETE"
-            //     })
-            // await api({
-            //         path: "questions/navigation.6",
-            //         method: "DELETE"
-            //     })
+            await api({
+                    path: "questions/navigation.7",
+                    method: "DELETE"
+                })
+            await api({
+                    path: "questions/navigation.8",
+                    method: "DELETE"
+                })
+            await api({
+                    path: "questions/navigation.3",
+                    method: "DELETE"
+                })
+            await api({
+                    path: "questions/navigation.4",
+                    method: "DELETE"
+                })
+            await api({
+                    path: "questions/navigation.5",
+                    method: "DELETE"
+                })
+            await api({
+                    path: "questions/navigation.6",
+                    method: "DELETE"
+                })
             test.done()
         }
     }
