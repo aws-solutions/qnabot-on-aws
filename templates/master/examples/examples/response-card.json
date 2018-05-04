@@ -1,0 +1,16 @@
+{
+    "qna": [
+        {
+            "qid": "aws.card.sagemaker",
+            "q": [
+                "What is sagemaker",
+                "how does sagemaker work"
+            ],
+            "a": "Sagemaker makes it possible to create,train, and deploy ML models",
+            "r":{
+                "title":"sagemaker",
+                "imageUrl":"{{photos}}/sagemaker.svg"
+            }
+        }
+    ] 
+}

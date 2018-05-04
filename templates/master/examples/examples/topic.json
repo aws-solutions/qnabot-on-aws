@@ -1,0 +1,40 @@
+{
+    "qna": [
+        {
+            "qid": "AWS.AmazonEC2.1",
+            "q": [
+                "tell me about Amazon EC2",
+                "what is Amazon EC2"
+            ],
+            "a": "Virtual Servers in the Cloud",
+            "t": "AmazonEC2"
+        },
+        {
+            "qid": "AWS.AmazonEC2.2",
+            "q": [
+                "how much does it cost",
+                "how much does ec2 cost"
+            ],
+            "a": "EC2 is billed by the second according to instance type.",
+            "t": "AmazonEC2"
+        },
+        {
+            "qid": "AWS.AWSLambda.1",
+            "q": [
+                "tell me about AWS Lambda",
+                "what is AWS Lambda"
+            ],
+            "a": "Run your Code in Response to Events",
+            "t": "AWSLambda"
+        },
+        {
+            "qid": "AWS.AWSLambda.2",
+            "q": [
+                "how much does it cost",
+                "how much does lambda cost"
+            ],
+            "a": "Lambda is bill by the ms accounding to memory size",
+            "t": "AWSLambda"
+        }      
+    ]
+}

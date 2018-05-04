@@ -1,0 +1,41 @@
+#set ( $root="https://${!context.apiId}.execute-api.${!stageVariables.Region}.amazonaws.com/${!context.stage}")
+
+{
+    "region":"${!stageVariables.Region}",
+    "BotName":"${LexBot}",
+    "PoolId":"${IdPool}",
+    "ClientIdClient":"${ClientClient}",
+    "ClientIdDesigner":"${ClientDesigner}",
+    "UserPool":"${UserPool}",
+    "Id":"$stageVariables.Id",
+    "_links":{
+        "root":{
+            "href":"$root"
+        },
+        "questions":{
+            "href":"$root/questions"
+        },
+        "bot":{
+            "href":"$root/bot"
+        },
+        "jobs":{
+            "href":"$root/jobs"
+        },
+        "examples":{
+            "href":"$root/examples/documents"
+        },
+        "DesignerLogin":{
+            "href":"$stageVariables.DesignerLoginUrl"
+        },
+        "ClientLogin":{
+            "href":"$stageVariables.ClientLoginUrl"
+        },
+        "CognitoEndpoint":{
+            "href":"$stageVariables.CognitoEndpoint"
+        },
+        "Services":{
+            "href":"$root/services"
+        }
+    }
+}
+

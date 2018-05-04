@@ -1,0 +1,9 @@
+#set ($errorMessageObj = $util.parseJson($input.path('$.errorMessage')))
+
+
+{
+    "type":$errorMessageObj.type,
+    "message":"$errorMessageObj.message",
+    "data":"$errorMessageObj.data"
+}
+

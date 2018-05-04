@@ -1,0 +1,8 @@
+#set($inputRoot = $input.path('$'))
+#set($utterances = $inputRoot.enumerationValues)
+[
+#foreach( $utterance in $utterances)
+    "$utterance.value" #if( $foreach.hasNext ),#end
+#end
+]
+

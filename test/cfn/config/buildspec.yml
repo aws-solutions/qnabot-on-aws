@@ -1,0 +1,19 @@
+version: 0.2
+
+phases:
+  install:
+    commands:
+      - npm install
+  pre_build:
+    commands:
+      - ./test/configure.sh
+      - ./test/setup.sh
+  build:
+    commands:
+      - ./test/test.sh
+  post_build:
+    commands:
+      - ./test/teardown.js
+artifacts:
+  files:
+    - ./test/output/**/*

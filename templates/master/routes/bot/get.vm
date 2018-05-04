@@ -1,0 +1,9 @@
+{
+    "fnc":"getBot",
+    "params":{
+        "name":"${LexBot}",
+        "versionOrAlias":"\$LATEST"
+    }
+}                
+               
+

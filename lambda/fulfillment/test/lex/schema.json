@@ -1,0 +1,32 @@
+{
+"type":"object",
+"properties":{
+    "sessionAttributes":{
+        "type":"object"
+    },
+    "dialogAction":{
+        "type":"object",
+        "properties":{
+            "type":{
+                "type":"string",
+                "enum":["Close"]
+            },
+            "fulfillmentState":{
+                "type":"string",
+                "enum":["Fulfilled","Failed"]
+            },
+            "message":{
+                "type":"object",
+                "properties":{
+                    "contentType":{"type":"string"},
+                    "content":{"type":"string"}
+                }
+            },
+            "responseCard":{
+                "type":"object" 
+            }
+        }
+    }
+
+}
+}

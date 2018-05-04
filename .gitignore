@@ -58,4 +58,5 @@ typings/
 # dotenv environment variables file
 .env
 
-
+build
+config.json
