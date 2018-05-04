@@ -5,7 +5,7 @@
       "a": "Unable to leave feedback at the moment...",
       "r": {},
       "type": "qna",
-      "l": "{{FeedbackPY}}",
+      "l": "QNA:ExamplePYTHONLambdaFeedback",
       "q": [
         "Feedback",
         "That is wrong",

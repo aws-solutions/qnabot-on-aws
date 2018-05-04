@@ -9,6 +9,33 @@ module.exports={
             "BuildDate":(new Date()).toISOString()
         }
     },
+    "UtteranceLambda": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Code": {
+            "S3Bucket": {"Ref":"BootstrapBucket"},
+            "S3Key": {"Fn::Sub":"${BootstrapPrefix}/lambda/proxy-es.zip"},
+            "S3ObjectVersion":{"Ref":"ESProxyCodeVersion"}
+        },
+        "Environment": {
+          "Variables": {
+            ES_INDEX:{"Fn::GetAtt":["Var","index"]},
+            ES_ADDRESS:{"Fn::GetAtt":["ESVar","ESAddress"]},
+            UTTERANCE_BUCKET:{"Ref":"AssetBucket"},
+            UTTERANCE_KEY:"default-utterances.json",
+          }
+        },
+        "Handler": "index.utterances",
+        "MemorySize": "1408",
+        "Role": {"Fn::GetAtt": ["ESProxyLambdaRole","Arn"]},
+        "Runtime": "nodejs8.10",
+        "Timeout": 300,
+        "Tags":[{
+            Key:"Type",
+            Value:"Service"
+        }]
+      }
+    },
     "ESQidLambda": {
       "Type": "AWS::Lambda::Function",
       "Properties": {
@@ -26,7 +53,7 @@ module.exports={
         "Handler": "index.qid",
         "MemorySize": "1408",
         "Role": {"Fn::GetAtt": ["ESProxyLambdaRole","Arn"]},
-        "Runtime": "nodejs6.10",
+        "Runtime": "nodejs8.10",
         "Timeout": 300,
         "Tags":[{
             Key:"Type",
@@ -50,7 +77,7 @@ module.exports={
         "Handler": "index.logging",
         "MemorySize": "1408",
         "Role": {"Fn::GetAtt": ["ESLoggingLambdaRole","Arn"]},
-        "Runtime": "nodejs6.10",
+        "Runtime": "nodejs8.10",
         "Timeout": 300,
         "Tags":[{
             Key:"Type",
@@ -75,7 +102,7 @@ module.exports={
         "Handler": "index.query",
         "MemorySize": "1408",
         "Role": {"Fn::GetAtt": ["ESProxyLambdaRole","Arn"]},
-        "Runtime": "nodejs6.10",
+        "Runtime": "nodejs8.10",
         "Timeout": 300,
         "Tags":[{
             Key:"Type",
@@ -101,7 +128,7 @@ module.exports={
         "Handler": "index.handler",
         "MemorySize": "1408",
         "Role": {"Fn::GetAtt": ["ESProxyLambdaRole","Arn"]},
-        "Runtime": "nodejs6.10",
+        "Runtime": "nodejs8.10",
         "Timeout": 300,
         "Tags":[{
             Key:"Type",
@@ -193,6 +220,13 @@ module.exports={
                 "es:*"
               ],
               "Resource":["*"]
+            },
+            {
+                "Effect": "Allow",
+                "Action": ["s3:Get*"],
+                "Resource":[
+                    {"Fn::Sub":"arn:aws:s3:::${AssetBucket}*"}
+                ]
             }
           ]
         }

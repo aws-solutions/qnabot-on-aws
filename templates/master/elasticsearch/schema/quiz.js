@@ -54,8 +54,8 @@ module.exports={
                             maxLength:140
                         },
                         end:{
-                            title:"End quiz Response",
-                            description:"Response that will be returned to the user end the end of the quiz",
+                            title:"End Quiz Response",
+                            description:"The response that will be returned to the user end the end of the quiz if this is the last question",
                             type:"string",
                             maxLength:140
                         }

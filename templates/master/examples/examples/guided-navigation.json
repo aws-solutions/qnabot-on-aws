@@ -10,7 +10,7 @@
         "url": ""
       },
       "type": "qna",
-      "l": "{{PreviousPY}}",
+      "l": "QNA:ExamplePYTHONLambdaPrevious",
       "q": [
         "Previous Room",
         "Previous",
@@ -27,7 +27,7 @@
         "url": ""
       },
       "type": "qna",
-      "l": "{{NextPY}}",
+      "l": "QNA:ExamplePYTHONLambdaNext",
       "q": [
         "Next Room",
         "Next",

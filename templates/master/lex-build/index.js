@@ -8,10 +8,10 @@ module.exports={
         "S3ObjectVersion":{"Ref":"LexBuildCodeVersion"}
     },{
         UTTERANCE_BUCKET:{"Ref":"AssetBucket"},
+        UTTERANCE_KEY:"default-utterances.json",
         POLL_LAMBDA:{"Fn::GetAtt":["LexBuildLambdaPoll","Arn"]},
         STATUS_BUCKET:{"Ref":"BuildStatusBucket"},
         STATUS_KEY:"status.json",
-        UTTERANCE_KEY:"default-utterances.json",
         BOTNAME:{"Ref":"LexBot"},
         SLOTTYPE:{"Ref":"SlotType"},
         INTENT:{"Ref":"Intent"},

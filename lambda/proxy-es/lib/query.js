@@ -4,9 +4,7 @@ var bodybuilder = require('bodybuilder')
 var aws=require('aws-sdk')
 var url=require('url')
 var _=require('lodash')
-var myCredentials = new aws.EnvironmentCredentials('AWS'); 
 var request=require('./request')
-var markdown=require('markdown').markdown
 
 module.exports=function(req,res){
     console.log(JSON.stringify({req,res},null,2))

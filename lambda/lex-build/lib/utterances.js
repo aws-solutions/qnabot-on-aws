@@ -57,8 +57,6 @@ module.exports=function(params){
     }).promise().tap(console.log).then(x=>JSON.parse(x.Body.toString()))
 
     return Promise.join(es_utterances,s3_utterances)
-    .then(utterances=>_.compact(
-        _.uniqBy(_.flatten(utterances),x=>x.toUpperCase())
-    ))
+    .then(utterances=>_.compact(_.uniq(_.flatten(utterances))))
 }
 

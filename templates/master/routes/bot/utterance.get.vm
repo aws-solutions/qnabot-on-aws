@@ -1,9 +1,6 @@
 {
-    "fnc":"getSlotType",
-    "params":{
-        "name":"${SlotType}",
-        "version":"\$LATEST"
-    }
+    "name":"${SlotType}",
+    "version":"\$LATEST"
 }                
                
 
