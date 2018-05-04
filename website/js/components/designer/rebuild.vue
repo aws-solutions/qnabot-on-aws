@@ -65,6 +65,7 @@ module.exports={
       this.loading=true
       this.snackbar=true 
       this.success=false
+      this.error=false
       this.$store.dispatch('data/build')
       .then(function(){
         self.success=true
