@@ -88,6 +88,8 @@ def updateResult(event, response):
                     event["res"]["card"]["text"] = card["text"]
                 except:
                     event["res"]["card"]["text"] = ""
+                if 'subTitle' in card:
+                    event["res"]["card"]["subTitle"] = card["subTitle"]
                 if 'imageUrl' in card:
                     event["res"]["card"]["imageUrl"] = card["imageUrl"]
     if 't' in response:
