@@ -1,4 +1,7 @@
 ## [2.0]
+### fixed
+- QnABot is now a single template
+
 ### added
 - new ui based on vuetify
 - topic memory
@@ -7,6 +10,7 @@
 - Cognito Hosted Login for Admin Screen
 - Improved Importing
 - Backups to s3
+- Better deployment scripts using namespaces and AWS CLI Profiles.
 
 ### removed
 - link parsing
