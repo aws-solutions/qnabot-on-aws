@@ -34,7 +34,8 @@ now edit config.json with you information.
 | param | description | 
 |-------|-------------|
 |region | the AWS region to launch stacks in |
-|profile| the AWS credentials profile to use |
+|profile| the AWS credential profile to use |
+|namespace| a logical name space to run your templates in such as dev, test and/or prod |
 |devEmail(required) | the email to use when creating admin users in automated stack launches |
 
 Next, use the following command to launch a CloudFormation template to create the S3 bucket to be used for lambda code and CloudFormation templates. Wait for this template to complete (you can watch progress from the command line or [AWS CloudFormation console](https://console.AWS.amazon.com/cloudformation/home))  
@@ -51,12 +52,9 @@ npm run up
 ### CloudFormation Templates
 The CloudFormation test templates are in the templates/test folder. The current templates are:
 
-1. Master and Public: these are the top level templates
-2. domain: creates and initializes the ElasticSearch cluster
-3. lex: create the Lex bot
-4. api: creates the ApiGateway and Cognito UserPool needed for the Designer/Client Ui
-5. dashboard: Creates an AWS CloudWatch dashboard to monitor the resources in the templates. 
-6. various templates in /templates/dev: needed for local testing of the lambda functions. 
+1. Master: the template contains all the resources for QnABot.
+2. Public: this is a version of the Master template with less parameters, less outputs, and the bootstrap bucket hardcoded to the publicBucket in config.json
+3. various templates in /templates/dev: needed for local testing of the lambda functions. 
 
 Run a template test with:
 ```shell
