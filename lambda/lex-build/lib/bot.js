@@ -20,7 +20,7 @@ var Intent=require('./intent')
 var _=require('lodash')
 var run=require('./run')
 
-module.exports=function(version,data){
+module.exports=async function(version,data){
     data.intents[0].intentVersion=version
     delete data.status
     delete data.failureReason
@@ -28,13 +28,36 @@ module.exports=function(version,data){
     delete data.createdDate
     delete data.version
 
-    return run('putBot',data).get('checksum')
-    .then(function(checksum){
-        return run('createBotVersion',{
-            name:data.name,
-            checksum
-        })
+    var bot=await run('putBot',data)
+    var checksum=bot.checksum
+    
+    var result=await run('createBotVersion',{
+        name:data.name,
+        checksum
     })
-    .get('version')
+    var new_version=result.version
+
+    await new Promise(function(res,rej){
+        next(100)
+
+        async function next(count){
+            var tmp=await run("getBot",{
+                name:data.name,
+                versionOrAlias:new_version
+            })
+            if(count===0){
+                throw "build timeout"
+            }else if(tmp.status==="READY"){
+                res() 
+            }else if(tmp.status==="BUILDING"){
+                await Promise.delay(5000)
+                next(--count)
+            }else{
+                throw tmp
+            }
+        }
+    })
+
+    return new_version 
 }
 

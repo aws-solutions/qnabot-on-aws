@@ -19,6 +19,7 @@ var run=require('./run')
 var getUtterances=require('./utterances')
 var Slot=require('./slot')
 var Intent=require('./intent')
+var Alias=require('./alias')
 var Bot=require('./bot')
 var clean=require('./delete')
 var status=require('./status')
@@ -48,19 +49,23 @@ module.exports=function(params){
 
         .tap(()=>status("Rebuilding Intent"))
         .then(slot_version=>{
-            clean_slottype=()=>clean.intent(process.env.INTENT,slot_version)
+            clean_intent=()=>clean.intent(process.env.INTENT,slot_version)
             return Promise.join(slot_version,intent)
         })
         .spread(Intent)
 
         .tap(()=>status("Rebuild Bot"))
         .then(intent_version=>{
-            clean_intent=()=>clean.slot(process.env.SLOTTYPE,version)
+            clean_slot=()=>clean.slot(process.env.SLOTTYPE,version)
             return Promise.join(intent_version,bot)
         })
         .spread(Bot)
+        .tap(version=>Alias(version,{
+            botName:process.env.BOTNAME,
+            name:process.env.BOTALIAS
+        }))
         .delay(1000)
-        .then(()=>wait())
+        .tap(()=>wait())
         .then(version=>clean.bot(process.env.BOTNAME,version))
         .then(clean_intent)
         .then(clean_slottype)

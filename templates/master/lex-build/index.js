@@ -13,6 +13,7 @@ module.exports={
         STATUS_BUCKET:{"Ref":"BuildStatusBucket"},
         STATUS_KEY:"status.json",
         BOTNAME:{"Ref":"LexBot"},
+        BOTALIAS:{"Ref":"Alias"},
         SLOTTYPE:{"Ref":"SlotType"},
         INTENT:{"Ref":"Intent"},
         ADDRESS:{"Fn::GetAtt":["ESVar","ESAddress"]},

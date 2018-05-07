@@ -3,6 +3,7 @@
 {
     "region":"${!stageVariables.Region}",
     "BotName":"${LexBot}",
+    "BotVersion":"${Alias}",
     "PoolId":"${IdPool}",
     "ClientIdClient":"${ClientClient}",
     "ClientIdDesigner":"${ClientDesigner}",
