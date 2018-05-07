@@ -34,7 +34,11 @@ def handler(event, context):
         currentQid = event["req"]["question"].upper()
     try:
         #get the Question ID (qid) of the previous document that was returned to the web client 
-        stringToJson = json.loads(event["req"]["_event"]["sessionAttributes"]["previous"])
+        if "sessionAttributes" in event["req"]["_event"]:
+            stringToJson = json.loads(event["req"]["_event"]["sessionAttributes"]["previous"])
+        #for Alexa
+        else:
+            stringToJson = json.loads(event["req"]["_event"]["session"]["attributes"]["previous"])
         previousQid = stringToJson["qid"]
         previousQuestion = stringToJson["q"]
         previousAnswer = stringToJson["a"]
