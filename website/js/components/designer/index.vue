@@ -168,9 +168,18 @@ module.exports={
         return this.get(this.pagination)
       }
     },
-    pagination:function(event){
-      return this.get(event)      
-    }
+    "pagination.page":function(event){
+      return this.get(this.pagination)      
+    },
+    "pagination.descending":function(event){
+      return this.get(this.pagination)      
+    },
+    "pagination.rowsPerPage":function(event){
+      return this.get(this.pagination)      
+    },
+    "pagination.sortBy":function(event){
+      return this.get(this.pagination)  
+		}
   },
   methods:{
     get:_.debounce(function(event){
