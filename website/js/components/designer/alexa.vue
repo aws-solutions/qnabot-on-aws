@@ -65,9 +65,11 @@ module.exports={
     open:function(){
       this.dialog=true
     },
-    copy:function(){
+    copy:async function(){
       this.loading=true
-      setTimeout(()=>this.loading=false,1000)
+      await this.$store.dispatch('data/botinfo')
+      await this.$copyText(this.text).catch(console.log)
+      this.loading=false
     }
   }
 }
