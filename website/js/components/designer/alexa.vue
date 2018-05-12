@@ -8,8 +8,13 @@
         p You only need to update the schema of your alexa skill.
       v-card-actions
         v-btn( :loading="loading"
-          v-clipboard:copy="text"
+          v-if="!ready" 
+          @click="download"
+        ) download Schema
+        v-btn( :loading="loading"
+          v-if="ready"
           @click="copy"
+          v-clipboard:copy="text"
         ) Copy Schema
         input(style="display:none"
           type="text"
@@ -38,22 +43,22 @@ License for the specific language governing permissions and limitations under th
 var Vuex=require('vuex')
 var Promise=require('bluebird')
 var _=require('lodash')
+var Promise=require('bluebird')
 
 module.exports={
   data:function(){
     var self=this
     return {
       dialog:false,
-      loading:false
+      loading:false,
+      text:false,
+      ready:false
     }
   },
   components:{
   },
   computed:{
-    text:function(){
-      console.log(this.$store.state.bot)
-      return JSON.stringify(this.$store.state.bot.alexa,null,2)
-    }
+    
   },
   created:function(){
     this.$store.dispatch('data/botinfo').catch(()=>null) 
@@ -65,10 +70,17 @@ module.exports={
     open:function(){
       this.dialog=true
     },
-    copy:async function(){
+    download:async function(){
       this.loading=true
       await this.$store.dispatch('data/botinfo')
-      await this.$copyText(this.text).catch(console.log)
+      this.text=JSON.stringify(this.$store.state.bot.alexa,null,2)
+      this.ready=true
+      this.loading=false
+    },
+    copy:async function(){
+      this.loading=true
+      await Promise.delay(1000)
+      this.ready=false
       this.loading=false
     }
   }
