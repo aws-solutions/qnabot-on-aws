@@ -29,6 +29,23 @@ module.exports=Object.assign(
     _.fromPairs(js.map(x=>[x.name,x.resource])),
     _.fromPairs(py.map(x=>[x.name,x.resource])),
     {
+    "InvokePolicy": {
+      "Type": "AWS::IAM::ManagedPolicy",
+      "Properties": {
+        "PolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [{
+              "Effect": "Allow",
+              "Action": [
+                "lambda:InvokeFunction"
+              ],
+              "Resource":js.concat(py)
+                .map(x=>{ return {"Fn::GetAtt":[x.name,"Arn"]}})
+            }]
+        },
+        "Roles": [{"Ref": "FulfillmentLambdaRole"}]
+      }
+    },
     "QuizKey":{
         "Type" : "AWS::KMS::Key",
         "Properties":{
@@ -59,30 +76,27 @@ module.exports=Object.assign(
         }
     },
     "LambdaHookExamples":{
-        "Condition":"BuildExamples",
         "Type": "Custom::QnABotExamples",
         "Properties": Object.assign(
             _.fromPairs(js.map(x=>[x.id,{"Ref":x.name}])),
             _.fromPairs(py.map(x=>[x.id,{"Ref":x.name}]))
         ,{
             "ServiceToken": { "Fn::GetAtt" : ["ExampleWriteLambda", "Arn"] },
-            "photos":{"Fn::Sub":"${ApiUrl.Name}/examples/photos"},
+            "photos":{"Fn::Sub":"${ApiUrlName}/examples/photos"},
             "Bucket": {"Ref":"AssetBucket"},
             "version":{"Ref":"ExampleCodeVersion"}
         })
     },
     "ExampleCodeVersion":{
-        "Condition":"BuildExamples",
         "Type": "Custom::S3Version",
         "Properties": {
-            "ServiceToken": { "Fn::GetAtt" : ["CFNLambda", "Arn"] },
+            "ServiceToken": {"Ref":"CFNLambda"},
             "Bucket": {"Ref":"BootstrapBucket"},
             "Key": {"Fn::Sub":"${BootstrapPrefix}/lambda/examples.zip"},
             "BuildDate":(new Date()).toISOString()
         }
     },
     "ExampleWriteLambda":{
-      "Condition":"BuildExamples",
       "Type": "AWS::Lambda::Function",
       "Properties": {
         "Code": {
@@ -95,7 +109,7 @@ module.exports=Object.assign(
         },
         "Handler": "cfn.handler",
         "MemorySize": "128",
-        "Role": {"Fn::GetAtt": ["CFNLambdaRole","Arn"]},
+        "Role":{"Ref":"CFNLambdaRole"} ,
         "Runtime": "nodejs6.10",
         "Timeout": 300,
         "Tags":[{
@@ -106,7 +120,6 @@ module.exports=Object.assign(
     },
     "ExampleLambdaRole":{
       "Type": "AWS::IAM::Role",
-      "Condition":"BuildExamples",
       "Properties": {
         "AssumeRolePolicyDocument": {
           "Version": "2012-10-17",
@@ -151,7 +164,7 @@ module.exports=Object.assign(
                     "firehose:PutRecordBatch"
                   ],
                   "Resource": [
-                    {"Fn::GetAtt" : ["FeedbackFirehose", "Arn"]}
+                    {"Ref":"FeedbackFirehose"}
                   ]
                 }
             ]
@@ -165,7 +178,6 @@ module.exports=Object.assign(
 function jslambda(name){
     return {
       "Type": "AWS::Lambda::Function",
-      "Condition":"BuildExamples",
       "Properties": {
         "Code": {
             "S3Bucket": {"Ref":"BootstrapBucket"},
@@ -177,15 +189,14 @@ function jslambda(name){
         },
         "Environment": {
           "Variables": {
-            "ES_QNA_TYPE": {"Fn::GetAtt":["Var","QnAType"]},
-            "ES_QUIZE_TYPE": {"Fn::GetAtt":["Var","QuizType"]},
-            "ES_INDEX": {"Fn::GetAtt":["Var","index"]},
+            "ES_QNA_TYPE": {"Ref":"QnAType"},
+            "ES_QUIZE_TYPE": {"Ref":"QuizType"},
+            "ES_INDEX": {"Ref":"Index"},
             "FIREHOSE_NAME":{"Ref":"FeedbackFirehose"},
-            "ES_ADDRESS": {"Fn::GetAtt":["ESVar","ESAddress"]},
+            "ES_ADDRESS": {"Ref":"ESAddress"},
             "QUIZ_KMS_KEY":{"Ref":"QuizKey"}
           }
         },
-        "FunctionName":{"Fn::Sub":`qna-\${AWS::StackName}-${name}-JS`},
         "Handler":`js/${name}.handler`,
         "MemorySize": "128",
         "Role": {"Fn::GetAtt": ["ExampleLambdaRole","Arn"]},
@@ -201,7 +212,6 @@ function jslambda(name){
 function pylambda(name){
     return {
       "Type": "AWS::Lambda::Function",
-      "Condition":"BuildExamples",
       "Properties": {
         "Code": {
             "S3Bucket": {"Ref":"BootstrapBucket"},
@@ -213,14 +223,14 @@ function pylambda(name){
         },
         "Environment": {
           "Variables": {
-            "ES_QNA_TYPE": {"Fn::GetAtt":["Var","QnAType"]},
-            "ES_QUIZE_TYPE": {"Fn::GetAtt":["Var","QuizType"]},
-            "ES_INDEX": {"Fn::GetAtt":["Var","index"]},
+            "ES_QNA_TYPE": {"Ref":"QnAType"},
+            "ES_QUIZE_TYPE": {"Ref":"QuizType"},
+            "ES_INDEX": {"Ref":"Index"},
             "FIREHOSE_NAME":{"Ref":"FeedbackFirehose"},
-            "ES_ADDRESS": {"Fn::GetAtt":["ESVar","ESAddress"]},
+            "ES_ADDRESS": {"Ref":"ESAddress"},
+            "QUIZ_KMS_KEY":{"Ref":"QuizKey"}
           }
         },
-        "FunctionName":{"Fn::Sub":`qna-\${AWS::StackName}-${name}-PY`},
         "Handler":`py/${name}.handler`,
         "MemorySize": "128",
         "Role": {"Fn::GetAtt": ["ExampleLambdaRole","Arn"]},

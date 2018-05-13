@@ -104,18 +104,6 @@ module.exports={
     },
     "ElasticsearchIndex":{
       "Value":{"Fn::GetAtt":["Var","index"]}
-    },
-    "NextLambda":{
-      "Value":{"Fn::GetAtt":["ExamplePYTHONLambdaNext","Arn"]}
-    },
-    "PreviousLambda":{
-      "Value":{"Fn::GetAtt":["ExamplePYTHONLambdaPrevious", "Arn"]}
-    },
-    "FeedbackLambda":{
-      "Value":{"Fn::GetAtt":["ExamplePYTHONLambdaFeedback", "Arn"]}
-    },
-    "QuizLambda":{
-      "Value":{"Fn::GetAtt":["ExampleJSLambdaQuiz", "Arn"]}
     }
   },
   "Parameters": {
