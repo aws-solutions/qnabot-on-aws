@@ -94,7 +94,7 @@ module.exports={
             "ServiceToken": { "Fn::GetAtt" : ["CFNLambda", "Arn"] },
             "IdentityPoolId":{"Ref":"IdPool"},
             "Roles":{
-                "authenticated":{"Fn::GetAtt":["UserRole","Arn"]},
+                "authenticated":{"Fn::GetAtt":["AdminRole","Arn"]},
                 "unauthenticated":{"Fn::GetAtt":["UnauthenticatedRole","Arn"]} 
             },
             "RoleMappings":[{
