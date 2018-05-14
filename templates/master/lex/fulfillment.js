@@ -71,6 +71,7 @@ module.exports={
                 {"Fn::GetAtt":["ESQueryLambda","Arn"]},
                 {"Fn::GetAtt":["ESQidLambda","Arn"]},
                 {"Fn::GetAtt":["ESProxyLambda","Arn"]},
+                {"Fn::GetAtt":["ESLoggingLambda","Arn"]}
               ]
             }]
         },
