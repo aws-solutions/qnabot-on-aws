@@ -47,7 +47,7 @@ async function run(stack,options={}){
         .reverse().join('-').split('.')[0]
     
     var template=await fs.readFileSync(options.file || `${__dirname}/../build/templates/${stack}.json`,'utf8')
-
+    console.log('resources: '+Object.keys(JSON.parse(template).Resources).length)
     if(Buffer.byteLength(template)>51200){
         var exp=await bootstrap()
         var Bucket=exp.Bucket

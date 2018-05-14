@@ -9,12 +9,22 @@ zip.file('Dockerfile',fs.readFileSync(__dirname+'/Dockerfile','utf-8'))
 
 var tag="test"
 var source="source.zip"
-module.exports=Promise.join(
-    Promise.resolve(zip.generateAsync({type:'nodebuffer'})),
-    child.execAsync('git rev-parse --abbrev-ref HEAD',{
+async function run(){
+    var buff=await Promise.resolve(zip.generateAsync({type:'nodebuffer'}))
+    var info=await child.execAsync('git rev-parse --symbolic-full-name --abbrev-ref @{u}',{
         cwd:__dirname
-    }).then(x=>x.trim())
-).spread(function(buff,branch){
+    })
+    var info_parse=info.match(/(.*)\/(.*)/)
+    var remote=info_parse[1]
+    var branch=info_parse[2]
+
+    var remote_info=await child.execAsync(`git remote get-url ${remote}`,{
+        cwd:__dirname
+    })
+
+    var path=remote_info.match(/(.*):(.*)/)[2]
+    var url=`https://github.com/${path}`
+
     return {
        "Description": "This template creates test infastructure for testing QnABot",
        "Resources":{
@@ -54,7 +64,7 @@ module.exports=Promise.join(
                 ServiceRole:{"Ref":"TestServiceRole"},
                 Source:{
                     Type:"GITHUB",
-                    Location:package.repository.url,
+                    Location:url,
                     Auth:{
                         Type:"OAUTH"
                     }
@@ -295,7 +305,9 @@ module.exports=Promise.join(
             }
        }
     }
-})
+}
+run()
+module.exports=run()
 
 
 function lambda(name){

@@ -56,7 +56,8 @@ module.exports={
         "Client":{"Fn::Join": ["",[
             {"Fn::GetAtt":["ApiUrl","Name"]},
             "/static/client.html"
-        ]]}
+        ]]},
+        "Kibana":{"Fn::Sub":"${ESVar.ESAddress}/_plugin/kibana/"}
     }
 }
 }

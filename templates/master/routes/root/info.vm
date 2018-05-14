@@ -36,6 +36,9 @@
         },
         "Services":{
             "href":"$root/services"
+        },
+        "Kibana":{
+            "href":"https://${Urls.Kibana}"
         }
     }
 }

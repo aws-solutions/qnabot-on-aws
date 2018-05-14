@@ -4,7 +4,7 @@ DST=../../build/templates/$(NAME).json
 LAMBDA_DST=../../build/lambda
 .PHONY: $(LAMBDA_DST)/examples.zip lambda
 
-$(DST):./* ./routes/* ./routes/*/* ./signup/* ./cognito/style/* lambda 
+$(DST):./* $(LAMBDA_DST)/examples.zip
 	 $(BUILD) --stack $(NAME) --verbose && $(BUILD) --stack public --verbose
 
 ../../build/assets.zip:../../assets/*
@@ -13,4 +13,5 @@ $(DST):./* ./routes/* ./routes/*/* ./signup/* ./cognito/style/* lambda
 lambda:
 	make -C ../../lambda
 
-
+$(LAMBDA_DST)/examples.zip:./examples/**
+	make -C ./examples

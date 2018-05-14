@@ -222,7 +222,7 @@ module.exports = {
                         type: "qna",
                         q: ["next"],
                         a: "no next room",
-                        l: args.NextLambda
+                        l: "QNA:ExamplePYTHONNextLambda"
                     }
                 })
             await  api({
@@ -233,7 +233,7 @@ module.exports = {
                         type: "qna",
                         q: ["previous"],
                         a: "no previous room",
-                        l: args.PreviousLambda
+                        l: "QNA:ExamplePYTHONPreviousLambda"
                     }
                 })
             var sessionAttributes = {}
@@ -281,7 +281,7 @@ module.exports = {
                             type: "qna",
                             q: ["Next"],
                             a: "no next room",
-                            l: args.NextLambda
+                            l: "QNA:ExamplePYTHONNextLambda"
                         }
                     })
                 await  api({
@@ -292,7 +292,7 @@ module.exports = {
                             type: "qna",
                             q: ["Previous"],
                             a: "no previous room",
-                            l: args.PreviousLambda
+                            l: "QNA:ExamplePYTHONPreviousLambda"
                         }
                     })
                await api({
@@ -434,7 +434,7 @@ module.exports = {
                             type: "qna",
                             q: ["feedback"],
                             a: defaultResp,
-                            l: args.FeedbackLambda
+                            l: "QNA:ExamplePYTHONFeedbackLambda"
                         }
                     })
                 await  api({
