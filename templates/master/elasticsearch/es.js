@@ -41,12 +41,13 @@ module.exports={
     },
     "ElasticsearchDomainUpdate": {
          "Type": "Custom::ElasticSearchUpdate",
+         "DependsOn":["CognitoDomain"],
          "Properties":{
             "ServiceToken": { "Fn::GetAtt" : ["CFNLambda", "Arn"] },
             "DomainName":{"Fn::GetAtt":["ESVar","ESDomain"]},
             "CognitoOptions":{
                 Enabled: true ,
-                IdentityPoolId: {"Ref":"IdPool"},
+                IdentityPoolId: {"Ref":"KibanaIdPool"},
                 RoleArn:{"Fn::GetAtt":["ESCognitoRole","Arn"]},
                 UserPoolId: {"Ref":"UserPool"}
             }

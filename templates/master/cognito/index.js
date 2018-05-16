@@ -74,7 +74,7 @@ module.exports={
     "IdPool": {
       "Type": "AWS::Cognito::IdentityPool",
       "Properties": {
-        "IdentityPoolName": "UserPool",
+        "IdentityPoolName": "QnabotUserPool",
         "AllowUnauthenticatedIdentities": true,
         "CognitoIdentityProviders": [{
             "ClientId": {"Ref": "ClientDesigner"},
@@ -88,13 +88,43 @@ module.exports={
         ]
       }
     },
+    "KibanaIdPool": {
+      "Type": "AWS::Cognito::IdentityPool",
+      "Properties": {
+        "IdentityPoolName": "QnABotUserPool",
+        "AllowUnauthenticatedIdentities": false
+      }
+    },
+    "KibanaRoleAttachment": {
+        "Type": "Custom::CognitoRole",
+        "Properties": {
+            "ServiceToken": { "Fn::GetAtt" : ["CFNLambda", "Arn"] },
+            "IdentityPoolId":{"Ref":"KibanaIdPool"},
+            "Roles":{
+                "authenticated":{"Fn::GetAtt":["UserRole","Arn"]},
+                "unauthenticated":{"Fn::GetAtt":["UnauthenticatedRole","Arn"]} 
+            },
+            "RoleMappings":[{
+                "ClientId":{"Fn::GetAtt":["KibanaClient","ClientId"]},
+                "UserPool":{"Ref":"UserPool"},
+                "Type":"Rules",
+                "AmbiguousRoleResolution":"Deny",
+                "RulesConfiguration":{"Rules":[{
+                    "Claim":"cognito:groups",
+                    "MatchType":"Contains",
+                    "Value":"Admin",
+                    "RoleARN":{"Fn::GetAtt":["AdminRole","Arn"]}
+                }]}
+            }]
+        }
+    },
     "RoleAttachment": {
         "Type": "Custom::CognitoRole",
         "Properties": {
             "ServiceToken": { "Fn::GetAtt" : ["CFNLambda", "Arn"] },
             "IdentityPoolId":{"Ref":"IdPool"},
             "Roles":{
-                "authenticated":{"Fn::GetAtt":["AdminRole","Arn"]},
+                "authenticated":{"Fn::GetAtt":["UserRole","Arn"]},
                 "unauthenticated":{"Fn::GetAtt":["UnauthenticatedRole","Arn"]} 
             },
             "RoleMappings":[{
@@ -146,6 +176,14 @@ module.exports={
             "PreSignUp":{"Fn::GetAtt":["SignupLambda","Arn"]}
         }
     }
+    },
+    "KibanaClient":{
+        "Type": "Custom::ESCognitoClient",
+        "DependsOn":["ElasticsearchDomainUpdate"],
+        "Properties": {
+            "ServiceToken": { "Fn::GetAtt" : ["CFNLambda", "Arn"] },
+            "UserPool":{"Ref":"UserPool"},
+        }
     },
     "ClientDesigner": {
       "Type": "AWS::Cognito::UserPoolClient",

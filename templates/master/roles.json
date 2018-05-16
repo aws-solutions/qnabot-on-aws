@@ -28,6 +28,12 @@
               "Statement": [{
                   "Effect": "Allow",
                   "Action": [   
+                    "es:ESHttp*"
+                  ],
+                  "Resource": [{"Fn::GetAtt":["ESVar","ESArn"]}]
+                },{
+                  "Effect": "Allow",
+                  "Action": [   
                     "execute-api:*"
                   ],
                   "Resource": [{"Fn::Sub":
@@ -164,10 +170,7 @@
                 {
                   "Effect": "Allow",
                   "Action": [
-                    "cognito-idp:UpdateUserPoolClient",
-                    "cognito-idp:CreateUserPoolDomain",
-                    "cognito-idp:DeleteUserPoolDomain",
-                    "cognito-idp:SetUICustomization"
+                    "cognito-idp:*"
                   ],
                   "Resource": ["*"]
                 },

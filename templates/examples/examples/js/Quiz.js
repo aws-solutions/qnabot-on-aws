@@ -125,6 +125,7 @@ exports.handler=async function(event,context,callback){
                 prevDocument,"responses.end","Thank you for taking the quiz!")
             var score=quizBot.correctAnswerCount/quizBot.questionCount*100
             templateParams.score=Math.round(score)
+            templateParams.success=templateParams.score > 50 ? true : false
             clear(event)
         }
         render(event,templateParams)

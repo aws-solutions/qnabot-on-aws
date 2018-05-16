@@ -4,7 +4,7 @@
 {{#each answers}}
 __{{{this.[2]}}}__. {{{this.[0]}}}  
 {{/each}}{{/if}}
-{{#if finished}} You got __{{totalCorrect}}__ questions correct out of __{{totalQuestions}}__ with a score of __{{score}}%__.  
+{{#if finished}} You got __{{totalCorrect}}__ questions correct out of __{{totalQuestions}}__ with a score of <span style="color:red;">__{{score}}%__</span>.  
 {{endmessage}}{{/if}}
 {{#if exit}}
 You have now exited the quiz. Ask for __help__ for next steps.

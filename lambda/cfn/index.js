@@ -18,7 +18,8 @@ var targets={
     Variable:require('./lib/Variable'),
     ApiCompression:require('./lib/ApiCompression'),
     ApiDeployment:require('./lib/ApiDeployment'),
-    ElasticSearchUpdate:require('./lib/ElasticSearchUpdate')
+    ElasticSearchUpdate:require('./lib/ElasticSearchUpdate'),
+    ESCognitoClient:require('./lib/ESCognitoClient') 
 }
 var Lex=require('./lib/lex')
 
