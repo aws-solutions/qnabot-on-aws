@@ -1,18 +1,5 @@
 var properties={
-    "AccessPolicies": {
-       "Version": "2012-10-17",
-       "Statement": [
-          {
-             "Sid": "EnforceAuth",
-             "Principal": {
-                "AWS": {"Ref":"AWS::AccountId"}
-             },
-             "Effect": "Allow",
-             "Action": "es:*",
-             "Resource": "*"
-          }
-       ]
-    },
+    
     "ElasticsearchClusterConfig": {
        "DedicatedMasterEnabled": false,
        "InstanceCount": 2,
@@ -50,7 +37,21 @@ module.exports={
                 IdentityPoolId: {"Ref":"KibanaIdPool"},
                 RoleArn:{"Fn::GetAtt":["ESCognitoRole","Arn"]},
                 UserPoolId: {"Ref":"UserPool"}
-            }
+            },
+            "AccessPolicies": {"Fn::Sub":JSON.stringify({
+               "Version": "2012-10-17",
+               "Statement": [
+                  {
+                     "Sid": "CognitoAuth",
+                     "Principal": {
+                        "AWS":"${KibanaRole.Arn}"
+                     },
+                     "Effect": "Allow",
+                     "Action": "es:ESHttp*",
+                     "Resource":"${ESVar.ESArn}/*"
+                  }
+               ]
+            })},
         }
     },
     "ESCognitoRole": {

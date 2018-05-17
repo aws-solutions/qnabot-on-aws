@@ -113,7 +113,7 @@ module.exports={
                     "Claim":"cognito:groups",
                     "MatchType":"Contains",
                     "Value":"Admin",
-                    "RoleARN":{"Fn::GetAtt":["AdminRole","Arn"]}
+                    "RoleARN":{"Fn::GetAtt":["KibanaRole","Arn"]}
                 }]}
             }]
         }
