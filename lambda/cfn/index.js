@@ -19,7 +19,8 @@ var targets={
     ApiCompression:require('./lib/ApiCompression'),
     ApiDeployment:require('./lib/ApiDeployment'),
     ElasticSearchUpdate:require('./lib/ElasticSearchUpdate'),
-    ESCognitoClient:require('./lib/ESCognitoClient') 
+    ESCognitoClient:require('./lib/ESCognitoClient'),
+    Kibana:require('./lib/kibana'),
 }
 var Lex=require('./lib/lex')
 

@@ -1,3 +1,5 @@
+var _=require('lodash')
+
 module.exports={
     "ESCFNProxyLambda": {
       "Type": "AWS::Lambda::Function",
@@ -26,9 +28,13 @@ module.exports={
                 endpoint:{"Fn::GetAtt":["ESVar","ESAddress"]},
                 path:{"Fn::Sub":"/${Var.index}"},
                 method:"PUT",
-                body:{
-                    settings:{}
-                }
+                body:{"Fn::Sub":JSON.stringify({ 
+                    settings:{},
+                    mappings:{
+                        "${Var.QnAType}":require('./schema/qna'),
+                        "${Var.QuizType}":require('./schema/quiz')
+                    }
+                })}
             },
             "delete":{
                 endpoint:{"Fn::GetAtt":["ESVar","ESAddress"]},
@@ -37,30 +43,11 @@ module.exports={
             }
         }
     },
-    "QnAType":{
-        "Type": "Custom::ESProxy",
-        "DependsOn":["Index"],
+    "Kibana":{
+        "Type": "Custom::Kibana",
         "Properties": {
-            "ServiceToken": { "Fn::GetAtt" : ["ESCFNProxyLambda", "Arn"] },
-            "create":{
-                endpoint:{"Fn::GetAtt":["ESVar","ESAddress"]},
-                path:{"Fn::Sub":"/${Var.index}/_mapping/${Var.QnAType}"},
-                method:"PUT",
-                body:JSON.stringify(require('./schema/qna'))
-            }
-        }
-    },
-    "QuizType":{
-        "Type": "Custom::ESProxy",
-        "DependsOn":["Index"],
-        "Properties": {
-            "ServiceToken": { "Fn::GetAtt" : ["ESCFNProxyLambda", "Arn"] },
-            "create":{
-                endpoint:{"Fn::GetAtt":["ESVar","ESAddress"]},
-                path:{"Fn::Sub":"/${Var.index}/_mapping/${Var.QuizType}"},
-                method:"PUT",
-                body:JSON.stringify(require('./schema/quiz'))
-            }
+            "ServiceToken": { "Fn::GetAtt" : ["CFNLambda", "Arn"] },
+            "address":{"Fn::GetAtt":["ESVar","ESAddress"]}
         }
     }
 }
