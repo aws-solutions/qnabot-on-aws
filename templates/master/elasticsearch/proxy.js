@@ -24,6 +24,7 @@ module.exports={
         "Type": "Custom::ESProxy",
         "Properties": {
             "ServiceToken": { "Fn::GetAtt" : ["ESCFNProxyLambda", "Arn"] },
+            "NoUpdate":true,
             "create":{
                 endpoint:{"Fn::GetAtt":["ESVar","ESAddress"]},
                 path:{"Fn::Sub":"/${ESVar.MetricsIndex}"},
@@ -43,6 +44,7 @@ module.exports={
         "Type": "Custom::ESProxy",
         "Properties": {
             "ServiceToken": { "Fn::GetAtt" : ["ESCFNProxyLambda", "Arn"] },
+            "NoUpdate":true,
             "create":{
                 endpoint:{"Fn::GetAtt":["ESVar","ESAddress"]},
                 path:{"Fn::Sub":"/${ESVar.FeedbackIndex}"},
@@ -62,6 +64,7 @@ module.exports={
         "Type": "Custom::ESProxy",
         "Properties": {
             "ServiceToken": { "Fn::GetAtt" : ["ESCFNProxyLambda", "Arn"] },
+            "NoUpdate":true,
             "create":{
                 endpoint:{"Fn::GetAtt":["ESVar","ESAddress"]},
                 path:{"Fn::Sub":"/${Var.index}"},

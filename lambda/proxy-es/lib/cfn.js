@@ -15,8 +15,13 @@ exports.Create=function(params,reply){
     }
 }
 exports.Update=function(ID,params,oldparams,reply){
-    exports.Create(params,reply,{data:"none"}) 
+    if(params.NoUpdate){
+        reply(null,"es",{data:"none"})
+    }else{
+        exports.Create(params,reply,{data:"none"}) 
+    }
 }
+
 exports.Delete=function(ID,params,reply){
     if(params.delete){
         handler(params.delete,null,function(err,data){
