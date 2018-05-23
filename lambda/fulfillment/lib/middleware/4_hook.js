@@ -5,6 +5,7 @@ var util=require('./util')
 
 module.exports=function(req,res){
     var arn=util.getLambdaArn(_.get(res.result,"l",""))
+    
     if(arn){
         console.log("Lambda PostProcess Hooks:",JSON.stringify({
             req,

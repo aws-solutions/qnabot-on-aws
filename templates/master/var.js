@@ -29,7 +29,9 @@ module.exports={
             "CreateDomain",
             {"Ref":"ElasticsearchDomain"},
             {"Ref":"ElasticsearchName"}
-        ]}
+        ]},
+        "MetricsIndex":{"Fn::Sub":"${Var.index}-metrics"},
+        "FeedbackIndex":{"Fn::Sub":"${Var.index}-feedback"},
     }
 },
 "ApiUrl":{

@@ -29,13 +29,8 @@ module.exports=function(params){
             createMapping(es,"server")
         )
     }).tap(()=>console.log("created mappings"))
-    .tap(x=>x[0].indices.refresh())
-    .then(function(es){
-        return Promise.all(
-            documents.concat(require('./config'))
-            .map(document=>putDocument(es,document))
-        )
-    }).tap(()=>console.log("put files"))
+    .tap(es=>es.indices.refresh())
+    .tap(()=>console.log("put files"))
 }
 
 var createIndex=function(es){

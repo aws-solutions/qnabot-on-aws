@@ -7,7 +7,7 @@ var handler=require('./handler')
 exports.Create=function(params,reply){
     try{
         handler(params.create,null,function(err,data){
-            err ? reply(JSON.stringify(err)) : reply(null,"es")
+            err ? reply(JSON.stringify(err)) : reply(null,"es",{data:"none"})
         })
     }catch(e){
         console.log(e)
@@ -15,7 +15,7 @@ exports.Create=function(params,reply){
     }
 }
 exports.Update=function(ID,params,oldparams,reply){
-    exports.Create(params,reply) 
+    exports.Create(params,reply,{data:"none"}) 
 }
 exports.Delete=function(ID,params,reply){
     if(params.delete){

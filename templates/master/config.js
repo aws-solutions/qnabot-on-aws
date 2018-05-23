@@ -3,7 +3,14 @@ var methods=[]
 _.forEach(require('./routes'),(value,key)=>{
     value.Type==='AWS::ApiGateway::Method' ? methods.push(key) : null
 })
-var permissions=_.keys(require('./lambda')).filter(x=>x.match(/^InvokePermission/))
+var permissions=_.keys(require('./lambda'))
+    .filter(x=>x.match(/^InvokePermission/))
+    .filter(x=>![
+        'InvokePermissionLexBuildLambda',
+        'InvokePermissionLexBuildLambdaPoll',
+        'InvokePermissionLexStatusLambda'
+        ].includes(x))
+
 
 module.exports={
 "API": {

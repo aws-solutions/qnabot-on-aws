@@ -1,9 +1,11 @@
 var config=require('./config')
 var _=require('lodash')
-var example=require('../examples')
-var examples=_.fromPairs(_.toPairs(example)
-    .filter(x=>x[1].Type==="AWS::Lambda::Function")
-    .map(x=>[x[0],{"Fn::GetAtt":[x[0],"Arn"]}]))
+
+examples=_.fromPairs(require('../../examples/outputs')
+    .names
+    .map(x=>{
+        return [x,{"Fn::GetAtt":["ExamplesStack",`Outputs.${x}`]}]
+    }))
 
 module.exports={
     "Alexa":{
@@ -42,7 +44,7 @@ module.exports={
             ES_SERVICE_PROXY:{"Ref":"ESProxyLambda"},
             "ERRORMESSAGE":config.ErrorMessage,
             "EMPTYMESSAGE":config.EmptyMessage
-          },examples)
+          })
         },
         "Handler": "index.handler",
         "MemorySize": "1408",
@@ -67,12 +69,11 @@ module.exports={
               ],
               "Resource":[
                 "arn:aws:lambda:*:*:function:qna-*",
-                "arn:aws:lambda:*:*:function:QNA-*",
-                {"Fn::GetAtt":["ESQueryLambda","Arn"]},
-                {"Fn::GetAtt":["ESQidLambda","Arn"]},
-                {"Fn::GetAtt":["ESProxyLambda","Arn"]},
-                {"Fn::GetAtt":["ESLoggingLambda","Arn"]}
-              ]
+                "arn:aws:lambda:*:*:function:QNA-*"
+              ].concat(require('../../examples/outputs').names
+                .map(x=>{
+                    return {"Fn::GetAtt":["ExamplesStack",`Outputs.${x}`]}
+                }))
             }]
         },
         "Roles": [{"Ref": "FulfillmentLambdaRole"}]
