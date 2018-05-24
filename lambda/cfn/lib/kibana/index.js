@@ -25,13 +25,8 @@ module.exports=class Kibana extends require('../base'){
                 LambdaApi: Lambda,
                 Methods: {
                     Create: function(createReponse, params, reply, notDone){
-                        var con=(require('./lib/con.js'))(params.address)
-
-                        con.retry(function(){
-                            return create(params)
-                            .then(()=>reply(null))
-                        })
-                        .tapCatch(console.log)
+                        return create(params)
+                        .then(()=>reply(null))
                         .catch(notDone)
                     }
                 }
