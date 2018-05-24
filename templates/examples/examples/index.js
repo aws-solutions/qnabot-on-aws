@@ -192,7 +192,7 @@ function jslambda(name){
             "ES_QNA_TYPE": {"Ref":"QnAType"},
             "ES_QUIZE_TYPE": {"Ref":"QuizType"},
             "ES_INDEX": {"Ref":"Index"},
-            "FIREHOSE_NAME":{"Ref":"FeedbackFirehose"},
+            "FIREHOSE_NAME":{"Ref":"FeedbackFirehoseName"},
             "ES_ADDRESS": {"Ref":"ESAddress"},
             "QUIZ_KMS_KEY":{"Ref":"QuizKey"}
           }
@@ -226,7 +226,7 @@ function pylambda(name){
             "ES_QNA_TYPE": {"Ref":"QnAType"},
             "ES_QUIZE_TYPE": {"Ref":"QuizType"},
             "ES_INDEX": {"Ref":"Index"},
-            "FIREHOSE_NAME":{"Ref":"FeedbackFirehose"},
+            "FIREHOSE_NAME":{"Ref":"FeedbackFirehoseName"},
             "ES_ADDRESS": {"Ref":"ESAddress"},
             "QUIZ_KMS_KEY":{"Ref":"QuizKey"}
           }

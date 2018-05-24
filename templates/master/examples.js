@@ -12,6 +12,7 @@ module.exports={
                 "BootstrapBucket":{"Ref":"BootstrapBucket"},
                 "BootstrapPrefix":{"Ref":"BootstrapPrefix"},
                 "FeedbackFirehose":{"Fn::GetAtt":["FeedbackFirehose","Arn"]},
+                "FeedbackFirehoseName":{"Ref":"FeedbackFirehose"},
                 "CFNLambda":{"Fn::GetAtt":["CFNLambda","Arn"]},
                 "CFNLambdaRole":{"Fn::GetAtt":["CFNLambdaRole","Arn"]},
                 "ApiUrlName":{"Fn::GetAtt":["ApiUrl","Name"]},

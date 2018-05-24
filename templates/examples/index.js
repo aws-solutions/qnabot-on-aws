@@ -21,6 +21,7 @@ module.exports={
     "BootstrapBucket":{"Type":"String"},
     "BootstrapPrefix":{"Type":"String"},
     "FeedbackFirehose":{"Type":"String"},
+    "FeedbackFirehoseName":{"Type":"String"},
     "CFNLambda":{"Type":"String"},
     "CFNLambdaRole":  {"Type":"String"},
     "ApiUrlName":{"Type":"String"},

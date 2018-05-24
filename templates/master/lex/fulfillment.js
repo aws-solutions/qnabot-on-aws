@@ -44,7 +44,7 @@ module.exports={
             ES_SERVICE_PROXY:{"Ref":"ESProxyLambda"},
             "ERRORMESSAGE":config.ErrorMessage,
             "EMPTYMESSAGE":config.EmptyMessage
-          })
+          },examples)
         },
         "Handler": "index.handler",
         "MemorySize": "1408",
