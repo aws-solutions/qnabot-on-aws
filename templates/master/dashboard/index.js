@@ -3,7 +3,7 @@ module.exports={
     "dashboard":{
         "Type" : "AWS::CloudWatch::Dashboard",
         "Properties" : {
-            "DashboardName" : {"Ref":"AWS::StackName"},
+            "DashboardName" : {"Fn::Sub":"${AWS::Region}-${AWS::StackName}"},
             "DashboardBody" : {"Fn::Sub":JSON.stringify(require('./body'))}
         }
     }
