@@ -1,5 +1,6 @@
 from __future__ import print_function
 import json
+import string
 import boto3
 import os
 import collections
@@ -31,7 +32,8 @@ def handler(event, context):
         currentQid = event['res']['result']['qid']
     #Have to get information through the question when we bypass Elastic Search and go directly to this function (Not Ideal) 
     except:
-        currentQid = event["req"]["question"].upper()
+        translator = str.maketrans('', '', string.punctuation)
+        currentQid = event["req"]["question"].upper().translate(translator)
     try:
         #get the Question ID (qid) of the previous document that was returned to the web client 
         if "sessionAttributes" in event["req"]["_event"]:
