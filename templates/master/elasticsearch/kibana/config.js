@@ -24,6 +24,7 @@ module.exports=[
 "_id": {"Fn::Sub":"${Var.index}-metrics"},
 "_source": {
   "title":{"Fn::Sub":"${Var.index}-metrics"},
+  "timeFieldName":"datetime",
   "fields":JSON.stringify(require('./metrics-index-pattern'))
 }
 },
@@ -33,6 +34,7 @@ module.exports=[
 "_id": {"Fn::Sub":"${Var.index}-feedback"},
 "_source": {
   "title":{"Fn::Sub":"${Var.index}-feedback"},
+  "timeFieldName":"datetime",
   "fields":JSON.stringify(require('./feedback-index-pattern'))
 }
 }
