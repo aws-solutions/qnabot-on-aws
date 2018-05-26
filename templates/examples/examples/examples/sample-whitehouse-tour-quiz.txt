@@ -1,1 +1,0 @@
-Imports documents to enable the sample quiz for the sample White House tour.

@@ -1,1 +1,0 @@
-Imports  documents that show an example of using the provided Next, Previous, and Feedback example Lambda functions to iterate between documents to create a guided navigation sequence between documents and log feedback into Elasticsearch using the provided Kinesis Firehose
