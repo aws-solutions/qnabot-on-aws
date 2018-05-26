@@ -50,5 +50,5 @@ exports.assemble=function(request,response){
 }
 
 function isCard(card){
-    return card.send 
+    return _.get(card,"send")
 }

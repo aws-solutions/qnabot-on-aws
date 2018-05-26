@@ -87,7 +87,7 @@ exports.assemble=function(request,response){
                 text:response.type==='PlainText' ? response.message : null,
                 ssml:response.type==='SSML' ? response.message : null,
             }),
-            card:response.card.imageUrl ? {
+            card:_.get(response,"card.imageUrl") ? {
                 type:"Standard",
                 title:response.card.title || request.question,
                 text:_.has(response.card,'subTitle')? response.card.subTitle +"\n\n" + response.message:response.message,
@@ -97,7 +97,7 @@ exports.assemble=function(request,response){
                 }
             } : {
                 type:"Simple",
-                title:response.card.title || request.question || "Image",
+                title:_.get(response,"card.title") || request.question || "Image",
                 content:response.message
             },
             shouldEndSession:false

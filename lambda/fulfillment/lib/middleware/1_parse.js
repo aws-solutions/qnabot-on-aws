@@ -3,10 +3,8 @@ var lex=require('./lex')
 var alexa=require('./alexa')
 var _=require('lodash')
 
-
-module.exports=function(req,res){
+module.exports=function parse(req,res){
     req._type=req._event.version ? "ALEXA" : "LEX"
-    console.log(req,res)
 
     switch(req._type){
         case 'LEX':

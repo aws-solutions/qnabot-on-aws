@@ -1,50 +1,39 @@
 var Promise=require('bluebird')
 var lex=require('./lex')
 var alexa=require('./alexa')
-var aws=require('../aws')
-var lambda= new aws.Lambda()
 var _=require('lodash')
+var util=require('./util')
 
-module.exports=function response(req,res){
-    return new Promise(function(resolve,reject){
-        if(process.env.LAMBDA_LOG){
-            lambda.invoke({
-                FunctionName:process.env.LAMBDA_LOG,
-                InvocationType:"Event",
-                Payload:JSON.stringify({req,res})
-            })
-            .promise()
-            .then(resolve)
-            .catch(reject)
-        }else{
-            resolve()
-        }
-    })
-    .then(function(){
-        if(process.env.LAMBDA_RESPONSE){
-            return lambda.invoke({
-                FunctionName:process.env.LAMBDA_RESPONSE,
-                InvocationType:"RequestResponse",
-                Payload:JSON.stringify(res)
-            }).promise()
-            .then(result=>{
-                _.merge(res,JSON.parse(result.Payload))
-            })
-        }
-    })
-    .then(()=>{
-        res.session=_.mapValues(
-            _.get(res,'session',{}),
-            x=>_.isString(x) ? x : JSON.stringify(x)
-        )
-        switch(req._type){
-            case 'LEX':
-                res.out=lex.assemble(req,res)
-                break;
-            case 'ALEXA':
-                res.out=alexa.assemble(req,res)
-                break;
-        }
-        return {req,res}
-    })
+module.exports=async function assemble(req,res){
+    if(process.env.LAMBDA_LOG){
+        await util.invokeLambda({
+            FunctionName:process.env.LAMBDA_LOG,
+            InvocationType:"Event",
+            req,res
+        })
+    }
+
+    if(process.env.LAMBDA_RESPONSE){
+        var result=await util.invokeLambda({
+            FunctionName:process.env.LAMBDA_RESPONSE,
+            InvocationType:"RequestResponse",
+            Payload:JSON.stringify(res)
+        })
+
+        _.merge(res,result)
+    }
+    
+    res.session=_.mapValues(
+        _.get(res,'session',{}),
+        x=>_.isString(x) ? x : JSON.stringify(x)
+    )
+    switch(req._type){
+        case 'LEX':
+            res.out=lex.assemble(req,res)
+            break;
+        case 'ALEXA':
+            res.out=alexa.assemble(req,res)
+            break;
+    }
+    return {req,res}
 }

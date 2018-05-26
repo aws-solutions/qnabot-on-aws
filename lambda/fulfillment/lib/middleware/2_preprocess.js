@@ -1,9 +1,7 @@
-var aws=require('../aws')
-var lambda= new aws.Lambda()
+var util=require('./util')
 var _=require('lodash')
 
-module.exports=function(req,res){
-    console.log("pre")
+module.exports=async function preprocess(req,res){
     _.set(req,"_info.es.address",process.env.ES_ADDRESS)
     _.set(req,"_info.es.index",process.env.ES_INDEX)
     _.set(req,"_info.es.type",process.env.ES_TYPE)
@@ -11,14 +9,9 @@ module.exports=function(req,res){
     _.set(req,"_info.es.service.proxy",process.env.ES_SERVICE_PROXY)
     
     if(process.env.LAMBDA_PREPROCESS){
-        return lambda.invoke({
+        return await util.invokeLambda({
             FunctionName:process.env.LAMBDA_PREPROCESS,
-            InvocationType:"RequestResponse",
-            Payload:JSON.stringify({req,res})
-        }).promise()
-        .then(result=>{
-            var parsed=JSON.parse(result.Payload)
-            return parsed
+            req,res
         })
     }else{
         return {req,res}
