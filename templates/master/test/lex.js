@@ -44,6 +44,7 @@ module.exports = {
                 path: "questions/test.1",
                 method: "PUT",
                 body: {
+                    type:"qna",
                     qid: "test.1",
                     q: ["hello"],
                     a: "i am the unit"
@@ -91,6 +92,7 @@ module.exports = {
                 path: "questions/" + id,
                 method: "PUT",
                 body: {
+                    type:"qna",
                     qid: id,
                     q: ["who am i"],
                     a: "i am the unit",
@@ -105,6 +107,7 @@ module.exports = {
                 method: "PUT",
                 body: {
                     qid: id2,
+                    type:"qna",
                     q: ["who are you"],
                     a: "you are the test"
                 }
@@ -139,6 +142,7 @@ module.exports = {
                     path: `questions/${id1}`,
                     method: "PUT",
                     body: {
+                        type:"qna",
                         qid: id1,
                         q: ["what do zombies eat", "what do they eat"],
                         a: "zombies eat brains",
@@ -149,6 +153,7 @@ module.exports = {
                     path: `questions/${id2}`,
                     method: "PUT",
                     body: {
+                        type:"qna",
                         qid: id2,
                         q: ["what do humans eat", "what do they eat"],
                         a: "humans eat food",
@@ -192,6 +197,7 @@ module.exports = {
                 path: `questions/${id1}`,
                 method: "PUT",
                 body: {
+                    type:"qna",
                     qid: id1,
                     q: ["what do zombies eat", "what do they eat"],
                     a: "zombies eat brains",
@@ -222,7 +228,7 @@ module.exports = {
                         type: "qna",
                         q: ["next"],
                         a: "no next room",
-                        l: "QNA:ExamplePYTHONNextLambda"
+                        l: "QNA:ExamplePYTHONLambdaNext"
                     }
                 })
             await  api({
@@ -233,7 +239,7 @@ module.exports = {
                         type: "qna",
                         q: ["previous"],
                         a: "no previous room",
-                        l: "QNA:ExamplePYTHONPreviousLambda"
+                        l: "QNA:ExamplePYTHONLambdaPrevious"
                     }
                 })
             var sessionAttributes = {}
@@ -281,7 +287,7 @@ module.exports = {
                             type: "qna",
                             q: ["Next"],
                             a: "no next room",
-                            l: "QNA:ExamplePYTHONNextLambda"
+                            l: "QNA:ExamplePYTHONLambdaNext"
                         }
                     })
                 await  api({
@@ -292,7 +298,7 @@ module.exports = {
                             type: "qna",
                             q: ["Previous"],
                             a: "no previous room",
-                            l: "QNA:ExamplePYTHONPreviousLambda"
+                            l: "QNA:ExamplePYTHONLambdaPrevious"
                         }
                     })
                await api({

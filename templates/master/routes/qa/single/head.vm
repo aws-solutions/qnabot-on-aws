@@ -1,7 +1,7 @@
 {
     "endpoint":"${ESVar.ESAddress}",
     "method":"HEAD",
-    "path":"/${Var.index}/$util.urlDecode($input.params('ID'))"
+    "path":"/${Var.index}/_all/$util.urlDecode($input.params('ID'))"
 }
 
 
