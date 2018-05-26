@@ -39,7 +39,7 @@ module.exports=function(req,res){
             if(req.outputDialogMode!=="Text"){
                 if(_.get(res,"result.alt.ssml")){
                     res.type="SSML"
-                    res.message=res.result.alt.ssml
+                    res.message=res.result.alt.ssml.replace(/\r?\n|\r/g,' ')
                 }
             }
             console.log(res.message)
