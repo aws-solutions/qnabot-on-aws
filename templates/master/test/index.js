@@ -9,6 +9,5 @@ module.exports={
     routes:require('./routes'),
     workflows:require('./workflows'),
     lex:require('./lex'),
-    examples:require('../examples/test')
 }
 

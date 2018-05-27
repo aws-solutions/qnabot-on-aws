@@ -30,7 +30,7 @@ module.exports = {
                 self.lex = new aws.LexRuntime({
                     region: config.region,
                     params: {
-                        botAlias: "$LATEST",
+                        botAlias: output.BotAlias,
                         botName: output.BotName,
                         userId: "test"
                     }
@@ -440,7 +440,7 @@ module.exports = {
                             type: "qna",
                             q: ["feedback"],
                             a: defaultResp,
-                            l: "QNA:ExamplePYTHONFeedbackLambda"
+                            l: "QNA:ExamplePYTHONLambdaFeedback"
                         }
                     })
                 await  api({

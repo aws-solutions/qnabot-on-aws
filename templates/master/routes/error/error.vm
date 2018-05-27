@@ -2,7 +2,7 @@
 
 
 {
-    "type":$errorMessageObj.type,
+    "type":"$errorMessageObj.type",
     "message":"$errorMessageObj.message",
     "data":"$errorMessageObj.data"
 }

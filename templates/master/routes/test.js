@@ -4,5 +4,7 @@ module.exports={
     health:require('./health/test'),
     qa:require('./qa/test'),
     root:require('./root/test'),
-    examples:require('./examples')
+    examples:require('./examples'),
+    jobs:require('./jobs'),
+    services:require('./services')
 }

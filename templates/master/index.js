@@ -31,6 +31,9 @@ module.exports={
     "BotName":{
         "Value":{"Ref":"LexBot"}
     },
+    "BotAlias":{
+        "Value":{"Ref":"Alias"}
+    },
     "SlotType":{
         "Value":{"Ref":"SlotType"}
     },
