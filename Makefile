@@ -5,7 +5,7 @@ All: assets templates lambda website build
 build:
 	mkdir -p build; mkdir -p build/lambda; mkdir -p build/templates/test;mkdir -p build/templates;mkdir -p build/documents; mkdir -p build/templates/dev
 
-.PHONY: lambda templates upload website test bootstrap
+.PHONY: lambda templates upload website test bootstrap assets
 
 config.json:
 	node bin/config.js > config.json

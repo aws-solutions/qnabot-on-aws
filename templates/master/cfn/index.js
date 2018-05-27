@@ -20,7 +20,6 @@ module.exports={
     },
     "CFNVersion":{
         "Type": "Custom::S3Version",
-        "DependsOn":["CFNLambdaPolicy"],
         "Properties": {
             "ServiceToken": { "Fn::GetAtt" : ["VersionLambda", "Arn"] },
             "Bucket": {"Ref":"BootstrapBucket"},
@@ -42,7 +41,7 @@ module.exports={
         "Handler": "index.handler",
         "MemorySize": "128",
         "Role": {"Fn::GetAtt": ["CFNLambdaRole","Arn"]},
-        "Runtime": "nodejs6.10",
+        "Runtime": "nodejs8.10",
         "Timeout": 60,
         "Tags":[{
             Key:"Type",

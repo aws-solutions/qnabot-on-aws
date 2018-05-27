@@ -15,23 +15,29 @@
       v-card(id="add-question-form")
         v-card-title(primary-title)
           .headline {{title}}
-        v-card-text
+        v-card-text.pb-0
+          .title document type
+          v-radio-group(v-model="type" row)
+            v-radio(v-for="t in types" :label='t' :value="t")
+        v-card-text.pt-0
           v-form(v-if="dialog")
             schema-input( 
-              v-model="data"
-              :valid.sync="valid"
+              v-model="data[type]"
+              :valid.sync="valid.required"
               :schema="schema" 
-              :pick="schema.required"
+              :pick="required"
               path="add"
+              ref="requiredInput"
             )
             v-expansion-panel.elevation-0
               v-expansion-panel-content
                 div( slot="header") Advanced
                 schema-input( 
-                  v-model="data"
-                  :valid.sync="valid"
+                  v-model="data[type]"
+                  :valid.sync="valid.optional"
                   :schema="schema" 
-                  :omit="schema.required"
+                  :omit="required"
+                  ref="optionalInput"
                   path="add"
                 )
           small *indicates required field
@@ -61,6 +67,8 @@ var saveAs=require('file-saver').saveAs
 var Promise=require('bluebird')
 var _=require('lodash')
 var empty=require('./empty')
+var Ajv=require('ajv')
+var ajv=new Ajv()
 
 module.exports={
   data:function(){
@@ -68,9 +76,13 @@ module.exports={
       title:"Add New Item",
       error:'',
       success:'',
+      type:'qna',
       dialog:false,
       loading:false,
-      valid:false,
+      valid:{
+        required:false,
+        optional:false
+      },
       data:{}
     }
   },
@@ -78,8 +90,14 @@ module.exports={
     "schema-input":require('./input.vue')
   },
   computed:{
+    types:function(){
+      return Object.keys(this.$store.state.data.schema).sort()
+    },
     schema:function(){
-      return this.$store.state.data.schema
+      return _.get(this,`$store.state.data.schema[${this.type}]`,{type:"object"})
+    },
+    required:function(){
+      return _.get(this,'schema.required',[])
     }
   },
   methods:{
@@ -90,53 +108,69 @@ module.exports={
       this.error=false
     },
     reset:function(){
-      this.data=empty(this.schema) 
+      this.data=_.mapValues(this.$store.state.data.schema,(value,key)=>{
+        return empty(value) 
+      }) 
       this.$refs.dialog.$refs.dialog.scrollTo(0,0)
+    },
+    validate:function(){
+      var data=this.data[this.type]
+      return !!validate(value) || validate.errors.map(x=>x.message).join('. ')
     },
     add:async function(){
       var self=this
       this.error=false
-      if(this.valid){
+      var data=clean(_.cloneDeep(this.data[this.type]))
+      var validate=ajv.compile(this.schema || true)
+      console.log(data)
+      var valid=validate(data)
+
+      if(valid){
         this.loading=true
         this.dialog=false
         try{ 
-          var exists=await this.$store.dispatch('api/check',this.data.qid)
+          var exists=await this.$store.dispatch('api/check',data.qid)
           if(exists){
             self.error='Question already exists'
             self.loading=false
             self.dialog=true
           }else{
             self.$refs.dialog.$refs.dialog.scrollTo(0,0)
-            var out=clean(_.cloneDeep(self.data))
-            console.log(out)
-            await self.$store.dispatch('data/add',out)
+            data.type=this.type
+            await self.$store.dispatch('data/add',data)
             self.success='Success!'
-            self.$store.commit('data/addQA',_.cloneDeep(self.data))
+            self.$store.commit('data/addQA',_.cloneDeep(data))
             self.reset()
           }
         }catch(e){
           console.log(e)
           self.error=e 
         }
+      }else{
+        this.error=validate.errors.map(x=>x.message).join('. ')
       }
     }
   }
 }
-function clean(data){
-  console.log(data)
-  try{
-    if(Array.isArray(data)){
-      data=_.compact(data)
-      data=_.forEach(data,clean)
-    }else if(typeof data==='object'){
-      data=_.pickBy(data,x=>x)
-      data=_.mapValues(data,clean)
+
+function clean(obj){
+    if(Array.isArray(obj)){
+        for( var i=0; i<obj.length; i++){
+            obj[i]=clean(obj[i])
+        }
+        var out=_.compact(obj)
+        return out.length ? out : null
+    }else if(typeof obj==="object"){
+        for (var key in obj){
+            obj[key]=clean(obj[key])
+        }
+        var out=_.pickBy(obj)
+        return _.keys(out).length ? out : null
+    }else if(obj.trim){
+        return obj.trim() || null
+    }else{
+        return obj
     }
-  }catch(e){
-    console.log(e)
-    throw e
-  }
-  return data
 }
 </script>
 

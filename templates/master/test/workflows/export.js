@@ -25,7 +25,7 @@ module.exports={
         .tap(info=>s3.putObject({
             Bucket:info.bucket,
             Key:info.uploadPrefix+name,
-            Body:range(0,count-1).map(qna).join('\n')
+            Body:range(0,count).map(qna).join('\n')
         }).promise())
         .tap(function(info){
             return new Promise(function(res,rej){
@@ -104,6 +104,7 @@ module.exports={
                 Bucket:completed.bucket,
                 Key:completed.key,
             }).promise()).Body.toString().split('\n')
+            console.log(data.length,this.count)
             test.ok(data.length>=this.count)
             data.forEach(x=>{
                 try{

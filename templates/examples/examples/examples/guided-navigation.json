@@ -1,0 +1,38 @@
+{
+  "qna": [
+    {
+      "qid": "Previous",
+      "a": "Unable to go to the previous room...",
+      "r": {
+        "title": "",
+        "imageUrl": "",
+        "text": "",
+        "url": ""
+      },
+      "type": "qna",
+      "l": "QNA:ExamplePYTHONLambdaPrevious",
+      "q": [
+        "Previous Room",
+        "Previous",
+        "Let's go to the Previous Room"
+      ]
+    },
+    {
+      "qid": "Next",
+      "a": "Unable to go to the next room...",
+      "r": {
+        "title": "",
+        "imageUrl": "",
+        "text": "",
+        "url": ""
+      },
+      "type": "qna",
+      "l": "QNA:ExamplePYTHONLambdaNext",
+      "q": [
+        "Next Room",
+        "Next",
+        "Let's go to the Next Room"
+      ]
+    }
+  ]
+}

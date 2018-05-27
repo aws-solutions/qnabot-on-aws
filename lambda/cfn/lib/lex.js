@@ -124,21 +124,10 @@ class Lex {
 
     Update(ID,params,oldparams,reply){
         var self=this
-        if(self.name(params) === oldparams.name){
-            self.checksum(ID)
-            .tap(console.log)
-            .then(function(checksum){   
-                params.checksum=checksum
-                self.Create(params,reply) 
-            })
+        if(this.type!=='SlotType'){
+            self.Create(params,reply) 
         }else{
-            self.Delete(ID,oldparams,function(err){
-                if(err){
-                    reply(err)
-                }else{
-                    setTimeout(()=>self.Create(params,reply),1000)
-                }
-            })
+            reply(null,ID)
         }
     }
     

@@ -10,7 +10,7 @@ module.exports={
     },
     "Clear":{
         "Type": "Custom::S3Clear",
-        "DependsOn":["CFNLambdaPolicy","CFNInvokePolicy"],
+        "DependsOn":["CFNInvokePolicy"],
         "Properties": {
             "ServiceToken": { "Fn::GetAtt" : ["CFNLambda", "Arn"] },
             "Bucket":{"Ref":"Bucket"}
@@ -18,7 +18,6 @@ module.exports={
     },
     "Unzip":{
         "Type": "Custom::S3Unzip",
-        "DependsOn":["CFNLambdaPolicy"],
         "Properties": {
             "ServiceToken": { "Fn::GetAtt" : ["CFNLambda", "Arn"] },
             "SrcBucket":{"Ref":"BootstrapBucket"},

@@ -1,0 +1,1 @@
+Imports the Next and Previous documents with lambda hook functionality that enables guided navigation

@@ -1,0 +1,18 @@
+{
+  "qna": [
+    {
+      "qid": "StartQuiz",
+      "a": "Starting the quiz.  Good luck!",
+      "r": {},
+      "l": "QNA:ExampleJSLambdaQuiz",
+      "args": [
+        "Quiz.1"
+      ],
+      "type": "qna",
+      "q": [
+        "I want to take the quiz.",
+        "Take the quiz."
+      ]
+    }
+  ]
+}

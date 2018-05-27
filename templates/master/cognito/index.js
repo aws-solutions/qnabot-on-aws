@@ -2,7 +2,6 @@ var fs=require('fs')
 module.exports={
     "CognitoDomain":{
         "Type": "Custom::CognitoDomain",
-        "DependsOn":["CFNLambdaPolicy"],
         "Properties": {
             "ServiceToken": { "Fn::GetAtt" : ["CFNLambda", "Arn"] },
             "UserPool":{"Ref":"UserPool"}
@@ -10,7 +9,6 @@ module.exports={
     },
     "CognitoLoginClient":{
         "Type": "Custom::CognitoLogin",
-        "DependsOn":["CFNLambdaPolicy"],
         "Properties": {
             "ServiceToken": { "Fn::GetAtt" : ["CFNLambda", "Arn"] },
             "UserPool":{"Ref":"UserPool"},
@@ -23,7 +21,6 @@ module.exports={
     },
     "CognitoLoginDesigner":{
         "Type": "Custom::CognitoLogin",
-        "DependsOn":["CFNLambdaPolicy"],
         "Properties": {
             "ServiceToken": { "Fn::GetAtt" : ["CFNLambda", "Arn"] },
             "UserPool":{"Ref":"UserPool"},
@@ -36,7 +33,6 @@ module.exports={
     },
     "DesignerLogin":{
         "Type": "Custom::CognitoUrl",
-        "DependsOn":["CFNLambdaPolicy"],
         "Properties": {
             "ServiceToken": { "Fn::GetAtt" : ["CFNLambda", "Arn"] },
             "adad":"adaad",
@@ -47,7 +43,6 @@ module.exports={
     },
     "ClientLogin":{
         "Type": "Custom::CognitoUrl",
-        "DependsOn":["CFNLambdaPolicy"],
         "Properties": {
             "ServiceToken": { "Fn::GetAtt" : ["CFNLambda", "Arn"] },
             "ClientId":{"Ref":"ClientClient"},
@@ -57,7 +52,7 @@ module.exports={
     },
     "User":{
         "Type" : "AWS::Cognito::UserPoolUser",
-        "DependsOn":["SignupPermision","MessagePermision"],
+        "DependsOn":["SignupPermision","MessagePermision","Kibana"],
         "Properties" : {
             "DesiredDeliveryMediums":["EMAIL"],
             "UserAttributes":[{
@@ -79,7 +74,7 @@ module.exports={
     "IdPool": {
       "Type": "AWS::Cognito::IdentityPool",
       "Properties": {
-        "IdentityPoolName": "UserPool",
+        "IdentityPoolName": "QnabotUserPool",
         "AllowUnauthenticatedIdentities": true,
         "CognitoIdentityProviders": [{
             "ClientId": {"Ref": "ClientDesigner"},
@@ -93,9 +88,38 @@ module.exports={
         ]
       }
     },
+    "KibanaIdPool": {
+      "Type": "AWS::Cognito::IdentityPool",
+      "Properties": {
+        "IdentityPoolName": "QnABotUserPool",
+        "AllowUnauthenticatedIdentities": false
+      }
+    },
+    "KibanaRoleAttachment": {
+        "Type": "Custom::CognitoRole",
+        "Properties": {
+            "ServiceToken": { "Fn::GetAtt" : ["CFNLambda", "Arn"] },
+            "IdentityPoolId":{"Ref":"KibanaIdPool"},
+            "Roles":{
+                "authenticated":{"Fn::GetAtt":["UserRole","Arn"]},
+                "unauthenticated":{"Fn::GetAtt":["UnauthenticatedRole","Arn"]} 
+            },
+            "RoleMappings":[{
+                "ClientId":{"Fn::GetAtt":["KibanaClient","ClientId"]},
+                "UserPool":{"Ref":"UserPool"},
+                "Type":"Rules",
+                "AmbiguousRoleResolution":"Deny",
+                "RulesConfiguration":{"Rules":[{
+                    "Claim":"cognito:groups",
+                    "MatchType":"Contains",
+                    "Value":"Admin",
+                    "RoleARN":{"Fn::GetAtt":["KibanaRole","Arn"]}
+                }]}
+            }]
+        }
+    },
     "RoleAttachment": {
         "Type": "Custom::CognitoRole",
-        "DependsOn":["CFNLambdaPolicy"],
         "Properties": {
             "ServiceToken": { "Fn::GetAtt" : ["CFNLambda", "Arn"] },
             "IdentityPoolId":{"Ref":"IdPool"},
@@ -152,6 +176,14 @@ module.exports={
             "PreSignUp":{"Fn::GetAtt":["SignupLambda","Arn"]}
         }
     }
+    },
+    "KibanaClient":{
+        "Type": "Custom::ESCognitoClient",
+        "DependsOn":["ElasticsearchDomainUpdate"],
+        "Properties": {
+            "ServiceToken": { "Fn::GetAtt" : ["CFNLambda", "Arn"] },
+            "UserPool":{"Ref":"UserPool"},
+        }
     },
     "ClientDesigner": {
       "Type": "AWS::Cognito::UserPoolClient",

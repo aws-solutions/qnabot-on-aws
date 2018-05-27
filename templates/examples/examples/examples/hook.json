@@ -1,0 +1,12 @@
+{
+    "qna": [
+        {
+            "qid": "Help",
+            "q": [
+                "help"
+            ],
+            "a": "Ask me a question!",
+            "l":"QNA:ExampleJSLambdahello"
+        }
+    ]
+}

@@ -63,10 +63,13 @@
               v-model="props.item.select" tabindex='-1' color="primary" 
               :id="'qa-'+props.item.qid+'-select'"
             )
-          td.text-xs-left.shrink.primary--text.title(v-if="active==='test'") {{props.item._score}}
+          td.text-xs-left.shrink.primary--text.title(
+            v-if="active==='test'"
+          ) {{props.item._score || '-'}}
           td.text-xs-left.shrink.title 
             b(:id="props.item.qid") {{props.item.qid}}
-          td.text-xs-left.title {{props.item.q[0]}}
+          td.text-xs-left.title {{props.item.type || 'qna'}}
+          td.text-xs-left.title {{props.item.q[0] || props.item.question}}
           td.d-flex.pa-0.pr-1
             edit(
               :data.sync="props.item" 
@@ -122,8 +125,13 @@ module.exports={
       sortable:true
     },
     {
+      text:'Type',
+      value:'type',
+      align:'left'
+    },
+    {
       text:'First Question',
-      value:'q[0]',
+      value:'q[0] || a',
       align:'left'
     }]
   }},
@@ -182,9 +190,9 @@ module.exports={
 		}
   },
   methods:{
-    get:_.debounce(function(event){
+    get:_.debounce(async function(event){
       this.selectAll=false
-      return this.$store.dispatch('data/get',{
+      await this.$store.dispatch('data/get',{
         page:event.page-1,
         perpage:event.rowsPerPage,
         order:event.descending ? 'desc' : 'asc'

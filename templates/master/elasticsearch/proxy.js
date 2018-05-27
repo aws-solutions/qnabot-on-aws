@@ -1,3 +1,5 @@
+var _=require('lodash')
+
 module.exports={
     "ESCFNProxyLambda": {
       "Type": "AWS::Lambda::Function",
@@ -10,7 +12,7 @@ module.exports={
         "Handler": "index.resource",
         "MemorySize": "1408",
         "Role": {"Fn::GetAtt": ["ESProxyLambdaRole","Arn"]},
-        "Runtime": "nodejs6.10",
+        "Runtime": "nodejs8.10",
         "Timeout": 300,
         "Tags":[{
             Key:"Type",
@@ -18,17 +20,62 @@ module.exports={
         }]
       }
     },
+    "MetricsIndex":{
+        "Type": "Custom::ESProxy",
+        "Properties": {
+            "ServiceToken": { "Fn::GetAtt" : ["ESCFNProxyLambda", "Arn"] },
+            "NoUpdate":true,
+            "create":{
+                endpoint:{"Fn::GetAtt":["ESVar","ESAddress"]},
+                path:{"Fn::Sub":"/${ESVar.MetricsIndex}"},
+                method:"PUT",
+                body:{"Fn::Sub":JSON.stringify({ 
+                    settings:{},
+                })}
+            },
+            "delete":{
+                endpoint:{"Fn::GetAtt":["ESVar","ESAddress"]},
+                path:{"Fn::Sub":"/${ESVar.MetricsIndex}"},
+                method:"DELETE"
+            }
+        }
+    },
+    "FeedbackIndex":{
+        "Type": "Custom::ESProxy",
+        "Properties": {
+            "ServiceToken": { "Fn::GetAtt" : ["ESCFNProxyLambda", "Arn"] },
+            "NoUpdate":true,
+            "create":{
+                endpoint:{"Fn::GetAtt":["ESVar","ESAddress"]},
+                path:{"Fn::Sub":"/${ESVar.FeedbackIndex}"},
+                method:"PUT",
+                body:{"Fn::Sub":JSON.stringify({ 
+                    settings:{},
+                })}
+            },
+            "delete":{
+                endpoint:{"Fn::GetAtt":["ESVar","ESAddress"]},
+                path:{"Fn::Sub":"/${ESVar.FeedbackIndex}"},
+                method:"DELETE"
+            }
+        }
+    },
     "Index":{
         "Type": "Custom::ESProxy",
         "Properties": {
             "ServiceToken": { "Fn::GetAtt" : ["ESCFNProxyLambda", "Arn"] },
+            "NoUpdate":true,
             "create":{
                 endpoint:{"Fn::GetAtt":["ESVar","ESAddress"]},
                 path:{"Fn::Sub":"/${Var.index}"},
                 method:"PUT",
-                body:{
-                    settings:{}
-                }
+                body:{"Fn::Sub":JSON.stringify({ 
+                    settings:{},
+                    mappings:{
+                        "${Var.QnAType}":require('./schema/qna'),
+                        "${Var.QuizType}":require('./schema/quiz')
+                    }
+                })}
             },
             "delete":{
                 endpoint:{"Fn::GetAtt":["ESVar","ESAddress"]},
@@ -37,16 +84,29 @@ module.exports={
             }
         }
     },
-    "Type":{
+    "Kibana":{
+        "Type": "Custom::Kibana",
+        "Properties": {
+            "ServiceToken": { "Fn::GetAtt" : ["CFNLambda", "Arn"] },
+            "address":{"Fn::GetAtt":["ESVar","ESAddress"]}
+        }
+    },
+    "KibanaConfig":{
         "Type": "Custom::ESProxy",
-        "DependsOn":["Index"],
+        "DependsOn":["Kibana"],
         "Properties": {
             "ServiceToken": { "Fn::GetAtt" : ["ESCFNProxyLambda", "Arn"] },
             "create":{
                 endpoint:{"Fn::GetAtt":["ESVar","ESAddress"]},
-                path:{"Fn::Sub":"/${Var.index}/_mapping/${Var.type}"},
-                method:"PUT",
-                body:JSON.stringify(require('./schema'))
+                path:{"Fn::Sub":"_bulk"},
+                method:"POST",
+                body:_.flatten(_.flatten([
+                    require('./kibana/config'),
+                    require('./kibana/Dashboards')
+                ]).map(x=>[
+                    {"index":{"_index":x._index,"_type":x._type,"_id":x._id}},
+                    x._source
+                ]))
             }
         }
     }

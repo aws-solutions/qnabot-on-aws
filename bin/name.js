@@ -30,11 +30,19 @@ if (require.main === module) {
 
 function run(stack,options={}){
     var namespace=options.namespace || config.namespace
+
     try {
-        var increments=require('./.inc')
+        var increments=require('../build/inc.json')
     } catch(e){
-        var increments={}
+        try {
+            var increments=require('./.inc.json')
+            fs.unlinkSync(`${__dirname}/.inc.json`)
+            fs.writeFileSync(__dirname+'/../build/inc.json',JSON.stringify(increments,null,2))
+        } catch(e){
+            var increments={}
+        }
     }
+    
     var stackname=stack.replace('/','-')
     var full=`${namespace}-${stackname}`
     var path=`["${config.profile}"].["${namespace}"].["${stackname}"]`
@@ -58,7 +66,7 @@ function run(stack,options={}){
 
     function set(value){
         _.set(increments,path,parseInt(value))
-        fs.writeFileSync(__dirname+'/.inc.json',JSON.stringify(increments,null,2))
+        fs.writeFileSync(__dirname+'/../build/inc.json',JSON.stringify(increments,null,2))
     }
 }
 

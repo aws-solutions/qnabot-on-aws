@@ -48,6 +48,11 @@ Finally, use the following command to launch template to deploy the QnA bot in y
 npm run up
 ```
 
+If you have an existing stack you can run the following to update your stack:
+```shell 
+npm run update
+```
+
 ## Components
 ### CloudFormation Templates
 The CloudFormation test templates are in the templates/test folder. The current templates are:

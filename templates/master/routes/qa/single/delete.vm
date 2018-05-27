@@ -1,7 +1,15 @@
 {
     "endpoint":"${ESVar.ESAddress}",
-    "method":"DELETE",
-    "path":"/${Var.type}/${Var.index}/$util.urlDecode($input.params('ID'))?refresh=wait_for"
+    "method":"POST",
+    "path":"/${Var.index}/_delete_by_query?refresh=wait_for",
+    "body":{
+        "query":{
+            "match":{
+                "qid":"$util.urlDecode($input.params('ID'))"
+            }
+        }
+    }
+
 }
 
 

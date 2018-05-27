@@ -3,7 +3,17 @@ exports.parse=function(event){
     var out={
         _type:"ALEXA",
         original:event,
-        session:_.get(event,'session.attributes',{}) || {},
+        session:_.mapValues(
+            _.get(event,'session.attributes',{}),
+            x=>{
+                try {
+                    return JSON.parse(x)
+                } catch(e){
+                    return x
+                }
+            }
+        ),
+
         channel:null,
     }
 
@@ -77,25 +87,22 @@ exports.assemble=function(request,response){
                 text:response.type==='PlainText' ? response.message : null,
                 ssml:response.type==='SSML' ? response.message : null,
             }),
-            card:response.card.imageUrl ? {
+            card:_.get(response,"card.imageUrl") ? {
                 type:"Standard",
                 title:response.card.title || request.question,
-                text:response.message,
+                text:_.has(response.card,'subTitle')? response.card.subTitle +"\n\n" + response.message:response.message,
                 image:{
                     smallImageUrl:response.card.imageUrl,
                     largeImageUrl:response.card.imageUrl
                 }
             } : {
                 type:"Simple",
-                title:response.card.title || request.question,
+                title:_.get(response,"card.title") || request.question || "Image",
                 content:response.message
             },
             shouldEndSession:false
         },
-        sessionAttributes:_.mapValues(
-            _.get(response,'session',{}),
-            x=>_.isString(x) ? x : JSON.stringify(x)
-        )
+        sessionAttributes:_.get(response,'session',{})
     }
 }
 

@@ -31,6 +31,9 @@ module.exports={
     "BotName":{
         "Value":{"Ref":"LexBot"}
     },
+    "BotAlias":{
+        "Value":{"Ref":"Alias"}
+    },
     "SlotType":{
         "Value":{"Ref":"SlotType"}
     },
@@ -96,8 +99,11 @@ module.exports={
     "ElasticsearchEndpoint":{
       "Value":{"Fn::GetAtt":["ESVar","ESAddress"]}
     },
-    "ElasticsearchType":{
-      "Value":{"Fn::GetAtt":["Var","type"]}
+    "ElasticsearchQnAType":{
+      "Value":{"Fn::GetAtt":["Var","QnAType"]}
+    },
+    "ElasticsearchQuizType":{
+       "Value":{"Fn::GetAtt":["Var","QuizType"]}
     },
     "ElasticsearchIndex":{
       "Value":{"Fn::GetAtt":["Var","index"]}

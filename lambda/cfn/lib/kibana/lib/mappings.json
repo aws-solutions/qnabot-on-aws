@@ -1,0 +1,174 @@
+{
+  "index-pattern": {
+    "properties": {
+      "fieldFormatMap": {
+        "type": "text"
+      },
+      "fields": {
+        "type": "text"
+      },
+      "intervalName": {
+        "type": "text"
+      },
+      "notExpandable": {
+        "type": "boolean"
+      },
+      "sourceFilters": {
+        "type": "text"
+      },
+      "timeFieldName": {
+        "type": "text"
+      },
+      "title": {
+        "type": "text"
+      }
+    }
+  },
+  "config": {
+    "properties": {
+      "buildNum": {
+        "type": "keyword"
+      },
+      "defaultIndex": {
+        "type": "text",
+        "fields": {
+          "keyword": {
+            "type": "keyword",
+            "ignore_above": 256
+          }
+        }
+      },
+      "visualization:tileMap:WMSdefaults": {
+        "type": "text",
+        "fields": {
+          "keyword": {
+            "type": "keyword",
+            "ignore_above": 256
+          }
+        }
+      }
+    }
+  },
+  "visualization": {
+    "properties": {
+      "description": {
+        "type": "text"
+      },
+      "kibanaSavedObjectMeta": {
+        "properties": {
+          "searchSourceJSON": {
+            "type": "text"
+          }
+        }
+      },
+      "savedSearchId": {
+        "type": "text"
+      },
+      "title": {
+        "type": "text"
+      },
+      "uiStateJSON": {
+        "type": "text"
+      },
+      "version": {
+        "type": "integer"
+      },
+      "visState": {
+        "type": "text"
+      }
+    }
+  },
+  "search": {
+    "properties": {
+      "columns": {
+        "type": "text"
+      },
+      "description": {
+        "type": "text"
+      },
+      "hits": {
+        "type": "integer"
+      },
+      "kibanaSavedObjectMeta": {
+        "properties": {
+          "searchSourceJSON": {
+            "type": "text"
+          }
+        }
+      },
+      "sort": {
+        "type": "text"
+      },
+      "title": {
+        "type": "text"
+      },
+      "version": {
+        "type": "integer"
+      }
+    }
+  },
+  "dashboard": {
+    "properties": {
+      "description": {
+        "type": "text"
+      },
+      "hits": {
+        "type": "integer"
+      },
+      "kibanaSavedObjectMeta": {
+        "properties": {
+          "searchSourceJSON": {
+            "type": "text"
+          }
+        }
+      },
+      "optionsJSON": {
+        "type": "text"
+      },
+      "panelsJSON": {
+        "type": "text"
+      },
+      "refreshInterval": {
+        "properties": {
+          "display": {
+            "type": "text"
+          },
+          "pause": {
+            "type": "boolean"
+          },
+          "section": {
+            "type": "integer"
+          },
+          "value": {
+            "type": "integer"
+          }
+        }
+      },
+      "timeFrom": {
+        "type": "text"
+      },
+      "timeRestore": {
+        "type": "boolean"
+      },
+      "timeTo": {
+        "type": "text"
+      },
+      "title": {
+        "type": "text"
+      },
+      "uiStateJSON": {
+        "type": "text"
+      },
+      "version": {
+        "type": "integer"
+      }
+    }
+  },
+  "server": {
+    "properties": {
+      "uuid": {
+        "type": "keyword"
+      }
+    }
+  }
+}

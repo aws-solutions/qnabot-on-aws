@@ -31,7 +31,7 @@
               v-model="tmp"
               :valid.sync="valid"
               :schema="schema"
-              :pick="schema.required"
+              :pick="required"
               path="edit"
             )
             v-expansion-panel.elevation-0
@@ -41,7 +41,7 @@
                   v-model="tmp"
                   :valid.sync="valid"
                   :schema="schema" 
-                  :omit="schema.required"
+                  :omit="required"
                   path="add"
                 )
           small *indicates required field
@@ -89,8 +89,14 @@ module.exports={
     "schema-input":require('./input.vue')
   },
   computed:{
+    type:function(){
+      return this.data.type || 'qna'
+    },
     schema:function(){
-      return this.$store.state.data.schema
+      return _.get(this,`$store.state.data.schema[${this.type}]`,{type:"object"})
+    },
+    required:function(){
+      return _.get(this,'schema.required',[])
     }
   },
   methods:{

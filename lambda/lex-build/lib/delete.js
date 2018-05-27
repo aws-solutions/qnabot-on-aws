@@ -18,18 +18,21 @@ var _=require('lodash')
 var run=require('./run.js')
 
 exports.bot=function(name,version){
-    return run('getBotVersions',{name}).get('bots')
-    .filter(type=>["$LATEST",version].indexOf(type.version)===-1)
-    .map(x=>run('deleteBotVersion',{name,version:x.version}))
+    return Promise.all(run('getBotVersions',{name}).get('bots')
+    .map(x=>x.version)
+    .filter(x=>!_.includes(["$LATEST",version],x))
+    .map(x=>run('deleteBotVersion',{name,version:x})))
 }
 exports.intent=function(name,version){
-    return run('getIntentVersions',{name,}).get('intents')
-    .filter(type=>["$LATEST",version].indexOf(type.version)===-1)
-    .map(x=>run('deleteIntentVersion',{name,version:x.version }))
+    return Promise.all(run('getIntentVersions',{name,}).get('intents')
+    .map(x=>x.version)
+    .filter(x=>!_.includes(["$LATEST",version],x))
+    .map(x=>run('deleteIntentVersion',{name,version:x})))
 }
 exports.slot=function(name,version){
-    return run('getSlotTypeVersions',{name}).get('slotTypes')
-    .filter(type=>["$LATEST",version].indexOf(type.version)===-1)
-    .map(x=>run('deleteSlotTypeVersion',{name,version:x.version}))
+    return Promise.all(run('getSlotTypeVersions',{name}).get('slotTypes')
+    .map(x=>x.version)
+    .filter(x=>!_.includes(["$LATEST",version],x))
+    .map(x=>run('deleteSlotTypeVersion',{name,version:x})))
 }
 

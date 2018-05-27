@@ -116,6 +116,13 @@ module.exports={
         icon:"forum",
         target:'_blank',
         href:_.get(this,"$store.state.info._links.ClientLogin.href")
+      },{
+        title:"Kibana Dashboard",
+        id:"kibana",
+        subTitle:"Analyze ChatBot usage",
+        icon:"show_chart",
+        target:'_blank',
+        href:_.get(this,"$store.state.info._links.Kibana.href")+"#/dashboard/Default?_g=()"
       }]
     }
   },

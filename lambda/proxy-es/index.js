@@ -4,7 +4,8 @@ var cfnLambda=require('cfn-lambda')
 var request=require('./lib/request')
 
 exports.qid=require('./lib/qid')
-
+exports.logging=require('./lib/logging')
+exports.utterances=require('./lib/utterances')
 exports.handler =require('./lib/handler') 
 exports.resource=require('./lib/cfn').resource
 

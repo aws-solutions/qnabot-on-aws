@@ -8,17 +8,17 @@ module.exports={
         "S3ObjectVersion":{"Ref":"LexBuildCodeVersion"}
     },{
         UTTERANCE_BUCKET:{"Ref":"AssetBucket"},
+        UTTERANCE_KEY:"default-utterances.json",
         POLL_LAMBDA:{"Fn::GetAtt":["LexBuildLambdaPoll","Arn"]},
         STATUS_BUCKET:{"Ref":"BuildStatusBucket"},
         STATUS_KEY:"status.json",
-        UTTERANCE_KEY:"default-utterances.json",
         BOTNAME:{"Ref":"LexBot"},
+        BOTALIAS:{"Ref":"Alias"},
         SLOTTYPE:{"Ref":"SlotType"},
         INTENT:{"Ref":"Intent"},
         ADDRESS:{"Fn::GetAtt":["ESVar","ESAddress"]},
         INDEX:{"Fn::GetAtt":["Var","index"]},
-        TYPE:{"Fn::GetAtt":["Var","type"]}
-    }),
+    },"nodejs8.10"),
     "LexBuildLambdaStart":lambda({
         "ZipFile":fs.readFileSync(__dirname+'/start.js','utf8')
     },{
@@ -35,7 +35,6 @@ module.exports={
     }),
     "LexBuildCodeVersion":{
         "Type": "Custom::S3Version",
-        "DependsOn":["CFNLambdaPolicy"],
         "Properties": {
             "ServiceToken": { "Fn::GetAtt" : ["CFNLambda", "Arn"] },
             "Bucket": {"Ref":"BootstrapBucket"},
@@ -126,7 +125,7 @@ module.exports={
     },
     "BuildStatusClear":{
         "Type": "Custom::S3Clear",
-        "DependsOn":["CFNLambdaPolicy","CFNInvokePolicy"],
+        "DependsOn":["CFNInvokePolicy"],
         "Properties": {
             "ServiceToken": { "Fn::GetAtt" : ["CFNLambda", "Arn"] },
             "Bucket":{"Ref":"BuildStatusBucket"}
@@ -134,7 +133,7 @@ module.exports={
     }
 }
 
-function lambda(code,variable={}){
+function lambda(code,variable={},runtime="nodejs6.10"){
     return {
       "Type": "AWS::Lambda::Function",
       "Properties": {
@@ -145,7 +144,7 @@ function lambda(code,variable={}){
         "Handler": "index.handler",
         "MemorySize": "128",
         "Role": {"Fn::GetAtt": ["LexBuildLambdaRole","Arn"]},
-        "Runtime": "nodejs6.10",
+        "Runtime":runtime,
         "Timeout": 300,
         "Tags":[{
             Key:"Type",

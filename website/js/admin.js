@@ -25,8 +25,7 @@ import IdleVue from 'idle-vue'
 var Idle=require('idle-js')
 var validate=require('vee-validate')
 import VueClipboard from 'vue-clipboard2'
-
-
+var _=require('lodash')
 
 Vue.use(validate,{
     classNames:{
@@ -73,12 +72,7 @@ function init(){
         var App=new Vue({
             router,
             store,
-            render:h=>h(app),
-            onIdle:function(){
-                window.alert("Sorry, you are being logged out for being idle. Please log back in")
-                this.$store.dispatch('user/logout')
-                window.location=this.login
-            }
+            render:h=>h(app)
         })
         
         require('./lib/validator')(App)        

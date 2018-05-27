@@ -28,6 +28,7 @@ module.exports={
             path:"questions/"+id,
             method:"PUT",
             body:{
+                type:"qna",
                 qid:id,
                 q:["who am i"],
                 a:"i am the unit",
@@ -50,6 +51,7 @@ module.exports={
                 path:"questions/"+id1,
                 method:"PUT",
                 body:{
+                    type:"qna",
                     qid:id1,
                     q:["who am i"],
                     a:"i am the unit"
@@ -60,6 +62,7 @@ module.exports={
                 path:"questions/"+id2,
                 method:"PUT",
                 body:{
+                    type:"qna",
                     qid:id2,
                     q:["who am i"],
                     a:"i am the unit"
@@ -85,6 +88,7 @@ module.exports={
                 path:"questions/"+id1,
                 method:"PUT",
                 body:{
+                    type:"qna",
                     qid:id1,
                     q:["who am i"],
                     a:"i am the unit"
@@ -95,6 +99,7 @@ module.exports={
                 path:"questions/"+id2,
                 method:"PUT",
                 body:{
+                    type:"qna",
                     qid:id2,
                     q:["who am i"],
                     a:"i am the unit"
@@ -111,13 +116,13 @@ module.exports={
             }))
             .then(()=>exists(id1,test,false))
             .then(()=>exists(id2,test,true))
-            .then(()=>api({
+            /*.then(()=>api({
                 path:"questions",
                 method:"DELETE",
                 body:{
                     query:".*test"
                 }
-            }))
+            }))*/
             .finally(()=>test.done())
         },
         list:function(test){
@@ -127,6 +132,7 @@ module.exports={
                 path:"questions/"+id1,
                 method:"PUT",
                 body:{
+                    type:"qna",
                     qid:id1,
                     q:["who am i"],
                     a:"i am the unit"
@@ -137,6 +143,7 @@ module.exports={
                 path:"questions/"+id2,
                 method:"PUT",
                 body:{
+                    type:"qna",
                     qid:id2,
                     q:["who am i"],
                     a:"i am the unit"

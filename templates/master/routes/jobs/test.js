@@ -16,21 +16,7 @@ module.exports={
     list:test=>run(__dirname+'/'+"list",input({
         perpage:100,
         token:""
-    }),test),
-    handler:function(test){
-        env.then(function(envs){
-            require('./handler').handler({
-                bucket:envs["QNA-DEV-BUCKET"],
-                prefix:"",
-                root:"example.com"
-            },{},function(err,result){
-                console.log(result)
-                test.ifError(err)
-                test.ok(result)
-                test.done()
-            })
-        })
-    }
+    }),test)
 }
 
 

@@ -7,10 +7,8 @@ module.exports={
             value:{"Ref":"AWS::StackName"},
             op:"toLowerCase"
         },
-        "type":{
-            value:{"Ref":"AWS::StackName"},
-            op:"toLowerCase"
-        }
+        "QnAType":"qna",
+        "QuizType":"quiz"
     }
 },
 "ESVar":{
@@ -31,7 +29,9 @@ module.exports={
             "CreateDomain",
             {"Ref":"ElasticsearchDomain"},
             {"Ref":"ElasticsearchName"}
-        ]}
+        ]},
+        "MetricsIndex":{"Fn::Sub":"${Var.index}-metrics"},
+        "FeedbackIndex":{"Fn::Sub":"${Var.index}-feedback"},
     }
 },
 "ApiUrl":{
@@ -58,7 +58,8 @@ module.exports={
         "Client":{"Fn::Join": ["",[
             {"Fn::GetAtt":["ApiUrl","Name"]},
             "/static/client.html"
-        ]]}
+        ]]},
+        "Kibana":{"Fn::Sub":"${ESVar.ESAddress}/_plugin/kibana/"}
     }
 }
 }

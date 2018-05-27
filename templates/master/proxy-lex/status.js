@@ -15,10 +15,23 @@ exports.handler = (event, context, callback) => {
         return {}
     })
     .then(result=>{
-        return lex.getBot({
+        return lex.getBotVersions({
             name:process.env.BOT_NAME,
-            versionOrAlias:"$LATEST"
         }).promise()
+        .then(versions=>{
+            console.log(versions)
+            var version=versions.bots
+                .filter(version=>version.status==="READY")
+                .map(x=>x.version)
+                .sort()
+                .reverse()[0]
+            console.log(version)
+            return version
+        })
+        .then(version=>lex.getBot({
+            name:process.env.BOT_NAME,
+            versionOrAlias:version
+        }).promise())
         .then(bot=>{
             bot.build=result
             return bot

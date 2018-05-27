@@ -38,16 +38,20 @@ exports.step=function(event,context,cb){
                 } catch(e){
                     config.buffer=objects.pop()
                 }
-                var out=[] 
-                objects.filter(x=>x).forEach(x=>{
+                var out=[]
+                objects.filter(x=>x)
+                .forEach(x=>{
                     try{
                         var obj=JSON.parse(x)
-                        obj.questions=obj.q.map(x=>{return {q:x}})
-                        delete obj.q
+                        obj.type=obj.type || 'qna'
+                        if(obj.type==='qna'){
+                            obj.questions=obj.q.map(x=>{return {q:x}})
+                            delete obj.q
+                        }
                         out.push(JSON.stringify({
                             index:{
                                 "_index":process.env.ES_INDEX,
-                                "_type":process.env.ES_TYPE,
+                                "_type":obj.type,
                                 "_id":obj.qid
                             }
                         }))

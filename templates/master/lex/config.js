@@ -13,9 +13,9 @@ License for the specific language governing permissions and limitations under th
 
 module.exports={
     "voiceId":"Joanna",
-    "Clarification":"Sorry, can you please repeat that?",
+    "Clarification":"Sorry, I did not understand that",
     "ErrorMessage":"Sadly I encountered an error when searching for your answer. Please ask me again later.",
     "EmptyMessage":"You stumped me! Sadly I don't know how to answer your question.",
-    "Abort":"Sorry, can you please repeat that?",
+    "Abort":"Sorry, I did not understand that",
     "utterances":require('../../../assets/default-utterances')
 }
