@@ -29,7 +29,7 @@ module.exports=[
             "type": "visualization"
           },
           {
-            "id": "client-types",
+            "id": "Client-types",
             "type": "visualization",
             "panelIndex": 3,
             "size_x": 4,
@@ -38,7 +38,7 @@ module.exports=[
             "row": 5
           },
           {
-            "id": "requests",
+            "id": "Requests",
             "type": "visualization",
             "panelIndex": 4,
             "size_x": 12,
