@@ -69,7 +69,11 @@ module.exports={
               ],
               "Resource":[
                 "arn:aws:lambda:*:*:function:qna-*",
-                "arn:aws:lambda:*:*:function:QNA-*"
+                "arn:aws:lambda:*:*:function:QNA-*",
+                {"Fn::GetAtt":["ESQueryLambda","Arn"]},
+                {"Fn::GetAtt":["ESProxyLambda","Arn"]},
+                {"Fn::GetAtt":["ESLoggingLambda","Arn"]},
+                {"Fn::GetAtt":["ESQidLambda","Arn"]},
               ].concat(require('../../examples/outputs').names
                 .map(x=>{
                     return {"Fn::GetAtt":["ExamplesStack",`Outputs.${x}`]}
