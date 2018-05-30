@@ -11,42 +11,51 @@ module.exports=[
       "description": "",
       "panelsJSON":JSON.stringify([
           {
-            "col": 1,
-            "id": "Feedback-by-QID-and-Utterance",
-            "panelIndex": 1,
-            "row": 9,
-            "size_x": 11,
-            "size_y": 5,
+            "col": 9,
+            "id": "Client-types",
+            "panelIndex": 3,
+            "row": 1,
+            "size_x": 4,
+            "size_y": 4,
             "type": "visualization"
           },
           {
-            "col": 5,
-            "id": "Logged-Utterances",
-            "panelIndex": 2,
-            "row": 5,
+            "col": 1,
+            "id": "Requests",
+            "panelIndex": 4,
+            "row": 1,
             "size_x": 8,
             "size_y": 4,
             "type": "visualization"
           },
           {
-            "id": "Client-types",
-            "type": "visualization",
-            "panelIndex": 3,
-            "size_x": 4,
-            "size_y": 4,
             "col": 1,
-            "row": 5
+            "id": "Incorrect-feedback-wordcloud",
+            "panelIndex": 5,
+            "row": 9,
+            "size_x": 6,
+            "size_y": 3,
+            "type": "visualization"
           },
           {
-            "id": "Requests",
-            "type": "visualization",
-            "panelIndex": 4,
+            "col": 7,
+            "id": "Correct-feedback-wordcloud",
+            "panelIndex": 6,
+            "row": 9,
+            "size_x": 6,
+            "size_y": 3,
+            "type": "visualization"
+          },
+          {
+            "col": 3,
+            "id": "Logged-Utterances",
+            "panelIndex": 7,
+            "row": 5,
             "size_x": 12,
             "size_y": 4,
-            "col": 1,
-            "row": 1
+            "type": "visualization"
           }
-      ]),
+        ]),
       "optionsJSON": "{\"darkTheme\":false}",
       "uiStateJSON": "{}",
       "version": 1,
@@ -187,6 +196,98 @@ module.exports=[
       "version": 1,
       "kibanaSavedObjectMeta": {
         "searchSourceJSON": {"Fn::Sub":"{\"index\":\"${ESVar.MetricsIndex}\",\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"filter\":[]}"}
+      }
+    }
+  },
+  {
+    "_id": "Correct-feedback-wordcloud",
+    "_type": "visualization",
+    "_index":".kibana",
+    "_source": {
+      "title": "Anwsers with positive feedback",
+      "visState":JSON.stringify({
+          "aggs": [
+            {
+              "enabled": true,
+              "id": "1",
+              "params": {},
+              "schema": "metric",
+              "type": "count"
+            },
+            {
+              "enabled": true,
+              "id": "2",
+              "params": {
+                "field": "qid.keyword",
+                "order": "desc",
+                "orderBy": "1",
+                "size": 5
+              },
+              "schema": "segment",
+              "type": "terms"
+            }
+          ],
+          "listeners": {},
+          "params": {
+            "maxFontSize": 72,
+            "minFontSize": 18,
+            "orientation": "single",
+            "scale": "linear"
+          },
+          "title":"Anwsers with positive feedback",
+          "type": "tagcloud"
+      }),
+      "uiStateJSON": "{}",
+      "description": "",
+      "version": 1,
+      "kibanaSavedObjectMeta": {
+        "searchSourceJSON": {"Fn::Sub":"{\"index\":\"${ESVar.FeedbackIndex}\",\"query\":{\"query_string\":{\"query\":\"feedback=The answer was a good response to your question.\",\"analyze_wildcard\":true}},\"filter\":[]}"}
+      }
+    }
+  },
+  {
+    "_id": "Incorrect-feedback-wordcloud",
+    "_type": "visualization",
+    "_index":".kibana",
+    "_source": {
+      "title": "Anwsers with negative feedback",
+      "visState":JSON.stringify({
+          "aggs": [
+            {
+              "enabled": true,
+              "id": "1",
+              "params": {},
+              "schema": "metric",
+              "type": "count"
+            },
+            {
+              "enabled": true,
+              "id": "2",
+              "params": {
+                "field": "qid.keyword",
+                "order": "desc",
+                "orderBy": "1",
+                "size": 5
+              },
+              "schema": "segment",
+              "type": "terms"
+            }
+          ],
+          "listeners": {},
+          "params": {
+            "maxFontSize": 72,
+            "minFontSize": 18,
+            "orientation": "single",
+            "scale": "linear"
+          },
+          "title":"Anwsers with positive feedback",
+          "type": "tagcloud"
+      }),
+      "uiStateJSON": "{}",
+      "description": "",
+      "version": 1,
+      "kibanaSavedObjectMeta": {
+        "searchSourceJSON": {"Fn::Sub":"{\"index\":\"${ESVar.FeedbackIndex}\",\"query\":{\"query_string\":{\"query\":\"feedback=The answer was a bad response to your question.\",\"analyze_wildcard\":true}},\"filter\":[]}"}
       }
     }
   }
