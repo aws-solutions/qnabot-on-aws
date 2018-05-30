@@ -85,7 +85,69 @@
         "ManagedPolicyArns": [
             "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
             {"Ref":"CFNLambdaPolicy"}
-        ]
+        ],
+        "Policies":[{
+            "PolicyName":"access", 
+            "PolicyDocument": {
+                "Version": "2012-10-17",
+                "Statement": [{
+                  "Effect": "Allow",
+                  "Action": [
+                    "es:*"
+                  ],
+                  "Resource":["*"]
+                },
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "lex:PutSlotType",
+                    "lex:DeleteSlotType",
+                    "lex:PutIntent",
+                    "lex:DeleteIntent",
+                    "lex:PutBot",
+                    "lex:DeleteBot",
+                    "lex:PutBotAlias",
+                    "lex:DeleteBotAlias"
+                  ],
+                  "Resource": [
+                    "*"
+                  ]
+                },
+                {
+                  "Effect": "Allow",
+                  "Action": [   
+                    "apigateway:*"
+                  ],
+                  "Resource": ["*"]
+                },
+                {
+                  "Effect": "Allow",
+                  "Action": [   
+                    "cognito-identity:SetIdentityPoolRoles",
+                    "cognito-identity:GetIdentityPoolRoles",
+                    "iam:PassRole",
+                    "iam:CreateServiceLinkedRole"
+                  ],
+                  "Resource": ["*"]
+                },
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "cognito-idp:*"
+                  ],
+                  "Resource": ["*"]
+                },
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "s3:*"
+                  ],
+                  "Resource":[
+                    {"Fn::Sub":"arn:aws:s3:::*"}
+                  ]
+                }]
+            }
+        }]
       }
     }
 }
