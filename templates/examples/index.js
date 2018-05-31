@@ -25,7 +25,8 @@ module.exports={
     "CFNLambda":{"Type":"String"},
     "CFNLambdaRole":  {"Type":"String"},
     "ApiUrlName":{"Type":"String"},
-    "AssetBucket":{"Type":"String"}
+    "AssetBucket":{"Type":"String"},
+    "QIDLambdaArn":{"Type":"String"}
   },
   "Conditions":{}
 }

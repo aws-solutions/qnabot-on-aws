@@ -155,6 +155,7 @@ module.exports=Object.assign(
                   "Resource": [
                     {"Fn::Join": ["",["arn:aws:lambda:",{ "Ref" : "AWS::Region" },":",{ "Ref" : "AWS::AccountId" },":function:qna-*"]]},
                     {"Fn::Join": ["",["arn:aws:lambda:",{ "Ref" : "AWS::Region" },":",{ "Ref" : "AWS::AccountId" },":function:QNA-*"]]},
+                    {"Ref":"QIDLambdaArn"} 
                   ]
                 },
                 {

@@ -17,7 +17,8 @@ module.exports={
                 "CFNLambdaRole":{"Fn::GetAtt":["CFNLambdaRole","Arn"]},
                 "ApiUrlName":{"Fn::GetAtt":["ApiUrl","Name"]},
                 "AssetBucket":{"Ref":"AssetBucket"},
-                "FulfillmentLambdaRole":{"Ref": "FulfillmentLambdaRole"}
+                "FulfillmentLambdaRole":{"Ref": "FulfillmentLambdaRole"},
+                "QIDLambdaArn":{"Fn::GetAtt":["ESQidLambda","Arn"]}
             }
         }
     }
