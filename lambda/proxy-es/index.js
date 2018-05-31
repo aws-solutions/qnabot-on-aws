@@ -5,6 +5,7 @@ var request=require('./lib/request')
 
 exports.qid=require('./lib/qid')
 exports.logging=require('./lib/logging')
+exports.cleanmetrics=require('./lib/cleanmetrics')
 exports.utterances=require('./lib/utterances')
 exports.handler =require('./lib/handler') 
 exports.resource=require('./lib/cfn').resource
