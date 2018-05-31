@@ -218,7 +218,7 @@ module.exports=[
               "enabled": true,
               "id": "2",
               "params": {
-                "field": "qid.keyword",
+                "field": "utterance.keyword",
                 "order": "desc",
                 "orderBy": "1",
                 "size": 5
@@ -264,7 +264,7 @@ module.exports=[
               "enabled": true,
               "id": "2",
               "params": {
-                "field": "qid.keyword",
+                "field": "utterance.keyword",
                 "order": "desc",
                 "orderBy": "1",
                 "size": 5
