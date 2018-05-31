@@ -12,3 +12,4 @@
 3) increment semver in package.json
 4) merge and push to github
 5) tag release with semver
+6) update public bucket with public template
