@@ -1,4 +1,8 @@
-## [2.0]
+## [2.0.1]
+## fixed
+- serviceCreateRole issue in  CNFLambda when creating lex bots
+
+## [2.0.0]
 ### fixed
 - QnABot is now a single template
 
