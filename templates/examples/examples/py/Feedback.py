@@ -19,11 +19,8 @@ def handler(event, context):
     validResponseQid = collections.OrderedDict()
     validResponseQid.update({'A':'The answer was a good response to your question.'})
     validResponseQid.update({'B':'The answer was a bad response to your question.'})
-    validResponseQid.update({'C':'The answer is wrong or does not make sense.'})
-    validResponseQid.update({'D':'There is something else wrong with the answer.'})
-
     #the Qid to exit feedback without leaving feedback
-    exitResponseQid={'E':'Cancel leaving feedback'}
+    exitResponseQid={'C':'Cancel leaving feedback'}
     previousQid = None
     previousQuestion = None
     previousAnswer = None
@@ -59,7 +56,7 @@ def handler(event, context):
     # if it is a valid response for leaving feedback
     elif currentQid in validResponseQid:
         logFeedback(previousQid,previousQuestion,previousAnswer,previousAlt,validResponseQid.get(currentQid))
-        event["res"]["message"] = "Thank you for leaving the feedback,{0}. Relevant information has been logged and will be looked at.".format(validResponseQid.get(currentQid))
+        event["res"]["message"] = "Thank you for leaving the feedback."
         event["res"]["session"]["previous"] = {'qid': previousQid , 'a': previousAnswer, 'alt': previousAlt,'q': previousQuestion}
         #set back to normal mode if in feedback mode
         event["res"]["session"].pop("queryLambda",None)
