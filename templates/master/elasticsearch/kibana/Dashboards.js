@@ -241,7 +241,7 @@ module.exports=[
       "description": "",
       "version": 1,
       "kibanaSavedObjectMeta": {
-        "searchSourceJSON": {"Fn::Sub":"{\"index\":\"${ESVar.FeedbackIndex}\",\"query\":{\"query_string\":{\"query\":\"feedback=The answer was a good response to your question.\",\"analyze_wildcard\":true}},\"filter\":[]}"}
+        "searchSourceJSON": {"Fn::Sub":"{\"index\":\"${ESVar.FeedbackIndex}\",\"query\":{\"query_string\":{\"query\":\"feedback=good\",\"analyze_wildcard\":true}},\"filter\":[]}"}
       }
     }
   },
@@ -280,14 +280,14 @@ module.exports=[
             "orientation": "single",
             "scale": "linear"
           },
-          "title":"Anwsers with positive feedback",
+          "title":"Anwsers with negative feedback",
           "type": "tagcloud"
       }),
       "uiStateJSON": "{}",
       "description": "",
       "version": 1,
       "kibanaSavedObjectMeta": {
-        "searchSourceJSON": {"Fn::Sub":"{\"index\":\"${ESVar.FeedbackIndex}\",\"query\":{\"query_string\":{\"query\":\"feedback=The answer was a bad response to your question.\",\"analyze_wildcard\":true}},\"filter\":[]}"}
+        "searchSourceJSON": {"Fn::Sub":"{\"index\":\"${ESVar.FeedbackIndex}\",\"query\":{\"query_string\":{\"query\":\"feedback=bad\",\"analyze_wildcard\":true}},\"filter\":[]}"}
       }
     }
   }
