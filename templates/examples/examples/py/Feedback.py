@@ -17,13 +17,11 @@ def handler(event, context):
     
     # list of all the valid qids to be used for response feedback
     validResponseQid = collections.OrderedDict()
-    validResponseQid.update({'A':'The answer was a good response to your question.'})
-    validResponseQid.update({'B':'The answer was a bad response to your question.'})
-    validResponseQid.update({'C':'The answer is wrong or does not make sense.'})
-    validResponseQid.update({'D':'There is something else wrong with the answer.'})
+    validResponseQid.update({'A':'Correct and/or usefull'})
+    validResponseQid.update({'B':'Incorrect and/or not usefull'})
 
     #the Qid to exit feedback without leaving feedback
-    exitResponseQid={'E':'Cancel leaving feedback'}
+    exitResponseQid={'C':'Cancel feedback'}
     previousQid = None
     previousQuestion = None
     previousAnswer = None
@@ -72,10 +70,10 @@ def handler(event, context):
     #Give feedback options upon first call of feedback function or invalid response    
     else:
         defaultResp = [
-            'What feedback would you like to leave for the question, "{0}" ?'.format(previousQuestion),
+            'Thank you for leaving feedback. Was the last answer:, "{0}" ?'.format(previousQuestion),
         ]
         htmlResp = [
-            'What feedback would you like to leave for the question, <i>"{0}"</i> ?\n'.format(previousQuestion),
+            'Thank you for leaving feedback. Was the last answer:, <i>"{0}"</i> ?\n'.format(previousQuestion),
         ]
         #Append list of all valid responses
         htmlResp.append('<ul style="list-style-type:none";>')
