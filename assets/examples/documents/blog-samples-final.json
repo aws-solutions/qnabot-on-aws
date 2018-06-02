@@ -1,0 +1,236 @@
+{
+  "qna": [
+    {
+      "a": "Greetings friendly human! Ask me a question. Try to stump me.",
+      "qid": "BotStyle.001",
+      "type": "qna",
+      "q": [
+        "Hello"
+      ]
+    },
+    {
+      "qid": "QnABot.002",
+      "a": "Create and administer your questions and answers using the Q and A Bot Content Designer UI. End users ask questions using the Lex web UI which supports voice or chat, or using Alexa devices for hands free voice interaction. ",
+      "r": {
+        "title": "",
+        "imageUrl": ""
+      },
+      "type": "qna",
+      "q": [
+        "How do I use Q and A bot"
+      ]
+    },
+    {
+      "qid": "Media.001",
+      "a": "Add an image attachment to the item using the Content Designer.",
+      "r": {
+        "title": "",
+        "imageUrl": ""
+      },
+      "type": "qna",
+      "q": [
+        "How can I include pictures in Q and A Bot answers"
+      ]
+    },
+    {
+      "next": "",
+      "args": [
+        ""
+      ],
+      "a": "Echo Show brings you everything you love about Alexa, and now she can show you things. She is the perfect companion for Q and A Bot.",
+      "r": {
+        "subTitle": "",
+        "imageUrl": "https://images-na.ssl-images-amazon.com/images/I/61OddH8ddDL._SL1000_.jpg",
+        "title": "Echo Show"
+      },
+      "t": "EchoShow",
+      "alt": {
+        "markdown": "",
+        "ssml": ""
+      },
+      "l": "",
+      "qid": "Alexa.001",
+      "type": "qna",
+      "selected": false,
+      "q": [
+        "What is an Amazon Echo Show"
+      ]
+    },
+    {
+      "a": "For latest prices on the Echo Show, see the Amazon retail site or shopping app.",
+      "t": "EchoShow",
+      "qid": "Alexa.cost",
+      "type": "qna",
+      "q": [
+        "How much does it cost?"
+      ]
+    },
+    {
+      "a": "Q and A Bot is priceless",
+      "t": "QnABot",
+      "qid": "QnABot.Cost",
+      "type": "qna",
+      "q": [
+        "How much does it cost?"
+      ]
+    },
+    {
+      "qid": "Admin.002",
+      "a": "Yes. Use the Content Designer to export your content as a JSON file. Maintain this file in your version control system or S3 bucket. Use the Designer UI Import feature to restore content from the JSON file.",
+      "r": {
+        "title": "",
+        "imageUrl": ""
+      },
+      "type": "qna",
+      "q": [
+        "Can I backup Q and A Bot content"
+      ]
+    },
+    {
+      "qid": "Admin.003",
+      "a": "Yes, the Content Designer has an import function which lets you load items from a formatted JSON file. You can create JSON files using the Export feature, or you can write your own tools to create JSON files from existing content such as a website FAQ page.",
+      "r": {
+        "title": "",
+        "imageUrl": ""
+      },
+      "type": "qna",
+      "q": [
+        "Can I import Q and A Bot content from a file"
+      ]
+    },
+    {
+      "next": "",
+      "args": [
+        ""
+      ],
+      "a": "The Q and A Bot uses Amazon Lex and Alexa to provide a natural language interface for your FAQ knowledge base, so your users can just ask a question and get a quick and relevant answer.",
+      "r": {
+        "subTitle": "",
+        "imageUrl": "",
+        "title": ""
+      },
+      "t": "QnABot",
+      "alt": {
+        "markdown": "# QnaBot\nThe Q and A Bot uses [Amazon Lex](https://aws.amazon.com/lex) and [Alexa](https://developer.amazon.com/alexa) to provide a natural language interface for your FAQ knowledge base.  \nNow your users can just ask a *question* and get a quick and relevant *answer*.",
+        "ssml": "<speak>    QnABot is <emphasis level=\"strong\">great</emphasis>. But I want to tell you a secret.  <amazon:effect name=\"whispered\">I am not a real human.</amazon:effect>.   Can you believe it? </speak>"
+      },
+      "l": "",
+      "qid": "QnABot.001",
+      "type": "qna",
+      "q": [
+        "What is Q and A Bot"
+      ]
+    },
+    {
+      "qid": "Admin.005",
+      "a": "Use the Filter feature in the Questions tab to filter the items list based on the ID field. Or use the Test tab to list all the items that match a question.",
+      "r": {
+        "title": "",
+        "imageUrl": ""
+      },
+      "type": "qna",
+      "q": [
+        "How can I find specific Q and A items in the Designer UI"
+      ]
+    },
+    {
+      "qid": "Feedback",
+      "a": "Unable to leave feedback at the moment...",
+      "r": {},
+      "type": "qna",
+      "l": "QNA:ExamplePYTHONLambdaFeedback",
+      "q": [
+        "Feedback",
+        "That is wrong",
+        "leave feedback",
+        "good answer",
+        "bad answer"
+      ]
+    },
+    {
+      "qid": "EnterSampleQuiz",
+      "a": "Starting the sample quiz.  Good luck!",
+      "r": {},
+      "l": "QNA:ExampleJSLambdaQuiz",
+      "args": [
+        "sampleQuiz.1"
+      ],
+      "type": "qna",
+      "q": [
+        "I want to take the sample quiz.",
+        "Take the sample quiz.",
+        "Take the White House quiz."
+      ]
+    },
+    {
+      "next": "",
+      "args": [
+        ""
+      ],
+      "a": "Fire TV brings all the live TV and streaming content you love, and Alexa, onto the big screen. Use Alexa on the Fire TV to bring QnABot into your living room!",
+      "r": {
+        "subTitle": "",
+        "imageUrl": "",
+        "title": ""
+      },
+      "t": "",
+      "alt": {
+        "markdown": "**Fire TV** brings all the live TV and streaming content you love, and Alexa, onto the big screen. Use Alexa on the Fire TV to bring QnABot into your living room!\n<iframe src=\"https://www.youtube.com/embed/OE4MrFx2XCs\"></iframe>",
+        "ssml": ""
+      },
+      "l": "",
+      "qid": "FireTV.001",
+      "type": "qna",
+      "selected": false,
+      "q": [
+        "What is Amazon Fire TV?"
+      ]
+    },
+    {
+      "qid": "Admin.004",
+      "a": "Use the Content Designer test tool to test a question, and check what items are returned, ranked in order of score. If the desired item does not have the highest score, then add the question to the item and run the test again. The desired item should now have the highest score. Take care not to create items with duplicate questions, to avoid unpredictable responses.",
+      "r": {
+        "title": "",
+        "imageUrl": ""
+      },
+      "type": "qna",
+      "q": [
+        "How do I troubleshoot and fix problems with Q and A Bot."
+      ]
+    },
+    {
+      "qid": "Help",
+      "a": "Ask me a question!",
+      "l": "QNA:ExampleJSLambdahello",
+      "type": "qna",
+      "q": [
+        "help"
+      ]
+    },
+    {
+      "next": "",
+      "args": [
+        ""
+      ],
+      "a": "Use the Content Designer Question and Test tools to find your existing documents and edit them directly in the console. You can also export existing documents as a JSON file, make changes to the file, and re-import.",
+      "r": {
+        "subTitle": "",
+        "imageUrl": "",
+        "title": ""
+      },
+      "t": "",
+      "alt": {
+        "markdown": "",
+        "ssml": ""
+      },
+      "l": "",
+      "qid": "Admin.001",
+      "type": "qna",
+      "q": [
+        "How do I modify Q and A Bot content",
+        "How can I edit items",
+        "Need to change some answers"
+      ]
+    }
+  ]
+}
