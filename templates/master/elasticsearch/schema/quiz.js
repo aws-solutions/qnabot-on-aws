@@ -38,7 +38,6 @@ module.exports={
                 },
                 responses:{
                     title:"Custom Responses",
-                    description:"Enter incorrect answer options for this question.  These will be presented to the user in randomized order alongside the correct answer(s) you entered above.",
                     type:"object",
                     properties:{
                         correct:{
