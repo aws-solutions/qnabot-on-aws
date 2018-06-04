@@ -241,7 +241,7 @@ module.exports=[
       "description": "",
       "version": 1,
       "kibanaSavedObjectMeta": {
-        "searchSourceJSON": {"Fn::Sub":"{\"index\":\"${ESVar.FeedbackIndex}\",\"query\":{\"query_string\":{\"query\":\"feedback=good\",\"analyze_wildcard\":true}},\"filter\":[]}"}
+        "searchSourceJSON": {"Fn::Sub":"{\"index\":\"${ESVar.FeedbackIndex}\",\"query\":{\"query_string\":{\"query\":\"feedback=correct\",\"analyze_wildcard\":true}},\"filter\":[]}"}
       }
     }
   },
@@ -287,7 +287,7 @@ module.exports=[
       "description": "",
       "version": 1,
       "kibanaSavedObjectMeta": {
-        "searchSourceJSON": {"Fn::Sub":"{\"index\":\"${ESVar.FeedbackIndex}\",\"query\":{\"query_string\":{\"query\":\"feedback=bad\",\"analyze_wildcard\":true}},\"filter\":[]}"}
+        "searchSourceJSON": {"Fn::Sub":"{\"index\":\"${ESVar.FeedbackIndex}\",\"query\":{\"query_string\":{\"query\":\"feedback=incorrect\",\"analyze_wildcard\":true}},\"filter\":[]}"}
       }
     }
   }
