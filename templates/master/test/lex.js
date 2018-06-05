@@ -18,9 +18,9 @@ var run = require('./util').run
 var api = require('./util').api
 
 function sleep(ms){
-    return new Promise(resolve=>{
-        setTimeout(resolve,ms)
-    })
+    // return new Promise(resolve=>{
+    //     setTimeout(resolve,ms)
+    // })
 }
 module.exports = {
     

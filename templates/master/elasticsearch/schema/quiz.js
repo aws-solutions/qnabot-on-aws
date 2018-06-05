@@ -38,7 +38,7 @@ module.exports={
                 },
                 responses:{
                     title:"Custom Responses",
-                    description:"Enter incorrect answer options for this question.  These will be presented to the user in randomized order alongside the correct answer(s) you entered above.",
+                    description:"Enter custom responses for correct answers, incorrect answers, and the response returned on finishing the quiz.",
                     type:"object",
                     properties:{
                         correct:{
