@@ -20,7 +20,7 @@ module.exports=function(req,res){
         entireRequest:unwrappedReq,
         entireResponse:unwrappedRes,
         qid:_.get(unwrappedRes.result,"qid"),
-        utterance:unwrappedReq.question,
+        utterance: String(unwrappedReq.question).toLowerCase().replace(/[\u2000-\u206F\u2E00-\u2E7F\\'!"#$%&()*+,\-.\/:;<=>?@\[\]^_`{|}~]/g,""),
         answer:_.get(unwrappedRes,"message"),
         topic:_.get(unwrappedRes.result,"t",""),
         clientType:unwrappedReq._type,

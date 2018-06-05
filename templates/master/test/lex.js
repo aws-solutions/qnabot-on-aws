@@ -479,7 +479,7 @@ module.exports = {
             }).promise()
             console.log(response)
             sessionAttributes = response.sessionAttributes
-            test.ok(response.message.includes("What feedback would you like to leave for the question, \"One\" ?"))
+            test.ok(response.message.includes("\"One\""))
             
             response = await this.lex.postText({
                 sessionAttributes:sessionAttributes,
@@ -487,7 +487,7 @@ module.exports = {
             }).promise()
             console.log(response)
             sessionAttributes = response.sessionAttributes
-            test.ok(response.message.includes("What feedback would you like to leave for the question, \"One\" ?"))
+            test.ok(response.message.includes("\"One\""))
             
             response = await this.lex.postText({
                 sessionAttributes:sessionAttributes,
@@ -503,11 +503,11 @@ module.exports = {
             }).promise()
             console.log(response)
             sessionAttributes = response.sessionAttributes
-            test.ok(response.message.includes("What feedback would you like to leave for the question, \"One\" ?"))
+            test.ok(response.message.includes("\"One\""))
             
             response = await this.lex.postText({
                 sessionAttributes:sessionAttributes,
-                inputText: "E"
+                inputText: "C"
             }).promise()
             console.log(response)
             sessionAttributes = response.sessionAttributes
