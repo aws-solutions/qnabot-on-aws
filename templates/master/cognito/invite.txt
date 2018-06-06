@@ -1,9 +1,9 @@
 <p>Hello {username},
-<p>Welcome to QnABot, your temporary password is:
+<p>Welcome to QnABot! Your temporary password is:
 <p>     {####} 
 <p>
-<p>Please go to the following link to log in and start building your bot!
+<p>When the CloudFormation stack is COMPLETE (in approxmately 30 minutes), use the link below to log in to QnABot Content Designer, set your permanent password, and start building your bot!
 <p>     ${ApiUrl.Name}/pages/designer
 <p>
-<p>Happy to help,
-<p>  QnABot
+<p>Good luck!
+<p>QnABot (www.amazon.com/qnabot)
