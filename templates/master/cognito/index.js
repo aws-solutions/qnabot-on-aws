@@ -52,7 +52,7 @@ module.exports={
     },
     "User":{
         "Type" : "AWS::Cognito::UserPoolUser",
-        "DependsOn":["SignupPermision","MessagePermision","Kibana"],
+        "DependsOn":["SignupPermision","MessagePermision","ElasticsearchDomainUpdate"],
         "Properties" : {
             "DesiredDeliveryMediums":["EMAIL"],
             "UserAttributes":[{
