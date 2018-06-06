@@ -38,6 +38,7 @@ module.exports={
                 },
                 responses:{
                     title:"Custom Responses",
+                    description:"Enter custom responses for correct answers, incorrect answers, and the response returned on finishing the quiz.",
                     type:"object",
                     properties:{
                         correct:{

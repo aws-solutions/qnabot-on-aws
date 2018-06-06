@@ -70,10 +70,10 @@ def handler(event, context):
     #Give feedback options upon first call of feedback function or invalid response    
     else:
         defaultResp = [
-            'Thank you for leaving feedback. Was the last answer:, "{0}" ?'.format(previousQuestion),
+            'Thank you for leaving feedback. Was the answer to "{0}" :'.format(previousQuestion),
         ]
         htmlResp = [
-            'Thank you for leaving feedback. Was the last answer:, <i>"{0}"</i> ?\n'.format(previousQuestion),
+            'Thank you for leaving feedback. Was the answer to <i>"{0}"</i> : \n'.format(previousQuestion),
         ]
         #Append list of all valid responses
         htmlResp.append('<ul style="list-style-type:none";>')

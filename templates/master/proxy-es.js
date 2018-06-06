@@ -61,6 +61,54 @@ module.exports={
         }]
       }
     },
+    "ESCleaningLambda": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Code": {
+            "S3Bucket": {"Ref":"BootstrapBucket"},
+            "S3Key": {"Fn::Sub":"${BootstrapPrefix}/lambda/proxy-es.zip"},
+            "S3ObjectVersion":{"Ref":"ESProxyCodeVersion"}
+        },
+        "Environment": {
+          "Variables": {
+            ES_INDEX:{"Fn::GetAtt":["Var","index"]},
+            ES_ADDRESS:{"Fn::GetAtt":["ESVar","ESAddress"]},
+            FEEDBACK_DELETE_RANGE_MINUTES:43200,
+            METRICS_DELETE_RANGE_MINUTES:43200,
+          }
+        },
+        "Handler": "index.cleanmetrics",
+        "MemorySize": "1408",
+        "Role": {"Fn::GetAtt": ["ESProxyLambdaRole","Arn"]},
+        "Runtime": "nodejs8.10",
+        "Timeout": 300,
+        "Tags":[{
+            Key:"Type",
+            Value:"Service"
+        }]
+      }
+    },
+    "ScheduledESCleaning": {
+      "Type": "AWS::Events::Rule",
+      "Properties": {
+        "Description": "",
+        "ScheduleExpression": "rate(1 day)",
+        "State": "ENABLED",
+        "Targets": [{
+          "Arn": { "Fn::GetAtt": ["ESCleaningLambda", "Arn"] },
+          "Id": "ES_Cleaning_Function"
+        }]
+      }
+    },
+    "PermissionForEventsToInvokeLambda": {
+      "Type": "AWS::Lambda::Permission",
+      "Properties": {
+        "FunctionName": { "Ref": "ESCleaningLambda" },
+        "Action": "lambda:InvokeFunction",
+        "Principal": "events.amazonaws.com",
+        "SourceArn": { "Fn::GetAtt": ["ScheduledESCleaning", "Arn"] }
+      }
+    },
     "ESLoggingLambda": {
       "Type": "AWS::Lambda::Function",
       "Properties": {
