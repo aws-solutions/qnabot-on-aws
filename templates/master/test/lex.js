@@ -228,7 +228,7 @@ module.exports = {
                         qid: "navigation.1",
                         type: "qna",
                         q: ["next"],
-                        a: "no next room",
+                        a: "Unable to go to the next room...",
                         l: "QNA:ExamplePYTHONLambdaNext"
                     }
                 })
@@ -239,7 +239,7 @@ module.exports = {
                         qid: "navigation.2",
                         type: "qna",
                         q: ["previous"],
-                        a: "no previous room",
+                        a: "Unable to go to the previous room...",
                         l: "QNA:ExamplePYTHONLambdaPrevious"
                     }
                 })
@@ -250,7 +250,7 @@ module.exports = {
             }).promise()
             console.log(response)
             sessionAttributes = response.sessionAttributes
-            test.equal(response.message, "no next room")
+            test.equal(response.message, "Unable to go to the next room...")
             
             response = await this.lex.postText({
                 sessionAttributes: sessionAttributes,
@@ -258,7 +258,7 @@ module.exports = {
             }).promise()
             console.log(response)
             sessionAttributes = response.sessionAttributes
-            test.equal(response.message, "no previous room")
+            test.equal(response.message, "Unable to go to the previous room...")
             
         }
         catch (e) {
