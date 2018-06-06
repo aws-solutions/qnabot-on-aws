@@ -37,17 +37,16 @@ module.exports=[{
     title:"Test",
     image:"../images/alexa_enable.png",
     text:`
-Congratulations! After you enable testing your skill is ready to be used. You will have to publish your skill in order for people to use it outside of your account. 
+Congratulations! Your QnABot skill is now ready to be used. 
 
-You can use this page to test your new Alexa skill or use the following: 
-
-### EchoSim
-You can use the convenient [echosim.io](https://echosim.io/) site to test your bot.
+Enable testing (as shown below) and use the test page to try and test your new skill. 
 
 ### Alexa Device 
 To access your unpublished skill, register your Alexa device to the same account as your Amazon Developer account. If you have a device that is not registered to the right account, you can re-register it by following these directions: [Registering an Alexa-enabled Device for Testing](https://developer.amazon.com/public/solutions/alexa/alexa-skills-kit/docs/testing-an-alexa-skill#h2_register)
 
 Ask questions in the form: *\"Alexa, ask Q and A, How do I use Q and A Bot?\"*  (Assuming your device wake word is 'Alexa')
+
+Publish your skill if you want to make it available for others to use from their own Amazon accounts.
 `
 }
 ]
