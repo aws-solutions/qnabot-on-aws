@@ -90,7 +90,7 @@ exports.assemble=function(request,response){
             card:_.get(response,"card.imageUrl") ? {
                 type:"Standard",
                 title:response.card.title || request.question,
-                text:_.has(response.card,'subTitle')? response.card.subTitle +"\n\n" + response.message:response.message,
+                text:_.has(response.card,'subTitle')? response.card.subTitle +"\n\n" + response.plainMessage:response.plainMessage,
                 image:{
                     smallImageUrl:response.card.imageUrl,
                     largeImageUrl:response.card.imageUrl
@@ -98,7 +98,7 @@ exports.assemble=function(request,response){
             } : {
                 type:"Simple",
                 title:_.get(response,"card.title") || request.question || "Image",
-                content:response.message
+                content:response.plainMessage
             },
             shouldEndSession:false
         },

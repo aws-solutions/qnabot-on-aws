@@ -33,9 +33,13 @@ module.exports=function(req,res){
         if(res.result){
             res.type="PlainText"
             res.message=res.result.a
+            res.plainMessage=res.result.a
             _.set(res,"session.appContext.altMessages",
-                _.get(res,"result.alt",{})
+                _.get(res,"result.alt",{"markdown":res.result.a})
             )
+            if(! _.has(res,"res.session.appContext.altMessages.markdown") || res.session.appContext.altMessages.markdown == ""){
+                res.session.appContext.altMessages.markdown = res.result.a
+            }
             if(req.outputDialogMode!=="Text"){
                 if(_.get(res,"result.alt.ssml")){
                     res.type="SSML"
