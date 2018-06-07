@@ -15,7 +15,7 @@ exports.handler = (event, context, callback) => {
         return {}
     })
     .then(result=>{
-        lex.getBot({
+        return lex.getBot({
             name:process.env.BOT_NAME,
             versionOrAlias:"$LATEST"
         }).promise()
