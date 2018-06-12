@@ -37,7 +37,7 @@ module.exports=function(req,res){
             _.set(res,"session.appContext.altMessages",
                 _.get(res,"result.alt",{"markdown":res.result.a})
             )
-            if(! _.has(res,"res.session.appContext.altMessages.markdown") || res.session.appContext.altMessages.markdown == ""){
+            if(! _.has(res,"session.appContext.altMessages.markdown") || res.session.appContext.altMessages.markdown == ""){
                 res.session.appContext.altMessages.markdown = res.result.a
             }
             if(req.outputDialogMode!=="Text"){

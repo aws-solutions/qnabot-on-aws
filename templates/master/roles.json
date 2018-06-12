@@ -146,8 +146,7 @@
         },
         "Path": "/",
         "ManagedPolicyArns": [
-            "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
-            {"Ref":"CFNLambdaPolicy"}
+            "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
         ],
         "Policies":[{
             "PolicyName":"access", 
