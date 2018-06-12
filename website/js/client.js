@@ -34,7 +34,9 @@ var config = {
     toolbarColor:"cyan",
     toolbarTitle:"QnABot",
     toolbarLogo:null,
-    pushInitialTextOnRestart:false
+    pushInitialTextOnRestart:false,
+    AllowSuperDangerousHTMLInMessage:true,
+    showDialogStateIcon:false,
   },
   recorder:{}
 }
@@ -45,9 +47,11 @@ document.addEventListener('DOMContentLoaded', function(){
         return Promise.resolve(axios.get(`/${stage}`)).get('data')
     })
     .tap(console.log)
+
     .then(function(result){
         config.cognito.poolId=result.PoolId
         config.lex.botName=result.BotName
+        config.lex.botAlias=result.BotVersion
         return config
         console.log(config) 
     }) 

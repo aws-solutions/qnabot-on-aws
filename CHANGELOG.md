@@ -1,3 +1,15 @@
+## [2.1]
+### fixed
+- issue in stack name namespacing with different profiles
+
+### added
+- support for html, markdown, and SSML alternate answers 
+- quiz document type and lambda hook
+- feedback example lambda hook
+- navigation example lambda hook
+- kibana integration in designer ui
+- examples are in a nested template
+
 ## [2.0.1]
 ## fixed
 - serviceCreateRole issue in  CNFLambda when creating lex bots

@@ -13,7 +13,11 @@
 {
     "endpoint":"${ESVar.ESAddress}",
     "method":"POST",
-    "path":"/${Var.index}/${Var.type}/_search?search_type=dfs_query_then_fetch",
+    #if($input.params('query').length()>0)
+        "path":"/${Var.index}/${Var.QnAType}/_search?search_type=dfs_query_then_fetch",
+    #else
+        "path":"/${Var.index}/_search?search_type=dfs_query_then_fetch",
+    #end
     "body":{
         "size":"$perpage",
         "from":"$from",

@@ -1,4 +1,29 @@
 {
+    "KibanaRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+				"Effect": "Allow",
+				"Principal": {
+					"Federated": "cognito-identity.amazonaws.com"
+				},
+				"Action": "sts:AssumeRoleWithWebIdentity",
+				"Condition": {
+				    "StringEquals": {
+				        "cognito-identity.amazonaws.com:aud":{"Ref":"KibanaIdPool"}
+				    }
+				}
+            }
+          ]
+        },
+        "Path": "/",
+        "ManagedPolicyArns": [],
+        "Policies":[]
+      }
+    },
     "AdminRole": {
       "Type": "AWS::IAM::Role",
       "Properties": {
@@ -20,7 +45,45 @@
           ]
         },
         "Path": "/",
-        "ManagedPolicyArns": []
+        "ManagedPolicyArns": [],
+        "Policies":[{
+            "PolicyName":"apiAccess",
+            "PolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [{
+                  "Effect": "Allow",
+                  "Action": [   
+                    "es:ESHttp*"
+                  ],
+                  "Resource": [{"Fn::GetAtt":["ESVar","ESArn"]}]
+                },{
+                  "Effect": "Allow",
+                  "Action": [   
+                    "execute-api:*"
+                  ],
+                  "Resource": [{"Fn::Sub":
+                    "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${API}/*/*/*"
+                    }]
+                },{
+                  "Effect": "Allow",
+                  "Action": [   
+                    "s3:PutObject"
+                  ],
+                  "Resource": [{"Fn::Sub":
+                    "arn:aws:s3:::${ImportBucket}/data/*"
+                    }]
+                },{
+                  "Effect": "Allow",
+                  "Action": [   
+                    "s3:GetObject"
+                  ],
+                  "Resource": [{"Fn::Sub":
+                    "arn:aws:s3:::${ExportBucket}/data/*"
+                    }]
+                }
+              ]
+            }
+        }]
       }
     },
     "UserRole": {

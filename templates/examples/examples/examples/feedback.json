@@ -1,0 +1,19 @@
+{
+  "qna": [
+    {
+      "qid": "Feedback",
+      "a": "Unable to leave feedback at the moment...",
+      "r": {},
+      "type": "qna",
+      "l": "QNA:ExamplePYTHONLambdaFeedback",
+      "q": [
+        "Feedback",
+        "That is wrong",
+        "that is right",
+        "leave feedback",
+        "good answer",
+        "bad answer"
+      ]
+    }
+  ]
+}

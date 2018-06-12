@@ -1,0 +1,24 @@
+{{#if first}}
+{{{message}}}
+{{/if}}
+{{#if correct}}
+Correct answer! {{message}}
+{{/if}}
+{{#if incorrect}}
+Sorry, that was incorrect. The correct {{#arrayPlural correctAnswers "answer is" "answers are" }}{{/arrayPlural}}{{#each correctAnswers}} {{this}}{{/each}}. {{message}}
+{{/if}}
+{{#if question}}
+The {{#if first}}first{{else}}next{{/if}} question is: {{{question}}}
+    {{#each answers}}
+    {{{this.[2]}}}) {{{this.[0]}}}
+    {{/each}}
+{{/if}}
+{{#if finished}}
+You got {{totalCorrect}} questions correct out of {{totalQuestions}} with a score of {{score}}. {{message}}
+{{/if}}
+{{#if exit}}
+You have now exited the quiz. Ask for help for next steps.
+{{/if}}
+{{#if invalid}}
+Sorry that was an invalid response, the valid responses are{{#each answers}} {{this}}{{/each}}.
+{{/if}}

@@ -3,7 +3,13 @@ var methods=[]
 _.forEach(require('./routes'),(value,key)=>{
     value.Type==='AWS::ApiGateway::Method' ? methods.push(key) : null
 })
-var permissions=_.keys(require('./lambda')).filter(x=>x.match(/^InvokePermission/))
+var permissions=_.keys(require('./lambda'))
+    .filter(x=>x.match(/^InvokePermission/))
+    .filter(x=>![
+        'InvokePermissionLexBuildLambda',
+        'InvokePermissionLexBuildLambdaPoll',
+        'InvokePermissionLexStatusLambda'
+        ].includes(x))
 
 module.exports={
 "API": {
@@ -13,7 +19,6 @@ module.exports={
     "Description":"An Api interface for the admin actions on the QNA bot",
     "BinaryMediaTypes":["image/png"]
   },
-  "DependsOn":permissions 
 },
 "ApiCompression":{
     "Type": "Custom::ApiCompression",
@@ -31,7 +36,7 @@ module.exports={
         "buildDate":new Date(),
         "stage":"prod"
     },
-    "DependsOn":methods
+    "DependsOn":methods.concat(permissions)
 },
 "Stage":stage('prod'),
 "ApiGatewayAccount": {

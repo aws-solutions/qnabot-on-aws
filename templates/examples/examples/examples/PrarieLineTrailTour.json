@@ -1,0 +1,1161 @@
+{
+  "qna": [
+    {
+      "qid": "Previous",
+      "a": "Unable to go to the previous room...",
+      "r": {
+        "title": "",
+        "imageUrl": "",
+        "text": "",
+        "url": ""
+      },
+      "type": "qna",
+      "l": "QNA:ExamplePYTHONLambdaPrevious",
+      "q": [
+        "Previous Stop",
+        "Previous",
+        "Let's go to the Previous Stop"
+      ]
+    },
+    {
+      "qid": "Next",
+      "a": "Unable to go to the next room...",
+      "r": {
+        "title": "",
+        "imageUrl": "",
+        "text": "",
+        "url": ""
+      },
+      "type": "qna",
+      "l": "QNA:ExamplePYTHONLambdaNext",
+      "q": [
+        "Next Stop",
+        "Next",
+        "Let's go to the Next Stop"
+      ]
+    },
+      {
+          "a": "This paired sculpture and mural features a finger and thumb clasping a steel needle, followed by a trail of stitches. The title takes its inspiration from a late-1800's promotional slogan for Tacoma, and the mural elaborates on this era in Tacoma's urban development. Together, these elements tell the story of the Northern Pacific Railroad finding its end at Commencement Bay and the growth of urban Tacoma.\n\n Ask for more about the art, the artist, or the medium for additional information.", 
+          "qid": "Where the Rails Meet the Sails", 
+          "next": "Pressure + Flow", 
+          "q": [
+              "Where the Rails Meet the Sails", 
+              "Rails Meet the Sails", 
+              "Start the tour", 
+              "Start", 
+              "Let's begin"
+          ], 
+          "r": {
+              "imageUrl": "https://www.prairielinetrail.org/media/dynamic/heroes/243_Where_the_rails_meet_the_sails_rendering.jpg", 
+              "title": "Where the Rails Meet the Sails (Rendering of proposed piece)"
+          }, 
+          "t": "Where the Rails Meet the Sails", 
+          "alt": {
+              "markdown": "This paired sculpture and mural features a finger and thumb clasping a steel needle, followed by a trail of stitches. The title takes its inspiration from a late-1800's promotional slogan for Tacoma, and the mural elaborates on this era in Tacoma's urban development. Together, these elements tell the story of the Northern Pacific Railroad finding its end at Commencement Bay and the growth of urban Tacoma.\n\n Ask for more about the art, the artist, or the medium for additional information."
+          }, 
+          "type": "qna"
+      }, 
+      {
+          "a": "Steel rail, reinforced steel stitching, paint on concrete", 
+          "qid": "Where the Rails Meet the Sails: Medium", 
+          "q": [
+              "Medium", 
+              "Material", 
+              "What is it made of", 
+              "what is the medium", 
+              "what's the material"
+          ], 
+          "t": "Where the Rails Meet the Sails", 
+          "alt": {
+              "markdown": "Steel rail, reinforced steel stitching, paint on concrete"
+          }, 
+          "type": "qna"
+      }, 
+      {
+          "a": "Rotator Creative is an agency located in Tacoma, working at the intersection of art, advertising, and community building.\n\nLance Kagey is best known for his Beautiful Angle street-art posters. They use poetry, design, and antique typefaces to celebrate Tacoma, much like his first permanent public art piece. For Kagey, Where the Rails Meet the Sails is a meditation on how the world is an incredibly connected place.\n\nMark Alvis, whose great grandfather worked as an advertiser in Tacoma, marvels at the opportunity to use his own design skills to commemorate the efforts of his ancestor and others like him.\n\nScott Varga designs everything from websites, to hot rods, to industrial sculpture. He sees a direct connection between the coming of the railroad in 1873 and the proudly working-class, global city Tacoma has become.\n\nVisit their website at : http://www.rotatorcreative.com/", 
+          "qid": "Where the Rails Meet the Sails: Meet the artists", 
+          "q": [
+              "who made this", 
+              "who is the artist", 
+              "artist", 
+              "about the artist", 
+              "artist information"
+          ], 
+          "t": "Where the Rails Meet the Sails", 
+          "alt": {
+              "markdown": "Rotator Creative is an agency located in Tacoma, working at the intersection of art, advertising, and community building.\n\nLance Kagey is best known for his Beautiful Angle street-art posters. They use poetry, design, and antique typefaces to celebrate Tacoma, much like his first permanent public art piece. For Kagey, Where the Rails Meet the Sails is a meditation on how the world is an incredibly connected place.\n\nMark Alvis, whose great grandfather worked as an advertiser in Tacoma, marvels at the opportunity to use his own design skills to commemorate the efforts of his ancestor and others like him.\n\nScott Varga designs everything from websites, to hot rods, to industrial sculpture. He sees a direct connection between the coming of the railroad in 1873 and the proudly working-class, global city Tacoma has become.\n\nVisit their website at : [http://www.rotatorcreative.com/](http://www.rotatorcreative.com/)"
+          }, 
+          "type": "qna"
+      }, 
+      {
+          "a": "Where the Rails Meet the Sails is a metaphor for rails and sails being stitched together to complete the connection of the Northern Route of the Transcontinental Railroad in 1873. Here in Tacoma, trains traveled to meet the ships headed to San Francisco, Alaska, Asia, and beyond.\n\nThe needle is a piece of historic rail salvaged from the Prairie Line Trail, and the stitches are made from the same kind of heavy mooring cable used to sew cotton sails. The mural's text and title is inspired by the many marketing campaigns that sought to attract people and investment to Tacoma.\n\nThe hand holding the needle in the sculpture and mural is larger-than-life, which is fitting considering the far-reaching impacts unleashed by the decision to set the western terminus of the Northern Pacific Railroad (NPRR) in Tacoma.", 
+          "qid": "Where the Rails Meet the Sails: About the art", 
+          "q": [
+              "more about the art", 
+              "about the art", 
+              "additional information", 
+              "additional info"
+          ], 
+          "t": "Where the Rails Meet the Sails", 
+          "alt": {
+              "markdown": "Where the Rails Meet the Sails is a metaphor for rails and sails being stitched together to complete the connection of the Northern Route of the Transcontinental Railroad in 1873. Here in Tacoma, trains traveled to meet the ships headed to San Francisco, Alaska, Asia, and beyond.\n\nThe needle is a piece of historic rail salvaged from the Prairie Line Trail, and the stitches are made from the same kind of heavy mooring cable used to sew cotton sails. The mural's text and title is inspired by the many marketing campaigns that sought to attract people and investment to Tacoma.\n\nThe hand holding the needle in the sculpture and mural is larger-than-life, which is fitting considering the far-reaching impacts unleashed by the decision to set the western terminus of the Northern Pacific Railroad (NPRR) in Tacoma."
+          }, 
+          "type": "qna"
+      }, 
+      {
+          "a": "Commissioned by the City of Tacoma.\n\nA two-part installation, Pressure + Flow is a reflection on the power of technology and communication to transform a landscape. Pressure is a sculpture inspired by the inner workings of a steam engine, and Flow involves etched writing applied directly to the historic Prairie Line rails, excerpted from historic documents and letters.\n\n Ask for more about the art, the artist, or the medium for additional information.", 
+          "qid": "Pressure + Flow", 
+          "next": "Shipment to China", 
+          "q": [
+              "Pressure + Flow", 
+              "Pressure plus Flow", 
+              "Pressure and Flow", 
+              "Flow and Pressure", 
+              "Flow plus Pressure"
+          ], 
+          "r": {
+              "imageUrl": "https://www.prairielinetrail.org/media/dynamic/heroes/237_Dockrey_rendering.jpg", 
+              "title": "Pressure + Flow (Rendering of proposed piece)"
+          }, 
+          "t": "Pressure + Flow", 
+          "alt": {
+              "markdown": "Commissioned by the City of Tacoma.\n\nA two-part installation, Pressure + Flow is a reflection on the power of technology and communication to transform a landscape. Pressure is a sculpture inspired by the inner workings of a steam engine, and Flow involves etched writing applied directly to the historic Prairie Line rails, excerpted from historic documents and letters.\n\n Ask for more about the art, the artist, or the medium for additional information."
+          }, 
+          "type": "qna"
+      }, 
+      {
+          "a": "Steel sculpture", 
+          "qid": "Pressure + Flow: Medium", 
+          "q": [
+              "Medium", 
+              "Material", 
+              "What is it made of", 
+              "what is the medium", 
+              "what's the material"
+          ], 
+          "t": "Pressure + Flow", 
+          "alt": {
+              "markdown": "Steel sculpture"
+          }, 
+          "type": "qna"
+      }, 
+      {
+          "a": "Matthew Dockery is a Seattle-area industrial artist who works in metal, electronics, wood and textiles. The history of technology provides the inspiration for much of his work, and he has a special love for machines, gadgets, gears that mesh properly, and history. His work has been featured on the Discovery Channel, at Greenwich Observatory in London, at the annual Burning Man festival, and around the Pacific Northwest. Dockery describes his work as living at the intersection of gears and mad science.\n\nWhen asked how Pressure + Flow tells the Prairie Line's story, Dockery replied, In many ways, the railroad is Tacoma's story. It was just another small town until the Northern Pacific made it their terminus. Dockery insists that in many ways society is still moving to the frontier: There are still such things as real estate bubbles and speculation, risk and reward, boom and bust.\n\nVisit his website at : http://www.attoparsec.com/", 
+          "qid": "Pressure + Flow: Meet the artist", 
+          "q": [
+              "who made this", 
+              "who is the artist", 
+              "artist", 
+              "about the artist", 
+              "artist information"
+          ], 
+          "t": "Pressure + Flow", 
+          "alt": {
+              "markdown": "Matthew Dockery is a Seattle-area industrial artist who works in metal, electronics, wood and textiles. The history of technology provides the inspiration for much of his work, and he has a special love for machines, gadgets, gears that mesh properly, and history. His work has been featured on the Discovery Channel, at Greenwich Observatory in London, at the annual Burning Man festival, and around the Pacific Northwest. Dockery describes his work as living at the intersection of gears and mad science.\n\nWhen asked how Pressure + Flow tells the Prairie Line's story, Dockery replied, In many ways, the railroad is Tacoma's story. It was just another small town until the Northern Pacific made it their terminus. Dockery insists that in many ways society is still moving to the frontier: There are still such things as real estate bubbles and speculation, risk and reward, boom and bust.\n\nVisit his website at : [http://www.attoparsec.com/](http://www.attoparsec.com/)"
+          }, 
+          "type": "qna"
+      }, 
+      {
+          "a": " Pressure + Flow reveals the hidden mechanisms, both technical and cultural, that have carried us into the present. As we travel daily in cars, bikes, and planes, it is easy to take for granted the complex machines working to get us to our destinations. Pressure unveils the inner workings of a steam-powered train engine like those used in the early railroad era, providing an opportunity to interact with the usually unseen piston and pipes.\n\nAlongside rail lines came telegraph towers, marking a revolution in communication technology. Trains transported immigrants from all over the world to Tacoma, and each traveler brought their own stories and cultures with them. Excerpts from historical documents, journals, oral histories, telegrams, and letters are etched in different languages into the remaining historical railroad tracks along the trail, representing the flow of new communities into the area alongside the original occupants of Tacoma  the Puyallup.\n\nThis artwork encourages us to look more deeply at how we arrived where we are today, and provides snapshots of the many stories embedded along the Prairie Line.\n\nPressure + Flow will be installed by Spring 2018.", 
+          "qid": "Pressure + Flow: About the art", 
+          "q": [
+              "more about the art", 
+              "about the art", 
+              "additional information", 
+              "additional info"
+          ], 
+          "t": "Pressure + Flow", 
+          "alt": {
+              "markdown": " Pressure + Flow reveals the hidden mechanisms, both technical and cultural, that have carried us into the present. As we travel daily in cars, bikes, and planes, it is easy to take for granted the complex machines working to get us to our destinations. Pressure unveils the inner workings of a steam-powered train engine like those used in the early railroad era, providing an opportunity to interact with the usually unseen piston and pipes.\n\nAlongside rail lines came telegraph towers, marking a revolution in communication technology. Trains transported immigrants from all over the world to Tacoma, and each traveler brought their own stories and cultures with them. Excerpts from historical documents, journals, oral histories, telegrams, and letters are etched in different languages into the remaining historical railroad tracks along the trail, representing the flow of new communities into the area alongside the original occupants of Tacoma  the Puyallup.\n\nThis artwork encourages us to look more deeply at how we arrived where we are today, and provides snapshots of the many stories embedded along the Prairie Line.\n\nPressure + Flow will be installed by Spring 2018."
+          }, 
+          "type": "qna"
+      }, 
+      {
+          "a": "Commissioned by the Chinese Reconciliation Project Foundation in partnership with the City of Tacoma.\n\nThis piece commemorates the early Chinese in America, their labors to construct the transcontinental railroads railroad construction, and their unjust suffering. It consists of an antique train truck and abstracted representation of 100 ash boxes, a reference to the Chinese workers who died while building the railroads.\n\n Ask for more about the art, the artist, or the medium for additional information.", 
+          "qid": "Shipment to China", 
+          "next": "Nexus", 
+          "q": [
+              "Shipment to China", 
+              "Ship to China", 
+              "a shipment to china", 
+              "the shipment to china"
+          ], 
+          "r": {
+              "imageUrl": "https://www.prairielinetrail.org/media/dynamic/heroes/241_118_Shipment_to_China_photo.jpg", 
+              "title": "Shipment to China"
+          }, 
+          "t": "Shipment to China", 
+          "alt": {
+              "markdown": "Commissioned by the Chinese Reconciliation Project Foundation in partnership with the City of Tacoma.\n\nThis piece commemorates the early Chinese in America, their labors to construct the transcontinental railroads railroad construction, and their unjust suffering. It consists of an antique train truck and abstracted representation of 100 ash boxes, a reference to the Chinese workers who died while building the railroads.\n\n Ask for more about the art, the artist, or the medium for additional information."
+          }, 
+          "type": "qna"
+      }, 
+      {
+          "a": "Bronze, antique train truck", 
+          "qid": "Shipment to China: Medium", 
+          "q": [
+              "Medium", 
+              "Material", 
+              "What is it made of", 
+              "what is the medium", 
+              "what's the material"
+          ], 
+          "t": "Shipment to China", 
+          "alt": {
+              "markdown": "Bronze, antique train truck"
+          }, 
+          "type": "qna"
+      }, 
+      {
+          "a": "A native of China, Haiying Wu was a professional sculptor before emigrating to the US. In 1989, he participated in demonstrations in his hometown of Chengdu, getting caught in the square when the military attacked demonstrators.  Wu emigrated to the U.S. in the same year. He created this piece while a graduate student at the University of Washington. A prolific artist, his work can be found in Seattle, Lynnwood, Tacoma, Redmond, and in Chengdu, in the Sichuan province of China.\n\nAccording to Wu,This piece shows the bitterness of the Chinese experience in America during that time, for the railroad built by their efforts was the same transportation used to carry them out of Tacoma.\n\nThanks to the Chinese Reconciliation Project Foundation for contributing this important piece for exhibition on the Prairie Line Trail, now displayed on the very tracks that the Chinese worked tirelessly to build.\n\nVisit their website at : http://www.tacomachinesepark.org/", 
+          "qid": "Shipment to China: Meet the artist", 
+          "q": [
+              "who made this", 
+              "who is the artist", 
+              "artist", 
+              "about the artist", 
+              "artist information"
+          ], 
+          "t": "Shipment to China", 
+          "alt": {
+              "markdown": "A native of China, Haiying Wu was a professional sculptor before emigrating to the US. In 1989, he participated in demonstrations in his hometown of Chengdu, getting caught in the square when the military attacked demonstrators.  Wu emigrated to the U.S. in the same year. He created this piece while a graduate student at the University of Washington. A prolific artist, his work can be found in Seattle, Lynnwood, Tacoma, Redmond, and in Chengdu, in the Sichuan province of China.\n\nAccording to Wu,This piece shows the bitterness of the Chinese experience in America during that time, for the railroad built by their efforts was the same transportation used to carry them out of Tacoma.\n\nThanks to the Chinese Reconciliation Project Foundation for contributing this important piece for exhibition on the Prairie Line Trail, now displayed on the very tracks that the Chinese worked tirelessly to build.\n\nVisit their website at : [http://www.tacomachinesepark.org/](http://www.tacomachinesepark.org/)"
+          }, 
+          "type": "qna"
+      }, 
+      {
+          "a": " Shipment to China was created to commemorate the Chinese laborers who were instrumental in building the transcontinental railroad in the United States. Starting in the mid-1860's, thousands of Chinese came to the US to work on the country's expanding railroad lines. In addition to dangerous, sometimes fatal working conditions, many Chinese laborers were threatened and killed during anti-Chinese expulsion movements.\n\nAfter a Chinese worker died, the ashes of the deceased were often sent back to China in boxes, so that they could be buried next to their ancestors.  This piece refers to that practice.  Each box represents a worker.  The majority of boxes are anonymous; however a few choice names and dates powerfully connect us to the past and the people who gave their lives to build the railroad and the West.\n\nAfter connecting the city to the nation by building the Northern Pacific Railroad (NPRR), many Chinese workers settled in the growing city. But national sentiment began to turn against these immigrants, and in Tacoma, the Chinese community was intentionally expelled after anti-Chinese sentiment turned violent.  Led by Tacoma's Mayor, the Chinese community of 600 was driven out of town on November 3, 1885. After the riot, the Chinese District, sometimes called Little Canton, lay in smoldering ruins. This horrific event, and the complicit role of the City's leaders, led this kind of expulsion to be known as the Tacoma Method nation-wide.", 
+          "qid": "Shipment to China: About the art", 
+          "q": [
+              "more about the art", 
+              "about the art", 
+              "additional information", 
+              "additional info"
+          ], 
+          "t": "Shipment to China", 
+          "alt": {
+              "markdown": " Shipment to China was created to commemorate the Chinese laborers who were instrumental in building the transcontinental railroad in the United States. Starting in the mid-1860's, thousands of Chinese came to the US to work on the country's expanding railroad lines. In addition to dangerous, sometimes fatal working conditions, many Chinese laborers were threatened and killed during anti-Chinese expulsion movements.\n\nAfter a Chinese worker died, the ashes of the deceased were often sent back to China in boxes, so that they could be buried next to their ancestors.  This piece refers to that practice.  Each box represents a worker.  The majority of boxes are anonymous; however a few choice names and dates powerfully connect us to the past and the people who gave their lives to build the railroad and the West.\n\nAfter connecting the city to the nation by building the Northern Pacific Railroad (NPRR), many Chinese workers settled in the growing city. But national sentiment began to turn against these immigrants, and in Tacoma, the Chinese community was intentionally expelled after anti-Chinese sentiment turned violent.  Led by Tacoma's Mayor, the Chinese community of 600 was driven out of town on November 3, 1885. After the riot, the Chinese District, sometimes called Little Canton, lay in smoldering ruins. This horrific event, and the complicit role of the City's leaders, led this kind of expulsion to be known as the Tacoma Method nation-wide."
+          }, 
+          "type": "qna"
+      }, 
+      {
+          "a": "Commissioned by the City of Tacoma.\n\nNexus creates a space for playful learning. Presenting a series of replicas of luxury goods that were traded between the Puyallup and other Coast and Interior Salish tribes, it offers a representation of the trade networks that spanned the continent prior to European contact.\n\n Ask for more about the art, the artist, or the medium for additional information", 
+          "qid": "Nexus", 
+          "next": "Welcome Figure", 
+          "q": [
+              "Nexus", 
+              "a Nexus", 
+              "the Nexus"
+          ], 
+          "r": {
+              "imageUrl": "https://www.prairielinetrail.org/media/dynamic/heroes/235_Feddersen_Nexus_-_larger.jpg", 
+              "title": "Nexus (Rendering of proposed piece)"
+          }, 
+          "t": "Nexus", 
+          "alt": {
+              "markdown": "Commissioned by the City of Tacoma.\n\nNexus creates a space for playful learning. Presenting a series of replicas of luxury goods that were traded between the Puyallup and other Coast and Interior Salish tribes, it offers a representation of the trade networks that spanned the continent prior to European contact.\n\n Ask for more about the art, the artist, or the medium for additional information"
+          }, 
+          "type": "qna"
+      }, 
+      {
+          "a": "Painted metal, with elements of wood, tile, and glass", 
+          "qid": "Nexus: Medium", 
+          "q": [
+              "Medium", 
+              "Material", 
+              "What is it made of", 
+              "what is the medium", 
+              "what's the material"
+          ], 
+          "t": "Nexus", 
+          "alt": {
+              "markdown": "Painted metal, with elements of wood, tile, and glass"
+          }, 
+          "type": "qna"
+      }, 
+      {
+          "a": "Ryan Feddersen is a mixed media installation artist. Her work is characterized by a sense of exploration and experimentation. Many of her pieces utilize tongue in cheek humor accompanied by interactivity, inviting the viewer to engage with the irrationalities and hypocrisies of contemporary American culture. Feddersen is a member of the Confederated Tribes of the Colville Reservation (Okanogan / Arrow Lakes), the Interior Salish community that historically moved trade goods across the Plateau region and had especially strong relationships with the Puyallup and other Coastal Salish tribes.\n\nSpeaking about the potential of interactive art, Feddersen noted that the simple act of play can transport you to another time, creating a connection to the deep history of a place..\n\nVisit her website at : http://ryanfeddersen.com/", 
+          "qid": "Nexus: Meet the artist", 
+          "q": [
+              "who made this", 
+              "who is the artist", 
+              "artist", 
+              "about the artist", 
+              "artist information"
+          ], 
+          "t": "Nexus", 
+          "alt": {
+              "markdown": "Ryan Feddersen is a mixed media installation artist. Her work is characterized by a sense of exploration and experimentation. Many of her pieces utilize tongue in cheek humor accompanied by interactivity, inviting the viewer to engage with the irrationalities and hypocrisies of contemporary American culture. Feddersen is a member of the Confederated Tribes of the Colville Reservation (Okanogan / Arrow Lakes), the Interior Salish community that historically moved trade goods across the Plateau region and had especially strong relationships with the Puyallup and other Coastal Salish tribes.\n\nSpeaking about the potential of interactive art, Feddersen noted that the simple act of play can transport you to another time, creating a connection to the deep history of a place..\n\nVisit her website at : [http://ryanfeddersen.com/](http://ryanfeddersen.com/)"
+          }, 
+          "type": "qna"
+      }, 
+      {
+          "a": "Taking inspiration from the childhood games of playing store, this artwork is staged as a trading space that you can step into, making room for imaginative play while also learning about the relationships between Native American tribes.  The artwork references the exchange of goods, people, and cultural interactions along pre-colonial trade routes. The inter-tribal trade network was vast, but main lines connected the Pacific Northwest Coast most closely to the Subarctic, California, and Plateauthe region represented as a trade partner in the artwork.\n\nThe section of the Prairie Line Trail that this artwork occupies was historically known by the Puyallup Tribe as the Place of Many Fires, where locals and visitors came together and traded for luxurious goods like the ones seen here.\n\nNexus will be installed in Spring 2018.", 
+          "qid": "Nexus: About the art", 
+          "q": [
+              "more about the art", 
+              "about the art", 
+              "additional information", 
+              "additional info"
+          ], 
+          "t": "Nexus", 
+          "alt": {
+              "markdown": "Taking inspiration from the childhood games of playing store, this artwork is staged as a trading space that you can step into, making room for imaginative play while also learning about the relationships between Native American tribes.  The artwork references the exchange of goods, people, and cultural interactions along pre-colonial trade routes. The inter-tribal trade network was vast, but main lines connected the Pacific Northwest Coast most closely to the Subarctic, California, and Plateauthe region represented as a trade partner in the artwork.\n\nThe section of the Prairie Line Trail that this artwork occupies was historically known by the Puyallup Tribe as the Place of Many Fires, where locals and visitors came together and traded for luxurious goods like the ones seen here.\n\nNexus will be installed in Spring 2018."
+          }, 
+          "type": "qna"
+      }, 
+      {
+          "a": "The Tacoma Arts Commission and Tacoma Art Museum.\n\nAccording to Puyallup historians, Native American travelers knew the tough part of their journey lay behind them when they were greeted by a welcome figure like this on the shores of Puget Sound. Carved by Qwalsius (Shaun Peterson), in a style unique to the Puyallup People, spuy'elepebS Welcome Figure is a modern take on a local traditional art form.\n\n Ask for more about the art, the artist, historical context, or the medium for additional information", 
+          "qid": "Welcome Figure", 
+          "next": "Maru", 
+          "q": [
+              "Welcome Figure", 
+              "a Welcome Figure", 
+              "the Welcome Figure"
+          ], 
+          "r": {
+              "imageUrl": "https://www.prairielinetrail.org/media/dynamic/heroes/180_WelcomeFigure-MCO.jpg", 
+              "title": "Welcome Figure"
+          }, 
+          "t": "Welcome Figure", 
+          "alt": {
+              "markdown": "The Tacoma Arts Commission and Tacoma Art Museum.\n\nAccording to Puyallup historians, Native American travelers knew the tough part of their journey lay behind them when they were greeted by a welcome figure like this on the shores of Puget Sound. Carved by Qwalsius (Shaun Peterson), in a style unique to the Puyallup People, spuy'elepebS Welcome Figure is a modern take on a local traditional art form.\n\n Ask for more about the art, the artist, historical context, or the medium for additional information"
+          }, 
+          "type": "qna"
+      }, 
+      {
+          "a": "Western Red Cedar, exterior latex paint textured by a traditional adze method, chisels, and knives", 
+          "qid": "Welcome Figure: Medium", 
+          "q": [
+              "Medium", 
+              "Material", 
+              "What is it made of", 
+              "what is the medium", 
+              "what's the material"
+          ], 
+          "t": "Welcome Figure", 
+          "alt": {
+              "markdown": "Western Red Cedar, exterior latex paint textured by a traditional adze method, chisels, and knives"
+          }, 
+          "type": "qna"
+      }, 
+      {
+          "a": "Qwalsius (Shaun Peterson) is a prolific Puyallup artist and a towering presence in the movement to revive Coast Salish Art traditions. He carved Welcome Figure in 2010. Qwalsius works in many art forms, from carving, to painting, to printing  always inspired by his heritage. His pieces mix tradition with innovation.  His works have graced exhibitions in New Zealand, China, Japan, and throughout the U.S., and permanently adorn several buildings on the Puyallup Reservation. He is currently working on a large commission for the Seattle waterfront.\n\n Visit his website at : http://www.qwalsius.com/", 
+          "qid": "Welcome Figure: Meet the artist", 
+          "q": [
+              "who made this", 
+              "who is the artist", 
+              "artist", 
+              "about the artist", 
+              "artist information"
+          ], 
+          "t": "Welcome Figure", 
+          "alt": {
+              "markdown": "Qwalsius (Shaun Peterson) is a prolific Puyallup artist and a towering presence in the movement to revive Coast Salish Art traditions. He carved Welcome Figure in 2010. Qwalsius works in many art forms, from carving, to painting, to printing  always inspired by his heritage. His pieces mix tradition with innovation.  His works have graced exhibitions in New Zealand, China, Japan, and throughout the U.S., and permanently adorn several buildings on the Puyallup Reservation. He is currently working on a large commission for the Seattle waterfront.\n\n Visit his website at : [http://www.qwalsius.com/](http://www.qwalsius.com/)"
+          }, 
+          "type": "qna"
+      }, 
+      {
+          "a": "The style of Welcome Figure is traditional to this region and the Coast Salish tribes. Totem poles are often mistakenly identified with the Pacific Northwest, but that form was primarily practiced by the First Nations Groups of Canada and Alaska. Traditional wood carving practices of the Puyallup included welcome figures.\n\nIn the words of the artist, the colors and formlines of this piece were chosen with intention and purpose:The earth red color here signifies the healing power associated with Thunderbird by the Puyallup people long ago. Although it was believed that Thunderbird had white feathers, the print and the painted dress pattern convey a healing that is called upon for the devastation of losing a prominent village. Contrary to surrounding tribes who envision the Thunderbird as a massive creature who consumes whales, the Puyallup percieved the being to be no larger than a small hawk. It is an indication that power was not associated with mass and that the strength to heal was of equal if not greater importance in the philosophy of our ancestors.\n\n Many Puget Sound tribes continue to practice the important practices that distinguish this region of the world, generously sharing their culture through art, song, and dance. The intention of this contemporary welcoming figure is the same as that of its predecessors: with its arms outstretched, it gracefully receives visitors to the site while powerfully honoring the traditions of the area's first peoples.", 
+          "qid": "Welcome Figure: About the art", 
+          "q": [
+              "more about the art", 
+              "about the art", 
+              "additional information", 
+              "additional info"
+          ], 
+          "t": "Welcome Figure", 
+          "alt": {
+              "markdown": "The style of Welcome Figure is traditional to this region and the Coast Salish tribes. Totem poles are often mistakenly identified with the Pacific Northwest, but that form was primarily practiced by the First Nations Groups of Canada and Alaska. Traditional wood carving practices of the Puyallup included welcome figures.\n\nIn the words of the artist, the colors and formlines of this piece were chosen with intention and purpose:The earth red color here signifies the healing power associated with Thunderbird by the Puyallup people long ago. Although it was believed that Thunderbird had white feathers, the print and the painted dress pattern convey a healing that is called upon for the devastation of losing a prominent village. Contrary to surrounding tribes who envision the Thunderbird as a massive creature who consumes whales, the Puyallup percieved the being to be no larger than a small hawk. It is an indication that power was not associated with mass and that the strength to heal was of equal if not greater importance in the philosophy of our ancestors.\n\n Many Puget Sound tribes continue to practice the important practices that distinguish this region of the world, generously sharing their culture through art, song, and dance. The intention of this contemporary welcoming figure is the same as that of its predecessors: with its arms outstretched, it gracefully receives visitors to the site while powerfully honoring the traditions of the area's first peoples."
+          }, 
+          "type": "qna"
+      }, 
+      {
+          "a": " Generous and blessed with abundant resources, the Puyallup often hosted Native travelers. Their generosity extended to non-Native newcomers as well, though their gestures of friendship were not always reciprocal.\n\n The tribes of the Pacific Northwest were connected through travel, marriage, and a practice called potlatch. A potlatch is a gift-giving feast meant to mark an important event. At the end of the party, the host family gave away all their worldly possessions. Ample resources and a culture of generosity made it easy for hosts regain what was lost after they hosted a potlatch.\n\n From the site of Welcome Figure, visitors can glimpse the Tacoma Dome, and on clear days, Tacopid (Mt. Rainier). Tacopid supports its caretakers with water, fish, timber, and game. It is a beloved source of life for the Puyallup. Historically, the Tribe tucked villages and temporary hunting camps into the gentle curves of the streams and rivers that flowed from the mountain. But their main village sat where the Tacoma Dome now stands. What little remains of that village lies beneath forty feet of fill today.\n\n Today, tribal headquarters are located off of Portland Avenue, in East Tacoma, where the tribe owns many local businesses, provides services to tribal members, and offers education about the tribe's historic and contemporary cultural practices and lifeways.", 
+          "qid": "Welcome Figure: Historical Context", 
+          "q": [
+              "more about the history", 
+              "about the historical context", 
+              "history", 
+              "historical context"
+          ], 
+          "t": "Welcome Figure", 
+          "alt": {
+              "markdown": " Generous and blessed with abundant resources, the Puyallup often hosted Native travelers. Their generosity extended to non-Native newcomers as well, though their gestures of friendship were not always reciprocal.\n\n The tribes of the Pacific Northwest were connected through travel, marriage, and a practice called potlatch. A potlatch is a gift-giving feast meant to mark an important event. At the end of the party, the host family gave away all their worldly possessions. Ample resources and a culture of generosity made it easy for hosts regain what was lost after they hosted a potlatch.\n\n From the site of Welcome Figure, visitors can glimpse the Tacoma Dome, and on clear days, Tacopid (Mt. Rainier). Tacopid supports its caretakers with water, fish, timber, and game. It is a beloved source of life for the Puyallup. Historically, the Tribe tucked villages and temporary hunting camps into the gentle curves of the streams and rivers that flowed from the mountain. But their main village sat where the Tacoma Dome now stands. What little remains of that village lies beneath forty feet of fill today.\n\n Today, tribal headquarters are located off of Portland Avenue, in East Tacoma, where the tribe owns many local businesses, provides services to tribal members, and offers education about the tribe's historic and contemporary cultural practices and lifeways."
+          }, 
+          "type": "qna"
+      }, 
+      {
+          "a": "The University of Washington Tacoma.\n\nThis nine-foot-tall sculpture honors the Japanese Language School that once stood at Tacoma Avenue and S 19th Street. It also celebrates the Japanese American community that thrived in this neighborhood until incarceration during World War II.\n\n Ask for more about the art, the artist, historical context, WWII internment, or the medium for additional information", 
+          "qid": "Maru", 
+          "next": "Joy Building", 
+          "q": [
+              "Maru", 
+              "a Maru", 
+              "the Maru"
+          ], 
+          "r": {
+              "imageUrl": "https://www.prairielinetrail.org/media/dynamic/heroes/176_Maru_UWT.jpg", 
+              "title": "Maru"
+          }, 
+          "t": "Maru", 
+          "alt": {
+              "markdown": "The University of Washington Tacoma.\n\nThis nine-foot-tall sculpture honors the Japanese Language School that once stood at Tacoma Avenue and S 19th Street. It also celebrates the Japanese American community that thrived in this neighborhood until incarceration during World War II.\n\n Ask for more about the art, the artist, historical context, WWII internment, or the medium for additional information"
+          }, 
+          "type": "qna"
+      }, 
+      {
+          "a": "Bronze", 
+          "qid": "Maru: Medium", 
+          "q": [
+              "Medium", 
+              "Material", 
+              "What is it made of", 
+              "what is the medium", 
+              "what's the material"
+          ], 
+          "t": "Maru", 
+          "alt": {
+              "markdown": "Bronze"
+          }, 
+          "type": "qna"
+      }, 
+      {
+          "a": "While designing Maru, sculptor Gerard Tsutakawa worked with an advisory board of former students. The late landscape designer Kenichi Nakano also collaborated on this sculpture.\n\n Tsutakawa's designs combine the cultures and traditions of the Pacific Rim, incorporating Japanese forms and sensibilities with his lifetime of experience living in the Pacific Northwest's unique natural environment. Well known for MITT, the sculpture that stands outside Safeco Field in Seattle, his sculptures are humanistic, accessible, and inviting.", 
+          "qid": "Maru: Meet the artist", 
+          "q": [
+              "who made this", 
+              "who is the artist", 
+              "artist", 
+              "about the artist", 
+              "artist information"
+          ], 
+          "t": "Maru", 
+          "alt": {
+              "markdown": "While designing Maru, sculptor Gerard Tsutakawa worked with an advisory board of former students. The late landscape designer Kenichi Nakano also collaborated on this sculpture.\n\n Tsutakawa's designs combine the cultures and traditions of the Pacific Rim, incorporating Japanese forms and sensibilities with his lifetime of experience living in the Pacific Northwest's unique natural environment. Well known for MITT, the sculpture that stands outside Safeco Field in Seattle, his sculptures are humanistic, accessible, and inviting."
+          }, 
+          "type": "qna"
+      }, 
+      {
+          "a": "Maru stands among a landscape of boulders and Japanese maples. The bronze sculpture has a large cut-out circle, inviting visitors to sit, touch, and interact with the piece.  It also offers an opportunity for contemplation and learning about the history of the Japanese Language school, which was located a few blocks up the hill from the sculpture.\n\n Maru, which means \"circle,\" might alternatively evoke a sense of negative space, or the image of a closed, unending circle. Similarly, the piece suggests both the hollow space left in the community after wartime incarceration, as well as the continued presence of the Japanese American community in Tacoma. Japanese ship names often end in -maru, so the piece may also refer to the importance of Japanese ships in bringing people and goods to Tacoma.", 
+          "qid": "Maru: About the art", 
+          "q": [
+              "more about the art", 
+              "about the art", 
+              "additional information", 
+              "additional info"
+          ], 
+          "t": "Maru", 
+          "alt": {
+              "markdown": "Maru stands among a landscape of boulders and Japanese maples. The bronze sculpture has a large cut-out circle, inviting visitors to sit, touch, and interact with the piece.  It also offers an opportunity for contemplation and learning about the history of the Japanese Language school, which was located a few blocks up the hill from the sculpture.\n\n Maru, which means \"circle,\" might alternatively evoke a sense of negative space, or the image of a closed, unending circle. Similarly, the piece suggests both the hollow space left in the community after wartime incarceration, as well as the continued presence of the Japanese American community in Tacoma. Japanese ship names often end in -maru, so the piece may also refer to the importance of Japanese ships in bringing people and goods to Tacoma."
+          }, 
+          "type": "qna"
+      }, 
+      {
+          "a": " As the point of arrival for the railroad, the hillside west of the Prairie Line corridor hosted many ethnic enclaves, including the Nihonmachi, or Japan Town. By 1890, approximately 500 Japanese-Americans lived in Tacoma. Arriving by ship, many Japanese first came to work in railroad construction. In the 1880s, the Northern Pacific enlisted Hifumi Harry Kumamoto to recruit 2,000 Japanese laborers to help build the Cascade Branch of the NPRR. Building this more direct route over the Cascades was what made Tacoma finally boom.\n\n As the city grew up, so did the Nihonmachi. Japanese entrepreneurs like Fujimatsu and Sadako Moriguchi set up shop. Established in 1928, their store  Uwajima-ya  sold Japanese staples to countrymen craving a bit of home.\n\n The Japanese Language School, Nihongo Gakko, served as the main hub of Japan Town. From 1911 through 1942, the school brought the families of a thriving urban neighborhood together to support the future of their community and their children. The school was located on the 1700 block of Tacoma Avenue in a bustling neighborhood of hotels, restaurants, laundries, banks, and houses. For three decades, the school instilled in its young students the moral and cultural values of their Japanese heritage, and also emphasized a strong commitment to American citizenship.", 
+          "qid": "Maru: Historical Context", 
+          "q": [
+              "more about the history", 
+              "about the historical context", 
+              "history", 
+              "historical context"
+          ], 
+          "t": "Maru", 
+          "alt": {
+              "markdown": " As the point of arrival for the railroad, the hillside west of the Prairie Line corridor hosted many ethnic enclaves, including the Nihonmachi, or Japan Town. By 1890, approximately 500 Japanese-Americans lived in Tacoma. Arriving by ship, many Japanese first came to work in railroad construction. In the 1880s, the Northern Pacific enlisted Hifumi Harry Kumamoto to recruit 2,000 Japanese laborers to help build the Cascade Branch of the NPRR. Building this more direct route over the Cascades was what made Tacoma finally boom.\n\n As the city grew up, so did the Nihonmachi. Japanese entrepreneurs like Fujimatsu and Sadako Moriguchi set up shop. Established in 1928, their store  Uwajima-ya  sold Japanese staples to countrymen craving a bit of home.\n\n The Japanese Language School, Nihongo Gakko, served as the main hub of Japan Town. From 1911 through 1942, the school brought the families of a thriving urban neighborhood together to support the future of their community and their children. The school was located on the 1700 block of Tacoma Avenue in a bustling neighborhood of hotels, restaurants, laundries, banks, and houses. For three decades, the school instilled in its young students the moral and cultural values of their Japanese heritage, and also emphasized a strong commitment to American citizenship."
+          }, 
+          "type": "qna"
+      }, 
+      {
+          "a": " As the point of arrival for the railroad, the hillside west of the Prairie Line corridor hosted many ethnic enclaves, including the Nihonmachi, or Japan Town. By 1890, approximately 500 Japanese-Americans lived in Tacoma. Arriving by ship, many Japanese first came to work in railroad construction. In the 1880s, the Northern Pacific enlisted Hifumi Harry Kumamoto to recruit 2,000 Japanese laborers to help build the Cascade Branch of the NPRR. Building this more direct route over the Cascades was what made Tacoma finally boom.\n\n As the city grew up, so did the Nihonmachi. Japanese entrepreneurs like Fujimatsu and Sadako Moriguchi set up shop. Established in 1928, their store  Uwajima-ya  sold Japanese staples to countrymen craving a bit of home.\n\n The Japanese Language School, Nihongo Gakko, served as the main hub of Japan Town. From 1911 through 1942, the school brought the families of a thriving urban neighborhood together to support the future of their community and their children. The school was located on the 1700 block of Tacoma Avenue in a bustling neighborhood of hotels, restaurants, laundries, banks, and houses. For three decades, the school instilled in its young students the moral and cultural values of their Japanese heritage, and also emphasized a strong commitment to American citizenship.", 
+          "qid": "Maru: WWII Internment", 
+          "q": [
+              "world war 2", 
+              "world war two", 
+              "world war 2 internment", 
+              "internment", 
+              "about the internment", 
+              "WWII"
+          ], 
+          "r": {
+              "imageUrl": "https://www.prairielinetrail.org/media/dynamic/images/109_TPL_D12799_10.jpg", 
+              "subTitle": "Tacoma Public Library, Richards Studio D12799-10", 
+              "title": "Japanese Americans boarding a train to be sent to internment camps, May 1942."
+          }, 
+          "t": "Maru", 
+          "alt": {
+              "markdown": " As the point of arrival for the railroad, the hillside west of the Prairie Line corridor hosted many ethnic enclaves, including the Nihonmachi, or Japan Town. By 1890, approximately 500 Japanese-Americans lived in Tacoma. Arriving by ship, many Japanese first came to work in railroad construction. In the 1880s, the Northern Pacific enlisted Hifumi Harry Kumamoto to recruit 2,000 Japanese laborers to help build the Cascade Branch of the NPRR. Building this more direct route over the Cascades was what made Tacoma finally boom.\n\n As the city grew up, so did the Nihonmachi. Japanese entrepreneurs like Fujimatsu and Sadako Moriguchi set up shop. Established in 1928, their store  Uwajima-ya  sold Japanese staples to countrymen craving a bit of home.\n\n The Japanese Language School, Nihongo Gakko, served as the main hub of Japan Town. From 1911 through 1942, the school brought the families of a thriving urban neighborhood together to support the future of their community and their children. The school was located on the 1700 block of Tacoma Avenue in a bustling neighborhood of hotels, restaurants, laundries, banks, and houses. For three decades, the school instilled in its young students the moral and cultural values of their Japanese heritage, and also emphasized a strong commitment to American citizenship."
+          }, 
+          "type": "qna"
+      }, 
+      {
+          "a": "In 1990, the University of Washington started renovating vacant buildings in what was historically known as the Jobber's District, including this 1892 building commissioned by Russell T. Joy. The Joy Building used flatiron technology, a major innovation in its day. Built in brick, the building's interior structure was steel, rather than Douglas fir timber  a first step towards the emergence of skyscrapers. The building was supposed to be nearly fireproof. This was an important selling point: just four years prior, Seattle had burnt to the ground.\n\n But in 1903, a four-engine fire at the Joy Building destroyed the inventory and equipment of four tenants, including that of the Weigel and Star Diamond candy companies. Luckily, the fire was contained, and the building was renovated a few months later. Since then, the building was repurposed for many uses, including a glove manufacturer, coffee company, and automobile dealerships. \n\n Ask for more about adapative reuse for additional information", 
+          "qid": "Joy Building", 
+          "next": "Branch: West Coast Grocery and Union Station", 
+          "q": [
+              "Joy Building", 
+              "a Joy Building", 
+              "the Joy Building"
+          ], 
+          "r": {
+              "imageUrl": "https://www.prairielinetrail.org/media/dynamic/heroes/189_Joy_UWT.jpg", 
+              "title": "Joy Building",
+              "subTitle":"Photo courtesy of University of Washington Tacoma"
+          }, 
+          "t": "Joy Building", 
+          "alt": {
+              "markdown": "In 1990, the University of Washington started renovating vacant buildings in what was historically known as the Jobber's District, including this 1892 building commissioned by Russell T. Joy. The Joy Building used flatiron technology, a major innovation in its day. Built in brick, the building's interior structure was steel, rather than Douglas fir timber  a first step towards the emergence of skyscrapers. The building was supposed to be nearly fireproof. This was an important selling point: just four years prior, Seattle had burnt to the ground.\n\n But in 1903, a four-engine fire at the Joy Building destroyed the inventory and equipment of four tenants, including that of the Weigel and Star Diamond candy companies. Luckily, the fire was contained, and the building was renovated a few months later. Since then, the building was repurposed for many uses, including a glove manufacturer, coffee company, and automobile dealerships. \n\n Ask for more about adapative reuse for additional information"
+          }, 
+          "type": "qna"
+      }, 
+      {
+          "a": " Roughly 120 years after it was originally built, UW Tacoma renovated the Joy Building. This remodel was a part of an innovative campus development project that adaptively and creatively reused the historic warehouse buildings along the Prairie Line.\n\n Though the buildings were redesigned for their new purpose, historical elements like facades and painted signs (sometimes called ghost signage) were intentionally left in place. Here's a handy list to help you find all of UW Tacoma's ghost signs, http://www.tacoma.washington.edu/about-uw-tacoma/ghost-signs-campus.", 
+          "qid": "Joy Building: UW Tacoma and adaptive reuse", 
+          "q": [
+              "more about adaptive reuse", 
+              "adaptive reuse"
+          ], 
+          "r": {
+              "imageUrl": "https://www.prairielinetrail.org/media/dynamic/images/216_Ghostsigns_UWT.jpg", 
+              "title": "Ghost signage, F.S. Harmon building and Mattress Factory",
+              "subTitle":"Photo courtesy of University of Washington Tacoma"
+
+          }, 
+          "t": "Joy Building", 
+          "alt": {
+              "markdown": " Roughly 120 years after it was originally built, UW Tacoma renovated the Joy Building. This remodel was a part of an innovative campus development project that adaptively and creatively reused the historic warehouse buildings along the Prairie Line.\n\n Though the buildings were redesigned for their new purpose, historical elements like facades and painted signs (sometimes called ghost signage) were intentionally left in place. Here's a handy list to help you find all of UW Tacoma's ghost signs, http://www.tacoma.washington.edu/about-uw-tacoma/ghost-signs-campus."
+          }, 
+          "type": "qna"
+      }, 
+      {
+          "a": "There are two options for the next stop, Terminus and Union Station. Union Station is slightly out of the way. Say or type which stop you would like to go to next.", 
+          "qid": "Branch: West Coast Grocery and Union Station", 
+          "next": "Branch: West Coast Grocery and Union Station", 
+          "q": [
+              "Branch: West Coast Grocery and Union Station"
+          ],
+          "r": {
+            "imageUrl": "https://s3.amazonaws.com/qnabot-guided-navigation-blogpost/Branch+West+Coast+Grocery+and+Union+Station.png", 
+            "title": "Map Overview"
+            },  
+          "t": "Branch: West Coast Grocery and Union Station", 
+          "alt": {
+              "markdown": "There are two options for the next stop, Terminus and Union Station. Union Station is slightly out of the way. Say or type which stop you would like to go to next."
+          }, 
+          "type": "qna"
+      }, 
+      {
+          "a": "In 1990, the University of Washington started renovating vacant buildings in what was historically known as the Jobber's District, including this 1892 building commissioned by Russell T. Joy. The Pacific Avenue and Union Station used flatiron technology, a major innovation in its day. Built in brick, the building's interior structure was steel, rather than Douglas fir timber  a first step towards the emergence of skyscrapers. The building was supposed to be nearly fireproof. This was an important selling point: just four years prior, Seattle had burnt to the ground.\n\n But in 1903, a four-engine fire at the Pacific Avenue and Union Station destroyed the inventory and equipment of four tenants, including that of the Weigel and Star Diamond candy companies. Luckily, the fire was contained, and the building was renovated a few months later. Since then, the building was repurposed for many uses, including a glove manufacturer, coffee company, and automobile dealerships. \n\n Ask for more about early development or more about the station for additional information", 
+          "qid": "Pacific Avenue and Union Station", 
+          "next": "West Coast Grocery", 
+          "q": [
+              "Pacific Avenue and Union Station", 
+              "Union Station", 
+              "the Union Station"
+          ], 
+          "r": {
+              "imageUrl": "https://www.prairielinetrail.org/media/dynamic/heroes/129_20160304_Historic_Buildings_DSC03231-HDR.jpg", 
+              "title": "Union Station and Pacific Avenue"
+          }, 
+          "t": "Pacific Avenue and Union Station", 
+          "alt": {
+              "markdown": "In 1990, the University of Washington started renovating vacant buildings in what was historically known as the Jobber's District, including this 1892 building commissioned by Russell T. Joy. The Pacific Avenue and Union Station used flatiron technology, a major innovation in its day. Built in brick, the building's interior structure was steel, rather than Douglas fir timber  a first step towards the emergence of skyscrapers. The building was supposed to be nearly fireproof. This was an important selling point: just four years prior, Seattle had burnt to the ground.\n\n But in 1903, a four-engine fire at the Pacific Avenue and Union Station destroyed the inventory and equipment of four tenants, including that of the Weigel and Star Diamond candy companies. Luckily, the fire was contained, and the building was renovated a few months later. Since then, the building was repurposed for many uses, including a glove manufacturer, coffee company, and automobile dealerships. \n\n Ask for more about early development or more about the station for additional information"
+          }, 
+          "type": "qna"
+      }, 
+      {
+          "a": " Roughly 120 years after it was originally built, UW Tacoma renovated the Pacific Avenue and Union Station. This remodel was a part of an innovative campus development project that adaptively and creatively reused the historic warehouse buildings along the Prairie Line.\n\n Though the buildings were redesigned for their new purpose, historical elements like facades and painted signs (sometimes called ghost signage) were intentionally left in place. Here's a handy list to help you find all of UW Tacoma's ghost signs, http://www.tacoma.washington.edu/about-uw-tacoma/ghost-signs-campus.", 
+          "qid": "Platting Tacoma and Pacific Avenue", 
+          "q": [
+              "more about early development", 
+              "more about development", 
+              "development", 
+              "Platting Tacoma and Pacific Avenue"
+          ], 
+          "r": {
+              "imageUrl": "https://www.prairielinetrail.org/media/dynamic/images/130_WSHS_2011_0_211.jpg", 
+              "title": "Union Station, June 9, 1911",
+              "subTitle":"(2011.0.211, Washington State Historical Society (Tacoma, Wash.))"
+
+          }, 
+          "t": "Pacific Avenue and Union Station", 
+          "alt": {
+              "markdown": " Roughly 120 years after it was originally built, UW Tacoma renovated the Pacific Avenue and Union Station. This remodel was a part of an innovative campus development project that adaptively and creatively reused the historic warehouse buildings along the Prairie Line.\n\n Though the buildings were redesigned for their new purpose, historical elements like facades and painted signs (sometimes called ghost signage) were intentionally left in place. Here's a handy list to help you find all of UW Tacoma's ghost signs, http://www.tacoma.washington.edu/about-uw-tacoma/ghost-signs-campus."
+          }, 
+          "type": "qna"
+      }, 
+      {
+          "a": " The Northern Pacific's copper-topped passenger depot wouldn't be built along Pacific Avenue until 1909. Union Station arrived amid a flurry of railroad activity. Three new railroads connected to Tacoma in the early 1900's: The Great Northern (1909), Union Pacific (1910), and the Milwaukee Railroad (1911). \n\n For many years, Union Station was the key transportation hub for the region. But in the mid-1900's, the national highway system replaced railroads as the preferred travel method for most Americans. Ridership dwindled.\n\n In 1984, an Amtrak Station was built in the Dome District. Union Station saw its last passenger train depart the same year. The historic depot sat vacant for several years. Neighboring warehouses were also abandoned for several years until renovation by the University of Washington Tacoma began in the 1990's.", 
+          "qid": "More about Union Station", 
+          "q": [
+              "more about union station", 
+              "more about the station", 
+              "more about the history"
+          ], 
+          "r": {
+              "imageUrl": "https://www.prairielinetrail.org/media/dynamic/images/216_Ghostsigns_UWT.jpg", 
+              "title": "Amtrak train at Union Station",
+              "subTitle":"By Jim Fredrickson, used with permission from Pacific Northwest Railroad Archive"
+          }, 
+          "t": "Pacific Avenue and Union Station", 
+          "alt": {
+              "markdown": " The Northern Pacific's copper-topped passenger depot wouldn't be built along Pacific Avenue until 1909. Union Station arrived amid a flurry of railroad activity. Three new railroads connected to Tacoma in the early 1900's: The Great Northern (1909), Union Pacific (1910), and the Milwaukee Railroad (1911). \n\n For many years, Union Station was the key transportation hub for the region. But in the mid-1900's, the national highway system replaced railroads as the preferred travel method for most Americans. Ridership dwindled.\n\n In 1984, an Amtrak Station was built in the Dome District. Union Station saw its last passenger train depart the same year. The historic depot sat vacant for several years. Neighboring warehouses were also abandoned for several years until renovation by the University of Washington Tacoma began in the 1990's."
+          }, 
+          "type": "qna"
+      }, 
+      {
+          "a": "This building's original tenants  Tacoma Grocery  supplied groceries from Montana to Alaska, but went belly up in the Panic of 1893. West Coast Grocery reused the space and built a more lasting grocery empire headquartered right here in the Jobber's District.  \n\n Ask about the boom,bust,and boom or more about the Jobber's district information", 
+          "qid": "West Coast Grocery", 
+          "next": "Terminus", 
+          "q": [
+              "West Coast Grocery", 
+              "Union Station", 
+              "the Union Station"
+          ], 
+          "r": {
+              "imageUrl": "https://www.prairielinetrail.org/media/dynamic/heroes/199_WestCoastGrocery_UWT.jpg", 
+              "title": "West Coast Grocery",
+              "subTitle":"Photo credit University of Washington Tacoma"
+          }, 
+          "t": "West Coast Grocery", 
+          "alt": {
+              "markdown": "This building's original tenants  Tacoma Grocery  supplied groceries from Montana to Alaska, but went belly up in the Panic of 1893. West Coast Grocery reused the space and built a more lasting grocery empire headquartered right here in the Jobber's District.  \n\n Ask about the boom,bust,and boom or more about the Jobber's district information"
+          }, 
+          "type": "qna"
+      }, 
+      {
+          "a": " Tacoma Grocery's founders intended to establish the largest wholesale grocery in the Pacific Northwest. Instead, they got caught in the throes of a nationwide depression caused by a banking crisis. Many local startups faced a similar fate. \n\n Three years later, West Coast Grocery took over where Tacoma Grocery left off. Selling products under the brand name Amocat (Tacoma spelled backward), West Coast Grocery thrived, expanding into the Birmingham Hay & Seed Building on its south side in 1917. The building served as a warehouse for West Coast Grocery until 1970.", 
+          "qid": "Boom, bust, and boom again", 
+          "q": [
+              "boom", 
+              "boom bust and boom", 
+              "boom again", 
+              "boom and bust"
+          ], 
+          "r": {
+              "imageUrl": "https://www.prairielinetrail.org/media/dynamic/images/227_Richards_Studio_D274643.jpg", 
+              "subTitle": "ca. 1947. (Tacoma Public Library, Richards Studio D27464-3)", 
+              "title": "West Coast Grocery View of the Prairie Line. The ghost sign is visible today"
+
+          }, 
+          "t": "West Coast Grocery", 
+          "alt": {
+              "markdown": " Tacoma Grocery's founders intended to establish the largest wholesale grocery in the Pacific Northwest. Instead, they got caught in the throes of a nationwide depression caused by a banking crisis. Many local startups faced a similar fate. \n\n Three years later, West Coast Grocery took over where Tacoma Grocery left off. Selling products under the brand name Amocat (Tacoma spelled backward), West Coast Grocery thrived, expanding into the Birmingham Hay & Seed Building on its south side in 1917. The building served as a warehouse for West Coast Grocery until 1970."
+          }, 
+          "type": "qna"
+      }, 
+      {
+          "a": " The area was called the Jobber's District after the multitude of wholesale businesses who sprouted up along the Prairie Line, taking advantage of the spur lines that could connect them to goods arriving by rail. Those who worked in the warehouses were also known as jobbers, and multitudes flooded in to work in these growing industries.\n\n West Coast Grocery, with its retail space in front and warehouse space in the back, is a typical example of Jobber's District architecture. Other businesses along this stretch of the Prairie Line included the Joy Building, Garretson, Woodruff and Pratt Company; F. S. Harmon Furniture Manufacturing Company; Lindstrom-Berg Cabinet Works; and Tacoma Paper and Stationary.\n\n Built right along the Prairie Line Rail corridor, most of these buildings share similarities. The side facing Pacific Avenue was usually more attractive since it faced the shopping public, while the side facing the railroad was more industrial, offering efficient loading and unloading on a special railroad spur built just off of the Prairie Line.  We can thank this design strategy for West Coast Grocery's timeless Italianate façade.\n\n The building was renovated in 1996 by the University of Washington. As UW Tacoma renovated this and other buildings in the Jobber's District, it kept some of this history in tact, keeping the original loading docks and repurposing them as covered walkways.", 
+          "qid": "The Jobber's District", 
+          "q": [
+              "jobbers district", 
+              "jobber's district", 
+              "more about the jobber district"
+          ], 
+          "t": "West Coast Grocery", 
+          "alt": {
+              "markdown": " The area was called the Jobber's District after the multitude of wholesale businesses who sprouted up along the Prairie Line, taking advantage of the spur lines that could connect them to goods arriving by rail. Those who worked in the warehouses were also known as jobbers, and multitudes flooded in to work in these growing industries.\n\n West Coast Grocery, with its retail space in front and warehouse space in the back, is a typical example of Jobber's District architecture. Other businesses along this stretch of the Prairie Line included the Joy Building, Garretson, Woodruff and Pratt Company; F. S. Harmon Furniture Manufacturing Company; Lindstrom-Berg Cabinet Works; and Tacoma Paper and Stationary.\n\n Built right along the Prairie Line Rail corridor, most of these buildings share similarities. The side facing Pacific Avenue was usually more attractive since it faced the shopping public, while the side facing the railroad was more industrial, offering efficient loading and unloading on a special railroad spur built just off of the Prairie Line.  We can thank this design strategy for West Coast Grocery's timeless Italianate façade.\n\n The building was renovated in 1996 by the University of Washington. As UW Tacoma renovated this and other buildings in the Jobber's District, it kept some of this history in tact, keeping the original loading docks and repurposing them as covered walkways."
+          }, 
+          "type": "qna"
+      }, 
+      {
+          "a": "The Washington State Arts Commission, in partnership with the University of Washington Tacoma.Brian Goldbloom's stone sculpture draws inspiration from Tacoma's place as the Western terminus of the Northern Pacific Railroad. Made up of 10 hinged pieces of rough white granite that reference travelers' suitcases, the sculpture sits in a courtyard close to the location of the original passenger terminal, Villard Station.", 
+          "qid": "Terminus", 
+          "next": "Branch: Swiss Hall, Washington State History Museum, and Rails & Rain Garden", 
+          "q": [
+              "Terminus", 
+              "the terminus", 
+              "terminal"
+          ], 
+          "r": {
+              "imageUrl": "https://www.prairielinetrail.org/media/dynamic/heroes/178_Terminus_UWT.jpg", 
+              "title": "Terminus",
+              "subTitle":"Photo courtesy of University of Washington Tacoma"
+          }, 
+          "t": "Terminus", 
+          "alt": {
+              "markdown": "The Washington State Arts Commission, in partnership with the University of Washington Tacoma.Brian Goldbloom's stone sculpture draws inspiration from Tacoma's place as the Western terminus of the Northern Pacific Railroad. Made up of 10 hinged pieces of rough white granite that reference travelers' suitcases, the sculpture sits in a courtyard close to the location of the original passenger terminal, Villard Station."
+          }, 
+          "type": "qna"
+      }, 
+      {
+          "a": "Granite, stainless steel, and fluorescent lights", 
+          "qid": "Terminus: Medium", 
+          "q": [
+              "Medium", 
+              "Material", 
+              "What is it made of", 
+              "what is the medium", 
+              "what's the material"
+          ], 
+          "t": "Terminus", 
+          "alt": {
+              "markdown": "Granite, stainless steel, and fluorescent lights"
+          }, 
+          "type": "qna"
+      }, 
+      {
+          "a": "Brian Goldbloom is a sculptor and public artist, well known for his site-specific stone constructions. Drawing inspiration from each site, his natural stone pieces provide contrast and interest to built environments.\n\nVisit their website at : http://www.goldbloomart.com/artist.asp?ArtistID=22174&Akey=EGW9FJRW&flM=1", 
+          "qid": "Terminus: Meet the artist", 
+          "q": [
+              "who made this", 
+              "who is the artist", 
+              "artist", 
+              "about the artist", 
+              "artist information"
+          ], 
+          "t": "Terminus", 
+          "alt": {
+              "markdown": "Brian Goldbloom is a sculptor and public artist, well known for his site-specific stone constructions. Drawing inspiration from each site, his natural stone pieces provide contrast and interest to built environments.\n\nVisit their website at : [http://www.goldbloomart.com/artist.asp?ArtistID=22174&Akey=EGW9FJRW&flM=1](http://www.goldbloomart.com/artist.asp?ArtistID=22174&Akey=EGW9FJRW&flM=1)"
+          }, 
+          "type": "qna"
+      }, 
+      {
+          "a": "Nine of the sculpture's ten granite forms are left rough; one has been shaped into a smoother, more recognizable suitcase form, providing a focal point and interpretive clue to the piece. Recessed lamps in the granite flood the ground with pools of light, making the sculpture particularly striking at night.\n\nThese multiple forms help to remind us of the crowded terminal city that once surrounded this site, and the upturned suitcase hints at those who emptied their suitcases and put down roots, and those who merely passed through.", 
+          "qid": "Terminus: About the art", 
+          "q": [
+              "more about the art", 
+              "about the art", 
+              "additional information", 
+              "additional info"
+          ], 
+          "t": "Terminus", 
+          "alt": {
+              "markdown": "Nine of the sculpture's ten granite forms are left rough; one has been shaped into a smoother, more recognizable suitcase form, providing a focal point and interpretive clue to the piece. Recessed lamps in the granite flood the ground with pools of light, making the sculpture particularly striking at night.\n\nThese multiple forms help to remind us of the crowded terminal city that once surrounded this site, and the upturned suitcase hints at those who emptied their suitcases and put down roots, and those who merely passed through."
+          }, 
+          "type": "qna"
+      }, 
+      {
+          "a": "In July of 1873, a telegram arrived in Tacoma: the small waterfront community had been selected as the terminus of the Northern Pacific Railroad (NPRR). Under a tight deadline to connect the railroad to saltwater, the railroad raced to connect Tacoma to existing rail lines along the Columbia River at Kalama, WA.\n\n Built between the fall and winter of 1873 by a diverse group of laborers, including over 750 Chinese workers who had also worked on the Central Pacific Railroad, the Tacoma-Kalama line was finished with weeks to spare on December 16, 1873. Regular train service began in January of 1874. The Northern Pacific established their first passenger depot at 17th Street and present-day South Hood Street, close to the location of Terminus. \n\nThe final leg of this railroad ran from Tenino to Tacoma, passing through the burnt prairie near Olympia. Thus, it became known as the Prairie Line. For roughly a decade, the Prairie Line was the only game in town. Rows of brick warehouses lined its tracks.\n\n However, the completion of the rail line into Tacoma didn't immediately bring the boost the city wanted. Tacoma only grew by 283 people between 1875 and 1880. The Tacoma - Kalama line wasn't ideal. To reach the Northern Pacific main line, trains took a ferry  equipped with rails  across the Columbia River. Once in Oregon, the track finally shot eastward toward the plains.  But the line wasn't connected to the Midwest unitl 1883, holding Tacoma's growth in check. Tacoma's population began to climb in the mid-1880's, reaching 7,000 people by 1885.\n\n Ask about part 2 of the history for more information.", 
+          "qid": "Terminus: Historical Context Part 1", 
+          "q": [
+              "more about the history", 
+              "about the historical context", 
+              "history", 
+              "historical context"
+          ], 
+          "r": {
+              "imageUrl": "https://www.prairielinetrail.org/media/dynamic/images/112_WSHS_1996_114_13.jpg", 
+              "title": "Train on ferry",
+              "subTitle":"ca. 1900 (1996.114.13, Washington State Historical Society (Tacoma, Wash.))"
+          }, 
+          "t": "Terminus", 
+          "alt": {
+              "markdown": "In July of 1873, a telegram arrived in Tacoma: the small waterfront community had been selected as the terminus of the Northern Pacific Railroad (NPRR). Under a tight deadline to connect the railroad to saltwater, the railroad raced to connect Tacoma to existing rail lines along the Columbia River at Kalama, WA.\n\n Built between the fall and winter of 1873 by a diverse group of laborers, including over 750 Chinese workers who had also worked on the Central Pacific Railroad, the Tacoma-Kalama line was finished with weeks to spare on December 16, 1873. Regular train service began in January of 1874. The Northern Pacific established their first passenger depot at 17th Street and present-day South Hood Street, close to the location of Terminus. \n\nThe final leg of this railroad ran from Tenino to Tacoma, passing through the burnt prairie near Olympia. Thus, it became known as the Prairie Line. For roughly a decade, the Prairie Line was the only game in town. Rows of brick warehouses lined its tracks.\n\n However, the completion of the rail line into Tacoma didn't immediately bring the boost the city wanted. Tacoma only grew by 283 people between 1875 and 1880. The Tacoma - Kalama line wasn't ideal. To reach the Northern Pacific main line, trains took a ferry  equipped with rails  across the Columbia River. Once in Oregon, the track finally shot eastward toward the plains.  But the line wasn't connected to the Midwest unitl 1883, holding Tacoma's growth in check. Tacoma's population began to climb in the mid-1880's, reaching 7,000 people by 1885.\n\n Ask about part 2 of the history for more information."
+          }, 
+          "type": "qna"
+      }, 
+      {
+          "a": " The real boom came after the NPRR completed the Stampede Pass tunnel, a direct route that cut through the mountains of the Cascades to Eastern Washington. By 1890, Tacoma was 36,000 strong.\n\n The Cascade Branch met the Prairie Line at South 15th Street, bringing with it Tacoma's first major surge of passenger traffic. The next wave of newcomers, many of them immigrants, poured into Tacoma. Ethnic enclaves took root in Old Town and west of the Prairie Line on the hill overlooking Commencement Bay. Swedes, Germans, Danes, Italians, Norwegians, Greeks, and Croatians grouped together to ease their transition to America and preserve their culture. Japanese immigrants, arriving by ship, also settled near the rail line, opening hotels and other businesses and creating the Nihonmachi, or Japan Town neighborhood. Many African-Americans who arrived in Tacoma worked for the railroad, and some settled up the hill in a neighborhood that would become known as Hilltop.\n\n In 1911, Union Station replaced the passenger depot on South 17th Street, creating a formal railroad terminal for passengers arriving in Tacoma. ", 
+          "qid": "Terminus: Historical Context Part 2", 
+          "q": [
+              "history part 2", 
+              "part 2 of history", 
+              "part 2 of the history", 
+              "part 2", 
+              "historical context part 2"
+          ], 
+          "r": {
+              "imageUrl": "https://www.prairielinetrail.org/media/dynamic/images/111_WSHS__2015_0_316.jpg", 
+              "title": "Railroad workers in front of a locomotive, Stampede Tunnel Line",
+              "subTitle":"ca. 1885 (2015.0.316, Washington State Historical Society (Tacoma, Wash.))"
+          }, 
+          "t": "Terminus", 
+          "alt": {
+              "markdown": " The real boom came after the NPRR completed the Stampede Pass tunnel, a direct route that cut through the mountains of the Cascades to Eastern Washington. By 1890, Tacoma was 36,000 strong.\n\n The Cascade Branch met the Prairie Line at South 15th Street, bringing with it Tacoma's first major surge of passenger traffic. The next wave of newcomers, many of them immigrants, poured into Tacoma. Ethnic enclaves took root in Old Town and west of the Prairie Line on the hill overlooking Commencement Bay. Swedes, Germans, Danes, Italians, Norwegians, Greeks, and Croatians grouped together to ease their transition to America and preserve their culture. Japanese immigrants, arriving by ship, also settled near the rail line, opening hotels and other businesses and creating the Nihonmachi, or Japan Town neighborhood. Many African-Americans who arrived in Tacoma worked for the railroad, and some settled up the hill in a neighborhood that would become known as Hilltop.\n\n In 1911, Union Station replaced the passenger depot on South 17th Street, creating a formal railroad terminal for passengers arriving in Tacoma. "
+          }, 
+          "type": "qna"
+      }, 
+      {
+          "a": "The next possible destinations are the Swiss Hall, the Washington State History Museum, and the Rails & Rain Garden. Choosing the Swiss Hall or the Washington State History Museum will send you off the main trail, while the Rails & Rain Garden is on the main trail. Which one would you like to go to next?", 
+          "qid": "Branch: Swiss Hall, Washington State History Museum, and Rails & Rain Garden", 
+          "next": "Branch: Swiss Hall, Washington State History Museum, and Rails & Rain Garden", 
+          "q": [
+              "Branch: Swiss Hall, Washington State History Museum, and Rails & Rain Garden"
+          ], 
+          "r": {
+              "imageUrl": "https://s3.amazonaws.com/qnabot-guided-navigation-blogpost/Branch+Swiss+Hall+Washington+State+History+Museum+and+Rails++Rain+Garden.png", 
+              "title": "Map Overview"
+          }, 
+          "t": "Branch: Swiss Hall, Washington State History Museum, and Rails & Rain Garden", 
+          "alt": {
+              "markdown": "The next possible destinations are the Swiss Hall, the Washington State History Museum, and the Rails & Rain Garden. Choosing the Swiss Hall or the Washington State History Museum will send you off the main trail, while the Rails & Rain Garden is on the main trail. Which one would you like to go to next?"
+          }, 
+          "type": "qna"
+      }, 
+      {
+          "a": "On the terraced hill west of the Prairie Line, immigrant communities formed societies offering support and social events. The Swiss Hall, which is visible from the main steps of the UW Tacoma campus, is one example of these ethnic halls created to host society events. The halls can be found throughout the city. Ask for more about the hall or about other ethnic halls for additional information.", 
+          "qid": "Swiss Hall", 
+          "next": "Branch: Washington State History Museum and Rails & Rain Garden", 
+          "q": [
+              "Swiss Hall", 
+              "the swiss hall", 
+              "go to the swiss hall"
+          ], 
+          "r": {
+              "imageUrl": "https://www.prairielinetrail.org/media/dynamic/heroes/195_SwissHall-MCO.jpg", 
+              "title": "Swiss Hall"
+          }, 
+          "t": "Swiss Hall", 
+          "alt": {
+              "markdown": "On the terraced hill west of the Prairie Line, immigrant communities formed societies offering support and social events. The Swiss Hall, which is visible from the main steps of the UW Tacoma campus, is one example of these ethnic halls created to host society events. The halls can be found throughout the city. Ask for more about the hall or about other ethnic halls for additional information."
+          }, 
+          "type": "qna"
+      }, 
+      {
+          "a": "The Swiss Society built their half-timbered hall between the jobbers' district and the ethnic neighborhoods above Market Street in 1903. The hall's distinctive tower once marked the southern edge of Tacoma's open-air markets. Japanese grocers and merchants lined Market Street to the north, lending the street its name.", 
+          "qid": "Swiss Hall: More about the hall", 
+          "q": [
+              "more about the hall", 
+              "more about the swiss hall", 
+              "additional information about the swiss hall"
+          ], 
+          "r": {
+              "imageUrl": "https://www.prairielinetrail.org/media/dynamic/images/222_Richards_Studio_A326031.jpg", 
+              "title": "Swiss Hall",
+              "subTitle": "Tacoma Public Library, Richards Studio A32603-1"
+          }, 
+          "t": "Swiss Hall", 
+          "alt": {
+              "markdown": "The Swiss Society built their half-timbered hall between the jobbers' district and the ethnic neighborhoods above Market Street in 1903. The hall's distinctive tower once marked the southern edge of Tacoma's open-air markets. Japanese grocers and merchants lined Market Street to the north, lending the street its name."
+          }, 
+          "type": "qna"
+      }, 
+      {
+          "a": "The Swiss Society built their half-timbered hall between the jobbers' district and the ethnic neighborhoods above Market Street in 1903. The hall's distinctive tower once marked the southern edge of Tacoma's open-air markets. Japanese grocers and merchants lined Market Street to the north, lending the street its name.", 
+          "qid": "Swiss Hall: Other ethnic halls", 
+          "q": [
+              "more about other ethnic halls", 
+              "other ethnic halls", 
+              "ethnic halls"
+          ], 
+          "r": {
+              "imageUrl": "https://www.prairielinetrail.org/media/dynamic/heroes/195_SwissHall-MCO.jpg", 
+              "title": "Image of the Normanettes,a Scandinavian singing group",
+              "subTitle":"ca. 1950 (Tacoma Public Library, Richards Studio D50094-1)"
+          }, 
+          "t": "Swiss Hall", 
+          "alt": {
+              "markdown": "The Swiss Society built their half-timbered hall between the jobbers' district and the ethnic neighborhoods above Market Street in 1903. The hall's distinctive tower once marked the southern edge of Tacoma's open-air markets. Japanese grocers and merchants lined Market Street to the north, lending the street its name."
+          }, 
+          "type": "qna"
+      }, 
+      {
+          "a": "The next possible destinations are the Washington State History Museum and the Rails & Rain Garden. The Washington State History Museum is off the main trail, while the Rails & Rain Garden is on the main trail. Which one would you like to go to next?", 
+          "qid": "Branch: Washington State History Museum and Rails & Rain Garden", 
+          "next": "Branch: Washington State History Museum and Rails & Rain Garden", 
+          "q": [
+              "Branch: Washington State History Museum and Rails & Rain Garden"
+          ], 
+          "r": {
+              "imageUrl": "https://s3.amazonaws.com/qnabot-guided-navigation-blogpost/Branch+Washington+State+History+Museum+and+Rails++Rain+Garden.png", 
+              "title": "Map Overview"
+          }, 
+          "t": "Branch: Washington State History Museum and Rails & Rain Garden", 
+          "alt": {
+              "markdown": "The next possible destinations are the Washington State History Museum and the Rails & Rain Garden. The Washington State History Museum is off the main trail, while the Rails & Rain Garden is on the main trail. Which one would you like to go to next?"
+          }, 
+          "type": "qna"
+      }, 
+      {
+          "a": "The Washington State History Museum's interactive exhibits, dynamic storytelling, high-tech displays, and dramatic artifacts bring the state's history to life. The museum also played a key role in revitalizing downtown Tacoma. Ask about the historical context or about \"a new cultural dimension\" for additional information  ", 
+          "qid": "Washington State History Museum", 
+          "next": "Branch: Swiss Hall and Rails & Rain Garden", 
+          "q": [
+              "Washington State History Museum", 
+              "the Washington State History Museum", 
+              "go to the Washington State History Museum"
+          ], 
+          "r": {
+              "imageUrl": "https://www.prairielinetrail.org/media/dynamic/heroes/128_WSHM_arch.JPG", 
+              "title": "Washington State History Museum arch",
+              "subTitle":"Photo courtesy of Washington State Historical Society"
+          }, 
+          "t": "Washington State History Museum", 
+          "alt": {
+              "markdown": "The Washington State History Museum's interactive exhibits, dynamic storytelling, high-tech displays, and dramatic artifacts bring the state's history to life. The museum also played a key role in revitalizing downtown Tacoma. Ask about the historical context or about \"a new cultural dimension\" for additional information  "
+          }, 
+          "type": "qna"
+      }, 
+      {
+          "a": " Initially, the super highway was unkind to downtown Tacoma and countless more urban centers across the country. Suburbs, complete with shopping malls, popped up. Downtown businesses departed. Blight set in. From the 1960's to the early 80's, downtown Tacoma felt deserted.\n\n The jewel of the city, Union Station, sat vacant from 1984 until 1989. Then it was restored and repurposed as a federal courthouse. Nearby, in the Warehouse District, the University of Washington started rehabilitating historic buildings. And I-705 finally connected downtown Tacoma to I-5.", 
+          "qid": "Washington State History Museum: Historical Context", 
+          "q": [
+              "more about the history", 
+              "about the historical context", 
+              "history", 
+              "historical context"
+          ], 
+          "t": "Washington State History Museum", 
+          "alt": {
+              "markdown": " Initially, the super highway was unkind to downtown Tacoma and countless more urban centers across the country. Suburbs, complete with shopping malls, popped up. Downtown businesses departed. Blight set in. From the 1960's to the early 80's, downtown Tacoma felt deserted.\n\n The jewel of the city, Union Station, sat vacant from 1984 until 1989. Then it was restored and repurposed as a federal courthouse. Nearby, in the Warehouse District, the University of Washington started rehabilitating historic buildings. And I-705 finally connected downtown Tacoma to I-5."
+          }, 
+          "type": "qna"
+      }, 
+      {
+          "a": "Amidst this flurry of downtown revitalization came Tacoma's first major museum. The Washington State Historical Society began constructing the History Museum on a site adjacent to Union Station. The museum, designed by architects Charles Moore and Arthur Andersson, imitated the arched facades of the Union Depot. Completed in 1996, the museum fit in well with the historic district.\n\n The History Museum became the first of six museums that, today, comprise Tacoma's Museum District. Featuring world class collections of studio glass, collectible cars, Northwest art, maritime history, and much more, Tacoma's Museum District offers a variety of avenues to explore in one walkable cluster. It's one reason for Tacoma's re-emergence as a thriving cultural and economic hub.\n\nTo learn more, visit the Washington State History Museum's website: http://www.washingtonhistory.org/visit/wshm/ .", 
+          "qid": "Washington State History Museum: A new cultural dimension", 
+          "q": [
+              "more about other the new cultural dimension", 
+              "cultural dimension", 
+              "a new cultural dimension"
+          ], 
+          "t": "Washington State History Museum", 
+          "alt": {
+              "markdown": "Amidst this flurry of downtown revitalization came Tacoma's first major museum. The Washington State Historical Society began constructing the History Museum on a site adjacent to Union Station. The museum, designed by architects Charles Moore and Arthur Andersson, imitated the arched facades of the Union Depot. Completed in 1996, the museum fit in well with the historic district.\n\n The History Museum became the first of six museums that, today, comprise Tacoma's Museum District. Featuring world class collections of studio glass, collectible cars, Northwest art, maritime history, and much more, Tacoma's Museum District offers a variety of avenues to explore in one walkable cluster. It's one reason for Tacoma's re-emergence as a thriving cultural and economic hub.\n\nTo learn more, visit the Washington State History Museum's website: [http://www.washingtonhistory.org/visit/wshm/](http://www.washingtonhistory.org/visit/wshm/) ."
+          }, 
+          "type": "qna"
+      }, 
+      {
+          "a": "The next possible destinations are the Washington State History Museum and the Rails & Rain Garden. The Washington State History Museum is off the main trail, while the Rails & Rain Garden is on the main trail. Which one would you like to go to next?", 
+          "qid": "Branch: Swiss Hall and Rails & Rain Garden", 
+          "next": "Branch: Swiss Hall and Rails & Rain Garden", 
+          "q": [
+              "Branch: Swiss Hall and Rails & Rain Garden"
+          ], 
+          "r": {
+              "imageUrl": "https://s3.amazonaws.com/qnabot-guided-navigation-blogpost/Branch+Swiss+Hall+and+Rails++Rain+Garden.png", 
+              "title": "Map Overview"
+          }, 
+          "t": "Branch: Swiss Hall and Rails & Rain Garden", 
+          "alt": {
+              "markdown": "The next possible destinations are the Washington State History Museum and the Rails & Rain Garden. The Washington State History Museum is off the main trail, while the Rails & Rain Garden is on the main trail. Which one would you like to go to next?"
+          }, 
+          "type": "qna"
+      }, 
+      {
+          "a": "Visitors are often intrigued by this garden-like feature at the south end of the UW segment of the Prairie Line Trail. It has plants, rusty steel brackets and troughs, and often water flowing through it. Is it art? History? A science project? This rain garden could be said to be all three. Ask about the art ,history and science or about the \"End of the Line\" for additional information", 
+          "qid": "Rails & Rain Garden", 
+          "next": "Heidelberg Complex", 
+          "q": [
+              "Rails & Rain Garden", 
+              "Rails and Rain Garden", 
+              "Rain and Rails Garden", 
+              "the Rails & Rain Garden", 
+              "go to the Rails and Rain Garden"
+          ], 
+          "r": {
+              "imageUrl": "https://www.prairielinetrail.org/media/dynamic/heroes/105_rails-garden.jpg", 
+              "title": "Rails & Rain Garden"
+          }, 
+          "t": "Rails & Rain Garden", 
+          "alt": {
+              "markdown": "Visitors are often intrigued by this garden-like feature at the south end of the UW segment of the Prairie Line Trail. It has plants, rusty steel brackets and troughs, and often water flowing through it. Is it art? History? A science project? This rain garden could be said to be all three. Ask about the art ,history and science or about the \"End of the Line\" for additional information"
+          }, 
+          "type": "qna"
+      }, 
+      {
+          "a": "This feature's main practical function is to treat stormwater. In an urban environment, stormwater picks up pollutants. Rain gardens like this one use special plants to filter out pollution before runoff hits major waterways. This rain garden treats stormwater from 42 acres of developed urban space upstream, making sure that water is clean and safe when it joins the Thea Foss Waterway at the bottom of the hill.\n\n Learn more about the Prairie Line Trail Stormwater Treatment: https://www.tacoma.uw.edu/news/article/how-it-works-prairie-line-trail-stormwater-treatment . \n\n Artfully designed to work with the existing railroad tracks, the rain garden also preserves a key piece of Tacoma's history. A close look at the rusty track segments reveals dates. These dates show the last time the tracks were swapped out for maintenance reasons. The last train rumbled over the Prairie Line tracks in Tacoma on the afternoon of March 30, 2003, just under fifty years after these rails were last replaced.", 
+          "qid": "Rails & Rain Garden: Art, history, and science", 
+          "q": [
+              "art", 
+              "history", 
+              "science", 
+              "art history and science"
+          ], 
+          "r": {
+              "imageUrl": "https://www.prairielinetrail.org/media/dynamic/heroes/105_rails-garden.jpg", 
+              "title": "Last Prairie Line passenger train",
+              "subTitle":"By Jim Fredrickson, consent from Pacific Northwest Railroad Archive, Burien, WA"
+          }, 
+          "t": "Rails & Rain Garden", 
+          "alt": {
+              "markdown": "This feature's main practical function is to treat stormwater. In an urban environment, stormwater picks up pollutants. Rain gardens like this one use special plants to filter out pollution before runoff hits major waterways. This rain garden treats stormwater from 42 acres of developed urban space upstream, making sure that water is clean and safe when it joins the Thea Foss Waterway at the bottom of the hill.\n\n Learn more about the Prairie Line Trail Stormwater Treatment: https://www.tacoma.uw.edu/news/article/how-it-works-prairie-line-trail-stormwater-treatment . \n\n Artfully designed to work with the existing railroad tracks, the rain garden also preserves a key piece of Tacoma's history. A close look at the rusty track segments reveals dates. These dates show the last time the tracks were swapped out for maintenance reasons. The last train rumbled over the Prairie Line tracks in Tacoma on the afternoon of March 30, 2003, just under fifty years after these rails were last replaced."
+          }, 
+          "type": "qna"
+      }, 
+      {
+          "a": "Closing the book on the Prairie Line opened a new chapter in Tacoma's story  a chapter that harkens back to an earlier time. Historically, a streetcar ran up and down Pacific Avenue. The city brought streetcars back with Tacoma Link light rail in 2003.  The historic rail line complicated the intersection of South 17th and Pacific Avenue. To make room for this new rail line, the City and the railroad agreed to phase out the Prairie Line. \n\nVacating the Prairie Line made light rail much more affordable. It also created an opportunity for a multi-modal transportation route through the heart of Tacoma featuring light rail, automobile, pedestrian, and bicycle traffic.\n\n Bonus: Prairie Line Trail connects to the Thea Foss Esplanade and the historic Water Flume Line Trail, creating a multi-district biking and walking trail enhanced with art and history.", 
+          "qid": "Rails & Rain Garden: End of the Line", 
+          "q": [
+              "end of the line", 
+              "end line", 
+              "the end of the line"
+          ], 
+          "t": "Rails & Rain Garden", 
+          "alt": {
+              "markdown": "Closing the book on the Prairie Line opened a new chapter in Tacoma's story  a chapter that harkens back to an earlier time. Historically, a streetcar ran up and down Pacific Avenue. The city brought streetcars back with Tacoma Link light rail in 2003.  The historic rail line complicated the intersection of South 17th and Pacific Avenue. To make room for this new rail line, the City and the railroad agreed to phase out the Prairie Line. \n\nVacating the Prairie Line made light rail much more affordable. It also created an opportunity for a multi-modal transportation route through the heart of Tacoma featuring light rail, automobile, pedestrian, and bicycle traffic.\n\n Bonus: Prairie Line Trail connects to the Thea Foss Esplanade and the historic Water Flume Line Trail, creating a multi-district biking and walking trail enhanced with art and history."
+          }, 
+          "type": "qna"
+      }, 
+      {
+          "a": "The Columbia  Heidelberg Building produced Northwest beer for three-quarters of a century before shutting down in 1979. In 2016, the historic brewing complex gained a new tenant  7 Seas Brewing Company  making way for this neighborhood's comeback and an emerging Brewery District.Ask about the beginning, prohibition, or the post-war boom for additional information", 
+          "qid": "Heidelberg Complex", 
+          "next": "Working Forward, Weaving Anew", 
+          "q": [
+              "Heidelberg Complex", 
+              "Heidelberg building", 
+              "hindenburg complex", 
+              "the hindenburg building", 
+              "the Heidelberg Complex"
+          ], 
+          "r": {
+              "imageUrl": "https://www.prairielinetrail.org/media/dynamic/heroes/215_7_Seas_-_MCO.jpg", 
+              "title": "7 Seas Brewing"
+          }, 
+          "t": "Heidelberg Complex", 
+          "alt": {
+              "markdown": "The Columbia  Heidelberg Building produced Northwest beer for three-quarters of a century before shutting down in 1979. In 2016, the historic brewing complex gained a new tenant  7 Seas Brewing Company  making way for this neighborhood's comeback and an emerging Brewery District.Ask about the beginning, prohibition, or the post-war boom for additional information"
+          }, 
+          "type": "qna"
+      }, 
+      {
+          "a": "The Heidelberg Brewing complex, located at 2120-32 South C Street, first housed Columbia Brewing Company. Columbia started in 1900, created by German-born Emil Kliese and William C. Klitz. This wasn't Kleise's first beer venture. He started at Capital Brewing Company in Tumwater, WA. By 1899, Kleise had risen to head brewmaster. Investors approached him about starting a brewery in Tacoma. He signed on.\n\n Tacoma was a thirsty city. At the turn of the century, it boasted 95 different bars. Columbia Brewing rolled out 50 barrels a day to meet demand. They created various brands, including Columbia, Golden Drops, Golden Foam, Old Pilsner, and Alt Heidelberg (Old Heidelberg). Tacoma's brewing industry was hopping but the beer bubble was about to burst.", 
+          "qid": "Heidelberg Complex: The beginning", 
+          "q": [
+              "beginning", 
+              "the beginning", 
+              "heidelberg beggining"
+          ], 
+          "r": {
+              "imageUrl": "https://www.prairielinetrail.org/media/dynamic/images/101_TPL_C59415_3.jpg", 
+              "title": "Columbia Brewing Company's original building",
+              "subTitle":"ca. 1912 (Tacoma Public Library, Richards Studio C59415-3)"
+          }, 
+          "t": "Heidelberg Complex", 
+          "alt": {
+              "markdown": "The Heidelberg Brewing complex, located at 2120-32 South C Street, first housed Columbia Brewing Company. Columbia started in 1900, created by German-born Emil Kliese and William C. Klitz. This wasn't Kleise's first beer venture. He started at Capital Brewing Company in Tumwater, WA. By 1899, Kleise had risen to head brewmaster. Investors approached him about starting a brewery in Tacoma. He signed on.\n\n Tacoma was a thirsty city. At the turn of the century, it boasted 95 different bars. Columbia Brewing rolled out 50 barrels a day to meet demand. They created various brands, including Columbia, Golden Drops, Golden Foam, Old Pilsner, and Alt Heidelberg (Old Heidelberg). Tacoma's brewing industry was hopping but the beer bubble was about to burst."
+          }, 
+          "type": "qna"
+      }, 
+      {
+          "a": "Prohibition hit in Washington State in 1916, four years earlier than the nation. Many saloons shut down, but some reinvented themselves as soft drink parlors. Columbia adapted. They started brewing soda: Birch Beer, Green River, Chocolate Soldier, and Blue Jay. They also crafted a near beer (non-alcoholic beer).\n\n Columbia Brewing Company became Columbia Breweries Inc. in 1933. Prohibition was over. The company resurrected their Alt Heidelberg brand. The company logo changed too. Its patriotic female figure was out. In came a good-timing character popularized by a play, opera, and silent movie. He was called the Student Prince.", 
+          "qid": "Heidelberg Complex: Prohibition", 
+          "q": [
+              "prohibition", 
+              "the prohibition"
+          ], 
+          "r": {
+              "imageUrl": "https://www.prairielinetrail.org/media/dynamic/images/102_TPL_C87485_61.jpg", 
+              "title": "Columbia Brewing near beer fan. Clothes have been made from Columbia Brew labels",
+              "subTitle":"Tacoma Public Library, Richards Studio C87485-61"
+          }, 
+          "t": "Heidelberg Complex", 
+          "alt": {
+              "markdown": "Prohibition hit in Washington State in 1916, four years earlier than the nation. Many saloons shut down, but some reinvented themselves as soft drink parlors. Columbia adapted. They started brewing soda: Birch Beer, Green River, Chocolate Soldier, and Blue Jay. They also crafted a near beer (non-alcoholic beer).\n\n Columbia Brewing Company became Columbia Breweries Inc. in 1933. Prohibition was over. The company resurrected their Alt Heidelberg brand. The company logo changed too. Its patriotic female figure was out. In came a good-timing character popularized by a play, opera, and silent movie. He was called the Student Prince."
+          }, 
+          "type": "qna"
+      }, 
+      {
+          "a": " The Heidelberg brand proved enduring. In 1949, the company restructured, taking on the named Heidelberg Brewing. It ramped up to meet post-war demand. Kitchy Alt Heidelberg ads blanketed the Northwest, driving up sales.\n\n The company traded hands two more times, but kept the popular Alt Heidelberg brand afloat. In 1976, G. Heileman Brewing Co was expanding in the Northwest, and purchased Columbia-Heidelberg. Heilman had already purchased Rainier Brewing Company in Seattle. The courts ruled that Heilman owned too much of the Northwest beer market, and forced it to part with one of its companies. In 1979, the Columbia-Heidelberg brewery closed for good.\n\n Much of the original Columbia - Heidelberg complex is gone now, but the post-prohibition part of its facility remains. In 2016, the 7 Seas Brewing Company renovated this historic site, creating a brewery, tap room, and multi-use culinary space.", 
+          "qid": "Heidelberg Complex: Post-war boom", 
+          "q": [
+              "the post war boom", 
+              "post-war boom", 
+              "the boom"
+          ], 
+          "r": {
+              "imageUrl": "https://www.prairielinetrail.org/media/dynamic/images/102_TPL_C87485_61.jpg", 
+              "title": "Train car advertising canned beer.",
+              "subTitle":"Tacoma Public Library, Richards Studio C87485-5"
+          }, 
+          "t": "Heidelberg Complex", 
+          "alt": {
+              "markdown": " The Heidelberg brand proved enduring. In 1949, the company restructured, taking on the named Heidelberg Brewing. It ramped up to meet post-war demand. Kitchy Alt Heidelberg ads blanketed the Northwest, driving up sales.\n\n The company traded hands two more times, but kept the popular Alt Heidelberg brand afloat. In 1976, G. Heileman Brewing Co was expanding in the Northwest, and purchased Columbia-Heidelberg. Heilman had already purchased Rainier Brewing Company in Seattle. The courts ruled that Heilman owned too much of the Northwest beer market, and forced it to part with one of its companies. In 1979, the Columbia-Heidelberg brewery closed for good.\n\n Much of the original Columbia - Heidelberg complex is gone now, but the post-prohibition part of its facility remains. In 2016, the 7 Seas Brewing Company renovated this historic site, creating a brewery, tap room, and multi-use culinary space."
+          }, 
+          "type": "qna"
+      }, 
+      {
+          "a": "Working Forward, Weaving Anew is a 13,000-square-foot, team-created mural. It intertwines scenes of hand production: Puyallup basket weaving, logging, furniture-building, and present-day weaving, telling a site-specific story of the changing attitudes towards the natural world. \n\n Ask for more about the art, the artist, or the medium for additional information.", 
+          "qid": "Working Forward, Weaving Anew", 
+          "next": "The Brewery District", 
+          "q": [
+              "Working Forward, Weaving Anew", 
+              "Walking forward", 
+              "weaving anew", 
+              "weaving anew and walking forward", 
+              "the Working Forward, Weaving Anew"
+          ], 
+          "r": {
+              "imageUrl": "https://www.prairielinetrail.org/media/dynamic/heroes/239_working_forward_panorama.jpg", 
+              "title": "Working Forward, Weaving Anew"
+          }, 
+          "t": "Working Forward, Weaving Anew", 
+          "alt": {
+              "markdown": "Working Forward, Weaving Anew is a 13,000-square-foot, team-created mural. It intertwines scenes of hand production: Puyallup basket weaving, logging, furniture-building, and present-day weaving, telling a site-specific story of the changing attitudes towards the natural world. \n\n Ask for more about the art, the artist, or the medium for additional information."
+          }, 
+          "type": "qna"
+      }, 
+      {
+          "a": "Paint and sculpted metal", 
+          "qid": "Working Forward, Weaving Anew: Medium", 
+          "q": [
+              "Medium", 
+              "Material", 
+              "What is it made of", 
+              "what is the medium", 
+              "what's the material"
+          ], 
+          "t": "Working Forward, Weaving Anew", 
+          "alt": {
+              "markdown": "Paint and sculpted metal"
+          }, 
+          "type": "qna"
+      }, 
+      {
+          "a": " Jessilyn Brinkerhoff and Esteban Camacho Steffensen are muralists and collaborative public artists.  Their work flows out of conversations, and tells awe-inspiring, larger-than-life stories. In this case, their conversations with local historians and representatives from the Puyallup Tribe inspired this mural, which was conceptualized and refined in 20 different versions of the design.\n\n To create the final mural, the artists used their full artistic arsenal: sketching, painting, photography, and graphic design. As they designed, the artists relied on historic photos, documents, and artifacts to accurately capture and weave together this complex array of stories.\n\n Visit Jessilyn Brinkerhoff's website: https://www.wildcloudcreative.com/.\n\n Visit Esteban Camacho Steffensen's website: http://camachosteffensen.blogspot.com/.", 
+          "qid": "Working Forward, Weaving Anew: Meet the artists", 
+          "q": [
+              "who made this", 
+              "who is the artist", 
+              "artist", 
+              "about the artist", 
+              "artist information"
+          ], 
+          "t": "Working Forward, Weaving Anew", 
+          "alt": {
+              "markdown": " Jessilyn Brinkerhoff and Esteban Camacho Steffensen are muralists and collaborative public artists.  Their work flows out of conversations, and tells awe-inspiring, larger-than-life stories. In this case, their conversations with local historians and representatives from the Puyallup Tribe inspired this mural, which was conceptualized and refined in 20 different versions of the design.\n\n To create the final mural, the artists used their full artistic arsenal: sketching, painting, photography, and graphic design. As they designed, the artists relied on historic photos, documents, and artifacts to accurately capture and weave together this complex array of stories.\n\n Visit Jessilyn Brinkerhoff's website: [https://www.wildcloudcreative.com/](https://www.wildcloudcreative.com/).\n\n Visit Esteban Camacho Steffensen's website: [http://camachosteffensen.blogspot.com/](http://camachosteffensen.blogspot.com/)."
+          }, 
+          "type": "qna"
+      }, 
+      {
+          "a": " Esteban Camacho Steffensen and Jessilyn Brinkerhoff created this mural through an exploration of the history of production in Tacoma, primarily employing images of wood and weaving. Their design includes a Puyallup basket weaver, clearcutting, furniture making, and a person creating a contemporary artwork. All of these forms of production are intimately connected with the history of this place, from the massive cedar trees that once stood along this corridor to the furniture shop that occupied buildings in the surrounding warehouses.\n\n Working Forward, Weaving Anew is a mural designed to honor cultural traditions, the natural environment, and our need for new harmonious and sustainable paths forward into the future. The muralists worked closely with representatives from the Puyallup Tribe to ensure the cultural imagery in their artwork is respectful and accurate. This 50-foot-tall mural was hand painted in a span of 6 weeks with help from a team of nine Native American artists: Bruce Speakthunder Berry, Andrea Bob, Lloyd Neeka Cook, Anthony Duenas, Kanani Miyamoto, Ariella Pool, Elisabeth Tail, Charles Taylor, and Paul Valencia.\n\n View a closeup mural (https://www.youtube.com/watch?v=Uczz83XO4RE) showing the artists at work.", 
+          "qid": "Working Forward, Weaving Anew: About the art", 
+          "q": [
+              "more about the art", 
+              "about the art", 
+              "additional information", 
+              "additional info"
+          ], 
+          "t": "Working Forward, Weaving Anew", 
+          "alt": {
+              "markdown": " Esteban Camacho Steffensen and Jessilyn Brinkerhoff created this mural through an exploration of the history of production in Tacoma, primarily employing images of wood and weaving. Their design includes a Puyallup basket weaver, clearcutting, furniture making, and a person creating a contemporary artwork. All of these forms of production are intimately connected with the history of this place, from the massive cedar trees that once stood along this corridor to the furniture shop that occupied buildings in the surrounding warehouses.\n\n Working Forward, Weaving Anew is a mural designed to honor cultural traditions, the natural environment, and our need for new harmonious and sustainable paths forward into the future. The muralists worked closely with representatives from the Puyallup Tribe to ensure the cultural imagery in their artwork is respectful and accurate. This 50-foot-tall mural was hand painted in a span of 6 weeks with help from a team of nine Native American artists: Bruce Speakthunder Berry, Andrea Bob, Lloyd Neeka Cook, Anthony Duenas, Kanani Miyamoto, Ariella Pool, Elisabeth Tail, Charles Taylor, and Paul Valencia.\n\n View a closeup mural (https://www.youtube.com/watch?v=Uczz83XO4RE) showing the artists at work."
+          }, 
+          "type": "qna"
+      }, 
+      {
+          "a": "Growing rapidly through 1890's and early 1900's, the district hit a roadblock in 1916. Prohibition. Some breweries fell. Others fought through. For the better part of a century, some of the Northwest's most recognizable beers were brewed here. Today, many breweries are capitalizing on these historic warehouses. \n\n Ask for more about the timeline for additional information.", 
+          "qid": "The Brewery District", 
+          "next": "End of Tour", 
+          "q": [
+              "The Brewery District", 
+              "Walking forward", 
+              "weaving anew", 
+              "weaving anew and walking forward", 
+              "the The Brewery District"
+          ], 
+          "r": {
+              "imageUrl": "https://www.prairielinetrail.org/media/dynamic/heroes/107_TPL_C59415_3.jpg", 
+              "title": "Columbia Brewing",
+              "subTitle":"Tacoma Public Library, Richards Studio C59415-3"
+          }, 
+          "t": "The Brewery District", 
+          "alt": {
+              "markdown": "Growing rapidly through 1890's and early 1900's, the district hit a roadblock in 1916. Prohibition. Some breweries fell. Others fought through. For the better part of a century, some of the Northwest's most recognizable beers were brewed here. Today, many breweries are capitalizing on these historic warehouses. \n\n Ask for more about the timeline for additional information."
+          }, 
+          "type": "qna"
+      }, 
+      {
+          "a": "John D. Scholl and Anton Huth established the Puget Sound Brewery in 1888. They set up shop at 1532 C Street before moving to the corner of Jefferson Avenue and 25th Street.\n\n In 1891, Scholl, Huth, and business partner Peter A. Kalenborn incorporated the Puget Sound Brewing Company with $600,000 in capital stock.\n\n Growth came quickly. Huth soon partnered with Samuel S. Loeb of the Milwaukee Brewing Company in 1897, merging the two companies into Pacific Brewing & Malting Company. Their new location? 2511-15 South Holgate Street.\n\n Columbia Brewing Company, located at 2120-32 South C Street, was formed in 1900 by German-born Emil Kliese and William C. Klitz.\n\n In 1916, the state of Washington prohibited the manufacture and sale of liquor.\n\n Many saloons rebranded as soft drink parlors during prohibition.\n\n In 1949, Heidelberg Brewing purchased Columbia Breweries, Inc. \n\n In 2014, Pacific Brewing & Malting returned (now in the Stadium District and under new ownership).\n\n The 7 Seas Brewing Co. moved into the Heidelberg complex in 2016. Beer is being brewed again at this location for the first time since 1979.", 
+          "qid": "The Brewery District: Timeline", 
+          "q": [
+              "Timeline", 
+              "the timeline"
+          ], 
+          "t": "The Brewery District", 
+          "alt": {
+              "markdown": "John D. Scholl and Anton Huth established the Puget Sound Brewery in 1888. They set up shop at 1532 C Street before moving to the corner of Jefferson Avenue and 25th Street.\n\n In 1891, Scholl, Huth, and business partner Peter A. Kalenborn incorporated the Puget Sound Brewing Company with $600,000 in capital stock.\n\n Growth came quickly. Huth soon partnered with Samuel S. Loeb of the Milwaukee Brewing Company in 1897, merging the two companies into Pacific Brewing & Malting Company. Their new location? 2511-15 South Holgate Street.\n\n Columbia Brewing Company, located at 2120-32 South C Street, was formed in 1900 by German-born Emil Kliese and William C. Klitz.\n\n In 1916, the state of Washington prohibited the manufacture and sale of liquor.\n\n Many saloons rebranded as soft drink parlors during prohibition.\n\n In 1949, Heidelberg Brewing purchased Columbia Breweries, Inc. \n\n In 2014, Pacific Brewing & Malting returned (now in the Stadium District and under new ownership).\n\n The 7 Seas Brewing Co. moved into the Heidelberg complex in 2016. Beer is being brewed again at this location for the first time since 1979."
+          }, 
+          "type": "qna"
+      }
+  ]
+}

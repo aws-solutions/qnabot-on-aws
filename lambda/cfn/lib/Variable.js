@@ -20,7 +20,6 @@ module.exports=class Variable extends require('./base') {
     Update(ID,params,oldparams,reply){
         this.Create(params,reply) 
     }
-
 }
 
 function id(params){

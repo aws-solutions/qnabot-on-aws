@@ -29,12 +29,10 @@ module.exports={
         })
         .then(function(data){
             return Promise.join(
-                api(context,'utterances'),
                 api(context,'alexa')
             )
         })
-        .spread(function(utterances,alexa){
-            context.commit('utterances',utterances,{root:true})
+        .spread(function(alexa){
             context.commit('alexa',alexa,{root:true})
         })
         .tapCatch(e=>console.log('Error:',e))

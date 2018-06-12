@@ -1,4 +1,11 @@
 var config=require('./config')
+var _=require('lodash')
+
+examples=_.fromPairs(require('../../examples/outputs')
+    .names
+    .map(x=>{
+        return [x,{"Fn::GetAtt":["ExamplesStack",`Outputs.${x}`]}]
+    }))
 
 module.exports={
     "Alexa":{
@@ -27,21 +34,22 @@ module.exports={
             "S3ObjectVersion":{"Ref":"FulfillmentCodeVersion"}
         },
         "Environment": {
-          "Variables": {
-            ES_TYPE:{"Fn::GetAtt":["Var","type"]},
+          "Variables": Object.assign({
+            ES_TYPE:{"Fn::GetAtt":["Var","QnAType"]},
             ES_INDEX:{"Fn::GetAtt":["Var","index"]},
             ES_ADDRESS:{"Fn::GetAtt":["ESVar","ESAddress"]},
             LAMBDA_DEFAULT_QUERY:{"Ref":"ESQueryLambda"},
+            LAMBDA_LOG:{"Ref":"ESLoggingLambda"},
             ES_SERVICE_QID:{"Ref":"ESQidLambda"},
             ES_SERVICE_PROXY:{"Ref":"ESProxyLambda"},
             "ERRORMESSAGE":config.ErrorMessage,
             "EMPTYMESSAGE":config.EmptyMessage
-          }
+          },examples)
         },
         "Handler": "index.handler",
         "MemorySize": "1408",
         "Role": {"Fn::GetAtt": ["FulfillmentLambdaRole","Arn"]},
-        "Runtime": "nodejs6.10",
+        "Runtime": "nodejs8.10",
         "Timeout": 300,
         "Tags":[{
             Key:"Type",
@@ -63,9 +71,13 @@ module.exports={
                 "arn:aws:lambda:*:*:function:qna-*",
                 "arn:aws:lambda:*:*:function:QNA-*",
                 {"Fn::GetAtt":["ESQueryLambda","Arn"]},
-                {"Fn::GetAtt":["ESQidLambda","Arn"]},
                 {"Fn::GetAtt":["ESProxyLambda","Arn"]},
-              ]
+                {"Fn::GetAtt":["ESLoggingLambda","Arn"]},
+                {"Fn::GetAtt":["ESQidLambda","Arn"]},
+              ].concat(require('../../examples/outputs').names
+                .map(x=>{
+                    return {"Fn::GetAtt":["ExamplesStack",`Outputs.${x}`]}
+                }))
             }]
         },
         "Roles": [{"Ref": "FulfillmentLambdaRole"}]

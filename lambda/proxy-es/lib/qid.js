@@ -8,12 +8,32 @@ var myCredentials = new aws.EnvironmentCredentials('AWS');
 var request=require('./request')
 
 module.exports=function(event,context,callback){
-    var query=bodybuilder()
-    .orQuery('match','qid',event.qid)
-    .from(0)
-    .size(1)
-    .build()
-
+    var query
+    console.log("Qid",event.qid)
+    switch(event.type){
+        case "next":
+            query=bodybuilder()
+            .orFilter('term', 'next.keyword', event.qid)
+		    .from(0)
+		    .size(1)
+            .build() 
+            break;
+        case "qid":
+            query=bodybuilder()
+            .orQuery('match','qid',event.qid)
+            .from(0)
+            .size(1)
+            .build()
+            break;
+        default:
+            query=bodybuilder()
+            .orQuery('match','qid',event.qid)
+            .from(0)
+            .size(1)
+            .build()
+            break;
+    }
+    
     console.log("ElasticSearch Query",JSON.stringify(query,null,2))
     return request({
         url:url.resolve(`https://${process.env.ES_ADDRESS}`,`/${process.env.ES_INDEX}/_search`),

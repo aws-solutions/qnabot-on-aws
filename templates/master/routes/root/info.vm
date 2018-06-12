@@ -3,6 +3,7 @@
 {
     "region":"${!stageVariables.Region}",
     "BotName":"${LexBot}",
+    "BotVersion":"${Alias}",
     "PoolId":"${IdPool}",
     "ClientIdClient":"${ClientClient}",
     "ClientIdDesigner":"${ClientDesigner}",
@@ -35,6 +36,9 @@
         },
         "Services":{
             "href":"$root/services"
+        },
+        "Kibana":{
+            "href":"https://${Urls.Kibana}"
         }
     }
 }

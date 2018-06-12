@@ -1,0 +1,93 @@
+﻿{
+  "qna": [
+    {
+      "qid": "ExampleQuiz.2",
+      "question": "Can Questionnaire Bot ask questions with image attachments?",
+      "correctAnswers": [
+        "Yes."
+      ],
+      "incorrectAnswers": [
+        "No."
+      ],
+      "responses": {
+        "correct": "I like your style.",
+        "incorrect": "You'll get 'em next time, slugger.",
+        "end": ""
+      },
+      "next": [
+        "ExampleQuiz.3"
+      ],
+      "r": {
+        "title": "Hint",
+        "subTitle": "",
+        "imageUrl": "https://s3.amazonaws.com/public-blog-image-hosting/jambo.jpeg"
+      },
+      "quiz": "",
+      "type": "quiz",
+      "q": [],
+      "t": ""
+    },
+    {
+      "qid": "QuizEntry",
+      "a": "Starting the example quiz!",
+      "l": "QNA:ExampleJSLambdaQuiz",
+      "args": [
+        "ExampleQuiz.1"
+      ],
+      "type": "qna",
+      "q": [
+        "Start the example quiz.",
+        "Take the example quiz."
+      ]
+    },
+    {
+      "qid": "ExampleQuiz.1",
+      "question": "What does the dog say?",
+      "correctAnswers": [
+        "Woof!"
+      ],
+      "incorrectAnswers": [
+        "Meow!",
+        "Tweet!",
+        "Honk!"
+      ],
+      "next": [
+        "ExampleQuiz.2"
+      ],
+      "type": "quiz"
+    },
+    {
+      "qid": "ExampleQuiz.3",
+      "question": "Can you customize Questionnaire Bot's responses?",
+      "correctAnswers": [
+        "Yes.",
+        "Yes.",
+        "Yes."
+      ],
+      "incorrectAnswers": [
+        "No.",
+        "Probably not.",
+        "Why are three of the answers \"Yes?\""
+      ],
+      "responses": {
+        "correct": "And knowing is half the battle!",
+        "incorrect": "And knowing is half the battle!",
+        "end": "See you later, friend!"
+      },
+      "next": [
+        ""
+      ],
+      "r": {
+        "title": "",
+        "subTitle": "",
+        "imageUrl": "",
+        "text": "",
+        "url": ""
+      },
+      "quiz": "",
+      "type": "quiz",
+      "q": [],
+      "t": ""
+    }
+  ]
+}

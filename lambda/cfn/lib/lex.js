@@ -28,6 +28,15 @@ function makeid(prefix){
     return text
 }
 
+function id(length){
+    var text = "";
+    var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+
+    for( var i=0; i < length; i++ )
+    text += possible.charAt(Math.floor(Math.random() * possible.length));
+    return text
+}
+
 function clean(name){
     var map={
         '0':'zero',
@@ -96,7 +105,7 @@ class Lex {
     name(params){
         var name=params.name ? clean(params.name) : this.type+makeid()
         name=params.prefix ? [params.prefix,name].join('_') : name;
-        return name.slice(0,30)
+        return name.slice(0,28)+id(2)
     }
 
     Create(params,reply){
@@ -124,21 +133,10 @@ class Lex {
 
     Update(ID,params,oldparams,reply){
         var self=this
-        if(self.name(params) === oldparams.name){
-            self.checksum(ID)
-            .tap(console.log)
-            .then(function(checksum){   
-                params.checksum=checksum
-                self.Create(params,reply) 
-            })
+        if(this.type!=='SlotType'){
+            self.Create(params,reply) 
         }else{
-            self.Delete(ID,oldparams,function(err){
-                if(err){
-                    reply(err)
-                }else{
-                    setTimeout(()=>self.Create(params,reply),1000)
-                }
-            })
+            reply(null,ID)
         }
     }
     
