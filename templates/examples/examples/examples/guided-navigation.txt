@@ -1,1 +1,1 @@
-Imports the Next and Previous documents with lambda hook functionality that enables guided navigation
+Imports two documents, Next and Previous. These documents have lambda hook functionality that enables guided navigation. Questions can be updated to better suit your purpose

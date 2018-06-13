@@ -1,1 +1,1 @@
-Imports the Feedback document with lambda hook functionality that enables users to leave feedback on a document
+Imports one document, Feeback. This document has lambda hook functionality that enables clients to leave simple feedback.
