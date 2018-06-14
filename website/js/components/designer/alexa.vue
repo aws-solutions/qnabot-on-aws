@@ -10,7 +10,7 @@
         v-btn( :loading="loading"
           v-if="!ready" 
           @click="download"
-        ) download Schema
+        ) Copy Schema
         v-btn( :loading="loading"
           v-if="ready"
           @click="copy"
