@@ -59,9 +59,7 @@ def updateResult(event, response):
     event["res"]["type"] = "PlainText"
     event["res"]["message"] = response["a"]
     event["res"]["plainMessage"]=response["a"]
-    event["res"]["session"]["appContext"]["altMessages"] = response.get("alt",{"markdown":response["a"]})
-    if "markdown" not in event["res"]["session"]["appContext"]["altMessages"] or event["res"]["session"]["appContext"]["altMessages"]["markdown"] =="":
-        event["res"]["session"]["appContext"]["altMessages"]["markdown"] = response["a"]
+    event["res"]["session"]["appContext"]["altMessages"] = response.get("alt",{})
 
     if "outputDialogMode" not in event["req"] or event["req"]["outputDialogMode"]!="Text":
         if response.get("alt",False) and "ssml" in response["alt"]:

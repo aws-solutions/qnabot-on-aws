@@ -181,7 +181,7 @@
               "the shipment to china"
           ], 
           "r": {
-              "imageUrl": "https://www.prairielinetrail.org/media/dynamic/heroes/241_118_Shipment_to_China_photo.jpg", 
+              "imageUrl": "https://s3.amazonaws.com/qnabot-guided-navigation-blogpost/placeholder.jpg", 
               "title": "Shipment to China"
           }, 
           "t": "Shipment to China", 
@@ -313,7 +313,7 @@
               "the Welcome Figure"
           ], 
           "r": {
-              "imageUrl": "https://www.prairielinetrail.org/media/dynamic/heroes/180_WelcomeFigure-MCO.jpg", 
+              "imageUrl": "https://s3.amazonaws.com/qnabot-guided-navigation-blogpost/placeholder.jpg", 
               "title": "Welcome Figure"
           }, 
           "t": "Welcome Figure", 
@@ -394,7 +394,7 @@
               "the Maru"
           ], 
           "r": {
-              "imageUrl": "https://www.prairielinetrail.org/media/dynamic/heroes/176_Maru_UWT.jpg", 
+              "imageUrl": "https://s3.amazonaws.com/qnabot-guided-navigation-blogpost/placeholder.jpg", 
               "title": "Maru"
           }, 
           "t": "Maru", 
@@ -497,7 +497,7 @@
               "the Joy Building"
           ], 
           "r": {
-              "imageUrl": "https://www.prairielinetrail.org/media/dynamic/heroes/189_Joy_UWT.jpg", 
+              "imageUrl": "https://s3.amazonaws.com/qnabot-guided-navigation-blogpost/placeholder.jpg", 
               "title": "Joy Building",
               "subTitle":"Photo courtesy of University of Washington Tacoma"
           }, 
@@ -553,7 +553,7 @@
               "the Union Station"
           ], 
           "r": {
-              "imageUrl": "https://www.prairielinetrail.org/media/dynamic/heroes/129_20160304_Historic_Buildings_DSC03231-HDR.jpg", 
+              "imageUrl": "https://s3.amazonaws.com/qnabot-guided-navigation-blogpost/placeholder.jpg", 
               "title": "Union Station and Pacific Avenue"
           }, 
           "t": "Pacific Avenue and Union Station", 
@@ -612,7 +612,7 @@
               "the Union Station"
           ], 
           "r": {
-              "imageUrl": "https://www.prairielinetrail.org/media/dynamic/heroes/199_WestCoastGrocery_UWT.jpg", 
+              "imageUrl": "https://s3.amazonaws.com/qnabot-guided-navigation-blogpost/placeholder.jpg", 
               "title": "West Coast Grocery",
               "subTitle":"Photo credit University of Washington Tacoma"
           }, 
@@ -667,7 +667,7 @@
               "terminal"
           ], 
           "r": {
-              "imageUrl": "https://www.prairielinetrail.org/media/dynamic/heroes/178_Terminus_UWT.jpg", 
+              "imageUrl": "https://s3.amazonaws.com/qnabot-guided-navigation-blogpost/placeholder.jpg", 
               "title": "Terminus",
               "subTitle":"Photo courtesy of University of Washington Tacoma"
           }, 
@@ -792,7 +792,7 @@
               "go to the swiss hall"
           ], 
           "r": {
-              "imageUrl": "https://www.prairielinetrail.org/media/dynamic/heroes/195_SwissHall-MCO.jpg", 
+              "imageUrl": "https://s3.amazonaws.com/qnabot-guided-navigation-blogpost/placeholder.jpg", 
               "title": "Swiss Hall"
           }, 
           "t": "Swiss Hall", 
@@ -866,7 +866,7 @@
               "go to the Washington State History Museum"
           ], 
           "r": {
-              "imageUrl": "https://www.prairielinetrail.org/media/dynamic/heroes/128_WSHM_arch.JPG", 
+              "imageUrl": "https://s3.amazonaws.com/qnabot-guided-navigation-blogpost/placeholder.jpg", 
               "title": "Washington State History Museum arch",
               "subTitle":"Photo courtesy of Washington State Historical Society"
           }, 
@@ -934,7 +934,7 @@
               "go to the Rails and Rain Garden"
           ], 
           "r": {
-              "imageUrl": "https://www.prairielinetrail.org/media/dynamic/heroes/105_rails-garden.jpg", 
+              "imageUrl": "https://s3.amazonaws.com/qnabot-guided-navigation-blogpost/placeholder.jpg", 
               "title": "Rails & Rain Garden"
           }, 
           "t": "Rails & Rain Garden", 
@@ -989,7 +989,7 @@
               "the Heidelberg Complex"
           ], 
           "r": {
-              "imageUrl": "https://www.prairielinetrail.org/media/dynamic/heroes/215_7_Seas_-_MCO.jpg", 
+              "imageUrl": "https://s3.amazonaws.com/qnabot-guided-navigation-blogpost/placeholder.jpg", 
               "title": "7 Seas Brewing"
           }, 
           "t": "Heidelberg Complex", 
@@ -1066,7 +1066,7 @@
               "the Working Forward, Weaving Anew"
           ], 
           "r": {
-              "imageUrl": "https://www.prairielinetrail.org/media/dynamic/heroes/239_working_forward_panorama.jpg", 
+              "imageUrl": "https://s3.amazonaws.com/qnabot-guided-navigation-blogpost/placeholder.jpg", 
               "title": "Working Forward, Weaving Anew"
           }, 
           "t": "Working Forward, Weaving Anew", 
