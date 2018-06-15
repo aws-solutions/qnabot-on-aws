@@ -1,0 +1,96 @@
+﻿{
+  "qna": [
+    {
+      "qid": "Previous",
+      "a": "Unable to go to the previous room...",
+      "r": {
+        "title": "",
+        "imageUrl": "",
+        "text": "",
+        "url": ""
+      },
+      "type": "qna",
+      "l": "QNA:ExamplePYTHONLambdaPrevious",
+      "q": [
+        "Previous Stop",
+        "Previous",
+        "Let's go to the Previous Stop"
+      ]
+    },
+    {
+      "qid": "Next",
+      "a": "Unable to go to the next room...",
+      "r": {
+        "title": "",
+        "imageUrl": "",
+        "text": "",
+        "url": ""
+      },
+      "type": "qna",
+      "l": "QNA:ExamplePYTHONLambdaNext",
+      "q": [
+        "Next Stop",
+        "Next",
+        "Let's go to the Next Stop"
+      ]
+    },
+    {
+      "qid": "Pressure + Flow",
+      "a": "Commissioned by the City of Tacoma. A two-part installation, Pressure + Flow is a reflection on the power of technology and communication to transform a landscape. Pressure is a sculpture inspired by the inner workings of a steam engine, and Flow involves etched writing applied directly to the historic Prairie Line rails, excerpted from historic documents and letters.\n\nAsk for more about the art, the artist, or the medium for additional information.",
+      "next": "Shipment to China",
+      "r": {},
+      "args": [],
+      "type": "qna",
+      "q": [
+        "Pressure + Flow",
+        "Pressure plus Flow",
+        "Pressure and Flow",
+        "Flow and Pressure",
+        "Flow plus Pressure"
+      ]
+    },
+    {
+      "qid": "Shipment to China",
+      "a": "Commissioned by the Chinese Reconciliation Project Foundation in partnership with the City of Tacoma. This piece commemorates the early Chinese in America, their labors to construct the transcontinental railroads railroad construction, and their unjust suffering. It consists of an antique train truck and abstracted representation of 100 ash boxes, a reference to the Chinese workers who died while building the railroads. Ask for more about the art, the artist, or the medium for additional information.",
+      "t": "",
+      "next": "",
+      "r": {
+        "title": "",
+        "imageUrl": ""
+      },
+      "l": "",
+      "args": [
+        ""
+      ],
+      "type": "qna",
+      "q": [
+        "Shipment to China",
+        "Ship to China",
+        "a shipment to China",
+        "the shipment to China"
+      ]
+    },
+    {
+      "qid": "Where the Rails Meet the Sails",
+      "a": "This paired sculpture and mural features a finger and thumb clasping a steel needle, followed by a trail of stitches. The title takes its inspiration from a late-1800’s promotional slogan for Tacoma, and the mural elaborates on this era in Tacoma’s urban development. Together, these elements tell the story of the Northern Pacific Railroad finding its end at Commencement Bay and the growth of urban Tacoma.\n\nAsk for more about the art, the artist, or the medium for additional information.",
+      "t": "Where the Rails Meet the Sails",
+      "next": "Pressure + Flow",
+      "r": {
+        "title": "",
+        "imageUrl": ""
+      },
+      "l": "",
+      "args": [
+        ""
+      ],
+      "type": "qna",
+      "q": [
+        "Where the Rails Meet the Sails",
+        "Rails Meet the Sails",
+        "Start the tour",
+        "Start",
+        "Let's begin"
+      ]
+    }
+  ]
+}
