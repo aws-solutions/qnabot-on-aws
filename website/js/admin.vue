@@ -22,8 +22,8 @@
             v-list-tile-title About QnABot
           v-list-tile
             v-list-tile-content 
-              v-list-tile-tile Version: {{Version}}
-              v-list-tile-tile BuildDate: {{BuildDate}}
+              v-list-tile-title Version: {{Version}}
+              v-list-tile-title BuildDate: {{BuildDate}}
               v-list-tile-title 
                 a(href="https://amazon.com/qnabot" target="_blank") Read Blog Post
     v-toolbar(app fixed)
