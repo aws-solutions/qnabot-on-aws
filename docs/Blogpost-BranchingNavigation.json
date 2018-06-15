@@ -1,0 +1,169 @@
+﻿{
+  "qna": [
+      {
+        "qid": "Previous",
+        "a": "Unable to go to the previous stop...",
+        "r": {
+          "title": "",
+          "imageUrl": "",
+          "text": "",
+          "url": ""
+        },
+        "type": "qna",
+        "l": "QNA:ExamplePYTHONLambdaPrevious",
+        "q": [
+          "Previous Stop",
+          "Previous",
+          "Let's go to the Previous Stop"
+        ]
+      },
+      {
+        "qid": "Next",
+        "a": "Unable to go to the next stop...",
+        "r": {
+          "title": "",
+          "imageUrl": "",
+          "text": "",
+          "url": ""
+        },
+        "type": "qna",
+        "l": "QNA:ExamplePYTHONLambdaNext",
+        "q": [
+          "Next Stop",
+          "Next",
+          "Let's go to the Next Stop"
+        ]
+      },
+      {
+        "qid": "Joy Building",
+        "a": "In 1990, the University of Washington started renovating vacant buildings in what was historically known as the Jobber’s District, including this 1892 building commissioned by Russell T. Joy. The Joy Building used “flatiron” technology, a major innovation in its day. Built in brick, the building's interior structure was steel, rather than Douglas fir timber — a first step towards the emergence of skyscrapers. The building was supposed to be nearly fireproof. This was an important selling point: just four years prior, Seattle had burnt to the ground.\n\n But in 1903, a four-engine fire at the Joy Building destroyed the inventory and equipment of four tenants, including that of the Weigel and Star Diamond candy companies. Luckily, the fire was contained, and the building was renovated a few months later. Since then, the building was repurposed for many uses, including a glove manufacturer, coffee company, and automobile dealerships. \n\n Ask for more about adapative reuse for additional information",
+        "t": "Joy Building",
+        "next": "Branch: West Coast Grocery and Union Station",
+        "r": {
+          "title": "Joy Building | Photo courtesy of University of Washington Tacoma ",
+          "imageUrl": "https://www.prairielinetrail.org/media/dynamic/heroes/189_Joy_UWT.jpg"
+        },
+        "type": "qna",
+        "q": [
+          "Joy Building",
+          "a Joy Building",
+          "the Joy Building"
+        ]
+      },
+      {
+        "qid": "Joy Building: UW Tacoma and adaptive reuse",
+        "a": " Roughly 120 years after it was originally built, UW Tacoma renovated the Joy Building. This remodel was a part of an innovative campus development project that adaptively and creatively reused the historic warehouse buildings along the Prairie Line.\n\n Though the buildings were redesigned for their new purpose, historical elements like facades and painted signs (sometimes called ghost signage) were intentionally left in place. Here’s a handy list to help you find all of UW Tacoma’s ghost signs, http://www.tacoma.washington.edu/about-uw-tacoma/ghost-signs-campus.",
+        "t": "Joy Building",
+        "r": {
+          "title": "Ghost signage, F.S. Harmon building and Mattress Factory| Photo courtesy UW Tacoma. ",
+          "imageUrl": "https://www.prairielinetrail.org/media/dynamic/images/216_Ghostsigns_UWT.jpg"
+        },
+        "type": "qna",
+        "q": [
+          "more about adaptive reuse",
+          "adaptive reuse"
+        ]
+      },
+      {
+        "qid": "Branch: West Coast Grocery and Union Station",
+        "a": "There are two options for the next stop, Terminus and Union Station. Union Station is slightly out of the way. Say or type which stop you would like to go to next.",
+        "t": "Branch: West Coast Grocery and Union Station",
+        "next": "Branch: West Coast Grocery and Union Station",
+        "type": "qna",
+        "q": [
+          "Branch: West Coast Grocery and Union Station"
+        ]
+      },
+      {
+        "qid": "Pacific Avenue and Union Station",
+        "a": "In 1990, the University of Washington started renovating vacant buildings in what was historically known as the Jobber’s District, including this 1892 building commissioned by Russell T. Joy. The Pacific Avenue and Union Station used “flatiron” technology, a major innovation in its day. Built in brick, the building's interior structure was steel, rather than Douglas fir timber — a first step towards the emergence of skyscrapers. The building was supposed to be nearly fireproof. This was an important selling point: just four years prior, Seattle had burnt to the ground.\n\n But in 1903, a four-engine fire at the Pacific Avenue and Union Station destroyed the inventory and equipment of four tenants, including that of the Weigel and Star Diamond candy companies. Luckily, the fire was contained, and the building was renovated a few months later. Since then, the building was repurposed for many uses, including a glove manufacturer, coffee company, and automobile dealerships. \n\n Ask for more about early development or more about the station for additional information",
+        "t": "Pacific Avenue and Union Station",
+        "next": "West Coast Grocery",
+        "r": {
+          "title": "Union Station and Pacific Avenue",
+          "imageUrl": "https://www.prairielinetrail.org/media/dynamic/heroes/129_20160304_Historic_Buildings_DSC03231-HDR.jpg"
+        },
+        "type": "qna",
+        "q": [
+          "Pacific Avenue and Union Station",
+          "Union Station",
+          "the Union Station"
+        ]
+      },
+      {
+        "qid": "Platting Tacoma and Pacific Avenue",
+        "a": " Roughly 120 years after it was originally built, UW Tacoma renovated the Pacific Avenue and Union Station. This remodel was a part of an innovative campus development project that adaptively and creatively reused the historic warehouse buildings along the Prairie Line.\n\n Though the buildings were redesigned for their new purpose, historical elements like facades and painted signs (sometimes called ghost signage) were intentionally left in place. Here’s a handy list to help you find all of UW Tacoma’s ghost signs, http://www.tacoma.washington.edu/about-uw-tacoma/ghost-signs-campus.",
+        "t": "Pacific Avenue and Union Station",
+        "r": {
+          "title": "Union Station, June 9, 1911|(2011.0.211, Washington State Historical Society (Tacoma, Wash.)) ",
+          "imageUrl": "https://www.prairielinetrail.org/media/dynamic/images/130_WSHS_2011_0_211.jpg"
+        },
+        "type": "qna",
+        "q": [
+          "more about early development",
+          "more about development",
+          "development",
+          "Platting Tacoma and Pacific Avenue"
+        ]
+      },
+      {
+        "qid": "More about Union Station",
+        "a": " The Northern Pacific’s copper-topped passenger depot wouldn’t be built along Pacific Avenue until 1909. Union Station arrived amid a flurry of railroad activity. Three new railroads connected to Tacoma in the early 1900’s: The Great Northern (1909), Union Pacific (1910), and the Milwaukee Railroad (1911). \n\n For many years, Union Station was the key transportation hub for the region. But in the mid-1900’s, the national highway system replaced railroads as the preferred travel method for most Americans. Ridership dwindled.\n\n In 1984, an Amtrak Station was built in the Dome District. Union Station saw its last passenger train depart the same year. The historic depot sat vacant for several years. Neighboring warehouses were also abandoned for several years until renovation by the University of Washington Tacoma began in the 1990’s.",
+        "t": "Pacific Avenue and Union Station",
+        "r": {
+          "title": "Amtrak train at Union Station| (Photo by Jim Fredrickson, used with permission from Pacific Northwest Railroad Archive).",
+          "imageUrl": "https://www.prairielinetrail.org/media/dynamic/images/216_Ghostsigns_UWT.jpg"
+        },
+        "type": "qna",
+        "q": [
+          "more about union station",
+          "more about the station",
+          "more about the history"
+        ]
+      },
+      {
+        "qid": "West Coast Grocery",
+        "a": "This building’s original tenants — Tacoma Grocery — supplied groceries from Montana to Alaska, but went belly up in the Panic of 1893. West Coast Grocery reused the space and built a more lasting grocery empire headquartered right here in the Jobber’s District.  \n\n Ask about the boom,bust,and boom or more about the Jobber's district information",
+        "t": "West Coast Grocery",
+        "next": "Terminus",
+        "r": {
+          "title": "West Coast Grocery | Photo credit University of Washington Tacoma",
+          "imageUrl": "https://www.prairielinetrail.org/media/dynamic/heroes/199_WestCoastGrocery_UWT.jpg"
+        },
+        "type": "qna",
+        "q": [
+          "West Coast Grocery",
+          "Union Station",
+          "the Union Station"
+        ]
+      },
+      {
+        "qid": "Boom, bust, and boom again",
+        "a": " Tacoma Grocery’s founders intended to establish the largest wholesale grocery in the Pacific Northwest. Instead, they got caught in the throes of a nationwide depression caused by a banking crisis. Many local startups faced a similar fate. \n\n Three years later, West Coast Grocery took over where Tacoma Grocery left off. Selling products under the brand name “Amocat” (Tacoma spelled backward), West Coast Grocery thrived, expanding into the Birmingham Hay & Seed Building on its south side in 1917. The building served as a warehouse for West Coast Grocery until 1970.",
+        "t": "West Coast Grocery",
+        "r": {
+          "title": "Union Station, June 9, 1911|(2011.0.211, Washington State Historical Society (Tacoma, Wash.)) ",
+          "subTitle": "West Coast Grocery View of the Prairie Line (The ghost sign is still visible today)| ca. 1947. (Tacoma Public Library, Richards Studio D27464-3).",
+          "imageUrl": "https://www.prairielinetrail.org/media/dynamic/images/227_Richards_Studio_D274643.jpg"
+        },
+        "type": "qna",
+        "q": [
+          "boom",
+          "boom bust and boom",
+          "boom again",
+          "boom and bust"
+        ]
+      },
+      {
+        "qid": "The Jobber’s District",
+        "a": " The area was called the Jobber's District after the multitude of wholesale businesses who sprouted up along the Prairie Line, taking advantage of the spur lines that could connect them to goods arriving by rail. Those who worked in the warehouses were also known as jobbers, and multitudes flooded in to work in these growing industries.\n\n West Coast Grocery, with its retail space in front and warehouse space in the back, is a typical example of Jobber’s District architecture. Other businesses along this stretch of the Prairie Line included the Joy Building, Garretson, Woodruff and Pratt Company; F. S. Harmon Furniture Manufacturing Company; Lindstrom-Berg Cabinet Works; and Tacoma Paper and Stationary.\n\n Built right along the Prairie Line Rail corridor, most of these buildings share similarities. The side facing Pacific Avenue was usually more attractive since it faced the shopping public, while the side facing the railroad was more industrial, offering efficient loading and unloading on a special railroad spur built just off of the Prairie Line.  We can thank this design strategy for West Coast Grocery’s timeless Italianate façade.\n\n The building was renovated in 1996 by the University of Washington. As UW Tacoma renovated this and other buildings in the Jobber’s District, it kept some of this history in tact, keeping the original loading docks and repurposing them as covered walkways.",
+        "t": "West Coast Grocery",
+        "type": "qna",
+        "q": [
+          "jobbers district",
+          "jobber's district",
+          "more about the jobber district"
+        ]
+      }
+  ]
+}

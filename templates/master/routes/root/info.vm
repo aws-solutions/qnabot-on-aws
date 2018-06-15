@@ -2,6 +2,8 @@
 
 {
     "region":"${!stageVariables.Region}",
+    "Version":"${InfoVar.Version}",
+    "BuildDate":"${InfoVar.BuildDateString}",
     "BotName":"${LexBot}",
     "BotVersion":"${Alias}",
     "PoolId":"${IdPool}",

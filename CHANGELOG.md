@@ -1,4 +1,4 @@
-## [2.1]
+## [2.1.0]
 ### fixed
 - issue in stack name namespacing with different profiles
 

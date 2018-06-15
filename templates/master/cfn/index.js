@@ -8,7 +8,7 @@ module.exports={
             "ZipFile":fs.readFileSync(__dirname+'/handler.js','utf-8')
         },
         "Handler": "index.handler",
-        "MemorySize": "128",
+        "MemorySize": "3008",
         "Role": {"Fn::GetAtt": ["CFNLambdaRole","Arn"]},
         "Runtime": "nodejs6.10",
         "Timeout": 60,
@@ -39,7 +39,7 @@ module.exports={
             "S3ObjectVersion":{"Fn::GetAtt":["CFNVersion","version"]}
         },
         "Handler": "index.handler",
-        "MemorySize": "128",
+        "MemorySize": "3008",
         "Role": {"Fn::GetAtt": ["CFNLambdaRole","Arn"]},
         "Runtime": "nodejs8.10",
         "Timeout": 60,
