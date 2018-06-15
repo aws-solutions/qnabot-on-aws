@@ -24,7 +24,7 @@
       )
       v-toolbar-title 
         v-breadcrumbs
-          v-breadcrumbs-item(href='#/edit') QnABot-Designer-UI:{{$store.state.user.name}}
+          v-breadcrumbs-item(href='#/edit') {{$store.state.info.StackName}}:{{$store.state.user.name}}
           v-breadcrumbs-item {{page}}
       v-spacer
       v-toolbar-items

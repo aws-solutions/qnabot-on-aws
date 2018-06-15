@@ -25,6 +25,7 @@ module.exports=Promise.resolve(require('../master')).then(function(base){
         "DashboardURL",
         "UserPoolURL",
         "BotName",
+        "BotAlias",
         "Intent"
     ])
 

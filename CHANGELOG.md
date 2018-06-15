@@ -9,6 +9,7 @@
 - navigation example lambda hook
 - kibana integration in designer ui
 - examples are in a nested template
+- support for IE11 and Edge for client page
 
 ## [2.0]
 ### fixed

@@ -27,11 +27,11 @@ const extractSass = new ExtractTextPlugin({
 
 module.exports={
     entry:{
-        main:"./entry.js",
-        check:"./js/browser-check.js",
-        client:"./js/client.js",
-        test:"./js/test.js",
-        vendor:["aws-sdk"]
+        main:["babel-polyfill","./entry.js"],
+        check:["babel-polyfill","./js/browser-check.js"],
+        client:["babel-polyfill","./js/client.js"],
+        test:["babel-polyfill","./js/test.js"],
+        vendor:["babel-polyfill","aws-sdk"]
     },
     output:{
         path:path.join(__dirname,'../build'),
@@ -78,7 +78,14 @@ module.exports={
         }
     },
     module: {
-        rules: [
+        rules: [{
+            test: /\.js$/,
+            exclude:/node_modules/,
+            loader: 'babel-loader',
+            query: {
+                presets: ['env']
+            }
+          },
           {
             test: /\.(md|txt)$/,
             loader: 'raw-loader'
@@ -89,7 +96,13 @@ module.exports={
             options: {
               loaders: {
                 'scss': 'vue-style-loader!css-loader!sass-loader',
-                'sass': 'vue-style-loader!css-loader!sass-loader?indentedSyntax'
+                'sass': 'vue-style-loader!css-loader!sass-loader?indentedSyntax',
+                js:{
+                    loader:'babel-loader',
+                    options:{
+                        presets: ['env']
+                    }
+                }
               }
             }
           },
