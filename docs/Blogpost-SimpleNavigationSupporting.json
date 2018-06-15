@@ -2,7 +2,7 @@
   "qna": [
     {
       "qid": "Previous",
-      "a": "Unable to go to the previous room...",
+      "a": "Unable to go to the previous stop...",
       "r": {
         "title": "",
         "imageUrl": "",
@@ -19,7 +19,7 @@
     },
     {
       "qid": "Next",
-      "a": "Unable to go to the next room...",
+      "a": "Unable to go to the next stop...",
       "r": {
         "title": "",
         "imageUrl": "",
