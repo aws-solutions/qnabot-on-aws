@@ -17,6 +17,13 @@
           v-list-tile-content
             v-list-tile-title {{page.title}}
             v-list-tile-sub-title {{page.subTitle}}
+        v-list-group( prepend-icon="info" value="true")
+          v-list-tile(slot="activator") 
+            v-list-tile-title Info
+          v-list-tile
+            v-list-tile-content 
+              v-list-tile-tile Version: {{Version}}
+              v-list-tile-tile BuildDate: {{BuildDate}}
     v-toolbar(app fixed)
       v-toolbar-side-icon.primary--text(
         id="nav-open"
@@ -71,6 +78,12 @@ module.exports={
     },
     username:function(){
       return this.$store.state.user.name
+    },
+    Version:function(){
+      return _.get(this,"$store.state.info.Version")
+    },
+    BuildDate:function(){
+      return _.get(this,"$store.state.info.BuildDate")
     },
     login:function(){
       return _.get(this,"$store.state.info._links.DesignerLogin.href")

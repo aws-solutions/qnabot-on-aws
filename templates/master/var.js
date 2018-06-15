@@ -1,3 +1,4 @@
+var date=new Date()
 module.exports={
 "Var":{
     "Type": "Custom::Variable",
@@ -9,6 +10,15 @@ module.exports={
         },
         "QnAType":"qna",
         "QuizType":"quiz"
+    }
+},
+"InfoVar":{
+    "Type": "Custom::Variable",
+    "Properties": {
+        "ServiceToken": { "Fn::GetAtt" : ["CFNLambda", "Arn"] },
+        "Version":require('../../package.json').version,
+        "BuildDateString":`${date.toDateString()} ${date.toTimeString()}`,
+        "BuildDate":date
     }
 },
 "ESVar":{
