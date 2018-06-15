@@ -17,13 +17,15 @@
           v-list-tile-content
             v-list-tile-title {{page.title}}
             v-list-tile-sub-title {{page.subTitle}}
-        v-list-group( prepend-icon="info" value="true")
+        v-list-group( prepend-icon="info" value="true" color="primary")
           v-list-tile(slot="activator") 
-            v-list-tile-title Info
+            v-list-tile-title About QnABot
           v-list-tile
             v-list-tile-content 
               v-list-tile-tile Version: {{Version}}
               v-list-tile-tile BuildDate: {{BuildDate}}
+              v-list-tile-title 
+                a(href="https://amazon.com/qnabot" target="_blank") Read Blog Post
     v-toolbar(app fixed)
       v-toolbar-side-icon.primary--text(
         id="nav-open"

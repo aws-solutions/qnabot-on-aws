@@ -1,4 +1,4 @@
-## [2.1]
+## [2.1.0]
 ### fixed
 - issue in stack name namespacing with different profiles
 
@@ -11,7 +11,7 @@
 - examples are in a nested template
 - support for IE11 and Edge for client page
 
-## [2.0]
+## [2.0.0]
 ### fixed
 - QnABot is now a single template
 
