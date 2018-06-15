@@ -10,7 +10,7 @@ or in the "license" file accompanying this file. This file is distributed on an 
 BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied. See the
 License for the specific language governing permissions and limitations under the License.
 */
-
+require("babel-polyfill");
 var Promise=require('bluebird')
 var axios=require('axios')
 var Vue=require('vue')
@@ -59,7 +59,7 @@ document.addEventListener('DOMContentLoaded', function(){
     Promise.join(
         Config,
         Auth(),
-        System.import(/* webpackChunkName: "client-page" */'./client.vue')
+        require('./client.vue')
     )
     .spread(function(config,auth,app){
         
