@@ -5,6 +5,7 @@
     "BotName":"${LexBot}",
     "BotVersion":"${Alias}",
     "PoolId":"${IdPool}",
+    "StackName":"${AWS::StackName}",
     "ClientIdClient":"${ClientClient}",
     "ClientIdDesigner":"${ClientDesigner}",
     "UserPool":"${UserPool}",
