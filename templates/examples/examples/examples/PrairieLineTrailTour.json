@@ -177,11 +177,11 @@
           "q": [
               "Shipment to China", 
               "Ship to China", 
-              "a shipment to china", 
-              "the shipment to china"
+              "a shipment to China", 
+              "the shipment to China"
           ], 
           "r": {
-              "imageUrl": "https://s3.amazonaws.com/qnabot-guided-navigation-blogpost/placeholder.jpg", 
+              "imageUrl": "https://raw.githubusercontent.com/aws-samples/aws-ai-qna-bot/develop/assets/examples/photos/shipment%20to%20china.jpg", 
               "title": "Shipment to China"
           }, 
           "t": "Shipment to China", 
@@ -313,7 +313,7 @@
               "the Welcome Figure"
           ], 
           "r": {
-              "imageUrl": "https://s3.amazonaws.com/qnabot-guided-navigation-blogpost/placeholder.jpg", 
+              "imageUrl": "https://raw.githubusercontent.com/aws-samples/aws-ai-qna-bot/develop/assets/examples/photos/welcome%20figure.jpg", 
               "title": "Welcome Figure"
           }, 
           "t": "Welcome Figure", 
@@ -394,7 +394,7 @@
               "the Maru"
           ], 
           "r": {
-              "imageUrl": "https://s3.amazonaws.com/qnabot-guided-navigation-blogpost/placeholder.jpg", 
+              "imageUrl": "https://raw.githubusercontent.com/aws-samples/aws-ai-qna-bot/develop/assets/examples/photos/maru.jpg", 
               "title": "Maru"
           }, 
           "t": "Maru", 
@@ -497,7 +497,7 @@
               "the Joy Building"
           ], 
           "r": {
-              "imageUrl": "https://s3.amazonaws.com/qnabot-guided-navigation-blogpost/placeholder.jpg", 
+              "imageUrl": "https://raw.githubusercontent.com/aws-samples/aws-ai-qna-bot/develop/assets/examples/photos/joy%20building.jpg", 
               "title": "Joy Building",
               "subTitle":"Photo courtesy of University of Washington Tacoma"
           }, 
@@ -534,7 +534,7 @@
               "Branch: West Coast Grocery and Union Station"
           ],
           "r": {
-            "imageUrl": "https://s3.amazonaws.com/qnabot-guided-navigation-blogpost/Branch+West+Coast+Grocery+and+Union+Station.png", 
+            "imageUrl": "https://raw.githubusercontent.com/aws-samples/aws-ai-qna-bot/develop/assets/examples/photos/Branch%20West%20Coast%20Grocery%20and%20Union%20Station.png", 
             "title": "Map Overview"
             },  
           "t": "Branch: West Coast Grocery and Union Station", 
@@ -553,7 +553,7 @@
               "the Union Station"
           ], 
           "r": {
-              "imageUrl": "https://s3.amazonaws.com/qnabot-guided-navigation-blogpost/placeholder.jpg", 
+              "imageUrl": "https://raw.githubusercontent.com/aws-samples/aws-ai-qna-bot/develop/assets/examples/photos/union%20station.jpg", 
               "title": "Union Station and Pacific Avenue"
           }, 
           "t": "Pacific Avenue and Union Station", 
@@ -612,7 +612,7 @@
               "the Union Station"
           ], 
           "r": {
-              "imageUrl": "https://s3.amazonaws.com/qnabot-guided-navigation-blogpost/placeholder.jpg", 
+              "imageUrl": "https://raw.githubusercontent.com/aws-samples/aws-ai-qna-bot/develop/assets/examples/photos/west%20coast%20grocery.jpg", 
               "title": "West Coast Grocery",
               "subTitle":"Photo credit University of Washington Tacoma"
           }, 
@@ -667,7 +667,7 @@
               "terminal"
           ], 
           "r": {
-              "imageUrl": "https://s3.amazonaws.com/qnabot-guided-navigation-blogpost/placeholder.jpg", 
+              "imageUrl": "https://raw.githubusercontent.com/aws-samples/aws-ai-qna-bot/develop/assets/examples/photos/terminus.jpg", 
               "title": "Terminus",
               "subTitle":"Photo courtesy of University of Washington Tacoma"
           }, 
@@ -773,7 +773,7 @@
               "Branch: Swiss Hall, Washington State History Museum, and Rails & Rain Garden"
           ], 
           "r": {
-              "imageUrl": "https://s3.amazonaws.com/qnabot-guided-navigation-blogpost/Branch+Swiss+Hall+Washington+State+History+Museum+and+Rails++Rain+Garden.png", 
+              "imageUrl": "https://raw.githubusercontent.com/aws-samples/aws-ai-qna-bot/develop/assets/examples/photos/Branch%20Swiss%20Hall%20Washington%20State%20History%20Museum%20and%20Rails%20%20Rain%20Garden.png", 
               "title": "Map Overview"
           }, 
           "t": "Branch: Swiss Hall, Washington State History Museum, and Rails & Rain Garden", 
@@ -792,7 +792,7 @@
               "go to the swiss hall"
           ], 
           "r": {
-              "imageUrl": "https://s3.amazonaws.com/qnabot-guided-navigation-blogpost/placeholder.jpg", 
+              "imageUrl": "https://raw.githubusercontent.com/aws-samples/aws-ai-qna-bot/develop/assets/examples/photos/swiss%20hall.jpg", 
               "title": "Swiss Hall"
           }, 
           "t": "Swiss Hall", 
@@ -847,7 +847,7 @@
               "Branch: Washington State History Museum and Rails & Rain Garden"
           ], 
           "r": {
-              "imageUrl": "https://s3.amazonaws.com/qnabot-guided-navigation-blogpost/Branch+Washington+State+History+Museum+and+Rails++Rain+Garden.png", 
+              "imageUrl": "https://raw.githubusercontent.com/aws-samples/aws-ai-qna-bot/develop/assets/examples/photos/Branch%20Washington%20State%20History%20Museum%20and%20Rails%20%20Rain%20Garden.png", 
               "title": "Map Overview"
           }, 
           "t": "Branch: Washington State History Museum and Rails & Rain Garden", 
@@ -866,7 +866,7 @@
               "go to the Washington State History Museum"
           ], 
           "r": {
-              "imageUrl": "https://s3.amazonaws.com/qnabot-guided-navigation-blogpost/placeholder.jpg", 
+              "imageUrl": "https://raw.githubusercontent.com/aws-samples/aws-ai-qna-bot/develop/assets/examples/photos/washington%20state%20history%20museum%20arch%20.jpg", 
               "title": "Washington State History Museum arch",
               "subTitle":"Photo courtesy of Washington State Historical Society"
           }, 
@@ -913,7 +913,7 @@
               "Branch: Swiss Hall and Rails & Rain Garden"
           ], 
           "r": {
-              "imageUrl": "https://s3.amazonaws.com/qnabot-guided-navigation-blogpost/Branch+Swiss+Hall+and+Rails++Rain+Garden.png", 
+              "imageUrl": "https://raw.githubusercontent.com/aws-samples/aws-ai-qna-bot/develop/assets/examples/photos/Branch%20Swiss%20Hall%20and%20Rails%20%20Rain%20Garden.png", 
               "title": "Map Overview"
           }, 
           "t": "Branch: Swiss Hall and Rails & Rain Garden", 
@@ -934,7 +934,7 @@
               "go to the Rails and Rain Garden"
           ], 
           "r": {
-              "imageUrl": "https://s3.amazonaws.com/qnabot-guided-navigation-blogpost/placeholder.jpg", 
+              "imageUrl": "https://raw.githubusercontent.com/aws-samples/aws-ai-qna-bot/develop/assets/examples/photos/rails%20and%20rain.jpg", 
               "title": "Rails & Rain Garden"
           }, 
           "t": "Rails & Rain Garden", 
@@ -989,7 +989,7 @@
               "the Heidelberg Complex"
           ], 
           "r": {
-              "imageUrl": "https://s3.amazonaws.com/qnabot-guided-navigation-blogpost/placeholder.jpg", 
+              "imageUrl": "https://raw.githubusercontent.com/aws-samples/aws-ai-qna-bot/develop/assets/examples/photos/heidelberg%20complex.jpg", 
               "title": "7 Seas Brewing"
           }, 
           "t": "Heidelberg Complex", 
@@ -1066,7 +1066,7 @@
               "the Working Forward, Weaving Anew"
           ], 
           "r": {
-              "imageUrl": "https://s3.amazonaws.com/qnabot-guided-navigation-blogpost/placeholder.jpg", 
+              "imageUrl": "https://raw.githubusercontent.com/aws-samples/aws-ai-qna-bot/develop/assets/examples/photos/walking%20forward%20and%20weaving%20anew.jpg", 
               "title": "Working Forward, Weaving Anew"
           }, 
           "t": "Working Forward, Weaving Anew", 
