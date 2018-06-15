@@ -23,6 +23,7 @@ BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied. See the
 License for the specific language governing permissions and limitations under the License.
 */
 
+require("babel-polyfill");
 var Vuex=require('vuex')
 var Promise=require('bluebird')
 
