@@ -17,6 +17,15 @@
           v-list-tile-content
             v-list-tile-title {{page.title}}
             v-list-tile-sub-title {{page.subTitle}}
+        v-list-group( prepend-icon="info" value="true" color="primary")
+          v-list-tile(slot="activator") 
+            v-list-tile-title About QnABot
+          v-list-tile
+            v-list-tile-content 
+              v-list-tile-tile Version: {{Version}}
+              v-list-tile-tile BuildDate: {{BuildDate}}
+              v-list-tile-title 
+                a(href="https://amazon.com/qnabot" target="_blank") Read Blog Post
     v-toolbar(app fixed)
       v-toolbar-side-icon.primary--text(
         id="nav-open"
@@ -71,6 +80,12 @@ module.exports={
     },
     username:function(){
       return this.$store.state.user.name
+    },
+    Version:function(){
+      return _.get(this,"$store.state.info.Version")
+    },
+    BuildDate:function(){
+      return _.get(this,"$store.state.info.BuildDate")
     },
     login:function(){
       return _.get(this,"$store.state.info._links.DesignerLogin.href")
