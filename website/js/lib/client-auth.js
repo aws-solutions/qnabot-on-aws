@@ -1,4 +1,3 @@
-var Promise=require('bluebird')
 var aws=require('aws-sdk')
 var axios=require('axios')
 var _=require('lodash')
@@ -9,7 +8,7 @@ module.exports=function(){
     return Promise.resolve(axios.head(window.location.href))
     .then(function(result){
         var stage=result.headers['api-stage']
-        return Promise.resolve(axios.get(`/${stage}`)).get('data')
+        return Promise.resolve(axios.get(`/${stage}`)).then(x=>x['data'])
     })
     .then(function(info){
         var hash=window.location.hash.slice(1)
@@ -38,11 +37,11 @@ module.exports=function(){
             })
         }
         credentials.clearCachedId() 
-        return Promise.resolve(credentials.getPromise()).return({
+        return Promise.resolve(credentials.getPromise()).then(x=>{return{
             credentials,
             username,
             Login:_.get(info,"_links.ClientLogin.href")
-        })
+        }})
     })
     .then(function(result){
         aws.config.credentials=result.credentials
@@ -54,5 +53,4 @@ module.exports=function(){
             Login:result.Login
         }
     })
-    .catch(console.log)
 }

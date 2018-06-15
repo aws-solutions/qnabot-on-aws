@@ -11,7 +11,6 @@ BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied. See the
 License for the specific language governing permissions and limitations under the License.
 */
 require("babel-polyfill");
-var Promise=require('bluebird')
 var axios=require('axios')
 var Vue=require('vue')
 var Vuex=require('vuex').default
@@ -44,9 +43,8 @@ document.addEventListener('DOMContentLoaded', function(){
     var Config=Promise.resolve(axios.head(window.location.href))
     .then(function(result){
         var stage=result.headers['api-stage']
-        return Promise.resolve(axios.get(`/${stage}`)).get('data')
+        return Promise.resolve(axios.get(`/${stage}`)).then(x=>x['data'])
     })
-    .tap(console.log)
 
     .then(function(result){
         config.cognito.poolId=result.PoolId
@@ -56,13 +54,17 @@ document.addEventListener('DOMContentLoaded', function(){
         console.log(config) 
     }) 
 
-    Promise.join(
+    Promise.all([
         Config,
         Auth(),
         require('./client.vue')
-    )
-    .spread(function(config,auth,app){
-        
+    ])
+    .then(function(results){
+        console.log(results)
+        var config=results[0]
+        var auth=results[1]
+        var app=results[2]
+
         var LexWebUi=require('aws-lex-web-ui/dist/lex-web-ui.js')
         var store=new Vuex.Store(LexWebUi.Store)
         if(auth.username){

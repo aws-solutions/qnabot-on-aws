@@ -25,7 +25,6 @@ License for the specific language governing permissions and limitations under th
 
 require("babel-polyfill");
 var Vuex=require('vuex')
-var Promise=require('bluebird')
 
 module.exports={
   data:()=>{return {}},
