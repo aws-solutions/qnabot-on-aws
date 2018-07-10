@@ -38,7 +38,8 @@ module.exports={
             "adad":"adaad",
             "ClientId":{"Ref":"ClientDesigner"},
             "Domain":{"Ref":"CognitoDomain"},
-            "LoginRedirectUrl":{"Fn::GetAtt":["Urls","Designer"]}
+            "LoginRedirectUrl":{"Fn::GetAtt":["Urls","Designer"]},
+            "response_type":"code"
         }
     },
     "ClientLogin":{
@@ -47,7 +48,8 @@ module.exports={
             "ServiceToken": { "Fn::GetAtt" : ["CFNLambda", "Arn"] },
             "ClientId":{"Ref":"ClientClient"},
             "Domain":{"Ref":"CognitoDomain"},
-            "LoginRedirectUrl":{"Fn::GetAtt":["Urls","Client"]}
+            "LoginRedirectUrl":{"Fn::GetAtt":["Urls","Client"]},
+            "response_type":"token"
         }
     },
     "User":{
