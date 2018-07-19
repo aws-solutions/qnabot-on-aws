@@ -178,7 +178,7 @@ module.exports={
       this.loading=true
       var files_raw=self.$refs.file.files
       var files=[]
-      for(i=0;i<files_raw.length;i++){
+      for(var i=0;i<files_raw.length;i++){
         files.push(files_raw[i])
       }
       Promise.all(files.map(file=>{
