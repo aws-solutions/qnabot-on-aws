@@ -52,15 +52,11 @@ exports.parse=function(event){
             })
             break;
         case "AMAZON.RepeatIntent":
+            console.log("At Repeat Intent")
+            console.log(JSON.stringify(out))
             throw new Respond({
                 version:'1.0',
-                response:{
-                    outputSpeech:{
-                        type:"PlainText",
-                        text:_.get(out,"session.previous.a","Sorry, i do not remember")
-                    },
-                    shouldEndSession:false
-                }
+                response: _.get(out,"session.cachedOutput",{outputSpeech:{type:"PlainText",text:"Sorry, I do not remember."},shouldEndSession:false})
             })
             break;
         case "AMAZON.StopIntent":
