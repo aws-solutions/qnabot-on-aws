@@ -34,6 +34,9 @@
           "name": "AMAZON.StopIntent"
         },
         {
+          "name": "AMAZON.RepeatIntent"
+        },
+        {
           "name": "AMAZON.CancelIntent"
         }
       ]
