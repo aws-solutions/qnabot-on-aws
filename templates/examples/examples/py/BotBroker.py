@@ -29,13 +29,16 @@ def handler(event, context):
         htmlResp = '<i> Welcome back to QnABot!!! </i>'
         event["res"]["message"] = '{0}'.format(plaintextResp)
         event["res"]["session"]["appContext"]={"altMessages":{"html":htmlResp}}
+    # return the default message telling the user that we are taking them to a partner bot
+    elif "queryLambda" not in event["res"]["session"]:
+        return middleman(event,True)
     else:
-        return middleman(event)
+        return middleman(event,False)
 
     return event
 
 #handle the brokerage between Lex bots
-def middleman(event):
+def middleman(event, initialConnection):
     lexClient = boto3.client('lex-runtime')
     tempBotName = event["req"]["_event"].get("sessionAttributes").get("botName" , None)
     tempBotAlias = event["req"]["_event"].get("sessionAttributes").get("botAlias", None)
@@ -48,20 +51,31 @@ def middleman(event):
             tempBotUserID = event["req"]["_event"]["userId"]
         else:
             tempBotUserID ='{0}{1}'.format(event["req"]["_event"]["userId"],int(round(time.time() * 1000)))
-    print (tempBotUserID)       
-    response = lexClient.post_text(
-        botName = tempBotName,
-        botAlias = tempBotAlias,
-        userId= tempBotUserID,
-        sessionAttributes= event["req"]["_event"]["sessionAttributes"],
-        inputText=event["req"]["question"]
-    )
-    
-    if "message" in response:
-        event["res"]["type"] = response["messageFormat"]
-        event["res"]["message"] = response["message"]
-        event["res"]["plainMessage"]=response["message"]
-        event["res"]["session"] = response["sessionAttributes"]
+    print (tempBotUserID) 
+    if not initialConnection:
+        response = lexClient.post_text(
+            botName = tempBotName,
+            botAlias = tempBotAlias,
+            userId= tempBotUserID,
+            sessionAttributes= event["req"]["_event"]["sessionAttributes"],
+            inputText=event["req"]["question"]
+        )
+        print (json.dumps(response))
+        if "dialogState" in response:
+            event["res"]["type"] = response.get("messageFormat", "PlainText")
+            event["res"]["session"] = response["sessionAttributes"]
+            if "message" in response:
+                event["res"]["message"] = response["message"]
+                event["res"]["plainMessage"]=response["message"]
+            else:
+                tempMessage = "Intent {0} is {1}:".format(response["intentName"], response["dialogState"])
+                htmlMessage = tempMessage
+                for slot in response["slots"]:
+                    tempMessage += " {0}:{1}".format(slot,response["slots"][slot])
+                    htmlMessage += "<br> {0}:{1}".format(slot,response["slots"][slot])
+                event["res"]["message"] = tempMessage
+                event["res"]["plainMessage"]= tempMessage
+                event["res"]["session"]["appContext"]={"altMessages":{"html":htmlMessage}}
         if "responseCard" in response:
             card = response["responseCard"]["genericAttachments"][0]
             event["res"]["card"]["send"] = True
