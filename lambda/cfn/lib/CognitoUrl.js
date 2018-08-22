@@ -21,7 +21,7 @@ module.exports=class CognitoUrl extends require('./base') {
         var loginUrl=[
             Domain,
             "/login?redirect_uri=",encodeURIComponent(params.LoginRedirectUrl),"&",
-            "response_type=code&",
+            `response_type=${params.response_type}&`,
             "client_id=",params.ClientId
         ].join("")
 
