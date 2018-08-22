@@ -139,8 +139,11 @@ module.exports={
                 href:exampleHrefs._links.photos.href,
                 method:"get"
             })
+            console.log(photos.photos)
             await Promise.all(
-                photos.photos.map(href=>{
+                photos.photos
+                .filter(x=>x.match('svg'))
+                .map(href=>{
                     return api({
                         href,
                         method:"get"

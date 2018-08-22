@@ -112,13 +112,13 @@ module.exports={
             properties:{
                 q:{
                     type:"text",
-                    analyzer:"english"
+                    analyzer:"custom_english"
                 }
             }
         },
         a:{
             type:"text",
-            analyzer:"english"
+            analyzer:"custom_english"
         },
         t:{
             type:'text',analyzer:"whitespace" 
