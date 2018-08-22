@@ -79,15 +79,8 @@ def middleman(event, initialConnection):
         if "responseCard" in response:
             card = response["responseCard"]["genericAttachments"][0]
             event["res"]["card"]["send"] = True
-            event["res"]["card"]["title"] = card["title"]
-            try:
-                event["res"]["card"]["text"] = card["text"]
-            except:
-                event["res"]["card"]["text"] = ""
-            if 'subTitle' in card:
-                event["res"]["card"]["subTitle"] = card["subTitle"]
-            if 'imageUrl' in card:
-                event["res"]["card"]["imageUrl"] = card["imageUrl"]
+            for key,value in card.items():
+                event["res"]["card"][key] = value
     if "botName" not in event["res"]["session"]:            
         event["res"]["session"]["botName"] = tempBotName
         event["res"]["session"]["botAlias"] = tempBotAlias
