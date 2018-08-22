@@ -19,13 +19,19 @@
             v-list-tile-sub-title {{page.subTitle}}
         v-list-group( prepend-icon="info" value="true" color="primary")
           v-list-tile(slot="activator") 
-            v-list-tile-title About QnABot
+            v-list-tile-title QnABot Help
           v-list-tile
             v-list-tile-content 
               v-list-tile-title Version: {{Version}}
               v-list-tile-title BuildDate: {{BuildDate}}
+          v-list-tile
+            v-list-tile-content
               v-list-tile-title 
-                a(href="https://amazon.com/qnabot" target="_blank") Read Blog Post
+                a(href="https://amazon.com/qnabot" target="_blank") General Instructions / QnABot Blog Post
+              v-list-tile-title
+                a(href="https://aws.amazon.com/blogs/machine-learning/creating-virtual-guided-navigation-using-a-question-and-answer-bot-with-amazon-lex-and-amazon-alexa/" target="_blank") Guided Navigation using QnABot
+              v-list-tile-title
+                a(href="https://aws.amazon.com/blogs/machine-learning/create-a-questionnaire-bot-with-amazon-lex-and-amazon-alexa/" target="_blank") Create a questionnaire using QnABot
     v-toolbar(app fixed)
       v-toolbar-side-icon.primary--text(
         id="nav-open"
