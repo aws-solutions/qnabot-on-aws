@@ -3,6 +3,7 @@ import json
 import string
 import boto3
 import time
+import hashlib
 import os
 import collections
 from collections import defaultdict
@@ -17,7 +18,7 @@ def handler(event, context):
     # print(jsondump)
     
     #the utterances to exit the bot broker 
-    exitResponses={'quit','exit'}
+    exitResponses={'quit','ExitLambdaHookRequest'}
     currentUtterance = event["req"]["question"].lower()
     print (currentUtterance)
     if currentUtterance in exitResponses and "queryLambda" in event["res"]["session"]:
@@ -40,24 +41,33 @@ def handler(event, context):
 #handle the brokerage between Lex bots
 def middleman(event, initialConnection):
     lexClient = boto3.client('lex-runtime')
-    tempBotName = event["req"]["_event"].get("sessionAttributes").get("botName" , None)
-    tempBotAlias = event["req"]["_event"].get("sessionAttributes").get("botAlias", None)
-    tempBotUserID = event["req"]["_event"].get("sessionAttributes").get("brokerUID", None)
+    
+    sessionAttrib = {}
+    #for Lex
+    if "sessionAttributes" in event["req"]["_event"]:
+        sessionAttrib = event["req"]["_event"].get("sessionAttributes",{})
+    #for Alexa
+    else:
+        sessionAttrib = event["req"]["_event"].get("session").get("attributes", {})
+    
+    tempBotName = sessionAttrib.get("botName" , None)
+    tempBotAlias = sessionAttrib.get("botAlias", None)
+    tempBotUserID = sessionAttrib.get("brokerUID", None)
 
     if tempBotName == None:
         tempBotName = event["res"]["result"]["args"][0]
         tempBotAlias = event["res"]["result"]["args"][1]
-        if len(event["res"]["result"]["args"]) < 3 or event["res"]["result"]["args"][2].lower() == "remember":
-            tempBotUserID = event["req"]["_event"]["userId"]
-        else:
-            tempBotUserID ='{0}{1}'.format(event["req"]["_event"]["userId"],int(round(time.time() * 1000)))
+        #userID location varies based on whether Lex or Alexa
+        tempBotUserID = event["req"]["_event"].get("userId") or event["req"]["_event"]["session"]["sessionId"]
+        if not(len(event["res"]["result"]["args"]) < 3 or event["res"]["result"]["args"][2].lower() == "remember"):
+            tempBotUserID ='{0}{1}'.format(tempBotUserID,int(round(time.time() * 1000)))
     print (tempBotUserID) 
     if not initialConnection:
         response = lexClient.post_text(
             botName = tempBotName,
             botAlias = tempBotAlias,
             userId= tempBotUserID,
-            sessionAttributes= event["req"]["_event"]["sessionAttributes"],
+            sessionAttributes= sessionAttrib,
             inputText=event["req"]["question"]
         )
         print (json.dumps(response))
