@@ -18,7 +18,7 @@ def handler(event, context):
     # print(jsondump)
     
     #the utterances to exit the bot broker 
-    exitResponses={'quit','ExitLambdaHookRequest'}
+    exitResponses={'quit','exit','return'}
     currentUtterance = event["req"]["question"].lower()
     print (currentUtterance)
     if currentUtterance in exitResponses and "queryLambda" in event["res"]["session"]:
