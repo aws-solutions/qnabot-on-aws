@@ -72,6 +72,25 @@ module.exports={
                             description:"Optional",
                             maxLength:80
                         },
+                        buttons:{
+                            title:"Lex Buttons",
+                            description:"Optional. Add response buttons users can click on if they are interacting through Lex.",
+                            type:"array",
+                            items:{
+                                title:"Button",
+                                type:"object",
+                                properties:{
+                                    text: {
+                                        title: "Display Text",
+                                        type : "string"
+                                    },
+                                    value: {
+                                        title: "Button Value",
+                                        type : "string"
+                                    }
+                                }
+                            }   
+                        },
                         imageUrl:{
                             type:"string",
                             description:"Required",

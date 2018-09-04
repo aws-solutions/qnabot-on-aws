@@ -53,6 +53,7 @@ module.exports=function(req,res){
                 res.card.title=_.get(card,'title')
                 res.card.subTitle=_.get(card,'subTitle')
                 res.card.imageUrl=_.get(card,'imageUrl')
+                res.card.buttons=_.get(card,'buttons')
             }
 
             res.session.topic=_.get(res.result,"t")
