@@ -33,7 +33,8 @@ exports.assemble=function(request,response){
                 genericAttachments:[_.pickBy({
                     title:_.get(response,"card.title","Image"),
                     subTitle:_.get(response.card,'subTitle'),
-                    imageUrl:response.card.imageUrl
+                    imageUrl:response.card.imageUrl,
+                    buttons: _.get(response.card,'buttons')
                 })]
             } : null
         })
