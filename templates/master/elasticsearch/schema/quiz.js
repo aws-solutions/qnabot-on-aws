@@ -114,15 +114,15 @@ module.exports={
         },
         question:{
             type:"string",
-            analyzer:"english"
+            analyzer:"custom_english"
         },
         incorrectAnswers:{
             type:"text",
-            analyzer:"english"
+            analyzer:"custom_english"
         },
         correctAnswers:{
             type:"text",
-            analyzer:"english"
+            analyzer:"custom_english"
         }
     }
 }
