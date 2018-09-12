@@ -63,6 +63,8 @@ def middleman(event, initialConnection):
             tempBotUserID ='{0}{1}'.format(tempBotUserID,int(round(time.time() * 1000)))
     print (tempBotUserID) 
     if not initialConnection:
+        #if we don't unset the queryLambda here and we call another QnABot, we will run into a processing error and an infinite loop of Lambda calls
+        sessionAttrib.pop("queryLambda",None)
         response = lexClient.post_text(
             botName = tempBotName,
             botAlias = tempBotAlias,
