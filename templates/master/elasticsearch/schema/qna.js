@@ -101,7 +101,8 @@ module.exports={
                     },
                     dependencies:{
                         title:["imageUrl"]
-                    }
+                    },
+                    required:["title","imageUrl"]
                 },
                 l:{
                     type:"string",
