@@ -18,6 +18,12 @@ exports.parse=function(event){
 }
 
 exports.assemble=function(request,response){
+    var filteredButtons = _.get(response.card,"buttons",[])
+    for (var i = filteredButtons.length - 1; i >= 0; --i){
+        if (!(filteredButtons[i].text && filteredButtons[i].value)){
+            filteredButtons.splice(i,1)
+        }
+    }
     var out={
         sessionAttributes:_.get(response,'session',{}),
         dialogAction:_.pickBy({
@@ -27,14 +33,14 @@ exports.assemble=function(request,response){
                 contentType:response.type,
                 content:response.message
             },
-            responseCard:isCard(response.card) ? {
+            responseCard:isCard(response.card) && (_.get(response.card,"imageUrl").trim() || filteredButtons.length > 0) ? {
                 version:"1",
                 contentType:"application/vnd.amazonaws.card.generic",
                 genericAttachments:[_.pickBy({
                     title:_.get(response,"card.title","Image"),
                     subTitle:_.get(response.card,'subTitle'),
                     imageUrl:response.card.imageUrl,
-                    buttons: _.get(response.card,'buttons')
+                    buttons: _.has(filteredButtons, [0]) ? filteredButtons : null
                 })]
             } : null
         })

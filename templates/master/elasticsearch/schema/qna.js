@@ -74,7 +74,7 @@ module.exports={
                         },
                         buttons:{
                             title:"Lex Buttons",
-                            description:"Optional. Add response buttons users can click on if they are interacting through Lex.",
+                            description:"Conditionally Required for Lex if no Card Image Url is specified. Add response buttons users can click on if they are interacting through Lex.",
                             type:"array",
                             items:{
                                 title:"Button",
@@ -88,21 +88,19 @@ module.exports={
                                         title: "Button Value",
                                         type : "string"
                                     }
-                                }
+                                },
+                                required:["text","value"]
                             }   
                         },
                         imageUrl:{
                             type:"string",
-                            description:"Required",
+                            description:"Optional",
                             title:"Card Image Url",
                             format:'url',
                             maxLength:2000
                         }
                     },
-                    dependencies:{
-                        title:["imageUrl"]
-                    },
-                    required:["title","imageUrl"]
+                    required:["title"]
                 },
                 l:{
                     type:"string",

@@ -94,7 +94,7 @@ exports.assemble=function(request,response){
             } : {
                 type:"Simple",
                 title:_.get(response,"card.title") || request.question || "Image",
-                content:response.plainMessage
+                content:_.has(response.card,'subTitle')? response.card.subTitle +"\n\n" + response.plainMessage:response.plainMessage
             },
             shouldEndSession:false
         },

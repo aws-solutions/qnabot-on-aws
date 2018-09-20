@@ -104,18 +104,20 @@ module.exports={
                                         title: "Button Value",
                                         type : "string"
                                     }
-                                }
+                                },
+                                required:["text","value"]
+
                             }   
                         },
                         imageUrl:{
                             type:"string",
-                            description:"Required",
+                            description:"Optional",
                             title:"Card Image Url",
                             format:'url',
                             maxLength:2000
                         }
                     },
-                    required:["title","imageUrl"]
+                    required:["title"]
                 },
                 quiz:{
                     type:"string",
