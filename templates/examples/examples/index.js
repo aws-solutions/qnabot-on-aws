@@ -170,6 +170,24 @@ module.exports=Object.assign(
                 }
             ]
           }
+        },
+        { 
+          "PolicyName" : "LexQNALambda",
+          "PolicyDocument" : {
+          "Version": "2012-10-17",
+            "Statement": [
+              {
+                  "Effect": "Allow",
+                  "Action": [
+                      "lex:PostText"
+                   ],   
+                  "Resource": [
+                      {"Fn::Join": ["",["arn:aws:lex:",{ "Ref" : "AWS::Region" },":",{ "Ref" : "AWS::AccountId" },":bot:*",":qna*"]]},
+                      {"Fn::Join": ["",["arn:aws:lex:",{ "Ref" : "AWS::Region" },":",{ "Ref" : "AWS::AccountId" },":bot:*",":QNA*"]]},
+                  ]
+              }
+            ]
+          }
         }],
         "ManagedPolicyArns": [
             "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"]
