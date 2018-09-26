@@ -52,7 +52,7 @@ exports.handler=async function(event,context,callback){
                 Payload:JSON.stringify({qid:quizBot.prev})
             }).promise()
 
-            prevDocument=JSON.parse(result.Payload)
+            prevDocument=JSON.parse(prev.Payload)
             console.log(JSON.stringify(nextDocument,null,2))
             if(!prevDocument) throw `Next Document not Found:${quizBot.prev}`
 
