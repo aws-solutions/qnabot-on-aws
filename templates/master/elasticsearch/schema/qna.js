@@ -57,7 +57,7 @@ module.exports={
                 },
                 r:{
                     title:"Response card",
-                    description:"Attach images to your answer",
+                    description:"Attach images and buttons to your answer",
                     type:"object",
                     properties:{
                         title:{
