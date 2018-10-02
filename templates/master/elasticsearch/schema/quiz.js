@@ -106,7 +106,6 @@ module.exports={
                                     }
                                 },
                                 required:["text","value"]
-
                             }   
                         },
                         imageUrl:{

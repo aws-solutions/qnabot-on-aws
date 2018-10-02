@@ -130,12 +130,18 @@ module.exports={
           return out
         })
         .sort((x,y)=>{
-          return _.get(y,'propertyOrder',0)-_.get(x,'propertyOrder',0)
+          return _.get(x,'propertyOrder',Number.MAX_SAFE_INTEGER)-_.get(y,'propertyOrder',Number.MAX_SAFE_INTEGER)
         })
       }
       function recurseDown(currentDepth){
           if(_.has(currentDepth,"properties")){
             for(var key in Object.keys(currentDepth.properties)){
+              recurseDown(key)
+            }
+            return helperSort(currentDepth.properties)
+          }
+          if(_.has(currentDepth,"items.properties")){
+            for(var key in Object.keys(currentDepth.items.properties)){
               recurseDown(key)
             }
             return helperSort(currentDepth.properties)

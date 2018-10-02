@@ -50,21 +50,55 @@ module.exports={
     },
     schema(state,schema){
         state.schema=schema
-         
-        state.schema.qna.properties.qid.propertyOrder=8
-        state.schema.qna.properties.q.propertyOrder=7
-        state.schema.qna.properties.a.propertyOrder=6
-        state.schema.qna.properties.alt.propertyOrder=5
-        state.schema.qna.properties.t.propertyOrder=4
-        state.schema.qna.properties.r.propertyOrder=3
-        state.schema.qna.properties.l.propertyOrder=2
-        state.schema.qna.properties.args.propertyOrder=1
-        state.schema.qna.properties.next.propertyOrder=0
         
-        state.schema.qna.properties.r.properties.title.propertyOrder=3
-        state.schema.qna.properties.r.properties.subTitle.propertyOrder=2
-        state.schema.qna.properties.r.properties.imageUrl.propertyOrder=1
-        state.schema.qna.properties.r.properties.buttons.propertyOrder=0
+        /*.....................qna schema........................*/
+        
+        //top level schema attribute order 
+        state.schema.qna.properties.qid.propertyOrder=0
+        state.schema.qna.properties.q.propertyOrder=1
+        state.schema.qna.properties.a.propertyOrder=2
+        state.schema.qna.properties.alt.propertyOrder=3
+        state.schema.qna.properties.t.propertyOrder=4
+        state.schema.qna.properties.r.propertyOrder=5
+        state.schema.qna.properties.l.propertyOrder=6
+        state.schema.qna.properties.args.propertyOrder=7
+        state.schema.qna.properties.next.propertyOrder=8
+        
+        //response card property order
+        state.schema.qna.properties.r.properties.title.propertyOrder=0
+        state.schema.qna.properties.r.properties.subTitle.propertyOrder=1
+        state.schema.qna.properties.r.properties.imageUrl.propertyOrder=2
+        state.schema.qna.properties.r.properties.buttons.propertyOrder=3
+        
+        //response card button property order
+        state.schema.qna.properties.r.properties.buttons.items.properties.text.propertyOrder=0
+        state.schema.qna.properties.r.properties.buttons.items.properties.value.propertyOrder=1
+        
+        /*.....................quiz schema........................*/
+        state.schema.quiz.properties.qid.propertyOrder=0
+        state.schema.quiz.properties.question.propertyOrder=1
+        state.schema.quiz.properties.correctAnswers.propertyOrder=2
+        state.schema.quiz.properties.incorrectAnswers.propertyOrder=3
+        state.schema.quiz.properties.quiz.propertyOrder=4
+        state.schema.quiz.properties.responses.propertyOrder=5
+        state.schema.quiz.properties.next.propertyOrder=6
+        state.schema.quiz.properties.r.propertyOrder=7
+        
+        //responses property order
+        state.schema.quiz.properties.responses.properties.correct.propertyOrder=0
+        state.schema.quiz.properties.responses.properties.incorrect.propertyOrder=1
+        state.schema.quiz.properties.responses.properties.end.propertyOrder=2
+        
+        //response card property order
+        state.schema.quiz.properties.r.properties.title.propertyOrder=0
+        state.schema.quiz.properties.r.properties.subTitle.propertyOrder=1
+        state.schema.quiz.properties.r.properties.imageUrl.propertyOrder=2
+        state.schema.quiz.properties.r.properties.buttons.propertyOrder=3
+        
+        //response card button property order
+        state.schema.quiz.properties.r.properties.buttons.items.properties.text.propertyOrder=0
+        state.schema.quiz.properties.r.properties.buttons.items.properties.value.propertyOrder=1       
+
     },
     delQA(state,QA){
         var index=state.QAs.findIndex(qa=>qa.qid===QA.qid)

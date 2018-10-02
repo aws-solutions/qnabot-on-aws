@@ -36,7 +36,7 @@
                   v-model="data[type]"
                   :valid.sync="valid.optional"
                   :schema="schema" 
-                  :omit="required"
+                  :omit="schema.required"
                   ref="optionalInput"
                   path="add"
                 )
