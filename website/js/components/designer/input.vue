@@ -130,7 +130,7 @@ module.exports={
           return out
         })
         .sort((x,y)=>{
-          return _.get(y,'propertyOrder',0)-_.get(x,'propertyOrder',0)
+          return _.get(x,'propertyOrder',Number.MAX_SAFE_INTEGER)-_.get(y,'propertyOrder',Number.MAX_SAFE_INTEGER)
         })
       }else{
         []

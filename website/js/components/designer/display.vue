@@ -73,21 +73,39 @@ module.exports={
     },
     properties:function(){
       var self=this
-      if(this.schema.properties){ 
-        return Object.keys(this.schema.properties)
+      function helperSort(nextDepth){
+        return Object.keys(nextDepth)
         .filter(x=>Object.keys(self.value).includes(x))
         .map(function(x){
-          var out=_.cloneDeep(self.schema.properties[x])
+          var out=_.cloneDeep(nextDepth[x])
           out.name=x
           return out
         })
         .sort((x,y)=>{
-          return _.get(y,'propertyOrder',0)-_.get(x,'propertyOrder',0)
+          return _.get(x,'propertyOrder',Number.MAX_SAFE_INTEGER)-_.get(y,'propertyOrder',Number.MAX_SAFE_INTEGER)
         })
+      }
+      function recurseDown(currentDepth){
+          if(_.has(currentDepth,"properties")){
+            for(var key in Object.keys(currentDepth.properties)){
+              recurseDown(key)
+            }
+            return helperSort(currentDepth.properties)
+          }
+          if(_.has(currentDepth,"items.properties")){
+            for(var key in Object.keys(currentDepth.items.properties)){
+              recurseDown(key)
+            }
+            return helperSort(currentDepth.properties)
+          }
+        return currentDepth
+      } 
+      if(this.schema.properties){
+        return recurseDown(this.schema)
       }else{
         []
       }
-    }
+    },
   },
   methods:{
   }
