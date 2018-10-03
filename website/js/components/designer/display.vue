@@ -106,23 +106,6 @@ module.exports={
         []
       }
     },
-    // properties:function(){
-    //   var self=this
-    //   if(this.schema.properties){ 
-    //     return Object.keys(this.schema.properties)
-    //     .filter(x=>Object.keys(self.value).includes(x))
-    //     .map(function(x){
-    //       var out=_.cloneDeep(self.schema.properties[x])
-    //       out.name=x
-    //       return out
-    //     })
-    //     .sort((x,y)=>{
-    //       return _.get(y,'propertyOrder',0)-_.get(x,'propertyOrder',0)
-    //     })
-    //   }else{
-    //     []
-    //   }
-    // }
   },
   methods:{
   }
