@@ -8,7 +8,8 @@ module.exports={
                     type:"string",
                     title:"Item ID",
                     description:"Assign a unique identifier for this item.",
-                    maxLength:100
+                    maxLength:100,
+                    propertyOrder: 0
                 },
                 q:{
                     title:"Questions",
@@ -18,13 +19,15 @@ module.exports={
                         title:"Question",
                         type:"string",
                         maxLength:140
-                    }
+                    },
+                    propertyOrder: 1
                 },
                 a:{
                     type:"string",
                     title:"Answer",
                     description:"Enter the answer you want to be returned when the user asks one of the above questions.",
                     maxLength:8000,
+                    propertyOrder: 2
                 },
                 alt:{
                     type:"object",
@@ -35,42 +38,50 @@ module.exports={
                             title:"SSML Answer",
                             description:"Alternate SSML answer",
                             maxLength:8000,
+                            propertyOrder: 1
                         },
                         markdown:{
                             type:"string",
                             title:"Markdown Answer",
                             description:"Alternate Markdown answer",
                             maxLength:8000,
+                            propertyOrder: 0
                         },
-                    }
+                    },
+                    propertyOrder: 3
                 },
                 t:{
                     type:"string",
                     description:"Assign a topic to this item, to support follow up questions on the same topic.",
-                    title:"Topic"
-                },
-                next:{
-                    title:"Next Document",
-                    description:"If applicable, enter the QID of the document(s) that is/are next in the sequence, otherwise leave blank. Be careful; if you set this field to an earlier document in the sequence, you might make your sequence loop forever, which would not be fun!  You can add more QIDs after the first, but they won't do anything at the moment.",
-                    type:"string",
-                    maxLength:100
+                    title:"Topic",
+                    propertyOrder: 4
                 },
                 r:{
                     title:"Response card",
-                    description:"Attach images to your answer",
+                    description:"Attach images and buttons to your answer",
                     type:"object",
                     properties:{
                         title:{
                             type:"string",
                             title:"Card Title",
                             description:"Required",
-                            maxLength:80
+                            maxLength:80,
+                            propertyOrder: 0
                         },
                         subTitle:{
                             type:"string",
                             title:"Card Subtitle",
                             description:"Optional",
-                            maxLength:80
+                            maxLength:80,
+                            propertyOrder: 1
+                        },
+                        imageUrl:{
+                            type:"string",
+                            description:"Optional",
+                            title:"Card Image Url",
+                            format:'url',
+                            maxLength:2000,
+                            propertyOrder: 2
                         },
                         buttons:{
                             title:"Lex Buttons",
@@ -82,30 +93,28 @@ module.exports={
                                 properties:{
                                     text: {
                                         title: "Display Text",
-                                        type : "string"
+                                        type : "string",
+                                        propertyOrder: 0
                                     },
                                     value: {
                                         title: "Button Value",
-                                        type : "string"
+                                        type : "string",
+                                        propertyOrder: 1
                                     }
                                 },
                                 required:["text","value"]
-                            }   
-                        },
-                        imageUrl:{
-                            type:"string",
-                            description:"Optional",
-                            title:"Card Image Url",
-                            format:'url',
-                            maxLength:2000
+                            },   
+                            propertyOrder: 3
                         }
                     },
+                    propertyOrder:5,
                     required:["title"]
                 },
                 l:{
                     type:"string",
                     description:"Enter your lambda function name/ARN to dynamically create or modify answers, or to redirect to a different question.",
-                    title:"Lambda Hook"
+                    title:"Lambda Hook",
+                    propertyOrder:6
                 },
                 args:{
                     title:"Lambda Hook Arguments",
@@ -114,9 +123,17 @@ module.exports={
                     items:{
                         title:"Argument",
                         type:"string",
-                        maxLength:2000
-                    }
-                }
+                        maxLength:140
+                    },
+                    propertyOrder:7
+                },
+                next:{
+                    title:"Next Document",
+                    description:"If applicable, enter the QID of the document(s) that is/are next in the sequence, otherwise leave blank. Be careful; if you set this field to an earlier document in the sequence, you might make your sequence loop forever, which would not be fun!  You can add more QIDs after the first, but they won't do anything at the moment.",
+                    type:"string",
+                    maxLength:100,
+                    propertyOrder:8
+                },
             },
             required:["qid","q","a"]
         }

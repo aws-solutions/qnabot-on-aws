@@ -28,7 +28,7 @@
             :required="index===0"
             :name="name"
             :path="path+'['+index+']'"
-            style="display:inline-block;width:80%"
+            style="display:inline-block;width:80%;"
             @update:valid="isValid"
           )
           v-btn.delete(icon @click.native='remove(index)' 
@@ -51,6 +51,7 @@
             v-model="value[property.name]"
             :path="path+'.'+property.name"
             @update:valid="isValid"
+            style="margin-left:5%;"
           )
 </template>
 
@@ -104,6 +105,7 @@ module.exports={
     value:function(v){
       this.local=v
     }
+    
   },
   computed:{
     singularTitle:function(){
@@ -130,7 +132,7 @@ module.exports={
           return out
         })
         .sort((x,y)=>{
-          return _.get(y,'propertyOrder',0)-_.get(x,'propertyOrder',0)
+          return _.get(x,'propertyOrder',Number.MAX_SAFE_INTEGER)-_.get(y,'propertyOrder',Number.MAX_SAFE_INTEGER)
         })
       }else{
         []
@@ -145,7 +147,7 @@ module.exports={
     },
     id:function(){
       return this.index ? `${this.name}-${this.index}` : this.name
-    }
+    },
   },
   methods:{
     remove:function(index){

@@ -33,7 +33,7 @@ exports.assemble=function(request,response){
                 contentType:response.type,
                 content:response.message
             },
-            responseCard:isCard(response.card) && (_.get(response.card,"imageUrl").trim() || filteredButtons.length > 0) ? {
+            responseCard:isCard(response.card) && (_.get(response.card,"imageUrl","").trim() || filteredButtons.length > 0) ? {
                 version:"1",
                 contentType:"application/vnd.amazonaws.card.generic",
                 genericAttachments:[_.pickBy({
