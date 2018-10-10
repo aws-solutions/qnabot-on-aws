@@ -114,7 +114,7 @@ module.exports={
                     items:{
                         title:"Argument",
                         type:"string",
-                        maxLength:140
+                        maxLength:2000
                     }
                 }
             },
