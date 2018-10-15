@@ -2,7 +2,6 @@ from __future__ import print_function
 import json
 import boto3
 import os
-import botocore.response as br
 
 def handler(event, context):
 
@@ -43,7 +42,7 @@ def handler(event, context):
                 # modify the event to make the previous question the redirected question that was just asked instead of "Next Question"
         else:
             event["res"]["session"]["previous"] ={"qid":qidList,"a":navigationToJson["a"],"q":navigationToJson["q"]}
-            event["res"]["session"]["navigation"]={"next":navigationToJson["next"],"previous":[],"hasParent":navigationToJson["hasParent"]} 
+            event["res"]["session"]["navigation"]={"next":navigationToJson["next"],"previous":[],"hasParent":navigationToJson["hasParent"]}
 
         #uncomment line below if you want to see the final JSON before it is returned to the client
         # print(json.dumps(event))
@@ -62,7 +61,7 @@ def updateResult(event, response):
     event["res"]["session"]["appContext"]["altMessages"] = response.get("alt",{})
 
     if "outputDialogMode" not in event["req"] or event["req"]["outputDialogMode"]!="Text":
-        if response.get("alt",False) and "ssml" in response["alt"]:
+        if response.get("alt",False) and "ssml" in response["alt"] and len(response["alt"]["ssml"])>0:
             event["res"]["type"]="SSML"
             event["res"]["message"]=response["alt"]["ssml"].replace('\n',' ')
     if "r" in response:
@@ -78,9 +77,11 @@ def updateResult(event, response):
                     event["res"]["card"]["text"] = ""
                 if 'imageUrl' in card:
                     event["res"]["card"]["imageUrl"] = card["imageUrl"]
+                if 'buttons' in card:
+                    event["res"]["card"]["buttons"] = card["buttons"]
     if 't' in response:
         event["res"]["session"]["topic"] = response["t"]
-     #for Lex
+    #for Lex
     if "sessionAttributes" in event["req"]["_event"]:
         navigationToJson = json.loads(event["req"]["_event"]["sessionAttributes"]["navigation"])
     #for Alexa
@@ -90,7 +91,19 @@ def updateResult(event, response):
     #shift to remove previous function name from list
     tempList.pop()
     event["res"]["session"]["previous"] ={"qid":response["qid"],"a":response["a"],"alt":response.get("alt",{}),"q":event["req"]["question"]}
-    event["res"]["session"]["navigation"]={"next":response["next"],"previous":tempList,"hasParent":navigationToJson["hasParent"]} 
+    event["res"]["session"]["navigation"]={"next":response["next"],"previous":tempList,"hasParent":navigationToJson["hasParent"]}
+
+    # Do not call lambdafunction from the previous item if the link actually points to this previous function
+    if 'l' in response and response["l"].find(os.environ.get('AWS_LAMBDA_FUNCTION_NAME'))<=0:
+        event["res"]["result"]["args"] = response["args"]
+        client = boto3.client('lambda')
+        lhresp = client.invoke(
+            FunctionName = response["l"],
+            Payload = json.dumps(event),
+            InvocationType = "RequestResponse"
+        )
+        # Because the payload is of a streamable type object, we must explicitly read it and load JSON
+        event = json.loads(lhresp['Payload'].read())
 
     return event
 
