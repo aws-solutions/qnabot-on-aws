@@ -36,9 +36,23 @@ def handler(event, context):
     #uncomment below if you want to see the response 
     #print(json.dumps(response))
 
+
+    # Do not call lambdafunction from the next item if the link actually points to this next function
+    if 'l' in response and response["l"].find(os.environ.get('AWS_LAMBDA_FUNCTION_NAME'))<=0:
+        event["res"]["result"]["args"] = response["args"]
+        client = boto3.client('lambda')
+        lhresp = client.invoke(
+            FunctionName = response["l"],
+            Payload = json.dumps(event),
+            InvocationType = "RequestResponse"
+        )
+        # Because the payload is of a streamable type object, we must explicitly read it and load JSON
+        event = updateResult(event, json.loads(lhresp['Payload'].read()))
+        event = updateNavigation(event,response)
     #if the response has no answer we must have hit the end of the guided navigation for this segment
-    if 'a' in response:
+    elif 'a' in response:
         event = updateResult(event,response)
+        event = updateNavigation(event,response)
             # modify the event to make the previous question the redirected question that was just asked instead of "Next Question"
     else:
         #if unable to find anything, set the previous attribute back to the document qid that was previously returned,since we don't want this document to be in history
@@ -97,7 +111,10 @@ def updateResult(event, response):
                     event["res"]["card"]["buttons"] = card["buttons"]
     if 't' in response:
         event["res"]["session"]["topic"] = response["t"]
-   
+    return event
+
+#update the navigation session attributes based off original event
+def updateNavigation(event, response):   
      #for Lex
     if "sessionAttributes" in event["req"]["_event"]:
         previousToJson = json.loads(event["req"]["_event"]["sessionAttributes"]["previous"])
