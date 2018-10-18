@@ -40,7 +40,8 @@ def handler(event, context):
         
         # Do not call lambdafunction from the previous item if the link actually points to this previous function
         if 'l' in response and response["l"].find(os.environ.get('AWS_LAMBDA_FUNCTION_NAME'))<=0:
-            event["res"]["result"]["args"] = response["args"]
+            if "args" in response:
+                event["res"]["result"]["args"] = response["args"]
             client = boto3.client('lambda')
             lhresp = client.invoke(
                 FunctionName = response["l"],
@@ -48,7 +49,7 @@ def handler(event, context):
                 InvocationType = "RequestResponse"
             )
             # Because the payload is of a streamable type object, we must explicitly read it and load JSON
-            event = updateResult(event, json.loads(lhresp['Payload'].read()))
+            event = updateLambdaHook(event,json.loads(lhresp['Payload'].read()),response)
         elif 'a' in response:
             event = updateResult(event,response)
                 # modify the event to make the previous question the redirected question that was just asked instead of "Next Question"
@@ -63,6 +64,26 @@ def handler(event, context):
        # event["res"]["session"]["previous"] ={"qid":qidList,"a":navigationToJson["a"],"q":navigationToJson["q"],"next":navigationToJson["next"],"previous":[]}
 
     return event
+
+
+#update the event with the information if there is a Lambda hook
+def updateLambdaHook(event,hookEvent, response):
+        #for Lex
+    if "sessionAttributes" in event["req"]["_event"]:
+        navigationToJson = json.loads(event["req"]["_event"]["sessionAttributes"]["navigation"])
+    #for Alexa
+    else:
+        navigationToJson = json.loads(event["req"]["_event"]["session"]["attributes"]["navigation"])
+    tempList= navigationToJson["previous"]
+    #shift to remove previous function name from list
+    tempList.pop()
+    if "session" not in hookEvent["res"]:
+        hookEvent["res"]["session"] = {}
+    hookEvent["res"]["session"]["previous"] ={"qid":response["qid"],"a":response["a"],"alt":response.get("alt",{}),"q":event["req"]["question"]}
+    hookEvent["res"]["session"]["navigation"]={"next":response["next"],"previous":tempList,"hasParent":navigationToJson["hasParent"]}
+    return hookEvent
+
+
 
 #update the event with the information from the new Query
 def updateResult(event, response):
