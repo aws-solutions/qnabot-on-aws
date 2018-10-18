@@ -2,7 +2,6 @@ from __future__ import print_function
 import json
 import boto3
 import os
-import botocore.response as br
 
 def handler(event, context):
 
@@ -75,7 +74,7 @@ def updateResult(event, response):
     event["res"]["session"]["appContext"]["altMessages"] = response.get("alt",{})
 
     if "outputDialogMode" not in event["req"] or event["req"]["outputDialogMode"]!="Text":
-        if response.get("alt",False) and "ssml" in response["alt"]:
+        if response.get("alt",False) and "ssml" in response["alt"] and len(response["alt"]["ssml"])>0:
             event["res"]["type"]="SSML"
             event["res"]["message"]=response["alt"]["ssml"].replace('\n',' ')
             
@@ -94,6 +93,8 @@ def updateResult(event, response):
                     event["res"]["card"]["subTitle"] = card["subTitle"]
                 if 'imageUrl' in card:
                     event["res"]["card"]["imageUrl"] = card["imageUrl"]
+                if 'buttons' in card:
+                    event["res"]["card"]["buttons"] = card["buttons"]
     if 't' in response:
         event["res"]["session"]["topic"] = response["t"]
    

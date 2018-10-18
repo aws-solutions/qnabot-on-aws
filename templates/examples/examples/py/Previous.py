@@ -93,17 +93,17 @@ def updateResult(event, response):
     event["res"]["session"]["previous"] ={"qid":response["qid"],"a":response["a"],"alt":response.get("alt",{}),"q":event["req"]["question"]}
     event["res"]["session"]["navigation"]={"next":response["next"],"previous":tempList,"hasParent":navigationToJson["hasParent"]}
 
-    # Do not call lambdafunction from the previous item if the link actually points to this previous function
-    if 'l' in response and response["l"].find(os.environ.get('AWS_LAMBDA_FUNCTION_NAME'))<=0:
-        event["res"]["result"]["args"] = response["args"]
-        client = boto3.client('lambda')
-        lhresp = client.invoke(
-            FunctionName = response["l"],
-            Payload = json.dumps(event),
-            InvocationType = "RequestResponse"
-        )
-        # Because the payload is of a streamable type object, we must explicitly read it and load JSON
-        event = json.loads(lhresp['Payload'].read())
+    # # Do not call lambdafunction from the previous item if the link actually points to this previous function
+    # if 'l' in response and response["l"].find(os.environ.get('AWS_LAMBDA_FUNCTION_NAME'))<=0:
+    #     event["res"]["result"]["args"] = response["args"]
+    #     client = boto3.client('lambda')
+    #     lhresp = client.invoke(
+    #         FunctionName = response["l"],
+    #         Payload = json.dumps(event),
+    #         InvocationType = "RequestResponse"
+    #     )
+    #     # Because the payload is of a streamable type object, we must explicitly read it and load JSON
+    #     event = json.loads(lhresp['Payload'].read())
 
     return event
 
