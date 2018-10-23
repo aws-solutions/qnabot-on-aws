@@ -47,7 +47,7 @@
     "ask-cli": "^1.3.1",
     "async-mutex": "^0.1.3",
     "autosize": "^3.0.21",
-    "aws-lex-web-ui": "git+https://github.com/aws-samples/aws-lex-web-ui.git#semver:0.13.2",
+    "aws-lex-web-ui": "git+https://github.com/aws-samples/aws-lex-web-ui.git#semver:0.14.2",
     "aws-sdk": "^2.257.1",
     "aws4": "^1.7.0",
     "axios": "^0.17.1",
