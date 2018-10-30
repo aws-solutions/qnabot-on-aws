@@ -291,13 +291,13 @@ Your AWS Cloud9 environment will begin to be setup. Once its ready continue with
     * Under getting started select Clone Git Repository
     * In the terminal window that pops up complete the clone command to be
     <pre>
-    git clone https://github.com/bobpskier/aws-qnabot-workshop.git TBD - THIS NEEDS TO BE UPDATED
+    git clone https://github.com/aws-samples/aws-ai-qna-bot.git
     </pre>
 
 2) Run a script in your Cloud9 IDE that runs CloudFormation to setup an S3 bucket to host the website and uploads the two files
 
     <pre>
-    cd aws-qnabot-workshop/bin
+    cd aws-ai-qna-bot/workshops/reinvent2018/bin
     ./setupwebsite.sh
     </pre>
 
@@ -387,7 +387,7 @@ that is our Sun.
     
 7) Copy the from your snippet url, open web/index.html in Cloud9, and paste into index.html just below the '\<body\>' tag.
 
-8) From the terminal window in Cloud9 make sure you are in the aws-qnabot-workshop/bin folder. Then run
+8) From the terminal window in Cloud9 make sure you are in the aws-ai-qna-bot/workshops/reinvent2018/bin folder. Then run
 
     <pre>
     ./setupwebsite.sh
@@ -755,7 +755,7 @@ the following steps:
 2) Setup the lambda function by deploying a preconfigured CloudFormation template using sam
 
     ```$xslt
-    cd code/solarflare
+    cd aws-ai-qna-bot/workshops/reinvent2018/code/solarflare
     npm install
     cd ../../bin
     ./solarflare-setup.sh
@@ -855,7 +855,7 @@ For this use case lets use the first argument to indicate how many recent solar 
 1) Run tests to validate syntax
 
 <pre>
-cd aws-qnabot-workshoip/code/solarflare
+cd aws-ai-qna-bot/workshops/reinvent2018/code/solarflare
 npm test
 </pre>
 
@@ -868,7 +868,7 @@ If the tests are successful, continue with the next section to redeploy your fun
 1) Execute the following commands to redeploy the updated function.
 
 <pre>
-cd aws-qnabot-workshoip/code/solarflare
+cd aws-ai-qna-bot/workshops/reinvent2018/code/solarflare
 ./solarflare-pkg.sh
 ./solarflare-deploy.sh
 </pre>
@@ -957,7 +957,7 @@ Delete manually created resources throughout the laUbs:
 
 * Use your AWS Cloud9 IDE's terminal to remove the sample web site
 ```$xslt
-cd aws-qnabot-workshop/bin
+cd aws-ai-qna-bot/workshops/reinvent2018/bin
 ./removewebsite.sh
 ```
 * Use the AWS Cloud9 Dashboard to Delete your development environment
