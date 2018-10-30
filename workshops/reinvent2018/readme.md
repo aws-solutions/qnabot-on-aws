@@ -63,7 +63,7 @@ You will be deploying infrastructure on AWS which will have an associated cost. 
 
 * * *
 
-## Step 1 - Let's Begin and deploy a working QnABot
+## Step 1 - Let's begin and deploy a working QnABot
 
 ### Workshop Setup:
 
@@ -79,7 +79,7 @@ You've found the QnABot open source package and want to give this a spin as a po
 
     You can also click (copy link / paste link in new tab) on the link directly on this page to launch the [CloudFormation template](https://console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/new?stackName=QnABot&templateURL=http://s3.amazonaws.com/aws-bigdata-blog/artifacts/aws-ai-qna-bot/templates/public.json). 
 
-3) Launch the CloudFormation template for your selected region to stand up the core workshop infrastructure. You can find out more information about CloudFormation using this [link](http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/Welcome.html).
+3) Launch the CloudFormation template for your selected region to stand up the QnaBot infrastructure. You can find out more information about CloudFormation using this [link](http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/Welcome.html).
 
     Once the template is launched it will automatically bring you to the CloudFormation Dashboard and start the stack creation process in the specified region. Do not change anything on the first screen. Click **Next** to continue.
 
@@ -961,6 +961,8 @@ cd aws-ai-qna-bot/workshops/reinvent2018/bin
 ./removewebsite.sh
 ```
 * Use the AWS Cloud9 Dashboard to Delete your development environment
+
+* Use the Amazon Connect console to delete your call center instance
 
 Finally, [delete the CloudFormation stacks](http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/cfn-console-delete-stack.html) launched at the beginning of the workshop to clean up the rest.  If the stack deletion process encountered errors, look at the Events tab in the CloudFormation dashboard, and you'll see what steps failed.  It might just be a case where you need to clean up a manually created asset that is tied to a resource goverened by CloudFormation.
 * Use the AWS CloudFormation console to delete the QnABot stacks you launched
