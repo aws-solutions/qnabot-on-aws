@@ -1,0 +1,56 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  SAM Template for solarflare function
+
+# More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
+Globals:
+  Function:
+    Timeout: 3
+
+Resources:
+
+  SolarFlareFunctionRole:
+    Type: "AWS::IAM::Role"
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+        - Effect: "Allow"
+          Principal:
+            Service:
+            - "lambda.amazonaws.com"
+          Action:
+          - "sts:AssumeRole"
+      Path: "/"
+      Policies:
+      - PolicyName: "solarflarelambdafunctionpolicy"
+        PolicyDocument:
+          Version: "2012-10-17"
+          Statement:
+          - Effect: "Allow"
+            Action: "logs:*"
+            Resource: "*"
+
+  SolarFlareFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: ../code/solarflare/
+      Handler: app.lambdaHandler
+      Runtime: nodejs8.10
+      Role: !GetAtt SolarFlareFunctionRole.Arn
+      Environment: # More info about Env Vars: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#environment-object
+        Variables:
+          DEBUG: "solarflare node app.js"
+          Region: !Sub "${AWS::Region}"
+          api_key: "DEMO_KEY"
+
+Outputs:
+
+  SolarFlareFunctionIamRole:
+    Description: "IAM Role created for SolarFlare function"
+    Value: !GetAtt SolarFlareFunctionRole.Arn
+
+  SolarFlareFunction:
+    Description: "Solarflare Lambda Function ARN"
+    Value: !GetAtt SolarFlareFunction.Arn
