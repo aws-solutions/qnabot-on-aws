@@ -329,10 +329,10 @@ that is our Sun.
 
     1) Launch the [lex-web-ui](https://console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/new?stackName=lex-web-ui&templateURL=https://s3.amazonaws.com/aws-bigdata-blog/artifacts/aws-lex-web-ui/artifacts/templates/master.yaml "Lex Web Ui") stack 
     2) Leave parameters defaulted except for 
-        * stack name <pre>lex-web-ui-qnabot-workshop </pre>
+        * Stack name <pre>lex-web-ui-qnabot-workshop </pre>
         * CodeBuildName <pre>lex-web-ui-qnaabot-workshop </pre>
-        * BotName <pre> QnABottwotwozero_Botup </pre>
-        * WebAppParentOrigin <pre> **URI** of the website you captured previously </pre>
+        * BotName <pre> **The botname obtained from AWS Console or from command line aws lexmodels get-bots**</pre>
+        * WebAppParentOrigin <pre> **URI** of the website you created previously </pre>
             * Note: The **URI** ends with .com and does not include the path /index.html
             
         * WebAppConfBotInitialText <pre> You can ask me for information on the Sun. Just type questions for me or click on the mic and ask me.</pre>
@@ -365,7 +365,7 @@ that is our Sun.
             .catch(function (error) { console.error(error); });
         </script>
     ```    
-7) Copy from your snippet url, open web/index.html in Cloud9, and paste into index.html just below the '\<body\>' tag.
+7) Copy the contents returned by your snippet url, open web/index.html in Cloud9, and paste into index.html just below the '\<body\>' tag.
     * Note, ignore the Cloud9 IDE warning 'ChatBotUiLoader is not defined'. It is defined in the referenced javascript.
 
 8) From the terminal window in Cloud9 make sure you are in the ~/aws-ai-qna-bot/workshops/reinvent2018/bin folder. Then run
@@ -381,12 +381,12 @@ on the Solar Association web site. Try chatting again and asking the bot questio
 
 ![Web Integration](images/Lab3-web-001.png "Web Example")
 
-## Improving the look and feel of your bot
+### Improving the look and feel of your bot
 
 The QnABot in conjunction with the lex web ui support some advanced features that will help 
 to improve look and feel as well as provide assisted navigation.  
 
-### Markdown
+#### Markdown
 
 1) Edit a question in your QnABot using the Designer. Select Advanced. Scroll down until you 
 see Alternate Answers / Markdown. Add markdown to your answer
@@ -416,7 +416,7 @@ back to the solar associations web page to try it out.
     [NASA](https://www.nasa.gov) 
     </pre>
     
-### Response Card and Buttons
+#### Response Card and Buttons
 
 Response cards are a great way to augment a response. You might want to display an
 image to a user on an Echo Show or on the web site, or perhaps you'd like to display buttons 
