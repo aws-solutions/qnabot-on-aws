@@ -54,7 +54,6 @@ For example, ***DOMAIN-NAME*** refers to the name of an Elasticsearch domain cre
 values either in the CloudFormation outputs or by navigating to the specific service dashboard in the [AWS management console](https://console.aws.amazon.com).
 
 Tasks or actions that you need to complete will always start with a number 
-
 1) For example, this is an action you should take
 
 ### IMPORTANT: Workshop Cleanup
@@ -67,40 +66,24 @@ You will be deploying infrastructure on AWS which will have an associated cost. 
 
 ### Workshop Setup:
 
-You've found the QnABot open source package and want to give this a spin as a possible mechanism to implement your chatbot.
+You've found the AWS QnABot open source project and want to test this as a possible vehicle to implement your chatbot.
 
 1) Log into the AWS Management Console using Chrome or Firefox and select **US East (N.Virginia)** for your [AWS region](http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/using-regions-availability-zones.html).
 
     The region dropdown is in the upper right hand corner of the console to the left of the Support dropdown menu.  For this workshop, you will use **N.Virginia**.
 
-2) In a new tab or browser window and navigate to the [QnABot blog post](https://www.amazon.com/qnabot) and navigate down until you see the Launch Stack button. 
+2) Launch the [CloudFormation template](https://console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/new?stackName=QnABot&templateURL=http://s3.amazonaws.com/aws-bigdata-blog/artifacts/aws-ai-qna-bot/templates/public.json). 
 
-    Note: The blog posts for QnABot provide the most up-to-date version and information regarding this toolset.
+3) On the Specify Details step of the Create Stack process, enter values for the following fields:
 
-    You can also click (copy link / paste link in new tab) on the link directly on this page to launch the [CloudFormation template](https://console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/new?stackName=QnABot&templateURL=http://s3.amazonaws.com/aws-bigdata-blog/artifacts/aws-ai-qna-bot/templates/public.json). 
+    * **Stack Name** <pre> QnABotWorkshop </pre>
+    * **Email** <pre> ***[valid email address]*** </pre>
+        * Note: Provide a valid email address you have access to. This field is to used to send an email registering you for 
+        access to the QnABot Content Designer. You must have access to this email. Without this it becomes difficult to access the Content Designer
+    * **Username** <pre> Admin </pre>
 
-3) Launch the CloudFormation template for your selected region to stand up the QnaBot infrastructure. You can find out more information about CloudFormation using this [link](http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/Welcome.html).
-
-    Once the template is launched it will automatically bring you to the CloudFormation Dashboard and start the stack creation process in the specified region. Do not change anything on the first screen. Click **Next** to continue.
-
-4) On the Specify Details step of the Create Stack process, enter values for the following fields:
-
-    * **Stack Name** - the stack name is an identifier that helps you find a particular stack from a list of stacks, e.g. QnABotWorkshop
-    * **Email** - Specify a valid email address you can reach during the workshop. This field is to used to send an email registering you for access to the QnABot Content Designer. 
-        * Note: Without obtaining this email it becomes difficult to access the Content Designer
-    * **Username** - The default is "Admin". You can change this name but be sure to remember the username specified. You'll need this to access the Content Designer. 
-
-5) Click **Next** to continue.
-
-6) No changes or inputs are required on the Options page.  Click **Next** to move on to the Review page.
-
-7) Acknowledge that CloudFormation will create IAM resources and create the stack.
-
-8) On the Review page, scroll down to the **Capabilities** section and click on the checkbox next to *"I acknowledge that AWS CloudFormation might create IAM resources with custom names."*.  If you do not check this box, the stack creation will fail.
-
+4) Launch the stack. Make sure to select the checkbox next to *"I acknowledge that AWS CloudFormation might create IAM resources with custom names"*.  
     ![CloudFormation acknowledgement](images/00-cf-create.png)
-
-9) Click **Create** to launch the CloudFormation stack.
 
 The CloudFormation template will launch the following:
 
@@ -117,19 +100,19 @@ The CloudFormation template will launch the following:
 ![CloudFormation Starting Stack](images/00-arch.png)
 
 ### Checkpoint:
-The CloudFormation stack will take 15 to 25 minutes to launch.  Periodically check on the stack creation process in the CloudFormation Dashboard. If no stack shows up immediately, click the refresh button at the top right hand corner of your screen.  Your stack should show status **CREATE\_COMPLETE** in roughly 15 minutes.  If you select the box next to your stack and click on the **Events** tab, you can see what step it's on. 
+The CloudFormation stack will take 25 minutes to launch.  Periodically check on the stack creation process in the 
+CloudFormation Dashboard. If no stack shows up immediately, click the refresh button at the top right hand corner of 
+your screen.  Your stack should show status **CREATE\_COMPLETE** in roughly 25 minutes. 
 
 If there was an [error](http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/troubleshooting.html#troubleshooting-errors) during the stack creation process, CloudFormation will rollback and terminate.  You can investigate and troubleshoot by looking in the Events tab.  Any errors encountered during stack creation will appear in the event stream as a failure.
 
-Go ahead and start reading the next section while your stack creates. Once the stack has been created you can 
+Go ahead and start reading the next section while your stack is being created. Once the stack has been created you can 
 explore resources using the AWS console for ElasticSearch, Lex, Lambda, Cognito. 
 
-You can also login to your new Cloud9 environment and use the AWS CLI commands to explore. 
-
 If you have cli access to your AWS account you can also use the following commands to explore the resources 
-being created. Later in Step 3 you'll setup an AWS Cloud9 IDE which you can also use to run these commands.
+being created. Later in Step 3 you'll setup an AWS Cloud9 IDE which you can also use to run these commands.                                           
 
-#### Elasticsearch Service
+##### Elasticsearch Service
 <pre>
 $ aws es list-domain-names
 $ aws es describe-elasticsearch-domain --domain-name <b><i>DOMAIN-NAME</i></b>
@@ -137,21 +120,21 @@ $ aws es describe-elasticsearch-domain --domain-name <b><i>DOMAIN-NAME</i></b>
 
 * Note: Use the domain name output from the first command to use as the DOMAIN-NAME in the second command.
 
-#### AWS Lex Bot
+##### AWS Lex Bot
 <pre>
 $ aws lex-models get-bots</b>
 </pre>
 
 The prior command will show the Lex Bot that has been created for you.
 
-#### AWS Cognito UserPool
+##### AWS Cognito UserPool
 <pre>
 $ aws cognito-idp list-user-pools --max-results 5
 </pre>
 
 * Note: The --max-results argument could need to be increased based on the number of existing cognito user pools in your account
 
-#### AWS CloudFormation stack outputs
+##### AWS CloudFormation stack outputs
 <pre>
 $ aws cloudformation list-stacks
 $ aws cloudformation describe-stacks --stack-name <b><i>YOURSTACKNAME</i></b>
@@ -164,6 +147,7 @@ Notice a number of urls. There are two very important URLs:
 * BotName
 * DashboardURL
 
+Fore more information on the stack this is launching refer to the AWS QnABot at [QnABot blog post](https://www.amazon.com/qnabot).  
 
 [*^ back to top*](#solar-association-deploying-and-customizing-a-ready-made-question-and-answer-bot)
 * * *
@@ -174,66 +158,68 @@ Notice a number of urls. There are two very important URLs:
 
 ***NOTE: QnABot Stack complete in ~25 minutes after launch.*** Before proceeding make sure the stack is complete.
 
-1) You need to update the Admin password for the content designer using the email that the CloudFormation stack sent to you. Remember 
-the password you set.  You'll need this to log into the designer over time. 
+1) Open the email CloudFormation sent to you. 
 
-    * Note: the initial password must be reset during the first login. A temporary password is provided in the email. 
+2) Click on the link in the email that the CloudFormation stack sent to you. 
 
-2) Once logged in, click on "Add" to input a new question. Use a question id of "sun.1".
+3) The user name is <pre>Admin</pre>
 
-3) The first question we want the Bot to respond to is "Tell me about our Sun". This represents our most frequently asked question. 
+4) The password is the temporary password sent to you via email. Copy just the text of the temporary password. 
+No spaces in front of or after the password. 
 
-4) The bot needs to answer with "Our sun is 4.6 billion years old. Its considered a yellow dwarf with a diameter of 1,392,684 
+5) After the first login, you will be asked to update the password. The requirements are:
+    * 8 characters minimum length
+    * Numbers, special character, uppercase and lowercase letters
+
+6) Once logged in, click on "Add" to input a new question. Use a question id of 
+    <pre>
+    sun.1
+    </pre>
+
+7) The first question we want the Bot to respond to is 
+    <pre>
+    Tell me about our Sun". 
+    </pre>
+    This represents our most frequently asked question. 
+
+8) The bot needs to answer with <pre>Our sun is 4.6 billion years old. Its considered a yellow dwarf with a diameter of 1,392,684 
 kilometers and a circumference of 4,370,005 kilometers. It has a mass that is equal to 333,060 earths and a surface 
-temperature of 5,500 degrees celsius. Really Hot!"
+temperature of 5,500 degrees celsius. Really Hot!</pre>
 
-5) Once you've added the first question and its answers, naturally you want to test it out. Using the Content Designer UI, 
+9) Once you've added the first question and its answers, naturally you want to test it out. Using the Content Designer UI, 
 click on the menu item in the upper left hand corner and select the "QnABot client". 
 
-    A sample web based client will appear. In the chat area type in 'Tell me about the sun' and press enter. You'll see your 
+    A sample web based client will appear. In the chat area type in: <pre>Tell me about the sun</pre> and press enter. You'll see your 
 question answered. If you have headsets available, plug these in and click on the mic button. Then speak to the bot
-saying 'Tell me about the sun'. The Bot should respond with audio as well. 
+saying:<pre>Tell me about the sun</pre> The Bot should respond with audio as well. 
 
-6) Lets add three more questions 
-    1) one
-        * Item id: sun.2
-        * Q: How old is the Sun?
-        * A: Our sun is 4.6 billion years old
+10) Lets add one more question 
 
-    2) two
-        * Item id: sun.3
-        * Q: How hot is it at the center of the Sun?
-        * A: At its centre the Sun reaches temperatures of 15 million degrees Celsius.
+    * Item id: <pre>sun.2</pre>
+    * Q: <pre>How old is the Sun?</pre>
+    * A: <pre>Our sun is 4.6 billion years old</pre>
 
-    3) three
-        * Item id: sun.4
-        * Q: Will the Sun ever consume the earth?
-        * A: When all the Hydrogen has been burned, the Sun will continue for about 130 million more years, burning Helium, 
-during which time it will expand to the point that it will engulf Mercury and Venus and the Earth. 
-At this stage it will have become a red giant.
+11) Test out the second question.  
 
-7) Once these are added test them out.  
+12) Click on Test to bring up the Test dialog in the Designer UI.
 
-    So how does QnaBot select an answer to a question it is given?
+13) Enter a question <pre> How old is the sun </pre>
 
-8) Click on Test to bring up the Test dialog in the Designer UI.
+14) Click on search
 
-9) Enter a question 
-
-10) Click on search
-
-Look at the results. Notice the score column. The answer selected by the QnABot via Lex will be the answer with highest matching score.
+Look at the results. Notice the score column. The answer selected by the QnABot will be the answer with highest matching score.
 
 ![QnaBot Test Results ](images/02-score.png)
 
 
 ### Checkpoint:
 
-You've now been able to add questions that your bot can respond to. Your bot's configuration can be 
-exported using the Designer UI to a json file and downloaded to your system. You can also import a json file
+You've now been able to add questions that your bot can respond to. 
+
+Your bot's configuration can be exported using the Designer UI to a json file and downloaded to your system. You can also import a json file
 containing QnABot configuration using the Designer.
 
-1) Use 'Download' in the Designer UI menu to download your current configuration to your local system.
+1) Use 'Export' and once compmlete then click on the download arrow next to available file.
 
 2) Use 'Import' to the import a configuration file from the following url:
 
@@ -241,7 +227,7 @@ containing QnABot configuration using the Designer.
     https://raw.githubusercontent.com/aws-samples/aws-ai-qna-bot/develop/workshops/reinvent2018/samples/sun-questions-qna-step-2.json
     </pre>
  
-This file contains the questions preconfigured for the step. 
+This file contains a set of preconfigured questions. 
 
 * Note: An import will overwrite existing questions with the same Question ID. 
 
@@ -251,7 +237,7 @@ This file contains the questions preconfigured for the step.
 
 ## Step 3 - Integrate QnABot into your website:
 
-### Here's what you're going to work on in step 3: Deploy the Lex-Web-Ui and integrate a snippet of URL into your main html page.
+### Here's what you're going to work on in step 3: Deploy the Lex-Web-Ui and integrate a snippet of code into an html page.
 
 Solar Association does not yet have a website and you've been tasked to create one. Lets deploy a simple 
 website with just two files using Amazon S3 to host the website. The two files will be index.html and solar.png. 
@@ -269,7 +255,7 @@ following to setup a new AWS Cloud9 Environment
 
 3) Click on create environment
 
-4) Give this a name and description of QnABotWorkshop
+4) Give this a name and description of <pre>QnABotWorkshop</pre>
 
 5) Click Next step
 
@@ -297,7 +283,7 @@ Your AWS Cloud9 environment will begin to be setup. Once its ready continue with
 2) Run a script in your Cloud9 IDE that runs CloudFormation to setup an S3 bucket to host the website and uploads the two files
 
     <pre>
-    cd aws-ai-qna-bot/workshops/reinvent2018/bin
+    cd ~/aws-ai-qna-bot/workshops/reinvent2018/scripts
     ./setupwebsite.sh
     </pre>
 
@@ -306,26 +292,26 @@ Your AWS Cloud9 environment will begin to be setup. Once its ready continue with
     <pre>
     
     Waiting for changeset to be created..
-    
-    No changes to deploy. Stack qnabotworkshop-website is up to date
+    Waiting for stack create/update to complete
+    Successfully created/updated stack - qnabotworkshop-website
     
     S3 Bucket: 
-    qnabotworkshop-website-s3bucket-47l091varlix
+    qnabotworkshop-website-s3bucket-1aty4rnkfi6x0
     
     Website Url:
-    http://qnabotworkshop-website-s3bucket-47l091varlix.s3-website-us-east-1.amazonaws.com/index.html
+    https://qnabotworkshop-website-s3bucket-1aty4rnkfi6x0.s3.amazonaws.com/index.html
     
-    upload: ../web/index.html to s3://qnabotworkshop-website-s3bucket-47l091varlix/index.html
-    upload: ../web/solar.png to s3://qnabotworkshop-website-s3bucket-47l091varlix/solar.png
+    upload: ../web/index.html to s3://qnabotworkshop-website-s3bucket-1aty4rnkfi6x0/index.html
+    upload: ../web/solar.png to s3://qnabotworkshop-website-s3bucket-1aty4rnkfi6x0/solar.png
     </pre>
 
     * Note the Website Url. You can open this by clicking on the link from the IDE. Great. You should now see a fireball 
 that is our Sun. 
 
-3) Record the path to your website reported above. For example:
+3) Record the URI to your website reported above. For example:
     
     ```
-    http://qnabotworkshop-website-s3bucket-47l091varlix.s3-website-us-east-1.amazonaws.com
+    https://qnabotworkshop-website-s3bucket-1aty4rnkfi6x0.s3.amazonaws.com
     ```
 
     This value will be used for ***WebAppParentOrigin*** when configuring the Lex-Web-Ui. 
@@ -341,30 +327,26 @@ that is our Sun.
 
 5) Deploy the lex-web-ui
 
-    1) Open a new browser tab and navigate to https://www.amazon.com/chatbotui.  
-    2) Scroll down until you see the yellow Launch Stack button and click it
-    3) On Select Template, click Next
-    4) On the parameters screen 
-        * Set the stack name to be 'lex-web-ui-qnabot-workshop'
-        * Set the CodeBuildName to be 'lex-web-ui-qnaabot-workshop'
-        * Set the BotName to that returned in the step above for example 'QnABottwotwozero_Botup'
-        * Set the WebAppParentOrigin to be the **URI** of the website you created
+    1) Launch the [lex-web-ui](https://console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/new?stackName=lex-web-ui&templateURL=https://s3.amazonaws.com/aws-bigdata-blog/artifacts/aws-lex-web-ui/artifacts/templates/master.yaml "Lex Web Ui") stack 
+    2) Leave parameters defaulted except for 
+        * stack name <pre>lex-web-ui-qnabot-workshop </pre>
+        * CodeBuildName <pre>lex-web-ui-qnaabot-workshop </pre>
+        * BotName <pre> QnABottwotwozero_Botup </pre>
+        * WebAppParentOrigin <pre> **URI** of the website you captured previously </pre>
             * Note: The **URI** ends with .com and does not include the path /index.html
-        * Set the WebAppConfBotInitialText to be 'You can ask me for information on the Sun. Just type questions for me or click on the mic and ask me.'
-        * Set the WebAppConfBotInitialSpeech to be 'Ask me Sun questions.' to get started'
-        * Set the WebAppConfToolbarTitle to be 'Sun Info'
-        * Leave all the other parameters as is
-    5) Click Next twice
-    6) Check I acknowledge that AWS CloudFormation might create IAM resources with custom names.
-    7) Click Create
+            
+        * WebAppConfBotInitialText <pre> You can ask me for information on the Sun. Just type questions for me or click on the mic and ask me.</pre>
+        * WebAppConfBotInitialSpeech <pre> Ask me questions about the Sun </pre>
+        * WebAppConfToolbarTitle <pre> Sun Info </pre>
+    3) Create the stack
 
-    A new stack will launch which you can see in the CloudFormation console. This will take about fourt minutes to 
+    A new stack will launch which you can see in the CloudFormation console. This will take four or five minutes to 
     finish. When its done, use the AWS Console to take a look at the stack Outputs
     
     * WebAppUrl
     * SnippetUrl
     
-    These outputs provide links to web pages that provide access to the chat bot using different techniques.
+    These outputs provide links to web pages that provide access to the chat bot.
     
     ***WebAppUrl*** provides a sample fullpage view of the chat bot. Click on this link and try 
     out chatting as well. 
@@ -382,31 +364,22 @@ that is our Sun.
           loader.load()
             .catch(function (error) { console.error(error); });
         </script>
-    ```
-    * Note, ignore the Cloud9 IDE warning 'ChatBotUiLoader is not defined'. It is defined in the refereneced javascript.
-    
-7) Copy the from your snippet url, open web/index.html in Cloud9, and paste into index.html just below the '\<body\>' tag.
+    ```    
+7) Copy from your snippet url, open web/index.html in Cloud9, and paste into index.html just below the '\<body\>' tag.
+    * Note, ignore the Cloud9 IDE warning 'ChatBotUiLoader is not defined'. It is defined in the referenced javascript.
 
-8) From the terminal window in Cloud9 make sure you are in the aws-ai-qna-bot/workshops/reinvent2018/bin folder. Then run
+8) From the terminal window in Cloud9 make sure you are in the ~/aws-ai-qna-bot/workshops/reinvent2018/bin folder. Then run
 
     <pre>
     ./setupwebsite.sh
     </pre>
 
     This will push the changes to index.html up to S3 hosting the website.
- 
-8) Open or Refresh the solar web page. You will now have embedded the open source lex-web-ui
+    
+9) Open or Refresh the solar web page. You will now have embedded the open source lex-web-ui
 on the Solar Association web site. Try chatting again and asking the bot questions.
 
 ![Web Integration](images/Lab3-web-001.png "Web Example")
-
-## CORS configuration
-
-The configuration of the lex-web-ui took into account the parent page hosting the iframe
-and performed the CORS configuration on the Lex Web UI S3 bucket for you. As long as the correct
-parent page origin is configured into the Lex Web UI when the Cloud Formation template is
-started, CORS will be automatically setup to allow the parent page and the newly minted 
-Lex Web UI resources to work together. 
 
 ## Improving the look and feel of your bot
 
@@ -417,26 +390,30 @@ to improve look and feel as well as provide assisted navigation.
 
 1) Edit a question in your QnABot using the Designer. Select Advanced. Scroll down until you 
 see Alternate Answers / Markdown. Add markdown to your answer
-
-    \# For H1
+    <pre>
     
-    \#\# For H2
-    
-    \*Italic Characters\*
+        # For H1
+        
+        ## For H2
+        
+        *Italic Characters*
+    </pre>
 
 2) You can also generate simple tables to display. Try adding markdown to one of your questions and go 
 back to the solar associations web page to try it out. 
     <pre>
-    | Tables        | Are           | Cool  |
-    | ------------- |:-------------:| -----:|
-    | col 3 is      | right-aligned | $1600 |
-    | col 2 is      | centered      |   $12 |
-    | zebra stripes | are neat      |    $1 |
+    ## Some facts 
+    |Property            | Value              | 
+    |:------------------- |------------------:|
+    | Age                 | 4.6 Billion Years  |
+    | Type                | Yellow Dwarf (G2V) |
+    | Diameter            | 1,392,684 km       |
+    | Surface Temperature | 5,500 °C           |
     </pre>
 
-3) Add a link using Markdown ito the Alternate Answers
+3) Add a link using markdown into the Alternate Answers Markdown field
     <pre>
-    [name](https://someurl) 
+    [NASA](https://www.nasa.gov) 
     </pre>
     
 ### Response Card and Buttons
@@ -471,8 +448,7 @@ to help the user navigate easily.
     * Each button can be configured with the text to display in the button and the value that
     will be sent back to Lex if the button is clicked. 
     
-5) Once you are happy with the additions you've made for markdown or response cards, 
-click on update and then close once the update is successful.
+5) Click on update once the changes have been made and then close once the update is successful.
 
 6) Go back to the solar web page and type in the question you have been editing to see the 
 photo response.
@@ -490,12 +466,12 @@ This file contains the questions preconfigured for the step.
 
 ### Quiz
 
-On your own you can implement simple multiple choice quiz using the quiz functionality. See the 
+Outside of the workshop you can implement simple multiple choice quiz using the quiz functionality. See the 
 [Questionnaire Blog Post.](https://aws.amazon.com/blogs/machine-learning/create-a-questionnaire-bot-with-amazon-lex-and-amazon-alexa/ "Quiz")
 
 ### Guided navigation
 
-On your own can implement a tour / guided navigation. See the 
+Outside of the workshopu you can implement a tour / guided navigation. See the 
 [Guided navigation Blog Post.](https://aws.amazon.com/blogs/machine-learning/creating-virtual-guided-navigation-using-a-question-and-answer-bot-with-amazon-lex-and-amazon-alexa/ "Guided")
 
 ### Checkpoint:
