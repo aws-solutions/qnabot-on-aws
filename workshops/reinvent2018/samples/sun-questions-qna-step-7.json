@@ -5,7 +5,7 @@
       "args": [
         ""
       ],
-      "a": "When all the Hydrogen has been burned, the Sun will continue for about 130 million more years, burning Helium, during which time it will expand to the point that it will engulf Mercury and Venus and the Earth. At this stage it will have become a red giant.",
+      "a": "When all the Hydrogen has been burned, the Sun will continue for about 130 million more years. During this time it is consuming Helium and will expand to engulf Mercury, Venus, and the Earth. It is now a red giant.",
       "r": {
         "subTitle": "",
         "imageUrl": "",
@@ -21,12 +21,13 @@
       "type": "qna",
       "selected": false,
       "q": [
-        "Will the Sun every consume the earth?"
+        "Will the Sun ever consume the earth?"
       ]
     },
     {
       "a": "The Sun is 109 times wider than the Earth and 330,000 times as massive",
       "r": {
+        "subTitle": "Image referenced from space-facts.com",
         "imageUrl": "https://space-facts.com/wp-content/uploads/sun-size.png",
         "title": "Image"
       },
@@ -49,7 +50,7 @@
             "value": "How far away is the sun?"
           }
         ],
-        "subTitle": "",
+        "subTitle": "Image referenced from solarsystem.nasa.gov",
         "imageUrl": "https://solarsystem.nasa.gov/system/resources/detail_files/823_cover-1920_detail.jpg",
         "title": "Sun Image",
         "text": "",
@@ -122,7 +123,7 @@
         "markdown": "",
         "ssml": ""
       },
-      "l": "arn:aws:lambda:us-east-1:539180715237:function:qna-workshop-solarflare-SolarFlareFunction-1VV6PCDMIBLGR",
+      "l": "arn:aws:lambda:us-east-1:REPLACE:function:qna-workshop-solarflare-SolarFlareFunction-REPLACE",
       "qid": "sun.2",
       "type": "qna",
       "q": [
@@ -150,10 +151,10 @@
       },
       "t": "",
       "alt": {
-        "markdown": "# Test One",
-        "ssml": "<speak>this is a test</speak>"
+        "markdown": "# To be replaced by lambda hook",
+        "ssml": "<speak>To be replaced by lambda hook</speak>"
       },
-      "l": "arn:aws:lambda:us-east-1:539180715237:function:qna-workshop-solarflare-SolarFlareFunction-1VV6PCDMIBLGR",
+      "l": "arn:aws:lambda:us-east-1:REPLACE:function:qna-workshop-solarflare-SolarFlareFunction-REPLACE",
       "qid": "sun.8",
       "type": "qna",
       "q": [
@@ -173,7 +174,7 @@
             "value": "How large is the sun?"
           }
         ],
-        "subTitle": "",
+        "subTitle": "Image referenced from blogspot.com",
         "imageUrl": "https://3.bp.blogspot.com/-EQIjUw2H3To/WZvsoY4IrlI/AAAAAAAABIs/-iXnUDigA1cK2iZ9dV6AFp3v-P8kD_eewCLcBGAs/s1600/earthorbit.gif",
         "title": "Map"
       },
