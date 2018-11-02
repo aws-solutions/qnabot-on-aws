@@ -737,7 +737,7 @@ the following steps:
     ```$xslt
     cd ~/environment/aws-ai-qna-bot/workshops/reinvent2018/code/solarflare
     npm install
-    cd ../../bin
+    cd ../../scripts
     ./solarflare-setup.sh
     ./solarflare-pkg.sh
     ./solarflare-deploy.sh
@@ -755,9 +755,16 @@ The event object passed to the Lambda has two properties:
 
 The Lambda handler must return the modified event object. The general sections to modify are shown below.
 
-### Calling the NASA API
+### Looking at the provided source code
 
-1) Call the API
+1) In your Cloud9 IDE open the file <pre>QnaBotWorkshop/aws-ai-qna-bot/workshops/reinvent2018/code/solarflare/app.js</pre>
+
+2) You'll see four TODO areas that you'll need to replace. You can write your own code or use the
+code provided below.
+  
+
+#### TODO 1 Calling the NASA API after setting up the parameters used in the url. Log the output if debug is enabled.
+
     <pre>
         debug("Calling via axios");
         const finalUrl = baseurl + '?startDate=2017-01-01' + '&api_key=' + process.env.api_key;
@@ -765,9 +772,7 @@ The Lambda handler must return the modified event object. The general sections t
         debug("RESPONSE RECEIVED: ", JSON.stringify(res.data, null, 2));
     </pre>
 
-### Check for the existence of an argument 
-
-For this use case lets use the first argument to indicate how many recent solar flare event times to return to the caller 
+#### TODO 2 Check for the existence of an argument that indicates how many recent solar flares should be returned
 
     <pre>
         // if lambdahook argument requests last solar flares, walk the returned flares up to
@@ -781,7 +786,7 @@ For this use case lets use the first argument to indicate how many recent solar 
         }
     </pre>    
 
-### Return markdown based on the API result and the existing of an argument
+#### TODO 3 Return markdown based on the API results if an argument was passed indicating how many recent solar flares to return
 
     <pre>
         if (recentCount > 0) {
@@ -803,7 +808,7 @@ For this use case lets use the first argument to indicate how many recent solar 
         } else {
     </pre>
 
-### Else augment the message with an alert if the a solar flare has been detected in the last 30 days
+#### TODO 4 - Else no augment was passed. Just update the message with an alert if a solar flare has been detected in the last 30 days
 
     <pre>
           // check dates for recent solar flares.

@@ -15,23 +15,23 @@ async function handleQuery(event) {
 
   try {
 
-    /* TODO - call the DONKI solar flare ExtensionScriptApis and await its response.
+    /* TODO 1 - call the DONKI solar flare ExtensionScriptApis and await its response.
      *   const finalUrl = baseurl + '?startDate=2017-01-01' + '&api_key=' + process.env.api_key;
      *   let res = await axios(finalUrl, axiosConfig);
      */
 
 
-    /* TODO - check if an argument was passed to the function that indicates how many recent
+    /* TODO 2 - check if an argument was passed to the function that indicates how many recent
      * solar flare incidents should e returned to the caller. Look in
      * event.res.result.args
      */
 
 
-    /* TODO - if a count was passed to the function in the first argument,
+    /* TODO 3 - if a count was passed to the function in the first argument,
      * return a custom payload that contains markdown data with the last several solar flares.
      */
 
-    /* TODO - else if no arguments passed to the function, then check to see if any solar flares have
+    /* TODO 4 - else if no arguments passed to the function, then check to see if any solar flares have
      * occurred in the last 30 days and augment the response message with a message that indicates
      * recent solar flares have occurred.
      */
