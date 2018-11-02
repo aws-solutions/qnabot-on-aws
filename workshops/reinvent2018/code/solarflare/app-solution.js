@@ -1,7 +1,7 @@
 const debug = require('debug')('solarflare');
 const axios = require('axios');
 const moment = require('moment');
-const baseurl = 'https://api.nasa.gov/DONKI/SEP';
+const baseurl = 'https://api.nasa.gov/DONKI/FLR';
 
 
 async function handleQuery(event) {
@@ -35,7 +35,7 @@ async function handleQuery(event) {
         let plainMessage = '';
         let ssmlMessage = '';
         for (let i = res.data.length - 1; i >= 0 && cnt < recentCount; i--) {
-          const t = moment(res.data[i].eventTime);
+          const t = moment(res.data[i].beginTime);
           messageMarkDown += "\n* " + t.format('MM-DD-YYYY');
           plainMessage += "\n" + t.format('MM-DD-YYYY');
           if (cnt+1 === recentCount || i === 1) {
@@ -66,12 +66,12 @@ async function handleQuery(event) {
       let oneMonthAgo = moment().subtract(30, 'days');
       debug('computed month ago: ' + oneMonthAgo);
       res.data.forEach((o) => {
-        debug(`reported event time: ${o.eventTime}`);
-        let eventTime = moment(o.eventTime);
-        debug('parsed eventTime: ' + eventTime);
-        if (eventTime > oneMonthAgo) {
+        debug(`reported event time: ${o.beginTime}`);
+        let beginTime = moment(o.beginTime);
+        debug('parsed beginTime: ' + beginTime);
+        if (beginTime > oneMonthAgo) {
           recentFlares = true;
-          recentFlaresEventTime = o.eventTime;
+          recentFlaresEventTime = o.beginTime;
         }
       });
       if (recentFlares) {

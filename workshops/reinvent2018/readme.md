@@ -567,6 +567,8 @@ and buttons.
   
   
 20) Try it now... Call the phone number for your new call center, and ask QnABot a question (ideally a question that you already entered into the Designer!)  
+    * Note - It takes a little bit of time before the new contact flow is ready. If you
+    get the default contact flow, wait 30 seconds or so and try again.  
   
 ### Checkpoint:
 
@@ -610,10 +612,10 @@ To find out what your users up to with respect to your chat bot use a preconfigu
     ![Lab6-Monitor-001](images/Lab6-Monitor-001.png "Kibana")
 
 ### Standard Dashboard
-1) Requests
-2) Client types
-3) Frequent utterances (tag cloud)
-4)  answers with positive or negative feedback (requires enablement in designer)
+* Requests
+* Client types
+* Frequent utterances (tag cloud)
+* Answers with positive or negative feedback (requires enablement in designer)
 
 ### Build a query that finds all utterances that did not resolve to a question
 
@@ -621,13 +623,15 @@ To find out what your users up to with respect to your chat bot use a preconfigu
 match any question?
 
     * In Kibana, click on Discover
-    * Switch to the metrics index
+    ![Lab6-Monitor-002](images/Lab6-Monitor-002.png "Discover")
+    * Switch to the qnametrics index
+    ![Lab6-Monitor-003](images/Lab6-Monitor-003.png "qnametrics")
     * In the query area enter 
     <pre>
     !(_exists_:"qid")
     </pre>
     Add utterance as a selected field
-
+    ![Lab6-Monitor-004](images/Lab6-Monitor-004.png "qnametrics")
     * Note: Any document in the metrics index that does not have a qid did not match a question in
 elastic search. 
 
@@ -673,15 +677,15 @@ Solar Association wants to provide quick access to Solar Flare information. In p
 the Association wants to let users know when the last solar flare events were detected. For this workshop,
 implement two adjustments to your questions. 
 
-1) Add to any answer if a Solar flare has detected in the last 30 days. 
+* Add to any answer if a Solar flare has been detected in the last 30 days. 
 
-2) Augment our QnA with the question, when were the last solar flares detected? 
+* Add a new question, 'When were the last solar flares detected?' 
 
-To do this we are going to use a NASA API to create a lambda hook.
+To do this we are going to use a public api from [NASA API](https://api.nasa.gov/index.html "NASA API") named [DONKI](https://api.nasa.gov/api.html#DONKI "NASA API")
+to obtain information on Solar Flares.
 
-The [NASA API](https://api.nasa.gov/api.html#DONKI "NASA API") is at
 
-[NASA API Example](https://api.nasa.gov/DONKI/SEP?startDate=2017-01-01&endDate=2018-12-30&api_key=DEMO_KEY "Example call")
+[NASA API Example](https://api.nasa.gov/DONKI/FLR?startDate=2017-01-01&endDate=2018-12-30&api_key=DEMO_KEY "Example call")
 
 The API takes two parameters, startDate and endDate. endDate defaults to current UTC Time 
 so we can leave this empty unless we want to provide a question and answer for a specific
@@ -691,7 +695,7 @@ time range.
 
 The challenge is to write a NodeJS based (or python or your favorite Lambda supported language)
 that calls this api and augments an answer with whether a solar flare has occurred in the past
-30 days. 
+30 days. We've provided a default implementation in NodeJS.
 
 The Lambda hook should also generate a response that lists the time the last several
 solar flares were detected using a markdown table format.  
@@ -731,7 +735,7 @@ the following steps:
 2) Setup the lambda function by deploying a preconfigured CloudFormation template using sam
 
     ```$xslt
-    cd aws-ai-qna-bot/workshops/reinvent2018/code/solarflare
+    cd ~/environment/aws-ai-qna-bot/workshops/reinvent2018/code/solarflare
     npm install
     cd ../../bin
     ./solarflare-setup.sh
@@ -749,7 +753,7 @@ The event object passed to the Lambda has two properties:
 * event.req the normalized request object
 * event.res the normalized response object (edit this to change the response)
 
-The Lambda handler must return the modified event object.
+The Lambda handler must return the modified event object. The general sections to modify are shown below.
 
 ### Calling the NASA API
 
@@ -788,7 +792,7 @@ For this use case lets use the first argument to indicate how many recent solar 
             let obj = {};
             obj.messages = [];
             for (let i = res.data.length - 1; i >= 0 && cnt < recentCount; i--) {
-              messageMarkDown += "\n* " + res.data[i].eventTime;
+              messageMarkDown += "\n* " + res.data[i].beginTime;
               cnt++;
             }
             obj.messages.push({type: "CustomPayload", value: messageMarkDown} );
@@ -809,12 +813,12 @@ For this use case lets use the first argument to indicate how many recent solar 
           let oneMonthAgo = moment().subtract(30, 'days');
           debug('computed month ago: ' + oneMonthAgo);
           res.data.forEach((o) => {
-            debug(`reported event time: ${o.eventTime}`);
-            let eventTime = moment(o.eventTime);
-            debug('parsed eventTime: ' + eventTime);
-            if (eventTime > oneMonthAgo) {
+            debug(`reported event time: ${o.beginime}`);
+            let beginTime = moment(o.beginTime);
+            debug('parsed beginTime: ' + beginTime);
+            if (beginTime > oneMonthAgo) {
               recentFlares = true;
-              recentFlaresEventTime = o.eventTime;
+              recentFlaresEventTime = o.beginTime;
             }
           });
           if (recentFlares) {
@@ -831,7 +835,7 @@ For this use case lets use the first argument to indicate how many recent solar 
 1) Run tests to validate syntax
 
 <pre>
-cd aws-ai-qna-bot/workshops/reinvent2018/code/solarflare
+cd ~/environment/aws-ai-qna-bot/workshops/reinvent2018/code/solarflare
 npm test
 </pre>
 
@@ -844,14 +848,14 @@ If the tests are successful, continue with the next section to redeploy your fun
 1) Execute the following commands to redeploy the updated function.
 
 <pre>
-cd aws-ai-qna-bot/workshops/reinvent2018/code/solarflare
+cd ~/environment/aws-ai-qna-bot/workshops/reinvent2018/code/solarflare
 ./solarflare-pkg.sh
 ./solarflare-deploy.sh
 </pre>
 
 * Note: Copy the Function ARN reported by solarflare-deploy.sh. You'll use this value to configure the Lambda hooks.
 
-Once your package is redeployed the next step will be to add the Lambda hook to existing questions and adding a new
+Once your package is redeployed the next step will be to add the Lambda hook to existing questions and add a new
 question.
 
 ### Adding the Lambda Hook to existing questions
@@ -909,7 +913,7 @@ This file contains the questions preconfigured for the step.
 
 * Note 1: An import will overwrite existing questions with the same Question ID. 
 
-* Note 2: Two questions reference the lambda function. You need to update the ARN of these functions
+* Note 2: Two questions reference lambda functions. You need to update the ARN of these functions
 after importing the sample file with the ARN of the function you have created in step 7. The question
 ids to update are sun.8 and sun.2.
 

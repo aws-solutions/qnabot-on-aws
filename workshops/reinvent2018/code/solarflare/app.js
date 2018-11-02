@@ -3,7 +3,7 @@ const debug = require('debug')('solarflare');
 const axios = require('axios');
 const moment = require('moment');
 const awsRegion = process.env.Region ? process.env.Region : 'us-east-1';
-const baseurl = 'https://api.nasa.gov/DONKI/SEP';
+const baseurl = 'https://api.nasa.gov/DONKI/FLR';
 
 
 async function handleQuery(event) {
