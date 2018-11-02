@@ -702,37 +702,7 @@ solar flares were detected using a markdown table format.
 
 ### Lambda Hook Setup
 
-1) On your Cloud9 IDE make sure that you have the latest sam-cli. If on 0.2.11 follow 
-the following steps:
-
-    ```$xslt
-    sam --version
-    
-    A newer version of the AWS SAM CLI is available!
-    Your version:   0.2.11
-    Latest version: 0.6.1
-    See https://github.com/awslabs/aws-sam-local for upgrade instructions
-    
-    sam version 0.2.11
-    
-    ```
-    
-    1) Use the following to install latest sam cli and latest aws cli packages
-    ```$xslt
-    npm uninstall -g aws-sam-local
-    pip install --user aws-sam-cli
-    pip install awscli --upgrade --user
-    ```
-
-    Add the following to .bash_profile and source this profile
-    ```$xslt
-    USER_BASE_PATH=$(python -m site --user-base)
-    export PATH=$USER_BASE_PATH/bin:$PATH
-    ```
-
-    sam --version should now return a current version
-
-2) Setup the lambda function by deploying a preconfigured CloudFormation template using sam
+1) Setup the lambda function by deploying a preconfigured CloudFormation template using sam
 
     ```$xslt
     cd ~/environment/aws-ai-qna-bot/workshops/reinvent2018/code/solarflare
@@ -764,76 +734,74 @@ code provided below.
   
 
 #### TODO 1 Calling the NASA API after setting up the parameters used in the url. Log the output if debug is enabled.
-
-    <pre>
-        debug("Calling via axios");
-        const finalUrl = baseurl + '?startDate=2017-01-01' + '&api_key=' + process.env.api_key;
-        let res = await axios(finalUrl, axiosConfig);
-        debug("RESPONSE RECEIVED: ", JSON.stringify(res.data, null, 2));
-    </pre>
+<pre>
+    debug("Calling via axios");
+    const finalUrl = baseurl + '?startDate=2017-01-01' + '&api_key=' + process.env.api_key;
+    let res = await axios(finalUrl, axiosConfig);
+    debug("RESPONSE RECEIVED: ", JSON.stringify(res.data, null, 2));
+</pre>
 
 #### TODO 2 Check for the existence of an argument that indicates how many recent solar flares should be returned
-
-    <pre>
-        // if lambdahook argument requests last solar flares, walk the returned flares up to
-        // count provided adding to output using markdown
-        let recentCount = 0;
-        if (event.res.result.args &&
-          event.res.result.args.length > 0 &&
-          event.res.result.args[0] &&
-          event.res.result.args[0].length > 0) {
-          recentCount = parseInt(event.res.result.args[0]);
-        }
-    </pre>    
+<pre>
+    // if lambdahook argument requests last solar flares, walk the returned flares up to
+    // count provided adding to output using markdown
+    let recentCount = 0;
+    if (event.res.result.args &&
+      event.res.result.args.length > 0 &&
+      event.res.result.args[0] &&
+      event.res.result.args[0].length > 0) {
+      recentCount = parseInt(event.res.result.args[0]);
+    }
+</pre>    
 
 #### TODO 3 Return markdown based on the API results if an argument was passed indicating how many recent solar flares to return
 
-    <pre>
-        if (recentCount > 0) {
-          //walk the return data and provide dates for the requested number of solar flares
-          let cnt = 0;
-          if (res.data.length > 0) {
-            let messageMarkDown = '';
-            let obj = {};
-            obj.messages = [];
-            for (let i = res.data.length - 1; i >= 0 && cnt < recentCount; i--) {
-              messageMarkDown += "\n* " + res.data[i].beginTime;
-              cnt++;
-            }
-            obj.messages.push({type: "CustomPayload", value: messageMarkDown} );
-            event.res.message = JSON.stringify(obj);
-            debug('Sending message: ' + event.res.message);
-          }
-    
-        } else {
-    </pre>
+<pre>
+    if (recentCount > 0) {
+      //walk the return data and provide dates for the requested number of solar flares
+      let cnt = 0;
+      if (res.data.length > 0) {
+        let messageMarkDown = '';
+        let obj = {};
+        obj.messages = [];
+        for (let i = res.data.length - 1; i >= 0 && cnt < recentCount; i--) {
+          messageMarkDown += "\n* " + res.data[i].beginTime;
+          cnt++;
+        }
+        obj.messages.push({type: "CustomPayload", value: messageMarkDown} );
+        event.res.message = JSON.stringify(obj);
+        debug('Sending message: ' + event.res.message);
+      }
+
+    } else {
+</pre>
 
 #### TODO 4 - Else no augment was passed. Just update the message with an alert if a solar flare has been detected in the last 30 days
 
-    <pre>
-          // check dates for recent solar flares.
-          let recentFlares = false;
-          let recentFlaresEventTime = '';
-    
-          let oneMonthAgo = moment().subtract(30, 'days');
-          debug('computed month ago: ' + oneMonthAgo);
-          res.data.forEach((o) => {
-            debug(`reported event time: ${o.beginime}`);
-            let beginTime = moment(o.beginTime);
-            debug('parsed beginTime: ' + beginTime);
-            if (beginTime > oneMonthAgo) {
-              recentFlares = true;
-              recentFlaresEventTime = o.beginTime;
-            }
-          });
-          if (recentFlares) {
-            debug('recent flares detected');
-            event.res.message += ' Alert. Recent Solar Flare has been reported on ' + recentFlaresEventTime;
-          } else {
-            debug('recent flares not reported in the last 30 days');
-          }
+<pre>
+      // check dates for recent solar flares.
+      let recentFlares = false;
+      let recentFlaresEventTime = '';
+
+      let oneMonthAgo = moment().subtract(30, 'days');
+      debug('computed month ago: ' + oneMonthAgo);
+      res.data.forEach((o) => {
+        debug(`reported event time: ${o.beginime}`);
+        let beginTime = moment(o.beginTime);
+        debug('parsed beginTime: ' + beginTime);
+        if (beginTime > oneMonthAgo) {
+          recentFlares = true;
+          recentFlaresEventTime = o.beginTime;
         }
-    </pre>
+      });
+      if (recentFlares) {
+        debug('recent flares detected');
+        event.res.message += ' Alert. Recent Solar Flare has been reported on ' + recentFlaresEventTime;
+      } else {
+        debug('recent flares not reported in the last 30 days');
+      }
+    }
+</pre>
     
 ###  Test your code for valid syntax
 
