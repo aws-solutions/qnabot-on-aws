@@ -171,14 +171,14 @@ No spaces in front of or after the password.
     * 8 characters minimum length
     * Numbers, special character, uppercase and lowercase letters
 
-6) Once logged in, click on "Add" to input a new question. Use a question id of 
+6) Once logged in, click on "Add" to input a new question. Use a Item Id of 
     <pre>
     sun.1
     </pre>
 
 7) The first question we want the Bot to respond to is 
     <pre>
-    Tell me about our Sun". 
+    Tell me about our Sun. 
     </pre>
     This represents our most frequently asked question. 
 
@@ -283,7 +283,7 @@ Your AWS Cloud9 environment will begin to be setup. Once its ready continue with
 2) Run a script in your Cloud9 IDE that runs CloudFormation to setup an S3 bucket to host the website and uploads the two files
 
     <pre>
-    cd ~/aws-ai-qna-bot/workshops/reinvent2018/scripts
+    cd ~/environment/aws-ai-qna-bot/workshops/reinvent2018/scripts
     ./setupwebsite.sh
     </pre>
 
@@ -305,8 +305,8 @@ Your AWS Cloud9 environment will begin to be setup. Once its ready continue with
     upload: ../web/solar.png to s3://qnabotworkshop-website-s3bucket-1aty4rnkfi6x0/solar.png
     </pre>
 
-    * Note the Website Url. You can open this by clicking on the link from the IDE. Great. You should now see a fireball 
-that is our Sun. 
+    * Note the Website Url. You can open this by clicking on the link from the IDE. Great. You should now see artwork 
+representing the Sun. 
 
 3) Record the URI to your website reported above. For example:
     
@@ -403,8 +403,8 @@ see Alternate Answers / Markdown. Add markdown to your answer
 back to the solar associations web page to try it out. 
     <pre>
     ## Some facts 
-    |Property            | Value              | 
-    |:------------------- |------------------:|
+    |Property             | Value              | 
+    |:--------------------|-------------------:|
     | Age                 | 4.6 Billion Years  |
     | Type                | Yellow Dwarf (G2V) |
     | Diameter            | 1,392,684 km       |

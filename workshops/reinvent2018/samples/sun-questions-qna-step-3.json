@@ -5,7 +5,7 @@
       "args": [
         ""
       ],
-      "a": "When all the Hydrogen has been burned, the Sun will continue for about 130 million more years. During this time it is consuming Helium and will expand to engulf Mercury, Venus, and the Earth. It is now a red giant.",
+      "a": "When all the Hydrogen has been burned, the Sun will continue for about 130 million more years. During this time, it is consuming Helium and will expand to engulf Mercury, Venus, and the Earth. It is now a red giant.",
       "r": {
         "subTitle": "",
         "imageUrl": "",
@@ -90,7 +90,7 @@
       "t": "",
       "alt": {
         "markdown": "## Some facts\n* Our sun is 4.6 billion years old\n* It is considered a yellow dwarf\n* It has a mass that is equal to 333,060 earths",
-        "ssml": ""
+        "ssml": "<speak> Our Sun is 4.6 billion years old. It is considered a yellow dwarf and has a mass that is equal to 333,060 earths.</speak>"
       },
       "l": "",
       "qid": "sun.1",
