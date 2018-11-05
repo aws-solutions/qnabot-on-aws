@@ -713,8 +713,7 @@ solar flares were detected using a markdown table format.
     ./solarflare-deploy.sh
     ```
     * Note: This function is defined in templates/solarflare-master.yaml. The solarflare-pkg.sh and solarflare-deploy.sh
-    builds and uploads code for a Lambda function that will start with 'qna-'. The QnABot fulfillment lambda function is 
-    given permissions to call other functions that start with 'qna'. 
+    builds and uploads code for a Lambda function that will start with the name 'qna-'.
     
 ### Lambda Hook Inputs and Return structure
 
@@ -762,17 +761,31 @@ code provided below.
       let cnt = 0;
       if (res.data.length > 0) {
         let messageMarkDown = '';
-        let obj = {};
-        obj.messages = [];
+        let plainMessage = '';
+        let ssmlMessage = '';
         for (let i = res.data.length - 1; i >= 0 && cnt < recentCount; i--) {
-          messageMarkDown += "\n* " + res.data[i].beginTime;
+          const t = moment(res.data[i].beginTime);
+          messageMarkDown += "\n* " + t.format('MM-DD-YYYY');
+          plainMessage += "\n" + t.format('MM-DD-YYYY');
+          if (cnt+1 === recentCount || i === 1) {
+            ssmlMessage +=', and '+ t.format('MM-DD-YYYY');
+          } else {
+            ssmlMessage +=', '+ t.format('MM-DD-YYYY');
+          }
           cnt++;
         }
-        obj.messages.push({type: "CustomPayload", value: messageMarkDown} );
-        event.res.message = JSON.stringify(obj);
-        debug('Sending message: ' + event.res.message);
-      }
 
+        // for markdown using lex-web-ui specific attribute
+        event.res.session.appContext.altMessages.markdown= messageMarkDown;
+        
+        // for Alex and lex-web-ui set message and tyhpe to SSML
+        ssmlMessage = '<speak>' + ssmlMessage + '</speak>';
+        event.res.message = ssmlMessage;
+        event.res.type = 'SSML';
+        
+        // always include a plainMessage for fallback / Alexa Show
+        event.res.plainMessage = plainMessage;
+      }
     } else {
 </pre>
 
@@ -805,7 +818,13 @@ code provided below.
     
 ###  Test your code for valid syntax
 
-1) Run tests to validate syntax
+1) Make sure your nodejs version is version 8.12.0 and sam are available
+<pre>
+cd ~/environment/aws-ai-qna-bot/workshops/reinvent2018/scripts
+./update-nodejs-version.sh
+</pre>
+
+2) Run tests to validate syntax
 
 <pre>
 cd ~/environment/aws-ai-qna-bot/workshops/reinvent2018/code/solarflare
@@ -821,7 +840,7 @@ If the tests are successful, continue with the next section to redeploy your fun
 1) Execute the following commands to redeploy the updated function.
 
 <pre>
-cd ~/environment/aws-ai-qna-bot/workshops/reinvent2018/code/solarflare
+cd ~/environment/aws-ai-qna-bot/workshops/reinvent2018/scripts
 ./solarflare-pkg.sh
 ./solarflare-deploy.sh
 </pre>
@@ -842,13 +861,25 @@ question.
 4) Save and update the question
 
 4) Use the Lex-Web-Ui to ask the question you just modified.
+    * Note - The last solar flare to occur was back in May 2018. The function alerts only if one occurred 
+    during the last 30 days. No difference in output will be detected. 
 
 5) Verify the function executed in CloudWatch logs
-
+    * Note - You can check in CloudWatch logs to see that the NASA API was called and responded correctly. 
 
 ### Adding the Lambda Hook to the new question
 
-1) Add a new question 'When did the last solar flare occur?'
+1) Add a new question with multiple ways of asking the question
+    Item Id: <pre>sun.8</pre>
+    Questions:
+    <pre>
+    When did the last solar flare occur?
+    Tell me when the last solar flares occured?
+    How recent were the last solar flares?
+    Have solar flares occurred recently?
+    </pre>
+    Answer:
+    <pre> We had problems looking this up - in normal process this text will be replaced </pre>
 
 2) Click on Advanced and scroll down to the Lambda section
 

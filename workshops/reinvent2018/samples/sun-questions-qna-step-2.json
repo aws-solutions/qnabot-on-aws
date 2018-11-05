@@ -190,6 +190,104 @@
       "q": [
         "What other locations on the internet have information about the sun?"
       ]
+    },
+    {
+      "args": [
+        ""
+      ],
+      "next": "",
+      "a": "A brief eruption of intense high-energy radiation from the sun's surface, associated with sunspots and causing electromagnetic disturbances on the earth, as with radio frequency communications and power line transmissions.",
+      "r": {
+        "buttons": [
+          {
+            "text": "",
+            "value": ""
+          }
+        ],
+        "subTitle": "",
+        "imageUrl": "",
+        "title": "",
+        "text": "",
+        "url": ""
+      },
+      "t": "",
+      "alt": {
+        "markdown": "A brief eruption of intense high-energy radiation from the sun's surface, associated with sunspots and causing electromagnetic disturbances on the earth, as with radio frequency communications and power line transmissions. [NASA Definition](https://www.nasa.gov/content/goddard/what-is-a-solar-flare 'Solar Flare')",
+        "ssml": "<speak>A brief eruption of intense high-energy radiation from the sun's surface.</speak>"
+      },
+      "l": "",
+      "qid": "sun.9",
+      "type": "qna",
+      "q": [
+        "What are solar flares?",
+        "what is a solar flare?",
+        "Define solar flares.",
+        "I'd like to know more about solar flares."
+      ]
+    },
+    {
+      "args": [
+        ""
+      ],
+      "next": "",
+      "a": "Eight planets orbit the sun. Mercury, Venus, Earth, Mars, Jupiter, Saturn, Uranus, and Neptune. Sorry Pluto.",
+      "r": {
+        "buttons": [
+          {
+            "text": "",
+            "value": ""
+          }
+        ],
+        "subTitle": "",
+        "imageUrl": "",
+        "title": "Suggestions",
+        "text": "",
+        "url": ""
+      },
+      "t": "",
+      "alt": {
+        "markdown": "",
+        "ssml": ""
+      },
+      "l": "",
+      "qid": "sun.10",
+      "type": "qna",
+      "q": [
+        "How many planets orbit the Sun?",
+        "Which planets orbit the Sun?"
+      ]
+    },
+    {
+      "args": [
+        ""
+      ],
+      "next": "",
+      "a": "The Sun's diameter is 1.4 million kilometers.",
+      "r": {
+        "buttons": [
+          {
+            "text": "",
+            "value": ""
+          }
+        ],
+        "subTitle": "",
+        "imageUrl": "",
+        "title": "Suggestions",
+        "text": "",
+        "url": ""
+      },
+      "t": "",
+      "alt": {
+        "markdown": "",
+        "ssml": ""
+      },
+      "l": "",
+      "qid": "sun.11",
+      "type": "qna",
+      "q": [
+        "What is the diameter of the Sun?",
+        "How wide is the sun?"
+      ]
     }
   ]
 }
