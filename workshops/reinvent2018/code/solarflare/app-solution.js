@@ -47,15 +47,15 @@ async function handleQuery(event) {
         }
 
         // for markdown using lex-web-ui specific attribute
-        event.res.session.appContext.altMessages.markdown= messageMarkDown;
-        
-        // for Alex and lex-web-ui set message and tyhpe to SSML
-        ssmlMessage = '<speak>' + ssmlMessage + '</speak>';
+        event.res.session.appContext.altMessages.markdown = '### Recent Solar Flares \n ' +  messageMarkDown;
+
+        // for Alex and lex-web-ui set message and type to SSML
+        ssmlMessage = '<speak> The most recent solar flares occurred on ' + ssmlMessage + '</speak>';
         event.res.message = ssmlMessage;
         event.res.type = 'SSML';
-        
+
         // always include a plainMessage for fallback / Alexa Show
-        event.res.plainMessage = plainMessage;
+        event.res.plainMessage = 'The most recent solar flares occurred on ' + plainMessage;
       }
 
     } else {
