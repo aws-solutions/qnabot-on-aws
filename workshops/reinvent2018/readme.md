@@ -600,11 +600,44 @@ Cool. Now you can ask Sun questions using your Alexa Skill and keep these easily
 ## Step 6 - Monitor Usage with Kibana:
 
 ### Here's what you're going to work on in step 6: 
-To find out what your users up to with respect to your chat bot use a preconfigured Kibana deployment.
+* Enable Feedback in QnaBot - By default feedback is not enabled in QnABot. This step will
+  walk you through enabling the standard Feedback mechanism.
+* Use a preconfigured Kibana deployment to find out what your users have been up to with respect to your 
+  chat bot.
+  
+### Enable Feedback
+1) Log into the Designer UI
+2) Pull down the upper left menu and select Import from the upper left
+3) Expand the Examples/Demos at the bottom
+4) Click on the load button across from 'feedback'
+5) Wait for the load of feedback.json to complete (should be very quick)
+   You'll see a new question id of Feedback with questions like 'that is wrong' and 'that is right'
+6) Rebuild the Lex bot so that it understands responses such as 'that is right'
+    1) Use the menu on the right hand side of the Designer UI
+    2) Select the "three vertical dots"
+    3) From the pull down, select Lex Rebuild. This will take all the known questions and add these to the Lex Bot and then
+       rebuild the bot.
+
+7) Once this process is complete, after asking a question and getting an answer,
+ users can give feedback to the system by saying or typing 'leave feedback', or 'that is right', or 
+'that is wrong'. This feedback will be seen in the Kibana dashboard. 
+
+8) Try the following from your chat bot web client
+```
+How hot is the sun
+leave feedback
+A
+```
+
+```
+How hot is mars
+leave feedback
+B
+```
 
 ### Launching Kibana
 1) Log into the Designer UI
-2) From the menu pull down select Kibana Dashboard
+2) Pull down the upper left menu and select select Kibana Dashboard
 3) Once Kibana appears for the first time select Dashboard on the left
 4) Next click on Open
 5) Select the 'Default'
@@ -615,7 +648,7 @@ To find out what your users up to with respect to your chat bot use a preconfigu
 * Requests
 * Client types
 * Frequent utterances (tag cloud)
-* Answers with positive or negative feedback (requires enablement in designer)
+* Answers with positive or negative feedback (needs to be enabled in the Designer UI)
 
 ### Build a query that finds all utterances that did not resolve to a question
 
@@ -644,16 +677,6 @@ elastic search.
         The message __You stumped me! Sadly I don't know how to answer your question.__ comes from qnabot. 
         You should find the utterances of this sort captured in the Kibana query above. 
 
-### Rebuilding the Lex bot
-
-If you experience many of the Lex matching errors, you can rebuild the Lex bot using the
-Designer UI. 
-
-1) Use the menu on the right hand side of the designer
-2) Find the "three vertical dots"
-3) Select Lex Rebuild. This will take the questions and add these to the Lex intent and then
-rebuild the bot. **This is one way of reducing** the number of messages that Lex will
-not forward to the Intent. 
 
 ### Experiment with other queries
 
@@ -662,8 +685,8 @@ Try implementing other Kibana queries using the fields available in the metrics 
 
 ### Checkpoint:
 
-You learned using Kibana to see how users are exercising your bot and how to look for utterances 
-that the system is not matching against. 
+You learned how to enable feedback, you learned how to use Kibana to see how users are exercising 
+your bot and how to look for questions that the system is not matching against. 
 
 [*^ back to top*](#solar-association-deploying-and-customizing-a-ready-made-question-and-answer-bot)
 
@@ -940,7 +963,7 @@ This is really important because if you leave stuff running in your account, it 
 Delete manually created resources throughout the laUbs:
 
 * Use your AWS Cloud9 IDE's terminal to remove the sample web site
-```$xslt
+```
 cd aws-ai-qna-bot/workshops/reinvent2018/bin
 ./removewebsite.sh
 ```
