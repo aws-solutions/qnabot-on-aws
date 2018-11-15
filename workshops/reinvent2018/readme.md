@@ -365,26 +365,32 @@ representing the Sun.
             .catch(function (error) { console.error(error); });
         </script>
     ```    
-7) Copy the contents returned by your snippet url, and in the Cloud9 IDE open 
+7) Copy the contents returned by your snippet url into your clipboard
+
+8) In the Cloud9 IDE open 
     ```
     QnaBotWorkshop/aws-ai-qna-bot/workshops/reinvent2018/web/index.html 
     ```
-    in Cloud9, and paste into index.html just below the '\<body\>' tag. Save the modified file.
+
+9) Paste your clipboard into index.html just below the '\<body\>' tag
+
+10) Save the modified file
     * Note, ignore the Cloud9 IDE warning 'ChatBotUiLoader is not defined'. It is defined in the referenced javascript.
 
-8) From the terminal window in Cloud9 make sure you are cd to the 
+11) From a terminal window in Cloud9 IDE make sure you cd to the 
     ```
     cd ~/environment/aws-ai-qna-bot/workshops/reinvent2018/scripts
     ```
-    folder and then run
+
+12) Then in the terminal run
 
     <pre>
     ./setupwebsite.sh
     </pre>
 
-    This will push the changes to index.html up to S3 hosting the website.
+    This will push the changes made to index.html up to S3 hosting the website.
     
-9) Open or Refresh the solar web page. You will now have embedded the open source lex-web-ui
+13) Open or Refresh the solar web page. You will now have embedded the open source lex-web-ui
 on the Solar Association web site. Try chatting again and asking the bot questions.
 
 ![Web Integration](images/Lab3-web-001.png "Web Example")
