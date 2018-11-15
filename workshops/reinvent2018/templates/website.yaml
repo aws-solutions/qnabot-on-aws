@@ -1,0 +1,34 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: >
+  Template do deploy a simple website
+
+Resources:
+
+  S3Bucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      WebsiteConfiguration:
+        IndexDocument: index.html
+        ErrorDocument: error.html
+    DeletionPolicy: Delete
+
+Outputs:
+
+  S3Bucket:
+    Value: !Ref S3Bucket
+    Description: Website S3 Bucket
+
+  WebsiteURL:
+    Value: !GetAtt
+    - S3Bucket
+    - WebsiteURL
+    Description: URL for website hosted on S3
+
+  S3BucketSecureURL:
+    Value: !Join
+    - ''
+    - - 'https://'
+      - !GetAtt
+        - S3Bucket
+        - DomainName
+    Description: Name of S3 bucket to hold website content
