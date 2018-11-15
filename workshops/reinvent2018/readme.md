@@ -960,9 +960,9 @@ If an argument (N) is supplied as an integer, the function will return N most re
 
 Use 'Import' to the import a configuration file from the following url:
 
-    <pre>
-    https://raw.githubusercontent.com/aws-samples/aws-ai-qna-bot/master/workshops/reinvent2018/samples/sun-questions-qna-step-7.json
-    </pre>
+```
+https://raw.githubusercontent.com/aws-samples/aws-ai-qna-bot/master/workshops/reinvent2018/samples/sun-questions-qna-step-7.json
+```
  
 This file contains the questions preconfigured for the step. 
 
