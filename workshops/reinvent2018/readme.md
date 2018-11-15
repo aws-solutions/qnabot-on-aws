@@ -178,7 +178,7 @@ No spaces in front of or after the password.
 
 7) The first question we want the Bot to respond to is 
     <pre>
-    Tell me about our Sun. 
+    Tell me about our Sun
     </pre>
     This represents our most frequently asked question. 
 
@@ -186,7 +186,7 @@ No spaces in front of or after the password.
 kilometers and a circumference of 4,370,005 kilometers. It has a mass that is equal to 333,060 earths and a surface 
 temperature of 5,500 degrees celsius. Really Hot!</pre>
 
-9) Once you've added the first question and its answers, naturally you want to test it out. Using the Content Designer UI, 
+9) Once you've added the first question and its answer, naturally you want to test it out. Using the Content Designer UI, 
 click on the menu item in the upper left hand corner and select the "QnABot client". 
 
     A sample web based client will appear. In the chat area type in: <pre>Tell me about the sun</pre> and press enter. You'll see your 
@@ -219,7 +219,7 @@ You've now been able to add questions that your bot can respond to.
 Your bot's configuration can be exported using the Designer UI to a json file and downloaded to your system. You can also import a json file
 containing QnABot configuration using the Designer.
 
-1) Use 'Export' and once compmlete then click on the download arrow next to available file.
+1) Use 'Export' and once complete then click on the download arrow next to available file.
 
 2) Use 'Import' to the import a configuration file from the following url:
 
@@ -365,10 +365,18 @@ representing the Sun.
             .catch(function (error) { console.error(error); });
         </script>
     ```    
-7) Copy the contents returned by your snippet url, open web/index.html in Cloud9, and paste into index.html just below the '\<body\>' tag.
+7) Copy the contents returned by your snippet url, and in the Cloud9 IDE open 
+    ```
+    QnaBotWorkshop/aws-ai-qna-bot/workshops/reinvent2018/web/index.html 
+    ```
+    in Cloud9, and paste into index.html just below the '\<body\>' tag. Save the modified file.
     * Note, ignore the Cloud9 IDE warning 'ChatBotUiLoader is not defined'. It is defined in the referenced javascript.
 
-8) From the terminal window in Cloud9 make sure you are in the ~/aws-ai-qna-bot/workshops/reinvent2018/bin folder. Then run
+8) From the terminal window in Cloud9 make sure you are cd to the 
+    ```
+    cd ~/environment/aws-ai-qna-bot/workshops/reinvent2018/scripts
+    ```
+    folder and then run
 
     <pre>
     ./setupwebsite.sh
