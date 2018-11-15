@@ -624,7 +624,7 @@ Cool. Now you can ask Sun questions using your Alexa Skill and keep these easily
 2) Pull down the upper left menu and select Import from the upper left
 3) Expand the Examples/Demos at the bottom
 4) Click on the load button across from 'feedback'
-5) Wait for the load of feedback.json to complete (should be very quick)
+5) Wait for the load of feedback.json to complete (should be very quick).
    You'll see a new question id of Feedback with questions like 'that is wrong' and 'that is right'
 6) Rebuild the Lex bot so that it understands responses such as 'that is right'
     1) Use the menu on the right hand side of the Designer UI
@@ -639,17 +639,31 @@ Cool. Now you can ask Sun questions using your Alexa Skill and keep these easily
 8) Try the following from your chat bot web client
 ```
 How hot is the sun
+```
+Then chat with
+```
 leave feedback
+```
+Finally pick option A
+```
 A
 ```
 
+Ask another question and leave feedback once more.
 ```
 How hot is mars
+```
+```
 leave feedback
+```
+```
 B
 ```
 
-### Launching Kibana
+The above steps will will prime the system with some feedback to
+display in Kibana.
+
+### Launch Kibana
 1) Log into the Designer UI
 2) Pull down the upper left menu and select select Kibana Dashboard
 3) Once Kibana appears for the first time select Dashboard on the left
