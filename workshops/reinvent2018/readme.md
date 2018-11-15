@@ -470,9 +470,9 @@ photo response.
 ### Load in pre-configured questions for the end of Step 3
 Use 'Import' to the import a configuration file from the following url:
 
-    <pre>
-    https://raw.githubusercontent.com/aws-samples/aws-ai-qna-bot/develop/workshops/reinvent2018/samples/sun-questions-qna-step-3.json
-    </pre>
+```
+https://raw.githubusercontent.com/aws-samples/aws-ai-qna-bot/develop/workshops/reinvent2018/samples/sun-questions-qna-step-3.json
+```
  
 This file contains the questions preconfigured for the step. 
 
