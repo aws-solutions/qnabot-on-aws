@@ -27,9 +27,9 @@
     {
       "a": "The Sun is 109 times wider than the Earth and 330,000 times as massive",
       "r": {
-        "imageUrl": "https://space-facts.com/wp-content/uploads/sun-size.png",
-        "title": "Image",
-        "subTitle": "Image referenced from space-facts.com"
+        "imageUrl": "",
+        "title": "",
+        "subTitle": ""
       },
       "qid": "sun.6",
       "type": "qna",
@@ -46,13 +46,13 @@
       "r": {
         "buttons": [
           {
-            "text": "How far away is the sun?",
-            "value": "How far away is the sun?"
+            "text": "",
+            "value": ""
           }
         ],
-        "subTitle": "Image referenced from solarsystem.nasa.gov",
-        "imageUrl": "https://solarsystem.nasa.gov/system/resources/detail_files/823_cover-1920_detail.jpg",
-        "title": "Sun Image",
+        "subTitle": "",
+        "imageUrl": "",
+        "title": "",
         "text": "",
         "url": ""
       },
@@ -77,13 +77,13 @@
       "r": {
         "buttons": [
           {
-            "text": "How hot is the sun",
-            "value": "How hot is the sun"
+            "text": "",
+            "value": ""
           }
         ],
         "subTitle": "",
         "imageUrl": "",
-        "title": "Options",
+        "title": "",
         "text": "",
         "url": ""
       },
@@ -139,13 +139,13 @@
       "r": {
         "buttons": [
           {
-            "text": "How large is the sun?",
-            "value": "How large is the sun?"
+            "text": "",
+            "value": ""
           }
         ],
-        "subTitle": "Image referenced from blogspot.com",
-        "imageUrl": "https://3.bp.blogspot.com/-EQIjUw2H3To/WZvsoY4IrlI/AAAAAAAABIs/-iXnUDigA1cK2iZ9dV6AFp3v-P8kD_eewCLcBGAs/s1600/earthorbit.gif",
-        "title": "Map"
+        "subTitle": "",
+        "imageUrl": "",
+        "title": ""
       },
       "t": "",
       "alt": {
@@ -176,7 +176,7 @@
         ],
         "subTitle": "",
         "imageUrl": "",
-        "title": "Options"
+        "title": ""
       },
       "t": "",
       "alt": {
@@ -212,8 +212,8 @@
       },
       "t": "",
       "alt": {
-        "markdown": "A brief eruption of intense high-energy radiation from the sun's surface, associated with sunspots and causing electromagnetic disturbances on the earth, as with radio frequency communications and power line transmissions. [NASA Definition](https://www.nasa.gov/content/goddard/what-is-a-solar-flare 'Solar Flare')",
-        "ssml": "<speak>A brief eruption of intense high-energy radiation from the sun's surface.</speak>"
+        "markdown": "",
+        "ssml": ""
       },
       "l": "",
       "qid": "sun.9",
@@ -240,7 +240,7 @@
         ],
         "subTitle": "",
         "imageUrl": "",
-        "title": "Suggestions",
+        "title": "",
         "text": "",
         "url": ""
       },
@@ -272,7 +272,7 @@
         ],
         "subTitle": "",
         "imageUrl": "",
-        "title": "Suggestions",
+        "title": "",
         "text": "",
         "url": ""
       },
