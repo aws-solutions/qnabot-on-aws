@@ -753,7 +753,7 @@ solar flares were detected using a markdown table format.
 
 ### Lambda Hook Setup
 
-1) Setup the lambda function by deploying a preconfigured CloudFormation template using sam
+1) Using the Cloud9 IDE, setup the lambda function by deploying a preconfigured CloudFormation template using sam
 
     ```$xslt
     cd ~/environment/aws-ai-qna-bot/workshops/reinvent2018/code/solarflare
@@ -872,7 +872,7 @@ code provided below.
 1) Make sure your nodejs version is version 8.12.0 and sam are available
 <pre>
 cd ~/environment/aws-ai-qna-bot/workshops/reinvent2018/scripts
-./update-nodejs-version.sh
+source ./update-nodejs-version.sh
 </pre>
 
 2) Run tests to validate syntax
