@@ -5,7 +5,9 @@ aws cloudformation deploy --template-file ../templates/website.yaml --stack-name
 echo $'\nS3 Bucket: '; aws cloudformation describe-stacks --stack-name qnabotworkshop-website --query "Stacks[0].Outputs[?OutputKey=='S3Bucket'].OutputValue" --no-paginate --output text
 export S3Bucket=`aws cloudformation describe-stacks --stack-name qnabotworkshop-website --query "Stacks[0].Outputs[?OutputKey=='S3Bucket'].OutputValue" --no-paginate --output text`
 export S3URL=`aws cloudformation describe-stacks --stack-name qnabotworkshop-website --query "Stacks[0].Outputs[?OutputKey=='S3BucketSecureURL'].OutputValue" --no-paginate --output text`
-echo $'\nWebsite Url:'
+echo $'\nWebsite URI (Use this as the PARENT ORIGIN): '
+echo $S3URL
+echo $'\nWebsite URL:'
 echo $S3URL/index.html
 echo
 
