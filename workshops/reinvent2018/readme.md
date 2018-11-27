@@ -90,7 +90,7 @@ The CloudFormation template will launch the following:
 * Elasticsearch Service cluster
 * API Gateway
 * Amazon Cognito UserPool and related settings
-* S3 Buckets to hold the Content Designer web app, Lex-Web-Ui web app, and QnAbot metrics
+* S3 Buckets to hold the Content Designer web app, Lex-Web-Ui web app, and QnABot metrics
 * An Amazon Lex Bot to handle questions and answers
 * Lambda functions support the Content Designer and Lex Fulfillment
 * Kibana Dashboard to display usage metrics  
@@ -296,22 +296,26 @@ Your AWS Cloud9 environment will begin to be setup. Once its ready continue with
     Successfully created/updated stack - qnabotworkshop-website
     
     S3 Bucket: 
-    qnabotworkshop-website-s3bucket-1aty4rnkfi6x0
+    qnabotworkshop-website-s3bucket-d83f7qqz91u5
     
-    Website Url:
-    https://qnabotworkshop-website-s3bucket-1aty4rnkfi6x0.s3.amazonaws.com/index.html
+    Website URI (Use this as the PARENT ORIGIN): 
+    https://qnabotworkshop-website-s3bucket-d83f7qqz91u5.s3.amazonaws.com
     
-    upload: ../web/index.html to s3://qnabotworkshop-website-s3bucket-1aty4rnkfi6x0/index.html
-    upload: ../web/solar.png to s3://qnabotworkshop-website-s3bucket-1aty4rnkfi6x0/solar.png
+    Website URL:
+    https://qnabotworkshop-website-s3bucket-d83f7qqz91u5.s3.amazonaws.com/index.html
+    
+    upload: ../web/index.html to s3://qnabotworkshop-website-s3bucket-d83f7qqz91u5/index.html
+    upload: ../web/solar.png to s3://qnabotworkshop-website-s3bucket-d83f7qqz91u5/solar.png   upload: ../web/solar.png to s3://qnabotworkshop-website-s3bucket-1aty4rnkfi6x0/solar.png
     </pre>
 
-    * Note the Website Url. You can open this by clicking on the link from the IDE. Great. You should now see artwork 
+    * Note the Website URI. You'll use this as input to the ***WebAppParentOrigin*** when configuring the Lex-Web-Ui.
+    * Note the Website URL. You can open this by clicking on the link from the IDE. You should now see artwork 
 representing the Sun. 
 
 3) Record the URI to your website reported above. For example:
     
     ```
-    https://qnabotworkshop-website-s3bucket-1aty4rnkfi6x0.s3.amazonaws.com
+    https://qnabotworkshop-website-s3bucket-d83f7qqz91u5.s3.amazonaws.com
     ```
 
     This value will be used for ***WebAppParentOrigin*** when configuring the Lex-Web-Ui. 
@@ -485,12 +489,12 @@ Outside of the workshop you can implement simple multiple choice quiz using the 
 
 ### Guided navigation
 
-Outside of the workshopu you can implement a tour / guided navigation. See the 
+Outside of the workshop you can implement a tour / guided navigation. See the 
 [Guided navigation Blog Post.](https://aws.amazon.com/blogs/machine-learning/creating-virtual-guided-navigation-using-a-question-and-answer-bot-with-amazon-lex-and-amazon-alexa/ "Guided")
 
 ### Checkpoint:
 
-At this point you should be comfortable with embedding the qnabot on your website using
+At this point you should be comfortable with embedding the QnABot on your website using
 the lex-web-ui. You should also be comfortable improving the experience of the bot
 using the advanced configuration features such as markdown, response cards with images,
 and buttons. 
@@ -699,10 +703,10 @@ elastic search.
     * Note: Sometimes Lex does not always pass utterances to the bot. 
 
         The message __Sorry, I did not understand that__ is due to Lex not matching an 
-        intent to send this to. In qnabot there is one intent. Hence this message means that Lex
-        did not understand enough about the request to the qnabot. 
+        intent to send this to. In QnABot there is one intent. Hence this message means that Lex
+        did not understand enough about the request to the QnABot. 
 
-        The message __You stumped me! Sadly I don't know how to answer your question.__ comes from qnabot. 
+        The message __You stumped me! Sadly I don't know how to answer your question.__ comes from QnABot. 
         You should find the utterances of this sort captured in the Kibana query above. 
 
 
