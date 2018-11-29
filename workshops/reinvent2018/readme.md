@@ -334,7 +334,7 @@ representing the Sun.
     1) Launch the [lex-web-ui](https://console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/new?stackName=lex-web-ui&templateURL=https://s3.amazonaws.com/aws-bigdata-blog/artifacts/aws-lex-web-ui/artifacts/templates/master.yaml "Lex Web Ui") stack 
     2) Leave parameters defaulted except for 
         * Stack name <pre>lex-web-ui-qnabot-workshop </pre>
-        * CodeBuildName <pre>lex-web-ui-qnaabot-workshop </pre>
+        * CodeBuildName <pre>lex-web-ui-qnabot-workshop </pre>
         * BotName <pre> **The botname obtained from AWS Console or from command line aws lexmodels get-bots**</pre>
         * WebAppParentOrigin <pre> **URI** of the website you created previously </pre>
             * Note: The **URI** ends with .com and does not include the path /index.html
