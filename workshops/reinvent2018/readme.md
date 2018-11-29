@@ -996,7 +996,7 @@ Delete manually created resources throughout the laUbs:
 
 * Use your AWS Cloud9 IDE's terminal to remove the sample web site
 ```
-cd aws-ai-qna-bot/workshops/reinvent2018/bin
+cd aws-ai-qna-bot/workshops/reinvent2018/scripts
 ./removewebsite.sh
 ```
 * Use the AWS Cloud9 Dashboard to Delete your development environment
