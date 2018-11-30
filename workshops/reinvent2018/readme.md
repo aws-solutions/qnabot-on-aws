@@ -205,11 +205,24 @@ saying:<pre>Tell me about the sun</pre> The Bot should respond with audio as wel
 
 13) Enter a question <pre> How old is the sun </pre>
 
-14) Click on search
+14) Click on search. Look at the results. Notice the score column. The answer selected by the QnABot will be the answer with highest matching score.
 
-Look at the results. Notice the score column. The answer selected by the QnABot will be the answer with highest matching score.
+    ![QnaBot Test Results ](images/02-score.png)
 
-![QnaBot Test Results ](images/02-score.png)
+15) For a small percent of questions, the Amazon Lex service does not match a Lex Intent for the question asked. 
+  Usually the response is, "Sorry, I did not understand that". When you encounter these errors, the Designer UI should 
+  be used to rebuild the Lex Bot. Lets rebuild the Lex Bot now to show you how this is done. This action takes
+  all the presently defined questions and inserts them directly into a Slot Value used in Lex. After a rebuild
+  Lex should be able to match the question to the intent correctly and call the qnabot correctly. Invoke the 
+  menu item show in the images below to rebuild the Lex Bot. 
+
+    ![Designer Menu](images/02-lex-rebuild-a.png)
+
+    ![Designer Lex Rebuild](images/02-lex-rebuild-a.png)
+
+16) Another error you might see is "You stumped me! Sadly I don't know how to answer your question." This error 
+comes from QnaBot. QnaBot could not find an acceptable match in the knowledge base managed by elasticsearch. 
+You'll need to add a new question to the knowledge that provides an appropriate answer.
 
 
 ### Checkpoint:
