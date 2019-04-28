@@ -110,7 +110,7 @@ module.exports=Object.assign(
         "Handler": "cfn.handler",
         "MemorySize": "128",
         "Role":{"Ref":"CFNLambdaRole"} ,
-        "Runtime": "nodejs6.10",
+        "Runtime": "nodejs8.10",
         "Timeout": 300,
         "Tags":[{
             Key:"Type",

@@ -27,7 +27,7 @@ module.exports=Object.assign(
         "Handler": "index.start",
         "MemorySize": "128",
         "Role": {"Fn::GetAtt": ["ImportRole","Arn"]},
-        "Runtime": "nodejs6.10",
+        "Runtime": "nodejs8.10",
         "Timeout": 300,
         "Tags":[{
             Key:"Type",
@@ -53,7 +53,7 @@ module.exports=Object.assign(
         "Handler": "index.step",
         "MemorySize": "320",
         "Role": {"Fn::GetAtt": ["ImportRole","Arn"]},
-        "Runtime": "nodejs6.10",
+        "Runtime": "nodejs8.10",
         "Timeout": 300,
         "Tags":[{
             Key:"Type",

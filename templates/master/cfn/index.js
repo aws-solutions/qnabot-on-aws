@@ -10,7 +10,7 @@ module.exports={
         "Handler": "index.handler",
         "MemorySize": "3008",
         "Role": {"Fn::GetAtt": ["CFNLambdaRole","Arn"]},
-        "Runtime": "nodejs6.10",
+        "Runtime": "nodejs8.10",
         "Timeout": 60,
         "Tags":[{
             Key:"Type",

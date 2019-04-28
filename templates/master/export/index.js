@@ -29,7 +29,7 @@ module.exports=Object.assign(
         "Handler": "index.step",
         "MemorySize": "320",
         "Role": {"Fn::GetAtt": ["ExportRole","Arn"]},
-        "Runtime": "nodejs6.10",
+        "Runtime": "nodejs8.10",
         "Timeout": 300,
         "Tags":[{
             Key:"Type",

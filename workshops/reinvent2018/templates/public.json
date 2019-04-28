@@ -45,7 +45,7 @@
         "Handler": "index.handler",
         "MemorySize": "3008",
         "Role": {"Fn::GetAtt": ["CFNLambdaRole", "Arn"]},
-        "Runtime": "nodejs6.10",
+        "Runtime": "nodejs8.10",
         "Timeout": 60,
         "Tags": [{"Key": "Type", "Value": "CustomResource"}]
       }
@@ -405,7 +405,7 @@
         "Handler": "index.handler",
         "MemorySize": "128",
         "Role": {"Fn::GetAtt": ["ESProxyLambdaRole", "Arn"]},
-        "Runtime": "nodejs6.10",
+        "Runtime": "nodejs8.10",
         "Timeout": 300,
         "Tags": [{"Key": "Type", "Value": "CustomResource"}]
       }
@@ -962,7 +962,7 @@
         "Handler": "index.step",
         "MemorySize": "320",
         "Role": {"Fn::GetAtt": ["ExportRole", "Arn"]},
-        "Runtime": "nodejs6.10",
+        "Runtime": "nodejs8.10",
         "Timeout": 300,
         "Tags": [{"Key": "Type", "Value": "Export"}]
       }
@@ -1099,7 +1099,7 @@
         "Handler": "index.start",
         "MemorySize": "128",
         "Role": {"Fn::GetAtt": ["ImportRole", "Arn"]},
-        "Runtime": "nodejs6.10",
+        "Runtime": "nodejs8.10",
         "Timeout": 300,
         "Tags": [{"Key": "Type", "Value": "Import"}]
       }
@@ -1122,7 +1122,7 @@
         "Handler": "index.step",
         "MemorySize": "320",
         "Role": {"Fn::GetAtt": ["ImportRole", "Arn"]},
-        "Runtime": "nodejs6.10",
+        "Runtime": "nodejs8.10",
         "Timeout": 300,
         "Tags": [{"Key": "Type", "Value": "Import"}]
       }
@@ -1526,7 +1526,7 @@
         "Handler": "index.handler",
         "MemorySize": "128",
         "Role": {"Fn::GetAtt": ["LexBuildLambdaRole", "Arn"]},
-        "Runtime": "nodejs6.10",
+        "Runtime": "nodejs8.10",
         "Timeout": 300,
         "Tags": [{"Key": "Type", "Value": "Api"}]
       }
@@ -1547,7 +1547,7 @@
         "Handler": "index.handler",
         "MemorySize": "128",
         "Role": {"Fn::GetAtt": ["LexBuildLambdaRole", "Arn"]},
-        "Runtime": "nodejs6.10",
+        "Runtime": "nodejs8.10",
         "Timeout": 300,
         "Tags": [{"Key": "Type", "Value": "Api"}]
       }
@@ -2021,7 +2021,7 @@
         "Handler": "index.handler",
         "MemorySize": "128",
         "Role": {"Fn::GetAtt": ["LexProxyLambdaRole", "Arn"]},
-        "Runtime": "nodejs6.10",
+        "Runtime": "nodejs8.10",
         "Timeout": 300,
         "Tags": [{"Key": "Type", "Value": "Api"}]
       }
@@ -2042,7 +2042,7 @@
         "Handler": "index.handler",
         "MemorySize": "128",
         "Role": {"Fn::GetAtt": ["LexProxyLambdaRole", "Arn"]},
-        "Runtime": "nodejs6.10",
+        "Runtime": "nodejs8.10",
         "Timeout": 300,
         "Tags": [{"Key": "Type", "Value": "Api"}]
       }
@@ -2637,7 +2637,7 @@
         "Handler": "index.handler",
         "MemorySize": "128",
         "Role": {"Fn::GetAtt": ["SchemaLambdaRole", "Arn"]},
-        "Runtime": "nodejs6.10",
+        "Runtime": "nodejs8.10",
         "Timeout": 300,
         "Tags": [{"Key": "Type", "Value": "Api"}]
       }
@@ -3843,7 +3843,7 @@
         "Handler": "index.handler",
         "MemorySize": "128",
         "Role": {"Fn::GetAtt": ["S3ListLambdaRole", "Arn"]},
-        "Runtime": "nodejs6.10",
+        "Runtime": "nodejs8.10",
         "Timeout": 300,
         "Tags": [{"Key": "Type", "Value": "Api"}]
       }
@@ -4257,7 +4257,7 @@
         "Handler": "index.documents",
         "MemorySize": "128",
         "Role": {"Fn::GetAtt": ["S3ListLambdaRole", "Arn"]},
-        "Runtime": "nodejs6.10",
+        "Runtime": "nodejs8.10",
         "Timeout": 300,
         "Tags": [{"Key": "Type", "Value": "Api"}]
       }
@@ -4271,7 +4271,7 @@
         "Handler": "index.photos",
         "MemorySize": "128",
         "Role": {"Fn::GetAtt": ["S3ListLambdaRole", "Arn"]},
-        "Runtime": "nodejs6.10",
+        "Runtime": "nodejs8.10",
         "Timeout": 300,
         "Tags": [{"Key": "Type", "Value": "Api"}]
       }
@@ -4493,7 +4493,7 @@
           }
         },
         "Role": {"Fn::GetAtt": ["SignupLambdaRole", "Arn"]},
-        "Runtime": "nodejs6.10",
+        "Runtime": "nodejs8.10",
         "Timeout": 300,
         "Tags": [{"Key": "Type", "Value": "Cognito"}]
       }
@@ -4514,7 +4514,7 @@
           }
         },
         "Role": {"Fn::GetAtt": ["SignupLambdaRole", "Arn"]},
-        "Runtime": "nodejs6.10",
+        "Runtime": "nodejs8.10",
         "Timeout": 300,
         "Tags": [{"Key": "Type", "Value": "Cognito"}]
       }
