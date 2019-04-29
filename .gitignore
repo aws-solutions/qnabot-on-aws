@@ -60,3 +60,9 @@ typings/
 
 build
 config.json
+**/.DS_Store
+.idea/
+
+
+
+
