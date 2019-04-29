@@ -133,7 +133,7 @@ module.exports={
     }
 }
 
-function lambda(code,variable={},runtime="nodejs6.10"){
+function lambda(code,variable={},runtime="nodejs8.10"){
     return {
       "Type": "AWS::Lambda::Function",
       "Properties": {
