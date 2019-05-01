@@ -127,7 +127,7 @@
     "vue-markdown-loader": "^1.0.0",
     "vue-router": "^2.8.1",
     "vue-template-compiler": "^2.5.16",
-    "vuetify": "^1.0.19",
+    "vuetify": "1.0.19",
     "vuex": "^3.0.1",
     "vuex-router-sync": "^5.0.0",
     "webdriverio": "^4.12.0",
