@@ -26,8 +26,9 @@ module.exports=function(req,res){
         clientType:unwrappedReq._type,
         datetime:now
     }
-    // encode to base64 string to put into firehose
-    var objJsonStr = JSON.stringify(jsonData);
+    // encode to base64 string to put into firehose and
+    // append new line for proper downstream kinesis processing in kibana and/or athena queries over s3
+    var objJsonStr = JSON.stringify(jsonData) + '\n';
     var firehose = new aws.Firehose()
     
     var params = {
