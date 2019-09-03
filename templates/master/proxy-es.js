@@ -275,6 +275,11 @@ module.exports={
                 "Resource":[
                     {"Fn::Sub":"arn:aws:s3:::${AssetBucket}*"}
                 ]
+            },
+            {
+              "Effect": "Allow",
+              "Action": ["comprehend:DetectSyntax"],
+              "Resource":["*"]
             }
           ]
         }

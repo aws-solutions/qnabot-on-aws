@@ -1,31 +1,25 @@
 //start connection
-var Promise=require('bluebird')
-var bodybuilder = require('bodybuilder')
-var aws=require('aws-sdk')
-var url=require('url')
-var _=require('lodash')
-var request=require('./request')
+var _=require('lodash');
+var request=require('./request');
+var build_es_query=require('./esbodybuilder');
 
 module.exports=function(req,res){
-    console.log(JSON.stringify({req,res},null,2))
-    var query=bodybuilder()
-    .orQuery('nested',{
-        path:'questions',
-        score_mode:'sum',
-        boost:2},
-        q=>q.query('match','questions.q',req.question)
-    )
-    .orQuery('match','a',req.question)
-    .orQuery('match','t',_.get(req,'session.topic',''))
-    .from(0)
-    .size(1)
-    .build()
-
-    console.log("ElasticSearch Query",JSON.stringify(query,null,2))
-    return request({
-        url:`https://${req._info.es.address}/${req._info.es.index}/${req._info.es.type}/_search?search_type=dfs_query_then_fetch`,
-        method:"GET",
-        body:query
+    console.log("REQ:",JSON.stringify(req,null,2));
+    console.log("RES:",JSON.stringify(res,null,2));
+    var query_params = {
+        question: req.question,
+        topic: _.get(req,'session.topic',''),
+        from: 0,
+        size: 1
+    };
+    return(build_es_query(query_params))
+    .then( function(es_query) {
+        console.log("ElasticSearch Query",JSON.stringify(es_query,null,2));
+        return request({
+            url:`https://${req._info.es.address}/${req._info.es.index}/${req._info.es.type}/_search?search_type=dfs_query_then_fetch`,
+            method:"GET",
+            body:es_query
+        });
     })
     .then(function(result){
         console.log("ES result:"+JSON.stringify(result,null,2))
