@@ -14,7 +14,6 @@ module.exports=function(req,res){
     };
     return(build_es_query(query_params))
     .then( function(es_query) {
-        console.log("ElasticSearch Query",JSON.stringify(es_query,null,2));
         return request({
             url:`https://${req._info.es.address}/${req._info.es.index}/${req._info.es.type}/_search?search_type=dfs_query_then_fetch`,
             method:"GET",

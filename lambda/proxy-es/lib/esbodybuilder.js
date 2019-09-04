@@ -5,7 +5,7 @@ var get_keywords=require('./keywords');
 var _=require('lodash');
 
 
-var minimum_should_match = '2<75%';
+var minimum_should_match = process.env.ES_KEYWORDS_MINIMUM_SHOULD_MATCH || '2<75%';
 
 function build_query(params) {
     return(get_keywords(params))

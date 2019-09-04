@@ -143,8 +143,13 @@ module.exports={
         },
         "Environment": {
           "Variables": {
-            "ERRORMESSAGE":lexConfig.ErrorMessage,
-            "EMPTYMESSAGE":lexConfig.EmptyMessage,
+            ERRORMESSAGE:lexConfig.ErrorMessage,
+            EMPTYMESSAGE:lexConfig.EmptyMessage,
+            ES_USE_KEYWORD_FILTERS:"true",
+            ES_KEYWORD_SYNTAX_TYPES:"NOUN,PROPN,VERB,ADJ,INTJ",
+            ES_SYNTAX_CONFIDENCE_LIMIT:".20",
+            ES_STOPWORDS:"a,an,and,are,as,at,be,but,by,for,if,in,into,is,it,not,of,on,or,such,that,the,their,then,there,these,they,this,to,was,will,with",
+            ES_MINIMUM_SHOULD_MATCH:"2<75%"
           }
         },
         "Handler": "index.query",
@@ -170,7 +175,12 @@ module.exports={
           "Variables": {
             ES_TYPE:{"Fn::GetAtt":["Var","QnAType"]},
             ES_INDEX:{"Fn::GetAtt":["Var","index"]},
-            ES_ADDRESS:{"Fn::GetAtt":["ESVar","ESAddress"]}
+            ES_ADDRESS:{"Fn::GetAtt":["ESVar","ESAddress"]},
+            ES_USE_KEYWORD_FILTERS:"true",
+            ES_KEYWORD_SYNTAX_TYPES:"NOUN,PROPN,VERB,ADJ,INTJ",
+            ES_SYNTAX_CONFIDENCE_LIMIT:".20",
+            ES_STOPWORDS:"a,an,and,are,as,at,be,but,by,for,if,in,into,is,it,not,of,on,or,such,that,the,their,then,there,these,they,this,to,was,will,with",
+            ES_KEYWORDS_MINIMUM_SHOULD_MATCH:"2<75%"
           }
         },
         "Handler": "index.handler",
