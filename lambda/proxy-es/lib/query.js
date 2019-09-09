@@ -3,15 +3,10 @@ var _=require('lodash');
 var request=require('./request');
 var build_es_query=require('./esbodybuilder');
 
-module.exports=function(req,res){
-    console.log("REQ:",JSON.stringify(req,null,2));
-    console.log("RES:",JSON.stringify(res,null,2));
-    var query_params = {
-        question: req.question,
-        topic: _.get(req,'session.topic',''),
-        from: 0,
-        size: 1
-    };
+var no_hits_question = process.env.ES_NO_HITS_QUESTION || "no_hits";
+
+
+function run_query(req, query_params){
     return(build_es_query(query_params))
     .then( function(es_query) {
         return request({
@@ -19,7 +14,33 @@ module.exports=function(req,res){
             method:"GET",
             body:es_query
         });
-    })
+    });  
+}
+
+function get_answer(req){
+    var query_params = {
+        question: req.question,
+        topic: _.get(req,'session.topic',''),
+        from: 0,
+        size: 1
+    };
+    return(run_query(req, query_params))
+    .then( function(response){
+        var hit = _.get(response,"hits.hits[0]._source");
+        if (hit){
+            return response;
+        } else {
+            console.log("No hits from query - searching instead for: " + no_hits_question);
+            query_params['question'] = no_hits_question;
+            return run_query(req, query_params);
+        }
+    });
+}
+
+module.exports=function(req,res){
+    console.log("REQ:",JSON.stringify(req,null,2));
+    console.log("RES:",JSON.stringify(res,null,2));
+    return(get_answer(req))
     .then(function(result){
         console.log("ES result:"+JSON.stringify(result,null,2))
         res.result=_.get(result,"hits.hits[0]._source")
@@ -96,3 +117,4 @@ module.exports=function(req,res){
         console.log("RESULT",JSON.stringify(req),JSON.stringify(res))
     })
 }
+

@@ -145,6 +145,7 @@ module.exports={
           "Variables": {
             ERRORMESSAGE:lexConfig.ErrorMessage,
             EMPTYMESSAGE:lexConfig.EmptyMessage,
+            ES_NO_HITS_QUESTION:"no_hits",
             ES_USE_KEYWORD_FILTERS:"true",
             ES_KEYWORD_SYNTAX_TYPES:"NOUN,PROPN,INTJ",
             ES_SYNTAX_CONFIDENCE_LIMIT:".20",
