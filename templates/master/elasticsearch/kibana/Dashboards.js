@@ -47,12 +47,21 @@ module.exports=[
             "type": "visualization"
           },
           {
-            "col": 3,
+            "col": 1,
             "id": "Logged-Utterances",
             "panelIndex": 7,
             "row": 5,
-            "size_x": 12,
-            "size_y": 4,
+            "size_x": 6,
+            "size_y": 3,
+            "type": "visualization"
+          },
+          {
+            "col": 7,
+            "id": "No-Hits",
+            "panelIndex": 8,
+            "row": 5,
+            "size_x": 6,
+            "size_y": 3,
             "type": "visualization"
           }
         ]),
@@ -68,7 +77,7 @@ module.exports=[
     }
   },
   {
-    "_id": "Logged-Utterances",
+    "_id": "Utterances",
     "_type": "visualization",
     "_index":".kibana",
     "_source": {
@@ -79,6 +88,21 @@ module.exports=[
       "version": 1,
       "kibanaSavedObjectMeta": {
         "searchSourceJSON": {"Fn::Sub":"{\"index\":\"${ESVar.MetricsIndex}\",\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"filter\":[]}"}
+      }
+    }
+  },
+  {
+    "_id": "No-Hits",
+    "_type": "visualization",
+    "_index":".kibana",
+    "_source": {
+      "title": "No Hits",
+      "visState": "{\"title\":\"No Hits\",\"type\":\"tagcloud\",\"params\":{\"scale\":\"linear\",\"orientation\":\"single\",\"minFontSize\":16,\"maxFontSize\":100,\"hideLabel\":true},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"segment\",\"params\":{\"field\":\"utterance.keyword\",\"size\":1000,\"order\":\"desc\",\"orderBy\":\"1\"}}],\"listeners\":{}}",
+      "uiStateJSON": "{}",
+      "description": "",
+      "version": 1,
+      "kibanaSavedObjectMeta": {
+        "searchSourceJSON": {"Fn::Sub":"{\"index\":\"${ESVar.MetricsIndex}\",\"query\":{\"query_string\":{\"query\":\"entireResponse.got_hits=0\",\"analyze_wildcard\":true}},\"filter\":[]}"}
       }
     }
   },
@@ -204,7 +228,7 @@ module.exports=[
     "_type": "visualization",
     "_index":".kibana",
     "_source": {
-      "title": "Anwsers with positive feedback",
+      "title": "Answers with positive feedback",
       "visState":JSON.stringify({
           "aggs": [
             {
@@ -234,7 +258,7 @@ module.exports=[
             "orientation": "single",
             "scale": "linear"
           },
-          "title":"Anwsers with positive feedback",
+          "title":"Answers with positive feedback",
           "type": "tagcloud"
       }),
       "uiStateJSON": "{}",
@@ -250,7 +274,7 @@ module.exports=[
     "_type": "visualization",
     "_index":".kibana",
     "_source": {
-      "title": "Anwsers with negative feedback",
+      "title": "Answers with negative feedback",
       "visState":JSON.stringify({
           "aggs": [
             {
@@ -280,7 +304,7 @@ module.exports=[
             "orientation": "single",
             "scale": "linear"
           },
-          "title":"Anwsers with negative feedback",
+          "title":"Answers with negative feedback",
           "type": "tagcloud"
       }),
       "uiStateJSON": "{}",

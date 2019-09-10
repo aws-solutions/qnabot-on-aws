@@ -17,7 +17,7 @@ function run_query(req, query_params){
     });  
 }
 
-function get_answer(req){
+function get_answer(req, res){
     var query_params = {
         question: req.question,
         topic: _.get(req,'session.topic',''),
@@ -28,10 +28,12 @@ function get_answer(req){
     .then( function(response){
         var hit = _.get(response,"hits.hits[0]._source");
         if (hit){
+            res['got_hits']=1;  // response flag, used in logging / kibana
             return response;
         } else {
             console.log("No hits from query - searching instead for: " + no_hits_question);
             query_params['question'] = no_hits_question;
+            res['got_hits']=0;  // response flag, used in logging / kibana
             return run_query(req, query_params);
         }
     });
@@ -40,7 +42,7 @@ function get_answer(req){
 module.exports=function(req,res){
     console.log("REQ:",JSON.stringify(req,null,2));
     console.log("RES:",JSON.stringify(res,null,2));
-    return(get_answer(req))
+    return(get_answer(req, res))
     .then(function(result){
         console.log("ES result:"+JSON.stringify(result,null,2))
         res.result=_.get(result,"hits.hits[0]._source")
