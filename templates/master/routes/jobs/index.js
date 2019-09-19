@@ -12,6 +12,47 @@ module.exports={
         subTemplate:"jobs/info",
         resource:{"Ref":"Jobs"}
     }),
+    "testalls": resource('testall',{"Ref":"Jobs"}),
+    "testallsList":lambda({
+        authorization:"AWS_IAM",
+        method:"get",
+        lambda:{"Fn::GetAtt":["S3ListLambda","Arn"]},
+        subTemplate:fs.readFileSync(__dirname+'/list-testall.vm','utf8'),
+        resource:{"Ref":"testalls"},
+        parameterLocations:{
+            "method.request.querystring.perpage":false,
+            "method.request.querystring.token":false
+        }
+    }),
+    "testall": resource('{proxy+}',{"Ref":"testalls"}),
+    "testallPut":proxy({
+        resource:{"Ref": "testall"},
+        method:"PUT",
+        bucket:{"Ref":"TestAllBucket"},
+        path:"/status/{proxy}",
+        template:fs.readFileSync(`${__dirname}/testall-start.vm`,'utf-8'),
+        requestParams:{
+            "integration.request.path.proxy":"method.request.path.proxy"
+        }
+    }),
+    "testallGet":proxy({
+        resource:{"Ref": "testall"},
+        method:"GET",
+        bucket:{"Ref":"TestAllBucket"},
+        path:"/status/{proxy}",
+        requestParams:{
+            "integration.request.path.proxy":"method.request.path.proxy"
+        }
+    }),
+    "testallDelete":proxy({
+        resource:{"Ref": "testall"},
+        method:"delete",
+        bucket:{"Ref":"TestAllBucket"},
+        path:"/status/{proxy}",
+        requestParams:{
+            "integration.request.path.proxy":"method.request.path.proxy"
+        }
+    }),
     "exports": resource('exports',{"Ref":"Jobs"}),
     "exportsList":lambda({
         authorization:"AWS_IAM",

@@ -5,7 +5,7 @@ module.exports=Object.assign(
     "ImportCodeVersion":{
         "Type": "Custom::S3Version",
         "Properties": {
-            "ServiceToken": { "Fn::GetAtt" : ["CFNLambda", "Arn"] },
+            "ServiceToken": { "Ref" : "CFNLambda" },
             "Bucket": {"Ref":"BootstrapBucket"},
             "Key": {"Fn::Sub":"${BootstrapPrefix}/lambda/import.zip"},
             "BuildDate":(new Date()).toISOString()
@@ -45,9 +45,9 @@ module.exports=Object.assign(
         },
         "Environment": {
             "Variables": {
-                ES_INDEX:{"Fn::GetAtt":["Var","index"]},
-                ES_ENDPOINT:{"Fn::GetAtt":["ESVar","ESAddress"]},
-                ES_PROXY:{"Fn::GetAtt":["ESProxyLambda","Arn"]}
+                ES_INDEX:{"Ref":"VarIndex"},
+                ES_ENDPOINT:{"Ref":"EsEndpoint"},
+                ES_PROXY:{"Ref":"EsProxyLambda"}
             }
         },
         "Handler": "index.step",
@@ -99,10 +99,17 @@ module.exports=Object.assign(
               "Action": [
                 "lambda:InvokeFunction"
               ],
-              "Resource":[{"Fn::GetAtt":["ESProxyLambda","Arn"]}]
+              "Resource":[{"Ref":"EsProxyLambda"}]
           }]
         }
       }
+    },
+    "ImportClear":{
+        "Type": "Custom::S3Clear",
+        "Properties": {
+            "ServiceToken": { "Ref" : "CFNLambda" },
+            "Bucket":{"Ref":"ImportBucket"}
+        }
     }
 })
 

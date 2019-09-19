@@ -71,6 +71,9 @@
                   ],
                   "Resource": [{"Fn::Sub":
                     "arn:aws:s3:::${ImportBucket}/data/*"
+                    },
+                    {"Fn::Sub":
+                    "arn:aws:s3:::${TestAllBucket}/data/*"
                     }]
                 },{
                   "Effect": "Allow",
@@ -79,6 +82,9 @@
                   ],
                   "Resource": [{"Fn::Sub":
                     "arn:aws:s3:::${ExportBucket}/data/*"
+                    },
+                    {"Fn::Sub":
+                    "arn:aws:s3:::${TestAllBucket}/data/*"
                     }]
                 }
               ]

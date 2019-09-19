@@ -11,9 +11,17 @@ exports.handler = (event, context, callback) => {
         MaxKeys:event.perpage || 100,
         Marker:event.token || null
     }).promise()
-    .then(x=>{
-        console.log("s3 response:",JSON.stringify(x,null,2))
-        callback(null,{
+        .then(x => {
+            if (x.Contents && Array.isArray(x.Contents)) {
+                x.Contents.sort((a, b) => {
+                    if (a.LastModified && b.LastModified) {
+                        return new Date(b.LastModified).getTime() - new Date(a.LastModified).getTime();
+                    } else {
+                        return 0;
+                    }
+                })
+            }
+            callback(null, {
             token:x.NextMarker,
             jobs:x.Contents.map(y=>{return {
                 id:y.Key.split('/').pop(),

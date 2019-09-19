@@ -10,6 +10,7 @@
         )
           v-tab.title(ripple href="#questions" id="questions-tab") Questions
           v-tab.title(ripple href="#test" id="test-tab") Test
+          v-tab.title(ripple href="#testAll" id="testAll-tab") Test All
         v-spacer
         v-menu(bottom left)
           v-btn.white--text(icon slot="activator" id="edit-sub-menu")
@@ -22,7 +23,9 @@
     span
       questions(@filter="get(pagination)" v-if="active==='questions'")
       test(v-if="active==='test'")
+      testAll(v-if="active==='testAll'")
     v-data-table(
+      v-if="active!=='testAll'"
       :headers="headers"
       :items="QAs"
       :search="search"
@@ -139,6 +142,7 @@ module.exports={
     qa:require('./qa.vue'),
     questions:require('./menu-questions.vue'),
     test:require('./menu-test.vue'),
+    testAll:require('./menu-testall.vue'),
     delete:require('./delete.vue'),
     edit:require('./edit.vue'),
     build:require('./rebuild.vue'),

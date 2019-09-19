@@ -1,37 +1,8 @@
 module.exports={
-    "ImportBucket":{
-        "Type" : "AWS::S3::Bucket",
-        "Properties":{
-            LifecycleConfiguration:{
-                Rules:[{
-                    ExpirationInDays:1,
-                    Status:"Enabled"
-                }]
-            },
-            "VersioningConfiguration":{
-                "Status":"Enabled"
-            },
-            "CorsConfiguration":{
-                CorsRules:[{
-                    AllowedHeaders:['*'],
-                    AllowedMethods:['PUT'],
-                    AllowedOrigins:['*']
-                }]
-            }
-        }
-    },
-    "ImportClear":{
-        "Type": "Custom::S3Clear",
-        "DependsOn":["CFNInvokePolicy"],
-        "Properties": {
-            "ServiceToken": { "Fn::GetAtt" : ["CFNLambda", "Arn"] },
-            "Bucket":{"Ref":"ImportBucket"}
-        }
-    },
-    "ImportTrigger":{
+    "ImportTriggerFromS3":{
         "Type": "Custom::S3Lambda",
         "Properties": {
-            "ServiceToken": { "Fn::GetAtt" : ["CFNLambda", "Arn"] },
+            "ServiceToken": { "Ref" : "CFNLambda" },
             "Bucket":{"Ref":"ImportBucket"},
             NotificationConfiguration:{
                 LambdaFunctionConfigurations:[{

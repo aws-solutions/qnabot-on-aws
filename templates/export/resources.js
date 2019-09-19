@@ -1,11 +1,16 @@
 var fs=require('fs')
+var _=require('lodash')
+
+var files=fs.readdirSync(`${__dirname}`)
+    .filter(x=>!x.match(/README.md|Makefile|index|test|outputs/))
+    .map(x=>require(`./${x}`))
 
 module.exports=Object.assign(
-    require('./bucket'),{
+    {
     "ExportCodeVersion":{
         "Type": "Custom::S3Version",
         "Properties": {
-            "ServiceToken": { "Fn::GetAtt" : ["CFNLambda", "Arn"] },
+            "ServiceToken": { "Ref" : "CFNLambda" },
             "Bucket": {"Ref":"BootstrapBucket"},
             "Key": {"Fn::Sub":"${BootstrapPrefix}/lambda/export.zip"},
             "BuildDate":(new Date()).toISOString()
@@ -21,9 +26,9 @@ module.exports=Object.assign(
         },
         "Environment": {
             "Variables": {
-                ES_INDEX:{"Fn::GetAtt":["Var","index"]},
-                ES_ENDPOINT:{"Fn::GetAtt":["ESVar","ESAddress"]},
-                ES_PROXY:{"Fn::GetAtt":["ESProxyLambda","Arn"]}
+                ES_INDEX:{"Ref":"VarIndex"},
+                ES_ENDPOINT:{"Ref":"EsEndpoint"},
+                ES_PROXY:{"Ref":"EsProxyLambda"}
             }
         },
         "Handler": "index.step",
@@ -75,10 +80,17 @@ module.exports=Object.assign(
               "Action": [
                 "lambda:InvokeFunction"
               ],
-              "Resource":[{"Fn::GetAtt":["ESProxyLambda","Arn"]}]
+              "Resource":[{"Ref":"EsProxyLambda"}]
           }]
         }
       }
+    },
+    "ExportClear":{
+        "Type": "Custom::S3Clear",
+        "Properties": {
+            "ServiceToken": { "Ref" : "CFNLambda" },
+            "Bucket":{"Ref":"ExportBucket"}
+        }
     }
 })
 
