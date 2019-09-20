@@ -18,11 +18,16 @@ module.exports=class S3Lambda extends base{
         .catch(reply)
     }
 
+    /**
+     Delete has in the past removed the putBucketNotificationConfiguration by setting
+     the configuration to an empty array. Change to support upgrading a stack to the new
+     use of nested stacks for import and export. The deletion of the original resources
+     occurred after the new configuration had been set. This caused import and export
+     to fail as the creation event of job files in the S3 bucket went unnoticed. This fix
+     has no impact on bucket cleanup / removal.
+     */
     Delete(ID,params,reply){
-        params
-            .NotificationConfiguration
-            .LambdaFunctionConfigurations=[]
-        this.Create(params,reply) 
+        reply(null);
     }
 }
 
