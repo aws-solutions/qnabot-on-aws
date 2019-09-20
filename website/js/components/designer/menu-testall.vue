@@ -192,7 +192,15 @@ data:function(){
           for (let idx=1; idx<rows.length; idx++) {
               if (rows[idx].length>0) {
                   let currentRow = rows[idx].split(',');
-                  dataRows.push(currentRow);
+                  if (currentRow.length > 6) {
+                      // handle case where ',' appears in last column and join into a single column'
+                      let revisedRow = currentRow.slice(0,5);
+                      let additions = currentRow.slice(5);
+                      revisedRow.push(additions.join(","));
+                      dataRows.push(revisedRow);
+                  } else {
+                      dataRows.push(currentRow);
+                  }
               }
           }
           this.tableHeader = rows[0].split(',');

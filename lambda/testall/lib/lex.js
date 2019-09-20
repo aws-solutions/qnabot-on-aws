@@ -30,14 +30,14 @@ function processWithLex(data, filter) {
                    if (res_qid === undefined) {
                        res_qid = "NO_QID_IN_RESPONSE";
                    }
-                   let res_msg = resp.message;
+                   let res_msg = `"${resp.message}"`;
                    let result_matches = 'No';
                    if (exp_qid === res_qid) {
                        result_matches = 'Yes';
                    }
                    res += result_matches + ',' + question + ',' + topic + ',' + exp_qid + ',' + res_qid + ',' + res_msg + '\n';
                } catch (err) {
-                   let msg = `${err.toString().replace(/\n/g, '')}`
+                   let msg = `"${err.toString().replace(/\n/g, '')}"`
                    res += 'No' + ',' + question + ',' + topic + ',' + exp_qid + ',' + 'undefined' + ',' + msg + '\n';
                }
            }
