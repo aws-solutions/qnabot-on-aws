@@ -30,7 +30,9 @@ function processWithLex(data, filter) {
                    if (res_qid === undefined) {
                        res_qid = "NO_QID_IN_RESPONSE";
                    }
-                   let res_msg = `"${resp.message}"`;
+                   let m1 = resp.message.toString().replace(/\"/g,'');
+                   m1 = m1.replace(/(\r\n)+|\r+|\n+|\t+/i,' ');
+                   let res_msg = `"${m1}"`;
                    let result_matches = 'No';
                    if (exp_qid === res_qid) {
                        result_matches = 'Yes';
