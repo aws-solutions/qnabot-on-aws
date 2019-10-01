@@ -41,7 +41,7 @@ module.exports={
     top:["q","a"]
   }},
   components:{
-    display:require('./display.vue')
+    display:require('./display.vue').default
   },
   computed:{
     type:function(){

@@ -139,14 +139,14 @@ module.exports={
     }]
   }},
   components:{
-    qa:require('./qa.vue'),
-    questions:require('./menu-questions.vue'),
-    test:require('./menu-test.vue'),
-    testAll:require('./menu-testall.vue'),
-    delete:require('./delete.vue'),
-    edit:require('./edit.vue'),
-    build:require('./rebuild.vue'),
-    alexa:require('./alexa.vue'),
+    qa:require('./qa.vue').default,
+    questions:require('./menu-questions.vue').default,
+    test:require('./menu-test.vue').default,
+    testAll:require('./menu-testall.vue').default,
+    delete:require('./delete.vue').default,
+    edit:require('./edit.vue').default,
+    build:require('./rebuild.vue').default,
+    alexa:require('./alexa.vue').default,
   },
   computed:{
     empty:function(){

@@ -62,8 +62,8 @@ module.exports={
     }
   },
   components:{
-    add:require('./add.vue'),
-    delete:require('./delete.vue')
+    add:require('./add.vue').default,
+    delete:require('./delete.vue').default
   },
   computed:{},
   methods:{

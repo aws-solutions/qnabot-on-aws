@@ -18,7 +18,7 @@ module.exports=function(App){
             try {
                 var card=JSON.parse(value)
                 var v =new  (require('jsonschema').Validator)();
-                var valid=v.validate(card,require('./store/api/card-schema')).valid
+                var valid=v.validate(card,require('./store/api/card-schema.json')).valid
                 return valid
             } catch(e){
                 return false

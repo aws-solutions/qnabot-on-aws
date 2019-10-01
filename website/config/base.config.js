@@ -10,28 +10,19 @@ or in the "license" file accompanying this file. This file is distributed on an 
 BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied. See the
 License for the specific language governing permissions and limitations under the License.
 */
-var config=require('../../config')
-var CompressionPlugin = require("compression-webpack-plugin")
 var path=require('path')
+const VueLoaderPlugin = require('vue-loader/lib/plugin');
 var CopyWebpackPlugin = require('copy-webpack-plugin');
 var HtmlWebpackPlugin = require('html-webpack-plugin');
-var LodashModuleReplacementPlugin = require('lodash-webpack-plugin');
-var FaviconPlugin=require('favicons-webpack-plugin')
-var webpack=require('webpack')
-var _=require('lodash')
-const ExtractTextPlugin = require("extract-text-webpack-plugin");
-
-const extractSass = new ExtractTextPlugin({
-    filename: "[name].css"
-});
+var _=require('lodash');
 
 module.exports={
     entry:{
         main:["babel-polyfill","./entry.js"],
-        check:["babel-polyfill","./js/browser-check.js"],
+        check:["./js/browser-check.js"],
         client:["babel-polyfill","./js/client.js"],
         test:["babel-polyfill","./js/test.js"],
-        vendor:["babel-polyfill","aws-sdk"]
+        vendor:["aws-sdk"]
     },
     output:{
         path:path.join(__dirname,'../build'),
@@ -39,11 +30,7 @@ module.exports={
         chunkFilename: '[name].js', 
     },
     plugins:_.compact([
-        new webpack.optimize.CommonsChunkPlugin({
-            name:'vendor',
-            minChunks:2
-        }),
-        extractSass,
+        new VueLoaderPlugin(),
         new CopyWebpackPlugin([{from:'./assets',to:"assets"}]),
         new CopyWebpackPlugin([{
             from:'../node_modules/aws-lex-web-ui/dist/wav-worker.min.js',
@@ -70,67 +57,78 @@ module.exports={
             inject:false
         })
     ]),
-    resolve:{
-        alias:{
+    resolve: {
+        modules: [path.resolve(__dirname, '../../'), 'node_modules'],
+        extensions: [ '.js', '.vue', '.pug', '.styl', '.scss', '.css' ],
+        alias: {
             vue$:'vue/dist/vue.js',
             handlebars: 'handlebars/dist/handlebars.min.js',
             querystring: 'querystring-browser'
         }
     },
     module: {
-        rules: [{
-            test: /\.js$/,
-            exclude:/node_modules/,
-            loader: 'babel-loader',
-            query: {
-                presets: ['env']
-            }
-          },
-          {
-            test: /\.(md|txt)$/,
-            loader: 'raw-loader'
-          },
-          {
-            test: /\.vue$/,
-            loader: 'vue-loader',
-            options: {
-              loaders: {
-                'scss': 'vue-style-loader!css-loader!sass-loader',
-                'sass': 'vue-style-loader!css-loader!sass-loader?indentedSyntax',
-                js:{
-                    loader:'babel-loader',
-                    options:{
-                        presets: ['env']
+        rules: [
+            {
+                test: /\.js$/,
+                exclude:/node_modules/,
+                loader: 'babel-loader',
+                query: {
+                    presets: ['env']
+                }
+            },
+            {
+                test: /\.(md|txt)$/,
+                loader: 'raw-loader'
+            },
+            {
+                test: /\.vue$/,
+                loader: 'vue-loader',
+                options: {
+                    loaders: {
+                        'scss': 'vue-style-loader!css-loader!sass-loader',
+                        'sass': 'vue-style-loader!css-loader!sass-loader?indentedSyntax',
+                        js:{
+                            loader:'babel-loader',
+                            options:{
+                                presets: ['env']
+                            }
+                        }
                     }
                 }
-              }
-            }
-          },
-          { 
-            test: /\.(png|woff|woff2|eot|ttf|svg)$/, 
-            loader: 'url-loader?limit=100000' 
-          },
-          {
-            test: /\.pug$/,
-            loader: 'pug-loader'
-          },
-          {
-            test: /\.css$/,
-            use: ['style-loader','css-loader']
-          },
-          {
-            test: /\.styl$/,
-            use: ['style-loader','css-loader','stylus-loader']
-          },
-          {
-            test: /\.scss$/,
-            use: extractSass.extract({
+            },
+            {
+                test: /\.(png|woff|woff2|eot|ttf|svg)$/,
+                loader: 'url-loader?limit=100000'
+            },
+            {
+                test: /\.pug$/,
+                oneOf: [
+                    {
+                        resourceQuery: /^\?vue/,
+                        use: ['pug-plain-loader'],
+                    },
+                    {
+                        use: ['raw-loader', 'pug-plain-loader']
+                    }
+                ]
+            },
+            {
+                test: /\.css$/,
+                use: ['vue-style-loader', 'css-loader']
+            },
+            {
+                test: /\.styl$/,
+                use: ['style-loader','css-loader','stylus-loader']
+            },
+
+            {
+                test: /\.scss$/,
                 use:[
-                    {loader: "css-loader" }, 
+                    {loader: "vue-style-loader"},
+                    {loader: "css-loader" },
                     {loader: "sass-loader" }
                 ]
-            })
-          }
+            }
         ]
     }
 }

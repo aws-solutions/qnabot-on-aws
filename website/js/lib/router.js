@@ -18,26 +18,26 @@ module.exports={
     routes:[
         {   path:'/alexa',
             name:"alexa",
-            component:require('../components/alexa/index.vue')
+            component:require('../components/alexa/index.vue').default
         },
         {   path:'/hooks',
             name:"hooks",
-            component:require('../components/hooks/index.vue')
+            component:require('../components/hooks/index.vue').default
         },
         {   path:'/import',
             name:"import",
-            component:require('../components/import.vue')
+            component:require('../components/import.vue').default
         },
         {   path:'/export',
             name:"export",
-            component:require('../components/export.vue')
+            component:require('../components/export.vue').default
         },
         {   path:'/edit',
             name:"edit",
-            component:require('../components/designer/index.vue')
+            component:require('../components/designer/index.vue').default
         },
         {   path:'/loading',
-            component:require('../components/loading.vue')
+            component:require('../components/loading.vue').default
         }
     ]
 }

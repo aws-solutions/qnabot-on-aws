@@ -25,6 +25,7 @@ import IdleVue from 'idle-vue'
 var Idle=require('idle-js')
 var validate=require('vee-validate')
 import VueClipboard from 'vue-clipboard2'
+import app from './admin.vue'
 var _=require('lodash')
 
 Vue.use(validate,{
@@ -67,16 +68,16 @@ function init(){
         store:store,
         startAtIdle:false
     })
-    System.import(/* webpackChunkName: "admin-page" */'./admin.vue')
-    .then(function(app){
-        var App=new Vue({
-            router,
-            store,
-            render:h=>h(app)
-        })
-        
-        require('./lib/validator')(App)        
-        store.state.modal=App.$modal
-        router.onReady(()=>App.$mount('#App'))
+
+
+    var App=new Vue({
+        router,
+        store,
+        render:h=>h(app)
     })
+
+    require('./lib/validator')(App)
+    store.state.modal=App.$modal
+    router.onReady(()=>App.$mount('#App'))
+
 }

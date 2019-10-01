@@ -86,7 +86,7 @@ module.exports={
     }
   },
   components:{
-    "schema-input":require('./input.vue')
+    "schema-input":require('./input.vue').default
   },
   computed:{
     type:function(){

@@ -18,7 +18,7 @@
         v-card-text.pb-0
           .title document type
           v-radio-group(v-model="type" row)
-            v-radio(v-for="t in types" :label='t' :value="t")
+            v-radio(v-for="t in types" v-bind:key='t' :label='t' :value="t")
         v-card-text.pt-0
           v-form(v-if="dialog")
             schema-input( 
@@ -87,7 +87,7 @@ module.exports={
     }
   },
   components:{
-    "schema-input":require('./input.vue')
+    "schema-input":require('./input.vue').default
   },
   computed:{
     types:function(){
