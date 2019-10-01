@@ -1,0 +1,14 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: >
+  Template for solarflare code bucket
+
+Resources:
+
+  SolarFlareOutputBucket:
+    Type: AWS::S3::Bucket
+
+Outputs:
+
+  S3Bucket:
+    Value: !Ref SolarFlareOutputBucket
+    Description: SolarFlare S3 code Bucket
