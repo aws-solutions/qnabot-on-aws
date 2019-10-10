@@ -101,7 +101,6 @@ or in the "license" file accompanying this file. This file is distributed on an 
 BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied. See the
 License for the specific language governing permissions and limitations under the License.
 */
-
 var Vuex=require('vuex')
 var Promise=require('bluebird')
 var _=require('lodash')
@@ -195,12 +194,14 @@ module.exports={
   },
   methods:{
     get:_.debounce(async function(event){
-      this.selectAll=false
-      await this.$store.dispatch('data/get',{
-        page:event.page-1,
-        perpage:event.rowsPerPage,
-        order:event.descending ? 'desc' : 'asc'
-      }) 
+        if (this.active === 'questions') {
+            this.selectAll = false
+            await this.$store.dispatch('data/get', {
+                page: event.page - 1,
+                perpage: event.rowsPerPage,
+                order: event.descending ? 'desc' : 'asc'
+            })
+        }
     },100,{trailing:true,leading:false}),
     changeSort:_.debounce(function(column) {
       if(this.tab==='questions'){
