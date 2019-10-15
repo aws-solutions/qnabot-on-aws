@@ -1,32 +1,48 @@
 //start connection
-var Promise=require('bluebird')
-var bodybuilder = require('bodybuilder')
-var aws=require('aws-sdk')
-var url=require('url')
-var _=require('lodash')
-var request=require('./request')
+var _=require('lodash');
+var request=require('./request');
+var build_es_query=require('./esbodybuilder');
+
+var no_hits_question = process.env.ES_NO_HITS_QUESTION || "no_hits";
+
+
+function run_query(req, query_params){
+    return(build_es_query(query_params))
+    .then( function(es_query) {
+        return request({
+            url:`https://${req._info.es.address}/${req._info.es.index}/${req._info.es.type}/_search?search_type=dfs_query_then_fetch`,
+            method:"GET",
+            body:es_query
+        });
+    });  
+}
+
+function get_answer(req, res){
+    var query_params = {
+        question: req.question,
+        topic: _.get(req,'session.topic',''),
+        from: 0,
+        size: 1
+    };
+    return(run_query(req, query_params))
+    .then( function(response){
+        var hit = _.get(response,"hits.hits[0]._source");
+        if (hit){
+            res['got_hits']=1;  // response flag, used in logging / kibana
+            return response;
+        } else {
+            console.log("No hits from query - searching instead for: " + no_hits_question);
+            query_params['question'] = no_hits_question;
+            res['got_hits']=0;  // response flag, used in logging / kibana
+            return run_query(req, query_params);
+        }
+    });
+}
 
 module.exports=function(req,res){
-    console.log(JSON.stringify({req,res},null,2))
-    var query=bodybuilder()
-    .orQuery('nested',{
-        path:'questions',
-        score_mode:'sum',
-        boost:2},
-        q=>q.query('match','questions.q',req.question)
-    )
-    .orQuery('match','a',req.question)
-    .orQuery('match','t',_.get(req,'session.topic',''))
-    .from(0)
-    .size(1)
-    .build()
-
-    console.log("ElasticSearch Query",JSON.stringify(query,null,2))
-    return request({
-        url:`https://${req._info.es.address}/${req._info.es.index}/${req._info.es.type}/_search?search_type=dfs_query_then_fetch`,
-        method:"GET",
-        body:query
-    })
+    console.log("REQ:",JSON.stringify(req,null,2));
+    console.log("RES:",JSON.stringify(res,null,2));
+    return(get_answer(req, res))
     .then(function(result){
         console.log("ES result:"+JSON.stringify(result,null,2))
         res.result=_.get(result,"hits.hits[0]._source")
@@ -103,3 +119,4 @@ module.exports=function(req,res){
         console.log("RESULT",JSON.stringify(req),JSON.stringify(res))
     })
 }
+

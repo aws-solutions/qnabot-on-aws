@@ -10,49 +10,42 @@
     #set ( $from = $input.params('from') )
 #end
 
+#if ( $input.params('order').length()==0 )
+    #set ( $order = "asc" )
+#else
+    #set ( $order = $input.params('order') )
+#end
+    
 {
     "endpoint":"${ESVar.ESAddress}",
     "method":"POST",
+
+    
     #if($input.params('query').length()>0)
-        "path":"/${Var.index}/${Var.QnAType}/_search?search_type=dfs_query_then_fetch",
+    "path":"/${Var.index}/${Var.QnAType}/_search?search_type=dfs_query_then_fetch",
+    "question": "$util.urlDecode($input.params('query'))",
     #else
-        "path":"/${Var.index}/_search?search_type=dfs_query_then_fetch",
+    "path":"/${Var.index}/_search?search_type=dfs_query_then_fetch",
+    "question": "",
     #end
+    
+    #if ($input.params('topic'))
+    "topic": "$util.urlDecode($input.params('topic'))",
+    #else
+    "topic": "",
+    #end
+
+    "size":"$perpage",
+    "from":"$from",
+
+
     "body":{
+        #if($input.params('query').length()>0)
+        "comment": "ES Query for test queries are now built dynamically by ESProxy Lambda handler."
+        #else
         "size":"$perpage",
         "from":"$from",
         "query": {
-            #if($input.params('query').length()>0)
-                #if ( !$input.params('topic') )
-                    #set ( $topic = "" )
-                #else
-                    #set ( $topic = $util.urlDecode($input.params('topic')) )
-                #end
-
-            "bool": {
-                "should": [{
-                    "multi_match": {
-                        "query": "$util.urlDecode($input.params('query'))",
-                        "fields" : ["a"]
-                    }},
-                    {"multi_match": {
-                        "query": "$topic",
-                        "fields" : ["t"]
-                    }},
-                    {"nested":{  
-                        "path":"questions",
-                        "score_mode":"sum",
-                        "boost":2,
-                        "query":{  
-                            "match":{  
-                                "questions.q":"$util.urlDecode($input.params('query'))"
-                            }
-                        }
-                    }} 
-                ]
-            }
-            #end
-            #if($input.params('query').length()==0)
             "bool":{
                 #if($input.params('filter').length()==0)
                 "must":{"match_all":{}}
@@ -62,15 +55,7 @@
                 }}
                 #end
             }
-            #end
         }
-        #if($input.params('query').length()==0)
-            #if ( $input.params('order').length()==0 )
-                #set ( $order = "asc" )
-            #else
-                #set ( $order = $input.params('order') )
-            #end
-
         ,"sort":{
             "qid":{
                 "order":"$order" 
