@@ -24,7 +24,7 @@ exports.parse=function(event){
                 response:{
                     outputSpeech:{
                         type:"PlainText",
-                        text:"Hello, Please ask a question"
+                        text: (process.env.DEFAULT_ALEXA_LAUNCH_MESSAGE ? process.env.DEFAULT_ALEXA_LAUNCH_MESSAGE : "Hello, Please ask a question")
                     },
                     shouldEndSession:false
                 }
@@ -65,7 +65,7 @@ exports.parse=function(event){
                 response:{
                     outputSpeech:{
                         type:"PlainText",
-                        text:"GoodBye"
+                        text:(process.env.DEFAULT_ALEXA_STOP_MESSAGE ? process.env.DEFAULT_ALEXA_STOP_MESSAGE :"GoodBye")
                     },
                     shouldEndSession:true
                 }

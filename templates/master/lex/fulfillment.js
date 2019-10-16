@@ -43,7 +43,9 @@ module.exports={
             ES_SERVICE_QID:{"Ref":"ESQidLambda"},
             ES_SERVICE_PROXY:{"Ref":"ESProxyLambda"},
             "ERRORMESSAGE":config.ErrorMessage,
-            "EMPTYMESSAGE":config.EmptyMessage
+            "EMPTYMESSAGE":config.EmptyMessage,
+            "DEFAULT_ALEXA_LAUNCH_MESSAGE":config.DefaultAlexaLaunchMessage,
+            "DEFAULT_ALEXA_STOP_MESSAGE":config.DefaultAlexaStopMessage
           },examples)
         },
         "Handler": "index.handler",
