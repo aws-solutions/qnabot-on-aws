@@ -20,8 +20,9 @@ var Intent=require('./intent')
 var _=require('lodash')
 var run=require('./run')
 
-module.exports=async function(version,data){
-    data.intents[0].intentVersion=version
+module.exports=async function(versionobj,data){
+    data.intents[0].intentVersion=versionobj.intent_version
+    data.intents[1].intentVersion=versionobj.intentFallback_version
     delete data.status
     delete data.failureReason
     delete data.lastUpdatedDate
