@@ -110,6 +110,9 @@ module.exports={
     },
     "UsersTable":{
       "Value":{"Ref":"UsersTable"}
+    },
+    "SettingsSSMParameterName":{
+      "Value":{"Ref":"QnABotSettings"}
     }
   },
   "Parameters": {
