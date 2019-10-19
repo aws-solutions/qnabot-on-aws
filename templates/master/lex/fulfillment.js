@@ -1,7 +1,7 @@
 var config=require('./config')
 var _=require('lodash')
 
-examples=_.fromPairs(require('../../examples/outputs')
+var examples=_.fromPairs(require('../../examples/outputs')
     .names
     .map(x=>{
         return [x,{"Fn::GetAtt":["ExamplesStack",`Outputs.${x}`]}]
@@ -42,10 +42,8 @@ module.exports={
             LAMBDA_LOG:{"Ref":"ESLoggingLambda"},
             ES_SERVICE_QID:{"Ref":"ESQidLambda"},
             ES_SERVICE_PROXY:{"Ref":"ESProxyLambda"},
-            "ERRORMESSAGE":config.ErrorMessage,
-            "EMPTYMESSAGE":config.EmptyMessage,
-            "DEFAULT_ALEXA_LAUNCH_MESSAGE":config.DefaultAlexaLaunchMessage,
-            "DEFAULT_ALEXA_STOP_MESSAGE":config.DefaultAlexaStopMessage
+            DYNAMODB_USERSTABLE:{"Ref":"UsersTable"},
+            SETTINGS_PARAM:{"Ref":"QnABotSettings"},
           },examples)
         },
         "Handler": "index.handler",
@@ -80,6 +78,41 @@ module.exports={
                 .map(x=>{
                     return {"Fn::GetAtt":["ExamplesStack",`Outputs.${x}`]}
                 }))
+            }]
+        },
+        "Roles": [{"Ref": "FulfillmentLambdaRole"}]
+      }
+    },
+    "DynamoDBPolicy": {
+      "Type": "AWS::IAM::ManagedPolicy",
+      "Properties": {
+        "PolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [{
+              "Effect": "Allow",
+              "Action": [
+                "dynamodb:GetItem",
+                "dynamodb:PutItem",
+              ],
+              "Resource":[
+                {"Fn::GetAtt":["UsersTable","Arn"]}
+              ]
+            }]
+        },
+        "Roles": [{"Ref": "FulfillmentLambdaRole"}]
+      }
+    },
+    "ParamStorePolicy": {
+      "Type": "AWS::IAM::ManagedPolicy",
+      "Properties": {
+        "PolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [{
+              "Effect": "Allow",
+              "Action": [
+                "ssm:GetParameter"
+              ],
+              "Resource":["*"]
             }]
         },
         "Roles": [{"Ref": "FulfillmentLambdaRole"}]

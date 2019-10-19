@@ -3,9 +3,6 @@ var _=require('lodash');
 var request=require('./request');
 var build_es_query=require('./esbodybuilder');
 
-var no_hits_question = process.env.ES_NO_HITS_QUESTION || "no_hits";
-
-
 function run_query(req, query_params){
     return(build_es_query(query_params))
     .then( function(es_query) {
@@ -22,8 +19,13 @@ function get_answer(req, res){
         question: req.question,
         topic: _.get(req,'session.topic',''),
         from: 0,
-        size: 1
+        size: 1,
+        minimum_should_match: _.get(req,'_settings.ES_MINIMUM_SHOULD_MATCH'),
+        use_keyword_filters: _.get(req,'_settings.ES_USE_KEYWORD_FILTERS'),
+        keyword_syntax_types: _.get(req,'_settings.ES_KEYWORD_SYNTAX_TYPES'),
+        syntax_confidence_limit: _.get(req,'_settings.ES_SYNTAX_CONFIDENCE_LIMIT'),
     };
+    var no_hits_question = _.get(req,'_settings.ES_NO_HITS_QUESTION','no_hits');
     return(run_query(req, query_params))
     .then( function(response){
         var hit = _.get(response,"hits.hits[0]._source");
@@ -114,7 +116,7 @@ module.exports=function(req,res){
             }
         }else{
             res.type="PlainText"
-            res.message=process.env.EMPTYMESSAGE
+            res.message=_.get(req,'_settings.EMPTYMESSAGE','You stumped me!');
         }
         console.log("RESULT",JSON.stringify(req),JSON.stringify(res))
     })

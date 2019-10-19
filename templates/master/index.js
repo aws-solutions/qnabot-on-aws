@@ -9,7 +9,7 @@ module.exports={
   "Resources":_.assign.apply({},files),
   "Conditions": {},
   "AWSTemplateFormatVersion": "2010-09-09",
-  "Description": `QnABot with admin and client websites - (Master v${process.env.npm_package_version})`,
+  "Description": "QnABot with admin and client websites",
   "Mappings": {},
   "Outputs": {
     "CognitoEndpoint":{
@@ -107,6 +107,9 @@ module.exports={
     },
     "ElasticsearchIndex":{
       "Value":{"Fn::GetAtt":["Var","index"]}
+    },
+    "UsersTable":{
+      "Value":{"Ref":"UsersTable"}
     }
   },
   "Parameters": {

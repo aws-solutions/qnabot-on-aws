@@ -1,5 +1,7 @@
+var _=require('lodash')
 var aws=require('../aws')
 var lambda= new aws.Lambda()
+
 
 exports.getLambdaArn=function(name){
     var match=name.match(/QNA:(.*)/)
@@ -34,7 +36,54 @@ exports.invokeLambda=async function(params){
             throw e
         }
     }else{
-        console.log(result.FunctionError)
-        throw result.FunctionError
+        switch(params.req._type){
+            case 'LEX':
+                var error_message = new LexError(_.get(params,'req._settings.ERRORMESSAGE',"Exception from Lambda Hook"));                
+                break;
+            case 'ALEXA':
+                var error_message = new AlexaError(_.get(params,'req._settings.ERRORMESSAGE',"Exception from Lambda Hook"));
+                break;
+        }
+
+        console.log("Error Response",JSON.stringify(error_message,null,2))
+        throw error_message
+    }
+}
+
+function Respond(message){
+    this.action="RESPOND"
+    this.message=message
+}
+
+function AlexaError(errormessage){
+    this.action="RESPOND"
+    this.message={
+        version:'1.0',
+        response:{
+            outputSpeech:{
+                type:"PlainText",
+                text:errormessage
+            },
+            card: {
+              type: "Simple",
+              title: "Processing Error",
+              content: errormessage
+            },
+            shouldEndSession:true
+        }
+    }
+}
+
+function LexError(errormessage) {
+    this.action="RESPOND"
+    this.message={
+        dialogAction:{
+            type:"Close",
+            fulfillmentState:"Fulfilled",
+            message: {
+                contentType: "PlainText",
+                content: errormessage
+            }
+        }
     }
 }
