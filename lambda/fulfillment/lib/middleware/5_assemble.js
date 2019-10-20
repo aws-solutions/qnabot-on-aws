@@ -10,9 +10,7 @@ function sms_hint(req,res) {
         if (_.get(req,"_settings.SMS_HINT_REMINDER_ENABLE") == 'true') {
             var interval_hrs = parseInt(_.get(req,'_settings.SMS_HINT_REMINDER_INTERVAL_HRS','24'));
             var hint_message = _.get(req,'_settings.SMS_HINT_REMINDER',"");
-            var now = new Date();
-            var lastSeen = Date.parse(req._userInfo.LastSeen.S || "1970/1/1 12:00:00");
-            var hours = Math.abs(now - lastSeen) / 36e5;
+            var hours = req._userInfo.TimeSinceLastInteraction / 36e5;
             if (hours >= interval_hrs) {
                 hint = hint_message;
                 console.log("Appending hint to SMS answer: ", hint);

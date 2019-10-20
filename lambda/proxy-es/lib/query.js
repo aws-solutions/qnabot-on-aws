@@ -2,6 +2,7 @@
 var _=require('lodash');
 var request=require('./request');
 var build_es_query=require('./esbodybuilder');
+var handlebars=require('./handlebars');
 
 function run_query(req, query_params){
     return(build_es_query(query_params))
@@ -46,9 +47,10 @@ module.exports=function(req,res){
     console.log("RES:",JSON.stringify(res,null,2));
     return(get_answer(req, res))
     .then(function(result){
-        console.log("ES result:"+JSON.stringify(result,null,2))
-        res.result=_.get(result,"hits.hits[0]._source")
-        if(res.result){
+        console.log("ES result:"+JSON.stringify(result,null,2));
+        var hit=_.get(result,"hits.hits[0]._source");
+        if(hit){
+            res.result=handlebars(req,hit);
             res.type="PlainText"
             res.message=res.result.a
             res.plainMessage=res.result.a

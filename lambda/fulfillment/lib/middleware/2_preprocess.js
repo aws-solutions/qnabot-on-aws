@@ -3,39 +3,46 @@ var Promise=require('bluebird');
 var util=require('./util');
 var AWS=require('aws-sdk');
 
-async function get_userInfo(userId, idtoken_payload) {
+async function get_userInfo(userId, idattrs) {
     var default_userInfo = {
-        UserId:{S:userId},
-        UserName:{S:"None"},
-        GivenName: {S: "None"},
-        FamilyName: {S: "None"},
-        Email: {S: "None"},
-        FirstSeen:{S:""},
-        LastSeen:{S:""},
-        InteractionCount:{N:0},
-        UserProperties:{S:JSON.stringify({})},
+        UserId:userId,
+        InteractionCount:0
     };
     var usersTable = process.env.DYNAMODB_USERSTABLE;
-    var ddb = new AWS.DynamoDB({apiVersion: '2012-08-10'});
+    var docClient = new AWS.DynamoDB.DocumentClient({apiVersion: '2012-08-10'});
     var params = {
         TableName: usersTable,
         Key: {
-            'UserId': {S: userId}
+            'UserId': userId
         },
     };
     console.log("Getting user info for user: ", userId, "from DynamoDB table: ", usersTable);
     var ddbResponse = {};
     try {
-        ddbResponse = await ddb.getItem(params).promise();
+        ddbResponse = await docClient.get(params).promise();
     }catch(e){
         console.log("DDB Exception caught.. can't retrieve userInfo: ", e)
     }
     console.log("DDB Response: ", ddbResponse);
     var req_userInfo = _.get(ddbResponse,"Item",default_userInfo);
-    _.set(req_userInfo, 'UserName.S', _.get(idtoken_payload,'preferred_username',"None"));
-    _.set(req_userInfo, 'GivenName.S', _.get(idtoken_payload,'given_name',"None"));
-    _.set(req_userInfo, 'FamilyName.S', _.get(idtoken_payload,'family_name',"None"));
-    _.set(req_userInfo, 'Email.S', _.get(idtoken_payload,'email',"None"));
+    // append user identity attributes if known
+    if (_.get(idattrs,'preferred_username')) {
+        _.set(req_userInfo, 'UserName', _.get(idattrs,'preferred_username'));
+    }
+    if (_.get(idattrs,'given_name')) {
+        _.set(req_userInfo, 'GivenName', _.get(idattrs,'given_name'));
+    }
+    if (_.get(idattrs,'family_name')) {
+        _.set(req_userInfo, 'FamilyName', _.get(idattrs,'family_name'));
+    }
+    if (_.get(idattrs,'email')) {
+        _.set(req_userInfo, 'Email', _.get(idattrs,'email'));
+    }
+    // append time since last seen
+    var now = new Date();
+    var lastSeen = Date.parse(req_userInfo.LastSeen || "1970/1/1 12:00:00");
+    var timeSinceLastInteraction = Math.abs(now - lastSeen)/1000; // seconds
+    _.set(req_userInfo, 'TimeSinceLastInteraction', timeSinceLastInteraction);
     console.log("Request User Info: ", req_userInfo);
     return req_userInfo;
 }
@@ -43,9 +50,9 @@ async function get_userInfo(userId, idtoken_payload) {
 async function update_userInfo(userId, req_userInfo) {
     var res_userInfo = _.cloneDeep(req_userInfo);
     var dt = new Date();
-    res_userInfo.FirstSeen.S = req_userInfo.FirstSeen.S || dt.toString();
-    res_userInfo.LastSeen.S = dt.toString();
-    res_userInfo.InteractionCount.N = (parseInt(req_userInfo.InteractionCount.N) + 1).toString();
+    res_userInfo.FirstSeen = req_userInfo.FirstSeen || dt.toString();
+    res_userInfo.LastSeen = dt.toString();
+    res_userInfo.InteractionCount = req_userInfo.InteractionCount + 1;
     console.log("Response User Info: ", res_userInfo);
     return res_userInfo;
 }
@@ -54,15 +61,15 @@ module.exports=async function preprocess(req,res){
 
     // lex-web-ui: If idtoken session attribute is present, decode it
     var idtoken = _.get(req,'_event.sessionAttributes.idtokenjwt');
-    var idtoken_payload={};
+    var idattrs={};
     if (idtoken) {
-        idtoken_payload = util.jwtdecode(idtoken);
-        console.log("Decoded idtoken:",idtoken_payload)
+        idattrs = util.jwtdecode(idtoken);
+        console.log("Decoded idtoken:",idattrs)
     }
     // Add _userInfo to req, from UsersTable
     // TODO Will need to rework logic if/when we link userid across clients (SMS,WebUI,Alexa)
     var userId = req._userId;
-    var req_userInfo = await get_userInfo(userId, idtoken_payload);
+    var req_userInfo = await get_userInfo(userId, idattrs);
     _.set(req,"_userInfo", req_userInfo);
     // Add _userInfo to res, with updated timestamps
     // May be further modified by lambda hooks

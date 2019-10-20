@@ -8,7 +8,7 @@ var AWS=require('aws-sdk');
 async function update_userInfo(res) {
     var dt = new Date();
     var usersTable = process.env.DYNAMODB_USERSTABLE;
-    var ddb = new AWS.DynamoDB({apiVersion: '2012-08-10'});
+    var docClient = new AWS.DynamoDB.DocumentClient({apiVersion: '2012-08-10'});
     var params = {
         TableName: usersTable,
         Item: res._userInfo,
@@ -16,7 +16,7 @@ async function update_userInfo(res) {
     console.log("Saving response user info to DynamoDB: ", params);
     var ddbResponse={}
     try {
-        ddbResponse = await ddb.putItem(params).promise();
+        ddbResponse = await docClient.put(params).promise();
     }catch(e){
         console.log("ERROR: DDB Exception caught - can't save userInfo: ", e)
     }
