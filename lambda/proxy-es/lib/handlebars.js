@@ -34,6 +34,7 @@ var apply_handlebars=function(req,hit){
     var context={
         LexOrAlexa: req._type,
         UserInfo: req._userInfo,
+        SessionAttributes: _.get(req,'session')
     }
     console.log("Apply handlebars preprocessing to ES Response. Context: ", context);
     var hit_out=_.cloneDeep(hit);
