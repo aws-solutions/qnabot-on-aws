@@ -43,7 +43,8 @@ module.exports={
             ES_SERVICE_QID:{"Ref":"ESQidLambda"},
             ES_SERVICE_PROXY:{"Ref":"ESProxyLambda"},
             DYNAMODB_USERSTABLE:{"Ref":"UsersTable"},
-            SETTINGS_PARAM:{"Ref":"QnABotSettings"},
+            DEFAULT_SETTINGS_PARAM:{"Ref":"DefaultQnABotSettings"},
+            CUSTOM_SETTINGS_PARAM:{"Ref":"CustomQnABotSettings"},
           },examples)
         },
         "Handler": "index.handler",

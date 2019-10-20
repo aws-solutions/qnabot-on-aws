@@ -4,17 +4,28 @@ var alexa=require('./alexa')
 var _=require('lodash')
 var AWS=require('aws-sdk');
 
-
-async function get_settings() {
-    var settings_param = process.env.SETTINGS_PARAM;
+async function get_parameter(param_name) {
     var ssm = new AWS.SSM();
     var params = {
-        Name: settings_param,
+        Name: param_name,
     };
-    console.log("Getting QnABot settings from SSM Parameter Store: ", settings_param);
     var response = await ssm.getParameter(params).promise();
-    var settings = JSON.parse(response.Parameter.Value);
-    console.log("Settings: ", settings);
+    var settings = JSON.parse(response.Parameter.Value); 
+    return settings;
+}
+
+async function get_settings() {
+    var default_settings_param = process.env.DEFAULT_SETTINGS_PARAM;
+    var custom_settings_param = process.env.CUSTOM_SETTINGS_PARAM;
+
+    console.log("Getting Default QnABot settings from SSM Parameter Store: ", default_settings_param);
+    var default_settings = await get_parameter(default_settings_param);
+    
+    console.log("Getting Custom QnABot settings from SSM Parameter Store: ", custom_settings_param);
+    var custom_settings = await get_parameter(custom_settings_param);
+
+    var settings = _.merge(default_settings, custom_settings);
+    console.log("Merged Settings: ", settings);
     return settings;    
 }
 

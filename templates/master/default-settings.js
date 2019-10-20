@@ -14,12 +14,20 @@ var default_settings = {
           }
 
 module.exports={
-    "QnABotSettings":{
+    "DefaultQnABotSettings":{
         "Type" : "AWS::SSM::Parameter",
         "Properties" : {
-            "Description" : "QnABot Configuration Settings",
+            "Description" : "Default QnABot Settings - DO NOT MODIFY",
             "Type" : "String",
             "Value" : JSON.stringify(default_settings)
+        }
+    },
+    "CustomQnABotSettings":{
+        "Type" : "AWS::SSM::Parameter",
+        "Properties" : {
+            "Description" : "Custom QnABot Settings - Modify to override defaults, or to add new settings",
+            "Type" : "String",
+            "Value" : "{}"
         }
     }
 }

@@ -143,7 +143,8 @@ module.exports={
         },
         "Environment": {
           "Variables": {
-            SETTINGS_PARAM:{"Ref":"QnABotSettings"},
+            DEFAULT_SETTINGS_PARAM:{"Ref":"DefaultQnABotSettings"},
+            CUSTOM_SETTINGS_PARAM:{"Ref":"CustomQnABotSettings"},
           }
         },
         "Handler": "index.query",
@@ -170,7 +171,8 @@ module.exports={
             ES_TYPE:{"Fn::GetAtt":["Var","QnAType"]},
             ES_INDEX:{"Fn::GetAtt":["Var","index"]},
             ES_ADDRESS:{"Fn::GetAtt":["ESVar","ESAddress"]},
-            SETTINGS_PARAM:{"Ref":"QnABotSettings"},
+            DEFAULT_SETTINGS_PARAM:{"Ref":"DefaultQnABotSettings"},
+            CUSTOM_SETTINGS_PARAM:{"Ref":"CustomQnABotSettings"},
           }
         },
         "Handler": "index.handler",
