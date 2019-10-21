@@ -1,0 +1,20 @@
+{
+    "qna": [
+        {
+            "qid": "CustomPYHook",
+            "q": [
+                "Test Custom Python Hook"
+            ],
+            "a": "Testing the Python Hook!",
+            "l":"QNA:EXTCustomPYHook"
+        },
+        {
+            "qid": "CustomJSHook",
+            "q": [
+                "Test Custom Javascript Hook"
+            ],
+            "a": "Testing the Javascript Hook!",
+            "l":"QNA:EXTCustomJSHook"
+        }
+    ]
+}

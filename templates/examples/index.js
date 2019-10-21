@@ -1,12 +1,12 @@
 var fs=require('fs')
 var _=require('lodash')
 
-var files=fs.readdirSync(`${__dirname}`)
-    .filter(x=>!x.match(/README.md|Makefile|index|test|outputs/))
-    .map(x=>require(`./${x}`))
+var examples=require(`./examples`);
+var extensions=require(`./extensions`);
+var resources=Object.assign(examples,extensions);
 
 module.exports={
-  "Resources":_.assign.apply({},files),
+  "Resources":resources,
   "Conditions": {},
   "AWSTemplateFormatVersion": "2010-09-09",
   "Description": "QnABot with admin and client websites",

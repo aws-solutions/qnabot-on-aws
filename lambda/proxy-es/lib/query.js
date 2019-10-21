@@ -55,7 +55,7 @@ module.exports=function(req,res){
                 _.get(res,"result.alt",{})
             )
 
-            if(req.outputDialogMode!=="Text"){
+            if(req._event.outputDialogMode!=="Text"){
                 if(_.get(res,"result.alt.ssml")){
                     res.type="SSML"
                     res.message=res.result.alt.ssml.replace(/\r?\n|\r/g,' ')

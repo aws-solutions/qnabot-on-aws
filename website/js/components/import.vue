@@ -40,7 +40,7 @@
       v-flex
         v-expansion-panel
           v-expansion-panel-content
-            p.headline(slot="header" id="examples-open") Examples/Demos
+            p.headline(slot="header" id="examples-open") Examples/Extensions
             v-list(two-line)
               template(v-for="(example,index) in examples")
                 v-divider
