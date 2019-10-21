@@ -1,16 +1,15 @@
 //start connection
+var _=require('lodash');
 var Promise=require('bluebird');
 var aws=require('aws-sdk');
 
-// Config params from environment (or defaults if env not set)
-var use_keyword_filters = process.env.ES_USE_KEYWORD_FILTERS || "true";
-var keyword_syntax_types = process.env.ES_KEYWORD_SYNTAX_TYPES || "NOUN,PROPN,VERB,INTJ";
-var syntax_confidence_limit = process.env.ES_SYNTAX_CONFIDENCE_LIMIT || .20;
-var stopwords = process.env.ES_STOPWORDS || "a,an,and,are,as,at,be,but,by,for,if,in,into,is,it,not,of,on,or,such,that,the,their,then,there,these,they,this,to,was,will,with";
+var stopwords = "a,an,and,are,as,at,be,but,by,for,if,in,into,is,it,not,of,on,or,such,that,the,their,then,there,these,they,this,to,was,will,with";
 
 function get_keywords_from_comprehend(params) {
     // get keywords from question using Comprehend syntax api
     var keywords="";
+    var keyword_syntax_types = _.get(params,'keyword_syntax_types') || "NOUN,PROPN,VERB,INTJ";
+    var syntax_confidence_limit = _.get(params,'syntax_confidence_limit') || .20;
     var comprehend = new aws.Comprehend();
     var comprehend_params = {
         LanguageCode: 'en',
@@ -45,7 +44,7 @@ function get_keywords_from_comprehend(params) {
 }
 
 function get_keywords(params) {
-    if (use_keyword_filters == "true") {
+    if (_.get(params,'use_keyword_filters') == "true") {
         console.log("use_keyword_filters is true; detecting keywords from question using Comprehend");
         return get_keywords_from_comprehend(params);
     } else {

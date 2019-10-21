@@ -143,14 +143,8 @@ module.exports={
         },
         "Environment": {
           "Variables": {
-            ERRORMESSAGE:lexConfig.ErrorMessage,
-            EMPTYMESSAGE:lexConfig.EmptyMessage,
-            ES_NO_HITS_QUESTION:"no_hits",
-            ES_USE_KEYWORD_FILTERS:"true",
-            ES_KEYWORD_SYNTAX_TYPES:"NOUN,PROPN,VERB,INTJ",
-            ES_SYNTAX_CONFIDENCE_LIMIT:".20",
-            ES_STOPWORDS:"a,an,and,are,as,at,be,but,by,for,if,in,into,is,it,not,of,on,or,such,that,the,their,then,there,these,they,this,to,was,will,with",
-            ES_MINIMUM_SHOULD_MATCH:"2<75%"
+            DEFAULT_SETTINGS_PARAM:{"Ref":"DefaultQnABotSettings"},
+            CUSTOM_SETTINGS_PARAM:{"Ref":"CustomQnABotSettings"},
           }
         },
         "Handler": "index.query",
@@ -177,11 +171,8 @@ module.exports={
             ES_TYPE:{"Fn::GetAtt":["Var","QnAType"]},
             ES_INDEX:{"Fn::GetAtt":["Var","index"]},
             ES_ADDRESS:{"Fn::GetAtt":["ESVar","ESAddress"]},
-            ES_USE_KEYWORD_FILTERS:"true",
-            ES_KEYWORD_SYNTAX_TYPES:"NOUN,PROPN,VERB,INTJ",
-            ES_SYNTAX_CONFIDENCE_LIMIT:".20",
-            ES_STOPWORDS:"a,an,and,are,as,at,be,but,by,for,if,in,into,is,it,not,of,on,or,such,that,the,their,then,there,these,they,this,to,was,will,with",
-            ES_KEYWORDS_MINIMUM_SHOULD_MATCH:"2<75%"
+            DEFAULT_SETTINGS_PARAM:{"Ref":"DefaultQnABotSettings"},
+            CUSTOM_SETTINGS_PARAM:{"Ref":"CustomQnABotSettings"},
           }
         },
         "Handler": "index.handler",
@@ -215,6 +206,19 @@ module.exports={
           "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
           {"Ref":"EsPolicy"},
           "arn:aws:iam::aws:policy/AmazonLexFullAccess"
+        ],
+        "Policies": [
+          {
+          	"PolicyName": "ParamStorePolicy",
+          	"PolicyDocument": {
+          		"Version": "2012-10-17",
+          		"Statement": [{
+          			"Effect": "Allow",
+          			"Action": "ssm:GetParameter",
+          			"Resource": "*"
+          		}]
+          	}
+          }
         ]
       }
     },

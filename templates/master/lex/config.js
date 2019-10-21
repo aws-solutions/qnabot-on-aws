@@ -14,10 +14,6 @@ License for the specific language governing permissions and limitations under th
 module.exports={
     "voiceId":"Joanna",
     "Clarification":"Sorry, I did not understand that",
-    "ErrorMessage":"Sadly I encountered an error when searching for your answer. Please ask me again later.",
-    "EmptyMessage":"You stumped me! Sadly I don't know how to answer your question.",
-    "DefaultAlexaLaunchMessage":"Hello, Please ask a question",
-    "DefaultAlexaStopMessage":"Goodbye",
     "Abort":"Sorry, I did not understand that",
     "utterances":require('../../../assets/default-utterances')
 }

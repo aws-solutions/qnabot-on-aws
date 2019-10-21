@@ -1,22 +1,23 @@
 var _=require('lodash')
-exports.parse=function(event){
+exports.parse=function(req){
+    var event = req._event;
     var out={
         _type:"ALEXA",
+        _userId:_.get(event,"session.user.userId","Unknown Alexa User"),
         original:event,
         session:_.mapValues(
             _.get(event,'session.attributes',{}),
             x=>{
                 try {
-                    return JSON.parse(x)
+                    return JSON.parse(x);
                 } catch(e){
-                    return x
+                    return x;
                 }
             }
         ),
-
         channel:null,
-    }
-
+    };
+    var welcome_message = _.get(req,'_settings.DEFAULT_ALEXA_LAUNCH_MESSAGE', 'Hello, Please ask a question');
     switch(_.get(event,"request.type")){
         case "LaunchRequest":
             throw new Respond({
@@ -24,14 +25,19 @@ exports.parse=function(event){
                 response:{
                     outputSpeech:{
                         type:"PlainText",
-                        text: (process.env.DEFAULT_ALEXA_LAUNCH_MESSAGE ? process.env.DEFAULT_ALEXA_LAUNCH_MESSAGE : "Hello, Please ask a question")
+                        text: welcome_message
+                    },
+                    card: {
+                      type: "Simple",
+                      title: "Welcome",
+                      content:welcome_message
                     },
                     shouldEndSession:false
                 }
-            })
+            });
             break;
         case "IntentRequest":
-            out.question=_.get(event,'request.intent.slots.QnA_slot.value')
+            out.question=_.get(event,'request.intent.slots.QnA_slot.value');
             break;
         case "SessionEndedRequest":
             throw new End() 
@@ -45,7 +51,12 @@ exports.parse=function(event){
                 response:{
                     outputSpeech:{
                         type:"PlainText",
-                        text:"GoodBye"
+                        text:(_.get(req,'_settings.DEFAULT_ALEXA_STOP_MESSAGE',"Goodbye"))
+                    },
+                    card: {
+                      type: "Simple",
+                      title: "Cancel",
+                      content:(_.get(req,'_settings.DEFAULT_ALEXA_STOP_MESSAGE',"Goodbye"))
                     },
                     shouldEndSession:true
                 }
@@ -56,7 +67,7 @@ exports.parse=function(event){
             console.log(JSON.stringify(out))
             throw new Respond({
                 version:'1.0',
-                response: _.get(out,"session.cachedOutput",{outputSpeech:{type:"PlainText",text:"Sorry, I do not remember."},shouldEndSession:false})
+                response: _.get(out,"session.cachedOutput",{outputSpeech:{type:"PlainText",text:welcome_message},shouldEndSession:false})
             })
             break;
         case "AMAZON.StopIntent":
@@ -65,7 +76,12 @@ exports.parse=function(event){
                 response:{
                     outputSpeech:{
                         type:"PlainText",
-                        text:(process.env.DEFAULT_ALEXA_STOP_MESSAGE ? process.env.DEFAULT_ALEXA_STOP_MESSAGE :"GoodBye")
+                        text:(_.get(req,'_settings.DEFAULT_ALEXA_STOP_MESSAGE',"Goodbye"))
+                    },
+                    card: {
+                      type: "Simple",
+                      title: "Stop",
+                      content:(_.get(req,'_settings.DEFAULT_ALEXA_STOP_MESSAGE',"Goodbye"))
                     },
                     shouldEndSession:true
                 }
