@@ -48,7 +48,7 @@ module.exports=[
           },
           {
             "col": 1,
-            "id": "Logged-Utterances",
+            "id": "Utterances",
             "panelIndex": 7,
             "row": 5,
             "size_x": 6,
