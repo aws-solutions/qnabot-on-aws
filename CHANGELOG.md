@@ -4,7 +4,7 @@
 - support for Test All functionality
 - fix for alexa repeat intent
 - fix for better handling of tab navigation between questions and test tab
-- added AnABot version number to cloudformation stack description
+- added QnABot version number to cloudformation stack description
 - separated import and export functionality into nested stacks freeing up ability to add resources to master stack
 - updates to npm module versions
 - added newline to separate records injected to firehose
