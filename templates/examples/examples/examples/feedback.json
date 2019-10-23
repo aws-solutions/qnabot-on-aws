@@ -1,19 +1,46 @@
 {
-  "qna": [
-    {
-      "qid": "Feedback",
-      "a": "Unable to leave feedback at the moment...",
-      "r": {},
-      "type": "qna",
-      "l": "QNA:ExamplePYTHONLambdaFeedback",
-      "q": [
-        "Feedback",
-        "That is wrong",
-        "that is right",
-        "leave feedback",
-        "good answer",
-        "bad answer"
-      ]
-    }
-  ]
+	"qna": [{
+			"a": "Thank you for your positive feedback on this answer, your feedback helps us continuously improve.",
+			"qid": "Feedback.002",
+			"args": [
+				"correct"
+			],
+			"l": "QNA:ExamplePYTHONLambdaFeedback",
+			"q": [
+				"Thumbs up",
+				"Good answer"
+			],
+			"type": "qna"
+		},
+		{
+			"a": "Thank you for your feedback - we will try to improve this answer.",
+			"qid": "Feedback.001",
+			"args": [
+				"incorrect"
+			],
+			"l": "QNA:ExamplePYTHONLambdaFeedback",
+			"next": "",
+			"q": [
+				"Thumbs down",
+				"Bad answer"
+			],
+			"r": {
+				"subTitle": "",
+				"title": "",
+				"url": "",
+				"text": "",
+				"imageUrl": "",
+				"buttons": [{
+					"text": "",
+					"value": ""
+				}]
+			},
+			"t": "",
+			"alt": {
+				"ssml": "",
+				"markdown": ""
+			},
+			"type": "qna"
+		}
+	]
 }

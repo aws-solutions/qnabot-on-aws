@@ -29,6 +29,38 @@ module.exports=Object.assign(
     _.fromPairs(js.map(x=>[x.name,x.resource])),
     _.fromPairs(py.map(x=>[x.name,x.resource])),
     {
+    "FeedbackSNS": {
+      "Type": "AWS::SNS::Topic"
+    },
+    "feedbacksnspolicy" : {
+        "Type" : "AWS::SNS::TopicPolicy",
+        "Properties" : {
+           "PolicyDocument" :  {
+              "Id" : "MysnsTopicPolicy",
+              "Version" : "2012-10-17",
+              "Statement" : [ {
+                 "Sid" : "My-statement-id",
+                 "Effect" : "Allow",
+                 "Principal" : {
+                    "AWS" : {"Fn::Sub":"${AWS::AccountId}"}
+                 },
+                 "Action": [
+                   "SNS:GetTopicAttributes",
+                   "SNS:SetTopicAttributes",
+                   "SNS:AddPermission",
+                   "SNS:RemovePermission",
+                   "SNS:DeleteTopic",
+                   "SNS:Subscribe",
+                   "SNS:ListSubscriptionsByTopic",
+                   "SNS:Publish",
+                   "SNS:Receive"
+                 ],
+                 "Resource" : "*"
+              } ]
+           },
+           "Topics" : [ { "Ref" : "FeedbackSNS" } ]
+        }
+     },
     "InvokePolicy": {
       "Type": "AWS::IAM::ManagedPolicy",
       "Properties": {
@@ -172,6 +204,21 @@ module.exports=Object.assign(
           }
         },
         { 
+          "PolicyName" : "SNSQNALambda",
+          "PolicyDocument" : {
+          "Version": "2012-10-17",
+            "Statement": [
+              {
+                  "Effect": "Allow",
+                  "Action": [
+                      "sns:Publish"
+                   ],
+					"Resource":{"Ref":"FeedbackSNS"}
+              }
+            ]
+          }
+        },
+        { 
           "PolicyName" : "LexQNALambda",
           "PolicyDocument" : {
           "Version": "2012-10-17",
@@ -247,7 +294,8 @@ function pylambda(name){
             "ES_INDEX": {"Ref":"Index"},
             "FIREHOSE_NAME":{"Ref":"FeedbackFirehoseName"},
             "ES_ADDRESS": {"Ref":"ESAddress"},
-            "QUIZ_KMS_KEY":{"Ref":"QuizKey"}
+            "QUIZ_KMS_KEY":{"Ref":"QuizKey"},
+            "SNS_TOPIC_ARN":{"Ref":"FeedbackSNS"}
           }
         },
         "Handler":`py/${name}.handler`,
