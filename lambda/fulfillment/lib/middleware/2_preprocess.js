@@ -41,7 +41,7 @@ async function get_userInfo(userId, idattrs) {
         _.set(req_userInfo, 'Email', _.get(idattrs,'email'));
     }
     if (_.get(idattrs,'verifiedIdentity')) {
-        _.set(req_userInfo, 'VerifiedIdentity', _.get(idattrs,'verifiedIdentity'));
+        _.set(req_userInfo, 'isVerifiedIdentity', _.get(idattrs,'verifiedIdentity'));
     }
     // append time since last seen
     var now = new Date();
@@ -79,9 +79,10 @@ module.exports=async function preprocess(req,res){
             console.log("Attempt to verify idtoken using jwks urls:",urls);
             var verified_url = await jwt.verify(kid,urls) ;
             if (verified_url) {
-                _.set(idattrs,'verifiedIdentity',"TRUE");
+                _.set(idattrs,'verifiedIdentity',"true");
                 console.log("Verified identity with:",verified_url);
             } else {
+                _.set(idattrs,'verifiedIdentity',"false");
                 console.log("Unable to verify identity for any configured IdP jwks urls");
             }     
         } else {
