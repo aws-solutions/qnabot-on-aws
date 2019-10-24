@@ -11,9 +11,18 @@ var default_settings = {
             SMS_HINT_REMINDER_ENABLE:"true",
             SMS_HINT_REMINDER:" (Feedback? Reply THUMBS UP or THUMBS DOWN. Ask HELP ME at any time)",
             SMS_HINT_REMINDER_INTERVAL_HRS:"24",
+            IDENTITY_PROVIDER_JWKS_URLS: []  // User can override this empty list using CustomQnABotSettings to add trusted IdPs (eg from Lex-Web-UI)
           }
 
 module.exports={
+    "DefaultUserPoolJwksUrl":{
+        "Type" : "AWS::SSM::Parameter",
+        "Properties" : {
+            "Description" : "Default QnABot Setting - DO NOT MODIFY",
+            "Type" : "String",
+            "Value" : {"Fn::Join": ["",["https://cognito-idp.",{"Ref": "AWS::Region"},".amazonaws.com/",{"Ref": "UserPool"},"/.well-known/jwks.json"]]}
+        }
+    },
     "DefaultQnABotSettings":{
         "Type" : "AWS::SSM::Parameter",
         "Properties" : {
