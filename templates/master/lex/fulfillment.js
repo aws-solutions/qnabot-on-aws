@@ -43,6 +43,7 @@ module.exports={
             ES_SERVICE_QID:{"Ref":"ESQidLambda"},
             ES_SERVICE_PROXY:{"Ref":"ESProxyLambda"},
             DYNAMODB_USERSTABLE:{"Ref":"UsersTable"},
+            DEFAULT_USER_POOL_JWKS_PARAM:{"Ref":"DefaultUserPoolJwksUrl"},
             DEFAULT_SETTINGS_PARAM:{"Ref":"DefaultQnABotSettings"},
             CUSTOM_SETTINGS_PARAM:{"Ref":"CustomQnABotSettings"},
           },examples)
@@ -111,7 +112,8 @@ module.exports={
           "Statement": [{
               "Effect": "Allow",
               "Action": [
-                "ssm:GetParameter"
+                "ssm:GetParameter",
+                "ssm:GetParameters"
               ],
               "Resource":["*"]
             }]

@@ -1,7 +1,9 @@
 var _=require('lodash');
 var Promise=require('bluebird');
 var util=require('./util');
+var jwt=require('./jwt');
 var AWS=require('aws-sdk');
+
 
 async function get_userInfo(userId, idattrs) {
     var default_userInfo = {
@@ -38,6 +40,9 @@ async function get_userInfo(userId, idattrs) {
     if (_.get(idattrs,'email')) {
         _.set(req_userInfo, 'Email', _.get(idattrs,'email'));
     }
+    if (_.get(idattrs,'verifiedIdentity')) {
+        _.set(req_userInfo, 'VerifiedIdentity', _.get(idattrs,'verifiedIdentity'));
+    }
     // append time since last seen
     var now = new Date();
     var lastSeen = Date.parse(req_userInfo.LastSeen || "1970/1/1 12:00:00");
@@ -63,8 +68,25 @@ module.exports=async function preprocess(req,res){
     var idtoken = _.get(req,'_event.sessionAttributes.idtokenjwt');
     var idattrs={};
     if (idtoken) {
-        idattrs = util.jwtdecode(idtoken);
-        console.log("Decoded idtoken:",idattrs)
+        var decoded = jwt.decode(idtoken);
+        if (decoded) {
+            idattrs = _.get(decoded,'payload');
+            console.log("Decoded idtoken:",idattrs);
+            var kid = _.get(decoded,'header.kid');
+            var default_jwks_url = [_.get(req,'_settings.DEFAULT_USER_POOL_JWKS_URL')];
+            var identity_provider_jwks_url = _.get(req,'_settings.IDENTITY_PROVIDER_JWKS_URLS');
+            var urls = default_jwks_url.concat(identity_provider_jwks_url);
+            console.log("Attempt to verify idtoken using jwks urls:",urls);
+            var verified_url = await jwt.verify(kid,urls) ;
+            if (verified_url) {
+                _.set(idattrs,'verifiedIdentity',"TRUE");
+                console.log("Verified identity with:",verified_url);
+            } else {
+                console.log("Unable to verify identity for any configured IdP jwks urls");
+            }     
+        } else {
+            console.log("Invalid idtokenjwt - cannot decode");
+        }
     }
     // Add _userInfo to req, from UsersTable
     // TODO Will need to rework logic if/when we link userid across clients (SMS,WebUI,Alexa)
