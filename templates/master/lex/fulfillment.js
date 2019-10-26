@@ -85,42 +85,6 @@ module.exports={
         "Roles": [{"Ref": "FulfillmentLambdaRole"}]
       }
     },
-    "DynamoDBPolicy": {
-      "Type": "AWS::IAM::ManagedPolicy",
-      "Properties": {
-        "PolicyDocument": {
-          "Version": "2012-10-17",
-          "Statement": [{
-              "Effect": "Allow",
-              "Action": [
-                "dynamodb:GetItem",
-                "dynamodb:PutItem",
-              ],
-              "Resource":[
-                {"Fn::GetAtt":["UsersTable","Arn"]}
-              ]
-            }]
-        },
-        "Roles": [{"Ref": "FulfillmentLambdaRole"}]
-      }
-    },
-    "ParamStorePolicy": {
-      "Type": "AWS::IAM::ManagedPolicy",
-      "Properties": {
-        "PolicyDocument": {
-          "Version": "2012-10-17",
-          "Statement": [{
-              "Effect": "Allow",
-              "Action": [
-                "ssm:GetParameter",
-                "ssm:GetParameters"
-              ],
-              "Resource":["*"]
-            }]
-        },
-        "Roles": [{"Ref": "FulfillmentLambdaRole"}]
-      }
-    },
     "FulfillmentLambdaRole": {
       "Type": "AWS::IAM::Role",
       "Properties": {
@@ -140,6 +104,38 @@ module.exports={
         "ManagedPolicyArns": [
           "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
           {"Ref":"EsPolicy"}
+        ],
+        "Policies": [
+          {
+            "PolicyName" : "ParamStorePolicy",
+            "PolicyDocument" : {
+              "Version": "2012-10-17",
+              "Statement": [{
+                  "Effect": "Allow",
+                  "Action": [
+                    "ssm:GetParameter",
+                    "ssm:GetParameters"
+                  ],
+                  "Resource":["*"]
+              }]
+            }
+          },
+          {
+            "PolicyName" : "DynamoDBPolicy",
+            "PolicyDocument" : {
+              "Version": "2012-10-17",
+              "Statement": [{
+                  "Effect": "Allow",
+                  "Action": [
+                    "dynamodb:GetItem",
+                    "dynamodb:PutItem",
+                  ],
+                  "Resource":[
+                    {"Fn::GetAtt":["UsersTable","Arn"]}
+                  ]
+              }]
+            }
+          },
         ]
       }
     }
