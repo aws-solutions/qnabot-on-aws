@@ -41,6 +41,25 @@
 				"markdown": ""
 			},
 			"type": "qna"
+		},
+		{
+			"a": "You stumped me, I don't currently know the answer to that question.",
+			"qid": "CustomNoMatches",
+			"type": "qna",
+			"q": [
+				"no_hits"
+			]
+		},
+		{
+			"a": "I am the QnA bot, ask me a question and I will try my best to answer it.",
+			"qid": "Help",
+			"type": "qna",
+			"q": [
+				"help",
+				"help me",
+				"need help"
+			]
 		}
+
 	]
 }
