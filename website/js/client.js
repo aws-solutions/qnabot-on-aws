@@ -37,6 +37,9 @@ var config = {
     pushInitialTextOnRestart:false,
     AllowSuperDangerousHTMLInMessage:true,
     showDialogStateIcon:false,
+    positiveFeedbackIntent: "Thumbs up",
+    negativeFeedbackIntent: "Thumbs down",
+    helpIntent: "Help"
   },
   recorder:{}
 }
