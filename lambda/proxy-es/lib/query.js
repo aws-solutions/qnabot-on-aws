@@ -50,7 +50,7 @@ module.exports=function(req,res){
         console.log("ES result:"+JSON.stringify(result,null,2));
         var hit=_.get(result,"hits.hits[0]._source");
         if(hit){
-            res.result=handlebars(req,hit);
+            res.result=handlebars(req,res,hit);
             res.type="PlainText"
             res.message=res.result.a
             res.plainMessage=res.result.a

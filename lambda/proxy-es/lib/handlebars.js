@@ -2,6 +2,8 @@
 var _=require('lodash');
 var Handlebars=require('handlebars');
 
+var res_glbl={};
+
 Handlebars.registerHelper('ifCond', function (v1, operator, v2, options) {
     switch (operator) {
         case '==':
@@ -29,8 +31,24 @@ Handlebars.registerHelper('ifCond', function (v1, operator, v2, options) {
     }
 });
 
+Handlebars.registerHelper('setSessionAttr', function (k, v, options) {
+    console.log("Setting res session attribute:",k," Value:",v);
+    var key = "session." + k;
+    _.set(res_glbl,key,v);
+    return "";
+});
 
-var apply_handlebars=function(req,hit){
+Handlebars.registerHelper('randomPick', function () {
+    var argcount = arguments.length - 1;  // ignore final 'options' argument
+    console.log("Select randomly from ",argcount,"inputs: ", arguments);
+    var item = arguments[Math.floor(Math.random()*argcount)];
+    console.log("Selected: ", item);
+    return item;
+});
+
+
+var apply_handlebars=function(req,res,hit){
+    res_glbl=res; // shallow copy - allow modification by setSessionAttr helper
     var context={
         LexOrAlexa: req._type,
         UserInfo: req._userInfo,
@@ -73,8 +91,8 @@ var apply_handlebars=function(req,hit){
     return hit_out;
 }
 
-module.exports=function(req,es_hit){
-    return apply_handlebars(req,es_hit);
+module.exports=function(req,res,es_hit){
+    return apply_handlebars(req,res,es_hit);
 };
 
 
