@@ -38,6 +38,14 @@ Handlebars.registerHelper('setSessionAttr', function (k, v, options) {
     return "";
 });
 
+Handlebars.registerHelper('randomPick', function () {
+    var argcount = arguments.length - 1;  // ignore final 'options' argument
+    console.log("Select randomly from ",argcount,"inputs: ", arguments);
+    var item = arguments[Math.floor(Math.random()*argcount)];
+    console.log("Selected: ", item);
+    return item;
+});
+
 
 var apply_handlebars=function(req,res,hit){
     res_glbl=res; // shallow copy - allow modification by setSessionAttr helper
