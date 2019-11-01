@@ -1,4 +1,5 @@
 var fs=require('fs')
+const path = require('path')
 const resplib = path.join(__dirname, '..', '..','lib', 'response.js')
 module.exports={
   "Resources": {
