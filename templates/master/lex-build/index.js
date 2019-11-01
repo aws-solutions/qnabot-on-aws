@@ -19,7 +19,7 @@ module.exports={
         INTENTFALLBACK:{"Ref":"IntentFallback"},
         ADDRESS:{"Fn::GetAtt":["ESVar","ESAddress"]},
         INDEX:{"Fn::GetAtt":["Var","index"]},
-    },"nodejs8.10"),
+    },"nodejs10.x"),
     "LexBuildLambdaStart":lambda({
         "ZipFile":fs.readFileSync(__dirname+'/start.js','utf8')
     },{
@@ -134,7 +134,7 @@ module.exports={
     }
 }
 
-function lambda(code,variable={},runtime="nodejs8.10"){
+function lambda(code,variable={},runtime="nodejs10.x"){
     return {
       "Type": "AWS::Lambda::Function",
       "Properties": {
