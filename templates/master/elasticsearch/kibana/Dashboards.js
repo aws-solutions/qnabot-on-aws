@@ -102,7 +102,7 @@ module.exports=[
       "description": "",
       "version": 1,
       "kibanaSavedObjectMeta": {
-        "searchSourceJSON": {"Fn::Sub":"{\"index\":\"${ESVar.MetricsIndex}\",\"query\":{\"query_string\":{\"query\":\"entireResponse.got_hits=0\",\"analyze_wildcard\":true}},\"filter\":[]}"}
+        "searchSourceJSON": {"Fn::Sub":"{\"index\":\"${ESVar.MetricsIndex}\",\"query\":{\"query_string\":{\"query\":\"entireResponse.got_hits:0\",\"analyze_wildcard\":true}},\"filter\":[]}"}
       }
     }
   },
