@@ -21,7 +21,7 @@ QnABot now lets you use [Handlebars](https://handlebarsjs.com/) templates in you
    {{/ifCond}}_   
 1. Use the Web UI, or Alexa, to interact with the bot again. Wait over a minute between interactions and observe the conditional answer in action.
 
-## Available variables (Content)
+## Available variables (handlebars context)
 QnABot exposes the following content to the Handlebars context:
 
 |Context Variable                  | Notes                                                                                          |
