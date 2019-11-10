@@ -40,8 +40,8 @@ QnABot exposes the following content to the Handlebars context:
 |SessionAttributes._name_          | all session attributes are available to the handlebars context |
 
 ## Helpers
-The [built-in handlerbars helpers](https://handlebarsjs.com/builtin_helpers.html) can be used.  
-QnABot provides these additional helpers:
+You can use any [built-in handlerbars helpers](https://handlebarsjs.com/builtin_helpers.html).  
+QnABot also provides these additional helpers:
 
 |Helper                  | Descr                                      | Example                                                                                     |
 |------------------------|--------------------------------------------|---------------------------------------------------------------------------------------------|
