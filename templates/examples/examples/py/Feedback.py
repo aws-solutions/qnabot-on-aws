@@ -24,22 +24,19 @@ def handler(event, context):
         previousQuestion = stringToJson["q"]
         previousAnswer = stringToJson["a"]
         previousAlt = stringToJson["alt"]
-    except:
-        #replace qid with the String '' if there is no previous questions that have been asked
-        previousQid = ''
-    
-    
-    feedbackArg = event["res"]["result"]["args"][0]
-    print(feedbackArg)
-   
-    # - Check feedbackArg from the UI payload. Parse for "thumbs_down_arg" feedback. Based on user action, sendFeedback through SNS, and log in Firehose. 
-    if (feedbackArg == "incorrect") :
-        sendFeedbackNotification(previousQid,previousAnswer,previousQuestion, previousAlt, feedbackArg)
-        logFeedback(previousQid,previousAnswer,previousQuestion, previousAlt, feedbackArg)
-    else:
-        logFeedback(previousQid,previousAnswer,previousQuestion, previousAlt, feedbackArg)
-        
-
+        feedbackArg = event["res"]["result"]["args"][0]
+        print(feedbackArg)
+        # - Check feedbackArg from the UI payload. Parse for "thumbs_down_arg" feedback. Based on user action, sendFeedback through SNS, and log in Firehose. 
+        if (feedbackArg == "incorrect") :
+            sendFeedbackNotification(previousQid,previousAnswer,previousQuestion, previousAlt, feedbackArg)
+            logFeedback(previousQid,previousAnswer,previousQuestion, previousAlt, feedbackArg)
+            print("Negative feedback logged, and SNS notification sent")
+        else:
+            logFeedback(previousQid,previousAnswer,previousQuestion, previousAlt, feedbackArg)
+            print("Positive feedback logged")
+    except Exception as e:
+        print("Exception caught (no previous question?): ", e)
+        print("Feedback not logged.")
     return event
 
 #logs feedback for the questions
