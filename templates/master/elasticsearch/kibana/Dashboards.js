@@ -10,7 +10,7 @@ module.exports=[
       "hits": 0,
       "description": "",
       "panelsJSON": "[{\"col\":9,\"id\":\"Client-types\",\"panelIndex\":3,\"row\":1,\"size_x\":4,\"size_y\":4,\"type\":\"visualization\"},{\"col\":1,\"id\":\"Requests\",\"panelIndex\":4,\"row\":1,\"size_x\":8,\"size_y\":4,\"type\":\"visualization\"},{\"col\":1,\"id\":\"Incorrect-feedback-wordcloud\",\"panelIndex\":5,\"row\":24,\"size_x\":12,\"size_y\":6,\"type\":\"visualization\"},{\"col\":1,\"id\":\"Correct-feedback-wordcloud\",\"panelIndex\":6,\"row\":18,\"size_x\":12,\"size_y\":6,\"type\":\"visualization\"},{\"col\":1,\"id\":\"Utterances\",\"panelIndex\":7,\"row\":5,\"size_x\":12,\"size_y\":6,\"type\":\"visualization\"},{\"col\":1,\"id\":\"No-Hits\",\"panelIndex\":8,\"row\":11,\"size_x\":12,\"size_y\":7,\"type\":\"visualization\"}]",
-      "optionsJSON": "{\"darkTheme\":true}",
+      "optionsJSON": "{\"darkTheme\":false}",
       "uiStateJSON": "{}",
       "version": "1",
       "timeRestore": "false",
