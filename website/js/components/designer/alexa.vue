@@ -1,6 +1,7 @@
 <template lang="pug">
-  v-dialog(v-model='dialog' max-width='50%')
-    v-btn.block(flat slot="activator" @click='open') Alexa Update
+  v-dialog(v-model='dialog' persistent max-width='50%')
+    template
+      v-btn.block(flat slot="activator" v-on="on") Alexa Update
     v-card(id="alexa-modal")
       v-card-title(primary-title)
         .headline Re-configure Alexa
@@ -23,7 +24,7 @@
         )
       v-card-actions
         v-spacer
-        v-btn(@click='close') Close
+        v-btn(@click='dialog = false') Close
 </template>
 
 <script>
@@ -61,15 +62,9 @@ module.exports={
     
   },
   created:function(){
-    this.$store.dispatch('data/botinfo').catch(()=>null) 
+    this.$store.dispatch('data/botinfo').catch((err)=>console.log('error while obtaining botinfo: ' + err));
   },
   methods:{
-    close:function(){
-      this.dialog=false
-    },
-    open:function(){
-      this.dialog=true
-    },
     download:async function(){
       this.loading=true
       await this.$store.dispatch('data/botinfo')

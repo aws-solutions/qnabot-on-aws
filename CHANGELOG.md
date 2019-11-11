@@ -1,6 +1,8 @@
 ## [2.4.0]
-- updated lex-web-ui to 0.14.7
-- added environment variables to allow configuration of prompts for Alexa launch intent and stop intent
+- added use of SSM Parameter store to hold default configuration settings
+- added use of use of Comprehend for better selection of appropriate answer 
+- added use of AMAZON.Fallback intent
+- updated lex-web-ui to 0.14.8
 - support for Test All functionality
 - fix for alexa repeat intent
 - fix for better handling of tab navigation between questions and test tab
