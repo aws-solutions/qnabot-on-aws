@@ -12,7 +12,7 @@ module.exports=function(offset){
             "view": "timeSeries",
             "stacked": false,
             "metrics": [
-                [ "AWS/Lex", "MissedUtteranceCount", "BotVersion", "$LATEST", "Operation", "PostText", "BotName", "${LexBot}"],
+                [ "AWS/Lex", "MissedUtteranceCount", "BotAlias", "${Alias}", "Operation", "PostText", "BotName", "${LexBot}"],
                 [ ".", "RuntimeSucessfulRequestLatency", ".", ".", ".", ".", ".", ".", { "yAxis": "right" } ],
                 [ ".", "RuntimeRequestCount", ".", ".", ".", ".", ".", "." ]
             ],
