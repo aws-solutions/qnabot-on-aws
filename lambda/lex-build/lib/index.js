@@ -19,6 +19,7 @@ var run=require('./run')
 var getUtterances=require('./utterances')
 var Slot=require('./slot')
 var Intent=require('./intent')
+var IntentFallback=require('./intentFallback')
 var Alias=require('./alias')
 var Bot=require('./bot')
 var clean=require('./delete')
@@ -36,11 +37,16 @@ module.exports=function(params){
         name:process.env.INTENT,
         version:"$LATEST"
     })
+    var intentFallback=run("getIntent",{
+        name:process.env.INTENTFALLBACK,
+        version:"$LATEST"
+    })
     var bot=run('getBot',{
         name:process.env.BOTNAME,
         versionOrAlias:"$LATEST"
     })
     var clean_intent=null
+    var clean_intentFallback=null
     var clean_slottype=null
 
     return Promise.join(utterances,slottype)
@@ -54,11 +60,19 @@ module.exports=function(params){
         })
         .spread(Intent)
 
-        .tap(()=>status("Rebuild Bot"))
+        .tap(()=>status("Rebuilding IntentFallback"))
         .then(intent_version=>{
-            clean_slot=()=>clean.slot(process.env.SLOTTYPE,version)
-            return Promise.join(intent_version,bot)
+            clean_intentFallback=()=>clean.intent(process.env.INTENTFALLBACK,intent_version)
+            return Promise.join(intent_version,intentFallback)
         })
+        .spread(IntentFallback)
+
+        .tap(versions=>status("Rebuild Bot "))
+        .then(versions=>{
+            clean_slot=()=>clean.slot(process.env.SLOTTYPE,versions.intent_version)
+            return Promise.join(versions,bot)
+        })
+
         .spread(Bot)
         .tap(version=>Alias(version,{
             botName:process.env.BOTNAME,

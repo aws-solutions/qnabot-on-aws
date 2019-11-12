@@ -107,6 +107,15 @@ module.exports={
     },
     "ElasticsearchIndex":{
       "Value":{"Fn::GetAtt":["Var","index"]}
+    },
+    "UsersTable":{
+      "Value":{"Ref":"UsersTable"}
+    },
+    "DefaultSettingsSSMParameterName":{
+      "Value":{"Ref":"DefaultQnABotSettings"}
+    },
+    "CustomSettingsSSMParameterName":{
+      "Value":{"Ref":"CustomQnABotSettings"}
     }
   },
   "Parameters": {

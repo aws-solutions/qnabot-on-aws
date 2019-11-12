@@ -42,6 +42,24 @@ module.exports={
       },
       "DependsOn": "QNAInvokePermission"
     },
+    "IntentFallback": {
+        "Type": "Custom::LexIntent",
+        "Properties": {
+            "ServiceToken": {
+                "Fn::GetAtt": ["CFNLambda","Arn"]
+            },
+            "prefix":"qnabotfallbackfulfilment",
+            "fulfillmentActivity": {
+                "type": "CodeHook",
+                "codeHook": {
+                    "uri": {"Fn::GetAtt":["FulfillmentLambda","Arn"]},
+                    "messageVersion": "1.0"
+                }
+            },
+            "parentIntentSignature": "AMAZON.FallbackIntent"
+        },
+        "DependsOn": "QNAInvokePermission"
+    },
     "LexBot": {
       "Type": "Custom::LexBot",
       "Properties": {
@@ -56,17 +74,9 @@ module.exports={
         "voiceId": config.voiceId,
         "childDirected": false,
         "intents": [
-            {"intentName": {"Ref": "Intent"},"intentVersion": "$LATEST"}
+            {"intentName": {"Ref": "Intent"},"intentVersion": "$LATEST"},
+            {"intentName": {"Ref": "IntentFallback"},"intentVersion": "$LATEST"}
         ],
-        "clarificationPrompt": {
-          "maxAttempts": 5,
-          "messages": [
-            {
-              "content": config.Clarification,
-              "contentType": "PlainText"
-            }
-          ]
-        },
         "abortStatement": {
           "messages": [
             {

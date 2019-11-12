@@ -1,1 +1,0 @@
-Imports one document, Feeback. This document has lambda hook functionality that enables clients to leave simple feedback.

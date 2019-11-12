@@ -37,28 +37,27 @@ module.exports=Object.assign(
         },
         "Path": "/",
         "ManagedPolicyArns": [
-          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
-          {"Ref":"LambdaPolicy"}
+          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ],
+        "Policies": [
+          {
+            "PolicyName" : "LambdaPolicy",
+            "PolicyDocument" : {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "lambda:*"
+                  ],
+                  "Resource":["*"]
+                }
+              ]
+            }
+          }
         ]
       }
-},
-"LambdaPolicy": {
-  "Type": "AWS::IAM::ManagedPolicy",
-  "Properties": {
-    "PolicyDocument": {
-      "Version": "2012-10-17",
-      "Statement": [
-        {
-          "Effect": "Allow",
-          "Action": [
-            "lambda:*"
-          ],
-          "Resource":["*"]
-        }
-      ]
-    }
-  }
-}
+  },
 })
 
 function permission(name){

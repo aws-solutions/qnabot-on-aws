@@ -20,7 +20,7 @@
       "r": {
         "title": "Hint",
         "subTitle": "",
-        "imageUrl": "https://s3.amazonaws.com/public-blog-image-hosting/jambo.jpeg"
+        "imageUrl": "https://raw.githubusercontent.com/aws-samples/aws-ai-qna-bot/develop/assets/examples/photos/klimage.jpg"
       },
       "quiz": "",
       "type": "quiz",
