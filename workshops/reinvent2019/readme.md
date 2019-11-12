@@ -19,7 +19,8 @@ Your job is to implement Sun facts on your website.
 
 ### Requirements:
 
-* AWS account - if you don't have one, it's easy and free to [create one](https://aws.amazon.com/).
+* AWS account - if you don't have one, it's easy and free to [create one](https://aws.amazon.com/). Note: If you are 
+attending the workshop at re:Invent 2019, an AWS account will be provided to you for use during the workshop.
 * Amazon developer account - if you don't have one its easy and free to [create one](https://developer.amazon.com).
 * AWS IAM account with elevated privileges allowing you to interact with CloudFormation, IAM, S3, Elasticsearch, CloudWatch, Cloud9. [Learn how](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_users_create.html).
 * Familiarity with [NodeJS](https://www.nodejs.org) and [AWS](httpts://aws.amazon.com) - *not required but a bonus*.
@@ -35,8 +36,9 @@ During the workshop, AWS staff will give you a high-level overview of the labs a
 * **Step 3:** [Integrate on your WebSite](#step-3---integrate-qnabot-into-your-website)
 * **Step 4:** [Integrate QnABot into an Amazon Connect Call Center](#step-4---integrate-qnabot-into-an-amazon-connect-call-center)
 * **Step 5:** [Integrate Alexa](#step-5---integrate-alexa)
-* **Step 6:** [Monitor Usage in Kibana](#step-6---monitor-usage-with-kibana)
-* **Step 7:** [Customize with Lambda](#step-7---customize-with-lambda)
+* **Step 6:** [Integrate SMS](#step-6---integrate-SMS)
+* **Step 7:** [Monitor Usage in Kibana](#step-7---monitor-usage-with-kibana)
+* **Step 8:** [Customize with Lambda](#step-8---customize-with-lambda)
 * **Cleanup** [Put everything away nicely](#workshop-cleanup)
 
 ### Conventions:
@@ -63,6 +65,26 @@ You will be deploying infrastructure on AWS which will have an associated cost. 
 * * *
 
 ## Step 1 - Let's begin and deploy a working QnABot
+
+Important note: If you are attending re:Invent 2019, step 1 is already complete except for resetting the Content Designer UI 
+Admin user password which you will need to perform. After the Content Designer UI Admin password is reset to something you know, you can
+jump along to Step 2. 
+
+### Resetting the Content Designer UI Password
+``` 
+aws cognito-idp list-user-pools --max-results 25
+```
+This outputs json. Looks for something similar to
+``` 
+"Id": "us-east-1_tdc8N6oyZ",
+"Name": "UserPool-QNA-[basedOnStackName]"
+```
+Next execute the command below. You can use any password you wish. This password will be required when
+you login to the designerUI. 
+``` 
+aws cognito-idp admin-set-user-password --user-pool-id [YourUserPoolIdFromJson] --username Admin --password MyPassword2019_
+```
+Skip to step 2 if you are running the workshop at re:Invent 2019 and using a preconfigured AWS account.
 
 ### Workshop Setup:
 
@@ -628,9 +650,13 @@ Cool. Now you can ask Sun questions using your Alexa Skill and keep these easily
 
 * * *
   
-## Step 6 - Monitor Usage with Kibana:
+## Step 6 - Integrate SMS:
 
-### Here's what you're going to work on in step 6: 
+* * *
+  
+## Step 7 - Monitor Usage with Kibana:
+
+### Here's what you're going to work on in step 7: 
 * Enable Feedback in QnaBot - By default feedback is not enabled in QnABot. This step will
   walk you through enabling the standard Feedback mechanism.
 * Use a preconfigured Kibana deployment to find out what your users have been up to with respect to your 
@@ -737,9 +763,9 @@ your bot and how to look for questions that the system is not matching against.
 
 * * *
 
-## Step 7 - Customize with Lambda:
+## Step 8 - Customize with Lambda:
 
-### Here's what you're going to work on in step 7:
+### Here's what you're going to work on in step 8:
 
 Solar Association wants to provide quick access to Solar Flare information. In particular
 the Association wants to let users know when the last solar flare events were detected. For this workshop,
@@ -1015,6 +1041,8 @@ cd aws-ai-qna-bot/workshops/reinvent2018/scripts
 * Use the AWS Cloud9 Dashboard to Delete your development environment
 
 * Use the Amazon Connect console to delete your call center instance
+
+* Remove any Twilio resources used to establish an SMS channel
 
 Finally, [delete the CloudFormation stacks](http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/cfn-console-delete-stack.html) launched at the beginning of the workshop to clean up the rest.  If the stack deletion process encountered errors, look at the Events tab in the CloudFormation dashboard, and you'll see what steps failed.  It might just be a case where you need to clean up a manually created asset that is tied to a resource goverened by CloudFormation.
 * Use the AWS CloudFormation console to delete the QnABot stacks you launched
