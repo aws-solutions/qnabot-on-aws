@@ -70,7 +70,14 @@ Important note: If you are attending re:Invent 2019, step 1 is already complete 
 Admin user password which you will need to perform. After the Content Designer UI Admin password is reset to something you know, you can
 jump along to Step 2. 
 
-### Resetting the Content Designer UI Password
+If you are not attending re:Invent 2019, please follow the steps in Workshop Setup below. 
+
+### Resetting the Content Designer UI Password for Event Engine Supplied AWS Account
+
+Login to the event engine supplied AWS Account and provision a Cloud9 IDE. If you have not used Cloud9 IDE before, 
+these steps are also covered in Step 3. Within the Cloud9 console open a new Terminal window. From this window
+perform the following steps.
+
 ``` 
 aws cognito-idp list-user-pools --max-results 25
 ```
@@ -79,8 +86,9 @@ This outputs json. Looks for something similar to
 "Id": "us-east-1_tdc8N6oyZ",
 "Name": "UserPool-QNA-[basedOnStackName]"
 ```
-Next execute the command below. You can use any password you wish. This password will be required when
-you login to the designerUI. 
+Next execute the command below. You can specify any password you wish although it should be at least 8 characters in length,
+have at least one uppercase letter, one lowercase letter, one number, and one special character. An acceptable password is "MyPassword2019_" as shown in the
+command. This password will be required when you login to the designer UI later in step 2. 
 ``` 
 aws cognito-idp admin-set-user-password --user-pool-id [YourUserPoolIdFromJson] --username Admin --password MyPassword2019_
 ```
