@@ -10,6 +10,7 @@
         )
           v-tab.title(ripple href="#questions" id="questions-tab") Questions
           v-tab.title(ripple href="#test" id="test-tab") Test
+          v-tab.title(ripple href="#testAll" id="testAll-tab") Test All
         v-spacer
         v-menu(bottom left)
           v-btn.white--text(icon slot="activator" id="edit-sub-menu")
@@ -22,7 +23,9 @@
     span
       questions(@filter="get(pagination)" v-if="active==='questions'")
       test(v-if="active==='test'")
+      testAll(v-if="active==='testAll'")
     v-data-table(
+      v-if="active!=='testAll'"
       :headers="headers"
       :items="QAs"
       :search="search"
@@ -98,7 +101,6 @@ or in the "license" file accompanying this file. This file is distributed on an 
 BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied. See the
 License for the specific language governing permissions and limitations under the License.
 */
-
 var Vuex=require('vuex')
 var Promise=require('bluebird')
 var _=require('lodash')
@@ -136,13 +138,14 @@ module.exports={
     }]
   }},
   components:{
-    qa:require('./qa.vue'),
-    questions:require('./menu-questions.vue'),
-    test:require('./menu-test.vue'),
-    delete:require('./delete.vue'),
-    edit:require('./edit.vue'),
-    build:require('./rebuild.vue'),
-    alexa:require('./alexa.vue'),
+    qa:require('./qa.vue').default,
+    questions:require('./menu-questions.vue').default,
+    test:require('./menu-test.vue').default,
+    testAll:require('./menu-testall.vue').default,
+    delete:require('./delete.vue').default,
+    edit:require('./edit.vue').default,
+    build:require('./rebuild.vue').default,
+    alexa:require('./alexa.vue').default,
   },
   computed:{
     empty:function(){
@@ -191,12 +194,14 @@ module.exports={
   },
   methods:{
     get:_.debounce(async function(event){
-      this.selectAll=false
-      await this.$store.dispatch('data/get',{
-        page:event.page-1,
-        perpage:event.rowsPerPage,
-        order:event.descending ? 'desc' : 'asc'
-      }) 
+        if (this.active === 'questions') {
+            this.selectAll = false
+            await this.$store.dispatch('data/get', {
+                page: event.page - 1,
+                perpage: event.rowsPerPage,
+                order: event.descending ? 'desc' : 'asc'
+            })
+        }
     },100,{trailing:true,leading:false}),
     changeSort:_.debounce(function(column) {
       if(this.tab==='questions'){

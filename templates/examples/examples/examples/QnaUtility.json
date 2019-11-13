@@ -1,0 +1,65 @@
+{
+	"qna": [{
+			"a": "Thank you for your positive feedback on this answer, your feedback helps us continuously improve.",
+			"qid": "Feedback.002",
+			"args": [
+				"correct"
+			],
+			"l": "QNA:ExamplePYTHONLambdaFeedback",
+			"q": [
+				"Thumbs up",
+				"Good answer"
+			],
+			"type": "qna"
+		},
+		{
+			"a": "Thank you for your feedback - we will try to improve this answer.",
+			"qid": "Feedback.001",
+			"args": [
+				"incorrect"
+			],
+			"l": "QNA:ExamplePYTHONLambdaFeedback",
+			"next": "",
+			"q": [
+				"Thumbs down",
+				"Bad answer"
+			],
+			"r": {
+				"subTitle": "",
+				"title": "",
+				"url": "",
+				"text": "",
+				"imageUrl": "",
+				"buttons": [{
+					"text": "",
+					"value": ""
+				}]
+			},
+			"t": "",
+			"alt": {
+				"ssml": "",
+				"markdown": ""
+			},
+			"type": "qna"
+		},
+		{
+			"a": "You stumped me, I don't currently know the answer to that question.",
+			"qid": "CustomNoMatches",
+			"type": "qna",
+			"q": [
+				"no_hits"
+			]
+		},
+		{
+			"a": "I am the QnA bot, ask me a question and I will try my best to answer it.",
+			"qid": "Help",
+			"type": "qna",
+			"q": [
+				"help",
+				"help me",
+				"need help"
+			]
+		}
+
+	]
+}

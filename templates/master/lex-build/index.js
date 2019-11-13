@@ -16,6 +16,7 @@ module.exports={
         BOTALIAS:{"Ref":"Alias"},
         SLOTTYPE:{"Ref":"SlotType"},
         INTENT:{"Ref":"Intent"},
+        INTENTFALLBACK:{"Ref":"IntentFallback"},
         ADDRESS:{"Fn::GetAtt":["ESVar","ESAddress"]},
         INDEX:{"Fn::GetAtt":["Var","index"]},
     },"nodejs8.10"),

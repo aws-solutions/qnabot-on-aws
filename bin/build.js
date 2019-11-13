@@ -42,11 +42,11 @@ async function create(options){
     log('building '+(options.stack || options.input),stack,!options.silent)
     var file=options.input || __dirname+'/../templates/'+stack
     var output=options.output || `${__dirname}/../build/templates/${stack}.json`
-    try {  
+    try {
         var temp=await Promise.resolve(require(file))
         var template_string=typeof temp ==="object" ? JSON.stringify(temp) : temp
         
-        log("writting to "+output,!options.silent)
+        log("writing to "+output,!options.silent)
 
         await fs.writeFileAsync(output,stringify(JSON.parse(template_string)))
         await check(stack,{file:output})

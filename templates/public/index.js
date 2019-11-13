@@ -26,7 +26,9 @@ module.exports=Promise.resolve(require('../master')).then(function(base){
         "UserPoolURL",
         "BotName",
         "BotAlias",
-        "Intent"
+        "Intent",
+        "DefaultSettingsSSMParameterName",
+        "CustomSettingsSSMParameterName"
     ])
 
     base.Parameters=_.pick(base.Parameters,[

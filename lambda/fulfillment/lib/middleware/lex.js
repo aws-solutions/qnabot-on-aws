@@ -1,7 +1,9 @@
 var _=require('lodash')
-exports.parse=function(event){
-    return {
+exports.parse=function(req){
+    var event = req._event;
+    var out={
         _type:"LEX",
+        _userId:_.get(event,"userId","Unknown Lex User"),
         question:_.get(event,'inputTranscript'),
         session:_.mapValues(
             _.get(event,'sessionAttributes',{}),
@@ -15,6 +17,7 @@ exports.parse=function(event){
         ),
         channel:_.get(event,"requestAttributes.'x-amz-lex:channel-type'")
     }
+    return out;
 }
 
 exports.assemble=function(request,response){

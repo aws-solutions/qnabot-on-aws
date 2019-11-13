@@ -1,5 +1,5 @@
 <template lang="pug">
-  v-container(fluid)
+  v-container(fluid v-chosen)
     v-layout(column)
       v-flex
         v-container
@@ -10,7 +10,6 @@
                 label="Filter items by ID prefix" 
                 v-model="$store.state.data.filter"
                 @input="filter"
-                @keyup.enter="emit" 
                 id="filter"
                 clearable 
               )
@@ -34,64 +33,71 @@
 </template>
 
 <script>
-/*
-Copyright 2017-2017 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+    /*
+    Copyright 2017-2017 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 
-Licensed under the Amazon Software License (the "License"). You may not use this file
-except in compliance with the License. A copy of the License is located at
+    Licensed under the Amazon Software License (the "License"). You may not use this file
+    except in compliance with the License. A copy of the License is located at
 
-http://aws.amazon.com/asl/
+    http://aws.amazon.com/asl/
 
-or in the "license" file accompanying this file. This file is distributed on an "AS IS"
-BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied. See the
-License for the specific language governing permissions and limitations under the License.
-*/
+    or in the "license" file accompanying this file. This file is distributed on an "AS IS"
+    BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied. See the
+    License for the specific language governing permissions and limitations under the License.
+    */
 
-var Vuex=require('vuex')
-var saveAs=require('file-saver').saveAs
-var Promise=require('bluebird')
-var _=require('lodash')
+    var Vuex = require('vuex')
+    var saveAs = require('file-saver').saveAs
+    var Promise = require('bluebird')
+    var _ = require('lodash')
+    module.exports = {
+        data: function () {
+            return {
+                dialog: false,
+                building: false,
+                success: false,
+                error: ''
+            }
+        },
+        components: {
+            add: require('./add.vue').default,
+            delete: require('./delete.vue').default
+        },
+        directives: {
+            chosen: {
+                // directive definition - this calls the emit function to request filters be reapplied to
+                // the current question view. This resets any changes made in the test tab.
+                inserted: (el, binding, vnode) => {
+                    vnode.context.emit();
+                }
+            }
+        },
+        computed: {},
+        methods: {
+            filter: function (event) {
+                this.emit()
+            },
+            emit: _.debounce(function () {
+                this.$emit('filter')
+            }, 100, {leading: true, trailing: false}),
+            build: function () {
+                var self = this
+                this.building = true
 
-module.exports={
-  data:function(){
-    return {
-      dialog:false,
-      building:false,
-      success:false,
-      error:''
+                this.$store.dispatch('data/build')
+                    .then(function () {
+                        self.success = true
+                        setTimeout(() => self.success = false, 2000)
+                    })
+                    .catch(e => self.error = e)
+                    .then(() => self.building = false)
+            }
+        }
     }
-  },
-  components:{
-    add:require('./add.vue'),
-    delete:require('./delete.vue')
-  },
-  computed:{},
-  methods:{
-    filter:function(event){
-      this.$store.state.data.filter=event || ""
-      this.emit()
-    },
-    emit:_.debounce(function(){
-      this.$emit('filter')
-    },500,{leading:true,trailing:false}),
-    build:function(){
-      var self=this
-      this.building=true
-      
-      this.$store.dispatch('data/build')
-      .then(function(){
-        self.success=true
-        setTimeout(()=>self.success=false,2000)
-      })
-      .catch(e=>self.error=e)
-      .then(()=>self.building=false)
-    }
-  }
-}
 </script>
 
 <style lang='scss' scoped>
-  .refresh {
-    flex:0; 
-  }
+    .refresh {
+        flex: 0;
+    }
 </style>

@@ -1,4 +1,4 @@
-{
+﻿{
   "qna": [
     {
       "a": "Greetings friendly human! Ask me a question. Try to stump me.",
@@ -9,15 +9,13 @@
       ]
     },
     {
-      "qid": "QnABot.002",
-      "a": "Create and administer your questions and answers using the Q and A Bot Content Designer UI. End users ask questions using the Lex web UI which supports voice or chat, or using Alexa devices for hands free voice interaction. ",
-      "r": {
-        "title": "",
-        "imageUrl": ""
-      },
+      "qid": "GreetingHookExample",
+      "a": "Lambda Hooks allow you to extend QnABot by returning dynamic answers.",
+      "l": "QNA:ExampleJSLambdahook",
       "type": "qna",
       "q": [
-        "How do I use Q and A bot"
+        "What are lambda hooks",
+        "What is a lambda hook"
       ]
     },
     {
@@ -33,12 +31,22 @@
       ]
     },
     {
-      "next": "",
       "args": [
         ""
       ],
+      "next": "",
       "a": "Echo Show brings you everything you love about Alexa, and now she can show you things. She is the perfect companion for Q and A Bot.",
       "r": {
+        "buttons": [
+          {
+            "text": "QnABot",
+            "value": "What is Q and A bot?"
+          },
+          {
+            "text": "FireTV",
+            "value": "What is Amazon Fire TV?"
+          }
+        ],
         "subTitle": "",
         "imageUrl": "https://images-na.ssl-images-amazon.com/images/I/61OddH8ddDL._SL1000_.jpg",
         "title": "Echo Show"
@@ -57,12 +65,45 @@
       ]
     },
     {
-      "a": "For latest prices on the Echo Show, see the Amazon retail site or shopping app.",
-      "t": "EchoShow",
-      "qid": "Alexa.cost",
+      "args": [
+        ""
+      ],
+      "next": "",
+      "a": "So far, you have interacted with me {{UserInfo.InteractionCount}} times.\n{{#ifCond UserInfo.TimeSinceLastInteraction '>' 60}}\nIt's over a minute since I heard from you last.. I almost fell asleep!\n{{else}}\nKeep those questions coming fast.. It's been {{UserInfo.TimeSinceLastInteraction}} seconds since your last interaction.\n{{/ifCond}}",
+      "r": {
+        "buttons": [
+          {
+            "text": "",
+            "value": ""
+          }
+        ],
+        "subTitle": "",
+        "imageUrl": "",
+        "title": ""
+      },
+      "t": "",
+      "alt": {
+        "markdown": "",
+        "ssml": ""
+      },
+      "l": "",
+      "qid": "Handlebars.001",
+      "type": "qna",
+      "selected": false,
+      "q": [
+        "What is my interaction count?"
+      ]
+    },
+    {
+      "qid": "QnABot.002",
+      "a": "Create and administer your questions and answers using the Q and A Bot Content Designer UI. End users ask questions using the Lex web UI which supports voice or chat, or using Alexa devices for hands free voice interaction. ",
+      "r": {
+        "title": "",
+        "imageUrl": ""
+      },
       "type": "qna",
       "q": [
-        "How much does it cost?"
+        "How do I use Q and A bot"
       ]
     },
     {
@@ -99,26 +140,89 @@
       ]
     },
     {
+      "a": "Thank you for your positive feedback on this answer, your feedback helps us continuously improve.",
+      "qid": "Feedback.002",
+      "args": [
+        "correct"
+      ],
+      "l": "QNA:ExamplePYTHONLambdaFeedback",
+      "type": "qna",
+      "q": [
+        "Thumbs up",
+        "Good answer"
+      ]
+    },
+    {
+      "a": "Thank you for your feedback - we will try to improve this answer.",
+      "qid": "Feedback.001",
+      "args": [
+        "incorrect"
+      ],
+      "l": "QNA:ExamplePYTHONLambdaFeedback",
       "next": "",
+      "r": {
+        "subTitle": "",
+        "title": "",
+        "url": "",
+        "text": "",
+        "imageUrl": "",
+        "buttons": [
+          {
+            "text": "",
+            "value": ""
+          }
+        ]
+      },
+      "t": "",
+      "alt": {
+        "ssml": "",
+        "markdown": ""
+      },
+      "type": "qna",
+      "q": [
+        "Thumbs down",
+        "Bad answer"
+      ]
+    },
+    {
       "args": [
         ""
       ],
+      "next": "",
       "a": "The Q and A Bot uses Amazon Lex and Alexa to provide a natural language interface for your FAQ knowledge base, so your users can just ask a question and get a quick and relevant answer.",
       "r": {
+        "buttons": [
+          {
+            "text": "",
+            "value": ""
+          }
+        ],
         "subTitle": "",
         "imageUrl": "",
         "title": ""
       },
       "t": "QnABot",
       "alt": {
-        "markdown": "# QnaBot\nThe Q and A Bot uses [Amazon Lex](https://aws.amazon.com/lex) and [Alexa](https://developer.amazon.com/alexa) to provide a natural language interface for your FAQ knowledge base.  \nNow your users can just ask a *question* and get a quick and relevant *answer*.",
-        "ssml": "<speak>    QnABot is <emphasis level=\"strong\">great</emphasis>. But I want to tell you a secret.  <amazon:effect name=\"whispered\">I am not a real human.</amazon:effect>.   Can you believe it? </speak>"
+        "markdown": "# QnaBot\nThe Q and A Bot uses [Amazon Lex](https://aws.amazon.com/lex) and [Alexa](https://developer.amazon.com/alexa) to provide a natural language interface for your FAQ knowledge base. Now your users can just ask a *question* and get a quick and relevant *answer*.",
+        "ssml": "<speak>QnABot is <emphasis level=\"strong\">great</emphasis>. But I want to tell you a secret. <amazon:effect name=\"whispered\">I am not a real human.</amazon:effect>. Can you believe it? </speak>"
       },
       "l": "",
       "qid": "QnABot.001",
       "type": "qna",
       "q": [
         "What is Q and A Bot"
+      ]
+    },
+    {
+      "qid": "QnABot.003",
+      "a": "You can integrate it with your website to provide quick and easy access to frequently asked questions. Use it with Alexa to provide hands free answers in the kitchen, in the factory or in the car. Since it can display images too, use it to provide illustrations and photographs to enrich your answers.",
+      "r": {
+        "title": "",
+        "imageUrl": ""
+      },
+      "type": "qna",
+      "q": [
+        "What can Q and A bot do"
       ]
     },
     {
@@ -134,56 +238,23 @@
       ]
     },
     {
-      "qid": "Feedback",
-      "a": "Unable to leave feedback at the moment...",
-      "r": {},
-      "type": "qna",
-      "l": "QNA:ExamplePYTHONLambdaFeedback",
-      "q": [
-        "Feedback",
-        "That is wrong",
-        "leave feedback",
-        "good answer",
-        "bad answer"
-      ]
-    },
-    {
-      "qid": "EnterSampleQuiz",
-      "a": "Starting the sample quiz.  Good luck!",
-      "r": {},
-      "l": "QNA:ExampleJSLambdaQuiz",
-      "args": [
-        "sampleQuiz.1"
-      ],
-      "type": "qna",
-      "q": [
-        "I want to take the sample quiz.",
-        "Take the sample quiz.",
-        "Take the White House quiz."
-      ]
-    },
-    {
-      "next": "",
-      "args": [
-        ""
-      ],
       "a": "Fire TV brings all the live TV and streaming content you love, and Alexa, onto the big screen. Use Alexa on the Fire TV to bring QnABot into your living room!",
-      "r": {
-        "subTitle": "",
-        "imageUrl": "",
-        "title": ""
-      },
-      "t": "",
       "alt": {
-        "markdown": "**Fire TV** brings all the live TV and streaming content you love, and Alexa, onto the big screen. Use Alexa on the Fire TV to bring QnABot into your living room!\n<iframe src=\"https://www.youtube.com/embed/OE4MrFx2XCs\"></iframe>",
-        "ssml": ""
+        "markdown": "**Fire TV** brings all the live TV and streaming content you love, and Alexa, onto the big screen. Use Alexa on the Fire TV to bring QnABot into your living room!\n<iframe src=\"https://www.youtube.com/embed/OE4MrFx2XCs\"></iframe>"
       },
-      "l": "",
       "qid": "FireTV.001",
       "type": "qna",
-      "selected": false,
       "q": [
         "What is Amazon Fire TV?"
+      ]
+    },
+    {
+      "a": "For latest prices on the Echo Show, see the Amazon retail site or shopping app.",
+      "t": "EchoShow",
+      "qid": "Alexa.Cost",
+      "type": "qna",
+      "q": [
+        "How much does it cost?"
       ]
     },
     {
@@ -199,21 +270,18 @@
       ]
     },
     {
-      "qid": "Help",
-      "a": "Ask me a question!",
-      "l": "QNA:ExampleJSLambdahello",
-      "type": "qna",
-      "q": [
-        "help"
-      ]
-    },
-    {
-      "next": "",
       "args": [
         ""
       ],
+      "next": "",
       "a": "Use the Content Designer Question and Test tools to find your existing documents and edit them directly in the console. You can also export existing documents as a JSON file, make changes to the file, and re-import.",
       "r": {
+        "buttons": [
+          {
+            "text": "",
+            "value": ""
+          }
+        ],
         "subTitle": "",
         "imageUrl": "",
         "title": ""
@@ -228,8 +296,25 @@
       "type": "qna",
       "q": [
         "How do I modify Q and A Bot content",
-        "How can I edit items",
-        "Need to change some answers"
+        "How can I edit items"
+      ]
+    },
+    {
+      "a": "You stumped me, I don't currently know the answer to that question.",
+      "qid": "CustomNoMatches",
+      "type": "qna",
+      "q": [
+        "no_hits"
+      ]
+    },
+    {
+      "a": "I am the QnA bot, ask me a question and I will try my best to answer it.",
+      "qid": "Help",
+      "type": "qna",
+      "q": [
+        "help",
+        "help me",
+        "need help"
       ]
     }
   ]

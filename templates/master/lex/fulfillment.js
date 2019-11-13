@@ -1,7 +1,7 @@
 var config=require('./config')
 var _=require('lodash')
 
-examples=_.fromPairs(require('../../examples/outputs')
+var examples=_.fromPairs(require('../../examples/outputs')
     .names
     .map(x=>{
         return [x,{"Fn::GetAtt":["ExamplesStack",`Outputs.${x}`]}]
@@ -42,8 +42,10 @@ module.exports={
             LAMBDA_LOG:{"Ref":"ESLoggingLambda"},
             ES_SERVICE_QID:{"Ref":"ESQidLambda"},
             ES_SERVICE_PROXY:{"Ref":"ESProxyLambda"},
-            "ERRORMESSAGE":config.ErrorMessage,
-            "EMPTYMESSAGE":config.EmptyMessage
+            DYNAMODB_USERSTABLE:{"Ref":"UsersTable"},
+            DEFAULT_USER_POOL_JWKS_PARAM:{"Ref":"DefaultUserPoolJwksUrl"},
+            DEFAULT_SETTINGS_PARAM:{"Ref":"DefaultQnABotSettings"},
+            CUSTOM_SETTINGS_PARAM:{"Ref":"CustomQnABotSettings"},
           },examples)
         },
         "Handler": "index.handler",
@@ -102,6 +104,38 @@ module.exports={
         "ManagedPolicyArns": [
           "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
           {"Ref":"EsPolicy"}
+        ],
+        "Policies": [
+          {
+            "PolicyName" : "ParamStorePolicy",
+            "PolicyDocument" : {
+              "Version": "2012-10-17",
+              "Statement": [{
+                  "Effect": "Allow",
+                  "Action": [
+                    "ssm:GetParameter",
+                    "ssm:GetParameters"
+                  ],
+                  "Resource":["*"]
+              }]
+            }
+          },
+          {
+            "PolicyName" : "DynamoDBPolicy",
+            "PolicyDocument" : {
+              "Version": "2012-10-17",
+              "Statement": [{
+                  "Effect": "Allow",
+                  "Action": [
+                    "dynamodb:GetItem",
+                    "dynamodb:PutItem",
+                  ],
+                  "Resource":[
+                    {"Fn::GetAtt":["UsersTable","Arn"]}
+                  ]
+              }]
+            }
+          },
         ]
       }
     }

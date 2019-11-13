@@ -31,7 +31,8 @@ var aws=require('aws-sdk')
 var failed=false
 module.exports=Object.assign(
     require('./export'),
-    require('./import'),{
+    require('./import'),
+    require('./testall'),{
     _request:Promise.method(async function(context,opts){
         var url=Url.parse(opts.url)
         var request={

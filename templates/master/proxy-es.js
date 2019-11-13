@@ -143,8 +143,8 @@ module.exports={
         },
         "Environment": {
           "Variables": {
-            "ERRORMESSAGE":lexConfig.ErrorMessage,
-            "EMPTYMESSAGE":lexConfig.EmptyMessage,
+            DEFAULT_SETTINGS_PARAM:{"Ref":"DefaultQnABotSettings"},
+            CUSTOM_SETTINGS_PARAM:{"Ref":"CustomQnABotSettings"},
           }
         },
         "Handler": "index.query",
@@ -170,7 +170,9 @@ module.exports={
           "Variables": {
             ES_TYPE:{"Fn::GetAtt":["Var","QnAType"]},
             ES_INDEX:{"Fn::GetAtt":["Var","index"]},
-            ES_ADDRESS:{"Fn::GetAtt":["ESVar","ESAddress"]}
+            ES_ADDRESS:{"Fn::GetAtt":["ESVar","ESAddress"]},
+            DEFAULT_SETTINGS_PARAM:{"Ref":"DefaultQnABotSettings"},
+            CUSTOM_SETTINGS_PARAM:{"Ref":"CustomQnABotSettings"},
           }
         },
         "Handler": "index.handler",
@@ -204,6 +206,19 @@ module.exports={
           "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
           {"Ref":"EsPolicy"},
           "arn:aws:iam::aws:policy/AmazonLexFullAccess"
+        ],
+        "Policies": [
+          {
+          	"PolicyName": "ParamStorePolicy",
+          	"PolicyDocument": {
+          		"Version": "2012-10-17",
+          		"Statement": [{
+          			"Effect": "Allow",
+          			"Action": ["ssm:GetParameter","ssm:GetParameters"],
+          			"Resource": "*"
+          		}]
+          	}
+          }
         ]
       }
     },
@@ -275,6 +290,11 @@ module.exports={
                 "Resource":[
                     {"Fn::Sub":"arn:aws:s3:::${AssetBucket}*"}
                 ]
+            },
+            {
+              "Effect": "Allow",
+              "Action": ["comprehend:DetectSyntax"],
+              "Resource":["*"]
             }
           ]
         }

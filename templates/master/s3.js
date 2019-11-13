@@ -46,50 +46,51 @@ module.exports={
           ]
         },
         "Path": "/",
-        "ManagedPolicyArns": [{"Ref":"S3AccessPolicy"}]
+        "Policies":[{
+          "PolicyName": "S3AccessPolicy",
+          "PolicyDocument": {
+            "Version": "2012-10-17",
+            "Statement": [{
+                "Effect": "Allow",
+                "Action": [
+                  "lex:*"
+                ],
+                "Resource":"*" 
+              },{
+                "Effect": "Allow",
+                "Action": [
+                  "s3:GetObject"
+                ],
+                "Resource": [
+                  {"Fn::Sub":"arn:aws:s3:::${ImportBucket}/*"},
+                  {"Fn::Sub":"arn:aws:s3:::${ExportBucket}/*"},
+                  {"Fn::Sub":"arn:aws:s3:::${TestAllBucket}/*"},
+                  {"Fn::Sub":"arn:aws:s3:::${Bucket}/*"},
+                  {"Fn::Sub":"arn:aws:s3:::${AssetBucket}/*"}
+                ]
+              },{
+                "Effect": "Allow",
+                "Action": [
+                  "s3:PutObject"
+                ],
+                "Resource": [
+                  {"Fn::Sub":"arn:aws:s3:::${ExportBucket}/*"},
+                  {"Fn::Sub":"arn:aws:s3:::${TestAllBucket}/*"},
+                ]
+              },{
+                "Effect": "Allow",
+                "Action": [
+                  "s3:DeleteObject"
+                ],
+                "Resource": [
+                  {"Fn::Sub":"arn:aws:s3:::${ImportBucket}/*"},
+                  {"Fn::Sub":"arn:aws:s3:::${ExportBucket}/*"},
+                  {"Fn::Sub":"arn:aws:s3:::${TestAllBucket}/*"}
+                ]
+              }
+            ]
+          }
+        }]
       }
     },
-    "S3AccessPolicy":{
-      "Type": "AWS::IAM::ManagedPolicy",
-      "Properties": {
-        "PolicyDocument": {
-          "Version": "2012-10-17",
-          "Statement": [{
-              "Effect": "Allow",
-              "Action": [
-                "lex:*"
-              ],
-              "Resource":"*" 
-            },{
-              "Effect": "Allow",
-              "Action": [
-                "s3:GetObject"
-              ],
-              "Resource": [
-                {"Fn::Sub":"arn:aws:s3:::${ImportBucket}/*"},
-                {"Fn::Sub":"arn:aws:s3:::${ExportBucket}/*"},
-                {"Fn::Sub":"arn:aws:s3:::${Bucket}/*"},
-                {"Fn::Sub":"arn:aws:s3:::${AssetBucket}/*"}
-              ]
-            },{
-              "Effect": "Allow",
-              "Action": [
-                "s3:PutObject"
-              ],
-              "Resource": [
-                {"Fn::Sub":"arn:aws:s3:::${ExportBucket}/*"},
-              ]
-            },{
-              "Effect": "Allow",
-              "Action": [
-                "s3:DeleteObject"
-              ],
-              "Resource": [
-                {"Fn::Sub":"arn:aws:s3:::${ImportBucket}/*"},
-                {"Fn::Sub":"arn:aws:s3:::${ExportBucket}/*"}
-              ]
-            }]
-        }
-      }
-    }
-}
+};
