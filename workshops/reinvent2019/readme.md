@@ -131,7 +131,7 @@ Congratulations on attending re:Invent 2019. We provisioned an AWS account that 
 can use during this workshop with an install of QnABot. You can log into this AWS account using the hash code 
 handed out to you as you entered the workshop. Navigate to:
 
-![Event Enginge Dashboard](https://dashboard.eventengine.run/)
+[Event Enginge Dashboard](https://dashboard.eventengine.run/)
 
 Log into the AWS console using the links provided at EventEngine. 
 
