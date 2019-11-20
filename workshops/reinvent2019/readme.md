@@ -17,13 +17,9 @@ existing website. They don't know anything about implementing a chatbot but need
 
 Your job is to implement Sun facts on your website. 
 
-TODO - new screen shots (mostly done except for connect)
-
 TODO - new SMS module (see Mohamed for status)
 
 TODO - new features ?
-
-TODO - Update Kibana Dashboard - add CloudWatch Dashboard Info
 
 ### Requirements:
 
@@ -876,7 +872,7 @@ Click on Dashboards
 
 Click on the existing QnABot Dashboard
 
-    ![Lab6-Monitor-006](images/Lab6-Monitor-005.png "CloudWatch Dashboard")
+   ![Lab6-Monitor-005](images/Lab6-Monitor-005.png "CloudWatch Dashboard")
 
 ### Checkpoint:
 
