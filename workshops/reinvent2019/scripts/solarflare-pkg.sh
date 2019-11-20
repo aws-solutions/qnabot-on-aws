@@ -5,5 +5,5 @@ export S3Bucket=`aws cloudformation describe-stacks --stack-name solarflare-code
 sam package \
     --template-file ../templates/solarflare-master.yaml \
     --output-template-file ../templates/solarflare-packaged.yaml \
-    --s3-bucket $S3Bucket
+    --s3-bucket $S3Bucket > /dev/null
 
