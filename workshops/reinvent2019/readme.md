@@ -140,9 +140,10 @@ The setup of QnABot is complete except for one small detail.
 The normal install of QnABot will send via email a url to the QnABot Designer UI along with the temporary 
 password that has been set for you. You would normally use this link to reset the Admin password for the
 QnABot Designer UI. Since QnABot was setup ahead of time you will need to manually reset the Content Designer UI Admin 
-user password to value you specify. 
+user password to a value you specify. You will be setting a new temporary password that will need to be changed
+the first time you login to the QnABot Designer UI. 
 
-### Resetting the Content Designer UI Password for your EventEngine Supplied AWS Account
+### Setting a new temporary password for the Content Designer UI for your EventEngine Supplied AWS Account
 
 Login to the EventEngine supplied AWS Account and provision a Cloud9 IDE. If you have not used Cloud9 IDE before, 
 follow theses steps which are also covered again in Step 3. 
@@ -192,7 +193,8 @@ This command outputs json. Looks for that attributes named "Id" and "Name".  sim
 Next execute the command below. You can specify any password you wish although it should be at least 
 8 characters in length, have at least one uppercase letter, one lowercase letter, one number, and one 
 special character. An acceptable password is "MyPassword2019_" as shown in the
-command. This password will be required when you login to the designer UI later in step 2. 
+command. This password will be required when you login to the designer UI later in step 2 the first time. This 
+command will set a new temporary password that you will change the first time you login to the QnABot Designer UI.
 ``` 
 aws cognito-idp admin-set-user-password --user-pool-id [YourUserPoolIdFromJson] --username Admin --password MyPassword2019_
 ```
@@ -679,7 +681,12 @@ and buttons.
   
     ![Lab4-connect-012](images/Lab4-connect-012.png)
   
-14) Click on Import and load the sample contact flow 
+14) From the Cloud9 IDE, open the workshops/reinvent2019/connect-assets folder and download the qnabot-sample file 
+to your local system.
+
+15) Back in the Contact Flow you just created, Click on the Down Arrow next to Save, and then select Import(beta) and 
+load the sample contact flow you just downloaded to your system. After loading the contact flow it will look similar
+to the image below. 
 
 ```
 ~/environment/workshops/reinvent2019/connect-assets-qnabot-sample
@@ -688,8 +695,8 @@ and buttons.
    ![Lab4-connect-023](images/Lab4-connect-023.png)
     
 This flow contains a number of items that drive the logic in Connect. You'll notice the use of 'Get customer input' to
-interact with the QnABot. This widget is used twice in the contact flow. You need to update the name of the bot 
-used by the flow and the intents which are used within the bot.  
+interact with the QnABot. This widget is used twice in the contact flow. You need to update the Name of the bot 
+used by the flow and the Intents which are used within the bot. The sample contact flow needs to be updated. 
 
 To do that first open up the AWS Lex Console so that you an obtain the intent names for your QnABot.
 
