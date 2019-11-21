@@ -776,13 +776,15 @@ resource to perform a limited experiment with the integration from a single veri
 2) Provide the account details and start your trial.
   ![Lab6-twilio-trial-1](images/Lab6-twilio-trial-1.png "Trial SignUp")
 3) Verify the new account setup via the email Twilio sends.
-4) Verify your phone number using the code sent to you. 
+4) Verify your phone number using the code sent to you.
+  ![Lab6-twilio-trial-1](images/Lab6-twilio-trial-9.png "Verify")
 5) Select Yes for "Do you write code?"
 6) Select NODE.JS
 7) Select "Use Twilio in a project"
 8) Select "Send or receive a SMS" for "What do you want to do first?"
 
 Your free Trial Account should now be setup. 
+![Lab6-twilio-trial-1](images/Lab6-twilio-trial-8.png "Trial SignUp")
 
 From your Twilio project dashboard 
 
@@ -823,6 +825,8 @@ to the bot.
 
 If you have time and a valid Facebook app, you can integration a Facebook channel as well. 
 
+[*^ back to top*](#solar-association-deploying-and-customizing-a-ready-made-question-and-answer-bot)
+
 * * *
   
 ## Step 7 - Monitor Usage with Kibana and CloudWatch:
@@ -836,46 +840,26 @@ If you have time and a valid Facebook app, you can integration a Facebook channe
 ### Enable Feedback
 1) Log into the Designer UI
 2) Pull down the upper left menu and select Import from the upper left
-3) Expand the Examples/Demos at the bottom
-4) Click on the load button across from 'feedback'
-5) Wait for the load of feedback.json to complete (should be very quick).
-   You'll see a new question id of Feedback with questions like 'that is wrong' and 'that is right'
-6) Rebuild the Lex bot so that it understands responses such as 'that is right'
-    1) Use the menu on the right hand side of the Designer UI
-    2) Select the "three vertical dots"
-    3) From the pull down, select Lex Rebuild. This will take all the known questions and add these to the Lex Bot and then
-       rebuild the bot.
-
-7) Once this process is complete, after asking a question and getting an answer,
- users can give feedback to the system by saying or typing 'leave feedback', or 'that is right', or 
-'that is wrong'. This feedback will be seen in the Kibana dashboard. 
-
-8) Try the following from your chat bot web client
+3) Expand the Examples/Extensions at the bottom
+4) Click on the load button across from 'QnaUtility'
+5) Wait for the load of QnaUtility.json to complete (should be very quick).
+   You'll see new question ids of Feedback.001, Feedback.002, and CustomNoMatches with questions 'Thumbs Down', 'Thumbs Up', and 'no_hits'. 
+6) Once this process is complete, after asking a question and getting an answer,
+ users can give feedback to the system by clicking on the thumbs up or thumbs down buttons or saying or typing 'thumbs up', or 'thumbs down'. This feedback will be seen in the Kibana dashboard. 
+7) Try the following from your chat bot web client
 ```
 How hot is the sun
 ```
-Then chat with
-```
-leave feedback
-```
-Finally pick option A
-```
-A
-```
+
+Click on the Thumbs up button. 
 
 Ask another question and leave feedback once more.
 ```
 How hot is mars
 ```
-```
-leave feedback
-```
-```
-B
-```
+Click on the Thumbs down button.
 
-The above steps will will prime the system with some feedback to
-display in Kibana.
+The above steps will will prime the system with some feedback to display in Kibana.
 
 ### Launch Kibana
 1) Log into the Designer UI
@@ -1212,6 +1196,8 @@ feedback with integrated thumbs up/down buttons in web client, automated questio
 support variable substitution and conditional answers using ‘handlebars’ templates in Content Designer.
 
 For a description of these features be sure to checkout the blog post at [New Features](https://aws.amazon.com/blogs/machine-learning/creating-a-question-and-answer-bot-with-amazon-lex-and-amazon-alexa/#new-features-log)
+
+[*^ back to top*](#solar-association-deploying-and-customizing-a-ready-made-question-and-answer-bot)
 
 * * *
 
