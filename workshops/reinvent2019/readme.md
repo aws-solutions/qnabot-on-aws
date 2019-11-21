@@ -17,10 +17,6 @@ existing website. They don't know anything about implementing a chatbot but need
 
 Your job is to implement Sun facts on your website. 
 
-TODO - new SMS module (see Mohamed for status)
-
-TODO - new features ?
-
 ### Requirements:
 
 * AWS account - if you don't have one, it's easy and free to [create one](https://aws.amazon.com/). Note: If you are 
@@ -40,9 +36,10 @@ During the workshop, AWS staff will give you a high-level overview of the labs a
 * **Step 3:** [Integrate on your WebSite](#step-3---integrate-qnabot-into-your-website)
 * **Step 4:** [Integrate QnABot into an Amazon Connect Call Center](#step-4---integrate-qnabot-into-an-amazon-connect-call-center)
 * **Step 5:** [Integrate Alexa](#step-5---integrate-alexa)
-* **Step 6:** [Integrate SMS](#step-6---integrate-SMS)
-* **Step 7:** [Monitor Usage in Kibana](#step-7---monitor-usage-with-kibana)
+* **Step 6:** [Integrate SMS](#step-6---integrate-sms)
+* **Step 7:** [Monitor Usage in Kibana](#step-7---monitor-usage-with-kibana-and-cloudwatch)
 * **Step 8:** [Customize with Lambda](#step-8---customize-with-lambda)
+* **Step 9:** [New QnABot features in 2.4.0](#step-9---new-features)
 * **Cleanup** [Put everything away nicely](#workshop-cleanup)
 
 ### Conventions:
@@ -763,9 +760,72 @@ Cool. Now you can ask Sun questions using your Alexa Skill and keep these easily
   
 ## Step 6 - Integrate SMS:
 
+### Here's what you're going to work on in step 6:
+
+* Setup a new Twilio free trial account
+* Acquire a new phone number to send messages to
+* Setup the Twilio channel for QnABot 
+* Setup Twilio with a WebHook to send messages via Lex to QnABot
+* Test out the integration
+
+The first item to complete is to setup a free trail account at Twilio. This trial account will provide enough
+resource to perform a limited experiment with the integration from a single verified phone number . 
+
+1)Navigate to the following URL
+  [Twilio Account Signup](https://www.twilio.com/try-twilio)
+2) Provide the account details and start your trial.
+  ![Lab6-twilio-trial-1](images/Lab6-twilio-trial-1.png "Trial SignUp")
+3) Verify the new account setup via the email Twilio sends.
+4) Verify your phone number using the code sent to you. 
+5) Select Yes for "Do you write code?"
+6) Select NODE.JS
+7) Select "Use Twilio in a project"
+8) Select "Send or receive a SMS" for "What do you want to do first?"
+
+Your free Trial Account should now be setup. 
+
+From your Twilio project dashboard 
+
+1) Obtain a Trial Number
+![Lab6-twilio-trial-2](images/Lab6-twilio-trial-2.png "Trial Number")
+2) Find your ACCOUNT SID and AUTH TOKEN
+![Lab6-twilio-trial-3](images/Lab6-twilio-trial-3.png "Trial Number")
+
+Navigate to the Amazon Lex Console
+
+1) Open your QnABot
+2) Select the channels tab
+3) Select the Twilio channel on the left
+4) Fill in the Twilio channel properties including the Account SID and Auth Token obtained from Twilio. Click on Activate.
+![Lab6-twilio-trial-4](images/Lab6-twilio-trial-4.png "Form Properties")
+
+At the bottom of your Amazon Lex Twilio channel properties page, copy the next Endpoint URL
+![Lab6-twilio-trial-5](images/Lab6-twilio-trial-5.png "Channel Properties")
+
+Back in the Twilio page
+1) Click on the all products and services button "..."
+2) Open the Phone Numbers page under the Super Network menu item
+3) Click on your active number
+![Lab6-twilio-trial-6](images/Lab6-twilio-trial-6.png "Channel Properties")
+4) Scroll down and file in the AWS endpoint url as the WebHook for incoming calls
+![Lab6-twilio-trial-7](images/Lab6-twilio-trial-7.png "WebHook")
+5) Click on Save
+
+Test out your integration. 
+1) Open your message app on your mobile device
+2) Send a question to your new Twilio phone number
+3) QnABot should respond with the appropriate answer
+
+### Checkpoint:
+
+Super. If everything is setup, now you have a text message based channel for your QnABot. You can text your questions
+to the bot. 
+
+If you have time and a valid Facebook app, you can integration a Facebook channel as well. 
+
 * * *
   
-## Step 7 - Monitor Usage with Kibana:
+## Step 7 - Monitor Usage with Kibana and CloudWatch:
 
 ### Here's what you're going to work on in step 7: 
 * Enable Feedback in QnaBot - By default feedback is not enabled in QnABot. This step will
@@ -1141,6 +1201,20 @@ ids to update are sun.8 and sun.2.
 [*^ back to top*](#solar-association-deploying-and-customizing-a-ready-made-question-and-answer-bot)
 
 * * *
+
+## Step 9 - New Features:
+
+QnABot version 2.4.0 provides some significant new features.
+
+November 2019 (v2.4.0) – Customizable configuration settings, minimized need to rebuild Lex bot when adding new content, 
+improved accuracy using keyword filters, configurable response when answer isn’t found, improved handling of user 
+feedback with integrated thumbs up/down buttons in web client, automated question testing in Content Designer, 
+support variable substitution and conditional answers using ‘handlebars’ templates in Content Designer.
+
+For a description of these features be sure to checkout the blog post at [New Features](https://aws.amazon.com/blogs/machine-learning/creating-a-question-and-answer-bot-with-amazon-lex-and-amazon-alexa/#new-features-log)
+
+* * *
+
 ## Finished! Please fill out evaluation cards!
 
 Congratulations on completing the labs, or at least giving it a good go.  Thanks for helping Solar Universal publish a 
