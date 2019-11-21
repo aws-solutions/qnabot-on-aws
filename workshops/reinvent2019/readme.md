@@ -19,7 +19,8 @@ Your job is to implement Sun facts on your website.
 
 ### Requirements:
 
-* AWS account - if you don't have one, it's easy and free to [create one](https://aws.amazon.com/).
+* AWS account - if you don't have one, it's easy and free to [create one](https://aws.amazon.com/). Note: If you are 
+attending the workshop at re:Invent 2019, an AWS account will be provided to you for use during the workshop.
 * Amazon developer account - if you don't have one its easy and free to [create one](https://developer.amazon.com).
 * AWS IAM account with elevated privileges allowing you to interact with CloudFormation, IAM, S3, Elasticsearch, CloudWatch, Cloud9. [Learn how](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_users_create.html).
 * Familiarity with [NodeJS](https://www.nodejs.org) and [AWS](httpts://aws.amazon.com) - *not required but a bonus*.
@@ -35,8 +36,10 @@ During the workshop, AWS staff will give you a high-level overview of the labs a
 * **Step 3:** [Integrate on your WebSite](#step-3---integrate-qnabot-into-your-website)
 * **Step 4:** [Integrate QnABot into an Amazon Connect Call Center](#step-4---integrate-qnabot-into-an-amazon-connect-call-center)
 * **Step 5:** [Integrate Alexa](#step-5---integrate-alexa)
-* **Step 6:** [Monitor Usage in Kibana](#step-6---monitor-usage-with-kibana)
-* **Step 7:** [Customize with Lambda](#step-7---customize-with-lambda)
+* **Step 6:** [Integrate SMS](#step-6---integrate-sms)
+* **Step 7:** [Monitor Usage in Kibana](#step-7---monitor-usage-with-kibana-and-cloudwatch)
+* **Step 8:** [Customize with Lambda](#step-8---customize-with-lambda)
+* **Step 9:** [New QnABot features in 2.4.0](#step-9---new-features)
 * **Cleanup** [Put everything away nicely](#workshop-cleanup)
 
 ### Conventions:
@@ -58,11 +61,24 @@ Tasks or actions that you need to complete will always start with a number
 
 ### IMPORTANT: Workshop Cleanup
 
-You will be deploying infrastructure on AWS which will have an associated cost. If you're attending an AWS event, credits will be provided.  When you're done with the workshop, [follow the steps at the very end of the instructions](#workshop-cleanup) to make sure everything is cleaned up and avoid unnecessary charges.
+You will be deploying infrastructure on AWS which will have an associated cost.
+When you're done with the workshop, [follow the steps at the very end of the instructions](#workshop-cleanup) to make 
+sure everything is cleaned up and avoid unnecessary charges.
 
 * * *
 
 ## Step 1 - Let's begin and deploy a working QnABot
+
+You have an important choice to make at this point of the workshop. 
+
+If you are attending re:Invent 2019, skip to step 1B. Installation of QnABot has already 
+been performed in an account you will use for the duration of the workshop. 
+
+If you are not attending re:Invent 2019 or you wish to deploy QnABot in your own
+AWS account, please follow the steps in step 1A below. Note this part of the setup
+will take ~25 minutes to complete.
+
+## Step 1A
 
 ### Workshop Setup:
 
@@ -97,14 +113,94 @@ The CloudFormation template will launch the following:
 * Kinesis Firehouse used as an alternate mechanism to store metrics in S3
 * IAM Roles and Policies to support access to the resources
 
-![CloudFormation Starting Stack](images/00-arch.png)
+![CloudFormation Starting Stack](images/00-arch-b.png)
+
+Once the CloudFormation template is complete you can skip on the Checkpoint below or on
+to Step 2.
+
+## Step 1B
+
+Congratulations on attending re:Invent 2019. We provisioned an AWS account that you
+can use during this workshop with an install of QnABot. You can log into this AWS account using the hash code 
+handed out to you as you entered the workshop. Navigate to:
+
+[Event Enginge Dashboard](https://dashboard.eventengine.run/)
+
+Log into the AWS console using the links provided at EventEngine. 
+
+The setup of QnABot is complete except for one small detail. 
+
+The normal install of QnABot will send via email a url to the QnABot Designer UI along with the temporary 
+password that has been set for you. You would normally use this link to reset the Admin password for the
+QnABot Designer UI. Since QnABot was setup ahead of time you will need to manually reset the Content Designer UI Admin 
+user password to a value you specify. You will be setting a new temporary password that will need to be changed
+the first time you login to the QnABot Designer UI. 
+
+### Setting a new temporary password for the Content Designer UI for your EventEngine Supplied AWS Account
+
+Login to the EventEngine supplied AWS Account and provision a Cloud9 IDE. If you have not used Cloud9 IDE before, 
+follow theses steps which are also covered again in Step 3. 
+
+We are going to use the [AWS Cloud9 IDE](https://aws.amazon.com/cloud9/ "Cloud9") to assist us to reset the password.
+Perform the following to setup a new AWS Cloud9 Environment. Note: You will not need to perform this again in step 3. 
+
+#### Cloud9 Setup
+   
+1) Log into the AWS Console using your AWS Account
+
+2) Set your region to N. Virginia (us-east-1)
+
+3) Navigate to the Cloud9 Service
+
+4) Click on create environment
+
+5) Give this a name and description of <pre>QnABotWorkshop</pre>
+
+6) Click Next step
+
+7) Use the default of Create a new instance for environment (EC2)
+
+8) Use the default of t2.micro
+
+9) Use the default of Cost-saving setting - After 30 minutes (default)
+
+10) Click Next step
+
+11) Click Create environment
+   
+Your AWS Cloud9 environment will begin to be setup. Once its ready continue with the following.
+
+In the Cloud9 console, open a new Terminal window using the "+" button. 
+
+From this window perform the following steps.
+
+List the Amazon Cognito user pool that has been provisioned for you. 
+
+``` 
+aws cognito-idp list-user-pools --max-results 5
+```
+This command outputs json. Looks for that attributes named "Id" and "Name".  similar to
+``` 
+"Id": "us-east-1_tdc8N6oyZ",
+```
+Next execute the command below. You can specify any password you wish although it should be at least 
+8 characters in length, have at least one uppercase letter, one lowercase letter, one number, and one 
+special character. An acceptable password is "MyPassword2019_" as shown in the
+command. This password will be required when you login to the designer UI later in step 2 the first time. This 
+command will set a new temporary password that you will change the first time you login to the QnABot Designer UI.
+``` 
+aws cognito-idp admin-set-user-password --user-pool-id [YourUserPoolIdFromJson] --username Admin --password MyPassword2019_
+```
 
 ### Checkpoint:
+
 The CloudFormation stack will take 25 minutes to launch.  Periodically check on the stack creation process in the 
 CloudFormation Dashboard. If no stack shows up immediately, click the refresh button at the top right hand corner of 
 your screen.  Your stack should show status **CREATE\_COMPLETE** in roughly 25 minutes. 
 
-If there was an [error](http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/troubleshooting.html#troubleshooting-errors) during the stack creation process, CloudFormation will rollback and terminate.  You can investigate and troubleshoot by looking in the Events tab.  Any errors encountered during stack creation will appear in the event stream as a failure.
+If there was an [error](http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/troubleshooting.html#troubleshooting-errors) 
+during the stack creation process, CloudFormation will rollback and terminate.  You can investigate and troubleshoot by 
+looking in the Events tab.  Any errors encountered during stack creation will appear in the event stream as a failure.
 
 Go ahead and start reading the next section while your stack is being created. Once the stack has been created you can 
 explore resources using the AWS console for ElasticSearch, Lex, Lambda, Cognito. 
@@ -140,6 +236,8 @@ $ aws cloudformation list-stacks
 $ aws cloudformation describe-stacks --stack-name <b><i>YOURSTACKNAME</i></b>
 </pre>
 
+"TemplateDescription": "QnABot with admin and client websites - (Master v2.4.0)", 
+
 You should also look to see the Outputs from your stack displayed in the Cloud Formation console. 
 Notice a number of urls. There are two very important URLs:
 * ContentDesignerURL
@@ -158,58 +256,56 @@ Fore more information on the stack this is launching refer to the AWS QnABot at 
 
 ***NOTE: QnABot Stack complete in ~25 minutes after launch.*** Before proceeding make sure the stack is complete.
 
-1) Open the email CloudFormation sent to you. 
+1) Either Open the link in the email CloudFormation sent to you (running in your own account) or open the link fro the ContentDesigner UI
+available in outputs from the QnABot stack. 
 
-2) Click on the link in the email that the CloudFormation stack sent to you. 
+2) The user name is <pre>Admin</pre>
 
-3) The user name is <pre>Admin</pre>
+3) The password is the temporary password either sent to you via email or you set to previously.
 
-4) The password is the temporary password sent to you via email. Copy just the text of the temporary password. 
-No spaces in front of or after the password. 
-
-5) After the first login, you will be asked to update the password. The requirements are:
+4) After the first login, you will be asked to update the password. The requirements are:
     * 8 characters minimum length
     * Numbers, special character, uppercase and lowercase letters
 
-6) Once logged in, click on "Add" to input a new question. Use a Item Id of 
+5) Once logged in, click on "Add" to input a new question. Use a Item Id of 
     <pre>
     sun.1
     </pre>
 
-7) The first question we want the Bot to respond to is 
+6) The first question we want the Bot to respond to is 
     <pre>
     Tell me about our Sun
     </pre>
     This represents our most frequently asked question. 
 
-8) The bot needs to answer with <pre>Our sun is 4.6 billion years old. Its considered a yellow dwarf with a diameter of 1,392,684 
+7) The bot needs to answer with <pre>Our sun is 4.6 billion years old. Its considered a yellow dwarf with a diameter of 1,392,684 
 kilometers and a circumference of 4,370,005 kilometers. It has a mass that is equal to 333,060 earths and a surface 
 temperature of 5,500 degrees celsius. Really Hot!</pre>
 
-9) Once you've added the first question and its answer, naturally you want to test it out. Using the Content Designer UI, 
+8) Once you've added the first question and its answer, naturally you want to test it out. Using the Content Designer UI, 
 click on the menu item in the upper left hand corner and select the "QnABot client". 
 
-    A sample web based client will appear. In the chat area type in: <pre>Tell me about the sun</pre> and press enter. You'll see your 
+A sample web based client will appear. In the chat area type in: <pre>Tell me about the sun</pre> and press enter. You'll see your 
 question answered. If you have headsets available, plug these in and click on the mic button. Then speak to the bot
 saying:<pre>Tell me about the sun</pre> The Bot should respond with audio as well. 
 
-10) Lets add one more question 
+9) Lets add one more question 
 
     * Item id: <pre>sun.2</pre>
     * Q: <pre>How old is the Sun?</pre>
     * A: <pre>Our sun is 4.6 billion years old</pre>
 
-11) Test out the second question.  
+10) Test out the second question.  
 
-12) Click on Test to bring up the Test dialog in the Designer UI.
+11) Click on Test to bring up the Test dialog in the Designer UI.
 
-13) Enter a question <pre> How old is the sun </pre>
+12) Enter a question <pre> How old is the sun </pre>
 
-14) Click on search. Look at the results. Notice the score column. The answer selected by the QnABot will be the answer with highest matching score.
+13) Click on search. Look at the results. Notice the score column. The answer selected by the QnABot will be the answer with highest matching score.
 
     ![QnaBot Test Results ](images/02-score.png)
 
-15) For a small percent of questions, the Amazon Lex service does not match a Lex Intent for the question asked. 
+14) For a small percent of questions, the Amazon Lex service does not match a Lex Intent for the question asked. 
   Usually the response is, "Sorry, I did not understand that". When you encounter these errors, the Designer UI should 
   be used to rebuild the Lex Bot. Lets rebuild the Lex Bot now to show you how this is done. This action takes
   all the presently defined questions and inserts them directly into a Slot Value used in Lex. After a rebuild
@@ -218,11 +314,17 @@ saying:<pre>Tell me about the sun</pre> The Bot should respond with audio as wel
 
     ![Designer Menu](images/02-lex-rebuild-a.png)
 
-    ![Designer Lex Rebuild](images/02-lex-rebuild-a.png)
-
-16) Another error you might see is "You stumped me! Sadly I don't know how to answer your question." This error 
+15) Another error you might see is "You stumped me! Sadly I don't know how to answer your question." This error 
 comes from QnaBot. QnaBot could not find an acceptable match in the knowledge base managed by elasticsearch. 
 You'll need to add a new question to the knowledge that provides an appropriate answer.
+
+16) The new version of QnABot (2.4.0 and higher) and Lex-Web-Ui (0.14.89) support 
+default implementations of Thumbs Up, Thumbs Down, and Help. These are loaded as 
+Questions into QnABot. Use the Designer UI Import Menu. Click on Examples/Extensions
+and click on the Load button next to QnaUtility. You'll see several new questions
+that handle Thumbs Up, Thumbs Down, and Help added to the list of Questions. 
+
+    ![Designer Menu](images/02-lex-qnautility-questions.png)
 
 
 ### Checkpoint:
@@ -237,7 +339,7 @@ containing QnABot configuration using the Designer.
 2) Use 'Import' to the import a configuration file from the following url:
 
     <pre>
-    https://raw.githubusercontent.com/aws-samples/aws-ai-qna-bot/master/workshops/reinvent2018/samples/sun-questions-qna-step-2.json
+    https://raw.githubusercontent.com/aws-samples/aws-ai-qna-bot/master/workshops/reinvent2019/samples/sun-questions-qna-step-2.json
     </pre>
  
 This file contains a set of preconfigured questions. 
@@ -256,7 +358,7 @@ Solar Association does not yet have a website and you've been tasked to create o
 website with just two files using Amazon S3 to host the website. The two files will be index.html and solar.png. 
 
 We are going to use the [AWS Cloud9 IDE](https://aws.amazon.com/cloud9/ "Cloud9") to assist us. Perform the 
-following to setup a new AWS Cloud9 Environment
+following to setup a new AWS Cloud9 Environment unless you've this up previously. 
 
 #### Cloud9 Setup
    
@@ -264,23 +366,23 @@ following to setup a new AWS Cloud9 Environment
 
 2) Set your region to N. Virginia (us-east-1)
 
-2) Navigate to the Cloud9 Service
+3) Navigate to the Cloud9 Service
 
-3) Click on create environment
+4) Click on create environment
 
-4) Give this a name and description of <pre>QnABotWorkshop</pre>
+5) Give this a name and description of <pre>QnABotWorkshop</pre>
 
-5) Click Next step
+6) Click Next step
 
-6) Use the default of Create a new instance for environment (EC2)
+7) Use the default of Create a new instance for environment (EC2)
 
-7) Use the default of t2.micro
+8) Use the default of t2.micro
 
-8) Use the default of Cost-saving setting - After 30 minutes (default)
+9) Use the default of Cost-saving setting - After 30 minutes (default)
 
-9) Click Next step
+10) Click Next step
 
-10) Click Create environment
+11) Click Create environment
    
 Your AWS Cloud9 environment will begin to be setup. Once its ready continue with the following.
 
@@ -296,7 +398,7 @@ Your AWS Cloud9 environment will begin to be setup. Once its ready continue with
 2) Run a script in your Cloud9 IDE that runs CloudFormation to setup an S3 bucket to host the website and uploads the two files
 
     <pre>
-    cd ~/environment/aws-ai-qna-bot/workshops/reinvent2018/scripts
+    cd ~/environment/aws-ai-qna-bot/workshops/reinvent2019/scripts
     ./setupwebsite.sh
     </pre>
 
@@ -386,7 +488,7 @@ representing the Sun.
 
 8) In the Cloud9 IDE open 
     ```
-    QnaBotWorkshop/aws-ai-qna-bot/workshops/reinvent2018/web/index.html 
+    QnaBotWorkshop/aws-ai-qna-bot/workshops/reinvent2019/web/index.html 
     ```
 
 9) Paste your clipboard into index.html just below the '\<body\>' tag
@@ -396,7 +498,7 @@ representing the Sun.
 
 11) From a terminal window in Cloud9 IDE make sure you cd to the 
     ```
-    cd ~/environment/aws-ai-qna-bot/workshops/reinvent2018/scripts
+    cd ~/environment/aws-ai-qna-bot/workshops/reinvent2019/scripts
     ```
 
 12) Then in the terminal run
@@ -467,7 +569,7 @@ to help the user navigate easily.
 
 3) Add an image link
     <pre>
-    https://3c1703fe8d.site.internapcdn.net/newman/gfx/news/hires/2018/imagethesunt.jpg
+    https://3c1703fe8d.site.internapcdn.net/newman/gfx/news/hires/2019/imagethesunt.jpg
     </pre>
 
 4) Add a button for the response card
@@ -488,7 +590,7 @@ photo response.
 Use 'Import' to the import a configuration file from the following url:
 
 ```
-https://raw.githubusercontent.com/aws-samples/aws-ai-qna-bot/master/workshops/reinvent2018/samples/sun-questions-qna-step-3.json
+https://raw.githubusercontent.com/aws-samples/aws-ai-qna-bot/master/workshops/reinvent2019/samples/sun-questions-qna-step-3.json
 ```
  
 This file contains the questions preconfigured for the step. 
@@ -572,32 +674,60 @@ and buttons.
   
     ![Lab4-connect-012](images/Lab4-connect-012.png)
   
-14) Open the 'Interact' folder, and drag 'Get customer input' widget to the canvas:  
+14) From the Cloud9 IDE, open the workshops/reinvent2019/connect-assets folder and download the qnabot-sample file 
+to your local system.
+
+15) Back in the Contact Flow you just created, Click on the Down Arrow next to Save, and then select Import(beta) and 
+load the sample contact flow you just downloaded to your system. After loading the contact flow it will look similar
+to the image below. 
+
+```
+~/environment/workshops/reinvent2019/connect-assets-qnabot-sample
+```
+
+   ![Lab4-connect-023](images/Lab4-connect-023.png)
+    
+This flow contains a number of items that drive the logic in Connect. You'll notice the use of 'Get customer input' to
+interact with the QnABot. This widget is used twice in the contact flow. You need to update the Name of the bot 
+used by the flow and the Intents which are used within the bot. The sample contact flow needs to be updated. 
+
+To do that first open up the AWS Lex Console so that you an obtain the intent names for your QnABot.
+
+Then click on each of the Get customer input widgets. First change the Bot. It should automatically show the available
+QnABot. Then scroll down a bit. 
+
+Next in the AWS Lex Console click on the QnABot. It will open and show you the two intents associated with the bot. 
+You'll need to cut and paste each intent name from the AWS Lex Console for QnABot into the intents section in the 'Get 
+customer input' widget. Be sure to save the changes to each widget. 
+
+You'll also notice the use of the "Disconnect / hang up" widget at the end of the call flow. 
+
+In this example, we can have QnABot return a Lex Session attribute that instructs Connect to loop immediately back to 
+the bot. In the text for an answer embed the following "HandleBar" template to set a session attribute. 
+
+    ![Lab4-connect-023](images/Lab4-connect-023.png)
+
+```
+{{setSessionAttr 'connectKeepAlive' 'true'}}
+```
+
+The sample contact flow looks for this attribute and immediately loops back to QnABot for another question. 
+
+This is a very simple example. Sometimes one will implement additional Lex bots to prompt for Yes/No answers directly
+within Connect.
+
+14) Finally save the Contact flow and then publish the Contact flow. 
   
-    ![Lab4-connect-014a](images/Lab4-connect-014a.png)
-  
-15) Click on the 'Get customer input' widget to open its property pane. Enter a 'text to speech' prompt, eg "Hi, I'm Q and A bot. Ask me a question."  
-  
-    ![Lab4-connect-013](images/Lab4-connect-013.png)
-  
-16) Scroll down a bit, and enter the name of the QnABot Lex bot (Hint - go to the AWS CloudFormation Outputs tab to find the `BotName` value, and copy/paste to here.  Enter `$LATEST` as the Alias.  
-  
-    ![Lab4-connect-014](images/Lab4-connect-014.png)
-  
-17) Add a "Disconnect / hang up" widget and connect the widgets as shown. Select 'Save and Publish"  
-  
-    ![Lab4-connect-016](images/Lab4-connect-016.png)
-  
-18) Go to "Routing"→"Phone numbers":  
+15) Go to "Routing"→"Phone numbers":  
   
     ![Lab4-connect-017](images/Lab4-connect-017.png)
   
-19) Choose the phone number to open the Edit Phone number form. Select the "QnABot" contact flow that we just created, and choose 'Save".  
+16) Choose the phone number to open the Edit Phone number form. Select the "QnABot" contact flow that we just created, and choose 'Save'. 
   
     ![Lab4-connect-018](images/Lab4-connect-018.png)
   
   
-20) Try it now... Call the phone number for your new call center, and ask QnABot a question (ideally a question that you already entered into the Designer!)  
+17) Try it now... Call the phone number for your new call center, and ask QnABot a question (ideally a question that you already entered into the Designer!)  
     * Note - It takes a little bit of time before the new contact flow is ready. If you
     get the default contact flow, wait 30 seconds or so and try again.  
   
@@ -628,9 +758,80 @@ Cool. Now you can ask Sun questions using your Alexa Skill and keep these easily
 
 * * *
   
-## Step 6 - Monitor Usage with Kibana:
+## Step 6 - Integrate SMS:
 
-### Here's what you're going to work on in step 6: 
+### Here's what you're going to work on in step 6:
+
+* Setup a new Twilio free trial account
+* Acquire a new phone number to send messages to
+* Setup the Twilio channel for QnABot 
+* Setup Twilio with a WebHook to send messages via Lex to QnABot
+* Test out the integration
+
+The first item to complete is to setup a free trail account at Twilio. This trial account will provide enough
+resource to perform a limited experiment with the integration from a single verified phone number . 
+
+1)Navigate to the following URL
+  [Twilio Account Signup](https://www.twilio.com/try-twilio)
+2) Provide the account details and start your trial.
+  ![Lab6-twilio-trial-1](images/Lab6-twilio-trial-1.png "Trial SignUp")
+3) Verify the new account setup via the email Twilio sends.
+4) Verify your phone number using the code sent to you.
+  ![Lab6-twilio-trial-1](images/Lab6-twilio-trial-9.png "Verify")
+5) Select Yes for "Do you write code?"
+6) Select NODE.JS
+7) Select "Use Twilio in a project"
+8) Select "Send or receive a SMS" for "What do you want to do first?"
+
+Your free Trial Account should now be setup. 
+![Lab6-twilio-trial-1](images/Lab6-twilio-trial-8.png "Trial SignUp")
+
+From your Twilio project dashboard 
+
+1) Obtain a Trial Number
+![Lab6-twilio-trial-2](images/Lab6-twilio-trial-2.png "Trial Number")
+2) Find your ACCOUNT SID and AUTH TOKEN
+![Lab6-twilio-trial-3](images/Lab6-twilio-trial-3.png "Trial Number")
+
+Navigate to the Amazon Lex Console
+
+1) Open your QnABot
+2) Select the channels tab
+3) Select the Twilio channel on the left
+4) Fill in the Twilio channel properties including the Account SID and Auth Token obtained from Twilio. Click on Activate.
+![Lab6-twilio-trial-4](images/Lab6-twilio-trial-4.png "Form Properties")
+
+At the bottom of your Amazon Lex Twilio channel properties page, copy the next Endpoint URL
+![Lab6-twilio-trial-5](images/Lab6-twilio-trial-5.png "Channel Properties")
+
+Back in the Twilio page
+1) Click on the all products and services button "..."
+2) Open the Phone Numbers page under the Super Network menu item
+3) Click on your active number
+![Lab6-twilio-trial-6](images/Lab6-twilio-trial-6.png "Channel Properties")
+4) Scroll down and file in the AWS endpoint url as the WebHook for incoming calls
+![Lab6-twilio-trial-7](images/Lab6-twilio-trial-7.png "WebHook")
+5) Click on Save
+
+Test out your integration. 
+1) Open your message app on your mobile device
+2) Send a question to your new Twilio phone number
+3) QnABot should respond with the appropriate answer
+
+### Checkpoint:
+
+Super. If everything is setup, now you have a text message based channel for your QnABot. You can text your questions
+to the bot. 
+
+If you have time and a valid Facebook app, you can integration a Facebook channel as well. 
+
+[*^ back to top*](#solar-association-deploying-and-customizing-a-ready-made-question-and-answer-bot)
+
+* * *
+  
+## Step 7 - Monitor Usage with Kibana and CloudWatch:
+
+### Here's what you're going to work on in step 7: 
 * Enable Feedback in QnaBot - By default feedback is not enabled in QnABot. This step will
   walk you through enabling the standard Feedback mechanism.
 * Use a preconfigured Kibana deployment to find out what your users have been up to with respect to your 
@@ -639,46 +840,26 @@ Cool. Now you can ask Sun questions using your Alexa Skill and keep these easily
 ### Enable Feedback
 1) Log into the Designer UI
 2) Pull down the upper left menu and select Import from the upper left
-3) Expand the Examples/Demos at the bottom
-4) Click on the load button across from 'feedback'
-5) Wait for the load of feedback.json to complete (should be very quick).
-   You'll see a new question id of Feedback with questions like 'that is wrong' and 'that is right'
-6) Rebuild the Lex bot so that it understands responses such as 'that is right'
-    1) Use the menu on the right hand side of the Designer UI
-    2) Select the "three vertical dots"
-    3) From the pull down, select Lex Rebuild. This will take all the known questions and add these to the Lex Bot and then
-       rebuild the bot.
-
-7) Once this process is complete, after asking a question and getting an answer,
- users can give feedback to the system by saying or typing 'leave feedback', or 'that is right', or 
-'that is wrong'. This feedback will be seen in the Kibana dashboard. 
-
-8) Try the following from your chat bot web client
+3) Expand the Examples/Extensions at the bottom
+4) Click on the load button across from 'QnaUtility'
+5) Wait for the load of QnaUtility.json to complete (should be very quick).
+   You'll see new question ids of Feedback.001, Feedback.002, and CustomNoMatches with questions 'Thumbs Down', 'Thumbs Up', and 'no_hits'. 
+6) Once this process is complete, after asking a question and getting an answer,
+ users can give feedback to the system by clicking on the thumbs up or thumbs down buttons or saying or typing 'thumbs up', or 'thumbs down'. This feedback will be seen in the Kibana dashboard. 
+7) Try the following from your chat bot web client
 ```
 How hot is the sun
 ```
-Then chat with
-```
-leave feedback
-```
-Finally pick option A
-```
-A
-```
+
+Click on the Thumbs up button. 
 
 Ask another question and leave feedback once more.
 ```
 How hot is mars
 ```
-```
-leave feedback
-```
-```
-B
-```
+Click on the Thumbs down button.
 
-The above steps will will prime the system with some feedback to
-display in Kibana.
+The above steps will will prime the system with some feedback to display in Kibana.
 
 ### Launch Kibana
 1) Log into the Designer UI
@@ -727,6 +908,15 @@ elastic search.
 
 Try implementing other Kibana queries using the fields available in the metrics index. 
 
+### Open the CloudWatch QnABot Dashboard for service level monitoring
+
+In the AWS Console open CloudWatch
+
+Click on Dashboards
+
+Click on the existing QnABot Dashboard
+
+   ![Lab6-Monitor-005](images/Lab6-Monitor-005.png "CloudWatch Dashboard")
 
 ### Checkpoint:
 
@@ -737,9 +927,9 @@ your bot and how to look for questions that the system is not matching against.
 
 * * *
 
-## Step 7 - Customize with Lambda:
+## Step 8 - Customize with Lambda:
 
-### Here's what you're going to work on in step 7:
+### Here's what you're going to work on in step 8:
 
 Solar Association wants to provide quick access to Solar Flare information. In particular
 the Association wants to let users know when the last solar flare events were detected. For this workshop,
@@ -753,7 +943,7 @@ To do this we are going to use a public api from [NASA API](https://api.nasa.gov
 to obtain information on Solar Flares.
 
 
-[NASA API Example](https://api.nasa.gov/DONKI/FLR?startDate=2017-01-01&endDate=2018-12-30&api_key=DEMO_KEY "Example call")
+[NASA API Example](https://api.nasa.gov/DONKI/FLR?startDate=2017-01-01&endDate=2019-12-30&api_key=DEMO_KEY "Example call")
 
 The API takes two parameters, startDate and endDate. endDate defaults to current UTC Time 
 so we can leave this empty unless we want to provide a question and answer for a specific
@@ -773,7 +963,7 @@ solar flares were detected using a markdown table format.
 1) Using the Cloud9 IDE, setup the lambda function by deploying a preconfigured CloudFormation template using sam
 
     ```$xslt
-    cd ~/environment/aws-ai-qna-bot/workshops/reinvent2018/code/solarflare
+    cd ~/environment/aws-ai-qna-bot/workshops/reinvent2019/code/solarflare
     npm install
     cd ../../scripts
     ./solarflare-setup.sh
@@ -794,7 +984,7 @@ The Lambda handler must return the modified event object. The general sections t
 
 ### Looking at the provided source code
 
-1) In your Cloud9 IDE open the file <pre>QnaBotWorkshop/aws-ai-qna-bot/workshops/reinvent2018/code/solarflare/app.js</pre>
+1) In your Cloud9 IDE open the file <pre>QnaBotWorkshop/aws-ai-qna-bot/workshops/reinvent2019/code/solarflare/app.js</pre>
 
 2) You'll see four TODO areas that you'll need to replace. You can write your own code or use the
 code provided below.
@@ -886,16 +1076,16 @@ code provided below.
     
 ###  Test your code for valid syntax
 
-1) Make sure your nodejs version is version 8.12.0 and sam are available
+1) Make sure your nodejs version is version 8.12.0 or higher and sam are available
 <pre>
-cd ~/environment/aws-ai-qna-bot/workshops/reinvent2018/scripts
+cd ~/environment/aws-ai-qna-bot/workshops/reinvent2019/scripts
 source ./update-nodejs-version.sh
 </pre>
 
 2) Run tests to validate syntax
 
 <pre>
-cd ~/environment/aws-ai-qna-bot/workshops/reinvent2018/code/solarflare
+cd ~/environment/aws-ai-qna-bot/workshops/reinvent2019/code/solarflare
 npm test
 </pre>
 
@@ -908,7 +1098,7 @@ If the tests are successful, continue with the next section to redeploy your fun
 1) Execute the following commands to redeploy the updated function.
 
 <pre>
-cd ~/environment/aws-ai-qna-bot/workshops/reinvent2018/scripts
+cd ~/environment/aws-ai-qna-bot/workshops/reinvent2019/scripts
 ./solarflare-pkg.sh
 ./solarflare-deploy.sh
 </pre>
@@ -929,7 +1119,7 @@ question.
 4) Save and update the question
 
 4) Use the Lex-Web-Ui to ask the question you just modified.
-    * Note - The last solar flare to occur was back in May 2018. The function alerts only if one occurred 
+    * Note - The function alerts only if one occurred 
     during the last 30 days. No difference in output will be detected. 
 
 5) Verify the function executed in CloudWatch logs
@@ -978,7 +1168,7 @@ If an argument (N) is supplied as an integer, the function will return N most re
 Use 'Import' to the import a configuration file from the following url:
 
 ```
-https://raw.githubusercontent.com/aws-samples/aws-ai-qna-bot/master/workshops/reinvent2018/samples/sun-questions-qna-step-7.json
+https://raw.githubusercontent.com/aws-samples/aws-ai-qna-bot/master/workshops/reinvent2019/samples/sun-questions-qna-step-7.json
 ```
  
 This file contains the questions preconfigured for the step. 
@@ -995,28 +1185,50 @@ ids to update are sun.8 and sun.2.
 [*^ back to top*](#solar-association-deploying-and-customizing-a-ready-made-question-and-answer-bot)
 
 * * *
+
+## Step 9 - New Features:
+
+QnABot version 2.4.0 provides some significant new features.
+
+November 2019 (v2.4.0) – Customizable configuration settings, minimized need to rebuild Lex bot when adding new content, 
+improved accuracy using keyword filters, configurable response when answer isn’t found, improved handling of user 
+feedback with integrated thumbs up/down buttons in web client, automated question testing in Content Designer, 
+support variable substitution and conditional answers using ‘handlebars’ templates in Content Designer.
+
+For a description of these features be sure to checkout the blog post at [New Features](https://aws.amazon.com/blogs/machine-learning/creating-a-question-and-answer-bot-with-amazon-lex-and-amazon-alexa/#new-features-log)
+
+[*^ back to top*](#solar-association-deploying-and-customizing-a-ready-made-question-and-answer-bot)
+
+* * *
+
 ## Finished! Please fill out evaluation cards!
 
-Congratulations on completing the labs, or at least giving it a good go.  Thanks for helping Solar Universal publish a chatbot and reduce the load on its call center! 
+Congratulations on completing the labs, or at least giving it a good go.  Thanks for helping Solar Universal publish a 
+chatbot and reduce the load on its call center! 
 
 * * *
 
 ## Workshop Cleanup
 
-This is really important because if you leave stuff running in your account, it will continue to generate charges.  Certain things were created by CloudFormation and certain things were created manually throughout the workshop.  Follow the steps below to make sure you clean up properly.
+This is really important because if you leave stuff running in your account, it will continue to generate charges.  
+Certain things were created by CloudFormation and certain things were created manually throughout the workshop.  
+Follow the steps below to make sure you clean up properly.
 
 Delete manually created resources throughout the laUbs:
 
 * Use your AWS Cloud9 IDE's terminal to remove the sample web site
 ```
-cd aws-ai-qna-bot/workshops/reinvent2018/scripts
+cd aws-ai-qna-bot/workshops/reinvent2019/scripts
 ./removewebsite.sh
 ```
 * Use the AWS Cloud9 Dashboard to Delete your development environment
 
 * Use the Amazon Connect console to delete your call center instance
 
-Finally, [delete the CloudFormation stacks](http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/cfn-console-delete-stack.html) launched at the beginning of the workshop to clean up the rest.  If the stack deletion process encountered errors, look at the Events tab in the CloudFormation dashboard, and you'll see what steps failed.  It might just be a case where you need to clean up a manually created asset that is tied to a resource goverened by CloudFormation.
+* Remove any Twilio resources used to establish an SMS channel
+
+Finally, [delete the CloudFormation stacks](http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/cfn-console-delete-stack.html) 
+launched at the beginning of the workshop to clean up the rest.  If the stack deletion process encountered errors, look at the Events tab in the CloudFormation dashboard, and you'll see what steps failed.  It might just be a case where you need to clean up a manually created asset that is tied to a resource goverened by CloudFormation.
 * Use the AWS CloudFormation console to delete the QnABot stacks you launched
   * lex-web-ui
   * qnabotworkshop
