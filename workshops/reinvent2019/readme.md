@@ -194,12 +194,12 @@ aws cognito-idp admin-set-user-password --user-pool-id [YourUserPoolIdFromJson] 
 
 ### Checkpoint:
 
-This Checkpoint only applies to step 1A where you are installing QnABot from CloudFormation template. 
+This Checkpoint only applies to step 1A where you are installing QnABot from a CloudFormation template into your own account.
 
 If you are completing step 1B please proceed to running the commands below starting with Elasticsearch Service. 
-You will not need to wait 25 minutes for setup to complete. 
+You will not need to wait 25 minutes for setup to complete as this stack has been pre-installed. 
 
-The CloudFormation stack will take 25 minutes to launch.  Periodically check on the stack creation process in the 
+If you have just launched the CloudFormation stack, it will take 25 minutes to complete.  Periodically check on the stack creation process in the 
 CloudFormation Dashboard. If no stack shows up immediately, click the refresh button at the top right hand corner of 
 your screen.  Your stack should show status **CREATE\_COMPLETE** in roughly 25 minutes. 
 
@@ -212,6 +212,8 @@ explore resources using the AWS console for ElasticSearch, Lex, Lambda, Cognito.
 
 If you have cli access to your AWS account you can also use the following commands to explore the resources 
 being created. Later in Step 3 you'll setup an AWS Cloud9 IDE which you can also use to run these commands.                                           
+
+#### Helpful commands to look at your resources are shown below
 
 ##### Elasticsearch Service
 <pre>
@@ -302,11 +304,11 @@ saying:<pre>Tell me about the sun</pre> The Bot should respond with audio as wel
 
 10) Test out the second question.  
 
-11) Click on Test to bring up the Test dialog in the Designer UI.
+11) Click on The Test tab to bring up the Test area in the Designer UI.
 
 12) Enter a question <pre> How old is the sun </pre>
 
-13) Click on search. Look at the results. Notice the score column. The answer selected by the QnABot will be the answer with highest matching score.
+13) Click on the Search button. Look at the results. Notice the score column. The answer selected by the QnABot will be the answer with highest matching score.
 
     ![QnaBot Test Results ](images/02-score.png)
 
@@ -323,11 +325,15 @@ saying:<pre>Tell me about the sun</pre> The Bot should respond with audio as wel
 comes from QnaBot. QnaBot could not find an acceptable match in the knowledge base managed by elasticsearch. 
 You'll need to add a new question to the knowledge that provides an appropriate answer.
 
-16) The new version of QnABot (2.4.0 and higher) and Lex-Web-Ui (0.14.89) support 
+16) The new version of QnABot (2.4.0 and higher) and Lex-Web-Ui (0.14.8) support 
 default implementations of Thumbs Up, Thumbs Down, and Help. These are loaded as 
 Questions into QnABot. Use the Designer UI Import Menu. Click on Examples/Extensions
 and click on the Load button next to QnaUtility. You'll see several new questions
 that handle Thumbs Up, Thumbs Down, and Help added to the list of Questions. 
+
+    ![Import Menu](images/02-import.png)
+    
+    ![Import Examples](images/02-import-examples.png)
 
     ![Designer Menu](images/02-lex-qnautility-questions.png)
 
@@ -362,8 +368,9 @@ This file contains a set of preconfigured questions.
 Solar Association does not yet have a website and you've been tasked to create one. Lets deploy a simple 
 website with just two files using Amazon S3 to host the website. The two files will be index.html and solar.png. 
 
-We are going to use the [AWS Cloud9 IDE](https://aws.amazon.com/cloud9/ "Cloud9") to assist us. Perform the 
-following to setup a new AWS Cloud9 Environment unless you've this up previously. 
+We are going to use the [AWS Cloud9 IDE](https://aws.amazon.com/cloud9/ "Cloud9") to assist us. 
+
+If you have already setup Cloud9 in Step 1B you can skip these Cloud9 setup instructions.  If not, perform the following to setup a new AWS Cloud9 Environment. 
 
 #### Cloud9 Setup
    
@@ -814,7 +821,7 @@ Back in the Twilio page
 2) Open the Phone Numbers page under the Super Network menu item
 3) Click on your active number
 ![Lab6-twilio-trial-6](images/Lab6-twilio-trial-6.png "Channel Properties")
-4) Scroll down and file in the AWS endpoint url as the WebHook for incoming calls
+4) Scroll down and file in the AWS endpoint url as the WebHook for Messaging
 ![Lab6-twilio-trial-7](images/Lab6-twilio-trial-7.png "WebHook")
 5) Click on Save
 
