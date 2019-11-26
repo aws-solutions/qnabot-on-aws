@@ -1,4 +1,3 @@
-var response = require('cfn-response')
 var aws=require('aws-sdk')
 aws.config.region=process.env.AWS_REGION
 var s3=new aws.S3()
@@ -8,13 +7,13 @@ exports.handler = function(event, context) {
 
     if(event.RequestType==="Delete"){
         Delete(event.ResourceProperties)
-        .then(()=>response.send(event, context, response.SUCCESS))
+        .then(()=>send(event, context, SUCCESS))
         .catch(x=>{
             console.log(x)
-            response.send(event, context, response.FAILED)
+            send(event, context, FAILED)
         })
     }else{
-        response.send(event, context, response.SUCCESS)
+        send(event, context, SUCCESS)
     }
 }
 

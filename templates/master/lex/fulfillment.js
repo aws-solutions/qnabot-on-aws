@@ -51,7 +51,7 @@ module.exports={
         "Handler": "index.handler",
         "MemorySize": "1408",
         "Role": {"Fn::GetAtt": ["FulfillmentLambdaRole","Arn"]},
-        "Runtime": "nodejs8.10",
+        "Runtime": "nodejs10.x",
         "Timeout": 300,
         "Tags":[{
             Key:"Type",

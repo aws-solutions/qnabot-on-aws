@@ -1,5 +1,6 @@
 var fs=require('fs')
-
+const path = require('path')
+const resplib = path.join(__dirname, '..', '..','lib', 'response.js')
 module.exports={
   "Resources": {
     "Bucket": {
@@ -28,12 +29,12 @@ module.exports={
       "Type": "AWS::Lambda::Function",
       "Properties": {
         "Code": {
-            "ZipFile":fs.readFileSync(__dirname+'/handler.js','utf-8')
+            "ZipFile":fs.readFileSync(__dirname+'/handler.js','utf-8') + fs.readFileSync(resplib,'utf-8')
         },
         "Handler": "index.handler",
         "MemorySize": "128",
         "Role": {"Fn::GetAtt": ["CFNLambdaRole","Arn"]},
-        "Runtime": "nodejs8.10",
+        "Runtime": "nodejs10.x",
         "Timeout": 60
       }
     },
