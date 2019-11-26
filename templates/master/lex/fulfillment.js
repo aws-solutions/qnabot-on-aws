@@ -116,7 +116,41 @@ module.exports={
                     "ssm:GetParameter",
                     "ssm:GetParameters"
                   ],
-                  "Resource":["*"]
+                  "Resource":[
+                      {
+                          "Fn::Join": [
+                              "", [
+                                  "arn:aws:ssm:",
+                                  {"Fn::Sub": "${AWS::Region}:" },
+                                  {"Fn::Sub": "${AWS::AccountId}:" },
+                                  "parameter/",
+                                  {"Ref": "DefaultQnABotSettings"}
+                              ]
+                          ]
+                      },
+                      {
+                          "Fn::Join": [
+                              "", [
+                                  "arn:aws:ssm:",
+                                  {"Fn::Sub": "${AWS::Region}:" },
+                                  {"Fn::Sub": "${AWS::AccountId}:" },
+                                  "parameter/",
+                                  {"Ref": "CustomQnABotSettings"}
+                              ]
+                          ]
+                      },
+                      {
+                          "Fn::Join": [
+                              "", [
+                                  "arn:aws:ssm:",
+                                  {"Fn::Sub": "${AWS::Region}:" },
+                                  {"Fn::Sub": "${AWS::AccountId}:" },
+                                  "parameter/",
+                                  {"Ref": "DefaultUserPoolJwksUrl"}
+                              ]
+                          ]
+                      }
+                  ]
               }]
             }
           },

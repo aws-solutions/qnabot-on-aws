@@ -53,12 +53,6 @@ module.exports={
             "Statement": [{
                 "Effect": "Allow",
                 "Action": [
-                  "lex:*"
-                ],
-                "Resource":"*" 
-              },{
-                "Effect": "Allow",
-                "Action": [
                   "s3:GetObject"
                 ],
                 "Resource": [
