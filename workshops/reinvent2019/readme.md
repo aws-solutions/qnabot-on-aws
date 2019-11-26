@@ -194,6 +194,11 @@ aws cognito-idp admin-set-user-password --user-pool-id [YourUserPoolIdFromJson] 
 
 ### Checkpoint:
 
+This Checkpoint only applies to step 1A where you are installing QnABot from CloudFormation template. 
+
+If you are completing step 1B please proceed to running the commands below starting with Elasticsearch Service. 
+You will not need to wait 25 minutes for setup to complete. 
+
 The CloudFormation stack will take 25 minutes to launch.  Periodically check on the stack creation process in the 
 CloudFormation Dashboard. If no stack shows up immediately, click the refresh button at the top right hand corner of 
 your screen.  Your stack should show status **CREATE\_COMPLETE** in roughly 25 minutes. 
@@ -261,7 +266,7 @@ available in outputs from the QnABot stack.
 
 2) The user name is <pre>Admin</pre>
 
-3) The password is the temporary password either sent to you via email or you set to previously.
+3) The password is the temporary password either sent to you via email or you set via step 1B.
 
 4) After the first login, you will be asked to update the password. The requirements are:
     * 8 characters minimum length
