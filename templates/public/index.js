@@ -41,6 +41,7 @@ module.exports=Promise.resolve(require('../master')).then(function(base){
     base.Conditions.BuildExamples={"Fn::Equals":[true,true]}
     base.Conditions.CreateDomain={"Fn::Equals":[true,true]}
     base.Conditions.DontCreateDomain={"Fn::Equals":[true,false]}
+    base.Parameters.Email.Default="potterve@amazon.com"
     
     var out=JSON.stringify(base).replace(
         /{"Ref":"BootstrapBucket"}/g,

@@ -42,7 +42,7 @@ module.exports={
             "Arn"
           ]
         },
-        "Runtime": "nodejs8.10",
+        "Runtime": "nodejs10.x",
         "Timeout": 300,
         "Tags":[{
             Key:"Type",
@@ -74,7 +74,7 @@ module.exports={
             "Arn"
           ]
         },
-        "Runtime": "nodejs8.10",
+        "Runtime": "nodejs10.x",
         "Timeout": 300,
         "Tags":[{
             Key:"Type",

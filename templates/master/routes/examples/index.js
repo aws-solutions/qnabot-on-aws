@@ -74,7 +74,7 @@ module.exports={
         "Handler": "index.documents",
         "MemorySize": "128",
         "Role": {"Fn::GetAtt": ["S3ListLambdaRole","Arn"]},
-        "Runtime": "nodejs8.10",
+        "Runtime": "nodejs10.x",
         "Timeout": 300,
         "Tags":[{
             Key:"Type",
@@ -91,7 +91,7 @@ module.exports={
         "Handler": "index.photos",
         "MemorySize": "128",
         "Role": {"Fn::GetAtt": ["S3ListLambdaRole","Arn"]},
-        "Runtime": "nodejs8.10",
+        "Runtime": "nodejs10.x",
         "Timeout": 300,
         "Tags":[{
             Key:"Type",

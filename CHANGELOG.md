@@ -1,3 +1,8 @@
+## [2.5.0]
+- IAM Policy updates
+- Update of default utterances for Alexa
+- Change to NodeJS 10.X for Lambdas
+- Updated reInvent2019 workshop
 ## [2.4.0]
 - added use of SSM Parameter store to hold default configuration settings
 - added use of use of Comprehend for better selection of appropriate answer 
