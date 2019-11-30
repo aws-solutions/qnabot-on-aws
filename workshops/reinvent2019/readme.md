@@ -243,7 +243,7 @@ $ aws cloudformation list-stacks
 $ aws cloudformation describe-stacks --stack-name <b><i>YOURSTACKNAME</i></b>
 </pre>
 
-"TemplateDescription": "QnABot with admin and client websites - (Master v2.4.0)", 
+"TemplateDescription": "QnABot with admin and client websites - (Master v2.5.0)", 
 
 You should also look to see the Outputs from your stack displayed in the Cloud Formation console. 
 Notice a number of urls. There are two very important URLs:
@@ -581,7 +581,7 @@ to help the user navigate easily.
 
 3) Add an image link
     <pre>
-    https://3c1703fe8d.site.internapcdn.net/newman/gfx/news/hires/2019/imagethesunt.jpg
+    https://spaceplace.nasa.gov/review/gallery-sun/SOHO_composite_L.en.jpg
     </pre>
 
 4) Add a button for the response card
