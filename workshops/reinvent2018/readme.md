@@ -1,3 +1,5 @@
+## This is the 2018 workshop. For the 2019 workshop use this link [2019 Workshop](https://github.com/aws-samples/aws-ai-qna-bot/blob/master/workshops/reinvent2019/readme.md)
+
 # Solar Association: Deploying and Customizing a ready made Question and Answer Bot
 
 ## Overview:
