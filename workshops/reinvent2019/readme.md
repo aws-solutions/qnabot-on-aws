@@ -536,11 +536,8 @@ to improve look and feel as well as provide assisted navigation.
 1) Edit a question in your QnABot using the Designer. Select Advanced. Scroll down until you 
 see Alternate Answers / Markdown. Add markdown to your answer
     <pre>
-    
         # For H1
-        
         ## For H2
-        
         *Italic Characters*
     </pre>
 
@@ -637,7 +634,7 @@ and buttons.
 
     ![Lab4-connect-001](images/Lab4-connect-001.png)
 
-2) Add an instance - I used 'qnabot' as the name, but you will have to use a globally unique name, e.g.: qnabot-<yourname>:  
+2) Add an instance - I used 'qnabot' as the name, but you will have to use a globally unique name, e.g.: qnabot-*yourname*  
 
     ![Lab4-connect-002](images/Lab4-connect-002.png)
 
@@ -697,33 +694,40 @@ to the image below.
 ~/environment/workshops/reinvent2019/connect-assets-qnabot-sample
 ```
 
-   ![Lab4-connect-023](images/Lab4-connect-023.png)
-    
+![Lab4-connect-023](images/Lab4-connect-023.png)  
+
 This flow contains a number of items that drive the logic in Connect. You'll notice the use of 'Get customer input' to
 interact with the QnABot. This widget is used twice in the contact flow. You need to update the Name of the bot 
 used by the flow and the Intents which are used within the bot. The sample contact flow needs to be updated. 
 
 To do that first open up the AWS Lex Console so that you an obtain the intent names for your QnABot.
 
-Then click on each of the Get customer input widgets. First change the Bot. It should automatically show the available
-QnABot. Then scroll down a bit. 
+Then click on each of the Get customer input widgets. First change the Bot it is using. It should automatically show 
+the available QnABot.
 
 Next in the AWS Lex Console click on the QnABot. It will open and show you the two intents associated with the bot. 
 You'll need to cut and paste each intent name from the AWS Lex Console for QnABot into the intents section in the 'Get 
-customer input' widget. Be sure to save the changes to each widget. 
+customer input' widget. Update both intents. Be sure to save the changes to each widget. 
 
 You'll also notice the use of the "Disconnect / hang up" widget at the end of the call flow. 
 
-In this example, we can have QnABot return a Lex Session attribute that instructs Connect to loop immediately back to 
-the bot. In the text for an answer embed the following "HandleBar" template to set a session attribute. 
+In this example, we have the Connect call flow looping back to QnABot. The call flow sets a Lex attribute named 
+connectKeepAlive to true on each iteration. QnABot can disconnect this loop by setting the attribute named 
+connectKeepAlive to false when the bot wishes to disconnect. 
 
-    ![Lab4-connect-023](images/Lab4-connect-023.png)
+To set connectKeepAlive to false you can use the following "HandleBar" template to set a session attribute. 
 
 ```
-{{setSessionAttr 'connectKeepAlive' 'true'}}
+{{setSessionAttr 'connectKeepAlive' 'false'}}
 ```
 
-The sample contact flow looks for this attribute and immediately loops back to QnABot for another question. 
+The sample contact flow looks for this attribute and loops back to QnABot as long as the attribute is true. To 
+implement this disconnect, add a new question to QnABot. The question should be "Goodbye". The answer should be
+
+```
+{{setSessionAttr 'connectKeepAlive' 'false'}}Goodbye. Thanks for calling.
+```
+
 
 This is a very simple example. Sometimes one will implement additional Lex bots to prompt for Yes/No answers directly
 within Connect.
@@ -899,7 +903,7 @@ match any question?
     ![Lab6-Monitor-003](images/Lab6-Monitor-003.png "qnametrics")
     * In the query area enter 
     <pre>
-    !(_exists_:"qid")
+    entireResponse.got_hits:0
     </pre>
     Add utterance as a selected field
     ![Lab6-Monitor-004](images/Lab6-Monitor-004.png "qnametrics")
@@ -909,8 +913,9 @@ elastic search.
     * Note: Sometimes Lex does not always pass utterances to the bot. 
 
         The message __Sorry, I did not understand that__ is due to Lex not matching an 
-        intent to send this to. In QnABot there is one intent. Hence this message means that Lex
-        did not understand enough about the request to the QnABot. 
+        intent to send this to. In QnABot there are two intents now including a Fallback Intent. This message was
+        present in prior versions of QnABot and indicated that Lex could not match an Intent. However, since QnABot v2.4.0 
+        and higher, QnABot should always be called by Lex with the additiona of the Fallback Intent. 
 
         The message __You stumped me! Sadly I don't know how to answer your question.__ comes from QnABot. 
         You should find the utterances of this sort captured in the Kibana query above. 
