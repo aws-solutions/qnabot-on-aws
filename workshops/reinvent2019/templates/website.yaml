@@ -18,17 +18,21 @@ Outputs:
     Value: !Ref S3Bucket
     Description: Website S3 Bucket
 
-  WebsiteURL:
-    Value: !GetAtt
-    - S3Bucket
-    - WebsiteURL
-    Description: URL for website hosted on S3
-
-  S3BucketSecureURL:
+  WebSiteUrl:
     Value: !Join
     - ''
     - - 'https://'
       - !GetAtt
         - S3Bucket
         - DomainName
-    Description: Name of S3 bucket to hold website content
+      - '/index.html'
+    Description: URL to use to access the website
+
+  ParentOriginForLexWebUi:
+    Value: !Join
+      - ''
+      - - 'https://'
+        - !GetAtt
+          - S3Bucket
+          - DomainName
+    Description: Parent origin to specify for lex-web-ui
