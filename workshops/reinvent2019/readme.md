@@ -416,20 +416,20 @@ Your AWS Cloud9 environment will begin to be setup. Once its ready continue with
 
     You'll see output similar to the following. 
     
-    <span style="color:red">*Note: Do not copy these values from the readme. Instead use the values from your cloud9 bash window.*</span>
+    *Note: Do not copy these values from the readme. Instead use the values from your cloud9 bash window.*
     
     <pre>
     S3 Bucket: 
     qnabotworkshop-website-s3bucket-8gu5l0vyt777
 
     LEX WEB UI PARENT ORIGIN: 
-    https://qnabotworkshop-website-s3bucket-8gu5l0vyt777.s3.amazonaws.com
+    https://qnabotworkshop-website-s3bucket-example-do-not-copy.s3.amazonaws.com
 
     Website URL:
-    https://qnabotworkshop-website-s3bucket-8gu5l0vyt777.s3.amazonaws.com/index.html
+    https://qnabotworkshop-website-s3bucket-example-do-not-copy.s3.amazonaws.com/index.html
 
-    upload: ../web/index.html to s3://qnabotworkshop-website-s3bucket-8gu5l0vyt777/index.html
-    upload: ../web/solar.png to s3://qnabotworkshop-website-s3bucket-8gu5l0vyt777/solar.png
+    upload: ../web/index.html to s3://qnabotworkshop-website-s3bucket-example-do-not-copy/index.html
+    upload: ../web/solar.png to s3://qnabotworkshop-website-s3bucket-example-do-not-copy/solar.png
     
     </pre>
 
@@ -439,7 +439,7 @@ Your AWS Cloud9 environment will begin to be setup. Once its ready continue with
 3) Record the URI to your LEX WEB UI PARENT ORIGIN reported above. It will be similar to the following:
 
  
-    <span style="color:red">*Note: Do not copy these values from the readme. Instead use the values from your cloud9 bash window.*</span>
+    *Note: Do not copy these values from the readme. Instead use the values from your cloud9 bash window.*
     
     ```
     https://qnabotworkshop-website-s3bucket-example-origin-do-not-use.s3.amazonaws.com
