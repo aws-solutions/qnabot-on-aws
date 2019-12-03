@@ -414,35 +414,35 @@ Your AWS Cloud9 environment will begin to be setup. Once its ready continue with
     ./setupwebsite.sh
     </pre>
 
-    You'll see output similar to
+    You'll see output similar to the following. 
+    
+    *Note: Do not copy these values from the readme. Instead use the values from your cloud9 bash window.*
     
     <pre>
-    
-    Waiting for changeset to be created..
-    Waiting for stack create/update to complete
-    Successfully created/updated stack - qnabotworkshop-website
-    
     S3 Bucket: 
-    qnabotworkshop-website-s3bucket-d83f7qqz91u5
-    
-    Website URI (Use this as the PARENT ORIGIN): 
-    https://qnabotworkshop-website-s3bucket-d83f7qqz91u5.s3.amazonaws.com
-    
+    qnabotworkshop-website-s3bucket-8gu5l0vyt777
+
+    LEX WEB UI PARENT ORIGIN: 
+    https://qnabotworkshop-website-s3bucket-example-do-not-copy.s3.amazonaws.com
+
     Website URL:
-    https://qnabotworkshop-website-s3bucket-d83f7qqz91u5.s3.amazonaws.com/index.html
+    https://qnabotworkshop-website-s3bucket-example-do-not-copy.s3.amazonaws.com/index.html
+
+    upload: ../web/index.html to s3://qnabotworkshop-website-s3bucket-example-do-not-copy/index.html
+    upload: ../web/solar.png to s3://qnabotworkshop-website-s3bucket-example-do-not-copy/solar.png
     
-    upload: ../web/index.html to s3://qnabotworkshop-website-s3bucket-d83f7qqz91u5/index.html
-    upload: ../web/solar.png to s3://qnabotworkshop-website-s3bucket-d83f7qqz91u5/solar.png   upload: ../web/solar.png to s3://qnabotworkshop-website-s3bucket-1aty4rnkfi6x0/solar.png
     </pre>
 
-    * Note the Website URI. You'll use this as input to the ***WebAppParentOrigin*** when configuring the Lex-Web-Ui.
-    * Note the Website URL. You can open this by clicking on the link from the IDE. You should now see artwork 
-representing the Sun. 
+    * Note the LEX WEB UI PARENT ORIGIN. You'll use this as input to the ***WebAppParentOrigin*** when configuring the Lex-Web-Ui.
+    * Note the Website URL. You can open this by clicking on the link from the IDE. You should now see artwork representing the Sun. 
 
-3) Record the URI to your website reported above. For example:
+3) Record the URI to your LEX WEB UI PARENT ORIGIN reported above. It will be similar to the following:
+
+ 
+    *Note: Do not copy these values from the readme. Instead use the values from your cloud9 bash window.*
     
     ```
-    https://qnabotworkshop-website-s3bucket-d83f7qqz91u5.s3.amazonaws.com
+    https://qnabotworkshop-website-s3bucket-example-origin-do-not-use.s3.amazonaws.com
     ```
 
     This value will be used for ***WebAppParentOrigin*** when configuring the Lex-Web-Ui. 
