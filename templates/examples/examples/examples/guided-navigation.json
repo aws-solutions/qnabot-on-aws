@@ -2,7 +2,7 @@
   "qna": [
     {
       "qid": "Previous",
-      "a": "Unable to go to the previous room...",
+      "a": "We are at the beginning of the chain. Unable to go to the previous room...",
       "r": {
         "title": "",
         "imageUrl": "",
@@ -19,7 +19,7 @@
     },
     {
       "qid": "Next",
-      "a": "Unable to go to the next room...",
+      "a": "We are at the end of the chain. Unable to go to the next room...",
       "r": {
         "title": "",
         "imageUrl": "",
