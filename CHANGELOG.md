@@ -1,3 +1,7 @@
+## [2.6.0]
+- Fix for the Next/Previous sample functions when the next or previous questions reference a lambda hook
+- Update handlebars in extensions / samples to use version ^4.3.0
+- Addition of Kendra Fallback feature
 ## [2.5.0]
 - IAM Policy updates
 - Update of default utterances for Alexa
