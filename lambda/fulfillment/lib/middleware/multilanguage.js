@@ -58,6 +58,8 @@ function set_userLocale(Languages, userPreferredLocale, defaultConfidenceScore, 
     _.set(req._event.sessionAttributes, "userDetectedLocaleConfidence", userDetectedLocaleConfidence);
     if (userDetectedSecondaryLocale) {
         _.set(req._event.sessionAttributes, "userDetectedSecondaryLocale", userDetectedSecondaryLocale);
+    } else {
+        if (req._event.sessionAttributes.userDetectedSecondaryLocale) delete req._event.sessionAttributes.userDetectedSecondaryLocale;
     }
 
     if (userPreferredLocale && userDetectedLocale !== '') {
