@@ -1,55 +1,70 @@
-var Promise = require('bluebird')
-var _ = require('lodash')
-var AWS = require('aws-sdk');
+const Promise = require('bluebird')
+const _ = require('lodash')
+const AWS = require('aws-sdk');
 
 async function get_userLanguages(inputText) {
     const params = {
         Text: inputText /* required */
     };
-    var comprehendClient = new AWS.Comprehend();
-    var languages = comprehendClient.detectDominantLanguage(params).promise();
+    const comprehendClient = new AWS.Comprehend();
+    const languages = comprehendClient.detectDominantLanguage(params).promise();
     return languages;
 }
 
-async function get_translation(inputText, lang) {
+async function get_translation(inputText, sourceLang) {
     const params = {
-        SourceLanguageCode: lang, /* required */
+        SourceLanguageCode: sourceLang, /* required */
         TargetLanguageCode: 'en', /* required */
         Text: inputText, /* required */
     };
-    var translateClient = new AWS.Translate();
-    var translation = await translateClient.translateText(params).promise();
-
-    return translation;
+    const translateClient = new AWS.Translate();
+    try {
+        const translation = await translateClient.translateText(params).promise();
+        return translation;
+    } catch (err) {
+        console.log("warning - error during translation. Returning: " + inputText);
+        const res = {};
+        res.TranslatedText = inputText;
+        return res;
+    }
 }
 
 function set_userLocale(Languages, userPreferredLocale, defaultConfidenceScore, req) {
-    var locale = '';
-    var userDetectedLocaleConfidence = Languages.Languages[0].Score;
-    var userDetectedLocale = Languages.Languages[0].LanguageCode;
-    var isPreferredLanguageDetected = false;
-    var i = 0;
+    let locale = '';
+    let userDetectedLocaleConfidence = Languages.Languages[0].Score;
+    let userDetectedLocale = Languages.Languages[0].LanguageCode;
+    let isPreferredLanguageDetected = false;
+    let i = 0;
+    let userDetectedSecondaryLocale;
 
     console.log("preferred lang", userPreferredLocale);
     for (i = 0; i <= Languages.Languages.length - 1; i++) {
+        console.log("found lang: " + Languages.Languages[i].LanguageCode);
+        console.log("score: " + Languages.Languages[i].Score);
         if (Languages.Languages[i].LanguageCode === userPreferredLocale) {
-            console.log("detected lang", Languages.Languages[i].LanguageCode);
             isPreferredLanguageDetected = true;
+            userDetectedLocale = Languages.Languages[i].LanguageCode;
+        }
+        if (i > 0 && Languages.Languages[i].LanguageCode !== 'en' && userDetectedSecondaryLocale === undefined) {
+            userDetectedSecondaryLocale = Languages.Languages[i].LanguageCode;
         }
     }
     console.log("isPreferredLanguageDetected", isPreferredLanguageDetected);
-    console.log("detected lang", userDetectedLocale);
+    console.log("detected locale", userDetectedLocale);
+    console.log("detected secondary locale", userDetectedSecondaryLocale);
     console.log("detected Confidence", userDetectedLocaleConfidence);
 
     _.set(req._event.sessionAttributes, "userDetectedLocale", userDetectedLocale);
     _.set(req._event.sessionAttributes, "userDetectedLocaleConfidence", userDetectedLocaleConfidence);
+    if (userDetectedSecondaryLocale) {
+        _.set(req._event.sessionAttributes, "userDetectedSecondaryLocale", userDetectedSecondaryLocale);
+    }
 
     if (userPreferredLocale && userDetectedLocale !== '') {
         locale = userPreferredLocale;
         console.log("set user preference as language to use: ", locale);
     } else if ((userPreferredLocale === undefined || userPreferredLocale === '') && userDetectedLocaleConfidence <= defaultConfidenceScore) {
-        locale = 'en';
-        console.log("defaulting locale to en as userDetectedLocaleConfidence not high enough.");
+        locale = '';
     } else {
         locale = userDetectedLocale;
         console.log("set detected language as language to use: ", locale);
@@ -58,26 +73,26 @@ function set_userLocale(Languages, userPreferredLocale, defaultConfidenceScore, 
 }
 
 async function set_translated_transcript(locale, req) {
-    var SessionAttributes = _.get(req._event, 'sessionAttributes');
-    var detectedLocale = SessionAttributes.userDetectedLocale;
-    var detectedConfidence = SessionAttributes.userDetectedLocaleConfidence;
+    const SessionAttributes = _.get(req._event, 'sessionAttributes');
+    const detectedLocale = SessionAttributes.userDetectedLocale;
+    const detectedSecondaryLocale = SessionAttributes.userDetectedSecondaryLocale;
 
-    if ((locale == '' && detectedLocale != 'en') || (locale == '' && detectedLocale == 'en' && detectedConfidence < 0.5)) {
-        _.set(req._event, "inputTranscript", "set language preference");
-        console.log("confidence not high enough asking for a preferred language to use, new transcript:  ", req._event.inputTranscript);
-    }
-
-    if (locale != '' && locale != 'en' && locale.charAt(0) != '%') {
-        console.log("Confidence in the detected language high enough.");
-        var translation = await get_translation(req._event.inputTranscript, locale);
+    if (locale === 'en' && detectedLocale === 'en' && detectedSecondaryLocale === undefined) {
+        console.log("No translation - english detected");
+    } else if (locale === 'en' && detectedLocale === 'en' && detectedSecondaryLocale) {
+        console.log("translate to english using secondary detected locale:  ", req._event.inputTranscript);
+        const translation = await get_translation(req._event.inputTranscript, detectedSecondaryLocale);
         _.set(req, "_translation", translation.TranslatedText);
         _.set(req._event, "inputTranscript", translation.TranslatedText);
         console.log("Overriding input transcript with translation: ", req._event.inputTranscript);
-    }
-    if (locale.charAt(0) === '%') {
-        console.log("Using a language with low confidence and preferred language not detected.");
-        _.set(req._event, "inputTranscript", "please speak your language");
-        _.set(req._event.sessionAttributes, "userLocale", locale.slice(1));
+    }  else if (locale !== '' && locale.charAt(0) !== '%' && detectedLocale && detectedLocale !== '') {
+        console.log("Confidence in the detected language high enough.");
+        const translation = await get_translation(req._event.inputTranscript, detectedLocale);
+        _.set(req, "_translation", translation.TranslatedText);
+        _.set(req._event, "inputTranscript", translation.TranslatedText);
+        console.log("Overriding input transcript with translation: ", req._event.inputTranscript);
+    }  else {
+        console.log ('not possible to perform language translation')
     }
 
 }
@@ -87,13 +102,10 @@ exports.set_multilang_env = async function (req) {
     console.log("Entering multilanguage Middleware");
     console.log("req:", req);
 
-    var userLocale = '';
-    var defaultConfidenceScore = req._settings.MINIMUM_CONFIDENCE_SCORE;
-
-    var userLanguages = await get_userLanguages(req._event.inputTranscript);
-
+    let userLocale = '';
+    const defaultConfidenceScore = req._settings.MINIMUM_CONFIDENCE_SCORE;
+    const userLanguages = await get_userLanguages(req._event.inputTranscript);
     const userPreferredLocale = req._event.sessionAttributes.userPreferredLocale ? req._event.sessionAttributes.userPreferredLocale : '';
-
     userLocale = set_userLocale(userLanguages, userPreferredLocale, defaultConfidenceScore, req);
     _.set(req._event.sessionAttributes, "userLocale", userLocale);
     _.set(req._event, "origTranscript", req._event.inputTranscript);

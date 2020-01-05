@@ -36,26 +36,31 @@ Handlebars.registerHelper('ifCond', function (v1, operator, v2, options) {
 });
 
 Handlebars.registerHelper('ifLang', function (lang, options) {
+    const SessionAttributes = _.get(req_glbl, 'session');
+    const usrLang = SessionAttributes.userLocale;
+    if (usrLang && lang === usrLang) {
+        _.set(req_glbl.session, 'matchlang', 'true');
+        return options.fn(this);
+    }
+});
+
+Handlebars.registerHelper('defaultLang', function (options) {
     var SessionAttributes = _.get(req_glbl, 'session');
-    var usrLang = SessionAttributes.userLocale;
     let previousMatchLang = SessionAttributes.matchlang;
 
-    if (lang === 'en' && previousMatchLang && previousMatchLang === 'true' ) {
+    if (previousMatchLang && previousMatchLang === 'true' ) {
         // case one. Hitting the default en lang response and a previous lang has matched. Return nothing and reset matchlang
         // matchlang to false for next processing.
         _.set(req_glbl.session, 'matchlang', 'false');
         return options.inverse(this);
-    } else if (lang === 'en' && previousMatchLang && previousMatchLang === 'false' ) {
-        // case two. Hitting the default en lang response and a previous lang has NOT matched. Return en value. matchlang is
+    } else if (previousMatchLang && previousMatchLang === 'false' ) {
+        // case two. Hitting the default lang response and a previous lang has NOT matched. Return value. matchlang is
         // false for next processing.
         return options.fn(this);
-    } else if (lang === 'en' && previousMatchLang === undefined && usrLang && lang === usrLang) {
-        // case three. Hitting the default en lang response and no previous lang has been encountered. Return en value
+    } else if (previousMatchLang === undefined) {
+        // case three. Hitting the default lang response and no previous lang has been encountered. Return default value
         // but set matchlang to false for next processing.
         _.set(req_glbl.session, 'matchlang', 'false');
-        return options.fn(this);
-    } else if (usrLang && lang === usrLang) {
-        _.set(req_glbl.session, 'matchlang', 'true');
         return options.fn(this);
     } else {
         if (previousMatchLang === undefined) {
