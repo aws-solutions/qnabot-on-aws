@@ -21,9 +21,9 @@ function sms_hint(req,res) {
 }
 
 function resetAttributes(req,res) {
+    // Kendra attributes
     let previous;
     let prevQid;
-
     let kendraResponsibleQid;
     previous = _.get(req._event.sessionAttributes,"previous");
     if (previous) {
@@ -31,9 +31,7 @@ function resetAttributes(req,res) {
         prevQid = obj.qid;
     }
     kendraResponsibleQid = _.get(res.session,"kendraResponsibleQid");
-    console.log('kendraRespQid: ' + kendraResponsibleQid);
-    console.log('prevQid: ' + prevQid);
-    if (res.result.qid === undefined || ( kendraResponsibleQid && (res.result.qid !== kendraResponsibleQid))) {
+    if ( (res.result === undefined || res.result.qid === undefined) || ( kendraResponsibleQid && (res.result.qid !== kendraResponsibleQid))) {
         // remove any prior session attributes for kendra as they are no longer valid
         if (res.session.kendraQueryId) delete res.session.kendraQueryId;
         if (res.session.kendraIndexId) delete res.session.kendraIndexId;
