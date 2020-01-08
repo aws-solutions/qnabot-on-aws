@@ -1247,7 +1247,7 @@ add to the object a new key/value pair rather than replacing the entire string.
 ```
 {"ALT_SEARCH_KENDRA_INDEXES":"[\"857710ab-9637-4a46-910f-9a1456d02596\"]"}
 ```
-`
+
 **Note the Escaped Quote marks around the array of Kendra index ids are required**
 
 **Don't forget to use your Kendra Index ID rather than the one in the sample**
