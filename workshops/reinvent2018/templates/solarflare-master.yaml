@@ -37,7 +37,7 @@ Resources:
     Properties:
       CodeUri: ../code/solarflare/
       Handler: app.lambdaHandler
-      Runtime: nodejs8.10
+      Runtime: nodejs10.x
       Role: !GetAtt SolarFlareFunctionRole.Arn
       Environment: # More info about Env Vars: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#environment-object
         Variables:
