@@ -137,9 +137,10 @@ var apply_handlebars = function (req, res, hit) {
     }
     console.log("Apply handlebars preprocessing to ES Response. Context: ", context);
     var hit_out = _.cloneDeep(hit);
-    var a = _.get(hit, "a")
-    var markdown = _.get(hit, "alt.markdown")
-    var ssml = _.get(hit, "alt.ssml")
+    var a = _.get(hit, "a");
+    var markdown = _.get(hit, "alt.markdown");
+    var ssml = _.get(hit, "alt.ssml");
+    var r = _.get(hit, "r");
     // catch and log errors before throwing exception.
     if (a) {
         try {
@@ -167,6 +168,42 @@ var apply_handlebars = function (req, res, hit) {
             console.log("ERROR: SSML caused Handlebars exception. Check syntax: ", ssml)
             throw (e);
         }
+    }
+    if (r) {
+        try {
+            if (r.subTitle && r.subTitle.length > 0) {
+                var subTitle_template = Handlebars.compile(r.subTitle);
+                hit_out.r.subTitle = subTitle_template(context);
+            }
+            if (r.title && r.title.length > 0) {
+                var title_template = Handlebars.compile(r.title);
+                hit_out.r.title = title_template(context);
+            }
+            if (r.text && r.text.length > 0) {
+                var text_template = Handlebars.compile(r.text);
+                hit_out.r.text = text_template(context);
+            }
+            if (r.imageUrl && r.imageUrl.length > 0) {
+                var imageUrl_template = Handlebars.compile(r.imageUrl);
+                hit_out.r.imageUrl = imageUrl_template(context);
+            }
+            if (r.url && r.url.length > 0) {
+                var url_template = Handlebars.compile(r.url);
+                hit_out.r.url = url_template(context);
+            }
+            if (r.buttons && r.buttons.length > 0) {
+                for (let x=0; x<r.buttons.length; x++) {
+                    var b_text_template = Handlebars.compile(r.buttons[x].text);
+                    hit_out.r.buttons[x].text = b_text_template(context);
+                    var b_value_template = Handlebars.compile(r.buttons[x].value);
+                    hit_out.r.buttons[x].value = b_value_template(context);
+                }
+            }
+        } catch (e) {
+            console.log("ERROR: response card fields format caused Handlebars exception. Check syntax: " + e );
+            throw (e);
+        }
+
     }
     console.log("Preprocessed Result: ", hit_out);
     return hit_out;

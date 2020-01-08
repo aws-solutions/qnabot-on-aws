@@ -1,6 +1,6 @@
 # Kendra Fallback Function
 
-Provides a preview Lambda Hook for the no_hits question to search a set of Kendra indexes
+Provides a Lambda Hook for the no_hits question to search a set of Kendra indexes
 as a fallback mechanism to provide answers. 
 
 Kendra provides a number of innovative features. This Kendra Fallback function performs a query against a
