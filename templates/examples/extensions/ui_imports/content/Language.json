@@ -1,0 +1,23 @@
+{
+  "qna": [
+    {
+      "qid": "Language.001",
+      "a": "{{setSessionAttr \"userPreferredLocale\" \"\"}} I will try and answer based on language detected",
+      "q": [
+        "Reset language",
+        "Detect language"
+      ]
+    },
+    {
+      "qid": "Language.000",
+      "a": "{{#setLang 'fr' false}} D'accord. J'ai défini votre langue préférée sur l'anglais. {{/setLang}}\n{{#setLang 'es' false}} Okay. He configurado tu idioma preferido al inglés.  {{/setLang}}\n{{#setLang 'de' false}} In Ordnung. Ich habe Ihre bevorzugte Sprache auf Englisch eingestellt. {{/setLang}}\n{{#setLang 'it' false}} Ok. Ho impostato la tua lingua preferita sull'inglese.{{/setLang}}\n{{#setLang 'en' true}} Ok. I've set your preferred language to English. {{/setLang}}",
+      "q": [
+        "French",
+        "Spanish",
+        "German",
+        "English",
+        "Italian"
+      ]
+    }
+  ]
+}

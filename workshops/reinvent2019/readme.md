@@ -39,7 +39,9 @@ During the workshop, AWS staff will give you a high-level overview of the labs a
 * **Step 6:** [Integrate SMS](#step-6---integrate-sms)
 * **Step 7:** [Monitor Usage in Kibana](#step-7---monitor-usage-with-kibana-and-cloudwatch)
 * **Step 8:** [Customize with Lambda](#step-8---customize-with-lambda)
-* **Step 9:** [New QnABot features in 2.4.0](#step-9---new-features)
+* **Step 9:** [Kendra Fallback Search](#step-9---extending-qnabot-to-leverage-enterprise-search-with-kendra)
+* **Step 10:** [Multiple Languages](#step-10---supporting-multiple-languages-in-qnabot)
+* **Step 11:** [New QnABot features in 2.4.0](#step-9---new-features)
 * **Cleanup** [Put everything away nicely](#workshop-cleanup)
 
 ### Conventions:
@@ -1203,7 +1205,218 @@ ids to update are sun.8 and sun.2.
 
 * * *
 
-## Step 9 - New Features:
+## Step 9 - Extending QnABot to leverage Enterprise Search with Kendra:
+
+QnABot version 2.6.0 optionally supports integration with Amazon Kendra. For the workshop perform the following steps:
+
+1) Enable Amazon Kendra in your account
+
+![Lab9-Kendra-1](images/Lab9-Kendra-1.png "Enable Kendra")
+
+2) Create an Index
+![Lab9-Kendra-2](images/Lab9-Kendra-2.png "Create an Index")
+![Lab9-Kendra-3](images/Lab9-Kendra-3.png "Create an Index")
+
+3) Create an S3 bucket and allow objects to be public read. Then upload the pdfs from workshops/reinvent2019/kendra-assets 
+to this bucket. Allow the objects to be public read. 
+
+4) From the Kendra Console open the new Kendra Index you created and add a data source that targets your S3 bucket. Make sure this 
+new data source is synced before proceeding.
+
+5) Set Custom Property 'ALT_SEARCH_KENDRA_INDEXES'
+
+This custom property will contain a string value that specifies an array of 
+Kendra indexes to search. At least one index must be specified. Until this custom property 
+is set in QnABot, use of Kendra as a fallback mechanism will return an error. 
+
+You can override this setting using SSM Parameter Store to add a new key/value pair as a custom property. 
+Find your custom property name from the QnABot CF stack outputs. The key in the QnABot CF stack outputs is 
+'CustomSettingsSSMParameterName'. If will have a value similar to 
+
+```
+CFN-CustomQnABotSettings-EOVHQJcYx9Ms
+```
+
+Find your CustomSettingsSSMParameterName property name in CloudFormation. Open the AWS Systems Manager console. 
+Navigate to ParameterStore. Filter the list using your custom property name name. Open and Edit the parameter. 
+
+Add the following content but use the Kendra IndexId rather than the ID below. This is a json object. You may already
+have set a new custom property if you performed step 10 below. As such you may need to 
+add to the object a new key/value pair rather than replacing the entire string. 
+
+```
+{"ALT_SEARCH_KENDRA_INDEXES":"[\"857710ab-9637-4a46-910f-9a1456d02596\"]"}
+```
+
+**Note the Escaped Quote marks around the array of Kendra index ids are required**
+
+**Don't forget to use your Kendra Index ID rather than the one in the sample**
+
+6) Use the Designer UI to import the Sample/Extension named Kendra Support.
+
+This loads a new question with a qid of "KendraFallback". Edit this question in the Designer and change its question from 
+"no_hits_alternative" to "no_hits" and save the changes. 
+
+If you have previously loaded the QnAUtility.json from Examples/Extensions you need to either remove 
+the question with the ID "CustomNoMatches" or change the question for this ID from "no_hits" to "no_hits_original"
+
+Once the new question, "KendraFallback" is configured as the response for "no_hits", the Kendra index will be
+searched for an answer whenever a curated answer can not be found. Once setup, Kendra provides a fallback 
+mechanism prior to telling the user an answer could not be found. 
+
+7) Test out a question
+
+```
+What are the layers of the Sun?
+
+Is there such a thing as sunspots?
+``` 
+
+You'll notice that elastic search has no curated answers for these questions. Instead of saying sadly we could not answer the question,
+kendra is searched and the answer and discovered text is returned. The links are clickable as well and if the document 
+is available to be read it can be downloaded from the S3 bucket. 
+
+**Important note. Please delete your data source and kendra index when done with this exercise. You have 30 days trial but
+after that charges to the account will occur. **
+
+[*^ back to top*](#solar-association-deploying-and-customizing-a-ready-made-question-and-answer-bot)
+ 
+* * *
+
+## Step 10 - Supporting multiple languages in QnABot:
+
+QnABot version 2.6.0 supports use of multiple languages. 
+
+Once enabled, if the user enters a question in a language other than english, QnABot will attempt to return an answer in 
+the other language. Its does this by using AWS Comprehend to identify the language spoken or typed. If Comprehend
+can identify the language based on a configured minimum confidence, QnABot will serve up content based on that locale.
+It converts the question to English from the source language and performs a lookup of the answer in Elastic Search 
+just as it normally does. Once it finds the question, QnABot will serve up the configured answer. The answers help
+the process by specifying locale specific content as described in 3 below. 
+
+Users can also set a preferred language whereby QnABot will always attempt to respond with content in the chosen
+locale.  If the user sets the preferred language to be Spanish, QnABot will always try and serve up content using
+Spanish if possible. 
+
+By default this feature is disabled. Use the following three steps to enable and configure this feature. Step 1 enables 
+the feature. Step 2 loads in two questions from this extension that allow the user to select a preferred language. The 
+defaults supplied in this question are English, Spanish, French, German, and Italian. For this step in the workshop
+perform all 3 steps below. 
+
+1) Custom Property
+
+a) QnABot uses a property named ENABLE_MULTI_LANGUAGE_SUPPORT. It is a boolean and has a default value of false. 
+You can override this setting using SSM Parameter Store to add a new key/value pair as a custom property. 
+Find your custom property name from the QnABot CF stack outputs. The key in the QnABot CF stack outputs is 
+'CustomSettingsSSMParameterName'. If will have a value similar to 
+
+```
+CFN-CustomQnABotSettings-EOVHQJcYx9Ms
+```
+
+b) Find your CustomSettingsSSMParameterName property name in CloudFormation. Open the AWS Systems Manager console. 
+Navigate to ParameterStore. Filter the list using your custom property name name. Open and Edit the parameter. 
+
+Set the value to be the following and save the changes.
+
+```
+{"ENABLE_MULTI_LANGUAGE_SUPPORT":true}
+```
+
+2) Use the Designer UI to import the Sample/Extension named Language / Multiple Language Support. 
+
+This will add two questions to the system: Language.000 and Language.001. 
+
+Language.000 provides a question that allows the user to set the current sessions preferred output saying a simple word 
+such as French, German, or Spanish, or Italian. 
+
+Language.001 resets the preferred language. This can be performed by saying or typing 'reset language' or 'detect language'. 
+You can also input using your language of choice assuming AWS Translate can translate the input back to English. 
+
+Once you've imported this extension question try typing the question 'Spanish'. You should see a Spanish response. 
+
+Next enter 'English' and you will have switched your preference back to English. 
+
+Next enter 'reset language' and your preference will be reset and auto detection will occur again.
+
+The answer for Language.000 uses the following handlebar syntax
+
+```
+{{#setLang 'fr' false}} D'accord. J'ai défini votre langue préférée sur l'anglais. {{/setLang}}
+{{#setLang 'es' false}} Okay. He configurado tu idioma preferido al inglés.  {{/setLang}}
+{{#setLang 'de' false}} In Ordnung. Ich habe Ihre bevorzugte Sprache auf Englisch eingestellt. {{/setLang}}
+{{#setLang 'it' false}} Ok. Ho impostato la tua lingua preferita sull'inglese.{{/setLang}}
+{{#setLang 'en' true}} Ok. I've set your preferred language to English. {{/setLang}}
+```
+
+The helper function setLang performs the necessary processing based on the language/locale detected by Comprehend. To
+add support for other languages just extend the answer in Language.000 with additional locales. 
+
+3) In order to serve up content 
+
+Last step is to modify answers in questions to respond in multiple languages. Lets modify the question sun.1, 
+'Tell me about the Sun' to support an answer in Spanish. 
+
+a) In the Content Designer open the question sun.1.
+
+Replace the answer with
+
+```
+{{#ifLang 'es'}}
+Nuestro sol tiene 4.600 millones de años. Se considera una enana amarilla con un diámetro de 1,392,684 kilómetros y una circunferencia de 4,370,005 kilómetros. Tiene una masa que es igual a 333,060 tierras y una temperatura superficial de 5,500 grados centígrados. ¡Muy caliente!
+{{/ifLang}}
+{{#defaultLang}}
+Our sun is 4.6 billion years old. Its considered a yellow dwarf with a diameter of 1,392,684 kilometers and a circumference of 4,370,005 kilometers. It has a mass that is equal to 333,060 earths and a surface temperature of 5,500 degrees celsius. Really Hot!
+{{/defaultLang}}
+```
+
+b) Under Advanced, replace the markdown field with
+
+```
+{{#ifLang 'es'}}
+## Algunos hechos
+* Nuestro sol tiene 4.600 millones de años.
+* Se considera una enana amarilla
+* Tiene una masa igual a 333,060 tierras.
+{{/ifLang}}
+{{#defaultLang}}
+## Some facts
+* Our sun is 4.6 billion years old
+* It is considered a yellow dwarf
+* It has a mass that is equal to 333,060 earths
+{{/defaultLang}}
+```
+
+c) Under advanced, replace the SSMl with 
+```
+{{#ifLang 'es'}}
+<speak> Our Sun is 4.6 billion years old. It is considered a yellow dwarf and has a mass that is equal to 333,060 earths.</speak>
+{{/ifLang}}
+{{#defaultLang}}
+<speak> Our Sun is 4.6 billion years old. It is considered a yellow dwarf and has a mass that is equal to 333,060 earths.</speak>
+{{/defaultLang}}
+```
+
+Notice the use of the handlebar function ifLang. It takes locale as a parameter. This tells QnABot to serve up the 
+Spanish answer if the detected input language is Spanish or if the user has set a preference of Spanish.
+
+Also notice the use of the function defaultLang. This function needs to be positioned last in the answer block and will be
+the default response should the question not be configured with the user's preferred language or the detected language. 
+
+d) Save this question and try asking 'Tell me about the Sun'. You'll see an English response.
+
+e) Try asking 'Cuéntame sobre el sol'. This should respond with a Spanish answer.
+
+f) Invoke the input 'Spanish' to switch your preference to Spanish and then the question 'Tell me about the Sun'. 
+You should observe the Spanish answer. 
+
+g) Invoke the input "reset language" and then 'Tell me about the Sun'. You should observe an English response. 
+
+[*^ back to top*](#solar-association-deploying-and-customizing-a-ready-made-question-and-answer-bot)
+
+* * *
+
+## Step 11 - New Features:
 
 QnABot version 2.4.0 provides some significant new features.
 

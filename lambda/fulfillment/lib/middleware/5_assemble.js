@@ -20,6 +20,30 @@ function sms_hint(req,res) {
     return hint;
 }
 
+function resetAttributes(req,res) {
+    // Kendra attributes
+    let previous;
+    let prevQid;
+    let kendraResponsibleQid;
+    previous = _.get(req._event.sessionAttributes,"previous");
+    if (previous) {
+        let obj = JSON.parse(previous);
+        prevQid = obj.qid;
+    }
+    kendraResponsibleQid = _.get(res.session,"kendraResponsibleQid");
+    if ( (res.result === undefined || res.result.qid === undefined) || ( kendraResponsibleQid && (res.result.qid !== kendraResponsibleQid))) {
+        // remove any prior session attributes for kendra as they are no longer valid
+        if (res.session.kendraQueryId) delete res.session.kendraQueryId;
+        if (res.session.kendraIndexId) delete res.session.kendraIndexId;
+        if (res.session.kendraResultId) delete res.session.kendraResultId;
+        if (res.session.kendraResponsibleQid) delete res.session.kendraResponsibleQid;
+        if (req._event.sessionAttributes.kendraQueryId) delete req._event.sessionAttributes.kendraQueryId;
+        if (req._event.sessionAttributes.kendraIndexId) delete req._event.sessionAttributes.kendraIndexId;
+        if (req._event.sessionAttributes.kendraResultId) delete req._event.sessionAttributes.kendraResultId;
+        if (req._event.sessionAttributes.kendraResponsibleQid) delete req._event.sessionAttributes.kendraResponsibleQid;
+    }
+}
+
 module.exports=async function assemble(req,res){
     if(process.env.LAMBDA_LOG){
         await util.invokeLambda({
@@ -54,5 +78,8 @@ module.exports=async function assemble(req,res){
             res.out=alexa.assemble(req,res)
             break;
     }
+
+    resetAttributes(req,res);
+
     return {req,res}
 }

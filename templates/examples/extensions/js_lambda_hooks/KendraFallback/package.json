@@ -1,0 +1,18 @@
+{
+  "name": "kendraFallback",
+  "version": "1.0.0",
+  "description": "kendra fallback function",
+  "author": "SAM CLI",
+  "license": "MIT",
+  "dependencies": {
+    "aws-sdk": "^2.585.0"
+  },
+  "repository": {},
+  "scripts": {
+    "test": "mocha ../tests/unit/"
+  },
+  "devDependencies": {
+    "chai": "^4.1.2",
+    "mocha": "^5.1.1"
+  }
+}
