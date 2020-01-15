@@ -1214,9 +1214,12 @@ QnABot version 2.6.0 optionally supports integration with Amazon Kendra. For the
 ![Lab9-Kendra-1](images/Lab9-Kendra-1.png "Enable Kendra")
 
 2) Create an Index
-***Note that while still in Preview, Kendra only supports creating one index***
-***Also Note that Kendra can take upwards of 30 minutes to create an index.*** While the Index is being created be
-sure to checkout other steps in the Workshop.
+
+***Note that while still in Preview, an AWS account only supports one Kendra index***
+
+***Also Note that Kendra can take upwards of 30 minutes to create an index.*** 
+
+While the Index is being created be sure to checkout other steps in the Workshop.
 
 ![Lab9-Kendra-2](images/Lab9-Kendra-2.png "Create an Index")
 ![Lab9-Kendra-3](images/Lab9-Kendra-3.png "Create an Index")
@@ -1225,10 +1228,10 @@ sure to checkout other steps in the Workshop.
 to this bucket. Allow the objects to be public read. 
 
 4) From the Kendra Console open the new Kendra Index you created and add a data source that targets your S3 bucket. 
-When you "Add a Data Source" and you select Amazon S3 as the Connector, make sure to select "Create a new role" to give Kendra
+When you "Add a Data Source" and select Amazon S3 as the Connector, make sure to select "Create a new role" to give Kendra
 permission to access this S3 buckert. 
 
-![Lab9-Kendra-3](images/Lab9-Kendra-4.png "Create a new role")
+![Lab9-Kendra-4](images/Lab9-Kendra-4.png "Create a new role")
 
 ***Make sure this new data source is synced before proceeding.***
 
