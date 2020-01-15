@@ -1214,14 +1214,23 @@ QnABot version 2.6.0 optionally supports integration with Amazon Kendra. For the
 ![Lab9-Kendra-1](images/Lab9-Kendra-1.png "Enable Kendra")
 
 2) Create an Index
+***Note that while still in Preview, Kendra only supports creating one index***
+***Also Note that Kendra can take upwards of 30 minutes to create an index.*** While the Index is being created be
+sure to checkout other steps in the Workshop.
+
 ![Lab9-Kendra-2](images/Lab9-Kendra-2.png "Create an Index")
 ![Lab9-Kendra-3](images/Lab9-Kendra-3.png "Create an Index")
 
 3) Create an S3 bucket and allow objects to be public read. Then upload the pdfs from workshops/reinvent2019/kendra-assets 
 to this bucket. Allow the objects to be public read. 
 
-4) From the Kendra Console open the new Kendra Index you created and add a data source that targets your S3 bucket. Make sure this 
-new data source is synced before proceeding.
+4) From the Kendra Console open the new Kendra Index you created and add a data source that targets your S3 bucket. 
+When you "Add a Data Source" and you select Amazon S3 as the Connector, make sure to select "Create a new role" to give Kendra
+permission to access this S3 buckert. 
+
+![Lab9-Kendra-3](images/Lab9-Kendra-4.png "Create a new role")
+
+***Make sure this new data source is synced before proceeding.***
 
 5) Set Custom Property 'ALT_SEARCH_KENDRA_INDEXES'
 
@@ -1252,7 +1261,7 @@ add to the object a new key/value pair rather than replacing the entire string.
 
 **Don't forget to use your Kendra Index ID rather than the one in the sample**
 
-6) Use the Designer UI to import the Sample/Extension named Kendra Support.
+6) Use the Designer UI to import the Sample/Extension named KendraFallback.
 
 This loads a new question with a qid of "KendraFallback". Edit this question in the Designer and change its question from 
 "no_hits_alternative" to "no_hits" and save the changes. 
@@ -1288,7 +1297,7 @@ after that charges to the account will occur. **
 QnABot version 2.6.0 supports use of multiple languages. 
 
 Once enabled, if the user enters a question in a language other than english, QnABot will attempt to return an answer in 
-the other language. Its does this by using AWS Comprehend to identify the language spoken or typed. If Comprehend
+the other language. Its does this by using AWS Comprehend to identify the language from the text provided. If Comprehend
 can identify the language based on a configured minimum confidence, QnABot will serve up content based on that locale.
 It converts the question to English from the source language and performs a lookup of the answer in Elastic Search 
 just as it normally does. Once it finds the question, QnABot will serve up the configured answer. The answers help
@@ -1301,7 +1310,7 @@ Spanish if possible.
 By default this feature is disabled. Use the following three steps to enable and configure this feature. Step 1 enables 
 the feature. Step 2 loads in two questions from this extension that allow the user to select a preferred language. The 
 defaults supplied in this question are English, Spanish, French, German, and Italian. For this step in the workshop
-perform all 3 steps below. 
+perform all 3. 
 
 1) Custom Property
 
