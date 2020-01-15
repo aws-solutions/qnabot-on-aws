@@ -71,14 +71,17 @@ sure everything is cleaned up and avoid unnecessary charges.
 
 ## Step 1 - Let's begin and deploy a working QnABot
 
-You have an important choice to make at this point of the workshop. 
+### You have an important choice to make at this point of the workshop.
 
-If you are attending re:Invent 2019, skip to step 1B. Installation of QnABot has already 
-been performed in an account you will use for the duration of the workshop. 
+#### You are Not At reInvent (Most likely)
 
-If you are not attending re:Invent 2019 or you wish to deploy QnABot in your own
+You are not attending re:Invent 2019 or you wish to deploy QnABot in your own
 AWS account, please follow the steps in step 1A below. Note this part of the setup
 will take ~25 minutes to complete.
+
+#### You are attending at reInvent 2019
+
+You are attending re:Invent 2019. Jump forward to Step 1B below and ***DO NOT run Step 1A***. 
 
 ## Step 1A
 
@@ -120,7 +123,11 @@ The CloudFormation template will launch the following:
 Once the CloudFormation template is complete you can skip on the Checkpoint below or on
 to Step 2.
 
+[Step 2 - Manage questions, answers, test the simple bot](#step-2---manage-questions-answers-and-test-using-the-client-ui)
+
 ## Step 1B
+
+### You are attending at reInvent
 
 Congratulations on attending re:Invent 2019. We provisioned an AWS account that you
 can use during this workshop with an install of QnABot. You can log into this AWS account using the hash code 
