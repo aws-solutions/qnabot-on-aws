@@ -1215,7 +1215,7 @@ QnABot version 2.6.0 optionally supports integration with Amazon Kendra. For the
 
 2) Create an Index
 
-***Note that while still in Preview, an AWS account only supports one Kendra index***
+***Note that while still in Preview, an AWS account only supports one Kendra index.***
 
 ***Also Note that Kendra can take upwards of 30 minutes to create an index.*** 
 
@@ -1288,8 +1288,8 @@ You'll notice that elastic search has no curated answers for these questions. In
 kendra is searched and the answer and discovered text is returned. The links are clickable as well and if the document 
 is available to be read it can be downloaded from the S3 bucket. 
 
-**Important note. Please delete your data source and kendra index when done with this exercise. You have 30 days trial but
-after that charges to the account will occur. **
+***Important note. Please delete your data source and kendra index when done with this exercise. You have 30 days trial but
+after that charges to the account will occur.***
 
 [*^ back to top*](#solar-association-deploying-and-customizing-a-ready-made-question-and-answer-bot)
  
