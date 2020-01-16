@@ -71,17 +71,15 @@ sure everything is cleaned up and avoid unnecessary charges.
 
 ## Step 1 - Let's begin and deploy a working QnABot
 
-### You have an important choice to make at this point of the workshop.
+### You have an important choice to make at this point of the workshop
 
-#### You are Not At reInvent (Most likely)
+#### You are Not At reInvent (Most likely) or you wish to deploy QnABot in your own AWS account
 
-You are not attending re:Invent 2019 or you wish to deploy QnABot in your own
-AWS account, please follow the steps in step 1A below. Note this part of the setup
-will take ~25 minutes to complete.
+- Follow the steps in step 1A below and then go on to Step 2 [Manage questions, answers, test the simple bot](#step-2---manage-questions-answers-and-test-using-the-client-ui) (Note this part of the setup will take ~25 minutes to complete)
 
 #### You are attending at reInvent 2019
 
-You are attending re:Invent 2019. Jump forward to Step 1B below and ***DO NOT run Step 1A***. 
+- Jump forward to Step 1B below and ***DO NOT run Step 1A***. 
 
 ## Step 1A
 
@@ -103,7 +101,7 @@ You've found the AWS QnABot open source project and want to test this as a possi
         access to the QnABot Content Designer. You must have access to this email. Without this it becomes difficult to access the Content Designer
     * **Username** <pre> Admin </pre>
 
-4) Launch the stack. Make sure to select the checkbox next to *"I acknowledge that AWS CloudFormation might create IAM resources with custom names"*.  
+4) Launch the stack. Make sure to select both checkboxes in the Capabilities acknowledgements.  
     ![CloudFormation acknowledgement](images/00-cf-create.png)
 
 The CloudFormation template will launch the following:
@@ -120,10 +118,71 @@ The CloudFormation template will launch the following:
 
 ![CloudFormation Starting Stack](images/00-arch-b.png)
 
-Once the CloudFormation template is complete you can skip on the Checkpoint below or on
-to Step 2.
+### Checkpoint:
+
+This Checkpoint only applies to step 1A where you are installing QnABot from a CloudFormation template into your own account.
+
+If you are completing step 1B please proceed to running the commands below starting with Elasticsearch Service. 
+You will not need to wait 25 minutes for setup to complete as this stack has been pre-installed. 
+
+If you have just launched the CloudFormation stack, it will take 25 minutes to complete.  Periodically check on the stack creation process in the 
+CloudFormation Dashboard. If no stack shows up immediately, click the refresh button at the top right hand corner of 
+your screen.  Your stack should show status **CREATE\_COMPLETE** in roughly 25 minutes. 
+
+If there was an [error](http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/troubleshooting.html#troubleshooting-errors) 
+during the stack creation process, CloudFormation will rollback and terminate.  You can investigate and troubleshoot by 
+looking in the Events tab.  Any errors encountered during stack creation will appear in the event stream as a failure.
+
+Go ahead and start reading the next section while your stack is being created. Once the stack has been created you can 
+explore resources using the AWS console for ElasticSearch, Lex, Lambda, Cognito. 
+
+If you have cli access to your AWS account you can also use the following commands to explore the resources 
+being created. Later in Step 3 you'll setup an AWS Cloud9 IDE which you can also use to run these commands.                                           
+
+#### Helpful commands to look at your resources are shown below
+
+##### Elasticsearch Service
+<pre>
+$ aws es list-domain-names
+$ aws es describe-elasticsearch-domain --domain-name <b><i>DOMAIN-NAME</i></b>
+</pre>
+
+* Note: Use the domain name output from the first command to use as the DOMAIN-NAME in the second command.
+
+##### AWS Lex Bot
+<pre>
+$ aws lex-models get-bots</b>
+</pre>
+
+The prior command will show the Lex Bot that has been created for you.
+
+##### AWS Cognito UserPool
+<pre>
+$ aws cognito-idp list-user-pools --max-results 5
+</pre>
+
+* Note: The --max-results argument could need to be increased based on the number of existing cognito user pools in your account
+
+##### AWS CloudFormation stack outputs
+<pre>
+$ aws cloudformation list-stacks
+$ aws cloudformation describe-stacks --stack-name <b><i>YOURSTACKNAME</i></b>
+</pre>
+
+"TemplateDescription": "QnABot with admin and client websites - (Master v2.5.0)", 
+
+You should also look to see the Outputs from your stack displayed in the Cloud Formation console. 
+Notice a number of urls. There are two very important URLs:
+* ContentDesignerURL
+* ClientURL
+* BotName
+* DashboardURL
+
+Fore more information on the stack this is launching refer to the AWS QnABot at [QnABot blog post](https://www.amazon.com/qnabot).  
 
 [Step 2 - Manage questions, answers, test the simple bot](#step-2---manage-questions-answers-and-test-using-the-client-ui)
+
+[*^ back to top*](#solar-association-deploying-and-customizing-a-ready-made-question-and-answer-bot)
 
 ## Step 1B
 
@@ -200,69 +259,6 @@ command will set a new temporary password that you will change the first time yo
 ``` 
 aws cognito-idp admin-set-user-password --user-pool-id [YourUserPoolIdFromJson] --username Admin --password MyPassword2019_
 ```
-
-### Checkpoint:
-
-This Checkpoint only applies to step 1A where you are installing QnABot from a CloudFormation template into your own account.
-
-If you are completing step 1B please proceed to running the commands below starting with Elasticsearch Service. 
-You will not need to wait 25 minutes for setup to complete as this stack has been pre-installed. 
-
-If you have just launched the CloudFormation stack, it will take 25 minutes to complete.  Periodically check on the stack creation process in the 
-CloudFormation Dashboard. If no stack shows up immediately, click the refresh button at the top right hand corner of 
-your screen.  Your stack should show status **CREATE\_COMPLETE** in roughly 25 minutes. 
-
-If there was an [error](http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/troubleshooting.html#troubleshooting-errors) 
-during the stack creation process, CloudFormation will rollback and terminate.  You can investigate and troubleshoot by 
-looking in the Events tab.  Any errors encountered during stack creation will appear in the event stream as a failure.
-
-Go ahead and start reading the next section while your stack is being created. Once the stack has been created you can 
-explore resources using the AWS console for ElasticSearch, Lex, Lambda, Cognito. 
-
-If you have cli access to your AWS account you can also use the following commands to explore the resources 
-being created. Later in Step 3 you'll setup an AWS Cloud9 IDE which you can also use to run these commands.                                           
-
-#### Helpful commands to look at your resources are shown below
-
-##### Elasticsearch Service
-<pre>
-$ aws es list-domain-names
-$ aws es describe-elasticsearch-domain --domain-name <b><i>DOMAIN-NAME</i></b>
-</pre>
-
-* Note: Use the domain name output from the first command to use as the DOMAIN-NAME in the second command.
-
-##### AWS Lex Bot
-<pre>
-$ aws lex-models get-bots</b>
-</pre>
-
-The prior command will show the Lex Bot that has been created for you.
-
-##### AWS Cognito UserPool
-<pre>
-$ aws cognito-idp list-user-pools --max-results 5
-</pre>
-
-* Note: The --max-results argument could need to be increased based on the number of existing cognito user pools in your account
-
-##### AWS CloudFormation stack outputs
-<pre>
-$ aws cloudformation list-stacks
-$ aws cloudformation describe-stacks --stack-name <b><i>YOURSTACKNAME</i></b>
-</pre>
-
-"TemplateDescription": "QnABot with admin and client websites - (Master v2.5.0)", 
-
-You should also look to see the Outputs from your stack displayed in the Cloud Formation console. 
-Notice a number of urls. There are two very important URLs:
-* ContentDesignerURL
-* ClientURL
-* BotName
-* DashboardURL
-
-Fore more information on the stack this is launching refer to the AWS QnABot at [QnABot blog post](https://www.amazon.com/qnabot).  
-
 [*^ back to top*](#solar-association-deploying-and-customizing-a-ready-made-question-and-answer-bot)
 * * *
 
