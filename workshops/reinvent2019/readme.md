@@ -412,7 +412,20 @@ Your AWS Cloud9 environment will begin to be setup. Once its ready continue with
     git clone https://github.com/aws-samples/aws-ai-qna-bot.git
     </pre>
 
-2) Run a script in your Cloud9 IDE that runs CloudFormation to setup an S3 bucket to host the website and uploads the two files
+2) Run a script in your Cloud9 IDE that runs CloudFormation to setup an S3 bucket to host the website and uploads two files
+
+    Running this script requires the ability to set the file's acl in the S3 bucket to public-read. The S3 Bucket
+    will not be public-read. Only the files uploaded will be public-read. Before running this 
+    script, at a minimum set "Block public access to buckets and objects granted through new access control lists (ACLs)"
+    to "Off" in the account's S3 Block public access (Account Settings). 
+    
+    * Open the AWS S3 Console
+    * On the left select, "S3 Block public access (account settings)"
+    * Make sure "Block public access to buckets and objects granted through new access control lists (ACLs)" is not selected
+    ![BlockPublicAccess Settings](images/Lab3-S3-public-access-settings.png)
+    
+    Once you have confirmed and/or updated your settings in S3 you can run the following in your Cloud9 IDE bash window. 
+    After Step 3 in the workshop has been completed, set your S3 Block public access (account settings) to desired values. 
 
     <pre>
     cd ~/environment/aws-ai-qna-bot/workshops/reinvent2019/scripts
