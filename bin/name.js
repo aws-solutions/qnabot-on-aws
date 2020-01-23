@@ -59,9 +59,9 @@ function run(stack,options={}){
     }
 
     if(options.prefix){
-        return `QNA-${full}`
+        return `${config.stackNamePrefix}-${full}`
     }else{
-        return `QNA-${full}-${increment}` 
+        return `${config.stackNamePrefix}-${full}-${increment}`
     }
 
     function set(value){
