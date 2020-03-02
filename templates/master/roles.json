@@ -173,6 +173,7 @@
                     "lex:PutIntent",
                     "lex:DeleteIntent",
                     "lex:PutBot",
+                    "lex:GetBot",
                     "lex:DeleteBot",
                     "lex:PutBotAlias",
                     "lex:DeleteBotAlias"
