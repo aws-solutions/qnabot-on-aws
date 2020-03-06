@@ -58,6 +58,8 @@ function run(stack,options={}){
         set(++increment)
     }
 
+    config.stackNamePrefix = config.stackNamePrefix ? config.stackNamePrefix : 'QNA';
+
     if(options.prefix){
         return `${config.stackNamePrefix}-${full}`
     }else{
