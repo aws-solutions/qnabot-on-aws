@@ -37,10 +37,6 @@ function resetAttributes(req,res) {
         if (res.session.kendraIndexId) delete res.session.kendraIndexId;
         if (res.session.kendraResultId) delete res.session.kendraResultId;
         if (res.session.kendraResponsibleQid) delete res.session.kendraResponsibleQid;
-        if (req._event.sessionAttributes.kendraQueryId) delete req._event.sessionAttributes.kendraQueryId;
-        if (req._event.sessionAttributes.kendraIndexId) delete req._event.sessionAttributes.kendraIndexId;
-        if (req._event.sessionAttributes.kendraResultId) delete req._event.sessionAttributes.kendraResultId;
-        if (req._event.sessionAttributes.kendraResponsibleQid) delete req._event.sessionAttributes.kendraResponsibleQid;
     }
 }
 
@@ -70,6 +66,9 @@ module.exports=async function assemble(req,res){
         _.get(res,'session',{}),
         x=>_.isString(x) ? x : JSON.stringify(x)
     )
+
+    resetAttributes(req,res);
+
     switch(req._type){
         case 'LEX':
             res.out=lex.assemble(req,res)
@@ -78,8 +77,6 @@ module.exports=async function assemble(req,res){
             res.out=alexa.assemble(req,res)
             break;
     }
-
-    resetAttributes(req,res);
 
     return {req,res}
 }

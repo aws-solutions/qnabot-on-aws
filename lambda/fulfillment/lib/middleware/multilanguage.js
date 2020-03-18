@@ -54,12 +54,12 @@ function set_userLocale(Languages, userPreferredLocale, defaultConfidenceScore, 
     console.log("detected secondary locale", userDetectedSecondaryLocale);
     console.log("detected Confidence", userDetectedLocaleConfidence);
 
-    _.set(req._event.sessionAttributes, "userDetectedLocale", userDetectedLocale);
-    _.set(req._event.sessionAttributes, "userDetectedLocaleConfidence", userDetectedLocaleConfidence);
+    _.set(req.session, "userDetectedLocale", userDetectedLocale);
+    _.set(req.session, "userDetectedLocaleConfidence", userDetectedLocaleConfidence);
     if (userDetectedSecondaryLocale) {
-        _.set(req._event.sessionAttributes, "userDetectedSecondaryLocale", userDetectedSecondaryLocale);
+        _.set(req.session, "userDetectedSecondaryLocale", userDetectedSecondaryLocale);
     } else {
-        if (req._event.sessionAttributes.userDetectedSecondaryLocale) delete req._event.sessionAttributes.userDetectedSecondaryLocale;
+        if (req.session.userDetectedSecondaryLocale) delete req.session.userDetectedSecondaryLocale;
     }
 
     if (userPreferredLocale && userDetectedLocale !== '') {
@@ -75,24 +75,24 @@ function set_userLocale(Languages, userPreferredLocale, defaultConfidenceScore, 
 }
 
 async function set_translated_transcript(locale, req) {
-    const SessionAttributes = _.get(req._event, 'sessionAttributes');
+    const SessionAttributes = _.get(req, 'session');
     const detectedLocale = SessionAttributes.userDetectedLocale;
     const detectedSecondaryLocale = SessionAttributes.userDetectedSecondaryLocale;
 
     if (locale === 'en' && detectedLocale === 'en' && detectedSecondaryLocale === undefined) {
         console.log("No translation - english detected");
     } else if (locale === 'en' && detectedLocale === 'en' && detectedSecondaryLocale) {
-        console.log("translate to english using secondary detected locale:  ", req._event.inputTranscript);
-        const translation = await get_translation(req._event.inputTranscript, detectedSecondaryLocale);
+        console.log("translate to english using secondary detected locale:  ", req.question);
+        const translation = await get_translation(req.question, detectedSecondaryLocale);
         _.set(req, "_translation", translation.TranslatedText);
-        _.set(req._event, "inputTranscript", translation.TranslatedText);
-        console.log("Overriding input transcript with translation: ", req._event.inputTranscript);
+        _.set(req, "question", translation.TranslatedText);
+        console.log("Overriding input question with translation: ", req.question);
     }  else if (locale !== '' && locale.charAt(0) !== '%' && detectedLocale && detectedLocale !== '') {
         console.log("Confidence in the detected language high enough.");
-        const translation = await get_translation(req._event.inputTranscript, detectedLocale);
+        const translation = await get_translation(req.question, detectedLocale);
         _.set(req, "_translation", translation.TranslatedText);
-        _.set(req._event, "inputTranscript", translation.TranslatedText);
-        console.log("Overriding input transcript with translation: ", req._event.inputTranscript);
+        _.set(req, "question", translation.TranslatedText);
+        console.log("Overriding input question with translation: ", req.question);
     }  else {
         console.log ('not possible to perform language translation')
     }
@@ -106,11 +106,11 @@ exports.set_multilang_env = async function (req) {
 
     let userLocale = '';
     const defaultConfidenceScore = req._settings.MINIMUM_CONFIDENCE_SCORE;
-    const userLanguages = await get_userLanguages(req._event.inputTranscript);
-    const userPreferredLocale = req._event.sessionAttributes.userPreferredLocale ? req._event.sessionAttributes.userPreferredLocale : '';
+    const userLanguages = await get_userLanguages(req.question);
+    const userPreferredLocale = req.session.userPreferredLocale ? req.session.userPreferredLocale : '';
     userLocale = set_userLocale(userLanguages, userPreferredLocale, defaultConfidenceScore, req);
-    _.set(req._event.sessionAttributes, "userLocale", userLocale);
-    _.set(req._event, "origTranscript", req._event.inputTranscript);
+    _.set(req.session, "userLocale", userLocale);
+    _.set(req._event, "origQuestion", req.question);
     await set_translated_transcript(userLocale, req);
 
     return req;
