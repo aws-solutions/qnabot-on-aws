@@ -153,8 +153,7 @@ var apply_handlebars = async function (req, res, hit) {
             const a_template = Handlebars.compile(a);
             hit_out.a=a_template(context);
             if (autotranslate){
-                const res = await translate.get_translation(hit_out.a, usrLang) ; 
-                hit_out.a = res.TranslatedText;
+                hit_out.a = await translate.get_translation(hit_out.a, usrLang) ; 
             } 
         } catch (e) {
             console.log("ERROR: Answer caused Handlebars exception. Check syntax: ", a)
@@ -166,8 +165,7 @@ var apply_handlebars = async function (req, res, hit) {
             var markdown_template = Handlebars.compile(markdown);
             hit_out.alt.markdown = markdown_template(context);
             if (autotranslate){
-                const res = await translate.get_translation(hit_out.alt.markdown, usrLang) ; 
-                hit_out.alt.markdown = res.TranslatedText;
+                hit_out.alt.markdown = await translate.get_translation(hit_out.alt.markdown, usrLang) ; 
             } 
         } catch (e) {
             console.log("ERROR: Markdown caused Handlebars exception. Check syntax: ", markdown)
@@ -179,8 +177,7 @@ var apply_handlebars = async function (req, res, hit) {
             var ssml_template = Handlebars.compile(ssml);
             hit_out.alt.ssml = ssml_template(context);
             if (autotranslate){
-                const res = await translate.get_translation(hit_out.alt.ssml, usrLang) ; 
-                hit_out.alt.ssml = res.TranslatedText;
+                hit_out.alt.ssml = await translate.get_translation(hit_out.alt.ssml, usrLang) ; 
             } 
         } catch (e) {
             console.log("ERROR: SSML caused Handlebars exception. Check syntax: ", ssml)
