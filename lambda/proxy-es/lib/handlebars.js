@@ -1,12 +1,14 @@
 //start connection
 var _ = require('lodash');
 var Handlebars = require('handlebars');
+var translate = require('./translate');
 var supportedLanguages = require('./supportedLanguages');
 
 console.log("SUPPORTED lang: ", supportedLanguages.getSupportedLanguages());
 
 var res_glbl = {};
 var req_glbl = {};
+var autotranslate = false;
 
 Handlebars.registerHelper('ifCond', function (v1, operator, v2, options) {
     switch (operator) {
@@ -56,11 +58,13 @@ Handlebars.registerHelper('defaultLang', function (options) {
     } else if (previousMatchLang && previousMatchLang === 'false' ) {
         // case two. Hitting the default lang response and a previous lang has NOT matched. Return value. matchlang is
         // false for next processing.
+        autotranslate = true;
         return options.fn(this);
     } else if (previousMatchLang === undefined) {
         // case three. Hitting the default lang response and no previous lang has been encountered. Return default value
         // but set matchlang to false for next processing.
         _.set(req_glbl.session, 'matchlang', 'false');
+        autotranslate = true;
         return options.fn(this);
     } else {
         if (previousMatchLang === undefined) {
@@ -123,7 +127,7 @@ Handlebars.registerHelper('randomPick', function () {
     return item;
 });
 
-var apply_handlebars = function (req, res, hit) {
+var apply_handlebars = async function (req, res, hit) {
     console.log("apply handlebars");
     console.log('req is: ' + JSON.stringify(req,null,2));
     console.log('res is: ' + JSON.stringify(res,null,2));
@@ -135,6 +139,8 @@ var apply_handlebars = function (req, res, hit) {
         UserInfo: req._userInfo,
         SessionAttributes: _.get(req, 'session')
     }
+    const usrLang = _.get(req, 'session.userLocale');
+    autotranslate = false;
     console.log("Apply handlebars preprocessing to ES Response. Context: ", context);
     var hit_out = _.cloneDeep(hit);
     var a = _.get(hit, "a");
@@ -144,8 +150,12 @@ var apply_handlebars = function (req, res, hit) {
     // catch and log errors before throwing exception.
     if (a) {
         try {
-            var a_template = Handlebars.compile(a);
-            hit_out.a = a_template(context);
+            const a_template = Handlebars.compile(a);
+            hit_out.a=a_template(context);
+            if (autotranslate){
+                const res = await translate.get_translation(hit_out.a, usrLang) ; 
+                hit_out.a = res.TranslatedText;
+            } 
         } catch (e) {
             console.log("ERROR: Answer caused Handlebars exception. Check syntax: ", a)
             throw (e);
@@ -155,6 +165,10 @@ var apply_handlebars = function (req, res, hit) {
         try {
             var markdown_template = Handlebars.compile(markdown);
             hit_out.alt.markdown = markdown_template(context);
+            if (autotranslate){
+                const res = await translate.get_translation(hit_out.alt.markdown, usrLang) ; 
+                hit_out.alt.markdown = res.TranslatedText;
+            } 
         } catch (e) {
             console.log("ERROR: Markdown caused Handlebars exception. Check syntax: ", markdown)
             throw (e);
@@ -164,6 +178,10 @@ var apply_handlebars = function (req, res, hit) {
         try {
             var ssml_template = Handlebars.compile(ssml);
             hit_out.alt.ssml = ssml_template(context);
+            if (autotranslate){
+                const res = await translate.get_translation(hit_out.alt.ssml, usrLang) ; 
+                hit_out.alt.ssml = res.TranslatedText;
+            } 
         } catch (e) {
             console.log("ERROR: SSML caused Handlebars exception. Check syntax: ", ssml)
             throw (e);
@@ -209,7 +227,7 @@ var apply_handlebars = function (req, res, hit) {
     return hit_out;
 }
 
-module.exports = function (req, res, es_hit) {
+module.exports = async function (req, res, es_hit) {
     console.log("entering apply_handlebars");
-    return apply_handlebars(req, res, es_hit);
+    return await apply_handlebars(req, res, es_hit);
 };
