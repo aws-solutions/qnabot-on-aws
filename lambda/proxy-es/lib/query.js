@@ -3,6 +3,8 @@ var _=require('lodash');
 var request=require('./request');
 var build_es_query=require('./esbodybuilder');
 var handlebars=require('./handlebars');
+var translate = require('./translate');
+
 
 function run_query(req, query_params){
     return(build_es_query(query_params))
@@ -79,7 +81,17 @@ module.exports=function(req,res){
         var hit=_.get(result,"hits.hits[0]._source");
         if(hit){
             res.session.topic=_.get(res.result,"t")
-            res.result= await handlebars(req,res,hit);
+            hit=await handlebars(req,res,hit);
+            if (req._settings.ENABLE_MULTI_LANGUAGE_SUPPORT){
+                const usrLang = _.get(req, 'session.userLocale');
+                if (usrLang != 'en') {
+                    console.log("Autotranslate response to usrLang: ", usrLang);
+                    hit=await translate.translate_hit(hit,usrLang);
+                } else {
+                    console.log("User Lang is en, Autotranslate not required.");
+                }
+            }
+            res.result = hit;
             res.type="PlainText"
             res.message=res.result.a
             res.plainMessage=res.result.a

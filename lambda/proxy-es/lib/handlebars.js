@@ -1,14 +1,13 @@
 //start connection
 var _ = require('lodash');
 var Handlebars = require('handlebars');
-var translate = require('./translate');
 var supportedLanguages = require('./supportedLanguages');
 
 console.log("SUPPORTED lang: ", supportedLanguages.getSupportedLanguages());
 
 var res_glbl = {};
 var req_glbl = {};
-var autotranslate = false;
+var autotranslate;
 
 Handlebars.registerHelper('ifCond', function (v1, operator, v2, options) {
     switch (operator) {
@@ -42,6 +41,8 @@ Handlebars.registerHelper('ifLang', function (lang, options) {
     const usrLang = SessionAttributes.userLocale;
     if (usrLang && lang === usrLang) {
         _.set(req_glbl.session, 'matchlang', 'true');
+        // Disable autotranslation, since we have an explicit language match
+        autotranslate = false;
         return options.fn(this);
     }
 });
@@ -52,17 +53,18 @@ Handlebars.registerHelper('defaultLang', function (options) {
 
     if (previousMatchLang && previousMatchLang === 'true' ) {
         // case one. Hitting the default en lang response and a previous lang has matched. Return nothing and reset matchlang
-        // matchlang to false for next processing.
+        // matchlang to false for next processing. Disable autotranslation.
         _.set(req_glbl.session, 'matchlang', 'false');
+        autotranslate = false;
         return options.inverse(this);
     } else if (previousMatchLang && previousMatchLang === 'false' ) {
         // case two. Hitting the default lang response and a previous lang has NOT matched. Return value. matchlang is
-        // false for next processing.
+        // false for next processing. Enable autotranslation.
         autotranslate = true;
         return options.fn(this);
     } else if (previousMatchLang === undefined) {
         // case three. Hitting the default lang response and no previous lang has been encountered. Return default value
-        // but set matchlang to false for next processing.
+        // but set matchlang to false for next processing. Enable autotranslation.
         _.set(req_glbl.session, 'matchlang', 'false');
         autotranslate = true;
         return options.fn(this);
@@ -114,8 +116,7 @@ Handlebars.registerHelper('setLang', function (lang, last, options) {
 
 Handlebars.registerHelper('setSessionAttr', function (k, v, options) {
     console.log("Setting res session attribute:", k, " Value:", v);
-    var key = "session." + k;
-    _.set(res_glbl, key, v);
+    _.set(res_glbl.session, k, v);
     return "";
 });
 
@@ -140,7 +141,8 @@ var apply_handlebars = async function (req, res, hit) {
         SessionAttributes: _.get(req, 'session')
     }
     const usrLang = _.get(req, 'session.userLocale');
-    autotranslate = false;
+    // Autotranslation enabled by default.. will be disabled when handlebars finds explicit language match block.
+    autotranslate = true;
     console.log("Apply handlebars preprocessing to ES Response. Context: ", context);
     var hit_out = _.cloneDeep(hit);
     var a = _.get(hit, "a");
@@ -153,7 +155,7 @@ var apply_handlebars = async function (req, res, hit) {
             const a_template = Handlebars.compile(a);
             hit_out.a=a_template(context);
             if (autotranslate){
-                hit_out.a = await translate.get_translation(hit_out.a, usrLang) ; 
+                _.set(hit_out, 'autotranslate.a', true);
             } 
         } catch (e) {
             console.log("ERROR: Answer caused Handlebars exception. Check syntax: ", a)
@@ -165,7 +167,7 @@ var apply_handlebars = async function (req, res, hit) {
             var markdown_template = Handlebars.compile(markdown);
             hit_out.alt.markdown = markdown_template(context);
             if (autotranslate){
-                hit_out.alt.markdown = await translate.get_translation(hit_out.alt.markdown, usrLang) ; 
+                _.set(hit_out, 'autotranslate.alt.markdown', true);
             } 
         } catch (e) {
             console.log("ERROR: Markdown caused Handlebars exception. Check syntax: ", markdown)
@@ -177,7 +179,7 @@ var apply_handlebars = async function (req, res, hit) {
             var ssml_template = Handlebars.compile(ssml);
             hit_out.alt.ssml = ssml_template(context);
             if (autotranslate){
-                hit_out.alt.ssml = await translate.get_translation(hit_out.alt.ssml, usrLang) ; 
+                _.set(hit_out, 'autotranslate.alt.ssml', true);
             } 
         } catch (e) {
             console.log("ERROR: SSML caused Handlebars exception. Check syntax: ", ssml)
@@ -189,10 +191,16 @@ var apply_handlebars = async function (req, res, hit) {
             if (r.subTitle && r.subTitle.length > 0) {
                 var subTitle_template = Handlebars.compile(r.subTitle);
                 hit_out.r.subTitle = subTitle_template(context);
+                if (autotranslate){
+                    _.set(hit_out, 'autotranslate.r.subTitle', true);
+                } 
             }
             if (r.title && r.title.length > 0) {
                 var title_template = Handlebars.compile(r.title);
                 hit_out.r.title = title_template(context);
+                if (autotranslate){
+                    _.set(hit_out, 'autotranslate.r.title', true);
+                } 
             }
             if (r.text && r.text.length > 0) {
                 var text_template = Handlebars.compile(r.text);
@@ -210,8 +218,14 @@ var apply_handlebars = async function (req, res, hit) {
                 for (let x=0; x<r.buttons.length; x++) {
                     var b_text_template = Handlebars.compile(r.buttons[x].text);
                     hit_out.r.buttons[x].text = b_text_template(context);
+                    if (r.buttons[x].text.length > 0 && autotranslate){
+                        _.set(hit_out, 'autotranslate.r.buttons[x].text', true);
+                    } 
                     var b_value_template = Handlebars.compile(r.buttons[x].value);
                     hit_out.r.buttons[x].value = b_value_template(context);
+                    if (r.buttons[x].value.length > 0 && autotranslate){
+                        _.set(hit_out, 'autotranslate.r.buttons[x].value', true);
+                    }
                 }
             }
         } catch (e) {
