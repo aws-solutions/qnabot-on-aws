@@ -80,7 +80,7 @@ module.exports=function(req,res){
         console.log("ES result:"+JSON.stringify(result,null,2));
         var hit=_.get(result,"hits.hits[0]._source");
         if(hit){
-            res.session.topic=_.get(res.result,"t")
+            _.set(res,"session.topic", _.get(hit,"t"));
             hit=await handlebars(req,res,hit);
             if (req._settings.ENABLE_MULTI_LANGUAGE_SUPPORT){
                 const usrLang = _.get(req, 'session.userLocale');

@@ -19,7 +19,7 @@ async function get_translation(inputText, sourceLang, targetLang) {
     };
     console.log("get_translation:", targetLang, "InputText: ", inputText);
     if (targetLang === sourceLang) {
-        console.log("get_translation: source and targe are the same, translation not required.");
+        console.log("get_translation: source and target are the same, translation not required.");
         const res = {};
         res.TranslatedText = inputText;
         return res;
