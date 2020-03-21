@@ -185,18 +185,43 @@ Enterprise search solution.**
 
 ### MultiLanguage Support
 
-QnABot version 2.6.0 supports use of multiple languages. Once enabled, if the user enters a question in a language other 
-than english, QnABot will attempt to return an answer in the other language. Its does this by using AWS Comprehend to 
-identify the language spoken or typed. If Comprehend can identify the language based on a configured minimum confidence, 
-QnABot will serve up content based on that locale.
+QnABot version 2.6.0 supports use of multiple languages with these limitations:
+- MultiLanguage support for voice is limited to use with Alexa skills only. (Amazon Lex currently supports voice recognition in English only)
+- MutiLanguage support for text is available via all text clients (e.g. Lex Web UI, SMS, etc.)
 
-It converts the question posed by the user to English and performs a lookup of the answer in Elastic Search 
-just as it normally does. Once it finds the question, QnABot will serve up the configured answer. The answers specifying 
-blocks to use for different locales.
+ ####Lex (text mode only):  
+
+If the user enters a question in a language other than english, QnABot will attempt to return an answer in the other language. 
+It does this by using Amazon Comprehend to identify the language typed. If Comprehend can identify the language based on a configured minimum confidence, 
+QnABot will serve up content based on that locale.
 
 Users can also set a preferred language whereby QnABot will always attempt to respond with content in the chosen
 locale.  If the user sets the preferred language to be Spanish, QnABot will always try and serve up content using
 Spanish when possible. 
+
+####Alexa (voice)
+
+You will need to add each language you want to use to tou QnABot skill, in the Alexa Developer console. The intent schema for each 
+language will be the same except for the skill invocation name.. Give the skill a unique invokation name for each language that you add.
+
+QnABot will use the language setting provided by Alexa, and will attempt to respond in that language.
+
+####How it works
+
+QnABot converts the question posed by the user to English, using Amazon Translate, and performs a lookup of the answer in Elastic Search 
+just as it normally does, using the English translation of the question. ElasticSearch searches are done in English only since QnABot documents
+are indexed using the English text analyser (stemming, stop words, etc.)
+
+To ensure good matching of translated questions, you can use the Amazon Translate console to see the English tranlation of your local language question. Use QnABot content designer
+to ensure your QnA item has the right sample questions to ensure a match.
+
+Once it finds the question, QnABot will serve up the configured answer. 
+
+You can use Handlebar blocks to define explicit answers in each different language you want to support. OR, if you do not 
+explicitly define an answer in the user's language, QnABot will automatically use Amazon Translate to convert the default enghlish 
+answer to the target language.
+
+####Configuration
 
 By default this feature is disabled. Use the following three steps to enable and configure this feature. Step 1 enables 
 the feature. Step 2 loads in two questions from this extension that allow the user to select a preferred language. The 
@@ -224,9 +249,13 @@ this property. If you do have existing key/value apirs, be sure to add the key a
 {"ENABLE_MULTI_LANGUAGE_SUPPORT":true}
 ```
 
-Step 2) Use the Designer UI to import the Sample/Extension named Language / Multiple Language Support. 
+Step 2) Use the Designer UI to import the Sample/Extension named Language / Multiple Language Support.
 
-This will add two questions to the system: Language.000 and Language.001. 
+This will add two questions to the system: Language.000 and Language.001. When using Lex text clients, these questions will allow you to set your preferred language.  
+The preferred language, if set, will take precendence over
+the auto detected language.  
+
+_When using Alexa, the language is automatically set by the skill. You will not be able to override the preferred language when using Alexa._
 
 Language.000 provides a question that allows the user to set the current sessions preferred output saying a simple word 
 such as French, German, or Spanish, or Italian. 
@@ -250,10 +279,15 @@ The answer for Language.000 uses the following handlebar syntax
 {{#setLang 'en' true}} Ok. I've set your preferred language to English. {{/setLang}}
 ```
 
-The helper function setLang performs the necessary processing based on the language/locale detected by Comprehend. To
+The helper function setLang performs the necessary processing to set the preferred language/locale for teh session. To
 add support for other languages just extend the answer in Language.000 with additional locales. 
 
-Step 3) In order to serve up content that is locale specific modify answers in questions to respond in multiple languages. 
+
+Step 3) In order to serve up content that is locale specific you can
+
+- allow QnABot to automaticall translate your english answers to the session language using Amazon Translate.
+- OR provide explicitly curated answers in QnA items, in multiple languages. 
+
 Lets modify the question sun.1. The following would be an example where the handlebar function ifLang is used to 
 specify a response for spanish. 
 
