@@ -58,10 +58,10 @@ module.exports = async function parse(req, res) {
 
     switch (req._type) {
         case 'LEX':
-            Object.assign(req, lex.parse(req))
+            Object.assign(req, await lex.parse(req))
             break;
         case 'ALEXA':
-            Object.assign(req, alexa.parse(req))
+            Object.assign(req, await alexa.parse(req))
             break;
     }
 

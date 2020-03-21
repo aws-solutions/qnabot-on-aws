@@ -11,12 +11,20 @@ async function get_userLanguages(inputText) {
     return languages;
 }
 
-async function get_translation(inputText, sourceLang) {
+async function get_translation(inputText, sourceLang, targetLang) {
     const params = {
         SourceLanguageCode: sourceLang, /* required */
-        TargetLanguageCode: 'en', /* required */
+        TargetLanguageCode: targetLang, /* required */
         Text: inputText, /* required */
     };
+    console.log("get_translation:", targetLang, "InputText: ", inputText);
+    if (targetLang === sourceLang) {
+        console.log("get_translation: source and targe are the same, translation not required.");
+        const res = {};
+        res.TranslatedText = inputText;
+        return res;
+    }
+
     const translateClient = new AWS.Translate();
     try {
         const translation = await translateClient.translateText(params).promise();
@@ -83,13 +91,13 @@ async function set_translated_transcript(locale, req) {
         console.log("No translation - english detected");
     } else if (locale === 'en' && detectedLocale === 'en' && detectedSecondaryLocale) {
         console.log("translate to english using secondary detected locale:  ", req.question);
-        const translation = await get_translation(req.question, detectedSecondaryLocale);
+        const translation = await get_translation(req.question, detectedSecondaryLocale, 'en');
         _.set(req, "_translation", translation.TranslatedText);
         _.set(req, "question", translation.TranslatedText);
         console.log("Overriding input question with translation: ", req.question);
     }  else if (locale !== '' && locale.charAt(0) !== '%' && detectedLocale && detectedLocale !== '') {
         console.log("Confidence in the detected language high enough.");
-        const translation = await get_translation(req.question, detectedLocale);
+        const translation = await get_translation(req.question, detectedLocale, 'en');
         _.set(req, "_translation", translation.TranslatedText);
         _.set(req, "question", translation.TranslatedText);
         console.log("Overriding input question with translation: ", req.question);
@@ -114,4 +122,9 @@ exports.set_multilang_env = async function (req) {
     await set_translated_transcript(userLocale, req);
 
     return req;
+}
+
+exports.translateText = async function (inputText, sourceLang, targetLang) {
+    const res = await get_translation(inputText, sourceLang, targetLang);
+    return res.TranslatedText;
 }

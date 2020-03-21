@@ -1,5 +1,16 @@
-var _=require('lodash')
-exports.parse=function(req){
+var _=require('lodash');
+var translate = require('./multilanguage.js');
+
+async function get_welcome_message(req, locale){
+    const welcome_message = _.get(req,'_settings.DEFAULT_ALEXA_LAUNCH_MESSAGE', 'Hello, Please ask a question');
+    return await translate.translateText(welcome_message,'en',locale); 
+}
+async function get_stop_message(req, locale){
+    const stop_message = _.get(req,'_settings.DEFAULT_ALEXA_STOP_MESSAGE', 'Goodbye');
+    return await translate.translateText(stop_message,'en',locale); 
+}
+
+exports.parse=async function(req){
     var event = req._event;
     var out={
         _type:"ALEXA",
@@ -17,9 +28,16 @@ exports.parse=function(req){
         ),
         channel:null,
     };
-    var welcome_message = _.get(req,'_settings.DEFAULT_ALEXA_LAUNCH_MESSAGE', 'Hello, Please ask a question');
+    // set userPreferredLocale from Alexa request
+    const alexa_locale = _.get(event,'request.locale').split("-")[0];
+    out.session.userPreferredLocale = alexa_locale;
+    console.log("Set userPreferredLocale:", out.session.userPreferredLocale);
+    var welcome_message;
+    var stop_message;
+    
     switch(_.get(event,"request.type")){
         case "LaunchRequest":
+            welcome_message = await get_welcome_message(req,alexa_locale);
             throw new Respond({
                 version:'1.0',
                 response:{
@@ -46,23 +64,25 @@ exports.parse=function(req){
     
     switch(_.get(event,"request.intent.name")){
         case "AMAZON.CancelIntent":
+            stop_message = await get_stop_message(req,alexa_locale);
             throw new Respond({
                 version:'1.0',
                 response:{
                     outputSpeech:{
                         type:"PlainText",
-                        text:(_.get(req,'_settings.DEFAULT_ALEXA_STOP_MESSAGE',"Goodbye"))
+                        text:stop_message
                     },
                     card: {
                       type: "Simple",
                       title: "Cancel",
-                      content:(_.get(req,'_settings.DEFAULT_ALEXA_STOP_MESSAGE',"Goodbye"))
+                      content:stop_message
                     },
                     shouldEndSession:true
                 }
             })
             break;
         case "AMAZON.RepeatIntent":
+            welcome_message = await get_welcome_message(req,alexa_locale);
             console.log("At Repeat Intent")
             console.log(JSON.stringify(out))
             throw new Respond({
@@ -71,17 +91,18 @@ exports.parse=function(req){
             })
             break;
         case "AMAZON.StopIntent":
+            stop_message = await get_stop_message(req,alexa_locale);
             throw new Respond({
                 version:'1.0',
                 response:{
                     outputSpeech:{
                         type:"PlainText",
-                        text:(_.get(req,'_settings.DEFAULT_ALEXA_STOP_MESSAGE',"Goodbye"))
+                        text:stop_message
                     },
                     card: {
                       type: "Simple",
                       title: "Stop",
-                      content:(_.get(req,'_settings.DEFAULT_ALEXA_STOP_MESSAGE',"Goodbye"))
+                      content:stop_message
                     },
                     shouldEndSession:true
                 }
