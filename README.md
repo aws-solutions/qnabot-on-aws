@@ -285,8 +285,8 @@ add support for other languages just extend the answer in Language.000 with addi
 
 Step 3) In order to serve up content that is locale specific you can
 
-- allow QnABot to automaticall translate your english answers to the session language using Amazon Translate.
-- OR provide explicitly curated answers in QnA items, in multiple languages. 
+- allow QnABot to automatically translate your english answers to the session language using Amazon Translate.
+- OR provide explicitly curated answers in QnA items, in multiple languages, using handlebars, as shown below. 
 
 Lets modify the question sun.1. The following would be an example where the handlebar function ifLang is used to 
 specify a response for spanish. 
