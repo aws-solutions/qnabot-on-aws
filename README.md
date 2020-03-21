@@ -201,8 +201,8 @@ Spanish when possible.
 
 ####Alexa (voice)
 
-You will need to add each language you want to use to tou QnABot skill, in the Alexa Developer console. The intent schema for each 
-language will be the same except for the skill invocation name.. Give the skill a unique invokation name for each language that you add.
+You will need to add each language you want to use to your QnABot skill using the Alexa Developer console. The intent schema for each 
+language will be identical except for the skill invocation name. Give the skill a unique invokation name for each language that you add.
 
 QnABot will use the language setting provided by Alexa, and will attempt to respond in that language.
 
