@@ -3,6 +3,8 @@ var _=require('lodash');
 var request=require('./request');
 var build_es_query=require('./esbodybuilder');
 var handlebars=require('./handlebars');
+var translate = require('./translate');
+
 
 function run_query(req, query_params){
     return(build_es_query(query_params))
@@ -14,6 +16,28 @@ function run_query(req, query_params){
         });
     });  
 }
+
+function merge_next(req, response1, query_params){
+    console.log("Query for chained document");
+    return(run_query(req, query_params))
+    .then( function(response2) {
+        console.log("Query Response: ", response2);
+        var hit1 = _.get(response1,"hits.hits[0]._source");
+        var hit2 = _.get(response2,"hits.hits[0]._source");
+        if (hit2){
+            console.log("Merge answer fields");
+            // modifying 'hit2' also modifies 'response2'
+            hit2.a = hit1.a + hit2.a;
+            hit2.alt.markdown = hit1.alt.markdown + hit2.alt.markdown;
+            hit2.alt.ssml = hit1.alt.ssml + hit2.alt.ssml;
+            return response2;
+        } else {
+            console.log("Chained document not found.");
+            return response1;
+        }
+    });  
+}
+
 
 function get_answer(req, res){
     var query_params = {
@@ -32,6 +56,12 @@ function get_answer(req, res){
         var hit = _.get(response,"hits.hits[0]._source");
         if (hit){
             res['got_hits']=1;  // response flag, used in logging / kibana
+            // TODO: Address this code for chained documents
+            //if (hit.next){
+            //    console.log("Chained document specified:", hit.next);
+            //    query_params['question'] = hit.next;
+            //    return merge_next(req, response, query_params);
+            //}
             return response;
         } else {
             console.log("No hits from query - searching instead for: " + no_hits_question);
@@ -46,11 +76,22 @@ module.exports=function(req,res){
     console.log("REQ:",JSON.stringify(req,null,2));
     console.log("RES:",JSON.stringify(res,null,2));
     return(get_answer(req, res))
-    .then(function(result){
+    .then(async function(result){
         console.log("ES result:"+JSON.stringify(result,null,2));
         var hit=_.get(result,"hits.hits[0]._source");
         if(hit){
-            res.result=handlebars(req,res,hit);
+            _.set(res,"session.topic", _.get(hit,"t"));
+            hit=await handlebars(req,res,hit);
+            if (req._settings.ENABLE_MULTI_LANGUAGE_SUPPORT){
+                const usrLang = _.get(req, 'session.userLocale');
+                if (usrLang != 'en') {
+                    console.log("Autotranslate response to usrLang: ", usrLang);
+                    hit=await translate.translate_hit(hit,usrLang);
+                } else {
+                    console.log("User Lang is en, Autotranslate not required.");
+                }
+            }
+            res.result = hit;
             res.type="PlainText"
             res.message=res.result.a
             res.plainMessage=res.result.a
@@ -76,7 +117,6 @@ module.exports=function(req,res){
                 res.card.buttons=_.get(card,'buttons')
             }
 
-            res.session.topic=_.get(res.result,"t")
             
             var navigationJson = _.get(res,"session.navigation",false)
             var previousQid = _.get(res,"session.previous.qid",false)

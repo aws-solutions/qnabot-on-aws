@@ -39,7 +39,7 @@ module.exports = async function query(req,res) {
             req, res
         });
         if ( localEsQueryResults.res.got_hits > 0 && localEsQueryResults.res.result.qid.startsWith('specialty') &&
-            (localEsQueryResults.req["_event"].sessionAttributes.botName !==
+            (localEsQueryResults.req.session.botName !==
                 localEsQueryResults.res.result.args[0]) ) {
             /**
              * A number of session state attributes need to be removed as we switch away to another
@@ -50,11 +50,6 @@ module.exports = async function query(req,res) {
             delete localEsQueryResults.res.session.botName;
             delete localEsQueryResults.res.session.nohits;
             delete localEsQueryResults.res.session.specialtyLambda;
-            delete localEsQueryResults.req["_event"].sessionAttributes.botName;
-            delete localEsQueryResults.req["_event"].sessionAttributes.botAlias;
-            delete localEsQueryResults.req["_event"].sessionAttributes.nohits;
-            delete localEsQueryResults.req["_event"].sessionAttributes.specialtyLambda;
-            delete localEsQueryResults.req["_event"].sessionAttributes.brokerUID;
             return localEsQueryResults;
         }
     }

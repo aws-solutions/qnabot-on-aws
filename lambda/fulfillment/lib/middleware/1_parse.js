@@ -54,23 +54,24 @@ module.exports = async function parse(req, res) {
     var settings = await get_settings();
     _.set(req, "_settings", settings);
 
-    // multilanguage support modification
-    var isMultilanguageEnabled = settings.ENABLE_MULTI_LANGUAGE_SUPPORT;
-    if (isMultilanguageEnabled) {
-        await multilanguage.set_multilang_env(req);
-    }
-    // end of multilanguage support modification
-
     req._type = req._event.version ? "ALEXA" : "LEX"
 
     switch (req._type) {
         case 'LEX':
-            Object.assign(req, lex.parse(req))
+            Object.assign(req, await lex.parse(req))
             break;
         case 'ALEXA':
-            Object.assign(req, alexa.parse(req))
+            Object.assign(req, await alexa.parse(req))
             break;
     }
+
+
+    // multilanguage support 
+    var isMultilanguageEnabled = settings.ENABLE_MULTI_LANGUAGE_SUPPORT;
+    if (isMultilanguageEnabled) {
+        await multilanguage.set_multilang_env(req);
+    }
+    // end of multilanguage support 
 
     Object.assign(res, {
         type: "PlainText",
