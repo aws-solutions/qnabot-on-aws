@@ -140,7 +140,6 @@ var apply_handlebars = async function (req, res, hit) {
         UserInfo: req._userInfo,
         SessionAttributes: _.get(req, 'session')
     }
-    const usrLang = _.get(req, 'session.userLocale');
     // Autotranslation enabled by default.. will be disabled when handlebars finds explicit language match block.
     autotranslate = true;
     console.log("Apply handlebars preprocessing to ES Response. Context: ", context);

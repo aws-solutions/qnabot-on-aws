@@ -35,9 +35,8 @@ function merge_next(req, response1, query_params){
             console.log("Chained document not found.");
             return response1;
         }
-    });  
+    });
 }
-
 
 function get_answer(req, res){
     var query_params = {
@@ -117,7 +116,6 @@ module.exports=function(req,res){
                 res.card.buttons=_.get(card,'buttons')
             }
 
-            
             var navigationJson = _.get(res,"session.navigation",false)
             var previousQid = _.get(res,"session.previous.qid",false)
             var previousArray  = _.get(res,"session.navigation.previous",[])

@@ -1,5 +1,4 @@
-const Promise = require('bluebird')
-const _ = require('lodash')
+const _ = require('lodash');
 const AWS = require('aws-sdk');
 
 async function get_translation(englishText, targetLang){
@@ -26,18 +25,25 @@ async function get_translation(englishText, targetLang){
     }
 }
 
+function escapeRegExp(string) {
+    return string.replace(/[.*+\-?^${}()|[\]\\]/g, '\\$&'); // $& means the whole matched string
+}
+
+function replaceAll(str, find, replace) {
+    return str.replace(new RegExp(escapeRegExp(find), 'g'), replace);
+}
+
 exports.translate_hit = async function(hit,usrLang){
     console.log("translate_hit:", JSON.stringify(hit,null,2));
-
-    var hit_out = _.cloneDeep(hit);
-    var a = _.get(hit, "a");
-    var markdown = _.get(hit, "alt.markdown");
-    var ssml = _.get(hit, "alt.ssml");
-    var r = _.get(hit, "r");
+    let hit_out = _.cloneDeep(hit);
+    let a = _.get(hit, "a");
+    let markdown = _.get(hit, "alt.markdown");
+    let ssml = _.get(hit, "alt.ssml");
+    let r = _.get(hit, "r");
     // catch and log errors before throwing exception.
     if (a && _.get(hit,'autotranslate.a')) {
         try {
-            hit_out.a = await get_translation(hit_out.a, usrLang) ; 
+            hit_out.a = await get_translation(hit_out.a, usrLang);
         } catch (e) {
             console.log("ERROR: Answer caused Translate exception: ", a)
             throw (e);
@@ -45,7 +51,8 @@ exports.translate_hit = async function(hit,usrLang){
     }
     if (markdown && _.get(hit,'autotranslate.alt.markdown')) {
         try {
-            hit_out.alt.markdown = await get_translation(hit_out.alt.markdown, usrLang) ; 
+            const res = await get_translation(hit_out.alt.markdown, usrLang);
+            hit_out.alt.markdown  = replaceAll(res,'] (http', '](http');
         } catch (e) {
             console.log("ERROR: Markdown caused Translate exception: ", a)
             throw (e);
@@ -53,9 +60,9 @@ exports.translate_hit = async function(hit,usrLang){
     }
     if (ssml && _.get(hit,'autotranslate.alt.ssml')) {
         try {
-            hit_out.alt.ssml = await get_translation(hit_out.alt.ssml, usrLang) ; 
+            hit_out.alt.ssml = await get_translation(hit_out.alt.ssml, usrLang);
         } catch (e) {
-            console.log("ERROR: SSML caused Translate exception: ", a)
+            console.log("ERROR: SSML caused Translate exception: ", a);
             throw (e);
         }
     }
@@ -94,4 +101,4 @@ exports.translate_hit = async function(hit,usrLang){
     }
     console.log("Preprocessed Result: ", hit_out);
     return hit_out;    
-}
+};
