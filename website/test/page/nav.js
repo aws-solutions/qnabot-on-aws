@@ -32,6 +32,9 @@ module.exports=(A)=>class Nav extends A{
     goToExport(){
         return this._goTo('export')
     }
+    goToSettings(){
+        return this._goTo('settings')
+    }
     async goToEdit(){
         await this._goTo('edit')
         this.client=this.client.waitForVisible('#questions-tab')

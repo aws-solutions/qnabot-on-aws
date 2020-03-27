@@ -107,6 +107,12 @@ module.exports={
         icon:"mode_edit",
         href:"#/edit"
       },{
+        title:"Settings",
+        id:"settings",
+        subTitle:"Parameter settings for lambda functions",
+        icon:"settings",
+        href:"#/settings"
+      },{
         title:"Import",
         id:"import",
         subTitle:"Import new questions",

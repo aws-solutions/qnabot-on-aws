@@ -32,6 +32,7 @@ var failed=false
 module.exports=Object.assign(
     require('./export'),
     require('./import'),
+    require('./settings'),
     require('./testall'),{
     _request:Promise.method(async function(context,opts){
         var url=Url.parse(opts.url)

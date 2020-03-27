@@ -38,6 +38,11 @@ module.exports={
         },
         {   path:'/loading',
             component:require('../components/loading.vue').default
+        },
+        {
+            path:'/settings',
+            name:"settings",
+            component:require('../components/settings.vue').default
         }
     ]
 }

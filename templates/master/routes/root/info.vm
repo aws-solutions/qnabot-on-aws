@@ -11,6 +11,8 @@
     "ClientIdClient":"${ClientClient}",
     "ClientIdDesigner":"${ClientDesigner}",
     "UserPool":"${UserPool}",
+    "DefaultQnABotSettings":"${DefaultQnABotSettings}",
+    "CustomQnABotSettings":"${CustomQnABotSettings}",
     "Id":"$stageVariables.Id",
     "_links":{
         "root":{
