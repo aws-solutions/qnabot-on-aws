@@ -31,9 +31,11 @@ function build_query(params) {
             boost:2,
             path:'questions'},
             q=>q.query('match','questions.q',params.question)
-        )
-        .orQuery('match','a',params.question)
-        .orQuery('match','t',_.get(params,'topic',''))
+        ) ;
+        if (params.score_answer_field == 'true') {
+            query = query.orQuery('match','a',params.question) ;  
+        }
+        query = query.orQuery('match','t',_.get(params,'topic',''))
         .from(_.get(params,'from',0))
         .size(_.get(params,'size',1))
         .build();

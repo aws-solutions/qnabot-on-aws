@@ -60,6 +60,7 @@ async function get_hit(req, res) {
         use_keyword_filters: _.get(req, '_settings.ES_USE_KEYWORD_FILTERS'),
         keyword_syntax_types: _.get(req, '_settings.ES_KEYWORD_SYNTAX_TYPES'),
         syntax_confidence_limit: _.get(req, '_settings.ES_SYNTAX_CONFIDENCE_LIMIT'),
+        score_answer_field: _.get(req, '_settings.ES_SCORE_ANSWER_FIELD'),
     };
     var no_hits_question = _.get(req, '_settings.ES_NO_HITS_QUESTION', 'no_hits');
     var response = await run_query(req, query_params);
