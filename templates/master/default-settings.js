@@ -13,7 +13,9 @@ var default_settings = {
     SMS_HINT_REMINDER_INTERVAL_HRS: "24",
     IDENTITY_PROVIDER_JWKS_URLS: [],  // User can override this empty list using CustomQnABotSettings to add trusted IdPs (eg from Lex-Web-UI)
     ENABLE_MULTI_LANGUAGE_SUPPORT: false, //User can override and set to true using CustomQnABotSettings to Enable Multilanguage support
-    MINIMUM_CONFIDENCE_SCORE: 0.6 //User can override this value to set the minimum confidence they accept using CustomQnABotSettings
+    MINIMUM_CONFIDENCE_SCORE: 0.6, //User can override this value to set the minimum confidence they accept using CustomQnABotSettings
+    ELICIT_RESPONSE_MAX_RETRIES: 5, // Number of times an elictResponse LexBot can be called before giving up
+    ELICIT_RESPONSE_RETRY_MESSAGE: "Please try again?" // Default retry message when working with LexBot
 }
 
 module.exports = {

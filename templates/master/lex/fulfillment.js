@@ -85,6 +85,24 @@ module.exports = {
       "Roles": [{ "Ref": "FulfillmentLambdaRole" }]
     }
   },
+  "LexBotPolicy": {
+    "Type": "AWS::IAM::ManagedPolicy",
+    "Properties": {
+      "PolicyDocument": {
+        "Version": "2012-10-17",
+        "Statement": [{
+          "Effect": "Allow",
+          "Action": [
+            "lex:PostText"
+          ],
+          "Resource": [
+            "arn:aws:lex:*:*:bot:QNA*"
+          ]
+        }]
+      },
+      "Roles": [{ "Ref": "FulfillmentLambdaRole" }]
+    }
+  },
   "FulfillmentLambdaRole": {
     "Type": "AWS::IAM::Role",
     "Properties": {

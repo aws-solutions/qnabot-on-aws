@@ -125,12 +125,41 @@ module.exports={
                     },
                     propertyOrder:7
                 },
+                elicitResponse:{
+                    title:"Elicit Response",
+                    description:"If your answer includes a question to the user, configure QnABot to process the user's response.",
+                    type:"object",
+                    propertyOrder:8,
+                    properties:{
+                        responsebot_hook:{
+                            title:"Elicit Response: ResponseBot Hook",
+                            description:"\"If applicable, enter name for a supported BuiltIn Type (e.g. QNA:TypePhoneNumber, QNA:TypeName, QNA:TypeYesNo, etc.), or your Custom response bot name.",
+                            type:"string",
+                            maxLength:100,
+                            propertyOrder:0
+                        },
+                        response_sessionattr_namespace:{
+                            title:"Elicit Response: Response Session Attribute Namespace",
+                            description:"Enter a string used as a name space for session attributes that will store returned values from the Response Bot.",
+                            type:"string",
+                            maxLength:100,
+                            propertyOrder:1
+                        }
+                    }
+                },
+                conditionalChaining:{
+                    title:"Document Chaining: Chaining Rule",
+                    description:"Chaining rule must be a *quoted* string, or a JavaScript expression that evaluates to a string. The string defines the next utterance used to query for a new document.",
+                    type:"string",
+                    maxLength:4000,
+                    propertyOrder:9
+                },
                 next:{
-                    title:"Next Document",
+                    title:"Guided Navigation: Next QID",
                     description:"If applicable, enter the QID of the document(s) that is/are next in the sequence, otherwise leave blank. Be careful; if you set this field to an earlier document in the sequence, you might make your sequence loop forever, which would not be fun!  You can add more QIDs after the first, but they won't do anything at the moment.",
                     type:"string",
                     maxLength:100,
-                    propertyOrder:8
+                    propertyOrder:10
                 },
             },
             required:["qid","q","a"]
