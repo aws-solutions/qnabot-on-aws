@@ -108,10 +108,7 @@ async function processResponse(req, res, hook) {
                 }
             ]
         };
-    } else if (botResp.dialogState === 'Failed') {
-        res.session.elicitResponseProgress = botResp.dialogState;
-        indicateFailure(res, botResp);
-    } else if (botResp.dialogState === 'ElicitIntent' || botResp.dialogState === 'ElicitSlot') {
+    } else if (botResp.dialogState === 'Failed' || botResp.dialogState === 'ElicitIntent' || botResp.dialogState === 'ElicitSlot') {
         if (elicitResponseLoopCount >= maxElicitResponseLoopCount) {
             res.session.elicitResponseProgress = 'Failed';
             indicateFailure(res, botResp);
@@ -127,7 +124,7 @@ async function processResponse(req, res, hook) {
             }
             res.card = undefined;
         }
-    } else if (botResp.dialogState === 'Fulfilled') {
+    } else if (botResp.dialogState === 'Fulfilled' || botResp.dialogState === 'ReadyForFulfillment') {
         if (botResp.message) {
             res.message = botResp.message;
             res.plainMessage = botResp.message;
@@ -136,7 +133,7 @@ async function processResponse(req, res, hook) {
             res.plainMessage = "";
         }
         res.session.elicitResponseProgress = botResp.dialogState;
-        res.session[res.session.elicitResponseNamespace] = botResp.slots;
+        _.set(res.session,res.session.elicitResponseNamespace,botResp.slots);
         res.session.elicitResponse = undefined;
         res.session.elicitResponseNamespace = undefined;
     } else {

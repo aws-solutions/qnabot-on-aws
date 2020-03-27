@@ -52,8 +52,9 @@ module.exports=async function query(req,res) {
     if (elicitResponse) {
         console.log('Handling elicitResponse');
         let resp = await lexRouter.elicitResponse(req,res, elicitResponse);
-        if (resp.res.session.elicitResponseProgress === 'Fulfilled') {
-            console.log("Both was fulfilled");
+        if (resp.res.session.elicitResponseProgress === 'Fulfilled' ||
+            resp.res.session.elicitResponseProgress === 'ReadyForFulfillment') {
+            console.log("Bot was fulfilled");
             // LexBot has completed. See if we need to using chaining to go to another question
             if (chainingConfig) {
                 console.log("Conditional chaining: " + chainingConfig);
