@@ -1,5 +1,6 @@
 <template lang='pug'>
   v-container(grid-list-md)
+    v-alert(v-model="successAlert" outline type="info" dismissible) Successfully saved settings!
     v-layout(column )
       v-flex
         v-card
@@ -9,10 +10,10 @@
             v-list(three-line)
                 v-list-tile(v-for="(parameter,index) in mergedSettings")
                     v-list-tile-content
-                        v-text-field(:label="index"  v-model="settingsHolder[index]" @input="testInput")
+                        v-text-field(:label="index"  v-model="settingsHolder[index]")
             v-btn(@click="SaveSettings") Save
-            v-btn Add New parameter
-            v-btn Reset to defaults
+            //- v-btn Add New parameter
+            v-btn(@click="resetToDefaults") Reset to defaults
             
 </template>
 
@@ -41,6 +42,7 @@ module.exports={
             defaultSettings:{},
             customSettings: {},
             settingsHolder: {},
+            successAlert: false
         }
     },
     components:{},
@@ -48,30 +50,37 @@ module.exports={
     created:async function(){
       const settings = await this.$store.dispatch('api/listSettings');
       this.defaultSettings = settings[0];
-      console.log('default', this.defaultSettings);
       this.customSettings = settings[1];
-      console.log('custom', this.customSettings);
       this.mergedSettings = settings[2];
-      console.log('merged', this.mergedSettings);
       this.settingsHolder = settings[2];
-      console.log('holder', this.settingsHolder);
     },
     methods:{
       SaveSettings: async function(){
-        console.log('tom youre not insane');
-        // var newCustomSettings = this.settingsHolder;
-        // for (var key in newCustomSettings) {
-        //   let value = newCustomSettings[key];
-        //   console.log("new settings", key, value);
-        //   var compare = _.get(this.defaultSettings, key);
-        //   console.log("old value", compare);
-        // }
+        let newCustomSettings = _.clone(this.settingsHolder);
+        for (let key in newCustomSettings) {
+          let value = newCustomSettings[key];
+          let compare = _.get(this.defaultSettings, key);
+          if (value === compare) {
+            delete newCustomSettings[key]
+          }
+        }
+        let cloned_custom = _.clone(this.customSettings);
+        let newSettings = _.merge(cloned_custom, newCustomSettings)
+        let response = await this.$store.dispatch('api/updateSettings', newSettings);
+        if (response) {
+          this.successAlert = true;
+          window.scrollTo(0,0);
+        }
       },
-      testInput: function(index){
-        console.log('default', this.defaultSettings);
-        console.log('custom', this.customSettings);
-        console.log('merged', this.mergedSettings);
-        console.log('holder', this.settingsHolder);
+      resetToDefaults: async function(){
+        let customOverride = {};
+        let response = await this.$store.dispatch('api/updateSettings', customOverride);
+        if(response) {
+          this.settingsHolder = this.defaultSettings;
+          this.successAlert = true;
+          window.scrollTo(0,0);
+        }
+
       }
     }
 }

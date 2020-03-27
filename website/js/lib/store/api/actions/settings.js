@@ -74,19 +74,22 @@ var failed=false
 module.exports={
     async listSettings(context){
         aws.config.credentials=context.rootState.user.credentials
+        const customParams = context.rootState.info.CustomQnABotSettings;
+        const defaultParams = context.rootState.info.DefaultQnABotSettings;
         const ssm = new aws.SSM({region:context.rootState.info.region})
         const query = {
-            Names: ["CFN-CustomQnABotSettings-frCD4aIYZKCd", "CFN-DefaultQnABotSettings-rUMmPoHZdDax"],
+            Names: [customParams, defaultParams],
         }
         var response = await getParameters(ssm, query);
         return response;
     },
     async updateSettings(context, settings){
-        console.log('params: ' + JSON.stringify(settings));
+        // console.log('params: ' + JSON.stringify(settings));
         aws.config.credentials=context.rootState.user.credentials
+        const customParams=context.rootState.info.CustomQnABotSettings;
         const ssm = new aws.SSM({region:context.rootState.info.region})
         const params = {
-            Name: "CFN-CustomQnABotSettings-frCD4aIYZKCd",
+            Name: customParams,
             Type: "String",
             Value: JSON.stringify(settings),
             Overwrite: true

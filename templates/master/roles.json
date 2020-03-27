@@ -86,6 +86,17 @@
                     {"Fn::Sub":
                     "arn:aws:s3:::${TestAllBucket}/data/*"
                     }]
+                },{
+                  "Effect": "Allow",
+                  "Action": [
+                    "ssm:GetParameters",
+                    "ssm:PutParameter"
+                  ],
+                  "Resource": [{"Fn::Sub":
+                    "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${DefaultQnABotSettings}"
+                    }, {"Fn::Sub":
+                    "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${CustomQnABotSettings}"
+                    }]
                 }
               ]
             }
