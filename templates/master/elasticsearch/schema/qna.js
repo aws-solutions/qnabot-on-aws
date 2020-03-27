@@ -127,20 +127,20 @@ module.exports={
                 },
                 elicitResponse:{
                     title:"Elicit Response",
-                    description:"If your answer includes a question to the user, configure QnABot to process the user's response.",
+                    description:"If your answer includes a question to the user, configure QnABot to process and capture the user's response as session attributes.",
                     type:"object",
                     propertyOrder:8,
                     properties:{
                         responsebot_hook:{
                             title:"Elicit Response: ResponseBot Hook",
-                            description:"\"If applicable, enter name for a supported BuiltIn Type (e.g. QNA:TypePhoneNumber, QNA:TypeName, QNA:TypeYesNo, etc.), or your Custom response bot name.",
+                            description:"To capture the next utterance as a response, provide the name of a Lex bot to parse the response and return at least one slot value, e.g. (QNAYesNo, QNADate, etc.). ResponseBot name must start with \"QNA\".",
                             type:"string",
                             maxLength:100,
                             propertyOrder:0
                         },
                         response_sessionattr_namespace:{
                             title:"Elicit Response: Response Session Attribute Namespace",
-                            description:"Enter a string used as a name space for session attributes that will store returned values from the Response Bot.",
+                            description:"Enter a string used as a name space for session attributes that will store returned slot values from the Response Bot.",
                             type:"string",
                             maxLength:100,
                             propertyOrder:1
@@ -149,7 +149,7 @@ module.exports={
                 },
                 conditionalChaining:{
                     title:"Document Chaining: Chaining Rule",
-                    description:"Chaining rule must be a *quoted* string, or a JavaScript expression that evaluates to a string. The string defines the next utterance used to query for a new document.",
+                    description:"Automatically move on to another item based on the question string returned by this rule. Rule can be a single-quoted string, e.g. 'next question', or a JavaScript conditional expression that evaluates to a string, e.g. (SessionAttributes.namespace.Yes_No == \"Yes\" ) ? \"Yes question\" : \"No Question\"",
                     type:"string",
                     maxLength:4000,
                     propertyOrder:9
