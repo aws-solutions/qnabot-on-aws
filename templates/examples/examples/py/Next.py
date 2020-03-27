@@ -3,9 +3,11 @@ import json
 import boto3
 import os
 
+stackoutputs = None
+stackname = os.getenv('CFSTACK')
+
 def handler(event, context):
 
-    #uncomment below if you want to see the JSON that is being passed to the Lambda Function
     jsondump = json.dumps(event)
     print(jsondump)
 
@@ -27,7 +29,6 @@ def handler(event, context):
         event["res"]["session"]["navigation"]={}
         return event
     
-    
     #for now we only go to the first document in list of next documents, change later when we add functionality for branching and converging paths
     if isinstance(nextDoc,list):
         response = qidLambda(event, nextDoc[0])
@@ -36,32 +37,38 @@ def handler(event, context):
     #uncomment below if you want to see the response 
     #print(json.dumps(response))
 
-
-    # Do not call lambdafunction from the next item if the link actually points to this next function
-    if 'l' in response and response["l"].find(os.environ.get('AWS_LAMBDA_FUNCTION_NAME'))<=0:
+    # Do not call lambdafunction from the next item if the link points to ourselves
+    function_name=response.get('l', '')
+    if function_name != '' and function_name != 'QNA:ExamplePYTHONLambdaNext' and os.environ.get('AWS_LAMBDA_FUNCTION_NAME') not in function_name:
+        # This update will pull in standard qid content into the eventual result passed back up the stack
+        event = updateResult(event,response)
         if "args" in response:
             event["res"]["result"]["args"] = response["args"]
         client = boto3.client('lambda')
+        targetname = response.get('l', '')
+        if targetname.startswith('arn') != True:
+            targetname = mapToArn(targetname, stackname)
         lhresp = client.invoke(
-            FunctionName = response["l"],
+            FunctionName = targetname,
             Payload = json.dumps(event),
             InvocationType = "RequestResponse"
         )
         # Because the payload is of a streamable type object, we must explicitly read it and load JSON
         event = updateLambdaHook(event,json.loads(lhresp['Payload'].read()),response)
-    #if the response has no answer we must have hit the end of the guided navigation for this segment
     elif 'a' in response:
-        event = updateResult(event,response)
-            # modify the event to make the previous question the redirected question that was just asked instead of "Next Question"
+        event = updateResult(event, response)
+        # No lambda hook to call so just merge in content from the target question(event,response)
+        # modify the event to make the previous question the redirected question that was just asked instead of "Next Question"
     else:
+        #if the response has no answer we must have hit the end of the guided navigation for this segment
         #if unable to find anything, set the previous attribute back to the document qid that was previously returned,since we don't want this document to be in history
         event["res"]["session"]["previous"]={"qid":qid,"a":previousToJson["a"],"q":previousToJson["q"]}
         event["res"]["session"]["navigation"]={"next":navigationToJson["next"],"previous":navigationToJson["previous"],"hasParent":navigationToJson["hasParent"]} 
     #uncomment line below if you want to see the final JSON before it is returned to the client
     # print(json.dumps(event))
 
-
     return event
+
 
 #Invoke the prepackaged function that Queries ElasticSearch using a document qid
 def qidLambda(event,nextQid):
@@ -78,6 +85,20 @@ def qidLambda(event,nextQid):
     response = json.loads(tempResponse)
     return response
 
+#maps a shortname to the full name via CF Output stack value
+def mapToArn(name,stack):
+    res = name
+    global stackoutputs
+    if stackoutputs is None:
+        cf = boto3.client('cloudformation')
+        r = cf.describe_stacks(StackName=stack)
+        stack, = r['Stacks']
+        stackoutputs = stack['Outputs']
+    for o in stackoutputs:
+        if name == 'QNA:' + o['OutputKey']:
+            res = o['OutputValue']
+            break
+    return res
 
 #update the event with the information if there is a Lambda hook
 def updateLambdaHook(event,hookEvent, response):

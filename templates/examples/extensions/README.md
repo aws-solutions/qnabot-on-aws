@@ -43,5 +43,5 @@ from Content Designer.
 
 ### NOTES
 - The extensions Makefile creates separate zip packages for each separate Lambda hook function 
-- Lambda hook functions use nodejs8.10 or python3.6 only at this time
+- Lambda hook functions use nodejs10.x or python3.6 only at this time
 - Lambda hook functions will be allocated 2048MB memory (defined in index.js)

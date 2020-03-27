@@ -142,7 +142,7 @@ module.exports=Object.assign(
         "Handler": "cfn.handler",
         "MemorySize": "128",
         "Role":{"Ref":"CFNLambdaRole"} ,
-        "Runtime": "nodejs8.10",
+        "Runtime": "nodejs10.x",
         "Timeout": 300,
         "Tags":[{
             Key:"Type",
@@ -166,7 +166,7 @@ module.exports=Object.assign(
           ]
         },
         "Path": "/",
-        "Policies":[{ 
+        "Policies":[{
           "PolicyName" : "LambdaFeedbackFirehoseQNALambda",
           "PolicyDocument" : {
           "Version": "2012-10-17",
@@ -235,9 +235,54 @@ module.exports=Object.assign(
               }
             ]
           }
-        }],
+        },
+        {
+            "PolicyName": "LambdaQnABotStdExecution",
+            "PolicyDocument": {
+                "Version": "2012-10-17",
+                "Statement": [{
+                    "Effect": "Allow",
+                    "Action": [
+                        "lambda:InvokeFunction"
+                    ],
+                    "Resource": [
+                        "arn:aws:lambda:*:*:function:qna-*",
+                        "arn:aws:lambda:*:*:function:QNA-*",
+                        {"Fn::Join": ["", ["arn:aws:lambda:*:*:function:", {"Fn::Select" : [ "0", { "Fn::Split": ["-", {"Ref": "AWS::StackName"}]}]},"-*"]]}
+                    ]
+                },
+                {
+                    "Effect": "Allow",
+                    "Action": [
+                        "cloudformation:DescribeStacks"
+                    ],
+                    "Resource": [
+                        {"Ref": "AWS::StackId"}
+                    ]
+                }]
+
+            }
+        },
+        {
+            "PolicyName" : "KendraFeedback",
+            "PolicyDocument" : {
+                "Version": "2012-10-17",
+                "Statement": [
+                    {
+                        "Effect": "Allow",
+                        "Action": [
+                            "kendra:SubmitFeedback"
+                        ],
+                        "Resource": "*"
+                    }
+                ]
+            }
+        }
+        ],
         "ManagedPolicyArns": [
-            "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"]
+            "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
+            "arn:aws:iam::aws:policy/AmazonKendraReadOnlyAccess"
+        ]
       }
     }
 })
@@ -260,13 +305,14 @@ function jslambda(name){
             "ES_INDEX": {"Ref":"Index"},
             "FIREHOSE_NAME":{"Ref":"FeedbackFirehoseName"},
             "ES_ADDRESS": {"Ref":"ESAddress"},
-            "QUIZ_KMS_KEY":{"Ref":"QuizKey"}
+            "QUIZ_KMS_KEY":{"Ref":"QuizKey"},
+            "CFSTACK":{"Ref":"AWS::StackName"}
           }
         },
         "Handler":`js/${name}.handler`,
         "MemorySize": "128",
         "Role": {"Fn::GetAtt": ["ExampleLambdaRole","Arn"]},
-        "Runtime": "nodejs8.10",
+        "Runtime": "nodejs10.x",
         "Timeout": 300,
         "Tags":[{
             Key:"Type",
@@ -295,7 +341,8 @@ function pylambda(name){
             "FIREHOSE_NAME":{"Ref":"FeedbackFirehoseName"},
             "ES_ADDRESS": {"Ref":"ESAddress"},
             "QUIZ_KMS_KEY":{"Ref":"QuizKey"},
-            "SNS_TOPIC_ARN":{"Ref":"FeedbackSNS"}
+            "SNS_TOPIC_ARN":{"Ref":"FeedbackSNS"},
+            "CFSTACK":{"Ref":"AWS::StackName"}
           }
         },
         "Handler":`py/${name}.handler`,

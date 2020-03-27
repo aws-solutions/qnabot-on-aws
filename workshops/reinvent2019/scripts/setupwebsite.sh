@@ -4,11 +4,13 @@ aws cloudformation deploy --template-file ../templates/website.yaml --stack-name
 # get S3 bucket location and https based url
 echo $'\nS3 Bucket: '; aws cloudformation describe-stacks --stack-name qnabotworkshop-website --query "Stacks[0].Outputs[?OutputKey=='S3Bucket'].OutputValue" --no-paginate --output text
 export S3Bucket=`aws cloudformation describe-stacks --stack-name qnabotworkshop-website --query "Stacks[0].Outputs[?OutputKey=='S3Bucket'].OutputValue" --no-paginate --output text`
-export S3URL=`aws cloudformation describe-stacks --stack-name qnabotworkshop-website --query "Stacks[0].Outputs[?OutputKey=='S3BucketSecureURL'].OutputValue" --no-paginate --output text`
-echo $'\nWebsite URI (Use this as the PARENT ORIGIN): '
-echo $S3URL
+export WEBSITEURL=`aws cloudformation describe-stacks --stack-name qnabotworkshop-website --query "Stacks[0].Outputs[?OutputKey=='WebSiteUrl'].OutputValue" --no-paginate --output text`
+export PARENTORIGIN=`aws cloudformation describe-stacks --stack-name qnabotworkshop-website --query "Stacks[0].Outputs[?OutputKey=='ParentOriginForLexWebUi'].OutputValue" --no-paginate --output text`
+
+echo $'\nLEX WEB UI PARENT ORIGIN: '
+echo $PARENTORIGIN
 echo $'\nWebsite URL:'
-echo $S3URL/index.html
+echo $WEBSITEURL
 echo
 
 # copy in the content to the S3 bucket with public read access

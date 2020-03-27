@@ -64,15 +64,13 @@ module.exports={
                         title:{
                             type:"string",
                             title:"Card Title",
-                            description:"Required",
-                            maxLength:80,
+                            description:"Required - max length of 80 after handlebars processing",
                             propertyOrder: 0
                         },
                         subTitle:{
                             type:"string",
                             title:"Card Subtitle",
-                            description:"Optional",
-                            maxLength:80,
+                            description:"Optional - max length of 80 after handlebars processing",
                             propertyOrder: 1
                         },
                         imageUrl:{

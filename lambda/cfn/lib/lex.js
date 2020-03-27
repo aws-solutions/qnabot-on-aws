@@ -53,7 +53,6 @@ function clean(name){
     }
     var out=name.replace(/([0-9])/g,x=>map[x])
     out=out.replace(/-/g,'_')
-    console.log(out)
     return out
 }
 
@@ -90,16 +89,17 @@ function run(fnc,params){
 
 
 class Lex {
-    constructor(type){
-        this.type=type
-        this.create_method='put'+type
-        this.delete_method='delete'+type
-        this.get_method="get"+type
+    constructor(type) {
+        this.type = type
+        this.create_method = 'put' + type
+        this.update_method = 'put' + type
+        this.delete_method = 'delete' + type
+        this.get_method = "get" + type
     }
     checksum(id){
         return lex[this.get_method]({
             name:id,
-            version:"$LATEST"
+            versionOrAlias:"$LATEST"
         }).promise().get("checksum")
     }
     name(params){
@@ -109,8 +109,10 @@ class Lex {
     }
 
     Create(params,reply){
+        console.log('Create Lex. Params: ' + JSON.stringify(params,null,2))
         var self=this
         params.name=this.name(params)
+        console.log('Create params.name: ' + params.name)
         delete params.prefix
     
         if(params.childDirected){
@@ -132,9 +134,28 @@ class Lex {
     }
 
     Update(ID,params,oldparams,reply){
+        console.log('Update Lex. ID: ' + ID)
+        console.log('Params: ' + JSON.stringify(params,null,2))
+        console.log('OldParams: ' + JSON.stringify(oldparams,null,2))
+        console.log('Type: ' + this.type)
         var self=this
-        if(this.type!=='SlotType'){
-            self.Create(params,reply) 
+        if(this.type!=='SlotType'){ // The type of SlotType can not be updated.
+            if(params.childDirected){
+                params.childDirected={"false":false,"true":true}[params.childDirected]
+            }
+            params.name=ID
+            if(this.type==='Bot') {
+                this.checksum(ID).then(cksum => {
+                    params.checksum = cksum;
+                    run(self.update_method, params)
+                        .then(msg => reply(null, msg.name, null))
+                        .error(reply).catch(reply)
+                });
+            } else {
+                run(self.update_method, params)
+                    .then(msg => reply(null, msg.name, null))
+                    .error(reply).catch(reply)
+            }
         }else{
             reply(null,ID)
         }

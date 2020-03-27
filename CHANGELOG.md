@@ -1,6 +1,17 @@
+## [2.6.0]
+- Fix for the Next/Previous sample functions when the next or previous questions reference a lambda hook
+- Update handlebars in extensions / samples to use version ^4.3.0
+- Addition of Kendra Fallback feature
+## [2.5.0]
+- IAM Policy updates
+- Update of default utterances for Alexa
+- Change to NodeJS 10.X for Lambdas
+- Updated reInvent2019 workshop
 ## [2.4.0]
-- updated lex-web-ui to 0.14.7
-- added environment variables to allow configuration of prompts for Alexa launch intent and stop intent
+- added use of SSM Parameter store to hold default configuration settings
+- added use of use of Comprehend for better selection of appropriate answer 
+- added use of AMAZON.Fallback intent
+- updated lex-web-ui to 0.14.8
 - support for Test All functionality
 - fix for alexa repeat intent
 - fix for better handling of tab navigation between questions and test tab

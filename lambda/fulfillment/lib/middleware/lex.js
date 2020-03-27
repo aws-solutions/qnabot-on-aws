@@ -1,5 +1,5 @@
 var _=require('lodash')
-exports.parse=function(req){
+exports.parse=async function(req){
     var event = req._event;
     var out={
         _type:"LEX",

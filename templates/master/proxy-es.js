@@ -28,7 +28,7 @@ module.exports={
         "Handler": "index.utterances",
         "MemorySize": "1408",
         "Role": {"Fn::GetAtt": ["ESProxyLambdaRole","Arn"]},
-        "Runtime": "nodejs8.10",
+        "Runtime": "nodejs10.x",
         "Timeout": 300,
         "Tags":[{
             Key:"Type",
@@ -53,7 +53,7 @@ module.exports={
         "Handler": "index.qid",
         "MemorySize": "1408",
         "Role": {"Fn::GetAtt": ["ESProxyLambdaRole","Arn"]},
-        "Runtime": "nodejs8.10",
+        "Runtime": "nodejs10.x",
         "Timeout": 300,
         "Tags":[{
             Key:"Type",
@@ -80,7 +80,7 @@ module.exports={
         "Handler": "index.cleanmetrics",
         "MemorySize": "1408",
         "Role": {"Fn::GetAtt": ["ESProxyLambdaRole","Arn"]},
-        "Runtime": "nodejs8.10",
+        "Runtime": "nodejs10.x",
         "Timeout": 300,
         "Tags":[{
             Key:"Type",
@@ -125,7 +125,7 @@ module.exports={
         "Handler": "index.logging",
         "MemorySize": "1408",
         "Role": {"Fn::GetAtt": ["ESLoggingLambdaRole","Arn"]},
-        "Runtime": "nodejs8.10",
+        "Runtime": "nodejs10.x",
         "Timeout": 300,
         "Tags":[{
             Key:"Type",
@@ -150,7 +150,7 @@ module.exports={
         "Handler": "index.query",
         "MemorySize": "1408",
         "Role": {"Fn::GetAtt": ["ESProxyLambdaRole","Arn"]},
-        "Runtime": "nodejs8.10",
+        "Runtime": "nodejs10.x",
         "Timeout": 300,
         "Tags":[{
             Key:"Type",
@@ -178,7 +178,7 @@ module.exports={
         "Handler": "index.handler",
         "MemorySize": "1408",
         "Role": {"Fn::GetAtt": ["ESProxyLambdaRole","Arn"]},
-        "Runtime": "nodejs8.10",
+        "Runtime": "nodejs10.x",
         "Timeout": 300,
         "Tags":[{
             Key:"Type",
@@ -204,6 +204,7 @@ module.exports={
         "Path": "/",
         "ManagedPolicyArns": [
           "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
+          "arn:aws:iam::aws:policy/TranslateReadOnly",
           {"Ref":"EsPolicy"},
           "arn:aws:iam::aws:policy/AmazonLexFullAccess"
         ],
