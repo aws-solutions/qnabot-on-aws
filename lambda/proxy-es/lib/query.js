@@ -116,6 +116,7 @@ async function evaluateConditionalChaining(req, res, hit, conditionalChaining) {
         if (responsebot_hook && responsebot_session_namespace) {
             res.session.elicitResponse = responsebot_hook;
             res.session.elicitResponseNamespace = responsebot_session_namespace;
+            _.set(res.session, res.session.elicitResponseNamespace + ".boterror", undefined );
             res.session.elicitResponseChainingConfig = chaining_configuration;
         } else {
             res.session.elicitResponse = undefined;

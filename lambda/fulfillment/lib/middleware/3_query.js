@@ -125,6 +125,7 @@ module.exports=async function query(req,res) {
         }
         postQuery.res.session.elicitResponse = responsebot_hook;
         postQuery.res.session.elicitResponseNamespace = responsebot_session_namespace;
+        _.set(postQuery.res.session, postQuery.res.session.elicitResponseNamespace + ".boterror", undefined );
         postQuery.res.session.elicitResponseChainingConfig = chaining_configuration;
     }
 

@@ -60,21 +60,20 @@ async function handleRequest(req, res, botName, botAlias) {
  * @param hook
  * @returns {Promise<{}>}
  */
-async function processResponse(req, res, hook) {
-    function indicateFailure(res, botResp) {
-        if (botResp.message) {
-            res.message = botResp.message;
-            res.plainMessage = botResp.message;
-        } else {
-            const errMsg = "I'm having trouble receiving your input. Could your restart or ask your main questions again?";
-            res.message = errMsg;
-            res.plainMessage = errMsg;
-        }
+async function processResponse(req, res, hook, msg) {
+
+    function indicateFailure(req, res, errmsg) {
+        res.message = errmsg;
+        res.plainMessage = errmsg;
+        _.set(res.session,res.session.elicitResponseNamespace + '.boterror','true');
+        res.session.elicitResponseProgress = 'Failed';
         res.session.elicitResponse = undefined;
         res.session.elicitResponseChainingConfig = undefined;
         res.session.elicitResponseNamespace = undefined;
+        res.session.elicitResponseLoopCount = 0;
         res.card = undefined;
     }
+
     const maxElicitResponseLoopCount = _.get(req, '_settings.ELICIT_RESPONSE_MAX_RETRIES', 5);
     const elicit_Response_Retry_Message = _.get(req, '_settings.ELICIT_RESPONSE_RETRY_MESSAGE', "Please try again?");
 
@@ -87,8 +86,8 @@ async function processResponse(req, res, hook) {
             res.message = botResp.message;
             res.plainMessage = botResp.message;
         } else {
-            res.message = "";
-            res.plainMessage = "";
+            res.message = undefined;
+            res.plainMessage = undefined;
         }
         res.card = {
             "send": true,
@@ -108,10 +107,11 @@ async function processResponse(req, res, hook) {
                 }
             ]
         };
-    } else if (botResp.dialogState === 'Failed' || botResp.dialogState === 'ElicitIntent' || botResp.dialogState === 'ElicitSlot') {
+    } else if (botResp.dialogState === 'Failed') {
+        indicateFailure(req, res, _.get(req, '_settings.ELICIT_RESPONSE_BOT_FAILURE_MESSAGE', 'Your response was not understood. Please start again.' ) );
+    } else if (botResp.dialogState === 'ElicitIntent' || botResp.dialogState === 'ElicitSlot') {
         if (elicitResponseLoopCount >= maxElicitResponseLoopCount) {
-            res.session.elicitResponseProgress = 'Failed';
-            indicateFailure(res, botResp);
+            indicateFailure(req, res, _.get(req, '_settings.ELICIT_RESPONSE_MAX_ERROR_MESSAGE', 'Error, maximum number of retries exceeded.') );
         } else {
             res.session.elicitResponseLoopCount = ++elicitResponseLoopCount;
             res.session.elicitResponseProgress = botResp.dialogState;
@@ -129,8 +129,8 @@ async function processResponse(req, res, hook) {
             res.message = botResp.message;
             res.plainMessage = botResp.message;
         } else {
-            res.message = "";
-            res.plainMessage = "";
+            res.message = undefined;
+            res.plainMessage = undefined;
         }
         res.session.elicitResponseProgress = botResp.dialogState;
         _.set(res.session,res.session.elicitResponseNamespace,botResp.slots);
@@ -146,6 +146,12 @@ async function processResponse(req, res, hook) {
         }
         res.session.elicitResponseProgress = botResp.dialogState;
     }
+
+    // as much as we'd like to return an empty message, QnABot semantics requires some message to
+    // be returned.
+    res.message = res.message ? res.message : _.get(req, '_settings.ELICIT_RESPONSE_DEFAULT_MSG', 'Ok. ');
+    res.plainMessage = res.plainMessage ? res.plainMessage : _.get(req, '_settings.ELICIT_RESPONSE_DEFAULT_MSG', 'Ok. ');
+
     const resp = {};
     resp.req = req;
     resp.res = res;
