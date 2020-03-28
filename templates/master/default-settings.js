@@ -18,7 +18,6 @@ var default_settings = {
     ALT_SEARCH_KENDRA_INDEXES: [], // Add Kendra index to array to enable Amazon Kendra as a fallback source of answers
     ELICIT_RESPONSE_MAX_RETRIES: 3, // Number of times an elicitResponse LexBot can be called before giving up when the Bot returns Failed
     ELICIT_RESPONSE_RETRY_MESSAGE: "Please try again?", // Default retry message when working with LexBot
-    ELICIT_RESPONSE_MAX_ERROR_MESSAGE: "Error, maximum number of retries exceeded.", // Message used when maximum number of retries is exceeded
     ELICIT_RESPONSE_BOT_FAILURE_MESSAGE: "Your response was not understood. Please start again.", // Message used when maximum number of retries is exceeded
     ELICIT_RESPONSE_DEFAULT_MSG: "Ok. " // Ok. with an intentional blank space after the period
 }
