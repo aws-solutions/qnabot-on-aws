@@ -37,17 +37,22 @@ function lexClientRequester(lexClient,params) {
  * @returns {Promise<*>}
  */
 async function handleRequest(req, res, botName, botAlias) {
+    function mapFromSimpleName(botName) {
+        const bName = process.env[botName];
+        return bName ? bName : botName;
+    }
+
     let tempBotUserID = _.get(req,"_event.userId");
     tempBotUserID = tempBotUserID ? tempBotUserID : _.get(res,"session.sessionId");
     tempBotUserID = tempBotUserID ? tempBotUserID : Math.floor(Date.now() * 1000).toString();
     const lexClient = new AWS.LexRuntime({apiVersion: '2016-11-28'});
     const params = {
         botAlias: botAlias,
-        botName: botName,
+        botName: mapFromSimpleName(botName),
         inputText: _.get(req,"question"),
         userId: tempBotUserID
     };
-
+    console.log("Lex parameters: " + JSON.stringify(params));
     const response = await lexClientRequester(lexClient,params);
     return response;
 };
