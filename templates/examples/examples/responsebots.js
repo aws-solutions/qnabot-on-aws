@@ -111,5 +111,5 @@ exports.names=[
 
 
 exports.outputs=_.fromPairs(exports.names.map(x=>{
-        return [x,{Value:{"Ref": "YesNoBot"}}];
+        return [x,{Value:{"Ref": x}}];
     }));

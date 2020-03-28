@@ -5,7 +5,7 @@ var examples=require(`./examples`);
 var extensions=require(`./extensions`);
 var resources=Object.assign(examples,extensions);
 var outputs1=require('./outputs').outputs;
-var outputs2=require('./responsebots').outputs;
+var outputs2=require('./examples/responsebots').outputs;
 var outputs=Object.assign(outputs1,outputs2);
 
 module.exports={
