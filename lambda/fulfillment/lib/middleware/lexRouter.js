@@ -108,22 +108,25 @@ async function processResponse(req, res, hook, msg) {
             ]
         };
     } else if (botResp.dialogState === 'Failed') {
-        indicateFailure(req, res, _.get(req, '_settings.ELICIT_RESPONSE_BOT_FAILURE_MESSAGE', 'Your response was not understood. Please start again.' ) );
-    } else if (botResp.dialogState === 'ElicitIntent' || botResp.dialogState === 'ElicitSlot') {
+        res.session.elicitResponseLoopCount = ++elicitResponseLoopCount;
         if (elicitResponseLoopCount >= maxElicitResponseLoopCount) {
-            indicateFailure(req, res, _.get(req, '_settings.ELICIT_RESPONSE_MAX_ERROR_MESSAGE', 'Error, maximum number of retries exceeded.') );
+            indicateFailure(req, res, _.get(req, '_settings.ELICIT_RESPONSE_BOT_FAILURE_MESSAGE', 'Your response was not understood. Please start again.'));
         } else {
-            res.session.elicitResponseLoopCount = ++elicitResponseLoopCount;
             res.session.elicitResponseProgress = botResp.dialogState;
-            if (botResp.message) {
-                res.message = botResp.message;
-                res.plainMessage = botResp.message;
-            } else {
-                res.message = elicit_Response_Retry_Message;
-                res.plainMessage = elicit_Response_Retry_Message;
-            }
+            res.message = elicit_Response_Retry_Message;
+            res.plainMessage = elicit_Response_Retry_Message;
             res.card = undefined;
         }
+    } else if (botResp.dialogState === 'ElicitIntent' || botResp.dialogState === 'ElicitSlot') {
+        res.session.elicitResponseProgress = botResp.dialogState;
+        if (botResp.message) {
+            res.message = botResp.message;
+            res.plainMessage = botResp.message;
+        } else {
+            res.message = elicit_Response_Retry_Message;
+            res.plainMessage = elicit_Response_Retry_Message;
+        }
+        res.card = undefined;
     } else if (botResp.dialogState === 'Fulfilled' || botResp.dialogState === 'ReadyForFulfillment') {
         if (botResp.message) {
             res.message = botResp.message;
