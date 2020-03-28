@@ -6,6 +6,11 @@ var examples = _.fromPairs(require('../../examples/outputs')
   .map(x => {
     return [x, { "Fn::GetAtt": ["ExamplesStack", `Outputs.${x}`] }]
   }))
+var responsebots = _.fromPairs(require('../../examples/examples/responsebots')
+  .names
+  .map(x => {
+    return [x, { "Fn::GetAtt": ["ExamplesStack", `Outputs.${x}`] }]
+  }))
 
 module.exports = {
   "Alexa": {
@@ -46,7 +51,7 @@ module.exports = {
           DEFAULT_USER_POOL_JWKS_PARAM: { "Ref": "DefaultUserPoolJwksUrl" },
           DEFAULT_SETTINGS_PARAM: { "Ref": "DefaultQnABotSettings" },
           CUSTOM_SETTINGS_PARAM: { "Ref": "CustomQnABotSettings" },
-        }, examples)
+        }, examples, responsebots)
       },
       "Handler": "index.handler",
       "MemorySize": "1408",
