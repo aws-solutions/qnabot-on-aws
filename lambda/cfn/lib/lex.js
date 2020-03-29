@@ -144,7 +144,14 @@ class Lex {
                 params.childDirected={"false":false,"true":true}[params.childDirected]
             }
             params.name=ID
-            if(this.type==='Bot') {
+            if (this.type==='Bot') {
+                this.checksum(ID).then(cksum => {
+                    params.checksum = cksum;
+                    run(self.update_method, params)
+                        .then(msg => reply(null, msg.name, null))
+                        .error(reply).catch(reply)
+                });
+            } else if (this.type==='Intent') {
                 this.checksum(ID).then(cksum => {
                     params.checksum = cksum;
                     run(self.update_method, params)
