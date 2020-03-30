@@ -64,7 +64,7 @@ async function get_hit(req, res) {
     };
     var no_hits_question = _.get(req, '_settings.ES_NO_HITS_QUESTION', 'no_hits');
     var response = await run_query(req, query_params);
-    console.log("Query response: ", response);
+    console.log("Query response: ", JSON.stringify(response,null,2));
     var hit = _.get(response, "hits.hits[0]._source");
     if (hit) {
         res['got_hits'] = 1;  // response flag, used in logging / kibana
@@ -146,7 +146,7 @@ module.exports = async function (req, res) {
     }
     if (hit) {
         // found a document in elastic search.
-        if (_.get(hit, "conditionalChaining") && _.get(hit, "elicitResponse.responsebot_hook", undefined) === undefined) {
+        if (_.get(hit, "conditionalChaining") && _.get(hit, "elicitResponse.responsebot_hook", "") === "" ) {
             // ElicitResonse is not involved and this document has conditionalChaining defined. Process the
             // conditionalChaining in this case.
             hit = await evaluateConditionalChaining(req, res, hit, hit.conditionalChaining);

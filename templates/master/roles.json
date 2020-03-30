@@ -185,6 +185,7 @@
                   "Effect": "Allow",
                   "Action": [
                     "lex:PutSlotType",
+                    "lex:GetSlotType",
                     "lex:DeleteSlotType",
                     "lex:PutIntent",
                     "lex:DeleteIntent",

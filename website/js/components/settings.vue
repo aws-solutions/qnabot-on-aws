@@ -49,10 +49,10 @@ module.exports={
     computed:{},
     created:async function(){
       const settings = await this.$store.dispatch('api/listSettings');
-      this.defaultSettings = settings[0];
-      this.customSettings = settings[1];
-      this.mergedSettings = settings[2];
-      this.settingsHolder = settings[2];
+      this.defaultSettings = _.clone(settings[0]);
+      this.customSettings = _.clone(settings[1]);
+      this.mergedSettings = _.clone(settings[2]);
+      this.settingsHolder = _.clone(settings[2]);
     },
     methods:{
       SaveSettings: async function(){
@@ -76,7 +76,7 @@ module.exports={
         let customOverride = {};
         let response = await this.$store.dispatch('api/updateSettings', customOverride);
         if(response) {
-          this.settingsHolder = this.defaultSettings;
+          this.settingsHolder = _.clone(this.defaultSettings);
           this.successAlert = true;
           window.scrollTo(0,0);
         }

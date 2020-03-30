@@ -102,6 +102,12 @@ class Lex {
             versionOrAlias:"$LATEST"
         }).promise().get("checksum")
     }
+    checksumIntentOrSlotType(id){
+        return lex[this.get_method]({
+            name:id,
+            version:"$LATEST"
+        }).promise().get("checksum")
+    }
     name(params){
         var name=params.name ? clean(params.name) : this.type+makeid()
         name=params.prefix ? [params.prefix,name].join('_') : name;
@@ -110,6 +116,7 @@ class Lex {
 
     Create(params,reply){
         console.log('Create Lex. Params: ' + JSON.stringify(params,null,2))
+        console.log('Type: ' + this.type)
         var self=this
         params.name=this.name(params)
         console.log('Create params.name: ' + params.name)
@@ -130,6 +137,7 @@ class Lex {
         }
         start.then(()=>run(self.create_method,params))
         .then(msg=>reply(null,msg.name,null))
+        .catch(error => { console.log('caught', error); reply(error); })
         .error(reply).catch(reply)
     }
 
@@ -139,29 +147,65 @@ class Lex {
         console.log('OldParams: ' + JSON.stringify(oldparams,null,2))
         console.log('Type: ' + this.type)
         var self=this
-        if(this.type!=='SlotType'){ // The type of SlotType can not be updated.
+        if(this.type!=='Alias'){ // The type of Alias should not be updated.
             if(params.childDirected){
                 params.childDirected={"false":false,"true":true}[params.childDirected]
             }
             params.name=ID
             if (this.type==='Bot') {
-                this.checksum(ID).then(cksum => {
-                    params.checksum = cksum;
-                    run(self.update_method, params)
-                        .then(msg => reply(null, msg.name, null))
-                        .error(reply).catch(reply)
-                });
+                try {
+                    this.checksum(ID).then(cksum => {
+                        params.checksum = cksum;
+                        params.processBehavior = "BUILD";
+                            run(self.update_method, params)
+                                .then(msg => reply(null, msg.name, null))
+                                .catch(error => { console.log('caught', error); reply(error);})
+                                .error(reply).catch(reply)
+                    });
+                } catch (err) {
+                    console.log("Exception detected: " + err);
+                    reply(null, ID);
+                }
             } else if (this.type==='Intent') {
-                this.checksum(ID).then(cksum => {
-                    params.checksum = cksum;
+                try {
+                    this.checksumIntentOrSlotType(ID).then(cksum => {
+                        params.checksum = cksum;
+                        params.version = "$LATEST";
+                        console.log("Intent parameters for update are: " + JSON.stringify(params,null,2));
+                            run(self.update_method, params)
+                                .then(msg => reply(null, msg.name, null))
+                                .catch(error => { console.log('caught', error); reply(error);})
+                                .error(reply).catch(reply)
+                    });
+                } catch (err) {
+                    console.log("Exception detected: " + err);
+                    reply(null, ID);
+                }
+            } else if (this.type==='SlotType') {
+                try {
+                    this.checksumIntentOrSlotType(ID).then(cksum => {
+                        params.checksum = cksum;
+                        console.log("Slot parameters for update are: " + JSON.stringify(params,null,2));
+                        run(self.update_method, params)
+                            .then(msg => reply(null, msg.name, null))
+                            .catch(error => { console.log('caught', error); reply(error);})
+                            .error(reply).catch(reply)
+                    });
+                } catch (err) {
+                    console.log("Exception detected: " + err);
+                    reply(null, ID);
+                }
+            } else {
+                console.log("Parameters for update: " + JSON.stringify(params,null,2));
+                try {
                     run(self.update_method, params)
                         .then(msg => reply(null, msg.name, null))
+                        .catch(error => { console.log('caught', error); reply(error);})
                         .error(reply).catch(reply)
-                });
-            } else {
-                run(self.update_method, params)
-                    .then(msg => reply(null, msg.name, null))
-                    .error(reply).catch(reply)
+                } catch (err) {
+                    console.log("Exception detected: " + err);
+                    reply(null, ID);
+                }
             }
         }else{
             reply(null,ID)

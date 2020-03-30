@@ -1,3 +1,11 @@
+/**
+ *
+ * SlotTypes, Intents, and Bots for elicit response bots.
+ *
+ * Warning : Important Note: If you update an Intent or a SlotType, it is mandatory to update the description
+ * in the associated Bot. Failure to do so when running an update will leave the bot in the NOT_BUILT state and you
+ * will need to rebuild in the AWS Console.
+ */
 var _ = require('lodash');
 
 var config={
@@ -14,9 +22,10 @@ exports.resources={
         "Properties": {
             "ServiceToken": {"Ref": "CFNLambda"},
             "name":{"Fn::Sub":"QNAYesNoSlotType-${AWS::StackName}"},
+            "valueSelectionStrategy": "TOP_RESOLUTION",
             "enumerationValues": [
                 {"value":"Yes", "synonyms":["OK","Yeah","Sure","Yep","Affirmative","Si","Oui"]},
-                {"value":"No", "synonyms":["Nope","Na","Negative","Non"]},
+                {"value":"No", "synonyms":["Nope","Na","Negative","Non"]}
               ]
         }
     },
@@ -63,6 +72,7 @@ exports.resources={
     },
     "QNAYesNo": {
       "Type": "Custom::LexBot",
+      "DependsOn": ["YesNoSlotType", "YesNoIntent"],
       "Properties": {
         "ServiceToken": {"Ref": "CFNLambda"},
         "name":{"Fn::Sub":"QNAYesNoBot-${AWS::StackName}"},
@@ -88,7 +98,8 @@ exports.resources={
               "contentType": "PlainText"
             }
           ]
-        }
+        },
+        "description": "QNA Custom Yes/No elicit response bot"
       }
     },
     "YesNoAlias": {
@@ -166,6 +177,7 @@ exports.resources={
     },
     "QNADate": {
         "Type": "Custom::LexBot",
+        "DependsOn": "DateIntent",
         "Properties": {
             "ServiceToken": {"Ref": "CFNLambda"},
             "name":{"Fn::Sub":"QNADateBot-${AWS::StackName}"},
@@ -268,6 +280,7 @@ exports.resources={
     },
     "QNADayOfWeek": {
         "Type": "Custom::LexBot",
+        "DependsOn": "DayOfWeekIntent",
         "Properties": {
             "ServiceToken": {"Ref": "CFNLambda"},
             "name":{"Fn::Sub":"QNADayOfWeekBot-${AWS::StackName}"},
@@ -369,6 +382,7 @@ exports.resources={
     },
     "QNAMonth": {
         "Type": "Custom::LexBot",
+        "DependsOn": "MonthIntent",
         "Properties": {
             "ServiceToken": {"Ref": "CFNLambda"},
             "name":{"Fn::Sub":"QNAMonthBot-${AWS::StackName}"},
@@ -469,6 +483,7 @@ exports.resources={
     },
     "QNANumber": {
         "Type": "Custom::LexBot",
+        "DependsOn": "NumberIntent",
         "Properties": {
             "ServiceToken": {"Ref": "CFNLambda"},
             "name":{"Fn::Sub":"QNANumberBot-${AWS::StackName}"},
@@ -569,6 +584,7 @@ exports.resources={
     },
     "QNAPhoneNumber": {
         "Type": "Custom::LexBot",
+        "DependsOn": "PhoneNumberIntent",
         "Properties": {
             "ServiceToken": {"Ref": "CFNLambda"},
             "name":{"Fn::Sub":"QNAPhoneNumberBot-${AWS::StackName}"},
@@ -669,6 +685,7 @@ exports.resources={
     },
     "QNATime": {
         "Type": "Custom::LexBot",
+        "DependsOn": "TimeIntent",
         "Properties": {
             "ServiceToken": {"Ref": "CFNLambda"},
             "name":{"Fn::Sub":"QNATimeBot-${AWS::StackName}"},
@@ -768,6 +785,7 @@ exports.resources={
     },
     "QNAEmailAddress": {
         "Type": "Custom::LexBot",
+        "DependsOn": "EmailAddressIntent",
         "Properties": {
             "ServiceToken": {"Ref": "CFNLambda"},
             "name":{"Fn::Sub":"QNAEmailAddressBot-${AWS::StackName}"},
@@ -806,12 +824,132 @@ exports.resources={
             },
             "botVersion": "$LATEST"
         }
+    },
+    "NameIntent": {
+        "Type": "Custom::LexIntent",
+        "Properties": {
+            "ServiceToken": {"Ref": "CFNLambda"},
+            "name":{"Fn::Sub":"QNANameIntent-${AWS::StackName}"},
+            "sampleUtterances": [
+                "My last name is {LastName}",
+                "My first name is {FirstName}",
+                "My first name is {FirstName} and My last name is {LastName}",
+                "My name is {FirstName} {LastName}",
+                "I am {FirstName} {LastName}",
+                "{FirstName} {LastName}",
+                "{FirstName}",
+                "{LastName}"
+            ],
+            conclusionStatement: {
+                messages: [
+                    {
+                        content: "OK. ",
+                        contentType: "PlainText"
+                    }
+                ],
+            },
+            confirmationPrompt: {
+                maxAttempts: 1,
+                messages: [
+                    {
+                        content: "Did I get your name right (Yes/No) {FirstName} {LastName}?",
+                        contentType: "PlainText"
+                    }
+                ]
+            },
+            rejectionStatement: {
+                messages: [
+                    {
+                        content: "Please let me know your name again?",
+                        contentType: "PlainText"
+                    }
+                ]
+            },
+            description: "Parse name responses.",
+            fulfillmentActivity: {
+                type: "ReturnIntent"
+            },
+            "slots": [
+                {
+                    "name":"FirstName",
+                    "slotType": "AMAZON.US_FIRST_NAME",
+                    "slotConstraint": "Required",
+                    "valueElicitationPrompt": {
+                        "messages": [
+                            {
+                                "contentType": "PlainText",
+                                "content": "What is your first name?"
+                            }
+                        ],
+                        "maxAttempts": 2
+                    },
+                    "priority": 1,
+                },
+                {
+                    "name":"LastName",
+                    "slotType": "AMAZON.US_LAST_NAME",
+                    "slotConstraint": "Required",
+                    "valueElicitationPrompt": {
+                        "messages": [
+                            {
+                                "contentType": "PlainText",
+                                "content": "What is your last name?"
+                            }
+                        ],
+                        "maxAttempts": 2
+                    },
+                    "priority": 1,
+                }
+            ],
+        },
+    },
+    "QNAName": {
+        "Type": "Custom::LexBot",
+        "DependsOn": "NameIntent",
+        "Properties": {
+            "ServiceToken": {"Ref": "CFNLambda"},
+            "name":{"Fn::Sub":"QNANameBot-${AWS::StackName}"},
+            "locale": "en-US",
+            "voiceId": config.voiceId,
+            "childDirected": false,
+            "intents": [
+                {"intentName": {"Ref": "NameIntent"},"intentVersion": "$LATEST"},
+            ],
+            "clarificationPrompt": {
+                "messages": [
+                    {
+                        "contentType": "PlainText",
+                        "content": "Please let me know your first and last name?"
+                    }
+                ],
+                "maxAttempts": 3
+            },
+            "abortStatement": {
+                "messages": [
+                    {
+                        "content": config.Abort,
+                        "contentType": "PlainText"
+                    }
+                ]
+            }
+        }
+    },
+    "NameAlias": {
+        "Type": "Custom::LexAlias",
+        "DependsOn": "QNAName",
+        "Properties": {
+            "ServiceToken": {"Ref": "CFNLambda"},
+            "botName": {
+                "Ref": "QNAName"
+            },
+            "botVersion": "$LATEST"
+        }
     }
 };
 
 
 exports.names=[
-  "QNAYesNo", "QNADate", "QNADayOfWeek", "QNAMonth", "QNANumber", "QNAPhoneNumber", "QNATime", "QNAEmailAddress"
+  "QNAYesNo", "QNADate", "QNADayOfWeek", "QNAMonth", "QNANumber", "QNAPhoneNumber", "QNATime", "QNAEmailAddress", "QNAName"
 ] ;
 
 

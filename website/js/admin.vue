@@ -109,7 +109,7 @@ module.exports={
       },{
         title:"Settings",
         id:"settings",
-        subTitle:"Parameter settings for lambda functions",
+        subTitle:"View and Modify QnABot configuration settings",
         icon:"settings",
         href:"#/settings"
       },{
