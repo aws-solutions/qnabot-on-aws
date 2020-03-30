@@ -86,7 +86,7 @@ exports.resources={
           "messages": [
             {
               "contentType": "PlainText",
-              "content": config.Clarification
+              "content": "Please repeat - say Yes or No."
             }
           ],
           "maxAttempts": 5
@@ -124,7 +124,9 @@ exports.resources={
                 "I went on {date}",
                 "It is {date}",
                 "It occurred on {date}",
+                "I was born on {date}",
                 "My birthdate is {date}",
+                "My date of birth is {date}",
                 "{date}"
             ],
             conclusionStatement: {
@@ -158,7 +160,7 @@ exports.resources={
             },
             "slots": [
                 {
-                    "name":"Date",
+                    "name":"date",
                     "slotType": "AMAZON.DATE",
                     "slotConstraint": "Required",
                     "valueElicitationPrompt": {
@@ -191,7 +193,7 @@ exports.resources={
                 "messages": [
                     {
                         "contentType": "PlainText",
-                        "content": config.Clarification
+                        "content": "Please repeat the date."
                     }
                 ],
                 "maxAttempts": 3
@@ -294,7 +296,7 @@ exports.resources={
                 "messages": [
                     {
                         "contentType": "PlainText",
-                        "content": config.Clarification
+                        "content": "Please repeat the day of the week."
                     }
                 ],
                 "maxAttempts": 3
@@ -396,7 +398,7 @@ exports.resources={
                 "messages": [
                     {
                         "contentType": "PlainText",
-                        "content": config.Clarification
+                        "content": "Please repeat the month."
                     }
                 ],
                 "maxAttempts": 3
@@ -497,7 +499,7 @@ exports.resources={
                 "messages": [
                     {
                         "contentType": "PlainText",
-                        "content": config.Clarification
+                        "content": "Please repeat the number."
                     }
                 ],
                 "maxAttempts": 3
@@ -519,6 +521,115 @@ exports.resources={
             "ServiceToken": {"Ref": "CFNLambda"},
             "botName": {
                 "Ref": "QNANumber"
+            },
+            "botVersion": "$LATEST"
+        }
+    },
+    "AgeIntent": {
+        "Type": "Custom::LexIntent",
+        "Properties": {
+            "ServiceToken": {"Ref": "CFNLambda"},
+            "name":{"Fn::Sub":"QNAAgeIntent-${AWS::StackName}"},
+            "sampleUtterances": [
+                "My age is {Age}",
+                "Age is {Age}",
+                "It is {Age}",
+                "I am {Age}",
+                "I am {Age} years old",
+                "His age is {Age}",
+                "He is {Age}",
+                "He is {Age} years old",
+                "Her age is {Age}",
+                "She is {Age}",
+                "She is {Age} years old",
+                "{Age}"
+            ],
+            conclusionStatement: {
+                messages: [
+                    {
+                        content: "OK. ",
+                        contentType: "PlainText"
+                    }
+                ],
+            },
+            confirmationPrompt: {
+                maxAttempts: 1,
+                messages: [
+                    {
+                        content: "Is {Age} correct (Yes/No)?",
+                        contentType: "PlainText"
+                    }
+                ]
+            },
+            rejectionStatement: {
+                messages: [
+                    {
+                        content: "Please let me know the age again?",
+                        contentType: "PlainText"
+                    }
+                ]
+            },
+            description: "Parse Age responses.",
+            fulfillmentActivity: {
+                type: "ReturnIntent"
+            },
+            "slots": [
+                {
+                    "name":"Age",
+                    "slotType": "AMAZON.NUMBER",
+                    "slotConstraint": "Required",
+                    "valueElicitationPrompt": {
+                        "messages": [
+                            {
+                                "contentType": "PlainText",
+                                "content": "What age?"
+                            }
+                        ],
+                        "maxAttempts": 2
+                    },
+                    "priority": 1,
+                }
+            ],
+        },
+    },
+    "QNAAge": {
+        "Type": "Custom::LexBot",
+        "DependsOn": "AgeIntent",
+        "Properties": {
+            "ServiceToken": {"Ref": "CFNLambda"},
+            "name":{"Fn::Sub":"QNAAgeBot-${AWS::StackName}"},
+            "locale": "en-US",
+            "voiceId": config.voiceId,
+            "childDirected": false,
+            "intents": [
+                {"intentName": {"Ref": "AgeIntent"},"intentVersion": "$LATEST"},
+            ],
+            "clarificationPrompt": {
+                "messages": [
+                    {
+                        "contentType": "PlainText",
+                        "content": "Please repeat the age."
+                    }
+                ],
+                "maxAttempts": 3
+            },
+            "abortStatement": {
+                "messages": [
+                    {
+                        "content": config.Abort,
+                        "contentType": "PlainText"
+                    }
+                ]
+            }
+        }
+    },
+    "AgeAlias": {
+        "Type": "Custom::LexAlias",
+        "DependsOn": "QNAAge",
+        "Properties": {
+            "ServiceToken": {"Ref": "CFNLambda"},
+            "botName": {
+                "Ref": "QNAAge"
             },
             "botVersion": "$LATEST"
         }
@@ -598,7 +709,7 @@ exports.resources={
                 "messages": [
                     {
                         "contentType": "PlainText",
-                        "content": config.Clarification
+                        "content": "Please repeat the phone number."
                     }
                 ],
                 "maxAttempts": 3
@@ -699,7 +810,7 @@ exports.resources={
                 "messages": [
                     {
                         "contentType": "PlainText",
-                        "content": config.Clarification
+                        "content": "Please repeat the time, specifying am or pm."
                     }
                 ],
                 "maxAttempts": 3
@@ -799,7 +910,7 @@ exports.resources={
                 "messages": [
                     {
                         "contentType": "PlainText",
-                        "content": config.Clarification
+                        "content": "Please repeat the email address."
                     }
                 ],
                 "maxAttempts": 3
@@ -919,7 +1030,7 @@ exports.resources={
                 "messages": [
                     {
                         "contentType": "PlainText",
-                        "content": "Please let me know your first and last name?"
+                        "content": "Please repeat your first and last name?"
                     }
                 ],
                 "maxAttempts": 3
@@ -949,7 +1060,7 @@ exports.resources={
 
 
 exports.names=[
-  "QNAYesNo", "QNADate", "QNADayOfWeek", "QNAMonth", "QNANumber", "QNAPhoneNumber", "QNATime", "QNAEmailAddress", "QNAName"
+  "QNAYesNo", "QNADate", "QNADayOfWeek", "QNAMonth", "QNANumber", "QNAAge","QNAPhoneNumber", "QNATime", "QNAEmailAddress", "QNAName"
 ] ;
 
 
