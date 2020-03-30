@@ -188,6 +188,7 @@
                     "lex:GetSlotType",
                     "lex:DeleteSlotType",
                     "lex:PutIntent",
+                    "lex:GetIntent",
                     "lex:DeleteIntent",
                     "lex:PutBot",
                     "lex:GetBot",

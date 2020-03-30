@@ -161,7 +161,8 @@ class Lex {
                                 .then(msg => reply(null, msg.name, null))
                                 .catch(error => { console.log('caught', error); reply(error);})
                                 .error(reply).catch(reply)
-                    });
+                    })
+                    .catch(error => { console.log('caught', error); reply(error);})
                 } catch (err) {
                     console.log("Exception detected: " + err);
                     reply(null, ID);
@@ -170,13 +171,13 @@ class Lex {
                 try {
                     this.checksumIntentOrSlotType(ID).then(cksum => {
                         params.checksum = cksum;
-                        params.version = "$LATEST";
                         console.log("Intent parameters for update are: " + JSON.stringify(params,null,2));
                             run(self.update_method, params)
                                 .then(msg => reply(null, msg.name, null))
                                 .catch(error => { console.log('caught', error); reply(error);})
                                 .error(reply).catch(reply)
-                    });
+                    })
+                    .catch(error => { console.log('caught', error); reply(error);})
                 } catch (err) {
                     console.log("Exception detected: " + err);
                     reply(null, ID);
@@ -190,7 +191,8 @@ class Lex {
                             .then(msg => reply(null, msg.name, null))
                             .catch(error => { console.log('caught', error); reply(error);})
                             .error(reply).catch(reply)
-                    });
+                    })
+                    .catch(error => { console.log('caught', error); reply(error);})
                 } catch (err) {
                     console.log("Exception detected: " + err);
                     reply(null, ID);
