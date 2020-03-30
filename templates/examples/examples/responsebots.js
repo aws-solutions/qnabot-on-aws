@@ -158,7 +158,7 @@ exports.resources={
             },
             "slots": [
                 {
-                    "name":"date",
+                    "name":"Date",
                     "slotType": "AMAZON.DATE",
                     "slotConstraint": "Required",
                     "valueElicitationPrompt": {
