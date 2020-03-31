@@ -108,6 +108,8 @@
     "recursive-readdir": "^2.2.2",
     "require-dir": "^0.3.2",
     "roboto-fontface": "^0.8.0",
+    "safe-eval": "^0.4.1",
+    "simple-encryptor": "^3.0.0",
     "strip-ansi": "^4.0.0",
     "style-loader": "^0.18.2",
     "uglifyjs-webpack-plugin": "^2.2.0",

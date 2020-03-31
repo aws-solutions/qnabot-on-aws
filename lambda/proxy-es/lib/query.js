@@ -1,10 +1,13 @@
 //start connection
 var _ = require('lodash');
+var safeEval = require('safe-eval');
 var request = require('./request');
 var build_es_query = require('./esbodybuilder');
 var handlebars = require('./handlebars');
 var translate = require('./translate');
-
+// use DEFAULT_SETTINGS_PARAM as random encryption key unique to this QnABot installation
+var key = _.get(process.env, "DEFAULT_SETTINGS_PARAM", "fdsjhf98fd98fjh9 du98fjfd 8ud8fjdf");
+var encryptor = require('simple-encryptor')(key);
 
 async function run_query(req, query_params) {
     var es_query = await build_es_query(query_params);
@@ -81,6 +84,13 @@ async function get_hit(req, res) {
         _.set(res, "session.topic", _.get(hit, "t"));
         // run handlebars template processing
         hit = await handlebars(req, res, hit);
+        // encrypt conditionalChaining rule, if set
+        const conditionalChaining = _.get(hit, "conditionalChaining");
+        if (conditionalChaining) {
+            console.log("Encrypt conditionalChaining rule to ensure it is tamper proof in session attributes");
+            const encrypted = encryptor.encrypt(conditionalChaining);
+            _.set(hit, "conditionalChaining", encrypted);
+        }
     }
     return hit;
 }
@@ -96,14 +106,16 @@ async function get_hit(req, res) {
  * @returns {Promise<*>}
  */
 async function evaluateConditionalChaining(req, res, hit, conditionalChaining) {
-    console.log("Chained document rule specified:", conditionalChaining);
     console.log("evaluateConditionalChaining req: ", JSON.stringify(req, null, 2));
     console.log("evaluateConditionalChaining res: ", JSON.stringify(res, null, 2));
     console.log("evaluateConditionalChaining hit: ", JSON.stringify(hit, null, 2));
-    // provide 'SessionAttributes' var to chaining rule, consistent with Handlebars context
-    const SessionAttributes = res.session;
-    // evaluate conditionalChaining expression.. throws an exception if there is a syntax error
-    const next_q = eval(conditionalChaining);
+    // decrypt conditionalChaining
+    conditionalChaining = encryptor.decrypt(conditionalChaining);
+    console.log("Decrypted Chained document rule specified:", conditionalChaining);
+    // provide 'SessionAttributes' to chaining rule safeEval context, consistent with Handlebars context
+    const context={SessionAttributes:res.session};
+    // safely evaluate conditionalChaining expression.. throws an exception if there is a syntax error
+    const next_q = safeEval(conditionalChaining, context);
     console.log("Chained document rule evaluated to:", next_q);
     req.question = next_q;
     const hit2 = await get_hit(req, res);
