@@ -126,6 +126,7 @@ class Lex {
             params.childDirected={"false":false,"true":true}[params.childDirected]
         }
         if(this.type==='Bot'){
+            params.processBehavior = "BUILD";
             var start=iam.createServiceLinkedRole({
                 AWSServiceName: 'lex.amazonaws.com',
                 Description: 'Service linked role for lex'
