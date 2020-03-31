@@ -10,8 +10,8 @@ PUBLIC_BUCKET=$( cat $__dirname/../config.json | $__dirname/json.js publicBucket
 PUBLIC_PREFIX=$( cat $__dirname/../config.json | $__dirname/json.js publicPrefix)
 REGION=$AWS_DEFAULT_REGION
 
-MASTER="http://s3.amazonaws.com/$BUCKET/$PREFIX/templates/master.json"
-PUBLIC="http://s3.amazonaws.com/$PUBLIC_BUCKET/$PUBLIC_PREFIX/templates/public.json"
+MASTER="http://$BUCKET.s3.$REGION.amazonaws.com/$PREFIX/templates/master.json"
+PUBLIC="http://$PUBLIC_BUCKET.s3.$REGION.amazonaws.com/$PUBLIC_PREFIX/templates/public.json"
 
 echo "========================Master=============="
 echo "template url:"

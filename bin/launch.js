@@ -6,6 +6,7 @@ var aws=require('aws-sdk')
 var Promise=require('bluebird')
 aws.config.setPromisesDependency(Promise)
 aws.config.region=require('../config').region
+var region=require('../config').region
 var _=require('lodash')
 var fs=require('fs')
 var cf=new aws.CloudFormation()
@@ -118,7 +119,7 @@ async function up(stack,options){
                 var exp=await bootstrap()
                 var bucket=exp.Bucket
                 var prefix=exp.Prefix
-                var url=`http://s3.amazonaws.com/${bucket}/${prefix}/templates/${stack}.json`
+                var url=`http://${bucket}.s3.${region}.amazonaws.com/${prefix}/templates/${stack}.json`
                 await s3.putObject({
                     Bucket:bucket,
                     Key:`${prefix}/templates/${stack}.json`,
@@ -166,7 +167,7 @@ function update(stack,options){
                 var start=bootstrap().then(function(exp){
                     var bucket=exp.Bucket
                     var prefix=exp.Prefix
-                    var url=`http://s3.amazonaws.com/${bucket}/${prefix}/templates/${stack}.json`
+                    var url=`http://${bucket}.s3.${region}.amazonaws.com/${prefix}/templates/${stack}.json`
                     console.log(url)
                     return s3.putObject({
                         Bucket:bucket,

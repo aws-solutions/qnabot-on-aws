@@ -2,7 +2,7 @@ module.exports={
     "ExportStack":{
         "Type" : "AWS::CloudFormation::Stack",
         "Properties" : {
-            "TemplateURL" :{"Fn::Sub":"http://${BootstrapBucket}.s3.amazonaws.com/${BootstrapPrefix}/templates/export.json"},
+            "TemplateURL" :{"Fn::Sub":"http://${BootstrapBucket}.s3.${AWS::Region}.amazonaws.com/${BootstrapPrefix}/templates/export.json"},
             "Parameters" :{
                 "CFNLambda":{"Fn::GetAtt":["CFNLambda","Arn"]},
                 "CFNInvokePolicy":{"Ref":"CFNInvokePolicy"},

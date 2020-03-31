@@ -7,6 +7,7 @@ var aws=require('aws-sdk')
 var Promise=require('bluebird')
 aws.config.setPromisesDependency(Promise)
 aws.config.region=require('../config').region
+var region=require('../config').region
 var cf=new aws.CloudFormation()
 var s3=new aws.S3()
 var name=require('./name')
@@ -53,7 +54,7 @@ async function run(stack,options={}){
         var Bucket=exp.Bucket
         var prefix=exp.Prefix
         var Key=`${prefix}/templates/${stack}.json`
-        var TemplateURL=`http://s3.amazonaws.com/${Bucket}/${Key}`
+        var TemplateURL=`http://${Bucket}.s3.${region}.amazonaws.com/${Key}`
         console.log(TemplateURL)
         await s3.putObject({Bucket,Key,Body:template}).promise()
         return cf.validateTemplate({TemplateURL}).promise()

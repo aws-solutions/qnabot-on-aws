@@ -2,7 +2,7 @@ module.exports={
     "TestAllStack":{
         "Type" : "AWS::CloudFormation::Stack",
         "Properties" : {
-            "TemplateURL" :{"Fn::Sub":"http://${BootstrapBucket}.s3.amazonaws.com/${BootstrapPrefix}/templates/testall.json"},
+            "TemplateURL" :{"Fn::Sub":"http://${BootstrapBucket}.s3.${AWS::Region}.amazonaws.com/${BootstrapPrefix}/templates/testall.json"},
             "Parameters" :{
                 "CFNLambda":{"Fn::GetAtt":["CFNLambda","Arn"]},
                 "CFNInvokePolicy":{"Ref":"CFNInvokePolicy"},

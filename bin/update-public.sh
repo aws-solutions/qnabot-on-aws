@@ -23,4 +23,4 @@ if [ "$1" == "--run" ]; then
     $__dirname/URL.sh
 fi
 
-echo https://s3.amazonaws.com/$PUBLICBUCKET/$PUBLICPREFIX/templates/master.json
+echo https://$PUBLICBUCKET.s3.$REGION.amazonaws.com/$PUBLICPREFIX/templates/master.json
