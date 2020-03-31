@@ -7,7 +7,18 @@ This repository contains code for the QnABot, described in the AWS AI blog post 
 
 See the "Getting Started" to launch your own QnABot
 
-**New features in 2.6.0** [Kendra Fallback and MultiLanguage Support](#new-features)
+**New features in 3.0.0** [ElicitResponse, Conditional Chaining, new Launch regions](#new-features)
+
+**Note that versions prior to 3.0.0 will not directly upgrade to this version.** If running version 2.6.n,
+you will need to:
+- Export your old configuration to a json file and download to your system using the Designer UI
+- Install this stack as a new QnABot
+- Import your prior configuration to the new QnABot using the Designer UI
+- If using the standalone LexWebUi, you will need to redeploy a new LexWebUi and configure
+to use the new QnABot
+
+Once you are completely satisfied of proper operation of your new Bot and new LexWebUi, you can remove the old 
+stacks.
 
 ## Prerequisites
 
@@ -126,6 +137,19 @@ We are currently working on adding Microsoft Edge support.
 See the [LICENSE.md](LICENSE.md) file for details
 
 ## New features
+
+### Configuring QnABot to ask the questions
+QnABot was designed to answer questions, but now it can also ask questions and process 
+the user’s answers. Use this feature for data collection and validation; 
+o implement surveys, quizzes, personalized recommendations; or to build a triage 
+chatbot application. See the [blog post](https://aws.amazon.com/blogs/machine-learning/creating-a-question-and-answer-bot-with-amazon-lex-and-amazon-alexa/) for details about this new feature. 
+This feature is know as ElicitResponse from a configuration perspective.
+
+### Automatically advancing and branching along a tree of questions
+QnABot can now chain the user from one answer to another. This can be used with ElicitResponse
+to ask multiple questions from a user. Conditional chaining allows branching based on 
+the state of session variables. Please see the [blog post](https://aws.amazon.com/blogs/machine-learning/creating-a-question-and-answer-bot-with-amazon-lex-and-amazon-alexa/)
+for a description on how to use this feature.
 
 ### Kendra Fallback Support
 QnABot version 2.6.0 optionally supports integration with Amazon Kendra as a fallback mechanism if a question/answer can not
