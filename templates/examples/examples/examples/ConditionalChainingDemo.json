@@ -20,13 +20,13 @@
       "t": "",
       "elicitResponse": {
         "response_sessionattr_namespace": "demo.age",
-        "responsebot_hook": "QNANumber"
+        "responsebot_hook": "QNAAge"
       },
       "alt": {
         "markdown": "Hi {{SessionAttributes.demo.name.FirstName}}.  \nNow tell me your age (in years) please?",
         "ssml": ""
       },
-      "conditionalChaining": "(SessionAttributes.demo.age.Number >= 60) ? \"Over 60\" : (SessionAttributes.demo.age.Number  < 12) ? \"Under 12\" : \"Between 12 and 60\"",
+      "conditionalChaining": "(SessionAttributes.demo.age.Age>= 60) ? \"Over 60\" : (SessionAttributes.demo.age.Age< 12) ? \"Under 12\" : \"Between 12 and 60\"",
       "l": "",
       "qid": "20.chaining.demo.Age",
       "type": "qna",
