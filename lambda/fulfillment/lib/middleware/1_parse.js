@@ -67,8 +67,7 @@ module.exports = async function parse(req, res) {
 
 
     // multilanguage support 
-    var isMultilanguageEnabled = settings.ENABLE_MULTI_LANGUAGE_SUPPORT;
-    if (isMultilanguageEnabled) {
+    if (_.get(settings, 'ENABLE_MULTI_LANGUAGE_SUPPORT', "false").toLowerCase() === "true") {
         await multilanguage.set_multilang_env(req);
     }
     // end of multilanguage support 

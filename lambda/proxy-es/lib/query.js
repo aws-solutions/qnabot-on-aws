@@ -163,7 +163,7 @@ module.exports = async function (req, res) {
             // conditionalChaining in this case.
             hit = await evaluateConditionalChaining(req, res, hit, hit.conditionalChaining);
         }
-        if (req._settings.ENABLE_MULTI_LANGUAGE_SUPPORT) {
+        if (_.get(req._settings, 'ENABLE_MULTI_LANGUAGE_SUPPORT', "false").toLowerCase() === "true") {
             const usrLang = _.get(req, 'session.userLocale');
             if (usrLang != 'en') {
                 console.log("Autotranslate hit to usrLang: ", usrLang);

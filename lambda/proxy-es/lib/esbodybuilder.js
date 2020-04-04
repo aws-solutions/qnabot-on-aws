@@ -32,7 +32,7 @@ function build_query(params) {
             path:'questions'},
             q=>q.query('match','questions.q',params.question)
         ) ;
-        if (params.score_answer_field == 'true') {
+        if (_.get(params, 'score_answer_field', "false").toLowerCase() === "true") {
             query = query.orQuery('match','a',params.question) ;  
         }
         query = query.orQuery('match','t',_.get(params,'topic',''))

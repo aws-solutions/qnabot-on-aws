@@ -252,26 +252,11 @@ the feature. Step 2 loads in two questions from this extension that allow the us
 defaults supplied in this question are English, Spanish, French, German, and Italian. You can extend this list to
 support other languages. 
 
-Step 1) Custom Property
+Step 1) Enable multi language support 
 
-a) QnABot uses a property named ENABLE_MULTI_LANGUAGE_SUPPORT. It is a boolean and has a default value of false. 
-You can override this setting using SSM Parameter Store to add a new key/value pair as a custom property. 
-Find your custom property name from the QnABot CF stack outputs. The key in the QnABot CF stack outputs is 
-'CustomSettingsSSMParameterName'. If will have a value similar to 
+a) QnABot uses a property named ENABLE_MULTI_LANGUAGE_SUPPORT, default value of "false". 
+You can change this setting using the Content Designer Settings page. Set it to "true" to enable multi language support.
 
-```
-CFN-CustomQnABotSettings-EOVHQJcYx9Ms
-```
-
-b) Identify your CustomSettingsSSMParameterName property name using CloudFormation and then open the AWS Systems 
-Manager console and navigate to ParameterStore. Filter the list using your custom property name name. Open and Edit the parameter. 
-
-Set the value to be the following and save the changes. Be careful if you already have existing key/value pairs in
-this property. If you do have existing key/value apirs, be sure to add the key and value as a new attribute of the object. 
-
-```
-{"ENABLE_MULTI_LANGUAGE_SUPPORT":true}
-```
 
 Step 2) Use the Designer UI to import the Sample/Extension named Language / Multiple Language Support.
 

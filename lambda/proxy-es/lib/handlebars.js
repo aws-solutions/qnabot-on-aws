@@ -77,7 +77,7 @@ Handlebars.registerHelper('defaultLang', function (options) {
 });
 
 Handlebars.registerHelper('setLang', function (lang, last, options) {
-    if (_.get(req_glbl._settings, 'ENABLE_MULTI_LANGUAGE_SUPPORT') === true) {
+    if (_.get(req_glbl._settings, 'ENABLE_MULTI_LANGUAGE_SUPPORT', "false").toLowerCase() === "true") {
         const userPreferredLocaleKey = 'session.userPreferredLocale';
         const userLocaleKey = 'session.userLocale';
         const currentPreferredLocale = _.get(res_glbl, userPreferredLocaleKey);
