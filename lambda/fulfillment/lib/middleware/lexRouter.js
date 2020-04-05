@@ -42,15 +42,14 @@ async function handleRequest(req, res, botName, botAlias) {
         return bName ? bName : botName;
     }
 
-    let tempBotUserID = _.get(req,"_event.userId");
-    tempBotUserID = tempBotUserID ? tempBotUserID : _.get(res,"session.sessionId");
-    tempBotUserID = tempBotUserID ? tempBotUserID : Math.floor(Date.now() * 1000).toString();
+    let tempBotUserID = _.get(req,"_userInfo.UserId","nouser");
+    tempBotUserID = tempBotUserID.substring(0, 100); // Lex has max userId length of 100
     const lexClient = new AWS.LexRuntime({apiVersion: '2016-11-28'});
     const params = {
         botAlias: botAlias,
         botName: mapFromSimpleName(botName),
         inputText: _.get(req,"question"),
-        userId: tempBotUserID
+        userId: tempBotUserID,
     };
     console.log("Lex parameters: " + JSON.stringify(params));
     const response = await lexClientRequester(lexClient,params);
