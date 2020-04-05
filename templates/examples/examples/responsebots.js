@@ -4,8 +4,10 @@
  *
  * Warning : Important Note: If you update an Intent or a SlotType, it is mandatory to update the description
  * in the associated Bot. Failure to do so when running an update will leave the bot in the NOT_BUILT state and you
- * will need to rebuild in the AWS Console.
+ * will need to rebuild in the AWS Console. To update description for all bots, change botDateVersion string below.
  */
+const botDateVersion = "04/05/2020 v2";  // CHANGE ME TO FORCE BOT REBUILD
+
 var _ = require('lodash');
 
 var config={
@@ -99,7 +101,7 @@ exports.resources={
             }
           ]
         },
-        "description": "QNA Custom Yes/No elicit response bot"
+        "description": "QNA Custom Yes or No elicit response bot - " + botDateVersion,
       }
     },
     "YesNoAlias": {
@@ -141,7 +143,7 @@ exports.resources={
                 maxAttempts: 1,
                 messages: [
                     {
-                        content: "Is {date} correct (Yes/No)?",
+                        content: "Is {date} correct (Yes or No)?",
                         contentType: "PlainText"
                     }
                 ]
@@ -205,7 +207,8 @@ exports.resources={
                         "contentType": "PlainText"
                     }
                 ]
-            }
+            },
+            "description": "QNADate response bot - " + botDateVersion,
         }
     },
     "DateAlias": {
@@ -244,7 +247,7 @@ exports.resources={
                 maxAttempts: 1,
                 messages: [
                     {
-                        content: "Is {DayOfWeek} correct (Yes/No)?",
+                        content: "Is {DayOfWeek} correct (Yes or No)?",
                         contentType: "PlainText"
                     }
                 ]
@@ -308,7 +311,8 @@ exports.resources={
                         "contentType": "PlainText"
                     }
                 ]
-            }
+            },
+            "description": "QNADayOfWeek response bot - " + botDateVersion,
         }
     },
     "DayOfWeekAlias": {
@@ -346,7 +350,7 @@ exports.resources={
                 maxAttempts: 1,
                 messages: [
                     {
-                        content: "Is {Month} correct (Yes/No)?",
+                        content: "Is {Month} correct (Yes or No)?",
                         contentType: "PlainText"
                     }
                 ]
@@ -410,7 +414,8 @@ exports.resources={
                         "contentType": "PlainText"
                     }
                 ]
-            }
+            },
+            "description": "QNAMonth response bot - " + botDateVersion,
         }
     },
     "MonthAlias": {
@@ -447,7 +452,7 @@ exports.resources={
                 maxAttempts: 1,
                 messages: [
                     {
-                        content: "Is {Number} correct (Yes/No)?",
+                        content: "Is {Number} correct (Yes or No)?",
                         contentType: "PlainText"
                     }
                 ]
@@ -511,7 +516,8 @@ exports.resources={
                         "contentType": "PlainText"
                     }
                 ]
-            }
+            },
+            "description": "QNANumber response bot - " + botDateVersion,
         }
     },
     "NumberAlias": {
@@ -556,7 +562,7 @@ exports.resources={
                 maxAttempts: 1,
                 messages: [
                     {
-                        content: "Is {Age} correct (Yes/No)?",
+                        content: "Is {Age} correct (Yes or No)?",
                         contentType: "PlainText"
                     }
                 ]
@@ -620,7 +626,8 @@ exports.resources={
                         "contentType": "PlainText"
                     }
                 ]
-            }
+            },
+            "description": "QNAAge response bot - " + botDateVersion,
         }
     },
     "AgeAlias": {
@@ -657,7 +664,10 @@ exports.resources={
                 maxAttempts: 1,
                 messages: [
                     {
-                        content: "Is {PhoneNumber} correct (Yes/No)?",
+                        // QnABot always uses postText to interact with response bot, however, it supports embedded SSML tags in
+                        // the confirmation prompt so that speech back to Alexa or Lex client in postContent mode.
+                        // SSML tags are automatically stripped by QnABot for text mode clients.
+                        content: '<speak>Is <say-as interpret-as="telephone">{PhoneNumber}</say-as> correct (Yes or No)?</speak>',
                         contentType: "PlainText"
                     }
                 ]
@@ -721,7 +731,8 @@ exports.resources={
                         "contentType": "PlainText"
                     }
                 ]
-            }
+            },
+            "description": "QNAPhoneNumber response bot - " + botDateVersion,
         }
     },
     "PhoneNumberAlias": {
@@ -758,7 +769,7 @@ exports.resources={
                 maxAttempts: 1,
                 messages: [
                     {
-                        content: "Is {Time} correct (Yes/No)?",
+                        content: "Is {Time} correct (Yes or No)?",
                         contentType: "PlainText"
                     }
                 ]
@@ -822,7 +833,8 @@ exports.resources={
                         "contentType": "PlainText"
                     }
                 ]
-            }
+            },
+            "description": "QNATime response bot - " + botDateVersion,
         }
     },
     "TimeAlias": {
@@ -858,7 +870,7 @@ exports.resources={
                 maxAttempts: 1,
                 messages: [
                     {
-                        content: "Is {EmailAddress} correct (Yes/No)?",
+                        content: "Is {EmailAddress} correct (Yes or No)?",
                         contentType: "PlainText"
                     }
                 ]
@@ -922,7 +934,8 @@ exports.resources={
                         "contentType": "PlainText"
                     }
                 ]
-            }
+            },
+            "description": "QNAEmailAddress response bot - " + botDateVersion,
         }
     },
     "EmailAddressAlias": {
@@ -963,7 +976,7 @@ exports.resources={
                 maxAttempts: 1,
                 messages: [
                     {
-                        content: "Did I get your name right (Yes/No) {FirstName} {LastName}?",
+                        content: "Did I get your name right (Yes or No) {FirstName} {LastName}?",
                         contentType: "PlainText"
                     }
                 ]
@@ -1042,7 +1055,8 @@ exports.resources={
                         "contentType": "PlainText"
                     }
                 ]
-            }
+            },
+            "description": "QNAName response bot - " + botDateVersion,
         }
     },
     "NameAlias": {

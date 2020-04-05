@@ -83,15 +83,22 @@ async function processResponse(req, res, hook, msg) {
 
     let botResp = await handleRequest(req, res, hook, "$LATEST");
     console.log("botResp: " + JSON.stringify(botResp,null,2));
+    var plainMessage = undefined;
+    var ssmlMessage = undefined;
+    // if messsage contains SSML tags, strip for plain text, but preserve for SSML 
+    if (botResp.message) {
+        plainMessage = botResp.message.replace(/<\/?[^>]+(>|$)/g, "");
+        ssmlMessage = botResp.message  ;        
+    }
     let elicitResponseLoopCount =_.get(res,"session.elicitResponseLoopCount");
     if (botResp.dialogState === 'ConfirmIntent') {
         res.session.elicitResponseProgress = 'ConfirmIntent';
-        if (botResp.message) {
-            res.message = botResp.message;
-            res.plainMessage = botResp.message;
+        res.plainMessage = plainMessage;                
+        if (req._event.outputDialogMode !== "Text") {
+            res.type = "SSML";
+            res.message = ssmlMessage;
         } else {
-            res.message = undefined;
-            res.plainMessage = undefined;
+            res.message = plainMessage;
         }
         res.card = {
             "send": true,
