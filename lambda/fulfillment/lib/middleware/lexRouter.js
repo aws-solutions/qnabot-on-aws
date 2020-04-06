@@ -107,18 +107,19 @@ async function processResponse(req, res, hook, msg) {
 
     let botResp = await handleRequest(req, res, hook, "$LATEST");
     console.log("botResp: " + JSON.stringify(botResp,null,2));
-    var plainMessage = undefined;
+    var plainMessage = botResp.message;
     var ssmlMessage = undefined;
-    // if messsage contains SSML tags, strip for plain text, but preserve for SSML 
-    if (botResp.message) {
-        plainMessage = botResp.message.replace(/<\/?[^>]+(>|$)/g, "");
+    // if messsage contains SSML tags, strip tags for plain text, but preserve tags for SSML 
+    if (plainMessage && plainMessage.includes("<speak>")) {
         ssmlMessage = botResp.message  ;        
+        plainMessage = plainMessage.replace(/<\/?[^>]+(>|$)/g, "");
     }
     let elicitResponseLoopCount =_.get(res,"session.elicitResponseLoopCount");
     if (botResp.dialogState === 'ConfirmIntent') {
         res.session.elicitResponseProgress = 'ConfirmIntent';
-        res.plainMessage = plainMessage;                
-        if (req._event.outputDialogMode !== "Text") {
+        res.plainMessage = plainMessage;      
+        // if SSML tags were present, and we're not in text client mode, build SSML response
+        if (ssmlMessage && req._event.outputDialogMode !== "Text") {
             res.type = "SSML";
             res.message = ssmlMessage;
         } else {
