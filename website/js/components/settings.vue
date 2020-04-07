@@ -76,6 +76,7 @@ module.exports={
         let customOverride = {};
         let response = await this.$store.dispatch('api/updateSettings', customOverride);
         if(response) {
+          this.customSettings = {};
           this.settingsHolder = _.clone(this.defaultSettings);
           this.successAlert = true;
           window.scrollTo(0,0);
