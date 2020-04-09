@@ -101,8 +101,11 @@ Handlebars.registerHelper('setLang', function (lang, last, options) {
 
         if (userLanguageCode && lang == userLanguageCode) {
             console.log("setting: ", options.fn(this));
-            console.log("Setting res session attribute:", "session.userPreferredLocale", " Value:", userLanguageCode);
+            console.log("Setting req & res session attribute:", "session.userPreferredLocale", " Value:", userLanguageCode);
             _.set(res_glbl, userPreferredLocaleKey, userLanguageCode);
+            _.set(req_glbl, userPreferredLocaleKey, userLanguageCode);
+            _.set(res_glbl, userLocaleKey, userLanguageCode);
+            _.set(req_glbl, userLocaleKey, userLanguageCode);
             return options.fn(this);
         } else if ((last === true) && (_.get(res_glbl, userPreferredLocaleKey) !== userLanguageCode) && !errorFound) {
             return languageErrorMessages[errorLocale].errorMessage;

@@ -40,6 +40,9 @@ module.exports={
     "Intent":{
         "Value":{"Ref":"Intent"}
     },
+    "IntentFallback":{
+        "Value":{"Ref":"IntentFallback"}
+    },
     "DashboardURL":{
         "Value":{"Fn::Join":["",[
             "https://console.aws.amazon.com/cloudwatch/home?",
