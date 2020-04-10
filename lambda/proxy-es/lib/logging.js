@@ -16,16 +16,34 @@ module.exports=function(req,res){
     // need to unwrap the request and response objects we actually want from the req object
     var unwrappedReq =req.req
     var unwrappedRes =req.res
-    var jsonData = {
-        entireRequest:unwrappedReq,
-        entireResponse:unwrappedRes,
-        qid:_.get(unwrappedRes.result,"qid"),
-        utterance: String(unwrappedReq.question).toLowerCase().replace(/[\u2000-\u206F\u2E00-\u2E7F\\'!"#$%&()*+,\-.\/:;<=>?@\[\]^_`{|}~]/g,""),
-        answer:_.get(unwrappedRes,"message"),
-        topic:_.get(unwrappedRes.result,"t",""),
-        clientType:unwrappedReq._type,
-        datetime:now
+    let jsonData = {};
+
+    if (process.env.DISABLE_REDACT) {
+        jsonData = {
+            entireRequest: unwrappedReq,
+            entireResponse: unwrappedRes,
+            qid: _.get(unwrappedRes.result, "qid"),
+            utterance: String(unwrappedReq.question).toLowerCase().replace(/[\u2000-\u206F\u2E00-\u2E7F\\'!"#$%&()*+,\-.\/:;<=>?@\[\]^_`{|}~]/g, ""),
+            answer: _.get(unwrappedRes, "message"),
+            topic: _.get(unwrappedRes.result, "t", ""),
+            clientType: unwrappedReq._type,
+            datetime: now
+        }
+    } else {
+        let unWrappedReqText = JSON.stringify(unwrappedReq).replace(/\b[0-9\.\-\,]{2,}\b/g, 'XXXXX');
+        let unWrappedResponseText = JSON.stringify(unwrappedRes).replace(/\b[0-9\.\-\,]{2,}\b/g, 'XXXXX');
+        jsonData = {
+            entireRequest: { "value": unWrappedReqText},
+            entireResponse: { "value": unWrappedResponseText},
+            qid: _.get(unwrappedRes.result, "qid"),
+            utterance: String(unwrappedReq.question).toLowerCase().replace(/\b[0-9\.\-\,]{2,}\b/g, 'XXXXX').replace(/[\u2000-\u206F\u2E00-\u2E7F\\'!"#$%&()*+,\-.\/:;<=>?@\[\]^_`{|}~]/g, ""),
+            answer: _.get(unwrappedRes, "message").replace(/\b[0-9\.\-\,]{2,}\b/g, 'XXXXX'),
+            topic: _.get(unwrappedRes.result, "t", ""),
+            clientType: unwrappedReq._type,
+            datetime: now
+        }
     }
+
     // encode to base64 string to put into firehose and
     // append new line for proper downstream kinesis processing in kibana and/or athena queries over s3
     var objJsonStr = JSON.stringify(jsonData) + '\n';

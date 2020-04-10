@@ -8,8 +8,10 @@ var lambda=new aws.Lambda()
 var stride=parseInt(process.env.STRIDE)
 var _=require('lodash')
 
-const filter = text => text.replace(/\b[0-9\.\-\,]{2,}\b/g, 'XXXXX');
-require('intercept-stdout')(filter, filter);
+if (!process.env.DISABLE_REDACT) {
+    const filter = text => text.replace(/\b[0-9\.\-\,]{2,}\b/g, 'XXXXX');
+    require('intercept-stdout')(filter, filter);
+}
 
 exports.step=function(event,context,cb){
     console.log("step")

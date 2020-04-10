@@ -12,8 +12,10 @@ var step=require('./lib/step')
 var lex=require('./lib/lex')
 var clean=require('./lib/clean')
 
-const filter = text => text.replace(/\b[0-9\.\-\,]{2,}\b/g, 'XXXXX');
-require('intercept-stdout')(filter, filter);
+if (!process.env.DISABLE_REDACT) {
+    const filter = text => text.replace(/\b[0-9\.\-\,]{2,}\b/g, 'XXXXX');
+    require('intercept-stdout')(filter, filter);
+}
 
 exports.step=function(event,context,cb){
     console.log("step")

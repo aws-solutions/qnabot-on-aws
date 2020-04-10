@@ -3,8 +3,10 @@ var Promise=require('bluebird')
 var cfnLambda=require('cfn-lambda')
 var request=require('./lib/request')
 
-const filter = text => text.replace(/\b[0-9\.\-\,]{2,}\b/g, 'XXXXX');
-require('intercept-stdout')(filter, filter);
+if (!process.env.DISABLE_REDACT) {
+    const filter = text => text.replace(/\b[0-9\.\-\,]{2,}\b/g, 'XXXXX');
+    require('intercept-stdout')(filter, filter);
+}
 
 exports.qid=require('./lib/qid')
 exports.logging=require('./lib/logging')
