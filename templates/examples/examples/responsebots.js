@@ -6,7 +6,7 @@
  * in the associated Bot. Failure to do so when running an update will leave the bot in the NOT_BUILT state and you
  * will need to rebuild in the AWS Console. To update description for all bots, change botDateVersion string below.
  */
-const botDateVersion = "04/05/2020 v2";  // CHANGE ME TO FORCE BOT REBUILD
+const botDateVersion = "04/09/2020 v2";  // CHANGE ME TO FORCE BOT REBUILD
 
 var _ = require('lodash');
 
@@ -18,6 +18,437 @@ var config={
 };
 
 exports.resources={
+    "WageSlotType":{
+        "Type": "Custom::LexSlotType",
+        "Properties": {
+            "ServiceToken": {"Ref": "CFNLambda"},
+            "name":{"Fn::Sub":"QNAWageSlotType-${AWS::StackName}"},
+            "parentSlotTypeSignature": "AMAZON.AlphaNumeric",
+            "slotTypeConfigurations": [
+                {
+                    "regexConfiguration": {
+                        "pattern" : "[0-9]{1,5}" 
+                    }
+                }
+            ]
+        }
+    },
+    "QNAWage": {
+        "Type": "Custom::LexBot",
+        "DependsOn": "WageIntent",
+        "Properties": {
+            "ServiceToken": {"Ref": "CFNLambda"},
+            "name":{"Fn::Sub":"QNAWageBot-${AWS::StackName}"},
+            "locale": "en-US",
+            "voiceId": config.voiceId,
+            "childDirected": false,
+            "intents": [
+                {"intentName": {"Ref": "WageIntent"},"intentVersion": "$LATEST"},
+            ],
+            "clarificationPrompt": {
+                "messages": [
+                    {
+                        "contentType": "PlainText",
+                        "content": "Please repeat your wage."
+                    }
+                ],
+                "maxAttempts": 3
+            },
+            "abortStatement": {
+                "messages": [
+                    {
+                        "content": config.Abort,
+                        "contentType": "PlainText"
+                    }
+                ]
+            }
+        }
+    },
+    "WageIntent": {
+        "Type": "Custom::LexIntent",
+        "Properties": {
+            "ServiceToken": {"Ref": "CFNLambda"},
+            "name":{"Fn::Sub":"QNAWageIntent-${AWS::StackName}"},
+            "sampleUtterances": [
+                "My salary is {Wage}",
+                "I made {SSN}",
+                "My wage is {Wage}",
+                "{Wage}"
+            ],
+            conclusionStatement: {
+                messages: [
+                    {
+                        content: "OK. ",
+                        contentType: "PlainText"
+                    }
+                ],
+            },
+            confirmationPrompt: {
+                maxAttempts: 1,
+                messages: [
+                    {
+                        content: "Is {Wage} correct (Yes/No)?",
+                        contentType: "PlainText"
+                    }
+                ]
+            },
+            rejectionStatement: {
+                messages: [
+                    {
+                        content: "Please let me what your wage was again?",
+                        contentType: "PlainText"
+                    }
+                ]
+            },
+            description: "Parse wage responses.",
+            fulfillmentActivity: {
+                type: "ReturnIntent"
+            },
+            "slots": [
+              {
+                "name":"Wage",
+                "slotType":{"Ref":"WageSlotType"},
+                "slotTypeVersion":"$LATEST",
+                "slotConstraint": "Required",
+                "valueElicitationPrompt": {
+                  "messages": [
+                    {
+                      "contentType": "PlainText",
+                      "content": "What is your wage?"
+                    }
+                  ],
+                  "maxAttempts": 2
+                },
+                "priority": 1,
+              }
+            ],
+        },
+    },
+
+    //social-security responseBot
+    "SocialSecuritySlotType":{
+        "Type": "Custom::LexSlotType",
+        "Properties": {
+            "ServiceToken": {"Ref": "CFNLambda"},
+            "name":{"Fn::Sub":"QNASocialSecuritySlotType-${AWS::StackName}"},
+            "parentSlotTypeSignature": "AMAZON.AlphaNumeric",
+            "slotTypeConfigurations": [
+                {
+                    "regexConfiguration": {
+                        "pattern" : "[0-9]{3}-[0-9]{2}-[0-9]{4}" 
+                    }
+                }
+            ]
+        }
+    },
+    "QNASocialSecurity": {
+        "Type": "Custom::LexBot",
+        "DependsOn": "SocialSecurityIntent",
+        "Properties": {
+            "ServiceToken": {"Ref": "CFNLambda"},
+            "name":{"Fn::Sub":"QNASocialSecurityBot-${AWS::StackName}"},
+            "locale": "en-US",
+            "voiceId": config.voiceId,
+            "childDirected": false,
+            "intents": [
+                {"intentName": {"Ref": "SocialSecurityIntent"},"intentVersion": "$LATEST"},
+            ],
+            "clarificationPrompt": {
+                "messages": [
+                    {
+                        "contentType": "PlainText",
+                        "content": "Please repeat your social security number."
+                    }
+                ],
+                "maxAttempts": 3
+            },
+            "abortStatement": {
+                "messages": [
+                    {
+                        "content": config.Abort,
+                        "contentType": "PlainText"
+                    }
+                ]
+            }
+        }
+    },
+    "SocialSecurityIntent": {
+        "Type": "Custom::LexIntent",
+        "Properties": {
+            "ServiceToken": {"Ref": "CFNLambda"},
+            "name":{"Fn::Sub":"QNASocialSecurityIntent-${AWS::StackName}"},
+            "sampleUtterances": [
+                "The social security number is {SSN}",
+                "My social security number is {SSN}",
+                "It is {SSN}",
+                "{SSN}"
+            ],
+            conclusionStatement: {
+                messages: [
+                    {
+                        content: "OK. ",
+                        contentType: "PlainText"
+                    }
+                ],
+            },
+            confirmationPrompt: {
+                maxAttempts: 1,
+                messages: [
+                    {
+                        content: "Is {SSN} correct (Yes/No)?",
+                        contentType: "PlainText"
+                    }
+                ]
+            },
+            rejectionStatement: {
+                messages: [
+                    {
+                        content: "Please let me know the social security number again?",
+                        contentType: "PlainText"
+                    }
+                ]
+            },
+            description: "Parse social security responses.",
+            fulfillmentActivity: {
+                type: "ReturnIntent"
+            },
+            "slots": [
+              {
+                "name":"SSN",
+                "slotType":{"Ref":"SocialSecuritySlotType"},
+                "slotTypeVersion":"$LATEST",
+                "slotConstraint": "Required",
+                "valueElicitationPrompt": {
+                  "messages": [
+                    {
+                      "contentType": "PlainText",
+                      "content": "What is your social security number?"
+                    }
+                  ],
+                  "maxAttempts": 2
+                },
+                "priority": 1,
+              }
+            ],
+        },
+    },
+
+    //Pin responseBot
+    "PinSlotType":{
+        "Type": "Custom::LexSlotType",
+        "Properties": {
+            "ServiceToken": {"Ref": "CFNLambda"},
+            "name":{"Fn::Sub":"QNAPinSlotType-${AWS::StackName}"},
+            "parentSlotTypeSignature": "AMAZON.AlphaNumeric",
+            "slotTypeConfigurations": [
+                {
+                    "regexConfiguration": {
+                        "pattern" : "[0-9]{4}" 
+                    }
+                }
+            ]
+        }
+    },
+    "QNAPin": {
+        "Type": "Custom::LexBot",
+        "DependsOn": "PinIntent",
+        "Properties": {
+            "ServiceToken": {"Ref": "CFNLambda"},
+            "name":{"Fn::Sub":"QNAPinBot-${AWS::StackName}"},
+            "locale": "en-US",
+            "voiceId": config.voiceId,
+            "childDirected": false,
+            "intents": [
+                {"intentName": {"Ref": "PinIntent"},"intentVersion": "$LATEST"},
+            ],
+            "clarificationPrompt": {
+                "messages": [
+                    {
+                        "contentType": "PlainText",
+                        "content": "Please repeat your pin number."
+                    }
+                ],
+                "maxAttempts": 3
+            },
+            "abortStatement": {
+                "messages": [
+                    {
+                        "content": config.Abort,
+                        "contentType": "PlainText"
+                    }
+                ]
+            }
+        }
+    },
+    "PinIntent": {
+        "Type": "Custom::LexIntent",
+        "Properties": {
+            "ServiceToken": {"Ref": "CFNLambda"},
+            "name":{"Fn::Sub":"QNAPinIntent-${AWS::StackName}"},
+            "sampleUtterances": [
+                "The pin number is {Pin}",
+                "My pin number is {Pin}",
+                "It is {Pin}",
+                "{Pin}"
+            ],
+            conclusionStatement: {
+                messages: [
+                    {
+                        content: "OK. ",
+                        contentType: "PlainText"
+                    }
+                ],
+            },
+            confirmationPrompt: {
+                maxAttempts: 1,
+                messages: [
+                    {
+                        content: "Is {Pin} correct (Yes/No)?",
+                        contentType: "PlainText"
+                    }
+                ]
+            },
+            rejectionStatement: {
+                messages: [
+                    {
+                        content: "Please let me know the pin number again?",
+                        contentType: "PlainText"
+                    }
+                ]
+            },
+            description: "Parse pin responses.",
+            fulfillmentActivity: {
+                type: "ReturnIntent"
+            },
+            "slots": [
+              {
+                "name":"Pin",
+                "slotType":{"Ref":"PinSlotType"},
+                "slotTypeVersion":"$LATEST",
+                "slotConstraint": "Required",
+                "valueElicitationPrompt": {
+                  "messages": [
+                    {
+                      "contentType": "PlainText",
+                      "content": "What is your pin number?"
+                    }
+                  ],
+                  "maxAttempts": 2
+                },
+                "priority": 1,
+              }
+            ],
+        },
+    },
+
+
+    //BYE code responseBot
+    "ByeCodeSlotType":{
+        "Type": "Custom::LexSlotType",
+        "Properties": {
+            "ServiceToken": {"Ref": "CFNLambda"},
+            "name":{"Fn::Sub":"QNAByeCodeSlotType-${AWS::StackName}"},
+            "parentSlotTypeSignature": "AMAZON.AlphaNumeric",
+            "slotTypeConfigurations": [
+                {
+                    "regexConfiguration": {
+                        "pattern" : "[0-9]{2}" 
+                    }
+                }
+            ]
+        }
+    },
+    "QNAByeCode": {
+        "Type": "Custom::LexBot",
+        "DependsOn": "ByeCodeIntent",
+        "Properties": {
+            "ServiceToken": {"Ref": "CFNLambda"},
+            "name":{"Fn::Sub":"QNAByeCodeBot-${AWS::StackName}"},
+            "locale": "en-US",
+            "voiceId": config.voiceId,
+            "childDirected": false,
+            "intents": [
+                {"intentName": {"Ref": "ByeCodeIntent"},"intentVersion": "$LATEST"},
+            ],
+            "clarificationPrompt": {
+                "messages": [
+                    {
+                        "contentType": "PlainText",
+                        "content": "Please repeat your BYE code."
+                    }
+                ],
+                "maxAttempts": 3
+            },
+            "abortStatement": {
+                "messages": [
+                    {
+                        "content": config.Abort,
+                        "contentType": "PlainText"
+                    }
+                ]
+            }
+        }
+    },
+    "ByeCodeIntent": {
+        "Type": "Custom::LexIntent",
+        "Properties": {
+            "ServiceToken": {"Ref": "CFNLambda"},
+            "name":{"Fn::Sub":"QNAByeCodeIntent-${AWS::StackName}"},
+            "sampleUtterances": [
+                "The bye code is {ByeCode}",
+                "My bye code is {ByeCode}",
+                "It is {ByeCode}",
+                "{ByeCode}"
+            ],
+            conclusionStatement: {
+                messages: [
+                    {
+                        content: "OK. ",
+                        contentType: "PlainText"
+                    }
+                ],
+            },
+            confirmationPrompt: {
+                maxAttempts: 1,
+                messages: [
+                    {
+                        content: "Is {ByeCode} correct (Yes/No)?",
+                        contentType: "PlainText"
+                    }
+                ]
+            },
+            rejectionStatement: {
+                messages: [
+                    {
+                        content: "Please let me know the BYE code again?",
+                        contentType: "PlainText"
+                    }
+                ]
+            },
+            description: "Parse BYE code responses.",
+            fulfillmentActivity: {
+                type: "ReturnIntent"
+            },
+            "slots": [
+              {
+                "name":"ByeCode",
+                "slotType":{"Ref":"ByeCodeSlotType"},
+                "slotTypeVersion":"$LATEST",
+                "slotConstraint": "Required",
+                "valueElicitationPrompt": {
+                  "messages": [
+                    {
+                      "contentType": "PlainText",
+                      "content": "What is your BYE code?"
+                    }
+                  ],
+                  "maxAttempts": 2
+                },
+                "priority": 1,
+              }
+            ],
+        },
+    },
     // Yes_No ResponseBot
     "YesNoSlotType":{
         "Type": "Custom::LexSlotType",
@@ -26,7 +457,7 @@ exports.resources={
             "name":{"Fn::Sub":"QNAYesNoSlotType-${AWS::StackName}"},
             "valueSelectionStrategy": "TOP_RESOLUTION",
             "enumerationValues": [
-                {"value":"Yes", "synonyms":["OK","Yeah","Sure","Yep","Affirmative","Si","Oui"]},
+                {"value":"Yes", "synonyms":["OK","Yeah","Sure","Yep","Affirmative","aye"]},
                 {"value":"No", "synonyms":["Nope","Na","Negative","Non"]}
               ]
         }
@@ -1074,7 +1505,9 @@ exports.resources={
 
 
 exports.names=[
-  "QNAYesNo", "QNADate", "QNADayOfWeek", "QNAMonth", "QNANumber", "QNAAge","QNAPhoneNumber", "QNATime", "QNAEmailAddress", "QNAName"
+  "QNAYesNo", "QNADate", "QNADayOfWeek", "QNAMonth", "QNANumber",
+  "QNAAge","QNAPhoneNumber", "QNATime", "QNAEmailAddress", "QNAName",
+  "QNAWage","QNASocialSecurity","QNAByeCode","QNAPin"
 ] ;
 
 

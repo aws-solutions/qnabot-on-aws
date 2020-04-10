@@ -13,6 +13,10 @@ License for the specific language governing permissions and limitations under th
 var lib='./lib/middleware'
 var router=new (require('./lib/router'))()
 var fs=require('fs')
+
+const filter = text => text.replace(/\b[0-9\.\-\,]{2,}\b/g, 'XXXXX');
+require('intercept-stdout')(filter, filter);
+
 var middleware=fs.readdirSync(`${__dirname}/${lib}`)
     .filter(name=>name.match(/\d*_.*\.js/))
     .sort()
