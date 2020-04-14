@@ -138,10 +138,15 @@ See the [LICENSE.md](LICENSE.md) file for details
 
 ## New features
 
+### Improved Scale
+This release of QnABot utilizes Lex Bot aliases and Lex versioning. The QnA Bot and all ElicitResponse Bots are
+now installed using the alias 'live'. 'live' points at the 'Latest' Bot version. All Lex resources are now
+versioned starting with '1' after initial installation.
+
 ### Configuring QnABot to ask the questions
 QnABot was designed to answer questions, but now it can also ask questions and process 
 the user’s answers. Use this feature for data collection and validation; 
-o implement surveys, quizzes, personalized recommendations; or to build a triage 
+or implement surveys, quizzes, personalized recommendations; or to build a triage 
 chatbot application. See the [blog post](https://aws.amazon.com/blogs/machine-learning/creating-a-question-and-answer-bot-with-amazon-lex-and-amazon-alexa/) for details about this new feature. 
 This feature is know as ElicitResponse from a configuration perspective.
 

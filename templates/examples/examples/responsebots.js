@@ -6,7 +6,7 @@
  * in the associated Bot. Failure to do so when running an update will leave the bot in the NOT_BUILT state and you
  * will need to rebuild in the AWS Console. To update description for all bots, change botDateVersion string below.
  */
-const botDateVersion = "04/09/2020 v2";  // CHANGE ME TO FORCE BOT REBUILD
+const botDateVersion = "QnABot 3.0.1 - 04/13/2020 v2";  // CHANGE ME TO FORCE BOT REBUILD
 
 var _ = require('lodash');
 
@@ -23,6 +23,8 @@ exports.resources={
         "Properties": {
             "ServiceToken": {"Ref": "CFNLambda"},
             "name":{"Fn::Sub":"QNAWageSlotType-${AWS::StackName}"},
+            "createVersion" : true,
+            "description": "QNA Wage Slot Type - " + botDateVersion,
             "parentSlotTypeSignature": "AMAZON.AlphaNumeric",
             "slotTypeConfigurations": [
                 {
@@ -42,8 +44,9 @@ exports.resources={
             "locale": "en-US",
             "voiceId": config.voiceId,
             "childDirected": false,
+            "createVersion": true,
             "intents": [
-                {"intentName": {"Ref": "WageIntent"},"intentVersion": "$LATEST"},
+                {"intentName": {"Ref": "WageIntent"}},
             ],
             "clarificationPrompt": {
                 "messages": [
@@ -61,7 +64,8 @@ exports.resources={
                         "contentType": "PlainText"
                     }
                 ]
-            }
+            },
+            "description": "QNA Wage elicit response - " + botDateVersion,
         }
     },
     "WageIntent": {
@@ -69,9 +73,10 @@ exports.resources={
         "Properties": {
             "ServiceToken": {"Ref": "CFNLambda"},
             "name":{"Fn::Sub":"QNAWageIntent-${AWS::StackName}"},
+            "createVersion": true,
+            "description": "QNA Wage Intent - " + botDateVersion,
             "sampleUtterances": [
                 "My salary is {Wage}",
-                "I made {SSN}",
                 "My wage is {Wage}",
                 "{Wage}"
             ],
@@ -108,7 +113,7 @@ exports.resources={
               {
                 "name":"Wage",
                 "slotType":{"Ref":"WageSlotType"},
-                "slotTypeVersion":"$LATEST",
+                "slotTypeVersion":"QNABOT-AUTO-ASSIGNED",
                 "slotConstraint": "Required",
                 "valueElicitationPrompt": {
                   "messages": [
@@ -124,13 +129,24 @@ exports.resources={
             ],
         },
     },
-
-    //social-security responseBot
+    "WageAlias": {
+        "Type": "Custom::LexAlias",
+        "Properties": {
+            "ServiceToken": {"Ref": "CFNLambda"},
+            "botName": {
+                "Ref": "QNAWage"
+            },
+            "name": "live",
+            "description": "QNA Wage Alias - " + botDateVersion
+        }
+    },
     "SocialSecuritySlotType":{
         "Type": "Custom::LexSlotType",
         "Properties": {
             "ServiceToken": {"Ref": "CFNLambda"},
             "name":{"Fn::Sub":"QNASocialSecuritySlotType-${AWS::StackName}"},
+            "createVersion": true,
+            "description": "QNA Social Security Slot Type - " + botDateVersion,
             "parentSlotTypeSignature": "AMAZON.AlphaNumeric",
             "slotTypeConfigurations": [
                 {
@@ -150,8 +166,9 @@ exports.resources={
             "locale": "en-US",
             "voiceId": config.voiceId,
             "childDirected": false,
+            "createVersion": true,
             "intents": [
-                {"intentName": {"Ref": "SocialSecurityIntent"},"intentVersion": "$LATEST"},
+                {"intentName": {"Ref": "SocialSecurityIntent"}},
             ],
             "clarificationPrompt": {
                 "messages": [
@@ -169,7 +186,8 @@ exports.resources={
                         "contentType": "PlainText"
                     }
                 ]
-            }
+            },
+            "description": "QNA Social Security elicit response - " + botDateVersion,
         }
     },
     "SocialSecurityIntent": {
@@ -177,6 +195,8 @@ exports.resources={
         "Properties": {
             "ServiceToken": {"Ref": "CFNLambda"},
             "name":{"Fn::Sub":"QNASocialSecurityIntent-${AWS::StackName}"},
+            "createVersion": true,
+            "description": "QNA Social Security Intent - " + botDateVersion,
             "sampleUtterances": [
                 "The social security number is {SSN}",
                 "My social security number is {SSN}",
@@ -208,7 +228,6 @@ exports.resources={
                     }
                 ]
             },
-            description: "Parse social security responses.",
             fulfillmentActivity: {
                 type: "ReturnIntent"
             },
@@ -216,7 +235,7 @@ exports.resources={
               {
                 "name":"SSN",
                 "slotType":{"Ref":"SocialSecuritySlotType"},
-                "slotTypeVersion":"$LATEST",
+                "slotTypeVersion":"QNABOT-AUTO-ASSIGNED",
                 "slotConstraint": "Required",
                 "valueElicitationPrompt": {
                   "messages": [
@@ -232,14 +251,25 @@ exports.resources={
             ],
         },
     },
-
-    //Pin responseBot
+    "SocialSecurityAlias": {
+        "Type": "Custom::LexAlias",
+        "Properties": {
+            "ServiceToken": {"Ref": "CFNLambda"},
+            "botName": {
+                "Ref": "QNASocialSecurity"
+            },
+            "name": "live",
+            "description": "QNA Social Security Alias - " + botDateVersion
+        }
+    },
     "PinSlotType":{
         "Type": "Custom::LexSlotType",
         "Properties": {
             "ServiceToken": {"Ref": "CFNLambda"},
             "name":{"Fn::Sub":"QNAPinSlotType-${AWS::StackName}"},
+            "description": "QNA Pin Slot Type - " + botDateVersion,
             "parentSlotTypeSignature": "AMAZON.AlphaNumeric",
+            "createVersion": true,
             "slotTypeConfigurations": [
                 {
                     "regexConfiguration": {
@@ -258,8 +288,9 @@ exports.resources={
             "locale": "en-US",
             "voiceId": config.voiceId,
             "childDirected": false,
+            "createVersion": true,
             "intents": [
-                {"intentName": {"Ref": "PinIntent"},"intentVersion": "$LATEST"},
+                {"intentName": {"Ref": "PinIntent"}},
             ],
             "clarificationPrompt": {
                 "messages": [
@@ -277,7 +308,8 @@ exports.resources={
                         "contentType": "PlainText"
                     }
                 ]
-            }
+            },
+            "description": "QNA Pin elicit response - " + botDateVersion,
         }
     },
     "PinIntent": {
@@ -285,6 +317,8 @@ exports.resources={
         "Properties": {
             "ServiceToken": {"Ref": "CFNLambda"},
             "name":{"Fn::Sub":"QNAPinIntent-${AWS::StackName}"},
+            "description": "QNA Pin Intent - " + botDateVersion,
+            "createVersion": true,
             "sampleUtterances": [
                 "The pin number is {Pin}",
                 "My pin number is {Pin}",
@@ -324,7 +358,7 @@ exports.resources={
               {
                 "name":"Pin",
                 "slotType":{"Ref":"PinSlotType"},
-                "slotTypeVersion":"$LATEST",
+                "slotTypeVersion":"QNABOT-AUTO-ASSIGNED",
                 "slotConstraint": "Required",
                 "valueElicitationPrompt": {
                   "messages": [
@@ -340,14 +374,24 @@ exports.resources={
             ],
         },
     },
-
-
-    //BYE code responseBot
+    "PinAlias": {
+        "Type": "Custom::LexAlias",
+        "Properties": {
+            "ServiceToken": {"Ref": "CFNLambda"},
+            "botName": {
+                "Ref": "QNAPin"
+            },
+            "name": "live",
+            "description": "QNA Pin Alias - " + botDateVersion
+        }
+    },
     "ByeCodeSlotType":{
         "Type": "Custom::LexSlotType",
         "Properties": {
             "ServiceToken": {"Ref": "CFNLambda"},
             "name":{"Fn::Sub":"QNAByeCodeSlotType-${AWS::StackName}"},
+            "description": "QNA Bye Code Slot Type - " + botDateVersion,
+            "createVersion": true,
             "parentSlotTypeSignature": "AMAZON.AlphaNumeric",
             "slotTypeConfigurations": [
                 {
@@ -367,8 +411,9 @@ exports.resources={
             "locale": "en-US",
             "voiceId": config.voiceId,
             "childDirected": false,
+            "createVersion": true,
             "intents": [
-                {"intentName": {"Ref": "ByeCodeIntent"},"intentVersion": "$LATEST"},
+                {"intentName": {"Ref": "ByeCodeIntent"}},
             ],
             "clarificationPrompt": {
                 "messages": [
@@ -386,7 +431,8 @@ exports.resources={
                         "contentType": "PlainText"
                     }
                 ]
-            }
+            },
+            "description": "QNA Bye Code elicit response - " + botDateVersion,
         }
     },
     "ByeCodeIntent": {
@@ -394,6 +440,8 @@ exports.resources={
         "Properties": {
             "ServiceToken": {"Ref": "CFNLambda"},
             "name":{"Fn::Sub":"QNAByeCodeIntent-${AWS::StackName}"},
+            "description": "QNA Bye Code Intent - " + botDateVersion,
+            "createVersion": true,
             "sampleUtterances": [
                 "The bye code is {ByeCode}",
                 "My bye code is {ByeCode}",
@@ -425,7 +473,6 @@ exports.resources={
                     }
                 ]
             },
-            description: "Parse BYE code responses.",
             fulfillmentActivity: {
                 type: "ReturnIntent"
             },
@@ -433,7 +480,7 @@ exports.resources={
               {
                 "name":"ByeCode",
                 "slotType":{"Ref":"ByeCodeSlotType"},
-                "slotTypeVersion":"$LATEST",
+                "slotTypeVersion":"QNABOT-AUTO-ASSIGNED",
                 "slotConstraint": "Required",
                 "valueElicitationPrompt": {
                   "messages": [
@@ -449,12 +496,24 @@ exports.resources={
             ],
         },
     },
-    // Yes_No ResponseBot
+    "ByeAlias": {
+        "Type": "Custom::LexAlias",
+        "Properties": {
+            "ServiceToken": {"Ref": "CFNLambda"},
+            "botName": {
+                "Ref": "QNAByeCode"
+            },
+            "name": "live",
+            "description": "QNA Bye Alias - " + botDateVersion
+        }
+    },
     "YesNoSlotType":{
         "Type": "Custom::LexSlotType",
         "Properties": {
             "ServiceToken": {"Ref": "CFNLambda"},
             "name":{"Fn::Sub":"QNAYesNoSlotType-${AWS::StackName}"},
+            "description": "QNA Yes No Slot Type - " + botDateVersion,
+            "createVersion": true,
             "valueSelectionStrategy": "TOP_RESOLUTION",
             "enumerationValues": [
                 {"value":"Yes", "synonyms":["OK","Yeah","Sure","Yep","Affirmative","aye"]},
@@ -467,6 +526,8 @@ exports.resources={
       "Properties": {
         "ServiceToken": {"Ref": "CFNLambda"},
         "name":{"Fn::Sub":"QNAYesNoIntent-${AWS::StackName}"},
+        "createVersion": true,
+        "description": "QNA Yes No Intent - " + botDateVersion,
         "sampleUtterances": [
             "{Yes_No}",
             "I said {Yes_No}"
@@ -487,7 +548,7 @@ exports.resources={
           {
             "name":"Yes_No",
             "slotType":{"Ref":"YesNoSlotType"},
-            "slotTypeVersion":"$LATEST",
+            "slotTypeVersion":"QNABOT-AUTO-ASSIGNED",
             "slotConstraint": "Required",
             "valueElicitationPrompt": {
               "messages": [
@@ -509,11 +570,13 @@ exports.resources={
       "Properties": {
         "ServiceToken": {"Ref": "CFNLambda"},
         "name":{"Fn::Sub":"QNAYesNoBot-${AWS::StackName}"},
+        "description": "QNA Yes No Bot - " + botDateVersion,
         "locale": "en-US",
         "voiceId": config.voiceId,
         "childDirected": false,
+        "createVersion": true,
         "intents": [
-            {"intentName": {"Ref": "YesNoIntent"},"intentVersion": "$LATEST"},
+            {"intentName": {"Ref": "YesNoIntent"}},
         ],
         "clarificationPrompt": {
           "messages": [
@@ -532,7 +595,6 @@ exports.resources={
             }
           ]
         },
-        "description": "QNA Custom Yes or No elicit response bot - " + botDateVersion,
       }
     },
     "YesNoAlias": {
@@ -543,7 +605,8 @@ exports.resources={
         "botName": {
           "Ref": "QNAYesNo"
         },
-        "botVersion": "$LATEST"
+        "name": "live",
+        "description": "QNA Yes No Alias - " + botDateVersion,
       }
     },
     "DateIntent": {
@@ -551,6 +614,8 @@ exports.resources={
         "Properties": {
             "ServiceToken": {"Ref": "CFNLambda"},
             "name":{"Fn::Sub":"QNADateIntent-${AWS::StackName}"},
+            "createVersion": true,
+            "description": "QNA DateIntent - " + botDateVersion,
             "sampleUtterances": [
                 "The date is {date}",
                 "The date was {date}",
@@ -587,7 +652,6 @@ exports.resources={
                     }
                 ]
             },
-            description: "Parse date responses.",
             fulfillmentActivity: {
                 type: "ReturnIntent"
             },
@@ -616,11 +680,13 @@ exports.resources={
         "Properties": {
             "ServiceToken": {"Ref": "CFNLambda"},
             "name":{"Fn::Sub":"QNADateBot-${AWS::StackName}"},
+            "description": "QNA Date Bot - " + botDateVersion,
             "locale": "en-US",
             "voiceId": config.voiceId,
             "childDirected": false,
+            "createVersion": true,
             "intents": [
-                {"intentName": {"Ref": "DateIntent"},"intentVersion": "$LATEST"},
+                {"intentName": {"Ref": "DateIntent"}},
             ],
             "clarificationPrompt": {
                 "messages": [
@@ -638,8 +704,7 @@ exports.resources={
                         "contentType": "PlainText"
                     }
                 ]
-            },
-            "description": "QNADate response bot - " + botDateVersion,
+            }
         }
     },
     "DateAlias": {
@@ -650,7 +715,8 @@ exports.resources={
             "botName": {
                 "Ref": "QNADate"
             },
-            "botVersion": "$LATEST"
+            "name": "live",
+            "description": "QNA Date Alias - " + botDateVersion
         }
     },
     "DayOfWeekIntent": {
@@ -658,6 +724,8 @@ exports.resources={
         "Properties": {
             "ServiceToken": {"Ref": "CFNLambda"},
             "name":{"Fn::Sub":"QNADayOfWeekIntent-${AWS::StackName}"},
+            "description": "QNA Day Of Week Intent - " + botDateVersion,
+            "createVersion": true,
             "sampleUtterances": [
                 "The day is {DayOfWeek}",
                 "The day was {DayOfWeek}",
@@ -691,7 +759,6 @@ exports.resources={
                     }
                 ]
             },
-            description: "Parse day responses.",
             fulfillmentActivity: {
                 type: "ReturnIntent"
             },
@@ -723,8 +790,9 @@ exports.resources={
             "locale": "en-US",
             "voiceId": config.voiceId,
             "childDirected": false,
+            "createVersion": true,
             "intents": [
-                {"intentName": {"Ref": "DayOfWeekIntent"},"intentVersion": "$LATEST"},
+                {"intentName": {"Ref": "DayOfWeekIntent"}},
             ],
             "clarificationPrompt": {
                 "messages": [
@@ -743,7 +811,7 @@ exports.resources={
                     }
                 ]
             },
-            "description": "QNADayOfWeek response bot - " + botDateVersion,
+            "description": "QNADayOfWeek bot - " + botDateVersion,
         }
     },
     "DayOfWeekAlias": {
@@ -754,7 +822,8 @@ exports.resources={
             "botName": {
                 "Ref": "QNADayOfWeek"
             },
-            "botVersion": "$LATEST"
+            "name": "live",
+            "description": "QNA Day Of Week Alias - " + botDateVersion
         }
     },
     "MonthIntent": {
@@ -762,6 +831,8 @@ exports.resources={
         "Properties": {
             "ServiceToken": {"Ref": "CFNLambda"},
             "name":{"Fn::Sub":"QNAMonthIntent-${AWS::StackName}"},
+            "description": "QNA Month Intent - " + botDateVersion,
+            "createVersion": true,
             "sampleUtterances": [
                 "The month is {Month}",
                 "The month was {Month}",
@@ -794,7 +865,6 @@ exports.resources={
                     }
                 ]
             },
-            description: "Parse day responses.",
             fulfillmentActivity: {
                 type: "ReturnIntent"
             },
@@ -826,8 +896,9 @@ exports.resources={
             "locale": "en-US",
             "voiceId": config.voiceId,
             "childDirected": false,
+            "createVersion": true,
             "intents": [
-                {"intentName": {"Ref": "MonthIntent"},"intentVersion": "$LATEST"},
+                {"intentName": {"Ref": "MonthIntent"}},
             ],
             "clarificationPrompt": {
                 "messages": [
@@ -846,7 +917,7 @@ exports.resources={
                     }
                 ]
             },
-            "description": "QNAMonth response bot - " + botDateVersion,
+            "description": "QNA Month Bot - " + botDateVersion,
         }
     },
     "MonthAlias": {
@@ -857,7 +928,8 @@ exports.resources={
             "botName": {
                 "Ref": "QNAMonth"
             },
-            "botVersion": "$LATEST"
+            "name": "live",
+            "description": "QNA Month Alias - " + botDateVersion
         }
     },
     "NumberIntent": {
@@ -865,6 +937,8 @@ exports.resources={
         "Properties": {
             "ServiceToken": {"Ref": "CFNLambda"},
             "name":{"Fn::Sub":"QNANumberIntent-${AWS::StackName}"},
+            "description": "QNA Number Intent - " + botDateVersion,
+            "createVersion": true,
             "sampleUtterances": [
                 "The number is {Number}",
                 "The number was {Number}",
@@ -896,7 +970,6 @@ exports.resources={
                     }
                 ]
             },
-            description: "Parse number responses.",
             fulfillmentActivity: {
                 type: "ReturnIntent"
             },
@@ -928,8 +1001,9 @@ exports.resources={
             "locale": "en-US",
             "voiceId": config.voiceId,
             "childDirected": false,
+            "createVersion": true,
             "intents": [
-                {"intentName": {"Ref": "NumberIntent"},"intentVersion": "$LATEST"},
+                {"intentName": {"Ref": "NumberIntent"}},
             ],
             "clarificationPrompt": {
                 "messages": [
@@ -948,7 +1022,7 @@ exports.resources={
                     }
                 ]
             },
-            "description": "QNANumber response bot - " + botDateVersion,
+            "description": "QNA Number Bot - " + botDateVersion,
         }
     },
     "NumberAlias": {
@@ -959,7 +1033,8 @@ exports.resources={
             "botName": {
                 "Ref": "QNANumber"
             },
-            "botVersion": "$LATEST"
+            "name": "live",
+            "description": "QNA Number Alias - " + botDateVersion
         }
     },
     "AgeIntent": {
@@ -967,6 +1042,8 @@ exports.resources={
         "Properties": {
             "ServiceToken": {"Ref": "CFNLambda"},
             "name":{"Fn::Sub":"QNAAgeIntent-${AWS::StackName}"},
+            "description": "QNA Age Intent - " + botDateVersion,
+            "createVersion": true,
             "sampleUtterances": [
                 "My age is {Age}",
                 "Age is {Age}",
@@ -1006,7 +1083,6 @@ exports.resources={
                     }
                 ]
             },
-            description: "Parse Age responses.",
             fulfillmentActivity: {
                 type: "ReturnIntent"
             },
@@ -1035,11 +1111,13 @@ exports.resources={
         "Properties": {
             "ServiceToken": {"Ref": "CFNLambda"},
             "name":{"Fn::Sub":"QNAAgeBot-${AWS::StackName}"},
+            "description": "QNA Age Bot - " + botDateVersion,
             "locale": "en-US",
             "voiceId": config.voiceId,
             "childDirected": false,
+            "createVersion": true,
             "intents": [
-                {"intentName": {"Ref": "AgeIntent"},"intentVersion": "$LATEST"},
+                {"intentName": {"Ref": "AgeIntent"}},
             ],
             "clarificationPrompt": {
                 "messages": [
@@ -1057,8 +1135,7 @@ exports.resources={
                         "contentType": "PlainText"
                     }
                 ]
-            },
-            "description": "QNAAge response bot - " + botDateVersion,
+            }
         }
     },
     "AgeAlias": {
@@ -1069,7 +1146,8 @@ exports.resources={
             "botName": {
                 "Ref": "QNAAge"
             },
-            "botVersion": "$LATEST"
+            "name": "live",
+            "description": "QNA Age Alias - " + botDateVersion
         }
     },
     "PhoneNumberIntent": {
@@ -1077,6 +1155,8 @@ exports.resources={
         "Properties": {
             "ServiceToken": {"Ref": "CFNLambda"},
             "name":{"Fn::Sub":"QNAPhoneNumberIntent-${AWS::StackName}"},
+            "description": "QNA Phone Number Intent - " + botDateVersion,
+            "createVersion": true,
             "sampleUtterances": [
                 "The phone number is {PhoneNumber}",
                 "My phone number is {PhoneNumber}",
@@ -1111,7 +1191,6 @@ exports.resources={
                     }
                 ]
             },
-            description: "Parse phone number responses.",
             fulfillmentActivity: {
                 type: "ReturnIntent"
             },
@@ -1140,11 +1219,13 @@ exports.resources={
         "Properties": {
             "ServiceToken": {"Ref": "CFNLambda"},
             "name":{"Fn::Sub":"QNAPhoneNumberBot-${AWS::StackName}"},
+            "description": "QNA Phone Number Bot - " + botDateVersion,
             "locale": "en-US",
             "voiceId": config.voiceId,
             "childDirected": false,
+            "createVersion": true,
             "intents": [
-                {"intentName": {"Ref": "PhoneNumberIntent"},"intentVersion": "$LATEST"},
+                {"intentName": {"Ref": "PhoneNumberIntent"}},
             ],
             "clarificationPrompt": {
                 "messages": [
@@ -1162,8 +1243,7 @@ exports.resources={
                         "contentType": "PlainText"
                     }
                 ]
-            },
-            "description": "QNAPhoneNumber response bot - " + botDateVersion,
+            }
         }
     },
     "PhoneNumberAlias": {
@@ -1174,7 +1254,8 @@ exports.resources={
             "botName": {
                 "Ref": "QNAPhoneNumber"
             },
-            "botVersion": "$LATEST"
+            "name": "live",
+            "description": "QNA Phone Number Alias - " + botDateVersion
         }
     },
     "TimeIntent": {
@@ -1182,6 +1263,8 @@ exports.resources={
         "Properties": {
             "ServiceToken": {"Ref": "CFNLambda"},
             "name":{"Fn::Sub":"QNATimeIntent-${AWS::StackName}"},
+            "description": "QNA Time Intent - " + botDateVersion,
+            "createVersion": true,
             "sampleUtterances": [
                 "The time was {Time}",
                 "It occurred at {Time}",
@@ -1213,7 +1296,6 @@ exports.resources={
                     }
                 ]
             },
-            description: "Parse time responses.",
             fulfillmentActivity: {
                 type: "ReturnIntent"
             },
@@ -1242,11 +1324,13 @@ exports.resources={
         "Properties": {
             "ServiceToken": {"Ref": "CFNLambda"},
             "name":{"Fn::Sub":"QNATimeBot-${AWS::StackName}"},
+            "description": "QNA Time Bot - " + botDateVersion,
             "locale": "en-US",
             "voiceId": config.voiceId,
             "childDirected": false,
+            "createVersion": true,
             "intents": [
-                {"intentName": {"Ref": "TimeIntent"},"intentVersion": "$LATEST"},
+                {"intentName": {"Ref": "TimeIntent"}},
             ],
             "clarificationPrompt": {
                 "messages": [
@@ -1264,8 +1348,7 @@ exports.resources={
                         "contentType": "PlainText"
                     }
                 ]
-            },
-            "description": "QNATime response bot - " + botDateVersion,
+            }
         }
     },
     "TimeAlias": {
@@ -1276,7 +1359,8 @@ exports.resources={
             "botName": {
                 "Ref": "QNATime"
             },
-            "botVersion": "$LATEST"
+            "name": "live",
+            "description": "QNA Time Alias - " + botDateVersion
         }
     },
     "EmailAddressIntent": {
@@ -1284,6 +1368,8 @@ exports.resources={
         "Properties": {
             "ServiceToken": {"Ref": "CFNLambda"},
             "name":{"Fn::Sub":"QNAEmailAddressIntent-${AWS::StackName}"},
+            "description": "QNA Email Address Intent - " + botDateVersion,
+            "createVersion": true,
             "sampleUtterances": [
                 "My email address is {EmailAddress}",
                 "The email address is {EmailAddress}",
@@ -1314,7 +1400,6 @@ exports.resources={
                     }
                 ]
             },
-            description: "Parse email address responses.",
             fulfillmentActivity: {
                 type: "ReturnIntent"
             },
@@ -1343,11 +1428,13 @@ exports.resources={
         "Properties": {
             "ServiceToken": {"Ref": "CFNLambda"},
             "name":{"Fn::Sub":"QNAEmailAddressBot-${AWS::StackName}"},
+            "description": "QNA Email Address Intent - " + botDateVersion,
             "locale": "en-US",
             "voiceId": config.voiceId,
             "childDirected": false,
+            "createVersion": true,
             "intents": [
-                {"intentName": {"Ref": "EmailAddressIntent"},"intentVersion": "$LATEST"},
+                {"intentName": {"Ref": "EmailAddressIntent"}},
             ],
             "clarificationPrompt": {
                 "messages": [
@@ -1365,8 +1452,7 @@ exports.resources={
                         "contentType": "PlainText"
                     }
                 ]
-            },
-            "description": "QNAEmailAddress response bot - " + botDateVersion,
+            }
         }
     },
     "EmailAddressAlias": {
@@ -1377,7 +1463,8 @@ exports.resources={
             "botName": {
                 "Ref": "QNAEmailAddress"
             },
-            "botVersion": "$LATEST"
+            "name": "live",
+            "description": "QNA Email Address Alias - " + botDateVersion
         }
     },
     "NameIntent": {
@@ -1385,6 +1472,8 @@ exports.resources={
         "Properties": {
             "ServiceToken": {"Ref": "CFNLambda"},
             "name":{"Fn::Sub":"QNANameIntent-${AWS::StackName}"},
+            "description": "QNA Name Intent - " + botDateVersion,
+            "createVersion": true,
             "sampleUtterances": [
                 "My last name is {LastName}",
                 "My first name is {FirstName}",
@@ -1464,11 +1553,13 @@ exports.resources={
         "Properties": {
             "ServiceToken": {"Ref": "CFNLambda"},
             "name":{"Fn::Sub":"QNANameBot-${AWS::StackName}"},
+            "description": "QNA Name Bot - " + botDateVersion,
             "locale": "en-US",
             "voiceId": config.voiceId,
             "childDirected": false,
+            "createVersion": true,
             "intents": [
-                {"intentName": {"Ref": "NameIntent"},"intentVersion": "$LATEST"},
+                {"intentName": {"Ref": "NameIntent"}},
             ],
             "clarificationPrompt": {
                 "messages": [
@@ -1486,8 +1577,7 @@ exports.resources={
                         "contentType": "PlainText"
                     }
                 ]
-            },
-            "description": "QNAName response bot - " + botDateVersion,
+            }
         }
     },
     "NameAlias": {
@@ -1498,7 +1588,8 @@ exports.resources={
             "botName": {
                 "Ref": "QNAName"
             },
-            "botVersion": "$LATEST"
+            "name": "live",
+            "description": "QNA Name Alias - " + botDateVersion
         }
     }
 };

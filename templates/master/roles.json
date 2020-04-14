@@ -194,7 +194,11 @@
                     "lex:GetBot",
                     "lex:DeleteBot",
                     "lex:PutBotAlias",
-                    "lex:DeleteBotAlias"
+                    "lex:DeleteBotAlias",
+                    "lex:GetBotAlias",
+                    "lex:GetBotVersions",
+                    "lex:GetIntentVersions",
+                    "lex:GetSlotTypeVersions"
                   ],
                   "Resource": [
                     "*"
