@@ -162,7 +162,7 @@ class Lex {
         } else {
             var name = params.name ? clean(params.name) : this.type + makeid()
             name = params.prefix ? [params.prefix, name].join('_') : name;
-            return name.slice(0, 28) + id(2)
+            return name.slice(0, 35) + id(5)
         }
     }
 
