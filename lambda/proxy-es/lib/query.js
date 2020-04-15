@@ -132,8 +132,10 @@ async function evaluateConditionalChaining(req, res, hit, conditionalChaining) {
         next_q=res.Payload;
     } else {
         // provide 'SessionAttributes' to chaining rule safeEval context, consistent with Handlebars context
+        const SessionAttributes = (arg) => _.get(SessionAttributes, arg, undefined);
+        _.assign(SessionAttributes, res.session);
+        const context={SessionAttributes};
         console.log("Evaluating:", conditionalChaining);
-        const context={SessionAttributes:res.session};
         // safely evaluate conditionalChaining expression.. throws an exception if there is a syntax error
         next_q = safeEval(conditionalChaining, context);
     }
