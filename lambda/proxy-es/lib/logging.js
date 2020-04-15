@@ -18,26 +18,32 @@ module.exports=function(req,res){
     var unwrappedRes =req.res
     let jsonData = {};
 
-    if (process.env.DISABLE_REDACT) {
+    let redactEnabled = _.get(unwrappedReq, '_settings.ENABLE_REDACTING', "false");
+    let redactRegex = _.get(unwrappedReq, '_settings.REDACTING_REGEX', "\\b\\d{4}\\b(?![-])|\\b\\d{9}\\b|\\b\\d{3}-\\d{2}-\\d{4}\\b");
+
+    if (redactEnabled === "true") {
+        console.log("redact enabled");
+        let re = new RegExp(redactRegex,"g");
+        let unWrappedReqText = JSON.stringify(unwrappedReq).replace(re, 'XXXXX');
+        let unWrappedResponseText = JSON.stringify(unwrappedRes).replace(re, 'XXXXX');
+        jsonData = {
+            entireRequest: { "value": unWrappedReqText},
+            entireResponse: { "value": unWrappedResponseText},
+            qid: _.get(unwrappedRes.result, "qid"),
+            utterance: String(unwrappedReq.question).toLowerCase().replace(re, 'XXXXX').replace(/[\u2000-\u206F\u2E00-\u2E7F\\'!"#$%&()*+,\-.\/:;<=>?@\[\]^_`{|}~]/g, ""),
+            answer: _.get(unwrappedRes, "message").replace(re, 'XXXXX'),
+            topic: _.get(unwrappedRes.result, "t", ""),
+            clientType: unwrappedReq._type,
+            datetime: now
+        }
+    } else {
+        console.log("redact disabled");
         jsonData = {
             entireRequest: unwrappedReq,
             entireResponse: unwrappedRes,
             qid: _.get(unwrappedRes.result, "qid"),
             utterance: String(unwrappedReq.question).toLowerCase().replace(/[\u2000-\u206F\u2E00-\u2E7F\\'!"#$%&()*+,\-.\/:;<=>?@\[\]^_`{|}~]/g, ""),
             answer: _.get(unwrappedRes, "message"),
-            topic: _.get(unwrappedRes.result, "t", ""),
-            clientType: unwrappedReq._type,
-            datetime: now
-        }
-    } else {
-        let unWrappedReqText = JSON.stringify(unwrappedReq).replace(/\b[0-9\.\-\,]{2,}\b/g, 'XXXXX');
-        let unWrappedResponseText = JSON.stringify(unwrappedRes).replace(/\b[0-9\.\-\,]{2,}\b/g, 'XXXXX');
-        jsonData = {
-            entireRequest: { "value": unWrappedReqText},
-            entireResponse: { "value": unWrappedResponseText},
-            qid: _.get(unwrappedRes.result, "qid"),
-            utterance: String(unwrappedReq.question).toLowerCase().replace(/\b[0-9\.\-\,]{2,}\b/g, 'XXXXX').replace(/[\u2000-\u206F\u2E00-\u2E7F\\'!"#$%&()*+,\-.\/:;<=>?@\[\]^_`{|}~]/g, ""),
-            answer: _.get(unwrappedRes, "message").replace(/\b[0-9\.\-\,]{2,}\b/g, 'XXXXX'),
             topic: _.get(unwrappedRes.result, "t", ""),
             clientType: unwrappedReq._type,
             datetime: now

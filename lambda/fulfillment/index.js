@@ -14,10 +14,16 @@ var lib='./lib/middleware'
 var router=new (require('./lib/router'))()
 var fs=require('fs')
 
-if (!process.env.DISABLE_REDACT) {
-    const filter = text => text.replace(/\b[0-9\.\-\,]{2,}\b/g, 'XXXXX');
-    require('intercept-stdout')(filter, filter);
+const filter = text => {
+    if (process.env.QNAREDACT === "true") {
+        let re = new RegExp(process.env.REDACTING_REGEX,"g");
+        return text.replace(re,"XXXXXX");
+    } else {
+        return text;
+    }
 }
+
+require('intercept-stdout')(filter, filter);
 
 var middleware=fs.readdirSync(`${__dirname}/${lib}`)
     .filter(name=>name.match(/\d*_.*\.js/))

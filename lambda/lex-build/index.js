@@ -17,11 +17,6 @@ var aws=require('./lib/aws')
 var lambda=new aws.Lambda()
 var lex=new aws.LexModelBuildingService()
 
-if (!process.env.DISABLE_REDACT) {
-    const filter = text => text.replace(/\b[0-9\.\-\,]{2,}\b/g, 'XXXXX');
-    require('intercept-stdout')(filter, filter);
-}
-
 exports.handler=function(event,context,callback){
     console.log("Event:",JSON.stringify(event,null,2))
     

@@ -6,7 +6,7 @@
  * in the associated Bot. Failure to do so when running an update will leave the bot in the NOT_BUILT state and you
  * will need to rebuild in the AWS Console. To update description for all bots, change botDateVersion string below.
  */
-const botDateVersion = "QnABot 3.0.1 - 04/13/2020 v2";  // CHANGE ME TO FORCE BOT REBUILD
+const botDateVersion = "QnABot 3.0.1 - 04/15/2020 v1";  // CHANGE ME TO FORCE BOT REBUILD
 
 var _ = require('lodash');
 
@@ -29,7 +29,7 @@ exports.resources={
             "slotTypeConfigurations": [
                 {
                     "regexConfiguration": {
-                        "pattern" : "[0-9]{1,5}" 
+                        "pattern" : "[0-9]{1,7}"
                     }
                 }
             ]
@@ -383,128 +383,6 @@ exports.resources={
             },
             "name": "live",
             "description": "QNA Pin Alias - " + botDateVersion
-        }
-    },
-    "ByeCodeSlotType":{
-        "Type": "Custom::LexSlotType",
-        "Properties": {
-            "ServiceToken": {"Ref": "CFNLambda"},
-            "name":{"Fn::Sub":"QNAByeCodeSlotType-${AWS::StackName}"},
-            "description": "QNA Bye Code Slot Type - " + botDateVersion,
-            "createVersion": true,
-            "parentSlotTypeSignature": "AMAZON.AlphaNumeric",
-            "slotTypeConfigurations": [
-                {
-                    "regexConfiguration": {
-                        "pattern" : "[0-9]{2}" 
-                    }
-                }
-            ]
-        }
-    },
-    "QNAByeCode": {
-        "Type": "Custom::LexBot",
-        "DependsOn": "ByeCodeIntent",
-        "Properties": {
-            "ServiceToken": {"Ref": "CFNLambda"},
-            "name":{"Fn::Sub":"QNAByeCodeBot-${AWS::StackName}"},
-            "locale": "en-US",
-            "voiceId": config.voiceId,
-            "childDirected": false,
-            "createVersion": true,
-            "intents": [
-                {"intentName": {"Ref": "ByeCodeIntent"}},
-            ],
-            "clarificationPrompt": {
-                "messages": [
-                    {
-                        "contentType": "PlainText",
-                        "content": "Please repeat your BYE code."
-                    }
-                ],
-                "maxAttempts": 3
-            },
-            "abortStatement": {
-                "messages": [
-                    {
-                        "content": config.Abort,
-                        "contentType": "PlainText"
-                    }
-                ]
-            },
-            "description": "QNA Bye Code elicit response - " + botDateVersion,
-        }
-    },
-    "ByeCodeIntent": {
-        "Type": "Custom::LexIntent",
-        "Properties": {
-            "ServiceToken": {"Ref": "CFNLambda"},
-            "name":{"Fn::Sub":"QNAByeCodeIntent-${AWS::StackName}"},
-            "description": "QNA Bye Code Intent - " + botDateVersion,
-            "createVersion": true,
-            "sampleUtterances": [
-                "The bye code is {ByeCode}",
-                "My bye code is {ByeCode}",
-                "It is {ByeCode}",
-                "{ByeCode}"
-            ],
-            conclusionStatement: {
-                messages: [
-                    {
-                        content: "OK. ",
-                        contentType: "PlainText"
-                    }
-                ],
-            },
-            confirmationPrompt: {
-                maxAttempts: 1,
-                messages: [
-                    {
-                        content: "Is {ByeCode} correct (Yes/No)?",
-                        contentType: "PlainText"
-                    }
-                ]
-            },
-            rejectionStatement: {
-                messages: [
-                    {
-                        content: "Please let me know the BYE code again?",
-                        contentType: "PlainText"
-                    }
-                ]
-            },
-            fulfillmentActivity: {
-                type: "ReturnIntent"
-            },
-            "slots": [
-              {
-                "name":"ByeCode",
-                "slotType":{"Ref":"ByeCodeSlotType"},
-                "slotTypeVersion":"QNABOT-AUTO-ASSIGNED",
-                "slotConstraint": "Required",
-                "valueElicitationPrompt": {
-                  "messages": [
-                    {
-                      "contentType": "PlainText",
-                      "content": "What is your BYE code?"
-                    }
-                  ],
-                  "maxAttempts": 2
-                },
-                "priority": 1,
-              }
-            ],
-        },
-    },
-    "ByeAlias": {
-        "Type": "Custom::LexAlias",
-        "Properties": {
-            "ServiceToken": {"Ref": "CFNLambda"},
-            "botName": {
-                "Ref": "QNAByeCode"
-            },
-            "name": "live",
-            "description": "QNA Bye Alias - " + botDateVersion
         }
     },
     "YesNoSlotType":{
@@ -1598,7 +1476,7 @@ exports.resources={
 exports.names=[
   "QNAYesNo", "QNADate", "QNADayOfWeek", "QNAMonth", "QNANumber",
   "QNAAge","QNAPhoneNumber", "QNATime", "QNAEmailAddress", "QNAName",
-  "QNAWage","QNASocialSecurity","QNAByeCode","QNAPin"
+  "QNAWage","QNASocialSecurity","QNAPin"
 ] ;
 
 

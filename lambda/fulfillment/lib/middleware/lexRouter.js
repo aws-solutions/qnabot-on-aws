@@ -21,8 +21,10 @@ async function translate_res(req, res){
         }
         if (_.get(res,"card.buttons")) {
             res.card.buttons.forEach(async function (button) {
-                button.text = await translate.translateText(button.text,'en',locale); 
-                button.value = await translate.translateText(button.value,'en',locale); 
+                button.text = await translate.translateText(button.text,'en',locale);
+                //TODO Address multilanguage issues with translating button values for use in confirmation prompts
+                //Disable translate of button value
+                //button.value = await translate.translateText(button.value,'en',locale);
             });
             res.plainMessage = await translate.translateText(res.plainMessage,'en',locale); 
         }

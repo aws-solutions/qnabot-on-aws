@@ -138,10 +138,21 @@ See the [LICENSE.md](LICENSE.md) file for details
 
 ## New features
 
+### Conditional Chaining now supports Lambda Function
+You can specify that a Conditional Chaining rule runs a Lambda Function using the "Lambda::FunctionName" syntax.
+The Lambda function name must start with "QNA". The Lambda will receive arguments the same as Lambda Hooks. The
+function must return a String that is used to resolve the next item just the same as other conditional chaining rules.
+
 ### Improved Scale
 This release of QnABot utilizes Lex Bot aliases and Lex versioning. The QnA Bot and all ElicitResponse Bots are
-now installed using the alias 'live'. 'live' points at the 'Latest' Bot version. All Lex resources are now
+now installed using the alias 'live'. 'live' points at the latest numbered Bot version. All Lex resources are now
 versioned starting with '1' after initial installation.
+
+### Additional Elicit Response Bots
+This release adds several elicit response bots for 
+QNAWage - 7 digit wage value - returns slot named "Wage"
+QNASocialSecurity - SSN Numbers in the nnn-nn-nnnn format - returns slot named "SSN"
+QNAPin - 4 digit pin value - Returns slot named "Pin"
 
 ### Configuring QnABot to ask the questions
 QnABot was designed to answer questions, but now it can also ask questions and process 
