@@ -13,6 +13,18 @@ License for the specific language governing permissions and limitations under th
 var lib='./lib/middleware'
 var router=new (require('./lib/router'))()
 var fs=require('fs')
+
+const filter = text => {
+    if (process.env.QNAREDACT === "true") {
+        let re = new RegExp(process.env.REDACTING_REGEX,"g");
+        return text.replace(re,"XXXXXX");
+    } else {
+        return text;
+    }
+}
+
+require('intercept-stdout')(filter, filter);
+
 var middleware=fs.readdirSync(`${__dirname}/${lib}`)
     .filter(name=>name.match(/\d*_.*\.js/))
     .sort()

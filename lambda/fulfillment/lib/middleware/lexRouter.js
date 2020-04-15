@@ -5,6 +5,32 @@
  */
 const _=require('lodash');
 const AWS = require('aws-sdk');
+var translate = require('./multilanguage.js');
+
+async function translate_res(req, res){
+    const locale = _.get(req, 'session.userLocale');
+    if (_.get(req._settings, 'ENABLE_MULTI_LANGUAGE_SUPPORT', "false").toLowerCase() === "true"){
+        if (_.get(res,"message")) {
+            res.message = await translate.translateText(res.message,'en',locale); 
+        }
+        if (_.get(res,"plainMessage")) {
+            res.plainMessage = await translate.translateText(res.plainMessage,'en',locale); 
+        }
+        if (_.get(res,"card")) {
+            res.card.title = await translate.translateText(res.card.title,'en',locale);
+        }
+        if (_.get(res,"card.buttons")) {
+            res.card.buttons.forEach(async function (button) {
+                button.text = await translate.translateText(button.text,'en',locale);
+                //TODO Address multilanguage issues with translating button values for use in confirmation prompts
+                //Disable translate of button value
+                //button.value = await translate.translateText(button.value,'en',locale);
+            });
+            res.plainMessage = await translate.translateText(res.plainMessage,'en',locale); 
+        }
+    }
+    return res;
+}
 
 /**
  * Call postText and use promise to return data response.
@@ -42,15 +68,14 @@ async function handleRequest(req, res, botName, botAlias) {
         return bName ? bName : botName;
     }
 
-    let tempBotUserID = _.get(req,"_event.userId");
-    tempBotUserID = tempBotUserID ? tempBotUserID : _.get(res,"session.sessionId");
-    tempBotUserID = tempBotUserID ? tempBotUserID : Math.floor(Date.now() * 1000).toString();
+    let tempBotUserID = _.get(req,"_userInfo.UserId","nouser");
+    tempBotUserID = tempBotUserID.substring(0, 100); // Lex has max userId length of 100
     const lexClient = new AWS.LexRuntime({apiVersion: '2016-11-28'});
     const params = {
         botAlias: botAlias,
         botName: mapFromSimpleName(botName),
         inputText: _.get(req,"question"),
-        userId: tempBotUserID
+        userId: tempBotUserID,
     };
     console.log("Lex parameters: " + JSON.stringify(params));
     const response = await lexClientRequester(lexClient,params);
@@ -82,17 +107,25 @@ async function processResponse(req, res, hook, msg) {
     const maxElicitResponseLoopCount = _.get(req, '_settings.ELICIT_RESPONSE_MAX_RETRIES', 5);
     const elicit_Response_Retry_Message = _.get(req, '_settings.ELICIT_RESPONSE_RETRY_MESSAGE', "Please try again?");
 
-    let botResp = await handleRequest(req, res, hook, "$LATEST");
+    let botResp = await handleRequest(req, res, hook, "live");
     console.log("botResp: " + JSON.stringify(botResp,null,2));
+    var plainMessage = botResp.message;
+    var ssmlMessage = undefined;
+    // if messsage contains SSML tags, strip tags for plain text, but preserve tags for SSML 
+    if (plainMessage && plainMessage.includes("<speak>")) {
+        ssmlMessage = botResp.message  ;        
+        plainMessage = plainMessage.replace(/<\/?[^>]+(>|$)/g, "");
+    }
     let elicitResponseLoopCount =_.get(res,"session.elicitResponseLoopCount");
     if (botResp.dialogState === 'ConfirmIntent') {
         res.session.elicitResponseProgress = 'ConfirmIntent';
-        if (botResp.message) {
-            res.message = botResp.message;
-            res.plainMessage = botResp.message;
+        res.plainMessage = plainMessage;      
+        // if SSML tags were present, and we're not in text client mode, build SSML response
+        if (ssmlMessage && req._event.outputDialogMode !== "Text") {
+            res.type = "SSML";
+            res.message = ssmlMessage;
         } else {
-            res.message = undefined;
-            res.plainMessage = undefined;
+            res.message = plainMessage;
         }
         res.card = {
             "send": true,
@@ -159,6 +192,9 @@ async function processResponse(req, res, hook, msg) {
     // be returned.
     res.message = res.message ? res.message : _.get(req, '_settings.ELICIT_RESPONSE_DEFAULT_MSG', 'Ok. ');
     res.plainMessage = res.plainMessage ? res.plainMessage : _.get(req, '_settings.ELICIT_RESPONSE_DEFAULT_MSG', 'Ok. ');
+    
+    // autotranslate res fields
+    res = await translate_res(req,res);
 
     const resp = {};
     resp.req = req;

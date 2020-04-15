@@ -219,6 +219,20 @@ module.exports={
           			"Resource": "*"
           		}]
           	}
+          },
+          {
+            "PolicyName": "LambdaInvokePolicy",
+            "PolicyDocument": {
+                "Version": "2012-10-17",
+                "Statement": [{
+                    "Effect": "Allow",
+                    "Action": ["lambda:InvokeFunction"],
+                    "Resource": [
+                        "arn:aws:lambda:*:*:function:qna*",
+                        "arn:aws:lambda:*:*:function:QNA*"
+                    ]
+                }]
+            }
           }
         ]
       }

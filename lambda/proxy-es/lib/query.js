@@ -1,10 +1,12 @@
 //start connection
 var _ = require('lodash');
 var safeEval = require('safe-eval');
+const aws = require('aws-sdk');
 var request = require('./request');
 var build_es_query = require('./esbodybuilder');
 var handlebars = require('./handlebars');
 var translate = require('./translate');
+
 // use DEFAULT_SETTINGS_PARAM as random encryption key unique to this QnABot installation
 var key = _.get(process.env, "DEFAULT_SETTINGS_PARAM", "fdsjhf98fd98fjh9 du98fjfd 8ud8fjdf");
 var encryptor = require('simple-encryptor')(key);
@@ -112,12 +114,29 @@ async function evaluateConditionalChaining(req, res, hit, conditionalChaining) {
     // decrypt conditionalChaining
     conditionalChaining = encryptor.decrypt(conditionalChaining);
     console.log("Decrypted Chained document rule specified:", conditionalChaining);
-    // provide 'SessionAttributes' to chaining rule safeEval context, consistent with Handlebars context
-    const SessionAttributes = (arg) => _.get(SessionAttributes, arg, undefined);
-    _.assign(SessionAttributes, res.session);
-    const context={SessionAttributes};
-    // safely evaluate conditionalChaining expression.. throws an exception if there is a syntax error
-    const next_q = safeEval(conditionalChaining, context);
+    var next_q;
+    // If chaining rule a lambda, or an expression?
+    if (conditionalChaining.toLowerCase().startsWith("lambda::")) {
+        // Chaining rule is a Lambda function
+        var lambdaName = conditionalChaining.split("::")[1] ;
+        console.log("Calling Lambda:", lambdaName);
+        var lambda= new aws.Lambda();
+        var res=await lambda.invoke({
+            FunctionName:lambdaName,
+            InvocationType:"RequestResponse",
+            Payload:JSON.stringify({
+                req:req,
+                res:res
+            })
+        }).promise();
+        next_q=res.Payload;
+    } else {
+        // provide 'SessionAttributes' to chaining rule safeEval context, consistent with Handlebars context
+        console.log("Evaluating:", conditionalChaining);
+        const context={SessionAttributes:res.session};
+        // safely evaluate conditionalChaining expression.. throws an exception if there is a syntax error
+        next_q = safeEval(conditionalChaining, context);
+    }
     console.log("Chained document rule evaluated to:", next_q);
     req.question = next_q;
     const hit2 = await get_hit(req, res);
@@ -145,6 +164,16 @@ async function evaluateConditionalChaining(req, res, hit, conditionalChaining) {
 }
 
 module.exports = async function (req, res) {
+    let redactEnabled = _.get(req, '_settings.ENABLE_REDACTING', "false");
+    let redactRegex = _.get(req, '_settings.REDACTING_REGEX', "\\b\\d{4}\\b(?![-])|\\b\\d{9}\\b|\\b\\d{3}-\\d{2}-\\d{4}\\b");
+
+    if (redactEnabled.toLowerCase() === "true") {
+        process.env.QNAREDACT= "true";
+        process.env.REDACTING_REGEX = redactRegex;
+    } else {
+        process.env.QNAREDACT="false";
+        process.env.REDACTING_REGEX="";
+    }
     const elicitResponseChainingConfig = _.get(res, "session.elicitResponseChainingConfig", undefined);
     const elicitResponseProgress = _.get(res, "session.elicitResponseProgress", undefined);
     let hit = undefined;
@@ -165,7 +194,7 @@ module.exports = async function (req, res) {
             // conditionalChaining in this case.
             hit = await evaluateConditionalChaining(req, res, hit, hit.conditionalChaining);
         }
-        if (req._settings.ENABLE_MULTI_LANGUAGE_SUPPORT) {
+        if (_.get(req._settings, 'ENABLE_MULTI_LANGUAGE_SUPPORT', "false").toLowerCase() === "true") {
             const usrLang = _.get(req, 'session.userLocale');
             if (usrLang != 'en') {
                 console.log("Autotranslate hit to usrLang: ", usrLang);

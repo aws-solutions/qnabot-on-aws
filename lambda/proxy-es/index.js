@@ -3,6 +3,17 @@ var Promise=require('bluebird')
 var cfnLambda=require('cfn-lambda')
 var request=require('./lib/request')
 
+const filter = text => {
+    if (process.env.QNAREDACT === "true") {
+        let re = new RegExp(process.env.REDACTING_REGEX,"g");
+        return text.replace(re,"XXXXXX");
+    } else {
+        return text;
+    }
+}
+
+require('intercept-stdout')(filter, filter);
+
 exports.qid=require('./lib/qid')
 exports.logging=require('./lib/logging')
 exports.cleanmetrics=require('./lib/cleanmetrics')

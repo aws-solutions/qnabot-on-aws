@@ -45,6 +45,16 @@ async function get_settings() {
     _.set(settings, "DEFAULT_USER_POOL_JWKS_URL", default_jwks_url);
 
     console.log("Merged Settings: ", settings);
+
+    if (settings.ENABLE_REDACTING.toLowerCase() === "true") {
+        console.log("redacting enabled");
+        process.env.QNAREDACT="true";
+        process.env.REDACTING_REGEX=settings.REDACTING_REGEX;
+    } else {
+        console.log("redacting disabled");
+        process.env.QNAREDACT="false";
+        process.env.REDACTING_REGEX="";
+    }
     return settings;
 }
 
@@ -67,8 +77,7 @@ module.exports = async function parse(req, res) {
 
 
     // multilanguage support 
-    var isMultilanguageEnabled = settings.ENABLE_MULTI_LANGUAGE_SUPPORT;
-    if (isMultilanguageEnabled) {
+    if (_.get(settings, 'ENABLE_MULTI_LANGUAGE_SUPPORT', "false").toLowerCase() === "true") {
         await multilanguage.set_multilang_env(req);
     }
     // end of multilanguage support 

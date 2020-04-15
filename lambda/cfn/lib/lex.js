@@ -96,24 +96,85 @@ class Lex {
         this.delete_method = 'delete' + type
         this.get_method = "get" + type
     }
-    checksum(id){
+    checksum(id,version){
         return lex[this.get_method]({
             name:id,
-            versionOrAlias:"$LATEST"
+            versionOrAlias:version,
         }).promise().get("checksum")
     }
-    checksumIntentOrSlotType(id){
+    checksumIntentOrSlotType(id,version){
         return lex[this.get_method]({
             name:id,
-            version:"$LATEST"
+            version:version,
         }).promise().get("checksum")
     }
-    name(params){
-        var name=params.name ? clean(params.name) : this.type+makeid()
-        name=params.prefix ? [params.prefix,name].join('_') : name;
-        return name.slice(0,28)+id(2)
+    checksumBotAlias(botName, name){
+        return lex[this.get_method]({
+            botName:botName,
+            name:name
+        }).promise().get("checksum")
     }
 
+    /**
+     * Find all versions of a given slottype. Lex API returns an array of objects that describe
+     * the available versions of a given slottype. This function returns a promise that resolves
+     * to that array.
+     * @param id
+     * @returns {Promise<PromiseResult<LexModelBuildingService.GetSlotTypeVersionsResponse, AWSError>>}
+     */
+    slotTypeVersions(id){
+        return lex["getSlotTypeVersions"]({
+            name:id,
+            maxResults: 50,
+        }).promise();
+    }
+
+    /**
+     * Find all versions of a given intent. Lex API returns an array of objects that describe
+     * the available versions of a given intent. THis function returns a promise that
+     * resolves to that array.
+     * @param id
+     * @returns {Promise<PromiseResult<LexModelBuildingService.GetIntentVersionsResponse, AWSError>>}
+     */
+    intentVersions(id){
+        return lex["getIntentVersions"]({
+            name:id,
+            maxResults: 50,
+        }).promise();
+    }
+
+    /**
+     * Find all versions of a give Bot. Lex API returns an array of versions available for a given
+     * Bot. This functions resolves the promise and returns that array.
+     * @param id
+     * @returns {*}
+     */
+    botVersions(id){
+        return lex["getBotVersions"]({
+            name:id,
+            maxResults: 50,
+        }).promise().get("bots");
+    }
+    name(params){
+        if (this.type === 'BotAlias' && params.name) {
+            // use name defined in template if provided otherwise generate a name
+            return params.name;
+        } else {
+            var name = params.name ? clean(params.name) : this.type + makeid()
+            name = params.prefix ? [params.prefix, name].join('_') : name;
+            return name.slice(0, 35) + id(5)
+        }
+    }
+
+    /**
+     * Create is called to construct Bot resources. All resources during a a Create are
+     * given a version of '1'. This includes SlotTypes and Intents. It is best practice to
+     * construct and Alias with a name that points to the first version of the Bot created which
+     * by default is 1.
+     * @param params
+     * @param reply
+     * @constructor
+     */
     Create(params,reply){
         console.log('Create Lex. Params: ' + JSON.stringify(params,null,2))
         console.log('Type: ' + this.type)
@@ -125,7 +186,25 @@ class Lex {
         if(params.childDirected){
             params.childDirected={"false":false,"true":true}[params.childDirected]
         }
+        if(params.createVersion){
+            params.createVersion={"false":false,"true":true}[params.createVersion]
+        }
+        if(this.type==='BotAlias') {
+            params.botVersion = '1';
+        }
+        if(this.type==='Intent') {
+            if (params.slots) {
+                params.slots.forEach(element => {
+                    if (element.slotTypeVersion && element.slotTypeVersion === 'QNABOT-AUTO-ASSIGNED') {
+                        element.slotTypeVersion = '1';
+                    }
+                });
+            }
+        }
         if(this.type==='Bot'){
+            if (params.intents) {
+                params.intents.forEach(element => element.intentVersion = '1');
+            }
             params.processBehavior = "BUILD";
             var start=iam.createServiceLinkedRole({
                 AWSServiceName: 'lex.amazonaws.com',
@@ -142,58 +221,172 @@ class Lex {
         .error(reply).catch(reply)
     }
 
+    /**
+     * Update a resource for a Lex Bot, Intent, SlotType, Alias. Update for each resource is designed to
+     * find the most recent version of a dependent resource and use the last version of that dependent resource.
+     * So an Intent will find the most recent version number of referenced SlotTypes. A Bot will find the most
+     * recent version of a referenced Intents. BotAlias will find the most recent version number of a Bot. The
+     * correct checksums most also be identified to correctly call put operations against these resources. Promises
+     * are used to find checksums and versions and when complete will drive the assignment of versions referenced
+     * by parent resources.
+     * @param ID
+     * @param params
+     * @param oldparams
+     * @param reply
+     * @constructor
+     */
     Update(ID,params,oldparams,reply){
         console.log('Update Lex. ID: ' + ID)
         console.log('Params: ' + JSON.stringify(params,null,2))
         console.log('OldParams: ' + JSON.stringify(oldparams,null,2))
         console.log('Type: ' + this.type)
+        delete params.prefix
         var self=this
         if(this.type!=='Alias'){ // The type of Alias should not be updated.
             if(params.childDirected){
                 params.childDirected={"false":false,"true":true}[params.childDirected]
             }
+            if(params.createVersion){
+                params.createVersion={"false":false,"true":true}[params.createVersion]
+            }
             params.name=ID
             if (this.type==='Bot') {
                 try {
-                    this.checksum(ID).then(cksum => {
+                    /**
+                     * Updates are always made against the $LATEST version so find the checksum of this version.
+                     */
+                    this.checksum(ID,'$LATEST').then( cksum => {
                         params.checksum = cksum;
-                        params.processBehavior = "BUILD";
+                        let p1=[];
+                        /**
+                         * For each Intent in this bot find the latest version number
+                         */
+                        params.intents.forEach(element=>{
+                            p1.push(this.intentVersions(element.intentName));
+                        });
+                        Promise.all(p1).then( values => {
+                            // store a map of the latest version found for each intent. By definition the
+                            // highest version of each intent will be the last element.
+                            const map = new Map();
+                            values.forEach(results => {
+                                const element = results.intents[results.intents.length-1];
+                                map.set(element.name,element.version);
+                            });
+                            params.intents.forEach(element=>{
+                               element.intentVersion = map.get(element.intentName);
+                            });
+                            params.processBehavior = "BUILD";
+                            console.log('Final params before call to update method: ' + JSON.stringify(params,null,2));
                             run(self.update_method, params)
                                 .then(msg => reply(null, msg.name, null))
-                                .catch(error => { console.log('caught', error); reply(error);})
+                                .catch(error => {
+                                    console.log('caught', error);
+                                    reply(error);
+                                })
                                 .error(reply).catch(reply)
-                    })
-                    .catch(error => { console.log('caught', error); reply(error);})
+                        }).catch(error => {
+                            console.log('caught', error);
+                            reply(error);
+                        });
+                    }).catch(error => { console.log('caught', error); reply(error); })
                 } catch (err) {
                     console.log("Exception detected: " + err);
                     reply(null, ID);
                 }
             } else if (this.type==='Intent') {
+                /**
+                 * Update an Intent
+                 */
                 try {
-                    this.checksumIntentOrSlotType(ID).then(cksum => {
+                    // find the checksum for the $LATEST version to use for update
+                    this.checksumIntentOrSlotType(ID,'$LATEST').then(cksum => {
                         params.checksum = cksum;
-                        console.log("Intent parameters for update are: " + JSON.stringify(params,null,2));
+                        // figure out the new SlotType versions as needed
+                        let p1 = [];
+                        if (params.slots) {
+                            params.slots.forEach(element => {
+                                if (element.slotTypeVersion === "QNABOT-AUTO-ASSIGNED") {
+                                    p1.push(this.slotTypeVersions(element.slotType));
+                                }
+                            });
+                        }
+                        if (p1.length > 0) {
+                            Promise.all(p1).then(values => {
+                                const slotTypeMap = new Map();
+                                values.forEach(results => {
+                                    const element = results.slotTypes[results.slotTypes.length-1];
+                                    slotTypeMap.set(element.name, element.version);
+                                });
+                                params.slots.forEach(element => {
+                                    element.slotTypeVersion = slotTypeMap.get(element.slotType);
+                                });
+                                console.log("Intent parameters for update are: " + JSON.stringify(params, null, 2));
+                                run(self.update_method, params)
+                                    .then(msg => reply(null, msg.name, null))
+                                    .catch(error => {
+                                        console.log('caught', error);
+                                        reply(error);
+                                    })
+                                    .error(reply).catch(reply)
+                            }).catch(error => {
+                                console.log('caught', error);
+                                reply(error);
+                            });
+                        } else {
+                            console.log("Intent parameters for update are: " + JSON.stringify(params, null, 2));
                             run(self.update_method, params)
                                 .then(msg => reply(null, msg.name, null))
-                                .catch(error => { console.log('caught', error); reply(error);})
+                                .catch(error => {
+                                    console.log('caught', error);
+                                    reply(error);
+                                })
                                 .error(reply).catch(reply)
-                    })
-                    .catch(error => { console.log('caught', error); reply(error);})
+                        }
+                    }).catch(error => { console.log('caught', error); reply(error);})
                 } catch (err) {
                     console.log("Exception detected: " + err);
                     reply(null, ID);
                 }
             } else if (this.type==='SlotType') {
+                /**
+                 * Update SlotType. This requires finding the checksum of the more recent version
+                 * of the SlotType.
+                 */
                 try {
-                    this.checksumIntentOrSlotType(ID).then(cksum => {
-                        params.checksum = cksum;
-                        console.log("Slot parameters for update are: " + JSON.stringify(params,null,2));
-                        run(self.update_method, params)
-                            .then(msg => reply(null, msg.name, null))
-                            .catch(error => { console.log('caught', error); reply(error);})
-                            .error(reply).catch(reply)
+                    this.slotTypeVersions(ID).then(versions => {
+                        let lastVersion = versions.slotTypes[versions.slotTypes.length-1].version;
+                        this.checksumIntentOrSlotType(ID,lastVersion).then(cksum => {
+                            params.checksum = cksum;
+                            console.log("Slot parameters for update are: " + JSON.stringify(params,null,2));
+                            run(self.update_method, params)
+                                .then(msg => reply(null, msg.name, null))
+                                .catch(error => { console.log('caught', error); reply(error);})
+                                .error(reply).catch(reply)
+                        }).catch(error => { console.log('caught', error); reply(error);})
                     })
-                    .catch(error => { console.log('caught', error); reply(error);})
+                } catch (err) {
+                    console.log("Exception detected: " + err);
+                    reply(null, ID);
+                }
+            } else if (this.type==='BotAlias') {
+                /**
+                 * Update a BotAlias. This requires obtaining:
+                 * - the checksum of the BotAlias
+                 * - the latest version of the Bot now existing on the system
+                 * With these two pieces of information an update can occur using the "run" method.
+                 */
+                try {
+                    this.checksumBotAlias(params.botName, ID).then(cksum => {
+                        params.checksum = cksum;
+                        this.botVersions(params.botName).then(version => {
+                            params.botVersion = version[version.length-1].version; // last version
+                            console.log("BotAlias parameters for update are: " + JSON.stringify(params,null,2));
+                            run(self.update_method, params)
+                                .then(msg => reply(null, msg.name, null))
+                                .catch(error => { console.log('caught', error); reply(error);})
+                                .error(reply).catch(reply)
+                        }).catch(error => { console.log('caught', error); reply(error);})
+                    }).catch(error => { console.log('caught', error); reply(error);})
                 } catch (err) {
                     console.log("Exception detected: " + err);
                     reply(null, ID);

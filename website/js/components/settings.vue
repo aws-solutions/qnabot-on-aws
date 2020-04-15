@@ -30,59 +30,70 @@ or in the "license" file accompanying this file. This file is distributed on an 
 BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied. See the
 License for the specific language governing permissions and limitations under the License.
 */
-var Vuex=require('vuex')
-var Promise=require('bluebird')
-var _=require('lodash')
+var Vuex = require('vuex')
+var Promise = require('bluebird')
+var _ = require('lodash')
 
-module.exports={
-    data:function(){
-        var self=this
+module.exports = {
+    data: function () {
+        var self = this
         return {
-            mergedSettings:{},
-            defaultSettings:{},
+            mergedSettings: {},
+            defaultSettings: {},
             customSettings: {},
             settingsHolder: {},
             successAlert: false
         }
     },
-    components:{},
-    computed:{},
-    created:async function(){
-      const settings = await this.$store.dispatch('api/listSettings');
-      this.defaultSettings = _.clone(settings[0]);
-      this.customSettings = _.clone(settings[1]);
-      this.mergedSettings = _.clone(settings[2]);
-      this.settingsHolder = _.clone(settings[2]);
+    components: {},
+    computed: {},
+    created: async function () {
+        const settings = await this.$store.dispatch('api/listSettings');
+        this.defaultSettings = _.clone(settings[0]);
+        this.customSettings = _.clone(settings[1]);
+        this.mergedSettings = _.clone(settings[2]);
+        this.settingsHolder = _.clone(settings[2]);
     },
-    methods:{
-      SaveSettings: async function(){
-        let newCustomSettings = _.clone(this.settingsHolder);
-        for (let key in newCustomSettings) {
-          let value = newCustomSettings[key];
-          let compare = _.get(this.defaultSettings, key);
-          if (value === compare) {
-            delete newCustomSettings[key]
-          }
-        }
-        let cloned_custom = _.clone(this.customSettings);
-        let newSettings = _.merge(cloned_custom, newCustomSettings)
-        let response = await this.$store.dispatch('api/updateSettings', newSettings);
-        if (response) {
-          this.successAlert = true;
-          window.scrollTo(0,0);
-        }
-      },
-      resetToDefaults: async function(){
-        let customOverride = {};
-        let response = await this.$store.dispatch('api/updateSettings', customOverride);
-        if(response) {
-          this.customSettings = {};
-          this.settingsHolder = _.clone(this.defaultSettings);
-          this.successAlert = true;
-          window.scrollTo(0,0);
-        }
+    methods: {
+        SaveSettings: async function () {
+            // update current customSettings with new values from settingsHolder
+            for (let key in this.customSettings) {
+                this.customSettings[key] = this.settingsHolder[key];
+            }
 
-      }
+            // place in customSettings any differences from defaultSettings
+            for (let key in this.settingsHolder) {
+                if (this.settingsHolder[key] !== this.defaultSettings[key]) {
+                    this.customSettings[key] = this.settingsHolder[key];
+                }
+            }
+
+            // remove any custom settings that are identical to default settings
+            for (let key in this.customSettings) {
+                if (this.customSettings[key] === this.defaultSettings[key]) {
+                    delete this.customSettings[key];
+                }
+            }
+
+            // clone object to send on api request - no chance of inflight updates from the ui
+            const cloned_custom = _.clone(this.customSettings);
+            let response = await this.$store.dispatch('api/updateSettings', cloned_custom);
+            if (response) {
+                this.successAlert = true;
+                window.scrollTo(0, 0);
+            }
+        },
+        resetToDefaults: async function () {
+            let customOverride = {};
+            let response = await this.$store.dispatch('api/updateSettings', customOverride);
+            if (response) {
+                this.customSettings = {};
+                this.settingsHolder = _.clone(this.defaultSettings);
+                this.successAlert = true;
+                window.scrollTo(0, 0);
+            }
+
+        }
     }
 }
 </script>

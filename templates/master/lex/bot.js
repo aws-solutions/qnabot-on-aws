@@ -1,5 +1,8 @@
 var config=require('./config')
 
+//must change this version to force upgrades to reapply across the entire Bot echo system
+const qnabotversion = "QnABot 3.0.1 - 04/13/2020 v2";
+
 module.exports={
     "QNAInvokePermission": {
       "Type": "AWS::Lambda::Permission",
@@ -13,6 +16,8 @@ module.exports={
         "Type": "Custom::LexSlotType",
         "Properties": {
             "ServiceToken": { "Fn::GetAtt" : ["CFNLambda", "Arn"] },
+            "createVersion" : true,
+            "description": "custom slot type " + qnabotversion,
             "enumerationValues": config.utterances.map(x=>{return {value:x}})
         }
     },
@@ -23,6 +28,8 @@ module.exports={
           "Fn::GetAtt": ["CFNLambda","Arn"]
         },
         "prefix":"fulfilment",
+        "description": "custom intent " + qnabotversion,
+        "createVersion" : true,
         "sampleUtterances": [
             "{slot}"
         ],
@@ -30,7 +37,7 @@ module.exports={
             "name":"slot",
             "slotType":{"Ref":"SlotType"},
             "slotConstraint":"Optional",
-            "slotTypeVersion":"$LATEST"
+            "slotTypeVersion":"QNABOT-AUTO-ASSIGNED"
         }],
         "fulfillmentActivity": {
           "type": "CodeHook",
@@ -49,6 +56,8 @@ module.exports={
                 "Fn::GetAtt": ["CFNLambda","Arn"]
             },
             "prefix":"qnabotfallbackfulfilment",
+            "description": "custom fallback intent " + qnabotversion,
+            "createVersion" : true,
             "fulfillmentActivity": {
                 "type": "CodeHook",
                 "codeHook": {
@@ -70,12 +79,14 @@ module.exports={
           ]
         },
         "name":{"Fn::Sub":"${AWS::StackName}-Bot"},
+        "description": "QnABot primary bot " + qnabotversion,
         "locale": "en-US",
         "voiceId": config.voiceId,
         "childDirected": false,
-        "intents": [
-            {"intentName": {"Ref": "Intent"},"intentVersion": "$LATEST"},
-            {"intentName": {"Ref": "IntentFallback"},"intentVersion": "$LATEST"}
+        "createVersion": true,
+          "intents": [
+            {"intentName": {"Ref": "Intent"}},
+            {"intentName": {"Ref": "IntentFallback"}}
         ],
         "abortStatement": {
           "messages": [
@@ -100,7 +111,8 @@ module.exports={
         "botName": {
           "Ref": "LexBot"
         },
-        "botVersion": "$LATEST"
+        "name": "live",
+        "description": "QnABot live alias " + qnabotversion
       }
     }
 }

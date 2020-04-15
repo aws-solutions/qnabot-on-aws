@@ -138,10 +138,26 @@ See the [LICENSE.md](LICENSE.md) file for details
 
 ## New features
 
+### Conditional Chaining now supports Lambda Function
+You can specify that a Conditional Chaining rule runs a Lambda Function using the "Lambda::FunctionName" syntax.
+The Lambda function name must start with "QNA". The Lambda will receive arguments the same as Lambda Hooks. The
+function must return a String that is used to resolve the next item just the same as other conditional chaining rules.
+
+### Improved Scale
+This release of QnABot utilizes Lex Bot aliases and Lex versioning. The QnA Bot and all ElicitResponse Bots are
+now installed using the alias 'live'. 'live' points at the latest numbered Bot version. All Lex resources are now
+versioned starting with '1' after initial installation.
+
+### Additional Elicit Response Bots
+This release adds several elicit response bots for 
+QNAWage - 7 digit wage value - returns slot named "Wage"
+QNASocialSecurity - SSN Numbers in the nnn-nn-nnnn format - returns slot named "SSN"
+QNAPin - 4 digit pin value - Returns slot named "Pin"
+
 ### Configuring QnABot to ask the questions
 QnABot was designed to answer questions, but now it can also ask questions and process 
 the user’s answers. Use this feature for data collection and validation; 
-o implement surveys, quizzes, personalized recommendations; or to build a triage 
+or implement surveys, quizzes, personalized recommendations; or to build a triage 
 chatbot application. See the [blog post](https://aws.amazon.com/blogs/machine-learning/creating-a-question-and-answer-bot-with-amazon-lex-and-amazon-alexa/) for details about this new feature. 
 This feature is know as ElicitResponse from a configuration perspective.
 
@@ -252,26 +268,11 @@ the feature. Step 2 loads in two questions from this extension that allow the us
 defaults supplied in this question are English, Spanish, French, German, and Italian. You can extend this list to
 support other languages. 
 
-Step 1) Custom Property
+Step 1) Enable multi language support 
 
-a) QnABot uses a property named ENABLE_MULTI_LANGUAGE_SUPPORT. It is a boolean and has a default value of false. 
-You can override this setting using SSM Parameter Store to add a new key/value pair as a custom property. 
-Find your custom property name from the QnABot CF stack outputs. The key in the QnABot CF stack outputs is 
-'CustomSettingsSSMParameterName'. If will have a value similar to 
+a) QnABot uses a property named ENABLE_MULTI_LANGUAGE_SUPPORT, default value of "false". 
+You can change this setting using the Content Designer Settings page. Set it to "true" to enable multi language support.
 
-```
-CFN-CustomQnABotSettings-EOVHQJcYx9Ms
-```
-
-b) Identify your CustomSettingsSSMParameterName property name using CloudFormation and then open the AWS Systems 
-Manager console and navigate to ParameterStore. Filter the list using your custom property name name. Open and Edit the parameter. 
-
-Set the value to be the following and save the changes. Be careful if you already have existing key/value pairs in
-this property. If you do have existing key/value apirs, be sure to add the key and value as a new attribute of the object. 
-
-```
-{"ENABLE_MULTI_LANGUAGE_SUPPORT":true}
-```
 
 Step 2) Use the Designer UI to import the Sample/Extension named Language / Multiple Language Support.
 

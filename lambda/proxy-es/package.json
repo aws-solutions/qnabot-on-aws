@@ -20,6 +20,7 @@
     "markdown": "^0.5.0",
     "handlebars": "^4.7.2",
     "safe-eval": "^0.4.1",
-    "simple-encryptor": "^3.0.0"
+    "simple-encryptor": "^3.0.0",
+    "intercept-stdout": "^0.1.2"
   }
 }
