@@ -113,7 +113,9 @@ async function evaluateConditionalChaining(req, res, hit, conditionalChaining) {
     conditionalChaining = encryptor.decrypt(conditionalChaining);
     console.log("Decrypted Chained document rule specified:", conditionalChaining);
     // provide 'SessionAttributes' to chaining rule safeEval context, consistent with Handlebars context
-    const context={SessionAttributes:res.session};
+    const SessionAttributes = (arg) => _.get(SessionAttributes, arg, undefined);
+    _.assign(SessionAttributes, res.session);
+    const context={SessionAttributes};
     // safely evaluate conditionalChaining expression.. throws an exception if there is a syntax error
     const next_q = safeEval(conditionalChaining, context);
     console.log("Chained document rule evaluated to:", next_q);
