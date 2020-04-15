@@ -32,7 +32,7 @@ module.exports={
         "Value":{"Ref":"LexBot"}
     },
     "BotAlias":{
-        "Value":{"Ref":"Alias"}
+        "Value":{"Ref":"VersionAlias"}
     },
     "SlotType":{
         "Value":{"Ref":"SlotType"}

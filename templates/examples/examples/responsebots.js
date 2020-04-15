@@ -6,7 +6,7 @@
  * in the associated Bot. Failure to do so when running an update will leave the bot in the NOT_BUILT state and you
  * will need to rebuild in the AWS Console. To update description for all bots, change botDateVersion string below.
  */
-const botDateVersion = "QnABot 3.0.1 - 04/15/2020 v1";  // CHANGE ME TO FORCE BOT REBUILD
+const botDateVersion = "QnABot 3.0.1 - 04/15/2020 v3";  // CHANGE ME TO FORCE BOT REBUILD
 
 var _ = require('lodash');
 
@@ -129,7 +129,7 @@ exports.resources={
             ],
         },
     },
-    "WageAlias": {
+    "WageAliasV2": {
         "Type": "Custom::LexAlias",
         "Properties": {
             "ServiceToken": {"Ref": "CFNLambda"},
@@ -251,7 +251,7 @@ exports.resources={
             ],
         },
     },
-    "SocialSecurityAlias": {
+    "SocialSecurityAliasV2": {
         "Type": "Custom::LexAlias",
         "Properties": {
             "ServiceToken": {"Ref": "CFNLambda"},
@@ -374,7 +374,7 @@ exports.resources={
             ],
         },
     },
-    "PinAlias": {
+    "PinAliasV2": {
         "Type": "Custom::LexAlias",
         "Properties": {
             "ServiceToken": {"Ref": "CFNLambda"},
@@ -475,7 +475,7 @@ exports.resources={
         },
       }
     },
-    "YesNoAlias": {
+    "YesNoAliasV2": {
       "Type": "Custom::LexAlias",
       "DependsOn": "QNAYesNo",
       "Properties": {
@@ -585,7 +585,7 @@ exports.resources={
             }
         }
     },
-    "DateAlias": {
+    "DateAliasV2": {
         "Type": "Custom::LexAlias",
         "DependsOn": "QNADate",
         "Properties": {
@@ -692,7 +692,7 @@ exports.resources={
             "description": "QNADayOfWeek bot - " + botDateVersion,
         }
     },
-    "DayOfWeekAlias": {
+    "DayOfWeekAliasV2": {
         "Type": "Custom::LexAlias",
         "DependsOn": "QNADayOfWeek",
         "Properties": {
@@ -798,7 +798,7 @@ exports.resources={
             "description": "QNA Month Bot - " + botDateVersion,
         }
     },
-    "MonthAlias": {
+    "MonthAliasV2": {
         "Type": "Custom::LexAlias",
         "DependsOn": "QNAMonth",
         "Properties": {
@@ -903,7 +903,7 @@ exports.resources={
             "description": "QNA Number Bot - " + botDateVersion,
         }
     },
-    "NumberAlias": {
+    "NumberAliasV2": {
         "Type": "Custom::LexAlias",
         "DependsOn": "QNANumber",
         "Properties": {
@@ -1016,7 +1016,7 @@ exports.resources={
             }
         }
     },
-    "AgeAlias": {
+    "AgeAliasV2": {
         "Type": "Custom::LexAlias",
         "DependsOn": "QNAAge",
         "Properties": {
@@ -1124,7 +1124,7 @@ exports.resources={
             }
         }
     },
-    "PhoneNumberAlias": {
+    "PhoneNumberAliasV2": {
         "Type": "Custom::LexAlias",
         "DependsOn": "QNAPhoneNumber",
         "Properties": {
@@ -1229,7 +1229,7 @@ exports.resources={
             }
         }
     },
-    "TimeAlias": {
+    "TimeAliasV2": {
         "Type": "Custom::LexAlias",
         "DependsOn": "QNATime",
         "Properties": {
@@ -1333,7 +1333,7 @@ exports.resources={
             }
         }
     },
-    "EmailAddressAlias": {
+    "EmailAddressAliasV2": {
         "Type": "Custom::LexAlias",
         "DependsOn": "QNAEmailAddress",
         "Properties": {
@@ -1458,7 +1458,7 @@ exports.resources={
             }
         }
     },
-    "NameAlias": {
+    "NameAliasV2": {
         "Type": "Custom::LexAlias",
         "DependsOn": "QNAName",
         "Properties": {

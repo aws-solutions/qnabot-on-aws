@@ -7,7 +7,7 @@ module.exports={
                 "CFNLambda":{"Fn::GetAtt":["CFNLambda","Arn"]},
                 "CFNInvokePolicy":{"Ref":"CFNInvokePolicy"},
                 "BotName":{"Ref":"LexBot"},
-                "BotAlias":{"Ref":"Alias"},
+                "BotAlias":{"Ref":"VersionAlias"},
                 "BootstrapBucket":{"Ref":"BootstrapBucket"},
                 "BootstrapPrefix":{"Ref":"BootstrapPrefix"},
                 "VarIndex": {"Fn::GetAtt": ["Var", "index"]},

@@ -249,8 +249,8 @@ class Lex {
             if(params.createVersion){
                 params.createVersion={"false":false,"true":true}[params.createVersion]
             }
-            params.name=ID
             if (this.type==='Bot') {
+                params.name = ID;
                 try {
                     /**
                      * Updates are always made against the $LATEST version so find the checksum of this version.
@@ -297,6 +297,7 @@ class Lex {
                 /**
                  * Update an Intent
                  */
+                params.name = ID;
                 try {
                     // find the checksum for the $LATEST version to use for update
                     this.checksumIntentOrSlotType(ID,'$LATEST').then(cksum => {
@@ -352,6 +353,7 @@ class Lex {
                  * Update SlotType. This requires finding the checksum of the more recent version
                  * of the SlotType.
                  */
+                params.name = ID;
                 try {
                     this.slotTypeVersions(ID).then(versions => {
                         let lastVersion = versions.slotTypes[versions.slotTypes.length-1].version;

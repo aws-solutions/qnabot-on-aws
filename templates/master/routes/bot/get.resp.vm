@@ -7,7 +7,7 @@
     "status":"$inputRoot.status",
     "build":$input.json('$.build'),
     "botname":"${LexBot}",
-    "botversion":"${Alias}",
+    "botversion":"${VersionAlias}",
     "messages":{
         "clarification":[
             #foreach($message in $input.path('$.clarificationPrompt.messages'))

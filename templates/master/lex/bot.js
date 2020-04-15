@@ -1,7 +1,7 @@
 var config=require('./config')
 
 //must change this version to force upgrades to reapply across the entire Bot echo system
-const qnabotversion = "QnABot 3.0.1 - 04/13/2020 v2";
+const qnabotversion = "QnABot 3.0.1 - 04/15/2020 v3";
 
 module.exports={
     "QNAInvokePermission": {
@@ -98,7 +98,7 @@ module.exports={
         }
       }
     },
-    "Alias": {
+    "VersionAlias": {
       "Type": "Custom::LexAlias",
       "DependsOn": "LexBot",
       "Properties": {

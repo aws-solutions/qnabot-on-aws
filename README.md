@@ -7,6 +7,8 @@ This repository contains code for the QnABot, described in the AWS AI blog post 
 
 See the "Getting Started" to launch your own QnABot
 
+**New features in 3.0.1** [New Elicit Response Bots, Lambda Functions backing conditional chaining, Lex Bot versioning use](#new-features)
+
 **New features in 3.0.0** [ElicitResponse, Conditional Chaining, new Launch regions](#new-features)
 
 **Note that versions prior to 3.0.0 will not directly upgrade to this version.** If running version 2.6.n,
