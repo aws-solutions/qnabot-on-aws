@@ -1,3 +1,10 @@
+## [3.0.0 - 3.0.2]
+- Improved scale using Lex versions and aliases
+- Elicit Response Bots allowing QnABot to ask its own questions
+- Conditional chaining to jump to other items based on user answers
+- New Connect Callback example bot and questions
+- New launch regions to install QnABot in eu-west-1, ap-southeast-2, us-west-2
+- Editable settings
 ## [2.6.0]
 - Fix for the Next/Previous sample functions when the next or previous questions reference a lambda hook
 - Update handlebars in extensions / samples to use version ^4.3.0

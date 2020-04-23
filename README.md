@@ -7,7 +7,7 @@ This repository contains code for the QnABot, described in the AWS AI blog post 
 
 See the "Getting Started" to launch your own QnABot
 
-**New features in 3.0.1** [New Elicit Response Bots, Lambda Functions backing conditional chaining, Lex Bot versioning use](#new-features)
+**New features in 3.0.2** [New Elicit Response Bots, Lambda Functions backing conditional chaining, Lex Bot versioning use](#new-features)
 
 **New features in 3.0.0** [ElicitResponse, Conditional Chaining, new Launch regions](#new-features)
 
@@ -139,6 +139,39 @@ We are currently working on adding Microsoft Edge support.
 See the [LICENSE.md](LICENSE.md) file for details
 
 ## New features
+
+### New Connect Callback Example
+New example demonstrating how QnABot can be asked by a user for a live agent based phone callback. The 
+implementation provides a new LambdaHook example as well as four sample questions that ask a user for 
+their name and phone number prior to handing off to an Amazon Connect instance to initiate the callback. 
+To configuration updates are required to use this example with Amazon Connect. 
+
+1) The IAM Role/Policy used by the ConnectCallback Lambda must include a new policy that allows 
+the action "connect:StartOutboundVoiceContact" to be used with the resource
+"arn:aws:connect:*:*:instance/<YourConnectInstanceId>/*". The following is an example of this policy
+```
+{
+   "Version": "2012-10-17",
+   "Statement": [
+       {
+           "Sid": "VisualEditor0",
+           "Effect": "Allow",
+           "Action": "connect:StartOutboundVoiceContact",
+           "Resource": "arn:aws:connect:*:*:instance/<YourConnectInstanceId>/contact/*"
+       }
+   ]
+}
+```
+2) Using the UI Designer, the item with qid CONNECT_TO_AGENT.04 needs to have is Lambda Arguments updated. The fields
+Under advanced, the item's arguments field needs to be adjusted replacing the following identifiers with actual
+identifiers from the Connect instance:
+``` 
+"AWS_connect_instance_id": "<your-connect-instance-id >",
+"AWS_connect_contact_flow_id": "<your-connect-contact-flow-id>", 
+"AWS_connect_queue_id": "<your-connect-queue-id>", 
+```
+Once these configuration changes are in place, QnABot can be successfully use Amazon Connect to place
+outbound calls. 
 
 ### Conditional Chaining now supports Lambda Function
 You can specify that a Conditional Chaining rule runs a Lambda Function using the "Lambda::FunctionName" syntax.
