@@ -1,0 +1,155 @@
+{
+    "qna": [
+        {
+            "args": [
+                "{\n\"AWS_region\": \"COPIED_FROM_AMAZON_CONNECT_CONTACT_FLOW\", \"AWS_connect_instance_id\": \"COPIED_FROM_AMAZON_CONNECT_CONTACT_FLOW\", \"AWS_connect_contact_flow_id\": \"COPIED_FROM_AMAZON_CONNECT_CONTACT_FLOW\", \"AWS_connect_queue_id\": \"COPIED_FROM_AMAZON_CONNECT_QUEUE_FLOW\", \"AWS_connect_phone_number\": \"+1AMAZON_CONNECT_PHONE_NUMBER\"\n}"
+            ],
+            "next": "",
+            "a": "We will call you in just a moment. Thank you.",
+            "r": {
+                "buttons": [
+                    {
+                        "text": "",
+                        "value": ""
+                    }
+                ],
+                "subTitle": "",
+                "imageUrl": "",
+                "title": "",
+                "text": "",
+                "url": ""
+            },
+            "t": "",
+            "elicitResponse": {
+                "response_sessionattr_namespace": "",
+                "responsebot_hook": ""
+            },
+            "alt": {
+                "markdown": "",
+                "ssml": ""
+            },
+            "conditionalChaining": "",
+            "l": "QNA:ExamplePYTHONLambdaConnectCallback",
+            "qid": "CONNECT_TO_AGENT.04",
+            "type": "qna",
+            "q": [
+                "CONNECT_TO_AGENT"
+            ]
+        },
+        {
+            "args": [
+                ""
+            ],
+            "next": "",
+            "a": "What phone number can we reach you at? Enter phone number such as: (xxx) xxx xxxx",
+            "r": {
+                "buttons": [
+                    {
+                        "text": "",
+                        "value": ""
+                    }
+                ],
+                "subTitle": "",
+                "imageUrl": "",
+                "title": ""
+            },
+            "t": "",
+            "elicitResponse": {
+                "response_sessionattr_namespace": "contact_phone_number",
+                "responsebot_hook": "QNAPhoneNumber"
+            },
+            "alt": {
+                "markdown": "",
+                "ssml": ""
+            },
+            "conditionalChaining": "'CONNECT_TO_AGENT'",
+            "l": "",
+            "qid": "CONNECT_TO_AGENT.03",
+            "type": "qna",
+            "selected": false,
+            "q": [
+                "ACCEPT_CONTACT_PHONE_NUMBER"
+            ]
+        },
+        {
+            "args": [
+                ""
+            ],
+            "next": "",
+            "a": "What is your name?",
+            "r": {
+                "buttons": [
+                    {
+                        "text": "",
+                        "value": ""
+                    }
+                ],
+                "subTitle": "",
+                "imageUrl": "",
+                "title": "",
+                "text": "",
+                "url": ""
+            },
+            "t": "",
+            "elicitResponse": {
+                "response_sessionattr_namespace": "contact_name",
+                "responsebot_hook": "QNAName"
+            },
+            "alt": {
+                "markdown": "",
+                "ssml": ""
+            },
+            "conditionalChaining": "'ACCEPT_CONTACT_PHONE_NUMBER'",
+            "l": "",
+            "qid": "CONNECT_TO_AGENT.02",
+            "type": "qna",
+            "q": [
+                "ACCEPT_CONTACT_NAME"
+            ]
+        },
+        {
+            "args": [
+                ""
+            ],
+            "next": "",
+            "a": "Sure. Before I connect you with an agent, I'll need some additional information. ",
+            "r": {
+                "buttons": [
+                    {
+                        "text": "",
+                        "value": ""
+                    }
+                ],
+                "subTitle": "",
+                "imageUrl": "",
+                "title": ""
+            },
+            "t": "",
+            "elicitResponse": {
+                "response_sessionattr_namespace": "",
+                "responsebot_hook": ""
+            },
+            "alt": {
+                "markdown": "",
+                "ssml": ""
+            },
+            "conditionalChaining": "'ACCEPT_CONTACT_NAME'",
+            "l": "",
+            "qid": "CONNECT_TO_AGENT.01",
+            "type": "qna",
+            "selected": false,
+            "q": [
+                "can you call me",
+                "call me",
+                "want to speak with a agent",
+                "please call me",
+                "connect me with a live person",
+                "live agent",
+                "agent please",
+                "representative please",
+                "I need someone to call me",
+                "I need to speak with someone on the phone"
+            ]
+        }
+    ]
+}
