@@ -144,9 +144,10 @@ See the [LICENSE.md](LICENSE.md) file for details
 New example demonstrating how QnABot can be asked by a user for a live agent based phone callback. The 
 implementation provides a new LambdaHook example as well as four sample questions that ask a user for 
 their name and phone number prior to handing off to an Amazon Connect instance to initiate the callback. 
-To configuration updates are required to use this example with Amazon Connect. 
 
-1) The IAM Role/Policy used by the ConnectCallback Lambda must include a new policy that allows 
+Two configuration updates are required to use this example with Amazon Connect. 
+
+* The IAM Role/Policy used by the ConnectCallback Lambda must include a new policy that allows 
 the action "connect:StartOutboundVoiceContact" to be used with the resource
 "arn:aws:connect:*:*:instance/<YourConnectInstanceId>/*". The following is an example of this policy
 ```
@@ -162,9 +163,8 @@ the action "connect:StartOutboundVoiceContact" to be used with the resource
    ]
 }
 ```
-2) Using the UI Designer, the item with qid CONNECT_TO_AGENT.04 needs to have is Lambda Arguments updated. The fields
-Under advanced, the item's arguments field needs to be adjusted replacing the following identifiers with actual
-identifiers from the Connect instance:
+* Lambda Hook Arguments need to be updated. Before being used, the item with qid CONNECT_TO_AGENT.04 
+should have its Arguments field adjusted to reflect identifiers from the Connect instance:
 ``` 
 "AWS_connect_instance_id": "<your-connect-instance-id >",
 "AWS_connect_contact_flow_id": "<your-connect-contact-flow-id>", 
