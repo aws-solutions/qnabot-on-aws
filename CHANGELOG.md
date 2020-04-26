@@ -1,3 +1,6 @@
+## [3.0.3]
+- Enhanced CFN lex create/update to identify and use versions of the Bot externally created
+- Added content tuning Readme
 ## [3.0.0 - 3.0.2]
 - Improved scale using Lex versions and aliases
 - Elicit Response Bots allowing QnABot to ask its own questions

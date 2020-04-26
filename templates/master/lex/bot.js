@@ -1,7 +1,7 @@
 var config=require('./config')
 
 //must change this version to force upgrades to reapply across the entire Bot echo system
-const qnabotversion = "QnABot 3.0.1 - 04/15/2020 v3";
+const qnabotversion = "QnABot 3.0.3 - 04/26/2020 v1";
 
 module.exports={
     "QNAInvokePermission": {

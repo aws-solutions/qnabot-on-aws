@@ -6,7 +6,7 @@
  * in the associated Bot. Failure to do so when running an update will leave the bot in the NOT_BUILT state and you
  * will need to rebuild in the AWS Console. To update description for all bots, change botDateVersion string below.
  */
-const botDateVersion = "QnABot 3.0.1 - 04/15/2020 v3";  // CHANGE ME TO FORCE BOT REBUILD
+const botDateVersion = "QnABot 3.0.3 - 04/26/2020 v1";  // CHANGE ME TO FORCE BOT REBUILD
 
 var _ = require('lodash');
 

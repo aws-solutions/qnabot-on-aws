@@ -7,6 +7,8 @@ This repository contains code for the QnABot, described in the AWS AI blog post 
 
 See the "Getting Started" to launch your own QnABot
 
+**New features in 3.0.3** [New content tuning Readme, Enhanced CFN Lex Resource to work with manually created Bot versions](#new-features)
+
 **New features in 3.0.2** [New Elicit Response Bots, Lambda Functions backing conditional chaining, Lex Bot versioning use](#new-features)
 
 **New features in 3.0.0** [ElicitResponse, Conditional Chaining, new Launch regions](#new-features)
@@ -139,6 +141,9 @@ We are currently working on adding Microsoft Edge support.
 See the [LICENSE.md](LICENSE.md) file for details
 
 ## New features
+
+### Content Tuning and Accuracy Guide
+Content Tuning an and Accuracy Guide now available as a Markdown Readme.  [README](tuning_accuracy_guide/AWS_QnABot_tuning_recognition_accuracy_guide.md)
 
 ### Optional Redact feature for log and metric output
 QnABot can be configured to redact information written to CloudWatch logs, S3 metrics, and Kibana metrics logs. 
