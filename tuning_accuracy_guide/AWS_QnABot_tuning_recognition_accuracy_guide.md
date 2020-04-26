@@ -216,7 +216,6 @@ way to see how well the chatbot is performing. You can then augment the
 knowledge base where needed.
 
 ![](image9.png)
-    
 *Figure 4.0 -- Kibana dashboard showing* No Hits *report*
 
     Any questions not in the knowledge base can be easily added by using the QnABot designer console.
@@ -233,7 +232,6 @@ the same question that can be included to further train the bot to
 understand user input.
 
 ![](image10.png)
-
 *Figure 5.0 -- Example question that can provide undesired and skewed results*
 
     In the above example, you can see that the question uses repeated "*how
