@@ -466,7 +466,6 @@ class Lex {
                 params.name = ID;
                 try {
                     this.slotTypeVersions(ID).then(versions => {
-                        let lastVersion = versions.slotTypes[versions.slotTypes.length-1].version;
                         this.checksumIntentOrSlotType(ID,'$LATEST').then(cksum => {
                             params.checksum = cksum;
                             console.log("Slot parameters for update are: " + JSON.stringify(params,null,2));
