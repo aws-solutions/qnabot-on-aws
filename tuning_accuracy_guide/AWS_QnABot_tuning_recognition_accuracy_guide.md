@@ -215,8 +215,9 @@ no question and answer exists in the knowledge base. This can be another
 way to see how well the chatbot is performing. You can then augment the
 knowledge base where needed.
 
-    ![](image9.png)
-    *Figure 4.0 -- Kibana dashboard showing* No Hits *report*
+![](image9.png)
+    
+*Figure 4.0 -- Kibana dashboard showing* No Hits *report*
 
     Any questions not in the knowledge base can be easily added by using the QnABot designer console.
 
@@ -231,8 +232,9 @@ question. In the below example, you can see there are many variations of
 the same question that can be included to further train the bot to
 understand user input.
 
-    ![](image10.png)
-    *Figure 5.0 -- Example question that can provide undesired and skewed results*
+![](image10.png)
+
+*Figure 5.0 -- Example question that can provide undesired and skewed results*
 
     In the above example, you can see that the question uses repeated "*how
 do I use*" phrase in the question. This could skew other questions like
