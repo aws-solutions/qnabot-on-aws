@@ -216,25 +216,27 @@ way to see how well the chatbot is performing. You can then augment the
 knowledge base where needed.
 
 ![](image9.png)
+
 *Figure 4.0 -- Kibana dashboard showing* No Hits *report*
 
-    Any questions not in the knowledge base can be easily added by using the QnABot designer console.
+Any questions not in the knowledge base can be easily added by using the QnABot designer console.
 
-    Additionally, for questions that are going unanswered (even though the
+Additionally, for questions that are going unanswered (even though the
 knowledge base contains the questions and answers), you can re-visit
 those questions in the QnABot designer and add different variations of
 the same questions (as noticed in the Kibana "No Hits" report).
 
-    For example: For the question "*How do I use Q&A chatbot?*" you can use
+For example: For the question "*How do I use Q&A chatbot?*" you can use
 the QnABot designer to add multiple variations of how one can ask the
 question. In the below example, you can see there are many variations of
 the same question that can be included to further train the bot to
 understand user input.
 
 ![](image10.png)
+
 *Figure 5.0 -- Example question that can provide undesired and skewed results*
 
-    In the above example, you can see that the question uses repeated "*how
+In the above example, you can see that the question uses repeated "*how
 do I use*" phrase in the question. This could skew other questions like
 "*How do I use* Alexa?" or \"*How do I use* Kibana?\" to this answer. If
 you had another item, with just one question "*How do I use* Alexa?" It
@@ -243,13 +245,15 @@ repeated "*how do I use*" from the three questions in the above example
 could add up to more than the score for the match on "*How do I use*
 Alexa?" or \"*How do I use* Kibana?\"
 
-    It is a better practice to avoid repeating phrases in multiple
+It is a better practice to avoid repeating phrases in multiple
 questions. Instead, you can actually put all the alternatives into a
 single question, such as below:
 
-    "How do I use Q&A / q and a chatbot?"
+```
+"How do I use Q&A / q and a chatbot?"
+````
 
-    These options can further help tune the chatbot to better understand
+These options can further help tune the chatbot to better understand
 user input and be able to support different ways of asking the same
 question.
 
