@@ -2,7 +2,7 @@ module.exports=[
 {
 "_index": ".kibana",
 "_type": "config",
-"_id": "5.1.1",
+"_id": "7.4",
 "_source": {
   "buildNum": 14566,
   "defaultIndex": {"Fn::Sub":"${Var.index}"},

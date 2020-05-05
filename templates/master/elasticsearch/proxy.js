@@ -115,8 +115,26 @@ module.exports={
                         }
                     },
                     mappings:{
-                        "${Var.QnAType}":require('./schema/qna'),
-                        "${Var.QuizType}":require('./schema/quiz')
+                        // "${Var.QnAType}":require('./schema/qna')
+                        _meta: {
+                            schema: {
+                                properties: {
+                                    qid: {
+                                        type: "string",
+                                        title: "Item ID",
+                                        description: "Assign a unique identifier for this item.",
+                                        maxLength: 100,
+                                        propertyOrder: 0
+                                    },
+                                    required: ["qid"]
+                                }
+                            },
+                        },
+                        properties:{
+                            qid:{
+                                type:"keyword"
+                            },
+                        }
                     }
                 })}
             },

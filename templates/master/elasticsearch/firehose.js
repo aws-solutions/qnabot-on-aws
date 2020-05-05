@@ -27,7 +27,7 @@ module.exports={
                     "CompressionFormat" : "UNCOMPRESSED",
                     "RoleARN" : {"Fn::GetAtt" : ["FirehoseESS3Role", "Arn"] }
                 },
-                "TypeName" : "feedback"
+                "TypeName" : ""
             },
         }
     },
@@ -59,7 +59,7 @@ module.exports={
                     "CompressionFormat" : "UNCOMPRESSED",
                     "RoleARN" : {"Fn::GetAtt" : ["FirehoseESS3Role", "Arn"] }
                 },
-                "TypeName" : "general"
+                "TypeName" : ""
             },
         }
     },

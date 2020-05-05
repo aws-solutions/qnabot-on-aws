@@ -40,7 +40,7 @@
   "homepage": "https://github.com/awslabs/aws-ai-qna-bot#readme",
   "dependencies": {
     "JSONPath": "^0.11.2",
-    "ajv": "^6.10.2",
+    "ajv": "^6.12.2",
     "alexa-sdk": "^1.0.25",
     "amazon-cognito-identity-js": "^1.31.0",
     "ask-cli": "^1.7.23",

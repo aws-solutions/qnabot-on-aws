@@ -669,7 +669,7 @@
           "path": {"Fn::Sub": "_bulk"},
           "method": "POST",
           "body": [
-            {"index": {"_index": ".kibana", "_type": "config", "_id": "5.1.1"}},
+            {"index": {"_index": ".kibana", "_type": "config", "_id": "7.4"}},
             {
               "buildNum": 14566,
               "defaultIndex": {"Fn::Sub": "${Var.index}"},
