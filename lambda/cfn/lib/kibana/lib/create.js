@@ -21,30 +21,25 @@ module.exports=function(params){
 
     return con.tap(createIndex).tap(function(es){
         return Promise.join(
-            createMapping(es,"index-pattern"),        
-            createMapping(es,"config"),        
-            createMapping(es,"visualization"),        
-            createMapping(es,"search"),
-            createMapping(es,"dashboard"),
-            createMapping(es,"server")
+            createMapping(es,"_doc")
         )
     }).tap(()=>console.log("created mappings"))
-    .tap(es=>es.indices.refresh())
-    .tap(()=>console.log("put files"))
+        .tap(es=>es.indices.refresh())
+        .tap(()=>console.log("put files"))
 }
 
 var createIndex=function(es){
     return es.indices.exists({
         index:index
     })
-    .tap(exists=>console.log('index '+index+' exists:'+exists))
-    .tap(function(exists){ 
-        return !exists ? es.indices.create({
-            index:index
-        }) : null
-    })
-    .tap(()=>console.log('index created'))
-    .tapCatch(()=>console.log('index failed'))
+        .tap(exists=>console.log('index '+index+' exists:'+exists))
+        .tap(function(exists){
+            return !exists ? es.indices.create({
+                index:index
+            }) : null
+        })
+        .tap(()=>console.log('index created'))
+        .tapCatch(()=>console.log('index failed'))
 }
 
 var createMapping=function(es,type){
@@ -52,20 +47,22 @@ var createMapping=function(es,type){
         index:index,
         type:type
     })
-    .tap(exists=>console.log('type '+type+' exists'))
-    .tap(function(exists){ 
-        var body={}
-        if(!exists){
-            body[type]=require('./mappings')[type]
-            return es.indices.putMapping({
-                index:index,
-                type:type,
-                body:body
-            })
-        }
-    })
-    .tap(()=>console.log('type:'+type+' created'))
-    .tapCatch(()=>console.log('type:'+type+' failed'))
+        .tap(exists=>console.log('type '+type+' exists='+exists))
+        .tap(function(exists){
+            var body={}
+            if(!exists){
+                body[type]=require('./mappings')[type]
+                return es.indices.putMapping({
+                    index:index,
+                    type:type,
+                    body:body,
+                    include_type_name: true
+                })
+            }
+        })
+        .tap(()=>console.log('type:'+type+' created'))
+        .catch(error=>console.log(error))
+//    .tapCatch(()=>console.log('type:'+type+' failed'))
 }
 
 var putDocument=function(es,document){
@@ -74,15 +71,9 @@ var putDocument=function(es,document){
         index:index,
         type:document._type,
         id:document._id,
-        body:document._source
+        body:document._source,
+        include_type_name: true
     }
     return es.index(param)
         .then(()=>console.log(document._id+' '+document._type+' created'))
 }
-
-
-
-
-
-
-

@@ -73,7 +73,7 @@ module.exports={
             "NoUpdate":true,
             "create":{
                 endpoint:{"Fn::GetAtt":["ESVar","ESAddress"]},
-                path:{"Fn::Sub":"/${Var.index}"},
+                path:{"Fn::Sub":"/${Var.index}?include_type_name=true"},
                 method:"PUT",
                 body:{"Fn::Sub":JSON.stringify({ 
                     settings: {

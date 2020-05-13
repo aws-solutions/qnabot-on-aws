@@ -2,82 +2,92 @@ var range=require('range').range
 
 module.exports=[
   {
-    "_id": "Default",
-    "_type": "dashboard",
+    "_id": "dashboard:Default",
+    "_type": "_doc",
     "_index":".kibana",
     "_source": {
-      "title": "Default",
-      "hits": 0,
-      "description": "",
-      "panelsJSON": "[{\"col\":9,\"id\":\"Client-types\",\"panelIndex\":3,\"row\":1,\"size_x\":4,\"size_y\":4,\"type\":\"visualization\"},{\"col\":1,\"id\":\"Requests\",\"panelIndex\":4,\"row\":1,\"size_x\":8,\"size_y\":4,\"type\":\"visualization\"},{\"col\":1,\"id\":\"Incorrect-feedback-wordcloud\",\"panelIndex\":5,\"row\":24,\"size_x\":12,\"size_y\":6,\"type\":\"visualization\"},{\"col\":1,\"id\":\"Correct-feedback-wordcloud\",\"panelIndex\":6,\"row\":18,\"size_x\":12,\"size_y\":6,\"type\":\"visualization\"},{\"col\":1,\"id\":\"Utterances\",\"panelIndex\":7,\"row\":5,\"size_x\":12,\"size_y\":6,\"type\":\"visualization\"},{\"col\":1,\"id\":\"No-Hits\",\"panelIndex\":8,\"row\":11,\"size_x\":12,\"size_y\":7,\"type\":\"visualization\"}]",
-      "optionsJSON": "{\"darkTheme\":false}",
-      "uiStateJSON": "{}",
-      "version": "1",
-      "timeRestore": "false",
-      "timeTo": "now/w",
-      "timeFrom": "now/w",
-      "refreshInterval": {
-        "display": "Off",
-        "pause": false,
-        "value": 0
+      "dashboard": {
+        "title": "Default",
+        "hits": 0,
+        "description": "",
+        "panelsJSON": "[{\"col\":9,\"id\":\"Client-types\",\"panelIndex\":3,\"row\":1,\"size_x\":4,\"size_y\":4,\"type\":\"visualization\"},{\"col\":1,\"id\":\"Requests\",\"panelIndex\":4,\"row\":1,\"size_x\":8,\"size_y\":4,\"type\":\"visualization\"},{\"col\":1,\"id\":\"Incorrect-feedback-wordcloud\",\"panelIndex\":5,\"row\":24,\"size_x\":12,\"size_y\":6,\"type\":\"visualization\"},{\"col\":1,\"id\":\"Correct-feedback-wordcloud\",\"panelIndex\":6,\"row\":18,\"size_x\":12,\"size_y\":6,\"type\":\"visualization\"},{\"col\":1,\"id\":\"Utterances\",\"panelIndex\":7,\"row\":5,\"size_x\":12,\"size_y\":6,\"type\":\"visualization\"},{\"col\":1,\"id\":\"No-Hits\",\"panelIndex\":8,\"row\":11,\"size_x\":12,\"size_y\":7,\"type\":\"visualization\"}]",
+        "optionsJSON": "{\"darkTheme\":false}",
+        "version": "1",
+        "timeRestore": "false",
+        "timeTo": "now/w",
+        "timeFrom": "now/w",
+        "refreshInterval": {
+          "display": "Off",
+          "pause": false,
+          "value": 0
+        },
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"filter\":[{\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\"}}}]}"
+        }
       },
-      "kibanaSavedObjectMeta": {
-        "searchSourceJSON": "{\"filter\":[{\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\"}}}]}"
-      }
+      "type": "dashboard"
     }
   },
   {
-    "_id": "Utterances",
-    "_type": "visualization",
+    "_id": "visualization:Utterances",
+    "_type": "_doc",
     "_index":".kibana",
     "_source": {
-      "title": "Logged Utterances",
-      "visState": "{\"title\":\"Logged Utterances\",\"type\":\"tagcloud\",\"params\":{\"scale\":\"linear\",\"orientation\":\"single\",\"minFontSize\":16,\"maxFontSize\":50,\"hideLabel\":true},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"segment\",\"params\":{\"field\":\"utterance.keyword\",\"size\":1000,\"order\":\"desc\",\"orderBy\":\"1\"}}],\"listeners\":{}}",
-      "uiStateJSON": "{}",
-      "description": "",
-      "version": 1,
-      "kibanaSavedObjectMeta": {
-        "searchSourceJSON": {"Fn::Sub":"{\"index\":\"${ESVar.MetricsIndex}\",\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"filter\":[]}"}
-      }
+      "visualization": {
+        "title": "Logged Utterances",
+        "visState": "{\"title\":\"Logged Utterances\",\"type\":\"tagcloud\",\"params\":{\"scale\":\"linear\",\"orientation\":\"single\",\"minFontSize\":16,\"maxFontSize\":50,\"hideLabel\":true},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"segment\",\"params\":{\"field\":\"utterance.keyword\",\"size\":1000,\"order\":\"desc\",\"orderBy\":\"1\"}}],\"listeners\":{}}",
+        "description": "",
+        "version": 1,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {"Fn::Sub":"{\"index\":\"${ESVar.MetricsIndex}\",\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"filter\":[]}"}
+        }
+      },
+      "type": "visualization"
     }
   },
   {
-    "_id": "No-Hits",
-    "_type": "visualization",
+    "_id": "visualization:No-Hits",
+    "_type": "_doc",
     "_index":".kibana",
     "_source": {
-      "title": "No Hits",
-      "visState": "{\"title\":\"No Hits\",\"type\":\"tagcloud\",\"params\":{\"scale\":\"linear\",\"orientation\":\"single\",\"minFontSize\":16,\"maxFontSize\":50,\"hideLabel\":true},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"segment\",\"params\":{\"field\":\"utterance.keyword\",\"size\":1000,\"order\":\"desc\",\"orderBy\":\"1\"}}],\"listeners\":{}}",
-      "uiStateJSON": "{}",
-      "description": "",
-      "version": 1,
-      "kibanaSavedObjectMeta": {
-        "searchSourceJSON": {"Fn::Sub":"{\"index\":\"${ESVar.MetricsIndex}\",\"query\":{\"query_string\":{\"query\":\"entireResponse.got_hits:0\",\"analyze_wildcard\":true}},\"filter\":[]}"}
-      }
+      "visualization": {
+        "title": "No Hits",
+        "visState": "{\"title\":\"No Hits\",\"type\":\"tagcloud\",\"params\":{\"scale\":\"linear\",\"orientation\":\"single\",\"minFontSize\":16,\"maxFontSize\":50,\"hideLabel\":true},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"segment\",\"params\":{\"field\":\"utterance.keyword\",\"size\":1000,\"order\":\"desc\",\"orderBy\":\"1\"}}],\"listeners\":{}}",
+        "description": "",
+        "version": 1,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {"Fn::Sub":"{\"index\":\"${ESVar.MetricsIndex}\",\"query\":{\"query_string\":{\"query\":\"entireResponse.got_hits:0\",\"analyze_wildcard\":true}},\"filter\":[]}"}
+        }
+      },
+      "type": "visualization"
     }
   },
   {
-    "_id": "Feedback-by-QID-and-Utterance",
-    "_type": "visualization",
+    "_id": "visualization:Feedback-by-QID-and-Utterance",
+    "_type": "_doc",
     "_index":".kibana",
     "_source": {
-      "title": "Feedback by QID and Utterance",
-      "visState": "{\"title\":\"Feedback by QID and Utterance\",\"type\":\"histogram\",\"params\":{\"shareYAxis\":true,\"addTooltip\":true,\"addLegend\":true,\"legendPosition\":\"right\",\"scale\":\"linear\",\"mode\":\"stacked\",\"times\":[],\"addTimeMarker\":false,\"defaultYExtents\":false,\"setYExtents\":false,\"yAxis\":{}},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"group\",\"params\":{\"field\":\"feedback.keyword\",\"size\":1000,\"order\":\"desc\",\"orderBy\":\"_term\"}},{\"id\":\"3\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"split\",\"params\":{\"field\":\"utterance.keyword\",\"size\":1000,\"order\":\"desc\",\"orderBy\":\"1\",\"row\":true}},{\"id\":\"4\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"segment\",\"params\":{\"field\":\"qid.keyword\",\"size\":1000,\"order\":\"desc\",\"orderBy\":\"1\"}}],\"listeners\":{}}",
-      "uiStateJSON": "{\"vis\":{\"legendOpen\":true}}",
-      "description": "",
-      "version": 1,
-      "kibanaSavedObjectMeta": {
-        "searchSourceJSON": {"Fn::Sub":"{\"index\":\"${ESVar.FeedbackIndex}\",\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"filter\":[]}"}
-      }
+      "visualization": {
+        "title": "Feedback by QID and Utterance",
+        "visState": "{\"title\":\"Feedback by QID and Utterance\",\"type\":\"histogram\",\"params\":{\"shareYAxis\":true,\"addTooltip\":true,\"addLegend\":true,\"legendPosition\":\"right\",\"scale\":\"linear\",\"mode\":\"stacked\",\"times\":[],\"addTimeMarker\":false,\"defaultYExtents\":false,\"setYExtents\":false,\"yAxis\":{}},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"group\",\"params\":{\"field\":\"feedback.keyword\",\"size\":1000,\"order\":\"desc\",\"orderBy\":\"_term\"}},{\"id\":\"3\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"split\",\"params\":{\"field\":\"utterance.keyword\",\"size\":1000,\"order\":\"desc\",\"orderBy\":\"1\",\"row\":true}},{\"id\":\"4\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"segment\",\"params\":{\"field\":\"qid.keyword\",\"size\":1000,\"order\":\"desc\",\"orderBy\":\"1\"}}],\"listeners\":{}}",
+        "uiStateJSON": "{\"vis\":{\"legendOpen\":true}}",
+        "description": "",
+        "version": 1,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {"Fn::Sub":"{\"index\":\"${ESVar.FeedbackIndex}\",\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"filter\":[]}"}
+        }
+      },
+      "type": "visualization"
     }
   },
   {
-    "_id": "Client-types",
-    "_type": "visualization",
+    "_id": "visualization:Client-types",
+    "_type": "_doc",
     "_index":".kibana",
     "_source": {
-      "title": "Client Types",
-      "visState":JSON.stringify({
+      "visualization": {
+        "title": "Client Types",
+        "visState":JSON.stringify({
           "title": "client-types",
           "type": "pie",
           "params": {
@@ -109,22 +119,24 @@ module.exports=[
             }
           ],
           "listeners": {}
-      }),
-      "uiStateJSON": "{}",
-      "description": "",
-      "version": 1,
-      "kibanaSavedObjectMeta": {
-        "searchSourceJSON": {"Fn::Sub":"{\"index\":\"${ESVar.MetricsIndex}\",\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"filter\":[]}"}
-      }
+        }),
+        "description": "",
+        "version": 1,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {"Fn::Sub":"{\"index\":\"${ESVar.MetricsIndex}\",\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"filter\":[]}"}
+        }
+      },
+      "type": "visualization"
     }
   },
   {
-    "_id": "Requests",
-    "_type": "visualization",
+    "_id": "visualization:Requests",
+    "_type": "_doc",
     "_index":".kibana",
     "_source": {
-      "title": "Requests",
-      "visState":JSON.stringify({
+      "visualization": {
+        "title": "Requests",
+        "visState":JSON.stringify({
           "title": "requests",
           "type": "histogram",
           "params": {
@@ -165,21 +177,23 @@ module.exports=[
           ],
           "listeners": {}
         }),
-      "uiStateJSON": "{}",
-      "description": "",
-      "version": 1,
-      "kibanaSavedObjectMeta": {
-        "searchSourceJSON": {"Fn::Sub":"{\"index\":\"${ESVar.MetricsIndex}\",\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"filter\":[]}"}
-      }
+        "description": "",
+        "version": 1,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {"Fn::Sub":"{\"index\":\"${ESVar.MetricsIndex}\",\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"filter\":[]}"}
+        }
+      },
+      "type": "visualization"
     }
   },
   {
-    "_id": "Correct-feedback-wordcloud",
-    "_type": "visualization",
+    "_id": "visualization:Correct-feedback-wordcloud",
+    "_type": "_doc",
     "_index":".kibana",
     "_source": {
-      "title": "Answers with positive feedback",
-      "visState":JSON.stringify({
+      "visualization": {
+        "title": "Answers with positive feedback",
+        "visState":JSON.stringify({
           "aggs": [
             {
               "enabled": true,
@@ -210,22 +224,24 @@ module.exports=[
           },
           "title":"Answers with positive feedback",
           "type": "tagcloud"
-      }),
-      "uiStateJSON": "{}",
-      "description": "",
-      "version": 1,
-      "kibanaSavedObjectMeta": {
-        "searchSourceJSON": {"Fn::Sub":"{\"index\":\"${ESVar.FeedbackIndex}\",\"query\":{\"query_string\":{\"query\":\"feedback=correct\",\"analyze_wildcard\":true}},\"filter\":[]}"}
-      }
+        }),
+        "description": "",
+        "version": 1,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {"Fn::Sub":"{\"index\":\"${ESVar.FeedbackIndex}\",\"query\":{\"query_string\":{\"query\":\"feedback=correct\",\"analyze_wildcard\":true}},\"filter\":[]}"}
+        }
+      },
+      "type": "visualization"
     }
   },
   {
-    "_id": "Incorrect-feedback-wordcloud",
-    "_type": "visualization",
+    "_id": "visualization:Incorrect-feedback-wordcloud",
+    "_type": "_doc",
     "_index":".kibana",
     "_source": {
-      "title": "Answers with negative feedback",
-      "visState":JSON.stringify({
+      "visualization": {
+        "title": "Answers with negative feedback",
+        "visState":JSON.stringify({
           "aggs": [
             {
               "enabled": true,
@@ -256,13 +272,14 @@ module.exports=[
           },
           "title":"Answers with negative feedback",
           "type": "tagcloud"
-      }),
-      "uiStateJSON": "{}",
-      "description": "",
-      "version": 1,
-      "kibanaSavedObjectMeta": {
-        "searchSourceJSON": {"Fn::Sub":"{\"index\":\"${ESVar.FeedbackIndex}\",\"query\":{\"query_string\":{\"query\":\"feedback=incorrect\",\"analyze_wildcard\":true}},\"filter\":[]}"}
-      }
+        }),
+        "description": "",
+        "version": 1,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {"Fn::Sub":"{\"index\":\"${ESVar.FeedbackIndex}\",\"query\":{\"query_string\":{\"query\":\"feedback=incorrect\",\"analyze_wildcard\":true}},\"filter\":[]}"}
+        }
+      },
+      "type": "visualization"
     }
   }
 ]
