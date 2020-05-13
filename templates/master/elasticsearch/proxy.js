@@ -2,29 +2,31 @@ var _=require('lodash')
 
 module.exports={
     "ESCFNProxyLambda": {
-      "Type": "AWS::Lambda::Function",
-      "Properties": {
-        "Code": {
-            "S3Bucket": {"Ref":"BootstrapBucket"},
-            "S3Key": {"Fn::Sub":"${BootstrapPrefix}/lambda/proxy-es.zip"},
-            "S3ObjectVersion":{"Ref":"ESProxyCodeVersion"}
-        },
-        "Environment": {
-            "Variables": {
-                DEFAULT_SETTINGS_PARAM:{"Ref":"DefaultQnABotSettings"},
-                CUSTOM_SETTINGS_PARAM:{"Ref":"CustomQnABotSettings"},
-            }
-        },
-        "Handler": "index.resource",
-        "MemorySize": "1408",
-        "Role": {"Fn::GetAtt": ["ESProxyLambdaRole","Arn"]},
-        "Runtime": "nodejs10.x",
-        "Timeout": 300,
-        "Tags":[{
-            Key:"Type",
-            Value:"CustomResource"
-        }]
-      }
+        "Type": "AWS::Lambda::Function",
+        "Properties": {
+            "Code": {
+                "S3Bucket": {"Ref":"BootstrapBucket"},
+                "S3Key": {"Fn::Sub":"${BootstrapPrefix}/lambda/proxy-es.zip"},
+                "S3ObjectVersion":{"Ref":"ESProxyCodeVersion"}
+            },
+            "Layers" : [{ "Fn::GetAtt": ["ExtraStack", "Outputs.AwsXrayLayerVersion"] }],
+            "Environment": {
+                "Variables": {
+                    DEFAULT_SETTINGS_PARAM:{"Ref":"DefaultQnABotSettings"},
+                    CUSTOM_SETTINGS_PARAM:{"Ref":"CustomQnABotSettings"},
+                }
+            },
+            "Handler": "index.resource",
+            "MemorySize": "1408",
+            "Role": {"Fn::GetAtt": ["ESProxyLambdaRole","Arn"]},
+            "Runtime": "nodejs10.x",
+            "TracingConfig": {"Mode": "Active"},
+            "Timeout": 300,
+            "Tags":[{
+                Key:"Type",
+                Value:"CustomResource"
+            }]
+        }
     },
     "MetricsIndex":{
         "Type": "Custom::ESProxy",
@@ -35,9 +37,9 @@ module.exports={
                 endpoint:{"Fn::GetAtt":["ESVar","ESAddress"]},
                 path:{"Fn::Sub":"/${ESVar.MetricsIndex}"},
                 method:"PUT",
-                body:{"Fn::Sub":JSON.stringify({ 
-                    settings:{},
-                })}
+                body:{"Fn::Sub":JSON.stringify({
+                        settings:{},
+                    })}
             },
             "delete":{
                 endpoint:{"Fn::GetAtt":["ESVar","ESAddress"]},
@@ -55,9 +57,9 @@ module.exports={
                 endpoint:{"Fn::GetAtt":["ESVar","ESAddress"]},
                 path:{"Fn::Sub":"/${ESVar.FeedbackIndex}"},
                 method:"PUT",
-                body:{"Fn::Sub":JSON.stringify({ 
-                    settings:{},
-                })}
+                body:{"Fn::Sub":JSON.stringify({
+                        settings:{},
+                    })}
             },
             "delete":{
                 endpoint:{"Fn::GetAtt":["ESVar","ESAddress"]},
@@ -75,68 +77,49 @@ module.exports={
                 endpoint:{"Fn::GetAtt":["ESVar","ESAddress"]},
                 path:{"Fn::Sub":"/${Var.index}?include_type_name=true"},
                 method:"PUT",
-                body:{"Fn::Sub":JSON.stringify({ 
-                    settings: {
-                        analysis: {
-                          filter: {
-                            english_stop: {
-                              type:       "stop",
-                              stopwords:  ["a", "an", "and", "are", "as", "at", "be", "but", "by", "for", "if", "in", "into", "is", "it",
+                body:{"Fn::Sub":JSON.stringify({
+                        settings: {
+                            analysis: {
+                                filter: {
+                                    english_stop: {
+                                        type:       "stop",
+                                        stopwords:  ["a", "an", "and", "are", "as", "at", "be", "but", "by", "for", "if", "in", "into", "is", "it",
                                             "not", "of", "on", "or", "such", "that", "the", "their", "then", "there", "these",
                                             "they", "this", "to", "was", "will", "with"
-                                          ]  
-                            },
-                            english_keywords: {
-                              type:       "keyword_marker",
-                              keywords:   ["example"] 
-                            },
-                            english_stemmer: {
-                              type:       "stemmer",
-                              language:   "english"
-                            },
-                            english_possessive_stemmer: {
-                              type:       "stemmer",
-                              language:   "possessive_english"
-                            }
-                          },
-                          analyzer: {
-                            custom_english: {
-                              type: "custom",    
-                              tokenizer:  "standard",
-                              filter: [
-                                "english_possessive_stemmer",
-                                "lowercase",
-                                "english_stop",
-                                "english_keywords",
-                                "english_stemmer"
-                              ]
-                            }
-                          }
-                        }
-                    },
-                    mappings:{
-                        // "${Var.QnAType}":require('./schema/qna')
-                        _meta: {
-                            schema: {
-                                properties: {
-                                    qid: {
-                                        type: "string",
-                                        title: "Item ID",
-                                        description: "Assign a unique identifier for this item.",
-                                        maxLength: 100,
-                                        propertyOrder: 0
+                                        ]
                                     },
-                                    required: ["qid"]
+                                    english_keywords: {
+                                        type:       "keyword_marker",
+                                        keywords:   ["example"]
+                                    },
+                                    english_stemmer: {
+                                        type:       "stemmer",
+                                        language:   "english"
+                                    },
+                                    english_possessive_stemmer: {
+                                        type:       "stemmer",
+                                        language:   "possessive_english"
+                                    }
+                                },
+                                analyzer: {
+                                    custom_english: {
+                                        type: "custom",
+                                        tokenizer:  "standard",
+                                        filter: [
+                                            "english_possessive_stemmer",
+                                            "lowercase",
+                                            "english_stop",
+                                            "english_keywords",
+                                            "english_stemmer"
+                                        ]
+                                    }
                                 }
-                            },
+                            }
                         },
-                        properties:{
-                            qid:{
-                                type:"keyword"
-                            },
+                        mappings:{
+                            "${Var.QnAType}":require('./schema/qna')
                         }
-                    }
-                })}
+                    })}
             },
             "delete":{
                 endpoint:{"Fn::GetAtt":["ESVar","ESAddress"]},
@@ -172,4 +155,3 @@ module.exports={
         }
     }
 }
-
