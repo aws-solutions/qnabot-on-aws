@@ -214,7 +214,7 @@ module.exports = async function (req, res) {
             _.get(res, "result.alt", {})
         )
 
-        if (req._event.outputDialogMode !== "Text") {
+        if (req._preferredResponseType == "SSML") {
             if (_.get(res, "result.alt.ssml")) {
                 res.type = "SSML"
                 res.message = res.result.alt.ssml.replace(/\r?\n|\r/g, ' ')

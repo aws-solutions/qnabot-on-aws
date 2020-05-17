@@ -120,8 +120,8 @@ async function processResponse(req, res, hook, msg) {
     if (botResp.dialogState === 'ConfirmIntent') {
         res.session.elicitResponseProgress = 'ConfirmIntent';
         res.plainMessage = plainMessage;      
-        // if SSML tags were present, and we're not in text client mode, build SSML response
-        if (ssmlMessage && req._event.outputDialogMode !== "Text") {
+        // if SSML tags were present and client supports SSML then build SSML response
+        if (ssmlMessage && req._preferredResponseType == "SSML") {
             res.type = "SSML";
             res.message = ssmlMessage;
         } else {
