@@ -11,26 +11,31 @@ function build_query(params) {
         var query=bodybuilder();
         if (keywords.length > 0) {
             query = query.filter(
-      			'nested',{
-      				path:'questions',
-      				query: {
-                    	match:{
-                        	'questions.q':{
-                            	query: keywords,
-                                minimum_should_match: _.get(params,'minimum_should_match','2<75%'),
-                                zero_terms_query: 'all'
-                            }
-                        }
-                	}
-    			}
+            	'match',{
+                	'quniqueterms':{
+                    	query: keywords,
+                        minimum_should_match: _.get(params,'minimum_should_match','2<75%'),
+                        zero_terms_query: 'all',
+                        fuzziness: "AUTO"
+                    }
+            	}
             );          
-        } 
+        }
+        query = query.orQuery(
+            'match',{
+            	'quniqueterms':{
+                	query: params.question,
+                    boost:2,
+                    fuzziness: "AUTO"
+                }
+            }
+        ) ;
         query = query.orQuery(
             'nested',{
-            score_mode:'sum',
+            score_mode:'max',
             boost:2,
             path:'questions'},
-            q=>q.query('match','questions.q',params.question)
+            q=>q.query('match_phrase','questions.q',params.question)
         ) ;
         if (_.get(params, 'score_answer_field', "false").toLowerCase() === "true") {
             query = query.orQuery('match','a',params.question) ;  

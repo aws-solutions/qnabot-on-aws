@@ -101,16 +101,28 @@ module.exports={
                           },
                           analyzer: {
                             custom_english: {
-                              type: "custom",    
-                              tokenizer:  "standard",
-                              filter: [
-                                "english_possessive_stemmer",
-                                "lowercase",
-                                "english_stop",
-                                "english_keywords",
-                                "english_stemmer"
-                              ]
-                            }
+                                type: "custom",    
+                                tokenizer:  "standard",
+                                filter: [
+                                    "english_possessive_stemmer",
+                                    "lowercase",
+                                    "english_stop",
+                                    "english_keywords",
+                                    "english_stemmer"
+                                ]
+                            },
+            				"custom_english_unique": {
+            					"type": "custom",
+            					"tokenizer": "standard",
+            					"filter": [
+            					    "english_possessive_stemmer", 
+            					    "lowercase", 
+            					    "english_stop", 
+            					    "english_keywords", 
+            					    "english_stemmer", 
+            					    "unique"
+            				    ]
+            				}
                           }
                         }
                     },

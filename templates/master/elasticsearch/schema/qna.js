@@ -169,6 +169,10 @@ module.exports={
         qid:{
             type:"keyword"
         },
+		quniqueterms: {
+			type: "text",
+			analyzer: "custom_english_unique"
+		},
         questions:{
             type:"nested",
             properties:{
