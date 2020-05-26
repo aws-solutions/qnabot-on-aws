@@ -5,6 +5,7 @@ var default_settings = {
     ES_SYNTAX_CONFIDENCE_LIMIT: ".20",
     ES_MINIMUM_SHOULD_MATCH: "2<75%",
     ES_SCORE_ANSWER_FIELD: "false",
+    ES_USE_FUZZY_MATCH: "true",
     ERRORMESSAGE: "Unfortunately I encountered an error when searching for your answer. Please ask me again later.",
     EMPTYMESSAGE: "You stumped me! Sadly I don't know how to answer your question.",
     DEFAULT_ALEXA_LAUNCH_MESSAGE: "Hello, Please ask a question",

@@ -8,27 +8,31 @@ var _=require('lodash');
 function build_query(params) {
     return(get_keywords(params))
     .then(function(keywords) {
-        var query=bodybuilder();
-        if (keywords.length > 0) {
-            query = query.filter(
-            	'match',{
-                	'quniqueterms':{
-                    	query: keywords,
-                        minimum_should_match: _.get(params,'minimum_should_match','2<75%'),
-                        zero_terms_query: 'all',
-                        fuzziness: "AUTO"
-                    }
-            	}
-            );          
-        }
-        query = query.orQuery(
-            'match',{
+        var filter_query = {
+            	'quniqueterms':{
+                	query: keywords,
+                    minimum_should_match: _.get(params,'minimum_should_match','2<75%'),
+                    zero_terms_query: 'all',
+                }
+        	};
+        var match_query = {
             	'quniqueterms':{
                 	query: params.question,
                     boost:2,
-                    fuzziness: "AUTO"
                 }
-            }
+            };
+        if (_.get(params, 'fuzziness', "false").toLowerCase() === "true") {
+            filter_query.quniqueterms.fuzziness = "AUTO";
+            match_query.quniqueterms.fuzziness = "AUTO";
+        }
+        var query=bodybuilder();
+        if (keywords.length > 0) {
+            query = query.filter(
+            	'match', filter_query
+            );          
+        }
+        query = query.orQuery(
+            'match', match_query
         ) ;
         query = query.orQuery(
             'nested',{
