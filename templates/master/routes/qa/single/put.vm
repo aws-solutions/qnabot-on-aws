@@ -12,9 +12,7 @@
     "path":"/${Var.index}/$type/$input.params('ID')?refresh=wait_for",
     "body":{
         #foreach($paramName in $inputRoot.keySet())
-            #if( $paramName == 'quniqueterms' )
-              ## Ignore any previous value of quniqueterms - we regenerate it below
-            #elseif( $paramName == 'q' && $type=="qna")
+            #if( $paramName == 'q' && $type=="qna")
                 ## generate quniqueterms field by concatenating questions in q array
                 "quniqueterms":" #foreach( $q in $inputRoot.get($paramName))$q #end ",
                 ## replace q array with nested questions array
