@@ -403,6 +403,5 @@ Our sun is 4.6 billion years old. Its considered a yellow dwarf with a diameter 
 The handlebar function ifLang takes locale as a quoted parameter. This tells QnABot which locale to associate with the subsequent
 text. 
 
-
 A [workshop](https://github.com/aws-samples/aws-ai-qna-bot/tree/master/workshops/reinvent2019/readme.md) is available in github 
 that will walk you through setting up this feature. 
