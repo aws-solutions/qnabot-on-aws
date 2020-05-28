@@ -44,6 +44,7 @@ async function get_es_query(event) {
             keyword_syntax_types: _.get(settings,'ES_KEYWORD_SYNTAX_TYPES'),
             syntax_confidence_limit: _.get(settings,'ES_SYNTAX_CONFIDENCE_LIMIT'),
             score_answer_field: _.get(settings,'ES_SCORE_ANSWER_FIELD'),
+            fuzziness: _.get(settings, 'ES_USE_FUZZY_MATCH'),
         };
         return build_es_query(query_params);
     } else {

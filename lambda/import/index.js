@@ -45,7 +45,8 @@ exports.step=function(event,context,cb){
                         var obj=JSON.parse(x)
                         obj.type=obj.type || 'qna'
                         if(obj.type==='qna'){
-                            obj.questions=obj.q.map(x=>{return {q:x}})
+                            obj.questions=obj.q.map(x=>{return {q:x}});
+                            obj.quniqueterms=obj.q.join(" ");
                             delete obj.q
                         }
                         out.push(JSON.stringify({

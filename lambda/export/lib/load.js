@@ -27,6 +27,7 @@ module.exports=function(config,body){
                 if(out.type==='qna'){ 
                     out.q=out.questions.map(y=>y.q)
                     delete out.questions
+                    delete out.quniqueterms;
                 }else{
                 }
                 return JSON.stringify(out)
