@@ -14,7 +14,7 @@ var encryptor = require('simple-encryptor')(key);
 async function run_query(req, query_params) {
     var es_query = await build_es_query(query_params);
     var es_response = await request({
-        url: `https://${req._info.es.address}/${req._info.es.index}/${req._info.es.type}/_search?search_type=dfs_query_then_fetch`,
+        url: `https://${req._info.es.address}/${req._info.es.index}/_doc/_search?search_type=dfs_query_then_fetch`,
         method: "GET",
         body: es_query
     });

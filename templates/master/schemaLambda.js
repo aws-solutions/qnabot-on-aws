@@ -1,11 +1,22 @@
 var fs=require('fs')
 
 module.exports={
+    "SchemaLambdaCodeVersion":{
+        "Type": "Custom::S3Version",
+        "Properties": {
+            "ServiceToken": { "Fn::GetAtt" : ["CFNLambda", "Arn"] },
+            "Bucket": {"Ref":"BootstrapBucket"},
+            "Key": {"Fn::Sub":"${BootstrapPrefix}/lambda/schema.zip"},
+            "BuildDate":(new Date()).toISOString()
+        }
+    },
     "SchemaLambda": {
       "Type": "AWS::Lambda::Function",
       "Properties": {
         "Code": {
-            "ZipFile":fs.readFileSync(__dirname+'/handler.js','utf8')
+            "S3Bucket": {"Ref":"BootstrapBucket"},
+            "S3Key": {"Fn::Sub":"${BootstrapPrefix}/lambda/schema.zip"},
+            "S3ObjectVersion":{"Ref":"SchemaLambdaCodeVersion"}
         },
         "Handler": "index.handler",
         "MemorySize": "128",

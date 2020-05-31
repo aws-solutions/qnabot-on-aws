@@ -58,29 +58,33 @@ if (require.main === module) {
         .slice(0,2)
         .reverse().join('-').split('.')[0]
     var op=options.operation || (options.input ? options.args[0] : options.args[1])
-    if( stack && op){
-        switch(op){
-            case "up":
-                up(stack,options || {})
-                break;
-            case "update":
-                update(stack,options || {})
-                break;
-            case "down":
-                down(stack,options || {})
-                break;
-            case "restart":
-                log("restarting stack",options||{})
-                down(stack,options || {}).then(()=>up(stack,options || {}))
-                break;
-            case "make-sure":
-                sure(stack,options)
-                break;
-            default:
-                argv.outputHelp()
+    try {
+        if( stack && op){
+            switch(op){
+                case "up":
+                    up(stack,options || {})
+                    break;
+                case "update":
+                    update(stack,options || {})
+                    break;
+                case "down":
+                    down(stack,options || {})
+                    break;
+                case "restart":
+                    log("restarting stack",options||{})
+                    down(stack,options || {}).then(()=>up(stack,options || {}))
+                    break;
+                case "make-sure":
+                    sure(stack,options)
+                    break;
+                default:
+                    argv.outputHelp()
+            }
+        }else{
+            argv.outputHelp()
         }
-    }else{
-        argv.outputHelp()
+    }catch(e){
+            log(e.message,options)
     }
 }
 async function syntax(stack,options){

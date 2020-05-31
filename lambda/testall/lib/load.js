@@ -9,7 +9,7 @@ var stride=parseInt(process.env.STRIDE)
 var _=require('lodash')
 
 module.exports=function(config,body){
-    console.log('payload for testall es proy is: ' + JSON.stringify(body));
+    console.log('payload for testall es proxy is: ' + JSON.stringify(body));
     return lambda.invoke({
         FunctionName:process.env.ES_PROXY,
         Payload:JSON.stringify(body)
@@ -24,7 +24,6 @@ module.exports=function(config,body){
         if(documents.length){
             var body=documents.map(x=>{
                 var out=x._source
-                out.type=x._type
                 if(out.type==='qna'){ 
                     out.q=out.questions.map(y=>y.q)
                     delete out.questions

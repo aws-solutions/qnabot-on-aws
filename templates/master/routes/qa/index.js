@@ -3,7 +3,7 @@ var lambda=require('../util/lambda')
 var fs=require('fs')
 
 module.exports=Object.assign(
-require('./schema'),{
+{
 "Questions": resource('questions'),
 "QuestionsGet":lambda({
     authorization:"AWS_IAM",

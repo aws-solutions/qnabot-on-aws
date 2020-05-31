@@ -1,7 +1,4 @@
 {
-    "endpoint":"https://${ESVar.ESAddress}",
-    "method":"GET",
-    "path":"/${Var.index}/_mapping",
-    "index":"${Var.index}"
+    "comment": "API mapping no-op since ES 7.x upgrade. Schema now returned directly from SchemaLambda, rather than from Elasticsearch metadata"
 }
 

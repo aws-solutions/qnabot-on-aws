@@ -9,6 +9,7 @@ module.exports={
             "BuildDate":(new Date()).toISOString()
         }
     },
+
     "UtteranceLambda": {
       "Type": "AWS::Lambda::Function",
       "Properties": {
