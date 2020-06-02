@@ -7,7 +7,7 @@ module.exports={
             "Parameters" :{
                 "QnAType":{"Fn::GetAtt":["Var","QnAType"]}, 
                 "QuizType":{"Fn::GetAtt":["Var","QuizType"]},
-                "Index":{"Fn::GetAtt":["Var","index"]},
+                "Index":{"Fn::GetAtt":["ESVar","QnaIndex"]},
                 "ESAddress":{"Fn::GetAtt":["ESVar","ESAddress"]},
                 "BootstrapBucket":{"Ref":"BootstrapBucket"},
                 "BootstrapPrefix":{"Ref":"BootstrapPrefix"},

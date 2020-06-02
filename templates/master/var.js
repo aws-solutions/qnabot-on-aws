@@ -40,8 +40,9 @@ module.exports={
             {"Ref":"ElasticsearchDomain"},
             {"Ref":"ElasticsearchName"}
         ]},
-        "MetricsIndex":{"Fn::Sub":"${Var.index}-metrics"},
-        "FeedbackIndex":{"Fn::Sub":"${Var.index}-feedback"},
+        "QnaIndex":"qnabot-qna",
+        "MetricsIndex":"qnabot-metrics",
+        "FeedbackIndex":"qnabot-feedback",
     }
 },
 "ApiUrl":{

@@ -30,19 +30,12 @@ module.exports={
         "Type": "Custom::ESProxy",
         "Properties": {
             "ServiceToken": { "Fn::GetAtt" : ["ESCFNProxyLambda", "Arn"] },
-            "NoUpdate":true,
             "create":{
+                index:{"Fn::Sub":"${ESVar.MetricsIndex}"},
                 endpoint:{"Fn::GetAtt":["ESVar","ESAddress"]},
-                path:{"Fn::Sub":"/${ESVar.MetricsIndex}"},
-                method:"PUT",
                 body:{"Fn::Sub":JSON.stringify({ 
                     settings:{},
                 })}
-            },
-            "delete":{
-                endpoint:{"Fn::GetAtt":["ESVar","ESAddress"]},
-                path:{"Fn::Sub":"/${ESVar.MetricsIndex}"},
-                method:"DELETE"
             }
         }
     },
@@ -50,19 +43,12 @@ module.exports={
         "Type": "Custom::ESProxy",
         "Properties": {
             "ServiceToken": { "Fn::GetAtt" : ["ESCFNProxyLambda", "Arn"] },
-            "NoUpdate":true,
             "create":{
+                index:{"Fn::Sub":"${ESVar.FeedbackIndex}"},
                 endpoint:{"Fn::GetAtt":["ESVar","ESAddress"]},
-                path:{"Fn::Sub":"/${ESVar.FeedbackIndex}"},
-                method:"PUT",
                 body:{"Fn::Sub":JSON.stringify({ 
                     settings:{},
                 })}
-            },
-            "delete":{
-                endpoint:{"Fn::GetAtt":["ESVar","ESAddress"]},
-                path:{"Fn::Sub":"/${ESVar.FeedbackIndex}"},
-                method:"DELETE"
             }
         }
     },
@@ -70,20 +56,13 @@ module.exports={
         "Type": "Custom::ESProxy",
         "Properties": {
             "ServiceToken": { "Fn::GetAtt" : ["ESCFNProxyLambda", "Arn"] },
-            "NoUpdate":true,
             "create":{
+                index:{"Fn::Sub":"${ESVar.QnaIndex}"},
                 endpoint:{"Fn::GetAtt":["ESVar","ESAddress"]},
-                path:{"Fn::Sub":"/${Var.index}"},
-                method:"PUT",
                 body:{"Fn::Sub":JSON.stringify({ 
                     settings:require('./index_settings.js'),
                     mappings:require('./index_mappings.js'),
                 })}
-            },
-            "delete":{
-                endpoint:{"Fn::GetAtt":["ESVar","ESAddress"]},
-                path:{"Fn::Sub":"/${Var.index}"},
-                method:"DELETE"
             }
         }
     },
