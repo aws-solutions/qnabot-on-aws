@@ -211,9 +211,10 @@ module.exports = async function (req, res) {
         res.message = res.result.a
         res.plainMessage = res.result.a
 
-        _.set(res, "session.appContext.altMessages",
-            _.get(res, "result.alt", {})
-        )
+        // Add alt messages to appContext session attribute JSON value (for lex-web-ui)
+        var tmp=JSON.parse(_.get(res,"session.appContext","{}"));
+        tmp.altMessages=_.get(res, "result.alt", {});
+        _.set(res, "session.appContext",JSON.stringify(tmp))
 
         if (req._event.outputDialogMode !== "Text") {
             if (_.get(res, "result.alt.ssml")) {
