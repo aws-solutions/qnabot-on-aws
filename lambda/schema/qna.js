@@ -50,13 +50,13 @@ module.exports={
         },
         t:{
             type:"string",
-            description:"Assign a topic to this item, to support follow up questions on the same topic.",
+            description:"Assign a topic to this item, to support follow up questions on the same topic. (Sets session attribute 'topic' in response)",
             title:"Topic",
             propertyOrder: 4
         },
         r:{
             title:"Response card",
-            description:"Attach images and buttons to your answer",
+            description:"Attach images and/or buttons to your answer. A reponse card must have an imageUrl or at least one button.",
             type:"object",
             properties:{
                 title:{
@@ -81,7 +81,7 @@ module.exports={
                 },
                 buttons:{
                     title:"Lex Buttons",
-                    description:"Conditionally Required for Lex if no Card Image Url is specified. Add response buttons users can click on if they are interacting through Lex.",
+                    description:"Add buttons for Amazon Lex client users. NOTE: Standard Amazon Lex clients will display up to 5 buttons only (Lex limit) - this limit does not apply to Lex-Web-UI version 0.16 or later.",
                     type:"array",
                     items:{
                         title:"Button",
