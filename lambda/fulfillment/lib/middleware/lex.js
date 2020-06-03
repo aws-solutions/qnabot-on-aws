@@ -59,14 +59,14 @@ exports.assemble=function(request,response){
         response.session.appContext=JSON.stringify(tmp);
     }
  
-    // Lex has limit of max 5 buttons in the responsecard.. if we have more than 5, use the first 5 only.
+    // Lex has limit of max 5 buttons in the responsecard.. if we have more than 5, don;t send back any. 
     // note when using lex-web-ui, this limitation is circumvented by use of the appContext session attribute above.
     var buttons = _.get(out,"dialogAction.responseCard.genericAttachments[0].buttons");
     if (buttons && buttons.length > 5) {
-        _.set(out,"dialogAction.responseCard.genericAttachments[0].buttons",buttons.slice(0,5));
+        _.set(out,"dialogAction.responseCard",null);
     }
     
-    console.log("Lex response:",JSON.stringify(out,null,2))
+    console.log("Lex response:",JSON.stringify(out,null,2));
     return out
 }
 
