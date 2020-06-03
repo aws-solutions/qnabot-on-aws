@@ -49,7 +49,7 @@ exports.Create=async function(params){
             res = await run_es_query(create);
             console.log(res) ;  
         } catch(err) {
-            console.log("Delete returned:" + err.response.statusText+" ["+err.response.status+"]") ;
+            console.log("Delete returned: " + err.response.statusText+" ["+err.response.status+"]") ;
         }         
         console.log("Create alias for new index:", index_alias);
         create.method="PUT";
@@ -79,19 +79,23 @@ exports.Update=async function(ID,params,oldparams){
             update.path="/"+index_name;
             res = await run_es_query(update);
             console.log(res) ;
-            console.log("Update: reindex existing index to new index:", index_alias+" -> "+index_name);
-        	var reindex={
-        	  "source": {
-        	    "index": index_alias
-        	  },
-        	  "dest": {
-        	    "index": index_name
-        	  }
-        	};
-            update.method="POST";
-            update.path="/_reindex";
-            update.body=reindex;
-            res = await run_es_query(update);                
+            try {
+                console.log("Update: reindex existing index to new index:", index_alias+" -> "+index_name);
+            	var reindex={
+            	  "source": {
+            	    "index": index_alias
+            	  },
+            	  "dest": {
+            	    "index": index_name
+            	  }
+            	};
+                update.method="POST";
+                update.path="/_reindex";
+                update.body=reindex;
+                res = await run_es_query(update);  
+            } catch(err) {
+                console.log("Reindex request returned: " + err.response.statusText+" ["+err.response.status+"]") ;
+            }
             console.log(res) ;
             try {
                 console.log("Delete existing alias, if exists:", index_alias);
@@ -101,7 +105,7 @@ exports.Update=async function(ID,params,oldparams){
                 res = await run_es_query(update);
                 console.log(res) ;  
             } catch(err) {
-                console.log("Delete returned:" + err.response.statusText+" ["+err.response.status+"]") ;
+                console.log("Delete alias returned: " + err.response.statusText+" ["+err.response.status+"]") ;
             }
             try {
                 console.log("Delete existing index, if exists from earlier release:", index_alias);
@@ -111,7 +115,7 @@ exports.Update=async function(ID,params,oldparams){
                 res = await run_es_query(update);
                 console.log(res) ; 
             } catch(err) {
-                console.log("Delete returned:" + err.response.statusText+" ["+err.response.status+"]") ;
+                console.log("Delete index returned: " + err.response.statusText+" ["+err.response.status+"]") ;
             }
             console.log("Update alias for new index:", index_alias);
             update.method="PUT";
