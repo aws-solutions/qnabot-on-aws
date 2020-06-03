@@ -197,8 +197,10 @@ module.exports = async function (req, res) {
             // conditionalChaining in this case.
             hit = await evaluateConditionalChaining(req, res, hit, hit.conditionalChaining);
         }
+        // translate response
+        var usrLang = 'en';
         if (_.get(req._settings, 'ENABLE_MULTI_LANGUAGE_SUPPORT', "false").toLowerCase() === "true") {
-            const usrLang = _.get(req, 'session.userLocale');
+            usrLang = _.get(req, 'session.userLocale');
             if (usrLang != 'en') {
                 console.log("Autotranslate hit to usrLang: ", usrLang);
                 hit = await translate.translate_hit(hit, usrLang);
@@ -206,6 +208,21 @@ module.exports = async function (req, res) {
                 console.log("User Lang is en, Autotranslate not required.");
             }
         }
+        // prepend debug msg
+        if (_.get(req._settings, 'ENABLE_DEBUG_RESPONSES', "false").toLowerCase() === "true") {
+            var msg = "User Input: \"" + req.question + "\"";
+            if (usrLang != 'en') {
+                msg = "User Input: \"" + _.get(req,"_event.origQuestion","notdefined") + "\", Translated to: \"" + req.question + "\"";
+            }          
+            var debug_msg = {
+                a: "[" + msg + "] ",
+                alt: {
+                    markdown: "*[" + msg + "]*  \n",
+                    ssml: "<speak>" + msg + "</speak>"
+                }
+            };
+            hit = merge_next(debug_msg, hit) ;
+        };
         res.result = hit;
         res.type = "PlainText"
         res.message = res.result.a
