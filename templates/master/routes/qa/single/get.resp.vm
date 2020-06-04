@@ -1,7 +1,7 @@
 #set($inputRoot = $input.path('$'))
 
 {
-    "total":$inputRoot.hits.total,
+    "total":$inputRoot.hits.total.value,
     "version":"1",
     "qa":[
         #foreach( $hit in $inputRoot.hits.hits)

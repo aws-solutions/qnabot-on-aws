@@ -38,6 +38,10 @@ QnABot exposes the following content to the Handlebars context:
 |UserInfo.Email                    | Email address: Authenticated users only - from token in session attribute 'accesstokenjwt' |
 |UserInfo.isVerifiedIdentity       | true or false: Authenticated users only - verifies if token is signed by key in jwks from trusted identity provider per QnABot setting IDENTITY\_PROVIDER\_JWKS\_URLS |
 |SessionAttributes._name_          | all session attributes are available to the handlebars context |
+|Settings._name_                   | all settings values are available to the handlebars context |
+|Question                          | the users utterance, or question - translated to English if ENABLE\_MULTI\_LANGUAGE\_SUPPORT is true |
+|OrigQuestion                      | the users utterance, or question - before translation to English if ENABLE\_MULTI\_LANGUAGE\_SUPPORT is true |
+
 
 ## Helpers
 You can use any [built-in handlerbars helpers](https://handlebarsjs.com/guide/builtin-helpers.html).  

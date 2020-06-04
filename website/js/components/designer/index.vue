@@ -117,7 +117,7 @@ module.exports={
     ],
     pagination:{
       page:1,
-      rowsPerPage:"10",
+      rowsPerPage:"100",
       sortBy:'qid'
     },
     headers:[{

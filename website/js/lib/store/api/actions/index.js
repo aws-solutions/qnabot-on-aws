@@ -126,7 +126,7 @@ module.exports=Object.assign(
         })
     },
     list(context,opts){
-        var perpage=opts.perpage || 10
+        var perpage=opts.perpage || 100
         return context.dispatch('_request',{
             url:context.rootState.info._links.questions.href+'?'+query({
                 from:(opts.page || 0)*perpage,

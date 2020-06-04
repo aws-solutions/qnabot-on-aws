@@ -41,7 +41,7 @@ module.exports = {
       "Environment": {
         "Variables": Object.assign({
           ES_TYPE: { "Fn::GetAtt": ["Var", "QnAType"] },
-          ES_INDEX: { "Fn::GetAtt": ["Var", "index"] },
+          ES_INDEX: { "Fn::GetAtt": ["ESVar","QnaIndex"] },
           ES_ADDRESS: { "Fn::GetAtt": ["ESVar", "ESAddress"] },
           LAMBDA_DEFAULT_QUERY: { "Ref": "ESQueryLambda" },
           LAMBDA_LOG: { "Ref": "ESLoggingLambda" },

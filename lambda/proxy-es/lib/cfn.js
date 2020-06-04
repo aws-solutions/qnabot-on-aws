@@ -2,40 +2,152 @@ var Url=require('url')
 var Promise=require('bluebird')
 var cfnLambda=require('cfn-lambda')
 var request=require('./request')
-var handler=require('./handler')
 
-exports.Create=function(params,reply){
-    try{
-        handler(params.create,null,function(err,data){
-            err ? reply(JSON.stringify(err)) : reply(null,"es",{data:"none"})
-        })
-    }catch(e){
-        console.log(e)
-        reply(e)
-    }
+async function run_es_query(event) {
+    console.log('Received event:', JSON.stringify(event, null, 2));
+    var res = await request({
+            url:Url.resolve("https://"+event.endpoint,event.path),
+            method:event.method,
+            headers:event.headers,
+            body:event.body 
+        });
+    console.log("ElasticSearch Response",JSON.stringify(res,null,2));
+    return res ;
+};
+
+
+var newname=function(alias){
+    var now = new Date();
+    // create formatted time
+    var yyyy = now.getFullYear();
+    var mm = now.getMonth() < 9 ? "0" + (now.getMonth() + 1) : (now.getMonth() + 1); // getMonth() is zero-based
+    var dd  = now.getDate() < 10 ? "0" + now.getDate() : now.getDate();
+    var hh = now.getHours() < 10 ? "0" + now.getHours() : now.getHours();
+    var mmm  = now.getMinutes() < 10 ? "0" + now.getMinutes() : now.getMinutes();
+    var ss  = now.getSeconds() < 10 ? "0" + now.getSeconds() : now.getSeconds();
+    // make new index name as alias with timestamp
+    var name = alias+"_"+yyyy+mm+dd+"_"+hh+mm+ss;   
+    return name;
 }
-exports.Update=function(ID,params,oldparams,reply){
+
+exports.Create=async function(params){
+    var create = params.create ;
+    var res;
+    if (create.index){
+        var index_alias=create.index; 
+        var index_name=newname(index_alias);
+        console.log("Create new index:", index_name);
+        create.method="PUT";
+        create.path="/"+index_name;
+        res = await run_es_query(create);
+        console.log(res) ;
+        try {
+            console.log("Delete existing alias, if exists:", index_alias);
+            create.method="DELETE";
+            create.path="/*/_alias/"+index_alias;
+            create.body="";
+            res = await run_es_query(create);
+            console.log(res) ;  
+        } catch(err) {
+            console.log("Delete returned: " + err.response.statusText+" ["+err.response.status+"]") ;
+        }         
+        console.log("Create alias for new index:", index_alias);
+        create.method="PUT";
+        create.path="/"+index_name+"/_alias/"+index_alias;
+        create.body="";
+        res = await run_es_query(create);
+        console.log(res) ;
+    } else {
+        // use request params from CfN
+        res = await run_es_query(create);
+        console.log(res) ;            
+    }
+    return{PhysicalResourceId:index_alias, FnGetAttrsDataObj:{index_name:index_name, index_alias:index_alias}};
+};
+
+exports.Update=async function(ID,params,oldparams){
     if(params.NoUpdate){
-        reply(null,"es",{data:"none"})
+        return{PhysicalResourceId:ID, FnGetAttrsDataObj:{}};
     }else{
-        exports.Create(params,reply,{data:"none"}) 
+        var res;
+        var update = params.create ;
+        if (update.index){
+            var index_alias=update.index; 
+            var index_name=newname(index_alias);
+            console.log("Update: create new index:", index_name);
+            update.method="PUT";
+            update.path="/"+index_name;
+            res = await run_es_query(update);
+            console.log(res) ;
+            try {
+                console.log("Update: reindex existing index to new index:", index_alias+" -> "+index_name);
+            	var reindex={
+            	  "source": {
+            	    "index": index_alias
+            	  },
+            	  "dest": {
+            	    "index": index_name
+            	  }
+            	};
+                update.method="POST";
+                update.path="/_reindex";
+                update.body=reindex;
+                res = await run_es_query(update);  
+            } catch(err) {
+                console.log("Reindex request returned: " + err.response.statusText+" ["+err.response.status+"]") ;
+            }
+            console.log(res) ;
+            try {
+                console.log("Delete existing alias, if exists:", index_alias);
+                update.method="DELETE";
+                update.path="/*/_alias/"+index_alias;
+                update.body="";
+                res = await run_es_query(update);
+                console.log(res) ;  
+            } catch(err) {
+                console.log("Delete alias returned: " + err.response.statusText+" ["+err.response.status+"]") ;
+            }
+            try {
+                console.log("Delete existing index, if exists from earlier release:", index_alias);
+                update.method="DELETE";
+                update.path="/"+index_alias;
+                update.body="";
+                res = await run_es_query(update);
+                console.log(res) ; 
+            } catch(err) {
+                console.log("Delete index returned: " + err.response.statusText+" ["+err.response.status+"]") ;
+            }
+            console.log("Update alias for new index:", index_alias);
+            update.method="PUT";
+            update.path="/"+index_name+"/_alias/"+index_alias;
+            update.body="";
+            res = await run_es_query(update);
+            console.log(res) ;
+        } else {
+            // use request params from CfN
+            res = await run_es_query(update);
+            console.log(res) ;            
+        }
+        return{PhysicalResourceId:ID, FnGetAttrsDataObj:{index_name:index_name, index_alias:index_alias}};
     }
-}
+};
 
-exports.Delete=function(ID,params,reply){
+exports.Delete=async function(ID,params){
     if(params.delete){
-        handler(params.delete,null,function(err,data){
-            err ? reply(JSON.stringify(err)) : reply(null,"es")
-        })
+        console.log("Delete resource using ES params:", JSON.stringify(params.delete));
+        var res = await run_es_query(params.delete);
+        console.log(res) ;
+        return{PhysicalResourceId:ID, FnGetAttrsDataObj:{}};
     }else{
-        reply(null,ID)
+        return{PhysicalResourceId:ID, FnGetAttrsDataObj:{}};
     }
-}
+};
+
 
 exports.resource=cfnLambda({
-    Create:exports.Create,
-    Update:exports.Update,
-    Delete:exports.Delete
+    AsyncCreate:exports.Create,
+    AsyncUpdate:exports.Update,
+    AsyncDelete:exports.Delete
 })
 
 

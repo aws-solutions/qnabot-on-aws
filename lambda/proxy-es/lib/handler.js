@@ -60,6 +60,7 @@ module.exports= (event, context, callback) => {
         return request({
             url:Url.resolve("https://"+event.endpoint,event.path),
             method:event.method,
+            headers:event.headers,
             body:es_query 
         });
     })
