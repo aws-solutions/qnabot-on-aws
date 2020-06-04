@@ -134,6 +134,7 @@ async function routeKendraRequest(event, context) {
                     docInfo.text = element.DocumentExcerpt.Text.replace(/\r?\n|\r/g, " ");
                     docInfo.uri = element.DocumentURI;
                     helpfulDocumentsUris.add(docInfo);
+                    foundAnswerCount++;
                     foundDocumentCount++;
                 }
             });
