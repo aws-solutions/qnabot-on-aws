@@ -33,6 +33,11 @@ var newname=function(alias){
 exports.Create=async function(params){
     var create = params.create ;
     var res;
+    if (create.replaceTokenInBody) {
+        // replaceTokenInBody is array of objects like [{f:"find_pattern",r:"replace_pattern"},{...}]
+        // used to replace tokenized index names in Kibana Dashboard JSON
+        create.replaceTokenInBody.forEach(item => create.body = create.body.replace(item.f,item.r));
+    }
     if (create.index){
         var index_alias=create.index; 
         var index_name=newname(index_alias);
@@ -71,6 +76,11 @@ exports.Update=async function(ID,params,oldparams){
     }else{
         var res;
         var update = params.create ;
+        if (update.replaceTokenInBody) {
+            // replaceTokenInBody is array of objects like [{f:"find_pattern",r:"replace_pattern"},{...}]
+            // used to replace tokenized index names in Kibana Dashboard JSON
+            update.replaceTokenInBody.forEach(item => update.body = update.body.replace(item.f,item.r));
+        }
         if (update.index){
             var index_alias=update.index; 
             var index_name=newname(index_alias);

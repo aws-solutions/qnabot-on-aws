@@ -2,12 +2,11 @@ var exportfile=`ExportAll_QnABot_v${process.env.npm_package_version}.json`;
 module.exports={
     "PreUpgradeExport":{
         "Type": "Custom::PreUpgradeExport",
-        "DependsOn":["CFNInvokePolicy"],
         "Properties": {
             ServiceToken: { "Fn::GetAtt" : ["CFNLambda", "Arn"] },
             bucket:{"Ref":"ExportBucket"},
             id:exportfile,
-            index:{"Fn::Sub":"${ESVar.QnaIndex}"},
+            index:{"Fn::Sub":"${Var.QnaIndex}"},
         }
     },
     "PostUpgradeImport":{
@@ -18,7 +17,7 @@ module.exports={
             importbucket:{"Ref":"ImportBucket"},
             exportbucket:{"Ref":"ExportBucket"},
             id:exportfile,
-            index:{"Fn::Sub":"${ESVar.QnaIndex}"},
+            index:{"Fn::Sub":"${Var.QnaIndex}"},
         }
     },
 }

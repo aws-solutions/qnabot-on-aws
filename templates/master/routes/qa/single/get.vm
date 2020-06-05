@@ -22,10 +22,10 @@
 
     
     #if($input.params('query').length()>0)
-    "path":"/${ESVar.QnaIndex}/_search?search_type=dfs_query_then_fetch",
+    "path":"/${Var.QnaIndex}/_search?search_type=dfs_query_then_fetch",
     "question": "$util.urlDecode($input.params('query'))",
     #else
-    "path":"/${ESVar.QnaIndex}/_search?search_type=dfs_query_then_fetch",
+    "path":"/${Var.QnaIndex}/_search?search_type=dfs_query_then_fetch",
     "question": "",
     #end
     

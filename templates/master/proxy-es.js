@@ -20,7 +20,7 @@ module.exports={
         },
         "Environment": {
           "Variables": {
-            ES_INDEX:{"Fn::GetAtt":["ESVar","QnaIndex"]},
+            ES_INDEX:{"Fn::GetAtt":["Var","QnaIndex"]},
             ES_ADDRESS:{"Fn::GetAtt":["ESVar","ESAddress"]},
             UTTERANCE_BUCKET:{"Ref":"AssetBucket"},
             UTTERANCE_KEY:"default-utterances.json",
@@ -47,7 +47,7 @@ module.exports={
         },
         "Environment": {
           "Variables": {
-            ES_INDEX:{"Fn::GetAtt":["ESVar","QnaIndex"]},
+            ES_INDEX:{"Fn::GetAtt":["Var","QnaIndex"]},
             ES_ADDRESS:{"Fn::GetAtt":["ESVar","ESAddress"]}
           }
         },
@@ -72,7 +72,7 @@ module.exports={
         },
         "Environment": {
           "Variables": {
-            ES_INDEX:{"Fn::GetAtt":["ESVar","QnaIndex"]},
+            ES_INDEX:{"Fn::GetAtt":["Var","QnaIndex"]},
             ES_ADDRESS:{"Fn::GetAtt":["ESVar","ESAddress"]},
             FEEDBACK_DELETE_RANGE_MINUTES:43200,
             METRICS_DELETE_RANGE_MINUTES:43200,
@@ -170,7 +170,7 @@ module.exports={
         "Environment": {
           "Variables": {
             ES_TYPE:{"Fn::GetAtt":["Var","QnAType"]},
-            ES_INDEX:{"Fn::GetAtt":["ESVar","QnaIndex"]},
+            ES_INDEX:{"Fn::GetAtt":["Var","QnaIndex"]},
             ES_ADDRESS:{"Fn::GetAtt":["ESVar","ESAddress"]},
             DEFAULT_SETTINGS_PARAM:{"Ref":"DefaultQnABotSettings"},
             CUSTOM_SETTINGS_PARAM:{"Ref":"CustomQnABotSettings"},

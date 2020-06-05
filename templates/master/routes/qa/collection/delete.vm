@@ -1,7 +1,7 @@
 {
     "endpoint":"${ESVar.ESAddress}",
     "method":"POST",
-    "path":"/${ESVar.QnaIndex}/_delete_by_query?refresh=wait_for",
+    "path":"/${Var.QnaIndex}/_delete_by_query?refresh=wait_for",
     "body":{
         "query":{
             #if($input.path('$.query').length()!=0)

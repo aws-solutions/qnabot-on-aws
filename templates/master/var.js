@@ -9,7 +9,19 @@ module.exports={
             op:"toLowerCase"
         },
         "QnAType":"qna",
-        "QuizType":"quiz"
+        "QuizType":"quiz",
+        "QnaIndex":{
+            value:{"Fn::Sub":"${AWS::StackName}"},
+            op:"toLowerCase"
+        },
+        "MetricsIndex":{
+            value:{"Fn::Sub":"${AWS::StackName}-metrics"},
+            op:"toLowerCase"
+        },
+        "FeedbackIndex":{
+            value:{"Fn::Sub":"${AWS::StackName}-feedback"},
+            op:"toLowerCase"
+        },
     }
 },
 "InfoVar":{
@@ -40,9 +52,6 @@ module.exports={
             {"Ref":"ElasticsearchDomain"},
             {"Ref":"ElasticsearchName"}
         ]},
-        "QnaIndex":"qnabot-qna",
-        "MetricsIndex":"qnabot-metrics",
-        "FeedbackIndex":"qnabot-feedback",
     }
 },
 "ApiUrl":{
