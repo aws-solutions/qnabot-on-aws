@@ -20,7 +20,8 @@ var targets={
     ApiDeployment:require('./lib/ApiDeployment'),
     ElasticSearchUpdate:require('./lib/ElasticSearchUpdate'),
     ESCognitoClient:require('./lib/ESCognitoClient'),
-    Kibana:require('./lib/kibana'),
+    PreUpgradeExport:require('./lib/PreUpgradeExport'),
+    PostUpgradeImport:require('./lib/PostUpgradeImport'),
 }
 var Lex=require('./lib/lex')
 
