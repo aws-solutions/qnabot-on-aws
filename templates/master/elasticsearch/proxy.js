@@ -31,7 +31,7 @@ module.exports={
         "Properties": {
             "ServiceToken": { "Fn::GetAtt" : ["ESCFNProxyLambda", "Arn"] },
             "create":{
-                index:{"Fn::Sub":"${ESVar.MetricsIndex}"},
+                index:{"Fn::Sub":"${Var.MetricsIndex}"},
                 endpoint:{"Fn::GetAtt":["ESVar","ESAddress"]},
                 body:{"Fn::Sub":JSON.stringify({ 
                     settings:{},
@@ -44,7 +44,7 @@ module.exports={
         "Properties": {
             "ServiceToken": { "Fn::GetAtt" : ["ESCFNProxyLambda", "Arn"] },
             "create":{
-                index:{"Fn::Sub":"${ESVar.FeedbackIndex}"},
+                index:{"Fn::Sub":"${Var.FeedbackIndex}"},
                 endpoint:{"Fn::GetAtt":["ESVar","ESAddress"]},
                 body:{"Fn::Sub":JSON.stringify({ 
                     settings:{},
@@ -57,7 +57,7 @@ module.exports={
         "Properties": {
             "ServiceToken": { "Fn::GetAtt" : ["ESCFNProxyLambda", "Arn"] },
             "create":{
-                index:{"Fn::Sub":"${ESVar.QnaIndex}"},
+                index:{"Fn::Sub":"${Var.QnaIndex}"},
                 endpoint:{"Fn::GetAtt":["ESVar","ESAddress"]},
                 body:{"Fn::Sub":JSON.stringify({ 
                     settings:require('./index_settings.js'),
@@ -77,6 +77,11 @@ module.exports={
                 method:"POST",
                 headers:{"kbn-xsrf":"kibana"},
                 body:require('./kibana/QnABotDashboard'),
+                replaceTokenInBody:[
+                    {f:"<INDEX_QNA>",r:{"Fn::Sub":"${Var.QnaIndex}"}},
+                    {f:"<INDEX_METRICS>",r:{"Fn::Sub":"${Var.MetricsIndex}"}},
+                    {f:"<INDEX_FEEDBACK>",r:{"Fn::Sub":"${Var.FeedbackIndex}"}},
+                ],
             }
         }
     }

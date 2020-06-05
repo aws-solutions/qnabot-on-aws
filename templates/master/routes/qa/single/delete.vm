@@ -1,7 +1,7 @@
 {
     "endpoint":"${ESVar.ESAddress}",
     "method":"POST",
-    "path":"/${ESVar.QnaIndex}/_delete_by_query?refresh=true",
+    "path":"/${Var.QnaIndex}/_delete_by_query?refresh=true",
     "body":{
         "query":{
             "match":{

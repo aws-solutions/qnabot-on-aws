@@ -8,7 +8,7 @@ module.exports={
                 "CFNInvokePolicy":{"Ref":"CFNInvokePolicy"},
                 "BootstrapBucket":{"Ref":"BootstrapBucket"},
                 "BootstrapPrefix":{"Ref":"BootstrapPrefix"},
-                "VarIndex": {"Fn::GetAtt": ["ESVar", "QnaIndex"]},
+                "VarIndex": {"Fn::GetAtt": ["Var", "QnaIndex"]},
                 "EsEndpoint": {"Fn::GetAtt": ["ESVar", "ESAddress"]},
                 "EsProxyLambda": {"Fn::GetAtt":["ESProxyLambda","Arn"]},
                 "ImportBucket": {"Ref":"ImportBucket"},

@@ -23,6 +23,7 @@ var properties={
 module.exports={
     "ElasticsearchDomain": {
         "Type": "AWS::Elasticsearch::Domain",
+        "DependsOn":["PreUpgradeExport"],
         "Condition":"CreateDomain",
         "Properties":properties 
     },
