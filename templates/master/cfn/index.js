@@ -44,7 +44,7 @@ module.exports={
         "MemorySize": "3008",
         "Role": {"Fn::GetAtt": ["CFNLambdaRole","Arn"]},
         "Runtime": "nodejs10.x",
-        "Timeout": 60,
+        "Timeout": 180,
         "Tags":[{
             Key:"Type",
             Value:"CustomResource"
