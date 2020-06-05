@@ -36,7 +36,9 @@ exports.Create=async function(params){
     if (create.replaceTokenInBody) {
         // replaceTokenInBody is array of objects like [{f:"find_pattern",r:"replace_pattern"},{...}]
         // used to replace tokenized index names in Kibana Dashboard JSON
-        create.replaceTokenInBody.forEach(item => create.body = create.body.replace(item.f,item.r));
+        var str=JSON.stringify(create.body);
+        create.replaceTokenInBody.forEach(item => str = str.replace(item.f,item.r));
+        create.body=JSON.parse(str);
     }
     if (create.index){
         var index_alias=create.index; 
@@ -79,7 +81,9 @@ exports.Update=async function(ID,params,oldparams){
         if (update.replaceTokenInBody) {
             // replaceTokenInBody is array of objects like [{f:"find_pattern",r:"replace_pattern"},{...}]
             // used to replace tokenized index names in Kibana Dashboard JSON
-            update.replaceTokenInBody.forEach(item => update.body = update.body.replace(item.f,item.r));
+            var str=JSON.stringify(update.body);
+            update.replaceTokenInBody.forEach(item => str = str.replace(item.f,item.r));
+            update.body=JSON.parse(str);
         }
         if (update.index){
             var index_alias=update.index; 
