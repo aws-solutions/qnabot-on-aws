@@ -93,7 +93,7 @@ module.exports={
     "KibanaIdPool": {
       "Type": "AWS::Cognito::IdentityPool",
       "Properties": {
-        "IdentityPoolName": "QnABotUserPool",
+        "IdentityPoolName": "KibanaQnABotUserPool",
         "AllowUnauthenticatedIdentities": false
       }
     },
