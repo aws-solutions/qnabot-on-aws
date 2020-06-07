@@ -2,7 +2,7 @@ var default_settings = {
     ENABLE_DEBUG_RESPONSES: "false",
     ES_USE_KEYWORD_FILTERS: "true",
     ES_NO_HITS_QUESTION: "no_hits",
-    ES_USE_FUZZY_MATCH: "true",
+    ES_USE_FUZZY_MATCH: "false",
     ES_KEYWORD_SYNTAX_TYPES: "NOUN,PROPN,VERB,INTJ",
     ES_SYNTAX_CONFIDENCE_LIMIT: ".20",
     ES_MINIMUM_SHOULD_MATCH: "2<75%",
