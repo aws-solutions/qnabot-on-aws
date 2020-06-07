@@ -62,6 +62,7 @@ async function get_hit(req, res) {
         from: 0,
         size: 1,
         minimum_should_match: _.get(req, '_settings.ES_MINIMUM_SHOULD_MATCH'),
+        phrase_boost: _.get(req, '_settings.ES_PHRASE_BOOST'),
         use_keyword_filters: _.get(req, '_settings.ES_USE_KEYWORD_FILTERS'),
         keyword_syntax_types: _.get(req, '_settings.ES_KEYWORD_SYNTAX_TYPES'),
         syntax_confidence_limit: _.get(req, '_settings.ES_SYNTAX_CONFIDENCE_LIMIT'),

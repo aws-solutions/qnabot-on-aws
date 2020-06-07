@@ -6,6 +6,7 @@ var default_settings = {
     ES_KEYWORD_SYNTAX_TYPES: "NOUN,PROPN,VERB,INTJ",
     ES_SYNTAX_CONFIDENCE_LIMIT: ".20",
     ES_MINIMUM_SHOULD_MATCH: "2<75%",
+    ES_PHRASE_BOOST: "4",
     ES_SCORE_ANSWER_FIELD: "false",
     ERRORMESSAGE: "Unfortunately I encountered an error when searching for your answer. Please ask me again later.",
     EMPTYMESSAGE: "You stumped me! Sadly I don't know how to answer your question.",
