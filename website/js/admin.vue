@@ -149,7 +149,7 @@ module.exports={
         subTitle:"Analyze ChatBot usage",
         icon:"show_chart",
         target:'_blank',
-        href:_.get(this,"$store.state.info._links.Kibana.href")+"#/dashboard/Default?_g=()"
+        href:_.get(this,"$store.state.info._links.Kibana.href")+"#/dashboards?_g=()"
       }]
     }
   },
