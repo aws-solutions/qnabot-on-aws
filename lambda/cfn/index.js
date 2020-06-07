@@ -22,6 +22,7 @@ var targets={
     ESCognitoClient:require('./lib/ESCognitoClient'),
     PreUpgradeExport:require('./lib/PreUpgradeExport'),
     PostUpgradeImport:require('./lib/PostUpgradeImport'),
+    Kibana:require('./lib/base'),  // Kibana custom resource deprecated.. preserve entry here to avoid resource delete failure on stack upgrade.
 }
 var Lex=require('./lib/lex')
 
