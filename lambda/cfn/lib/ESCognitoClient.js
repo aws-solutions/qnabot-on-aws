@@ -23,8 +23,11 @@ async function run(params,reply){
             MaxResults:10
         }).promise()
         console.log(clients)
+        
+        let myReg = new RegExp(params.DomainName )
+
         var client=clients.UserPoolClients
-            .filter(x=>x.ClientName.match(/AWSElasticsearch/))
+            .filter(x=>x.ClientName.match(myReg))
             [0].ClientId
        
         console.log(client)
@@ -42,3 +45,9 @@ async function run(params,reply){
 }
 
 
+/*
+// test
+var reply = () => {};
+var params={UserPool:"us-east-1_kH9fn0uHR", DomainName:"qnabot-elasti-22v8xhjj98ea"};
+run(params, reply);
+*/

@@ -20,8 +20,11 @@ module.exports=class CognitoRole extends require('./base') {
             IdentityPoolId:params.IdentityPoolId
         }).promise().tap(console.log)
         .then(function(result){
-            result.Roles=Object.assign(result.Roles || {},params.Roles)
-            result.RoleMappings=Object.assign(result.RoleMappings || {},RoleMappings)
+            //result.Roles=Object.assign(result.Roles || {},params.Roles)
+            //result.RoleMappings=Object.assign(result.RoleMappings || {},RoleMappings)
+            //Overwrite any existing roles and mappings with new ones - existing mappings may no longer be valid after an upgrade.
+            result.Roles=params.Roles;
+            result.RoleMappings=RoleMappings;
             console.log(result)
 
             return cognito.setIdentityPoolRoles(result).promise()
@@ -29,7 +32,9 @@ module.exports=class CognitoRole extends require('./base') {
         .then(()=>reply(null,"RoleMapping"))
         .catch(reply)
     }
-    
+    Update(ID,params,oldparams,reply){
+        this.Create(params,reply);
+    }
     Delete(ID,params,reply){
         var ids={}
 
