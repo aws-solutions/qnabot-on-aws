@@ -3,7 +3,7 @@ var _=require('lodash')
 var util=require('./util')
 
 var files=fs.readdirSync(`${__dirname}/..`)
-    .filter(x=>!x.match(/README.md|Makefile|dashboard|index|test/))
+    .filter(x=>!x.match(/README.md|Makefile|dashboard|index|test|.DS_Store/))
     .map(x=>require(`../${x}`))
     
 var lambdas={}
