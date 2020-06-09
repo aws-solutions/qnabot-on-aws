@@ -4,6 +4,6 @@
     "slottype":"${SlotType}",
     "intent":"${Intent}",
     "address":"${ESVar.ESAddress}",
-    "index":"${Var.index}",
+    "index":"${Var.QnaIndex}",
     "type":"${Var.QnAType}"
 }  

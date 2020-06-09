@@ -6,6 +6,7 @@ var _=require('lodash');
 
 
 function build_query(params) {
+    console.log("Build_query - params: ",JSON.stringify(params,null,2));
     return(get_keywords(params))
     .then(function(keywords) {
         var filter_query = {
@@ -37,7 +38,7 @@ function build_query(params) {
         query = query.orQuery(
             'nested',{
             score_mode:'max',
-            boost:2,
+            boost:_.get(params,'phrase_boost',4),
             path:'questions'},
             q=>q.query('match_phrase','questions.q',params.question)
         ) ;

@@ -14,7 +14,7 @@ var encryptor = require('simple-encryptor')(key);
 async function run_query(req, query_params) {
     var es_query = await build_es_query(query_params);
     var es_response = await request({
-        url: `https://${req._info.es.address}/${req._info.es.index}/${req._info.es.type}/_search?search_type=dfs_query_then_fetch`,
+        url: `https://${req._info.es.address}/${req._info.es.index}/_doc/_search?search_type=dfs_query_then_fetch`,
         method: "GET",
         body: es_query
     });
@@ -62,6 +62,7 @@ async function get_hit(req, res) {
         from: 0,
         size: 1,
         minimum_should_match: _.get(req, '_settings.ES_MINIMUM_SHOULD_MATCH'),
+        phrase_boost: _.get(req, '_settings.ES_PHRASE_BOOST'),
         use_keyword_filters: _.get(req, '_settings.ES_USE_KEYWORD_FILTERS'),
         keyword_syntax_types: _.get(req, '_settings.ES_KEYWORD_SYNTAX_TYPES'),
         syntax_confidence_limit: _.get(req, '_settings.ES_SYNTAX_CONFIDENCE_LIMIT'),
@@ -197,8 +198,10 @@ module.exports = async function (req, res) {
             // conditionalChaining in this case.
             hit = await evaluateConditionalChaining(req, res, hit, hit.conditionalChaining);
         }
+        // translate response
+        var usrLang = 'en';
         if (_.get(req._settings, 'ENABLE_MULTI_LANGUAGE_SUPPORT', "false").toLowerCase() === "true") {
-            const usrLang = _.get(req, 'session.userLocale');
+            usrLang = _.get(req, 'session.userLocale');
             if (usrLang != 'en') {
                 console.log("Autotranslate hit to usrLang: ", usrLang);
                 hit = await translate.translate_hit(hit, usrLang);
@@ -206,14 +209,30 @@ module.exports = async function (req, res) {
                 console.log("User Lang is en, Autotranslate not required.");
             }
         }
+        // prepend debug msg
+        if (_.get(req._settings, 'ENABLE_DEBUG_RESPONSES', "false").toLowerCase() === "true") {
+            var msg = "User Input: \"" + req.question + "\"";
+            if (usrLang != 'en') {
+                msg = "User Input: \"" + _.get(req,"_event.origQuestion","notdefined") + "\", Translated to: \"" + req.question + "\"";
+            }          
+            var debug_msg = {
+                a: "[" + msg + "] ",
+                alt: {
+                    markdown: "*[" + msg + "]*  \n",
+                    ssml: "<speak>" + msg + "</speak>"
+                }
+            };
+            hit = merge_next(debug_msg, hit) ;
+        };
         res.result = hit;
         res.type = "PlainText"
         res.message = res.result.a
         res.plainMessage = res.result.a
 
-        _.set(res, "session.appContext.altMessages",
-            _.get(res, "result.alt", {})
-        )
+        // Add alt messages to appContext session attribute JSON value (for lex-web-ui)
+        var tmp=JSON.parse(_.get(res,"session.appContext","{}"));
+        tmp.altMessages=_.get(res, "result.alt", {});
+        _.set(res, "session.appContext",JSON.stringify(tmp))
 
         if (req._preferredResponseType == "SSML") {
             if (_.get(res, "result.alt.ssml")) {

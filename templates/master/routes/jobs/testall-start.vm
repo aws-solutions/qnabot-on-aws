@@ -2,7 +2,7 @@
 
 {
     "bucket":"${TestAllBucket}",
-    "index":"${Var.index}",
+    "index":"${Var.QnaIndex}",
     "id":"$input.params('proxy')",
     "config":"status/$input.params('proxy')",
     "tmp":"tmp/$input.params('proxy')",

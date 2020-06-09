@@ -9,7 +9,7 @@ module.exports={
                     "SizeInMBs" : 5
                 },
                 "DomainARN" :{"Fn::GetAtt":["ESVar","ESArn"]},
-                "IndexName" :{"Fn::Sub":"${ESVar.FeedbackIndex}"} ,
+                "IndexName" :{"Fn::Sub":"${Var.FeedbackIndex}"} ,
                 "IndexRotationPeriod" : "NoRotation",
                 "RetryOptions" : {
                     "DurationInSeconds" : 300
@@ -27,7 +27,7 @@ module.exports={
                     "CompressionFormat" : "UNCOMPRESSED",
                     "RoleARN" : {"Fn::GetAtt" : ["FirehoseESS3Role", "Arn"] }
                 },
-                "TypeName" : "feedback"
+                "TypeName" : ""
             },
         }
     },
@@ -41,7 +41,7 @@ module.exports={
                     "SizeInMBs" : 5
                 },
                 "DomainARN" :{"Fn::GetAtt":["ESVar","ESArn"]},
-                "IndexName" : {"Fn::Sub":"${ESVar.MetricsIndex}"},
+                "IndexName" : {"Fn::Sub":"${Var.MetricsIndex}"},
                 "IndexRotationPeriod" : "NoRotation",
                 "RetryOptions" : {
                     "DurationInSeconds" : 300
@@ -59,7 +59,7 @@ module.exports={
                     "CompressionFormat" : "UNCOMPRESSED",
                     "RoleARN" : {"Fn::GetAtt" : ["FirehoseESS3Role", "Arn"] }
                 },
-                "TypeName" : "general"
+                "TypeName" : ""
             },
         }
     },

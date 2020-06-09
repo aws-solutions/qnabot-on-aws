@@ -12,7 +12,7 @@ module.exports={
   "Resources":resources,
   "Conditions": {},
   "AWSTemplateFormatVersion": "2010-09-09",
-  "Description": "QnABot with admin and client websites",
+  "Description": "QnABot nested example resources",
   "Mappings": {},
   "Outputs": outputs,
   "Parameters": {

@@ -11,12 +11,7 @@ BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied. See the
 License for the specific language governing permissions and limitations under the License.
 */
 
-var Promise=require('bluebird')
-var lib=require('./lib')
-var aws=require('./lib/aws')
-var lambda=new aws.Lambda()
-var lex=new aws.LexModelBuildingService()
-
+const lib=require('./lib')
 exports.handler=function(event,context,callback){
     console.log("Event:",JSON.stringify(event,null,2))
     

@@ -9,7 +9,7 @@
 {
     "endpoint":"${ESVar.ESAddress}",
     "method":"PUT",
-    "path":"/${Var.index}/$type/$input.params('ID')?refresh=wait_for",
+    "path":"/${Var.QnaIndex}/_doc/$input.params('ID')?refresh=wait_for",
     "body":{
         #foreach($paramName in $inputRoot.keySet())
             #if( $paramName == 'q' && $type=="qna")

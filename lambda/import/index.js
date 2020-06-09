@@ -52,7 +52,7 @@ exports.step=function(event,context,cb){
                         out.push(JSON.stringify({
                             index:{
                                 "_index":process.env.ES_INDEX,
-                                "_type":obj.type,
+                                "_type":"_doc",
                                 "_id":obj.qid
                             }
                         }))
