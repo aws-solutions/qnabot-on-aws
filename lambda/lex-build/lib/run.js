@@ -11,22 +11,22 @@ BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied. See the
 License for the specific language governing permissions and limitations under the License.
 */
 
-var Promise=require('bluebird')
-var aws=require('./aws')
-var lex=new aws.LexModelBuildingService()
+const Promise=require('bluebird')
+const aws=require('./aws')
+const lex=new aws.LexModelBuildingService()
 
 module.exports=function run(fnc,params){
     console.log(fnc+':request:'+JSON.stringify(params,null,3))
     return new Promise(function(res,rej){
-        var next=function(count){
+        const next=function(count){
             console.log("tries-left:"+count)
-            var request=lex[fnc](params)
+            const request=lex[fnc](params)
             request.promise()
             .tap(x=>console.log(fnc+':result:'+JSON.stringify(x,null,3)))
             .then(res)
             .catch(function(err){
                 console.log(fnc+':'+err.code)
-                var retry = err.retryDelay || 5
+                const retry = err.retryDelay || 5
                 console.log("retry in "+retry)
 
                 if(err.code==="ConflictException"){

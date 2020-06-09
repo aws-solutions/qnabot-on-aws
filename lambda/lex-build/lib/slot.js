@@ -11,12 +11,8 @@ BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied. See the
 License for the specific language governing permissions and limitations under the License.
 */
 
-var Promise=require('bluebird')
-var aws=require('./aws')
-var lex=new aws.LexModelBuildingService()
-var getUtterances=require('./utterances')
-var _=require('lodash')
-var run=require('./run')
+const _=require('lodash')
+const run=require('./run')
 
 module.exports=function(utterances,slottype){
     console.log("utterances="+utterances)

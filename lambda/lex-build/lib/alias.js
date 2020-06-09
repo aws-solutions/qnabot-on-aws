@@ -11,20 +11,13 @@ BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied. See the
 License for the specific language governing permissions and limitations under the License.
 */
 
-var Promise=require('bluebird')
-var aws=require('./aws')
-var lex=new aws.LexModelBuildingService()
-var getUtterances=require('./utterances')
-var Slot=require('./slot')
-var Intent=require('./intent')
-var _=require('lodash')
-var run=require('./run')
+const run=require('./run')
 
 module.exports=async function(version,data){
-    var alias=await run('getBotAlias',data)
-    var checksum=alias.checksum
+    const alias=await run('getBotAlias',data)
+    const checksum=alias.checksum
     
-    var update=await run('putBotAlias',{
+    await run('putBotAlias',{
         botName:data.botName,
         botVersion:version,
         name:data.name,
