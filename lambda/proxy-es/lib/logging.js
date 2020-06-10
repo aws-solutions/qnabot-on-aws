@@ -13,16 +13,14 @@ function processKeysForRegEx(obj, re) {
         if (_.isPlainObject(val)) {
             processKeysForRegEx(val, re);
         } else if ( key === "slot") {
-            val = val.replace(re,'XXXXX');
-            obj[key] = val;
+            obj[key] = val.replace(re,'XXXXX');
         } else if ( key === "recentIntentSummaryView") {
             if (val) {
                 processKeysForRegEx(val, re);
             }
         } else {
             if (typeof val === 'string') {
-                val = val.replace(re,'XXXXX');
-                obj[key] = val;
+                obj[key] = val.replace(re,'XXXXX');
             }
         }
     });
