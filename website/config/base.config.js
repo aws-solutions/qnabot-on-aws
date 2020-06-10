@@ -31,11 +31,11 @@ module.exports={
     },
     plugins:_.compact([
         new VueLoaderPlugin(),
-        new CopyWebpackPlugin([{from:'./assets',to:"assets"}]),
-        new CopyWebpackPlugin([{
+        new CopyWebpackPlugin({ patterns: [{from:'./assets',to:"assets"}] }),
+        new CopyWebpackPlugin({ patterns: [{
             from:'../node_modules/aws-lex-web-ui/dist/wav-worker.min.js',
             to:"wav-worker.js"
-        }]),
+        }]}),
         new HtmlWebpackPlugin({
             template:'./html/admin.pug',
             filename:'index.html',

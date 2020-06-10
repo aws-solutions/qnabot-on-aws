@@ -11,11 +11,9 @@ BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied. See the
 License for the specific language governing permissions and limitations under the License.
 */
 
-var Promise=require('bluebird')
-var aws=require('./aws')
-var lex=new aws.LexModelBuildingService()
-var _=require('lodash')
-var run=require('./run.js')
+const Promise=require('bluebird')
+const _=require('lodash')
+const run=require('./run.js')
 
 exports.bot=function(name,version){
     return Promise.all(run('getBotVersions',{name}).get('bots')

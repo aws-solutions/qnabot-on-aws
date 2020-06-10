@@ -86,8 +86,10 @@ async function routeKendraRequest(event, context) {
     // process kendra query responses and update answer content
 
     /* default message text - can be overridden using QnABot SSM Parameter Store Custom Property */
-    let answerMessage = 'While I did not find an exact answer, the following might be helpful. ';
-    let answerMessageMd = '*While I did not find an exact answer, the following might be helpful.* \n ';
+    let answerMessage = 'While I did not find an exact answer, these search results from Amazon Kendra might be helpful. ';
+    let answerMessageMd = '*While I did not find an exact answer, these search results from Amazon Kendra might be helpful.* \n ';
+    let faqanswerMessage = 'Answer from Amazon Kendra FAQ.';
+    let faqanswerMessageMd = '*Answer from Amazon Kendra FAQ.* \n ';
     let helpfulLinksMsg = 'Possible Links';
     let extractedTextMsg = 'Discovered Text';
     let maxDocumentCount = 4;
@@ -118,11 +120,21 @@ async function routeKendraRequest(event, context) {
                     kendraIndexId = res.originalKendraIndexId; // store off the Kendra IndexId to use as a session attribute for feedback
                     kendraResultId = element.Id; // store off resultId to use as a session attribute for feedback
                     foundAnswerCount++;
+                } else if (element.Type === 'QUESTION_ANSWER' && foundAnswerCount === 0 && element.AdditionalAttributes &&
+                    element.AdditionalAttributes.length > 1) {
+                    // There will be 2 elements - [0] - QuestionText, [1] - AnswerText
+                    answerMessage = faqanswerMessage + '\n\n ' + element.AdditionalAttributes[1].Value.TextWithHighlightsValue.Text.replace(/\r?\n|\r/g, " ");
+                    answerMessageMd = faqanswerMessageMd + '\n\n ' + element.AdditionalAttributes[1].Value.TextWithHighlightsValue.Text.replace(/\r?\n|\r/g, " ");
+                    kendraQueryId = res.QueryId; // store off the QueryId to use as a session attribute for feedback
+                    kendraIndexId = res.originalKendraIndexId; // store off the Kendra IndexId to use as a session attribute for feedback
+                    kendraResultId = element.Id; // store off resultId to use as a session attribute for feedback
+                    foundAnswerCount++;                    
                 } else if (element.Type === 'DOCUMENT' && element.DocumentExcerpt.Text && element.DocumentURI) {
                     const docInfo = {}
                     docInfo.text = element.DocumentExcerpt.Text.replace(/\r?\n|\r/g, " ");
                     docInfo.uri = element.DocumentURI;
                     helpfulDocumentsUris.add(docInfo);
+                    foundAnswerCount++;
                     foundDocumentCount++;
                 }
             });

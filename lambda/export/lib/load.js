@@ -23,10 +23,10 @@ module.exports=function(config,body){
         if(documents.length){
             var body=documents.map(x=>{
                 var out=x._source
-                out.type=x._type
                 if(out.type==='qna'){ 
                     out.q=out.questions.map(y=>y.q)
                     delete out.questions
+                    delete out.quniqueterms;
                 }else{
                 }
                 return JSON.stringify(out)

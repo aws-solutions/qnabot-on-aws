@@ -1,5 +1,5 @@
-var aws=require('./aws')
-var lambda=new aws.Lambda()
+const aws=require('./aws')
+const lambda=new aws.Lambda()
 
 module.exports=function(status){
     console.log("calling poll lambda")

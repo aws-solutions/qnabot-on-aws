@@ -11,43 +11,40 @@ BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied. See the
 License for the specific language governing permissions and limitations under the License.
 */
 
-var Promise=require('bluebird')
-var aws=require('./aws')
-var lex=new aws.LexModelBuildingService()
-var _=require('lodash')
-var run=require('./run')
-var getUtterances=require('./utterances')
-var Slot=require('./slot')
-var Intent=require('./intent')
-var IntentFallback=require('./intentFallback')
-var Alias=require('./alias')
-var Bot=require('./bot')
-var clean=require('./delete')
-var status=require('./status')
-var wait=require('./wait')
+const Promise=require('bluebird')
+const run=require('./run')
+const getUtterances=require('./utterances')
+const Slot=require('./slot')
+const Intent=require('./intent')
+const IntentFallback=require('./intentFallback')
+const Alias=require('./alias')
+const Bot=require('./bot')
+const clean=require('./delete')
+const status=require('./status')
+const wait=require('./wait')
 
 module.exports=function(params){ 
-    var utterances=getUtterances(params)
+    const utterances=getUtterances(params)
     
-    var slottype=run("getSlotType",{
+    const slottype=run("getSlotType",{
         name:process.env.SLOTTYPE,
         version:"$LATEST"
     })
-    var intent=run("getIntent",{
+    const intent=run("getIntent",{
         name:process.env.INTENT,
         version:"$LATEST"
     })
-    var intentFallback=run("getIntent",{
+    const intentFallback=run("getIntent",{
         name:process.env.INTENTFALLBACK,
         version:"$LATEST"
     })
-    var bot=run('getBot',{
+    const bot=run('getBot',{
         name:process.env.BOTNAME,
         versionOrAlias:"$LATEST"
     })
-    var clean_intent=null
-    var clean_intentFallback=null
-    var clean_slottype=null
+    let clean_intent=null
+    let clean_intentFallback=null
+    let clean_slottype=null
 
     return Promise.join(utterances,slottype)
         .tap(status("Rebuilding Slot"))

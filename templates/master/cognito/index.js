@@ -54,7 +54,7 @@ module.exports={
     },
     "User":{
         "Type" : "AWS::Cognito::UserPoolUser",
-        "DependsOn":["SignupPermision","MessagePermision","ElasticsearchDomainUpdate","Kibana","KibanaRoleAttachment","RoleAttachment"],
+        "DependsOn":["SignupPermision","MessagePermision","ElasticsearchDomainUpdate","KibanaRoleAttachment","RoleAttachment"],
         "Properties" : {
             "DesiredDeliveryMediums":["EMAIL"],
             "UserAttributes":[{
@@ -76,7 +76,7 @@ module.exports={
     "IdPool": {
       "Type": "AWS::Cognito::IdentityPool",
       "Properties": {
-        "IdentityPoolName": "QnabotUserPool",
+        "IdentityPoolName": {"Fn::Join": ["-",["QnaBotIdPool",{"Ref": "AWS::StackName"}]]},
         "AllowUnauthenticatedIdentities": true,
         "CognitoIdentityProviders": [{
             "ClientId": {"Ref": "ClientDesigner"},
@@ -93,7 +93,7 @@ module.exports={
     "KibanaIdPool": {
       "Type": "AWS::Cognito::IdentityPool",
       "Properties": {
-        "IdentityPoolName": "QnABotUserPool",
+        "IdentityPoolName": {"Fn::Join": ["-",["KibanaIdPool",{"Ref": "AWS::StackName"}]]},
         "AllowUnauthenticatedIdentities": false
       }
     },
@@ -102,6 +102,7 @@ module.exports={
         "Properties": {
             "ServiceToken": { "Fn::GetAtt" : ["CFNLambda", "Arn"] },
             "IdentityPoolId":{"Ref":"KibanaIdPool"},
+            "DomainName":{"Fn::GetAtt":["ESVar","ESDomain"]},
             "Roles":{
                 "authenticated":{"Fn::GetAtt":["UserRole","Arn"]},
                 "unauthenticated":{"Fn::GetAtt":["UnauthenticatedRole","Arn"]} 
@@ -185,6 +186,7 @@ module.exports={
         "Properties": {
             "ServiceToken": { "Fn::GetAtt" : ["CFNLambda", "Arn"] },
             "UserPool":{"Ref":"UserPool"},
+            "DomainName":{"Fn::GetAtt":["ESVar","ESDomain"]} 
         }
     },
     "ClientDesigner": {

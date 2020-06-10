@@ -1,5 +1,5 @@
-var aws=require('./aws')
-var s3=new aws.S3()
+const aws=require('./aws')
+const s3=new aws.S3()
 
 module.exports=function(status,message){
     return s3.getObject({

@@ -11,10 +11,10 @@ BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied. See the
 License for the specific language governing permissions and limitations under the License.
 */
 
-var Promise=require('bluebird')
-var AWS = require('./aws.js');
-var myCredentials = new AWS.EnvironmentCredentials('AWS'); 
-var _=require('lodash')
+const Promise=require('bluebird')
+const AWS = require('./aws.js');
+const myCredentials = new AWS.EnvironmentCredentials('AWS');
+const _=require('lodash')
 
 module.exports=_.memoize(function(address){
     return require('elasticsearch').Client({

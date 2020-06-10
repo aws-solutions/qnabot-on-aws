@@ -9,21 +9,25 @@
 {
     "endpoint":"${ESVar.ESAddress}",
     "method":"PUT",
-    "path":"/${Var.index}/$type/$input.params('ID')?refresh=wait_for",
+    "path":"/${Var.QnaIndex}/_doc/$input.params('ID')?refresh=wait_for",
     "body":{
         #foreach($paramName in $inputRoot.keySet())
             #if( $paramName == 'q' && $type=="qna")
+                ## generate quniqueterms field by concatenating questions in q array
+                "quniqueterms":" #foreach( $q in $inputRoot.get($paramName))$q #end ",
+                ## replace q array with nested questions array
                 "questions":[
                     #foreach( $q in $inputRoot.get($paramName))
                         {"q":"$q"}
                         #if($foreach.hasNext),#end
                     #end
                 ]
+                #if($foreach.hasNext),#end
             #else
                 #set( $body =  '$.'+$paramName)
                 "$paramName" :$input.json($body) 
+                #if($foreach.hasNext),#end
             #end
-        #if($foreach.hasNext),#end
         #end
     }
 }

@@ -40,10 +40,12 @@ async function get_es_query(event) {
             from: _.get(event,'from',0),
             size: _.get(event,'size',1),
             minimum_should_match: _.get(settings,'ES_MINIMUM_SHOULD_MATCH'),
+            phrase_boost: _.get(settings, 'ES_PHRASE_BOOST'),
             use_keyword_filters: _.get(settings,'ES_USE_KEYWORD_FILTERS'),
             keyword_syntax_types: _.get(settings,'ES_KEYWORD_SYNTAX_TYPES'),
             syntax_confidence_limit: _.get(settings,'ES_SYNTAX_CONFIDENCE_LIMIT'),
             score_answer_field: _.get(settings,'ES_SCORE_ANSWER_FIELD'),
+            fuzziness: _.get(settings, 'ES_USE_FUZZY_MATCH'),
         };
         return build_es_query(query_params);
     } else {
@@ -59,6 +61,7 @@ module.exports= (event, context, callback) => {
         return request({
             url:Url.resolve("https://"+event.endpoint,event.path),
             method:event.method,
+            headers:event.headers,
             body:es_query 
         });
     })

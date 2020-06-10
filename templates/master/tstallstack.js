@@ -10,7 +10,7 @@ module.exports={
                 "BotAlias":{"Ref":"VersionAlias"},
                 "BootstrapBucket":{"Ref":"BootstrapBucket"},
                 "BootstrapPrefix":{"Ref":"BootstrapPrefix"},
-                "VarIndex": {"Fn::GetAtt": ["Var", "index"]},
+                "VarIndex": {"Fn::GetAtt": ["Var", "QnaIndex"]},
                 "EsEndpoint": {"Fn::GetAtt": ["ESVar", "ESAddress"]},
                 "EsProxyLambda": {"Fn::GetAtt":["ESProxyLambda","Arn"]},
                 "TestAllBucket": {"Ref":"TestAllBucket"},

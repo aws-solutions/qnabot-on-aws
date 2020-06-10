@@ -11,7 +11,7 @@ var properties={
        "VolumeSize": 10,
        "VolumeType": "gp2"
     },
-    "ElasticsearchVersion": "5.1",
+    "ElasticsearchVersion": "7.4",
     "SnapshotOptions": {
        "AutomatedSnapshotStartHour": "0"
     },
@@ -23,6 +23,7 @@ var properties={
 module.exports={
     "ElasticsearchDomain": {
         "Type": "AWS::Elasticsearch::Domain",
+        "DependsOn":["PreUpgradeExport"],
         "Condition":"CreateDomain",
         "Properties":properties 
     },

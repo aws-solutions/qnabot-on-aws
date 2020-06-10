@@ -37,6 +37,7 @@ var config = {
     pushInitialTextOnRestart:false,
     AllowSuperDangerousHTMLInMessage:true,
     showDialogStateIcon:false,
+    shouldDisplayResponseCardTitle:false,
     positiveFeedbackIntent: "Thumbs up",
     negativeFeedbackIntent: "Thumbs down",
     helpIntent: "Help"

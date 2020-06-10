@@ -2,14 +2,14 @@ var fs=require('fs')
 var _=require('lodash')
 
 var files=fs.readdirSync(`${__dirname}`)
-    .filter(x=>!x.match(/README.md|Makefile|index|test|outputs/))
+    .filter(x=>!x.match(/README.md|Makefile|index|test|outputs|.DS_Store/))
     .map(x=>require(`./${x}`))
 
 module.exports={
     "Resources":_.assign.apply({},files),
     "Conditions": {},
     "AWSTemplateFormatVersion": "2010-09-09",
-    "Description": "Template for export resources",
+    "Description": "QnABot nested import resources",
     "Outputs": require('./outputs'),
     "Parameters": {
         "CFNLambda":{"Type":"String"},

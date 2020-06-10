@@ -141,7 +141,10 @@ var apply_handlebars = async function (req, res, hit) {
     var context = {
         LexOrAlexa: req._type,
         UserInfo: req._userInfo,
-        SessionAttributes: _.get(res, 'session')
+        SessionAttributes: _.get(res, 'session'),
+        Settings: req._settings,
+        Question: req.question,
+        OrigQuestion: _.get(req,"_event.origQuestion",req.question),
     }
     // Autotranslation enabled by default.. will be disabled when handlebars finds explicit language match block.
     autotranslate = true;

@@ -128,9 +128,10 @@ module.exports={
               await self.$store.dispatch('api/remove',self.data.qid)
             }
           }
-          
-          await self.$store.dispatch('data/update',self.tmp)
-          self.$emit('update:data',_.cloneDeep(self.tmp))
+          var newdata = clean(_.cloneDeep(self.tmp));
+          delete newdata.quniqueterms;
+          await self.$store.dispatch('data/update',newdata)
+          self.$emit('update:data',_.cloneDeep(newdata))
           self.success="success!"
         }catch(error){
           self.dialog=true
@@ -142,6 +143,27 @@ module.exports={
     }
   }
 }
+
+function clean(obj){
+    if(Array.isArray(obj)){
+        for( var i=0; i<obj.length; i++){
+            obj[i]=clean(obj[i])
+        }
+        var out=_.compact(obj)
+        return out.length ? out : null
+    }else if(typeof obj==="object"){
+        for (var key in obj){
+            obj[key]=clean(obj[key])
+        }
+        var out=_.pickBy(obj)
+        return _.keys(out).length ? out : null
+    }else if(obj.trim){
+        return obj.trim() || null
+    }else{
+        return obj
+    }
+}
+
 </script>
 
 <style lang='scss' scoped>
