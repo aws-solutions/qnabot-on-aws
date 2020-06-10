@@ -57,7 +57,7 @@ exports.step=function(event,context,cb){
                         var obj=JSON.parse(x)
                         var timestamp=_.get(obj,'datetime',"");
                         var docid ;
-                        if (timestamp == "") {
+                        if (timestamp === "") {
                             // only metrics and feedback items have datetime field.. This must be a qna item.
                             obj.type=obj.type || 'qna'
                             if(obj.type==='qna'){
