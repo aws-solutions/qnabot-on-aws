@@ -23,6 +23,7 @@ module.exports=function(config,body){
         if(documents.length){
             var body=documents.map(x=>{
                 var out=x._source
+                out._id=x._id;
                 if(out.type==='qna'){ 
                     out.q=out.questions.map(y=>y.q)
                     delete out.questions

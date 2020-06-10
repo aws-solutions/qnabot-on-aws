@@ -56,7 +56,7 @@ exports.step=function(event,context,cb){
                     try{
                         var obj=JSON.parse(x)
                         var timestamp=_.get(obj,'datetime',"");
-                        var docid;
+                        var docid ;
                         if (timestamp == "") {
                             // only metrics and feedback items have datetime field.. This must be a qna item.
                             obj.type=obj.type || 'qna'
@@ -65,9 +65,16 @@ exports.step=function(event,context,cb){
                                 obj.quniqueterms=obj.q.join(" ");
                                 delete obj.q
                             }
-                            docid = obj.qid;
+                            docid = obj._id || obj.qid ;
                         } else {
-                            docid = obj.qid + "_" + timestamp;
+                            docid = obj._id || obj.qid + "_upgrade_restore_" + timestamp;
+                            // Stringify session attributes
+                            var sessionAttrs = _.get(obj,"entireResponse.session",{}) ;
+                            for (var key of Object.keys(sessionAttrs)) {
+                                if (typeof sessionAttrs[key] != 'string') {
+                                    sessionAttrs[key]=JSON.stringify(sessionAttrs[key]);
+                                }
+                            }
                         }
                         out.push(JSON.stringify({
                             index:{
