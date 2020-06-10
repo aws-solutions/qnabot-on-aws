@@ -9,10 +9,16 @@ var request=require('./request')
 
 function processKeysForRegEx(obj, re) {
     Object.keys(obj).forEach(function(key,index) {
-        //console.log(`Key ${key}`);
         let val = obj[key];
         if (_.isPlainObject(val)) {
             processKeysForRegEx(val, re);
+        } else if ( key === "slot") {
+            val = val.replace(re,'XXXXX');
+            obj[key] = val;
+        } else if ( key === "recentIntentSummaryView") {
+            if (val) {
+                processKeysForRegEx(val, re);
+            }
         } else {
             if (typeof val === 'string') {
                 val = val.replace(re,'XXXXX');
@@ -23,7 +29,6 @@ function processKeysForRegEx(obj, re) {
 }
 
 module.exports=function(req,res){
-            
     //data to send to general metrics logging
     var date = new Date()
     var now = date.toISOString()
