@@ -94,24 +94,6 @@ exports.Update=async function(ID,params,oldparams){
             res = await run_es_query(update);
             console.log(res) ;
             try {
-                console.log("Update: reindex existing index to new index:", index_alias+" -> "+index_name);
-            	var reindex={
-            	  "source": {
-            	    "index": index_alias
-            	  },
-            	  "dest": {
-            	    "index": index_name
-            	  }
-            	};
-                update.method="POST";
-                update.path="/_reindex";
-                update.body=reindex;
-                res = await run_es_query(update);  
-            } catch(err) {
-                console.log("Reindex request returned: " + err.response.statusText+" ["+err.response.status+"]") ;
-            }
-            console.log(res) ;
-            try {
                 console.log("Delete existing alias, if exists:", index_alias);
                 update.method="DELETE";
                 update.path="/*/_alias/"+index_alias;
