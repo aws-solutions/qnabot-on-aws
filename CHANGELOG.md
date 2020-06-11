@@ -1,3 +1,18 @@
+## [4.0.0]
+- Update to Elasticsearch 7.4
+- Update to 0.16.0 of embedded lex-web-ui
+- Fix to redacting feature with respect to kibana metrics
+- Fix to CustomNoHits to use configured setting
+- npm audit package updates
+- Improved question matching accuracy and tuning
+- Tolerance for typos and minor spelling errors with fuzzy matching setting
+- Easier troubleshooting when using voice or multi-language support with new debug setting
+- SSML support when using Amazon Connect
+- Fixes and improvements to Amazon Kendra integration, support FAQ answers
+- Full upgrade support without data loss when upgrading from previous versions
+- Disable response card titles in embedded lex-web-ui
+- Added region launch links to README
+- Fix to language responses in Language extension. Added mapping of 'Chinese' to use 'Simplified Chinese'
 ## [3.0.3]
 - Enhanced CFN lex create/update to identify and use versions of the Bot externally created
 - Added content tuning Readme
