@@ -282,7 +282,7 @@ understand user input.
 In previous releases (before v4.0.0) repeated terms like "*how
 do I use*" could skew scoring toward items with higher numbers of repeating words.
 In QnABot 4.0.0 and onward, this problem has been eliminated by changing the 
-elasticsearch index and query to socre now only on unique (not repeating) word
+elasticsearch index and query to score now only on unique (not repeating) word
 matches. Previously we recommended to avoid repeating phrases in multiple
 questions by putting all the alternatives into a single question like 
 `"How do I use Q&A / q and a chatbot?"`. This practice is no longer recommended.
