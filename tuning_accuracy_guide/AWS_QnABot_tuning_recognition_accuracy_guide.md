@@ -93,12 +93,12 @@ When you ask QnABot a question, a few things happen:
     document from the searchable index. Relevancy ranking is based on a
     few properties:
 
-      -   Count: How many search terms appear in a document
+        -   Count: How many search terms appear in a document
 
-      -   Frequency: How often the specified keywords occur in a given
+        -   Frequency: How often the specified keywords occur in a given
         document
 
-      -   Importance: How rare or new the specified keywords are and how
+        -   Importance: How rare or new the specified keywords are and how
         closely the keywords occur together in a phrase
 
     -   The closer the alignment between a question associated with an item
@@ -115,9 +115,9 @@ When you ask QnABot a question, a few things happen:
     used as ‘keywords’. Any answer returned by QnABot must have questions 
     that match these keywords, using the following (default) rule:
     
-       - if there are 1 or 2 keywords, then all keywords must match.  
-       - if there are 3 or more keywords, then 75% of the keywords must match.  
-       - If QnABot can’t find any answers that match these keyword filter rules, 
+         - if there are 1 or 2 keywords, then all keywords must match.  
+         - if there are 3 or more keywords, then 75% of the keywords must match.  
+         - If QnABot can’t find any answers that match these keyword filter rules, 
        then it will admit that it doesn’t know the answer rather than guessing 
        an answer that doesn’t match the keywords. QnABot logs every question 
        that it can’t answer so you can see them in the Kibana Dashboard which 
