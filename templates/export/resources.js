@@ -2,7 +2,7 @@ var fs=require('fs')
 var _=require('lodash')
 
 var files=fs.readdirSync(`${__dirname}`)
-    .filter(x=>!x.match(/README.md|Makefile|index|test|outputs/))
+    .filter(x=>!x.match(/README.md|Makefile|index|test|outputs|.DS_Store/))
     .map(x=>require(`./${x}`))
 
 module.exports=Object.assign(
@@ -32,7 +32,7 @@ module.exports=Object.assign(
             }
         },
         "Handler": "index.step",
-        "MemorySize": "320",
+        "MemorySize": "1024",
         "Role": {"Fn::GetAtt": ["ExportRole","Arn"]},
         "Runtime": "nodejs10.x",
         "Timeout": 300,

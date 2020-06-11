@@ -7,6 +7,7 @@ const supportedLanguages = {
     "Bengali": "bn",
     "Bosnian": "bs",
     "Bulgarian": "bg",
+    "Chinese": "zh",
     "Chinese (Simplified)": "zh",
     "Chinese (Traditional)": "zh-TW",
     "Croatian": "hr",

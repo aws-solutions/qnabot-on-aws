@@ -15,13 +15,25 @@ exports.step=function(event,context,cb){
     var Key=decodeURI(event.Records[0].s3.object.key)
     
     var progress
-    console.log(Bucket,Key) 
+    console.log(Bucket,Key);
     s3.waitFor('objectExists',{Bucket,Key}).promise()
     .then(()=>s3.getObject({Bucket,Key}).promise())
     .then(x=>JSON.parse(x.Body.toString()))
     .then(function(config){
-        console.log("Config:",JSON.stringify(config,null,2))
+        console.log("Config:",JSON.stringify(config,null,2));
         if(config.status==="InProgress"){
+            // TODO - design a more robust way to identify target ES index for auto import of metrics and feedback
+            // Filenames must match across:
+            // aws-ai-qna-bot/templates/import/UpgradeAutoImport.js
+            // aws-ai-qna-bot/templates/master/UpgradeAutoExport.js
+            // and pattern in /aws-ai-qna-bot/lambda/import/index.js
+            var esindex = process.env.ES_INDEX ;
+            if (Key.match(/.*ExportAll_QnABot_.*_metrics\.json/)) {
+                esindex = process.env.ES_METRICSINDEX ;
+            } else if (Key.match(/.*ExportAll_QnABot_.*_feedback\.json/)) {
+                esindex = process.env.ES_FEEDBACKINDEX ;        
+            } 
+            console.log("Importing to index: ", esindex);
             return s3.getObject({
                 Bucket:config.bucket,
                 Key:config.key,
@@ -43,17 +55,32 @@ exports.step=function(event,context,cb){
                 .forEach(x=>{
                     try{
                         var obj=JSON.parse(x)
-                        obj.type=obj.type || 'qna'
-                        if(obj.type==='qna'){
-                            obj.questions=obj.q.map(x=>{return {q:x}});
-                            obj.quniqueterms=obj.q.join(" ");
-                            delete obj.q
+                        var timestamp=_.get(obj,'datetime',"");
+                        var docid ;
+                        if (timestamp === "") {
+                            // only metrics and feedback items have datetime field.. This must be a qna item.
+                            obj.type=obj.type || 'qna'
+                            if(obj.type==='qna'){
+                                obj.questions=obj.q.map(x=>{return {q:x}});
+                                obj.quniqueterms=obj.q.join(" ");
+                                delete obj.q
+                            }
+                            docid = obj._id || obj.qid ;
+                        } else {
+                            docid = obj._id || obj.qid + "_upgrade_restore_" + timestamp;
+                            // Stringify session attributes
+                            var sessionAttrs = _.get(obj,"entireResponse.session",{}) ;
+                            for (var key of Object.keys(sessionAttrs)) {
+                                if (typeof sessionAttrs[key] != 'string') {
+                                    sessionAttrs[key]=JSON.stringify(sessionAttrs[key]);
+                                }
+                            }
                         }
                         out.push(JSON.stringify({
                             index:{
-                                "_index":process.env.ES_INDEX,
+                                "_index":esindex,
                                 "_type":"_doc",
-                                "_id":obj.qid
+                                "_id":docid 
                             }
                         }))
                         config.count+=1
@@ -64,7 +91,7 @@ exports.step=function(event,context,cb){
                     }
                 })
                 console.log(result.ContentRange)
-                tmp=result.ContentRange.match(/bytes (.*)-(.*)\/(.*)/)
+                var tmp=result.ContentRange.match(/bytes (.*)-(.*)\/(.*)/)
                 progress=(parseInt(tmp[2])+1)/parseInt(tmp[3])
 
                 return out.join('\n')+'\n'
@@ -142,8 +169,9 @@ exports.start=function(event,context,cb){
         },
         status:"InProgress",
         bucket,key,
-        version:event.Records[0].s3.object.versionId
+        version:event.Records[0].s3.object.versionId,
     }
+    console.log("Config: ",JSON.stringify(config));
     var out_key="status/"+decodeURI(event.Records[0].s3.object.key.split('/').pop())
     console.log(bucket,out_key) 
     s3.putObject({

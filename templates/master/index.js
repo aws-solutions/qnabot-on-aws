@@ -2,7 +2,7 @@ var fs=require('fs')
 var _=require('lodash')
 
 var files=fs.readdirSync(`${__dirname}`)
-    .filter(x=>!x.match(/README.md|Makefile|index|test/))
+    .filter(x=>!x.match(/README.md|Makefile|index|test|.DS_Store/))
     .map(x=>require(`./${x}`))
 
 module.exports={

@@ -9,27 +9,43 @@ var request=require('./request')
 
 function processKeysForRegEx(obj, re) {
     Object.keys(obj).forEach(function(key,index) {
-        //console.log(`Key ${key}`);
         let val = obj[key];
         if (_.isPlainObject(val)) {
             processKeysForRegEx(val, re);
+        } else if ( key === "slot") {
+            obj[key] = val.replace(re,'XXXXX');
+        } else if ( key === "recentIntentSummaryView") {
+            if (val) {
+                processKeysForRegEx(val, re);
+            }
         } else {
             if (typeof val === 'string') {
-                val = val.replace(re,'XXXXX');
-                obj[key] = val;
+                obj[key] = val.replace(re,'XXXXX');
             }
         }
     });
 }
 
+function stringifySessionAttribues(res) {
+    var sessionAttrs = _.get(res,"session",{}) ;
+    for (var key of Object.keys(sessionAttrs)) {
+        if (typeof sessionAttrs[key] != 'string') {
+            sessionAttrs[key]=JSON.stringify(sessionAttrs[key]);
+        }
+    }
+}
+
 module.exports=function(req,res){
-            
     //data to send to general metrics logging
     var date = new Date()
     var now = date.toISOString()
     // need to unwrap the request and response objects we actually want from the req object
     var unwrappedReq =req.req
     var unwrappedRes =req.res
+    
+    // response session attributes logged as JSON string values to avoid 
+    // ES mapping errors.
+    stringifySessionAttribues(unwrappedRes);
 
     let redactEnabled = _.get(unwrappedReq, '_settings.ENABLE_REDACTING', "false");
     let redactRegex = _.get(unwrappedReq, '_settings.REDACTING_REGEX', "\\b\\d{4}\\b(?![-])|\\b\\d{9}\\b|\\b\\d{3}-\\d{2}-\\d{4}\\b");
