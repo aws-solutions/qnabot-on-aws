@@ -25,7 +25,7 @@ See the "Getting Started" to launch your own QnABot
 
 
 ## Getting Started
-Two approaches can be used to get started. One deploying using precreated repositors or Two clone the repo and building a version yourself.
+Two approaches can be used to get started. Deploy from pre-created repositories or clone the repo and build a version yourself.
 
 ### Pre-created deployment 
 Click a button to launch QnABot CloudFormation stack in the desired region
