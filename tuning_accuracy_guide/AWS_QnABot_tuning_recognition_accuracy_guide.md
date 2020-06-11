@@ -137,7 +137,8 @@ When you ask QnABot a question, a few things happen:
     to increase the overall relevance score when topic value (field t) matches. 
     The following example shows the query:
     
-       ![](image3.png)
+       ![](image3.png)  
+         
        *Figure 2.0 -- Example Elasticsearch query*
 
       -   If an item has a large number of questions representing many unique 
