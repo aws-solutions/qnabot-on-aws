@@ -15,17 +15,6 @@ See the "Getting Started" to launch your own QnABot
 
 **New features in 3.0.0** [ElicitResponse, Conditional Chaining, new Launch regions](#new-features)
 
-**Note that versions prior to 3.0.0 will not directly upgrade to this version.** If running version 2.6.n,
-you will need to:
-- Export your old configuration to a json file and download to your system using the Designer UI
-- Install this stack as a new QnABot
-- Import your prior configuration to the new QnABot using the Designer UI
-- If using the standalone LexWebUi, you will need to redeploy a new LexWebUi and configure
-to use the new QnABot
-
-Once you are completely satisfied of proper operation of your new Bot and new LexWebUi, you can remove the old 
-stacks.
-
 ## Prerequisites
 
 - Run Linux. (tested on Amazon Linux)
