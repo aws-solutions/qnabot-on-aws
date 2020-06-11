@@ -5,7 +5,9 @@
  */
 const _=require('lodash');
 const AWS = require('aws-sdk');
-var translate = require('./multilanguage.js');
+const FREE_TEXT_ELICIT_RESPONSE_NAME = 'QNAFreeText';
+
+const translate = require('./multilanguage.js');
 
 async function translate_res(req, res){
     const locale = _.get(req, 'session.userLocale');
@@ -67,19 +69,31 @@ async function handleRequest(req, res, botName, botAlias) {
         const bName = process.env[botName];
         return bName ? bName : botName;
     }
+    function getFreeTextResponse(inputText) {
+        let response = {
+            message: "",
+            slots: { 'FreeText' : inputText},
+            dialogState: 'Fulfilled',
+        }
+        return response;
+    }
 
     let tempBotUserID = _.get(req,"_userInfo.UserId","nouser");
     tempBotUserID = tempBotUserID.substring(0, 100); // Lex has max userId length of 100
-    const lexClient = new AWS.LexRuntime({apiVersion: '2016-11-28'});
-    const params = {
-        botAlias: botAlias,
-        botName: mapFromSimpleName(botName),
-        inputText: _.get(req,"question"),
-        userId: tempBotUserID,
-    };
-    console.log("Lex parameters: " + JSON.stringify(params));
-    const response = await lexClientRequester(lexClient,params);
-    return response;
+    if (botName === FREE_TEXT_ELICIT_RESPONSE_NAME) {
+        return getFreeTextResponse(_.get(req, "question"));
+    } else {
+        const lexClient = new AWS.LexRuntime({apiVersion: '2016-11-28'});
+        const params = {
+            botAlias: botAlias,
+            botName: mapFromSimpleName(botName),
+            inputText: _.get(req, "question"),
+            userId: tempBotUserID,
+        };
+        console.log("Lex parameters: " + JSON.stringify(params));
+        const response = await lexClientRequester(lexClient, params);
+        return response;
+    }
 };
 
 /**
