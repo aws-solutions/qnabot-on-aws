@@ -1,4 +1,4 @@
-﻿**Tuning Recognition Accuracy**
+**Tuning Recognition Accuracy**
 ===============================
 
 Overview
@@ -106,39 +106,81 @@ When you ask QnABot a question, a few things happen:
     the QnABot will choose that item as the most relevant answer. Noise
     words such as article, preposition in sentence constructs have lower
     weighting than unique keywords.
+    
+    -   The keyword filter feature helps QnABot to be more accurate when 
+    answering questions, and to admit more readily when it doesn’t know the 
+    answer. The keyword filter feature works by using Amazon Comprehend to 
+    determine the ‘part of speech’ that applies to each word you say to QnABot. 
+    By default, nouns (including proper nouns), verbs, and interjections are 
+    used as ‘keywords’. Any answer returned by QnABot must have questions 
+    that match these keywords, using the following (default) rule:
+    
+       - if there are 1 or 2 keywords, then all keywords must match.  
+       - if there are 3 or more keywords, then 75% of the keywords must match.  
+       - If QnABot can’t find any answers that match these keyword filter rules, 
+       then it will admit that it doesn’t know the answer rather than guessing 
+       an answer that doesn’t match the keywords. QnABot logs every question 
+       that it can’t answer so you can see them in the Kibana Dashboard which 
+       we’ll show you a little later. The keyword filters feature is enabled by 
+       default, but if it causes problems for you, you can customize its 
+       settings, or disable it altogether - see [Modifying configuration settings](https://www.amazon.com/qnabot/#config-settings)
 
-    -   The QnABot fulfillment Lambda function generates an Amazon ES query
-    containing the transcribed question. The query attempts to find the
-    best match from all the questions and answers you have previously
-    provided, filtering items to apply the keyword filters and using
-    Amazon ES relevance scoring to rank the results. Matches found in
-    the text of stored questions (nested field: {questions.q}) are
-    summed and given greater weight than matches found in the text of
-    the stored answers (field: {a}). The topic value assigned to the
-    previous answer (if any) will increase the overall relevance score
-    for matches on topic value (field {t}). The following example shows
-    the query:
+    -   The Bot fulfillment Lambda function generates an Amazon ES query 
+    containing the transcribed question. The query attempts to find the best 
+    match from all the questions and answers you’ve previously provided, 
+    filtering items to apply the keyword filters and using Amazon ES 
+    relevance scoring to rank the results. Scoring is based on (i) matching 
+    the words in the user’s question against the unique set of words used in 
+    the stored questions (“quniqueterms”), (ii) matching the phrasing of the 
+    user’s question to the text of stored questions (nested field: questions.q),
+    and (iii) matching the topic value assigned to the previous answer (if any) 
+    to increase the overall relevance score when topic value (field t) matches. 
+    The following example shows the query.:
 
       ![](image3.png)
       *Figure 2.0 -- Example Elasticsearch query*
 
-      ![](image4.png)
+      -   If an item has a large number of questions representing many unique 
+      words, you might find that a short question (one or two words) might not 
+      generate a high enough score to match the correct answer, even if it 
+      exactly matches one of the stored questions in the item. You can 
+      experiment by increasing the weight (boost) given to exact 'phrase'
+      matches:
+      
+          a.  Log in to the content designer, choose the tools menu ( ☰ ) and
+    choose Settings.
 
-      *Figure 3.0 -- Elasticsearch index mapping*
+          b.  Change the value of the setting ES\_PHRASE\_BOOST from default
+          or '4' to a larger number, say '8'.
 
-      -   By including matches found in the answer field, QnABot gives greater
-    relevance to items where the answer contains multiple references to
-    the terms used in the user's question. This is not always desirable,
-    however, since term matches contained in the answer {a} field can
-    make it harder to predict and control the items, you want to score
-    highest for any question. You can now configure the QnABot to score
-    matches only using the question {questions.q} and topic {t} fields:
+          c.  Scroll to the bottom and choose Save.
+          
+      -   QnABot now supports Elasticsearch fuzzy matching which makes it more 
+      tolerant of misspellings and typing errors in the user input. Enable 
+      this feature in the Settings page:
+      
+          a.  Log in to the content designer, choose the tools menu ( ☰ ) and
+    choose Settings.
+
+          b.  Change the value of the setting ES\_USE\_FUZZY\_MATCH from false
+    to true.
+
+          c.  Scroll to the bottom and choose Save.
+          
+      -   In previous releases, QnABot also included matches found in the 
+      answer field to give greater relevance to items where the answer 
+      contains multiple references to the terms used in the user’s question. 
+      This is not always desirable, however, since term matches contained in 
+      the answer field can make it harder to predict and control the items 
+      you want to score highest for any question. QnABot v4.0.0 and later 
+      disables this feature by default. You can, of course, turn it on 
+      again using the Settings page::
 
           a.  Log in to the content designer, choose the tools menu ( ☰ ) and
     choose Settings.
 
-          b.  Change the value of the setting ES\_SCORE\_ANSWER\_FIELD from true
-    to false.
+          b.  Change the value of the setting ES\_SCORE\_ANSWER\_FIELD from false
+    to true.
 
           c.  Scroll to the bottom and choose Save.
 
@@ -234,24 +276,30 @@ understand user input.
 
 ![](image10.png)
 
-*Figure 5.0 -- Example question that can provide undesired and skewed results*
+*Figure 5.0 -- Example question variations*
 
-In the above example, you can see that the question uses repeated "*how
-do I use*" phrase in the question. This could skew other questions like
-"*How do I use* Alexa?" or \"*How do I use* Kibana?\" to this answer. If
-you had another item, with just one question "*How do I use* Alexa?" It
-might not get the highest score because the cumulative score for the
-repeated "*how do I use*" from the three questions in the above example
-could add up to more than the score for the match on "*How do I use*
-Alexa?" or \"*How do I use* Kibana?\"
+In previous releases (before v4.0.0) repeated terms like "*how
+do I use*" could skew scoring toward items with higher numbers of repeating words.
+In QnABot 4.0.0 and onward, this problem has been eliminated by changing the 
+elasticsearch index and query to socre now only on unique (not repeating) word
+matches. Previously we recommended to avoid repeating phrases in multiple
+questions by putting all the alternatives into a single question like 
+`"How do I use Q&A / q and a chatbot?"`. This practice is no longer recommended.
+  
+Instead, just add new questions as needed to represent various synonyms and 
+phrases that a user might say to mean the same thing. 
 
-It is a better practice to avoid repeating phrases in multiple
-questions. Instead, you can actually put all the alternatives into a
-single question, such as below:
+The example questions you provide are used to help improve the accuracy of the
+answers from QnABot. 
 
-```
-"How do I use Q&A / q and a chatbot?"
-````
+The example questions are also used to train the Lex Bot (or Alexa skill) to
+provide more accurate voice recognition, especially when questions are expected
+to contain uncommon words like acronyms, proper names, or specialized vocabulary.
+When using voice, for example when using QnABot in an Amazon Connect contact 
+center, you will find that transcribed questions are more accurate when you 
+provide many examples, and use the 'LEX REBUILD' feature as described in 
+[Tuning the Bot’s Natural Language Processing](https://www.amazon.com/qnabot/#troubleshoot-tune).
+
 
 These options can further help tune the chatbot to better understand
 user input and be able to support different ways of asking the same
@@ -261,7 +309,8 @@ Conclusion
 ==========
 
 There are of course many ways we can improve the search experience, such
-as adding support for synonyms, lexicons, taxonomies. We are continuing
+as adding support for synonyms, lexicons, taxonomies, and [Amazon Kendra integration](https://www.amazon.com/qnabot/#kendra)
+now provides an alternative approach to question matching. We are continuing
 to explore and see how that we could best integrate that in the
 solution. As we look to further improving and extending the AWS QnABot
 solution with more functionalities and features, we welcome you to share
