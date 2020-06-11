@@ -124,7 +124,7 @@ When you ask QnABot a question, a few things happen:
        we’ll show you a little later. The keyword filters feature is enabled by 
        default, but if it causes problems for you, you can customize its 
        settings, or disable it altogether - see [Modifying configuration settings](https://www.amazon.com/qnabot/#config-settings)
-
+    
     -   The Bot fulfillment Lambda function generates an Amazon ES query 
     containing the transcribed question. The query attempts to find the best 
     match from all the questions and answers you’ve previously provided, 
@@ -135,10 +135,10 @@ When you ask QnABot a question, a few things happen:
     user’s question to the text of stored questions (nested field: questions.q),
     and (iii) matching the topic value assigned to the previous answer (if any) 
     to increase the overall relevance score when topic value (field t) matches. 
-    The following example shows the query.:
-
-      ![](image3.png)
-      *Figure 2.0 -- Example Elasticsearch query*
+    The following example shows the query:
+    
+       ![](image3.png)
+       *Figure 2.0 -- Example Elasticsearch query*
 
       -   If an item has a large number of questions representing many unique 
       words, you might find that a short question (one or two words) might not 
