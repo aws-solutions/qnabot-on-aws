@@ -48,22 +48,11 @@ async function routeKendraRequest(event, context) {
     if (event && event.res && event.res.session.kendraIndexId) delete event.res.session.kendraIndexId;
     if (event && event.res && event.res.session.kendraResultId) delete event.res.session.kendraResultId;
     if (event && event.res && event.res.session.kendraResponsibleQid) delete event.res.session.kendraResponsibleQid;
-    
 
-    let promises = [];
-    let resArray = [];
-    let kendraClient = undefined;
-    // if test environment, then use mock-up of kendraClient
-    if (event.test) {
-        kendraClient = require('./test/mockClient.js');
-    } else if (event.test2) {
-        kendraClient = require('./test/mockClient2.js');
-    } else {
-        kendraClient = (process.env.REGION ?
-            new AWSKendra({apiVersion: '2019-02-03', region: process.env.REGION}) :
-            new AWSKendra({apiVersion: '2019-02-03'})
-        );
-    }
+    const kendraClient = (process.env.REGION ?
+        new AWSKendra({apiVersion: '2019-02-03', region: process.env.REGION}) :
+        new AWSKendra({apiVersion: '2019-02-03'})
+    );
 
     // process query against Kendra for QnABot
     let indexes = event.req["_settings"]["ALT_SEARCH_KENDRA_INDEXES"] ? event.req["_settings"]["ALT_SEARCH_KENDRA_INDEXES"] : process.env.KENDRA_INDEXES
@@ -80,6 +69,8 @@ async function routeKendraRequest(event, context) {
 
     // This function can handle configuration with an array of kendraIndexes.
     // Iterate through this area and perform queries against Kendra.
+    let promises = [];
+    let resArray = [];
     kendraIndexes.forEach(function (index, i) {
         const params = {
             IndexId: index, /* required */
@@ -99,7 +90,6 @@ async function routeKendraRequest(event, context) {
     let answerMessageMd = '*While I did not find an exact answer, these search results from Amazon Kendra might be helpful.* \n ';
     let faqanswerMessage = 'Answer from Amazon Kendra FAQ.';
     let faqanswerMessageMd = '*Answer from Amazon Kendra FAQ.* \n ';
-    let markdownAnswer = "";
     let helpfulLinksMsg = 'Possible Links';
     let extractedTextMsg = 'Discovered Text';
     let maxDocumentCount = 4;
@@ -111,7 +101,6 @@ async function routeKendraRequest(event, context) {
     let kendraResultId;
     let answerDocumentUris = new Set();
     let helpfulDocumentsUris = new Set();
-    
     resArray.forEach(function (res) {
         if (res && res.ResultItems.length > 0) {
             helpfulLinksMsg = event.req["_settings"]["ALT_SEARCH_HELPFUL_LINKS_MSG"] ? event.req["_settings"]["ALT_SEARCH_HELPFUL_LINKS_MSG"] : helpfulLinksMsg;
@@ -119,37 +108,13 @@ async function routeKendraRequest(event, context) {
             maxDocumentCount = event.req["_settings"]["ALT_SEARCH_MAX_DOCUMENT_COUNT"] ? event.req["_settings"]["ALT_SEARCH_MAX_DOCUMENT_COUNT"] : maxDocumentCount;
             answerMessage = event.req["_settings"]["ALT_SEARCH_MESSAGE"] ? event.req["_settings"]["ALT_SEARCH_MESSAGE"] : answerMessage;
             answerMessageMd = event.req["_settings"]["ALT_SEARCH_MESSAGE_MD"] ? event.req["_settings"]["ALT_SEARCH_MESSAGE_MD"] : answerMessageMd;
-            
             res.ResultItems.forEach(function (element, i) {
                 /* Note - only the first answer will be provided back to the requester */
                 if (element.Type === 'ANSWER' && foundAnswerCount === 0 && element.AdditionalAttributes &&
                     element.AdditionalAttributes.length > 0 &&
                     element.AdditionalAttributes[0].Value.TextWithHighlightsValue.Text) {
                     answerMessage += '\n\n ' + element.AdditionalAttributes[0].Value.TextWithHighlightsValue.Text.replace(/\r?\n|\r/g, " ");
-                    let answerTextMd = element.AdditionalAttributes[0].Value.TextWithHighlightsValue.Text.replace(/\r?\n|\r/g, " ");
-                    // iterates over the answer highlights, finds top answer if it exists
-                    var elem;
-                    var seenTop = false;
-                    let len = element.AdditionalAttributes[0].Value.TextWithHighlightsValue.Highlights.length;
-                    var j;
-                    for (j=0; j<len; j++) {
-                        elem = element.AdditionalAttributes[0].Value.TextWithHighlightsValue.Highlights[j];
-                        let offset = 2*j;
-                        let beginning = answerTextMd.substring(0, elem.BeginOffset+offset);
-                        let highlight = answerTextMd.substring(elem.BeginOffset+offset, elem.EndOffset+offset);
-                        let rest = answerTextMd.substr(elem.EndOffset+offset);
-                        
-                        if (elem.TopAnswer == true) {
-                            seenTop = true;
-                            answerMessage = 'Answer from Amazon Kendra: ' + highlight;
-                            answerTextMd = '*' + highlight + '* ';
-                            break;
-                        } else {
-                            answerTextMd = beginning + '*' + highlight + '*' + rest;
-                        }
-                    };
-                    answerMessageMd = faqanswerMessageMd + '\n\n' + answerTextMd;
-                    // answerMessageMd += '\n\n' + element.AdditionalAttributes[0].Value.TextWithHighlightsValue.Text.replace(/\r?\n|\r/g, " ");
+                    answerMessageMd += '\n\n ' + element.AdditionalAttributes[0].Value.TextWithHighlightsValue.Text.replace(/\r?\n|\r/g, " ");
                     answerDocumentUris.add(element.DocumentURI);
                     kendraQueryId = res.QueryId; // store off the QueryId to use as a session attribute for feedback
                     kendraIndexId = res.originalKendraIndexId; // store off the Kendra IndexId to use as a session attribute for feedback
@@ -159,21 +124,7 @@ async function routeKendraRequest(event, context) {
                     element.AdditionalAttributes.length > 1) {
                     // There will be 2 elements - [0] - QuestionText, [1] - AnswerText
                     answerMessage = faqanswerMessage + '\n\n ' + element.AdditionalAttributes[1].Value.TextWithHighlightsValue.Text.replace(/\r?\n|\r/g, " ");
-                    let answerTextMd = element.AdditionalAttributes[1].Value.TextWithHighlightsValue.Text.replace(/\r?\n|\r/g, " ");
-                    // iterates over the FAQ highlights
-                    var elem;
-                    var seenTop = false;
-                    let len = element.AdditionalAttributes[1].Value.TextWithHighlightsValue.Highlights.length;
-                    var j;
-                    for (j=0; j<len; j++) {
-                        elem = element.AdditionalAttributes[1].Value.TextWithHighlightsValue.Highlights[j];
-                        let offset = 2*j;
-                        let beginning = answerTextMd.substring(0, elem.BeginOffset+offset);
-                        let highlight = answerTextMd.substring(elem.BeginOffset+offset, elem.EndOffset+offset);
-                        let rest = answerTextMd.substr(elem.EndOffset+offset);
-                        answerTextMd = beginning + '*' + highlight + '*' + rest;
-                    };
-                    answerMessageMd = faqanswerMessageMd + '\n\n' + answerTextMd;
+                    answerMessageMd = faqanswerMessageMd + '\n\n ' + element.AdditionalAttributes[1].Value.TextWithHighlightsValue.Text.replace(/\r?\n|\r/g, " ");
                     kendraQueryId = res.QueryId; // store off the QueryId to use as a session attribute for feedback
                     kendraIndexId = res.originalKendraIndexId; // store off the Kendra IndexId to use as a session attribute for feedback
                     kendraResultId = element.Id; // store off resultId to use as a session attribute for feedback
@@ -181,19 +132,6 @@ async function routeKendraRequest(event, context) {
                 } else if (element.Type === 'DOCUMENT' && element.DocumentExcerpt.Text && element.DocumentURI) {
                     const docInfo = {}
                     docInfo.text = element.DocumentExcerpt.Text.replace(/\r?\n|\r/g, " ");
-                    // iterates over the document excerpt highlights
-                    var elem;
-                    let len = element.DocumentExcerpt.Highlights.length;
-                    var j;
-                    for (j=0; j<len; j++) {
-                        elem = element.DocumentExcerpt.Highlights[j];
-                        let offset = 2*j;
-                        let beginning = docInfo.text.substring(0, elem.BeginOffset+offset);
-                        let highlight = docInfo.text.substring(elem.BeginOffset+offset, elem.EndOffset+offset);
-                        let rest = docInfo.text.substr(elem.EndOffset+offset);
-                        docInfo.text = beginning + '*' + highlight + '*' + rest;
-                    };
-
                     docInfo.uri = element.DocumentURI;
                     helpfulDocumentsUris.add(docInfo);
                     foundAnswerCount++;
@@ -243,6 +181,7 @@ async function routeKendraRequest(event, context) {
         event.res.session.kendraIndexId = kendraIndexId;
         event.res.session.kendraResultId = kendraResultId;
     }
+
     console.log("final return: " + JSON.stringify(event,null,2));
     return event;
 }

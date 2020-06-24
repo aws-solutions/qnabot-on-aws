@@ -1,0 +1,94 @@
+{
+    "QueryId": "ec35a915-8990-4ef7-a5da-f490911cad42",
+    "ResultItems": [
+        {
+            "Id": "ec35a915-8990-4ef7-a5da-f490911cad42-2db7aa5b-1fcb-4910-a2fc-b3922a6069e3",
+            "Type": "QUESTION_ANSWER",
+            "AdditionalAttributes": [
+                {
+                    "Key": "QuestionText",
+                    "ValueType": "TEXT_WITH_HIGHLIGHTS_VALUE",
+                    "Value": {
+                        "TextWithHighlightsValue": {
+                            "Text": "How many planets orbit the Sun",
+                            "Highlights": [
+                                {
+                                    "BeginOffset": 4,
+                                    "EndOffset": 8,
+                                    "TopAnswer": false
+                                },
+                                {
+                                    "BeginOffset": 9,
+                                    "EndOffset": 16,
+                                    "TopAnswer": false
+                                },
+                                {
+                                    "BeginOffset": 17,
+                                    "EndOffset": 22,
+                                    "TopAnswer": false
+                                },
+                                {
+                                    "BeginOffset": 27,
+                                    "EndOffset": 30,
+                                    "TopAnswer": false
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "Key": "AnswerText",
+                    "ValueType": "TEXT_WITH_HIGHLIGHTS_VALUE",
+                    "Value": {
+                        "TextWithHighlightsValue": {
+                            "Text": "Eight planets orbit the sun. Mercury, Venus, Earth, Mars, Jupiter, Saturn, Uranus, and Neptune. Sorry I'm required to leave out my favorite, Pluto",
+                            "Highlights": [
+                                {
+                                    "BeginOffset": 6,
+                                    "EndOffset": 13,
+                                    "TopAnswer": false
+                                },
+                                {
+                                    "BeginOffset": 14,
+                                    "EndOffset": 19,
+                                    "TopAnswer": false
+                                },
+                                {
+                                    "BeginOffset": 24,
+                                    "EndOffset": 27,
+                                    "TopAnswer": false
+                                }
+                            ]
+                        }
+                    }
+                }
+            ],
+            "DocumentId": "c8e0762c86ee7fc92f253ce925b1ecbd101479541164cc5afac09fb027c659dd1592335726833",
+            "DocumentTitle": {
+                "Text": ""
+            },
+            "DocumentExcerpt": {
+                "Text": "Eight planets orbit the sun. Mercury, Venus, Earth, Mars, Jupiter, Saturn, Uranus, and Neptune. Sorry I'm required to leave out my favorite, Pluto",
+                "Highlights": [
+                    {
+                        "BeginOffset": 0,
+                        "EndOffset": 146,
+                        "TopAnswer": false
+                    }
+                ]
+            },
+            "DocumentURI": "<document url>",
+            "DocumentAttributes": [
+                {
+                    "Key": "_source_uri",
+                    "Value": {
+                        "StringValue": "<document url>"
+                    }
+                }
+            ]
+        }
+    ],
+    "FacetResults": [],
+    "TotalNumberOfResults": 1,
+    "originalKendraIndexId": "e1c23860-e5c8-4409-ae26-b05bd6ced00a"
+}

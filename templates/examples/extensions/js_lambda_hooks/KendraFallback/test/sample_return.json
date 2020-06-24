@@ -1,0 +1,150 @@
+{
+    "req": {
+        "_event": {
+            "messageVersion": "1.0",
+            "invocationSource": "FulfillmentCodeHook",
+            "userId": "us-east-1:05aef6ae-bc99-41a5-98ad-3d74df5b4bc1",
+            "sessionAttributes": {},
+            "requestAttributes": null,
+            "bot": {
+                "name": "QNAbot_dev_dev_dev_master_four_BotoNDIv",
+                "alias": "live",
+                "version": "1"
+            },
+            "outputDialogMode": "Text",
+            "currentIntent": {
+                "name": "fulfilment_IntentrDEldIYchy",
+                "slots": {
+                    "slot": "How many planets orbit the sun"
+                },
+                "slotDetails": {
+                    "slot": {
+                        "resolutions": [],
+                        "originalValue": "How many planets orbit the sun"
+                    }
+                },
+                "confirmationStatus": "None"
+            },
+            "inputTranscript": "How many planets orbit the sun?",
+            "recentIntentSummaryView": null,
+            "sentimentResponse": null,
+            "kendraResponse": null,
+            "origQuestion": "How many planets orbit the sun?",
+            "errorFound": false
+        },
+        "_settings": {
+            "ENABLE_DEBUG_RESPONSES": "false",
+            "ES_USE_KEYWORD_FILTERS": "true",
+            "ES_NO_HITS_QUESTION": "no_hits",
+            "ES_USE_FUZZY_MATCH": "false",
+            "ES_KEYWORD_SYNTAX_TYPES": "NOUN,PROPN,VERB,INTJ",
+            "ES_SYNTAX_CONFIDENCE_LIMIT": ".20",
+            "ES_MINIMUM_SHOULD_MATCH": "2<75%",
+            "ES_PHRASE_BOOST": "4",
+            "ES_SCORE_ANSWER_FIELD": "false",
+            "ERRORMESSAGE": "Unfortunately I encountered an error when searching for your answer. Please ask me again later.",
+            "EMPTYMESSAGE": "You stumped me! Sadly I don't know how to answer your question.",
+            "DEFAULT_ALEXA_LAUNCH_MESSAGE": "Hello, Please ask a question",
+            "DEFAULT_ALEXA_STOP_MESSAGE": "Goodbye",
+            "SMS_HINT_REMINDER_ENABLE": "true",
+            "SMS_HINT_REMINDER": " (Feedback? Reply THUMBS UP or THUMBS DOWN. Ask HELP ME at any time)",
+            "SMS_HINT_REMINDER_INTERVAL_HRS": "24",
+            "IDENTITY_PROVIDER_JWKS_URLS": [],
+            "ENABLE_MULTI_LANGUAGE_SUPPORT": "true",
+            "MINIMUM_CONFIDENCE_SCORE": 0.6,
+            "ALT_SEARCH_KENDRA_INDEXES": "[\"e1c23860-e5c8-4409-ae26-b05bd6ced00a\"]",
+            "ELICIT_RESPONSE_MAX_RETRIES": 3,
+            "ELICIT_RESPONSE_RETRY_MESSAGE": "Please try again?",
+            "ELICIT_RESPONSE_BOT_FAILURE_MESSAGE": "Your response was not understood. Please start again.",
+            "ELICIT_RESPONSE_DEFAULT_MSG": "Ok. ",
+            "ENABLE_REDACTING": "false",
+            "REDACTING_REGEX": "\\b\\d{4}\\b(?![-])|\\b\\d{9}\\b|\\b\\d{3}-\\d{2}-\\d{4}\\b",
+            "DEFAULT_USER_POOL_JWKS_URL": "https://cognito-idp.us-east-1.amazonaws.com/us-east-1_EZg5Ia82Z/.well-known/jwks.json"
+        },
+        "_type": "LEX",
+        "_userId": "us-east-1:05aef6ae-bc99-41a5-98ad-3d74df5b4bc1",
+        "question": "How many planets orbit the sun?",
+        "session": {
+            "userDetectedLocale": "en",
+            "userDetectedLocaleConfidence": 0.9948722720146179,
+            "userLocale": "en"
+        },
+        "_preferredResponseType": "PlainText",
+        "_userInfo": {
+            "UserId": "us-east-1:05aef6ae-bc99-41a5-98ad-3d74df5b4bc1",
+            "InteractionCount": 0,
+            "TimeSinceLastInteraction": 1592902513.847
+        },
+        "_info": {
+            "es": {
+                "address": "search-qnabot-elasti-4n2sjlh1tlwf-ziyzyejzynvs6rs2cvx7yaqxma.us-east-1.es.amazonaws.com",
+                "index": "qnabot-dev-dev-dev-master-4",
+                "type": "qna",
+                "service": {
+                    "qid": "QNAbot-dev-dev-dev-master-4-ESQidLambda-636ARD1AGUJH",
+                    "proxy": "QNAbot-dev-dev-dev-master-4-ESProxyLambda-NF5QMNB8RE00"
+                }
+            }
+        }
+    },
+    "res": {
+        "type": "PlainText",
+        "message": "Answer from Amazon Kendra FAQ.\n\n Eight planets orbit the sun. Mercury, Venus, Earth, Mars, Jupiter, Saturn, Uranus, and Neptune. Sorry I'm required to leave out my favorite, Pluto",
+        "session": {
+            "userDetectedLocale": "en",
+            "userDetectedLocaleConfidence": 0.9948722720146179,
+            "userLocale": "en",
+            "appContext": {
+                "altMessages": {
+                    "markdown": "*Answer from Amazon Kendra FAQ.* \n \n\n Eight planets orbit the sun. Mercury, Venus, Earth, Mars, Jupiter, Saturn, Uranus, and Neptune. Sorry I'm required to leave out my favorite, Pluto",
+                    "ssml": "<speak> Answer from Amazon Kendra FAQ.   Eight planets orbit the sun. Mercury, Venus, Earth, Mars, Jupiter, Saturn, Uranus, and Neptune </speak>"
+                }
+            },
+            "previous": {
+                "qid": "KendraFallback",
+                "a": "The Kendra Fallback search was not able to identify any results",
+                "alt": {},
+                "q": "How many planets orbit the sun?"
+            },
+            "navigation": {
+                "next": "",
+                "previous": [],
+                "hasParent": true
+            },
+            "kendraResponsibleQid": "KendraFallback",
+            "kendraQueryId": "ec35a915-8990-4ef7-a5da-f490911cad42",
+            "kendraIndexId": "e1c23860-e5c8-4409-ae26-b05bd6ced00a",
+            "kendraResultId": "ec35a915-8990-4ef7-a5da-f490911cad42-2db7aa5b-1fcb-4910-a2fc-b3922a6069e3"
+        },
+        "card": {
+            "send": false,
+            "title": "",
+            "text": "",
+            "url": ""
+        },
+        "_userInfo": {
+            "UserId": "us-east-1:05aef6ae-bc99-41a5-98ad-3d74df5b4bc1",
+            "InteractionCount": 1,
+            "TimeSinceLastInteraction": 1592902513.847,
+            "FirstSeen": "Tue Jun 23 2020 20:55:13 GMT+0000 (Coordinated Universal Time)",
+            "LastSeen": "Tue Jun 23 2020 20:55:13 GMT+0000 (Coordinated Universal Time)"
+        },
+        "got_hits": 0,
+        "result": {
+            "qid": "KendraFallback",
+            "quniqueterms": " no_hits  ",
+            "questions": [
+                {
+                    "q": "no_hits"
+                }
+            ],
+            "a": "The Kendra Fallback search was not able to identify any results",
+            "l": "QNA:EXTKendraFallback",
+            "type": "qna",
+            "autotranslate": {
+                "a": true
+            }
+        },
+        "plainMessage": "The Kendra Fallback search was not able to identify any results"
+    }
+}

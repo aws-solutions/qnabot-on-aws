@@ -7,5 +7,11 @@
   "dependencies": {
     "aws-sdk": "^2.585.0"
   },
-  "repository": {}
+  "repository": {},
+  "devDependencies": {
+    "mocha": "^8.0.1"
+  },
+  "scripts": {
+  "test": "mocha"
+  }
 }
