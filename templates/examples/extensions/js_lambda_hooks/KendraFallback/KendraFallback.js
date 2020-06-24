@@ -134,7 +134,7 @@ async function routeKendraRequest(event, context) {
                     var j;
                     for (j=0; j<len; j++) {
                         elem = element.AdditionalAttributes[0].Value.TextWithHighlightsValue.Highlights[j];
-                        let offset = 2*j;
+                        let offset = 4*j;
                         let beginning = answerTextMd.substring(0, elem.BeginOffset+offset);
                         let highlight = answerTextMd.substring(elem.BeginOffset+offset, elem.EndOffset+offset);
                         let rest = answerTextMd.substr(elem.EndOffset+offset);
@@ -142,10 +142,10 @@ async function routeKendraRequest(event, context) {
                         if (elem.TopAnswer == true) {
                             seenTop = true;
                             answerMessage = 'Answer from Amazon Kendra: ' + highlight;
-                            answerTextMd = '*' + highlight + '* ';
+                            answerTextMd = '**' + highlight + '** ';
                             break;
                         } else {
-                            answerTextMd = beginning + '*' + highlight + '*' + rest;
+                            answerTextMd = beginning + '**' + highlight + '**' + rest;
                         }
                     };
                     answerMessageMd = faqanswerMessageMd + '\n\n' + answerTextMd;
@@ -167,11 +167,11 @@ async function routeKendraRequest(event, context) {
                     var j;
                     for (j=0; j<len; j++) {
                         elem = element.AdditionalAttributes[1].Value.TextWithHighlightsValue.Highlights[j];
-                        let offset = 2*j;
+                        let offset = 4*j;
                         let beginning = answerTextMd.substring(0, elem.BeginOffset+offset);
                         let highlight = answerTextMd.substring(elem.BeginOffset+offset, elem.EndOffset+offset);
                         let rest = answerTextMd.substr(elem.EndOffset+offset);
-                        answerTextMd = beginning + '*' + highlight + '*' + rest;
+                        answerTextMd = beginning + '**' + highlight + '**' + rest;
                     };
                     answerMessageMd = faqanswerMessageMd + '\n\n' + answerTextMd;
                     kendraQueryId = res.QueryId; // store off the QueryId to use as a session attribute for feedback
@@ -187,11 +187,11 @@ async function routeKendraRequest(event, context) {
                     var j;
                     for (j=0; j<len; j++) {
                         elem = element.DocumentExcerpt.Highlights[j];
-                        let offset = 2*j;
+                        let offset = 4*j;
                         let beginning = docInfo.text.substring(0, elem.BeginOffset+offset);
                         let highlight = docInfo.text.substring(elem.BeginOffset+offset, elem.EndOffset+offset);
                         let rest = docInfo.text.substr(elem.EndOffset+offset);
-                        docInfo.text = beginning + '*' + highlight + '*' + rest;
+                        docInfo.text = beginning + '**' + highlight + '**' + rest;
                     };
 
                     docInfo.uri = element.DocumentURI;
