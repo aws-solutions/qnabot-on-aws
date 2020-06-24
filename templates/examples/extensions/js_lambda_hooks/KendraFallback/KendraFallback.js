@@ -140,6 +140,7 @@ async function routeKendraRequest(event, context) {
                         let rest = answerTextMd.substr(elem.EndOffset+offset);
                         
                         if (elem.TopAnswer == true) {
+                            // if top answer is found, then only show this abbreviated version
                             seenTop = true;
                             answerMessage = 'Answer from Amazon Kendra. \n\n ' + highlight + '.';
                             answerTextMd = '**' + highlight + '** ';
