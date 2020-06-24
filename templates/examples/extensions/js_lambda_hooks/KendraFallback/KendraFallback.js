@@ -27,8 +27,7 @@ function kendraRequester(kendraClient,params,resArray) {
             }
             else {
                 data.originalKendraIndexId = indexId;
-                // TODO: uncomment
-                // console.log("Data from Kendra request:" + JSON.stringify(data, null, 2));
+                console.log("Data from Kendra request:" + JSON.stringify(data, null, 2));
                 resArray.push(data);
                 resolve(data);
             }
@@ -57,8 +56,6 @@ async function routeKendraRequest(event, context) {
     // if test environment, then use mock-up of kendraClient
     if (event.test) {
         kendraClient = require('./test/mockClient.js');
-        // TODO: delete
-        // console.log('kendraClient substituted');
     } else if (event.test2) {
         kendraClient = require('./test/mockClient2.js');
     } else {
@@ -246,14 +243,12 @@ async function routeKendraRequest(event, context) {
         event.res.session.kendraIndexId = kendraIndexId;
         event.res.session.kendraResultId = kendraResultId;
     }
-    // TODO: undo comment
-    // console.log("final return: " + JSON.stringify(event,null,2));
+    console.log("final return: " + JSON.stringify(event,null,2));
     return event;
 }
 
 exports.handler = async (event, context) => {
-    // TODO: undo comments
-    // console.log("event: " + JSON.stringify(event, null, 2));
-    // console.log('context: ' + JSON.stringify(context, null, 2));
+    console.log("event: " + JSON.stringify(event, null, 2));
+    console.log('context: ' + JSON.stringify(context, null, 2));
     return routeKendraRequest(event, context);
 };
