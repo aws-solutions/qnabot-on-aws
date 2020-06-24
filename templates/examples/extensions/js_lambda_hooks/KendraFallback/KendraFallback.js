@@ -103,6 +103,7 @@ async function routeKendraRequest(event, context) {
     let helpfulLinksMsg = 'Possible Links';
     let extractedTextMsg = 'Discovered Text';
     let maxDocumentCount = 4;
+    var seenTop = false;
 
     let foundAnswerCount = 0;
     let foundDocumentCount = 0;
@@ -129,7 +130,6 @@ async function routeKendraRequest(event, context) {
                     let answerTextMd = element.AdditionalAttributes[0].Value.TextWithHighlightsValue.Text.replace(/\r?\n|\r/g, " ");
                     // iterates over the answer highlights, finds top answer if it exists
                     var elem;
-                    var seenTop = false;
                     let len = element.AdditionalAttributes[0].Value.TextWithHighlightsValue.Highlights.length;
                     var j;
                     for (j=0; j<len; j++) {
@@ -141,15 +141,15 @@ async function routeKendraRequest(event, context) {
                         
                         if (elem.TopAnswer == true) {
                             seenTop = true;
-                            answerMessage = 'Answer from Amazon Kendra: ' + highlight;
+                            answerMessage = 'Answer from Amazon Kendra. \n\n ' + highlight + '.';
                             answerTextMd = '**' + highlight + '** ';
+                            answerMessageMd = '*Answer from Amazon Kendra.* \n ';
                             break;
                         } else {
                             answerTextMd = beginning + '**' + highlight + '**' + rest;
                         }
                     };
                     answerMessageMd = answerMessageMd + '\n\n' + answerTextMd;
-                    // answerMessageMd += '\n\n' + element.AdditionalAttributes[0].Value.TextWithHighlightsValue.Text.replace(/\r?\n|\r/g, " ");
                     answerDocumentUris.add(element.DocumentURI);
                     kendraQueryId = res.QueryId; // store off the QueryId to use as a session attribute for feedback
                     kendraIndexId = res.originalKendraIndexId; // store off the Kendra IndexId to use as a session attribute for feedback
@@ -162,7 +162,6 @@ async function routeKendraRequest(event, context) {
                     let answerTextMd = element.AdditionalAttributes[1].Value.TextWithHighlightsValue.Text.replace(/\r?\n|\r/g, " ");
                     // iterates over the FAQ highlights
                     var elem;
-                    var seenTop = false;
                     let len = element.AdditionalAttributes[1].Value.TextWithHighlightsValue.Highlights.length;
                     var j;
                     for (j=0; j<len; j++) {
@@ -179,25 +178,28 @@ async function routeKendraRequest(event, context) {
                     kendraResultId = element.Id; // store off resultId to use as a session attribute for feedback
                     foundAnswerCount++;
                 } else if (element.Type === 'DOCUMENT' && element.DocumentExcerpt.Text && element.DocumentURI) {
-                    const docInfo = {}
-                    docInfo.text = element.DocumentExcerpt.Text.replace(/\r?\n|\r/g, " ");
-                    // iterates over the document excerpt highlights
-                    var elem;
-                    let len = element.DocumentExcerpt.Highlights.length;
-                    var j;
-                    for (j=0; j<len; j++) {
-                        elem = element.DocumentExcerpt.Highlights[j];
-                        let offset = 4*j;
-                        let beginning = docInfo.text.substring(0, elem.BeginOffset+offset);
-                        let highlight = docInfo.text.substring(elem.BeginOffset+offset, elem.EndOffset+offset);
-                        let rest = docInfo.text.substr(elem.EndOffset+offset);
-                        docInfo.text = beginning + '**' + highlight + '**' + rest;
-                    };
-
-                    docInfo.uri = element.DocumentURI;
-                    helpfulDocumentsUris.add(docInfo);
-                    foundAnswerCount++;
-                    foundDocumentCount++;
+                    if (seenTop == false) {
+                        // if topAnswer found, then do not show document excerpts
+                        const docInfo = {}
+                        docInfo.text = element.DocumentExcerpt.Text.replace(/\r?\n|\r/g, " ");
+                        // iterates over the document excerpt highlights
+                        var elem;
+                        let len = element.DocumentExcerpt.Highlights.length;
+                        var j;
+                        for (j=0; j<len; j++) {
+                            elem = element.DocumentExcerpt.Highlights[j];
+                            let offset = 4*j;
+                            let beginning = docInfo.text.substring(0, elem.BeginOffset+offset);
+                            let highlight = docInfo.text.substring(elem.BeginOffset+offset, elem.EndOffset+offset);
+                            let rest = docInfo.text.substr(elem.EndOffset+offset);
+                            docInfo.text = beginning + '**' + highlight + '**' + rest;
+                        };
+    
+                        docInfo.uri = element.DocumentURI;
+                        helpfulDocumentsUris.add(docInfo);
+                        foundAnswerCount++;
+                        foundDocumentCount++;
+                    }
                 }
             });
         }
@@ -220,7 +222,7 @@ async function routeKendraRequest(event, context) {
             event.res.plainMessage = answerMessage;
         }
     }
-    if (answerDocumentUris.size > 0) {
+    if (answerDocumentUris.size > 0 && (seenTop==false)) {
         event.res.session.appContext.altMessages.markdown += `\n\n #### ${helpfulLinksMsg}`;
         answerDocumentUris.forEach(function (element) {
             event.res.session.appContext.altMessages.markdown += `\n\n [${element}](${element})`;

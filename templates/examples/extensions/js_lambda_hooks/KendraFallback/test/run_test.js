@@ -28,9 +28,11 @@ describe('#test_kendra_highlights()', () => {
     it('test_top_answer', async function() {
         let resp = await test_top_ans();
         assert.equal(resp.res.session.appContext.altMessages.markdown,
-        "*Answer from Amazon Kendra FAQ.* \n \n\n**Sun** \n\n #### Possible Links\n\n [https://s3.us-east-1.amazonaws.com/explore-kendra-solar/Sun_Lithograph.pdf](https://s3.us-east-1.amazonaws.com/explore-kendra-solar/Sun_Lithograph.pdf)\n\n #### Discovered Text \n\n ...from as early as the 6th century BCE. Now we know, of course,  that all the planets orbit our lone **star** — the Sun.   The Sun is the **closest** **star** to **Earth**, at a mean distance from  our planet of 149.60 million kilometers (92.96 million miles...\n\n [https://s3.us-east-1.amazonaws.com/explore-kendra-solar/Sun_Lithograph.pdf](https://s3.us-east-1.amazonaws.com/explore-kendra-solar/Sun_Lithograph.pdf)\n\n #### Discovered Text \n\n ...Solar Cycle   Solar Storms   **Earth**’s Magnetosphere   **Earth**’s Upper Atmosphere   Space Weather   Credits   2   4   6   8   10   14   16   18        Prologue and Introduction   Now in the early 21st century, we know that the Sun is a **star**, composed mostly of hydrogen, at the center of the Solar...\n\n [https://s3.us-east-1.amazonaws.com/explore-kendra-solar/637244main_MysteriesOfTheSun_Book.pdf](https://s3.us-east-1.amazonaws.com/explore-kendra-solar/637244main_MysteriesOfTheSun_Book.pdf)");
+        "*Answer from Amazon Kendra.* \n \n\n**Sun** ");
         assert.equal(resp.res.session.appContext.altMessages.ssml,
-        "<speak> Answer from Amazon Kendra: Sun </speak>");
+        "<speak> Answer from Amazon Kendra.    Sun </speak>");
+        // TODO: add test to check that document excerpts are highlighted when top answer Not found
     });
+
     
 });
