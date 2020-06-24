@@ -148,7 +148,7 @@ async function routeKendraRequest(event, context) {
                             answerTextMd = beginning + '**' + highlight + '**' + rest;
                         }
                     };
-                    answerMessageMd = faqanswerMessageMd + '\n\n' + answerTextMd;
+                    answerMessageMd = answerMessageMd + '\n\n' + answerTextMd;
                     // answerMessageMd += '\n\n' + element.AdditionalAttributes[0].Value.TextWithHighlightsValue.Text.replace(/\r?\n|\r/g, " ");
                     answerDocumentUris.add(element.DocumentURI);
                     kendraQueryId = res.QueryId; // store off the QueryId to use as a session attribute for feedback
