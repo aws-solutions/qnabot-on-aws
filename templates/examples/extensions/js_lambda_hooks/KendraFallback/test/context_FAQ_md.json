@@ -1,0 +1,10 @@
+{
+    "callbackWaitsForEmptyEventLoop": true,
+    "functionVersion": "$LATEST",
+    "functionName": "QNAbot-dev-dev-dev-master-4-Exam-EXTKendraFallback-T1KJ602HXNIW",
+    "memoryLimitInMB": "2048",
+    "logGroupName": "/aws/lambda/QNAbot-dev-dev-dev-master-4-Exam-EXTKendraFallback-T1KJ602HXNIW",
+    "logStreamName": "2020/06/23/[$LATEST]9b1c9c2803c64f3db0ee8d14e6ac22d6",
+    "invokedFunctionArn": "arn:aws:lambda:us-east-1:425742325899:function:QNAbot-dev-dev-dev-master-4-Exam-EXTKendraFallback-T1KJ602HXNIW",
+    "awsRequestId": "9ab26fab-6b8c-4c14-8287-cbc8a48179f3"
+}
