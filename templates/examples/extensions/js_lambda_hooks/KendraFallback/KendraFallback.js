@@ -189,8 +189,8 @@ async function routeKendraRequest(event, context) {
 
                         if (elem.TopAnswer == true) {   // if top answer is found, then answer is abbreviated to this phrase
                             seenTop = true;
-                            answerMessage = 'Answer from Amazon Kendra. \n\n ' + highlight + '.';
-                            answerMessageMd = '*Answer from Amazon Kendra.* \n ';
+                            answerMessage = 'Amazon Kendra suggested answer. \n\n ' + highlight + '.';
+                            answerMessageMd = '*Amazon Kendra suggested answer.* \n ';
                             helpfulLinksMsg = 'Source Link';
                             answerTextMd = '**' + highlight + '** ';
                             break;
