@@ -27,6 +27,7 @@ async function test_doc_query() {
     return actual_resp;
 }
 
+
 describe('#test_kendra_highlights()', () => {
     it('test_markdown', async function() {
         let resp = await test_markdown();
@@ -47,12 +48,12 @@ describe('#test_kendra_highlights()', () => {
         "<speak> Answer from Amazon Kendra.    Sun </speak>");
     });
     it('test_doc_query', async function() {
-       let resp = await test_doc_query();
+      let resp = await test_doc_query();
        
-       // tests that when querying an unstructured document, highlights are boldened in the excerpts when no top answer is found
-       assert.equal(resp.res.session.appContext.altMessages.markdown,
-       undefined);
+      // tests that when querying an unstructured document, highlights are boldened in the excerpts when no top answer is found
+      assert.equal(resp.res.session.appContext.altMessages.markdown,
+      "*While I did not find an exact answer, these search results from Amazon Kendra might be helpful.* \n \n\nAnatomy of the Sun Mysteries of the Sun   **The Sun is an incandescent mass of hydrogen, helium, and other heavier elements**. While it appears constant and unchanging from  our vantage point on Earth, it actually has a dynamic and variable system of twisting magnetic fields that cause solar events of almost  unimaginable power.   The Convection Zone Energy continues to move toward the surface  through convection currents of heated and  cooled gas in the convection zone.       The Radiative Zone Energy moves slowly outward—taking  more than 170,000 years to radiate through  the layer of the **Sun** known as the radiative  zone.\n\n #### Possible Links\n\n [https://s3.us-east-1.amazonaws.com/explore-kendra-solar/637244main_MysteriesOfTheSun_Book.pdf](https://s3.us-east-1.amazonaws.com/explore-kendra-solar/637244main_MysteriesOfTheSun_Book.pdf)\n\n #### Discovered Text \n\n ...Mass 1.989 × 1030 kg  Density 1.409 g/cm3  **Composition** 92.1% hydrogen, 7.8% helium,    0.1% other elements  Surface Temperature (Photosphere) 5,500 deg C      (10,000 deg F)  Luminosity*  3.83 × 1033 ergs/sec   *The total energy radiated by the **Sun** (or any star) per second at all wavelengths...\n\n [https://s3.us-east-1.amazonaws.com/explore-kendra-solar/Sun_Lithograph.pdf](https://s3.us-east-1.amazonaws.com/explore-kendra-solar/Sun_Lithograph.pdf)\n\n #### Discovered Text \n\n ...gases may  contribute to a change in tempera- ture or water **composition** in   the atmosphere.        Stratosphere 10–31 Miles   The ozone layer lies within the   stratosphere and absorbs ultraviolet  radiation from the **Sun**.   Troposphere 0–10 Miles   The troposphere is the layer of the...\n\n [https://s3.us-east-1.amazonaws.com/explore-kendra-solar/637244main_MysteriesOfTheSun_Book.pdf](https://s3.us-east-1.amazonaws.com/explore-kendra-solar/637244main_MysteriesOfTheSun_Book.pdf)");
     });
-
-    
 });
+
+

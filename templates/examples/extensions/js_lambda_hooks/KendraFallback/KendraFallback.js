@@ -35,6 +35,52 @@ function kendraRequester(kendraClient,params,resArray) {
     });
 }
 
+
+
+/**
+ * Function to sort and merge overlapping intervals
+ * @param intervals
+ * @returns [*]
+ * Source: https://gist.github.com/vrachieru/5649bce26004d8a4682b
+ */
+function mergeIntervals(intervals) {
+  // test if there are at least 2 intervals
+  if(intervals.length <= 1)
+    return intervals;
+
+  var stack = [];
+  var top   = null;
+
+  // sort the intervals based on their start values
+  intervals.sort(function(a, b) {return a[0] - b[0]});
+
+  // push the 1st interval into the stack
+  stack.push(intervals[0]);
+
+  // start from the next interval and merge if needed
+  for (var i = 1; i < intervals.length; i++) {
+    // get the top element
+    top = stack[stack.length - 1];
+
+    // if the current interval doesn't overlap with the 
+    // stack top element, push it to the stack
+    if (top.EndOffset < intervals[i].BeginOffset) {
+      stack.push(intervals[i]);
+    }
+    // otherwise update the end value of the top element
+    // if end of current interval is higher
+    else if (top.EndOffset < intervals[i].EndOffset)
+    {
+      top.EndOffset = intervals[i].EndOffset;
+      stack.pop();
+      stack.push(top);
+    }
+  }
+
+  return stack;
+}
+
+
 /** Function that processes kendra requests and handles response. Decides whether to handle SNS
  * events or Lambda Hook events from QnABot.
  * @param event - input event passed to the Lambda Handler
@@ -58,6 +104,8 @@ async function routeKendraRequest(event, context) {
         kendraClient = require('./test/mockClient.js');
     } else if (event.test2) {
         kendraClient = require('./test/mockClient2.js');
+    } else if (event.test3) {
+        kendraClient = require('./test/mockClient3.js');
     } else {
         kendraClient = (process.env.REGION ?
             new AWSKendra({apiVersion: '2019-02-03', region: process.env.REGION}) :
@@ -127,47 +175,49 @@ async function routeKendraRequest(event, context) {
                     element.AdditionalAttributes.length > 0 &&
                     element.AdditionalAttributes[0].Value.TextWithHighlightsValue.Text) {
                     answerMessage += '\n\n ' + element.AdditionalAttributes[0].Value.TextWithHighlightsValue.Text.replace(/\r?\n|\r/g, " ");
+                    
                     let answerTextMd = element.AdditionalAttributes[0].Value.TextWithHighlightsValue.Text.replace(/\r?\n|\r/g, " ");
-                    // iterates over the answer highlights, finds top answer if it exists
-                    var elem;
-                    let len = element.AdditionalAttributes[0].Value.TextWithHighlightsValue.Highlights.length;
-                    var j;
-                    for (j=0; j<len; j++) {
-                        elem = element.AdditionalAttributes[0].Value.TextWithHighlightsValue.Highlights[j];
+                    // iterates over the answer highlights in sorted order of BeginOffset, merges the overlapping intervals
+                    var sorted_highlights = mergeIntervals(element.AdditionalAttributes[0].Value.TextWithHighlightsValue.Highlights);
+                    var j, elem;
+                    for (j=0; j<sorted_highlights.length; j++) {
+                        elem = sorted_highlights[j];
                         let offset = 4*j;
                         let beginning = answerTextMd.substring(0, elem.BeginOffset+offset);
                         let highlight = answerTextMd.substring(elem.BeginOffset+offset, elem.EndOffset+offset);
                         let rest = answerTextMd.substr(elem.EndOffset+offset);
-                        
-                        if (elem.TopAnswer == true) {
-                            // if top answer is found, then only show this abbreviated version
+
+                        if (elem.TopAnswer == true) {   // if top answer is found, then answer is abbreviated to this phrase
                             seenTop = true;
                             answerMessage = 'Answer from Amazon Kendra. \n\n ' + highlight + '.';
-                            answerTextMd = '**' + highlight + '** ';
                             answerMessageMd = '*Answer from Amazon Kendra.* \n ';
+                            answerTextMd = '**' + highlight + '** ';
                             break;
                         } else {
                             answerTextMd = beginning + '**' + highlight + '**' + rest;
                         }
                     };
                     answerMessageMd = answerMessageMd + '\n\n' + answerTextMd;
+                    
                     answerDocumentUris.add(element.DocumentURI);
                     kendraQueryId = res.QueryId; // store off the QueryId to use as a session attribute for feedback
                     kendraIndexId = res.originalKendraIndexId; // store off the Kendra IndexId to use as a session attribute for feedback
                     kendraResultId = element.Id; // store off resultId to use as a session attribute for feedback
                     foundAnswerCount++;
+                    
+                    
                 } else if (element.Type === 'QUESTION_ANSWER' && foundAnswerCount === 0 && element.AdditionalAttributes &&
                     element.AdditionalAttributes.length > 1) {
                     // There will be 2 elements - [0] - QuestionText, [1] - AnswerText
                     answerMessage = faqanswerMessage + '\n\n ' + element.AdditionalAttributes[1].Value.TextWithHighlightsValue.Text.replace(/\r?\n|\r/g, " ");
-                    let answerTextMd = element.AdditionalAttributes[1].Value.TextWithHighlightsValue.Text.replace(/\r?\n|\r/g, " ");
+                    
                     seenTop = true; // if the answer is in the FAQ, don't show document extracts
-                    // iterates over the FAQ highlights
-                    var elem;
-                    let len = element.AdditionalAttributes[1].Value.TextWithHighlightsValue.Highlights.length;
-                    var j;
-                    for (j=0; j<len; j++) {
-                        elem = element.AdditionalAttributes[1].Value.TextWithHighlightsValue.Highlights[j];
+                    let answerTextMd = element.AdditionalAttributes[1].Value.TextWithHighlightsValue.Text.replace(/\r?\n|\r/g, " ");
+                    // iterates over the FAQ answer highlights in sorted order of BeginOffset, merges the overlapping intervals
+                    var sorted_highlights = mergeIntervals(element.AdditionalAttributes[1].Value.TextWithHighlightsValue.Highlights);
+                    var j, elem;
+                    for (j=0; j<sorted_highlights.length; j++) {
+                        elem = sorted_highlights[j];
                         let offset = 4*j;
                         let beginning = answerTextMd.substring(0, elem.BeginOffset+offset);
                         let highlight = answerTextMd.substring(elem.BeginOffset+offset, elem.EndOffset+offset);
@@ -175,21 +225,23 @@ async function routeKendraRequest(event, context) {
                         answerTextMd = beginning + '**' + highlight + '**' + rest;
                     };
                     answerMessageMd = faqanswerMessageMd + '\n\n' + answerTextMd;
+                    
                     kendraQueryId = res.QueryId; // store off the QueryId to use as a session attribute for feedback
                     kendraIndexId = res.originalKendraIndexId; // store off the Kendra IndexId to use as a session attribute for feedback
                     kendraResultId = element.Id; // store off resultId to use as a session attribute for feedback
                     foundAnswerCount++;
+                    
+                    
                 } else if (element.Type === 'DOCUMENT' && element.DocumentExcerpt.Text && element.DocumentURI) {
                     const docInfo = {}
-                    if (seenTop == false) {
                     // if topAnswer found, then do not show document excerpts
+                    if (seenTop == false) {
                         docInfo.text = element.DocumentExcerpt.Text.replace(/\r?\n|\r/g, " ");
-                        // iterates over the document excerpt highlights
-                        var elem;
-                        let len = element.DocumentExcerpt.Highlights.length;
-                        var j;
-                        for (j=0; j<len; j++) {
-                            elem = element.DocumentExcerpt.Highlights[j];
+                        // iterates over the document excerpt highlights in sorted order of BeginOffset, merges overlapping intervals
+                        var sorted_highlights = mergeIntervals(element.DocumentExcerpt.Highlights);
+                        var j, elem;
+                        for (j=0; j<sorted_highlights.length; j++) {
+                            elem = sorted_highlights[j];
                             let offset = 4*j;
                             let beginning = docInfo.text.substring(0, elem.BeginOffset+offset);
                             let highlight = docInfo.text.substring(elem.BeginOffset+offset, elem.EndOffset+offset);
@@ -249,12 +301,15 @@ async function routeKendraRequest(event, context) {
         event.res.session.kendraIndexId = kendraIndexId;
         event.res.session.kendraResultId = kendraResultId;
     }
-    console.log("final return: " + JSON.stringify(event,null,2));
+    // console.log("final return: " + JSON.stringify(event,null,2));
     return event;
 }
 
 exports.handler = async (event, context) => {
-    console.log("event: " + JSON.stringify(event, null, 2));
-    console.log('context: ' + JSON.stringify(context, null, 2));
+    // console.log("event: " + JSON.stringify(event, null, 2));
+    // console.log('context: ' + JSON.stringify(context, null, 2));
     return routeKendraRequest(event, context);
 };
+
+
+// TODO: uncomment console.logs
