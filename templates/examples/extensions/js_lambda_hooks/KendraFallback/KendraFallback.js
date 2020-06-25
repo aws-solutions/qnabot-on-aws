@@ -180,9 +180,9 @@ async function routeKendraRequest(event, context) {
                     kendraResultId = element.Id; // store off resultId to use as a session attribute for feedback
                     foundAnswerCount++;
                 } else if (element.Type === 'DOCUMENT' && element.DocumentExcerpt.Text && element.DocumentURI) {
+                    const docInfo = {}
                     if (seenTop == false) {
-                        // if topAnswer found, then do not show document excerpts
-                        const docInfo = {}
+                    // if topAnswer found, then do not show document excerpts
                         docInfo.text = element.DocumentExcerpt.Text.replace(/\r?\n|\r/g, " ");
                         // iterates over the document excerpt highlights
                         var elem;
@@ -196,12 +196,12 @@ async function routeKendraRequest(event, context) {
                             let rest = docInfo.text.substr(elem.EndOffset+offset);
                             docInfo.text = beginning + '**' + highlight + '**' + rest;
                         };
-    
-                        docInfo.uri = element.DocumentURI;
-                        helpfulDocumentsUris.add(docInfo);
-                        foundAnswerCount++;
-                        foundDocumentCount++;
                     }
+                    // but even if topAnswer is found, show URL in markdown
+                    docInfo.uri = element.DocumentURI;
+                    helpfulDocumentsUris.add(docInfo);
+                    foundAnswerCount++;
+                    foundDocumentCount++;   // TODO: foundDocumentCount is not used elsewhere...
                 }
             });
         }
@@ -224,22 +224,24 @@ async function routeKendraRequest(event, context) {
             event.res.plainMessage = answerMessage;
         }
     }
-    if (answerDocumentUris.size > 0 && (seenTop==false)) {
+    if (answerDocumentUris.size > 0) {
         event.res.session.appContext.altMessages.markdown += `\n\n #### ${helpfulLinksMsg}`;
         answerDocumentUris.forEach(function (element) {
             event.res.session.appContext.altMessages.markdown += `\n\n [${element}](${element})`;
         });
     }
-
+    
     let idx=0;
-    helpfulDocumentsUris.forEach(function (element) {
-        if (idx++ < maxDocumentCount) {
-            if (element.text && element.text.length > 0) {
-                event.res.session.appContext.altMessages.markdown += `\n\n #### ${extractedTextMsg} \n\n ${element.text}`
+    if (seenTop == false){
+        helpfulDocumentsUris.forEach(function (element) {
+            if (idx++ < maxDocumentCount) {
+                if (element.text && element.text.length > 0) {
+                    event.res.session.appContext.altMessages.markdown += `\n\n #### ${extractedTextMsg} \n\n ${element.text}`
+                }
+                event.res.session.appContext.altMessages.markdown += `\n\n [${element.uri}](${element.uri})`;
             }
-            event.res.session.appContext.altMessages.markdown += `\n\n [${element.uri}](${element.uri})`;
-        }
-    });
+        });
+    }
 
     if (kendraQueryId) {
         event.res.session.kendraResponsibleQid = event.res.result.qid;
