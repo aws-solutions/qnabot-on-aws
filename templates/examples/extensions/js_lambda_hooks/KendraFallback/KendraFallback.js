@@ -191,6 +191,7 @@ async function routeKendraRequest(event, context) {
                             seenTop = true;
                             answerMessage = 'Answer from Amazon Kendra. \n\n ' + highlight + '.';
                             answerMessageMd = '*Answer from Amazon Kendra.* \n ';
+                            helpfulLinksMsg = 'Source Link';
                             answerTextMd = '**' + highlight + '** ';
                             break;
                         } else {
