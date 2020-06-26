@@ -76,6 +76,7 @@ exports.step=function(event,context,cb){
                                 }
                             }
                         }
+                        delete obj._id;
                         out.push(JSON.stringify({
                             index:{
                                 "_index":esindex,
