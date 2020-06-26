@@ -119,6 +119,9 @@ module.exports={
     },
     "CustomSettingsSSMParameterName":{
       "Value":{"Ref":"CustomQnABotSettings"}
+    },
+    "DefaultUserPoolJwksUrlParameterName": {
+      "Value":{"Ref":"DefaultUserPoolJwksUrl"}
     }
   },
   "Parameters": {
