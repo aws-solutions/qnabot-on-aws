@@ -15,6 +15,10 @@ See the "Getting Started" to launch your own QnABot
 
 **New features in 3.0.0** [ElicitResponse, Conditional Chaining, new Launch regions](#new-features)
 
+## Upgrade Notes
+During an upgrade, we recommend that existing QnABot content first be exported and downloaded from the Content Designer prior to 
+the upgrade. In this release we expect upgrade to be smooth but just in case you should always have your QnABot content preserved. 
+
 ## Prerequisites
 
 - Run Linux. (tested on Amazon Linux)

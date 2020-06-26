@@ -17,7 +17,7 @@ var config=require('../../../config')
 var aws=require('aws-sdk')
 var outputs=require('../../../bin/exports')
 
-module.exports=function(event){
+module.exports=function(){
     return Promise.join(
         outputs("dev/master",{wait:true}),
         outputs("dev/lambda",{wait:true})
@@ -42,8 +42,6 @@ module.exports=function(event){
         process.env.DEFAULT_SETTINGS_PARAM=master.DefaultSettingsSSMParameterName
         process.env.CUSTOM_SETTINGS_PARAM=master.CustomSettingsSSMParameterName
         process.env.DEFAULT_USER_POOL_JWKS_PARAM=master.DefaultUserPoolJwksUrlParameterName
-
-        return Promise.promisify(require('../index.js').handler)(event,{})
     })
 }
 

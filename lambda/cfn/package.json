@@ -25,7 +25,12 @@
     "jszip": "^3.1.4",
     "lodash": "^4.17.15",
     "multer": "^1.3.0",
-    "nodeunit": "^0.11.1",
     "stack-utils": "^1.0.1"
+  },
+  "devDependencies": {
+    "diff": "^4.0.2",
+    "nodeunit": "^0.11.3",
+    "tap": "^14.10.7",
+    "tap-mocha-reporter": "^5.0.1"
   }
 }
