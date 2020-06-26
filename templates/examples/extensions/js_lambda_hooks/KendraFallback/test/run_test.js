@@ -41,11 +41,11 @@ describe('#test_kendra_highlights()', () => {
         
         // tests that in markdown format, only the top answer phrase is returned with the link from where it is extracted
         assert.equal(resp.res.session.appContext.altMessages.markdown,
-        "*Answer from Amazon Kendra.* \n \n\n**Sun** \n\n #### Possible Links\n\n [https://s3.us-east-1.amazonaws.com/explore-kendra-solar/Sun_Lithograph.pdf](https://s3.us-east-1.amazonaws.com/explore-kendra-solar/Sun_Lithograph.pdf)");
+        "*Amazon Kendra suggested answer.* \n \n\n**Sun** \n\n #### Source Link\n\n [https://s3.us-east-1.amazonaws.com/explore-kendra-solar/Sun_Lithograph.pdf](https://s3.us-east-1.amazonaws.com/explore-kendra-solar/Sun_Lithograph.pdf)");
         
         // tests that in SSML format, only the top answer phrase is returned
         assert.equal(resp.res.session.appContext.altMessages.ssml,
-        "<speak> Answer from Amazon Kendra.    Sun </speak>");
+        "<speak> Amazon Kendra suggested answer.    Sun </speak>");
     });
     it('test_doc_query', async function() {
       let resp = await test_doc_query();
