@@ -286,13 +286,11 @@ async function routeKendraRequest(event, context) {
     
     let idx=0;
     if (seenTop == false){
-        // TODO
         helpfulDocumentsUris.forEach(function (element) {
             if (idx++ < maxDocumentCount) {
                 event.res.session.appContext.altMessages.markdown += `\n\n`;
                 event.res.session.appContext.altMessages.markdown += `***`;
                 event.res.session.appContext.altMessages.markdown += `\n\n <br>`;
-                // event.res.session.appContext.altMessages.markdown += `\n\n <br>`;
                 
                 if (element.text && element.text.length > 0) {
                     event.res.session.appContext.altMessages.markdown += `\n\n  ${element.text}`;
