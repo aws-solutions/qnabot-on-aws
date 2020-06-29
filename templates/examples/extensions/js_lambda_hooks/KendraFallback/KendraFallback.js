@@ -164,7 +164,10 @@ async function routeKendraRequest(event, context) {
     // process kendra query responses and update answer content
 
     /* default message text - can be overridden using QnABot SSM Parameter Store Custom Property */
-    let answerMessage = 'While I did not find an exact answer, these search results from Amazon Kendra might be helpful. ';
+    let topAnswerMessage = "Amazon Kendra suggested answer. \n\n ";
+    let topAnswerMessageMd = "*Amazon Kendra suggested answer.* \n ";
+    let docSearchMessage = 'While I did not find an exact answer, these search results from Amazon Kendra might be helpful. ';
+    let answerMessage = docSearchMessage;
     let answerMessageMd = '*While I did not find an exact answer, these search results from Amazon Kendra might be helpful.* \n ';
     let faqanswerMessage = 'Answer from Amazon Kendra FAQ.';
     let faqanswerMessageMd = '*Answer from Amazon Kendra FAQ.* \n ';
@@ -213,8 +216,8 @@ async function routeKendraRequest(event, context) {
 
                         if (elem.TopAnswer == true) {   // if top answer is found, then answer is abbreviated to this phrase
                             seenTop = true;
-                            answerMessage = 'Amazon Kendra suggested answer. \n\n ' + highlight + '.';
-                            answerMessageMd = '*Amazon Kendra suggested answer.* \n ';
+                            answerMessage = topAnswerMessage + highlight + '.';
+                            answerMessageMd = topAnswerMessageMd;
                             answerTextMd = '**' + highlight + '** ';
                             break;
                         } else {
@@ -223,10 +226,14 @@ async function routeKendraRequest(event, context) {
                     };
                     answerMessageMd = answerMessageMd + '\n\n' + answerTextMd;
                     
-                    // Shortens the speech response to contain say the longest highlighted phrase
-                    var longest_highlight = longestInterval(sorted_highlights);
-                    let answerText = element.AdditionalAttributes[0].Value.TextWithHighlightsValue.Text.replace(/\r?\n|\r/g, " ");
-                    speechMessage = answerText.substring(longest_highlight.BeginOffset, longest_highlight.EndOffset);
+                    // Shortens the speech response to contain say the longest highlighted phrase ONLY IF top answer not found
+                    if (seenTop == false) {
+                        var longest_highlight = longestInterval(sorted_highlights);
+                        let answerText = element.AdditionalAttributes[0].Value.TextWithHighlightsValue.Text.replace(/\r?\n|\r/g, " ");
+                        speechMessage = answerText.substring(longest_highlight.BeginOffset, longest_highlight.EndOffset);
+                        speechMessage = docSearchMessage + speechMessage + '.';
+                    }
+                    
                     
                     answerDocumentUris.add(element.DocumentURI);
                     kendraQueryId = res.QueryId; // store off the QueryId to use as a session attribute for feedback
@@ -301,6 +308,7 @@ async function routeKendraRequest(event, context) {
             ssmlMessage = ssmlMessage.substring(0,lastIndex);
         }
         ssmlMessage = `<speak> ${ssmlMessage} </speak>`;
+        
         event.res.session.appContext.altMessages.markdown = answerMessageMd;
         event.res.session.appContext.altMessages.ssml = ssmlMessage;
         if (event.req["_event"].outputDialogMode !== 'Text') {
