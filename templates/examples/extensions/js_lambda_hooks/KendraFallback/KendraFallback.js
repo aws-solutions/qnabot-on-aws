@@ -176,7 +176,7 @@ async function routeKendraRequest(event, context) {
     let helpfulLinksMsg = 'Source Link';
     let extractedTextMsg = 'Discovered Text';
     let moreResultsMsg = 'Additional Search Results';
-    let maxDocumentCount = 4;
+    let maxDocumentCount = 2;
     var seenTop = false;
 
     let foundAnswerCount = 0;
