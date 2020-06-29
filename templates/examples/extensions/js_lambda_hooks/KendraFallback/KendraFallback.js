@@ -150,7 +150,7 @@ async function routeKendraRequest(event, context) {
     let markdownAnswer = "";
     let helpfulLinksMsg = 'Possible Links';
     let extractedTextMsg = 'Discovered Text';
-    let maxDocumentCount = 4;
+    let maxDocumentCount = 2;
     var seenTop = false;
 
     let foundAnswerCount = 0;
