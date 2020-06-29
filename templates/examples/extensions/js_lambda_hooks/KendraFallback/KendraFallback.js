@@ -148,9 +148,10 @@ async function routeKendraRequest(event, context) {
     let faqanswerMessage = 'Answer from Amazon Kendra FAQ.';
     let faqanswerMessageMd = '*Answer from Amazon Kendra FAQ.* \n ';
     let markdownAnswer = "";
-    let helpfulLinksMsg = 'Possible Links';
+    let helpfulLinksMsg = 'Source Link';
     let extractedTextMsg = 'Discovered Text';
-    let maxDocumentCount = 4;
+    let moreResultsMsg = 'Additional Search Results';
+    let maxDocumentCount = 2;
     var seenTop = false;
 
     let foundAnswerCount = 0;
@@ -191,7 +192,6 @@ async function routeKendraRequest(event, context) {
                             seenTop = true;
                             answerMessage = 'Amazon Kendra suggested answer. \n\n ' + highlight + '.';
                             answerMessageMd = '*Amazon Kendra suggested answer.* \n ';
-                            helpfulLinksMsg = 'Source Link';
                             answerTextMd = '**' + highlight + '** ';
                             break;
                         } else {
@@ -278,9 +278,9 @@ async function routeKendraRequest(event, context) {
         }
     }
     if (answerDocumentUris.size > 0) {
-        event.res.session.appContext.altMessages.markdown += `\n\n #### ${helpfulLinksMsg}`;
+        event.res.session.appContext.altMessages.markdown += `\n\n ${helpfulLinksMsg}: `;
         answerDocumentUris.forEach(function (element) {
-            event.res.session.appContext.altMessages.markdown += `\n\n [${element}](${element})`;
+            event.res.session.appContext.altMessages.markdown += `[${element}](${element})`;
         });
     }
     
@@ -288,10 +288,14 @@ async function routeKendraRequest(event, context) {
     if (seenTop == false){
         helpfulDocumentsUris.forEach(function (element) {
             if (idx++ < maxDocumentCount) {
+                event.res.session.appContext.altMessages.markdown += `\n\n`;
+                event.res.session.appContext.altMessages.markdown += `***`;
+                event.res.session.appContext.altMessages.markdown += `\n\n <br>`;
+                
                 if (element.text && element.text.length > 0) {
-                    event.res.session.appContext.altMessages.markdown += `\n\n #### ${extractedTextMsg} \n\n ${element.text}`
+                    event.res.session.appContext.altMessages.markdown += `\n\n  ${element.text}`;
                 }
-                event.res.session.appContext.altMessages.markdown += `\n\n [${element.uri}](${element.uri})`;
+                event.res.session.appContext.altMessages.markdown += `\n\n  ${helpfulLinksMsg}: [${element.uri}](${element.uri})`;
             }
         });
     }
@@ -302,15 +306,12 @@ async function routeKendraRequest(event, context) {
         event.res.session.kendraIndexId = kendraIndexId;
         event.res.session.kendraResultId = kendraResultId;
     }
-    // console.log("final return: " + JSON.stringify(event,null,2));
+    console.log("final return: " + JSON.stringify(event,null,2));
     return event;
 }
 
 exports.handler = async (event, context) => {
-    // console.log("event: " + JSON.stringify(event, null, 2));
-    // console.log('context: ' + JSON.stringify(context, null, 2));
+    console.log("event: " + JSON.stringify(event, null, 2));
+    console.log('context: ' + JSON.stringify(context, null, 2));
     return routeKendraRequest(event, context);
 };
-
-
-// TODO: uncomment console.logs
