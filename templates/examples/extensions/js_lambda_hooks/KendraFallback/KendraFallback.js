@@ -81,6 +81,27 @@ function mergeIntervals(intervals) {
 }
 
 
+
+/**
+ * Function to return the longest interval from a list of sorted intervals
+ * @param intervals
+ * @returns {*}
+ */
+function longestInterval(intervals) {
+  // test if there are at least 2 intervals
+  if (intervals.length == 0) {
+      return intervals;
+  } else if (intervals.length == 1) {
+    return intervals[0];
+  }
+  
+  // sort the intervals based on their length
+  intervals.sort(function(a, b) {return (a[1]-a[0]) - (b[1]-b[0])});
+  return intervals[0];
+
+}
+
+
 /** Function that processes kendra requests and handles response. Decides whether to handle SNS
  * events or Lambda Hook events from QnABot.
  * @param event - input event passed to the Lambda Handler
@@ -148,6 +169,7 @@ async function routeKendraRequest(event, context) {
     let faqanswerMessage = 'Answer from Amazon Kendra FAQ.';
     let faqanswerMessageMd = '*Answer from Amazon Kendra FAQ.* \n ';
     let markdownAnswer = "";
+    let speechMessage = "";
     let helpfulLinksMsg = 'Source Link';
     let extractedTextMsg = 'Discovered Text';
     let moreResultsMsg = 'Additional Search Results';
@@ -177,6 +199,7 @@ async function routeKendraRequest(event, context) {
                     element.AdditionalAttributes[0].Value.TextWithHighlightsValue.Text) {
                     answerMessage += '\n\n ' + element.AdditionalAttributes[0].Value.TextWithHighlightsValue.Text.replace(/\r?\n|\r/g, " ");
                     
+                    // Emboldens the highlighted phrases returned by the Kendra response API in markdown format
                     let answerTextMd = element.AdditionalAttributes[0].Value.TextWithHighlightsValue.Text.replace(/\r?\n|\r/g, " ");
                     // iterates over the answer highlights in sorted order of BeginOffset, merges the overlapping intervals
                     var sorted_highlights = mergeIntervals(element.AdditionalAttributes[0].Value.TextWithHighlightsValue.Highlights);
@@ -199,6 +222,11 @@ async function routeKendraRequest(event, context) {
                         }
                     };
                     answerMessageMd = answerMessageMd + '\n\n' + answerTextMd;
+                    
+                    // Shortens the speech response to contain say the longest highlighted phrase
+                    var longest_highlight = longestInterval(sorted_highlights);
+                    let answerText = element.AdditionalAttributes[0].Value.TextWithHighlightsValue.Text.replace(/\r?\n|\r/g, " ");
+                    speechMessage = answerText.substring(longest_highlight.BeginOffset, longest_highlight.EndOffset);
                     
                     answerDocumentUris.add(element.DocumentURI);
                     kendraQueryId = res.QueryId; // store off the QueryId to use as a session attribute for feedback
@@ -264,6 +292,10 @@ async function routeKendraRequest(event, context) {
     if (foundAnswerCount > 0) {
         event.res.message = answerMessage;
         let ssmlMessage = `${answerMessage.substring(0,600).replace(/\r?\n|\r/g, " ")}`;
+        if (speechMessage != "") {
+            ssmlMessage = `${speechMessage.substring(0,600).replace(/\r?\n|\r/g, " ")}`;
+        }
+        
         let lastIndex = ssmlMessage.lastIndexOf('.');
         if (lastIndex > 0) {
             ssmlMessage = ssmlMessage.substring(0,lastIndex);
