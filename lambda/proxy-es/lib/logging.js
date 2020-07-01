@@ -67,7 +67,7 @@ module.exports=function(req,res){
         utterance: String(unwrappedReq.question).toLowerCase().replace(/[\u2000-\u206F\u2E00-\u2E7F\\'!"#$%&()*+,\-.\/:;<=>?@\[\]^_`{|}~]/g, ""),
         answer: _.get(unwrappedRes, "message"),
         topic: _.get(unwrappedRes.result, "t", ""),
-        clientType: unwrappedReq._type,
+        clientType: unwrappedReq._clientType,
         datetime: now
     }
 
