@@ -297,5 +297,9 @@ module.exports = async function (req, res) {
         res.type = "PlainText"
         res.message = _.get(req, '_settings.EMPTYMESSAGE', 'You stumped me!');
     }
+    // add session attributes for qid and no_hits - useful for Amazon Connect integration
+    res.session.qnabot_qid = _.get(res.result, "qid", "") ;
+    res.session.qnabot_gotanswer = (res['got_hits'] > 0) ? true : false ;
+
     console.log("RESULT", JSON.stringify(req), JSON.stringify(res))
 };
