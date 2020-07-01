@@ -47,10 +47,10 @@ module.exports=function(req,res){
     // ES mapping errors.
     stringifySessionAttribues(unwrappedRes);
 
-    let redactEnabled = _.get(unwrappedReq, '_settings.ENABLE_REDACTING', "false");
+    let redactEnabled = _.get(unwrappedReq, '_settings.ENABLE_REDACTING');
     let redactRegex = _.get(unwrappedReq, '_settings.REDACTING_REGEX', "\\b\\d{4}\\b(?![-])|\\b\\d{9}\\b|\\b\\d{3}-\\d{2}-\\d{4}\\b");
 
-    if (redactEnabled === "true") {
+    if (redactEnabled) {
         console.log("redact enabled");
         let re = new RegExp(redactRegex, "g");
         processKeysForRegEx(unwrappedReq, re);

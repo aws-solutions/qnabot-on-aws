@@ -168,10 +168,10 @@ async function evaluateConditionalChaining(req, res, hit, conditionalChaining) {
 }
 
 module.exports = async function (req, res) {
-    let redactEnabled = _.get(req, '_settings.ENABLE_REDACTING', "false");
+    let redactEnabled = _.get(req, '_settings.ENABLE_REDACTING');
     let redactRegex = _.get(req, '_settings.REDACTING_REGEX', "\\b\\d{4}\\b(?![-])|\\b\\d{9}\\b|\\b\\d{3}-\\d{2}-\\d{4}\\b");
 
-    if (redactEnabled.toLowerCase() === "true") {
+    if (redactEnabled) {
         process.env.QNAREDACT= "true";
         process.env.REDACTING_REGEX = redactRegex;
     } else {
@@ -200,7 +200,7 @@ module.exports = async function (req, res) {
         }
         // translate response
         var usrLang = 'en';
-        if (_.get(req._settings, 'ENABLE_MULTI_LANGUAGE_SUPPORT', "false").toLowerCase() === "true") {
+        if (_.get(req._settings, 'ENABLE_MULTI_LANGUAGE_SUPPORT')) {
             usrLang = _.get(req, 'session.userLocale');
             if (usrLang != 'en') {
                 console.log("Autotranslate hit to usrLang: ", usrLang);
@@ -210,7 +210,7 @@ module.exports = async function (req, res) {
             }
         }
         // prepend debug msg
-        if (_.get(req._settings, 'ENABLE_DEBUG_RESPONSES', "false").toLowerCase() === "true") {
+        if (_.get(req._settings, 'ENABLE_DEBUG_RESPONSES')) {
             var msg = "User Input: \"" + req.question + "\"";
             if (usrLang != 'en') {
                 msg = "User Input: \"" + _.get(req,"_event.origQuestion","notdefined") + "\", Translated to: \"" + req.question + "\"";

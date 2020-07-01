@@ -11,7 +11,7 @@ const translate = require('./multilanguage.js');
 
 async function translate_res(req, res){
     const locale = _.get(req, 'session.userLocale');
-    if (_.get(req._settings, 'ENABLE_MULTI_LANGUAGE_SUPPORT', "false").toLowerCase() === "true"){
+    if (_.get(req._settings, 'ENABLE_MULTI_LANGUAGE_SUPPORT')){
         if (_.get(res,"message")) {
             res.message = await translate.translateText(res.message,'en',locale); 
         }

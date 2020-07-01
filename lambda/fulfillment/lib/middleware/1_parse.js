@@ -14,6 +14,21 @@ function isJson(str) {
     return true;
 }
 
+function str2bool(settings) {
+    var new_settings = _.mapValues(settings, x => {
+        if (_.isString(x)) {
+            if (x.toLowerCase() === "true") {
+                return true ;
+            }
+            if (x.toLowerCase() === "false") {
+                return false ;
+            }
+        }
+        return x;
+    });
+    return new_settings;
+}
+
 async function get_parameter(param_name) {
     var ssm = new AWS.SSM();
     var params = {
@@ -24,6 +39,7 @@ async function get_parameter(param_name) {
     if (isJson(settings)) {
         settings = JSON.parse(response.Parameter.Value);
     }
+    settings = str2bool(settings) ;
     return settings;
 }
 
@@ -46,7 +62,7 @@ async function get_settings() {
 
     console.log("Merged Settings: ", settings);
 
-    if (settings.ENABLE_REDACTING.toLowerCase() === "true") {
+    if (settings.ENABLE_REDACTING) {
         console.log("redacting enabled");
         process.env.QNAREDACT="true";
         process.env.REDACTING_REGEX=settings.REDACTING_REGEX;
@@ -118,7 +134,7 @@ module.exports = async function parse(req, res) {
 
 
     // multilanguage support 
-    if (_.get(settings, 'ENABLE_MULTI_LANGUAGE_SUPPORT', "false").toLowerCase() === "true") {
+    if (_.get(settings, 'ENABLE_MULTI_LANGUAGE_SUPPORT')) {
         await multilanguage.set_multilang_env(req);
     }
     // end of multilanguage support 
