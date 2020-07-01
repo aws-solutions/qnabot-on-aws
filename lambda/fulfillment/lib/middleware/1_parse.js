@@ -58,7 +58,7 @@ async function get_settings() {
     return settings;
 }
 
-// makes best guess as to lex client tppe in use based on fields in req.. not perfect
+// makes best guess as to lex client type in use based on fields in req.. not perfect
 function getClientType(req) {
     if (req._type == 'ALEXA') {
         return req._type ;
