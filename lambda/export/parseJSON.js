@@ -1,4 +1,4 @@
-// parseJson.js
+// parseJSON.js
 
 /**
  * Function to parse JSON of configurations/questions from QNA Content Designer and write an output CSV file
@@ -28,7 +28,12 @@ function qnaJsonParser(input_path, output_path, plainText) {
   const q_list = require(input_path).qna;
   q_list.forEach(function(elem) {
     elem['q'].forEach(function(ques) {
-      var entry = {question:ques, answer:elem['a'], link:'<document url>'};
+      var entry = {question:ques, answer:elem, link:'<document url>'};    // entire JSON field in the answer field
+      var entry = {question:ques, answer:elem['a'], link:elem};    // entire JSON field in the URL field
+      // var entry = {question:ques, answer:elem['a'], link:'QID: ' + elem['qid']}; // QID in the URL field
+      // var entry = {question:ques, answer:elem['a'], link:'<document url>'};      // explore changing link display text
+      
+      // var entry = {question:ques, answer:elem['a'], link:'<document url>'};  // original
       data.push(entry);
     });
   });
