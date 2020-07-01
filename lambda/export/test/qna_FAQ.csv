@@ -1,26 +1,17 @@
 Question,Answer,Document URL (optional)
-help,"I am the QnA bot, ask me a question and I will try my best to answer it.",<document url>
-help me,"I am the QnA bot, ask me a question and I will try my best to answer it.",<document url>
-need help,"I am the QnA bot, ask me a question and I will try my best to answer it.",<document url>
-no_hits,The Kendra Fallback search was not able to identify any results,<document url>
-Thumbs down,Thank you for your feedback - we will try to improve this answer.,<document url>
-Bad answer,Thank you for your feedback - we will try to improve this answer.,<document url>
 Will the Sun ever consume the earth?,"When all the Hydrogen has been burned, the Sun will continue for about 130 million more years. During this time, it is consuming Helium and will expand to engulf Mercury, Venus, and the Earth. It is now a red giant.",<document url>
 How large is the sun?,"The Sun is 109 times wider than the Earth and 330,000 times as massive",<document url>
 How hot is it at the center of the Sun?,At its centre the Sun reaches temperatures of 15 million °C.,<document url>
-How many planets orbit the Sun?,"Eight planets orbit the sun. Mercury, Venus, Earth, Mars, Jupiter, Saturn, Uranus, and Neptune. Sorry I'm required to leave out my favorite, Pluto.",<document url>
-Which planets orbit the Sun?,"Eight planets orbit the sun. Mercury, Venus, Earth, Mars, Jupiter, Saturn, Uranus, and Neptune. Sorry I'm required to leave out my favorite, Pluto.",<document url>
-What is the diameter of the Sun?,The Sun's diameter is 1.4 million kilometers.,<document url>
-How wide is the sun?,The Sun's diameter is 1.4 million kilometers.,<document url>
-Thumbs up,"Thank you for your positive feedback on this answer, your feedback helps us continuously improve.",<document url>
-Good answer,"Thank you for your positive feedback on this answer, your feedback helps us continuously improve.",<document url>
 Tell me about the sun?,"Our sun is 4.6 billion years old. Its considered a yellow dwarf with a diameter of 1,392,684 kilometers and a circumference of 4,370,005 kilometers. It has a mass that is equal to 333,060 earths and a surface temperature of 5,500 degrees celsius. Really Hot!",<document url>
+How old is the Sun?,Our Sun is 4.6 billion years old.,<document url>
 How far away is the sun?,"The sun is 149,598,262 km (1 AU) from earth.",<document url>
 What distance is the sun from the earth?,"The sun is 149,598,262 km (1 AU) from earth.",<document url>
+What other locations on the internet have information about the sun?,Here is one place on the web you can go: https://solarsystem.nasa.gov/solar-system/sun/overview/.,<document url>
 What are solar flares?,"A brief eruption of intense high-energy radiation from the sun's surface, associated with sunspots and causing electromagnetic disturbances on the earth, as with radio frequency communications and power line transmissions.",<document url>
 what is a solar flare?,"A brief eruption of intense high-energy radiation from the sun's surface, associated with sunspots and causing electromagnetic disturbances on the earth, as with radio frequency communications and power line transmissions.",<document url>
 Define solar flares.,"A brief eruption of intense high-energy radiation from the sun's surface, associated with sunspots and causing electromagnetic disturbances on the earth, as with radio frequency communications and power line transmissions.",<document url>
 I'd like to know more about solar flares.,"A brief eruption of intense high-energy radiation from the sun's surface, associated with sunspots and causing electromagnetic disturbances on the earth, as with radio frequency communications and power line transmissions.",<document url>
-How old is the Sun?,Our Sun is 4.6 billion years old.,<document url>
-What other locations on the internet have information about the sun?,Here is one place on the web you can go: https://solarsystem.nasa.gov/solar-system/sun/overview/.,<document url>
-no_hits_orig,{{Settings.EMPTYMESSAGE}},<document url>
+How many planets orbit the Sun?,"Eight planets orbit the sun. Mercury, Venus, Earth, Mars, Jupiter, Saturn, Uranus, and Neptune. Sorry I'm required to leave out my favorite, Pluto.",<document url>
+Which planets orbit the Sun?,"Eight planets orbit the sun. Mercury, Venus, Earth, Mars, Jupiter, Saturn, Uranus, and Neptune. Sorry I'm required to leave out my favorite, Pluto.",<document url>
+What is the diameter of the Sun?,The Sun's diameter is 1.4 million kilometers.,<document url>
+How wide is the sun?,The Sun's diameter is 1.4 million kilometers.,<document url>

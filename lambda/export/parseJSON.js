@@ -27,13 +27,14 @@ function qnaJsonParser(input_path, output_path, plainText) {
   
   const q_list = require(input_path).qna;
   q_list.forEach(function(elem) {
-    elem['q'].forEach(function(ques) {
-      var entry = {question:ques, answer:elem, link:'<document url>'};    // entire JSON field in the answer field
-      var entry = {question:ques, answer:elem['a'], link:elem};    // entire JSON field in the URL field
-      // var entry = {question:ques, answer:elem['a'], link:'QID: ' + elem['qid']}; // QID in the URL field
-      // var entry = {question:ques, answer:elem['a'], link:'<document url>'};      // explore changing link display text
+    console.log();
+    console.log('ELEM IS ' + JSON.stringify(elem.q[0]));
+    elem.q.forEach(function(ques) {
       
-      // var entry = {question:ques, answer:elem['a'], link:'<document url>'};  // original
+      // var ans = JSON.stringify(elem);
+      // var entry = {question:ques, answer: ans, link:'<document url>'};    // entire JSON field in the answer field
+      
+      var entry = {question:ques, answer:elem.a, link:'<document url>'};  // original
       data.push(entry);
     });
   });

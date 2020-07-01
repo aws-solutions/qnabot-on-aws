@@ -82,8 +82,11 @@ async function createFAQ() {
       ACL: 'private',
       Body: fs.createReadStream(csv_path),  // use read stream option in case file is large
     };
-    await s3Uploader(s3Client, s3_params);
-    
+    var s3_response = await s3Uploader(s3Client, s3_params);
+    // if (s3_response) {
+    //     return s3_response;
+    // }
+
     
     // create the FAQ
     var faq_params = {
@@ -107,3 +110,5 @@ async function createFAQ() {
 exports.handler = async() => {
     return createFAQ();
 }
+
+createFAQ();
