@@ -106,9 +106,21 @@ function faqLister(kendraClient,params) {
  * @returns {*}
  */
 async function createFAQ() {
+    
+    // FAQ attributes // TODO: don't hardcode (also for the region)
+    let faq_name = 'solar-facts';
+    let faq_index_id = 'e1c23860-e5c8-4409-ae26-b05bd6ced00a';
+    let csv_path = './test/qna_FAQ.csv';
+    let csv_name = 'qna_FAQ.csv';
+    let s3_bucket = 'explore-kendra-solar';
+    let kendra_s3_access_role = 'arn:aws:iam::425742325899:role/service-role/AmazonKendra-question-bucketer';
+    let region = 'us-east-1';
+    
+    
+    // create kendra and s3 clients    
     let kendraClient = (process.env.REGION ?
             new AWSKendra({apiVersion: '2019-02-03', region: process.env.REGION}) :
-            new AWSKendra({apiVersion: '2019-02-03', region: "us-east-1"})
+            new AWSKendra({apiVersion: '2019-02-03', region: region})
             );
     let s3Client = (process.env.REGION ?
             new AWSS3({apiVersion: '2006-03-01', region: process.env.REGION}) :
@@ -116,32 +128,25 @@ async function createFAQ() {
     console.log('clients created');
     
     
-    // FAQ attributes // TODO: don't hardcode (also for the region)
-    let faq_name = 'solar-facts';
-    let faq_index_id = 'e1c23860-e5c8-4409-ae26-b05bd6ced00a';
-    let csv_path = './test/qna_FAQ.csv';
-    
-    
     // read in CSV and upload to S3 bucket
     var fs = require('fs');
     var s3_params = {
-      Bucket: 'explore-kendra-solar',
-      Key: 'qna_FAQ.csv',
+      Bucket: s3_bucket,
+      Key: csv_name,
       ACL: 'private',   // TODO: do we want this to be publicly readable by linking QID's?
       Body: fs.createReadStream(csv_path),  // use read stream option in case file is large
     };
     var s3_response = await s3Uploader(s3Client, s3_params);
     
     
-    // if FAQ exists already: then the old one and update it
+    // if FAQ exists already, delete the old one and update it
     var index_params = {
       IndexId: faq_index_id,
       MaxResults: '30'      // default max number of FAQs in developer edition
     //   NextToken: ''      // TODO: for when the number of FAQs goes over a page...
     };
-    // TODO: this errors when there are no FAQs already
+    // TODO: this errors when there are no FAQs already (empty arrays --> throttling exceptions)
     var list_faq_response = await faqLister(kendraClient, index_params);
-    // TODO: does it always have this field?
     var j, elem, index=null;
     for (j=0; j<list_faq_response.FaqSummaryItems.length; j++) {
         elem = list_faq_response.FaqSummaryItems[j];
@@ -158,17 +163,18 @@ async function createFAQ() {
         var del_faq_response = await faqDeleter(kendraClient, delete_faq_params);
     }
     
+    
     // create the FAQ
     var faq_params = {
       IndexId: faq_index_id,
       Name: faq_name,
-      RoleArn: 'arn:aws:iam::425742325899:role/service-role/AmazonKendra-question-bucketer',
+      RoleArn: kendra_s3_access_role,
       S3Path: {
-        Bucket: 'explore-kendra-solar',
-        Key: 'qna_FAQ.csv'
+        Bucket: s3_bucket,
+        Key: csv_name
       },
       Description: 'Exported FAQ of questions from QnABot designer console'
-    //   Tags: [{Key: 'key1', Value: 'val1'}] // if no tags, just comment out! throttling exception caused with empty tags array (and remove ending object comma)
+      // if no tags, just comment it out because empty arrays cause throttling exceptions
     };
     var faq_response = await faqConverter(kendraClient, faq_params);
 
