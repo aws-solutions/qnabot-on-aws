@@ -27,8 +27,6 @@ function qnaJsonParser(input_path, output_path, plainText) {
   
   const q_list = require(input_path).qna;
   q_list.forEach(function(elem) {
-    console.log();
-    console.log('ELEM IS ' + JSON.stringify(elem.q[0]));
     elem.q.forEach(function(ques) {
       
       // var ans = JSON.stringify(elem);
