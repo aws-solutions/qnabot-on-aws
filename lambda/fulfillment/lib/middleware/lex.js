@@ -43,7 +43,6 @@ exports.assemble=function(request,response){
                     title:_.get(response,"card.title","Image"),
                     subTitle:_.get(response.card,'subTitle'),
                     imageUrl:response.card.imageUrl,
-                    // Lex has limit of 5 max 5 buttons (but we can support more via 'appcontext' sessiona attribute using lex-web-ui)
                     buttons: _.has(filteredButtons, [0]) ? filteredButtons : null
                 })]
             } : null
