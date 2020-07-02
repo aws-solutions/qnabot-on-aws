@@ -3,17 +3,17 @@
         "_event": {
             "messageVersion": "1.0",
             "invocationSource": "FulfillmentCodeHook",
-            "userId": "us-east-1:05aef6ae-bc99-41a5-98ad-3d74df5b4bc1",
+            "userId": "us-east-1:7ace124d-bfd1-4356-ac5a-ed8a98785fd9",
             "sessionAttributes": {},
             "requestAttributes": null,
             "bot": {
-                "name": "QNAbot_dev_dev_dev_master_four_BotoNDIv",
+                "name": "QNA_dev_dev_dev_master_two_BotUSFgl",
                 "alias": "live",
                 "version": "1"
             },
             "outputDialogMode": "Text",
             "currentIntent": {
-                "name": "fulfilment_IntentrDEldIYchy",
+                "name": "fulfilment_IntentfiuhxvkSil",
                 "slots": {
                     "slot": "How many planets orbit the sun"
                 },
@@ -29,7 +29,6 @@
             "recentIntentSummaryView": null,
             "sentimentResponse": null,
             "kendraResponse": null,
-            "origQuestion": "How many planets orbit the sun?",
             "errorFound": false
         },
         "_settings": {
@@ -50,7 +49,7 @@
             "SMS_HINT_REMINDER": " (Feedback? Reply THUMBS UP or THUMBS DOWN. Ask HELP ME at any time)",
             "SMS_HINT_REMINDER_INTERVAL_HRS": "24",
             "IDENTITY_PROVIDER_JWKS_URLS": [],
-            "ENABLE_MULTI_LANGUAGE_SUPPORT": "true",
+            "ENABLE_MULTI_LANGUAGE_SUPPORT": "false",
             "MINIMUM_CONFIDENCE_SCORE": 0.6,
             "ALT_SEARCH_KENDRA_INDEXES": "[\"e1c23860-e5c8-4409-ae26-b05bd6ced00a\"]",
             "ELICIT_RESPONSE_MAX_RETRIES": 3,
@@ -59,45 +58,38 @@
             "ELICIT_RESPONSE_DEFAULT_MSG": "Ok. ",
             "ENABLE_REDACTING": "false",
             "REDACTING_REGEX": "\\b\\d{4}\\b(?![-])|\\b\\d{9}\\b|\\b\\d{3}-\\d{2}-\\d{4}\\b",
-            "DEFAULT_USER_POOL_JWKS_URL": "https://cognito-idp.us-east-1.amazonaws.com/us-east-1_EZg5Ia82Z/.well-known/jwks.json"
+            "DEFAULT_USER_POOL_JWKS_URL": "https://cognito-idp.us-east-1.amazonaws.com/us-east-1_jt2cXkCEb/.well-known/jwks.json"
         },
         "_type": "LEX",
-        "_userId": "us-east-1:05aef6ae-bc99-41a5-98ad-3d74df5b4bc1",
+        "_userId": "us-east-1:7ace124d-bfd1-4356-ac5a-ed8a98785fd9",
         "question": "How many planets orbit the sun?",
-        "session": {
-            "userDetectedLocale": "en",
-            "userDetectedLocaleConfidence": 0.9948722720146179,
-            "userLocale": "en"
-        },
+        "session": {},
         "_preferredResponseType": "PlainText",
         "_userInfo": {
-            "UserId": "us-east-1:05aef6ae-bc99-41a5-98ad-3d74df5b4bc1",
+            "UserId": "us-east-1:7ace124d-bfd1-4356-ac5a-ed8a98785fd9",
             "InteractionCount": 0,
-            "TimeSinceLastInteraction": 1592902513.847
+            "TimeSinceLastInteraction": 1593663418.209
         },
         "_info": {
             "es": {
-                "address": "search-qnabot-elasti-4n2sjlh1tlwf-ziyzyejzynvs6rs2cvx7yaqxma.us-east-1.es.amazonaws.com",
-                "index": "qnabot-dev-dev-dev-master-4",
+                "address": "search-qna-dev-elasti-mtl6ojldf3ja-w5begr25vpfuyidnlgb4izlbtq.us-east-1.es.amazonaws.com",
+                "index": "qna-dev-dev-dev-master-2",
                 "type": "qna",
                 "service": {
-                    "qid": "QNAbot-dev-dev-dev-master-4-ESQidLambda-636ARD1AGUJH",
-                    "proxy": "QNAbot-dev-dev-dev-master-4-ESProxyLambda-NF5QMNB8RE00"
+                    "qid": "QNA-dev-dev-dev-master-2-ESQidLambda-1I9JEHU6U4K9I",
+                    "proxy": "QNA-dev-dev-dev-master-2-ESProxyLambda-1NMAY6LNBRJDY"
                 }
             }
         }
     },
     "res": {
         "type": "PlainText",
-        "message": "Answer from Amazon Kendra FAQ.\n\n Eight planets orbit the sun. Mercury, Venus, Earth, Mars, Jupiter, Saturn, Uranus, and Neptune. Sorry I'm required to leave out my favorite, Pluto",
+        "message": "Answer from Amazon Kendra FAQ.\n\n Eight planets orbit the sun. Mercury, Venus, Earth, Mars, Jupiter, Saturn, Uranus, and Neptune. Sorry I'm required to leave out my favorite, Pluto.",
         "session": {
-            "userDetectedLocale": "en",
-            "userDetectedLocaleConfidence": 0.9948722720146179,
-            "userLocale": "en",
             "appContext": {
                 "altMessages": {
-                    "markdown": "*Answer from Amazon Kendra FAQ.* \n \n\n Eight planets orbit the sun. Mercury, Venus, Earth, Mars, Jupiter, Saturn, Uranus, and Neptune. Sorry I'm required to leave out my favorite, Pluto",
-                    "ssml": "<speak> Answer from Amazon Kendra FAQ.   Eight planets orbit the sun. Mercury, Venus, Earth, Mars, Jupiter, Saturn, Uranus, and Neptune </speak>"
+                    "markdown": "*Answer from Amazon Kendra FAQ.* \n \n\nEight **planets** **orbit** the **sun**. Mercury, Venus, Earth, Mars, Jupiter, Saturn, Uranus, and Neptune. Sorry I'm required to leave out my favorite, Pluto.",
+                    "ssml": "<speak> Answer from Amazon Kendra FAQ.   Eight planets orbit the sun. Mercury, Venus, Earth, Mars, Jupiter, Saturn, Uranus, and Neptune. Sorry I'm required to leave out my favorite, Pluto </speak>"
                 }
             },
             "previous": {
@@ -112,9 +104,9 @@
                 "hasParent": true
             },
             "kendraResponsibleQid": "KendraFallback",
-            "kendraQueryId": "ec35a915-8990-4ef7-a5da-f490911cad42",
+            "kendraQueryId": "b904542d-af85-447d-808b-d86b5df16c06",
             "kendraIndexId": "e1c23860-e5c8-4409-ae26-b05bd6ced00a",
-            "kendraResultId": "ec35a915-8990-4ef7-a5da-f490911cad42-2db7aa5b-1fcb-4910-a2fc-b3922a6069e3"
+            "kendraResultId": "b904542d-af85-447d-808b-d86b5df16c06-ee0db51d-15f4-4786-9144-b51d29d37f66"
         },
         "card": {
             "send": false,
@@ -123,11 +115,11 @@
             "url": ""
         },
         "_userInfo": {
-            "UserId": "us-east-1:05aef6ae-bc99-41a5-98ad-3d74df5b4bc1",
+            "UserId": "us-east-1:7ace124d-bfd1-4356-ac5a-ed8a98785fd9",
             "InteractionCount": 1,
-            "TimeSinceLastInteraction": 1592902513.847,
-            "FirstSeen": "Tue Jun 23 2020 20:55:13 GMT+0000 (Coordinated Universal Time)",
-            "LastSeen": "Tue Jun 23 2020 20:55:13 GMT+0000 (Coordinated Universal Time)"
+            "TimeSinceLastInteraction": 1593663418.209,
+            "FirstSeen": "Thu Jul 02 2020 16:16:58 GMT+0000 (Coordinated Universal Time)",
+            "LastSeen": "Thu Jul 02 2020 16:16:58 GMT+0000 (Coordinated Universal Time)"
         },
         "got_hits": 0,
         "result": {

@@ -34,7 +34,7 @@ describe('#test_kendra_highlights()', () => {
         
         // tests that in markdown format, highlights are boldened
         assert.equal(resp.res.session.appContext.altMessages.markdown, 
-        "*Answer from Amazon Kendra FAQ.* \n \n\nEight **planets** **orbit** the **sun**. Mercury, Venus, Earth, Mars, Jupiter, Saturn, Uranus, and Neptune. Sorry I'm required to leave out my favorite, Pluto");
+        "*Answer from Amazon Kendra FAQ.* \n \n\nEight **planets** **orbit** the **sun**. Mercury, Venus, Earth, Mars, Jupiter, Saturn, Uranus, and Neptune. Sorry I'm required to leave out my favorite, Pluto.");
     });
     it('test_top_answer', async function() {
         let resp = await test_top_ans();

@@ -252,6 +252,7 @@ async function routeKendraRequest(event, context) {
                     foundAnswerCount++;
                     
                     // TODO: use json structure for query response from doc URL field
+                    // var json_struct = JSON.parse(element.DocumentURI);
                     
                     
                 } else if (element.Type === 'DOCUMENT' && element.DocumentExcerpt.Text && element.DocumentURI) {
@@ -327,7 +328,7 @@ async function routeKendraRequest(event, context) {
         event.res.session.kendraIndexId = kendraIndexId;
         event.res.session.kendraResultId = kendraResultId;
     }
-    console.log("final return: " + JSON.stringify(event,null,2));
+    // console.log("final return: " + JSON.stringify(event,null,2));
     return event;
 }
 
