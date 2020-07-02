@@ -150,16 +150,18 @@ async function evaluateConditionalChaining(req, res, hit, conditionalChaining) {
         const responsebot_hook = _.get(hit2, "elicitResponse.responsebot_hook", undefined);
         const responsebot_session_namespace = _.get(hit2, "elicitResponse.response_sessionattr_namespace", undefined);
         const chaining_configuration = _.get(hit2, "conditionalChaining", undefined);
+        var elicitResponse = {} ;
         if (responsebot_hook && responsebot_session_namespace) {
-            res.session.elicitResponse = responsebot_hook;
-            res.session.elicitResponseNamespace = responsebot_session_namespace;
+            elicitResponse.responsebot = responsebot_hook;
+            elicitResponse.namespace = responsebot_session_namespace;
+            elicitResponse.chainingConfig = chaining_configuration;
             _.set(res.session, res.session.elicitResponseNamespace + ".boterror", undefined );
-            res.session.elicitResponseChainingConfig = chaining_configuration;
         } else {
-            res.session.elicitResponse = undefined;
-            res.session.elicitResponseNamespace = undefined;
-            res.session.elicitResponseChainingConfig = chaining_configuration;
+            elicitResponse.responsebot = undefined;
+            elicitResponse.namespace = undefined;
+            elicitResponse.chainingConfig = chaining_configuration;
         }
+        _.set(res.session,'qnabotcontext.elicitResponse',elicitResponse);
         return (merge_next(hit, hit2));
     } else {
         console.log("WARNING: No documents found for evaluated chaining rule:", next_q);
@@ -178,8 +180,8 @@ module.exports = async function (req, res) {
         process.env.QNAREDACT="false";
         process.env.REDACTING_REGEX="";
     }
-    const elicitResponseChainingConfig = _.get(res, "session.elicitResponseChainingConfig", undefined);
-    const elicitResponseProgress = _.get(res, "session.elicitResponseProgress", undefined);
+    const elicitResponseChainingConfig = _.get(res, "session.qnabotcontext.elicitResponse.chainingConfig", undefined);
+    const elicitResponseProgress = _.get(res, "session.qnabotcontext.elicitResponse.progress", undefined);
     let hit = undefined;
     if (elicitResponseChainingConfig && elicitResponseProgress === 'Fulfilled') {
         // elicitResponse is finishing up as the LexBot has fulfilled its intent.
