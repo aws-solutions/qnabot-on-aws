@@ -29,10 +29,10 @@ function qnaJsonParser(input_path, output_path, plainText) {
   q_list.forEach(function(elem) {
     elem.q.forEach(function(ques) {
       
-      // var ans = JSON.stringify(elem);
-      // var entry = {question:ques, answer: ans, link:'<document url>'};    // entire JSON field in the answer field
+      var json_doc = JSON.stringify(elem);
+      var entry = {question:ques, answer:elem.a, link:json_doc};    // entire JSON structure in URL field
       
-      var entry = {question:ques, answer:elem.a, link:'<document url>'};  // original
+      // var entry = {question:ques, answer:elem.a, link:'<document url>'};  // original
       data.push(entry);
     });
   });

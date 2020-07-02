@@ -81,6 +81,25 @@ function mergeIntervals(intervals) {
 }
 
 
+
+/** Function that returns if a string has JSON structure
+ * @param str - input string
+ * @returns boolean true or false
+ */
+function hasJsonStructure(str) {
+    if (typeof str !== 'string') return false;
+    try {
+        const result = JSON.parse(str);
+        const type = Object.prototype.toString.call(result);
+        return type === '[object Object]' 
+            || type === '[object Array]';
+    } catch (err) {
+        return false;
+    }
+}
+
+
+
 /** Function that processes kendra requests and handles response. Decides whether to handle SNS
  * events or Lambda Hook events from QnABot.
  * @param event - input event passed to the Lambda Handler
@@ -231,6 +250,8 @@ async function routeKendraRequest(event, context) {
                     kendraIndexId = res.originalKendraIndexId; // store off the Kendra IndexId to use as a session attribute for feedback
                     kendraResultId = element.Id; // store off resultId to use as a session attribute for feedback
                     foundAnswerCount++;
+                    
+                    // TODO: use json structure for query response from doc URL field
                     
                     
                 } else if (element.Type === 'DOCUMENT' && element.DocumentExcerpt.Text && element.DocumentURI) {

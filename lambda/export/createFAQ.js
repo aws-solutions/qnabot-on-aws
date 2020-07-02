@@ -1,7 +1,5 @@
 // createFAQ.js
 
-// TODO: don't hardcode
-
 
 const AWSKendra = require('aws-sdk/clients/kendra');
 const AWSS3 = require('aws-sdk/clients/s3');
@@ -107,8 +105,8 @@ function faqLister(kendraClient,params) {
  */
 async function createFAQ() {
     
-    // FAQ attributes // TODO: don't hardcode (also for the region)
-    let faq_name = 'solar-facts';
+    // FAQ attributes // TODO: don't hardcode
+    let faq_name = 'qna-facts';
     let faq_index_id = 'e1c23860-e5c8-4409-ae26-b05bd6ced00a';
     let csv_path = './test/qna_FAQ.csv';
     let csv_name = 'qna_FAQ.csv';
@@ -145,7 +143,6 @@ async function createFAQ() {
       MaxResults: '30'      // default max number of FAQs in developer edition
     //   NextToken: ''      // TODO: for when the number of FAQs goes over a page...
     };
-    // TODO: this errors when there are no FAQs already (empty arrays --> throttling exceptions)
     var list_faq_response = await faqLister(kendraClient, index_params);
     var j, elem, index=null;
     for (j=0; j<list_faq_response.FaqSummaryItems.length; j++) {
