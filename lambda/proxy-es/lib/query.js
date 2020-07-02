@@ -123,7 +123,7 @@ async function evaluateConditionalChaining(req, res, hit, conditionalChaining) {
         var lambdaName = conditionalChaining.split("::")[1] ;
         console.log("Calling Lambda:", lambdaName);
         var lambda= new aws.Lambda();
-        var res=await lambda.invoke({
+        var lambdares=await lambda.invoke({
             FunctionName:lambdaName,
             InvocationType:"RequestResponse",
             Payload:JSON.stringify({
@@ -131,7 +131,7 @@ async function evaluateConditionalChaining(req, res, hit, conditionalChaining) {
                 res:res
             })
         }).promise();
-        next_q=res.Payload;
+        next_q=lambdares.Payload;
     } else {
         // provide 'SessionAttributes' to chaining rule safeEval context, consistent with Handlebars context
         const SessionAttributes = (arg) => _.get(SessionAttributes, arg, undefined);
