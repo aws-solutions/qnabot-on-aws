@@ -39,8 +39,8 @@ async function get_parameter(param_name) {
     var settings = response.Parameter.Value
     if (isJson(settings)) {
         settings = JSON.parse(response.Parameter.Value);
+        settings = str2bool(settings) ;
     }
-    settings = str2bool(settings) ;
     return settings;
 }
 
@@ -143,7 +143,9 @@ module.exports = async function parse(req, res) {
     // get sentiment
     if (_.get(settings, 'ENABLE_SENTIMENT_SUPPORT')) {
         req.sentiment = await get_sentiment(req.question);
-    }    
+    } else {
+        req.sentiment = "NOT_ENABLED";
+    }  
 
     Object.assign(res, {
         type: "PlainText",
