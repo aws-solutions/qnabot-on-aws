@@ -1,6 +1,7 @@
 var Promise = require('bluebird')
 var lex = require('./lex')
 var multilanguage = require('./multilanguage')
+var get_sentiment=require('./sentiment');
 var alexa = require('./alexa')
 var _ = require('lodash')
 var AWS = require('aws-sdk');
@@ -138,6 +139,11 @@ module.exports = async function parse(req, res) {
         await multilanguage.set_multilang_env(req);
     }
     // end of multilanguage support 
+    
+    // get sentiment
+    if (_.get(settings, 'ENABLE_SENTIMENT_SUPPORT')) {
+        req.sentiment = await get_sentiment(req.question);
+    }    
 
     Object.assign(res, {
         type: "PlainText",

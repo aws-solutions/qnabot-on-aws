@@ -260,6 +260,9 @@ class Lex {
         if(params.childDirected){
             params.childDirected={"false":false,"true":true}[params.childDirected]
         }
+        if(params.detectSentiment){
+            params.detectSentiment={"false":false,"true":true}[params.detectSentiment]
+        }
         if(params.createVersion){
             params.createVersion={"false":false,"true":true}[params.createVersion]
         }
@@ -381,6 +384,9 @@ class Lex {
         if(this.type!=='Alias'){ // The type of Alias should not be updated.
             if(params.childDirected){
                 params.childDirected={"false":false,"true":true}[params.childDirected]
+            }
+            if(params.detectSentiment){
+                params.detectSentiment={"false":false,"true":true}[params.detectSentiment]
             }
             if(params.createVersion){
                 params.createVersion={"false":false,"true":true}[params.createVersion]

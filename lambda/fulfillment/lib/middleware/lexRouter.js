@@ -69,10 +69,10 @@ async function handleRequest(req, res, botName, botAlias) {
         const bName = process.env[botName];
         return bName ? bName : botName;
     }
-    function getFreeTextResponse(inputText) {
+    function getFreeTextResponse(inputText, sentiment) {
         let response = {
             message: "",
-            slots: { 'FreeText' : inputText},
+            slots: { 'FreeText' : inputText, 'Sentiment' : sentiment},
             dialogState: 'Fulfilled',
         }
         return response;
@@ -81,7 +81,7 @@ async function handleRequest(req, res, botName, botAlias) {
     let tempBotUserID = _.get(req,"_userInfo.UserId","nouser");
     tempBotUserID = tempBotUserID.substring(0, 100); // Lex has max userId length of 100
     if (botName === FREE_TEXT_ELICIT_RESPONSE_NAME) {
-        return getFreeTextResponse(_.get(req, "question"));
+        return getFreeTextResponse(_.get(req, "question"), _.get(req, "sentiment"));
     } else {
         const lexClient = new AWS.LexRuntime({apiVersion: '2016-11-28'});
         const params = {
