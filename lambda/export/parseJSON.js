@@ -38,5 +38,5 @@ function qnaJsonParser(input_path, output_path) {
 }
 
 exports.handler = async (params) => {
-    return qnaJsonParser(params.input_path, params.output);
+    return qnaJsonParser(params.input_path, params.output_path);
 };
