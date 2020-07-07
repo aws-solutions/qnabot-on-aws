@@ -133,10 +133,18 @@ async function evaluateConditionalChaining(req, res, hit, conditionalChaining) {
         }).promise();
         next_q=lambdares.Payload;
     } else {
-        // provide 'SessionAttributes' to chaining rule safeEval context, consistent with Handlebars context
+        // create chaining rule safeEval context, aligned with Handlebars context
         const SessionAttributes = (arg) => _.get(SessionAttributes, arg, undefined);
         _.assign(SessionAttributes, res.session);
-        const context={SessionAttributes};
+        const context={
+            LexOrAlexa: req._type,
+            UserInfo:req._userInfo, 
+            SessionAttributes,
+            Settings: req._settings,
+            Question: req.question,
+            OrigQuestion: _.get(req,"_event.origQuestion",req.question),
+            Sentiment: req.sentiment,
+        };
         console.log("Evaluating:", conditionalChaining);
         // safely evaluate conditionalChaining expression.. throws an exception if there is a syntax error
         next_q = safeEval(conditionalChaining, context);
