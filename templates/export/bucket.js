@@ -41,7 +41,7 @@ module.kendra_sync_exports={
                     Events:["s3:ObjectCreated:*"],
                     Filter:{Key:{FilterRules:[{
                         Name:"prefix",
-                        Value:"status"
+                        Value:"kendradata"
                     }]}}
                 }]
             }
