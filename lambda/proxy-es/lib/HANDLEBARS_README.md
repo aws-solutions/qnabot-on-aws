@@ -41,6 +41,7 @@ QnABot exposes the following content to the Handlebars context:
 |Settings._name_                   | all settings values are available to the handlebars context |
 |Question                          | the users utterance, or question - translated to English if ENABLE\_MULTI\_LANGUAGE\_SUPPORT is true |
 |OrigQuestion                      | the users utterance, or question - before translation to English if ENABLE\_MULTI\_LANGUAGE\_SUPPORT is true |
+|Sentiment                         | the detected sentiment value of user's question/utterance (POSITIVE\|NEGATIVE\|NEUTRAL\|MIXED)|
 
 
 ## Helpers
