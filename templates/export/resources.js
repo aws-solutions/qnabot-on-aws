@@ -91,6 +91,57 @@ module.exports=Object.assign(
             "ServiceToken": { "Ref" : "CFNLambda" },
             "Bucket":{"Ref":"ExportBucket"}
         }
+    },
+    "KendraSyncExportRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "lambda.amazonaws.com"
+              },
+              "Action": "sts:AssumeRole"
+            }
+          ]
+        },
+        "Path": "/",
+        "ManagedPolicyArns": [
+          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
+          {"Ref":"ExportPolicy"}
+        ]
+      }
+    },
+    "KendraySyncExportPolicy": {
+      "Type": "AWS::IAM::ManagedPolicy",
+      "Properties": {
+        "PolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [{
+              "Effect": "Allow",
+              "Action": [
+                "s3:*"
+              ],
+              "Resource":[{"Fn::Sub":"arn:aws:s3:::${ExportBucket}*"}]
+          },{
+              "Effect": "Allow",
+              "Action": [
+                "lambda:InvokeFunction"
+              ],
+              "Resource":[{"Ref":"EsProxyLambda"}]
+          }]
+        }
+      }
+    },
+    "SyncKendraExportClear":{
+        "Type": "Custom::S3Clear",
+        "Properties": {
+            "ServiceToken": { "Ref" : "CFNLambda" },
+            "Bucket":{"Ref":"ExportBucket"}
+        }
     }
+    
 })
 

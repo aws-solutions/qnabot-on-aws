@@ -4,15 +4,9 @@
  * Function to parse JSON of configurations/questions from QNA Content Designer and write an output CSV file
  * @param input_path : the input file path of the exported JSON
  * @param output_path : the output file path to write the CSV
- * @param plainText : a boolean to write the standard Q&A format or the JSON meta-data format
  * @returns output_path
  */
-function qnaJsonParser(input_path, output_path, plainText) {
-  // sets default behavior to construct a plain text FAQ which does NOT string-ify the entire JSON field into the 'Answer' column
-  if (plainText == undefined) {
-    plainText = true;
-  }
-  
+function qnaJsonParser(input_path, output_path) {
   const createCsvWriter = require('./node_modules/csv-writer').createObjectCsvWriter;
   const csvWriter = createCsvWriter({
     path: output_path,
@@ -32,7 +26,6 @@ function qnaJsonParser(input_path, output_path, plainText) {
       var json_doc = JSON.stringify(elem);
       var entry = {question:ques, answer:elem.a, link:json_doc};    // entire JSON structure in URL field
       
-      // var entry = {question:ques, answer:elem.a, link:'<document url>'};  // original
       data.push(entry);
     });
   });
@@ -44,6 +37,6 @@ function qnaJsonParser(input_path, output_path, plainText) {
   return output_path;
 }
 
-exports.handler = async (input, output, plainText) => {
-    return qnaJsonParser(input, output, plainText);
+exports.handler = async (params) => {
+    return qnaJsonParser(params.input_path, params.output);
 };

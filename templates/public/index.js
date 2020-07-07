@@ -29,7 +29,8 @@ module.exports=Promise.resolve(require('../master')).then(function(base){
         "Intent",
         "IntentFallback",
         "DefaultSettingsSSMParameterName",
-        "CustomSettingsSSMParameterName"
+        "CustomSettingsSSMParameterName",
+        "KendraIndexParameter"
     ])
 
     base.Parameters=_.pick(base.Parameters,[

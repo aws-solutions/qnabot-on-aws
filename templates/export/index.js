@@ -19,6 +19,7 @@ module.exports={
         "VarIndex": {"Type":"String"},
         "EsEndpoint": {"Type":"String"},
         "EsProxyLambda": {"Type":"String"},
-        "ExportBucket": {"Type":"String"}
+        "ExportBucket": {"Type":"String"},
+        "KendraIndexParameter": {"Type":"String"}
     }
 }

@@ -103,16 +103,16 @@ function faqLister(kendraClient,params) {
  * Function to upload CSV into S3 bucket and convert into Kendra FAQ, return Promise
  * @returns {*}
  */
-async function createFAQ() {
+async function createFAQ(params) {
     
     // FAQ attributes // TODO: don't hardcode
-    let faq_name = 'qna-facts';
-    let faq_index_id = 'e1c23860-e5c8-4409-ae26-b05bd6ced00a';
-    let csv_path = './test/qna_FAQ.csv';
-    let csv_name = 'qna_FAQ.csv';
-    let s3_bucket = 'explore-kendra-solar';
-    let kendra_s3_access_role = 'arn:aws:iam::425742325899:role/service-role/AmazonKendra-question-bucketer';
-    let region = 'us-east-1';
+    let faq_name = params.faq_name; //'qna-facts';
+    let faq_index_id = params.faq_index_id; //'e1c23860-e5c8-4409-ae26-b05bd6ced00a';
+    let csv_path = params.csv_path; //'./test/qna_FAQ.csv';
+    let csv_name = params.csv_name; //'qna_FAQ.csv';
+    let s3_bucket = params.s3_bucket; //'explore-kendra-solar';
+    let kendra_s3_access_role = params.kendra_s3_access_role; //'arn:aws:iam::425742325899:role/service-role/AmazonKendra-question-bucketer';
+    let region = params.region; //'us-east-1';
     
     
     // create kendra and s3 clients    
@@ -141,7 +141,6 @@ async function createFAQ() {
     var index_params = {
       IndexId: faq_index_id,
       MaxResults: '30'      // default max number of FAQs in developer edition
-    //   NextToken: ''      // TODO: for when the number of FAQs goes over a page...
     };
     var list_faq_response = await faqLister(kendraClient, index_params);
     var j, elem, index=null;
@@ -171,7 +170,7 @@ async function createFAQ() {
         Key: csv_name
       },
       Description: 'Exported FAQ of questions from QnABot designer console'
-      // if no tags, just comment it out because empty arrays cause throttling exceptions
+      // if no tags, delete parameter because empty arrays cause throttling exceptions
     };
     var faq_response = await faqConverter(kendraClient, faq_params);
 
@@ -179,6 +178,6 @@ async function createFAQ() {
 }
 
 // TODO: event and context will be triggered by the clicking on the menu item
-exports.handler = async() => {
-    return createFAQ();
+exports.handler = async(params) => {
+    return createFAQ(params);
 }

@@ -28,3 +28,34 @@ module.exports={
     }
 
 }
+
+module.kendra_sync_exports={
+    "KendraSyncFromS3":{
+        "Type": "Custom::S3Lambda",
+        "Properties": {
+            "ServiceToken": { "Ref" : "CFNLambda"},
+            "Bucket":{"Ref":"ExportBucket"},
+            NotificationConfiguration:{
+                LambdaFunctionConfigurations:[{
+                    LambdaFunctionArn:{"Fn::GetAtt":["KendraSyncLambda","Arn"]},
+                    Events:["s3:ObjectCreated:*"],
+                    Filter:{Key:{FilterRules:[{
+                        Name:"prefix",
+                        Value:"status"
+                    }]}}
+                }]
+            }
+        }
+    },
+    "KendraSyncPermission":{
+        "Type": "AWS::Lambda::Permission",
+        "Properties": {
+            "FunctionName":{"Fn::GetAtt":["KendraSyncLambda","Arn"]},
+            "Action": "lambda:InvokeFunction",
+            "Principal": "s3.amazonaws.com",
+            "SourceAccount": {"Ref": "AWS::AccountId"},
+            "SourceArn":{"Fn::Sub":"arn:aws:s3:::${ExportBucket}"}
+        }
+    }
+
+}
