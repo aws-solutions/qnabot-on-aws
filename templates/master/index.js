@@ -168,7 +168,14 @@ module.exports={
       "Type":"String",
       "Default":"TRUE"
     },
-    "KendraIndexParameter":{
+    "EnableKendraFAQ":{
+      "Type":"String",
+      "AllowedValues":["FALSE","TRUE"],
+      "ConstraintDescription":"Allowed Values are FALSE or TRUE",
+      "Default":"FALSE",
+      "Description":"Defines whether Kendra FAQ integration is enabled"
+    },
+    "KendraIndex":{
       "Type":"String",
       "Default":""
     }
@@ -179,7 +186,8 @@ module.exports={
     "Domain":{"Fn::Not":[{"Fn::Equals":[{"Ref":"ApprovedDomain"},"NONE"]}]},
     "BuildExamples":{"Fn::Equals":[{"Ref":"BuildExamples"},"TRUE"]},
     "CreateDomain":{"Fn::Equals":[{"Ref":"ElasticsearchName"},"EMPTY"]},
-    "DontCreateDomain":{"Fn::Not":[{"Fn::Equals":[{"Ref":"ElasticsearchName"},"EMPTY"]}]}
+    "DontCreateDomain":{"Fn::Not":[{"Fn::Equals":[{"Ref":"ElasticsearchName"},"EMPTY"]}]},
+    "KendraFAQ":{"Fn::Equals":[{"Ref":"EnableKendraFAQ"}, "TRUE"]}
   }
 }
 

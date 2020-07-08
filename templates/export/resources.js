@@ -137,10 +137,10 @@ module.exports=Object.assign(
             },
             "Environment": {
                 "Variables": {
-                    "KENDRA_INDEX":{"Ref":"KendraIndexParameter"},
+                    "KENDRA_INDEX":{"Ref":"KendraIndex"},
                     "OUTPUT_S3_BUCKET":{"Ref":"ExportBucket"},
-                    "KENDRA_ROLE":{"Ref":"KendraSyncRole"},
-                    "REGION":{"Ref":"AWS::Region"} // "$AWS_REGION"
+                    "KENDRA_ROLE":{"Fn::GetAtt": ["KendraSyncRole","Arn"]},
+                    "REGION":{"Ref":"AWS::Region"}
                 }
             },
             "Handler": "kendraSync.performSync",
@@ -166,6 +166,12 @@ module.exports=Object.assign(
                 "Service": "lambda.amazonaws.com"
               },
               "Action": "sts:AssumeRole"
+            },{
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "kendra.amazonaws.com"
+              },
+              "Action": "sts:AssumeRole"
             }
           ]
         },
@@ -187,12 +193,12 @@ module.exports=Object.assign(
                 "s3:*"
               ],
               "Resource":[{"Fn::Sub":"arn:aws:s3:::${ExportBucket}*"}]
-          // },{
-          //     "Effect": "Allow",
-          //     "Action": [
-          //       "lambda:InvokeFunction"
-          //     ],
-          //     "Resource":[{"Ref":"EsProxyLambda"}]
+          },{
+              "Effect": "Allow",
+              "Action": [
+                ""
+              ],
+              "Resource":[{"Ref":"KendraIndex"}]
           }]
         }
       }

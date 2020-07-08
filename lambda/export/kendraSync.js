@@ -32,22 +32,26 @@ exports.performSync=function(event,context,cb){
             content:content,
             output_path:'/tmp/qna_FAQ.csv',
         }
-        parse.handler(parseJSONparams);
-        console.log("Parsed content JSON into CSV stored locally");
-            
-        var createFAQparams = {
-            faq_name:'qna-facts',
-            faq_index_id:process.env.KENDRA_INDEX,
-            csv_path:parseJSONparams.output_path,
-            csv_name:parseJSONparams.csv_name,
-            s3_bucket:process.env.OUTPUT_S3_BUCKET,
-            s3_key:"kendra_csv" + "/" + parseJSONparams.csv_name,
-            kendra_s3_access_role:process.env.KENDRA_ROLE,
-            region:process.env.REGION
-        }
-        console.log('kendra role is ' + createFAQparams.kendra_s3_access_role);
-        create.handler(createFAQparams)
-        console.log('Completed CSV converting to FAQ');
+        parse.handler(parseJSONparams).then(()=>{
+            console.log("Parsed content JSON into CSV stored locally");
+                
+            var createFAQparams = {
+                faq_name:'qna-facts',
+                faq_index_id:process.env.KENDRA_INDEX,
+                csv_path:parseJSONparams.output_path,
+                csv_name:parseJSONparams.csv_name,
+                s3_bucket:process.env.OUTPUT_S3_BUCKET,
+                s3_key:"kendra_csv" + "/" + parseJSONparams.csv_name,
+                kendra_s3_access_role:process.env.KENDRA_ROLE,
+                region:process.env.REGION
+            }
+            console.log('s3 bucket is ' + createFAQparams.s3_bucket);
+            console.log('kendra role is ' + createFAQparams.kendra_s3_access_role);
+            create.handler(createFAQparams)
+            console.log('Completed CSV converting to FAQ');
+        });
     })
     .catch(cb)
+    
+    return 'Synced';
 }

@@ -18,7 +18,8 @@ module.exports={
     "publicPrefix":"artifacts/aws-ai-qna-bot",
     "devEmail":"",
     "namespace":"dev",
-    "stackNamePrefix":"QNA"
+    "stackNamePrefix":"QNA",
+    "KendraIndex":""
 }
 
 if (require.main === module) {

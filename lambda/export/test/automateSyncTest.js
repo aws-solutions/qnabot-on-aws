@@ -51,17 +51,32 @@ async function test_create_faq() {
     return create.handler(createFAQparams);
 }
 
-// TODO: test performSync
+//performSync test
+async function test_performSync() {
+    const kendraSync = require('../kendraSync.js');
+    const event = require('./syncEvent.json');
+    var context = undefined;
+    var cb = undefined;
+    process.env.OUTPUT_S3_BUCKET = 'qna-dev-dev-dev-master-2-exportbucket-nwlyflasajwe'
+    process.env.KENDRA_INDEX = 'e1c23860-e5c8-4409-ae26-b05bd6ced00a';
+    process.env.KENDRA_ROLE = 'arn:aws:iam::425742325899:role/QNA-dev-dev-dev-master-2-ExportStac-KendraSyncRole-1G3IEI1JF7L3S'
+    return kendraSync.performSync(event, context, cb);
+}
 
 describe('#test automate-sync()', () => {
-    it('test_json_parser', async function() {
-        let resp = await test_parser();
-        assert(resp, "CSV file does not exist!");
-    });
+    // it('test_json_parser', async function() {
+    //     let resp = await test_parser();
+    //     assert(resp, "CSV file does not exist!");
+    // });
     
-    it('test_create_faq', async function() {
-        let resp = await test_create_faq();
-        assert(resp, undefined);  // TODO: fill in later
+    // it('test_create_faq', async function() {
+    //     let resp = await test_create_faq();
+    //     assert(resp, undefined);  // TODO: fill in later
+    // });
+
+    it('test_perform_sync', async function() {
+        let resp = await test_performSync();
+        assert(resp, 'Synced');  // TODO: fill in later
     });
 });
 
