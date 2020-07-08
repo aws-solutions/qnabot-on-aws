@@ -167,6 +167,10 @@ module.exports={
     "BuildExamples":{
       "Type":"String",
       "Default":"TRUE"
+    },
+    "KendraIndexParameter":{
+      "Type":"String",
+      "Default":""
     }
   },
   "Conditions":{

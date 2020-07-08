@@ -6,10 +6,10 @@
  * @param output_path : the output file path to write the CSV
  * @returns output_path
  */
-function qnaJsonParser(input_path, output_path) {
+function qnaJsonParser(params) {
   const createCsvWriter = require('./node_modules/csv-writer').createObjectCsvWriter;
   const csvWriter = createCsvWriter({
-    path: output_path,
+    path: params.output_path,
     header: [
       {id: 'question', title: 'Question'},
       {id: 'answer', title: 'Answer'},
@@ -19,7 +19,7 @@ function qnaJsonParser(input_path, output_path) {
   
   const data = [];
   
-  const q_list = require(input_path).qna;
+  const q_list = params.content.qna;
   q_list.forEach(function(elem) {
     elem.q.forEach(function(ques) {
       
@@ -32,11 +32,11 @@ function qnaJsonParser(input_path, output_path) {
   
   csvWriter
     .writeRecords(data)
-    .then(()=> console.log('The CSV file ' + output_path + ' was written successfully'));
+    .then(()=> console.log('The CSV file ' + params.output_path + ' was written successfully'));
     
-  return output_path;
+  return params.output_path;
 }
 
 exports.handler = async (params) => {
-    return qnaJsonParser(params.input_path, params.output_path);
+    return qnaJsonParser(params);
 };

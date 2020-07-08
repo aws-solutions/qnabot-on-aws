@@ -105,48 +105,38 @@ function faqLister(kendraClient,params) {
  */
 async function createFAQ(params) {
     
-    // FAQ attributes // TODO: don't hardcode
-    let faq_name = params.faq_name; //'qna-facts';
-    let faq_index_id = params.faq_index_id; //'e1c23860-e5c8-4409-ae26-b05bd6ced00a';
-    let csv_path = params.csv_path; //'./test/qna_FAQ.csv';
-    let csv_name = params.csv_name; //'qna_FAQ.csv';
-    let s3_bucket = params.s3_bucket; //'explore-kendra-solar';
-    let kendra_s3_access_role = params.kendra_s3_access_role; //'arn:aws:iam::425742325899:role/service-role/AmazonKendra-question-bucketer';
-    let region = params.region; //'us-east-1';
-    
-    
     // create kendra and s3 clients    
     let kendraClient = (process.env.REGION ?
-            new AWSKendra({apiVersion: '2019-02-03', region: process.env.REGION}) :
-            new AWSKendra({apiVersion: '2019-02-03', region: region})
+            new AWSKendra({apiVersion:'2019-02-03', region:process.env.REGION}) :
+            new AWSKendra({apiVersion:'2019-02-03', region:params.region})
             );
     let s3Client = (process.env.REGION ?
-            new AWSS3({apiVersion: '2006-03-01', region: process.env.REGION}) :
-            new AWSS3({apiVersion: '2006-03-01'}));
+            new AWSS3({apiVersion:'2006-03-01', region:process.env.REGION}) :
+            new AWSS3({apiVersion:'2006-03-01', region:params.region}));
     console.log('clients created');
     
     
     // read in CSV and upload to S3 bucket
     var fs = require('fs');
     var s3_params = {
-      Bucket: s3_bucket,
-      Key: csv_name,
-      ACL: 'private',   // TODO: do we want this to be publicly readable by linking QID's?
-      Body: fs.createReadStream(csv_path),  // use read stream option in case file is large
+      Bucket: params.s3_bucket,
+      Key: params.s3_key,
+      ACL: 'bucket-owner-read',                     // TODO: should this param be public?
+      Body: fs.createReadStream(params.csv_path),   // use read stream option in case file is large
     };
     var s3_response = await s3Uploader(s3Client, s3_params);
     
     
     // if FAQ exists already, delete the old one and update it
     var index_params = {
-      IndexId: faq_index_id,
+      IndexId: params.faq_index_id,
       MaxResults: '30'      // default max number of FAQs in developer edition
     };
     var list_faq_response = await faqLister(kendraClient, index_params);
     var j, elem, index=null;
     for (j=0; j<list_faq_response.FaqSummaryItems.length; j++) {
         elem = list_faq_response.FaqSummaryItems[j];
-        if (elem.Name == faq_name) {
+        if (elem.Name == params.faq_name) {
             index = elem.Id;
             break;
         }
@@ -154,7 +144,7 @@ async function createFAQ(params) {
     if (index != null) {
         var delete_faq_params = {
           Id: index,
-          IndexId: faq_index_id
+          IndexId: params.faq_index_id
         }
         var del_faq_response = await faqDeleter(kendraClient, delete_faq_params);
     }
@@ -162,12 +152,12 @@ async function createFAQ(params) {
     
     // create the FAQ
     var faq_params = {
-      IndexId: faq_index_id,
-      Name: faq_name,
-      RoleArn: kendra_s3_access_role,
+      IndexId: params.faq_index_id,
+      Name: params.faq_name,
+      RoleArn: params.kendra_s3_access_role,
       S3Path: {
-        Bucket: s3_bucket,
-        Key: csv_name
+        Bucket: params.s3_bucket,
+        Key: params.s3_key
       },
       Description: 'Exported FAQ of questions from QnABot designer console'
       // if no tags, delete parameter because empty arrays cause throttling exceptions

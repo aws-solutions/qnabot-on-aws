@@ -16,6 +16,15 @@ module.exports=Object.assign(
             "BuildDate":(new Date()).toISOString()
         }
     },
+    "SyncCodeVersion":{
+        "Type": "Custom::S3Version",
+        "Properties": {
+            "ServiceToken": { "Ref" : "CFNLambda" },
+            "Bucket": {"Ref":"BootstrapBucket"},
+            "Key": {"Fn::Sub":"${BootstrapPrefix}/lambda/export.zip"},
+            "BuildDate":(new Date()).toISOString()
+        }
+    },
     "ExportStepLambda": {
       "Type": "AWS::Lambda::Function",
       "Properties": {
@@ -92,7 +101,60 @@ module.exports=Object.assign(
             "Bucket":{"Ref":"ExportBucket"}
         }
     },
-    "KendraSyncExportRole": {
+      "ExportStepLambda": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Code": {
+            "S3Bucket": {"Ref":"BootstrapBucket"},
+            "S3Key": {"Fn::Sub":"${BootstrapPrefix}/lambda/export.zip"},
+            "S3ObjectVersion":{"Ref":"ExportCodeVersion"}
+        },
+        "Environment": {
+            "Variables": {
+                ES_INDEX:{"Ref":"VarIndex"},
+                ES_ENDPOINT:{"Ref":"EsEndpoint"},
+                ES_PROXY:{"Ref":"EsProxyLambda"}
+            }
+        },
+        "Handler": "index.step",
+        "MemorySize": "1024",
+        "Role": {"Fn::GetAtt": ["ExportRole","Arn"]},
+        "Runtime": "nodejs10.x",
+        "Timeout": 300,
+        "Tags":[{
+            Key:"Type",
+            Value:"Export"
+        }]
+      }
+    },
+    "KendraSyncLambda": {
+        "Type": "AWS::Lambda::Function",
+        "Properties": {
+            "Code": {
+                "S3Bucket": {"Ref":"BootstrapBucket"},
+                "S3Key": {"Fn::Sub":"${BootstrapPrefix}/lambda/export.zip"},
+                "S3ObjectVersion":{"Ref":"SyncCodeVersion"}
+            },
+            "Environment": {
+                "Variables": {
+                    "KENDRA_INDEX":{"Ref":"KendraIndexParameter"},
+                    "OUTPUT_S3_BUCKET":{"Ref":"ExportBucket"},
+                    "KENDRA_ROLE":{"Ref":"KendraSyncRole"},
+                    "REGION":{"Ref":"AWS::Region"} // "$AWS_REGION"
+                }
+            },
+            "Handler": "kendraSync.performSync",
+            "MemorySize": "1024",
+            "Role": {"Fn::GetAtt": ["KendraSyncRole","Arn"]},
+            "Runtime": "nodejs10.x",
+            "Timeout": 300,
+            "Tags":[{
+                Key:"Type",
+                Value:"Sync"
+            }]
+        }
+    },
+    "KendraSyncRole": {
       "Type": "AWS::IAM::Role",
       "Properties": {
         "AssumeRolePolicyDocument": {
@@ -110,11 +172,11 @@ module.exports=Object.assign(
         "Path": "/",
         "ManagedPolicyArns": [
           "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
-          {"Ref":"ExportPolicy"}
+          {"Ref":"KendraSyncPolicy"}
         ]
       }
     },
-    "KendraySyncExportPolicy": {
+    "KendraSyncPolicy": {
       "Type": "AWS::IAM::ManagedPolicy",
       "Properties": {
         "PolicyDocument": {
@@ -125,23 +187,15 @@ module.exports=Object.assign(
                 "s3:*"
               ],
               "Resource":[{"Fn::Sub":"arn:aws:s3:::${ExportBucket}*"}]
-          },{
-              "Effect": "Allow",
-              "Action": [
-                "lambda:InvokeFunction"
-              ],
-              "Resource":[{"Ref":"EsProxyLambda"}]
+          // },{
+          //     "Effect": "Allow",
+          //     "Action": [
+          //       "lambda:InvokeFunction"
+          //     ],
+          //     "Resource":[{"Ref":"EsProxyLambda"}]
           }]
         }
       }
-    },
-    "SyncKendraExportClear":{
-        "Type": "Custom::S3Clear",
-        "Properties": {
-            "ServiceToken": { "Ref" : "CFNLambda" },
-            "Bucket":{"Ref":"ExportBucket"}
-        }
     }
-    
 })
 

@@ -25,11 +25,7 @@ module.exports={
             "SourceAccount": {"Ref": "AWS::AccountId"},
             "SourceArn":{"Fn::Sub":"arn:aws:s3:::${ExportBucket}"}
         }
-    }
-
-}
-
-module.kendra_sync_exports={
+    },
     "KendraSyncFromS3":{
         "Type": "Custom::S3Lambda",
         "Properties": {
