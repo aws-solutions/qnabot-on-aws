@@ -69,10 +69,19 @@ async function get_hit(req, res) {
         score_answer_field: _.get(req, '_settings.ES_SCORE_ANSWER_FIELD'),
         fuzziness: _.get(req, '_settings.ES_USE_FUZZY_MATCH'),
     };
+    
+    // TODO: find the parameter which says EnableKendraFAQ instead
+    if (_.get(req, "_settings.ALT_SEARCH_KENDRA_INDEXES").length > 0) {
+        // TODO: if Kendra engine is enabled, what 'question' do we want?
+        var kendra_question = _.get(req, '_settings.KENDRA_QUERY_QUESTION', 'no_hits_alternative');
+        query_params.question = kendra_question;
+    }
     var no_hits_question = _.get(req, '_settings.ES_NO_HITS_QUESTION', 'no_hits');
+    
     var response = await run_query(req, query_params);
     console.log("Query response: ", JSON.stringify(response,null,2));
     var hit = _.get(response, "hits.hits[0]._source");
+    
     if (hit) {
         res['got_hits'] = 1;  // response flag, used in logging / kibana
     } else {
