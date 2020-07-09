@@ -12,7 +12,15 @@ module.exports={
                         Name:"prefix",
                         Value:"status"
                     }]}}
-                }]
+                },{
+                    LambdaFunctionArn:{"Fn::GetAtt":["KendraSyncLambda","Arn"]},
+                    Events:["s3:ObjectCreated:*"],
+                    Filter:{Key:{FilterRules:[{
+                        Name:"prefix",
+                        Value:"data"
+                    }]}}
+                }
+                ]
             }
         }
     },
@@ -24,23 +32,6 @@ module.exports={
             "Principal": "s3.amazonaws.com",
             "SourceAccount": {"Ref": "AWS::AccountId"},
             "SourceArn":{"Fn::Sub":"arn:aws:s3:::${ExportBucket}"}
-        }
-    },
-    "KendraSyncFromS3":{
-        "Type": "Custom::S3Lambda",
-        "Properties": {
-            "ServiceToken": { "Ref" : "CFNLambda"},
-            "Bucket":{"Ref":"ExportBucket"},
-            NotificationConfiguration:{
-                LambdaFunctionConfigurations:[{
-                    LambdaFunctionArn:{"Fn::GetAtt":["KendraSyncLambda","Arn"]},
-                    Events:["s3:ObjectCreated:*"],
-                    Filter:{Key:{FilterRules:[{
-                        Name:"prefix",
-                        Value:"kendradata"
-                    }]}}
-                }]
-            }
         }
     },
     "KendraSyncPermission":{

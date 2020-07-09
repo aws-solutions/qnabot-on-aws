@@ -57,9 +57,9 @@ async function test_performSync() {
     const event = require('./syncEvent.json');
     var context = undefined;
     var cb = undefined;
-    process.env.OUTPUT_S3_BUCKET = 'qna-dev-dev-dev-master-2-exportbucket-nwlyflasajwe'
+    process.env.OUTPUT_S3_BUCKET = 'qna-dev-dev-dev-master-3-exportbucket-1nvhu6nwzea5j'
     process.env.KENDRA_INDEX = 'e1c23860-e5c8-4409-ae26-b05bd6ced00a';
-    process.env.KENDRA_ROLE = 'arn:aws:iam::425742325899:role/QNA-dev-dev-dev-master-2-ExportStac-KendraSyncRole-1G3IEI1JF7L3S'
+    process.env.KENDRA_ROLE = 'arn:aws:iam::425742325899:role/QNA-dev-dev-dev-master-3-ExportStac-KendraSyncRole-1RN4NKGMDFRNH'
     return kendraSync.performSync(event, context, cb);
 }
 
@@ -71,12 +71,12 @@ describe('#test automate-sync()', () => {
     
     // it('test_create_faq', async function() {
     //     let resp = await test_create_faq();
-    //     assert(resp, undefined);  // TODO: fill in later
+    //     assert(resp, 'Failed to create FAQ');
     // });
 
     it('test_perform_sync', async function() {
         let resp = await test_performSync();
-        assert(resp, 'Synced');  // TODO: fill in later
+        assert(resp, 'Synced'); 
     });
 });
 

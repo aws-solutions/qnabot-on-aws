@@ -27,7 +27,7 @@
                     "arn": "arn:aws:s3:::example-bucket"
                 },
                 "object": {
-                    "key": "qna_FAQ.json",
+                    "key": "data/qna.json",
                     "size": 1024,
                     "eTag": "8f9ad97afed386ca0ff9452ef2ca198a"
                 }

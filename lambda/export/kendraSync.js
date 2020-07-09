@@ -5,18 +5,11 @@ aws.config.region=process.env.AWS_REGION
 
 var s3=new aws.S3()
 const AWSS3 = require('aws-sdk/clients/s3')
-// var lambda=new aws.Lambda()
-var stride=parseInt(process.env.STRIDE)
 var _=require('lodash')
-// var start=require('./lib/start')
-// var step=require('./lib/step')
-// var join=require('./lib/join')
-// var clean=require('./lib/clean')
 var parse=require('./parseJSON')
 var create=require('./createFAQ')
 
 exports.performSync=function(event,context,cb){
-    console.log("step")
     console.log("Request",JSON.stringify(event,null,2))
     var Bucket=event.Records[0].s3.bucket.name
     var Key=decodeURI(event.Records[0].s3.object.key)

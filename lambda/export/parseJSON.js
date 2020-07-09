@@ -29,7 +29,6 @@ function qnaJsonParser(params) {
       data.push(entry);
     });
   });
-  console.log(`data is ${data}`);
   
   return csvWriter
     .writeRecords(data)

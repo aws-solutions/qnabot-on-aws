@@ -186,22 +186,29 @@ module.exports=Object.assign(
       "Type": "AWS::IAM::ManagedPolicy",
       "Properties": {
         "PolicyDocument": {
-          "Version": "2012-10-17",
-          "Statement": [{
-              "Effect": "Allow",
-              "Action": [
-                "s3:*"
-              ],
-              "Resource":[{"Fn::Sub":"arn:aws:s3:::${ExportBucket}*"}]
-          },{
-              "Effect": "Allow",
-              "Action": [
-                ""
-              ],
-              "Resource":[{"Ref":"KendraIndex"}]
+        "Version": "2012-10-17",
+        "Statement": [{
+          "Effect": "Allow",
+          "Action": [
+              "s3:PutObject",
+              "s3:GetObject",
+              "kendra:CreateFaq",
+              "kendra:ListFaqs",
+              "s3:ListBucket",
+              "kendra:TagResource",
+              "kendra:DeleteFaq"
+            ],
+            "Resource": [
+                {"Fn::Sub":"arn:aws:kendra:::index/${KendraIndex}"},
+                {"Fn::Sub":"arn:aws:kendra:::index/${KendraIndex}/faq/*"},
+                {"Fn::Sub":"arn:aws:s3:::${ExportBucket}"},
+                {"Fn::Sub":"arn:aws:s3:::${ExportBucket}/*"}
+            ]
           }]
         }
       }
     }
-})
+  }
+)
+
 
