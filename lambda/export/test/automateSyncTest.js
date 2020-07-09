@@ -43,9 +43,9 @@ async function test_create_faq() {
         faq_index_id:'e1c23860-e5c8-4409-ae26-b05bd6ced00a',
         csv_path:parseJSONparams.output_path,
         csv_name:parseJSONparams.csv_name,
-        s3_bucket:'qna-dev-dev-dev-master-2-exportbucket-nwlyflasajwe',
+        s3_bucket:'qna-dev-dev-dev-master-4-exportbucket-o5r0tsjifuu9',
         s3_key:"kendra_csv" + "/" + parseJSONparams.csv_name,
-        kendra_s3_access_role:'arn:aws:iam::425742325899:role/QNA-dev-dev-dev-master-2-ExportStac-KendraSyncRole-1G3IEI1JF7L3S',
+        kendra_s3_access_role:'arn:aws:iam::425742325899:role/QNA-dev-dev-dev-master-4-ExportStack-KendraS3Role-1D5W35EQT8OCX',
         region:'us-east-1'
     }
     return create.handler(createFAQparams);
@@ -57,9 +57,9 @@ async function test_performSync() {
     const event = require('./syncEvent.json');
     var context = undefined;
     var cb = undefined;
-    process.env.OUTPUT_S3_BUCKET = 'qna-dev-dev-dev-master-3-exportbucket-1nvhu6nwzea5j'
+    process.env.OUTPUT_S3_BUCKET = 'qna-dev-dev-dev-master-4-exportbucket-o5r0tsjifuu9'
     process.env.KENDRA_INDEX = 'e1c23860-e5c8-4409-ae26-b05bd6ced00a';
-    process.env.KENDRA_ROLE = 'arn:aws:iam::425742325899:role/QNA-dev-dev-dev-master-3-ExportStac-KendraSyncRole-1RN4NKGMDFRNH'
+    process.env.KENDRA_ROLE = 'arn:aws:iam::425742325899:role/QNA-dev-dev-dev-master-4-ExportStack-KendraS3Role-1D5W35EQT8OCX'
     return kendraSync.performSync(event, context, cb);
 }
 
