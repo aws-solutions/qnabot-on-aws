@@ -65,7 +65,7 @@ async function update_userInfo(userId, req_userInfo) {
 module.exports=async function preprocess(req,res){
 
     // lex-web-ui: If idtoken session attribute is present, decode it
-    var idtoken = _.get(req,'_event.sessionAttributes.idtokenjwt');
+    var idtoken = _.get(req,'session.idtokenjwt');
     var idattrs={};
     if (idtoken) {
         var decoded = jwt.decode(idtoken);
@@ -87,6 +87,14 @@ module.exports=async function preprocess(req,res){
             }     
         } else {
             console.log("Invalid idtokenjwt - cannot decode");
+        }
+    }
+    // Do we need to enforce authentication?
+    if (_.get(req, '_settings.ENFORCE_VERIFIED_IDENTITY')) {
+        if ( _.get(idattrs, 'verifiedIdentity') === "false") {
+            // identity is not verified
+            // reset question to the configured no_verified_identity question
+            req.question = _.get(req, '_settings.NO_VERIFIED_IDENTITY_QUESTION','no_verified_identity') ;
         }
     }
     // Add _userInfo to req, from UsersTable

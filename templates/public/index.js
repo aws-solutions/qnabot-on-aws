@@ -34,9 +34,10 @@ module.exports=Promise.resolve(require('../master')).then(function(base){
 
     base.Parameters=_.pick(base.Parameters,[
         "Email",
-        "Username"
+        "Username",
+        "PublicOrPrivate"
     ])
-    base.Conditions.Public={"Fn::Equals":[true,true]}
+    base.Conditions.Public={"Fn::Equals":[{"Ref":"PublicOrPrivate"},"PUBLIC"]},
     base.Conditions.AdminSignUp={"Fn::Equals":[true,true]}
     base.Conditions.Domain={"Fn::Equals":[true,false]}
     base.Conditions.BuildExamples={"Fn::Equals":[true,true]}

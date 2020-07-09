@@ -135,13 +135,6 @@ module.exports={
       "ConstraintDescription":"Allowed Values are FALSE or TRUE",
       "Default":"TRUE"
     },
-    "PublicOrPrivate":{
-        "Type":"String",
-        "Description":"(optional) Whether access to the QnABot should be publicly available or restricted to users in QnABot UserPool. Allowed values are PUBLIC or PRIVATE",
-        "AllowedPattern":"(PUBLIC|PRIVATE)",
-        "Default":"PUBLIC",
-        "ConstraintDescription":"Allowed Values are PUBLIC or PRIVATE"
-    },
     "ApprovedDomain":{
         "Type":"String",
         "Description":"(optional) If QnABot is private, restrict user sign up to users whos email domain matches this domain. eg. amazon.com",
@@ -167,7 +160,13 @@ module.exports={
     "BuildExamples":{
       "Type":"String",
       "Default":"TRUE"
-    }
+    },
+    "PublicOrPrivate":{
+        "Type":"String",
+        "Description":"Choose whether access to the QnABot client should be publicly available or restricted to users in QnABot UserPool.",
+        "AllowedValues" : ["PUBLIC", "PRIVATE"],
+        "Default":"PUBLIC"
+    },
   },
   "Conditions":{
     "Public":{"Fn::Equals":[{"Ref":"PublicOrPrivate"},"PUBLIC"]},

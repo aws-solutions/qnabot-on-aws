@@ -71,8 +71,11 @@ document.addEventListener('DOMContentLoaded', function(){
         var LexWebUi=require('aws-lex-web-ui/dist/lex-web-ui.js')
         var store=new Vuex.Store(LexWebUi.Store)
         if(auth.username){
-            config.ui.toolbarTitle+=":"+auth.username
+            config.ui.toolbarTitle+=" ["+auth.username+"]";
         }
+        config.lex.sessionAttributes = {
+            idtokenjwt:auth.idtoken,
+        } ;
         store.state.Login=auth.Login
         store.state.Username=auth.username
         Vue.use(LexWebUi.Plugin,{
