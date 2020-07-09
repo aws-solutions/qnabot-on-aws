@@ -66,7 +66,7 @@ module.exports=async function preprocess(req,res){
 
     // lex-web-ui: If idtoken session attribute is present, decode it
     var idtoken = _.get(req,'session.idtokenjwt');
-    var idattrs={};
+    var idattrs={"verifiedIdentity":"false"};
     if (idtoken) {
         var decoded = jwt.decode(idtoken);
         if (decoded) {
@@ -91,7 +91,7 @@ module.exports=async function preprocess(req,res){
     }
     // Do we need to enforce authentication?
     if (_.get(req, '_settings.ENFORCE_VERIFIED_IDENTITY')) {
-        if ( _.get(idattrs, 'verifiedIdentity') === "false") {
+        if ( _.get(idattrs, 'verifiedIdentity',"false") != "true") {
             // identity is not verified
             // reset question to the configured no_verified_identity question
             req.question = _.get(req, '_settings.NO_VERIFIED_IDENTITY_QUESTION','no_verified_identity') ;
