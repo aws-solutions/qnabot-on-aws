@@ -139,7 +139,7 @@ module.exports=Object.assign(
                 "Variables": {
                     "KENDRA_INDEX":{"Ref":"KendraIndex"},
                     "OUTPUT_S3_BUCKET":{"Ref":"ExportBucket"},
-                    "KENDRA_ROLE":{"Fn::GetAtt": ["KendraSyncRole","Arn"]},
+                    "KENDRA_ROLE":{"Fn::GetAtt": ["KendraS3Role","Arn"]},
                     "REGION":{"Ref":"AWS::Region"}
                 }
             },
@@ -196,13 +196,63 @@ module.exports=Object.assign(
               "kendra:ListFaqs",
               "s3:ListBucket",
               "kendra:TagResource",
-              "kendra:DeleteFaq"
+              "kendra:DeleteFaq",
+              "iam:passRole"
             ],
             "Resource": [
-                {"Fn::Sub":"arn:aws:kendra:::index/${KendraIndex}"},
-                {"Fn::Sub":"arn:aws:kendra:::index/${KendraIndex}/faq/*"},
+                {"Fn::Sub":"arn:aws:kendra:${AWS::Region}:${AWS::AccountId}:index/${KendraIndex}"},
+                {"Fn::Sub":"arn:aws:kendra:${AWS::Region}:${AWS::AccountId}:index/${KendraIndex}/faq/*"},
                 {"Fn::Sub":"arn:aws:s3:::${ExportBucket}"},
-                {"Fn::Sub":"arn:aws:s3:::${ExportBucket}/*"}
+                {"Fn::Sub":"arn:aws:s3:::${ExportBucket}/*"},
+                {"Fn::GetAtt": ["KendraS3Role","Arn"]}
+            ]
+          }]
+        }
+      }
+    },
+    "KendraS3Role": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "lambda.amazonaws.com"
+              },
+              "Action": "sts:AssumeRole"
+            },{
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "kendra.amazonaws.com"
+              },
+              "Action": "sts:AssumeRole"
+            }
+          ]
+        },
+        "Path": "/",
+        "ManagedPolicyArns": [
+          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
+          {"Ref":"KendraS3Policy"}
+        ]
+      }
+    },
+    "KendraS3Policy": {
+      "Type": "AWS::IAM::ManagedPolicy",
+      "Properties": {
+        "PolicyDocument": {
+        "Version": "2012-10-17",
+        "Statement": [{
+          "Effect": "Allow",
+          "Action": [
+              "s3:GetObject",
+              "kendra:CreateFaq",
+            ],
+            "Resource": [
+                {"Fn::Sub":"arn:aws:kendra:${AWS::Region}:${AWS::AccountId}:index/${KendraIndex}"},
+                {"Fn::Sub":"arn:aws:s3:::${ExportBucket}"},
+                {"Fn::Sub":"arn:aws:s3:::${ExportBucket}/*"},
             ]
           }]
         }

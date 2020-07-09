@@ -147,6 +147,8 @@ async function createFAQ(params) {
           IndexId: params.faq_index_id
         }
         var del_faq_response = await faqDeleter(kendraClient, delete_faq_params);
+    } else {
+        console.log("No old FAQ to delete");
     }
     
     

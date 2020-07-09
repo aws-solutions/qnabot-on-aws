@@ -38,8 +38,6 @@ exports.performSync=function(event,context,cb){
                 kendra_s3_access_role:process.env.KENDRA_ROLE,
                 region:process.env.REGION
             }
-            console.log('s3 bucket is ' + createFAQparams.s3_bucket);
-            console.log('kendra role is ' + createFAQparams.kendra_s3_access_role);
             create.handler(createFAQparams)
             console.log('Completed CSV converting to FAQ');
         });
