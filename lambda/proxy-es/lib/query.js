@@ -191,7 +191,7 @@ module.exports = async function (req, res) {
     const elicitResponseChainingConfig = _.get(res, "session.qnabotcontext.elicitResponse.chainingConfig", undefined);
     const elicitResponseProgress = _.get(res, "session.qnabotcontext.elicitResponse.progress", undefined);
     let hit = undefined;
-    if (elicitResponseChainingConfig && elicitResponseProgress === 'Fulfilled') {
+    if (elicitResponseChainingConfig && (elicitResponseProgress === 'Fulfilled') || elicitResponseProgress === 'ReadyForFulfillment') {
         // elicitResponse is finishing up as the LexBot has fulfilled its intent.
         // we use a fakeHit with either the Bot's message or an empty string.
         let fakeHit = {};
