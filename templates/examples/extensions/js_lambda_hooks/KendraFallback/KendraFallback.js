@@ -117,13 +117,15 @@ async function routeKendraRequest(event, context) {
     let indexes = event.req["_settings"]["ALT_SEARCH_KENDRA_INDEXES"] ? event.req["_settings"]["ALT_SEARCH_KENDRA_INDEXES"] : process.env.KENDRA_INDEXES
     if (indexes && indexes.length) {
         try {
+            // parse JSON array of kendra indexes
             kendraIndexes = JSON.parse(indexes);
         } catch (err) {
-            console.warn('kendra indexes could not be parsed');
+            // assume setting is a string containing single index
+            kendraIndexes = [ indexes ];
         }
     }
     if (kendraIndexes === undefined) {
-        throw new Error('Undefined Kendra Indexe');
+        throw new Error('Undefined Kendra Index');
     }
 
     // This function can handle configuration with an array of kendraIndexes.

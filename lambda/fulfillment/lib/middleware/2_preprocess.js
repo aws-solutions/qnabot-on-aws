@@ -4,7 +4,6 @@ var util=require('./util');
 var jwt=require('./jwt');
 var AWS=require('aws-sdk');
 
-
 async function get_userInfo(userId, idattrs) {
     var default_userInfo = {
         UserId:userId,
@@ -75,6 +74,13 @@ module.exports=async function preprocess(req,res){
             var kid = _.get(decoded,'header.kid');
             var default_jwks_url = [_.get(req,'_settings.DEFAULT_USER_POOL_JWKS_URL')];
             var identity_provider_jwks_url = _.get(req,'_settings.IDENTITY_PROVIDER_JWKS_URLS');
+            if (identity_provider_jwks_url && identity_provider_jwks_url.length) {
+                try {
+                    identity_provider_jwks_url = JSON.parse(identity_provider_jwks_url);
+                } catch (err) {
+                    true
+                }
+            }
             var urls = default_jwks_url.concat(identity_provider_jwks_url);
             console.log("Attempt to verify idtoken using jwks urls:",urls);
             var verified_url = await jwt.verify(kid,urls) ;
