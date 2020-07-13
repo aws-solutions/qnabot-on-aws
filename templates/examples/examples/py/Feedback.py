@@ -17,32 +17,22 @@ def handler(event, context):
     kendraResultId = None
     kendraResponsibleQid = None
 
-    try:
-        if "sessionAttributes" in event["req"]["_event"]:
-            kendraIndexId = event["req"]["_event"]["sessionAttributes"]["kendraIndexId"]
-            kendraQueryId = event["req"]["_event"]["sessionAttributes"]["kendraQueryId"]
-            kendraResultId = event["req"]["_event"]["sessionAttributes"]["kendraResultId"]
-            kendraResponsibleQid = event["req"]["_event"]["sessionAttributes"]["kendraResponsibleQid"]
-            #for Alexa
-        else:
-            kendraIndexId = event["req"]["_event"]["session"]["attributes"]["kendraIndexId"]
-            kendraQueryId = event["req"]["_event"]["session"]["attributes"]["kendraQueryId"]
-            kendraResultId = event["req"]["_event"]["session"]["attributes"]["kendraResultId"]
-            kendraResponsibleQid = event["req"]["_event"]["session"]["attributes"]["kendraResponsibleQid"]
-    except Exception as e:
-        print("no kendra information present: ", e)
+    if event.get('req',{}).get('session',{}).get('qnabotcontext',{}).get('kendra'):
+        kendraIndexId = event.get('req').get('session').get('qnabotcontext').get('kendra').get('kendraIndexId')
+        kendraQueryId = event.get('req').get('session').get('qnabotcontext').get('kendra').get('kendraQueryId')
+        kendraResultId = event.get('req').get('session').get('qnabotcontext').get('kendra').get('kendraResultId')
+        kendraResponsibleQid = event.get('req').get('session').get('qnabotcontext').get('kendra').get('kendraResponsibleQid')
+    else:
+        print("no kendra information present in session attribute qnabotcontext")
+
 
     try:
         #get the Question ID (qid) of the previous document that was returned to the web client 
-        if "sessionAttributes" in event["req"]["_event"]:
-            stringToJson = json.loads(event["req"]["_event"]["sessionAttributes"]["previous"])
-        #for Alexa
-        else:
-            stringToJson = json.loads(event["req"]["_event"]["session"]["attributes"]["previous"])
-        previousQid = stringToJson["qid"]
-        previousQuestion = stringToJson["q"]
-        previousAnswer = stringToJson["a"]
-        previousAlt = stringToJson["alt"]
+        previous = event["req"]["session"]["previous"]
+        previousQid = previous["qid"]
+        previousQuestion = previous["q"]
+        previousAnswer = previous["a"]
+        previousAlt = previous["alt"]
         feedbackArg = event["res"]["result"]["args"][0]
         print(feedbackArg)
         # - Check feedbackArg from the UI payload. Parse for "thumbs_down_arg" feedback. Based on user action, sendFeedback through SNS, and log in Firehose. 

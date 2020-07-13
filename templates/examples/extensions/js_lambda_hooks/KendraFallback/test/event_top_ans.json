@@ -5,15 +5,19 @@
             "invocationSource": "FulfillmentCodeHook",
             "userId": "us-east-1:4f20bd96-a761-4541-a1d9-fcbb0e51c236",
             "sessionAttributes": {
-                "kendraResponsibleQid": "KendraFallback",
                 "navigation": "{\"next\":\"\",\"previous\":[],\"hasParent\":true}",
                 "userLocale": "en",
                 "previous": "{\"qid\":\"KendraFallback\",\"a\":\"The Kendra Fallback search was not able to identify any results\",\"alt\":{},\"q\":\"How many layers does the sun have?\"}",
                 "userDetectedLocaleConfidence": "0.9988220930099487",
-                "kendraIndexId": "e1c23860-e5c8-4409-ae26-b05bd6ced00a",
-                "kendraQueryId": "09c519d4-4b9a-4355-a586-e25e64285c4f",
+                "qnabotcontext": {
+                    "kendra":{
+                        "kendraIndexId":"e1c23860-e5c8-4409-ae26-b05bd6ced00a",
+                        "kendraQueryId":"09c519d4-4b9a-4355-a586-e25e64285c4f",
+                        "kendraResultId":"09c519d4-4b9a-4355-a586-e25e64285c4f-3527f152-b335-4619-a934-b5d7eecd1982",
+                        "kendraResponsibleQid": "KendraFallback"
+                    }
+                }
                 "userDetectedLocale": "en",
-                "kendraResultId": "09c519d4-4b9a-4355-a586-e25e64285c4f-3527f152-b335-4619-a934-b5d7eecd1982"
             },
             "requestAttributes": null,
             "bot": {

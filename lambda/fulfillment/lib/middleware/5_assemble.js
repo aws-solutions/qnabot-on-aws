@@ -30,13 +30,13 @@ function resetAttributes(req,res) {
         let obj = JSON.parse(previous);
         prevQid = obj.qid;
     }
-    kendraResponsibleQid = _.get(res.session,"kendraResponsibleQid");
+    kendraResponsibleQid = _.get(res.session,"qnabotcontext.kendra.kendraResponsibleQid");
     if ( (res.result === undefined || res.result.qid === undefined) || ( kendraResponsibleQid && (res.result.qid !== kendraResponsibleQid))) {
         // remove any prior session attributes for kendra as they are no longer valid
-        if (res.session.kendraQueryId) delete res.session.kendraQueryId;
-        if (res.session.kendraIndexId) delete res.session.kendraIndexId;
-        if (res.session.kendraResultId) delete res.session.kendraResultId;
-        if (res.session.kendraResponsibleQid) delete res.session.kendraResponsibleQid;
+        _.unset(res,"session.qnabotcontext.kendra.kendraQueryId") ;
+        _.unset(res,"session.qnabotcontext.kendra.kendraIndexId") ;
+        _.unset(res,"session.qnabotcontext.kendra.kendraResultId") ;
+        _.unset(res,"session.qnabotcontext.kendra.kendraResponsibleQid") ;
     }
 }
 
