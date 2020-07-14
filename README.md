@@ -7,22 +7,17 @@ This repository contains code for the QnABot, described in the AWS AI blog post 
 
 See the "Getting Started" to launch your own QnABot
 
+**New features in 4.0.0** [Update to Elasticsearch 7.4, improved question matching accuracy, fuzzy matching, new multi-language support debug setting, SSML for Amazon Connect, improved Kendra integration, full upgrade support](#new-features)
+
 **New features in 3.0.3** [New content tuning Readme, Enhanced CFN Lex Resource to work with manually created Bot versions](#new-features)
 
 **New features in 3.0.2** [New Elicit Response Bots, Lambda Functions backing conditional chaining, Lex Bot versioning use](#new-features)
 
 **New features in 3.0.0** [ElicitResponse, Conditional Chaining, new Launch regions](#new-features)
 
-**Note that versions prior to 3.0.0 will not directly upgrade to this version.** If running version 2.6.n,
-you will need to:
-- Export your old configuration to a json file and download to your system using the Designer UI
-- Install this stack as a new QnABot
-- Import your prior configuration to the new QnABot using the Designer UI
-- If using the standalone LexWebUi, you will need to redeploy a new LexWebUi and configure
-to use the new QnABot
-
-Once you are completely satisfied of proper operation of your new Bot and new LexWebUi, you can remove the old 
-stacks.
+## Upgrade Notes
+During an upgrade, we recommend that existing QnABot content first be exported and downloaded from the Content Designer prior to 
+the upgrade. In this release we expect upgrade to be smooth but just in case you should always have your QnABot content preserved. 
 
 ## Prerequisites
 
@@ -34,6 +29,19 @@ stacks.
 
 
 ## Getting Started
+Two approaches can be used to get started. Deploy from pre-created repositories or clone the repo and build a version yourself.
+
+### Pre-created deployment 
+Click a button to launch QnABot CloudFormation stack in the desired region
+
+| Region   |  Launch | 
+|----------|:-------------:|
+| Northern Virginia | <a target="_blank" href="https://us-east-1.console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/new?stackName=QnABot&templateURL=http://aws-bigdata-blog.s3.amazonaws.com/artifacts/aws-ai-qna-bot/templates/public.json"><span><img height="24px" src="https://s3.amazonaws.com/cloudformation-examples/cloudformation-launch-stack.png"/></span></a>     |
+| Oregon | <a target="_blank" href="https://us-west-2.console.aws.amazon.com/cloudformation/home?region=us-west-2#/stacks/new?stackName=QnABot&templateURL=http://aws-bigdata-blog-replica-us-west-2.s3.us-west-2.amazonaws.com/artifacts/aws-ai-qna-bot/templates/public.json"><span><img height="24px" src="https://s3.amazonaws.com/cloudformation-examples/cloudformation-launch-stack.png"/></span></a> |
+| Ireland | <a target="_blank" href="https://eu-west-1.console.aws.amazon.com/cloudformation/home?region=eu-west-1#/stacks/new?stackName=QnABot&templateURL=https://aws-bigdata-blog-replica-eu-west-1.s3-eu-west-1.amazonaws.com/artifacts/aws-ai-qna-bot/templates/public.json"><span><img height="24px" src="https://s3.amazonaws.com/cloudformation-examples/cloudformation-launch-stack.png"/></span></a> |
+| Sydney | <a target="_blank" href="https://ap-southeast-2.console.aws.amazon.com/cloudformation/home?region=ap-southeast-2#/stacks/new?stackName=QnABot&templateURL=https://aws-bigdata-blog-replica-ap-southeast-2.s3-ap-southeast-2.amazonaws.com/artifacts/aws-ai-qna-bot/templates/public.json"><span><img height="24px" src="https://s3.amazonaws.com/cloudformation-examples/cloudformation-launch-stack.png"/></span></a> |
+
+### Clone the git repo and build a version
 First, install all prerequisites:
 ```shell
 npm install 
@@ -140,7 +148,16 @@ We are currently working on adding Microsoft Edge support.
 ## License
 See the [LICENSE.md](LICENSE.md) file for details
 
-## New features
+## New features 
+
+### Version 4.0.0
+- Update to Elasticsearch 7.4
+- Improved question matching accuracy and tuning
+- Tolerance for typos and minor spelling errors with fuzzy matching setting
+- Easier troubleshooting when using voice or multi-language support with new debug setting
+- SSML support when using Amazon Connect
+- Improvements to Amazon Kendra integration
+- Full upgrade support without data loss when upgrading from previous versions.
 
 ### Content Tuning and Accuracy Guide
 Content Tuning an and Accuracy Guide now available as a Markdown Readme.  [README](tuning_accuracy_guide/AWS_QnABot_tuning_recognition_accuracy_guide.md)
@@ -245,36 +262,14 @@ be found in QnABot.
 review the Kendra pricing structure. The fallback mechanism for QnABot can be useful when deploying Kendra as an
 Enterprise search solution.**
  
-To enable this support for your Kendra indexes add the Custom Property 'ALT_SEARCH_KENDRA_INDEXES' 
-to QnABot's set of custom properties in Systems Manager Parameter Store. 
-
-This custom property will contain a string value that specifies an array of 
-Kendra indexes to search. At least one index must be specified. Until this custom property 
-is set in QnABot, use of Kendra as a fallback mechanism will return an error. 
-
-To find your custom property name used in Parameter store, open the QnABot CF stack outputs. You'll set key in QnABot CF
-Stack Outputs called 'CustomSettingsSSMParameterName'. If will have a value similar to 
-
+To enable this support for your Kendra indexes, use the Settings UI in the Designer and add your 
+index to the ALT_SEARCH_KENDRA_INDEXS parameter. This parameter takes an array of strings and uses the form below.
 ```
-CFN-CustomQnABotSettings-EOVHQJcYx9Ms
+["a672e3a2-nnnn-nnnn-nnnn-7b3abc81c313"]
 ```
-
-Once you know the name of your parameter, use the SSM Parameter Store UI to edit the parameter. 
-Add your Kendra IndexId to a key/value pair in this json object. If you already
-have set a new custom property for QnABot you will need to 
-add to the object a new key/value pair rather than replacing the entire string. Once completed your property
-will look similar to the following.  
-
-```
-{"ALT_SEARCH_KENDRA_INDEXES":"[\"857710ab-9637-4a46-910f-9a1456d02596\"]"}
-```
-
-**Note the Escaped Quote marks around the array of Kendra index ids are required**
-
 **Don't forget to use your Kendra Index ID rather than the one in the sample**
 
-The last step you need to perform to enable this feature is to use the QnABot Designer UI to import a Sample/Extension 
-named KendraFallback.
+Next use the QnABot Designer UI to import a Sample/Extension named KendraFallback.
 
 This loads a new question with a qid of "KendraFallback". Edit this question in the Designer UI and change its question from 
 "no_hits_alternative" to "no_hits" and save the changes. 
@@ -283,8 +278,8 @@ If you have previously loaded the QnAUtility.json from Examples/Extensions you n
 the question with the ID "CustomNoMatches" or change the question for this ID from "no_hits" to "no_hits_original"
 
 Once the new question, "KendraFallback" is configured as the response for "no_hits", the Kendra index will be
-searched for an answer whenever a curated answer can not be found. Once setup, Kendra provides a fallback 
-mechanism prior to telling the user an answer could not be found. 
+searched for an answer whenever a curated answer can not be found. This feature provides a fallback mechanism
+prior to telling the user an answer could not be found. 
 
 A [workshop](https://github.com/aws-samples/aws-ai-qna-bot/tree/master/workshops/reinvent2019/readme.md) is available in github 
 that will walk you through setting up this feature. 

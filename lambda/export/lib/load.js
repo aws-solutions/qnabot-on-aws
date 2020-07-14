@@ -28,6 +28,7 @@ module.exports=function(config,body){
                     delete out.questions
                     delete out.quniqueterms;
                 }else{
+                    out._id=x._id;
                 }
                 return JSON.stringify(out)
             }).join('\n')

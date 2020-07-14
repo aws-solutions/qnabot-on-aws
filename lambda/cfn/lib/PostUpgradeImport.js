@@ -9,9 +9,13 @@ async function copyData(s3exportparms,s3importparms) {
         var res = await s3.getObject(s3exportparms).promise() ;
         var data_json=res.Body.toString()
         var count = data_json.length ;
-        console.log("Copy data to import bucket: length: "+count);
-        s3importparms.Body=data_json;
-        res = await s3.putObject(s3importparms).promise() ;
+        if (count > 0) {
+            console.log("Copy data to import bucket: length: "+count);
+            s3importparms.Body=data_json;
+            res = await s3.putObject(s3importparms).promise() ;            
+        } else {
+            console.log("Export file has no data - skipping import");
+        }
         return count;
     } catch(err) {
         console.log("No previously exported data:", err);
@@ -68,13 +72,10 @@ async function run_import(params,reply) {
     var count=await copyData(s3exportparms,s3importparms);
     if (count > 0) {
         console.log("Running import process.");
-        // Create object in import bucket to trigger import lambda
         var s3params = {
             Bucket: params.importbucket, 
             Key: data.config,
-            Body: JSON.stringify(data), 
         };
-        await s3.putObject(s3params).promise();
         console.log("Wait up to 60 seconds for status to be completed");
         delete s3params.Body;
         var complete = await waitForImport(s3params,60000);

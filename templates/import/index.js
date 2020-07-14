@@ -16,9 +16,12 @@ module.exports={
         "CFNInvokePolicy":{"Type":"String"},
         "BootstrapBucket":{"Type":"String"},
         "BootstrapPrefix":{"Type":"String"},
-        "VarIndex": {"Type":"String"},
         "EsEndpoint": {"Type":"String"},
         "EsProxyLambda": {"Type":"String"},
-        "ImportBucket": {"Type":"String"}
+        "ImportBucket": {"Type":"String"},
+        "ExportBucket": {"Type":"String"},
+        "VarIndex": {"Type":"String"},
+        "MetricsIndex": {"Type":"String"},
+        "FeedbackIndex": {"Type":"String"},
     }
 }

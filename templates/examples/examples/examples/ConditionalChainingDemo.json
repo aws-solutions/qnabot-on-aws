@@ -36,36 +36,12 @@
       ]
     },
     {
-      "args": [
-        ""
-      ],
-      "next": "",
-      "a": "{{SessionAttributes.demo.name.FirstName}}, since you are over 60 let me recommend the movie First Man. It takes a look at the life of the astronaut, Neil Armstrong, and the legendary space mission that led him to become the first man to walk on the Moon.",
-      "r": {
-        "buttons": [
-          {
-            "text": "",
-            "value": ""
-          }
-        ],
-        "subTitle": "",
-        "imageUrl": "",
-        "title": "",
-        "text": "",
-        "url": ""
-      },
-      "t": "",
-      "elicitResponse": {
-        "response_sessionattr_namespace": "",
-        "responsebot_hook": ""
-      },
-      "alt": {
-        "markdown": "{{SessionAttributes.demo.name.FirstName}}, since you are over 60 let me recommend the movie **First Man**. It takes a look at the life of the astronaut, Neil Armstrong, and the legendary space mission that led him to become the first man to walk on the Moon.",
-        "ssml": ""
-      },
-      "conditionalChaining": "",
-      "l": "",
       "qid": "32.chaining.demo.Over60",
+      "a": "{{SessionAttributes.demo.name.FirstName}}, since you are over 60 let me recommend the movie First Man. It takes a look at the life of the astronaut, Neil Armstrong, and the legendary space mission that led him to become the first man to walk on the Moon.",
+      "alt": {
+        "markdown": "{{SessionAttributes.demo.name.FirstName}}, since you are over 60 let me recommend the movie **First Man**. It takes a look at the life of the astronaut, Neil Armstrong, and the legendary space mission that led him to become the first man to walk on the Moon."
+      },
+      "conditionalChaining": "'Leave Us Some Feedback'",
       "type": "qna",
       "q": [
         "Over 60"
@@ -107,75 +83,42 @@
       ]
     },
     {
-      "args": [
-        ""
-      ],
-      "next": "",
-      "a": "{{SessionAttributes.demo.name.FirstName}}, since you are between 12 and 60, let me recommend the movie 2001: A Space Odyssey. It is a 1968 epic science fiction film that takes place in outer space.",
-      "r": {
-        "buttons": [
-          {
-            "text": "",
-            "value": ""
-          }
-        ],
-        "subTitle": "",
-        "imageUrl": "",
-        "title": "",
-        "text": "",
-        "url": ""
-      },
-      "t": "",
-      "elicitResponse": {
-        "response_sessionattr_namespace": "",
-        "responsebot_hook": ""
-      },
-      "alt": {
-        "markdown": "{{SessionAttributes.demo.name.FirstName}}, since you are between 12 and 60, let me recommend the movie **2001: A Space Odyssey**. It is a 1968 epic science fiction film that takes place in outer space.",
-        "ssml": ""
-      },
-      "conditionalChaining": "",
-      "l": "",
       "qid": "30.chaining.demo.Between12and60",
+      "a": "{{SessionAttributes.demo.name.FirstName}}, since you are between 12 and 60, let me recommend the movie 2001: A Space Odyssey. It is a 1968 epic science fiction film that takes place in outer space.",
+      "alt": {
+        "markdown": "{{SessionAttributes.demo.name.FirstName}}, since you are between 12 and 60, let me recommend the movie **2001: A Space Odyssey**. It is a 1968 epic science fiction film that takes place in outer space."
+      },
+      "conditionalChaining": "'Leave Us Some Feedback'",
       "type": "qna",
       "q": [
         "Between 12 and 60"
       ]
     },
     {
-      "args": [
-        ""
-      ],
-      "next": "",
-      "a": "{{SessionAttributes.demo.name.FirstName}}, since you are under 12, I recommend watching Disney's WALL-E. It's a wonderful cartoon about a robot looking for a friend.",
-      "r": {
-        "buttons": [
-          {
-            "text": "",
-            "value": ""
-          }
-        ],
-        "subTitle": "",
-        "imageUrl": "",
-        "title": "",
-        "text": "",
-        "url": ""
-      },
-      "t": "",
-      "elicitResponse": {
-        "response_sessionattr_namespace": "",
-        "responsebot_hook": ""
-      },
-      "alt": {
-        "markdown": "{{SessionAttributes.demo.name.FirstName}}, since you are under 12, I recommend watching Disney's **WALL-E**. It's a wonderful cartoon about a robot looking for a friend.",
-        "ssml": ""
-      },
-      "conditionalChaining": "",
-      "l": "",
       "qid": "31.chaining.demo.Under12",
+      "a": "{{SessionAttributes.demo.name.FirstName}}, since you are under 12, I recommend watching Disney's WALL-E. It's a wonderful cartoon about a robot looking for a friend.",
+      "alt": {
+        "markdown": "{{SessionAttributes.demo.name.FirstName}}, since you are under 12, I recommend watching Disney's **WALL-E**. It's a wonderful cartoon about a robot looking for a friend."
+      },
+      "conditionalChaining": "'Leave Us Some Feedback'",
       "type": "qna",
       "q": [
         "Under 12"
+      ]
+    },
+    {
+      "qid": "40.leave.feedback",
+      "a": "Please give us some feedback about this selection.",
+      "alt": {
+        "markdown": "***Please give us some feedback about this selection?***"
+      },
+      "elicitResponse": {
+        "responsebot_hook": "QNAFreeText",
+        "response_sessionattr_namespace": "demo.comment"
+      },
+      "type": "qna",
+      "q": [
+        "Leave Us Some Feedback"
       ]
     }
   ]
