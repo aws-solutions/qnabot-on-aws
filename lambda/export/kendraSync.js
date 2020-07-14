@@ -18,7 +18,8 @@ exports.performSync=function(event,context,cb){
     
     s3.waitFor('objectExists',{Bucket,Key,VersionId}).promise()
     .then(()=>s3.getObject({Bucket,Key,VersionId}).promise())
-    .then(x=>JSON.parse(x.Body.toString()))
+    // .then(x=>JSON.parse(x.Body.toString()))
+    .then(x=>console.log(x.Body.toString()))
     .then(async function(content){
         var parseJSONparams = {
             csv_name:'qna_FAQ.csv',

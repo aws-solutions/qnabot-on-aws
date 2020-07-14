@@ -10,13 +10,13 @@
       v-card(id="kendra-syncing")
         v-card-title(primary-title) Syncing  : {{status}}
         v-card-text
-          v-subheader.error--text(v-if='error' id="kendra-error") {{error}}
-          v-subheader.success--text(v-if='success' id="kendra-success") Success! 
+          v-subheader.error--text(v-if='error' id="error") {{error}}
+          v-subheader.success--text(v-if='success' id="success") Success! 
           v-subheader.error--text(v-if='message' ) {{message}}
           v-progress-linear(v-if='!error && !success' indeterminate)
         v-card-actions
           v-spacer
-          v-btn(@click='cancel' flat id="kendra-close") close
+          v-btn(@click='cancel' flat id="close") close
 </template>
 
 <script>
@@ -58,19 +58,11 @@ module.exports={
     this.refresh() 
   },
   methods:{
-    // sync:function(){
-    //   var self=this
-    //   this.loading=true
-    //   this.snackbar=true 
-    //   this.success=false
-    //   this.error=false
-    //   this.$store.dispatch('data/sync')
-    //   .then(function(){
-    //     self.success=true
-    //   })
-    //   .catch(e=>self.error=e)
-    //   .then(()=>self.loading=false)
-    // },
+    cancel:function(){
+      var self=this
+      self.success=false
+      self.snackbar=false
+    },
     refresh:async function(){
       var self=this
       var exports=await this.$store.dispatch('api/listExports')
@@ -89,6 +81,7 @@ module.exports={
             setTimeout(()=>poll(),1000)
           }
         }
+        // TODO: status updates beyond just the export
       })
     },
     start:async function(){
@@ -99,8 +92,8 @@ module.exports={
       this.error=false
       try{
         await this.$store.dispatch('api/startKendraSyncExport',{
-          name:this.filename,
-          filter:this.filter
+          name:'qna-kendra-faq.txt',
+          filter:''
         })
         await this.refresh()
       }catch(e){

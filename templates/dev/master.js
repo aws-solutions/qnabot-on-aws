@@ -10,7 +10,7 @@ module.exports=Promise.join(
     base.Parameters.BootstrapBucket.Default=output.Bucket
     base.Parameters.BootstrapPrefix.Default=output.Prefix
     base.Parameters.Email.Default=config.devEmail
-    base.Parameters.KendraFAQIndex.Default=config.KendraFAQIndex
+    // base.Parameters.KendraFAQIndex.Default=config.KendraFAQIndex
     return base
 })
 

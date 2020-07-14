@@ -58,7 +58,7 @@ module.exports={
             "ServiceToken": { "Fn::GetAtt" : ["ESCFNProxyLambda", "Arn"] },
             "create":{
                 index:{"Fn::Sub":"${Var.QnaIndex}"},
-                endpoint:{"Fn::GetAtt":["ESVar","ESAddress", "KendraFAQIndex"]},
+                endpoint:{"Fn::GetAtt":["ESVar","ESAddress"]},
                 body:{"Fn::Sub":JSON.stringify({ 
                     settings:require('./index_settings.js'),
                     mappings:require('./index_mappings.js'),

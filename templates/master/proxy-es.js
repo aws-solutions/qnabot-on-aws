@@ -146,8 +146,6 @@ module.exports={
           "Variables": {
             DEFAULT_SETTINGS_PARAM:{"Ref":"DefaultQnABotSettings"},
             CUSTOM_SETTINGS_PARAM:{"Ref":"CustomQnABotSettings"},
-            KENDRA_FAQ:{"Fn::GetAtt":["Var","EnableKendraFAQ"]},
-            KENDRA_FAQ_INDEX:{"Fn::GetAtt":["Var","KendraFAQIndex"]}
           }
         },
         "Handler": "index.query",
@@ -307,7 +305,7 @@ module.exports={
                 "kendra:Query"
               ],
               "Resource":[
-                {"Fn::Sub":"arn:aws:kendra:${AWS::Region}:${AWS::AccountId}:index/${KendraFAQIndex}"},
+                {"Fn::Sub":"arn:aws:kendra:${AWS::Region}:${AWS::AccountId}:index/*"},
               ]
             },{
                 "Effect": "Allow",
