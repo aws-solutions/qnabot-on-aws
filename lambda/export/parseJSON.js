@@ -18,7 +18,8 @@ function qnaJsonParser(params) {
   });
   
   const data = [];
-  
+  // var qna = `{"qna":[${params.content.toString().replace(/\n/g,',\n')}]}`
+  // params.content = JSON.parse(qna).qna;
   const q_list = params.content.qna;
   q_list.forEach(function(elem) {
     elem.q.forEach(function(ques) {

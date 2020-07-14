@@ -1,7 +1,7 @@
 <template lang="pug">
   span(class="wrapper")
     v-btn.block(
-      :disabled="loading" @click="sync" slot="activator"
+      :disabled="loading" @click="start" slot="activator"
       flat id="kendra-sync") Sync Kendra FAQ
     v-dialog(
       persistent
@@ -58,19 +58,19 @@ module.exports={
     this.refresh() 
   },
   methods:{
-    sync:function(){
-      var self=this
-      this.loading=true
-      this.snackbar=true 
-      this.success=false
-      this.error=false
-      this.$store.dispatch('data/sync')
-      .then(function(){
-        self.success=true
-      })
-      .catch(e=>self.error=e)
-      .then(()=>self.loading=false)
-    },
+    // sync:function(){
+    //   var self=this
+    //   this.loading=true
+    //   this.snackbar=true 
+    //   this.success=false
+    //   this.error=false
+    //   this.$store.dispatch('data/sync')
+    //   .then(function(){
+    //     self.success=true
+    //   })
+    //   .catch(e=>self.error=e)
+    //   .then(()=>self.loading=false)
+    // },
     refresh:async function(){
       var self=this
       var exports=await this.$store.dispatch('api/listExports')
@@ -93,29 +93,20 @@ module.exports={
     },
     start:async function(){
       var self=this
+      this.loading=true
+      this.snackbar=true 
+      this.success=false
+      this.error=false
       try{
-        await this.$store.dispatch('api/startExport',{
+        await this.$store.dispatch('api/startKendraSyncExport',{
           name:this.filename,
           filter:this.filter
         })
         await this.refresh()
       }catch(e){
-        this.error=err
+        this.error=e
       }finally{
       }
-    },
-    remove:async function(index){
-      await this.$store.dispatch('api/deleteExport',this.exports[index])
-      await this.refresh()
-    },
-    download:async function(index){
-      var raw=await this.$store.dispatch('api/downloadExport',this.exports[index])
-      var blob = new Blob(
-        [JSON.stringify(JSON.parse(raw),null,2)], 
-        {type: "text/plain;charset=utf-8"}
-      );
-      var name=this.exports[index].id
-      return Promise.resolve(saveAs(blob,name))
     }
   }
 }

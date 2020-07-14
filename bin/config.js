@@ -19,7 +19,7 @@ module.exports={
     "devEmail":"",
     "namespace":"dev",
     "stackNamePrefix":"QNA",
-    "KendraIndex":""
+    "KendraFAQIndex":""
 }
 
 if (require.main === module) {

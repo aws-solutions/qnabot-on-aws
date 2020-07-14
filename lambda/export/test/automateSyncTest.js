@@ -4,19 +4,21 @@ var assert = require('assert');
 async function test_parser() {
     const parseJSON = require('../parseJSON.js');
     var content = require('./qna_export.json');
+    // var content = require('./qna.txt')
+    // var qna = `{"qna":[${content.toString().replace(/\n/g,',\n')}]}`
+    // console.log(JSON.parse(qna).qna);
+    
     var parseJSONparams = {
         csv_name:'qna_FAQ.csv',
         content:content,
-        output_path:'/tmp/qna_FAQ.csv',
+        output_path:'./test/qna_FAQ.csv',
     }
-    const csv_path = await parseJSON.handler(parseJSONparams);
-    
+    const resp = await parseJSON.handler(parseJSONparams);
     const fs = require('fs')
 
     try {
-      if (fs.existsSync(csv_path)) {
-        //file exists
-        return 'exists';
+      if (fs.existsSync(parseJSONparams.output_path)) {
+        return true;
       } else {
         return false;
       }
@@ -24,7 +26,6 @@ async function test_parser() {
       console.error(err)
       return false;
     }
-
     // TODO: CHECK CONTENTS OF CSV ROWS TO VALIDATE FORMAT
 }
 
@@ -32,7 +33,7 @@ async function test_parser() {
 // create FAQ test
 async function test_create_faq() {
     const create = require('../createFAQ.js');
-    var content = require('./qna_export.json');
+    var content = require('./qna_FAQ.json');
     var parseJSONparams = {
         csv_name:'qna_FAQ.csv',
         content:content,
@@ -64,19 +65,19 @@ async function test_performSync() {
 }
 
 describe('#test automate-sync()', () => {
-    // it('test_json_parser', async function() {
-    //     let resp = await test_parser();
-    //     assert(resp, "CSV file does not exist!");
-    // });
+    it('test_json_parser', async function() {
+        let resp = await test_parser();
+        assert.equal(resp, true);
+    });
     
     // it('test_create_faq', async function() {
     //     let resp = await test_create_faq();
     //     assert(resp, 'Failed to create FAQ');
     // });
 
-    it('test_perform_sync', async function() {
-        let resp = await test_performSync();
-        assert(resp, 'Synced'); 
-    });
+    // it('test_perform_sync', async function() {
+    //     let resp = await test_performSync();
+    //     assert(resp, 'Synced'); 
+    // });
 });
 

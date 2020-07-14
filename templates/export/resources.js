@@ -137,7 +137,7 @@ module.exports=Object.assign(
             },
             "Environment": {
                 "Variables": {
-                    "KENDRA_INDEX":{"Ref":"KendraIndex"},
+                    "KENDRA_INDEX":{"Ref":"KendraFAQIndex"},
                     "OUTPUT_S3_BUCKET":{"Ref":"ExportBucket"},
                     "KENDRA_ROLE":{"Fn::GetAtt": ["KendraS3Role","Arn"]},
                     "REGION":{"Ref":"AWS::Region"}
@@ -200,8 +200,8 @@ module.exports=Object.assign(
               "iam:passRole"
             ],
             "Resource": [
-                {"Fn::Sub":"arn:aws:kendra:${AWS::Region}:${AWS::AccountId}:index/${KendraIndex}"},
-                {"Fn::Sub":"arn:aws:kendra:${AWS::Region}:${AWS::AccountId}:index/${KendraIndex}/faq/*"},
+                {"Fn::Sub":"arn:aws:kendra:${AWS::Region}:${AWS::AccountId}:index/${KendraFAQIndex}"},
+                {"Fn::Sub":"arn:aws:kendra:${AWS::Region}:${AWS::AccountId}:index/${KendraFAQIndex}/faq/*"},
                 {"Fn::Sub":"arn:aws:s3:::${ExportBucket}"},
                 {"Fn::Sub":"arn:aws:s3:::${ExportBucket}/*"},
                 {"Fn::GetAtt": ["KendraS3Role","Arn"]}
@@ -250,7 +250,7 @@ module.exports=Object.assign(
               "kendra:CreateFaq",
             ],
             "Resource": [
-                {"Fn::Sub":"arn:aws:kendra:${AWS::Region}:${AWS::AccountId}:index/${KendraIndex}"},
+                {"Fn::Sub":"arn:aws:kendra:${AWS::Region}:${AWS::AccountId}:index/${KendraFAQIndex}"},
                 {"Fn::Sub":"arn:aws:s3:::${ExportBucket}"},
                 {"Fn::Sub":"arn:aws:s3:::${ExportBucket}/*"},
             ]

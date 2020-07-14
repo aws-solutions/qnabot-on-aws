@@ -27,7 +27,7 @@ exports.performSync=function(event,context,cb){
         }
         parse.handler(parseJSONparams).then(()=>{
             console.log("Parsed content JSON into CSV stored locally");
-                
+            
             var createFAQparams = {
                 faq_name:'qna-facts',
                 faq_index_id:process.env.KENDRA_INDEX,

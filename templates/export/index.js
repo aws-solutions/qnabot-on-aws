@@ -20,6 +20,6 @@ module.exports={
         "EsEndpoint": {"Type":"String"},
         "EsProxyLambda": {"Type":"String"},
         "ExportBucket": {"Type":"String"},
-        "KendraIndex": {"Type":"String"}
+        "KendraFAQIndex": {"Type":"String"}
     }
 }
