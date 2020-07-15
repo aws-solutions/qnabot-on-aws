@@ -137,10 +137,13 @@ module.exports=Object.assign(
             },
             "Environment": {
                 "Variables": {
-                    "KENDRA_INDEX":{"Ref":"KendraIndex"},
+                    // "KENDRA_INDEX":{"Ref":"KendraFAQIndex"},
+                    // "DEFAULT_USER_POOL_JWKS_PARAM": { "Ref": "DefaultUserPoolJwksUrl" },
+                    // "DEFAULT_SETTINGS_PARAM": { "Ref": "DefaultQnABotSettings" },
+                    // "CUSTOM_SETTINGS_PARAM": { "Ref": "CustomQnABotSettings" },
                     "OUTPUT_S3_BUCKET":{"Ref":"ExportBucket"},
                     "KENDRA_ROLE":{"Fn::GetAtt": ["KendraS3Role","Arn"]},
-                    "REGION":{"Ref":"AWS::Region"}
+                    // "REGION":{"Ref":"AWS::Region"}
                 }
             },
             "Handler": "kendraSync.performSync",
@@ -200,8 +203,8 @@ module.exports=Object.assign(
               "iam:passRole"
             ],
             "Resource": [
-                {"Fn::Sub":"arn:aws:kendra:${AWS::Region}:${AWS::AccountId}:index/${KendraIndex}"},
-                {"Fn::Sub":"arn:aws:kendra:${AWS::Region}:${AWS::AccountId}:index/${KendraIndex}/faq/*"},
+                {"Fn::Sub":"arn:aws:kendra:${AWS::Region}:${AWS::AccountId}:index/*"},
+                {"Fn::Sub":"arn:aws:kendra:${AWS::Region}:${AWS::AccountId}:index/*/faq/*"},
                 {"Fn::Sub":"arn:aws:s3:::${ExportBucket}"},
                 {"Fn::Sub":"arn:aws:s3:::${ExportBucket}/*"},
                 {"Fn::GetAtt": ["KendraS3Role","Arn"]}
@@ -250,7 +253,7 @@ module.exports=Object.assign(
               "kendra:CreateFaq",
             ],
             "Resource": [
-                {"Fn::Sub":"arn:aws:kendra:${AWS::Region}:${AWS::AccountId}:index/${KendraIndex}"},
+                {"Fn::Sub":"arn:aws:kendra:${AWS::Region}:${AWS::AccountId}:index/*"},
                 {"Fn::Sub":"arn:aws:s3:::${ExportBucket}"},
                 {"Fn::Sub":"arn:aws:s3:::${ExportBucket}/*"},
             ]

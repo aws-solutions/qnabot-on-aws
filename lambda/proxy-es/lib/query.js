@@ -6,12 +6,24 @@ var request = require('./request');
 var build_es_query = require('./esbodybuilder');
 var handlebars = require('./handlebars');
 var translate = require('./translate');
+var kendra = require('./kendraQuery');
+
 
 // use DEFAULT_SETTINGS_PARAM as random encryption key unique to this QnABot installation
 var key = _.get(process.env, "DEFAULT_SETTINGS_PARAM", "fdsjhf98fd98fjh9 du98fjfd 8ud8fjdf");
 var encryptor = require('simple-encryptor')(key);
 
 async function run_query(req, query_params) {
+    if (_.get(req, "_settings.KENDRA_FAQ_INDEX") != "") {
+        console.log("Querying Kendra FAQ index: " + _.get(req, "_settings.KENDRA_FAQ_INDEX"));
+        return await run_query_kendra(req, query_params);
+    } else {
+        console.log('Querying ElasticSearch');
+        return await run_query_es(req, query_params);
+    }
+}
+
+async function run_query_es(req, query_params) {
     var es_query = await build_es_query(query_params);
     var es_response = await request({
         url: `https://${req._info.es.address}/${req._info.es.index}/_doc/_search?search_type=dfs_query_then_fetch`,
@@ -19,6 +31,78 @@ async function run_query(req, query_params) {
         body: es_query
     });
     return es_response;
+}
+
+async function run_query_kendra(req, query_params) {
+    // new function duplicating KendraFallback code
+    var context=undefined;
+    
+    // set up response structure
+    var res = {
+        "type": "PlainText",
+        "message": "The Kendra FAQ search was not able to identify any results",
+        "session": {
+            "appContext": {
+                "altMessages": {}
+            },
+            "previous": {
+                "qid": "",
+                "a": "The Kendra FAQ search was not able to identify any results",
+                "alt": {},
+                "q": req["question"]
+            },
+            "navigation": {
+                "next": "",
+                "previous": [],
+                "hasParent": false
+            }
+        },
+        "card": {
+            "send": false,
+            "title": "",
+            "text": "",
+            "url": ""
+        },
+        "_userInfo": req["_userInfo"],
+        "got_hits": 0,
+        "result": {
+            "qid": "",
+            "quniqueterms": " no_hits  ",
+            "questions": [
+                {
+                    "q": "no_hits"
+                }
+            ],
+            "a": "The Kendra FAQ search was not able to identify any results",
+            "l": "QNA:ESQueryLambda",
+            "type": "qna",
+            "autotranslate": {
+                "a": true
+            }
+        },
+        "plainMessage": "The Kendra FAQ search was not able to identify any results"
+    }
+
+    var event = {
+        "req":req,
+        "res":res
+    };
+    var resp_event = await kendra.handler(event, context);
+    
+    // set up query response structure
+    // TODO: many fields missing. see link: https://console.aws.amazon.com/cloudwatch/home?region=us-east-1#logsV2:log-groups/log-group/$252Faws$252Flambda$252FQNA-dev-dev-dev-master-4-ESQueryLambda-KFV8D14SHW8F/log-events/2020$252F07$252F14$252F$255B$2524LATEST$255Dd94ad2dad07e4b6fac1c32c754ddefd5
+    let hits_struct = {
+        "hits": {
+            "hits": [{
+                "_type": "_doc",
+                "_id": resp_event.res.result.qid,
+                "_source": resp_event.res.result
+            }]
+        }
+    }
+
+    
+    return hits_struct;
 }
 
 function merge_next(hit1, hit2) {
@@ -73,6 +157,7 @@ async function get_hit(req, res) {
     var response = await run_query(req, query_params);
     console.log("Query response: ", JSON.stringify(response,null,2));
     var hit = _.get(response, "hits.hits[0]._source");
+    
     if (hit) {
         res['got_hits'] = 1;  // response flag, used in logging / kibana
     } else {

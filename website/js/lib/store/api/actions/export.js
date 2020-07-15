@@ -39,7 +39,22 @@ module.exports={
         var result=await context.dispatch('_request',{
             url:`${info._links.exports.href}/${opts.name}`,
             method:'put',
-            body:opts.filter ? {filter:`${opts.filter}.*`} : {}
+            body:opts.filter ? {filter:`${opts.filter}.*`, prefix:''} : {prefix:''}
+        })
+    },
+    startKendraSyncExport:async function(context,opts){
+        console.log("Entering startKendraSyncExport function");
+        var info=await context.dispatch('_request',{
+            url:context.rootState.info._links.jobs.href,
+            method:'get'
+        })
+        console.log(`info is ` + JSON.stringify(info));
+        console.log(`opts is ` + JSON.stringify(opts));
+        
+        var result=await context.dispatch('_request',{
+            url:`${info._links.exports.href}/${opts.name}`,
+            method:'put',
+            body:opts.filter ? {filter:`${opts.filter}.*`, prefix:'kendra-'} : {prefix:'kendra-'}
         })
     },
     downloadExport:async function(context,opts){

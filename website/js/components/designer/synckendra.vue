@@ -1,7 +1,7 @@
 <template lang="pug">
   span(class="wrapper")
     v-btn.block(
-      :disabled="loading" @click="sync" slot="activator"
+      :disabled="loading" @click="start" slot="activator"
       flat id="kendra-sync") Sync Kendra FAQ
     v-dialog(
       persistent
@@ -10,13 +10,13 @@
       v-card(id="kendra-syncing")
         v-card-title(primary-title) Syncing  : {{status}}
         v-card-text
-          v-subheader.error--text(v-if='error' id="kendra-error") {{error}}
-          v-subheader.success--text(v-if='success' id="kendra-success") Success! 
+          v-subheader.error--text(v-if='error' id="error") {{error}}
+          v-subheader.success--text(v-if='success' id="success") Success! 
           v-subheader.error--text(v-if='message' ) {{message}}
           v-progress-linear(v-if='!error && !success' indeterminate)
         v-card-actions
           v-spacer
-          v-btn(@click='cancel' flat id="kendra-close") close
+          v-btn(@click='cancel' flat id="close") close
 </template>
 
 <script>
@@ -58,18 +58,10 @@ module.exports={
     this.refresh() 
   },
   methods:{
-    sync:function(){
+    cancel:function(){
       var self=this
-      this.loading=true
-      this.snackbar=true 
-      this.success=false
-      this.error=false
-      this.$store.dispatch('data/sync')
-      .then(function(){
-        self.success=true
-      })
-      .catch(e=>self.error=e)
-      .then(()=>self.loading=false)
+      self.success=false
+      self.snackbar=false
     },
     refresh:async function(){
       var self=this
@@ -89,33 +81,25 @@ module.exports={
             setTimeout(()=>poll(),1000)
           }
         }
+        // TODO: status updates beyond just the export
       })
     },
     start:async function(){
       var self=this
+      this.loading=true
+      this.snackbar=true 
+      this.success=false
+      this.error=false
       try{
-        await this.$store.dispatch('api/startExport',{
-          name:this.filename,
-          filter:this.filter
+        await this.$store.dispatch('api/startKendraSyncExport',{
+          name:'qna-kendra-faq.txt',
+          filter:''
         })
         await this.refresh()
       }catch(e){
-        this.error=err
+        this.error=e
       }finally{
       }
-    },
-    remove:async function(index){
-      await this.$store.dispatch('api/deleteExport',this.exports[index])
-      await this.refresh()
-    },
-    download:async function(index){
-      var raw=await this.$store.dispatch('api/downloadExport',this.exports[index])
-      var blob = new Blob(
-        [JSON.stringify(JSON.parse(raw),null,2)], 
-        {type: "text/plain;charset=utf-8"}
-      );
-      var name=this.exports[index].id
-      return Promise.resolve(saveAs(blob,name))
     }
   }
 }

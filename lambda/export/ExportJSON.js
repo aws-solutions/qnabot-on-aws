@@ -33,7 +33,7 @@ async function run_export(params,reply) {
         "faq_index_id":params.faq_index_id,
         "id":params.id,
         "config":"kendra-status/"+params.id,
-        "tmp":"kendra-tmp/"+params.id,
+        "tmp":"tmp/"+params.id,
         "key":"kendra-data/"+params.id,
         "filter":"",
         "status":"Started"

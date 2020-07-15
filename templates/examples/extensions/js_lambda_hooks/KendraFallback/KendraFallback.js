@@ -142,7 +142,7 @@ async function routeKendraRequest(event, context) {
         }
     }
     if (kendraIndexes === undefined) {
-        throw new Error('Undefined Kendra Indexe');
+        throw new Error('Undefined Kendra Indexes');
     }
 
     // This function can handle configuration with an array of kendraIndexes.
@@ -276,7 +276,6 @@ async function routeKendraRequest(event, context) {
                     docInfo.uri = element.DocumentURI;
                     helpfulDocumentsUris.add(docInfo);
                     foundAnswerCount++;
-                    foundDocumentCount++;   // TODO: foundDocumentCount is not used elsewhere...
                 }
             });
         }
