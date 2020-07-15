@@ -3,10 +3,9 @@ var assert = require('assert');
 // json parsing test
 async function test_parser() {
     const parseJSON = require('../parseJSON.js');
-    var content = require('./qna_export.json');
-    // var content = require('./qna.txt')
-    // var qna = `{"qna":[${content.toString().replace(/\n/g,',\n')}]}`
-    // console.log(JSON.parse(qna).qna);
+    var qna = require('./qna-kendra-faq.txt')
+    var content = `{"qna":[${qna.toString().replace(/\n/g,',\n')}]}`
+    content = JSON.parse(content);
     
     var parseJSONparams = {
         csv_name:'qna_FAQ.csv',
@@ -26,7 +25,7 @@ async function test_parser() {
       console.error(err)
       return false;
     }
-    // TODO: CHECK CONTENTS OF CSV ROWS TO VALIDATE FORMAT
+    // ALERT: does not check rows of CSV, so must manually validate content and format
 }
 
 
@@ -45,7 +44,7 @@ async function test_create_faq() {
         csv_path:parseJSONparams.output_path,
         csv_name:parseJSONparams.csv_name,
         s3_bucket:'qna-dev-dev-dev-master-4-exportbucket-o5r0tsjifuu9',
-        s3_key:"kendra_csv" + "/" + parseJSONparams.csv_name,
+        s3_key:"kendra-data" + "/" + parseJSONparams.csv_name,
         kendra_s3_access_role:'arn:aws:iam::425742325899:role/QNA-dev-dev-dev-master-4-ExportStack-KendraS3Role-1D5W35EQT8OCX',
         region:'us-east-1'
     }
@@ -70,14 +69,14 @@ describe('#test automate-sync()', () => {
         assert.equal(resp, true);
     });
     
-    // it('test_create_faq', async function() {
-    //     let resp = await test_create_faq();
-    //     assert(resp, 'Failed to create FAQ');
-    // });
+    it('test_create_faq', async function() {
+        let resp = await test_create_faq();
+        assert(resp, 'Failed to create FAQ');
+    });
 
-    // it('test_perform_sync', async function() {
-    //     let resp = await test_performSync();
-    //     assert(resp, 'Synced'); 
-    // });
+    it('test_perform_sync', async function() {
+        let resp = await test_performSync();
+        assert(resp, 'Synced'); 
+    });
 });
 

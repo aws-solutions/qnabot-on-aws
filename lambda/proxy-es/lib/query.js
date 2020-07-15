@@ -160,8 +160,6 @@ async function get_hit(req, res) {
     
     if (hit) {
         res['got_hits'] = 1;  // response flag, used in logging / kibana
-        console.log('HIT! Hit is ');
-        console.log(hit);
     } else {
         console.log("No hits from query - searching instead for: " + no_hits_question);
         query_params['question'] = no_hits_question;

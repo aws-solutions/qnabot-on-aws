@@ -185,9 +185,7 @@ async function routeKendraRequest(event, context) {
                     // to determine if this is the FAQ you need
                     // listFAQs and throw error if multiple
                     json_struct = JSON.parse(element.DocumentURI);
-                    console.log("JSON struct of FAQ question:")
-                    console.log(json_struct);
-                    
+
                     kendraQueryId = res.QueryId; // store off the QueryId to use as a session attribute for feedback
                     kendraIndexId = res.originalKendraIndexId; // store off the Kendra IndexId to use as a session attribute for feedback
                     kendraResultId = element.Id; // store off resultId to use as a session attribute for feedback

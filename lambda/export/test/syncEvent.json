@@ -27,9 +27,10 @@
           "arn": "arn:aws:s3:::qna-dev-dev-dev-master-4-exportbucket-o5r0tsjifuu9"
         },
         "object": {
-          "key": "kendra_csv/qna_FAQ.json",
+          "key": "kendra-data/qna-kendra-faq.txt",
           "size": 1024,
-          "eTag": "8f9ad97afed386ca0ff9452ef2ca198a"
+          "eTag": "ea5f317edb95c13611cea52d30f056b6",
+          "sequencer": "0A1B2C3D4E5F678901"
         }
       }
     }
