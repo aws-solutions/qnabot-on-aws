@@ -1,0 +1,45 @@
+    {
+        "type": "PlainText",
+        "message": "The Kendra FAQ search was not able to identify any results",
+        "session": {
+            "appContext": {
+                "altMessages": {}
+            },
+            "previous": {
+                "qid": "",
+                "a": "The Kendra FAQ search was not able to identify any results",
+                "alt": {},
+                "q": req["question"]
+            },
+            "navigation": {
+                "next": "",
+                "previous": [],
+                "hasParent": false
+            }
+        },
+        "card": {
+            "send": false,
+            "title": "",
+            "text": "",
+            "url": ""
+        },
+        "_userInfo": req["_userInfo"],
+        "got_hits": 0,
+        "result": {
+            "qid": "",
+            "quniqueterms": " no_hits  ",
+            "questions": [
+                {
+                    "q": "no_hits"
+                }
+            ],
+            "a": "The Kendra FAQ search was not able to identify any results",
+            "l": "QNA:ESQueryLambda",
+            "type": "qna",
+            "autotranslate": {
+                "a": true
+            }
+        },
+        "plainMessage": "The Kendra FAQ search was not able to identify any results"
+    }
+

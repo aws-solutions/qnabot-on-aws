@@ -199,7 +199,6 @@ async function routeKendraRequest(event, context) {
     // update QnABot answer content for ssml, markdown, and text
     if (foundAnswerCount > 0) {
         
-        event.res["got_hits"] = 1;
         event.res["result"] = json_struct;
         
         event.res.message = answerMessage;

@@ -34,74 +34,23 @@ async function run_query_es(req, query_params) {
 }
 
 async function run_query_kendra(req, query_params) {
-    // new function duplicating KendraFallback code
+    // calls kendrQuery function which duplicates KendraFallback code, but only searches through FAQs
+    // sets up response structure and input parameters
     var context=undefined;
-    
-    // set up response structure
-    var res = {
-        "type": "PlainText",
-        "message": "The Kendra FAQ search was not able to identify any results",
-        "session": {
-            "appContext": {
-                "altMessages": {}
-            },
-            "previous": {
-                "qid": "",
-                "a": "The Kendra FAQ search was not able to identify any results",
-                "alt": {},
-                "q": req["question"]
-            },
-            "navigation": {
-                "next": "",
-                "previous": [],
-                "hasParent": false
-            }
-        },
-        "card": {
-            "send": false,
-            "title": "",
-            "text": "",
-            "url": ""
-        },
-        "_userInfo": req["_userInfo"],
-        "got_hits": 0,
-        "result": {
-            "qid": "",
-            "quniqueterms": " no_hits  ",
-            "questions": [
-                {
-                    "q": "no_hits"
-                }
-            ],
-            "a": "The Kendra FAQ search was not able to identify any results",
-            "l": "QNA:ESQueryLambda",
-            "type": "qna",
-            "autotranslate": {
-                "a": true
-            }
-        },
-        "plainMessage": "The Kendra FAQ search was not able to identify any results"
-    }
-
+    var res = JSON.parse(require('res_resp_struct.json')); 
     var event = {
         "req":req,
         "res":res
     };
     var resp_event = await kendra.handler(event, context);
     
-    // set up query response structure
+    // return query response structure
     // TODO: many fields missing. see link: https://console.aws.amazon.com/cloudwatch/home?region=us-east-1#logsV2:log-groups/log-group/$252Faws$252Flambda$252FQNA-dev-dev-dev-master-4-ESQueryLambda-KFV8D14SHW8F/log-events/2020$252F07$252F14$252F$255B$2524LATEST$255Dd94ad2dad07e4b6fac1c32c754ddefd5
-    let hits_struct = {
+    var hits_struct = {
         "hits": {
-            "hits": [{
-                "_type": "_doc",
-                "_id": resp_event.res.result.qid,
-                "_source": resp_event.res.result
-            }]
+            "hits": [{"_type": "_doc", "_id": resp_event.res.result.qid, "_source": resp_event.res.result}]
         }
     }
-
-    
     return hits_struct;
 }
 

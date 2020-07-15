@@ -124,6 +124,7 @@ async function createFAQ(params) {
       ACL: 'bucket-owner-read',                     // TODO: should this param be public?
       Body: fs.createReadStream(params.csv_path),   // use read stream option in case file is large
     };
+    
     var s3_response = await s3Uploader(s3Client, s3_params);
     
     
@@ -169,7 +170,7 @@ async function createFAQ(params) {
     return faq_response;
 }
 
-// TODO: event and context will be triggered by the clicking on the menu item
+
 exports.handler = async(params) => {
-    return createFAQ(params);
+    return await createFAQ(params);
 }

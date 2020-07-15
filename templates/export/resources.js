@@ -139,11 +139,11 @@ module.exports=Object.assign(
                 "Variables": {
                     // "KENDRA_INDEX":{"Ref":"KendraFAQIndex"},
                     // "DEFAULT_USER_POOL_JWKS_PARAM": { "Ref": "DefaultUserPoolJwksUrl" },
-                    // "DEFAULT_SETTINGS_PARAM": { "Ref": "DefaultQnABotSettings" },
-                    // "CUSTOM_SETTINGS_PARAM": { "Ref": "CustomQnABotSettings" },
+                    "DEFAULT_SETTINGS_PARAM":{"Ref":"DefaultQnABotSettings"},
+                    "CUSTOM_SETTINGS_PARAM":{"Ref":"CustomQnABotSettings"},
                     "OUTPUT_S3_BUCKET":{"Ref":"ExportBucket"},
                     "KENDRA_ROLE":{"Fn::GetAtt": ["KendraS3Role","Arn"]},
-                    // "REGION":{"Ref":"AWS::Region"}
+                    "REGION":{"Ref":"AWS::Region"}
                 }
             },
             "Handler": "kendraSync.performSync",
@@ -190,24 +190,27 @@ module.exports=Object.assign(
       "Properties": {
         "PolicyDocument": {
         "Version": "2012-10-17",
+        // TODO: split the statements up
         "Statement": [{
           "Effect": "Allow",
           "Action": [
               "s3:PutObject",
-              "s3:GetObject",
+              "s3:Get*",
+              "s3:List*",
               "kendra:CreateFaq",
               "kendra:ListFaqs",
-              "s3:ListBucket",
               "kendra:TagResource",
               "kendra:DeleteFaq",
-              "iam:passRole"
+              "iam:passRole",
+              "ssm:getParameter"
             ],
             "Resource": [
                 {"Fn::Sub":"arn:aws:kendra:${AWS::Region}:${AWS::AccountId}:index/*"},
                 {"Fn::Sub":"arn:aws:kendra:${AWS::Region}:${AWS::AccountId}:index/*/faq/*"},
                 {"Fn::Sub":"arn:aws:s3:::${ExportBucket}"},
                 {"Fn::Sub":"arn:aws:s3:::${ExportBucket}/*"},
-                {"Fn::GetAtt": ["KendraS3Role","Arn"]}
+                {"Fn::GetAtt": ["KendraS3Role","Arn"]},
+                {"Fn::Sub":"arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:*"}
             ]
           }]
         }
