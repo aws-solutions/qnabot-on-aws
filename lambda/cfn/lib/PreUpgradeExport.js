@@ -49,7 +49,6 @@ async function run_export(params,reply) {
     console.log("Wait up to 60 seconds for status to be completed");
     delete s3params.Body;
     var complete = await waitForExport(s3params,60000);
-    console.log("Export completed: ",statusfile);
     if (complete) {
         console.log("Export completed: ",statusfile);
         reply(null,ID) ;
