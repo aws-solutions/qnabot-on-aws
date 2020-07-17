@@ -14,7 +14,8 @@ var key = _.get(process.env, "DEFAULT_SETTINGS_PARAM", "fdsjhf98fd98fjh9 du98fjf
 var encryptor = require('simple-encryptor')(key);
 
 async function run_query(req, query_params) {
-    if (_.get(req, "_settings.KENDRA_FAQ_INDEX") != "") {
+    var no_hits_question = _.get(req, '_settings.ES_NO_HITS_QUESTION', 'no_hits');
+    if (_.get(req, "_settings.KENDRA_FAQ_INDEX") != "" && query_params['question'] != no_hits_question) {
         console.log("Querying Kendra FAQ index: " + _.get(req, "_settings.KENDRA_FAQ_INDEX"));
         return await run_query_kendra(req, query_params);
     } else {
