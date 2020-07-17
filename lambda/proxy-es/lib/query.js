@@ -14,7 +14,8 @@ var key = _.get(process.env, "DEFAULT_SETTINGS_PARAM", "fdsjhf98fd98fjh9 du98fjf
 var encryptor = require('simple-encryptor')(key);
 
 async function run_query(req, query_params) {
-    if (_.get(req, "_settings.KENDRA_FAQ_INDEX") != "") {
+    var no_hits_question = _.get(req, '_settings.ES_NO_HITS_QUESTION', 'no_hits');
+    if (_.get(req, "_settings.KENDRA_FAQ_INDEX") != "" && query_params['question'] != no_hits_question) {
         console.log("Querying Kendra FAQ index: " + _.get(req, "_settings.KENDRA_FAQ_INDEX"));
         return await run_query_kendra(req, query_params);
     } else {
@@ -34,75 +35,21 @@ async function run_query_es(req, query_params) {
 }
 
 async function run_query_kendra(req, query_params) {
-    // new function duplicating KendraFallback code
-    var context=undefined;
-    
-    // set up response structure
-    var res = {
-        "type": "PlainText",
-        "message": "The Kendra FAQ search was not able to identify any results",
-        "session": {
-            "appContext": {
-                "altMessages": {}
-            },
-            "previous": {
-                "qid": "",
-                "a": "The Kendra FAQ search was not able to identify any results",
-                "alt": {},
-                "q": req["question"]
-            },
-            "navigation": {
-                "next": "",
-                "previous": [],
-                "hasParent": false
-            }
-        },
-        "card": {
-            "send": false,
-            "title": "",
-            "text": "",
-            "url": ""
-        },
-        "_userInfo": req["_userInfo"],
-        "got_hits": 0,
-        "result": {
-            "qid": "",
-            "quniqueterms": " no_hits  ",
-            "questions": [
-                {
-                    "q": "no_hits"
-                }
-            ],
-            "a": "The Kendra FAQ search was not able to identify any results",
-            "l": "QNA:ESQueryLambda",
-            "type": "qna",
-            "autotranslate": {
-                "a": true
-            }
-        },
-        "plainMessage": "The Kendra FAQ search was not able to identify any results"
+    // calls kendrQuery function which duplicates KendraFallback code, but only searches through FAQs
+    //sets up query structure
+    var request_params = {
+        kendra_faq_index:req["_settings"]["KENDRA_FAQ_INDEX"],
+        input_transcript:req["_event"].inputTranscript,
     }
-
-    var event = {
-        "req":req,
-        "res":res
-    };
-    var resp_event = await kendra.handler(event, context);
     
-    // set up query response structure
-    // TODO: many fields missing. see link: https://console.aws.amazon.com/cloudwatch/home?region=us-east-1#logsV2:log-groups/log-group/$252Faws$252Flambda$252FQNA-dev-dev-dev-master-4-ESQueryLambda-KFV8D14SHW8F/log-events/2020$252F07$252F14$252F$255B$2524LATEST$255Dd94ad2dad07e4b6fac1c32c754ddefd5
-    let hits_struct = {
-        "hits": {
-            "hits": [{
-                "_type": "_doc",
-                "_id": resp_event.res.result.qid,
-                "_source": resp_event.res.result
-            }]
-        }
-    }
-
+    var res = await kendra.handler(request_params);
+    // TODO: invoke error with fulfillment lambda when using Kendra query & Kendra fallback engine
+    // double check the response structure for when kendra doesn't find anything, and ensure 
+    // its the same as the ES structure when there is no hits!
+    // TODO: check if ever more than 1 answer in kendra FAQ...(check console?) 
+    // ... assign confidence to 100% for the first one...if necessary?
     
-    return hits_struct;
+    return res;
 }
 
 function merge_next(hit1, hit2) {
@@ -155,7 +102,7 @@ async function get_hit(req, res) {
     };
     var no_hits_question = _.get(req, '_settings.ES_NO_HITS_QUESTION', 'no_hits');
     var response = await run_query(req, query_params);
-    console.log("Query response: ", JSON.stringify(response,null,2));
+    console.log("Query response: ", JSON.stringify(response,null,2));   // TODO: delete
     var hit = _.get(response, "hits.hits[0]._source");
     
     if (hit) {

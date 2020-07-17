@@ -6,7 +6,7 @@
  * @param output_path : the output file path to write the CSV
  * @returns output_path
  */
-function qnaJsonParser(params) {
+async function qnaJsonParser(params) {
   const createCsvWriter = require('csv-writer').createObjectCsvWriter;
   const csvWriter = createCsvWriter({
     path: params.output_path,
@@ -39,5 +39,5 @@ function qnaJsonParser(params) {
 }
 
 exports.handler = async (params) => {
-    return qnaJsonParser(params);
+    return await qnaJsonParser(params);
 };

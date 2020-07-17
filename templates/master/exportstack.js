@@ -13,6 +13,8 @@ module.exports={
                 "EsProxyLambda": {"Fn::GetAtt":["ESProxyLambda","Arn"]},
                 "ExportBucket": {"Ref":"ExportBucket"},
                 // "KendraFAQIndex": {"Ref":"KendraFAQIndex"}
+                "DefaultQnABotSettings":{"Ref":"DefaultQnABotSettings"},
+                "CustomQnABotSettings":{"Ref":"CustomQnABotSettings"},
             }
         }
     }

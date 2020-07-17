@@ -106,7 +106,7 @@ module.exports={
         })
         await this.refresh()
       }catch(e){
-        this.error=err
+        this.error=e
       }finally{
       }
     },

@@ -20,6 +20,8 @@ module.exports={
         "EsEndpoint": {"Type":"String"},
         "EsProxyLambda": {"Type":"String"},
         "ExportBucket": {"Type":"String"},
+        "DefaultQnABotSettings": {"Type":"String"},
+        "CustomQnABotSettings": {"Type":"String"},
         // "KendraFAQIndex": {"Type":"String"}
     }
 }
