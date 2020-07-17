@@ -101,18 +101,12 @@ function hasJsonStructure(str) {
 
 /** Function that processes kendra requests and handles response. Decides whether to handle SNS
  * events or Lambda Hook events from QnABot.
- * @param event - input event passed to the Lambda Handler
- * @param context - input context passed to the Lambda Handler
+ * @param request - request parameters object
+//  * @param event - input event passed to the Lambda Handler
+//  * @param context - input context passed to the Lambda Handler
  * @returns {Promise<*>} - returns the response in event.res
  */
-async function routeKendraRequest(event, context) {
-
-    // remove any prior session attributes for kendra
-    if (event && event.res && event.res.session && event.res.session.kendraQueryId) delete event.res.session.kendraQueryId;
-    if (event && event.res && event.res.session && event.res.session.kendraIndexId) delete event.res.session.kendraIndexId;
-    if (event && event.res && event.res.session && event.res.session.kendraResultId) delete event.res.session.kendraResultId;
-    if (event && event.res && event.res.session && event.res.session.kendraResponsibleQid) delete event.res.session.kendraResponsibleQid;
-    
+async function routeKendraRequest(request_params) {
 
     var kendraClient = (process.env.REGION ?
             new AWSKendra({apiVersion: '2019-02-03', region: process.env.REGION}) :
@@ -123,7 +117,7 @@ async function routeKendraRequest(event, context) {
     let promises = [];
     let resArray = [];
     let kendraIndexes = undefined;
-    let kendraFaqIndex = event.req["_settings"]["KENDRA_FAQ_INDEX"];
+    let kendraFaqIndex = request_params.kendra_faq_index;
     if (kendraFaqIndex != "" && kendraFaqIndex != undefined) {
         kendraIndexes = [kendraFaqIndex];
     } else {
@@ -133,7 +127,7 @@ async function routeKendraRequest(event, context) {
     kendraIndexes.forEach(function (index, i) {
         const params = {
             IndexId: index, /* required */
-            QueryText: event.req["_event"].inputTranscript, /* required */
+            QueryText: request_params.input_transcript
         };
         let p = kendraRequester(kendraClient,params,resArray);
         promises.push(p);
@@ -144,91 +138,85 @@ async function routeKendraRequest(event, context) {
     // ----- process kendra query responses and update answer content -----
 
     /* default message text - can be overridden using QnABot SSM Parameter Store Custom Property */
-    let answerMessage = 'While I did not find an exact answer, these search results from Amazon Kendra might be helpful. ';
-    let answerMessageMd = '*While I did not find an exact answer, these search results from Amazon Kendra might be helpful.* \n ';
-    let faqanswerMessage = 'Answer from Amazon Kendra FAQ.';
-    let faqanswerMessageMd = '*Answer from Amazon Kendra FAQ.* \n ';
     let maxDocumentCount = 2;
-
     let foundAnswerCount = 0;
     let kendraQueryId;
     let kendraIndexId;
     let kendraResultId;
-    let json_struct;
-
+    let json_struct = [];
+    
+    
     resArray.forEach(function (res) {
         if (res && res.ResultItems.length > 0) {
-            maxDocumentCount = event.req["_settings"]["ALT_SEARCH_MAX_DOCUMENT_COUNT"] ? event.req["_settings"]["ALT_SEARCH_MAX_DOCUMENT_COUNT"] : maxDocumentCount;
-    
-            res.ResultItems.forEach(function (element, i) {
+            maxDocumentCount = request_params.max_doc_count ? request_params.max_doc_count : maxDocumentCount;
+            
+            var i, element;
+            for (i=0; i<res.ResultItems.length; i++) {
+                element = res.ResultItems[i];
                 /* Note - only FAQ format will be provided back to the requester */
                 if (element.Type === 'QUESTION_ANSWER' && foundAnswerCount === 0 && element.AdditionalAttributes &&
                     element.AdditionalAttributes.length > 1) {
-                    // There will be 2 elements - [0] - QuestionText, [1] - AnswerText
-                    answerMessage = faqanswerMessage + '\n\n ' + element.AdditionalAttributes[1].Value.TextWithHighlightsValue.Text.replace(/\r?\n|\r/g, " ");
-                    
-                    let answerTextMd = element.AdditionalAttributes[1].Value.TextWithHighlightsValue.Text.replace(/\r?\n|\r/g, " ");
-                    // iterates over the FAQ answer highlights in sorted order of BeginOffset, merges the overlapping intervals
-                    var sorted_highlights = mergeIntervals(element.AdditionalAttributes[1].Value.TextWithHighlightsValue.Highlights);
-                    var j, elem;
-                    for (j=0; j<sorted_highlights.length; j++) {
-                        elem = sorted_highlights[j];
-                        let offset = 4*j;
-                        let beginning = answerTextMd.substring(0, elem.BeginOffset+offset);
-                        let highlight = answerTextMd.substring(elem.BeginOffset+offset, elem.EndOffset+offset);
-                        let rest = answerTextMd.substr(elem.EndOffset+offset);
-                        answerTextMd = beginning + '**' + highlight + '**' + rest;
-                    };
-                    answerMessageMd = faqanswerMessageMd + '\n\n' + answerTextMd;
                     
                     // TODO: use json structure for query response from doc URL field
                     // to determine if this is the FAQ you need
                     // listFAQs and throw error if multiple
-                    json_struct = JSON.parse(element.DocumentURI);
+                    
+                    if (!hasJsonStructure(element.DocumentURI)) {
+                        break;
+                    }
+                    var hit = JSON.parse(element.DocumentURI);
+                    console.log(`hit is ${JSON.stringify(hit)}`);
+                    json_struct.push(hit);
 
                     kendraQueryId = res.QueryId; // store off the QueryId to use as a session attribute for feedback
                     kendraIndexId = res.originalKendraIndexId; // store off the Kendra IndexId to use as a session attribute for feedback
                     kendraResultId = element.Id; // store off resultId to use as a session attribute for feedback
                     foundAnswerCount++;
                 }
-            });
+            };
         }
     });
     
-    
-    // update QnABot answer content for ssml, markdown, and text
-    if (foundAnswerCount > 0) {
-        
-        event.res["result"] = json_struct;
-        
-        event.res.message = answerMessage;
-        let ssmlMessage = `${answerMessage.substring(0,600).replace(/\r?\n|\r/g, " ")}`;
-        let lastIndex = ssmlMessage.lastIndexOf('.');
-        if (lastIndex > 0) {
-            ssmlMessage = ssmlMessage.substring(0,lastIndex);
-        }
-        ssmlMessage = `<speak> ${ssmlMessage} </speak>`;
-        event.res.session.appContext.altMessages.markdown = answerMessageMd;
-        event.res.session.appContext.altMessages.ssml = ssmlMessage;
-        if (event.req["_event"].outputDialogMode !== 'Text') {
-            event.res.message = ssmlMessage;
-            event.res.type = 'SSML';
-            event.res.plainMessage = answerMessage;
-        }
+    // return query response structure (if no answers found, total hits # is 0 and hits list is empty)
+    var hits_struct = {
+        // "took": 104,
+        // "timed_out": false,
+        "hits": {
+            "total": {
+                "value": foundAnswerCount,
+                "relation": "eq"
+            },
+            // "max_score": 19.81313,
+            "hits": [],
+        },
+        // TODO: in event.res.session add kendra query id, kendra index id, kendra result id
+        "kendraQueryId":kendraQueryId,
+        "kendraIndexId":kendraIndexId,
+        "kendraResultId":kendraResultId
     }
 
-    if (kendraQueryId) {
-        event.res.session.kendraResponsibleQid = event.res.result.qid;
-        event.res.session.kendraQueryId = kendraQueryId;
-        event.res.session.kendraIndexId = kendraIndexId;
-        event.res.session.kendraResultId = kendraResultId;
+    
+    let ans = {};
+    var j, faq_struct;
+    for (j=0; j<json_struct.length; j++) {
+        faq_struct = json_struct[j];
+        
+        ans = {
+            "_index": request_params.kendra_faq_index,
+            "_type": "_faq",
+            "_id": faq_struct.qid,
+            // TODO: "_score": ???,
+            "_source": faq_struct
+        }
+        hits_struct.hits.hits.push(ans);
     }
-    console.log("RETURN: " + JSON.stringify(event,null,2));
-    return event;
+    
+
+    console.log("RETURN: " + JSON.stringify(hits_struct));
+    return hits_struct;
 }
 
-exports.handler = async (event, context) => {
-    console.log("event: " + JSON.stringify(event, null, 2));
-    console.log('context: ' + JSON.stringify(context, null, 2));
-    return routeKendraRequest(event, context);
+exports.handler = async (request_params) => {
+    console.log("kendra query request: " + JSON.stringify(request_params));
+    return routeKendraRequest(request_params);
 };
