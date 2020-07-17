@@ -168,17 +168,6 @@ module.exports={
       "Type":"String",
       "Default":"TRUE"
     },
-    // "EnableKendraFAQ":{
-    //   "Type":"String",
-    //   "AllowedValues":["FALSE","TRUE"],
-    //   "ConstraintDescription":"Allowed Values are FALSE or TRUE",
-    //   "Default":"FALSE",
-    //   "Description":"Defines whether Kendra FAQ integration is enabled"
-    // },
-    // "KendraFAQIndex":{
-    //   "Type":"String",
-    //   "Default":""
-    // }
   },
   "Conditions":{
     "Public":{"Fn::Equals":[{"Ref":"PublicOrPrivate"},"PUBLIC"]},
@@ -187,7 +176,6 @@ module.exports={
     "BuildExamples":{"Fn::Equals":[{"Ref":"BuildExamples"},"TRUE"]},
     "CreateDomain":{"Fn::Equals":[{"Ref":"ElasticsearchName"},"EMPTY"]},
     "DontCreateDomain":{"Fn::Not":[{"Fn::Equals":[{"Ref":"ElasticsearchName"},"EMPTY"]}]},
-    // "KendraFAQIndex":{"Fn::Equals":[{"Ref":"EnableKendraFAQ"}, "TRUE"]}
   }
 }
 

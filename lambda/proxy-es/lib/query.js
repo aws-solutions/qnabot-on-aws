@@ -36,19 +36,13 @@ async function run_query_es(req, query_params) {
 
 async function run_query_kendra(req, query_params) {
     // calls kendrQuery function which duplicates KendraFallback code, but only searches through FAQs
-    //sets up query structure
     var request_params = {
         kendra_faq_index:req["_settings"]["KENDRA_FAQ_INDEX"],
         input_transcript:req["_event"].inputTranscript,
     }
-    
     var res = await kendra.handler(request_params);
-    // TODO: invoke error with fulfillment lambda when using Kendra query & Kendra fallback engine
-    // double check the response structure for when kendra doesn't find anything, and ensure 
-    // its the same as the ES structure when there is no hits!
     // TODO: check if ever more than 1 answer in kendra FAQ...(check console?) 
     // ... assign confidence to 100% for the first one...if necessary?
-    
     return res;
 }
 
@@ -102,7 +96,7 @@ async function get_hit(req, res) {
     };
     var no_hits_question = _.get(req, '_settings.ES_NO_HITS_QUESTION', 'no_hits');
     var response = await run_query(req, query_params);
-    console.log("Query response: ", JSON.stringify(response,null,2));   // TODO: delete
+    console.log("Query response: ", JSON.stringify(response,null,2));
     var hit = _.get(response, "hits.hits[0]._source");
     
     if (hit) {
