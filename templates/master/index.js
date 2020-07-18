@@ -135,13 +135,6 @@ module.exports={
       "ConstraintDescription":"Allowed Values are FALSE or TRUE",
       "Default":"TRUE"
     },
-    "PublicOrPrivate":{
-        "Type":"String",
-        "Description":"(optional) Whether access to the QnABot should be publicly available or restricted to users in QnABot UserPool. Allowed values are PUBLIC or PRIVATE",
-        "AllowedPattern":"(PUBLIC|PRIVATE)",
-        "Default":"PUBLIC",
-        "ConstraintDescription":"Allowed Values are PUBLIC or PRIVATE"
-    },
     "Encryption":{
         "Type":"String",
         "Description":"Defines whether resources (S3 and ElasticSearch) are encrypted at rest. Selecting encrypted configuration will provision c5.large.elasticsearch instances - see https://aws.amazon.com/elasticsearch-service/pricing/.",
