@@ -174,7 +174,13 @@ module.exports={
     "BuildExamples":{
       "Type":"String",
       "Default":"TRUE"
-    }
+    },
+    "PublicOrPrivate":{
+        "Type":"String",
+        "Description":"Choose whether access to the QnABot client should be publicly available or restricted to users in QnABot UserPool.",
+        "AllowedValues" : ["PUBLIC", "PRIVATE"],
+        "Default":"PUBLIC"
+    },
   },
   "Conditions":{
     "Public":{"Fn::Equals":[{"Ref":"PublicOrPrivate"},"PUBLIC"]},

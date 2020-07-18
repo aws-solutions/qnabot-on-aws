@@ -1,6 +1,7 @@
 var Promise = require('bluebird')
 var lex = require('./lex')
 var multilanguage = require('./multilanguage')
+var get_sentiment=require('./sentiment');
 var alexa = require('./alexa')
 var _ = require('lodash')
 var AWS = require('aws-sdk');
@@ -14,6 +15,21 @@ function isJson(str) {
     return true;
 }
 
+function str2bool(settings) {
+    var new_settings = _.mapValues(settings, x => {
+        if (_.isString(x)) {
+            if (x.toLowerCase() === "true") {
+                return true ;
+            }
+            if (x.toLowerCase() === "false") {
+                return false ;
+            }
+        }
+        return x;
+    });
+    return new_settings;
+}
+
 async function get_parameter(param_name) {
     var ssm = new AWS.SSM();
     var params = {
@@ -23,6 +39,7 @@ async function get_parameter(param_name) {
     var settings = response.Parameter.Value
     if (isJson(settings)) {
         settings = JSON.parse(response.Parameter.Value);
+        settings = str2bool(settings) ;
     }
     return settings;
 }
@@ -46,7 +63,7 @@ async function get_settings() {
 
     console.log("Merged Settings: ", settings);
 
-    if (settings.ENABLE_REDACTING.toLowerCase() === "true") {
+    if (settings.ENABLE_REDACTING) {
         console.log("redacting enabled");
         process.env.QNAREDACT="true";
         process.env.REDACTING_REGEX=settings.REDACTING_REGEX;
@@ -57,6 +74,29 @@ async function get_settings() {
     }
     return settings;
 }
+
+// makes best guess as to lex client type in use based on fields in req.. not perfect
+function getClientType(req) {
+    if (req._type == 'ALEXA') {
+        return req._type ;
+    }
+    // Try to determine which Lex client is being used based on patterns in the req - best effort attempt.
+    const voiceortext = (req._preferredResponseType == 'SSML') ? "Voice" : "Text" ;
+    // Amazon Connect indicates support for SSML using request header x-amz-lex:accept-content-types
+    if (_.get(req,"_event.requestAttributes.x-amz-lex:accept-content-types")) {
+        return "LEX.AmazonConnect." + voiceortext ;
+    } else if (_.get(req,"_event.requestAttributes.x-amz-lex:channel-type") == "Twilio-SMS") {
+        return "LEX.TwilioSMS." + voiceortext ;
+    } else if (/^.*-.*-\d:.*-.*-.*-.*$/.test(_.get(req,"_event.userId"))){
+        // user id pattern to detect lex-web-uithrough use of cognito id as userId: e.g. us-east-1:a8e1f7b2-b20d-441c-9698-aff8b519d8d5
+        // TODO: add another clientType indicator for lex-web-ui?
+        return "LEX.LexWebUI." + voiceortext ;
+    } else {
+        // generic LEX client
+        return "LEX." + voiceortext ;
+    }
+}
+
 
 module.exports = async function parse(req, res) {
 
@@ -91,12 +131,21 @@ module.exports = async function parse(req, res) {
         console.log("WARNING: Unrecognised value for outputDialogMode:", outputDialogMode);
     }
 
+    req._clientType = getClientType(req) ;
+
 
     // multilanguage support 
-    if (_.get(settings, 'ENABLE_MULTI_LANGUAGE_SUPPORT', "false").toLowerCase() === "true") {
+    if (_.get(settings, 'ENABLE_MULTI_LANGUAGE_SUPPORT')) {
         await multilanguage.set_multilang_env(req);
     }
     // end of multilanguage support 
+    
+    // get sentiment
+    if (_.get(settings, 'ENABLE_SENTIMENT_SUPPORT')) {
+        req.sentiment = await get_sentiment(req.question);
+    } else {
+        req.sentiment = "NOT_ENABLED";
+    }  
 
     Object.assign(res, {
         type: "PlainText",

@@ -74,7 +74,8 @@ function set_userLocale(Languages, userPreferredLocale, defaultConfidenceScore, 
         locale = userPreferredLocale;
         console.log("set user preference as language to use: ", locale);
     } else if ((userPreferredLocale === undefined || userPreferredLocale === '') && userDetectedLocaleConfidence <= defaultConfidenceScore) {
-        locale = '';
+        locale = 'en'; // default to english
+        console.log("Detected language confidence too low, defaulting to English");
     } else {
         locale = userDetectedLocale;
         console.log("set detected language as language to use: ", locale);

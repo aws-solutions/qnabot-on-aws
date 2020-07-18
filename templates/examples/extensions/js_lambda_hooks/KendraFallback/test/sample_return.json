@@ -111,10 +111,14 @@
                 "previous": [],
                 "hasParent": true
             },
-            "kendraResponsibleQid": "KendraFallback",
-            "kendraQueryId": "ec35a915-8990-4ef7-a5da-f490911cad42",
-            "kendraIndexId": "e1c23860-e5c8-4409-ae26-b05bd6ced00a",
-            "kendraResultId": "ec35a915-8990-4ef7-a5da-f490911cad42-2db7aa5b-1fcb-4910-a2fc-b3922a6069e3"
+            "qnabotcontext": {
+                "kendra":{
+                    "kendraIndexId":"e1c23860-e5c8-4409-ae26-b05bd6ced00a",
+                    "kendraQueryId":"ec35a915-8990-4ef7-a5da-f490911cad42",
+                    "kendraResultId":"ec35a915-8990-4ef7-a5da-f490911cad42-2db7aa5b-1fcb-4910-a2fc-b3922a6069e3",
+                    "kendraResponsibleQid": "KendraFallback"
+                }
+            }
         },
         "card": {
             "send": false,
