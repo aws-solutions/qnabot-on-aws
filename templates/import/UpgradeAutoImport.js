@@ -16,6 +16,7 @@ module.exports={
             exportbucket:{"Ref":"ExportBucket"},
             id:exportfile,
             index:{"Ref":"VarIndex"},
+            encryption:{"Ref":"Encryption"},
         }
     },
     "PostUpgradeImportMetrics":{
@@ -27,6 +28,7 @@ module.exports={
             exportbucket:{"Ref":"ExportBucket"},
             id:exportfile_metrics,
             index:{"Ref":"MetricsIndex"},
+            encryption:{"Ref":"Encryption"},
         }
     },
     "PostUpgradeImportFeedback":{
@@ -38,6 +40,7 @@ module.exports={
             exportbucket:{"Ref":"ExportBucket"},
             id:exportfile_feedback,
             index:{"Ref":"FeedbackIndex"},
+            encryption:{"Ref":"Encryption"},
         }
     },
 }

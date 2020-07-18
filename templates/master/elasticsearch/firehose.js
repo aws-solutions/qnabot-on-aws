@@ -67,6 +67,21 @@ module.exports={
         "Type" : "AWS::S3::Bucket",
         "DeletionPolicy":"Delete",
         "Properties" : {
+          "BucketEncryption": {
+              "Fn::If": [
+                  "Encrypted",
+                  {
+                      "ServerSideEncryptionConfiguration": [{
+                          "ServerSideEncryptionByDefault": {
+                              "SSEAlgorithm": "AES256"
+                          }
+                      }]
+                  },
+                  {
+                      "Ref": "AWS::NoValue"
+                  }
+              ]
+          },
           "Tags" : [
               {
                 "Key" : "Use",

@@ -14,6 +14,7 @@ module.exports={
             bucket:{"Ref":"ExportBucket"},
             id:exportfile,
             index:{"Fn::Sub":"${Var.QnaIndex}"},
+            encryption:{"Ref":"Encryption"},
         }
     },
     "PreUpgradeExportMetrics":{
@@ -23,6 +24,7 @@ module.exports={
             bucket:{"Ref":"ExportBucket"},
             id:exportfile_metrics,
             index:{"Fn::Sub":"${Var.MetricsIndex}"},
+            encryption:{"Ref":"Encryption"},
         }
     },
     "PreUpgradeExportFeedback":{
@@ -32,6 +34,7 @@ module.exports={
             bucket:{"Ref":"ExportBucket"},
             id:exportfile_feedback,
             index:{"Fn::Sub":"${Var.FeedbackIndex}"},
+            encryption:{"Ref":"Encryption"},
         }
     },
 }

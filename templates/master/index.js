@@ -142,6 +142,13 @@ module.exports={
         "Default":"PUBLIC",
         "ConstraintDescription":"Allowed Values are PUBLIC or PRIVATE"
     },
+    "Encryption":{
+        "Type":"String",
+        "Description":"Defines whether resources (S3 and ElasticSearch) are encrypted at rest. Selecting encrypted configuration will provision c5.large.elasticsearch instances - see https://aws.amazon.com/elasticsearch-service/pricing/.",
+        "AllowedValues": ["ENCRYPTED", "UNENCRYPTED"],
+        "Default":"UNENCRYPTED",
+        "ConstraintDescription":"Allowed Values are UNENCRYPTED or ENCRYPTED"
+    },
     "ApprovedDomain":{
         "Type":"String",
         "Description":"(optional) If QnABot is private, restrict user sign up to users whos email domain matches this domain. eg. amazon.com",
@@ -171,6 +178,7 @@ module.exports={
   },
   "Conditions":{
     "Public":{"Fn::Equals":[{"Ref":"PublicOrPrivate"},"PUBLIC"]},
+    "Encrypted":{"Fn::Equals":[{"Ref":"Encryption"}, "ENCRYPTED"]},
     "AdminSignUp":{"Fn::Equals":[{"Ref":"AdminUserSignUp"},"TRUE"]},
     "Domain":{"Fn::Not":[{"Fn::Equals":[{"Ref":"ApprovedDomain"},"NONE"]}]},
     "BuildExamples":{"Fn::Equals":[{"Ref":"BuildExamples"},"TRUE"]},

@@ -34,7 +34,8 @@ module.exports=Promise.resolve(require('../master')).then(function(base){
 
     base.Parameters=_.pick(base.Parameters,[
         "Email",
-        "Username"
+        "Username",
+        "Encryption"
     ])
     base.Conditions.Public={"Fn::Equals":[true,true]}
     base.Conditions.AdminSignUp={"Fn::Equals":[true,true]}

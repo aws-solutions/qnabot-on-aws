@@ -23,5 +23,6 @@ module.exports={
         "VarIndex": {"Type":"String"},
         "MetricsIndex": {"Type":"String"},
         "FeedbackIndex": {"Type":"String"},
+        "Encryption": {"Type":"String"},
     }
 }
