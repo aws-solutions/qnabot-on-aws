@@ -1,4 +1,4 @@
-#set ( $root="https://${!context.domainName}/${!context.stage}")
+#set ( $root="https://${!context.apiId}.execute-api.${!stageVariables.Region}.amazonaws.com/${!context.stage}")
 
 {
     "region":"${!stageVariables.Region}",
@@ -31,10 +31,10 @@
             "href":"$root/examples/documents"
         },
         "DesignerLogin":{
-            "href":"$root/pages/designer"
+            "href":"$stageVariables.DesignerLoginUrl"
         },
         "ClientLogin":{
-            "href":"$root/static/client.html"
+            "href":"$stageVariables.ClientLoginUrl"
         },
         "CognitoEndpoint":{
             "href":"$stageVariables.CognitoEndpoint"
@@ -47,3 +47,4 @@
         }
     }
 }
+
