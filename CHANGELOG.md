@@ -12,6 +12,7 @@
     - Added session attribute named "qnabot_qid" that holds the matching question id found in elastic search
     - Added session attribute "qnabot_gotanswer" that holds boolean true/fale if an answer was fround
     - Encapsulating all Kendra and Elicit Response Bot session attributes into a single "qnabotcontext" attribute making it easier to store and reset in Connect contact flow
+- Added new QNAYesNoExit elicit response bot which allows a user to exit the YesNoExit question using "exit", "bye", "quit", "admin", "rep","representative","stop", "help", "bye", "goodbye" which sets the Yes_No_Exit slot value / session attribute to "Exit".
 - Update to 0.17.0 of embedded lex-web-ui
 - Resolved additional dependabot identified security issues with dependent packages
 - Fixed lambda/fulfillment unit tests
