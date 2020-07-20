@@ -12,6 +12,6 @@
     "bluebird": "^3.5.1",
     "cfn-response": "^1.0.1",
     "handlebars": "^4.7.6",
-    "lodash": "^4.17.4"
+    "lodash": "^4.17.19"
   }
 }
