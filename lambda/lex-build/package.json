@@ -15,7 +15,7 @@
     "elasticsearch": "^16.7.1",
     "http-aws-es": "^6.0.0",
     "intercept-stdout": "^0.1.2",
-    "lodash": "^4.17.15"
+    "lodash": "^4.17.19"
   },
   "devDependencies": {
     "nodeunit": "^0.11.1"
