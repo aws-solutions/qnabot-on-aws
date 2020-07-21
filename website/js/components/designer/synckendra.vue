@@ -8,13 +8,11 @@
       v-model="snackbar"
     )
       v-card(id="kendra-syncing")
-        v-card-title(primary-title) Syncing  : {{status}}
+        v-card-title(primary-title) Syncing  : {{request_status}}
         v-card-text
           v-subheader.error--text(v-if='error' id="error") {{error}}
           v-subheader.success--text(v-if='success' id="success") Success!
-          v-subheader.error--text(v-if='message' ) {{message}}
           v-progress-linear(v-if='!error && !success' indeterminate)
-          <!--v-progress-linear(v-model="job.progress*100")-->
         v-card-actions
           v-spacer
           v-btn(@click='cancel' flat id="kendra-close") close
@@ -46,16 +44,11 @@ module.exports={
       loading:false,
       success:false,
       error:'',
-      request_status:"Ready"
+      request_status:"Ready",
+      filename:'qna-kendra-faq.txt'
     }
   },
   computed:{
-    status:function(){
-      return _.get(this, "$request_status", "Ready")
-    },
-    message:function(){
-      return _.get(this,"$store.state.bot.build.message")
-    }
   },
   created:async function(){
     this.refresh() 
@@ -79,28 +72,20 @@ module.exports={
         async function poll(){
           var status=await self.$store.dispatch('api/getExport',job)
           Object.assign(out,coll[index],status)
-          console.log(status.status)
-          
-          if (status.status == 'Completed') this.request_status = 'Export Finished'
-          else this.request_status = status.status
-          
-          if(this.request_status!=="Export Finished" && this.request_status!=="Error"){
-            setTimeout(()=>poll(),1000)
-          // } else if (this.request_status=='Export Finished'){
-            // TODO: status updates beyond just the export
-            // poll_sync();
+          console.log(status.status);
+          if (status.status == 'Completed') {
+            status.status = 'Export finished. Running KendraSync'   // this just masks it in the UI
           }
+          self.request_status = status.status
+          // TODO: grab the status file, write another state after completed, check for syncing finished.
+          // in the lambda doing the conversion, in the key hardwire the status self.filename, 
+          // update to sync completed when finished (or error)
+          
+          if(status.status!=="Completed" && status.status!=="Error"){
+            setTimeout(()=>poll(),1000)
+          }
+          // TODO: delete old export file!!!
         }
-        // async function poll_sync(){
-        //   var status=await self.$store.dispatch('api/getExport',job)
-        //   Object.assign(out,coll[index],status)
-        //   console.log(status.status)
-        //   if(status.status!=="Completed" && status.status!=="Error"){
-        //     setTimeout(()=>poll(),1000)
-        //   } else if (status.status=='Completed'){
-        //     // TODO: status updates beyond just the export
-        //   }
-        // }
       })
     },
     start:async function(){
@@ -111,7 +96,7 @@ module.exports={
       this.error=''
       try{
         await this.$store.dispatch('api/startKendraSyncExport',{
-          name:'qna-kendra-faq.txt',
+          name:this.filename,
           filter:''
         })
         await this.refresh()

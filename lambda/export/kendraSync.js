@@ -3,10 +3,10 @@ var aws=require("aws-sdk")
 aws.config.setPromisesDependency(Promise)
 aws.config.region=process.env.AWS_REGION
 
-var s3=(process.env.REGION ? 
-        new aws.S3({apiVersion: "2006-03-01", region:process.env.REGION}) :
-        new aws.S3({apiVersion: "2006-03-01", region:'us-east-1'}));    // TODO: pull from AWS::Region
-// const AWSS3 = require('aws-sdk/clients/s3')
+var s3=new aws.S3({apiVersion: "2006-03-01", region:process.env.REGION});
+// var s3=(process.env.REGION ? 
+//         new aws.S3({apiVersion: "2006-03-01", region:process.env.REGION}) :
+//         new aws.S3({apiVersion: "2006-03-01", region:'us-east-1'}));
 var _=require('lodash')
 var parse=require('./parseJSON')
 var create=require('./createFAQ')
