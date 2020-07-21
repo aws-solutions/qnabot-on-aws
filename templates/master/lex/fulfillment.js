@@ -127,7 +127,7 @@ module.exports = {
       "ManagedPolicyArns": [
         "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
         "arn:aws:iam::aws:policy/TranslateReadOnly",
-        { "Ref": "EsPolicy" }
+        { "Ref": "QueryPolicy" }
       ],
       "Policies": [
         {

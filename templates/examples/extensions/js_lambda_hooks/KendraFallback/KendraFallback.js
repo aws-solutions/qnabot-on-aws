@@ -102,6 +102,24 @@ function longestInterval(intervals) {
 }
 
 
+/** Function that returns if a string has JSON structure
+ * @param str - input string
+ * @returns boolean true or false
+ */
+function hasJsonStructure(str) {
+    if (typeof str !== 'string') return false;
+    try {
+        const result = JSON.parse(str);
+        const type = Object.prototype.toString.call(result);
+        return type === '[object Object]' 
+            || type === '[object Array]';
+    } catch (err) {
+        return false;
+    }
+}
+
+
+
 /** Function that processes kendra requests and handles response. Decides whether to handle SNS
  * events or Lambda Hook events from QnABot.
  * @param event - input event passed to the Lambda Handler
@@ -144,7 +162,7 @@ async function routeKendraRequest(event, context) {
         }
     }
     if (kendraIndexes === undefined) {
-        throw new Error('Undefined Kendra Indexe');
+        throw new Error('Undefined Kendra Indexes');
     }
 
     // This function can handle configuration with an array of kendraIndexes.
@@ -267,6 +285,9 @@ async function routeKendraRequest(event, context) {
                     kendraResultId = element.Id; // store off resultId to use as a session attribute for feedback
                     foundAnswerCount++;
                     
+                    // TODO: use json structure for query response from doc URL field
+                    // var json_struct = JSON.parse(element.DocumentURI);
+                    
                     
                 } else if (element.Type === 'DOCUMENT' && element.DocumentExcerpt.Text && element.DocumentURI) {
                     const docInfo = {}
@@ -289,7 +310,6 @@ async function routeKendraRequest(event, context) {
                     docInfo.uri = element.DocumentURI;
                     helpfulDocumentsUris.add(docInfo);
                     foundAnswerCount++;
-                    foundDocumentCount++;   // TODO: foundDocumentCount is not used elsewhere...
                 }
             });
         }
@@ -346,7 +366,7 @@ async function routeKendraRequest(event, context) {
         event.res.session.kendraIndexId = kendraIndexId;
         event.res.session.kendraResultId = kendraResultId;
     }
-    console.log("final return: " + JSON.stringify(event,null,2));
+    // console.log("final return: " + JSON.stringify(event,null,2));
     return event;
 }
 

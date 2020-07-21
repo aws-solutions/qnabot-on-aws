@@ -30,11 +30,14 @@ module.exports=Promise.resolve(require('../master')).then(function(base){
         "IntentFallback",
         "DefaultSettingsSSMParameterName",
         "CustomSettingsSSMParameterName"
+        // "KendraFAQIndex"
     ])
 
     base.Parameters=_.pick(base.Parameters,[
         "Email",
-        "Username"
+        "Username",
+        // "KendraFAQIndex",
+        // "EnableKendraFAQ"
     ])
     base.Conditions.Public={"Fn::Equals":[true,true]}
     base.Conditions.AdminSignUp={"Fn::Equals":[true,true]}

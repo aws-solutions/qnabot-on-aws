@@ -12,6 +12,9 @@ module.exports={
                 "EsEndpoint": {"Fn::GetAtt": ["ESVar", "ESAddress"]},
                 "EsProxyLambda": {"Fn::GetAtt":["ESProxyLambda","Arn"]},
                 "ExportBucket": {"Ref":"ExportBucket"},
+                // "KendraFAQIndex": {"Ref":"KendraFAQIndex"}
+                "DefaultQnABotSettings":{"Ref":"DefaultQnABotSettings"},
+                "CustomQnABotSettings":{"Ref":"CustomQnABotSettings"},
             }
         }
     }

@@ -6,12 +6,25 @@ var request = require('./request');
 var build_es_query = require('./esbodybuilder');
 var handlebars = require('./handlebars');
 var translate = require('./translate');
+var kendra = require('./kendraQuery');
+
 
 // use DEFAULT_SETTINGS_PARAM as random encryption key unique to this QnABot installation
 var key = _.get(process.env, "DEFAULT_SETTINGS_PARAM", "fdsjhf98fd98fjh9 du98fjfd 8ud8fjdf");
 var encryptor = require('simple-encryptor')(key);
 
 async function run_query(req, query_params) {
+    var no_hits_question = _.get(req, '_settings.ES_NO_HITS_QUESTION', 'no_hits');
+    if (_.get(req, "_settings.KENDRA_FAQ_INDEX") != "" && query_params['question'] != no_hits_question) {
+        console.log("Querying Kendra FAQ index: " + _.get(req, "_settings.KENDRA_FAQ_INDEX"));
+        return await run_query_kendra(req, query_params);
+    } else {
+        console.log('Querying ElasticSearch');
+        return await run_query_es(req, query_params);
+    }
+}
+
+async function run_query_es(req, query_params) {
     var es_query = await build_es_query(query_params);
     var es_response = await request({
         url: `https://${req._info.es.address}/${req._info.es.index}/_doc/_search?search_type=dfs_query_then_fetch`,
@@ -19,6 +32,24 @@ async function run_query(req, query_params) {
         body: es_query
     });
     return es_response;
+}
+
+async function run_query_kendra(req, query_params) {
+    // calls kendrQuery function which duplicates KendraFallback code, but only searches through FAQs
+    //sets up query structure
+    var request_params = {
+        kendra_faq_index:req["_settings"]["KENDRA_FAQ_INDEX"],
+        input_transcript:req["_event"].inputTranscript,
+    }
+    
+    var res = await kendra.handler(request_params);
+    // TODO: invoke error with fulfillment lambda when using Kendra query & Kendra fallback engine
+    // double check the response structure for when kendra doesn't find anything, and ensure 
+    // its the same as the ES structure when there is no hits!
+    // TODO: check if ever more than 1 answer in kendra FAQ...(check console?) 
+    // ... assign confidence to 100% for the first one...if necessary?
+    
+    return res;
 }
 
 function merge_next(hit1, hit2) {
@@ -71,8 +102,9 @@ async function get_hit(req, res) {
     };
     var no_hits_question = _.get(req, '_settings.ES_NO_HITS_QUESTION', 'no_hits');
     var response = await run_query(req, query_params);
-    console.log("Query response: ", JSON.stringify(response,null,2));
+    console.log("Query response: ", JSON.stringify(response,null,2));   // TODO: delete
     var hit = _.get(response, "hits.hits[0]._source");
+    
     if (hit) {
         res['got_hits'] = 1;  // response flag, used in logging / kibana
     } else {

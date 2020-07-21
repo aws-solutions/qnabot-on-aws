@@ -51,7 +51,7 @@ module.exports={
             "CreateDomain",
             {"Ref":"ElasticsearchDomain"},
             {"Ref":"ElasticsearchName"}
-        ]},
+        ]}
     }
 },
 "ApiUrl":{
