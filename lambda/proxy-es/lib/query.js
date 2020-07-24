@@ -215,7 +215,7 @@ module.exports = async function (req, res) {
         hit = await evaluateConditionalChaining(req, res, fakeHit, elicitResponseChainingConfig);
     } else {
         // elicitResponse is not involved. obtain the next question to serve up to the user.
-        hit = await get_hit(req, res);
+        hit = await get_hit(req, res);  // TODO: translate to english first...?
     }
     if (hit) {
         // found a document in elastic search.

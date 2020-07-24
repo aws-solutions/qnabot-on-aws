@@ -3,10 +3,8 @@ var aws=require("aws-sdk")
 aws.config.setPromisesDependency(Promise)
 aws.config.region=process.env.AWS_REGION
 
-var s3=new aws.S3({apiVersion: "2006-03-01", region:process.env.REGION});
-// var s3=(process.env.REGION ? 
-//         new aws.S3({apiVersion: "2006-03-01", region:process.env.REGION}) :
-//         new aws.S3({apiVersion: "2006-03-01", region:'us-east-1'}));
+var s3=new aws.S3({apiVersion: "2006-03-01", region:process.env.REGION})
+var kendra=new aws.Kendra({apiVersion: "2019-02-03", region:process.env.REGION})
 var _=require('lodash')
 var parse=require('./parseJSON')
 var create=require('./createFAQ')
@@ -86,48 +84,90 @@ async function get_settings() {
  * @returns 'Synced' if successful
  */
 exports.performSync=async function(event,context,cb){
-    console.log("Request",JSON.stringify(event,null,2))
-    var Bucket=event.Records[0].s3.bucket.name
-    var Key=decodeURI(event.Records[0].s3.object.key)
-    var VersionId=_.get(event,"Records[0].s3.object.versionId")
-    console.log(Bucket,Key)
-    
-    await s3.headObject({Bucket,Key,VersionId})
-    await s3.waitFor('objectExists',{Bucket,Key,VersionId}).promise()
-    console.log('objectExists promise');
-    let x = await s3.getObject({Bucket,Key,VersionId}).promise()
-    var content = x.Body.toString()
-    
-    var parseJSONparams = {
-        csv_name:'qna_FAQ.csv',
-        content:content,
-        output_path:'/tmp/qna_FAQ.csv',
-    }
-    await parse.handler(parseJSONparams)
-    console.log("Parsed content JSON into CSV stored locally");
+    try {
+        console.log("Request",JSON.stringify(event,null,2))
+        var Bucket=event.Records[0].s3.bucket.name
+        var Key=decodeURI(event.Records[0].s3.object.key)
+        var VersionId=_.get(event,"Records[0].s3.object.versionId")
+        console.log(Bucket,Key)
         
-    // get QnABot settings to retrieve KendraFAQIndex
-    var settings = await get_settings();
-    var kendra_faq_index = _.get(settings, 'KENDRA_FAQ_INDEX', "");
-    if (kendra_faq_index == "") {
-        throw new Error(`No FAQ Index set: ${kendra_faq_index}`);
+        // triggered by export file, waits to be uploaded
+        await s3.headObject({Bucket,Key,VersionId})
+        await s3.waitFor('objectExists',{Bucket,Key,VersionId}).promise()
+        console.log('objectExists promise');
+        let x = await s3.getObject({Bucket,Key,VersionId}).promise()
+        var content = x.Body.toString()
+        
+        // parse JSON into CSV
+        var parseJSONparams = {
+            csv_name:'qna_FAQ.csv',
+            content:content,
+            output_path:'/tmp/qna_FAQ.csv',
+        }
+        // await update_status(process.env.OUTPUT_S3_BUCKET, 'Parsing content JSON');
+        await parse.handler(parseJSONparams)
+        console.log("Parsed content JSON into CSV stored locally");
+            
+        // get QnABot settings to retrieve KendraFAQIndex
+        var settings = await get_settings();
+        var kendra_faq_index = _.get(settings, 'KENDRA_FAQ_INDEX', "");
+        if (kendra_faq_index == "") {
+            throw new Error(`No FAQ Index set: ${kendra_faq_index}`);
+        }
+        console.log(`kendra faq index is ${kendra_faq_index}`);
+        
+        // create kendra FAQ from csv
+        var createFAQparams = {
+            faq_name:'qna-facts',
+            faq_index_id:kendra_faq_index,
+            csv_path:parseJSONparams.output_path,
+            csv_name:parseJSONparams.csv_name,
+            s3_bucket:process.env.OUTPUT_S3_BUCKET,
+            s3_key:"kendra_csv" + "/" + parseJSONparams.csv_name,
+            kendra_s3_access_role:process.env.KENDRA_ROLE,
+            region:process.env.REGION
+        }
+        // await update_status(process.env.OUTPUT_S3_BUCKET, 'Creating FAQ');
+        await create.handler(createFAQparams);  // awaits a promise
+
+        // wait for index to complete creation
+        // TODO: https://docs.aws.amazon.com/kendra/latest/dg/create-index.html
+
+        console.log('Completed CSV converting to FAQ');
+
+        var status_params = {
+            Bucket:process.env.OUTPUT_S3_BUCKET,
+            Key:'status/qna-kendra-faq.txt'
+        }
+        
+        x = await s3.getObject(status_params);
+        var config = JSON.parse(x.Body.toString());
+        config.status = 'Sync Complete';
+        status_params.Body = JSON.stringify(config);
+        await s3.putObject(status_params);
+        // await update_status(process.env.OUTPUT_S3_BUCKET, 'Sync Complete');
+        
+        console.log(`sync complete`);
+        return 'Synced';
+        
+    } catch (err) {
+        await update_status(process.env.OUTPUT_S3_BUCKET, 'Error');
+        console.log(`failed sync`);
+        return err
     }
-    console.log(`kendra faq index is ${kendra_faq_index}`);
-    
-    var createFAQparams = {
-        faq_name:'qna-facts',
-        faq_index_id:kendra_faq_index,
-        csv_path:parseJSONparams.output_path,
-        csv_name:parseJSONparams.csv_name,
-        s3_bucket:process.env.OUTPUT_S3_BUCKET,
-        s3_key:"kendra_csv" + "/" + parseJSONparams.csv_name,
-        kendra_s3_access_role:process.env.KENDRA_ROLE,
-        region:process.env.REGION
-    }
-    await create.handler(createFAQparams);
-    
-    console.log('Completed CSV converting to FAQ');
-    return 'Synced';
 }
 
 
+async function update_status(bucket, new_stat) {
+    var status_params = {
+        Bucket:bucket,
+        Key:'status/qna-kendra-faq.txt'
+    }
+    
+    var x = await s3.getObject(status_params).promise();
+    var config = JSON.parse(x.Body.toString());
+    config.status = new_stat;
+    status_params.Body = JSON.stringify(config);
+    console.log('updated config file status to ' + new_stat);
+    return await s3.putObject(status_params).promise();
+}

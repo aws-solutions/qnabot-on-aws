@@ -45,7 +45,7 @@ module.exports={
       success:false,
       error:'',
       request_status:"Ready",
-      filename:'qna-kendra-faq.txt'
+      filename:'qna-kendra-faq.txt' // do not change because same key needed for UI status updates in lambda/export/kendraSync
     }
   },
   computed:{
@@ -69,22 +69,25 @@ module.exports={
         Object.assign(out,coll[index],info)
         coll.splice(index,1,out)
         poll()
+        
         async function poll(){
+          // get status file
           var status=await self.$store.dispatch('api/getExport',job)
           Object.assign(out,coll[index],status)
           console.log(status.status);
-          if (status.status == 'Completed') {
-            status.status = 'Export finished. Running KendraSync'   // this just masks it in the UI
-          }
-          self.request_status = status.status
-          // TODO: grab the status file, write another state after completed, check for syncing finished.
-          // in the lambda doing the conversion, in the key hardwire the status self.filename, 
-          // update to sync completed when finished (or error)
           
-          if(status.status!=="Completed" && status.status!=="Error"){
+          // if export status is completed, switch to running kendra sync
+          if (status.status == 'Completed') status.status = 'Export finished. Running KendraSync'   // this just masks it in the UI
+          self.request_status = status.status
+          
+          // if job is not complete and not error, poll again
+          if(status.status!=="Sync Complete" && status.status!=="Error"){
             setTimeout(()=>poll(),1000)
           }
           // TODO: delete old export file!!!
+          var exports=await this.$store.dispatch('api/listExports')
+          await self.$store.dispatch('api/deleteExport',exports[index])
+          setTimeout(undefined, 60000);
         }
       })
     },
@@ -102,7 +105,9 @@ module.exports={
         await this.refresh()
       }catch(e){
         this.error=e
+        this.request_status = 'Error'
       }finally{
+        if (this.request_status != 'Error') this.success = true
       }
     }
   }
