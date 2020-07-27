@@ -84,8 +84,9 @@ module.exports={
           if(status.status!=="Sync Complete" && status.status!=="Error"){
             setTimeout(()=>poll(),1000)
           }
-          // TODO: delete old export file!!!
-          var exports=await this.$store.dispatch('api/listExports')
+          
+          // delete old export file
+          var exports=await self.$store.dispatch('api/listExports')
           await self.$store.dispatch('api/deleteExport',exports[index])
           setTimeout(undefined, 60000);
         }

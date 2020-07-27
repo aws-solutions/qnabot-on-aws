@@ -92,7 +92,7 @@ exports.performSync=async function(event,context,cb){
         console.log(Bucket,Key)
         
         // triggered by export file, waits to be uploaded
-        await s3.headObject({Bucket,Key,VersionId})
+        // await s3.headObject({Bucket,Key,VersionId})
         await s3.waitFor('objectExists',{Bucket,Key,VersionId}).promise()
         console.log('objectExists promise');
         let x = await s3.getObject({Bucket,Key,VersionId}).promise()
