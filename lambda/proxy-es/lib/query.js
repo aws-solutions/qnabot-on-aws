@@ -23,8 +23,8 @@ async function run_query(req, query_params) {
 }
 
 async function run_query_es(req, query_params) {
-    console.log('Querying ElasticSearch');
     var es_query = await build_es_query(query_params);
+    console.log('Querying ElasticSearch');
     var es_response = await request({
         url: `https://${req._info.es.address}/${req._info.es.index}/_doc/_search?search_type=dfs_query_then_fetch`,
         method: "GET",
@@ -37,9 +37,15 @@ async function run_query_kendra(req, query_params) {
     console.log("Querying Kendra FAQ index: " + _.get(req, "_settings.KENDRA_FAQ_INDEX"));
     // calls kendrQuery function which duplicates KendraFallback code, but only searches through FAQs
     var request_params = {
-        kendra_faq_index:req["_settings"]["KENDRA_FAQ_INDEX"],
-        input_transcript:req["_event"].inputTranscript,
+        kendra_faq_index:req["_settings"]["KENDRA_FAQ_INDEX"]
     }
+    // autotranslate
+    if (req["_event"]['userDetectedLocale'] != 'en') {
+        request_params['input_transcript'] = query_params.question;
+    } else {
+        request_params['input_transcript']= req["_event"].inputTranscript;
+    }
+
     var res = await kendra.handler(request_params);
     // TODO: check if ever more than 1 answer in kendra FAQ...(check console?) 
     // ... assign confidence to 100% for the first one...if necessary?
