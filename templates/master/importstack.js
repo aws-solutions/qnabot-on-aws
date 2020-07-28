@@ -16,6 +16,7 @@ module.exports={
                 "VarIndex": {"Fn::GetAtt": ["Var", "QnaIndex"]},
                 "MetricsIndex": {"Fn::GetAtt": ["Var", "MetricsIndex"]},
                 "FeedbackIndex": {"Fn::GetAtt": ["Var", "FeedbackIndex"]},
+                "Encryption": {"Ref":"Encryption"},
             }
         }
     }

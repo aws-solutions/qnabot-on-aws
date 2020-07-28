@@ -35,7 +35,7 @@ async function waitForImport(s3params, timeout){
         var res = await s3.getObject(s3params).promise() ;
         body = JSON.parse(res.Body.toString()); 
         console.log(body.status);
-        complete = (body.status == "Completed") ? true : false ;
+        complete = (body.status == "Complete") ? true : false ;
         timedout = (Date.now() > stoptime) ? true : false ;
     } while( !complete && !timedout );
     if (!complete && timedout ) {

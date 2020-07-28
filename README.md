@@ -7,6 +7,8 @@ This repository contains code for the QnABot, described in the AWS AI blog post 
 
 See the "Getting Started" to launch your own QnABot
 
+**New features in 4.1.0** [Encryption at rest for S3 and Elastic Search Cluster, option to require Cognito user pool authorization to access embedded web UI, enhanced Kendra integration, enhanced Connect integration, and others](#new-features)
+
 **New features in 4.0.0** [Update to Elasticsearch 7.4, improved question matching accuracy, fuzzy matching, new multi-language support debug setting, SSML for Amazon Connect, improved Kendra integration, full upgrade support](#new-features)
 
 **New features in 3.0.3** [New content tuning Readme, Enhanced CFN Lex Resource to work with manually created Bot versions](#new-features)
@@ -149,6 +151,26 @@ We are currently working on adding Microsoft Edge support.
 See the [LICENSE.md](LICENSE.md) file for details
 
 ## New features 
+
+### Version 4.1.0
+- Install / Upgrade now supports the option to configure S3 Buckets and Elastic Search cluster using encryption at rest
+- Install / Upgrade now supports the option to require Cognito based user authorization to access the built-in full screen web UI (Public/Private parameter in template) - Public is the default
+- Added two settings parameters to enforce user identity verification check, so that bot can be secured for use by authenticated users only
+    - ENFORCE_VERIFIED_IDENTITY. Default is false. Set to true to make QnABot require verified identity from client
+    - NO_VERIFIED_IDENTITY_QUESTION. The default is "no_verified_identity". If user identity cannot be verified, replace question string with this. If not verified, the system will respond to user's question with the result of searching for NO_VERIFIED_IDENTITY_QUESTION. This allows a customizable message which informs the user that they must log in. A default question with qid "no_verified_identity" is included in QNAUtility example package.
+- Enhanced Kendra fallback integration to use a specific answer if there is a best answer available and bold face highlighted words from Kendra response
+- Added Comprehend sentiment analysis to all utterances and text captured by the QNAFreeText elicit response bot
+- Enhanced Kibana dashboard to identify Lex client channels - Connect, Web, SMS
+- Improved internal use of Booleans from settings configuration 
+- Enhanced Connect integration 
+    - Added session attribute named "qnabot_qid" that holds the matching question id found in elastic search
+    - Added session attribute "qnabot_gotanswer" that holds boolean true/fale if an answer was fround
+    - Encapsulating all Kendra and Elicit Response Bot session attributes into a single "qnabotcontext" attribute making it easier to store and reset in Connect contact flow
+- Added new QNAYesNoExit elicit response bot which allows a user to exit the YesNoExit question using "exit", "bye", "quit", "admin", "rep","representative","stop", "help", "bye", "goodbye" which sets the Yes_No_Exit slot value / session attribute to "Exit".
+- Update to 0.17.0 of embedded lex-web-ui
+- Resolved additional dependabot identified security issues with dependent packages
+- Fixed lambda/fulfillment unit tests
+- Fixed defect where response bot was not triggered on next question when using lambda function for conditional chaining 
 
 ### Version 4.0.0
 - Update to Elasticsearch 7.4

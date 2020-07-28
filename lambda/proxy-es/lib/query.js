@@ -160,7 +160,7 @@ async function evaluateConditionalChaining(req, res, hit, conditionalChaining) {
         var lambdaName = conditionalChaining.split("::")[1] ;
         console.log("Calling Lambda:", lambdaName);
         var lambda= new aws.Lambda();
-        var res=await lambda.invoke({
+        var lambdares=await lambda.invoke({
             FunctionName:lambdaName,
             InvocationType:"RequestResponse",
             Payload:JSON.stringify({
@@ -168,12 +168,20 @@ async function evaluateConditionalChaining(req, res, hit, conditionalChaining) {
                 res:res
             })
         }).promise();
-        next_q=res.Payload;
+        next_q=lambdares.Payload;
     } else {
-        // provide 'SessionAttributes' to chaining rule safeEval context, consistent with Handlebars context
+        // create chaining rule safeEval context, aligned with Handlebars context
         const SessionAttributes = (arg) => _.get(SessionAttributes, arg, undefined);
         _.assign(SessionAttributes, res.session);
-        const context={SessionAttributes};
+        const context={
+            LexOrAlexa: req._type,
+            UserInfo:req._userInfo, 
+            SessionAttributes,
+            Settings: req._settings,
+            Question: req.question,
+            OrigQuestion: _.get(req,"_event.origQuestion",req.question),
+            Sentiment: req.sentiment,
+        };
         console.log("Evaluating:", conditionalChaining);
         // safely evaluate conditionalChaining expression.. throws an exception if there is a syntax error
         next_q = safeEval(conditionalChaining, context);
@@ -187,16 +195,18 @@ async function evaluateConditionalChaining(req, res, hit, conditionalChaining) {
         const responsebot_hook = _.get(hit2, "elicitResponse.responsebot_hook", undefined);
         const responsebot_session_namespace = _.get(hit2, "elicitResponse.response_sessionattr_namespace", undefined);
         const chaining_configuration = _.get(hit2, "conditionalChaining", undefined);
+        var elicitResponse = {} ;
         if (responsebot_hook && responsebot_session_namespace) {
-            res.session.elicitResponse = responsebot_hook;
-            res.session.elicitResponseNamespace = responsebot_session_namespace;
+            elicitResponse.responsebot = responsebot_hook;
+            elicitResponse.namespace = responsebot_session_namespace;
+            elicitResponse.chainingConfig = chaining_configuration;
             _.set(res.session, res.session.elicitResponseNamespace + ".boterror", undefined );
-            res.session.elicitResponseChainingConfig = chaining_configuration;
         } else {
-            res.session.elicitResponse = undefined;
-            res.session.elicitResponseNamespace = undefined;
-            res.session.elicitResponseChainingConfig = chaining_configuration;
+            elicitResponse.responsebot = undefined;
+            elicitResponse.namespace = undefined;
+            elicitResponse.chainingConfig = chaining_configuration;
         }
+        _.set(res.session,'qnabotcontext.elicitResponse',elicitResponse);
         return (merge_next(hit, hit2));
     } else {
         console.log("WARNING: No documents found for evaluated chaining rule:", next_q);
@@ -205,20 +215,20 @@ async function evaluateConditionalChaining(req, res, hit, conditionalChaining) {
 }
 
 module.exports = async function (req, res) {
-    let redactEnabled = _.get(req, '_settings.ENABLE_REDACTING', "false");
+    let redactEnabled = _.get(req, '_settings.ENABLE_REDACTING');
     let redactRegex = _.get(req, '_settings.REDACTING_REGEX', "\\b\\d{4}\\b(?![-])|\\b\\d{9}\\b|\\b\\d{3}-\\d{2}-\\d{4}\\b");
 
-    if (redactEnabled.toLowerCase() === "true") {
+    if (redactEnabled) {
         process.env.QNAREDACT= "true";
         process.env.REDACTING_REGEX = redactRegex;
     } else {
         process.env.QNAREDACT="false";
         process.env.REDACTING_REGEX="";
     }
-    const elicitResponseChainingConfig = _.get(res, "session.elicitResponseChainingConfig", undefined);
-    const elicitResponseProgress = _.get(res, "session.elicitResponseProgress", undefined);
+    const elicitResponseChainingConfig = _.get(res, "session.qnabotcontext.elicitResponse.chainingConfig", undefined);
+    const elicitResponseProgress = _.get(res, "session.qnabotcontext.elicitResponse.progress", undefined);
     let hit = undefined;
-    if (elicitResponseChainingConfig && elicitResponseProgress === 'Fulfilled') {
+    if (elicitResponseChainingConfig && (elicitResponseProgress === 'Fulfilled') || elicitResponseProgress === 'ReadyForFulfillment') {
         // elicitResponse is finishing up as the LexBot has fulfilled its intent.
         // we use a fakeHit with either the Bot's message or an empty string.
         let fakeHit = {};
@@ -238,7 +248,7 @@ module.exports = async function (req, res) {
         }
         // translate response
         var usrLang = 'en';
-        if (_.get(req._settings, 'ENABLE_MULTI_LANGUAGE_SUPPORT', "false").toLowerCase() === "true") {
+        if (_.get(req._settings, 'ENABLE_MULTI_LANGUAGE_SUPPORT')) {
             usrLang = _.get(req, 'session.userLocale');
             if (usrLang != 'en') {
                 console.log("Autotranslate hit to usrLang: ", usrLang);
@@ -248,7 +258,7 @@ module.exports = async function (req, res) {
             }
         }
         // prepend debug msg
-        if (_.get(req._settings, 'ENABLE_DEBUG_RESPONSES', "false").toLowerCase() === "true") {
+        if (_.get(req._settings, 'ENABLE_DEBUG_RESPONSES')) {
             var msg = "User Input: \"" + req.question + "\"";
             if (usrLang != 'en') {
                 msg = "User Input: \"" + _.get(req,"_event.origQuestion","notdefined") + "\", Translated to: \"" + req.question + "\"";
@@ -335,5 +345,9 @@ module.exports = async function (req, res) {
         res.type = "PlainText"
         res.message = _.get(req, '_settings.EMPTYMESSAGE', 'You stumped me!');
     }
+    // add session attributes for qid and no_hits - useful for Amazon Connect integration
+    res.session.qnabot_qid = _.get(res.result, "qid", "") ;
+    res.session.qnabot_gotanswer = (res['got_hits'] > 0) ? true : false ;
+
     console.log("RESULT", JSON.stringify(req), JSON.stringify(res))
 };

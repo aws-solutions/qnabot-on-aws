@@ -1,3 +1,5 @@
+var _ = require('lodash')
+
 /**
  * optional environment variables - These are not used defined during setup of this function in QnABot but are
  * useful for testing if defined.
@@ -111,11 +113,10 @@ function longestInterval(intervals) {
 async function routeKendraRequest(event, context) {
 
     // remove any prior session attributes for kendra
-    if (event && event.res && event.res.session.kendraQueryId) delete event.res.session.kendraQueryId;
-    if (event && event.res && event.res.session.kendraIndexId) delete event.res.session.kendraIndexId;
-    if (event && event.res && event.res.session.kendraResultId) delete event.res.session.kendraResultId;
-    if (event && event.res && event.res.session.kendraResponsibleQid) delete event.res.session.kendraResponsibleQid;
-    
+    _.unset(event,"res.session.qnabotcontext.kendra.kendraQueryId") ;
+    _.unset(event,"res.session.qnabotcontext.kendra.kendraIndexId") ;
+    _.unset(event,"res.session.qnabotcontext.kendra.kendraResultId") ;
+    _.unset(event,"res.session.qnabotcontext.kendra.kendraResponsibleQid") ;
 
     let promises = [];
     let resArray = [];
@@ -138,9 +139,11 @@ async function routeKendraRequest(event, context) {
     let indexes = event.req["_settings"]["ALT_SEARCH_KENDRA_INDEXES"] ? event.req["_settings"]["ALT_SEARCH_KENDRA_INDEXES"] : process.env.KENDRA_INDEXES
     if (indexes && indexes.length) {
         try {
+            // parse JSON array of kendra indexes
             kendraIndexes = JSON.parse(indexes);
         } catch (err) {
-            console.warn('kendra indexes could not be parsed');
+            // assume setting is a string containing single index
+            kendraIndexes = [ indexes ];
         }
     }
     if (kendraIndexes === undefined) {
@@ -352,10 +355,10 @@ async function routeKendraRequest(event, context) {
     }
 
     if (kendraQueryId) {
-        event.res.session.kendraResponsibleQid = event.res.result.qid;
-        event.res.session.kendraQueryId = kendraQueryId;
-        event.res.session.kendraIndexId = kendraIndexId;
-        event.res.session.kendraResultId = kendraResultId;
+        _.set(event,"res.session.qnabotcontext.kendra.kendraQueryId",kendraQueryId) ;
+        _.set(event,"res.session.qnabotcontext.kendra.kendraIndexId",kendraIndexId) ;
+        _.set(event,"res.session.qnabotcontext.kendra.kendraResultId",kendraResultId) ;
+        _.set(event,"res.session.qnabotcontext.kendra.kendraResponsibleQid",event.res.result.qid) ;
     }
     // console.log("final return: " + JSON.stringify(event,null,2));
     return event;

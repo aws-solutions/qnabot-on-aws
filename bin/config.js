@@ -17,6 +17,8 @@ module.exports={
     "publicBucket":"aws-bigdata-blog",
     "publicPrefix":"artifacts/aws-ai-qna-bot",
     "devEmail":"",
+    "devEncryption": "UNENCRYPTED",
+    "devPublicOrPrivate": "PUBLIC",
     "namespace":"dev",
     "stackNamePrefix":"QNA",
     "KendraFAQIndex":""

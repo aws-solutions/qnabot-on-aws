@@ -3,7 +3,7 @@ var translate = require('./multilanguage.js');
 
 async function get_welcome_message(req, locale){
     const welcome_message = _.get(req,'_settings.DEFAULT_ALEXA_LAUNCH_MESSAGE', 'Hello, Please ask a question');
-    if (_.get(req._settings, 'ENABLE_MULTI_LANGUAGE_SUPPORT', "false").toLowerCase() === "true"){
+    if (_.get(req._settings, 'ENABLE_MULTI_LANGUAGE_SUPPORT')){
         return await translate.translateText(welcome_message,'en',locale);
     } else {
         return welcome_message;
@@ -11,7 +11,7 @@ async function get_welcome_message(req, locale){
 }
 async function get_stop_message(req, locale){
     const stop_message = _.get(req,'_settings.DEFAULT_ALEXA_STOP_MESSAGE', 'Goodbye');
-    if (_.get(req._settings, 'ENABLE_MULTI_LANGUAGE_SUPPORT', "false").toLowerCase() === "true"){
+    if (_.get(req._settings, 'ENABLE_MULTI_LANGUAGE_SUPPORT')){
         return await translate.translateText(stop_message,'en',locale); 
     } else {
         return stop_message;

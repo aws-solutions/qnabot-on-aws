@@ -44,7 +44,7 @@ function get_keywords_from_comprehend(params) {
 }
 
 function get_keywords(params) {
-    if (_.get(params,'use_keyword_filters').toLowerCase() == "true") {
+    if (_.get(params,'use_keyword_filters')) {
         console.log("use_keyword_filters is true; detecting keywords from question using Comprehend");
         return get_keywords_from_comprehend(params);
     } else {

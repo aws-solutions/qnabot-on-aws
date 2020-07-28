@@ -1,0 +1,33 @@
+//start connection
+var _=require('lodash');
+var Promise=require('bluebird');
+var aws=require('aws-sdk');
+
+function get_sentiment_from_comprehend(utterance) {
+    // get sentiment from utterance using Comprehend detectSentiment api
+    console.log("detecting sentiment from utterance using Comprehend: ", utterance);
+    var keywords="";
+    var comprehend = new aws.Comprehend();
+    var comprehend_params = {
+        LanguageCode: 'en',
+        Text: utterance
+    };
+    return(Promise.resolve(comprehend.detectSentiment(comprehend_params).promise()))
+    .then(function(data) {
+        console.log(JSON.stringify(data));
+        return data.Sentiment ;
+    });
+}
+
+
+module.exports=function(utterance){
+    return get_sentiment_from_comprehend(utterance);
+};
+
+
+/*
+var testparams = {
+    question: "what is an example user question",
+};
+get_keywords(testparams);
+*/

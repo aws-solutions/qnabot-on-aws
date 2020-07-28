@@ -8,9 +8,7 @@
                 "kendraResponsibleQid": "KendraFallback",
                 "navigation": "{\"next\":\"\",\"previous\":[],\"hasParent\":true}",
                 "previous": "{\"qid\":\"KendraFallback\",\"a\":\"The Kendra Fallback search was not able to identify any results\",\"alt\":{},\"q\":\"How many regions does the sun have?\"}",
-                "kendraIndexId": "e1c23860-e5c8-4409-ae26-b05bd6ced00a",
-                "kendraQueryId": "9b04b1d3-2409-43de-9d07-8c0ce3979e37",
-                "kendraResultId": "9b04b1d3-2409-43de-9d07-8c0ce3979e37-2f0c0b44-bd10-4f23-9969-702e97a2286a"
+                "qnabotcontext": "{\"kendra\":{\"kendraIndexId\":\"e1c23860-e5c8-4409-ae26-b05bd6ced00a\", \"kendraQueryId\":\"9b04b1d3-2409-43de-9d07-8c0ce3979e37\", \"kendraResultId\":\"9b04b1d3-2409-43de-9d07-8c0ce3979e37-2f0c0b44-bd10-4f23-9969-702e97a2286a\"}}"
             },
             "requestAttributes": null,
             "bot": {
@@ -83,7 +81,6 @@
         "_userId": "us-east-1:36231782-ac61-483c-b4ab-13c20c1efb57",
         "question": "What is the composition of the sun?",
         "session": {
-            "kendraResponsibleQid": "KendraFallback",
             "navigation": {
                 "next": "",
                 "previous": [],
@@ -95,9 +92,14 @@
                 "alt": {},
                 "q": "How many regions does the sun have?"
             },
-            "kendraIndexId": "e1c23860-e5c8-4409-ae26-b05bd6ced00a",
-            "kendraQueryId": "9b04b1d3-2409-43de-9d07-8c0ce3979e37",
-            "kendraResultId": "9b04b1d3-2409-43de-9d07-8c0ce3979e37-2f0c0b44-bd10-4f23-9969-702e97a2286a"
+            "qnabotcontext": {
+                "kendra":{
+                    "kendraIndexId":"e1c23860-e5c8-4409-ae26-b05bd6ced00a",
+                    "kendraQueryId":"9b04b1d3-2409-43de-9d07-8c0ce3979e37",
+                    "kendraResultId":"9b04b1d3-2409-43de-9d07-8c0ce3979e37-2f0c0b44-bd10-4f23-9969-702e97a2286a",
+                    "kendraResponsibleQid": "KendraFallback"
+                }
+            }
         },
         "_preferredResponseType": "PlainText",
         "_userInfo": {

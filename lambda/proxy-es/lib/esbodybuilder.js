@@ -22,7 +22,7 @@ function build_query(params) {
                     boost:2,
                 }
             };
-        if (_.get(params, 'fuzziness', "false").toLowerCase() === "true") {
+        if (_.get(params, 'fuzziness')) {
             filter_query.quniqueterms.fuzziness = "AUTO";
             match_query.quniqueterms.fuzziness = "AUTO";
         }
@@ -42,7 +42,7 @@ function build_query(params) {
             path:'questions'},
             q=>q.query('match_phrase','questions.q',params.question)
         ) ;
-        if (_.get(params, 'score_answer_field', "false").toLowerCase() === "true") {
+        if (_.get(params, 'score_answer_field')) {
             query = query.orQuery('match','a',params.question) ;  
         }
         query = query.orQuery('match','t',_.get(params,'topic',''))

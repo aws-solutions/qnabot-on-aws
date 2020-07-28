@@ -3,7 +3,23 @@ var fs=require('fs')
 module.exports={
     "AssetBucket": {
       "Type": "AWS::S3::Bucket",
-      "Properties": {}
+      "Properties": {
+        "BucketEncryption": {
+            "Fn::If": [
+                "Encrypted",
+                {
+                    "ServerSideEncryptionConfiguration": [{
+                        "ServerSideEncryptionByDefault": {
+                            "SSEAlgorithm": "AES256"
+                        }
+                    }]
+                },
+                {
+                    "Ref": "AWS::NoValue"
+                }
+            ]
+        }
+      }
     },
     "AssetClear":{
         "Type": "Custom::S3Clear",

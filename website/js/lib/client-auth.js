@@ -40,7 +40,8 @@ module.exports=function(){
         return Promise.resolve(credentials.getPromise()).then(x=>{return{
             credentials,
             username,
-            Login:_.get(info,"_links.ClientLogin.href")
+            Login:_.get(info,"_links.ClientLogin.href"),
+            id_token:params.id_token
         }})
     })
     .then(function(result){
@@ -50,7 +51,8 @@ module.exports=function(){
             lex:new aws.LexRuntime(),
             polly:new aws.Polly(),
             username:result.username,
-            Login:result.Login
+            Login:result.Login,
+            idtoken:result.id_token
         }
     })
 }

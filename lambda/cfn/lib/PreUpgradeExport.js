@@ -53,7 +53,8 @@ async function run_export(params,reply) {
         console.log("Export completed: ",statusfile);
         reply(null,ID) ;
     } else {
-        console.log("Export did NOT complete: ",statusfile);
+        console.log("Export did NOT complete - possibly this is a new install - delete status file so it doesn't show up in Exports list in console: ",statusfile);
+        await s3.deleteObject(s3params).promise();
         reply(null,ID) ;
     }
 }

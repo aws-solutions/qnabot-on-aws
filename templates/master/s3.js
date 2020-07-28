@@ -5,6 +5,21 @@ module.exports={
         "Properties" : {
             "WebsiteConfiguration":{
                 "IndexDocument":"index.html"
+            },
+            "BucketEncryption": {
+                "Fn::If": [
+                    "Encrypted",
+                    {
+                        "ServerSideEncryptionConfiguration": [{
+                            "ServerSideEncryptionByDefault": {
+                                "SSEAlgorithm": "AES256"
+                            }
+                        }]
+                    },
+                    {
+                        "Ref": "AWS::NoValue"
+                    }
+                ]
             }
         }
     },
