@@ -8,13 +8,11 @@
       v-model="snackbar"
     )
       v-card(id="kendra-syncing")
-        v-card-title(primary-title) Syncing  : {{status}}
+        v-card-title(primary-title) Syncing  : {{request_status}}
         v-card-text
           v-subheader.error--text(v-if='error' id="error") {{error}}
           v-subheader.success--text(v-if='success' id="success") Success!
-          v-subheader.error--text(v-if='message' ) {{message}}
           v-progress-linear(v-if='!error && !success' indeterminate)
-          <!--v-progress-linear(v-model="job.progress*100")-->
         v-card-actions
           v-spacer
           v-btn(@click='cancel' flat id="kendra-close") close
@@ -46,16 +44,11 @@ module.exports={
       loading:false,
       success:false,
       error:'',
-      request_status:"Ready"
+      request_status:"Ready",
+      filename:'qna-kendra-faq.txt' // do not change because same key needed for UI status updates in lambda/export/kendraSync
     }
   },
   computed:{
-    status:function(){
-      return _.get(this, "$request_status", "Ready")
-    },
-    message:function(){
-      return _.get(this,"$store.state.bot.build.message")
-    }
   },
   created:async function(){
     this.refresh() 
@@ -76,31 +69,27 @@ module.exports={
         Object.assign(out,coll[index],info)
         coll.splice(index,1,out)
         poll()
+        
         async function poll(){
+          // get status file
           var status=await self.$store.dispatch('api/getExport',job)
           Object.assign(out,coll[index],status)
-          console.log(status.status)
+          console.log(status.status);
           
-          if (status.status == 'Completed') this.request_status = 'Export Finished'
-          else this.request_status = status.status
+          // if export status is completed, switch to running kendra sync
+          if (status.status == 'Completed') status.status = 'Export finished. Running KendraSync'   // this just masks it in the UI
+          self.request_status = status.status
           
-          if(this.request_status!=="Export Finished" && this.request_status!=="Error"){
+          // if job is not complete and not error, poll again
+          if(status.status!=="Sync Complete" && status.status!=="Error"){
             setTimeout(()=>poll(),1000)
-          // } else if (this.request_status=='Export Finished'){
-            // TODO: status updates beyond just the export
-            // poll_sync();
           }
+          
+          // delete old export file
+          var exports=await self.$store.dispatch('api/listExports')
+          await self.$store.dispatch('api/deleteExport',exports[index])
+          setTimeout(undefined, 60000);
         }
-        // async function poll_sync(){
-        //   var status=await self.$store.dispatch('api/getExport',job)
-        //   Object.assign(out,coll[index],status)
-        //   console.log(status.status)
-        //   if(status.status!=="Completed" && status.status!=="Error"){
-        //     setTimeout(()=>poll(),1000)
-        //   } else if (status.status=='Completed'){
-        //     // TODO: status updates beyond just the export
-        //   }
-        // }
       })
     },
     start:async function(){
@@ -111,13 +100,15 @@ module.exports={
       this.error=''
       try{
         await this.$store.dispatch('api/startKendraSyncExport',{
-          name:'qna-kendra-faq.txt',
+          name:this.filename,
           filter:''
         })
         await this.refresh()
       }catch(e){
         this.error=e
+        this.request_status = 'Error'
       }finally{
+        if (this.request_status != 'Error') this.success = true
       }
     }
   }

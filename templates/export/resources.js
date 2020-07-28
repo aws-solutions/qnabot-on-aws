@@ -137,8 +137,6 @@ module.exports=Object.assign(
             },
             "Environment": {
                 "Variables": {
-                    // "KENDRA_INDEX":{"Ref":"KendraFAQIndex"},
-                    // "DEFAULT_USER_POOL_JWKS_PARAM": { "Ref": "DefaultUserPoolJwksUrl" },
                     "DEFAULT_SETTINGS_PARAM":{"Ref":"DefaultQnABotSettings"},
                     "CUSTOM_SETTINGS_PARAM":{"Ref":"CustomQnABotSettings"},
                     "OUTPUT_S3_BUCKET":{"Ref":"ExportBucket"},

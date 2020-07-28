@@ -157,10 +157,8 @@ async function routeKendraRequest(request_params) {
                 if (element.Type === 'QUESTION_ANSWER' && foundAnswerCount === 0 && element.AdditionalAttributes &&
                     element.AdditionalAttributes.length > 1) {
                     
-                    // TODO: use json structure for query response from doc URL field
-                    // to determine if this is the FAQ you need
-                    // listFAQs and throw error if multiple
                     
+                    // TODO?: listFAQs and throw error if multiple
                     if (!hasJsonStructure(element.DocumentURI)) {
                         break;
                     }
