@@ -82,22 +82,24 @@ function mergeIntervals(intervals) {
 
 
 
-/** Function that returns if a string has JSON structure
- * @param str - input string
- * @returns boolean true or false
+/**
+ * Function to return the longest interval from a list of sorted intervals
+ * @param intervals
+ * @returns {*}
  */
-function hasJsonStructure(str) {
-    if (typeof str !== 'string') return false;
-    try {
-        const result = JSON.parse(str);
-        const type = Object.prototype.toString.call(result);
-        return type === '[object Object]' 
-            || type === '[object Array]';
-    } catch (err) {
-        return false;
-    }
-}
+function longestInterval(intervals) {
+  // test if there are at least 2 intervals
+  if (intervals.length == 0) {
+      return intervals;
+  } else if (intervals.length == 1) {
+    return intervals[0];
+  }
+  
+  // sort the intervals based on their length
+  intervals.sort(function(a, b) {return (a[1]-a[0]) - (b[1]-b[0])});
+  return intervals[0];
 
+}
 
 
 /** Function that processes kendra requests and handles response. Decides whether to handle SNS
@@ -162,11 +164,14 @@ async function routeKendraRequest(event, context) {
     // process kendra query responses and update answer content
 
     /* default message text - can be overridden using QnABot SSM Parameter Store Custom Property */
+    let topAnswerMessage = "Amazon Kendra suggested answer. \n\n ";
+    let topAnswerMessageMd = "*Amazon Kendra suggested answer.* \n ";
     let answerMessage = 'While I did not find an exact answer, these search results from Amazon Kendra might be helpful. ';
     let answerMessageMd = '*While I did not find an exact answer, these search results from Amazon Kendra might be helpful.* \n ';
     let faqanswerMessage = 'Answer from Amazon Kendra FAQ.';
     let faqanswerMessageMd = '*Answer from Amazon Kendra FAQ.* \n ';
     let markdownAnswer = "";
+    let speechMessage = "";
     let helpfulLinksMsg = 'Source Link';
     let extractedTextMsg = 'Discovered Text';
     let moreResultsMsg = 'Additional Search Results';
@@ -196,6 +201,7 @@ async function routeKendraRequest(event, context) {
                     element.AdditionalAttributes[0].Value.TextWithHighlightsValue.Text) {
                     answerMessage += '\n\n ' + element.AdditionalAttributes[0].Value.TextWithHighlightsValue.Text.replace(/\r?\n|\r/g, " ");
                     
+                    // Emboldens the highlighted phrases returned by the Kendra response API in markdown format
                     let answerTextMd = element.AdditionalAttributes[0].Value.TextWithHighlightsValue.Text.replace(/\r?\n|\r/g, " ");
                     // iterates over the answer highlights in sorted order of BeginOffset, merges the overlapping intervals
                     var sorted_highlights = mergeIntervals(element.AdditionalAttributes[0].Value.TextWithHighlightsValue.Highlights);
@@ -209,8 +215,8 @@ async function routeKendraRequest(event, context) {
 
                         if (elem.TopAnswer == true) {   // if top answer is found, then answer is abbreviated to this phrase
                             seenTop = true;
-                            answerMessage = 'Amazon Kendra suggested answer. \n\n ' + highlight + '.';
-                            answerMessageMd = '*Amazon Kendra suggested answer.* \n ';
+                            answerMessage = topAnswerMessage + highlight + '.';
+                            answerMessageMd = topAnswerMessageMd;
                             answerTextMd = '**' + highlight + '** ';
                             break;
                         } else {
@@ -218,6 +224,18 @@ async function routeKendraRequest(event, context) {
                         }
                     };
                     answerMessageMd = answerMessageMd + '\n\n' + answerTextMd;
+                    
+                    // Shortens the speech response to contain say the longest highlighted phrase ONLY IF top answer not found
+                    if (seenTop == false) {
+                        var longest_highlight = longestInterval(sorted_highlights);
+                        let answerText = element.AdditionalAttributes[0].Value.TextWithHighlightsValue.Text.replace(/\r?\n|\r/g, " ");
+                        // speechMessage = answerText.substring(longest_highlight.BeginOffset, longest_highlight.EndOffset) + '.';
+
+                        var pattern = new RegExp('[^.]* '+longest_highlight+'[^.]*\.[^.]*\.')
+                        pattern.lastIndex = 0;  // must reset this property of regex object for searches
+                        speechMessage = pattern.exec(answerText)[0]
+                    }
+                    
                     
                     answerDocumentUris.add(element.DocumentURI);
                     kendraQueryId = res.QueryId; // store off the QueryId to use as a session attribute for feedback
@@ -251,10 +269,6 @@ async function routeKendraRequest(event, context) {
                     kendraResultId = element.Id; // store off resultId to use as a session attribute for feedback
                     foundAnswerCount++;
                     
-                    // TODO: use json structure for query response from doc URL field
-                    // var json_struct = JSON.parse(element.DocumentURI);
-                    
-                    
                 } else if (element.Type === 'DOCUMENT' && element.DocumentExcerpt.Text && element.DocumentURI) {
                     const docInfo = {}
                     // if topAnswer found, then do not show document excerpts
@@ -271,25 +285,41 @@ async function routeKendraRequest(event, context) {
                             let rest = docInfo.text.substr(elem.EndOffset+offset);
                             docInfo.text = beginning + '**' + highlight + '**' + rest;
                         };
+                        
+                        if (foundAnswerCount == 0 && foundDocumentCount == 0) {
+                            speechMessage = element.DocumentExcerpt.Text.replace(/\r?\n|\r/g, " ");;
+                            if (sorted_highlights.length > 0) {
+                                var highlight = speechMessage.substring(sorted_highlights[0].BeginOffset, sorted_highlights[0].EndOffset)
+                                var pattern = new RegExp('[^.]* '+highlight+'[^.]*\.[^.]*\.')
+                                pattern.lastIndex = 0;  // must reset this property of regex object for searches
+                                speechMessage = pattern.exec(speechMessage)[0]
+                            }
+                        }
                     }
                     // but even if topAnswer is found, show URL in markdown
                     docInfo.uri = element.DocumentURI;
                     helpfulDocumentsUris.add(docInfo);
-                    foundAnswerCount++;
+                    // foundAnswerCount++;
+                    foundDocumentCount++;
                 }
             });
         }
     });
 
     // update QnABot answer content for ssml, markdown, and text
-    if (foundAnswerCount > 0) {
+    if (foundAnswerCount > 0 || foundDocumentCount > 0) {
         event.res.message = answerMessage;
         let ssmlMessage = `${answerMessage.substring(0,600).replace(/\r?\n|\r/g, " ")}`;
+        if (speechMessage != "") {
+            ssmlMessage = `${speechMessage.substring(0,600).replace(/\r?\n|\r/g, " ")}`;
+        }
+        
         let lastIndex = ssmlMessage.lastIndexOf('.');
         if (lastIndex > 0) {
             ssmlMessage = ssmlMessage.substring(0,lastIndex);
         }
         ssmlMessage = `<speak> ${ssmlMessage} </speak>`;
+        
         event.res.session.appContext.altMessages.markdown = answerMessageMd;
         event.res.session.appContext.altMessages.ssml = ssmlMessage;
         if (event.req["_event"].outputDialogMode !== 'Text') {
