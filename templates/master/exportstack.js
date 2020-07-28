@@ -12,6 +12,8 @@ module.exports={
                 "EsEndpoint": {"Fn::GetAtt": ["ESVar", "ESAddress"]},
                 "EsProxyLambda": {"Fn::GetAtt":["ESProxyLambda","Arn"]},
                 "ExportBucket": {"Ref":"ExportBucket"},
+                "DefaultQnABotSettings":{"Ref":"DefaultQnABotSettings"},
+                "CustomQnABotSettings":{"Ref":"CustomQnABotSettings"},
             }
         }
     }
