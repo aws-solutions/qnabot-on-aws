@@ -107,7 +107,7 @@ exports.performSync=async function(event,context,cb){
         // await update_status(process.env.OUTPUT_S3_BUCKET, 'Parsing content JSON');
         await parse.handler(parseJSONparams)
         console.log("Parsed content JSON into CSV stored locally");
-            
+        
         // get QnABot settings to retrieve KendraFAQIndex
         var settings = await get_settings();
         var kendra_faq_index = _.get(settings, 'KENDRA_FAQ_INDEX', "");
