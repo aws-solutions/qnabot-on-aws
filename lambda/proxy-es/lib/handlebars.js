@@ -117,7 +117,12 @@ Handlebars.registerHelper('setLang', function (lang, last, options) {
     }
 });
 
-Handlebars.registerHelper('setSessionAttr', function (k, v, options) {
+Handlebars.registerHelper('setSessionAttr', function () {
+    let args = Array.from(arguments);
+    const k = args[0];
+    // concat remaining arguments to create value
+    const v_arr = args.slice(1, args.length - 1); // ignore final 'options' argument
+    const v = v_arr.join(""); // concatenate value arguments 
     console.log("Setting res session attribute:", k, " Value:", v);
     _.set(res_glbl.session, k, v);
     return "";
