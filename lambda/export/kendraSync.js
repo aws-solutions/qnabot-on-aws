@@ -151,6 +151,7 @@ exports.performSync=async function(event,context,cb){
         
     } catch (err) {
         await update_status(process.env.OUTPUT_S3_BUCKET, 'Error');
+        console.log(err);
         await sleep(20000);
         console.log(`failed sync`);
         return err

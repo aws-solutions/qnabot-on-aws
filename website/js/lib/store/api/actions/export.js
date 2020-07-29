@@ -107,6 +107,7 @@ module.exports={
         })
     },
     deleteExport(context,opts){
+        console.log(`delete export opts: ${JSON.stringify(opts, null, 2)}`);
         return context.dispatch('_request',{
             url:opts.href,
             method:'delete'
