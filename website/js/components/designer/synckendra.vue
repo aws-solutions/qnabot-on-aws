@@ -42,7 +42,7 @@ module.exports={
     var self=this
     return {
       snackbar:false,
-      loading:false,
+      // loading:false,
       success:false,
       error:'',
       request_status:"Ready",
@@ -78,14 +78,13 @@ module.exports={
           console.log(status.status);
           
           // if export status is completed, switch to running kendra sync
-          if (status.status == 'Completed') status.status = 'Export finished. Running KendraSync'   // this just masks it in the UI
+          if (status.status == 'Completed') status.status = 'Export finished'   // this just masks it in the UI
           self.request_status = status.status
           
           // if job is not complete and not error, poll again
           if(status.status!=="Sync Complete" && status.status!=="Error"){
             setTimeout(()=>poll(),1000)
           }
-          await sleep(10000);
         }
       })
     },
@@ -93,7 +92,7 @@ module.exports={
       var self=this
       this.loading=true
       this.snackbar=true 
-      this.success=''
+      this.success=false
       this.error=''
       try{
         await this.$store.dispatch('api/startKendraSyncExport',{
@@ -102,15 +101,17 @@ module.exports={
         })
         await this.refresh()
       }catch(e){
+        console.log('error')
         this.error=e
         this.request_status = 'Error'
       }finally{
+        console.log('finished');
         // TODO: delete old export file
         var exports=await this.$store.dispatch('api/listExports')
         await this.$store.dispatch('api/deleteExport',exports[0])
         await sleep(10000);
-        await this.refresh()
         if (this.request_status=='Sync Complete') this.success = true
+        await this.refresh()
       }
     }
   }

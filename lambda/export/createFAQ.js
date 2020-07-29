@@ -127,17 +127,17 @@ async function createFAQ(params) {
     };
     
     let count=0;
-    while (count<3) {
+    while (count<1) {
         try {
             var s3_response = await s3Uploader(s3Client, s3_params);
+            count++;
         } catch (error) {
             if (error.code=='ThrottlingException') {
-                count++;
-                console.log(`Throttling exception: trying again in 10 seconds`);
-                await sleep(10000);
+                console.log(`Throttling exception: trying upload CSV again in 20 seconds`);
+                await sleep(15000);
                 continue;
             } else {
-                return error;
+                throw error;
             }
         }
     }
@@ -151,21 +151,21 @@ async function createFAQ(params) {
     };
     
     count=0;
-    while (count<3) {
+    while (count<1) {
         try {
             var list_faq_response = await faqLister(kendraClient, index_params);
+            count++;
         } catch (error) {
             if (error.code=='ThrottlingException') {
-                count++;
-                console.log(`Throttling exception: trying again in 10 seconds`);
-                await sleep(10000);
+                console.log(`Throttling exception: trying list FAQs again in 20 seconds`);
+                await sleep(15000);
                 continue;
             } else {
-                return error;
+                throw error;
             }
         }
     }
-    await sleep(20000);
+    await sleep(10000);
     
     
     var j, elem, index=null;
@@ -182,24 +182,24 @@ async function createFAQ(params) {
           IndexId: params.faq_index_id
         }
         count=0;        
-        while (count<3) {
+        while (count<1) {
             try {
                 var del_faq_response = await faqDeleter(kendraClient, delete_faq_params);
+                count++;
             } catch (error) {
                 if (error.code=='ThrottlingException') {
-                    count++;
-                    console.log(`Throttling exception: trying again in 10 seconds`);
-                    await sleep(10000);
+                    console.log(`Throttling exception: trying delete FAQ again in 20 seconds`);
+                    await sleep(15000);
                     continue;
                 } else {
-                    return error;
+                    throw error;
                 }
             }
         }
     } else {
         console.log("No old FAQ to delete");
     }
-    await sleep(20000);
+    await sleep(10000);
     
     // create the FAQ
     var faq_params = {
@@ -215,21 +215,21 @@ async function createFAQ(params) {
     };
 
     count=0;        
-    while (count<3) {
+    while (count<1) {
         try {
             var faq_response = await faqConverter(kendraClient, faq_params);
+            count++;
         } catch (error) {
             if (error.code=='ThrottlingException') {
-                count++;
-                console.log(`Throttling exception: trying again in 10 seconds`);
-                await sleep(10000);
+                console.log(`Throttling exception: trying convert to FAQ again in 20 seconds`);
+                await sleep(15000);
                 continue;
             } else {
-                return error;
+                throw error;
             }
         }
     }
-    await sleep(20000);
+    await sleep(10000);
     return faq_response;
 }
 
