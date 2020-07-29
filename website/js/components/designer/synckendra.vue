@@ -8,7 +8,7 @@
       v-model="snackbar"
     )
       v-card(id="kendra-syncing")
-        v-card-title(primary-title) Syncing  : {{request_status}}
+        v-card-title(primary-title) Syncing: {{request_status}}
         v-card-text
           v-subheader.error--text(v-if='error' id="error") {{error}}
           v-subheader.success--text(v-if='success' id="success") Success!
@@ -35,6 +35,7 @@ License for the specific language governing permissions and limitations under th
 var Vuex=require('vuex')
 var Promise=require('bluebird')
 var _=require('lodash')
+var sleep = require('util').promisify(setTimeout)
 
 module.exports={
   data:function(){
@@ -84,11 +85,7 @@ module.exports={
           if(status.status!=="Sync Complete" && status.status!=="Error"){
             setTimeout(()=>poll(),1000)
           }
-          
-          // delete old export file
-          var exports=await self.$store.dispatch('api/listExports')
-          await self.$store.dispatch('api/deleteExport',exports[index])
-          setTimeout(undefined, 60000);
+          await sleep(10000);
         }
       })
     },
@@ -108,7 +105,12 @@ module.exports={
         this.error=e
         this.request_status = 'Error'
       }finally{
-        if (this.request_status != 'Error') this.success = true
+        // TODO: delete old export file
+        var exports=await this.$store.dispatch('api/listExports')
+        await this.$store.dispatch('api/deleteExport',exports[0])
+        await sleep(10000);
+        await this.refresh()
+        if (this.request_status=='Sync Complete') this.success = true
       }
     }
   }

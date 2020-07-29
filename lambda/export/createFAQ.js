@@ -3,6 +3,7 @@
 
 const AWSKendra = require('aws-sdk/clients/kendra');
 const AWSS3 = require('aws-sdk/clients/s3');
+const sleep = require('util').promisify(setTimeout)
 
 
 /**
@@ -125,15 +126,48 @@ async function createFAQ(params) {
       Body: fs.createReadStream(params.csv_path),   // use read stream option in case file is large
     };
     
-    var s3_response = await s3Uploader(s3Client, s3_params);
-    
+    let count=0;
+    while (count<3) {
+        try {
+            var s3_response = await s3Uploader(s3Client, s3_params);
+        } catch (error) {
+            if (error.code=='ThrottlingException') {
+                count++;
+                console.log(`Throttling exception: trying again in 10 seconds`);
+                await sleep(10000);
+                continue;
+            } else {
+                return error;
+            }
+        }
+    }
+    await sleep(10000);
+
     
     // if FAQ exists already, delete the old one and update it
     var index_params = {
       IndexId: params.faq_index_id,
       MaxResults: '30'      // default max number of FAQs in developer edition
     };
-    var list_faq_response = await faqLister(kendraClient, index_params);
+    
+    count=0;
+    while (count<3) {
+        try {
+            var list_faq_response = await faqLister(kendraClient, index_params);
+        } catch (error) {
+            if (error.code=='ThrottlingException') {
+                count++;
+                console.log(`Throttling exception: trying again in 10 seconds`);
+                await sleep(10000);
+                continue;
+            } else {
+                return error;
+            }
+        }
+    }
+    await sleep(20000);
+    
+    
     var j, elem, index=null;
     for (j=0; j<list_faq_response.FaqSummaryItems.length; j++) {
         elem = list_faq_response.FaqSummaryItems[j];
@@ -147,11 +181,25 @@ async function createFAQ(params) {
           Id: index,
           IndexId: params.faq_index_id
         }
-        var del_faq_response = await faqDeleter(kendraClient, delete_faq_params);
+        count=0;        
+        while (count<3) {
+            try {
+                var del_faq_response = await faqDeleter(kendraClient, delete_faq_params);
+            } catch (error) {
+                if (error.code=='ThrottlingException') {
+                    count++;
+                    console.log(`Throttling exception: trying again in 10 seconds`);
+                    await sleep(10000);
+                    continue;
+                } else {
+                    return error;
+                }
+            }
+        }
     } else {
         console.log("No old FAQ to delete");
     }
-    
+    await sleep(20000);
     
     // create the FAQ
     var faq_params = {
@@ -165,8 +213,23 @@ async function createFAQ(params) {
       Description: 'Exported FAQ of questions from QnABot designer console'
       // if no tags, delete parameter because empty arrays cause throttling exceptions
     };
-    var faq_response = await faqConverter(kendraClient, faq_params);
 
+    count=0;        
+    while (count<3) {
+        try {
+            var faq_response = await faqConverter(kendraClient, faq_params);
+        } catch (error) {
+            if (error.code=='ThrottlingException') {
+                count++;
+                console.log(`Throttling exception: trying again in 10 seconds`);
+                await sleep(10000);
+                continue;
+            } else {
+                return error;
+            }
+        }
+    }
+    await sleep(20000);
     return faq_response;
 }
 

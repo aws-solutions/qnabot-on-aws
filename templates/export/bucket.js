@@ -17,7 +17,7 @@ module.exports={
                     Events:["s3:ObjectCreated:*"],
                     Filter:{Key:{FilterRules:[{
                         Name:"prefix",
-                        Value:"data"
+                        Value:"kendra-data"
                     }]}}
                 }
                 ]
