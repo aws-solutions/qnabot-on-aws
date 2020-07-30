@@ -93,9 +93,7 @@ exports.performSync=async function(event,context,cb){
         
         // triggered by export file, waits to be uploaded
         await s3.waitFor('objectExists',{Bucket,Key,VersionId}).promise()
-        await sleep(10000);
         let x = await s3.getObject({Bucket,Key,VersionId}).promise()
-        await sleep(10000);
         var content = x.Body.toString()
         
         // parse JSON into CSV
@@ -104,14 +102,12 @@ exports.performSync=async function(event,context,cb){
             content:content,
             output_path:'/tmp/qna_FAQ.csv',
         }
-        await update_status(process.env.OUTPUT_S3_BUCKET, 'Parsing content JSON');
+        // await update_status(process.env.OUTPUT_S3_BUCKET, 'Parsing content JSON');
         await parse.handler(parseJSONparams)
-        await sleep(20000);
         console.log("Parsed content JSON into CSV stored locally");
         
         // get QnABot settings to retrieve KendraFAQIndex
         var settings = await get_settings();
-        await sleep(5000);
         var kendra_faq_index = _.get(settings, 'KENDRA_FAQ_INDEX', "");
         if (kendra_faq_index == "") {
             throw new Error(`No FAQ Index set: ${kendra_faq_index}`);
@@ -129,7 +125,7 @@ exports.performSync=async function(event,context,cb){
             kendra_s3_access_role:process.env.KENDRA_ROLE,
             region:process.env.REGION
         }
-        await update_status(process.env.OUTPUT_S3_BUCKET, 'Creating FAQ');
+        // await update_status(process.env.OUTPUT_S3_BUCKET, 'Creating FAQ');
         await create.handler(createFAQparams);  // awaits a promise
         await sleep(20000);
         
@@ -137,22 +133,15 @@ exports.performSync=async function(event,context,cb){
         // TODO: https://docs.aws.amazon.com/kendra/latest/dg/create-index.html
     
         console.log('Completed CSV converting to FAQ');
-    
-        var status_params = {
-            Bucket:process.env.OUTPUT_S3_BUCKET,
-            Key:'status/qna-kendra-faq.txt'
-        }
-        
-        await update_status(process.env.OUTPUT_S3_BUCKET, 'Sync Complete');
+        // await update_status(process.env.OUTPUT_S3_BUCKET, 'Sync Complete');
         await sleep(20000);
         
         console.log(`sync complete`);
         return 'Synced';
         
     } catch (err) {
-        await update_status(process.env.OUTPUT_S3_BUCKET, 'Error');
+        // await update_status(process.env.OUTPUT_S3_BUCKET, 'Error');
         console.log(err);
-        await sleep(20000);
         console.log(`failed sync`);
         return err
     }
@@ -165,11 +154,12 @@ async function update_status(bucket, new_stat) {
         Key:'status/qna-kendra-faq.txt'
     }
     
+    // TODO: check the return value of the object in case of an error...
     var x = await s3.getObject(status_params).promise();
-    await sleep(20000);
     var config = JSON.parse(x.Body.toString());
     config.status = new_stat;
     status_params.Body = JSON.stringify(config);
+    x = await s3.putObject(status_params).promise();
     console.log('updated config file status to ' + new_stat);
-    return await s3.putObject(status_params).promise();
+    return x;
 }

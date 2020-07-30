@@ -30,8 +30,14 @@ async function run_query_es(req, query_params) {
         method: "GET",
         body: es_query
     });
+    
+    if (_.get(es_response, "hits.hits[0]._source")) {
+        _.set(es_response, "hits.hits[0]._source.answersource", "ElasticSearch");
+    }
+    
     return es_response;
 }
+
 
 async function run_query_kendra(req, query_params) {
     console.log("Querying Kendra FAQ index: " + _.get(req, "_settings.KENDRA_FAQ_INDEX"));
@@ -46,10 +52,17 @@ async function run_query_kendra(req, query_params) {
         request_params['input_transcript']= req["_event"].inputTranscript;
     }
 
-    var res = await kendra.handler(request_params);
+    var kendra_response = await kendra.handler(request_params);
+    
+    if (_.get(kendra_response, "hits.hits[0]._source")) {
+        _.set(kendra_response, "hits.hits[0]._source.answersource", "KendraFAQ");
+    }
+    
     // TODO: check if ever more than 1 answer in kendra FAQ...(check console?) 
     // ... assign confidence to 100% for the first one...if necessary?
-    return res;
+    
+    return kendra_response;
+
 }
 
 function merge_next(hit1, hit2) {
@@ -104,8 +117,9 @@ async function get_hit(req, res) {
     var response = await run_query(req, query_params);
     console.log("Query response: ", JSON.stringify(response,null,2));
     var hit = _.get(response, "hits.hits[0]._source");
+    
+    // ES fallback if KendraFAQ fails
     if (!hit && _.get(req, '_settings.ES_FALLBACK', false)) {
-        // ES fallback if KendraFAQ fails
         response = await run_query_es(req, query_params);
         hit = _.get(response, "hits.hits[0]._source");
     }
@@ -239,6 +253,9 @@ module.exports = async function (req, res) {
         hit = await get_hit(req, res);
         
     }
+    console.log(`hit is ${JSON.stringify(hit, null, 2)}`);
+    
+    
     if (hit) {
         // found a document in elastic search.
         if (_.get(hit, "conditionalChaining") && _.get(hit, "elicitResponse.responsebot_hook", "") === "" ) {
@@ -262,7 +279,8 @@ module.exports = async function (req, res) {
             var msg = "User Input: \"" + req.question + "\"";
             if (usrLang != 'en') {
                 msg = "User Input: \"" + _.get(req,"_event.origQuestion","notdefined") + "\", Translated to: \"" + req.question + "\"";
-            }          
+            }
+            msg += ", Source: " + _.get(hit, "answersource", "unknown");
             var debug_msg = {
                 a: "[" + msg + "] ",
                 alt: {
@@ -270,7 +288,7 @@ module.exports = async function (req, res) {
                     ssml: "<speak>" + msg + "</speak>"
                 }
             };
-            hit = merge_next(debug_msg, hit) ;
+            hit = merge_next(debug_msg, hit);
         };
         res.result = hit;
         res.type = "PlainText"
