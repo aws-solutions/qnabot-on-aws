@@ -355,6 +355,7 @@ async function routeKendraRequest(event, context) {
     }
 
     if (kendraQueryId) {
+        _.set(event,"res.session.qnabotcontext.answersource",'KendraFallback');
         _.set(event,"res.session.qnabotcontext.kendra.kendraQueryId",kendraQueryId) ;
         _.set(event,"res.session.qnabotcontext.kendra.kendraIndexId",kendraIndexId) ;
         _.set(event,"res.session.qnabotcontext.kendra.kendraResultId",kendraResultId) ;

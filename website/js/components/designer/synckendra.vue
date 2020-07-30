@@ -71,6 +71,8 @@ module.exports={
         coll.splice(index,1,out)
         poll()
         
+        // TODO: updating the status file is triggering the export function
+        // so basically, need a new way to track the status of the kendrasync function
         async function poll(){
           // get status file
           var status=await self.$store.dispatch('api/getExport',job)
@@ -78,7 +80,7 @@ module.exports={
           console.log(status.status);
           
           // if export status is completed, switch to running kendra sync
-          if (status.status == 'Completed') status.status = 'Export finished'   // this just masks it in the UI
+          if (status.status == 'Completed') status.status = 'Export finished. Running KendraSync'   // this just masks it in the UI
           self.request_status = status.status
           
           // if job is not complete and not error, poll again
@@ -109,7 +111,6 @@ module.exports={
         // TODO: delete old export file
         var exports=await this.$store.dispatch('api/listExports')
         await this.$store.dispatch('api/deleteExport',exports[0])
-        await sleep(10000);
         if (this.request_status=='Sync Complete') this.success = true
         await this.refresh()
       }

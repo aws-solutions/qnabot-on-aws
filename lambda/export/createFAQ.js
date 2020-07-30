@@ -133,8 +133,8 @@ async function createFAQ(params) {
             count++;
         } catch (error) {
             if (error.code=='ThrottlingException') {
-                console.log(`Throttling exception: trying upload CSV again in 20 seconds`);
-                await sleep(15000);
+                console.log(`Throttling exception: trying upload CSV again in 10 seconds`);
+                await sleep(10000);
                 continue;
             } else {
                 throw error;
@@ -157,8 +157,8 @@ async function createFAQ(params) {
             count++;
         } catch (error) {
             if (error.code=='ThrottlingException') {
-                console.log(`Throttling exception: trying list FAQs again in 20 seconds`);
-                await sleep(15000);
+                console.log(`Throttling exception: trying list FAQs again in 10 seconds`);
+                await sleep(10000);
                 continue;
             } else {
                 throw error;
@@ -188,8 +188,8 @@ async function createFAQ(params) {
                 count++;
             } catch (error) {
                 if (error.code=='ThrottlingException') {
-                    console.log(`Throttling exception: trying delete FAQ again in 20 seconds`);
-                    await sleep(15000);
+                    console.log(`Throttling exception: trying delete FAQ again in 10 seconds`);
+                    await sleep(10000);
                     continue;
                 } else {
                     throw error;
@@ -221,8 +221,8 @@ async function createFAQ(params) {
             count++;
         } catch (error) {
             if (error.code=='ThrottlingException') {
-                console.log(`Throttling exception: trying convert to FAQ again in 20 seconds`);
-                await sleep(15000);
+                console.log(`Throttling exception: trying convert to FAQ again in 10 seconds`);
+                await sleep(10000);
                 continue;
             } else {
                 throw error;
