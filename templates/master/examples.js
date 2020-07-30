@@ -18,7 +18,10 @@ module.exports={
                 "ApiUrlName":{"Fn::GetAtt":["ApiUrl","Name"]},
                 "AssetBucket":{"Ref":"AssetBucket"},
                 "FulfillmentLambdaRole":{"Ref": "FulfillmentLambdaRole"},
-                "QIDLambdaArn":{"Fn::GetAtt":["ESQidLambda","Arn"]}
+                "QIDLambdaArn":{"Fn::GetAtt":["ESQidLambda","Arn"]},
+                "VPCSubnetIdList" : { "Fn::Join" : [ ",", {"Ref":"VPCSubnetIdList"} ] },
+                "VPCSecurityGroupIdList": { "Fn::Join" : [ ",", {"Ref":"VPCSecurityGroupIdList"} ] },
+                "XraySetting":{"Ref": "XraySetting"},
             }
         }
     }

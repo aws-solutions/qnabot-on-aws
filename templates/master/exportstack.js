@@ -12,6 +12,9 @@ module.exports={
                 "EsEndpoint": {"Fn::GetAtt": ["ESVar", "ESAddress"]},
                 "EsProxyLambda": {"Fn::GetAtt":["ESProxyLambda","Arn"]},
                 "ExportBucket": {"Ref":"ExportBucket"},
+                "VPCSubnetIdList" : { "Fn::Join" : [ ",", {"Ref":"VPCSubnetIdList"} ] },
+                "VPCSecurityGroupIdList": { "Fn::Join" : [ ",", {"Ref":"VPCSecurityGroupIdList"} ] },
+                "XraySetting":{"Ref": "XraySetting"},
             }
         }
     }

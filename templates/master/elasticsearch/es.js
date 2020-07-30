@@ -20,6 +20,12 @@ var properties={
     },
     "EncryptionAtRestOptions": {
        "Enabled": {"Fn::If": [ "Encrypted", true, false]}
+    },
+    "VPCOptions" : {
+        "Fn::If": [ "VPCEnabled", {
+            "SubnetIds": {"Ref": "VPCSubnetIdList"},
+            "SecurityGroupIds": {"Ref": "VPCSecurityGroupIdList"}
+        }, {"Ref" : "AWS::NoValue"} ]
     }
 }
 

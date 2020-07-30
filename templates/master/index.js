@@ -174,15 +174,36 @@ module.exports={
         "AllowedValues" : ["PUBLIC", "PRIVATE"],
         "Default":"PUBLIC"
     },
+    "VPCSubnetIdList" : {
+        "Description" : "Subnet IDs", "Type": "List<AWS::EC2::Subnet::Id>",
+        "Default": ""
+    },
+    "VPCSecurityGroupIdList": {
+        "Description" : "Security Group IDs", "Type": "List<AWS::EC2::SecurityGroup::Id>",
+        "Default": ""
+    },
+    "XraySetting":{
+        "Type":"String",
+        "Description": "Configure Lambdas with X-Ray enabled",
+        "AllowedValues": ["FALSE", "TRUE"],
+        "Default":"FALSE",
+        "ConstraintDescription":"Allowed Values are FALSE or TRUE"
+    },
   },
   "Conditions":{
     "Public":{"Fn::Equals":[{"Ref":"PublicOrPrivate"},"PUBLIC"]},
     "Encrypted":{"Fn::Equals":[{"Ref":"Encryption"}, "ENCRYPTED"]},
     "AdminSignUp":{"Fn::Equals":[{"Ref":"AdminUserSignUp"},"TRUE"]},
+    "XRAYEnabled":{"Fn::Equals":[{"Ref":"XraySetting"},"TRUE"]},
     "Domain":{"Fn::Not":[{"Fn::Equals":[{"Ref":"ApprovedDomain"},"NONE"]}]},
     "BuildExamples":{"Fn::Equals":[{"Ref":"BuildExamples"},"TRUE"]},
     "CreateDomain":{"Fn::Equals":[{"Ref":"ElasticsearchName"},"EMPTY"]},
-    "DontCreateDomain":{"Fn::Not":[{"Fn::Equals":[{"Ref":"ElasticsearchName"},"EMPTY"]}]}
+    "DontCreateDomain":{"Fn::Not":[{"Fn::Equals":[{"Ref":"ElasticsearchName"},"EMPTY"]}]},
+    "VPCEnabled": { "Fn::Not": [
+              { "Fn::Equals": [ "",
+                      { "Fn::Join": [ "", { "Ref": "VPCSecurityGroupIdList" } ] }
+                  ] }
+          ] }
   }
 }
 

@@ -58,6 +58,16 @@ module.exports = {
       "Role": { "Fn::GetAtt": ["FulfillmentLambdaRole", "Arn"] },
       "Runtime": "nodejs10.x",
       "Timeout": 300,
+      "VpcConfig" : {
+        "Fn::If": [ "VPCEnabled", {
+          "SubnetIds": {"Ref": "VPCSubnetIdList"},
+          "SecurityGroupIds": {"Ref": "VPCSecurityGroupIdList"}
+        }, {"Ref" : "AWS::NoValue"} ]
+      },
+      "TracingConfig" : {
+        "Fn::If": [ "XRAYEnabled", {"Mode": "Active"},
+          {"Ref" : "AWS::NoValue"} ]
+      },
       "Tags": [{
         Key: "Type",
         Value: "Fulfillment"
@@ -126,6 +136,8 @@ module.exports = {
       "Path": "/",
       "ManagedPolicyArns": [
         "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
+        "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole",
+        "arn:aws:iam::aws:policy/AWSXRayDaemonWriteAccess",
         "arn:aws:iam::aws:policy/TranslateReadOnly",
         "arn:aws:iam::aws:policy/ComprehendReadOnly",
         { "Ref": "EsPolicy" }

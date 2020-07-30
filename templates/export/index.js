@@ -19,6 +19,15 @@ module.exports={
         "VarIndex": {"Type":"String"},
         "EsEndpoint": {"Type":"String"},
         "EsProxyLambda": {"Type":"String"},
-        "ExportBucket": {"Type":"String"}
+        "ExportBucket": {"Type":"String"},
+        "VPCSubnetIdList" : {"Type": "String"},
+        "VPCSecurityGroupIdList": {"Type": "String"},
+        "XraySetting": {"Type": "String"}
+    },
+    "Conditions": {
+        "VPCEnabled": { "Fn::Not": [
+                { "Fn::Equals": [ "", { "Ref": "VPCSecurityGroupIdList" } ] }
+            ] },
+        "XRAYEnabled":{"Fn::Equals":[{"Ref":"XraySetting"},"TRUE"]},
     }
 }

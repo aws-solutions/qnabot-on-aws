@@ -76,6 +76,16 @@ module.exports={
         "Role": {"Fn::GetAtt": ["S3ListLambdaRole","Arn"]},
         "Runtime": "nodejs10.x",
         "Timeout": 300,
+        "VpcConfig" : {
+            "Fn::If": [ "VPCEnabled", {
+                "SubnetIds": {"Ref": "VPCSubnetIdList"},
+                "SecurityGroupIds": {"Ref": "VPCSecurityGroupIdList"}
+            }, {"Ref" : "AWS::NoValue"} ]
+        },
+        "TracingConfig" : {
+            "Fn::If": [ "XRAYEnabled", {"Mode": "Active"},
+                {"Ref" : "AWS::NoValue"} ]
+        },
         "Tags":[{
             Key:"Type",
             Value:"Api"
@@ -93,6 +103,16 @@ module.exports={
         "Role": {"Fn::GetAtt": ["S3ListLambdaRole","Arn"]},
         "Runtime": "nodejs10.x",
         "Timeout": 300,
+        "VpcConfig" : {
+            "Fn::If": [ "VPCEnabled", {
+                "SubnetIds": {"Ref": "VPCSubnetIdList"},
+                "SecurityGroupIds": {"Ref": "VPCSecurityGroupIdList"}
+            }, {"Ref" : "AWS::NoValue"} ]
+        },
+        "TracingConfig" : {
+            "Fn::If": [ "XRAYEnabled", {"Mode": "Active"},
+                {"Ref" : "AWS::NoValue"} ]
+        },
         "Tags":[{
             Key:"Type",
             Value:"Api"

@@ -17,6 +17,9 @@ module.exports={
                 "MetricsIndex": {"Fn::GetAtt": ["Var", "MetricsIndex"]},
                 "FeedbackIndex": {"Fn::GetAtt": ["Var", "FeedbackIndex"]},
                 "Encryption": {"Ref":"Encryption"},
+                "VPCSubnetIdList" : { "Fn::Join" : [ ",", {"Ref":"VPCSubnetIdList"} ] },
+                "VPCSecurityGroupIdList": { "Fn::Join" : [ ",", {"Ref":"VPCSecurityGroupIdList"} ] },
+                "XraySetting":{"Ref": "XraySetting"},
             }
         }
     }

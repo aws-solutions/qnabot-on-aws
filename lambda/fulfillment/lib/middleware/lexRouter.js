@@ -72,7 +72,13 @@ async function handleRequest(req, res, botName, botAlias) {
     function getFreeTextResponse(inputText, sentiment) {
         let response = {
             message: "",
-            slots: { 'FreeText' : inputText, 'Sentiment' : sentiment},
+            slots: { 'FreeText' : inputText,
+                'Sentiment' : sentiment.Sentiment,
+                'SentimentPositive': sentiment.SentimentScore.Positive,
+                'SentimentNegative': sentiment.SentimentScore.Negative,
+                'SentimentNeutral': sentiment.SentimentScore.Neutral,
+                'SentimentMixed': sentiment.SentimentScore.Mixed
+            },
             dialogState: 'Fulfilled',
         }
         return response;

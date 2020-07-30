@@ -37,6 +37,8 @@ module.exports=Promise.resolve(require('../master')).then(function(base){
         "Username",
         "Encryption",
         "PublicOrPrivate",
+        "VPCSubnetIdList",
+        "VPCSecurityGroupIdList",
         "XraySetting"
     ])
     base.Conditions.Public={"Fn::Equals":[{"Ref":"PublicOrPrivate"},"PUBLIC"]}
@@ -46,7 +48,11 @@ module.exports=Promise.resolve(require('../master')).then(function(base){
     base.Conditions.BuildExamples={"Fn::Equals":[true,true]}
     base.Conditions.CreateDomain={"Fn::Equals":[true,true]}
     base.Conditions.DontCreateDomain={"Fn::Equals":[true,false]}
-    base.Conditions.VPCEnabled={"Fn::Equals":[true,false]}
+    base.Conditions.VPCEnabled={ "Fn::Not": [
+            { "Fn::Equals": [ "",
+                    { "Fn::Join": [ "", { "Ref": "VPCSecurityGroupIdList" } ] }
+                ] }
+        ] }
     
     var out=JSON.stringify(base).replace(
         /{"Ref":"BootstrapBucket"}/g,
@@ -71,14 +77,6 @@ module.exports=Promise.resolve(require('../master')).then(function(base){
     out=out.replace(
         /{"Ref":"BootstrapPrefix"}/g,
         '"'+config.publicPrefix+'"')
-
-    out=out.replace(
-        /{"Ref":"VPCSubnetIdList"}/g,
-        '["EMPTY"]')
-
-    out=out.replace(
-        /{"Ref":"VPCSecurityGroupIdList"}/g,
-        '["EMPTY"]')
 
     return JSON.parse(out)
 })

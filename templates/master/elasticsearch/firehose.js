@@ -27,7 +27,14 @@ module.exports={
                     "CompressionFormat" : "UNCOMPRESSED",
                     "RoleARN" : {"Fn::GetAtt" : ["FirehoseESS3Role", "Arn"] }
                 },
-                "TypeName" : ""
+                "TypeName" : "",
+                "VpcConfiguration" : {
+                    "Fn::If": [ "VPCEnabled", {
+                        "RoleARN": {"Fn::GetAtt" : ["FirehoseESS3Role", "Arn"] },
+                        "SubnetIds": {"Ref": "VPCSubnetIdList"},
+                        "SecurityGroupIds": {"Ref": "VPCSecurityGroupIdList"}
+                    }, {"Ref" : "AWS::NoValue"} ]
+                }
             },
         }
     },
@@ -59,7 +66,14 @@ module.exports={
                     "CompressionFormat" : "UNCOMPRESSED",
                     "RoleARN" : {"Fn::GetAtt" : ["FirehoseESS3Role", "Arn"] }
                 },
-                "TypeName" : ""
+                "TypeName" : "",
+                "VpcConfiguration" : {
+                    "Fn::If": [ "VPCEnabled", {
+                        "RoleARN": {"Fn::GetAtt" : ["FirehoseESS3Role", "Arn"] },
+                        "SubnetIds": {"Ref": "VPCSubnetIdList"},
+                        "SecurityGroupIds": {"Ref": "VPCSecurityGroupIdList"}
+                    }, {"Ref" : "AWS::NoValue"} ]
+                }
             },
         }
     },
@@ -170,7 +184,22 @@ module.exports={
                 "Resource": [
                   {"Fn::Join": ["",["arn:aws:logs:",{ "Ref" : "AWS::Region" },":",{ "Ref" : "AWS::AccountId" },":log-group:/aws/kinesisfirehose/*"]]}
                 ]
-              }
+              },
+              {
+                "Sid": "",
+                "Effect": "Allow",
+                "Action": [
+                    "ec2:DescribeVpcs",
+                    "ec2:DescribeVpcAttribute",
+                    "ec2:DescribeSubnets",
+                    "ec2:DescribeSecurityGroups",
+                    "ec2:DescribeNetworkInterfaces",
+                    "ec2:CreateNetworkInterface",
+                    "ec2:CreateNetworkInterfacePermission",
+                    "ec2:DeleteNetworkInterface"
+                ],
+                "Resource": "*"
+            }
             ]
           },
           "PolicyName" : "QnAFirehose"

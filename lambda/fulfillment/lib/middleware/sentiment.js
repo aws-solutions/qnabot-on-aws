@@ -15,7 +15,7 @@ function get_sentiment_from_comprehend(utterance) {
     return(Promise.resolve(comprehend.detectSentiment(comprehend_params).promise()))
     .then(function(data) {
         console.log(JSON.stringify(data));
-        return data.Sentiment ;
+        return data;
     });
 }
 
