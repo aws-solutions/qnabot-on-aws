@@ -138,7 +138,7 @@ async function get_hit(req, res) {
     }
     // Do we have a hit?
     if (hit) {
-        // set res topic from document before running handlebars, so that handlebars cann access or overwrite it.
+        // set res topic from document before running handlebars, so that handlebars can access or overwrite it.
         _.set(res, "session.topic", _.get(hit, "t"));
         // run handlebars template processing
         hit = await handlebars(req, res, hit);
@@ -299,7 +299,7 @@ module.exports = async function (req, res) {
         var ansSource = _.get(hit, "answersource", "unknown")
         if (ansSource==="Kendra FAQ") {
             res.answerSource = "KENDRA"
-        } else if (ansSource==="ElasticSearch" || ansSource==="ES Fallback")
+        } else if (ansSource==="ElasticSearch" || ansSource==="ES Fallback") {
             res.answerSource = "ES"
         } else {
             res.answerSource = ansSource
