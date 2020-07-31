@@ -299,7 +299,7 @@ module.exports = async function (req, res) {
         var ansSource = _.get(hit, "answersource", "unknown")
         if (ansSource==="Kendra FAQ") {
             res.answerSource = "KENDRA"
-        } else if (ansSource==="ElasticSearch" || ansSource==="ES Fallback")
+        } else if (ansSource==="ElasticSearch" || ansSource==="ES Fallback") {
             res.answerSource = "ES"
         } else {
             res.answerSource = ansSource
