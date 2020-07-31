@@ -121,6 +121,9 @@ async function get_hit(req, res) {
     // ES fallback if KendraFAQ fails
     if (!hit && _.get(req, '_settings.ES_FALLBACK', false)) {
         response = await run_query_es(req, query_params);
+        if (_.get(response, "hits.hits[0]._source")) {
+            _.set(response, "hits.hits[0]._source.answersource", "ElasticSearch Fallback");
+        }
         hit = _.get(response, "hits.hits[0]._source");
     }
     
