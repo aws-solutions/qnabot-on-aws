@@ -55,7 +55,7 @@ async function run_query_kendra(req, query_params) {
     var kendra_response = await kendra.handler(request_params);
     
     if (_.get(kendra_response, "hits.hits[0]._source")) {
-        _.set(kendra_response, "hits.hits[0]._source.answersource", "KendraFAQ");
+        _.set(kendra_response, "hits.hits[0]._source.answersource", "Kendra FAQ");
     }
     
     // TODO: check if ever more than 1 answer in kendra FAQ...(check console?) 
@@ -295,7 +295,15 @@ module.exports = async function (req, res) {
         res.type = "PlainText"
         res.message = res.result.a
         res.plainMessage = res.result.a
-        res.answerSource = _.get(hit, "answersource", "unknown")
+        // Add answerSource for query hits
+        var ansSource = _.get(hit, "answersource", "unknown")
+        if (ansSource==="Kendra FAQ") {
+            res.answerSource = "KENDRA"
+        } else if (ansSource==="ElasticSearch" || ansSource==="ES Fallback")
+            res.answerSource = "ES"
+        } else {
+            res.answerSource = ansSource
+        }
 
         // Add alt messages to appContext session attribute JSON value (for lex-web-ui)
         var tmp
