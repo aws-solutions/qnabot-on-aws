@@ -361,7 +361,7 @@ async function routeKendraRequest(event, context) {
         _.set(event,"res.session.qnabotcontext.kendra.kendraResultId",kendraResultId) ;
         _.set(event,"res.session.qnabotcontext.kendra.kendraResponsibleQid",event.res.result.qid) ;
     }
-    // console.log("final return: " + JSON.stringify(event,null,2));
+    
     return event;
 }
 

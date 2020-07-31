@@ -91,6 +91,11 @@ module.exports={
           if(status.status!=="Sync Complete" && status.status!=="Error"){
             setTimeout(()=>poll(),1000)
           }
+          
+          if (self.request_status=='Sync Complete'){
+            self.success = true
+          }
+          self.loading=false
         }
       })
     },
@@ -110,10 +115,9 @@ module.exports={
         console.log('error')
         this.error=e
         this.request_status = 'Error'
+        self.loading=false
       }finally{
-        console.log('finished');
-        if (this.request_status=='Sync Complete') this.success = true
-        this.loading=false
+        // fails to enter this block
       }
     }
   }
