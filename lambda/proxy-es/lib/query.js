@@ -122,7 +122,7 @@ async function get_hit(req, res) {
     if (!hit && _.get(req, '_settings.ES_FALLBACK', false)) {
         response = await run_query_es(req, query_params);
         if (_.get(response, "hits.hits[0]._source")) {
-            _.set(response, "hits.hits[0]._source.answersource", "ElasticSearch Fallback");
+            _.set(response, "hits.hits[0]._source.answersource", "ES Fallback");
         }
         hit = _.get(response, "hits.hits[0]._source");
     }
