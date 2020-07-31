@@ -7,6 +7,7 @@ var build_es_query = require('./esbodybuilder');
 var handlebars = require('./handlebars');
 var translate = require('./translate');
 var kendra = require('./kendraQuery');
+const sleep = require('util').promisify(setTimeout);
 
 
 // use DEFAULT_SETTINGS_PARAM as random encryption key unique to this QnABot installation
@@ -15,7 +16,14 @@ var encryptor = require('simple-encryptor')(key);
 
 async function run_query(req, query_params) {
     var no_hits_question = _.get(req, '_settings.ES_NO_HITS_QUESTION', 'no_hits');
-    if (_.get(req, "_settings.KENDRA_FAQ_INDEX") != "" && query_params['question'] != no_hits_question) {
+    var kendrafaq = _.get(req, "_settings.KENDRA_FAQ_INDEX");
+    var kendra_fb = _.get(req, '_.settings.ALT_KENDRA_INDEXES', []);
+    
+    if (kendrafaq!='' && kendra_fb!=[] && query_params['question']===no_hits_question) {
+        await sleep(2000);
+    }
+    
+    if (kendrafaq != ""){
         return await run_query_kendra(req, query_params);
     } else {
         return await run_query_es(req, query_params);
@@ -34,7 +42,7 @@ async function run_query_es(req, query_params) {
     if (_.get(es_response, "hits.hits[0]._source")) {
         _.set(es_response, "hits.hits[0]._source.answersource", "ElasticSearch");
     }
-    
+
     return es_response;
 }
 
@@ -57,10 +65,7 @@ async function run_query_kendra(req, query_params) {
     if (_.get(kendra_response, "hits.hits[0]._source")) {
         _.set(kendra_response, "hits.hits[0]._source.answersource", "Kendra FAQ");
     }
-    
     // TODO: check if ever more than 1 answer in kendra FAQ...(check console?) 
-    // ... assign confidence to 100% for the first one...if necessary?
-    
     return kendra_response;
 
 }
