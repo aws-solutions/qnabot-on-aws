@@ -55,7 +55,7 @@ async function run_query_kendra(req, query_params) {
     var kendra_response = await kendra.handler(request_params);
     
     if (_.get(kendra_response, "hits.hits[0]._source")) {
-        _.set(kendra_response, "hits.hits[0]._source.answersource", "KendraFAQ");
+        _.set(kendra_response, "hits.hits[0]._source.answersource", "Kendra FAQ");
     }
     
     // TODO: check if ever more than 1 answer in kendra FAQ...(check console?) 
@@ -121,6 +121,9 @@ async function get_hit(req, res) {
     // ES fallback if KendraFAQ fails
     if (!hit && _.get(req, '_settings.ES_FALLBACK', false)) {
         response = await run_query_es(req, query_params);
+        if (_.get(response, "hits.hits[0]._source")) {
+            _.set(response, "hits.hits[0]._source.answersource", "ES Fallback");
+        }
         hit = _.get(response, "hits.hits[0]._source");
     }
     
@@ -253,8 +256,6 @@ module.exports = async function (req, res) {
         hit = await get_hit(req, res);
         
     }
-    console.log(`hit is ${JSON.stringify(hit, null, 2)}`);
-    
     
     if (hit) {
         // found a document in elastic search.
@@ -294,6 +295,15 @@ module.exports = async function (req, res) {
         res.type = "PlainText"
         res.message = res.result.a
         res.plainMessage = res.result.a
+        // Add answerSource for query hits
+        var ansSource = _.get(hit, "answersource", "unknown")
+        if (ansSource==="Kendra FAQ") {
+            res.answerSource = "KENDRA"
+        } else if (ansSource==="ElasticSearch" || ansSource==="ES Fallback")
+            res.answerSource = "ES"
+        } else {
+            res.answerSource = ansSource
+        }
 
         // Add alt messages to appContext session attribute JSON value (for lex-web-ui)
         var tmp
