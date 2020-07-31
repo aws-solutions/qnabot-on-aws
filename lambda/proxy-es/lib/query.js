@@ -256,8 +256,6 @@ module.exports = async function (req, res) {
         hit = await get_hit(req, res);
         
     }
-    console.log(`hit is ${JSON.stringify(hit, null, 2)}`);
-    
     
     if (hit) {
         // found a document in elastic search.
@@ -297,6 +295,7 @@ module.exports = async function (req, res) {
         res.type = "PlainText"
         res.message = res.result.a
         res.plainMessage = res.result.a
+        res.answerSource = _.get(hit, "answersource", "unknown")
 
         // Add alt messages to appContext session attribute JSON value (for lex-web-ui)
         var tmp
