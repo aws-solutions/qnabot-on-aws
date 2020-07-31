@@ -102,9 +102,10 @@ exports.performSync=async function(event,context,cb){
             content:content,
             output_path:'/tmp/qna_FAQ.csv',
         }
-        // await update_status(process.env.OUTPUT_S3_BUCKET, 'Parsing content JSON');
+        await update_status(process.env.OUTPUT_S3_BUCKET, 'Parsing content JSON');
         await parse.handler(parseJSONparams)
         console.log("Parsed content JSON into CSV stored locally");
+        
         
         // get QnABot settings to retrieve KendraFAQIndex
         var settings = await get_settings();
@@ -125,22 +126,19 @@ exports.performSync=async function(event,context,cb){
             kendra_s3_access_role:process.env.KENDRA_ROLE,
             region:process.env.REGION
         }
-        // await update_status(process.env.OUTPUT_S3_BUCKET, 'Creating FAQ');
-        await create.handler(createFAQparams);  // awaits a promise
-        await sleep(20000);
-        
+        await update_status(process.env.OUTPUT_S3_BUCKET, 'Creating FAQ');
+        await create.handler(createFAQparams);
         // wait for index to complete creation
         // TODO: https://docs.aws.amazon.com/kendra/latest/dg/create-index.html
-    
         console.log('Completed CSV converting to FAQ');
-        // await update_status(process.env.OUTPUT_S3_BUCKET, 'Sync Complete');
-        await sleep(20000);
         
-        console.log(`sync complete`);
+        
+        await update_status(process.env.OUTPUT_S3_BUCKET, 'Sync Complete');
+        console.log(`completed sync`);
         return 'Synced';
         
     } catch (err) {
-        // await update_status(process.env.OUTPUT_S3_BUCKET, 'Error');
+        await update_status(process.env.OUTPUT_S3_BUCKET, 'Error');
         console.log(err);
         console.log(`failed sync`);
         return err

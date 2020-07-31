@@ -42,7 +42,7 @@ module.exports={
     var self=this
     return {
       snackbar:false,
-      // loading:false,
+      loading:false,
       success:false,
       error:'',
       request_status:"Ready",
@@ -68,6 +68,10 @@ module.exports={
         var info=await this.$store.dispatch('api/getExport',job)
         var out={}
         Object.assign(out,coll[index],info)
+        
+        // TODO: this is hacky fix to why the job sometimes starts out with sync complete
+        if (info.status == 'Sync Complete')  setTimeout(()=>null, 5000);
+        
         coll.splice(index,1,out)
         poll()
         
@@ -87,13 +91,18 @@ module.exports={
           if(status.status!=="Sync Complete" && status.status!=="Error"){
             setTimeout(()=>poll(),1000)
           }
+          
+          if (self.request_status=='Sync Complete'){
+            self.success = true
+          }
+          self.loading=false
         }
       })
     },
     start:async function(){
       var self=this
       this.loading=true
-      this.snackbar=true 
+      this.snackbar=true
       this.success=false
       this.error=''
       try{
@@ -106,13 +115,9 @@ module.exports={
         console.log('error')
         this.error=e
         this.request_status = 'Error'
+        self.loading=false
       }finally{
-        console.log('finished');
-        // TODO: delete old export file
-        var exports=await this.$store.dispatch('api/listExports')
-        await this.$store.dispatch('api/deleteExport',exports[0])
-        if (this.request_status=='Sync Complete') this.success = true
-        await this.refresh()
+        // fails to enter this block
       }
     }
   }

@@ -144,11 +144,13 @@ async function routeKendraRequest(request_params) {
     let kendraIndexId;
     let kendraResultId;
     let json_struct = [];
+    let scores = [];
     
     
+    // note that this for loop will only execute once but the structure was kept due to its elegance earlier
     resArray.forEach(function (res) {
         if (res && res.ResultItems.length > 0) {
-            maxDocumentCount = request_params.max_doc_count ? request_params.max_doc_count : maxDocumentCount;
+            maxDocumentCount = request_params.max_doc_count ? request_params.max_doc_count : maxDocumentCount;  // TODO: configure by user? or expandable bubble?
             
             var i, element;
             for (i=0; i<res.ResultItems.length; i++) {
@@ -165,6 +167,8 @@ async function routeKendraRequest(request_params) {
                     var hit = JSON.parse(element.DocumentURI);
                     console.log(`hit is ${JSON.stringify(hit)}`);
                     json_struct.push(hit);
+                    
+                    scores.push(res.ResultItems.length-i); // the score of each person will be its inverse ranking
 
                     kendraQueryId = res.QueryId; // store off the QueryId to use as a session attribute for feedback
                     kendraIndexId = res.originalKendraIndexId; // store off the Kendra IndexId to use as a session attribute for feedback
@@ -175,16 +179,16 @@ async function routeKendraRequest(request_params) {
         }
     });
     
-    // return query response structure (if no answers found, total hits # is 0 and hits list is empty)
+    // return query response structure
     var hits_struct = {
         // "took": 104,
         // "timed_out": false,
         "hits": {
             "total": {
-                "value": foundAnswerCount,
+                "value": foundAnswerCount,  // if no answers found, total hits # is 0 and hits list is empty
                 "relation": "eq"
             },
-            // "max_score": 19.81313,
+            "max_score": Math.max(scores),
             "hits": [],
         },
         // TODO: in event.res.session add kendra query id, kendra index id, kendra result id
@@ -203,7 +207,7 @@ async function routeKendraRequest(request_params) {
             "_index": request_params.kendra_faq_index,
             "_type": "_faq",
             "_id": faq_struct.qid,
-            // TODO: "_score": ???,
+            "_score": scores[j],
             "_source": faq_struct
         }
         hits_struct.hits.hits.push(ans);
