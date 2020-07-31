@@ -360,6 +360,7 @@ async function routeKendraRequest(event, context) {
         _.set(event,"res.session.qnabotcontext.kendra.kendraResultId",kendraResultId) ;
         _.set(event,"res.session.qnabotcontext.kendra.kendraResponsibleQid",event.res.result.qid) ;
     }
+
     return event;
 }
 
