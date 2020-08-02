@@ -31,16 +31,16 @@ function merge_next(hit1, hit2) {
         hit2.a = hit1.a + hit2.a;
     }
     // merge markdown, if present in both items
-    var md1 = (_.get(hit1, "alt.markdown"));
-    var md2 = (_.get(hit2, "alt.markdown"));
+    var md1 = _.get(hit1, "alt.markdown");
+    var md2 = _.get(hit2, "alt.markdown");
     if (md1 && md2) {
         _.set(hit2, "alt.markdown", md1 + "\n" + md2);
     } else {
         console.log("Markdown field missing from one or both items; skip markdown merge");
     }
     // merge SSML, if present in both items
-    var ssml1 = (_.get(hit1, "alt.ssml"));
-    var ssml2 = (_.get(hit2, "alt.ssml"));
+    var ssml1 = _.get(hit1, "alt.ssml");
+    var ssml2 = _.get(hit2, "alt.ssml");
     if (ssml1 && ssml2) {
         // strip <speak> tags
         ssml1 = ssml1.replace(/<speak>|<\/speak>/g, "");
@@ -50,6 +50,23 @@ function merge_next(hit1, hit2) {
     } else {
         console.log("SSML field missing from one or both items; skip SSML merge");
     }
+    // build arrays of Lambda Hooks and arguments
+    var lambdahooks = _.get(hit1, "lambdahooks",[]);
+    // if hits1 doesn't have a lambdahooks field (no previous merge), then initialize using 'l' and 'args' from hit 1
+    if ( lambdahooks.length == 0 ) {
+        lambdahooks = [
+                {
+                    l:      _.get(hit1, "l"),
+                    args:   _.get(hit1, "args",[]),
+                }
+            ];
+    }
+    lambdahooks.push({
+        l:      _.get(hit2, "l"),
+        args:   _.get(hit2, "args",[]),        
+    });
+    _.set(hit2, "lambdahooks", lambdahooks);
+    
     // all other fields inherited from item 2
     console.log("Chained items merged:", hit2);
     return hit2;
@@ -203,10 +220,17 @@ module.exports = async function (req, res) {
     }
     if (hit) {
         // found a document in elastic search.
-        if (_.get(hit, "conditionalChaining") && _.get(hit, "elicitResponse.responsebot_hook", "") === "" ) {
+        var c=0;
+        while (_.get(hit, "conditionalChaining") && _.get(hit, "elicitResponse.responsebot_hook", "") === "" ) {
+            c++;
             // ElicitResonse is not involved and this document has conditionalChaining defined. Process the
             // conditionalChaining in this case.
             hit = await evaluateConditionalChaining(req, res, hit, hit.conditionalChaining);
+            console.log("Chained doc count: ", c);
+            if (c >= 10) {
+                console.log("Reached Max limit of 10 chained documents (safeguard to prevent infinite loops).") ;
+                break ;
+            }
         }
         // translate response
         var usrLang = 'en';
