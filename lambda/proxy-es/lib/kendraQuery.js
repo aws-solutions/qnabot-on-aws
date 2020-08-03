@@ -147,7 +147,7 @@ async function routeKendraRequest(request_params) {
     let scores = [];
     
     
-    // note that this for loop will only execute once but the structure was kept due to its elegance earlier
+    // note that this outside for loop will only execute once (one FAQ index) but the structure was kept due to its elegance
     resArray.forEach(function (res) {
         if (res && res.ResultItems.length > 0) {
             maxDocumentCount = request_params.max_doc_count ? request_params.max_doc_count : maxDocumentCount;  // TODO: configure by user? or expandable bubble?
@@ -159,8 +159,6 @@ async function routeKendraRequest(request_params) {
                 if (element.Type === 'QUESTION_ANSWER' && foundAnswerCount === 0 && element.AdditionalAttributes &&
                     element.AdditionalAttributes.length > 1) {
                     
-                    
-                    // TODO?: listFAQs and throw error if multiple
                     if (!hasJsonStructure(element.DocumentURI)) {
                         break;
                     }
@@ -179,10 +177,10 @@ async function routeKendraRequest(request_params) {
         }
     });
     
-    // return query response structure
+    // return query response structure to make Kendra results look like ES results so we don't have to change the UI
     var hits_struct = {
         // "took": 104,
-        // "timed_out": false,
+        "timed_out": false,
         "hits": {
             "total": {
                 "value": foundAnswerCount,  // if no answers found, total hits # is 0 and hits list is empty

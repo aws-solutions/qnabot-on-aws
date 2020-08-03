@@ -58,7 +58,6 @@ module.exports={
       return this.$store.dispatch('data/search',{
         query:this.query,
         topic:this.topic,
-        mode:"test"
       })
     },500,{trailing:false,leading:true})
   }

@@ -19,7 +19,6 @@ module.exports=Object.assign(
       "method.request.querystring.filter":false,
       "method.request.querystring.order":false,
       "method.request.querystring.perpage":false,
-      "method.request.querystring.mode":false,
     }
 }),
 "QuestionsDelete":lambda({
