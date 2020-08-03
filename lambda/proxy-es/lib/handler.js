@@ -73,7 +73,7 @@ async function run_query_kendra(event, kendra_index) {
     var request_params = {
         kendra_faq_index:kendra_index,
         input_transcript:event.question,
-        //TODO: size:_.get(event,'size',10)
+        size:10 // limit kendra hits to 10 max to avoid pagination issues
     }
     var kendra_response = await kendra.handler(request_params);
     return kendra_response;
