@@ -3,6 +3,7 @@ var Promise=require('bluebird');
 var request=require('./request');
 var _=require('lodash');
 var build_es_query=require('./esbodybuilder');
+var kendra = require('./kendraQuery');
 var AWS=require('aws-sdk');
 
 async function get_parameter(param_name) {
@@ -53,7 +54,78 @@ async function get_es_query(event) {
     }
 }
 
-module.exports= (event, context, callback) => {
+
+
+async function run_query_es(event) {
+    console.log("ElasticSearch Query",JSON.stringify(es_query,null,2));
+    var es_query = await build_es_query(event);
+    var es_response = await request({
+        url:Url.resolve("https://"+event.endpoint,event.path),
+        method:event.method,
+        headers:event.headers,
+        body:es_query 
+    });
+    if (_.get(es_response, "hits.hits[0]._source")) {
+        _.set(es_response, "hits.hits[0]._source.answersource", "ElasticSearch");
+    }
+    return es_response;
+}
+
+
+async function run_query_kendra(event, kendra_index) {
+    console.log("Kendra FAQ Query index:" + kendra_index);
+    // calls kendrQuery function which duplicates KendraFallback code, but only searches through FAQs
+    var request_params = {
+        kendra_faq_index:kendra_index,
+        input_transcript:event.question
+    }
+    var kendra_response = await kendra.handler(request_params);
+    
+    if (_.get(kendra_response, "hits.hits[0]._source")) {
+        _.set(kendra_response, "hits.hits[0]._source.answersource", "Kendra FAQ");
+    }
+    return kendra_response;
+}
+
+
+
+
+module.exports= async (event, context, callback) => {
+    console.log('Received event:', JSON.stringify(event, null, 2));
+    try {
+        var settings = await get_settings();
+        var kendra_index = _.get(settings, "KENDRA_FAQ_INDEX")
+        if (kendra_index != "") {
+            var response = await run_query_kendra(event, kendra_index);
+        } else {
+            var response = await run_query_es(event);
+        }
+        
+        console.log("Query response: ", JSON.stringify(response,null,2));
+        // ES fallback if KendraFAQ fails
+        var hit = _.get(response, "hits.hits[0]._source");
+        if (!hit && _.get(settings, 'ES_FALLBACK', false)) {
+            console.log("ES Fallback");
+            response = await run_query_es(event);
+            if (_.get(response, "hits.hits[0]._source")) {
+                _.set(response, "hits.hits[0]._source.answersource", "ES Fallback");
+            }
+        }
+        return callback(null, response);
+    } catch (error) {
+        console.log(`error is ${JSON.stringify(error, null,2)}`);
+        return callback(JSON.stringify({
+            type:error.response.status===404 ? "[NotFoud]":"[InternalServiceError]",
+            status:error.response.status,
+            message:error.response.statusText,
+            data:error.response.data
+        }))
+    }
+}
+
+
+
+module.exports2= (event, context, callback) => {
     console.log('Received event:', JSON.stringify(event, null, 2));
     return(Promise.resolve(get_es_query(event)))
     .then( function(es_query) {
