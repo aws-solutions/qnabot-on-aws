@@ -17,10 +17,12 @@
     "bluebird": "^3.5.1",
     "bodybuilder": "^2.2.7",
     "cfn-lambda": "^4.0.0",
-    "markdown": "^0.5.0",
     "handlebars": "^4.7.2",
+    "intercept-stdout": "^0.1.2",
+    "markdown": "^0.5.0",
+    "mocha": "^8.1.0",
     "safe-eval": "^0.4.1",
-    "simple-encryptor": "^3.0.0",
-    "intercept-stdout": "^0.1.2"
+    "save-dev": "0.0.1-security",
+    "simple-encryptor": "^3.0.0"
   }
 }
