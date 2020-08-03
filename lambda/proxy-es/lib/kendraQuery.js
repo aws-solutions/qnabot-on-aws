@@ -198,7 +198,11 @@ async function routeKendraRequest(request_params) {
     
     let ans = {};
     var j, faq_struct;
-    for (j=0; j<json_struct.length; j++) {
+    var num=json_struct.length;
+    if (request_params.size) {
+        num = Math.min(num, request_params.size);
+    }
+    for (j=0; j<num; j++) {
         faq_struct = json_struct[j];
         
         ans = {
