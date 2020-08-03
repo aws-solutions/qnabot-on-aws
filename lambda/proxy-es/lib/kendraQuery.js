@@ -160,7 +160,6 @@ async function routeKendraRequest(request_params) {
                     element.AdditionalAttributes.length > 1) {
                     
                     
-                    // TODO?: listFAQs and throw error if multiple
                     if (!hasJsonStructure(element.DocumentURI)) {
                         break;
                     }
