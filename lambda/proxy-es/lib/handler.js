@@ -95,27 +95,28 @@ module.exports= async (event, context, callback) => {
     try {
         var settings = await get_settings();
         var kendra_index = _.get(settings, "KENDRA_FAQ_INDEX")
-        if (kendra_index != "") {
+        // if test mode & kendra index exists, then test with kendra faq query
+        if (_.get(event,'mode',"")=="test" && kendra_index != "") {
             var response = await run_query_kendra(event, kendra_index);
+            // ES fallback if KendraFAQ fails
+            var hit = _.get(response, "hits.hits[0]._source");
+            if (!hit && _.get(settings, 'ES_FALLBACK', false)) {
+                console.log("ES Fallback");
+                response = await run_query_es(event);
+                if (_.get(response, "hits.hits[0]._source")) {
+                    _.set(response, "hits.hits[0]._source.answersource", "ES Fallback");
+                }
+            }
         } else {
             var response = await run_query_es(event);
         }
         
         console.log("Query response: ", JSON.stringify(response,null,2));
-        // ES fallback if KendraFAQ fails
-        var hit = _.get(response, "hits.hits[0]._source");
-        if (!hit && _.get(settings, 'ES_FALLBACK', false)) {
-            console.log("ES Fallback");
-            response = await run_query_es(event);
-            if (_.get(response, "hits.hits[0]._source")) {
-                _.set(response, "hits.hits[0]._source.answersource", "ES Fallback");
-            }
-        }
         return callback(null, response);
     } catch (error) {
         console.log(`error is ${JSON.stringify(error, null,2)}`);
         return callback(JSON.stringify({
-            type:error.response.status===404 ? "[NotFoud]":"[InternalServiceError]",
+            type:error.response.status===404 ? "[NotFound]":"[InternalServiceError]",
             status:error.response.status,
             message:error.response.statusText,
             data:error.response.data
@@ -141,7 +142,7 @@ module.exports2= (event, context, callback) => {
     .tapCatch(x=>console.log(x))
     .then(result=>callback(null,result))
     .catch(error=>callback(JSON.stringify({
-        type:error.response.status===404 ? "[NotFoud]" : "[InternalServiceError]",
+        type:error.response.status===404 ? "[NotFound]" : "[InternalServiceError]",
         status:error.response.status,
         message:error.response.statusText,
         data:error.response.data

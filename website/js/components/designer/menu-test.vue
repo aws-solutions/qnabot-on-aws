@@ -57,7 +57,8 @@ module.exports={
     simulate:_.debounce(function(){
       return this.$store.dispatch('data/search',{
         query:this.query,
-        topic:this.topic
+        topic:this.topic,
+        mode:"test"
       })
     },500,{trailing:false,leading:true})
   }
