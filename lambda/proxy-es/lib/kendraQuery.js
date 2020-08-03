@@ -159,7 +159,6 @@ async function routeKendraRequest(request_params) {
                 if (element.Type === 'QUESTION_ANSWER' && foundAnswerCount === 0 && element.AdditionalAttributes &&
                     element.AdditionalAttributes.length > 1) {
                     
-                    
                     // TODO?: listFAQs and throw error if multiple
                     if (!hasJsonStructure(element.DocumentURI)) {
                         break;
