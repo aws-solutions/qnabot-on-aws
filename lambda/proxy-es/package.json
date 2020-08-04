@@ -3,12 +3,6 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
-  "directories": {
-    "test": "test"
-  },
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
   "author": "",
   "license": "ISC",
   "dependencies": {
@@ -19,8 +13,12 @@
     "cfn-lambda": "^4.0.0",
     "markdown": "^0.5.0",
     "handlebars": "^4.7.2",
+    "mocha": "^8.0.1",
     "safe-eval": "^0.4.1",
     "simple-encryptor": "^3.0.0",
     "intercept-stdout": "^0.1.2"
+  },
+  "scripts": {
+    "test": "mocha --timeout 50000"
   }
 }

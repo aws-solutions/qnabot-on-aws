@@ -124,6 +124,7 @@ async function get_hit(req, res) {
     var hit = _.get(response, "hits.hits[0]._source");
     
     // ES fallback if KendraFAQ fails
+    console.log('ES Fallback');
     if (!hit && _.get(req, '_settings.ES_FALLBACK', false)) {
         response = await run_query_es(req, query_params);
         if (_.get(response, "hits.hits[0]._source")) {

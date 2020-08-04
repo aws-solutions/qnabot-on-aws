@@ -110,7 +110,7 @@ async function routeKendraRequest(request_params) {
 
     var kendraClient = (process.env.REGION ?
             new AWSKendra({apiVersion: '2019-02-03', region: process.env.REGION}) :
-            new AWSKendra({apiVersion: '2019-02-03'})
+            new AWSKendra({apiVersion: '2019-02-03', region: 'us-east-1'})  // TODO: delete region here, for testing purposes only
         );
         
     
