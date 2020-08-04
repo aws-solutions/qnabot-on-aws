@@ -165,8 +165,6 @@ async function routeKendraRequest(request_params) {
                     var hit = JSON.parse(element.DocumentURI);
                     console.log(`hit is ${JSON.stringify(hit)}`);
                     json_struct.push(hit);
-                    
-                    scores.push(res.ResultItems.length-i); // the score of each person will be its inverse ranking
 
                     kendraQueryId = res.QueryId; // store off the QueryId to use as a session attribute for feedback
                     kendraIndexId = res.originalKendraIndexId; // store off the Kendra IndexId to use as a session attribute for feedback
@@ -186,7 +184,7 @@ async function routeKendraRequest(request_params) {
                 "value": foundAnswerCount,  // if no answers found, total hits # is 0 and hits list is empty
                 "relation": "eq"
             },
-            "max_score": Math.max(scores),
+            "max_score": json_struct.length,
             "hits": [],
         },
         // TODO: in event.res.session add kendra query id, kendra index id, kendra result id
@@ -209,12 +207,11 @@ async function routeKendraRequest(request_params) {
             "_index": request_params.kendra_faq_index,
             "_type": "_faq",
             "_id": faq_struct.qid,
-            "_score": scores[j],
+            "_score": json_struct.length-j, // score is inverse ranking of returned results
             "_source": faq_struct
         }
         hits_struct.hits.hits.push(ans);
     }
-    
 
     console.log("RETURN: " + JSON.stringify(hits_struct));
     return hits_struct;
