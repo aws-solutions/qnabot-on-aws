@@ -92,7 +92,7 @@ module.exports= async (event, context, callback) => {
             var response = await run_query_kendra(event, kendra_index);
             // ES fallback if KendraFAQ fails
             var hit = _.get(response, "hits.hits[0]._source");
-            if (!hit && _.get(settings, 'ES_FALLBACK', false)) {
+            if (!hit && _.get(settings, 'ES_FALLBACK', false)==='true') {   // TODO: 'false' evalulates to true so have to check the string value
                 console.log("ES Fallback");
                 response = await run_query_es(event, settings);
             }
