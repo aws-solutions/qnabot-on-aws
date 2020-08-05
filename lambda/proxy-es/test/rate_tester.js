@@ -1,9 +1,11 @@
 var query = require('../lib/query');
 const sleep = require('util').promisify(setTimeout)
 
-var NUM_USERS = 5;
-var NUM_SECONDS_SPACE = 0;
-var NUM_QUERIES_PER_USER = 5;
+
+
+var NUM_USERS = 2;
+var NUM_SECONDS_SPACE = 1;
+var NUM_QUERIES_PER_USER = 10;
 
 
 // kendra faq no fallback
@@ -20,7 +22,6 @@ async function rate_tester(req, res) {
             await sleep(NUM_SECONDS_SPACE * 1000);
         } catch (error) {
             if (error==="Error from Kendra query request:ThrottlingException: null" || error.code==='ThrottlingException') {
-                // console.log(`Throttling exception: trying query again in ${NUM_SECONDS_SPACE} seconds`);
                 count_throttles++;
                 await sleep(NUM_SECONDS_SPACE * 1000);
                 continue;

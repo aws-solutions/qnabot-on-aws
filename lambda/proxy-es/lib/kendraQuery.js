@@ -6,7 +6,16 @@
  *
  */
 
-const AWSKendra = require('aws-sdk/clients/kendra');
+// const AWSKendra = require('aws-sdk/clients/kendra');
+const AWS = require('aws-sdk');
+
+// AWS.sdk.config.update({
+//   maxRetries: 6, // default 3
+//   retryDelayOptions: {
+//     base: 300, // default 100
+//   },
+// });
+
 // let kendraFaqIndex = undefined;
 
 /**
@@ -26,7 +35,8 @@ function kendraRequester(kendraClient,params,resArray) {
             }
             else {
                 data.originalKendraIndexId = indexId;
-                console.log("Data from Kendra request:" + JSON.stringify(data, null, 2));
+                // TODO: undo
+                // console.log("Data from Kendra request:" + JSON.stringify(data, null, 2));
                 resArray.push(data);
                 resolve(data);
             }
@@ -109,8 +119,8 @@ function hasJsonStructure(str) {
 async function routeKendraRequest(request_params) {
 
     var kendraClient = (process.env.REGION ?
-            new AWSKendra({apiVersion: '2019-02-03', region: process.env.REGION}) :
-            new AWSKendra({apiVersion: '2019-02-03', region: 'us-east-1'})  // TODO: delete region here, for testing purposes only
+            new AWS.Kendra({apiVersion: '2019-02-03', region: process.env.REGION}) :
+            new AWS.Kendra({apiVersion: '2019-02-03', region: 'us-east-1'})  // TODO: delete region here, for testing purposes only
         );
         
     
@@ -163,7 +173,8 @@ async function routeKendraRequest(request_params) {
                         break;
                     }
                     var hit = JSON.parse(element.DocumentURI);
-                    console.log(`hit is ${JSON.stringify(hit)}`);
+                    // TODO: undo
+                    // console.log(`hit is ${JSON.stringify(hit)}`);
                     json_struct.push(hit);
 
                     kendraQueryId = res.QueryId; // store off the QueryId to use as a session attribute for feedback
@@ -212,12 +223,14 @@ async function routeKendraRequest(request_params) {
         }
         hits_struct.hits.hits.push(ans);
     }
-
-    console.log("RETURN: " + JSON.stringify(hits_struct));
+    
+    // TODO: undo
+    // console.log("RETURN: " + JSON.stringify(hits_struct));
     return hits_struct;
 }
 
 exports.handler = async (request_params) => {
-    console.log("kendra query request: " + JSON.stringify(request_params));
+    // TODO: undo
+    // console.log("kendra query request: " + JSON.stringify(request_params));
     return routeKendraRequest(request_params);
 };
