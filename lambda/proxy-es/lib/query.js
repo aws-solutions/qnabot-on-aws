@@ -105,6 +105,7 @@ async function get_hit(req, res) {
         _.set(res, "session.topic", _.get(hit, "t"));
         // run handlebars template processing
         hit = await handlebars(req, res, hit);
+
         // encrypt conditionalChaining rule, if set
         const conditionalChaining = _.get(hit, "conditionalChaining");
         if (conditionalChaining) {
@@ -139,16 +140,31 @@ async function evaluateConditionalChaining(req, res, hit, conditionalChaining) {
         // Chaining rule is a Lambda function
         var lambdaName = conditionalChaining.split("::")[1] ;
         console.log("Calling Lambda:", lambdaName);
+        var event={req:req, res:res};
         var lambda= new aws.Lambda();
         var lambdares=await lambda.invoke({
             FunctionName:lambdaName,
             InvocationType:"RequestResponse",
-            Payload:JSON.stringify({
-                req:req,
-                res:res
-            })
+            Payload:JSON.stringify(event)
         }).promise();
-        next_q=lambdares.Payload;
+        console.log("Chaining Rule Lambda response: ", lambdares);
+        var payload=lambdares.Payload;
+        try {
+            payload = JSON.parse(payload);
+        } catch (e) {
+            // response is not JSON
+        }
+        if (_.get(payload,"req") && _.get(payload,"res")) {
+            console.log("Chaining Rules Lambda returned possibly modified session event in response.");
+            req = _.get(payload,"req") ;
+            res = _.get(payload,"res") ;  
+            next_q = _.get(payload,"req.question");
+        }
+        else {
+            console.log("Chaining Rules Lambda did not return session event in response.");
+            console.log("assume response is a simple string containing next_q value");
+            next_q = payload ;
+        }
     } else {
         // create chaining rule safeEval context, aligned with Handlebars context
         const SessionAttributes = (arg) => _.get(SessionAttributes, arg, undefined);
@@ -187,10 +203,11 @@ async function evaluateConditionalChaining(req, res, hit, conditionalChaining) {
             elicitResponse.chainingConfig = chaining_configuration;
         }
         _.set(res.session,'qnabotcontext.elicitResponse',elicitResponse);
-        return (merge_next(hit, hit2));
+        var mergedhit = merge_next(hit, hit2);
+        return [req, res, mergedhit] ;
     } else {
         console.log("WARNING: No documents found for evaluated chaining rule:", next_q);
-        return hit;
+        return [req, res, hit];
     }
 }
 
@@ -213,7 +230,7 @@ module.exports = async function (req, res) {
         // we use a fakeHit with either the Bot's message or an empty string.
         let fakeHit = {};
         fakeHit.a = res.message ? res.message : "";
-        hit = await evaluateConditionalChaining(req, res, fakeHit, elicitResponseChainingConfig);
+        [req, res, hit] = await evaluateConditionalChaining(req, res, fakeHit, elicitResponseChainingConfig);
     } else {
         // elicitResponse is not involved. obtain the next question to serve up to the user.
         hit = await get_hit(req, res);
@@ -225,7 +242,7 @@ module.exports = async function (req, res) {
             c++;
             // ElicitResonse is not involved and this document has conditionalChaining defined. Process the
             // conditionalChaining in this case.
-            hit = await evaluateConditionalChaining(req, res, hit, hit.conditionalChaining);
+            [req, res, hit] = await evaluateConditionalChaining(req, res, hit, hit.conditionalChaining);
             console.log("Chained doc count: ", c);
             if (c >= 10) {
                 console.log("Reached Max limit of 10 chained documents (safeguard to prevent infinite loops).") ;
@@ -335,5 +352,7 @@ module.exports = async function (req, res) {
     res.session.qnabot_qid = _.get(res.result, "qid", "") ;
     res.session.qnabot_gotanswer = (res['got_hits'] > 0) ? true : false ;
 
-    console.log("RESULT", JSON.stringify(req), JSON.stringify(res))
+    var event = {req, res} ;
+    console.log("RESULT", JSON.stringify(event));
+    return event ;
 };
