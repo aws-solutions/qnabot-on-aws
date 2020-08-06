@@ -3,7 +3,7 @@ module.exports=[{
     text:`
 - create an Amazon Connect Instance [Amazon Connect Tutorial](https://docs.aws.amazon.com/connect/latest/adminguide/tutorials.html)
     `,
-    image:"../images/connect_create_instance.png""
+    image:"../images/connect_create_instance.png"
 },{
     title:"Make QnABot Accessible",
     text:`
