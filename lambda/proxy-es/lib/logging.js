@@ -35,7 +35,7 @@ function stringifySessionAttribues(res) {
     }
 }
 
-module.exports=function(event, context){
+module.exports=function(event, context, callback){
     //data to send to general metrics logging
     var date = new Date()
     var now = date.toISOString()
