@@ -95,7 +95,7 @@ module.exports={
       stepNumber:1,
       schema:new clipboard('#Schema',{
         text:function(){
-          return JSON.stringify(self.$store.state.bot.alexa,null,2)
+          return JSON.stringify(self.$store.state.bot.connect,null,2)
         }
       }),
       arn:new clipboard('#LambdaArn',{

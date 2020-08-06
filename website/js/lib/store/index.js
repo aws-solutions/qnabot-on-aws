@@ -21,9 +21,11 @@ module.exports=new Vuex.Store({
             status:"",
             message:"",
             utterances:[],
-            alexa:{}
+            alexa:{},
+            connect:{}
         },
         alexa:{},
+        connect:{},
         error:""
     },
     mutations:require('./mutations'),

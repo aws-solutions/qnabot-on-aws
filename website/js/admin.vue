@@ -133,7 +133,7 @@ module.exports={
       },
       {
         title:"Connect",
-        id:"alexa",
+        id:"connect",
         subTitle:"Instructions for integrating with Connect",
         icon:"info",
         href:"#/connect"
