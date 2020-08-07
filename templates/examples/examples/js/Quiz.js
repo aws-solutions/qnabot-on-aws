@@ -37,7 +37,7 @@ exports.handler=async function(event,context,callback){
                 questionCount:0,
                 correctAnswerCount:0,
                 next:event.res.result.args[0],
-                originalDocumentQid:_.get(event,"res.session.previous.qid","")
+                originalDocumentQid:_.get(event,"res.session.qnabotcontext.previous.qid","")
             }
         }
         console.log(JSON.stringify(quizBot,null,2))

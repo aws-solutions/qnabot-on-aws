@@ -308,9 +308,9 @@ module.exports = async function (req, res) {
         }
 
 
-        var navigationJson = _.get(res, "session.navigation", false)
-        var previousQid = _.get(res, "session.previous.qid", false)
-        var previousArray = _.get(res, "session.navigation.previous", [])
+        var navigationJson = _.get(res, "session.qnabotcontext.navigation", false)
+        var previousQid = _.get(res, "session.qnabotcontext.previous.qid", false)
+        var previousArray = _.get(res, "session.qnabotcontext.navigation.previous", [])
 
         if (
             previousQid != _.get(res.result, "qid") &&
@@ -330,22 +330,19 @@ module.exports = async function (req, res) {
         if ("next" in res.result) {
             hasParent = false
         }
-        res.session.previous = {
+        _.set(res,"session.qnabotcontext.previous", {
             qid: _.get(res.result, "qid"),
             a: _.get(res.result, "a"),
             alt: _.get(res.result, "alt", {}),
             q: req.question
-        }
-        res.session.navigation = {
-            next: _.get(res.result,
-                "next",
-                _.get(res, "session.navigation.next", "")
-            ),
+            }) ;
+         _.set(res,"session.qnabotcontext.navigation", {
+            next: _.get(res.result, "next", _.get(res, "session.qnabotcontext.navigation.next", "")),
             previous: previousArray,
             hasParent: hasParent
-        }
+            }) ;
     } else {
-        res.type = "PlainText"
+        res.type = "PlainText";
         res.message = _.get(req, '_settings.EMPTYMESSAGE', 'You stumped me!');
     }
     // add session attributes for qid and no_hits - useful for Amazon Connect integration
