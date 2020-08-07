@@ -67,7 +67,18 @@
 				"help me",
 				"need help"
 			]
-		}
-
+		},
+	    {
+	      "qid": "Repeat",
+	      "a": "{{!-- The 'repeat' magic is in the Document Chaining Rule in the Advanced section --}}",
+	      "conditionalChaining": "(SessionAttributes('qnabotcontext.previous.q')) ? SessionAttributes('qnabotcontext.previous.q') : 'help'",
+	      "type": "qna",
+	      "q": [
+	        "Repeat",
+	        "Can you repeat that",
+	        "Can you please say that again",
+	        "Please repeat that"
+	      ]
+	    }
 	]
 }
