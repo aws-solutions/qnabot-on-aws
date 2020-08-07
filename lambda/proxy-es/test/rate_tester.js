@@ -1,4 +1,4 @@
-// var query = require('../lib/query');
+// rate tester for kendra throttle
 const sleep = require('util').promisify(setTimeout)
 const AWS = require('aws-sdk');
 AWS.config.update({
