@@ -128,6 +128,12 @@ Handlebars.registerHelper('setSessionAttr', function () {
     return "";
 });
 
+Handlebars.registerHelper('getSessionAttr', function (attr, def, options) {
+    let v = _.get(res_glbl.session, attr, def);
+    console.log("Return session attribute key, value: ", attr, v);
+    return v;
+});
+
 Handlebars.registerHelper('randomPick', function () {
     var argcount = arguments.length - 1;  // ignore final 'options' argument
     console.log("Select randomly from ", argcount, "inputs: ", arguments);
