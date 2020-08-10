@@ -9,15 +9,6 @@
 var _ = require('lodash');
 const AWS = require('aws-sdk');
 
-// AWS.sdk.config.update({
-//   maxRetries: 6, // default 3
-//   retryDelayOptions: {
-//     base: 300, // default 100
-//   },
-// });
-
-// let kendraFaqIndex = undefined;
-
 /**
  * Function to query kendraClient and return results via Promise
  * @param kendraClient
@@ -70,10 +61,18 @@ function hasJsonStructure(str) {
  * @returns {Promise<*>} - returns the response in event.res
  */
 async function routeKendraRequest(request_params) {
+    
+    AWS.config.update({
+      maxRetries: request_params.maxRetries,
+      retryDelayOptions: {
+        base: request_params.retryDelay
+      },
+    });
 
+    // if testing: specify region
     var kendraClient = (process.env.REGION ?
             new AWS.Kendra({apiVersion: '2019-02-03', region: process.env.REGION}) :
-            new AWS.Kendra({apiVersion: '2019-02-03', region: 'us-east-1'})  // TODO: delete region here, for testing purposes only
+            new AWS.Kendra({apiVersion: '2019-02-03'})
         );
         
     

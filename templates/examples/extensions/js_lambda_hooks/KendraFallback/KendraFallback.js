@@ -160,7 +160,7 @@ async function routeKendraRequest(event, context) {
             
             return new Promise(function(resolve, reject) {
                 var data = _.get(event.res, "result.kendraResultsCached");
-                // TODO: address _.set(event.res, "result.kendraResultsCached", "cached and removed");
+                // TODO: address _.unset(event.res, "result.kendraResultsCached");
                 data.originalKendraIndexId = index;
                 console.log("Data from Kendra request:" + JSON.stringify(data,null,2));
                 resArray.push(data);

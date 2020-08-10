@@ -51,7 +51,9 @@ async function run_query_kendra(req, query_params) {
     console.log("Querying Kendra FAQ index: " + _.get(req, "_settings.KENDRA_FAQ_INDEX"));
     // calls kendrQuery function which duplicates KendraFallback code, but only searches through FAQs
     var request_params = {
-        kendra_faq_index:req["_settings"]["KENDRA_FAQ_INDEX"]
+        kendra_faq_index:req["_settings"]["KENDRA_FAQ_INDEX"],
+        maxRetries:req["_settings"]["KENDRAFAQ_CONFIG_MAX_RETRIES"],
+        retryDelay:req["_settings"]["KENDRAFAQ_CONFIG_RETRY_DELAY"],
     }
     // autotranslate
     if (req["_event"]['userDetectedLocale'] != 'en') {
