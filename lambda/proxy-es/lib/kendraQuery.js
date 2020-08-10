@@ -6,7 +6,7 @@
  *
  */
 
-// const AWSKendra = require('aws-sdk/clients/kendra');
+var _ = require('lodash');
 const AWS = require('aws-sdk');
 
 // AWS.sdk.config.update({
@@ -35,60 +35,13 @@ function kendraRequester(kendraClient,params,resArray) {
             }
             else {
                 data.originalKendraIndexId = indexId;
-                // TODO: undo
-                // console.log("Data from Kendra request:" + JSON.stringify(data, null, 2));
+                console.log("Data from Kendra request:" + JSON.stringify(data, null, 2));
                 resArray.push(data);
                 resolve(data);
             }
         });
     });
 }
-
-
-
-/**
- * Function to sort and merge overlapping intervals
- * @param intervals
- * @returns [*]
- * Source: https://gist.github.com/vrachieru/5649bce26004d8a4682b
- */
-function mergeIntervals(intervals) {
-  // test if there are at least 2 intervals
-  if(intervals.length <= 1)
-    return intervals;
-
-  var stack = [];
-  var top   = null;
-
-  // sort the intervals based on their start values
-  intervals.sort(function(a, b) {return a[0] - b[0]});
-
-  // push the 1st interval into the stack
-  stack.push(intervals[0]);
-
-  // start from the next interval and merge if needed
-  for (var i = 1; i < intervals.length; i++) {
-    // get the top element
-    top = stack[stack.length - 1];
-
-    // if the current interval doesn't overlap with the 
-    // stack top element, push it to the stack
-    if (top.EndOffset < intervals[i].BeginOffset) {
-      stack.push(intervals[i]);
-    }
-    // otherwise update the end value of the top element
-    // if end of current interval is higher
-    else if (top.EndOffset < intervals[i].EndOffset)
-    {
-      top.EndOffset = intervals[i].EndOffset;
-      stack.pop();
-      stack.push(top);
-    }
-  }
-
-  return stack;
-}
-
 
 
 /** Function that returns if a string has JSON structure
@@ -154,12 +107,11 @@ async function routeKendraRequest(request_params) {
     let kendraIndexId;
     let kendraResultId;
     let json_struct = [];
-    let scores = [];
     
     
     // note that this outside for loop will only execute once (one FAQ index) but the structure was kept due to its elegance
     resArray.forEach(function (res) {
-        if (res && res.ResultItems.length > 0) {
+        if (res && res.ResultItems && res.ResultItems.length > 0) {
             maxDocumentCount = request_params.max_doc_count ? request_params.max_doc_count : maxDocumentCount;  // TODO: configure by user? or expandable bubble?
             
             var i, element;
@@ -173,8 +125,7 @@ async function routeKendraRequest(request_params) {
                         break;
                     }
                     var hit = JSON.parse(element.DocumentURI);
-                    // TODO: undo
-                    // console.log(`hit is ${JSON.stringify(hit)}`);
+                    console.log(`hit is ${JSON.stringify(hit)}`);
                     json_struct.push(hit);
 
                     kendraQueryId = res.QueryId; // store off the QueryId to use as a session attribute for feedback
@@ -224,13 +175,38 @@ async function routeKendraRequest(request_params) {
         hits_struct.hits.hits.push(ans);
     }
     
-    // TODO: undo
-    // console.log("RETURN: " + JSON.stringify(hits_struct));
+    // cache kendra results to optimize fallback engine
+    if (request_params.same_index && resArray.length>0) {
+        if (hits_struct.hits.hits.length===0) {
+            console.log(`no hits found in KendraFAQ: returning KendraFallback qid and caching results`)
+            hits_struct.max_score = 1
+            hits_struct.hits.hits.push({
+                "_index": kendraIndexId,
+                "_type": "_faq",
+                "_id": "KendraFallback",
+                "_score": 1,
+            });
+            hits_struct.hits.hits[0]['_source'] = {
+                "qid": "KendraFallback",
+                "a": "The Kendra Fallback search was not able to identify any results",
+                "l": "QNA:EXTKendraFallback",
+                "type": "qna",
+                "q": [
+                    "no_hits"
+                ],
+                "kendraResultsCached":resArray[0]
+            }
+        } else if (hits_struct.hits.hits.length>0 && _.get(hits_struct.hits.hits[0], "_id")==="KendraFallback") {
+            // this case if matching a no_hits query
+            console.log(`KendraFallback found in KendraFAQ: caching results for fallback optimization`)
+            hits_struct.hits.hits[0]['_source']['kendraResultsCached'] = resArray[0]//.ResultItems;
+        }
+    }
+    console.log("RETURN: " + JSON.stringify(hits_struct));
     return hits_struct;
 }
 
 exports.handler = async (request_params) => {
-    // TODO: undo
-    // console.log("kendra query request: " + JSON.stringify(request_params));
+    console.log("kendra query request: " + JSON.stringify(request_params));
     return routeKendraRequest(request_params);
 };

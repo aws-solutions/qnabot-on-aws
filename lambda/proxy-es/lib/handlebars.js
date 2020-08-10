@@ -155,6 +155,7 @@ var apply_handlebars = async function (req, res, hit) {
     var markdown = _.get(hit, "alt.markdown");
     var ssml = _.get(hit, "alt.ssml");
     var r = _.get(hit, "r");
+    var kendraResultsCached = _.get(hit, "kendraResultsCached");
     // catch and log errors before throwing exception.
     if (a) {
         try {
@@ -238,7 +239,9 @@ var apply_handlebars = async function (req, res, hit) {
             console.log("ERROR: response card fields format caused Handlebars exception. Check syntax: " + e );
             throw (e);
         }
-
+    }
+    if (kendraResultsCached) {
+        _.set(hit_out, 'kendraResultsCached', kendraResultsCached);
     }
     console.log("Preprocessed Result: ", hit_out);
     return hit_out;

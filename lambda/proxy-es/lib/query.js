@@ -32,7 +32,7 @@ async function run_query(req, query_params) {
 
 async function run_query_es(req, query_params) {
     var es_query = await build_es_query(query_params);
-    // console.log('Querying ElasticSearch');
+    console.log('Querying ElasticSearch');
     var es_response = await request({
         url: `https://${req._info.es.address}/${req._info.es.index}/_doc/_search?search_type=dfs_query_then_fetch`,
         method: "GET",
@@ -48,7 +48,7 @@ async function run_query_es(req, query_params) {
 
 
 async function run_query_kendra(req, query_params) {
-    // console.log("Querying Kendra FAQ index: " + _.get(req, "_settings.KENDRA_FAQ_INDEX"));
+    console.log("Querying Kendra FAQ index: " + _.get(req, "_settings.KENDRA_FAQ_INDEX"));
     // calls kendrQuery function which duplicates KendraFallback code, but only searches through FAQs
     var request_params = {
         kendra_faq_index:req["_settings"]["KENDRA_FAQ_INDEX"]
@@ -59,13 +59,28 @@ async function run_query_kendra(req, query_params) {
     } else {
         request_params['input_transcript']= req["_event"].inputTranscript;
     }
+    
+    // optimize kendra queries for throttling
+    let alt_kendra_idxs = _.get(req, "_settings.ALT_SEARCH_KENDRA_INDEXES");
+    if (alt_kendra_idxs && alt_kendra_idxs.length) {
+        try {
+            // parse JSON array of kendra indexes
+            alt_kendra_idxs = JSON.parse(alt_kendra_idxs);
+        } catch (err) {
+            // assume setting is a string containing single index
+            alt_kendra_idxs = [ alt_kendra_idxs ];
+        }
+    }
+    if (alt_kendra_idxs.includes(request_params.kendra_faq_index)) {
+        console.log(`optimizing for KendraFallback`);
+        request_params['same_index'] = true
+    }
 
     var kendra_response = await kendra.handler(request_params);
     
     if (_.get(kendra_response, "hits.hits[0]._source")) {
         _.set(kendra_response, "hits.hits[0]._source.answersource", "Kendra FAQ");
     }
-    // TODO: check if ever more than 1 answer in kendra FAQ...(check console?) 
     return kendra_response;
 
 }
@@ -74,7 +89,7 @@ function merge_next(hit1, hit2) {
     if (hit1 === undefined) {
         return hit2;
     }
-    // console.log("Merge chained items");
+    console.log("Merge chained items");
     // merge plaintext answer
     if (hit1 && hit1.a) {
         hit2.a = hit1.a + hit2.a;
@@ -85,7 +100,7 @@ function merge_next(hit1, hit2) {
     if (md1 && md2) {
         _.set(hit2, "alt.markdown", md1 + "\n" + md2);
     } else {
-        // console.log("Markdown field missing from one or both items; skip markdown merge");
+        console.log("Markdown field missing from one or both items; skip markdown merge");
     }
     // merge SSML, if present in both items
     var ssml1 = (_.get(hit1, "alt.ssml"));
@@ -97,10 +112,10 @@ function merge_next(hit1, hit2) {
         // concatenate, and re-wrap with <speak> tags
         _.set(hit2, "alt.ssml", "<speak>" + ssml1 + " " + ssml2 + "</speak>");
     } else {
-        // console.log("SSML field missing from one or both items; skip SSML merge");
+        console.log("SSML field missing from one or both items; skip SSML merge");
     }
     // all other fields inherited from item 2
-    // console.log("Chained items merged:", hit2);
+    console.log("Chained items merged:", hit2);
     return hit2;
 }
 
@@ -120,11 +135,11 @@ async function get_hit(req, res) {
     };
     var no_hits_question = _.get(req, '_settings.ES_NO_HITS_QUESTION', 'no_hits');
     var response = await run_query(req, query_params);
-    // console.log("Query response: ", JSON.stringify(response,null,2));
+    console.log("Query response: ", JSON.stringify(response,null,2));
     var hit = _.get(response, "hits.hits[0]._source");
     
     // ES fallback if KendraFAQ fails
-    // console.log('ES Fallback');
+    console.log('ES Fallback');
     if (!hit && _.get(req, '_settings.ES_FALLBACK', false)) {
         response = await run_query_es(req, query_params);
         if (_.get(response, "hits.hits[0]._source")) {
@@ -136,9 +151,10 @@ async function get_hit(req, res) {
     if (hit) {
         res['got_hits'] = 1;  // response flag, used in logging / kibana
     } else {
-        // console.log("No hits from query - searching instead for: " + no_hits_question);
+        console.log("No hits from query - searching instead for: " + no_hits_question);
         query_params['question'] = no_hits_question;
         res['got_hits'] = 0;  // response flag, used in logging / kibana
+        
         response = await run_query(req, query_params);
         hit = _.get(response, "hits.hits[0]._source");
     }
@@ -151,7 +167,7 @@ async function get_hit(req, res) {
         // encrypt conditionalChaining rule, if set
         const conditionalChaining = _.get(hit, "conditionalChaining");
         if (conditionalChaining) {
-            // console.log("Encrypt conditionalChaining rule to ensure it is tamper proof in session attributes");
+            console.log("Encrypt conditionalChaining rule to ensure it is tamper proof in session attributes");
             const encrypted = encryptor.encrypt(conditionalChaining);
             _.set(hit, "conditionalChaining", encrypted);
         }
@@ -170,18 +186,18 @@ async function get_hit(req, res) {
  * @returns {Promise<*>}
  */
 async function evaluateConditionalChaining(req, res, hit, conditionalChaining) {
-    // console.log("evaluateConditionalChaining req: ", JSON.stringify(req, null, 2));
-    // console.log("evaluateConditionalChaining res: ", JSON.stringify(res, null, 2));
-    // console.log("evaluateConditionalChaining hit: ", JSON.stringify(hit, null, 2));
+    console.log("evaluateConditionalChaining req: ", JSON.stringify(req, null, 2));
+    console.log("evaluateConditionalChaining res: ", JSON.stringify(res, null, 2));
+    console.log("evaluateConditionalChaining hit: ", JSON.stringify(hit, null, 2));
     // decrypt conditionalChaining
     conditionalChaining = encryptor.decrypt(conditionalChaining);
-    // console.log("Decrypted Chained document rule specified:", conditionalChaining);
+    console.log("Decrypted Chained document rule specified:", conditionalChaining);
     var next_q;
     // If chaining rule a lambda, or an expression?
     if (conditionalChaining.toLowerCase().startsWith("lambda::")) {
         // Chaining rule is a Lambda function
         var lambdaName = conditionalChaining.split("::")[1] ;
-        // console.log("Calling Lambda:", lambdaName);
+        console.log("Calling Lambda:", lambdaName);
         var lambda= new aws.Lambda();
         var lambdares=await lambda.invoke({
             FunctionName:lambdaName,
@@ -205,11 +221,11 @@ async function evaluateConditionalChaining(req, res, hit, conditionalChaining) {
             OrigQuestion: _.get(req,"_event.origQuestion",req.question),
             Sentiment: req.sentiment,
         };
-        // console.log("Evaluating:", conditionalChaining);
+        console.log("Evaluating:", conditionalChaining);
         // safely evaluate conditionalChaining expression.. throws an exception if there is a syntax error
         next_q = safeEval(conditionalChaining, context);
     }
-    // console.log("Chained document rule evaluated to:", next_q);
+    console.log("Chained document rule evaluated to:", next_q);
     req.question = next_q;
     const hit2 = await get_hit(req, res);
     // if the question we are chaining to, also has conditional chaining, be sure to navigate set up
@@ -232,7 +248,7 @@ async function evaluateConditionalChaining(req, res, hit, conditionalChaining) {
         _.set(res.session,'qnabotcontext.elicitResponse',elicitResponse);
         return (merge_next(hit, hit2));
     } else {
-        // console.log("WARNING: No documents found for evaluated chaining rule:", next_q);
+        console.log("WARNING: No documents found for evaluated chaining rule:", next_q);
         return hit;
     }
 }
@@ -275,10 +291,10 @@ module.exports = async function (req, res) {
         if (_.get(req._settings, 'ENABLE_MULTI_LANGUAGE_SUPPORT')) {
             usrLang = _.get(req, 'session.userLocale');
             if (usrLang != 'en') {
-                // console.log("Autotranslate hit to usrLang: ", usrLang);
+                console.log("Autotranslate hit to usrLang: ", usrLang);
                 hit = await translate.translate_hit(hit, usrLang);
             } else {
-                // console.log("User Lang is en, Autotranslate not required.");
+                console.log("User Lang is en, Autotranslate not required.");
             }
         }
         // prepend debug msg
@@ -301,6 +317,7 @@ module.exports = async function (req, res) {
         res.type = "PlainText"
         res.message = res.result.a
         res.plainMessage = res.result.a
+        
         // Add answerSource for query hits
         var ansSource = _.get(hit, "answersource", "unknown")
         if (ansSource==="Kendra FAQ") {
@@ -327,7 +344,7 @@ module.exports = async function (req, res) {
                 res.message = res.result.alt.ssml.replace(/\r?\n|\r/g, ' ')
             }
         }
-        // console.log(res.message)
+        console.log(res.message)
         var card = _.get(res, "result.r.title") ? res.result.r : null
 
         if (card) {
@@ -383,5 +400,5 @@ module.exports = async function (req, res) {
     res.session.qnabot_qid = _.get(res.result, "qid", "") ;
     res.session.qnabot_gotanswer = (res['got_hits'] > 0) ? true : false ;
 
-    // console.log("RESULT", JSON.stringify(req), JSON.stringify(res))
+    console.log("RESULT", JSON.stringify(req), JSON.stringify(res))
 };
