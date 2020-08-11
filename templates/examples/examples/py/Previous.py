@@ -8,18 +8,12 @@ stackname = os.getenv('CFSTACK')
 
 def handler(event, context):
 
-    jsondump = json.dumps(event)
-    print(jsondump)
+    print("INPUT: ",json.dumps(event))
     
     # check we aren't calling this function before any document have been returned to the client and that 
     try:
         #Because "sub documents", like a sofa document that is connected to a room document, does not have a next, the in built query lambda attempts to figure out a parent document and will give the necessary information to perform room iteration
-        #for Lex
-        if "sessionAttributes" in event["req"]["_event"]:
-            navigationToJson = json.loads(event["req"]["_event"]["sessionAttributes"]["navigation"])
-        #for Alexa
-        else:
-            navigationToJson = json.loads(event["req"]["_event"]["session"]["attributes"]["navigation"])
+        navigationToJson = event["req"]["session"]["qnabotcontext"]["navigation"]
     except KeyError as k:
         navigationToJson = {}
     qidList = navigationToJson.get("previous",[])
@@ -29,7 +23,7 @@ def handler(event, context):
     if len(qidList) > 0:
         client = boto3.client('lambda')
         #Invoke the prepackaged function that Queries ElasticSearch using a document qid
-        temp = qidList.pop()
+        temp = qidList[-1]
         resp = client.invoke(
             FunctionName = event["req"]["_info"]["es"]["service"]["qid"],
             Payload = json.dumps({'qid':temp,'type':"qid"}),
@@ -64,12 +58,10 @@ def handler(event, context):
             event = updateResult(event,response)
                 # modify the event to make the previous question the redirected question that was just asked instead of "Next Question"
         else:
-            event["res"]["session"]["previous"] ={"qid":qidList,"a":navigationToJson["a"],"q":navigationToJson["q"]}
-            event["res"]["session"]["navigation"]={"next":navigationToJson["next"],"previous":[],"hasParent":navigationToJson["hasParent"]}
+            event["res"]["session"]["qnabotcontext"]["previous"] ={"qid":qidList,"a":navigationToJson["a"],"q":navigationToJson["q"]}
+            event["res"]["session"]["qnabotcontext"]["navigation"]={"next":navigationToJson["next"],"previous":[],"hasParent":navigationToJson["hasParent"]}
 
-        #uncomment line below if you want to see the final JSON before it is returned to the client
-        # print(json.dumps(event))
-
+    print("OUTPUT: ",json.dumps(event))
     return event
 
 #maps a shortname to the full name via CF Output stack value
@@ -89,19 +81,14 @@ def mapToArn(name,stack):
 
 #update the event with the information if there is a Lambda hook
 def updateLambdaHook(event,hookEvent, response):
-        #for Lex
-    if "sessionAttributes" in event["req"]["_event"]:
-        navigationToJson = json.loads(event["req"]["_event"]["sessionAttributes"]["navigation"])
-    #for Alexa
-    else:
-        navigationToJson = json.loads(event["req"]["_event"]["session"]["attributes"]["navigation"])
+    navigationToJson = event["req"]["session"]["qnabotcontext"]["navigation"]
     tempList= navigationToJson["previous"]
     #shift to remove previous function name from list
     tempList.pop()
     if "session" not in hookEvent["res"]:
         hookEvent["res"]["session"] = {}
-    hookEvent["res"]["session"]["previous"] ={"qid":response["qid"],"a":response["a"],"alt":response.get("alt",{}),"q":event["req"]["question"]}
-    hookEvent["res"]["session"]["navigation"]={"next":response["next"],"previous":tempList,"hasParent":navigationToJson["hasParent"]}
+    hookEvent["res"]["session"]["qnabotcontext"]["previous"] ={"qid":response["qid"],"a":response["a"],"alt":response.get("alt",{}),"q":event["req"]["question"]}
+    hookEvent["res"]["session"]["qnabotcontext"]["navigation"]={"next":response["next"],"previous":tempList,"hasParent":navigationToJson["hasParent"]}
     return hookEvent
 
 
@@ -135,17 +122,11 @@ def updateResult(event, response):
                     event["res"]["card"]["buttons"] = card["buttons"]
     if 't' in response:
         event["res"]["session"]["topic"] = response["t"]
-    #for Lex
-    if "sessionAttributes" in event["req"]["_event"]:
-        navigationToJson = json.loads(event["req"]["_event"]["sessionAttributes"]["navigation"])
-    #for Alexa
-    else:
-        navigationToJson = json.loads(event["req"]["_event"]["session"]["attributes"]["navigation"])
+    navigationToJson = event["req"]["session"]["qnabotcontext"]["navigation"]
     tempList= navigationToJson["previous"]
     #shift to remove previous function name from list
     tempList.pop()
-    event["res"]["session"]["previous"] ={"qid":response["qid"],"a":response["a"],"alt":response.get("alt",{}),"q":event["req"]["question"]}
-    event["res"]["session"]["navigation"]={"next":response["next"],"previous":tempList,"hasParent":navigationToJson["hasParent"]}
-
+    event["res"]["session"]["qnabotcontext"]["previous"] ={"qid":response["qid"],"a":response["a"],"alt":response.get("alt",{}),"q":event["req"]["question"]}
+    event["res"]["session"]["qnabotcontext"]["navigation"]={"next":response["next"],"previous":tempList,"hasParent":navigationToJson["hasParent"]}
     return event
 

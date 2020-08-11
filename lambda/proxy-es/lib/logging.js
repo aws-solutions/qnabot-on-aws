@@ -35,13 +35,13 @@ function stringifySessionAttribues(res) {
     }
 }
 
-module.exports=function(req,res){
+module.exports=function(event, context, callback){
     //data to send to general metrics logging
     var date = new Date()
     var now = date.toISOString()
     // need to unwrap the request and response objects we actually want from the req object
-    var unwrappedReq =req.req
-    var unwrappedRes =req.res
+    var unwrappedReq =event.req
+    var unwrappedRes =event.res
     
     // response session attributes logged as JSON string values to avoid 
     // ES mapping errors.
@@ -55,9 +55,9 @@ module.exports=function(req,res){
         let re = new RegExp(redactRegex, "g");
         processKeysForRegEx(unwrappedReq, re);
         processKeysForRegEx(unwrappedRes, re);
-        console.log("RESULT",JSON.stringify(req).replace(re, 'XXXXX'),JSON.stringify(res).replace(re, 'XXXXX'));
+        console.log("RESULT",JSON.stringify(event).replace(re, 'XXXXX'));
     } else {
-        console.log("RESULT",JSON.stringify(req),JSON.stringify(res));
+        console.log("RESULT",JSON.stringify(event));
     }
 
     let jsonData = {

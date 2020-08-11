@@ -31,16 +31,16 @@ function merge_next(hit1, hit2) {
         hit2.a = hit1.a + hit2.a;
     }
     // merge markdown, if present in both items
-    var md1 = (_.get(hit1, "alt.markdown"));
-    var md2 = (_.get(hit2, "alt.markdown"));
+    var md1 = _.get(hit1, "alt.markdown");
+    var md2 = _.get(hit2, "alt.markdown");
     if (md1 && md2) {
         _.set(hit2, "alt.markdown", md1 + "\n" + md2);
     } else {
         console.log("Markdown field missing from one or both items; skip markdown merge");
     }
     // merge SSML, if present in both items
-    var ssml1 = (_.get(hit1, "alt.ssml"));
-    var ssml2 = (_.get(hit2, "alt.ssml"));
+    var ssml1 = _.get(hit1, "alt.ssml");
+    var ssml2 = _.get(hit2, "alt.ssml");
     if (ssml1 && ssml2) {
         // strip <speak> tags
         ssml1 = ssml1.replace(/<speak>|<\/speak>/g, "");
@@ -50,6 +50,23 @@ function merge_next(hit1, hit2) {
     } else {
         console.log("SSML field missing from one or both items; skip SSML merge");
     }
+    // build arrays of Lambda Hooks and arguments
+    var lambdahooks = _.get(hit1, "lambdahooks",[]);
+    // if hits1 doesn't have a lambdahooks field (no previous merge), then initialize using 'l' and 'args' from hit 1
+    if ( lambdahooks.length == 0 ) {
+        lambdahooks = [
+                {
+                    l:      _.get(hit1, "l"),
+                    args:   _.get(hit1, "args",[]),
+                }
+            ];
+    }
+    lambdahooks.push({
+        l:      _.get(hit2, "l"),
+        args:   _.get(hit2, "args",[]),        
+    });
+    _.set(hit2, "lambdahooks", lambdahooks);
+    
     // all other fields inherited from item 2
     console.log("Chained items merged:", hit2);
     return hit2;
@@ -88,6 +105,7 @@ async function get_hit(req, res) {
         _.set(res, "session.topic", _.get(hit, "t"));
         // run handlebars template processing
         hit = await handlebars(req, res, hit);
+
         // encrypt conditionalChaining rule, if set
         const conditionalChaining = _.get(hit, "conditionalChaining");
         if (conditionalChaining) {
@@ -122,16 +140,31 @@ async function evaluateConditionalChaining(req, res, hit, conditionalChaining) {
         // Chaining rule is a Lambda function
         var lambdaName = conditionalChaining.split("::")[1] ;
         console.log("Calling Lambda:", lambdaName);
+        var event={req:req, res:res};
         var lambda= new aws.Lambda();
         var lambdares=await lambda.invoke({
             FunctionName:lambdaName,
             InvocationType:"RequestResponse",
-            Payload:JSON.stringify({
-                req:req,
-                res:res
-            })
+            Payload:JSON.stringify(event)
         }).promise();
-        next_q=lambdares.Payload;
+        console.log("Chaining Rule Lambda response: ", lambdares);
+        var payload=lambdares.Payload;
+        try {
+            payload = JSON.parse(payload);
+        } catch (e) {
+            // response is not JSON
+        }
+        if (_.get(payload,"req") && _.get(payload,"res")) {
+            console.log("Chaining Rules Lambda returned possibly modified session event in response.");
+            req = _.get(payload,"req") ;
+            res = _.get(payload,"res") ;  
+            next_q = _.get(payload,"req.question");
+        }
+        else {
+            console.log("Chaining Rules Lambda did not return session event in response.");
+            console.log("assume response is a simple string containing next_q value");
+            next_q = payload ;
+        }
     } else {
         // create chaining rule safeEval context, aligned with Handlebars context
         const SessionAttributes = (arg) => _.get(SessionAttributes, arg, undefined);
@@ -170,10 +203,11 @@ async function evaluateConditionalChaining(req, res, hit, conditionalChaining) {
             elicitResponse.chainingConfig = chaining_configuration;
         }
         _.set(res.session,'qnabotcontext.elicitResponse',elicitResponse);
-        return (merge_next(hit, hit2));
+        var mergedhit = merge_next(hit, hit2);
+        return [req, res, mergedhit] ;
     } else {
         console.log("WARNING: No documents found for evaluated chaining rule:", next_q);
-        return hit;
+        return [req, res, hit];
     }
 }
 
@@ -196,17 +230,24 @@ module.exports = async function (req, res) {
         // we use a fakeHit with either the Bot's message or an empty string.
         let fakeHit = {};
         fakeHit.a = res.message ? res.message : "";
-        hit = await evaluateConditionalChaining(req, res, fakeHit, elicitResponseChainingConfig);
+        [req, res, hit] = await evaluateConditionalChaining(req, res, fakeHit, elicitResponseChainingConfig);
     } else {
         // elicitResponse is not involved. obtain the next question to serve up to the user.
         hit = await get_hit(req, res);
     }
     if (hit) {
         // found a document in elastic search.
-        if (_.get(hit, "conditionalChaining") && _.get(hit, "elicitResponse.responsebot_hook", "") === "" ) {
+        var c=0;
+        while (_.get(hit, "conditionalChaining") && _.get(hit, "elicitResponse.responsebot_hook", "") === "" ) {
+            c++;
             // ElicitResonse is not involved and this document has conditionalChaining defined. Process the
             // conditionalChaining in this case.
-            hit = await evaluateConditionalChaining(req, res, hit, hit.conditionalChaining);
+            [req, res, hit] = await evaluateConditionalChaining(req, res, hit, hit.conditionalChaining);
+            console.log("Chained doc count: ", c);
+            if (c >= 10) {
+                console.log("Reached Max limit of 10 chained documents (safeguard to prevent infinite loops).") ;
+                break ;
+            }
         }
         // translate response
         var usrLang = 'en';
@@ -267,9 +308,9 @@ module.exports = async function (req, res) {
         }
 
 
-        var navigationJson = _.get(res, "session.navigation", false)
-        var previousQid = _.get(res, "session.previous.qid", false)
-        var previousArray = _.get(res, "session.navigation.previous", [])
+        var navigationJson = _.get(res, "session.qnabotcontext.navigation", false)
+        var previousQid = _.get(res, "session.qnabotcontext.previous.qid", false)
+        var previousArray = _.get(res, "session.qnabotcontext.navigation.previous", [])
 
         if (
             previousQid != _.get(res.result, "qid") &&
@@ -289,27 +330,26 @@ module.exports = async function (req, res) {
         if ("next" in res.result) {
             hasParent = false
         }
-        res.session.previous = {
+        _.set(res,"session.qnabotcontext.previous", {
             qid: _.get(res.result, "qid"),
             a: _.get(res.result, "a"),
             alt: _.get(res.result, "alt", {}),
             q: req.question
-        }
-        res.session.navigation = {
-            next: _.get(res.result,
-                "next",
-                _.get(res, "session.navigation.next", "")
-            ),
+            }) ;
+         _.set(res,"session.qnabotcontext.navigation", {
+            next: _.get(res.result, "next", _.get(res, "session.qnabotcontext.navigation.next", "")),
             previous: previousArray,
             hasParent: hasParent
-        }
+            }) ;
     } else {
-        res.type = "PlainText"
+        res.type = "PlainText";
         res.message = _.get(req, '_settings.EMPTYMESSAGE', 'You stumped me!');
     }
     // add session attributes for qid and no_hits - useful for Amazon Connect integration
     res.session.qnabot_qid = _.get(res.result, "qid", "") ;
     res.session.qnabot_gotanswer = (res['got_hits'] > 0) ? true : false ;
 
-    console.log("RESULT", JSON.stringify(req), JSON.stringify(res))
+    var event = {req, res} ;
+    console.log("RESULT", JSON.stringify(event));
+    return event ;
 };
