@@ -13,6 +13,8 @@ var default_settings = {
     MINIMUM_CONFIDENCE_SCORE: 0.6, //User can override this value to set the minimum confidence they accept using CustomQnABotSettings
     ALT_SEARCH_KENDRA_INDEXES: [], // Add Kendra index to array to enable Amazon Kendra as a fallback source of answers
     KENDRA_FAQ_INDEX: "", // Kendra Index specific for FAQ for if Kendra FAQ sync is enabled
+    KENDRAFAQ_CONFIG_MAX_RETRIES: 8,    //User can override number of max retries in AWS SDK configurations
+    KENDRAFAQ_CONFIG_RETRY_DELAY: 600,  //User can override number of miliseconds delay between retries in AWS SDK configurations
     ES_FALLBACK: "false", // Kendra Index specific for FAQ for if Kendra FAQ sync is enabled
     ERRORMESSAGE: "Unfortunately I encountered an error when searching for your answer. Please ask me again later.",
     EMPTYMESSAGE: "You stumped me! Sadly I don't know how to answer your question.",

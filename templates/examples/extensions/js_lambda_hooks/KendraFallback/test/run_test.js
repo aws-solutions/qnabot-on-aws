@@ -6,7 +6,7 @@ const kendraFallback = require('../KendraFallback.js');
 async function test_markdown() {
     const event = require('./event_FAQ_md.json');
     const context = require('./context_FAQ_md.json');
-    event.test = true;
+    event.test = 1;
     const actual_resp = await kendraFallback.handler(event, context);
     return actual_resp;
 }
@@ -14,7 +14,7 @@ async function test_markdown() {
 async function test_top_ans() {
     const event = require('./event_top_ans.json');
     const context = require('./context_top_ans.json');
-    event.test2 = true;
+    event.test = 2;
     const actual_resp = await kendraFallback.handler(event, context);
     return actual_resp;
 }
@@ -22,7 +22,7 @@ async function test_top_ans() {
 async function test_doc_query() {
     const event = require('./event_doc_query.json');
     const context = require('./context_doc_query.json');
-    event.test3 = true;
+    event.test = 3;
     const actual_resp = await kendraFallback.handler(event, context);
     return actual_resp;
 }

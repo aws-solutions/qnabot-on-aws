@@ -7,6 +7,7 @@ var build_es_query = require('./esbodybuilder');
 var handlebars = require('./handlebars');
 var translate = require('./translate');
 var kendra = require('./kendraQuery');
+// const sleep = require('util').promisify(setTimeout);
 
 
 // use DEFAULT_SETTINGS_PARAM as random encryption key unique to this QnABot installation
@@ -15,7 +16,10 @@ var encryptor = require('simple-encryptor')(key);
 
 async function run_query(req, query_params) {
     var no_hits_question = _.get(req, '_settings.ES_NO_HITS_QUESTION', 'no_hits');
-    if (_.get(req, "_settings.KENDRA_FAQ_INDEX") != "" && query_params['question'] != no_hits_question) {
+    var kendrafaq = _.get(req, "_settings.KENDRA_FAQ_INDEX");
+    var ES_only_questions = [no_hits_question];
+    
+    if (kendrafaq != "" && !(ES_only_questions.includes(query_params['question']))){
         return await run_query_kendra(req, query_params);
     } else {
         return await run_query_es(req, query_params);
@@ -34,7 +38,7 @@ async function run_query_es(req, query_params) {
     if (_.get(es_response, "hits.hits[0]._source")) {
         _.set(es_response, "hits.hits[0]._source.answersource", "ElasticSearch");
     }
-    
+
     return es_response;
 }
 
@@ -43,7 +47,9 @@ async function run_query_kendra(req, query_params) {
     console.log("Querying Kendra FAQ index: " + _.get(req, "_settings.KENDRA_FAQ_INDEX"));
     // calls kendrQuery function which duplicates KendraFallback code, but only searches through FAQs
     var request_params = {
-        kendra_faq_index:req["_settings"]["KENDRA_FAQ_INDEX"]
+        kendra_faq_index:req["_settings"]["KENDRA_FAQ_INDEX"],
+        maxRetries:req["_settings"]["KENDRAFAQ_CONFIG_MAX_RETRIES"],
+        retryDelay:req["_settings"]["KENDRAFAQ_CONFIG_RETRY_DELAY"],
     }
     // autotranslate
     if (req["_event"]['userDetectedLocale'] != 'en') {
@@ -51,16 +57,28 @@ async function run_query_kendra(req, query_params) {
     } else {
         request_params['input_transcript']= req["_event"].inputTranscript;
     }
+    
+    // optimize kendra queries for throttling by checking if KendraFallback idxs include KendraFAQIndex
+    let alt_kendra_idxs = _.get(req, "_settings.ALT_SEARCH_KENDRA_INDEXES");
+    if (alt_kendra_idxs && alt_kendra_idxs.length) {
+        try {
+            // parse JSON array of kendra indexes
+            alt_kendra_idxs = JSON.parse(alt_kendra_idxs);
+        } catch (err) {
+            // assume setting is a string containing single index
+            alt_kendra_idxs = [ alt_kendra_idxs ];
+        }
+    }
+    if (alt_kendra_idxs.includes(request_params.kendra_faq_index)) {
+        console.log(`optimizing for KendraFallback`);
+        request_params['same_index'] = true
+    }
 
     var kendra_response = await kendra.handler(request_params);
     
     if (_.get(kendra_response, "hits.hits[0]._source")) {
         _.set(kendra_response, "hits.hits[0]._source.answersource", "Kendra FAQ");
     }
-    
-    // TODO: check if ever more than 1 answer in kendra FAQ...(check console?) 
-    // ... assign confidence to 100% for the first one...if necessary?
-    
     return kendra_response;
 
 }
@@ -118,7 +136,12 @@ async function get_hit(req, res) {
     console.log("Query response: ", JSON.stringify(response,null,2));
     var hit = _.get(response, "hits.hits[0]._source");
     
+    // TODO: check during merge
+    console.log(`response.kendraResultsCached after first hit: ${JSON.stringify(response.kendraResultsCached)}`);
+    _.set(req, "kendraResultsCached", response.kendraResultsCached);
+    
     // ES fallback if KendraFAQ fails
+    console.log('ES Fallback');
     if (!hit && _.get(req, '_settings.ES_FALLBACK', false)) {
         response = await run_query_es(req, query_params);
         if (_.get(response, "hits.hits[0]._source")) {
@@ -133,6 +156,7 @@ async function get_hit(req, res) {
         console.log("No hits from query - searching instead for: " + no_hits_question);
         query_params['question'] = no_hits_question;
         res['got_hits'] = 0;  // response flag, used in logging / kibana
+        
         response = await run_query(req, query_params);
         hit = _.get(response, "hits.hits[0]._source");
     }
@@ -295,6 +319,7 @@ module.exports = async function (req, res) {
         res.type = "PlainText"
         res.message = res.result.a
         res.plainMessage = res.result.a
+        
         // Add answerSource for query hits
         var ansSource = _.get(hit, "answersource", "unknown")
         if (ansSource==="Kendra FAQ") {
