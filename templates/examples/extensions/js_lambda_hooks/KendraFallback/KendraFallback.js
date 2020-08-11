@@ -137,7 +137,7 @@ async function routeKendraRequest(event, context) {
 
     // process query against Kendra for QnABot
     let indexes = event.req["_settings"]["ALT_SEARCH_KENDRA_INDEXES"] ? event.req["_settings"]["ALT_SEARCH_KENDRA_INDEXES"] : process.env.KENDRA_INDEXES
-    var kendra_faq_index = event.req["_settings"]["KENDRA_FAQ_INDEX"];
+    var kendraResultsCached = _.get(event, "kendraResultsCached");
     if (indexes && indexes.length) {
         try {
             // parse JSON array of kendra indexes
@@ -150,22 +150,21 @@ async function routeKendraRequest(event, context) {
     if (kendraIndexes === undefined) {
         throw new Error('Undefined Kendra Indexes');
     }
-
+    
     // This function can handle configuration with an array of kendraIndexes.
     // Iterate through this area and perform queries against Kendra.
     kendraIndexes.forEach(function (index, i) {
         // if results cached from KendraFAQ, skip index by pushing Promise to resolve cached results
-        if (index===kendra_faq_index && _.get(event.res, "result.kendraResultsCached")) {
+        if (kendraResultsCached && index===kendraResultsCached.originalKendraIndexId) {
             console.log(`retrieving cached kendra results`)
-            
-            return new Promise(function(resolve, reject) {
-                var data = _.get(event.res, "result.kendraResultsCached");
-                // TODO: address _.unset(event.res, "result.kendraResultsCached");
+            promises.push(new Promise(function(resolve, reject) {
+                var data = kendraResultsCached
+                _.unset(event, "kendraResultsCached");  // TODO: address? cleans the logs
                 data.originalKendraIndexId = index;
                 console.log("Data from Kendra request:" + JSON.stringify(data,null,2));
                 resArray.push(data);
                 resolve(data);
-            })
+            }));
         }
         
         const params = {

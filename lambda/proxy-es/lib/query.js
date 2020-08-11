@@ -18,12 +18,13 @@ async function run_query(req, query_params) {
     var no_hits_question = _.get(req, '_settings.ES_NO_HITS_QUESTION', 'no_hits');
     var kendrafaq = _.get(req, "_settings.KENDRA_FAQ_INDEX");
     var kendra_fb = _.get(req, '_.settings.ALT_KENDRA_INDEXES', []);
-    
     if (kendrafaq!='' && kendra_fb!=[] && query_params['question']===no_hits_question) {
         await sleep(2000);
     }
     
-    if (kendrafaq != ""){
+    var ES_only_questions = [no_hits_question];
+    
+    if (kendrafaq != "" && !(ES_only_questions.includes(query_params['question']))){
         return await run_query_kendra(req, query_params);
     } else {
         return await run_query_es(req, query_params);
@@ -62,7 +63,7 @@ async function run_query_kendra(req, query_params) {
         request_params['input_transcript']= req["_event"].inputTranscript;
     }
     
-    // optimize kendra queries for throttling
+    // optimize kendra queries for throttling by checking if KendraFallback idxs include KendraFAQIndex
     let alt_kendra_idxs = _.get(req, "_settings.ALT_SEARCH_KENDRA_INDEXES");
     if (alt_kendra_idxs && alt_kendra_idxs.length) {
         try {
@@ -139,6 +140,10 @@ async function get_hit(req, res) {
     var response = await run_query(req, query_params);
     console.log("Query response: ", JSON.stringify(response,null,2));
     var hit = _.get(response, "hits.hits[0]._source");
+    
+    // TODO: check during merge
+    console.log(`response.kendraResultsCached after first hit: ${JSON.stringify(response.kendraResultsCached)}`);
+    _.set(req, "kendraResultsCached", response.kendraResultsCached);
     
     // ES fallback if KendraFAQ fails
     console.log('ES Fallback');

@@ -100,7 +100,6 @@ async function routeKendraRequest(request_params) {
     // ----- process kendra query responses and update answer content -----
 
     /* default message text - can be overridden using QnABot SSM Parameter Store Custom Property */
-    let maxDocumentCount = 2;
     let foundAnswerCount = 0;
     let kendraQueryId;
     let kendraIndexId;
@@ -111,7 +110,6 @@ async function routeKendraRequest(request_params) {
     // note that this outside for loop will only execute once (one FAQ index) but the structure was kept due to its elegance
     resArray.forEach(function (res) {
         if (res && res.ResultItems && res.ResultItems.length > 0) {
-            maxDocumentCount = request_params.max_doc_count ? request_params.max_doc_count : maxDocumentCount;  // TODO: configure by user? or expandable bubble?
             
             var i, element;
             for (i=0; i<res.ResultItems.length; i++) {
@@ -176,31 +174,9 @@ async function routeKendraRequest(request_params) {
     
     // cache kendra results to optimize fallback engine
     if (request_params.same_index && resArray.length>0) {
-        if (hits_struct.hits.hits.length===0) {
-            console.log(`no hits found in KendraFAQ: returning KendraFallback qid and caching results`)
-            hits_struct.max_score = 1
-            hits_struct.hits.hits.push({
-                "_index": kendraIndexId,
-                "_type": "_faq",
-                "_id": "KendraFallback",
-                "_score": 1,
-            });
-            hits_struct.hits.hits[0]['_source'] = {
-                "qid": "KendraFallback",
-                "a": "The Kendra Fallback search was not able to identify any results",
-                "l": "QNA:EXTKendraFallback",
-                "type": "qna",
-                "q": [
-                    "no_hits"
-                ],
-                "kendraResultsCached":resArray[0]
-            }
-        } else if (hits_struct.hits.hits.length>0 && _.get(hits_struct.hits.hits[0], "_id")==="KendraFallback") {
-            // this case if matching a no_hits query
-            console.log(`KendraFallback found in KendraFAQ: caching results for fallback optimization`)
-            hits_struct.hits.hits[0]['_source']['kendraResultsCached'] = resArray[0]//.ResultItems;
-        }
+        hits_struct['kendraResultsCached'] = resArray[0];
     }
+    
     console.log("RETURN: " + JSON.stringify(hits_struct));
     return hits_struct;
 }
