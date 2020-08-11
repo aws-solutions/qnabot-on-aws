@@ -68,8 +68,7 @@ async function routeKendraRequest(request_params) {
         base: request_params.retryDelay
       },
     });
-
-    // if testing: specify region
+    
     var kendraClient = (process.env.REGION ?
             new AWS.Kendra({apiVersion: '2019-02-03', region: process.env.REGION}) :
             new AWS.Kendra({apiVersion: '2019-02-03'})

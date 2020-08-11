@@ -1,4 +1,9 @@
 // rate tester for kendra throttle
+
+// MAKE SURE TO ADD REGION IN KENDRAFAQ QUERY AND KENDRAFALLBACK FOR TESTING SINCE NOT PASSED IN AS PARAMETER
+// lambda/proxy-es/lib/kendraQuery
+// templates/examples/extensions/js_lambda_hooks/KendraFallback
+
 const sleep = require('util').promisify(setTimeout)
 const AWS = require('aws-sdk');
 AWS.config.update({

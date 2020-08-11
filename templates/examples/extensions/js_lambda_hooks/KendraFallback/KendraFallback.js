@@ -9,7 +9,7 @@ var _ = require('lodash')
  *
  */
 
-const AWSKendra = require('aws-sdk/clients/kendra');
+const AWS = require('aws-sdk');
 let kendraIndexes = undefined;
 
 /**
@@ -121,23 +121,27 @@ async function routeKendraRequest(event, context) {
     let promises = [];
     let resArray = [];
     let kendraClient = undefined;
+    
     // if test environment, then use mock-up of kendraClient
     if (event.test) {
-        kendraClient = require('./test/mockClient.js');
-    } else if (event.test2) {
-        kendraClient = require('./test/mockClient2.js');
-    } else if (event.test3) {
-        kendraClient = require('./test/mockClient3.js');
+        var mockup = './test/mockClient' + event.test + '.js';
+        kendraClient = require(mockup);
     } else {
+        AWS.config.update({
+          maxRetries: _.get(event.req["_settings"], "KENDRAFAQ_CONFIG_MAX_RETRIES"),
+          retryDelayOptions: {
+            base: _.get(event.req["_settings"], "KENDRAFAQ_CONFIG_RETRY_DELAY")
+          },
+        });
         kendraClient = (process.env.REGION ?
-            new AWSKendra({apiVersion: '2019-02-03', region: process.env.REGION}) :
-            new AWSKendra({apiVersion: '2019-02-03'})
+            new AWS.Kendra({apiVersion: '2019-02-03', region: process.env.REGION}) :
+            new AWS.Kendra({apiVersion: '2019-02-03'})
         );
     }
 
     // process query against Kendra for QnABot
     let indexes = event.req["_settings"]["ALT_SEARCH_KENDRA_INDEXES"] ? event.req["_settings"]["ALT_SEARCH_KENDRA_INDEXES"] : process.env.KENDRA_INDEXES
-    var kendraResultsCached = _.get(event, "kendraResultsCached");
+    var kendraResultsCached = _.get(event.req, "kendraResultsCached");
     if (indexes && indexes.length) {
         try {
             // parse JSON array of kendra indexes
@@ -157,14 +161,16 @@ async function routeKendraRequest(event, context) {
         // if results cached from KendraFAQ, skip index by pushing Promise to resolve cached results
         if (kendraResultsCached && index===kendraResultsCached.originalKendraIndexId) {
             console.log(`retrieving cached kendra results`)
+            
             promises.push(new Promise(function(resolve, reject) {
                 var data = kendraResultsCached
-                _.unset(event, "kendraResultsCached");  // TODO: address? cleans the logs
+                _.set(event.req, "kendraResultsCached", "cached and retrieved");  // cleans the logs
                 data.originalKendraIndexId = index;
                 console.log("Data from Kendra request:" + JSON.stringify(data,null,2));
                 resArray.push(data);
                 resolve(data);
             }));
+            return;
         }
         
         const params = {
