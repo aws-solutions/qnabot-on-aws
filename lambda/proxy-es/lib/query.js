@@ -17,10 +17,6 @@ var encryptor = require('simple-encryptor')(key);
 async function run_query(req, query_params) {
     var no_hits_question = _.get(req, '_settings.ES_NO_HITS_QUESTION', 'no_hits');
     var kendrafaq = _.get(req, "_settings.KENDRA_FAQ_INDEX");
-    // var kendra_fb = _.get(req, '_.settings.ALT_KENDRA_INDEXES', []);
-    // if (kendrafaq!='' && kendra_fb!=[] && query_params['question']===no_hits_question) {    // 2-second sleep to optimize kendra query calls
-    //     await sleep(2000);
-    // }
     var ES_only_questions = [no_hits_question];
     
     if (kendrafaq != "" && !(ES_only_questions.includes(query_params['question']))){
