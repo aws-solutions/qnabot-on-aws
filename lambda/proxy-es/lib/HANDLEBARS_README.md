@@ -51,7 +51,8 @@ QnABot also provides these additional helpers:
 |Helper                  | Descr                                      | Example                                                                                     |
 |------------------------|--------------------------------------------|---------------------------------------------------------------------------------------------|
 |ifCond                  | Block helper for conditional output.<br>Supported comparison operators:<br>'==', '===', '!=' ,'!==', '<', '<=', '>', '>=', '&&','&#124;&#124;' |{{#ifCond LexOrAlexa '==' 'LEX'}}<br>_output if true_<br>{{else}}<br>_output if false_<br>{{/ifCond}}<br> |
-|setSessionAttr          | Sets a named session attribute to specified value. | {{setSessionAttr '_testAttrName_' '_value_'}} |
+|getSessionAttr          | Returns named session attribute value if it is defined, or default value. | {{getSessionAttr '_attrName_' '_default_'}} |
+|setSessionAttr          | Sets a named session attribute to specified value. | {{setSessionAttr '_attrName_' '_value_'}} |
 |randomPick              | Randomly return a string selected from a list. | {{randomPick<br>"Greetings."<br>"Hi there!"<br>"Howdy"<br>"Hello, how are you?"<br>"Whassup dude!"<br>}}|
 
 ## Comments
@@ -83,6 +84,9 @@ Ask me a question. Try to stump me.
    {{setSessionAttr 'testAttr' 'BobRocks'}}
    Done
 {{/if}}
+
+{{!-- get nested Session Attribute, or default if attribute doesn't exist or is not defined --}}
+Previous answer was {{getSessionAttr 'qnabotcontext.previous.a' 'No previous response'}}
 
 {{!-- pick a random answer from list below --}}
 {{randomPick 
