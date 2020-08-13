@@ -15,20 +15,38 @@ var key = _.get(process.env, "DEFAULT_SETTINGS_PARAM", "fdsjhf98fd98fjh9 du98fjf
 var encryptor = require('simple-encryptor')(key);
 
 async function run_query(req, query_params) {
-    var no_hits_question = _.get(req, '_settings.ES_NO_HITS_QUESTION', 'no_hits');
-    var kendrafaq = _.get(req, "_settings.KENDRA_FAQ_INDEX");
-    var ES_only_questions = [no_hits_question];
+    var onlyES = await isESonly(req, query_params);
     
-    if (kendrafaq != "" && !(ES_only_questions.includes(query_params['question']))){
+    // runs kendra query if question supported on Kendra and KENDRA_FAQ_INDEX is set
+    if (!onlyES && _.get(req, "_settings.KENDRA_FAQ_INDEX")!=""){
         return await run_query_kendra(req, query_params);
     } else {
         return await run_query_es(req, query_params);
     }
 }
 
+async function isESonly(req, query_params) {
+    // returns boolean whether question is supported only on ElasticSearch
+    // no_hits is ES only
+    var no_hits_question = _.get(req, '_settings.ES_NO_HITS_QUESTION', 'no_hits');
+    var ES_only_questions = [no_hits_question];
+    if (ES_only_questions.includes(query_params['question'])) {
+        return true
+    }
+    // QID querying is ES only
+    if (query_params.question.toLowerCase().startsWith("qid::")) {
+        return true
+    }
+    // setting topics is ES only
+    if (_.get(query_params, 'topic')!="") {
+        return true
+    }
+    return false;
+}
+
 async function run_query_es(req, query_params) {
-    var es_query = await build_es_query(query_params);
     console.log('Querying ElasticSearch');
+    var es_query = await build_es_query(query_params);
     var es_response = await request({
         url: `https://${req._info.es.address}/${req._info.es.index}/_doc/_search?search_type=dfs_query_then_fetch`,
         method: "GET",
@@ -153,13 +171,12 @@ async function get_hit(req, res) {
     console.log("Query response: ", JSON.stringify(response,null,2));
     var hit = _.get(response, "hits.hits[0]._source");
     
-    // TODO: check during merge
-    console.log(`response.kendraResultsCached after first hit: ${JSON.stringify(response.kendraResultsCached)}`);
-    _.set(req, "kendraResultsCached", response.kendraResultsCached);
+    _.set(res, "kendraResultsCached", response.kendraResultsCached);
+    if (response.kendraResultsCached) console.log(`kendra results cached in res structure`);
     
     // ES fallback if KendraFAQ fails
-    console.log('ES Fallback');
     if (!hit && _.get(req, '_settings.ES_FALLBACK', false)) {
+        console.log('ES Fallback');
         response = await run_query_es(req, query_params);
         if (_.get(response, "hits.hits[0]._source")) {
             _.set(response, "hits.hits[0]._source.answersource", "ES Fallback");
