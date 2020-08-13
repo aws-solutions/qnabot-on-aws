@@ -24,7 +24,8 @@ exports.step=function(event,context,cb){
     .then(()=>s3.getObject({Bucket,Key,VersionId}).promise())
     .then(x=>JSON.parse(x.Body.toString()))
     .then(function(config){
-        if(config.status!=="Error" && config.status!=="Completed"){
+        var step_status_ignore = ['Error', 'Completed', 'Sync Complete', 'Parsing content JSON', 'Creating FAQ']
+        if (step_status_ignore.includes(config.status)===false) {
             return Promise.try(function(){
                 console.log("Config:",JSON.stringify(config,null,2))
                 switch(config.status){

@@ -206,7 +206,7 @@ module.exports={
         "ManagedPolicyArns": [
           "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
           "arn:aws:iam::aws:policy/TranslateReadOnly",
-          {"Ref":"EsPolicy"},
+          {"Ref":"QueryPolicy"},
           "arn:aws:iam::aws:policy/AmazonLexFullAccess"
         ],
         "Policies": [
@@ -287,7 +287,7 @@ module.exports={
         ]
       }
     },
-    "EsPolicy": {
+    "QueryPolicy": {
       "Type": "AWS::IAM::ManagedPolicy",
       "Properties": {
         "PolicyDocument": {
@@ -299,8 +299,15 @@ module.exports={
                 "es:*"
               ],
               "Resource":["*"]
-            },
-            {
+            },{
+              "Effect": "Allow",
+              "Action": [
+                "kendra:Query"
+              ],
+              "Resource":[
+                {"Fn::Sub":"arn:aws:kendra:${AWS::Region}:${AWS::AccountId}:index/*"},
+              ]
+            },{
                 "Effect": "Allow",
                 "Action": ["s3:Get*"],
                 "Resource":[

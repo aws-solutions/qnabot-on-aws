@@ -47,7 +47,7 @@ module.exports={
         "Path": "/",
         "ManagedPolicyArns": [
           "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
-          {"Ref":"EsPolicy"}
+          {"Ref":"QueryPolicy"}
         ]
       }
     }

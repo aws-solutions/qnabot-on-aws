@@ -6,19 +6,81 @@ var request = require('./request');
 var build_es_query = require('./esbodybuilder');
 var handlebars = require('./handlebars');
 var translate = require('./translate');
+var kendra = require('./kendraQuery');
+// const sleep = require('util').promisify(setTimeout);
+
 
 // use DEFAULT_SETTINGS_PARAM as random encryption key unique to this QnABot installation
 var key = _.get(process.env, "DEFAULT_SETTINGS_PARAM", "fdsjhf98fd98fjh9 du98fjfd 8ud8fjdf");
 var encryptor = require('simple-encryptor')(key);
 
 async function run_query(req, query_params) {
+    var no_hits_question = _.get(req, '_settings.ES_NO_HITS_QUESTION', 'no_hits');
+    var kendrafaq = _.get(req, "_settings.KENDRA_FAQ_INDEX");
+    var ES_only_questions = [no_hits_question];
+    
+    if (kendrafaq != "" && !(ES_only_questions.includes(query_params['question']))){
+        return await run_query_kendra(req, query_params);
+    } else {
+        return await run_query_es(req, query_params);
+    }
+}
+
+async function run_query_es(req, query_params) {
     var es_query = await build_es_query(query_params);
+    console.log('Querying ElasticSearch');
     var es_response = await request({
         url: `https://${req._info.es.address}/${req._info.es.index}/_doc/_search?search_type=dfs_query_then_fetch`,
         method: "GET",
         body: es_query
     });
+    
+    if (_.get(es_response, "hits.hits[0]._source")) {
+        _.set(es_response, "hits.hits[0]._source.answersource", "ElasticSearch");
+    }
+
     return es_response;
+}
+
+
+async function run_query_kendra(req, query_params) {
+    console.log("Querying Kendra FAQ index: " + _.get(req, "_settings.KENDRA_FAQ_INDEX"));
+    // calls kendrQuery function which duplicates KendraFallback code, but only searches through FAQs
+    var request_params = {
+        kendra_faq_index:req["_settings"]["KENDRA_FAQ_INDEX"],
+        maxRetries:req["_settings"]["KENDRAFAQ_CONFIG_MAX_RETRIES"],
+        retryDelay:req["_settings"]["KENDRAFAQ_CONFIG_RETRY_DELAY"],
+    }
+    // autotranslate
+    if (req["_event"]['userDetectedLocale'] != 'en') {
+        request_params['input_transcript'] = query_params.question;
+    } else {
+        request_params['input_transcript']= req["_event"].inputTranscript;
+    }
+    
+    // optimize kendra queries for throttling by checking if KendraFallback idxs include KendraFAQIndex
+    let alt_kendra_idxs = _.get(req, "_settings.ALT_SEARCH_KENDRA_INDEXES");
+    if (alt_kendra_idxs && alt_kendra_idxs.length) {
+        try {
+            // parse JSON array of kendra indexes
+            alt_kendra_idxs = JSON.parse(alt_kendra_idxs);
+        } catch (err) {
+            // assume setting is a string containing single index
+            alt_kendra_idxs = [ alt_kendra_idxs ];
+        }
+    }
+    if (alt_kendra_idxs.includes(request_params.kendra_faq_index)) {
+        console.log(`optimizing for KendraFallback`);
+        request_params['same_index'] = true
+    }
+
+    var kendra_response = await kendra.handler(request_params);
+    
+    if (_.get(kendra_response, "hits.hits[0]._source")) {
+        _.set(kendra_response, "hits.hits[0]._source.answersource", "Kendra FAQ");
+    }
+    return kendra_response;
+
 }
 
 function merge_next(hit1, hit2) {
@@ -73,18 +135,34 @@ async function get_hit(req, res) {
     var response = await run_query(req, query_params);
     console.log("Query response: ", JSON.stringify(response,null,2));
     var hit = _.get(response, "hits.hits[0]._source");
+    
+    // TODO: check during merge
+    console.log(`response.kendraResultsCached after first hit: ${JSON.stringify(response.kendraResultsCached)}`);
+    _.set(req, "kendraResultsCached", response.kendraResultsCached);
+    
+    // ES fallback if KendraFAQ fails
+    console.log('ES Fallback');
+    if (!hit && _.get(req, '_settings.ES_FALLBACK', false)) {
+        response = await run_query_es(req, query_params);
+        if (_.get(response, "hits.hits[0]._source")) {
+            _.set(response, "hits.hits[0]._source.answersource", "ES Fallback");
+        }
+        hit = _.get(response, "hits.hits[0]._source");
+    }
+    
     if (hit) {
         res['got_hits'] = 1;  // response flag, used in logging / kibana
     } else {
         console.log("No hits from query - searching instead for: " + no_hits_question);
         query_params['question'] = no_hits_question;
         res['got_hits'] = 0;  // response flag, used in logging / kibana
+        
         response = await run_query(req, query_params);
         hit = _.get(response, "hits.hits[0]._source");
     }
     // Do we have a hit?
     if (hit) {
-        // set res topic from document before running handlebars, so that handlebars cann access or overwrite it.
+        // set res topic from document before running handlebars, so that handlebars can access or overwrite it.
         _.set(res, "session.topic", _.get(hit, "t"));
         // run handlebars template processing
         hit = await handlebars(req, res, hit);
@@ -200,7 +278,9 @@ module.exports = async function (req, res) {
     } else {
         // elicitResponse is not involved. obtain the next question to serve up to the user.
         hit = await get_hit(req, res);
+        
     }
+    
     if (hit) {
         // found a document in elastic search.
         if (_.get(hit, "conditionalChaining") && _.get(hit, "elicitResponse.responsebot_hook", "") === "" ) {
@@ -224,7 +304,8 @@ module.exports = async function (req, res) {
             var msg = "User Input: \"" + req.question + "\"";
             if (usrLang != 'en') {
                 msg = "User Input: \"" + _.get(req,"_event.origQuestion","notdefined") + "\", Translated to: \"" + req.question + "\"";
-            }          
+            }
+            msg += ", Source: " + _.get(hit, "answersource", "unknown");
             var debug_msg = {
                 a: "[" + msg + "] ",
                 alt: {
@@ -232,12 +313,22 @@ module.exports = async function (req, res) {
                     ssml: "<speak>" + msg + "</speak>"
                 }
             };
-            hit = merge_next(debug_msg, hit) ;
+            hit = merge_next(debug_msg, hit);
         };
         res.result = hit;
         res.type = "PlainText"
         res.message = res.result.a
         res.plainMessage = res.result.a
+        
+        // Add answerSource for query hits
+        var ansSource = _.get(hit, "answersource", "unknown")
+        if (ansSource==="Kendra FAQ") {
+            res.answerSource = "KENDRA"
+        } else if (ansSource==="ElasticSearch" || ansSource==="ES Fallback") {
+            res.answerSource = "ES"
+        } else {
+            res.answerSource = ansSource
+        }
 
         // Add alt messages to appContext session attribute JSON value (for lex-web-ui)
         var tmp
