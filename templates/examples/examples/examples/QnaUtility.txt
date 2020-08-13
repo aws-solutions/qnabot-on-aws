@@ -1,1 +1,1 @@
-Imports configurable functionality enhancements. 1) A configurable no_hits QID. 2) A configurable no_verified_identity QID. 2) A configurable help QID. 3) A configurable feedback flow that is attached to the thumbs up/down buttons in the UI. 
+Basic utility QIDS every bot should support: 1) no_hits 2) no_verified_identity 3) Help 4) Repeat 5) Feedback - Thumbs up and Down. 

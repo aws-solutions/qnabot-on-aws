@@ -24,8 +24,8 @@ function processWithLex(data, filter) {
                             inputText: question
                         }).promise();
                         let res_qid;
-                        if (resp.sessionAttributes.previous) {
-                            let previous = JSON.parse(resp.sessionAttributes.previous);
+                        if (resp.sessionAttributes.qnabotcontext.previous) {
+                            let previous = JSON.parse(resp.sessionAttributes.qnabotcontext.previous);
                             res_qid = previous.qid;
                         }
                         if (res_qid === undefined) {
