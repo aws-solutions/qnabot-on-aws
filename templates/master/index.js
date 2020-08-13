@@ -119,6 +119,9 @@ module.exports={
     },
     "CustomSettingsSSMParameterName":{
       "Value":{"Ref":"CustomQnABotSettings"}
+    },
+    "DefaultUserPoolJwksUrlParameterName": {
+      "Value":{"Ref":"DefaultUserPoolJwksUrl"}
     }
   },
   "Parameters": {
@@ -132,12 +135,12 @@ module.exports={
       "ConstraintDescription":"Allowed Values are FALSE or TRUE",
       "Default":"TRUE"
     },
-    "PublicOrPrivate":{
+    "Encryption":{
         "Type":"String",
-        "Description":"(optional) Whether access to the QnABot should be publicly available or restricted to users in QnABot UserPool. Allowed values are PUBLIC or PRIVATE",
-        "AllowedPattern":"(PUBLIC|PRIVATE)",
-        "Default":"PUBLIC",
-        "ConstraintDescription":"Allowed Values are PUBLIC or PRIVATE"
+        "Description":"Choose whether resources (S3 and ElasticSearch) are encrypted at rest. Selecting encrypted configuration will provision c5.large.elasticsearch instances - see https://aws.amazon.com/elasticsearch-service/pricing/.",
+        "AllowedValues": ["ENCRYPTED", "UNENCRYPTED"],
+        "Default":"UNENCRYPTED",
+        "ConstraintDescription":"Allowed Values are UNENCRYPTED or ENCRYPTED"
     },
     "ApprovedDomain":{
         "Type":"String",
@@ -164,15 +167,22 @@ module.exports={
     "BuildExamples":{
       "Type":"String",
       "Default":"TRUE"
-    }
+    },
+    "PublicOrPrivate":{
+        "Type":"String",
+        "Description":"Choose whether access to the QnABot client should be publicly available or restricted to users in QnABot UserPool.",
+        "AllowedValues" : ["PUBLIC", "PRIVATE"],
+        "Default":"PUBLIC"
+    },
   },
   "Conditions":{
     "Public":{"Fn::Equals":[{"Ref":"PublicOrPrivate"},"PUBLIC"]},
+    "Encrypted":{"Fn::Equals":[{"Ref":"Encryption"}, "ENCRYPTED"]},
     "AdminSignUp":{"Fn::Equals":[{"Ref":"AdminUserSignUp"},"TRUE"]},
     "Domain":{"Fn::Not":[{"Fn::Equals":[{"Ref":"ApprovedDomain"},"NONE"]}]},
     "BuildExamples":{"Fn::Equals":[{"Ref":"BuildExamples"},"TRUE"]},
     "CreateDomain":{"Fn::Equals":[{"Ref":"ElasticsearchName"},"EMPTY"]},
-    "DontCreateDomain":{"Fn::Not":[{"Fn::Equals":[{"Ref":"ElasticsearchName"},"EMPTY"]}]}
+    "DontCreateDomain":{"Fn::Not":[{"Fn::Equals":[{"Ref":"ElasticsearchName"},"EMPTY"]}]},
   }
 }
 

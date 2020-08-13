@@ -6,7 +6,7 @@ var _=require('lodash')
 module.exports=class ApiDeployment {
     Create(params,reply){
         run(()=>api.createDeployment(
-                _.omit(params,["buildDate","stage"])
+                _.omit(params,["buildDate","stage","Encryption"])
             ).promise()
         )
         .tap(console.log)

@@ -418,7 +418,6 @@ exports.resources={
             }
           ], 
         },
-        description: "Parse Yes or No responses.", 
         fulfillmentActivity: {
           type: "ReturnIntent"
         },
@@ -486,6 +485,108 @@ exports.resources={
         "name": "live",
         "description": "QNA Yes No Alias - " + botDateVersion,
       }
+    },
+    "YesNoExitSlotType":{
+        "Type": "Custom::LexSlotType",
+        "Properties": {
+            "ServiceToken": {"Ref": "CFNLambda"},
+            "name":{"Fn::Sub":"QNAYesNoExitSlotType-${AWS::StackName}"},
+            "description": "QNA Yes No Exit Slot Type - " + botDateVersion,
+            "createVersion": true,
+            "valueSelectionStrategy": "TOP_RESOLUTION",
+            "enumerationValues": [
+                {"value":"Yes", "synonyms":["OK","Yeah","Sure","Yep","Affirmative","aye"]},
+                {"value":"No", "synonyms":["Nope","Na","Negative","Non"]},
+                {"value":"Exit", "synonyms":["agent","rep","representative","stop","quit", "help", "bye", "goodbye"]}
+            ]
+        }
+    },
+    "YesNoExitIntent": {
+        "Type": "Custom::LexIntent",
+        "Properties": {
+            "ServiceToken": {"Ref": "CFNLambda"},
+            "name":{"Fn::Sub":"QNAYesNoExitIntent-${AWS::StackName}"},
+            "createVersion": true,
+            "description": "QNA Yes No Exit Intent - " + botDateVersion,
+            "sampleUtterances": [
+                "{Yes_No_Exit}",
+                "I said {Yes_No_Exit}"
+            ],
+            conclusionStatement: {
+                messages: [
+                    {
+                        content: "Got it. ",
+                        contentType: "PlainText"
+                    }
+                ],
+            },
+            fulfillmentActivity: {
+                type: "ReturnIntent"
+            },
+            "slots": [
+                {
+                    "name":"Yes_No_Exit",
+                    "slotType":{"Ref":"YesNoExitSlotType"},
+                    "slotTypeVersion":"QNABOT-AUTO-ASSIGNED",
+                    "slotConstraint": "Required",
+                    "valueElicitationPrompt": {
+                        "messages": [
+                            {
+                                "contentType": "PlainText",
+                                "content": "Say Yes, No, or Exit."
+                            }
+                        ],
+                        "maxAttempts": 2
+                    },
+                    "priority": 1,
+                }
+            ],
+        },
+    },
+    "QNAYesNoExit": {
+        "Type": "Custom::LexBot",
+        "DependsOn": ["YesNoExitSlotType", "YesNoExitIntent"],
+        "Properties": {
+            "ServiceToken": {"Ref": "CFNLambda"},
+            "name":{"Fn::Sub":"QNAYesNoExitBot-${AWS::StackName}"},
+            "description": "QNA Yes No Exit Bot - " + botDateVersion,
+            "locale": "en-US",
+            "voiceId": config.voiceId,
+            "childDirected": false,
+            "createVersion": true,
+            "intents": [
+                {"intentName": {"Ref": "YesNoExitIntent"}},
+            ],
+            "clarificationPrompt": {
+                "messages": [
+                    {
+                        "contentType": "PlainText",
+                        "content": "Please repeat - say Yes or No. You can also say exit, agent, quit, or bye to leave."
+                    }
+                ],
+                "maxAttempts": 5
+            },
+            "abortStatement": {
+                "messages": [
+                    {
+                        "content": config.Abort,
+                        "contentType": "PlainText"
+                    }
+                ]
+            },
+        }
+    },
+    "YesNoExitAliasV2": {
+        "Type": "Custom::LexAlias",
+        "DependsOn": "QNAYesNoExit",
+        "Properties": {
+            "ServiceToken": {"Ref": "CFNLambda"},
+            "botName": {
+                "Ref": "QNAYesNoExit"
+            },
+            "name": "live",
+            "description": "QNA Yes No Exit Alias - " + botDateVersion,
+        }
     },
     "DateIntent": {
         "Type": "Custom::LexIntent",
@@ -1474,7 +1575,7 @@ exports.resources={
 
 
 exports.names=[
-  "QNAYesNo", "QNADate", "QNADayOfWeek", "QNAMonth", "QNANumber",
+  "QNAYesNo", "QNAYesNoExit", "QNADate", "QNADayOfWeek", "QNAMonth", "QNANumber",
   "QNAAge","QNAPhoneNumber", "QNATime", "QNAEmailAddress", "QNAName",
   "QNAWage","QNASocialSecurity","QNAPin"
 ] ;

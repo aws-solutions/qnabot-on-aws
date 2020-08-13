@@ -51,6 +51,14 @@
 			]
 		},
 		{
+			"a": "Sorry, your identity cannot be verified - please log in.",
+			"qid": "CustomNoVerifiedIdentity",
+			"type": "qna",
+			"q": [
+				"no_verified_identity"
+			]
+		},
+		{
 			"a": "I am the QnA bot, ask me a question and I will try my best to answer it.",
 			"qid": "Help",
 			"type": "qna",

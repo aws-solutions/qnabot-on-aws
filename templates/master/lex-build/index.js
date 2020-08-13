@@ -100,7 +100,7 @@ module.exports={
         "Path": "/",
         "ManagedPolicyArns": [
           "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
-          {"Ref":"EsPolicy"},
+          {"Ref":"QueryPolicy"},
           "arn:aws:iam::aws:policy/AmazonLexFullAccess"
         ]
       }
@@ -121,6 +121,21 @@ module.exports={
             },
             "VersioningConfiguration":{
                 "Status":"Enabled"
+            },
+            "BucketEncryption": {
+                "Fn::If": [
+                    "Encrypted",
+                    {
+                        "ServerSideEncryptionConfiguration": [{
+                            "ServerSideEncryptionByDefault": {
+                                "SSEAlgorithm": "AES256"
+                            }
+                        }]
+                    },
+                    {
+                        "Ref": "AWS::NoValue"
+                    }
+                ]
             }
         }
     },

@@ -39,6 +39,10 @@ module.exports=function(event){
         process.env.ERRORMESSAGE="error"
         process.env.EMPTYMESSAGE="empty"
 
+        process.env.DEFAULT_SETTINGS_PARAM=master.DefaultSettingsSSMParameterName
+        process.env.CUSTOM_SETTINGS_PARAM=master.CustomSettingsSSMParameterName
+        process.env.DEFAULT_USER_POOL_JWKS_PARAM=master.DefaultUserPoolJwksUrlParameterName
+
         return Promise.promisify(require('../index.js').handler)(event,{})
     })
 }

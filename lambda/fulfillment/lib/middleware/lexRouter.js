@@ -11,7 +11,7 @@ const translate = require('./multilanguage.js');
 
 async function translate_res(req, res){
     const locale = _.get(req, 'session.userLocale');
-    if (_.get(req._settings, 'ENABLE_MULTI_LANGUAGE_SUPPORT', "false").toLowerCase() === "true"){
+    if (_.get(req._settings, 'ENABLE_MULTI_LANGUAGE_SUPPORT')){
         if (_.get(res,"message")) {
             res.message = await translate.translateText(res.message,'en',locale); 
         }
@@ -69,10 +69,10 @@ async function handleRequest(req, res, botName, botAlias) {
         const bName = process.env[botName];
         return bName ? bName : botName;
     }
-    function getFreeTextResponse(inputText) {
+    function getFreeTextResponse(inputText, sentiment) {
         let response = {
             message: "",
-            slots: { 'FreeText' : inputText},
+            slots: { 'FreeText' : inputText, 'Sentiment' : sentiment},
             dialogState: 'Fulfilled',
         }
         return response;
@@ -81,7 +81,7 @@ async function handleRequest(req, res, botName, botAlias) {
     let tempBotUserID = _.get(req,"_userInfo.UserId","nouser");
     tempBotUserID = tempBotUserID.substring(0, 100); // Lex has max userId length of 100
     if (botName === FREE_TEXT_ELICIT_RESPONSE_NAME) {
-        return getFreeTextResponse(_.get(req, "question"));
+        return getFreeTextResponse(_.get(req, "question"), _.get(req, "sentiment"));
     } else {
         const lexClient = new AWS.LexRuntime({apiVersion: '2016-11-28'});
         const params = {
@@ -110,11 +110,11 @@ async function processResponse(req, res, hook, msg) {
         res.message = errmsg;
         res.plainMessage = errmsg;
         _.set(res.session,res.session.elicitResponseNamespace + '.boterror','true');
-        res.session.elicitResponseProgress = 'Failed';
-        res.session.elicitResponse = undefined;
-        res.session.elicitResponseChainingConfig = undefined;
-        res.session.elicitResponseNamespace = undefined;
-        res.session.elicitResponseLoopCount = 0;
+        _.set(res,'session.qnabotcontext.elicitResponse.progress','Failed');
+        _.set(res,'session.qnabotcontext.elicitResponse.responsebot',undefined);
+        _.set(res,'session.qnabotcontext.elicitResponse.chainingConfig',undefined);
+        _.set(res,'session.qnabotcontext.elicitResponse.namespace',undefined);
+        _.set(res,'session.qnabotcontext.elicitResponse.loopCount',0);
         res.card = undefined;
     }
 
@@ -130,9 +130,9 @@ async function processResponse(req, res, hook, msg) {
         ssmlMessage = botResp.message  ;        
         plainMessage = plainMessage.replace(/<\/?[^>]+(>|$)/g, "");
     }
-    let elicitResponseLoopCount =_.get(res,"session.elicitResponseLoopCount");
+    let elicitResponseLoopCount =_.get(res,"session.qnabotcontext.elicitResponse.loopCount");
     if (botResp.dialogState === 'ConfirmIntent') {
-        res.session.elicitResponseProgress = 'ConfirmIntent';
+        _.set(res,'session.qnabotcontext.elicitResponse.progress','ConfirmIntent');
         res.plainMessage = plainMessage;      
         // if SSML tags were present and client supports SSML then build SSML response
         if (ssmlMessage && req._preferredResponseType == "SSML") {
@@ -160,17 +160,17 @@ async function processResponse(req, res, hook, msg) {
             ]
         };
     } else if (botResp.dialogState === 'Failed') {
-        res.session.elicitResponseLoopCount = ++elicitResponseLoopCount;
+        _.set(res,'session.qnabotcontext.elicitResponse.loopCount',++elicitResponseLoopCount);
         if (elicitResponseLoopCount >= maxElicitResponseLoopCount) {
             indicateFailure(req, res, _.get(req, '_settings.ELICIT_RESPONSE_BOT_FAILURE_MESSAGE', 'Your response was not understood. Please start again.'));
         } else {
-            res.session.elicitResponseProgress = botResp.dialogState;
+            _.set(res,'session.qnabotcontext.elicitResponse.progress',botResp.dialogState);
             res.message = elicit_Response_Retry_Message;
             res.plainMessage = elicit_Response_Retry_Message;
             res.card = undefined;
         }
     } else if (botResp.dialogState === 'ElicitIntent' || botResp.dialogState === 'ElicitSlot') {
-        res.session.elicitResponseProgress = botResp.dialogState;
+        _.set(res,'session.qnabotcontext.elicitResponse.progress',botResp.dialogState);
         if (botResp.message) {
             res.message = botResp.message;
             res.plainMessage = botResp.message;
@@ -187,10 +187,10 @@ async function processResponse(req, res, hook, msg) {
             res.message = undefined;
             res.plainMessage = undefined;
         }
-        res.session.elicitResponseProgress = botResp.dialogState;
-        _.set(res.session,res.session.elicitResponseNamespace,botResp.slots);
-        res.session.elicitResponse = undefined;
-        res.session.elicitResponseNamespace = undefined;
+        _.set(res,'session.qnabotcontext.elicitResponse.progress',botResp.dialogState);
+        _.set(res.session,res.session.qnabotcontext.elicitResponse.namespace,botResp.slots);
+        _.set(res,'session.qnabotcontext.elicitResponse.responsebot',undefined);
+        _.set(res,'session.qnabotcontext.elicitResponse.namespace',undefined);
     } else {
         if (botResp.message) {
             res.message = botResp.message;
@@ -199,7 +199,7 @@ async function processResponse(req, res, hook, msg) {
             res.message = elicit_Response_Retry_Message;
             res.plainMessage = elicit_Response_Retry_Message;
         }
-        res.session.elicitResponseProgress = botResp.dialogState;
+        _.set(res,'session.qnabotcontext.elicitResponse.progress',botResp.dialogState);
     }
 
     // as much as we'd like to return an empty message, QnABot semantics requires some message to

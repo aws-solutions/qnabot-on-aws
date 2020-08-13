@@ -10,6 +10,8 @@ module.exports=Promise.join(
     base.Parameters.BootstrapBucket.Default=output.Bucket
     base.Parameters.BootstrapPrefix.Default=output.Prefix
     base.Parameters.Email.Default=config.devEmail
+    base.Parameters.Encryption.Default = config.devEncryption ? config.devEncryption : base.Parameters.Encryption.Default
+    base.Parameters.PublicOrPrivate.Default = config.devPublicOrPrivate ? config.devPublicOrPrivate : base.Parameters.PublicOrPrivate.Default
     return base
 })
 

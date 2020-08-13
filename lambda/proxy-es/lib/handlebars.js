@@ -77,7 +77,7 @@ Handlebars.registerHelper('defaultLang', function (options) {
 });
 
 Handlebars.registerHelper('setLang', function (lang, last, options) {
-    if (_.get(req_glbl._settings, 'ENABLE_MULTI_LANGUAGE_SUPPORT', "false").toLowerCase() === "true") {
+    if (_.get(req_glbl._settings, 'ENABLE_MULTI_LANGUAGE_SUPPORT')) {
         const userPreferredLocaleKey = 'session.userPreferredLocale';
         const userLocaleKey = 'session.userLocale';
         const currentPreferredLocale = _.get(res_glbl, userPreferredLocaleKey);
@@ -145,7 +145,8 @@ var apply_handlebars = async function (req, res, hit) {
         Settings: req._settings,
         Question: req.question,
         OrigQuestion: _.get(req,"_event.origQuestion",req.question),
-    }
+        Sentiment: req.sentiment,
+    };
     // Autotranslation enabled by default.. will be disabled when handlebars finds explicit language match block.
     autotranslate = true;
     console.log("Apply handlebars preprocessing to ES Response. Context: ", context);
@@ -154,6 +155,7 @@ var apply_handlebars = async function (req, res, hit) {
     var markdown = _.get(hit, "alt.markdown");
     var ssml = _.get(hit, "alt.ssml");
     var r = _.get(hit, "r");
+
     // catch and log errors before throwing exception.
     if (a) {
         try {
@@ -237,7 +239,6 @@ var apply_handlebars = async function (req, res, hit) {
             console.log("ERROR: response card fields format caused Handlebars exception. Check syntax: " + e );
             throw (e);
         }
-
     }
     console.log("Preprocessed Result: ", hit_out);
     return hit_out;

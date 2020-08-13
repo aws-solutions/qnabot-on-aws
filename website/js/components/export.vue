@@ -91,8 +91,8 @@ module.exports={
           var status=await self.$store.dispatch('api/getExport',job)
           Object.assign(out,coll[index],status)
           console.log(status.status)
-          if(status.status!=="Completed" && status.status!=="Error"){
-            setTimeout(()=>poll(),1000)
+          if(status.status!=="Completed" && status.status!=="Error" && status.status!='Sync Complete'){
+            setTimeout(()=>poll(),1000) 
           }
         }
       })
@@ -106,7 +106,7 @@ module.exports={
         })
         await this.refresh()
       }catch(e){
-        this.error=err
+        this.error=e
       }finally{
       }
     },

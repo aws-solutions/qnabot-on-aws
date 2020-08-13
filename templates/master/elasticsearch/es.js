@@ -3,7 +3,7 @@ var properties={
     "ElasticsearchClusterConfig": {
        "DedicatedMasterEnabled": false,
        "InstanceCount": 2,
-       "InstanceType": "t2.small.elasticsearch",
+       "InstanceType": {"Fn::If": [ "Encrypted", "c5.large.elasticsearch", "t2.small.elasticsearch"]},
        "ZoneAwarenessEnabled": "true"
     },
     "EBSOptions": {
@@ -17,6 +17,9 @@ var properties={
     },
     "AdvancedOptions": {
        "rest.action.multi.allow_explicit_index": "true"
+    },
+    "EncryptionAtRestOptions": {
+       "Enabled": {"Fn::If": [ "Encrypted", true, false]}
     }
 }
 

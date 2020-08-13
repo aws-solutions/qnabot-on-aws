@@ -22,6 +22,21 @@ module.exports={
                     AllowedMethods:['GET'],
                     AllowedOrigins:['*']
                 }]
+            },
+            "BucketEncryption": {
+                "Fn::If": [
+                    "Encrypted",
+                    {
+                        "ServerSideEncryptionConfiguration": [{
+                            "ServerSideEncryptionByDefault": {
+                                "SSEAlgorithm": "AES256"
+                            }
+                        }]
+                    },
+                    {
+                        "Ref": "AWS::NoValue"
+                    }
+                ]
             }
         }
     },
@@ -43,6 +58,21 @@ module.exports={
                     AllowedMethods:['PUT'],
                     AllowedOrigins:['*']
                 }]
+            },
+            "BucketEncryption": {
+                "Fn::If": [
+                    "Encrypted",
+                    {
+                        "ServerSideEncryptionConfiguration": [{
+                            "ServerSideEncryptionByDefault": {
+                                "SSEAlgorithm": "AES256"
+                            }
+                        }]
+                    },
+                    {
+                        "Ref": "AWS::NoValue"
+                    }
+                ]
             }
         }
     },
@@ -64,6 +94,21 @@ module.exports={
                     AllowedMethods:['GET'],
                     AllowedOrigins:['*']
                 }]
+            },
+            "BucketEncryption": {
+                "Fn::If": [
+                    "Encrypted",
+                    {
+                        "ServerSideEncryptionConfiguration": [{
+                            "ServerSideEncryptionByDefault": {
+                                "SSEAlgorithm": "AES256"
+                            }
+                        }]
+                    },
+                    {
+                        "Ref": "AWS::NoValue"
+                    }
+                ]
             }
         }
     }

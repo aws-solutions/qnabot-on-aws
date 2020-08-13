@@ -4,7 +4,6 @@ var util=require('./util');
 var jwt=require('./jwt');
 var AWS=require('aws-sdk');
 
-
 async function get_userInfo(userId, idattrs) {
     var default_userInfo = {
         UserId:userId,
@@ -65,8 +64,8 @@ async function update_userInfo(userId, req_userInfo) {
 module.exports=async function preprocess(req,res){
 
     // lex-web-ui: If idtoken session attribute is present, decode it
-    var idtoken = _.get(req,'_event.sessionAttributes.idtokenjwt');
-    var idattrs={};
+    var idtoken = _.get(req,'session.idtokenjwt');
+    var idattrs={"verifiedIdentity":"false"};
     if (idtoken) {
         var decoded = jwt.decode(idtoken);
         if (decoded) {
@@ -75,6 +74,13 @@ module.exports=async function preprocess(req,res){
             var kid = _.get(decoded,'header.kid');
             var default_jwks_url = [_.get(req,'_settings.DEFAULT_USER_POOL_JWKS_URL')];
             var identity_provider_jwks_url = _.get(req,'_settings.IDENTITY_PROVIDER_JWKS_URLS');
+            if (identity_provider_jwks_url && identity_provider_jwks_url.length) {
+                try {
+                    identity_provider_jwks_url = JSON.parse(identity_provider_jwks_url);
+                } catch (err) {
+                    true
+                }
+            }
             var urls = default_jwks_url.concat(identity_provider_jwks_url);
             console.log("Attempt to verify idtoken using jwks urls:",urls);
             var verified_url = await jwt.verify(kid,urls) ;
@@ -87,6 +93,14 @@ module.exports=async function preprocess(req,res){
             }     
         } else {
             console.log("Invalid idtokenjwt - cannot decode");
+        }
+    }
+    // Do we need to enforce authentication?
+    if (_.get(req, '_settings.ENFORCE_VERIFIED_IDENTITY')) {
+        if ( _.get(idattrs, 'verifiedIdentity',"false") != "true") {
+            // identity is not verified
+            // reset question to the configured no_verified_identity question
+            req.question = _.get(req, '_settings.NO_VERIFIED_IDENTITY_QUESTION','no_verified_identity') ;
         }
     }
     // Add _userInfo to req, from UsersTable

@@ -34,7 +34,8 @@ module.exports={
         "ServiceToken": { "Fn::GetAtt" : ["CFNLambda", "Arn"] },
         "restApiId": {"Ref": "API"},
         "buildDate":new Date(),
-        "stage":"prod"
+        "stage":"prod",
+        "Encryption":{"Ref": "Encryption"}
     },
     "DependsOn":methods.concat(permissions)
 },

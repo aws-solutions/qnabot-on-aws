@@ -12,7 +12,15 @@ module.exports={
                         Name:"prefix",
                         Value:"status"
                     }]}}
-                }]
+                },{
+                    LambdaFunctionArn:{"Fn::GetAtt":["KendraSyncLambda","Arn"]},
+                    Events:["s3:ObjectCreated:*"],
+                    Filter:{Key:{FilterRules:[{
+                        Name:"prefix",
+                        Value:"kendra-data"
+                    }]}}
+                }
+                ]
             }
         }
     },
@@ -20,6 +28,16 @@ module.exports={
         "Type": "AWS::Lambda::Permission",
         "Properties": {
             "FunctionName":{"Fn::GetAtt":["ExportStepLambda","Arn"]},
+            "Action": "lambda:InvokeFunction",
+            "Principal": "s3.amazonaws.com",
+            "SourceAccount": {"Ref": "AWS::AccountId"},
+            "SourceArn":{"Fn::Sub":"arn:aws:s3:::${ExportBucket}"}
+        }
+    },
+    "KendraSyncPermission":{
+        "Type": "AWS::Lambda::Permission",
+        "Properties": {
+            "FunctionName":{"Fn::GetAtt":["KendraSyncLambda","Arn"]},
             "Action": "lambda:InvokeFunction",
             "Principal": "s3.amazonaws.com",
             "SourceAccount": {"Ref": "AWS::AccountId"},
