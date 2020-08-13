@@ -117,10 +117,21 @@ Handlebars.registerHelper('setLang', function (lang, last, options) {
     }
 });
 
-Handlebars.registerHelper('setSessionAttr', function (k, v, options) {
+Handlebars.registerHelper('setSessionAttr', function () {
+    let args = Array.from(arguments);
+    const k = args[0];
+    // concat remaining arguments to create value
+    const v_arr = args.slice(1, args.length - 1); // ignore final 'options' argument
+    const v = v_arr.join(""); // concatenate value arguments 
     console.log("Setting res session attribute:", k, " Value:", v);
     _.set(res_glbl.session, k, v);
     return "";
+});
+
+Handlebars.registerHelper('getSessionAttr', function (attr, def, options) {
+    let v = _.get(res_glbl.session, attr, def);
+    console.log("Return session attribute key, value: ", attr, v);
+    return v;
 });
 
 Handlebars.registerHelper('randomPick', function () {
