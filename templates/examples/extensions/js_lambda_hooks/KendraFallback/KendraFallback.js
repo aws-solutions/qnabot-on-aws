@@ -141,7 +141,7 @@ async function routeKendraRequest(event, context) {
 
     // process query against Kendra for QnABot
     let indexes = event.req["_settings"]["ALT_SEARCH_KENDRA_INDEXES"] ? event.req["_settings"]["ALT_SEARCH_KENDRA_INDEXES"] : process.env.KENDRA_INDEXES
-    var kendraResultsCached = _.get(event.req, "kendraResultsCached");
+    var kendraResultsCached = _.get(event.res, "kendraResultsCached");
     if (indexes && indexes.length) {
         try {
             // parse JSON array of kendra indexes

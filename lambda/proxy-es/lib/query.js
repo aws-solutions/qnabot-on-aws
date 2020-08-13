@@ -137,8 +137,8 @@ async function get_hit(req, res) {
     var hit = _.get(response, "hits.hits[0]._source");
     
     // TODO: check during merge
-    console.log(`response.kendraResultsCached after first hit: ${JSON.stringify(response.kendraResultsCached)}`);
-    _.set(req, "kendraResultsCached", response.kendraResultsCached);
+    console.log(`kendra results cached in res structure`);
+    _.set(res, "kendraResultsCached", response.kendraResultsCached);
     
     // ES fallback if KendraFAQ fails
     console.log('ES Fallback');
