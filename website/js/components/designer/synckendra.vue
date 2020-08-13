@@ -1,7 +1,7 @@
 <template lang="pug">
   span(class="wrapper")
     v-btn.block(
-      :disabled="loading && !kendraFaqEnabled" @click="start" slot="activator"
+      :disabled="loading" @click="start" slot="activator"
       flat id="kendra-sync") Sync Kendra FAQ
     v-dialog(
       persistent
@@ -37,31 +37,22 @@ var Promise=require('bluebird')
 var _=require('lodash')
 var sleep = require('util').promisify(setTimeout)
 
-
 module.exports={
   data:function(){
     var self=this
-
     return {
       snackbar:false,
+      loading:false,
       success:false,
       error:'',
       request_status:"Ready",
-      filename:'qna-kendra-faq.txt', // do not change because same key needed for UI status updates in lambda/export/kendraSync
-      kendraFaqEnabled:false,
-      loading:true,
+      filename:'qna-kendra-faq.txt' // do not change because same key needed for UI status updates in lambda/export/kendraSync
     }
   },
   computed:{
   },
   created:async function(){
     this.refresh() 
-  },
-  mounted:async function() {
-    var self=this
-    var settings=await this.$store.dispatch('api/listSettings');
-    console.log(`settings: ${JSON.stringify(settings,null,2)}`);
-    this.kendraFaqEnabled = _.get(settings,"KENDRA_FAQ_INDEX")!=="";
   },
   methods:{
     cancel:function(){
@@ -84,6 +75,8 @@ module.exports={
         coll.splice(index,1,out)
         poll()
         
+        // TODO: updating the status file is triggering the export function
+        // so basically, need a new way to track the status of the kendrasync function
         async function poll(){
           // get status file
           var status=await self.$store.dispatch('api/getExport',job)

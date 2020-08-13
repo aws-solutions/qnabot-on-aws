@@ -81,7 +81,6 @@ module.exports={
             Names: [customParams, defaultParams],
         }
         var response = await getParameters(ssm, query);
-        console.log(`response from listSettings is ${JSON.stringify(response,null,2)}`)
         return response;
     },
     async updateSettings(context, settings){
