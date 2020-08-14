@@ -45,7 +45,7 @@ async function isESonly(req, query_params) {
 }
 
 async function run_query_es(req, query_params) {
-    console.log('Querying ElasticSearch');
+    
     var es_query = await build_es_query(query_params);
     var es_response = await request({
         url: `https://${req._info.es.address}/${req._info.es.index}/_doc/_search?search_type=dfs_query_then_fetch`,
