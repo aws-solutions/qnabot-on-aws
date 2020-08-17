@@ -1,0 +1,108 @@
+Index: workshops/reinvent2018/readme.md
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- workshops/reinvent2018/readme.md	(revision 41f34117b0edd938423b1263b985e8b1edd7227a)
++++ workshops/reinvent2018/readme.md	(date 1543940128000)
+@@ -892,7 +892,7 @@
+ source ./update-nodejs-version.sh
+ </pre>
+ 
+-2) Run tests to validate syntax
++2) Run tests to validate syntax and make an api call
+ 
+ <pre>
+ cd ~/environment/aws-ai-qna-bot/workshops/reinvent2018/code/solarflare
+@@ -955,11 +955,14 @@
+ 
+ 4) Fill the Argument with a value of 3
+ 
+-4) Use the Lex-Web-Ui to ask the question you just added
++5) Save the new question and rebuild the Lex Bot using the right hand menu. This ensures that all
++the questions are present in the the Lex Bot and will invoke the QnABot when asked.
+ 
+-5) Verify the function executed in CloudWatch logs
++6) Use the Lex-Web-Ui to ask the question you just added
+ 
+-6) Verify the output contains a table withe 3 rows in the markdown
++7) Verify the function executed in CloudWatch logs
++
++8) Verify the output contains a table withe 3 rows in the markdown
+ 
+ ### Checkpoint:
+ 
+Index: templates/master/routes/jobs/handler.js
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- templates/master/routes/jobs/handler.js	(revision 41f34117b0edd938423b1263b985e8b1edd7227a)
++++ templates/master/routes/jobs/handler.js	(date 1544028562000)
+@@ -1,30 +1,40 @@
+-var aws=require('aws-sdk')
+-aws.config.region=process.env.AWS_REGION
+-var s3=new aws.S3()
++var aws = require('aws-sdk')
++aws.config.region = process.env.AWS_REGION
++var s3 = new aws.S3()
+ 
+ exports.handler = (event, context, callback) => {
+     console.log('Received event:', JSON.stringify(event, null, 2));
+-   
++
++    /* return list sorted by lastmodifiedtime - most recent entry first */
+     return s3.listObjects({
+-        Bucket:event.bucket,
+-        Prefix:event.prefix,
+-        MaxKeys:event.perpage || 100,
+-        Marker:event.token || null
++        Bucket: event.bucket,
++        Prefix: event.prefix,
++        MaxKeys: event.perpage || 100,
++        Marker: event.token || null
+     }).promise()
+-    .then(x=>{
+-        console.log("s3 response:",JSON.stringify(x,null,2))
+-        callback(null,{
+-            token:x.NextMarker,
+-            jobs:x.Contents.map(y=>{return {
+-                id:y.Key.split('/').pop(),
+-                href:`${event.root}/jobs/${event.type}/`+encodeURI(y.Key.split('/').pop())
+-            }})
+-        })
+-    })
+-    .catch(e=>callback(JSON.stringify({
+-        type:"[InternalServiceError]",
+-        data:e
+-    })))
+-}
+-
+-
++        .then(x => {
++            if (x.Contents && Array.isArray(x.Contents)) {
++                x.Contents.sort((a, b) => {
++                    if (a.LastModified && b.LastModified) {
++                        return new Date(b.LastModified).getTime() - new Date(a.LastModified).getTime();
++                    } else {
++                        return 0;
++                    }
++                })
++            }
++            console.log("s3 response:", JSON.stringify(x, null, 2))
++            callback(null, {
++                token: x.NextMarker,
++                jobs: x.Contents.map(y => {
++                    return {
++                        id: y.Key.split('/').pop(),
++                        href: `${event.root}/jobs/${event.type}/` + encodeURI(y.Key.split('/').pop())
++                    }
++                })
++            })
++        })
++        .catch(e => callback(JSON.stringify({
++            type: "[InternalServiceError]",
++            data: e
++        })))
++};
+\ No newline at end of file

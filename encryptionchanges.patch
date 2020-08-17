@@ -1,0 +1,162 @@
+Index: templates/master/s3.js
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- templates/master/s3.js	(revision 36e9caa8a7f19c7272e9533fcd2b23a46f4a5c5a)
++++ templates/master/s3.js	(date 1589571527876)
+@@ -5,6 +5,13 @@
+         "Properties" : {
+             "WebsiteConfiguration":{
+                 "IndexDocument":"index.html"
++            },
++            "BucketEncryption": {
++                "ServerSideEncryptionConfiguration": [{
++                    "ServerSideEncryptionByDefault": {
++                        "SSEAlgorithm": "aws:kms"
++                    }
++                }]
+             }
+         }
+     },
+Index: templates/master/elasticsearch/es.js
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- templates/master/elasticsearch/es.js	(revision 36e9caa8a7f19c7272e9533fcd2b23a46f4a5c5a)
++++ templates/master/elasticsearch/es.js	(date 1589571527875)
+@@ -3,7 +3,7 @@
+     "ElasticsearchClusterConfig": {
+        "DedicatedMasterEnabled": false,
+        "InstanceCount": 2,
+-       "InstanceType": "t2.small.elasticsearch",
++       "InstanceType": "m5.large.elasticsearch",
+        "ZoneAwarenessEnabled": "true"
+     },
+     "EBSOptions": {
+@@ -17,6 +17,9 @@
+     },
+     "AdvancedOptions": {
+        "rest.action.multi.allow_explicit_index": "true"
++    },
++    "EncryptionAtRestOptions": {
++       "Enabled": true
+     }
+ }
+ 
+Index: templates/master/lex-build/index.js
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- templates/master/lex-build/index.js	(revision 36e9caa8a7f19c7272e9533fcd2b23a46f4a5c5a)
++++ templates/master/lex-build/index.js	(date 1589571527876)
+@@ -121,6 +121,13 @@
+             },
+             "VersioningConfiguration":{
+                 "Status":"Enabled"
++            },
++            "BucketEncryption": {
++                "ServerSideEncryptionConfiguration": [{
++                    "ServerSideEncryptionByDefault": {
++                        "SSEAlgorithm": "aws:kms"
++                    }
++                }]
+             }
+         }
+     },
+Index: templates/master/assets.js
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- templates/master/assets.js	(revision 36e9caa8a7f19c7272e9533fcd2b23a46f4a5c5a)
++++ templates/master/assets.js	(date 1589571527874)
+@@ -3,7 +3,15 @@
+ module.exports={
+     "AssetBucket": {
+       "Type": "AWS::S3::Bucket",
+-      "Properties": {}
++      "Properties": {
++        "BucketEncryption": {
++            "ServerSideEncryptionConfiguration": [{
++                "ServerSideEncryptionByDefault": {
++                    "SSEAlgorithm": "aws:kms"
++                }
++            }]
++        }
++      }
+     },
+     "AssetClear":{
+         "Type": "Custom::S3Clear",
+Index: templates/master/elasticsearch/firehose.js
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- templates/master/elasticsearch/firehose.js	(revision 36e9caa8a7f19c7272e9533fcd2b23a46f4a5c5a)
++++ templates/master/elasticsearch/firehose.js	(date 1589571527875)
+@@ -67,6 +67,13 @@
+         "Type" : "AWS::S3::Bucket",
+         "DeletionPolicy":"Delete",
+         "Properties" : {
++          "BucketEncryption": {
++              "ServerSideEncryptionConfiguration": [{
++                  "ServerSideEncryptionByDefault": {
++                      "SSEAlgorithm": "aws:kms"
++                  }
++              }]
++          },
+           "Tags" : [
+               {
+                 "Key" : "Use",
+Index: templates/master/bucket.js
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- templates/master/bucket.js	(revision 36e9caa8a7f19c7272e9533fcd2b23a46f4a5c5a)
++++ templates/master/bucket.js	(date 1589571527875)
+@@ -22,6 +22,13 @@
+                     AllowedMethods:['GET'],
+                     AllowedOrigins:['*']
+                 }]
++            },
++            "BucketEncryption": {
++                "ServerSideEncryptionConfiguration": [{
++                    "ServerSideEncryptionByDefault": {
++                        "SSEAlgorithm": "aws:kms"
++                    }
++                }]
+             }
+         }
+     },
+@@ -43,6 +50,13 @@
+                     AllowedMethods:['PUT'],
+                     AllowedOrigins:['*']
+                 }]
++            },
++            "BucketEncryption": {
++                "ServerSideEncryptionConfiguration": [{
++                    "ServerSideEncryptionByDefault": {
++                        "SSEAlgorithm": "aws:kms"
++                    }
++                }]
+             }
+         }
+     },
+@@ -64,6 +78,13 @@
+                     AllowedMethods:['GET'],
+                     AllowedOrigins:['*']
+                 }]
++            },
++            "BucketEncryption": {
++                "ServerSideEncryptionConfiguration": [{
++                    "ServerSideEncryptionByDefault": {
++                        "SSEAlgorithm": "aws:kms"
++                    }
++                }]
+             }
+         }
+     }
