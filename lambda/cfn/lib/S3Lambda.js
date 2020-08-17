@@ -29,5 +29,9 @@ module.exports=class S3Lambda extends base{
     Delete(ID,params,reply){
         reply(null);
     }
+
+    Update(ID,params,oldparams,reply){
+        this.Create(params,reply)
+    }
 }
 

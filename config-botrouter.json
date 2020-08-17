@@ -1,0 +1,9 @@
+{
+  "region": "us-west-2",
+  "profile": "default",
+  "publicBucket": "qnabuild304-botrouter-us-west-2",
+  "publicPrefix": "artifacts/aws-ai-qna-bot",
+  "devEmail": "potterve@amazon.com",
+  "namespace": "dev",
+  "stackNamePrefix": "QNABuild304"
+}
