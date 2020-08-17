@@ -101,30 +101,15 @@ module.exports={
         }))
     },
     getExport(context,opts){
-        console.log(context)
-        console.log(opts)
         return context.dispatch('_request',{
             url:opts.href,
             method:'get'
         })
     },
-    getExportByJobID(context,opts){
+    getExportByJobId(context,id){
         return context.dispatch('_request',{
-            url:context.rootState.info._links.jobs.href,
+            url:context.rootState.info._links.jobs.href + '/exports/' + id,
             method:'get'
-        })
-        .then(response=>context.dispatch('_request',{
-            url:response._links.exports.href,
-            method:'get'
-        }))
-        .then(response=> {
-            console.log(`response: ${JSON.stringify(response,null,2)}`);
-            for (var job in response.jobs){
-                if (job.id===opts.id) {
-                    console.log(`found job: ${JSON.stringify(job)}`);
-                    return job
-                }
-            }
         })
     },
     deleteExport(context,opts){
