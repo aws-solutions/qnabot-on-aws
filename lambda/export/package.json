@@ -15,7 +15,7 @@
     "save-dev": "0.0.1-security"
   },
   "scripts": {
-    "test": "mocha"
+    "test": "mocha",
     "lodash": "^4.17.19",
     "intercept-stdout": "^0.1.2"
   }

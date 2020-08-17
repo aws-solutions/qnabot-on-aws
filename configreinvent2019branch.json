@@ -1,0 +1,8 @@
+{
+  "region": "us-east-1",
+  "profile": "bobpskier7",
+  "publicBucket": "qnabot-reinvent2019",
+  "publicPrefix": "artifacts/aws-ai-qna-bot",
+  "devEmail": "potterve@amazon.com",
+  "namespace": "reinvent2019"
+}
