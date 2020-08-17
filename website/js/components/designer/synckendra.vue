@@ -62,6 +62,41 @@ module.exports={
     },
     refresh:async function(){
       var self=this
+      var job = {
+        id:"qna-kendra-faq.txt",
+      }
+      var out = [job]
+      poll();
+      
+      async function poll(){
+        // get status file
+        var status=await self.$store.dispatch('api/getExportByJobID',job)
+        if (!status){
+          return;
+        }
+        console.log(`job info is ${JSON.stringify(status,null,2)}`);
+        console.log(status.status);
+        
+        // if export status is completed, switch to running kendra sync
+        if (status.status == 'Completed') status.status = 'Export finished. Running KendraSync'   // this just masks it in the UI
+        self.request_status = status.status
+        
+        // if job is not complete and not error, poll again
+        if(status.status!=="Sync Complete" && status.status!=="Error"){
+          setTimeout(()=>poll(),1000)
+        }
+        
+        if (self.request_status=='Sync Complete'){
+          self.success = true
+        } else if (self.request_status=="Error") {
+          self.error='Error!'
+        }
+        self.loading=false
+      }
+    },
+    
+    refresh_old:async function(){
+      var self=this
       var exports=await this.$store.dispatch('api/listExports')
       this.exports=exports.jobs
       this.exports.map(async (job,index,coll)=>{
