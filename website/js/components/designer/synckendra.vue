@@ -69,14 +69,15 @@ module.exports={
         var out={}
         Object.assign(out,coll[index],info)
         
-        // TODO: this is hacky fix to why the job sometimes starts out with sync complete
-        if (info.status == 'Sync Complete')  setTimeout(()=>null, 5000);
+        
+        if (info.status == 'Sync Complete')  setTimeout(()=>null, 5000);  // a hacky fix for when job starts with sync complete
         
         coll.splice(index,1,out)
-        poll()
         
-        // TODO: updating the status file is triggering the export function
-        // so basically, need a new way to track the status of the kendrasync function
+        if (info.key == "kendra-data/qna-kendra-faq.txt") {
+          poll()
+        }
+        
         async function poll(){
           // get status file
           var status=await self.$store.dispatch('api/getExport',job)
@@ -94,6 +95,8 @@ module.exports={
           
           if (self.request_status=='Sync Complete'){
             self.success = true
+          } else if (self.request_status=="Error") {
+            self.error='Error!'
           }
           self.loading=false
         }
@@ -112,12 +115,9 @@ module.exports={
         })
         await this.refresh()
       }catch(e){
-        console.log('error')
-        this.error=e
-        this.request_status = 'Error'
-        self.loading=false
+        // never enters this block
       }finally{
-        // fails to enter this block
+        // never enters this block
       }
     }
   }

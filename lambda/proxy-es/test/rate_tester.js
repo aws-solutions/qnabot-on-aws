@@ -55,7 +55,7 @@ function user(kendra_params,params,resArray) {
 
 async function rate_tester() {
     console.log('entering rate tester');
-    var NUM_USERS = 4;
+    var NUM_USERS = 1;
     var NUM_SECONDS_SPACE = 2;
     var NUM_QUERIES_PER_USER = 10;
     
