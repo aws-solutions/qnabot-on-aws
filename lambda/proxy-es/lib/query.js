@@ -45,7 +45,7 @@ async function isESonly(req, query_params) {
 }
 
 async function run_query_es(req, query_params) {
-    console.log('Querying ElasticSearch');
+    
     var es_query = await build_es_query(query_params);
     var es_response = await request({
         url: `https://${req._info.es.address}/${req._info.es.index}/_doc/_search?search_type=dfs_query_then_fetch`,
@@ -65,9 +65,9 @@ async function run_query_kendra(req, query_params) {
     console.log("Querying Kendra FAQ index: " + _.get(req, "_settings.KENDRA_FAQ_INDEX"));
     // calls kendrQuery function which duplicates KendraFallback code, but only searches through FAQs
     var request_params = {
-        kendra_faq_index:req["_settings"]["KENDRA_FAQ_INDEX"],
-        maxRetries:req["_settings"]["KENDRAFAQ_CONFIG_MAX_RETRIES"],
-        retryDelay:req["_settings"]["KENDRAFAQ_CONFIG_RETRY_DELAY"],
+        kendra_faq_index:_.get(req, "_settings.KENDRA_FAQ_INDEX"),
+        maxRetries:_.get(req, "_settings.KENDRA_FAQ_CONFIG_MAX_RETRIES"),
+        retryDelay:_.get(req, "_settings.KENDRA_FAQ_CONFIG_RETRY_DELAY"),
     }
     // autotranslate
     if (req["_event"]['userDetectedLocale'] != 'en') {
@@ -175,7 +175,7 @@ async function get_hit(req, res) {
     if (response.kendraResultsCached) console.log(`kendra results cached in res structure`);
     
     // ES fallback if KendraFAQ fails
-    if (!hit && _.get(req, '_settings.ES_FALLBACK', false)) {
+    if (!hit && _.get(req, '_settings.KENDRA_FAQ_ES_FALLBACK', true)) {
         console.log('ES Fallback');
         response = await run_query_es(req, query_params);
         if (_.get(response, "hits.hits[0]._source")) {

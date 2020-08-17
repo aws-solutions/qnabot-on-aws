@@ -52,7 +52,6 @@ module.exports={
   computed:{
   },
   created:async function(){
-    this.refresh() 
   },
   methods:{
     cancel:function(){
@@ -64,47 +63,43 @@ module.exports={
       var self=this
       var exports=await this.$store.dispatch('api/listExports')
       this.exports=exports.jobs
-      this.exports.map(async (job,index,coll)=>{
-        var info=await this.$store.dispatch('api/getExport',job)
-        var out={}
-        Object.assign(out,coll[index],info)
+      var info = await this.$store.dispatch('api/getExportByJobId', 'qna-kendra-faq.txt');
+      
+      if (info.status !== 'Sync Complete') {
+        await poll();
+      }
+      
+      async function poll(){
+        // console.log('poll starting');
+        // get status file
+        var status = await self.$store.dispatch('api/getExportByJobId', 'qna-kendra-faq.txt');
+        console.log(status.status);
         
-        // TODO: this is hacky fix to why the job sometimes starts out with sync complete
-        if (info.status == 'Sync Complete')  setTimeout(()=>null, 5000);
+        // if export status is completed, switch to running kendra sync
+        if (status.status == 'Completed') status.status = 'Export finished. Running KendraSync'   // this just masks it in the UI
         
-        coll.splice(index,1,out)
-        poll()
+        self.request_status = status.status
         
-        // TODO: updating the status file is triggering the export function
-        // so basically, need a new way to track the status of the kendrasync function
-        async function poll(){
-          // get status file
-          var status=await self.$store.dispatch('api/getExport',job)
-          Object.assign(out,coll[index],status)
-          console.log(status.status);
-          
-          // if export status is completed, switch to running kendra sync
-          if (status.status == 'Completed') status.status = 'Export finished. Running KendraSync'   // this just masks it in the UI
-          self.request_status = status.status
-          
-          // if job is not complete and not error, poll again
-          if(status.status!=="Sync Complete" && status.status!=="Error"){
-            setTimeout(()=>poll(),1000)
-          }
-          
-          if (self.request_status=='Sync Complete'){
-            self.success = true
-          }
-          self.loading=false
+        // if job is not complete and not error, poll again
+        if(status.status!=="Sync Complete" && status.status!=="Error"){
+          setTimeout(()=>poll(),1000)
         }
-      })
-    },
+        
+        if (self.request_status==='Sync Complete'){
+          self.success = true
+        } else if (self.request_status==='Error'){
+          self.error='Error!'
+        }
+        self.loading=false
+      }
+    },    
     start:async function(){
       var self=this
       this.loading=true
       this.snackbar=true
       this.success=false
       this.error=''
+      this.request_status="Ready"
       try{
         await this.$store.dispatch('api/startKendraSyncExport',{
           name:this.filename,
@@ -112,12 +107,9 @@ module.exports={
         })
         await this.refresh()
       }catch(e){
-        console.log('error')
-        this.error=e
-        this.request_status = 'Error'
-        self.loading=false
+        // never enters this block
       }finally{
-        // fails to enter this block
+        // never enters this block
       }
     }
   }

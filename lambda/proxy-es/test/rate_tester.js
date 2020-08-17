@@ -1,9 +1,5 @@
 // rate tester for kendra throttle
 
-// MAKE SURE TO ADD REGION IN KENDRAFAQ QUERY AND KENDRAFALLBACK FOR TESTING SINCE NOT PASSED IN AS PARAMETER
-// lambda/proxy-es/lib/kendraQuery
-// templates/examples/extensions/js_lambda_hooks/KendraFallback
-
 const sleep = require('util').promisify(setTimeout)
 const AWS = require('aws-sdk');
 AWS.config.update({
@@ -59,15 +55,16 @@ function user(kendra_params,params,resArray) {
 
 async function rate_tester() {
     console.log('entering rate tester');
-    var NUM_USERS = 10;
+    var NUM_USERS = 1;
     var NUM_SECONDS_SPACE = 2;
-    var NUM_QUERIES_PER_USER = 5;
+    var NUM_QUERIES_PER_USER = 10;
     
     var u;
     var kendra_params = {
-        IndexId:'e1c23860-e5c8-4409-ae26-b05bd6ced00a', // developer edition
-        // IndexId:'4cb810f8-4326-43f2-ba22-aaccd447a1e2', // enterprise edition
-        QueryText:'How old is the sun?',
+        // IndexId:'e1c23860-e5c8-4409-ae26-b05bd6ced00a', // developer edition
+        IndexId:'4cb810f8-4326-43f2-ba22-aaccd447a1e2', // enterprise edition
+        // QueryText:'How old is the sun?',    // KendraFallback
+        QueryText:'What are the goals of an economy?',    // KendraFAQ
     }
     var user_params = {
         NUM_QUERIES:NUM_QUERIES_PER_USER,
