@@ -1,7 +1,7 @@
 <template lang="pug">
   span(class="wrapper")
     v-btn.block(
-      :disabled="loading" @click="start" slot="activator"
+      :disabled="!(kendraFaqEnabled && busy)" @click="start" slot="activator"
       flat id="kendra-sync") Sync Kendra FAQ
     v-dialog(
       persistent
@@ -42,16 +42,23 @@ module.exports={
     var self=this
     return {
       snackbar:false,
-      loading:false,
+      busy:false,
       success:false,
       error:'',
       request_status:"Ready",
-      filename:'qna-kendra-faq.txt' // do not change because same key needed for UI status updates in lambda/export/kendraSync
+      filename:'qna-kendra-faq.txt', // do not change because same key needed for UI status updates in lambda/export/kendraSync
+      kendraFaqEnabled:false,
     }
   },
   computed:{
   },
-  created:async function(){
+  created:{
+  },
+  mounted:async function() {  //TODO: try it without the 'async function()' prefix
+    var self=this
+    var settings=await this.$store.dispatch('api/listSettings');
+    // console.log(`settings: ${JSON.stringify(settings,null,2)}`);
+    this.kendraFaqEnabled = _.get(settings,"KENDRA_FAQ_INDEX")!=="";
   },
   methods:{
     cancel:function(){
@@ -90,12 +97,12 @@ module.exports={
         } else if (self.request_status==='Error'){
           self.error='Error!'
         }
-        self.loading=false
+        self.busy=false
       }
     },    
     start:async function(){
       var self=this
-      this.loading=true
+      this.busy=true
       this.snackbar=true
       this.success=false
       this.error=''
