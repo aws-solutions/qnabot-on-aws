@@ -1,8 +1,0 @@
-{
-  "region": "us-east-1",
-  "profile": "potterveoregonstate",
-  "publicBucket": "qna-develop-dev-bootstrap-2-bucket-vwz0cbmzm29o",
-  "publicPrefix": "artifacts/aws-ai-qna-bot",
-  "devEmail": "potterve@amazon.com",
-  "namespace": "develop"
-}

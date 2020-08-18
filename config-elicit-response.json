@@ -1,9 +1,0 @@
-{
-  "region": "us-east-1",
-  "profile": "default",
-  "publicBucket": "qnanew-dev-dev-bootstrap-3-bucket-1f607wz6nop43",
-  "publicPrefix": "artifacts/aws-ai-qna-bot",
-  "devEmail": "potterve@amazon.com",
-  "namespace": "dev",
-  "stackNamePrefix": "QNAElicit"
-}
