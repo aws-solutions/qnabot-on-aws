@@ -145,10 +145,14 @@ async function routeKendraRequest(request_params) {
             "max_score": json_struct.length,
             "hits": [],
         },
-        "kendraQueryId":kendraQueryId,
-        "kendraIndexId":kendraIndexId,
-        "kendraResultId":kendraResultId,
-        "kendraResponsibleQid":"KendraFAQ"
+    }
+    if (kendraQueryId) {
+        hits_struct.kendra_context = {
+            "kendraQueryId":kendraQueryId,
+            "kendraIndexId":kendraIndexId,
+            "kendraResultId":kendraResultId,
+            "kendraResponsibleQid":"KendraFAQ"
+        }
     }
 
     

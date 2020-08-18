@@ -54,11 +54,12 @@ module.exports={
   },
   created:{
   },
-  mounted:async function() {
-    var self=this
-    var settings=await this.$store.dispatch('api/listSettings');
-    // console.log(`settings: ${JSON.stringify(settings,null,2)}`);
-    self.kendraFaqEnabled = _.get(settings,"KENDRA_FAQ_INDEX")!=="";
+  mounted:function() {
+    const self=this;
+    setTimeout(async function() {
+      const settings=await self.$store.dispatch('api/listSettings');
+      self.kendraFaqEnabled = _.get(settings,"KENDRA_FAQ_INDEX")!=="";
+    }, 2000);
   },
   methods:{
     cancel:function(){
