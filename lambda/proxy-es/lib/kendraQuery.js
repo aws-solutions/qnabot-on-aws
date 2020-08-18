@@ -145,10 +145,14 @@ async function routeKendraRequest(request_params) {
             "max_score": json_struct.length,
             "hits": [],
         },
-        // TODO: in event.res.session add kendra query id, kendra index id, kendra result id
-        "kendraQueryId":kendraQueryId,
-        "kendraIndexId":kendraIndexId,
-        "kendraResultId":kendraResultId
+    }
+    if (kendraQueryId) {
+        hits_struct.kendra_context = {
+            "kendraQueryId":kendraQueryId,
+            "kendraIndexId":kendraIndexId,
+            "kendraResultId":kendraResultId,
+            "kendraResponsibleQid":"KendraFAQ"
+        }
     }
 
     

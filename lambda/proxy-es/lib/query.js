@@ -173,6 +173,8 @@ async function get_hit(req, res) {
     
     _.set(res, "kendraResultsCached", response.kendraResultsCached);
     if (response.kendraResultsCached) console.log(`kendra results cached in res structure`);
+    _.set(req, "session.qnabotcontext.kendra", response.kendra_context);
+    if (response.kendra_context) console.log(`kendra context set in res session`);
     
     // ES fallback if KendraFAQ fails
     if (!hit && _.get(req, '_settings.KENDRA_FAQ_ES_FALLBACK', true)) {
