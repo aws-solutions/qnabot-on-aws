@@ -1,7 +1,7 @@
 <template lang="pug">
   span(class="wrapper")
     v-btn.block(
-      :disabled="!(kendraFaqEnabled && loading)" @click="start" slot="activator"
+      :disabled="!(kendraFaqEnabled && !loading)" @click="start" slot="activator"
       flat id="kendra-sync") Sync Kendra FAQ
     v-dialog(
       persistent
