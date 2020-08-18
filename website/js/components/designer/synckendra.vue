@@ -1,7 +1,7 @@
 <template lang="pug">
   span(class="wrapper")
     v-btn.block(
-      :disabled="!(kendraFaqEnabled && busy)" @click="start" slot="activator"
+      :disabled="!(kendraFaqEnabled && loading)" @click="start" slot="activator"
       flat id="kendra-sync") Sync Kendra FAQ
     v-dialog(
       persistent
@@ -42,7 +42,7 @@ module.exports={
     var self=this
     return {
       snackbar:false,
-      busy:false,
+      loading:false,
       success:false,
       error:'',
       request_status:"Ready",
@@ -54,17 +54,18 @@ module.exports={
   },
   created:{
   },
-  mounted:async function() {  //TODO: try it without the 'async function()' prefix
+  mounted:async function() {
     var self=this
     var settings=await this.$store.dispatch('api/listSettings');
     // console.log(`settings: ${JSON.stringify(settings,null,2)}`);
-    this.kendraFaqEnabled = _.get(settings,"KENDRA_FAQ_INDEX")!=="";
+    self.kendraFaqEnabled = _.get(settings,"KENDRA_FAQ_INDEX")!=="";
   },
   methods:{
     cancel:function(){
       var self=this
       self.success=false
       self.snackbar=false
+      self.loading=false
     },
     refresh:async function(){
       var self=this
@@ -97,12 +98,12 @@ module.exports={
         } else if (self.request_status==='Error'){
           self.error='Error!'
         }
-        self.busy=false
+        self.loading=false
       }
     },    
     start:async function(){
       var self=this
-      this.busy=true
+      this.loading=true
       this.snackbar=true
       this.success=false
       this.error=''
