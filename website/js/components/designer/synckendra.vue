@@ -1,7 +1,7 @@
 <template lang="pug">
   span(class="wrapper")
     v-btn.block(
-      :disabled="loading" @click="start" slot="activator"
+      :disabled="!(kendraFaqEnabled && loading)" @click="start" slot="activator"
       flat id="kendra-sync") Sync Kendra FAQ
     v-dialog(
       persistent
@@ -46,18 +46,26 @@ module.exports={
       success:false,
       error:'',
       request_status:"Ready",
-      filename:'qna-kendra-faq.txt' // do not change because same key needed for UI status updates in lambda/export/kendraSync
+      filename:'qna-kendra-faq.txt', // do not change because same key needed for UI status updates in lambda/export/kendraSync
+      kendraFaqEnabled:false,
     }
   },
   computed:{
   },
-  created:async function(){
+  created:{
+  },
+  mounted:async function() {
+    var self=this
+    var settings=await this.$store.dispatch('api/listSettings');
+    // console.log(`settings: ${JSON.stringify(settings,null,2)}`);
+    self.kendraFaqEnabled = _.get(settings,"KENDRA_FAQ_INDEX")!=="";
   },
   methods:{
     cancel:function(){
       var self=this
       self.success=false
       self.snackbar=false
+      self.loading=false
     },
     refresh:async function(){
       var self=this
