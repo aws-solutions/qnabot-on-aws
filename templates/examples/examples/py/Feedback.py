@@ -28,7 +28,7 @@ def handler(event, context):
 
     try:
         #get the Question ID (qid) of the previous document that was returned to the web client 
-        previous = event["req"]["session"]["previous"]
+        previous = event["req"]["session"]["qnabotcontext"]["previous"]
         previousQid = previous["qid"]
         previousQuestion = previous["q"]
         previousAnswer = previous["a"]
@@ -38,13 +38,13 @@ def handler(event, context):
         # - Check feedbackArg from the UI payload. Parse for "thumbs_down_arg" feedback. Based on user action, sendFeedback through SNS, and log in Firehose. 
         if feedbackArg == "incorrect":
             sendFeedbackNotification(previousQid, previousAnswer, previousQuestion, previousAlt, feedbackArg)
-            if (kendraIndexId is not None) and (kendraResponsibleQid == previousQid):
+            if (kendraIndexId is not None) and (kendraResponsibleQid==previousQid or kendraResponsibleQid=='KendraFAQ'):
                 print("submitting NOT_RELEVANT to Kendra Feedback")
                 submitFeedbackForKendra(kendraIndexId, kendraQueryId, kendraResultId, "NOT_RELEVANT")
             logFeedback(previousQid,previousAnswer,previousQuestion, previousAlt, feedbackArg)
             print("Negative feedback logged, and SNS notification sent")
         else:
-            if (kendraIndexId is not None) and (kendraResponsibleQid == previousQid):
+            if (kendraIndexId is not None) and (kendraResponsibleQid==previousQid or kendraResponsibleQid=='KendraFAQ'):
                 print("submitting RELEVANT to Kendra Feedback")
                 submitFeedbackForKendra(kendraIndexId, kendraQueryId, kendraResultId, "RELEVANT")
             logFeedback(previousQid, previousAnswer, previousQuestion, previousAlt, feedbackArg)
