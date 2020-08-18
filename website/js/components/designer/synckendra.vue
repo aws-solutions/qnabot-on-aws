@@ -52,13 +52,14 @@ module.exports={
   },
   computed:{
   },
-  created:{
+  created:function(){
   },
-  mounted:function() {
-    const self=this;
+  mounted:function(){
+    const self=this
     setTimeout(async function() {
       const settings=await self.$store.dispatch('api/listSettings');
-      self.kendraFaqEnabled = _.get(settings,"KENDRA_FAQ_INDEX")!=="";
+      // console.log(`${JSON.stringify(settings[2],null,2)}`);
+      self.kendraFaqEnabled = _.get(settings[2],"KENDRA_FAQ_INDEX")!=="";
     }, 2000);
   },
   methods:{
