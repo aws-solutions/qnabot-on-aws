@@ -10,7 +10,7 @@ These instructions will get you a copy of the project up and running on your loc
 
 1. Install [QnaBot](https://aws.amazon.com/blogs/machine-learning/creating-a-question-and-answer-bot-with-amazon-lex-and-amazon-alexa/)
 2. Install [Lex-web-UI](https://github.com/aws-samples/aws-lex-web-ui)
-3. Download the [iframeparent.html](https://aws-bigdata-blog.s3.amazonaws.com/artifacts/lex-web-ui-enhancementblog/enhancements/iframeparent.html) and copy it into the s3 bucket hosting the Lex-web-Ui installation.
+3. Download the [iframeparent.html](assets/iframeparent.html) and copy it into the s3 bucket hosting the Lex-web-Ui installation.
 
 
 ### Configuring
