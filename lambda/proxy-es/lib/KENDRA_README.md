@@ -4,8 +4,8 @@
 
 QnABot now offers a new machine-learning based query method based on Amazon Kendra to improve question-matching accuracies and reduce the tuning workload. Let's try a simple example to illustrate the concept:
 
+### Part 1: See the limitations of ElasticSearch ###
 
-**Part 1: See the limitations of ElasticSearch**
 1. Add the following question to your designer console:
 
     QID: econ.1
@@ -19,7 +19,8 @@ QnABot now offers a new machine-learning based query method based on Amazon Kend
 
 You'll find that the ElasticSearch based QnABot does not know that these two questions mean the same thing. We're going to see how Amazon Kendra can address this limitation.
 
-**Part 2: Create an Amazon Kendra index**
+### Part 2: Create an Amazon Kendra index ###
+
 1. Go to [Amazon Kendra](http://console.aws.amazon.com/kendra) and click on **Create Index** in the top right corner.
 2. Provide an *Index name* and optional *Description*.
 3. Choose the recommended *Create a new role* for the IAM role and provide a name like *explore-qnabot*.
@@ -29,19 +30,21 @@ You'll find that the ElasticSearch based QnABot does not know that these two que
   
 5. **Create** the index. It will take ~30 minutes.
 
-**Part 3: Set up KendraFAQ in Designer Console**
-2. Log in to the Content Designer, and go to settings. Scroll down until you see the field *KENDRA_FAQ_INDEX*.
-3. Enter your Kendra index ID copied from the Kendra console.
+
+### Part 3: Set up KendraFAQ in Designer Console ###
+
+1. Log in to the Content Designer, and go to settings. Scroll down until you see the field *KENDRA_FAQ_INDEX*.
+2. Enter your Kendra index ID copied from the Kendra console.
 
 <img src="./kendra_console_readme.png?raw=true" width="250" height="300">
 
-4. Save the settings and return to the home page of the web interface.
-5. Click on the button on the top right of the QnABot home screen to open up a drop-down menu. Press **Sync Kendra FAQ**.
+3. Save the settings and return to the home page of the web interface.
+4. Click on the button on the top right of the QnABot home screen to open up a drop-down menu. Press **Sync Kendra FAQ**.
 
 <img src="./sync_kendra_faq_menu.png?raw=true" width="200" height="200">
 
-6. Wait until your designer console finish syncing to the Kendra index.
-7. Go back into the QnABot client and try out the new phrasing again: "What main objectives do economies try to achieve?"
+5. Wait until your designer console finish syncing to the Kendra index.
+6. Go back into the QnABot client and try out the new phrasing again: "What main objectives do economies try to achieve?"
 
 You'll see that with Kendra-based question matching, the QnABot can understand variations in human language better! Amazon Kendra is an enterprise search service powered by machine learning and natural language processing. This means that it can apply different semantic meanings over the terms in a user’s question to better understand the meaning of complex human language, and identify better answers. With Amazon Kendra, QnABot is able to comprehend that these two question phrasings mean the same thing.
 
