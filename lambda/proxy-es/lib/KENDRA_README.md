@@ -28,12 +28,12 @@ You'll find that the ElasticSearch based QnABot does not know that these two que
 2. Log in to the Content Designer, and go to settings. Scroll down until you see the field *KENDRA_FAQ_INDEX*.
 3. Enter your Kendra index ID copied from the Kendra console.
 
-![Kendra Console Index ID](./kendra_console_readme.png?raw=true "Kendra Console Index ID")
+<img src="./kendra_console_readme.png?raw=true" width="250" height="300">
 
 4. Save the settings and return to the home page of the web interface.
 5. Click on the button on the top right of the QnABot home screen to open up a drop-down menu. Press **Sync Kendra FAQ**.
 
-![Menu](./sync_kendra_faq_menu.png?raw=true "Menu")
+<img src="./sync_kendra_faq_menu.png?raw=true" width="200" height="200">
 
 6. Wait until your designer console finish syncing to the Kendra index.
 7. Go back into the QnABot client and try out the new phrasing again: "What main objectives do economies try to achieve?"
