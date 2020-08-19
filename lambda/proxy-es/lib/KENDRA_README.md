@@ -82,11 +82,11 @@ The Kendra integration is still on its way to being fully realized. As the Kendr
 These are addional example questions where the new phrasing fails to find a match using ElasticSearch, but succeeds with the Kendra integration.
 
 QID: solar.1
-Question: How old is the sun?
-Answer: Our sun is 4.6 billion years old.
-New phrasing: What is the age of the sun?
+- Question: How old is the sun?
+- Answer: Our sun is 4.6 billion years old.
+- New phrasing: What is the age of the sun?
 
 QID: bus.1
-Question: What are the main functions of management?
-Answer: There are 4 main functions of management: planning, organizing, directing, and controlling.
-New phrasing: What main operations does management fulfill?
+- Question: What are the main functions of management?
+- Answer: There are 4 main functions of management: planning, organizing, directing, and controlling.
+- New phrasing: What main operations does management fulfill?
