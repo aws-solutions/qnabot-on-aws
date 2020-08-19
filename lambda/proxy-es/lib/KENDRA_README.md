@@ -20,8 +20,7 @@ You'll find that the ElasticSearch based QnABot does not know that these two que
 2. Provide an *Index name* and optional *Description*.
 3. Choose the recommended *Create a new role* for the IAM role and provide a name like *explore-qnabot*.
 4. Press **Next**. Decide if you want the Enterprise or Developer edition. 
-- Kendra's Free Tier of usage provides the Developer edition for free usage of up to 750 hours for the first 30 days. For more information on pricing details, go to https://aws.amazon.com/kendra/pricing/.
-- Both editions have a query rate that is strictly enforced at 0.5 queries/second. The Enterprise edition provides the option to increase this limit for additional cost. The Developer edition cannot increase query capacity.
+Kendra's Free Tier of usage provides the Developer edition for free usage of up to 750 hours for the first 30 days. Both editions have a query rate that is strictly enforced at 0.5 queries/second. The Enterprise edition provides the option to increase this limit for additional cost. The Developer edition cannot increase query capacity. For more information on pricing details, go to https://aws.amazon.com/kendra/pricing/.
 5. **Create** the index. It will take ~30 minutes.
 
 **Part 3: Set up KendraFAQ in Designer Console**
