@@ -43,8 +43,9 @@ You'll find that the ElasticSearch based QnABot does not know that these two que
 
 <img src="./sync_kendra_faq_menu.png?raw=true" width="200" height="200">
 
-5. Wait until your designer console finishes syncing to the Kendra index.
-6. Go back into the QnABot client and try out the new phrasing again: "What main objectives do economies try to achieve?"
+5. Wait until your designer console finishes syncing to the Kendra index. This will likely take a couple minutes. 
+6. When it shows the *Sync Complete* status, you can go to your QnABot index in the Kendra console and check the FAQs tab to see a newly created (or updated) `qna-facts` FAQ. You will need to sync your questions to a Kendra FAQ each time you update the content in your designer console.
+7. Go back into the QnABot client and try out the new phrasing again: "What main objectives do economies try to achieve?"
 
 You'll see that with Kendra-based question matching, the QnABot can understand variations in human language better! Amazon Kendra is an enterprise search service powered by machine learning and natural language processing. This means that it can apply different semantic meanings over the terms in a user’s question to better understand the meaning of complex human language, and identify better answers. With Amazon Kendra, QnABot is able to comprehend that these two question phrasings mean the same thing.
 
@@ -78,12 +79,12 @@ QnABot supports the following features with its Amazon Kendra alternative implem
 ## Details about the Kendra FAQ integration
 The Kendra integration is currently a Beta feature for you to try. As the Kendra service develops frameworks to support similar use cases, its capabilities will continue changing. For this reason, here we document the limitations and current functions here.
 
-Query Throttling Rates
+**Query Throttling Rates**
 - Kendra by default throttles queries to a rate of 1 query every 2 seconds on average. The Kendra Enterprise indexes allow you to purchase addition query units to increase the throughput. For additional information on adjusting query capacity, see [https://docs.aws.amazon.com/kendra/latest/dg/adjusting-capacity.html](https://docs.aws.amazon.com/kendra/latest/dg/adjusting-capacity.html).
 - If there are many simultaneous users on QnABot at a time, expect there to be significant latency or even failure to execute Kendra queries. The current implementation is optimized to support 10 concurrent users where each user will wait a maximum of 4.5 seconds before receiving a response to their question. 
 - To optimize your QnABot for different numbers of users or use cases, see the fields `KENDRA_FAQ_MAX_RETRIES` and `KENDRA_FAQ_CONFIG_RETRY_DELAY`. They deal with Kendra's in-built exponential delay and retry function in the case that a query times out or is blocked due to too many other simultaneous queries. The first setting sets the maximum number of retries, and the second sets the base number of milliseconds that Kendra delays before retrying a query.
 
-One-word Questions, Topics, QID Querying
+**One-word Questions, Topics, QID Querying**
 - Kendra FAQ currently performs poorly when trying to match a question with only 1 term in it, such as 'help' or 'hello'. For this reason, adding Style and other one-word Custom Don't Know Answers are supported via the optional ElasticSearch fallback engine.
 - Similarly with Topics and QID querying, Kendra does not currently support them and QnABot defaults to ElasticSearch to identify an answer.
 
