@@ -17,19 +17,22 @@ async function qnaJsonParser(params) {
     ]
   });
   
-  const data = [];
   var qna = `{"qna":[${params.content.toString().replace(/\n/g,',\n')}]}`
   params.content = JSON.parse(qna);
-
   const q_list = params.content.qna;
+  
+  const data = [];
   q_list.forEach(function(elem) {
-    elem.q.forEach(function(ques) {
+      var json_doc = JSON.stringify(elem);    // puts entire JSON structure in URL field
+      if (elem.q) {                           // qna type questions (standard)
+        elem.q.forEach(function(ques){
+          var entry = {question:ques, answer:elem.a, link:json_doc};
+          data.push(entry);
+        })
+      } else {
+        console.log(`this element is not supported with KendraFAQ and was skipped in the sync: ${JSON.stringify(elem)}`);
+      }
       
-      var json_doc = JSON.stringify(elem);
-      var entry = {question:ques, answer:elem.a, link:json_doc};    // entire JSON structure in URL field
-      
-      data.push(entry);
-    });
   });
   
   return csvWriter
