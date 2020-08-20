@@ -178,10 +178,10 @@ async function get_hit(req, res) {
     
     // ES fallback if KendraFAQ fails
     if (!hit && _.get(req, '_settings.KENDRA_FAQ_ES_FALLBACK', true)) {
-        console.log('ES Fallback');
+        console.log('ElasticSearch Fallback');
         response = await run_query_es(req, query_params);
         if (_.get(response, "hits.hits[0]._source")) {
-            _.set(response, "hits.hits[0]._source.answersource", "ES Fallback");
+            _.set(response, "hits.hits[0]._source.answersource", "ElasticSearch Fallback");
         }
         hit = _.get(response, "hits.hits[0]._source");
     }
@@ -382,10 +382,10 @@ module.exports = async function (req, res) {
         
         // Add answerSource for query hits
         var ansSource = _.get(hit, "answersource", "unknown")
-        if (ansSource==="Kendra FAQ") {
+        if (ansSource==="Kendra FAQ") { // kendra fallback sets answerSource directly
             res.answerSource = "KENDRA"
-        } else if (ansSource==="ElasticSearch" || ansSource==="ES Fallback") {
-            res.answerSource = "ES"
+        } else if (ansSource==="ElasticSearch" || ansSource==="ElasticSearch Fallback") {
+            res.answerSource = "ELASTICSEARCH"
         } else {
             res.answerSource = ansSource
         }
