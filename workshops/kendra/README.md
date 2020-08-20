@@ -10,24 +10,33 @@ QnABot now offers a new machine-learning based query method based on Amazon Kend
 
 #### Part 1: See the limitations of ElasticSearch
 
+Open the QnABot designer console. You can find the link to the 'ContentDesignerURL' under the Outputs tab of the launched CloudFormation template. If you do not know your login, you should have received an email once the template finished creating with a temporary password. The default username is 'Admin'.
+    
+<img src="./cftemplate_designer_url.png?raw=true" width="350" height="400">
+
 1. Add the following question to your designer console:
 
-    QID: econ.1
+    QID: *econ.1*
   
-    Question: "What are the main goals of an economy?" 
+    Question: *What are the main goals of an economy?*
   
-    Answer: "All economies in the world try to achieve 3 things: Growth, High employment"
+    Answer: *All economies in the world try to achieve 3 things: Growth, High employment*
     
+    <img src="./designer_add_button.png?raw=true" width="650" height="150">
+        
 2. Try this question out in the QnABot client. 
-3. Then, try out a different phrasing: "What main objectives do economies try to achieve?" 
+3. Then, try out a different phrasing: *What main objectives do economies try to achieve?*
 
 You'll find that the ElasticSearch based QnABot does not know that these two questions mean the same thing. We're going to see how Amazon Kendra can address this limitation.
 
 #### Part 2: Create an Amazon Kendra index
 
 1. Go to [Amazon Kendra](http://console.aws.amazon.com/kendra) and click on **Create Index** in the top right corner.
-2. Provide an *Index name* and optional *Description*.
-3. Choose the recommended *Create a new role* for the IAM role and provide a name like *explore-qnabot*.
+2. Provide an *Index name* like *explore-qnabot* and optional *Description*.
+3. Choose the recommended *Create a new role* for the IAM role and provide a name like *qnabot-idx-role*.
+
+<img src="./create_kendra_idx_opts.png?raw=true" width="500" height="450">
+
 4. Press **Next**. Decide if you want the Enterprise or Developer edition. 
 
     Kendra's Free Tier of usage provides the Developer edition for free usage of up to 750 hours for the first 30 days. Both editions have a query rate that is strictly enforced at 0.5 queries/second. The Enterprise edition provides the option to increase this limit for additional cost. The Developer edition cannot increase query capacity. For more information on pricing details, go to [https://aws.amazon.com/kendra/pricing/](https://aws.amazon.com/kendra/pricing/).
@@ -105,15 +114,15 @@ The Kendra integration is currently a Beta feature for you to try. As the Kendra
 ### Additional Question-Matching Examples  
 These are addional example questions where the new phrasing fails to find a match using ElasticSearch, but succeeds with the Kendra integration.
 
-QID: solar.1
-- Question: How old is the sun?
-- Answer: Our sun is 4.6 billion years old.
-- New phrasing: What is the age of the sun?
+QID: *solar.1*
+- Question: *How old is the sun?*
+- Answer: *Our sun is 4.6 billion years old.*
+- New phrasing: *What is the age of the sun?*
 
 QID: bus.1
-- Question: What are the main functions of management?
-- Answer: There are 4 main functions of management: planning, organizing, directing, and controlling.
-- New phrasing: What main operations does management fulfill?
+- Question: *What are the main functions of management?*
+- Answer: *There are 4 main functions of management: planning, organizing, directing, and controlling.*
+- New phrasing: *What main operations does management fulfill?*
 
 
 
@@ -187,14 +196,14 @@ There are a couple different types of responses from the KendraFallback engine.
 #### Top answer
 For some queries, Kendra is able to find an answer in the uploaded documents with a very high confidence and yields a 'top answer' phrase. QnABot takes the Kendra results and shortens its response to only contain this phrase and the source link. 
 
-For example, ask QnABot **"When did Galileo first see sunspots?"** or **"How many regions does the sun have?"** and take a look at the concise response returned. 
+For example, ask QnABot *When did Galileo first see sunspots?* or *How many regions does the sun have?* and take a look at the concise response returned. 
 
 If you are interacting through a voice channel (such as an Echo or via the microphone on the bottom right of the web interface), QnABot will speak this shortened answer instead of the full text extract that it was retrieved from.
 
 #### Most relevant phrases with document search
 In other cases, QnABot is able to find a text excerpt that most closely answers the question and it highlights the most relevant phrases of this response. This is returned along with other top results and their source links, enabling QnABot to act like a search engine over the uploaded documents.
 
-Try asking **"What is the composition of the sun?"** to see how QnABot selectively highlights the most important elements of a text extract.
+Try asking *What is the composition of the sun?* to see how QnABot selectively highlights the most important elements of a text extract.
 
 If a highly relevant phrase is identified, then this selective emphasis also applies to the voice response, which will read out the first 2 sentences of the most important highlighted text to provide context to the answer.
 
