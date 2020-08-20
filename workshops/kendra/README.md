@@ -24,7 +24,12 @@ Open the QnABot designer console. You can find the link to the 'ContentDesignerU
     
     <img src="./designer_add_button.png?raw=true" width="650" height="150">
         
-2. Try this question out in the QnABot client. 
+2. Try this question out in the QnABot client.
+
+<img src="./qnabot_tools_menu.png?raw=true" width="300" height="100"> 
+
+<img src="./qnabot_tools_open_client.png?raw=true" width="200" height="450"> 
+
 3. Then, try out a different phrasing: *What main objectives do economies try to achieve?*
 
 You'll find that the ElasticSearch based QnABot does not know that these two questions mean the same thing. We're going to see how Amazon Kendra can address this limitation.
@@ -47,6 +52,11 @@ You'll find that the ElasticSearch based QnABot does not know that these two que
 #### Part 3: Set up KendraFAQ in the designer console
 
 1. Log in to the Content Designer, and go to settings. Scroll down until you see the field *KENDRA_FAQ_INDEX*.
+
+<img src="./qnabot_tools_open_settings.png?raw=true" width="200" height="450">
+
+<img src="./qnabot_settings_kendra_idx.png?raw=true" width="400" height="150">
+
 2. Enter your Kendra index ID copied from the Kendra console.
 
 <img src="./kendra_console_readme.png?raw=true" width="250" height="300">
@@ -140,8 +150,15 @@ What if you want to ask the QnABot a question that is not present in the FAQs bu
 2. Create an S3 bucket and allow objects to be public read.
 
     a. In the S3 console, click on **Create bucket** and entire a *Bucket name* such as qnabot-docs. Press **Next** until you get to *Set permissions* (Step 3).
-
+    
+    <img src="./s3_create_bucket.png?raw=true" width="300" height="100">
+    
+    
+    <img src="./s3_create_bucket_step1.png?raw=true" width="500" height="300">
+    
     b. **Uncheck** the box which states *Block all public access* and then mark the checkbox to acknowledge the statement.
+    
+    <img src="./s3_create_bucket_step3.png?raw=true" width="500" height="300">
     
     c. Press **Next** until you **Create** the bucket.
     
@@ -150,6 +167,8 @@ What if you want to ask the QnABot a question that is not present in the FAQs bu
     - [solar_mysteries_book.pdf](./solar_mysteries_book.pdf)
 
     - [sun_lithograph.pdf](./sun_lithograph.pdf)
+    
+    <img src="./s3_bucket_upload.png?raw=true" width="400" height="100">    
 
 3. Go to the Kendra console and select your index. Click on the **Step 2. Add data sources** button and select the Amazon S3 Connector.
 
@@ -180,7 +199,13 @@ What if you want to ask the QnABot a question that is not present in the FAQs bu
 
 3. Save the settings and return to the home page of the web interface.
 4. Go to the **Import** tool from the designer console and open the drop down Examples/Extensions menu.
+
+<img src="./qnabot_tools_open_settings.png?raw=true" width="200" height="450">
+
 5. Load the KendraFallback extension and wait for it to complete. Return to the home page of the designer console. This loads a new question with a QID of "KendraFallback".
+
+<img src="./load_kendrafallback_ext.png?raw=true" width="900" height="100">
+
 6. Edit this question in the Designer and change its question text from "no_hits_alternative" to your current ES_NO_HITS_QUESTION (most likely it will be "no_hits") and save the changes. You can find this phrase in your settings parameters.
 7. If you have previously loaded the QnAUtility.json from Examples/Extensions you need to either remove the question with the ID "CustomNoMatches" or change the question for this ID from your current ES_NO_HITS_QUESTION (e.g. "no_hits") to "no_hits_alt".
 
