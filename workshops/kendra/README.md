@@ -174,22 +174,21 @@ What if you want to ask the QnABot a question that is not present in the FAQs bu
 ### Example questions
 There are a couple different types of responses from the KendraFallback engine. 
 
-**Top answer**
+#### Top answer
 For some queries, Kendra is able to find an answer in the uploaded documents with a very high confidence and yields a 'top answer' phrase. QnABot takes the Kendra results and shortens its response to only contain this phrase and the source link. 
 
 For example, ask QnABot **"When did Galileo first see sunspots?"** or **"How many regions does the sun have?"** and take a look at the concise response returned. 
 
 If you are interacting through a voice channel (such as an Echo or via the microphone on the bottom right of the web interface), QnABot will speak this shortened answer instead of the full text extract that it was retrieved from.
 
-**Most relevant phrases with document search**
+#### Most relevant phrases with document search
 In other cases, QnABot is able to find a text excerpt that most closely answers the question and it highlights the most relevant phrases of this response. This is returned along with other top results and their source links, enabling QnABot to act like a search engine over the uploaded documents.
 
 Try asking **"What is the composition of the sun?"** to see how QnABot selectively highlights the most important elements of a text extract.
 
 If a highly relevant phrase is identified, then this selective emphasis also applies to the voice response, which will read out the first 2 sentences of the most important highlighted text to provide context to the answer.
 
-
-For more question suggestions, try:
+#### For more question suggestions, try:
 - What is a solar flare?
 - How many Earth's could fit inside the sun?
 - What are Earth's atmosphere layers?
