@@ -127,8 +127,10 @@ What if you want to ask the QnABot a question that is not present in the FAQs bu
     c. Press **Next** until you **Create** the bucket.
     
     d. **Upload** these PDFs into your new S3 bucket. Ensure that the objects are public read.
-        - [solar_mysteries_book.pdf](./solar_mysteries_book.pdf)
-        - [sun_lithograph.pdf](./sun_lithograph.pdf)
+    
+    - [solar_mysteries_book.pdf](./solar_mysteries_book.pdf)
+
+    - [sun_lithograph.pdf](./sun_lithograph.pdf)
 
 3. Go to the Kendra console and select your index. Click on the **Step 2. Add data sources** button and select the Amazon S3 Connector.
 
