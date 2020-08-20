@@ -55,9 +55,11 @@ You'll find that the ElasticSearch based QnABot does not know that these two que
 
 <img src="./qnabot_tools_open_settings.png?raw=true" width="200" height="450">
 
-<img src="./qnabot_settings_kendra_idx.png?raw=true" width="400" height="150">
-
 2. Enter your Kendra index ID copied from the Kendra console.
+
+<img src="./qnabot_settings_kendra_idx.png?raw=true" width="400" height="100">
+
+<br>
 
 <img src="./kendra_console_readme.png?raw=true" width="250" height="300">
 
@@ -152,8 +154,7 @@ What if you want to ask the QnABot a question that is not present in the FAQs bu
     a. In the S3 console, click on **Create bucket** and entire a *Bucket name* such as qnabot-docs. Press **Next** until you get to *Set permissions* (Step 3).
     
     <img src="./s3_create_bucket.png?raw=true" width="300" height="100">
-    
-    
+    <br>
     <img src="./s3_create_bucket_step1.png?raw=true" width="500" height="300">
     
     b. **Uncheck** the box which states *Block all public access* and then mark the checkbox to acknowledge the statement.
