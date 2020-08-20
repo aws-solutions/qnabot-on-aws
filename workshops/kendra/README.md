@@ -35,7 +35,7 @@ You'll find that the ElasticSearch based QnABot does not know that these two que
 5. **Create** the index and wait for it to become active. **Note that this takes about ~30 minutes to complete**.
 
 
-#### Part 3: Set up KendraFAQ in Designer Console
+#### Part 3: Set up KendraFAQ in the designer console
 
 1. Log in to the Content Designer, and go to settings. Scroll down until you see the field *KENDRA_FAQ_INDEX*.
 2. Enter your Kendra index ID copied from the Kendra console.
@@ -55,7 +55,7 @@ You'll see that with Kendra-based question matching, the QnABot can understand v
 
 
 ### Supported features
-QnABot supports the following features with its Amazon Kendra alternative implementation. If a feature is only supported on ElasticSearch, then QnABot will default to using the ElasticSearch query method instead. If a question does not find any matches through the Kendra FAQ method, this integration provides an optional ElasticSearch fallback (ES Fallback).
+QnABot supports the following features with its Amazon Kendra alternative implementation. 
 
 |Feature                                                  | Supported                                                               |
 |---------------------------------------------------------|-------------------------------------------------------------------------|
@@ -67,7 +67,7 @@ QnABot supports the following features with its Amazon Kendra alternative implem
 |Using Topics to support follow-up questions              | NO. Supported only on ElasticSearch                                     |
 |Adding style to QnABot                                   | YES                                                                     |
 |Extending QnABot with lambda hook functions              | YES                                                                     |
-|Keyword filters and custom "Don't know" answers          | Supported via optional ES Fallback                                      |
+|Keyword filters and custom "Don't know" answers          | Supported via optional ElasticSearch Fallback                           |
 |Tuning, testing, and troubleshooting                     | YES                                                                     |
 |Exporting and importing answers                          | YES                                                                     |
 |Modifying configuration settings                         | YES                                                                     |
@@ -80,7 +80,17 @@ QnABot supports the following features with its Amazon Kendra alternative implem
 |QID querying                                             | NO. Supported only on ElasticSearch                                     |
 
 
-### Details about the Kendra FAQ integration
+### QnABot Answer Sources
+There are four unique sources that supply answers to QnABot.
+- **ElasticSearch**: The first method is the standard ElasticSearch implementation. If the `KENDRA_FAQ_INDEX` is not enabled or if a feature is only supported on ElasticSearch, then QnABot will default to this query method. 
+- **KendraFAQ**: Then there is the KendraFAQ method. If the custom parameter `KENDRA_FAQ_INDEX` is set and if that query is supported through the Kendra integration, then QnABot relies on Amazon Kendra's natural language and deep learning models to understand and match a question to an answer. This section walked through setting up this KendraFAQ model.
+- **ElasticSearch Fallback**: If a question does not find any matches through the KendraFAQ method, this integration provides an optional ElasticSearch Fallback which is enabled by default in settings (`KENDRA_FAQ_ES_FALLBACK`).
+- **Kendra Fallback**: Finally, if no matches are found to a curated question, then QnABot has the ability to search through documents uploaded to a Kendra index via the Kendra Fallback engine. This extension must first be loaded in and then enabled through the `ALT_SEARCH_KENDRA_INDEXES` setting. Part 2 below covers how to launch this mode.
+
+Turning on the `ENABLE_DEBUG_RESPONSES` parameter in settings will allow you to see which source generated a QnABot response.
+
+
+### Limitations of the Kendra FAQ integration
 The Kendra integration is currently a Beta feature for you to try. As the Kendra service develops frameworks to support similar use cases, its capabilities will continue changing. For this reason, here we document the limitations and current functions here.
 
 **Query Throttling Rates**
@@ -140,7 +150,7 @@ What if you want to ask the QnABot a question that is not present in the FAQs bu
 5. Browse for your S3 bucket to enter its location.
 6. Choose the recommended *Create new role* for the IAM role and provide a name like *kendra-s3-qnabot-access*.
 
-<img src="./kendra_role.png?raw=true" width="700" height="150">
+<img src="./kendra_role.png?raw=true" width="800" height="150">
 
 7. You can choose how freqeuntly to sync this data source with the Kendra index. If you will be updating content frequently, perhaps select a periodic option. Else, go with our *Run on demand* default.
 
