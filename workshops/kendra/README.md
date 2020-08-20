@@ -1,10 +1,10 @@
 # Kendra Integration
 
-
+There are 2 use cases of the Kendra integration. This tutorial covers both parts. The first uses Kendra's FAQ model to improve QnABot's understanding of human language and find better matches to questions. The second covers the Kendra Fallback engine which performs searches over documents in Kendra to extract answers for unanticipated questions.
 
 ## Section 1: Kendra FAQ
 
-### Simple example
+### Economics class example
 
 QnABot now offers a new machine-learning based query method based on Amazon Kendra to improve question-matching accuracies and reduce the tuning workload. Let's try a simple example to illustrate the concept:
 
@@ -109,7 +109,7 @@ QID: bus.1
 
 ## Section 2: Kendra Fallback Search
 
-### Simple example
+### Solar-facts example
 
 QnABot now offers a new machine-learning based query method based on Amazon Kendra to improve question-matching accuracies and reduce the tuning workload. Let's try a simple example to illustrate the concept:
 
