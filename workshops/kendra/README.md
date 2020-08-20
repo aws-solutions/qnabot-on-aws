@@ -10,24 +10,38 @@ QnABot now offers a new machine-learning based query method based on Amazon Kend
 
 #### Part 1: See the limitations of ElasticSearch
 
+Open the QnABot designer console. You can find the link to the 'ContentDesignerURL' under the Outputs tab of the launched CloudFormation template. If you do not know your login, you should have received an email once the template finished creating with a temporary password. The default username is 'Admin'.
+    
+<img src="./cftemplate_designer_url.png?raw=true" width="350" height="400">
+
 1. Add the following question to your designer console:
 
-    QID: econ.1
+    QID: *econ.1*
   
-    Question: "What are the main goals of an economy?" 
+    Question: *What are the main goals of an economy?*
   
-    Answer: "All economies in the world try to achieve 3 things: Growth, High employment"
+    Answer: *All economies in the world try to achieve 3 things: Growth, High employment*
     
-2. Try this question out in the QnABot client. 
-3. Then, try out a different phrasing: "What main objectives do economies try to achieve?" 
+    <img src="./designer_add_button.png?raw=true" width="650" height="150">
+        
+2. Try this question out in the QnABot client.
+
+<img src="./qnabot_tools_menu.png?raw=true" width="300" height="100"> 
+
+<img src="./qnabot_tools_open_client.png?raw=true" width="200" height="450"> 
+
+3. Then, try out a different phrasing: *What main objectives do economies try to achieve?*
 
 You'll find that the ElasticSearch based QnABot does not know that these two questions mean the same thing. We're going to see how Amazon Kendra can address this limitation.
 
 #### Part 2: Create an Amazon Kendra index
 
 1. Go to [Amazon Kendra](http://console.aws.amazon.com/kendra) and click on **Create Index** in the top right corner.
-2. Provide an *Index name* and optional *Description*.
-3. Choose the recommended *Create a new role* for the IAM role and provide a name like *explore-qnabot*.
+2. Provide an *Index name* like *explore-qnabot* and optional *Description*.
+3. Choose the recommended *Create a new role* for the IAM role and provide a name like *qnabot-idx-role*.
+
+<img src="./create_kendra_idx_opts.png?raw=true" width="500" height="450">
+
 4. Press **Next**. Decide if you want the Enterprise or Developer edition. 
 
     Kendra's Free Tier of usage provides the Developer edition for free usage of up to 750 hours for the first 30 days. Both editions have a query rate that is strictly enforced at 0.5 queries/second. The Enterprise edition provides the option to increase this limit for additional cost. The Developer edition cannot increase query capacity. For more information on pricing details, go to [https://aws.amazon.com/kendra/pricing/](https://aws.amazon.com/kendra/pricing/).
@@ -38,6 +52,11 @@ You'll find that the ElasticSearch based QnABot does not know that these two que
 #### Part 3: Set up KendraFAQ in the designer console
 
 1. Log in to the Content Designer, and go to settings. Scroll down until you see the field *KENDRA_FAQ_INDEX*.
+
+<img src="./qnabot_tools_open_settings.png?raw=true" width="200" height="450">
+
+<img src="./qnabot_settings_kendra_idx.png?raw=true" width="400" height="150">
+
 2. Enter your Kendra index ID copied from the Kendra console.
 
 <img src="./kendra_console_readme.png?raw=true" width="250" height="300">
@@ -105,15 +124,15 @@ The Kendra integration is currently a Beta feature for you to try. As the Kendra
 ### Additional Question-Matching Examples  
 These are addional example questions where the new phrasing fails to find a match using ElasticSearch, but succeeds with the Kendra integration.
 
-QID: solar.1
-- Question: How old is the sun?
-- Answer: Our sun is 4.6 billion years old.
-- New phrasing: What is the age of the sun?
+QID: *solar.1*
+- Question: *How old is the sun?*
+- Answer: *Our sun is 4.6 billion years old.*
+- New phrasing: *What is the age of the sun?*
 
 QID: bus.1
-- Question: What are the main functions of management?
-- Answer: There are 4 main functions of management: planning, organizing, directing, and controlling.
-- New phrasing: What main operations does management fulfill?
+- Question: *What are the main functions of management?*
+- Answer: *There are 4 main functions of management: planning, organizing, directing, and controlling.*
+- New phrasing: *What main operations does management fulfill?*
 
 
 
@@ -131,8 +150,15 @@ What if you want to ask the QnABot a question that is not present in the FAQs bu
 2. Create an S3 bucket and allow objects to be public read.
 
     a. In the S3 console, click on **Create bucket** and entire a *Bucket name* such as qnabot-docs. Press **Next** until you get to *Set permissions* (Step 3).
-
+    
+    <img src="./s3_create_bucket.png?raw=true" width="300" height="100">
+    
+    
+    <img src="./s3_create_bucket_step1.png?raw=true" width="500" height="300">
+    
     b. **Uncheck** the box which states *Block all public access* and then mark the checkbox to acknowledge the statement.
+    
+    <img src="./s3_create_bucket_step3.png?raw=true" width="500" height="300">
     
     c. Press **Next** until you **Create** the bucket.
     
@@ -141,6 +167,8 @@ What if you want to ask the QnABot a question that is not present in the FAQs bu
     - [solar_mysteries_book.pdf](./solar_mysteries_book.pdf)
 
     - [sun_lithograph.pdf](./sun_lithograph.pdf)
+    
+    <img src="./s3_bucket_upload.png?raw=true" width="400" height="100">    
 
 3. Go to the Kendra console and select your index. Click on the **Step 2. Add data sources** button and select the Amazon S3 Connector.
 
@@ -171,7 +199,13 @@ What if you want to ask the QnABot a question that is not present in the FAQs bu
 
 3. Save the settings and return to the home page of the web interface.
 4. Go to the **Import** tool from the designer console and open the drop down Examples/Extensions menu.
+
+<img src="./qnabot_tools_open_settings.png?raw=true" width="200" height="450">
+
 5. Load the KendraFallback extension and wait for it to complete. Return to the home page of the designer console. This loads a new question with a QID of "KendraFallback".
+
+<img src="./load_kendrafallback_ext.png?raw=true" width="900" height="100">
+
 6. Edit this question in the Designer and change its question text from "no_hits_alternative" to your current ES_NO_HITS_QUESTION (most likely it will be "no_hits") and save the changes. You can find this phrase in your settings parameters.
 7. If you have previously loaded the QnAUtility.json from Examples/Extensions you need to either remove the question with the ID "CustomNoMatches" or change the question for this ID from your current ES_NO_HITS_QUESTION (e.g. "no_hits") to "no_hits_alt".
 
@@ -187,14 +221,14 @@ There are a couple different types of responses from the KendraFallback engine.
 #### Top answer
 For some queries, Kendra is able to find an answer in the uploaded documents with a very high confidence and yields a 'top answer' phrase. QnABot takes the Kendra results and shortens its response to only contain this phrase and the source link. 
 
-For example, ask QnABot **"When did Galileo first see sunspots?"** or **"How many regions does the sun have?"** and take a look at the concise response returned. 
+For example, ask QnABot *When did Galileo first see sunspots?* or *How many regions does the sun have?* and take a look at the concise response returned. 
 
 If you are interacting through a voice channel (such as an Echo or via the microphone on the bottom right of the web interface), QnABot will speak this shortened answer instead of the full text extract that it was retrieved from.
 
 #### Most relevant phrases with document search
 In other cases, QnABot is able to find a text excerpt that most closely answers the question and it highlights the most relevant phrases of this response. This is returned along with other top results and their source links, enabling QnABot to act like a search engine over the uploaded documents.
 
-Try asking **"What is the composition of the sun?"** to see how QnABot selectively highlights the most important elements of a text extract.
+Try asking *What is the composition of the sun?* to see how QnABot selectively highlights the most important elements of a text extract.
 
 If a highly relevant phrase is identified, then this selective emphasis also applies to the voice response, which will read out the first 2 sentences of the most important highlighted text to provide context to the answer.
 
