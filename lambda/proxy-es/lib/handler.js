@@ -6,13 +6,42 @@ var build_es_query=require('./esbodybuilder');
 var kendra = require('./kendraQuery');
 var AWS=require('aws-sdk');
 
+
+function isJson(str) {
+    try {
+        JSON.parse(str);
+    } catch (e) {
+        return false;
+    }
+    return true;
+}
+
+function str2bool(settings) {
+    var new_settings = _.mapValues(settings, x => {
+        if (_.isString(x)) {
+            if (x.toLowerCase() === "true") {
+                return true ;
+            }
+            if (x.toLowerCase() === "false") {
+                return false ;
+            }
+        }
+        return x;
+    });
+    return new_settings;
+}
+
 async function get_parameter(param_name) {
     var ssm = new AWS.SSM();
     var params = {
         Name: param_name,
     };
     var response = await ssm.getParameter(params).promise();
-    var settings = JSON.parse(response.Parameter.Value); 
+    var settings = response.Parameter.Value
+    if (isJson(settings)) {
+        settings = JSON.parse(response.Parameter.Value);
+        settings = str2bool(settings) ;
+    }
     return settings;
 }
 
@@ -22,14 +51,26 @@ async function get_settings() {
 
     console.log("Getting Default QnABot settings from SSM Parameter Store: ", default_settings_param);
     var default_settings = await get_parameter(default_settings_param);
-    
+
     console.log("Getting Custom QnABot settings from SSM Parameter Store: ", custom_settings_param);
     var custom_settings = await get_parameter(custom_settings_param);
 
     var settings = _.merge(default_settings, custom_settings);
+
     console.log("Merged Settings: ", settings);
-    return settings;    
+
+    if (settings.ENABLE_REDACTING) {
+        console.log("redacting enabled");
+        process.env.QNAREDACT="true";
+        process.env.REDACTING_REGEX=settings.REDACTING_REGEX;
+    } else {
+        console.log("redacting disabled");
+        process.env.QNAREDACT="false";
+        process.env.REDACTING_REGEX="";
+    }
+    return settings;
 }
+
 
 async function get_es_query(event, settings) {
     var question = _.get(event,'question','');
@@ -92,7 +133,7 @@ module.exports= async (event, context, callback) => {
             var response = await run_query_kendra(event, kendra_index);
             // ES fallback if KendraFAQ fails
             var hit = _.get(response, "hits.hits[0]._source");
-            if (!hit && _.get(settings, 'KENDRA_FAQ_ES_FALLBACK', false)==='true') {   // TODO: 'false' evalulates to true so have to check the string value
+            if (!hit && _.get(settings, 'KENDRA_FAQ_ES_FALLBACK', false)){
                 console.log("ES Fallback");
                 response = await run_query_es(event, settings);
             }
