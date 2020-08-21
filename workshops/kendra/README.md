@@ -46,7 +46,7 @@ You'll find that the ElasticSearch based QnABot does not know that these two que
 
     Kendra's Free Tier of usage provides the Developer edition for free usage of up to 750 hours for the first 30 days. Both editions have a query rate that is strictly enforced at 0.5 queries/second. The Enterprise edition provides the option to increase this limit for additional cost. The Developer edition cannot increase query capacity. For more information on pricing details, go to [https://aws.amazon.com/kendra/pricing/](https://aws.amazon.com/kendra/pricing/).
   
-5. **Create** the index and wait for it to become active. **Note that this takes about ~30 minutes to complete**.
+5. **Create** the index and wait for it to become active. **Note that this takes about ~30 minutes to complete. You will NOT be able to move forward in the tutorial before this index has finished creating.**
 
 
 #### Part 3: Set up KendraFAQ in the designer console
