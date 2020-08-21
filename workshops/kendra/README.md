@@ -24,7 +24,7 @@ Open the QnABot designer console. You can find the link to the 'ContentDesignerU
     
     <img src="./designer_add_button.png?raw=true" width="650" height="150">
         
-2. Try this question out in the QnABot client.
+2. Open QnABot client and enter the question "What are the main goals of an economy?"
 
 <img src="./qnabot_tools_menu.png?raw=true" width="300" height="100"> 
 
@@ -115,13 +115,14 @@ Turning on the `ENABLE_DEBUG_RESPONSES` parameter in settings will allow you to 
 The Kendra integration is currently a Beta feature for you to try. As the Kendra service develops frameworks to support similar use cases, its capabilities will continue changing. For this reason, here we document the limitations and current functions here.
 
 **Query Throttling Rates**
-- Kendra by default throttles queries to a rate of 1 query every 2 seconds on average. The Kendra Enterprise indexes allow you to purchase addition query units to increase the throughput. For additional information on adjusting query capacity, see [https://docs.aws.amazon.com/kendra/latest/dg/adjusting-capacity.html](https://docs.aws.amazon.com/kendra/latest/dg/adjusting-capacity.html).
-- If there are many simultaneous users on QnABot at a time, expect there to be significant latency or even failure to execute Kendra queries. The current implementation is optimized to support 10 concurrent users where each user will wait a maximum of 4.5 seconds before receiving a response to their question. 
+
+- Kendra by default throttles queries to a rate of 1 query every 2 seconds on average. If there are many simultaneous users on QnABot at a time, expect there to be significant latency or even failure to execute Kendra queries. The current implementation is optimized to support 10 concurrent users where each user will wait a maximum of 4.5 seconds before receiving a response to their question.
+- The Kendra Enterprise indices allow you to purchase addition query units to increase the throughput to support higher numbers of concurrent users. For additional information on adjusting query capacity, see [https://docs.aws.amazon.com/kendra/latest/dg/adjusting-capacity.html](https://docs.aws.amazon.com/kendra/latest/dg/adjusting-capacity.html).
 - To optimize your QnABot for different numbers of users or use cases, see the fields `KENDRA_FAQ_MAX_RETRIES` and `KENDRA_FAQ_CONFIG_RETRY_DELAY`. They deal with Kendra's in-built exponential delay and retry function in the case that a query times out or is blocked due to too many other simultaneous queries. The first setting sets the maximum number of retries, and the second sets the base number of milliseconds that Kendra delays before retrying a query.
 
 **One-word Questions, Topics, QID Querying**
-- Kendra FAQ currently performs poorly when trying to match a question with only 1 term in it, such as 'help' or 'hello'. For this reason, adding Style and other one-word Custom Don't Know Answers are supported via the optional ElasticSearch fallback engine.
-- Similarly with Topics and QID querying, Kendra does not currently support them and QnABot defaults to ElasticSearch to identify an answer.
+- Kendra FAQ currently does not find matches to single word questions, such as 'help' or 'hello'. QnABot falls back to using ElasticSearch to answer these questions.
+- Kendra does not currently support follow-up questions using Topics. QnABot defaults to using ElasticSearch to identify an answer when a topic is defined.
 
 ### Additional Question-Matching Examples  
 These are addional example questions where the new phrasing fails to find a match using ElasticSearch, but succeeds with the Kendra integration.
@@ -201,7 +202,7 @@ What if you want to ask the QnABot a question that is not present in the FAQs bu
 3. Save the settings and return to the home page of the web interface.
 4. Go to the **Import** tool from the designer console and open the drop down Examples/Extensions menu.
 
-<img src="./qnabot_tools_open_settings.png?raw=true" width="200" height="450">
+<img src="./qnabot_tools_open_import.png?raw=true" width="200" height="450">
 
 5. Load the KendraFallback extension and wait for it to complete. Return to the home page of the designer console. This loads a new question with a QID of "KendraFallback".
 
