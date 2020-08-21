@@ -113,15 +113,21 @@ async function handleRequest(req, res, botName, botAlias) {
 async function processResponse(req, res, hook, msg) {
 
     function indicateFailure(req, res, errmsg) {
-        res.message = errmsg;
-        res.plainMessage = errmsg;
-        _.set(res.session,res.session.elicitResponseNamespace + '.boterror','true');
+        let namespace = _.get(res,'session.qnabotcontext.elicitResponse.namespace', undefined);
+        if (namespace) {
+            _.set(res.session,namespace + '.boterror','true');
+        }
         _.set(res,'session.qnabotcontext.elicitResponse.progress','Failed');
         _.set(res,'session.qnabotcontext.elicitResponse.responsebot',undefined);
-        _.set(res,'session.qnabotcontext.elicitResponse.chainingConfig',undefined);
         _.set(res,'session.qnabotcontext.elicitResponse.namespace',undefined);
         _.set(res,'session.qnabotcontext.elicitResponse.loopCount',0);
         res.card = undefined;
+
+        let chainingConfig = _.get(res,'session.qnabotcontext.elicitResponse.chainingConfig',undefined);
+        if (chainingConfig === undefined) {
+            res.message = errmsg;
+            res.plainMessage = errmsg;
+        }
     }
 
     const maxElicitResponseLoopCount = _.get(req, '_settings.ELICIT_RESPONSE_MAX_RETRIES', 5);
@@ -136,7 +142,7 @@ async function processResponse(req, res, hook, msg) {
         ssmlMessage = botResp.message  ;        
         plainMessage = plainMessage.replace(/<\/?[^>]+(>|$)/g, "");
     }
-    let elicitResponseLoopCount =_.get(res,"session.qnabotcontext.elicitResponse.loopCount");
+    let elicitResponseLoopCount =_.get(res,"session.qnabotcontext.elicitResponse.loopCount", 0);
     if (botResp.dialogState === 'ConfirmIntent') {
         _.set(res,'session.qnabotcontext.elicitResponse.progress','ConfirmIntent');
         res.plainMessage = plainMessage;      
@@ -170,7 +176,7 @@ async function processResponse(req, res, hook, msg) {
         if (elicitResponseLoopCount >= maxElicitResponseLoopCount) {
             indicateFailure(req, res, _.get(req, '_settings.ELICIT_RESPONSE_BOT_FAILURE_MESSAGE', 'Your response was not understood. Please start again.'));
         } else {
-            _.set(res,'session.qnabotcontext.elicitResponse.progress',botResp.dialogState);
+            _.set(res,'session.qnabotcontext.elicitResponse.progress','ErrorHandling');
             res.message = elicit_Response_Retry_Message;
             res.plainMessage = elicit_Response_Retry_Message;
             res.card = undefined;
