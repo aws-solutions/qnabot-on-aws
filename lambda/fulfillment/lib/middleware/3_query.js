@@ -53,7 +53,7 @@ module.exports=async function query(req,res) {
         console.log('Handling elicitResponse');
         let resp = await lexRouter.elicitResponse(req,res, elicitResponse);
         let progress = _.get(resp,"res.session.qnabotcontext.elicitResponse.progress", undefined);
-        if (progress === 'Fulfilled' || progress === 'ReadyForFulfillment') {
+        if (progress === 'Fulfilled' || progress === 'ReadyForFulfillment' || progress === 'Failed') {
             console.log("Bot was fulfilled");
             // LexBot has completed. See if we need to using chaining to go to another question
             if (chainingConfig) {
@@ -126,7 +126,8 @@ module.exports=async function query(req,res) {
         _.set(postQuery,'res.session.qnabotcontext.elicitResponse.responsebot',responsebot_hook)
         _.set(postQuery,'res.session.qnabotcontext.elicitResponse.namespace',responsebot_session_namespace)
         _.set(postQuery,'res.session.qnabotcontext.elicitResponse.chainingConfig',chaining_configuration)
-        _.set(postQuery.res.session, postQuery.res.session.elicitResponseNamespace + ".boterror", undefined );
+        _.set(postQuery.res.session, responsebot_session_namespace + ".boterror", undefined );
+        _.set(postQuery.res.session, responsebot_session_namespace, {} );
     }
 
     console.log("Standard path return from 3_query: " + JSON.stringify(postQuery, null, 2));
