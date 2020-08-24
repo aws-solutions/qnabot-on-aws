@@ -17,6 +17,7 @@ module.exports={
             id:exportfile,
             index:{"Ref":"VarIndex"},
             encryption:{"Ref":"Encryption"},
+            es_endpoint:{"Ref":"EsEndpoint"},
         }
     },
     "PostUpgradeImportMetrics":{
@@ -29,6 +30,7 @@ module.exports={
             id:exportfile_metrics,
             index:{"Ref":"MetricsIndex"},
             encryption:{"Ref":"Encryption"},
+            es_endpoint:{"Ref":"EsEndpoint"},
         }
     },
     "PostUpgradeImportFeedback":{
@@ -41,6 +43,7 @@ module.exports={
             id:exportfile_feedback,
             index:{"Ref":"FeedbackIndex"},
             encryption:{"Ref":"Encryption"},
+            es_endpoint:{"Ref":"EsEndpoint"},
         }
     },
 }
