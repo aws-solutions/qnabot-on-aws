@@ -9,6 +9,7 @@ async function get_parameter(param_name) {
     var ssm = new AWS.SSM();
     var params = {
         Name: param_name,
+        WithDecryption: true
     };
     var response = await ssm.getParameter(params).promise();
     var settings = JSON.parse(response.Parameter.Value); 

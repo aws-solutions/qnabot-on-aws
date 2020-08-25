@@ -79,6 +79,7 @@ module.exports={
         const ssm = new aws.SSM({region:context.rootState.info.region})
         const query = {
             Names: [customParams, defaultParams],
+            WithDecryption:true,
         }
         var response = await getParameters(ssm, query);
         return response;
