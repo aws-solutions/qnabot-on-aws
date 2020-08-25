@@ -1,3 +1,5 @@
+## [4.2.1]
+- Return Error if Lex inputTranscript is an empty string or not present. Processing an empty inputTranscript produces other downstream failure.
 ## [4.2.0]
 - New Kendra FAQ support (Beta version) using the setting KENDRA_FAQ_INDEX. New menu item in Designer UI to export Questions as a Kendra FAQ. See revised Blog Post for details.
 - New GetSessionAttribute Handlebars helper to obtain session attribute. Works similar to lodash get(). Will not through exception and will return a default value.
