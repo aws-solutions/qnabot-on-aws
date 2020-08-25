@@ -2,6 +2,7 @@ import boto3
 import argparse
 import json
 import base64
+import sys
 
 
 parser = argparse.ArgumentParser(description='Uses a specified CMK to encrypt QnABot Lambdas and Parameter Store settings')
@@ -17,11 +18,11 @@ s3_client = boto3.client('s3')
 
 args = type('', (), {})()
 
-if __name__ != "__main__":
+if len(sys.argv) != 0:
     args = parser.parse_args()
 else:
-    args.stack_arn = 'QNA-dev-dev-master-4'
-    args.cmk_arn = "arn:aws:kms:us-east-1:471804106294:key/71bd2c26-b9f8-4953-9dbe-fbcfe8bd5573"
+    args.stack_arn = 'QnaBot-JohnDoe'
+    args.cmk_arn = "arn:aws:kms:us-east-1:12345677:key/aaaaa-bbbb-ccccc-ddddd"
 
 policy_document = {
     "Version":"2012-10-17",
