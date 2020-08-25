@@ -10,6 +10,7 @@ DEVBUCKET=$( echo $OUTPUT | $__dirname/json.js Bucket)
 PREFIX=$( echo $OUTPUT | $__dirname/json.js Prefix)
 REGION=$AWS_DEFAULT_REGION
 
+echo $DEVBUCKET
 
 PUBLICBUCKET=$(node -e "console.log(require('$__dirname'+'/../config').publicBucket)")
 PUBLICPREFIX=$(node -e "console.log(require('$__dirname'+'/../config').publicPrefix)")
