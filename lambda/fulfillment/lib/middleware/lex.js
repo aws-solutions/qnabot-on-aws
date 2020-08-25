@@ -1,23 +1,28 @@
 var _=require('lodash')
 exports.parse=async function(req){
     var event = req._event;
-    var out={
-        _type:"LEX",
-        _userId:_.get(event,"userId","Unknown Lex User"),
-        question:_.get(event,'inputTranscript'),
-        session:_.mapValues(
-            _.get(event,'sessionAttributes',{}),
-            x=>{
-                try {
-                    return JSON.parse(x)
-                } catch(e){
-                    return x
+    if (event.inputTranscript === undefined || event.inputTranscript === "") {
+        // trap invalid input from Lex and and return an error if there is no inputTranscript.
+        throw new Error("No inputTranscript provided.");
+    } else {
+        var out = {
+            _type: "LEX",
+            _userId: _.get(event, "userId", "Unknown Lex User"),
+            question: _.get(event, 'inputTranscript'),
+            session: _.mapValues(
+                _.get(event, 'sessionAttributes', {}),
+                x => {
+                    try {
+                        return JSON.parse(x)
+                    } catch (e) {
+                        return x
+                    }
                 }
-            }
-        ),
-        channel:_.get(event,"requestAttributes.'x-amz-lex:channel-type'")
+            ),
+            channel: _.get(event, "requestAttributes.'x-amz-lex:channel-type'")
+        }
+        return out;
     }
-    return out;
 }
 
 exports.assemble=function(request,response){
