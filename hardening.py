@@ -5,6 +5,7 @@ import base64
 import sys
 
 
+
 parser = argparse.ArgumentParser(description='Uses a specified CMK to encrypt QnABot Lambdas and Parameter Store settings')
 parser.add_argument("stack_arn", help="the arn of the QnABot CloudFormation Stack")
 parser.add_argument("cmk_arn", help="the ARN of the Customer Master Key to use for encryption")
@@ -15,14 +16,16 @@ kms_client = boto3.client("kms")
 cloudformation_client = boto3.client('cloudformation')
 ssm_client = boto3.client('ssm')
 s3_client = boto3.client('s3')
+ddb_client = boto3.client('dynamodb')
+
 
 args = type('', (), {})()
 
-if len(sys.argv) != 0:
+if len(sys.argv) != 1:
     args = parser.parse_args()
 else:
-    args.stack_arn = 'QnaBot-JohnDoe'
-    args.cmk_arn = "arn:aws:kms:us-east-1:12345677:key/aaaaa-bbbb-ccccc-ddddd"
+    args.stack_arn = "QnaBotVPC4"
+    args.cmk_arn = "arn:aws:kms:us-east-1:123456778:key/aaaaa-bbbb-cccc-dddd-eeeee"
 
 policy_document = {
     "Version":"2012-10-17",
@@ -87,7 +90,7 @@ def process_stacks(stackname):
             parameter_value = parameter_response['Parameter']['Value']
             description = parameter_response['Parameter']["Description"] if "Decription" in parameter_response['Parameter'] else ""
 
-            ssm_response = ssm_client.put_parameter(
+            ssm_client.put_parameter(
                     Name=parameter_name,
                     Description=description,
                     Value=parameter_value,
@@ -99,7 +102,7 @@ def process_stacks(stackname):
 
         s3_buckets = filter(lambda x: x["ResourceType"] == "AWS::S3::Bucket",response["StackResourceSummaries"])
         for bucket in s3_buckets:
-            response = s3_client.put_bucket_encryption(
+            s3_client.put_bucket_encryption(
                         Bucket=bucket["PhysicalResourceId"],
                         ServerSideEncryptionConfiguration={
                             'Rules': [
@@ -113,6 +116,18 @@ def process_stacks(stackname):
                                 }
                             )
             print(f"Encryption set for {bucket['PhysicalResourceId']}")
+
+        ddb_tables = filter(lambda x: x["ResourceType"] == "AWS::DynamoDB::Table",response["StackResourceSummaries"])
+        for table in ddb_tables:
+            ddb_client.update_table(
+                TableName = table["PhysicalResourceId"],
+                SSESpecification ={
+                    'Enabled': True,
+                    'SSEType': 'KMS',
+                    'KMSMasterKeyId': args.cmk_arn
+                }
+            )
+
 
 process_stacks(args.stack_arn)
 
