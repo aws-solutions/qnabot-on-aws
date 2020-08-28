@@ -39,7 +39,20 @@ module.exports={
         var result=await context.dispatch('_request',{
             url:`${info._links.exports.href}/${opts.name}`,
             method:'put',
-            body:opts.filter ? {filter:`${opts.filter}.*`} : {}
+            body:opts.filter ? {filter:`${opts.filter}.*`, prefix:''} : {prefix:''}
+        })
+    },
+    startKendraSyncExport:async function(context,opts){
+        console.log("Entering startKendraSyncExport function");
+        var info=await context.dispatch('_request',{
+            url:context.rootState.info._links.jobs.href,
+            method:'get'
+        })
+
+        var result=await context.dispatch('_request',{
+            url:`${info._links.exports.href}/${opts.name}`,
+            method:'put',
+            body:opts.filter ? {filter:`${opts.filter}.*`, prefix:'kendra-'} : {prefix:'kendra-'}
         })
     },
     downloadExport:async function(context,opts){
@@ -93,7 +106,14 @@ module.exports={
             method:'get'
         })
     },
+    getExportByJobId(context,id){
+        return context.dispatch('_request',{
+            url:context.rootState.info._links.jobs.href + '/exports/' + id,
+            method:'get'
+        })
+    },
     deleteExport(context,opts){
+        console.log(`delete export opts: ${JSON.stringify(opts, null, 2)}`);
         return context.dispatch('_request',{
             url:opts.href,
             method:'delete'

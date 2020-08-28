@@ -3,7 +3,33 @@ var Promise=require('bluebird');
 var request=require('./request');
 var _=require('lodash');
 var build_es_query=require('./esbodybuilder');
+var kendra = require('./kendraQuery');
 var AWS=require('aws-sdk');
+
+
+function isJson(str) {
+    try {
+        JSON.parse(str);
+    } catch (e) {
+        return false;
+    }
+    return true;
+}
+
+function str2bool(settings) {
+    var new_settings = _.mapValues(settings, x => {
+        if (_.isString(x)) {
+            if (x.toLowerCase() === "true") {
+                return true ;
+            }
+            if (x.toLowerCase() === "false") {
+                return false ;
+            }
+        }
+        return x;
+    });
+    return new_settings;
+}
 
 async function get_parameter(param_name) {
     var ssm = new AWS.SSM();
@@ -12,7 +38,11 @@ async function get_parameter(param_name) {
         WithDecryption: true
     };
     var response = await ssm.getParameter(params).promise();
-    var settings = JSON.parse(response.Parameter.Value); 
+    var settings = response.Parameter.Value
+    if (isJson(settings)) {
+        settings = JSON.parse(response.Parameter.Value);
+        settings = str2bool(settings) ;
+    }
     return settings;
 }
 
@@ -22,17 +52,28 @@ async function get_settings() {
 
     console.log("Getting Default QnABot settings from SSM Parameter Store: ", default_settings_param);
     var default_settings = await get_parameter(default_settings_param);
-    
+
     console.log("Getting Custom QnABot settings from SSM Parameter Store: ", custom_settings_param);
     var custom_settings = await get_parameter(custom_settings_param);
 
     var settings = _.merge(default_settings, custom_settings);
+
     console.log("Merged Settings: ", settings);
-    return settings;    
+
+    if (settings.ENABLE_REDACTING) {
+        console.log("redacting enabled");
+        process.env.QNAREDACT="true";
+        process.env.REDACTING_REGEX=settings.REDACTING_REGEX;
+    } else {
+        console.log("redacting disabled");
+        process.env.QNAREDACT="false";
+        process.env.REDACTING_REGEX="";
+    }
+    return settings;
 }
 
-async function get_es_query(event) {
-    var settings = await get_settings();
+
+async function get_es_query(event, settings) {
     var question = _.get(event,'question','');
     if (question.length > 0) {
         var query_params = {
@@ -54,25 +95,62 @@ async function get_es_query(event) {
     }
 }
 
-module.exports= (event, context, callback) => {
+
+
+async function run_query_es(event, settings) {
+    console.log("ElasticSearch Query",JSON.stringify(es_query,null,2));
+    var es_query = await get_es_query(event, settings);
+    var es_response = await request({
+        url:Url.resolve("https://"+event.endpoint,event.path),
+        method:event.method,
+        headers:event.headers,
+        body:es_query 
+    });
+    return es_response;
+}
+
+
+async function run_query_kendra(event, kendra_index) {
+    console.log("Kendra FAQ Query index:" + kendra_index);
+    var request_params = {
+        kendra_faq_index:kendra_index,
+        input_transcript:event.question,
+        size:10 // limit kendra hits to 10 max to avoid pagination issues
+    }
+    var kendra_response = await kendra.handler(request_params);
+    return kendra_response;
+}
+
+
+
+
+module.exports= async (event, context, callback) => {
     console.log('Received event:', JSON.stringify(event, null, 2));
-    return(Promise.resolve(get_es_query(event)))
-    .then( function(es_query) {
-        console.log("ElasticSearch Query",JSON.stringify(es_query,null,2));
-        return request({
-            url:Url.resolve("https://"+event.endpoint,event.path),
-            method:event.method,
-            headers:event.headers,
-            body:es_query 
-        });
-    })
-    .tap(x=>console.log(JSON.stringify(x)))
-    .tapCatch(x=>console.log(x))
-    .then(result=>callback(null,result))
-    .catch(error=>callback(JSON.stringify({
-        type:error.response.status===404 ? "[NotFoud]" : "[InternalServiceError]",
-        status:error.response.status,
-        message:error.response.statusText,
-        data:error.response.data
-    })));
-};
+    try {
+        var settings = await get_settings();
+        var kendra_index = _.get(settings, "KENDRA_FAQ_INDEX")
+        var question = _.get(event,'question','');
+        if (question.length > 0 && kendra_index != "") {
+            var response = await run_query_kendra(event, kendra_index);
+            // ES fallback if KendraFAQ fails
+            var hit = _.get(response, "hits.hits[0]._source");
+            if (!hit && _.get(settings, 'KENDRA_FAQ_ES_FALLBACK', false)){
+                console.log("ES Fallback");
+                response = await run_query_es(event, settings);
+            }
+        } else {
+            var response = await run_query_es(event, settings);
+        }
+        
+        console.log("Query response: ", JSON.stringify(response,null,2));
+        return callback(null, response);
+    } catch (error) {
+        console.log(`error is ${JSON.stringify(error, null,2)}`);
+        return callback(JSON.stringify({
+            type:error.response.status===404 ? "[NotFound]":"[InternalServiceError]",
+            status:error.response.status,
+            message:error.response.statusText,
+            data:error.response.data
+        }))
+    }
+}

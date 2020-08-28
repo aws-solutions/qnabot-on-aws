@@ -59,7 +59,8 @@ module.exports={
           "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
           "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole",
           "arn:aws:iam::aws:policy/AWSXRayDaemonWriteAccess",
-          {"Ref":"EsPolicy"}
+          {"Ref":"EsPolicy"},
+          {"Ref":"QueryPolicy"}
         ]
       }
     }

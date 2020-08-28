@@ -15,6 +15,8 @@ module.exports={
                 "VPCSubnetIdList" : { "Fn::Join" : [ ",", {"Ref":"VPCSubnetIdList"} ] },
                 "VPCSecurityGroupIdList": { "Fn::Join" : [ ",", {"Ref":"VPCSecurityGroupIdList"} ] },
                 "XraySetting":{"Ref": "XraySetting"},
+                "DefaultQnABotSettings":{"Ref":"DefaultQnABotSettings"},
+                "CustomQnABotSettings":{"Ref":"CustomQnABotSettings"},
             }
         }
     }

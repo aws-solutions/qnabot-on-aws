@@ -268,7 +268,7 @@ module.exports={
           "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole",
           "arn:aws:iam::aws:policy/AWSXRayDaemonWriteAccess",
           "arn:aws:iam::aws:policy/TranslateReadOnly",
-          {"Ref":"EsPolicy"},
+          {"Ref":"QueryPolicy"},
           "arn:aws:iam::aws:policy/AmazonLexFullAccess"
         ],
         "Policies": [
@@ -351,7 +351,7 @@ module.exports={
         ]
       }
     },
-    "EsPolicy": {
+    "QueryPolicy": {
       "Type": "AWS::IAM::ManagedPolicy",
       "Properties": {
         "PolicyDocument": {
@@ -363,8 +363,15 @@ module.exports={
                 "es:*"
               ],
               "Resource":["*"]
-            },
-            {
+            },{
+              "Effect": "Allow",
+              "Action": [
+                "kendra:Query"
+              ],
+              "Resource":[
+                {"Fn::Sub":"arn:aws:kendra:${AWS::Region}:${AWS::AccountId}:index/*"},
+              ]
+            },{
                 "Effect": "Allow",
                 "Action": ["s3:Get*"],
                 "Resource":[

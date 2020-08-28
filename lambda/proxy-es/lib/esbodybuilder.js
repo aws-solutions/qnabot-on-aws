@@ -5,6 +5,18 @@ var get_keywords=require('./keywords');
 var _=require('lodash');
 
 
+function build_qid_query(params) { 
+    console.log("Build_qid_query - params: ",JSON.stringify(params,null,2));
+    var query=bodybuilder()
+            .orQuery('match','qid',params.qid)
+            .from(0)
+            .size(1)
+            .build();
+    console.log("ElasticSearch Query",JSON.stringify(query,null,2));
+    return new Promise.resolve(query);
+}
+
+
 function build_query(params) {
     console.log("Build_query - params: ",JSON.stringify(params,null,2));
     return(get_keywords(params))
@@ -56,7 +68,14 @@ function build_query(params) {
 
 
 module.exports=function(params){
-    return build_query(params);
+    // if question starts with "QID::" then build a Qid targeted query, else build question matching query.
+    if (params.question.toLowerCase().startsWith("qid::")) {
+        // question specifies targeted Qid
+        params.qid = params.question.split("::")[1] ;
+        return build_qid_query(params);
+    } else {
+        return build_query(params);
+    }
 };
 
 

@@ -5,11 +5,12 @@
   "author": "SAM CLI",
   "license": "MIT",
   "dependencies": {
-    "aws-sdk": "^2.585.0"
+    "aws-sdk": "^2.585.0",
+    "lodash": "^4.17.20"
   },
   "repository": {},
   "devDependencies": {
-    "mocha": "^8.0.1"
+    "mocha": "^8.1.1"
   },
   "scripts": {
     "test": "mocha"

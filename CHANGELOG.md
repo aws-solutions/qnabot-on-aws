@@ -1,3 +1,19 @@
+## [4.2.2]
+- Fix KendraFallback Lambda Function lodash dependency
+## [4.2.1]
+- Return Error if Lex inputTranscript is an empty string or not present. Processing an empty inputTranscript produces other downstream failure.
+## [4.2.0]
+- New Kendra FAQ support (Beta version) using the setting KENDRA_FAQ_INDEX. New menu item in Designer UI to export Questions as a Kendra FAQ. See revised Blog Post for details.
+- New GetSessionAttribute Handlebars helper to obtain session attribute. Works similar to lodash get(). Will not through exception and will return a default value.
+- Enhanced handlebars to support string concatenation including handlevar 'variables' like Session Attributes and UserInfo, etc. Use case, e.g. to build a url containing a users email, eg a google calendar URL. Example of syntax now supported - in this case to dynamically build a personalized URL based on user info. {{setSessionAttr 'link' 'https://calendar.google.com/calendar/embed?src=' UserInfo.Email '&ctz=America%2FNew_York'}}
+- Moved 'previous' and 'navigation' session attributes under a new 'qnabotcontext' session attribute so that Connect (and other) clients have fewer session attributes to preserve.
+- Allows Chaining rule Lambda function to return a modified session object in addition to the string for chaining.
+- Allows Chaining of up to 10 documents. Each document's Lambda hooks will also be invoked in sequence if defined.
+- Added a new Repeat QID in the QNAUtility example package. Allows QnABot to easily repeat the last answer.  
+- Allow the chaining rule to specify a specific QID rather than an answer. A QID can be specified in the chaining rule by using string such as QID::<qid> e.g. QID::Admin.001. Note, the new QID::<qid> syntax can also be used from the webUI, say as button values if/when you prefer to target a specific QID (exact query) rather than rely on question matching.
+- Fixed a defect to allow conditional chaining to be invoked after an elicit response bot failure.
+- Upgrades to and installs ElasticSearch 7.7.
+
 ## [4.1.0]
 - Install / Upgrade now supports the option to configure S3 Buckets and Elastic Search cluster using encryption at rest
 - Install / Upgrade now supports the option to require Cognito based user authorization to access the built-in full screen web UI (Public/Private parameter in template) - Public is the default

@@ -140,7 +140,7 @@ module.exports = {
         "arn:aws:iam::aws:policy/AWSXRayDaemonWriteAccess",
         "arn:aws:iam::aws:policy/TranslateReadOnly",
         "arn:aws:iam::aws:policy/ComprehendReadOnly",
-        { "Ref": "EsPolicy" }
+        { "Ref": "QueryPolicy" }
       ],
       "Policies": [
         {

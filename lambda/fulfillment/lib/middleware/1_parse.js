@@ -166,5 +166,9 @@ module.exports = async function parse(req, res) {
             url: ""
         }
     })
+    // ensure res.session.qnabotcontext exists
+    if ( ! _.get(res,"session.qnabotcontext")) {
+        _.set(res,"session.qnabotcontext",{}) ;
+    }
     return { req, res }
 }

@@ -3,13 +3,19 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
-  "scripts": {
-    "test": "nodeunit test.js"
-  },
   "author": "",
   "license": "ISC",
   "dependencies": {
     "bluebird": "^3.5.1",
+    "csv-parser": "^2.3.3",
+    "csv-writer": "^1.6.0",
+    "intercept-stdout": "^0.1.2",
+    "lodash": "^4.17.15",
+    "mocha": "^8.1.1",
+    "save-dev": "0.0.1-security"
+  },
+  "scripts": {
+    "test": "mocha",
     "lodash": "^4.17.19",
     "intercept-stdout": "^0.1.2"
   }

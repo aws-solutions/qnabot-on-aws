@@ -103,6 +103,7 @@ module.exports={
           "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole",
           "arn:aws:iam::aws:policy/AWSXRayDaemonWriteAccess",
           {"Ref":"EsPolicy"},
+          {"Ref":"QueryPolicy"},
           "arn:aws:iam::aws:policy/AmazonLexFullAccess"
         ]
       }

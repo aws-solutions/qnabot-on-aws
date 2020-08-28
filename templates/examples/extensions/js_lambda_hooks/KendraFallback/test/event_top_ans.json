@@ -16,8 +16,8 @@
                         "kendraResultId":"09c519d4-4b9a-4355-a586-e25e64285c4f-3527f152-b335-4619-a934-b5d7eecd1982",
                         "kendraResponsibleQid": "KendraFallback"
                     }
-                }
-                "userDetectedLocale": "en",
+                },
+                "userDetectedLocale": "en"
             },
             "requestAttributes": null,
             "bot": {
