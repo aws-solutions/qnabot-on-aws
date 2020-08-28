@@ -1,3 +1,5 @@
+## [4.2.2]
+- Fix KendraFallback Lambda Function lodash dependency
 ## [4.2.1]
 - Return Error if Lex inputTranscript is an empty string or not present. Processing an empty inputTranscript produces other downstream failure.
 ## [4.2.0]
