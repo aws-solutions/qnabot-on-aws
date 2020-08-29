@@ -18,6 +18,7 @@ function isJson(str) {
 function str2bool(settings) {
     var new_settings = _.mapValues(settings, x => {
         if (_.isString(x)) {
+            x = x.replace(/^"(.+)"$/,'$1');  // remove wrapping quotes
             if (x.toLowerCase() === "true") {
                 return true ;
             }
@@ -30,13 +31,14 @@ function str2bool(settings) {
     return new_settings;
 }
 
+
 async function get_parameter(param_name) {
     var ssm = new AWS.SSM();
     var params = {
         Name: param_name,
     };
     var response = await ssm.getParameter(params).promise();
-    var settings = response.Parameter.Value
+    var settings = response.Parameter.Value ;
     if (isJson(settings)) {
         settings = JSON.parse(response.Parameter.Value);
         settings = str2bool(settings) ;

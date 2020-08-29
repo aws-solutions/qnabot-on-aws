@@ -25,6 +25,23 @@ function isJson(str) {
     return true;
 }
 
+function str2bool(settings) {
+    var new_settings = _.mapValues(settings, x => {
+        if (_.isString(x)) {
+            x = x.replace(/^"(.+)"$/,'$1');  // remove wrapping quotes
+            if (x.toLowerCase() === "true") {
+                return true ;
+            }
+            if (x.toLowerCase() === "false") {
+                return false ;
+            }
+        }
+        return x;
+    });
+    return new_settings;
+}
+
+
 /**
  * Function to get parameters from QnABot settings
  * @param param_name
@@ -40,6 +57,7 @@ async function get_parameter(param_name) {
     var settings = response.Parameter.Value
     if (isJson(settings)) {
         settings = JSON.parse(response.Parameter.Value);
+        settings = str2bool(settings) ;
     }
     return settings;
 }
@@ -63,7 +81,7 @@ async function get_settings() {
 
     console.log("Merged Settings: ", settings);
 
-    if (settings.ENABLE_REDACTING.toLowerCase() === "true") {
+    if (settings.ENABLE_REDACTING) {
         console.log("redacting enabled");
         process.env.QNAREDACT="true";
         process.env.REDACTING_REGEX=settings.REDACTING_REGEX;
