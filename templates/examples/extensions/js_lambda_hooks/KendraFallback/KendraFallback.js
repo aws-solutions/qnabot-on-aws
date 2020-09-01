@@ -12,6 +12,7 @@ var _ = require('lodash')
 const AWS = require('aws-sdk');
 let kendraIndexes = undefined;
 
+
 /**
  * Function to query kendraClient and return results via Promise
  * @param kendraClient
@@ -83,6 +84,48 @@ function mergeIntervals(intervals) {
 }
 
 
+function signS3URL(url, expireSecs) {
+    var bucket, key; 
+    if (url.search(/\/s3[.-](\w{2}-\w{4,9}-\d\.)?amazonaws\.com/) != -1) {
+      //bucket in path format
+      bucket = url.split('/')[3];
+      key = url.split('/').slice(4).join('/');
+    }
+    if (url.search(/\.s3[.-](\w{2}-\w{4,9}-\d\.)?amazonaws\.com/) != -1) {
+      //bucket in hostname format
+      let hostname = url.split("/")[2];
+      bucket = hostname.split(".")[0];
+      key = url.split('/').slice(3).join('/');
+    }
+    if (bucket && key) {
+        console.log("Attempt to convert S3 url to a signed URL: ",url);
+        console.log("Bucket: ", bucket, " Key: ", key) ;
+        try {
+            const s3 = new AWS.S3() ;
+            const signedurl = s3.getSignedUrl('getObject', {
+                Bucket: bucket,
+                Key: key,
+                Expires: expireSecs
+            })
+            console.log("Signed URL: ", signedurl);
+            url = signedurl;
+        } catch (err) {
+              console.log("Error signing S3 URL (returning original URL): ", err) ;
+        }
+    } else {
+        console.log("URL is not an S3 url - return unchanged: ",url);
+    }   
+    return url;
+}
+
+// get document name from URL
+// last element of path with any params removed
+function docName(uri) {
+    let x = uri.split("/");
+    let y = x[x.length -1] ;
+    let n = y.split("?")[0] ;
+    return n;
+}
 
 /**
  * Function to return the longest interval from a list of sorted intervals
@@ -208,6 +251,9 @@ async function routeKendraRequest(event, context) {
     let kendraResultId;
     let answerDocumentUris = new Set();
     let helpfulDocumentsUris = new Set();
+    let signS3Urls = _.get(event.req,"_settings.ALT_SEARCH_KENDRA_S3_SIGNED_URLS",true);
+    let expireSeconds = _.get(event.req,"_settings.ALT_SEARCH_KENDRA_S3_SIGNED_URL_EXPIRE_SECS",300);
+
     
     resArray.forEach(function (res) {
         if (res && res.ResultItems.length > 0) {
@@ -259,14 +305,14 @@ async function routeKendraRequest(event, context) {
                         speechMessage = pattern.exec(answerText)[0]
                     }
                     
-                    
-                    answerDocumentUris.add(element.DocumentURI);
+                    // Convert S3 Object URLs to signed URLs
+                    let uri = element.DocumentURI ;
+                    answerDocumentUris.add(uri);
                     kendraQueryId = res.QueryId; // store off the QueryId to use as a session attribute for feedback
                     kendraIndexId = res.originalKendraIndexId; // store off the Kendra IndexId to use as a session attribute for feedback
                     kendraResultId = element.Id; // store off resultId to use as a session attribute for feedback
                     foundAnswerCount++;
-                    
-                    
+
                 } else if (element.Type === 'QUESTION_ANSWER' && foundAnswerCount === 0 && element.AdditionalAttributes &&
                     element.AdditionalAttributes.length > 1) {
                     // There will be 2 elements - [0] - QuestionText, [1] - AnswerText
@@ -354,7 +400,12 @@ async function routeKendraRequest(event, context) {
     if (answerDocumentUris.size > 0) {
         event.res.session.appContext.altMessages.markdown += `\n\n ${helpfulLinksMsg}: `;
         answerDocumentUris.forEach(function (element) {
-            event.res.session.appContext.altMessages.markdown += `[${element}](${element})`;
+            let label = docName(element) ;
+            // Convert S3 Object URLs to signed URLs
+            if (signS3Urls) {
+                element = signS3URL(element, expireSeconds)
+            }
+            event.res.session.appContext.altMessages.markdown += `[${label}](${element})`;
         });
     }
     
@@ -369,7 +420,12 @@ async function routeKendraRequest(event, context) {
                 if (element.text && element.text.length > 0) {
                     event.res.session.appContext.altMessages.markdown += `\n\n  ${element.text}`;
                 }
-                event.res.session.appContext.altMessages.markdown += `\n\n  ${helpfulLinksMsg}: [${element.uri}](${element.uri})`;
+                let label = docName(element.uri) ;
+                // Convert S3 Object URLs to signed URLs
+                if (signS3Urls) {
+                    element.uri = signS3URL(element.uri, expireSeconds)
+                }
+                event.res.session.appContext.altMessages.markdown += `\n\n  ${helpfulLinksMsg}: [${label}](${element.uri})`;
             }
         });
     }
