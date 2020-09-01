@@ -20,6 +20,8 @@ module.exports={
         "EsEndpoint": {"Type":"String"},
         "EsProxyLambda": {"Type":"String"},
         "ExportBucket": {"Type":"String"},
+        "DefaultQnABotSettings": {"Type":"String"},
+        "CustomQnABotSettings": {"Type":"String"},
         "VPCSubnetIdList" : {"Type": "String"},
         "VPCSecurityGroupIdList": {"Type": "String"},
         "XraySetting": {"Type": "String"}
@@ -29,8 +31,5 @@ module.exports={
                 { "Fn::Equals": [ "", { "Ref": "VPCSecurityGroupIdList" } ] }
             ] },
         "XRAYEnabled":{"Fn::Equals":[{"Ref":"XraySetting"},"TRUE"]},
-        "ExportBucket": {"Type":"String"},
-        "DefaultQnABotSettings": {"Type":"String"},
-        "CustomQnABotSettings": {"Type":"String"},
     }
 }
