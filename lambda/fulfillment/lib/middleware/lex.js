@@ -1,17 +1,24 @@
 var _=require('lodash')
 
-function trapIgnoreWords(req, transcript) {
-    const ignoreWords = _.get(req, '_settings.IGNORE_WORDS', 'a,e');
-    if (ignoreWords.length === 0 ||
-        _.get(req,"_event.requestAttributes.x-amz-lex:accept-content-types", undefined) === undefined) {
+// When using QnABot in Amazon Connect call center, filter out 'filler' words that callers sometimes use
+// filler words are defined in setting CONNECT_IGNORE_WORDS
+// If inPutTranscript contains only filler words, return true.
+function isConnectClient(req) {
+    if (_.get(req,"_event.requestAttributes.x-amz-lex:accept-content-types", undefined) === undefined) {
         return false;
     }
-    const ignoreWordsArr = ignoreWords.split(',');
+    return true;
+}
+function trapIgnoreWords(req, transcript) {
+    const ignoreWordsArr = _.get(req, '_settings.CONNECT_IGNORE_WORDS', "").split(',');
+    if (ignoreWordsArr.length === 0 || !isConnectClient(req)) {
+        return false;
+    }
     const wordsInTranscript = transcript.split(' ');
     let trs = "";
-    const wordsLength = wordsInTranscript.length;
-    for (let i = 0; i < wordsLength; i++) {
-        if (!ignoreWords.includes(wordsInTranscript[i])) {
+    const wordCount = wordsInTranscript.length;
+    for (let i = 0; i < wordCount; i++) {
+        if (!ignoreWordsArr.includes(wordsInTranscript[i])) {
             if (trs.length > 0) trs += ' ';
             trs += wordsInTranscript[i];
         }
@@ -27,9 +34,9 @@ exports.parse=async function(req){
     var event = req._event;
     if (event.inputTranscript === undefined || event.inputTranscript === "") {
         // trap invalid input from Lex and and return an error if there is no inputTranscript.
-        throw new Error("No inputTranscript provided.");
+        throw new Error("Error - inputTranscript string is empty.");
     } else if (trapIgnoreWords(req, event.inputTranscript)) {
-        throw new Error("Error - ignoreWord match in inputTranscript.");
+        throw new Error(`Error - inputTranscript contains only words specified in setting CONNECT_IGNORE_WORDS: "${event.inputTranscript}"`);
     } else {
         var out = {
             _type: "LEX",
