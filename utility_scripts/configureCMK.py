@@ -1,4 +1,5 @@
 import boto3
+from botocore.config import Config
 import argparse
 import json
 import base64
@@ -6,28 +7,27 @@ import sys
 
 
 parser = argparse.ArgumentParser(description='Uses a specified CMK to encrypt QnABot Lambdas and Parameter Store settings')
+parser.add_argument("region", help="AWS Region")
 parser.add_argument("stack_arn", help="the arn of the QnABot CloudFormation Stack")
 parser.add_argument("cmk_arn", help="the ARN of the Customer Master Key to use for encryption")
 
-lambda_client = boto3.client('lambda')
-iam_client = boto3.client('iam')
-role_paginator = iam_client.get_paginator('list_role_policies')
-kms_client = boto3.client("kms")
-cloudformation_client = boto3.client('cloudformation')
-ssm_client = boto3.client('ssm')
-s3_client = boto3.client('s3')
-ddb_client = boto3.client('dynamodb')
-sts_client = boto3.client('sts')
-
-
-
 args = type('', (), {})()
 
-if len(sys.argv) != 1:
-    args = parser.parse_args()
-else:
-    args.stack_arn = "QnaBotVPC4"
-    args.cmk_arn = "arn:aws:kms:us-east-1:1234567890:key/aaaaaaa-bbbb-cccc-dddd-123456789"
+args = parser.parse_args()
+
+client_config = Config(
+    region_name = args.region
+)
+
+lambda_client = boto3.client('lambda', config=client_config)
+iam_client = boto3.client('iam', config=client_config)
+role_paginator = iam_client.get_paginator('list_role_policies')
+kms_client = boto3.client("kms", config=client_config)
+cloudformation_client = boto3.client('cloudformation', config=client_config)
+ssm_client = boto3.client('ssm', config=client_config)
+s3_client = boto3.client('s3', config=client_config)
+ddb_client = boto3.client('dynamodb', config=client_config)
+sts_client = boto3.client('sts', config=client_config)
 
 policy_name = "CMKPolicy4"
 policy_document = {
@@ -185,8 +185,7 @@ def process_stacks(stackname):
         ddb_tables = filter(lambda x: x["ResourceType"] == "AWS::DynamoDB::Table",response["StackResourceSummaries"])
         for table in ddb_tables:
             table_description = ddb_client.describe_table(TableName = table["PhysicalResourceId"])
-
-            if('KMSMasterKeyArn' not in table_description["Table"]['SSEDescription'] or  table_description["Table"]['SSEDescription']['KMSMasterKeyArn']!= args.cmk_arn ):
+            if('SSEDescription' not in table_description["Table"] or 'KMSMasterKeyArn' not in table_description["Table"]['SSEDescription'] or  table_description["Table"]['SSEDescription']['KMSMasterKeyArn']!= args.cmk_arn ):
                 ddb_client.update_table(
                     TableName = table["PhysicalResourceId"],
                     SSESpecification ={
@@ -222,25 +221,4 @@ for response in response_iterator:
         process_stacks(stack["PhysicalResourceId"])
 
 put_key_policy(args.stack_arn,cmk_roles_physical_ids)
-
-
-
-
-
-
-
-
-    
-
-
-
-    
-
-
-        
-
-
-
-
-
 
