@@ -1,9 +1,35 @@
 var _=require('lodash')
+
+function trapIgnoreWords(req, transcript) {
+    const ignoreWords = _.get(req, '_settings.IGNORE_WORDS', 'a,e');
+    if (ignoreWords.length === 0 ||
+        _.get(req,"_event.requestAttributes.x-amz-lex:accept-content-types", undefined) === undefined) {
+        return false;
+    }
+    const ignoreWordsArr = ignoreWords.split(',');
+    const wordsInTranscript = transcript.split(' ');
+    let trs = "";
+    const wordsLength = wordsInTranscript.length;
+    for (let i = 0; i < wordsLength; i++) {
+        if (!ignoreWords.includes(wordsInTranscript[i])) {
+            if (trs.length > 0) trs += ' ';
+            trs += wordsInTranscript[i];
+        }
+    }
+    if (trs.trim().length === 0) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
 exports.parse=async function(req){
     var event = req._event;
     if (event.inputTranscript === undefined || event.inputTranscript === "") {
         // trap invalid input from Lex and and return an error if there is no inputTranscript.
         throw new Error("No inputTranscript provided.");
+    } else if (trapIgnoreWords(req, event.inputTranscript)) {
+        throw new Error("Error - ignoreWord match in inputTranscript.");
     } else {
         var out = {
             _type: "LEX",
