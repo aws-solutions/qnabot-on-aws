@@ -6,4 +6,10 @@ than default AES-256 based keys. The configureCMK.py script allows a user to spe
 to encrypt QnABot Lambdas and Parameter Store settings.
 
 Use 
-python3 configureCMK.py <CLOUDFORMATION STACK ARN> <KMS CMK ARN>
+python3 configureCMK.py <aws region> <CLOUDFORMATION STACK NAME> <KMS CMK ARN>
+
+As an example
+
+```
+python3 configureCMK.py us-west-2 QnABotDevStack arn:aws:kms:us-west-2:nnnnnnnnnnnn:key/nnnnnnnn-nnnn-nnnn-nnnn-nnnnnnnnnnnn
+```

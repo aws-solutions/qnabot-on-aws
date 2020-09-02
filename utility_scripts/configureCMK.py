@@ -51,7 +51,9 @@ policy_document = {
 cmk_roles_logical_ids = [
     'S3AccessRole',
     'FirehoseESS3Role',
-    'AdminRole'
+    'AdminRole',
+    'ESProxyLambdaRole',
+    'FulfillmentLambdaRole'
 ]
 
 cmk_roles_physical_ids = []
@@ -105,7 +107,7 @@ def put_key_policy (stackname,roles):
                     "kms:Decrypt",
                     "kms:GenerateDataKey"
                 ],
-                "Resource": "QNA*"
+                "Resource": "*"
             }
         )
 
