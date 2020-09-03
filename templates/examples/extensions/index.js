@@ -63,6 +63,10 @@ module.exports=Object.assign(
                 "SecurityGroupIds": { "Fn::Split" : [ ",", {"Ref": "VPCSecurityGroupIdList"} ] },
             }, {"Ref" : "AWS::NoValue"} ]
         },
+        "TracingConfig" : {
+            "Fn::If": [ "XRAYEnabled", {"Mode": "Active"},
+                {"Ref" : "AWS::NoValue"} ]
+        },
         "Tags":[{
             Key:"Type",
             Value:"CustomResource"
