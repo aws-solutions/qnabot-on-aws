@@ -147,11 +147,12 @@ exports.assemble=function(request,response){
                 content:_.has(response.card,'subTitle')? response.card.subTitle +"\n\n" + response.plainMessage:response.plainMessage
             },
             reprompt: {
-                outputSpeech: {
-                  type: 'PlainText',
-                  text: 'Test Reprompt here',
-                  playBehavior: 'REPLACE_ENQUEUED'            
-                }
+                outputSpeech: _.pickBy({
+                    type:response.reprompt.type,
+                    text:response.reprompt.type==='PlainText' ? response.reprompt.text : null,
+                    ssml:response.reprompt.type==='SSML' ? response.reprompt.text : null,
+                    playBehavior: 'REPLACE_ENQUEUED',
+                })
             },
             shouldEndSession:false
         },
