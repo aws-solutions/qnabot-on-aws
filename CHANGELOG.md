@@ -1,3 +1,8 @@
+## [4.2.4]
+- Add CONNECT_IGNORE_WORDS to settings which allows single character words to be ignored during input to QnABot via Connect. Default is empty string but can be set to an array such as "a,e" such that single character inputTranscript uses the Connect Error branch in Get customer input.
+- Display Kendra document names as the URL and add ability to generate Signed S3 URLs for Kendra document integration. Uses new setting named ALT_SEARCH_KENDRA_S3_SIGNED_URLS. Set this to true to convert Kendra based S3 document URLs to signed urls allowing access.
+- Expose session attributes in the res object as an object such that they are usable in Kibana UI.
+- Fix to ensure a "Test" invocation, when using a topic, always uses ElasticSearch to perform the query. 
 ## [4.2.2]
 - Fix KendraFallback Lambda Function lodash dependency
 ## [4.2.1]
