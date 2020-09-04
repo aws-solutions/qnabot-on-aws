@@ -371,7 +371,8 @@ module.exports = async function (req, res) {
                 alt: {
                     markdown: "*[" + msg + "]*  \n",
                     ssml: "<speak>" + msg + "</speak>"
-                }
+                },
+                rp: "[" + _.get(hit, "rp") + "] "
             };
             hit = merge_next(debug_msg, hit) ;
         };
@@ -399,6 +400,19 @@ module.exports = async function (req, res) {
         }
         tmp.altMessages=_.get(res, "result.alt", {});
         _.set(res, "session.appContext",tmp)
+
+        // Add reprompt 
+        var rp = _.get(res, "result.rp");
+        if (rp) {
+            var type = 'PlainText'
+            
+            if (rp.includes("<speak>")) {
+                type = 'SSML'
+                rp = rp.replace(/<speak>|<\/speak>/g, "");
+                rp = rp.replace(/\r?\n|\r/g, ' ')
+            }
+            _.set(res, "reprompt",{type, text : rp })
+        }
 
         if (req._preferredResponseType == "SSML") {
             if (_.get(res, "result.alt.ssml")) {
