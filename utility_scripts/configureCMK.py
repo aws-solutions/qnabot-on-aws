@@ -52,8 +52,11 @@ cmk_roles_logical_ids = [
     'S3AccessRole',
     'FirehoseESS3Role',
     'AdminRole',
-    'ESProxyLambdaRole',
-    'FulfillmentLambdaRole'
+    'ExportRole',
+    'ImportRole',
+    'ApiGatewayRole',
+    'ESCognitoRole',
+    'KibanaRole',
 ]
 
 cmk_roles_physical_ids = []
@@ -197,8 +200,9 @@ def process_stacks(stackname):
                     }
                 )
 
-        role_resources = filter(lambda x: x["LogicalResourceId"] in cmk_roles_logical_ids, response["StackResourceSummaries"])
+        role_resources = filter(lambda x: 'LambdaRole' in x["LogicalResourceId"] or x["LogicalResourceId"] in cmk_roles_logical_ids , response["StackResourceSummaries"])
         for role_resource in role_resources:
+            print(f"role_resource: {role_resource['PhysicalResourceId']}")
             cmk_roles_physical_ids.append(role_resource["PhysicalResourceId"])
             assign_role(role_resource["PhysicalResourceId"])
 
