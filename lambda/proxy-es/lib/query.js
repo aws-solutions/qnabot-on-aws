@@ -408,7 +408,6 @@ module.exports = async function (req, res) {
             
             if (rp.includes("<speak>")) {
                 type = 'SSML'
-                rp = rp.replace(/<speak>|<\/speak>/g, "");
                 rp = rp.replace(/\r?\n|\r/g, ' ')
             }
             _.set(res, "reprompt",{type, text : rp })
