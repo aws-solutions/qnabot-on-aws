@@ -51,7 +51,7 @@ module.exports={
         rp:{
             type:"string",
             title:"Alexa Reprompt",
-            description:"Enter the Alexa reprompt to returned if the user does not respond. (SSML autodetection)",
+            description:"Enter the Alexa reprompt to returned if the user does not respond. (SSML autodetection with &lt;speak&gt;&lt;/speak&gt;)",
             maxLength:8000,
             propertyOrder: 4
         },
