@@ -28,6 +28,7 @@ ssm_client = boto3.client('ssm', config=client_config)
 s3_client = boto3.client('s3', config=client_config)
 ddb_client = boto3.client('dynamodb', config=client_config)
 sts_client = boto3.client('sts', config=client_config)
+kinesis_client = boto3.client('firehose')
 
 policy_name = "CMKPolicy4"
 policy_document = {
@@ -199,6 +200,22 @@ def process_stacks(stackname):
                         'KMSMasterKeyId': args.cmk_arn
                     }
                 )
+                
+        kinesis_streams = filter(lambda x: x["ResourceType"] == "AWS::KinesisFirehose::DeliveryStream",response["StackResourceSummaries"])
+        for stream in kinesis_streams:
+            stream_response = kinesis_client.describe_delivery_stream(
+                        DeliveryStreamName=stream["PhysicalResourceId"])
+
+            if('KeyType' not in stream_response['DeliveryStreamDescription']['DeliveryStreamEncryptionConfiguration'] 
+                or ( stream_response['DeliveryStreamDescription']['DeliveryStreamEncryptionConfiguration']['KeyType']   != "CUSTOMER_MANAGED_CMK"  
+                and  stream_response['DeliveryStreamDescription']['DeliveryStreamEncryptionConfiguration']['KeyARN'] != args.cmk_arn)):
+
+                kinesis_client.start_delivery_stream_encryption(
+                    DeliveryStreamName=stream["PhysicalResourceId"],
+                    DeliveryStreamEncryptionConfigurationInput={
+                        'KeyARN': args.cmk_arn,
+                        'KeyType': 'CUSTOMER_MANAGED_CMK'})
+
 
         role_resources = filter(lambda x: 'LambdaRole' in x["LogicalResourceId"] or x["LogicalResourceId"] in cmk_roles_logical_ids , response["StackResourceSummaries"])
         for role_resource in role_resources:
