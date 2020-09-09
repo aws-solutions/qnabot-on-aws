@@ -19,6 +19,11 @@ module.exports={
         "VarIndex": {"Type":"String"},
         "EsEndpoint": {"Type":"String"},
         "EsProxyLambda": {"Type":"String"},
-        "ExportBucket": {"Type":"String"}
+        "ExportBucket": {"Type":"String"},
+        "FallbackIntent": {"Type":"String"},
+        "Intent":{"Type":"String"},
+        "BotName":{"Type":"String"},
+        "Api":{"Type":"String"},
+        "ApiRootResourceId":{"Type":"String"}
     }
 }

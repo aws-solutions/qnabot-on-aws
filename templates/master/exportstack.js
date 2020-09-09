@@ -12,6 +12,12 @@ module.exports={
                 "EsEndpoint": {"Fn::GetAtt": ["ESVar", "ESAddress"]},
                 "EsProxyLambda": {"Fn::GetAtt":["ESProxyLambda","Arn"]},
                 "ExportBucket": {"Ref":"ExportBucket"},
+                "FallbackIntent": {"Ref":"IntentFallback"},
+                "Intent":{"Ref":"Intent"},
+                "BotName":{"Ref":"LexBot"},
+                "Api":{"Ref":"API"},
+                "ApiRootResourceId":{"Fn::GetAtt":["API","RootResourceId"]}
+
             }
         }
     }

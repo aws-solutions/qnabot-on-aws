@@ -126,8 +126,24 @@ module.exports={
     }
     }
   ),
+  updated: function () {
+  this.$nextTick(function () {
+
+      var button = document.getElementById("DownloadContactFlow");
+      if(button)
+      {
+        button.onclick = function()
+        {
+          window.location = "https://4tafrs3rwe.execute-api.us-east-1.amazonaws.com/prod/test"
+        }
+      }
+
+    })
+},
+
   created:function(){
     this.$store.dispatch('data/botinfo').catch(()=>null) 
+
   },
   methods:{
     copy:function(btn){
@@ -136,4 +152,5 @@ module.exports={
     }
   } 
 }
+
 </script>
