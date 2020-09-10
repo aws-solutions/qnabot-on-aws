@@ -27,6 +27,9 @@
         "jobs":{
             "href":"$root/jobs"
         },
+        "connect":{
+            "href":"$root/connect"
+        },
         "examples":{
             "href":"$root/examples/documents"
         },

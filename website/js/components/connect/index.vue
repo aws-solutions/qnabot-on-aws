@@ -75,6 +75,7 @@ License for the specific language governing permissions and limitations under th
 var Vuex=require('vuex')
 var Promise=require('bluebird')
 var markdown=require('marked')
+var saveAs=require('file-saver').saveAs
 var renderer=new markdown.Renderer()
 renderer.link=function(href,title,text){
   return `<a href="${href}" title="${title}" target="_blank">${text}</a>` 
@@ -127,14 +128,34 @@ module.exports={
     }
   ),
   updated: function () {
+  var self = this;
   this.$nextTick(function () {
+
+        const downloadBlobAsFile = (function closure_shell() {
+        const a = document.createElement("a");
+        return function downloadBlobAsFile(blob, filename) {
+            const object_URL = URL.createObjectURL(blob);
+            a.href = object_URL;
+            a.download = filename;
+            a.click();
+            URL.revokeObjectURL(object_URL);
+        };
+      })();
 
       var button = document.getElementById("DownloadContactFlow");
       if(button)
       {
         button.onclick = function()
         {
-          window.location = "https://4tafrs3rwe.execute-api.us-east-1.amazonaws.com/prod/test"
+          var result = self.$store.dispatch('api/getContactFlow').then((result) => {
+          downloadBlobAsFile(new Blob(
+              [result.CallFlow],
+              {type: "text/plain"}
+          ), result.FileName);
+
+            //saveAs(result.FileName, result.CallFlow)
+          })
+
         }
       }
 

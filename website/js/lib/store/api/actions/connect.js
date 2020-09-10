@@ -33,7 +33,7 @@ var failed=false
 module.exports={
     getContactFlow(context,opts){
         return context.dispatch('_request',{
-            url:opts.href,
+            url:context.rootState.info._links.connect.href,
             method:'get'
         })
     },

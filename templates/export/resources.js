@@ -93,13 +93,13 @@ module.exports=Object.assign(
             },
             "IntegrationResponses": [
                {
-                  "StatusCode": 302
+                  "StatusCode": 200
                }
             ]
          },
          "MethodResponses": [
             {
-               "StatusCode": 302
+               "StatusCode": 200
             }
          ],
         }

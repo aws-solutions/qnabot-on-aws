@@ -8,12 +8,8 @@ const { Readable } = require("stream");
 
 exports.handler =  async function(event, context) {
     try {
-            var url = await createCallFlow();
-            return createResponse(302,
-            {
-                Location: url,
-                'Cache-Control': "max-age=0"
-            }, "")
+            var result = await createCallFlow();
+            return result;
     } catch (e) {
         console.log(e)
         return{
@@ -26,17 +22,7 @@ exports.handler =  async function(event, context) {
     
   }
   
-    function createResponse(statusCode, headers, responseBody)
-  {
-      response = {
-        "statusCode": statusCode,
-        "headers": headers,
-        "body": JSON.stringify(responseBody),
-        "isBase64Encoded": false
-    };
-      console.log(JSON.stringify(response));
-      return  response
-  }
+ 
   
 
   function uuidv4() {
@@ -77,38 +63,9 @@ exports.handler =  async function(event, context) {
     };
     
 
-    const s3 = new AWS.S3();
-    const key = uuidv4() ;
-    
-    let outfile = path.join("/tmp/",key + ".json");
+    return {
+      CallFlow: flow,
+      FileName: flows[0]
 
-    
-    fs.writeFileSync(outfile,JSON.stringify(outfile));
-
-    await s3.putObject({
-          Bucket: process.env.outputBucket,
-          Key: process.env.s3Prefix + key + ".json",
-          Body: JSON.stringify(flow),
-          ContentDisposition: `attachment; filename="${key}"`
-      }).promise()
-
-
-    let params =
-    {
-        Bucket: process.env.outputBucket,
-        Key: process.env.s3Prefix + key + ".json" 
-    }
-
-    var signed_url =  await new Promise(r => s3.getSignedUrl('getObject',
-    params,
-    async (e, url) => {
-        if (e) {
-            // Execute callback with caught error
-            console.log(e)
-            await fn(e);
-            this.error(e); // Throw error if not done in callback
-        }
-        r(url); // return the url
-    }));
-    return signed_url;
+    };
   }
