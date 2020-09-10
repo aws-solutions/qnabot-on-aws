@@ -115,7 +115,7 @@ def put_key_policy (stackname,roles):
             }
         )
 
-    print(f"Updating policy for key  {args.cmk_arn} with statement {json.dumps(policy)}")
+    print(f"Updating policy for key  {args.cmk_arn}")
 
 
     kms_client.put_key_policy(
@@ -124,7 +124,7 @@ def put_key_policy (stackname,roles):
         Policy = json.dumps(policy)
     )
 
-    print(f"Policy for key {args.cmk_arn} updated with statement {policy}")
+    print(f"Policy for key {args.cmk_arn} updated.")
 
 def process_stacks(stackname):
     paginator = cloudformation_client.get_paginator('list_stack_resources')

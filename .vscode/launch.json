@@ -9,7 +9,7 @@
             "type": "python",
             "request": "launch",
             "program": "${file}",
-            "args":["us-east-1","QNAVpcSupport-dev-dev-master-4","arn:aws:kms:us-east-1:090962805078:key/0c10a576-3eda-421a-a773-a16a4c38b80a"],
+            "args":["us-east-1","QnaBotVPC4","arn:aws:kms:us-east-1:090962805078:key/0c10a576-3eda-421a-a773-a16a4c38b80a"],
             "console": "integratedTerminal"
         }
     ]
