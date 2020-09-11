@@ -20,10 +20,17 @@ var api=util.api
 module.exports={
     build(context){
         context.rootState.bot.status="Submitting"
+        context.rootState.bot.build.message=""
+        context.rootState.bot.build.token=""
+        context.rootState.bot.build.status=""
         return api(context,'botinfo')
         .then(function(result){
             if(result.status==='READY'){
                 return api(context,'build')
+                    .then(function(result){
+                        context.rootState.bot.build.token = result.token
+                        return result;
+                })
             }else if(result.status==='BUILDING'){
                 return 
             }else {
@@ -32,13 +39,14 @@ module.exports={
         })
         .delay(200)
         .then(function(result){
+            context.rootState.bot.build.token = result.token
             return new Promise(function(res,rej){
                 var next=function(count){
                     api(context,'botinfo')
                     .then(function(info){
                         if(info.build.token===result.token){
                             context.rootState.bot.status=info.build.status
-                            context.rootState.bot.message=info.build.message
+                            context.rootState.bot.build.message=info.build.message
                             if(info.build.status==="READY"){
                                 res()
                             }else if(info.build.status==="Failed"){

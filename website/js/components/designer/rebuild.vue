@@ -59,6 +59,7 @@ module.exports={
       var self=this
       self.success=false
       self.snackbar=false
+      this.$store.commit('clearBotBuildMessage')
     },
     build:function(){
       var self=this
