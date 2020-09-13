@@ -19,6 +19,7 @@ function isJson(str) {
 function str2bool(settings) {
     var new_settings = _.mapValues(settings, x => {
         if (_.isString(x)) {
+            x = x.replace(/^"(.+)"$/,'$1');  // remove wrapping quotes
             if (x.toLowerCase() === "true") {
                 return true ;
             }
@@ -122,15 +123,15 @@ async function run_query_kendra(event, kendra_index) {
 }
 
 
-
-
 module.exports= async (event, context, callback) => {
     console.log('Received event:', JSON.stringify(event, null, 2));
     try {
         var settings = await get_settings();
         var kendra_index = _.get(settings, "KENDRA_FAQ_INDEX")
         var question = _.get(event,'question','');
-        if (question.length > 0 && kendra_index != "") {
+        var topic = _.get(event,'topic','');
+        let okKendraQuery = (question.length > 0 && topic.length == 0 && kendra_index != "") ;
+        if ( okKendraQuery ) {
             var response = await run_query_kendra(event, kendra_index);
             // ES fallback if KendraFAQ fails
             var hit = _.get(response, "hits.hits[0]._source");
