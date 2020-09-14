@@ -149,7 +149,7 @@ module.exports={
         {
           var result = self.$store.dispatch('api/getContactFlow').then((result) => {
           downloadBlobAsFile(new Blob(
-              [result.CallFlow],
+              [JSON.stringify(result.CallFlow)],
               {type: "text/plain"}
           ), result.FileName);
 
