@@ -24,6 +24,9 @@ module.exports={
         "Intent":{"Type":"String"},
         "BotName":{"Type":"String"},
         "Api":{"Type":"String"},
-        "ApiRootResourceId":{"Type":"String"}
+        "ApiRootResourceId":{"Type":"String"},
+        "Encryption":{"Type":"String"},
+        "Stage":{"Type":"String"},
+        "ApiDeploymentId":{"Type":"String"}
     }
 }

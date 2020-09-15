@@ -16,7 +16,10 @@ module.exports={
                 "Intent":{"Ref":"Intent"},
                 "BotName":{"Ref":"LexBot"},
                 "Api":{"Ref":"API"},
-                "ApiRootResourceId":{"Fn::GetAtt":["API","RootResourceId"]}
+                "ApiRootResourceId":{"Fn::GetAtt":["API","RootResourceId"]},
+                "Encryption":{"Ref":"Encryption"},
+                "Stage":{"Ref":"Stage"},
+                "ApiDeploymentId":{"Ref":"Deployment"}
 
             }
         }

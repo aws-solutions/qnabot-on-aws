@@ -75,15 +75,15 @@ exports.handler =  async function(event, context) {
 
     };
   }
-  process.env.lexBot = 'QNAVpcSupport_dev_dev_master_three_VATdO'
-  process.env.intent = 'fulfilment_IntentdgGRQJbPjf'
-  process.env.fallBackIntent = 'qnabotfallbackfulfilment_IntentZpZuraZhd'
-  process.env.outputBack = 'qnavpcsupport-dev-dev-master-3-exportbucket-1gefbpnc1o2hj'
-  process.env.s3Prefix = 'connect/'
+  // process.env.lexBot = 'QNAVpcSupport_dev_dev_master_three_VATdO'
+  // process.env.intent = 'fulfilment_IntentdgGRQJbPjf'
+  // process.env.fallBackIntent = 'qnabotfallbackfulfilment_IntentZpZuraZhd'
+  // process.env.outputBack = 'qnavpcsupport-dev-dev-master-3-exportbucket-1gefbpnc1o2hj'
+  // process.env.s3Prefix = 'connect/'
   
 
-  createCallFlow().then(result => {
-    console.log(JSON.stringify(result.CallFlow,null,4))
-  });
+  // createCallFlow().then(result => {
+  //   console.log(JSON.stringify(result.CallFlow,null,4))
+  // });
 
  

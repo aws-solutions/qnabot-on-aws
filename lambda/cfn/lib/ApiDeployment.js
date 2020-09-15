@@ -5,18 +5,34 @@ var api=new aws.APIGateway()
 var _=require('lodash')
 module.exports=class ApiDeployment {
     Create(params,reply){
-        run(()=>api.createDeployment(
-                _.omit(params,["buildDate","stage","Encryption"])
-            ).promise()
-        )
-        .tap(console.log)
-        .then(x=>reply(null,x.id))
-        .catch(reply)
+        //We have a 200 resource stack limit for the master stack 
+        //If we want to add an API resource to a nested stack we have to redeploy the same API
+        //from the nested stack.  CF will send a Create, but we need to treat it like an Update
+        if(!("ApiDeploymentId" in params))
+        {
+            run(()=>api.createDeployment(
+                    _.omit(params,["buildDate","stage","Encryption","ApiDeploymentId"])
+                ).promise()
+            )
+            .tap(console.log)
+            .then(x=>reply(null,x.id))
+            .catch(reply)
+        }
+        else
+        {
+            console.log(`Updating ${params["ApiDeploymentId"]} as part of 'Create'`)
+            var ID = params["ApiDeploymentId"];
+            params = _.omit(params,["ApiDeploymentId"])
+            this.Update(ID,params,{},reply)
+
+        }
     }
 
     Update(ID,params,oldparams,reply){
         var self=this
         new Promise(function(res,rej){
+            console.log(`Creating new deployment as part of 'Update'`)
+
             self.Create(params,function(error,id){
                 error ? rej(error) : setTimeout(()=>res(id),2000)
             })

@@ -69,6 +69,18 @@ module.exports=Object.assign(
           "Principal": "apigateway.amazonaws.com"
         }
       },
+      "Deployment":{
+        "Type": "Custom::ApiDeployment",
+        "DependsOn":["ConnectGet","ConnectApiResource","InvokePermissionConnectLambda"],
+        "Properties": {
+          "ServiceToken": { "Ref" : "CFNLambda" },
+          "restApiId": {"Ref": "Api"},
+            "buildDate":new Date(),
+            "stage":"prod",
+            "ApiDeploymentId": {"Ref": "ApiDeploymentId"},
+            "Encryption":{"Ref": "Encryption"}
+        },
+    },
       "ConnectGet": {
         "Type": "AWS::ApiGateway::Method",
         "Properties": {
