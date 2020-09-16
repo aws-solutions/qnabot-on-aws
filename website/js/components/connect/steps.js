@@ -2,7 +2,7 @@ module.exports=[
 
 {
     title:"Import Questions",
-    text:`-Choose *Import* from the Tools menu. 
+    text:`- Choose *Import* from the Tools menu. 
     `,
     image:"../images/content_designer_01.png"
 },{
