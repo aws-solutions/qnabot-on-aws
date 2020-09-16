@@ -1,4 +1,19 @@
-module.exports=[{
+module.exports=[
+
+{
+    title:"Import Questions",
+    text:`-Choose *Import* from the Tools menu. 
+    `,
+    image:"../images/content_designer_01.png"
+},{
+    title:"Load the question and answer package.",
+    text:`
+- Click Load. 
+    `,
+    image:"../images/content_designer_02.png"
+
+},
+{
     title:"Provision a Connect Instance",
     text:`
 Create an Amazon Connect Instance by walking through the first Tutorial [Amazon Connect Tutorial](https://docs.aws.amazon.com/connect/latest/adminguide/tutorials.html)
