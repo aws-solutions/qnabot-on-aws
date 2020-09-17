@@ -6,8 +6,29 @@
 const _=require('lodash');
 const AWS = require('aws-sdk');
 const FREE_TEXT_ELICIT_RESPONSE_NAME = 'QNAFreeText';
+const QNANumber = "QNANumber";;
+const QNAWage = "QNAWage";
+const QNASocialSecurity  = "QNASocialSecurity"
+const QNAPin = "QNAPin";
+const QNADate = "QNADate";
+const QNADayOfWeek = "QNADayOfWeek";
+const QNAMonth = "QNAMonth"
+const QNAAge = "QNAAge";
+const QNAPhoneNumber = "QNAPhoneNumber";
+const QNATime = "QNATime";
+const QNAEmailAddress = "QNAEmailAddress";
+const QNAName = "QNAName";
+const QNAYesNo = "QNAYesNo";
+const QNAYesNoExit = "QNAYesNoExit";
 
 const translate = require('./multilanguage.js');
+
+function isConnectClient(req) {
+    if (_.get(req,"_event.requestAttributes.x-amz-lex:accept-content-types", undefined) === undefined) {
+        return false;
+    }
+    return true;
+}
 
 async function translate_res(req, res){
     const locale = _.get(req, 'session.userLocale');
@@ -90,10 +111,21 @@ async function handleRequest(req, res, botName, botAlias) {
         return getFreeTextResponse(_.get(req, "question"), _.get(req, "sentiment"));
     } else {
         const lexClient = new AWS.LexRuntime({apiVersion: '2016-11-28'});
+
+        // if a connect client and an elicitResponse bot such as QNANumber and the user is confirming the response
+        // from the bot, proxy a key pad press (phone touch) of 1 for Yes and 2 for No. This helps accessibility
+        // when confirming responses to a Lex intent.
+        let respText = _.get(req, "question");
+        let progress = _.get(req, "session.qnabotcontext.elicitResponse.progress", undefined);
+        if (isConnectClient(req) && ( botName != QNAYesNo && botName != QNAYesNoExit) && progress === 'ConfirmIntent') {
+            if (respText === '1' || respText.toLowerCase() === 'one' ) respText = 'Yes';
+            if (respText === '2' || respText.toLowerCase() === 'two' ) respText = 'No';
+        }
+        // call the Bot using the respText
         const params = {
             botAlias: botAlias,
             botName: mapFromSimpleName(botName),
-            inputText: _.get(req, "question"),
+            inputText: respText,
             userId: tempBotUserID,
         };
         console.log("Lex parameters: " + JSON.stringify(params));

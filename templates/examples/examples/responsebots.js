@@ -394,8 +394,8 @@ exports.resources={
             "createVersion": true,
             "valueSelectionStrategy": "TOP_RESOLUTION",
             "enumerationValues": [
-                {"value":"Yes", "synonyms":["OK","Yeah","Sure","Yep","Affirmative","aye"]},
-                {"value":"No", "synonyms":["Nope","Na","Negative","Non"]}
+                {"value":"Yes", "synonyms":["OK","Yeah","Sure","Yep","Affirmative","aye", "1", "One"]},
+                {"value":"No", "synonyms":["Nope","Na","Negative","Non", "2", "Two"]}
               ]
         }
     },
@@ -495,9 +495,9 @@ exports.resources={
             "createVersion": true,
             "valueSelectionStrategy": "TOP_RESOLUTION",
             "enumerationValues": [
-                {"value":"Yes", "synonyms":["OK","Yeah","Sure","Yep","Affirmative","aye"]},
-                {"value":"No", "synonyms":["Nope","Na","Negative","Non"]},
-                {"value":"Exit", "synonyms":["agent","rep","representative","stop","quit", "help", "bye", "goodbye"]}
+                {"value":"Yes", "synonyms":["OK","Yeah","Sure","Yep","Affirmative","aye", "1", "One"]},
+                {"value":"No", "synonyms":["Nope","Na","Negative","Non", "2", "Two"]},
+                {"value":"Exit", "synonyms":["agent","rep","representative","stop","quit", "help", "bye", "goodbye", "3", "Three"]}
             ]
         }
     },

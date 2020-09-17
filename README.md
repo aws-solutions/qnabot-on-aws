@@ -154,6 +154,25 @@ See the [LICENSE.md](LICENSE.md) file for details
 
 ## New features 
 
+### Version 4.3.0
+Provides the ability to deploy QnABot components within VPC infrastructure via a new template named public-vpc-support.json. 
+This template is made available for use as a separate installation mechanism. It is not the default template utilized in the 
+public distribution buckets. Please take great care in deploying QnABot in VPC. The Elasticsearch Cluster
+becomes bound to the VPC as well as the Lambda's installed. The Elasticsearch cluster is no longer available
+outside of the VPC. All Lambdas are bound to the VPC to allow communication with the cluster.
+
+The following limitations exist:
+
+- A QnABot deployed within VPC can NOT be modified to operated in non-VPC.
+- A properly configured VPC with public/private subnets using proper Internet Gateway and Nat Gateway must be available.
+- Two private subnets must be specified as parameters for the CloudFormation template.
+- A Security Group allowing inbound port 443 from connections within the VPC CIDR block must be configured and specified
+as a parameter for the CloudFormation template.
+- The Kibana dashboard will only be available from clients that have access to the VPC.
+- The VPC must be configured to allow access to Lex, S3, Lambda, DynamoDB, Systems Manager (SSM Parameter Store), Kendra, and
+Comprehend. As more features are added to QnABot the required service access may increase. VPC Endpoints using PrivateLink 
+is not required but may be used if available. 
+ 
 ### Version 4.2.0
 - New Kendra FAQ support (Beta version) using the setting KENDRA_FAQ_INDEX. New menu item in Designer UI to export Questions as a Kendra FAQ. See revised Blog Post for details.
 - New GetSessionAttribute Handlebars helper to obtain session attribute. Works similar to lodash get(). Will not through exception and will return a default value.

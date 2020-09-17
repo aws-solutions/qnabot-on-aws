@@ -28,7 +28,7 @@ ssm_client = boto3.client('ssm', config=client_config)
 s3_client = boto3.client('s3', config=client_config)
 ddb_client = boto3.client('dynamodb', config=client_config)
 sts_client = boto3.client('sts', config=client_config)
-kinesis_client = boto3.client('firehose')
+kinesis_client = boto3.client('firehose', config=client_config)
 
 policy_name = "CMKPolicy4"
 policy_document = {
