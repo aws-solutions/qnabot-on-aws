@@ -83,7 +83,7 @@ module.exports=async function preprocess(req,res){
             }
             var urls = default_jwks_url.concat(identity_provider_jwks_url);
             console.log("Attempt to verify idtoken using jwks urls:",urls);
-            var verified_url = await jwt.verify(kid,urls) ;
+            var verified_url = await jwt.verify(idtoken,kid,urls) ;
             if (verified_url) {
                 _.set(idattrs,'verifiedIdentity',"true");
                 console.log("Verified identity with:",verified_url);
