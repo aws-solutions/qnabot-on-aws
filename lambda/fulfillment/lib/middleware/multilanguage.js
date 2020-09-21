@@ -88,22 +88,26 @@ async function set_translated_transcript(locale, req) {
     const detectedLocale = SessionAttributes.userDetectedLocale;
     const detectedSecondaryLocale = SessionAttributes.userDetectedSecondaryLocale;
 
-    if (locale === 'en' && detectedLocale === 'en' && detectedSecondaryLocale === undefined) {
-        console.log("No translation - english detected");
-    } else if (locale === 'en' && detectedLocale === 'en' && detectedSecondaryLocale) {
-        console.log("translate to english using secondary detected locale:  ", req.question);
-        const translation = await get_translation(req.question, detectedSecondaryLocale, 'en');
-        _.set(req, "_translation", translation.TranslatedText);
-        _.set(req, "question", translation.TranslatedText);
-        console.log("Overriding input question with translation: ", req.question);
-    }  else if (locale !== '' && locale.charAt(0) !== '%' && detectedLocale && detectedLocale !== '') {
-        console.log("Confidence in the detected language high enough.");
-        const translation = await get_translation(req.question, detectedLocale, 'en');
-        _.set(req, "_translation", translation.TranslatedText);
-        _.set(req, "question", translation.TranslatedText);
-        console.log("Overriding input question with translation: ", req.question);
-    }  else {
-        console.log ('not possible to perform language translation')
+    if ( ! req.question.toLowerCase().startsWith("qid::")) {
+        if (locale === 'en' && detectedLocale === 'en' && detectedSecondaryLocale === undefined) {
+            console.log("No translation - english detected");
+        } else if (locale === 'en' && detectedLocale === 'en' && detectedSecondaryLocale) {
+            console.log("translate to english using secondary detected locale:  ", req.question);
+            const translation = await get_translation(req.question, detectedSecondaryLocale, 'en');
+            _.set(req, "_translation", translation.TranslatedText);
+            _.set(req, "question", translation.TranslatedText);
+            console.log("Overriding input question with translation: ", req.question);
+        }  else if (locale !== '' && locale.charAt(0) !== '%' && detectedLocale && detectedLocale !== '') {
+            console.log("Confidence in the detected language high enough.");
+            const translation = await get_translation(req.question, detectedLocale, 'en');
+            _.set(req, "_translation", translation.TranslatedText);
+            _.set(req, "question", translation.TranslatedText);
+            console.log("Overriding input question with translation: ", req.question);
+        }  else {
+            console.log ('not possible to perform language translation')
+        }
+    } else {
+        console.log("Question targeting specified Qid (starts with QID::) - skip translation");
     }
 
 }

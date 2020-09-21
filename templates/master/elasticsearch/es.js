@@ -11,7 +11,7 @@ var properties={
        "VolumeSize": 10,
        "VolumeType": "gp2"
     },
-    "ElasticsearchVersion": "7.4",
+    "ElasticsearchVersion": "7.7",
     "SnapshotOptions": {
        "AutomatedSnapshotStartHour": "0"
     },

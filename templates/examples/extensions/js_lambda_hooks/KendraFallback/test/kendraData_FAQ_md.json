@@ -1,8 +1,8 @@
 {
-    "QueryId": "ec35a915-8990-4ef7-a5da-f490911cad42",
+    "QueryId": "b904542d-af85-447d-808b-d86b5df16c06",
     "ResultItems": [
         {
-            "Id": "ec35a915-8990-4ef7-a5da-f490911cad42-2db7aa5b-1fcb-4910-a2fc-b3922a6069e3",
+            "Id": "b904542d-af85-447d-808b-d86b5df16c06-ee0db51d-15f4-4786-9144-b51d29d37f66",
             "Type": "QUESTION_ANSWER",
             "AdditionalAttributes": [
                 {
@@ -10,7 +10,7 @@
                     "ValueType": "TEXT_WITH_HIGHLIGHTS_VALUE",
                     "Value": {
                         "TextWithHighlightsValue": {
-                            "Text": "How many planets orbit the Sun",
+                            "Text": "How many planets orbit the Sun?",
                             "Highlights": [
                                 {
                                     "BeginOffset": 4,
@@ -41,7 +41,7 @@
                     "ValueType": "TEXT_WITH_HIGHLIGHTS_VALUE",
                     "Value": {
                         "TextWithHighlightsValue": {
-                            "Text": "Eight planets orbit the sun. Mercury, Venus, Earth, Mars, Jupiter, Saturn, Uranus, and Neptune. Sorry I'm required to leave out my favorite, Pluto",
+                            "Text": "Eight planets orbit the sun. Mercury, Venus, Earth, Mars, Jupiter, Saturn, Uranus, and Neptune. Sorry I'm required to leave out my favorite, Pluto.",
                             "Highlights": [
                                 {
                                     "BeginOffset": 6,
@@ -63,26 +63,26 @@
                     }
                 }
             ],
-            "DocumentId": "c8e0762c86ee7fc92f253ce925b1ecbd101479541164cc5afac09fb027c659dd1592335726833",
+            "DocumentId": "a212c9bbe37131a9777efc915d837915ee33e5b327ec7df4645cb96d6d165f4a1593702980960",
             "DocumentTitle": {
                 "Text": ""
             },
             "DocumentExcerpt": {
-                "Text": "Eight planets orbit the sun. Mercury, Venus, Earth, Mars, Jupiter, Saturn, Uranus, and Neptune. Sorry I'm required to leave out my favorite, Pluto",
+                "Text": "Eight planets orbit the sun. Mercury, Venus, Earth, Mars, Jupiter, Saturn, Uranus, and Neptune. Sorry I'm required to leave out my favorite, Pluto.",
                 "Highlights": [
                     {
                         "BeginOffset": 0,
-                        "EndOffset": 146,
+                        "EndOffset": 147,
                         "TopAnswer": false
                     }
                 ]
             },
-            "DocumentURI": "<document url>",
+            "DocumentURI": "{\"args\":[\"\"],\"next\":\"\",\"a\":\"Eight planets orbit the sun. Mercury, Venus, Earth, Mars, Jupiter, Saturn, Uranus, and Neptune. Sorry I'm required to leave out my favorite, Pluto.\",\"r\":{\"buttons\":[{\"text\":\"What is a solar flare?\",\"value\":\"What is a solar flare\"}],\"subTitle\":\"\",\"imageUrl\":\"\",\"title\":\"Suggestions\",\"text\":\"\",\"url\":\"\"},\"t\":\"\",\"alt\":{\"markdown\":\"\",\"ssml\":\"\"},\"l\":\"\",\"qid\":\"sun.10\",\"type\":\"qna\",\"q\":[\"How many planets orbit the Sun?\",\"Which planets orbit the Sun?\"]}",
             "DocumentAttributes": [
                 {
                     "Key": "_source_uri",
                     "Value": {
-                        "StringValue": "<document url>"
+                        "StringValue": "{\"args\":[\"\"],\"next\":\"\",\"a\":\"Eight planets orbit the sun. Mercury, Venus, Earth, Mars, Jupiter, Saturn, Uranus, and Neptune. Sorry I'm required to leave out my favorite, Pluto.\",\"r\":{\"buttons\":[{\"text\":\"What is a solar flare?\",\"value\":\"What is a solar flare\"}],\"subTitle\":\"\",\"imageUrl\":\"\",\"title\":\"Suggestions\",\"text\":\"\",\"url\":\"\"},\"t\":\"\",\"alt\":{\"markdown\":\"\",\"ssml\":\"\"},\"l\":\"\",\"qid\":\"sun.10\",\"type\":\"qna\",\"q\":[\"How many planets orbit the Sun?\",\"Which planets orbit the Sun?\"]}"
                     }
                 }
             ]

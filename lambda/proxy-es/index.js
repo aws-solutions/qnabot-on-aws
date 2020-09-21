@@ -23,7 +23,7 @@ exports.resource=require('./lib/cfn').resource
 
 exports.query=function(event,context,callback){
     require('./lib/query')(event.req,event.res)
-    .then(()=>callback(null,event)) 
+    .then((x)=>callback(null,x)) 
     .catch(callback)
 }
 

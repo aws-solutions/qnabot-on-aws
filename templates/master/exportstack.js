@@ -19,8 +19,10 @@ module.exports={
                 "ApiRootResourceId":{"Fn::GetAtt":["API","RootResourceId"]},
                 "Encryption":{"Ref":"Encryption"},
                 "Stage":{"Ref":"Stage"},
-                "ApiDeploymentId":{"Ref":"Deployment"}
+                "ApiDeploymentId":{"Ref":"Deployment"},
 
+                "DefaultQnABotSettings":{"Ref":"DefaultQnABotSettings"},
+                "CustomQnABotSettings":{"Ref":"CustomQnABotSettings"},
             }
         }
     }

@@ -117,10 +117,21 @@ Handlebars.registerHelper('setLang', function (lang, last, options) {
     }
 });
 
-Handlebars.registerHelper('setSessionAttr', function (k, v, options) {
+Handlebars.registerHelper('setSessionAttr', function () {
+    let args = Array.from(arguments);
+    const k = args[0];
+    // concat remaining arguments to create value
+    const v_arr = args.slice(1, args.length - 1); // ignore final 'options' argument
+    const v = v_arr.join(""); // concatenate value arguments 
     console.log("Setting res session attribute:", k, " Value:", v);
     _.set(res_glbl.session, k, v);
     return "";
+});
+
+Handlebars.registerHelper('getSessionAttr', function (attr, def, options) {
+    let v = _.get(res_glbl.session, attr, def);
+    console.log("Return session attribute key, value: ", attr, v);
+    return v;
 });
 
 Handlebars.registerHelper('randomPick', function () {
@@ -155,6 +166,7 @@ var apply_handlebars = async function (req, res, hit) {
     var markdown = _.get(hit, "alt.markdown");
     var ssml = _.get(hit, "alt.ssml");
     var r = _.get(hit, "r");
+
     // catch and log errors before throwing exception.
     if (a) {
         try {
@@ -238,7 +250,6 @@ var apply_handlebars = async function (req, res, hit) {
             console.log("ERROR: response card fields format caused Handlebars exception. Check syntax: " + e );
             throw (e);
         }
-
     }
     console.log("Preprocessed Result: ", hit_out);
     return hit_out;

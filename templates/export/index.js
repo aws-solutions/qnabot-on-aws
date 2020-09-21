@@ -27,6 +27,8 @@ module.exports={
         "ApiRootResourceId":{"Type":"String"},
         "Encryption":{"Type":"String"},
         "Stage":{"Type":"String"},
-        "ApiDeploymentId":{"Type":"String"}
+        "ApiDeploymentId":{"Type":"String"},
+        "DefaultQnABotSettings": {"Type":"String"},
+        "CustomQnABotSettings": {"Type":"String"},
     }
 }
