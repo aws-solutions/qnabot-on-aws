@@ -1,20 +1,5 @@
-{
+﻿{
   "qna": [
-    {
-      "qid": "ConnectHelper.Repeat",
-      "a": "{{!-- The 'repeat' magic is in the Document Chaining Rule in the Advanced section --}}",
-      "conditionalChaining": "(SessionAttributes('previous.q')) ? SessionAttributes('previous.q') : 'default menu'",
-      "type": "qna",
-      "q": [
-        "Repeat",
-        "Can you repeat that",
-        "Can you please say that again",
-        "Please repeat that",
-        "What did you say",
-        "Say again",
-        "Come again"
-      ]
-    },
     {
       "qid": "ConnectHelper.Menu",
       "a": "Okay. Taking you to the main menu. {{setSessionAttr 'nextAction' 'MENU'}}",
@@ -37,8 +22,23 @@
       ]
     },
     {
+      "qid": "ConnectHelper.Repeat",
+      "a": "{{!-- The 'repeat' magic is in the Document Chaining Rule in the Advanced section --}}",
+      "conditionalChaining": "(SessionAttributes('qnabotcontext.previous.q')) ? SessionAttributes('qnabotcontext.previous.q') : 'default menu'",
+      "type": "qna",
+      "q": [
+        "Repeat",
+        "Can you repeat that",
+        "Can you please say that again",
+        "Please repeat that",
+        "What did you say",
+        "Say again",
+        "Come again"
+      ]
+    },
+    {
       "qid": "ConnectHelper.Constitution",
-      "a": "Okay, but it’s pretty long.  Feel free to ask your next question whenever. {{setSessionAttr 'nextPrompt' 'We the People of the United States, in Order to form a more perfect Union, establish Justice, insure domestic Tranquility, provide for the common defense, promote the general Welfare, and secure the Blessings of Liberty to ourselves and our Posterity, do ordain and establish this Constitution for the United States of America.'}}",
+      "a": "Okay, but it’s pretty long.  Feel free to ask your next question when you are ready. {{setSessionAttr ‘nextPrompt’ ‘We the People of the United States, in Order to form a more perfect Union, establish Justice, insure domestic Tranquility, provide for the common defense, promote the general Welfare, and secure the Blessings of Liberty to ourselves and our Posterity, do ordain and establish this Constitution for the United States of America.’}}",
       "type": "qna",
       "q": [
         "Read me the U.S. Constitution",
