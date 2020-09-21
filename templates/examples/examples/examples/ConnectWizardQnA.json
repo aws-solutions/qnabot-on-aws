@@ -38,7 +38,7 @@
     },
     {
       "qid": "ConnectHelper.Constitution",
-      "a": "Okay, but it’s pretty long.  Feel free to ask your next question when you are ready. {{setSessionAttr ‘nextPrompt’ ‘We the People of the United States, in Order to form a more perfect Union, establish Justice, insure domestic Tranquility, provide for the common defense, promote the general Welfare, and secure the Blessings of Liberty to ourselves and our Posterity, do ordain and establish this Constitution for the United States of America.’}}",
+      "a": "Okay, but it's pretty long.  Feel free to ask your next question when you are ready. {{setSessionAttr 'nextPrompt' 'We the People of the United States, in Order to form a more perfect Union, establish Justice, insure domestic Tranquility, provide for the common defense, promote the general Welfare, and secure the Blessings of Liberty to ourselves and our Posterity, do ordain and establish this Constitution for the United States of America.'}}",
       "type": "qna",
       "q": [
         "Read me the U.S. Constitution",
@@ -105,7 +105,7 @@
     },
     {
       "qid": "ConnectHelper.ChannelCondition",
-      "a": "{{#ifCond SessionAttributes.isConnectChannel '==' 'CHAT'}}\nYou can visit our blog post here:\nhttps://aws.amazon.com/blogs/machine-learning/creating-a-question-and-answer-bot-with-amazon-lex-and-amazon-alexa/\n{{else ifCond SessionAttributes.isConnectChannel '==' 'VOICE'}}\nYou can visit aws.amazon.com and search for QnA bot. Once again, that’s aws.amazon.com\n{{else}}\nYou can visit our blog post here:\nhttps://aws.amazon.com/blogs/machine-learning/creating-a-question-and-answer-bot-with-amazon-lex-and-amazon-alexa/\n{{/ifCond}}",
+      "a": "{{#ifCond SessionAttributes.isConnectChannel '==' 'CHAT'}}\nYou can visit our blog post here:\nhttps://aws.amazon.com/blogs/machine-learning/creating-a-question-and-answer-bot-with-amazon-lex-and-amazon-alexa/\n{{else ifCond SessionAttributes.isConnectChannel '==' 'VOICE'}}\nYou can visit aws.amazon.com and search for QnA bot. Once again, that's aws.amazon.com\n{{else}}\nYou can visit our blog post here:\nhttps://aws.amazon.com/blogs/machine-learning/creating-a-question-and-answer-bot-with-amazon-lex-and-amazon-alexa/\n{{/ifCond}}",
       "type": "qna",
       "q": [
         "Where can I get additional information on QnABot?",
