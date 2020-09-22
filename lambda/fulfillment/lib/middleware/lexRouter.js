@@ -121,6 +121,9 @@ async function handleRequest(req, res, botName, botAlias) {
             if (respText === '1' || respText.toLowerCase() === 'one' ) respText = 'Yes';
             if (respText === '2' || respText.toLowerCase() === 'two' ) respText = 'No';
         }
+        if (botName === QNAPhoneNumber && ( progress === 'ElicitSlot' || progress === 'ElicitIntent' || progress === "" || progress === undefined ) ) {
+            respText = 'my number is ' + respText;
+        }
         // call the Bot using the respText
         const params = {
             botAlias: botAlias,

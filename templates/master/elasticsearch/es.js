@@ -21,6 +21,12 @@ var properties={
     "EncryptionAtRestOptions": {
        "Enabled": {"Fn::If": [ "Encrypted", true, false]}
     },
+    "NodeToNodeEncryptionOptions": {
+        "Enabled": {"Fn::If": [ "Encrypted", true, false]}
+    },
+    "DomainEndpointOptions": {
+        "EnforceHTTPS": {"Fn::If": [ "Encrypted", true, false]}
+    },
     "VPCOptions" : {
         "Fn::If": [ "VPCEnabled", {
             "SubnetIds": {"Ref": "VPCSubnetIdList"},

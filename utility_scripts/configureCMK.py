@@ -10,6 +10,7 @@ parser = argparse.ArgumentParser(description='Uses a specified CMK to encrypt Qn
 parser.add_argument("region", help="AWS Region")
 parser.add_argument("stack_arn", help="the arn of the QnABot CloudFormation Stack")
 parser.add_argument("cmk_arn", help="the ARN of the Customer Master Key to use for encryption")
+parser.add_argument("target_s3_bucket", help="the Name of the S3 bucket to use for server access logs")
 
 args = type('', (), {})()
 
@@ -187,6 +188,16 @@ def process_stacks(stackname):
                                 }
                             )
             print(f"Encryption set for {bucket['PhysicalResourceId']}")
+            s3_client.put_bucket_logging(
+                Bucket=bucket["PhysicalResourceId"],
+                BucketLoggingStatus={
+                    'LoggingEnabled': {
+                        'TargetBucket': args.target_s3_bucket,
+                        'TargetPrefix': bucket["PhysicalResourceId"] + '/'
+                    }
+                }
+            )
+            print(f"Access Logs set for {bucket['PhysicalResourceId']}")
 
         ddb_tables = filter(lambda x: x["ResourceType"] == "AWS::DynamoDB::Table",response["StackResourceSummaries"])
         for table in ddb_tables:
