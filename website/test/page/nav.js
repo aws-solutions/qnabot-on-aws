@@ -50,6 +50,9 @@ module.exports=(A)=>class Nav extends A{
     goToAlexa(){
         return this._goTo('alexa')
     }
+    goToConnect(){
+        return this._goTo('connect')
+    }
     goToHooks(){
         return this._goTo('hooks')
     }

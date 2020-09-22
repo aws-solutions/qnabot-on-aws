@@ -12,6 +12,15 @@ module.exports={
                 "EsEndpoint": {"Fn::GetAtt": ["ESVar", "ESAddress"]},
                 "EsProxyLambda": {"Fn::GetAtt":["ESProxyLambda","Arn"]},
                 "ExportBucket": {"Ref":"ExportBucket"},
+                "FallbackIntent": {"Ref":"IntentFallback"},
+                "Intent":{"Ref":"Intent"},
+                "BotName":{"Ref":"LexBot"},
+                "Api":{"Ref":"API"},
+                "ApiRootResourceId":{"Fn::GetAtt":["API","RootResourceId"]},
+                "Encryption":{"Ref":"Encryption"},
+                "Stage":{"Ref":"Stage"},
+                "ApiDeploymentId":{"Ref":"Deployment"},
+
                 "DefaultQnABotSettings":{"Ref":"DefaultQnABotSettings"},
                 "CustomQnABotSettings":{"Ref":"CustomQnABotSettings"},
             }

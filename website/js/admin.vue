@@ -130,7 +130,15 @@ module.exports={
         subTitle:"Instructions for setting up an Alexa Skill",
         icon:"info",
         href:"#/alexa"
-      },{
+      },
+      {
+        title:"Connect",
+        id:"connect",
+        subTitle:"Instructions for integrating with Connect",
+        icon:"info",
+        href:"#/connect"
+      },
+      {
         title:"Lambda Hooks",
         id:"hooks",
         subTitle:"Instructions for customizing QnABot behavior using AWS Lambda",
