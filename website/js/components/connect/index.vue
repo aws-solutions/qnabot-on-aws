@@ -130,7 +130,7 @@ module.exports={
   updated: function () {
   var self = this;
   this.$nextTick(function () {
-
+    
         const downloadBlobAsFile = (function closure_shell() {
         const a = document.createElement("a");
         return function downloadBlobAsFile(blob, filename) {
@@ -142,6 +142,13 @@ module.exports={
         };
       })();
 
+      var links = document.links;
+
+      for (var i = 0, linksLength = links.length; i < linksLength; i++) {
+        if (links[i].hostname != window.location.hostname) {
+          links[i].target = '_blank';
+        } 
+      }
       var button = document.getElementById("DownloadContactFlow");
       if(button)
       {
@@ -152,11 +159,18 @@ module.exports={
               [JSON.stringify(result.CallFlow)],
               {type: "text/plain"}
           ), result.FileName);
-
-            //saveAs(result.FileName, result.CallFlow)
           })
 
         }
+      }
+
+      var spanBot = document.getElementById("spnBotname")
+      if(spanBot)
+      {
+         self.$store.dispatch("api/botinfo").then((result) => {
+           console.log(result)
+           spanBot.innerHTML = result.botname;
+         })
       }
 
     })

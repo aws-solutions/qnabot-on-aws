@@ -1,22 +1,10 @@
 module.exports=[
 
-{
-    title:"Import Questions",
-    text:`- Choose *Import* from the Tools menu. 
-    `,
-    image:"../images/content_designer_01.png"
-},{
-    title:"Load the question and answer package.",
-    text:`
-- Click Load. 
-    `,
-    image:"../images/content_designer_02.png"
 
-},
 {
     title:"Provision a Connect Instance",
     text:`
-Create an Amazon Connect Instance by walking through the first Tutorial [Amazon Connect Tutorial](https://docs.aws.amazon.com/connect/latest/adminguide/tutorials.html)
+Complete  [Tutorial 1: Set up your Amazon Connect Instance](https://docs.aws.amazon.com/connect/latest/adminguide/tutorial1-set-up-your-instance.html)
     `,
     image:"../images/connect_create_instance.png"
 },{
@@ -24,16 +12,16 @@ Create an Amazon Connect Instance by walking through the first Tutorial [Amazon 
     text:`
 - Now we must make the QnABot accessible to our new call center. 
 <br/> 
-&#8291;1. Open the Amazon Connect console in a new tab (https://console.aws.amazon.com/connect) <br/>
+&#8291;1. Open the  <a href="https://console.aws.amazon.com/connect">Amazon Connect console</a> in a new tab  <br/>
 &#8291;2. Select Contact Flows <br/>
-&#8291;3. Type in the name of your bot <br/>
+&#8291;3. Select <b><span id='spnBotname'>your bot</span></b> in the drop down <br/>
 &#8291;4. Click add Lex Bot
     `,
     image:"../images/connect_01.png"
 },{
     title:"Open Contact Flows",
     text:`
-&#8291;1. Go back to the call center admin page<br>
+&#8291;1. Go back to the call center admin page by clicking on <b>Amazon Connect</b> and choosing your instance <br/>
 &#8291;2.  Select Contact Flows
     `,
     image:"../images/connect_02.png"
@@ -49,9 +37,9 @@ Create an Amazon Connect Instance by walking through the first Tutorial [Amazon 
 {
     title:"Import Contact Flow",
     text:`
-&nbsp;1. Download the JSON file below <br/>
-&nbsp;2. Name your Contact Flow <br/>
-&nbsp;3. Import the Contact Flow`,
+&nbsp;1. Choose DOWNLOAD button below to download a JSON contact flow file for QnABot <br/>
+&nbsp;2. In Connect, choose Save->Import flow to import the downloaded file from your computer <br/>
+`,
     image:"../images/connect_04.png",
     buttons:[{
         text:"Download",
@@ -70,8 +58,9 @@ Create an Amazon Connect Instance by walking through the first Tutorial [Amazon 
     title:"Assign Contact Flow to Phone Number",
     image:"../images/connect_07.png",
     text:`
-&nbsp;1.  Go back to the Dashboard <br/>
-&nbsp;2.  Choose 'Phone numbers' <br/>
+&nbsp;1. Go back to the Dashboard <br/>
+&nbsp;2. Choose 'Phone numbers' <br/>
+&nbsp;3. Click on your Phone number to open the 'Edit Phone number' page <br/>
 `
 },
 {
@@ -80,5 +69,26 @@ Create an Amazon Connect Instance by walking through the first Tutorial [Amazon 
     text:`
 &nbsp; Choose the contact flow you just created and click save.
 `
+},
+{
+    title:"Import Questions",
+    text:`
+&nbsp; 1. Choose  <a href="#/import"> Import </a> from the tools menu ( &#9776; ): <br/>
+&nbsp; 2. Open Examples/Extensions, and choose LOAD from the 'ConnectWizardQnA' example <br/> 
+
+    `,
+    image:"../images/content_designer_02.png"
+},
+{
+    title:"Test your call center.",
+    text:`
+- Call your Connect phone number 
+- You can ask questions such as <br/>
+&#8291; 1. "Where can I get additional information on QnABot?"<br/> 
+&#8291; 2. "When is your business open"<br/> 
+&#8291; 3. "Read me the U.S. Constitution" <br/>
+&#8291; 4. "Can you call me?" <br/> 
+&#8291; 5. To hang up say "Goodbye" <br/> 
+    `,
 }
 ]
