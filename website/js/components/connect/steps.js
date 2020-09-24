@@ -96,7 +96,6 @@ Complete  [Tutorial 1: Set up your Amazon Connect Instance](https://docs.aws.ama
 &#8291; 4. "What is the meaning of life?" <br/> 
 &#8291; 5. "Is Cereal Soup?" <br/> 
 &#8291; 6. "Go to the main menu" <br/> 
-&#8291; 6. "Can you call me?" (Work in Progress) <br/> 
 &#8291; 7. To hang up say "Goodbye" <br/> 
     `,
 }
