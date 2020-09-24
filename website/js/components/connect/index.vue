@@ -43,6 +43,8 @@
                                     :loading="y.loading"
                                     @click="copy(y)") {{y.text}}
 
+
+
                               v-flex(xs12)
                                 img(
                                   :src="step.image"
@@ -77,6 +79,8 @@ var Promise=require('bluebird')
 var markdown=require('marked')
 var saveAs=require('file-saver').saveAs
 var renderer=new markdown.Renderer()
+var axios=require('axios')
+
 renderer.link=function(href,title,text){
   return `<a href="${href}" title="${title}" target="_blank">${text}</a>` 
 }
@@ -87,6 +91,7 @@ renderer.table=function(header,body){
 var handlebars=require('handlebars')
 var clipboard=require('clipboard')
 var _=require('lodash')
+const { stringify }=require('querystring')
 
 module.exports={
   data:function(){
@@ -128,64 +133,130 @@ module.exports={
     }
   ),
   updated: function () {
-  var self = this;
-  this.$nextTick(function () {
+      var self = this;
+      this.$nextTick(function () {
+        
+            const downloadBlobAsFile = (function closure_shell() {
+            const a = document.createElement("a");
+            return function downloadBlobAsFile(blob, filename) {
+                const object_URL = URL.createObjectURL(blob);
+                a.href = object_URL;
+                a.download = filename;
+                a.click();
+                URL.revokeObjectURL(object_URL);
+            };
+          })();
+
+          var links = document.links;
+
+          for (var i = 0, linksLength = links.length; i < linksLength; i++) {
+            if (links[i].hostname != window.location.hostname) {
+              links[i].target = '_blank';
+            } 
+          }
+          var button = document.getElementById("DownloadContactFlow");
+          if(button)
+          {
+            button.onclick = function()
+            {
+              var result = self.$store.dispatch('api/getContactFlow').then((result) => {
+              downloadBlobAsFile(new Blob(
+                  [JSON.stringify(result.CallFlow)],
+                  {type: "text/json"}
+              ), result.FileName);
+              })
+
+            }
+          }
+
     
-        const downloadBlobAsFile = (function closure_shell() {
-        const a = document.createElement("a");
-        return function downloadBlobAsFile(blob, filename) {
-            const object_URL = URL.createObjectURL(blob);
-            a.href = object_URL;
-            a.download = filename;
-            a.click();
-            URL.revokeObjectURL(object_URL);
-        };
-      })();
+          function poll(url){
+            Promise.resolve(axios.get(url))
+            .then(function(result){
 
-      var links = document.links;
+              if(result.status==="InProgress"){
+                setTimeout(()=>poll(),100)
+              }
+              else
+              {
+                return self.$store.dispatch('data/build')
+                .then(function(){
+                  btnImportQuestions.disabled = false;
+                  ImportQuestionsStatus.innerHTML = "";
 
-      for (var i = 0, linksLength = links.length; i < linksLength; i++) {
-        if (links[i].hostname != window.location.hostname) {
-          links[i].target = '_blank';
-        } 
-      }
-      var button = document.getElementById("DownloadContactFlow");
-      if(button)
-      {
-        button.onclick = function()
-        {
-          var result = self.$store.dispatch('api/getContactFlow').then((result) => {
-          downloadBlobAsFile(new Blob(
-              [JSON.stringify(result.CallFlow)],
-              {type: "text/plain"}
-          ), result.FileName);
-          })
+                  btnImportQuestions.innerHTML = "Import Sample Questions and Answers";
+ 
+                })
+                .else(e => 
+                  ImportQuestionsStatus.innerHTML = "Error Rebuilding LexBot. Please return to the Content Designer, correct the errors and REBUILD LEXBOT </br>" +
+                  "LexBot Rebuild Error " + e
+                 )
 
-        }
-      }
+              }
+            })
+          }
 
-      var spanBot = document.getElementById("spnBotname")
-      if(spanBot)
-      {
-         self.$store.dispatch("api/botinfo").then((result) => {
-           console.log(result)
-           spanBot.innerHTML = result.botname;
-         })
-      }
+          //Attach function to ImportQuestions button
+          var btnImportQuestions = document.getElementById("ImportQuestions");
+          var ImportQuestionsStatus = document.getElementById("ImportQuestionsStatus");
 
-    })
-},
+          
+          if(btnImportQuestions){
+                  btnImportQuestions.onclick = function() {
+                    btnImportQuestions.disabled = true;
+                    btnImportQuestions.innerHTML = "Processing..."
+                    ImportQuestionsStatus.innerHTML = "Importing Questions (Step 1)..."
+                    self.$store.dispatch('api/getContactFlow')
+                    .then(result => {
+                      self.contactFlow = result;
+                      ImportQuestionsStatus.innerHTML = "Importing Questions (Step 2)..."
 
-  created:function(){
-    this.$store.dispatch('data/botinfo').catch(()=>null) 
+                      return self.$store.dispatch("api/listExamples")
+                    })
+                    .then(results => {
+                        ImportQuestionsStatus.innerHTML = "Importing Questions (Step 3)..."
+                        let  exampleUrl = results.filter(example => self.contactFlow.QnaFile == example.document.href.split("/").slice(-1)[0] )[0];
+                        return Promise.resolve(axios.get(exampleUrl.document.href));
+                    })
+                    .then(result =>  {
+                        ImportQuestionsStatus.innerHTML = "Importing Questions (Step 4)..."
+                        return self.$store.dispatch('api/startImport',{
+                        qa:result.data.qna,
+                        name:self.contactFlow.QnaFile
+                      })
+                     } )
+                    .then(res =>  {
+                      ImportQuestionsStatus.innerHTML = "Rebuilding Lex Bot."
+                      self.pollUrl = res._links.imports.href+"/" + self.contactFlow.QnaFile;
+                      return Promise.resolve(axios.get(self.pollUrl))
+                    })
+                    .then(result => poll(self.pollUrl))
 
+                    }
+              }
+          
+          
+
+          var spanBot = document.getElementById("spnBotname")
+          if(spanBot)
+          {
+            self.$store.dispatch("api/botinfo").then((result) => spanBot.innerHTML = result.botname);
+          }
+
+        })
   },
-  methods:{
-    copy:function(btn){
-      btn.loading=true
-      setTimeout(()=>btn.loading=false,1000)
-    }
+
+   created:function(){
+     this.$store.dispatch('data/botinfo').catch(()=>null) 
+   },
+    methods:{
+      copy:function(btn){
+        btn.loading=true
+        setTimeout(()=>btn.loading=false,1000)
+      }
+    } 
+
   } 
-}
+
 
 </script>

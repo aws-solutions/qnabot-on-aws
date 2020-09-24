@@ -68,10 +68,16 @@ exports.handler =  async function(event, context) {
         
     };
     
+    let configFile = path.join(`${__dirname}`,"questions.json")
+    let config = fs.readFileSync(configFile);
+    config = JSON.parse(config);
+
+
 
     return {
       CallFlow: flow,
-      FileName: flows[0]
+      FileName: flows[0],
+      QnaFile: config.FlowInfos.filter(c => c.ContactFlow == flows[0])[0].QnAExample
 
     };
   }
@@ -84,6 +90,6 @@ exports.handler =  async function(event, context) {
 
   // createCallFlow().then(result => {
   //   console.log(JSON.stringify(result.CallFlow,null,4))
-  // });
+ //});
 
  

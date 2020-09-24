@@ -13,9 +13,10 @@ Complete  [Tutorial 1: Set up your Amazon Connect Instance](https://docs.aws.ama
 - Now we must make the QnABot accessible to our new call center. 
 <br/> 
 &#8291;1. Open the  <a href="https://console.aws.amazon.com/connect">Amazon Connect console</a> in a new tab  <br/>
-&#8291;2. Select Contact Flows <br/>
-&#8291;3. Select <b><span id='spnBotname'>your bot</span></b> in the drop down <br/>
-&#8291;4. Click add Lex Bot
+&#8291;2. Select your instance <br/>
+&#8291;3. Select Contact Flows <br/>
+&#8291;4. Select <b><span id='spnBotname'>your bot</span></b> in the drop down <br/>
+&#8291;5. Click add Lex Bot
     `,
     image:"../images/connect_01.png"
 },{
@@ -64,7 +65,7 @@ Complete  [Tutorial 1: Set up your Amazon Connect Instance](https://docs.aws.ama
 `
 },
 {
-    title:"Select the Contact Flow",
+    title:"Select Contact Flow",
     image:"../images/connect_08.png",
     text:`
 &nbsp; Choose the contact flow you just created and click save.
@@ -73,12 +74,17 @@ Complete  [Tutorial 1: Set up your Amazon Connect Instance](https://docs.aws.ama
 {
     title:"Import Questions",
     text:`
-&nbsp; 1. Choose  <a href="#/import"> Import </a> from the tools menu ( &#9776; ): <br/>
-&nbsp; 2. Open Examples/Extensions, and choose LOAD from the 'ConnectWizardQnA' example <br/> 
-
+- Click below to Import Sample Questions and Answers <br/>
+<span id="ImportQuestionsStatus"/>
     `,
-    image:"../images/content_designer_02.png"
+    image:"../images/content_designer_02.png",
+    buttons: [{
+        text:"Import Sample Questions and Answers",
+        id:"ImportQuestions",
+        loading:false
+    }]
 },
+
 {
     title:"Test your call center.",
     text:`
@@ -87,8 +93,11 @@ Complete  [Tutorial 1: Set up your Amazon Connect Instance](https://docs.aws.ama
 &#8291; 1. "Where can I get additional information on QnABot?"<br/> 
 &#8291; 2. "When is your business open"<br/> 
 &#8291; 3. "Read me the U.S. Constitution" <br/>
-&#8291; 4. "Can you call me?" <br/> 
-&#8291; 5. To hang up say "Goodbye" <br/> 
+&#8291; 4. "What is the meaning of life?" <br/> 
+&#8291; 5. "Is Cereal Soup?" <br/> 
+&#8291; 6. "Go to the main menu" <br/> 
+&#8291; 6. "Can you call me?" (Work in Progress) <br/> 
+&#8291; 7. To hang up say "Goodbye" <br/> 
     `,
 }
 ]
