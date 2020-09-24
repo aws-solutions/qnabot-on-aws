@@ -215,7 +215,9 @@ module.exports={
                     })
                     .then(results => {
                         ImportQuestionsStatus.innerHTML = "Importing Questions (Step 3)..."
+                        console.log("documents </br>" + JSON.stringify(results))
                         let  exampleUrl = results.filter(example => self.contactFlow.QnaFile == example.document.href.split("/").slice(-1)[0] )[0];
+                        console.log("Example URL:" + exampleUrl);
                         return Promise.resolve(axios.get(exampleUrl.document.href));
                     })
                     .then(result =>  {
