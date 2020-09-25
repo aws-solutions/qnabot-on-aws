@@ -182,7 +182,8 @@ module.exports={
                 return self.$store.dispatch('data/build')
                 .then(function(){
                   btnImportQuestions.disabled = false;
-                  ImportQuestionsStatus.innerHTML = "";
+                  btnImportQuestions.style.opacity = "1"
+                  ImportQuestionsStatus.innerHTML = "Complete";
 
                   btnImportQuestions.innerHTML = "Import Sample Questions and Answers";
  
@@ -204,7 +205,8 @@ module.exports={
           if(btnImportQuestions){
                   btnImportQuestions.onclick = function() {
                     btnImportQuestions.disabled = true;
-                    btnImportQuestions.innerHTML = "Processing..."
+                    btnImportQuestions.style.opacity = "0.5"
+                    document.getElementById("stsLabel").innerHTML = "Status:"
                     ImportQuestionsStatus.innerHTML = "Importing Questions (Step 1)..."
                     self.$store.dispatch('api/getContactFlow')
                     .then(result => {
