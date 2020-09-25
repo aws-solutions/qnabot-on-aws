@@ -118,7 +118,7 @@ async function handleRequest(req, res, botName, botAlias) {
         let respText = _.get(req, "question");
         let progress = _.get(req, "session.qnabotcontext.elicitResponse.progress", undefined);
         if (isConnectClient(req) && ( botName != QNAYesNo && botName != QNAYesNoExit) && progress === 'ConfirmIntent') {
-            if (respText === '1' || respText.toLowerCase() === 'one' ) respText = 'Yes';
+            if (respText === '1' || respText.toLowerCase() === 'one' || respText.toLowerCase() === 'correct' ) respText = 'Yes';
             if (respText === '2' || respText.toLowerCase() === 'two' ) respText = 'No';
         }
         if (botName === QNAPhoneNumber && ( progress === 'ElicitSlot' || progress === 'ElicitIntent' || progress === "" || progress === undefined ) ) {

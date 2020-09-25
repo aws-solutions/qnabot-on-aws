@@ -37,7 +37,178 @@ module.exports={
             "name":"slot",
             "slotType":{"Ref":"SlotType"},
             "slotConstraint":"Optional",
-            "slotTypeVersion":"QNABOT-AUTO-ASSIGNED"
+            "slotTypeVersion":"QNABOT-AUTO-ASSIGNED",
+            "priority": 1,
+        },
+        {
+            "sampleUtterances": [],
+            "slotType": "AMAZON.Actor",
+            "obfuscationSetting": "NONE",
+            "slotConstraint": "Optional",
+            "valueElicitationPrompt": {
+                "messages": [
+                    {
+                        "contentType": "PlainText",
+                        "content": "actor"
+                    }
+                ],
+                "maxAttempts": 2
+            },
+            "priority": 5,
+            "name": "actor"
+        },
+        {
+            "sampleUtterances": [],
+            "slotType": "AMAZON.US_CITY",
+            "obfuscationSetting": "NONE",
+            "slotConstraint": "Optional",
+            "valueElicitationPrompt": {
+                "messages": [
+                    {
+                        "contentType": "PlainText",
+                        "content": "city"
+                    }
+                ],
+                "maxAttempts": 2
+            },
+            "priority": 3,
+            "name": "city"
+        },
+        {
+            "sampleUtterances": [],
+            "slotType": "AMAZON.Country",
+            "obfuscationSetting": "NONE",
+            "slotConstraint": "Optional",
+            "valueElicitationPrompt": {
+                "messages": [
+                    {
+                        "contentType": "PlainText",
+                        "content": "country"
+                    }
+                ],
+                "maxAttempts": 2
+            },
+            "priority": 2,
+            "name": "country"
+        },
+        {
+            "sampleUtterances": [],
+            "slotType": "AMAZON.Food",
+            "obfuscationSetting": "NONE",
+            "slotConstraint": "Optional",
+            "valueElicitationPrompt": {
+                "messages": [
+                    {
+                        "contentType": "PlainText",
+                        "content": "food"
+                    }
+                ],
+                "maxAttempts": 2
+            },
+            "priority": 7,
+            "name": "food"
+        },
+        {
+            "sampleUtterances": [],
+            "slotType": "AMAZON.Game",
+            "obfuscationSetting": "NONE",
+            "slotConstraint": "Optional",
+            "valueElicitationPrompt": {
+                "messages": [
+                    {
+                        "contentType": "PlainText",
+                        "content": "game"
+                    }
+                ],
+                "maxAttempts": 2
+            },
+            "priority": 10,
+            "name": "game"
+        },
+        {
+            "sampleUtterances": [],
+            "slotType": "AMAZON.MusicRecording",
+            "obfuscationSetting": "NONE",
+            "slotConstraint": "Optional",
+            "valueElicitationPrompt": {
+                "messages": [
+                    {
+                        "contentType": "PlainText",
+                        "content": "music"
+                    }
+                ],
+                "maxAttempts": 2
+            },
+            "priority": 6,
+            "name": "music"
+        },
+        {
+            "sampleUtterances": [],
+            "slotType": "AMAZON.Person",
+            "obfuscationSetting": "NONE",
+            "slotConstraint": "Optional",
+            "valueElicitationPrompt": {
+                "messages": [
+                    {
+                        "contentType": "PlainText",
+                        "content": "person"
+                    }
+                ],
+                "maxAttempts": 2
+            },
+            "priority": 9,
+            "name": "person"
+        },
+        {
+            "sampleUtterances": [],
+            "slotType": "AMAZON.MusicRecording",
+            "obfuscationSetting": "NONE",
+            "slotConstraint": "Optional",
+            "valueElicitationPrompt": {
+                "messages": [
+                    {
+                        "contentType": "PlainText",
+                        "content": "recording"
+                    }
+                ],
+                "maxAttempts": 2
+            },
+            "priority": 11,
+            "name": "recording"
+        },
+        {
+            "sampleUtterances": [],
+            "slotType": "AMAZON.Sport",
+            "obfuscationSetting": "NONE",
+            "slotConstraint": "Optional",
+            "valueElicitationPrompt": {
+                "messages": [
+                    {
+                        "contentType": "PlainText",
+                        "content": "sport"
+                    }
+                ],
+                "maxAttempts": 2
+            },
+            "priority": 8,
+            "name": "sport"
+        },
+        {
+            "sampleUtterances": [],
+            "slotType": "AMAZON.US_STATE",
+            "obfuscationSetting": "NONE",
+            "slotConstraint": "Optional",
+            "valueElicitationPrompt": {
+                "messages": [
+                    {
+                        "contentType": "PlainText",
+                        "content": "state"
+                    }
+                ],
+                "maxAttempts": 2
+            },
+            "priority": 4,
+            "name": "state"
         }],
         "fulfillmentActivity": {
           "type": "CodeHook",

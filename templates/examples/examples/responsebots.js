@@ -337,7 +337,7 @@ exports.resources={
                 maxAttempts: 1,
                 messages: [
                     {
-                        content: "Is {Pin} correct (Yes/No)?",
+                        content: "<speak>Is <say-as interpret-as=\"digits\">{Pin}</say-as> correct (Yes or No)?</speak>",
                         contentType: "PlainText"
                     }
                 ]
@@ -394,7 +394,7 @@ exports.resources={
             "createVersion": true,
             "valueSelectionStrategy": "TOP_RESOLUTION",
             "enumerationValues": [
-                {"value":"Yes", "synonyms":["OK","Yeah","Sure","Yep","Affirmative","aye", "1", "One"]},
+                {"value":"Yes", "synonyms":["OK","Yeah","Sure","Yep","Affirmative","aye", "Correct", "1", "One"]},
                 {"value":"No", "synonyms":["Nope","Na","Negative","Non", "2", "Two"]}
               ]
         }
@@ -495,7 +495,7 @@ exports.resources={
             "createVersion": true,
             "valueSelectionStrategy": "TOP_RESOLUTION",
             "enumerationValues": [
-                {"value":"Yes", "synonyms":["OK","Yeah","Sure","Yep","Affirmative","aye", "1", "One"]},
+                {"value":"Yes", "synonyms":["OK","Yeah","Sure","Yep","Affirmative","aye", "Correct", "1", "One"]},
                 {"value":"No", "synonyms":["Nope","Na","Negative","Non", "2", "Two"]},
                 {"value":"Exit", "synonyms":["agent","rep","representative","stop","quit", "help", "bye", "goodbye", "3", "Three"]}
             ]
@@ -936,7 +936,7 @@ exports.resources={
                 maxAttempts: 1,
                 messages: [
                     {
-                        content: "Is {Number} correct (Yes or No)?",
+                        content: "<speak>Is <say-as interpret-as=\"digits\">{Number}</say-as> correct (Yes or No)?</speak>",
                         contentType: "PlainText"
                     }
                 ]
