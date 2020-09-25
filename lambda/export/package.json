@@ -11,7 +11,7 @@
     "csv-writer": "^1.6.0",
     "intercept-stdout": "^0.1.2",
     "lodash": "^4.17.15",
-    "mocha": "^8.0.1",
+    "mocha": "^8.1.1",
     "save-dev": "0.0.1-security"
   },
   "scripts": {

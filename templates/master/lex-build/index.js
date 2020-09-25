@@ -17,7 +17,7 @@ module.exports={
         SLOTTYPE:{"Ref":"SlotType"},
         INTENT:{"Ref":"Intent"},
         INTENTFALLBACK:{"Ref":"IntentFallback"},
-        ADDRESS:{"Fn::GetAtt":["ESVar","ESAddress"]},
+        ADDRESS:{"Fn::Join" : [ "", [ "https://", {"Fn::GetAtt":["ESVar","ESAddress"]} ] ] },
         INDEX:{"Fn::GetAtt":["Var","index"]},
     },"nodejs10.x"),
     "LexBuildLambdaStart":lambda({

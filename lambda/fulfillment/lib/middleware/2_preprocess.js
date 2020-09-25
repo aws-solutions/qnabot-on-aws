@@ -83,7 +83,7 @@ module.exports=async function preprocess(req,res){
             }
             var urls = default_jwks_url.concat(identity_provider_jwks_url);
             console.log("Attempt to verify idtoken using jwks urls:",urls);
-            var verified_url = await jwt.verify(kid,urls) ;
+            var verified_url = await jwt.verify(idtoken,kid,urls) ;
             if (verified_url) {
                 _.set(idattrs,'verifiedIdentity',"true");
                 console.log("Verified identity with:",verified_url);
@@ -100,6 +100,7 @@ module.exports=async function preprocess(req,res){
         if ( _.get(idattrs, 'verifiedIdentity',"false") != "true") {
             // identity is not verified
             // reset question to the configured no_verified_identity question
+            console.log("Missing or invalid idtokenjwt - ENFORCE_VERIFIED_IDENTITY is true - seeting question to NO_VERIFIED_IDENTITY_QUESTION") ;
             req.question = _.get(req, '_settings.NO_VERIFIED_IDENTITY_QUESTION','no_verified_identity') ;
         }
     }

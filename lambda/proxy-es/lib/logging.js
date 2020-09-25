@@ -40,34 +40,37 @@ module.exports=function(event, context, callback){
     var date = new Date()
     var now = date.toISOString()
     // need to unwrap the request and response objects we actually want from the req object
-    var unwrappedReq =event.req
-    var unwrappedRes =event.res
+    var req =event.req
+    var res =event.res
+    var sessionAttributes = _.cloneDeep(_.get(res,"session",{}));
     
-    // response session attributes logged as JSON string values to avoid 
-    // ES mapping errors.
-    stringifySessionAttribues(unwrappedRes);
+    // response session attributes are logged as JSON string values to avoid 
+    // ES mapping errors after upgrading from previous releases.
+    stringifySessionAttribues(res);
 
-    let redactEnabled = _.get(unwrappedReq, '_settings.ENABLE_REDACTING');
-    let redactRegex = _.get(unwrappedReq, '_settings.REDACTING_REGEX', "\\b\\d{4}\\b(?![-])|\\b\\d{9}\\b|\\b\\d{3}-\\d{2}-\\d{4}\\b");
+    let redactEnabled = _.get(req, '_settings.ENABLE_REDACTING');
+    let redactRegex = _.get(req, '_settings.REDACTING_REGEX', "\\b\\d{4}\\b(?![-])|\\b\\d{9}\\b|\\b\\d{3}-\\d{2}-\\d{4}\\b");
 
     if (redactEnabled) {
         console.log("redact enabled");
         let re = new RegExp(redactRegex, "g");
-        processKeysForRegEx(unwrappedReq, re);
-        processKeysForRegEx(unwrappedRes, re);
+        processKeysForRegEx(req, re);
+        processKeysForRegEx(res, re);
+        processKeysForRegEx(sessionAttributes, re);
         console.log("RESULT",JSON.stringify(event).replace(re, 'XXXXX'));
     } else {
         console.log("RESULT",JSON.stringify(event));
     }
 
     let jsonData = {
-        entireRequest: unwrappedReq,
-        entireResponse: unwrappedRes,
-        qid: _.get(unwrappedRes.result, "qid"),
-        utterance: String(unwrappedReq.question).toLowerCase().replace(/[\u2000-\u206F\u2E00-\u2E7F\\'!"#$%&()*+,\-.\/:;<=>?@\[\]^_`{|}~]/g, ""),
-        answer: _.get(unwrappedRes, "message"),
-        topic: _.get(unwrappedRes.result, "t", ""),
-        clientType: unwrappedReq._clientType,
+        entireRequest: req,
+        entireResponse: res,
+        qid: _.get(res.result, "qid"),
+        utterance: String(req.question).toLowerCase().replace(/[\u2000-\u206F\u2E00-\u2E7F\\'!"#$%&()*+,\-.\/:;<=>?@\[\]^_`{|}~]/g, ""),
+        answer: _.get(res, "message"),
+        topic: _.get(res.result, "t", ""),
+        session: sessionAttributes,
+        clientType: req._clientType,
         datetime: now
     }
 
