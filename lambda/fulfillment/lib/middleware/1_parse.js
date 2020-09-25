@@ -111,27 +111,27 @@ module.exports = async function parse(req, res) {
     switch (req._type) {
         case 'LEX':
             Object.assign(req, await lex.parse(req))
+            _.set(req,"_preferredResponseType","PlainText") ;
+            // Determine preferred response message type - PlainText, or SSML
+            const outputDialogMode = _.get(req,"_event.outputDialogMode");
+            if (outputDialogMode == "Voice") {
+                _.set(req,"_preferredResponseType","SSML") ;
+            } else if (outputDialogMode == "Text") {
+                // Amazon Connect uses outputDialogMode "Text" yet indicates support for SSML using request header x-amz-lex:accept-content-types
+                const contentTypes = _.get(req,"_event.requestAttributes.x-amz-lex:accept-content-types","") ;
+                if (contentTypes.includes("SSML")) {
+                    _.set(req,"_preferredResponseType","SSML") ;
+                }
+            } else {
+                console.log("WARNING: Unrecognised value for outputDialogMode:", outputDialogMode);
+            }
             break;
         case 'ALEXA':
             Object.assign(req, await alexa.parse(req))
+            _.set(req,"_preferredResponseType","SSML") ;
             break;
     }
     
-
-    // Determine preferred response message type - PlainText, or SSML
-    const outputDialogMode = _.get(req,"_event.outputDialogMode");
-    _.set(req,"_preferredResponseType","PlainText") ;
-    if (outputDialogMode == "Voice") {
-        _.set(req,"_preferredResponseType","SSML") ;
-    } else if (outputDialogMode == "Text") {
-        // Amazon Connect uses outputDialogMode "Text" yet indicates support for SSML using request header x-amz-lex:accept-content-types
-        const contentTypes = _.get(req,"_event.requestAttributes.x-amz-lex:accept-content-types","") ;
-        if (contentTypes.includes("SSML")) {
-            _.set(req,"_preferredResponseType","SSML") ;
-        }
-    } else {
-        console.log("WARNING: Unrecognised value for outputDialogMode:", outputDialogMode);
-    }
 
     req._clientType = getClientType(req) ;
 
