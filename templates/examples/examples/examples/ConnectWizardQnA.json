@@ -38,7 +38,7 @@
     },
     {
       "qid": "ConnectHelper.Constitution",
-      "a": "Okay, but it's pretty long.  Feel free to ask your next question when you are ready. {{setSessionAttr 'nextPrompt' 'We the People of the United States, in Order to form a more perfect Union, establish Justice, insure domestic Tranquility, provide for the common defense, promote the general Welfare, and secure the Blessings of Liberty to ourselves and our Posterity, do ordain and establish this Constitution for the United States of America.'}}",
+      "a": "Okay, but it's pretty long.  Feel free to ask your next question when you are ready. We the People of the United States, in Order to form a more perfect Union, establish Justice, insure domestic Tranquility, provide for the common defense, promote the general Welfare, and secure the Blessings of Liberty to ourselves and our Posterity, do ordain and establish this Constitution for the United States of America.",
       "type": "qna",
       "q": [
         "Read me the U.S. Constitution",
@@ -90,7 +90,7 @@
     },
     {
       "qid": "ConnectHelper.DefaultMenu",
-      "a": "Welcome to QnA bot.  {{setSessionAttr 'nextPrompt' 'Ask me a question, say main menu, or ask to speak to a representative.'}}",
+      "a": "Welcome to QnA bot.  Ask me a question, say main menu, or ask to speak to a representative. {{setSessionAttr 'connect_nextPrompt' ''}}",
       "type": "qna",
       "q": [
         "Default menu"
@@ -131,7 +131,7 @@
     },
     {
       "qid": "ConnectHelper.Hours",
-      "a": "We have multiple locations in Seattle and Boston.  {{setSessionAttr 'nextPrompt' 'Do you want to know the hours for Seattle or Boston?'}}",
+      "a": "We have multiple locations in Seattle and Boston.  {{setSessionAttr 'connect_nextPrompt' 'Do you want to know the hours for Seattle or Boston?'}}",
       "t": "Hours",
       "type": "qna",
       "q": [
