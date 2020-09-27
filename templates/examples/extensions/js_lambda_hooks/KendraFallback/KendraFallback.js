@@ -377,6 +377,7 @@ async function routeKendraRequest(event, context) {
 
     // update QnABot answer content for ssml, markdown, and text
     if (foundAnswerCount > 0 || foundDocumentCount > 0) {
+        event.res.session.qnabot_gotanswer = true ; 
         event.res.message = answerMessage;
         let ssmlMessage = `${answerMessage.substring(0,600).replace(/\r?\n|\r/g, " ")}`;
         if (speechMessage != "") {
