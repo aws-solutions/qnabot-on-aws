@@ -377,6 +377,7 @@ async function routeKendraRequest(event, context) {
 
     // update QnABot answer content for ssml, markdown, and text
     if (foundAnswerCount > 0 || foundDocumentCount > 0) {
+        event.res.session.qnabot_gotanswer = true ; 
         event.res.message = answerMessage;
         let ssmlMessage = `${answerMessage.substring(0,600).replace(/\r?\n|\r/g, " ")}`;
         if (speechMessage != "") {
@@ -391,7 +392,7 @@ async function routeKendraRequest(event, context) {
         
         event.res.session.appContext.altMessages.markdown = answerMessageMd;
         event.res.session.appContext.altMessages.ssml = ssmlMessage;
-        if (event.req["_event"].outputDialogMode !== 'Text') {
+        if (event.req._preferredResponseType == "SSML") {
             event.res.message = ssmlMessage;
             event.res.type = 'SSML';
             event.res.plainMessage = answerMessage;
@@ -419,6 +420,7 @@ async function routeKendraRequest(event, context) {
                 
                 if (element.text && element.text.length > 0) {
                     event.res.session.appContext.altMessages.markdown += `\n\n  ${element.text}`;
+                    event.res.message += `\n\n  ${element.text}`;
                 }
                 let label = docName(element.uri) ;
                 // Convert S3 Object URLs to signed URLs
@@ -436,6 +438,8 @@ async function routeKendraRequest(event, context) {
         _.set(event,"res.session.qnabotcontext.kendra.kendraResultId",kendraResultId) ;
         _.set(event,"res.session.qnabotcontext.kendra.kendraResponsibleQid",event.res.result.qid) ;
     }
+    
+    console.log("Returning event: ", JSON.stringify(event, null, 2));
 
     return event;
 }
