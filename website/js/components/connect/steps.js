@@ -73,7 +73,7 @@ Now we must make the QnABot accessible to our new call center.  Open the  <b><a 
 <br /><br />
 Choose <b>IMPORT SAMPLE QUESTIONS AND ANSWERS</b> below, it can take up to <b>2 minutes</b> to finish this process.<br/>
 After Rebuild is done, you are ready to try your Bot!, Call the <b>Phone Number</b> and try some of the questions below.<br/>
-For more information see our blog post <a href="https://github.com/aws-samples/aws-ai-qna-bot/blob/ConnectWizard/workshops/Connect/README.md">Build an AI powered agent for Amazon Connect using AWS QnABot</a></br>
+For more information see our blog post <a href="https://github.com/aws-samples/aws-ai-qna-bot/blob/master/workshops/Connect/README.md">Build an AI powered agent for Amazon Connect using AWS QnABot</a></br>
 
 <br/><span id="stsLabel"></span> <span id="ImportQuestionsStatus"/><br /><br />
 `
