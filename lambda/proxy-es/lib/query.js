@@ -410,6 +410,9 @@ module.exports = async function (req, res) {
         var card = _.get(res, "result.r.title") ? res.result.r : null
 
         if (card) {
+            if (res.card === undefined) {
+                res.card = {};
+            }
             res.card.send = true
             res.card.title = _.get(card, 'title')
             res.card.subTitle = _.get(card, 'subTitle')
