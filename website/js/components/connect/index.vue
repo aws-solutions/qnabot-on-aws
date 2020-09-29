@@ -171,7 +171,7 @@ module.exports={
 
     
           function poll(url){
-            Promise.resolve(axios.get(url))
+            return self.$store.dispatch('api/getImport',{href: url})
             .then(function(result){
 
               if(result.status==="InProgress"){
@@ -187,8 +187,8 @@ module.exports={
 
                   btnImportQuestions.innerHTML = "Import Sample Questions and Answers";
  
-                })
-                .else(e => 
+                }).then( result => {})
+                .catch(e => 
                   ImportQuestionsStatus.innerHTML = "Error Rebuilding LexBot. Please return to the Content Designer, correct the errors and REBUILD LEXBOT </br>" +
                   "LexBot Rebuild Error " + e
                  )
@@ -217,24 +217,15 @@ module.exports={
                     })
                     .then(results => {
                         ImportQuestionsStatus.innerHTML = "Importing Questions (Step 3)..."
-                        console.log("documents </br>" + JSON.stringify(results))
                         let  exampleUrl = results.filter(example => self.contactFlow.QnaFile == example.document.href.split("/").slice(-1)[0] )[0];
-                        console.log("Example URL:" + exampleUrl);
-                        return Promise.resolve(axios.get(exampleUrl.document.href));
+                        return self.$store.dispatch('api/waitForImport',{id: self.contactFlow.QnaFile })
                     })
-                    .then(result =>  {
-                        ImportQuestionsStatus.innerHTML = "Importing Questions (Step 4)..."
-                        return self.$store.dispatch('api/startImport',{
-                        qa:result.data.qna,
-                        name:self.contactFlow.QnaFile
-                      })
-                     } )
                     .then(res =>  {
                       ImportQuestionsStatus.innerHTML = "Rebuilding Lex Bot."
-                      self.pollUrl = res._links.imports.href+"/" + self.contactFlow.QnaFile;
-                      return Promise.resolve(axios.get(self.pollUrl))
+                      self.pollUrl = res.href;
+                      return poll(self.pollUrl)
                     })
-                    .then(result => poll(self.pollUrl))
+                    .then()
 
                     }
               }
