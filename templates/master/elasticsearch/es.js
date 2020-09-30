@@ -2,7 +2,7 @@ var properties={
     
     "ElasticsearchClusterConfig": {
        "DedicatedMasterEnabled": false,
-       "InstanceCount": 2,
+       "InstanceCount": {"Ref":"ElasticSearchNodeCount"},
        "InstanceType": {"Fn::If": [ "Encrypted", "c5.large.elasticsearch", "t2.small.elasticsearch"]},
        "ZoneAwarenessEnabled": "true"
     },
