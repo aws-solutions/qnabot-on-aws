@@ -55,7 +55,7 @@
     },
     {
       "qid": "ConnectHelper.Cereal",
-      "a": "Cereal itself is not soup, However, Cereal with milk it a soup. Cereal is defined as \"a prepared foodstuff of grain. \" This means that \"cereal\" itself is not a soup. However, a soup is defined as a liquid food; often containing pieces of solid food. Milk is a liquid food, And cereal is solid food, Therefore cereal with milk is a soup.",
+      "a": "Cereal itself is not soup. However, Cereal with milk it a soup. Cereal is defined as \"a prepared foodstuff of grain.\" This means that \"cereal\" itself is not a soup. However, a soup is defined as a liquid food; often containing pieces of solid food. Milk is a liquid food, and cereal is solid food, therefore cereal with milk is a soup.",
       "type": "qna",
       "q": [
         "Is Cereal Soup?"
