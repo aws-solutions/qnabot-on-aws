@@ -49,6 +49,7 @@ module.exports={
     }),
     "Example": resource('{proxy+}',{"Ref":"Documents"}),
     "ExampleGet":proxy({
+        authorization:"AWS_IAM",
         resource:{"Ref": "Example"},
         method:"get",
         bucket:{"Ref":"AssetBucket"},
@@ -108,7 +109,7 @@ function proxy(opts){
     return {
       "Type": "AWS::ApiGateway::Method",
       "Properties": {
-        "AuthorizationType": "NONE",
+        "AuthorizationType": opts.auth || "AWS_IAM",
         "HttpMethod":opts.method.toUpperCase(),
         "Integration": {
           "Type": "AWS",

@@ -6,6 +6,7 @@ module.exports={
     "Static": resource('static'),
     "Proxy": resource('{proxy+}',{"Ref":"Static"}),
     "ProxyAnyGet":proxy({
+        auth: "NONE",
         resource:{"Ref": "Proxy"},
         method:"get",
         path:"/{proxy}",
@@ -17,6 +18,7 @@ module.exports={
         }
     }),
     "ProxyAnyHead":proxy({
+        auth: "NONE",
         resource:{"Ref": "Proxy"},
         method:"head",
         path:"/{proxy}",
@@ -33,7 +35,7 @@ function proxy(opts){
     return {
       "Type": "AWS::ApiGateway::Method",
       "Properties": {
-        "AuthorizationType": "NONE",
+        "AuthorizationType": opts.auth || "AWS_IAM",
         "HttpMethod":opts.method.toUpperCase(),
         "Integration": {
           "Type": "AWS",
