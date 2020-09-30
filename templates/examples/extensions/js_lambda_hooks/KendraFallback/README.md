@@ -11,58 +11,36 @@ whether this link is usable. In addition Kendra can return discovered text with 
 This function returns a default of four discovered texts/links. The maximum number of returned links is
 configurable. 
 
-## Custom Properties
-QnABot utilizes custom properties stored within Systems Manager Parameter Store. 
 
-The following custom properties can be set within Systems Manager Parameter Store that affect
-output for web and text. 
+### Configure Kendra Fallback using the following settings in Content designer Setting page.
 
-Please look at your CloudFormation stack outputs for the key 'CustomSettingsSSMParameterName' 
-to identify the name of the parameter to update in SSM Parameter Store.
-
-The value for this key will look similar to 
-```
-CFN-CustomQnABotSettings-VZNvdO2sJ3r7
-```
-
-### Customer properties that can be set are the following
-
-#### ALT_SEARCH_KENDRA_INDEXES
+#### ALT\_SEARCH\_KENDRA\_INDEXES
 **Required** - A String value that specifies an array of 
-Kendra indexes to search. At least one index must be specified. Until this custom property is set 
-in QnABot, use of Kendra as a fallback mechanism will return an error. 
-
-Edit this custom property mentioned earlier to add a key/value similar to 
+Kendra indexes to search. 
+The value of ALT\_SEARCH\_KENDRA\_INDEXES should be either a single index id, or an array of index ids, for example: 
 
 ```
-{"ALT_SEARCH_KENDRA_INDEXES":"[\"857710ab-9637-4a46-910f-9a1456d02596\"]"}
+"857710ab-example-do-not-copy" OR ["857710ab-example1-do-not-copy","857710ab-example2-do-not-copy"]
 ```
-**Note the Escaped Quote marks around the array of Kendra index ids are required**
 
-#### ALT_SEARCH_MESSAGE 
-String - Overrides the default text to prepend to the response
-indicating alternate search results are being used. 
-
-#### ALT_SEARCH_MESSAGE_MD 
-String - Overrides the default Markdown to prepend to the response
-indicating alternate search results are being used. 
-
-#### ALT_SEARCH_HELPFUL_LINKS_MSG
-String - Overrides the default message to insert in markdown 
-output prior to display of Kendra Answer document uris. Default is 'Possible Links'.
-
-#### ALT_SEARCH_EXTRACTED_TEXT_MSG
-String - Overrides the default message to insert in markdown 
-output prior to display the Answer's document uris. Default is 'Discovered Text'.
-
-#### ALT_SEARCH_MAX_DOCUMENT_COUNT 
+#### ALT\_SEARCH\_KENDRA\_MAX\_DOCUMENT\_COUNT 
 Number - Overrides the maximum number of discovered text links
 to display in markdown result. Default is 4.
           
+#### ALT_SEARCH_KENDRA_S3_SIGNED_URLS  
+  
+If set **true** then if S3 document URL is in the search result, convert to a signed URL. 
+IMPORTANT: Make sure IAM Role *...ExtensionLambdaRole...* (used by the Kendra Fallback function) has been granted S3:GetObject access to S3 objects in the Kendra index (otherwise the signed URLS will not have access)
+
+#### ALT\_SEARCH\_KENDRA\_S3\_SIGNED\_URL\_EXPIRE\_SECS  
+  
+Value determines the expiration of the S3 URL - default 300 seconds.
+    
+    
 ## Installation
 
 ### Step 1
-Set the ALT_SEARCH_KENDRA_INDEXES custom property in SSM Parameter Store
+Set the ALT\_SEARCH\_KENDRA\_INDEXES setting in QnABot Designer UI Settings page
 
 ### Step 2
 Using QnABot Designer UI, use the import menu and expand the Examples/Extensions block. Then look
