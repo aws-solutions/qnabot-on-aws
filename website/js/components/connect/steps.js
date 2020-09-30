@@ -71,9 +71,10 @@ Now we must make the QnABot accessible to our new call center.  Open the  <b><a 
     image:"../images/wizard-6.png",
     text:`
 <br /><br />
-Choose <b>IMPORT SAMPLE QUESTIONS AND ANSWERS</b> below, it can take up to <b>2 minutes</b> to finish this process.<br/>
-After Rebuild is done, you are ready to try your Bot!, Call the <b>Phone Number</b> and try some of the questions below.<br/>
-For more information see our blog post <a href="https://github.com/aws-samples/aws-ai-qna-bot/blob/ConnectWizard/workshops/Connect/README.md">Build an AI powered agent for Amazon Connect using AWS QnABot</a></br>
+&#8291;1. Choose <b>IMPORT SAMPLE QUESTIONS AND ANSWERS</b> below, it can take up to <b>2 minutes</b> to finish this process.<br/>
+&#8291;2. After Rebuild is done, enable the new interruptable reponse feature: (i) From the Designer Tools menu (&#x2630;) choose <b>Settings</b>, (ii) set <b>CONNECT_ENABLE_VOICE_RESPONSE_INTERRUPT</b> to <b>true</b>, and (iii) save changes.<br/><br/> 
+&#8291;3. You are ready to try your Bot!, Call the <b>Phone Number</b> and try some of the questions below.<br/>
+For more information see our blog post <a href="https://github.com/aws-samples/aws-ai-qna-bot/blob/master/workshops/Connect/README.md">Build an AI powered agent for Amazon Connect using AWS QnABot</a></br>
 
 <br/><span id="stsLabel"></span> <span id="ImportQuestionsStatus"/><br /><br />
 `

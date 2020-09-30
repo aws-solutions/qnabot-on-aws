@@ -36,6 +36,7 @@ module.exports=Promise.resolve(require('../master')).then(function(base){
         "Email",
         "Username",
         "Encryption",
+        "ElasticSearchNodeCount",
         "PublicOrPrivate"
     ])
     base.Conditions.Public={"Fn::Equals":[{"Ref":"PublicOrPrivate"},"PUBLIC"]}
