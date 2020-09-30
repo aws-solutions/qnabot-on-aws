@@ -171,11 +171,12 @@ module.exports={
 
     
           function poll(url){
+            console.log(url)
             return self.$store.dispatch('api/getImport',{href: url})
             .then(function(result){
 
               if(result.status==="InProgress"){
-                setTimeout(()=>poll(),100)
+                setTimeout(()=>poll(url),100)
               }
               else
               {
@@ -215,12 +216,27 @@ module.exports={
 
                       return self.$store.dispatch("api/listExamples")
                     })
-                    .then(results => {
+                    .then(result =>  {
                         ImportQuestionsStatus.innerHTML = "Importing Questions (Step 3)..."
-                        let  exampleUrl = results.filter(example => self.contactFlow.QnaFile == example.document.href.split("/").slice(-1)[0] )[0];
+                        let  exampleUrl = result.filter(example => self.contactFlow.QnaFile == example.document.href.split("/").slice(-1)[0] )[0];
+                        return self.$store.dispatch('api/getImport',{href: exampleUrl.document.href})
+                    })
+                    .then(result =>  {
+                        ImportQuestionsStatus.innerHTML = "Importing Questions (Step 4)..."
+
+
+                        return self.$store.dispatch('api/startImport',{
+                        qa:result.qna,
+                        name:self.contactFlow.QnaFile
+                      
+                      })
+                    })
+                    .then(results => {
+                        ImportQuestionsStatus.innerHTML = "Importing Questions (Step 5)..."
                         return self.$store.dispatch('api/waitForImport',{id: self.contactFlow.QnaFile })
                     })
                     .then(res =>  {
+                      console.log(JSON.stringify(res))
                       ImportQuestionsStatus.innerHTML = "Rebuilding Lex Bot."
                       self.pollUrl = res.href;
                       return poll(self.pollUrl)
