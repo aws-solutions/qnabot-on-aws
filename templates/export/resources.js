@@ -71,6 +71,7 @@ module.exports=Object.assign(
       },
       "Deployment":{
         "Type": "Custom::ApiDeployment",
+        "DeletionPolicy":"Retain",
         "DependsOn":["ConnectGet","ConnectApiResource","InvokePermissionConnectLambda"],
         "Properties": {
           "ServiceToken": { "Ref" : "CFNLambda" },
