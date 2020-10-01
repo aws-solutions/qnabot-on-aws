@@ -46,9 +46,9 @@ Within the QnABot invocation, pass in the defaultPrompt to ensure there is a pro
 
 The default prompt defines what gets played out to the user if a next prompt is not explicitly set from within a QnABot response. This can be something like &quot;Ask another question, say return to main menu, or ask to speak to a representative&quot;. In this way, we can guarantee that there is always a prompt played out to the user. This default prompt is always passed into the Get Customer Input block as the next prompt in case it is not set within the question.
 
-The next prompt feature lets you explicitly define a prompt that overwrites the default prompt through the use of QnABot Handlebars and Amazon Lex session attributes. This lets you create guardrails and recommended paths for users to follow as they traverse through the system.
+The next prompt feature lets you explicitly define a prompt that overwrites the default prompt through the use of QnABot Handlebars and Amazon Lex session attributes. This lets you create guardrails and recommended paths for users to follow as they traverse through the system. By default, we assign the next prompt using the connect\_nextPrompt attribute name, however this can be changed using the CONNECT\_NEXT\_PROMPT\_VARNAME option within the Settings menu for your QnABot implementation.
 
-For example, if you have a question like &quot;When is your business open?&quot; the logical response might be &quot;We have two offices with different hours. Which location are you referring to?&quot; Without the nextPrompt construct, the user would get played the default message before being able to respond, breaking the conversational chain. In this instance, the question in QnABot could be formatted in the following way:
+For example, if you have a question like &quot;When is your business open?&quot; the logical response might be &quot;We have two offices with different hours. Which location are you referring to?&quot; Without the connect\_nextPrompt construct, the user would get played the default message before being able to respond, breaking the conversational chain. In this instance, the question in QnABot could be formatted in the following way:
 
 ![](images/3_hours.png)
 
@@ -64,7 +64,7 @@ By overwriting the default prompt with the next prompt attribute, we can guide t
 
 You can configure a feature called [Barge In for Amazon Lex](https://docs.aws.amazon.com/connect/latest/adminguide/get-customer-input.html#get-customer-input-bargein) within Amazon Connect. This allows users to interrupt a prompt with their response, which is useful for longer menus where users want to provide an input before the entire message plays. In the example contact flow, this feature is enabled for you by setting a session attribute in the Get customer input block.
 
-This feature, combined with the &#39;next prompt&#39; construct, allows you to write longer form responses to questions that let users ask their next question without waiting. For example:
+This feature, combined with the new CONNECT\_ENABLE\_VOICE\_RESPONSE\_INTERRUPT setting in QnABot 4.3+, allows you to write longer form responses to questions that let users ask their next question without waiting. By setting this option to true, QnABot automatically passes the text after the first sentence into the connect\_nextPrompt session attribute along with the default or assigned next prompt. This forces the text to be played at the next invocation of the bot where a caller can interrupt the playback as soon as their question is answered or they have another question. This allows content designers to simplify how they write longer responses (while still enabling barge-in) without having to explicitly set the next prompt within the question. For example:
 
 ![](images/5_barge.png)
 
@@ -128,9 +128,15 @@ By passing in the Contact ID from Amazon Connect, you can leverage it in reporti
 
 QnABot records the invocation details and session attributes every time the bot is called inside of an Amazon ElasticSearch cluster that is provisioned for you when you launch the solution. This cluster includes default dashboards to monitor the performance of the bot, including questions that were asked that you didn&#39;t have answers to. By passing in the Contact ID, you can look at specific users that called the bot from Amazon Connect and view the journey they took from one question to another. This type of analysis can be useful if you&#39;re looking to understand the way your end users are interacting with the bot or if you should build additional guardrails or suggestions that would improve the experience.
 
+## Tuning and Error Handling
+
+Like any other AI powered system, it&#39;s important to continuously train and monitor your bot to improve customer experience. QnABot offers [tuning recommendations and monitoring capabilities](https://github.com/aws-samples/aws-ai-qna-bot/blob/master/tuning_accuracy_guide/AWS_QnABot_tuning_recognition_accuracy_guide.md) to ensure your customers are able to find the answers to their questions.
+
+Over a voice interface, sometimes filler words can cause QnABot to transcribe an unintentional input. To accommodate for this, QnABot offers a CONNECT\_IGNORE\_WORDS setting that can be used to strip out unintentional inputs to better understand questions or provide better error handling. The setting accepts a comma delimited list for the words transcribed by filler sounds (for example e,a,uh,uhh,ah,ahh,um,umm). By monitoring the inputs to QnABot, you can build out such an exclude list to improve the performance of the bot while learning more about the questions being asked to your bot.
+
 # Conclusion
 
-Using session attributes and other channel specific constructs, you can improve how users engage with QnABot when using Amazon Connect. While this post is not an exhaustive list of how to improve the experience, using these parameters you can design a better customer experience that lets your users get to the information they need in an intuitive, interactive manner.
+Using session attributes, QnABot settings, and other channel specific constructs, you can improve how users engage with QnABot when using Amazon Connect. While this post is not an exhaustive list of how to improve the experience, using these parameters you can design a better customer experience that lets your users get to the information they need in an intuitive, interactive manner.
 
 Combining Amazon Connect with QnABot allows your customer service representatives to spend time with your customers on more complex tasks while also providing users with a better experience through self-service. Customer satisfaction increases all while costs decrease since you&#39;re consuming fewer connected minutes and maximizing agent utilization.
 

@@ -37,15 +37,6 @@
       ]
     },
     {
-      "qid": "ConnectHelper.Constitution",
-      "a": "Okay, but it's pretty long.  Feel free to ask your next question when you are ready. {{setSessionAttr 'nextPrompt' 'We the People of the United States, in Order to form a more perfect Union, establish Justice, insure domestic Tranquility, provide for the common defense, promote the general Welfare, and secure the Blessings of Liberty to ourselves and our Posterity, do ordain and establish this Constitution for the United States of America.'}}",
-      "type": "qna",
-      "q": [
-        "Read me the U.S. Constitution",
-        "Read the Constitution"
-      ]
-    },
-    {
       "qid": "ConnectHelper.MeaningOfLife",
       "a": "The meaning of life, the universe, and everything is 42",
       "type": "qna",
@@ -55,10 +46,19 @@
     },
     {
       "qid": "ConnectHelper.Cereal",
-      "a": "Cereal itself is not soup, However, Cereal with milk it a soup. Cereal is defined as \"a prepared foodstuff of grain. \" This means that \"cereal\" itself is not a soup. However, a soup is defined as a liquid food; often containing pieces of solid food. Milk is a liquid food, And cereal is solid food, Therefore cereal with milk is a soup.",
+      "a": "Cereal itself is not soup. However, Cereal with milk it a soup. Cereal is defined as \"a prepared foodstuff of grain.\" This means that \"cereal\" itself is not a soup. However, a soup is defined as a liquid food; often containing pieces of solid food. Milk is a liquid food, and cereal is solid food, therefore cereal with milk is a soup.",
       "type": "qna",
       "q": [
         "Is Cereal Soup?"
+      ]
+    },
+    {
+      "qid": "ConnectHelper.Constitution",
+      "a": "Okay, but it's pretty long. If you enabled the interuptable responses setting, you can ask your next question at any time during the response. We the People of the United States, in Order to form a more perfect Union, establish Justice, insure domestic Tranquility, provide for the common defense, promote the general Welfare, and secure the Blessings of Liberty to ourselves and our Posterity, do ordain and establish this Constitution for the United States of America.",
+      "type": "qna",
+      "q": [
+        "Read me the U.S. Constitution",
+        "Read the Constitution"
       ]
     },
     {
@@ -90,7 +90,7 @@
     },
     {
       "qid": "ConnectHelper.DefaultMenu",
-      "a": "Welcome to QnA bot.  {{setSessionAttr 'nextPrompt' 'Ask me a question, say main menu, or ask to speak to a representative.'}}",
+      "a": "Welcome to QnA bot.  Ask me a question, say main menu, or ask to speak to a representative. {{setSessionAttr 'connect_nextPrompt' ''}}",
       "type": "qna",
       "q": [
         "Default menu"
@@ -131,7 +131,7 @@
     },
     {
       "qid": "ConnectHelper.Hours",
-      "a": "We have multiple locations in Seattle and Boston.  {{setSessionAttr 'nextPrompt' 'Do you want to know the hours for Seattle or Boston?'}}",
+      "a": "We have multiple locations in Seattle and Boston.  {{setSessionAttr 'connect_nextPrompt' 'Do you want to know the hours for Seattle or Boston?'}}",
       "t": "Hours",
       "type": "qna",
       "q": [
