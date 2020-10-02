@@ -7,6 +7,8 @@ This repository contains code for the QnABot, described in the AWS AI blog post 
 
 See the "Getting Started" to launch your own QnABot
 
+**New features in 4.3.0** [Connect Wizard to assist in Connect / Lex / QnABot use case, Security enhancement in API Gateway, Four node elastic search cluster support](#new-features)
+
 **New features in 4.2.0** [Beta Kendra FAQ Support, Bug fixes, Multiple document chaining, Repeat question, Elastic Search 7.7 upgrade](#new-features)
 
 **New features in 4.1.0** [Encryption at rest for S3 and Elastic Search Cluster, option to require Cognito user pool authorization to access embedded web UI, enhanced Kendra integration, enhanced Connect integration, and others](#new-features)
@@ -153,6 +155,15 @@ We are currently working on adding Microsoft Edge support.
 See the [LICENSE.md](LICENSE.md) file for details
 
 ## New features 
+
+### Version 4.3.0
+- New Connect Wizard available in the Content Designer UI to assist integration with a Connect Contact Flow.
+- New 4-node Elasticsearch domain support for improved fault tolerance in deployment template.
+- Elicit Response bot support for confirmation responses using phone keypad 1 = yes 2 = no.
+- Security improvements in API Gateway.
+- ID token values removed from session event after validation and redacted from logging.
+- Setting to limit the number of Kendra fallback search results.
+- Setting to enable signed URLs for S3 documents in Kendra search results. 
 
 ### Version 4.2.0
 - New Kendra FAQ support (Beta version) using the setting KENDRA_FAQ_INDEX. New menu item in Designer UI to export Questions as a Kendra FAQ. See revised Blog Post for details.

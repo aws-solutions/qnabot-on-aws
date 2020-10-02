@@ -1,4 +1,4 @@
-﻿{
+{
   "qna": [
     {
       "qid": "ConnectHelper.Menu",
@@ -37,6 +37,15 @@
       ]
     },
     {
+      "qid": "ConnectHelper.Constitution",
+      "a": "Okay, but it's pretty long. If you enabled the interruptable responses setting, you can ask your next question at any time during the response. We the People of the United States, in Order to form a more perfect Union, establish Justice, insure domestic Tranquility, provide for the common defense, promote the general Welfare, and secure the Blessings of Liberty to ourselves and our Posterity, do ordain and establish this Constitution for the United States of America.",
+      "type": "qna",
+      "q": [
+        "Read me the U.S. Constitution",
+        "Read the Constitution"
+      ]
+    },
+    {
       "qid": "ConnectHelper.MeaningOfLife",
       "a": "The meaning of life, the universe, and everything is 42",
       "type": "qna",
@@ -46,19 +55,10 @@
     },
     {
       "qid": "ConnectHelper.Cereal",
-      "a": "Cereal itself is not soup. However, Cereal with milk it a soup. Cereal is defined as \"a prepared foodstuff of grain.\" This means that \"cereal\" itself is not a soup. However, a soup is defined as a liquid food; often containing pieces of solid food. Milk is a liquid food, and cereal is solid food, therefore cereal with milk is a soup.",
+      "a": "Cereal itself is not soup. However, Cereal with milk is a soup. Cereal is defined as \"a prepared foodstuff of grain.\" This means that \"cereal\" itself is not a soup. However, a soup is defined as a liquid food; often containing pieces of solid food. Milk is a liquid food, and cereal is solid food, therefore cereal with milk is a soup.",
       "type": "qna",
       "q": [
         "Is Cereal Soup?"
-      ]
-    },
-    {
-      "qid": "ConnectHelper.Constitution",
-      "a": "Okay, but it's pretty long. If you enabled the interuptable responses setting, you can ask your next question at any time during the response. We the People of the United States, in Order to form a more perfect Union, establish Justice, insure domestic Tranquility, provide for the common defense, promote the general Welfare, and secure the Blessings of Liberty to ourselves and our Posterity, do ordain and establish this Constitution for the United States of America.",
-      "type": "qna",
-      "q": [
-        "Read me the U.S. Constitution",
-        "Read the Constitution"
       ]
     },
     {
@@ -143,3 +143,4 @@
     }
   ]
 }
+
