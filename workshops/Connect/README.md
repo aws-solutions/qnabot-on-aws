@@ -11,18 +11,12 @@ In this post, we will walk through some options and configurations that will ena
 To get started, you will need the following:
 
 - An [AWS account](https://signin.aws.amazon.com/signin?redirect_uri=https%3A%2F%2Fportal.aws.amazon.com%2Fbilling%2Fsignup%2Fresume&amp;client_id=signup)
-- An Amazon Connect instance
-
 - A deployment of the [AWS QnABot](https://aws.amazon.com/blogs/machine-learning/creating-a-question-and-answer-bot-with-amazon-lex-and-amazon-alexa/) (version 4.3 or later)
 
-## Step by Step instructions
+## Creating and Configuring  a Connect Instance
 
-1. Ensure [Amazon Connect has permission to invoke your QnABot](https://docs.aws.amazon.com/connect/latest/adminguide/tutorial1-add-permissions-for-bot.html)&#39;s primary Amazon Lex Bot
-2. Log into your Amazon Connect instance and [import the sample contact flow](https://docs.aws.amazon.com/connect/latest/adminguide/contact-flow-import-export.html) or leverage the built in Amazon Connect utility within the QnABot Content Designer.  If importing the contact flow directly, make sure to update the values within the Get Customer Input block to point to your QnABot, the version alias, as well as QnABot&#39;s fulfilment and fallback intents for your implementation
-3. Save and publish your contact flow
-4. Log into the QnABot designer and import the sample ConnectHelper questions
-5. Use the Test Chat functionality to verify Connect is able to call QnABot
-6. Optional: Associate your contact flow to a phone number
+- Log in to the QnABot Content Designer, choose the tools menu (&#9776;) and choose Connect
+- Follow the step by step directions to create a contact center using QnABot to answer caller’s questions
 
 # Enhancing QnABot within Amazon Connect
 
@@ -88,7 +82,7 @@ The ConnectHelper.Menu question demonstrates how to set a next action attribute 
 
 ## Repeat Answer
 
-QnABot stores the response of the previous question inside of a Lex session attribute called qnabotconnect. Using a QnABot feature called Document Chaining, you can enable a &quot;repeat&quot; type of question by passing the session attribute qnabotconnect back into the Get Customer Input block.
+QnABot stores the response of the previous question inside of a Lex session attribute called qnabotcontext. Using a QnABot feature called Document Chaining, you can enable a &quot;repeat&quot; type of question by passing the session attribute qnabotcontext back into the Get Customer Input block.
 
 ![](images/8_qnabotcontext.png)
 
