@@ -256,6 +256,9 @@ async function processResponse(req, res, hook, msg) {
     
     // autotranslate res fields
     res = await translate_res(req,res);
+    
+    // set res.session.qnabot_gotanswer
+    _.set(res,'session.qnabot_gotanswer',true) ;
 
     const resp = {};
     resp.req = req;
