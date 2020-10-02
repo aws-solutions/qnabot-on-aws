@@ -15,11 +15,8 @@ To get started, you will need the following:
 
 ## Creating and Configuring  a Connect Instance
 
-Choose **Connect** from the **Tools** menu.  It will walk you through:
-
-- Creating an Amazon Connect instance
-- Downloading and importing a contact flow
-- Importing a corresponding sample question and answer bank
+- Log in to the QnABot Content Designer, choose the tools menu (&#9776;) and choose Connect
+- Follow the step by step directions to create a contact center using QnABot to answer caller’s questions
 
 # Enhancing QnABot within Amazon Connect
 
