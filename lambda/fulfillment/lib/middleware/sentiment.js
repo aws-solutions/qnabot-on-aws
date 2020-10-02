@@ -4,7 +4,7 @@ var Promise=require('bluebird');
 var aws=require('aws-sdk');
 
 function get_sentiment_from_comprehend(utterance) {
-    // get sentiment from utterance using Comprehend detectSentiment api
+    // get sentiment and scores from utterance using Comprehend detectSentiment api
     console.log("detecting sentiment from utterance using Comprehend: ", utterance);
     var keywords="";
     var comprehend = new aws.Comprehend();
@@ -15,7 +15,7 @@ function get_sentiment_from_comprehend(utterance) {
     return(Promise.resolve(comprehend.detectSentiment(comprehend_params).promise()))
     .then(function(data) {
         console.log(JSON.stringify(data));
-        return data.Sentiment ;
+        return data ;
     });
 }
 

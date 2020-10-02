@@ -144,9 +144,12 @@ module.exports = async function parse(req, res) {
     
     // get sentiment
     if (_.get(settings, 'ENABLE_SENTIMENT_SUPPORT')) {
-        req.sentiment = await get_sentiment(req.question);
+        let sentiment = await get_sentiment(req.question);
+        req.sentiment = sentiment.Sentiment ;
+        req.sentimentScore = sentiment.SentimentScore ;
     } else {
         req.sentiment = "NOT_ENABLED";
+        req.sentimentScore = {} ;
     }  
 
     Object.assign(res, {
