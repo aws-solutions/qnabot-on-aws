@@ -19,7 +19,7 @@ Choose **Connect** from the **Tools** menu.  It will walk you through:
 
 - Creating an Amazon Connect instance
 - Downloading and importing a contact flow
-- Importing a corresponding sample question and answer bank.
+- Importing a corresponding sample question and answer bank
 
 # Enhancing QnABot within Amazon Connect
 
