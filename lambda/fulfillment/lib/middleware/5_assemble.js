@@ -21,6 +21,7 @@ function sms_hint(req,res) {
 }
 
 function split_message(message) {
+    message=message.replace(/\n/g," ") ;
     var parts = message.split(/[\.\?\!](.+)/,2) ; //split on first of these sentence terminators - '.?!'
     if (parts[1] == undefined) {
         parts[1]="";
