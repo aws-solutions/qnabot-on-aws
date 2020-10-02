@@ -82,7 +82,7 @@ The ConnectHelper.Menu question demonstrates how to set a next action attribute 
 
 ## Repeat Answer
 
-QnABot stores the response of the previous question inside of a Lex session attribute called qnabotcontext. Using a QnABot feature called Document Chaining, you can enable a &quot;repeat&quot; type of question by passing the session attribute qnabotconnect back into the Get Customer Input block.
+QnABot stores the response of the previous question inside of a Lex session attribute called qnabotcontext. Using a QnABot feature called Document Chaining, you can enable a &quot;repeat&quot; type of question by passing the session attribute qnabotcontext back into the Get Customer Input block.
 
 ![](images/8_qnabotcontext.png)
 
