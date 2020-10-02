@@ -171,23 +171,6 @@ module.exports={
         },
         {
             "sampleUtterances": [],
-            "slotType": "AMAZON.MusicRecording",
-            "obfuscationSetting": "NONE",
-            "slotConstraint": "Optional",
-            "valueElicitationPrompt": {
-                "messages": [
-                    {
-                        "contentType": "PlainText",
-                        "content": "recording"
-                    }
-                ],
-                "maxAttempts": 2
-            },
-            "priority": 11,
-            "name": "recording"
-        },
-        {
-            "sampleUtterances": [],
             "slotType": "AMAZON.Sport",
             "obfuscationSetting": "NONE",
             "slotConstraint": "Optional",
