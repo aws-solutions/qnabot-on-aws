@@ -394,8 +394,8 @@ exports.resources={
             "createVersion": true,
             "valueSelectionStrategy": "TOP_RESOLUTION",
             "enumerationValues": [
-                {"value":"Yes", "synonyms":["OK","Yeah","Sure","Yep","Affirmative","aye", "Correct", "1", "One"]},
-                {"value":"No", "synonyms":["Nope","Na","Negative","Non", "2", "Two"]}
+                {"value":"Yes", "synonyms":["yes", "ok","yeah","sure","yep","affirmative","aye", "correct", "1", "one"]},
+                {"value":"No", "synonyms":["no", "nope","na","negative","non", "2", "two"]}
               ]
         }
     },
@@ -495,9 +495,9 @@ exports.resources={
             "createVersion": true,
             "valueSelectionStrategy": "TOP_RESOLUTION",
             "enumerationValues": [
-                {"value":"Yes", "synonyms":["OK","Yeah","Sure","Yep","Affirmative","aye", "Correct", "1", "One"]},
-                {"value":"No", "synonyms":["Nope","Na","Negative","Non", "2", "Two"]},
-                {"value":"Exit", "synonyms":["agent","rep","representative","stop","quit", "help", "bye", "goodbye", "3", "Three"]}
+                {"value":"Yes", "synonyms":["yes", "ok","yeah","sure","yep","affirmative","aye", "correct", "1", "one"]},
+                {"value":"No", "synonyms":["no", "nope","na","negative","non", "2", "two"]},
+                {"value":"Exit", "synonyms":["exit", "agent","rep","representative","stop","quit", "help", "bye", "goodbye", "3", "three"]}
             ]
         }
     },

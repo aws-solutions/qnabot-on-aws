@@ -39,9 +39,21 @@ module.exports={
             "{game}",
             "{music}",
             "{person}",
-            "{recording}",
             "{sport}",
-            "{state}"
+            "{state}",
+            "{animal}",
+            "{artist}",
+            "{movie}",
+            "{movieseries}",
+            "{tvseries}",
+            "{tvepisode}",
+            "{atcity}",
+            "{atregion}",
+            "{decity}",
+            "{deregion}",
+            "{gbcity}",
+            "{gbregion}",
+            "{europecity}"
         ],
         "slots": [{
             "name":"slot",
@@ -49,40 +61,6 @@ module.exports={
             "slotConstraint":"Optional",
             "slotTypeVersion":"QNABOT-AUTO-ASSIGNED",
             "priority": 1,
-        },
-        {
-            "sampleUtterances": [],
-            "slotType": "AMAZON.Actor",
-            "obfuscationSetting": "NONE",
-            "slotConstraint": "Optional",
-            "valueElicitationPrompt": {
-                "messages": [
-                    {
-                        "contentType": "PlainText",
-                        "content": "actor"
-                    }
-                ],
-                "maxAttempts": 2
-            },
-            "priority": 5,
-            "name": "actor"
-        },
-        {
-            "sampleUtterances": [],
-            "slotType": "AMAZON.US_CITY",
-            "obfuscationSetting": "NONE",
-            "slotConstraint": "Optional",
-            "valueElicitationPrompt": {
-                "messages": [
-                    {
-                        "contentType": "PlainText",
-                        "content": "city"
-                    }
-                ],
-                "maxAttempts": 2
-            },
-            "priority": 3,
-            "name": "city"
         },
         {
             "sampleUtterances": [],
@@ -103,37 +81,54 @@ module.exports={
         },
         {
             "sampleUtterances": [],
-            "slotType": "AMAZON.Food",
+            "slotType": "AMAZON.US_CITY",
             "obfuscationSetting": "NONE",
             "slotConstraint": "Optional",
             "valueElicitationPrompt": {
                 "messages": [
                     {
                         "contentType": "PlainText",
-                        "content": "food"
+                        "content": "city"
                     }
                 ],
                 "maxAttempts": 2
             },
-            "priority": 7,
-            "name": "food"
+            "priority": 3,
+            "name": "city"
         },
         {
             "sampleUtterances": [],
-            "slotType": "AMAZON.Game",
+            "slotType": "AMAZON.US_STATE",
             "obfuscationSetting": "NONE",
             "slotConstraint": "Optional",
             "valueElicitationPrompt": {
                 "messages": [
                     {
                         "contentType": "PlainText",
-                        "content": "game"
+                        "content": "state"
                     }
                 ],
                 "maxAttempts": 2
             },
-            "priority": 10,
-            "name": "game"
+            "priority": 4,
+            "name": "state"
+        },
+        {
+            "sampleUtterances": [],
+            "slotType": "AMAZON.Actor",
+            "obfuscationSetting": "NONE",
+            "slotConstraint": "Optional",
+            "valueElicitationPrompt": {
+                "messages": [
+                    {
+                        "contentType": "PlainText",
+                        "content": "actor"
+                    }
+                ],
+                "maxAttempts": 2
+            },
+            "priority": 5,
+            "name": "actor"
         },
         {
             "sampleUtterances": [],
@@ -154,20 +149,20 @@ module.exports={
         },
         {
             "sampleUtterances": [],
-            "slotType": "AMAZON.Person",
+            "slotType": "AMAZON.Food",
             "obfuscationSetting": "NONE",
             "slotConstraint": "Optional",
             "valueElicitationPrompt": {
                 "messages": [
                     {
                         "contentType": "PlainText",
-                        "content": "person"
+                        "content": "food"
                     }
                 ],
                 "maxAttempts": 2
             },
-            "priority": 9,
-            "name": "person"
+            "priority": 7,
+            "name": "food"
         },
         {
             "sampleUtterances": [],
@@ -188,21 +183,260 @@ module.exports={
         },
         {
             "sampleUtterances": [],
-            "slotType": "AMAZON.US_STATE",
+            "slotType": "AMAZON.Person",
             "obfuscationSetting": "NONE",
             "slotConstraint": "Optional",
             "valueElicitationPrompt": {
                 "messages": [
                     {
                         "contentType": "PlainText",
-                        "content": "state"
+                        "content": "person"
                     }
                 ],
                 "maxAttempts": 2
             },
-            "priority": 4,
-            "name": "state"
-        }],
+            "priority": 9,
+            "name": "person"
+        },
+        {
+            "sampleUtterances": [],
+            "slotType": "AMAZON.Game",
+            "obfuscationSetting": "NONE",
+            "slotConstraint": "Optional",
+            "valueElicitationPrompt": {
+                "messages": [
+                    {
+                        "contentType": "PlainText",
+                        "content": "game"
+                    }
+                ],
+                "maxAttempts": 2
+            },
+            "priority": 10,
+            "name": "game"
+        },
+        {
+            "sampleUtterances": [],
+            "slotType": "AMAZON.Movie",
+            "obfuscationSetting": "NONE",
+            "slotConstraint": "Optional",
+            "valueElicitationPrompt": {
+                "messages": [
+                    {
+                        "contentType": "PlainText",
+                        "content": "movie"
+                    }
+                ],
+                "maxAttempts": 2
+            },
+            "priority": 11,
+            "name": "movie"
+        },
+        {
+            "sampleUtterances": [],
+            "slotType": "AMAZON.MovieSeries",
+            "obfuscationSetting": "NONE",
+            "slotConstraint": "Optional",
+            "valueElicitationPrompt": {
+                "messages": [
+                    {
+                        "contentType": "PlainText",
+                        "content": "movie series"
+                    }
+                ],
+                "maxAttempts": 2
+            },
+            "priority": 12,
+            "name": "movieseries"
+        },
+        {
+            "sampleUtterances": [],
+            "slotType": "AMAZON.AT_CITY",
+            "obfuscationSetting": "NONE",
+            "slotConstraint": "Optional",
+            "valueElicitationPrompt": {
+                "messages": [
+                    {
+                        "contentType": "PlainText",
+                        "content": "at city"
+                    }
+                ],
+                "maxAttempts": 2
+            },
+            "priority": 13,
+            "name": "atcity"
+        },
+        {
+            "sampleUtterances": [],
+            "slotType": "AMAZON.AT_REGION",
+            "obfuscationSetting": "NONE",
+            "slotConstraint": "Optional",
+            "valueElicitationPrompt": {
+                "messages": [
+                    {
+                        "contentType": "PlainText",
+                        "content": "at region"
+                    }
+                ],
+                "maxAttempts": 2
+            },
+            "priority": 14,
+            "name": "atregion"
+        },
+        {
+            "sampleUtterances": [],
+            "slotType": "AMAZON.DE_CITY",
+            "obfuscationSetting": "NONE",
+            "slotConstraint": "Optional",
+            "valueElicitationPrompt": {
+                "messages": [
+                    {
+                        "contentType": "PlainText",
+                        "content": "de city"
+                    }
+                ],
+                "maxAttempts": 2
+            },
+            "priority": 15,
+            "name": "decity"
+        },
+        {
+            "sampleUtterances": [],
+            "slotType": "AMAZON.DE_REGION",
+            "obfuscationSetting": "NONE",
+            "slotConstraint": "Optional",
+            "valueElicitationPrompt": {
+                "messages": [
+                    {
+                        "contentType": "PlainText",
+                        "content": "de region"
+                    }
+                ],
+                "maxAttempts": 2
+            },
+            "priority": 16,
+            "name": "deregion"
+        },
+        {
+            "sampleUtterances": [],
+            "slotType": "AMAZON.GB_CITY",
+            "obfuscationSetting": "NONE",
+            "slotConstraint": "Optional",
+            "valueElicitationPrompt": {
+                "messages": [
+                    {
+                        "contentType": "PlainText",
+                        "content": "gb city"
+                    }
+                ],
+                "maxAttempts": 2
+            },
+            "priority": 17,
+            "name": "gbcity"
+        },
+        {
+            "sampleUtterances": [],
+            "slotType": "AMAZON.GB_REGION",
+            "obfuscationSetting": "NONE",
+            "slotConstraint": "Optional",
+            "valueElicitationPrompt": {
+                "messages": [
+                    {
+                        "contentType": "PlainText",
+                        "content": "gb region"
+                    }
+                ],
+                "maxAttempts": 2
+            },
+            "priority": 18,
+            "name": "gbregion"
+        },
+        {
+            "sampleUtterances": [],
+            "slotType": "AMAZON.EUROPE_CITY",
+            "obfuscationSetting": "NONE",
+            "slotConstraint": "Optional",
+            "valueElicitationPrompt": {
+                "messages": [
+                    {
+                        "contentType": "PlainText",
+                        "content": "europe city"
+                    }
+                ],
+                "maxAttempts": 2
+            },
+            "priority": 19,
+            "name": "europecity"
+        },
+        {
+            "sampleUtterances": [],
+            "slotType": "AMAZON.Animal",
+            "obfuscationSetting": "NONE",
+            "slotConstraint": "Optional",
+            "valueElicitationPrompt": {
+                "messages": [
+                    {
+                        "contentType": "PlainText",
+                        "content": "animal"
+                    }
+                ],
+                "maxAttempts": 2
+            },
+            "priority": 20,
+            "name": "animal"
+        },
+        {
+            "sampleUtterances": [],
+            "slotType": "AMAZON.Artist",
+            "obfuscationSetting": "NONE",
+            "slotConstraint": "Optional",
+            "valueElicitationPrompt": {
+                "messages": [
+                    {
+                        "contentType": "PlainText",
+                        "content": "artist"
+                    }
+                ],
+                "maxAttempts": 2
+            },
+            "priority": 21,
+            "name": "artist"
+        },
+        {
+            "sampleUtterances": [],
+            "slotType": "AMAZON.TVSeries",
+            "obfuscationSetting": "NONE",
+            "slotConstraint": "Optional",
+            "valueElicitationPrompt": {
+                "messages": [
+                    {
+                        "contentType": "PlainText",
+                        "content": "tv series"
+                    }
+                ],
+                "maxAttempts": 2
+            },
+            "priority": 22,
+            "name": "tvseries"
+        },
+        {
+            "sampleUtterances": [],
+            "slotType": "AMAZON.TVEpisode",
+            "obfuscationSetting": "NONE",
+            "slotConstraint": "Optional",
+            "valueElicitationPrompt": {
+                "messages": [
+                    {
+                        "contentType": "PlainText",
+                        "content": "tv episode"
+                    }
+                ],
+                "maxAttempts": 2
+            },
+            "priority": 23,
+            "name": "tvepisode"
+        }
+        ],
         "fulfillmentActivity": {
           "type": "CodeHook",
           "codeHook": {
