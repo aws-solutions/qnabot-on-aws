@@ -15,6 +15,15 @@ module.exports={
                 "VPCSubnetIdList" : { "Fn::Join" : [ ",", {"Ref":"VPCSubnetIdList"} ] },
                 "VPCSecurityGroupIdList": { "Fn::Join" : [ ",", {"Ref":"VPCSecurityGroupIdList"} ] },
                 "XraySetting":{"Ref": "XraySetting"},
+                "FallbackIntent": {"Ref":"IntentFallback"},
+                "Intent":{"Ref":"Intent"},
+                "BotName":{"Ref":"LexBot"},
+                "Api":{"Ref":"API"},
+                "ApiRootResourceId":{"Fn::GetAtt":["API","RootResourceId"]},
+                "Encryption":{"Ref":"Encryption"},
+                "Stage":{"Ref":"Stage"},
+                "ApiDeploymentId":{"Ref":"Deployment"},
+
                 "DefaultQnABotSettings":{"Ref":"DefaultQnABotSettings"},
                 "CustomQnABotSettings":{"Ref":"CustomQnABotSettings"},
             }

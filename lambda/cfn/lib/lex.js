@@ -439,7 +439,7 @@ class Lex {
                                 });
                                 console.log("Intent parameters for update are: " + JSON.stringify(params, null, 2));
                                 run(self.update_method, params)
-                                    .then(msg => reply(null, msg.name, null))
+                                    .then(msg => reply(null, msg.name, {}))
                                     .catch(error => {
                                         console.log('caught', error);
                                         reply(error);
@@ -452,7 +452,7 @@ class Lex {
                         } else {
                             console.log("Intent parameters for update are: " + JSON.stringify(params, null, 2));
                             run(self.update_method, params)
-                                .then(msg => reply(null, msg.name, null))
+                                .then(msg => reply(null, msg.name, {}))
                                 .catch(error => {
                                     console.log('caught', error);
                                     reply(error);

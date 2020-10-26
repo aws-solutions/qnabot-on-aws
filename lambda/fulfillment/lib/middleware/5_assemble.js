@@ -7,7 +7,7 @@ var util=require('./util')
 function sms_hint(req,res) {
     var hint = "";
     if (_.get(req,"_event.requestAttributes.x-amz-lex:channel-type") == "Twilio-SMS") {
-        if (_.get(req,"_settings.SMS_HINT_REMINDER_ENABLE") == 'true') {
+        if (_.get(req,"_settings.SMS_HINT_REMINDER_ENABLE")) {
             var interval_hrs = parseInt(_.get(req,'_settings.SMS_HINT_REMINDER_INTERVAL_HRS','24'));
             var hint_message = _.get(req,'_settings.SMS_HINT_REMINDER',"");
             var hours = req._userInfo.TimeSinceLastInteraction / 36e5;
@@ -18,6 +18,43 @@ function sms_hint(req,res) {
         }
     }
     return hint;
+}
+
+function split_message(message) {
+    message=message.replace(/\n/g," ") ;
+    var parts = message.split(/[\.\?\!](.+)/,2) ; //split on first of these sentence terminators - '.?!'
+    if (parts[1] == undefined) {
+        parts[1]="";
+    }
+    return parts;
+}
+
+function connect_response(req, res) {
+    if (req._clientType == "LEX.AmazonConnect.Voice") {
+        if (_.get(req,"_settings.CONNECT_ENABLE_VOICE_RESPONSE_INTERRUPT")) {
+            console.log("CONNECT_ENABLE_VOICE_RESPONSE_INTERRUPT is true. splitting response.")
+            // split multi sentence responses.. First sentence stays in response, remaining sentences get prepended to next prompt session attribute.
+            let nextPromptVarName = _.get(req,"_settings.CONNECT_NEXT_PROMPT_VARNAME",'nextPrompt') ;
+            let message = res.message ;
+            let prompt = _.get(res.session,nextPromptVarName,"").replace(/<speak>|<\/speak>/g, "") ;
+            if (res.type == "PlainText") {
+                // process plain text
+                let a = split_message(message) ; //split on first period
+                res.message = a[0];
+                _.set(res.session,nextPromptVarName,a[1] + " " + prompt);
+            } else if (res.type == "SSML") {
+                // process SSML
+                // strip <speak> tags
+                message = message.replace(/<speak>|<\/speak>/g, "");
+                let a = split_message(message) ;
+                res.message = "<speak>" + a[0] + "</speak>" ;
+                _.set(res.session,nextPromptVarName, "<speak>" + a[1] + " " + prompt + "</speak>");
+            }
+            console.log("Response message:", res.message);
+            console.log("Reponse session var:", nextPromptVarName, ":", _.get(res.session,nextPromptVarName)) ;
+        }
+    }
+    return res ;
 }
 
 function resetAttributes(req,res) {
@@ -60,7 +97,11 @@ module.exports=async function assemble(req,res){
     }
     
     // append hint to SMS message (if it's been a while since user last interacted)
-    res.message += sms_hint(req,res)
+    res.message += sms_hint(req,res);
+    
+    // enable interruptable bot response for Connect
+    res = connect_response(req,res);
+
     
     res.session=_.mapValues(
         _.get(res,'session',{}),

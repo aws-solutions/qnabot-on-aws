@@ -27,6 +27,7 @@ module.exports={
     "testall": resource('{proxy+}',{"Ref":"testalls"}),
     "testallPut":proxy({
         resource:{"Ref": "testall"},
+        auth:"AWS_IAM",
         method:"PUT",
         bucket:{"Ref":"TestAllBucket"},
         path:"/status/{proxy}",
@@ -37,6 +38,7 @@ module.exports={
     }),
     "testallGet":proxy({
         resource:{"Ref": "testall"},
+        auth:"AWS_IAM",
         method:"GET",
         bucket:{"Ref":"TestAllBucket"},
         path:"/status/{proxy}",
@@ -46,6 +48,7 @@ module.exports={
     }),
     "testallDelete":proxy({
         resource:{"Ref": "testall"},
+        auth:"AWS_IAM",
         method:"delete",
         bucket:{"Ref":"TestAllBucket"},
         path:"/status/{proxy}",
@@ -69,6 +72,7 @@ module.exports={
     "imports": resource('imports',{"Ref":"Jobs"}),
     "exportPut":proxy({
         resource:{"Ref": "export"},
+        auth:"AWS_IAM",
         method:"PUT",
         bucket:{"Ref":"ExportBucket"},
         path:"/status/{proxy}",
@@ -79,6 +83,7 @@ module.exports={
     }),
     "exportGet":proxy({
         resource:{"Ref": "export"},
+        auth:"AWS_IAM",
         method:"GET",
         bucket:{"Ref":"ExportBucket"},
         path:"/status/{proxy}",
@@ -88,6 +93,7 @@ module.exports={
     }),
     "exportDelete":proxy({
         resource:{"Ref": "export"},
+        auth:"AWS_IAM",
         method:"delete",
         bucket:{"Ref":"ExportBucket"},
         path:"/status/{proxy}",
@@ -109,6 +115,7 @@ module.exports={
     "import": resource('{proxy+}',{"Ref":"imports"}),
     "importGet":proxy({
         resource:{"Ref": "import"},
+        auth:"AWS_IAM",
         method:"get",
         bucket:{"Ref":"ImportBucket"},
         path:"/status/{proxy}",
@@ -118,6 +125,7 @@ module.exports={
     }),
     "importDelete":proxy({
         resource:{"Ref": "import"},
+        auth:"AWS_IAM",
         method:"delete",
         bucket:{"Ref":"ImportBucket"},
         path:"/status/{proxy}",
@@ -196,7 +204,7 @@ function proxy(opts){
     return {
       "Type": "AWS::ApiGateway::Method",
       "Properties": {
-        "AuthorizationType": "NONE",
+        "AuthorizationType": opts.auth || "AWS_IAM",
         "HttpMethod":opts.method.toUpperCase(),
         "Integration": _.pickBy({
           "Type": "AWS",

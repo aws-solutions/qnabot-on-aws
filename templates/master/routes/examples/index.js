@@ -7,7 +7,7 @@ var _=require('lodash')
 module.exports={
     "Examples": resource('examples'),
     "ExamplesGet":mock({
-        auth:'NONE',
+        authorization:"AWS_IAM",
         method:"GET",
         subTemplate:"examples/info",
         resource:{"Ref":"Examples"}
@@ -32,7 +32,8 @@ module.exports={
         path:"/examples/photos/{proxy}",
         requestParams:{
             "integration.request.path.proxy":"method.request.path.proxy"
-        }
+        },
+        authorization:"AWS_IAM"
     }),
     "Documents":resource('documents',{"Ref":"Examples"}),
     "DocumentsList":lambda({
@@ -48,13 +49,15 @@ module.exports={
     }),
     "Example": resource('{proxy+}',{"Ref":"Documents"}),
     "ExampleGet":proxy({
+        authorization:"AWS_IAM",
         resource:{"Ref": "Example"},
         method:"get",
         bucket:{"Ref":"AssetBucket"},
         path:"/examples/documents/{proxy}",
         requestParams:{
             "integration.request.path.proxy":"method.request.path.proxy"
-        }
+        },
+        authorization:"AWS_IAM"
     }),
     "ExampleHead":proxy({
         resource:{"Ref": "Example"},
@@ -63,7 +66,8 @@ module.exports={
         path:"/examples/documents/{proxy}",
         requestParams:{
             "integration.request.path.proxy":"method.request.path.proxy"
-        }
+        },
+        authorization:"AWS_IAM"
     }),
     "ExampleS3ListLambda": {
       "Type": "AWS::Lambda::Function",
@@ -125,7 +129,7 @@ function proxy(opts){
     return {
       "Type": "AWS::ApiGateway::Method",
       "Properties": {
-        "AuthorizationType": "NONE",
+        "AuthorizationType": opts.auth || "AWS_IAM",
         "HttpMethod":opts.method.toUpperCase(),
         "Integration": {
           "Type": "AWS",

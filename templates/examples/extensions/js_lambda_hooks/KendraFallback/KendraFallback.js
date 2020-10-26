@@ -232,16 +232,13 @@ async function routeKendraRequest(event, context) {
     /* default message text - can be overridden using QnABot SSM Parameter Store Custom Property */
     let topAnswerMessage = "Amazon Kendra suggested answer. \n\n ";
     let topAnswerMessageMd = "*Amazon Kendra suggested answer.* \n ";
-    let answerMessage = 'While I did not find an exact answer, these search results from Amazon Kendra might be helpful. ';
+    let answerMessage = 'While I did not find an exact answer, these search results from Amazon Kendra might be helpful. ' ;
     let answerMessageMd = '*While I did not find an exact answer, these search results from Amazon Kendra might be helpful.* \n ';
     let faqanswerMessage = 'Answer from Amazon Kendra FAQ.';
     let faqanswerMessageMd = '*Answer from Amazon Kendra FAQ.* \n ';
-    let markdownAnswer = "";
     let speechMessage = "";
     let helpfulLinksMsg = 'Source Link';
-    let extractedTextMsg = 'Discovered Text';
-    let moreResultsMsg = 'Additional Search Results';
-    let maxDocumentCount = 2;
+    let maxDocumentCount = _.get(event.req,'_settings.ALT_SEARCH_KENDRA_MAX_DOCUMENT_COUNT',2);
     var seenTop = false;
 
     let foundAnswerCount = 0;
@@ -257,12 +254,6 @@ async function routeKendraRequest(event, context) {
     
     resArray.forEach(function (res) {
         if (res && res.ResultItems.length > 0) {
-            helpfulLinksMsg = event.req["_settings"]["ALT_SEARCH_HELPFUL_LINKS_MSG"] ? event.req["_settings"]["ALT_SEARCH_HELPFUL_LINKS_MSG"] : helpfulLinksMsg;
-            extractedTextMsg = event.req["_settings"]["ALT_SEARCH_EXTRACTED_TEXT_MSG"] ? event.req["_settings"]["ALT_SEARCH_EXTRACTED_TEXT_MSG"] : extractedTextMsg;
-            maxDocumentCount = event.req["_settings"]["ALT_SEARCH_MAX_DOCUMENT_COUNT"] ? event.req["_settings"]["ALT_SEARCH_MAX_DOCUMENT_COUNT"] : maxDocumentCount;
-            answerMessage = event.req["_settings"]["ALT_SEARCH_MESSAGE"] ? event.req["_settings"]["ALT_SEARCH_MESSAGE"] : answerMessage;
-            answerMessageMd = event.req["_settings"]["ALT_SEARCH_MESSAGE_MD"] ? event.req["_settings"]["ALT_SEARCH_MESSAGE_MD"] : answerMessageMd;
-            
             res.ResultItems.forEach(function (element, i) {
                 /* Note - only the first answer will be provided back to the requester */
                 if (element.Type === 'ANSWER' && foundAnswerCount === 0 && element.AdditionalAttributes &&
@@ -377,6 +368,7 @@ async function routeKendraRequest(event, context) {
 
     // update QnABot answer content for ssml, markdown, and text
     if (foundAnswerCount > 0 || foundDocumentCount > 0) {
+        event.res.session.qnabot_gotanswer = true ; 
         event.res.message = answerMessage;
         let ssmlMessage = `${answerMessage.substring(0,600).replace(/\r?\n|\r/g, " ")}`;
         if (speechMessage != "") {
@@ -391,7 +383,7 @@ async function routeKendraRequest(event, context) {
         
         event.res.session.appContext.altMessages.markdown = answerMessageMd;
         event.res.session.appContext.altMessages.ssml = ssmlMessage;
-        if (event.req["_event"].outputDialogMode !== 'Text') {
+        if (event.req._preferredResponseType == "SSML") {
             event.res.message = ssmlMessage;
             event.res.type = 'SSML';
             event.res.plainMessage = answerMessage;
@@ -412,13 +404,14 @@ async function routeKendraRequest(event, context) {
     let idx=0;
     if (seenTop == false){
         helpfulDocumentsUris.forEach(function (element) {
-            if (idx++ < maxDocumentCount) {
+            if (idx++ < maxDocumentCount-1) {
                 event.res.session.appContext.altMessages.markdown += `\n\n`;
                 event.res.session.appContext.altMessages.markdown += `***`;
                 event.res.session.appContext.altMessages.markdown += `\n\n <br>`;
                 
                 if (element.text && element.text.length > 0) {
                     event.res.session.appContext.altMessages.markdown += `\n\n  ${element.text}`;
+                    event.res.message += `\n\n  ${element.text}`;
                 }
                 let label = docName(element.uri) ;
                 // Convert S3 Object URLs to signed URLs
@@ -436,6 +429,8 @@ async function routeKendraRequest(event, context) {
         _.set(event,"res.session.qnabotcontext.kendra.kendraResultId",kendraResultId) ;
         _.set(event,"res.session.qnabotcontext.kendra.kendraResponsibleQid",event.res.result.qid) ;
     }
+    
+    console.log("Returning event: ", JSON.stringify(event, null, 2));
 
     return event;
 }

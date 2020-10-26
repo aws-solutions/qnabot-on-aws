@@ -1,0 +1,146 @@
+{
+  "qna": [
+    {
+      "qid": "ConnectHelper.Menu",
+      "a": "Okay. Taking you to the main menu. {{setSessionAttr 'nextAction' 'MENU'}}",
+      "type": "qna",
+      "q": [
+        "go to the main menu",
+        "return to the menu",
+        "i need more help",
+        "Menu",
+        "main menu"
+      ]
+    },
+    {
+      "qid": "ConnectHelper.Goodbye",
+      "a": "okay.  Thank you for using QnA Bot. {{setSessionAttr 'nextAction' 'END'}}",
+      "type": "qna",
+      "q": [
+        "Goodbye",
+        "No further questions"
+      ]
+    },
+    {
+      "qid": "ConnectHelper.Repeat",
+      "a": "{{!-- The 'repeat' magic is in the Document Chaining Rule in the Advanced section --}}",
+      "conditionalChaining": "(SessionAttributes('qnabotcontext.previous.q')) ? SessionAttributes('qnabotcontext.previous.q') : 'default menu'",
+      "type": "qna",
+      "q": [
+        "Repeat",
+        "Can you repeat that",
+        "Can you please say that again",
+        "Please repeat that",
+        "What did you say",
+        "Say again",
+        "Come again"
+      ]
+    },
+    {
+      "qid": "ConnectHelper.Constitution",
+      "a": "Okay, but it's pretty long. If you enabled the interruptable responses setting, you can ask your next question at any time during the response. We the People of the United States, in Order to form a more perfect Union, establish Justice, insure domestic Tranquility, provide for the common defense, promote the general Welfare, and secure the Blessings of Liberty to ourselves and our Posterity, do ordain and establish this Constitution for the United States of America.",
+      "type": "qna",
+      "q": [
+        "Read me the U.S. Constitution",
+        "Read the Constitution"
+      ]
+    },
+    {
+      "qid": "ConnectHelper.MeaningOfLife",
+      "a": "The meaning of life, the universe, and everything is 42",
+      "type": "qna",
+      "q": [
+        "What is the meaning of life"
+      ]
+    },
+    {
+      "qid": "ConnectHelper.Cereal",
+      "a": "Cereal itself is not soup. However, Cereal with milk is a soup. Cereal is defined as \"a prepared foodstuff of grain.\" This means that \"cereal\" itself is not a soup. However, a soup is defined as a liquid food; often containing pieces of solid food. Milk is a liquid food, and cereal is solid food, therefore cereal with milk is a soup.",
+      "type": "qna",
+      "q": [
+        "Is Cereal Soup?"
+      ]
+    },
+    {
+      "qid": "ConnectHelper.Agent",
+      "a": "Ok. Let me route you to a representative who can assist you. {{setSessionAttr 'nextAction' 'AGENT'}}",
+      "t": "AGENT",
+      "type": "qna",
+      "q": [
+        "Speak to an agent",
+        "Agent",
+        "Can I speak to a representative?",
+        "Representative",
+        "Operator",
+        "Can I speak to an operator?",
+        "Agent Please",
+        "Operator Please",
+        "can i talk to a real human being",
+        "can i talk to a person",
+        "speak to a person",
+        "talk to a person",
+        "i need another person",
+        "i need to talk to somebody",
+        "let me talk to somebody",
+        "i wanna talk to a person",
+        "i wanna talk to somebody",
+        "can i speak to an agent",
+        "zero"
+      ]
+    },
+    {
+      "qid": "ConnectHelper.DefaultMenu",
+      "a": "Welcome to QnA bot.  Ask me a question, say main menu, or ask to speak to a representative. {{setSessionAttr 'connect_nextPrompt' ''}}",
+      "type": "qna",
+      "q": [
+        "Default menu"
+      ]
+    },
+    {
+      "qid": "ConnectHelper.HoursSeattle",
+      "a": "Our Seattle location is open Monday and Tuesday from 9 to 5 Pacific Time",
+      "t": "Hours",
+      "type": "qna",
+      "q": [
+        "Seattle",
+        "Seattle hours",
+        "When is the seattle office open"
+      ]
+    },
+    {
+      "qid": "ConnectHelper.HoursBoston",
+      "a": "The Boston Office is open Wednesday through Friday from 9 to 5 Eastern time.",
+      "t": "Hours",
+      "type": "qna",
+      "q": [
+        "Boston",
+        "Boston Hours",
+        "Boston Office",
+        "When is the Boston office open"
+      ]
+    },
+    {
+      "qid": "ConnectHelper.ChannelCondition",
+      "a": "{{#ifCond SessionAttributes.isConnectChannel '==' 'CHAT'}}\nYou can visit our blog post here:\nhttps://aws.amazon.com/blogs/machine-learning/creating-a-question-and-answer-bot-with-amazon-lex-and-amazon-alexa/\n{{else ifCond SessionAttributes.isConnectChannel '==' 'VOICE'}}\nYou can visit aws.amazon.com and search for QnA bot. Once again, that's aws.amazon.com\n{{else}}\nYou can visit our blog post here:\nhttps://aws.amazon.com/blogs/machine-learning/creating-a-question-and-answer-bot-with-amazon-lex-and-amazon-alexa/\n{{/ifCond}}",
+      "type": "qna",
+      "q": [
+        "Where can I get additional information on QnABot?",
+        "More information on Q n A bot",
+        "More information"
+      ]
+    },
+    {
+      "qid": "ConnectHelper.Hours",
+      "a": "We have multiple locations in Seattle and Boston.  {{setSessionAttr 'connect_nextPrompt' 'Do you want to know the hours for Seattle or Boston?'}}",
+      "t": "Hours",
+      "type": "qna",
+      "q": [
+        "When is your business open",
+        "When are you open",
+        "What are your hours",
+        "office hours"
+      ]
+    }
+  ]
+}
+

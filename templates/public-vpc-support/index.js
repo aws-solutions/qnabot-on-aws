@@ -37,6 +37,7 @@ module.exports=Promise.resolve(require('../master')).then(function(base){
         "Username",
         "Encryption",
         "PublicOrPrivate",
+        "ElasticSearchNodeCount",
         "VPCSubnetIdList",
         "VPCSecurityGroupIdList",
         "XraySetting"

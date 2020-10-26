@@ -6,6 +6,7 @@ module.exports={
     "Images": resource('images'),
     "ImagesProxy": resource('{proxy+}',{"Ref":"Images"}),
     "ImagesProxyGet":proxy({
+        auth: "NONE",
         resource:{"Ref": "ImagesProxy"},
         method:"get",
         path:"/assets/{proxy}",
@@ -22,7 +23,7 @@ function proxy(opts){
     return {
       "Type": "AWS::ApiGateway::Method",
       "Properties": {
-        "AuthorizationType": "NONE",
+        "AuthorizationType": opts.auth || "AWS_IAM",
         "HttpMethod":opts.method.toUpperCase(),
         "Integration": {
           "Type": "AWS",

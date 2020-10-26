@@ -20,6 +20,11 @@ module.exports={
             name:"alexa",
             component:require('../components/alexa/index.vue').default
         },
+        {   
+            path:'/connect',
+            name:"connect",
+            component:require('../components/connect/index.vue').default
+        },
         {   path:'/hooks',
             name:"hooks",
             component:require('../components/hooks/index.vue').default

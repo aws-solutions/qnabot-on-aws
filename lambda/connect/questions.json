@@ -1,0 +1,8 @@
+{
+  "FlowInfos": [
+    {
+      "ContactFlow": "contactflow.json",
+      "QnAExample": "ConnectWizardQnA.json"
+    }
+  ]
+}

@@ -56,9 +56,11 @@ module.exports={
     getCredentials:Promise.method(async function(context){
         try {
             if(!_.get(context,'state.credentials')){
-                return await getCredentials(context)
+                let credentials = await getCredentials(context)
+                return credentials
             }else if(context.state.credentials.needsRefresh()){
-                return await getCredentials(context)
+                let  credentials = await getCredentials(context)
+                return 
             }else{
                 return context.state.credentials
             }

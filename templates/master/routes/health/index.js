@@ -6,6 +6,7 @@ module.exports={
     "Health": resource('health'),
     "HealthGet":lambda({
         method:'get',
+        authorization:"AWS_IAM",
         lambda:{"Fn::GetAtt":["ESProxyLambda","Arn"]},
         subTemplate:fs.readFileSync(__dirname+"/health.vm",'utf8'),
         responseTemplate:fs.readFileSync(__dirname+'/health.resp.vm','utf8'),

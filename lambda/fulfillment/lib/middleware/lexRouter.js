@@ -90,25 +90,25 @@ async function handleRequest(req, res, botName, botAlias) {
         const bName = process.env[botName];
         return bName ? bName : botName;
     }
-    function getFreeTextResponse(inputText, sentiment) {
+    function getFreeTextResponse(inputText, sentiment, sentimentScore) {
         let response = {
             message: "",
             slots: { 'FreeText' : inputText,
-                'Sentiment' : sentiment.Sentiment,
-                'SentimentPositive': sentiment.SentimentScore.Positive,
-                'SentimentNegative': sentiment.SentimentScore.Negative,
-                'SentimentNeutral': sentiment.SentimentScore.Neutral,
-                'SentimentMixed': sentiment.SentimentScore.Mixed
+                'Sentiment' : sentiment,
+                'SentimentPositive': _.get(sentimentScore, 'Positive', ''),
+                'SentimentNegative': _.get(sentimentScore, 'Negative', ''),
+                'SentimentNeutral': _.get(sentimentScore, 'Neutral', ''),
+                'SentimentMixed': _.get(sentimentScore, 'Mixed', '')
             },
             dialogState: 'Fulfilled',
-        }
+        } ;
         return response;
     }
 
     let tempBotUserID = _.get(req,"_userInfo.UserId","nouser");
     tempBotUserID = tempBotUserID.substring(0, 100); // Lex has max userId length of 100
     if (botName === FREE_TEXT_ELICIT_RESPONSE_NAME) {
-        return getFreeTextResponse(_.get(req, "question"), _.get(req, "sentiment"));
+        return getFreeTextResponse(_.get(req, "question"), _.get(req, "sentiment"), _.get(req, "sentimentScore"));
     } else {
         const lexClient = new AWS.LexRuntime({apiVersion: '2016-11-28'});
 
@@ -256,6 +256,9 @@ async function processResponse(req, res, hook, msg) {
     
     // autotranslate res fields
     res = await translate_res(req,res);
+
+    // set res.session.qnabot_gotanswer
+    _.set(res,'session.qnabot_gotanswer',true) ;
 
     const resp = {};
     resp.req = req;

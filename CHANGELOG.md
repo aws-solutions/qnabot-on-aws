@@ -1,3 +1,11 @@
+## [4.3.0]
+- New Connect Wizard available in the Content Designer UI to assist integration with a Connect Contact Flow.
+- New 4-node Elasticsearch domain support for improved fault tolerance in deployment template.
+- Elicit Response bot support for confirmation responses using phone keypad 1 = yes 2 = no.
+- Security improvements in API Gateway.
+- ID token values removed from session event after validation and redacted from logging.
+- Setting to limit the number of Kendra fallback search results.
+- Setting to enable signed URLs for S3 documents in Kendra search results. 
 ## [4.2.4]
 - Add CONNECT_IGNORE_WORDS to settings which allows single character words to be ignored during input to QnABot via Connect. Default is empty string but can be set to an array such as "a,e" such that single character inputTranscript uses the Connect Error branch in Get customer input.
 - Display Kendra document names as the URL and add ability to generate Signed S3 URLs for Kendra document integration. Uses new setting named ALT_SEARCH_KENDRA_S3_SIGNED_URLS. Set this to true to convert Kendra based S3 document URLs to signed urls allowing access.

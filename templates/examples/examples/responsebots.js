@@ -110,22 +110,22 @@ exports.resources={
                 type: "ReturnIntent"
             },
             "slots": [
-              {
-                "name":"Wage",
-                "slotType":{"Ref":"WageSlotType"},
-                "slotTypeVersion":"QNABOT-AUTO-ASSIGNED",
-                "slotConstraint": "Required",
-                "valueElicitationPrompt": {
-                  "messages": [
-                    {
-                      "contentType": "PlainText",
-                      "content": "What is your wage?"
-                    }
-                  ],
-                  "maxAttempts": 2
-                },
-                "priority": 1,
-              }
+                {
+                    "name":"Wage",
+                    "slotType":{"Ref":"WageSlotType"},
+                    "slotTypeVersion":"QNABOT-AUTO-ASSIGNED",
+                    "slotConstraint": "Required",
+                    "valueElicitationPrompt": {
+                        "messages": [
+                            {
+                                "contentType": "PlainText",
+                                "content": "What is your wage?"
+                            }
+                        ],
+                        "maxAttempts": 2
+                    },
+                    "priority": 1,
+                }
             ],
         },
     },
@@ -151,7 +151,7 @@ exports.resources={
             "slotTypeConfigurations": [
                 {
                     "regexConfiguration": {
-                        "pattern" : "[0-9]{3}-[0-9]{2}-[0-9]{4}" 
+                        "pattern" : "[0-9]{3}-[0-9]{2}-[0-9]{4}"
                     }
                 }
             ]
@@ -232,22 +232,22 @@ exports.resources={
                 type: "ReturnIntent"
             },
             "slots": [
-              {
-                "name":"SSN",
-                "slotType":{"Ref":"SocialSecuritySlotType"},
-                "slotTypeVersion":"QNABOT-AUTO-ASSIGNED",
-                "slotConstraint": "Required",
-                "valueElicitationPrompt": {
-                  "messages": [
-                    {
-                      "contentType": "PlainText",
-                      "content": "What is your social security number?"
-                    }
-                  ],
-                  "maxAttempts": 2
-                },
-                "priority": 1,
-              }
+                {
+                    "name":"SSN",
+                    "slotType":{"Ref":"SocialSecuritySlotType"},
+                    "slotTypeVersion":"QNABOT-AUTO-ASSIGNED",
+                    "slotConstraint": "Required",
+                    "valueElicitationPrompt": {
+                        "messages": [
+                            {
+                                "contentType": "PlainText",
+                                "content": "What is your social security number?"
+                            }
+                        ],
+                        "maxAttempts": 2
+                    },
+                    "priority": 1,
+                }
             ],
         },
     },
@@ -273,7 +273,7 @@ exports.resources={
             "slotTypeConfigurations": [
                 {
                     "regexConfiguration": {
-                        "pattern" : "[0-9]{4}" 
+                        "pattern" : "[0-9]{4}"
                     }
                 }
             ]
@@ -355,22 +355,22 @@ exports.resources={
                 type: "ReturnIntent"
             },
             "slots": [
-              {
-                "name":"Pin",
-                "slotType":{"Ref":"PinSlotType"},
-                "slotTypeVersion":"QNABOT-AUTO-ASSIGNED",
-                "slotConstraint": "Required",
-                "valueElicitationPrompt": {
-                  "messages": [
-                    {
-                      "contentType": "PlainText",
-                      "content": "What is your pin number?"
-                    }
-                  ],
-                  "maxAttempts": 2
-                },
-                "priority": 1,
-              }
+                {
+                    "name":"Pin",
+                    "slotType":{"Ref":"PinSlotType"},
+                    "slotTypeVersion":"QNABOT-AUTO-ASSIGNED",
+                    "slotConstraint": "Required",
+                    "valueElicitationPrompt": {
+                        "messages": [
+                            {
+                                "contentType": "PlainText",
+                                "content": "What is your pin number?"
+                            }
+                        ],
+                        "maxAttempts": 2
+                    },
+                    "priority": 1,
+                }
             ],
         },
     },
@@ -400,91 +400,91 @@ exports.resources={
         }
     },
     "YesNoIntent": {
-      "Type": "Custom::LexIntent",
-      "Properties": {
-        "ServiceToken": {"Ref": "CFNLambda"},
-        "name":{"Fn::Sub":"QNAYesNoIntent-${AWS::StackName}"},
-        "createVersion": true,
-        "description": "QNA Yes No Intent - " + botDateVersion,
-        "sampleUtterances": [
-            "{Yes_No}",
-            "I said {Yes_No}"
-        ],
-        conclusionStatement: {
-          messages: [
-            {
-              content: "OK. ", 
-              contentType: "PlainText"
-            }
-          ], 
-        },
-        fulfillmentActivity: {
-          type: "ReturnIntent"
-        },
-        "slots": [
-          {
-            "name":"Yes_No",
-            "slotType":{"Ref":"YesNoSlotType"},
-            "slotTypeVersion":"QNABOT-AUTO-ASSIGNED",
-            "slotConstraint": "Required",
-            "valueElicitationPrompt": {
-              "messages": [
-                {
-                  "contentType": "PlainText",
-                  "content": "Say Yes or No."
-                }
-              ],
-              "maxAttempts": 2
+        "Type": "Custom::LexIntent",
+        "Properties": {
+            "ServiceToken": {"Ref": "CFNLambda"},
+            "name":{"Fn::Sub":"QNAYesNoIntent-${AWS::StackName}"},
+            "createVersion": true,
+            "description": "QNA Yes No Intent - " + botDateVersion,
+            "sampleUtterances": [
+                "{Yes_No}",
+                "I said {Yes_No}"
+            ],
+            conclusionStatement: {
+                messages: [
+                    {
+                        content: "OK. ",
+                        contentType: "PlainText"
+                    }
+                ],
             },
-            "priority": 1,
-          }
-        ],
-      },
+            fulfillmentActivity: {
+                type: "ReturnIntent"
+            },
+            "slots": [
+                {
+                    "name":"Yes_No",
+                    "slotType":{"Ref":"YesNoSlotType"},
+                    "slotTypeVersion":"QNABOT-AUTO-ASSIGNED",
+                    "slotConstraint": "Required",
+                    "valueElicitationPrompt": {
+                        "messages": [
+                            {
+                                "contentType": "PlainText",
+                                "content": "Say Yes or No."
+                            }
+                        ],
+                        "maxAttempts": 2
+                    },
+                    "priority": 1,
+                }
+            ],
+        },
     },
     "QNAYesNo": {
-      "Type": "Custom::LexBot",
-      "DependsOn": ["YesNoSlotType", "YesNoIntent"],
-      "Properties": {
-        "ServiceToken": {"Ref": "CFNLambda"},
-        "name":{"Fn::Sub":"QNAYesNoBot-${AWS::StackName}"},
-        "description": "QNA Yes No Bot - " + botDateVersion,
-        "locale": "en-US",
-        "voiceId": config.voiceId,
-        "childDirected": false,
-        "createVersion": true,
-        "intents": [
-            {"intentName": {"Ref": "YesNoIntent"}},
-        ],
-        "clarificationPrompt": {
-          "messages": [
-            {
-              "contentType": "PlainText",
-              "content": "Please repeat - say Yes or No."
-            }
-          ],
-          "maxAttempts": 5
-        },
-        "abortStatement": {
-          "messages": [
-            {
-              "content": config.Abort,
-              "contentType": "PlainText"
-            }
-          ]
-        },
-      }
+        "Type": "Custom::LexBot",
+        "DependsOn": ["YesNoSlotType", "YesNoIntent"],
+        "Properties": {
+            "ServiceToken": {"Ref": "CFNLambda"},
+            "name":{"Fn::Sub":"QNAYesNoBot-${AWS::StackName}"},
+            "description": "QNA Yes No Bot - " + botDateVersion,
+            "locale": "en-US",
+            "voiceId": config.voiceId,
+            "childDirected": false,
+            "createVersion": true,
+            "intents": [
+                {"intentName": {"Ref": "YesNoIntent"}},
+            ],
+            "clarificationPrompt": {
+                "messages": [
+                    {
+                        "contentType": "PlainText",
+                        "content": "Please repeat - say Yes or No."
+                    }
+                ],
+                "maxAttempts": 5
+            },
+            "abortStatement": {
+                "messages": [
+                    {
+                        "content": config.Abort,
+                        "contentType": "PlainText"
+                    }
+                ]
+            },
+        }
     },
     "YesNoAliasV2": {
-      "Type": "Custom::LexAlias",
-      "DependsOn": "QNAYesNo",
-      "Properties": {
-        "ServiceToken": {"Ref": "CFNLambda"},
-        "botName": {
-          "Ref": "QNAYesNo"
-        },
-        "name": "live",
-        "description": "QNA Yes No Alias - " + botDateVersion,
-      }
+        "Type": "Custom::LexAlias",
+        "DependsOn": "QNAYesNo",
+        "Properties": {
+            "ServiceToken": {"Ref": "CFNLambda"},
+            "botName": {
+                "Ref": "QNAYesNo"
+            },
+            "name": "live",
+            "description": "QNA Yes No Alias - " + botDateVersion,
+        }
     },
     "YesNoExitSlotType":{
         "Type": "Custom::LexSlotType",
@@ -1575,12 +1575,12 @@ exports.resources={
 
 
 exports.names=[
-  "QNAYesNo", "QNAYesNoExit", "QNADate", "QNADayOfWeek", "QNAMonth", "QNANumber",
-  "QNAAge","QNAPhoneNumber", "QNATime", "QNAEmailAddress", "QNAName",
-  "QNAWage","QNASocialSecurity","QNAPin"
+    "QNAYesNo", "QNAYesNoExit", "QNADate", "QNADayOfWeek", "QNAMonth", "QNANumber",
+    "QNAAge","QNAPhoneNumber", "QNATime", "QNAEmailAddress", "QNAName",
+    "QNAWage","QNASocialSecurity","QNAPin"
 ] ;
 
 
 exports.outputs=_.fromPairs(exports.names.map(x=>{
-        return [x,{Value:{"Ref": x}}];
-    }));
+    return [x,{Value:{"Ref": x}}];
+}));

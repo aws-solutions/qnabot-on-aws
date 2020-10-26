@@ -4,6 +4,8 @@
 {
     "lambdaArn": "${FulfillmentLambda.Arn}",
     "lambdaRole":"${FulfillmentLambdaRole}",
+    "intent":"${Intent}",
+    "intentFallback":"${IntentFallback}",
     "status":"$inputRoot.status",
     "build":$input.json('$.build'),
     "botname":"${LexBot}",

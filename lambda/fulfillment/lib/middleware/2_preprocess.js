@@ -83,7 +83,7 @@ module.exports=async function preprocess(req,res){
             }
             var urls = default_jwks_url.concat(identity_provider_jwks_url);
             console.log("Attempt to verify idtoken using jwks urls:",urls);
-            var verified_url = await jwt.verify(kid,urls) ;
+            var verified_url = await jwt.verify(idtoken,kid,urls) ;
             if (verified_url) {
                 _.set(idattrs,'verifiedIdentity',"true");
                 console.log("Verified identity with:",verified_url);
@@ -100,6 +100,7 @@ module.exports=async function preprocess(req,res){
         if ( _.get(idattrs, 'verifiedIdentity',"false") != "true") {
             // identity is not verified
             // reset question to the configured no_verified_identity question
+            console.log("Missing or invalid idtokenjwt - ENFORCE_VERIFIED_IDENTITY is true - seeting question to NO_VERIFIED_IDENTITY_QUESTION") ;
             req.question = _.get(req, '_settings.NO_VERIFIED_IDENTITY_QUESTION','no_verified_identity') ;
         }
     }
@@ -114,6 +115,29 @@ module.exports=async function preprocess(req,res){
     var res_userInfo = await update_userInfo(userId, req_userInfo);
     _.set(res,"_userInfo", res_userInfo);
     
+    // by default, remove tokens from session event to prevent accidental logging of token values
+    // to keep tokens, create custom setting "REMOVE_ID_TOKENS_FROM_SESSION" and set to "false"
+    if (_.get(req, '_settings.REMOVE_ID_TOKENS_FROM_SESSION',true)) {
+        console.log("Removing id tokens from session event: idtokenjwt, accesstokenjwt, refreshtoken") ;
+        delete req.session.idtokenjwt ;
+        delete req.session.accesstokenjwt ;
+        delete req.session.refreshtoken ;
+        delete res.session.idtokenjwt ;
+        delete res.session.accesstokenjwt ;
+        delete res.session.refreshtoken ;
+        // Lex
+        if (req._type == "LEX") {
+            delete req._event.sessionAttributes.idtokenjwt ;
+            delete req._event.sessionAttributes.accesstokenjwt ;
+            delete req._event.sessionAttributes.refreshtoken ;            
+        }
+        if (req._type == "ALEXA") {
+            delete req._event.session.attributes.idtokenjwt ;
+            delete req._event.session.attributes.accesstokenjwt ;
+            delete req._event.session.attributes.refreshtoken ;
+        }
+    }
+
     _.set(req,"_info.es.address",process.env.ES_ADDRESS)
     _.set(req,"_info.es.index",process.env.ES_INDEX)
     _.set(req,"_info.es.type",process.env.ES_TYPE)

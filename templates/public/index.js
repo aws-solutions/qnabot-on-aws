@@ -36,6 +36,7 @@ module.exports=Promise.resolve(require('../master')).then(function(base){
         "Email",
         "Username",
         "Encryption",
+        "ElasticSearchNodeCount",
         "PublicOrPrivate",
         "XraySetting"
     ])
@@ -47,7 +48,7 @@ module.exports=Promise.resolve(require('../master')).then(function(base){
     base.Conditions.CreateDomain={"Fn::Equals":[true,true]}
     base.Conditions.DontCreateDomain={"Fn::Equals":[true,false]}
     base.Conditions.VPCEnabled={"Fn::Equals":[true,false]}
-    
+
     var out=JSON.stringify(base).replace(
         /{"Ref":"BootstrapBucket"}/g,
         '"'+config.publicBucket+'"')

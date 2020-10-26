@@ -209,8 +209,8 @@ module.exports={
       this.loading=true
       var name=(new URL(self.url)).pathname.split('/').reverse()[0]
 
-      Promise.resolve(axios.get(self.url))
-      .then(x=>x.data)
+      self.$store.dispatch('api/getImport',{href: self.url})
+      .then(x=>x)
       .tapCatch(x=>self.error=JSON.stringify({
         status:x.response.status,
         message:x.response.data
