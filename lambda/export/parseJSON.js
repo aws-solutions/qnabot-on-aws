@@ -1,5 +1,8 @@
 // parseJSON.js
 
+const { S3, FSx } = require('aws-sdk');
+var fs = require('fs');
+
 /**
  * Function to parse JSON of configurations/questions from QNA Content Designer and write an output CSV file
  * @param input_path : the input file path of the exported JSON
@@ -85,7 +88,7 @@ async function qnaJsontoKendraJsonParser(params){
             ]
         }
     
-}
+
   
   var qna = `{"qna":[${params.content.toString().replace(/\n/g,',\n')}]}`
   params.content = JSON.parse(qna);
@@ -110,10 +113,20 @@ async function qnaJsontoKendraJsonParser(params){
       }
       
   });
-  
-  return data;
-  
+  console.log(`Kendra Data ${JSON.stringify(data)}`)
 
+  // var params ={
+  //   Body: Buffer.from(JSON.stringify(data),'binary'),
+  //   Bucket: params.Records[0].s3.bucket.name,
+  //   Key: params.output_path 
+
+  // };
+  //await S3.putObject(params).pronise();
+  fs.writeFileSync(params.output_path,JSON.stringify(data),{encoding: "utf8"});
+  console.log('The JSON file ' + params.output_path + ' was written successfully')
+  return 
+  
+}
 
 
 exports.handler = async (params) => {

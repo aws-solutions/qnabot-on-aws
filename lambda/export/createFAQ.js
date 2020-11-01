@@ -206,6 +206,7 @@ async function createFAQ(params) {
       IndexId: params.faq_index_id,
       Name: params.faq_name,
       RoleArn: params.kendra_s3_access_role,
+      FileFormat: "JSON",
       S3Path: {
         Bucket: params.s3_bucket,
         Key: params.s3_key
