@@ -63,7 +63,7 @@ async function run_query_es(req, query_params) {
 
 async function run_query_kendra(req, query_params) {
     console.log("Querying Kendra FAQ index: " + _.get(req, "_settings.KENDRA_FAQ_INDEX"));
-    // calls kendrQuery function which duplicates KendraFallback code, but only searches through FAQs
+    // calls kendraQuery function which duplicates KendraFallback code, but only searches through FAQs
     var request_params = {
         kendra_faq_index:_.get(req, "_settings.KENDRA_FAQ_INDEX"),
         maxRetries:_.get(req, "_settings.KENDRA_FAQ_CONFIG_MAX_RETRIES"),
@@ -89,8 +89,10 @@ async function run_query_kendra(req, query_params) {
     }
     if (alt_kendra_idxs.includes(request_params.kendra_faq_index)) {
         console.log(`optimizing for KendraFallback`);
-        request_params['same_index'] = true
+        request_params['same_index'] = true ;
     }
+    request_params['es_address'] = req._info.es.address ;
+    request_params['es_path'] = '/' + req._info.es.index + '/_doc/_search?search_type=dfs_query_then_fetch' ;
 
     var kendra_response = await kendra.handler(request_params);
     
@@ -98,7 +100,6 @@ async function run_query_kendra(req, query_params) {
         _.set(kendra_response, "hits.hits[0]._source.answersource", "Kendra FAQ");
     }
     return kendra_response;
-
 }
 
 function merge_next(hit1, hit2) {
