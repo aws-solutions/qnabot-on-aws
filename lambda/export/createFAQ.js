@@ -43,8 +43,9 @@ function faqConverter(kendraClient,params) {
                 reject(err);
             }
             else {
-                console.log('Converted CSV to FAQ successfully:');
+                console.log('Converted JSON to FAQ successfully:');
                 console.log(data);           // successful response
+                poll(() => kendraClient.describeFaq({IndexId: params.IndexId,Id:data.Id }).promise(),(result) => result.Status != "ACTIVE",5000 ).then(() => resolve(data));        // successful response
                 resolve(data);
             }
             });
@@ -67,13 +68,37 @@ function faqDeleter(kendraClient,params) {
             }
             else {
                 console.log('Deleted old FAQ successfully. New list of FAQs in index ' + params.IndexId + ':');
-                console.log(data);           // successful response
-                resolve(data);
+                console.log("Delete parameters " + JSON.stringify(params));   
+                //describeFaq should cause an exception when the faq has been deleted.
+                poll(() => kendraClient.describeFaq(params).promise(),(result) => true,5000 ).then(() => resolve(data));        // successful response
+                
             }
             });
     });
 }
 
+function wait(ms = 1000) {
+    return new Promise(resolve => {
+      console.log(`waiting ${ms} ms...`);
+      setTimeout(resolve, ms);
+    });
+  }
+
+async function poll(fn, fnCondition, ms) {
+    let result = await fn();
+    while (fnCondition(result)) {
+      await wait(ms);
+      try{
+        result = await fn();
+        
+      } catch(e)
+      {
+          console.log("Poll exception " + JSON.stringify(e));
+          return e;
+      }
+    }
+    return result;
+  }
 
 /**
  * Function to list existing FAQs in a Kendra index, return Promise
@@ -218,7 +243,7 @@ async function createFAQ(params) {
     count=0;        
     while (count<1) {
         try {
-            var faq_response = await faqConverter(kendraClient, faq_params);
+            var faq_response = await faqConverter(kendraClient, faq_params,delete_faq_params);
             count++;
         } catch (error) {
             if (error.code=='ThrottlingException') {
