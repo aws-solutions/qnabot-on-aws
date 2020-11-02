@@ -127,14 +127,18 @@ module.exports=async function preprocess(req,res){
         delete res.session.refreshtoken ;
         // Lex
         if (req._type == "LEX") {
-            delete req._event.sessionAttributes.idtokenjwt ;
-            delete req._event.sessionAttributes.accesstokenjwt ;
-            delete req._event.sessionAttributes.refreshtoken ;            
+            if (_.get(req,"_event.sessionAttributes")) {
+                delete req._event.sessionAttributes.idtokenjwt ;
+                delete req._event.sessionAttributes.accesstokenjwt ;
+                delete req._event.sessionAttributes.refreshtoken ;
+            }
         }
         if (req._type == "ALEXA") {
-            delete req._event.session.attributes.idtokenjwt ;
-            delete req._event.session.attributes.accesstokenjwt ;
-            delete req._event.session.attributes.refreshtoken ;
+            if (_.get(req,"_event.session.attributes")) {
+                delete req._event.session.attributes.idtokenjwt ;
+                delete req._event.session.attributes.accesstokenjwt ;
+                delete req._event.session.attributes.refreshtoken ;
+            }
         }
     }
 
