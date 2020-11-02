@@ -13,33 +13,6 @@ async function qnaJsontoKendraJsonParser(params){
   var data = {
     "SchemaVersion": 1,
     "FaqDocuments": [
-        // {
-        //     "Question": "How tall is the Space Needle?",
-        //     "Answer": "605 feet"
-        // },
-        // {
-        //     "Question": "How tall is Smith Tower?",
-        //     "Answer": "484 feet",
-        //     "Attributes": {
-        //         "_source_uri": "https://www.smithtower.com",
-        //         "_authors": ["Richard Roe", "Jorge Souza"],
-        //         "_category": "Buildings",
-        //         "_created_at": "2020-09-15T22:40:46Z",
-        //         "_last_updated_at": "2020-09-15T22:40:46-08:00",
-        //         "_version": "v1",
-        //         "_view_count": 123
-        //     },
-        //     "AccessControlList": [
-        //        {
-        //            "Name": "user@amazon.com",
-        //            "Type": "USER",
-        //            "Access": "ALLOW"
-        //        },
-        //        {
-        //            "Name": "Admin",
-        //            "Type": "GROUP",
-        //            "Access": "ALLOW"
-        //        }
             ]
         }
     
@@ -71,13 +44,6 @@ async function qnaJsontoKendraJsonParser(params){
   });
   console.log(`Kendra Data ${JSON.stringify(data)}`)
 
-  // var params ={
-  //   Body: Buffer.from(JSON.stringify(data),'binary'),
-  //   Bucket: params.Records[0].s3.bucket.name,
-  //   Key: params.output_path 
-
-  // };
-  //await S3.putObject(params).pronise();
   fs.writeFileSync(params.output_path,JSON.stringify(data),{encoding: "utf8"});
   console.log('The JSON file ' + params.output_path + ' was written successfully')
   return 
@@ -86,6 +52,5 @@ async function qnaJsontoKendraJsonParser(params){
 
 
 exports.handler = async (params) => {
-    //return await qnaJsonParser(params);
     return await qnaJsontoKendraJsonParser(params)
 };
