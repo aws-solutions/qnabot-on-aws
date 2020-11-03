@@ -309,6 +309,7 @@ async function routeKendraRequest(event, context) {
                     answerMessage = faqanswerMessage + '\n\n ' + element.AdditionalAttributes[1].Value.TextWithHighlightsValue.Text.replace(/\r?\n|\r/g, " ");
                     
                     seenTop = true; // if the answer is in the FAQ, don't show document extracts
+                    answerDocumentUris=[];
                     let answerTextMd = element.AdditionalAttributes[1].Value.TextWithHighlightsValue.Text.replace(/\r?\n|\r/g, " ");
                     // iterates over the FAQ answer highlights in sorted order of BeginOffset, merges the overlapping intervals
                     var sorted_highlights = mergeIntervals(element.AdditionalAttributes[1].Value.TextWithHighlightsValue.Highlights);
