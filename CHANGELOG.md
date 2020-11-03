@@ -1,3 +1,8 @@
+## [4.3.2]
+- Bug fixes for Kendra FAQ integration 
+    - Support lengthy answer definition for Kendra FAQ
+    - Check of FAQ deletion in Kendra when FAQ content is being resynced
+- Package version updates to address current github dependabot alerts
 ## [4.3.0]
 - New Connect Wizard available in the Content Designer UI to assist integration with a Connect Contact Flow.
 - New 4-node Elasticsearch domain support for improved fault tolerance in deployment template.
