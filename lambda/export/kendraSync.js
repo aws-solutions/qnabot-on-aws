@@ -114,15 +114,15 @@ exports.performSync=async function(event,context,cb){
         let x = await s3.getObject({Bucket,Key,VersionId}).promise()
         var content = x.Body.toString()
         
-        // parse JSON into CSV
+        // parse JSON into Kendra format
         var parseJSONparams = {
-            csv_name:'qna_FAQ.csv',
+            json_name:'qna_FAQ.json',
             content:content,
-            output_path:'/tmp/qna_FAQ.csv',
+            output_path:'/tmp/qna_FAQ.json',
         }
         await update_status(process.env.OUTPUT_S3_BUCKET, 'Parsing content JSON');
         await parse.handler(parseJSONparams)
-        console.log("Parsed content JSON into CSV stored locally");
+        console.log("Parsed content JSON into Kendra FAQ file format stored locally");
         
         
         // get QnABot settings to retrieve KendraFAQIndex
@@ -133,14 +133,14 @@ exports.performSync=async function(event,context,cb){
         }
         console.log(`kendra faq index is ${kendra_faq_index}`);
         
-        // create kendra FAQ from csv
+        // create kendra FAQ from JSON
         var createFAQparams = {
             faq_name:'qna-facts',
             faq_index_id:kendra_faq_index,
-            csv_path:parseJSONparams.output_path,
-            csv_name:parseJSONparams.csv_name,
+            json_path:parseJSONparams.output_path,
+            json_name:parseJSONparams.json_name,
             s3_bucket:process.env.OUTPUT_S3_BUCKET,
-            s3_key:"kendra_csv" + "/" + parseJSONparams.csv_name,
+            s3_key:"kendra_json" + "/" + parseJSONparams.json_name,
             kendra_s3_access_role:process.env.KENDRA_ROLE,
             region:process.env.REGION
         }
@@ -148,7 +148,7 @@ exports.performSync=async function(event,context,cb){
         await create.handler(createFAQparams);
         // wait for index to complete creation
         // TODO: https://docs.aws.amazon.com/kendra/latest/dg/create-index.html
-        console.log('Completed CSV converting to FAQ');
+        console.log('Completed JSON converting to FAQ');
         
         
         await update_status(process.env.OUTPUT_S3_BUCKET, 'Sync Complete');

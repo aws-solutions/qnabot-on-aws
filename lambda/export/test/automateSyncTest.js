@@ -15,9 +15,9 @@ async function test_parser() {
     // content = JSON.parse(content);
     
     var parseJSONparams = {
-        csv_name:'qna_FAQ.csv',
+        json_name:'qna_FAQ.json',
         content:content,
-        output_path:'./test/qna_FAQ.csv',
+        output_path:'./test/qna_FAQ.json',
     }
     const resp = await parseJSON.handler(parseJSONparams);
 
@@ -31,7 +31,7 @@ async function test_parser() {
       console.error(err)
       return false;
     }
-    // ALERT: does not check rows of CSV, so must manually validate content and format
+    // ALERT: does not check rows of JSON, so must manually validate content and format
 }
 
 
@@ -40,17 +40,17 @@ async function test_create_faq() {
     const create = require('../createFAQ.js');
     var content = require('./qna_FAQ.json');
     var parseJSONparams = {
-        csv_name:'qna_FAQ.csv',
+        json_name:'qna_FAQ.json',
         content:content,
-        output_path:'./test/qna_FAQ.csv',
+        output_path:'./test/qna_FAQ.json',
     }
     var createFAQparams = {
         faq_name:'qna-facts',
         faq_index_id:'e1c23860-e5c8-4409-ae26-b05bd6ced00a',
-        csv_path:parseJSONparams.output_path,
-        csv_name:parseJSONparams.csv_name,
+        json_path:parseJSONparams.output_path,
+        json_name:parseJSONparams.csv_name,
         s3_bucket:'qna-dev-dev-dev-master-5-exportbucket-yj1v0yw9u094',
-        s3_key:"kendra-data" + "/" + parseJSONparams.csv_name,
+        s3_key:"kendra-data" + "/" + parseJSONparams.json_name,
         kendra_s3_access_role:'arn:aws:iam::425742325899:role/QNA-dev-dev-dev-master-5-ExportStack-KendraS3Role-7966TLAABU2N',
         region:'us-east-1'
     }

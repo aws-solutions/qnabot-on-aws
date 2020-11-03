@@ -7,7 +7,7 @@ const sleep = require('util').promisify(setTimeout)
 
 
 /**
- * Function to upload CSV to S3 bucket, return Promise
+ * Function to upload JSON to S3 bucket, return Promise
  * @param s3Client
  * @param params
  * @returns {*}
@@ -20,7 +20,7 @@ function s3Uploader(s3Client,params) {
                 reject(err);
             }
             else {
-                console.log('Uploaded CSV to S3 successfully:');
+                console.log('Uploaded JSON to S3 successfully:');
                 console.log(data);           // successful response
                 resolve(data);
             }
@@ -30,7 +30,7 @@ function s3Uploader(s3Client,params) {
 
 
 /**
- * Function to convert uploaded CSV into Kendra FAQ, return Promise
+ * Function to convert uploaded JSON into Kendra FAQ, return Promise
  * @param kendraClient
  * @param params
  * @returns {*}
@@ -45,7 +45,16 @@ function faqConverter(kendraClient,params) {
             else {
                 console.log('Converted JSON to FAQ successfully:');
                 console.log(data);           // successful response
-                poll(() => kendraClient.describeFaq({IndexId: params.IndexId,Id:data.Id }).promise(),(result) => result.Status != "ACTIVE",5000 ).then(() => resolve(data));        // successful response
+                poll(() => kendraClient.describeFaq({IndexId: params.IndexId,Id:data.Id }).promise(),(result) => {
+                    
+                    var status = result.Status != "ACTIVE" && result.status != "FAILED";
+                    return {
+                        Status: status ? "PENDING" : result.Status,
+                        Message: result.Status == "FAILED" ? result.ErrorMessage : null 
+                    }
+                
+                },5000 )
+                .then(() => resolve(data));        // successful response
                 resolve(data);
             }
             });
@@ -70,7 +79,7 @@ function faqDeleter(kendraClient,params) {
                 console.log('Deleted old FAQ successfully. New list of FAQs in index ' + params.IndexId + ':');
                 console.log("Delete parameters " + JSON.stringify(params));   
                 //describeFaq should cause an exception when the faq has been deleted.
-                poll(() => kendraClient.describeFaq(params).promise(),(result) => true,5000 ).then(() => resolve(data));        // successful response
+                poll(() => kendraClient.describeFaq(params).promise(),(result) => result.Status = "PENDING",5000 ).then(() => resolve(data));        // successful response
                 
             }
             });
@@ -86,14 +95,25 @@ function wait(ms = 1000) {
 
 async function poll(fn, fnCondition, ms) {
     let result = await fn();
-    while (fnCondition(result)) {
+    while (fnCondition(result.Status == "PENDING")) {
       await wait(ms);
       try{
         result = await fn();
+        if(e.Status == "FAILED")
+        {
+            throw {
+                Propragate: true,
+                Message: result.Message
+            }
+        }
         
       } catch(e)
       {
           console.log("Poll exception " + JSON.stringify(e));
+          if(e.Propragate)
+          {
+              throw e.Message
+          }
           return e;
       }
     }
@@ -126,7 +146,7 @@ function faqLister(kendraClient,params) {
 
 
 /**
- * Function to upload CSV into S3 bucket and convert into Kendra FAQ, return Promise
+ * Function to upload JSON into S3 bucket and convert into Kendra FAQ, return Promise
  * @returns {*}
  */
 async function createFAQ(params) {
@@ -142,13 +162,13 @@ async function createFAQ(params) {
     console.log('clients created');
     
     
-    // read in CSV and upload to S3 bucket
+    // read in JSON and upload to S3 bucket
     var fs = require('fs');
     var s3_params = {
       Bucket: params.s3_bucket,
       Key: params.s3_key,
       ACL: 'bucket-owner-read',                     // TODO: should this param be public?
-      Body: fs.createReadStream(params.csv_path),   // use read stream option in case file is large
+      Body: fs.createReadStream(params.json_path),   // use read stream option in case file is large
     };
     
     let count=0;
