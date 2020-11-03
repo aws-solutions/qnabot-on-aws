@@ -111,7 +111,7 @@ async function routeKendraRequest(request_params) {
     kendraIndexes.forEach(function (index, i) {
         const params = {
             IndexId: index, /* required */
-            QueryText: request_params.input_transcript
+            QueryText: request_params.question
         };
         let p = kendraRequester(kendraClient,params,resArray);
         promises.push(p);
@@ -138,7 +138,7 @@ async function routeKendraRequest(request_params) {
             for (i=0; i<res.ResultItems.length; i++) {
                 element = res.ResultItems[i];
                 /* Note - only FAQ format will be provided back to the requester */
-                if (element.Type === 'QUESTION_ANSWER' && foundAnswerCount === 0 && element.AdditionalAttributes &&
+                if (element.Type === 'QUESTION_ANSWER' && foundAnswerCount < request_params.size && element.AdditionalAttributes &&
                     element.AdditionalAttributes.length > 1) {
 
                     if (!hasJsonStructure(element.DocumentURI)) {
