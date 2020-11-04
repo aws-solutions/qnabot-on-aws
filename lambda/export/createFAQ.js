@@ -46,16 +46,17 @@ function faqConverter(kendraClient,params) {
                 console.log('Converted JSON to FAQ successfully:');
                 console.log(data);           // successful response
                 poll(() => kendraClient.describeFaq({IndexId: params.IndexId,Id:data.Id }).promise(),(result) => {
-                    
-                    var status = result.Status != "ACTIVE" && result.status != "FAILED";
+                    console.log("describeFaq " + JSON.stringify(result));
+                    var status = result.Status == "PENDING_CREATION";
                     return {
-                        Status: status ? "PENDING" : result.Status,
+                        Status: status ?  "PENDING":"FAILED",
                         Message: result.Status == "FAILED" ? result.ErrorMessage : null 
                     }
                 
                 },5000 )
-                .then(() => resolve(data));        // successful response
-                resolve(data);
+                .then(() => {
+                    return resolve(data)})
+                .catch(() => reject("Could not sync Kendra FAQ"))       // successful response
             }
             });
     });
@@ -95,29 +96,29 @@ function wait(ms = 1000) {
 
 async function poll(fn, fnCondition, ms) {
     let result = await fn();
-    while (fnCondition(result.Status == "PENDING")) {
+ 
+    while (fnCondition(result).Status == "PENDING") {
+ 
       await wait(ms);
+ 
       try{
         result = await fn();
-        if(result.Status == "FAILED")
-        {
-            throw {
-                Propragate: true,
-                Message: result.Message
-            }
-        }
-        
       } catch(e)
       {
-          console.log("Poll exception " + JSON.stringify(e));
+ 
           if(e.Propragate)
           {
-              throw e.Message
+              throw(e.Message)
           }
+ 
           return e;
       }
     }
-    return result;
+    if(result.Status == "FAILED")
+    {
+        throw ("Error during Kendra Sync")
+    }
+   return result;
   }
 
 /**

@@ -145,10 +145,11 @@ exports.performSync=async function(event,context,cb){
             region:process.env.REGION
         }
         await update_status(process.env.OUTPUT_S3_BUCKET, 'Creating FAQ');
-        await create.handler(createFAQparams);
+        var status = await create.handler(createFAQparams);
+    
         // wait for index to complete creation
         // TODO: https://docs.aws.amazon.com/kendra/latest/dg/create-index.html
-        console.log('Completed JSON converting to FAQ');
+        console.log('Completed JSON converting to FAQ ' + JSON.stringify(status));
         
         
         await update_status(process.env.OUTPUT_S3_BUCKET, 'Sync Complete');
