@@ -68,13 +68,11 @@ async function run_query_kendra(req, query_params) {
         kendra_faq_index:_.get(req, "_settings.KENDRA_FAQ_INDEX"),
         maxRetries:_.get(req, "_settings.KENDRA_FAQ_CONFIG_MAX_RETRIES"),
         retryDelay:_.get(req, "_settings.KENDRA_FAQ_CONFIG_RETRY_DELAY"),
-    }
-    // autotranslate
-    if (req["_event"]['userDetectedLocale'] != 'en') {
-        request_params['input_transcript'] = query_params.question;
-    } else {
-        request_params['input_transcript']= req["_event"].inputTranscript;
-    }
+        size:1,
+        question: query_params.question,
+        es_address: req._info.es.address,
+        es_path: '/' + req._info.es.index + '/_doc/_search?search_type=dfs_query_then_fetch',
+    } ;
     
     // optimize kendra queries for throttling by checking if KendraFallback idxs include KendraFAQIndex
     let alt_kendra_idxs = _.get(req, "_settings.ALT_SEARCH_KENDRA_INDEXES");
@@ -91,8 +89,6 @@ async function run_query_kendra(req, query_params) {
         console.log(`optimizing for KendraFallback`);
         request_params['same_index'] = true ;
     }
-    request_params['es_address'] = req._info.es.address ;
-    request_params['es_path'] = '/' + req._info.es.index + '/_doc/_search?search_type=dfs_query_then_fetch' ;
 
     var kendra_response = await kendra.handler(request_params);
     
