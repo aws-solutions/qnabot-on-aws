@@ -47,9 +47,9 @@ function faqConverter(kendraClient,params) {
                 console.log(data);           // successful response
                 poll(() => kendraClient.describeFaq({IndexId: params.IndexId,Id:data.Id }).promise(),(result) => {
                     console.log("describeFaq " + JSON.stringify(result));
-                    var status = result.Status == "PENDING_CREATION";
+                    var status = result.Status == "PENDING_CREATION" || result.Status == "CREATING";
                     return {
-                        Status: status ?  "PENDING":"FAILED",
+                        Status: status ?  "PENDING":result.Status,
                         Message: result.Status == "FAILED" ? result.ErrorMessage : null 
                     }
                 
