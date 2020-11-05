@@ -218,7 +218,7 @@ async function routeKendraRequest(event, context) {
         
         const params = {
             IndexId: index, /* required */
-            QueryText: event.req["_event"].inputTranscript, /* required */
+            QueryText: event.req["question"], /* required */
         };
         let p = kendraRequester(kendraClient,params,resArray);
         promises.push(p);
@@ -409,7 +409,7 @@ async function routeKendraRequest(event, context) {
                 event.res.session.appContext.altMessages.markdown += `***`;
                 event.res.session.appContext.altMessages.markdown += `\n\n <br>`;
                 
-                if (element.text && element.text.length > 0) {
+                if (element.text && element.text.length > 0 && event.req._preferredResponseType != "SSML") { //don't append doc search to SSML answers
                     event.res.session.appContext.altMessages.markdown += `\n\n  ${element.text}`;
                     event.res.message += `\n\n  ${element.text}`;
                 }
