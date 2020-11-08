@@ -6,7 +6,7 @@
  * in the associated Bot. Failure to do so when running an update will leave the bot in the NOT_BUILT state and you
  * will need to rebuild in the AWS Console. To update description for all bots, change botDateVersion string below.
  */
-const botDateVersion = process.env.npm_package_version + " - v1";  // CHANGE ME TO FORCE BOT REBUILD
+const botDateVersion = process.env.npm_package_version + " - v6";  // CHANGE ME TO FORCE BOT REBUILD
 
 var _ = require('lodash');
 
@@ -385,6 +385,95 @@ exports.resources={
             "description": "QNA Pin Alias - " + botDateVersion
         }
     },
+    "QNAPinNoConfirm2": {
+        "Type": "Custom::LexBot",
+        "DependsOn": "PinIntentNoConfirm",
+        "Properties": {
+            "ServiceToken": {"Ref": "CFNLambda"},
+            "name":{"Fn::Sub":"QNAPinBotNoConfirm-${AWS::StackName}"},
+            "locale": "en-US",
+            "voiceId": config.voiceId,
+            "childDirected": false,
+            "createVersion": true,
+            "intents": [
+                {"intentName": {"Ref": "PinIntentNoConfirm"}},
+            ],
+            "clarificationPrompt": {
+                "messages": [
+                    {
+                        "contentType": "PlainText",
+                        "content": "Please repeat your pin number."
+                    }
+                ],
+                "maxAttempts": 3
+            },
+            "abortStatement": {
+                "messages": [
+                    {
+                        "content": config.Abort,
+                        "contentType": "PlainText"
+                    }
+                ]
+            },
+            "description": "QNA Pin No Confirm elicit response - " + botDateVersion,
+        }
+    },
+    "PinIntentNoConfirm": {
+        "Type": "Custom::LexIntent",
+        "Properties": {
+            "ServiceToken": {"Ref": "CFNLambda"},
+            "name":{"Fn::Sub":"QNAPinIntentNoConfirm-${AWS::StackName}"},
+            "description": "QNA Pin Intent No Confirm - " + botDateVersion,
+            "createVersion": true,
+            "sampleUtterances": [
+                "The pin number is {Pin}",
+                "My pin number is {Pin}",
+                "It is {Pin}",
+                "{Pin}"
+            ],
+            conclusionStatement: {
+                messages: [
+                    {
+                        content: "OK. ",
+                        contentType: "PlainText"
+                    }
+                ],
+            },
+            description: "Parse pin responses.",
+            fulfillmentActivity: {
+                type: "ReturnIntent"
+            },
+            "slots": [
+                {
+                    "name":"Pin",
+                    "slotType":{"Ref":"PinSlotType"},
+                    "slotTypeVersion":"QNABOT-AUTO-ASSIGNED",
+                    "slotConstraint": "Required",
+                    "valueElicitationPrompt": {
+                        "messages": [
+                            {
+                                "contentType": "PlainText",
+                                "content": "What is your pin number?"
+                            }
+                        ],
+                        "maxAttempts": 2
+                    },
+                    "priority": 1,
+                }
+            ],
+        },
+    },
+    "PinNoConfirmAliasV2": {
+        "Type": "Custom::LexAlias",
+        "Properties": {
+            "ServiceToken": {"Ref": "CFNLambda"},
+            "botName": {
+                "Ref": "QNAPinNoConfirm2"
+            },
+            "name": "live",
+            "description": "QNA Pin No Confirm Alias - " + botDateVersion
+        }
+    },
     "YesNoSlotType":{
         "Type": "Custom::LexSlotType",
         "Properties": {
@@ -515,7 +604,7 @@ exports.resources={
             conclusionStatement: {
                 messages: [
                     {
-                        content: "Got it. ",
+                        content: "Ok. ",
                         contentType: "PlainText"
                     }
                 ],
@@ -696,6 +785,99 @@ exports.resources={
             },
             "name": "live",
             "description": "QNA Date Alias - " + botDateVersion
+        }
+    },
+    "DateIntentNoConfirm": {
+        "Type": "Custom::LexIntent",
+        "Properties": {
+            "ServiceToken": {"Ref": "CFNLambda"},
+            "name":{"Fn::Sub":"QNADateIntentNoConfirm-${AWS::StackName}"},
+            "createVersion": true,
+            "description": "QNA DateIntentNoConfirm - " + botDateVersion,
+            "sampleUtterances": [
+                "The date is {date}",
+                "The date was {date}",
+                "I went on {date}",
+                "It is {date}",
+                "It occurred on {date}",
+                "I was born on {date}",
+                "My birthdate is {date}",
+                "My date of birth is {date}",
+                "{date}"
+            ],
+            conclusionStatement: {
+                messages: [
+                    {
+                        content: "OK. ",
+                        contentType: "PlainText"
+                    }
+                ],
+            },
+            fulfillmentActivity: {
+                type: "ReturnIntent"
+            },
+            "slots": [
+                {
+                    "name":"date",
+                    "slotType": "AMAZON.DATE",
+                    "slotConstraint": "Required",
+                    "valueElicitationPrompt": {
+                        "messages": [
+                            {
+                                "contentType": "PlainText",
+                                "content": "What date?"
+                            }
+                        ],
+                        "maxAttempts": 2
+                    },
+                    "priority": 1,
+                }
+            ],
+        },
+    },
+    "QNADateNoConfirm": {
+        "Type": "Custom::LexBot",
+        "DependsOn": "DateIntentNoConfirm",
+        "Properties": {
+            "ServiceToken": {"Ref": "CFNLambda"},
+            "name":{"Fn::Sub":"QNADateBotNoConfirm-${AWS::StackName}"},
+            "description": "QNA Date Bot No Confirm - " + botDateVersion,
+            "locale": "en-US",
+            "voiceId": config.voiceId,
+            "childDirected": false,
+            "createVersion": true,
+            "intents": [
+                {"intentName": {"Ref": "DateIntentNoConfirm"}},
+            ],
+            "clarificationPrompt": {
+                "messages": [
+                    {
+                        "contentType": "PlainText",
+                        "content": "Please repeat the date."
+                    }
+                ],
+                "maxAttempts": 3
+            },
+            "abortStatement": {
+                "messages": [
+                    {
+                        "content": config.Abort,
+                        "contentType": "PlainText"
+                    }
+                ]
+            }
+        }
+    },
+    "DateAliasNoConfirmV2": {
+        "Type": "Custom::LexAlias",
+        "DependsOn": "QNADateNoConfirm",
+        "Properties": {
+            "ServiceToken": {"Ref": "CFNLambda"},
+            "botName": {
+                "Ref": "QNADateNoConfirm"
+            },
+            "name": "live",
+            "description": "QNA Date No Confirm Alias - " + botDateVersion
         }
     },
     "DayOfWeekIntent": {
@@ -1577,7 +1759,7 @@ exports.resources={
 exports.names=[
     "QNAYesNo", "QNAYesNoExit", "QNADate", "QNADayOfWeek", "QNAMonth", "QNANumber",
     "QNAAge","QNAPhoneNumber", "QNATime", "QNAEmailAddress", "QNAName",
-    "QNAWage","QNASocialSecurity","QNAPin"
+    "QNAWage","QNASocialSecurity","QNAPin", "QNAPinNoConfirm2"
 ] ;
 
 
