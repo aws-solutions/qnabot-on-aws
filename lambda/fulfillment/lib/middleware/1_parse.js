@@ -75,6 +75,13 @@ async function get_settings() {
         process.env.QNAREDACT="false";
         process.env.REDACTING_REGEX="";
     }
+    if (settings.DISABLE_CLOUDWATCH_LOGGING) {
+        console.log("disable cloudwatch logging");
+        process.env.DISABLECLOUDWATCHLOGGING="true";
+    } else {
+        console.log("enable cloudwatch logging");
+        process.env.DISABLECLOUDWATCHLOGGING="false";
+    }
     return settings;
 }
 

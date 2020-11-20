@@ -50,16 +50,21 @@ module.exports=function(event, context, callback){
 
     let redactEnabled = _.get(req, '_settings.ENABLE_REDACTING');
     let redactRegex = _.get(req, '_settings.REDACTING_REGEX', "\\b\\d{4}\\b(?![-])|\\b\\d{9}\\b|\\b\\d{3}-\\d{2}-\\d{4}\\b");
+    let cloudwatchLoggingDisabled = _.get(req, '_settings.DISABLE_CLOUDWATCH_LOGGING');
 
-    if (redactEnabled) {
-        console.log("redact enabled");
-        let re = new RegExp(redactRegex, "g");
-        processKeysForRegEx(req, re);
-        processKeysForRegEx(res, re);
-        processKeysForRegEx(sessionAttributes, re);
-        console.log("RESULT",JSON.stringify(event).replace(re, 'XXXXX'));
+    if (cloudwatchLoggingDisabled) {
+        console.log("RESULT", "cloudwatch logging disabled");
     } else {
-        console.log("RESULT",JSON.stringify(event));
+        if (redactEnabled) {
+            console.log("redact enabled");
+            let re = new RegExp(redactRegex, "g");
+            processKeysForRegEx(req, re);
+            processKeysForRegEx(res, re);
+            processKeysForRegEx(sessionAttributes, re);
+            console.log("RESULT", JSON.stringify(event).replace(re, 'XXXXX'));
+        } else {
+            console.log("RESULT", JSON.stringify(event));
+        }
     }
 
     let jsonData = {
@@ -74,6 +79,11 @@ module.exports=function(event, context, callback){
         datetime: now
     }
 
+    if (cloudwatchLoggingDisabled) {
+        jsonData.entireRequest = undefined;
+        jsonData.utterance = undefined;
+        jsonData.session = undefined;
+    }
     // encode to base64 string to put into firehose and
     // append new line for proper downstream kinesis processing in kibana and/or athena queries over s3
     var objJsonStr = JSON.stringify(jsonData) + '\n';

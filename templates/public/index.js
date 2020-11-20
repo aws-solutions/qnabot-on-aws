@@ -75,11 +75,13 @@ module.exports=Promise.resolve(require('../master')).then(function(base){
 
     out=out.replace(
         /{"Ref":"VPCSubnetIdList"}/g,
-        '["EMPTY"]')
+        '[{"Ref":"AWS::NoValue"}]')
 
     out=out.replace(
         /{"Ref":"VPCSecurityGroupIdList"}/g,
-        '["EMPTY"]')
+        '[{"Ref":"AWS::NoValue"}]')
 
     return JSON.parse(out)
 })
+
+// "VPCSubnetIdList" : { "Fn::Join" : [ ",", {"Ref":"VPCSubnetIdList"} ] }
