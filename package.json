@@ -70,7 +70,7 @@
     "file-saver": "^1.3.8",
     "handlebars": "^4.7.6",
     "handlebars-loader": "^1.7.0",
-    "highlight.js": "^9.15.10",
+    "highlight.js": "^10.1.2",
     "html-webpack-plugin": "^3.2.0",
     "idle-vue": "^2.0.5",
     "js-cache": "^1.0.3",
