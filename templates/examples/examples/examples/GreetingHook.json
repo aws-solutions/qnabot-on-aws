@@ -6,7 +6,7 @@
                 "What are lambda hooks",
                 "What is a lambda hook"
             ],
-            "a": "Lambda Hooks allow you to extend QnABot by returning dynamic answers.",
+            "a": "Lambda Hooks allow you to extend QNA Bot by returning dynamic answers.",
             "l":"QNA:ExampleJSLambdahook"
         }
     ]

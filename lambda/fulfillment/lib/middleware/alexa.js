@@ -92,6 +92,11 @@ exports.parse=async function(req){
     }
     return out ;
 } ;
+
+/**
+ * @see https://developer.amazon.com/en-US/docs/alexa/custom-skills/request-and-response-json-reference.html#response-format
+ * 
+ */
 exports.assemble=function(request,response){
     return {
         version:'1.0',
@@ -113,6 +118,14 @@ exports.assemble=function(request,response){
                 type:"Simple",
                 title:_.get(response,"card.title") || request.question || "Image",
                 content:_.has(response.card,'subTitle')? response.card.subTitle +"\n\n" + response.plainMessage:response.plainMessage
+            },
+            reprompt: {
+                outputSpeech: _.pickBy({
+                    type:response.reprompt.type,
+                    text:response.reprompt.type==='PlainText' ? response.reprompt.text : null,
+                    ssml:response.reprompt.type==='SSML' ? response.reprompt.text : null,
+                    playBehavior: 'REPLACE_ENQUEUED',
+                })
             },
             shouldEndSession:false
         },
