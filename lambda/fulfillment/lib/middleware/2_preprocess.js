@@ -7,7 +7,7 @@ var AWS=require('aws-sdk');
 async function get_userInfo(userId, idattrs) {
     var default_userInfo = {
         UserId:userId,
-        InteractionCount:0
+        InteractionCount:1
     };
     var usersTable = process.env.DYNAMODB_USERSTABLE;
     var docClient = new AWS.DynamoDB.DocumentClient({apiVersion: '2012-08-10'});
