@@ -151,6 +151,7 @@ var apply_handlebars = async function (req, res, hit) {
     _.set(req_glbl._event, 'errorFound', false);
     var context = {
         LexOrAlexa: req._type,
+        ClientType: req._clientType,
         UserInfo: req._userInfo,
         SessionAttributes: _.get(res, 'session'),
         Settings: req._settings,

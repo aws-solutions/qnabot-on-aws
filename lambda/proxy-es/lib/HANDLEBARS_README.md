@@ -26,7 +26,8 @@ QnABot exposes the following content to the Handlebars context:
 
 |Context Variable                  | Notes                                                                                          |
 |----------------------------------|------------------------------------------------------------------------------------------------|
-|LexOrAlexa                        | Indicates if QnABot access method is LEX or ALEXA
+|LexOrAlexa                        | Indicates if QnABot access method is LEX or ALEXA |
+|ClientType                        | Detected client type. May be ALEXA, LEX.Slack.Text, LEX.TwilioSMS.Text, LEX.AmazonConnect.Text&#124;Voice, LEX.LexWebUI.Text&#124;Voice, or LEX.Text&#124;Voice | 
 |UserInfo.UserId                   | Lex or Alexa user id set by client (For Twilio SMS, UserId is the user's phone number) |
 |UserInfo.InteractionCount         | Accumulating interaction count for UserId (not including current interaction) |
 |UserInfo.FirstSeen                | Date and time of user's first interaction with QnABot |
@@ -96,5 +97,21 @@ Previous answer was {{getSessionAttr 'qnabotcontext.previous.a' 'No previous res
 "Hello, how are you?"
 "Whassup dude!"
 }}
+
+
+{{!-- Support different markdown syntax / messages for Slack in Markdown answer--}}
+{{#ifCond ClientType '==' 'LEX.Slack.Text'}}
+   Slack Markdown
+   _Italics_  
+   *Bold*  
+   <https://google.com|this is a link>
+{{else}}
+   # Lex Web UI markdown  
+   _Italics_  
+   **Bold**  
+   [this is a link](https://google.com)  
+{{/ifCond}}
+
+
 ```
 
