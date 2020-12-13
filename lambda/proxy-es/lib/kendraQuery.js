@@ -8,6 +8,23 @@
 
 var _ = require('lodash');
 const AWS = require('aws-sdk');
+var build_es_query = require('./esbodybuilder');
+var request = require('./request');
+
+
+async function run_query_es(params, qid) {
+    console.log("run_query_es params: ", params);
+    let question = "qid::"+qid;
+    var es_query = await build_es_query({question:question});
+    var es_response = await request({
+        url: `https://${params.es_address}${params.es_path}`,
+        method: "GET",
+        body: es_query
+    });
+    console.log("run_query_es result: ", JSON.stringify(es_response, null, 2));
+    return es_response;
+}
+
 
 /**
  * Function to query kendraClient and return results via Promise
@@ -52,6 +69,12 @@ function hasJsonStructure(str) {
 }
 
 
+async function asyncForEach(array, callback) {
+  for (let index = 0; index < array.length; index++) {
+    await callback(array[index], index, array);
+  }
+}
+
 
 /** Function that processes kendra requests and handles response. Decides whether to handle SNS
  * events or Lambda Hook events from QnABot.
@@ -88,7 +111,7 @@ async function routeKendraRequest(request_params) {
     kendraIndexes.forEach(function (index, i) {
         const params = {
             IndexId: index, /* required */
-            QueryText: request_params.input_transcript
+            QueryText: request_params.question
         };
         let p = kendraRequester(kendraClient,params,resArray);
         promises.push(p);
@@ -107,20 +130,30 @@ async function routeKendraRequest(request_params) {
     
     
     // note that this outside for loop will only execute once (one FAQ index) but the structure was kept due to its elegance
-    resArray.forEach(function (res) {
+    //resArray.forEach(async function (res) {
+    await asyncForEach(resArray, async function (res) {
         if (res && res.ResultItems && res.ResultItems.length > 0) {
             
             var i, element;
             for (i=0; i<res.ResultItems.length; i++) {
                 element = res.ResultItems[i];
                 /* Note - only FAQ format will be provided back to the requester */
-                if (element.Type === 'QUESTION_ANSWER' && foundAnswerCount === 0 && element.AdditionalAttributes &&
+                if (element.Type === 'QUESTION_ANSWER' && foundAnswerCount < request_params.size && element.AdditionalAttributes &&
                     element.AdditionalAttributes.length > 1) {
 
                     if (!hasJsonStructure(element.DocumentURI)) {
                         break;
                     }
                     var hit = JSON.parse(element.DocumentURI);
+                    if (_.get(hit,"_source_qid")) {
+                        let qid = hit._source_qid ;
+                        // FAQ only references the QID but doesn't contain the full docunment.. retrieve it from ES
+                        console.log("Kendra matched qid: ", qid, ". Retrieving full document from Elasticsearch.");
+                        let es_response = await run_query_es(request_params, qid) ;
+                        console.log("Qid document from Elasticsearch: ", JSON.stringify(hit));
+                        hit = _.get(es_response, "hits.hits[0]._source");
+                    }
+                    
                     console.log(`hit is ${JSON.stringify(hit)}`);
                     json_struct.push(hit);
 
@@ -129,7 +162,7 @@ async function routeKendraRequest(request_params) {
                     kendraResultId = element.Id; // store off resultId to use as a session attribute for feedback
                     foundAnswerCount++;
                 }
-            };
+            }
         }
     });
     

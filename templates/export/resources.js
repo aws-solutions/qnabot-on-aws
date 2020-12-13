@@ -307,6 +307,7 @@ module.exports=Object.assign(
               "kendra:ListFaqs",
               "kendra:TagResource",
               "kendra:DeleteFaq",
+              "kendra:DescribeFaq",
               "iam:passRole",
               "ssm:getParameter"
             ],

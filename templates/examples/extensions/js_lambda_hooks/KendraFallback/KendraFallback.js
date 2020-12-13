@@ -218,7 +218,7 @@ async function routeKendraRequest(event, context) {
         
         const params = {
             IndexId: index, /* required */
-            QueryText: event.req["_event"].inputTranscript, /* required */
+            QueryText: event.req["question"], /* required */
         };
         let p = kendraRequester(kendraClient,params,resArray);
         promises.push(p);
@@ -304,12 +304,12 @@ async function routeKendraRequest(event, context) {
                     kendraResultId = element.Id; // store off resultId to use as a session attribute for feedback
                     foundAnswerCount++;
 
-                } else if (element.Type === 'QUESTION_ANSWER' && foundAnswerCount === 0 && element.AdditionalAttributes &&
-                    element.AdditionalAttributes.length > 1) {
+                } else if (element.Type === 'QUESTION_ANSWER' && element.AdditionalAttributes && element.AdditionalAttributes.length > 1) {
                     // There will be 2 elements - [0] - QuestionText, [1] - AnswerText
                     answerMessage = faqanswerMessage + '\n\n ' + element.AdditionalAttributes[1].Value.TextWithHighlightsValue.Text.replace(/\r?\n|\r/g, " ");
                     
                     seenTop = true; // if the answer is in the FAQ, don't show document extracts
+                    answerDocumentUris=[];
                     let answerTextMd = element.AdditionalAttributes[1].Value.TextWithHighlightsValue.Text.replace(/\r?\n|\r/g, " ");
                     // iterates over the FAQ answer highlights in sorted order of BeginOffset, merges the overlapping intervals
                     var sorted_highlights = mergeIntervals(element.AdditionalAttributes[1].Value.TextWithHighlightsValue.Highlights);
@@ -409,7 +409,7 @@ async function routeKendraRequest(event, context) {
                 event.res.session.appContext.altMessages.markdown += `***`;
                 event.res.session.appContext.altMessages.markdown += `\n\n <br>`;
                 
-                if (element.text && element.text.length > 0) {
+                if (element.text && element.text.length > 0 && event.req._preferredResponseType != "SSML") { //don't append doc search to SSML answers
                     event.res.session.appContext.altMessages.markdown += `\n\n  ${element.text}`;
                     event.res.message += `\n\n  ${element.text}`;
                 }

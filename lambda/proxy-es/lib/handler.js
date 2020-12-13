@@ -115,9 +115,11 @@ async function run_query_kendra(event, kendra_index) {
     console.log("Kendra FAQ Query index:" + kendra_index);
     var request_params = {
         kendra_faq_index:kendra_index,
-        input_transcript:event.question,
-        size:10 // limit kendra hits to 10 max to avoid pagination issues
-    }
+        question:event.question,
+        size:10, // limit kendra hits to 10 max to avoid pagination issues
+        es_address: event.endpoint,
+        es_path: event.path,
+    } ;
     var kendra_response = await kendra.handler(request_params);
     return kendra_response;
 }

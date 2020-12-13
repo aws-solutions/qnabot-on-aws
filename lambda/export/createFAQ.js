@@ -7,7 +7,7 @@ const sleep = require('util').promisify(setTimeout)
 
 
 /**
- * Function to upload CSV to S3 bucket, return Promise
+ * Function to upload JSON to S3 bucket, return Promise
  * @param s3Client
  * @param params
  * @returns {*}
@@ -20,7 +20,7 @@ function s3Uploader(s3Client,params) {
                 reject(err);
             }
             else {
-                console.log('Uploaded CSV to S3 successfully:');
+                console.log('Uploaded JSON to S3 successfully:');
                 console.log(data);           // successful response
                 resolve(data);
             }
@@ -30,7 +30,7 @@ function s3Uploader(s3Client,params) {
 
 
 /**
- * Function to convert uploaded CSV into Kendra FAQ, return Promise
+ * Function to convert uploaded JSON into Kendra FAQ, return Promise
  * @param kendraClient
  * @param params
  * @returns {*}
@@ -43,9 +43,20 @@ function faqConverter(kendraClient,params) {
                 reject(err);
             }
             else {
-                console.log('Converted CSV to FAQ successfully:');
+                console.log('Converted JSON to FAQ successfully:');
                 console.log(data);           // successful response
-                resolve(data);
+                poll(() => kendraClient.describeFaq({IndexId: params.IndexId,Id:data.Id }).promise(),(result) => {
+                    console.log("describeFaq " + JSON.stringify(result));
+                    var status = result.Status == "PENDING_CREATION" || result.Status == "CREATING";
+                    return {
+                        Status: status ?  "PENDING":result.Status,
+                        Message: result.Status == "FAILED" ? result.ErrorMessage : null 
+                    }
+                
+                },5000 )
+                .then(() => {
+                    return resolve(data)})
+                .catch(() => reject("Could not sync Kendra FAQ"))       // successful response
             }
             });
     });
@@ -67,13 +78,48 @@ function faqDeleter(kendraClient,params) {
             }
             else {
                 console.log('Deleted old FAQ successfully. New list of FAQs in index ' + params.IndexId + ':');
-                console.log(data);           // successful response
-                resolve(data);
+                console.log("Delete parameters " + JSON.stringify(params));   
+                //describeFaq should cause an exception when the faq has been deleted.
+                poll(() => kendraClient.describeFaq(params).promise(),(result) => {return {Status:"PENDING"}},5000 ).then(() => resolve(data));        // successful response
+                
             }
             });
     });
 }
 
+function wait(ms = 1000) {
+    return new Promise(resolve => {
+      console.log(`waiting ${ms} ms...`);
+      setTimeout(resolve, ms);
+    });
+  }
+
+async function poll(fn, fnCondition, ms) {
+    let result = await fn();
+ 
+    while (fnCondition(result).Status == "PENDING") {
+ 
+      await wait(ms);
+ 
+      try{
+        result = await fn();
+      } catch(e)
+      {
+ 
+          if(e.Propragate)
+          {
+              throw(e.Message)
+          }
+ 
+          return e;
+      }
+    }
+    if(result.Status == "FAILED")
+    {
+        throw ("Error during Kendra Sync")
+    }
+   return result;
+  }
 
 /**
  * Function to list existing FAQs in a Kendra index, return Promise
@@ -101,7 +147,7 @@ function faqLister(kendraClient,params) {
 
 
 /**
- * Function to upload CSV into S3 bucket and convert into Kendra FAQ, return Promise
+ * Function to upload JSON into S3 bucket and convert into Kendra FAQ, return Promise
  * @returns {*}
  */
 async function createFAQ(params) {
@@ -117,13 +163,13 @@ async function createFAQ(params) {
     console.log('clients created');
     
     
-    // read in CSV and upload to S3 bucket
+    // read in JSON and upload to S3 bucket
     var fs = require('fs');
     var s3_params = {
       Bucket: params.s3_bucket,
       Key: params.s3_key,
       ACL: 'bucket-owner-read',                     // TODO: should this param be public?
-      Body: fs.createReadStream(params.csv_path),   // use read stream option in case file is large
+      Body: fs.createReadStream(params.json_path),   // use read stream option in case file is large
     };
     
     let count=0;
@@ -206,6 +252,7 @@ async function createFAQ(params) {
       IndexId: params.faq_index_id,
       Name: params.faq_name,
       RoleArn: params.kendra_s3_access_role,
+      FileFormat: "JSON",
       S3Path: {
         Bucket: params.s3_bucket,
         Key: params.s3_key
@@ -217,7 +264,7 @@ async function createFAQ(params) {
     count=0;        
     while (count<1) {
         try {
-            var faq_response = await faqConverter(kendraClient, faq_params);
+            var faq_response = await faqConverter(kendraClient, faq_params,delete_faq_params);
             count++;
         } catch (error) {
             if (error.code=='ThrottlingException') {
