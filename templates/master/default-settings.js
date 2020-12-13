@@ -39,7 +39,8 @@ var default_settings = {
     ENABLE_REDACTING: "false", // Enable the system to redact log output
     REDACTING_REGEX: "\\b\\d{4}\\b(?![-])|\\b\\d{9}\\b|\\b\\d{3}-\\d{2}-\\d{4}\\b", // default regex to use for redacting - redacts 4 digit numbers not followed by a '-', 9 digit numbers (SSN with no '-'s), and Standard SSN format
     DISABLE_CLOUDWATCH_LOGGING: "false", // disable all logging in fulfillment es query handler lambda. does not disable logging from Lambda Hooks or Conditional Chaining Lambda functions
-    MINIMAL_ES_LOGGING: "false" // do not log utterances or session attributes to elasticsearch for kibana logging
+    MINIMAL_ES_LOGGING: "false", // do not log utterances or session attributes to elasticsearch for kibana logging
+    S3_PUT_REQUEST_ENCRYPTION: "" // enable header x-amz-server-side-encryption header and set with this value
 }
 
 module.exports = {

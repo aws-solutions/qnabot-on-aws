@@ -27,18 +27,57 @@ var reason=function(r){
         Promise.reject(r)
     }
 }
-var aws=require('aws-sdk')
+var aws=require('aws-sdk');
 
-var failed=false
+function getParameters(ssm, params) {
+    return new Promise(function(resolve, reject) {
+        ssm.getParameters(params, function(err, data) {
+            if (err) {
+                console.log(err, err.stack);
+                reject('Error back from request: ' + err);
+            } else {
+                const custom_settings = JSON.parse(data.Parameters[0].Value);
+                const default_settings = JSON.parse(data.Parameters[1].Value);
+                const cloned_default = _.clone(default_settings);
+                const merged_settings = _.merge(cloned_default, custom_settings);
+                const settings = [default_settings, custom_settings, merged_settings]
+                resolve(settings);
+            }
+        })
+    })
+}
+
+async function listSettings(context) {
+    aws.config.credentials=context.rootState.user.credentials
+    const customParams = context.rootState.info.CustomQnABotSettings;
+    const defaultParams = context.rootState.info.DefaultQnABotSettings;
+    const ssm = new aws.SSM({region:context.rootState.info.region})
+    const query = {
+        Names: [customParams, defaultParams],
+        WithDecryption:true,
+    }
+    var response = await getParameters(ssm, query);
+    return response;
+}
+
+var failed=false;
 module.exports={
     startExport:async function(context,opts){
         var info=await context.dispatch('_request',{
             url:context.rootState.info._links.jobs.href,
             method:'get'
         })
+        const settings = await listSettings(context);
+        const merged = settings[2];
+        let headers = undefined;
+        if (merged.S3_PUT_REQUEST_ENCRYPTION && merged.S3_PUT_REQUEST_ENCRYPTION.length>0) {
+            headers = {'x-amz-server-side-encryption': merged.S3_PUT_REQUEST_ENCRYPTION};
+            console.log(`headers: ${headers}`);
+        }
         var result=await context.dispatch('_request',{
             url:`${info._links.exports.href}/${opts.name}`,
             method:'put',
+            headers: headers ? headers : undefined,
             body:opts.filter ? {filter:`${opts.filter}.*`, prefix:''} : {prefix:''}
         })
     },
@@ -113,7 +152,6 @@ module.exports={
         })
     },
     deleteExport(context,opts){
-        console.log(`delete export opts: ${JSON.stringify(opts, null, 2)}`);
         return context.dispatch('_request',{
             url:opts.href,
             method:'delete'

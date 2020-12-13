@@ -6,7 +6,7 @@
  * in the associated Bot. Failure to do so when running an update will leave the bot in the NOT_BUILT state and you
  * will need to rebuild in the AWS Console. To update description for all bots, change botDateVersion string below.
  */
-const botDateVersion = process.env.npm_package_version + " - v10";  // CHANGE ME TO FORCE BOT REBUILD
+const botDateVersion = process.env.npm_package_version + " - v11";  // CHANGE ME TO FORCE BOT REBUILD
 
 var _ = require('lodash');
 
@@ -1093,6 +1093,95 @@ exports.resources={
             "description": "QNA Month Alias - " + botDateVersion
         }
     },
+    "MonthIntentNoConfirm": {
+        "Type": "Custom::LexIntent",
+        "Properties": {
+            "ServiceToken": {"Ref": "CFNLambda"},
+            "name":{"Fn::Sub":"QNAMonthIntentNoConfirm-${AWS::StackName}"},
+            "description": "QNA Month Intent No Confirm - " + botDateVersion,
+            "createVersion": true,
+            "sampleUtterances": [
+                "The month is {Month}",
+                "The month was {Month}",
+                "It is {Month}",
+                "It occurred on {Month}",
+                "{Month}"
+            ],
+            conclusionStatement: {
+                messages: [
+                    {
+                        content: "OK. ",
+                        contentType: "PlainText"
+                    }
+                ],
+            },
+            fulfillmentActivity: {
+                type: "ReturnIntent"
+            },
+            "slots": [
+                {
+                    "name":"Month",
+                    "slotType": "AMAZON.Month",
+                    "slotConstraint": "Required",
+                    "valueElicitationPrompt": {
+                        "messages": [
+                            {
+                                "contentType": "PlainText",
+                                "content": "What month?"
+                            }
+                        ],
+                        "maxAttempts": 2
+                    },
+                    "priority": 1,
+                }
+            ],
+        },
+    },
+    "QNAMonthNoConfirm": {
+        "Type": "Custom::LexBot",
+        "DependsOn": "MonthIntentNoConfirm",
+        "Properties": {
+            "ServiceToken": {"Ref": "CFNLambda"},
+            "name":{"Fn::Sub":"QNAMonthBotNoConfirm-${AWS::StackName}"},
+            "locale": "en-US",
+            "voiceId": config.voiceId,
+            "childDirected": false,
+            "createVersion": true,
+            "intents": [
+                {"intentName": {"Ref": "MonthIntentNoConfirm"}},
+            ],
+            "clarificationPrompt": {
+                "messages": [
+                    {
+                        "contentType": "PlainText",
+                        "content": "Please repeat the month."
+                    }
+                ],
+                "maxAttempts": 3
+            },
+            "abortStatement": {
+                "messages": [
+                    {
+                        "content": config.Abort,
+                        "contentType": "PlainText"
+                    }
+                ]
+            },
+            "description": "QNA Month Bot No Confirm - " + botDateVersion,
+        }
+    },
+    "MonthAliasNoConfirmV2": {
+        "Type": "Custom::LexAlias",
+        "DependsOn": "QNAMonthNoConfirm",
+        "Properties": {
+            "ServiceToken": {"Ref": "CFNLambda"},
+            "botName": {
+                "Ref": "QNAMonthNoConfirm"
+            },
+            "name": "live",
+            "description": "QNA Month Alias No Confirm - " + botDateVersion
+        }
+    },
     "NumberIntent": {
         "Type": "Custom::LexIntent",
         "Properties": {
@@ -1507,6 +1596,94 @@ exports.resources={
             "description": "QNA Phone Number Alias - " + botDateVersion
         }
     },
+    "PhoneNumberIntentNoConfirm": {
+        "Type": "Custom::LexIntent",
+        "Properties": {
+            "ServiceToken": {"Ref": "CFNLambda"},
+            "name":{"Fn::Sub":"QNAPhoneNumberIntentNoConfirm-${AWS::StackName}"},
+            "description": "QNA Phone Number Intent No Confirm - " + botDateVersion,
+            "createVersion": true,
+            "sampleUtterances": [
+                "The phone number is {PhoneNumber}",
+                "My phone number is {PhoneNumber}",
+                "It is {PhoneNumber}",
+                "{PhoneNumber}"
+            ],
+            conclusionStatement: {
+                messages: [
+                    {
+                        content: "OK. ",
+                        contentType: "PlainText"
+                    }
+                ],
+            },
+            fulfillmentActivity: {
+                type: "ReturnIntent"
+            },
+            "slots": [
+                {
+                    "name":"PhoneNumber",
+                    "slotType": "AMAZON.PhoneNumber",
+                    "slotConstraint": "Required",
+                    "valueElicitationPrompt": {
+                        "messages": [
+                            {
+                                "contentType": "PlainText",
+                                "content": "What phone number?"
+                            }
+                        ],
+                        "maxAttempts": 2
+                    },
+                    "priority": 1,
+                }
+            ],
+        },
+    },
+    "QNAPhoneNumberNoConfirm": {
+        "Type": "Custom::LexBot",
+        "DependsOn": "PhoneNumberIntentNoConfirm",
+        "Properties": {
+            "ServiceToken": {"Ref": "CFNLambda"},
+            "name":{"Fn::Sub":"QNAPhoneNumberBotNoConfirm-${AWS::StackName}"},
+            "description": "QNA Phone Number Bot No Confirm - " + botDateVersion,
+            "locale": "en-US",
+            "voiceId": config.voiceId,
+            "childDirected": false,
+            "createVersion": true,
+            "intents": [
+                {"intentName": {"Ref": "PhoneNumberIntentNoConfirm"}},
+            ],
+            "clarificationPrompt": {
+                "messages": [
+                    {
+                        "contentType": "PlainText",
+                        "content": "Please repeat the phone number."
+                    }
+                ],
+                "maxAttempts": 3
+            },
+            "abortStatement": {
+                "messages": [
+                    {
+                        "content": config.Abort,
+                        "contentType": "PlainText"
+                    }
+                ]
+            }
+        }
+    },
+    "PhoneNumberAliasNoConfirmV2": {
+        "Type": "Custom::LexAlias",
+        "DependsOn": "QNAPhoneNumberNoConfirm",
+        "Properties": {
+            "ServiceToken": {"Ref": "CFNLambda"},
+            "botName": {
+                "Ref": "QNAPhoneNumberNoConfirm"
+            },
+            "name": "live",
+            "description": "QNA Phone Number Alias No Confirm - " + botDateVersion
+        }
+    },
     "TimeIntent": {
         "Type": "Custom::LexIntent",
         "Properties": {
@@ -1845,9 +2022,9 @@ exports.resources={
 
 
 exports.names=[
-    "QNAYesNo", "QNAYesNoExit", "QNADate", "QNADateNoConfirm", "QNADayOfWeek", "QNAMonth", "QNANumber",
-    "QNANumberNoConfirm", "QNAAge","QNAPhoneNumber", "QNATime", "QNAEmailAddress", "QNAName",
-    "QNAWage","QNASocialSecurity","QNAPin", "QNAPinNoConfirm"
+    "QNAYesNo", "QNAYesNoExit", "QNADate", "QNADateNoConfirm", "QNADayOfWeek", "QNAMonth", "QNAMonthNoConfirm",
+    "QNANumber", "QNANumberNoConfirm", "QNAAge","QNAPhoneNumber", "QNAPhoneNumberNoConfirm",
+    "QNATime", "QNAEmailAddress", "QNAName", "QNAWage","QNASocialSecurity","QNAPin", "QNAPinNoConfirm"
 ] ;
 
 
