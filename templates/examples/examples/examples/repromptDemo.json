@@ -1,0 +1,13 @@
+﻿{
+  "qna": [
+    {
+      "qid": "reprompt.demo",
+      "a": "this is an example  answer with a reprompt. When testing on an Alexa device do not say anything to hear it.",
+      "rp": "<speak><amazon:effect name=\"whispered\">This is the reprompt message</amazon:effect></speak>",
+      "type": "qna",
+      "q": [
+        "test reprompt"
+      ]
+    }
+  ]
+}

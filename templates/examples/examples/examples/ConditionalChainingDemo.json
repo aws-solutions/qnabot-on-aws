@@ -5,7 +5,7 @@
         ""
       ],
       "next": "",
-      "a": "Hello and Welcome to the demo for QnABot ElicitResponse and Conditional Chaining features. In this demo we will be recommending a space movie based on your age.\nLet's start by getting your name. Just give me your First Name and Last Name please.",
+      "a": "Hello and Welcome to the demo for QNA Bot ElicitResponse and Conditional Chaining features. In this demo we will be recommending a space movie based on your age.\nLet's start by getting your name. Just give me your First Name and Last Name please.",
       "r": {
         "buttons": [
           {
@@ -26,6 +26,7 @@
         "markdown": "Hello and Welcome to the demo for QnABot ElicitResponse and Conditional Chaining features. In this demo we will be recommending a space movie based on your age.\n  \nLet's start by getting your name. Just give me your **First Name** and **Last Name** please.",
         "ssml": ""
       },
+      "rp": "Please say your First Name and Last Name.",
       "conditionalChaining": "'Elicit Age'",
       "l": "",
       "qid": "10.chaining.demo.Name",
@@ -64,6 +65,7 @@
       "alt": {
         "markdown": "<br>\n***Please give us some feedback about this selection?***"
       },
+      "rp": "Have you any feedback?",
       "elicitResponse": {
         "responsebot_hook": "QNAFreeText",
         "response_sessionattr_namespace": "demo.comment"
@@ -112,6 +114,7 @@
         "markdown": "Hi {{SessionAttributes.demo.name.FirstName}}.  \nNow tell me your age (in years) please?",
         "ssml": ""
       },
+      "rp": "How old are you?",
       "conditionalChaining": "(SessionAttributes.demo.age.Age>= 60) ? \"Over 60\" : (SessionAttributes.demo.age.Age< 12) ? \"Under 12\" : \"Between 12 and 60\"",
       "l": "",
       "qid": "20.chaining.demo.Age",

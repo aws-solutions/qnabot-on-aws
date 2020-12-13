@@ -22,6 +22,7 @@ var default_settings = {
     ERRORMESSAGE: "Unfortunately I encountered an error when searching for your answer. Please ask me again later.",
     EMPTYMESSAGE: "You stumped me! Sadly I don't know how to answer your question.",
     DEFAULT_ALEXA_LAUNCH_MESSAGE: "Hello, Please ask a question",
+    DEFAULT_ALEXA_REPROMPT: "Please either answer the question, ask another question or say Goodbye to end the conversation.",
     DEFAULT_ALEXA_STOP_MESSAGE: "Goodbye",
     SMS_HINT_REMINDER_ENABLE: "true",
     SMS_HINT_REMINDER: " (Feedback? Reply THUMBS UP or THUMBS DOWN. Ask HELP ME at any time)",

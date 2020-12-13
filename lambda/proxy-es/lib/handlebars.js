@@ -151,6 +151,7 @@ var apply_handlebars = async function (req, res, hit) {
     _.set(req_glbl._event, 'errorFound', false);
     var context = {
         LexOrAlexa: req._type,
+        ClientType: req._clientType,
         UserInfo: req._userInfo,
         SessionAttributes: _.get(res, 'session'),
         Settings: req._settings,
@@ -165,6 +166,7 @@ var apply_handlebars = async function (req, res, hit) {
     var a = _.get(hit, "a");
     var markdown = _.get(hit, "alt.markdown");
     var ssml = _.get(hit, "alt.ssml");
+    var rp = _.get(hit, "rp", _.get(req, '_settings.DEFAULT_ALEXA_REPROMPT'));
     var r = _.get(hit, "r");
 
     // catch and log errors before throwing exception.
@@ -201,6 +203,18 @@ var apply_handlebars = async function (req, res, hit) {
             } 
         } catch (e) {
             console.log("ERROR: SSML caused Handlebars exception. Check syntax: ", ssml)
+            throw (e);
+        }
+    }
+    if (rp) {
+        try {
+            var rp_template = Handlebars.compile(rp);
+            hit_out.rp = rp_template(context);
+            if (autotranslate){
+                _.set(hit_out, 'autotranslate.rp', true);
+            } 
+        } catch (e) {
+            console.log("ERROR: reprompt caused Handlebars exception. Check syntax: ", rp)
             throw (e);
         }
     }
