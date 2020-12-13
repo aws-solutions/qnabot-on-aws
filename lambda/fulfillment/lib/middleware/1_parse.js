@@ -84,12 +84,14 @@ function getClientType(req) {
     }
     // Try to determine which Lex client is being used based on patterns in the req - best effort attempt.
     const voiceortext = (req._preferredResponseType == 'SSML') ? "Voice" : "Text" ;
-    // Amazon Connect indicates support for SSML using request header x-amz-lex:accept-content-types
-    if (_.get(req,"_event.requestAttributes.x-amz-lex:accept-content-types")) {
-        return "LEX.AmazonConnect." + voiceortext ;
+    if (_.get(req,"_event.requestAttributes.x-amz-lex:channel-type") == "Slack") {
+        return "LEX.Slack." + voiceortext ;
     } else if (_.get(req,"_event.requestAttributes.x-amz-lex:channel-type") == "Twilio-SMS") {
         return "LEX.TwilioSMS." + voiceortext ;
-    } else if (/^.*-.*-\d:.*-.*-.*-.*$/.test(_.get(req,"_event.userId"))){
+    } else if (_.get(req,"_event.requestAttributes.x-amz-lex:accept-content-types")) {
+        return "LEX.AmazonConnect." + voiceortext ;
+    }
+    else if (/^.*-.*-\d:.*-.*-.*-.*$/.test(_.get(req,"_event.userId"))){
         // user id pattern to detect lex-web-uithrough use of cognito id as userId: e.g. us-east-1:a8e1f7b2-b20d-441c-9698-aff8b519d8d5
         // TODO: add another clientType indicator for lex-web-ui?
         return "LEX.LexWebUI." + voiceortext ;
