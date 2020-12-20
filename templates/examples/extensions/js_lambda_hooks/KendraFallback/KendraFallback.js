@@ -14,6 +14,14 @@ const AWS = require('aws-sdk');
 let kendraIndexes = undefined;
 
 
+/**
+ * Function to bold highlights in Kendra answer by adding markdown
+ * @param {string} textIn
+ * @param {number} hlBeginOffset
+ * @param {number} hlEndOffset
+ * @param {boolean} highlightOnly
+ * @returns {string}
+ */
 function addMarkdownHighlights(textIn,hlBeginOffset,hlEndOffset,highlightOnly=false) {
     let beginning = textIn.substring(0, hlBeginOffset);
     let highlight = textIn.substring(hlBeginOffset, hlEndOffset);
