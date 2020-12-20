@@ -79,5 +79,11 @@ module.exports=Promise.resolve(require('../master')).then(function(base){
         /{"Ref":"BootstrapPrefix"}/g,
         '"'+config.publicPrefix+'"')
 
+    // The next two replaces are order dependent. Keep in this order.
+    out=out.replace(
+        /CommaDelimitedList/, "List<AWS::EC2::Subnet::Id>")
+    out=out.replace(
+        /CommaDelimitedList/, "List<AWS::EC2::SecurityGroup::Id>")
+
     return JSON.parse(out)
 })

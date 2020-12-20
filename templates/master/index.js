@@ -181,11 +181,11 @@ module.exports={
         "Default":"2"
     },
     "VPCSubnetIdList" : {
-        "Description" : "Subnet IDs", "Type": "List<AWS::EC2::Subnet::Id>",
+        "Description" : "Subnet IDs", "Type": "CommaDelimitedList",
         "Default": ""
     },
     "VPCSecurityGroupIdList": {
-        "Description" : "Security Group IDs", "Type": "List<AWS::EC2::SecurityGroup::Id>",
+        "Description" : "Security Group IDs", "Type": "CommaDelimitedList",
         "Default": ""
     },
     "XraySetting":{
