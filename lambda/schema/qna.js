@@ -166,6 +166,35 @@ module.exports={
             maxLength:100,
             propertyOrder:11
         },
+        botRouting:{
+            title:"Bot Routing",
+            description:"Use QnABot as a supervisory Bot and route to other Bots to handle the conversation. This parameter identifies a target Bot or Lambda with which to route communication.",
+            type:"object",
+            propertyOrder:12,
+            properties:{
+                specialty_bot:{
+                    title:"Bot Routing: Bot Name or Lambda",
+                    description:"The name of a Lex Bot (Specialty Bot) or Lambda Function to route requests to. Specialty Bot names must start with \"QNA\". This can be a Lambda Function Name or ARN that will manage the conversation. Specified as \"Lambda::FunctionName\". Function name must start with \"QNA\". (Required)",
+                    type:"string",
+                    maxLength:100,
+                    propertyOrder:0
+                },
+                specialty_bot_name:{
+                    title:"A simple name for the Specialty Bot that can optionally be presented in a user interface such as a bread crumb. (Required)",
+                    description:"Enter a string used as the Specialty Bot's simple name.",
+                    type:"string",
+                    maxLength:100,
+                    propertyOrder:1
+                },
+                specialty_bot_alias:{
+                    title:"The Bot alias to use for the Specialty Bot. (Required for other Lex/QnA Bot targets - Not utilized when Lambda Function is used.)",
+                    description:"Enter a string for the Specialty Bot's Lex alias.",
+                    type:"string",
+                    maxLength:100,
+                    propertyOrder:2
+                }
+            }
+        },
     },
     required:["qid","q","a"]
 
