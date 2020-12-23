@@ -6,7 +6,7 @@
  * in the associated Bot. Failure to do so when running an update will leave the bot in the NOT_BUILT state and you
  * will need to rebuild in the AWS Console. To update description for all bots, change botDateVersion string below.
  */
-const botDateVersion = process.env.npm_package_version + " - v11";  // CHANGE ME TO FORCE BOT REBUILD
+const botDateVersion = process.env.npm_package_version + " - v1";  // CHANGE ME TO FORCE BOT REBUILD
 
 var _ = require('lodash');
 
@@ -296,7 +296,7 @@ exports.resources={
                 "messages": [
                     {
                         "contentType": "PlainText",
-                        "content": "Please repeat the digits again."
+                        "content": "I’m sorry I did not get all the digits, please re-enter all digits."
                     }
                 ],
                 "maxAttempts": 3
@@ -345,7 +345,7 @@ exports.resources={
             rejectionStatement: {
                 messages: [
                     {
-                        content: "Please let me know the digits again.",
+                        content: "I’m sorry I did not get all the digits, please re-enter all digits.",
                         contentType: "PlainText"
                     }
                 ]
@@ -364,7 +364,7 @@ exports.resources={
                         "messages": [
                             {
                                 "contentType": "PlainText",
-                                "content": "What is are the digits?"
+                                "content": "What are all the digits?"
                             }
                         ],
                         "maxAttempts": 2
@@ -402,7 +402,7 @@ exports.resources={
                 "messages": [
                     {
                         "contentType": "PlainText",
-                        "content": "Please repeat the digits again."
+                        "content": "I’m sorry I did not get all the digits, please re-enter all digits."
                     }
                 ],
                 "maxAttempts": 3
@@ -453,7 +453,7 @@ exports.resources={
                         "messages": [
                             {
                                 "contentType": "PlainText",
-                                "content": "What are the digits?"
+                                "content": "What are all the digits?"
                             }
                         ],
                         "maxAttempts": 2

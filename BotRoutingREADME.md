@@ -3,8 +3,8 @@
 
 Bots exist to perform a variety of automation tasks. Usually they take
 as input a message from a human and respond performing
-some task. They might ask for additional input, verify the input, 
-and responsd with completion. They come in many shapes and sizes. Bots might be implemented
+some task. Bot's might ask for additional input, verify the input, 
+and respond with completion. They come in many shapes and sizes. Bots might be implemented
 using Amazon Lex or might be implemented using other toolsets. A great
 example is the [nutritionix bot](https://www.nutritionix.com/natural-demo?q=for%20breakfast%20i%20ate%203%20eggs,%20bacon%20and%20cheese)
 where you can tell the bot what you've had for breakfast and it will 
@@ -106,6 +106,6 @@ source to use your own x-app-id and x-app-key from Nutritionix.
 ```
 Next build and deploy the code into Lambda using your favorite techniques and grant
 permission within the QnABot Fulfillment Lambda Role using IAM to invoke this Lambda. 
-Hinte: If you name the lambda starting with 'qna', QnABot is already configured with permissions 
+Hint: If you name the lambda starting with 'qna', QnABot is already configured with permissions 
 to invoke this Lambda. 
 

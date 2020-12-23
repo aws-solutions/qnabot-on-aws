@@ -83,7 +83,9 @@ module.exports=Object.assign(
     "QuizKey":{
         "Type" : "AWS::KMS::Key",
         "Properties":{
-			KeyPolicy:{
+            "Description": "QNABot Internal KMS CMK for quiz workflow",
+            "EnableKeyRotation" : true,
+			"KeyPolicy": {
 				"Version": "2012-10-17",
 				"Id": "key-default-1",
 				"Statement": [
