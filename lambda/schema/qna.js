@@ -174,7 +174,7 @@ module.exports={
             properties:{
                 specialty_bot:{
                     title:"Bot Routing: Bot Name or Lambda",
-                    description:"The name of a Lex Bot (Specialty Bot) or Lambda Function to route requests to. Specialty Bot names must start with \"QNA\". This can be a Lambda Function Name or ARN that will manage the conversation. Specified as \"Lambda::FunctionName\". Function name must start with \"QNA\". (Required)",
+                    description:"The name of a Lex Bot (Specialty Bot) or Lambda Function to route requests to. Specialty Bot names must start with \"QNA\". Lambda functions can be specified as \"Lambda::FunctionName\" or \"Lambda::FunctionARN\" - Lambda function names must start with \"QNA\".",
                     type:"string",
                     maxLength:100,
                     propertyOrder:0

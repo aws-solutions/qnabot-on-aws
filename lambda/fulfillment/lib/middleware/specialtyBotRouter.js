@@ -223,7 +223,7 @@ async function processResponse(req, res, hook, alias) {
             if (botResp.sessionAttributes && botResp.sessionAttributes.appContext) {
                 const appContext = ( isString(botResp.sessionAttributes.appContext) ? JSON.parse(botResp.sessionAttributes.appContext) : botResp.sessionAttributes.appContext);
                 // if alt.messsages contains SSML tags setup to return ssmlMessage
-                if (appContext.altMessages.ssml && appContext.altMessages.ssml.includes("<speak>")) {
+                if (appContext && _.has(appContext,'altMessages.ssml') && appContext.altMessages.ssml.includes("<speak>")) {
                     ssmlMessage = appContext.altMessages.ssml;
                 }
                 _.set(res.session, "appContext.altMessages", appContext.altMessages);
@@ -233,7 +233,10 @@ async function processResponse(req, res, hook, alias) {
             _.set(res, "plainMessage", botResp.message);
             _.set(res, "messageFormat", botResp.messageFormat);
             if (_.get(botResp,'responseCard'))  {
-                console.log("found a response card and attached to res");
+                console.log("found a response card. attached to res. only one / first response card will be used");
+                if (botResp.responseCard.genericAttachments[0].subTitle === null) botResp.responseCard.genericAttachments[0].subTitle = '';
+                if (botResp.responseCard.genericAttachments[0].attachmentLinkUrl === null) botResp.responseCard.genericAttachments[0].attachmentLinkUrl = '';
+                if (botResp.responseCard.genericAttachments[0].imageUrl === null) botResp.responseCard.genericAttachments[0].imageUrl = '';
                 _.set(res, "result.r", botResp.responseCard.genericAttachments[0]);
                 _.set(res, "card", botResp.responseCard.genericAttachments[0]);
                 _.set(res, "card.send", true);

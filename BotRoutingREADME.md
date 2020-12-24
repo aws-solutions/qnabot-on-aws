@@ -3,7 +3,7 @@
 
 Bots exist to perform a variety of automation tasks. Usually they take
 as input a message from a human and respond performing
-some task. Bot's might ask for additional input, verify the input, 
+some task. Bots might ask for additional input, verify the input, 
 and respond with completion. They come in many shapes and sizes. Bots might be implemented
 using Amazon Lex or might be implemented using other toolsets. A great
 example is the [nutritionix bot](https://www.nutritionix.com/natural-demo?q=for%20breakfast%20i%20ate%203%20eggs,%20bacon%20and%20cheese)
