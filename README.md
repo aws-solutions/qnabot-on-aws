@@ -7,7 +7,7 @@ This repository contains code for the QnABot, described in the AWS AI blog post 
 
 See the "Getting Started" to launch your own QnABot
 
-**New features in 4.4.0** [Beta version of VPC Deployment Support, Upgrade to ES 7.9, Slack client detection and Markdown Support](#new-features)
+**New features in 4.4.0** [Preview version of VPC Deployment Support, Preview version of BotRouter, Upgrade to ES 7.9, Slack client detection and Markdown Support](#new-features)
 
 **New features in 4.3.0** [Connect Wizard to assist in Connect / Lex / QnABot use case, Security enhancement in API Gateway, Four node elastic search cluster support](#new-features)
 
@@ -159,23 +159,24 @@ See the [LICENSE.md](LICENSE.md) file for details
 ## New features 
 
 ### Verson 4.4.0
-- Beta VPC support
+- Preview VPC support - [readme](./VPCSupportREADME.md)
+- Preview BotRouter support - [read](./BotRoutingREADME.md)  
 - Upgrade to Elasticsearch service version 7.9
 - Slack client support via Lex with Slack specific markdown support
 - Added support for Alexa re-prompt functionality  
 - Bug fixes and defect enhancements
 
-VPC support is enabled in beta mode through a new template available in the distribution repos. 
+VPC support is enabled in beta mode through a new template available in the distribution repos. Please understand
+the content in [readme](./VPCSupportREADME.md) before proceeding with this type of deployment. 
 * artifacts/aws-ai-qna-bot/templates/public-vpc-support.json
-
 This beta template exposes two new additional parameters that can be specified when deployed using the CloudFormation console.
 These parameters are:
 * VPCSubnetIdList
 * VPCSecurityGroupIdList
-As one might expect a set of SubnetIds and SecurityGroupIds can be specified. Two private subnets with appropriate NAT
+As one might expect a set of SubnetIds and SecurityGroupIds need to be specified. Two private subnets with appropriate NAT
 based gateway to public internet should be selected. The security group specified must allow at a minimum inbound 
-connectivity on port 443. The elastic search cluster and all Lambdas will be attached to these private subnets. The
-Designer UI is still available outside of the VPC but requires login via the Cognito user pool. The elastic search
+connectivity on port 443. The Elasticsearch cluster and all Lambdas will be attached to these private subnets. The
+Designer UI is still available outside of the VPC but requires login via the Cognito user pool. The Elasticsearch
 cluster will not be available externally. Users wishing to use the Kibana console will need VPN connectivity to the 
 VPC and is outside the scope of this document.   
 
