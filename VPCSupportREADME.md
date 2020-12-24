@@ -16,6 +16,12 @@ must be met.
     2) allows outbound connections to 0.0.0.0.
    
 ### Deployment
+Deploying Elasticsearch cluster into a VPC requires creating a service linked role for es. You can execute the following command
+using credentials for the target account.
+
+```
+aws iam create-service-linked-role --aws-service-name es.amazonaws.com
+```
 A new template has been created that supports deployment within a VPC named public-vpc-support.json. You'll find this template
 alongside the public.json template. In us-east-1 this S3 location would be
 ```
