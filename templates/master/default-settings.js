@@ -22,6 +22,7 @@ var default_settings = {
     ERRORMESSAGE: "Unfortunately I encountered an error when searching for your answer. Please ask me again later.",
     EMPTYMESSAGE: "You stumped me! Sadly I don't know how to answer your question.",
     DEFAULT_ALEXA_LAUNCH_MESSAGE: "Hello, Please ask a question",
+    DEFAULT_ALEXA_REPROMPT: "Please either answer the question, ask another question or say Goodbye to end the conversation.",
     DEFAULT_ALEXA_STOP_MESSAGE: "Goodbye",
     SMS_HINT_REMINDER_ENABLE: "true",
     SMS_HINT_REMINDER: " (Feedback? Reply THUMBS UP or THUMBS DOWN. Ask HELP ME at any time)",
@@ -37,7 +38,12 @@ var default_settings = {
     CONNECT_ENABLE_VOICE_RESPONSE_INTERRUPT: "false", // Return bot response in session attribute to enable contact flow to use response as an interruptible prompt.
     CONNECT_NEXT_PROMPT_VARNAME: "connect_nextPrompt", // Name of session var to use for next prompt
     ENABLE_REDACTING: "false", // Enable the system to redact log output
-    REDACTING_REGEX: "\\b\\d{4}\\b(?![-])|\\b\\d{9}\\b|\\b\\d{3}-\\d{2}-\\d{4}\\b" // default regex to use for redacting - redacts 4 digit numbers not followed by a '-', 9 digit numbers (SSN with no '-'s), and Standard SSN format
+    REDACTING_REGEX: "\\b\\d{4}\\b(?![-])|\\b\\d{9}\\b|\\b\\d{3}-\\d{2}-\\d{4}\\b", // default regex to use for redacting - redacts 4 digit numbers not followed by a '-', 9 digit numbers (SSN with no '-'s), and Standard SSN format
+    DISABLE_CLOUDWATCH_LOGGING: "false", // disable all logging in fulfillment es query handler lambda. does not disable logging from Lambda Hooks or Conditional Chaining Lambda functions
+    MINIMAL_ES_LOGGING: "false", // do not log utterances or session attributes to elasticsearch for kibana logging
+    S3_PUT_REQUEST_ENCRYPTION: "", // enable header x-amz-server-side-encryption header and set with this value
+    BOT_ROUTER_WELCOME_BACK_MSG: "Welcome back to QnABot.", // The text used by QnABot when ending communication from a specialty bot
+    BOT_ROUTER_EXIT_MSGS: "exit,quit,goodbye,leave" // The exit phrases in comma separated list available for the a user to end communication with a specialty bot
 }
 
 module.exports = {

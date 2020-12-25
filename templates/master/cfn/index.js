@@ -14,6 +14,16 @@ module.exports={
         "Role": {"Fn::GetAtt": ["CFNLambdaRole","Arn"]},
         "Runtime": "nodejs10.x",
         "Timeout": 60,
+        "VpcConfig" : {
+            "Fn::If": [ "VPCEnabled", {
+                "SubnetIds": {"Ref": "VPCSubnetIdList"},
+                "SecurityGroupIds": {"Ref": "VPCSecurityGroupIdList"}
+            }, {"Ref" : "AWS::NoValue"} ]
+        },
+        "TracingConfig" : {
+            "Fn::If": [ "XRAYEnabled", {"Mode": "Active"},
+                {"Ref" : "AWS::NoValue"} ]
+        },
         "Tags":[{
             Key:"Type",
             Value:"CustomResource"
@@ -45,6 +55,16 @@ module.exports={
         "Role": {"Fn::GetAtt": ["CFNLambdaRole","Arn"]},
         "Runtime": "nodejs10.x",
         "Timeout": 180,
+        "VpcConfig" : {
+          "Fn::If": [ "VPCEnabled", {
+              "SubnetIds": {"Ref": "VPCSubnetIdList"},
+              "SecurityGroupIds": {"Ref": "VPCSecurityGroupIdList"}
+          }, {"Ref" : "AWS::NoValue"} ]
+        },
+        "TracingConfig" : {
+            "Fn::If": [ "XRAYEnabled", {"Mode": "Active"},
+                {"Ref" : "AWS::NoValue"} ]
+        },
         "Tags":[{
             Key:"Type",
             Value:"CustomResource"

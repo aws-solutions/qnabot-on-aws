@@ -30,5 +30,14 @@ module.exports={
         "ApiDeploymentId":{"Type":"String"},
         "DefaultQnABotSettings": {"Type":"String"},
         "CustomQnABotSettings": {"Type":"String"},
+        "VPCSubnetIdList" : {"Type": "String"},
+        "VPCSecurityGroupIdList": {"Type": "String"},
+        "XraySetting": {"Type": "String"}
+    },
+    "Conditions": {
+        "VPCEnabled": { "Fn::Not": [
+                { "Fn::Equals": [ "", { "Ref": "VPCSecurityGroupIdList" } ] }
+            ] },
+        "XRAYEnabled":{"Fn::Equals":[{"Ref":"XraySetting"},"TRUE"]},
     }
 }

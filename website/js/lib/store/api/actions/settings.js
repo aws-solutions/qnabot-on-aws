@@ -79,6 +79,7 @@ module.exports={
         const ssm = new aws.SSM({region:context.rootState.info.region})
         const query = {
             Names: [customParams, defaultParams],
+            WithDecryption:true,
         }
         var response = await getParameters(ssm, query);
         return response;
@@ -88,9 +89,11 @@ module.exports={
         aws.config.credentials=context.rootState.user.credentials
         const customParams=context.rootState.info.CustomQnABotSettings;
         const ssm = new aws.SSM({region:context.rootState.info.region})
+        // Note type is not required in params if the parameter exists. Some customers require this parameter
+        // to be a SecureString and set this type post deploy of QnABot. Removing type supports
+        // this setting.
         const params = {
             Name: customParams,
-            Type: "String",
             Value: JSON.stringify(settings),
             Overwrite: true
         }

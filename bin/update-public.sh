@@ -10,6 +10,7 @@ DEVBUCKET=$( echo $OUTPUT | $__dirname/json.js Bucket)
 PREFIX=$( echo $OUTPUT | $__dirname/json.js Prefix)
 REGION=$AWS_DEFAULT_REGION
 
+echo $DEVBUCKET
 
 PUBLICBUCKET=$(node -e "console.log(require('$__dirname'+'/../config').publicBucket)")
 PUBLICPREFIX=$(node -e "console.log(require('$__dirname'+'/../config').publicPrefix)")
@@ -26,3 +27,5 @@ if [ "$1" == "--run" ]; then
 fi
 
 echo https://$PUBLICBUCKET.s3.$REGION.amazonaws.com/$PUBLICPREFIX/templates/master.json
+echo https://$PUBLICBUCKET.s3.$REGION.amazonaws.com/$PUBLICPREFIX/templates/public.json
+echo https://$PUBLICBUCKET.s3.$REGION.amazonaws.com/$PUBLICPREFIX/templates/public-vpc-support.json

@@ -1,4 +1,5 @@
-var _ = require('lodash')
+var _ = require('lodash');
+var linkify = require('linkifyjs');
 
 /**
  * optional environment variables - These are not used defined during setup of this function in QnABot but are
@@ -12,6 +13,43 @@ var _ = require('lodash')
 const AWS = require('aws-sdk');
 let kendraIndexes = undefined;
 
+
+/**
+ * Function to bold highlights in Kendra answer by adding markdown
+ * @param {string} textIn
+ * @param {number} hlBeginOffset
+ * @param {number} hlEndOffset
+ * @param {boolean} highlightOnly
+ * @returns {string}
+ */
+function addMarkdownHighlights(textIn,hlBeginOffset,hlEndOffset,highlightOnly=false) {
+    let beginning = textIn.substring(0, hlBeginOffset);
+    let highlight = textIn.substring(hlBeginOffset, hlEndOffset);
+    let rest = textIn.substr(hlEndOffset);
+    let textOut = textIn; //default
+    // add markdown only if highlight is not in the middle of a url/link.. 
+    if (! isHighlightInLink(textIn,hlBeginOffset)) {
+        if (highlightOnly) {
+            textOut = '**' + highlight + '**';
+        } else {
+            textOut = beginning + '**' + highlight + '**' + rest;
+        }        
+    }
+    return textOut ;
+}
+
+function isHighlightInLink(textIn,hlBeginOffset) {
+    let links = linkify.find(textIn) ;
+    for (let l=0; l<links.length; l++) {
+        let linkText=links[l].value ;
+        let linkBeginOffset = textIn.indexOf(linkText) ;
+        let linkEndOffset = linkBeginOffset + linkText.length ;
+        if (hlBeginOffset >= linkBeginOffset && hlBeginOffset <= linkEndOffset) {
+            return true;
+        }
+    }
+    return false;
+}
 
 /**
  * Function to query kendraClient and return results via Promise
@@ -218,7 +256,7 @@ async function routeKendraRequest(event, context) {
         
         const params = {
             IndexId: index, /* required */
-            QueryText: event.req["_event"].inputTranscript, /* required */
+            QueryText: event.req["question"], /* required */
         };
         let p = kendraRequester(kendraClient,params,resArray);
         promises.push(p);
@@ -264,25 +302,22 @@ async function routeKendraRequest(event, context) {
                     // Emboldens the highlighted phrases returned by the Kendra response API in markdown format
                     let answerTextMd = element.AdditionalAttributes[0].Value.TextWithHighlightsValue.Text.replace(/\r?\n|\r/g, " ");
                     // iterates over the answer highlights in sorted order of BeginOffset, merges the overlapping intervals
-                    var sorted_highlights = mergeIntervals(element.AdditionalAttributes[0].Value.TextWithHighlightsValue.Highlights);
-                    var j, elem;
+                    let sorted_highlights = mergeIntervals(element.AdditionalAttributes[0].Value.TextWithHighlightsValue.Highlights);
+                    let j, elem;
                     for (j=0; j<sorted_highlights.length; j++) {
                         elem = sorted_highlights[j];
                         let offset = 4*j;
-                        let beginning = answerTextMd.substring(0, elem.BeginOffset+offset);
-                        let highlight = answerTextMd.substring(elem.BeginOffset+offset, elem.EndOffset+offset);
-                        let rest = answerTextMd.substr(elem.EndOffset+offset);
 
                         if (elem.TopAnswer == true) {   // if top answer is found, then answer is abbreviated to this phrase
                             seenTop = true;
                             answerMessage = topAnswerMessage + highlight + '.';
                             answerMessageMd = topAnswerMessageMd;
-                            answerTextMd = '**' + highlight + '** ';
+                            answerTextMd = addMarkdownHighlights(answerTextMd, elem.BeginOffset+offset, elem.EndOffset+offset, true) ;
                             break;
                         } else {
-                            answerTextMd = beginning + '**' + highlight + '**' + rest;
+                            answerTextMd = addMarkdownHighlights(answerTextMd, elem.BeginOffset+offset, elem.EndOffset+offset, false) ;
                         }
-                    };
+                    }
                     answerMessageMd = answerMessageMd + '\n\n' + answerTextMd;
                     
                     // Shortens the speech response to contain say the longest highlighted phrase ONLY IF top answer not found
@@ -312,16 +347,13 @@ async function routeKendraRequest(event, context) {
                     answerDocumentUris=[];
                     let answerTextMd = element.AdditionalAttributes[1].Value.TextWithHighlightsValue.Text.replace(/\r?\n|\r/g, " ");
                     // iterates over the FAQ answer highlights in sorted order of BeginOffset, merges the overlapping intervals
-                    var sorted_highlights = mergeIntervals(element.AdditionalAttributes[1].Value.TextWithHighlightsValue.Highlights);
-                    var j, elem;
+                    let sorted_highlights = mergeIntervals(element.AdditionalAttributes[1].Value.TextWithHighlightsValue.Highlights);
+                    let j, elem;
                     for (j=0; j<sorted_highlights.length; j++) {
                         elem = sorted_highlights[j];
                         let offset = 4*j;
-                        let beginning = answerTextMd.substring(0, elem.BeginOffset+offset);
-                        let highlight = answerTextMd.substring(elem.BeginOffset+offset, elem.EndOffset+offset);
-                        let rest = answerTextMd.substr(elem.EndOffset+offset);
-                        answerTextMd = beginning + '**' + highlight + '**' + rest;
-                    };
+                        answerTextMd = addMarkdownHighlights(answerTextMd, elem.BeginOffset+offset, elem.EndOffset+offset, false) ;
+                    }
                     answerMessageMd = faqanswerMessageMd + '\n\n' + answerTextMd;
                     
                     kendraQueryId = res.QueryId; // store off the QueryId to use as a session attribute for feedback
@@ -409,7 +441,7 @@ async function routeKendraRequest(event, context) {
                 event.res.session.appContext.altMessages.markdown += `***`;
                 event.res.session.appContext.altMessages.markdown += `\n\n <br>`;
                 
-                if (element.text && element.text.length > 0) {
+                if (element.text && element.text.length > 0 && event.req._preferredResponseType != "SSML") { //don't append doc search to SSML answers
                     event.res.session.appContext.altMessages.markdown += `\n\n  ${element.text}`;
                     event.res.message += `\n\n  ${element.text}`;
                 }

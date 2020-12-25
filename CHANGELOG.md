@@ -1,10 +1,10 @@
-## [4.3.2]
-- Bug fixes for Kendra FAQ integration 
-- Support lengthy answer definition for Kendra FAQ
-- Check of FAQ deletion in Kendra when FAQ content is being resynced
-- Support multiple responses when using Test in content designer with Kendra FAQ enabled
-- Fix for exception - "Cannot convert undefined or null to object" when Session Attributes are no provided during Lex input. https://github.com/aws-samples/aws-ai-qna-bot/issues/229
-- Package version updates to address current github dependabot alerts
+## [4.4.0]
+- Preview VPC support - [readme](./VPCSupportREADME.md)
+- Preview BotRouter support - [read](./BotRoutingREADME.md)
+- Upgrade to Elasticsearch service version 7.9
+- Slack client support via Lex with Slack specific markdown support
+- Added support for Alexa re-prompt functionality
+- Bug fixes and defect enhancements
 ## [4.3.0]
 - New Connect Wizard available in the Content Designer UI to assist integration with a Connect Contact Flow.
 - New 4-node Elasticsearch domain support for improved fault tolerance in deployment template.

@@ -66,13 +66,13 @@ function CheckProcessComplete(params, reply, notDone) {
       console.error('Error when pinging for Processing Complete: %j', err);
       return reply(err.message);
     }
-    if (domain.DomainStatus.Processing || !domain.DomainStatus.Endpoint) {
+    if (domain.DomainStatus.Processing || (!domain.DomainStatus.Endpoint && !domain.DomainStatus.Endpoints.vpc) ) {
       console.log('Status is not Processing: false yet. Ping not done: %j', domain);
       return notDone();
     }
     console.log('Status is Processing: false! %j', domain);
     reply(null, domain.DomainStatus.DomainId, {
-      Endpoint: domain.DomainStatus.Endpoint
+      Endpoint: domain.DomainStatus.Endpoint ? domain.DomainStatus.Endpoint : domain.DomainStatus.Endpoints.vpc
     });
   });
 }
@@ -95,7 +95,7 @@ function NoUpdate(phys, params, reply) {
     }
     console.log('NoUpdate pingcheck success! %j', domain);
     reply(null, domain.DomainStatus.DomainId, {
-      Endpoint: domain.DomainStatus.Endpoint
+      Endpoint: domain.DomainStatus.Endpoint ? domain.DomainStatus.Endpoint : domain.DomainStatus.Endpoints.vpc
     });
   });
 }

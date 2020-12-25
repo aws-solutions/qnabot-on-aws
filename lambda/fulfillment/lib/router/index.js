@@ -13,7 +13,7 @@ module.exports=class router {
             console.log("final:",JSON.stringify(res,null,2))
             callback(null,res)
         }catch(e){
-            console.log("error",e)
+            console.log("throwing response:",JSON.stringify(e))
             if(e.action==='END'){
                 callback(null)
             }else if(e.action==="RESPOND"){

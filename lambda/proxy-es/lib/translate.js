@@ -39,6 +39,7 @@ exports.translate_hit = async function(hit,usrLang){
     let a = _.get(hit, "a");
     let markdown = _.get(hit, "alt.markdown");
     let ssml = _.get(hit, "alt.ssml");
+    let rp = _.get(hit, "rp");
     let r = _.get(hit, "r");
     // catch and log errors before throwing exception.
     if (a && _.get(hit,'autotranslate.a')) {
@@ -63,6 +64,14 @@ exports.translate_hit = async function(hit,usrLang){
             hit_out.alt.ssml = await get_translation(hit_out.alt.ssml, usrLang);
         } catch (e) {
             console.log("ERROR: SSML caused Translate exception: ", a);
+            throw (e);
+        }
+    }
+    if (rp && _.get(hit,'autotranslate.rp')) {
+        try {
+            hit_out.rp = await get_translation(hit_out.rp, usrLang);
+        } catch (e) {
+            console.log("ERROR: Reprompt caused Translate exception: ", rp);
             throw (e);
         }
     }

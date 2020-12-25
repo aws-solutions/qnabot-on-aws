@@ -29,9 +29,17 @@ module.exports={
     "CFNLambdaRole":  {"Type":"String"},
     "ApiUrlName":{"Type":"String"},
     "AssetBucket":{"Type":"String"},
-    "QIDLambdaArn":{"Type":"String"}
+    "QIDLambdaArn":{"Type":"String"},
+    "VPCSubnetIdList" : {"Type": "String"},
+    "VPCSecurityGroupIdList": {"Type": "String"},
+    "XraySetting": {"Type": "String"}
   },
-  "Conditions":{}
+  "Conditions": {
+    "VPCEnabled": { "Fn::Not": [
+        { "Fn::Equals": [ "", { "Ref": "VPCSecurityGroupIdList" } ] }
+      ] },
+    "XRAYEnabled":{"Fn::Equals":[{"Ref":"XraySetting"},"TRUE"]},
+  }
 }
 
 

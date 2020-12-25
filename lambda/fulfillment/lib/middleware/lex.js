@@ -85,6 +85,13 @@ exports.assemble=function(request,response){
                 })]
             } : null
         })
+    } ;
+    
+    // If client is slack, use Markdown in response
+    if (request._clientType == "LEX.Slack.Text") {
+        if (_.get(response,"result.alt.markdown")) {
+            out.dialogAction.message.content = response.result.alt.markdown ;
+        }
     }
     
     // copy response card to appContext session attribute used by lex-web-ui

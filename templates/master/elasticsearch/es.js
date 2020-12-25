@@ -11,7 +11,7 @@ var properties={
        "VolumeSize": 10,
        "VolumeType": "gp2"
     },
-    "ElasticsearchVersion": "7.7",
+    "ElasticsearchVersion": "7.9",
     "SnapshotOptions": {
        "AutomatedSnapshotStartHour": "0"
     },
@@ -26,6 +26,12 @@ var properties={
     },
     "DomainEndpointOptions": {
         "EnforceHTTPS": {"Fn::If": [ "Encrypted", true, false]}
+    },
+    "VPCOptions" : {
+        "Fn::If": [ "VPCEnabled", {
+            "SubnetIds": {"Ref": "VPCSubnetIdList"},
+            "SecurityGroupIds": {"Ref": "VPCSecurityGroupIdList"}
+        }, {"Ref" : "AWS::NoValue"} ]
     }
 }
 

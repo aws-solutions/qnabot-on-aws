@@ -37,7 +37,8 @@ module.exports=Promise.resolve(require('../master')).then(function(base){
         "Username",
         "Encryption",
         "ElasticSearchNodeCount",
-        "PublicOrPrivate"
+        "PublicOrPrivate",
+        "XraySetting"
     ])
     base.Conditions.Public={"Fn::Equals":[{"Ref":"PublicOrPrivate"},"PUBLIC"]}
     base.Conditions.Encrypted={"Fn::Equals":[{"Ref":"Encryption"},"ENCRYPTED"]}
@@ -46,7 +47,8 @@ module.exports=Promise.resolve(require('../master')).then(function(base){
     base.Conditions.BuildExamples={"Fn::Equals":[true,true]}
     base.Conditions.CreateDomain={"Fn::Equals":[true,true]}
     base.Conditions.DontCreateDomain={"Fn::Equals":[true,false]}
-    
+    base.Conditions.VPCEnabled={"Fn::Equals":[true,false]}
+
     var out=JSON.stringify(base).replace(
         /{"Ref":"BootstrapBucket"}/g,
         '"'+config.publicBucket+'"')
@@ -71,5 +73,15 @@ module.exports=Promise.resolve(require('../master')).then(function(base){
         /{"Ref":"BootstrapPrefix"}/g,
         '"'+config.publicPrefix+'"')
 
+    out=out.replace(
+        /{"Ref":"VPCSubnetIdList"}/g,
+        '[{"Ref":"AWS::NoValue"}]')
+
+    out=out.replace(
+        /{"Ref":"VPCSecurityGroupIdList"}/g,
+        '[{"Ref":"AWS::NoValue"}]')
+
     return JSON.parse(out)
 })
+
+// "VPCSubnetIdList" : { "Fn::Join" : [ ",", {"Ref":"VPCSubnetIdList"} ] }

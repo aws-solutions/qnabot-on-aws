@@ -7,6 +7,8 @@ This repository contains code for the QnABot, described in the AWS AI blog post 
 
 See the "Getting Started" to launch your own QnABot
 
+**New features in 4.4.0** [Preview version of VPC Deployment Support, Preview version of BotRouter, Upgrade to ES 7.9, Slack client detection and Markdown Support](#new-features)
+
 **New features in 4.3.0** [Connect Wizard to assist in Connect / Lex / QnABot use case, Security enhancement in API Gateway, Four node elastic search cluster support](#new-features)
 
 **New features in 4.2.0** [Beta Kendra FAQ Support, Bug fixes, Multiple document chaining, Repeat question, Elastic Search 7.7 upgrade](#new-features)
@@ -156,6 +158,28 @@ See the [LICENSE.md](LICENSE.md) file for details
 
 ## New features 
 
+### Verson 4.4.0
+- Preview VPC support - [readme](./VPCSupportREADME.md)
+- Preview BotRouter support - [read](./BotRoutingREADME.md)  
+- Upgrade to Elasticsearch service version 7.9
+- Slack client support via Lex with Slack specific markdown support
+- Added support for Alexa re-prompt functionality  
+- Bug fixes and defect enhancements
+
+VPC support is enabled in beta mode through a new template available in the distribution repos. Please understand
+the content in [readme](./VPCSupportREADME.md) before proceeding with this type of deployment. 
+* artifacts/aws-ai-qna-bot/templates/public-vpc-support.json
+This beta template exposes two new additional parameters that can be specified when deployed using the CloudFormation console.
+These parameters are:
+* VPCSubnetIdList
+* VPCSecurityGroupIdList
+As one might expect a set of SubnetIds and SecurityGroupIds need to be specified. Two private subnets with appropriate NAT
+based gateway to public internet should be selected. The security group specified must allow at a minimum inbound 
+connectivity on port 443. The Elasticsearch cluster and all Lambdas will be attached to these private subnets. The
+Designer UI is still available outside of the VPC but requires login via the Cognito user pool. The Elasticsearch
+cluster will not be available externally. Users wishing to use the Kibana console will need VPN connectivity to the 
+VPC and is outside the scope of this document.   
+
 ### Version 4.3.0
 - New Connect Wizard available in the Content Designer UI to assist integration with a Connect Contact Flow.
 - New 4-node Elasticsearch domain support for improved fault tolerance in deployment template.
@@ -165,6 +189,24 @@ See the [LICENSE.md](LICENSE.md) file for details
 - Setting to limit the number of Kendra fallback search results.
 - Setting to enable signed URLs for S3 documents in Kendra search results. 
 
+Provides the ability to deploy QnABot components within VPC infrastructure via a new template named public-vpc-support.json. 
+This template is made available for use as a separate installation mechanism. It is not the default template utilized in the 
+public distribution buckets. Please take great care in deploying QnABot in VPC. The Elasticsearch Cluster
+becomes bound to the VPC as well as the Lambda's installed. The Elasticsearch cluster is no longer available
+outside of the VPC. All Lambdas are bound to the VPC to allow communication with the cluster.
+
+The following limitations exist:
+
+- A QnABot deployed within VPC can NOT be modified to operated in non-VPC.
+- A properly configured VPC with public/private subnets using proper Internet Gateway and Nat Gateway must be available.
+- Two private subnets must be specified as parameters for the CloudFormation template.
+- A Security Group allowing inbound port 443 from connections within the VPC CIDR block must be configured and specified
+as a parameter for the CloudFormation template.
+- The Kibana dashboard will only be available from clients that have access to the VPC.
+- The VPC must be configured to allow access to Lex, S3, Lambda, DynamoDB, Systems Manager (SSM Parameter Store), Kendra, and
+Comprehend. As more features are added to QnABot the required service access may increase. VPC Endpoints using PrivateLink 
+is not required but may be used if available. 
+ 
 ### Version 4.2.0
 - New Kendra FAQ support (Beta version) using the setting KENDRA_FAQ_INDEX. New menu item in Designer UI to export Questions as a Kendra FAQ. See revised Blog Post for details.
 - New GetSessionAttribute Handlebars helper to obtain session attribute. Works similar to lodash get(). Will not through exception and will return a default value.

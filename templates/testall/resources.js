@@ -38,6 +38,16 @@ module.exports=Object.assign(
         "Role": {"Fn::GetAtt": ["TestAllRole","Arn"]},
         "Runtime": "nodejs10.x",
         "Timeout": 900,
+        "VpcConfig" : {
+          "Fn::If": [ "VPCEnabled", {
+              "SubnetIds": { "Fn::Split" : [ ",", {"Ref": "VPCSubnetIdList"} ] },
+              "SecurityGroupIds": { "Fn::Split" : [ ",", {"Ref": "VPCSecurityGroupIdList"} ] },
+          }, {"Ref" : "AWS::NoValue"} ]
+        },
+        "TracingConfig" : {
+            "Fn::If": [ "XRAYEnabled", {"Mode": "Active"},
+                {"Ref" : "AWS::NoValue"} ]
+        },
         "Tags":[{
             Key:"Type",
             Value:"TestAll"
@@ -62,6 +72,8 @@ module.exports=Object.assign(
         "Path": "/",
         "ManagedPolicyArns": [
           "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
+          "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole",
+          "arn:aws:iam::aws:policy/AWSXRayDaemonWriteAccess"
         ],
         "Policies": [
           {

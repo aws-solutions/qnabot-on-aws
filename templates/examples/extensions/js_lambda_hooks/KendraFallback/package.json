@@ -6,7 +6,8 @@
   "license": "MIT",
   "dependencies": {
     "aws-sdk": "^2.585.0",
-    "lodash": "^4.17.20"
+    "lodash": "^4.17.20",
+    "linkifyjs": "^2.1.9"
   },
   "repository": {},
   "devDependencies": {

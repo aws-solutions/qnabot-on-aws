@@ -14,7 +14,12 @@ License for the specific language governing permissions and limitations under th
 const run=require('./run.js')
 
 module.exports=function(version,result){
-    result.slots[0].slotTypeVersion=version
+    // update the version of the slot for the slot named 'slot'. All other slots are unaffected
+    result.slots.forEach(element => {
+        if (element.name === "slot") {
+            element.slotTypeVersion = version;
+        }
+    });
     
     delete result.lastUpdatedDate
     delete result.version

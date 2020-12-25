@@ -37,8 +37,10 @@ module.exports={
             "name":"slot",
             "slotType":{"Ref":"SlotType"},
             "slotConstraint":"Optional",
-            "slotTypeVersion":"QNABOT-AUTO-ASSIGNED"
-        }],
+            "slotTypeVersion":"QNABOT-AUTO-ASSIGNED",
+            "priority": 1,
+        }
+        ],
         "fulfillmentActivity": {
           "type": "CodeHook",
           "codeHook": {

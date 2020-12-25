@@ -11,10 +11,12 @@ const QNAWage = "QNAWage";
 const QNASocialSecurity  = "QNASocialSecurity"
 const QNAPin = "QNAPin";
 const QNADate = "QNADate";
+const QNADateNoConfirm = "QNADateNoConfirm";
 const QNADayOfWeek = "QNADayOfWeek";
 const QNAMonth = "QNAMonth"
 const QNAAge = "QNAAge";
 const QNAPhoneNumber = "QNAPhoneNumber";
+const QNAPhoneNumberNoConfirm = "QNAPhoneNumberNoConfirm";
 const QNATime = "QNATime";
 const QNAEmailAddress = "QNAEmailAddress";
 const QNAName = "QNAName";
@@ -118,11 +120,14 @@ async function handleRequest(req, res, botName, botAlias) {
         let respText = _.get(req, "question");
         let progress = _.get(req, "session.qnabotcontext.elicitResponse.progress", undefined);
         if (isConnectClient(req) && ( botName != QNAYesNo && botName != QNAYesNoExit) && progress === 'ConfirmIntent') {
-            if (respText === '1' || respText.toLowerCase() === 'one' ) respText = 'Yes';
+            if (respText === '1' || respText.toLowerCase() === 'one' || respText.toLowerCase() === 'correct' ) respText = 'Yes';
             if (respText === '2' || respText.toLowerCase() === 'two' ) respText = 'No';
         }
-        if (botName === QNAPhoneNumber && ( progress === 'ElicitSlot' || progress === 'ElicitIntent' || progress === "" || progress === undefined ) ) {
+        if ((botName === QNAPhoneNumber || botName === QNAPhoneNumberNoConfirm) && ( progress === 'ElicitSlot' || progress === 'ElicitIntent' || progress === "" || progress === undefined ) ) {
             respText = 'my number is ' + respText;
+        }
+        if ((botName === QNADate || botName === QNADateNoConfirm) && ( progress === 'ElicitSlot' || progress === 'ElicitIntent' || progress === "" || progress === undefined ) ) {
+            respText = 'the date is ' + respText;
         }
         // call the Bot using the respText
         const params = {
@@ -256,7 +261,7 @@ async function processResponse(req, res, hook, msg) {
     
     // autotranslate res fields
     res = await translate_res(req,res);
-    
+
     // set res.session.qnabot_gotanswer
     _.set(res,'session.qnabot_gotanswer',true) ;
 

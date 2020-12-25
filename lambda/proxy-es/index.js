@@ -4,11 +4,15 @@ var cfnLambda=require('cfn-lambda')
 var request=require('./lib/request')
 
 const filter = text => {
-    if (process.env.QNAREDACT === "true") {
-        let re = new RegExp(process.env.REDACTING_REGEX,"g");
-        return text.replace(re,"XXXXXX");
+    if (process.env.CLOUDWATCHLOGGINGDISABLED === "true"){
+        return "cloudwatch logging disabled";
     } else {
-        return text;
+        if (process.env.QNAREDACT === "true") {
+            let re = new RegExp(process.env.REDACTING_REGEX, "g");
+            return text.replace(re, "XXXXXX");
+        } else {
+            return text;
+        }
     }
 }
 
