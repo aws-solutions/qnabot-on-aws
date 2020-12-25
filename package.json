@@ -82,6 +82,7 @@
     "jsonwebtoken": "^8.3.0",
     "jszip": "^3.1.5",
     "lodash-webpack-plugin": "^0.11.5",
+    "lodash": "^4.17.20",
     "marked": "^0.7.0",
     "material-design-icons": "^3.0.1",
     "mini-css-extract-plugin": "^0.8.0",
