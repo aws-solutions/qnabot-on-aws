@@ -1,3 +1,7 @@
+## [4.4.1]
+- Fix for Designer UI from breaking change in highlight.js due to dependabot alert / change.
+- Added support for setting 'profile' as an identity attribute from cognito federation. 
+- Fix syntax error introduced in 4.4.0 QNAPin and QNAPinNoConfirm bots that prevents updates from succeeding.
 ## [4.4.0]
 - Preview VPC support - [readme](./VPCSupportREADME.md)
 - Preview BotRouter support - [read](./BotRoutingREADME.md)

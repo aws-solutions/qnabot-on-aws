@@ -33,7 +33,26 @@ function dispatch(event,context,cb){
     if(_.get(Lextype,1)==='Alias') Lextype[1]='BotAlias'
     console.log(targets[type[1]]) 
     
-    if(Lextype){ 
+    if(Lextype){
+        /* change to fix 4.4.0 installs where QNAPin and QNAPinNoConfirm elicit response bots inadvertently included a
+         * bad character in clarificationPrompt and rejectionStatement which would break further updates.
+        */
+        if (_.has(event,"OldResourceProperties.clarificationPrompt.messages[0].content")) {
+            let v = _.get(event, "OldResourceProperties.clarificationPrompt.messages[0].content", "");
+            if (v.includes("I’m")) {
+                console.log('found bad apostrophe and replacing');
+                v = v.replace("I’m", "I'm");
+                _.set(event, "OldResourceProperties.clarificationPrompt.messages[0].content", v);
+            }
+        }
+        if (_.has(event,"OldResourceProperties.rejectionStatement.messages[0].content")) {
+            let v =_.get(event, "OldResourceProperties.rejectionStatement.messages[0].content", "");
+            if (v.includes("I’m")) {
+                console.log('found bad apostrophe and replacing');
+                v = v.replace("I’m","I'm");
+                _.set(event, "OldResourceProperties.rejectionStatement.messages[0].content", v);
+            }
+        }
         cfnLambda(new Lex(Lextype[1]))(event,context,cb)
     }else if(targets[type[1]]){
         return cfnLambda(new targets[type[1]])(event,context,cb)

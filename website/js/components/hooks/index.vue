@@ -54,7 +54,7 @@ var Vuex=require('vuex')
 var Promise=require('bluebird')
 var markdown=require('marked')
 
-import hljs from 'highlight.js/lib/highlight';
+import hljs from 'highlight.js/lib/core';
 import javascriptlang from 'highlight.js/lib/languages/javascript';
 import pythonlang from 'highlight.js/lib/languages/python';
 import jsonlang from 'highlight.js/lib/languages/json';

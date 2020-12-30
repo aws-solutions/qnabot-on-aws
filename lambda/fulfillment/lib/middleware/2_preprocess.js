@@ -42,6 +42,9 @@ async function get_userInfo(userId, idattrs) {
     if (_.get(idattrs,'verifiedIdentity')) {
         _.set(req_userInfo, 'isVerifiedIdentity', _.get(idattrs,'verifiedIdentity'));
     }
+    if (_.get(idattrs, 'profile')) {
+        _.set(req_userInfo, 'Profile', _.get(idattrs, 'profile'));
+    }
     // append time since last seen
     var now = new Date();
     var lastSeen = Date.parse(req_userInfo.LastSeen || "1970/1/1 12:00:00");

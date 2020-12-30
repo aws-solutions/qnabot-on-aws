@@ -296,7 +296,7 @@ exports.resources={
                 "messages": [
                     {
                         "contentType": "PlainText",
-                        "content": "I’m sorry I did not get all the digits, please re-enter all digits."
+                        "content": "I'm sorry I did not get all the digits, please re-enter all digits."
                     }
                 ],
                 "maxAttempts": 3
@@ -345,7 +345,7 @@ exports.resources={
             rejectionStatement: {
                 messages: [
                     {
-                        content: "I’m sorry I did not get all the digits, please re-enter all digits.",
+                        content: "I'm sorry I did not get all the digits, please re-enter all digits.",
                         contentType: "PlainText"
                     }
                 ]
@@ -402,7 +402,7 @@ exports.resources={
                 "messages": [
                     {
                         "contentType": "PlainText",
-                        "content": "I’m sorry I did not get all the digits, please re-enter all digits."
+                        "content": "I'm sorry I did not get all the digits, please re-enter all digits."
                     }
                 ],
                 "maxAttempts": 3
