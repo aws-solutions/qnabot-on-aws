@@ -352,13 +352,13 @@ containing QnABot configuration using the Designer.
 
 1) Use 'Export' and once complete then click on the download arrow next to available file.
 
-2) Use 'Import' to the import a configuration file from the following url:
+2) Download the file below. The file contains a set of preconfigured questions:
 
     <pre>
     https://raw.githubusercontent.com/aws-samples/aws-ai-qna-bot/master/workshops/reinvent2019/samples/sun-questions-qna-step-2.json
     </pre>
  
-This file contains a set of preconfigured questions. 
+2) Use 'Import' > 'From File' to import the sun-questions-qna-step-2.json file.
 
 * Note: An import will overwrite existing questions with the same Question ID. 
 
@@ -614,7 +614,7 @@ to help the user navigate easily.
 photo response.
 
 ### Load in pre-configured questions for the end of Step 3
-Use 'Import' to the import a configuration file from the following url:
+Download the file below and use 'Import' > 'From File' to the import a configuration file:
 
 ```
 https://raw.githubusercontent.com/aws-samples/aws-ai-qna-bot/master/workshops/reinvent2019/samples/sun-questions-qna-step-3.json
@@ -1200,7 +1200,7 @@ If an argument (N) is supplied as an integer, the function will return N most re
 
 ### If desired, load in pre-configured questions with Lambda support for the end of Step 7
 
-Use 'Import' to the import a configuration file from the following url:
+Download the file below and use 'Import' > 'From File' to the import a configuration file from the following url:
 
 ```
 https://raw.githubusercontent.com/aws-samples/aws-ai-qna-bot/master/workshops/reinvent2019/samples/sun-questions-qna-step-7.json
