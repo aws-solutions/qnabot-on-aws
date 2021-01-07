@@ -51,7 +51,7 @@ Throughout this workshop, we will provide commands for you to run.  These comman
 <pre>
 $ aws es list-domain-names
 $ aws es describe-elasticsearch-domain --domain-name <b><i>DOMAIN-NAME</i></b>
-$ aws lex-models get-bots</b>
+$ aws lex-models get-bots
 </pre>
 
 The command starts after the `$`.  Text that is ***UPPER_ITALIC_BOLD*** indicates a value that is unique to your environment.  
@@ -151,7 +151,7 @@ $ aws es describe-elasticsearch-domain --domain-name <b><i>DOMAIN-NAME</i></b>
 
 ##### AWS Lex Bot
 <pre>
-$ aws lex-models get-bots</b>
+$ aws lex-models get-bots
 </pre>
 
 The prior command will show the Lex Bot that has been created for you.
@@ -897,17 +897,22 @@ The above steps will will prime the system with some feedback to display in Kiba
 
 ### Launch Kibana
 1) Log into the Designer UI
-2) Pull down the upper left menu and select select Kibana Dashboard
+2) Pull down the upper left menu and select Kibana Dashboard
 3) Once Kibana appears for the first time select Dashboard on the left
-4) Next click on Open
-5) Select the 'Default'
+4) Select the 'QnABot Dashboard'
+   
+    ![Lab6-Monitor-001](images/Lab6-Monitor-001a.png "Dashboards")
+   
+5) Reset the date filter for 'Today'
 
-    ![Lab6-Monitor-001](images/Lab6-Monitor-001.png "Kibana")
+    ![Lab6-Monitor-001](images/Lab6-Monitor-001b.png "QnABot Dashboard")
 
 ### Standard Dashboard
 * Requests
+* Requests AnswerSource
 * Client types
-* Frequent utterances (tag cloud)
+* Logged utterances (tag cloud)
+* No Hits
 * Answers with positive or negative feedback (needs to be enabled in the Designer UI)
 
 ### Build a query that finds all utterances that did not resolve to a question
@@ -915,19 +920,22 @@ The above steps will will prime the system with some feedback to display in Kiba
 1) See if you can build a query in Kibana that finds utterances a user made that did not
 match any question?
 
-    * In Kibana, click on Discover
-    ![Lab6-Monitor-002](images/Lab6-Monitor-002.png "Discover")
-    * Switch to the qnametrics index
-    ![Lab6-Monitor-003](images/Lab6-Monitor-003.png "qnametrics")
+    * In Kibana, pull down the upper left menu and click on Discover
+    
+    ![Lab6-Monitor-002](images/Lab6-Monitor-002a.png "Discover")
+    
+    * If necessary, switch to the `qnabotworkshop-metrics` index
+    
+    ![Lab6-Monitor-003](images/Lab6-Monitor-003a.png "qnabotworkshop-metrics")
+    
     * In the query area enter 
-    <pre>
+    ```
     entireResponse.got_hits:0
-    </pre>
-    Add utterance as a selected field
-    ![Lab6-Monitor-004](images/Lab6-Monitor-004.png "qnametrics")
-    * Note: Any document in the metrics index that does not have a qid did not match a question in
-elastic search. 
-
+    ```
+    * Add utterance as a selected field (enter `utterance` in the filter field and click 'Add')
+    
+    ![Lab6-Monitor-004](images/Lab6-Monitor-004a.png "No response queries")
+   
     * Note: Sometimes Lex does not always pass utterances to the bot. 
 
         The message __Sorry, I did not understand that__ is due to Lex not matching an 
