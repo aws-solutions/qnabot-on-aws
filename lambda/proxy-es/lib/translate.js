@@ -16,7 +16,15 @@ async function get_translation(englishText, targetLang){
     const translateClient = new AWS.Translate();
     try {
         console.log("input text:", englishText);
+        const hasAmazonEffectTag = englishText.includes('amazon:effect')
+        if (hasAmazonEffectTag) {
+            console.log("input text has <amazon:effect> tags, override to fix translate bug");
+            englishText.replace(/amazon:effect/g, 'amazon-effect');
+        }
         const translation = await translateClient.translateText(params).promise();
+        if (hasAmazonEffectTag) {
+            translation.TranslatedText.replace(/amazon-effect/g, 'amazon:effect');
+        }
         console.log("translation:", translation);
         return translation.TranslatedText;
     } catch (err) {
