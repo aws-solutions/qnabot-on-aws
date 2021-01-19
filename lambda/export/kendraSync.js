@@ -51,6 +51,7 @@ async function get_parameter(param_name) {
     var ssm = new aws.SSM();
     var params = {
         Name: param_name,
+        WithDecryption: true
     };
     // TODO: update permissions
     var response = await ssm.getParameter(params).promise();
