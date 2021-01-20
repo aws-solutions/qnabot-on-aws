@@ -7,11 +7,13 @@ import calendar
 import urllib3
 import urllib.parse
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+import fuzzywuzzy
 from fuzzywuzzy import fuzz
 from fuzzywuzzy import process
 
 
 # Import the Canvas class
+import canvasapi
 from canvasapi import Canvas
 
 #----------------------------------------------------------------------
