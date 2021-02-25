@@ -3,7 +3,7 @@ var properties={
     "ElasticsearchClusterConfig": {
        "DedicatedMasterEnabled": false,
        "InstanceCount": {"Ref":"ElasticSearchNodeCount"},
-       "InstanceType": {"Fn::If": [ "Encrypted", "t3.medium.elasticsearch", "t3.medium.elasticsearch"]},
+       "InstanceType": {"Fn::If": [ "Encrypted", "c5.large.elasticsearch", "t3.medium.elasticsearch"]},
        "ZoneAwarenessEnabled": "true"
     },
     "EBSOptions": {
