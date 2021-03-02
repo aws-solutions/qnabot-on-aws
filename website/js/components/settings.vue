@@ -5,7 +5,9 @@
       v-flex
         v-card
           v-card-title 
-            h3 Settings
+            h2 Settings
+          v-card-text
+            h3 For more information about settings, see <a href="https://github.com/aws-samples/aws-ai-qna-bot/blob/master/website/js/components/settings.md" target="_blank">here</a>
           v-card-text
             v-list(three-line)
                 v-list-tile(v-for="(parameter,index) in mergedSettings")
@@ -13,7 +15,20 @@
                         v-text-field(:label="index"  v-model="settingsHolder[index]")
             v-btn(@click="SaveSettings") Save
             //- v-btn Add New parameter
-            v-btn(@click="resetToDefaults") Reset to defaults
+            v-btn(@click="resetToDefaults" style="margin-right:80px;") Reset to defaults
+            v-btn(@click="showAddModal = true") Add New Setting
+    
+
+    v-dialog(v-model ="showAddModal")
+        v-card
+            v-card-title New Setting
+            v-card-text
+                v-text-field(label="Name" v-model="newKey")
+                v-text-field(label="Value" v-model="newValue")
+            v-card-actions
+                v-spacer
+                v-btn(@click="addSetting") Add
+                v-btn(@click="closeModal") Cancel
             
 </template>
 
@@ -38,11 +53,14 @@ module.exports = {
     data: function () {
         var self = this
         return {
+            showAddModal: false,
             mergedSettings: {},
             defaultSettings: {},
             customSettings: {},
             settingsHolder: {},
-            successAlert: false
+            successAlert: false,
+            newKey: "",
+            newValue: ""
         }
     },
     components: {},
@@ -93,6 +111,25 @@ module.exports = {
                 window.scrollTo(0, 0);
             }
 
+        },
+        showModal: async function() {
+            this.showAddModal = true;
+        },
+        closeModal: async function() {
+            this.showAddModal = false;
+        },
+        addSetting: async function() {
+            if (this.newKey.length >= 1) {
+                console.log('hi tom');
+                this.mergedSettings[this.newKey] = this.newValue;
+                this.customSettings[this.newKey] = this.newValue;
+                this.settingsHolder[this.newKey] = this.newValue;
+            }
+            console.log(this.mergedSettings);
+
+            this.showAddModal = false;
+            this.newValue = "";
+            this.newKey = "";
         }
     }
 }

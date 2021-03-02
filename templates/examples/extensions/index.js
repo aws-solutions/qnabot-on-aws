@@ -152,7 +152,7 @@ module.exports=Object.assign(
             ]
           }
         },
-        { 
+        {
           "PolicyName" : "LexQNALambda",
           "PolicyDocument" : {
           "Version": "2012-10-17",
@@ -163,8 +163,26 @@ module.exports=Object.assign(
                       "lex:PostText"
                    ],   
                   "Resource": [
-                      {"Fn::Join": ["",["arn:aws:lex:",{ "Ref" : "AWS::Region" },":",{ "Ref" : "AWS::AccountId" },":bot:*",":qna*"]]},
+                      {"Fn::Join": ["",["arn:aws:s3:::qnabot-kendra/*",{ "Ref" : "AWS::Region" },":",{ "Ref" : "AWS::AccountId" },":bot:*",":qna*"]]},
                       {"Fn::Join": ["",["arn:aws:lex:",{ "Ref" : "AWS::Region" },":",{ "Ref" : "AWS::AccountId" },":bot:*",":QNA*"]]},
+                  ]
+              }
+            ]
+          }          
+        },
+        { 
+          "PolicyName" : "S3QNABucketReadAccess",
+          "PolicyDocument" : {
+          "Version": "2012-10-17",
+            "Statement": [
+              {
+                  "Effect": "Allow",
+                  "Action": [
+                      "s3:GetObject"
+                   ],   
+                  "Resource": [
+                      "arn:aws:s3:::QNA*/*",
+                      "arn:aws:s3:::qna*/*"
                   ]
               }
             ]
@@ -172,6 +190,7 @@ module.exports=Object.assign(
         }],
         "ManagedPolicyArns": [
             "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
+            "arn:aws:iam::aws:policy/TranslateReadOnly",
             "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole",
             "arn:aws:iam::aws:policy/AWSXRayDaemonWriteAccess",
             "arn:aws:iam::aws:policy/AmazonKendraReadOnlyAccess"]
@@ -215,7 +234,7 @@ function jslambda(name){
           "Fn::If": [ "XRAYEnabled", {"Mode": "Active"},
               {"Ref" : "AWS::NoValue"} ]
       },
-      "Tags":[{
+            "Tags":[{
           Key:"Type",
           Value:"LambdaHook"
       }]
@@ -251,15 +270,15 @@ function pylambda(name){
       "Runtime": "python3.6",
       "Timeout": 300,
       "VpcConfig" : {
-          "Fn::If": [ "VPCEnabled", {
-              "SubnetIds": { "Fn::Split" : [ ",", {"Ref": "VPCSubnetIdList"} ] },
-              "SecurityGroupIds": { "Fn::Split" : [ ",", {"Ref": "VPCSecurityGroupIdList"} ] },
-          }, {"Ref" : "AWS::NoValue"} ]
-      },
-      "TracingConfig" : {
-          "Fn::If": [ "XRAYEnabled", {"Mode": "Active"},
-              {"Ref" : "AWS::NoValue"} ]
-      },
+        "Fn::If": [ "VPCEnabled", {
+            "SubnetIds": { "Fn::Split" : [ ",", {"Ref": "VPCSubnetIdList"} ] },
+            "SecurityGroupIds": { "Fn::Split" : [ ",", {"Ref": "VPCSecurityGroupIdList"} ] },
+        }, {"Ref" : "AWS::NoValue"} ]
+    },
+    "TracingConfig" : {
+        "Fn::If": [ "XRAYEnabled", {"Mode": "Active"},
+            {"Ref" : "AWS::NoValue"} ]
+    },
       "Tags":[{
           Key:"Type",
           Value:"LambdaHook"

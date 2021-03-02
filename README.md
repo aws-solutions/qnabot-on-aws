@@ -7,6 +7,8 @@ This repository contains code for the QnABot, described in the AWS AI blog post 
 
 See the "Getting Started" to launch your own QnABot
 
+**New features in 4.5.0** [Kendra Web Crawler](#new-feature)
+
 **New features in 4.4.0** [Preview version of VPC Deployment Support, Preview version of BotRouter, Upgrade to ES 7.9, Slack client detection and Markdown Support](#new-features)
 
 **New features in 4.3.0** [Connect Wizard to assist in Connect / Lex / QnABot use case, Security enhancement in API Gateway, Four node elastic search cluster support](#new-features)
@@ -157,14 +159,21 @@ We are currently working on adding Microsoft Edge support.
 See the [LICENSE.md](LICENSE.md) file for details
 
 ## New features 
-
-### Verson 4.4.0
+### Version 4.5.0
+- Added Personal Identifiable Information detection support using Amazon Comprehend [readme](./docs/PII_Detection/README.md).
+- Added web indexing support using Kendra  - [readme](./docs/kendra_crawler_guide/README.md)
+- Added custom terminology support -- [readme](./docs/custom_terminology_guide/README.md)
 - Preview VPC support - [readme](./VPCSupportREADME.md)
 - Preview BotRouter support - [read](./BotRoutingREADME.md)  
 - Upgrade to Elasticsearch service version 7.9
 - Slack client support via Lex with Slack specific markdown support
 - Added support for Alexa re-prompt functionality  
-- Bug fixes and defect enhancements
+- Added Translation support for Kendra
+- Fixed bugs and defects.
+
+QnABot can now recognize and respond  when it detects PII.  QnABot will use the PII_REJECTION_REGEX to find matching PII patterns and if PII_REJECTION_WITH_COMPREHEND is set to true, it will also use [Amazon Comprehend](https://aws.amazon.com/blogs/machine-learning/detecting-and-redacting-pii-using-amazon-comprehend/) to find PII. 
+
+
 
 VPC support is enabled in beta mode through a new template available in the distribution repos. Please understand
 the content in [readme](./VPCSupportREADME.md) before proceeding with this type of deployment. 
@@ -179,6 +188,19 @@ connectivity on port 443. The Elasticsearch cluster and all Lambdas will be atta
 Designer UI is still available outside of the VPC but requires login via the Cognito user pool. The Elasticsearch
 cluster will not be available externally. Users wishing to use the Kibana console will need VPN connectivity to the 
 VPC and is outside the scope of this document.   
+
+Support has been added for [Amazon Translate custom terminology](https://docs.aws.amazon.com/translate/latest/dg/how-custom-terminology.html).
+
+Using custom terminology with your translation requests enables you to make sure that your brand names, character names, model names, and other unique content is translated exactly the way you need it, regardless of its context and the Amazon Translate algorithm’s decision.
+
+A new option has been added under the "Tools" menu - "Import Custom Translation".  While QnABot supports any installed custom terminology you have in your account,
+
+
+Improved handling for contractions.
+
+QnABot uses Amazon Comprehend to understand parts of speech.  Contractions like "can't","you're","I'm", and were not parsed correctly.  
+
+A new setting has been added  - ES_EXPAND_CONTRACTIONS - which can be used to specify contractions and their expanded forms.  QnaBot will expand the contractions before the question is processed by Comprehend.
 
 ### Version 4.3.0
 - New Connect Wizard available in the Content Designer UI to assist integration with a Connect Contact Flow.
