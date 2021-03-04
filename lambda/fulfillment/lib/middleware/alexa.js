@@ -1,9 +1,8 @@
 var _=require('lodash');
 var translate = require('./multilanguage.js');
 
-async function get_terminologies(sourceLang,allowedList =[]){
+async function get_terminologies(sourceLang){
     const translate = new AWS.Translate();
-        allowedList = allowedList.filter(a => a.length > 0)
         console.log("Getting registered custom terminologies")
 
         var configuredTerminologies = await  translate.listTerminologies({}).promise()
@@ -13,9 +12,6 @@ async function get_terminologies(sourceLang,allowedList =[]){
         console.log("terminology response " + JSON.stringify(configuredTerminologies))
         var sources = configuredTerminologies["TerminologyPropertiesList"].filter(t => t["SourceLanguageCode"] == sourceLang).map(s => s.Name);
         console.log("Filtered Sources " + JSON.stringify(sources))
-        if(allowedList.length != 0){
-            sources = _.intersection(sources,allowedList)
-        }
 
         return sources
 
@@ -40,7 +36,7 @@ async function get_translation(inputText, sourceLang, targetLang,req ) {
 
 
         console.log("Custom terminology enabled")
-        var customTerminologies = await get_terminologies(sourceLang,customTerminologies)
+        var customTerminologies = await get_terminologies(sourceLang)
         console.log("Using custom terminologies " + JSON.stringify(customTerminologies))
         params["TerminologyNames"] = customTerminologies;
     }
