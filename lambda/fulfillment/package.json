@@ -21,7 +21,7 @@
     "jwks-rsa-promisified": "^1.0.2"
   },
   "devDependencies": {
-    "diff": "^4.0.2",
-    "nodeunit": "^0.11.3"
+    "nodeunit": "^0.11.3",
+    "diff": "^4.0.2"
   }
 }

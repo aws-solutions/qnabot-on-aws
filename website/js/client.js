@@ -32,7 +32,7 @@ var config = {
   ui:{
     pageTitle:"QnABot Client",
     toolbarColor:"cyan",
-    toolbarTitle:"QnABot Test",
+    toolbarTitle:"QnABot",
     toolbarLogo:null,
     pushInitialTextOnRestart:false,
     AllowSuperDangerousHTMLInMessage:true,
