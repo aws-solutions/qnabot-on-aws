@@ -1,5 +1,4 @@
 var _ = require('lodash');
-var translate = require("./translate");
 var linkify = require('linkifyjs');
 
 /**
@@ -341,6 +340,7 @@ async function routeKendraRequest(event, context) {
                     
                     // Convert S3 Object URLs to signed URLs
                     answerDocumentUris.add(element);
+
                     kendraQueryId = res.QueryId; // store off the QueryId to use as a session attribute for feedback
                     kendraIndexId = res.originalKendraIndexId; // store off the Kendra IndexId to use as a session attribute for feedback
                     kendraResultId = element.Id; // store off resultId to use as a session attribute for feedback
@@ -414,13 +414,10 @@ async function routeKendraRequest(event, context) {
     });
 
     // update QnABot answer content for ssml, markdown, and text
-    let ssmlMessage = ""
     if (foundAnswerCount > 0 || foundDocumentCount > 0) {
         event.res.session.qnabot_gotanswer = true ; 
         event.res.message = answerMessage;
-        event.res.card = [];
-
-        ssmlMessage = `${answerMessage.substring(0,600).replace(/\r?\n|\r/g, " ")}`;
+        let ssmlMessage = `${answerMessage.substring(0,600).replace(/\r?\n|\r/g, " ")}`;
         if (speechMessage != "") {
             ssmlMessage = `${speechMessage.substring(0,600).replace(/\r?\n|\r/g, " ")}`;
         }
@@ -440,20 +437,21 @@ async function routeKendraRequest(event, context) {
         }
     }
     if (answerDocumentUris.size > 0) {
-      event.res.session.appContext.altMessages.markdown += `\n\n ${helpfulLinksMsg}: `;
-      answerDocumentUris.forEach(function(element) {
-        // Convert S3 Object URLs to signed URLs
-        if (signS3Urls) {
-          element.DocumentURI = signS3URL(element.DocumentURI, expireSeconds);
-        }
-        event.res.session.appContext.altMessages.markdown += `<span translate=no>[${element.DocumentTitle.Text}](${element.DocumentURI})</span>`;
-      });
+        event.res.session.appContext.altMessages.markdown += `\n\n ${helpfulLinksMsg}: `;
+        answerDocumentUris.forEach(function (element) {
+            let label = docName(element) ;
+            // Convert S3 Object URLs to signed URLs
+            if (signS3Urls) {
+                element = signS3URL(element, expireSeconds)
+            }
+            event.res.session.appContext.altMessages.markdown += `[${label}](${element})`;
+        });
     }
     
-    let idx=foundAnswerCount;
+    let idx=0;
     if (seenTop == false){
         helpfulDocumentsUris.forEach(function (element) {
-            if (idx++ < maxDocumentCount) {
+            if (idx++ < maxDocumentCount-1) {
                 event.res.session.appContext.altMessages.markdown += `\n\n`;
                 event.res.session.appContext.altMessages.markdown += `***`;
                 event.res.session.appContext.altMessages.markdown += `\n\n <br>`;
@@ -462,72 +460,24 @@ async function routeKendraRequest(event, context) {
                     event.res.session.appContext.altMessages.markdown += `\n\n  ${element.text}`;
                     event.res.message += `\n\n  ${element.text}`;
                 }
-                let label = element.Title ;
+                let label = docName(element.uri) ;
                 // Convert S3 Object URLs to signed URLs
                 if (signS3Urls) {
                     element.uri = signS3URL(element.uri, expireSeconds)
                 }
-                event.res.session.appContext.altMessages.markdown += `\n\n  ${helpfulLinksMsg}: <span translate=no>[${label}](${element.uri})</span>`;
+                event.res.session.appContext.altMessages.markdown += `\n\n  ${helpfulLinksMsg}: [${label}](${element.uri})`;
             }
         });
     }
-        var req = event.req;
-
-
-      // translate response
-    var usrLang = "en";
-    var hit = {
-        a:answerMessage,
-        markdown: event.res.session.appContext.altMessages.markdown,
-        ssml: ssmlMessage
-    }
-    var translated_hit=""
-    if (_.get(event.req._settings, "ENABLE_MULTI_LANGUAGE_SUPPORT")) {
-        console.log("Translating response....")
-        usrLang = _.get(event.req, "session.userDetectedLocale");
-      if (usrLang != "en") {
-        console.log("Autotranslate hit to usrLang: ", usrLang);
-  
-        hit= await translate.translate_hit(hit, usrLang, event.req);
-        //Translate places extra space between the * in the header
-
-      } else {
-        console.log("User Lang is en, Autotranslate not required.");
-      }
-    }
-
-    // prepend debug msg
-    var req = event.req;
-    if (_.get(req._settings, 'ENABLE_DEBUG_RESPONSES')) {
-        console.log("Adding debug message")
-        var msg = "User Input: \"" + req.question + "\"";
-        if (usrLang != 'en') {
-            msg = "User Input: \"" + _.get(req,"_event.origQuestion","notdefined") + "\", Translated to: \"" + req.question + "\"";
-        }
-        msg += ", Source: " + (foundAnswerCount > 0 || foundDocumentCount > 0 ? "Kendra" : "");
-        hit.a = msg + " " + hit.a;
-        hit.markdown = msg + "</br>" + hit.markdown;
-        hit.ssml = msg + " " + hit.ssmlMessage
-    };
-
-
-    event.res.session.appContext.altMessages.ssml = hit.ssml;
-    event.res.plainMessage = hit.a;
-    event.res.message = hit.markdown;
-    //Translate puts a space between text and the * not valid markdown
-    const regex = /\s\*\s+$/m;
-
-    event.res.session.appContext.altMessages.markdown = hit.markdown.replace(regex, '*')
-    
-    
     _.set(event,"res.answerSource",'KENDRA');
     if (kendraQueryId) {
         _.set(event,"res.session.qnabotcontext.kendra.kendraQueryId",kendraQueryId) ;
         _.set(event,"res.session.qnabotcontext.kendra.kendraIndexId",kendraIndexId) ;
         _.set(event,"res.session.qnabotcontext.kendra.kendraResultId",kendraResultId) ;
-//        _.set(event,"res.session.qnabotcontext.kendra.kendraResponsibleQid",event.res.result.qid) ;
+        _.set(event,"res.session.qnabotcontext.kendra.kendraResponsibleQid",event.res.result.qid) ;
     }
-
+    
+    console.log("Returning event: ", JSON.stringify(event, null, 2));
 
     return event;
 }
@@ -537,4 +487,3 @@ exports.handler = async (event, context) => {
     console.log('context: ' + JSON.stringify(context, null, 2));
     return routeKendraRequest(event, context);
 };
-

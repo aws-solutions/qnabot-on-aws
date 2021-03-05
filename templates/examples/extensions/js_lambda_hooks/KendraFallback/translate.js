@@ -4,7 +4,7 @@ const AWS = require('aws-sdk');
 
 async function get_terminologies(sourceLang){
     const translate = new AWS.Translate();
-\        console.log("Getting registered custom terminologies")
+        console.log("Getting registered custom terminologies")
 
         var configuredTerminologies = await  translate.listTerminologies({}).promise()
 
