@@ -1,8 +1,10 @@
-var aws=require('aws-sdk')
+var aws=require('aws-sdk/global')
 var axios=require('axios')
 var _=require('lodash')
 var query=require('query-string')
 var jwt=require('jsonwebtoken')
+var Polly = require('aws-sdk/clients/Polly')
+var LexRuntime = require('aws-sdk/clients/LexRuntime')
 
 module.exports=function(){
     return Promise.resolve(axios.head(window.location.href))
@@ -48,8 +50,8 @@ module.exports=function(){
         aws.config.credentials=result.credentials
         return {
             config:aws.config,
-            lex:new aws.LexRuntime(),
-            polly:new aws.Polly(),
+            lex:new LexRuntime(),
+            polly:new Polly(),
             username:result.username,
             Login:result.Login,
             idtoken:result.id_token
