@@ -32,7 +32,7 @@ var config = {
   ui:{
     pageTitle:"QnABot Client",
     toolbarColor:"cyan",
-    toolbarTitle:"QnABot",
+    toolbarTitle:"QnABot Test",
     toolbarLogo:null,
     pushInitialTextOnRestart:false,
     AllowSuperDangerousHTMLInMessage:true,
@@ -40,7 +40,8 @@ var config = {
     shouldDisplayResponseCardTitle:false,
     positiveFeedbackIntent: "Thumbs up",
     negativeFeedbackIntent: "Thumbs down",
-    helpIntent: "Help"
+    helpIntent: "Help",
+    messageMenu: true
   },
   recorder:{}
 }

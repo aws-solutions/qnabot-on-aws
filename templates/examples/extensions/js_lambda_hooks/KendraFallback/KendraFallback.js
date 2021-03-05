@@ -1,4 +1,5 @@
 var _ = require('lodash');
+var translate = require("./translate");
 var linkify = require('linkifyjs');
 
 /**
@@ -156,13 +157,20 @@ function signS3URL(url, expireSecs) {
     return url;
 }
 
+
 // get document name from URL
 // last element of path with any params removed
 function docName(uri) {
-    let x = uri.split("/");
-    let y = x[x.length -1] ;
-    let n = y.split("?")[0] ;
-    return n;
+  if (uri.DocumentTitle) {
+    return uri.Title;
+  }
+  if (uri.Uri) {
+    uri = uri.Uri;
+  }
+  let x = uri.split("/");
+  let y = x[x.length - 1];
+  let n = y.split("?")[0];
+  return n;
 }
 
 /**
@@ -268,12 +276,12 @@ async function routeKendraRequest(event, context) {
     // process kendra query responses and update answer content
 
     /* default message text - can be overridden using QnABot SSM Parameter Store Custom Property */
-    let topAnswerMessage = "Amazon Kendra suggested answer. \n\n ";
-    let topAnswerMessageMd = "*Amazon Kendra suggested answer.* \n ";
-    let answerMessage = 'While I did not find an exact answer, these search results from Amazon Kendra might be helpful. ' ;
-    let answerMessageMd = '*While I did not find an exact answer, these search results from Amazon Kendra might be helpful.* \n ';
-    let faqanswerMessage = 'Answer from Amazon Kendra FAQ.';
-    let faqanswerMessageMd = '*Answer from Amazon Kendra FAQ.* \n ';
+    let topAnswerMessage = event.req["_settings"]["ALT_SEARCH_KENDRA_TOP_ANSWER_MESSAGE"] + "\n\n"; //"Amazon Kendra suggested answer. \n\n ";
+    let topAnswerMessageMd = event.req["_settings"]["ALT_SEARCH_KENDRA_TOP_ANSWER_MESSAGE"] == "" ? "" : `*${event.req["_settings"]["ALT_SEARCH_KENDRA_TOP_ANSWER_MESSAGE"]}* \n `;
+    let answerMessage = event.req["_settings"]["ALT_SEARCH_KENDRA_ANSWER_MESSAGE"];
+    let answerMessageMd = event.req["_settings"]["ALT_SEARCH_KENDRA_ANSWER_MESSAGE"] == "" ? "" : `*${answerMessage}* \n `;
+    let faqanswerMessage = event.req["_settings"]["ALT_SEARCH_KENDRA_FAQ"] + "\n\n"; //'Answer from Amazon Kendra FAQ.'
+    let faqanswerMessageMd = event.req["_settings"]["ALT_SEARCH_KENDRA_FAQ"]  == "" ? "" : `*${event.req["_settings"]["ALT_SEARCH_KENDRA_FAQ"]}* \n`
     let speechMessage = "";
     let helpfulLinksMsg = 'Source Link';
     let maxDocumentCount = _.get(event.req,'_settings.ALT_SEARCH_KENDRA_MAX_DOCUMENT_COUNT',2);
@@ -291,8 +299,12 @@ async function routeKendraRequest(event, context) {
 
     
     resArray.forEach(function (res) {
+
         if (res && res.ResultItems.length > 0) {
             res.ResultItems.forEach(function (element, i) {
+                if(seenTop){
+                    return;
+                }
                 /* Note - only the first answer will be provided back to the requester */
                 if (element.Type === 'ANSWER' && foundAnswerCount === 0 && element.AdditionalAttributes &&
                     element.AdditionalAttributes.length > 0 &&
@@ -313,7 +325,6 @@ async function routeKendraRequest(event, context) {
                             answerMessage = topAnswerMessage + highlight + '.';
                             answerMessageMd = topAnswerMessageMd;
                             answerTextMd = addMarkdownHighlights(answerTextMd, elem.BeginOffset+offset, elem.EndOffset+offset, true) ;
-                            break;
                         } else {
                             answerTextMd = addMarkdownHighlights(answerTextMd, elem.BeginOffset+offset, elem.EndOffset+offset, false) ;
                         }
@@ -332,8 +343,7 @@ async function routeKendraRequest(event, context) {
                     }
                     
                     // Convert S3 Object URLs to signed URLs
-                    let uri = element.DocumentURI ;
-                    answerDocumentUris.add(uri);
+                    answerDocumentUris.add(element);
                     kendraQueryId = res.QueryId; // store off the QueryId to use as a session attribute for feedback
                     kendraIndexId = res.originalKendraIndexId; // store off the Kendra IndexId to use as a session attribute for feedback
                     kendraResultId = element.Id; // store off resultId to use as a session attribute for feedback
@@ -360,7 +370,7 @@ async function routeKendraRequest(event, context) {
                     kendraIndexId = res.originalKendraIndexId; // store off the Kendra IndexId to use as a session attribute for feedback
                     kendraResultId = element.Id; // store off resultId to use as a session attribute for feedback
                     foundAnswerCount++;
-                    
+                  
                 } else if (element.Type === 'DOCUMENT' && element.DocumentExcerpt.Text && element.DocumentURI) {
                     const docInfo = {}
                     // if topAnswer found, then do not show document excerpts
@@ -384,24 +394,35 @@ async function routeKendraRequest(event, context) {
                                 var highlight = speechMessage.substring(sorted_highlights[0].BeginOffset, sorted_highlights[0].EndOffset)
                                 var pattern = new RegExp('[^.]* '+highlight+'[^.]*\.[^.]*\.')
                                 pattern.lastIndex = 0;  // must reset this property of regex object for searches
-                                speechMessage = pattern.exec(speechMessage)[0]
+                                var regexMatch = pattern.exec(speechMessage)
+                                //TODO: Investigate this.  Should this be a nohits scenerio?
+                                if(regexMatch){
+                                    speechMessage = regexMatch[0]
+                                }
                             }
                         }
                     }
-                    // but even if topAnswer is found, show URL in markdown
-                    docInfo.uri = element.DocumentURI;
-                    helpfulDocumentsUris.add(docInfo);
-                    // foundAnswerCount++;
-                    foundDocumentCount++;
+                  // but even if topAnswer is found, show URL in markdown
+                  docInfo.uri = `${element.DocumentURI}`;
+                  let title;
+                  if (element.DocumentTitle && element.DocumentTitle.Text) {
+                    docInfo.Title = element.DocumentTitle.Text;
+                  }
+                  helpfulDocumentsUris.add(docInfo);
+                  // foundAnswerCount++;
+                  foundDocumentCount++;
                 }
             });
         }
     });
 
     // update QnABot answer content for ssml, markdown, and text
+    let ssmlMessage = ""
     if (foundAnswerCount > 0 || foundDocumentCount > 0) {
         event.res.session.qnabot_gotanswer = true ; 
         event.res.message = answerMessage;
+        event.res.card = [];
+
         let ssmlMessage = `${answerMessage.substring(0,600).replace(/\r?\n|\r/g, " ")}`;
         if (speechMessage != "") {
             ssmlMessage = `${speechMessage.substring(0,600).replace(/\r?\n|\r/g, " ")}`;
@@ -422,21 +443,20 @@ async function routeKendraRequest(event, context) {
         }
     }
     if (answerDocumentUris.size > 0) {
-        event.res.session.appContext.altMessages.markdown += `\n\n ${helpfulLinksMsg}: `;
-        answerDocumentUris.forEach(function (element) {
-            let label = docName(element) ;
-            // Convert S3 Object URLs to signed URLs
-            if (signS3Urls) {
-                element = signS3URL(element, expireSeconds)
-            }
-            event.res.session.appContext.altMessages.markdown += `[${label}](${element})`;
-        });
+      event.res.session.appContext.altMessages.markdown += `\n\n ${helpfulLinksMsg}: `;
+      answerDocumentUris.forEach(function(element) {
+        // Convert S3 Object URLs to signed URLs
+        if (signS3Urls) {
+          element.DocumentURI = signS3URL(element.DocumentURI, expireSeconds);
+        }
+        event.res.session.appContext.altMessages.markdown += `<span translate=no>[${element.DocumentTitle.Text}](${element.DocumentURI})</span>`;
+      });
     }
     
-    let idx=0;
+    let idx=foundAnswerCount;
     if (seenTop == false){
         helpfulDocumentsUris.forEach(function (element) {
-            if (idx++ < maxDocumentCount-1) {
+            if (idx++ < maxDocumentCount) {
                 event.res.session.appContext.altMessages.markdown += `\n\n`;
                 event.res.session.appContext.altMessages.markdown += `***`;
                 event.res.session.appContext.altMessages.markdown += `\n\n <br>`;
@@ -445,15 +465,62 @@ async function routeKendraRequest(event, context) {
                     event.res.session.appContext.altMessages.markdown += `\n\n  ${element.text}`;
                     event.res.message += `\n\n  ${element.text}`;
                 }
-                let label = docName(element.uri) ;
+                let label = element.Title ;
                 // Convert S3 Object URLs to signed URLs
                 if (signS3Urls) {
                     element.uri = signS3URL(element.uri, expireSeconds)
                 }
-                event.res.session.appContext.altMessages.markdown += `\n\n  ${helpfulLinksMsg}: [${label}](${element.uri})`;
+                event.res.session.appContext.altMessages.markdown += `\n\n  ${helpfulLinksMsg}: <span translate=no>[${label}](${element.uri})</span>`;
             }
         });
     }
+    var req = event.req;
+
+
+    // translate response
+    var usrLang = "en";
+    var hit = {
+        a:answerMessage,
+        markdown: event.res.session.appContext.altMessages.markdown,
+        ssml: ssmlMessage
+    }
+    var translated_hit=""
+    if (_.get(event.req._settings, "ENABLE_MULTI_LANGUAGE_SUPPORT")) {
+        console.log("Translating response....")
+        usrLang = _.get(event.req, "session.userDetectedLocale");
+      if (usrLang != "en") {
+        console.log("Autotranslate hit to usrLang: ", usrLang);
+        hit= await translate.translate_hit(hit, usrLang, event.req);
+        //Translate places extra space between the * in the header
+
+      } else {
+        console.log("User Lang is en, Autotranslate not required.");
+      }
+    }
+
+    // prepend debug msg
+    var req = event.req;
+    if (_.get(req._settings, 'ENABLE_DEBUG_RESPONSES')) {
+        console.log("Adding debug message")
+        var msg = "User Input: \"" + req.question + "\"";
+        if (usrLang != 'en') {
+            msg = "User Input: \"" + _.get(req,"_event.origQuestion","notdefined") + "\", Translated to: \"" + req.question + "\"";
+        }
+        msg += ", Source: " + (foundAnswerCount > 0 || foundDocumentCount > 0 ? "Kendra" : "");
+        hit.a = msg + " " + hit.a;
+        hit.markdown = msg + "</br>" + hit.markdown;
+        hit.ssml = msg + " " + hit.ssmlMessage
+    };
+
+
+    event.res.session.appContext.altMessages.ssml = hit.ssml;
+    event.res.plainMessage = hit.a;
+    event.res.message = hit.markdown;
+    //Translate puts a space between text and the * not valid markdown
+    const regex = /\s\*\s+$/m;
+
+    event.res.session.appContext.altMessages.markdown = hit.markdown.replace(regex, '*\n\n')
+
     _.set(event,"res.answerSource",'KENDRA');
     if (kendraQueryId) {
         _.set(event,"res.session.qnabotcontext.kendra.kendraQueryId",kendraQueryId) ;
@@ -472,3 +539,240 @@ exports.handler = async (event, context) => {
     console.log('context: ' + JSON.stringify(context, null, 2));
     return routeKendraRequest(event, context);
 };
+
+
+(async function main () {
+var event = {
+    "req": {
+        "_event": {
+            "messageVersion": "1.0",
+            "invocationSource": "FulfillmentCodeHook",
+            "userId": "us-east-1:163b2085-23e1-45d2-9948-67cf0f6b8b60",
+            "sessionAttributes": {
+                "qnabot_qid": "KendraFallback",
+                "qnabot_gotanswer": "false",
+                "qnabotcontext": "{\"previous\":{\"qid\":\"KendraFallback\",\"q\":\"What is batch transformation\"},\"navigation\":{\"next\":\"\",\"previous\":[],\"hasParent\":true},\"kendra\":{\"kendraQueryId\":\"896f3417-0355-4b87-8370-819b712f35d7\",\"kendraIndexId\":\"2c96386a-788e-419f-af2a-0721c148b849\",\"kendraResultId\":\"896f3417-0355-4b87-8370-819b712f35d7-9131f449-b033-43f4-a104-b658b7fbd204\",\"kendraResponsibleQid\":\"KendraFallback\"}}"
+            },
+            "requestAttributes": null,
+            "bot": {
+                "name": "qna_ridlt_dev_dev_master_onethree_Bmyxnk",
+                "alias": "live",
+                "version": "1"
+            },
+            "outputDialogMode": "Text",
+            "currentIntent": {
+                "name": "qnabotfallbackfulfilment_IntentWnhMGoVQE",
+                "slots": {},
+                "slotDetails": {},
+                "confirmationStatus": "None",
+                "nluIntentConfidenceScore": null
+            },
+            "alternativeIntents": [],
+            "inputTranscript": "Que es la transformación por lotes",
+            "recentIntentSummaryView": [
+                {
+                    "intentName": "fulfilment_IntentoKjYytvNaU",
+                    "checkpointLabel": null,
+                    "slots": {
+                        "slot": "What is batch transformation"
+                    },
+                    "confirmationStatus": "None",
+                    "dialogActionType": "Close",
+                    "fulfillmentState": "Fulfilled",
+                    "slotToElicit": null
+                },
+                {
+                    "intentName": "qnabotfallbackfulfilment_IntentWnhMGoVQE",
+                    "checkpointLabel": null,
+                    "slots": {},
+                    "confirmationStatus": "None",
+                    "dialogActionType": "Close",
+                    "fulfillmentState": "Fulfilled",
+                    "slotToElicit": null
+                }
+            ],
+            "sentimentResponse": null,
+            "kendraResponse": null,
+            "errorFound": false
+        },
+        "_settings": {
+            "ENABLE_DEBUG_RESPONSES": false,
+            "ES_USE_KEYWORD_FILTERS": true,
+            "ES_EXPAND_CONTRACTIONS": "{\"you're\":\"you are\",\"I'm\":\"I am\",\"can't\":\"cannot\"}",
+            "ES_KEYWORD_SYNTAX_TYPES": "NOUN,PROPN,VERB,INTJ",
+            "ES_SYNTAX_CONFIDENCE_LIMIT": ".20",
+            "ES_MINIMUM_SHOULD_MATCH": "2<75%",
+            "ES_NO_HITS_QUESTION": "no_hits",
+            "ES_USE_FUZZY_MATCH": false,
+            "ES_PHRASE_BOOST": "4",
+            "ES_SCORE_ANSWER_FIELD": false,
+            "ENABLE_SENTIMENT_SUPPORT": true,
+            "ENABLE_MULTI_LANGUAGE_SUPPORT": false,
+            "ENABLE_CUSTOM_TERMINOLOGY": false,
+            "MINIMUM_CONFIDENCE_SCORE": 0.6,
+            "ALT_SEARCH_KENDRA_INDEXES": "2c96386a-788e-419f-af2a-0721c148b849",
+            "ALT_SEARCH_KENDRA_S3_SIGNED_URLS": true,
+            "ALT_SEARCH_KENDRA_S3_SIGNED_URL_EXPIRE_SECS": 300,
+            "ALT_SEARCH_KENDRA_MAX_DOCUMENT_COUNT": 2,
+            "ALT_SEARCH_KENDRA_TOP_ANSWER_MESSAGE": "Amazon Kendra suggested answer.",
+            "ALT_SEARCH_KENDRA_ANSWER_MESSAGE": "While I did not find an exact answer, these search results from Amazon Kendra might be helpful.",
+            "KENDRA_FAQ_INDEX": "",
+            "KENDRA_FAQ_CONFIG_MAX_RETRIES": 8,
+            "KENDRA_FAQ_CONFIG_RETRY_DELAY": 600,
+            "KENDRA_FAQ_ES_FALLBACK": true,
+            "ENABLE_KENDRA_WEB_INDEXER": false,
+            "KENDRA_INDEXER_URLS": "",
+            "KENDRA_INDEXER_SCHEDULE": "rate(1 day)",
+            "KENDRA_WEB_PAGE_INDEX": "",
+            "ERRORMESSAGE": "Unfortunately I encountered an error when searching for your answer. Please ask me again later.",
+            "EMPTYMESSAGE": "You stumped me! Sadly I don't know how to answer your question.",
+            "DEFAULT_ALEXA_LAUNCH_MESSAGE": "Hello, Please ask a question",
+            "DEFAULT_ALEXA_REPROMPT": "Please either answer the question, ask another question or say Goodbye to end the conversation.",
+            "DEFAULT_ALEXA_STOP_MESSAGE": "Goodbye",
+            "SMS_HINT_REMINDER_ENABLE": true,
+            "SMS_HINT_REMINDER": " (Feedback? Reply THUMBS UP or THUMBS DOWN. Ask HELP ME at any time)",
+            "SMS_HINT_REMINDER_INTERVAL_HRS": "24",
+            "IDENTITY_PROVIDER_JWKS_URLS": [],
+            "ENFORCE_VERIFIED_IDENTITY": false,
+            "NO_VERIFIED_IDENTITY_QUESTION": "no_verified_identity",
+            "ELICIT_RESPONSE_MAX_RETRIES": 3,
+            "ELICIT_RESPONSE_RETRY_MESSAGE": "Please try again?",
+            "ELICIT_RESPONSE_BOT_FAILURE_MESSAGE": "Your response was not understood. Please start again.",
+            "ELICIT_RESPONSE_DEFAULT_MSG": "Ok. ",
+            "CONNECT_IGNORE_WORDS": "",
+            "CONNECT_ENABLE_VOICE_RESPONSE_INTERRUPT": false,
+            "CONNECT_NEXT_PROMPT_VARNAME": "connect_nextPrompt",
+            "ENABLE_REDACTING": false,
+            "REDACTING_REGEX": "\\b\\d{4}\\b(?![-])|\\b\\d{9}\\b|\\b\\d{3}-\\d{2}-\\d{4}\\b",
+            "PII_REJECTION_ENABLED": false,
+            "PII_REJECTION_QUESTION": "pii_rejection_question",
+            "PII_REJECTION_WITH_COMPREHEND": true,
+            "PII_REJECTION_REGEX": "\\b\\d{4}\\b(?![-])|\\b\\d{9}\\b|\\b\\d{3}-\\d{2}-\\d{4}\\b",
+            "PII_REJECTION_IGNORE_TYPES": "Name,Address",
+            "DISABLE_CLOUDWATCH_LOGGING": false,
+            "MINIMAL_ES_LOGGING": false,
+            "S3_PUT_REQUEST_ENCRYPTION": "",
+            "BOT_ROUTER_WELCOME_BACK_MSG": "Welcome back to QnABot.",
+            "BOT_ROUTER_EXIT_MSGS": "exit,quit,goodbye,leave",
+            "RUN_LAMBDAHOOK_FROM_QUERY_STEP": true,
+            "DEFAULT_USER_POOL_JWKS_URL": "https://cognito-idp.us-east-1.amazonaws.com/us-east-1_pRTw95UsN/.well-known/jwks.json"
+        },
+        "_type": "LEX",
+        "_userId": "us-east-1:163b2085-23e1-45d2-9948-67cf0f6b8b60",
+        "question": "Que es la transformación por lotes",
+        "session": {
+            "qnabot_qid": "KendraFallback",
+            "qnabot_gotanswer": false,
+            "qnabotcontext": {
+                "previous": {
+                    "qid": "KendraFallback",
+                    "q": "What is batch transformation"
+                },
+                "navigation": {
+                    "next": "",
+                    "previous": [],
+                    "hasParent": true
+                }
+            }
+        },
+        "_preferredResponseType": "PlainText",
+        "_clientType": "LEX.LexWebUI.Text",
+        "sentiment": "NEUTRAL",
+        "sentimentScore": {
+            "Positive": 0.0393349714577198,
+            "Negative": 0.1698005646467209,
+            "Neutral": 0.7583654522895813,
+            "Mixed": 0.032499056309461594
+        },
+        "_userInfo": {
+            "InteractionCount": 22,
+            "UserId": "us-east-1:163b2085-23e1-45d2-9948-67cf0f6b8b60",
+            "FirstSeen": "Thu Mar 04 2021 23:33:34 GMT+0000 (Coordinated Universal Time)",
+            "LastSeen": "Fri Mar 05 2021 02:11:21 GMT+0000 (Coordinated Universal Time)",
+            "TimeSinceLastInteraction": 276.191,
+            "isVerifiedIdentity": "false"
+        },
+        "_info": {
+            "es": {
+                "address": "search-qna-rid-elasti-1jjw1wmigbqys-udigehwa6s7e3mqdg7hth5j4bi.us-east-1.es.amazonaws.com",
+                "index": "qna-ridlt-dev-dev-master-13",
+                "type": "qna",
+                "service": {
+                    "qid": "qna-ridlt-dev-dev-master-13-ESQidLambda-1XHFQJFT8JO90",
+                    "proxy": "qna-ridlt-dev-dev-master-13-ESProxyLambda-1ATRB63WYGBO4"
+                }
+            }
+        }
+    },
+    "res": {
+        "type": "PlainText",
+        "message": "The Kendra Fallback search was not able to identify any results",
+        "session": {
+            "qnabot_qid": "KendraFallback",
+            "qnabot_gotanswer": false,
+            "qnabotcontext": {
+                "previous": {
+                    "qid": "KendraFallback",
+                    "q": "Que es la transformación por lotes"
+                },
+                "navigation": {
+                    "next": "",
+                    "previous": [],
+                    "hasParent": true
+                },
+                "kendra": {
+                    "kendraQueryId": "896f3417-0355-4b87-8370-819b712f35d7",
+                    "kendraIndexId": "2c96386a-788e-419f-af2a-0721c148b849",
+                    "kendraResultId": "896f3417-0355-4b87-8370-819b712f35d7-9131f449-b033-43f4-a104-b658b7fbd204",
+                    "kendraResponsibleQid": "KendraFallback"
+                }
+            },
+            "appContext": {
+                "altMessages": {}
+            }
+        },
+        "card": {
+            "send": false,
+            "title": "",
+            "text": "",
+            "url": ""
+        },
+        "_userInfo": {
+            "InteractionCount": 23,
+            "UserId": "us-east-1:163b2085-23e1-45d2-9948-67cf0f6b8b60",
+            "FirstSeen": "Thu Mar 04 2021 23:33:34 GMT+0000 (Coordinated Universal Time)",
+            "LastSeen": "Fri Mar 05 2021 02:15:57 GMT+0000 (Coordinated Universal Time)",
+            "TimeSinceLastInteraction": 276.191,
+            "isVerifiedIdentity": "false"
+        },
+        "got_hits": 0,
+        "result": {
+            "qid": "KendraFallback",
+            "quniqueterms": " no_hits  ",
+            "questions": [
+                {
+                    "q": "no_hits"
+                }
+            ],
+            "a": "The Kendra Fallback search was not able to identify any results",
+            "l": "QNA:EXTKendraFallback",
+            "type": "qna",
+            "answersource": "ElasticSearch",
+            "autotranslate": {
+                "a": true,
+                "rp": true
+            },
+            "rp": "Please either answer the question, ask another question or say Goodbye to end the conversation."
+        },
+        "plainMessage": "The Kendra Fallback search was not able to identify any results",
+        "answerSource": "ELASTICSEARCH",
+        "reprompt": {
+            "type": "PlainText",
+            "text": "Please either answer the question, ask another question or say Goodbye to end the conversation."
+        }
+    }
+}
+var result = await routeKendraRequest(event);
+return 
+})()
+

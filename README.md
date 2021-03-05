@@ -7,6 +7,8 @@ This repository contains code for the QnABot, described in the AWS AI blog post 
 
 See the "Getting Started" to launch your own QnABot
 
+**New features in 4.5.0** [Kendra Web Crawler, Comprehend PII Detection, Translate Custom Terminology, ](#new-features)
+
 **New features in 4.4.0** [Preview version of VPC Deployment Support, Preview version of BotRouter, Upgrade to ES 7.9, Slack client detection and Markdown Support](#new-features)
 
 **New features in 4.3.0** [Connect Wizard to assist in Connect / Lex / QnABot use case, Security enhancement in API Gateway, Four node elastic search cluster support](#new-features)
@@ -158,13 +160,25 @@ See the [LICENSE.md](LICENSE.md) file for details
 
 ## New features 
 
-### Verson 4.4.0
+### Version 4.5.0
+- Added single click deployment support for four additional regions
+- Changed unencrypted Amazon Elasticsearch instance types to be t3.medium.elasticsearch   
+- Added Personal Identifiable Information detection support using Amazon Comprehend - [readme](./docs/PII_Detection/README.md)
+- Added web indexing support using Amazon Kendra  - [readme](./docs/kendra_crawler_guide/README.md)
+- Added Amazon Translate custom terminology support - [readme](./docs/custom_terminology_guide/README.md)
+- Added multi-language translation with QnABot Kendra fallback processing
+- Added support for signing S3 URLs for bot responses, using handlebar syntax - [readme](./lambda/proxy-es/lib/HANDLEBARS_README.md)
+- Added support to defining user specified custom settings
+- Lambdahook responses can now be used with document chaining and are translated when multi-language support is enabled
+- Improved support when contractions are used in utterances  
+- Fixed bugs and defects
+
+### Version 4.4.0
 - Preview VPC support - [readme](./VPCSupportREADME.md)
-- Preview BotRouter support - [read](./BotRoutingREADME.md)  
+- Preview BotRouter support - [readme](./BotRoutingREADME.md)
 - Upgrade to Elasticsearch service version 7.9
 - Slack client support via Lex with Slack specific markdown support
 - Added support for Alexa re-prompt functionality  
-- Bug fixes and defect enhancements
 
 VPC support is enabled in beta mode through a new template available in the distribution repos. Please understand
 the content in [readme](./VPCSupportREADME.md) before proceeding with this type of deployment. 
@@ -178,7 +192,7 @@ based gateway to public internet should be selected. The security group specifie
 connectivity on port 443. The Elasticsearch cluster and all Lambdas will be attached to these private subnets. The
 Designer UI is still available outside of the VPC but requires login via the Cognito user pool. The Elasticsearch
 cluster will not be available externally. Users wishing to use the Kibana console will need VPN connectivity to the 
-VPC and is outside the scope of this document.   
+VPC and is outside the scope of this document.
 
 ### Version 4.3.0
 - New Connect Wizard available in the Content Designer UI to assist integration with a Connect Contact Flow.

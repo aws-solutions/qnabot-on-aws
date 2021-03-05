@@ -1,3 +1,15 @@
+## [4.5.0]
+- Added single click deployment support for four additional regions
+- Changed unencrypted Amazon Elasticsearch instance types to be t3.medium.elasticsearch
+- Added Personal Identifiable Information detection support using Amazon Comprehend - [readme](./docs/PII_Detection/README.md)
+- Added web indexing support using Amazon Kendra  - [readme](./docs/kendra_crawler_guide/README.md)
+- Added Amazon Translate custom terminology support - [readme](./docs/custom_terminology_guide/README.md)
+- Added multi-language translation with QnABot Kendra fallback processing
+- Added support for signing S3 URLs for bot responses, using handlebar syntax - [readme](./lambda/proxy-es/lib/HANDLEBARS_README.md)
+- Added support to defining user specified custom settings
+- Lambdahook responses can now be used with document chaining and are translated when multi-language support is enabled
+- Improved support when contractions are used in utterances
+- Fixed bugs and defects
 ## [4.4.1]
 - Fix for Designer UI from breaking change in highlight.js due to dependabot alert / change.
 - Added support for setting 'profile' as an identity attribute from cognito federation. 
@@ -9,6 +21,13 @@
 - Slack client support via Lex with Slack specific markdown support
 - Added support for Alexa re-prompt functionality
 - Bug fixes and defect enhancements
+## [4.3.2]
+- Bug fixes for Kendra FAQ integration 
+- Support lengthy answer definition for Kendra FAQ
+- Check of FAQ deletion in Kendra when FAQ content is being resynced
+- Support multiple responses when using Test in content designer with Kendra FAQ enabled
+- Fix for exception - "Cannot convert undefined or null to object" when Session Attributes are no provided during Lex input. https://github.com/aws-samples/aws-ai-qna-bot/issues/229
+- Package version updates to address current github dependabot alerts
 ## [4.3.0]
 - New Connect Wizard available in the Content Designer UI to assist integration with a Connect Contact Flow.
 - New 4-node Elasticsearch domain support for improved fault tolerance in deployment template.

@@ -8,7 +8,7 @@
   "license": "MIT",
   "dependencies": {
     "aws-sdk": "^2.331.0",
-    "axios": "^0.18.1",
+    "axios": "^0.21.1",
     "debug": "^4.0.1",
     "moment": "^2.22.2"
   },

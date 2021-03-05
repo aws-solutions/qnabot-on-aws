@@ -22,6 +22,7 @@
               build
             v-list-tile
               sync
+
     span
       questions(@filter="get(pagination)" v-if="active==='questions'")
       test(v-if="active==='test'")
@@ -148,7 +149,8 @@ module.exports={
     edit:require('./edit.vue').default,
     build:require('./rebuild.vue').default,
     alexa:require('./alexa.vue').default,
-    sync:require('./synckendra.vue').default
+    sync:require('./synckendra.vue').default,
+
   },
   computed:{
     empty:function(){

@@ -178,7 +178,7 @@ module.exports={
         "Type":"String",
         "Description":"Number of nodes in ElasticSearch domain - '4' is recommended for fault tolerant production deployments.",
         "AllowedValues" : ["2", "4"],
-        "Default":"2"
+        "Default":"4"
     },
     "VPCSubnetIdList" : {
         "Description" : "Subnet IDs", "Type": "CommaDelimitedList",
