@@ -32,76 +32,26 @@ function isConnectClient(req) {
     return true;
 }
 
-async function get_terminologies(sourceLang){
-    const translate = new AWS.Translate();
-        console.log("Getting registered custom terminologies")
-
-        var configuredTerminologies = await  translate.listTerminologies({}).promise()
-
-
-
-        console.log("terminology response " + JSON.stringify(configuredTerminologies))
-        var sources = configuredTerminologies["TerminologyPropertiesList"].filter(t => t["SourceLanguageCode"] == sourceLang).map(s => s.Name);
-        console.log("Filtered Sources " + JSON.stringify(sources))
-
-
-        return sources
-
-
-}
-
-async function get_translation(inputText, sourceLang, targetLang,req ) {
-    var customTerminologyEnabled = _.get(req._settings,"ENABLE_CUSTOM_TERMINOLOGY") == true;
-    console.log("get translation request " + JSON.stringify(inputText))
-    const params = {
-        SourceLanguageCode: sourceLang, /* required */
-        TargetLanguageCode: targetLang, /* required */
-        Text: inputText, /* required */
-    };
-    console.log("get_translation:", targetLang, "InputText: ", inputText);
-    if (targetLang === sourceLang) {
-        console.log("get_translation: source and target are the same, translation not required.");
-        return inputText;
-    }
-    if(customTerminologyEnabled){
-        var customTerminologies = await get_terminologies(sourceLang)
-        params["TerminologyNames"] = customTerminologies;
-    }
-
-    const translateClient = new AWS.Translate();
-    try {
-        console.log("Fullfilment params " + JSON.stringify(params))
-        const translation = await translateClient.translateText(params).promise();
-        return translation.TranslatedText;
-    } catch (err) {
-        console.log("warning - error during translation. Returning: " + inputText);
-        const res = {};
-        res.TranslatedText = inputText;
-        return res;
-    }
-}
-
-
 async function translate_res(req, res){
     const locale = _.get(req, 'session.userLocale');
     if (_.get(req._settings, 'ENABLE_MULTI_LANGUAGE_SUPPORT')){
         if (_.get(res,"message")) {
-            res.message = await get_translation(res.message,'en',locale,req); 
+            res.message = await translate.get_translation(res.message,'en',locale,req);
         }
         if (_.get(res,"plainMessage")) {
-            res.plainMessage = await get_translationt(res.plainMessage,'en',locale,req); 
+            res.plainMessage = await translate.get_translation(res.plainMessage,'en',locale,req);
         }
         if (_.get(res,"card")) {
-            res.card.title = await get_translation(res.card.title,'en',locale,req);
+            res.card.title = await translate.get_translation(res.card.title,'en',locale,req);
         }
         if (_.get(res,"card.buttons")) {
             res.card.buttons.forEach(async function (button) {
-                button.text = await get_translation(button.text,'en',locale,req);
+                button.text = await translate.get_translation(button.text,'en',locale,req);
                 //TODO Address multilanguage issues with translating button values for use in confirmation prompts
                 //Disable translate of button value
                 //button.value = await translate.translateText(button.value,'en',locale);
             });
-            res.plainMessage = await get_translation(res.plainMessage,'en',locale,req); 
+            res.plainMessage = await translate.get_translation(res.plainMessage,'en',locale,req);
         }
     }
     return res;

@@ -5,7 +5,7 @@ QnABot now supports Amazon Translate's [custom terminology](https://docs.aws.ama
 Using custom terminology with your translation requests enables you to make sure that your brand names, character names, model names, and other unique content is translated exactly the way you need it, regardless of its context and the Amazon Translate algorithm’s decision.
 
 
-First created a [comma separated file to import.](https://docs.aws.amazon.com/translate/latest/dg/creating-custom-terminology.html)
+First create a [comma separated file to import.](https://docs.aws.amazon.com/translate/latest/dg/creating-custom-terminology.html)
 
 en | fr | de | es | 
 ---|-----|---|----
