@@ -7,7 +7,7 @@ This repository contains code for the QnABot, described in the AWS AI blog post 
 
 See the "Getting Started" to launch your own QnABot
 
-**New features in 4.5.0** [Kendra Web Crawler, Comprehend PII Detection, Translate Custom Terminology, ](#new-features)
+**New features in 4.5.0** [Kendra Web Crawler, Comprehend PII Detection, Translate Custom Terminology](#new-features)
 
 **New features in 4.4.0** [Preview version of VPC Deployment Support, Preview version of BotRouter, Upgrade to ES 7.9, Slack client detection and Markdown Support](#new-features)
 
