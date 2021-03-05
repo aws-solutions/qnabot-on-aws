@@ -7,8 +7,8 @@ var default_settings = {
     ES_MINIMUM_SHOULD_MATCH: "2<75%", // Refer to https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-minimum-should-match.html for more information
     ES_NO_HITS_QUESTION: "no_hits", // The QID of the question when no answers could be found for a user's question
     ES_USE_FUZZY_MATCH: "false", // Refer to https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-fuzzy-query.html
-    ES_PHRASE_BOOST: "4", //TODO: Ask Bob
-    ES_SCORE_ANSWER_FIELD: "false",//TODO: Ask Bob
+    ES_PHRASE_BOOST: "4", 
+    ES_SCORE_ANSWER_FIELD: "false",
     ENABLE_SENTIMENT_SUPPORT: "true", //Determines whether to use Comprehend for sentiment analysis.  Refer to https://docs.aws.amazon.com/comprehend/latest/dg/how-sentiment.html 
     ENABLE_MULTI_LANGUAGE_SUPPORT: "false", //User can override and set to true to Enable Multilanguage support
     ENABLE_CUSTOM_TERMINOLOGY: "false",
@@ -18,6 +18,7 @@ var default_settings = {
     ALT_SEARCH_KENDRA_S3_SIGNED_URL_EXPIRE_SECS: 300, // Expiry time for signed URLs
     ALT_SEARCH_KENDRA_MAX_DOCUMENT_COUNT: 2, // limit number of document search results returned by Kendra fallback\
     ALT_SEARCH_KENDRA_TOP_ANSWER_MESSAGE: "Amazon Kendra suggested answer.",
+    ALT_SEARCH_KENDRA_FAQ: "Answer from Amazon Kendra FAQ.",
     ALT_SEARCH_KENDRA_ANSWER_MESSAGE: "While I did not find an exact answer, these search results from Amazon Kendra might be helpful.", //Message displayed when a search comes from Kemdra
     KENDRA_FAQ_INDEX: "", // Kendra Index specific for FAQ for if Kendra FAQ sync is enabled
     KENDRA_FAQ_CONFIG_MAX_RETRIES: 8,    //User can override number of max retries in AWS SDK configurations
