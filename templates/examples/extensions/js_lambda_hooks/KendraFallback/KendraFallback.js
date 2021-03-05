@@ -1,4 +1,5 @@
 var _ = require('lodash');
+var translate = require("./translate");
 var linkify = require('linkifyjs');
 
 /**
@@ -340,7 +341,6 @@ async function routeKendraRequest(event, context) {
                     
                     // Convert S3 Object URLs to signed URLs
                     answerDocumentUris.add(element);
-
                     kendraQueryId = res.QueryId; // store off the QueryId to use as a session attribute for feedback
                     kendraIndexId = res.originalKendraIndexId; // store off the Kendra IndexId to use as a session attribute for feedback
                     kendraResultId = element.Id; // store off resultId to use as a session attribute for feedback
@@ -414,9 +414,12 @@ async function routeKendraRequest(event, context) {
     });
 
     // update QnABot answer content for ssml, markdown, and text
+    let ssmlMessage = ""
     if (foundAnswerCount > 0 || foundDocumentCount > 0) {
         event.res.session.qnabot_gotanswer = true ; 
         event.res.message = answerMessage;
+        event.res.card = [];
+
         let ssmlMessage = `${answerMessage.substring(0,600).replace(/\r?\n|\r/g, " ")}`;
         if (speechMessage != "") {
             ssmlMessage = `${speechMessage.substring(0,600).replace(/\r?\n|\r/g, " ")}`;
@@ -437,21 +440,20 @@ async function routeKendraRequest(event, context) {
         }
     }
     if (answerDocumentUris.size > 0) {
-        event.res.session.appContext.altMessages.markdown += `\n\n ${helpfulLinksMsg}: `;
-        answerDocumentUris.forEach(function (element) {
-            let label = docName(element) ;
-            // Convert S3 Object URLs to signed URLs
-            if (signS3Urls) {
-                element = signS3URL(element, expireSeconds)
-            }
-            event.res.session.appContext.altMessages.markdown += `[${label}](${element})`;
-        });
+      event.res.session.appContext.altMessages.markdown += `\n\n ${helpfulLinksMsg}: `;
+      answerDocumentUris.forEach(function(element) {
+        // Convert S3 Object URLs to signed URLs
+        if (signS3Urls) {
+          element.DocumentURI = signS3URL(element.DocumentURI, expireSeconds);
+        }
+        event.res.session.appContext.altMessages.markdown += `<span translate=no>[${element.DocumentTitle.Text}](${element.DocumentURI})</span>`;
+      });
     }
     
-    let idx=0;
+    let idx=foundAnswerCount;
     if (seenTop == false){
         helpfulDocumentsUris.forEach(function (element) {
-            if (idx++ < maxDocumentCount-1) {
+            if (idx++ < maxDocumentCount) {
                 event.res.session.appContext.altMessages.markdown += `\n\n`;
                 event.res.session.appContext.altMessages.markdown += `***`;
                 event.res.session.appContext.altMessages.markdown += `\n\n <br>`;
@@ -460,12 +462,12 @@ async function routeKendraRequest(event, context) {
                     event.res.session.appContext.altMessages.markdown += `\n\n  ${element.text}`;
                     event.res.message += `\n\n  ${element.text}`;
                 }
-                let label = docName(element.uri) ;
+                let label = element.Title ;
                 // Convert S3 Object URLs to signed URLs
                 if (signS3Urls) {
                     element.uri = signS3URL(element.uri, expireSeconds)
                 }
-                event.res.session.appContext.altMessages.markdown += `\n\n  ${helpfulLinksMsg}: [${label}](${element.uri})`;
+                event.res.session.appContext.altMessages.markdown += `\n\n  ${helpfulLinksMsg}: <span translate=no>[${label}](${element.uri})</span>`;
             }
         });
     }
