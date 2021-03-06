@@ -1,6 +1,8 @@
 ## [4.5.0]
 - Added single click deployment support for four additional regions
 - Changed unencrypted Amazon Elasticsearch instance types to be t3.medium.elasticsearch
+- Changed default number of nodes for Amazon Elasticsearch cluster to 4 for better production level
+  cluster performance and resiliency. This can be changed to 2 for development clusters if desired.
 - Added Personal Identifiable Information detection support using Amazon Comprehend - [readme](./docs/PII_Detection/README.md)
 - Added web indexing support using Amazon Kendra  - [readme](./docs/kendra_crawler_guide/README.md)
 - Added Amazon Translate custom terminology support - [readme](./docs/custom_terminology_guide/README.md)
