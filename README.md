@@ -9,9 +9,10 @@ See the "Getting Started" to launch your own QnABot
 
 4.5.0 provides a number of new features described below. Several to call attention to are the following:
 
-- To improve performance and resiliency, the default Elasticsearch cluster instance type when unencrypted is now 
-  t3.medium.elasticsearch and the default number of nodes in a new cluster is now 4. For encrypted nodes, the instance
-  type remains c5.large.elasticsearch. The number of cluster nodes can be reduced to 2 for development environments
+- To improve performance, resiliency, and security, the Elasticsearch cluster will default to using ENCRYPTED nodes 
+  using the c5.large.elasticsearch instance type. If UNENCRYPTED is selected, the 
+  t3.small.elasticsearch instance types will be used. The default number of nodes in a new cluster is now 4 for improved
+  resiliency. The number of cluster nodes can be reduced to 2 for development environments
   if desired. 
   
 - QnABot distribution regions now available for one click deployment have increased to 8 regions. These are Northern 
@@ -180,7 +181,7 @@ See the [LICENSE.md](LICENSE.md) file for details
 
 ### Version 4.5.0
 - Added single click deployment support for four additional regions
-- Changed unencrypted Amazon Elasticsearch instance types to be t3.medium.elasticsearch  
+- Changed unencrypted Amazon Elasticsearch instance types to be t3.small.elasticsearch  
 - Changed default number of nodes for Amazon Elasticsearch cluster to 4 for better production level 
   cluster performance and resiliency. This can be changed to 2 for development clusters if desired. 
 - Added Personal Identifiable Information detection support using Amazon Comprehend - [readme](./docs/PII_Detection/README.md)
