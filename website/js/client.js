@@ -40,7 +40,8 @@ var config = {
     shouldDisplayResponseCardTitle:false,
     positiveFeedbackIntent: "Thumbs up",
     negativeFeedbackIntent: "Thumbs down",
-    helpIntent: "Help"
+    helpIntent: "Help",
+    messageMenu: true
   },
   recorder:{}
 }

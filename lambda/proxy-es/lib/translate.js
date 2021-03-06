@@ -1,27 +1,17 @@
 const _ = require('lodash');
 const AWS = require('aws-sdk');
 
-
-async function get_terminologies(sourceLang){
+async function get_terminologies(sourceLang) {
     const translate = new AWS.Translate();
-        console.log("Getting registered custom terminologies")
-
-        var configuredTerminologies = await  translate.listTerminologies({}).promise()
-
-
-
-        console.log("terminology response " + JSON.stringify(configuredTerminologies))
-        var sources = configuredTerminologies["TerminologyPropertiesList"].filter(t => t["SourceLanguageCode"] == sourceLang).map(s => s.Name);
-        console.log("Filtered Sources " + JSON.stringify(sources))
-
-
-        return sources
-
-
+    console.log("Getting registered custom terminologies");
+    const configuredTerminologies = await translate.listTerminologies({}).promise();
+    console.log("terminology response " + JSON.stringify(configuredTerminologies));
+    const sources = configuredTerminologies["TerminologyPropertiesList"].filter(t => t["SourceLanguageCode"] == sourceLang).map(s => s.Name);
+    console.log("Filtered Sources " + JSON.stringify(sources));
+    return sources;
 }
 
-async function get_translation(englishText, targetLang,req){
-
+async function get_translation(englishText, targetLang, req) {
     console.log("get_translation:", targetLang, "InputText: ", englishText);
     if (targetLang === 'en') {
         console.log("get_translation: target is en, translation not required. Return english text");
@@ -30,7 +20,7 @@ async function get_translation(englishText, targetLang,req){
 
     const translateClient = new AWS.Translate();
     try {
-        var customTerminologyEnabled = _.get(req._settings,"ENABLE_CUSTOM_TERMINOLOGY") == true;
+        var customTerminologyEnabled = _.get(req._settings, "ENABLE_CUSTOM_TERMINOLOGY") == true;
         console.log("get translation request " + JSON.stringify(req))
 
         const params = {
@@ -38,11 +28,11 @@ async function get_translation(englishText, targetLang,req){
             TargetLanguageCode: targetLang, /* required */
             Text: englishText, /* required */
         };
-        if(customTerminologyEnabled){
+        if (customTerminologyEnabled) {
             var customTerminologies = await get_terminologies("en")
             params["TerminologyNames"] = customTerminologies;
         }
-    
+
         console.log("input text:", englishText);
         const translation = await translateClient.translateText(params).promise();
         console.log("translation:", translation);

@@ -11,29 +11,19 @@ async function get_userLanguages(inputText) {
     return languages;
 }
 
-async function get_terminologies(sourceLang){
+async function get_terminologies(sourceLang) {
     const translate = new AWS.Translate();
-        console.log("Getting registered custom terminologies")
-
-        var configuredTerminologies = await  translate.listTerminologies({}).promise()
-
-
-
-        console.log("terminology response " + JSON.stringify(configuredTerminologies))
-        var sources = configuredTerminologies["TerminologyPropertiesList"].filter(t => t["SourceLanguageCode"] == sourceLang).map(s => s.Name);
-        console.log("Filtered Sources " + JSON.stringify(sources))
-
-
-        return sources
-
-
+    console.log("Getting registered custom terminologies");
+    const configuredTerminologies = await translate.listTerminologies({}).promise();
+    console.log("terminology response " + JSON.stringify(configuredTerminologies));
+    const sources = configuredTerminologies["TerminologyPropertiesList"].filter(t => t["SourceLanguageCode"] == sourceLang).map(s => s.Name);
+    console.log("Filtered Sources " + JSON.stringify(sources));
+    return sources;
 }
 
-async function get_translation(inputText, sourceLang, targetLang,req ) {
-    var customTerminologyEnabled = _.get(req._settings,"ENABLE_CUSTOM_TERMINOLOGY") == true;
-    console.log("get translation request " + JSON.stringify(inputText))
-
-
+async function get_translation(inputText, sourceLang, targetLang, req) {
+    const customTerminologyEnabled = _.get(req._settings, "ENABLE_CUSTOM_TERMINOLOGY") == true;
+    console.log("get translation request " + JSON.stringify(inputText));
     const params = {
         SourceLanguageCode: sourceLang, /* required */
         TargetLanguageCode: targetLang, /* required */
@@ -44,22 +34,17 @@ async function get_translation(inputText, sourceLang, targetLang,req ) {
         console.log("get_translation: source and target are the same, translation not required." + inputText);
         return inputText;
     }
-    if(customTerminologyEnabled){
-
-
-        console.log("Custom terminology enabled")
-        var customTerminologies = await get_terminologies(sourceLang)
-
-        console.log("Using custom terminologies " + JSON.stringify(customTerminologies))
+    if (customTerminologyEnabled) {
+        console.log("Custom terminology enabled");
+        const customTerminologies = await get_terminologies(sourceLang);
+        console.log("Using custom terminologies " + JSON.stringify(customTerminologies));
         params["TerminologyNames"] = customTerminologies;
-
     }
-
     const translateClient = new AWS.Translate();
     try {
-        console.log("Fullfilment params " + JSON.stringify(params))
+        console.log("Fulfillment params " + JSON.stringify(params));
         const translation = await translateClient.translateText(params).promise();
-        console.log("Translation response " + JSON.stringify(translation))
+        console.log("Translation response " + JSON.stringify(translation));
         return translation.TranslatedText;
     } catch (err) {
         console.log("warning - error during translation. Returning: " + inputText);
@@ -166,4 +151,6 @@ exports.translateText = async function (inputText, sourceLang, targetLang,req) {
     const res = await get_translation(inputText, sourceLang, targetLang,req);
     return res.TranslatedText;
 }
+
+exports.get_translation = get_translation;
 

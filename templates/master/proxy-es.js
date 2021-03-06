@@ -290,39 +290,45 @@ module.exports={
           		}]
           	}
           },
-          {
-            "PolicyName": "LambdaInvokePolicy",
-            "PolicyDocument": {
-                "Version": "2012-10-17",
-                "Statement": [{
+          { 
+            "PolicyName" : "S3QNABucketReadAccess",
+            "PolicyDocument" : {
+            "Version": "2012-10-17",
+              "Statement": [
+                {
                     "Effect": "Allow",
-                    "Action": ["lambda:InvokeFunction"],
+                    "Action": [
+                        "s3:GetObject"
+                     ],   
                     "Resource": [
-                        "arn:aws:lambda:*:*:function:qna*",
-                        "arn:aws:lambda:*:*:function:QNA*"
+                        "arn:aws:s3:::QNA*/*",
+                        "arn:aws:s3:::qna*/*"
                     ]
-                }]
+                }
+              ]
             }
-          },
-        { 
-          "PolicyName" : "S3QNABucketReadAccess",
-          "PolicyDocument" : {
-          "Version": "2012-10-17",
-            "Statement": [
-              {
-                  "Effect": "Allow",
-                  "Action": [
-                      "s3:GetObject"
-                   ],   
-                  "Resource": [
-                      "arn:aws:s3:::QNA*/*",
-                      "arn:aws:s3:::qna*/*"
-                  ]
-              }
-            ]
           }
-        }
         ]
+      }
+    },
+    "QueryLambdaInvokePolicy": {
+      "Type": "AWS::IAM::ManagedPolicy",
+      "Properties": {
+          "PolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [{
+                  "Effect": "Allow",
+                  "Action": ["lambda:InvokeFunction"],
+                  "Resource": [
+                      "arn:aws:lambda:*:*:function:qna*",
+                      "arn:aws:lambda:*:*:function:QNA*"
+                  ].concat(require('../examples/outputs').names
+                    .map(x => {
+                      return { "Fn::GetAtt": ["ExamplesStack", `Outputs.${x}`] };
+                    }))
+              }]
+          },
+        "Roles": [{ "Ref": "ESProxyLambdaRole" }]
       }
     },
     "ESLoggingLambdaRole": {

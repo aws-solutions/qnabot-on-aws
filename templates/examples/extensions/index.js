@@ -163,7 +163,7 @@ module.exports=Object.assign(
                       "lex:PostText"
                    ],   
                   "Resource": [
-                      {"Fn::Join": ["",["arn:aws:s3:::qnabot-kendra/*",{ "Ref" : "AWS::Region" },":",{ "Ref" : "AWS::AccountId" },":bot:*",":qna*"]]},
+                      {"Fn::Join": ["",["arn:aws:lex:",{ "Ref" : "AWS::Region" },":",{ "Ref" : "AWS::AccountId" },":bot:*",":qna*"]]},
                       {"Fn::Join": ["",["arn:aws:lex:",{ "Ref" : "AWS::Region" },":",{ "Ref" : "AWS::AccountId" },":bot:*",":QNA*"]]},
                   ]
               }
