@@ -137,7 +137,7 @@ module.exports={
     },
     "Encryption":{
         "Type":"String",
-        "Description":"Choose whether resources (S3 and ElasticSearch) are encrypted at rest. Selecting encrypted configuration will provision c5.large.elasticsearch instances - see https://aws.amazon.com/elasticsearch-service/pricing/.",
+        "Description":"Enables encryption at rest for S3 and ElasticSearch, and provisions c5.large.elasticsearch instances - recommended for production deployments. Selecting the unencryptped configuration provisions lower cost t3.small.elasticsearch instances. See https://aws.amazon.com/elasticsearch-service/pricing/.",
         "AllowedValues": ["ENCRYPTED", "UNENCRYPTED"],
         "Default":"ENCRYPTED",
         "ConstraintDescription":"Allowed Values are UNENCRYPTED or ENCRYPTED"
