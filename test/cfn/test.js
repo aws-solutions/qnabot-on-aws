@@ -320,7 +320,7 @@ function lambda(name){
         "Handler": "index."+name,
         "MemorySize": "128",
         "Role": {"Fn::GetAtt": ["LambdaRole","Arn"]},
-        "Runtime": "nodejs10.x",
+        "Runtime": "nodejs12.x",
         "Timeout": 300
       }
     }
