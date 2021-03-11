@@ -192,6 +192,7 @@ See the [LICENSE.md](LICENSE.md) file for details
 - Added support to defining user specified custom settings
 - Lambdahook responses can now be used with document chaining and are translated when multi-language support is enabled
 - Improved support when contractions are used in utterances  
+- Kendra Fallback message prefixes are now configurable in QnABot settings
 - Fixed bugs and defects
 
 ### Version 4.4.0

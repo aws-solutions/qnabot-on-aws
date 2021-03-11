@@ -11,6 +11,7 @@
 - Added support to defining user specified custom settings
 - Lambdahook responses can now be used with document chaining and are translated when multi-language support is enabled
 - Improved support when contractions are used in utterances
+- Kendra Fallback message prefixes are now configurable in QnABot settings.
 - Fixed bugs and defects
 ## [4.4.1]
 - Fix for Designer UI from breaking change in highlight.js due to dependabot alert / change.

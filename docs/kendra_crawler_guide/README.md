@@ -11,11 +11,12 @@ Go to the Settings option in the Tools menu
 
 ![](./settings.png)
 
-1. Enable the indexer by setting _ENABLE_WEB_INDEXER_ to true
-1. Tel QnABot which Kendra index to use by adding your Kendra IndexId to the setting _KENDRA_WEB_PAGE_INDEX_
+1. Enable the indexer by setting _ENABLE_WEB_PAGE_INDEXER_ to true
 1. Tell QnABot which web pages to index by specifying a comma separated list of addreses in _KENDRA_INDEXER_URLS_
-1. The indexer can be optionally configured to run on a schedule by setting the _KENDRA_INDEXER_SCHEDULER_
+1. The indexer can be optionally configured to run on a schedule by setting the _KENDRA_INDEXER_SCHEDULE_
    It supports standard [CloudWatch Events rate syntax](https://docs.aws.amazon.com/AmazonCloudWatch/latest/events/ScheduledEvents.html#RateExpressions)
+1. Tell QnABot which Kendra index to use by adding your Kendra IndexId to the setting _KENDRA_WEB_PAGE_INDEX_
+
 
 After you save your settings, go back to the Tools Menu and then choose **Kendra Web Page Indexing**
 
