@@ -325,6 +325,7 @@ async function routeKendraRequest(event, context) {
                             answerMessage = topAnswerMessage + highlight + '.';
                             answerMessageMd = topAnswerMessageMd;
                             answerTextMd = addMarkdownHighlights(answerTextMd, elem.BeginOffset+offset, elem.EndOffset+offset, true) ;
+                            break;
                         } else {
                             answerTextMd = addMarkdownHighlights(answerTextMd, elem.BeginOffset+offset, elem.EndOffset+offset, false) ;
                         }
@@ -541,4 +542,209 @@ exports.handler = async (event, context) => {
 };
 
 
+(async function main () {
+    var event ={
+        "req": {
+            "_event": {
+                "messageVersion": "1.0",
+                "invocationSource": "FulfillmentCodeHook",
+                "userId": "us-east-1:a7e65a66-4bc7-47a5-8174-54ec000acb0b",
+                "sessionAttributes": {},
+                "requestAttributes": null,
+                "bot": {
+                    "name": "qna_ridlt_dev_dev_master_onethree_Bmyxnk",
+                    "alias": "live",
+                    "version": "1"
+                },
+                "outputDialogMode": "Text",
+                "currentIntent": {
+                    "name": "fulfilment_IntentoKjYytvNaU",
+                    "slots": {
+                        "slot": "what is an utterance"
+                    },
+                    "slotDetails": {
+                        "slot": {
+                            "resolutions": [],
+                            "originalValue": "what is an utterance"
+                        }
+                    },
+                    "confirmationStatus": "None",
+                    "nluIntentConfidenceScore": null
+                },
+                "alternativeIntents": [],
+                "inputTranscript": "what is an utterance",
+                "recentIntentSummaryView": null,
+                "sentimentResponse": null,
+                "kendraResponse": null,
+                "origQuestion": "what is an utterance",
+                "errorFound": false
+            },
+            "_settings": {
+                "ENABLE_DEBUG_RESPONSES": false,
+                "ES_USE_KEYWORD_FILTERS": true,
+                "ES_EXPAND_CONTRACTIONS": "{\"you're\":\"you are\",\"I'm\":\"I am\",\"can't\":\"cannot\"}",
+                "ES_KEYWORD_SYNTAX_TYPES": "NOUN,PROPN,VERB,INTJ",
+                "ES_SYNTAX_CONFIDENCE_LIMIT": ".20",
+                "ES_MINIMUM_SHOULD_MATCH": "2<75%",
+                "ES_NO_HITS_QUESTION": "no_hits",
+                "ES_USE_FUZZY_MATCH": false,
+                "ES_PHRASE_BOOST": "4",
+                "ES_SCORE_ANSWER_FIELD": false,
+                "ENABLE_SENTIMENT_SUPPORT": true,
+                "ENABLE_MULTI_LANGUAGE_SUPPORT": true,
+                "ENABLE_CUSTOM_TERMINOLOGY": true,
+                "MINIMUM_CONFIDENCE_SCORE": 0.6,
+                "ALT_SEARCH_KENDRA_INDEXES": "027cf3bb-1deb-46af-8c8c-8242e649a90e",
+                "ALT_SEARCH_KENDRA_S3_SIGNED_URLS": true,
+                "ALT_SEARCH_KENDRA_S3_SIGNED_URL_EXPIRE_SECS": 300,
+                "ALT_SEARCH_KENDRA_MAX_DOCUMENT_COUNT": 2,
+                "ALT_SEARCH_KENDRA_TOP_ANSWER_MESSAGE": "Amazon Kendra suggested answer.",
+                "ALT_SEARCH_KENDRA_FAQ": "Answer from Amazon Kendra FAQ.",
+                "ALT_SEARCH_KENDRA_ANSWER_MESSAGE": "While I did not find an exact answer, these search results from Amazon Kendra might be helpful.",
+                "KENDRA_FAQ_INDEX": "2c96386a-788e-419f-af2a-0721c148b849",
+                "KENDRA_FAQ_CONFIG_MAX_RETRIES": 8,
+                "KENDRA_FAQ_CONFIG_RETRY_DELAY": 600,
+                "KENDRA_FAQ_ES_FALLBACK": true,
+                "ENABLE_KENDRA_WEB_INDEXER": true,
+                "KENDRA_INDEXER_URLS": "https://aws.amazon.com/lex/faqs/",
+                "KENDRA_INDEXER_SCHEDULE": "rate(1 day)",
+                "KENDRA_WEB_PAGE_INDEX": "2c96386a-788e-419f-af2a-0721c148b849",
+                "ERRORMESSAGE": "Unfortunately I encountered an error when searching for your answer. Please ask me again later.",
+                "EMPTYMESSAGE": "You stumped me! Sadly I don't know how to answer your question.",
+                "DEFAULT_ALEXA_LAUNCH_MESSAGE": "Hello, Please ask a question",
+                "DEFAULT_ALEXA_REPROMPT": "Please either answer the question, ask another question or say Goodbye to end the conversation.",
+                "DEFAULT_ALEXA_STOP_MESSAGE": "Goodbye",
+                "SMS_HINT_REMINDER_ENABLE": true,
+                "SMS_HINT_REMINDER": " (Feedback? Reply THUMBS UP or THUMBS DOWN. Ask HELP ME at any time)",
+                "SMS_HINT_REMINDER_INTERVAL_HRS": "24",
+                "IDENTITY_PROVIDER_JWKS_URLS": [],
+                "ENFORCE_VERIFIED_IDENTITY": false,
+                "NO_VERIFIED_IDENTITY_QUESTION": "no_verified_identity",
+                "ELICIT_RESPONSE_MAX_RETRIES": 3,
+                "ELICIT_RESPONSE_RETRY_MESSAGE": "Please try again?",
+                "ELICIT_RESPONSE_BOT_FAILURE_MESSAGE": "Your response was not understood. Please start again.",
+                "ELICIT_RESPONSE_DEFAULT_MSG": "Ok. ",
+                "CONNECT_IGNORE_WORDS": "",
+                "CONNECT_ENABLE_VOICE_RESPONSE_INTERRUPT": false,
+                "CONNECT_NEXT_PROMPT_VARNAME": "connect_nextPrompt",
+                "ENABLE_REDACTING": false,
+                "REDACTING_REGEX": "\\b\\d{4}\\b(?![-])|\\b\\d{9}\\b|\\b\\d{3}-\\d{2}-\\d{4}\\b",
+                "PII_REJECTION_ENABLED": false,
+                "PII_REJECTION_QUESTION": "pii_rejection_question",
+                "PII_REJECTION_WITH_COMPREHEND": true,
+                "PII_REJECTION_REGEX": "\\b\\d{4}\\b(?![-])|\\b\\d{9}\\b|\\b\\d{3}-\\d{2}-\\d{4}\\b",
+                "PII_REJECTION_IGNORE_TYPES": "Name,Address",
+                "DISABLE_CLOUDWATCH_LOGGING": false,
+                "MINIMAL_ES_LOGGING": false,
+                "S3_PUT_REQUEST_ENCRYPTION": "",
+                "BOT_ROUTER_WELCOME_BACK_MSG": "Welcome back to QnABot.",
+                "BOT_ROUTER_EXIT_MSGS": "exit,quit,goodbye,leave",
+                "RUN_LAMBDAHOOK_FROM_QUERY_STEP": true,
+                "DEFAULT_USER_POOL_JWKS_URL": "https://cognito-idp.us-east-1.amazonaws.com/us-east-1_pRTw95UsN/.well-known/jwks.json"
+            },
+            "_type": "LEX",
+            "_userId": "us-east-1:a7e65a66-4bc7-47a5-8174-54ec000acb0b",
+            "question": "what is an utterance",
+            "session": {
+                "userDetectedLocale": "en",
+                "userDetectedLocaleConfidence": 0.9890420436859131,
+                "userLocale": "en",
+                "qnabotcontext": {}
+            },
+            "_preferredResponseType": "PlainText",
+            "_clientType": "LEX.LexWebUI.Text",
+            "sentiment": "NEUTRAL",
+            "sentimentScore": {
+                "Positive": 0.010289929807186127,
+                "Negative": 0.46855083107948303,
+                "Neutral": 0.5183795094490051,
+                "Mixed": 0.0027797415386885405
+            },
+            "_userInfo": {
+                "UserId": "us-east-1:a7e65a66-4bc7-47a5-8174-54ec000acb0b",
+                "InteractionCount": 1,
+                "isVerifiedIdentity": "false",
+                "TimeSinceLastInteraction": 1615518085.551
+            },
+            "_info": {
+                "es": {
+                    "address": "search-qna-rid-elasti-1jjw1wmigbqys-udigehwa6s7e3mqdg7hth5j4bi.us-east-1.es.amazonaws.com",
+                    "index": "qna-ridlt-dev-dev-master-13",
+                    "type": "qna",
+                    "service": {
+                        "qid": "qna-ridlt-dev-dev-master-13-ESQidLambda-1XHFQJFT8JO90",
+                        "proxy": "qna-ridlt-dev-dev-master-13-ESProxyLambda-1ATRB63WYGBO4"
+                    }
+                }
+            }
+        },
+        "res": {
+            "type": "PlainText",
+            "message": "The Kendra Fallback search was not able to identify any results",
+            "session": {
+                "userDetectedLocale": "en",
+                "userDetectedLocaleConfidence": 0.9890420436859131,
+                "userLocale": "en",
+                "qnabotcontext": {
+                    "previous": {
+                        "qid": "KendraFallback",
+                        "q": "what is an utterance"
+                    },
+                    "navigation": {
+                        "next": "",
+                        "previous": [],
+                        "hasParent": true
+                    }
+                },
+                "appContext": {
+                    "altMessages": {}
+                },
+                "qnabot_qid": "KendraFallback",
+                "qnabot_gotanswer": false
+            },
+            "card": {
+                "send": false,
+                "title": "",
+                "text": "",
+                "url": ""
+            },
+            "_userInfo": {
+                "UserId": "us-east-1:a7e65a66-4bc7-47a5-8174-54ec000acb0b",
+                "InteractionCount": 2,
+                "isVerifiedIdentity": "false",
+                "TimeSinceLastInteraction": 1615518085.551,
+                "FirstSeen": "Fri Mar 12 2021 15:01:25 GMT+0000 (Coordinated Universal Time)",
+                "LastSeen": "Fri Mar 12 2021 15:01:25 GMT+0000 (Coordinated Universal Time)"
+            },
+            "got_hits": 0,
+            "result": {
+                "qid": "KendraFallback",
+                "quniqueterms": " no_hits  ",
+                "questions": [
+                    {
+                        "q": "no_hits"
+                    }
+                ],
+                "a": "The Kendra Fallback search was not able to identify any results",
+                "l": "QNA:EXTKendraFallback",
+                "type": "qna",
+                "answersource": "ElasticSearch",
+                "autotranslate": {
+                    "a": true,
+                    "rp": true
+                },
+                "rp": "Please either answer the question, ask another question or say Goodbye to end the conversation."
+            },
+            "plainMessage": "The Kendra Fallback search was not able to identify any results",
+            "answerSource": "ELASTICSEARCH",
+            "reprompt": {
+                "type": "PlainText",
+                "text": "Please either answer the question, ask another question or say Goodbye to end the conversation."
+            }
+        }
+    }
+    
+    var result = await routeKendraRequest(event);
+    return 
 
+  })()
