@@ -1,3 +1,7 @@
+## [4.5.1]
+- Fix for incorrect Thumbs Up / Thumbs Down processing in 4.5.0.
+- Fix for multi-language support when manually switching languages in 4.5.0.
+- Improve formatting of markdown responses from Kendra ANSWER responses.
 ## [4.5.0]
 - Added single click deployment support for four additional regions
 - Changed unencrypted Amazon Elasticsearch instance types to be t3.small.elasticsearch
