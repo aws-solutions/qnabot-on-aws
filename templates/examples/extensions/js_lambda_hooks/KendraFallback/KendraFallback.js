@@ -325,6 +325,7 @@ async function routeKendraRequest(event, context) {
                             answerMessage = topAnswerMessage + highlight + '.';
                             answerMessageMd = topAnswerMessageMd;
                             answerTextMd = addMarkdownHighlights(answerTextMd, elem.BeginOffset+offset, elem.EndOffset+offset, true) ;
+                            break;
                         } else {
                             answerTextMd = addMarkdownHighlights(answerTextMd, elem.BeginOffset+offset, elem.EndOffset+offset, false) ;
                         }
@@ -539,6 +540,5 @@ exports.handler = async (event, context) => {
     console.log('context: ' + JSON.stringify(context, null, 2));
     return routeKendraRequest(event, context);
 };
-
 
 
