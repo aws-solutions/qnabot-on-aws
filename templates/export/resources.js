@@ -1,185 +1,185 @@
-var fs=require('fs')
-var _=require('lodash')
+var fs = require('fs')
+var _ = require('lodash')
 
-var files=fs.readdirSync(`${__dirname}`)
-    .filter(x=>!x.match(/README.md|Makefile|index|test|outputs|.DS_Store/))
-    .map(x=>require(`./${x}`))
+var files = fs.readdirSync(`${__dirname}`)
+  .filter(x => !x.match(/README.md|Makefile|index|test|outputs|.DS_Store/))
+  .map(x => require(`./${x}`))
 
-module.exports=Object.assign(
-    {
-    "ExportCodeVersion":{
-        "Type": "Custom::S3Version",
-        "Properties": {
-            "ServiceToken": { "Ref" : "CFNLambda" },
-            "Bucket": {"Ref":"BootstrapBucket"},
-            "Key": {"Fn::Sub":"${BootstrapPrefix}/lambda/export.zip"},
-            "BuildDate":(new Date()).toISOString()
-        }
+module.exports = Object.assign(
+  {
+    "ExportCodeVersion": {
+      "Type": "Custom::S3Version",
+      "Properties": {
+        "ServiceToken": {"Ref": "CFNLambda"},
+        "Bucket": {"Ref": "BootstrapBucket"},
+        "Key": {"Fn::Sub": "${BootstrapPrefix}/lambda/export.zip"},
+        "BuildDate": (new Date()).toISOString()
+      }
     },
-    "ConnectCodeVersion":{
-          "Type": "Custom::S3Version",
-          "Properties": {
-              "ServiceToken": { "Ref" : "CFNLambda" },
-              "Bucket": {"Ref":"BootstrapBucket"},
-              "Key": {"Fn::Sub":"${BootstrapPrefix}/lambda/connect.zip"},
-              "BuildDate":(new Date()).toISOString()
-          }
-      },
-      "ConnectLambda": {
-        "Type": "AWS::Lambda::Function",
-        "Properties": {
-          "Code": {
-              "S3Bucket": {"Ref":"BootstrapBucket"},
-              "S3Key": {"Fn::Sub":"${BootstrapPrefix}/lambda/connect.zip"},
-              "S3ObjectVersion":{"Ref":"ConnectCodeVersion"}
-          },
-          "Environment": {
-              "Variables": {
-                fallBackIntent:{"Ref":"FallbackIntent"},
-                intent:{"Ref":"Intent"},
-                lexBot:{"Ref":"BotName"},
-                outputBucket:{"Ref":"ExportBucket"},
-                s3Prefix:"connect/"
-              }
-          },
-          "Handler": "index.handler",
-          "MemorySize": "1024",
-          "Role": {"Fn::GetAtt": ["ExportRole","Arn"]},
-          "Runtime": "nodejs10.x",
-          "Timeout": 300,
-          "VpcConfig" : {
-              "Fn::If": [ "VPCEnabled", {
-                  "SubnetIds": { "Fn::Split" : [ ",", {"Ref": "VPCSubnetIdList"} ] },
-                  "SecurityGroupIds": { "Fn::Split" : [ ",", {"Ref": "VPCSecurityGroupIdList"} ] },
-              }, {"Ref" : "AWS::NoValue"} ]
-          },
-          "TracingConfig" : {
-              "Fn::If": [ "XRAYEnabled", {"Mode": "Active"}, {"Ref" : "AWS::NoValue"} ]
-          },
-          "Tags":[{
-              Key:"Type",
-              Value:"Export"
-          }]
-        }
-      },
-      "ConnectApiResource": {
-        "Type": "AWS::ApiGateway::Resource",
-        "Properties": {
-          "ParentId": {"Ref": "ApiRootResourceId"},
-          "PathPart": "connect",
-          "RestApiId": {"Ref": "Api"}
-        }
-      },
-      "InvokePermissionConnectLambda": {
-        "Type": "AWS::Lambda::Permission",
-        "Properties": {
-          "Action": "lambda:InvokeFunction",
-          "FunctionName": {"Fn::GetAtt": ["ConnectLambda", "Arn"]},
-          "Principal": "apigateway.amazonaws.com"
-        }
-      },
-      Deployment: {
-        Type: "Custom::ApiDeployment",
-        DeletionPolicy: "Retain",
-        DependsOn: [
-          "ConnectGet",
-          "ConnectApiResource",
-          "InvokePermissionConnectLambda",
-          "TranslatePost",
-          "TranslateApiResource",
-          "TranslateApiRootResource",
-          "KendraCrawlerPost",
-          "KendraCrawlerApiResource",
-          "KendraCrawlerStatusRootApiResource",
-          "InvokePermissionTranslateLambda",
-            "KendraCrawlerStatusGet"
-        ],
-        Properties: {
-          ServiceToken: { Ref: "CFNLambda" },
-          restApiId: { Ref: "Api" },
-          buildDate: new Date(),
-          stage: "prod",
-          ApiDeploymentId: { Ref: "ApiDeploymentId" },
-          Encryption: { Ref: "Encryption" },
+    "ConnectCodeVersion": {
+      "Type": "Custom::S3Version",
+      "Properties": {
+        "ServiceToken": {"Ref": "CFNLambda"},
+        "Bucket": {"Ref": "BootstrapBucket"},
+        "Key": {"Fn::Sub": "${BootstrapPrefix}/lambda/connect.zip"},
+        "BuildDate": (new Date()).toISOString()
+      }
+    },
+    "ConnectLambda": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Code": {
+          "S3Bucket": {"Ref": "BootstrapBucket"},
+          "S3Key": {"Fn::Sub": "${BootstrapPrefix}/lambda/connect.zip"},
+          "S3ObjectVersion": {"Ref": "ConnectCodeVersion"}
         },
+        "Environment": {
+          "Variables": {
+            fallBackIntent: {"Ref": "FallbackIntent"},
+            intent: {"Ref": "Intent"},
+            lexBot: {"Ref": "BotName"},
+            outputBucket: {"Ref": "ExportBucket"},
+            s3Prefix: "connect/"
+          }
+        },
+        "Handler": "index.handler",
+        "MemorySize": "1024",
+        "Role": {"Fn::GetAtt": ["ExportRole", "Arn"]},
+        "Runtime": "nodejs10.x",
+        "Timeout": 300,
+        "VpcConfig": {
+          "Fn::If": ["VPCEnabled", {
+            "SubnetIds": {"Fn::Split": [",", {"Ref": "VPCSubnetIdList"}]},
+            "SecurityGroupIds": {"Fn::Split": [",", {"Ref": "VPCSecurityGroupIdList"}]},
+          }, {"Ref": "AWS::NoValue"}]
+        },
+        "TracingConfig": {
+          "Fn::If": ["XRAYEnabled", {"Mode": "Active"}, {"Ref": "AWS::NoValue"}]
+        },
+        "Tags": [{
+          Key: "Type",
+          Value: "Export"
+        }]
+      }
+    },
+    "ConnectApiResource": {
+      "Type": "AWS::ApiGateway::Resource",
+      "Properties": {
+        "ParentId": {"Ref": "ApiRootResourceId"},
+        "PathPart": "connect",
+        "RestApiId": {"Ref": "Api"}
+      }
+    },
+    "InvokePermissionConnectLambda": {
+      "Type": "AWS::Lambda::Permission",
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "FunctionName": {"Fn::GetAtt": ["ConnectLambda", "Arn"]},
+        "Principal": "apigateway.amazonaws.com"
+      }
+    },
+    Deployment: {
+      Type: "Custom::ApiDeployment",
+      DeletionPolicy: "Retain",
+      DependsOn: [
+        "ConnectGet",
+        "ConnectApiResource",
+        "InvokePermissionConnectLambda",
+        "TranslatePost",
+        "TranslateApiResource",
+        "TranslateApiRootResource",
+        "KendraCrawlerPost",
+        "KendraCrawlerApiResource",
+        "KendraCrawlerStatusRootApiResource",
+        "InvokePermissionTranslateLambda",
+        "KendraCrawlerStatusGet"
+      ],
+      Properties: {
+        ServiceToken: {Ref: "CFNLambda"},
+        restApiId: {Ref: "Api"},
+        buildDate: new Date(),
+        stage: "prod",
+        ApiDeploymentId: {Ref: "ApiDeploymentId"},
+        Encryption: {Ref: "Encryption"},
       },
-      "ConnectGet": {
-        "Type": "AWS::ApiGateway::Method",
-        "Properties": {
-          "AuthorizationType": "AWS_IAM",
-          "HttpMethod": "GET",
-          "RestApiId": {"Ref": "Api"},
-          "ResourceId": {"Ref": "ConnectApiResource"},
-          "Integration": {
-            "Type": "AWS",
-            "IntegrationHttpMethod": "POST",
-            "Uri": {
-              "Fn::Join": [
-                "",
-                [
-                  "arn:aws:apigateway:",
-                  {"Ref": "AWS::Region"},
-                  ":lambda:path/2015-03-31/functions/",
-                  {"Fn::GetAtt": ["ConnectLambda", "Arn"]},
-                  "/invocations"
-                ]
+    },
+    "ConnectGet": {
+      "Type": "AWS::ApiGateway::Method",
+      "Properties": {
+        "AuthorizationType": "AWS_IAM",
+        "HttpMethod": "GET",
+        "RestApiId": {"Ref": "Api"},
+        "ResourceId": {"Ref": "ConnectApiResource"},
+        "Integration": {
+          "Type": "AWS",
+          "IntegrationHttpMethod": "POST",
+          "Uri": {
+            "Fn::Join": [
+              "",
+              [
+                "arn:aws:apigateway:",
+                {"Ref": "AWS::Region"},
+                ":lambda:path/2015-03-31/functions/",
+                {"Fn::GetAtt": ["ConnectLambda", "Arn"]},
+                "/invocations"
               ]
-            },
-            "IntegrationResponses": [
-               {
-                  "StatusCode": 200
-               }
             ]
-         },
-         "MethodResponses": [
+          },
+          "IntegrationResponses": [
             {
-               "StatusCode": 200
+              "StatusCode": 200
             }
-         ],
-        }
-      },
-    "SyncCodeVersion":{
-        "Type": "Custom::S3Version",
-        "Properties": {
-            "ServiceToken": { "Ref" : "CFNLambda" },
-            "Bucket": {"Ref":"BootstrapBucket"},
-            "Key": {"Fn::Sub":"${BootstrapPrefix}/lambda/export.zip"},
-            "BuildDate":(new Date()).toISOString()
-        }
+          ]
+        },
+        "MethodResponses": [
+          {
+            "StatusCode": 200
+          }
+        ],
+      }
+    },
+    "SyncCodeVersion": {
+      "Type": "Custom::S3Version",
+      "Properties": {
+        "ServiceToken": {"Ref": "CFNLambda"},
+        "Bucket": {"Ref": "BootstrapBucket"},
+        "Key": {"Fn::Sub": "${BootstrapPrefix}/lambda/export.zip"},
+        "BuildDate": (new Date()).toISOString()
+      }
     },
     "ExportStepLambda": {
       "Type": "AWS::Lambda::Function",
       "Properties": {
         "Code": {
-            "S3Bucket": {"Ref":"BootstrapBucket"},
-            "S3Key": {"Fn::Sub":"${BootstrapPrefix}/lambda/export.zip"},
-            "S3ObjectVersion":{"Ref":"ExportCodeVersion"}
+          "S3Bucket": {"Ref": "BootstrapBucket"},
+          "S3Key": {"Fn::Sub": "${BootstrapPrefix}/lambda/export.zip"},
+          "S3ObjectVersion": {"Ref": "ExportCodeVersion"}
         },
         "Environment": {
-            "Variables": {
-                ES_INDEX:{"Ref":"VarIndex"},
-                ES_ENDPOINT:{"Ref":"EsEndpoint"},
-                ES_PROXY:{"Ref":"EsProxyLambda"}
-            }
+          "Variables": {
+            ES_INDEX: {"Ref": "VarIndex"},
+            ES_ENDPOINT: {"Ref": "EsEndpoint"},
+            ES_PROXY: {"Ref": "EsProxyLambda"}
+          }
         },
         "Handler": "index.step",
         "MemorySize": "1024",
-        "Role": {"Fn::GetAtt": ["ExportRole","Arn"]},
+        "Role": {"Fn::GetAtt": ["ExportRole", "Arn"]},
         "Runtime": "nodejs10.x",
         "Timeout": 300,
-        "VpcConfig" : {
-            "Fn::If": [ "VPCEnabled", {
-                "SubnetIds": { "Fn::Split" : [ ",", {"Ref": "VPCSubnetIdList"} ] },
-                "SecurityGroupIds": { "Fn::Split" : [ ",", {"Ref": "VPCSecurityGroupIdList"} ] },
-            }, {"Ref" : "AWS::NoValue"} ]
+        "VpcConfig": {
+          "Fn::If": ["VPCEnabled", {
+            "SubnetIds": {"Fn::Split": [",", {"Ref": "VPCSubnetIdList"}]},
+            "SecurityGroupIds": {"Fn::Split": [",", {"Ref": "VPCSecurityGroupIdList"}]},
+          }, {"Ref": "AWS::NoValue"}]
         },
-        "TracingConfig" : {
-            "Fn::If": [ "XRAYEnabled", {"Mode": "Active"},
-                {"Ref" : "AWS::NoValue"} ]
+        "TracingConfig": {
+          "Fn::If": ["XRAYEnabled", {"Mode": "Active"},
+            {"Ref": "AWS::NoValue"}]
         },
-        "Tags":[{
-            Key:"Type",
-            Value:"Export"
+        "Tags": [{
+          Key: "Type",
+          Value: "Export"
         }]
       }
     },
@@ -203,7 +203,7 @@ module.exports=Object.assign(
           "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
           "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole",
           "arn:aws:iam::aws:policy/AWSXRayDaemonWriteAccess",
-          {"Ref":"ExportPolicy"}
+          {"Ref": "ExportPolicy"}
         ]
       }
     },
@@ -213,65 +213,65 @@ module.exports=Object.assign(
         "PolicyDocument": {
           "Version": "2012-10-17",
           "Statement": [{
-              "Effect": "Allow",
-              "Action": [
-                "s3:*"
-              ],
-              "Resource":[{"Fn::Sub":"arn:aws:s3:::${ExportBucket}*"}]
-          },{
-              "Effect": "Allow",
-              "Action": [
-                "lambda:InvokeFunction"
-              ],
-              "Resource":[{"Ref":"EsProxyLambda"}]
+            "Effect": "Allow",
+            "Action": [
+              "s3:*"
+            ],
+            "Resource": [{"Fn::Sub": "arn:aws:s3:::${ExportBucket}*"}]
+          }, {
+            "Effect": "Allow",
+            "Action": [
+              "lambda:InvokeFunction"
+            ],
+            "Resource": [{"Ref": "EsProxyLambda"}]
           }]
         }
       }
     },
-    "ExportClear":{
-        "Type": "Custom::S3Clear",
-        "Properties": {
-            "ServiceToken": { "Ref" : "CFNLambda" },
-            "Bucket":{"Ref":"ExportBucket"}
-        }
+    "ExportClear": {
+      "Type": "Custom::S3Clear",
+      "Properties": {
+        "ServiceToken": {"Ref": "CFNLambda"},
+        "Bucket": {"Ref": "ExportBucket"}
+      }
     },
     "KendraSyncLambda": {
-        "Type": "AWS::Lambda::Function",
-        "Properties": {
-            "Code": {
-                "S3Bucket": {"Ref":"BootstrapBucket"},
-                "S3Key": {"Fn::Sub":"${BootstrapPrefix}/lambda/export.zip"},
-                "S3ObjectVersion":{"Ref":"SyncCodeVersion"}
-            },
-            "Environment": {
-                "Variables": {
-                    "DEFAULT_SETTINGS_PARAM":{"Ref":"DefaultQnABotSettings"},
-                    "CUSTOM_SETTINGS_PARAM":{"Ref":"CustomQnABotSettings"},
-                    "OUTPUT_S3_BUCKET":{"Ref":"ExportBucket"},
-                    "KENDRA_ROLE":{"Fn::GetAtt": ["KendraS3Role","Arn"]},
-                    "REGION":{"Ref":"AWS::Region"}
-                }
-            },
-            "Handler": "kendraSync.performSync",
-            "MemorySize": "1024",
-            "Role": {"Fn::GetAtt": ["KendraSyncRole","Arn"]},
-            "Runtime": "nodejs10.x",
-            "Timeout": 300,
-            "VpcConfig" : {
-                "Fn::If": [ "VPCEnabled", {
-                    "SubnetIds": { "Fn::Split" : [ ",", {"Ref": "VPCSubnetIdList"} ] },
-                    "SecurityGroupIds": { "Fn::Split" : [ ",", {"Ref": "VPCSecurityGroupIdList"} ] },
-                }, {"Ref" : "AWS::NoValue"} ]
-            },
-            "TracingConfig" : {
-                "Fn::If": [ "XRAYEnabled", {"Mode": "Active"},
-                    {"Ref" : "AWS::NoValue"} ]
-            },
-            "Tags":[{
-                Key:"Type",
-                Value:"Sync"
-            }]
-        }
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Code": {
+          "S3Bucket": {"Ref": "BootstrapBucket"},
+          "S3Key": {"Fn::Sub": "${BootstrapPrefix}/lambda/export.zip"},
+          "S3ObjectVersion": {"Ref": "SyncCodeVersion"}
+        },
+        "Environment": {
+          "Variables": {
+            "DEFAULT_SETTINGS_PARAM": {"Ref": "DefaultQnABotSettings"},
+            "CUSTOM_SETTINGS_PARAM": {"Ref": "CustomQnABotSettings"},
+            "OUTPUT_S3_BUCKET": {"Ref": "ExportBucket"},
+            "KENDRA_ROLE": {"Fn::GetAtt": ["KendraS3Role", "Arn"]},
+            "REGION": {"Ref": "AWS::Region"}
+          }
+        },
+        "Handler": "kendraSync.performSync",
+        "MemorySize": "1024",
+        "Role": {"Fn::GetAtt": ["KendraSyncRole", "Arn"]},
+        "Runtime": "nodejs10.x",
+        "Timeout": 300,
+        "VpcConfig": {
+          "Fn::If": ["VPCEnabled", {
+            "SubnetIds": {"Fn::Split": [",", {"Ref": "VPCSubnetIdList"}]},
+            "SecurityGroupIds": {"Fn::Split": [",", {"Ref": "VPCSecurityGroupIdList"}]},
+          }, {"Ref": "AWS::NoValue"}]
+        },
+        "TracingConfig": {
+          "Fn::If": ["XRAYEnabled", {"Mode": "Active"},
+            {"Ref": "AWS::NoValue"}]
+        },
+        "Tags": [{
+          Key: "Type",
+          Value: "Sync"
+        }]
+      }
     },
     "KendraSyncRole": {
       "Type": "AWS::IAM::Role",
@@ -285,7 +285,7 @@ module.exports=Object.assign(
                 "Service": "lambda.amazonaws.com"
               },
               "Action": "sts:AssumeRole"
-            },{
+            }, {
               "Effect": "Allow",
               "Principal": {
                 "Service": "kendra.amazonaws.com"
@@ -299,7 +299,7 @@ module.exports=Object.assign(
           "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
           "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole",
           "arn:aws:iam::aws:policy/AWSXRayDaemonWriteAccess",
-          {"Ref":"KendraSyncPolicy"}
+          {"Ref": "KendraSyncPolicy"}
         ]
       }
     },
@@ -307,11 +307,11 @@ module.exports=Object.assign(
       "Type": "AWS::IAM::ManagedPolicy",
       "Properties": {
         "PolicyDocument": {
-        "Version": "2012-10-17",
-        // TODO: split the statements up
-        "Statement": [{
-          "Effect": "Allow",
-          "Action": [
+          "Version": "2012-10-17",
+          // TODO: split the statements up
+          "Statement": [{
+            "Effect": "Allow",
+            "Action": [
               "s3:PutObject",
               "s3:Get*",
               "s3:List*",
@@ -324,12 +324,12 @@ module.exports=Object.assign(
               "ssm:getParameter"
             ],
             "Resource": [
-                {"Fn::Sub":"arn:aws:kendra:${AWS::Region}:${AWS::AccountId}:index/*"},
-                {"Fn::Sub":"arn:aws:kendra:${AWS::Region}:${AWS::AccountId}:index/*/faq/*"},
-                {"Fn::Sub":"arn:aws:s3:::${ExportBucket}"},
-                {"Fn::Sub":"arn:aws:s3:::${ExportBucket}/*"},
-                {"Fn::GetAtt": ["KendraS3Role","Arn"]},
-                {"Fn::Sub":"arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:*"}
+              {"Fn::Sub": "arn:aws:kendra:${AWS::Region}:${AWS::AccountId}:index/*"},
+              {"Fn::Sub": "arn:aws:kendra:${AWS::Region}:${AWS::AccountId}:index/*/faq/*"},
+              {"Fn::Sub": "arn:aws:s3:::${ExportBucket}"},
+              {"Fn::Sub": "arn:aws:s3:::${ExportBucket}/*"},
+              {"Fn::GetAtt": ["KendraS3Role", "Arn"]},
+              {"Fn::Sub": "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:*"}
             ]
           }]
         }
@@ -347,7 +347,7 @@ module.exports=Object.assign(
                 "Service": "lambda.amazonaws.com"
               },
               "Action": "sts:AssumeRole"
-            },{
+            }, {
               "Effect": "Allow",
               "Principal": {
                 "Service": "kendra.amazonaws.com"
@@ -361,26 +361,17 @@ module.exports=Object.assign(
           "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
           "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole",
           "arn:aws:iam::aws:policy/AWSXRayDaemonWriteAccess",
-          {"Ref":"KendraS3Policy"}
+          {"Ref": "KendraS3Policy"}
         ]
       }
-    },
-    TranslateCodeVersion: {
-      Type: "Custom::S3Version",
-      Properties: {
-        ServiceToken: { Ref: "CFNLambda" },
-        Bucket: { Ref: "BootstrapBucket" },
-        Key: { "Fn::Sub": "${BootstrapPrefix}/lambda/translate.zip" },
-        BuildDate: new Date().toISOString(),
-      },
     },
     TranslatePost: {
       Type: "AWS::ApiGateway::Method",
       Properties: {
         AuthorizationType: "AWS_IAM",
         HttpMethod: "POST",
-        RestApiId: { Ref: "Api" },
-        ResourceId: { Ref: "TranslateApiResource" },
+        RestApiId: {Ref: "Api"},
+        ResourceId: {Ref: "TranslateApiResource"},
         Integration: {
           Type: "AWS_PROXY",
           IntegrationHttpMethod: "POST",
@@ -392,9 +383,9 @@ module.exports=Object.assign(
               "",
               [
                 "arn:aws:apigateway:",
-                { Ref: "AWS::Region" },
+                {Ref: "AWS::Region"},
                 ":lambda:path/2015-03-31/functions/",
-                { "Fn::GetAtt": ["TranslateLambda", "Arn"] },
+                {"Fn::GetAtt": ["TranslateLambda", "Arn"]},
                 "/invocations",
               ],
             ],
@@ -408,61 +399,6 @@ module.exports=Object.assign(
         MethodResponses: [
           {
             StatusCode: 200,
-          },
-        ],
-      },
-    },  
-    TranslateApiRootResource: {
-      Type: "AWS::ApiGateway::Resource",
-      Properties: {
-        ParentId: { Ref: "ApiRootResourceId" },
-        PathPart: "translate",
-        RestApiId: { Ref: "Api" },
-      },
-    },
-    TranslateApiResource: {
-      Type: "AWS::ApiGateway::Resource",
-      Properties: {
-        ParentId: { Ref: "TranslateApiRootResource" },
-        PathPart: "{proxy+}",
-        RestApiId: { Ref: "Api" },
-      },
-    },
-    TranslateLambda: {
-      Type: "AWS::Lambda::Function",
-      Properties: {
-        Code: {
-          S3Bucket: { Ref: "BootstrapBucket" },
-          S3Key: { "Fn::Sub": "${BootstrapPrefix}/lambda/translate.zip" },
-          S3ObjectVersion: { Ref: "TranslateCodeVersion" },
-        },
-        Environment: {
-          Variables: {
-            outputBucket: { Ref: "ExportBucket" },
-          },
-        },
-        Handler: "index.handler",
-        MemorySize: "1024",
-        Role: { "Fn::GetAtt": ["TranslateRole", "Arn"] },
-        Runtime: "nodejs10.x",
-        Timeout: 300,
-        "VpcConfig": {
-          "Fn::If": [
-            "VPCEnabled",
-            {
-              "SubnetIds": {"Ref": "VPCSubnetIdList"},
-              "SecurityGroupIds": {"Ref": "VPCSecurityGroupIdList"}
-            },
-            {"Ref": "AWS::NoValue"}
-          ]
-        },
-        "TracingConfig": {
-          "Fn::If": ["XRAYEnabled", {"Mode": "Active"}, {"Ref": "AWS::NoValue"}]
-        },
-        Tags: [
-          {
-            Key: "Type",
-            Value: "Export",
           },
         ],
       },
@@ -485,16 +421,17 @@ module.exports=Object.assign(
         Path: "/",
         ManagedPolicyArns: [
           "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
-          { Ref: "TranslatePolicy" },
+          "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole",
+          {Ref: "TranslatePolicy"},
         ],
       },
     },
     TranslateCodeVersion: {
       Type: "Custom::S3Version",
       Properties: {
-        ServiceToken: { Ref: "CFNLambda" },
-        Bucket: { Ref: "BootstrapBucket" },
-        Key: { "Fn::Sub": "${BootstrapPrefix}/lambda/translate.zip" },
+        ServiceToken: {Ref: "CFNLambda"},
+        Bucket: {Ref: "BootstrapBucket"},
+        Key: {"Fn::Sub": "${BootstrapPrefix}/lambda/translate.zip"},
         BuildDate: new Date().toISOString(),
       },
     },
@@ -502,29 +439,25 @@ module.exports=Object.assign(
       Type: "AWS::Lambda::Function",
       Properties: {
         Code: {
-          S3Bucket: { Ref: "BootstrapBucket" },
-          S3Key: { "Fn::Sub": "${BootstrapPrefix}/lambda/translate.zip" },
-          S3ObjectVersion: { Ref: "TranslateCodeVersion" },
+          S3Bucket: {Ref: "BootstrapBucket"},
+          S3Key: {"Fn::Sub": "${BootstrapPrefix}/lambda/translate.zip"},
+          S3ObjectVersion: {Ref: "TranslateCodeVersion"},
         },
         Environment: {
           Variables: {
-            outputBucket: { Ref: "ExportBucket" },
+            outputBucket: {Ref: "ExportBucket"},
           },
         },
         Handler: "index.handler",
         MemorySize: "1024",
-        Role: { "Fn::GetAtt": ["TranslateRole", "Arn"] },
+        Role: {"Fn::GetAtt": ["TranslateRole", "Arn"]},
         Runtime: "nodejs10.x",
         Timeout: 300,
         "VpcConfig": {
-          "Fn::If": [
-            "VPCEnabled",
-            {
-              "SubnetIds": {"Ref": "VPCSubnetIdList"},
-              "SecurityGroupIds": {"Ref": "VPCSecurityGroupIdList"}
-            },
-            {"Ref": "AWS::NoValue"}
-          ]
+          "Fn::If": ["VPCEnabled", {
+            "SubnetIds": {"Fn::Split": [",", {"Ref": "VPCSubnetIdList"}]},
+            "SecurityGroupIds": {"Fn::Split": [",", {"Ref": "VPCSecurityGroupIdList"}]},
+          }, {"Ref": "AWS::NoValue"}]
         },
         "TracingConfig": {
           "Fn::If": ["XRAYEnabled", {"Mode": "Active"}, {"Ref": "AWS::NoValue"}]
@@ -536,7 +469,7 @@ module.exports=Object.assign(
           },
         ],
       },
-    },  
+    },
     TranslatePolicy: {
       Type: "AWS::IAM::ManagedPolicy",
       Properties: {
@@ -558,50 +491,50 @@ module.exports=Object.assign(
     TranslateApiRootResource: {
       Type: "AWS::ApiGateway::Resource",
       Properties: {
-        ParentId: { Ref: "ApiRootResourceId" },
+        ParentId: {Ref: "ApiRootResourceId"},
         PathPart: "translate",
-        RestApiId: { Ref: "Api" },
+        RestApiId: {Ref: "Api"},
       },
     },
     TranslateApiResource: {
       Type: "AWS::ApiGateway::Resource",
       Properties: {
-        ParentId: { Ref: "TranslateApiRootResource" },
+        ParentId: {Ref: "TranslateApiRootResource"},
         PathPart: "{proxy+}",
-        RestApiId: { Ref: "Api" },
+        RestApiId: {Ref: "Api"},
       },
     },
     InvokePermissionTranslateLambda: {
       Type: "AWS::Lambda::Permission",
       Properties: {
         Action: "lambda:InvokeFunction",
-        FunctionName: { "Fn::GetAtt": ["TranslateLambda", "Arn"] },
+        FunctionName: {"Fn::GetAtt": ["TranslateLambda", "Arn"]},
         Principal: "apigateway.amazonaws.com",
       },
-    },  
+    },
     KendraCodeVersion: {
       Type: "Custom::S3Version",
       Properties: {
-        ServiceToken: { Ref: "CFNLambda" },
-        Bucket: { Ref: "BootstrapBucket" },
-        Key: { "Fn::Sub": "${BootstrapPrefix}/lambda/kendra-crawler.zip" },
+        ServiceToken: {Ref: "CFNLambda"},
+        Bucket: {Ref: "BootstrapBucket"},
+        Key: {"Fn::Sub": "${BootstrapPrefix}/lambda/kendra-crawler.zip"},
         BuildDate: new Date().toISOString(),
       },
     },
     KendraCrawlerApiRootResource: {
       Type: "AWS::ApiGateway::Resource",
       Properties: {
-        ParentId: { Ref: "ApiRootResourceId" },
+        ParentId: {Ref: "ApiRootResourceId"},
         PathPart: "crawler",
-        RestApiId: { Ref: "Api" },
+        RestApiId: {Ref: "Api"},
       },
     },
     KendraCrawlerApiResource: {
       Type: "AWS::ApiGateway::Resource",
       Properties: {
-        ParentId: { Ref: "KendraCrawlerApiRootResource" },
+        ParentId: {Ref: "KendraCrawlerApiRootResource"},
         PathPart: "start",
-        RestApiId: { Ref: "Api" },
+        RestApiId: {Ref: "Api"},
       },
     },
     KendraCrawlerStatusGet: {
@@ -609,8 +542,8 @@ module.exports=Object.assign(
       Properties: {
         AuthorizationType: "AWS_IAM",
         HttpMethod: "POST",
-        RestApiId: { Ref: "Api" },
-        ResourceId: { Ref: "KendraCrawlerStatusRootApiResource" },
+        RestApiId: {Ref: "Api"},
+        ResourceId: {Ref: "KendraCrawlerStatusRootApiResource"},
         Integration: {
           Type: "AWS_PROXY",
           IntegrationHttpMethod: "POST",
@@ -619,9 +552,9 @@ module.exports=Object.assign(
               "",
               [
                 "arn:aws:apigateway:",
-                { Ref: "AWS::Region" },
+                {Ref: "AWS::Region"},
                 ":lambda:path/2015-03-31/functions/",
-                { "Fn::GetAtt": ["KendraCrawlerLambda", "Arn"] },
+                {"Fn::GetAtt": ["KendraCrawlerLambda", "Arn"]},
                 "/invocations",
               ],
             ],
@@ -643,19 +576,19 @@ module.exports=Object.assign(
       Type: "AWS::Lambda::Permission",
       Properties: {
         Action: "lambda:InvokeFunction",
-        FunctionName: { "Fn::GetAtt": ["KendraCrawlerLambda", "Arn"] },
+        FunctionName: {"Fn::GetAtt": ["KendraCrawlerLambda", "Arn"]},
         Principal: "apigateway.amazonaws.com",
       },
     },
     KendraSnsLambdaSubscription:
-    {
-      "Type" : "AWS::SNS::Subscription",
-      "Properties" : {
-          "Endpoint" : {"Fn::GetAtt":["KendraCrawlerLambda","Arn"]},
-          "Protocol" : "lambda",
-          "TopicArn" : {"Ref":"KendraCrawlerSnsTopic"}
+      {
+        "Type": "AWS::SNS::Subscription",
+        "Properties": {
+          "Endpoint": {"Fn::GetAtt": ["KendraCrawlerLambda", "Arn"]},
+          "Protocol": "lambda",
+          "TopicArn": {"Ref": "KendraCrawlerSnsTopic"}
         }
-    },
+      },
     KendraTopicApiGateRole: {
       Type: "AWS::IAM::Role",
       Properties: {
@@ -681,7 +614,7 @@ module.exports=Object.assign(
                 {
                   Effect: "Allow",
                   Action: ["sns:Publish"],
-                  Resource: { Ref: "KendraCrawlerSnsTopic" },
+                  Resource: {Ref: "KendraCrawlerSnsTopic"},
                 },
                 {
                   Effect: "Allow",
@@ -698,7 +631,7 @@ module.exports=Object.assign(
         ],
       },
     },
-  
+
     KendraCrawlerPost: {
       Type: "AWS::ApiGateway::Method",
       Properties: {
@@ -719,7 +652,7 @@ module.exports=Object.assign(
               "",
               [
                 "arn:aws:apigateway:",
-                { Ref: "AWS::Region" },
+                {Ref: "AWS::Region"},
                 ":sns:action/Publish",
               ],
             ],
@@ -747,17 +680,17 @@ module.exports=Object.assign(
             StatusCode: 200,
           },
         ],
-        RestApiId: { Ref: "Api" },
-        ResourceId: { Ref: "KendraCrawlerApiResource" },
+        RestApiId: {Ref: "Api"},
+        ResourceId: {Ref: "KendraCrawlerApiResource"},
       },
     },
-  
+
     InvokePermissionKendraCrawlerLambda: {
       Type: "AWS::Lambda::Permission",
       Properties: {
         Action: "lambda:InvokeFunction",
-        FunctionName: { "Fn::GetAtt": ["KendraCrawlerLambda", "Arn"] },
-        SourceArn: { Ref: "KendraCrawlerSnsTopic" },
+        FunctionName: {"Fn::GetAtt": ["KendraCrawlerLambda", "Arn"]},
+        SourceArn: {Ref: "KendraCrawlerSnsTopic"},
         Principal: "sns.amazonaws.com",
       },
     },
@@ -769,7 +702,7 @@ module.exports=Object.assign(
           source: ["aws.ssm"],
           "detail-type": ["Parameter Store Change"],
           detail: {
-            name: [{ Ref: "CustomQnABotSettings" }],
+            name: [{Ref: "CustomQnABotSettings"}],
             operation: ["Update"],
           },
         },
@@ -800,7 +733,7 @@ module.exports=Object.assign(
     },
     KendraCrawlerScheduleRule: {
       Type: "AWS::Events::Rule",
-      DependsOn:"CloudWatchEventRule",
+      DependsOn: "CloudWatchEventRule",
       Properties: {
         Description: "Run Kendra Web Crawler based on a schedule",
         ScheduleExpression: "rate(1 day)",
@@ -813,7 +746,7 @@ module.exports=Object.assign(
               {
                 "Fn::Select": [
                   2,
-                  { "Fn::Split": ["-", { Ref: "DefaultQnABotSettings" }] },
+                  {"Fn::Split": ["-", {Ref: "DefaultQnABotSettings"}]},
                 ],
               },
             ],
@@ -843,40 +776,36 @@ module.exports=Object.assign(
         },
       },
     },
-  
+
     KendraCrawlerStatusRootApiResource: {
       Type: "AWS::ApiGateway::Resource",
       Properties: {
-        ParentId: { Ref: "KendraCrawlerApiRootResource" },
+        ParentId: {Ref: "KendraCrawlerApiRootResource"},
         PathPart: "{proxy+}",
-        RestApiId: { Ref: "Api" },
+        RestApiId: {Ref: "Api"},
       },
-    },  
+    },
     KendraCrawlerLambda: {
       Type: "AWS::Lambda::Function",
       Properties: {
         Code: {
-          S3Bucket: { Ref: "BootstrapBucket" },
-          S3Key: { "Fn::Sub": "${BootstrapPrefix}/lambda/kendra-crawler.zip" },
-          S3ObjectVersion: { Ref: "KendraCodeVersion" },
+          S3Bucket: {Ref: "BootstrapBucket"},
+          S3Key: {"Fn::Sub": "${BootstrapPrefix}/lambda/kendra-crawler.zip"},
+          S3ObjectVersion: {Ref: "KendraCodeVersion"},
         },
         "VpcConfig": {
-          "Fn::If": [
-            "VPCEnabled",
-            {
-              "SubnetIds": {"Ref": "VPCSubnetIdList"},
-              "SecurityGroupIds": {"Ref": "VPCSecurityGroupIdList"}
-            },
-            {"Ref": "AWS::NoValue"}
-          ]
+          "Fn::If": ["VPCEnabled", {
+            "SubnetIds": {"Fn::Split": [",", {"Ref": "VPCSubnetIdList"}]},
+            "SecurityGroupIds": {"Fn::Split": [",", {"Ref": "VPCSecurityGroupIdList"}]},
+          }, {"Ref": "AWS::NoValue"}]
         },
         "TracingConfig": {
           "Fn::If": ["XRAYEnabled", {"Mode": "Active"}, {"Ref": "AWS::NoValue"}]
         },
         Environment: {
           Variables: {
-            DEFAULT_SETTINGS_PARAM: { Ref: "DefaultQnABotSettings" },
-            CUSTOM_SETTINGS_PARAM: { Ref: "CustomQnABotSettings" },
+            DEFAULT_SETTINGS_PARAM: {Ref: "DefaultQnABotSettings"},
+            CUSTOM_SETTINGS_PARAM: {Ref: "CustomQnABotSettings"},
             DATASOURCE_NAME: {
               "Fn::Join": [
                 "-",
@@ -885,7 +814,7 @@ module.exports=Object.assign(
                   {
                     "Fn::Select": [
                       2,
-                      { "Fn::Split": ["-", { Ref: "DefaultQnABotSettings" }] },
+                      {"Fn::Split": ["-", {Ref: "DefaultQnABotSettings"}]},
                     ],
                   },
                 ],
@@ -895,7 +824,7 @@ module.exports=Object.assign(
         },
         Handler: "index.handler",
         MemorySize: "2048",
-        Role: { "Fn::GetAtt": ["KendraCrawlerRole", "Arn"] },
+        Role: {"Fn::GetAtt": ["KendraCrawlerRole", "Arn"]},
         Runtime: "nodejs12.x",
         Timeout: 900,
         Tags: [
@@ -924,7 +853,8 @@ module.exports=Object.assign(
         Path: "/",
         ManagedPolicyArns: [
           "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
-          { Ref: "KendraCrawlerPolicy" },
+          "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole",
+          {Ref: "KendraCrawlerPolicy"},
         ],
       },
     },
@@ -954,9 +884,9 @@ module.exports=Object.assign(
                 "ssm:GetParameter",
               ],
               Resource: [
-                {"Fn::Join": ["",["arn:aws:ssm:",{"Ref":"AWS::Region"},":",{"Ref":"AWS::AccountId"},":parameter/",{"Ref":"CustomQnABotSettings"}]]},
-                {"Fn::Join": ["",["arn:aws:ssm:",{"Ref":"AWS::Region"},":",{"Ref":"AWS::AccountId"},":parameter/",{"Ref":"DefaultQnABotSettings"}]]},
-            ],
+                {"Fn::Join": ["", ["arn:aws:ssm:", {"Ref": "AWS::Region"}, ":", {"Ref": "AWS::AccountId"}, ":parameter/", {"Ref": "CustomQnABotSettings"}]]},
+                {"Fn::Join": ["", ["arn:aws:ssm:", {"Ref": "AWS::Region"}, ":", {"Ref": "AWS::AccountId"}, ":parameter/", {"Ref": "DefaultQnABotSettings"}]]},
+              ],
             },
           ],
         },
@@ -965,9 +895,9 @@ module.exports=Object.assign(
     KendraCrawlerCWRuleUpdaterCodeVersion: {
       Type: "Custom::S3Version",
       Properties: {
-        ServiceToken: { Ref: "CFNLambda" },
-        Bucket: { Ref: "BootstrapBucket" },
-        Key: { "Fn::Sub": "${BootstrapPrefix}/lambda/kendra-crawler-cwrule-updater.zip" },
+        ServiceToken: {Ref: "CFNLambda"},
+        Bucket: {Ref: "BootstrapBucket"},
+        Key: {"Fn::Sub": "${BootstrapPrefix}/lambda/kendra-crawler-cwrule-updater.zip"},
         BuildDate: new Date().toISOString(),
       },
     },
@@ -975,17 +905,17 @@ module.exports=Object.assign(
       "Type": "AWS::IAM::ManagedPolicy",
       "Properties": {
         "PolicyDocument": {
-        "Version": "2012-10-17",
-        "Statement": [{
-          "Effect": "Allow",
-          "Action": [
+          "Version": "2012-10-17",
+          "Statement": [{
+            "Effect": "Allow",
+            "Action": [
               "s3:GetObject",
               "kendra:CreateFaq",
             ],
             "Resource": [
-                {"Fn::Sub":"arn:aws:kendra:${AWS::Region}:${AWS::AccountId}:index/*"},
-                {"Fn::Sub":"arn:aws:s3:::${ExportBucket}"},
-                {"Fn::Sub":"arn:aws:s3:::${ExportBucket}/*"},
+              {"Fn::Sub": "arn:aws:kendra:${AWS::Region}:${AWS::AccountId}:index/*"},
+              {"Fn::Sub": "arn:aws:s3:::${ExportBucket}"},
+              {"Fn::Sub": "arn:aws:s3:::${ExportBucket}/*"},
             ]
           }]
         }
@@ -995,27 +925,23 @@ module.exports=Object.assign(
       Type: "AWS::Lambda::Function",
       Properties: {
         Code: {
-          S3Bucket: { Ref: "BootstrapBucket" },
-          S3Key: { "Fn::Sub": "${BootstrapPrefix}/lambda/kendra-crawler-cwrule-updater.zip"},
-          S3ObjectVersion: { Ref: "KendraCrawlerCWRuleUpdaterCodeVersion" },
+          S3Bucket: {Ref: "BootstrapBucket"},
+          S3Key: {"Fn::Sub": "${BootstrapPrefix}/lambda/kendra-crawler-cwrule-updater.zip"},
+          S3ObjectVersion: {Ref: "KendraCrawlerCWRuleUpdaterCodeVersion"},
         },
         "VpcConfig": {
-          "Fn::If": [
-            "VPCEnabled",
-            {
-              "SubnetIds": {"Ref": "VPCSubnetIdList"},
-              "SecurityGroupIds": {"Ref": "VPCSecurityGroupIdList"}
-            },
-            {"Ref": "AWS::NoValue"}
-          ]
+          "Fn::If": ["VPCEnabled", {
+            "SubnetIds": {"Fn::Split": [",", {"Ref": "VPCSubnetIdList"}]},
+            "SecurityGroupIds": {"Fn::Split": [",", {"Ref": "VPCSecurityGroupIdList"}]},
+          }, {"Ref": "AWS::NoValue"}]
         },
         "TracingConfig": {
           "Fn::If": ["XRAYEnabled", {"Mode": "Active"}, {"Ref": "AWS::NoValue"}]
         },
         Environment: {
           Variables: {
-            DEFAULT_SETTINGS_PARAM: { Ref: "DefaultQnABotSettings" },
-            CUSTOM_SETTINGS_PARAM: { Ref: "CustomQnABotSettings" },
+            DEFAULT_SETTINGS_PARAM: {Ref: "DefaultQnABotSettings"},
+            CUSTOM_SETTINGS_PARAM: {Ref: "CustomQnABotSettings"},
             CLOUDWATCH_RULENAME: {
               "Fn::Join": [
                 //Can't Ref the CloudWatchRule - creates circular dependency
@@ -1025,7 +951,7 @@ module.exports=Object.assign(
                   {
                     "Fn::Select": [
                       2,
-                      { "Fn::Split": ["-", { Ref: "DefaultQnABotSettings" }] },
+                      {"Fn::Split": ["-", {Ref: "DefaultQnABotSettings"}]},
                     ],
                   },
                 ],
@@ -1035,7 +961,7 @@ module.exports=Object.assign(
         },
         Handler: "index.handler",
         MemorySize: "2048",
-        Role: { "Fn::GetAtt": ["KendraCrawlerCWRuleUpdaterRole", "Arn"] },
+        Role: {"Fn::GetAtt": ["KendraCrawlerCWRuleUpdaterRole", "Arn"]},
         Runtime: "nodejs12.x",
         Timeout: 900,
         Tags: [
@@ -1064,7 +990,8 @@ module.exports=Object.assign(
         Path: "/",
         ManagedPolicyArns: [
           "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
-          { Ref: "KendraCrawlerCWRuleUpdaterrRolePolicy" },
+          "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole",
+          {Ref: "KendraCrawlerCWRuleUpdaterrRolePolicy"},
         ],
       },
     },
@@ -1094,11 +1021,11 @@ module.exports=Object.assign(
                 "ssm:GetParameter",
               ],
               Resource: [
-                {"Fn::Join": ["",["arn:aws:ssm:",{"Ref":"AWS::Region"},":",{"Ref":"AWS::AccountId"},":parameter/",{"Ref":"CustomQnABotSettings"}]]},
-                {"Fn::Join": ["",["arn:aws:ssm:",{"Ref":"AWS::Region"},":",{"Ref":"AWS::AccountId"},":parameter/",{"Ref":"DefaultQnABotSettings"}]]},
-            ],
+                {"Fn::Join": ["", ["arn:aws:ssm:", {"Ref": "AWS::Region"}, ":", {"Ref": "AWS::AccountId"}, ":parameter/", {"Ref": "CustomQnABotSettings"}]]},
+                {"Fn::Join": ["", ["arn:aws:ssm:", {"Ref": "AWS::Region"}, ":", {"Ref": "AWS::AccountId"}, ":parameter/", {"Ref": "DefaultQnABotSettings"}]]},
+              ],
             },
-  
+
             {
               Effect: "Allow",
               Action: ["events:DescribeRule", "events:PutRule"],
@@ -1106,12 +1033,12 @@ module.exports=Object.assign(
                 "Fn::Join": [
                   //Can't Ref the CloudWatchRule - creates circular dependency
                   "",
-                  ["arn:aws:events:",{"Ref":"AWS::Region"},":",{"Ref":"AWS::AccountId"},":rule/",
+                  ["arn:aws:events:", {"Ref": "AWS::Region"}, ":", {"Ref": "AWS::AccountId"}, ":rule/",
                     "KendraCrawlerRule-",
                     {
                       "Fn::Select": [
                         2,
-                        { "Fn::Split": ["-", { Ref: "DefaultQnABotSettings" }] },
+                        {"Fn::Split": ["-", {Ref: "DefaultQnABotSettings"}]},
                       ],
                     },
                   ],
