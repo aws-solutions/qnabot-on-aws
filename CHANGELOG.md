@@ -1,3 +1,5 @@
+## [4.5.2]
+- Fix for new Kendra resources deployed in VPC addressing issues in 4.5.0 and 4.5.1.
 ## [4.5.1]
 - Fix for incorrect Thumbs Up / Thumbs Down processing in 4.5.0.
 - Fix for multi-language support when manually switching languages in 4.5.0.
