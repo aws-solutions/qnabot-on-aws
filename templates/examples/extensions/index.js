@@ -55,7 +55,7 @@ module.exports=Object.assign(
         "Handler": "ui_import.handler",
         "MemorySize": "128",
         "Role":{"Ref":"CFNLambdaRole"} ,
-        "Runtime": "nodejs10.x",
+        "Runtime": "nodejs12.x",
         "Timeout": 300,
         "VpcConfig" : {
             "Fn::If": [ "VPCEnabled", {
@@ -222,7 +222,7 @@ function jslambda(name){
       "Handler":`${name}.handler`,
       "MemorySize": "2048",
       "Role": {"Fn::GetAtt": ["ExtensionLambdaRole","Arn"]},
-      "Runtime": "nodejs10.x",
+      "Runtime": "nodejs12.x",
       "Timeout": 300,
       "VpcConfig" : {
           "Fn::If": [ "VPCEnabled", {

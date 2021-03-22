@@ -12,7 +12,7 @@ module.exports={
         "Handler": "index.handler",
         "MemorySize": "3008",
         "Role": {"Fn::GetAtt": ["CFNLambdaRole","Arn"]},
-        "Runtime": "nodejs10.x",
+        "Runtime": "nodejs12.x",
         "Timeout": 60,
         "VpcConfig" : {
             "Fn::If": [ "VPCEnabled", {
@@ -53,7 +53,7 @@ module.exports={
         "Handler": "index.handler",
         "MemorySize": "3008",
         "Role": {"Fn::GetAtt": ["CFNLambdaRole","Arn"]},
-        "Runtime": "nodejs10.x",
+        "Runtime": "nodejs12.x",
         "Timeout": 180,
         "VpcConfig" : {
           "Fn::If": [ "VPCEnabled", {
