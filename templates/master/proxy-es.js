@@ -1,4 +1,11 @@
-var lexConfig=require('./lex/config')
+var _ = require('lodash');
+
+var examples = _.fromPairs(require('../examples/outputs')
+  .names
+  .map(x => {
+    return [x, { "Fn::GetAtt": ["ExamplesStack", `Outputs.${x}`] }];
+  }));
+  
 module.exports={
     "ESProxyCodeVersion":{
         "Type": "Custom::S3Version",
@@ -183,10 +190,10 @@ module.exports={
             "S3ObjectVersion":{"Ref":"ESProxyCodeVersion"}
         },
         "Environment": {
-          "Variables": {
-            DEFAULT_SETTINGS_PARAM:{"Ref":"DefaultQnABotSettings"},
-            CUSTOM_SETTINGS_PARAM:{"Ref":"CustomQnABotSettings"},
-          }
+          "Variables": Object.assign({
+              DEFAULT_SETTINGS_PARAM:{"Ref":"DefaultQnABotSettings"},
+              CUSTOM_SETTINGS_PARAM:{"Ref":"CustomQnABotSettings"},
+          }, examples)
         },
         "Handler": "index.query",
         "MemorySize": "1408",
@@ -283,21 +290,45 @@ module.exports={
           		}]
           	}
           },
-          {
-            "PolicyName": "LambdaInvokePolicy",
-            "PolicyDocument": {
-                "Version": "2012-10-17",
-                "Statement": [{
+          { 
+            "PolicyName" : "S3QNABucketReadAccess",
+            "PolicyDocument" : {
+            "Version": "2012-10-17",
+              "Statement": [
+                {
                     "Effect": "Allow",
-                    "Action": ["lambda:InvokeFunction"],
+                    "Action": [
+                        "s3:GetObject"
+                     ],   
                     "Resource": [
-                        "arn:aws:lambda:*:*:function:qna*",
-                        "arn:aws:lambda:*:*:function:QNA*"
+                        "arn:aws:s3:::QNA*/*",
+                        "arn:aws:s3:::qna*/*"
                     ]
-                }]
+                }
+              ]
             }
           }
         ]
+      }
+    },
+    "QueryLambdaInvokePolicy": {
+      "Type": "AWS::IAM::ManagedPolicy",
+      "Properties": {
+          "PolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [{
+                  "Effect": "Allow",
+                  "Action": ["lambda:InvokeFunction"],
+                  "Resource": [
+                      "arn:aws:lambda:*:*:function:qna*",
+                      "arn:aws:lambda:*:*:function:QNA*"
+                  ].concat(require('../examples/outputs').names
+                    .map(x => {
+                      return { "Fn::GetAtt": ["ExamplesStack", `Outputs.${x}`] };
+                    }))
+              }]
+          },
+        "Roles": [{ "Ref": "ESProxyLambdaRole" }]
       }
     },
     "ESLoggingLambdaRole": {

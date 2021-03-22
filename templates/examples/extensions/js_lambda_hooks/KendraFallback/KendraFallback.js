@@ -1,4 +1,5 @@
 var _ = require('lodash');
+var translate = require("./translate");
 var linkify = require('linkifyjs');
 
 /**
@@ -156,13 +157,20 @@ function signS3URL(url, expireSecs) {
     return url;
 }
 
+
 // get document name from URL
 // last element of path with any params removed
 function docName(uri) {
-    let x = uri.split("/");
-    let y = x[x.length -1] ;
-    let n = y.split("?")[0] ;
-    return n;
+  if (uri.DocumentTitle) {
+    return uri.Title;
+  }
+  if (uri.Uri) {
+    uri = uri.Uri;
+  }
+  let x = uri.split("/");
+  let y = x[x.length - 1];
+  let n = y.split("?")[0];
+  return n;
 }
 
 /**
@@ -268,12 +276,12 @@ async function routeKendraRequest(event, context) {
     // process kendra query responses and update answer content
 
     /* default message text - can be overridden using QnABot SSM Parameter Store Custom Property */
-    let topAnswerMessage = "Amazon Kendra suggested answer. \n\n ";
-    let topAnswerMessageMd = "*Amazon Kendra suggested answer.* \n ";
-    let answerMessage = 'While I did not find an exact answer, these search results from Amazon Kendra might be helpful. ' ;
-    let answerMessageMd = '*While I did not find an exact answer, these search results from Amazon Kendra might be helpful.* \n ';
-    let faqanswerMessage = 'Answer from Amazon Kendra FAQ.';
-    let faqanswerMessageMd = '*Answer from Amazon Kendra FAQ.* \n ';
+    let topAnswerMessage = event.req["_settings"]["ALT_SEARCH_KENDRA_TOP_ANSWER_MESSAGE"] + "\n\n"; //"Amazon Kendra suggested answer. \n\n ";
+    let topAnswerMessageMd = event.req["_settings"]["ALT_SEARCH_KENDRA_TOP_ANSWER_MESSAGE"] == "" ? "" : `*${event.req["_settings"]["ALT_SEARCH_KENDRA_TOP_ANSWER_MESSAGE"]}* \n `;
+    let answerMessage = event.req["_settings"]["ALT_SEARCH_KENDRA_ANSWER_MESSAGE"];
+    let answerMessageMd = event.req["_settings"]["ALT_SEARCH_KENDRA_ANSWER_MESSAGE"] == "" ? "" : `*${answerMessage}* \n `;
+    let faqanswerMessage = event.req["_settings"]["ALT_SEARCH_KENDRA_FAQ"] + "\n\n"; //'Answer from Amazon Kendra FAQ.'
+    let faqanswerMessageMd = event.req["_settings"]["ALT_SEARCH_KENDRA_FAQ"]  == "" ? "" : `*${event.req["_settings"]["ALT_SEARCH_KENDRA_FAQ"]}* \n`
     let speechMessage = "";
     let helpfulLinksMsg = 'Source Link';
     let maxDocumentCount = _.get(event.req,'_settings.ALT_SEARCH_KENDRA_MAX_DOCUMENT_COUNT',2);
@@ -291,8 +299,12 @@ async function routeKendraRequest(event, context) {
 
     
     resArray.forEach(function (res) {
+
         if (res && res.ResultItems.length > 0) {
             res.ResultItems.forEach(function (element, i) {
+                if(seenTop){
+                    return;
+                }
                 /* Note - only the first answer will be provided back to the requester */
                 if (element.Type === 'ANSWER' && foundAnswerCount === 0 && element.AdditionalAttributes &&
                     element.AdditionalAttributes.length > 0 &&
@@ -332,8 +344,7 @@ async function routeKendraRequest(event, context) {
                     }
                     
                     // Convert S3 Object URLs to signed URLs
-                    let uri = element.DocumentURI ;
-                    answerDocumentUris.add(uri);
+                    answerDocumentUris.add(element);
                     kendraQueryId = res.QueryId; // store off the QueryId to use as a session attribute for feedback
                     kendraIndexId = res.originalKendraIndexId; // store off the Kendra IndexId to use as a session attribute for feedback
                     kendraResultId = element.Id; // store off resultId to use as a session attribute for feedback
@@ -360,7 +371,7 @@ async function routeKendraRequest(event, context) {
                     kendraIndexId = res.originalKendraIndexId; // store off the Kendra IndexId to use as a session attribute for feedback
                     kendraResultId = element.Id; // store off resultId to use as a session attribute for feedback
                     foundAnswerCount++;
-                    
+                  
                 } else if (element.Type === 'DOCUMENT' && element.DocumentExcerpt.Text && element.DocumentURI) {
                     const docInfo = {}
                     // if topAnswer found, then do not show document excerpts
@@ -384,24 +395,35 @@ async function routeKendraRequest(event, context) {
                                 var highlight = speechMessage.substring(sorted_highlights[0].BeginOffset, sorted_highlights[0].EndOffset)
                                 var pattern = new RegExp('[^.]* '+highlight+'[^.]*\.[^.]*\.')
                                 pattern.lastIndex = 0;  // must reset this property of regex object for searches
-                                speechMessage = pattern.exec(speechMessage)[0]
+                                var regexMatch = pattern.exec(speechMessage)
+                                //TODO: Investigate this.  Should this be a nohits scenerio?
+                                if(regexMatch){
+                                    speechMessage = regexMatch[0]
+                                }
                             }
                         }
                     }
-                    // but even if topAnswer is found, show URL in markdown
-                    docInfo.uri = element.DocumentURI;
-                    helpfulDocumentsUris.add(docInfo);
-                    // foundAnswerCount++;
-                    foundDocumentCount++;
+                  // but even if topAnswer is found, show URL in markdown
+                  docInfo.uri = `${element.DocumentURI}`;
+                  let title;
+                  if (element.DocumentTitle && element.DocumentTitle.Text) {
+                    docInfo.Title = element.DocumentTitle.Text;
+                  }
+                  helpfulDocumentsUris.add(docInfo);
+                  // foundAnswerCount++;
+                  foundDocumentCount++;
                 }
             });
         }
     });
 
     // update QnABot answer content for ssml, markdown, and text
+    let ssmlMessage = ""
     if (foundAnswerCount > 0 || foundDocumentCount > 0) {
         event.res.session.qnabot_gotanswer = true ; 
         event.res.message = answerMessage;
+        event.res.card = [];
+
         let ssmlMessage = `${answerMessage.substring(0,600).replace(/\r?\n|\r/g, " ")}`;
         if (speechMessage != "") {
             ssmlMessage = `${speechMessage.substring(0,600).replace(/\r?\n|\r/g, " ")}`;
@@ -422,21 +444,20 @@ async function routeKendraRequest(event, context) {
         }
     }
     if (answerDocumentUris.size > 0) {
-        event.res.session.appContext.altMessages.markdown += `\n\n ${helpfulLinksMsg}: `;
-        answerDocumentUris.forEach(function (element) {
-            let label = docName(element) ;
-            // Convert S3 Object URLs to signed URLs
-            if (signS3Urls) {
-                element = signS3URL(element, expireSeconds)
-            }
-            event.res.session.appContext.altMessages.markdown += `[${label}](${element})`;
-        });
+      event.res.session.appContext.altMessages.markdown += `\n\n ${helpfulLinksMsg}: `;
+      answerDocumentUris.forEach(function(element) {
+        // Convert S3 Object URLs to signed URLs
+        if (signS3Urls) {
+          element.DocumentURI = signS3URL(element.DocumentURI, expireSeconds);
+        }
+        event.res.session.appContext.altMessages.markdown += `<span translate=no>[${element.DocumentTitle.Text}](${element.DocumentURI})</span>`;
+      });
     }
     
-    let idx=0;
+    let idx=foundAnswerCount;
     if (seenTop == false){
         helpfulDocumentsUris.forEach(function (element) {
-            if (idx++ < maxDocumentCount-1) {
+            if (idx++ < maxDocumentCount) {
                 event.res.session.appContext.altMessages.markdown += `\n\n`;
                 event.res.session.appContext.altMessages.markdown += `***`;
                 event.res.session.appContext.altMessages.markdown += `\n\n <br>`;
@@ -445,15 +466,62 @@ async function routeKendraRequest(event, context) {
                     event.res.session.appContext.altMessages.markdown += `\n\n  ${element.text}`;
                     event.res.message += `\n\n  ${element.text}`;
                 }
-                let label = docName(element.uri) ;
+                let label = element.Title ;
                 // Convert S3 Object URLs to signed URLs
                 if (signS3Urls) {
                     element.uri = signS3URL(element.uri, expireSeconds)
                 }
-                event.res.session.appContext.altMessages.markdown += `\n\n  ${helpfulLinksMsg}: [${label}](${element.uri})`;
+                event.res.session.appContext.altMessages.markdown += `\n\n  ${helpfulLinksMsg}: <span translate=no>[${label}](${element.uri})</span>`;
             }
         });
     }
+    var req = event.req;
+
+
+    // translate response
+    var usrLang = "en";
+    var hit = {
+        a:answerMessage,
+        markdown: event.res.session.appContext.altMessages.markdown,
+        ssml: ssmlMessage
+    }
+    var translated_hit=""
+    if (_.get(event.req._settings, "ENABLE_MULTI_LANGUAGE_SUPPORT")) {
+        console.log("Translating response....")
+        usrLang = _.get(event.req, "session.userDetectedLocale");
+      if (usrLang != "en") {
+        console.log("Autotranslate hit to usrLang: ", usrLang);
+        hit= await translate.translate_hit(hit, usrLang, event.req);
+        //Translate places extra space between the * in the header
+
+      } else {
+        console.log("User Lang is en, Autotranslate not required.");
+      }
+    }
+
+    // prepend debug msg
+    var req = event.req;
+    if (_.get(req._settings, 'ENABLE_DEBUG_RESPONSES')) {
+        console.log("Adding debug message")
+        var msg = "User Input: \"" + req.question + "\"";
+        if (usrLang != 'en') {
+            msg = "User Input: \"" + _.get(req,"_event.origQuestion","notdefined") + "\", Translated to: \"" + req.question + "\"";
+        }
+        msg += ", Source: " + (foundAnswerCount > 0 || foundDocumentCount > 0 ? "Kendra" : "");
+        hit.a = msg + " " + hit.a;
+        hit.markdown = msg + "</br>" + hit.markdown;
+        hit.ssml = msg + " " + hit.ssmlMessage
+    };
+
+
+    event.res.session.appContext.altMessages.ssml = hit.ssml;
+    event.res.plainMessage = hit.a;
+    event.res.message = hit.markdown;
+    //Translate puts a space between text and the * not valid markdown
+    const regex = /\s\*\s+$/m;
+
+    event.res.session.appContext.altMessages.markdown = hit.markdown.replace(regex, '*\n\n')
+
     _.set(event,"res.answerSource",'KENDRA');
     if (kendraQueryId) {
         _.set(event,"res.session.qnabotcontext.kendra.kendraQueryId",kendraQueryId) ;
@@ -472,3 +540,5 @@ exports.handler = async (event, context) => {
     console.log('context: ' + JSON.stringify(context, null, 2));
     return routeKendraRequest(event, context);
 };
+
+

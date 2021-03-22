@@ -137,9 +137,9 @@ module.exports={
     },
     "Encryption":{
         "Type":"String",
-        "Description":"Choose whether resources (S3 and ElasticSearch) are encrypted at rest. Selecting encrypted configuration will provision c5.large.elasticsearch instances - see https://aws.amazon.com/elasticsearch-service/pricing/.",
+        "Description":"Enables encryption at rest for S3 and ElasticSearch, and provisions c5.large.elasticsearch instances - recommended for production deployments. Selecting the unencrypted configuration provisions lower cost t3.small.elasticsearch instances. See https://aws.amazon.com/elasticsearch-service/pricing/.",
         "AllowedValues": ["ENCRYPTED", "UNENCRYPTED"],
-        "Default":"UNENCRYPTED",
+        "Default":"ENCRYPTED",
         "ConstraintDescription":"Allowed Values are UNENCRYPTED or ENCRYPTED"
     },
     "ApprovedDomain":{
@@ -178,7 +178,7 @@ module.exports={
         "Type":"String",
         "Description":"Number of nodes in ElasticSearch domain - '4' is recommended for fault tolerant production deployments.",
         "AllowedValues" : ["2", "4"],
-        "Default":"2"
+        "Default":"4"
     },
     "VPCSubnetIdList" : {
         "Description" : "Subnet IDs", "Type": "CommaDelimitedList",

@@ -7,6 +7,23 @@ This repository contains code for the QnABot, described in the AWS AI blog post 
 
 See the "Getting Started" to launch your own QnABot
 
+4.5.0 provides a number of new features described below. Several to call attention to are the following:
+
+- To improve performance, resiliency, and security, the Elasticsearch cluster will default to using ENCRYPTED nodes 
+  using the c5.large.elasticsearch instance type. If UNENCRYPTED is selected, the 
+  t3.small.elasticsearch instance types will be used. The default number of nodes in a new cluster is now 4 for improved
+  resiliency. The number of cluster nodes can be reduced to 2 for development environments
+  if desired. 
+  
+- QnABot distribution regions now available for one click deployment have increased to 8 regions. These are Northern 
+  Virginia (us-east-1), Oregon (us-west-2),  Ireland (eu-west-1), London (eu-west-2), Frankfurt (eu-central-1), 
+  Sydney (ap-southeast-2), Singapore (ap-southeast-1), (Tokyo) ap-northeast-1.
+  
+*Note: The Amazon Kendra service is available in Northern Virginia, Oregon, Sydney, and Ireland. If you desire to 
+use QnABot with Kendra, please make sure to use QnABot in one of these regions.*
+
+**New features in 4.5.0** [Kendra Web Crawler, Comprehend PII Detection, Translate Custom Terminology, Increased deployment regions](#new-features)
+
 **New features in 4.4.0** [Preview version of VPC Deployment Support, Preview version of BotRouter, Upgrade to ES 7.9, Slack client detection and Markdown Support](#new-features)
 
 **New features in 4.3.0** [Connect Wizard to assist in Connect / Lex / QnABot use case, Security enhancement in API Gateway, Four node elastic search cluster support](#new-features)
@@ -44,10 +61,14 @@ Click a button to launch QnABot CloudFormation stack in the desired region
 
 | Region   |  Launch | 
 |----------|:-------------:|
-| Northern Virginia | <a target="_blank" href="https://us-east-1.console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/new?stackName=QnABot&templateURL=http://aws-bigdata-blog.s3.amazonaws.com/artifacts/aws-ai-qna-bot/templates/public.json"><span><img height="24px" src="https://s3.amazonaws.com/cloudformation-examples/cloudformation-launch-stack.png"/></span></a>     |
-| Oregon | <a target="_blank" href="https://us-west-2.console.aws.amazon.com/cloudformation/home?region=us-west-2#/stacks/new?stackName=QnABot&templateURL=http://aws-bigdata-blog-replica-us-west-2.s3.us-west-2.amazonaws.com/artifacts/aws-ai-qna-bot/templates/public.json"><span><img height="24px" src="https://s3.amazonaws.com/cloudformation-examples/cloudformation-launch-stack.png"/></span></a> |
+| Northern Virginia | <a target="_blank" href="https://us-east-1.console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/new?stackName=QnABot&templateURL=https://aws-bigdata-blog.s3.amazonaws.com/artifacts/aws-ai-qna-bot/templates/public.json"><span><img height="24px" src="https://s3.amazonaws.com/cloudformation-examples/cloudformation-launch-stack.png"/></span></a>     |
+| Oregon | <a target="_blank" href="https://us-west-2.console.aws.amazon.com/cloudformation/home?region=us-west-2#/stacks/new?stackName=QnABot&templateURL=https://aws-bigdata-blog-replica-us-west-2.s3.us-west-2.amazonaws.com/artifacts/aws-ai-qna-bot/templates/public.json"><span><img height="24px" src="https://s3.amazonaws.com/cloudformation-examples/cloudformation-launch-stack.png"/></span></a> |
 | Ireland | <a target="_blank" href="https://eu-west-1.console.aws.amazon.com/cloudformation/home?region=eu-west-1#/stacks/new?stackName=QnABot&templateURL=https://aws-bigdata-blog-replica-eu-west-1.s3-eu-west-1.amazonaws.com/artifacts/aws-ai-qna-bot/templates/public.json"><span><img height="24px" src="https://s3.amazonaws.com/cloudformation-examples/cloudformation-launch-stack.png"/></span></a> |
 | Sydney | <a target="_blank" href="https://ap-southeast-2.console.aws.amazon.com/cloudformation/home?region=ap-southeast-2#/stacks/new?stackName=QnABot&templateURL=https://aws-bigdata-blog-replica-ap-southeast-2.s3-ap-southeast-2.amazonaws.com/artifacts/aws-ai-qna-bot/templates/public.json"><span><img height="24px" src="https://s3.amazonaws.com/cloudformation-examples/cloudformation-launch-stack.png"/></span></a> |
+| London | <a target="_blank" href="https://eu-west-2.console.aws.amazon.com/cloudformation/home?region=eu-west-2#/stacks/new?stackName=QnABot&templateURL=https://aws-bigdata-blog-replica-eu-west-2.s3-eu-west-2.amazonaws.com/artifacts/aws-ai-qna-bot/templates/public.json"><span><img height="24px" src="https://s3.amazonaws.com/cloudformation-examples/cloudformation-launch-stack.png"/></span></a>     | 
+| Frankfurt | <a target="_blank" href="https://eu-central-1.console.aws.amazon.com/cloudformation/home?region=eu-central-1#/stacks/new?stackName=QnABot&templateURL=https://aws-bigdata-blog-replica-eu-central-1.s3.eu-central-1.amazonaws.com/artifacts/aws-ai-qna-bot/templates/public.json"><span><img height="24px" src="https://s3.amazonaws.com/cloudformation-examples/cloudformation-launch-stack.png"/></span></a> |
+| Singapore | <a target="_blank" href="https://ap-southeast-1.console.aws.amazon.com/cloudformation/home?region=ap-southeast-1#/stacks/new?stackName=QnABot&templateURL=https://aws-bigdata-blog-replica-ap-southeast-1a.s3-ap-southeast-1.amazonaws.com/artifacts/aws-ai-qna-bot/templates/public.json"><span><img height="24px" src="https://s3.amazonaws.com/cloudformation-examples/cloudformation-launch-stack.png"/></span></a> |
+| Tokyo | <a target="_blank" href="https://ap-northeast-1.console.aws.amazon.com/cloudformation/home?region=ap-northeast-1#/stacks/new?stackName=QnABot&templateURL=https://aws-bigdata-blog-replica-ap-northeast-1.s3-ap-northeast-1.amazonaws.com/artifacts/aws-ai-qna-bot/templates/public.json"><span><img height="24px" src="https://s3.amazonaws.com/cloudformation-examples/cloudformation-launch-stack.png"/></span></a> |
 
 ### Clone the git repo and build a version
 First, install all prerequisites:
@@ -156,15 +177,30 @@ We are currently working on adding Microsoft Edge support.
 ## License
 See the [LICENSE.md](LICENSE.md) file for details
 
-## New features 
+## New features
 
-### Verson 4.4.0
+### Version 4.5.0
+- Added single click deployment support for four additional regions
+- Changed unencrypted Amazon Elasticsearch instance types to be t3.small.elasticsearch  
+- Changed default number of nodes for Amazon Elasticsearch cluster to 4 for better production level 
+  cluster performance and resiliency. This can be changed to 2 for development clusters if desired. 
+- Added Personal Identifiable Information detection support using Amazon Comprehend - [readme](./docs/PII_Detection/README.md)
+- Added web indexing support using Amazon Kendra  - [readme](./docs/kendra_crawler_guide/README.md)
+- Added Amazon Translate custom terminology support - [readme](./docs/custom_terminology_guide/README.md)
+- Added multi-language translation with QnABot Kendra fallback processing
+- Added support for signing S3 URLs for bot responses, using handlebar syntax - [readme](./lambda/proxy-es/lib/HANDLEBARS_README.md)
+- Added support to defining user specified custom settings
+- Lambdahook responses can now be used with document chaining and are translated when multi-language support is enabled
+- Improved support when contractions are used in utterances  
+- Kendra Fallback message prefixes are now configurable in QnABot settings
+- Fixed bugs and defects
+
+### Version 4.4.0
 - Preview VPC support - [readme](./VPCSupportREADME.md)
-- Preview BotRouter support - [read](./BotRoutingREADME.md)  
+- Preview BotRouter support - [readme](./BotRoutingREADME.md)
 - Upgrade to Elasticsearch service version 7.9
 - Slack client support via Lex with Slack specific markdown support
 - Added support for Alexa re-prompt functionality  
-- Bug fixes and defect enhancements
 
 VPC support is enabled in beta mode through a new template available in the distribution repos. Please understand
 the content in [readme](./VPCSupportREADME.md) before proceeding with this type of deployment. 
@@ -178,7 +214,7 @@ based gateway to public internet should be selected. The security group specifie
 connectivity on port 443. The Elasticsearch cluster and all Lambdas will be attached to these private subnets. The
 Designer UI is still available outside of the VPC but requires login via the Cognito user pool. The Elasticsearch
 cluster will not be available externally. Users wishing to use the Kibana console will need VPN connectivity to the 
-VPC and is outside the scope of this document.   
+VPC and is outside the scope of this document.
 
 ### Version 4.3.0
 - New Connect Wizard available in the Content Designer UI to assist integration with a Connect Contact Flow.

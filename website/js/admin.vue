@@ -118,13 +118,28 @@ module.exports={
         subTitle:"Import new questions",
         icon:"cloud_upload",
         href:"#/import"
-      },{
+      },
+      {
         title:"Export",
         id:"export",
         subTitle:"Download backups of your QnAs",
         icon:"file_download",
         href:"#/export"
-      },{
+      },      {
+        title:"Import Custom Terminology",
+        id:"customTranslate",
+        subTitle:"Import custom translation terminology",
+        icon:"transform",
+        href:"#/customTranslate"
+      },
+      {
+        title:"Kendra Web Page Indexing",
+        id:"kendraIndexing",
+        subTitle:"Index Web Pages with Kendra",
+        icon:"search",
+        href:"#/kendraIndex"
+      },
+      {
         title:"Alexa",
         id:"alexa",
         subTitle:"Instructions for setting up an Alexa Skill",
