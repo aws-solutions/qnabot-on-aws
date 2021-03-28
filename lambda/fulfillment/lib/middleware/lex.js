@@ -1,4 +1,7 @@
 var _=require('lodash')
+const slackifyMarkdown = require('slackify-markdown');
+const utf8 = require('utf8');
+
 
 // When using QnABot in Amazon Connect call center, filter out 'filler' words that callers sometimes use
 // filler words are defined in setting CONNECT_IGNORE_WORDS
@@ -87,13 +90,25 @@ exports.assemble=function(request,response){
         })
     } ;
     
-    // If client is slack, use Markdown in response
+    // Special handling for Slack responses
+    // Markdown conversion, and convert string to utf8 encoding for unicode support
     if (request._clientType == "LEX.Slack.Text") {
         if (_.get(response,"result.alt.markdown")) {
-            out.dialogAction.message.content = response.result.alt.markdown ;
-        }
+            let md = response.result.alt.markdown;
+            console.log("Converting markdown response to Slack format.");
+            console.log("Original markdown: ", JSON.stringify(md));
+            md = md.replace(/<\/?span[^>]*>/g,"");  // remove any span tags (eg no-translate tags)
+            md = md.replace(/<\/?br *\/?>/g,"\n"); // replace br with \n
+            md = slackifyMarkdown(md);
+            out.dialogAction.message.content = md ;
+            console.log("Converted markdown: ", JSON.stringify(md));
+        } 
+        console.log("Converting Slack message javascript string to utf8 (for multi-byte compatibility).");
+        let txt = out.dialogAction.message.content;
+        txt = utf8.encode(txt); // encode as utf8
+        out.dialogAction.message.content = txt;
     }
-    
+
     // copy response card to appContext session attribute used by lex-web-ui
     //  - allows repsonse card display even when using postContent (voice) with Lex (not otherwise supported by Lex)
     //  - allows Lex limit of 5 buttons to be exceeded when using lex-web-ui
