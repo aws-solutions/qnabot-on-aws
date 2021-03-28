@@ -16,14 +16,26 @@ let kendraIndexes = undefined;
 
 
 /**
- * Function to bold highlights in Kendra answer by adding markdown
- * @param {string} textIn
- * @param {number} hlBeginOffset
- * @param {number} hlEndOffset
- * @param {boolean} highlightOnly
- * @returns {string}
+ * Markdown formatting functions - implements Slack markdown
  */
-function addMarkdownHighlights(textIn,hlBeginOffset,hlEndOffset,highlightOnly=false) {
+
+function markdownItalic(textIn, markdownType) {
+    let italic_markup = '*'; //default
+    if (markdownType === 'Slack') {
+        italic_markup = '_';
+    }
+    return italic_markup + textIn + italic_markup;
+}
+
+function markdownBold(textIn, markdownType) {
+    let bold_markup = '**'; //default
+    if (markdownType === 'Slack') {
+        bold_markup = '*'; 
+    }
+    return bold_markup + textIn + bold_markup;
+}
+
+function addMarkdownHighlights(textIn,hlBeginOffset,hlEndOffset, markdownType, highlightOnly=false) {
     let beginning = textIn.substring(0, hlBeginOffset);
     let highlight = textIn.substring(hlBeginOffset, hlEndOffset);
     let rest = textIn.substr(hlEndOffset);
@@ -31,12 +43,20 @@ function addMarkdownHighlights(textIn,hlBeginOffset,hlEndOffset,highlightOnly=fa
     // add markdown only if highlight is not in the middle of a url/link.. 
     if (! isHighlightInLink(textIn,hlBeginOffset)) {
         if (highlightOnly) {
-            textOut = '**' + highlight + '**';
+            textOut = markdownBold(highlight, markdownType);
         } else {
-            textOut = beginning + '**' + highlight + '**' + rest;
+            textOut = beginning + markdownBold(highlight, markdownType) + rest;
         }        
     }
     return textOut ;
+}
+
+function highlightsOffset(markdownType) {
+    let offset = 4; //default
+    if (markdownType === 'Slack') {
+        offset = 2; //Slack uses single chars for bold
+    }    
+    return offset;
 }
 
 function isHighlightInLink(textIn,hlBeginOffset) {
@@ -51,6 +71,15 @@ function isHighlightInLink(textIn,hlBeginOffset) {
     }
     return false;
 }
+
+function markdownLink(url, label, markdownType) {
+    let link = `<span translate=no>[${label}](${url})</span>`;
+    if (markdownType === 'Slack') {
+        link = `<span translate=no><${url}|${label}></span>`;;
+    }
+    return link;
+}
+
 
 /**
  * Function to query kendraClient and return results via Promise
@@ -227,6 +256,14 @@ async function routeKendraRequest(event, context) {
             new AWS.Kendra({apiVersion: '2019-02-03'})
         );
     }
+    
+    // determine client type and associated markdown type to use
+    let markdownType = "Default" ;
+    let client_type = event.req["_clientType"];
+    if (client_type === "LEX.Slack.Text") {
+        markdownType = 'Slack';
+    }
+    
 
     // process query against Kendra for QnABot
     let indexes = event.req["_settings"]["ALT_SEARCH_KENDRA_INDEXES"] ? event.req["_settings"]["ALT_SEARCH_KENDRA_INDEXES"] : process.env.KENDRA_INDEXES
@@ -275,13 +312,13 @@ async function routeKendraRequest(event, context) {
 
     // process kendra query responses and update answer content
 
-    /* default message text - can be overridden using QnABot SSM Parameter Store Custom Property */
-    let topAnswerMessage = event.req["_settings"]["ALT_SEARCH_KENDRA_TOP_ANSWER_MESSAGE"] + "\n\n"; //"Amazon Kendra suggested answer. \n\n ";
-    let topAnswerMessageMd = event.req["_settings"]["ALT_SEARCH_KENDRA_TOP_ANSWER_MESSAGE"] == "" ? "" : `*${event.req["_settings"]["ALT_SEARCH_KENDRA_TOP_ANSWER_MESSAGE"]}* \n `;
+    /* default message text from QnABot Settings */
+    let topAnswerMessage = event.req["_settings"]["ALT_SEARCH_KENDRA_TOP_ANSWER_MESSAGE"]; 
+    let topAnswerMessageMd = markdownItalic(topAnswerMessage, markdownType);
     let answerMessage = event.req["_settings"]["ALT_SEARCH_KENDRA_ANSWER_MESSAGE"];
-    let answerMessageMd = event.req["_settings"]["ALT_SEARCH_KENDRA_ANSWER_MESSAGE"] == "" ? "" : `*${answerMessage}* \n `;
-    let faqanswerMessage = event.req["_settings"]["ALT_SEARCH_KENDRA_FAQ"] + "\n\n"; //'Answer from Amazon Kendra FAQ.'
-    let faqanswerMessageMd = event.req["_settings"]["ALT_SEARCH_KENDRA_FAQ"]  == "" ? "" : `*${event.req["_settings"]["ALT_SEARCH_KENDRA_FAQ"]}* \n`
+    let answerMessageMd = markdownItalic(answerMessage, markdownType);
+    let faqanswerMessage = event.req["_settings"]["ALT_SEARCH_KENDRA_FAQ"]; 
+    let faqanswerMessageMd = markdownItalic(faqanswerMessage, markdownType);
     let speechMessage = "";
     let helpfulLinksMsg = 'Source Link';
     let maxDocumentCount = _.get(event.req,'_settings.ALT_SEARCH_KENDRA_MAX_DOCUMENT_COUNT',2);
@@ -318,16 +355,16 @@ async function routeKendraRequest(event, context) {
                     let j, elem;
                     for (j=0; j<sorted_highlights.length; j++) {
                         elem = sorted_highlights[j];
-                        let offset = 4*j;
+                        let offset = highlightsOffset(markdownType) * j;
 
                         if (elem.TopAnswer == true) {   // if top answer is found, then answer is abbreviated to this phrase
                             seenTop = true;
                             answerMessage = topAnswerMessage + highlight + '.';
                             answerMessageMd = topAnswerMessageMd;
-                            answerTextMd = addMarkdownHighlights(answerTextMd, elem.BeginOffset+offset, elem.EndOffset+offset, true) ;
+                            answerTextMd = addMarkdownHighlights(answerTextMd, elem.BeginOffset+offset, elem.EndOffset+offset, markdownType, true) ;
                             break;
                         } else {
-                            answerTextMd = addMarkdownHighlights(answerTextMd, elem.BeginOffset+offset, elem.EndOffset+offset, false) ;
+                            answerTextMd = addMarkdownHighlights(answerTextMd, elem.BeginOffset+offset, elem.EndOffset+offset, markdownType, false) ;
                         }
                     }
                     answerMessageMd = answerMessageMd + '\n\n' + answerTextMd;
@@ -362,8 +399,8 @@ async function routeKendraRequest(event, context) {
                     let j, elem;
                     for (j=0; j<sorted_highlights.length; j++) {
                         elem = sorted_highlights[j];
-                        let offset = 4*j;
-                        answerTextMd = addMarkdownHighlights(answerTextMd, elem.BeginOffset+offset, elem.EndOffset+offset, false) ;
+                        let offset = highlightsOffset(markdownType) * j;
+                        answerTextMd = addMarkdownHighlights(answerTextMd, elem.BeginOffset+offset, elem.EndOffset+offset, markdownType, false) ;
                     }
                     answerMessageMd = faqanswerMessageMd + '\n\n' + answerTextMd;
                     
@@ -382,11 +419,8 @@ async function routeKendraRequest(event, context) {
                         var j, elem;
                         for (j=0; j<sorted_highlights.length; j++) {
                             elem = sorted_highlights[j];
-                            let offset = 4*j;
-                            let beginning = docInfo.text.substring(0, elem.BeginOffset+offset);
-                            let highlight = docInfo.text.substring(elem.BeginOffset+offset, elem.EndOffset+offset);
-                            let rest = docInfo.text.substr(elem.EndOffset+offset);
-                            docInfo.text = beginning + '**' + highlight + '**' + rest;
+                            let offset = highlightsOffset(markdownType) * j;
+                            docInfo.text = addMarkdownHighlights(docInfo.text, elem.BeginOffset+offset, elem.EndOffset+offset, markdownType, false) ;
                         };
                         
                         if (foundAnswerCount == 0 && foundDocumentCount == 0) {
@@ -450,7 +484,7 @@ async function routeKendraRequest(event, context) {
         if (signS3Urls) {
           element.DocumentURI = signS3URL(element.DocumentURI, expireSeconds);
         }
-        event.res.session.appContext.altMessages.markdown += `<span translate=no>[${element.DocumentTitle.Text}](${element.DocumentURI})</span>`;
+        event.res.session.appContext.altMessages.markdown += markdownLink(element.DocumentURI, element.DocumentTitle.Text, markdownType);
       });
     }
     
@@ -459,8 +493,8 @@ async function routeKendraRequest(event, context) {
         helpfulDocumentsUris.forEach(function (element) {
             if (idx++ < maxDocumentCount) {
                 event.res.session.appContext.altMessages.markdown += `\n\n`;
-                event.res.session.appContext.altMessages.markdown += `***`;
-                event.res.session.appContext.altMessages.markdown += `\n\n <br>`;
+                event.res.session.appContext.altMessages.markdown += (markdownType === "Slack") ? `--------------------\n` : `***`;
+                event.res.session.appContext.altMessages.markdown += `\n`;
                 
                 if (element.text && element.text.length > 0 && event.req._preferredResponseType != "SSML") { //don't append doc search to SSML answers
                     event.res.session.appContext.altMessages.markdown += `\n\n  ${element.text}`;
@@ -471,7 +505,7 @@ async function routeKendraRequest(event, context) {
                 if (signS3Urls) {
                     element.uri = signS3URL(element.uri, expireSeconds)
                 }
-                event.res.session.appContext.altMessages.markdown += `\n\n  ${helpfulLinksMsg}: <span translate=no>[${label}](${element.uri})</span>`;
+                event.res.session.appContext.altMessages.markdown += `\n\n  ${helpfulLinksMsg}: ` + markdownLink(element.uri, label, markdownType);
             }
         });
     }
@@ -513,14 +547,16 @@ async function routeKendraRequest(event, context) {
         hit.ssml = msg + " " + hit.ssmlMessage
     };
 
-
+    // remove the URL no-translate span tags to prevent display by Slack client
+    hit.markdown = hit.markdown.replace(/<\/?span[^>]*>/g,"");
+    
     event.res.session.appContext.altMessages.ssml = hit.ssml;
     event.res.plainMessage = hit.a;
     event.res.message = hit.markdown;
     //Translate puts a space between text and the * not valid markdown
     const regex = /\s\*\s+$/m;
-
     event.res.session.appContext.altMessages.markdown = hit.markdown.replace(regex, '*\n\n')
+    
 
     _.set(event,"res.answerSource",'KENDRA');
     if (kendraQueryId) {
