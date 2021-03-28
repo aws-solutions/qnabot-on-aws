@@ -101,17 +101,12 @@ Previous answer was qid: {{getSessionAttr 'qnabotcontext.previous.qid' 'No previ
 }}
 
 
-{{!-- Support different markdown syntax / messages for Slack in Markdown answer--}}
+{{!-- Support different for Slack answer--}}
+{{!-- NOTE: QnABot now automates conversion of standard markdown to Slack markdown syntax - always author in standard markdown --}}
 {{#ifCond ClientType '==' 'LEX.Slack.Text'}}
-   Slack Markdown
-   _Italics_  
-   *Bold*  
-   <https://google.com|this is a link>
+   Slack Message
 {{else}}
-   # Lex Web UI markdown  
-   _Italics_  
-   **Bold**  
-   [this is a link](https://google.com)  
+   Other client message 
 {{/ifCond}}
 
 {{!-- Use S3 Signed URL as a hyperlink to document/image in S3 --}}
