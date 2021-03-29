@@ -15,10 +15,9 @@ const AWS = require('aws-sdk');
 let kendraIndexes = undefined;
 
 
-function create_hit(answermessage,markdown,ssml,kendra){
+function create_hit(answermessage,markdown,ssml,hit_count,kendra){
     var hits =  {
                     "a": answermessage,
-                    "qid": "Maru",
                     "alt": {
                         "markdown": markdown,
                         "ssml":ssml
@@ -27,7 +26,8 @@ function create_hit(answermessage,markdown,ssml,kendra){
                     "questions": [
                     ],
                     "answersource": "Kendra",
-                    "kendra":kendra
+                    "kendra":kendra,
+                    "hit_count": hit_count
                 }
 
 
@@ -443,10 +443,6 @@ async function routeKendraRequest(event, context) {
     let markdown = answerMessageMd;
     let message = answerMessage;
     if (foundAnswerCount > 0 || foundDocumentCount > 0) {
-        event.res.session.qnabot_gotanswer = true ; 
-        event.res.message = answerMessage;
-        event.res.card = [];
-
         ssmlMessage = `${answerMessage.substring(0,600).replace(/\r?\n|\r/g, " ")}`;
         if (speechMessage != "") {
             ssmlMessage = `${speechMessage.substring(0,600).replace(/\r?\n|\r/g, " ")}`;
@@ -495,23 +491,13 @@ async function routeKendraRequest(event, context) {
     }
     var req = event.req;
 
-    hit = create_hit(message,markdown,ssmlMessage, {
+    hit = create_hit(message,markdown,ssmlMessage, foundAnswerCount + foundDocumentCount,{
         kendraQueryId: kendraQueryId,
         kendraIndexId: kendraIndexId,
-        kendraResultId: kendraResultId
+        kendraResultId: kendraResultId,
+        kendraFoundAnswerCount: foundAnswerCount,
+        kendraFoundDocumentCount: foundDocumentCount
     })
-
-
-
-
-
-
-    //Translate puts a space between text and the * not valid markdown
-    //const regex = /\s\*\s+$/m;
-
-    //event.res.session.appContext.altMessages.markdown = hit.markdown.replace(regex, '*\n\n')
-
-    _.set(event,"res.answerSource",'KENDRA');
     console.log("Returning event: ", JSON.stringify(hit, null, 2));
 
     return hit;

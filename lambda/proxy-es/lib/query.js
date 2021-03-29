@@ -7,7 +7,7 @@ var build_es_query = require('./esbodybuilder');
 var handlebars = require('./handlebars');
 var translate = require('./translate');
 var kendra = require('./kendraQuery');
-var kendra_fallback = require("./KendraFallback")
+var kendra_fallback = require("./kendra")
 // const sleep = require('util').promisify(setTimeout);
 
 
@@ -235,19 +235,24 @@ async function get_hit(req, res) {
     } else if(query_params.kendra_indexes.length != 0) {
         console.log("request entering kendra fallback " + JSON.stringify(req))
         hit = await  kendra_fallback.handler({req,res})
-        if(!hit)
+        console.log("Result from Kendra " + JSON.stringify(hit))
+        if(!(hit &&  hit.hit_count != 0))
         {
             console.log("No hits from query - searching instead for: " + no_hits_question);
             query_params['question'] = no_hits_question;
-            //res['got_hits'] = 0;  // response flag, used in logging / kibana
+            res['got_hits'] = 0;  // response flag, used in logging / kibana
             
-            hit = await run_query(req, query_params);
+            response = await run_query(req, query_params);
+            hit = _.get(response, "hits.hits[0]._source");
         }else{
             _.set(res,"answerSource",'KENDRA');
+            _.set(res,"card",[]);
+            _.set(res,"session.qnabot_gotanswer",true) ; 
+            _.set(res,"message", hit.a);
+            res['got_hits'] = 1;
 
         }
     }
-    console.log("After Kendra - " + JSON.stringify(hit))
     // Do we have a hit?
     if (hit) {
 

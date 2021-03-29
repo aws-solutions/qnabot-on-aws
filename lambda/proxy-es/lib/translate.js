@@ -36,6 +36,8 @@ async function get_translation(englishText, targetLang, req) {
         console.log("input text:", englishText);
         const translation = await translateClient.translateText(params).promise();
         console.log("translation:", translation);
+        const regex = /\s\*\s+$/m;
+        translation.TranslatedText = translation.TranslatedText.replace(regex, '*\n\n')
         return translation.TranslatedText;
     } catch (err) {
         console.log("warning - error during translation: ", err);
