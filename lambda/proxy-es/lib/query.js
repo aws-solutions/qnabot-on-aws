@@ -7,6 +7,7 @@ var build_es_query = require('./esbodybuilder');
 var handlebars = require('./handlebars');
 var translate = require('./translate');
 var kendra = require('./kendraQuery');
+var kendra_fallback = require("./KendraFallback")
 // const sleep = require('util').promisify(setTimeout);
 
 
@@ -205,7 +206,8 @@ async function get_hit(req, res) {
         syntax_confidence_limit: _.get(req, '_settings.ES_SYNTAX_CONFIDENCE_LIMIT'),
         score_answer_field: _.get(req, '_settings.ES_SCORE_ANSWER_FIELD'),
         fuzziness: _.get(req, '_settings.ES_USE_FUZZY_MATCH'),
-        es_expand_contractions: _.get(req,'_settings.ES_EXPAND_CONTRACTIONS')
+        es_expand_contractions: _.get(req,'_settings.ES_EXPAND_CONTRACTIONS'),
+        kendra_indexes: _.get(req,'_settings.ALT_SEARCH_KENDRA_INDEXES')
 
     };
     var no_hits_question = _.get(req, '_settings.ES_NO_HITS_QUESTION', 'no_hits');
@@ -230,16 +232,25 @@ async function get_hit(req, res) {
     
     if (hit) {
         res['got_hits'] = 1;  // response flag, used in logging / kibana
-    } else {
-        console.log("No hits from query - searching instead for: " + no_hits_question);
-        query_params['question'] = no_hits_question;
-        res['got_hits'] = 0;  // response flag, used in logging / kibana
-        
-        response = await run_query(req, query_params);
-        hit = _.get(response, "hits.hits[0]._source");
+    } else if(query_params.kendra_indexes.length != 0) {
+        console.log("request entering kendra fallback " + JSON.stringify(req))
+        hit = await  kendra_fallback.handler({req,res})
+        if(!hit)
+        {
+            console.log("No hits from query - searching instead for: " + no_hits_question);
+            query_params['question'] = no_hits_question;
+            //res['got_hits'] = 0;  // response flag, used in logging / kibana
+            
+            hit = await run_query(req, query_params);
+        }else{
+            _.set(res,"answerSource",'KENDRA');
+
+        }
     }
+    console.log("After Kendra - " + JSON.stringify(hit))
     // Do we have a hit?
     if (hit) {
+
         // set res topic from document before running handlebars, so that handlebars can access or overwrite it.
         _.set(res, "session.topic", _.get(hit, "t"));
         // run handlebars template processing
