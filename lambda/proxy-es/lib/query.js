@@ -245,10 +245,11 @@ async function get_hit(req, res) {
             response = await run_query(req, query_params);
             hit = _.get(response, "hits.hits[0]._source");
         }else{
-            _.set(res,"answerSource",'KENDRA');
+            _.set(res,"answersource",'KendraFallback');
             _.set(res,"card",[]);
             _.set(res,"session.qnabot_gotanswer",true) ; 
             _.set(res,"message", hit.a);
+            _.set(req,"debug",hit.debug)
             res['got_hits'] = 1;
 
         }
@@ -535,8 +536,14 @@ module.exports = async function (req, res) {
             }
         }
         // prepend debug msg
+        console.log("pre-debug " +JSON.stringify(req))
         if (_.get(req._settings, 'ENABLE_DEBUG_RESPONSES')) {
             var msg = "User Input: \"" + req.question + "\"";
+            if(req.debug)
+            {
+                msg += JSON.stringify(req.debug,2)
+            }
+
             if (usrLang != 'en') {
                 msg = "User Input: \"" + _.get(req,"_event.origQuestion","notdefined") + "\", Translated to: \"" + req.question + "\"";
             }
@@ -548,6 +555,7 @@ module.exports = async function (req, res) {
                     ssml: "<speak>" + msg + "</speak>"
                 },
                 rp: "[" + _.get(hit, "rp") + "] "
+
             };
             hit = merge_next(debug_msg, hit) ;
         }

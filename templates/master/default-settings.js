@@ -14,6 +14,7 @@ var default_settings = {
     ENABLE_CUSTOM_TERMINOLOGY: "false",
     MINIMUM_CONFIDENCE_SCORE: 0.6, //User can override this value to set the minimum confidence they accept using CustomQnABotSettings
     ALT_SEARCH_KENDRA_INDEXES: [], // Add Kendra index to array to enable Amazon Kendra as a fallback source of answers
+    ALT_SEARCH_KENDRA_CONFIDENCE_SCORE: "LOW", //Should be one of 'VERY_HIGH'|'HIGH'|'MEDIUM'|'LOW'
     ALT_SEARCH_KENDRA_S3_SIGNED_URLS: "true", // If S3 document URL is in the search result, convert to signed URL. Make sure IAM ExtensionLambdaRole has access to S3 objects in Kendra index (default role grants access to buckets starting with name QNA or qna).
     ALT_SEARCH_KENDRA_S3_SIGNED_URL_EXPIRE_SECS: 300, // Expiry time for signed URLs
     ALT_SEARCH_KENDRA_MAX_DOCUMENT_COUNT: 2, // limit number of document search results returned by Kendra fallback\

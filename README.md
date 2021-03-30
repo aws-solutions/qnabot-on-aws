@@ -388,7 +388,7 @@ review the Kendra pricing structure. The fallback mechanism for QnABot can be us
 Enterprise search solution.**
  
 To enable this support for your Kendra indexes, use the Settings UI in the Designer and add your 
-index to the ALT_SEARCH_KENDRA_INDEXS parameter. This parameter takes an array of strings and uses the form below.
+index to the ALT_SEARCH_KENDRA_INDEXES parameter. This parameter takes an array of strings and uses the form below.
 ```
 ["a672e3a2-nnnn-nnnn-nnnn-7b3abc81c313"]
 ```
