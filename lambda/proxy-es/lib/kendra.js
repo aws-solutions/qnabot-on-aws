@@ -370,9 +370,10 @@ async function routeKendraRequest(event, context) {
 
                         if (elem.TopAnswer == true) {   // if top answer is found, then answer is abbreviated to this phrase
                             seenTop = true;
-                            answerMessage = topAnswerMessage + highlight + '.';
                             answerMessageMd = topAnswerMessageMd;
                             answerTextMd = addMarkdownHighlights(answerTextMd, elem.BeginOffset+offset, elem.EndOffset+offset, true) ;
+                            answerMessage = topAnswerMessage + answerTextMd + '.';
+                            speechMessage = answerTextMd ;
                             break;
                         } else {
                             answerTextMd = addMarkdownHighlights(answerTextMd, elem.BeginOffset+offset, elem.EndOffset+offset, false) ;

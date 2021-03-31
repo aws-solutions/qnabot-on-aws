@@ -245,8 +245,7 @@ async function get_hit(req, res) {
             response = await run_query(req, query_params);
             hit = _.get(response, "hits.hits[0]._source");
         }else{
-            _.set(res,"answersource",'KendraFallback');
-            _.set(res,"card",[]);
+            _.set(res,"answersource","Kendra Fallback');
             _.set(res,"session.qnabot_gotanswer",true) ; 
             _.set(res,"message", hit.a);
             _.set(req,"debug",hit.debug)
@@ -395,7 +394,7 @@ function update_res_with_hit(req, res, hit) {
     // Add answerSource for query hits
     var ansSource = _.get(hit, "answersource", "unknown");
     if (ansSource==="Kendra FAQ") { // kendra fallback sets answerSource directly
-        res.answerSource = "KENDRA";
+        res.answerSource = "KENDRA FAQ";
     } else if (ansSource==="ElasticSearch" || ansSource==="ElasticSearch Fallback") {
         res.answerSource = "ELASTICSEARCH";
     } else {
