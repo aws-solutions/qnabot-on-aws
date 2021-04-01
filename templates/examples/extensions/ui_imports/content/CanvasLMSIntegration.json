@@ -27,7 +27,7 @@
         "ssml": ""
       },
       "conditionalChaining": "",
-      "l": "qna-bot-query-canvas",
+      "l": "QNA:EXTCanvasHook",
       "qid": "canvas.announcements",
       "type": "qna",
       "selected": false,
@@ -80,7 +80,7 @@
         "markdown": "",
         "ssml": ""
       },
-      "l": "qna-bot-query-canvas",
+      "l": "QNA:EXTCanvasHook",
       "qid": "canvas.classchoices",
       "type": "qna",
       "q": [
@@ -141,7 +141,7 @@
         "{\"Query\": \"AssignmentDueDates\"}"
       ],
       "a": "lambda answer",
-      "l": "qna-bot-query-canvas",
+      "l": "QNA:EXTCanvasHook",
       "qid": "canvas.assignments",
       "type": "qna",
       "q": [
@@ -243,7 +243,7 @@
         "ssml": ""
       },
       "conditionalChaining": "",
-      "l": "qna-bot-query-canvas",
+      "l": "QNA:EXTCanvasHook",
       "qid": "canvas.class",
       "type": "qna",
       "q": [
@@ -268,7 +268,7 @@
         "{\"Query\": \"SyllabusForCourse\"}"
       ],
       "a": "Below is your syllabus",
-      "l": "qna-bot-query-canvas",
+      "l": "QNA:EXTCanvasHook",
       "qid": "canvas.syllabus",
       "type": "qna",
       "q": [
@@ -302,7 +302,7 @@
         "ssml": ""
       },
       "conditionalChaining": "",
-      "l": "qna-bot-query-canvas",
+      "l": "QNA:EXTCanvasHook",
       "qid": "canvas.test.2",
       "type": "qna",
       "selected": false,
@@ -334,7 +334,7 @@
         "ssml": ""
       },
       "conditionalChaining": "",
-      "l": "qna-bot-query-canvas",
+      "l": "QNA:EXTCanvasHook",
       "qid": "canvas.classinformation",
       "type": "qna",
       "q": [
@@ -417,7 +417,7 @@
         "ssml": ""
       },
       "conditionalChaining": "",
-      "l": "qna-bot-query-canvas",
+      "l": "QNA:EXTCanvasHook",
       "qid": "canvas.grades",
       "type": "qna",
       "selected": false,
