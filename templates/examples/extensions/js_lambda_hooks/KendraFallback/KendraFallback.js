@@ -424,7 +424,7 @@ async function routeKendraRequest(event, context) {
         event.res.message = answerMessage;
         event.res.card = [];
 
-        let ssmlMessage = `${answerMessage.substring(0,600).replace(/\r?\n|\r/g, " ")}`;
+        ssmlMessage = `${answerMessage.substring(0,600).replace(/\r?\n|\r/g, " ")}`;
         if (speechMessage != "") {
             ssmlMessage = `${speechMessage.substring(0,600).replace(/\r?\n|\r/g, " ")}`;
         }
