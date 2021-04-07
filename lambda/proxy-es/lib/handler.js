@@ -121,6 +121,7 @@ async function run_query_kendra(event, kendra_index) {
         size:10, // limit kendra hits to 10 max to avoid pagination issues
         es_address: event.endpoint,
         es_path: event.path,
+        
     } ;
     var kendra_response = await kendra.handler(request_params);
     return kendra_response;
