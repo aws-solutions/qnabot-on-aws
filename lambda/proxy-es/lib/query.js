@@ -78,6 +78,7 @@ async function run_query_kendra(req, query_params) {
         kendra_faq_index:_.get(req, "_settings.KENDRA_FAQ_INDEX"),
         maxRetries:_.get(req, "_settings.KENDRA_FAQ_CONFIG_MAX_RETRIES"),
         retryDelay:_.get(req, "_settings.KENDRA_FAQ_CONFIG_RETRY_DELAY"),
+        minimum_score: _.get(req, "_settings.ALT_SEARCH_KENDRA_CONFIDENCE_SCORE"),
         size:1,
         question: query_params.question,
         es_address: req._info.es.address,
@@ -245,7 +246,7 @@ async function get_hit(req, res) {
             response = await run_query(req, query_params);
             hit = _.get(response, "hits.hits[0]._source");
         }else{
-            _.set(res,"answersource","Kendra Fallback');
+            _.set(res,"answersource","Kendra Fallback");
             _.set(res,"session.qnabot_gotanswer",true) ; 
             _.set(res,"message", hit.a);
             _.set(req,"debug",hit.debug)
