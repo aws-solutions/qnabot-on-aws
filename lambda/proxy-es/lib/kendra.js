@@ -19,7 +19,7 @@ function confidence_filter(minimum_score,kendra_result){
     var confidences = ["LOW","MEDIUM","HIGH","VERY_HIGH"]
     var index = confidences.findIndex( i => i == minimum_score.toUpperCase())
     if(index == undefined){
-        console.log("Warning: ALT_SEARCH_KENDRA_CONFIDENCE_SCORE should be one of 'VERY_HIGH'|'HIGH'|'MEDIUM'|'LOW'")
+        console.log("Warning: ALT_SEARCH_KENDRA_FALLBACK_CONFIDENCE_SCORE should be one of 'VERY_HIGH'|'HIGH'|'MEDIUM'|'LOW'")
         return true;
     }
     confidences = confidences.slice(index)
@@ -322,9 +322,9 @@ async function routeKendraRequest(event, context) {
     let topAnswerMessageMd = event.req["_settings"]["ALT_SEARCH_KENDRA_TOP_ANSWER_MESSAGE"] == "" ? "" : `*${event.req["_settings"]["ALT_SEARCH_KENDRA_TOP_ANSWER_MESSAGE"]}* \n `;
     let answerMessage = event.req["_settings"]["ALT_SEARCH_KENDRA_ANSWER_MESSAGE"];
     let answerMessageMd = event.req["_settings"]["ALT_SEARCH_KENDRA_ANSWER_MESSAGE"] == "" ? "" : `*${answerMessage}* \n `;
-    let faqanswerMessage = event.req["_settings"]["ALT_SEARCH_KENDRA_FAQ"] + "\n\n"; //'Answer from Amazon Kendra FAQ.'
-    let faqanswerMessageMd = event.req["_settings"]["ALT_SEARCH_KENDRA_FAQ"]  == "" ? "" : `*${event.req["_settings"]["ALT_SEARCH_KENDRA_FAQ"]}* \n`
-    let minimum_score = event.req["_settings"]["ALT_SEARCH_KENDRA_CONFIDENCE_SCORE"];
+    let faqanswerMessage = event.req["_settings"]["ALT_SEARCH_KENDRA_FAQ_MESSAGE"] + "\n\n"; //'Answer from Amazon Kendra FAQ.'
+    let faqanswerMessageMd = event.req["_settings"]["ALT_SEARCH_KENDRA_FAQ_MESSAGE"]  == "" ? "" : `*${event.req["_settings"]["ALT_SEARCH_KENDRA_FAQ_MESSAGE"]}* \n`
+    let minimum_score = event.req["_settings"]["ALT_SEARCH_KENDRA_FALLBACK_CONFIDENCE_SCORE"];
     let speechMessage = "";
     let helpfulLinksMsg = 'Source Link';
     let maxDocumentCount = _.get(event.req,'_settings.ALT_SEARCH_KENDRA_MAX_DOCUMENT_COUNT',2);

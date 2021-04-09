@@ -78,7 +78,7 @@ async function run_query_kendra(req, query_params) {
         kendra_faq_index:_.get(req, "_settings.KENDRA_FAQ_INDEX"),
         maxRetries:_.get(req, "_settings.KENDRA_FAQ_CONFIG_MAX_RETRIES"),
         retryDelay:_.get(req, "_settings.KENDRA_FAQ_CONFIG_RETRY_DELAY"),
-        minimum_score: _.get(req, "_settings.ALT_SEARCH_KENDRA_CONFIDENCE_SCORE"),
+        minimum_score: _.get(req, "_settings.ALT_SEARCH_KENDRA_FAQ_CONFIDENCE_SCORE"),
         size:1,
         question: query_params.question,
         es_address: req._info.es.address,
@@ -208,7 +208,8 @@ async function get_hit(req, res) {
         score_answer_field: _.get(req, '_settings.ES_SCORE_ANSWER_FIELD'),
         fuzziness: _.get(req, '_settings.ES_USE_FUZZY_MATCH'),
         es_expand_contractions: _.get(req,'_settings.ES_EXPAND_CONTRACTIONS'),
-        kendra_indexes: _.get(req,'_settings.ALT_SEARCH_KENDRA_INDEXES')
+        kendra_indexes: _.get(req,'_settings.ALT_SEARCH_KENDRA_INDEXES'),
+        minimum_confidence_score: _.get(req,'_settings.ALT_SEARCH_KENDRA_FAQ_CONFIDENCE_SCORE')
 
     };
     var no_hits_question = _.get(req, '_settings.ES_NO_HITS_QUESTION', 'no_hits');

@@ -151,7 +151,7 @@ async function routeKendraRequest(request_params) {
             for (i=0; i<res.ResultItems.length; i++) {
                 element = res.ResultItems[i];
 
-                if(!confidence_filter("HIGH",element))
+                if(!confidence_filter(request_params.minimum_score,element))
                     continue;
 
                 /* Note - only FAQ format will be provided back to the requester */
