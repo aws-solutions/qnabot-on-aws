@@ -17,10 +17,12 @@
 | ENABLE_CUSTOM_TERMINOLOGY| true or false |  Enable support for installed [Custom Terminology](https://aws.amazon.com/blogs/machine-learning/introducing-amazon-translate-custom-terminology/) files when using Amazon Translate
 | MINIMUM_CONFIDENCE_SCORE | decimal between 0.0 and 0,99 | The minimum confidence before Amazon Comprehend will determine the user's language
 | ALT_SEARCH_KENDRA_INDEXES | An Array of comma separated Ids |  A list of one or more [Amazon Kendra](https://aws.amazon.com/kendra/) indexes used for Kendra fallback
+| ALT_SEARCH_KENDRA_FALLBACK_CONFIDENCE_SCORE | VERY_HIGH \| HIGH \| MEDIUM \| LOW |  Answers will only be returned that or at or above the specified [confidence level](https://aws.amazon.com/about-aws/whats-new/2020/09/amazon-kendra-launches-confidence-scores/) when using Kendra Fallback
+| ALT_SEARCH_KENDRA_FAQ_CONFIDENCE_SCORE: | VERY_HIGH \| HIGH \| MEDIUM \| LOW |  Placeholder
 | ALT_SEARCH_KENDRA_S3_SIGNED_URLS | true or false | Enables [signed S3](https://docs.aws.amazon.com/AmazonS3/latest/userguide/ShareObjectPreSignedURL.html) Urls for Amazon Kendra results.  If enabled, allows support for Kendra documents which are not publicly accessible. 
 | ALT_SEARCH_KENDRA_S3_SIGNED_URL_EXPIRE_SECS | integer | Determines length of time in seconds for the validity of signed S3 Urls in Kendra fallback.
 | ALT_SEARCH_KENDRA_MAX_DOCUMENT_COUNT | integer | Number of documents returned by Amazon Kendra fallback
-| ALT_SEARCH_KENDRA_FAQ | string | Heading when a [Frequently Asked Question](https://docs.aws.amazon.com/kendra/latest/dg/response-types.html) is found by Amazon Kendra.
+| ALT_SEARCH_KENDRA_FAQ_MESSAGE | string | Heading when a [Frequently Asked Question](https://docs.aws.amazon.com/kendra/latest/dg/response-types.html) is found by Amazon Kendra.
 | ALT_SEARCH_KENDRA_TOP_ANSWER_MESSAGE | string | Heading when the [top answer](https://docs.aws.amazon.com/kendra/latest/dg/response-types.html) is found by Amazon Kendra 
 | ALT_SEARCH_KENDRA_ANSWER_MESSAGE | string | Heading when a [Document](https://docs.aws.amazon.com/kendra/latest/dg/response-types.html) is returned by Amazon Kendra
 | KENDRA_FAQ_INDEX | Kendra Index Id | Kendra Index to use sync Elastic Search questions and answers 
