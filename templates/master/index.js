@@ -161,6 +161,7 @@ module.exports={
     "DefaultKendraIndexId":{
         "Type":"String",
         "Description":"Optional: Index ID of an existing Kendra index, used as the default index for QnABot's Kendra integration. You can use the QnABot Content Designer to reconfigure Kendra Index ID settings at any time.",
+        "Default":""
     },
     "BootstrapBucket":{
         "Type":"String"
