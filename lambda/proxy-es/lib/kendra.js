@@ -23,10 +23,9 @@ function confidence_filter(minimum_score,kendra_result){
         return true;
     }
     confidences = confidences.slice(index)
-    console.log("Testing confidences " + JSON.stringify(confidences) + " " + _.get(kendra_result,"ScoreAttributes.ScoreConfidence") )
+    console.log("Testing confidences: Allowed - " + JSON.stringify(confidences) + " Actual - " + _.get(kendra_result,"ScoreAttributes.ScoreConfidence") )
     const found = confidences.find(element => element == _.get(kendra_result,"ScoreAttributes.ScoreConfidence")) != undefined
     return found
-
 }
 
 function create_hit(answermessage,markdown,ssml,hit_count,debug_results,kendra){
@@ -542,7 +541,6 @@ async function routeKendraRequest(event, context) {
 
 exports.handler = async (event, context) => {
     console.log("event: " + JSON.stringify(event, null, 2));
-    console.log('context: ' + JSON.stringify(context, null, 2));
     return routeKendraRequest(event, context);
 };
 
