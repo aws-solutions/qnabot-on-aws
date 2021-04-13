@@ -39,7 +39,6 @@ async function get_translation(englishText, targetLang, req) {
         const regex = /\s\*\s+$/m;
         translation.TranslatedText = translation.TranslatedText.replace(regex, '*\n\n') // Translate adds a space between the "*" causing incorrect Markdown
         translation.TranslatedText = translation.TranslatedText.replace(/<\/?span[^>]*>/g,""); // removes span tag used to keep Translate from translating URLs
-        transl
         return translation.TranslatedText;
     } catch (err) {
         console.log("warning - error during translation: ", err);

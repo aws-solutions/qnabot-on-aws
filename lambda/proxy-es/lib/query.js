@@ -540,13 +540,14 @@ module.exports = async function (req, res) {
         console.log("pre-debug " +JSON.stringify(req))
         if (_.get(req._settings, 'ENABLE_DEBUG_RESPONSES')) {
             var msg = "User Input: \"" + req.question + "\"";
-            if(req.debug)
-            {
-                msg += JSON.stringify(req.debug,2)
-            }
+
 
             if (usrLang != 'en') {
                 msg = "User Input: \"" + _.get(req,"_event.origQuestion","notdefined") + "\", Translated to: \"" + req.question + "\"";
+            }
+            if(req.debug)
+            {
+                msg += JSON.stringify(req.debug,2)
             }
             msg += ", Source: " + _.get(hit, "answersource", "unknown");
             var debug_msg = {
