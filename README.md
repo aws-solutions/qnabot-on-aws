@@ -1,25 +1,26 @@
 # A Question and Answer Bot Using Amazon Lex and Amazon Alexa
 
-> Build a chat bot to answer questions. 
+> Build a chat bot to answer questions.
 
 ## Overview
+
 This repository contains code for the QnABot, described in the AWS AI blog post [“Creating a Question and Answer Bot with Amazon Lex and Amazon Alexa”](https://aws.amazon.com/blogs/ai/creating-a-question-and-answer-bot-with-amazon-lex-and-amazon-alexa/).
 
 See the "Getting Started" to launch your own QnABot
 
 4.5.0 provides a number of new features described below. Several to call attention to are the following:
 
-- To improve performance, resiliency, and security, the Elasticsearch cluster will default to using ENCRYPTED nodes 
-  using the c5.large.elasticsearch instance type. If UNENCRYPTED is selected, the 
+- To improve performance, resiliency, and security, the Elasticsearch cluster will default to using ENCRYPTED nodes
+  using the c5.large.elasticsearch instance type. If UNENCRYPTED is selected, the
   t3.small.elasticsearch instance types will be used. The default number of nodes in a new cluster is now 4 for improved
   resiliency. The number of cluster nodes can be reduced to 2 for development environments
-  if desired. 
+  if desired.
   
-- QnABot distribution regions now available for one click deployment have increased to 8 regions. These are Northern 
-  Virginia (us-east-1), Oregon (us-west-2),  Ireland (eu-west-1), London (eu-west-2), Frankfurt (eu-central-1), 
+- QnABot distribution regions now available for one click deployment have increased to 8 regions. These are Northern
+  Virginia (us-east-1), Oregon (us-west-2),  Ireland (eu-west-1), London (eu-west-2), Frankfurt (eu-central-1),
   Sydney (ap-southeast-2), Singapore (ap-southeast-1), (Tokyo) ap-northeast-1.
   
-*Note: The Amazon Kendra service is available in Northern Virginia, Oregon, Sydney, and Ireland. If you desire to 
+*Note: The Amazon Kendra service is available in Northern Virginia, Oregon, Sydney, and Ireland. If you desire to
 use QnABot with Kendra, please make sure to use QnABot in one of these regions.*
 
 **New features in 4.5.0** [Kendra Web Crawler, Comprehend PII Detection, Translate Custom Terminology, Increased deployment regions](#new-features)
@@ -41,8 +42,9 @@ use QnABot with Kendra, please make sure to use QnABot in one of these regions.*
 **New features in 3.0.0** [ElicitResponse, Conditional Chaining, new Launch regions](#new-features)
 
 ## Upgrade Notes
-During an upgrade, we recommend that existing QnABot content first be exported and downloaded from the Content Designer prior to 
-the upgrade. In this release we expect upgrade to be smooth but just in case you should always have your QnABot content preserved. 
+
+During an upgrade, we recommend that existing QnABot content first be exported and downloaded from the Content Designer prior to
+the upgrade. In this release we expect upgrade to be smooth but just in case you should always have your QnABot content preserved.
 
 ## Prerequisites
 
@@ -56,22 +58,23 @@ the upgrade. In this release we expect upgrade to be smooth but just in case you
 ## Getting Started
 Two approaches can be used to get started. Deploy from pre-created repositories or clone the repo and build a version yourself.
 
-### Pre-created deployment 
+### Pre-created deployment
 Click a button to launch QnABot CloudFormation stack in the desired region
 
-| Region   |  Launch | 
+| Region   |  Launch |
 |----------|:-------------:|
 | Northern Virginia | <a target="_blank" href="https://us-east-1.console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/new?stackName=QnABot&templateURL=https://aws-bigdata-blog.s3.amazonaws.com/artifacts/aws-ai-qna-bot/templates/public.json"><span><img height="24px" src="https://s3.amazonaws.com/cloudformation-examples/cloudformation-launch-stack.png"/></span></a>     |
 | Oregon | <a target="_blank" href="https://us-west-2.console.aws.amazon.com/cloudformation/home?region=us-west-2#/stacks/new?stackName=QnABot&templateURL=https://aws-bigdata-blog-replica-us-west-2.s3.us-west-2.amazonaws.com/artifacts/aws-ai-qna-bot/templates/public.json"><span><img height="24px" src="https://s3.amazonaws.com/cloudformation-examples/cloudformation-launch-stack.png"/></span></a> |
 | Ireland | <a target="_blank" href="https://eu-west-1.console.aws.amazon.com/cloudformation/home?region=eu-west-1#/stacks/new?stackName=QnABot&templateURL=https://aws-bigdata-blog-replica-eu-west-1.s3-eu-west-1.amazonaws.com/artifacts/aws-ai-qna-bot/templates/public.json"><span><img height="24px" src="https://s3.amazonaws.com/cloudformation-examples/cloudformation-launch-stack.png"/></span></a> |
 | Sydney | <a target="_blank" href="https://ap-southeast-2.console.aws.amazon.com/cloudformation/home?region=ap-southeast-2#/stacks/new?stackName=QnABot&templateURL=https://aws-bigdata-blog-replica-ap-southeast-2.s3-ap-southeast-2.amazonaws.com/artifacts/aws-ai-qna-bot/templates/public.json"><span><img height="24px" src="https://s3.amazonaws.com/cloudformation-examples/cloudformation-launch-stack.png"/></span></a> |
-| London | <a target="_blank" href="https://eu-west-2.console.aws.amazon.com/cloudformation/home?region=eu-west-2#/stacks/new?stackName=QnABot&templateURL=https://aws-bigdata-blog-replica-eu-west-2.s3-eu-west-2.amazonaws.com/artifacts/aws-ai-qna-bot/templates/public.json"><span><img height="24px" src="https://s3.amazonaws.com/cloudformation-examples/cloudformation-launch-stack.png"/></span></a>     | 
+| London | <a target="_blank" href="https://eu-west-2.console.aws.amazon.com/cloudformation/home?region=eu-west-2#/stacks/new?stackName=QnABot&templateURL=https://aws-bigdata-blog-replica-eu-west-2.s3-eu-west-2.amazonaws.com/artifacts/aws-ai-qna-bot/templates/public.json"><span><img height="24px" src="https://s3.amazonaws.com/cloudformation-examples/cloudformation-launch-stack.png"/></span></a>     |
 | Frankfurt | <a target="_blank" href="https://eu-central-1.console.aws.amazon.com/cloudformation/home?region=eu-central-1#/stacks/new?stackName=QnABot&templateURL=https://aws-bigdata-blog-replica-eu-central-1.s3.eu-central-1.amazonaws.com/artifacts/aws-ai-qna-bot/templates/public.json"><span><img height="24px" src="https://s3.amazonaws.com/cloudformation-examples/cloudformation-launch-stack.png"/></span></a> |
 | Singapore | <a target="_blank" href="https://ap-southeast-1.console.aws.amazon.com/cloudformation/home?region=ap-southeast-1#/stacks/new?stackName=QnABot&templateURL=https://aws-bigdata-blog-replica-ap-southeast-1a.s3-ap-southeast-1.amazonaws.com/artifacts/aws-ai-qna-bot/templates/public.json"><span><img height="24px" src="https://s3.amazonaws.com/cloudformation-examples/cloudformation-launch-stack.png"/></span></a> |
 | Tokyo | <a target="_blank" href="https://ap-northeast-1.console.aws.amazon.com/cloudformation/home?region=ap-northeast-1#/stacks/new?stackName=QnABot&templateURL=https://aws-bigdata-blog-replica-ap-northeast-1.s3-ap-northeast-1.amazonaws.com/artifacts/aws-ai-qna-bot/templates/public.json"><span><img height="24px" src="https://s3.amazonaws.com/cloudformation-examples/cloudformation-launch-stack.png"/></span></a> |
 
 ### Clone the git repo and build a version
 First, install all prerequisites:
+
 ```shell
 npm install 
 ```
@@ -84,7 +87,7 @@ npm run config
 
 now edit config.json with you information.
 
-| param | description | 
+| param | description |
 |-------|-------------|
 |region | the AWS region to launch stacks in |
 |profile| the AWS credential profile to use |
@@ -92,11 +95,13 @@ now edit config.json with you information.
 |devEmail(required) | the email to use when creating admin users in automated stack launches |
 
 Next, use the following command to launch a CloudFormation template to create the S3 bucket to be used for lambda code and CloudFormation templates. Wait for this template to complete (you can watch progress from the command line or [AWS CloudFormation console](https://console.AWS.amazon.com/cloudformation/home))  
+
 ```shell
 npm run bootstrap
 ```
 
 Finally, use the following command to launch template to deploy the QnA bot in your AWS account. When the stack has completed you will be able to log into the Designer UI (The URL is an output of the template). A temporary password to the email in your config.json:
+
 ```shell
 npm run up
 ```
@@ -107,6 +112,7 @@ npm run update
 ```
 
 ## Components
+
 ### CloudFormation Templates
 The CloudFormation test templates are in the templates/test folder. The current templates are:
 
@@ -133,57 +139,69 @@ You also can check a template's syntax with:
 ```shell
 npm run check {template-name}
 ```
-ex. 
+
+ex.
+
 ```shell
 npm run check domain
 ```
 
 To understand the command more run: 
-```shell 
+```shell
 npm check stack -h
 ```
 
 ### Lambda Functions
-Lambda functions are found in the /lambda directory. Refer to the README.md file in each directory for instructions on setting up a dev environment and testing. 
+Lambda functions are found in the /lambda directory. Refer to the README.md file in each directory for instructions on setting up a dev environment and testing.
 [Fulfillment](lambda/fulfillment/README.md)
 [CFN](lambda/handler/README.md)
 [Lex-Build](lambda/lex-build/README.md)
 [Import](lambda/import/README.md)
 
 ### Web Interface
-The Designer UI and client UI code is in the /website directory. 
+
+The Designer UI and client UI code is in the /website directory.
 
 To Test the web ui, Launch a development master stack:
+
 ```shell
 npm run stack dev/master up
 ```
+
 when that stack has finished run:
+
 ```shell
 cd ./website ; make dev
 ```
-this will launch a running webpack process that will watch for changes to files and upload the changes to your running dev/master stack. 
 
-#### Designer UI Compatibility 
+this will launch a running webpack process that will watch for changes to files and upload the changes to your running dev/master stack.
+
+#### Designer UI Compatibility
+
 Currently the only browsers supported are:  
+
 - Chrome  
 - FireFox  
 We are currently working on adding Microsoft Edge support.  
 
 ## Built With
 
-* [Vue](https://vuejs.org/) 
+- [Vue](https://vuejs.org/)
+
 * [Webpack](https://webpack.github.io/)
 
 ## License
+
 See the [LICENSE.md](LICENSE.md) file for details
 
 ## New features
 
 ### Version 4.5.0
+
 - Added single click deployment support for four additional regions
 - Changed unencrypted Amazon Elasticsearch instance types to be t3.small.elasticsearch  
-- Changed default number of nodes for Amazon Elasticsearch cluster to 4 for better production level 
-  cluster performance and resiliency. This can be changed to 2 for development clusters if desired. 
+- Changed default number of nodes for Amazon Elasticsearch cluster to 4 for better production level
+  cluster performance and resiliency. This can be changed to 2 for development clusters if desired.
 - Added Personal Identifiable Information detection support using Amazon Comprehend - [readme](./docs/PII_Detection/README.md)
 - Added web indexing support using Amazon Kendra  - [readme](./docs/kendra_crawler_guide/README.md)
 - Added Amazon Translate custom terminology support - [readme](./docs/custom_terminology_guide/README.md)
@@ -196,6 +214,7 @@ See the [LICENSE.md](LICENSE.md) file for details
 - Fixed bugs and defects
 
 ### Version 4.4.0
+
 - Preview VPC support - [readme](./VPCSupportREADME.md)
 - Preview BotRouter support - [readme](./BotRoutingREADME.md)
 - Upgrade to Elasticsearch service version 7.9
@@ -203,7 +222,7 @@ See the [LICENSE.md](LICENSE.md) file for details
 - Added support for Alexa re-prompt functionality  
 
 VPC support is enabled in beta mode through a new template available in the distribution repos. Please understand
-the content in [readme](./VPCSupportREADME.md) before proceeding with this type of deployment. 
+the content in [readme](./VPCSupportREADME.md) before proceeding with this type of deployment.
 * artifacts/aws-ai-qna-bot/templates/public-vpc-support.json
 This beta template exposes two new additional parameters that can be specified when deployed using the CloudFormation console.
 These parameters are:
@@ -223,9 +242,9 @@ VPC and is outside the scope of this document.
 - Security improvements in API Gateway.
 - ID token values removed from session event after validation and redacted from logging.
 - Setting to limit the number of Kendra fallback search results.
-- Setting to enable signed URLs for S3 documents in Kendra search results. 
+- Setting to enable signed URLs for S3 documents in Kendra search results.
 
-Provides the ability to deploy QnABot components within VPC infrastructure via a new template named public-vpc-support.json. 
+Provides the ability to deploy QnABot components within VPC infrastructure via a new template named public-vpc-support.json.
 This template is made available for use as a separate installation mechanism. It is not the default template utilized in the 
 public distribution buckets. Please take great care in deploying QnABot in VPC. The Elasticsearch Cluster
 becomes bound to the VPC as well as the Lambda's installed. The Elasticsearch cluster is no longer available
@@ -244,9 +263,10 @@ Comprehend. As more features are added to QnABot the required service access may
 is not required but may be used if available. 
  
 ### Version 4.2.0
+
 - New Kendra FAQ support (Beta version) using the setting KENDRA_FAQ_INDEX. New menu item in Designer UI to export Questions as a Kendra FAQ. See revised Blog Post for details.
 - New GetSessionAttribute Handlebars helper to obtain session attribute. Works similar to lodash get(). Will not through exception and will return a default value.
-- Enhanced handlebars to support string concatenation including handlevar 'variables' like Session Attributes and UserInfo, etc. Use case, e.g. to build a url containing a users email, eg a google calendar URL. Example of syntax now supported - in this case to dynamically build a personalized URL based on user info. {{setSessionAttr 'link' 'https://calendar.google.com/calendar/embed?src=' UserInfo.Email '&ctz=America%2FNew_York'}}
+- Enhanced handlebars to support string concatenation including handlebar 'variables' like Session Attributes and UserInfo, etc. Use case, e.g. to build a url containing a users email, eg a google calendar URL. Example of syntax now supported - in this case to dynamically build a personalized URL based on user info. {{setSessionAttr 'link' 'https://calendar.google.com/calendar/embed?src=' UserInfo.Email '&ctz=America%2FNew_York'}}
 - Moved 'previous' and 'navigation' session attributes under a new 'qnabotcontext' session attribute so that Connect (and other) clients have fewer session attributes to preserve.
 - Allows Chaining rule Lambda function to return a modified session object in addition to the string for chaining.
 - Allows Chaining of up to 10 documents. Each document's Lambda hooks will also be invoked in sequence if defined.
@@ -256,6 +276,7 @@ is not required but may be used if available.
 - Upgrades to and installs ElasticSearch 7.7.
 
 ### Version 4.1.0
+
 - Install / Upgrade now supports the option to configure S3 Buckets and Elastic Search cluster using encryption at rest
 - Install / Upgrade now supports the option to require Cognito based user authorization to access the built-in full screen web UI (Public/Private parameter in template) - Public is the default
 - Added two settings parameters to enforce user identity verification check, so that bot can be secured for use by authenticated users only
@@ -267,7 +288,7 @@ is not required but may be used if available.
 - Improved internal use of Booleans from settings configuration 
 - Enhanced Connect integration 
     - Added session attribute named "qnabot_qid" that holds the matching question id found in elastic search
-    - Added session attribute "qnabot_gotanswer" that holds boolean true/fale if an answer was fround
+    - Added session attribute "qnabot_gotanswer" that holds boolean true/false if an answer was found
     - Encapsulating all Kendra and Elicit Response Bot session attributes into a single "qnabotcontext" attribute making it easier to store and reset in Connect contact flow
 - Added new QNAYesNoExit elicit response bot which allows a user to exit the YesNoExit question using "exit", "bye", "quit", "admin", "rep","representative","stop", "help", "bye", "goodbye" which sets the Yes_No_Exit slot value / session attribute to "Exit".
 - Update to 0.17.0 of embedded lex-web-ui
@@ -294,12 +315,13 @@ the RegEx applied to strings as they are logged. If RegEx matches are found, the
 'XXXXXX'.
 
 The initial RegEx is 
-```
+
+```regex
 \b\d{4}\b(?![-])|\b\d{9}\b|\b\d{3}-\d{2}-\d{4}\b
 ```
 
 This replaces 4 digit numbers not followed by a hyphen, a 9 digit number (SSN without hyphens), and a typical
-SSN using nnn-nn-nnnn syntax with hyphens. 
+SSN using nnn-nn-nnnn syntax with hyphens.
  
 ### New Connect Callback Example
 New example demonstrating how QnABot can be asked by a user for a live agent based phone callback. The 
@@ -311,7 +333,7 @@ their name and phone number prior to handing off to an Amazon Connect instance t
 The IAM Role/Policy used by the ConnectCallback Lambda must include a new policy that allows 
 the action "connect:StartOutboundVoiceContact" to be used with the resource
 "arn:aws:connect:*:*:instance/<YourConnectInstanceId>/*". The following is an example of this policy
-```
+```json
 {
    "Version": "2012-10-17",
    "Statement": [
@@ -324,6 +346,7 @@ the action "connect:StartOutboundVoiceContact" to be used with the resource
    ]
 }
 ```
+
 1) Find the Lambda ConnectCallback Function in the AWS Lambda Console
 2) Open the AWS Console and select the Lambda Service
 3) In the Console's filter enter 'ConnectCallback' and press enter
@@ -340,33 +363,38 @@ installed you'll see multiple functions listed
 
 You've now enabled Lambda functions using this role to start outbound calls via the connect instance
 
-Lambda Hook Arguments need to be updated. Before being used, the item with qid CONNECT_TO_AGENT.04 
+Lambda Hook Arguments need to be updated. Before being used, the item with qid CONNECT_TO_AGENT.04
 should have its Arguments field adjusted to reflect identifiers from the Connect instance:
+
 ``` 
 "AWS_connect_instance_id": "<your-connect-instance-id >",
 "AWS_connect_contact_flow_id": "<your-connect-contact-flow-id>", 
 "AWS_connect_queue_id": "<your-connect-queue-id>", 
 ```
 Once these configuration changes are in place, QnABot can be successfully use Amazon Connect to place
-outbound calls. 
+outbound calls.
 
 ### Conditional Chaining now supports Lambda Function
+
 You can specify that a Conditional Chaining rule runs a Lambda Function using the "Lambda::FunctionName" syntax.
 The Lambda function name must start with "QNA". The Lambda will receive arguments the same as Lambda Hooks. The
 function must return a String that is used to resolve the next item just the same as other conditional chaining rules.
 
 ### Improved Scale
+
 This release of QnABot utilizes Lex Bot aliases and Lex versioning. The QnA Bot and all ElicitResponse Bots are
 now installed using the alias 'live'. 'live' points at the latest numbered Bot version. All Lex resources are now
 versioned starting with '1' after initial installation.
 
 ### Additional Elicit Response Bots
-This release adds several elicit response bots for 
+
+This release adds several elicit response bots for
 QNAWage - 7 digit wage value - returns slot named "Wage"
 QNASocialSecurity - SSN Numbers in the nnn-nn-nnnn format - returns slot named "SSN"
 QNAPin - 4 digit pin value - Returns slot named "Pin"
 
 ### Configuring QnABot to ask the questions
+
 QnABot was designed to answer questions, but now it can also ask questions and process 
 the user’s answers. Use this feature for data collection and validation; 
 or implement surveys, quizzes, personalized recommendations; or to build a triage 
@@ -374,12 +402,14 @@ chatbot application. See the [blog post](https://aws.amazon.com/blogs/machine-le
 This feature is know as ElicitResponse from a configuration perspective.
 
 ### Automatically advancing and branching along a tree of questions
+
 QnABot can now chain the user from one answer to another. This can be used with ElicitResponse
 to ask multiple questions from a user. Conditional chaining allows branching based on 
 the state of session variables. Please see the [blog post](https://aws.amazon.com/blogs/machine-learning/creating-a-question-and-answer-bot-with-amazon-lex-and-amazon-alexa/)
 for a description on how to use this feature.
 
 ### Kendra Fallback Support
+
 QnABot version 2.6.0 optionally supports integration with Amazon Kendra as a fallback mechanism if a question/answer can not
 be found in QnABot.
  
@@ -389,104 +419,101 @@ Enterprise search solution.**
  
 To enable this support for your Kendra indexes, use the Settings UI in the Designer and add your 
 index to the ALT_SEARCH_KENDRA_INDEXES parameter. This parameter takes an array of strings and uses the form below.
-```
+
+```json
 ["a672e3a2-nnnn-nnnn-nnnn-7b3abc81c313"]
 ```
+
 **Don't forget to use your Kendra Index ID rather than the one in the sample**
 
 Next use the QnABot Designer UI to import a Sample/Extension named KendraFallback.
 
-This loads a new question with a qid of "KendraFallback". Edit this question in the Designer UI and change its question from 
-"no_hits_alternative" to "no_hits" and save the changes. 
+This loads a new question with a qid of "KendraFallback". Edit this question in the Designer UI and change its question from  "no_hits_alternative" to "no_hits" and save the changes.
 
-If you have previously loaded the QnAUtility.json from Examples/Extensions you need to either remove 
+If you have previously loaded the QnAUtility.json from Examples/Extensions you need to either remove
 the question with the ID "CustomNoMatches" or change the question for this ID from "no_hits" to "no_hits_original"
 
 Once the new question, "KendraFallback" is configured as the response for "no_hits", the Kendra index will be
 searched for an answer whenever a curated answer can not be found. This feature provides a fallback mechanism
-prior to telling the user an answer could not be found. 
+prior to telling the user an answer could not be found.
 
-A [workshop](https://github.com/aws-samples/aws-ai-qna-bot/tree/master/workshops/reinvent2019/readme.md) is available in github 
-that will walk you through setting up this feature. 
+A [workshop](https://github.com/aws-samples/aws-ai-qna-bot/tree/master/workshops/reinvent2019/readme.md) is available in GitHub.
+that will walk you through setting up this feature.
 
-**Important note. Use of Kendra as a fallback mechanism will incur additional charges for your AWS Account. Please 
-review the Kendra pricing structure. The fallback mechanism for QnABot can be useful when deploying Kendra as an
-Enterprise search solution.**
+**Important note. Use of Kendra as a fallback mechanism will incur additional charges for your AWS Account. Please review the Kendra pricing structure. The fallback mechanism for QnABot can be useful when deploying Kendra as an Enterprise search solution.**
 
 ### MultiLanguage Support
 
 QnABot version 2.6.0 supports use of multiple languages with these limitations:
+
 - MultiLanguage support for voice is limited to use with Alexa skills only. (Amazon Lex currently supports voice recognition in English only)
 - MutiLanguage support for text is available via all text clients (e.g. Lex Web UI, SMS, etc.)
 
  ####Lex (text mode only):  
 
-If the user enters a question in a language other than english, QnABot will attempt to return an answer in the other language. 
-It does this by using Amazon Comprehend to identify the language typed. If Comprehend can identify the language based on a configured minimum confidence, 
+If the user enters a question in a language other than english, QnABot will attempt to return an answer in the other language.
+It does this by using Amazon Comprehend to identify the language typed. If Comprehend can identify the language based on a configured minimum confidence,
 QnABot will serve up content based on that locale.
 
 Users can also set a preferred language whereby QnABot will always attempt to respond with content in the chosen
 locale.  If the user sets the preferred language to be Spanish, QnABot will always try and serve up content using
-Spanish when possible. 
+Spanish when possible.
 
-####Alexa (voice)
+#### Alexa (voice)
 
-You will need to add each language you want to use to your QnABot skill using the Alexa Developer console. The intent schema for each 
-language will be identical except for the skill invocation name. Give the skill a unique invokation name for each language that you add.
+You will need to add each language you want to use to your QnABot skill using the Alexa Developer console. The intent schema for each
+language will be identical except for the skill invocation name. Give the skill a unique invocation name for each language that you add.
 
 QnABot will use the language setting provided by Alexa, and will attempt to respond in that language.
 
-####How it works
+#### How it works
 
-QnABot converts the question posed by the user to English, using Amazon Translate, and performs a lookup of the answer in Elastic Search 
+QnABot converts the question posed by the user to English, using Amazon Translate, and performs a lookup of the answer in Elastic Search
 just as it normally does, using the English translation of the question. ElasticSearch searches are done in English only since QnABot documents
-are indexed using the English text analyser (stemming, stop words, etc.)
+are indexed using the English text analyzer (stemming, stop words, etc.)
 
-To ensure good matching of translated questions, you can use the Amazon Translate console to see the English tranlation of your local language question. Use QnABot content designer
+To ensure good matching of translated questions, you can use the Amazon Translate console to see the English translation of your local language question. Use QnABot content designer
 to ensure your QnA item has the right sample questions to ensure a match.
 
-Once it finds the question, QnABot will serve up the configured answer. 
+Once it finds the question, QnABot will serve up the configured answer.
 
-You can use Handlebar blocks to define explicit answers in each different language you want to support. OR, if you do not 
-explicitly define an answer in the user's language, QnABot will automatically use Amazon Translate to convert the default enghlish 
+You can use Handlebar blocks to define explicit answers in each different language you want to support. OR, if you do not
+explicitly define an answer in the user's language, QnABot will automatically use Amazon Translate to convert the default English.
 answer to the target language.
 
-####Configuration
+#### Configuration
 
-By default this feature is disabled. Use the following three steps to enable and configure this feature. Step 1 enables 
-the feature. Step 2 loads in two questions from this extension that allow the user to select a preferred language. The 
-defaults supplied in this question are English, Spanish, French, German, and Italian. You can extend this list to
-support other languages. 
+By default this feature is disabled. Use the following three steps to enable and configure this feature. Step 1 enables the feature. Step 2 loads in two questions from this extension that allow the user to select a preferred language. The defaults supplied in this question are English, Spanish, French, German, and Italian. You can extend this list to
+support other languages.
 
-Step 1) Enable multi language support 
+Step 1) Enable multi language support
 
-a) QnABot uses a property named ENABLE_MULTI_LANGUAGE_SUPPORT, default value of "false". 
+a) QnABot uses a property named ENABLE_MULTI_LANGUAGE_SUPPORT, default value of "false".
 You can change this setting using the Content Designer Settings page. Set it to "true" to enable multi language support.
-
 
 Step 2) Use the Designer UI to import the Sample/Extension named Language / Multiple Language Support.
 
 This will add two questions to the system: Language.000 and Language.001. When using Lex text clients, these questions will allow you to set your preferred language.  
-The preferred language, if set, will take precendence over
+The preferred language, if set, will take precedence over
 the auto detected language.  
 
 _When using Alexa, the language is automatically set by the skill. You will not be able to override the preferred language when using Alexa._
 
-Language.000 provides a question that allows the user to set the current sessions preferred output saying a simple word 
-such as French, German, or Spanish, or Italian. 
+Language.000 provides a question that allows the user to set the current sessions preferred output saying a simple word
+such as French, German, or Spanish, or Italian.
 
-Language.001 resets the preferred language. This can be performed by saying or typing 'reset language' or 'detect language'. 
-You can also input using your language of choice assuming AWS Translate can translate the input back to English. 
+Language.001 resets the preferred language. This can be performed by saying or typing 'reset language' or 'detect language'.
+You can also input using your language of choice assuming AWS Translate can translate the input back to English.
 
-Once you've imported this extension question try typing the question 'Spanish'. You should see a Spanish response. 
+Once you've imported this extension question try typing the question 'Spanish'. You should see a Spanish response.
 
-Next enter 'English' and you will have switched your preference back to English. 
+Next enter 'English' and you will have switched your preference back to English.
 
 Next enter 'reset language' and your preference will be reset and language auto detection will occur again.
 
 The answer for Language.000 uses the following handlebar syntax
 
-```
+```handlebars
 {{#setLang 'fr' false}} D'accord. J'ai défini votre langue préférée sur l'anglais. {{/setLang}}
 {{#setLang 'es' false}} Okay. He configurado tu idioma preferido al inglés.  {{/setLang}}
 {{#setLang 'de' false}} In Ordnung. Ich habe Ihre bevorzugte Sprache auf Englisch eingestellt. {{/setLang}}
@@ -494,24 +521,22 @@ The answer for Language.000 uses the following handlebar syntax
 {{#setLang 'en' true}} Ok. I've set your preferred language to English. {{/setLang}}
 ```
 
-The helper function setLang performs the necessary processing to set the preferred language/locale for teh session. To
-add support for other languages just extend the answer in Language.000 with additional locales. 
-
+The helper function setLang performs the necessary processing to set the preferred language/locale for the session. To
+add support for other languages just extend the answer in Language.000 with additional locales.
 
 Step 3) In order to serve up content that is locale specific you can
 
 - allow QnABot to automatically translate your english answers to the session language using Amazon Translate.
 - OR provide explicitly curated answers in QnA items, in multiple languages, using handlebars, as shown below. 
 
-Lets modify the question sun.1. The following would be an example where the handlebar function ifLang is used to 
-specify a response for spanish. 
+Lets modify the question sun.1. The following would be an example where the handlebar function ifLang is used to specify a response for Spanish.
 
 Use the handlebar template defaultLang to specify the response QnABot should provide when the language is unknown. By
-default this is typically in English but could be in any language as needed. 
+default this is typically in English but could be in any language as needed.
 
 {{#defaultLant}}{{/defaultLang}} must be the last element in the answer block. 
 
-```
+```handlebars
 {{#ifLang 'es'}}
 Nuestro sol tiene 4.600 millones de años. Se considera una enana amarilla con un diámetro de 1,392,684 kilómetros y una circunferencia de 4,370,005 kilómetros. Tiene una masa que es igual a 333,060 tierras y una temperatura superficial de 5,500 grados centígrados. ¡Muy caliente!
 {{/ifLang}}
@@ -521,8 +546,7 @@ Our sun is 4.6 billion years old. Its considered a yellow dwarf with a diameter 
 ```
 
 The handlebar function ifLang takes locale as a quoted parameter. This tells QnABot which locale to associate with the subsequent
-text. 
+text.
 
-
-A [workshop](https://github.com/aws-samples/aws-ai-qna-bot/tree/master/workshops/reinvent2019/readme.md) is available in github 
-that will walk you through setting up this feature. 
+A [workshop](https://github.com/aws-samples/aws-ai-qna-bot/tree/master/workshops/reinvent2019/readme.md) is available in GitHub 
+that will walk you through setting up this feature.
