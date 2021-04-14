@@ -3,14 +3,16 @@ var _=require('lodash')
 var fs=require('fs')
 
 var js=fs.readdirSync(`${__dirname}/js_lambda_hooks`)
-.map(name=>{
+.map(name=> {
+  if (fs.existsSync(`${__dirname}/js_lambda_hooks/${name}/${name}.js`)) {
     return {
-        name:`EXT${name}`,
-        resource:jslambda(name),
-        codeVersionName:`CodeVersion${name}`,
-        codeVersionResource:codeVersion(name),
-        id:`${name}JS`,
+      name: `EXT${name}`,
+      resource: jslambda(name),
+      codeVersionName: `CodeVersion${name}`,
+      codeVersionResource: codeVersion(name),
+      id: `${name}JS`,
     }
+  }
 })
 
 var py=fs.readdirSync(`${__dirname}/py_lambda_hooks`)

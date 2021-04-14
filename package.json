@@ -1,6 +1,6 @@
 {
   "name": "aws-ai-qna-bot",
-  "version": "4.5.2",
+  "version": "4.6.0",
   "engines": {
     "node": ">=12.16.1",
     "npm": ">=7.8.0"
