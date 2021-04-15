@@ -171,6 +171,26 @@ module.exports=Object.assign(
           }          
         },
         { 
+          "PolicyName" : "QNASecretsManagerLambda",
+          "PolicyDocument" : {
+          "Version": "2012-10-17",
+            "Statement": [
+              {
+                  "Effect": "Allow",
+                  "Action": [
+                    "secretsmanager:GetResourcePolicy",
+                    "secretsmanager:GetSecretValue",
+                    "secretsmanager:DescribeSecret"
+                   ],   
+                  "Resource": [
+                      "arn:aws:secretsmanager:::QNA*/*",
+                      "arn:aws:secretsmanager:::qna*/*" 
+                  ]
+              }
+            ]
+          }
+        },
+        { 
           "PolicyName" : "S3QNABucketReadAccess",
           "PolicyDocument" : {
           "Version": "2012-10-17",
