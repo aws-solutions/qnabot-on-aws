@@ -23,7 +23,7 @@
     "utf8": "3.0.0"
   },
   "devDependencies": {
-    "nodeunit": "^0.11.3",
-    "diff": "^4.0.2"
+    "diff": "^4.0.2",
+    "nodeunit": "^0.11.3"
   }
 }
