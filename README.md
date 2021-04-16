@@ -54,11 +54,12 @@ the upgrade. In this release we expect upgrade to be smooth but just in case you
 - Set up an AWS account. ([instructions](https://AWS.amazon.com/free/?sc_channel=PS&sc_campaign=acquisition_US&sc_publisher=google&sc_medium=cloud_computing_b&sc_content=AWS_account_bmm_control_q32016&sc_detail=%2BAWS%20%2Baccount&sc_category=cloud_computing&sc_segment=102882724242&sc_matchtype=b&sc_country=US&s_kwcid=AL!4422!3!102882724242!b!!g!!%2BAWS%20%2Baccount&ef_id=WS3s1AAAAJur-Oj2:20170825145941:s))
 - Configure AWS CLI and a local credentials file. ([instructions](http://docs.AWS.amazon.com/cli/latest/userguide/cli-chap-welcome.html))  
 
-
 ## Getting Started
+
 Two approaches can be used to get started. Deploy from pre-created repositories or clone the repo and build a version yourself.
 
 ### Pre-created deployment
+
 Click a button to launch QnABot CloudFormation stack in the desired region
 
 | Region   |  Launch |
@@ -73,6 +74,7 @@ Click a button to launch QnABot CloudFormation stack in the desired region
 | Tokyo | <a target="_blank" href="https://ap-northeast-1.console.aws.amazon.com/cloudformation/home?region=ap-northeast-1#/stacks/new?stackName=QnABot&templateURL=https://aws-bigdata-blog-replica-ap-northeast-1.s3-ap-northeast-1.amazonaws.com/artifacts/aws-ai-qna-bot/templates/public.json"><span><img height="24px" src="https://s3.amazonaws.com/cloudformation-examples/cloudformation-launch-stack.png"/></span></a> |
 
 ### Clone the git repo and build a version
+
 First, install all prerequisites:
 
 ```shell
@@ -107,35 +109,41 @@ npm run up
 ```
 
 If you have an existing stack you can run the following to update your stack:
-```shell 
+
+```shell
 npm run update
 ```
 
 ## Components
 
 ### CloudFormation Templates
+
 The CloudFormation test templates are in the templates/test folder. The current templates are:
 
 1. Master: the template contains all the resources for QnABot.
 2. Public: this is a version of the Master template with less parameters, less outputs, and the bootstrap bucket hardcoded to the publicBucket in config.json
-3. various templates in /templates/dev: needed for local testing of the lambda functions. 
+3. various templates in /templates/dev: needed for local testing of the lambda functions.
 
 Run a template test with:
+
 ```shell
 npm run stack test/{template-name}
 ```
 
 For example, if you want to test the domain template run:
+
 ```shell
 npm run stack test/domain
 ```
 
-To understand the command more run: 
-```shell 
+To understand the command more run:
+
+```shell
 npm run stack -h
 ```
 
 You also can check a template's syntax with:
+
 ```shell
 npm run check {template-name}
 ```
@@ -146,12 +154,14 @@ ex.
 npm run check domain
 ```
 
-To understand the command more run: 
+To understand the command more run:
+
 ```shell
 npm check stack -h
 ```
 
 ### Lambda Functions
+
 Lambda functions are found in the /lambda directory. Refer to the README.md file in each directory for instructions on setting up a dev environment and testing.
 [Fulfillment](lambda/fulfillment/README.md)
 [CFN](lambda/handler/README.md)
@@ -187,8 +197,7 @@ We are currently working on adding Microsoft Edge support.
 ## Built With
 
 - [Vue](https://vuejs.org/)
-
-* [Webpack](https://webpack.github.io/)
+- [Webpack](https://webpack.github.io/)
 
 ## License
 
@@ -223,19 +232,21 @@ See the [LICENSE.md](LICENSE.md) file for details
 
 VPC support is enabled in beta mode through a new template available in the distribution repos. Please understand
 the content in [readme](./VPCSupportREADME.md) before proceeding with this type of deployment.
-* artifacts/aws-ai-qna-bot/templates/public-vpc-support.json
+
+- artifacts/aws-ai-qna-bot/templates/public-vpc-support.json
 This beta template exposes two new additional parameters that can be specified when deployed using the CloudFormation console.
 These parameters are:
-* VPCSubnetIdList
-* VPCSecurityGroupIdList
+- VPCSubnetIdList
+- VPCSecurityGroupIdList
 As one might expect a set of SubnetIds and SecurityGroupIds need to be specified. Two private subnets with appropriate NAT
-based gateway to public internet should be selected. The security group specified must allow at a minimum inbound 
+based gateway to public internet should be selected. The security group specified must allow at a minimum inbound
 connectivity on port 443. The Elasticsearch cluster and all Lambdas will be attached to these private subnets. The
 Designer UI is still available outside of the VPC but requires login via the Cognito user pool. The Elasticsearch
-cluster will not be available externally. Users wishing to use the Kibana console will need VPN connectivity to the 
+cluster will not be available externally. Users wishing to use the Kibana console will need VPN connectivity to the
 VPC and is outside the scope of this document.
 
 ### Version 4.3.0
+
 - New Connect Wizard available in the Content Designer UI to assist integration with a Connect Contact Flow.
 - New 4-node Elasticsearch domain support for improved fault tolerance in deployment template.
 - Elicit Response bot support for confirmation responses using phone keypad 1 = yes 2 = no.
@@ -245,7 +256,7 @@ VPC and is outside the scope of this document.
 - Setting to enable signed URLs for S3 documents in Kendra search results.
 
 Provides the ability to deploy QnABot components within VPC infrastructure via a new template named public-vpc-support.json.
-This template is made available for use as a separate installation mechanism. It is not the default template utilized in the 
+This template is made available for use as a separate installation mechanism. It is not the default template utilized in the
 public distribution buckets. Please take great care in deploying QnABot in VPC. The Elasticsearch Cluster
 becomes bound to the VPC as well as the Lambda's installed. The Elasticsearch cluster is no longer available
 outside of the VPC. All Lambdas are bound to the VPC to allow communication with the cluster.
@@ -259,9 +270,9 @@ The following limitations exist:
 as a parameter for the CloudFormation template.
 - The Kibana dashboard will only be available from clients that have access to the VPC.
 - The VPC must be configured to allow access to Lex, S3, Lambda, DynamoDB, Systems Manager (SSM Parameter Store), Kendra, and
-Comprehend. As more features are added to QnABot the required service access may increase. VPC Endpoints using PrivateLink 
-is not required but may be used if available. 
- 
+Comprehend. As more features are added to QnABot the required service access may increase. VPC Endpoints using PrivateLink
+is not required but may be used if available.
+
 ### Version 4.2.0
 
 - New Kendra FAQ support (Beta version) using the setting KENDRA_FAQ_INDEX. New menu item in Designer UI to export Questions as a Kendra FAQ. See revised Blog Post for details.
@@ -280,23 +291,24 @@ is not required but may be used if available.
 - Install / Upgrade now supports the option to configure S3 Buckets and Elastic Search cluster using encryption at rest
 - Install / Upgrade now supports the option to require Cognito based user authorization to access the built-in full screen web UI (Public/Private parameter in template) - Public is the default
 - Added two settings parameters to enforce user identity verification check, so that bot can be secured for use by authenticated users only
-    - ENFORCE_VERIFIED_IDENTITY. Default is false. Set to true to make QnABot require verified identity from client
-    - NO_VERIFIED_IDENTITY_QUESTION. The default is "no_verified_identity". If user identity cannot be verified, replace question string with this. If not verified, the system will respond to user's question with the result of searching for NO_VERIFIED_IDENTITY_QUESTION. This allows a customizable message which informs the user that they must log in. A default question with qid "no_verified_identity" is included in QNAUtility example package.
+  - ENFORCE_VERIFIED_IDENTITY. Default is false. Set to true to make QnABot require verified identity from client
+  - NO_VERIFIED_IDENTITY_QUESTION. The default is "no_verified_identity". If user identity cannot be verified, replace question string with this. If not verified, the system will respond to user's question with the result of searching for NO_VERIFIED_IDENTITY_QUESTION. This allows a customizable message which informs the user that they must log in. A default question with qid "no_verified_identity" is included in QNAUtility example package.
 - Enhanced Kendra fallback integration to use a specific answer if there is a best answer available and bold face highlighted words from Kendra response
 - Added Comprehend sentiment analysis to all utterances and text captured by the QNAFreeText elicit response bot
 - Enhanced Kibana dashboard to identify Lex client channels - Connect, Web, SMS
-- Improved internal use of Booleans from settings configuration 
-- Enhanced Connect integration 
-    - Added session attribute named "qnabot_qid" that holds the matching question id found in elastic search
-    - Added session attribute "qnabot_gotanswer" that holds boolean true/false if an answer was found
-    - Encapsulating all Kendra and Elicit Response Bot session attributes into a single "qnabotcontext" attribute making it easier to store and reset in Connect contact flow
+- Improved internal use of Booleans from settings configuration
+- Enhanced Connect integration
+  - Added session attribute named "qnabot_qid" that holds the matching question id found in elastic search
+  - Added session attribute "qnabot_gotanswer" that holds boolean true/false if an answer was found
+  - Encapsulating all Kendra and Elicit Response Bot session attributes into a single "qnabotcontext" attribute making it easier to store and reset in Connect contact flow
 - Added new QNAYesNoExit elicit response bot which allows a user to exit the YesNoExit question using "exit", "bye", "quit", "admin", "rep","representative","stop", "help", "bye", "goodbye" which sets the Yes_No_Exit slot value / session attribute to "Exit".
 - Update to 0.17.0 of embedded lex-web-ui
 - Resolved additional dependabot identified security issues with dependent packages
 - Fixed lambda/fulfillment unit tests
-- Fixed defect where response bot was not triggered on next question when using lambda function for conditional chaining 
+- Fixed defect where response bot was not triggered on next question when using lambda function for conditional chaining
 
 ### Version 4.0.0
+
 - Update to Elasticsearch 7.4
 - Improved question matching accuracy and tuning
 - Tolerance for typos and minor spelling errors with fuzzy matching setting
@@ -306,15 +318,17 @@ is not required but may be used if available.
 - Full upgrade support without data loss when upgrading from previous versions.
 
 ### Content Tuning and Accuracy Guide
+
 Content Tuning an and Accuracy Guide now available as a Markdown Readme.  [README](tuning_accuracy_guide/AWS_QnABot_tuning_recognition_accuracy_guide.md)
 
 ### Optional Redact feature for log and metric output
-QnABot can be configured to redact information written to CloudWatch logs, S3 metrics, and Kibana metrics logs. 
+
+QnABot can be configured to redact information written to CloudWatch logs, S3 metrics, and Kibana metrics logs.
 This feature is disabled by default. Use the Designer UI Settings form to enable this feature. One can configure
 the RegEx applied to strings as they are logged. If RegEx matches are found, the match is replaced with the string
 'XXXXXX'.
 
-The initial RegEx is 
+The initial RegEx is
 
 ```regex
 \b\d{4}\b(?![-])|\b\d{9}\b|\b\d{3}-\d{2}-\d{4}\b
@@ -322,15 +336,16 @@ The initial RegEx is
 
 This replaces 4 digit numbers not followed by a hyphen, a 9 digit number (SSN without hyphens), and a typical
 SSN using nnn-nn-nnnn syntax with hyphens.
- 
+
 ### New Connect Callback Example
-New example demonstrating how QnABot can be asked by a user for a live agent based phone callback. The 
-implementation provides a new LambdaHook example as well as four sample questions that ask a user for 
-their name and phone number prior to handing off to an Amazon Connect instance to initiate the callback. 
+
+New example demonstrating how QnABot can be asked by a user for a live agent based phone callback. The
+implementation provides a new LambdaHook example as well as four sample questions that ask a user for
+their name and phone number prior to handing off to an Amazon Connect instance to initiate the callback.
 
 **Two configuration updates are required to use this example with Amazon Connect.**
 
-The IAM Role/Policy used by the ConnectCallback Lambda must include a new policy that allows 
+The IAM Role/Policy used by the ConnectCallback Lambda must include a new policy that allows
 the action "connect:StartOutboundVoiceContact" to be used with the resource
 "arn:aws:connect:*:*:instance/<YourConnectInstanceId>/*". The following is an example of this policy
 ```json
@@ -366,11 +381,12 @@ You've now enabled Lambda functions using this role to start outbound calls via 
 Lambda Hook Arguments need to be updated. Before being used, the item with qid CONNECT_TO_AGENT.04
 should have its Arguments field adjusted to reflect identifiers from the Connect instance:
 
-``` 
+```bash
 "AWS_connect_instance_id": "<your-connect-instance-id >",
 "AWS_connect_contact_flow_id": "<your-connect-contact-flow-id>", 
 "AWS_connect_queue_id": "<your-connect-queue-id>", 
 ```
+
 Once these configuration changes are in place, QnABot can be successfully use Amazon Connect to place
 outbound calls.
 
@@ -395,16 +411,16 @@ QNAPin - 4 digit pin value - Returns slot named "Pin"
 
 ### Configuring QnABot to ask the questions
 
-QnABot was designed to answer questions, but now it can also ask questions and process 
-the user’s answers. Use this feature for data collection and validation; 
-or implement surveys, quizzes, personalized recommendations; or to build a triage 
-chatbot application. See the [blog post](https://aws.amazon.com/blogs/machine-learning/creating-a-question-and-answer-bot-with-amazon-lex-and-amazon-alexa/) for details about this new feature. 
+QnABot was designed to answer questions, but now it can also ask questions and process
+the user’s answers. Use this feature for data collection and validation;
+or implement surveys, quizzes, personalized recommendations; or to build a triage
+chatbot application. See the [blog post](https://aws.amazon.com/blogs/machine-learning/creating-a-question-and-answer-bot-with-amazon-lex-and-amazon-alexa/) for details about this new feature.
 This feature is know as ElicitResponse from a configuration perspective.
 
 ### Automatically advancing and branching along a tree of questions
 
 QnABot can now chain the user from one answer to another. This can be used with ElicitResponse
-to ask multiple questions from a user. Conditional chaining allows branching based on 
+to ask multiple questions from a user. Conditional chaining allows branching based on
 the state of session variables. Please see the [blog post](https://aws.amazon.com/blogs/machine-learning/creating-a-question-and-answer-bot-with-amazon-lex-and-amazon-alexa/)
 for a description on how to use this feature.
 
@@ -412,11 +428,11 @@ for a description on how to use this feature.
 
 QnABot version 2.6.0 optionally supports integration with Amazon Kendra as a fallback mechanism if a question/answer can not
 be found in QnABot.
- 
-**Important note. Use of Kendra as a fallback mechanism will incur additional charges for your AWS Account. Please 
+
+**Important note. Use of Kendra as a fallback mechanism will incur additional charges for your AWS Account. Please
 review the Kendra pricing structure. The fallback mechanism for QnABot can be useful when deploying Kendra as an
 Enterprise search solution.**
- 
+
 To enable this support for your Kendra indexes, use the Settings UI in the Designer and add your 
 index to the ALT_SEARCH_KENDRA_INDEXES parameter. This parameter takes an array of strings and uses the form below.
 
@@ -527,14 +543,14 @@ add support for other languages just extend the answer in Language.000 with addi
 Step 3) In order to serve up content that is locale specific you can
 
 - allow QnABot to automatically translate your english answers to the session language using Amazon Translate.
-- OR provide explicitly curated answers in QnA items, in multiple languages, using handlebars, as shown below. 
+- OR provide explicitly curated answers in QnA items, in multiple languages, using handlebars, as shown below.
 
 Lets modify the question sun.1. The following would be an example where the handlebar function ifLang is used to specify a response for Spanish.
 
 Use the handlebar template defaultLang to specify the response QnABot should provide when the language is unknown. By
 default this is typically in English but could be in any language as needed.
 
-{{#defaultLant}}{{/defaultLang}} must be the last element in the answer block. 
+{{#defaultLant}}{{/defaultLang}} must be the last element in the answer block.
 
 ```handlebars
 {{#ifLang 'es'}}
@@ -548,5 +564,5 @@ Our sun is 4.6 billion years old. Its considered a yellow dwarf with a diameter 
 The handlebar function ifLang takes locale as a quoted parameter. This tells QnABot which locale to associate with the subsequent
 text.
 
-A [workshop](https://github.com/aws-samples/aws-ai-qna-bot/tree/master/workshops/reinvent2019/readme.md) is available in GitHub 
+A [workshop](https://github.com/aws-samples/aws-ai-qna-bot/tree/master/workshops/reinvent2019/readme.md) is available in GitHub
 that will walk you through setting up this feature.
