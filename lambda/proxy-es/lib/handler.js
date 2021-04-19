@@ -89,7 +89,9 @@ async function get_es_query(event, settings) {
             syntax_confidence_limit: _.get(settings,'ES_SYNTAX_CONFIDENCE_LIMIT'),
             score_answer_field: _.get(settings,'ES_SCORE_ANSWER_FIELD'),
             fuzziness: _.get(settings, 'ES_USE_FUZZY_MATCH'),
-            es_expand_contractions: _.get(settings,"ES_EXPAND_CONTRACTIONS")
+            es_expand_contractions: _.get(settings,"ES_EXPAND_CONTRACTIONS"),
+
+
 
         };
         return build_es_query(query_params);
@@ -107,7 +109,8 @@ async function run_query_es(event, settings) {
         url:Url.resolve("https://"+event.endpoint,event.path),
         method:event.method,
         headers:event.headers,
-        body:es_query 
+        body:es_query,
+
     });
     return es_response;
 }
@@ -115,12 +118,15 @@ async function run_query_es(event, settings) {
 
 async function run_query_kendra(event, kendra_index) {
     console.log("Kendra FAQ Query index:" + kendra_index);
+    console.log(event)
     var request_params = {
         kendra_faq_index:kendra_index,
         question:event.question,
         size:10, // limit kendra hits to 10 max to avoid pagination issues
         es_address: event.endpoint,
         es_path: event.path,
+        minimum_score: event.minimum_score,
+
         
     } ;
     var kendra_response = await kendra.handler(request_params);
@@ -133,7 +139,7 @@ module.exports= async (event, context, callback) => {
     try {
         var settings = await get_settings();
         var kendra_index = _.get(settings, "KENDRA_FAQ_INDEX")
-
+        event.minimum_score = _.get(settings, 'ALT_SEARCH_KENDRA_FAQ_CONFIDENCE_SCORE', "MEDIUM")
         var question = _.get(event,'question','');
         var topic = _.get(event,'topic','');
         let okKendraQuery = (question.length > 0 && topic.length == 0 && kendra_index != "") ;
