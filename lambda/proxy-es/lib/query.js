@@ -102,7 +102,7 @@ async function run_query_kendra(req, query_params) {
     }
 
     var kendra_response = await kendra.handler(request_params);
-    
+    console.log(kendra_response)
     if (_.get(kendra_response, "hits.hits[0]._source")) {
         _.set(kendra_response, "hits.hits[0]._source.answersource", "Kendra FAQ");
     }

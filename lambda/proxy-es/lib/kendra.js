@@ -38,7 +38,7 @@ function create_hit(answermessage,markdown,ssml,hit_count,debug_results,kendra){
                     "type": "qna",
                     "questions": [
                     ],
-                    "answersource": "Kendra Fallback",
+                    "answersource": "KENDRA FALLBACK",
                     "kendra":kendra,
                     "hit_count": hit_count,
                     debug: debug_results.slice(0,kendra.maxDocuments)
