@@ -3,6 +3,8 @@ const slackifyMarkdown = require('slackify-markdown');
 const utf8 = require('utf8');
 
 
+// PARSE FUNCTIONS
+
 // When using QnABot in Amazon Connect call center, filter out 'filler' words that callers sometimes use
 // filler words are defined in setting CONNECT_IGNORE_WORDS
 // If inPutTranscript contains only filler words, return true.
@@ -33,6 +35,50 @@ function trapIgnoreWords(req, transcript) {
     }
 }
 
+function parseLexV1Event(event) {
+    let out = {
+        _type: "LEX",
+        _lexVersion: "V1",
+        _userId: _.get(event, "userId", "Unknown Lex User"),
+        intentname: _.get(event, 'sessionState.intent.name'),
+        question: _.get(event, 'inputTranscript'),
+        session: _.mapValues(
+            _.get(event, 'sessionAttributes', {}),
+            x => {
+                try {
+                    return JSON.parse(x)
+                } catch (e) {
+                    return x
+                }
+            }
+        ),
+        channel: _.get(event, "requestAttributes.'x-amz-lex:channel-type'")
+    }
+    return out;
+}
+
+function parseLexV2Event(event) {
+    let out = {
+        _type: "LEX",
+        _lexVersion: "V2",
+        _userId: _.get(event, "sessionId", "Unknown Lex User"),
+        intentname: _.get(event, 'sessionState.intent.name'),
+        question: _.get(event, 'inputTranscript'),
+        session: _.mapValues(
+            _.get(event.sessionState, 'sessionAttributes', {}),
+            x => {
+                try {
+                    return JSON.parse(x)
+                } catch (e) {
+                    return x
+                }
+            }
+        ),
+        channel: _.get(event, "requestAttributes.'x-amz-lex:channel-type'")
+    }
+    return out;
+}
+
 exports.parse=async function(req){
     var event = req._event;
     if (event.inputTranscript === undefined || event.inputTranscript === "") {
@@ -41,34 +87,114 @@ exports.parse=async function(req){
     } else if (trapIgnoreWords(req, event.inputTranscript)) {
         throw new Error(`Error - inputTranscript contains only words specified in setting CONNECT_IGNORE_WORDS: "${event.inputTranscript}"`);
     } else {
-        var out = {
-            _type: "LEX",
-            _userId: _.get(event, "userId", "Unknown Lex User"),
-            question: _.get(event, 'inputTranscript'),
-            session: _.mapValues(
-                _.get(event, 'sessionAttributes', {}),
-                x => {
-                    try {
-                        return JSON.parse(x)
-                    } catch (e) {
-                        return x
-                    }
-                }
-            ),
-            channel: _.get(event, "requestAttributes.'x-amz-lex:channel-type'")
+        var out;
+        if ( ! _.get(event,"sessionId")) {
+            out = parseLexV1Event(event);
+        } else {
+            out = parseLexV2Event(event);
         }
         return out;
     }
 }
 
-exports.assemble=function(request,response){
-    var filteredButtons = _.get(response.card,"buttons",[])
-    for (var i = filteredButtons.length - 1; i >= 0; --i){
-        if (!(filteredButtons[i].text && filteredButtons[i].value)){
-            filteredButtons.splice(i,1)
+function filterButtons(response) {
+    var filteredButtons = _.get(response.card,"buttons",[]);
+    if (filteredButtons) {
+        for (var i = filteredButtons.length - 1; i >= 0; --i) {
+            if (!(filteredButtons[i].text && filteredButtons[i].value)){
+                filteredButtons.splice(i,1);
+            }
         }
+        _.set(response.card,"buttons",filteredButtons) ;
     }
-    var out={
+    return response;
+}
+
+// ASSEMBLE FUNCTIONS
+
+function slackifyResponse(response) {
+    // Special handling for Slack responses
+    // Markdown conversion, and convert string to utf8 encoding for unicode support
+    if (_.get(response,"result.alt.markdown")) {
+        let md = response.result.alt.markdown;
+        console.log("Converting markdown response to Slack format.");
+        console.log("Original markdown: ", JSON.stringify(md));
+        md = slackifyMarkdown(md);
+        response.message = md ;
+        console.log("Converted markdown: ", JSON.stringify(md));
+    } 
+    console.log("Converting Slack message javascript string to utf8 (for multi-byte compatibility).");
+    let txt = response.message;
+    txt = utf8.encode(txt); // encode as utf8
+    response.message = txt; 
+    return response;
+}
+
+function isCard(card){
+    return _.get(card,"send")
+}
+
+function buildResponseCardV1(response) {
+    let responseCardV1 = null;
+    if (isCard(response.card) && (_.get(response.card,"imageUrl","").trim() || (_.get(response.card,"buttons",[]).length > 0))) {
+        responseCardV1 = {
+            version:"1",
+            contentType:"application/vnd.amazonaws.card.generic",
+            genericAttachments:[_.pickBy({
+                title:_.get(response,"card.title","Title"),
+                subTitle:_.get(response.card,'subTitle'),
+                imageUrl:_.get(response.card,"imageUrl"),
+                buttons:_.get(response.card,"buttons")
+            })]
+        };
+    }
+    return responseCardV1;
+}
+
+function buildImageResponseCardV2(response) {
+    let imageResponseCardV2 = null;
+    if (isCard(response.card) && (_.get(response.card,"imageUrl","").trim() || (_.get(response.card,"buttons",[]).length > 0))) {
+        imageResponseCardV2 = {
+            title:_.get(response,"card.title","Title"),
+            subTitle:_.get(response.card,'subTitle'),
+            imageUrl:_.get(response.card,"imageUrl"),
+            buttons: _.get(response.card,"buttons")
+        };
+    }
+    return imageResponseCardV2;
+}
+
+function copyResponseCardtoSessionAttribute(response) {
+    let responseCardV1 = buildResponseCardV1(response);
+    if (responseCardV1) {
+        // copy Lex v1 response card to appContext session attribute used by lex-web-ui
+        //  - allows repsonse card display even when using postContent (voice) with Lex (not otherwise supported by Lex)
+        //  - allows Lex limit of 5 buttons to be exceeded when using lex-web-ui
+        let tmp;
+        try {
+            tmp=JSON.parse(_.get(response,"session.appContext","{}"));
+        } catch(e) {
+            tmp=_.get(response,"session.appContext","{}");
+        }
+        tmp.responseCard=responseCardV1;
+        response.session.appContext=JSON.stringify(tmp);
+    }
+    return response;
+}
+
+function limitLexButtonCount(response) {
+    // Lex has limit of max 5 buttons in the responsecard.. if we have more than 5, use the first 5 only.
+    // note when using lex-web-ui, this limitation is circumvented by use of the appContext session attribute above.
+    let buttons = _.get(response.card,"buttons",[]) ;
+    if (buttons && buttons.length > 5) {
+        console.log("WARNING: Truncating button list to contain only first 5 buttons to adhere to Lex limits.");
+        _.set(response.card,"buttons",buttons.slice(0,5));
+    }
+    return response;
+}
+
+function assembleLexV1Response(response) {
+    let out={
         sessionAttributes:_.get(response,'session',{}),
         dialogAction:_.pickBy({
             type:"Close",
@@ -77,64 +203,56 @@ exports.assemble=function(request,response){
                 contentType:response.type,
                 content:response.message
             },
-            responseCard:isCard(response.card) && (_.get(response.card,"imageUrl","").trim() || filteredButtons.length > 0) ? {
-                version:"1",
-                contentType:"application/vnd.amazonaws.card.generic",
-                genericAttachments:[_.pickBy({
-                    title:_.get(response,"card.title","Image"),
-                    subTitle:_.get(response.card,'subTitle'),
-                    imageUrl:response.card.imageUrl,
-                    buttons: _.has(filteredButtons, [0]) ? filteredButtons : null
-                })]
-            } : null
+            responseCard: buildResponseCardV1(response)
         })
-    } ;
-    
-    // Special handling for Slack responses
-    // Markdown conversion, and convert string to utf8 encoding for unicode support
-    if (request._clientType == "LEX.Slack.Text") {
-        if (_.get(response,"result.alt.markdown")) {
-            let md = response.result.alt.markdown;
-            console.log("Converting markdown response to Slack format.");
-            console.log("Original markdown: ", JSON.stringify(md));
-            md = md.replace(/<\/?span[^>]*>/g,"");  // remove any span tags (eg no-translate tags)
-            md = md.replace(/<\/?br *\/?>/g,"\n"); // replace br with \n
-            md = slackifyMarkdown(md);
-            out.dialogAction.message.content = md ;
-            console.log("Converted markdown: ", JSON.stringify(md));
-        } 
-        console.log("Converting Slack message javascript string to utf8 (for multi-byte compatibility).");
-        let txt = out.dialogAction.message.content;
-        txt = utf8.encode(txt); // encode as utf8
-        out.dialogAction.message.content = txt;
-    }
+    };
+    return out;
+}
 
-    // copy response card to appContext session attribute used by lex-web-ui
-    //  - allows repsonse card display even when using postContent (voice) with Lex (not otherwise supported by Lex)
-    //  - allows Lex limit of 5 buttons to be exceeded when using lex-web-ui
-    if(isCard(response.card)){
-        var tmp
-        try {
-            tmp=JSON.parse(_.get(response,"session.appContext","{}"));
-        } catch(e) {
-            tmp=_.get(response,"session.appContext","{}");
+function assembleLexV2Response(response) {
+    let out={
+        "sessionState": {
+            sessionAttributes:_.get(response,'session',{}),
+            dialogAction:{
+                type:"Close"
+            },
+            "intent": {
+                name: response.intentname,
+                state:"Fulfilled"
+            }
+        },
+        "messages": [
+            {
+                "contentType": response.type,
+                "content": response.message,
+            }
+        ]
+    } ;
+    let imageResponseCardV2 = buildImageResponseCardV2(response) ;
+    if (imageResponseCardV2) {
+        out.messages[1] = {
+            "contentType": "ImageResponseCard",
+            "imageResponseCard": imageResponseCardV2            
         }
-        tmp.responseCard=out.dialogAction.responseCard;
-        response.session.appContext=JSON.stringify(tmp);
     }
- 
-    // Lex has limit of max 5 buttons in the responsecard.. if we have more than 5, use the first 5 only.
-    // note when using lex-web-ui, this limitation is circumvented by use of the appContext session attribute above.
-    var buttons = _.get(out,"dialogAction.responseCard.genericAttachments[0].buttons");
-    if (buttons && buttons.length > 5) {
-        console.log("WARNING: Truncating button list to contain only first 5 buttons to adhere to Lex limits.");
-        _.set(out,"dialogAction.responseCard.genericAttachments[0].buttons",buttons.slice(0,5));
-    }
+    return out;
+}
     
+exports.assemble=function(request,response){
+    if (request._clientType == "LEX.Slack.Text") {
+        response = slackifyResponse(response);
+    }
+    response = filterButtons(response);
+    response = copyResponseCardtoSessionAttribute(response);
+    response = limitLexButtonCount(response);
+    let out;
+    if (request._lexVersion === "V1") {
+        out= assembleLexV1Response(response);        
+    } else {
+        out= assembleLexV2Response(response);
+    }
     console.log("Lex response:",JSON.stringify(out,null,2))
     return out
 }
 
-function isCard(card){
-    return _.get(card,"send")
-}
+
