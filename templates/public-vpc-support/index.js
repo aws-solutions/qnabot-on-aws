@@ -38,6 +38,7 @@ module.exports=Promise.resolve(require('../master')).then(function(base){
         "Encryption",
         "PublicOrPrivate",
         "ElasticSearchNodeCount",
+        "KibanaDashboardRetentionMinutes",
         "VPCSubnetIdList",
         "VPCSecurityGroupIdList",
         "XraySetting"
@@ -78,7 +79,8 @@ module.exports=Promise.resolve(require('../master')).then(function(base){
                    },
                    "Parameters": [
                         "ElasticSearchNodeCount",
-                        "Encryption"
+                        "Encryption",
+                        "KibanaDashboardRetentionMinutes"
                    ]
                 }
             ]

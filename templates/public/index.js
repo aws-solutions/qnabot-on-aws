@@ -37,6 +37,7 @@ module.exports=Promise.resolve(require('../master')).then(function(base){
         "DefaultKendraIndexId",
         "Encryption",
         "ElasticSearchNodeCount",
+        "KibanaDashboardRetentionMinutes",
         "PublicOrPrivate",
         "XraySetting"
     ]);
@@ -67,7 +68,8 @@ module.exports=Promise.resolve(require('../master')).then(function(base){
                    },
                    "Parameters": [
                         "ElasticSearchNodeCount",
-                        "Encryption"
+                        "Encryption",
+                        "KibanaDashboardRetentionMinutes"
                    ]
                 }
             ]
