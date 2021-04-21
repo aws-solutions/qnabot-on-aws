@@ -2,11 +2,69 @@ var Promise=require('bluebird')
 var aws=require("aws-sdk")
 aws.config.setPromisesDependency(Promise)
 aws.config.region=process.env.AWS_REGION
+let converter = require('json-2-csv');
+
 
 var s3=new aws.S3()
 var lambda=new aws.Lambda()
 var stride=parseInt(process.env.STRIDE)
 var _=require('lodash')
+
+async function parse(content){
+    header_mapping = {
+        "question":"q",
+        "topic":"t",
+        "markdown":"alt.markdown",
+        "answer":"a",
+        "ssml":"alt.ssml"
+    }
+    try {
+        return JSON.parse(content)
+    } catch{
+        console.log("File is not a valid JSON file. Trying to parse as CSV file")
+        console.log("Substituting headers")
+        var lines = content.split("\n")
+        headerColumns = lines[0].split(",")
+        for(i=0;i< headerColumns.length;i++){
+            var actualColumn = header_mapping[headerColumns[i].toLowerCase()]
+            if(actualColumn){
+                headerColumns[i] = actualColumn
+            }
+        }
+        lines.splice(0,1,headerColumns.join(","))
+        var json = await converter.csv2jsonAsync(lines.join("\n"))
+        json.forEach(q => {
+                    q.type = "qna";
+                    q.t = ""
+                }
+            )
+
+        json = {
+            qna: json
+        }
+
+
+        console.log(JSON.stringify(json))
+
+
+
+
+    }
+    
+}
+
+
+
+
+
+(async () => {
+
+    var csv = "qid,question,answer,topic,markdown,ssml\n"+
+          '"MeaningOfLife",["What is the meaning of life"],"42","","*42*",""'
+    parse(csv)
+
+})();
+
 
 exports.step=function(event,context,cb){
     console.log("step")
@@ -54,6 +112,7 @@ exports.step=function(event,context,cb){
                 objects.filter(x=>x)
                 .forEach(x=>{
                     try{
+
                         var obj=JSON.parse(x)
                         var timestamp=_.get(obj,'datetime',"");
                         var docid ;
