@@ -10,7 +10,7 @@ var lambda=new aws.Lambda()
 var stride=parseInt(process.env.STRIDE)
 var _=require('lodash')
 
-async function parse(content){
+function parse(content){
     header_mapping = {
         "question":"q",
         "topic":"t",
@@ -32,7 +32,7 @@ async function parse(content){
             }
         }
         lines.splice(0,1,headerColumns.join(","))
-        var json = await converter.csv2jsonAsync(lines.join("\n"))
+        converter.csv2jsonAsync(lines.join("\n")).then( x =>{
         json.forEach(q => {
                     q.type = "qna";
                     q.t = ""
@@ -45,6 +45,7 @@ async function parse(content){
 
 
         console.log(JSON.stringify(json))
+        return json})
 
 
 
@@ -57,13 +58,13 @@ async function parse(content){
 
 
 
-(async () => {
+// (async () => {
 
-    var csv = "qid,question,answer,topic,markdown,ssml\n"+
-          '"MeaningOfLife",["What is the meaning of life"],"42","","*42*",""'
-    parse(csv)
+//     var csv = "qid,question,answer,topic,markdown,ssml\n"+
+//           '"MeaningOfLife",["What is the meaning of life"],"42","","*42*",""'
+//     parse(csv)
 
-})();
+// })();
 
 
 exports.step=function(event,context,cb){
@@ -103,7 +104,9 @@ exports.step=function(event,context,cb){
                 
                 var objects=config.buffer.split(/\n/)
                 try {
-                    JSON.parse(objects[objects.length-1])
+                    console.log("in try")
+                    console.log(objects[objects.length-1])
+                    //JSON.parse(objects[objects.length-1])
                     config.buffer=""
                 } catch(e){
                     config.buffer=objects.pop()
@@ -113,7 +116,7 @@ exports.step=function(event,context,cb){
                 .forEach(x=>{
                     try{
 
-                        var obj=JSON.parse(x)
+                        var obj=parse(x)
                         var timestamp=_.get(obj,'datetime',"");
                         var docid ;
                         if (timestamp === "") {
