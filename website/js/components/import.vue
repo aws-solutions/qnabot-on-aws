@@ -251,7 +251,11 @@ module.exports = {
           "File is not a valid JSON file. Trying to parse as CSV file"
         );
         console.log("Substituting headers");
-        var lines = content.split("\n").map(m => m.replace(/(\r\n|\n|\r)/gm,""));
+        var lines = content.split("\n").map(m => m.replace(/(\r\n|\n|\r)/gm,"")     //remove end of line characters
+                                                  .replace(/[\u2018\u2019]/g, "'")  //replace smart single quotes
+                                                  .replace(/[\u201C\u201D]/g, '"')  //replace smart double quotes
+                                                  .replace("‘","'"))                //Replace non-UTF8 smart single quote
+
         var headerColumns = lines[0].split(",").map(m => m.replace(/(\r\n|\n|\r)/gm,""));
         for (var i = 0; i < headerColumns.length; i++) {
           var actualColumn = header_mapping[headerColumns[i].toLowerCase()];
@@ -261,7 +265,6 @@ module.exports = {
         }
         lines.splice(0, 1, headerColumns.join(","));
 
-        console.log("inside async");
         var json = await converter.csv2jsonAsync(lines.join("\n"));
         json.forEach((q) => {
           q.type = "qna";
