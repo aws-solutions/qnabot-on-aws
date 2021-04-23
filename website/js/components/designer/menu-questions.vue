@@ -22,14 +22,15 @@
               v-btn(@click='emit' class="ma-2 refresh" ) 
                 span Refresh
             v-flex
-              add 
-    v-dialog(v-if="error")
-      v-card
-        v-card-title.headling Error
-        v-card-text.error--text {{Error}}
-        v-card-actions
-          v-spacer
-          v-btn.lighten-3(@click="error=''" :class="{ teal: success}" ) close
+              add
+    v-dialog(v-model="error")
+        v-card(id="error-modal")
+          v-card-title(primary-title) Error Loading Content
+          v-card-text
+            v-subheader.error--text(v-if='error' id="add-error") {{errorMsg}}
+          v-card-actions
+            v-spacer
+            v-btn.lighten-3(@click="error=false;errorMsg='';" :class="{ teal: success}" ) close
 </template>
 
 <script>
@@ -56,7 +57,8 @@
                 dialog: false,
                 building: false,
                 success: false,
-                error: ''
+                error: false,
+                errorMsg: ''
             }
         },
         components: {
@@ -89,7 +91,7 @@
                         self.success = true
                         setTimeout(() => self.success = false, 2000)
                     })
-                    .catch(e => self.error = e)
+                    .catch(e => {self.error=true; self.errorMsg = e})
                     .then(() => self.building = false)
             }
         }

@@ -60,6 +60,7 @@ exports.step=function(event,context,cb){
                         if (timestamp === "") {
                             // only metrics and feedback items have datetime field.. This must be a qna item.
                             obj.type=obj.type || 'qna'
+                            obj.q = obj.q.map(x=>{ x = x.replace(/\\*"/g,''); return x});
                             if(obj.type==='qna'){
                                 obj.questions=obj.q.map(x=>{return {q:x}});
                                 obj.quniqueterms=obj.q.join(" ");

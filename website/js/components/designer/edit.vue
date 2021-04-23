@@ -117,8 +117,9 @@ module.exports={
     update:async function(){
       var self=this
       if(this.valid){
-        self.loading=true
-        self.dialog=false
+        self.loading=true;
+        self.dialog=false;
+        self.error='';
         try{
           if(self.data.qid!==self.tmp.qid){
             var exists=await self.$store.dispatch('api/check',self.tmp.qid)
