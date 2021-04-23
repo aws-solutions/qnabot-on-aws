@@ -242,7 +242,7 @@ module.exports = {
         ssml: "alt.ssml",
       };
       try {
-        return parseJson(content);
+        return Promise.resolve(parseJson(content));
       } catch (err) {
         console.log(
           "File is not a valid JSON file. Trying to parse as CSV file"
@@ -270,6 +270,7 @@ module.exports = {
         };
 
         console.log("processed csv file");
+        console.log(json)
         return json
 
       }
@@ -278,15 +279,16 @@ module.exports = {
     upload: function (data, name = "import") {
       data.then(json => 
       {
-        console.log("json " + JSON.stringify(json))
+        //console.log("json " + JSON.stringify(json))
         var self = this;
         var id = name.replace(" ", "-");
         new Promise(function (res, rej) {
           console.log(json);
           if (json.qna.length) {
+            console.log("qna length " + json.qna.length)
             self.$store
               .dispatch("api/startImport", {
-                qa: json.qna,
+                qa: [json],
                 name: id,
               })
               .then(res)

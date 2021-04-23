@@ -66,6 +66,7 @@ module.exports={
         .tap(response=>s3.putObject({
             Bucket:response._links.imports.bucket,
             Key:response._links.imports.uploadPrefix+opts.name,
+            //Body:JSON.stringify(opts.qa)
             Body:opts.qa.map(JSON.stringify).join('\n')
         }).promise())
     },

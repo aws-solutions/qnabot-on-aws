@@ -10,49 +10,51 @@ var lambda=new aws.Lambda()
 var stride=parseInt(process.env.STRIDE)
 var _=require('lodash')
 
-function parse(content){
-    header_mapping = {
-        "question":"q",
-        "topic":"t",
-        "markdown":"alt.markdown",
-        "answer":"a",
-        "ssml":"alt.ssml"
-    }
+async function parse (content) {
+    var header_mapping = {
+      question: "q",
+      topic: "t",
+      markdown: "alt.markdown",
+      answer: "a",
+      ssml: "alt.ssml",
+    };
     try {
-        return JSON.parse(content)
-    } catch{
-        console.log("File is not a valid JSON file. Trying to parse as CSV file")
-        console.log("Substituting headers")
-        var lines = content.split("\n")
-        headerColumns = lines[0].split(",")
-        for(i=0;i< headerColumns.length;i++){
-            var actualColumn = header_mapping[headerColumns[i].toLowerCase()]
-            if(actualColumn){
-                headerColumns[i] = actualColumn
-            }
+      var json = JSON.parse(content)
+      return Promise.resolve(json);
+    } catch (err) {
+    
+      console.log(
+        "File is not a valid JSON file. Trying to parse as CSV file"
+      );
+      console.log("Substituting headers");
+      var lines = content.split("\n");
+      var headerColumns = lines[0].split(",");
+      for (var i = 0; i < headerColumns.length; i++) {
+        var actualColumn = header_mapping[headerColumns[i].toLowerCase()];
+        if (actualColumn) {
+          headerColumns[i] = actualColumn;
         }
-        lines.splice(0,1,headerColumns.join(","))
-        converter.csv2jsonAsync(lines.join("\n")).then( x =>{
-        json.forEach(q => {
-                    q.type = "qna";
-                    q.t = ""
-                }
-            )
+      }
+      lines.splice(0, 1, headerColumns.join(","));
 
-        json = {
-            qna: json
-        }
+      console.log("inside async");
+      var json = await converter.csv2jsonAsync(lines.join("\n"));
+      json.forEach((q) => {
+        q.type = "qna";
+        q.t = "";
+      });
 
+      json = {
+        qna: json,
+      };
 
-        console.log(JSON.stringify(json))
-        return json})
-
-
-
+      console.log("processed csv file");
+      console.log(json)
+      return json
 
     }
-    
-}
+
+  }
 
 
 
@@ -67,7 +69,9 @@ function parse(content){
 // })();
 
 
-exports.step=function(event,context,cb){
+exports.step=step
+
+function step (event,context,cb){
     console.log("step")
     console.log("Request",JSON.stringify(event,null,2))
     var Bucket=event.Records[0].s3.bucket.name
@@ -116,38 +120,42 @@ exports.step=function(event,context,cb){
                 .forEach(x=>{
                     try{
 
-                        var obj=parse(x)
-                        var timestamp=_.get(obj,'datetime',"");
-                        var docid ;
-                        if (timestamp === "") {
-                            // only metrics and feedback items have datetime field.. This must be a qna item.
-                            obj.type=obj.type || 'qna'
-                            if(obj.type==='qna'){
-                                obj.questions=obj.q.map(x=>{return {q:x}});
-                                obj.quniqueterms=obj.q.join(" ");
-                                delete obj.q
-                            }
-                            docid = obj._id || obj.qid ;
-                        } else {
-                            docid = obj._id || obj.qid + "_upgrade_restore_" + timestamp;
-                            // Stringify session attributes
-                            var sessionAttrs = _.get(obj,"entireResponse.session",{}) ;
-                            for (var key of Object.keys(sessionAttrs)) {
-                                if (typeof sessionAttrs[key] != 'string') {
-                                    sessionAttrs[key]=JSON.stringify(sessionAttrs[key]);
+                        parse(x).then(obj =>
+                        {
+                            var timestamp=_.get(obj,'datetime',"");
+                            var docid ;
+                            if (timestamp === "") {
+                                // only metrics and feedback items have datetime field.. This must be a qna item.
+                                obj.type=obj.type || 'qna'
+                                if(obj.type==='qna'){
+                                    console.log("the object")
+                                    console.log(obj)
+                                    obj.questions=obj.qna.map(x=>{return {q:x}});
+                                    obj.quniqueterms=obj.q.join(" ");
+                                    delete obj.q
+                                }
+                                docid = obj._id || obj.qid ;
+                            } else {
+                                docid = obj._id || obj.qid + "_upgrade_restore_" + timestamp;
+                                // Stringify session attributes
+                                var sessionAttrs = _.get(obj,"entireResponse.session",{}) ;
+                                for (var key of Object.keys(sessionAttrs)) {
+                                    if (typeof sessionAttrs[key] != 'string') {
+                                        sessionAttrs[key]=JSON.stringify(sessionAttrs[key]);
+                                    }
                                 }
                             }
-                        }
-                        delete obj._id;
-                        out.push(JSON.stringify({
-                            index:{
-                                "_index":esindex,
-                                "_type":"_doc",
-                                "_id":docid 
-                            }
-                        }))
-                        config.count+=1
-                        out.push(JSON.stringify(obj))
+                            delete obj._id;
+                            out.push(JSON.stringify({
+                                index:{
+                                    "_index":esindex,
+                                    "_type":"_doc",
+                                    "_id":docid 
+                                }
+                            }))
+                            config.count+=1
+                            out.push(JSON.stringify(obj))
+                        })
                     } catch(e){
                         config.failed+=1
                         console.log("Failed to Parse:",e,x)
