@@ -2,76 +2,13 @@ var Promise=require('bluebird')
 var aws=require("aws-sdk")
 aws.config.setPromisesDependency(Promise)
 aws.config.region=process.env.AWS_REGION
-let converter = require('json-2-csv');
-
 
 var s3=new aws.S3()
 var lambda=new aws.Lambda()
 var stride=parseInt(process.env.STRIDE)
 var _=require('lodash')
 
-async function parse (content) {
-    var header_mapping = {
-      question: "q",
-      topic: "t",
-      markdown: "alt.markdown",
-      answer: "a",
-      ssml: "alt.ssml",
-    };
-    try {
-      var json = JSON.parse(content)
-      return Promise.resolve(json);
-    } catch (err) {
-    
-      console.log(
-        "File is not a valid JSON file. Trying to parse as CSV file"
-      );
-      console.log("Substituting headers");
-      var lines = content.split("\n");
-      var headerColumns = lines[0].split(",");
-      for (var i = 0; i < headerColumns.length; i++) {
-        var actualColumn = header_mapping[headerColumns[i].toLowerCase()];
-        if (actualColumn) {
-          headerColumns[i] = actualColumn;
-        }
-      }
-      lines.splice(0, 1, headerColumns.join(","));
-
-      console.log("inside async");
-      var json = await converter.csv2jsonAsync(lines.join("\n"));
-      json.forEach((q) => {
-        q.type = "qna";
-        q.t = "";
-      });
-
-      json = {
-        qna: json,
-      };
-
-      console.log("processed csv file");
-      console.log(json)
-      return json
-
-    }
-
-  }
-
-
-
-
-
-// (async () => {
-
-//     var csv = "qid,question,answer,topic,markdown,ssml\n"+
-//           '"MeaningOfLife",["What is the meaning of life"],"42","","*42*",""'
-//     parse(csv)
-
-// })();
-
-
-exports.step=step
-
-function step (event,context,cb){
+exports.step=function(event,context,cb){
     console.log("step")
     console.log("Request",JSON.stringify(event,null,2))
     var Bucket=event.Records[0].s3.bucket.name
@@ -108,9 +45,7 @@ function step (event,context,cb){
                 
                 var objects=config.buffer.split(/\n/)
                 try {
-                    console.log("in try")
-                    console.log(objects[objects.length-1])
-                    //JSON.parse(objects[objects.length-1])
+                    JSON.parse(objects[objects.length-1])
                     config.buffer=""
                 } catch(e){
                     config.buffer=objects.pop()
@@ -119,43 +54,46 @@ function step (event,context,cb){
                 objects.filter(x=>x)
                 .forEach(x=>{
                     try{
-
-                        parse(x).then(obj =>
-                        {
-                            var timestamp=_.get(obj,'datetime',"");
-                            var docid ;
-                            if (timestamp === "") {
-                                // only metrics and feedback items have datetime field.. This must be a qna item.
-                                obj.type=obj.type || 'qna'
-                                if(obj.type==='qna'){
-                                    console.log("the object")
-                                    console.log(obj)
-                                    obj.questions=obj.qna.map(x=>{return {q:x}});
+                        var obj=JSON.parse(x)
+                        var timestamp=_.get(obj,'datetime',"");
+                        var docid ;
+                        if (timestamp === "") {
+                            // only metrics and feedback items have datetime field.. This must be a qna item.
+                            obj.type=obj.type || 'qna'
+                            if(obj.type==='qna'){
+                                try
+                                {
+                                    obj.questions=obj.q.map(x=>{return {q:x}});
                                     obj.quniqueterms=obj.q.join(" ");
-                                    delete obj.q
                                 }
-                                docid = obj._id || obj.qid ;
-                            } else {
-                                docid = obj._id || obj.qid + "_upgrade_restore_" + timestamp;
-                                // Stringify session attributes
-                                var sessionAttrs = _.get(obj,"entireResponse.session",{}) ;
-                                for (var key of Object.keys(sessionAttrs)) {
-                                    if (typeof sessionAttrs[key] != 'string') {
-                                        sessionAttrs[key]=JSON.stringify(sessionAttrs[key]);
-                                    }
+                                catch(err){
+                                    console.log("skipping question invalid answer format")
+                                }
+                                delete obj.q
+
+
+                            }
+                            docid = obj._id || obj.qid ;
+                        } else {
+                            docid = obj._id || obj.qid + "_upgrade_restore_" + timestamp;
+                            // Stringify session attributes
+                            var sessionAttrs = _.get(obj,"entireResponse.session",{}) ;
+                            for (var key of Object.keys(sessionAttrs)) {
+                                if (typeof sessionAttrs[key] != 'string') {
+                                    sessionAttrs[key]=JSON.stringify(sessionAttrs[key]);
                                 }
                             }
-                            delete obj._id;
-                            out.push(JSON.stringify({
-                                index:{
-                                    "_index":esindex,
-                                    "_type":"_doc",
-                                    "_id":docid 
-                                }
-                            }))
-                            config.count+=1
-                            out.push(JSON.stringify(obj))
-                        })
+                        }
+                        delete obj._id;
+                        out.push(JSON.stringify({
+                            index:{
+                                "_index":esindex,
+                                "_type":"_doc",
+                                "_id":docid 
+                            }
+                        }))
+                        config.count+=1
+                        out.push(JSON.stringify(obj))
                     } catch(e){
                         config.failed+=1
                         console.log("Failed to Parse:",e,x)
@@ -256,4 +194,3 @@ exports.start=function(event,context,cb){
         data:x
     })))
 }
-

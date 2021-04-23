@@ -198,10 +198,13 @@ module.exports = {
             var reader = new FileReader();
             reader.onload = function (e) {
               try {
-                res({
-                  name: file.name,
-                  data: self.parse(e.target.result),
+                self.parse(e.target.result).then(data =>{                
+                  res({
+                    name: file.name,
+                    data: data,
                 });
+                })
+
               } catch (e) {
                 rej(e);
               }
@@ -248,8 +251,8 @@ module.exports = {
           "File is not a valid JSON file. Trying to parse as CSV file"
         );
         console.log("Substituting headers");
-        var lines = content.split("\n");
-        var headerColumns = lines[0].split(",");
+        var lines = content.split("\n").map(m => m.replace(/(\r\n|\n|\r)/gm,""));
+        var headerColumns = lines[0].split(",").map(m => m.replace(/(\r\n|\n|\r)/gm,""));
         for (var i = 0; i < headerColumns.length; i++) {
           var actualColumn = header_mapping[headerColumns[i].toLowerCase()];
           if (actualColumn) {
@@ -262,7 +265,6 @@ module.exports = {
         var json = await converter.csv2jsonAsync(lines.join("\n"));
         json.forEach((q) => {
           q.type = "qna";
-          q.t = "";
         });
 
         json = {
@@ -276,33 +278,27 @@ module.exports = {
       }
 
     },
-    upload: function (data, name = "import") {
-      data.then(json => 
-      {
-        //console.log("json " + JSON.stringify(json))
-        var self = this;
-        var id = name.replace(" ", "-");
-        new Promise(function (res, rej) {
-          console.log(json);
-          if (json.qna.length) {
-            console.log("qna length " + json.qna.length)
-            self.$store
-              .dispatch("api/startImport", {
-                qa: [json],
-                name: id,
-              })
-              .then(res)
-              .catch(rej);
-          } else {
-            rej("Invalid or Empty File");
-          }
-        })
-          .then(() => {
-            self.addJob(id);
+     upload:function(data,name="import"){
+      var self=this
+      var id=name.replace(' ' ,'-')
+      new Promise(function(res,rej){
+        console.log(data)
+        if(data.qna.length){
+          self.$store.dispatch('api/startImport',{
+            qa:data.qna,
+            name:id
           })
-          .tapCatch(console.log)
-          .catch((error) => (self.error = error));
+          .then(res)
+          .catch(rej)
+        }else{
+          rej('Invalid or Empty File')
+        }
       })
+      .then(()=>{
+        self.addJob(id)
+      })
+      .tapCatch(console.log)
+      .catch(error=>self.error=error)
     },
   },
 };
