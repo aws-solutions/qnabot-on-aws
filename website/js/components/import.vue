@@ -96,8 +96,7 @@ var Promise = require("bluebird");
 var saveAs = require("file-saver").saveAs;
 var axios = require("axios");
 const parseJson = require("json-parse-better-errors");
-let converter = require('json-2-csv');
-
+let converter = require("json-2-csv");
 
 var _ = require("lodash");
 
@@ -198,13 +197,12 @@ module.exports = {
             var reader = new FileReader();
             reader.onload = function (e) {
               try {
-                self.parse(e.target.result).then(data =>{                
+                self.parse(e.target.result).then((data) => {
                   res({
                     name: file.name,
                     data: data,
+                  });
                 });
-                })
-
               } catch (e) {
                 rej(e);
               }
@@ -247,61 +245,76 @@ module.exports = {
       try {
         return Promise.resolve(parseJson(content));
       } catch (err) {
-        console.log(
-          "File is not a valid JSON file. Trying to parse as CSV file"
-        );
-        console.log("Substituting headers");
-        var lines = content.split("\n").map(m => m.replace(/(\r\n|\n|\r)/gm,"")     //remove end of line characters
-                                                  .replace(/[\u2018\u2019]/g, "'")  //replace smart single quotes
-                                                  .replace(/[\u201C\u201D]/g, '"')  //replace smart double quotes
-                                                  .replace("‘","'"))                //Replace non-UTF8 smart single quote
+        try {
+          console.log(
+            "File is not a valid JSON file. Trying to parse as CSV file"
+          );
+          console.log("Substituting headers");
+          var lines = content.split("\n").map((m) =>
+            m
+              .replace(/(\r\n|\n|\r)/gm, "") //remove end of line characters
+              .replace(/[\u2018\u2019]/g, "'") //replace smart single quotes
+              .replace(/[\u201C\u201D]/g, '"') //replace smart double quotes
+              .replace("‘", "'")
+          ); //Replace non-UTF8 smart single quote
 
-        var headerColumns = lines[0].split(",").map(m => m.replace(/(\r\n|\n|\r)/gm,""));
-        for (var i = 0; i < headerColumns.length; i++) {
-          var actualColumn = header_mapping[headerColumns[i].toLowerCase()];
-          if (actualColumn) {
-            headerColumns[i] = actualColumn;
+          var headerColumns = lines[0]
+            .split(",")
+            .map((m) => m.replace(/(\r\n|\n|\r)/gm, ""));
+          for (var i = 0; i < headerColumns.length; i++) {
+            var actualColumn = header_mapping[headerColumns[i].toLowerCase()];
+            if (actualColumn) {
+              headerColumns[i] = actualColumn;
+            }
           }
+          lines.splice(0, 1, headerColumns.join(","));
+
+          var json = await converter.csv2jsonAsync(lines.join("\n"));
+          json.forEach((q) => {
+            q.type = "qna";
+          });
+
+          json = {
+            qna: json,
+          };
+
+          console.log("processed csv file");
+          console.log(json);
+          return json;
+        } catch (err) {
+          console.log("Parse error");
+          console.log(err);
+          throw err;
         }
-        lines.splice(0, 1, headerColumns.join(","));
-
-        var json = await converter.csv2jsonAsync(lines.join("\n"));
-        json.forEach((q) => {
-          q.type = "qna";
-        });
-
-        json = {
-          qna: json,
-        };
-
-        console.log("processed csv file");
-        console.log(json)
-        return json
-
       }
-
     },
-     upload:function(data,name="import"){
-      var self=this
-      var id=name.replace(' ' ,'-')
-      new Promise(function(res,rej){
-        console.log(data)
-        if(data.qna.length){
-          self.$store.dispatch('api/startImport',{
-            qa:data.qna,
-            name:id
+    upload: function (data, name = "import") {
+      try {
+        var self = this;
+        var id = name.replace(/[^a-zA-Z0-9-_]/g, ''); //removes all non URL safe characters
+        new Promise(function (res, rej) {
+          console.log(data);
+          if (data.qna.length) {
+            self.$store
+             
+              .dispatch("api/startImport", {
+                qa: data.qna,
+                name: id,
+              })
+              .then(res)
+              .catch(rej);
+          } else {
+            rej("Invalid or Empty File");
+          }
+        })
+          .then(() => {
+            self.addJob(id);
           })
-          .then(res)
-          .catch(rej)
-        }else{
-          rej('Invalid or Empty File')
-        }
-      })
-      .then(()=>{
-        self.addJob(id)
-      })
-      .tapCatch(console.log)
-      .catch(error=>self.error=error)
+          .tapCatch(console.log)
+          .catch((error) => (self.error = error));
+      } catch (error) {
+        console.log(error);
+      }
     },
   },
 };
