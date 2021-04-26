@@ -8,20 +8,13 @@ This repository contains code for the QnABot, described in the AWS AI blog post 
 
 See the "Getting Started" to launch your own QnABot
 
-4.5.0 provides a number of new features described below. Several to call attention to are the following:
+4.6.0 provides a number of new features described below. Several to call attention to are the following:
 
-- To improve performance, resiliency, and security, the Elasticsearch cluster will default to using ENCRYPTED nodes
-  using the c5.large.elasticsearch instance type. If UNENCRYPTED is selected, the
-  t3.small.elasticsearch instance types will be used. The default number of nodes in a new cluster is now 4 for improved
-  resiliency. The number of cluster nodes can be reduced to 2 for development environments
-  if desired.
-  
-- QnABot distribution regions now available for one click deployment have increased to 8 regions. These are Northern
-  Virginia (us-east-1), Oregon (us-west-2),  Ireland (eu-west-1), London (eu-west-2), Frankfurt (eu-central-1),
-  Sydney (ap-southeast-2), Singapore (ap-southeast-1), (Tokyo) ap-northeast-1.
-  
-*Note: The Amazon Kendra service is available in Northern Virginia, Oregon, Sydney, and Ireland. If you desire to
-use QnABot with Kendra, please make sure to use QnABot in one of these regions.*
+- Kendra custom no_hits item required in earlier releases is no longer required to enable Kendra Fallback and should be removed, configurable confidence thresholds now available for filtering Kendra results.
+- Kendra integration is now fully automated during install or update when the new default Kendra Index Id parameter is provided.
+- Standard markdown is now automatically converted to Slack markdown when using Slack, Kibana dashboard logs and metrics retention period is now configurable during install or update, Lambda runtime upgraded to Node.js 12.x.
+
+**New features in 4.6.0** [Improved Kendra integration and Kibana dashboards. Additional settings to filter Kendra responses based on confidence levels](#new-features)
 
 **New features in 4.5.0** [Kendra Web Crawler, Comprehend PII Detection, Translate Custom Terminology, Increased deployment regions](#new-features)
 
@@ -49,7 +42,7 @@ the upgrade. In this release we expect upgrade to be smooth but just in case you
 ## Prerequisites
 
 - Run Linux. (tested on Amazon Linux)
-- Install npm >6.13.1 and node >10.16.3. ([instructions](https://nodejs.org/en/download/))
+- Install npm >7.10.0 and node >12.15.1. ([instructions](https://nodejs.org/en/download/))
 - Clone this repo.
 - Set up an AWS account. ([instructions](https://AWS.amazon.com/free/?sc_channel=PS&sc_campaign=acquisition_US&sc_publisher=google&sc_medium=cloud_computing_b&sc_content=AWS_account_bmm_control_q32016&sc_detail=%2BAWS%20%2Baccount&sc_category=cloud_computing&sc_segment=102882724242&sc_matchtype=b&sc_country=US&s_kwcid=AL!4422!3!102882724242!b!!g!!%2BAWS%20%2Baccount&ef_id=WS3s1AAAAJur-Oj2:20170825145941:s))
 - Configure AWS CLI and a local credentials file. ([instructions](http://docs.AWS.amazon.com/cli/latest/userguide/cli-chap-welcome.html))  
@@ -205,6 +198,17 @@ See the [LICENSE.md](LICENSE.md) file for details
 
 ## New features
 
+### Version 4.6.0
+
+- Kendra integration is now fully automated during install or update when the new default Kendra Index Id parameter is provided.
+- Kendra custom no_hits item required in earlier releases is no longer required to enable Kendra Fallback and should be removed, configurable confidence thresholds now available for filtering Kendra results.
+- Kibana dashboard now shows additional detail on questions answered via Kendra FAQ and Kendra Fallback.
+- Standard markdown is now automatically converted to Slack markdown when using Slack, Kibana dashboard logs and metrics retention period is now configurable during install or update, Lambda runtime upgraded to Node.js 12.x.
+- Two new settings have been added
+
+  - ALT_SEARCH_KENDRA_FALLBACK_CONFIDENCE_SCORE - Answers will only be returned that or at or above the specified [confidence level](https://aws.amazon.com/about-aws/whats-new/2020/09/amazon-kendra-launches-confidence-scores/) when using Kendra Fallback
+  - ALT_SEARCH_KENDRA_FAQ_CONFIDENCE_SCORE - Synchronized FAQ questions will only be matched to an ElasticSearch question if the Kendra FAQ  confidence level is at or above the specified confidence level.
+
 ### Version 4.5.0
 
 - Added single click deployment support for four additional regions
@@ -221,6 +225,12 @@ See the [LICENSE.md](LICENSE.md) file for details
 - Improved support when contractions are used in utterances  
 - Kendra Fallback message prefixes are now configurable in QnABot settings
 - Fixed bugs and defects
+- To improve performance, resiliency, and security, the Elasticsearch cluster will default to using ENCRYPTED nodes
+  using the c5.large.elasticsearch instance type. If UNENCRYPTED is selected, the
+  t3.small.elasticsearch instance types will be used. The default number of nodes in a new cluster is now 4 for improved
+  resiliency. The number of cluster nodes can be reduced to 2 for development environments
+  if desired.
+- QnABot distribution regions now available for one click deployment have increased to 8 regions. These are Northern Virginia (us-east-1), Oregon (us-west-2),  Ireland (eu-west-1), London (eu-west-2), Frankfurt (eu-central-1), Sydney (ap-southeast-2), Singapore (ap-southeast-1), and Tokyo (ap-northeast-1).
 
 ### Version 4.4.0
 
@@ -277,7 +287,7 @@ is not required but may be used if available.
 
 - New Kendra FAQ support (Beta version) using the setting KENDRA_FAQ_INDEX. New menu item in Designer UI to export Questions as a Kendra FAQ. See revised Blog Post for details.
 - New GetSessionAttribute Handlebars helper to obtain session attribute. Works similar to lodash get(). Will not through exception and will return a default value.
-- Enhanced handlebars to support string concatenation including handlebar 'variables' like Session Attributes and UserInfo, etc. Use case, e.g. to build a url containing a users email, eg a google calendar URL. Example of syntax now supported - in this case to dynamically build a personalized URL based on user info. {{setSessionAttr 'link' 'https://calendar.google.com/calendar/embed?src=' UserInfo.Email '&ctz=America%2FNew_York'}}
+- Enhanced handlebars to support string concatenation including handlebar 'variables' like Session Attributes and UserInfo, etc. Use case, e.g. to build a url containing a users email, eg a google calendar URL. Example of syntax now supported - in this case to dynamically build a personalized URL based on user info. `{{setSessionAttr 'link' 'https://calendar.google.com/calendar/embed?src=' UserInfo.Email '&ctz=America%2FNew_York'}}`
 - Moved 'previous' and 'navigation' session attributes under a new 'qnabotcontext' session attribute so that Connect (and other) clients have fewer session attributes to preserve.
 - Allows Chaining rule Lambda function to return a modified session object in addition to the string for chaining.
 - Allows Chaining of up to 10 documents. Each document's Lambda hooks will also be invoked in sequence if defined.
@@ -347,7 +357,8 @@ their name and phone number prior to handing off to an Amazon Connect instance t
 
 The IAM Role/Policy used by the ConnectCallback Lambda must include a new policy that allows
 the action "connect:StartOutboundVoiceContact" to be used with the resource
-"arn:aws:connect:*:*:instance/<YourConnectInstanceId>/*". The following is an example of this policy
+`"arn:aws:connect:*:*:instance/<YourConnectInstanceId>/*"`. The following is an example of this policy
+
 ```json
 {
    "Version": "2012-10-17",
@@ -365,14 +376,14 @@ the action "connect:StartOutboundVoiceContact" to be used with the resource
 1) Find the Lambda ConnectCallback Function in the AWS Lambda Console
 2) Open the AWS Console and select the Lambda Service
 3) In the Console's filter enter 'ConnectCallback' and press enter
-4) The displayed function will start with <stackname>-ExamplePYTHONLambdaConne... If you have multiple QnABot stacks
+4) The displayed function will start with `<stackname>-ExamplePYTHONLambdaConne...` If you have multiple QnABot stacks
 installed you'll see multiple functions listed
 5) Open the Lambda function by clicking on the function
 6) Select the Permissions tab
 7) Click on the Role name to open this Role in a new tab
 8) Click on + Add inline policy
 9) Select the JSON tab
-10) Copy the sample text above, paste as JSON, and change <YourConnectInstanceId> to the Instance ID identified in the Connect Console.
+10) Copy the sample text above, paste as JSON, and change `<YourConnectInstanceId>` to the Instance ID identified in the Connect Console.
 11) Click on Review policy
 12) Enter a name for the policy and click Create policy
 
@@ -433,7 +444,7 @@ be found in QnABot.
 review the Kendra pricing structure. The fallback mechanism for QnABot can be useful when deploying Kendra as an
 Enterprise search solution.**
 
-To enable this support for your Kendra indexes, use the Settings UI in the Designer and add your 
+To enable this support for your Kendra indexes, use the Settings UI in the Designer and add your
 index to the ALT_SEARCH_KENDRA_INDEXES parameter. This parameter takes an array of strings and uses the form below.
 
 ```json
@@ -441,7 +452,6 @@ index to the ALT_SEARCH_KENDRA_INDEXES parameter. This parameter takes an array 
 ```
 
 **Don't forget to use your Kendra Index ID rather than the one in the sample**
-
 Next use the QnABot Designer UI to import a Sample/Extension named KendraFallback.
 
 This loads a new question with a qid of "KendraFallback". Edit this question in the Designer UI and change its question from  "no_hits_alternative" to "no_hits" and save the changes.
@@ -550,7 +560,7 @@ Lets modify the question sun.1. The following would be an example where the hand
 Use the handlebar template defaultLang to specify the response QnABot should provide when the language is unknown. By
 default this is typically in English but could be in any language as needed.
 
-{{#defaultLant}}{{/defaultLang}} must be the last element in the answer block.
+`{{#defaultLant}}{{/defaultLang}}` must be the last element in the answer block.
 
 ```handlebars
 {{#ifLang 'es'}}
