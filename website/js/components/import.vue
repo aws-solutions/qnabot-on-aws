@@ -190,7 +190,6 @@ module.exports = {
         files.push(files_raw[i])
       }
       Promise.all(files.map(file=>{
-        var name=file.name
         return new Promise(function(res,rej){
           var reader = new FileReader();
           reader.onload = function(e){ 
@@ -202,16 +201,18 @@ module.exports = {
                 });
               });
             } catch (e) {
-              rej(e);
+              self.error = true;
+              self.errorMsg = e.toLocaleString();
             }
           };
           reader.readAsArrayBuffer(file);
         })
       }))
-      .map(result=>self.upload(result.data,result.name))
-      .catch(e=>{
-        console.log(e)
-        self.error=e.message
+      .map(result => self.upload(result.data, result.name))
+      .catch(e => {
+        console.log(e);
+        self.error = true;
+        self.errorMsg = e ? e : 'Unknown error on Getfile';
       })
     },
     Geturl: function (event) {
@@ -254,7 +255,6 @@ module.exports = {
           if (data.qna.length) {
             var id = name.replace(/[^a-zA-Z0-9-_]/g, ''); //removes all non URL safe characters
             self.$store.dispatch('api/startImport', {
-
               qa: data.qna,
               name: id
             })

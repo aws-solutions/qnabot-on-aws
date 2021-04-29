@@ -71,8 +71,6 @@ exports.step=function(event,context,cb){
                                     console.log("skipping question invalid answer format")
                                 }
                                 delete obj.q
-
-
                             }
                             docid = obj._id || obj.qid ;
                         } else {
