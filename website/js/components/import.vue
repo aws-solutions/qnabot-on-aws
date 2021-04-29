@@ -245,7 +245,9 @@ module.exports = {
       };
 
       try {
-        return Promise.resolve(parseJson(content));
+        const enc = new TextDecoder('utf-8')
+        var jsonText = enc.decode(new Uint8Array(content))
+        return Promise.resolve(parseJson(jsonText));
       } catch (err) {
         try {
           console.log(
