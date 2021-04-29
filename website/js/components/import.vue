@@ -181,40 +181,38 @@ module.exports = {
             })
       }
     },
-    Getfile: function (event) {
-      var self = this;
-      this.loading = true;
-      var files_raw = self.$refs.file.files;
-      var files = [];
-      for (var i = 0; i < files_raw.length; i++) {
-        files.push(files_raw[i]);
+    Getfile:function(event){
+      var self=this
+      this.loading=true
+      var files_raw=self.$refs.file.files
+      var files=[]
+      for(var i=0;i<files_raw.length;i++){
+        files.push(files_raw[i])
       }
-      Promise.all(
-        files.map((file) => {
-          var name = file.name;
-          return new Promise(function (res, rej) {
-            var reader = new FileReader();
-            reader.onload = function (e) {
-              try {
-                self.parse(e.target.result).then((data) => {
-                  res({
-                    name: file.name,
-                    data: data,
-                  });
+      Promise.all(files.map(file=>{
+        var name=file.name
+        return new Promise(function(res,rej){
+          var reader = new FileReader();
+          reader.onload = function(e){ 
+            try {
+              self.parse(e.target.result).then((data) => {
+                res({
+                  name: file.name,
+                  data: data,
                 });
-              } catch (e) {
-                rej(e);
-              }
-            };
-            reader.readAsArrayBuffer(file);
-          });
+              });
+            } catch (e) {
+              rej(e);
+            }
+          };
+          reader.readAsArrayBuffer(file);
         })
-      )
-        .map((result) => self.upload(result.data, result.name))
-        .catch((e) => {
-          console.log(e);
-          self.error = e.message;
-        });
+      }))
+      .map(result=>self.upload(result.data,result.name))
+      .catch(e=>{
+        console.log(e)
+        self.error=e.message
+      })
     },
     Geturl: function (event) {
       const self = this
