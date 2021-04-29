@@ -96,7 +96,7 @@ var Promise = require("bluebird");
 var saveAs = require("file-saver").saveAs;
 var axios = require("axios");
 const parseJson = require("json-parse-better-errors");
-let converter = require("json-2-csv");
+var XLSX = require("xlsx")
 
 var _ = require("lodash");
 
@@ -207,7 +207,7 @@ module.exports = {
                 rej(e);
               }
             };
-            reader.readAsText(file);
+            reader.readAsArrayBuffer(file);
           });
         })
       )
@@ -240,8 +240,10 @@ module.exports = {
         topic: "t",
         markdown: "alt.markdown",
         answer: "a",
+        "Answer": "a",
         ssml: "alt.ssml",
       };
+
       try {
         return Promise.resolve(parseJson(content));
       } catch (err) {
@@ -249,38 +251,46 @@ module.exports = {
           console.log(
             "File is not a valid JSON file. Trying to parse as CSV file"
           );
-          console.log("Substituting headers");
-          var lines = content.split("\n").map((m) =>
-            m
-              .replace(/(\r\n|\n|\r)/gm, "") //remove end of line characters
-              .replace(/[\u2018\u2019]/g, "'") //replace smart single quotes
-              .replace(/[\u201C\u201D]/g, '"') //replace smart double quotes
-              .replace("‘", "'")
-          ); //Replace non-UTF8 smart single quote
+      var workbook = XLSX.read(content, {
+        type: 'array'
+      });
+      var valid_questions = []
+      workbook.SheetNames.forEach(function(sheetName) {
+        // Here is your object
+        var XL_row_object = XLSX.utils.sheet_to_row_object_array(workbook.Sheets[sheetName]);
+        var json_object = JSON.stringify(XL_row_object);
 
-          var headerColumns = lines[0]
-            .split(",")
-            .map((m) => m.replace(/(\r\n|\n|\r)/gm, ""));
-          for (var i = 0; i < headerColumns.length; i++) {
-            var actualColumn = header_mapping[headerColumns[i].toLowerCase()];
-            if (actualColumn) {
-              headerColumns[i] = actualColumn;
-            }
-          }
-          lines.splice(0, 1, headerColumns.join(","));
+        XL_row_object.forEach(question =>{
+           console.log("Processing " + JSON.stringify(question))
+           for(const property in header_mapping){
+             if(question[header_mapping[property]] == undefined){
+                question[header_mapping[property]] = question[property]
+                delete question[property]
+             }
+           }
+           if(question["q"] != undefined){
+              question["q"] = question["q"].split(",").map(q => q.replace("\"",""))
+           } else{
+             return;
+           }
+           if(question.a == undefined || question.a.replace(/[^a-zA-Z0-9-_]/g, '').trim().length == 0)
+           {
+             console.log("Warning: No answer for " + question.qid + " not importing")
+             return
+           }
+           if(question.length == 0){
+             console.log("Warning: No questions found for " + question.qid + " not importing")
+           }
+           console.log("Processed "+ JSON.stringify(question))
+           valid_questions.push(question)
 
-          var json = await converter.csv2jsonAsync(lines.join("\n"));
-          json.forEach((q) => {
-            q.type = "qna";
-          });
+           })
 
-          json = {
-            qna: json,
-          };
+      })
 
-          console.log("processed csv file");
-          console.log(json);
-          return json;
+        return {
+          qna: valid_questions
+        }
         } catch (err) {
           console.log("Parse error");
           console.log(err);
