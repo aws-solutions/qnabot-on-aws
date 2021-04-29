@@ -101,8 +101,8 @@ module.exports={
           "Variables": {
             ES_INDEX:{"Fn::GetAtt":["Var","QnaIndex"]},
             ES_ADDRESS:{"Fn::GetAtt":["ESVar","ESAddress"]},
-            FEEDBACK_DELETE_RANGE_MINUTES:43200,
-            METRICS_DELETE_RANGE_MINUTES:43200,
+            FEEDBACK_DELETE_RANGE_MINUTES: {"Ref":"KibanaDashboardRetentionMinutes"},
+            METRICS_DELETE_RANGE_MINUTES: {"Ref":"KibanaDashboardRetentionMinutes"},
           }
         },
         "Handler": "index.cleanmetrics",

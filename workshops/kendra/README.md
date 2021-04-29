@@ -106,7 +106,7 @@ There are four unique sources that supply answers to QnABot.
 - **ElasticSearch**: The first method is the standard ElasticSearch implementation. If the `KENDRA_FAQ_INDEX` is not enabled or if a feature is only supported on ElasticSearch, then QnABot will default to this query method. 
 - **KendraFAQ**: Then there is the KendraFAQ method. If the custom parameter `KENDRA_FAQ_INDEX` is set and if that query is supported through the Kendra integration, then QnABot relies on Amazon Kendra's natural language and deep learning models to understand and match a question to an answer. This section walked through setting up this KendraFAQ model.
 - **ElasticSearch Fallback**: If a question does not find any matches through the KendraFAQ method, this integration provides an optional ElasticSearch Fallback which is enabled by default in settings (`KENDRA_FAQ_ES_FALLBACK`).
-- **Kendra Fallback**: Finally, if no matches are found to a curated question, then QnABot has the ability to search through documents uploaded to a Kendra index via the Kendra Fallback engine. This extension must first be loaded in and then enabled through the `ALT_SEARCH_KENDRA_INDEXES` setting. Part 2 below covers how to launch this mode.
+- **Kendra Fallback**: Finally, if no matches are found to a curated question, then QnABot has the ability to search through documents uploaded to a Kendra index via the Kendra Fallback engine. This feature is enabled through the `ALT_SEARCH_KENDRA_INDEXES` setting. Part 2 below covers how to launch this mode.
 
 Turning on the `ENABLE_DEBUG_RESPONSES` parameter in settings will allow you to see which source generated a QnABot response.
 
@@ -125,7 +125,7 @@ The Kendra integration is currently a Beta feature for you to try. As the Kendra
 - Kendra does not currently support follow-up questions using Topics. QnABot defaults to using ElasticSearch to identify an answer when a topic is defined.
 
 ### Additional Question-Matching Examples  
-These are addional example questions where the new phrasing fails to find a match using ElasticSearch, but succeeds with the Kendra integration.
+These are additional example questions where the new phrasing fails to find a match using ElasticSearch, but succeeds with the Kendra integration.
 
 QID: *solar.1*
 - Question: *How old is the sun?*
@@ -150,21 +150,20 @@ What if you want to ask the QnABot a question that is not present in the FAQs bu
 
 #### Part 2: Add content to a Kendra index
 1. **THIS ASSUMES YOU HAVE COMPLETED PART 2 OF SECTION 1 (Create an Amazon Kendra index). If not, go back and complete those steps.**
-2. Create an S3 bucket and allow objects to be public read.
+2. Create an S3 bucket.
 
-    a. In the S3 console, click on **Create bucket** and entire a *Bucket name* such as qnabot-docs (your bucket name should start with QNA or qna). Press **Next** until you get to *Set permissions* (Step 3).
+    a. In the S3 console, click on **Create bucket** and enter a *Bucket name* such as qnabot-docs 
+   (your bucket name must start with 'qna' and needs to be unique. This naming convention allows access to objects
+   using signed urls stored in this bucket). Press **Create** to build the bucket.
     
     <img src="./s3_create_bucket.png?raw=true" width="300" height="100">
     <br>
     <img src="./s3_create_bucket_step1.png?raw=true" width="500" height="300">
+
+*Note: This creates a bucket with default permissions. Should other permissions be required be sure to alter
+the settings as necessary.*
     
-    b. **Uncheck** the box which states *Block all public access* and then mark the checkbox to acknowledge the statement.
-    
-    <img src="./s3_create_bucket_step3.png?raw=true" width="500" height="300">
-    
-    c. Press **Next** until you **Create** the bucket.
-    
-    d. **Upload** these PDFs into your new S3 bucket. 
+    b. **Upload** these PDFs into your new S3 bucket. 
     
     - [solar_mysteries_book.pdf](./solar_mysteries_book.pdf)
 
@@ -182,7 +181,7 @@ What if you want to ask the QnABot a question that is not present in the FAQs bu
 
 <img src="./kendra_role.png?raw=true" width="800" height="150">
 
-7. You can choose how freqeuntly to sync this data source with the Kendra index. If you will be updating content frequently, perhaps select a periodic option. Else, go with our *Run on demand* default.
+7. You can choose how frequently to sync this data source with the Kendra index. If you will be updating content frequently, perhaps select a periodic option. Else, go with our *Run on demand* default.
 
 <img src="./kendra_sync_schedule.png?raw=true" width="500" height="150">
 
@@ -200,22 +199,8 @@ What if you want to ask the QnABot a question that is not present in the FAQs bu
 <img src="./kendra_console_readme.png?raw=true" width="250" height="300">
 
 3. Save the settings and return to the home page of the web interface.
-4. Go to the **Import** tool from the designer console and open the drop down Examples/Extensions menu.
-
-<img src="./qnabot_tools_open_import.png?raw=true" width="200" height="450">
-
-5. Load the KendraFallback extension and wait for it to complete. Return to the home page of the designer console. This loads a new question with a QID of "KendraFallback".
-
-<img src="./load_kendrafallback_ext.png?raw=true" width="900" height="100">
-
-6. Edit this question in the Designer and change its question text from "no_hits_alternative" to your current ES_NO_HITS_QUESTION (most likely it will be "no_hits") and save the changes. You can find this phrase in your settings parameters.
-7. If you have previously loaded the QnAUtility.json from Examples/Extensions you need to either remove the question with the ID "CustomNoMatches" or change the question for this ID from your current ES_NO_HITS_QUESTION (e.g. "no_hits") to "no_hits_alt".
-
-<img src="./no_hits_question.png?raw=true" width="1000" height="150">
-
-  Once the new question, "KendraFallback" is configured as the response for "no_hits", the Kendra index will be searched for an answer whenever a curated answer can not be found. Once setup, Kendra provides a fallback mechanism prior to telling the user an answer could not be found.
-
-8. Go back into the QnABot client and try out some questions about the sun!
+   
+4. Go back into the QnABot client and try out some questions about the sun!
 
 ### Example questions
 There are a couple different types of responses from the KendraFallback engine. 

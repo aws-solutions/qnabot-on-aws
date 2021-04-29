@@ -51,15 +51,15 @@ module.exports=Object.assign(
             request.headers['content-type']='application/json'
         }
         try{
-            var credentials=await mutex.runExclusive(async function(){
+            const credentials=await mutex.runExclusive(async function(){
                 return context.dispatch('user/getCredentials',{},{root:true})
             })
-            var signed=sign(request,credentials)        
+            const signed=sign(request,credentials)
             delete request.headers["Host"]
             delete request.headers["Content-Length"]        
         
             context.commit('loading',true)
-            var result=await axios(signed)
+            const result=await axios(signed)
             return result.data
         }catch(e){
             console.log(JSON.stringify(_.get(e,"response",e),null,2))
@@ -128,7 +128,8 @@ module.exports=Object.assign(
         })
     },
     list(context,opts){
-        var perpage=opts.perpage || 100
+        console.log(`Calling list with opts: ${JSON.stringify(opts)}`);
+        const perpage=opts.perpage || 100
         return context.dispatch('_request',{
             url:context.rootState.info._links.questions.href+'?'+query({
                 from:(opts.page || 0)*perpage,

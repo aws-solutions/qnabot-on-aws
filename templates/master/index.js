@@ -200,6 +200,11 @@ module.exports={
         "Default":"FALSE",
         "ConstraintDescription":"Allowed Values are FALSE or TRUE"
     },
+    "KibanaDashboardRetentionMinutes":{
+        "Type":"Number",
+        "Description": "To conserve storage in Amazon ElasticSearch, metrics and feedback data used to populate the Kibana dashboard are automatically deleted after this period (default 43200 minutes = 30 days). Monitor 'Free storage space' for your ElasticSearch domain to ensure that you have sufficient space available to store data for the desired retention period.",
+        "Default":43200
+    }
   },
   "Conditions":{
     "Public":{"Fn::Equals":[{"Ref":"PublicOrPrivate"},"PUBLIC"]},
