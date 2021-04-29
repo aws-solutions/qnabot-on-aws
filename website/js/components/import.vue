@@ -181,17 +181,17 @@ module.exports = {
             })
       }
     },
-    Getfile:function(event){
-      var self=this
-      this.loading=true
-      var files_raw=self.$refs.file.files
-      var files=[]
-      for(var i=0;i<files_raw.length;i++){
+    Getfile: function (event) {
+      const self = this
+      this.loading = true
+      const files_raw = self.$refs.file.files
+      const files = []
+      for (let i = 0; i < files_raw.length; i++) {
         files.push(files_raw[i])
       }
-      Promise.all(files.map(file=>{
-        return new Promise(function(res,rej){
-          var reader = new FileReader();
+      Promise.all(files.map(file => {
+        return new Promise(function (res, rej) {
+          const reader = new FileReader();
           reader.onload = function(e){ 
             try {
               self.parse(e.target.result).then((data) => {
@@ -253,7 +253,7 @@ module.exports = {
       if (data) {
         new Promise(function (res, rej) {
           if (data.qna.length) {
-            var id = name.replace(/[^a-zA-Z0-9-_]/g, ''); //removes all non URL safe characters
+            var id = name.replace(/[^a-zA-Z0-9-_\.]/g, ''); //removes all non URL safe characters
             self.$store.dispatch('api/startImport', {
               qa: data.qna,
               name: id
