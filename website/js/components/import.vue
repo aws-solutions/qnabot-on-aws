@@ -96,7 +96,7 @@ const Promise = require('bluebird')
 const saveAs = require('file-saver').saveAs
 const axios = require('axios')
 const parseJson = require('json-parse-better-errors')
-
+var XLSX = require("xlsx")
 const _ = require('lodash')
 
 module.exports = {
@@ -182,36 +182,39 @@ module.exports = {
       }
     },
     Getfile: function (event) {
-      const self = this
-      this.loading = true
-      const files_raw = self.$refs.file.files
-      const files = []
-      for (let i = 0; i < files_raw.length; i++) {
-        files.push(files_raw[i])
+      var self = this;
+      this.loading = true;
+      var files_raw = self.$refs.file.files;
+      var files = [];
+      for (var i = 0; i < files_raw.length; i++) {
+        files.push(files_raw[i]);
       }
-      Promise.all(files.map(file => {
-        return new Promise(function (res, rej) {
-          const reader = new FileReader();
-          reader.onload = function (e) {
-            try {
-              res({
-                name: file.name,
-                data: parseJson(e.target.result)
-              })
-            } catch (e) {
-              self.error = true;
-              self.errorMsg = e.toLocaleString();
-            }
-          };
-          reader.readAsText(file);
+      Promise.all(
+        files.map((file) => {
+          var name = file.name;
+          return new Promise(function (res, rej) {
+            var reader = new FileReader();
+            reader.onload = function (e) {
+              try {
+                self.parse(e.target.result).then((data) => {
+                  res({
+                    name: file.name,
+                    data: data,
+                  });
+                });
+              } catch (e) {
+                rej(e);
+              }
+            };
+            reader.readAsArrayBuffer(file);
+          });
         })
-      }))
-      .map(result => self.upload(result.data, result.name))
-      .catch(e => {
-        console.log(e);
-        self.error = true;
-        self.errorMsg = e ? e : 'Unknown error on Getfile';
-      })
+      )
+        .map((result) => self.upload(result.data, result.name))
+        .catch((e) => {
+          console.log(e);
+          self.error = e.message;
+        });
     },
     Geturl: function (event) {
       const self = this
@@ -251,7 +254,9 @@ module.exports = {
       if (data) {
         new Promise(function (res, rej) {
           if (data.qna.length) {
+            var id = name.replace(/[^a-zA-Z0-9-_]/g, ''); //removes all non URL safe characters
             self.$store.dispatch('api/startImport', {
+
               qa: data.qna,
               name: id
             })
@@ -277,34 +282,73 @@ module.exports = {
         self.errorMsg = 'No content to upload';
       }
     },
-    upload: function (data, name = "import") {
+    parse: async function (content) {
+      var header_mapping = {
+        question: "q",
+        topic: "t",
+        markdown: "alt.markdown",
+        answer: "a",
+        "Answer": "a",
+        ssml: "alt.ssml",
+      };
+
       try {
-        var self = this;
-        var id = name.replace(/[^a-zA-Z0-9-_]/g, ''); //removes all non URL safe characters
-        new Promise(function (res, rej) {
-          console.log(data);
-          if (data.qna.length) {
-            self.$store
-             
-              .dispatch("api/startImport", {
-                qa: data.qna,
-                name: id,
-              })
-              .then(res)
-              .catch(rej);
-          } else {
-            rej("Invalid or Empty File");
-          }
-        })
-          .then(() => {
-            self.addJob(id);
-          })
-          .tapCatch(console.log)
-          .catch((error) => (self.error = error));
-      } catch (error) {
-        console.log(error);
+        const enc = new TextDecoder('utf-8')
+        var jsonText = enc.decode(new Uint8Array(content))
+        return Promise.resolve(parseJson(jsonText));
+      } catch (err) {
+        try {
+          console.log(
+            "File is not a valid JSON file. Trying to parse as CSV file"
+          );
+      var workbook = XLSX.read(content, {
+        type: 'array'
+      });
+      var valid_questions = []
+      workbook.SheetNames.forEach(function(sheetName) {
+        // Here is your object
+        var XL_row_object = XLSX.utils.sheet_to_row_object_array(workbook.Sheets[sheetName]);
+        var json_object = JSON.stringify(XL_row_object);
+
+        XL_row_object.forEach(question =>{
+           console.log("Processing " + JSON.stringify(question))
+           for(const property in header_mapping){
+             if(question[header_mapping[property]] == undefined){
+                question[header_mapping[property]] = question[property]
+                delete question[property]
+             }
+           }
+           if(question["q"] != undefined){
+              question["q"] = question["q"].split(",").map(q => q.replace("\"",""))
+           } else{
+             return;
+           }
+           if(question.a == undefined || question.a.replace(/[^a-zA-Z0-9-_]/g, '').trim().length == 0)
+           {
+             console.log("Warning: No answer for " + question.qid + " not importing")
+             return
+           }
+           if(question.length == 0){
+             console.log("Warning: No questions found for " + question.qid + " not importing")
+           }
+           console.log("Processed "+ JSON.stringify(question))
+           valid_questions.push(question)
+
+           })
+
+      })
+
+        return {
+          qna: valid_questions
+        }
+        } catch (err) {
+          console.log("Parse error");
+          console.log(err);
+          throw err;
+        }
       }
     },
+
   },
 };
 </script>
