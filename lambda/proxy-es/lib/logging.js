@@ -92,7 +92,7 @@ module.exports=function(event, context, callback){
     var params = {
           DeliveryStreamName: process.env.FIREHOSE_NAME, /* required */
           Record: { /* required */
-            Data: new Buffer(objJsonStr) /* Strings will be Base-64 encoded on your behalf */ /* required */
+            Data: Buffer.from(objJsonStr) /* Strings will be Base-64 encoded on your behalf */ /* required */
         }
     }
     

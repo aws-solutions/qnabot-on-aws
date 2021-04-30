@@ -7,15 +7,15 @@ var Url=require('url')
 
 module.exports=function(opts){
     
-    var url=Url.parse(opts.url)
-    var request={
+    const url=Url.parse(opts.url)
+    const request={
         host:url.hostname,
         method:opts.method.toUpperCase(),
         url:url.href,
         path:url.path,
         headers:opts.headers || {}
     }
-    
+    request.headers['Host']=request.host;
     if(opts.body){
         if(Array.isArray(opts.body)){
             opts.body=opts.body.map(JSON.stringify).join('\n')+'\n'
