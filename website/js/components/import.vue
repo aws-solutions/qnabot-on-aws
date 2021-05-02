@@ -280,17 +280,6 @@ module.exports = {
         self.errorMsg = 'No content to upload';
       }
     },
-    assign_value: function(obj,path_parts,value){
-        console.log(JSON.stringify({object:obj,property:path_parts,value:value}))
-        var property
-        if(path_parts.length != 1 ){
-          property = path_parts.shift()
-          obj[property] = {}
-          this.assign_value(obj[property],path_parts,value)
-        }else{
-          obj[path_parts[0]]=value;
-        }
-    },
     parse: async function (content) {
       var header_mapping = {
         question: "q",
@@ -324,8 +313,8 @@ module.exports = {
              var dest_property = header_mapping[property]
              if(question[dest_property] == undefined){
                 //question[dest_property] = question[property]
+                _.set(question,dest_property.split("."),question[property])
                 console.log("Assigning value for " + dest_property)
-                self.assign_value(question,dest_property.split("."),question[property])
                 delete question[property]
              }
            }
