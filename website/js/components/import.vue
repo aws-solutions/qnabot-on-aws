@@ -5,6 +5,8 @@
           v-card-title(primary-title) Error Loading Content
           v-card-text
             v-subheader.error--text(v-if='error' id="add-error") {{errorMsg?errorMsg:'Unknown error'}}
+              v-card-text
+                li(v-for="error in errorList") {{error}}
             v-card-actions
               v-spacer
               v-btn.lighten-3(@click="error=false;errorMsg='';$refs.file.value = [];" :class="{ teal: success}" ) close
@@ -110,7 +112,8 @@ module.exports = {
       errorMsg: "",
       success: '',
       jobs: [],
-      examples: []
+      examples: [],
+      errorList:[]
     }
   },
   components: {},
@@ -280,6 +283,9 @@ module.exports = {
         self.errorMsg = 'No content to upload';
       }
     },
+    addError: function (error){
+      this.errorList.push(error);
+    },
     parse: async function (content) {
       var header_mapping = {
         question: "q",
@@ -322,15 +328,17 @@ module.exports = {
              console.log("splitting " + JSON.stringify(question))
               question["q"] = question["q"].split(",").map(q => q.replace("\"",""))
            } else{
+             self.addError("Warning: No questions found for " + question.qid + " not importing")
              return;
            }
            if(question.a == undefined || question.a.replace(/[^a-zA-Z0-9-_]/g, '').trim().length == 0)
            {
-             console.log("Warning: No answer for " + question.qid + " not importing")
+             self.addError("Warning: No answer for " + question.qid + " not importing")
              return
            }
            if(question.length == 0){
-             console.log("Warning: No questions found for " + question.qid + " not importing")
+             self.addError("Warning: No questions found for " + question.qid + " not importing")
+             return
            }
            console.log("Processed "+ JSON.stringify(question))
            valid_questions.push(question)
@@ -338,12 +346,12 @@ module.exports = {
            })
 
       })
-
+        self.error = self.errorList.length != 0
         return {
           qna: valid_questions
         }
         } catch (err) {
-          console.log("Parse error");
+          self.addError("Parse error");
           console.log(err);
           throw err;
         }
