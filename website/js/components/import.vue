@@ -1,15 +1,15 @@
 <template lang='pug'>
   span(class="wrapper")
-    v-dialog(v-model="error")
+    v-dialog(v-model="error" scrollable width="auto")
         v-card(id="error-modal")
           v-card-title(primary-title) Error Loading Content
           v-card-text
-            v-subheader.error--text(v-if='error' id="add-error") {{errorMsg?errorMsg:'Unknown error'}}
+            v-subheader.error--text(v-if='error' id="add-error") 
               v-card-text
                 li(v-for="error in errorList") {{error}}
-            v-card-actions
-              v-spacer
-              v-btn.lighten-3(@click="error=false;errorMsg='';$refs.file.value = [];" :class="{ teal: success}" ) close
+          v-card-actions
+            v-spacer
+            v-btn.lighten-3(@click="error=false;errorMsg='';$refs.file.value = [];" :class="{ teal: success}" ) close
     v-container(column grid-list-md id="page-import")
       v-layout(column)
         v-flex
@@ -205,7 +205,7 @@ module.exports = {
               });
             } catch (e) {
               self.error = true;
-              self.errorMsg = e.toLocaleString();
+              self.addError(e.toLocaleString());
             }
           };
           reader.readAsArrayBuffer(file);
@@ -215,7 +215,7 @@ module.exports = {
       .catch(e => {
         console.log(e);
         self.error = true;
-        self.errorMsg = e ? e : 'Unknown error on Getfile';
+        self.addError(e ? e : 'Unknown error on Getfile');
       })
     },
     Geturl: function (event) {
@@ -229,31 +229,32 @@ module.exports = {
                 self.upload(data, name)
               } else {
                 self.error = true;
-                self.errorMsg = 'No data available to update';
+                self.addError('No data available to update');
               }
             })
             .catch(x => {
               self.error = true;
               if (x.status) {
-                self.errorMsg = `Error for ${name}: ${JSON.stringify({
+                self.addError(`Error for ${name}: ${JSON.stringify({
                   status: x.status,
                   message: x.response.error
-                })}`;
+                })}`);
               } else if (x.message) {
-                self.errorMsg = `Error for ${name}: ${x.message}`;
+                self.addError(`Error for ${name}: ${x.message}`);
               } else {
-                self.errorMsg = x;
+                self.addError(x);
               }
             })
       } catch (e) {
         self.error = true;
-        self.errorMsg = e ? e : 'Unknown error on url processing';
+        self.addError('Unknown error on url processing');
       }
     },
     upload: function (data, name = "import") {
       const self = this
       const id = name.replace(' ', '-')
       if (data) {
+        self.errorList = []
         new Promise(function (res, rej) {
           if (data.qna.length) {
             var id = name.replace(/[^a-zA-Z0-9-_\.]/g, ''); //removes all non URL safe characters
@@ -264,11 +265,11 @@ module.exports = {
             .then(res)
             .catch(e=>{
               self.error = true;
-              self.errorMsg = e ? e : 'Unknown error on upload dispatch';
+              self.addError(e ? e : 'Unknown error on upload dispatch');
             })
           } else {
             self.error = true;
-            self.errorMsg = 'Invalid or Empty File';
+            self.addError('Invalid or Empty File');
           }
         })
         .then(() => {
@@ -276,11 +277,11 @@ module.exports = {
         })
         .catch((e)=>{
           self.error = true;
-          self.errorMsg = e ? e : 'Unknown error on upload';
+          self.addError(e ? e : 'Unknown error on upload');
         })
       } else {
         self.error = true;
-        self.errorMsg = 'No content to upload';
+        self.addError('No content to upload');
       }
     },
     addError: function (error){
@@ -322,6 +323,30 @@ module.exports = {
                 _.set(question,dest_property.split("."),question[property])
                 console.log("Assigning value for " + dest_property)
                 delete question[property]
+             }
+           }
+          if(question["responsetitle"] != undefined){
+            console.log("processing response title")
+            question.r = {}
+            question.r.title = question["responsetitle"]
+            question.r.buttons = []
+            let i = 1
+            while(true){
+              console.log("    Processing Button"+i)
+              if(question["button"+i] != undefined){
+                var buttonParts = question["button"+i].split(",")
+                if(buttonParts.length != 2){
+                  self.addError(`Warning: Button button${i} is not well formed for qid ${question.qid} question and answer should be separated by a comma.`)
+                }
+                question.r.buttons.push({
+                  "text":buttonParts[0],
+                  "value":buttonParts[1]
+                })
+                i++;
+               }
+               else{
+                 break;
+               }
              }
            }
            if(question["q"]){
