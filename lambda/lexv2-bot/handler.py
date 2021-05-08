@@ -19,6 +19,7 @@ INTENT = os.environ["INTENT"]
 SLOT_TYPE = os.environ["SLOTTYPE"]
 FULFILLMENT_LAMBDA_ARN = os.environ["FULFILLMENT_LAMBDA_ARN"]
 LEXV2_BOT_DRAFT_VERSION = "DRAFT"
+LEXV2_TEST_BOT_ALIAS = "TestBotAlias"
 LEXV2_BOT_LOCALE_ID = "en_US"
 
 
@@ -459,6 +460,7 @@ def build_all():
     lexV2_qna_intent(INTENT, SLOT_TYPE, botId, LEXV2_BOT_DRAFT_VERSION, LEXV2_BOT_LOCALE_ID)
     build_lexV2_qna_bot(botId, LEXV2_BOT_DRAFT_VERSION, LEXV2_BOT_LOCALE_ID)
     botVersion = lexV2_qna_version(botId, LEXV2_BOT_DRAFT_VERSION, LEXV2_BOT_LOCALE_ID)
+    lexV2_qna_alias(botId, LEXV2_BOT_DRAFT_VERSION, LEXV2_TEST_BOT_ALIAS, LEXV2_BOT_LOCALE_ID, FULFILLMENT_LAMBDA_ARN)
     botAliasId = lexV2_qna_alias(botId, botVersion, BOT_ALIAS, LEXV2_BOT_LOCALE_ID, FULFILLMENT_LAMBDA_ARN)
     result = {
         "botName": BOT_NAME,
