@@ -116,5 +116,19 @@ module.exports={
         "name": "live",
         "description": "QnABot live alias " + qnabotversion
       }
+    },
+    "LexV2Bot": {
+      "Type": "Custom::LexV2Bot",
+      "DependsOn": "VersionAlias",
+      "Properties": {
+        "ServiceToken": {
+          "Fn::GetAtt": [
+            "Lexv2BotLambda",
+            "Arn"
+          ]
+        },
+        "name":{"Fn::Sub":"${AWS::StackName}-Bot"},
+        "description": "QnABot LexV2 " + qnabotversion
+      }
     }
 }
