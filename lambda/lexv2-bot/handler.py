@@ -450,6 +450,27 @@ def build_lexV2_qna_bot(botId, botVersion, localeId):
         localeId=localeId
     )
     wait_for_lexV2_qna_locale(botId, botVersion, localeId)
+    
+def lexV2_qna_delete_old_versions(botId):
+    response = clientLEXV2.list_bot_versions(
+        botId=botId,
+        sortBy={
+            'attribute': 'BotVersion',
+            'order': 'Ascending'
+        },
+        maxResults=1000
+    )
+    botVersionSummaries = response["botVersionSummaries"]
+    if len(botVersionSummaries) > 3:
+        botVersionSummariesToDelete = botVersionSummaries[:-3] # keep highest 2 versions
+        for botVersionSummary in botVersionSummariesToDelete:
+            botVersion = botVersionSummary["botVersion"]
+            print(f"Deleting BotVersion: {botVersion}")
+            response = clientLEXV2.delete_bot_version(
+                botId=botId,
+                botVersion=botVersion,
+                skipResourceInUseCheck=True
+            )
 
 
 def build_all():
@@ -462,12 +483,15 @@ def build_all():
     botVersion = lexV2_qna_version(botId, LEXV2_BOT_DRAFT_VERSION, LEXV2_BOT_LOCALE_ID)
     lexV2_qna_alias(botId, LEXV2_BOT_DRAFT_VERSION, LEXV2_TEST_BOT_ALIAS, LEXV2_BOT_LOCALE_ID, FULFILLMENT_LAMBDA_ARN)
     botAliasId = lexV2_qna_alias(botId, botVersion, BOT_ALIAS, LEXV2_BOT_LOCALE_ID, FULFILLMENT_LAMBDA_ARN)
+    lexV2_qna_delete_old_versions(botId)
     result = {
         "botName": BOT_NAME,
         "botId": botId,
         "botAlias": BOT_ALIAS,
         "botAliasId": botAliasId,
-        "botLocaleIds": [LEXV2_BOT_LOCALE_ID]
+        "botIntent": INTENT,
+        "botIntentFallback": "FallbackIntent",
+        "botLocaleIds": LEXV2_BOT_LOCALE_ID
     }
     return result
 
@@ -483,7 +507,7 @@ def delete_all():
 @helper.update
 def create_or_update_bot(event, _):
     result = build_all()
-    helper.Data = result
+    helper.Data.update(result)
 @helper.delete
 def delete_bot(event, _):
     delete_all()
@@ -497,6 +521,7 @@ def handler(event, context):
     else:
         print("Function not called from CloudFormation: " + json.dumps(event))
         result = build_all()
+        print("LexV2 bot info: " + json.dumps(result))
         return {
             'statusCode': 200,
             'body': json.dumps(result)

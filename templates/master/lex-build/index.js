@@ -17,6 +17,7 @@ module.exports={
         SLOTTYPE:{"Ref":"SlotType"},
         INTENT:{"Ref":"Intent"},
         INTENTFALLBACK:{"Ref":"IntentFallback"},
+        LEXV2_BOT_LAMBDA:{"Ref":"Lexv2BotLambda"},
         ADDRESS:{"Fn::Join" : [ "", [ "https://", {"Fn::GetAtt":["ESVar","ESAddress"]} ] ] },
         INDEX:{"Fn::GetAtt":["Var","index"]},
     },"nodejs12.x"),
@@ -55,7 +56,8 @@ module.exports={
               ],
               "Resource":[
                 {"Fn::GetAtt":["LexBuildLambda","Arn"]},
-                {"Fn::GetAtt":["LexBuildLambdaPoll","Arn"]}
+                {"Fn::GetAtt":["LexBuildLambdaPoll","Arn"]},
+                {"Fn::GetAtt":["Lexv2BotLambda","Arn"]}
               ]
             }]
         },

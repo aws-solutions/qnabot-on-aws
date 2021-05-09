@@ -28,20 +28,32 @@ module.exports={
         "#bot-editor:bot=",{"Ref":"LexBot"}
       ]]}
     },
-    "BotName":{
+    "LexBotName":{
         "Value":{"Ref":"LexBot"}
     },
-    "BotAlias":{
+    "LexBotAlias":{
         "Value":{"Ref":"VersionAlias"}
     },
-    "SlotType":{
+    "LexSlotType":{
         "Value":{"Ref":"SlotType"}
     },
-    "Intent":{
+    "LexIntent":{
         "Value":{"Ref":"Intent"}
     },
-    "IntentFallback":{
+    "LexV1IntentFallback":{
         "Value":{"Ref":"IntentFallback"}
+    },
+    "LexV2IntentFallback":{
+        "Value":{"Fn::GetAtt":["LexV2Bot","botIntentFallback"]}
+    },
+    "LexV2BotId":{
+        "Value":{"Fn::GetAtt":["LexV2Bot","botId"]}
+    },
+    "LexV2BotAliasId":{
+        "Value":{"Fn::GetAtt":["LexV2Bot","botAliasId"]}
+    },
+    "LexV2BotLocaleIds":{
+        "Value":{"Fn::GetAtt":["LexV2Bot","botLocaleIds"]}
     },
     "DashboardURL":{
         "Value":{"Fn::Join":["",[
