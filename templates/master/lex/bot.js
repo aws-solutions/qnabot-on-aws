@@ -128,7 +128,7 @@ module.exports={
           ]
         },
         "name":{"Fn::Sub":"${AWS::StackName}-Bot"},
-        "description": "QnABot LexV2 " + qnabotversion
+        "description": "QnABot Lex V2 Bot" + qnabotversion
       }
     }
 }

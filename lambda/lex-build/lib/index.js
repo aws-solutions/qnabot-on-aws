@@ -19,6 +19,7 @@ const Intent=require('./intent')
 const IntentFallback=require('./intentFallback')
 const Alias=require('./alias')
 const Bot=require('./bot')
+const LexV2Bot=require('./lexv2bot')
 const clean=require('./delete')
 const status=require('./status')
 const wait=require('./wait')
@@ -45,6 +46,8 @@ module.exports=function(params){
     let clean_intent=null
     let clean_intentFallback=null
     let clean_slottype=null
+    let clean_slot=null
+    let lexv2bot=null
 
     return Promise.join(utterances,slottype)
         .tap(status("Rebuilding Slot"))
@@ -64,17 +67,23 @@ module.exports=function(params){
         })
         .spread(IntentFallback)
 
-        .tap(versions=>status("Rebuild Bot "))
+        .tap(versions=>status("Rebuild Lex V1 Bot "))
         .then(versions=>{
             clean_slot=()=>clean.slot(process.env.SLOTTYPE,versions.intent_version)
             return Promise.join(versions,bot)
         })
-
         .spread(Bot)
+
         .tap(version=>Alias(version,{
             botName:process.env.BOTNAME,
             name:process.env.BOTALIAS
         }))
+        
+        .tap(lexv2bot=version=>{
+            status("Rebuilding Lex V1 and Lex V2 Bots "); 
+            return LexV2Bot(version)
+        })
+
         .delay(1000)
         .tap(()=>wait())
         .then(version=>clean.bot(process.env.BOTNAME,version))

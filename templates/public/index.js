@@ -24,10 +24,14 @@ module.exports=Promise.resolve(require('../master')).then(function(base){
         "ClientURL",
         "DashboardURL",
         "UserPoolURL",
-        "BotName",
-        "BotAlias",
-        "Intent",
-        "IntentFallback",
+        "LexBotName",
+        "LexBotAlias",
+        "LexIntent",
+        "LexV1IntentFallback",
+        "LexV2IntentFallback",
+        "LexV2BotId",
+        "LexV2BotAliasId",
+        "LexV2BotLocaleIds",
         "DefaultSettingsSSMParameterName",
         "CustomSettingsSSMParameterName"
     ])
