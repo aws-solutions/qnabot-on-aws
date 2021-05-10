@@ -82,6 +82,13 @@ module.exports={
                                 ]
                             }
                         }
+                    },
+                    {
+                        "Action": [
+                            "translate:TranslateText"
+                        ],
+                        "Effect": "Allow",
+                        "Resource": "*"
                     }
                 ]
             }
