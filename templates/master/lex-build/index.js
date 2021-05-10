@@ -165,7 +165,7 @@ function lambda(code,variable={},runtime="nodejs12.x"){
         "MemorySize": "128",
         "Role": {"Fn::GetAtt": ["LexBuildLambdaRole","Arn"]},
         "Runtime":runtime,
-        "Timeout": 300,
+        "Timeout": 900,
         "VpcConfig" : {
             "Fn::If": [ "VPCEnabled", {
                 "SubnetIds": {"Ref": "VPCSubnetIdList"},
