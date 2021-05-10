@@ -10,6 +10,7 @@ helper = CfnResource()
 clientLEXV1 = boto3.client('lex-models')
 clientLEXV2 = boto3.client('lexv2-models')
 clientIAM = boto3.client('iam')
+clientTRANSLATE = boto3.client('translate')
 
 
 # LEXV1 QNABOT INFO (from Cfn outputs)
@@ -20,23 +21,34 @@ SLOT_TYPE = os.environ["SLOTTYPE"]
 FULFILLMENT_LAMBDA_ARN = os.environ["FULFILLMENT_LAMBDA_ARN"]
 LEXV2_BOT_DRAFT_VERSION = "DRAFT"
 LEXV2_TEST_BOT_ALIAS = "TestBotAlias"
-LEXV2_BOT_LOCALE_ID = "en_US"
+LEXV2_BOT_LOCALE_IDS = {
+	"de_DE": "Hans",
+	"en_AU": "Nicole",
+	"en_GB": "Amy",
+	"en_US": "Joanna",
+	"es_419": "Mia",
+	"es_ES": "Conchita",
+	"es_US": "Lupe",
+	"fr_CA": "Chantal",
+	"fr_FR": "Mathieu",
+	"it_IT": "Bianca",
+	"ja_JP": "Mizuki"
+}
 
 
 # Copy utterances from existing V1 bot
-def get_qna_V1_slotutterances(slotNameV1):
+def get_qna_V1_slotutterances(slotTypeV1):
     utterances = []
     response = clientLEXV1.get_slot_type(
-        name=slotNameV1,
+        name=slotTypeV1,
         version='$LATEST'
     )
     for enumerationValue in response["enumerationValues"]:
         utterances.append(enumerationValue["value"])
     return utterances
     
-def get_qna_V2_slotTypeValues_from_V1(slotNameV1):
+def get_qna_V2_slotTypeValues(slotNameV1, utterances):
     slotTypeValues = []
-    utterances = get_qna_V1_slotutterances(slotNameV1)
     for utterance in utterances:
         slotTypeValue = {
             'sampleValue': {
@@ -138,9 +150,29 @@ def get_intentId(intentName, botId, botVersion, localeId):
         raise Exception(f"Multiple matching intents for intentName: {intentName}")
     return intentId   
 
-
-def lexV2_qna_slotTypeValues(slotTypeName, botId, botVersion, localeId):
-    slotTypeValues = get_qna_V2_slotTypeValues_from_V1(slotTypeName)
+def translate_utterances(localeId, utterances):
+    translatedUtterances = []
+    langCode = localeId.split("_")[0]
+    for utterance in utterances:
+        if len(utterance) > 1:
+            response = clientTRANSLATE.translate_text(
+                Text=utterance,
+                SourceLanguageCode='auto',
+                TargetLanguageCode=langCode
+            )
+            translatedUtterance = response["TranslatedText"]
+        else:
+            translatedUtterance = utterance
+        print(f"Translated utterance: {utterance} -> {translatedUtterance}")
+        translatedUtterances.append(translatedUtterance)
+    # deduplicate
+    translatedUtterances = list(dict.fromkeys(translatedUtterances))
+    return translatedUtterances
+        
+    
+def lexV2_qna_slotTypeValues(slotTypeName, botId, botVersion, localeId, utterances):
+    utterances = translate_utterances(localeId, utterances)
+    slotTypeValues = get_qna_V2_slotTypeValues(slotTypeName, utterances)
     slotTypeId = get_slotTypeId(slotTypeName, botId, botVersion, localeId)
     slotTypeParams = {
         "slotTypeName": slotTypeName,
@@ -259,7 +291,7 @@ def get_bot_locale_status(botId, botVersion, localeId):
         localeId=localeId
     )
     botLocaleStatus = response["botLocaleStatus"]
-    print(f"Bot locale status: {botLocaleStatus}")
+    print(f"Bot locale status: {localeId} => {botLocaleStatus}")
     return botLocaleStatus    
   
 def wait_for_lexV2_qna_locale(botId, botVersion, localeId):
@@ -269,21 +301,32 @@ def wait_for_lexV2_qna_locale(botId, botVersion, localeId):
             raise Exception(f"Invalid botLocaleStatus: {botLocaleStatus}")
         time.sleep(5)
         botLocaleStatus = get_bot_locale_status(botId, botVersion, localeId)
+    print(f"Bot localeId {localeId}: {botLocaleStatus}")
     return botLocaleStatus
 
-def lexV2_qna_locale(botId, botVersion, localeId):
+def localeIdExists(botId, botVersion, localeId):
+    intentId = None
     try:
+        response = clientLEXV2.describe_bot_locale(
+            botId=botId,
+            botVersion=botVersion,
+            localeId=localeId
+        )
+        return True
+    except:
+        return False
+
+def lexV2_qna_locale(botId, botVersion, localeId, voiceId):
+    if not localeIdExists(botId, botVersion, localeId):
         response = clientLEXV2.create_bot_locale(
             botId=botId,
             botVersion=botVersion,
             localeId=localeId,
             nluIntentConfidenceThreshold=0.40,
             voiceSettings={
-                'voiceId': 'Joanna'
+                'voiceId': voiceId
             }
         )
-    except:
-        print(f"Locale {localeId} already exists for botId {botId}")
     wait_for_lexV2_qna_locale(botId, botVersion, localeId)
     return localeId
 
@@ -361,16 +404,17 @@ def wait_for_lexV2_qna_version(botId, botVersion):
         botStatus = get_bot_version_status(botId, botVersion)
     return botStatus
     
-def lexV2_qna_version(botId, botDraftVersion, localeId):
+def lexV2_qna_version(botId, botDraftVersion, botLocaleIds):
     botVersion = None
     print(f"Creating bot version from {botDraftVersion}")
+    botVersionLocaleSpecification = {}
+    for botLocaleId in botLocaleIds:
+        botVersionLocaleSpecification[botLocaleId] = {
+            'sourceBotVersion': botDraftVersion
+        }
     response = clientLEXV2.create_bot_version(
         botId=botId,
-        botVersionLocaleSpecification={
-            localeId: {
-                'sourceBotVersion': botDraftVersion
-            }
-        }
+        botVersionLocaleSpecification=botVersionLocaleSpecification
     )
     botVersion = response["botVersion"]
     botStatus = response["botStatus"]
@@ -408,13 +452,10 @@ def wait_for_lexV2_qna_alias(botId, botAliasId):
         botAliasStatus = get_bot_alias_status(botId, botAliasId)
     return botAliasStatus
 
-def lexV2_qna_alias(botId, botVersion, botAliasName, botLocaleId, botFullfillmentLambdaArn):
-    botAliasId = get_bot_aliasId(botId, botAliasName)
-    aliasParams = {
-        'botAliasName':botAliasName,
-        'botVersion':botVersion,
-        'botAliasLocaleSettings':{
-            botLocaleId: {
+def lexV2_qna_alias(botId, botVersion, botAliasName, botLocaleIds, botFullfillmentLambdaArn):
+    botAliasLocaleSettings = {}
+    for botLocaleId in botLocaleIds:
+        botAliasLocaleSettings[botLocaleId] = {
                 'enabled': True,
                 'codeHookSpecification': {
                     'lambdaCodeHook': {
@@ -423,7 +464,11 @@ def lexV2_qna_alias(botId, botVersion, botAliasName, botLocaleId, botFullfillmen
                     }
                 }
             }
-        },
+    botAliasId = get_bot_aliasId(botId, botAliasName)
+    aliasParams = {
+        'botAliasName':botAliasName,
+        'botVersion':botVersion,
+        'botAliasLocaleSettings': botAliasLocaleSettings,
         'sentimentAnalysisSettings':{
             'detectSentiment': False
         },
@@ -442,14 +487,13 @@ def lexV2_qna_alias(botId, botVersion, botAliasName, botLocaleId, botFullfillmen
     wait_for_lexV2_qna_alias(botId, botAliasId)
     return botAliasId
 
-def build_lexV2_qna_bot(botId, botVersion, localeId):
-    print("Building bot: {botId}, {botVersion}, {localeId}")
+def build_lexV2_qna_bot_locale(botId, botVersion, localeId):
+    print(f"Building bot: {botId}, {botVersion}, {localeId}")
     response = clientLEXV2.build_bot_locale(
         botId=botId,
         botVersion=botVersion,
         localeId=localeId
     )
-    wait_for_lexV2_qna_locale(botId, botVersion, localeId)
     
 def lexV2_qna_delete_old_versions(botId):
     response = clientLEXV2.list_bot_versions(
@@ -472,18 +516,38 @@ def lexV2_qna_delete_old_versions(botId):
                 skipResourceInUseCheck=True
             )
 
+def batches(lst, n):
+    """Yield successive n-sized chunks from lst."""
+    for i in range(0, len(lst), n):
+        yield lst[i:i + n]
 
 def build_all():
+    utterances = get_qna_V1_slotutterances(SLOT_TYPE)
     botId = lexV2_qna_bot(BOT_NAME)
-    lexV2_qna_locale(botId, LEXV2_BOT_DRAFT_VERSION, LEXV2_BOT_LOCALE_ID)
-    lexV2_fallback_intent(botId, LEXV2_BOT_DRAFT_VERSION, LEXV2_BOT_LOCALE_ID)
-    lexV2_qna_slotTypeValues(SLOT_TYPE, botId, LEXV2_BOT_DRAFT_VERSION, LEXV2_BOT_LOCALE_ID)
-    lexV2_qna_intent(INTENT, SLOT_TYPE, botId, LEXV2_BOT_DRAFT_VERSION, LEXV2_BOT_LOCALE_ID)
-    build_lexV2_qna_bot(botId, LEXV2_BOT_DRAFT_VERSION, LEXV2_BOT_LOCALE_ID)
-    botVersion = lexV2_qna_version(botId, LEXV2_BOT_DRAFT_VERSION, LEXV2_BOT_LOCALE_ID)
-    lexV2_qna_alias(botId, LEXV2_BOT_DRAFT_VERSION, LEXV2_TEST_BOT_ALIAS, LEXV2_BOT_LOCALE_ID, FULFILLMENT_LAMBDA_ARN)
-    botAliasId = lexV2_qna_alias(botId, botVersion, BOT_ALIAS, LEXV2_BOT_LOCALE_ID, FULFILLMENT_LAMBDA_ARN)
+    # create of update bot for each locale
+    # process locales in batches to staty with service limit bot-locale-builds-per-account (default 5)
+    botLocaleIds = list(LEXV2_BOT_LOCALE_IDS.keys())
+    botlocaleIdBatches = list(batches(botLocaleIds,5))
+    for botlocaleIdBatch in botlocaleIdBatches:
+        print("Batch: " + str(botlocaleIdBatch))
+        for botLocaleId in botlocaleIdBatch:
+            print("LocaleId: " + botLocaleId)
+            lexV2_qna_locale(botId, LEXV2_BOT_DRAFT_VERSION, botLocaleId, voiceId=LEXV2_BOT_LOCALE_IDS[botLocaleId])
+            lexV2_fallback_intent(botId, LEXV2_BOT_DRAFT_VERSION, botLocaleId)
+            lexV2_qna_slotTypeValues(SLOT_TYPE, botId, LEXV2_BOT_DRAFT_VERSION, botLocaleId, utterances)
+            lexV2_qna_intent(INTENT, SLOT_TYPE, botId, LEXV2_BOT_DRAFT_VERSION, botLocaleId)
+        for botLocaleId in botlocaleIdBatch:
+            build_lexV2_qna_bot_locale(botId, LEXV2_BOT_DRAFT_VERSION, botLocaleId)
+        # wait for all locales to build
+        for botLocaleId in botlocaleIdBatch:
+            wait_for_lexV2_qna_locale(botId, LEXV2_BOT_DRAFT_VERSION, botLocaleId)
+    # create new bot version and update alias
+    botVersion = lexV2_qna_version(botId, LEXV2_BOT_DRAFT_VERSION, LEXV2_BOT_LOCALE_IDS)
+    lexV2_qna_alias(botId, LEXV2_BOT_DRAFT_VERSION, LEXV2_TEST_BOT_ALIAS, LEXV2_BOT_LOCALE_IDS, FULFILLMENT_LAMBDA_ARN)
+    botAliasId = lexV2_qna_alias(botId, botVersion, BOT_ALIAS, LEXV2_BOT_LOCALE_IDS, FULFILLMENT_LAMBDA_ARN)
+    # keep only the most recent bot versions
     lexV2_qna_delete_old_versions(botId)
+    # return bot ids
     result = {
         "botName": BOT_NAME,
         "botId": botId,
@@ -491,7 +555,7 @@ def build_all():
         "botAliasId": botAliasId,
         "botIntent": INTENT,
         "botIntentFallback": "FallbackIntent",
-        "botLocaleIds": LEXV2_BOT_LOCALE_ID
+        "botLocaleIds": ", ".join(LEXV2_BOT_LOCALE_IDS)
     }
     return result
 
