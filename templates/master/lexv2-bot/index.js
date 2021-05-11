@@ -115,7 +115,7 @@ function lambda(code,variable={},runtime="nodejs12.x"){
             "Variables":variable
         },
         "Handler": "handler.handler",
-        "MemorySize": "128",
+        "MemorySize": "1024",
         "Role": {"Fn::GetAtt": ["Lexv2BotLambdaRole","Arn"]},
         "Runtime":runtime,
         "Timeout": 900,

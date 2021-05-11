@@ -67,7 +67,7 @@ module.exports=function(params){
         })
         .spread(IntentFallback)
 
-        .tap(versions=>status("Rebuild Lex V1 Bot "))
+        .tap(versions=>status("Rebuilding Lex V1 and Lex V2 Bots - will take several minutes"))
         .then(versions=>{
             clean_slot=()=>clean.slot(process.env.SLOTTYPE,versions.intent_version)
             return Promise.join(versions,bot)
@@ -79,10 +79,7 @@ module.exports=function(params){
             name:process.env.BOTALIAS
         }))
         
-        .tap(lexv2bot=version=>{
-            status("Rebuilding Lex V1 and Lex V2 Bots "); 
-            return LexV2Bot(version)
-        })
+        .tap(version=>LexV2Bot(version))
 
         .delay(1000)
         .tap(()=>wait())

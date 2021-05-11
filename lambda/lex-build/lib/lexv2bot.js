@@ -12,7 +12,11 @@ License for the specific language governing permissions and limitations under th
 */
 
 const aws=require('./aws')
-var lambda=new aws.Lambda();
+var lambda=new aws.Lambda({
+    httpOptions: {
+        timeout: 900000 // time to wait for a response
+        }
+    });
 var functionName=process.env.LEXV2_BOT_LAMBDA;
 
 module.exports=async function(){

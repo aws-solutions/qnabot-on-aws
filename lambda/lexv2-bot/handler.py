@@ -297,10 +297,10 @@ def get_bot_locale_status(botId, botVersion, localeId):
 def wait_for_lexV2_qna_locale(botId, botVersion, localeId):
     botLocaleStatus = get_bot_locale_status(botId, botVersion, localeId)
     while botLocaleStatus not in ["NotBuilt","Built"]:
-        if botLocaleStatus not in ["Creating","Building","ReadyExpressTesting"]:
-            raise Exception(f"Invalid botLocaleStatus: {botLocaleStatus}")
         time.sleep(5)
         botLocaleStatus = get_bot_locale_status(botId, botVersion, localeId)
+        if botLocaleStatus not in ["Built","Creating","Building","ReadyExpressTesting"]:
+            raise Exception(f"Invalid botLocaleStatus: {botLocaleStatus}")
     print(f"Bot localeId {localeId}: {botLocaleStatus}")
     return botLocaleStatus
 
@@ -360,10 +360,10 @@ def get_bot_status(botId):
 def wait_for_lexV2_qna_bot(botId):
     botStatus = get_bot_status(botId)
     while botStatus != 'Available':
-        if botStatus not in ["Creating","Versioning"]:
-            raise Exception(f"Invalid botStatus: {botStatus}")
         time.sleep(5)
         botStatus = get_bot_status(botId)
+        if botStatus not in ["Available","Creating","Versioning"]:
+            raise Exception(f"Invalid botStatus: {botStatus}")
     return botStatus
 
 def lexV2_qna_bot(botName):
@@ -398,10 +398,10 @@ def get_bot_version_status(botId, botVersion):
 def wait_for_lexV2_qna_version(botId, botVersion):
     botStatus = get_bot_version_status(botId, botVersion)
     while botStatus != 'Available':
-        if botStatus not in ["Creating","Versioning"]:
-            raise Exception(f"Invalid botStatus: {botStatus}")
         time.sleep(5)
         botStatus = get_bot_version_status(botId, botVersion)
+        if botStatus not in ["Available","Creating","Versioning"]:
+            raise Exception(f"Invalid botStatus: {botStatus}")
     return botStatus
     
 def lexV2_qna_version(botId, botDraftVersion, botLocaleIds):
@@ -446,10 +446,10 @@ def get_bot_alias_status(botId, botAliasId):
 def wait_for_lexV2_qna_alias(botId, botAliasId):
     botAliasStatus = get_bot_alias_status(botId, botAliasId)
     while botAliasStatus != 'Available':
-        if botAliasStatus not in ["Creating","Versioning"]:
-            raise Exception(f"Invalid botStatus: {botAliasStatus}")
         time.sleep(5)
         botAliasStatus = get_bot_alias_status(botId, botAliasId)
+        if botAliasStatus not in ["Available","Creating","Versioning"]:
+            raise Exception(f"Invalid botStatus: {botAliasStatus}")
     return botAliasStatus
 
 def lexV2_qna_alias(botId, botVersion, botAliasName, botLocaleIds, botFullfillmentLambdaArn):
