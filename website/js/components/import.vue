@@ -254,7 +254,6 @@ module.exports = {
       const self = this
       const id = name.replace(' ', '-')
       if (data) {
-        self.errorList = []
         new Promise(function (res, rej) {
           if (data.qna.length) {
             var id = name.replace(/[^a-zA-Z0-9-_\.]/g, ''); //removes all non URL safe characters
@@ -285,6 +284,10 @@ module.exports = {
       }
     },
     addError: function (error){
+      if(this.errorMsg == true){ //The error dialog has already been shown. Clear the errorList
+        this.errorList = []
+        this.errorMsg = false;
+      }
       this.errorList.push(error);
     },
     parse: async function (content) {
@@ -319,7 +322,6 @@ module.exports = {
            for(const property in header_mapping){
              var dest_property = header_mapping[property]
              if(question[dest_property] == undefined){
-                //question[dest_property] = question[property]
                 _.set(question,dest_property.split("."),question[property])
                 console.log("Assigning value for " + dest_property)
                 delete question[property]
@@ -332,37 +334,61 @@ module.exports = {
             question.r.buttons = []
             let i = 1
             while(true){
-              console.log("    Processing Button"+i)
-              if(question["button"+i] != undefined){
-                var buttonParts = question["button"+i].split(",")
-                if(buttonParts.length != 2){
-                  self.addError(`Warning: Button button${i} is not well formed for qid ${question.qid} question and answer should be separated by a comma.`)
-                }
-                question.r.buttons.push({
-                  "text":buttonParts[0],
-                  "value":buttonParts[1]
-                })
-                i++;
-               }
-               else{
-                 break;
-               }
+
+              console.log("Processing Button"+i)
+              var buttonFieldTextName = "displaytext"+i
+              var buttonFieldValueName = "buttonvalue"+i
+              i++
+              var undefinedButtonFieldCount = (question[buttonFieldTextName] == undefined) + (question[buttonFieldValueName] == undefined)
+              console.log("ButtonName " + question[buttonFieldTextName] + " ButtonValue " + question[buttonFieldValueName] )
+              console.log("Undefined field count " + undefinedButtonFieldCount)
+
+              if(undefinedButtonFieldCount == 2){
+                break
+              }
+              if(undefinedButtonFieldCount == 1){
+                self.addError(`Warning:  Both ${buttonFieldTextName} and ${buttonFieldValueName} must be defined for qid: "${question.qid}"`)
+                continue;
+              }
+              console.log("Found two values")
+              if(question[buttonFieldValueName].length > 80){
+                self.addError(`Warning: ${buttonFieldValueName} must be less than or equal to 80 characters for qid:"${question.qid}"`)
+                continue;
+              }
+              if(question[buttonFieldTextName].length > 80){
+                self.addError(`Warning: ${buttonFieldTextName} must be less than or equal to 80 characters for qid:"${question.qid}"`)
+                continue;
+              }
+              var button = {
+                  "text":question[buttonFieldTextName],
+                  "value":question[buttonFieldValueName]
+              }
+              console.log("Adding button "+ JSON.stringify(button))
+              question.r.buttons.push(button)
              }
            }
-           if(question["q"]){
-             console.log("splitting " + JSON.stringify(question))
-              question["q"] = question["q"].split(",").map(q => q.replace("\"",""))
-           } else{
-             self.addError("Warning: No questions found for " + question.qid + " not importing")
-             return;
+           let counter = 1
+           question.q = question.q == undefined ? [] : question.q
+           while(true){
+             var userQuestion = question["question"+counter] 
+              if(userQuestion != undefined){
+                question.q.push(userQuestion)
+                counter++
+              }else{
+                break;
+              }
            }
+          if(question.q.length == 0){
+            self.addError("Warning: No questions found for QID:\"" + question.qid + "\". The question will be skipped.")
+          }
+
            if(question.a == undefined || question.a.replace(/[^a-zA-Z0-9-_]/g, '').trim().length == 0)
            {
-             self.addError("Warning: No answer for " + question.qid + " not importing")
+             self.addError("Warning: No answer for QID:\"" + question.qid + "\". The question will be skipped.")
              return
            }
            if(question.length == 0){
-             self.addError("Warning: No questions found for " + question.qid + " not importing")
+             self.addError("Warning: No questions found for QID: \"" + question.qid + "\". The question will be skipped.")
              return
            }
            console.log("Processed "+ JSON.stringify(question))
