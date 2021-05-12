@@ -327,10 +327,13 @@ module.exports = {
                 delete question[property]
              }
            }
-          if(question["responsetitle"] != undefined){
+          if(question["cardtitle"] != undefined){
             console.log("processing response title")
             question.r = {}
-            question.r.title = question["responsetitle"]
+            question.r.title = question["cardtitle"]
+            if(question["imageurl"] != undefined){
+              question.r.imageUrl = question.imageurl
+            }
             question.r.buttons = []
             let i = 1
             while(true){
