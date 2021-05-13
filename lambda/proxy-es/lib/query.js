@@ -238,15 +238,8 @@ async function get_hit(req, res) {
         console.log("request entering kendra fallback " + JSON.stringify(req))
         hit = await  kendra_fallback.handler({req,res})
         console.log("Result from Kendra " + JSON.stringify(hit))
-        if(!(hit &&  hit.hit_count != 0))
+        if(hit &&  hit.hit_count != 0)
         {
-            console.log("No hits from query - searching instead for: " + no_hits_question);
-            query_params['question'] = no_hits_question;
-            res['got_hits'] = 0;  // response flag, used in logging / kibana
-            
-            response = await run_query(req, query_params);
-            hit = _.get(response, "hits.hits[0]._source");
-        }else{
             _.set(res,"answersource","Kendra Fallback");
             _.set(res,"session.qnabot_gotanswer",true) ; 
             _.set(res,"message", hit.a);
@@ -254,6 +247,18 @@ async function get_hit(req, res) {
             res['got_hits'] = 1;
 
         }
+
+    }
+    if(!hit)
+    {
+        console.log("No hits from query - searching instead for: " + no_hits_question);
+        query_params['question'] = no_hits_question;
+        res['got_hits'] = 0;  // response flag, used in logging / kibana
+        
+        response = await run_query(req, query_params);
+        hit = _.get(response, "hits.hits[0]._source");
+
+        console.log("No hits response: " + JSON.stringify(hit))
     }
     // Do we have a hit?
     if (hit) {
