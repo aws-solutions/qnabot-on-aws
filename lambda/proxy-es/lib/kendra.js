@@ -46,7 +46,7 @@ function create_hit(answermessage,markdown,ssml,hit_count,debug_results,kendra){
 
 
     console.log("create_hit" +JSON.stringify(hits))
-    return hits;
+    return hit_count > 0 ? hits : undefined;
 }
 
 function create_debug_object(kendra_result){
