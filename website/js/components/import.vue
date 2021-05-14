@@ -4,9 +4,7 @@
         v-card(id="error-modal")
           v-card-title(primary-title) Error Loading Content
           v-card-text
-            v-subheader.error--text(v-if='error' id="add-error") 
-              v-card-text
-                li(v-for="error in errorList") {{error}}
+            li(v-for="error in errorList") {{error}}
           v-card-actions
             v-spacer
             v-btn.lighten-3(@click="error=false;errorList=[];errorMsg='';$refs.file.value = [];" :class="{ teal: success}" ) close
