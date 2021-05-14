@@ -9,7 +9,7 @@
                 li(v-for="error in errorList") {{error}}
           v-card-actions
             v-spacer
-            v-btn.lighten-3(@click="error=false;errorMsg='';$refs.file.value = [];" :class="{ teal: success}" ) close
+            v-btn.lighten-3(@click="error=false;errorList=[];errorMsg='';$refs.file.value = [];" :class="{ teal: success}" ) close
     v-container(column grid-list-md id="page-import")
       v-layout(column)
         v-flex
@@ -317,6 +317,7 @@ module.exports = {
         // Here is your object
         var XL_row_object = XLSX.utils.sheet_to_row_object_array(workbook.Sheets[sheetName]);
         var json_object = JSON.stringify(XL_row_object);
+        var question_number = 0
         XL_row_object.forEach(question =>{
            console.log("Processing " + JSON.stringify(question))
            for(const property in header_mapping){
@@ -327,6 +328,7 @@ module.exports = {
                 delete question[property]
              }
            }
+           question_number++
           if(question["cardtitle"] != undefined){
             console.log("processing response title")
             question.r = {}
@@ -381,16 +383,17 @@ module.exports = {
                 break;
               }
            }
-          if(question.q.length == 0){
-            self.addError("Warning: No questions found for QID:\"" + question.qid + "\". The question will be skipped.")
+          if(question.qid  == undefined){
+            self.addError(`Warning: No QID found for line ${question_number}. The question will be skipped.`)
+            return
           }
 
            if(question.a == undefined || question.a.replace(/[^a-zA-Z0-9-_]/g, '').trim().length == 0)
            {
-             self.addError("Warning: No answer for QID:\"" + question.qid + "\". The question will be skipped.")
+             self.addError("Warning: No answer found for QID:\"" + question.qid + "\". The question will be skipped.")
              return
            }
-           if(question.length == 0){
+           if(question.q.length == 0){
              self.addError("Warning: No questions found for QID: \"" + question.qid + "\". The question will be skipped.")
              return
            }
