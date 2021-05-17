@@ -11,7 +11,8 @@ module.exports={
         BOTALIAS:{"Ref":"VersionAlias"},
         SLOTTYPE:{"Ref":"SlotType"},
         INTENT:{"Ref":"Intent"},
-        FULFILLMENT_LAMBDA_ARN:{"Fn::GetAtt":["FulfillmentLambda","Arn"]}
+        FULFILLMENT_LAMBDA_ARN:{"Fn::GetAtt":["FulfillmentLambda","Arn"]},
+        LOCALES:{"Ref":"LexV2BotLocaleIds"}
     },"python3.7"),
     "Lexv2BotCodeVersion":{
         "Type": "Custom::S3Version",
