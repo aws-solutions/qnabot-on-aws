@@ -13,15 +13,18 @@ clientIAM = boto3.client('iam')
 clientTRANSLATE = boto3.client('translate')
 
 
-# LEXV1 QNABOT INFO (from Cfn outputs)
+# LEXV1 QNABOT INFO
 BOT_NAME = os.environ["BOTNAME"]
 BOT_ALIAS = os.environ["BOTALIAS"]
 INTENT = os.environ["INTENT"]
 SLOT_TYPE = os.environ["SLOTTYPE"]
 FULFILLMENT_LAMBDA_ARN = os.environ["FULFILLMENT_LAMBDA_ARN"]
+
+
 LEXV2_BOT_DRAFT_VERSION = "DRAFT"
 LEXV2_TEST_BOT_ALIAS = "TestBotAlias"
-LEXV2_BOT_LOCALE_IDS = {
+LEXV2_BOT_LOCALE_IDS = os.environ["LOCALES"].replace(' ','').split(",")
+LEXV2_BOT_LOCALE_VOICES = {
 	"de_DE": "Hans",
 	"en_AU": "Nicole",
 	"en_GB": "Amy",
@@ -299,7 +302,7 @@ def wait_for_lexV2_qna_locale(botId, botVersion, localeId):
     while botLocaleStatus not in ["NotBuilt","Built"]:
         time.sleep(5)
         botLocaleStatus = get_bot_locale_status(botId, botVersion, localeId)
-        if botLocaleStatus not in ["Built","Creating","Building","ReadyExpressTesting"]:
+        if botLocaleStatus not in ["NotBuilt","Built","Creating","Building","ReadyExpressTesting"]:
             raise Exception(f"Invalid botLocaleStatus: {botLocaleStatus}")
     print(f"Bot localeId {localeId}: {botLocaleStatus}")
     return botLocaleStatus
@@ -526,13 +529,12 @@ def build_all():
     botId = lexV2_qna_bot(BOT_NAME)
     # create of update bot for each locale
     # process locales in batches to staty with service limit bot-locale-builds-per-account (default 5)
-    botLocaleIds = list(LEXV2_BOT_LOCALE_IDS.keys())
-    botlocaleIdBatches = list(batches(botLocaleIds,5))
+    botlocaleIdBatches = list(batches(LEXV2_BOT_LOCALE_IDS,5))
     for botlocaleIdBatch in botlocaleIdBatches:
         print("Batch: " + str(botlocaleIdBatch))
         for botLocaleId in botlocaleIdBatch:
             print("LocaleId: " + botLocaleId)
-            lexV2_qna_locale(botId, LEXV2_BOT_DRAFT_VERSION, botLocaleId, voiceId=LEXV2_BOT_LOCALE_IDS[botLocaleId])
+            lexV2_qna_locale(botId, LEXV2_BOT_DRAFT_VERSION, botLocaleId, voiceId=LEXV2_BOT_LOCALE_VOICES[botLocaleId])
             lexV2_fallback_intent(botId, LEXV2_BOT_DRAFT_VERSION, botLocaleId)
             lexV2_qna_slotTypeValues(SLOT_TYPE, botId, LEXV2_BOT_DRAFT_VERSION, botLocaleId, utterances)
             lexV2_qna_intent(INTENT, SLOT_TYPE, botId, LEXV2_BOT_DRAFT_VERSION, botLocaleId)

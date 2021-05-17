@@ -43,6 +43,7 @@ module.exports=Promise.resolve(require('../master')).then(function(base){
         "ElasticSearchNodeCount",
         "KibanaDashboardRetentionMinutes",
         "PublicOrPrivate",
+        "LexV2BotLocaleIds",
         "XraySetting"
     ]);
     base.Metadata = {
@@ -74,6 +75,14 @@ module.exports=Promise.resolve(require('../master')).then(function(base){
                         "ElasticSearchNodeCount",
                         "Encryption",
                         "KibanaDashboardRetentionMinutes"
+                   ]
+                },
+                {
+                   "Label": {
+                        "default": "Amazon LexV2"
+                   },
+                   "Parameters": [
+                        "LexV2BotLocaleIds"
                    ]
                 }
             ]
