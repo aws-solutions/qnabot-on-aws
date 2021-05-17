@@ -198,12 +198,19 @@ module.exports={
         "Default":"4"
     },
     "VPCSubnetIdList" : {
-        "Description" : "Subnet IDs", "Type": "CommaDelimitedList",
+        "Type": "CommaDelimitedList",
+        "Description" : "Subnet IDs", 
         "Default": ""
     },
     "VPCSecurityGroupIdList": {
-        "Description" : "Security Group IDs", "Type": "CommaDelimitedList",
+        "Type": "CommaDelimitedList",
+        "Description" : "Security Group IDs", 
         "Default": ""
+    },
+    "LexV2BotLocaleIds":{
+        "Description" : "Languages for QnABot voice interaction using LexV2. Specify as a comma separated list of valid Locale IDs - see https://docs.aws.amazon.com/lexv2/latest/dg/how-languages.html", 
+        "Type": "String",
+        "Default": "en_US,es_US"
     },
     "XraySetting":{
         "Type":"String",

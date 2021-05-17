@@ -42,6 +42,7 @@ module.exports=Promise.resolve(require('../master')).then(function(base){
         "Encryption",
         "ElasticSearchNodeCount",
         "PublicOrPrivate",
+        "LexV2BotLocaleIds",
         "XraySetting"
     ]);
     base.Metadata = {
@@ -72,6 +73,14 @@ module.exports=Promise.resolve(require('../master')).then(function(base){
                    "Parameters": [
                         "ElasticSearchNodeCount",
                         "Encryption"
+                   ]
+                },
+                {
+                   "Label": {
+                        "default": "Amazon LexV2"
+                   },
+                   "Parameters": [
+                        "LexV2BotLocaleIds"
                    ]
                 }
             ]

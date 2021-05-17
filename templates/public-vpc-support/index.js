@@ -41,6 +41,7 @@ module.exports=Promise.resolve(require('../master')).then(function(base){
         "DefaultKendraIndexId",
         "Encryption",
         "PublicOrPrivate",
+        "LexV2BotLocaleIds",
         "ElasticSearchNodeCount",
         "VPCSubnetIdList",
         "VPCSecurityGroupIdList",
@@ -83,6 +84,14 @@ module.exports=Promise.resolve(require('../master')).then(function(base){
                    "Parameters": [
                         "ElasticSearchNodeCount",
                         "Encryption"
+                   ]
+                },
+                {
+                   "Label": {
+                        "default": "Amazon LexV2"
+                   },
+                   "Parameters": [
+                        "LexV2BotLocaleIds"
                    ]
                 }
             ]
