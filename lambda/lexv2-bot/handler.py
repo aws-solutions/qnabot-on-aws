@@ -562,10 +562,14 @@ def build_all():
     return result
 
 def delete_all():
-    response = clientLEXV2.delete_bot(
-        botId=BOT_NAME,
-        skipResourceInUseCheck=True
-    )
+    botId = get_botId(BOT_NAME)
+    response = None
+    if botId:
+        response = clientLEXV2.delete_bot(
+            botId=botId,
+            skipResourceInUseCheck=True
+        )
+    return response
 
 
 # cfnHelper functions
@@ -596,4 +600,5 @@ def handler(event, context):
 # for testing on terminal
 if __name__ == "__main__":
     result = build_all()
+    #result = delete_all()
     print(result)
