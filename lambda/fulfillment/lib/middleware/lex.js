@@ -76,6 +76,13 @@ function parseLexV2Event(event) {
         ),
         channel: _.get(event, "requestAttributes.'x-amz-lex:channel-type'")
     }
+    // If voice, set userPreferredLocale from Lex locale in request (Voice input/output language should be aligned to bot locale)
+    const mode = _.get(event,"inputMode") ;
+    if (mode == "Speech") {
+        const lex_locale = _.get(event,'bot.localeId').split("_")[0];
+        out.session.userPreferredLocale = lex_locale;
+        console.log("LexV2 in voice mode - Set userPreferredLocale from lex V2 bot locale:", out.session.userPreferredLocale);
+    } 
     return out;
 }
 
