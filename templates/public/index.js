@@ -84,6 +84,14 @@ module.exports=Promise.resolve(require('../master')).then(function(base){
                    "Parameters": [
                         "LexV2BotLocaleIds"
                    ]
+                },
+                {
+                   "Label": {
+                        "default": "Amazon LexV2"
+                   },
+                   "Parameters": [
+                        "LexV2BotLocaleIds"
+                   ]
                 }
             ]
         }
