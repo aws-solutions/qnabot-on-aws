@@ -19,12 +19,13 @@ var lambda=new aws.Lambda({
     });
 var functionName=process.env.LEXV2_BOT_LAMBDA;
 
-module.exports=async function(){
-    console.log(`Invoking ${functionName}`)
+module.exports=async function(utterances){
+    const utterance_list = await utterances ; 
+    console.log(`Invoking ${functionName} with Utterances: ${utterance_list}`)
     var result=await lambda.invoke({
         FunctionName:functionName,
         InvocationType: "RequestResponse",
-        Payload: JSON.stringify({})
+        Payload: JSON.stringify({"utterances":utterance_list})
     }).promise() ;
     console.log("LexV2 bot lambda result:" + JSON.stringify(result));
     if(result.FunctionError){

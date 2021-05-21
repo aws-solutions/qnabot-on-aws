@@ -28,29 +28,38 @@ module.exports={
         "#bot-editor:bot=",{"Ref":"LexBot"}
       ]]}
     },
-    "LexBotName":{
+    "LexV1BotName":{
         "Value":{"Ref":"LexBot"}
     },
-    "LexBotAlias":{
+    "LexV1BotAlias":{
         "Value":{"Ref":"VersionAlias"}
     },
-    "LexSlotType":{
+    "LexV1SlotType":{
         "Value":{"Ref":"SlotType"}
     },
-    "LexIntent":{
+    "LexV1Intent":{
         "Value":{"Ref":"Intent"}
     },
     "LexV1IntentFallback":{
         "Value":{"Ref":"IntentFallback"}
     },
-    "LexV2IntentFallback":{
-        "Value":{"Fn::GetAtt":["LexV2Bot","botIntentFallback"]}
+    "LexV2BotName":{
+        "Value":{"Fn::GetAtt":["LexV2Bot","botName"]}
     },
     "LexV2BotId":{
         "Value":{"Fn::GetAtt":["LexV2Bot","botId"]}
     },
+    "LexV2BotAlias":{
+        "Value":{"Fn::GetAtt":["LexV2Bot","botAlias"]}
+    },
     "LexV2BotAliasId":{
         "Value":{"Fn::GetAtt":["LexV2Bot","botAliasId"]}
+    },
+    "LexV2Intent":{
+        "Value":{"Fn::GetAtt":["LexV2Bot","botIntent"]}
+    },
+    "LexV2IntentFallback":{
+        "Value":{"Fn::GetAtt":["LexV2Bot","botIntentFallback"]}
     },
     "LexV2BotLocaleIds":{
         "Value":{"Fn::GetAtt":["LexV2Bot","botLocaleIds"]}

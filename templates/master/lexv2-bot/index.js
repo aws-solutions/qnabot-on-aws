@@ -7,10 +7,7 @@ module.exports={
         "S3Key": {"Fn::Sub":"${BootstrapPrefix}/lambda/lexv2-bot.zip"},
         "S3ObjectVersion":{"Ref":"Lexv2BotCodeVersion"}
     },{
-        BOTNAME:{"Ref":"LexBot"},
-        BOTALIAS:{"Ref":"VersionAlias"},
-        SLOTTYPE:{"Ref":"SlotType"},
-        INTENT:{"Ref":"Intent"},
+        STACKNAME:{"Ref":"AWS::StackName"},
         FULFILLMENT_LAMBDA_ARN:{"Fn::GetAtt":["FulfillmentLambda","Arn"]},
         LOCALES:{"Ref":"LexV2BotLocaleIds"}
     },"python3.7"),

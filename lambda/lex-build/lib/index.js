@@ -79,7 +79,7 @@ module.exports=function(params){
             name:process.env.BOTALIAS
         }))
         
-        .tap(version=>LexV2Bot(version))
+        .tap(version=>LexV2Bot(utterances))
 
         .delay(1000)
         .tap(()=>wait())

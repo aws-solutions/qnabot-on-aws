@@ -24,16 +24,17 @@ module.exports=Promise.resolve(require('../master')).then(function(base){
         "ClientURL",
         "DashboardURL",
         "UserPoolURL",
-        "LexBotName",
-        "LexBotAlias",
-        "LexIntent",
+        "LexV1BotName",
+        "LexV1BotAlias",
+        "LexV1Intent",
         "LexV1IntentFallback",
-        "LexV2IntentFallback",
+        "LexV2BotName",
         "LexV2BotId",
+        "LexV2BotAlias",
         "LexV2BotAliasId",
-        "LexV2BotLocaleIds",
-        "DefaultSettingsSSMParameterName",
-        "CustomSettingsSSMParameterName"
+        "LexV2Intent",
+        "LexV2IntentFallback",
+        "LexV2BotLocaleIds"
     ])
     base.Parameters=_.pick(base.Parameters,[
         "Email",

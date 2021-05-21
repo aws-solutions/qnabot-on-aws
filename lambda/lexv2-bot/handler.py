@@ -7,23 +7,22 @@ import boto3
 import time
 from crhelper import CfnResource
 helper = CfnResource()
-clientLEXV1 = boto3.client('lex-models')
 clientLEXV2 = boto3.client('lexv2-models')
 clientIAM = boto3.client('iam')
 clientTRANSLATE = boto3.client('translate')
 
 
-# LEXV1 QNABOT INFO
-BOT_NAME = os.environ["BOTNAME"]
-BOT_ALIAS = os.environ["BOTALIAS"]
-INTENT = os.environ["INTENT"]
-SLOT_TYPE = os.environ["SLOTTYPE"]
+# LEX QNABOT INFO
 FULFILLMENT_LAMBDA_ARN = os.environ["FULFILLMENT_LAMBDA_ARN"]
+STACKNAME = os.environ["STACKNAME"]
+LEXV2_BOT_LOCALE_IDS = os.environ["LOCALES"].replace(' ','').split(",")
 
-
+BOT_NAME = STACKNAME + "_QnaBot"
+INTENT = "QnaIntent"
+SLOT_TYPE = "QnaSlotType"
+BOT_ALIAS = "live"
 LEXV2_BOT_DRAFT_VERSION = "DRAFT"
 LEXV2_TEST_BOT_ALIAS = "TestBotAlias"
-LEXV2_BOT_LOCALE_IDS = os.environ["LOCALES"].replace(' ','').split(",")
 LEXV2_BOT_LOCALE_VOICES = {
 	"de_DE": "Hans",
 	"en_AU": "Nicole",
@@ -39,17 +38,6 @@ LEXV2_BOT_LOCALE_VOICES = {
 }
 
 
-# Copy utterances from existing V1 bot
-def get_qna_V1_slotutterances(slotTypeV1):
-    utterances = []
-    response = clientLEXV1.get_slot_type(
-        name=slotTypeV1,
-        version='$LATEST'
-    )
-    for enumerationValue in response["enumerationValues"]:
-        utterances.append(enumerationValue["value"])
-    return utterances
-    
 def get_qna_V2_slotTypeValues(slotNameV1, utterances):
     slotTypeValues = []
     for utterance in utterances:
@@ -524,8 +512,7 @@ def batches(lst, n):
     for i in range(0, len(lst), n):
         yield lst[i:i + n]
 
-def build_all():
-    utterances = get_qna_V1_slotutterances(SLOT_TYPE)
+def build_all(utterances):
     botId = lexV2_qna_bot(BOT_NAME)
     # create of update bot for each locale
     # process locales in batches to staty with service limit bot-locale-builds-per-account (default 5)
@@ -576,7 +563,8 @@ def delete_all():
 @helper.create
 @helper.update
 def create_or_update_bot(event, _):
-    result = build_all()
+    utterances = event["ResourceProperties"]["utterances"]
+    result = build_all(utterances)
     helper.Data.update(result)
 @helper.delete
 def delete_bot(event, _):
@@ -590,7 +578,8 @@ def handler(event, context):
         helper(event, context)
     else:
         print("Function not called from CloudFormation: " + json.dumps(event))
-        result = build_all()
+        utterances = event["utterances"]
+        result = build_all(utterances)
         print("LexV2 bot info: " + json.dumps(result))
         return {
             'statusCode': 200,
@@ -599,6 +588,7 @@ def handler(event, context):
 
 # for testing on terminal
 if __name__ == "__main__":
-    result = build_all()
+    testutterances = ["what is the capital city of France?", "How great is Q and A bot?"]
+    result = build_all(testutterances)
     #result = delete_all()
     print(result)
