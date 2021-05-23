@@ -315,7 +315,7 @@ module.exports = {
         // Here is your object
         var XL_row_object = XLSX.utils.sheet_to_row_object_array(workbook.Sheets[sheetName]);
         var json_object = JSON.stringify(XL_row_object);
-        var question_number = 0
+        var question_number = 1
         XL_row_object.forEach(question =>{
            console.log("Processing " + JSON.stringify(question))
            for(const property in header_mapping){
@@ -333,6 +333,9 @@ module.exports = {
             question.r.title = question["cardtitle"]
             if(question["imageurl"] != undefined){
               question.r.imageUrl = question.imageurl
+            }
+            if(question["cardsubtitle"] != undefinded){
+              question.r.subTitle = question.subtitle
             }
             question.r.buttons = []
             let i = 1
