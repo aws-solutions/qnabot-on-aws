@@ -21,6 +21,7 @@ module.exports={
                 "QIDLambdaArn":{"Fn::GetAtt":["ESQidLambda","Arn"]},
                 "VPCSubnetIdList" : { "Fn::Join" : [ ",", {"Ref":"VPCSubnetIdList"} ] },
                 "VPCSecurityGroupIdList": { "Fn::Join" : [ ",", {"Ref":"VPCSecurityGroupIdList"} ] },
+                "LexBotVersion": {"Ref": "LexBotVersion"},
                 "XraySetting":{"Ref": "XraySetting"},
             }
         }

@@ -45,6 +45,7 @@ module.exports=Promise.resolve(require('../master')).then(function(base){
         "KibanaDashboardRetentionMinutes",
         "PublicOrPrivate",
         "LexV2BotLocaleIds",
+        "LexBotVersion",
         "XraySetting"
     ]);
     base.Metadata = {

@@ -29,18 +29,23 @@ module.exports={
       ]]}
     },
     "LexV1BotName":{
+        "Condition": "CreateLexV1Bots",
         "Value":{"Ref":"LexBot"}
     },
     "LexV1BotAlias":{
+        "Condition": "CreateLexV1Bots",
         "Value":{"Ref":"VersionAlias"}
     },
     "LexV1SlotType":{
+        "Condition": "CreateLexV1Bots",
         "Value":{"Ref":"SlotType"}
     },
     "LexV1Intent":{
+        "Condition": "CreateLexV1Bots",
         "Value":{"Ref":"Intent"}
     },
     "LexV1IntentFallback":{
+        "Condition": "CreateLexV1Bots",
         "Value":{"Ref":"IntentFallback"}
     },
     "LexV2BotName":{
@@ -221,6 +226,12 @@ module.exports={
         "Type": "String",
         "Default": "en_US,es_US"
     },
+    "LexBotVersion":{
+        "Description" : "Lex versions to use for QnABot. Select 'LexV2 Only' to install QnABot in AWS reqions where LexV1 is not supported.",
+        "Type":"String",
+        "AllowedValues" : ["LexV1 and LexV2", "LexV2 Only"],
+        "Default":"LexV1 and LexV2"
+    },
     "XraySetting":{
         "Type":"String",
         "Description": "Configure Lambdas with X-Ray enabled",
@@ -243,6 +254,7 @@ module.exports={
     "BuildExamples":{"Fn::Equals":[{"Ref":"BuildExamples"},"TRUE"]},
     "CreateDomain":{"Fn::Equals":[{"Ref":"ElasticsearchName"},"EMPTY"]},
     "DontCreateDomain":{"Fn::Not":[{"Fn::Equals":[{"Ref":"ElasticsearchName"},"EMPTY"]}]},
+    "CreateLexV1Bots":{"Fn::Equals":[{"Ref":"LexBotVersion"},"LexV1 and LexV2"]},
     "VPCEnabled": { "Fn::Not": [
               { "Fn::Equals": [ "",
                       { "Fn::Join": [ "", { "Ref": "VPCSecurityGroupIdList" } ] }

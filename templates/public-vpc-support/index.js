@@ -43,6 +43,7 @@ module.exports=Promise.resolve(require('../master')).then(function(base){
         "Encryption",
         "PublicOrPrivate",
         "LexV2BotLocaleIds",
+        "LexBotVersion",
         "ElasticSearchNodeCount",
         "KibanaDashboardRetentionMinutes",
         "VPCSubnetIdList",

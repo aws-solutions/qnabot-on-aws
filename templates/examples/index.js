@@ -32,6 +32,7 @@ module.exports={
     "QIDLambdaArn":{"Type":"String"},
     "VPCSubnetIdList" : {"Type": "String"},
     "VPCSecurityGroupIdList": {"Type": "String"},
+    "LexBotVersion": {"Type": "String"},
     "XraySetting": {"Type": "String"}
   },
    "Conditions": {
@@ -39,6 +40,7 @@ module.exports={
         { "Fn::Equals": [ "", { "Ref": "VPCSecurityGroupIdList" } ] }
       ] },
     "XRAYEnabled":{"Fn::Equals":[{"Ref":"XraySetting"},"TRUE"]},
+    "CreateLexV1Bots":{"Fn::Equals":[{"Ref":"LexBotVersion"},"LexV1 and LexV2"]},
     }
   }
 
