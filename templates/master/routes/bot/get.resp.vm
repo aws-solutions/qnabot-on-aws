@@ -2,26 +2,21 @@
 #set($inputRoot = $input.path('$'))
 
 {
-    "lambdaArn": "${FulfillmentLambda.Arn}",
-    "lambdaRole":"${FulfillmentLambdaRole}",
-    "intent":"${Intent}",
-    "intentFallback":"${IntentFallback}",
+    "lambdaArn": "$inputRoot.lambdaArn",
+    "lambdaRole":"$inputRoot.lambdaRole",
+    "botversion":"$inputRoot.botversion",
+    "botname":"$inputRoot.botname",
+    "intent":"$inputRoot.intent",
+    "intentFallback":"$inputRoot.intentFallback",
+    "lexV2botname":"$inputRoot.lexV2botname",
+    "lexV2botid":"$inputRoot.lexV2botid",
+    "lexV2botalias":"$inputRoot.lexV2botalias",
+    "lexV2botaliasid":"$inputRoot.lexV2botaliasid",
+    "lexV2intent":"$inputRoot.lexV2intent",
+    "lexV2intentFallback":"$inputRoot.lexV2intentFallback",
+    "lexV2localeids":"$inputRoot.lexV2localeids",
     "status":"$inputRoot.status",
     "build":$input.json('$.build'),
-    "botname":"${LexBot}",
-    "botversion":"${VersionAlias}",
-    "messages":{
-        "clarification":[
-            #foreach($message in $input.path('$.clarificationPrompt.messages'))
-            "$message.content"#if( $foreach.hasNext ),#end
-            #end
-        ],
-        "abort":[
-            #foreach($message in $input.path('$.abortStatement.messages'))
-            "$message.content"#if( $foreach.hasNext ),#end
-            #end
-        ]
-    },
     "_links":{
         "alexa":{
             "href":"$root/bot/alexa"

@@ -29,8 +29,8 @@ module.exports=Object.assign(
                 ES_INDEX:{"Ref":"VarIndex"},
                 ES_ENDPOINT:{"Ref":"EsEndpoint"},
                 ES_PROXY:{"Ref":"EsProxyLambda"},
-                BOT_NAME:{"Ref":"BotName"},
-                BOT_ALIAS:{"Ref":"BotAlias"}
+                LEXV2_BOT_ID:{"Ref":"LexV2BotId"},
+                LEXV2_BOT_ALIAS_ID:{"Ref":"LexV2BotAliasId"}
             }
         },
         "Handler": "index.step",
@@ -96,8 +96,7 @@ module.exports=Object.assign(
                 {
                   "Effect": "Allow",
                   "Action": [
-                      "lex:PostContent",
-                      "lex:PostText"
+                      "lex:RecognizeText"
                   ],
                   "Resource": [
                       "*"

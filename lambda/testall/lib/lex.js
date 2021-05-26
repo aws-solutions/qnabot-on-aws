@@ -4,7 +4,7 @@ aws.config.setPromisesDependency(Promise);
 aws.config.region=process.env.AWS_REGION;
 
 const s3=new aws.S3();
-const lex = new aws.LexRuntime();
+const lexv2 = new aws.LexRuntimeV2();
 
 function processWithLex(data, filter) {
     const orig = JSON.parse(data);
@@ -16,23 +16,19 @@ function processWithLex(data, filter) {
                 const exp_qid = item.qid;
                 for (let [x, question] of Object.entries(item.q)) {
                     try {
-                        let resp = await lex.postText({
-                            botName: process.env.BOT_NAME,
-                            botAlias: process.env.BOT_ALIAS,
-                            userId: 'automated-tester1',
-                            sessionAttributes: {'topic': topic},
-                            inputText: question
+                        let resp = await lexv2.recognizeText({
+                            botId: process.env.LEXV2_BOT_ID,
+                            botAliasId: process.env.LEXV2_BOT_ALIAS_ID,
+                            localeId: "en_US",
+                            sessionId: 'automated-tester1',
+                            sessionState: {'sessionAttributes':{'topic': topic}},
+                            text: question
                         }).promise();
-                        let res_qid;
-                        if (resp.sessionAttributes.qnabotcontext) {
-                            let qnabotcontext = JSON.parse(resp.sessionAttributes.qnabotcontext);
-                            let previous = qnabotcontext.previous;
-                            res_qid = previous.qid;
-                        }
+                        let res_qid = resp.sessionState.sessionAttributes.qnabot_qid;
                         if (res_qid === undefined) {
                             res_qid = "NO_QID_IN_RESPONSE";
                         }
-                        let m1 = resp.message.toString().replace(/\"/g, '');
+                        let m1 = resp.messages[0].content.toString().replace(/\"/g, '');
                         m1 = m1.replace(/(\r\n)+|\r+|\n+|\t+/i, ' ');
                         let res_msg = `"${m1}"`;
                         let result_matches = 'No';

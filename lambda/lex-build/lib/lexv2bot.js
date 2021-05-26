@@ -12,20 +12,31 @@ License for the specific language governing permissions and limitations under th
 */
 
 const aws=require('./aws')
+const status=require('./statusv2')
+
+
 var lambda=new aws.Lambda({
     httpOptions: {
         timeout: 900000 // time to wait for a response
         }
     });
-var functionName=process.env.LEXV2_BOT_LAMBDA;
+var functionName=process.env.LEXV2_BUILD_LAMBDA;
+var bucket=process.env.STATUS_BUCKET;
+var lexV2StatusFile=process.env.LEXV2_STATUS_KEY;
 
 module.exports=async function(utterances){
     const utterance_list = await utterances ; 
     console.log(`Invoking ${functionName} with Utterances: ${utterance_list}`)
+    status("Starting LexV2 bot function")
     var result=await lambda.invoke({
         FunctionName:functionName,
         InvocationType: "RequestResponse",
-        Payload: JSON.stringify({"utterances":utterance_list})
+        Payload: JSON.stringify(
+            {
+                "statusFile":{"Bucket":bucket, "Key":lexV2StatusFile},
+                "utterances":utterance_list
+            }
+        )
     }).promise() ;
     console.log("LexV2 bot lambda result:" + JSON.stringify(result));
     if(result.FunctionError){

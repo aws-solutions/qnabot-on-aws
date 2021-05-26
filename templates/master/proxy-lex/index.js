@@ -36,9 +36,21 @@ module.exports={
         },
         "Environment": {
             "Variables":{
-                STATUS_KEY:"status.json",
                 STATUS_BUCKET:{"Ref":"BuildStatusBucket"},
-                BOT_NAME:{"Ref":"LexBot"},
+                STATUS_KEY:{"Fn::If": ["CreateLexV1Bots", "status.json", {"Ref":"AWS::NoValue"}]},
+                LEXV2_STATUS_KEY:"lexV2status.json",
+                FULFILLMENT_FUNCTION_ARN: {"Fn::GetAtt": ["FulfillmentLambda", "Arn"]},
+                FULFILLMENT_FUNCTION_ROLE: {"Ref": "FulfillmentLambdaRole"},
+                LEXV1_BOT_NAME: {"Fn::If": ["CreateLexV1Bots",{"Ref": "LexBot"},{"Ref": "AWS::NoValue"}]},
+                LEXV1_INTENT: {"Fn::If": ["CreateLexV1Bots",{"Ref": "Intent"},{"Ref": "AWS::NoValue"}]},
+                LEXV1_INTENT_FALLBACK: {"Fn::If": ["CreateLexV1Bots",{"Ref": "IntentFallback"},{"Ref": "AWS::NoValue"}]},
+                LEXV2_BOT_NAME: {"Fn::GetAtt": ["LexV2Bot", "botName"]},
+                LEXV2_BOT_ID: {"Fn::GetAtt": ["LexV2Bot", "botId"]},
+                LEXV2_BOT_ALIAS: {"Fn::GetAtt": ["LexV2Bot", "botAlias"]},
+                LEXV2_BOT_ALIAS_ID: {"Fn::GetAtt": ["LexV2Bot", "botAliasId"]},
+                LEXV2_INTENT: {"Fn::GetAtt": ["LexV2Bot", "botIntent"]},
+                LEXV2_INTENT_FALLBACK: {"Fn::GetAtt": ["LexV2Bot", "botIntentFallback"]},
+                LEXV2_BOT_LOCALE_IDS: {"Fn::GetAtt": ["LexV2Bot", "botLocaleIds"]}
             }
         },
         "Handler": "index.handler",

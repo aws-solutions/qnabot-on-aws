@@ -14,8 +14,8 @@ module.exports={
     "Parameters": {
         "CFNLambda":{"Type":"String"},
         "CFNInvokePolicy":{"Type":"String"},
-        "BotName":{"Type":"String"},
-        "BotAlias":{"Type":"String"},
+        "LexV2BotId":{"Type":"String"},
+        "LexV2BotAliasId":{"Type":"String"},
         "BootstrapBucket":{"Type":"String"},
         "BootstrapPrefix":{"Type":"String"},
         "VarIndex": {"Type":"String"},

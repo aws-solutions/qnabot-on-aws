@@ -15,7 +15,7 @@ var axios=require('axios')
 var Vue=require('vue')
 var Vuex=require('vuex').default
 import Vuetify from 'vuetify'
-var style=require('aws-lex-web-ui/dist/lex-web-ui.css')
+var style=require('aws-lex-web-ui/dist/lex-web-ui.min.css')
 var Auth=require('./lib/client-auth')
 import app from './client.vue'
 
@@ -56,8 +56,11 @@ document.addEventListener('DOMContentLoaded', function(){
         config.cognito.poolId=result.PoolId
         config.lex.botName=result.BotName
         config.lex.botAlias=result.BotVersion
-        return config
+        config.lex.v2BotId=result.v2BotId
+        config.lex.v2BotAliasId=result.v2BotAliasId
+        config.lex.v2BotLocaleId=result.v2BotLocaleId
         console.log(config) 
+        return config
     }) 
 
     Promise.all([

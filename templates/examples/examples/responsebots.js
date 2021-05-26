@@ -2091,5 +2091,6 @@ exports.names=[
 
 
 exports.outputs=_.fromPairs(exports.names.map(x=>{
-    return [x,{Condition: "CreateLexV1Bots", Value:{"Ref": x}}];
+    return [x,{Value:{"Fn::If": ["CreateLexV1Bots", {"Ref":x}, "ReponseBots not yet supported in LexV2-Only installations"]}}];
 }));
+
