@@ -196,10 +196,6 @@ async function processResponse(req, res, hook, msg) {
         res.card = {
             "send": true,
             "title": "Info",
-            "text": "",
-            "url": "",
-            "subTitle": "",
-            "imageUrl": "",
             "buttons": [
                 {
                     "text": "Yes",
