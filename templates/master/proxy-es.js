@@ -28,7 +28,7 @@ module.exports={
         "Environment": {
           "Variables": {
             ES_INDEX:{"Fn::GetAtt":["Var","QnaIndex"]},
-            ES_ADDRESS:{"Fn::GetAtt":["ESVar","ESAddress"]},
+            ES_ADDRESS:{"Fn::Join" : [ "", [ "https://", {"Fn::GetAtt":["ESVar","ESAddress"]} ] ] },
             UTTERANCE_BUCKET:{"Ref":"AssetBucket"},
             UTTERANCE_KEY:"default-utterances.json",
           }
