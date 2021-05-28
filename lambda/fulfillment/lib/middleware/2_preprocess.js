@@ -9,6 +9,7 @@ async function get_userInfo(userId, idattrs) {
         UserId:userId,
         InteractionCount:1
     };
+    console.log("idattr " + JSON.stringify(idattrs))
     var usersTable = process.env.DYNAMODB_USERSTABLE;
     var docClient = new AWS.DynamoDB.DocumentClient({apiVersion: '2012-08-10'});
     var params = {
@@ -177,7 +178,8 @@ module.exports=async function preprocess(req,res){
 
     // Add _userInfo to req, from UsersTable
     // TODO Will need to rework logic if/when we link userid across clients (SMS,WebUI,Alexa)
-    var userId = req._userId;
+    console.log("userid found",idattrs["cognito:username"],idattrs["verifiedIdentity"])
+    var userId = idattrs["cognito:username"] && idattrs["verifiedIdentity"] == "true" ? idattrs["cognito:username"] : req._userId;
     var req_userInfo = await get_userInfo(userId, idattrs);
     _.set(req,"_userInfo", req_userInfo);
     // Add _userInfo to res, with updated timestamps
