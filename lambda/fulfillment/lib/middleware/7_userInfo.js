@@ -5,8 +5,26 @@ var _=require('lodash')
 var util=require('./util')
 var AWS=require('aws-sdk');
 
-async function update_userInfo(res) {
+function getDistinctValues(list,objectId,sortField){
     var dt = new Date();
+
+    var distinctItems = [...new Set(list.map(item => item[objectId]))];
+    var sortedItems = _.cloneDeep(list).sort((a,b) => {
+        if(a[sortField] == b[sortField]){
+            return 0;
+        }
+        return a["sortField"] < b["sortField"] ? 1 : -1
+    });
+    distinctItems = distinctItems.map(id => sortedItems.filter( item => item[objectId] == id )[0])
+    return distinctItems
+}
+async function update_userInfo(res) {
+    var topics = _.get(res,"_userInfo.recentTopics",[])
+    var distinctTopics= getDistinctValues(topics,"topic").slice(0,10)
+    _.set(res,"_userInfo.recentTopics",distinctTopics)
+    console.log(res._userInfo)
+    var userId = _.get(res,"_userInfo.UserName") && _.get(res,"_userInfo.isVerifiedIdentity") == "true" ? _.get(res,"_userInfo.UserName") : _.get(res,"_userInfo.UserId");
+    _.set(res,"_userInfo.UserId",userId)
     var usersTable = process.env.DYNAMODB_USERSTABLE;
     var docClient = new AWS.DynamoDB.DocumentClient({apiVersion: '2012-08-10'});
     var params = {
@@ -26,6 +44,29 @@ async function update_userInfo(res) {
 
 module.exports=async function userInfo(req,res){
     console.log("Entering userInfo Middleware")
+
     await update_userInfo(res);
     return {req,res}
 }
+
+// topics = [
+//     {
+//         topic:"Apple",
+//         dateTime:1
+//     },
+//     {
+//         topic:"Pear",
+//         dateTime:2
+//     },
+//     {
+//         topic:"Apple",
+//         dateTime:3
+//     },
+//     {
+//         topic:"Bananna",
+//         dateTime:4
+//     }
+// ]
+
+// var result = getDistinctValues(topics,"topic","dateTime")
+// console.log(result)
