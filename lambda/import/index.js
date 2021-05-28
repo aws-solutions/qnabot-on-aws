@@ -62,8 +62,14 @@ exports.step=function(event,context,cb){
                             obj.type=obj.type || 'qna'
                             obj.q = obj.q.map(x=>{ x = x.replace(/\\*"/g,''); return x});
                             if(obj.type==='qna'){
-                                obj.questions=obj.q.map(x=>{return {q:x}});
-                                obj.quniqueterms=obj.q.join(" ");
+                                try
+                                {
+                                    obj.questions=obj.q.map(x=>{return {q:x}});
+                                    obj.quniqueterms=obj.q.join(" ");
+                                }
+                                catch(err){
+                                    console.log("skipping question invalid answer format")
+                                }
                                 delete obj.q
                             }
                             docid = obj._id || obj.qid ;
@@ -187,4 +193,3 @@ exports.start=function(event,context,cb){
         data:x
     })))
 }
-
