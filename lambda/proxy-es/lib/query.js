@@ -7,7 +7,7 @@ var build_es_query = require('./esbodybuilder');
 var handlebars = require('./handlebars');
 var translate = require('./translate');
 var kendra = require('./kendraQuery');
-var kendra_fallback = require("./kendra")
+var kendra_fallback = require("./kendra");
 // const sleep = require('util').promisify(setTimeout);
 
 
@@ -262,9 +262,21 @@ async function get_hit(req, res) {
     }
     // Do we have a hit?
     if (hit) {
-
+        console.log("Setting topic for " + JSON.stringify(hit))
         // set res topic from document before running handlebars, so that handlebars can access or overwrite it.
-        _.set(res, "session.topic", _.get(hit, "t"));
+         _.set(res, "session.topic", _.get(hit, "t"));
+        if(_.get(hit, "t")){
+            if(!res._userInfo){
+                res._userInfo = {}
+            }
+            if(!res._userInfo.recentTopics){
+                res._userInfo.recentTopics = []
+            }
+            res._userInfo.recentTopics.push({
+                topic: _.get(hit, "t"),
+                dateTime: (new Date()).toISOString()
+            })
+        }
         // run handlebars template processing
         hit = await handlebars(req, res, hit);
 

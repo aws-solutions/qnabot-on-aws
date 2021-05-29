@@ -1,13 +1,13 @@
 <template lang='pug'>
   span(class="wrapper")
-    v-dialog(v-model="error")
+    v-dialog(v-model="error" scrollable width="auto")
         v-card(id="error-modal")
           v-card-title(primary-title) Error Loading Content
           v-card-text
-            v-subheader.error--text(v-if='error' id="add-error") {{errorMsg?errorMsg:'Unknown error'}}
-            v-card-actions
-              v-spacer
-              v-btn.lighten-3(@click="error=false;errorMsg='';$refs.file.value = [];" :class="{ teal: success}" ) close
+            li(v-for="error in errorList") {{error}}
+          v-card-actions
+            v-spacer
+            v-btn.lighten-3(@click="error=false;errorList=[];errorMsg='';$refs.file.value = [];" :class="{ teal: success}" ) close
     v-container(column grid-list-md id="page-import")
       v-layout(column)
         v-flex
@@ -96,7 +96,7 @@ const Promise = require('bluebird')
 const saveAs = require('file-saver').saveAs
 const axios = require('axios')
 const parseJson = require('json-parse-better-errors')
-
+var XLSX = require("xlsx")
 const _ = require('lodash')
 
 module.exports = {
@@ -110,7 +110,8 @@ module.exports = {
       errorMsg: "",
       success: '',
       jobs: [],
-      examples: []
+      examples: [],
+      errorList:[]
     }
   },
   components: {},
@@ -192,25 +193,27 @@ module.exports = {
       Promise.all(files.map(file => {
         return new Promise(function (res, rej) {
           const reader = new FileReader();
-          reader.onload = function (e) {
+          reader.onload = function(e){ 
             try {
-              res({
-                name: file.name,
-                data: parseJson(e.target.result)
-              })
+              self.parse(e.target.result).then((data) => {
+                res({
+                  name: file.name,
+                  data: data,
+                });
+              });
             } catch (e) {
               self.error = true;
-              self.errorMsg = e.toLocaleString();
+              self.addError(e.toLocaleString());
             }
           };
-          reader.readAsText(file);
+          reader.readAsArrayBuffer(file);
         })
       }))
       .map(result => self.upload(result.data, result.name))
       .catch(e => {
         console.log(e);
         self.error = true;
-        self.errorMsg = e ? e : 'Unknown error on Getfile';
+        self.addError(e ? e : 'Unknown error on Getfile');
       })
     },
     Geturl: function (event) {
@@ -224,25 +227,25 @@ module.exports = {
                 self.upload(data, name)
               } else {
                 self.error = true;
-                self.errorMsg = 'No data available to update';
+                self.addError('No data available to update');
               }
             })
             .catch(x => {
               self.error = true;
               if (x.status) {
-                self.errorMsg = `Error for ${name}: ${JSON.stringify({
+                self.addError(`Error for ${name}: ${JSON.stringify({
                   status: x.status,
                   message: x.response.error
-                })}`;
+                })}`);
               } else if (x.message) {
-                self.errorMsg = `Error for ${name}: ${x.message}`;
+                self.addError(`Error for ${name}: ${x.message}`);
               } else {
-                self.errorMsg = x;
+                self.addError(x);
               }
             })
       } catch (e) {
         self.error = true;
-        self.errorMsg = e ? e : 'Unknown error on url processing';
+        self.addError('Unknown error on url processing');
       }
     },
     upload: function (data, name = "import") {
@@ -251,6 +254,7 @@ module.exports = {
       if (data) {
         new Promise(function (res, rej) {
           if (data.qna.length) {
+            var id = name.replace(/[^a-zA-Z0-9-_\.]/g, ''); //removes all non URL safe characters
             self.$store.dispatch('api/startImport', {
               qa: data.qna,
               name: id
@@ -258,11 +262,11 @@ module.exports = {
             .then(res)
             .catch(e=>{
               self.error = true;
-              self.errorMsg = e ? e : 'Unknown error on upload dispatch';
+              self.addError(e ? e : 'Unknown error on upload dispatch');
             })
           } else {
             self.error = true;
-            self.errorMsg = 'Invalid or Empty File';
+            self.addError('Invalid or Empty File');
           }
         })
         .then(() => {
@@ -270,15 +274,150 @@ module.exports = {
         })
         .catch((e)=>{
           self.error = true;
-          self.errorMsg = e ? e : 'Unknown error on upload';
+          self.addError(e ? e : 'Unknown error on upload');
         })
       } else {
         self.error = true;
-        self.errorMsg = 'No content to upload';
+        self.addError('No content to upload');
       }
     },
-  }
-}
+    addError: function (error){
+      if(this.errorMsg == true){ //The error dialog has already been shown. Clear the errorList
+        this.errorList = []
+        this.errorMsg = false;
+      }
+      this.errorList.push(error);
+    },
+    parse: async function (content) {
+      var header_mapping = {
+        question: "q",
+        topic: "t",
+        markdown: "alt.markdown",
+        answer: "a",
+        "Answer": "a",
+        ssml: "alt.ssml",
+      };
+      var self = this;
+      try {
+        const enc = new TextDecoder('utf-8')
+        var jsonText = enc.decode(new Uint8Array(content))
+        return Promise.resolve(parseJson(jsonText));
+      } catch (err) {
+        try {
+          console.log(
+            "File is not a valid JSON file. Trying to parse as CSV file"
+          );
+      var workbook = XLSX.read(content, {
+        type: 'array'
+      });
+      var valid_questions = []
+      workbook.SheetNames.forEach(function(sheetName) {
+        // Here is your object
+        var XL_row_object = XLSX.utils.sheet_to_row_object_array(workbook.Sheets[sheetName]);
+        var json_object = JSON.stringify(XL_row_object);
+        var question_number = 1
+        XL_row_object.forEach(question =>{
+           console.log("Processing " + JSON.stringify(question))
+           for(const property in header_mapping){
+             var dest_property = header_mapping[property]
+             if(question[dest_property] == undefined){
+                _.set(question,dest_property.split("."),question[property])
+                console.log("Assigning value for " + dest_property)
+                delete question[property]
+             }
+           }
+           question_number++
+          if(question["cardtitle"] != undefined){
+            console.log("processing response title")
+            question.r = {}
+            question.r.title = question["cardtitle"]
+            if(question["imageurl"] != undefined){
+              question.r.imageUrl = question.imageurl
+            }
+            if(question["cardsubtitle"] != undefinded){
+              question.r.subTitle = question.subtitle
+            }
+            question.r.buttons = []
+            let i = 1
+            while(true){
+
+              console.log("Processing Button"+i)
+              var buttonFieldTextName = "displaytext"+i
+              var buttonFieldValueName = "buttonvalue"+i
+              i++
+              var undefinedButtonFieldCount = (question[buttonFieldTextName] == undefined) + (question[buttonFieldValueName] == undefined)
+              console.log("ButtonName " + question[buttonFieldTextName] + " ButtonValue " + question[buttonFieldValueName] )
+              console.log("Undefined field count " + undefinedButtonFieldCount)
+
+              if(undefinedButtonFieldCount == 2){
+                break
+              }
+              if(undefinedButtonFieldCount == 1){
+                self.addError(`Warning:  Both ${buttonFieldTextName} and ${buttonFieldValueName} must be defined for qid: "${question.qid}"`)
+                continue;
+              }
+              console.log("Found two values")
+              if(question[buttonFieldValueName].length > 80){
+                self.addError(`Warning: ${buttonFieldValueName} must be less than or equal to 80 characters for qid:"${question.qid}"`)
+                continue;
+              }
+              if(question[buttonFieldTextName].length > 80){
+                self.addError(`Warning: ${buttonFieldTextName} must be less than or equal to 80 characters for qid:"${question.qid}"`)
+                continue;
+              }
+              var button = {
+                  "text":question[buttonFieldTextName],
+                  "value":question[buttonFieldValueName]
+              }
+              console.log("Adding button "+ JSON.stringify(button))
+              question.r.buttons.push(button)
+             }
+           }
+           let counter = 1
+           question.q = question.q == undefined ? [] : question.q
+           while(true){
+             var userQuestion = question["question"+counter] 
+              if(userQuestion != undefined){
+                question.q.push(userQuestion)
+                counter++
+              }else{
+                break;
+              }
+           }
+          if(question.qid  == undefined){
+            self.addError(`Warning: No QID found for line ${question_number}. The question will be skipped.`)
+            return
+          }
+
+           if(question.a == undefined || question.a.replace(/[^a-zA-Z0-9-_]/g, '').trim().length == 0)
+           {
+             self.addError("Warning: No answer found for QID:\"" + question.qid + "\". The question will be skipped.")
+             return
+           }
+           if(question.q.length == 0){
+             self.addError("Warning: No questions found for QID: \"" + question.qid + "\". The question will be skipped.")
+             return
+           }
+           console.log("Processed "+ JSON.stringify(question))
+           valid_questions.push(question)
+
+           })
+
+      })
+        self.error = self.errorList.length != 0
+        return {
+          qna: valid_questions
+        }
+        } catch (err) {
+          self.addError("Parse error");
+          console.log(err);
+          throw err;
+        }
+      }
+    },
+
+  },
+};
 </script>
 
 <style lang='scss' scoped>
