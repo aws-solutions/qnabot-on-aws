@@ -6,7 +6,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "aws-sdk": "^2.827.0",
+    "aws-sdk": "^2.913.0",
     "aws4": "^1.6.0",
     "axios": "^0.21.1",
     "bluebird": "^3.5.1",
