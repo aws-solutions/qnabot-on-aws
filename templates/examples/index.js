@@ -6,7 +6,8 @@ var extensions=require(`./extensions`);
 var resources=Object.assign(examples,extensions);
 var outputs1=require('./outputs').outputs;
 var outputs2=require('./examples/responsebots').outputs;
-var outputs=Object.assign(outputs1,outputs2);
+var outputSNSTopic={"FeedbackSNSTopic":{"Value":{ "Ref" : "FeedbackSNS" }}}
+var outputs=Object.assign(outputs1,outputs2,outputSNSTopic);
 
 module.exports={
   "Resources":resources,

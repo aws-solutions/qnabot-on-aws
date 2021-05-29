@@ -316,8 +316,6 @@ function jslambda(name){
         },
         "Environment": {
           "Variables": {
-            "ES_QNA_TYPE": {"Ref":"QnAType"},
-            "ES_QUIZE_TYPE": {"Ref":"QuizType"},
             "ES_INDEX": {"Ref":"Index"},
             "FIREHOSE_NAME":{"Ref":"FeedbackFirehoseName"},
             "ES_ADDRESS": {"Ref":"ESAddress"},
@@ -361,8 +359,6 @@ function pylambda(name){
         },
         "Environment": {
           "Variables": {
-            "ES_QNA_TYPE": {"Ref":"QnAType"},
-            "ES_QUIZE_TYPE": {"Ref":"QuizType"},
             "ES_INDEX": {"Ref":"Index"},
             "FIREHOSE_NAME":{"Ref":"FeedbackFirehoseName"},
             "ES_ADDRESS": {"Ref":"ESAddress"},

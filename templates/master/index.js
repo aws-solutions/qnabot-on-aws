@@ -148,6 +148,9 @@ module.exports={
     },
     "DefaultUserPoolJwksUrlParameterName": {
       "Value":{"Ref":"DefaultUserPoolJwksUrl"}
+    },
+    "FeedbackSNSTopic": {
+        "Value":{"Fn::GetAtt": ["ExamplesStack", "Outputs.FeedbackSNSTopic"]}
     }
   },
   "Parameters": {

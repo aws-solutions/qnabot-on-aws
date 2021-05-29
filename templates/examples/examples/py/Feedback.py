@@ -10,7 +10,6 @@ import datetime
 def handler(event, context):
 
     print(json.dumps(event))
-    # event["res"]["session"]["previous"]["feedback"] = True
 
     kendraIndexId = None
     kendraQueryId = None
@@ -28,37 +27,37 @@ def handler(event, context):
     try:
         #get the Question ID (qid) of the previous document that was returned to the web client 
         previous = event["req"]["session"]["qnabotcontext"]["previous"]
-        previousQid = previous["qid"]
+        previousQid = previous["qid"] if "qid" in previous else "Answer via Kendra Fallback (no Qid matched)"
         previousQuestion = previous["q"]
         feedbackArg = event["res"]["result"]["args"][0]
-        print(feedbackArg)
-        
+        userInfo = event["req"]["_userInfo"]
+
         # - Check feedbackArg from the UI payload. Parse for "thumbs_down_arg" feedback. Based on user action, sendFeedback through SNS, and log in Firehose. 
         if feedbackArg == "incorrect":
-            sendFeedbackNotification(previousQid, previousQuestion, feedbackArg)
+            sendFeedbackNotification(previousQid, previousQuestion, feedbackArg, userInfo)
             if (kendraIndexId is not None) and (kendraResponsibleQid==previousQid or kendraResponsibleQid=='KendraFAQ'):
                 print("submitting NOT_RELEVANT to Kendra Feedback")
                 submitFeedbackForKendra(kendraIndexId, kendraQueryId, kendraResultId, "NOT_RELEVANT")
-            logFeedback(previousQid, previousQuestion, feedbackArg)
+            logFeedback(previousQid, previousQuestion, feedbackArg, userInfo)
             print("Negative feedback logged, and SNS notification sent")
-        
         else:
             if (kendraIndexId is not None) and (kendraResponsibleQid==previousQid or kendraResponsibleQid=='KendraFAQ'):
                 print("submitting RELEVANT to Kendra Feedback")
                 submitFeedbackForKendra(kendraIndexId, kendraQueryId, kendraResultId, "RELEVANT")
-            logFeedback(previousQid, previousQuestion, feedbackArg)
+            logFeedback(previousQid, previousQuestion, feedbackArg, userInfo)
             print("Positive feedback logged")
     except Exception as e:
-        print("Exception caught (no previous question?): ", e)
+        print("Exception caught: ", e)
         print("Feedback not logged.")
     return event
 
 #logs feedback for the questions
-def logFeedback(qid, question, inputText):
+def logFeedback(qid, question, feedbackArg, userInfo):
     jsonData = {"qid":"{0}".format(qid),
         "utterance":"{0}".format(question),
-        "feedback":"{0}".format(inputText),
-        "datetime":"{0}".format(datetime.datetime.now().isoformat())
+        "feedback":"{0}".format(feedbackArg),
+        "datetime":"{0}".format(datetime.datetime.now().isoformat()),
+        "userInfo":userInfo
     }
     jsondump=json.dumps(jsonData,ensure_ascii=False)
     client = boto3.client('firehose')
@@ -68,16 +67,24 @@ def logFeedback(qid, question, inputText):
             'Data': jsondump
         }
     )
-    #uncomment below if you would like to see the response returned by the firehose stream
-    #print(response)
+    print("Feedback logged via Firehose - response:", response)
 
 # - Sends SNS notification for feedback.
-def sendFeedbackNotification( qid, question, inputText):
-    
-    notificationBody = "\n\nTimestamp: {3} Question ID: {0}\nQuestion: {1} \nFeedback: {2}".format(qid,question,inputText, datetime.datetime.now().isoformat())
-   
-    #print(notificationBody)
-    message = {"qnabot": "publish to feedback topic"}
+def sendFeedbackNotification( qid, question, feedbackArg, userInfo):
+    user = ""
+    if ("GivenName" in userInfo):
+        user += userInfo["GivenName"]
+    if ("FamilyName" in userInfo):
+        user += " " + userInfo["FamilyName"]  
+    if ("Email" in userInfo):
+        user += " <" + userInfo["Email"] + ">"
+    stack = os.environ["CFSTACK"]
+    if feedbackArg == "incorrect":
+        message = "Negative feedback (Thumbs Down) received on QnABot answer:\n"
+    else: 
+        message = "Positive feedback (Thumbs Up) received on QnABot answer:\n"
+    notificationBody = f"\n{message}\n\tTimestamp: {datetime.datetime.now().isoformat()} \n\tQuestion ID: {qid} \n\tQuestion: {question} \n\tUser: {user} \n\tFeedback: {feedbackArg}"
+    print("Publishing SNS message: ", notificationBody)
     client = boto3.client('sns')
     response = client.publish(
         TargetArn=  os.environ['SNS_TOPIC_ARN'], 
@@ -86,11 +93,10 @@ def sendFeedbackNotification( qid, question, inputText):
         Subject='QnABot - Feedback received',
         MessageStructure='json'
     )
-
+    print("Feedback notification sent to SNS - response:", response)
 
 # - Sends feedback notification for Kendra feedback.
 def submitFeedbackForKendra(kendraIndexId, kendraQueryId, kendraResultId, kendraRelevancy):
-
     client = boto3.client('kendra')
     response = client.submit_feedback(
         IndexId=kendraIndexId,
@@ -102,4 +108,4 @@ def submitFeedbackForKendra(kendraIndexId, kendraQueryId, kendraResultId, kendra
             },
         ]
     )
-    print("Feedback submitted to Kendra")
+    print("Feedback submitted to Kendra - response", response)
