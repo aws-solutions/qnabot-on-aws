@@ -13,6 +13,7 @@ License for the specific language governing permissions and limitations under th
 var lib='./lib/middleware'
 var router=new (require('./lib/router'))()
 var fs=require('fs')
+const esWarmer=new (require('./lib/warmer'))();
 
 const filter = text => {
     if (process.env.DISABLECLOUDWATCHLOGGING === "true") {
@@ -42,6 +43,11 @@ var middleware=fs.readdirSync(`${__dirname}/${lib}`)
 
 exports.handler=function(event,context,callback){
     router.start(event,callback)
+}
+
+exports.warmer=async function(event,context,callback) {
+    await esWarmer.perform(event,context,callback);
+    return "complete";
 }
 
 
