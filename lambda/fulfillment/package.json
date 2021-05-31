@@ -10,7 +10,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "aws-sdk": "^2.824.0",
+    "aws-sdk": "^2.913.0",
     "bluebird": "^3.5.0",
     "bodybuilder": "^2.2.6",
     "elasticsearch": "^16.7.1",

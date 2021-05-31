@@ -108,11 +108,12 @@ module.exports = {
         "Statement": [{
           "Effect": "Allow",
           "Action": [
-            "lex:PostText"
+            "lex:PostText",
+            "lex:RecognizeText"
           ],
           "Resource": [
             "arn:aws:lex:*:*:bot:QNA*",
-            "arn:aws:lex:*:*:bot:QnA*",
+            "arn:aws:lex:*:*:bot*",
           ]
         }]
       },

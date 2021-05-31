@@ -83,7 +83,7 @@ module.exports=async function query(req,res) {
         console.log('Handling elicitResponse');
         let resp = await lexRouter.elicitResponse(req,res, elicitResponse);
         let progress = _.get(resp,"res.session.qnabotcontext.elicitResponse.progress", undefined);
-        if (progress === 'Fulfilled' || progress === 'ReadyForFulfillment' || progress === 'Failed') {
+        if (progress === 'Fulfilled' || progress === 'ReadyForFulfillment' || progress === 'Close' || progress === 'Failed') {
             console.log("Bot was fulfilled");
             // LexBot has completed. See if we need to using chaining to go to another question
             if (chainingConfig) {

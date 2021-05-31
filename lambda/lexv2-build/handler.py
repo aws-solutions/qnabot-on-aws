@@ -1,5 +1,5 @@
-# Creates or updates a Lex V2 QnABot bot by copying an existing Lex V1 QnABot bot
-# Automatically generates locales as specified by environment var LOACLES - from Cfn parameter.
+# Creates or updates a Lex V2 QnABot bot
+# Automatically generates locales as specified by environment var LOCALES - from Cfn parameter.
 
 import os
 import json

@@ -6,7 +6,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "aws-sdk": "^2.783.0",
+    "aws-sdk": "^2.913.0",
     "bluebird": "^3.5.1",
     "csv-parser": "^2.3.3",
     "csv-writer": "^1.6.0",
