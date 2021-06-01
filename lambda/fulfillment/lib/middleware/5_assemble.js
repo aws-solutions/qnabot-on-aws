@@ -29,8 +29,11 @@ function split_message(message) {
     return parts;
 }
 
+// Split multi-part sentences to enable barge in for long fulfillment messages when using Connect voice.. 
+// except when QnAbot is in ElicitResoonse mode.. in that case we keep the bot session with GetCustomerInput block open, so 
+// the Connect contact flow loop is not invoked (and CONNECT_NEXT_PROMPT would not be played)
 function connect_response(req, res) {
-    if (req._clientType == "LEX.AmazonConnect.Voice") {
+    if (req._clientType == "LEX.AmazonConnect.Voice" && ! _.get(res,"session.qnabotcontext.elicitResponse.responsebot")) {
         if (_.get(req,"_settings.CONNECT_ENABLE_VOICE_RESPONSE_INTERRUPT")) {
             console.log("CONNECT_ENABLE_VOICE_RESPONSE_INTERRUPT is true. splitting response.")
             // split multi sentence responses.. First sentence stays in response, remaining sentences get prepended to next prompt session attribute.
