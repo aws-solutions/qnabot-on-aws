@@ -33,7 +33,7 @@ function isConnectClient(req) {
 }
 
 async function translate_res(req, res){
-    const locale = _.get(req, 'session.userLocale');
+    const locale = _.get(req, 'session.qnabotcontext.userLocale');
     if (_.get(req._settings, 'ENABLE_MULTI_LANGUAGE_SUPPORT')){
         if (_.get(res,"message")) {
             res.message = await translate.get_translation(res.message,'en',locale,req);

@@ -70,9 +70,11 @@
     "_userId": "us-east-1:6da887b1-e551-49a3-b3e4-cdd699d6d712",
     "question": "what are the main goals of an economy?",
     "session": {
+        "qnabotcontext": {
+            "userLocale": "en"
+        }
         "userDetectedLocale": "en",
-        "userDetectedLocaleConfidence": 0.9996602535247803,
-        "userLocale": "en"
+        "userDetectedLocaleConfidence": 0.9996602535247803
     },
     "_preferredResponseType": "PlainText",
     "_clientType": "LEX.LexWebUI.Text",

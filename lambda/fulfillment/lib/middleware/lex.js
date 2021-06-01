@@ -80,8 +80,8 @@ function parseLexV2Event(event) {
     const mode = _.get(event,"inputMode") ;
     if (mode == "Speech") {
         const lex_locale = _.get(event,'bot.localeId').split("_")[0];
-        out.session.userPreferredLocale = lex_locale;
-        console.log("LexV2 in voice mode - Set userPreferredLocale from lex V2 bot locale:", out.session.userPreferredLocale);
+        out.session.qnabotcontext.userPreferredLocale = lex_locale;
+        console.log("LexV2 in voice mode - Set userPreferredLocale from lex V2 bot locale:", out.session.qnabotcontext.userPreferredLocale);
     } 
     return out;
 }

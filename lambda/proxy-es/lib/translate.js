@@ -90,7 +90,7 @@ exports.translate_hit = async function(hit,usrLang,req){
     }
     if (rp && _.get(hit,'autotranslate.rp')) {
         try {
-            hit_out.rp = await get_translation(hit_out.rp, usrLang);
+            hit_out.rp = await get_translation(hit_out.rp, usrLang, req);
         } catch (e) {
             console.log("ERROR: Reprompt caused Translate exception: ", rp);
             throw (e);
