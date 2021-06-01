@@ -115,8 +115,8 @@ Handlebars.registerHelper('defaultLang', function (options) {
 
 Handlebars.registerHelper('setLang', function (lang, last, options) {
     if (_.get(req_glbl._settings, 'ENABLE_MULTI_LANGUAGE_SUPPORT')) {
-        const userPreferredLocaleKey = 'session.userPreferredLocale';
-        const userLocaleKey = 'session.userLocale';
+        const userPreferredLocaleKey = 'session.qnabotcontext.userPreferredLocale';
+        const userLocaleKey = 'session.qnabotcontext.userLocale';
         const currentPreferredLocale = _.get(res_glbl, userPreferredLocaleKey);
         const currentUserLocale = _.get(res_glbl, userLocaleKey);
         const errorLocale = currentPreferredLocale ? currentPreferredLocale : (currentUserLocale ? currentUserLocale : "en");
@@ -138,7 +138,7 @@ Handlebars.registerHelper('setLang', function (lang, last, options) {
 
         if (userLanguageCode && lang == userLanguageCode) {
             console.log("setting: ", options.fn(this));
-            console.log("Setting req & res session attribute:", "session.userPreferredLocale", " Value:", userLanguageCode);
+            console.log("Setting req & res session attribute:", "session.qnabotcontext.userPreferredLocale", " Value:", userLanguageCode);
             _.set(res_glbl, userPreferredLocaleKey, userLanguageCode);
             _.set(req_glbl, userPreferredLocaleKey, userLanguageCode);
             _.set(res_glbl, userLocaleKey, userLanguageCode);

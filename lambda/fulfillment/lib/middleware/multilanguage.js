@@ -137,9 +137,9 @@ exports.set_multilang_env = async function (req) {
     let userLocale = '';
     const defaultConfidenceScore = req._settings.MINIMUM_CONFIDENCE_SCORE;
     const userLanguages = await get_userLanguages(req.question);
-    const userPreferredLocale = req.session.userPreferredLocale ? req.session.userPreferredLocale : '';
+    const userPreferredLocale = _.get(req, "session.qnabotcontext.userPreferredLocale") ? req.session.qnabotcontext.userPreferredLocale : '';
     userLocale = set_userLocale(userLanguages, userPreferredLocale, defaultConfidenceScore, req);
-    _.set(req.session, "userLocale", userLocale);
+    _.set(req.session, "qnabotcontext.userLocale", userLocale);
     _.set(req._event, "origQuestion", req.question);
     await set_translated_transcript(userLocale, req);
 
