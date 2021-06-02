@@ -11,7 +11,7 @@
   "dependencies": {
     "bluebird": "^3.5.1",
     "cfn-response": "^1.0.1",
-    "handlebars": "^4.7.6",
+    "handlebars": "^4.7.7",
     "lodash": "^4.17.21"
   }
 }
