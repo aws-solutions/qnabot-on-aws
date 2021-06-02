@@ -41,7 +41,7 @@ function parseLexV1Event(event) {
         _lexVersion: "V1",
         _userId: _.get(event, "userId", "Unknown Lex User"),
         intentname: _.get(event, 'sessionState.intent.name'),
-        question: _.get(event, 'inputTranscript'),
+        question: _.get(event, 'inputTranscript').trim(),
         session: _.mapValues(
             _.get(event, 'sessionAttributes', {}),
             x => {

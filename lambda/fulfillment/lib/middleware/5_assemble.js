@@ -3,6 +3,8 @@ var lex=require('./lex')
 var alexa=require('./alexa')
 var _=require('lodash')
 var util=require('./util')
+var translate = require('./multilanguage.js')
+
 
 function sms_hint(req,res) {
     var hint = "";
@@ -29,10 +31,21 @@ function split_message(message) {
     return parts;
 }
 
-// Split multi-part sentences to enable barge in for long fulfillment messages when using Connect voice.. 
-// except when QnAbot is in ElicitResoonse mode.. in that case we keep the bot session with GetCustomerInput block open, so 
-// the Connect contact flow loop is not invoked (and CONNECT_NEXT_PROMPT would not be played)
-function connect_response(req, res) {
+
+async function connect_response(req, res) {
+    // If QnABot is in multi language mode, translate NextPrompt into target language
+    if (_.get(req._settings, 'ENABLE_MULTI_LANGUAGE_SUPPORT')){
+        const locale = _.get(req, 'session.qnabotcontext.userLocale');
+        let nextPromptVarName = _.get(req,"_settings.CONNECT_NEXT_PROMPT_VARNAME",'nextPrompt') ;
+        let prompt = _.get(res.session,nextPromptVarName,"");
+        if (prompt) {
+            prompt = await translate.get_translation(prompt,'auto',locale,req);
+        }
+        _.set(res.session,nextPromptVarName,prompt);
+    }
+    // Split multi-part sentences to enable barge in for long fulfillment messages when using Connect voice.. 
+    // except when QnAbot is in ElicitResoonse mode.. in that case we keep the bot session with GetCustomerInput block open, so 
+    // the Connect contact flow loop is not invoked (and CONNECT_NEXT_PROMPT would not be played)
     if (req._clientType == "LEX.AmazonConnect.Voice" && ! _.get(res,"session.qnabotcontext.elicitResponse.responsebot")) {
         if (_.get(req,"_settings.CONNECT_ENABLE_VOICE_RESPONSE_INTERRUPT")) {
             console.log("CONNECT_ENABLE_VOICE_RESPONSE_INTERRUPT is true. splitting response.")
@@ -103,7 +116,7 @@ module.exports=async function assemble(req,res){
     res.message += sms_hint(req,res);
     
     // enable interruptable bot response for Connect
-    res = connect_response(req,res);
+    res = await connect_response(req,res);
 
     
     res.session=_.mapValues(
