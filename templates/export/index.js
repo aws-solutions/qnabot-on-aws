@@ -20,9 +20,17 @@ module.exports={
         "EsEndpoint": {"Type":"String"},
         "EsProxyLambda": {"Type":"String"},
         "ExportBucket": {"Type":"String"},
+        "LexVersion": {"Type":"String"},
+        // Lex V1
         "FallbackIntent": {"Type":"String"},
         "Intent":{"Type":"String"},
         "BotName":{"Type":"String"},
+        // Lex V2
+        "LexV2BotName": {"Type":"String"},
+        "LexV2BotId": {"Type":"String"},
+        "LexV2BotAlias": {"Type":"String"},
+        "LexV2BotAliasId": {"Type":"String"},
+        "LexV2BotLocaleIds": {"Type":"String"},
         "Api":{"Type":"String"},
         "ApiRootResourceId":{"Type":"String"},
         "Encryption":{"Type":"String"},

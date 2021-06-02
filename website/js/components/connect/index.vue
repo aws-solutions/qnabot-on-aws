@@ -251,7 +251,7 @@ module.exports={
           var spanBot = document.getElementById("spnBotname")
           if(spanBot)
           {
-            self.$store.dispatch("api/botinfo").then((result) => spanBot.innerHTML = result.botname);
+            self.$store.dispatch("api/botinfo").then((result) => spanBot.innerHTML = (result.botname === "LEX V1 Bot not installed") ? result.lexV2botname : result.botname );
           }
 
         })

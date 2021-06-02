@@ -35,11 +35,21 @@ module.exports = Object.assign(
         },
         "Environment": {
           "Variables": {
+            outputBucket: {"Ref": "ExportBucket"},
+            s3Prefix: "connect/",
+            accountId: {"Ref": "AWS::AccountId"},
+            region: {"Ref": "AWS::Region"},
+            LexVersion: {"Ref": "LexVersion"},
+            // Lex V1
             fallBackIntent: {"Ref": "FallbackIntent"},
             intent: {"Ref": "Intent"},
             lexBot: {"Ref": "BotName"},
-            outputBucket: {"Ref": "ExportBucket"},
-            s3Prefix: "connect/"
+            // Lex V2
+            LexV2BotName: {"Ref": "LexV2BotName"},
+            LexV2BotId: {"Ref": "LexV2BotId"},
+            LexV2BotAlias: {"Ref": "LexV2BotAlias"},
+            LexV2BotAliasId: {"Ref": "LexV2BotAliasId"},
+            LexV2BotLocaleIds: {"Ref": "LexV2BotLocaleIds"}
           }
         },
         "Handler": "index.handler",
