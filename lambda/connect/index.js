@@ -105,7 +105,7 @@ async function createCallFlowLexV2() {
 
         let metadata = element.metadata;
         metadata.lexV2BotName = process.env.LexV2BotName;
-        metadata.lexV2BotAliasName = process.env.lexV2BotAliasName;
+        metadata.lexV2BotAliasName = process.env.LexV2BotAlias;
     }
     
     let configFile = path.join(`${__dirname}`,"questions.json");
