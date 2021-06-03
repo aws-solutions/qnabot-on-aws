@@ -227,7 +227,7 @@ module.exports={
     "LexV2BotLocaleIds":{
         "Description" : "Languages for QnABot voice interaction using LexV2. Specify as a comma separated list of valid Locale IDs - see https://docs.aws.amazon.com/lexv2/latest/dg/how-languages.html", 
         "Type": "String",
-        "Default": "en_US,es_US"
+        "Default": "en_US,es_US,fr_CA"
     },
     "LexBotVersion":{
         "Description" : "Lex versions to use for QnABot. Select 'LexV2 Only' to install QnABot in AWS reqions where LexV1 is not supported.",
