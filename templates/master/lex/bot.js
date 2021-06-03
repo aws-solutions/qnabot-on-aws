@@ -132,6 +132,7 @@ module.exports={
           ]
         },
         "description": "QnABot Lex V2 Bot" + qnabotversion,
+        "BuildDate":(new Date()).toISOString(),
         "localIds": {"Ref": "LexV2BotLocaleIds"},
         "utterances": config.utterances
       }

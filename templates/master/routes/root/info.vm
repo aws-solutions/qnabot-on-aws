@@ -8,7 +8,7 @@
     "BotVersion":"$LATEST",
     "v2BotId": "${LexV2Bot.botId}",
     "v2BotAliasId": "${LexV2Bot.botAliasId}",
-    "v2BotLocaleId": "${LexV2Bot.botLocaleIds}",
+    "v2BotLocaleId": "${LexV2BotLocaleIds}",
     "PoolId":"${IdPool}",
     "StackName":"${AWS::StackName}",
     "ClientIdClient":"${ClientClient}",

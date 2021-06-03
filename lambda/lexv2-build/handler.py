@@ -563,7 +563,7 @@ def build_all(utterances):
         "botAliasId": botAliasId,
         "botIntent": INTENT,
         "botIntentFallback": "FallbackIntent",
-        "botLocaleIds": ", ".join(LEXV2_BOT_LOCALE_IDS)
+        "botLocaleIds": ",".join(LEXV2_BOT_LOCALE_IDS)
     }
     status("READY")
     return result
