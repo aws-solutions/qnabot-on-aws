@@ -212,7 +212,7 @@ def lexV2_qna_intent_slot(slotName, intentId, slotTypeId, botId, botVersion, loc
             ], 
             "maxRetries": 4
         }, 
-        "slotConstraint": "Required"
+        "slotConstraint": "Optional"
     }
     slotParams = {
         "slotName": slotName,
