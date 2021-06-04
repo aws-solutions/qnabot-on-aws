@@ -31,7 +31,7 @@ var default_settings = {
     KENDRA_INDEXER_SCHEDULE: "rate(1 day)",//See https://docs.aws.amazon.com/AmazonCloudWatch/latest/events/ScheduledEvents.html for valid expressions
     KENDRA_WEB_PAGE_INDEX: "${DefaultKendraIndexId}",//The index to use for the web crawler, a custom data source will automatically be added to the specified index.  The index will automatically be added to ALT_SEARCH_KENDRA_INDEXES
     ERRORMESSAGE: "Unfortunately I encountered an error when searching for your answer. Please ask me again later.",
-    EMPTYMESSAGE: "You stumped me! Sadly I don't know how to answer your question.",
+    EMPTYMESSAGE: "You stumped me! Sadly I do not know how to answer your question.",
     DEFAULT_ALEXA_LAUNCH_MESSAGE: "Hello, Please ask a question",
     DEFAULT_ALEXA_REPROMPT: "Please either answer the question, ask another question or say Goodbye to end the conversation.",
     DEFAULT_ALEXA_STOP_MESSAGE: "Goodbye",
