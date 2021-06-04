@@ -252,7 +252,7 @@ function assembleLexV2Response(response) {
     let qnabotcontext = JSON.parse(response.session.qnabotcontext);
     if (_.get(qnabotcontext,"elicitResponse.responsebot")) {
         out.sessionState.dialogAction.type="ElicitIntent";
-        delete out.dialogAction.intent;
+        delete out.sessionState.intent;
     }
     return out;
 }
