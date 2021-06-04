@@ -334,7 +334,7 @@ module.exports = {
             if(question["imageurl"] != undefined){
               question.r.imageUrl = question.imageurl
             }
-            if(question["cardsubtitle"] != undefinded){
+            if(question["cardsubtitle"] != undefined){
               question.r.subTitle = question.subtitle
             }
             question.r.buttons = []
