@@ -1,14 +1,26 @@
 # VPC Support - Preview Mode
 (version 1.0 - December 2020)
 
-QnABot now provides in Preview Mode deployment using a VPC. 
+This feature allows deployment of QnABot components within VPC infrastructure via a new template named public-vpc-support.json.
+This template is made available for use as a separate installation mechanism. It is not the default template utilized in the
+public distribution buckets. Please take care in deploying QnABot in VPC. The Elasticsearch Cluster
+becomes bound to the VPC as well as the Lambda's installed. The Elasticsearch cluster is no longer available
+outside of the VPC. All Lambdas are bound to the VPC to allow communication with the cluster. 
+
+Two additional parameters are required by this template.
+
+- VPCSubnetIdList (two private subnets spread over two availability zones - see below)
+- VPCSecurityGroupIdList (see below)
 
 ### Requirements
 
 In order for deployment of resources attaching within a VPC two requirements
 must be met.
 
-1) A fully functioning VPC with a minimum of two private subnets spread over two availability zones is required. In addition
+1) A fully functioning VPC with a minimum of two private subnets spread over two availability zones is required. 
+   These private VPC subnets should have access to AWS services. This can be accomplished using NAT Gateway with proper IGW 
+   configuration / routing. Other third party gateway implementations can be used that provide access to AWS services. 
+   
 2) A pre-configured VPC security group that 
     1) allows inbound connections on port 443 from other addresses in the VPC CIDR block. For example,
        if the VPC's CIDR block is 10.178.0.0/16, inbound connections in the security
@@ -55,4 +67,3 @@ VPN or Direct Connect to the VPC.
 
 * The API Gateway used by the Designer UI is still available publicly and access is
 still authorized using Cognito. The Lambda's backing the API will run within the VPC.
-
