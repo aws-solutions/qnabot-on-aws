@@ -1,3 +1,22 @@
+## [4.7.0]
+- QnABot now supports LexV2 with voice interaction in multiple languages.
+  - Two installation/update modes are now available:
+    - (i) LexV1 + LexV2 (default, recommended for most AWS regions.
+    - (ii) LexV2-only (currently recommended for AWS regions where LexV1 is not available).
+  - LexV2 locales are specified via a new CloudFormation parameter
+    - The default locales are US English, US Spanish and Canadian French.
+- The QnABot web client now uses LexV2 and supports dynamic bot locale selection from a new title bar menu.
+- Custom LexV2 Elicit Response bots are now supported. The built-in response bots still use LexV1 and are
+  available only when QnABot is installed in LexV1+LexV2 mode.
+- CloudFormation deployment is now available for Canada/Montreal region (LexV2-only mode).
+- Amazon Connect integration in the Canada/Montreal region supports multiple voice languages using LexV2.
+- The Content Designer 'Test All' feature now uses LexV2.
+- Content Designer's "Rebuild Lex Bot" feature now rebuilds both LexV2 and LexV1 bots
+- Non-English LexV2 bot locales are automatically generated with sample utterances translated from English questions using Amazon Translate.
+- Content Designer's Import feature now supports Excel spreadsheets as well as the existing JSON format.
+- QnABot's Elasticsearch cache is now automatically kept warm to improve query time consistency.
+- Negative feedback (thumbs down) messages can now generate notifications (text, email, etc.) using Amazon SNS.
+
 ## [4.5.2]
 - Fix for new Kendra resources deployed in VPC addressing issues in 4.5.0 and 4.5.1.
 ## [4.5.1]
