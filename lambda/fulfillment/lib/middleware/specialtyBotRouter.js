@@ -6,7 +6,7 @@
  */
 const _=require('lodash');
 const AWS = require('aws-sdk');
-const multilanguage = require('./multilanguage.js');
+const translate = require('./multilanguage.js');
 
 /**
  * Identifies the user to pass on for requests to Lex or other bots
@@ -32,22 +32,22 @@ async function translate_res(req, res){
     const locale = _.get(req, 'session.userLocale');
     if (_.get(req._settings, 'ENABLE_MULTI_LANGUAGE_SUPPORT')){
         if (_.get(res,"message")) {
-            res.message = await translate.translateText(res.message,'en',locale);
+            res.message = await translate.get_translation(res.message,'en',locale,req);
         }
         if (_.get(res,"plainMessage")) {
-            res.plainMessage = await translate.translateText(res.plainMessage,'en',locale);
+            res.plainMessage = await translate.get_translation(res.plainMessage,'en',locale,req);
         }
         if (_.get(res,"card")) {
-            res.card.title = await translate.translateText(res.card.title,'en',locale);
+            res.card.title = await translate.get_translation(res.card.title,'en',locale,req);
         }
         if (_.get(res,"card.buttons")) {
             res.card.buttons.forEach(async function (button) {
-                button.text = await translate.translateText(button.text,'en',locale);
+                button.text = await translate.get_translation(button.text,'en',locale,req);
                 //TODO Address multilanguage issues with translating button values for use in confirmation prompts
                 //Disable translate of button value
                 //button.value = await translate.translateText(button.value,'en',locale);
             });
-            res.plainMessage = await translate.translateText(res.plainMessage,'en',locale);
+            res.plainMessage = await translate.get_translation(res.plainMessage,'en',locale,req);
         }
     }
     return res;
