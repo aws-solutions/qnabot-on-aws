@@ -6,8 +6,6 @@ import datetime
 import calendar
 import urllib3
 import urllib.parse
-urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
-import fuzzywuzzy
 from fuzzywuzzy import fuzz
 from fuzzywuzzy import process
 
@@ -16,12 +14,14 @@ from fuzzywuzzy import process
 import canvasapi
 from canvasapi import Canvas
 
+
 #----------------------------------------------------------------------
 # function: get_secret
 #----------------------------------------------------------------------
-def get_secret(domain):
 
-    secrets_id_name = os.environ['CANVAS_API_KEY_SECRETS_ID_NAME']
+
+def get_secret(secrets_id_name,domain):
+
     region_name = os.environ['AWS_REGION']
 
     # Create a Secrets Manager client
@@ -35,6 +35,9 @@ def get_secret(domain):
     # See https://docs.aws.amazon.com/secretsmanager/latest/apireference/API_GetSecretValue.html
     # We rethrow the exception by default.
 
+    if secrets_id_name:
+        print(secrets_id_name)
+        
     try:
         get_secret_value_response = client.get_secret_value(
             SecretId=secrets_id_name
@@ -76,14 +79,18 @@ def get_secret(domain):
 # function: query_enrollments_for_student
 #----------------------------------------------------------------------
 def query_enrollments_for_student(canvas, student_email_address, userinput):
+    print(student_email_address)
 
 
     enrollments_for_student = 'You are not currently enrolled in any courses.'
 
-    user = canvas.get_user_by_email_address(urllib.parse.quote(student_email_address))
-
+ 
+    account = canvas.get_accounts()
+    for i in account:
+    user = account.get_users(urllib.parse.quote(student_email_address))
+    
     if user:
-        user = canvas.get_user(user.id)
+        user = canvas.get_user(user[0].id)
         courses = user.get_courses(enrollment_status='active',include=['syllabus_body'])
 
         course_name = []
@@ -102,9 +109,12 @@ def query_enrollments_for_student(canvas, student_email_address, userinput):
 
 def query_choices_for_student(canvas, student_email_address, userinput):
 
-    user = canvas.get_user_by_email_address(urllib.parse.quote(student_email_address))
+    account = canvas.get_accounts()
+    for i in account:
+    user = account.get_users(urllib.parse.quote(student_email_address))
+    
     if user:
-        user = canvas.get_user(user.id)
+        user = canvas.get_user(user[0].id)
         courses = user.get_courses(enrollment_status='active')
 
         if courses: 
@@ -128,10 +138,14 @@ def query_assignment_due_dates(canvas, student_email_address, userinput):
     assignment_due_dates = '<ul>'
 
     # Get the user from the email address
-    user = canvas.get_user_by_email_address(urllib.parse.quote(student_email_address))
-    course_list = []
+    account = canvas.get_accounts()
+    for i in account:
+    user = account.get_users(urllib.parse.quote(student_email_address))
+    
     if user:
-        
+        user = canvas.get_user(user[0].id)
+        course_list = []
+
             
         courses = user.get_courses(enrollment_status='active')
     
@@ -219,9 +233,14 @@ def query_grades_for_student(canvas, student_email_address, userinput):
 
 
     # Get the user from the email address
-    user = canvas.get_user_by_email_address(urllib.parse.quote(student_email_address))
-    course_list = []
+    account = canvas.get_accounts()
+    for i in account:
+    user = account.get_users(urllib.parse.quote(student_email_address))
+    
     if user:
+        user = canvas.get_user(user[0].id)
+        course_list = []
+
         courses = user.get_enrollments(include='current_points', search_by='course')
         course_grades = "|Course|Grade|\n|:------------|:-----------------:|"
         for grade in courses:
@@ -242,13 +261,13 @@ def query_syllabus_for_student(canvas, student_email_address, userinput):
 
     no_syllabus = 'There is no syllabus currently available for this course.'
 
-    user = canvas.get_user_by_email_address(urllib.parse.quote(student_email_address))
+    account = canvas.get_accounts()
+    for i in account:
+    user = account.get_users(urllib.parse.quote(student_email_address))
     
-
     if user:
-
+        user = canvas.get_user(user[0].id)
         user = canvas.get_user(user.id)
-        
         course_list = []
 
         courses = user.get_courses(enrollment_status='active',include=['syllabus_body'])
@@ -263,7 +282,7 @@ def query_syllabus_for_student(canvas, student_email_address, userinput):
             for course in courses:
                 if course.name == choice[0]:
                     if course.syllabus_body:
-                        course_syllabus = "{}/courses/{}/assignments/syllabus".format(os.environ['CANVAS_DOMAIN_URL'],course.id)
+                        course_syllabus = "{}/courses/{}/assignments/syllabus".format(domain,course.id)
                     else:
                         course_syllabus = 'There is no syllabus posted for this course'
 
@@ -301,6 +320,7 @@ def validate_input(event):
 # function handler
 #----------------------------------------------------------------------
 def lambda_handler(event, context):
+    print('hello world')
     userinput = event["req"]["_event"]["inputTranscript"]
 
     return_message = ''
@@ -317,13 +337,17 @@ def lambda_handler(event, context):
     else:
 
         # Get the API domain. This will be need for API calls and for looking up the bearer token.
-        domain = os.environ['CANVAS_DOMAIN_URL']
+        domain = event['req']['_settings']['CanvasDomainName']
+        secrets_id_name = event['req']['_settings']['CanvasAPIKey']
+        print(domain + ' ' + secrets_id_name)
 
         # Get the bearer token from Secrets Manager.
-        api_token = get_secret(domain)
+        api_token = get_secret(secrets_id_name,domain)
+        print(api_token)
 
         # Initialize a new Canvas object
         canvas = Canvas(domain, api_token)
+        
 
         try:
 
@@ -420,4 +444,3 @@ def lambda_handler(event, context):
   
     # Return the result.
     return event
-
