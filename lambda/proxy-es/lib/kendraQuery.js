@@ -11,6 +11,19 @@ const AWS = require('aws-sdk');
 var build_es_query = require('./esbodybuilder');
 var request = require('./request');
 
+function confidence_filter(minimum_score,kendra_result){
+    var confidences = ["LOW","MEDIUM","HIGH","VERY_HIGH"]
+    var index = confidences.findIndex( i => i == minimum_score.toUpperCase())
+    if(index == undefined){
+        console.log("Warning: ALT_SEARCH_KENDRA_CONFIDENCE_SCORE should be one of 'VERY_HIGH'|'HIGH'|'MEDIUM'|'LOW'")
+        return true;
+    }
+    confidences = confidences.slice(index)
+    console.log("Testing confidences: Allowed - " + JSON.stringify(confidences) + " Actual - " + _.get(kendra_result,"ScoreAttributes.ScoreConfidence") )
+    const found = confidences.find(element => element == _.get(kendra_result,"ScoreAttributes.ScoreConfidence")) != undefined
+    return found
+
+}
 
 async function run_query_es(params, qid) {
     console.log("run_query_es params: ", params);
@@ -58,6 +71,7 @@ function kendraRequester(kendraClient,params,resArray) {
 function hasJsonStructure(str) {
     if (typeof str !== 'string') return false;
     try {
+        console.log('hasJsonStructure ' + str)
         const result = JSON.parse(str);
         const type = Object.prototype.toString.call(result);
         return type === '[object Object]' 
@@ -136,6 +150,10 @@ async function routeKendraRequest(request_params) {
             var i, element;
             for (i=0; i<res.ResultItems.length; i++) {
                 element = res.ResultItems[i];
+
+                if(!confidence_filter(request_params.minimum_score,element))
+                    continue;
+
                 /* Note - only FAQ format will be provided back to the requester */
                 if (element.Type === 'QUESTION_ANSWER' && foundAnswerCount < request_params.size && element.AdditionalAttributes &&
                     element.AdditionalAttributes.length > 1) {
@@ -149,8 +167,13 @@ async function routeKendraRequest(request_params) {
                         // FAQ only references the QID but doesn't contain the full docunment.. retrieve it from ES
                         console.log("Kendra matched qid: ", qid, ". Retrieving full document from Elasticsearch.");
                         let es_response = await run_query_es(request_params, qid) ;
-                        console.log("Qid document from Elasticsearch: ", JSON.stringify(hit));
-                        hit = _.get(es_response, "hits.hits[0]._source");
+                        console.log("Qid document from Kendra: ", JSON.stringify(hit));
+                        hit = _.get(es_response, "hits.hits[0]._source"); //todo fix if null -- test from content designer
+                        if(hit == null){
+                            console.log("WARNING: An answer was found in Kendrs FAQ, but a corresponding answer was not found in ElasticSearch for "+ hit)
+                            continue;
+
+                        }
                     }
                     
                     console.log(`hit is ${JSON.stringify(hit)}`);

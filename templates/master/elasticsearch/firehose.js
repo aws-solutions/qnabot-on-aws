@@ -3,6 +3,9 @@ module.exports={
         "Type" : "AWS::KinesisFirehose::DeliveryStream",
         "Properties" : {
             "DeliveryStreamType" : "DirectPut",
+            "DeliveryStreamEncryptionConfigurationInput": {
+              "KeyType": "AWS_OWNED_CMK"
+            },
             "ElasticsearchDestinationConfiguration" : {
                 "BufferingHints" : {
                     "IntervalInSeconds" : 60,
@@ -42,6 +45,9 @@ module.exports={
         "Type" : "AWS::KinesisFirehose::DeliveryStream",
         "Properties" : {
             "DeliveryStreamType" : "DirectPut",
+            "DeliveryStreamEncryptionConfigurationInput": {
+              "KeyType": "AWS_OWNED_CMK"
+            },
             "ElasticsearchDestinationConfiguration" : {
                 "BufferingHints" : {
                     "IntervalInSeconds" : 60,

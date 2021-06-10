@@ -6,8 +6,8 @@ module.exports={
             "Parameters" :{
                 "CFNLambda":{"Fn::GetAtt":["CFNLambda","Arn"]},
                 "CFNInvokePolicy":{"Ref":"CFNInvokePolicy"},
-                "BotName":{"Ref":"LexBot"},
-                "BotAlias":{"Ref":"VersionAlias"},
+                "LexV2BotId":{"Fn::GetAtt":["LexV2Bot","botId"]},
+                "LexV2BotAliasId":{"Fn::GetAtt":["LexV2Bot","botAliasId"]},
                 "BootstrapBucket":{"Ref":"BootstrapBucket"},
                 "BootstrapPrefix":{"Ref":"BootstrapPrefix"},
                 "VarIndex": {"Fn::GetAtt": ["Var", "QnaIndex"]},

@@ -146,7 +146,7 @@ module.exports=Object.assign(
         "Handler": "cfn.handler",
         "MemorySize": "128",
         "Role":{"Ref":"CFNLambdaRole"} ,
-        "Runtime": "nodejs10.x",
+        "Runtime": "nodejs12.x",
         "Timeout": 300,        
         "VpcConfig" : {
           "Fn::If": [ "VPCEnabled", {
@@ -316,8 +316,6 @@ function jslambda(name){
         },
         "Environment": {
           "Variables": {
-            "ES_QNA_TYPE": {"Ref":"QnAType"},
-            "ES_QUIZE_TYPE": {"Ref":"QuizType"},
             "ES_INDEX": {"Ref":"Index"},
             "FIREHOSE_NAME":{"Ref":"FeedbackFirehoseName"},
             "ES_ADDRESS": {"Ref":"ESAddress"},
@@ -328,7 +326,7 @@ function jslambda(name){
         "Handler":`js/${name}.handler`,
         "MemorySize": "128",
         "Role": {"Fn::GetAtt": ["ExampleLambdaRole","Arn"]},
-        "Runtime": "nodejs10.x",
+        "Runtime": "nodejs12.x",
         "Timeout": 300,
         "VpcConfig" : {
             "Fn::If": [ "VPCEnabled", {
@@ -361,8 +359,6 @@ function pylambda(name){
         },
         "Environment": {
           "Variables": {
-            "ES_QNA_TYPE": {"Ref":"QnAType"},
-            "ES_QUIZE_TYPE": {"Ref":"QuizType"},
             "ES_INDEX": {"Ref":"Index"},
             "FIREHOSE_NAME":{"Ref":"FeedbackFirehoseName"},
             "ES_ADDRESS": {"Ref":"ESAddress"},

@@ -11,28 +11,31 @@ module.exports={
         UTTERANCE_KEY:"default-utterances.json",
         POLL_LAMBDA:{"Fn::GetAtt":["LexBuildLambdaPoll","Arn"]},
         STATUS_BUCKET:{"Ref":"BuildStatusBucket"},
-        STATUS_KEY:"status.json",
-        BOTNAME:{"Ref":"LexBot"},
-        BOTALIAS:{"Ref":"VersionAlias"},
-        SLOTTYPE:{"Ref":"SlotType"},
-        INTENT:{"Ref":"Intent"},
-        INTENTFALLBACK:{"Ref":"IntentFallback"},
+        STATUS_KEY:{"Fn::If": ["CreateLexV1Bots", "status.json", {"Ref":"AWS::NoValue"}]},
+        LEXV2_STATUS_KEY:"lexV2status.json",
+        BOTNAME: {"Fn::If": ["CreateLexV1Bots", {"Ref":"LexBot"}, {"Ref":"AWS::NoValue"}]},
+        BOTALIAS:{"Fn::If": ["CreateLexV1Bots", {"Ref":"VersionAlias"}, {"Ref":"AWS::NoValue"}]},
+        SLOTTYPE:{"Fn::If": ["CreateLexV1Bots", {"Ref":"SlotType"}, {"Ref":"AWS::NoValue"}]},
+        INTENT:{"Fn::If": ["CreateLexV1Bots", {"Ref":"Intent"}, {"Ref":"AWS::NoValue"}]},
+        INTENTFALLBACK:{"Fn::If": ["CreateLexV1Bots", {"Ref":"IntentFallback"}, {"Ref":"AWS::NoValue"}]},
+        LEXV2_BUILD_LAMBDA:{"Ref":"Lexv2BotLambda"},
         ADDRESS:{"Fn::Join" : [ "", [ "https://", {"Fn::GetAtt":["ESVar","ESAddress"]} ] ] },
         INDEX:{"Fn::GetAtt":["Var","index"]},
-    },"nodejs10.x"),
+    },"nodejs12.x"),
     "LexBuildLambdaStart":lambda({
         "ZipFile":fs.readFileSync(__dirname+'/start.js','utf8')
     },{
         STATUS_BUCKET:{"Ref":"BuildStatusBucket"},
-        STATUS_KEY:"status.json",
+        STATUS_KEY:{"Fn::If": ["CreateLexV1Bots", "status.json", {"Ref":"AWS::NoValue"}]},
+        LEXV2_STATUS_KEY:"lexV2status.json",
         BUILD_FUNCTION:{"Fn::GetAtt":["LexBuildLambda","Arn"]}
     }),
     "LexBuildLambdaPoll":lambda({
         "ZipFile":fs.readFileSync(__dirname+'/poll.js','utf8')
     },{
-        STATUS_KEY:"status.json",
+        STATUS_KEY:{"Fn::If": ["CreateLexV1Bots", "status.json", {"Ref":"AWS::NoValue"}]},
         STATUS_BUCKET:{"Ref":"BuildStatusBucket"},
-        BOT_NAME:{"Ref":"LexBot"},
+        BOT_NAME:{"Fn::If": ["CreateLexV1Bots", {"Ref":"LexBot"}, {"Ref":"AWS::NoValue"}]},
     }),
     "LexBuildCodeVersion":{
         "Type": "Custom::S3Version",
@@ -55,7 +58,8 @@ module.exports={
               ],
               "Resource":[
                 {"Fn::GetAtt":["LexBuildLambda","Arn"]},
-                {"Fn::GetAtt":["LexBuildLambdaPoll","Arn"]}
+                {"Fn::GetAtt":["LexBuildLambdaPoll","Arn"]},
+                {"Fn::GetAtt":["Lexv2BotLambda","Arn"]}
               ]
             }]
         },
@@ -151,7 +155,7 @@ module.exports={
     }
 }
 
-function lambda(code,variable={},runtime="nodejs10.x"){
+function lambda(code,variable={},runtime="nodejs12.x"){
     return {
       "Type": "AWS::Lambda::Function",
       "Properties": {
@@ -160,10 +164,10 @@ function lambda(code,variable={},runtime="nodejs10.x"){
             "Variables":variable
         },
         "Handler": "index.handler",
-        "MemorySize": "128",
+        "MemorySize": "1024",
         "Role": {"Fn::GetAtt": ["LexBuildLambdaRole","Arn"]},
         "Runtime":runtime,
-        "Timeout": 300,
+        "Timeout": 900,
         "VpcConfig" : {
             "Fn::If": [ "VPCEnabled", {
                 "SubnetIds": {"Ref": "VPCSubnetIdList"},

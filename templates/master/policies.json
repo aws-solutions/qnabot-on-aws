@@ -8,7 +8,9 @@
           "Effect": "Allow",
           "Action": [
             "lex:PostContent",
-            "lex:PostText"
+            "lex:PostText",
+            "lex:RecognizeText",
+            "lex:RecognizeUtterance"
           ],
           "Resource": [
             "*"

@@ -56,7 +56,7 @@ module.exports = {
       "Handler": "index.handler",
       "MemorySize": "1408",
       "Role": { "Fn::GetAtt": ["FulfillmentLambdaRole", "Arn"] },
-      "Runtime": "nodejs10.x",
+      "Runtime": "nodejs12.x",
       "Timeout": 300,
       "VpcConfig" : {
         "Fn::If": [ "VPCEnabled", {
@@ -108,11 +108,12 @@ module.exports = {
         "Statement": [{
           "Effect": "Allow",
           "Action": [
-            "lex:PostText"
+            "lex:PostText",
+            "lex:RecognizeText"
           ],
           "Resource": [
             "arn:aws:lex:*:*:bot:QNA*",
-            "arn:aws:lex:*:*:bot:QnA*",
+            "arn:aws:lex:*:*:bot*",
           ]
         }]
       },
@@ -227,6 +228,153 @@ module.exports = {
           }
         }
       ]
+    }
+  },
+  "ESWarmerLambda": {
+    "Type": "AWS::Lambda::Function",
+    "Properties": {
+      "Code": {
+        "S3Bucket": { "Ref": "BootstrapBucket" },
+        "S3Key": { "Fn::Sub": "${BootstrapPrefix}/lambda/fulfillment.zip" },
+        "S3ObjectVersion": { "Ref": "FulfillmentCodeVersion" }
+      },
+      "Environment": {
+        "Variables": Object.assign({
+          REPEAT_COUNT:  "4",
+          TARGET_PATH: "_doc/_search",
+          TARGET_INDEX: { "Fn::GetAtt": ["Var","QnaIndex"] },
+          TARGET_URL: { "Fn::GetAtt": ["ESVar", "ESAddress"] },
+          DEFAULT_SETTINGS_PARAM: { "Ref": "DefaultQnABotSettings" },
+          CUSTOM_SETTINGS_PARAM: { "Ref": "CustomQnABotSettings" },
+        })
+      },
+      "Handler": "index.warmer",
+      "MemorySize": "512",
+      "Role": { "Fn::GetAtt": ["WarmerLambdaRole", "Arn"] },
+      "Runtime": "nodejs12.x",
+      "Timeout": 300,
+      "VpcConfig" : {
+        "Fn::If": [ "VPCEnabled", {
+          "SubnetIds": {"Ref": "VPCSubnetIdList"},
+          "SecurityGroupIds": {"Ref": "VPCSecurityGroupIdList"}
+        }, {"Ref" : "AWS::NoValue"} ]
+      },
+      "TracingConfig" : {
+        "Fn::If": [ "XRAYEnabled", {"Mode": "Active"},
+          {"Ref" : "AWS::NoValue"} ]
+      },
+      "Tags": [{
+        Key: "Type",
+        Value: "Warmer"
+      }]
+    }
+  },
+  "WarmerLambdaRole": {
+    "Type": "AWS::IAM::Role",
+    "Properties": {
+      "AssumeRolePolicyDocument": {
+        "Version": "2012-10-17",
+        "Statement": [
+          {
+            "Effect": "Allow",
+            "Principal": {
+              "Service": "lambda.amazonaws.com"
+            },
+            "Action": "sts:AssumeRole"
+          }
+        ]
+      },
+      "Path": "/",
+      "ManagedPolicyArns": [
+        "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
+        "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole",
+        "arn:aws:iam::aws:policy/AWSXRayDaemonWriteAccess"
+      ],
+      "Policies": [
+        {
+          "PolicyName": "ParamStorePolicy",
+          "PolicyDocument": {
+            "Version": "2012-10-17",
+            "Statement": [{
+              "Effect": "Allow",
+              "Action": [
+                "ssm:GetParameter",
+                "ssm:GetParameters"
+              ],
+              "Resource": [
+                {
+                  "Fn::Join": [
+                    "", [
+                      "arn:aws:ssm:",
+                      { "Fn::Sub": "${AWS::Region}:" },
+                      { "Fn::Sub": "${AWS::AccountId}:" },
+                      "parameter/",
+                      { "Ref": "DefaultQnABotSettings" }
+                    ]
+                  ]
+                },
+                {
+                  "Fn::Join": [
+                    "", [
+                      "arn:aws:ssm:",
+                      { "Fn::Sub": "${AWS::Region}:" },
+                      { "Fn::Sub": "${AWS::AccountId}:" },
+                      "parameter/",
+                      { "Ref": "CustomQnABotSettings" }
+                    ]
+                  ]
+                }
+              ]
+            },
+              {
+              "Sid": "AllowES",
+              "Effect": "Allow",
+              "Action": [
+                "es:ESHttpGet",
+              ],
+              "Resource": [
+                "*"
+              ]
+            }]
+          }
+        }
+      ]
+    }
+  },
+  "ESWarmerRule": {
+    "Type": "AWS::Events::Rule",
+    "Properties": {
+      "ScheduleExpression": "rate(1 minute)",
+      "Targets": [
+        {
+          "Id": "ESWarmerScheduler",
+          "Arn": {
+            "Fn::GetAtt": [
+              "ESWarmerLambda",
+              "Arn"
+            ]
+          }
+        }
+      ]
+    }
+  },
+  "ESWarmerRuleInvokeLambdaPermission": {
+    "Type": "AWS::Lambda::Permission",
+    "Properties": {
+      "FunctionName": {
+        "Fn::GetAtt": [
+          "ESWarmerLambda",
+          "Arn"
+        ]
+      },
+      "Action": "lambda:InvokeFunction",
+      "Principal": "events.amazonaws.com",
+      "SourceArn": {
+        "Fn::GetAtt": [
+          "ESWarmerRule",
+          "Arn"
+        ]
+      }
     }
   }
 }

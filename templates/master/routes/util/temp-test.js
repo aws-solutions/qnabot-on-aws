@@ -1,6 +1,6 @@
 var fs=require('fs')
 var Velocity=require('velocity')
-var JSONPath = require('JSONPath');
+var jsonpath = require('jsonpath');
 
 exports.run=function(name,context,test){
     var temp=new Velocity.Engine({
@@ -26,10 +26,10 @@ exports.input=function(body){
             input:{
                 params:(x)=>body[x],
                 path:(x)=>{
-                    return JSONPath({json:body,path:x})[0]
+                    return jsonpath({json:body,path:x})[0]
                 },
                 json:(x)=>{
-                    return JSON.stringify(JSONPath({json:body,path:x})[0])
+                    return JSON.stringify(jsonpath({json:body,path:x})[0])
                 }
             }
         }

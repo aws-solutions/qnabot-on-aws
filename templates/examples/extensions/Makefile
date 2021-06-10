@@ -1,6 +1,7 @@
 PWD=$(shell pwd)
 DSTDIR=$(PWD)/../../../build/lambda/
-JS_LAMBDAS=$(shell for l in $$(ls js_lambda_hooks);do echo $$l;done)
+# Remove obsolete KendraFallback folder from the build system - removed in github but needs local removal
+JS_LAMBDAS=$(shell rm -rf js_lambda_hooks/KendraFallback; for l in $$(ls js_lambda_hooks);do echo $$l;done)
 PY_LAMBDAS=$(shell for l in $$(ls py_lambda_hooks);do echo $$l;done)
 
 all : js_build py_build pkg_imports

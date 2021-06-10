@@ -1223,15 +1223,13 @@ ids to update are sun.8 and sun.2.
 
 ## Step 9 - Extending QnABot to leverage Enterprise Search with Kendra:
 
-QnABot version 2.6.0 optionally supports integration with Amazon Kendra. For the workshop perform the following steps:
+QnABot version 2.6.0 and later optionally supports integration with Amazon Kendra. For the workshop perform the following steps:
 
 1) Enable Amazon Kendra in your account
 
 ![Lab9-Kendra-1](images/Lab9-Kendra-1.png "Enable Kendra")
 
 2) Create an Index
-
-***Note that while still in Preview, an AWS account only supports one Kendra index.***
 
 ***Also Note that Kendra can take upwards of 30 minutes to create an index.*** 
 
@@ -1240,8 +1238,9 @@ While the Index is being created be sure to checkout other steps in the Workshop
 ![Lab9-Kendra-2](images/Lab9-Kendra-2.png "Create an Index")
 ![Lab9-Kendra-3](images/Lab9-Kendra-3.png "Create an Index")
 
-3) Create an S3 bucket and allow objects to be public read. Then upload the pdfs from workshops/reinvent2019/kendra-assets 
-to this bucket. Allow the objects to be public read. 
+3) Create an S3 bucket that starts with the name 'qna' which will hold objects that Kendra will index. Then upload the pdfs from workshops/reinvent2019/kendra-assets 
+to this bucket. As long as the bucket starts with 'qna', QnABot can provide signed urls to access the content
+that Kendra has indexed.    
 
 4) From the Kendra Console open the new Kendra Index you created and add a data source that targets your S3 bucket. 
 When you "Add a Data Source" and select Amazon S3 as the Connector, make sure to select "Create a new role" to give Kendra
@@ -1259,7 +1258,7 @@ is set in QnABot, use of Kendra as a fallback mechanism will return an error.
 
 You can override this setting using SSM Parameter Store to add a new key/value pair as a custom property. 
 Find your custom property name from the QnABot CF stack outputs. The key in the QnABot CF stack outputs is 
-'CustomSettingsSSMParameterName'. If will have a value similar to 
+'CustomSettingsSSMParameterName'. It will have a value similar to 
 
 ```
 CFN-CustomQnABotSettings-EOVHQJcYx9Ms
@@ -1280,19 +1279,7 @@ add to the object a new key/value pair rather than replacing the entire string.
 
 **Don't forget to use your Kendra Index ID rather than the one in the sample**
 
-6) Use the Designer UI to import the Sample/Extension named KendraFallback.
-
-This loads a new question with a qid of "KendraFallback". Edit this question in the Designer and change its question from 
-"no_hits_alternative" to "no_hits" and save the changes. 
-
-If you have previously loaded the QnAUtility.json from Examples/Extensions you need to either remove 
-the question with the ID "CustomNoMatches" or change the question for this ID from "no_hits" to "no_hits_original"
-
-Once the new question, "KendraFallback" is configured as the response for "no_hits", the Kendra index will be
-searched for an answer whenever a curated answer can not be found. Once setup, Kendra provides a fallback 
-mechanism prior to telling the user an answer could not be found. 
-
-7) Test out a question
+6) Test out a question
 
 ```
 What are the layers of the Sun?
@@ -1301,8 +1288,8 @@ Is there such a thing as sunspots?
 ``` 
 
 You'll notice that elastic search has no curated answers for these questions. Instead of saying sadly we could not answer the question,
-kendra is searched and the answer and discovered text is returned. The links are clickable as well and if the document 
-is available to be read it can be downloaded from the S3 bucket. 
+kendra is searched and the answer and discovered text is returned. The links are clickable as well. By default,
+signed URLs are used to access the document and are set to expire in 5 minutes.
 
 ***Important note. Please delete your data source and kendra index when done with this exercise. You have 30 days trial but
 after that charges to the account will occur.***

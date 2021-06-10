@@ -19,11 +19,11 @@ module.exports=function(config,body){
         config.scroll_id=result._scroll_id 
         config.status="InProgress"
         
-        var documents=_.get(result,"hits.hits",[])
+        const documents=_.get(result,"hits.hits",[])
         if(documents.length){
-            var body=documents.map(x=>{
-                var out=x._source
-                if(out.type==='qna'){ 
+            const body=documents.map(x=>{
+                const out=x._source
+                if(out.type==='qna' && _.has(out,"questions")){
                     out.q=out.questions.map(y=>y.q)
                     delete out.questions
                     delete out.quniqueterms;
@@ -32,7 +32,7 @@ module.exports=function(config,body){
                 }
                 return JSON.stringify(out)
             }).join('\n')
-            var key=`${config.tmp}/${config.parts.length+1}` 
+            const key=`${config.tmp}/${config.parts.length+1}`
             return s3.putObject({
                 Body:body,
                 Bucket:config.bucket,

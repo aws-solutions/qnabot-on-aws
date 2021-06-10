@@ -20,8 +20,7 @@ module.exports={
     "devEncryption": "UNENCRYPTED",
     "devPublicOrPrivate": "PUBLIC",
     "namespace":"dev",
-    "stackNamePrefix":"QNA",
-    "KendraFAQIndex":""
+    "stackNamePrefix":"QNA"
 }
 
 if (require.main === module) {

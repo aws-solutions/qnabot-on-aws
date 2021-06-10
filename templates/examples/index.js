@@ -6,7 +6,8 @@ var extensions=require(`./extensions`);
 var resources=Object.assign(examples,extensions);
 var outputs1=require('./outputs').outputs;
 var outputs2=require('./examples/responsebots').outputs;
-var outputs=Object.assign(outputs1,outputs2);
+var outputSNSTopic={"FeedbackSNSTopic":{"Value":{"Fn::GetAtt":["FeedbackSNS","TopicName"]}}};
+var outputs=Object.assign(outputs1,outputs2,outputSNSTopic);
 
 module.exports={
   "Resources":resources,
@@ -32,6 +33,7 @@ module.exports={
     "QIDLambdaArn":{"Type":"String"},
     "VPCSubnetIdList" : {"Type": "String"},
     "VPCSecurityGroupIdList": {"Type": "String"},
+    "LexBotVersion": {"Type": "String"},
     "XraySetting": {"Type": "String"}
   },
    "Conditions": {
@@ -39,6 +41,7 @@ module.exports={
         { "Fn::Equals": [ "", { "Ref": "VPCSecurityGroupIdList" } ] }
       ] },
     "XRAYEnabled":{"Fn::Equals":[{"Ref":"XraySetting"},"TRUE"]},
+    "CreateLexV1Bots":{"Fn::Equals":[{"Ref":"LexBotVersion"},"LexV1 and LexV2"]},
     }
   }
 

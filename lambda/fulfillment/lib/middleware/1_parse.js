@@ -123,8 +123,8 @@ module.exports = async function parse(req, res) {
             Object.assign(req, await lex.parse(req))
             _.set(req,"_preferredResponseType","PlainText") ;
             // Determine preferred response message type - PlainText, or SSML
-            const outputDialogMode = _.get(req,"_event.outputDialogMode");
-            if (outputDialogMode == "Voice") {
+            const outputDialogMode = _.get(req,"_event.outputDialogMode") || _.get(req,"_event.inputMode") ;
+            if (outputDialogMode == "Voice" || outputDialogMode == "Speech") {
                 _.set(req,"_preferredResponseType","SSML") ;
             } else if (outputDialogMode == "Text") {
                 // Amazon Connect uses outputDialogMode "Text" yet indicates support for SSML using request header x-amz-lex:accept-content-types
@@ -178,7 +178,8 @@ module.exports = async function parse(req, res) {
             title: "",
             text: "",
             url: ""
-        }
+        },
+        intentname: req.intentname
     })
     // ensure res.session.qnabotcontext exists
     if ( ! _.get(res,"session.qnabotcontext")) {

@@ -73,6 +73,8 @@ module.exports = {
       ready: false,
       kendraIndexerEnabled: false,
       lastStatusCheck: Date.now(),
+      intervalBetweenPoll: 10000,
+      isPolling: 0
     };
   },
   components: {},
@@ -80,18 +82,28 @@ module.exports = {
   updated: function () {
     console.log("updated");
     var self = this;
-    self.IsKendraEnabled().then((data) => {
-      self.kendraIndexerEnabled = data;
-    })
+    if(!self.kendraIndexerEnabled){
+      self.IsKendraEnabled().then((data) => {
+        self.kendraIndexerEnabled = data;
+      })
+    }
     this.poll(
       () => {
+
+
         console.log("last status check " + self.lastStatusCheck);
-        if (!self.lastStatusCheck || Date.now() - self.lastStatusCheck > 10000) {
+        if (!self.lastStatusCheck || (Date.now() - self.lastStatusCheck > self.intervalBetweenPoll)) {
+              self.lastStatusCheck = Date.now();
           console.log("getting status");
           self.getKendraIndexingStatus().then((data) => {
+            if(self.status == "SUCCEEDED" && data.Error && data.Error.toLowerCase().includes("not found")){
+              // Most likely caused by Kendra Throttling error, don't change the current status
+              self.intervalBetweenPoll = 20000
+              return
+            }
             self.status = data.Status;
-            (self.history = data.History),
-            self.lastStatusCheck = Date.now();
+            self.history = data.History;
+            self.intervalBetweenPoll = 10000
           });
         }
         //if the Kendra Start Index isn't displayed -- stop syncing
@@ -149,6 +161,7 @@ module.exports = {
     },
 
     IsKendraEnabled: async function(){
+        
         const settings=await this.$store.dispatch('api/listSettings');
         console.log(JSON.stringify(settings));
         return _.get(settings[2],"ENABLE_KENDRA_WEB_INDEXER")=="true" && _.get(settings[2],"KENDRA_INDEXER_URLS") !== "" 

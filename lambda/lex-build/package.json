@@ -10,15 +10,15 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "aws-sdk": "^2.692.0",
+    "aws-sdk": "^2.913.0",
     "bluebird": "^3.7.2",
     "elasticsearch": "^16.7.1",
     "http-aws-es": "^6.0.0",
     "intercept-stdout": "^0.1.2",
-    "lodash": "^4.17.19"
+    "lodash": "^4.17.21"
   },
   "devDependencies": {
-    "nodeunit": "^0.11.3",
-    "diff": "^4.0.2"
+    "diff": "^4.0.2",
+    "nodeunit": "^0.11.3"
   }
 }

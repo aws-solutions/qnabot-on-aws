@@ -11,76 +11,24 @@ BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied. See the
 License for the specific language governing permissions and limitations under the License.
 */
 
-const Promise=require('bluebird')
-const run=require('./run')
-const getUtterances=require('./utterances')
-const Slot=require('./slot')
-const Intent=require('./intent')
-const IntentFallback=require('./intentFallback')
-const Alias=require('./alias')
-const Bot=require('./bot')
-const clean=require('./delete')
-const status=require('./status')
-const wait=require('./wait')
+const lexV1Status=process.env.STATUS_KEY;
+const getUtterances=require('./utterances');
 
-module.exports=function(params){ 
-    const utterances=getUtterances(params)
-    
-    const slottype=run("getSlotType",{
-        name:process.env.SLOTTYPE,
-        version:"$LATEST"
-    })
-    const intent=run("getIntent",{
-        name:process.env.INTENT,
-        version:"$LATEST"
-    })
-    const intentFallback=run("getIntent",{
-        name:process.env.INTENTFALLBACK,
-        version:"$LATEST"
-    })
-    const bot=run('getBot',{
-        name:process.env.BOTNAME,
-        versionOrAlias:"$LATEST"
-    })
-    let clean_intent=null
-    let clean_intentFallback=null
-    let clean_slottype=null
-
-    return Promise.join(utterances,slottype)
-        .tap(status("Rebuilding Slot"))
-        .spread(Slot)
-
-        .tap(()=>status("Rebuilding Intent"))
-        .then(slot_version=>{
-            clean_intent=()=>clean.intent(process.env.INTENT,slot_version)
-            return Promise.join(slot_version,intent)
-        })
-        .spread(Intent)
-
-        .tap(()=>status("Rebuilding IntentFallback"))
-        .then(intent_version=>{
-            clean_intentFallback=()=>clean.intent(process.env.INTENTFALLBACK,intent_version)
-            return Promise.join(intent_version,intentFallback)
-        })
-        .spread(IntentFallback)
-
-        .tap(versions=>status("Rebuild Bot "))
-        .then(versions=>{
-            clean_slot=()=>clean.slot(process.env.SLOTTYPE,versions.intent_version)
-            return Promise.join(versions,bot)
-        })
-
-        .spread(Bot)
-        .tap(version=>Alias(version,{
-            botName:process.env.BOTNAME,
-            name:process.env.BOTALIAS
-        }))
-        .delay(1000)
-        .tap(()=>wait())
-        .then(version=>clean.bot(process.env.BOTNAME,version))
-        .then(clean_intent)
-        .then(clean_slottype)
-        .tapCatch(console.log)
-        .catch(error=>status("Failed",error.message))
-}
+module.exports=async function(params){ 
+    const utterances=getUtterances(params);
+    let promises=[];
+    if (lexV1Status) {
+        console.log("Starting Lex V1");
+        let LexV1Bot=require('./lexv1bot');
+        let lexV1 = LexV1Bot(utterances);
+        promises.push(lexV1);
+    }
+    console.log("Starting Lex V2");
+    let LexV2Bot=require('./lexv2bot');
+    var lexV2 = LexV2Bot(utterances);
+    promises.push(lexV2);
+    await Promise.all(promises);
+    console.log("All Done");
+    return 1;
+};
 

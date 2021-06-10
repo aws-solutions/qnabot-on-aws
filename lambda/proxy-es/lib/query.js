@@ -7,6 +7,7 @@ var build_es_query = require('./esbodybuilder');
 var handlebars = require('./handlebars');
 var translate = require('./translate');
 var kendra = require('./kendraQuery');
+var kendra_fallback = require("./kendra");
 // const sleep = require('util').promisify(setTimeout);
 
 
@@ -77,6 +78,7 @@ async function run_query_kendra(req, query_params) {
         kendra_faq_index:_.get(req, "_settings.KENDRA_FAQ_INDEX"),
         maxRetries:_.get(req, "_settings.KENDRA_FAQ_CONFIG_MAX_RETRIES"),
         retryDelay:_.get(req, "_settings.KENDRA_FAQ_CONFIG_RETRY_DELAY"),
+        minimum_score: _.get(req, "_settings.ALT_SEARCH_KENDRA_FAQ_CONFIDENCE_SCORE"),
         size:1,
         question: query_params.question,
         es_address: req._info.es.address,
@@ -100,7 +102,7 @@ async function run_query_kendra(req, query_params) {
     }
 
     var kendra_response = await kendra.handler(request_params);
-    
+    console.log(kendra_response)
     if (_.get(kendra_response, "hits.hits[0]._source")) {
         _.set(kendra_response, "hits.hits[0]._source.answersource", "Kendra FAQ");
     }
@@ -205,7 +207,9 @@ async function get_hit(req, res) {
         syntax_confidence_limit: _.get(req, '_settings.ES_SYNTAX_CONFIDENCE_LIMIT'),
         score_answer_field: _.get(req, '_settings.ES_SCORE_ANSWER_FIELD'),
         fuzziness: _.get(req, '_settings.ES_USE_FUZZY_MATCH'),
-        es_expand_contractions: _.get(req,'_settings.ES_EXPAND_CONTRACTIONS')
+        es_expand_contractions: _.get(req,'_settings.ES_EXPAND_CONTRACTIONS'),
+        kendra_indexes: _.get(req,'_settings.ALT_SEARCH_KENDRA_INDEXES'),
+        minimum_confidence_score: _.get(req,'_settings.ALT_SEARCH_KENDRA_FAQ_CONFIDENCE_SCORE')
 
     };
     var no_hits_question = _.get(req, '_settings.ES_NO_HITS_QUESTION', 'no_hits');
@@ -230,18 +234,49 @@ async function get_hit(req, res) {
     
     if (hit) {
         res['got_hits'] = 1;  // response flag, used in logging / kibana
-    } else {
+    } else if(query_params.kendra_indexes.length != 0) {
+        console.log("request entering kendra fallback " + JSON.stringify(req))
+        hit = await  kendra_fallback.handler({req,res})
+        console.log("Result from Kendra " + JSON.stringify(hit))
+        if(hit &&  hit.hit_count != 0)
+        {
+            _.set(res,"answersource","Kendra Fallback");
+            _.set(res,"session.qnabot_gotanswer",true) ; 
+            _.set(res,"message", hit.a);
+            _.set(req,"debug",hit.debug)
+            res['got_hits'] = 1;
+
+        }
+
+    }
+    if(!hit)
+    {
         console.log("No hits from query - searching instead for: " + no_hits_question);
         query_params['question'] = no_hits_question;
         res['got_hits'] = 0;  // response flag, used in logging / kibana
         
         response = await run_query(req, query_params);
         hit = _.get(response, "hits.hits[0]._source");
+
+        console.log("No hits response: " + JSON.stringify(hit))
     }
     // Do we have a hit?
     if (hit) {
+        console.log("Setting topic for " + JSON.stringify(hit))
         // set res topic from document before running handlebars, so that handlebars can access or overwrite it.
-        _.set(res, "session.topic", _.get(hit, "t"));
+         _.set(res, "session.topic", _.get(hit, "t"));
+        if(_.get(hit, "t")){
+            if(!res._userInfo){
+                res._userInfo = {}
+            }
+            if(!res._userInfo.recentTopics){
+                res._userInfo.recentTopics = []
+            }
+            res._userInfo.recentTopics.push({
+                topic: _.get(hit, "t"),
+                dateTime: (new Date()).toISOString()
+            })
+        }
         // run handlebars template processing
         hit = await handlebars(req, res, hit);
 
@@ -378,7 +413,7 @@ function update_res_with_hit(req, res, hit) {
     // Add answerSource for query hits
     var ansSource = _.get(hit, "answersource", "unknown");
     if (ansSource==="Kendra FAQ") { // kendra fallback sets answerSource directly
-        res.answerSource = "KENDRA";
+        res.answerSource = "KENDRA FAQ";
     } else if (ansSource==="ElasticSearch" || ansSource==="ElasticSearch Fallback") {
         res.answerSource = "ELASTICSEARCH";
     } else {
@@ -481,7 +516,7 @@ module.exports = async function (req, res) {
     const elicitResponseChainingConfig = _.get(res, "session.qnabotcontext.elicitResponse.chainingConfig", undefined);
     const elicitResponseProgress = _.get(res, "session.qnabotcontext.elicitResponse.progress", undefined);
     let hit = undefined;
-    if (elicitResponseChainingConfig && (elicitResponseProgress === 'Fulfilled' || elicitResponseProgress === 'ReadyForFulfillment' || elicitResponseProgress === 'Failed' )) {
+    if (elicitResponseChainingConfig && (elicitResponseProgress === 'Fulfilled' || elicitResponseProgress === 'ReadyForFulfillment' || elicitResponseProgress === 'Close' || elicitResponseProgress === 'Failed' )) {
         // elicitResponse is finishing up as the LexBot has fulfilled its intent.
         // we use a fakeHit with either the Bot's message or an empty string.
         let fakeHit = {};
@@ -510,7 +545,7 @@ module.exports = async function (req, res) {
         // translate response
         var usrLang = 'en';
         if (_.get(req._settings, 'ENABLE_MULTI_LANGUAGE_SUPPORT')) {
-            usrLang = _.get(req, 'session.userLocale');
+            usrLang = _.get(req, 'session.qnabotcontext.userLocale');
             if (usrLang != 'en') {
                 console.log("Autotranslate hit to usrLang: ", usrLang);
                 hit = await translate.translate_hit(hit, usrLang,req);
@@ -519,10 +554,17 @@ module.exports = async function (req, res) {
             }
         }
         // prepend debug msg
+        console.log("pre-debug " +JSON.stringify(req))
         if (_.get(req._settings, 'ENABLE_DEBUG_RESPONSES')) {
             var msg = "User Input: \"" + req.question + "\"";
+
+
             if (usrLang != 'en') {
                 msg = "User Input: \"" + _.get(req,"_event.origQuestion","notdefined") + "\", Translated to: \"" + req.question + "\"";
+            }
+            if(req.debug)
+            {
+                msg += JSON.stringify(req.debug,2)
             }
             msg += ", Source: " + _.get(hit, "answersource", "unknown");
             var debug_msg = {
@@ -532,6 +574,7 @@ module.exports = async function (req, res) {
                     ssml: "<speak>" + msg + "</speak>"
                 },
                 rp: "[" + _.get(hit, "rp") + "] "
+
             };
             hit = merge_next(debug_msg, hit) ;
         }

@@ -3,6 +3,10 @@
     {
       "ContactFlow": "contactflow.json",
       "QnAExample": "ConnectWizardQnA.json"
+    },
+    {
+      "ContactFlow": "contactflowLexV2.json",
+      "QnAExample": "ConnectWizardQnA.json"
     }
   ]
 }

@@ -2,9 +2,11 @@
     "type": "PlainText",
     "message": "",
     "session": {
+        "qnabotcontext": {
+            "userLocale": "en"
+        }
         "userDetectedLocale": "en",
-        "userDetectedLocaleConfidence": 0.9996602535247803,
-        "userLocale": "en"
+        "userDetectedLocaleConfidence": 0.9996602535247803
     },
     "card": {
         "send": false,

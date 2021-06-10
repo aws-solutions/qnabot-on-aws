@@ -37,6 +37,7 @@ build/Release
 node_modules/
 jspm_packages/
 py_modules/
+crhelper*/
 
 # Typescript v1 declaration files
 typings/

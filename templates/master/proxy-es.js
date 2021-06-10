@@ -28,7 +28,7 @@ module.exports={
         "Environment": {
           "Variables": {
             ES_INDEX:{"Fn::GetAtt":["Var","QnaIndex"]},
-            ES_ADDRESS:{"Fn::GetAtt":["ESVar","ESAddress"]},
+            ES_ADDRESS:{"Fn::Join" : [ "", [ "https://", {"Fn::GetAtt":["ESVar","ESAddress"]} ] ] },
             UTTERANCE_BUCKET:{"Ref":"AssetBucket"},
             UTTERANCE_KEY:"default-utterances.json",
           }
@@ -36,7 +36,7 @@ module.exports={
         "Handler": "index.utterances",
         "MemorySize": "1408",
         "Role": {"Fn::GetAtt": ["ESProxyLambdaRole","Arn"]},
-        "Runtime": "nodejs10.x",
+        "Runtime": "nodejs12.x",
         "Timeout": 300,
         "VpcConfig" : {
             "Fn::If": [ "VPCEnabled", {
@@ -71,7 +71,7 @@ module.exports={
         "Handler": "index.qid",
         "MemorySize": "1408",
         "Role": {"Fn::GetAtt": ["ESProxyLambdaRole","Arn"]},
-        "Runtime": "nodejs10.x",
+        "Runtime": "nodejs12.x",
         "Timeout": 300,
         "VpcConfig" : {
             "Fn::If": [ "VPCEnabled", {
@@ -101,14 +101,14 @@ module.exports={
           "Variables": {
             ES_INDEX:{"Fn::GetAtt":["Var","QnaIndex"]},
             ES_ADDRESS:{"Fn::GetAtt":["ESVar","ESAddress"]},
-            FEEDBACK_DELETE_RANGE_MINUTES:43200,
-            METRICS_DELETE_RANGE_MINUTES:43200,
+            FEEDBACK_DELETE_RANGE_MINUTES: {"Ref":"KibanaDashboardRetentionMinutes"},
+            METRICS_DELETE_RANGE_MINUTES: {"Ref":"KibanaDashboardRetentionMinutes"},
           }
         },
         "Handler": "index.cleanmetrics",
         "MemorySize": "1408",
         "Role": {"Fn::GetAtt": ["ESProxyLambdaRole","Arn"]},
-        "Runtime": "nodejs10.x",
+        "Runtime": "nodejs12.x",
         "Timeout": 300,
         "VpcConfig" : {
             "Fn::If": [ "VPCEnabled", {
@@ -163,7 +163,7 @@ module.exports={
         "Handler": "index.logging",
         "MemorySize": "1408",
         "Role": {"Fn::GetAtt": ["ESLoggingLambdaRole","Arn"]},
-        "Runtime": "nodejs10.x",
+        "Runtime": "nodejs12.x",
         "Timeout": 300,
         "VpcConfig" : {
             "Fn::If": [ "VPCEnabled", {
@@ -198,7 +198,7 @@ module.exports={
         "Handler": "index.query",
         "MemorySize": "1408",
         "Role": {"Fn::GetAtt": ["ESProxyLambdaRole","Arn"]},
-        "Runtime": "nodejs10.x",
+        "Runtime": "nodejs12.x",
         "Timeout": 300,
         "VpcConfig" : {
             "Fn::If": [ "VPCEnabled", {
@@ -236,7 +236,7 @@ module.exports={
         "Handler": "index.handler",
         "MemorySize": "1408",
         "Role": {"Fn::GetAtt": ["ESProxyLambdaRole","Arn"]},
-        "Runtime": "nodejs10.x",
+        "Runtime": "nodejs12.x",
         "Timeout": 300,
         "VpcConfig" : {
             "Fn::If": [ "VPCEnabled", {

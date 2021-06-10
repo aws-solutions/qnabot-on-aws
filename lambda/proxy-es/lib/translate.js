@@ -36,6 +36,9 @@ async function get_translation(englishText, targetLang, req) {
         console.log("input text:", englishText);
         const translation = await translateClient.translateText(params).promise();
         console.log("translation:", translation);
+        const regex = /\s\*\s+$/m;
+        translation.TranslatedText = translation.TranslatedText.replace(regex, '*\n\n') // Translate adds a space between the "*" causing incorrect Markdown
+        translation.TranslatedText = translation.TranslatedText.replace(/<\/?span[^>]*>/g,""); // removes span tag used to keep Translate from translating URLs
         return translation.TranslatedText;
     } catch (err) {
         console.log("warning - error during translation: ", err);
@@ -87,7 +90,7 @@ exports.translate_hit = async function(hit,usrLang,req){
     }
     if (rp && _.get(hit,'autotranslate.rp')) {
         try {
-            hit_out.rp = await get_translation(hit_out.rp, usrLang);
+            hit_out.rp = await get_translation(hit_out.rp, usrLang, req);
         } catch (e) {
             console.log("ERROR: Reprompt caused Translate exception: ", rp);
             throw (e);

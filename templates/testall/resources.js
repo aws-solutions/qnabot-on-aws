@@ -29,14 +29,14 @@ module.exports=Object.assign(
                 ES_INDEX:{"Ref":"VarIndex"},
                 ES_ENDPOINT:{"Ref":"EsEndpoint"},
                 ES_PROXY:{"Ref":"EsProxyLambda"},
-                BOT_NAME:{"Ref":"BotName"},
-                BOT_ALIAS:{"Ref":"BotAlias"}
+                LEXV2_BOT_ID:{"Ref":"LexV2BotId"},
+                LEXV2_BOT_ALIAS_ID:{"Ref":"LexV2BotAliasId"}
             }
         },
         "Handler": "index.step",
         "MemorySize": "1280",
         "Role": {"Fn::GetAtt": ["TestAllRole","Arn"]},
-        "Runtime": "nodejs10.x",
+        "Runtime": "nodejs12.x",
         "Timeout": 900,
         "VpcConfig" : {
           "Fn::If": [ "VPCEnabled", {
@@ -96,8 +96,7 @@ module.exports=Object.assign(
                 {
                   "Effect": "Allow",
                   "Action": [
-                      "lex:PostContent",
-                      "lex:PostText"
+                      "lex:RecognizeText"
                   ],
                   "Resource": [
                       "*"

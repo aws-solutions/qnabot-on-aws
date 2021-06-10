@@ -18,7 +18,7 @@ module.exports={
         "Handler": "index.resource",
         "MemorySize": "1408",
         "Role": {"Fn::GetAtt": ["ESProxyLambdaRole","Arn"]},
-        "Runtime": "nodejs10.x",
+        "Runtime": "nodejs12.x",
         "Timeout": 300,
         "VpcConfig" : {
           "Fn::If": [ "VPCEnabled", {
@@ -83,7 +83,7 @@ module.exports={
             "ServiceToken": { "Fn::GetAtt" : ["ESCFNProxyLambda", "Arn"] },
             "create":{
                 endpoint:{"Fn::GetAtt":["ESVar","ESAddress"]},
-                path:"/_plugin/kibana/api/kibana/dashboards/import",
+                path:"/_plugin/kibana/api/kibana/dashboards/import?force=true",
                 method:"POST",
                 headers:{"kbn-xsrf":"kibana"},
                 body:require('./kibana/QnABotDashboard'),

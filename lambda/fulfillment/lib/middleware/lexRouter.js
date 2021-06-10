@@ -33,7 +33,7 @@ function isConnectClient(req) {
 }
 
 async function translate_res(req, res){
-    const locale = _.get(req, 'session.userLocale');
+    const locale = _.get(req, 'session.qnabotcontext.userLocale');
     if (_.get(req._settings, 'ENABLE_MULTI_LANGUAGE_SUPPORT')){
         if (_.get(res,"message")) {
             res.message = await translate.get_translation(res.message,'en',locale,req);
@@ -63,9 +63,10 @@ async function translate_res(req, res){
  * @param params
  * @returns {*}
  */
-function lexClientRequester(lexClient,params) {
+function lexV1ClientRequester(params) {
+    const lexV1Client = new AWS.LexRuntime({apiVersion: '2016-11-28'});
     return new Promise(function(resolve, reject) {
-        lexClient.postText(params, function(err, data) {
+        lexV1Client.postText(params, function(err, data) {
             if (err) {
                 console.log(err, err.stack);
                 reject('Lex client request error:' + err);
@@ -77,6 +78,22 @@ function lexClientRequester(lexClient,params) {
         });
     });
 }
+function lexV2ClientRequester(params) {
+    const lexV2Client = new AWS.LexRuntimeV2();
+    return new Promise(function(resolve, reject) {
+        lexV2Client.recognizeText(params, function(err, data) {
+            if (err) {
+                console.log(err, err.stack);
+                reject('Lex client request error:' + err);
+            }
+            else {
+                console.log("Lex client response:" + JSON.stringify(data, null, 2));
+                resolve(data);
+            }
+        });
+    });
+}
+
 
 /**
  * Setup call to Lex including user ID, input text, botName, botAlis. It is an async function and
@@ -112,7 +129,6 @@ async function handleRequest(req, res, botName, botAlias) {
     if (botName === FREE_TEXT_ELICIT_RESPONSE_NAME) {
         return getFreeTextResponse(_.get(req, "question"), _.get(req, "sentiment"), _.get(req, "sentimentScore"));
     } else {
-        const lexClient = new AWS.LexRuntime({apiVersion: '2016-11-28'});
 
         // if a connect client and an elicitResponse bot such as QNANumber and the user is confirming the response
         // from the bot, proxy a key pad press (phone touch) of 1 for Yes and 2 for No. This helps accessibility
@@ -129,15 +145,51 @@ async function handleRequest(req, res, botName, botAlias) {
         if ((botName === QNADate || botName === QNADateNoConfirm) && ( progress === 'ElicitSlot' || progress === 'ElicitIntent' || progress === "" || progress === undefined ) ) {
             respText = 'the date is ' + respText;
         }
-        // call the Bot using the respText
-        const params = {
-            botAlias: botAlias,
-            botName: mapFromSimpleName(botName),
-            inputText: respText,
-            userId: tempBotUserID,
-        };
-        console.log("Lex parameters: " + JSON.stringify(params));
-        const response = await lexClientRequester(lexClient, params);
+        
+        // Resolve bot details from environment, if using simple name for built-in bots
+        const botIdentity = mapFromSimpleName(botName);
+        
+        // Determine if we using LexV1 or LexV2.. LexV2 bot is identified by "lexv2::BotId/BotAliasId/LocaleId"
+        let response = {};
+        if (botIdentity.toLowerCase().startsWith("lexv2::")) {
+            // lex v2 response bot
+            const ids = botIdentity.split("::")[1];
+            let [botId,botAliasId,localeId]=ids.split("/")
+            localeId = localeId || "en_US";
+            const params = {
+                botId: botId,
+                botAliasId: botAliasId,
+                localeId: localeId,
+                sessionId: tempBotUserID,
+                text: respText
+
+            };
+            console.log("Lex V2 parameters: " + JSON.stringify(params));
+            const lexv2response = await lexV2ClientRequester(params); 
+            console.log("Lex V2 response: " + JSON.stringify(lexv2response));
+            response.message = lexv2response.messages[0].content;
+            // lex v2 FallbackIntent match means it failed to fill desired slot(s).
+            if (lexv2response.sessionState.intent.name === "FallbackIntent" || 
+                lexv2response.sessionState.intent.state === "Failed") {
+                response.dialogState = "Failed";
+            } else {
+                response.dialogState = lexv2response.sessionState.dialogAction.type;
+            }
+            let slots = _.get(lexv2response,"sessionState.intent.slots");
+            if (slots) {
+                response.slots = _.mapValues(slots, x => { return _.get(x,"value.interpretedValue") } );
+            }
+        } else {
+            // lex v1 response bot
+            const params = {
+                botAlias: botAlias,
+                botName: mapFromSimpleName(botName),
+                inputText: respText,
+                userId: tempBotUserID,
+            };
+            console.log("Lex V1 parameters: " + JSON.stringify(params));
+            response = await lexV1ClientRequester(params);
+        }
         return response;
     }
 };
@@ -196,10 +248,6 @@ async function processResponse(req, res, hook, msg) {
         res.card = {
             "send": true,
             "title": "Info",
-            "text": "",
-            "url": "",
-            "subTitle": "",
-            "imageUrl": "",
             "buttons": [
                 {
                     "text": "Yes",
@@ -231,7 +279,7 @@ async function processResponse(req, res, hook, msg) {
             res.plainMessage = elicit_Response_Retry_Message;
         }
         res.card = undefined;
-    } else if (botResp.dialogState === 'Fulfilled' || botResp.dialogState === 'ReadyForFulfillment') {
+    } else if (botResp.dialogState === 'Fulfilled' || botResp.dialogState === 'ReadyForFulfillment' || botResp.dialogState === 'Close') {
         if (botResp.message) {
             res.message = botResp.message;
             res.plainMessage = botResp.message;
