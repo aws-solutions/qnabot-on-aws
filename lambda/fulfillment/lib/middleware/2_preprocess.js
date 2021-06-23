@@ -127,7 +127,6 @@ module.exports=async function preprocess(req,res){
             idattrs = _.get(decoded,'payload');
             console.log("Decoded idtoken:",idattrs);
             var kid = _.get(decoded,'header.kid');
-            console.log()
             var default_jwks_url = [_.get(req,'_settings.DEFAULT_USER_POOL_JWKS_URL')];
             var identity_provider_jwks_url = _.get(req,'_settings.IDENTITY_PROVIDER_JWKS_URLS');
             if (identity_provider_jwks_url && identity_provider_jwks_url.length) {
