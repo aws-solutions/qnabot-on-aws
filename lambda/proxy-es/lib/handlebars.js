@@ -75,7 +75,7 @@ Handlebars.registerHelper('ifCond', function (v1, operator, v2, options) {
 
 Handlebars.registerHelper('ifLang', function (lang, options) {
     const SessionAttributes = _.get(req_glbl, 'session');
-    const usrLang = SessionAttributes.userLocale;
+    const usrLang = SessionAttributes.qnabotcontext.userLocale;
     if (usrLang && lang === usrLang) {
         _.set(req_glbl.session, 'matchlang', 'true');
         // Disable autotranslation, since we have an explicit language match
