@@ -11,6 +11,423 @@ const botDateVersion = process.env.npm_package_version + " - v1";  // CHANGE ME 
 var _ = require('lodash');
 
 exports.resources={
+
+    "ResponseBotQNAYesNo": {
+        "Type": "Custom::LexBot",
+        "Properties": {
+            "ServiceToken": { "Ref":"LexV2CFNLambdaARN" },
+            "botName": {"Fn::Sub":"ResponseBot-QNAYesNo-${AWS::StackName}"},
+            "dataPrivacy": {"childDirected": "False"},
+            "description": "QNA Yes No Bot - " + botDateVersion,
+            "idleSessionTTLInSeconds": "300",
+            "roleArn": { "Ref":"LexV2ServiceLinkedRoleARN" },
+            "CR.botLocales": [{
+                "localeId": "en_US",
+                "nluIntentConfidenceThreshold": "0.40",
+                "voiceSettings": {"voiceId":"Salli"},
+                "CR.slotTypes": [
+                  {
+                    "slotTypeName": "QNAYesNoSlotType",
+                    "slotTypeValues": [
+                        {
+                            "sampleValue": {"value": "Yes"},
+                            "synonyms": [
+                                {"value": 'Yes'},
+                                {"value": 'OK'},
+                                {"value": 'yeah'},
+                                {"value": 'sure'},
+                                {"value": 'yep'},
+                                {"value": 'affirmative'},
+                                {"value": 'aye'},
+                                {"value": 'correct'},
+                                {"value": 'one'},
+                                {"value": '1'},
+                            ]
+                        },
+                        {
+                            "sampleValue": {"value": "No"},
+                            "synonyms": [
+                                {"value": 'no'},
+                                {"value": 'nope'},
+                                {"value": 'na'},
+                                {"value": 'negative'},
+                                {"value": 'non'},
+                                {"value": 'incorrect'},
+                                {"value": 'Two'},
+                                {"value": '2'},
+                            ]
+                        }
+                    ],
+                     "valueSelectionSetting": {
+                        "resolutionStrategy": "TopResolution"
+                    }
+                  }
+                ],
+                "CR.intents": [{
+                    "intentName": "YesNoIntent",
+                    "sampleUtterances": [
+                        {"utterance": "{Yes_No}"},
+                        {"utterance": "I said {Yes_No}"}
+                    ],
+                    "intentClosingSetting": {
+                        "closingResponse": {
+                            "messageGroups": [{
+                                "message": {"plainTextMessage": {"value": "OK. "}}
+                            }]
+                        }
+                    },
+                    "CR.slots": [{
+                        "slotName": "Yes_No",
+                        "CR.slotTypeName": "QNAYesNoSlotType",
+                        "valueElicitationSetting": {
+                            "slotConstraint": "Required",
+                            "promptSpecification": {
+                                "messageGroups": [{
+                                    "message": { "plainTextMessage": {"value": "Say Yes or No."}}
+                                }],
+                                "maxRetries": 2,
+                                "allowInterrupt": "True"
+                            }
+                        }
+                    }]
+                }],
+            }]
+        }
+    },
+    
+  "ResponseBotQNAYesNoVersion": {
+        "DeletionPolicy": "Retain",
+        "UpdateReplacePolicy": "Retain",
+        "Type": "Custom::LexBotVersion",
+        "Properties": {
+            "ServiceToken": { "Ref":"LexV2CFNLambdaARN" },
+            "botId": { "Ref":"ResponseBotQNAYesNo" },
+            "CR.botLocaleIds": {"Fn::GetAtt":["ResponseBotQNAYesNo","botLocaleIds"]},
+            "CR.lastUpdatedDateTime": {"Fn::GetAtt":["ResponseBotQNAYesNo","lastUpdatedDateTime"]}
+        }
+  },
+
+  "ResponseBotQNAYesNoAlias": {
+        "DeletionPolicy": "Retain",
+        "Type": "Custom::LexBotAlias",
+        "Properties": {
+            "ServiceToken": { "Ref":"LexV2CFNLambdaARN" },
+            "botId": { "Ref":"ResponseBotQNAYesNo" },
+            "botAliasName": "live",
+            "botVersion": { "Ref":"ResponseBotQNAYesNoVersion" },
+            "botAliasLocaleSettings": {
+                "en_US": {"enabled": "True"}
+            }
+        }
+    },
+    
+    "ResponseBotQNAYesNoExit": {
+        "Type": "Custom::LexBot",
+        "Properties": {
+            "ServiceToken": { "Ref":"LexV2CFNLambdaARN" },
+            "botName": {"Fn::Sub":"ResponseBot-QNAYesNoExit-${AWS::StackName}"},
+            "dataPrivacy": {"childDirected": "False"},
+            "description": "QNA Yes No Exit Bot - " + botDateVersion,
+            "idleSessionTTLInSeconds": "300",
+            "roleArn": { "Ref":"LexV2ServiceLinkedRoleARN" },
+            "CR.botLocales": [{
+                "localeId": "en_US",
+                "nluIntentConfidenceThreshold": "0.40",
+                "voiceSettings": {"voiceId":"Salli"},
+                "CR.slotTypes": [
+                  {
+                    "slotTypeName": "QNAYesNoExitSlotType",
+                    "slotTypeValues": [
+                        {
+                            "sampleValue": {"value": "Yes"},
+                            "synonyms": [
+                                {"value": 'Yes'},
+                                {"value": 'OK'},
+                                {"value": 'yeah'},
+                                {"value": 'sure'},
+                                {"value": 'yep'},
+                                {"value": 'affirmative'},
+                                {"value": 'aye'},
+                                {"value": 'correct'},
+                                {"value": 'one'},
+                                {"value": '1'},
+                            ]
+                        },
+                        {
+                            "sampleValue": {"value": "No"},
+                            "synonyms": [
+                                {"value": 'no'},
+                                {"value": 'nope'},
+                                {"value": 'na'},
+                                {"value": 'negative'},
+                                {"value": 'non'},
+                                {"value": 'incorrect'},
+                                {"value": 'Two'},
+                                {"value": '2'},
+                            ]
+                        },
+                        {
+                            "sampleValue": {"value": "Exit"},
+                            "synonyms": [
+                                {"value": 'agent'},
+                                {"value": 'rep'},
+                                {"value": 'representative'},
+                                {"value": 'stop'},
+                                {"value": 'quit'},
+                                {"value": 'help'},
+                                {"value": 'bye'},
+                                {"value": 'goodbye'},
+                                {"value": 'three'},
+                                {"value": '3'}
+                            ]
+                        }
+                    ],
+                     "valueSelectionSetting": {
+                        "resolutionStrategy": "TopResolution"
+                    }
+                  }
+                ],
+                "CR.intents": [{
+                    "intentName": "YesNoExitIntent",
+                    "sampleUtterances": [
+                        {"utterance": "{Yes_No_Exit}"},
+                        {"utterance": "I said {Yes_No_Exit}"}
+                    ],
+                    "intentClosingSetting": {
+                        "closingResponse": {
+                            "messageGroups": [{
+                                "message": {"plainTextMessage": {"value": "OK. "}}
+                            }]
+                        }
+                    },
+                    "CR.slots": [{
+                        "slotName": "Yes_No_Exit",
+                        "CR.slotTypeName": "QNAYesNoExitSlotType",
+                        "valueElicitationSetting": {
+                            "slotConstraint": "Required",
+                            "promptSpecification": {
+                                "messageGroups": [{
+                                    "message": { "plainTextMessage": {"value": "Say Yes, No, or Exit."}}
+                                }],
+                                "maxRetries": 2,
+                                "allowInterrupt": "True"
+                            }
+                        }
+                    }]
+                }],
+            }]
+        }
+    },
+    
+  "ResponseBotQNAYesNoExitVersion": {
+        "DeletionPolicy": "Retain",
+        "UpdateReplacePolicy": "Retain",
+        "Type": "Custom::LexBotVersion",
+        "Properties": {
+            "ServiceToken": { "Ref":"LexV2CFNLambdaARN" },
+            "botId": { "Ref":"ResponseBotQNAYesNoExit" },
+            "CR.botLocaleIds": {"Fn::GetAtt":["ResponseBotQNAYesNoExit","botLocaleIds"]},
+            "CR.lastUpdatedDateTime": {"Fn::GetAtt":["ResponseBotQNAYesNoExit","lastUpdatedDateTime"]}
+        }
+  },
+
+  "ResponseBotQNAYesNoExitAlias": {
+        "DeletionPolicy": "Retain",
+        "Type": "Custom::LexBotAlias",
+        "Properties": {
+            "ServiceToken": { "Ref":"LexV2CFNLambdaARN" },
+            "botId": { "Ref":"ResponseBotQNAYesNoExit" },
+            "botAliasName": "live",
+            "botVersion": { "Ref":"ResponseBotQNAYesNoExitVersion" },
+            "botAliasLocaleSettings": {
+                "en_US": {"enabled": "True"}
+            }
+        }
+    },
+    
+    "ResponseBotQNAPin": {
+        "Type": "Custom::LexBot",
+        "Properties": {
+            "ServiceToken": { "Ref":"LexV2CFNLambdaARN" },
+            "botName": {"Fn::Sub":"ResponseBot-QNAPin-${AWS::StackName}"},
+            "dataPrivacy": {"childDirected": "False"},
+            "description": "QNA PIN Bot - " + botDateVersion,
+            "idleSessionTTLInSeconds": "300",
+            "roleArn": { "Ref":"LexV2ServiceLinkedRoleARN" },
+            "CR.botLocales": [{
+                "localeId": "en_US",
+                "nluIntentConfidenceThreshold": "0.40",
+                "voiceSettings": {"voiceId":"Salli"},
+                "CR.slotTypes": [
+                  {
+                     "slotTypeName": "QNAPinSlotType",
+                     "valueSelectionSetting": {
+                        "resolutionStrategy": "OriginalValue",
+                        "regexFilter": {
+                            "pattern": "[0-9]{4}"
+                        }
+                    },
+                    "parentSlotTypeSignature": "AMAZON.AlphaNumeric"
+                  }
+                ],
+                "CR.intents": [{
+                    "intentName": "PINIntent",
+                    "sampleUtterances": [
+                        {"utterance": "The pin number is {Pin}"},
+                        {"utterance": "My pin number is {Pin}"},
+                        {"utterance": "It is {Pin}"},
+                        {"utterance": "{Pin}"}
+                    ],
+                    "intentConfirmationSetting": {
+                        "promptSpecification": {
+                            "messageGroups": [{
+                                "message": {"plainTextMessage": {"value": "<speak>Is <say-as interpret-as=\"digits\">{Pin}</say-as> correct (Yes or No)?"}}
+                            }],
+                            "maxRetries":1
+                        },
+                        "declinationResponse": {
+                            "messageGroups": [{
+                                "message": {"plainTextMessage": {"value": "I'm sorry I did not get all the digits, please re-enter all digits."}}
+                            }]
+                        }
+                    }, 
+                    "intentClosingSetting": {
+                        "closingResponse": {
+                            "messageGroups": [{
+                                "message": {"plainTextMessage": {"value": "OK. "}}
+                            }]
+                        }
+                    },
+                    "CR.slots": [{
+                        "slotName": "Pin",
+                        "CR.slotTypeName": "QNAPinSlotType",
+                        "valueElicitationSetting": {
+                            "slotConstraint": "Required",
+                            "promptSpecification": {
+                                "messageGroups": [{
+                                    "message": { "plainTextMessage": {"value": "What are all the digits?"}}
+                                }],
+                                "maxRetries": 2,
+                                "allowInterrupt": "True"
+                            }
+                        }
+                    }]
+                }],
+            }]
+        }
+    },
+    
+  "ResponseBotQNAPinVersion": {
+        "DeletionPolicy": "Retain",
+        "UpdateReplacePolicy": "Retain",
+        "Type": "Custom::LexBotVersion",
+        "Properties": {
+            "ServiceToken": { "Ref":"LexV2CFNLambdaARN" },
+            "botId": { "Ref":"ResponseBotQNAPin" },
+            "CR.botLocaleIds": {"Fn::GetAtt":["ResponseBotQNAPin","botLocaleIds"]},
+            "CR.lastUpdatedDateTime": {"Fn::GetAtt":["ResponseBotQNAPin","lastUpdatedDateTime"]}
+        }
+  },
+
+  "ResponseBotQNAPinAlias": {
+        "DeletionPolicy": "Retain",
+        "Type": "Custom::LexBotAlias",
+        "Properties": {
+            "ServiceToken": { "Ref":"LexV2CFNLambdaARN" },
+            "botId": { "Ref":"ResponseBotQNAPin" },
+            "botAliasName": "live",
+            "botVersion": { "Ref":"ResponseBotQNAPinVersion" },
+            "botAliasLocaleSettings": {
+                "en_US": {"enabled": "True"}
+            }
+        }
+    },
+    
+
+    "ResponseBotQNAPinNoConfirm": {
+        "Type": "Custom::LexBot",
+        "Properties": {
+            "ServiceToken": { "Ref":"LexV2CFNLambdaARN" },
+            "botName": {"Fn::Sub":"ResponseBot-QNAPinNoConfirm-${AWS::StackName}"},
+            "dataPrivacy": {"childDirected": "False"},
+            "description": "QNA PIN Bot (NoConfirm) - " + botDateVersion,
+            "idleSessionTTLInSeconds": "300",
+            "roleArn": { "Ref":"LexV2ServiceLinkedRoleARN" },
+            "CR.botLocales": [{
+                "localeId": "en_US",
+                "nluIntentConfidenceThreshold": "0.40",
+                "voiceSettings": {"voiceId":"Salli"},
+                "CR.slotTypes": [
+                  {
+                     "slotTypeName": "QNAPinNoConfirmSlotType",
+                     "valueSelectionSetting": {
+                        "resolutionStrategy": "OriginalValue",
+                        "regexFilter": {
+                            "pattern": "[0-9]{4}"
+                        }
+                    },
+                    "parentSlotTypeSignature": "AMAZON.AlphaNumeric",
+                  }
+                ],
+                "CR.intents": [{
+                    "intentName": "PINNoConfirmIntent",
+                    "sampleUtterances": [
+                        {"utterance": "The pin number is {Pin}"},
+                        {"utterance": "My pin number is {Pin}"},
+                        {"utterance": "It is {Pin}"},
+                        {"utterance": "{Pin}"}
+                    ],
+                    "intentClosingSetting": {
+                        "closingResponse": {
+                            "messageGroups": [{
+                                "message": {"plainTextMessage": {"value": "OK. "}}
+                            }]
+                        }
+                    },
+                    "CR.slots": [{
+                        "slotName": "Pin",
+                        "CR.slotTypeName": "QNAPinNoConfirmSlotType",
+                        "valueElicitationSetting": {
+                            "slotConstraint": "Required",
+                            "promptSpecification": {
+                                "messageGroups": [{
+                                    "message": { "plainTextMessage": {"value": "What are all the digits?"}}
+                                }],
+                                "maxRetries": 2,
+                                "allowInterrupt": "True"
+                            }
+                        }
+                    }]
+                }],
+            }]
+        }
+    },
+    
+  "ResponseBotQNAPinNoConfirmVersion": {
+        "DeletionPolicy": "Retain",
+        "UpdateReplacePolicy": "Retain",
+        "Type": "Custom::LexBotVersion",
+        "Properties": {
+            "ServiceToken": { "Ref":"LexV2CFNLambdaARN" },
+            "botId": { "Ref":"ResponseBotQNAPinNoConfirm" },
+            "CR.botLocaleIds": {"Fn::GetAtt":["ResponseBotQNAPinNoConfirm","botLocaleIds"]},
+            "CR.lastUpdatedDateTime": {"Fn::GetAtt":["ResponseBotQNAPinNoConfirm","lastUpdatedDateTime"]}
+        }
+  },
+
+  "ResponseBotQNAPinNoConfirmAlias": {
+        "DeletionPolicy": "Retain",
+        "Type": "Custom::LexBotAlias",
+        "Properties": {
+            "ServiceToken": { "Ref":"LexV2CFNLambdaARN" },
+            "botId": { "Ref":"ResponseBotQNAPinNoConfirm" },
+            "botAliasName": "live",
+            "botVersion": { "Ref":"ResponseBotQNAPinNoConfirmVersion" },
+            "botAliasLocaleSettings": {
+                "en_US": {"enabled": "True"}
+            }
+        }
+    },
     
     "ResponseBotQNASocialSecurity": {
         "Type": "Custom::LexBot",
@@ -110,6 +527,7 @@ exports.resources={
         }
     },
     
+
     "ResponseBotQNAWage": {
         "Type": "Custom::LexBot",
         "Properties": {
@@ -206,7 +624,7 @@ exports.resources={
             }
         }
     },
-    
+
     "ResponseBotQNAName": {
         "Type": "Custom::LexBot",
         "Properties": {
@@ -408,7 +826,7 @@ exports.resources={
 
 
 exports.names=[
-    "QNAAge", "QNAName", "QNAWage", "QNASocialSecurity"
+    "QNAAge", "QNAName", "QNAWage", "QNASocialSecurity", "QNAPinNoConfirm", "QNAPin", "QNAYesNo", "QNAYesNoExit" 
 ] ;
 
 
