@@ -12,6 +12,385 @@ var _ = require('lodash');
 
 exports.resources={
 
+    "ResponseBotQNAWage": {
+        "Type": "Custom::LexBot",
+        "Properties": {
+            "ServiceToken": { "Ref":"LexV2CFNLambdaARN" },
+            "botName": {"Fn::Sub":"ResponseBot-QNAWage-${AWS::StackName}"},
+            "dataPrivacy": {"childDirected": "False"},
+            "description": "QNA Wage Bot - " + botDateVersion,
+            "idleSessionTTLInSeconds": "300",
+            "roleArn": { "Ref":"LexV2ServiceLinkedRoleARN" },
+            "CR.botLocales": [{
+                "localeId": "en_US",
+                "nluIntentConfidenceThreshold": "0.40",
+                "voiceSettings": {"voiceId":"Salli"},
+                "CR.slotTypes": [
+                  {
+                     "slotTypeName": "QNAWageSlotType",
+                     "valueSelectionSetting": {
+                        "resolutionStrategy": "OriginalValue",
+                        "regexFilter": {
+                            "pattern": "[0-9]{1,7}"
+                        }
+                    },
+                    "parentSlotTypeSignature": "AMAZON.AlphaNumeric",
+                  }
+                ],
+                "CR.intents": [{
+                    "intentName": "WageIntent",
+                    "sampleUtterances": [
+                        {"utterance": "My salary is {Wage}"},
+                        {"utterance": "My wage is {Wage}"},
+                        {"utterance": "{Wage}"}
+                    ],
+                    "intentConfirmationSetting": {
+                        "promptSpecification": {
+                            "messageGroups": [{
+                                "message": {"plainTextMessage": {"value": "Is {Wage} correct (Yes/No)?"}}
+                            }],
+                            "maxRetries":1
+                        },
+                        "declinationResponse": {
+                            "messageGroups": [{
+                                "message": {"plainTextMessage": {"value": "Please let me what your wage was again?"}}
+                            }]
+                        }
+                    }, 
+                    "intentClosingSetting": {
+                        "closingResponse": {
+                            "messageGroups": [{
+                                "message": {"plainTextMessage": {"value": "OK. "}}
+                            }]
+                        }
+                    },
+                    "CR.slots": [{
+                        "slotName": "Wage",
+                        "CR.slotTypeName": "QNAWageSlotType",
+                        "valueElicitationSetting": {
+                            "slotConstraint": "Required",
+                            "promptSpecification": {
+                                "messageGroups": [{
+                                    "message": { "plainTextMessage": {"value": "What is your wage?"}}
+                                }],
+                                "maxRetries": 2,
+                                "allowInterrupt": "True"
+                            }
+                        }
+                    }]
+                }],
+            }]
+        }
+    },
+    
+  "ResponseBotQNAWageVersion": {
+        "DeletionPolicy": "Retain",
+        "UpdateReplacePolicy": "Retain",
+        "Type": "Custom::LexBotVersion",
+        "Properties": {
+            "ServiceToken": { "Ref":"LexV2CFNLambdaARN" },
+            "botId": { "Ref":"ResponseBotQNAWage" },
+            "CR.botLocaleIds": {"Fn::GetAtt":["ResponseBotQNAWage","botLocaleIds"]},
+            "CR.lastUpdatedDateTime": {"Fn::GetAtt":["ResponseBotQNAWage","lastUpdatedDateTime"]}
+        }
+  },
+
+  "ResponseBotQNAWageAlias": {
+        "DeletionPolicy": "Retain",
+        "Type": "Custom::LexBotAlias",
+        "Properties": {
+            "ServiceToken": { "Ref":"LexV2CFNLambdaARN" },
+            "botId": { "Ref":"ResponseBotQNAWage" },
+            "botAliasName": "live",
+            "botVersion": { "Ref":"ResponseBotQNAWageVersion" },
+            "botAliasLocaleSettings": {
+                "en_US": {"enabled": "True"}
+            }
+        }
+    },
+    
+    "ResponseBotQNASocialSecurity": {
+        "Type": "Custom::LexBot",
+        "Properties": {
+            "ServiceToken": { "Ref":"LexV2CFNLambdaARN" },
+            "botName": {"Fn::Sub":"ResponseBot-QNASocialSecurity-${AWS::StackName}"},
+            "dataPrivacy": {"childDirected": "False"},
+            "description": "QNA SocialSecurity Bot - " + botDateVersion,
+            "idleSessionTTLInSeconds": "300",
+            "roleArn": { "Ref":"LexV2ServiceLinkedRoleARN" },
+            "CR.botLocales": [{
+                "localeId": "en_US",
+                "nluIntentConfidenceThreshold": "0.40",
+                "voiceSettings": {"voiceId":"Salli"},
+                "CR.slotTypes": [
+                  {
+                     "slotTypeName": "QNASocialSecuritySlotType",
+                     "valueSelectionSetting": {
+                        "resolutionStrategy": "OriginalValue",
+                        "regexFilter": {
+                            "pattern": "[0-9]{3}-[0-9]{2}-[0-9]{4}"
+                        }
+                    },
+                    "parentSlotTypeSignature": "AMAZON.AlphaNumeric",
+                  }
+                ],
+                "CR.intents": [{
+                    "intentName": "SocialSecurityIntent",
+                    "sampleUtterances": [
+                        {"utterance": "The social security number is {SSN}"},
+                        {"utterance": "My social security number is {SSN}"},
+                        {"utterance": "It is {SSN}"},
+                        {"utterance": "{SSN}"}
+                    ],
+                    "intentConfirmationSetting": {
+                        "promptSpecification": {
+                            "messageGroups": [{
+                                "message": {"plainTextMessage": {"value": "Is {SSN} correct (Yes/No)?"}}
+                            }],
+                            "maxRetries":1
+                        },
+                        "declinationResponse": {
+                            "messageGroups": [{
+                                "message": {"plainTextMessage": {"value": "Please let me know the social security number again?"}}
+                            }]
+                        }
+                    }, 
+                    "intentClosingSetting": {
+                        "closingResponse": {
+                            "messageGroups": [{
+                                "message": {"plainTextMessage": {"value": "OK. "}}
+                            }]
+                        }
+                    },
+                    "CR.slots": [{
+                        "slotName": "SSN",
+                        "CR.slotTypeName": "QNASocialSecuritySlotType",
+                        "valueElicitationSetting": {
+                            "slotConstraint": "Required",
+                            "promptSpecification": {
+                                "messageGroups": [{
+                                    "message": { "plainTextMessage": {"value": "What is your social security number?"}}
+                                }],
+                                "maxRetries": 2,
+                                "allowInterrupt": "True"
+                            }
+                        }
+                    }]
+                }],
+            }]
+        }
+    },
+    
+  "ResponseBotQNASocialSecurityVersion": {
+        "DeletionPolicy": "Retain",
+        "UpdateReplacePolicy": "Retain",
+        "Type": "Custom::LexBotVersion",
+        "Properties": {
+            "ServiceToken": { "Ref":"LexV2CFNLambdaARN" },
+            "botId": { "Ref":"ResponseBotQNASocialSecurity" },
+            "CR.botLocaleIds": {"Fn::GetAtt":["ResponseBotQNASocialSecurity","botLocaleIds"]},
+            "CR.lastUpdatedDateTime": {"Fn::GetAtt":["ResponseBotQNASocialSecurity","lastUpdatedDateTime"]}
+        }
+  },
+
+  "ResponseBotQNASocialSecurityAlias": {
+        "DeletionPolicy": "Retain",
+        "Type": "Custom::LexBotAlias",
+        "Properties": {
+            "ServiceToken": { "Ref":"LexV2CFNLambdaARN" },
+            "botId": { "Ref":"ResponseBotQNASocialSecurity" },
+            "botAliasName": "live",
+            "botVersion": { "Ref":"ResponseBotQNASocialSecurityVersion" },
+            "botAliasLocaleSettings": {
+                "en_US": {"enabled": "True"}
+            }
+        }
+    },
+    
+    "ResponseBotQNAPin": {
+        "Type": "Custom::LexBot",
+        "Properties": {
+            "ServiceToken": { "Ref":"LexV2CFNLambdaARN" },
+            "botName": {"Fn::Sub":"ResponseBot-QNAPin-${AWS::StackName}"},
+            "dataPrivacy": {"childDirected": "False"},
+            "description": "QNA PIN Bot - " + botDateVersion,
+            "idleSessionTTLInSeconds": "300",
+            "roleArn": { "Ref":"LexV2ServiceLinkedRoleARN" },
+            "CR.botLocales": [{
+                "localeId": "en_US",
+                "nluIntentConfidenceThreshold": "0.40",
+                "voiceSettings": {"voiceId":"Salli"},
+                "CR.slotTypes": [
+                  {
+                     "slotTypeName": "QNAPinSlotType",
+                     "valueSelectionSetting": {
+                        "resolutionStrategy": "OriginalValue",
+                        "regexFilter": {
+                            "pattern": "[0-9]{4}"
+                        }
+                    },
+                    "parentSlotTypeSignature": "AMAZON.AlphaNumeric"
+                  }
+                ],
+                "CR.intents": [{
+                    "intentName": "PINIntent",
+                    "sampleUtterances": [
+                        {"utterance": "The pin number is {Pin}"},
+                        {"utterance": "My pin number is {Pin}"},
+                        {"utterance": "It is {Pin}"},
+                        {"utterance": "{Pin}"}
+                    ],
+                    "intentConfirmationSetting": {
+                        "promptSpecification": {
+                            "messageGroups": [{
+                                "message": {"plainTextMessage": {"value": "<speak>Is <say-as interpret-as=\"digits\">{Pin}</say-as> correct (Yes or No)?"}}
+                            }],
+                            "maxRetries":1
+                        },
+                        "declinationResponse": {
+                            "messageGroups": [{
+                                "message": {"plainTextMessage": {"value": "I'm sorry I did not get all the digits, please re-enter all digits."}}
+                            }]
+                        }
+                    }, 
+                    "intentClosingSetting": {
+                        "closingResponse": {
+                            "messageGroups": [{
+                                "message": {"plainTextMessage": {"value": "OK. "}}
+                            }]
+                        }
+                    },
+                    "CR.slots": [{
+                        "slotName": "Pin",
+                        "CR.slotTypeName": "QNAPinSlotType",
+                        "valueElicitationSetting": {
+                            "slotConstraint": "Required",
+                            "promptSpecification": {
+                                "messageGroups": [{
+                                    "message": { "plainTextMessage": {"value": "What are all the digits?"}}
+                                }],
+                                "maxRetries": 2,
+                                "allowInterrupt": "True"
+                            }
+                        }
+                    }]
+                }],
+            }]
+        }
+    },
+    
+  "ResponseBotQNAPinVersion": {
+        "DeletionPolicy": "Retain",
+        "UpdateReplacePolicy": "Retain",
+        "Type": "Custom::LexBotVersion",
+        "Properties": {
+            "ServiceToken": { "Ref":"LexV2CFNLambdaARN" },
+            "botId": { "Ref":"ResponseBotQNAPin" },
+            "CR.botLocaleIds": {"Fn::GetAtt":["ResponseBotQNAPin","botLocaleIds"]},
+            "CR.lastUpdatedDateTime": {"Fn::GetAtt":["ResponseBotQNAPin","lastUpdatedDateTime"]}
+        }
+  },
+
+  "ResponseBotQNAPinAlias": {
+        "DeletionPolicy": "Retain",
+        "Type": "Custom::LexBotAlias",
+        "Properties": {
+            "ServiceToken": { "Ref":"LexV2CFNLambdaARN" },
+            "botId": { "Ref":"ResponseBotQNAPin" },
+            "botAliasName": "live",
+            "botVersion": { "Ref":"ResponseBotQNAPinVersion" },
+            "botAliasLocaleSettings": {
+                "en_US": {"enabled": "True"}
+            }
+        }
+    },
+    
+
+    "ResponseBotQNAPinNoConfirm": {
+        "Type": "Custom::LexBot",
+        "Properties": {
+            "ServiceToken": { "Ref":"LexV2CFNLambdaARN" },
+            "botName": {"Fn::Sub":"ResponseBot-QNAPinNoConfirm-${AWS::StackName}"},
+            "dataPrivacy": {"childDirected": "False"},
+            "description": "QNA PIN Bot (NoConfirm) - " + botDateVersion,
+            "idleSessionTTLInSeconds": "300",
+            "roleArn": { "Ref":"LexV2ServiceLinkedRoleARN" },
+            "CR.botLocales": [{
+                "localeId": "en_US",
+                "nluIntentConfidenceThreshold": "0.40",
+                "voiceSettings": {"voiceId":"Salli"},
+                "CR.slotTypes": [
+                  {
+                     "slotTypeName": "QNAPinNoConfirmSlotType",
+                     "valueSelectionSetting": {
+                        "resolutionStrategy": "OriginalValue",
+                        "regexFilter": {
+                            "pattern": "[0-9]{4}"
+                        }
+                    },
+                    "parentSlotTypeSignature": "AMAZON.AlphaNumeric",
+                  }
+                ],
+                "CR.intents": [{
+                    "intentName": "PINNoConfirmIntent",
+                    "sampleUtterances": [
+                        {"utterance": "The pin number is {Pin}"},
+                        {"utterance": "My pin number is {Pin}"},
+                        {"utterance": "It is {Pin}"},
+                        {"utterance": "{Pin}"}
+                    ],
+                    "intentClosingSetting": {
+                        "closingResponse": {
+                            "messageGroups": [{
+                                "message": {"plainTextMessage": {"value": "OK. "}}
+                            }]
+                        }
+                    },
+                    "CR.slots": [{
+                        "slotName": "Pin",
+                        "CR.slotTypeName": "QNAPinNoConfirmSlotType",
+                        "valueElicitationSetting": {
+                            "slotConstraint": "Required",
+                            "promptSpecification": {
+                                "messageGroups": [{
+                                    "message": { "plainTextMessage": {"value": "What are all the digits?"}}
+                                }],
+                                "maxRetries": 2,
+                                "allowInterrupt": "True"
+                            }
+                        }
+                    }]
+                }],
+            }]
+        }
+    },
+    
+  "ResponseBotQNAPinNoConfirmVersion": {
+        "DeletionPolicy": "Retain",
+        "UpdateReplacePolicy": "Retain",
+        "Type": "Custom::LexBotVersion",
+        "Properties": {
+            "ServiceToken": { "Ref":"LexV2CFNLambdaARN" },
+            "botId": { "Ref":"ResponseBotQNAPinNoConfirm" },
+            "CR.botLocaleIds": {"Fn::GetAtt":["ResponseBotQNAPinNoConfirm","botLocaleIds"]},
+            "CR.lastUpdatedDateTime": {"Fn::GetAtt":["ResponseBotQNAPinNoConfirm","lastUpdatedDateTime"]}
+        }
+  },
+
+  "ResponseBotQNAPinNoConfirmAlias": {
+        "DeletionPolicy": "Retain",
+        "Type": "Custom::LexBotAlias",
+        "Properties": {
+            "ServiceToken": { "Ref":"LexV2CFNLambdaARN" },
+            "botId": { "Ref":"ResponseBotQNAPinNoConfirm" },
+            "botAliasName": "live",
+            "botVersion": { "Ref":"ResponseBotQNAPinNoConfirmVersion" },
+            "botAliasLocaleSettings": {
+                "en_US": {"enabled": "True"}
+            }
+        }
+    },
+    
     "ResponseBotQNAYesNo": {
         "Type": "Custom::LexBot",
         "Properties": {
@@ -244,50 +623,43 @@ exports.resources={
             }
         }
     },
-    
-    "ResponseBotQNAPin": {
+
+    "ResponseBotQNADate": {
         "Type": "Custom::LexBot",
         "Properties": {
             "ServiceToken": { "Ref":"LexV2CFNLambdaARN" },
-            "botName": {"Fn::Sub":"ResponseBot-QNAPin-${AWS::StackName}"},
+            "botName": {"Fn::Sub":"ResponseBot-QNADate-${AWS::StackName}"},
             "dataPrivacy": {"childDirected": "False"},
-            "description": "QNA PIN Bot - " + botDateVersion,
+            "description": "QNA Date Bot - " + botDateVersion,
             "idleSessionTTLInSeconds": "300",
             "roleArn": { "Ref":"LexV2ServiceLinkedRoleARN" },
             "CR.botLocales": [{
                 "localeId": "en_US",
                 "nluIntentConfidenceThreshold": "0.40",
                 "voiceSettings": {"voiceId":"Salli"},
-                "CR.slotTypes": [
-                  {
-                     "slotTypeName": "QNAPinSlotType",
-                     "valueSelectionSetting": {
-                        "resolutionStrategy": "OriginalValue",
-                        "regexFilter": {
-                            "pattern": "[0-9]{4}"
-                        }
-                    },
-                    "parentSlotTypeSignature": "AMAZON.AlphaNumeric"
-                  }
-                ],
                 "CR.intents": [{
-                    "intentName": "PINIntent",
+                    "intentName": "DateIntent",
                     "sampleUtterances": [
-                        {"utterance": "The pin number is {Pin}"},
-                        {"utterance": "My pin number is {Pin}"},
-                        {"utterance": "It is {Pin}"},
-                        {"utterance": "{Pin}"}
+                        {"utterance": "The date is {date}"},
+                        {"utterance": "The date was {date}"},
+                        {"utterance": "I went on {date}"},
+                        {"utterance": "It is {date}"},
+                        {"utterance": "It occurred on {date}"},
+                        {"utterance": "I was born on {date}"},
+                        {"utterance": "My birthdate is {date}"},
+                        {"utterance": "My date of birth is {date}"},
+                        {"utterance": "{date}"}
                     ],
                     "intentConfirmationSetting": {
                         "promptSpecification": {
                             "messageGroups": [{
-                                "message": {"plainTextMessage": {"value": "<speak>Is <say-as interpret-as=\"digits\">{Pin}</say-as> correct (Yes or No)?"}}
+                                "message": {"plainTextMessage": {"value": "Is {date} correct (Yes or No)?"}}
                             }],
                             "maxRetries":1
                         },
                         "declinationResponse": {
                             "messageGroups": [{
-                                "message": {"plainTextMessage": {"value": "I'm sorry I did not get all the digits, please re-enter all digits."}}
+                                "message": {"plainTextMessage": {"value": "Please let me know the date again?"}}
                             }]
                         }
                     }, 
@@ -299,13 +671,13 @@ exports.resources={
                         }
                     },
                     "CR.slots": [{
-                        "slotName": "Pin",
-                        "CR.slotTypeName": "QNAPinSlotType",
+                        "slotName": "date",
+                        "CR.slotTypeName": "AMAZON.Date",
                         "valueElicitationSetting": {
                             "slotConstraint": "Required",
                             "promptSpecification": {
                                 "messageGroups": [{
-                                    "message": { "plainTextMessage": {"value": "What are all the digits?"}}
+                                    "message": { "plainTextMessage": {"value": "What date?"}}
                                 }],
                                 "maxRetries": 2,
                                 "allowInterrupt": "True"
@@ -317,65 +689,57 @@ exports.resources={
         }
     },
     
-  "ResponseBotQNAPinVersion": {
+  "ResponseBotQNADateVersion": {
         "DeletionPolicy": "Retain",
         "UpdateReplacePolicy": "Retain",
         "Type": "Custom::LexBotVersion",
         "Properties": {
             "ServiceToken": { "Ref":"LexV2CFNLambdaARN" },
-            "botId": { "Ref":"ResponseBotQNAPin" },
-            "CR.botLocaleIds": {"Fn::GetAtt":["ResponseBotQNAPin","botLocaleIds"]},
-            "CR.lastUpdatedDateTime": {"Fn::GetAtt":["ResponseBotQNAPin","lastUpdatedDateTime"]}
+            "botId": { "Ref":"ResponseBotQNADate" },
+            "CR.botLocaleIds": {"Fn::GetAtt":["ResponseBotQNADate","botLocaleIds"]},
+            "CR.lastUpdatedDateTime": {"Fn::GetAtt":["ResponseBotQNADate","lastUpdatedDateTime"]}
         }
   },
 
-  "ResponseBotQNAPinAlias": {
+  "ResponseBotQNADateAlias": {
         "DeletionPolicy": "Retain",
         "Type": "Custom::LexBotAlias",
         "Properties": {
             "ServiceToken": { "Ref":"LexV2CFNLambdaARN" },
-            "botId": { "Ref":"ResponseBotQNAPin" },
+            "botId": { "Ref":"ResponseBotQNADate" },
             "botAliasName": "live",
-            "botVersion": { "Ref":"ResponseBotQNAPinVersion" },
+            "botVersion": { "Ref":"ResponseBotQNADateVersion" },
             "botAliasLocaleSettings": {
                 "en_US": {"enabled": "True"}
             }
         }
     },
-    
 
-    "ResponseBotQNAPinNoConfirm": {
+    "ResponseBotQNADateNoConfirm": {
         "Type": "Custom::LexBot",
         "Properties": {
             "ServiceToken": { "Ref":"LexV2CFNLambdaARN" },
-            "botName": {"Fn::Sub":"ResponseBot-QNAPinNoConfirm-${AWS::StackName}"},
+            "botName": {"Fn::Sub":"ResponseBot-QNADateNoConfirm-${AWS::StackName}"},
             "dataPrivacy": {"childDirected": "False"},
-            "description": "QNA PIN Bot (NoConfirm) - " + botDateVersion,
+            "description": "QNA Date Bot (NoConfirm) - " + botDateVersion,
             "idleSessionTTLInSeconds": "300",
             "roleArn": { "Ref":"LexV2ServiceLinkedRoleARN" },
             "CR.botLocales": [{
                 "localeId": "en_US",
                 "nluIntentConfidenceThreshold": "0.40",
                 "voiceSettings": {"voiceId":"Salli"},
-                "CR.slotTypes": [
-                  {
-                     "slotTypeName": "QNAPinNoConfirmSlotType",
-                     "valueSelectionSetting": {
-                        "resolutionStrategy": "OriginalValue",
-                        "regexFilter": {
-                            "pattern": "[0-9]{4}"
-                        }
-                    },
-                    "parentSlotTypeSignature": "AMAZON.AlphaNumeric",
-                  }
-                ],
                 "CR.intents": [{
-                    "intentName": "PINNoConfirmIntent",
+                    "intentName": "DateNoConfirmIntent",
                     "sampleUtterances": [
-                        {"utterance": "The pin number is {Pin}"},
-                        {"utterance": "My pin number is {Pin}"},
-                        {"utterance": "It is {Pin}"},
-                        {"utterance": "{Pin}"}
+                        {"utterance": "The date is {date}"},
+                        {"utterance": "The date was {date}"},
+                        {"utterance": "I went on {date}"},
+                        {"utterance": "It is {date}"},
+                        {"utterance": "It occurred on {date}"},
+                        {"utterance": "I was born on {date}"},
+                        {"utterance": "My birthdate is {date}"},
+                        {"utterance": "My date of birth is {date}"},
+                        {"utterance": "{date}"}
                     ],
                     "intentClosingSetting": {
                         "closingResponse": {
@@ -385,13 +749,13 @@ exports.resources={
                         }
                     },
                     "CR.slots": [{
-                        "slotName": "Pin",
-                        "CR.slotTypeName": "QNAPinNoConfirmSlotType",
+                        "slotName": "date",
+                        "CR.slotTypeName": "AMAZON.Date",
                         "valueElicitationSetting": {
                             "slotConstraint": "Required",
                             "promptSpecification": {
                                 "messageGroups": [{
-                                    "message": { "plainTextMessage": {"value": "What are all the digits?"}}
+                                    "message": { "plainTextMessage": {"value": "What date?"}}
                                 }],
                                 "maxRetries": 2,
                                 "allowInterrupt": "True"
@@ -403,39 +767,39 @@ exports.resources={
         }
     },
     
-  "ResponseBotQNAPinNoConfirmVersion": {
+  "ResponseBotQNADateNoConfirmVersion": {
         "DeletionPolicy": "Retain",
         "UpdateReplacePolicy": "Retain",
         "Type": "Custom::LexBotVersion",
         "Properties": {
             "ServiceToken": { "Ref":"LexV2CFNLambdaARN" },
-            "botId": { "Ref":"ResponseBotQNAPinNoConfirm" },
-            "CR.botLocaleIds": {"Fn::GetAtt":["ResponseBotQNAPinNoConfirm","botLocaleIds"]},
-            "CR.lastUpdatedDateTime": {"Fn::GetAtt":["ResponseBotQNAPinNoConfirm","lastUpdatedDateTime"]}
+            "botId": { "Ref":"ResponseBotQNADateNoConfirm" },
+            "CR.botLocaleIds": {"Fn::GetAtt":["ResponseBotQNADateNoConfirm","botLocaleIds"]},
+            "CR.lastUpdatedDateTime": {"Fn::GetAtt":["ResponseBotQNADateNoConfirm","lastUpdatedDateTime"]}
         }
   },
 
-  "ResponseBotQNAPinNoConfirmAlias": {
+  "ResponseBotQNADateNoConfirmAlias": {
         "DeletionPolicy": "Retain",
         "Type": "Custom::LexBotAlias",
         "Properties": {
             "ServiceToken": { "Ref":"LexV2CFNLambdaARN" },
-            "botId": { "Ref":"ResponseBotQNAPinNoConfirm" },
+            "botId": { "Ref":"ResponseBotQNADateNoConfirm" },
             "botAliasName": "live",
-            "botVersion": { "Ref":"ResponseBotQNAPinNoConfirmVersion" },
+            "botVersion": { "Ref":"ResponseBotQNADateNoConfirmVersion" },
             "botAliasLocaleSettings": {
                 "en_US": {"enabled": "True"}
             }
         }
     },
-    
-    "ResponseBotQNASocialSecurity": {
+
+    "ResponseBotQNADayOfWeek": {
         "Type": "Custom::LexBot",
         "Properties": {
             "ServiceToken": { "Ref":"LexV2CFNLambdaARN" },
-            "botName": {"Fn::Sub":"ResponseBot-QNASocialSecurity-${AWS::StackName}"},
+            "botName": {"Fn::Sub":"ResponseBot-QNADayOfWeek-${AWS::StackName}"},
             "dataPrivacy": {"childDirected": "False"},
-            "description": "QNA SocialSecurity Bot - " + botDateVersion,
+            "description": "QNA DayOfWeek Bot - " + botDateVersion,
             "idleSessionTTLInSeconds": "300",
             "roleArn": { "Ref":"LexV2ServiceLinkedRoleARN" },
             "CR.botLocales": [{
@@ -444,34 +808,82 @@ exports.resources={
                 "voiceSettings": {"voiceId":"Salli"},
                 "CR.slotTypes": [
                   {
-                     "slotTypeName": "QNASocialSecuritySlotType",
-                     "valueSelectionSetting": {
-                        "resolutionStrategy": "OriginalValue",
-                        "regexFilter": {
-                            "pattern": "[0-9]{3}-[0-9]{2}-[0-9]{4}"
+                    "slotTypeName": "QNADayOfWeekSlotType",
+                    "slotTypeValues": [
+                        {
+                            "sampleValue": {"value": "Sunday"},
+                            "synonyms": [
+                                {"value": 'Su'},
+                                {"value": 'Sun'}
+                            ]
+                        },{
+                            "sampleValue": {"value": "Monday"},
+                            "synonyms": [
+                                {"value": 'M'},
+                                {"value": 'Mo'},
+                                {"value": 'Mon'}
+                            ]
+                        },{
+                            "sampleValue": {"value": "Tuesday"},
+                            "synonyms": [
+                                {"value": 'Tu'},
+                                {"value": 'Tue'},
+                                {"value": 'Tues'},
+                            ]
+                        },{
+                            "sampleValue": {"value": "Wednesday"},
+                            "synonyms": [
+                                {"value": 'W'},
+                                {"value": 'We'},
+                                {"value": 'Wed'}
+                            ]
+                        },{
+                            "sampleValue": {"value": "Thursday"},
+                            "synonyms": [
+                                {"value": 'Th'},
+                                {"value": 'Thu'},
+                                {"value": 'Thurs'},
+                            ]
+                        },{
+                            "sampleValue": {"value": "Friday"},
+                            "synonyms": [
+                                {"value": 'F'},
+                                {"value": 'Fr'},
+                                {"value": 'Fri'}
+                            ]
+                        },{
+                            "sampleValue": {"value": "Saturday"},
+                            "synonyms": [
+                                {"value": 'Sa'},
+                                {"value": 'Sat'}
+                            ]
                         }
-                    },
-                    "parentSlotTypeSignature": "AMAZON.AlphaNumeric",
+                    ],
+                     "valueSelectionSetting": {
+                        "resolutionStrategy": "TopResolution"
+                    }
                   }
                 ],
                 "CR.intents": [{
-                    "intentName": "SocialSecurityIntent",
+                    "intentName": "DayOfWeekIntent",
                     "sampleUtterances": [
-                        {"utterance": "The social security number is {SSN}"},
-                        {"utterance": "My social security number is {SSN}"},
-                        {"utterance": "It is {SSN}"},
-                        {"utterance": "{SSN}"}
+                        {"utterance": "The day is {DayOfWeek}"},
+                        {"utterance": "The day was {DayOfWeek}"},
+                        {"utterance": "I went on {DayOfWeek}"},
+                        {"utterance": "It is {DayOfWeek}"},
+                        {"utterance": "It occurred on {DayOfWeek}"},
+                        {"utterance": "{DayOfWeek}"}
                     ],
                     "intentConfirmationSetting": {
                         "promptSpecification": {
                             "messageGroups": [{
-                                "message": {"plainTextMessage": {"value": "Is {SSN} correct (Yes/No)?"}}
+                                "message": {"plainTextMessage": {"value": "Is {DayOfWeek} correct (Yes or No)?"}}
                             }],
                             "maxRetries":1
                         },
                         "declinationResponse": {
                             "messageGroups": [{
-                                "message": {"plainTextMessage": {"value": "Please let me know the social security number again?"}}
+                                "message": {"plainTextMessage": {"value": "Please let me know the day of the week again?"}}
                             }]
                         }
                     }, 
@@ -483,58 +895,57 @@ exports.resources={
                         }
                     },
                     "CR.slots": [{
-                        "slotName": "SSN",
-                        "CR.slotTypeName": "QNASocialSecuritySlotType",
+                        "slotName": "DayOfWeek",
+                        "CR.slotTypeName": "QNADayOfWeekSlotType",
                         "valueElicitationSetting": {
                             "slotConstraint": "Required",
                             "promptSpecification": {
                                 "messageGroups": [{
-                                    "message": { "plainTextMessage": {"value": "What is your social security number?"}}
+                                    "message": { "plainTextMessage": {"value": "What day of the week?"}}
                                 }],
                                 "maxRetries": 2,
                                 "allowInterrupt": "True"
                             }
                         }
                     }]
-                }],
+                }]
             }]
         }
     },
     
-  "ResponseBotQNASocialSecurityVersion": {
+  "ResponseBotQNADayOfWeekVersion": {
         "DeletionPolicy": "Retain",
         "UpdateReplacePolicy": "Retain",
         "Type": "Custom::LexBotVersion",
         "Properties": {
             "ServiceToken": { "Ref":"LexV2CFNLambdaARN" },
-            "botId": { "Ref":"ResponseBotQNASocialSecurity" },
-            "CR.botLocaleIds": {"Fn::GetAtt":["ResponseBotQNASocialSecurity","botLocaleIds"]},
-            "CR.lastUpdatedDateTime": {"Fn::GetAtt":["ResponseBotQNASocialSecurity","lastUpdatedDateTime"]}
+            "botId": { "Ref":"ResponseBotQNADayOfWeek" },
+            "CR.botLocaleIds": {"Fn::GetAtt":["ResponseBotQNADayOfWeek","botLocaleIds"]},
+            "CR.lastUpdatedDateTime": {"Fn::GetAtt":["ResponseBotQNADayOfWeek","lastUpdatedDateTime"]}
         }
   },
 
-  "ResponseBotQNASocialSecurityAlias": {
+  "ResponseBotQNADayOfWeekAlias": {
         "DeletionPolicy": "Retain",
         "Type": "Custom::LexBotAlias",
         "Properties": {
             "ServiceToken": { "Ref":"LexV2CFNLambdaARN" },
-            "botId": { "Ref":"ResponseBotQNASocialSecurity" },
+            "botId": { "Ref":"ResponseBotQNADayOfWeek" },
             "botAliasName": "live",
-            "botVersion": { "Ref":"ResponseBotQNASocialSecurityVersion" },
+            "botVersion": { "Ref":"ResponseBotQNADayOfWeekVersion" },
             "botAliasLocaleSettings": {
                 "en_US": {"enabled": "True"}
             }
         }
     },
-    
 
-    "ResponseBotQNAWage": {
+    "ResponseBotQNAMonth": {
         "Type": "Custom::LexBot",
         "Properties": {
             "ServiceToken": { "Ref":"LexV2CFNLambdaARN" },
-            "botName": {"Fn::Sub":"ResponseBot-QNAWage-${AWS::StackName}"},
+            "botName": {"Fn::Sub":"ResponseBot-QNAMonth-${AWS::StackName}"},
             "dataPrivacy": {"childDirected": "False"},
-            "description": "QNA Wage Bot - " + botDateVersion,
+            "description": "QNA Month Bot - " + botDateVersion,
             "idleSessionTTLInSeconds": "300",
             "roleArn": { "Ref":"LexV2ServiceLinkedRoleARN" },
             "CR.botLocales": [{
@@ -543,33 +954,107 @@ exports.resources={
                 "voiceSettings": {"voiceId":"Salli"},
                 "CR.slotTypes": [
                   {
-                     "slotTypeName": "QNAWageSlotType",
+                    "slotTypeName": "QNAMonthSlotType",
+                    "slotTypeValues": [
+                        {
+                            "sampleValue": {"value": "January"},
+                            "synonyms": [
+                                {"value": 'Jan'},
+                                {"value": '01'}
+                            ]
+                        },{
+                            "sampleValue": {"value": "February"},
+                            "synonyms": [
+                                {"value": 'Feb'},
+                                {"value": '02'}
+                            ]
+                        },{
+                            "sampleValue": {"value": "March"},
+                            "synonyms": [
+                                {"value": 'Mar'},
+                                {"value": '03'}
+                            ]
+                        },{
+                            "sampleValue": {"value": "April"},
+                            "synonyms": [
+                                {"value": 'Apr'},
+                                {"value": '04'}
+                            ]
+                        },{
+                            "sampleValue": {"value": "May"},
+                            "synonyms": [
+                                {"value": '05'}
+                            ]
+                        },{
+                            "sampleValue": {"value": "June"},
+                            "synonyms": [
+                                {"value": 'Jun'},
+                                {"value": '06'}
+                            ]
+                        },{
+                            "sampleValue": {"value": "July"},
+                            "synonyms": [
+                                {"value": 'Jul'},
+                                {"value": '07'}
+                            ]
+                        },{
+                            "sampleValue": {"value": "August"},
+                            "synonyms": [
+                                {"value": 'Aug'},
+                                {"value": '08'}
+                            ]
+                        },{
+                            "sampleValue": {"value": "September"},
+                            "synonyms": [
+                                {"value": 'Sep'},
+                                {"value": 'Sept'},
+                                {"value": '09'}
+                            ]
+                        },{
+                            "sampleValue": {"value": "October"},
+                            "synonyms": [
+                                {"value": 'Oct'},
+                                {"value": '10'}
+                            ]
+                        },{
+                            "sampleValue": {"value": "November"},
+                            "synonyms": [
+                                {"value": 'Nov'},
+                                {"value": '11'}
+                            ]
+                        },{
+                            "sampleValue": {"value": "December"},
+                            "synonyms": [
+                                {"value": 'Dec'},
+                                {"value": '12'}
+                            ]
+                        },
+
+                    ],
                      "valueSelectionSetting": {
-                        "resolutionStrategy": "OriginalValue",
-                        "regexFilter": {
-                            "pattern": "[0-9]{1,7}"
-                        }
-                    },
-                    "parentSlotTypeSignature": "AMAZON.AlphaNumeric",
+                        "resolutionStrategy": "TopResolution"
+                    }
                   }
                 ],
                 "CR.intents": [{
-                    "intentName": "WageIntent",
+                    "intentName": "MonthIntent",
                     "sampleUtterances": [
-                        {"utterance": "My salary is {Wage}"},
-                        {"utterance": "My wage is {Wage}"},
-                        {"utterance": "{Wage}"}
+                        {"utterance": "The month is {Month}"},
+                        {"utterance": "The day was {Month}"},
+                        {"utterance": "It is {Month}"},
+                        {"utterance": "It occurred on {Month}"},
+                        {"utterance": "{Month}"}
                     ],
                     "intentConfirmationSetting": {
                         "promptSpecification": {
                             "messageGroups": [{
-                                "message": {"plainTextMessage": {"value": "Is {Wage} correct (Yes/No)?"}}
+                                "message": {"plainTextMessage": {"value": "Is {Month} correct (Yes or No)?"}}
                             }],
                             "maxRetries":1
                         },
                         "declinationResponse": {
                             "messageGroups": [{
-                                "message": {"plainTextMessage": {"value": "Please let me what your wage was again?"}}
+                                "message": {"plainTextMessage": {"value": "Please let me know the month again?"}}
                             }]
                         }
                     }, 
@@ -581,13 +1066,13 @@ exports.resources={
                         }
                     },
                     "CR.slots": [{
-                        "slotName": "Wage",
-                        "CR.slotTypeName": "QNAWageSlotType",
+                        "slotName": "Month",
+                        "CR.slotTypeName": "QNAMonthSlotType",
                         "valueElicitationSetting": {
                             "slotConstraint": "Required",
                             "promptSpecification": {
                                 "messageGroups": [{
-                                    "message": { "plainTextMessage": {"value": "What is your wage?"}}
+                                    "message": { "plainTextMessage": {"value": "What month?"}}
                                 }],
                                 "maxRetries": 2,
                                 "allowInterrupt": "True"
@@ -599,32 +1084,774 @@ exports.resources={
         }
     },
     
-  "ResponseBotQNAWageVersion": {
+  "ResponseBotQNAMonthVersion": {
         "DeletionPolicy": "Retain",
         "UpdateReplacePolicy": "Retain",
         "Type": "Custom::LexBotVersion",
         "Properties": {
             "ServiceToken": { "Ref":"LexV2CFNLambdaARN" },
-            "botId": { "Ref":"ResponseBotQNAWage" },
-            "CR.botLocaleIds": {"Fn::GetAtt":["ResponseBotQNAWage","botLocaleIds"]},
-            "CR.lastUpdatedDateTime": {"Fn::GetAtt":["ResponseBotQNAWage","lastUpdatedDateTime"]}
+            "botId": { "Ref":"ResponseBotQNAMonth" },
+            "CR.botLocaleIds": {"Fn::GetAtt":["ResponseBotQNAMonth","botLocaleIds"]},
+            "CR.lastUpdatedDateTime": {"Fn::GetAtt":["ResponseBotQNAMonth","lastUpdatedDateTime"]}
         }
   },
 
-  "ResponseBotQNAWageAlias": {
+  "ResponseBotQNAMonthAlias": {
         "DeletionPolicy": "Retain",
         "Type": "Custom::LexBotAlias",
         "Properties": {
             "ServiceToken": { "Ref":"LexV2CFNLambdaARN" },
-            "botId": { "Ref":"ResponseBotQNAWage" },
+            "botId": { "Ref":"ResponseBotQNAMonth" },
             "botAliasName": "live",
-            "botVersion": { "Ref":"ResponseBotQNAWageVersion" },
+            "botVersion": { "Ref":"ResponseBotQNAMonthVersion" },
             "botAliasLocaleSettings": {
                 "en_US": {"enabled": "True"}
             }
         }
     },
 
+    "ResponseBotQNAMonthNoConfirm": {
+        "Type": "Custom::LexBot",
+        "Properties": {
+            "ServiceToken": { "Ref":"LexV2CFNLambdaARN" },
+            "botName": {"Fn::Sub":"ResponseBot-QNAMonthNoConfirm-${AWS::StackName}"},
+            "dataPrivacy": {"childDirected": "False"},
+            "description": "QNA Month Bot (NoConfirm) - " + botDateVersion,
+            "idleSessionTTLInSeconds": "300",
+            "roleArn": { "Ref":"LexV2ServiceLinkedRoleARN" },
+            "CR.botLocales": [{
+                "localeId": "en_US",
+                "nluIntentConfidenceThreshold": "0.40",
+                "voiceSettings": {"voiceId":"Salli"},
+                "CR.slotTypes": [
+                  {
+                    "slotTypeName": "QNAMonthNoConfirmSlotType",
+                    "slotTypeValues": [
+                        {
+                            "sampleValue": {"value": "January"},
+                            "synonyms": [
+                                {"value": 'Jan'},
+                                {"value": '01'}
+                            ]
+                        },{
+                            "sampleValue": {"value": "February"},
+                            "synonyms": [
+                                {"value": 'Feb'},
+                                {"value": '02'}
+                            ]
+                        },{
+                            "sampleValue": {"value": "March"},
+                            "synonyms": [
+                                {"value": 'Mar'},
+                                {"value": '03'}
+                            ]
+                        },{
+                            "sampleValue": {"value": "April"},
+                            "synonyms": [
+                                {"value": 'Apr'},
+                                {"value": '04'}
+                            ]
+                        },{
+                            "sampleValue": {"value": "May"},
+                            "synonyms": [
+                                {"value": '05'}
+                            ]
+                        },{
+                            "sampleValue": {"value": "June"},
+                            "synonyms": [
+                                {"value": 'Jun'},
+                                {"value": '06'}
+                            ]
+                        },{
+                            "sampleValue": {"value": "July"},
+                            "synonyms": [
+                                {"value": 'Jul'},
+                                {"value": '07'}
+                            ]
+                        },{
+                            "sampleValue": {"value": "August"},
+                            "synonyms": [
+                                {"value": 'Aug'},
+                                {"value": '08'}
+                            ]
+                        },{
+                            "sampleValue": {"value": "September"},
+                            "synonyms": [
+                                {"value": 'Sep'},
+                                {"value": 'Sept'},
+                                {"value": '09'}
+                            ]
+                        },{
+                            "sampleValue": {"value": "October"},
+                            "synonyms": [
+                                {"value": 'Oct'},
+                                {"value": '10'}
+                            ]
+                        },{
+                            "sampleValue": {"value": "November"},
+                            "synonyms": [
+                                {"value": 'Nov'},
+                                {"value": '11'}
+                            ]
+                        },{
+                            "sampleValue": {"value": "December"},
+                            "synonyms": [
+                                {"value": 'Dec'},
+                                {"value": '12'}
+                            ]
+                        },
+
+                    ],
+                     "valueSelectionSetting": {
+                        "resolutionStrategy": "TopResolution"
+                    }
+                  }
+                ],
+                "CR.intents": [{
+                    "intentName": "MonthNoConfirmIntent",
+                    "sampleUtterances": [
+                        {"utterance": "The month is {Month}"},
+                        {"utterance": "The day was {Month}"},
+                        {"utterance": "It is {Month}"},
+                        {"utterance": "It occurred on {Month}"},
+                        {"utterance": "{Month}"}
+                    ],
+                    "intentClosingSetting": {
+                        "closingResponse": {
+                            "messageGroups": [{
+                                "message": {"plainTextMessage": {"value": "OK. "}}
+                            }]
+                        }
+                    },
+                    "CR.slots": [{
+                        "slotName": "Month",
+                        "CR.slotTypeName": "QNAMonthNoConfirmSlotType",
+                        "valueElicitationSetting": {
+                            "slotConstraint": "Required",
+                            "promptSpecification": {
+                                "messageGroups": [{
+                                    "message": { "plainTextMessage": {"value": "What month?"}}
+                                }],
+                                "maxRetries": 2,
+                                "allowInterrupt": "True"
+                            }
+                        }
+                    }]
+                }],
+            }]
+        }
+    },
+    
+  "ResponseBotQNAMonthNoConfirmVersion": {
+        "DeletionPolicy": "Retain",
+        "UpdateReplacePolicy": "Retain",
+        "Type": "Custom::LexBotVersion",
+        "Properties": {
+            "ServiceToken": { "Ref":"LexV2CFNLambdaARN" },
+            "botId": { "Ref":"ResponseBotQNAMonthNoConfirm" },
+            "CR.botLocaleIds": {"Fn::GetAtt":["ResponseBotQNAMonthNoConfirm","botLocaleIds"]},
+            "CR.lastUpdatedDateTime": {"Fn::GetAtt":["ResponseBotQNAMonthNoConfirm","lastUpdatedDateTime"]}
+        }
+  },
+
+  "ResponseBotQNAMonthNoConfirmAlias": {
+        "DeletionPolicy": "Retain",
+        "Type": "Custom::LexBotAlias",
+        "Properties": {
+            "ServiceToken": { "Ref":"LexV2CFNLambdaARN" },
+            "botId": { "Ref":"ResponseBotQNAMonthNoConfirm" },
+            "botAliasName": "live",
+            "botVersion": { "Ref":"ResponseBotQNAMonthNoConfirmVersion" },
+            "botAliasLocaleSettings": {
+                "en_US": {"enabled": "True"}
+            }
+        }
+    },
+
+    "ResponseBotQNANumber": {
+        "Type": "Custom::LexBot",
+        "Properties": {
+            "ServiceToken": { "Ref":"LexV2CFNLambdaARN" },
+            "botName": {"Fn::Sub":"ResponseBot-QNANumber-${AWS::StackName}"},
+            "dataPrivacy": {"childDirected": "False"},
+            "description": "QNA Number Bot - " + botDateVersion,
+            "idleSessionTTLInSeconds": "300",
+            "roleArn": { "Ref":"LexV2ServiceLinkedRoleARN" },
+            "CR.botLocales": [{
+                "localeId": "en_US",
+                "nluIntentConfidenceThreshold": "0.40",
+                "voiceSettings": {"voiceId":"Salli"},
+                "CR.intents": [{
+                    "intentName": "NumberIntent",
+                    "sampleUtterances": [
+                        {"utterance": "The number is {Number}"},
+                        {"utterance": "The number was {Number}"},
+                        {"utterance": "It is {Number}"},
+                        {"utterance": "{Number}"}
+                    ],
+                    "intentConfirmationSetting": {
+                        "promptSpecification": {
+                            "messageGroups": [{
+                                "message": {"plainTextMessage": {"value": "<speak>Is <say-as interpret-as=\"digits\">{Number}</say-as> correct (Yes or No)?</speak>"}}
+                            }],
+                            "maxRetries":1
+                        },
+                        "declinationResponse": {
+                            "messageGroups": [{
+                                "message": {"plainTextMessage": {"value": "Please let me know the number again?"}}
+                            }]
+                        }
+                    }, 
+                    "intentClosingSetting": {
+                        "closingResponse": {
+                            "messageGroups": [{
+                                "message": {"plainTextMessage": {"value": "OK. "}}
+                            }]
+                        }
+                    },
+                    "CR.slots": [{
+                        "slotName": "Number",
+                        "CR.slotTypeName": "AMAZON.Number",
+                        "valueElicitationSetting": {
+                            "slotConstraint": "Required",
+                            "promptSpecification": {
+                                "messageGroups": [{
+                                    "message": { "plainTextMessage": {"value": "What  number?"}}
+                                }],
+                                "maxRetries": 2,
+                                "allowInterrupt": "True"
+                            }
+                        }
+                    }]
+                }],
+            }]
+        }
+    },
+    
+  "ResponseBotQNANumberVersion": {
+        "DeletionPolicy": "Retain",
+        "UpdateReplacePolicy": "Retain",
+        "Type": "Custom::LexBotVersion",
+        "Properties": {
+            "ServiceToken": { "Ref":"LexV2CFNLambdaARN" },
+            "botId": { "Ref":"ResponseBotQNANumber" },
+            "CR.botLocaleIds": {"Fn::GetAtt":["ResponseBotQNANumber","botLocaleIds"]},
+            "CR.lastUpdatedDateTime": {"Fn::GetAtt":["ResponseBotQNANumber","lastUpdatedDateTime"]}
+        }
+  },
+
+  "ResponseBotQNANumberAlias": {
+        "DeletionPolicy": "Retain",
+        "Type": "Custom::LexBotAlias",
+        "Properties": {
+            "ServiceToken": { "Ref":"LexV2CFNLambdaARN" },
+            "botId": { "Ref":"ResponseBotQNANumber" },
+            "botAliasName": "live",
+            "botVersion": { "Ref":"ResponseBotQNANumberVersion" },
+            "botAliasLocaleSettings": {
+                "en_US": {"enabled": "True"}
+            }
+        }
+    },
+    
+    "ResponseBotQNANumberNoConfirm": {
+        "Type": "Custom::LexBot",
+        "Properties": {
+            "ServiceToken": { "Ref":"LexV2CFNLambdaARN" },
+            "botName": {"Fn::Sub":"ResponseBot-QNANumberNoConfirm-${AWS::StackName}"},
+            "dataPrivacy": {"childDirected": "False"},
+            "description": "QNA Number Bot (NoConfirm) - " + botDateVersion,
+            "idleSessionTTLInSeconds": "300",
+            "roleArn": { "Ref":"LexV2ServiceLinkedRoleARN" },
+            "CR.botLocales": [{
+                "localeId": "en_US",
+                "nluIntentConfidenceThreshold": "0.40",
+                "voiceSettings": {"voiceId":"Salli"},
+                "CR.intents": [{
+                    "intentName": "NumberNoConfirmIntent",
+                    "sampleUtterances": [
+                        {"utterance": "The number is {Number}"},
+                        {"utterance": "The number was {Number}"},
+                        {"utterance": "It is {Number}"},
+                        {"utterance": "{Number}"}
+                    ],
+                    "intentClosingSetting": {
+                        "closingResponse": {
+                            "messageGroups": [{
+                                "message": {"plainTextMessage": {"value": "OK. "}}
+                            }]
+                        }
+                    },
+                    "CR.slots": [{
+                        "slotName": "Number",
+                        "CR.slotTypeName": "AMAZON.Number",
+                        "valueElicitationSetting": {
+                            "slotConstraint": "Required",
+                            "promptSpecification": {
+                                "messageGroups": [{
+                                    "message": { "plainTextMessage": {"value": "What number?"}}
+                                }],
+                                "maxRetries": 2,
+                                "allowInterrupt": "True"
+                            }
+                        }
+                    }]
+                }],
+            }]
+        }
+    },
+    
+  "ResponseBotQNANumberNoConfirmVersion": {
+        "DeletionPolicy": "Retain",
+        "UpdateReplacePolicy": "Retain",
+        "Type": "Custom::LexBotVersion",
+        "Properties": {
+            "ServiceToken": { "Ref":"LexV2CFNLambdaARN" },
+            "botId": { "Ref":"ResponseBotQNANumberNoConfirm" },
+            "CR.botLocaleIds": {"Fn::GetAtt":["ResponseBotQNANumberNoConfirm","botLocaleIds"]},
+            "CR.lastUpdatedDateTime": {"Fn::GetAtt":["ResponseBotQNANumberNoConfirm","lastUpdatedDateTime"]}
+        }
+  },
+
+  "ResponseBotQNANumberNoConfirmAlias": {
+        "DeletionPolicy": "Retain",
+        "Type": "Custom::LexBotAlias",
+        "Properties": {
+            "ServiceToken": { "Ref":"LexV2CFNLambdaARN" },
+            "botId": { "Ref":"ResponseBotQNANumberNoConfirm" },
+            "botAliasName": "live",
+            "botVersion": { "Ref":"ResponseBotQNANumberNoConfirmVersion" },
+            "botAliasLocaleSettings": {
+                "en_US": {"enabled": "True"}
+            }
+        }
+    },
+
+    "ResponseBotQNAAge": {
+        "Type": "Custom::LexBot",
+        "Properties": {
+            "ServiceToken": { "Ref":"LexV2CFNLambdaARN" },
+            "botName": {"Fn::Sub":"ResponseBot-QNAAge-${AWS::StackName}"},
+            "dataPrivacy": {"childDirected": "False"},
+            "description": "QNA Age Bot - " + botDateVersion,
+            "idleSessionTTLInSeconds": "300",
+            "roleArn": { "Ref":"LexV2ServiceLinkedRoleARN" },
+            "CR.botLocales": [{
+                "localeId": "en_US",
+                "nluIntentConfidenceThreshold": "0.40",
+                "voiceSettings": {"voiceId":"Salli"},
+                "CR.intents": [{
+                    "intentName": "AgeIntent",
+                    "sampleUtterances": [
+                        {"utterance": "My age is {Age}"},
+                        {"utterance": "Age is {Age}"},
+                        {"utterance": "It is {Age}"},
+                        {"utterance": "I am {Age}"},
+                        {"utterance": "I am {Age} years old"},
+                        {"utterance": "His age is {Age}"},
+                        {"utterance": "He is {Age}"},
+                        {"utterance": "He is {Age} years old"},
+                        {"utterance": "Her age is {Age}"},
+                        {"utterance": "She is {Age}"},
+                        {"utterance": "She is {Age} years old"},
+                        {"utterance": "{Age}"}
+                    ],
+                    "intentConfirmationSetting": {
+                        "promptSpecification": {
+                            "messageGroups": [{
+                                "message": {"plainTextMessage": {"value": "Is {Age} correct (Yes or No)?"}}
+                            }],
+                            "maxRetries":1
+                        },
+                        "declinationResponse": {
+                            "messageGroups": [{
+                                "message": {"plainTextMessage": {"value": "Please let me know the age again?"}}
+                            }]
+                        }
+                    }, 
+                    "intentClosingSetting": {
+                        "closingResponse": {
+                            "messageGroups": [{
+                                "message": {"plainTextMessage": {"value": "OK. "}}
+                            }]
+                        }
+                    },
+                    "CR.slots": [{
+                        "slotName": "Age",
+                        "CR.slotTypeName": "AMAZON.Number",
+                        "valueElicitationSetting": {
+                            "slotConstraint": "Required",
+                            "promptSpecification": {
+                                "messageGroups": [{
+                                    "message": { "plainTextMessage": {"value": "What age?"}}
+                                }],
+                                "maxRetries": 2,
+                                "allowInterrupt": "True"
+                            }
+                        }
+                    }]
+                }],
+            }]
+        }
+    },
+    
+  "ResponseBotQNAAgeVersion": {
+        "DeletionPolicy": "Retain",
+        "UpdateReplacePolicy": "Retain",
+        "Type": "Custom::LexBotVersion",
+        "Properties": {
+            "ServiceToken": { "Ref":"LexV2CFNLambdaARN" },
+            "botId": { "Ref":"ResponseBotQNAAge" },
+            "CR.botLocaleIds": {"Fn::GetAtt":["ResponseBotQNAAge","botLocaleIds"]},
+            "CR.lastUpdatedDateTime": {"Fn::GetAtt":["ResponseBotQNAAge","lastUpdatedDateTime"]}
+        }
+  },
+
+  "ResponseBotQNAAgeAlias": {
+        "DeletionPolicy": "Retain",
+        "Type": "Custom::LexBotAlias",
+        "Properties": {
+            "ServiceToken": { "Ref":"LexV2CFNLambdaARN" },
+            "botId": { "Ref":"ResponseBotQNAAge" },
+            "botAliasName": "live",
+            "botVersion": { "Ref":"ResponseBotQNAAgeVersion" },
+            "botAliasLocaleSettings": {
+                "en_US": {"enabled": "True"}
+            }
+        }
+    },
+
+    "ResponseBotQNAPhoneNumber": {
+        "Type": "Custom::LexBot",
+        "Properties": {
+            "ServiceToken": { "Ref":"LexV2CFNLambdaARN" },
+            "botName": {"Fn::Sub":"ResponseBot-QNAPhoneNumber-${AWS::StackName}"},
+            "dataPrivacy": {"childDirected": "False"},
+            "description": "QNA Phone Number Bot - " + botDateVersion,
+            "idleSessionTTLInSeconds": "300",
+            "roleArn": { "Ref":"LexV2ServiceLinkedRoleARN" },
+            "CR.botLocales": [{
+                "localeId": "en_US",
+                "nluIntentConfidenceThreshold": "0.40",
+                "voiceSettings": {"voiceId":"Salli"},
+                "CR.intents": [{
+                    "intentName": "PhoneNumberIntent",
+                    "sampleUtterances": [
+                        {"utterance": "The phone number is {PhoneNumber}"},
+                        {"utterance": "My phone number is {PhoneNumber}"},
+                        {"utterance": "It is {PhoneNumber}"},
+                        {"utterance": "{PhoneNumber}"}
+                    ],
+                    "intentConfirmationSetting": {
+                        "promptSpecification": {
+                            "messageGroups": [{
+                                "message": {"plainTextMessage": {"value": "<speak>Is <say-as interpret-as=\"telephone\">{PhoneNumber}</say-as> correct (Yes or No)?</speak>"}}
+                            }],
+                            "maxRetries":1
+                        },
+                        "declinationResponse": {
+                            "messageGroups": [{
+                                "message": {"plainTextMessage": {"value": "Please let me know the phone number again?"}}
+                            }]
+                        }
+                    }, 
+                    "intentClosingSetting": {
+                        "closingResponse": {
+                            "messageGroups": [{
+                                "message": {"plainTextMessage": {"value": "OK. "}}
+                            }]
+                        }
+                    },
+                    "CR.slots": [{
+                        "slotName": "PhoneNumber",
+                        "CR.slotTypeName": "AMAZON.PhoneNumber",
+                        "valueElicitationSetting": {
+                            "slotConstraint": "Required",
+                            "promptSpecification": {
+                                "messageGroups": [{
+                                    "message": { "plainTextMessage": {"value": "What phone number?"}}
+                                }],
+                                "maxRetries": 2,
+                                "allowInterrupt": "True"
+                            }
+                        }
+                    }]
+                }],
+            }]
+        }
+    },
+    
+  "ResponseBotQNAPhoneNumberVersion": {
+        "DeletionPolicy": "Retain",
+        "UpdateReplacePolicy": "Retain",
+        "Type": "Custom::LexBotVersion",
+        "Properties": {
+            "ServiceToken": { "Ref":"LexV2CFNLambdaARN" },
+            "botId": { "Ref":"ResponseBotQNAPhoneNumber" },
+            "CR.botLocaleIds": {"Fn::GetAtt":["ResponseBotQNAPhoneNumber","botLocaleIds"]},
+            "CR.lastUpdatedDateTime": {"Fn::GetAtt":["ResponseBotQNAPhoneNumber","lastUpdatedDateTime"]}
+        }
+  },
+
+  "ResponseBotQNAPhoneNumberAlias": {
+        "DeletionPolicy": "Retain",
+        "Type": "Custom::LexBotAlias",
+        "Properties": {
+            "ServiceToken": { "Ref":"LexV2CFNLambdaARN" },
+            "botId": { "Ref":"ResponseBotQNAPhoneNumber" },
+            "botAliasName": "live",
+            "botVersion": { "Ref":"ResponseBotQNAPhoneNumberVersion" },
+            "botAliasLocaleSettings": {
+                "en_US": {"enabled": "True"}
+            }
+        }
+    },
+    
+    "ResponseBotQNAPhoneNumberNoConfirm": {
+        "Type": "Custom::LexBot",
+        "Properties": {
+            "ServiceToken": { "Ref":"LexV2CFNLambdaARN" },
+            "botName": {"Fn::Sub":"ResponseBot-QNAPhoneNumberNoConfirm-${AWS::StackName}"},
+            "dataPrivacy": {"childDirected": "False"},
+            "description": "QNA Phone Number Bot (NoConfirm) - " + botDateVersion,
+            "idleSessionTTLInSeconds": "300",
+            "roleArn": { "Ref":"LexV2ServiceLinkedRoleARN" },
+            "CR.botLocales": [{
+                "localeId": "en_US",
+                "nluIntentConfidenceThreshold": "0.40",
+                "voiceSettings": {"voiceId":"Salli"},
+                "CR.intents": [{
+                    "intentName": "NumberNoConfirmIntent",
+                    "sampleUtterances": [
+                        {"utterance": "The phone number is {PhoneNumber}"},
+                        {"utterance": "My phone number is {PhoneNumber}"},
+                        {"utterance": "It is {PhoneNumber}"},
+                        {"utterance": "{PhoneNumber}"}
+                    ],
+                    "intentClosingSetting": {
+                        "closingResponse": {
+                            "messageGroups": [{
+                                "message": {"plainTextMessage": {"value": "OK. "}}
+                            }]
+                        }
+                    },
+                    "CR.slots": [{
+                        "slotName": "PhoneNumber",
+                        "CR.slotTypeName": "AMAZON.PhoneNumber",
+                        "valueElicitationSetting": {
+                            "slotConstraint": "Required",
+                            "promptSpecification": {
+                                "messageGroups": [{
+                                    "message": { "plainTextMessage": {"value": "What phone number?"}}
+                                }],
+                                "maxRetries": 2,
+                                "allowInterrupt": "True"
+                            }
+                        }
+                    }]
+                }],
+            }]
+        }
+    },
+    
+  "ResponseBotQNAPhoneNumberNoConfirmVersion": {
+        "DeletionPolicy": "Retain",
+        "UpdateReplacePolicy": "Retain",
+        "Type": "Custom::LexBotVersion",
+        "Properties": {
+            "ServiceToken": { "Ref":"LexV2CFNLambdaARN" },
+            "botId": { "Ref":"ResponseBotQNAPhoneNumberNoConfirm" },
+            "CR.botLocaleIds": {"Fn::GetAtt":["ResponseBotQNAPhoneNumberNoConfirm","botLocaleIds"]},
+            "CR.lastUpdatedDateTime": {"Fn::GetAtt":["ResponseBotQNAPhoneNumberNoConfirm","lastUpdatedDateTime"]}
+        }
+  },
+
+  "ResponseBotQNAPhoneNumberNoConfirmAlias": {
+        "DeletionPolicy": "Retain",
+        "Type": "Custom::LexBotAlias",
+        "Properties": {
+            "ServiceToken": { "Ref":"LexV2CFNLambdaARN" },
+            "botId": { "Ref":"ResponseBotQNAPhoneNumberNoConfirm" },
+            "botAliasName": "live",
+            "botVersion": { "Ref":"ResponseBotQNAPhoneNumberNoConfirmVersion" },
+            "botAliasLocaleSettings": {
+                "en_US": {"enabled": "True"}
+            }
+        }
+    },
+
+    "ResponseBotQNATime": {
+        "Type": "Custom::LexBot",
+        "Properties": {
+            "ServiceToken": { "Ref":"LexV2CFNLambdaARN" },
+            "botName": {"Fn::Sub":"ResponseBot-QNATime-${AWS::StackName}"},
+            "dataPrivacy": {"childDirected": "False"},
+            "description": "QNA Time Bot - " + botDateVersion,
+            "idleSessionTTLInSeconds": "300",
+            "roleArn": { "Ref":"LexV2ServiceLinkedRoleARN" },
+            "CR.botLocales": [{
+                "localeId": "en_US",
+                "nluIntentConfidenceThreshold": "0.40",
+                "voiceSettings": {"voiceId":"Salli"},
+                "CR.intents": [{
+                    "intentName": "TimeIntent",
+                    "sampleUtterances": [
+                        {"utterance": "The time was {Time}"},
+                        {"utterance": "The time is {Time}"},
+                        {"utterance": "It occurred at {Time}"},
+                        {"utterance": "At {Time}"},
+                        {"utterance": "{Time}"}
+                    ],
+                    "intentConfirmationSetting": {
+                        "promptSpecification": {
+                            "messageGroups": [{
+                                "message": {"plainTextMessage": {"value": "Is {Time} correct (Yes or No)?"}}
+                            }],
+                            "maxRetries":1
+                        },
+                        "declinationResponse": {
+                            "messageGroups": [{
+                                "message": {"plainTextMessage": {"value": "Please let me know the time again?"}}
+                            }]
+                        }
+                    }, 
+                    "intentClosingSetting": {
+                        "closingResponse": {
+                            "messageGroups": [{
+                                "message": {"plainTextMessage": {"value": "OK. "}}
+                            }]
+                        }
+                    },
+                    "CR.slots": [{
+                        "slotName": "Time",
+                        "CR.slotTypeName": "AMAZON.Time",
+                        "valueElicitationSetting": {
+                            "slotConstraint": "Required",
+                            "promptSpecification": {
+                                "messageGroups": [{
+                                    "message": { "plainTextMessage": {"value": "What time?"}}
+                                }],
+                                "maxRetries": 2,
+                                "allowInterrupt": "True"
+                            }
+                        }
+                    }]
+                }],
+            }]
+        }
+    },
+    
+  "ResponseBotQNATimeVersion": {
+        "DeletionPolicy": "Retain",
+        "UpdateReplacePolicy": "Retain",
+        "Type": "Custom::LexBotVersion",
+        "Properties": {
+            "ServiceToken": { "Ref":"LexV2CFNLambdaARN" },
+            "botId": { "Ref":"ResponseBotQNATime" },
+            "CR.botLocaleIds": {"Fn::GetAtt":["ResponseBotQNATime","botLocaleIds"]},
+            "CR.lastUpdatedDateTime": {"Fn::GetAtt":["ResponseBotQNATime","lastUpdatedDateTime"]}
+        }
+  },
+
+  "ResponseBotQNATimeAlias": {
+        "DeletionPolicy": "Retain",
+        "Type": "Custom::LexBotAlias",
+        "Properties": {
+            "ServiceToken": { "Ref":"LexV2CFNLambdaARN" },
+            "botId": { "Ref":"ResponseBotQNATime" },
+            "botAliasName": "live",
+            "botVersion": { "Ref":"ResponseBotQNATimeVersion" },
+            "botAliasLocaleSettings": {
+                "en_US": {"enabled": "True"}
+            }
+        }
+    },
+
+    "ResponseBotQNAEmailAddress": {
+        "Type": "Custom::LexBot",
+        "Properties": {
+            "ServiceToken": { "Ref":"LexV2CFNLambdaARN" },
+            "botName": {"Fn::Sub":"ResponseBot-QNAEmailAddress-${AWS::StackName}"},
+            "dataPrivacy": {"childDirected": "False"},
+            "description": "QNA Email Address Bot - " + botDateVersion,
+            "idleSessionTTLInSeconds": "300",
+            "roleArn": { "Ref":"LexV2ServiceLinkedRoleARN" },
+            "CR.botLocales": [{
+                "localeId": "en_US",
+                "nluIntentConfidenceThreshold": "0.40",
+                "voiceSettings": {"voiceId":"Salli"},
+                "CR.intents": [{
+                    "intentName": "EmailAddressIntent",
+                    "sampleUtterances": [
+                        {"utterance": "My email address is {EmailAddress}"},
+                        {"utterance": "The email address is {EmailAddress}"},
+                        {"utterance": "{EmailAddress}"}
+                    ],
+                    "intentConfirmationSetting": {
+                        "promptSpecification": {
+                            "messageGroups": [{
+                                "message": {"plainTextMessage": {"value": "Is {EmailAddress} correct (Yes or No)?"}}
+                            }],
+                            "maxRetries":1
+                        },
+                        "declinationResponse": {
+                            "messageGroups": [{
+                                "message": {"plainTextMessage": {"value": "Please let me know the email address again?"}}
+                            }]
+                        }
+                    }, 
+                    "intentClosingSetting": {
+                        "closingResponse": {
+                            "messageGroups": [{
+                                "message": {"plainTextMessage": {"value": "OK. "}}
+                            }]
+                        }
+                    },
+                    "CR.slots": [{
+                        "slotName": "EmailAddress",
+                        "CR.slotTypeName": "AMAZON.EmailAddress",
+                        "valueElicitationSetting": {
+                            "slotConstraint": "Required",
+                            "promptSpecification": {
+                                "messageGroups": [{
+                                    "message": { "plainTextMessage": {"value": "What email address?"}}
+                                }],
+                                "maxRetries": 2,
+                                "allowInterrupt": "True"
+                            }
+                        }
+                    }]
+                }],
+            }]
+        }
+    },
+    
+  "ResponseBotQNAEmailAddressVersion": {
+        "DeletionPolicy": "Retain",
+        "UpdateReplacePolicy": "Retain",
+        "Type": "Custom::LexBotVersion",
+        "Properties": {
+            "ServiceToken": { "Ref":"LexV2CFNLambdaARN" },
+            "botId": { "Ref":"ResponseBotQNAEmailAddress" },
+            "CR.botLocaleIds": {"Fn::GetAtt":["ResponseBotQNAEmailAddress","botLocaleIds"]},
+            "CR.lastUpdatedDateTime": {"Fn::GetAtt":["ResponseBotQNAEmailAddress","lastUpdatedDateTime"]}
+        }
+  },
+
+  "ResponseBotQNAEmailAddressAlias": {
+        "DeletionPolicy": "Retain",
+        "Type": "Custom::LexBotAlias",
+        "Properties": {
+            "ServiceToken": { "Ref":"LexV2CFNLambdaARN" },
+            "botId": { "Ref":"ResponseBotQNAEmailAddress" },
+            "botAliasName": "live",
+            "botVersion": { "Ref":"ResponseBotQNAEmailAddressVersion" },
+            "botAliasLocaleSettings": {
+                "en_US": {"enabled": "True"}
+            }
+        }
+    },
+    
     "ResponseBotQNAName": {
         "Type": "Custom::LexBot",
         "Properties": {
@@ -726,107 +1953,14 @@ exports.resources={
                 "en_US": {"enabled": "True"}
             }
         }
-    },
-    
-    "ResponseBotQNAAge": {
-        "Type": "Custom::LexBot",
-        "Properties": {
-            "ServiceToken": { "Ref":"LexV2CFNLambdaARN" },
-            "botName": {"Fn::Sub":"ResponseBot-QNAAge-${AWS::StackName}"},
-            "dataPrivacy": {"childDirected": "False"},
-            "description": "QNA Age Bot - " + botDateVersion,
-            "idleSessionTTLInSeconds": "300",
-            "roleArn": { "Ref":"LexV2ServiceLinkedRoleARN" },
-            "CR.botLocales": [{
-                "localeId": "en_US",
-                "nluIntentConfidenceThreshold": "0.40",
-                "voiceSettings": {"voiceId":"Salli"},
-                "CR.intents": [{
-                    "intentName": "AgeIntent",
-                    "sampleUtterances": [
-                        {"utterance": "My age is {Age}"},
-                        {"utterance": "Age is {Age}"},
-                        {"utterance": "It is {Age}"},
-                        {"utterance": "I am {Age}"},
-                        {"utterance": "I am {Age} years old"},
-                        {"utterance": "His age is {Age}"},
-                        {"utterance": "He is {Age}"},
-                        {"utterance": "He is {Age} years old"},
-                        {"utterance": "Her age is {Age}"},
-                        {"utterance": "She is {Age}"},
-                        {"utterance": "She is {Age} years old"},
-                        {"utterance": "{Age}"}
-                    ],
-                    "intentConfirmationSetting": {
-                        "promptSpecification": {
-                            "messageGroups": [{
-                                "message": {"plainTextMessage": {"value": "Is {Age} correct (Yes or No)?"}}
-                            }],
-                            "maxRetries":1
-                        },
-                        "declinationResponse": {
-                            "messageGroups": [{
-                                "message": {"plainTextMessage": {"value": "Please let me know the age again?"}}
-                            }]
-                        }
-                    }, 
-                    "intentClosingSetting": {
-                        "closingResponse": {
-                            "messageGroups": [{
-                                "message": {"plainTextMessage": {"value": "OK. "}}
-                            }]
-                        }
-                    },
-                    "CR.slots": [{
-                        "slotName": "Age",
-                        "CR.slotTypeName": "AMAZON.Number",
-                        "valueElicitationSetting": {
-                            "slotConstraint": "Required",
-                            "promptSpecification": {
-                                "messageGroups": [{
-                                    "message": { "plainTextMessage": {"value": "What age?"}}
-                                }],
-                                "maxRetries": 2,
-                                "allowInterrupt": "True"
-                            }
-                        }
-                    }]
-                }],
-            }]
-        }
-    },
-    
-  "ResponseBotQNAAgeVersion": {
-        "DeletionPolicy": "Retain",
-        "UpdateReplacePolicy": "Retain",
-        "Type": "Custom::LexBotVersion",
-        "Properties": {
-            "ServiceToken": { "Ref":"LexV2CFNLambdaARN" },
-            "botId": { "Ref":"ResponseBotQNAAge" },
-            "CR.botLocaleIds": {"Fn::GetAtt":["ResponseBotQNAAge","botLocaleIds"]},
-            "CR.lastUpdatedDateTime": {"Fn::GetAtt":["ResponseBotQNAAge","lastUpdatedDateTime"]}
-        }
-  },
-
-  "ResponseBotQNAAgeAlias": {
-        "DeletionPolicy": "Retain",
-        "Type": "Custom::LexBotAlias",
-        "Properties": {
-            "ServiceToken": { "Ref":"LexV2CFNLambdaARN" },
-            "botId": { "Ref":"ResponseBotQNAAge" },
-            "botAliasName": "live",
-            "botVersion": { "Ref":"ResponseBotQNAAgeVersion" },
-            "botAliasLocaleSettings": {
-                "en_US": {"enabled": "True"}
-            }
-        }
     }
     
 };
 
 
 exports.names=[
-    "QNAAge", "QNAName", "QNAWage", "QNASocialSecurity", "QNAPinNoConfirm", "QNAPin", "QNAYesNo", "QNAYesNoExit" 
+    "QNAWage", "QNASocialSecurity", "QNAPinNoConfirm", "QNAPin", "QNAYesNo", "QNAYesNoExit", "QNADate", "QNADateNoConfirm", "QNADayOfWeek", "QNAMonthNoConfirm", "QNAMonthNoConfirm", 
+    "QNANumber", "QNANumberNoConfirm", "QNAAge", "QNAPhoneNumber", "QNAPhoneNumberNoConfirm", "QNATime", "QNAEmailAddress", "QNAName"
 ] ;
 
 
