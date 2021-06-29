@@ -256,6 +256,7 @@ async function get_hit(req, res) {
         res['got_hits'] = 0;  // response flag, used in logging / kibana
         
         response = await run_query(req, query_params);
+
         hit = _.get(response, "hits.hits[0]._source");
 
         console.log("No hits response: " + JSON.stringify(hit))
@@ -265,6 +266,7 @@ async function get_hit(req, res) {
         console.log("Setting topic for " + JSON.stringify(hit))
         // set res topic from document before running handlebars, so that handlebars can access or overwrite it.
          _.set(res, "session.topic", _.get(hit, "t"));
+        
         if(_.get(hit, "t")){
             if(!res._userInfo){
                 res._userInfo = {}
@@ -296,7 +298,7 @@ async function get_hit(req, res) {
         //  - improved predictability of document chaining behavior.. each doc's lambda is run as it is chained
         //  - autotranslation is now applied to lambda hook responses by default when response is assembled
         // optional setting to turn off this behaviour if it causes problems, and revert to old way
-        if (_.get(req, '_settings.RUN_LAMBDAHOOK_FROM_QUERY_STEP', true)) { 
+        if (_.get(req, '_settings.RUN_LAMBDAHOOK_FROM_QUERY_STEP', true)) {// && res['got_hits'] == 1) { //
             var lambdaHook = _.get(hit, "l");
             if (lambdaHook) {
                 var payload;
@@ -306,8 +308,11 @@ async function get_hit(req, res) {
                 _.set(hit, "a", _.get(res,"message",""));
                 var markdown = _.get(res,"session.appContext.altMessages.markdown","");
                 var ssml = _.get(res,"session.appContext.altMessages.ssml","");
+                var card = _.get(res,"card",{})
                 _.set(hit, "alt.markdown", markdown);
                 _.set(hit, "alt.ssml", ssml);
+                _.set(hit,"r",card)
+          
             }
             _.set(hit,"l","") ;
             _.set(hit,"args",[]) ;

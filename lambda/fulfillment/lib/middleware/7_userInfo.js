@@ -15,7 +15,7 @@ function getDistinctValues(list,objectId,sortField){
         }
         return a["sortField"] < b["sortField"] ? 1 : -1
     });
-    distinctItems = distinctItems.map(id => sortedItems.filter( item => item[objectId] == id )[0])
+    distinctItems = distinctItems.map(id => sortedItems.filter( item => item[objectId] == id ).reverse()[0])
     return distinctItems
 }
 async function update_userInfo(res) {
@@ -49,24 +49,3 @@ module.exports=async function userInfo(req,res){
     return {req,res}
 }
 
-// topics = [
-//     {
-//         topic:"Apple",
-//         dateTime:1
-//     },
-//     {
-//         topic:"Pear",
-//         dateTime:2
-//     },
-//     {
-//         topic:"Apple",
-//         dateTime:3
-//     },
-//     {
-//         topic:"Bananna",
-//         dateTime:4
-//     }
-// ]
-
-// var result = getDistinctValues(topics,"topic","dateTime")
-// console.log(result)
