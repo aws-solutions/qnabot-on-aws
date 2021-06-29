@@ -115,7 +115,7 @@ async function up(stack,options){
             if(Buffer.byteLength(template)<51200){
                 var create=await cf.createStack({
                     StackName,
-                    Capabilities:["CAPABILITY_NAMED_IAM"],
+                    Capabilities:["CAPABILITY_NAMED_IAM","CAPABILITY_AUTO_EXPAND"],
                     DisableRollback:true,
                     TemplateBody:template
                 }).promise()
@@ -131,7 +131,7 @@ async function up(stack,options){
                 }).promise()
                 var create=await cf.createStack({
                     StackName,
-                    Capabilities:["CAPABILITY_NAMED_IAM"],
+                    Capabilities:["CAPABILITY_NAMED_IAM","CAPABILITY_AUTO_EXPAND"],
                     DisableRollback:true,
                     TemplateURL:url
                 }).promise()
@@ -164,7 +164,7 @@ function update(stack,options){
             if(Buffer.byteLength(template)<51200){
                 var start=cf.updateStack({
                     StackName,
-                    Capabilities:["CAPABILITY_NAMED_IAM"],
+                    Capabilities:["CAPABILITY_NAMED_IAM","CAPABILITY_AUTO_EXPAND"],
                     TemplateBody:template
                 }).promise()
             }else{
@@ -180,7 +180,7 @@ function update(stack,options){
                     }).promise()
                     .then(()=>cf.updateStack({
                         StackName,
-                        Capabilities:["CAPABILITY_NAMED_IAM"],
+                        Capabilities:["CAPABILITY_NAMED_IAM","CAPABILITY_AUTO_EXPAND"],
                         TemplateURL:url
                     }).promise())
                 })
