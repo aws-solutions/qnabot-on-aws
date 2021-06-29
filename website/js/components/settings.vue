@@ -1,8 +1,12 @@
 <template lang='pug'>
   v-container(grid-list-md)
-    v-alert(v-model="successAlert" outline type="info" dismissible) Successfully saved settings!
-    v-alert(v-model="importAlert" outline type="info" dismissible) Successfully imported settings!
-
+    v-dialog(v-model="showAlert" scrollable width="auto")
+        v-card(id="error-modal")
+          v-card-title(primary-title) {{alertTitle}}
+          v-card-text {{alertMessage}}
+          v-card-actions
+            v-spacer
+            v-btn.lighten-3(@click="showAlert=false;" ) close
     v-layout(column )
       v-flex
         v-card
@@ -65,10 +69,12 @@ module.exports = {
             defaultSettings: {},
             customSettings: {},
             settingsHolder: {},
-            successAlert: false,
             importAlert:false,
             newKey: "",
-            newValue: ""
+            newValue: "",
+            showAlert: false,
+            alertMessage: "",
+            alertTitle:""
         }
     },
     components: {},
@@ -111,7 +117,9 @@ module.exports = {
         SaveSettings: async function () {
             var cloned_custom = this._get_custom_settings()
             await this._save_settings(cloned_custom)
-            this.successAlert = true;
+            this.showAlert = true;
+            this.alertMessage = "Successfully saved settings!"
+            this.alertTitle = "Success"
 
 
         },
@@ -130,10 +138,25 @@ module.exports = {
                 const fileReader = new FileReader()
                 fileReader.addEventListener('loadend', (event) => {
                     console.log(event.target.result)
+                    try{
                     this._save_settings(JSON.parse(event.target.result)).then(() => {
                         console.log("settings saved")
                         this._loadSettings();
-                    }).then(() => this.importAlert = true )
+
+                    }).then(() => {
+                        this.showAlert = true;
+                        this.alertMessage = "Successfully imported settings!"
+                        this.alertTitle = "Success"
+                    } ).catch((e) =>{
+                        this.showAlert = true;
+                        this.alertMessage = "Upload failed " + JSON.stringify(e)
+                        this.alertTitle = "Error"
+                    } )}catch(e ){
+
+                        this.showAlert = true;
+                        this.alertMessage = "Upload failed. Please ensure that your settings file is properrly formatted JSON."
+                        this.alertTitle = "Error"
+                    }
                 })
                 fileReader.readAsBinaryString(files[0])
             },
@@ -153,6 +176,9 @@ module.exports = {
                   [JSON.stringify(settings)],
                   {type: "text/json"}
               ), "settings.json");
+            this.showAlert = true;
+            this.alertMessage = "Successfully exported settings.",
+            this.alertTitle = "Success"
         },
         resetToDefaults: async function () {
             let customOverride = {};

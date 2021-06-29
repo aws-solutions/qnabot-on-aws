@@ -14,7 +14,7 @@
           v-card
             v-card-title.display-1.pa-2 Import
             v-card-text
-              p {{importWarning}}
+              <p> <span v-html=importWarning></span></p>
               p.title From File
               div.ml-4.mb-2
                 input(
