@@ -2,6 +2,7 @@ var _=require('lodash')
 var util=require('./util')
 const lexRouter=require('./lexRouter');
 const specialtyBotRouter=require('./specialtyBotRouter');
+const esquery=require("/opt/lib/query.js")
 
 /**
  * This function identifies and invokes a lambda function that either queries elasticsearch for a
@@ -63,11 +64,8 @@ module.exports=async function query(req,res) {
                 console.log("Conditional chaining: " + chainingConfig);
                 // chainingConfig will be used in Query Lambda function
                 const arn = util.getLambdaArn(process.env.LAMBDA_DEFAULT_QUERY);
-                const postQuery = await util.invokeLambda({
-                    FunctionName: arn,
-                    req: resp.req,
-                    res: resp.res
-                });
+                const postQuery = await esquery(req,res)
+
                 // specialtyBot processing is done. Remove the flag for now.
                 _.set(postQuery, 'res.session.qnabotcontext.specialtyBotProgress', undefined);
                 console.log("After chaining the following response is being made: " + JSON.stringify(postQuery,null,2));
@@ -90,11 +88,8 @@ module.exports=async function query(req,res) {
                 console.log("Conditional chaining: " + chainingConfig);
                 // chainingConfig will be used in Query Lambda function
                 const arn = util.getLambdaArn(process.env.LAMBDA_DEFAULT_QUERY);
-                const postQuery = await util.invokeLambda({
-                    FunctionName: arn,
-                    req: resp.req,
-                    res: resp.res
-                });
+                const postQuery = await esquery(req,res)
+
                 // elicitResponse processing is done. Remove the flag for now.
                 _.set(postQuery,'res.session.qnabotcontext.elicitResponse.progress',undefined);
                 console.log("After chaining the following response is being made: " + JSON.stringify(postQuery,null,2));
@@ -110,10 +105,8 @@ module.exports=async function query(req,res) {
 
     let arn = util.getLambdaArn(process.env.LAMBDA_DEFAULT_QUERY);
     if (specialtyArn) {
-        let localEsQueryResults = await util.invokeLambda({
-            FunctionName: arn,
-            req, res
-        });
+        let localEsQueryResults = await esquery(req,res)
+
         if ( localEsQueryResults.res.got_hits > 0 && localEsQueryResults.res.result.qid.startsWith('specialty') &&
             (localEsQueryResults.req.session.botName !==
                 localEsQueryResults.res.result.args[0]) ) {
@@ -136,10 +129,8 @@ module.exports=async function query(req,res) {
     } else {
         arn = util.getLambdaArn(process.env.LAMBDA_DEFAULT_QUERY);
     }
-    let postQuery =  await util.invokeLambda({
-        FunctionName:arn,
-        req,res
-    });
+    let postQuery = await esquery(req,res)
+
 
     /*
      After standard query look for elicitResponse or specialtyBot in the question being returned and set session attributes

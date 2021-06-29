@@ -1,6 +1,8 @@
 <template lang='pug'>
   v-container(grid-list-md)
     v-alert(v-model="successAlert" outline type="info" dismissible) Successfully saved settings!
+    v-alert(v-model="importAlert" outline type="info" dismissible) Successfully imported settings!
+
     v-layout(column )
       v-flex
         v-card
@@ -16,7 +18,12 @@
             v-btn(@click="SaveSettings") Save
             //- v-btn Add New parameter
             v-btn(@click="resetToDefaults" style="margin-right:80px;") Reset to defaults
+            v-btn(@click="$refs.fileInput.click()") Import Settings
+
+            v-btn(@click="ExportSettings" style="margin-right:80px;") Export Settings
+
             v-btn(@click="showAddModal = true") Add New Setting
+            input(type="file" ref="fileInput" accept="application/json" @change="onFilePicked" style="display: none")
     
 
     v-dialog(v-model ="showAddModal")
@@ -59,6 +66,7 @@ module.exports = {
             customSettings: {},
             settingsHolder: {},
             successAlert: false,
+            importAlert:false,
             newKey: "",
             newValue: ""
         }
@@ -66,14 +74,11 @@ module.exports = {
     components: {},
     computed: {},
     created: async function () {
-        const settings = await this.$store.dispatch('api/listSettings');
-        this.defaultSettings = _.clone(settings[0]);
-        this.customSettings = _.clone(settings[1]);
-        this.mergedSettings = _.clone(settings[2]);
-        this.settingsHolder = _.clone(settings[2]);
+            await this._loadSettings()
     },
     methods: {
-        SaveSettings: async function () {
+
+        _get_custom_settings: function(){
             // update current customSettings with new values from settingsHolder
             for (let key in this.customSettings) {
                 this.customSettings[key] = this.settingsHolder[key];
@@ -94,12 +99,60 @@ module.exports = {
             }
 
             // clone object to send on api request - no chance of inflight updates from the ui
-            const cloned_custom = _.clone(this.customSettings);
-            let response = await this.$store.dispatch('api/updateSettings', cloned_custom);
+            return  _.clone(this.customSettings);
+        },
+         _loadSettings:async function() {
+                const settings = await this.$store.dispatch('api/listSettings');
+                this.defaultSettings = _.clone(settings[0]);
+                this.customSettings = _.clone(settings[1]);
+                this.mergedSettings = _.clone(settings[2]);
+                this.settingsHolder = _.clone(settings[2]);
+        },
+        SaveSettings: async function () {
+            var cloned_custom = this._get_custom_settings()
+            await this._save_settings(cloned_custom)
+            this.successAlert = true;
+
+
+        },
+        _save_settings:async function(settings){
+            settings = Object.assign(settings,this.customSettings)
+            console.log("settings " + JSON.stringify(settings))
+            let response = await this.$store.dispatch('api/updateSettings', settings);
             if (response) {
-                this.successAlert = true;
                 window.scrollTo(0, 0);
             }
+        },
+        onFilePicked:function (event) {
+               console.log("onFilePicked")
+                const files = event.target.files
+                let filename = files[0].name
+                const fileReader = new FileReader()
+                fileReader.addEventListener('loadend', (event) => {
+                    console.log(event.target.result)
+                    this._save_settings(JSON.parse(event.target.result)).then(() => {
+                        console.log("settings saved")
+                        this._loadSettings();
+                    }).then(() => this.importAlert = true )
+                })
+                fileReader.readAsBinaryString(files[0])
+            },
+        downloadBlobAsFile: (function closure_shell() {
+            const a = document.createElement("a");
+            return function downloadBlobAsFile(blob, filename) {
+                const object_URL = URL.createObjectURL(blob);
+                a.href = object_URL;
+                a.download = filename;
+                a.click();
+                URL.revokeObjectURL(object_URL);
+            };
+          })(),
+        ExportSettings: function(){
+            var settings = this._get_custom_settings()
+            this.downloadBlobAsFile(new Blob(
+                  [JSON.stringify(settings)],
+                  {type: "text/json"}
+              ), "settings.json");
         },
         resetToDefaults: async function () {
             let customOverride = {};

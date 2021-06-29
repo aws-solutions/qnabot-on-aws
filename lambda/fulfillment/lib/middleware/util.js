@@ -14,13 +14,16 @@ exports.getLambdaArn=function(name){
 
 exports.invokeLambda=async function(params){
     console.log(`Invoking ${params.FunctionName}`)
+    var payload = params.Payload || JSON.stringify({
+        req:params.req,
+        res:params.res
+    })
+    console.log("payload")
+    console.log(payload)
     var result=await lambda.invoke({
         FunctionName:params.FunctionName,
         InvocationType:params.InvocationType || "RequestResponse",
-        Payload:params.Payload || JSON.stringify({
-            req:params.req,
-            res:params.res
-        })
+        Payload:payload
     }).promise() 
     
     console.log(result)
