@@ -102,7 +102,9 @@ const _ = require('lodash')
 module.exports = {
   data: function () {
     return {
-      importWarning: "Warning, Importing will over write existing QnAs with the same ID",
+      importWarning: "Warning, Importing will over write existing QnAs with the same ID </br>" +
+                     "You can import either a JSON file exported from QnABot or a properly </br> " +
+                     "formatted Excel file.  For the file format, see <a href='https://github.com/aws-samples/aws-ai-qna-bot/tree/master/docs/excel_import#readme'>here</a>.",
       loading: false,
       testing: false,
       url: "",

@@ -588,7 +588,7 @@
           },
           "S3ObjectVersion": {"Ref": "ESProxyCodeVersion"}
         },
-        "Handler": "index.resource",
+        "Handler": "resource.handler",
         "MemorySize": "1408",
         "Role": {"Fn::GetAtt": ["ESProxyLambdaRole", "Arn"]},
         "Runtime": "nodejs12.x",
