@@ -122,18 +122,19 @@ module.exports=async function query(req,res) {
             return localEsQueryResults;
         }
     }
+    let postQuery;
     if (queryLambdaArn) {
-        let postQuery =  await util.invokeLambda({
+        postQuery =  await util.invokeLambda({
                 FunctionName:queryLambdaArn,
                 req,res
             });
     } else if (specialtyArn) {
-        let postQuery =  await util.invokeLambda({
+        postQuery =  await util.invokeLambda({
                 FunctionName:specialtyArn,
                 req,res
             });
     } else {
-        let postQuery = await esquery(req,res)
+        postQuery = await esquery(req,res)
     }
     
 
