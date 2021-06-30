@@ -123,13 +123,19 @@ module.exports=async function query(req,res) {
         }
     }
     if (queryLambdaArn) {
-        arn = queryLambdaArn;
+        let postQuery =  await util.invokeLambda({
+                FunctionName:queryLambdaArn,
+                req,res
+            });
     } else if (specialtyArn) {
-        arn = specialtyArn;
+        let postQuery =  await util.invokeLambda({
+                FunctionName:specialtyArn,
+                req,res
+            });
     } else {
-        arn = util.getLambdaArn(process.env.LAMBDA_DEFAULT_QUERY);
+        let postQuery = await esquery(req,res)
     }
-    let postQuery = await esquery(req,res)
+    
 
 
     /*
