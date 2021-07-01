@@ -23,6 +23,7 @@ module.exports={
       "Value":{"Ref":"ImportBucket"}
     },
     "BotConsoleUrl":{
+      "Condition": "CreateLexV1Bots",
       "Value":{"Fn::Join":["",[
         "https://console.aws.amazon.com/lex/home?",
         "region=",{"Ref":"AWS::Region"},
