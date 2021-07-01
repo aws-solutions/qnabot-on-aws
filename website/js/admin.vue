@@ -29,6 +29,8 @@
               v-list-tile-title 
                 a(href="https://amazon.com/qnabot" target="_blank") General Instructions / QnABot Blog Post
               v-list-tile-title
+                a(href="https://qnabot.workshop.aws/" target="_blank") QnABot Workshop
+              v-list-tile-title
                 a(href="https://aws.amazon.com/blogs/machine-learning/creating-virtual-guided-navigation-using-a-question-and-answer-bot-with-amazon-lex-and-amazon-alexa/" target="_blank") Guided Navigation using QnABot
               v-list-tile-title
                 a(href="https://aws.amazon.com/blogs/machine-learning/create-a-questionnaire-bot-with-amazon-lex-and-amazon-alexa/" target="_blank") Create a questionnaire using QnABot
