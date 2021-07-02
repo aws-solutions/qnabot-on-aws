@@ -81,9 +81,8 @@ async function get_parameter(param_name) {
  * Function to retrieve QnABot settings
  * @returns {*}
  */
-async function get_settings() {
-  var default_settings_param = process.env.DEFAULT_SETTINGS_PARAM;
-  var custom_settings_param = process.env.CUSTOM_SETTINGS_PARAM;
+async function get_settings(default_settings_param,custom_settings_param) {
+
 
   console.log(
     "Getting Default QnABot settings from SSM Parameter Store: ",
@@ -176,7 +175,7 @@ async function createKendraDocument(page, jobExecutionId, dataSourceId) {
       {
         Key: "_created_at",
         Value: {
-          DateValue: Date.now(),
+          DateValue: (new Date()).toISOString()
         },
       },
     ],
@@ -525,8 +524,10 @@ exports.handler = async (event, context, callback) => {
   console.log("Incoming event " + JSON.stringify(event));
 
   try {
-    var settings = await get_settings();
-    var kendraIndexId = settings.KENDRA_WEB_PAGE_INDEX;
+    let default_settings_param = process.env.DEFAULT_SETTINGS_PARAM;
+    let custom_settings_param = process.env.CUSTOM_SETTINGS_PARAM;
+    let settings = await get_settings(default_settings_param,custom_settings_param);
+    let kendraIndexId = settings.KENDRA_WEB_PAGE_INDEX;
 
     if (event["path"] == "/crawler/status") {
       if (!kendraIndexId) {
@@ -644,4 +645,6 @@ async function indexPages(
     throw err;
   }
 }
+
+
 
