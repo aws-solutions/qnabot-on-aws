@@ -134,9 +134,6 @@ function slackifyResponse(response) {
         console.log("Converted markdown: ", JSON.stringify(md));
     } 
     console.log("Converting Slack message javascript string to utf8 (for multi-byte compatibility).");
-    let txt = response.message;
-    txt = utf8.encode(txt); // encode as utf8
-    response.message = txt; 
     return response;
 }
 
