@@ -8,13 +8,23 @@ This repository contains code for the QnABot, described in the AWS AI blog post 
 
 See the "Getting Started" to launch your own QnABot.
 
+**See all the new features list for 4.7.1** [Lex V2 Elicit response bots, Config import/export](#new-features)
+
+4.7.1 provides performance improvements and component upgrades
+  - Amazon Elasticsearch version 7.10 is now utilized.
+  - Encrypted Elasticsearch (production) instance types now use m6g.large.elasticsearch for improved price/performance/memory. 
+  - The QnABot fulfillment Lambda function has been optimized to reduce query response times and variability, 
+    especially after periods of inactivity. 
+  - LexV2 built-in Elicit Response bots have been added. 
+  - Custom settings can now be exported and imported from the Content Designer Settings page.
+  - Bug fix when ES_SCORE_ANSWER_FIELD is set to true. Prior to this fix, answer fields were not
+    utilized fully in Elasticsearch queries.
+
 4.7.0 QnABot now supports LexV2 with voice interaction in multiple languages.
   - Two installation/update modes are now available:
     - (i) LexV1 + LexV2 (default, recommended for most AWS regions.
     - (ii) LexV2-only (currently recommended for AWS regions where LexV1 is not available).
-
-**See all the new features in 4.7.0** [LexV2 support, Excel Import, New Canada Central region](#new-features)
-      
+  
 4.6.0 provides a number of new features described below. Several to call attention to are the following:
 
 - Kendra custom no_hits item required in earlier releases is no longer required to enable Kendra Fallback and should be removed, configurable confidence thresholds now available for filtering Kendra results.
@@ -117,6 +127,10 @@ We are currently working on adding Microsoft Edge support.
 See the [LICENSE.md](LICENSE.md) file for details
 
 ## New features
+
+### Version 4.7.1
+- LexV2 built-in Elicit Response bots have been added.
+- Custom settings can now be exported and imported from the Content Designer Settings page.
 
 ### Version 4.7.0
 

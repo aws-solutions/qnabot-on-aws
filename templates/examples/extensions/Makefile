@@ -12,7 +12,7 @@ js_build:
 		pushd ./js_lambda_hooks/$$l ; \
 		rm -fr node_modules $(DSTDIR)/EXT$$l.zip ; \
 		[ -f package.json ] && \
-			npm install || true ; \
+			npm install --production || true ; \
 		zip -r -q $(DSTDIR)/EXT$$l.zip . ; \
 		popd ; \
 	done;

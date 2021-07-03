@@ -1,6 +1,12 @@
 <template lang='pug'>
   v-container(grid-list-md)
-    v-alert(v-model="successAlert" outline type="info" dismissible) Successfully saved settings!
+    v-dialog(v-model="showAlert" scrollable width="auto")
+        v-card(id="error-modal")
+          v-card-title(primary-title) {{alertTitle}}
+          v-card-text {{alertMessage}}
+          v-card-actions
+            v-spacer
+            v-btn.lighten-3(@click="showAlert=false;" ) close
     v-layout(column )
       v-flex
         v-card
@@ -10,13 +16,18 @@
             h3 For more information about settings, see <a href="https://github.com/aws-samples/aws-ai-qna-bot/blob/master/docs/settings.md" target="_blank">here</a>
           v-card-text
             v-list(three-line)
-                v-list-tile(v-for="(parameter,index) in mergedSettings")
+                v-list-tile(v-for="(parameter,index) in mergedSettings" :key="index")
                     v-list-tile-content
                         v-text-field(:label="index"  v-model="settingsHolder[index]")
             v-btn(@click="SaveSettings") Save
             //- v-btn Add New parameter
             v-btn(@click="resetToDefaults" style="margin-right:80px;") Reset to defaults
+            v-btn(@click="$refs.fileInput.click()") Import Settings
+
+            v-btn(@click="ExportSettings" style="margin-right:80px;") Export Settings
+
             v-btn(@click="showAddModal = true") Add New Setting
+            input(type="file" ref="fileInput" accept="application/json" @change="onFilePicked" style="display: none")
     
 
     v-dialog(v-model ="showAddModal")
@@ -58,22 +69,22 @@ module.exports = {
             defaultSettings: {},
             customSettings: {},
             settingsHolder: {},
-            successAlert: false,
+            importAlert:false,
             newKey: "",
-            newValue: ""
+            newValue: "",
+            showAlert: false,
+            alertMessage: "",
+            alertTitle:""
         }
     },
     components: {},
     computed: {},
     created: async function () {
-        const settings = await this.$store.dispatch('api/listSettings');
-        this.defaultSettings = _.clone(settings[0]);
-        this.customSettings = _.clone(settings[1]);
-        this.mergedSettings = _.clone(settings[2]);
-        this.settingsHolder = _.clone(settings[2]);
+            await this._loadSettings()
     },
     methods: {
-        SaveSettings: async function () {
+
+        _get_custom_settings: function(){
             // update current customSettings with new values from settingsHolder
             for (let key in this.customSettings) {
                 this.customSettings[key] = this.settingsHolder[key];
@@ -94,12 +105,80 @@ module.exports = {
             }
 
             // clone object to send on api request - no chance of inflight updates from the ui
-            const cloned_custom = _.clone(this.customSettings);
-            let response = await this.$store.dispatch('api/updateSettings', cloned_custom);
+            return  _.clone(this.customSettings);
+        },
+         _loadSettings:async function() {
+                const settings = await this.$store.dispatch('api/listSettings');
+                this.defaultSettings = _.clone(settings[0]);
+                this.customSettings = _.clone(settings[1]);
+                this.mergedSettings = _.clone(settings[2]);
+                this.settingsHolder = _.clone(settings[2]);
+        },
+        SaveSettings: async function () {
+            var cloned_custom = this._get_custom_settings()
+            await this._save_settings(cloned_custom)
+            this.showAlert = true;
+            this.alertMessage = "Successfully saved settings!"
+            this.alertTitle = "Success"
+
+
+        },
+        _save_settings:async function(settings){
+            settings = Object.assign(settings,this.customSettings)
+            console.log("settings " + JSON.stringify(settings))
+            let response = await this.$store.dispatch('api/updateSettings', settings);
             if (response) {
-                this.successAlert = true;
                 window.scrollTo(0, 0);
             }
+        },
+        onFilePicked:function (event) {
+               console.log("onFilePicked")
+                const files = event.target.files
+                let filename = files[0].name
+                const fileReader = new FileReader()
+                fileReader.addEventListener('loadend', (event) => {
+                    console.log(event.target.result)
+                    try{
+                    this._save_settings(JSON.parse(event.target.result)).then(() => {
+                        console.log("settings saved")
+                        this._loadSettings();
+
+                    }).then(() => {
+                        this.showAlert = true;
+                        this.alertMessage = "Successfully imported settings!"
+                        this.alertTitle = "Success"
+                    } ).catch((e) =>{
+                        this.showAlert = true;
+                        this.alertMessage = "Upload failed " + JSON.stringify(e)
+                        this.alertTitle = "Error"
+                    } )}catch(e ){
+
+                        this.showAlert = true;
+                        this.alertMessage = "Upload failed. Please ensure that your settings file is properrly formatted JSON."
+                        this.alertTitle = "Error"
+                    }
+                })
+                fileReader.readAsBinaryString(files[0])
+            },
+        downloadBlobAsFile: (function closure_shell() {
+            const a = document.createElement("a");
+            return function downloadBlobAsFile(blob, filename) {
+                const object_URL = URL.createObjectURL(blob);
+                a.href = object_URL;
+                a.download = filename;
+                a.click();
+                URL.revokeObjectURL(object_URL);
+            };
+          })(),
+        ExportSettings: function(){
+            var settings = this._get_custom_settings()
+            this.downloadBlobAsFile(new Blob(
+                  [JSON.stringify(settings)],
+                  {type: "text/json"}
+              ), "settings.json");
+            this.showAlert = true;
+            this.alertMessage = "Successfully exported settings.",
+            this.alertTitle = "Success"
         },
         resetToDefaults: async function () {
             let customOverride = {};

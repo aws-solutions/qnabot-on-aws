@@ -1,7 +1,3 @@
-var Url=require('url')
-var Promise=require('bluebird')
-var cfnLambda=require('cfn-lambda')
-var request=require('./lib/request')
 
 const filter = text => {
     if (process.env.CLOUDWATCHLOGGINGDISABLED === "true"){
@@ -18,12 +14,11 @@ const filter = text => {
 
 require('intercept-stdout')(filter, filter);
 
-exports.qid=require('./lib/qid')
-exports.logging=require('./lib/logging')
-exports.cleanmetrics=require('./lib/cleanmetrics')
-exports.utterances=require('./lib/utterances')
-exports.handler =require('./lib/handler') 
-exports.resource=require('./lib/cfn').resource
+exports.qid=require('/opt/lib/qid')
+exports.logging=require('/opt/lib/logging')
+exports.cleanmetrics=require('/opt/lib/cleanmetrics')
+exports.utterances=require('/opt/lib/utterances')
+exports.handler =require('/opt/lib/handler') 
 
 exports.query=function(event,context,callback){
     require('./lib/query')(event.req,event.res)

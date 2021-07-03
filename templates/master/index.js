@@ -9,6 +9,7 @@ module.exports={
   "Resources":_.assign.apply({},files),
   "Conditions": {},
   "AWSTemplateFormatVersion": "2010-09-09",
+  "Transform": "AWS::Serverless-2016-10-31",
   "Description": `QnABot with admin and client websites - (Master v${process.env.npm_package_version})`,
   "Mappings": {},
   "Outputs": {
@@ -22,6 +23,7 @@ module.exports={
       "Value":{"Ref":"ImportBucket"}
     },
     "BotConsoleUrl":{
+      "Condition": "CreateLexV1Bots",
       "Value":{"Fn::Join":["",[
         "https://console.aws.amazon.com/lex/home?",
         "region=",{"Ref":"AWS::Region"},

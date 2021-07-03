@@ -161,13 +161,18 @@ def translate_utterances(localeId, utterances):
     langCode = localeId.split("_")[0]
     for utterance in utterances:
         if len(utterance) > 1:
-            response = clientTRANSLATE.translate_text(
-                Text=utterance,
-                SourceLanguageCode='auto',
-                TargetLanguageCode=langCode
-            )
-            translatedUtterance = response["TranslatedText"]
+            try:
+                response = clientTRANSLATE.translate_text(
+                    Text=utterance,
+                    SourceLanguageCode='auto',
+                    TargetLanguageCode=langCode
+                )
+                translatedUtterance = response["TranslatedText"]
+            except Exception as e:
+                print(f"Auto translation failed for '{utterance}' - using original. Exception: {e}")
+                translatedUtterance = utterance
         else:
+            print(f"Utterance {utterance} too short to translate - using original.")
             translatedUtterance = utterance
         print(f"Translated utterance: {utterance} -> {translatedUtterance}")
         translatedUtterances.append(translatedUtterance)

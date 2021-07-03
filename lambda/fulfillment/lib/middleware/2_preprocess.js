@@ -9,7 +9,6 @@ async function get_userInfo(userId, idattrs) {
         UserId:userId,
         InteractionCount:1
     };
-    console.log("idattr " + JSON.stringify(idattrs))
     var usersTable = process.env.DYNAMODB_USERSTABLE;
     var docClient = new AWS.DynamoDB.DocumentClient({apiVersion: '2012-08-10'});
     var params = {

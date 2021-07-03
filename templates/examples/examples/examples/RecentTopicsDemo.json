@@ -1,0 +1,343 @@
+﻿{
+  "qna": [
+    {
+      "qid": "RecentTopics.AI.001",
+      "a": "AWS Offers a number of AI services.  Please choose an option below",
+      "t": "AI",
+      "r": {
+        "title": "AI",
+        "buttons": [
+          {
+            "text": "Amazon Kendra",
+            "value": "QID::RecentTopics.Kendra"
+          },
+          {
+            "text": "Amazon Comprehend",
+            "value": "QID::RecentTopics.Comprehend"
+          },
+          {
+            "text": "Amazon Lex",
+            "value": "QID::RecentTopics.Lex"
+          },
+          {
+            "text": "Amazon Translate",
+            "value": "QID::RecentTopics.Translate"
+          },
+          {
+            "text": "Amazon Polly",
+            "value": "QID::RecentTopics.Polly"
+          },
+          {
+            "text": "Amazon Translate",
+            "value": "QID::RecentTopics.Translate"
+          }
+        ]
+      },
+      "type": "qna",
+      "q": [
+        "What Artificial Intelligence Services does AWS offer?"
+      ]
+    },
+    {
+      "qid": "RecentTopics.Comprehend",
+      "a": "Amazon Comprehend is a natural-language processing (NLP) service that uses machine learning to uncover information in unstructured data. Instead of combing through documents, the process is simplified and unseen information is easier to understand.",
+      "alt": {
+        "markdown": "Amazon Comprehend is a natural-language processing (NLP) service that uses machine learning to uncover information in unstructured data. Instead of combing through documents, the process is simplified and unseen information is easier to understand.\n\nFor more information about Amazon Comprehend. Click [here](https://aws.amazon.com/comprehend/)"
+      },
+      "t": "Comprehend",
+      "r": {
+        "buttons": [
+          {
+            "text": "Ask another question",
+            "value": "QID::RecentTopics.General.001"
+          }
+        ]
+      },
+      "type": "qna",
+      "q": [
+        "What is Comprehend"
+      ]
+    },
+    {
+      "qid": "RecentTopics.ML.001",
+      "a": "Choose an item below to find out more about machine learning services AWS offers",
+      "t": "Machine Learning",
+      "r": {
+        "title": "More Info",
+        "buttons": [
+          {
+            "text": "Amazon SageMaker",
+            "value": "QID::RecentTopics.SageMaker"
+          },
+          {
+            "text": "Amazon SageMaker Ground Truth",
+            "value": "QID::RecentTopics.SageMaker.GroundTruth"
+          },
+          {
+            "text": "Amazon SageMaker Neo",
+            "value": "QID::RecentTopics.SageMaker.Neo"
+          },
+          {
+            "text": "Amazon Augmented AI",
+            "value": "QID::RecentTopics.SageMaker.AugmentedAI"
+          }
+        ]
+      },
+      "type": "qna",
+      "q": [
+        "What Machine Language services does AWS offer"
+      ]
+    },
+    {
+      "qid": "RecentTopics.General.001",
+      "a": "You can either choose from a topic below, choose \"Show My Previous Topics\" to go back to areas we discussed before or ask a question.",
+      "r": {
+        "title": "Start",
+        "buttons": [
+          {
+            "text": "Artificial Intelligence Services",
+            "value": "QID::RecentTopics.AI.001"
+          },
+          {
+            "text": "Machine Learning Services",
+            "value": "QID::RecentTopics.ML.001"
+          },
+          {
+            "text": "Show my Previous Topics",
+            "value": "QID::RecentTopics.PreviousTopics"
+          }
+        ]
+      },
+      "type": "qna",
+      "q": [
+        "Start over"
+      ]
+    },
+    {
+      "qid": "RecentTopics.Start",
+      "a": "Hi. You can ask a question about the following topics",
+      "r": {
+        "title": "top",
+        "buttons": [
+          {
+            "text": "AI Services",
+            "value": "QID::RecentTopics.RecentTopics.AI.001"
+          },
+          {
+            "text": "ML.Services",
+            "value": "QID::RecentTopics.ML.001"
+          }
+        ]
+      },
+      "type": "qna",
+      "q": [
+        "Hello"
+      ]
+    },
+    {
+      "qid": "RecentTopics.SageMaker.GroundTruth",
+      "a": "Amazon SageMaker Ground Truth is a fully managed data labeling service that makes it easy to build highly accurate training datasets for machine learning. Get started with labeling your data in minutes through the SageMaker Ground Truth console using custom or built-in data labeling workflows. These workflows support a variety of use cases including 3D point clouds, video, images, and text. As part of the workflows, labelers have access to assistive labeling features such as automatic 3D cuboid snapping, removal of distortion in 2D images, and auto-segment tools to reduce the time required to label datasets. In addition, Ground Truth offers automatic data labeling which uses a machine learning model to label your data.",
+      "alt": {
+        "markdown": "Amazon SageMaker Ground Truth is a fully managed data labeling service that makes it easy to build highly accurate training datasets for machine learning. Get started with labeling your data in minutes through the SageMaker Ground Truth console using custom or built-in data labeling workflows. These workflows support a variety of use cases including 3D point clouds, video, images, and text. As part of the workflows, labelers have access to assistive labeling features such as automatic 3D cuboid snapping, removal of distortion in 2D images, and auto-segment tools to reduce the time required to label datasets. In addition, Ground Truth offers automatic data labeling which uses a machine learning model to label your data.\n\nFor more information, click [here](https://aws.amazon.com/sagemaker/groundtruth/)"
+      },
+      "t": "SageMaker",
+      "r": {
+        "title": "Response",
+        "buttons": [
+          {
+            "text": "Ask another question",
+            "value": "QID::RecentTopics.General.001"
+          }
+        ]
+      },
+      "type": "qna",
+      "q": [
+        "What is Amazon SageMaker GroundTruth"
+      ]
+    },
+    {
+      "qid": "RecentTopics.SageMaker.Neo",
+      "a": "Amazon SageMaker Neo automatically optimizes machine learning models for inference on cloud instances and edge devices to run faster with no loss in accuracy. You start with a machine learning model already built with DarkNet, Keras, MXNet, PyTorch, TensorFlow, TensorFlow-Lite, ONNX, or XGBoost and trained in Amazon SageMaker or anywhere else. Then you choose your target hardware platform, which can be a SageMaker hosting instance or an edge device based on processors from Ambarella, Apple, ARM, Intel, MediaTek, Nvidia, NXP, Qualcomm, RockChip, Texas Instruments, or Xilinx. With a single click, SageMaker Neo optimizes the trained model and compiles it into an executable.",
+      "alt": {
+        "markdown": "Amazon SageMaker Neo automatically optimizes machine learning models for inference on cloud instances and edge devices to run faster with no loss in accuracy. You start with a machine learning model already built with DarkNet, Keras, MXNet, PyTorch, TensorFlow, TensorFlow-Lite, ONNX, or XGBoost and trained in Amazon SageMaker or anywhere else. Then you choose your target hardware platform, which can be a SageMaker hosting instance or an edge device based on processors from Ambarella, Apple, ARM, Intel, MediaTek, Nvidia, NXP, Qualcomm, RockChip, Texas Instruments, or Xilinx. With a single click, SageMaker Neo optimizes the trained model and compiles it into an executable. \n\nFor more information, click [here](https://aws.amazon.com/sagemaker/neo/)."
+      },
+      "t": "SageMaker",
+      "r": {
+        "title": "Response",
+        "buttons": [
+          {
+            "text": "Ask another question",
+            "value": "QID::RecentTopics.General.001"
+          }
+        ]
+      },
+      "type": "qna",
+      "q": [
+        "What is SageMaker Neo"
+      ]
+    },
+    {
+      "qid": "RecentTopics.Polly",
+      "a": "Amazon Lex is a service for building conversational interfaces into any application using voice and text. Amazon Lex provides the advanced deep learning functionalities of automatic speech recognition (ASR) for converting speech to text, and natural language understanding (NLU) to recognize the intent of the text, to enable you to build applications with highly engaging user experiences and lifelike conversational interactions. With Amazon Lex, the same deep learning technologies that power Amazon Alexa are now available to any developer, enabling you to quickly and easily build sophisticated, natural language, conversational bots (“chatbots”).",
+      "alt": {
+        "markdown": "Amazon Lex is a service for building conversational interfaces into any application using voice and text. Amazon Lex provides the advanced deep learning functionalities of automatic speech recognition (ASR) for converting speech to text, and natural language understanding (NLU) to recognize the intent of the text, to enable you to build applications with highly engaging user experiences and lifelike conversational interactions. With Amazon Lex, the same deep learning technologies that power Amazon Alexa are now available to any developer, enabling you to quickly and easily build sophisticated, natural language, conversational bots (“chatbots”).\n\nFor more information click [here](https://aws.amazon.com/lex/)."
+      },
+      "t": "Polly",
+      "r": {
+        "title": "Response",
+        "buttons": [
+          {
+            "text": "Ask another question",
+            "value": "QID::RecentTopics.General.001"
+          }
+        ]
+      },
+      "type": "qna",
+      "q": [
+        "What is Amazon Polly"
+      ]
+    },
+    {
+      "qid": "RecentTopics.Lex",
+      "a": "Amazon Lex is a service for building conversational interfaces into any application using voice and text. Amazon Lex provides the advanced deep learning functionalities of automatic speech recognition (ASR) for converting speech to text, and natural language understanding (NLU) to recognize the intent of the text, to enable you to build applications with highly engaging user experiences and lifelike conversational interactions. With Amazon Lex, the same deep learning technologies that power Amazon Alexa are now available to any developer, enabling you to quickly and easily build sophisticated, natural language, conversational bots (“chatbots”).",
+      "alt": {
+        "markdown": "Amazon Lex is a service for building conversational interfaces into any application using voice and text. Amazon Lex provides the advanced deep learning functionalities of automatic speech recognition (ASR) for converting speech to text, and natural language understanding (NLU) to recognize the intent of the text, to enable you to build applications with highly engaging user experiences and lifelike conversational interactions. With Amazon Lex, the same deep learning technologies that power Amazon Alexa are now available to any developer, enabling you to quickly and easily build sophisticated, natural language, conversational bots (“chatbots”).\n\nFor more information, click [here](https://aws.amazon.com/lex/)"
+      },
+      "t": "Lex",
+      "r": {
+        "title": "Response",
+        "buttons": [
+          {
+            "text": "Ask another question",
+            "value": "QID::RecentTopics.PreviousTopics"
+          }
+        ]
+      },
+      "type": "qna",
+      "q": [
+        "What is Amazon Lex"
+      ]
+    },
+    {
+      "qid": "RecentTopics.Translate",
+      "a": "Amazon Translate is a neural machine translation service that delivers fast, high-quality, affordable, and customizable language translation. Neural machine translation is a form of language translation automation that uses deep learning models to deliver more accurate and more natural sounding translation than traditional statistical and rule-based translation algorithms.",
+      "alt": {
+        "markdown": "Amazon Translate is a neural machine translation service that delivers fast, high-quality, affordable, and customizable language translation. Neural machine translation is a form of language translation automation that uses deep learning models to deliver more accurate and more natural sounding translation than traditional statistical and rule-based translation algorithms.\n\nFor more information, click [here](https://aws.amazon.com/translate/)"
+      },
+      "t": "Translate",
+      "r": {
+        "title": "Response",
+        "buttons": [
+          {
+            "text": "Ask another question",
+            "value": "QID::RecentTopics.General.001"
+          }
+        ]
+      },
+      "type": "qna",
+      "q": [
+        "What is Amazon Translate"
+      ]
+    },
+    {
+      "qid": "RecentTopics.Kendra",
+      "a": "Amazon Kendra is an intelligent search service powered by machine learning. Kendra reimagines enterprise search for your websites and applications so your employees and customers can easily find the content they are looking for, even when it’s scattered across multiple locations and content repositories within your organization.",
+      "alt": {
+        "markdown": "Amazon Kendra is an intelligent search service powered by machine learning. Kendra reimagines enterprise search for your websites and applications so your employees and customers can easily find the content they are looking for, even when it’s scattered across multiple locations and content repositories within your organization.\n\nFor more information. Click [here](https://aws.amazon.com/kendra/)"
+      },
+      "t": "Kendra",
+      "r": {
+        "title": "Buttons",
+        "buttons": [
+          {
+            "text": "Ask Another Question",
+            "value": "QID::RecentTopics.General.001"
+          }
+        ]
+      },
+      "type": "qna",
+      "q": [
+        "What is Kendra"
+      ]
+    },
+    {
+      "qid": "RecentTopics.PreviousTopics",
+      "a": "Here are some topics we discussed before.",
+      "r": {
+        "title": "Response",
+        "buttons": [
+          {
+            "text": "Ask Another Question",
+            "value": "QID::RecentTopics.General.001"
+          }
+        ]
+      },
+      "l": "QNA:EXTCreateRecentTopicsResponse",
+      "args": [
+        "{\"start\":0,\"end\":5}"
+      ],
+      "type": "qna",
+      "q": [
+        "What are my previous topics"
+      ]
+    },
+    {
+      "qid": "RecentTopics.SageMaker.AugmentedAI",
+      "a": "Amazon Augmented AI is a machine learning service which makes it easy to build the workflows required for human review. Amazon A2I brings human review to all developers, removing the undifferentiated heavy lifting associated with building human review systems or managing large numbers of human reviewers whether it runs on AWS or not.",
+      "t": "SageMaker",
+      "r": {
+        "title": "Response",
+        "buttons": [
+          {
+            "text": "Ask another question",
+            "value": "QID::RecentTopics.General.001"
+          }
+        ]
+      },
+      "type": "qna",
+      "q": [
+        "What is Amazon SageMaker Augmented AI"
+      ]
+    },
+    {
+      "qid": "RecentTopics.SageMaker",
+      "a": "Amazon SageMaker helps data scientists and developers to prepare, build, train, and deploy high-quality machine learning (ML) models quickly by bringing together a broad set of capabilities purpose-built for ML.",
+      "alt": {
+        "markdown": "Amazon SageMaker helps data scientists and developers to prepare, build, train, and deploy high-quality machine learning (ML) models quickly by bringing together a broad set of capabilities purpose-built for ML.\n\nFor more information, click [here](https://aws.amazon.com/sagemaker/)"
+      },
+      "t": "SageMaker",
+      "r": {
+        "title": "Response",
+        "buttons": [
+          {
+            "text": "Amazon SageMaker Augmented AI",
+            "value": "QID::RecentTopics.SageMaker.AugmentedAI"
+          },
+          {
+            "text": "Amazon SageMaker GroundTruth",
+            "value": "QID::RecentTopics.SageMaker.GroundTruth"
+          },
+          {
+            "text": "Amazon SageMaker Neo",
+            "value": "QID::RecentTopics.SageMaker.Neo"
+          }
+        ]
+      },
+      "type": "qna",
+      "q": [
+        "What is SageMaker"
+      ]
+    },
+    {
+      "qid": "RecentTopics.Instructions.001",
+      "a": "See the instructions",
+      "alt": {
+        "markdown": "Save the following JSON to a file and use the \"Import Settings\" option on the Settings page.\n\n```json\n{\n  \"topic::Comprehend\": \"Amazon Comprehend::Comprehend\",\n  \"topic::Kendra\": \"Amazon Kendra::Kendra\",\n  \"topic::Lex\": \"Amazon Lex::Lex\",\n  \"topic::Polly\": \"Amazon Polly::Polly\",\n  \"topic::SageMaker\": \"Amazon SageMaker::SageMaker\",\n  \"topic::Translate\": \"Amazon Translate::Translate\"\n}\n```\n\nSee [here](https://github.com/aws-samples/aws-ai-qna-bot/blob/master/docs/recent_topics_lambda_hook_example/README.md) for more information."
+      },
+      "type": "qna",
+      "q": [
+        "How do I use this demo?"
+      ]
+    }
+  ]
+}

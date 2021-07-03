@@ -2,6 +2,8 @@ var fs=require('fs')
 var _=require('lodash')
 var fs=require('fs')
 var responsebots=require('./responsebots.js').resources;
+var responsebots_lexv2=require('./responsebots-lexv2.js').resources;
+
 
 var js=fs.readdirSync(`${__dirname}/js`)
 .filter(x=>x.match(/(.*).js/))
@@ -28,6 +30,7 @@ var py=fs.readdirSync(`${__dirname}/py`)
 
 module.exports=Object.assign(
     responsebots,
+    responsebots_lexv2,
     _.fromPairs(js.map(x=>[x.name,x.resource])),
     _.fromPairs(py.map(x=>[x.name,x.resource])),
     {

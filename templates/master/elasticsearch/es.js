@@ -3,7 +3,7 @@ var properties={
     "ElasticsearchClusterConfig": {
        "DedicatedMasterEnabled": false,
        "InstanceCount": {"Ref":"ElasticSearchNodeCount"},
-       "InstanceType": {"Fn::If": [ "Encrypted", "c5.large.elasticsearch", "t3.small.elasticsearch"]},
+       "InstanceType": {"Fn::If": [ "Encrypted", "m6g.large.elasticsearch", "t3.small.elasticsearch"]},
        "ZoneAwarenessEnabled": "true"
     },
     "EBSOptions": {
@@ -11,7 +11,7 @@ var properties={
        "VolumeSize": 10,
        "VolumeType": "gp2"
     },
-    "ElasticsearchVersion": "7.9",
+    "ElasticsearchVersion": "7.10",
     "SnapshotOptions": {
        "AutomatedSnapshotStartHour": "0"
     },

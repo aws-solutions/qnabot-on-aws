@@ -1,0 +1,8 @@
+{
+  "topic::Comprehend": "Amazon Comprehend::Comprehend",
+  "topic::Kendra": "Amazon Kendra::Kendra",
+  "topic::Lex": "Amazon Lex::Lex",
+  "topic::Polly": "Amazon Polly::Polly",
+  "topic::SageMaker": "Amazon SageMaker::SageMaker",
+  "topic::Translate": "Amazon Translate::Translate"
+}

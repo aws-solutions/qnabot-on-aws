@@ -20,6 +20,7 @@ module.exports={
     "devEncryption": "UNENCRYPTED",
     "devPublicOrPrivate": "PUBLIC",
     "namespace":"dev",
+    "LexBotVersion":"LexV1 and LexV2",
     "stackNamePrefix":"QNA"
 }
 

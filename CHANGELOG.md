@@ -17,6 +17,15 @@
 - QnABot's Elasticsearch cache is now automatically kept warm to improve query time consistency.
 - Negative feedback (thumbs down) messages can now generate notifications (text, email, etc.) using Amazon SNS.
 
+## [4.7.1]
+- Amazon Elasticsearch version 7.10 is now utilized.
+- Encrypted Elasticsearch (production) instance types now use m6g.large.elasticsearch for improved price/performance/memory.
+- The QnABot fulfillment Lambda function has been optimized to reduce query response times and variability,
+  especially after periods of inactivity.
+- LexV2 built-in Elicit Response bots have been added.
+- Custom settings can now be exported and imported from the Content Designer Settings page.
+- Bug fix when ES_SCORE_ANSWER_FIELD is set to true. Prior to this fix, answer fields were not
+  utilized fully in Elasticsearch queries.
 ## [4.5.2]
 - Fix for new Kendra resources deployed in VPC addressing issues in 4.5.0 and 4.5.1.
 ## [4.5.1]

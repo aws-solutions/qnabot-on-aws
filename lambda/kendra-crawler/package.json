@@ -11,7 +11,7 @@
   "dependencies": {
     "chrome-aws-lambda": "^5.5.0",
     "lodash": "^4.17.20",
-    "pdfreader": "^1.2.8",
+    "pdfreader": "^1.2.10",
     "puppeteer-core": "^5.5.0"
   }
 }
