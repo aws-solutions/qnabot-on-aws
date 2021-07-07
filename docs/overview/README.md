@@ -16,7 +16,10 @@ Three key AWS services are at the core of the solution:
 Let's take a closer look at these three services and how they help power
 the QnABot solution.
 
+![Solution architecture and data flow](image2.png)
+
 ![Solution architecture and data flow](architecture.png)
+
 
 When you ask QnABot a question, a few things happen:
 
