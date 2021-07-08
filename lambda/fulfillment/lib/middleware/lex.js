@@ -204,15 +204,10 @@ function limitLexDisplayTextLength(response) {
     // Lex has limit of max 5 buttons in the responsecard.. if we have more than 5, use the first 5 only.
     // note when using lex-web-ui, this limitation is circumvented by use of the appContext session attribute above.
     let buttons = _.get(response.card,"buttons",[]) ;
-    console.log("in limitLexDisplayText")
-    console.log(buttons)
-    for(i=0;i<response.card.buttons.length;i++){
+    for(let i=0;i<buttons.length;i++){
         response.card.buttons[i].text = response.card.buttons[i].text.slice(0,50)
         response.card.buttons[i].value = response.card.buttons[i].value.slice(0,50)
-
     }
-    console.log("after limitLexDisplayTextLength")
-    console.log(JSON.stringify(response))
     return response;
 }
 
