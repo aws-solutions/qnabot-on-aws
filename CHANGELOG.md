@@ -1,3 +1,7 @@
+## [4.7.2]
+- Bug fix "TypeError: AWS.LexRuntimeV2 is not a constructor" when using Lex V2 based Elicit Response Bots.
+- Bug fix "Cannot read property 'buttons' of undefined" when no buttons specified in response card.
+- Bug fix Protect against TypeError exception while processing fallback intent case for an invalid response provided to a LexV2 Response Bot. 
 ## [4.7.1]
 - Amazon Elasticsearch version 7.10 is now utilized.
 - Encrypted Elasticsearch (production) instance types now use m6g.large.elasticsearch for improved price/performance/memory.

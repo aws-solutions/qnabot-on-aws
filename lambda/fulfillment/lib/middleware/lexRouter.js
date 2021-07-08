@@ -79,6 +79,7 @@ function lexV1ClientRequester(params) {
     });
 }
 function lexV2ClientRequester(params) {
+    console.log(`aws sdk version is ${AWS.VERSION}`);
     const lexV2Client = new AWS.LexRuntimeV2();
     return new Promise(function(resolve, reject) {
         lexV2Client.recognizeText(params, function(err, data) {
