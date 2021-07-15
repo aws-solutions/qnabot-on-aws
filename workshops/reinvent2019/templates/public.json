@@ -4640,14 +4640,6 @@
         "BinaryMediaTypes": ["image/png"]
       }
     },
-    "ApiCompression": {
-      "Type": "Custom::ApiCompression",
-      "Properties": {
-        "ServiceToken": {"Fn::GetAtt": ["CFNLambda", "Arn"]},
-        "restApiId": {"Ref": "API"},
-        "value": "500000"
-      }
-    },
     "Deployment": {
       "Type": "Custom::ApiDeployment",
       "Properties": {
