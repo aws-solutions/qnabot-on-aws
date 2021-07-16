@@ -16,7 +16,6 @@ var targets={
     S3Lambda:require('./lib/S3Lambda'),
     S3Unzip:require('./lib/S3Unzip'),
     Variable:require('./lib/Variable'),
-    ApiCompression:require('./lib/ApiCompression'),
     ApiDeployment:require('./lib/ApiDeployment'),
     ElasticSearchUpdate:require('./lib/ElasticSearchUpdate'),
     ESCognitoClient:require('./lib/ESCognitoClient'),

@@ -12,9 +12,6 @@ module.exports={
         cb()
     },
     api:{
-        compress:function(test){
-            lifecycle(require('./params/api.compress'),test)
-        },
         deploy:function(test){
             var lib=require('../lib/ApiDeployment')
             var params=require('./params/api.deploy')
