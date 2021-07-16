@@ -8,7 +8,10 @@ module.exports={
       "Type": "AWS::Lambda::Permission",
       "Properties": {
         "Action": "lambda:InvokeFunction",
-        "FunctionName": {"Fn::GetAtt":["FulfillmentLambda","Arn"]},
+        "FunctionName": {  "Fn::Join": [ ":", [
+          {"Fn::GetAtt":["FulfillmentLambda","Arn"]}, 
+          "live"
+        ]]},
         "Principal": "lex.amazonaws.com"
       }
     },
@@ -46,7 +49,10 @@ module.exports={
         "fulfillmentActivity": {
           "type": "CodeHook",
           "codeHook": {
-            "uri": {"Fn::GetAtt":["FulfillmentLambda","Arn"]},
+            "uri": {  "Fn::Join": [ ":", [
+              {"Fn::GetAtt":["FulfillmentLambda","Arn"]}, 
+              "live"
+            ]]},
             "messageVersion": "1.0"
           }
         }

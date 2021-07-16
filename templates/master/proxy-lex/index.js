@@ -39,7 +39,10 @@ module.exports={
                 STATUS_BUCKET:{"Ref":"BuildStatusBucket"},
                 STATUS_KEY:{"Fn::If": ["CreateLexV1Bots", "status.json", {"Ref":"AWS::NoValue"}]},
                 LEXV2_STATUS_KEY:"lexV2status.json",
-                FULFILLMENT_FUNCTION_ARN: {"Fn::GetAtt": ["FulfillmentLambda", "Arn"]},
+                FULFILLMENT_FUNCTION_ARN: {  "Fn::Join": [ ":", [
+                  {"Fn::GetAtt":["FulfillmentLambda","Arn"]},
+                  "live"
+                ]]},
                 FULFILLMENT_FUNCTION_ROLE: {"Ref": "FulfillmentLambdaRole"},
                 LEXV1_BOT_NAME: {"Fn::If": ["CreateLexV1Bots",{"Ref": "LexBot"},{"Ref": "AWS::NoValue"}]},
                 LEXV1_INTENT: {"Fn::If": ["CreateLexV1Bots",{"Ref": "Intent"},{"Ref": "AWS::NoValue"}]},

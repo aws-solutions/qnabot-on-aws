@@ -17,7 +17,10 @@ module.exports = {
     "Type": "AWS::Lambda::Permission",
     "Properties": {
       "Action": "lambda:InvokeFunction",
-      "FunctionName": { "Fn::GetAtt": ["FulfillmentLambda", "Arn"] },
+      "FunctionName": {  "Fn::Join": [ ":", [
+        {"Fn::GetAtt":["FulfillmentLambda","Arn"]}, 
+        "live"
+      ]]},
       "Principal": "alexa-appkit.amazon.com"
     }
   },
@@ -56,6 +59,9 @@ module.exports = {
       },
       "Handler": "index.handler",
       "MemorySize": 1408,
+      "ProvisionedConcurrencyConfig": {
+        "ProvisionedConcurrentExecutions": 2
+      },
       "Role": { "Fn::GetAtt": ["FulfillmentLambdaRole", "Arn"] },
       "Runtime": "nodejs12.x",
       "Timeout": 300,
