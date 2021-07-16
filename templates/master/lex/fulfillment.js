@@ -31,12 +31,13 @@ module.exports = {
     }
   },
   "FulfillmentLambda": {
-    "Type": "AWS::Lambda::Function",
+    "Type": "AWS::Serverless::Function",
     "Properties": {
-      "Code": {
-        "S3Bucket": { "Ref": "BootstrapBucket" },
-        "S3Key": { "Fn::Sub": "${BootstrapPrefix}/lambda/fulfillment.zip" },
-        "S3ObjectVersion": { "Ref": "FulfillmentCodeVersion" }
+      "AutoPublishAlias":"live",
+      "CodeUri": {
+        "Bucket": { "Ref": "BootstrapBucket" },
+        "Key": { "Fn::Sub": "${BootstrapPrefix}/lambda/fulfillment.zip" },
+        "Version": { "Ref": "FulfillmentCodeVersion" }
       },
       "Environment": {
         "Variables": Object.assign({
@@ -54,7 +55,7 @@ module.exports = {
         }, examples, responsebots)
       },
       "Handler": "index.handler",
-      "MemorySize": "1408",
+      "MemorySize": 1408,
       "Role": { "Fn::GetAtt": ["FulfillmentLambdaRole", "Arn"] },
       "Runtime": "nodejs12.x",
       "Timeout": 300,
@@ -64,17 +65,16 @@ module.exports = {
           "SecurityGroupIds": {"Ref": "VPCSecurityGroupIdList"}
         }, {"Ref" : "AWS::NoValue"} ]
       },
-      "TracingConfig" : {
-        "Fn::If": [ "XRAYEnabled", {"Mode": "Active"},
-          {"Ref" : "AWS::NoValue"} ]
+      "Tracing" : {
+        "Fn::If": [ "XRAYEnabled", "Active",
+          "PassThrough" ]
       },
       "Layers":[{"Ref":"AwsSdkLayerLambdaLayer"},
                 {"Ref":"CommonModulesLambdaLayer"},
                 {"Ref":"EsProxyLambdaLayer"}],
-      "Tags": [{
-        Key: "Type",
-        Value: "Fulfillment"
-      }]
+      "Tags": {
+        "Type": "Fulfillment"
+      }
     }
   },
   "InvokePolicy": {
