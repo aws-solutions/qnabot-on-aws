@@ -15,6 +15,7 @@ var responsebots = _.fromPairs(require('../../examples/examples/responsebots-lex
 module.exports = {
   "Alexa": {
     "Type": "AWS::Lambda::Permission",
+    "DependsOn": "FulfillmentLambdaAliaslive",
     "Properties": {
       "Action": "lambda:InvokeFunction",
       "FunctionName": {  "Fn::Join": [ ":", [
@@ -60,8 +61,13 @@ module.exports = {
       "Handler": "index.handler",
       "MemorySize": 1408,
       "ProvisionedConcurrencyConfig": {
-        "ProvisionedConcurrentExecutions": 2
+        "Fn::If": [ "CreateConcurrency", {
+          "ProvisionedConcurrentExecutions" : {"Ref": "FulfillmentConcurrency"}
+        }, {"Ref" : "AWS::NoValue"} ]
       },
+       /* {"Ref" : "AWS::NoValue"},{
+        "ProvisionedConcurrentExecutions": 
+      },*/
       "Role": { "Fn::GetAtt": ["FulfillmentLambdaRole", "Arn"] },
       "Runtime": "nodejs12.x",
       "Timeout": 300,

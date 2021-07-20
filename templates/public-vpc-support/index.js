@@ -48,6 +48,7 @@ module.exports=Promise.resolve(require('../master')).then(function(base){
         "PublicOrPrivate",
         "LexV2BotLocaleIds",
         "LexBotVersion",
+        "FulfillmentConcurrency",
         "ElasticSearchNodeCount",
         "KibanaDashboardRetentionMinutes",
         "VPCSubnetIdList",
