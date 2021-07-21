@@ -21,7 +21,8 @@ module.exports={
     "devPublicOrPrivate": "PUBLIC",
     "namespace":"dev",
     "LexBotVersion":"LexV1 and LexV2",
-    "stackNamePrefix":"QNA"
+    "stackNamePrefix":"QNA",
+    "FulfillmentConcurrency":1
 }
 
 if (require.main === module) {
