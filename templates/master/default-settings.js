@@ -7,6 +7,7 @@ var default_settings = {
     ES_MINIMUM_SHOULD_MATCH: "2<75%", // Refer to https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-minimum-should-match.html for more information
     ES_NO_HITS_QUESTION: "no_hits", // The QID of the question when no answers could be found for a user's question
     ES_USE_FUZZY_MATCH: "false", // Refer to https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-fuzzy-query.html
+    ES_ENABLE_CLIENT_FILTERS: "true",
     ES_PHRASE_BOOST: "4", 
     ES_SCORE_ANSWER_FIELD: "false",
     ENABLE_SENTIMENT_SUPPORT: "true", //Determines whether to use Comprehend for sentiment analysis.  Refer to https://docs.aws.amazon.com/comprehend/latest/dg/how-sentiment.html 

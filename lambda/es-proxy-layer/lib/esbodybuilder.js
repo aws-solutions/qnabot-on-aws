@@ -59,12 +59,42 @@ function build_query(params) {
       query = query.orQuery(
         'match', match_query
       );
+      if (_.get(params, 'enable_client_filters', false) === true) {
+        var qnaClientFilter = _.get(params, 'qnaClientFilter', "");
+        query = query.orFilter(
+          'bool', {
+          "must": [
+            {
+              "exists": {
+                "field": "clientFilterValues"
+              }
+            },
+            {
+              "term": {
+                "clientFilterValues": qnaClientFilter
+              }
+            }
+          ]
+        }
+        )
+          .orFilter(
+            'bool', {
+            "must_not": [
+              {
+                "exists": {
+                  "field": "clientFilterValues"
+                }
+              }
+            ]
+          }
+          ).filterMinimumShouldMatch(1);
+      }
       query = query.orQuery(
         'nested', {
-          score_mode: 'max',
-          boost: _.get(params, 'phrase_boost', 4),
-          path: 'questions'
-        },
+        score_mode: 'max',
+        boost: _.get(params, 'phrase_boost', 4),
+        path: 'questions'
+      },
         q => q.query('match_phrase', 'questions.q', params.question)
       );
       if (_.get(params, 'score_answer_field')) {
@@ -77,6 +107,7 @@ function build_query(params) {
       console.log("ElasticSearch Query", JSON.stringify(query, null, 2));
       return new Promise.resolve(query);
     });
+
 }
 
 
