@@ -1,428 +1,101 @@
-﻿{
+{
   "qna": [
     {
-      "args": [
-        "{\"Query\": \"AnnouncementsForStudent\"}"
-      ],
-      "next": "",
-      "a": "here are your announcements",
-      "r": {
-        "buttons": [
-          {
-            "text": "",
-            "value": ""
-          }
-        ],
-        "subTitle": "",
-        "imageUrl": "",
-        "title": ""
-      },
-      "t": "",
-      "elicitResponse": {
-        "response_sessionattr_namespace": "",
-        "responsebot_hook": ""
-      },
-      "alt": {
-        "markdown": "",
-        "ssml": ""
-      },
-      "conditionalChaining": "",
+      "qid": "canvas.enrollments",
+      "a": "Here are the courses you are have enrolled in.",
       "l": "QNA:EXTCanvasHook",
-      "qid": "canvas.announcements",
-      "type": "qna",
-      "selected": false,
-      "q": [
-        "tell me about my announcements"
-      ]
-    },
-    {
-      "a": "Welcome to the SLU school of professional studies canvas bot. I can access your canvas information for you, or help answer any questions you have on using canvas.",
-      "r": {
-        "buttons": [
-          {
-            "text": "Show me my canvas class information",
-            "value": "canvas"
-          },
-          {
-            "text": "General questions on how to use canvas",
-            "value": "General questions on how to use canvas"
-          }
-        ],
-        "title": "canvas"
-      },
-      "qid": "canvas.init",
-      "type": "qna",
-      "q": [
-        "initiate school of professional studies"
-      ]
-    },
-    {
       "args": [
-        "{\"Query\": \"EnrollmentsForStudent\"}"
+        "{\"Query\": \"CourseEnrollments\"}"
       ],
-      "next": "",
+      "type": "qna",
+      "q": [
+        "tell me about my enrollments",
+        "what courses have i enrolled in",
+        "course enrollments"
+      ]
+    },
+    {
+      "qid": "canvas.grades",
+      "a": "here are your grades",
+      "l": "QNA:EXTCanvasHook",
+      "args": [
+        "{\"Query\": \"GradesForStudent\"}"
+      ],
+      "type": "qna",
+      "q": [
+        "tell me about my grades",
+        "what are my grades",
+        "how did i do in my course"
+      ]
+    },
+    {
+      "qid": "canvas.class",
+      "a": "Please select one of the options.",
+      "l": "QNA:EXTCanvasHook",
+      "args": [
+        "{\"Query\": \"ChoicesForStudent\"}"
+      ],
+      "type": "qna",
+      "q": [
+        "more info about my course",
+        "more information about my course"
+      ]
+    },
+    {
+      "qid": "canvas.menu",
       "a": "Please select an option.",
-      "r": {
-        "buttons": [
-          {
-            "text": "",
-            "value": ""
-          }
-        ],
-        "subTitle": "",
-        "imageUrl": "",
-        "title": "",
-        "text": "",
-        "url": ""
-      },
-      "t": "",
-      "alt": {
-        "markdown": "",
-        "ssml": ""
-      },
       "l": "QNA:EXTCanvasHook",
-      "qid": "canvas.classchoices",
+      "args": [
+        "{\"Query\": \"CanvasMenu\"}"
+      ],
       "type": "qna",
       "q": [
+        "canvas menu",
         "canvas"
       ]
     },
     {
-      "a": "You can find out everything you need about starting a discussion in canvas by clicking the URL below:\n\nhttps://guides.instructure.com/m/4212/l/50009-how-do-i-create-a-discussion-in-a-group",
-      "alt": {
-        "markdown": "You can find out everything you need about starting a discussion in canvas by clicking the URL below:\n\nhttps://guides.instructure.com/m/4212/l/50009-how-do-i-create-a-discussion-in-a-group"
-      },
-      "qid": "canvas.start.discussion",
-      "type": "qna",
-      "q": [
-        "How do I start a discussion in a group",
-        "How do I start a discussion thread?"
-      ]
-    },
-    {
-      "args": [
-        ""
-      ],
-      "next": "",
-      "a": "You can find out all about changing your notification preferences in canvas below:\n\nhttps://guides.instructure.com/m/4212/l/710344-how-do-i-set-my-canvas-notification-preferences-as-a-student",
-      "r": {
-        "buttons": [
-          {
-            "text": "",
-            "value": ""
-          }
-        ],
-        "subTitle": "",
-        "imageUrl": "",
-        "title": ""
-      },
-      "t": "",
-      "elicitResponse": {
-        "response_sessionattr_namespace": "",
-        "responsebot_hook": ""
-      },
-      "alt": {
-        "markdown": "You can find out all about changing your notification preferences in canvas below:\n\nhttps://guides.instructure.com/m/4212/l/710344-how-do-i-set-my-canvas-notification-preferences-as-a-student",
-        "ssml": ""
-      },
-      "conditionalChaining": "",
-      "l": "",
-      "qid": "canvas.notification.settings",
-      "type": "qna",
-      "selected": false,
-      "q": [
-        "How do I change my notification settings",
-        "How do I set my Canvas notification preferences as a student",
-        "How do I set my Canvas notification preferences"
-      ]
-    },
-    {
-      "args": [
-        "{\"Query\": \"AssignmentDueDates\"}"
-      ],
-      "a": "lambda answer",
+      "qid": "canvas.announcements",
+      "a": "here are your announcements",
       "l": "QNA:EXTCanvasHook",
-      "qid": "canvas.assignments",
-      "type": "qna",
-      "q": [
-        "tell me about my assignments"
-      ]
-    },
-    {
       "args": [
-        ""
+        "{\"Query\": \"AnnouncementsForStudent\"}"
       ],
-      "next": "",
-      "a": "You can click here to read all about replying to a discussion post in canvas\n\nhttps://guides.instructure.com/m/4212/l/190706-how-do-i-reply-to-a-discussion-as-a-student",
-      "r": {
-        "buttons": [
-          {
-            "text": "",
-            "value": ""
-          }
-        ],
-        "subTitle": "",
-        "imageUrl": "",
-        "title": ""
-      },
-      "t": "",
-      "elicitResponse": {
-        "response_sessionattr_namespace": "",
-        "responsebot_hook": ""
-      },
-      "alt": {
-        "markdown": "You can click **[here](https://guides.instructure.com/m/4212/l/190706-how-do-i-reply-to-a-discussion-as-a-student)** to read all about replying to a discussion post in canvas",
-        "ssml": ""
-      },
-      "conditionalChaining": "",
-      "l": "",
-      "qid": "canvas.discussion.reply",
       "type": "qna",
-      "selected": false,
       "q": [
-        "How do I reply to a classmate’s discussion post",
-        "How do I reply to a classmate’s discussion post in canvas",
-        "how do I reply to discussion post"
+        "tell me about my announcements",
+        "do i have any announcements"
       ]
     },
     {
-      "a": "Which of these Canvas topics would you like to learn about?",
-      "r": {
-        "buttons": [
-          {
-            "text": "How do I change my notification settings?",
-            "value": "How do I change my notification settings"
-          },
-          {
-            "text": "How do I reply to a classmate’s discussion post?",
-            "value": "How do I reply to a classmate’s discussion post"
-          },
-          {
-            "text": "How do I add a profile picture?",
-            "value": "How do I add a profile picture"
-          },
-          {
-            "text": "How do I access the course calendar?",
-            "value": "How do I access the course calendar"
-          }
-        ],
-        "title": "canvas qa"
-      },
-      "qid": "canvas.general questions",
-      "type": "qna",
-      "q": [
-        "General questions on how to use canvas"
-      ]
-    },
-    {
-      "args": [
-        "{\"Query\": \"ChoicesForStudent\"}"
-      ],
-      "next": "",
-      "a": "lambda answer",
-      "r": {
-        "buttons": [
-          {
-            "text": "",
-            "value": ""
-          }
-        ],
-        "subTitle": "",
-        "imageUrl": "",
-        "title": "",
-        "text": "",
-        "url": ""
-      },
-      "t": "",
-      "elicitResponse": {
-        "response_sessionattr_namespace": "",
-        "responsebot_hook": ""
-      },
-      "alt": {
-        "markdown": "",
-        "ssml": ""
-      },
-      "conditionalChaining": "",
+      "qid": "canvas.syllabus",
+      "a": "Below is your syllabus",
       "l": "QNA:EXTCanvasHook",
-      "qid": "canvas.class",
-      "type": "qna",
-      "q": [
-        "more info on my class",
-        "more info about my class"
-      ]
-    },
-    {
-      "a": "The following URL shows you step by step how to add a profile picture to your canvas bio.\n\nhttps://guides.instructure.com/m/4212/l/710334-how-do-i-add-a-profile-picture-in-my-user-account-as-a-student",
-      "alt": {
-        "markdown": "The following URL shows you step by step how to add a profile picture to your canvas bio.\n\nhttps://guides.instructure.com/m/4212/l/710334-how-do-i-add-a-profile-picture-in-my-user-account-as-a-student"
-      },
-      "qid": "canvas.profilepicture",
-      "type": "qna",
-      "q": [
-        "How do I add a  profile picture?",
-        "How do I add a profile picture in canvas"
-      ]
-    },
-    {
       "args": [
         "{\"Query\": \"SyllabusForCourse\"}"
       ],
-      "a": "Below is your syllabus",
+      "type": "qna",
+      "q": [
+        "tell me about my syllabus",
+        "whats my syllabus",
+        "what is my syllabus"
+      ]
+    },
+    {
+      "qid": "canvas.assignments",
+      "a": "Here is a list of assignments:",
       "l": "QNA:EXTCanvasHook",
-      "qid": "canvas.syllabus",
-      "type": "qna",
-      "q": [
-        "tell me about my syllabus"
-      ]
-    },
-    {
       "args": [
-        "{\"Query\": \"EnrollmentsForStudent\"}"
+        "{\"Query\": \"CourseAssignments\"}"
       ],
-      "next": "",
-      "a": "multiple buttons return",
-      "r": {
-        "buttons": [
-          {
-            "text": "test button",
-            "value": "test button"
-          }
-        ],
-        "subTitle": "",
-        "imageUrl": "",
-        "title": "title"
-      },
-      "t": "",
-      "elicitResponse": {
-        "response_sessionattr_namespace": "",
-        "responsebot_hook": ""
-      },
-      "alt": {
-        "markdown": "",
-        "ssml": ""
-      },
-      "conditionalChaining": "",
-      "l": "QNA:EXTCanvasHook",
-      "qid": "canvas.test.2",
-      "type": "qna",
-      "selected": false,
-      "q": [
-        "multiple buttons"
-      ]
-    },
-    {
-      "args": [
-        "{\"Query\": \"EnrollmentsForStudent\"}"
-      ],
-      "next": "",
-      "a": "Which class would you like to learn more about?",
-      "r": {
-        "buttons": [],
-        "subTitle": "",
-        "imageUrl": "",
-        "title": "test",
-        "text": "",
-        "url": ""
-      },
-      "t": "",
-      "elicitResponse": {
-        "response_sessionattr_namespace": "",
-        "responsebot_hook": ""
-      },
-      "alt": {
-        "markdown": "",
-        "ssml": ""
-      },
-      "conditionalChaining": "",
-      "l": "QNA:EXTCanvasHook",
-      "qid": "canvas.classinformation",
       "type": "qna",
       "q": [
-        "canvas",
-        "canvas class information"
-      ]
-    },
-    {
-      "a": "The following link provides you step by step instructions on how to access your canvas course calendar\n\nhttps://guides.instructure.com/m/4212/l/710322-how-do-i-use-the-calendar-as-a-student",
-      "alt": {
-        "markdown": "The following link provides you step by step instructions on how to access your canvas course calendar\n\nhttps://guides.instructure.com/m/4212/l/710322-how-do-i-use-the-calendar-as-a-student"
-      },
-      "qid": "canvas.calendar",
-      "type": "qna",
-      "q": [
-        "How do I use my canvas calendar as a student",
-        "How do I access the course calendar"
-      ]
-    },
-    {
-      "args": [
-        ""
-      ],
-      "next": "",
-      "a": "Follow this guide to find out how to chat with other users and instructors on canvas:\n\nhttps://guides.instructure.com/m/4212/l/715891-how-do-i-use-chat-as-a-student",
-      "r": {
-        "buttons": [
-          {
-            "text": "",
-            "value": ""
-          }
-        ],
-        "subTitle": "",
-        "imageUrl": "",
-        "title": ""
-      },
-      "t": "",
-      "elicitResponse": {
-        "response_sessionattr_namespace": "",
-        "responsebot_hook": ""
-      },
-      "alt": {
-        "markdown": "Follow this [guide](https://guides.instructure.com/m/4212/l/715891-how-do-i-use-chat-as-a-student) to find out how to chat with other users and instructors on canvas:",
-        "ssml": ""
-      },
-      "conditionalChaining": "",
-      "l": "",
-      "qid": "canvas.chat",
-      "type": "qna",
-      "selected": false,
-      "q": [
-        "How do I chat as a student on canvas",
-        "Can I chat with my instructor or fellow classmates"
-      ]
-    },
-    {
-      "args": [
-        "{\"Query\": \"GradesForStudent\"}"
-      ],
-      "next": "",
-      "a": "here are your grades",
-      "r": {
-        "buttons": [
-          {
-            "text": "",
-            "value": ""
-          }
-        ],
-        "subTitle": "",
-        "imageUrl": "",
-        "title": ""
-      },
-      "t": "",
-      "elicitResponse": {
-        "response_sessionattr_namespace": "",
-        "responsebot_hook": ""
-      },
-      "alt": {
-        "markdown": "",
-        "ssml": ""
-      },
-      "conditionalChaining": "",
-      "l": "QNA:EXTCanvasHook",
-      "qid": "canvas.grades",
-      "type": "qna",
-      "selected": false,
-      "q": [
-        "tell me about my grades"
+        "tell me about my assignments",
+        "what assignments do i have due",
+        "what assignments do i have",
+        "what are my assignments",
+        "do i have any assignments",
+        "do i have any assignments due"
       ]
     }
   ]
