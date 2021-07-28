@@ -9,3 +9,5 @@ There are few prerequisites to get started with the setup:
 a.	During this setup, set the EnableLogin setting to True
 i.	This will allow us to enable authentication in the chatbot and connect that to the Identity provider of Canvas LMS. 
 b.	For BotName and BotAlias, use the BotName and Bot Alias as made available from the AWS QnABot solution deployment outputs. 
+
+--
