@@ -588,7 +588,7 @@
           },
           "S3ObjectVersion": {"Ref": "ESProxyCodeVersion"}
         },
-        "Handler": "index.resource",
+        "Handler": "resource.handler",
         "MemorySize": "1408",
         "Role": {"Fn::GetAtt": ["ESProxyLambdaRole", "Arn"]},
         "Runtime": "nodejs12.x",
@@ -4638,14 +4638,6 @@
         "Name": {"Ref": "AWS::StackName"},
         "Description": "An Api interface for the admin actions on the QNA bot",
         "BinaryMediaTypes": ["image/png"]
-      }
-    },
-    "ApiCompression": {
-      "Type": "Custom::ApiCompression",
-      "Properties": {
-        "ServiceToken": {"Fn::GetAtt": ["CFNLambda", "Arn"]},
-        "restApiId": {"Ref": "API"},
-        "value": "500000"
       }
     },
     "Deployment": {

@@ -6,7 +6,7 @@ var examples = _.fromPairs(require('../../examples/outputs')
   .map(x => {
     return [x, { "Fn::GetAtt": ["ExamplesStack", `Outputs.${x}`] }]
   }))
-var responsebots = _.fromPairs(require('../../examples/examples/responsebots')
+var responsebots = _.fromPairs(require('../../examples/examples/responsebots-lexv2')
   .names
   .map(x => {
     return [x, { "Fn::GetAtt": ["ExamplesStack", `Outputs.${x}`] }]
@@ -68,6 +68,9 @@ module.exports = {
         "Fn::If": [ "XRAYEnabled", {"Mode": "Active"},
           {"Ref" : "AWS::NoValue"} ]
       },
+      "Layers":[{"Ref":"AwsSdkLayerLambdaLayer"},
+                {"Ref":"CommonModulesLambdaLayer"},
+                {"Ref":"EsProxyLambdaLayer"}],
       "Tags": [{
         Key: "Type",
         Value: "Fulfillment"

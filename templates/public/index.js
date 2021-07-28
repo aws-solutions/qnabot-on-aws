@@ -35,7 +35,10 @@ module.exports=Promise.resolve(require('../master')).then(function(base){
         "LexV2Intent",
         "LexV2IntentFallback",
         "LexV2BotLocaleIds",
-        "FeedbackSNSTopic"
+        "FeedbackSNSTopic",
+        "ESProxyLambda",
+        "ElasticsearchEndpoint",
+        "ElasticsearchIndex",
     ])
     base.Parameters=_.pick(base.Parameters,[
         "Email",

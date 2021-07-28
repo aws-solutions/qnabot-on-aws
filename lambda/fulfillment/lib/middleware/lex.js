@@ -105,6 +105,8 @@ exports.parse=async function(req){
 }
 
 function filterButtons(response) {
+    console.log("Before filterButtons " + JSON.stringify(response))
+
     var filteredButtons = _.get(response.card,"buttons",[]);
     if (filteredButtons) {
         for (var i = filteredButtons.length - 1; i >= 0; --i) {
@@ -114,6 +116,7 @@ function filterButtons(response) {
         }
         _.set(response.card,"buttons",filteredButtons) ;
     }
+    console.log("Response from filterButtons " + JSON.stringify(response))
     return response;
 }
 
@@ -131,9 +134,6 @@ function slackifyResponse(response) {
         console.log("Converted markdown: ", JSON.stringify(md));
     } 
     console.log("Converting Slack message javascript string to utf8 (for multi-byte compatibility).");
-    let txt = response.message;
-    txt = utf8.encode(txt); // encode as utf8
-    response.message = txt; 
     return response;
 }
 
@@ -200,6 +200,17 @@ function limitLexButtonCount(response) {
     return response;
 }
 
+function limitLexDisplayTextLength(response) {
+    // Lex has limit of max 5 buttons in the responsecard.. if we have more than 5, use the first 5 only.
+    // note when using lex-web-ui, this limitation is circumvented by use of the appContext session attribute above.
+    let buttons = _.get(response.card,"buttons",[]) ;
+    for(let i=0;i<buttons.length;i++){
+        response.card.buttons[i].text = response.card.buttons[i].text.slice(0,50)
+        response.card.buttons[i].value = response.card.buttons[i].value.slice(0,50)
+    }
+    return response;
+}
+
 function assembleLexV1Response(response) {
     let out={
         sessionAttributes:_.get(response,'session',{}),
@@ -249,9 +260,14 @@ exports.assemble=function(request,response){
     if (request._clientType == "LEX.Slack.Text") {
         response = slackifyResponse(response);
     }
+    console.log("filterButtons")
     response = filterButtons(response);
+    console.log("copyResponseCardToSessionAttributes")
     response = copyResponseCardtoSessionAttribute(response);
+    console.log("limitLexButtonCounts")
     response = limitLexButtonCount(response);
+    console.log("limitLexDisplayTextLength")
+    response = limitLexDisplayTextLength(response)
     let out;
     if (request._lexVersion === "V1") {
         out= assembleLexV1Response(response);        

@@ -15,6 +15,8 @@ module.exports={
                 "FeedbackFirehoseName":{"Ref":"FeedbackFirehose"},
                 "CFNLambda":{"Fn::GetAtt":["CFNLambda","Arn"]},
                 "CFNLambdaRole":{"Fn::GetAtt":["CFNLambdaRole","Arn"]},
+                "LexV2CFNLambdaARN":{"Fn::GetAtt":["LexV2CfnCr","Outputs.LexV2CfnCrFunctionArn"]},
+                "LexV2ServiceLinkedRoleARN":{"Fn::GetAtt":["LexV2CfnCr","Outputs.LexServiceLinkedRole"]},
                 "ApiUrlName":{"Fn::GetAtt":["ApiUrl","Name"]},
                 "AssetBucket":{"Ref":"AssetBucket"},
                 "FulfillmentLambdaRole":{"Ref": "FulfillmentLambdaRole"},

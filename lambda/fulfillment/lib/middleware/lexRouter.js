@@ -79,6 +79,7 @@ function lexV1ClientRequester(params) {
     });
 }
 function lexV2ClientRequester(params) {
+    console.log(`aws sdk version is ${AWS.VERSION}`);
     const lexV2Client = new AWS.LexRuntimeV2();
     return new Promise(function(resolve, reject) {
         lexV2Client.recognizeText(params, function(err, data) {
@@ -167,7 +168,7 @@ async function handleRequest(req, res, botName, botAlias) {
             console.log("Lex V2 parameters: " + JSON.stringify(params));
             const lexv2response = await lexV2ClientRequester(params); 
             console.log("Lex V2 response: " + JSON.stringify(lexv2response));
-            response.message = lexv2response.messages[0].content;
+            response.message = _.get(lexv2response, 'messages[0].content', '');
             // lex v2 FallbackIntent match means it failed to fill desired slot(s).
             if (lexv2response.sessionState.intent.name === "FallbackIntent" || 
                 lexv2response.sessionState.intent.state === "Failed") {

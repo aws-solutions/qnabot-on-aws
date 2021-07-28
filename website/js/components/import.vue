@@ -14,7 +14,7 @@
           v-card
             v-card-title.display-1.pa-2 Import
             v-card-text
-              p {{importWarning}}
+              <p> <span v-html=importWarning></span></p>
               p.title From File
               div.ml-4.mb-2
                 input(
@@ -102,7 +102,9 @@ const _ = require('lodash')
 module.exports = {
   data: function () {
     return {
-      importWarning: "Warning, Importing will over write existing QnAs with the same ID",
+      importWarning: "Warning, Importing will over write existing QnAs with the same ID </br>" +
+                     "You can import either a JSON file exported from QnABot or a properly </br> " +
+                     "formatted Excel file.  For the file format, see <a href='https://github.com/aws-samples/aws-ai-qna-bot/tree/master/docs/excel_import#readme'>here</a>.",
       loading: false,
       testing: false,
       url: "",
