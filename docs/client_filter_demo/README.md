@@ -3,7 +3,6 @@
 The Client Feature branch demonstrates how QnABot's abilities are enhanced when paired with Amazon's LexWebUI project. Client features present a LexWebUI session attribute "QnAClientFilter" that matches a "Client Filter" from question settings to automatically filter QnABot's responses to questions that might be the same or similar for different groups of users talking to the bot.
 
 ## Enabling custom settings
-***
 
 QnABot needs the client filter setting to be enabled. Choose **Settings** from the Tools Menu.
 
@@ -14,7 +13,6 @@ Scroll down until you see **ES_ENABLE_CLIENT_FILTERS** in the Settings tab. Chan
 ![ES_ENABLE_CLIENT_FILTERS](./es_enable_client_filter.png)
 
 ## Importing the sample question bank
-***
 
 Choose **Import** from the Tools menu.
 
@@ -31,7 +29,6 @@ The sample question bank is pre-loaded with questions tagged with client filters
 ![Question List](./preloadedclientfilters.png)
 
 ## Sample Flows Demonstrating Client Filtering
-***
 Client filtering tackles practical applications of QnABot on websites that cater to different groups of traffic. For example, within a university that operates several colleges, each with different webpages on one website, there will be questions and answers that remain the same across the university and also questions and answers specific to each college. Client filtering enables users to deploy and manage one QnABot ContentDesigner while still being able to adhere different question banks for different users. In the following examples, this demo explores the benefits of client filtering for a user looking to explore several AWS Services.
 
 <!--- TODO: think about keeping or taking this out -->
