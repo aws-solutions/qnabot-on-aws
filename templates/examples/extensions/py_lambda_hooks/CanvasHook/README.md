@@ -1,4 +1,4 @@
-# Integrate the open source AWS QnABot solution with Canvas LMS
+# Integration with Canvas LMS
 
 Students use their schools' learning management solution (LMS) to keep track of their assignments, grades, and working through their course work. To make it easier for students to stay on track and also have easy access to a knowledge base, and help with their learning progress, you can now integrate the open source AWS QnABot solution with Canvas LMS, and enable students with in-the-moment support. With this integration, students will be able to ask the chatbot about their grades, syllabus, enrollments, assignments, and announcements. 
 
@@ -59,8 +59,9 @@ b. Rule 2: if there are 3 or more keywords, then 75% of the keywords must match.
 c. Rule 3: if QnABot can’t find any answers that match these keyword filter rules, then it will admit that it doesn’t know the answer rather than guessing an answer that doesn’t match the keywords.
 
 We will set this setting to “false” (to enable support for Rule 3), as we need to accept free form input for questions that do not exist in the knowledgebase and have our Canvas LMS integration figure out the best match.
-  - Scroll to the bottom of the Settings page and click “Save” button to update the setting.
 ```
+  - Scroll to the bottom of the Settings page and click “Save” button to update the setting.
+
 
 
 ## Enabling Authentication
@@ -74,8 +75,14 @@ Note: We are creating the user manually in Amazon Cognito to show this example s
   - Additional information on setting up Canvas LMS with SSO: 
 https://community.canvaslms.com/t5/Admin-Guide/How-do-I-configure-SSO-settings-for-my-authentication-provider/ta-p/217
 
+In this example, we are using {username} as the matching attribute with {sis_login_id} in Canvas LMS. 
+
+
   - Additional information on extending Amazon Cognito to Federate to your Identity provider
 https://qnabot.workshop.aws/deployment/sso.html
+
+
+
 ```
 
 
