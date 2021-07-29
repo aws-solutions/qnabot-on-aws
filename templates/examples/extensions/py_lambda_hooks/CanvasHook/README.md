@@ -75,8 +75,7 @@ Note: We are creating the user manually in Amazon Cognito to show this example s
 https://community.canvaslms.com/t5/Admin-Guide/How-do-I-configure-SSO-settings-for-my-authentication-provider/ta-p/217
 
   - Additional information on extending Amazon Cognito to Federate to your Identity provider
-[NEED REFERENCE LINK to QnABot documentation on how to setup Federation]
-
+https://qnabot.workshop.aws/deployment/sso.html
 ```
 
 
@@ -91,10 +90,10 @@ Try the below example questions:
   - If you are testing with voice input, you will see a browser message appear, asking permission to access the Microphone. Click on “Allow”. This will allow you to interact with the chat client via voice input.  
 
 
-*canvas menu*
-*do i have any announcements*
-*tell me about my syllabus*
-*do I have any announcements due*
+  - *canvas menu*
+  - *do i have any announcements*
+  - *tell me about my syllabus*
+  - *do I have any announcements due*
 
 
  
@@ -107,6 +106,6 @@ The following Canvas APIs are being used for this integration, below is a list f
   - Enrollment — students can ask questions such as: “what courses am i enrolled in”, “what courses have i signed up for”
   - Announcements — anything sent by the teacher to student(s) such as: “you have a test coming up”. Student can ask by saying “do I have any announcements”
 
-Canvas API wrapper — this integration uses a CanvasAPI python library to access information from Canvas. https://canvasapi.readthedocs.io/en/stable/getting-started.html
+This integration uses the canvasapi python library to access information from Canvas. https://canvasapi.readthedocs.io/en/stable/getting-started.html
 
 
