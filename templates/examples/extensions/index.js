@@ -185,8 +185,8 @@ module.exports=Object.assign(
                     "secretsmanager:DescribeSecret"
                    ],   
                   "Resource": [
-                      "arn:aws:secretsmanager:*:*:QNA*",
-                      "arn:aws:secretsmanager:*:*:qna*" 
+                      "arn:aws:secretsmanager:*:*:QNA-*",
+                      "arn:aws:secretsmanager:*:*:qna-*" 
                   ]
               }
             ]
