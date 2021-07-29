@@ -350,6 +350,7 @@ async function startKendraSync(kendraIndexId, name, forceSync = false) {
       Name: name,
       Type: "CUSTOM",
     };
+    //TODO: change this !! https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/Kendra.html#createDataSource-property
     console.log(`${name} doesn't exist.  Creating it....`);
     var createResponse = await kendra.createDataSource(params).promise();
     dataSourceId = createResponse.Id;
@@ -418,6 +419,7 @@ async function putDocuments(kendraIndexId, dataSourceId, documents) {
       var end = documents.length ? i + 10 : documents.length - 1;
       console.log(`Putting documents ${i} to ${end} in ${dataSourceId}`);
       var batchPutDocumentResponse = await kendra
+      // TODO: send URLS directly to method https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/Kendra.html#updateDataSource-property
         .batchPutDocument({
           Documents: documents.slice(i, end),
           IndexId: kendraIndexId,

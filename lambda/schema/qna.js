@@ -166,7 +166,7 @@ module.exports={
             propertyOrder:12
         },
         clientFilterValues:{
-            title:"Client Filters: Values (prototype)",
+            title:"Client Filters: Values",
             description:"Enter list of terms. When specified, client must provide N matching terms in request session attribute 'QNAClientFilter' for this answer to be eligible for the response",
             type:"string",
             maxLength:100,

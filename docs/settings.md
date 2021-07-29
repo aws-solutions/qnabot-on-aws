@@ -10,6 +10,7 @@
 | ES_MINIMUM_SHOULD_MATCH |"2<75%" <br/> See [query-dsl-minimum-should-match](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-minimum-should-match.html) for syntax |  Determines how close a question should match to return a hit
 | ES_NO_HITS_QUESTION | text | The question QnABot should use when it cannot find an answer
 | ES_USE_FUZZY_MATCH  | true or false | Determines whether QnABot should return answers similar to the question asked. See [Fuzzy Query](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-fuzzy-query.html) for more information
+| ES_ENABLE_CLIENT_FILTERS | true or false | Presents a web session attribute that enables QnABot to filter and block questions based on the session attribute.
 | ES_PHRASE_BOOST | integer | If the user's question is a phrase match to a question in the knowledge then boost the score by this factor.
 | ES_SCORE_ANSWER_FIELD | true or false | Include the content of the answer field (not just the question fields) when determining the score for a match
 | ENABLE_SENTIMENT_SUPPORT | true or false | Enables [Amazon Comprehend](https://docs.aws.amazon.com/comprehend/latest/dg/how-sentiment.html) be used for sentiment analysis

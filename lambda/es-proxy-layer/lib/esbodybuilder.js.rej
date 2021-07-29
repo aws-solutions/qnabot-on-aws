@@ -1,0 +1,16 @@
+diff a/lambda/es-proxy-layer/lib/esbodybuilder.js b/lambda/es-proxy-layer/lib/esbodybuilder.js	(rejected hunks)
+@@ -59,14 +59,8 @@ function build_query(params) {
+       query = query.orQuery(
+         'match', match_query
+       );
+-<<<<<<< HEAD
+-      console.log("find me " + (_.get(params, 'enable_client_filters', "false")))
+-      if (_.get(params, 'enable_client_filters', "false") === "true") {
+-        var qnaClientFilter = _.get(params, 'qnaClientFilter', "") ;
+-=======
+       if (_.get(params, 'enable_client_filters', false) === true) {
+         var qnaClientFilter = _.get(params, 'qnaClientFilter', "");
+->>>>>>> de38630b2c1e9f6a6484edf4d9a47729c413feb3
+         query = query.orFilter(
+           'bool', {
+           "must": [

@@ -1,0 +1,364 @@
+{
+    "qna": [
+      {
+        "qid": "AWS.Services.Cost",
+        "a": "There are many AWS Services to choose from. Which one would you like to explore today?",
+        "t": "cost",
+        "r": {
+          "title": "Button",
+          "buttons": [
+            {
+              "text": "Lex",
+              "value": "QID::AWS.Services.Cost.Lex"
+            },
+            {
+              "text": "ElasticSearch",
+              "value": "QID::AWS.Services.Cost.ES"
+            },
+            {
+              "text": "Kendra",
+              "value": "QID::AWS.Services.Cost.Kendra"
+            }
+          ]
+        },
+        "clientFilterValues": "unfiltered",
+        "type": "qna",
+        "q": [
+          "How much does it cost?"
+        ]
+      },
+      {
+        "qid": "AWS.Services.FAQ",
+        "a": "There are many AWS Services to choose from. Which one would you like to explore today?",
+        "r": {
+          "title": "Button",
+          "buttons": [
+            {
+              "text": "Lex",
+              "value": "QID::AWS.Services.FAQ.Lex"
+            },
+            {
+              "text": "ElasticSearch",
+              "value": "QID::AWS.Services.FAQ.ES"
+            },
+            {
+              "text": "Kendra",
+              "value": "QID::AWS.Services.FAQ.Kendra"
+            }
+          ]
+        },
+        "clientFilterValues": "unfiltered",
+        "type": "qna",
+        "q": [
+          "Where can I find more information?"
+        ]
+      },
+      {
+        "qid": "AWS.Services.Cost.ES",
+        "a": "You can get started for free on Amazon Elasticsearch Service with the AWS Free Tier. For customers in the AWS Free Tier, Amazon Elasticsearch Service provides free usage of up to 750 hours per month of a t2.small.elasticsearch or t3.small.elasticsearch instance and 10GB per month of optional EBS storage (Magnetic or General Purpose). If you exceed the free tier usage limits, you will be charged the Amazon Elasticsearch Service rates for the additional resources you use. See offer terms for more details.\n\nPlease visit the **[official AWS ElasticSearch product page](https://aws.amazon.com/elasticsearch-service/pricing/?nc=sn&loc=3)** for more information on the pricing model.",
+        "alt": {
+          "markdown": "You can get started for free on Amazon Elasticsearch Service with the AWS Free Tier. For customers in the AWS Free Tier, Amazon Elasticsearch Service provides free usage of up to **750 hours per month of a t2.small.elasticsearch or t3.small.elasticsearch instance and 10GB per month of optional EBS storage (Magnetic or General Purpose)**. If you exceed the free tier usage limits, you will be charged the **Amazon Elasticsearch Service rates** for the additional resources you use. See offer terms for more details.\n\nPlease visit the **[official AWS ElasticSearch product page](https://aws.amazon.com/elasticsearch-service/pricing/?nc=sn&loc=3)** for more information on the pricing model."
+        },
+        "clientFilterValues": "es cost",
+        "type": "qna",
+        "q": [
+          "How much does it cost?",
+          "How much does Elasticsearch cost?"
+        ]
+      },
+      {
+        "qid": "AWS.Services.Quotas",
+        "a": "There are many AWS Services to choose from. Which one would you like to explore today?",
+        "r": {
+          "title": "Button",
+          "buttons": [
+            {
+              "text": "Lex",
+              "value": "QID::AWS.Services.Quotas.Lex"
+            },
+            {
+              "text": "ElasticSearch",
+              "value": "QID::AWS.Services.Quotas.ES"
+            },
+            {
+              "text": "Kendra",
+              "value": "QID::AWS.Services.Quotas.Kendra"
+            }
+          ]
+        },
+        "clientFilterValues": "unfiltered",
+        "type": "qna",
+        "q": [
+          "What is the service quota?"
+        ]
+      },
+      {
+        "qid": "AWS.Services.QnABot",
+        "a": "There are many services that QnABot deploys. Which one would you like to explore today?",
+        "r": {
+          "title": "Button",
+          "buttons": [
+            {
+              "text": "Lex",
+              "value": "QID::AWS.Services.QnABot.Lex"
+            },
+            {
+              "text": "ElasticSearch",
+              "value": "QID::AWS.Services.QnABot.ES"
+            },
+            {
+              "text": "Kendra",
+              "value": "QID::AWS.Services.QnABot.Kendra"
+            }
+          ]
+        },
+        "clientFilterValues": "unfiltered",
+        "type": "qna",
+        "q": [
+          "How does QnABot use it?"
+        ]
+      },
+      {
+        "qid": "AWS.Services.Cost.Kendra",
+        "a": "There are different costs for AWS Kendra. With the free tier, customers can receive up to 750 hours free of charge for the first 30 days. After that, the developer edition costs $1.125 per hour, or $810 per month. There is also an enterprise edition of Kendra which costs $1.40 per hour, or $1008 per month. Please check additional pricing indexes on the AWS website.",
+        "alt": {
+          "markdown": "There are different costs for AWS Kendra. With the free tier, customers can receive up to **750 hours free of charge for the first 30 days**. After that, the developer edition costs **$1.125 per hour, or $810 per month**. There is also an enterprise edition of Kendra which costs **$1.40 per hour, or $1008 per month**.   \n\nPlease visit the **[official AWS Kendra product page](https://aws.amazon.com/kendra/pricing/)** for more information on the pricing model."
+        },
+        "clientFilterValues": "kendra cost",
+        "type": "qna",
+        "q": [
+          "How much does it cost?",
+          "How much does Kendra cost?"
+        ]
+      },
+      {
+        "qid": "set.kendra",
+        "a": "{{setSessionAttr 'QNAClientFilter' 'kendra'}} Let's talk about Kendra! Ask me any question you'd like.",
+        "alt": {
+          "markdown": "{{setSessionAttr 'QNAClientFilter' 'kendra'}} Let's talk about Kendra! **Ask me any question you'd like.**"
+        },
+        "type": "qna",
+        "q": [
+          "Set SessionAttribute QNAClientFilter to: kendra"
+        ]
+      },
+      {
+        "qid": "set.lex",
+        "a": "{{setSessionAttr 'QNAClientFilter' 'lex'}} Let's talk about Lex! **Ask me any question you'd like.**",
+        "alt": {
+          "markdown": "{{setSessionAttr 'QNAClientFilter' 'lex'}} Let's talk about Lex! **Ask me any question you'd like.**"
+        },
+        "type": "qna",
+        "q": [
+          "Set SessionAttribute QNAClientFilter to: lex"
+        ]
+      },
+      {
+        "qid": "AWS.Services.Cost.Lex",
+        "a": "You can try Amazon Lex for free. From the date you get started with Amazon Lex, you can process up to **10,000 text requests and 5,000 speech requests or speech intervals per month for free for the first year**.    \n\nWith the request and response interaction, each user input is processed as a separate API call. The cost is based on the number of speech or text API requests processed by your bot at **$0.004 per speech request and $0.00075 per text request**. For example, the cost for 1,000 speech requests would be $4.00, and 1,000 text requests would cost $0.75. The speech and text requests are added up at the end of the month to generate your monthly charges.    \n\nPlease visit the **[official AWS Lex product page](https://aws.amazon.com/lex/pricing/?nc=sn&loc=3)** for more information on the pricing model.\ncost cost cost",
+        "alt": {
+          "markdown": "You can try Amazon Lex for free. From the date you get started with Amazon Lex, you can process up to **10,000 text requests and 5,000 speech requests or speech intervals per month for free for the first year**.    \n\nWith the request and response interaction, each user input is processed as a separate API call. The cost is based on the number of speech or text API requests processed by your bot at **$0.004 per speech request and $0.00075 per text request**. For example, the cost for 1,000 speech requests would be $4.00, and 1,000 text requests would cost $0.75. The speech and text requests are added up at the end of the month to generate your monthly charges.    \n\nPlease visit the **[official AWS Lex product page](https://aws.amazon.com/lex/pricing/?nc=sn&loc=3)** for more information on the pricing model."
+        },
+        "clientFilterValues": "lex cost",
+        "type": "qna",
+        "q": [
+          "How much does it cost?",
+          "How much does Lex cost?"
+        ]
+      },
+      {
+        "qid": "AWS.Services.Quotas.Lex",
+        "a": "The Service Quotas for Lex can be found **[here](https://docs.aws.amazon.com/lex/latest/dg/gl-limits.html)**. For example, within bot quotas, **you can create up to 100 bots per AWS account**.",
+        "alt": {
+          "markdown": "The Service Quotas for Lex can be found **[here](https://docs.aws.amazon.com/lex/latest/dg/gl-limits.html)**. For example, within bot quotas, **you can create up to 100 bots per AWS account**."
+        },
+        "clientFilterValues": "lex",
+        "type": "qna",
+        "q": [
+          "What is the service quota?",
+          "What are the service quotas for Lex?"
+        ]
+      },
+      {
+        "qid": "set.nofilter",
+        "a": "Don't know what to ask me? I can tell you what you want to know about some of the most popular AWS Services, specifically Amazon Lex, Amazon Elasticsearch, and Amazon Kendra! We can start there.",
+        "alt": {
+          "markdown": "Don't know what to ask me? I can tell you what you want to know about some of the most popular AWS Services, **specifically Amazon Lex, Amazon Elasticsearch, and Amazon Kendra!** We can start there."
+        },
+        "type": "qna",
+        "q": [
+          "set nofilter"
+        ]
+      },
+      {
+        "qid": "set.es",
+        "a": "{{setSessionAttr 'QNAClientFilter' 'es'}} Let's talk about Elasticsearch! **Ask me any question you'd like.**",
+        "alt": {
+          "markdown": "{{setSessionAttr 'QNAClientFilter' 'es'}} Let's talk about Elasticsearch! **Ask me any question you'd like.**"
+        },
+        "type": "qna",
+        "q": [
+          "Set SessionAttribute QNAClientFilter to: es"
+        ]
+      },
+      {
+        "qid": "AWS.Services.FAQ.Lex",
+        "a": "Amazon Lex is a service for building conversational interfaces into any application using voice and text. Amazon Lex provides the advanced deep learning functionalities of automatic speech recognition (ASR) for converting speech to text, and natural language understanding (NLU) to recognize the intent of the text, to enable you to build applications with highly engaging user experiences and lifelike conversational interactions. With Amazon Lex, the same deep learning technologies that power Amazon Alexa are now available to any developer, enabling you to quickly and easily build sophisticated, natural language, conversational bots.    \n\nWith Amazon Lex, you can build bots to increase contact center productivity, automate simple tasks, and drive operational efficiencies across the enterprise. As a fully managed service, Amazon Lex scales automatically, so you don’t need to worry about managing infrastructure.\n\nPlease visit the **[official AWS Lex product page](https://aws.amazon.com/lex/?nc=sn&loc=1)** for more information regarding this service.",
+        "alt": {
+          "markdown": "**Amazon Lex is a service for building conversational interfaces into any application using voice and text.** Amazon Lex provides the advanced deep learning functionalities of automatic speech recognition (ASR) for converting speech to text, and natural language understanding (NLU) to recognize the intent of the text, to enable you to build applications with highly engaging user experiences and lifelike conversational interactions. With Amazon Lex, the same deep learning technologies that power Amazon Alexa are now available to any developer, enabling you to quickly and easily build sophisticated, natural language, conversational bots.    \n\nWith Amazon Lex, you can build bots to increase contact center productivity, automate simple tasks, and drive operational efficiencies across the enterprise. As a fully managed service, Amazon Lex scales automatically, so you don’t need to worry about managing infrastructure.\n\nPlease visit the **[official AWS Lex product page](https://aws.amazon.com/lex/?nc=sn&loc=1)** for more information regarding this service."
+        },
+        "clientFilterValues": "lex",
+        "type": "qna",
+        "q": [
+          "Where can I find more information?",
+          "Where can I find more information about Lex?"
+        ]
+      },
+      {
+        "qid": "AWS.Services.FAQ.Kendra",
+        "a": "Amazon Kendra is an intelligent search service powered by machine learning. Kendra reimagines enterprise search for your websites and applications so your employees and customers can easily find the content they are looking for, even when it’s scattered across multiple locations and content repositories within your organization.\nUsing Amazon Kendra, you can stop searching through troves of unstructured data and discover the right answers to your questions, when you need them. Amazon Kendra is a fully managed service, so there are no servers to provision, and no machine learning models to build, train, or deploy.",
+        "alt": {
+          "markdown": "> **Amazon Kendra is an intelligent search service powered by machine learning.** Kendra reimagines enterprise search for your websites and applications so your employees \n> and customers can easily find the content they are looking for, even when it’s scattered across multiple locations and content repositories within your organization.  \n> Using Amazon Kendra, you can stop searching through troves of unstructured data and discover the right answers to your questions, when you need them. Amazon Kendra \n> is a fully managed service, so there are no servers to provision, and no machine learning models to build, train, or deploy.    \n\nPlease check the **[official AWS Kendra product page](https://aws.amazon.com/kendra/)** for more information regarding this service."
+        },
+        "clientFilterValues": "kendra",
+        "type": "qna",
+        "q": [
+          "Where can I find more information?",
+          "Where can I find more information about Kendra?"
+        ]
+      },
+      {
+        "qid": "AWS.Services.FAQ.ES",
+        "a": "Amazon Elasticsearch Service is a fully managed service that makes it easy for you to deploy, secure, and run Elasticsearch cost effectively at scale. You can build, monitor, and troubleshoot your applications using the tools you love, at the scale you need. The service provides support for open source Elasticsearch APIs, managed Kibana, integration with Logstash and other AWS services, and built-in alerting and SQL querying. Amazon Elasticsearch Service lets you pay only for what you use – there are no upfront costs or usage requirements. With Amazon Elasticsearch Service, you get the ELK stack you need, without the operational overhead.",
+        "alt": {
+          "markdown": "**Amazon Elasticsearch Service is a fully managed service that makes it easy for you to deploy, secure, and run Elasticsearch cost effectively at scale.** You can build, monitor, and troubleshoot your applications using the tools you love, at the scale you need. The service provides support for open source Elasticsearch APIs, managed Kibana, integration with Logstash and other AWS services, and built-in alerting and SQL querying. Amazon Elasticsearch Service lets you pay only for what you use – there are no upfront costs or usage requirements. With Amazon Elasticsearch Service, you get the ELK stack you need, without the operational overhead.    \n\nPlease visit the **[official AWS Elasticsearch product page](https://aws.amazon.com/elasticsearch-service/?nc=sn&loc=1)** for more information regarding this service."
+        },
+        "clientFilterValues": "es",
+        "type": "qna",
+        "q": [
+          "Where can I find more information?",
+          "Where can I find more information about Elasticsearch?"
+        ]
+      },
+      {
+        "qid": "AWS.Services.FAQ.Alexa",
+        "a": "Alexa is Amazon’s cloud-based voice service available on hundreds of millions of devices from Amazon and third-party device manufacturers. With Alexa, you can build natural voice experiences that offer customers a more intuitive way to interact with the technology they use every day. We offer a collection of tools, APIs, reference solutions, and documentation to make it easier to build for Alexa.\n\nStart building for voice today by creating Alexa skills, connecting Alexa to devices, or integrating Alexa directly into your products. You can engage our Alexa Solution Provider network for a range of services including strategy, pre-tested reference architectures and hardware, hardware and software development, manufacturing, and go-to-market support.Please visit the **[official Amazon Alexa product page](https://developer.amazon.com/en-US/alexa)** for more information regarding this service.",
+        "alt": {
+          "markdown": "**Alexa is Amazon’s cloud-based voice service available on hundreds of millions of devices from Amazon and third-party device manufacturers.** With Alexa, you can build natural voice experiences that offer customers a more intuitive way to interact with the technology they use every day. We offer a collection of tools, APIs, reference solutions, and documentation to make it easier to build for Alexa.    \n\n\n\nStart building for voice today by creating Alexa skills, connecting Alexa to devices, or integrating Alexa directly into your products. You can engage our Alexa Solution Provider network for a range of services including strategy, pre-tested reference architectures and hardware, hardware and software development, manufacturing, and go-to-market support.    \n\nPlease visit the **[official Amazon Alexa product page](https://developer.amazon.com/en-US/alexa)** for more information regarding this service."
+        },
+        "type": "qna",
+        "q": [
+          "what is alexa?"
+        ]
+      },
+      {
+        "qid": "AWS.Services.Quotas.Kendra",
+        "a": "The Service Quotas for Kendra can be found **[here, on page 336](https://docs.aws.amazon.com/general/latest/gr/aws-general.pdf#aws-service-information)**. For example, the number of data sources available are **5 and 50, for both the developer and enterprise versions, respectively**.",
+        "alt": {
+          "markdown": "The Service Quotas for Kendra can be found **[here](https://docs.aws.amazon.com/kendra/latest/dg/quotas.html)**. For example, the **number of data sources available are 5 and 50, for both the developer and enterprise versions, respectively**."
+        },
+        "clientFilterValues": "kendra",
+        "type": "qna",
+        "q": [
+          "What is the service quota?",
+          "What are the service quotas for Kendra?"
+        ]
+      },
+      {
+        "qid": "AWS.Services.Quotas.ES",
+        "a": "The Service Quotas for Elasticsearch can be found **[here](https://docs.aws.amazon.com/elasticsearch-service/latest/developerguide/aes-limits.html)**. For example, the number of dedicated master instances per domain is 5**.",
+        "alt": {
+          "markdown": "The Service Quotas for Elasticsearch can be found **[here](https://docs.aws.amazon.com/elasticsearch-service/latest/developerguide/aes-limits.html)**. For example, **the number of dedicated master instances per domain is 5**."
+        },
+        "clientFilterValues": "es",
+        "type": "qna",
+        "q": [
+          "What is the service quota?",
+          "What are the service quotas for ElasticSearch?"
+        ]
+      },
+      {
+        "qid": "AWS.Services.QnABot.ES",
+        "a": "QnABot uses the Amazon Elasticsearch Service (Amazon ES) and optionally Amazon Kendra to make your questions and answers searchable. When a user asks a question, the Amazon ES powerful full-text search engine or Amazon Kendra’s machine learning natural language search engine is used behind the scenes to find the answer that is the best match for that question.  \n\nPlease visit the **[official QnABot Workshop](https://qnabot.workshop.aws/)** for FAQs on usage, deployment, and enrichment of your QnABot with Elasticsearch.",
+        "alt": {
+          "markdown": "**QnABot uses the Amazon Elasticsearch Service (Amazon ES) and optionally Amazon Kendra to make your questions and answers searchable.** When a user asks a question, the Amazon ES powerful full-text search engine or Amazon Kendra’s machine learning natural language search engine is used behind the scenes to find the answer that is the best match for that question.  \n\nPlease visit the **[official QnABot Workshop](https://qnabot.workshop.aws/)** for FAQs on usage, deployment, and enrichment of your QnABot with Elasticsearch."
+        },
+        "clientFilterValues": "es",
+        "type": "qna",
+        "q": [
+          "How does QnABot use it?",
+          "How does QnABot use ElasticSearch?"
+        ]
+      },
+      {
+        "qid": "set.filters",
+        "a": "Hello! Welcome to QnABot's client feature demo. How would you like to ask questions today?",
+        "r": {
+          "title": "demo",
+          "buttons": [
+            {
+              "text": "Let me ask questions normally",
+              "value": "QID::set.nofilter"
+            },
+            {
+              "text": "Let me ask questions about AWS services",
+              "value": "QID::set.unfiltered"
+            },
+            {
+              "text": "Let me ask questions specific to Lex",
+              "value": "QID::set.lex"
+            },
+            {
+              "text": "Let me ask questions specific to Elasticsearch",
+              "value": "QID::set.es"
+            },
+            {
+              "text": "Let me ask questions specific to Kendra",
+              "value": "QID::set.kendra"
+            }
+          ]
+        },
+        "type": "qna",
+        "q": [
+          "Hello!"
+        ]
+      },
+      {
+        "qid": "set.unfiltered",
+        "a": "{{setSessionAttr 'QNAClientFilter' 'unfiltered'}} Let's chat! Ask me any question you'd like about Amazon Lex, Amazon Elasticsearch, or Amazon Kendra.",
+        "alt": {
+          "markdown": "{{setSessionAttr 'QNAClientFilter' 'unfiltered'}} Let's chat! Ask me any question you'd like about **Amazon Lex, Amazon Elasticsearch, or Amazon Kendra**."
+        },
+        "type": "qna",
+        "q": [
+          "Set SessionAttribute QNAClientFilter to: unfiltered"
+        ]
+      },
+      {
+        "qid": "AWS.Services.QnABot.Lex",
+        "a": "QnABot uses Amazon Lex and Amazon Alexa to provide a conversational interface for your “Questions and Answers.” This allows your users to ask their questions and get quick and relevant answers. Amazon Lex lets you integrate both voice and text chat access into your existing applications. QnABot can also ask questions and process the answers from your users.\n\nPlease visit the **[official QnABot Workshop](https://qnabot.workshop.aws/)** for FAQs on usage, deployment, and enrichment of your QnABot with Amazon Lex.",
+        "alt": {
+          "markdown": "**QnABot uses Amazon Lex and Amazon Alexa to provide a conversational interface for your “Questions and Answers.”** This allows your users to ask their questions and get quick and relevant answers. Amazon Lex lets you integrate both voice and text chat access into your existing applications. QnABot can also ask questions and process the answers from your users.    \n\nPlease visit the **[official QnABot Workshop](https://qnabot.workshop.aws/)** for FAQs on usage, deployment, and enrichment of your QnABot with Amazon Lex."
+        },
+        "clientFilterValues": "lex",
+        "type": "qna",
+        "q": [
+          "How does QnABot use it?",
+          "How does QnABot use Lex?"
+        ]
+      },
+      {
+        "qid": "AWS.Services.QnABot.Kendra",
+        "a": "Amazon Kendra is a highly accurate intelligent search service that enables your users to search unstructured data using natural language. **It returns specific answers to questions, giving users an experience that’s close to interacting with a human expert.** It is highly scalable, tightly integrated with other AWS services, and offers enterprise-grade security.\n\nPlease visit the official **[QnABot Workshop](https://qnabot.workshop.aws/deployment/kendra.html)** for FAQs on usage, deployment, and enrichment of your QnABot with Kendra.",
+        "alt": {
+          "markdown": "Amazon Kendra is a highly accurate intelligent search service that enables your users to search unstructured data using natural language. **It returns specific answers to questions, giving users an experience that’s close to interacting with a human expert.** It is highly scalable, tightly integrated with other AWS services, and offers enterprise-grade security.\n\nPlease visit the official **[QnABot Workshop](https://qnabot.workshop.aws/deployment/kendra.html)** for FAQs on usage, deployment, and enrichment of your QnABot with Kendra."
+        },
+        "clientFilterValues": "kendra",
+        "type": "qna",
+        "q": [
+          "How does QnABot use it?",
+          "How does QnABot use Kendra?"
+        ]
+      }
+    ]
+  }
