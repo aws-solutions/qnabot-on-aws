@@ -17,7 +17,7 @@ import canvasapi
 from canvasapi import Canvas
 
 
-MATCHING_TOLERANCE_SCORE = 70
+MATCHING_TOLERANCE_SCORE = 70   #used for matching accuracy with fuzzy match
 
 #----------------------------------------------------------------------
 # function: get_secret
@@ -101,7 +101,6 @@ def query_enrollments_for_student(canvas, student_user_name, userinput):
                 course_name.append(course.name)
 
     result = {"CourseNames": course_name}
-
     return result
     
 
@@ -207,7 +206,6 @@ def query_announcements_for_student(canvas, student_user_name, userinput):
     course_announcements += '</ul>'
 
     result = {"Announcements": course_announcements}
-
     return result
 
 #----------------------------------------------------------------------
@@ -220,7 +218,6 @@ def query_grades_for_student(canvas, student_user_name, userinput):
     
     if user:
         course_list = []
-        #courses = user.get_enrollments(include='current_points', search_by='course')
         courses = user.get_courses(enrollment_status='active')
 
         for course in courses:
@@ -345,7 +342,7 @@ def handler(event, context):
 
             # Determine what the query is.
             if query == 'CourseAssignments':
-                # Retrieve the due dates for this student.
+                # Retrieve the assignments for this student.
                 result = query_course_assignments_for_student(canvas, student_user_name, userinput)
                 if result['CourseAssignments']:
                     return_message = result['CourseAssignments']
@@ -353,13 +350,13 @@ def handler(event, context):
                 else:
                     event['res']['session']['appContext']['altMessages']['markdown'] = "There are no upcoming assignments for this course."
             elif query == 'CanvasMenu':
-                # provide a menu to choose from (announcements, enrollments, grades)
+                # provide a menu to choose from (announcements, enrollments, syllabus, assignments, grades)
                 choicelist = [{'text':'Announcements','value':"tell me about my announcements"}, {'text':'Course Enrollments','value':"tell me about my enrollments"}, {'text':'Course Syllabus','value':"tell me about my syllabus"}, {'text':'Assignments','value':"tell me about my assignments"}, {'text':'Grades','value':"tell me about my grades"}]
                 genericAttachments = {'version': '1','contentType': 'application/vnd.amazonaws.card.generic','genericAttachments':[{"title":"response buttons","buttons":choicelist}]}
                 event['res']['session']['appContext']['responseCard'] = genericAttachments
                 event['res']['session']['appContext']['altMessages']['markdown'] = "Hello {}, please select one of the options below:".format(student_name)
             elif query == 'CourseEnrollments':
-                # Retrieve the enrollments for this student.
+                # Retrieve the course options for this student.
                 result = query_enrollments_for_student(canvas, student_user_name, userinput)
                 return_courses = result['CourseNames']
                 if return_courses:
@@ -372,11 +369,11 @@ def handler(event, context):
                 else:
                     event['res']['session']['appContext']['altMessages']['markdown'] = "You are not currently enrolled in any courses"
             elif query == 'SyllabusForCourse':
-                # Retrieve the enrollments for this student.
+                # Retrieve the course syllabus for this student.
                 result = query_syllabus_for_student(canvas, student_user_name, userinput)
                 event['res']['session']['appContext']['altMessages']['markdown'] = result['CourseSyllabus']
             elif query == 'ChoicesForStudent':
-                # Retrieve the enrollments for this student.
+                # Retrieve the course options for this student.
                 result = query_choices_for_student(canvas, student_user_name, userinput)
                 returned_course = result['Choice']
                 genericattachment = ['assignments','syllabus','grades']
@@ -394,7 +391,7 @@ def handler(event, context):
                 else:
                     event['res']['session']['appContext']['altMessages']['markdown'] = "You don't have any announcements at this moment."
             elif query == 'GradesForStudent':
-                # Retrieve the announcements for this student.
+                # Retrieve the course grades for this student.
                 result = query_grades_for_student(canvas, student_user_name, userinput)
                 return_message = result['Grades']
                 event['res']['session']['appContext']['altMessages']['markdown'] = return_message
