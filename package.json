@@ -156,7 +156,7 @@
     "webpack-archive-plugin": "^3.0.0",
     "webpack-bundle-analyzer": "^3.9.0",
     "webpack-cli": "^3.3.12",
-    "webpack-dev-server": "^3.11.0",
+    "webpack-dev-server": "^3.11.2",
     "webpack-merge": "^4.2.2",
     "webpack-s3-plugin": "^1.0.3"
   }
