@@ -6,9 +6,13 @@ const qnabotversion = process.env.npm_package_version + " - v1";
 module.exports={
     "QNAInvokePermission": {
       "Type": "AWS::Lambda::Permission",
+      "DependsOn": "FulfillmentLambdaAliaslive",
       "Properties": {
         "Action": "lambda:InvokeFunction",
-        "FunctionName": {"Fn::GetAtt":["FulfillmentLambda","Arn"]},
+        "FunctionName": {  "Fn::Join": [ ":", [
+          {"Fn::GetAtt":["FulfillmentLambda","Arn"]}, 
+          "live"
+        ]]},
         "Principal": "lex.amazonaws.com"
       }
     },
@@ -46,7 +50,10 @@ module.exports={
         "fulfillmentActivity": {
           "type": "CodeHook",
           "codeHook": {
-            "uri": {"Fn::GetAtt":["FulfillmentLambda","Arn"]},
+            "uri": {  "Fn::Join": [ ":", [
+              {"Fn::GetAtt":["FulfillmentLambda","Arn"]}, 
+              "live"
+            ]]},
             "messageVersion": "1.0"
           }
         }
@@ -66,7 +73,10 @@ module.exports={
           "fulfillmentActivity": {
               "type": "CodeHook",
               "codeHook": {
-                  "uri": {"Fn::GetAtt":["FulfillmentLambda","Arn"]},
+                  "uri": {  "Fn::Join": [ ":", [
+                    {"Fn::GetAtt":["FulfillmentLambda","Arn"]}, 
+                    "live"
+                  ]]},
                   "messageVersion": "1.0"
               }
           },

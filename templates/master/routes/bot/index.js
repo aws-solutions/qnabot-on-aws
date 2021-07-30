@@ -57,7 +57,10 @@ function config(opts){
                 "arn:aws:apigateway:",
                 {"Ref": "AWS::Region"},
                 ":lambda:path/2015-03-31/functions/",
-                {"Fn::GetAtt":["FulfillmentLambda","Arn"]},
+                { "Fn::Join": [ ":", [
+                    {"Fn::GetAtt":["FulfillmentLambda","Arn"]},
+                    "live"
+                  ]]},
                 "/configuration"
             ]]},
             "IntegrationResponses": [{

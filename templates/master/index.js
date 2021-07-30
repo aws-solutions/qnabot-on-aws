@@ -216,6 +216,11 @@ module.exports={
         "AllowedValues" : ["2", "4"],
         "Default":"4"
     },
+    "FulfillmentConcurrency": {
+      "Type":"Number",
+      "Description":"The amount of provisioned concurrency for the fulfillment Lambda function",
+      "Default": 0
+    },
     "VPCSubnetIdList" : {
         "Type": "CommaDelimitedList",
         "Description" : "Subnet IDs", 
@@ -264,7 +269,10 @@ module.exports={
               { "Fn::Equals": [ "",
                       { "Fn::Join": [ "", { "Ref": "VPCSecurityGroupIdList" } ] }
                   ] }
-          ] }
+          ] },
+    "CreateConcurrency":{ "Fn::Not": [
+      {"Fn::Equals":[{"Ref":"FulfillmentConcurrency"},"0"]}
+    ]}
   }
 }
 
