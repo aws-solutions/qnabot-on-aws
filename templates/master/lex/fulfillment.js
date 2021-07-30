@@ -65,9 +65,6 @@ module.exports = {
           "ProvisionedConcurrentExecutions" : {"Ref": "FulfillmentConcurrency"}
         }, {"Ref" : "AWS::NoValue"} ]
       },
-       /* {"Ref" : "AWS::NoValue"},{
-        "ProvisionedConcurrentExecutions": 
-      },*/
       "Role": { "Fn::GetAtt": ["FulfillmentLambdaRole", "Arn"] },
       "Runtime": "nodejs12.x",
       "Timeout": 300,
