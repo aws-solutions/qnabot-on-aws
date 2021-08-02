@@ -265,6 +265,11 @@ module.exports = {
       "Role": { "Fn::GetAtt": ["WarmerLambdaRole", "Arn"] },
       "Runtime": "nodejs12.x",
       "Timeout": 300,
+      "Layers": [
+        {"Ref": "AwsSdkLayerLambdaLayer"},
+        {"Ref": "CommonModulesLambdaLayer"},
+        {"Ref": "EsProxyLambdaLayer"}
+      ],
       "VpcConfig" : {
         "Fn::If": [ "VPCEnabled", {
           "SubnetIds": {"Ref": "VPCSubnetIdList"},
