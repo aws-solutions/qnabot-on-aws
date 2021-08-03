@@ -1,3 +1,8 @@
+## [4.7.3]
+- The QnABot fulfillment Lambda function can now be configured for provisioned concurrency to further improve query
+  response times after periods of inactivity.
+- Bug fix for proper invocation of ESWarmer lambda
+- Bug fix to resolve sporadic API Compression CloudFormation exception
 ## [4.7.2]
 - Bug fix "TypeError: AWS.LexRuntimeV2 is not a constructor" when using Lex V2 based Elicit Response Bots.
 - Bug fix "Cannot read property 'buttons' of undefined" when no buttons specified in response card.

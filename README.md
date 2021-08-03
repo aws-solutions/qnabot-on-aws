@@ -8,7 +8,13 @@ This repository contains code for the QnABot, described in the AWS AI blog post 
 
 See the "Getting Started" to launch your own QnABot.
 
-**See all the new features list for 4.7.1** [Lex V2 Elicit response bots, Config import/export](#new-features)
+**See all the new features list for 4.7.3** [Fulfillment Lambda Provisioned Concurrency](#new-features)
+
+4.7.3
+  - The QnABot fulfillment Lambda function can now be configured for provisioned concurrency to further improve query 
+    response times after periods of inactivity.
+  - Bug fix for proper invocation of ESWarmer lambda
+  - Bug fix to resolve sporadic API Compression CloudFormation exception
 
 4.7.1 provides performance improvements and component upgrades
   - Amazon Elasticsearch version 7.10 is now utilized.
@@ -127,6 +133,10 @@ We are currently working on adding Microsoft Edge support.
 See the [LICENSE.md](LICENSE.md) file for details
 
 ## New features
+
+### Version 4.7.3
+- The CloudFormation template now allows configuration of provisioned concurrency for the Fulfillment Lambda function. 
+  The default is 0 but can be changed to a higher integer value. Provisioned concurrency will increase Lambda costs.
 
 ### Version 4.7.1
 - LexV2 built-in Elicit Response bots have been added.
