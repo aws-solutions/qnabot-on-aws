@@ -128,7 +128,7 @@
     "vuex": "^3.0.1",
     "vuex-router-sync": "^5.0.0",
     "webdriverio": "^6.1.16",
-    "xlsx": "^0.16.9"
+    "xlsx": "^0.17.0"
   },
   "devDependencies": {
     "@babel/core": "^7.6.2",
