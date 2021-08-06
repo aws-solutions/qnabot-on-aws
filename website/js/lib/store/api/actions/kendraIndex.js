@@ -31,6 +31,7 @@ var aws=require('aws-sdk')
 var failed=false
 module.exports={
 
+    //point to new Kendra Lambda instead of the old one
     startKendraIndexing(context,opts){
         return context.dispatch('_request',{
             url:context.rootState.info._links.crawler.href+`/start?message=start&topic=${context.rootState.info.KendraCrawlerSnsTopic}`,
