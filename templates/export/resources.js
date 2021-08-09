@@ -870,6 +870,36 @@ module.exports = Object.assign(
         ],
       },
     },
+    KendraNativeCrawlerRole: {
+      Type: "AWS::IAM::Role",
+      Properties: {
+        AssumeRolePolicyDocument: {
+          Version: "2012-10-17",
+          Statement: [
+            {
+              Effect: "Allow",
+              Principal: {
+                Service: "lambda.amazonaws.com",
+              },
+              Action: "sts:AssumeRole",
+            },
+            {
+              Effect: "Allow",
+              Principal: {
+                Service: "kendra.amazonaws.com",
+              },
+              Action: "sts:AssumeRole",
+            }
+          ],
+        },
+        Path: "/",
+        ManagedPolicyArns: [
+          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
+          "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole",
+          {Ref: "KendraNativeCrawlerPolicy"},
+        ],
+      },
+    },
     KendraCrawlerPolicy: {
       Type: "AWS::IAM::ManagedPolicy",
       Properties: {
@@ -886,9 +916,15 @@ module.exports = Object.assign(
                 "kendra:StartDataSourceSyncJob",
                 "kendra:StopDataSourceSyncJob",
                 "kendra:UpdateDataSource",
-                "iam:passrole"
               ],
               Resource: ["*"],
+            },
+            {
+              Effect: "Allow",
+              Action: [
+                "iam:PassRole"
+              ],
+              Resource: [{"Fn::GetAtt":["KendraNativeCrawlerPassRole","Arn"]}],
             },
             {
               Effect: "Allow",
@@ -898,7 +934,6 @@ module.exports = Object.assign(
               Resource: [
                 {"Fn::Join": ["", ["arn:aws:ssm:", {"Ref": "AWS::Region"}, ":", {"Ref": "AWS::AccountId"}, ":parameter/", {"Ref": "CustomQnABotSettings"}]]},
                 {"Fn::Join": ["", ["arn:aws:ssm:", {"Ref": "AWS::Region"}, ":", {"Ref": "AWS::AccountId"}, ":parameter/", {"Ref": "DefaultQnABotSettings"}]]},
-                {"Fn::GetAtt" : ["KendraNativeCrawlerPassRole", "Arn"]}
               ],
             },
           ],
@@ -1043,53 +1078,6 @@ module.exports = Object.assign(
         ],
       }
     },
-    "KendraNativeCrawlerLambda": {
-      "Type": "AWS::Lambda::Function",
-      "Properties": {
-        "Code": {
-          "S3Bucket": {"Ref": "BootstrapBucket"},
-          "S3Key": {"Fn::Sub": "${BootstrapPrefix}/lambda/kendra-webcrawler.zip"},
-          "S3ObjectVersion": {"Ref": "KendraNativeCrawlerCodeVersion"}
-        },
-        "Environment": {
-          "Variables": {
-            outputBucket: {"Ref": "ExportBucket"},
-            s3Prefix: "connect/",
-            accountId: {"Ref": "AWS::AccountId"},
-            region: {"Ref": "AWS::Region"},
-            LexVersion: {"Ref": "LexVersion"},
-            // Lex V1
-            fallBackIntent: {"Ref": "FallbackIntent"},
-            intent: {"Ref": "Intent"},
-            lexBot: {"Ref": "BotName"},
-            // Lex V2
-            LexV2BotName: {"Ref": "LexV2BotName"},
-            LexV2BotId: {"Ref": "LexV2BotId"},
-            LexV2BotAlias: {"Ref": "LexV2BotAlias"},
-            LexV2BotAliasId: {"Ref": "LexV2BotAliasId"},
-            LexV2BotLocaleIds: {"Ref": "LexV2BotLocaleIds"}
-          }
-        },
-        "Handler": "index.handler",
-        "MemorySize": "1024",
-        "Role": {"Fn::GetAtt": ["ExportRole", "Arn"]},
-        "Runtime": "nodejs12.x",
-        "Timeout": 300,
-        "VpcConfig": {
-          "Fn::If": ["VPCEnabled", {
-            "SubnetIds": {"Fn::Split": [",", {"Ref": "VPCSubnetIdList"}]},
-            "SecurityGroupIds": {"Fn::Split": [",", {"Ref": "VPCSecurityGroupIdList"}]},
-          }, {"Ref": "AWS::NoValue"}]
-        },
-        "TracingConfig": {
-          "Fn::If": ["XRAYEnabled", {"Mode": "Active"}, {"Ref": "AWS::NoValue"}]
-        },
-        "Tags": [{
-          Key: "Type",
-          Value: "Export"
-        }]
-      }
-    },
     "KendraNativeCrawlerCodeVersion": {
       "Type": "Custom::S3Version",
       "Properties": {
@@ -1128,6 +1116,7 @@ module.exports = Object.assign(
           Variables: {
             DEFAULT_SETTINGS_PARAM: {Ref: "DefaultQnABotSettings"},
             CUSTOM_SETTINGS_PARAM: {Ref: "CustomQnABotSettings"},
+            ROLE_ARN: {"Fn::GetAtt" : ["KendraNativeCrawlerPassRole", "Arn"] },
             DATASOURCE_NAME: {
               "Fn::Join": [
                 "-",
@@ -1138,7 +1127,7 @@ module.exports = Object.assign(
                       2,
                       {"Fn::Split": ["-", {Ref: "DefaultQnABotSettings"}]},
                     ],
-                  },
+                  },"v2"
                 ],
               ],
             },
@@ -1146,7 +1135,7 @@ module.exports = Object.assign(
         },
         Handler: "kendra_webcrawler.handler",
         MemorySize: "2048",
-        Role: {"Fn::GetAtt": ["KendraCrawlerRole", "Arn"]},
+        Role: {"Fn::GetAtt": ["KendraNativeCrawlerRole", "Arn"]},
         Runtime: "python3.7",
         Timeout: 900,
         Tags: [
@@ -1183,7 +1172,7 @@ module.exports = Object.assign(
         },
         Path: "/",
         ManagedPolicyArns: [
-          {Ref: "KendraNativeCrawlerPolicy"},
+          //{Ref: "KendraNativeCrawlerPolicy"},
           {Ref: "KendraNativeCrawlerPassPolicy"},
         ],
       },
@@ -1204,11 +1193,11 @@ module.exports = Object.assign(
                 "kendra:StartDataSourceSyncJob",
                 "kendra:StopDataSourceSyncJob",
                 "kendra:UpdateDataSource",
-                "iam:passrole"
+                // "kendra:BatchPutDocument",
+                // "kendra:BatchDeleteDocument"
+               // "iam:passrole"
               ],
-              Resource: [
-                {"Fn::GetAtt" : ["KendraCrawlerRole", "Arn"]}
-              ],
+              Resource: ["*"],
             },
           ],
         },
@@ -1221,15 +1210,14 @@ module.exports = Object.assign(
           Version: "2012-10-17",
           Statement: [
             {
-              Effect: "Allow",
-              Action: [
-                "iam:passrole"
-              ],
-              Resource: [
-                {"Fn::GetAtt" : ["KendraCrawlerRole", "Arn"]}
-              ],
-            },
-          ],
+                "Effect": "Allow",
+                "Action": [
+                    "kendra:BatchPutDocument",
+                    "kendra:BatchDeleteDocument"
+                ],
+                "Resource":{"Fn::Sub":"arn:aws:kendra:${AWS::Region}:${AWS::AccountId}:index/*"}
+            }
+        ],
         },
       },
     },
