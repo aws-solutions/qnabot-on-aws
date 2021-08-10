@@ -135,7 +135,7 @@ module.exports = {
   methods: {
     start: async function () {
       this.$store
-        .dispatch("api/startKendraIndexing")
+        .dispatch("api/startKendraV2Indexing")
         .catch((err) =>
           console.log(`error while trying to start indexing ` + err)
         );

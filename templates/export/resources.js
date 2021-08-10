@@ -1095,6 +1095,14 @@ module.exports = Object.assign(
         "RestApiId": {"Ref": "Api"}
       }
     },
+    "KendraNativeCrawlerInvokePermissionConnectLambda": {
+      "Type": "AWS::Lambda::Permission",
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "FunctionName": {"Fn::GetAtt": ["KendraNativeCrawlerLambda", "Arn"]},
+        "Principal": "apigateway.amazonaws.com"
+      }
+    },
     KendraNativeCrawlerLambda: {
       Type: "AWS::Lambda::Function",
       Properties: {
@@ -1193,11 +1201,24 @@ module.exports = Object.assign(
                 "kendra:StartDataSourceSyncJob",
                 "kendra:StopDataSourceSyncJob",
                 "kendra:UpdateDataSource",
-                // "kendra:BatchPutDocument",
-                // "kendra:BatchDeleteDocument"
-               // "iam:passrole"
+
               ],
               Resource: ["*"],
+            },
+            {
+              "Effect": "Allow",
+              "Action": "iam:PassRole",
+              "Resource": {"Fn::GetAtt":["KendraNativeCrawlerPassRole","Arn"]}
+          },
+          {
+              Effect: "Allow",
+              Action: [
+                "ssm:GetParameter",
+              ],
+              Resource: [
+                {"Fn::Join": ["", ["arn:aws:ssm:", {"Ref": "AWS::Region"}, ":", {"Ref": "AWS::AccountId"}, ":parameter/", {"Ref": "CustomQnABotSettings"}]]},
+                {"Fn::Join": ["", ["arn:aws:ssm:", {"Ref": "AWS::Region"}, ":", {"Ref": "AWS::AccountId"}, ":parameter/", {"Ref": "DefaultQnABotSettings"}]]},
+              ],
             },
           ],
         },

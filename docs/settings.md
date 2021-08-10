@@ -31,6 +31,7 @@
 | KENDRA_FAQ_ES_FALLBACK | true or false | When Kendra FAQ is enabled, but does not return an answer then query ElasticSearch
 | ENABLE_KENDRA_WEB_INDEXER | true or false | Enables the web indexer
 | KENDRA_INDEXER_URLS | comma separated list | List of web addresses QnABot should crawl and [index with Kendra](./kendra_crawler_guide/README.md)
+| KENDRA_INDEXER_CRAWL_DEPTH | integer | Specifies the number of levels in a website that you want to crawl
 | KENDRA_INDEXER_SCHEDULE | [CloudWatch Rate Syntax](https://docs.aws.amazon.com/AmazonCloudWatch/latest/events/ScheduledEvents.html) | Interval Indexer should crawl
 | KENDRA_WEB_PAGE_INDEX | Kendra Index Id | The index to use for the web crawler, a [custom data source](https://docs.aws.amazon.com/kendra/latest/dg/data-source-custom.html) will automatically be added to the specified index.  
 | ERRORMESSAGE | text | Response to the user when a processing error occurs
