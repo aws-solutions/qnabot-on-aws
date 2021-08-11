@@ -22,21 +22,15 @@ def handler(event, context):
     else:
         kendra_update_data_source(IndexId, data_source_id, URLs);
         kendra_sync_data_source(IndexId, data_source_id);
-        
-    return {"IndexId": IndexId, "DataSourceId": data_source_id}
 
 def get_settings():
     default_settings_key = os.environ.get("DEFAULT_SETTINGS_PARAM")
     custom_settings_key = os.environ.get("CUSTOM_SETTINGS_PARAM")
 
     default_settings = ssm.get_parameter(Name=default_settings_key, WithDecryption=True)
-    default_settings = json.loads(default_settings['Parameter']['Value'])
-    
     custom_settings = ssm.get_parameter(Name=custom_settings_key, WithDecryption=True)
-    custom_settings = json.loads(custom_settings['Parameter']['Value'])
     default_settings.update(custom_settings)
 
-    print(default_settings)
     return default_settings
 
 
@@ -118,3 +112,5 @@ def kendra_list_data_source_sync_jobs(IndexId, data_source_id):
 if __name__ == "__main__":    
 
     handler(event, None);
+
+

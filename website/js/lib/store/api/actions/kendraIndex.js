@@ -40,7 +40,7 @@ module.exports={
     //point to new Kendra Lambda instead of the old one
     startKendraV2Indexing(context,opts){
         return context.dispatch('_request',{
-            url:context.rootState.info._links.crawlerV2.href+`/start?message=start&topic=${context.rootState.info.KendraCrawlerSnsTopic}`,
+            url:context.rootState.info._links.crawlerV2.href,
             method:'post'
         })
     },
