@@ -47,6 +47,10 @@ async function isESonly(req, query_params) {
     if (_.get(query_params, 'topic')!="") {
         return true
     }
+    // setting clientFilterValues should block Kendra FAQ indexing
+    if (_.get(query_params, 'clientFilterValues')!="") {
+        return true
+    }
     //Don't send one word questions to Kendra
     if(query_params.question.split(" ").length  < 2){
         return true;
