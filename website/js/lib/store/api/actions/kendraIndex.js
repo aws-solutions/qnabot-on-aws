@@ -46,8 +46,8 @@ module.exports={
     },
     getKendraIndexingStatus(context,opts){
         return context.dispatch('_request',{
-            url:context.rootState.info._links.crawler.href+`/status`,
-            method:'post'
+            url:context.rootState.info._links.crawlerV2.href,
+            method:'get'
         })
     },
 }
