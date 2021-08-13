@@ -65,11 +65,11 @@ def kendra_list_data_source_sync_jobs(IndexId, data_source_id):
     print(status)
     result = list(map(lambda item: {'StartTime': item['StartTime'].strftime("%m/%d/%Y, %H:%M:%S"),
                                     'EndTime': item['EndTime'].strftime("%m/%d/%Y, %H:%M:%S") if 'EndTime' in item else '',
-                                    'Status': item['Status'],
+                                    'Status': item['Status'] if item['Status'] != "INCOMPLETE" else "COMPLETE WITH ERRORS",
                                     'ErrorMessage': item['ErrorMessage'] if 'ErrorMessage' in item else '',
                                     'Metrics': item['Metrics']
                                     }, response['History']))
-    return {"Status": status, "History": result}
+    return {"Status": status, "History": result, "DashboardUrl": f'https://console.aws.amazon.com/cloudwatch/home?region={os.environ.get("AWS_REGION")}#dashboards:name={os.environ.get("DASHBOARD_NAME")}'}
     # return status, list of values in result
 
 

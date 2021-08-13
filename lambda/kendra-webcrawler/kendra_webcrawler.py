@@ -1,10 +1,12 @@
 import os
+import sys
 import json
 import boto3
 
 
 client = boto3.client('kendra')
 ssm = boto3.client('ssm')
+cloudwatch = boto3.client('cloudwatch')
 
 
 def handler(event, context):
@@ -18,9 +20,13 @@ def handler(event, context):
     URLs = settings['KENDRA_INDEXER_URLS'].replace(' ', '').split(',')
     data_source_id = get_data_source_id(IndexId, Name)
 
+    create_dashboard(IndexId, data_source_id)
+    return
+
     if data_source_id is None:
         data_source_id = kendra_create_data_source(client, IndexId, Name, Type, RoleArn, Description, URLs)
         kendra_sync_data_source(IndexId, data_source_id)
+        create_dashboard(IndexId, data_source_id)
     else:
         kendra_update_data_source(IndexId, data_source_id, URLs)
         kendra_sync_data_source(IndexId, data_source_id)
@@ -106,19 +112,31 @@ def kendra_update_data_source(IndexId, data_source_id, URLs):
     return response
 
 
-def kendra_list_data_source_sync_jobs(IndexId, data_source_id):
-    response = client.list_data_source_sync_jobs(
-        Id=data_source_id,
-        IndexId=IndexId,
-    )
+def create_dashboard(IndexId, data_source_id):
 
-    result = list(map(lambda item: {'StartTime': item['StartTime'],
-                                    'EndTime': item['EndTime'],
-                                    'Status': item['Status'],
-                                    'ErrorMessage': item['ErrorMessage'],
-                                    'Metrics': item['Metrics']
-                                    }, response['History']))
+    cwd = os.path.dirname(os.path.realpath(sys.argv[0]))
+    file = os.path.join(cwd, 'kendra-dashboard.json')
+
+    with open(file, 'r') as dashboard:
+        dashboard_body = dashboard.read()
+
+    dashboard_body = dashboard_body.replace('${IndexId}', IndexId)
+    dashboard_body = dashboard_body.replace('${data_source_id}', data_source_id)
+    dashboard_body = dashboard_body.replace('\n', '')
+
+    response = cloudwatch.put_dashboard(
+        DashboardName=os.environ.get('DASHBOARD_NAME'),
+        DashboardBody=dashboard_body
+    )
+    print(response)
 
 
 if __name__ == "__main__":
-    handler(event, None)
+    
+    os.environ["CUSTOM_SETTINGS_PARAM"] = 'CFN-CustomQnABotSettings-4VLlLa3BAFAB'
+    os.environ["DEFAULT_SETTINGS_PARAM"] = 'CFN-DefaultQnABotSettings-J3x2iwsNoWkx'
+    os.environ["DATASOURCE_NAME"] = 'QNABotKendraNativeCrawler-J3x2iwsNoWkx-v2'
+    os.environ["DASHBOARD_NAME"] = "QnABotKendraDashboard-J3x2iwsNoWkx-v2"
+    os.environ["ROLE_ARN"] = 'arn:aws:iam::743999250295:role/QNA-clientfilter-dev-mast-KendraNativeCrawlerPassR-DSWK1C590ZGP'
+    
+    handler(None, None)
