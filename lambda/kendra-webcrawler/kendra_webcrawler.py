@@ -1,5 +1,4 @@
 import os
-import sys
 import json
 import boto3
 
@@ -19,9 +18,6 @@ def handler(event, context):
     IndexId = settings['KENDRA_WEB_PAGE_INDEX']
     URLs = settings['KENDRA_INDEXER_URLS'].replace(' ', '').split(',')
     data_source_id = get_data_source_id(IndexId, Name)
-
-    create_dashboard(IndexId, data_source_id)
-    return
 
     if data_source_id is None:
         data_source_id = kendra_create_data_source(client, IndexId, Name, Type, RoleArn, Description, URLs)
@@ -88,7 +84,7 @@ def kendra_sync_data_source(IndexId, data_source_id):
         Id=data_source_id,
         IndexId=IndexId
     )
-    print(json.dumps(response))
+
     return response
 
 
@@ -114,7 +110,7 @@ def kendra_update_data_source(IndexId, data_source_id, URLs):
 
 def create_dashboard(IndexId, data_source_id):
 
-    cwd = os.path.dirname(os.path.realpath(sys.argv[0]))
+    cwd = os.environ['LAMBDA_TASK_ROOT']
     file = os.path.join(cwd, 'kendra-dashboard.json')
 
     with open(file, 'r') as dashboard:
@@ -131,12 +127,3 @@ def create_dashboard(IndexId, data_source_id):
     print(response)
 
 
-if __name__ == "__main__":
-    
-    os.environ["CUSTOM_SETTINGS_PARAM"] = 'CFN-CustomQnABotSettings-4VLlLa3BAFAB'
-    os.environ["DEFAULT_SETTINGS_PARAM"] = 'CFN-DefaultQnABotSettings-J3x2iwsNoWkx'
-    os.environ["DATASOURCE_NAME"] = 'QNABotKendraNativeCrawler-J3x2iwsNoWkx-v2'
-    os.environ["DASHBOARD_NAME"] = "QnABotKendraDashboard-J3x2iwsNoWkx-v2"
-    os.environ["ROLE_ARN"] = 'arn:aws:iam::743999250295:role/QNA-clientfilter-dev-mast-KendraNativeCrawlerPassR-DSWK1C590ZGP'
-    
-    handler(None, None)

@@ -22,7 +22,7 @@ v-container#page-import(column, grid-list-md)
         v-flex(v-if="history && history.length > 0")
           v-card-title.headline Kendra Indexing History
           v-card-text
-            h3 <a :href="job.DashboardUrl" target="_blank">View in CloudWatch </a>
+            h3 <a :href="dashboard_url" target="_blank">View in CloudWatch </a>
 
           v-card-text
             table.table
@@ -31,8 +31,10 @@ v-container#page-import(column, grid-list-md)
                 th(style="text-align: left") End Time
                 th(style="text-align: left") Status
                 th(style="text-align: left") Error Message
+                th(style="text-align: left") Documents Scanned
                 th(style="text-align: left") Documents Added
                 th(style="text-align: left") Documents Modified
+                th(style="text-align: left") Documents Deleted
                 th(style="text-align: left") Documents Failed
 
               template(v-for="(job, index) in history")
@@ -41,9 +43,11 @@ v-container#page-import(column, grid-list-md)
                   td {{ convertToLocalTime(job.EndTime) }}
                   td {{ job.Status }}
                   td {{ job.ErrorMessage }}
+                  td {{ job.Metrics.DocumentsScanned }}
                   td {{ job.Metrics.DocumentsAdded }}
                   td {{ job.Metrics.DocumentsModified }}
                   td {{ job.Metrics.DocumentsDeleted }}
+                  td {{ job.Metrics.DocumentsFailed }}
 </template>
 
 <script>
@@ -70,6 +74,7 @@ module.exports = {
     var self = this;
     return {
       status: "",
+      dashboard_url:"",
       history: {},
       dialog: false,
       text: false,
@@ -104,6 +109,7 @@ module.exports = {
               self.intervalBetweenPoll = 20000
               return
             }
+            self.dashboard_url = data.DashboardUrl;
             self.status = data.Status;
             self.history = data.History;
             self.intervalBetweenPoll = 10000

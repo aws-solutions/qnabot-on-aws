@@ -897,7 +897,7 @@ module.exports = Object.assign(
         ManagedPolicyArns: [
           "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
           "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole",
-          {Ref: "KendraNativeCrawlerPolicy"},
+          {"Ref":"KendraNativeCrawlerPolicy"},
         ],
       },
     },
@@ -1325,7 +1325,7 @@ module.exports = Object.assign(
             {
               Effect: "Allow",
               Action: "cloudwatch:PutDashboard",
-              Resource: {"Fn::Sub": "arn:aws:cloudwatch:${AWS::AccountId}:dashboard/QNA*"}
+              Resource: [{"Fn::Sub": "arn:aws:cloudwatch::${AWS::AccountId}:dashboard/QNA*"}]
             },
             {
               Effect: "Allow",
