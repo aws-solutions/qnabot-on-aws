@@ -5,8 +5,6 @@ var _ = require('lodash');
 var Handlebars = require('handlebars');
 var supportedLanguages = require('./supportedLanguages');
 
-console.log("SUPPORTED lang: ", supportedLanguages.getSupportedLanguages());
-
 var res_glbl = {};
 var req_glbl = {};
 var autotranslate;
@@ -137,12 +135,14 @@ Handlebars.registerHelper('setLang', function (lang, last, options) {
         }
 
         if (userLanguageCode && lang == userLanguageCode) {
-            console.log("setting: ", options.fn(this));
+            console.log("Setting language - message: ", options.fn(this));
             console.log("Setting req & res session attribute:", "session.qnabotcontext.userPreferredLocale", " Value:", userLanguageCode);
             _.set(res_glbl, userPreferredLocaleKey, userLanguageCode);
             _.set(req_glbl, userPreferredLocaleKey, userLanguageCode);
             _.set(res_glbl, userLocaleKey, userLanguageCode);
             _.set(req_glbl, userLocaleKey, userLanguageCode);
+            // setLang message is already localized.. disable autotransaltion
+            autotranslate = false;
             return options.fn(this);
         } else if ((last === true) && (_.get(res_glbl, userPreferredLocaleKey) !== userLanguageCode) && !errorFound) {
             return languageErrorMessages[errorLocale].errorMessage;
@@ -153,6 +153,15 @@ Handlebars.registerHelper('setLang', function (lang, last, options) {
         console.log("Warning - attempt to use setLang handlebar helper function while ENABLE_MULTI_LANGUAGE_SUPPORT is set to false. Please check configuration.");
     }
 });
+
+Handlebars.registerHelper('resetLang', function (msg, options) {
+    console.log("reset userPreferredLocale to reenable automatic language detection");
+    const userPreferredLocaleKey = 'session.qnabotcontext.userPreferredLocale';
+    _.set(req_glbl, userPreferredLocaleKey, "");
+    _.set(res_glbl, userPreferredLocaleKey, "");
+    return msg;
+});
+
 
 Handlebars.registerHelper('setSessionAttr', function () {
     let args = Array.from(arguments);
