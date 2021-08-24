@@ -17,8 +17,8 @@ var responsebots = _.fromPairs(require('../../examples/examples/responsebots-lex
 const filesToHash = ['fulfillment.zip', 'es-proxy-layer.zip','common-modules-layer.zip','aws-sdk-layer.zip']
 const comboHash = filesToHash.map(x => {
     let filePath = (fs.existsSync("../../build/lambda/" + x) ? "../../" : "./") + "build/lambda/" + x
-    let zipDate = fs.statSync(filePath).mtime.toISOString()
-    return crypto.createHash("sha256").update(zipDate).digest("hex")
+    let fileBuffer = fs.readFileSync(filePath);
+    return crypto.createHash("sha256").update(fileBuffer).digest("hex")
   }).reduce((a,b) => {
     return a + b;
   }); 
