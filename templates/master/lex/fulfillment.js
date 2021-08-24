@@ -1,5 +1,7 @@
 var config = require('./config')
 var _ = require('lodash')
+var crypto = require('crypto')
+var fs = require('fs')
 
 var examples = _.fromPairs(require('../../examples/outputs')
   .names
@@ -11,6 +13,16 @@ var responsebots = _.fromPairs(require('../../examples/examples/responsebots-lex
   .map(x => {
     return [x, { "Fn::GetAtt": ["ExamplesStack", `Outputs.${x}`] }]
   }))
+
+const filesToHash = ['fulfillment.zip', 'es-proxy-layer.zip','common-modules-layer.zip','aws-sdk-layer.zip']
+const comboHash = filesToHash.map(x => {
+    let filePath = (fs.existsSync("../../build/lambda/" + x) ? "../../" : "./") + "build/lambda/" + x
+    let zipDate = fs.statSync(filePath).mtime.toISOString()
+    return crypto.createHash("sha256").update(zipDate).digest("hex")
+  }).reduce((a,b) => {
+    return a + b;
+  }); 
+const fulfillmentHash =  crypto.createHash("sha256").update(comboHash).digest("hex")
 
 module.exports = {
   "Alexa": {
@@ -38,6 +50,7 @@ module.exports = {
     "Type": "AWS::Serverless::Function",
     "Properties": {
       "AutoPublishAlias":"live",
+      "AutoPublishCodeSha256": fulfillmentHash,
       "CodeUri": {
         "Bucket": { "Ref": "BootstrapBucket" },
         "Key": { "Fn::Sub": "${BootstrapPrefix}/lambda/fulfillment.zip" },
