@@ -151,7 +151,7 @@
     "stylus-loader": "^3.0.2",
     "transform-runtime": "0.0.0",
     "vue-loader": "^15.7.1",
-    "webpack": "^4.40.2",
+    "webpack": "^4.46.0",
     "webpack-archive-plugin": "^3.0.0",
     "webpack-bundle-analyzer": "^3.9.0",
     "webpack-cli": "^3.3.12",
