@@ -30,7 +30,7 @@
   "devDependencies": {
     "diff": "^4.0.2",
     "nodeunit": "^0.11.3",
-    "tap": "^14.10.7",
+    "tap": "^15.0.9",
     "tap-mocha-reporter": "^5.0.1"
   }
 }
