@@ -3,6 +3,7 @@ var Promise=require('bluebird');
 var util=require('./util');
 var jwt=require('./jwt');
 var AWS=require('aws-sdk');
+const qnabot = require("/opt/lib/logging")
 
 async function get_userInfo(userId, idattrs) {
     var default_userInfo = {
@@ -17,14 +18,14 @@ async function get_userInfo(userId, idattrs) {
             'UserId': userId
         },
     };
-    console.log("Getting user info for user: ", userId, "from DynamoDB table: ", usersTable);
+    qnabot.log("Getting user info for user: ", userId, "from DynamoDB table: ", usersTable);
     var ddbResponse = {};
     try {
         ddbResponse = await docClient.get(params).promise();
     }catch(e){
-        console.log("DDB Exception caught.. can't retrieve userInfo: ", e)
+        qnabot.log("DDB Exception caught.. can't retrieve userInfo: ", e)
     }
-    console.log("DDB Response: ", ddbResponse);
+    qnabot.log("DDB Response: ", ddbResponse);
     var req_userInfo = _.get(ddbResponse,"Item",default_userInfo);
     // append user identity attributes if known
     if (_.get(idattrs,'preferred_username')) {
@@ -50,7 +51,7 @@ async function get_userInfo(userId, idattrs) {
     var lastSeen = Date.parse(req_userInfo.LastSeen || "1970/1/1 12:00:00");
     var timeSinceLastInteraction = Math.abs(now - lastSeen)/1000; // seconds
     _.set(req_userInfo, 'TimeSinceLastInteraction', timeSinceLastInteraction);
-    console.log("Request User Info: ", req_userInfo);
+    qnabot.log("Request User Info: ", req_userInfo);
     return req_userInfo;
 }
 
@@ -60,7 +61,7 @@ async function update_userInfo(userId, req_userInfo) {
     res_userInfo.FirstSeen = req_userInfo.FirstSeen || dt.toString();
     res_userInfo.LastSeen = dt.toString();
     res_userInfo.InteractionCount = req_userInfo.InteractionCount + 1;
-    console.log("Response User Info: ", res_userInfo);
+    qnabot.log("Response User Info: ", res_userInfo);
     return res_userInfo;
 }
 
@@ -69,17 +70,17 @@ const comprehend_client = new AWS.Comprehend();
 const isPIIDetected = async (text,useComprehendForPII,piiRegex,pii_rejection_ignore_list) => {
 
 
-    console.log("Testing redaction ")
+    qnabot.log("Testing redaction ")
     if(piiRegex){
         let re = new RegExp(piiRegex,"g");
         let redacted_text = text.replace(re,"XXXXXX");
-        console.log(`redacted_text ${redacted_text} text ${text}`)
+        qnabot.log(`redacted_text ${redacted_text} text ${text}`)
         var result = redacted_text != text;
-        console.log(`Is Redacted ${result}`)
+        qnabot.log(`Is Redacted ${result}`)
         if(result) //if the regex was returned. No need to call Comprehend
             return result;
     } else {
-        console.log("Warning: No value found for setting  PII_REJECTION_REGEX not using REGEX Matching")
+        qnabot.log("Warning: No value found for setting  PII_REJECTION_REGEX not using REGEX Matching")
     }
     if(useComprehendForPII){
         var params = {
@@ -89,21 +90,21 @@ const isPIIDetected = async (text,useComprehendForPII,piiRegex,pii_rejection_ign
             try
             {
                 var comprehendResult = await comprehend_client.detectPiiEntities(params).promise();
-                console.log(JSON.stringify(comprehendResult) + "entity count == " + comprehendResult.Entities.length )
+                qnabot.log(JSON.stringify(comprehendResult) + "entity count == " + comprehendResult.Entities.length )
                 if(!("Entities" in comprehendResult) ||  comprehendResult.Entities.length == 0)
                 {
-                    console.log("No PII found by Comprehend")
+                    qnabot.log("No PII found by Comprehend")
                     return false;
                 }
-                console.log("Ignoring types for PII == " + pii_rejection_ignore_list)
+                qnabot.log("Ignoring types for PII == " + pii_rejection_ignore_list)
                 pii_rejection_ignore_list = pii_rejection_ignore_list.toLowerCase().split(",")
 
                 return comprehendResult.Entities.filter(entity => entity.Score > 0.90 && pii_rejection_ignore_list.indexOf(entity.Type.toLowerCase()) == -1).length > 0;;
 
             }catch(exception)
             {
-                console.log("Warning: Exception while trying to detect PII with Comprehend. Skipping...");
-                console.log("Exception " + exception);
+                qnabot.log("Warning: Exception while trying to detect PII with Comprehend. Skipping...");
+                qnabot.log("Exception " + exception);
                 return false;
             }
     
@@ -124,9 +125,9 @@ module.exports=async function preprocess(req,res){
         var decoded = jwt.decode(idtoken);
         if (decoded) {
             idattrs = _.get(decoded,'payload');
-            console.log("Decoded idtoken:",idattrs);
+            qnabot.log("Decoded idtoken:",idattrs);
             var kid = _.get(decoded,'header.kid');
-            console.log()
+            qnabot.log()
             var default_jwks_url = [_.get(req,'_settings.DEFAULT_USER_POOL_JWKS_URL')];
             var identity_provider_jwks_url = _.get(req,'_settings.IDENTITY_PROVIDER_JWKS_URLS');
             if (identity_provider_jwks_url && identity_provider_jwks_url.length) {
@@ -137,17 +138,17 @@ module.exports=async function preprocess(req,res){
                 }
             }
             var urls = default_jwks_url.concat(identity_provider_jwks_url);
-            console.log("Attempt to verify idtoken using jwks urls:",urls);
+            qnabot.log("Attempt to verify idtoken using jwks urls:",urls);
             var verified_url = await jwt.verify(idtoken,kid,urls) ;
             if (verified_url) {
                 _.set(idattrs,'verifiedIdentity',"true");
-                console.log("Verified identity with:",verified_url);
+                qnabot.log("Verified identity with:",verified_url);
             } else {
                 _.set(idattrs,'verifiedIdentity',"false");
-                console.log("Unable to verify identity for any configured IdP jwks urls");
+                qnabot.log("Unable to verify identity for any configured IdP jwks urls");
             }     
         } else {
-            console.log("Invalid idtokenjwt - cannot decode");
+            qnabot.log("Invalid idtokenjwt - cannot decode");
         }
     }
     // Do we need to enforce authentication?
@@ -155,29 +156,29 @@ module.exports=async function preprocess(req,res){
         if ( _.get(idattrs, 'verifiedIdentity',"false") != "true") {
             // identity is not verified
             // reset question to the configured no_verified_identity question
-            console.log("Missing or invalid idtokenjwt - ENFORCE_VERIFIED_IDENTITY is true - seeting question to NO_VERIFIED_IDENTITY_QUESTION") ;
+            qnabot.log("Missing or invalid idtokenjwt - ENFORCE_VERIFIED_IDENTITY is true - seeting question to NO_VERIFIED_IDENTITY_QUESTION") ;
             req.question = _.get(req, '_settings.NO_VERIFIED_IDENTITY_QUESTION','no_verified_identity') ;
         }
     }
     if(_.get(req,'_settings.PII_REJECTION_ENABLED')){
-        console.log("Checking for PII")
-        console.log("Request--" + JSON.stringify(req))
+        qnabot.log("Checking for PII")
+        qnabot.log("Request--" + JSON.stringify(req))
         if(_.get(req,"_settings.PII_REJECTION_QUESTION")){
             if(await isPIIDetected(req.question,
                 _.get(req,"_settings.PII_REJECTION_WITH_COMPREHEND"), 
                 _.get(req,"_settings.PII_REJECTION_REGEX"),
                 _.get(req,"_settings.PII_REJECTION_IGNORE_TYPES"))){
-                console.log("Found PII or REGEX Match - setting question to PII_REJECTION_QUESTION") ;
+                qnabot.log("Found PII or REGEX Match - setting question to PII_REJECTION_QUESTION") ;
                 req.question = _.get(req, '_settings.PII_REJECTION_QUESTION') ;
             }
         }
     }else{
-        console.log("Not checking for PII " + _.get(req,'_settings.PII_REJECTION_ENABLED'));
+        qnabot.log("Not checking for PII " + _.get(req,'_settings.PII_REJECTION_ENABLED'));
     }
 
     // Add _userInfo to req, from UsersTable
     // TODO Will need to rework logic if/when we link userid across clients (SMS,WebUI,Alexa)
-    console.log("userid found",idattrs["cognito:username"],idattrs["verifiedIdentity"])
+    qnabot.log("userid found",idattrs["cognito:username"],idattrs["verifiedIdentity"])
     var userId = idattrs["cognito:username"] && idattrs["verifiedIdentity"] == "true" ? idattrs["cognito:username"] : req._userId;
     var req_userInfo = await get_userInfo(userId, idattrs);
     _.set(req,"_userInfo", req_userInfo);
@@ -190,7 +191,7 @@ module.exports=async function preprocess(req,res){
     // by default, remove tokens from session event to prevent accidental logging of token values
     // to keep tokens, create custom setting "REMOVE_ID_TOKENS_FROM_SESSION" and set to "false"
     if (_.get(req, '_settings.REMOVE_ID_TOKENS_FROM_SESSION',true)) {
-        console.log("Removing id tokens from session event: idtokenjwt, accesstokenjwt, refreshtoken") ;
+        qnabot.log("Removing id tokens from session event: idtokenjwt, accesstokenjwt, refreshtoken") ;
         delete req.session.idtokenjwt ;
         delete req.session.accesstokenjwt ;
         delete req.session.refreshtoken ;

@@ -93,7 +93,8 @@ module.exports = {
       },
       "Layers":[{"Ref":"AwsSdkLayerLambdaLayer"},
                 {"Ref":"CommonModulesLambdaLayer"},
-                {"Ref":"EsProxyLambdaLayer"}],
+                {"Ref":"EsProxyLambdaLayer"},
+                {"Ref":"QnABotCommonLambdaLayer"}],
       "Tags": {
         "Type": "Fulfillment"
       }
