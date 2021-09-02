@@ -244,7 +244,8 @@ module.exports={
         },
         "Layers":[{"Ref":"AwsSdkLayerLambdaLayer"},
                   {"Ref":"CommonModulesLambdaLayer"},
-                  {"Ref":"EsProxyLambdaLayer"}],
+                  {"Ref":"EsProxyLambdaLayer"},
+                  {"Ref":"QnABotCommonLambdaLayer"}],
         "Environment": {
           "Variables": {
             ES_TYPE:{"Fn::GetAtt":["Var","QnAType"]},

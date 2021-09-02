@@ -6,6 +6,8 @@ var url=require('url')
 var _=require('lodash')
 var myCredentials = new aws.EnvironmentCredentials('AWS'); 
 var request=require('./request')
+const qnabot = require("/opt/lib/logging")
+
 
 function processKeysForRegEx(obj, re) {
     Object.keys(obj).forEach(function(key,index) {
@@ -53,17 +55,17 @@ module.exports=function(event, context, callback){
     let cloudwatchLoggingDisabled = _.get(req, '_settings.DISABLE_CLOUDWATCH_LOGGING');
 
     if (cloudwatchLoggingDisabled) {
-        console.log("RESULT", "cloudwatch logging disabled");
+        qnabot.log("RESULT", "cloudwatch logging disabled");
     } else {
         if (redactEnabled) {
-            console.log("redact enabled");
+            qnabot.log("redact enabled");
             let re = new RegExp(redactRegex, "g");
             processKeysForRegEx(req, re);
             processKeysForRegEx(res, re);
             processKeysForRegEx(sessionAttributes, re);
-            console.log("RESULT", JSON.stringify(event).replace(re, 'XXXXX'));
+            qnabot.log("RESULT", JSON.stringify(event).replace(re, 'XXXXX'));
         } else {
-            console.log("RESULT", JSON.stringify(event));
+            qnabot.log("RESULT", JSON.stringify(event));
         }
     }
 
@@ -97,8 +99,8 @@ module.exports=function(event, context, callback){
     }
     
     firehose.putRecord(params, function(err, data) {
-      if (err) console.log(err, err.stack) // an error occurred
-      else     console.log(data)          // successful response
+      if (err) qnabot.log(err, err.stack) // an error occurred
+      else     qnabot.log(data)          // successful response
     })
    
 }

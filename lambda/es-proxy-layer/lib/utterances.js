@@ -15,6 +15,8 @@ const AWS = require('./aws.js');
 const myCredentials = new AWS.EnvironmentCredentials('AWS');
 const _=require('lodash')
 const s3=new AWS.S3()
+const qnabot = require("/opt/lib/logging")
+
 
 
 var con=_.memoize(function(esAddress){
@@ -73,14 +75,14 @@ module.exports=async function(event,context,callback){
         const s3_utterances=s3.getObject({
             Bucket:process.env.UTTERANCE_BUCKET,
             Key:process.env.UTTERANCE_KEY
-        }).promise().tap(console.log).then(x=>JSON.parse(x.Body.toString()))
+        }).promise().tap(qnabot.log).then(x=>JSON.parse(x.Body.toString()))
     
         return Promise.join(es_utterances,s3_utterances)
         .then(utterances=>{
             return {utterances:_.compact(_.uniq(_.flatten(utterances)))}
         })
     }catch(e){
-        console.log(e)
+        qnabot.log(e)
         callback(e)
     }
 }
