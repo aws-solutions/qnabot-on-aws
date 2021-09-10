@@ -1,13 +1,20 @@
-## [4.7.3]
+# Change Log
+
+All notable changes to this project will be documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [4.7.3] - 2021-08-04
 - The QnABot fulfillment Lambda function can now be configured for provisioned concurrency to further improve query
   response times after periods of inactivity.
 - Bug fix for proper invocation of ESWarmer lambda
 - Bug fix to resolve sporadic API Compression CloudFormation exception
-## [4.7.2]
+## [4.7.2] - 2021-07-08
 - Bug fix "TypeError: AWS.LexRuntimeV2 is not a constructor" when using Lex V2 based Elicit Response Bots.
 - Bug fix "Cannot read property 'buttons' of undefined" when no buttons specified in response card.
 - Bug fix Protect against TypeError exception while processing fallback intent case for an invalid response provided to a LexV2 Response Bot. 
-## [4.7.1]
+## [4.7.1] - 2021-07-03
 - Amazon Elasticsearch version 7.10 is now utilized.
 - Encrypted Elasticsearch (production) instance types now use m6g.large.elasticsearch for improved price/performance/memory.
 - The QnABot fulfillment Lambda function has been optimized to reduce query response times and variability,
@@ -16,7 +23,7 @@
 - Custom settings can now be exported and imported from the Content Designer Settings page.
 - Bug fix when ES_SCORE_ANSWER_FIELD is set to true. Prior to this fix, answer fields were not
   utilized fully in Elasticsearch queries.
-## [4.7.0]
+## [4.7.0] - 2021-06-06
 - QnABot now supports LexV2 with voice interaction in multiple languages.
   - Two installation/update modes are now available:
     - (i) LexV1 + LexV2 (default, recommended for most AWS regions.
@@ -34,13 +41,13 @@
 - Content Designer's Import feature now supports Excel spreadsheets as well as the existing JSON format.
 - QnABot's Elasticsearch cache is now automatically kept warm to improve query time consistency.
 - Negative feedback (thumbs down) messages can now generate notifications (text, email, etc.) using Amazon SNS.
-## [4.5.2]
+## [4.5.2] - 2021-04-08
 - Fix for new Kendra resources deployed in VPC addressing issues in 4.5.0 and 4.5.1.
-## [4.5.1]
+## [4.5.1] - 2021-03-15
 - Fix for incorrect Thumbs Up / Thumbs Down processing in 4.5.0.
 - Fix for multi-language support when manually switching languages in 4.5.0.
 - Improve formatting of markdown responses from Kendra ANSWER responses.
-## [4.5.0]
+## [4.5.0] - 2021-03-07
 - Added single click deployment support for four additional regions
 - Changed unencrypted Amazon Elasticsearch instance types to be t3.small.elasticsearch
 - Changed default number of nodes for Amazon Elasticsearch cluster to 4 for better production level
@@ -55,25 +62,25 @@
 - Improved support when contractions are used in utterances
 - Kendra Fallback message prefixes are now configurable in QnABot settings.
 - Fixed bugs and defects
-## [4.4.1]
+## [4.4.1] - 2020-12-29
 - Fix for Designer UI from breaking change in highlight.js due to dependabot alert / change.
-- Added support for setting 'profile' as an identity attribute from cognito federation. 
+- Added support for setting 'profile' as an identity attribute from cognito federation.
 - Fix syntax error introduced in 4.4.0 QNAPin and QNAPinNoConfirm bots that prevents updates from succeeding.
-## [4.4.0]
+## [4.4.0] - 2020-12-24
 - Preview VPC support - [readme](./VPCSupportREADME.md)
 - Preview BotRouter support - [read](./BotRoutingREADME.md)
 - Upgrade to Elasticsearch service version 7.9
 - Slack client support via Lex with Slack specific markdown support
 - Added support for Alexa re-prompt functionality
 - Bug fixes and defect enhancements
-## [4.3.2]
+## [4.3.2] - 2020-11-09
 - Bug fixes for Kendra FAQ integration 
 - Support lengthy answer definition for Kendra FAQ
 - Check of FAQ deletion in Kendra when FAQ content is being resynced
 - Support multiple responses when using Test in content designer with Kendra FAQ enabled
 - Fix for exception - "Cannot convert undefined or null to object" when Session Attributes are no provided during Lex input. https://github.com/aws-samples/aws-ai-qna-bot/issues/229
 - Package version updates to address current github dependabot alerts
-## [4.3.0]
+## [4.3.0] - 2020-09-21
 - New Connect Wizard available in the Content Designer UI to assist integration with a Connect Contact Flow.
 - New 4-node Elasticsearch domain support for improved fault tolerance in deployment template.
 - Elicit Response bot support for confirmation responses using phone keypad 1 = yes 2 = no.
@@ -81,16 +88,16 @@
 - ID token values removed from session event after validation and redacted from logging.
 - Setting to limit the number of Kendra fallback search results.
 - Setting to enable signed URLs for S3 documents in Kendra search results. 
-## [4.2.4]
+## [4.2.4] - 2020-09-03
 - Add CONNECT_IGNORE_WORDS to settings which allows single character words to be ignored during input to QnABot via Connect. Default is empty string but can be set to an array such as "a,e" such that single character inputTranscript uses the Connect Error branch in Get customer input.
 - Display Kendra document names as the URL and add ability to generate Signed S3 URLs for Kendra document integration. Uses new setting named ALT_SEARCH_KENDRA_S3_SIGNED_URLS. Set this to true to convert Kendra based S3 document URLs to signed urls allowing access.
 - Expose session attributes in the res object as an object such that they are usable in Kibana UI.
 - Fix to ensure a "Test" invocation, when using a topic, always uses ElasticSearch to perform the query. 
-## [4.2.2]
+## [4.2.2] - 2020-08-28
 - Fix KendraFallback Lambda Function lodash dependency
-## [4.2.1]
+## [4.2.1] - 2020-08-25
 - Return Error if Lex inputTranscript is an empty string or not present. Processing an empty inputTranscript produces other downstream failure.
-## [4.2.0]
+## [4.2.0] - 2020-08-24
 - New Kendra FAQ support (Beta version) using the setting KENDRA_FAQ_INDEX. New menu item in Designer UI to export Questions as a Kendra FAQ. See revised Blog Post for details.
 - New GetSessionAttribute Handlebars helper to obtain session attribute. Works similar to lodash get(). Will not through exception and will return a default value.
 - Enhanced handlebars to support string concatenation including handlevar 'variables' like Session Attributes and UserInfo, etc. Use case, e.g. to build a url containing a users email, eg a google calendar URL. Example of syntax now supported - in this case to dynamically build a personalized URL based on user info. {{setSessionAttr 'link' 'https://calendar.google.com/calendar/embed?src=' UserInfo.Email '&ctz=America%2FNew_York'}}
@@ -102,7 +109,7 @@
 - Fixed a defect to allow conditional chaining to be invoked after an elicit response bot failure.
 - Upgrades to and installs ElasticSearch 7.7.
 
-## [4.1.0]
+## [4.1.0] - 2020-08-02
 - Install / Upgrade now supports the option to configure S3 Buckets and Elastic Search cluster using encryption at rest
 - Install / Upgrade now supports the option to require Cognito based user authorization to access the built-in full screen web UI (Public/Private parameter in template) - Public is the default
 - Added two settings parameters to enforce user identity verification check, so that bot can be secured for use by authenticated users only
@@ -121,7 +128,7 @@
 - Resolved additional dependabot identified security issues with dependent packages
 - Fixed lambda/fulfillment unit tests
 - Fixed defect where response bot was not triggered on next question when using lambda function for conditional chaining 
-## [4.0.0]
+## [4.0.0] - 2020-06-04
 - Update to Elasticsearch 7.4
 - Update to 0.16.0 of embedded lex-web-ui
 - Fix to redacting feature with respect to kibana metrics
@@ -136,26 +143,27 @@
 - Disable response card titles in embedded lex-web-ui
 - Added region launch links to README
 - Fix to language responses in Language extension. Added mapping of 'Chinese' to use 'Simplified Chinese'
-## [3.0.3]
+## [3.0.3] - 2020-04-26
 - Enhanced CFN lex create/update to identify and use versions of the Bot externally created
 - Added content tuning Readme
-## [3.0.0 - 3.0.2]
+## [3.0.2] - 2020-04-22
+- The following are changes for releases 3.0.0 to 3.0.2
 - Improved scale using Lex versions and aliases
 - Elicit Response Bots allowing QnABot to ask its own questions
 - Conditional chaining to jump to other items based on user answers
 - New Connect Callback example bot and questions
 - New launch regions to install QnABot in eu-west-1, ap-southeast-2, us-west-2
 - Editable settings
-## [2.6.0]
+## [2.6.0] - 2019-12-31
 - Fix for the Next/Previous sample functions when the next or previous questions reference a lambda hook
 - Update handlebars in extensions / samples to use version ^4.3.0
 - Addition of Kendra Fallback feature
-## [2.5.0]
+## [2.5.0] - 2019-11-26
 - IAM Policy updates
 - Update of default utterances for Alexa
 - Change to NodeJS 10.X for Lambdas
 - Updated reInvent2019 workshop
-## [2.4.0]
+## [2.4.0] - 2019-10-16
 - added use of SSM Parameter store to hold default configuration settings
 - added use of use of Comprehend for better selection of appropriate answer 
 - added use of AMAZON.Fallback intent
@@ -168,9 +176,9 @@
 - updates to npm module versions
 - added newline to separate records injected to firehose
 - improved accuracy by adding use of AWS Comprehend to identify nouns and verbs to confirm in identified question whose answer is being returned
-## [2.3.0]
+## [2.3.0] - 2019-05-01
 - upgraded to nodejs 8.10
-## [2.1.0]
+## [2.1.0] - 2018-05-31
 ### fixed
 - issue in stack name namespacing with different profiles
 
@@ -183,11 +191,11 @@
 - examples are in a nested template
 - support for IE11 and Edge for client page
 
-## [2.0.1]
-## fixed
+## [2.0.1] - 2018-05-31
+### fixed
 - serviceCreateRole issue in  CNFLambda when creating lex bots
+## [2.0.0] - 2018-05-04
 
-## [2.0.0]
 ### fixed
 - QnABot is now a single template
 
@@ -205,11 +213,11 @@
 - link parsing
 - cloudfront distributions
 
-## [1.1]
+## [1.1] - 2018-01-05
 ### fixed
 - spelling in documentation
 - small bugs
 
-## [1.0]
+## [1.0] - 2017-11-06
 ### Added 
 - initial
