@@ -51,7 +51,7 @@ if (require.main === module) {
         })
         .parse(process.argv)
 
-    var options=argv
+    const options = argv.opts();
     var stack=!options.input ? options.args[0] : options.input.split('/')
         .reverse()
         .filter(x=>x)
