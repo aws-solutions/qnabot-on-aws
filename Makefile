@@ -7,10 +7,13 @@ build: All
 make_directories:
 	mkdir -p build; mkdir -p build/lambda; mkdir -p build/templates/test;mkdir -p build/templates;mkdir -p build/documents; mkdir -p build/templates/dev
 
-.PHONY: lambda templates upload website test bootstrap assets
+.PHONY: lambda templates upload website test bootstrap assets config.aws-solutions.json
 
 config.json:
 	node bin/config.js > config.json
+
+config.aws-solutions.json:
+	node bin/config.js buildType=AWSSolutions > config.json
 
 lambda:  make_directories
 	make -C ./lambda

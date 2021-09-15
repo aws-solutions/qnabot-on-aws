@@ -76,7 +76,7 @@ module.exports=Promise.resolve(require('../master')).then(function(base){
                 },
                 {
                    "Label": {
-                        "default": "Amazon ElasticSearch"
+                        "default": "Amazon OpenSearch Service"
                    },
                    "Parameters": [
                         "ElasticSearchNodeCount",
@@ -104,10 +104,24 @@ module.exports=Promise.resolve(require('../master')).then(function(base){
     base.Conditions.DontCreateDomain={"Fn::Equals":[true,false]}
     base.Conditions.VPCEnabled={"Fn::Equals":[true,false]}
 
-    var out=JSON.stringify(base).replace(
-        /{"Ref":"BootstrapBucket"}/g,
-        '"'+config.publicBucket+'"')
-    
+    var out=JSON.stringify(base);
+
+    if(config.buildType == 'AWSSolutions') {
+        out=out.replace(
+            /{"Ref":"BootstrapBucket"}/g,
+            '{"Fn::Sub": "'+config.publicBucket+'-${AWS::Region}"}');
+        out=out.replace(
+            /\${BootstrapBucket}/g,
+            ''+config.publicBucket+'-${AWS::Region}');
+    } else {
+        out=out.replace(
+            /{"Ref":"BootstrapBucket"}/g,
+            '"'+config.publicBucket+'"');
+        out=out.replace(
+            /\${BootstrapBucket}/g,
+            ''+config.publicBucket+'');
+    }
+
     out=out.replace(
         /{"Ref":"ElasticsearchName"}/g,
         '"EMPTY"')
@@ -119,10 +133,6 @@ module.exports=Promise.resolve(require('../master')).then(function(base){
     out=out.replace(
         /\${BootstrapPrefix}/g,
         ''+config.publicPrefix+'')
-
-    out=out.replace(
-        /\${BootstrapBucket}/g,
-        ''+config.publicBucket+'')
 
     out=out.replace(
         /{"Ref":"BootstrapPrefix"}/g,
