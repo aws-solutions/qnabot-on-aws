@@ -70,3 +70,7 @@ config.json
 
 .vscode/launch.json
 utilities/migration.md
+
+# Temporary folders
+tmp/
+temp/

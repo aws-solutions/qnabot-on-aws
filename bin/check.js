@@ -46,22 +46,29 @@ async function run(stack,options={}){
         .filter(x=>x)
         .slice(0,2)
         .reverse().join('-').split('.')[0]
-    
-    var template=await fs.readFileSync(options.file || `${__dirname}/../build/templates/${stack}.json`,'utf8')
-    console.log('resources: '+Object.keys(JSON.parse(template).Resources).length)
-    if(Buffer.byteLength(template)>51200){
-        var exp=await bootstrap()
-        var Bucket=exp.Bucket
-        var prefix=exp.Prefix
-        var Key=`${prefix}/templates/${stack}.json`
-        var TemplateURL=`http://${Bucket}.s3.${region}.amazonaws.com/${Key}`
-        console.log(TemplateURL)
-        await s3.putObject({Bucket,Key,Body:template}).promise()
-        return cf.validateTemplate({TemplateURL}).promise()
-    }else{
-        return cf.validateTemplate({
-            TemplateBody:template
-        }).promise()
+
+    if (config.skipCheckTemplate) {
+        console.log('Skipping check for CFN tempalate');
+        return new Promise((resolve, reject) => {
+            resolve([]);
+        });
+    } else {
+        var template=await fs.readFileSync(options.file || `${__dirname}/../build/templates/${stack}.json`,'utf8')
+        console.log('resources: '+Object.keys(JSON.parse(template).Resources).length)
+        if(Buffer.byteLength(template)>51200){
+            var exp=await bootstrap()
+            var Bucket=exp.Bucket
+            var prefix=exp.Prefix
+            var Key=`${prefix}/templates/${stack}.json`
+            var TemplateURL=`http://${Bucket}.s3.${region}.amazonaws.com/${Key}`
+            console.log(TemplateURL)
+            await s3.putObject({Bucket,Key,Body:template}).promise()
+            return cf.validateTemplate({TemplateURL}).promise()
+        }else{
+            return cf.validateTemplate({
+                TemplateBody:template
+            }).promise()
+        }
     }
 }
 
@@ -70,7 +77,7 @@ async function bootstrap(){
     var tmp=await cf.describeStacks({
         StackName:name("dev/bootstrap",{})
     }).promise()
-    
+
     tmp.Stacks[0].Outputs.forEach(x=>outputs[x.OutputKey]=x.OutputValue)
     return outputs
 }
