@@ -98,7 +98,6 @@ const isPIIDetected = async (text, useComprehendForPII, piiRegex, pii_rejection_
             let entitiesToFilter = comprehendResult.Entities.filter(entity => entity.Score > 0.90 && pii_rejection_ignore_list.indexOf(entity.Type.toLowerCase()) == -1)
             //For now, we *redact* all detected PII from CloudWatch.  We accept any PII for processing that is listed PII_REJECTION_IGNORE_TYPES
 
-            process.env.found_comprehend_pii = comprehendResult.Entities.map(entity => text.slice(entity.BeginOffset, entity.EndOffset))
             return entitiesToFilter.length > 0 || found_redacted_pii;;
 
         } catch (exception) {

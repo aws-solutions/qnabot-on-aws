@@ -4,18 +4,7 @@ module.exports = {
     }
 }
 
-function filter_comprehend_pii(text) {
-    console.log("Running filter comprehend pii")
-    if (!process.env.found_comprehend_pii) {
-        return text
-    }
 
-    let regex = process.env.found_comprehend_pii.split(",").map(pii => `(${pii})`).join("|")
-    let re = new RegExp(regex, "g");
-
-    return text.replace(re, "XXXXXX");
-
-}
 const filter = text => {
 
     console.log("Running filter")
@@ -41,7 +30,7 @@ const filter = text => {
                 let re = new RegExp(process.env.REDACTING_REGEX, "g");
                 text = text.replace(re, "XXXXXX");
             }
-            text = filter_comprehend_pii(text)        }
+        }
     }
     return text
 };
