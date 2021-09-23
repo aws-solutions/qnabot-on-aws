@@ -439,9 +439,11 @@ module.exports = Object.assign(
           ],
         },
         Path: "/",
-        "Policies": [util.basicLambdaExecutionPolicy()],
-        ManagedPolicyArns: [// TODO: update aws managed policies
-          "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole",
+        "Policies": [
+          util.basicLambdaExecutionPolicy(),
+          util.lambdaVPCAccessExecutionRole()
+        ],
+        ManagedPolicyArns: [
           {Ref: "TranslatePolicy"},
         ],
       },
@@ -871,9 +873,11 @@ module.exports = Object.assign(
           ],
         },
         Path: "/",
-        "Policies": [util.basicLambdaExecutionPolicy()],
-        ManagedPolicyArns: [// TODO: update aws managed policies
-          "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole",
+        "Policies": [
+          util.basicLambdaExecutionPolicy(),
+          util.lambdaVPCAccessExecutionRole()
+        ],
+        ManagedPolicyArns: [
           {Ref: "KendraCrawlerPolicy"},
         ],
       },
@@ -1008,9 +1012,11 @@ module.exports = Object.assign(
           ],
         },
         Path: "/",
-        "Policies": [util.basicLambdaExecutionPolicy()],
-        ManagedPolicyArns: [// TODO: update aws managed policies
-          "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole",
+        "Policies": [
+          util.basicLambdaExecutionPolicy(),
+          util.lambdaVPCAccessExecutionRole()
+        ],
+        ManagedPolicyArns: [
           {Ref: "KendraCrawlerCWRuleUpdaterrRolePolicy"},
         ],
       },
