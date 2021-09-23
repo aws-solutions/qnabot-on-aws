@@ -6,7 +6,7 @@ var examples = _.fromPairs(require('../examples/outputs')
   .map(x => {
     return [x, { "Fn::GetAtt": ["ExamplesStack", `Outputs.${x}`] }];
   }));
-  
+
 module.exports={
     "ESProxyCodeVersion":{
         "Type": "Custom::S3Version",
@@ -68,7 +68,7 @@ module.exports={
             "S3ObjectVersion":{"Ref":"ESProxyCodeVersion"}
         },
         "Layers":[{"Ref":"AwsSdkLayerLambdaLayer"},
-                  {"Ref":"CommonModulesLambdaLayer"}, 
+                  {"Ref":"CommonModulesLambdaLayer"},
                   {"Ref":"EsProxyLambdaLayer"}],
         "Environment": {
           "Variables": {
@@ -318,7 +318,7 @@ module.exports={
           		}]
           	}
           },
-          { 
+          {
             "PolicyName" : "S3QNABucketReadAccess",
             "PolicyDocument" : {
             "Version": "2012-10-17",
@@ -327,7 +327,7 @@ module.exports={
                     "Effect": "Allow",
                     "Action": [
                         "s3:GetObject"
-                     ],   
+                     ],
                     "Resource": [
                         "arn:aws:s3:::QNA*/*",
                         "arn:aws:s3:::qna*/*"

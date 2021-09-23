@@ -1,7 +1,7 @@
 const util = require('../../util');
 
 var properties={
-    
+
     "ElasticsearchClusterConfig": {
        "DedicatedMasterEnabled": false,
        "InstanceCount": {"Ref":"ElasticSearchNodeCount"},
@@ -42,7 +42,7 @@ module.exports={
         "Type": "AWS::Elasticsearch::Domain",
         "DependsOn":["PreUpgradeExport"],
         "Condition":"CreateDomain",
-        "Properties":properties 
+        "Properties":properties
     },
     "ElasticsearchDomainUpdate": {
          "Type": "Custom::ElasticSearchUpdate",

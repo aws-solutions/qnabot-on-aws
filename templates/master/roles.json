@@ -50,13 +50,13 @@
               "Version": "2012-10-17",
               "Statement": [{
                   "Effect": "Allow",
-                  "Action": [   
+                  "Action": [
                     "es:ESHttp*"
                   ],
                   "Resource": [{"Fn::GetAtt":["ESVar","ESArn"]}]
                 },{
                   "Effect": "Allow",
-                  "Action": [   
+                  "Action": [
                     "execute-api:*"
                   ],
                   "Resource": [{"Fn::Sub":
@@ -64,7 +64,7 @@
                     }]
                 },{
                   "Effect": "Allow",
-                  "Action": [   
+                  "Action": [
                     "s3:PutObject"
                   ],
                   "Resource": [{"Fn::Sub":
@@ -75,7 +75,7 @@
                     }]
                 },{
                   "Effect": "Allow",
-                  "Action": [   
+                  "Action": [
                     "s3:GetObject"
                   ],
                   "Resource": [{"Fn::Sub":
@@ -176,7 +176,8 @@
             "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole",
             "arn:aws:iam::aws:policy/AWSXRayDaemonWriteAccess"
         ],
-        "Policies":[{
+          "Policies":[
+            {
               "PolicyDocument": {
                   "Statement": [
                   {
@@ -212,7 +213,7 @@
               },
               "PolicyName": "LambdaFunctionServiceRolePolicy"
             },{
-            "PolicyName":"access", 
+            "PolicyName":"access",
             "PolicyDocument": {
                 "Version": "2012-10-17",
                 "Statement": [{
@@ -247,14 +248,14 @@
                 },
                 {
                   "Effect": "Allow",
-                  "Action": [   
+                  "Action": [
                     "apigateway:*"
                   ],
                   "Resource": ["*"]
                 },
                 {
                   "Effect": "Allow",
-                  "Action": [   
+                  "Action": [
                     "cognito-identity:SetIdentityPoolRoles",
                     "cognito-identity:GetIdentityPoolRoles",
                     "iam:PassRole",

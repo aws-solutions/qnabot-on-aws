@@ -32,4 +32,4 @@ module.exports=function(url,resource){
       "Metadata": util.cfnNag(["W59"])
     }
 }
-    
+

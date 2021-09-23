@@ -66,6 +66,6 @@ module.exports={
             "version":{"Ref":"AssetZipVersion"}
         }
     }
-}
+};
 
 

@@ -107,7 +107,7 @@ module.exports={
             "DomainName":{"Fn::GetAtt":["ESVar","ESDomain"]},
             "Roles":{
                 "authenticated":{"Fn::GetAtt":["UserRole","Arn"]},
-                "unauthenticated":{"Fn::GetAtt":["UnauthenticatedRole","Arn"]} 
+                "unauthenticated":{"Fn::GetAtt":["UnauthenticatedRole","Arn"]}
             },
             "RoleMappings":[{
                 "ClientId":{"Fn::GetAtt":["KibanaClient","ClientId"]},
@@ -130,7 +130,7 @@ module.exports={
             "IdentityPoolId":{"Ref":"IdPool"},
             "Roles":{
                 "authenticated":{"Fn::GetAtt":["UserRole","Arn"]},
-                "unauthenticated":{"Fn::GetAtt":["UnauthenticatedRole","Arn"]} 
+                "unauthenticated":{"Fn::GetAtt":["UnauthenticatedRole","Arn"]}
             },
             "RoleMappings":[{
                 "ClientId":{"Ref":"ClientClient"},
@@ -188,7 +188,7 @@ module.exports={
         "Properties": {
             "ServiceToken": { "Fn::GetAtt" : ["CFNLambda", "Arn"] },
             "UserPool":{"Ref":"UserPool"},
-            "DomainName":{"Fn::GetAtt":["ESVar","ESDomain"]} 
+            "DomainName":{"Fn::GetAtt":["ESVar","ESDomain"]}
         }
     },
     "ClientDesigner": {

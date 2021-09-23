@@ -1,6 +1,7 @@
-var fs=require('fs')
-var _=require('lodash')
+var fs=require('fs');
+var _=require('lodash');
 const util = require('../../util');
+
 
 var js=fs.readdirSync(`${__dirname}/js_lambda_hooks`)
 .map(name=> {
@@ -131,7 +132,7 @@ module.exports=Object.assign(
                   "Action": [
         						"kms:Encrypt",
         						"kms:Decrypt",
-        					], 
+        					],
         					"Resource":{"Fn::GetAtt":["QuizKey","Arn"]}
                 },
                 {
@@ -142,7 +143,7 @@ module.exports=Object.assign(
                   "Resource": [
                     {"Fn::Join": ["",["arn:aws:lambda:",{ "Ref" : "AWS::Region" },":",{ "Ref" : "AWS::AccountId" },":function:qna-*"]]},
                     {"Fn::Join": ["",["arn:aws:lambda:",{ "Ref" : "AWS::Region" },":",{ "Ref" : "AWS::AccountId" },":function:QNA-*"]]},
-                    {"Ref":"QIDLambdaArn"} 
+                    {"Ref":"QIDLambdaArn"}
                   ]
                 },
                 {
@@ -167,14 +168,14 @@ module.exports=Object.assign(
                   "Effect": "Allow",
                   "Action": [
                       "lex:PostText"
-                   ],   
+                   ],
                   "Resource": [
                       {"Fn::Join": ["",["arn:aws:lex:",{ "Ref" : "AWS::Region" },":",{ "Ref" : "AWS::AccountId" },":bot:*",":qna*"]]},
                       {"Fn::Join": ["",["arn:aws:lex:",{ "Ref" : "AWS::Region" },":",{ "Ref" : "AWS::AccountId" },":bot:*",":QNA*"]]},
                   ]
               }
             ]
-          }          
+          }
         }],
       },
       "Metadata": util.cfnNagXray()

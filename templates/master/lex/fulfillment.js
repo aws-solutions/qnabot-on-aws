@@ -1,5 +1,5 @@
-var config = require('./config')
-var _ = require('lodash')
+var config = require('./config');
+var _ = require('lodash');
 var crypto = require('crypto')
 var fs = require('fs')
 const util = require('../../util');
@@ -22,7 +22,7 @@ const comboHash = filesToHash.map(x => {
     return crypto.createHash("sha256").update(fileBuffer).digest("hex")
   }).reduce((a,b) => {
     return a + b;
-  }); 
+  });
 const fulfillmentHash =  crypto.createHash("sha256").update(comboHash).digest("hex")
 
 module.exports = {
@@ -32,7 +32,7 @@ module.exports = {
     "Properties": {
       "Action": "lambda:InvokeFunction",
       "FunctionName": {  "Fn::Join": [ ":", [
-        {"Fn::GetAtt":["FulfillmentLambda","Arn"]}, 
+        {"Fn::GetAtt":["FulfillmentLambda","Arn"]},
         "live"
       ]]},
       "Principal": "alexa-appkit.amazon.com"
@@ -236,7 +236,7 @@ module.exports = {
             }]
           }
         },
-        { 
+        {
           "PolicyName" : "S3QNABucketReadAccess",
           "PolicyDocument" : {
           "Version": "2012-10-17",
@@ -245,7 +245,7 @@ module.exports = {
                   "Effect": "Allow",
                   "Action": [
                       "s3:GetObject"
-                   ],   
+                   ],
                   "Resource": [
                       "arn:aws:s3:::QNA*/*",
                       "arn:aws:s3:::qna*/*"
