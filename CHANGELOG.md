@@ -5,24 +5,34 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [5.0.0] - 2021-09-24
+- AWS QnABot release as an AWS Solution Implementation
+  - AWS QnABot now has a [landing page](https://aws.amazon.com/solutions/implementations/aws-qnabot/) and [Implementation Guide](https://docs.aws.amazon.com/solutions/latest/aws-qnabot/welcome.html)
+- Minor changes in IAM scopes to enhance security posture.
+- Bug fixes related to multiple language support
+- Amazon Connect integration wizard now uses Amazon LexV2 bots in all Regions  (no longer requires the 'LexV2 Only' setting to be true.)
+
+
 ## [4.7.3] - 2021-08-04
 - The QnABot fulfillment Lambda function can now be configured for provisioned concurrency to further improve query
   response times after periods of inactivity.
 - Bug fix for proper invocation of ESWarmer lambda
 - Bug fix to resolve sporadic API Compression CloudFormation exception
 ## [4.7.2] - 2021-07-08
+- LexV2 built-in Elicit Response bots have been added.
+- Custom settings can now be exported and imported from the Content Designer Settings page.
 - Bug fix "TypeError: AWS.LexRuntimeV2 is not a constructor" when using Lex V2 based Elicit Response Bots.
 - Bug fix "Cannot read property 'buttons' of undefined" when no buttons specified in response card.
 - Bug fix Protect against TypeError exception while processing fallback intent case for an invalid response provided to a LexV2 Response Bot. 
 ## [4.7.1] - 2021-07-03
-- Amazon Elasticsearch version 7.10 is now utilized.
-- Encrypted Elasticsearch (production) instance types now use m6g.large.elasticsearch for improved price/performance/memory.
+- Amazon Elasticsearch Service (succeeded by Amazon OpenSearch Service) version 7.10 is now utilized.
+- Encrypted Amazon Elasticsearch Service (production) instance types now use m6g.large.elasticsearch for improved price/performance/memory.
 - The QnABot fulfillment Lambda function has been optimized to reduce query response times and variability,
   especially after periods of inactivity.
 - LexV2 built-in Elicit Response bots have been added.
 - Custom settings can now be exported and imported from the Content Designer Settings page.
 - Bug fix when ES_SCORE_ANSWER_FIELD is set to true. Prior to this fix, answer fields were not
-  utilized fully in Elasticsearch queries.
+  utilized fully in Amazon Elasticsearch Service queries.
 ## [4.7.0] - 2021-06-06
 - QnABot now supports LexV2 with voice interaction in multiple languages.
   - Two installation/update modes are now available:
@@ -39,8 +49,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Content Designer's "Rebuild Lex Bot" feature now rebuilds both LexV2 and LexV1 bots
 - Non-English LexV2 bot locales are automatically generated with sample utterances translated from English questions using Amazon Translate.
 - Content Designer's Import feature now supports Excel spreadsheets as well as the existing JSON format.
-- QnABot's Elasticsearch cache is now automatically kept warm to improve query time consistency.
+- QnABot's Amazon Elasticsearch Service (succeeded by Amazon OpenSearch Service) cache is now automatically kept warm to improve query time consistency.
 - Negative feedback (thumbs down) messages can now generate notifications (text, email, etc.) using Amazon SNS.
+
+## [4.6.0] - 2021-04-30
+- Kendra integration is now fully automated during install or update when the new default Kendra Index ID parameter is provided.
+- Kendra custom no_hits item required in earlier releases is no longer required to turn on Kendra Fallback and should be removed, configurable confidence thresholds now available for filtering Kendra results.
+- Kibana dashboard now shows additional detail on questions answered via Kendra FAQ and Kendra Fallback.
+- Standard markdown is now automatically converted to Slack markdown when using Slack, Kibana dashboard logs and metrics retention period is now configurable during install or update, Lambda runtime upgraded to Node.js 12.x.
+- Two new settings have been added
+
+  - ALT_SEARCH_KENDRA_FALLBACK_CONFIDENCE_SCORE - Answers will only be returned at or above the specified [confidence level](https://aws.amazon.com/about-aws/whats-new/2020/09/amazon-kendra-launches-confidence-scores/) when using Kendra Fallback.
+  - ALT_SEARCH_KENDRA_FAQ_CONFIDENCE_SCORE - Synchronized FAQ questions will only be matched to an Amazon Elasticsearch Service (succeeded by Amazon OpenSearch Service) question if the Kendra FAQ  confidence level is at or above the specified confidence level.
 ## [4.5.2] - 2021-04-08
 - Fix for new Kendra resources deployed in VPC addressing issues in 4.5.0 and 4.5.1.
 ## [4.5.1] - 2021-03-15
@@ -49,8 +69,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Improve formatting of markdown responses from Kendra ANSWER responses.
 ## [4.5.0] - 2021-03-07
 - Added single click deployment support for four additional regions
-- Changed unencrypted Amazon Elasticsearch instance types to be t3.small.elasticsearch
-- Changed default number of nodes for Amazon Elasticsearch cluster to 4 for better production level
+- Changed unencrypted Amazon Elasticsearch Service (succeeded by Amazon OpenSearch Service) instance types to be t3.small.elasticsearch
+- Changed default number of nodes for Amazon Elasticsearch Service cluster to 4 for better production level
   cluster performance and resiliency. This can be changed to 2 for development clusters if desired.
 - Added Personal Identifiable Information detection support using Amazon Comprehend - [readme](./docs/PII_Detection/README.md)
 - Added web indexing support using Amazon Kendra  - [readme](./docs/kendra_crawler_guide/README.md)
@@ -62,6 +82,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Improved support when contractions are used in utterances
 - Kendra Fallback message prefixes are now configurable in QnABot settings.
 - Fixed bugs and defects
+- To improve performance, resiliency, and security, the Amazon Elasticsearch Service cluster will default to using ENCRYPTED nodes
+  using the c5.large.elasticsearch instance type. If UNENCRYPTED is selected, the
+  t3.small.elasticsearch instance types will be used. The default number of nodes in a new cluster is now 4 for improved
+  resiliency. The number of cluster nodes can be reduced to 2 for development environments
+  if desired.
+- QnABot distribution Regions now available for one click deployment have increased to 8 regions. These are Northern Virginia (us-east-1), Oregon (us-west-2),  Ireland (eu-west-1), London (eu-west-2), Frankfurt (eu-central-1), Sydney (ap-southeast-2), Singapore (ap-southeast-1), and Tokyo (ap-northeast-1).
 ## [4.4.1] - 2020-12-29
 - Fix for Designer UI from breaking change in highlight.js due to dependabot alert / change.
 - Added support for setting 'profile' as an identity attribute from cognito federation.
@@ -69,7 +95,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [4.4.0] - 2020-12-24
 - Preview VPC support - [readme](./VPCSupportREADME.md)
 - Preview BotRouter support - [read](./BotRoutingREADME.md)
-- Upgrade to Elasticsearch service version 7.9
+- Upgrade to Amazon Elasticsearch Service (succeeded by Amazon OpenSearch Service) version 7.9
 - Slack client support via Lex with Slack specific markdown support
 - Added support for Alexa re-prompt functionality
 - Bug fixes and defect enhancements
@@ -82,17 +108,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Package version updates to address current github dependabot alerts
 ## [4.3.0] - 2020-09-21
 - New Connect Wizard available in the Content Designer UI to assist integration with a Connect Contact Flow.
-- New 4-node Elasticsearch domain support for improved fault tolerance in deployment template.
+- New 4-node Amazon Elasticsearch Service (succeeded by Amazon OpenSearch Service) domain support for improved fault tolerance in deployment template.
 - Elicit Response bot support for confirmation responses using phone keypad 1 = yes 2 = no.
 - Security improvements in API Gateway.
 - ID token values removed from session event after validation and redacted from logging.
 - Setting to limit the number of Kendra fallback search results.
-- Setting to enable signed URLs for S3 documents in Kendra search results. 
+- Setting to allow signed URLs for S3 documents in Kendra search results.
 ## [4.2.4] - 2020-09-03
 - Add CONNECT_IGNORE_WORDS to settings which allows single character words to be ignored during input to QnABot via Connect. Default is empty string but can be set to an array such as "a,e" such that single character inputTranscript uses the Connect Error branch in Get customer input.
 - Display Kendra document names as the URL and add ability to generate Signed S3 URLs for Kendra document integration. Uses new setting named ALT_SEARCH_KENDRA_S3_SIGNED_URLS. Set this to true to convert Kendra based S3 document URLs to signed urls allowing access.
 - Expose session attributes in the res object as an object such that they are usable in Kibana UI.
-- Fix to ensure a "Test" invocation, when using a topic, always uses ElasticSearch to perform the query. 
+- Fix to ensure a "Test" invocation, when using a topic, always uses Amazon Elasticsearch Service (succeeded by Amazon OpenSearch Service) to perform the query.
 ## [4.2.2] - 2020-08-28
 - Fix KendraFallback Lambda Function lodash dependency
 ## [4.2.1] - 2020-08-25
@@ -104,13 +130,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Moved 'previous' and 'navigation' session attributes under a new 'qnabotcontext' session attribute so that Connect (and other) clients have fewer session attributes to preserve.
 - Allows Chaining rule Lambda function to return a modified session object in addition to the string for chaining.
 - Allows Chaining of up to 10 documents. Each document's Lambda hooks will also be invoked in sequence if defined.
-- Added a new Repeat QID in the QNAUtility example package. Allows QnABot to easily repeat the last answer.  
+- Added a new Repeat QID in the QNAUtility example package. Allows QnABot to easily repeat the last answer. 
 - Allow the chaining rule to specify a specific QID rather than an answer. A QID can be specified in the chaining rule by using string such as QID::<qid> e.g. QID::Admin.001. Note, the new QID::<qid> syntax can also be used from the webUI, say as button values if/when you prefer to target a specific QID (exact query) rather than rely on question matching.
 - Fixed a defect to allow conditional chaining to be invoked after an elicit response bot failure.
-- Upgrades to and installs ElasticSearch 7.7.
+- Upgrades to and installs Amazon Elasticsearch Service (succeeded by Amazon OpenSearch Service) 7.7.
 
 ## [4.1.0] - 2020-08-02
-- Install / Upgrade now supports the option to configure S3 Buckets and Elastic Search cluster using encryption at rest
+- Install / Upgrade now supports the option to configure S3 Buckets and Amazon Elasticsearch Service (succeeded by Amazon OpenSearch Service) cluster using encryption at rest
 - Install / Upgrade now supports the option to require Cognito based user authorization to access the built-in full screen web UI (Public/Private parameter in template) - Public is the default
 - Added two settings parameters to enforce user identity verification check, so that bot can be secured for use by authenticated users only
     - ENFORCE_VERIFIED_IDENTITY. Default is false. Set to true to make QnABot require verified identity from client
@@ -118,9 +144,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Enhanced Kendra fallback integration to use a specific answer if there is a best answer available and bold face highlighted words from Kendra response
 - Added Comprehend sentiment analysis to all utterances and text captured by the QNAFreeText elicit response bot
 - Enhanced Kibana dashboard to identify Lex client channels - Connect, Web, SMS
-- Improved internal use of Booleans from settings configuration 
-- Enhanced Connect integration 
-    - Added session attribute named "qnabot_qid" that holds the matching question id found in elastic search
+- Improved internal use of Booleans from settings configuration.
+- Enhanced Connect integration
+    - Added session attribute named "qnabot_qid" that holds the matching question id found in Amazon Elasticsearch Service
     - Added session attribute "qnabot_gotanswer" that holds boolean true/fale if an answer was fround
     - Encapsulating all Kendra and Elicit Response Bot session attributes into a single "qnabotcontext" attribute making it easier to store and reset in Connect contact flow
 - Added new QNAYesNoExit elicit response bot which allows a user to exit the YesNoExit question using "exit", "bye", "quit", "admin", "rep","representative","stop", "help", "bye", "goodbye" which sets the Yes_No_Exit slot value / session attribute to "Exit".
@@ -129,7 +155,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed lambda/fulfillment unit tests
 - Fixed defect where response bot was not triggered on next question when using lambda function for conditional chaining 
 ## [4.0.0] - 2020-06-04
-- Update to Elasticsearch 7.4
+- Update to Amazon Elasticsearch Service (succeeded by Amazon OpenSearch Service) 7.4
 - Update to 0.16.0 of embedded lex-web-ui
 - Fix to redacting feature with respect to kibana metrics
 - Fix to CustomNoHits to use configured setting
