@@ -1,6 +1,8 @@
 var fs=require('fs')
 const path = require('path')
 const resplib = path.join(__dirname, '..', '..','lib', 'response.js')
+const util = require('../../util');
+
 module.exports={
   "Resources": {
     "Bucket": {
@@ -14,9 +16,25 @@ module.exports={
                 "Status":"Enabled",
                 "NoncurrentVersionExpirationInDays":1
             }]
+        },
+        "BucketEncryption": {
+          "ServerSideEncryptionConfiguration": [
+            {
+              "ServerSideEncryptionByDefault": {
+                "SSEAlgorithm": "AES256"
+              }
+            }
+          ]
+        },
+        "PublicAccessBlockConfiguration": {
+          "BlockPublicAcls": true,
+          "BlockPublicPolicy": true,
+          "IgnorePublicAcls": true,
+          "RestrictPublicBuckets": true
         }
       }
     },
+    "HTTPSOnlyBucketPolicy": util.httpsOnlyBucketPolicy(),
     "Clear":{
         "Type": "Custom::S3Clear",
         "DependsOn":["CFNLambdaPolicy"],
@@ -36,7 +54,8 @@ module.exports={
         "Role": {"Fn::GetAtt": ["CFNLambdaRole","Arn"]},
         "Runtime": "nodejs12.x",
         "Timeout": 60
-      }
+      },
+      "Metadata": util.cfnNag(["W92"])
     },
     "CFNLambdaRole":{
       "Type": "AWS::IAM::Role",
@@ -53,12 +72,13 @@ module.exports={
             }
           ]
         },
+        "Policies": [util.basicLambdaExecutionPolicy()],
         "Path": "/",
         "ManagedPolicyArns": [
-            "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
             {"Ref":"CFNLambdaPolicy"}
         ]
-      }
+      },
+      "Metadata": util.cfnNag(["W11", "F3"])
     },
     "CFNLambdaPolicy":{
       "Type": "AWS::IAM::ManagedPolicy",
@@ -99,7 +119,6 @@ module.exports={
         }
     }
   },
-  "Conditions": {},
   "AWSTemplateFormatVersion": "2010-09-09",
   "Description": "Bootstrap bucket for QnABot assets",
   "Mappings": {},

@@ -1,6 +1,6 @@
 var fs=require('fs')
 var _=require('lodash')
-var fs=require('fs')
+const util = require('../../util');
 var responsebots=require('./responsebots.js').resources;
 var responsebots_lexv2=require('./responsebots-lexv2.js').resources;
 
@@ -165,7 +165,8 @@ module.exports=Object.assign(
             Key:"Type",
             Value:"CustomResource"
         }]
-      }
+      },
+      "Metadata": util.cfnNag(["W92"])
     },
     "ExampleLambdaRole":{
       "Type": "AWS::IAM::Role",
@@ -183,7 +184,12 @@ module.exports=Object.assign(
           ]
         },
         "Path": "/",
-        "Policies":[{
+        "Policies":[
+          util.basicLambdaExecutionPolicy(),
+          util.lambdaVPCAccessExecutionRole(),
+          util.xrayDaemonWriteAccess(),
+          util.amazonKendraReadOnlyAccess(),
+          {
           "PolicyName" : "LambdaFeedbackFirehoseQNALambda",
           "PolicyDocument" : {
           "Version": "2012-10-17",
@@ -296,13 +302,8 @@ module.exports=Object.assign(
             }
         }
         ],
-        "ManagedPolicyArns": [
-            "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
-            "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole",
-            "arn:aws:iam::aws:policy/AWSXRayDaemonWriteAccess",
-            "arn:aws:iam::aws:policy/AmazonKendraReadOnlyAccess"
-        ]
-      }
+      },
+      "Metadata": util.cfnNagXray()
     }
 })
 function jslambda(name){

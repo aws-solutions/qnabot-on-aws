@@ -1,5 +1,6 @@
 var fs=require('fs')
 var _=require('lodash')
+const util = require('../../util');
 
 module.exports={
     "LexBuildLambda":lambda({
@@ -81,7 +82,12 @@ module.exports={
             }
           ]
         },
-        "Policies":[{
+        "Policies": [
+          util.basicLambdaExecutionPolicy(),
+          util.lambdaVPCAccessExecutionRole(),
+          util.xrayDaemonWriteAccess(),
+          util.lexFullAccess(),
+          {
             PolicyName:"AssetBucketAccess",
             PolicyDocument:{
                 "Version" : "2012-10-17",
@@ -103,13 +109,10 @@ module.exports={
         }],
         "Path": "/",
         "ManagedPolicyArns": [
-          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
-          "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole",
-          "arn:aws:iam::aws:policy/AWSXRayDaemonWriteAccess",
           {"Ref":"QueryPolicy"},
-          "arn:aws:iam::aws:policy/AmazonLexFullAccess"
         ]
-      }
+      },
+      "Metadata": util.cfnNag(["W11", "W12", "W76", "F3"])
     },
     "BuildStatusBucket":{
         "Type" : "AWS::S3::Bucket",
@@ -128,6 +131,12 @@ module.exports={
             "VersioningConfiguration":{
                 "Status":"Enabled"
             },
+            "PublicAccessBlockConfiguration": {
+              "BlockPublicAcls": true,
+              "BlockPublicPolicy": true,
+              "IgnorePublicAcls": true,
+              "RestrictPublicBuckets": true
+            },
             "BucketEncryption": {
                 "Fn::If": [
                     "Encrypted",
@@ -143,6 +152,48 @@ module.exports={
                     }
                 ]
             }
+        },
+        "Metadata": util.cfnNag(["W35"])
+      },
+      "HTTPSOnlyBuildStatusBucketPolicy": {
+        "Type": "AWS::S3::BucketPolicy",
+        "Properties": {
+          "Bucket": {
+            "Ref": "BuildStatusBucket"
+          },
+          "PolicyDocument": {
+            "Statement": [
+              {
+                "Action": "*",
+                "Condition": {
+                  "Bool": {
+                    "aws:SecureTransport": "false"
+                  }
+                },
+                "Effect": "Deny",
+                "Principal": "*",
+                "Resource": {
+                  "Fn::Join": [
+                    "",
+                    [
+                      {
+                        "Fn::GetAtt": [
+                          "BuildStatusBucket",
+                          "Arn"
+                        ]
+                      },
+                      "/*"
+                    ]
+                  ]
+                },
+                "Sid": "HttpsOnly"
+              }
+            ],
+            "Version": "2012-10-17"
+          }
+        },
+        "Metadata": {
+          "aws:cdk:path": "serverless-bot-framework/CloudfrontStaticWebsite/CloudFrontToS3/S3LoggingBucket/Policy/Resource"
         }
     },
     "BuildStatusClear":{
@@ -182,6 +233,7 @@ function lambda(code,variable={},runtime="nodejs12.x"){
             Key:"Type",
             Value:"Api"
         }]
-      }
+      },
+      "Metadata": util.cfnNag(["W92"])
     }
 }

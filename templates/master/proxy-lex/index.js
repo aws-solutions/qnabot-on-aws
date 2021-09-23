@@ -1,4 +1,5 @@
 var fs=require('fs')
+const util = require('../../util');
 
 module.exports={
     "LexProxyLambda": {
@@ -26,7 +27,8 @@ module.exports={
             Key:"Type",
             Value:"Api"
         }]
-      }
+      },
+      "Metadata": util.cfnNag(["W92"])
     },
     "LexStatusLambda": {
       "Type": "AWS::Lambda::Function",
@@ -75,7 +77,8 @@ module.exports={
             Key:"Type",
             Value:"Api"
         }]
-      }
+      },
+      "Metadata": util.cfnNag(["W92"])
     },
     "LexProxyLambdaRole": {
       "Type": "AWS::IAM::Role",
@@ -93,13 +96,12 @@ module.exports={
           ]
         },
         "Path": "/",
-        "ManagedPolicyArns": [
-          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
-          "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole",
-          "arn:aws:iam::aws:policy/AmazonLexFullAccess",
-          "arn:aws:iam::aws:policy/AWSXRayDaemonWriteAccess",
-        ],
-        "Policies":[{
+        "Policies":[
+          util.basicLambdaExecutionPolicy(),
+          util.lambdaVPCAccessExecutionRole(),
+          util.lexFullAccess(),
+          util.xrayDaemonWriteAccess(),
+          {
             "PolicyName":"Access",
             "PolicyDocument": {
               "Version": "2012-10-17",
@@ -112,7 +114,8 @@ module.exports={
               }]
             }
         }]
-      }
+      },
+      "Metadata": util.cfnNag(["W11", "W12", "W76", "F3"])
     }
 }
 

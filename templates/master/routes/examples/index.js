@@ -3,6 +3,7 @@ var resource=require('../util/resource')
 var lambda=require('../util/lambda')
 var mock=require('../util/mock')
 var _=require('lodash')
+const util = require('../../../util');
 
 module.exports={
     "Examples": resource('examples'),
@@ -94,7 +95,8 @@ module.exports={
             Key:"Type",
             Value:"Api"
         }]
-      }
+      },
+      "Metadata": util.cfnNag(["W92"])
     },
     "ExampleS3ListPhotoLambda": {
       "Type": "AWS::Lambda::Function",
@@ -121,7 +123,8 @@ module.exports={
             Key:"Type",
             Value:"Api"
         }]
-      }
+      },
+      "Metadata": util.cfnNag(["W92"])
     }
 }
 

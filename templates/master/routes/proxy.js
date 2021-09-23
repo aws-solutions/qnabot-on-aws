@@ -1,6 +1,7 @@
 var fs=require('fs')
 var resource=require('./util/resource')
 var _=require('lodash')
+const util = require('../../util');
 
 module.exports={
     "Static": resource('static'),
@@ -82,6 +83,7 @@ function proxy(opts){
           {"StatusCode": 404}
         ],
         "RestApiId": {"Ref": "API"}
-      }
+      },
+      "Metadata": util.cfnNag(["W59"])
     }
 }

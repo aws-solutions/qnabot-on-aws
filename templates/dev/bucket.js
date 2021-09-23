@@ -1,4 +1,5 @@
 var outputs=require('../../bin/exports')
+const util = require('../util');
 
 module.exports=outputs('dev/bootstrap')
 .then(function(output){
@@ -11,8 +12,24 @@ module.exports=outputs('dev/bootstrap')
       "Properties": {
         "VersioningConfiguration":{
             "Status":"Enabled"
+        },
+        "BucketEncryption": {
+          "ServerSideEncryptionConfiguration": [
+            {
+              "ServerSideEncryptionByDefault": {
+                "SSEAlgorithm": "AES256"
+              }
+            }
+          ]
+        },
+        "PublicAccessBlockConfiguration": {
+          "BlockPublicAcls": true,
+          "BlockPublicPolicy": true,
+          "IgnorePublicAcls": true,
+          "RestrictPublicBuckets": true
         }
-      }
+      },
+      "Metadata": util.cfnNag(["W35"])
     },
     "Clear":{
         "Type": "Custom::S3Clear",
@@ -37,7 +54,8 @@ module.exports=outputs('dev/bootstrap')
         "Role": {"Fn::GetAtt": ["CFNLambdaRole","Arn"]},
         "Runtime": "nodejs12.x",
         "Timeout": 60
-      }
+      },
+      "Metadata": util.cfnNag(["W92"])
     },
     "CFNLambdaRole":{
       "Type": "AWS::IAM::Role",
@@ -54,12 +72,13 @@ module.exports=outputs('dev/bootstrap')
             }
           ]
         },
+        "Policies": [util.basicLambdaExecutionPolicy()],
         "Path": "/",
         "ManagedPolicyArns": [
-            "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
             {"Ref":"CFNLambdaPolicy"}
         ]
-      }
+      },
+      "Metadata": util.cfnNag(["W11", "F3"])
     },
     "CFNLambdaPolicy":{
       "Type": "AWS::IAM::ManagedPolicy",

@@ -1,4 +1,5 @@
 var _ = require('lodash');
+const util = require('../util');
 
 var examples = _.fromPairs(require('../examples/outputs')
   .names
@@ -55,7 +56,8 @@ module.exports={
             Key:"Type",
             Value:"Service"
         }]
-      }
+      },
+      "Metadata": util.cfnNag(["W92"])
     },
     "ESQidLambda": {
       "Type": "AWS::Lambda::Function",
@@ -96,7 +98,8 @@ module.exports={
             Key:"Type",
             Value:"Service"
         }]
-      }
+      },
+      "Metadata": util.cfnNag(["W92"])
     },
     "ESCleaningLambda": {
       "Type": "AWS::Lambda::Function",
@@ -136,7 +139,8 @@ module.exports={
             Key:"Type",
             Value:"Service"
         }]
-      }
+      },
+      "Metadata": util.cfnNag(["W92"])
     },
     "ScheduledESCleaning": {
       "Type": "AWS::Events::Rule",
@@ -194,7 +198,8 @@ module.exports={
             Key:"Type",
             Value:"Logging"
         }]
-      }
+      },
+      "Metadata": util.cfnNag(["W92"])
     },
     "ESQueryLambda": {
       "Type": "AWS::Lambda::Function",
@@ -232,7 +237,8 @@ module.exports={
             Key:"Type",
             Value:"Query"
         }]
-      }
+      },
+      "Metadata": util.cfnNag(["W92"])
     },
     "ESProxyLambda": {
       "Type": "AWS::Lambda::Function",
@@ -273,7 +279,8 @@ module.exports={
             Key:"Type",
             Value:"Service"
         }]
-      }
+      },
+      "Metadata": util.cfnNag(["W92"])
     },
     "ESProxyLambdaRole": {
       "Type": "AWS::IAM::Role",
@@ -292,14 +299,14 @@ module.exports={
         },
         "Path": "/",
         "ManagedPolicyArns": [
-          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
-          "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole",
-          "arn:aws:iam::aws:policy/AWSXRayDaemonWriteAccess",
-          "arn:aws:iam::aws:policy/TranslateReadOnly",
           {"Ref":"QueryPolicy"},
-          "arn:aws:iam::aws:policy/AmazonLexFullAccess"
         ],
         "Policies": [
+          util.basicLambdaExecutionPolicy(),
+          util.lambdaVPCAccessExecutionRole(),
+          util.xrayDaemonWriteAccess(),
+          util.translateReadOnly(),
+          util.lexFullAccess(),
           {
           	"PolicyName": "ParamStorePolicy",
           	"PolicyDocument": {
@@ -330,7 +337,8 @@ module.exports={
             }
           }
         ]
-      }
+      },
+      "Metadata": util.cfnNag(["W11", "W12", "W76", "F3"])
     },
     "QueryLambdaInvokePolicy": {
       "Type": "AWS::IAM::ManagedPolicy",
@@ -368,7 +376,11 @@ module.exports={
           ]
         },
         "Path": "/",
-        "Policies":[{ 
+        "Policies":[
+          util.basicLambdaExecutionPolicy(),
+          util.lambdaVPCAccessExecutionRole(),
+          util.xrayDaemonWriteAccess(),
+          {
           "PolicyName" : "LambdaGeneralFirehoseQNALambda",
           "PolicyDocument" : {
           "Version": "2012-10-17",
@@ -396,12 +408,8 @@ module.exports={
             ]
           }
         }],
-        "ManagedPolicyArns": [
-          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
-          "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole",
-          "arn:aws:iam::aws:policy/AWSXRayDaemonWriteAccess",
-        ]
-      }
+      },
+      "Metadata": util.cfnNag(["W11", "W12"])
     },
     "QueryPolicy": {
       "Type": "AWS::IAM::ManagedPolicy",
@@ -437,7 +445,8 @@ module.exports={
             }
           ]
         }
-      }
+      },
+      "Metadata": util.cfnNag(["F5", "W13"])
     }
 }
 
