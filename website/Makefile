@@ -8,8 +8,12 @@ dev:$(SOURCES)
 	export NODE_ENV=dev; make build -B
 
 build:
-	../node_modules/.bin/webpack --config ./config/webpack.config.js
+	cd ..
+	npm i webpack-merge -D
+	npx webpack-cli --config ./config/webpack.config.js
 
 test:
-	../node_modules/.bin/webpack --config ./config/test.config.js 
+	cd ..
+	npm i webpack-merge -D
+	npx webpack-cli --config ./config/test.config.js
 
