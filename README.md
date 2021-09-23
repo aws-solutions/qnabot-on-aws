@@ -18,10 +18,10 @@ See the "Getting Started" to launch your own QnABot.
 
 4.7.1 provides performance improvements and component upgrades
   - Amazon Elasticsearch version 7.10 is now utilized.
-  - Encrypted Elasticsearch (production) instance types now use m6g.large.elasticsearch for improved price/performance/memory. 
-  - The QnABot fulfillment Lambda function has been optimized to reduce query response times and variability, 
-    especially after periods of inactivity. 
-  - LexV2 built-in Elicit Response bots have been added. 
+  - Encrypted Elasticsearch (production) instance types now use m6g.large.elasticsearch for improved price/performance/memory.
+  - The QnABot fulfillment Lambda function has been optimized to reduce query response times and variability,
+    especially after periods of inactivity.
+  - LexV2 built-in Elicit Response bots have been added.
   - Custom settings can now be exported and imported from the Content Designer Settings page.
   - Bug fix when ES_SCORE_ANSWER_FIELD is set to true. Prior to this fix, answer fields were not
     utilized fully in Elasticsearch queries.
@@ -30,7 +30,7 @@ See the "Getting Started" to launch your own QnABot.
   - Two installation/update modes are now available:
     - (i) LexV1 + LexV2 (default, recommended for most AWS regions.
     - (ii) LexV2-only (currently recommended for AWS regions where LexV1 is not available).
-  
+
 4.6.0 provides a number of new features described below. Several to call attention to are the following:
 
 - Kendra custom no_hits item required in earlier releases is no longer required to enable Kendra Fallback and should be removed, configurable confidence thresholds now available for filtering Kendra results.
@@ -52,7 +52,7 @@ the upgrade. In this release we expect upgrade to be smooth but just in case you
 - Install npm >7.10.0 and node >12.15.1. ([instructions](https://nodejs.org/en/download/))
 - Clone this repo.
 - Set up an AWS account. ([instructions](https://AWS.amazon.com/free/?sc_channel=PS&sc_campaign=acquisition_US&sc_publisher=google&sc_medium=cloud_computing_b&sc_content=AWS_account_bmm_control_q32016&sc_detail=%2BAWS%20%2Baccount&sc_category=cloud_computing&sc_segment=102882724242&sc_matchtype=b&sc_country=US&s_kwcid=AL!4422!3!102882724242!b!!g!!%2BAWS%20%2Baccount&ef_id=WS3s1AAAAJur-Oj2:20170825145941:s))
-- Configure AWS CLI and a local credentials file. ([instructions](http://docs.AWS.amazon.com/cli/latest/userguide/cli-chap-welcome.html))  
+- Configure AWS CLI and a local credentials file. ([instructions](https://docs.AWS.amazon.com/cli/latest/userguide/cli-chap-welcome.html))
 
 ## Getting Started
 
@@ -79,7 +79,7 @@ Click a button to launch QnABot CloudFormation stack in the desired region
 First, install all prerequisites:
 
 ```shell
-npm install 
+npm install
 ```
 
 Next, set up your configuration file:
@@ -97,7 +97,7 @@ now edit config.json with you information.
 |namespace| a logical name space to run your templates in such as dev, test and/or prod |
 |devEmail(required) | the email to use when creating admin users in automated stack launches |
 
-Next, use the following command to launch a CloudFormation template to create the S3 bucket to be used for lambda code and CloudFormation templates. Wait for this template to complete (you can watch progress from the command line or [AWS CloudFormation console](https://console.AWS.amazon.com/cloudformation/home))  
+Next, use the following command to launch a CloudFormation template to create the S3 bucket to be used for lambda code and CloudFormation templates. Wait for this template to complete (you can watch progress from the command line or [AWS CloudFormation console](https://console.AWS.amazon.com/cloudformation/home))
 
 ```shell
 npm run bootstrap
@@ -117,11 +117,11 @@ npm run update
 
 #### Designer UI Compatibility
 
-Currently the only browsers supported are:  
+Currently the only browsers supported are:
 
-- Chrome  
-- FireFox  
-We are currently working on adding Microsoft Edge support.  
+- Chrome
+- FireFox
+We are currently working on adding Microsoft Edge support.
 
 ## Built With
 
@@ -144,22 +144,22 @@ See the [LICENSE.md](LICENSE.md) file for details
 
 ### Version 4.7.0
 
-- QnABot now supports LexV2 with voice interaction in multiple languages. 
-  - Two installation/update modes are now available: 
+- QnABot now supports LexV2 with voice interaction in multiple languages.
+  - Two installation/update modes are now available:
     - (i) LexV1 + LexV2 (default, recommended for most AWS regions.
     - (ii) LexV2-only (currently recommended for AWS regions where LexV1 is not available).
-  - LexV2 locales are specified via a new CloudFormation parameter 
-    - The default locales are US English, US Spanish and Canadian French. 
-- The QnABot web client now uses LexV2 and supports dynamic bot locale selection from a new title bar menu. 
-- Custom LexV2 Elicit Response bots are now supported. The built-in response bots still use LexV1 and are 
-  available only when QnABot is installed in LexV1+LexV2 mode. 
+  - LexV2 locales are specified via a new CloudFormation parameter
+    - The default locales are US English, US Spanish and Canadian French.
+- The QnABot web client now uses LexV2 and supports dynamic bot locale selection from a new title bar menu.
+- Custom LexV2 Elicit Response bots are now supported. The built-in response bots still use LexV1 and are
+  available only when QnABot is installed in LexV1+LexV2 mode.
 - CloudFormation deployment is now available for Canada/Montreal region (LexV2-only mode).
-- Amazon Connect integration in the Canada/Montreal region supports multiple voice languages using LexV2. 
-- The Content Designer 'Test All' feature now uses LexV2. 
-- Content Designer's "Rebuild Lex Bot" feature now rebuilds both LexV2 and LexV1 bots 
-- Non-English LexV2 bot locales are automatically generated with sample utterances translated from English questions using Amazon Translate. 
-- Content Designer's Import feature now supports Excel spreadsheets as well as the existing JSON format. 
-- QnABot's Elasticsearch cache is now automatically kept warm to improve query time consistency. 
+- Amazon Connect integration in the Canada/Montreal region supports multiple voice languages using LexV2.
+- The Content Designer 'Test All' feature now uses LexV2.
+- Content Designer's "Rebuild Lex Bot" feature now rebuilds both LexV2 and LexV1 bots
+- Non-English LexV2 bot locales are automatically generated with sample utterances translated from English questions using Amazon Translate.
+- Content Designer's Import feature now supports Excel spreadsheets as well as the existing JSON format.
+- QnABot's Elasticsearch cache is now automatically kept warm to improve query time consistency.
 - Negative feedback (thumbs down) messages can now generate notifications (text, email, etc.) using Amazon SNS.
 
 ### Version 4.6.0
@@ -176,7 +176,7 @@ See the [LICENSE.md](LICENSE.md) file for details
 ### Version 4.5.0
 
 - Added single click deployment support for four additional regions
-- Changed unencrypted Amazon Elasticsearch instance types to be t3.small.elasticsearch  
+- Changed unencrypted Amazon Elasticsearch instance types to be t3.small.elasticsearch
 - Changed default number of nodes for Amazon Elasticsearch cluster to 4 for better production level
   cluster performance and resiliency. This can be changed to 2 for development clusters if desired.
 - Added Personal Identifiable Information detection support using Amazon Comprehend - [readme](./docs/PII_Detection/README.md)
@@ -186,7 +186,7 @@ See the [LICENSE.md](LICENSE.md) file for details
 - Added support for signing S3 URLs for bot responses, using handlebar syntax - [readme](./lambda/proxy-es/lib/HANDLEBARS_README.md)
 - Added support to defining user specified custom settings
 - Lambdahook responses can now be used with document chaining and are translated when multi-language support is enabled
-- Improved support when contractions are used in utterances  
+- Improved support when contractions are used in utterances
 - Kendra Fallback message prefixes are now configurable in QnABot settings
 - Fixed bugs and defects
 - To improve performance, resiliency, and security, the Elasticsearch cluster will default to using ENCRYPTED nodes
@@ -198,3 +198,13 @@ See the [LICENSE.md](LICENSE.md) file for details
 
 A [workshop](https://github.com/aws-samples/aws-ai-qna-bot/tree/master/workshops/reinvent2019/readme.md) is available in GitHub
 that will walk you through setting up this feature.
+
+---
+
+Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+
+Licensed under the Amazon Software License (the "License"). You may not use this file except in compliance with the License. A copy of the License is located at
+
+    http://aws.amazon.com/asl/
+
+or in the "license" file accompanying this file. This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and limitations under the License.
