@@ -1,5 +1,6 @@
 var fs=require('fs')
 var _=require('lodash')
+const util = require('../../../util');
 module.exports=function(opts){
     return {
       "Type": "AWS::ApiGateway::Method",
@@ -29,6 +30,7 @@ module.exports=function(opts){
         "ResourceId":opts.resource,
         "MethodResponses": [{"StatusCode": 200}],
         "RestApiId":{"Ref":"API"} 
-      }
+      },
+      "Metadata": util.cfnNag(["W59"])
     }
 }

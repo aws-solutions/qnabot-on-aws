@@ -1,6 +1,6 @@
 var fs=require('fs')
 var _=require('lodash')
-var fs=require('fs')
+const util = require('../../util');
 
 var js=fs.readdirSync(`${__dirname}/js_lambda_hooks`)
 .map(name=> {
@@ -117,7 +117,11 @@ module.exports=Object.assign(
           ]
         },
         "Path": "/",
-        "Policies":[{ 
+        "Policies":[
+          util.basicLambdaExecutionPolicy(),
+          util.lambdaVPCAccessExecutionRole(),
+          util.xrayDaemonWriteAccess(),
+          {
           "PolicyName" : "LambdaFeedbackFirehoseQNALambda",
           "PolicyDocument" : {
           "Version": "2012-10-17",
@@ -172,12 +176,8 @@ module.exports=Object.assign(
             ]
           }          
         }],
-        "ManagedPolicyArns": [
-            "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
-            "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole",
-            "arn:aws:iam::aws:policy/AWSXRayDaemonWriteAccess"
-        ]
-      }
+      },
+      "Metadata": util.cfnNagXray()
     }
 });
 function jslambda(name){

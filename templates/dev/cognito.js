@@ -22,7 +22,6 @@ module.exports={
           ]
         },
         "Path": "/",
-        "ManagedPolicyArns": []
       }
     },
     "IdPool": {

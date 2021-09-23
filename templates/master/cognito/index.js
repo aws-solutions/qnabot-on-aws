@@ -1,4 +1,5 @@
 var fs=require('fs')
+const util = require('../../util');
 module.exports={
     "CognitoDomain":{
         "Type": "Custom::CognitoDomain",
@@ -88,7 +89,8 @@ module.exports={
             "ServerSideTokenCheck": true
           }
         ]
-      }
+      },
+      "Metadata": util.cfnNag(["W57"])
     },
     "KibanaIdPool": {
       "Type": "AWS::Cognito::IdentityPool",

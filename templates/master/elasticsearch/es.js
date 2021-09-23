@@ -1,3 +1,5 @@
+const util = require('../../util');
+
 var properties={
     
     "ElasticsearchClusterConfig": {
@@ -86,7 +88,10 @@ module.exports={
           ]
         },
         "Path": "/",
-        "ManagedPolicyArns": ["arn:aws:iam::aws:policy/AmazonESCognitoAccess"],
-      }
+        "Policies": [
+            util.esCognitoAccess()
+        ],
+      },
+      "Metadata": util.cfnNag(["W11", "W12", "F38"])
     }
 }

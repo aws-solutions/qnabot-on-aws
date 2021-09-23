@@ -1,4 +1,5 @@
 var _=require('lodash')
+const util = require('../../util');
 
 module.exports={
     "ESCFNProxyLambda": {
@@ -38,7 +39,8 @@ module.exports={
             Key:"Type",
             Value:"CustomResource"
         }]
-      }
+      },
+      "Metadata": util.cfnNag(["W92"])
     },
     "MetricsIndex":{
         "Type": "Custom::ESProxy",

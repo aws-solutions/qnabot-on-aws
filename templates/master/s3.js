@@ -1,3 +1,4 @@
+const util = require('../util');
 module.exports={
     "Bucket":{
         "Type" : "AWS::S3::Bucket",
@@ -5,6 +6,12 @@ module.exports={
         "Properties" : {
             "WebsiteConfiguration":{
                 "IndexDocument":"index.html"
+            },
+            "PublicAccessBlockConfiguration": {
+              "BlockPublicAcls": true,
+              "BlockPublicPolicy": true,
+              "IgnorePublicAcls": true,
+              "RestrictPublicBuckets": true
             },
             "BucketEncryption": {
                 "Fn::If": [
@@ -21,8 +28,10 @@ module.exports={
                     }
                 ]
             }
-        }
+        },
+        "Metadata": util.cfnNag(["W35"])
     },
+    "HTTPSOnlyBucketPolicy": util.httpsOnlyBucketPolicy(),
     "Clear":{
         "Type": "Custom::S3Clear",
         "DependsOn":["CFNInvokePolicy"],

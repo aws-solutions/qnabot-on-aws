@@ -30,6 +30,14 @@
         [{"Ref":"AdminRole"},{"Ref":"UnauthenticatedRole"},{"Ref":"UserRole"}],
         [{"Ref":"AdminRole"},{"Ref":"UserRole"}]
     ]}
+  },
+  "Metadata": {
+    "cfn_nag": {
+      "rules_to_suppress": [{
+        "id": "W13",
+        "reason": "This policy is required to have * resource"
+      }]
+    }
   }
 },
 "ApiGatewayCloudWatchLogsRole": {
@@ -74,6 +82,14 @@
         }
       }
     ]
+  },
+  "Metadata":{
+    "cfn_nag": {
+      "rules_to_suppress": [{
+        "id": "W11",
+        "reason": "This IAM role requires to have * resource on its permission policy"
+      }]
+    }
   }
 },
 "ApiGatewayRole": {

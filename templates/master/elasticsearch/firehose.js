@@ -1,3 +1,4 @@
+const util = require('../../util');
 module.exports={
     "FeedbackFirehose": {
         "Type" : "AWS::KinesisFirehose::DeliveryStream",
@@ -102,14 +103,59 @@ module.exports={
                   }
               ]
           },
+          "PublicAccessBlockConfiguration": {
+            "BlockPublicAcls": true,
+            "BlockPublicPolicy": true,
+            "IgnorePublicAcls": true,
+            "RestrictPublicBuckets": true
+          },
           "Tags" : [
               {
                 "Key" : "Use",
                 "Value" : "Metrics"
               }
             ]
-        }
+        },
+        "Metadata": util.cfnNag(["W35"])
+      },
+  "HTTPSOnlyMetricBucketsPolicy": {
+    "Type": "AWS::S3::BucketPolicy",
+    "Properties": {
+      "Bucket": {
+        "Ref": "MetricsBucket"
+      },
+      "PolicyDocument": {
+        "Statement": [
+          {
+            "Action": "*",
+            "Condition": {
+              "Bool": {
+                "aws:SecureTransport": "false"
+              }
+            },
+            "Effect": "Deny",
+            "Principal": "*",
+            "Resource": {
+              "Fn::Join": [
+                "",
+                [
+                  {
+                    "Fn::GetAtt": [
+                      "MetricsBucket",
+                      "Arn"
+                    ]
+                  },
+                  "/*"
+                ]
+              ]
+            },
+            "Sid": "HttpsOnly"
+          }
+        ],
+        "Version": "2012-10-17"
+      }
     },
+  },
     "MetricsBucketClear":{
         "Type": "Custom::S3Clear",
         "DependsOn":["CFNInvokePolicy"],
@@ -210,5 +256,7 @@ module.exports={
           },
           "PolicyName" : "QnAFirehose"
       }]
-    }}
+    },
+    "Metadata": util.cfnNag(["W11"])
+  }
 }
