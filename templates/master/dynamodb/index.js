@@ -7,7 +7,7 @@ module.exports={
             "AttributeDefinitions" : [
                 {
                 "AttributeName" : "UserId",
-                "AttributeType" : "S"   
+                "AttributeType" : "S"
                 },
             ],
             "KeySchema" : [

@@ -27,7 +27,7 @@ module.exports={
             },
             "ResourceId":{"Fn::GetAtt":["API","RootResourceId"]},
             "MethodResponses": [{"StatusCode": 200}],
-            "RestApiId":{"Ref":"API"} 
+            "RestApiId":{"Ref":"API"}
           }
         },
         "Deployment": {

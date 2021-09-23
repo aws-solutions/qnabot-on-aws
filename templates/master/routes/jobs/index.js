@@ -1,8 +1,8 @@
-var fs=require('fs')
-var resource=require('../util/resource')
-var lambda=require('../util/lambda')
-var mock=require('../util/mock')
-var _=require('lodash')
+var fs=require('fs');
+var resource=require('../util/resource');
+var lambda=require('../util/lambda');
+var mock=require('../util/mock');
+var _=require('lodash');
 const util = require('../../../util');
 
 module.exports={

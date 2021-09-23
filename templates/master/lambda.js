@@ -1,11 +1,11 @@
-var fs=require('fs')
-var _=require('lodash')
+var fs=require('fs');
+var _=require('lodash');
 const util = require('../util');
 
 var files=fs.readdirSync(`${__dirname}`)
     .filter(x=>!x.match(/README.md|Makefile|dashboard|index|test|.DS_Store/))
     .map(x=>require(`./${x}`))
-    
+
 var lambdas=[]
 _.forEach(_.assign.apply({},files),(value,key)=>{
     if(value.Type==='AWS::Lambda::Function'){
