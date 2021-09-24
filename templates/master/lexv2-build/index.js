@@ -1,5 +1,6 @@
-var fs=require('fs')
-var _=require('lodash')
+var fs=require('fs');
+var _=require('lodash');
+const util = require('../../util');
 
 module.exports={
     "Lexv2BotLambda":lambda({
@@ -41,6 +42,10 @@ module.exports={
         },
         // There in no LexV2 managed policy (yet) so adding inline policy to allow creation of LexV2 ServiceLinkedRole
         "Policies":[
+            util.basicLambdaExecutionPolicy(),
+            util.lambdaVPCAccessExecutionRole(),
+            util.xrayDaemonWriteAccess(),
+            util.lexFullAccess(),
             {
                 PolicyName:"LexV2ServiceLinkedRole",
                 PolicyDocument: {
@@ -113,13 +118,10 @@ module.exports={
         ],
         "Path": "/",
         "ManagedPolicyArns": [
-          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
-          "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole",
-          "arn:aws:iam::aws:policy/AWSXRayDaemonWriteAccess",
           {"Ref":"QueryPolicy"},
-          "arn:aws:iam::aws:policy/AmazonLexFullAccess"
         ]
-      }
+      },
+      "Metadata": util.cfnNag(["W11", "W12", "W76", "F3"])
     }
 }
 
@@ -150,6 +152,7 @@ function lambda(code,variable={},runtime="nodejs12.x"){
             Key:"Type",
             Value:"Api"
         }]
-      }
+      },
+      "Metadata": util.cfnNag(["W92"])
     }
 }

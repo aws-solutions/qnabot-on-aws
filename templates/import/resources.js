@@ -1,4 +1,4 @@
-var fs=require('fs')
+const util = require('../util');
 
 module.exports=Object.assign(
     require('./bucket'),{
@@ -104,13 +104,16 @@ module.exports=Object.assign(
           ]
         },
         "Path": "/",
+        "Policies": [
+          util.basicLambdaExecutionPolicy(),
+          util.lambdaVPCAccessExecutionRole(),
+          util.xrayDaemonWriteAccess(),
+        ],
         "ManagedPolicyArns": [
-          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
-          "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole",
-          "arn:aws:iam::aws:policy/AWSXRayDaemonWriteAccess",
           {"Ref":"ImportPolicy"}
         ]
-      }
+      },
+      "Metadata": util.cfnNagXray()
     },
     "ImportPolicy": {
       "Type": "AWS::IAM::ManagedPolicy",

@@ -1,6 +1,6 @@
 {
   "name": "aws-ai-qna-bot",
-  "version": "4.7.3",
+  "version": "5.0.0",
   "engines": {
     "node": ">=12.16.1",
     "npm": ">=7.8.0"
@@ -19,6 +19,8 @@
   "description": "An Amazon Lex powered Question and Answer (QnA) Bot ====================================================",
   "scripts": {
     "config": "make config.json",
+    "configAwsSolutions": "make config.aws-solutions.json",
+    "build": "make build",
     "check": "./bin/check.js",
     "stack": "./bin/launch.js",
     "upload": "make upload -j 4",
@@ -61,7 +63,7 @@
     "chrome-aws-lambda": "^5.5.0",
     "clean-deep": "^3.0.2",
     "clipboard": "^1.7.1",
-    "commander": "^2.15.1",
+    "commander": "^8.2.0",
     "copy-webpack-plugin": "^6.0.2",
     "crypto-js": "^3.1.9-1",
     "css-loader": "^3.2.0",
