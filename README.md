@@ -6,40 +6,13 @@
 
 This repository contains code for the QnABot, described in the AWS AI blog post [“Creating a Question and Answer Bot with Amazon Lex and Amazon Alexa”](https://aws.amazon.com/blogs/ai/creating-a-question-and-answer-bot-with-amazon-lex-and-amazon-alexa/).
 
-See the "Getting Started" to launch your own QnABot.
+Refer to "Getting Started" to launch your own QnABot.
 
-**See all the new features list for 4.7.3** [Fulfillment Lambda Provisioned Concurrency](#new-features)
+**See all the new features list for 4.7.3** [Fulfillment Lambda Provisioned Concurrency](CHANGELOG.md#473---2021-08-04)
 
-4.7.3
-  - The QnABot fulfillment Lambda function can now be configured for provisioned concurrency to further improve query 
-    response times after periods of inactivity.
-  - Bug fix for proper invocation of ESWarmer lambda
-  - Bug fix to resolve sporadic API Compression CloudFormation exception
+**New features in 4.6.0** [Improved Kendra integration and Kibana dashboards. Additional settings to filter Kendra responses based on confidence levels](CHANGELOG.md#460---2021-04-30)
 
-4.7.1 provides performance improvements and component upgrades
-  - Amazon Elasticsearch version 7.10 is now utilized.
-  - Encrypted Elasticsearch (production) instance types now use m6g.large.elasticsearch for improved price/performance/memory.
-  - The QnABot fulfillment Lambda function has been optimized to reduce query response times and variability,
-    especially after periods of inactivity.
-  - LexV2 built-in Elicit Response bots have been added.
-  - Custom settings can now be exported and imported from the Content Designer Settings page.
-  - Bug fix when ES_SCORE_ANSWER_FIELD is set to true. Prior to this fix, answer fields were not
-    utilized fully in Elasticsearch queries.
-
-4.7.0 QnABot now supports LexV2 with voice interaction in multiple languages.
-  - Two installation/update modes are now available:
-    - (i) LexV1 + LexV2 (default, recommended for most AWS regions.
-    - (ii) LexV2-only (currently recommended for AWS regions where LexV1 is not available).
-
-4.6.0 provides a number of new features described below. Several to call attention to are the following:
-
-- Kendra custom no_hits item required in earlier releases is no longer required to enable Kendra Fallback and should be removed, configurable confidence thresholds now available for filtering Kendra results.
-- Kendra integration is now fully automated during install or update when the new default Kendra Index Id parameter is provided.
-- Standard markdown is now automatically converted to Slack markdown when using Slack, Kibana dashboard logs and metrics retention period is now configurable during install or update, Lambda runtime upgraded to Node.js 12.x.
-
-**New features in 4.6.0** [Improved Kendra integration and Kibana dashboards. Additional settings to filter Kendra responses based on confidence levels](#new-features)
-
-**New features in 4.5.0** [Kendra Web Crawler, Comprehend PII Detection, Translate Custom Terminology, Increased deployment regions](#new-features)
+**New features in 4.5.0** [Kendra Web Crawler, Comprehend PII Detection, Translate Custom Terminology, Increased deployment regions](CHANGELOG.md#450---2021-03-07)
 
 ## Upgrade Notes
 
@@ -138,10 +111,10 @@ We are currently working on adding Microsoft Edge support.
 
 ## License
 
-See the [LICENSE.md](LICENSE.md) file for details
+Refer to [LICENSE.md](LICENSE.md) file for details
 
 ## New features
-See the [CHANGELOG.md](CHANGELOG.md) file for details of new features in each version.
+Refer to [CHANGELOG.md](CHANGELOG.md) file for details of new features in each version.
 
 A [workshop](https://qnabot.workshop.aws) is available
 that will walk you through QnABot features.
