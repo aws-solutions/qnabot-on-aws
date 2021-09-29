@@ -79,7 +79,7 @@ async function main() {
                 );
                 resp = { statusCode: 200 };
             } else {
-                if (!option.bucket) {
+                if (!options.bucket) {
                     console.log("error: required option '--bucket <string>' not specified");
                     process.exit(1);
                 }
