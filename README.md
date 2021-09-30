@@ -6,14 +6,16 @@
 
 This repository contains code for the QnABot, described in the AWS AI blog post [“Creating a Question and Answer Bot with Amazon Lex and Amazon Alexa”](https://aws.amazon.com/blogs/ai/creating-a-question-and-answer-bot-with-amazon-lex-and-amazon-alexa/).
 
-Refer to "Getting Started" to launch your own QnABot.
+Refer to [Getting Started](#getting-started) to launch your own QnABot, or [Automated Deployment](https://docs.aws.amazon.com/solutions/latest/aws-qnabot/automated-deployment.html) for detailed implementation instructions.
 
 **See all the new features list for 4.7.3** [Fulfillment Lambda Provisioned Concurrency](CHANGELOG.md#473---2021-08-04)
 
-**New features in 4.6.0** [Improved Kendra integration and Kibana dashboards. Additional settings to filter Kendra responses based on confidence levels](CHANGELOG.md#460---2021-04-30)
+**New features in 4.6.0** [Improved Kendra integration and Kibana dashboards. Additional settings to filter Kendra responses based on confidence levels](CHANGELOG.md#460---2021-04-30).
 
-**New features in 4.5.0** [Kendra Web Crawler, Comprehend PII Detection, Translate Custom Terminology, Increased deployment regions](CHANGELOG.md#450---2021-03-07)
+**New features in 4.5.0** [Kendra Web Crawler, Comprehend PII Detection, Translate Custom Terminology, Increased deployment regions](CHANGELOG.md#450---2021-03-07).
 
+## Architecture Overview
+![Architecture](deployment/architecture.png)
 ## Upgrade Notes
 
 During an upgrade, we recommend that existing QnABot content first be exported and downloaded from the Content Designer prior to
@@ -111,7 +113,7 @@ We are currently working on adding Microsoft Edge support.
 
 ## License
 
-Refer to [LICENSE.md](LICENSE.md) file for details
+Refer to [LICENSE.md](LICENSE.md) file for details.
 
 ## New features
 Refer to [CHANGELOG.md](CHANGELOG.md) file for details of new features in each version.
