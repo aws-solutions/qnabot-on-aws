@@ -413,7 +413,7 @@ async function routeKendraRequest(event, context) {
                     // There will be 2 elements - [0] - QuestionText, [1] - AnswerText
                     let message = element.AdditionalAttributes[1].Value.TextWithHighlightsValue.Text.replace(/\r?\n|\r/g, " ")
                     answerMessage = faqanswerMessage + '\n\n ' + message;
-                    allFilteredMessages.push(message)                    seenTop = true; // if the answer is in the FAQ, don't show document extracts
+                    allFilteredMessages.push(message) 
                     seenTop = true; // if the answer is in the FAQ, don't show document extracts
                     answerDocumentUris=[];
                     let answerTextMd = element.AdditionalAttributes[1].Value.TextWithHighlightsValue.Text.replace(/\r?\n|\r/g, " ");
