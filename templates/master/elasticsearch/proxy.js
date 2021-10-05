@@ -1,4 +1,5 @@
 var _=require('lodash')
+const util = require('../../util');
 
 module.exports={
     "ESCFNProxyLambda": {
@@ -39,7 +40,8 @@ module.exports={
             Key:"Type",
             Value:"CustomResource"
         }]
-      }
+      },
+      "Metadata": util.cfnNag(["W92"])
     },
     "MetricsIndex":{
         "Type": "Custom::ESProxy",
@@ -48,7 +50,7 @@ module.exports={
             "create":{
                 index:{"Fn::Sub":"${Var.MetricsIndex}"},
                 endpoint:{"Fn::GetAtt":["ESVar","ESAddress"]},
-                body:{"Fn::Sub":JSON.stringify({ 
+                body:{"Fn::Sub":JSON.stringify({
                     settings:{},
                 })}
             }
@@ -61,7 +63,7 @@ module.exports={
             "create":{
                 index:{"Fn::Sub":"${Var.FeedbackIndex}"},
                 endpoint:{"Fn::GetAtt":["ESVar","ESAddress"]},
-                body:{"Fn::Sub":JSON.stringify({ 
+                body:{"Fn::Sub":JSON.stringify({
                     settings:{},
                 })}
             }
@@ -74,7 +76,7 @@ module.exports={
             "create":{
                 index:{"Fn::Sub":"${Var.QnaIndex}"},
                 endpoint:{"Fn::GetAtt":["ESVar","ESAddress"]},
-                body:{"Fn::Sub":JSON.stringify({ 
+                body:{"Fn::Sub":JSON.stringify({
                     settings:require('./index_settings.js'),
                     mappings:require('./index_mappings.js'),
                 })}

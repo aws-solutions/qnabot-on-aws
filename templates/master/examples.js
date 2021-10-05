@@ -5,7 +5,7 @@ module.exports={
         "Properties" : {
             "TemplateURL" :{"Fn::Sub":"http://${BootstrapBucket}.s3.${AWS::Region}.amazonaws.com/${BootstrapPrefix}/templates/examples.json"},
             "Parameters" :{
-                "QnAType":{"Fn::GetAtt":["Var","QnAType"]}, 
+                "QnAType":{"Fn::GetAtt":["Var","QnAType"]},
                 "QuizType":{"Fn::GetAtt":["Var","QuizType"]},
                 "Index":{"Fn::GetAtt":["Var","QnaIndex"]},
                 "ESAddress":{"Fn::GetAtt":["ESVar","ESAddress"]},

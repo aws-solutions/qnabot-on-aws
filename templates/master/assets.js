@@ -1,4 +1,4 @@
-var fs=require('fs')
+var util = require('../util');
 
 module.exports={
     "AssetBucket": {
@@ -18,9 +18,17 @@ module.exports={
                     "Ref": "AWS::NoValue"
                 }
             ]
-        }
-      }
+        },
+        "PublicAccessBlockConfiguration": {
+            "BlockPublicAcls": true,
+            "BlockPublicPolicy": true,
+            "IgnorePublicAcls": true,
+            "RestrictPublicBuckets": true
+          }
+      },
+      "Metadata": util.cfnNag(["W35"])
     },
+    "HTTPSOnlyAssetBucketPolicy": util.httpsOnlyBucketPolicy("AssetBucket"),
     "AssetClear":{
         "Type": "Custom::S3Clear",
         "DependsOn":["CFNInvokePolicy"],
@@ -58,6 +66,6 @@ module.exports={
             "version":{"Ref":"AssetZipVersion"}
         }
     }
-}
+};
 
 

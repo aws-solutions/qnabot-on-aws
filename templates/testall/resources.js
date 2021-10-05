@@ -1,5 +1,6 @@
-var fs=require('fs')
-var _=require('lodash')
+var fs=require('fs');
+var _=require('lodash');
+const util = require('../util');
 
 var files=fs.readdirSync(`${__dirname}`)
     .filter(x=>!x.match(/README.md|Makefile|index|test|outputs|.DS_Store/))
@@ -70,12 +71,10 @@ module.exports=Object.assign(
           ]
         },
         "Path": "/",
-        "ManagedPolicyArns": [
-          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
-          "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole",
-          "arn:aws:iam::aws:policy/AWSXRayDaemonWriteAccess"
-        ],
         "Policies": [
+          util.basicLambdaExecutionPolicy(),
+          util.lambdaVPCAccessExecutionRole(),
+          util.xrayDaemonWriteAccess(),
           {
             "PolicyName" : "TestAllPolicy",
             "PolicyDocument" : {
@@ -106,7 +105,8 @@ module.exports=Object.assign(
             }
           }
         ]
-      }
+      },
+      "Metadata": util.cfnNagXray()
     },
     "TestAllClear":{
         "Type": "Custom::S3Clear",

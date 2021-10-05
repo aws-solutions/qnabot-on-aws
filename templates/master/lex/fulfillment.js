@@ -1,7 +1,8 @@
-var config = require('./config')
-var _ = require('lodash')
+var config = require('./config');
+var _ = require('lodash');
 var crypto = require('crypto')
 var fs = require('fs')
+const util = require('../../util');
 
 var examples = _.fromPairs(require('../../examples/outputs')
   .names
@@ -21,7 +22,7 @@ const comboHash = filesToHash.map(x => {
     return crypto.createHash("sha256").update(fileBuffer).digest("hex")
   }).reduce((a,b) => {
     return a + b;
-  }); 
+  });
 const fulfillmentHash =  crypto.createHash("sha256").update(comboHash).digest("hex")
 
 module.exports = {
@@ -31,7 +32,7 @@ module.exports = {
     "Properties": {
       "Action": "lambda:InvokeFunction",
       "FunctionName": {  "Fn::Join": [ ":", [
-        {"Fn::GetAtt":["FulfillmentLambda","Arn"]}, 
+        {"Fn::GetAtt":["FulfillmentLambda","Arn"]},
         "live"
       ]]},
       "Principal": "alexa-appkit.amazon.com"
@@ -99,7 +100,8 @@ module.exports = {
       "Tags": {
         "Type": "Fulfillment"
       }
-    }
+    },
+    "Metadata": util.cfnNag(["W89", "W92"])
   },
   "InvokePolicy": {
     "Type": "AWS::IAM::ManagedPolicy",
@@ -164,14 +166,14 @@ module.exports = {
       },
       "Path": "/",
       "ManagedPolicyArns": [
-        "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
-        "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole",
-        "arn:aws:iam::aws:policy/AWSXRayDaemonWriteAccess",
-        "arn:aws:iam::aws:policy/TranslateReadOnly",
-        "arn:aws:iam::aws:policy/ComprehendReadOnly",
         { "Ref": "QueryPolicy" }
       ],
       "Policies": [
+        util.basicLambdaExecutionPolicy(),
+        util.lambdaVPCAccessExecutionRole(),
+        util.xrayDaemonWriteAccess(),
+        util.translateReadOnly(),
+        util.comprehendReadOnly(),
         {
           "PolicyName": "ParamStorePolicy",
           "PolicyDocument": {
@@ -236,7 +238,7 @@ module.exports = {
             }]
           }
         },
-        { 
+        {
           "PolicyName" : "S3QNABucketReadAccess",
           "PolicyDocument" : {
           "Version": "2012-10-17",
@@ -245,7 +247,7 @@ module.exports = {
                   "Effect": "Allow",
                   "Action": [
                       "s3:GetObject"
-                   ],   
+                   ],
                   "Resource": [
                       "arn:aws:s3:::QNA*/*",
                       "arn:aws:s3:::qna*/*"
@@ -255,7 +257,8 @@ module.exports = {
           }
         }
       ]
-    }
+    },
+    "Metadata": util.cfnNag(["W11", "W12"])
   },
   "ESWarmerLambda": {
     "Type": "AWS::Lambda::Function",
@@ -299,7 +302,8 @@ module.exports = {
         Key: "Type",
         Value: "Warmer"
       }]
-    }
+    },
+    "Metadata": util.cfnNag(["W92"])
   },
   "WarmerLambdaRole": {
     "Type": "AWS::IAM::Role",
@@ -317,12 +321,10 @@ module.exports = {
         ]
       },
       "Path": "/",
-      "ManagedPolicyArns": [
-        "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
-        "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole",
-        "arn:aws:iam::aws:policy/AWSXRayDaemonWriteAccess"
-      ],
       "Policies": [
+        util.basicLambdaExecutionPolicy(),
+        util.lambdaVPCAccessExecutionRole(),
+        util.xrayDaemonWriteAccess(),
         {
           "PolicyName": "ParamStorePolicy",
           "PolicyDocument": {
@@ -371,7 +373,8 @@ module.exports = {
           }
         }
       ]
-    }
+    },
+    "Metadata": util.cfnNag(["W11", "W12"])
   },
   "ESWarmerRule": {
     "Type": "AWS::Events::Rule",

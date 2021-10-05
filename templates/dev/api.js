@@ -1,3 +1,4 @@
+const util = require('../util');
 module.exports={
    "Description": "This template creates dev ApiGateway",
     "Resources": {
@@ -26,7 +27,7 @@ module.exports={
             },
             "ResourceId":{"Fn::GetAtt":["API","RootResourceId"]},
             "MethodResponses": [{"StatusCode": 200}],
-            "RestApiId":{"Ref":"API"} 
+            "RestApiId":{"Ref":"API"}
           }
         },
         "Deployment": {
@@ -42,7 +43,8 @@ module.exports={
             "DeploymentId": {"Ref": "Deployment"},
             "RestApiId": {"Ref": "API"},
             "StageName":"test"
-          }
+          },
+          "Metadata": util.cfnNag(["W64", "W69"])
         }
    },
    "Outputs": {

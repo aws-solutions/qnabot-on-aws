@@ -1,6 +1,7 @@
 var fs=require('fs')
 const path = require('path')
 const resplib = path.join(__dirname, '..', '..','lib', 'response.js')
+const util = require('../../util');
 console.log(resplib)
 module.exports={
     "VersionLambda":{
@@ -28,7 +29,8 @@ module.exports={
             Key:"Type",
             Value:"CustomResource"
         }]
-      }
+      },
+      "Metadata": util.cfnNag(["W92"])
     },
     "CFNVersion":{
         "Type": "Custom::S3Version",
@@ -69,7 +71,8 @@ module.exports={
             Key:"Type",
             Value:"CustomResource"
         }]
-      }
+      },
+      "Metadata": util.cfnNag(["W92"])
     },
     "CFNInvokePolicy": {
       "Type": "AWS::IAM::ManagedPolicy",
@@ -88,5 +91,5 @@ module.exports={
         },
         "Roles": [{"Ref": "CFNLambdaRole"}]
       }
-    }   
+    }
 }

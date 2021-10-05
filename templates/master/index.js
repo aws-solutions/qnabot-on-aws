@@ -10,7 +10,7 @@ module.exports={
   "Conditions": {},
   "AWSTemplateFormatVersion": "2010-09-09",
   "Transform": "AWS::Serverless-2016-10-31",
-  "Description": `QnABot with admin and client websites - (Master v${process.env.npm_package_version})`,
+  "Description": `(SO0189) QnABot with admin and client websites - (Master v${process.env.npm_package_version})`,
   "Mappings": {},
   "Outputs": {
     "CognitoEndpoint":{
@@ -208,7 +208,7 @@ module.exports={
         "Type":"String",
         "Description":"Choose whether access to the QnABot client should be publicly available or restricted to users in QnABot UserPool.",
         "AllowedValues" : ["PUBLIC", "PRIVATE"],
-        "Default":"PUBLIC"
+        "Default":"PRIVATE"
     },
     "ElasticSearchNodeCount":{
         "Type":"String",
@@ -223,16 +223,16 @@ module.exports={
     },
     "VPCSubnetIdList" : {
         "Type": "CommaDelimitedList",
-        "Description" : "Subnet IDs", 
+        "Description" : "Subnet IDs",
         "Default": ""
     },
     "VPCSecurityGroupIdList": {
         "Type": "CommaDelimitedList",
-        "Description" : "Security Group IDs", 
+        "Description" : "Security Group IDs",
         "Default": ""
     },
     "LexV2BotLocaleIds":{
-        "Description" : "Languages for QnABot voice interaction using LexV2. Specify as a comma separated list of valid Locale IDs - see https://docs.aws.amazon.com/lexv2/latest/dg/how-languages.html", 
+        "Description" : "Languages for QnABot voice interaction using LexV2. Specify as a comma separated list of valid Locale IDs - see https://docs.aws.amazon.com/lexv2/latest/dg/how-languages.html",
         "Type": "String",
         "Default": "en_US,es_US,fr_CA"
     },

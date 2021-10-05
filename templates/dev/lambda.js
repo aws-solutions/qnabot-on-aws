@@ -1,3 +1,5 @@
+const util = require('../util');
+
 module.exports={
    "Description": "This template creates dev ElasticSearch Cluster",
    "Resources":{
@@ -42,10 +44,8 @@ module.exports={
             }
           ]
         },
+        "Policies": [util.basicLambdaExecutionPolicy()],
         "Path": "/",
-        "ManagedPolicyArns": [
-          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-        ]
       }
     }
   },

@@ -1,4 +1,5 @@
-build 
+
+build
 # Logs
 logs
 *.log
@@ -68,5 +69,14 @@ config.json
 
 
 
-.vscode/launch.json
+.vscode/
 utilities/migration.md
+
+# Temporary folders
+tmp/
+temp/
+
+# derived build assets
+**/deployment/global-s3-assets
+**/deployment/regional-s3-assets
+**/deployment/open-source
