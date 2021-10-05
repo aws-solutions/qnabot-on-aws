@@ -2,7 +2,7 @@
 const AWSKendra = require('aws-sdk/clients/kendra');
 const AWSS3 = require('aws-sdk/clients/s3');
 const sleep = require('util').promisify(setTimeout)
-const qnabot = require("/opt/lib/logging")
+const qnabot = require("qnabot/logging")
 
 
 

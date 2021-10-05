@@ -7,7 +7,7 @@
 const _=require('lodash');
 const AWS = require('aws-sdk');
 const translate = require('./multilanguage.js');
-const qnabot = require("/opt/lib/logging")
+const qnabot = require("qnabot/logging")
 
 
 /**

@@ -1,7 +1,7 @@
 var _=require('lodash');
 var aws=require('../aws');
 var lambda= new aws.Lambda();
-const qnabot = require("/opt/lib/logging")
+const qnabot = require("qnabot/logging")
 
 
 

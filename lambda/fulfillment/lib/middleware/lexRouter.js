@@ -22,7 +22,7 @@ const QNAEmailAddress = "QNAEmailAddress";
 const QNAName = "QNAName";
 const QNAYesNo = "QNAYesNo";
 const QNAYesNoExit = "QNAYesNoExit";
-const qnabot = require("/opt/lib/logging")
+const qnabot = require("qnabot/logging")
 
 
 const translate = require('./multilanguage.js');

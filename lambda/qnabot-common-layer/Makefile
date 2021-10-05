@@ -9,4 +9,8 @@ $(DST): $(RESOURCES)
 	rm -r ./nodejs || true
 	mkdir ./nodejs
 	mv node_modules ./nodejs/node_modules || true
-	zip -r $(DST) .
+	mkdir ./nodejs/node_modules || true  #if no node_modules folder exists because there was nothing to copy, create it
+	mkdir ./nodejs/node_modules/qnabot
+	cp -R qnabot ./nodejs/node_modules/
+	zip -FSr $(DST) .
+	zip -d $(DST) qnabot 

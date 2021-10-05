@@ -10,7 +10,7 @@ var _ = require('lodash');
 const AWS = require('aws-sdk');
 var build_es_query = require('./esbodybuilder');
 var request = require('./request');
-const qnabot = require("/opt/lib/logging")
+const qnabot = require("qnabot/logging")
 
 
 function confidence_filter(minimum_score,kendra_result){

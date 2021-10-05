@@ -1,6 +1,6 @@
 const _ = require('lodash');
 const AWS = require('aws-sdk');
-const qnabot = require("/opt/lib/logging")
+const qnabot = require("qnabot/logging")
 
 
 async function get_terminologies(sourceLang) {

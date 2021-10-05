@@ -15,7 +15,7 @@ const AWS = require('./aws.js');
 const myCredentials = new AWS.EnvironmentCredentials('AWS');
 const _=require('lodash')
 const s3=new AWS.S3()
-const qnabot = require("/opt/lib/logging")
+const qnabot = require("qnabot/logging")
 
 
 

@@ -3,7 +3,7 @@ var lex=require('./lex')
 var alexa=require('./alexa')
 var _=require('lodash')
 var util=require('./util')
-const qnabot = require("/opt/lib/logging")
+const qnabot = require("qnabot/logging")
 
 
 module.exports=async function cache(req,res){

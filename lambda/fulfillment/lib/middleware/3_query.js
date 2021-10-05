@@ -3,7 +3,7 @@ var util=require('./util')
 const lexRouter=require('./lexRouter');
 const specialtyBotRouter=require('./specialtyBotRouter');
 const esquery=require("/opt/lib/query.js")
-const qnabot = require("/opt/lib/logging")
+const qnabot = require("qnabot/logging")
 
 
 /**

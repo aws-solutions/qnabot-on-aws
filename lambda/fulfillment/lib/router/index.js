@@ -1,6 +1,6 @@
 var Promise=require('bluebird')
 var _=require('lodash')
-const qnabot = require("/opt/lib/logging")
+const qnabot = require("qnabot/logging")
 
 
 module.exports=class router {

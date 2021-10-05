@@ -1,6 +1,6 @@
 const _=require('lodash');
 const translate = require('./multilanguage.js');
-const qnabot = require("/opt/lib/logging")
+const qnabot = require("qnabot/logging")
 
 
 async function get_welcome_message(req, locale){

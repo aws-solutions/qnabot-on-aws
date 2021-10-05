@@ -1,6 +1,6 @@
 var _=require('lodash')
 var util=require('./util')
-const qnabot = require("/opt/lib/logging")
+const qnabot = require("qnabot/logging")
 
 
 module.exports = async function hook(req,res) {

@@ -4,7 +4,7 @@ aws.config.region=process.env.AWS_REGION
 var axios=require('axios')
 var sign=require('aws4').sign
 var Url=require('url')
-const qnabot = require("/opt/lib/logging")
+const qnabot = require("qnabot/logging")
 
 
 module.exports=function(opts){

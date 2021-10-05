@@ -1,6 +1,6 @@
 const AWS = require('aws-sdk');
 const url = require('url');
-const qnabot = require("/opt/lib/logging")
+const qnabot = require("qnabot/logging")
 
 
 let credentials;

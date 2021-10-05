@@ -6,7 +6,7 @@ var build_es_query=require('./esbodybuilder');
 var kendra = require('./kendraQuery');
 var AWS=require('aws-sdk');
 
-const qnabot = require("/opt/lib/logging")
+const qnabot = require("qnabot/logging")
 
 
 function isJson(str) {

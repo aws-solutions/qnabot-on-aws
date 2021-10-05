@@ -4,7 +4,7 @@ var alexa=require('./alexa')
 var _=require('lodash')
 var util=require('./util')
 var AWS=require('aws-sdk');
-const qnabot = require("/opt/lib/logging")
+const qnabot = require("qnabot/logging")
 
 
 function getDistinctValues(list,objectId,sortField){

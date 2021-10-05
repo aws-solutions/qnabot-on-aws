@@ -14,7 +14,7 @@ var linkify = require('linkifyjs');
 const AWS = require('aws-sdk');
 const { filter } = require('bluebird');
 let kendraIndexes = undefined;
-const qnabot = require("/opt/lib/logging")
+const qnabot = require("qnabot/logging")
 
 
 function confidence_filter(minimum_score,kendra_result){

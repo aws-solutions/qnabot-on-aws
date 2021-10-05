@@ -16,7 +16,7 @@ var Promise=require('bluebird')
 var config=require('../../../config')
 var aws=require('aws-sdk')
 var outputs=require('../../../bin/exports')
-const qnabot = require("/opt/lib/logging")
+const qnabot = require("qnabot/logging")
 
 
 module.exports=function(event){

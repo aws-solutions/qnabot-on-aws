@@ -2,7 +2,7 @@ var Url=require('url')
 var Promise=require('bluebird')
 var cfnLambda=require('cfn-lambda')
 var request=require('./request')
-const qnabot = require("/opt/lib/logging")
+const qnabot = require("qnabot/logging")
 
 
 async function run_es_query(event) {

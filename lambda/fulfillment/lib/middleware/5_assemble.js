@@ -4,7 +4,7 @@ var alexa=require('./alexa')
 var _=require('lodash')
 var util=require('./util')
 var translate = require('./multilanguage.js')
-const qnabot = require("/opt/lib/logging")
+const qnabot = require("qnabot/logging")
 
 
 

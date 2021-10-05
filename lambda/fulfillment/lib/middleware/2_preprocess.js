@@ -3,7 +3,7 @@ var Promise = require('bluebird');
 var util = require('./util');
 var jwt = require('./jwt');
 var AWS = require('aws-sdk');
-const qnabot = require("/opt/lib/logging")
+const qnabot = require("qnabot/logging")
 
 async function get_userInfo(userId, idattrs, userPrefs = undefined) {
     var default_userInfo = {

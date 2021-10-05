@@ -2,7 +2,7 @@
 var _=require('lodash');
 var Promise=require('bluebird');
 var aws=require('aws-sdk');
-const qnabot = require("/opt/lib/logging")
+const qnabot = require("qnabot/logging")
 
 
 function get_sentiment_from_comprehend(utterance) {

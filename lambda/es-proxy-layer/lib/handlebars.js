@@ -1,5 +1,5 @@
 const aws = require('aws-sdk');
-const qnabot = require("/opt/lib/logging")
+const qnabot = require("qnabot/logging")
 
 
 //start connection

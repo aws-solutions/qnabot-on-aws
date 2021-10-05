@@ -8,7 +8,7 @@ var handlebars = require('./handlebars');
 var translate = require('./translate');
 var kendra = require('./kendraQuery');
 var kendra_fallback = require("./kendra");
-const qnabot = require("/opt/lib/logging")
+const qnabot = require("qnabot/logging")
 
 // const sleep = require('util').promisify(setTimeout);
 

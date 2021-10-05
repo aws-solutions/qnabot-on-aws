@@ -4,7 +4,7 @@ const bodybuilder = require('bodybuilder');
 const get_keywords = require('./keywords');
 const _ = require('lodash');
 
-const qnabot = require("/opt/lib/logging")
+const qnabot = require("qnabot/logging")
 
 
 

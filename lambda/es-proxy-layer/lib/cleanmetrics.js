@@ -6,7 +6,7 @@ var url=require('url')
 var _=require('lodash')
 var myCredentials = new aws.EnvironmentCredentials('AWS'); 
 var request=require('./request')
-const qnabot = require("/opt/lib/logging")
+const qnabot = require("qnabot/logging")
 
 
 module.exports=function(event,context,callback){

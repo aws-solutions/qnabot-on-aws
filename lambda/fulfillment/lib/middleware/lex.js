@@ -1,7 +1,7 @@
 var _=require('lodash')
 const slackifyMarkdown = require('slackify-markdown');
 const utf8 = require('utf8');
-const qnabot = require("/opt/lib/logging")
+const qnabot = require("qnabot/logging")
 
 
 

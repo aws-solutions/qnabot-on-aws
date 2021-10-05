@@ -1,7 +1,7 @@
 var _=require('lodash');
 var jwt = require('jsonwebtoken');
 const jwksClient = require('jwks-rsa-promisified');
-const qnabot = require("/opt/lib/logging")
+const qnabot = require("qnabot/logging")
 
 
 
