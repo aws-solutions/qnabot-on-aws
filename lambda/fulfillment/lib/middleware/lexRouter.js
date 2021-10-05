@@ -22,6 +22,8 @@ const QNAEmailAddress = "QNAEmailAddress";
 const QNAName = "QNAName";
 const QNAYesNo = "QNAYesNo";
 const QNAYesNoExit = "QNAYesNoExit";
+const qnabot = require("qnabot/logging")
+
 
 const translate = require('./multilanguage.js');
 
@@ -68,27 +70,27 @@ function lexV1ClientRequester(params) {
     return new Promise(function(resolve, reject) {
         lexV1Client.postText(params, function(err, data) {
             if (err) {
-                console.log(err, err.stack);
+                qnabot.log(err, err.stack);
                 reject('Lex client request error:' + err);
             }
             else {
-                console.log("Lex client response:" + JSON.stringify(data, null, 2));
+                qnabot.log("Lex client response:" + JSON.stringify(data, null, 2));
                 resolve(data);
             }
         });
     });
 }
 function lexV2ClientRequester(params) {
-    console.log(`aws sdk version is ${AWS.VERSION}`);
+    qnabot.log(`aws sdk version is ${AWS.VERSION}`);
     const lexV2Client = new AWS.LexRuntimeV2();
     return new Promise(function(resolve, reject) {
         lexV2Client.recognizeText(params, function(err, data) {
             if (err) {
-                console.log(err, err.stack);
+                qnabot.log(err, err.stack);
                 reject('Lex client request error:' + err);
             }
             else {
-                console.log("Lex client response:" + JSON.stringify(data, null, 2));
+                qnabot.log("Lex client response:" + JSON.stringify(data, null, 2));
                 resolve(data);
             }
         });
@@ -165,9 +167,9 @@ async function handleRequest(req, res, botName, botAlias) {
                 text: respText
 
             };
-            console.log("Lex V2 parameters: " + JSON.stringify(params));
+            qnabot.log("Lex V2 parameters: " + JSON.stringify(params));
             const lexv2response = await lexV2ClientRequester(params); 
-            console.log("Lex V2 response: " + JSON.stringify(lexv2response));
+            qnabot.log("Lex V2 response: " + JSON.stringify(lexv2response));
             response.message = _.get(lexv2response, 'messages[0].content', '');
             // lex v2 FallbackIntent match means it failed to fill desired slot(s).
             if (lexv2response.sessionState.intent.name === "FallbackIntent" || 
@@ -188,7 +190,7 @@ async function handleRequest(req, res, botName, botAlias) {
                 inputText: respText,
                 userId: tempBotUserID,
             };
-            console.log("Lex V1 parameters: " + JSON.stringify(params));
+            qnabot.log("Lex V1 parameters: " + JSON.stringify(params));
             response = await lexV1ClientRequester(params);
         }
         return response;
@@ -227,7 +229,7 @@ async function processResponse(req, res, hook, msg) {
     const elicit_Response_Retry_Message = _.get(req, '_settings.ELICIT_RESPONSE_RETRY_MESSAGE', "Please try again?");
 
     let botResp = await handleRequest(req, res, hook, "live");
-    console.log("botResp: " + JSON.stringify(botResp,null,2));
+    qnabot.log("botResp: " + JSON.stringify(botResp,null,2));
     var plainMessage = botResp.message;
     var ssmlMessage = undefined;
     // if messsage contains SSML tags, strip tags for plain text, but preserve tags for SSML 

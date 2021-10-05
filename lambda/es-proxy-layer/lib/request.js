@@ -4,6 +4,8 @@ aws.config.region=process.env.AWS_REGION
 var axios=require('axios')
 var sign=require('aws4').sign
 var Url=require('url')
+const qnabot = require("qnabot/logging")
+
 
 module.exports=function(opts){
     
@@ -30,12 +32,12 @@ module.exports=function(opts){
         request.body=opts.body
         request.data=opts.body
     }
-    console.log("request",JSON.stringify(request,null,2))
+    qnabot.log("request",JSON.stringify(request,null,2))
 
     return new Promise(function(res,rej){
         function next(count){
             if(count>0){
-                console.log("Tries left:"+count)
+                qnabot.log("Tries left:"+count)
                 var credentials=aws.config.credentials
                 var signed=sign(request,credentials)        
                 Promise.resolve(axios(signed))
@@ -53,6 +55,6 @@ module.exports=function(opts){
         }
         next(10)
     })
-    .tap(x=>console.log(x.status))
+    .tap(x=>qnabot.log(x.status))
     .get('data')
 }

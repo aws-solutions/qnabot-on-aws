@@ -1,6 +1,8 @@
 var _=require('lodash');
 var aws=require('../aws');
 var lambda= new aws.Lambda();
+const qnabot = require("qnabot/logging")
+
 
 
 exports.getLambdaArn=function(name){
@@ -13,29 +15,29 @@ exports.getLambdaArn=function(name){
 }
 
 exports.invokeLambda=async function(params){
-    console.log(`Invoking ${params.FunctionName}`)
+    qnabot.log(`Invoking ${params.FunctionName}`)
     var payload = params.Payload || JSON.stringify({
         req:params.req,
         res:params.res
     })
-    console.log("payload")
-    console.log(payload)
+    qnabot.log("payload")
+    qnabot.log(payload)
     var result=await lambda.invoke({
         FunctionName:params.FunctionName,
         InvocationType:params.InvocationType || "RequestResponse",
         Payload:payload
     }).promise() 
     
-    console.log(result)
+    qnabot.log(result)
     if(!result.FunctionError){
         try{
             if(result.Payload){
                 var parsed=JSON.parse(result.Payload)
-                console.log("Response",JSON.stringify(parsed,null,2))
+                qnabot.log("Response",JSON.stringify(parsed,null,2))
                 return parsed
             }
         }catch(e){
-            console.log(e)
+            qnabot.log(e)
             throw e
         }
     }else{
@@ -48,7 +50,7 @@ exports.invokeLambda=async function(params){
                 break;
         }
 
-        console.log("Error Response",JSON.stringify(error_message,null,2))
+        qnabot.log("Error Response",JSON.stringify(error_message,null,2))
         throw error_message
     }
 }

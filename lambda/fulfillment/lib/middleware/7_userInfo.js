@@ -4,6 +4,8 @@ var alexa=require('./alexa')
 var _=require('lodash')
 var util=require('./util')
 var AWS=require('aws-sdk');
+const qnabot = require("qnabot/logging")
+
 
 function getDistinctValues(list,objectId,sortField){
     var dt = new Date();
@@ -22,7 +24,7 @@ async function update_userInfo(res) {
     var topics = _.get(res,"_userInfo.recentTopics",[])
     var distinctTopics= getDistinctValues(topics,"topic").slice(0,10)
     _.set(res,"_userInfo.recentTopics",distinctTopics)
-    console.log(res._userInfo)
+    qnabot.log(res._userInfo)
     var userId = _.get(res,"_userInfo.UserName") && _.get(res,"_userInfo.isVerifiedIdentity") == "true" ? _.get(res,"_userInfo.UserName") : _.get(res,"_userInfo.UserId");
     _.set(res,"_userInfo.UserId",userId)
     var usersTable = process.env.DYNAMODB_USERSTABLE;
@@ -31,19 +33,19 @@ async function update_userInfo(res) {
         TableName: usersTable,
         Item: res._userInfo,
     };
-    console.log("Saving response user info to DynamoDB: ", params);
+    qnabot.log("Saving response user info to DynamoDB: ", params);
     var ddbResponse={}
     try {
         ddbResponse = await docClient.put(params).promise();
     }catch(e){
-        console.log("ERROR: DDB Exception caught - can't save userInfo: ", e)
+        qnabot.log("ERROR: DDB Exception caught - can't save userInfo: ", e)
     }
-    console.log("DDB Response: ", ddbResponse);
+    qnabot.log("DDB Response: ", ddbResponse);
     return ddbResponse;
 }
 
 module.exports=async function userInfo(req,res){
-    console.log("Entering userInfo Middleware")
+    qnabot.log("Entering userInfo Middleware")
 
     await update_userInfo(res);
     return {req,res}

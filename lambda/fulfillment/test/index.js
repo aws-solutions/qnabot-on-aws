@@ -14,6 +14,8 @@ var lambda=require('./setup.js')
 const setupenv=require('./setupenv.js')
 var Promise=require('bluebird')
 var _=require('lodash')
+const qnabot = require("qnabot/logging")
+
 
 var Ajv=require('ajv')
 var ajv=new Ajv()
@@ -23,8 +25,8 @@ process.env.EMPTYMESSAGE="empty"
 
 var run=function(params,schema,test){
     return lambda(params)
-        .tap(msg=>console.log(JSON.stringify(msg)))
-        .tapCatch(msg=>console.log(JSON.stringify(msg)))
+        .tap(msg=>qnabot.log(JSON.stringify(msg)))
+        .tapCatch(msg=>qnabot.log(JSON.stringify(msg)))
         .tap(test.ok)
         .tap(function(x){
             var v=schema(x)
