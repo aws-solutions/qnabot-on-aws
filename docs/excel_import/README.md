@@ -28,6 +28,29 @@ Excel Column | Content Designer Field| Description
  displaytext1...displaytext(n) | Display Text | The text of the button. Each button text should be in a separate column numbered button1, button2, ...
  buttonvalue...buttonvalue(n) | Button Value| The value of the button. Each button value should be in a separate column numbered button1, button2, ...
 
+## Support for other Content Designer fields
+
+While special affordances have been made to allow importing the fields above, any "string" field in the [Content Designer schema](../../lambda/schema/qna.js)
+can be imported by specifying the JSON path as the column.  
+
+### Example of a field on the root level
+
+![Schema snippet](schema2.png)
+
+Excel Column | Content Designer Field
+-------------|-----------------------
+clientFilterValues | Client Filter: Values
+
+
+### Examples of nested fields
+
+![Schema snippet](schema.png)
+
+Excel Column | Content Designer Field (title in the schema.json) 
+-------------|------------------------
+elicitResponse.response_hooks | Elicit Response: Responsebot Hook
+elicitResponse.response_sessionattr_namespace |  Response Session Attribute Namespace
+
 ## Importing the Microsoft Excel file
 
 Choose *Import* from the Menu and then choose *From File*
