@@ -1,5 +1,7 @@
 var _=require('lodash')
 var util=require('./util')
+const qnabot = require("qnabot/logging")
+
 
 module.exports = async function hook(req,res) {
     
@@ -21,7 +23,7 @@ module.exports = async function hook(req,res) {
         if (lambdahooks[i].l) {
             event.res.result.l = lambdahooks[i].l;
             event.res.result.args = lambdahooks[i].args ;
-            console.log("Lambda Hook ", i, ": ", lambdahooks[i].l, " => Args: ", lambdahooks[i].args);
+            qnabot.log("Lambda Hook ", i, ": ", lambdahooks[i].l, " => Args: ", lambdahooks[i].args);
             let arn=util.getLambdaArn(lambdahooks[i].l);
             if (arn) {
                 event = await util.invokeLambda({

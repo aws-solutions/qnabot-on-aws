@@ -1,5 +1,7 @@
 const AWS = require('aws-sdk');
 const url = require('url');
+const qnabot = require("qnabot/logging")
+
 
 let credentials;
 
@@ -67,7 +69,7 @@ let execute = function(endpoint, region, path, method, body) {
         resolve(body);
       });
     }, (err) => {
-      console.log('Error: ' + err);
+      qnabot.log('Error: ' + err);
       reject(err);
     });
   });
@@ -94,7 +96,7 @@ let main = async function() {
     time1.t1 = d1.getTime();
     time1.t2 = d2.getTime();
     time1.duration = d2.getTime() - d1.getTime();
-    console.log(`${JSON.stringify(time1)}`);
+    qnabot.log(`${JSON.stringify(time1)}`);
     let e1 = new Date();
     res = await execute(endpoint, region, uri.path, method, input);
     let e2 = new Date();
@@ -103,7 +105,7 @@ let main = async function() {
     time2.t1 = e1.getTime();
     time2.t2 = e2.getTime();
     time2.duration = e2.getTime() - e1.getTime();
-    console.log(`${JSON.stringify(time2)}`);
+    qnabot.log(`${JSON.stringify(time2)}`);
   }
   return res;
 };
@@ -114,16 +116,16 @@ module.exports=class warmer {
 
   async perform(event, context, callback) {
     let count = process.env.REPEAT_COUNT ? parseInt(process.env.REPEAT_COUNT) : 4;
-    console.log(`Incoming payload: ${JSON.stringify(event, null, 2)}`);
+    qnabot.log(`Incoming payload: ${JSON.stringify(event, null, 2)}`);
     try {
       for (let i = 0; i < count; i++) {
-        console.log(`main ${i}`);
+        qnabot.log(`main ${i}`);
         let res = await main();
-        console.log(res);
+        qnabot.log(res);
       }
       return ("success");
     } catch (e) {
-      console.log(`Error detected ${e}`);
+      qnabot.log(`Error detected ${e}`);
       return ("failure");
     }
   }

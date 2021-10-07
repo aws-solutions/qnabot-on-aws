@@ -15,7 +15,7 @@ const filter = text => {
 require('intercept-stdout')(filter, filter);
 
 exports.qid=require('/opt/lib/qid')
-exports.logging=require('/opt/lib/logging')
+exports.logging=require('/opt/lib/es-logging')
 exports.cleanmetrics=require('/opt/lib/cleanmetrics')
 exports.utterances=require('/opt/lib/utterances')
 exports.handler =require('/opt/lib/handler') 

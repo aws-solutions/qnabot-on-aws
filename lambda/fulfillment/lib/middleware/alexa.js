@@ -1,5 +1,7 @@
 const _=require('lodash');
 const translate = require('./multilanguage.js');
+const qnabot = require("qnabot/logging")
+
 
 async function get_welcome_message(req, locale){
     const welcome_message = _.get(req,'_settings.DEFAULT_ALEXA_LAUNCH_MESSAGE', 'Hello, Please ask a question');
@@ -39,54 +41,54 @@ exports.parse=async function(req){
     // set userPreferredLocale from Alexa request
     const alexa_locale = _.get(event,'request.locale').split("-")[0];
     _.set(out, 'session.qnabotcontext.userPreferredLocale', alexa_locale);
-    console.log("Set userPreferredLocale:", out.session.qnabotcontext.userPreferredLocale);
+    qnabot.log("Set userPreferredLocale:", out.session.qnabotcontext.userPreferredLocale);
     var welcome_message;
     var stop_message;
     var err_message;
     
     switch(_.get(event,"request.type")){
         case "LaunchRequest":
-            console.log("INFO: LaunchRequest.");
+            qnabot.log("INFO: LaunchRequest.");
             welcome_message = await get_welcome_message(req,alexa_locale);
             throw new AlexaMessage(welcome_message, false) ;
         case "SessionEndedRequest":
-            console.log("INFO: SessionEndedRequest.");
+            qnabot.log("INFO: SessionEndedRequest.");
             throw new End() ;
         case "IntentRequest":
-            console.log("INFO: IntentRequest.");
+            qnabot.log("INFO: IntentRequest.");
             switch(_.get(event,"request.intent.name")){
                 case "AMAZON.CancelIntent":
-                    console.log("INFO: CancelIntent.");
+                    qnabot.log("INFO: CancelIntent.");
                     stop_message = await get_stop_message(req,alexa_locale);
                     throw new AlexaMessage(stop_message, true) ;
                 case "AMAZON.StopIntent":
-                    console.log("INFO: StopIntent.");
+                    qnabot.log("INFO: StopIntent.");
                     stop_message = await get_stop_message(req,alexa_locale);
                     throw new AlexaMessage(stop_message, true) ;
                 case "AMAZON.FallbackIntent":
-                    console.log("ERROR: FallbackIntent. This shouldn't happen - we can't get the utterance. Ask user to try again.");
+                    qnabot.log("ERROR: FallbackIntent. This shouldn't happen - we can't get the utterance. Ask user to try again.");
                     err_message = await translate.translateText("Sorry, I do not understand. Please try again.",'en',alexa_locale); 
                     throw new AlexaMessage(err_message, false) ;  
                 case "AMAZON.RepeatIntent":
                     welcome_message = await get_welcome_message(req,alexa_locale);
-                    console.log("At Repeat Intent") ;
-                    console.log(JSON.stringify(out)) ;
+                    qnabot.log("At Repeat Intent") ;
+                    qnabot.log(JSON.stringify(out)) ;
                     throw new Respond({
                         version:'1.0',
                         response: _.get(out,"session.cachedOutput",{outputSpeech:{type:"PlainText",text:welcome_message},shouldEndSession:false})
                     }) ;
                 case "Qna_intent":
-                    console.log("INFO: Qna_intent.");
+                    qnabot.log("INFO: Qna_intent.");
                     out.question=_.get(event,'request.intent.slots.QnA_slot.value',"");
                     break ;
                 default:
-                    console.log("ERROR: Unhandled Intent - ", _.get(event,"request.intent.name"));
+                    qnabot.log("ERROR: Unhandled Intent - ", _.get(event,"request.intent.name"));
                     err_message = await translate.translateText("The skill is unable to process the request.",'en',alexa_locale); 
                     throw new AlexaMessage(err_message, true) ;                    
             }
     }
     if (out.question === "") {
-        console.log("ERROR: No value found for QnA_slot") ;
+        qnabot.log("ERROR: No value found for QnA_slot") ;
         err_message = await translate.translateText("The skill is unable to process the request.",'en',alexa_locale); 
         throw new AlexaMessage(err_message, true) ;
     }

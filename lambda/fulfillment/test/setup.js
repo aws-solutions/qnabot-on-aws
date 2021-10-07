@@ -16,12 +16,14 @@ var Promise=require('bluebird')
 var config=require('../../../config')
 var aws=require('aws-sdk')
 var outputs=require('../../../bin/exports')
+const qnabot = require("qnabot/logging")
+
 
 module.exports=function(event){
     return Promise.join(
         outputs("dev/master",{wait:true}),
         outputs("dev/lambda",{wait:true})
-    ).tap(console.log).spread(function(master,lambda){
+    ).tap(qnabot.log).spread(function(master,lambda){
         process.env.ES_ADDRESS=master.ElasticsearchEndpoint
         process.env.ES_INDEX=master.ElasticsearchIndex
         process.env.ES_TYPE=master.ElasticsearchType

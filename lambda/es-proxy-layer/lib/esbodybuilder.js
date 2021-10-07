@@ -4,21 +4,25 @@ const bodybuilder = require('bodybuilder');
 const get_keywords = require('./keywords');
 const _ = require('lodash');
 
+const qnabot = require("qnabot/logging")
+
+
+
 
 function build_qid_query(params) {
-  console.log("Build_qid_query - params: ", JSON.stringify(params, null, 2));
+  qnabot.log("Build_qid_query - params: ", JSON.stringify(params, null, 2));
   const query = bodybuilder()
     .orQuery('match', 'qid', params.qid)
     .from(0)
     .size(1)
     .build();
-  console.log("ElasticSearch Query", JSON.stringify(query, null, 2));
+  qnabot.log("ElasticSearch Query", JSON.stringify(query, null, 2));
   return new Promise.resolve(query);
 }
 
 
 function build_query(params) {
-  console.log("Build_query - params: ", JSON.stringify(params, null, 2));
+  qnabot.log("Build_query - params: ", JSON.stringify(params, null, 2));
   return (get_keywords(params))
     .then(function (keywords) {
       const filter_query_unique_terms = {
@@ -74,7 +78,7 @@ function build_query(params) {
         .from(_.get(params, 'from', 0))
         .size(_.get(params, 'size', 1))
         .build();
-      console.log("ElasticSearch Query", JSON.stringify(query, null, 2));
+      qnabot.log("ElasticSearch Query", JSON.stringify(query, null, 2));
       return new Promise.resolve(query);
     });
 }

@@ -35,6 +35,42 @@ module.exports = {
       CompatibleRuntimes: ["nodejs12.x"],
     },
   },
+  QnABotCommonLayerCodeVersion: {
+    Type: "Custom::S3Version",
+    Properties: {
+      ServiceToken: { "Fn::GetAtt": ["CFNLambda", "Arn"] },
+      Bucket: { Ref: "BootstrapBucket" },
+      Key: { "Fn::Sub": "${BootstrapPrefix}/lambda/qnabot-common-layer.zip" },
+      BuildDate: new Date().toISOString(),
+    },
+  },
+  QnABotCommonLambdaLayer: {
+    Type: "AWS::Lambda::LayerVersion",
+    Properties: {
+      LayerName:{
+        "Fn::Join": [
+          "-",
+          [
+            "QnABotCommon",
+            {
+              "Fn::Select": [
+                2,
+                {"Fn::Split": ["-", {Ref: "DefaultQnABotSettings"}]},
+              ],
+            },
+          ],
+        ],
+      },
+      Content: {
+        S3Bucket: { Ref: "BootstrapBucket" },
+        S3Key: {
+          "Fn::Sub": "${BootstrapPrefix}/lambda/qnabot-common-layer.zip",
+        },
+        S3ObjectVersion: { Ref: "QnABotCommonLayerCodeVersion" },
+      },
+      CompatibleRuntimes: ["nodejs12.x"],
+    },
+  },
   AwsSdkLayerCodeVersion: {
     Type: "Custom::S3Version",
     Properties: {
