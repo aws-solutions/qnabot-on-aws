@@ -82,7 +82,7 @@ const isPIIDetected = async (text, useComprehendForPII, piiRegex, pii_rejection_
         qnabot.log("Warning: No value found for setting  PII_REJECTION_REGEX not using REGEX Matching")
     }
     let foundComprehendPII = false
-    if (useComprehendForPII) {
+    if (!found_redacted_pii && useComprehendForPII ) {
         var params = {
             LanguageCode: "en",
             Text: text
@@ -105,7 +105,7 @@ const isPIIDetected = async (text, useComprehendForPII, piiRegex, pii_rejection_
         }
 
     }
-    return foundComprehendPII > 0 || found_redacted_pii;
+    return foundComprehendPII  || found_redacted_pii;
 
 
 
