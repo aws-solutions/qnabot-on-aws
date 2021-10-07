@@ -15,7 +15,28 @@ Refer to [Getting Started](#getting-started) to launch your own QnABot, or [Auto
 **New features in 4.5.0** [Kendra Web Crawler, Comprehend PII Detection, Translate Custom Terminology, Increased deployment regions](CHANGELOG.md#450---2021-03-07).
 
 ## Architecture Overview
-![Architecture](deployment/architecture.png)
+![Architecture](docs/architecture.png)
+ 
+The AWS CloudFormation template deploys the following workflows and services:
+
+1. The admin deploys the solution into their AWS account, opens the Content Designer UI, and uses Amazon Cognito to authenticate.
+
+2. After authentication, Amazon CloudFront
+and Amazon S3 deliver the contents of the Content Designer UI.
+
+3. The admin configures questions and answers in the Content Designer and the UI sends requests to Amazon API Gateway to save the questions and answers.
+
+4. The Content Designer AWS Lambda
+function saves the input in Amazon OpenSearch Service (successor to Amazon ElasticSearch Service) in a questions bank index.
+
+5. Users of the chatbot interact with Amazon Lex via the web client UI or Amazon Connect.
+
+6. Amazon Lex forwards requests to the AWS Lambda (Bot Fulfillment) function. (Users can also send requests to this Lambda function via Amazon Alexa devices).
+
+7. The Bot Fulfillment function takes the users input and uses Amazon Comprehend
+and Amazon Translate (if necessary) to translate non-English requests to English and then looks up the answer in in Amazon OpenSearch Service. If Amazon Kendra index is configured and provided at the time of deployment, the Bot Fulfillment function also sends a request to the Amazon Kendra index.
+
+8. User interactions with Bot Fulfillment functions generate logs and metrics data, which is sent to Amazon Kinesis Data Firehose then to Amazon S3 for later data analysis. 
 ## Upgrade Notes
 
 During an upgrade, we recommend that existing QnABot content first be exported and downloaded from the Content Designer prior to
