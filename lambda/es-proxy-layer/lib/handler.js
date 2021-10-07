@@ -6,6 +6,8 @@ var build_es_query=require('./esbodybuilder');
 var kendra = require('./kendraQuery');
 var AWS=require('aws-sdk');
 
+const qnabot = require("qnabot/logging")
+
 
 function isJson(str) {
     try {
@@ -51,24 +53,31 @@ async function get_settings() {
     var default_settings_param = process.env.DEFAULT_SETTINGS_PARAM;
     var custom_settings_param = process.env.CUSTOM_SETTINGS_PARAM;
 
-    console.log("Getting Default QnABot settings from SSM Parameter Store: ", default_settings_param);
+    qnabot.log("Getting Default QnABot settings from SSM Parameter Store: ", default_settings_param);
     var default_settings = await get_parameter(default_settings_param);
 
-    console.log("Getting Custom QnABot settings from SSM Parameter Store: ", custom_settings_param);
+    qnabot.log("Getting Custom QnABot settings from SSM Parameter Store: ", custom_settings_param);
     var custom_settings = await get_parameter(custom_settings_param);
 
     var settings = _.merge(default_settings, custom_settings);
 
-    console.log("Merged Settings: ", settings);
+    qnabot.log("Merged Settings: ", settings);
 
     if (settings.ENABLE_REDACTING) {
-        console.log("redacting enabled");
+        qnabot.log("redacting enabled");
         process.env.QNAREDACT="true";
         process.env.REDACTING_REGEX=settings.REDACTING_REGEX;
     } else {
-        console.log("redacting disabled");
+        qnabot.log("redacting disabled");
         process.env.QNAREDACT="false";
         process.env.REDACTING_REGEX="";
+    }
+    if (settings.DISABLE_CLOUDWATCH_LOGGING) {
+        qnabot.log("disable cloudwatch logging");
+        process.env.DISABLECLOUDWATCHLOGGING="true";
+    } else {
+        qnabot.log("enable cloudwatch logging");
+        process.env.DISABLECLOUDWATCHLOGGING="false";
     }
     return settings;
 }
@@ -103,7 +112,7 @@ async function get_es_query(event, settings) {
 
 
 async function run_query_es(event, settings) {
-    console.log("ElasticSearch Query",JSON.stringify(es_query,null,2));
+    qnabot.log("ElasticSearch Query",JSON.stringify(es_query,null,2));
     var es_query = await get_es_query(event, settings);
     var es_response = await request({
         url:Url.resolve("https://"+event.endpoint,event.path),
@@ -117,8 +126,8 @@ async function run_query_es(event, settings) {
 
 
 async function run_query_kendra(event, kendra_index) {
-    console.log("Kendra FAQ Query index:" + kendra_index);
-    console.log(event)
+    qnabot.log("Kendra FAQ Query index:" + kendra_index);
+    qnabot.log(event)
     var request_params = {
         kendra_faq_index:kendra_index,
         question:event.question,
@@ -135,9 +144,10 @@ async function run_query_kendra(event, kendra_index) {
 
 
 module.exports= async (event, context, callback) => {
-    console.log('Received event:', JSON.stringify(event, null, 2));
     try {
         var settings = await get_settings();
+        qnabot.log('Received event:', JSON.stringify(event, null, 2));
+
         var kendra_index = _.get(settings, "KENDRA_FAQ_INDEX")
         event.minimum_score = _.get(settings, 'ALT_SEARCH_KENDRA_FAQ_CONFIDENCE_SCORE', "MEDIUM")
         var question = _.get(event,'question','');
@@ -148,17 +158,17 @@ module.exports= async (event, context, callback) => {
             // ES fallback if KendraFAQ fails
             var hit = _.get(response, "hits.hits[0]._source");
             if (!hit && _.get(settings, 'KENDRA_FAQ_ES_FALLBACK', false)){
-                console.log("ES Fallback");
+                qnabot.log("ES Fallback");
                 response = await run_query_es(event, settings);
             }
         } else {
             var response = await run_query_es(event, settings);
         }
         
-        console.log("Query response: ", JSON.stringify(response,null,2));
+        qnabot.log("Query response: ", JSON.stringify(response,null,2));
         return callback(null, response);
     } catch (error) {
-        console.log(`error is ${JSON.stringify(error, null,2)}`);
+        qnabot.log(`error is ${JSON.stringify(error, null,2)}`);
         return callback(JSON.stringify({
             type:error.response.status===404 ? "[NotFound]":"[InternalServiceError]",
             status:error.response.status,

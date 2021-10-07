@@ -4,6 +4,8 @@ var alexa=require('./alexa')
 var _=require('lodash')
 var util=require('./util')
 var translate = require('./multilanguage.js')
+const qnabot = require("qnabot/logging")
+
 
 
 function sms_hint(req,res) {
@@ -15,7 +17,7 @@ function sms_hint(req,res) {
             var hours = req._userInfo.TimeSinceLastInteraction / 36e5;
             if (hours >= interval_hrs) {
                 hint = hint_message;
-                console.log("Appending hint to SMS answer: ", hint);
+                qnabot.log("Appending hint to SMS answer: ", hint);
             }
         }
     }
@@ -51,7 +53,7 @@ async function connect_response(req, res) {
         if (! _.get(res,"session.qnabotcontext.elicitResponse.responsebot")) {
             // QnABot is not doing elicitResponse
             if (_.get(req,"_settings.CONNECT_ENABLE_VOICE_RESPONSE_INTERRUPT")) {
-                console.log("CONNECT_ENABLE_VOICE_RESPONSE_INTERRUPT is true. splitting response.")
+                qnabot.log("CONNECT_ENABLE_VOICE_RESPONSE_INTERRUPT is true. splitting response.")
                 // split multi sentence responses.. First sentence stays in response, remaining sentences get prepended to next prompt session attribute.
                 let message = res.message ;
                 let prompt = _.get(res.session,nextPromptVarName,"").replace(/<speak>|<\/speak>/g, "") ;
@@ -68,8 +70,8 @@ async function connect_response(req, res) {
                     res.message = "<speak>" + a[0] + "</speak>" ;
                     _.set(res.session,nextPromptVarName, "<speak>" + a[1] + " " + prompt + "</speak>");
                 }
-                console.log("Response message:", res.message);
-                console.log("Reponse session var:", nextPromptVarName, ":", _.get(res.session,nextPromptVarName)) ;
+                qnabot.log("Response message:", res.message);
+                qnabot.log("Reponse session var:", nextPromptVarName, ":", _.get(res.session,nextPromptVarName)) ;
             }
         } else {
             // QnABot is doing elicitResponse - disable Next_Prompt

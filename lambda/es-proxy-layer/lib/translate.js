@@ -1,27 +1,29 @@
 const _ = require('lodash');
 const AWS = require('aws-sdk');
+const qnabot = require("qnabot/logging")
+
 
 async function get_terminologies(sourceLang) {
     const translate = new AWS.Translate();
-    console.log("Getting registered custom terminologies");
+    qnabot.log("Getting registered custom terminologies");
     const configuredTerminologies = await translate.listTerminologies({}).promise();
-    console.log("terminology response " + JSON.stringify(configuredTerminologies));
+    qnabot.log("terminology response " + JSON.stringify(configuredTerminologies));
     const sources = configuredTerminologies["TerminologyPropertiesList"].filter(t => t["SourceLanguageCode"] == sourceLang).map(s => s.Name);
-    console.log("Filtered Sources " + JSON.stringify(sources));
+    qnabot.log("Filtered Sources " + JSON.stringify(sources));
     return sources;
 }
 
 async function get_translation(englishText, targetLang, req) {
-    console.log("get_translation:", targetLang, "InputText: ", englishText);
+    qnabot.log("get_translation:", targetLang, "InputText: ", englishText);
     if (targetLang === 'en') {
-        console.log("get_translation: target is en, translation not required. Return english text");
+        qnabot.log("get_translation: target is en, translation not required. Return english text");
         return englishText;
     }
 
     const translateClient = new AWS.Translate();
     try {
         var customTerminologyEnabled = _.get(req._settings, "ENABLE_CUSTOM_TERMINOLOGY") == true;
-        console.log("get translation request " + JSON.stringify(req))
+        qnabot.log("get translation request " + JSON.stringify(req))
 
         const params = {
             SourceLanguageCode: 'en', /* required */
@@ -33,15 +35,15 @@ async function get_translation(englishText, targetLang, req) {
             params["TerminologyNames"] = customTerminologies;
         }
 
-        console.log("input text:", englishText);
+        qnabot.log("input text:", englishText);
         const translation = await translateClient.translateText(params).promise();
-        console.log("translation:", translation);
+        qnabot.log("translation:", translation);
         const regex = /\s\*\s+$/m;
         translation.TranslatedText = translation.TranslatedText.replace(regex, '*\n\n') // Translate adds a space between the "*" causing incorrect Markdown
         translation.TranslatedText = translation.TranslatedText.replace(/<\/?span[^>]*>/g,""); // removes span tag used to keep Translate from translating URLs
         return translation.TranslatedText;
     } catch (err) {
-        console.log("warning - error during translation: ", err);
+        qnabot.log("warning - error during translation: ", err);
         return englishText;
     }
 }
@@ -55,7 +57,7 @@ function replaceAll(str, find, replace) {
 }
 
 exports.translate_hit = async function(hit,usrLang,req){
-    console.log("translate_hit:", JSON.stringify(hit,null,2));
+    qnabot.log("translate_hit:", JSON.stringify(hit,null,2));
     let hit_out = _.cloneDeep(hit);
     let a = _.get(hit, "a");
     let markdown = _.get(hit, "alt.markdown");
@@ -67,7 +69,7 @@ exports.translate_hit = async function(hit,usrLang,req){
         try {
             hit_out.a = await get_translation(hit_out.a, usrLang,req);
         } catch (e) {
-            console.log("ERROR: Answer caused Translate exception: ", a)
+            qnabot.log("ERROR: Answer caused Translate exception: ", a)
             throw (e);
         }
     }
@@ -76,7 +78,7 @@ exports.translate_hit = async function(hit,usrLang,req){
             const res = await get_translation(hit_out.alt.markdown, usrLang,req);
             hit_out.alt.markdown  = replaceAll(res,'] (http', '](http');
         } catch (e) {
-            console.log("ERROR: Markdown caused Translate exception: ", a)
+            qnabot.log("ERROR: Markdown caused Translate exception: ", a)
             throw (e);
         }
     }
@@ -84,7 +86,7 @@ exports.translate_hit = async function(hit,usrLang,req){
         try {
             hit_out.alt.ssml = await get_translation(hit_out.alt.ssml, usrLang,req);
         } catch (e) {
-            console.log("ERROR: SSML caused Translate exception: ", a);
+            qnabot.log("ERROR: SSML caused Translate exception: ", a);
             throw (e);
         }
     }
@@ -92,7 +94,7 @@ exports.translate_hit = async function(hit,usrLang,req){
         try {
             hit_out.rp = await get_translation(hit_out.rp, usrLang, req);
         } catch (e) {
-            console.log("ERROR: Reprompt caused Translate exception: ", rp);
+            qnabot.log("ERROR: Reprompt caused Translate exception: ", rp);
             throw (e);
         }
     }
@@ -124,11 +126,11 @@ exports.translate_hit = async function(hit,usrLang,req){
                 }
             }
         } catch (e) {
-            console.log("ERROR: response card fields format caused Translate exception. Check syntax: " + e );
+            qnabot.log("ERROR: response card fields format caused Translate exception. Check syntax: " + e );
             throw (e);
         }
 
     }
-    console.log("Preprocessed Result: ", hit_out);
+    qnabot.log("Preprocessed Result: ", hit_out);
     return hit_out;    
 };

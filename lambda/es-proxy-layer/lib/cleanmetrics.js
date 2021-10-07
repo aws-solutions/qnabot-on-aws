@@ -6,6 +6,8 @@ var url=require('url')
 var _=require('lodash')
 var myCredentials = new aws.EnvironmentCredentials('AWS'); 
 var request=require('./request')
+const qnabot = require("qnabot/logging")
+
 
 module.exports=function(event,context,callback){
 
@@ -23,14 +25,15 @@ function sendDelete(indexName,timeBack,callback) {
                     "lt" : `now-${timeBack}m`
                 })
             .build()
-    console.log("ElasticSearch Query",JSON.stringify(query,null,2))
+    qnabot.log("ElasticSearch Query",JSON.stringify(query,null,2))
+    qnabot.log("Got Here cleanmetrics")
     return request({
         url:url.resolve(`https://${process.env.ES_ADDRESS}`,`/${process.env.ES_INDEX}-${indexName}/_delete_by_query`),
         method:"POST",
         body:query
     })
     .then(function(result){
-        console.log("ES result:"+JSON.stringify(result,null,2))
+        qnabot.log("ES result:"+JSON.stringify(result,null,2))
         callback(null,_.get(result,"hits.hits[0]._source",{}))
     })
     .catch(callback)

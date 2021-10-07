@@ -7,6 +7,8 @@
 const _=require('lodash');
 const AWS = require('aws-sdk');
 const translate = require('./multilanguage.js');
+const qnabot = require("qnabot/logging")
+
 
 /**
  * Identifies the user to pass on for requests to Lex or other bots
@@ -93,7 +95,7 @@ async function lambdaClientRequester(name, req) {
         Payload: JSON.stringify(payload)
     }).promise();
     let obj = JSON.parse(result.Payload);
-    console.log("lambda payload obj is : " + JSON.stringify(obj,null,2));
+    qnabot.log("lambda payload obj is : " + JSON.stringify(obj,null,2));
     return obj;
 }
 
@@ -107,11 +109,11 @@ function lexClientRequester(lexClient,params) {
     return new Promise(function(resolve, reject) {
         lexClient.postText(params, function(err, data) {
             if (err) {
-                console.log(err, err.stack);
+                qnabot.log(err, err.stack);
                 reject('Lex client request error:' + err);
             }
             else {
-                console.log("Lex client response:" + JSON.stringify(data, null, 2));
+                qnabot.log("Lex client response:" + JSON.stringify(data, null, 2));
                 resolve(data);
             }
         });
@@ -131,9 +133,9 @@ async function handleRequest(req, res, botName, botAlias) {
     if (botName.toLowerCase().startsWith("lambda::")) {
         // target bot is a Lambda Function
         const lambdaName = botName.split("::")[1];
-        console.log("Calling Lambda:", lambdaName);
+        qnabot.log("Calling Lambda:", lambdaName);
         let response = await lambdaClientRequester(lambdaName, req);
-        console.log("lambda response: " + JSON.stringify(response,null,2));
+        qnabot.log("lambda response: " + JSON.stringify(response,null,2));
         return response;
     } else {
         function mapFromSimpleName(botName) {
@@ -151,7 +153,7 @@ async function handleRequest(req, res, botName, botAlias) {
             sessionAttributes: _.get(req, "session.qnabotcontext.specialtySessionAttributes", {}),
             userId: getBotUserId(req),
         };
-        console.log("Lex parameters: " + JSON.stringify(params));
+        qnabot.log("Lex parameters: " + JSON.stringify(params));
         const response = await lexClientRequester(lexClient, params);
         return response;
     }
@@ -195,24 +197,24 @@ function endUseOfSpecialtyBot(req, res, welcomeBackMessage) {
  * @returns {Promise<{}>}
  */
 async function processResponse(req, res, hook, alias) {
-    console.log('specialtyBotRouter request: ' + JSON.stringify(req, null, 2));
-    console.log('specialtyBotRouter response: ' + JSON.stringify(res, null, 2));
+    qnabot.log('specialtyBotRouter request: ' + JSON.stringify(req, null, 2));
+    qnabot.log('specialtyBotRouter response: ' + JSON.stringify(res, null, 2));
     const welcomeBackMessage = _.get(req._settings, 'BOT_ROUTER_WELCOME_BACK_MSG', 'Welcome back to QnABot.');
     const exitResponseDefault = _.get(req._settings, 'BOT_ROUTER_EXIT_MSGS', 'exit,quit,goodbye,leave');
     let exitResponses = exitResponseDefault.split(',');
     exitResponses.map(entry => entry.trim());
     let currentUtterance = req.question.toLowerCase();
-    console.log(`current utterance: ${currentUtterance}`);
-    console.log('exit responses are: ' + JSON.stringify(exitResponses,null,2));
+    qnabot.log(`current utterance: ${currentUtterance}`);
+    qnabot.log('exit responses are: ' + JSON.stringify(exitResponses,null,2));
     if (_.indexOf(exitResponses, currentUtterance)>=0) {
-        console.log('user provided exit response given');
+        qnabot.log('user provided exit response given');
         let resp = endUseOfSpecialtyBot(req, res, welcomeBackMessage);
         resp.res = await translate_res(resp.req, resp.res);
-        console.log("returning resp for user requested exit: " + JSON.stringify(resp,null,2));
+        qnabot.log("returning resp for user requested exit: " + JSON.stringify(resp,null,2));
         return resp;
     } else {
         let botResp = await handleRequest(req, res, hook, alias);
-        console.log("specialty botResp: " + JSON.stringify(botResp, null, 2));
+        qnabot.log("specialty botResp: " + JSON.stringify(botResp, null, 2));
         let lexBotIsFulfilled = false;
         if (botResp.message || _.get(botResp,'dialogState', "") === 'ReadyForFulfillment') {
             if (_.get(botResp,'dialogState', "") === 'ReadyForFulfillment') {
@@ -233,14 +235,14 @@ async function processResponse(req, res, hook, alias) {
             _.set(res, "plainMessage", botResp.message);
             _.set(res, "messageFormat", botResp.messageFormat);
             if (_.get(botResp,'responseCard'))  {
-                console.log("found a response card. attached to res. only one / first response card will be used");
+                qnabot.log("found a response card. attached to res. only one / first response card will be used");
                 if (botResp.responseCard.genericAttachments[0].subTitle === null) botResp.responseCard.genericAttachments[0].subTitle = '';
                 if (botResp.responseCard.genericAttachments[0].attachmentLinkUrl === null) botResp.responseCard.genericAttachments[0].attachmentLinkUrl = '';
                 if (botResp.responseCard.genericAttachments[0].imageUrl === null) botResp.responseCard.genericAttachments[0].imageUrl = '';
                 _.set(res, "result.r", botResp.responseCard.genericAttachments[0]);
                 _.set(res, "card", botResp.responseCard.genericAttachments[0]);
                 _.set(res, "card.send", true);
-                console.log(`res is ${JSON.stringify(res,null,2)}`);
+                qnabot.log(`res is ${JSON.stringify(res,null,2)}`);
             }
 
             if (ssmlMessage && req._preferredResponseType === "SSML") {
@@ -252,7 +254,7 @@ async function processResponse(req, res, hook, alias) {
                 lexBotIsFulfilled = true;
             }
             if (botResp.sessionAttributes.QNABOT_END_ROUTING || lexBotIsFulfilled) {
-                console.log("specialtyBot requested exit");
+                qnabot.log("specialtyBot requested exit");
                 let resp = endUseOfSpecialtyBot(req, res, undefined);
                 resp.res = await translate_res(resp.req, resp.res);
                 return resp;
