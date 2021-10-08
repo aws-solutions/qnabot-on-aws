@@ -64,3 +64,5 @@
 | BOT_ROUTER_WELCOME_BACK_MSG | text | The text used by QnABot when ending communication from a specialty bot
 | BOT_ROUTER_EXIT_MSGS | comma separated list | The exit phrases in comma separated list available for the a user to end communication with a specialty bot
 | RUN_LAMBDAHOOK_FROM_QUERY_STEP | true or false | Controls timing of execution for Lambda hooks
+| LAMBDA_PREPROCESS_HOOK | string | name of Lambda to run before each question is processed.
+    LAMBDA_POSTPROCESS_HOOK | string | name of Lambda to run after the question is processed. But before user profile information is saved.

@@ -61,6 +61,8 @@ var default_settings = {
     BOT_ROUTER_WELCOME_BACK_MSG: "Welcome back to QnABot.", // The text used by QnABot when ending communication from a specialty bot
     BOT_ROUTER_EXIT_MSGS: "exit,quit,goodbye,leave", // The exit phrases in comma separated list available for the a user to end communication with a specialty bot
     RUN_LAMBDAHOOK_FROM_QUERY_STEP: "true",
+    LAMBDA_PREPROCESS_HOOK: "",
+    LAMBDA_POSTPROCESS_HOOK: ""
 };
 
 module.exports = {

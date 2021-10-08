@@ -122,10 +122,10 @@ module.exports = async function preprocess(req, res) {
             FunctionName: prehook,
             req, res
         })
-        _.set(req, "_fulfillment.step", undefined)
         req = result.req
         res = result.res
     }
+    _.set(req, "_fulfillment.step", undefined)
     // lex-web-ui: If idtoken session attribute is present, decode it
     var idtoken = _.get(req, 'session.idtokenjwt');
     var idattrs = { "verifiedIdentity": "false" };

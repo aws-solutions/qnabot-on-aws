@@ -16,7 +16,8 @@ module.exports = async function hook(req,res) {
                 }
             ];
     }
-    
+     _.set(req,"_fulfillment.step","lambdahook")
+   
     var event = {req,res};
     var i=0;
     while (i<lambdahooks.length) {
@@ -35,5 +36,19 @@ module.exports = async function hook(req,res) {
         }  
         i=i+1 ;
     }
+    req = event.req
+    res = event.res
+
+    console.log(JSON.stringify(event))
+    let posthook = _.get(req,'_settings.LAMBDA_POSTPROCESS_HOOK',undefined)
+    _.set(req,"_fulfillment.step","postprocess")
+    if(posthook){
+         event = await util.invokeLambda({
+            FunctionName:posthook,
+            req,res
+        })
+    }
+        _.set(req,"_fulfillment.step","")
+
     return event;
 }
