@@ -1,0 +1,17 @@
+{
+    "widgets": [
+        {
+            "type": "log",
+            "x": 0,
+            "y": 6,
+            "width": 24,
+            "height": 24,
+            "properties": {
+                "query": "SOURCE '/aws/kendra/${IndexId}' | fields DocumentId, ErrorCode, ErrorMessage, @timestamp\n| sort @timestamp desc\n| filter @logStream like /^${data_source_id}/",
+                "region": "us-east-1",
+                "title": "QnABot Kendra Web Crawler Results",
+                "view": "table"
+            }
+        }
+    ]
+}
