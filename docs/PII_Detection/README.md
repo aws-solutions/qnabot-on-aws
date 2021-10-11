@@ -13,4 +13,6 @@ Setting | Description |
  PII_REJECTION_WITH_COMPREHEND | Enable's Personal Identifiable Information detection with Amazon Comprehend |
  PII_REJECTION_REGEX | Used to find PII based on a regular expression |
  PII_REJECTION_IGNORE_TYPES | Do not detect the specified list of [entity types](https://aws.amazon.com/blogs/machine-learning/detecting-and-redacting-pii-using-amazon-comprehend/) |
+ PII_REJECTION_CONFIDENCE_SCORE: | Determines the confidence threshold before a detected entity is considered PII
+
 
