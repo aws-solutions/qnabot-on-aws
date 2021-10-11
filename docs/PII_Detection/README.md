@@ -1,6 +1,8 @@
 # Personally Identifiable Information Rejection
 
-QnABot can now detect Personally Identifiable Information (PII) using [Amazon Comprehend](https://docs.aws.amazon.com/comprehend/latest/dg/how-pii.html) and regular expressions
+QnABot can now detect Personally Identifiable Information (PII) using [Amazon Comprehend](https://docs.aws.amazon.com/comprehend/latest/dg/how-pii.html) and regular expressions.
+
+If ENABLE_REDACTION is set to "true", the Comprehend detected PII entities will also be redacted from CloudWatch logs and ElasticSearch logs.
 
 
 ![](./settings.png)
