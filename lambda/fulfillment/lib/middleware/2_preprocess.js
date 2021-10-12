@@ -118,8 +118,9 @@ module.exports = async function preprocess(req, res) {
     let prehook = _.get(req, '_settings.LAMBDA_PREPROCESS_HOOK', undefined) || process.env.LAMBDA_PREPROCESS
     _.set(req, "_fulfillment.step", "preprocess")
     if (prehook) {
+        let arn = util.getLambdaArn(prehook)
         let result = await util.invokeLambda({
-            FunctionName: prehook,
+            FunctionName: arn,
             req, res
         })
         req = result.req
