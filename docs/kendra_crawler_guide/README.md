@@ -1,8 +1,8 @@
-# Kendra Web Indexer Integration
+# Kendra Web Crawler Integration
 
 Please read the [Kendra Integration](../../workshops/kendra/README.md) for instructions about configuring Kendra
 
-QnABot can now index your website with Kendra and answer questions based on what it has found.
+QnABot can now crawl your website with Kendra and answer questions based on what it has found.
 
 Go to the Settings option in the Tools menu
 
@@ -27,7 +27,7 @@ After you save your settings, go back to the Tools Menu and then choose **Kendra
 If your settings are correct, the first time you choose the option, you should see the following dialog.
 ![No Index Dialog](./NoIndexDialog.png)
 
-Just press **Start Indexing** to index your web pages to Kendra.  
+Just press **Start Crawling** to index your web pages to Kendra.  
 
 The Content Designer will show you a history of your indexing.
 
