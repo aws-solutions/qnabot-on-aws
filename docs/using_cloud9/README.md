@@ -1,6 +1,6 @@
 # Using AWS Cloud9 to Deploy QnABot
 
-QnABot can be installed via a properly configured [AWS Cloud 9](https://aws.amazon.com/cloud9/) instance.  The Amazon Cloud9 instance requires at least 25GB of storage space.  The bash commands below will create an AWS Cloud9 environment in the default VPC.  
+QnABot can be installed via a properly configured [AWS Cloud 9](https://aws.amazon.com/cloud9/) instance.  The AWS Cloud9 instance requires at least 25GB of storage space.  The bash commands below will create an AWS Cloud9 environment in the default VPC.  
 
 ## Launching AWS CloudShell
 
@@ -10,7 +10,7 @@ Log into the AWS Console and click on the Cloudshell icon.
 
 ![CloudShell](./cloudshell.png)
 
-## Creating the Amazon Cloud9 environment
+## Creating the AWS Cloud9 environment
 
 If you have made changes to your [default VPC settings](https://docs.aws.amazon.com/vpc/latest/userguide/default-vpc.html), deleted your default VPC or the script below does not work, please [see the requirements for Cloud 9](https://docs.aws.amazon.com/cloud9/latest/user-guide/vpc-settings.html).
 
@@ -42,7 +42,7 @@ The following set of bash commands will resize the volume attached to your Cloud
 
 ### Setting the name of the CloudFormation variable
 
-If you were able to run the bash commands above, the $STACKNAME will already be defined.  If you had to create the Amazon Cloud9 environmnent manually, set the STACKNAME variable. Then run the commands below to increase the size of the volume. The name of the CloudFormation stack will start with "aws-cloud9"
+If you were able to run the bash commands above, the $STACKNAME will already be defined.  If you had to create the AWS Cloud9 environmnent manually, set the STACKNAME variable. Then run the commands below to increase the size of the volume. The name of the CloudFormation stack will start with "aws-cloud9"
 
 ```bash
 STACKNAME=aws-cloud9....
