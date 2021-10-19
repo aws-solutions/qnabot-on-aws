@@ -19,7 +19,7 @@ exports.handler =  async function(event, context) {
 
 async function createCallFlowLexV2() {
     
-    // Lex botAliasArn is of the format: arn:aws:lex:ca-central-1:912625584728:bot-alias/2S1UMN0YHX/RMG8IVED3J
+    // Lex botAliasArn is of the format: arn:aws:lex:ca-central-1:123456789012:bot-alias/2S1UMN0YHX/RMG8IVED3J
     // NOTE: It's not yet clear if/how to associate GetCustomerInput block to specific localeId.. it seems to default to en_US. Requires further research.
     let botAliasArn = "arn:aws:lex:";
     botAliasArn += process.env.region + ":";
