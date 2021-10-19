@@ -13,12 +13,6 @@
     "install": "^0.13.0",
     "intercept-stdout": "^0.1.2",
     "lodash": "^4.17.21",
-    "mocha": "^8.1.1",
     "save-dev": "0.0.1-security"
-  },
-  "scripts": {
-    "test": "mocha",
-    "lodash": "^4.17.21",
-    "intercept-stdout": "^0.1.2"
   }
 }
