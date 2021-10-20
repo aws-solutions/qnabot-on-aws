@@ -52,7 +52,7 @@
     "aws-lex-web-ui": "git+https://github.com/aws-samples/aws-lex-web-ui.git#semver:0.18.1",
     "aws-sdk": "^2.913.0",
     "aws4": "^1.7.0",
-    "axios": "^0.21.1",
+    "axios": "0.21.1",
     "babel-polyfill": "^6.26.0",
     "babel-preset-es2015-ie": "^6.7.0",
     "bluebird": "^3.5.1",
