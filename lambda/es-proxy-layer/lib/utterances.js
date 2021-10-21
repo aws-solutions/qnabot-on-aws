@@ -1,20 +1,12 @@
-/*
-Copyright 2017-2017 Amazon.com, Inc. or its affiliates. All Rights Reserved.
-
-Licensed under the Amazon Software License (the "License"). You may not use this file
-except in compliance with the License. A copy of the License is located at
-
-http://aws.amazon.com/asl/
-
-or in the "license" file accompanying this file. This file is distributed on an "AS IS"
-BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied. See the
-License for the specific language governing permissions and limitations under the License.
-*/
+// Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+// SPDX-License-Identifier: Apache-2.0
 const Promise=require('bluebird')
 const AWS = require('./aws.js');
 const myCredentials = new AWS.EnvironmentCredentials('AWS');
 const _=require('lodash')
 const s3=new AWS.S3()
+const qnabot = require("qnabot/logging")
+
 
 
 var con=_.memoize(function(esAddress){
@@ -73,14 +65,14 @@ module.exports=async function(event,context,callback){
         const s3_utterances=s3.getObject({
             Bucket:process.env.UTTERANCE_BUCKET,
             Key:process.env.UTTERANCE_KEY
-        }).promise().tap(console.log).then(x=>JSON.parse(x.Body.toString()))
+        }).promise().tap(qnabot.log).then(x=>JSON.parse(x.Body.toString()))
     
         return Promise.join(es_utterances,s3_utterances)
         .then(utterances=>{
             return {utterances:_.compact(_.uniq(_.flatten(utterances)))}
         })
     }catch(e){
-        console.log(e)
+        qnabot.log(e)
         callback(e)
     }
 }

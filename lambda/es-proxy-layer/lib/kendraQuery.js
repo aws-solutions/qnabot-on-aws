@@ -10,23 +10,25 @@ var _ = require('lodash');
 const AWS = require('aws-sdk');
 var build_es_query = require('./esbodybuilder');
 var request = require('./request');
+const qnabot = require("qnabot/logging")
+
 
 function confidence_filter(minimum_score,kendra_result){
     var confidences = ["LOW","MEDIUM","HIGH","VERY_HIGH"]
     var index = confidences.findIndex( i => i == minimum_score.toUpperCase())
     if(index == undefined){
-        console.log("Warning: ALT_SEARCH_KENDRA_CONFIDENCE_SCORE should be one of 'VERY_HIGH'|'HIGH'|'MEDIUM'|'LOW'")
+        qnabot.log("Warning: ALT_SEARCH_KENDRA_CONFIDENCE_SCORE should be one of 'VERY_HIGH'|'HIGH'|'MEDIUM'|'LOW'")
         return true;
     }
     confidences = confidences.slice(index)
-    console.log("Testing confidences: Allowed - " + JSON.stringify(confidences) + " Actual - " + _.get(kendra_result,"ScoreAttributes.ScoreConfidence") )
+    qnabot.log("Testing confidences: Allowed - " + JSON.stringify(confidences) + " Actual - " + _.get(kendra_result,"ScoreAttributes.ScoreConfidence") )
     const found = confidences.find(element => element == _.get(kendra_result,"ScoreAttributes.ScoreConfidence")) != undefined
     return found
 
 }
 
 async function run_query_es(params, qid) {
-    console.log("run_query_es params: ", params);
+    qnabot.log("run_query_es params: ", params);
     let question = "qid::"+qid;
     var es_query = await build_es_query({question:question});
     var es_response = await request({
@@ -34,7 +36,7 @@ async function run_query_es(params, qid) {
         method: "GET",
         body: es_query
     });
-    console.log("run_query_es result: ", JSON.stringify(es_response, null, 2));
+    qnabot.log("run_query_es result: ", JSON.stringify(es_response, null, 2));
     return es_response;
 }
 
@@ -50,12 +52,12 @@ function kendraRequester(kendraClient,params,resArray) {
         kendraClient.query(params, function(err, data) {
             let indexId = params.IndexId;
             if (err) {
-                console.log(err, err.stack);
+                qnabot.log(err, err.stack);
                 reject('Error from Kendra query request:' + err);
             }
             else {
                 data.originalKendraIndexId = indexId;
-                console.log("Data from Kendra request:" + JSON.stringify(data, null, 2));
+                qnabot.log("Data from Kendra request:" + JSON.stringify(data, null, 2));
                 resArray.push(data);
                 resolve(data);
             }
@@ -71,7 +73,7 @@ function kendraRequester(kendraClient,params,resArray) {
 function hasJsonStructure(str) {
     if (typeof str !== 'string') return false;
     try {
-        console.log('hasJsonStructure ' + str)
+        qnabot.log('hasJsonStructure ' + str)
         const result = JSON.parse(str);
         const type = Object.prototype.toString.call(result);
         return type === '[object Object]' 
@@ -165,18 +167,18 @@ async function routeKendraRequest(request_params) {
                     if (_.get(hit,"_source_qid")) {
                         let qid = hit._source_qid ;
                         // FAQ only references the QID but doesn't contain the full docunment.. retrieve it from ES
-                        console.log("Kendra matched qid: ", qid, ". Retrieving full document from Elasticsearch.");
+                        qnabot.log("Kendra matched qid: ", qid, ". Retrieving full document from Elasticsearch.");
                         let es_response = await run_query_es(request_params, qid) ;
-                        console.log("Qid document from Kendra: ", JSON.stringify(hit));
+                        qnabot.log("Qid document from Kendra: ", JSON.stringify(hit));
                         hit = _.get(es_response, "hits.hits[0]._source"); //todo fix if null -- test from content designer
                         if(hit == null){
-                            console.log("WARNING: An answer was found in Kendrs FAQ, but a corresponding answer was not found in ElasticSearch for "+ hit)
+                            qnabot.log("WARNING: An answer was found in Kendrs FAQ, but a corresponding answer was not found in ElasticSearch for "+ hit)
                             continue;
 
                         }
                     }
                     
-                    console.log(`hit is ${JSON.stringify(hit)}`);
+                    qnabot.log(`hit is ${JSON.stringify(hit)}`);
                     json_struct.push(hit);
 
                     kendraQueryId = res.QueryId; // store off the QueryId to use as a session attribute for feedback
@@ -235,11 +237,11 @@ async function routeKendraRequest(request_params) {
         hits_struct['kendraResultsCached'] = resArray[0];
     }
     
-    console.log("RETURN: " + JSON.stringify(hits_struct));
+    qnabot.log("RETURN: " + JSON.stringify(hits_struct));
     return hits_struct;
 }
 
 exports.handler = async (request_params) => {
-    console.log("kendra query request: " + JSON.stringify(request_params));
+    qnabot.log("kendra query request: " + JSON.stringify(request_params));
     return routeKendraRequest(request_params);
 };

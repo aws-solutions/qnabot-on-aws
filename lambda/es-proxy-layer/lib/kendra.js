@@ -14,16 +14,18 @@ var linkify = require('linkifyjs');
 const AWS = require('aws-sdk');
 const { filter } = require('bluebird');
 let kendraIndexes = undefined;
+const qnabot = require("qnabot/logging")
+
 
 function confidence_filter(minimum_score,kendra_result){
     var confidences = ["LOW","MEDIUM","HIGH","VERY_HIGH"]
     var index = confidences.findIndex( i => i == minimum_score.toUpperCase())
     if(index == undefined){
-        console.log("Warning: ALT_SEARCH_KENDRA_FALLBACK_CONFIDENCE_SCORE should be one of 'VERY_HIGH'|'HIGH'|'MEDIUM'|'LOW'")
+        qnabot.log("Warning: ALT_SEARCH_KENDRA_FALLBACK_CONFIDENCE_SCORE should be one of 'VERY_HIGH'|'HIGH'|'MEDIUM'|'LOW'")
         return true;
     }
     confidences = confidences.slice(index)
-    console.log("Testing confidences: Allowed - " + JSON.stringify(confidences) + " Actual - " + _.get(kendra_result,"ScoreAttributes.ScoreConfidence") )
+    qnabot.log("Testing confidences: Allowed - " + JSON.stringify(confidences) + " Actual - " + _.get(kendra_result,"ScoreAttributes.ScoreConfidence") )
     const found = confidences.find(element => element == _.get(kendra_result,"ScoreAttributes.ScoreConfidence")) != undefined
     return found
 }
@@ -45,7 +47,7 @@ function create_hit(answermessage,markdown,ssml,hit_count,debug_results,kendra){
                 }
 
 
-    console.log("create_hit" +JSON.stringify(hits))
+    qnabot.log("create_hit" +JSON.stringify(hits))
     return hit_count > 0 ? hits : undefined;
 }
 
@@ -105,12 +107,12 @@ function kendraRequester(kendraClient,params,resArray) {
         kendraClient.query(params, function(err, data) {
             let indexId = params.IndexId;
             if (err) {
-                console.log(err, err.stack);
+                qnabot.log(err, err.stack);
                 reject('Error from Kendra query request:' + err);
             }
             else {
                 data.originalKendraIndexId = indexId;
-                console.log("Data from Kendra request:" + JSON.stringify(data, null, 2));
+                qnabot.log("Data from Kendra request:" + JSON.stringify(data, null, 2));
                 resArray.push(data);
                 resolve(data);
             }
@@ -178,8 +180,8 @@ function signS3URL(url, expireSecs) {
       key = url.split('/').slice(3).join('/');
     }
     if (bucket && key) {
-        console.log("Attempt to convert S3 url to a signed URL: ",url);
-        console.log("Bucket: ", bucket, " Key: ", key) ;
+        qnabot.log("Attempt to convert S3 url to a signed URL: ",url);
+        qnabot.log("Bucket: ", bucket, " Key: ", key) ;
         try {
             const s3 = new AWS.S3() ;
             const signedurl = s3.getSignedUrl('getObject', {
@@ -187,13 +189,13 @@ function signS3URL(url, expireSecs) {
                 Key: key,
                 Expires: expireSecs
             })
-            console.log("Signed URL: ", signedurl);
+            qnabot.log("Signed URL: ", signedurl);
             url = signedurl;
         } catch (err) {
-              console.log("Error signing S3 URL (returning original URL): ", err) ;
+              qnabot.log("Error signing S3 URL (returning original URL): ", err) ;
         }
     } else {
-        console.log("URL is not an S3 url - return unchanged: ",url);
+        qnabot.log("URL is not an S3 url - return unchanged: ",url);
     }   
     return url;
 }
@@ -290,13 +292,13 @@ async function routeKendraRequest(event, context) {
     kendraIndexes.forEach(function (index, i) {
         // if results cached from KendraFAQ, skip index by pushing Promise to resolve cached results
         if (kendraResultsCached && index===kendraResultsCached.originalKendraIndexId) {
-            console.log(`retrieving cached kendra results`)
+            qnabot.log(`retrieving cached kendra results`)
             
             promises.push(new Promise(function(resolve, reject) {
                 var data = kendraResultsCached
                 _.set(event.req, "kendraResultsCached", "cached and retrieved");  // cleans the logs
                 data.originalKendraIndexId = index;
-                console.log("Data from Kendra request:" + JSON.stringify(data,null,2));
+                qnabot.log("Data from Kendra request:" + JSON.stringify(data,null,2));
                 resArray.push(data);
                 resolve(data);
             }));
@@ -534,13 +536,13 @@ async function routeKendraRequest(event, context) {
         kendraFoundDocumentCount: foundDocumentCount,
         maxDocuments: maxDocumentCount
     })
-    console.log("Returning event: ", JSON.stringify(hit, null, 2));
+    qnabot.log("Returning event: ", JSON.stringify(hit, null, 2));
 
     return hit;
 }
 
 exports.handler = async (event, context) => {
-    console.log("event: " + JSON.stringify(event, null, 2));
+    qnabot.log("event: " + JSON.stringify(event, null, 2));
     return routeKendraRequest(event, context);
 };
 
