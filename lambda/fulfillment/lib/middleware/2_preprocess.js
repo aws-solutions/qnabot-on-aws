@@ -81,14 +81,14 @@ const isPIIDetected = async (text, useComprehendForPII, piiRegex, pii_rejection_
     } else {
         qnabot.log("Warning: No value found for setting  PII_REJECTION_REGEX not using REGEX Matching")
     }
-    if (useComprehendForPII) {
+    let foundComprehendPII = false
+    if (!found_redacted_pii && useComprehendForPII ) {
         var params = {
             LanguageCode: "en",
             Text: text
         };
         try {
             var comprehendResult = await comprehend_client.detectPiiEntities(params).promise();
-            process.env.comprenhend_pii = comprehendResult //This will be used by the filter.
             if (!("Entities" in comprehendResult) || comprehendResult.Entities.length == 0) {
                 qnabot.log("No PII found by Comprehend")
                 return false;
@@ -96,10 +96,7 @@ const isPIIDetected = async (text, useComprehendForPII, piiRegex, pii_rejection_
             qnabot.log("Ignoring types for PII == " + pii_rejection_ignore_list)
             pii_rejection_ignore_list = pii_rejection_ignore_list.toLowerCase().split(",")
             let entitiesToFilter = comprehendResult.Entities.filter(entity => entity.Score > 0.90 && pii_rejection_ignore_list.indexOf(entity.Type.toLowerCase()) == -1)
-            //For now, we *redact* all detected PII from CloudWatch.  We accept any PII for processing that is listed PII_REJECTION_IGNORE_TYPES
-
-            return entitiesToFilter.length > 0 || found_redacted_pii;;
-
+            foundComprehendPII = entitiesToFilter.length > 0;
         } catch (exception) {
             qnabot.log("Warning: Exception while trying to detect PII with Comprehend. All logging is disabled.");
             qnabot.log("Exception " + exception);
@@ -108,6 +105,8 @@ const isPIIDetected = async (text, useComprehendForPII, piiRegex, pii_rejection_
         }
 
     }
+    return foundComprehendPII  || found_redacted_pii;
+
 
 
 }

@@ -240,7 +240,7 @@ module.exports={
         "Description" : "Lex versions to use for QnABot. Select 'LexV2 Only' to install QnABot in AWS reqions where LexV1 is not supported.",
         "Type":"String",
         "AllowedValues" : ["LexV1 and LexV2", "LexV2 Only"],
-        "Default":"LexV1 and LexV2"
+        "Default":"LexV2 Only"
     },
     "XraySetting":{
         "Type":"String",
