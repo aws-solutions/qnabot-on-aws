@@ -48,7 +48,7 @@ clientFilterValues | Client Filter: Values
 
 Excel Column | Content Designer Field (title in the schema.json) 
 -------------|------------------------
-elicitResponse.response_hooks | Elicit Response: Responsebot Hook
+elicitResponse.response_hook | Elicit Response: Responsebot Hook
 elicitResponse.response_sessionattr_namespace |  Response Session Attribute Namespace
 
 ## Importing the Microsoft Excel file
