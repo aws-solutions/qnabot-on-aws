@@ -1,4 +1,4 @@
-let AWS = require("aws-sdk")
+const AWS = require("aws-sdk")
 
 module.exports = {
     log: function (...messages) {
@@ -15,7 +15,6 @@ function filter_comprehend_pii(text) {
     }
 
     let regex = process.env.found_comprehend_pii.split(",").map(pii => `(${pii})`).join("|")
-    // console.log("PII REGEX: " + regex)
     let re = new RegExp(regex, "g");
 
     return text.replace(re, "XXXXXX");
