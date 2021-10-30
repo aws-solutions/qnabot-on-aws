@@ -173,7 +173,7 @@ module.exports={
             properties:{
                 specialty_bot:{
                     title:"Bot Routing: Bot Name or Lambda",
-                    description:"The name of a Lex Bot (Specialty Bot) or Lambda Function to route requests to. Specialty Bot names must start with \"QNA\". Lambda functions can be specified as \"Lambda::FunctionName\" or \"Lambda::FunctionARN\" - Lambda function names must start with \"QNA\".",
+                    description:"The name of a Lex Bot (Specialty Bot) or Lambda Function to route requests to. Lex V2 specialty bot names use the format 'lexv2::BotId/BotAliasId/LocaleId'. Lex V1 specialty bot names must start with \"QNA\". Lambda functions can be specified as \"Lambda::FunctionName\" or \"Lambda::FunctionARN\" - Lambda function names must start with \"QNA\".",
                     type:"string",
                     maxLength:100,
                     propertyOrder:0
@@ -187,10 +187,17 @@ module.exports={
                 },
                 specialty_bot_alias:{
                     title:"The Bot alias to use for the Specialty Bot. (Required for other Lex/QnA Bot targets - Not utilized when Lambda Function is used.)",
-                    description:"Enter a string for the Specialty Bot's Lex alias.",
+                    description:"For Lex V2 leave empty. For Lex V1 specialty bots, enter a string for the Specialty Bot's Lex alias.",
                     type:"string",
                     maxLength:100,
                     propertyOrder:2
+                },
+                specialty_bot_session_attributes_to_merge:{
+                    title:"An optional comma separated list of session attributes to pass to a Lex specialty bot.",
+                    description:"Enter a comma separated list of session attributes to pass to a Lex specialty bot. Default is an empty string.",
+                    type:"string",
+                    maxLength:100,
+                    propertyOrder:3
                 }
             }
         },

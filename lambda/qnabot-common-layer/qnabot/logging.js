@@ -6,8 +6,6 @@ module.exports = {
 
 
 const filter = text => {
-
-    console.log("Running filter")
     if (process.env.DISABLECLOUDWATCHLOGGING === "true") {
         return "cloudwatch logging disabled";
     } else {
