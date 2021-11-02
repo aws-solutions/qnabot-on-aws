@@ -4,8 +4,7 @@ import boto3
 import re
 import datetime
 import calendar
-
-
+import logging
 
 client = boto3.client('kendra')
 ssm = boto3.client('ssm')
@@ -13,7 +12,6 @@ cloudwatch = boto3.client('cloudwatch')
 
 
 def create_cron_expression(schedule):
-    print(schedule)
     rate_regex = "(rate\()(\d\s(?:day|week|month)s?)(\))"
     match = re.match(rate_regex, schedule)
     if match is not None:
@@ -48,12 +46,14 @@ def create_cron_expression(schedule):
         cron[3] = "*"
         cron[4] = "?"
 
-    cron = "cron(" + " ".join(map(lambda i: str(i),cron)) + ")"
+    cron = "cron(" + " ".join(map(lambda i: str(i), cron)) + ")"
     print(cron)
     return cron
 
 
 def handler(event, context):
+    logging.info(event)
+
     Name = os.environ.get('DATASOURCE_NAME')
     RoleArn = os.environ.get('ROLE_ARN')
     Type = 'WEBCRAWLER'
@@ -66,8 +66,7 @@ def handler(event, context):
     crawler_mode = settings["KENDRA_INDEXER_CRAWL_MODE"].upper()
     schedule = create_cron_expression(schedule)
     if schedule == "INVALID":
-        schedule = ""
-        
+        schedule = ""        
     data_source_id = get_data_source_id(IndexId, Name)
 
     if data_source_id is None:
@@ -90,7 +89,6 @@ def get_settings():
     custom_settings = json.loads(custom_settings['Parameter']['Value'])
     default_settings.update(custom_settings)
 
-    print(default_settings)
     return default_settings
 
 
@@ -107,27 +105,26 @@ def get_data_source_id(index_id, data_source_name):
     return None
 
 
-def kendra_create_data_source(client, IndexId, Name, Type, RoleArn, Description, URLs,schedule,crawler_mode):
+def kendra_create_data_source(client, IndexId, Name, Type, RoleArn, Description, URLs, schedule, crawler_mode):
     response = client.create_data_source(
         Name=Name,
         IndexId=IndexId,
         Type=Type,
         RoleArn=RoleArn,
         Description=Description,
-        Schedule = schedule,
+        Schedule=schedule,
         Configuration={
             'WebCrawlerConfiguration': {
                 'Urls': {
                     'SeedUrlConfiguration': {
                         'SeedUrls': URLs,
-                        'WebCrawlerMode':crawler_mode
+                        'WebCrawlerMode': crawler_mode
                     }
                 },
                 'CrawlDepth': 2
             }
         }
     )
-    print(json.dumps(response))
     return response['Id']
 
 
@@ -144,7 +141,7 @@ def kendra_update_data_source(IndexId, data_source_id, URLs, RoleArn, schedule, 
     response = client.update_data_source(
         Id=data_source_id,
         RoleArn=RoleArn,
-        Schedule= schedule,
+        Schedule=schedule,
         IndexId=IndexId,
         Configuration={
             'WebCrawlerConfiguration': {
@@ -158,7 +155,6 @@ def kendra_update_data_source(IndexId, data_source_id, URLs, RoleArn, schedule, 
             }
         }
     )
-    print(json.dumps(response))
     return response
 
 
@@ -172,11 +168,11 @@ def create_dashboard(IndexId, data_source_id):
 
     dashboard_body = dashboard_body.replace('${IndexId}', IndexId)
     dashboard_body = dashboard_body.replace('${data_source_id}', data_source_id)
+    dashboard_body = dashboard_body.replace('${Region}', os.environ['AWS_REGION'])
     dashboard_body = dashboard_body.replace('\n', '')
 
-    response = cloudwatch.put_dashboard(
+    cloudwatch.put_dashboard(
         DashboardName=os.environ.get('DASHBOARD_NAME'),
         DashboardBody=dashboard_body
     )
-    print(response)
 

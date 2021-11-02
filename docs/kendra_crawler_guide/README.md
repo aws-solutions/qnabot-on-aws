@@ -1,6 +1,6 @@
-# Kendra Web Crawler Integration
+# Amazon Kendra Web Crawler Integration
 
-Please read the [Kendra Integration](../../workshops/kendra/README.md) for instructions about configuring Kendra
+Please read the [Amazon Kendra Integration](../../workshops/kendra/README.md) for instructions about configuring Kendra
 
 QnABot can now crawl your website with Kendra and answer questions based on what it has found.
 
@@ -13,7 +13,7 @@ The settings names have been maintained for compatibility.
 
 | Setting | Valid Values | Description |
 |---------|--------------|-------------|
-| ENABLE_KENDRA_WEB_INDEXER | true or false | Enables the web indexer
+| ENABLE_KENDRA_WEB_INDEXER | true or false | Enables the web crawler
 | KENDRA_INDEXER_URLS | comma separated list | List of web addresses QnABot should crawl and [index with Kendra](./kendra_crawler_guide/README.md)
 | KENDRA_INDEXER_SCHEDULE | [CloudWatch Rate Syntax](https://docs.aws.amazon.com/AmazonCloudWatch/latest/events/ScheduledEvents.html) | Interval Indexer should crawl
 | KENDRA_INDEXER_CRAWL_DEPTH | number | Sets the depth to the number of levels in a website from the seed level that you want to crawl
@@ -27,13 +27,13 @@ After you save your settings, go back to the Tools Menu and then choose **Kendra
 If your settings are correct, the first time you choose the option, you should see the following dialog.
 ![No Index Dialog](./NoIndexDialog.png)
 
-Just press **Start Crawling** to index your web pages to Kendra.  
+Just press **Start Crawling** to index your web pages to Amazon Kendra.  
 
 The Content Designer will show you a history of your indexing.
 
 ![Index Dialog](./IndexDialog.png)
 
 If you are logged into your AWS Account, you can click on "View Web Crawling Errors in CloudWatch" to get the details of
-any pages that Kendra couldn't crawl.
+any pages that Amazon Kendra couldn't crawl.
 
 ![CloudWatch](cloudwatch.png)

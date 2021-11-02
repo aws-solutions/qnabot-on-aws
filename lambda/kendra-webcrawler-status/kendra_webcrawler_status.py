@@ -69,6 +69,9 @@ def kendra_list_data_source_sync_jobs(IndexId, data_source_id):
                                     'ErrorMessage': item['ErrorMessage'] if 'ErrorMessage' in item else '',
                                     'Metrics': item['Metrics']
                                     }, response['History']))
-    return {"Status": status, "History": result, "DashboardUrl": f'https://console.aws.amazon.com/cloudwatch/home?region={os.environ.get("AWS_REGION")}#dashboards:name={os.environ.get("DASHBOARD_NAME")}'}
-    # return status, list of values in result
-
+    response = {
+                "Status": status,
+                "History": result,
+                "DashboardUrl": f'https://console.aws.amazon.com/cloudwatch/home?region={os.environ.get("AWS_REGION")}#dashboards:name={os.environ.get("DASHBOARD_NAME")}'
+                }
+    return response

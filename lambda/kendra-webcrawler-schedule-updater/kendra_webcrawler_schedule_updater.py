@@ -4,14 +4,14 @@ import boto3
 import re
 import datetime
 import calendar
+import logging
 
-client = boto3.client('kendra')
+kendra = boto3.client('kendra')
 ssm = boto3.client('ssm')
 cloudwatch = boto3.client('cloudwatch')
 
 
 def create_cron_expression(schedule):
-    print(schedule)
     rate_regex = "(rate\()(\d\s(?:day|week|month)s?)(\))"
     match = re.match(rate_regex, schedule)
     if match is not None:
@@ -22,6 +22,7 @@ def create_cron_expression(schedule):
     elif schedule is None or schedule == "":
         return ""
     else:
+        logging.warn("The schedule must be specified as either rate(day(s) | week(s) | month(s)) or daily | weekly | monthly")
         return "INVALID"
 
     now = datetime.datetime.now()
@@ -52,6 +53,7 @@ def create_cron_expression(schedule):
 
 
 def handler(event, context):
+    logging.info(event)
     Name = os.environ.get('DATASOURCE_NAME')
     RoleArn = os.environ.get('ROLE_ARN')
 
@@ -59,11 +61,13 @@ def handler(event, context):
     IndexId = settings['KENDRA_WEB_PAGE_INDEX']
     URLs = settings['KENDRA_INDEXER_URLS'].replace(' ', '').split(',')
     schedule = settings["KENDRA_INDEXER_SCHEDULE"]
+    crawl_depth = settings["KENDRA_INDEXER_CRAWL_DEPTH"]
 
     schedule = create_cron_expression(schedule)
     if schedule == "INVALID":
-        schedule = ""
-        
+        logging.warn("The cron schedule specified by KENDRA_INDEXER_SCHEDULE " +
+                       "is invalid. Schedule: ${schedule}. Crawling will not be done on a schedule/")
+        schedule = ""      
     data_source_id = get_data_source_id(IndexId, Name)
     current_schedule = get_data_source_schedule(IndexId, data_source_id)
 
@@ -75,7 +79,7 @@ def handler(event, context):
        schedule_parts[3] != current_schedule[3] or
        ((schedule_parts[3] != current_schedule[3]) and (schedule_parts[3] != "?" or current_schedule[3] != "?"))):
 
-        kendra_update_data_source(IndexId, data_source_id, URLs, RoleArn, schedule)
+        kendra_update_data_source(IndexId, data_source_id, URLs, RoleArn, schedule, crawl_depth)
 
     return {"IndexId": IndexId, "DataSourceId": data_source_id}
 
@@ -89,13 +93,11 @@ def get_settings():
     custom_settings = ssm.get_parameter(Name=custom_settings_key, WithDecryption=True)
     custom_settings = json.loads(custom_settings['Parameter']['Value'])
     default_settings.update(custom_settings)
-
-    print(default_settings)
     return default_settings
 
 
 def get_data_source_id(index_id, data_source_name):
-    response = client.list_data_sources(
+    response = kendra.list_data_sources(
         IndexId=index_id,
         MaxResults=5
     )
@@ -108,14 +110,15 @@ def get_data_source_id(index_id, data_source_name):
 
 
 def get_data_source_schedule(IndexId, datasource_id):
-    response = client.describe_data_source(Id=datasource_id, IndexId=IndexId)
+    response = kendra.describe_data_source(Id=datasource_id, IndexId=IndexId)
     return response["Schedule"]
 
-def kendra_update_data_source(IndexId, data_source_id, URLs, RoleArn, schedule):
-    response = client.update_data_source(
+
+def kendra_update_data_source(IndexId, data_source_id, URLs, RoleArn, schedule, crawl_depth):
+    response = kendra.update_data_source(
         Id=data_source_id,
         RoleArn=RoleArn,
-        Schedule= schedule,
+        Schedule=schedule,
         IndexId=IndexId,
         Configuration={
             'WebCrawlerConfiguration': {
@@ -125,11 +128,10 @@ def kendra_update_data_source(IndexId, data_source_id, URLs, RoleArn, schedule):
                         'WebCrawlerMode': 'EVERYTHING'
                     }
                 },
-                'CrawlDepth': 2
+                'CrawlDepth': crawl_depth
             }
         }
     )
-    print(json.dumps(response))
     return response
 
 
@@ -145,8 +147,7 @@ def create_dashboard(IndexId, data_source_id):
     dashboard_body = dashboard_body.replace('${data_source_id}', data_source_id)
     dashboard_body = dashboard_body.replace('\n', '')
 
-    response = cloudwatch.put_dashboard(
+    cloudwatch.put_dashboard(
         DashboardName=os.environ.get('DASHBOARD_NAME'),
         DashboardBody=dashboard_body
     )
-    print(response)
