@@ -1,11 +1,11 @@
 const aws = require('aws-sdk');
+const qnabot = require("qnabot/logging")
+
 
 //start connection
 var _ = require('lodash');
 var Handlebars = require('handlebars');
 var supportedLanguages = require('./supportedLanguages');
-
-console.log("SUPPORTED lang: ", supportedLanguages.getSupportedLanguages());
 
 var res_glbl = {};
 var req_glbl = {};
@@ -26,8 +26,8 @@ function signS3URL(url, expireSecs) {
       key = url.split('/').slice(3).join('/');
     }
     if (bucket && key) {
-        console.log("Attempt to convert S3 url to a signed URL: ",url);
-        console.log("Bucket: ", bucket, " Key: ", key) ;
+        qnabot.log("Attempt to convert S3 url to a signed URL: ",url);
+        qnabot.log("Bucket: ", bucket, " Key: ", key) ;
         try {
             const s3 = new aws.S3() ;
             const signedurl = s3.getSignedUrl('getObject', {
@@ -35,13 +35,13 @@ function signS3URL(url, expireSecs) {
                 Key: key,
                 Expires: expireSecs
             });
-            //console.log("Signed URL: ", signedurl);
+            //qnabot.log("Signed URL: ", signedurl);
             url = signedurl;
         } catch (err) {
-              console.log("Error signing S3 URL (returning original URL): ", err) ;
+              qnabot.log("Error signing S3 URL (returning original URL): ", err) ;
         }
     } else {
-        console.log("URL is not an S3 url - return unchanged: ",url);
+        qnabot.log("URL is not an S3 url - return unchanged: ",url);
     }   
     return url;
 }
@@ -131,18 +131,20 @@ Handlebars.registerHelper('setLang', function (lang, last, options) {
         var userLanguageCode = supported_languages[userLanguage];
 
         if (userLanguageCode === undefined && !errorFound) {
-            console.log("no language mapping for user utterance");
+            qnabot.log("no language mapping for user utterance");
             _.set(req_glbl._event, 'errorFound', true);
             return languageErrorMessages[errorLocale].errorMessage;
         }
 
         if (userLanguageCode && lang == userLanguageCode) {
-            console.log("setting: ", options.fn(this));
-            console.log("Setting req & res session attribute:", "session.qnabotcontext.userPreferredLocale", " Value:", userLanguageCode);
+            qnabot.log("Setting language - message: ", options.fn(this));
+            qnabot.log("Setting req & res session attribute:", "session.qnabotcontext.userPreferredLocale", " Value:", userLanguageCode);
             _.set(res_glbl, userPreferredLocaleKey, userLanguageCode);
             _.set(req_glbl, userPreferredLocaleKey, userLanguageCode);
             _.set(res_glbl, userLocaleKey, userLanguageCode);
             _.set(req_glbl, userLocaleKey, userLanguageCode);
+            // setLang message is already localized.. disable autotransaltion
+            autotranslate = false;
             return options.fn(this);
         } else if ((last === true) && (_.get(res_glbl, userPreferredLocaleKey) !== userLanguageCode) && !errorFound) {
             return languageErrorMessages[errorLocale].errorMessage;
@@ -150,9 +152,18 @@ Handlebars.registerHelper('setLang', function (lang, last, options) {
             return "";
         }
     } else {
-        console.log("Warning - attempt to use setLang handlebar helper function while ENABLE_MULTI_LANGUAGE_SUPPORT is set to false. Please check configuration.");
+        qnabot.log("Warning - attempt to use setLang handlebar helper function while ENABLE_MULTI_LANGUAGE_SUPPORT is set to false. Please check configuration.");
     }
 });
+
+Handlebars.registerHelper('resetLang', function (msg, options) {
+    qnabot.log("reset userPreferredLocale to reenable automatic language detection");
+    const userPreferredLocaleKey = 'session.qnabotcontext.userPreferredLocale';
+    _.set(req_glbl, userPreferredLocaleKey, "");
+    _.set(res_glbl, userPreferredLocaleKey, "");
+    return msg;
+});
+
 
 Handlebars.registerHelper('setSessionAttr', function () {
     let args = Array.from(arguments);
@@ -160,36 +171,36 @@ Handlebars.registerHelper('setSessionAttr', function () {
     // concat remaining arguments to create value
     const v_arr = args.slice(1, args.length - 1); // ignore final 'options' argument
     const v = v_arr.join(""); // concatenate value arguments 
-    console.log("Setting res session attribute:", k, " Value:", v);
+    qnabot.log("Setting res session attribute:", k, " Value:", v);
     _.set(res_glbl.session, k, v);
     return "";
 });
 
 Handlebars.registerHelper('getSessionAttr', function (attr, def, options) {
     let v = _.get(res_glbl.session, attr, def);
-    console.log("Return session attribute key, value: ", attr, v);
+    qnabot.log("Return session attribute key, value: ", attr, v);
     return v;
 });
 
 Handlebars.registerHelper('signS3URL', function (s3url, options) {
     let signedUrl = signS3URL(s3url, 300) ;
-    console.log("Return signed S3 URL: ", signedUrl);
+    qnabot.log("Return signed S3 URL: ", signedUrl);
     // return SafeString to prevent unwanted url escaping
     return new Handlebars.SafeString(signedUrl);
 });
 
 Handlebars.registerHelper('randomPick', function () {
     var argcount = arguments.length - 1;  // ignore final 'options' argument
-    console.log("Select randomly from ", argcount, "inputs: ", arguments);
+    qnabot.log("Select randomly from ", argcount, "inputs: ", arguments);
     var item = arguments[Math.floor(Math.random() * argcount)];
-    console.log("Selected: ", item);
+    qnabot.log("Selected: ", item);
     return item;
 });
 
 var apply_handlebars = async function (req, res, hit) {
-    console.log("apply handlebars");
-    console.log('req is: ' + JSON.stringify(req,null,2));
-    console.log('res is: ' + JSON.stringify(res,null,2));
+    qnabot.log("apply handlebars");
+    qnabot.log('req is: ' + JSON.stringify(req,null,2));
+    qnabot.log('res is: ' + JSON.stringify(res,null,2));
     res_glbl = res; // shallow copy - allow modification by setSessionAttr helper
     req_glbl = req; // shallow copy - allow sessionAttributes retrieval by ifLang helper
     _.set(req_glbl._event, 'errorFound', false);
@@ -206,7 +217,7 @@ var apply_handlebars = async function (req, res, hit) {
     };
     // Autotranslation enabled by default.. will be disabled when handlebars finds explicit language match block.
     autotranslate = true;
-    console.log("Apply handlebars preprocessing to ES Response. Context: ", context);
+    qnabot.log("Apply handlebars preprocessing to ES Response. Context: ", context);
     var hit_out = _.cloneDeep(hit);
     var a = _.get(hit, "a");
     var markdown = _.get(hit, "alt.markdown");
@@ -223,7 +234,7 @@ var apply_handlebars = async function (req, res, hit) {
                 _.set(hit_out, 'autotranslate.a', true);
             } 
         } catch (e) {
-            console.log("ERROR: Answer caused Handlebars exception. Check syntax: ", a)
+            qnabot.log("ERROR: Answer caused Handlebars exception. Check syntax: ", a)
             throw (e);
         }
     }
@@ -235,7 +246,7 @@ var apply_handlebars = async function (req, res, hit) {
                 _.set(hit_out, 'autotranslate.alt.markdown', true);
             } 
         } catch (e) {
-            console.log("ERROR: Markdown caused Handlebars exception. Check syntax: ", markdown)
+            qnabot.log("ERROR: Markdown caused Handlebars exception. Check syntax: ", markdown)
             throw (e);
         }
     }
@@ -247,7 +258,7 @@ var apply_handlebars = async function (req, res, hit) {
                 _.set(hit_out, 'autotranslate.alt.ssml', true);
             } 
         } catch (e) {
-            console.log("ERROR: SSML caused Handlebars exception. Check syntax: ", ssml)
+            qnabot.log("ERROR: SSML caused Handlebars exception. Check syntax: ", ssml)
             throw (e);
         }
     }
@@ -259,7 +270,7 @@ var apply_handlebars = async function (req, res, hit) {
                 _.set(hit_out, 'autotranslate.rp', true);
             } 
         } catch (e) {
-            console.log("ERROR: reprompt caused Handlebars exception. Check syntax: ", rp)
+            qnabot.log("ERROR: reprompt caused Handlebars exception. Check syntax: ", rp)
             throw (e);
         }
     }
@@ -306,15 +317,15 @@ var apply_handlebars = async function (req, res, hit) {
                 }
             }
         } catch (e) {
-            console.log("ERROR: response card fields format caused Handlebars exception. Check syntax: " + e );
+            qnabot.log("ERROR: response card fields format caused Handlebars exception. Check syntax: " + e );
             throw (e);
         }
     }
-    console.log("Preprocessed Result: ", hit_out);
+    qnabot.log("Preprocessed Result: ", hit_out);
     return hit_out;
 }
 
 module.exports = async function (req, res, es_hit) {
-    console.log("entering apply_handlebars");
+    qnabot.log("entering apply_handlebars");
     return await apply_handlebars(req, res, es_hit);
 };

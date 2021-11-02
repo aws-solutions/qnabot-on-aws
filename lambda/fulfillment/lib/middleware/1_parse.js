@@ -5,6 +5,8 @@ const get_sentiment=require('./sentiment');
 const alexa = require('./alexa')
 const _ = require('lodash')
 const AWS = require('aws-sdk');
+const qnabot = require("qnabot/logging")
+
 
 function isJson(str) {
     try {
@@ -52,35 +54,35 @@ async function get_settings() {
     const default_settings_param = process.env.DEFAULT_SETTINGS_PARAM;
     const custom_settings_param = process.env.CUSTOM_SETTINGS_PARAM;
 
-    console.log("Getting Default JWKS URL from SSM Parameter Store: ", default_jwks_param);
+    qnabot.log("Getting Default JWKS URL from SSM Parameter Store: ", default_jwks_param);
     const default_jwks_url = await get_parameter(default_jwks_param);
 
-    console.log("Getting Default QnABot settings from SSM Parameter Store: ", default_settings_param);
+    qnabot.log("Getting Default QnABot settings from SSM Parameter Store: ", default_settings_param);
     const default_settings = await get_parameter(default_settings_param);
-    console.log(`Default Settings: ${JSON.stringify(default_settings,null,2)}`);
+    qnabot.log(`Default Settings: ${JSON.stringify(default_settings,null,2)}`);
 
-    console.log("Getting Custom QnABot settings from SSM Parameter Store: ", custom_settings_param);
+    qnabot.log("Getting Custom QnABot settings from SSM Parameter Store: ", custom_settings_param);
     const custom_settings = await get_parameter(custom_settings_param);
-    console.log(`Custom Settings: ${JSON.stringify(custom_settings,null,2)}`);
+    qnabot.log(`Custom Settings: ${JSON.stringify(custom_settings,null,2)}`);
 
     const settings = _.merge(default_settings, custom_settings);
     _.set(settings, "DEFAULT_USER_POOL_JWKS_URL", default_jwks_url);
-    console.log(`Merged Settings: ${JSON.stringify(settings,null,2)}`);
+    qnabot.log(`Merged Settings: ${JSON.stringify(settings,null,2)}`);
 
     if (settings.ENABLE_REDACTING) {
-        console.log("redacting enabled");
+        qnabot.log("redacting enabled");
         process.env.QNAREDACT="true";
         process.env.REDACTING_REGEX=settings.REDACTING_REGEX;
     } else {
-        console.log("redacting disabled");
+        qnabot.log("redacting disabled");
         process.env.QNAREDACT="false";
         process.env.REDACTING_REGEX="";
     }
     if (settings.DISABLE_CLOUDWATCH_LOGGING) {
-        console.log("disable cloudwatch logging");
+        qnabot.log("disable cloudwatch logging");
         process.env.DISABLECLOUDWATCHLOGGING="true";
     } else {
-        console.log("enable cloudwatch logging");
+        qnabot.log("enable cloudwatch logging");
         process.env.DISABLECLOUDWATCHLOGGING="false";
     }
     return settings;
@@ -134,7 +136,7 @@ module.exports = async function parse(req, res) {
                     _.set(req,"_preferredResponseType","SSML") ;
                 }
             } else {
-                console.log("WARNING: Unrecognised value for outputDialogMode:", outputDialogMode);
+                qnabot.log("WARNING: Unrecognised value for outputDialogMode:", outputDialogMode);
             }
             break;
         case 'ALEXA':

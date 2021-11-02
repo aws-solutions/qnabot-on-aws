@@ -2,16 +2,18 @@ var Url=require('url')
 var Promise=require('bluebird')
 var cfnLambda=require('cfn-lambda')
 var request=require('./request')
+const qnabot = require("qnabot/logging")
+
 
 async function run_es_query(event) {
-    console.log('Received event:', JSON.stringify(event, null, 2));
+    qnabot.log('Received event:', JSON.stringify(event, null, 2));
     var res = await request({
             url:Url.resolve("https://"+event.endpoint,event.path),
             method:event.method,
             headers:event.headers,
             body:event.body 
         });
-    console.log("ElasticSearch Response",JSON.stringify(res,null,2));
+    qnabot.log("ElasticSearch Response",JSON.stringify(res,null,2));
     return res ;
 };
 
@@ -43,31 +45,31 @@ exports.Create=async function(params){
     if (create.index){
         var index_alias=create.index; 
         var index_name=newname(index_alias);
-        console.log("Create new index:", index_name);
+        qnabot.log("Create new index:", index_name);
         create.method="PUT";
         create.path="/"+index_name;
         res = await run_es_query(create);
-        console.log(res) ;
+        qnabot.log(res) ;
         try {
-            console.log("Delete existing alias, if exists:", index_alias);
+            qnabot.log("Delete existing alias, if exists:", index_alias);
             create.method="DELETE";
             create.path="/*/_alias/"+index_alias;
             create.body="";
             res = await run_es_query(create);
-            console.log(res) ;  
+            qnabot.log(res) ;  
         } catch(err) {
-            console.log("Delete returned: " + err.response.statusText+" ["+err.response.status+"]") ;
+            qnabot.log("Delete returned: " + err.response.statusText+" ["+err.response.status+"]") ;
         }         
-        console.log("Create alias for new index:", index_alias);
+        qnabot.log("Create alias for new index:", index_alias);
         create.method="PUT";
         create.path="/"+index_name+"/_alias/"+index_alias;
         create.body="";
         res = await run_es_query(create);
-        console.log(res) ;
+        qnabot.log(res) ;
     } else {
         // use request params from CfN
         res = await run_es_query(create);
-        console.log(res) ;            
+        qnabot.log(res) ;            
     }
     return{PhysicalResourceId:index_alias, FnGetAttrsDataObj:{index_name:index_name, index_alias:index_alias}};
 };
@@ -88,13 +90,13 @@ exports.Update=async function(ID,params,oldparams){
         if (update.index){
             var index_alias=update.index; 
             var index_name=newname(index_alias);
-            console.log("Update: create new index:", index_name);
+            qnabot.log("Update: create new index:", index_name);
             update.method="PUT";
             update.path="/"+index_name;
             res = await run_es_query(update);
-            console.log(res) ;
+            qnabot.log(res) ;
             try {
-                console.log("Update: reindex existing index to new index:", index_alias+" -> "+index_name);
+                qnabot.log("Update: reindex existing index to new index:", index_alias+" -> "+index_name);
             	var reindex={
             	  "source": {
             	    "index": index_alias
@@ -108,39 +110,39 @@ exports.Update=async function(ID,params,oldparams){
                 update.body=reindex;
                 res = await run_es_query(update);  
             } catch(err) {
-                console.log("Reindex request returned: " + err.response.statusText+" ["+err.response.status+"]") ;
+                qnabot.log("Reindex request returned: " + err.response.statusText+" ["+err.response.status+"]") ;
             }
-            console.log(res) ;
+            qnabot.log(res) ;
             try {
-                console.log("Delete existing alias, if exists:", index_alias);
+                qnabot.log("Delete existing alias, if exists:", index_alias);
                 update.method="DELETE";
                 update.path="/*/_alias/"+index_alias;
                 update.body="";
                 res = await run_es_query(update);
-                console.log(res) ;  
+                qnabot.log(res) ;  
             } catch(err) {
-                console.log("Delete alias returned: " + err.response.statusText+" ["+err.response.status+"]") ;
+                qnabot.log("Delete alias returned: " + err.response.statusText+" ["+err.response.status+"]") ;
             }
             try {
-                console.log("Delete existing index, if exists from earlier release:", index_alias);
+                qnabot.log("Delete existing index, if exists from earlier release:", index_alias);
                 update.method="DELETE";
                 update.path="/"+index_alias;
                 update.body="";
                 res = await run_es_query(update);
-                console.log(res) ; 
+                qnabot.log(res) ; 
             } catch(err) {
-                console.log("Delete index returned: " + err.response.statusText+" ["+err.response.status+"]") ;
+                qnabot.log("Delete index returned: " + err.response.statusText+" ["+err.response.status+"]") ;
             }
-            console.log("Update alias for new index:", index_alias);
+            qnabot.log("Update alias for new index:", index_alias);
             update.method="PUT";
             update.path="/"+index_name+"/_alias/"+index_alias;
             update.body="";
             res = await run_es_query(update);
-            console.log(res) ;
+            qnabot.log(res) ;
         } else {
             // use request params from CfN
             res = await run_es_query(update);
-            console.log(res) ;            
+            qnabot.log(res) ;            
         }
         return{PhysicalResourceId:ID, FnGetAttrsDataObj:{index_name:index_name, index_alias:index_alias}};
     }
@@ -148,9 +150,9 @@ exports.Update=async function(ID,params,oldparams){
 
 exports.Delete=async function(ID,params){
     if(params.delete){
-        console.log("Delete resource using ES params:", JSON.stringify(params.delete));
+        qnabot.log("Delete resource using ES params:", JSON.stringify(params.delete));
         var res = await run_es_query(params.delete);
-        console.log(res) ;
+        qnabot.log(res) ;
         return{PhysicalResourceId:ID, FnGetAttrsDataObj:{}};
     }else{
         return{PhysicalResourceId:ID, FnGetAttrsDataObj:{}};

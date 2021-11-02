@@ -8,6 +8,8 @@ var handlebars = require('./handlebars');
 var translate = require('./translate');
 var kendra = require('./kendraQuery');
 var kendra_fallback = require("./kendra");
+const qnabot = require("qnabot/logging")
+
 // const sleep = require('util').promisify(setTimeout);
 
 
@@ -27,7 +29,7 @@ async function run_query(req, query_params) {
     else {
         response= await run_query_es(req, query_params);
     }
-    console.log(`response ${JSON.stringify(response)}` )
+    qnabot.log(`response ${JSON.stringify(response)}` )
     return response;
 }
 
@@ -72,7 +74,7 @@ async function run_query_es(req, query_params) {
 
 
 async function run_query_kendra(req, query_params) {
-    console.log("Querying Kendra FAQ index: " + _.get(req, "_settings.KENDRA_FAQ_INDEX"));
+    qnabot.log("Querying Kendra FAQ index: " + _.get(req, "_settings.KENDRA_FAQ_INDEX"));
     // calls kendraQuery function which duplicates KendraFallback code, but only searches through FAQs
     var request_params = {
         kendra_faq_index:_.get(req, "_settings.KENDRA_FAQ_INDEX"),
@@ -97,12 +99,12 @@ async function run_query_kendra(req, query_params) {
         }
     }
     if (alt_kendra_idxs.includes(request_params.kendra_faq_index)) {
-        console.log(`optimizing for KendraFallback`);
+        qnabot.log(`optimizing for KendraFallback`);
         request_params['same_index'] = true ;
     }
 
     var kendra_response = await kendra.handler(request_params);
-    console.log(kendra_response)
+    qnabot.log(kendra_response)
     if (_.get(kendra_response, "hits.hits[0]._source")) {
         _.set(kendra_response, "hits.hits[0]._source.answersource", "Kendra FAQ");
     }
@@ -121,7 +123,7 @@ function getLambdaName(lambdaRef){
 // used to inoke either chaining rule lambda, or Lambda hook
 async function invokeLambda (lambdaRef, req, res) {
     let lambdaName = getLambdaName(lambdaRef);
-    console.log("Calling Lambda:", lambdaName);
+    qnabot.log("Calling Lambda:", lambdaName);
     var event={req:req, res:res};
     var lambda= new aws.Lambda();
     var lambdares=await lambda.invoke({
@@ -139,7 +141,7 @@ async function invokeLambda (lambdaRef, req, res) {
     } catch (e) {
         // response is not JSON - noop
     }
-    console.log("Lambda returned payload: ", JSON.stringify(payload));
+    qnabot.log("Lambda returned payload: ", JSON.stringify(payload));
     return [req, res, payload];
 }
 
@@ -147,7 +149,7 @@ function merge_next(hit1, hit2) {
     if (hit1 === undefined) {
         return hit2;
     }
-    console.log("Merge chained items");
+    qnabot.log("Merge chained items");
     // merge plaintext answer
     if (hit1 && hit1.a) {
         hit2.a = hit1.a + hit2.a;
@@ -158,7 +160,7 @@ function merge_next(hit1, hit2) {
     if (md1 && md2) {
         _.set(hit2, "alt.markdown", md1 + "\n" + md2);
     } else {
-        console.log("Markdown field missing from one or both items; skip markdown merge");
+        qnabot.log("Markdown field missing from one or both items; skip markdown merge");
     }
     // merge SSML, if present in both items
     var ssml1 = _.get(hit1, "alt.ssml");
@@ -170,7 +172,7 @@ function merge_next(hit1, hit2) {
         // concatenate, and re-wrap with <speak> tags
         _.set(hit2, "alt.ssml", "<speak>" + ssml1 + " " + ssml2 + "</speak>");
     } else {
-        console.log("SSML field missing from one or both items; skip SSML merge");
+        qnabot.log("SSML field missing from one or both items; skip SSML merge");
     }
     // build arrays of Lambda Hooks and arguments
     var lambdahooks = _.get(hit1, "lambdahooks",[]);
@@ -190,7 +192,7 @@ function merge_next(hit1, hit2) {
     _.set(hit2, "lambdahooks", lambdahooks);
     
     // all other fields inherited from item 2
-    console.log("Chained items merged:", hit2);
+    qnabot.log("Chained items merged:", hit2);
     return hit2;
 }
 
@@ -214,17 +216,17 @@ async function get_hit(req, res) {
     };
     var no_hits_question = _.get(req, '_settings.ES_NO_HITS_QUESTION', 'no_hits');
     var response = await run_query(req, query_params);
-    console.log("Query response: ", JSON.stringify(response,null,2));
+    qnabot.log("Query response: ", JSON.stringify(response,null,2));
     var hit = _.get(response, "hits.hits[0]._source");
     
     _.set(res, "kendraResultsCached", response.kendraResultsCached);
-    if (response.kendraResultsCached) console.log(`kendra results cached in res structure`);
+    if (response.kendraResultsCached) qnabot.log(`kendra results cached in res structure`);
     _.set(req, "session.qnabotcontext.kendra", response.kendra_context);
-    if (response.kendra_context) console.log(`kendra context set in res session`);
+    if (response.kendra_context) qnabot.log(`kendra context set in res session`);
     
     // ES fallback if KendraFAQ fails
     if (!hit && _.get(req, '_settings.KENDRA_FAQ_ES_FALLBACK', true)) {
-        console.log('ElasticSearch Fallback');
+        qnabot.log('ElasticSearch Fallback');
         response = await run_query_es(req, query_params);
         if (_.get(response, "hits.hits[0]._source")) {
             _.set(response, "hits.hits[0]._source.answersource", "ElasticSearch Fallback");
@@ -235,9 +237,9 @@ async function get_hit(req, res) {
     if (hit) {
         res['got_hits'] = 1;  // response flag, used in logging / kibana
     } else if(query_params.kendra_indexes.length != 0) {
-        console.log("request entering kendra fallback " + JSON.stringify(req))
+        qnabot.log("request entering kendra fallback " + JSON.stringify(req))
         hit = await  kendra_fallback.handler({req,res})
-        console.log("Result from Kendra " + JSON.stringify(hit))
+        qnabot.log("Result from Kendra " + JSON.stringify(hit))
         if(hit &&  hit.hit_count != 0)
         {
             _.set(res,"answersource","Kendra Fallback");
@@ -251,7 +253,7 @@ async function get_hit(req, res) {
     }
     if(!hit)
     {
-        console.log("No hits from query - searching instead for: " + no_hits_question);
+        qnabot.log("No hits from query - searching instead for: " + no_hits_question);
         query_params['question'] = no_hits_question;
         res['got_hits'] = 0;  // response flag, used in logging / kibana
         
@@ -259,11 +261,11 @@ async function get_hit(req, res) {
 
         hit = _.get(response, "hits.hits[0]._source");
 
-        console.log("No hits response: " + JSON.stringify(hit))
+        qnabot.log("No hits response: " + JSON.stringify(hit))
     }
     // Do we have a hit?
     if (hit) {
-        console.log("Setting topic for " + JSON.stringify(hit))
+        qnabot.log("Setting topic for " + JSON.stringify(hit))
         // set res topic from document before running handlebars, so that handlebars can access or overwrite it.
          _.set(res, "session.topic", _.get(hit, "t"));
         
@@ -285,7 +287,7 @@ async function get_hit(req, res) {
         // encrypt conditionalChaining rule, if set
         const conditionalChaining = _.get(hit, "conditionalChaining");
         if (conditionalChaining) {
-            console.log("Encrypt conditionalChaining rule to ensure it is tamper proof in session attributes");
+            qnabot.log("Encrypt conditionalChaining rule to ensure it is tamper proof in session attributes");
             const encrypted = encryptor.encrypt(conditionalChaining);
             _.set(hit, "conditionalChaining", encrypted);
         }
@@ -302,7 +304,7 @@ async function get_hit(req, res) {
             var lambdaHook = _.get(hit, "l");
             if (lambdaHook) {
                 var payload;
-                console.log("Invoking Lambda Hook function: ", lambdaHook);
+                qnabot.log("Invoking Lambda Hook function: ", lambdaHook);
                 [req, res, payload] = await invokeLambda(lambdaHook, req, res);
                 // update hit with values returned in res by lambda hook
                 _.set(hit, "a", _.get(res,"message",""));
@@ -334,12 +336,12 @@ async function get_hit(req, res) {
  * @returns {Promise<*>}
  */
 async function evaluateConditionalChaining(req, res, hit, conditionalChaining) {
-    console.log("evaluateConditionalChaining req: ", JSON.stringify(req, null, 2));
-    console.log("evaluateConditionalChaining res: ", JSON.stringify(res, null, 2));
-    console.log("evaluateConditionalChaining hit: ", JSON.stringify(hit, null, 2));
+    qnabot.log("evaluateConditionalChaining req: ", JSON.stringify(req, null, 2));
+    qnabot.log("evaluateConditionalChaining res: ", JSON.stringify(res, null, 2));
+    qnabot.log("evaluateConditionalChaining hit: ", JSON.stringify(hit, null, 2));
     // decrypt conditionalChaining
     conditionalChaining = encryptor.decrypt(conditionalChaining);
-    console.log("Decrypted Chained document rule specified:", conditionalChaining);
+    qnabot.log("Decrypted Chained document rule specified:", conditionalChaining);
     var next_q;
     // If chaining rule a lambda, or an expression?
     if (conditionalChaining.toLowerCase().startsWith("lambda::")) {
@@ -347,7 +349,7 @@ async function evaluateConditionalChaining(req, res, hit, conditionalChaining) {
         var lambdaName = conditionalChaining.split("::")[1] ;
         var payload;
         [req, res, payload] = await invokeLambda (lambdaName, req, res);
-        console.log("Chaining Rule Lambda response payload: ", payload);
+        qnabot.log("Chaining Rule Lambda response payload: ", payload);
         try {
             payload = JSON.parse(payload);
         } catch (e) {
@@ -357,8 +359,8 @@ async function evaluateConditionalChaining(req, res, hit, conditionalChaining) {
             next_q = _.get(payload,"req.question");
         }
         else {
-            console.log("Chaining Rules Lambda did not return session event in response.");
-            console.log("assume response is a simple string containing next_q value");
+            qnabot.log("Chaining Rules Lambda did not return session event in response.");
+            qnabot.log("assume response is a simple string containing next_q value");
             next_q = payload ;
         }
     } else {
@@ -375,11 +377,11 @@ async function evaluateConditionalChaining(req, res, hit, conditionalChaining) {
             PreviousQuestion: _.get(req, "session.qnabotcontext.previous.q", false),
             Sentiment: req.sentiment,
         };
-        console.log("Evaluating:", conditionalChaining);
+        qnabot.log("Evaluating:", conditionalChaining);
         // safely evaluate conditionalChaining expression.. throws an exception if there is a syntax error
         next_q = safeEval(conditionalChaining, context);
     }
-    console.log("Chained document rule evaluated to:", next_q);
+    qnabot.log("Chained document rule evaluated to:", next_q);
     req.question = next_q;
     var hit2;
     [req, res, hit2] = await get_hit(req, res);
@@ -404,7 +406,7 @@ async function evaluateConditionalChaining(req, res, hit, conditionalChaining) {
         var mergedhit = merge_next(hit, hit2);
         return [req, res, mergedhit] ;
     } else {
-        console.log("WARNING: No documents found for evaluated chaining rule:", next_q);
+        qnabot.log("WARNING: No documents found for evaluated chaining rule:", next_q);
         return [req, res, hit];
     }
 }
@@ -453,7 +455,7 @@ function update_res_with_hit(req, res, hit) {
             res.message = res.result.alt.ssml.replace(/\r?\n|\r/g, ' ');
         }
     }
-    console.log(res.message);
+    qnabot.log(res.message);
     var card = _.get(res, "result.r.title") ? res.result.r : null;
 
     if (card) {
@@ -541,9 +543,9 @@ module.exports = async function (req, res) {
             // ElicitResonse is not involved and this document has conditionalChaining defined. Process the
             // conditionalChaining in this case.
             [req, res, hit] = await evaluateConditionalChaining(req, res, hit, hit.conditionalChaining);
-            console.log("Chained doc count: ", c);
+            qnabot.log("Chained doc count: ", c);
             if (c >= 10) {
-                console.log("Reached Max limit of 10 chained documents (safeguard to prevent infinite loops).") ;
+                qnabot.log("Reached Max limit of 10 chained documents (safeguard to prevent infinite loops).") ;
                 break ;
             }
         }
@@ -552,14 +554,14 @@ module.exports = async function (req, res) {
         if (_.get(req._settings, 'ENABLE_MULTI_LANGUAGE_SUPPORT')) {
             usrLang = _.get(req, 'session.qnabotcontext.userLocale');
             if (usrLang != 'en') {
-                console.log("Autotranslate hit to usrLang: ", usrLang);
+                qnabot.log("Autotranslate hit to usrLang: ", usrLang);
                 hit = await translate.translate_hit(hit, usrLang,req);
             } else {
-                console.log("User Lang is en, Autotranslate not required.");
+                qnabot.log("User Lang is en, Autotranslate not required.");
             }
         }
         // prepend debug msg
-        console.log("pre-debug " +JSON.stringify(req))
+        qnabot.log("pre-debug " +JSON.stringify(req))
         if (_.get(req._settings, 'ENABLE_DEBUG_RESPONSES')) {
             var msg = "User Input: \"" + req.question + "\"";
 
@@ -594,6 +596,6 @@ module.exports = async function (req, res) {
     res.session.qnabot_gotanswer = (res['got_hits'] > 0) ? true : false ;
 
     var event = {req, res} ;
-    console.log("RESULT", JSON.stringify(event));
+    qnabot.log("RESULT", JSON.stringify(event));
     return event ;
 };

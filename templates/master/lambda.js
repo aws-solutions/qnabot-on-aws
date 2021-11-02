@@ -1,10 +1,11 @@
-var fs=require('fs')
-var _=require('lodash')
+var fs=require('fs');
+var _=require('lodash');
+const util = require('../util');
 
 var files=fs.readdirSync(`${__dirname}`)
     .filter(x=>!x.match(/README.md|Makefile|dashboard|index|test|.DS_Store/))
     .map(x=>require(`./${x}`))
-    
+
 var lambdas=[]
 _.forEach(_.assign.apply({},files),(value,key)=>{
     if(value.Type==='AWS::Lambda::Function'){
@@ -36,12 +37,10 @@ module.exports=Object.assign(
           ]
         },
         "Path": "/",
-        "ManagedPolicyArns": [
-          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
-          "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole",
-          "arn:aws:iam::aws:policy/AWSXRayDaemonWriteAccess",
-        ],
         "Policies": [
+          util.basicLambdaExecutionPolicy(),
+          util.lambdaVPCAccessExecutionRole(),
+          util.xrayDaemonWriteAccess(),
           {
             "PolicyName" : "LambdaPolicy",
             "PolicyDocument" : {
@@ -58,7 +57,8 @@ module.exports=Object.assign(
             }
           }
         ]
-      }
+      },
+      "Metadata": util.cfnNag(["W11", "W12", "F3"])
   },
 })
 

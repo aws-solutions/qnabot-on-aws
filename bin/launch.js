@@ -51,13 +51,13 @@ if (require.main === module) {
         })
         .parse(process.argv)
 
-    var options=argv
-    var stack=!options.input ? options.args[0] : options.input.split('/')
+    const options = argv.opts();
+    var stack=!options.input ? argv.args[0] : argv.input.split('/')
         .reverse()
         .filter(x=>x)
         .slice(0,2)
         .reverse().join('-').split('.')[0]
-    var op=options.operation || (options.input ? options.args[0] : options.args[1])
+    var op=options.operation || (options.input ? argv.args[0] : argv.args[1])
     try {
         if( stack && op){
             switch(op){

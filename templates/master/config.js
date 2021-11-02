@@ -11,6 +11,8 @@ var permissions=_.keys(require('./lambda'))
         'InvokePermissionLexStatusLambda'
         ].includes(x))
 
+const util = require('../util');
+
 module.exports={
 "API": {
   "Type": "AWS::ApiGateway::RestApi",
@@ -86,6 +88,7 @@ function stage(name){
                 ]]}
             ]}
         }
-      }
+      },
+      "Metadata": util.cfnNag(["W64", "W69"])
     }
 }

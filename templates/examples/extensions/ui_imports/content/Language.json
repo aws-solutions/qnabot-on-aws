@@ -2,7 +2,7 @@
   "qna": [
     {
       "qid": "Language.001",
-      "a": "{{setSessionAttr \"userPreferredLocale\" \"\"}} I will try and answer based on language detected",
+      "a": "{{resetLang \"I will try to answer based on language detected\"}}",
       "q": [
         "Reset language",
         "Detect language"

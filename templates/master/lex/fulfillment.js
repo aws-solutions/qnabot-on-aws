@@ -1,5 +1,8 @@
-var config = require('./config')
-var _ = require('lodash')
+var config = require('./config');
+var _ = require('lodash');
+var crypto = require('crypto')
+var fs = require('fs')
+const util = require('../../util');
 
 var examples = _.fromPairs(require('../../examples/outputs')
   .names
@@ -12,12 +15,26 @@ var responsebots = _.fromPairs(require('../../examples/examples/responsebots-lex
     return [x, { "Fn::GetAtt": ["ExamplesStack", `Outputs.${x}`] }]
   }))
 
+const filesToHash = ['fulfillment.zip', 'es-proxy-layer.zip','common-modules-layer.zip','aws-sdk-layer.zip','qnabot-common-layer.zip']
+const comboHash = filesToHash.map(x => {
+    let filePath = (fs.existsSync("../../build/lambda/" + x) ? "../../" : "./") + "build/lambda/" + x
+    let fileBuffer = fs.readFileSync(filePath);
+    return crypto.createHash("sha256").update(fileBuffer).digest("hex")
+  }).reduce((a,b) => {
+    return a + b;
+  });
+const fulfillmentHash =  crypto.createHash("sha256").update(comboHash).digest("hex")
+
 module.exports = {
   "Alexa": {
     "Type": "AWS::Lambda::Permission",
+    "DependsOn": "FulfillmentLambdaAliaslive",
     "Properties": {
       "Action": "lambda:InvokeFunction",
-      "FunctionName": { "Fn::GetAtt": ["FulfillmentLambda", "Arn"] },
+      "FunctionName": {  "Fn::Join": [ ":", [
+        {"Fn::GetAtt":["FulfillmentLambda","Arn"]},
+        "live"
+      ]]},
       "Principal": "alexa-appkit.amazon.com"
     }
   },
@@ -31,12 +48,15 @@ module.exports = {
     }
   },
   "FulfillmentLambda": {
-    "Type": "AWS::Lambda::Function",
+    "Type": "AWS::Serverless::Function",
+    "DependsOn": "FulfillmentCodeVersion",
     "Properties": {
-      "Code": {
-        "S3Bucket": { "Ref": "BootstrapBucket" },
-        "S3Key": { "Fn::Sub": "${BootstrapPrefix}/lambda/fulfillment.zip" },
-        "S3ObjectVersion": { "Ref": "FulfillmentCodeVersion" }
+      "AutoPublishAlias":"live",
+      "AutoPublishCodeSha256": fulfillmentHash,
+      "CodeUri": {
+        "Bucket": { "Ref": "BootstrapBucket" },
+        "Key": { "Fn::Sub": "${BootstrapPrefix}/lambda/fulfillment.zip" },
+        "Version": { "Ref": "FulfillmentCodeVersion" }
       },
       "Environment": {
         "Variables": Object.assign({
@@ -54,7 +74,12 @@ module.exports = {
         }, examples, responsebots)
       },
       "Handler": "index.handler",
-      "MemorySize": "1408",
+      "MemorySize": 1408,
+      "ProvisionedConcurrencyConfig": {
+        "Fn::If": [ "CreateConcurrency", {
+          "ProvisionedConcurrentExecutions" : {"Ref": "FulfillmentConcurrency"}
+        }, {"Ref" : "AWS::NoValue"} ]
+      },
       "Role": { "Fn::GetAtt": ["FulfillmentLambdaRole", "Arn"] },
       "Runtime": "nodejs12.x",
       "Timeout": 300,
@@ -64,18 +89,19 @@ module.exports = {
           "SecurityGroupIds": {"Ref": "VPCSecurityGroupIdList"}
         }, {"Ref" : "AWS::NoValue"} ]
       },
-      "TracingConfig" : {
-        "Fn::If": [ "XRAYEnabled", {"Mode": "Active"},
-          {"Ref" : "AWS::NoValue"} ]
+      "Tracing" : {
+        "Fn::If": [ "XRAYEnabled", "Active",
+          "PassThrough" ]
       },
       "Layers":[{"Ref":"AwsSdkLayerLambdaLayer"},
                 {"Ref":"CommonModulesLambdaLayer"},
-                {"Ref":"EsProxyLambdaLayer"}],
-      "Tags": [{
-        Key: "Type",
-        Value: "Fulfillment"
-      }]
-    }
+                {"Ref":"EsProxyLambdaLayer"},
+                {"Ref":"QnABotCommonLambdaLayer"}],
+      "Tags": {
+        "Type": "Fulfillment"
+      }
+    },
+    "Metadata": util.cfnNag(["W89", "W92"])
   },
   "InvokePolicy": {
     "Type": "AWS::IAM::ManagedPolicy",
@@ -140,14 +166,14 @@ module.exports = {
       },
       "Path": "/",
       "ManagedPolicyArns": [
-        "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
-        "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole",
-        "arn:aws:iam::aws:policy/AWSXRayDaemonWriteAccess",
-        "arn:aws:iam::aws:policy/TranslateReadOnly",
-        "arn:aws:iam::aws:policy/ComprehendReadOnly",
         { "Ref": "QueryPolicy" }
       ],
       "Policies": [
+        util.basicLambdaExecutionPolicy(),
+        util.lambdaVPCAccessExecutionRole(),
+        util.xrayDaemonWriteAccess(),
+        util.translateReadOnly(),
+        util.comprehendReadOnly(),
         {
           "PolicyName": "ParamStorePolicy",
           "PolicyDocument": {
@@ -212,7 +238,7 @@ module.exports = {
             }]
           }
         },
-        { 
+        {
           "PolicyName" : "S3QNABucketReadAccess",
           "PolicyDocument" : {
           "Version": "2012-10-17",
@@ -221,7 +247,7 @@ module.exports = {
                   "Effect": "Allow",
                   "Action": [
                       "s3:GetObject"
-                   ],   
+                   ],
                   "Resource": [
                       "arn:aws:s3:::QNA*/*",
                       "arn:aws:s3:::qna*/*"
@@ -231,7 +257,8 @@ module.exports = {
           }
         }
       ]
-    }
+    },
+    "Metadata": util.cfnNag(["W11", "W12"])
   },
   "ESWarmerLambda": {
     "Type": "AWS::Lambda::Function",
@@ -256,6 +283,11 @@ module.exports = {
       "Role": { "Fn::GetAtt": ["WarmerLambdaRole", "Arn"] },
       "Runtime": "nodejs12.x",
       "Timeout": 300,
+      "Layers": [
+        {"Ref": "AwsSdkLayerLambdaLayer"},
+        {"Ref": "CommonModulesLambdaLayer"},
+        {"Ref": "EsProxyLambdaLayer"}
+      ],
       "VpcConfig" : {
         "Fn::If": [ "VPCEnabled", {
           "SubnetIds": {"Ref": "VPCSubnetIdList"},
@@ -270,7 +302,8 @@ module.exports = {
         Key: "Type",
         Value: "Warmer"
       }]
-    }
+    },
+    "Metadata": util.cfnNag(["W92"])
   },
   "WarmerLambdaRole": {
     "Type": "AWS::IAM::Role",
@@ -288,12 +321,10 @@ module.exports = {
         ]
       },
       "Path": "/",
-      "ManagedPolicyArns": [
-        "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
-        "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole",
-        "arn:aws:iam::aws:policy/AWSXRayDaemonWriteAccess"
-      ],
       "Policies": [
+        util.basicLambdaExecutionPolicy(),
+        util.lambdaVPCAccessExecutionRole(),
+        util.xrayDaemonWriteAccess(),
         {
           "PolicyName": "ParamStorePolicy",
           "PolicyDocument": {
@@ -342,7 +373,8 @@ module.exports = {
           }
         }
       ]
-    }
+    },
+    "Metadata": util.cfnNag(["W11", "W12"])
   },
   "ESWarmerRule": {
     "Type": "AWS::Events::Rule",
@@ -381,4 +413,3 @@ module.exports = {
     }
   }
 }
-

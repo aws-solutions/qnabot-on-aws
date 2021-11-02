@@ -1,2 +1,132 @@
-aws-ai-qna-bot
-Copyright 2017-2017 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+aws-qnabot
+Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+
+Licensed under the Apache License Version 2.0 (the 'License'). You may not use this file except in compliance
+with the License. A copy of the License is located at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+or in the 'license' file accompanying this file. This file is distributed on an 'AS IS' BASIS, WITHOUT WARRANTIES
+OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions
+and limitations under the License.
+
+
+**********************
+THIRD PARTY COMPONENTS
+**********************
+This software includes third party software subject to the following copyrights:
+
+@babel/core under the Massachusetts Institute of Technology (MIT) license
+@babel/plugin-transform-runtime under the Massachusetts Institute of Technology (MIT) license
+@babel/preset-env under the Massachusetts Institute of Technology (MIT) license
+@babel/preset-stage-2 under the Massachusetts Institute of Technology (MIT) license
+ajv under the Massachusetts Institute of Technology (MIT) license
+alexa-sdk under the Apache License Version 2.0
+amazon-cognito-identity-js under the Apache License Version 2.0
+ask-cli under the Apache License Version 2.0
+async-mutex under the Massachusetts Institute of Technology (MIT) license
+autosize under the Massachusetts Institute of Technology (MIT) license
+aws-lex-web-ui under the Amazon Software License
+aws-sdk under the Apache License Version 2.0
+aws4 the Massachusetts Institute of Technology (MIT) license
+axios the Massachusetts Institute of Technology (MIT) license
+babel-core under the Massachusetts Institute of Technology (MIT) license
+babel-loader under the Massachusetts Institute of Technology (MIT) license
+babel-plugin-syntax-flow under the Massachusetts Institute of Technology (MIT) license
+babel-plugin-transform-flow-strip-types under the Massachusetts Institute of Technology (MIT) license
+babel-polyfill the Massachusetts Institute of Technology (MIT) license
+babel-preset-env under the Massachusetts Institute of Technology (MIT) license
+babel-preset-es2015 under the Massachusetts Institute of Technology (MIT) license
+babel-preset-es2015-ie the Massachusetts Institute of Technology (MIT) license
+bluebird under the Massachusetts Institute of Technology (MIT) license
+body-parser under the Massachusetts Institute of Technology (MIT) license
+bowser under the Massachusetts Institute of Technology (MIT) license
+cfn-response under the Amazon Software License
+chalk under the Massachusetts Institute of Technology (MIT) license
+chrome-aws-lambda under the Massachusetts Institute of Technology (MIT) license
+clean-deep under the Massachusetts Institute of Technology (MIT) license
+clipboard under the Massachusetts Institute of Technology (MIT) license
+commander under the Massachusetts Institute of Technology (MIT) license
+copy-webpack-plugin under the Massachusetts Institute of Technology (MIT) license
+crypto-js under the Massachusetts Institute of Technology (MIT) license
+css-loader under the Massachusetts Institute of Technology (MIT) license
+dir-loader under the Massachusetts Institute of Technology (MIT) license
+exports-loader under the Massachusetts Institute of Technology (MIT) license
+express under the Massachusetts Institute of Technology (MIT) license
+faker under the Massachusetts Institute of Technology (MIT) license
+file-saver under the Massachusetts Institute of Technology (MIT) license
+handlebars under the Massachusetts Institute of Technology (MIT) license
+handlebars-loader under the Massachusetts Institute of Technology (MIT) license
+highlight.js under BSD-3-Clause license
+html-webpack-plugin under the Massachusetts Institute of Technology (MIT) license
+idle-vue under the Massachusetts Institute of Technology (MIT) license
+js-cache under the Massachusetts Institute of Technology (MIT) license
+jsdom under the Massachusetts Institute of Technology (MIT) license
+jsdom-global under the Massachusetts Institute of Technology (MIT) license
+jsdom-loader under the Massachusetts Institute of Technology (MIT) license
+js-xlsx under the Apache License Version 2.0
+jsheader under the Apache License Version 2.0
+json-parse-better-errors under the Massachusetts Institute of Technology (MIT) license
+json-stringify-pretty-compact under the Massachusetts Institute of Technology (MIT) license
+JSONPath under the Massachusetts Institute of Technology (MIT) license
+jsonschema under the Massachusetts Institute of Technology (MIT) license
+jsonwebtoken under the Massachusetts Institute of Technology (MIT) license
+jszip under the Massachusetts Institute of Technology (MIT) license
+lodash under the Massachusetts Institute of Technology (MIT) license
+lodash-webpack-plugin under the Massachusetts Institute of Technology (MIT) license
+marked under the Massachusetts Institute of Technology (MIT) license
+material-design-icons under the Apache License Version 2.0
+mini-css-extract-plugin under the Massachusetts Institute of Technology (MIT) license
+minimist under the Massachusetts Institute of Technology (MIT) license
+moment under the Massachusetts Institute of Technology (MIT) license
+morgan under the Massachusetts Institute of Technology (MIT) license
+multer under the Massachusetts Institute of Technology (MIT) license
+node-sass under the Massachusetts Institute of Technology (MIT) license
+ora under the Massachusetts Institute of Technology (MIT) license
+progress-bar-webpack-plugin under the Massachusetts Institute of Technology (MIT) license
+pug under the Massachusetts Institute of Technology (MIT) license
+pug-loader under the Massachusetts Institute of Technology (MIT) license
+pug-plain-loader under the Massachusetts Institute of Technology (MIT) license
+pug-runtime under the Massachusetts Institute of Technology (MIT) license
+query-string under the Massachusetts Institute of Technology (MIT) license
+querystring under the Massachusetts Institute of Technology (MIT) license
+querystring-browser under the Massachusetts Institute of Technology (MIT) license
+quick-lru under the Massachusetts Institute of Technology (MIT) license
+range under the Massachusetts Institute of Technology (MIT) license
+raw-loader under the Massachusetts Institute of Technology (MIT) license
+raw-text under the Massachusetts Institute of Technology (MIT) license
+read-excel-file under the Massachusetts Institute of Technology (MIT) license
+recursive-readdir under the Massachusetts Institute of Technology (MIT) license
+require-dir under the Massachusetts Institute of Technology (MIT) license
+roboto-fontface under the Apache License Version 2.0
+sass under the Massachusetts Institute of Technology (MIT) license
+sass-loader under the Massachusetts Institute of Technology (MIT) license
+simple-encryptor under the Massachusetts Institute of Technology (MIT) license
+slackify-markdown under the Massachusetts Institute of Technology (MIT) license
+strip-ansi under the Massachusetts Institute of Technology (MIT) license
+style-loader under the Massachusetts Institute of Technology (MIT) license
+stylus under the Massachusetts Institute of Technology (MIT) license
+stylus-loader under the Massachusetts Institute of Technology (MIT) license
+urlcode-json under the BSD license
+utf8 under the Massachusetts Institute of Technology (MIT) license
+vee-validate under the Massachusetts Institute of Technology (MIT) license
+velocity under the Massachusetts Institute of Technology (MIT) license
+vue under the Massachusetts Institute of Technology (MIT) license
+vue-clipboard2 under the Massachusetts Institute of Technology (MIT) license
+vue-hint.css under the Massachusetts Institute of Technology (MIT) license
+vue-loader under the Massachusetts Institute of Technology (MIT) license
+vue-lorem-ipsum under the Massachusetts Institute of Technology (MIT) license
+vue-router under the Massachusetts Institute of Technology (MIT) license
+vue-template-compiler under the Massachusetts Institute of Technology (MIT) license
+vuetify under the Massachusetts Institute of Technology (MIT) license
+vuex under the Massachusetts Institute of Technology (MIT) license
+vuex-router-sync under the Massachusetts Institute of Technology (MIT) license
+webdriverio under the Massachusetts Institute of Technology (MIT) license
+webpack under the Massachusetts Institute of Technology (MIT) license
+webpack-archive-plugin under the Massachusetts Institute of Technology (MIT) license
+webpack-bundle-analyzer under the Massachusetts Institute of Technology (MIT) license
+webpack-cli under the Massachusetts Institute of Technology (MIT) license
+webpack-dev-server under the Massachusetts Institute of Technology (MIT) license
+webpack-merge under the Massachusetts Institute of Technology (MIT) license
+webpack-s3-plugin under the Massachusetts Institute of Technology (MIT) license
+xlsx under the Apache License Version 2.0

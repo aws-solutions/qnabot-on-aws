@@ -1,6 +1,8 @@
 var fs=require('fs')
 const path = require('path')
 const resplib = path.join(__dirname, '..', '..','lib', 'response.js')
+const util = require('../../util');
+
 module.exports={
     "ESInfo":{
         "Type": "Custom::ESProxy",
@@ -36,7 +38,8 @@ module.exports={
             Key:"Type",
             Value:"CustomResource"
         }]
-      }
+      },
+      "Metadata": util.cfnNag(["W92"])
     }
 }
 

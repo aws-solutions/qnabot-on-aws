@@ -22,7 +22,7 @@
         "bucket": {
           "name": "qna-dev-dev-dev-master-4-exportbucket-o5r0tsjifuu9",
           "ownerIdentity": {
-            "principalId": "425742325899"
+            "principalId": "111122223333"
           },
           "arn": "arn:aws:s3:::qna-dev-dev-dev-master-4-exportbucket-o5r0tsjifuu9"
         },
