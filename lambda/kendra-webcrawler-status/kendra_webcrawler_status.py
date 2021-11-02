@@ -12,6 +12,7 @@ def handler(event, context):
     Name = os.environ.get('DATASOURCE_NAME')
     settings = get_settings()
     IndexId = settings['KENDRA_WEB_PAGE_INDEX']
+    
     data_source_id = get_data_source_id(IndexId, Name)
 
     if data_source_id is None:

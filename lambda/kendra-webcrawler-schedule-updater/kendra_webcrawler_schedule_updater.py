@@ -66,7 +66,7 @@ def handler(event, context):
     schedule = create_cron_expression(schedule)
     if schedule == "INVALID":
         logging.warn("The cron schedule specified by KENDRA_INDEXER_SCHEDULE " +
-                       "is invalid. Schedule: ${schedule}. Crawling will not be done on a schedule/")
+                     "is invalid. Schedule: ${schedule}. Crawling will not be done on a schedule/")
         schedule = ""      
     data_source_id = get_data_source_id(IndexId, Name)
     current_schedule = get_data_source_schedule(IndexId, data_source_id)

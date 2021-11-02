@@ -64,17 +64,19 @@ def handler(event, context):
     URLs = settings['KENDRA_INDEXER_URLS'].replace(' ', '').split(',')
     schedule = settings["KENDRA_INDEXER_SCHEDULE"]
     crawler_mode = settings["KENDRA_INDEXER_CRAWL_MODE"].upper()
+    crawl_depth = settings["KENDRA_INDEXER_CRAWL_DEPTH"]
+
     schedule = create_cron_expression(schedule)
     if schedule == "INVALID":
-        schedule = ""        
+        schedule = ""
     data_source_id = get_data_source_id(IndexId, Name)
 
     if data_source_id is None:
-        data_source_id = kendra_create_data_source(client, IndexId, Name, Type, RoleArn, Description, URLs, schedule, crawler_mode)
+        data_source_id = kendra_create_data_source(client, IndexId, Name, Type, RoleArn, Description, URLs, schedule, crawler_mode,crawl_depth)
         kendra_sync_data_source(IndexId, data_source_id)
         create_dashboard(IndexId, data_source_id)
     else:
-        kendra_update_data_source(IndexId, data_source_id, URLs, RoleArn, schedule, crawler_mode)
+        kendra_update_data_source(IndexId, data_source_id, URLs, RoleArn, schedule, crawler_mode,crawl_depth)
         kendra_sync_data_source(IndexId, data_source_id)
     return {"IndexId": IndexId, "DataSourceId": data_source_id}
 
@@ -88,6 +90,7 @@ def get_settings():
     custom_settings = ssm.get_parameter(Name=custom_settings_key, WithDecryption=True)
     custom_settings = json.loads(custom_settings['Parameter']['Value'])
     default_settings.update(custom_settings)
+
 
     return default_settings
 
@@ -105,7 +108,7 @@ def get_data_source_id(index_id, data_source_name):
     return None
 
 
-def kendra_create_data_source(client, IndexId, Name, Type, RoleArn, Description, URLs, schedule, crawler_mode):
+def kendra_create_data_source(client, IndexId, Name, Type, RoleArn, Description, URLs, schedule, crawler_mode,crawl_depth):
     response = client.create_data_source(
         Name=Name,
         IndexId=IndexId,
@@ -121,7 +124,7 @@ def kendra_create_data_source(client, IndexId, Name, Type, RoleArn, Description,
                         'WebCrawlerMode': crawler_mode
                     }
                 },
-                'CrawlDepth': 2
+                'CrawlDepth': crawl_depth
             }
         }
     )
@@ -137,7 +140,7 @@ def kendra_sync_data_source(IndexId, data_source_id):
     return response
 
 
-def kendra_update_data_source(IndexId, data_source_id, URLs, RoleArn, schedule, crawler_mode):
+def kendra_update_data_source(IndexId, data_source_id, URLs, RoleArn, schedule, crawler_mode,crawl_depth):
     response = client.update_data_source(
         Id=data_source_id,
         RoleArn=RoleArn,
@@ -151,7 +154,7 @@ def kendra_update_data_source(IndexId, data_source_id, URLs, RoleArn, schedule, 
                         'WebCrawlerMode': crawler_mode
                     }
                 },
-                'CrawlDepth': 2
+                'CrawlDepth': crawl_depth
             }
         }
     )
