@@ -39,7 +39,6 @@ module.exports = async function hook(req,res) {
     req = event.req
     res = event.res
 
-    console.log(JSON.stringify(event))
     let posthook = _.get(req,'_settings.LAMBDA_POSTPROCESS_HOOK',undefined)
     _.set(req,"_fulfillment.step","postprocess")
     if(posthook){
