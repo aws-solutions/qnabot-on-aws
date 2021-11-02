@@ -6,14 +6,37 @@
 
 This repository contains code for the QnABot, described in the AWS AI blog post [“Creating a Question and Answer Bot with Amazon Lex and Amazon Alexa”](https://aws.amazon.com/blogs/ai/creating-a-question-and-answer-bot-with-amazon-lex-and-amazon-alexa/).
 
-Refer to "Getting Started" to launch your own QnABot.
+Refer to [Getting Started](#getting-started) to launch your own QnABot, or [Automated Deployment](https://docs.aws.amazon.com/solutions/latest/aws-qnabot/automated-deployment.html) for detailed implementation instructions.
 
 **See all the new features list for 4.7.3** [Fulfillment Lambda Provisioned Concurrency](CHANGELOG.md#473---2021-08-04)
 
-**New features in 4.6.0** [Improved Kendra integration and Kibana dashboards. Additional settings to filter Kendra responses based on confidence levels](CHANGELOG.md#460---2021-04-30)
+**New features in 4.6.0** [Improved Kendra integration and Kibana dashboards. Additional settings to filter Kendra responses based on confidence levels](CHANGELOG.md#460---2021-04-30).
 
-**New features in 4.5.0** [Kendra Web Crawler, Comprehend PII Detection, Translate Custom Terminology, Increased deployment regions](CHANGELOG.md#450---2021-03-07)
+**New features in 4.5.0** [Kendra Web Crawler, Comprehend PII Detection, Translate Custom Terminology, Increased deployment regions](CHANGELOG.md#450---2021-03-07).
 
+## Architecture Overview
+![Architecture](docs/architecture.png)
+ 
+The AWS CloudFormation template deploys the following workflows and services:
+
+1. The admin deploys the solution into their AWS account, opens the Content Designer UI, and uses Amazon Cognito to authenticate.
+
+2. After authentication, Amazon CloudFront
+and Amazon S3 deliver the contents of the Content Designer UI.
+
+3. The admin configures questions and answers in the Content Designer and the UI sends requests to Amazon API Gateway to save the questions and answers.
+
+4. The Content Designer AWS Lambda
+function saves the input in Amazon OpenSearch Service (successor to Amazon ElasticSearch Service) in a questions bank index.
+
+5. Users of the chatbot interact with Amazon Lex via the web client UI or Amazon Connect.
+
+6. Amazon Lex forwards requests to the AWS Lambda (Bot Fulfillment) function. (Users can also send requests to this Lambda function via Amazon Alexa devices).
+
+7. The Bot Fulfillment function takes the users input and uses Amazon Comprehend
+and Amazon Translate (if necessary) to translate non-English requests to English and then looks up the answer in in Amazon OpenSearch Service. If Amazon Kendra index is configured and provided at the time of deployment, the Bot Fulfillment function also sends a request to the Amazon Kendra index.
+
+8. User interactions with Bot Fulfillment functions generate logs and metrics data, which is sent to Amazon Kinesis Data Firehose then to Amazon S3 for later data analysis. 
 ## Upgrade Notes
 
 During an upgrade, we recommend that existing QnABot content first be exported and downloaded from the Content Designer prior to
@@ -111,7 +134,7 @@ We are currently working on adding Microsoft Edge support.
 
 ## License
 
-Refer to [LICENSE.md](LICENSE.md) file for details
+Refer to [LICENSE.md](LICENSE.md) file for details.
 
 ## New features
 Refer to [CHANGELOG.md](CHANGELOG.md) file for details of new features in each version.
@@ -126,8 +149,14 @@ When deploying the Cloudformation stack rarely, the custom resource creating Ama
 
 Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
 
-Licensed under the Amazon Software License (the "License"). You may not use this file except in compliance with the License. A copy of the License is located at
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
 
-    http://aws.amazon.com/asl/
+    http://www.apache.org/licenses/LICENSE-2.0
 
-or in the "license" file accompanying this file. This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and limitations under the License.
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.

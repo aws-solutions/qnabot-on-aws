@@ -1,4 +1,4 @@
-﻿{
+{
   "qna": [
     {
       "qid": "RecentTopics.AI.001",
@@ -121,7 +121,7 @@
         "buttons": [
           {
             "text": "AI Services",
-            "value": "QID::RecentTopics.RecentTopics.AI.001"
+            "value": "QID::RecentTopics.AI.001"
           },
           {
             "text": "ML.Services",
@@ -332,7 +332,7 @@
       "qid": "RecentTopics.Instructions.001",
       "a": "See the instructions",
       "alt": {
-        "markdown": "Save the following JSON to a file and use the \"Import Settings\" option on the Settings page.\n\n```json\n{\n  \"topic::Comprehend\": \"Amazon Comprehend::Comprehend\",\n  \"topic::Kendra\": \"Amazon Kendra::Kendra\",\n  \"topic::Lex\": \"Amazon Lex::Lex\",\n  \"topic::Polly\": \"Amazon Polly::Polly\",\n  \"topic::SageMaker\": \"Amazon SageMaker::SageMaker\",\n  \"topic::Translate\": \"Amazon Translate::Translate\"\n}\n```\n\nSee [here](https://github.com/aws-samples/aws-ai-qna-bot/blob/master/docs/recent_topics_lambda_hook_example/README.md) for more information."
+        "markdown": "Save the following JSON to a file and use the \"Import Settings\" option on the Settings page.\n\n```json\n{\n    \"topic::Comprehend\": \"Amazon Comprehend::RecentTopics.Comprehend\",\n    \"topic::Kendra\": \"Amazon Kendra::RecentTopics.Kendra\",\n    \"topic::Lex\": \"Amazon Lex::RecentTopics.Lex\",\n    \"topic::Polly\": \"Amazon Polly::RecentTopics.Polly\",\n    \"topic::SageMaker\": \"Amazon SageMaker::RecentTopics.SageMaker\",\n    \"topic::Translate\": \"Amazon Translate::RecentTopic.Translate\",\n }\n```\n\nSee [here](https://github.com/aws-samples/aws-ai-qna-bot/blob/master/docs/recent_topics_lambda_hook_example/README.md) for more information."
       },
       "type": "qna",
       "q": [

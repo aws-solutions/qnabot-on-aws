@@ -25,6 +25,7 @@ module.exports={
                 "VPCSecurityGroupIdList": { "Fn::Join" : [ ",", {"Ref":"VPCSecurityGroupIdList"} ] },
                 "LexBotVersion": {"Ref": "LexBotVersion"},
                 "XraySetting":{"Ref": "XraySetting"},
+                "DefaultQnABotSettings": {"Ref":"DefaultQnABotSettings"}
             }
         }
     }
