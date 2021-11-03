@@ -146,6 +146,13 @@ module.exports={
         href:"#/connect"
       },
       {
+        title:"Genesys Cloud",
+        id:"genesys",
+        subTitle:"Instructions for integrating with Genesys Cloud",
+        icon:"info",
+        href:"#/genesys"
+      },
+      {
         title:"Lambda Hooks",
         id:"hooks",
         subTitle:"Instructions for customizing QnABot behavior using AWS Lambda",
