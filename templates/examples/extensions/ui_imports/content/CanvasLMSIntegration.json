@@ -2,7 +2,7 @@
   "qna": [
     {
       "qid": "canvas.enrollments",
-      "a": "Here are the courses you are have enrolled in.",
+      "a": "Here are the courses you are enrolled in:",
       "l": "QNA:EXTCanvasHook",
       "args": [
         "{\"Query\": \"CourseEnrollments\"}"
@@ -16,7 +16,7 @@
     },
     {
       "qid": "canvas.grades",
-      "a": "here are your grades",
+      "a": "Here are your grades:",
       "l": "QNA:EXTCanvasHook",
       "args": [
         "{\"Query\": \"GradesForStudent\"}"
@@ -30,7 +30,7 @@
     },
     {
       "qid": "canvas.class",
-      "a": "Please select one of the options.",
+      "a": "Please select one of the options:",
       "l": "QNA:EXTCanvasHook",
       "args": [
         "{\"Query\": \"ChoicesForStudent\"}"
@@ -43,7 +43,7 @@
     },
     {
       "qid": "canvas.menu",
-      "a": "Please select an option.",
+      "a": "Please select one of the options:",
       "l": "QNA:EXTCanvasHook",
       "args": [
         "{\"Query\": \"CanvasMenu\"}"
@@ -56,7 +56,7 @@
     },
     {
       "qid": "canvas.announcements",
-      "a": "here are your announcements",
+      "a": "Here are your announcements:",
       "l": "QNA:EXTCanvasHook",
       "args": [
         "{\"Query\": \"AnnouncementsForStudent\"}"
@@ -69,7 +69,7 @@
     },
     {
       "qid": "canvas.syllabus",
-      "a": "Below is your syllabus",
+      "a": "Here is your syllabus:",
       "l": "QNA:EXTCanvasHook",
       "args": [
         "{\"Query\": \"SyllabusForCourse\"}"

@@ -1,1 +1,1 @@
-Imports sample questions for connecting with Canvas LMS
+Imports sample questions for interacting with Canvas LMS
