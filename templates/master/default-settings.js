@@ -22,6 +22,8 @@ var default_settings = {
     ALT_SEARCH_KENDRA_TOP_ANSWER_MESSAGE: "Amazon Kendra suggested answer.",
     ALT_SEARCH_KENDRA_FAQ_MESSAGE: "Answer from Amazon Kendra FAQ.",
     ALT_SEARCH_KENDRA_ANSWER_MESSAGE: "While I did not find an exact answer, these search results from Amazon Kendra might be helpful.", //Message displayed when a search comes from Kemdra
+    ALT_SEARCH_KENDRA_RESPONSE_TYPES: "ANSWER,DOCUMENT,QUESTION_ANSWER",
+    ALT_SEARCH_KENDRA_ABBREVIATE_MESSAGE_FOR_SSML: "true",
     KENDRA_FAQ_INDEX: "${DefaultKendraIndexId}", // Kendra Index specific for FAQ for if Kendra FAQ sync is enabled
     KENDRA_FAQ_CONFIG_MAX_RETRIES: 8,    //User can override number of max retries in AWS SDK configurations
     KENDRA_FAQ_CONFIG_RETRY_DELAY: 600,  //User can override number of miliseconds delay between retries in AWS SDK configurations
