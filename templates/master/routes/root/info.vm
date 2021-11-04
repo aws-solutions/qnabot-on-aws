@@ -28,6 +28,9 @@
         "crawler":{
             "href":"$root/crawler"
         },
+        "crawlerV2":{
+            "href":"$root/kendranativecrawler"
+        },
         "bot":{
             "href":"$root/bot"
         },

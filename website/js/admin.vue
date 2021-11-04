@@ -125,9 +125,9 @@ module.exports={
         href:"#/customTranslate"
       },
       {
-        title:"Kendra Web Page Indexing",
+        title:"Kendra Web Crawler",
         id:"kendraIndexing",
-        subTitle:"Index Web Pages with Kendra",
+        subTitle:"Crawl web pages with Kendra",
         icon:"search",
         href:"#/kendraIndex"
       },
