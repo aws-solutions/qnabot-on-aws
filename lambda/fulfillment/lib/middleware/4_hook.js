@@ -42,12 +42,19 @@ module.exports = async function hook(req,res) {
     let posthook = _.get(req,'_settings.LAMBDA_POSTPROCESS_HOOK',undefined)
     _.set(req,"_fulfillment.step","postprocess")
     if(posthook){
-         let arn = util.getLambdaArn(posthook)
-         event = await util.invokeLambda({
-            FunctionName:arn,
-            req,res
-        })
+        let regex = new RegExp("(^QNA-)|(^qna-)", "g");
+        if(!posthook.match(regex)){
+            qnabot.warn('The name of the Lambda for a postprocessing hook must start with either "QNA-" or "qna-". ' +
+                        'The postprocessing Lambda hook will NOT be run')
+        }else{
+            let arn = util.getLambdaArn(posthook)
+            event = await util.invokeLambda({
+                FunctionName:arn,
+                req,res
+            })
+        }
     }
+    
         _.set(req,"_fulfillment.step","")
 
     return event;

@@ -76,13 +76,20 @@ module.exports = async function preprocess(req, res) {
     let prehook = _.get(req, '_settings.LAMBDA_PREPROCESS_HOOK', undefined) || process.env.LAMBDA_PREPROCESS
     _.set(req, "_fulfillment.step", "preprocess")
     if (prehook) {
-        let arn = util.getLambdaArn(prehook)
-        let result = await util.invokeLambda({
-            FunctionName: arn,
-            req, res
-        })
-        req = result.req
-        res = result.res
+        let regex = new RegExp("(^QNA-)|(^qna-)", "g");
+        if(!prehook.match(regex)){
+            qnabot.warn('The name of the Lambda for a preprocessing hook must start with either "QNA-" or "qna-". ' +
+                        'The preprocessing Lambda hook will NOT be run')
+        }else{
+
+            let arn = util.getLambdaArn(prehook)
+            let result = await util.invokeLambda({
+                FunctionName: arn,
+                req, res
+            })
+            req = result.req
+            res = result.res
+        }
     }
     _.set(req, "_fulfillment.step", undefined)
     // lex-web-ui: If idtoken session attribute is present, decode it
