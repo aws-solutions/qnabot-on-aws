@@ -25,13 +25,17 @@
 | ALT_SEARCH_KENDRA_FAQ_MESSAGE | string | Heading when a [Frequently Asked Question](https://docs.aws.amazon.com/kendra/latest/dg/response-types.html) is found by Amazon Kendra.
 | ALT_SEARCH_KENDRA_TOP_ANSWER_MESSAGE | string | Heading when the [top answer](https://docs.aws.amazon.com/kendra/latest/dg/response-types.html) is found by Amazon Kendra
 | ALT_SEARCH_KENDRA_ANSWER_MESSAGE | string | Heading when a [Document](https://docs.aws.amazon.com/kendra/latest/dg/response-types.html) is returned by Amazon Kendra
-| KENDRA_FAQ_INDEX | Kendra Index Id | Kendra Index to use sync Elastic Search questions and answers
+| ALT_SEARCH_KENDRA_RESPONSE_TYPES | Comma separated list. One or more valid [Amazon Kendra response type](https://docs.aws.amazon.com/kendra/latest/dg/response-types.html) | Kendra fallback will only return responses of the listed types
+| ALT_SEARCH_KENDRA_ABBREVIATE_MESSAGE_FOR_SSML | boolean | If a set to "true", an abbreviate Amazon Kendra response will be sent via voice.  If set to "false", the full text of the Kendra fallback response will be sent when using voice.
+| KENDRA_FAQ_INDEX | Kendra Index Id | Amazon Kendra Index to use sync Elastic Search questions and answers
 | KENDRA_FAQ_CONFIG_MAX_RETRIES | integer | Number of times to retry syncing FAQ's when a throttling error occurs
 | KENDRA_FAQ_CONFIG_RETRY_DELAY | integer | Amount of time to wait in seconds between attempts to retry syncing
 | KENDRA_FAQ_ES_FALLBACK | true or false | When Kendra FAQ is enabled, but does not return an answer then query ElasticSearch
 | ENABLE_KENDRA_WEB_INDEXER | true or false | Enables the web indexer
 | KENDRA_INDEXER_URLS | comma separated list | List of web addresses QnABot should crawl and [index with Kendra](./kendra_crawler_guide/README.md)
 | KENDRA_INDEXER_SCHEDULE | [CloudWatch Rate Syntax](https://docs.aws.amazon.com/AmazonCloudWatch/latest/events/ScheduledEvents.html) | Interval Indexer should crawl
+| KENDRA_INDEXER_CRAWL_DEPTH | number | Sets the depth to the number of levels in a website from the seed level that you want to crawl
+| KENDRA_INDEXER_CRAWL_MODE | HOST_ONLY \| SUBDOMAINS \| EVERYTHING | Determines which addresses should be crawled
 | KENDRA_WEB_PAGE_INDEX | Kendra Index Id | The index to use for the web crawler, a [custom data source](https://docs.aws.amazon.com/kendra/latest/dg/data-source-custom.html) will automatically be added to the specified index.  
 | ERRORMESSAGE | text | Response to the user when a processing error occurs
 | EMPTYMESSAGE | text | Response to the user when an answer could not be found
