@@ -95,9 +95,13 @@ function getClientType(req) {
     }
     // Try to determine which Lex client is being used based on patterns in the req - best effort attempt.
     const voiceortext = (req._preferredResponseType == 'SSML') ? "Voice" : "Text" ;
-    if (_.get(req,"_event.requestAttributes.x-amz-lex:channel-type") == "Slack") {
+
+    //for LexV1 channels -- check for x-amz-lex:channel-type requestAttribute
+    //for LexV2 channels -- check for x-amz-lex:channels:platform requestAttribute
+
+    if ((_.get(req,"_event.requestAttributes.x-amz-lex:channel-type") == "Slack") || (_.get(req,"_event.requestAttributes.x-amz-lex:channels:platform") == "Slack")) {
         return "LEX.Slack." + voiceortext ;
-    } else if (_.get(req,"_event.requestAttributes.x-amz-lex:channel-type") == "Twilio-SMS") {
+    } else if ((_.get(req,"_event.requestAttributes.x-amz-lex:channel-type") == "Twilio-SMS") || (_.get(req,"_event.requestAttributes.x-amz-lex:channels:platform") == "Twilio")) {
         return "LEX.TwilioSMS." + voiceortext ;
     } else if (_.get(req,"_event.requestAttributes.x-amz-lex:accept-content-types")) {
         return "LEX.AmazonConnect." + voiceortext ;
