@@ -149,7 +149,7 @@ module.exports = Object.assign(
       "Type": "AWS::ApiGateway::Resource",
       "Properties": {
         "ParentId": {"Ref": "ApiRootResourceId"},
-        "PathPart": "genssys",
+        "PathPart": "genesys",
         "RestApiId": {"Ref": "Api"}
       }
     },

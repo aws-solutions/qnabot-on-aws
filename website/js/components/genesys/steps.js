@@ -3,18 +3,25 @@ module.exports=[
     title:"Configure LexV2 and Genesys Cloud with AppFoundry",
     text:`
 <br/>
-Do step 2 through 5 in the <a href="https://help.mypurecloud.com/articles/amazon-lex-v2-quick-start-guide/">Lex V2 quick start guide.</a>
+Do step 2 through 4 in the <a href="https://help.mypurecloud.com/articles/amazon-lex-v2-quick-start-guide/">Lex V2 quick start guide.</a> 
+<br/>Note: Step 1 is already complete, as QnABot is a Lex bot.
 <br/> 
+&#8291;Step 1. <b>SKIP STEP 1</b>, QnABot deploys the LexV2 bot<br />
+&#8291;Step 2. <b>Step 2: Grant Genesys the permissions to call the Amazon Lex V2 bot</b><br />
+&#8291;Step 3. <b>Step 3: Obtain the Amazon Lex V2 integration from Genesys AppFoundry</b><br />
+&#8291;Step 4. <b>Step 4: Configure and activate the Lex V2 integration in Genesys Cloud</b><br /> 
 `,
     image:"../images/wizard-1.png"
 },{
     title:"Install and Configure Archy",
     text:`
 <br />
-Download and install the Genesys Archy tool, found <b><a href="https://console.aws.amazon.com/connect">here.</a></b>
-<br /><br />
+Download, install and configure the Genesys Archy tool. All the instructions are on the Genesys Archy developer website, 
+found here:<a href="https://developer.genesys.cloud/devapps/archy/install">https://developer.genesys.cloud/devapps/archy/install</a></b>
+<br /><br />High level steps:<br/>
 &#8291;1. Download the version of Archy for your operating system<br/>
-&#8291;2. Run archy setup and configure credentials 
+&#8291;2. Extract or install Archy<br/>
+&#8291;3. Run <code>archy setup</code> and configure authentication credentials 
 <br/>
     `,
     image:"../images/wizard-2.png"
