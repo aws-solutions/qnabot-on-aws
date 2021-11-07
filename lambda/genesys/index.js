@@ -39,9 +39,9 @@ async function createCallFlowLexV2() {
     let flowfile = path.join(dir,flows[0]);
     console.log("Processing contact flow file: ", flowfile);
     let rawdata = fs.readFileSync(flowfile);
-    
-    rawdata = rawdata.replace('QNABOT_NAME',process.env.LexV2BotId);
-    rawdata = rawdata.replace('QNABOT_ALIAS',process.env.LexV2BotAliasId);
+    rawdata = rawdata.toString();
+    rawdata = rawdata.replace('QNABOT_NAME',process.env.LexV2BotName);
+    rawdata = rawdata.replace('QNABOT_ALIAS',process.env.LexV2BotAlias);
     
     return rawdata;
 }
