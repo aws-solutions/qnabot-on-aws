@@ -1,0 +1,350 @@
+inboundCall:
+  name: QnABotCallFlow
+  division: Home
+  startUpRef: "/inboundCall/menus/menu[Main Menu_10]"
+  defaultLanguage: en-us
+  supportedLanguages:
+    en-us:
+      defaultLanguageSkill:
+        noValue: true
+      textToSpeech:
+        Amazon Polly:
+          voice: Joanna
+  initialGreeting:
+    tts: Welcome.
+  settingsActionDefaults:
+    playAudioOnSilence:
+      timeout:
+        lit:
+          seconds: 40
+    detectSilence:
+      timeout:
+        lit:
+          seconds: 40
+    callData:
+      processingPrompt:
+        noValue: true
+    callBridge:
+      processingPrompt:
+        noValue: true
+    collectInput:
+      noEntryTimeout:
+        lit:
+          seconds: 5
+    dialByExtension:
+      interDigitTimeout:
+        lit:
+          seconds: 6
+    transferToUser:
+      connectTimeout:
+        noValue: true
+    transferToNumber:
+      connectTimeout:
+        noValue: true
+    transferToGroup:
+      connectTimeout:
+        noValue: true
+    transferToFlowSecure:
+      connectTimeout:
+        lit:
+          seconds: 15
+  settingsErrorHandling:
+    errorHandling:
+      disconnect:
+        none: true
+    preHandlingAudio:
+      tts: Sorry, an error occurred. Please try your call again.
+  settingsMenu:
+    extensionDialingMaxDelay:
+      lit:
+        seconds: 1
+    listenForExtensionDialing:
+      lit: true
+    menuSelectionTimeout:
+      lit:
+        seconds: 10
+    repeatCount:
+      lit: 3
+  settingsPrompts:
+    ensureAudioInPrompts: false
+  settingsSpeechRec:
+    completeMatchTimeout:
+      lit:
+        ms: 100
+    incompleteMatchTimeout:
+      lit:
+        ms: 1500
+    maxSpeechLengthTimeout:
+      lit:
+        seconds: 20
+    minConfidenceLevel:
+      lit: 50
+    asrCompanyDir: none
+    asrEnabledOnFlow: true
+  menus:
+    - menu:
+        name: Main Menu
+        refId: Main Menu_10
+        audio:
+          tts: You are at the Main Menu, press 1 to go to the Q and A Bot demo, or press 9 to disconnect
+        settingsMenu:
+          extensionDialingMaxDelay:
+            noValue: true
+          listenForExtensionDialing:
+            noValue: true
+          menuSelectionTimeout:
+            noValue: true
+          repeatCount:
+            noValue: true
+        settingsSpeechRec:
+          completeMatchTimeout:
+            noValue: true
+          incompleteMatchTimeout:
+            noValue: true
+          maxSpeechLengthTimeout:
+            noValue: true
+          minConfidenceLevel:
+            noValue: true
+        choices:
+          - menuTask:
+              name: QnABot Flow
+              refId: QnABot Flow_28
+              dtmf: digit_1
+              globalDtmf: false
+              globalSpeechRecTerms: false
+              task:
+                variables:
+                  - stringVariable:
+                      name: Task.connect_nextPrompt
+                      initialValue:
+                        noValue: true
+                  - stringVariable:
+                      name: Task.defaultPrompt
+                      initialValue:
+                        noValue: true
+                  - stringVariable:
+                      name: Task.ErrorMessage
+                      initialValue:
+                        noValue: true
+                  - stringVariable:
+                      name: Task.ErrorType
+                      initialValue:
+                        noValue: true
+                  - integerVariable:
+                      name: Task.LoopCount
+                      initialValue:
+                        noValue: true
+                  - stringVariable:
+                      name: Task.nextAction
+                      initialValue:
+                        noValue: true
+                  - stringVariable:
+                      name: Task.prompt
+                      initialValue:
+                        noValue: true
+                  - stringVariable:
+                      name: Task.qnabot_gotanswer
+                      initialValue:
+                        noValue: true
+                  - stringVariable:
+                      name: Task.qnabotcontext
+                      initialValue:
+                        noValue: true
+                  - stringVariable:
+                      name: Task.topic
+                      initialValue:
+                        noValue: true
+                actions:
+                  - updateData:
+                      name: Update Data
+                      statements:
+                        - string:
+                            variable: Task.defaultPrompt
+                            value:
+                              lit: Ask another question or say return to main menu.
+                  - playAudio:
+                      name: Play Audio
+                      audio:
+                        tts: Hello. Welcome to QnA bot.  Ask me a question.
+                  - loop:
+                      name: Loop
+                      currentIndex:
+                        var: Task.LoopCount
+                      loopCount:
+                        exp: ToInt(Task.LoopCount) <= 3
+                      outputs:
+                        loop:
+                          actions:
+                            - callLexV2Bot:
+                                name: Call Lex V2 Bot
+                                outputSessionVariables:
+                                  - outputSessionVariable:
+                                      name:
+                                        lit: topic
+                                      variable: Task.topic
+                                  - outputSessionVariable:
+                                      name:
+                                        lit: qnabotcontext
+                                      variable: Task.qnabotcontext
+                                  - outputSessionVariable:
+                                      name:
+                                        lit: qnabot_gotanswer
+                                      variable: Task.qnabot_gotanswer
+                                  - outputSessionVariable:
+                                      name:
+                                        lit: connect_nextPrompt
+                                      variable: Task.prompt
+                                  - outputSessionVariable:
+                                      name:
+                                        lit: nextAction
+                                      variable: Task.nextAction
+                                  - outputSessionVariable:
+                                      name:
+                                        lit: connect_nextPrompt
+                                      variable: Task.connect_nextPrompt
+                                sessionVariables:
+                                  - sessionVariable:
+                                      name:
+                                        lit: qnabotcontext
+                                      value:
+                                        exp: ToString(Task.qnabotcontext)
+                                lexBot:
+                                  us-west-2:
+                                    QNABOT_NAME:
+                                      en-us:
+                                        QNABOT_ALIAS:
+                                          aliasInitialIntentName:
+                                            lit: GenesysInitialIntent
+                                          intents:
+                                            FallbackIntent:
+                                              none: true
+                                            QnaIntent:
+                                              qnaslot:
+                                                noValue: true
+                                            WelcomeMessage:
+                                              none: true
+                                          outputs:
+                                            intents:
+                                              FallbackIntent:
+                                                actions:
+                                                  - playAudio:
+                                                      name: Play Audio
+                                                      audio:
+                                                        tts: I am in the fallback intent
+                                              QnaIntent:
+                                                actions:
+                                                  - decision:
+                                                      name: Decision
+                                                      condition:
+                                                        exp: Task.qnabot_gotanswer == "true"
+                                                      outputs:
+                                                        yes:
+                                                          actions:
+                                                            - updateData:
+                                                                name: Update Data
+                                                                statements:
+                                                                  - integer:
+                                                                      variable: Task.LoopCount
+                                                                      value:
+                                                                        exp: ToInt(Task.LoopCount) - 1
+                                                            - switch:
+                                                                name: Switch
+                                                                evaluate:
+                                                                  firstTrue:
+                                                                    default:
+                                                                      actions:
+                                                                        - switch:
+                                                                            name: Switch
+                                                                            evaluate:
+                                                                              firstTrue:
+                                                                                default:
+                                                                                  actions:
+                                                                                    - playAudio:
+                                                                                        name: Play Audio
+                                                                                        audio:
+                                                                                          exp: AudioPlaybackOptions(ToAudioTTS(Task.defaultPrompt), true)
+                                                                                cases:
+                                                                                  - case:
+                                                                                      value:
+                                                                                        exp: IsSet(Task.connect_nextPrompt)
+                                                                                      actions:
+                                                                                        - playAudio:
+                                                                                            name: Play Audio
+                                                                                            audio:
+                                                                                              exp: AudioPlaybackOptions(ToAudioTTS(Task.connect_nextPrompt), true)
+                                                                        - loopNext:
+                                                                            name: Next Loop
+                                                                    cases:
+                                                                      - case:
+                                                                          value:
+                                                                            exp: Task.nextAction=="AGENT"
+                                                                          actions:
+                                                                            - transferToAcd:
+                                                                                name: Transfer to ACD
+                                                                                targetQueue:
+                                                                                  lit:
+                                                                                    name: QnABot Queue
+                                                                                preTransferAudio:
+                                                                                  tts: Let me find a representative who can assist
+                                                                                failureTransferAudio:
+                                                                                  tts: Transfer failed.
+                                                                                priority:
+                                                                                  lit: 0
+                                                                                preferredAgents:
+                                                                                  noValue: true
+                                                                                languageSkill:
+                                                                                  noValue: true
+                                                                                failureOutputs:
+                                                                                  errorType:
+                                                                                    noValue: true
+                                                                                  errorMessage:
+                                                                                    noValue: true
+                                                                                outputs:
+                                                                                  failure:
+                                                                                    actions:
+                                                                                      - disconnect:
+                                                                                          name: Disconnect
+                                                                      - case:
+                                                                          value:
+                                                                            exp: Task.nextAction=="END"
+                                                                          actions:
+                                                                            - playAudio:
+                                                                                name: Play Audio
+                                                                                audio:
+                                                                                  tts: Thank you for using QnA Bot, Goodbye
+                                                                            - disconnect:
+                                                                                name: Disconnect
+                                                                      - case:
+                                                                          value:
+                                                                            exp: Task.nextAction=="MENU"
+                                                                          actions:
+                                                                            - previousMenu:
+                                                                                name: Previous Menu
+                                                        no:
+                                                          actions:
+                                                            - loopNext:
+                                                                name: Next Loop
+                                            failure:
+                                              actions:
+                                                - playAudio:
+                                                    name: Play Audio
+                                                    audio:
+                                                      tts: I have failed at lex
+                                                - playAudio:
+                                                    name: Play Audio
+                                                    audio:
+                                                      exp: AudioPlaybackOptions(Append(ToAudioTTS(Task.ErrorType), ToAudioTTS("The error message is"), ToAudioTTS(Task.ErrorMessage)), true)
+                                                - disconnect:
+                                                    name: Disconnect
+                                          failureOutputs:
+                                            errorType:
+                                              var: Task.ErrorType
+                                            errorMessage:
+                                              var: Task.ErrorMessage
+                  - playAudio:
+                      name: Play Audio
+                      audio:
+                        tts: This is embarrassing. I'm sorry I don't know the answer to your questions.  I'm still learning, so check back tomorrow.
+                  - disconnect:
+                      name: Disconnect
+        defaultChildMenuRef: "./choices/menuTask[QnABot Flow_28]"

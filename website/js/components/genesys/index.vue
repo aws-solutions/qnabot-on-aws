@@ -89,16 +89,6 @@ module.exports={
     return {
       visible:false,
       stepNumber:1,
-      schema:new clipboard('#Schema',{
-        text:function(){
-          return JSON.stringify(self.$store.state.bot.connect,null,2)
-        }
-      }),
-      arn:new clipboard('#LambdaArn',{
-        text:function(){
-          return self.$store.state.bot.lambdaArn
-        }
-      }),
       stepsRaw:require('./steps.js')
     }
   },
@@ -125,8 +115,7 @@ module.exports={
   updated: function () {
       var self = this;
       this.$nextTick(function () {
-        
-            const downloadBlobAsFile = (function closure_shell() {
+          const downloadBlobAsFile = (function closure_shell() {
             const a = document.createElement("a");
             return function downloadBlobAsFile(blob, filename) {
                 const object_URL = URL.createObjectURL(blob);
@@ -151,92 +140,13 @@ module.exports={
             {
               var result = self.$store.dispatch('api/getGenesysCallFlow').then((result) => {
               downloadBlobAsFile(new Blob(
-                  [JSON.stringify(result.CallFlow)],
-                  {type: "text/json"}
-              ), result.FileName);
+                  [result],
+                  {type: "text/yaml"}
+              ), 'QnABotFlow.yaml');
               })
 
             }
           }
-
-    
-          function poll(url){
-            console.log(url)
-            return self.$store.dispatch('api/getImport',{href: url})
-            .then(function(result){
-
-              if(result.status==="InProgress"){
-                setTimeout(()=>poll(url),100)
-              }
-              else
-              {
-                return self.$store.dispatch('data/build')
-                .then(function(){
-                  btnImportQuestions.disabled = false;
-                  btnImportQuestions.style.opacity = "1"
-                  ImportQuestionsStatus.innerHTML = "Complete";
-
-                  btnImportQuestions.innerHTML = "Import Sample Questions and Answers";
- 
-                }).then( result => {})
-                .catch(e => 
-                  ImportQuestionsStatus.innerHTML = "Error Rebuilding LexBot. Please return to the Content Designer, correct the errors and REBUILD LEXBOT </br>" +
-                  "LexBot Rebuild Error " + e
-                 )
-
-              }
-            })
-          }
-
-          //Attach function to ImportQuestions button
-          var btnImportQuestions = document.getElementById("ImportQuestions");
-          var ImportQuestionsStatus = document.getElementById("ImportQuestionsStatus");
-
-          
-          if(btnImportQuestions){
-                  btnImportQuestions.onclick = function() {
-                    btnImportQuestions.disabled = true;
-                    btnImportQuestions.style.opacity = "0.5"
-                    document.getElementById("stsLabel").innerHTML = "Status:"
-                    ImportQuestionsStatus.innerHTML = "Importing Questions (Step 1)..."
-                    self.$store.dispatch('api/getContactFlow')
-                    .then(result => {
-                      self.contactFlow = result;
-                      ImportQuestionsStatus.innerHTML = "Importing Questions (Step 2)..."
-
-                      return self.$store.dispatch("api/listExamples")
-                    })
-                    .then(result =>  {
-                        ImportQuestionsStatus.innerHTML = "Importing Questions (Step 3)..."
-                        let  exampleUrl = result.filter(example => self.contactFlow.QnaFile == example.document.href.split("/").slice(-1)[0] )[0];
-                        return self.$store.dispatch('api/getImport',{href: exampleUrl.document.href})
-                    })
-                    .then(result =>  {
-                        ImportQuestionsStatus.innerHTML = "Importing Questions (Step 4)..."
-
-
-                        return self.$store.dispatch('api/startImport',{
-                        qa:result.qna,
-                        name:self.contactFlow.QnaFile
-                      
-                      })
-                    })
-                    .then(results => {
-                        ImportQuestionsStatus.innerHTML = "Importing Questions (Step 5)..."
-                        return self.$store.dispatch('api/waitForImport',{id: self.contactFlow.QnaFile })
-                    })
-                    .then(res =>  {
-                      console.log(JSON.stringify(res))
-                      ImportQuestionsStatus.innerHTML = "Rebuilding Lex Bot."
-                      self.pollUrl = res.href;
-                      return poll(self.pollUrl)
-                    })
-                    .then()
-
-                    }
-              }
-          
-          
 
           var spanBot = document.getElementById("spnBotname")
           if(spanBot)

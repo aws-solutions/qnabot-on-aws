@@ -35,8 +35,7 @@ Download and install the Genesys Archy tool, found <b><a href="https://console.a
     title:"Import Call Flow with Archy",
     text:`
 <br />In the terminal, run archy publish --file QnABotFlow.yaml. This will create and publish the call flow<br/>
-
-`,
+    `,
     image:"../images/wizard-5.png",
 },
 {

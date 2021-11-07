@@ -89,6 +89,78 @@ module.exports = Object.assign(
         "Principal": "apigateway.amazonaws.com"
       }
     },
+    "GenesysCodeVersion": {
+      "Type": "Custom::S3Version",
+      "Properties": {
+        "ServiceToken": {"Ref": "CFNLambda"},
+        "Bucket": {"Ref": "BootstrapBucket"},
+        "Key": {"Fn::Sub": "${BootstrapPrefix}/lambda/genesys.zip"},
+        "BuildDate": (new Date()).toISOString()
+      }
+    },
+    "GenesysLambda": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Code": {
+          "S3Bucket": {"Ref": "BootstrapBucket"},
+          "S3Key": {"Fn::Sub": "${BootstrapPrefix}/lambda/genesys.zip"},
+          "S3ObjectVersion": {"Ref": "GenesysCodeVersion"}
+        },
+        "Environment": {
+          "Variables": {
+            outputBucket: {"Ref": "ExportBucket"},
+            s3Prefix: "connect/",
+            accountId: {"Ref": "AWS::AccountId"},
+            region: {"Ref": "AWS::Region"},
+            LexVersion: {"Ref": "LexVersion"},
+            // Lex V1
+            fallBackIntent: {"Ref": "FallbackIntent"},
+            intent: {"Ref": "Intent"},
+            lexBot: {"Ref": "BotName"},
+            // Lex V2
+            LexV2BotName: {"Ref": "LexV2BotName"},
+            LexV2BotId: {"Ref": "LexV2BotId"},
+            LexV2BotAlias: {"Ref": "LexV2BotAlias"},
+            LexV2BotAliasId: {"Ref": "LexV2BotAliasId"},
+            LexV2BotLocaleIds: {"Ref": "LexV2BotLocaleIds"}
+          }
+        },
+        "Handler": "index.handler",
+        "MemorySize": "1024",
+        "Role": {"Fn::GetAtt": ["ExportRole", "Arn"]},
+        "Runtime": "nodejs12.x",
+        "Timeout": 300,
+        "VpcConfig": {
+          "Fn::If": ["VPCEnabled", {
+            "SubnetIds": {"Fn::Split": [",", {"Ref": "VPCSubnetIdList"}]},
+            "SecurityGroupIds": {"Fn::Split": [",", {"Ref": "VPCSecurityGroupIdList"}]},
+          }, {"Ref": "AWS::NoValue"}]
+        },
+        "TracingConfig": {
+          "Fn::If": ["XRAYEnabled", {"Mode": "Active"}, {"Ref": "AWS::NoValue"}]
+        },
+        "Tags": [{
+          Key: "Type",
+          Value: "Export"
+        }]
+      }
+    },
+    "GenesysApiResource": {
+      "Type": "AWS::ApiGateway::Resource",
+      "Properties": {
+        "ParentId": {"Ref": "ApiRootResourceId"},
+        "PathPart": "genssys",
+        "RestApiId": {"Ref": "Api"}
+      }
+    },
+    "InvokePermissionGenesysLambda": {
+      "Type": "AWS::Lambda::Permission",
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "FunctionName": {"Fn::GetAtt": ["GenesysLambda", "Arn"]},
+        "Principal": "apigateway.amazonaws.com"
+      }
+    },
     Deployment: {
       Type: "Custom::ApiDeployment",
       DeletionPolicy: "Retain",
@@ -96,6 +168,9 @@ module.exports = Object.assign(
         "ConnectGet",
         "ConnectApiResource",
         "InvokePermissionConnectLambda",
+        "GenesysGet",
+        "GenesysApiResource",
+        "InvokePermissionGenesysLambda",
         "TranslatePost",
         "TranslateApiResource",
         "TranslateApiRootResource",
@@ -132,6 +207,41 @@ module.exports = Object.assign(
                 {"Ref": "AWS::Region"},
                 ":lambda:path/2015-03-31/functions/",
                 {"Fn::GetAtt": ["ConnectLambda", "Arn"]},
+                "/invocations"
+              ]
+            ]
+          },
+          "IntegrationResponses": [
+            {
+              "StatusCode": 200
+            }
+          ]
+        },
+        "MethodResponses": [
+          {
+            "StatusCode": 200
+          }
+        ],
+      }
+    },
+    "GenesysGet": {
+      "Type": "AWS::ApiGateway::Method",
+      "Properties": {
+        "AuthorizationType": "AWS_IAM",
+        "HttpMethod": "GET",
+        "RestApiId": {"Ref": "Api"},
+        "ResourceId": {"Ref": "GenesysApiResource"},
+        "Integration": {
+          "Type": "AWS",
+          "IntegrationHttpMethod": "POST",
+          "Uri": {
+            "Fn::Join": [
+              "",
+              [
+                "arn:aws:apigateway:",
+                {"Ref": "AWS::Region"},
+                ":lambda:path/2015-03-31/functions/",
+                {"Fn::GetAtt": ["GenesysLambda", "Arn"]},
                 "/invocations"
               ]
             ]
