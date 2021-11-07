@@ -48,7 +48,7 @@ async function connect_response(req, res) {
     // Split multi-part sentences to enable barge in for long fulfillment messages when using Connect voice.. 
     // except when QnAbot is in ElicitResoonse mode.. in that case we keep the bot session with GetCustomerInput block open, so 
     // the Connect contact flow loop is not invoked (and CONNECT_NEXT_PROMPT would not be played)
-    if (req._clientType == "LEX.AmazonConnect.Voice" ) {
+    if (req._clientType == "LEX.AmazonConnect.Voice" || req._clientType == "Lex.GenesysCloud.Voice" ) {
         let nextPromptVarName = _.get(req,"_settings.CONNECT_NEXT_PROMPT_VARNAME",'nextPrompt') ;
         if (! _.get(res,"session.qnabotcontext.elicitResponse.responsebot")) {
             // QnABot is not doing elicitResponse
