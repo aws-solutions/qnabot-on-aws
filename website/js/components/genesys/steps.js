@@ -1,21 +1,21 @@
 module.exports=[
 {
-    title:"Configure LexV2 and Genesys Cloud with AppFoundry",
+    title:"Configure Genesys Cloud Integration",
     text:`
-<br/>
+<br/>Configure LexV2 and Genesys Cloud with AppFoundry<br/><br/>
 Do step 2 through 4 in the <a href="https://help.mypurecloud.com/articles/amazon-lex-v2-quick-start-guide/">Lex V2 quick start guide.</a> 
 <br/>Note: Step 1 is already complete, as QnABot is a Lex bot.
 <br/> 
 &#8291;Step 1. <b>SKIP STEP 1</b>, QnABot deploys the LexV2 bot<br />
-&#8291;Step 2. <b>Step 2: Grant Genesys the permissions to call the Amazon Lex V2 bot</b><br />
-&#8291;Step 3. <b>Step 3: Obtain the Amazon Lex V2 integration from Genesys AppFoundry</b><br />
-&#8291;Step 4. <b>Step 4: Configure and activate the Lex V2 integration in Genesys Cloud</b><br /> 
+&#8291;Step 2. <b>Grant Genesys the permissions to call the Amazon Lex V2 bot</b><br />
+&#8291;Step 3. <b>Obtain the Amazon Lex V2 integration from Genesys AppFoundry</b><br />
+&#8291;Step 4. <b>Configure and activate the Lex V2 integration in Genesys Cloud</b><br /> 
 `,
-    image:"../images/wizard-1.png"
+    image:"../images/genesys-1.png"
 },{
-    title:"Install and Configure Archy",
+    title:"Install  Archy",
     text:`
-<br />
+<br />Install and Configure Archy<br/><br/>
 Download, install and configure the Genesys Archy tool. All the instructions are on the Genesys Archy developer website, 
 found here:<a href="https://developer.genesys.cloud/devapps/archy/install">https://developer.genesys.cloud/devapps/archy/install</a></b>
 <br /><br />High level steps:<br/>
@@ -24,14 +24,14 @@ found here:<a href="https://developer.genesys.cloud/devapps/archy/install">https
 &#8291;3. Run <code>archy setup</code> and configure authentication credentials 
 <br/>
     `,
-    image:"../images/wizard-2.png"
+    image:"../images/genesys-2.png"
 },
 {
-    title:"Download Genesys Cloud Inbound Call Flow",
+    title:"Download Call Flow",
     text:`
-<br/> To begin this step, choose <b>DOWNLOAD INBOUND CALL FLOW</b> below. It will download a YAML inbound call flow file for QnABot.<br/> <br/>
+<br/>Download Genesys Cloud Inbound Call Flow</br><br/>
+To begin this step, choose <b>DOWNLOAD INBOUND CALL FLOW</b> below. It will download a YAML inbound call flow file for QnABot.<br/>
     `,
-    image:"../images/wizard-4.png",
     buttons:[{
         text:"DOWNLOAD INBOUND CALL FLOW",
         id:"DownloadInboundCallFlow",
@@ -39,22 +39,19 @@ found here:<a href="https://developer.genesys.cloud/devapps/archy/install">https
     }]
 },
 {
-    title:"Import Call Flow with Archy",
+    title:"Import Call Flow",
     text:`
-<br />In the terminal, run archy publish --file QnABotFlow.yaml. This will create and publish the call flow<br/>
+<br />Import Call Flow with Archy<br/><br/>
+In the terminal, run <code>archy publish --file QnABotFlow.yaml</code>.  This will create and publish the call flow, which will then appear in Genesys Architect.<br/>
     `,
-    image:"../images/wizard-5.png",
+    image:"../images/genesys-3.png",
 },
 {
     title:"Configure Call Routing",
-    buttons: [{
-        text:"IMPORT SAMPLE QUESTIONS AND ANSWERS",
-        id:"ImportQuestions",
-        loading:false
-    }],
-    image:"../images/wizard-6.png",
+    image:"../images/genesys-4.png",
     text:`
-<br />In Genesys Pure Cloud Admin, configure a call route to route to the newly published QnABot inbound call flow.
+<br />Configure Call Routing in Genesys Pure Cloud<br/><br/>
+In Genesys Pure Cloud Admin, configure a call route to route to the newly published QnABot inbound call flow.
 `
 }
 ]
