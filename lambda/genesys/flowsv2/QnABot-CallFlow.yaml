@@ -221,7 +221,7 @@ inboundCall:
                                             QnaIntent:
                                               qnaslot:
                                                 noValue: true
-                                            WelcomeMessage:
+                                            GenesysInitialIntent:
                                               none: true
                                           outputs:
                                             intents:
