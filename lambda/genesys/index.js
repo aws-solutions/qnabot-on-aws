@@ -40,6 +40,7 @@ async function createCallFlowLexV2() {
     console.log("Processing contact flow file: ", flowfile);
     let rawdata = fs.readFileSync(flowfile);
     rawdata = rawdata.toString();
+    rawdata = rawdata.replace('QNABOT_REGION',process.env.region);
     rawdata = rawdata.replace('QNABOT_NAME',process.env.LexV2BotName);
     rawdata = rawdata.replace('QNABOT_ALIAS',process.env.LexV2BotAlias);
     
