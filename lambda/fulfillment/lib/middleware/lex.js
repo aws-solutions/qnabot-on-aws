@@ -269,7 +269,7 @@ function assembleLexV2Response(response) {
 }
     
 exports.assemble=function(request,response){
-    if (request._clientType == "LEX.Slack.Text") {
+    if (request._clientType === "LEX.Slack.Text") {
         response = slackifyResponse(response);
     }
     qnabot.log("filterButtons")
