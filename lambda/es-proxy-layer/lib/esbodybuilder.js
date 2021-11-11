@@ -63,6 +63,36 @@ function build_query(params) {
       query = query.orQuery(
         'match', match_query
       );
+      
+      var qnaClientFilter = _.get(params, 'qnaClientFilter', "");
+      query = query.orFilter(
+        'bool', {
+        "must": [
+          {
+            "exists": {
+              "field": "clientFilterValues"
+            }
+          },
+          {
+            "term": {
+              "clientFilterValues": qnaClientFilter
+            }
+          }
+        ]
+      }
+      )
+        .orFilter(
+          'bool', {
+          "must_not": [
+            {
+              "exists": {
+                "field": "clientFilterValues"
+              }
+            }
+          ]
+        }
+        ).filterMinimumShouldMatch(1);
+
       query = query.orQuery(
         'nested', {
           score_mode: 'max',
@@ -81,7 +111,7 @@ function build_query(params) {
       qnabot.log("ElasticSearch Query", JSON.stringify(query, null, 2));
       return new Promise.resolve(query);
     });
-}
+    }
 
 
 module.exports = function (params) {
