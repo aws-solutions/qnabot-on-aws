@@ -56,6 +56,11 @@ function parseLexV1Event(event) {
         ),
         channel: _.get(event, "requestAttributes.'x-amz-lex:channel-type'")
     }
+    
+    //check if we pass in a qnabotUserId as a session attribute, if so, use it, else default
+    out._userId = _.get(event,"sessionState.sessionAttributes.qnabotUserId", out._userId);
+    qnabot.log("QnaBot User Id: " + out._userId);
+
     return out;
 }
 
@@ -85,6 +90,11 @@ function parseLexV2Event(event) {
         _.set(out,"session.qnabotcontext.userPreferredLocale", lex_locale);
         qnabot.log("LexV2 in voice mode - Set userPreferredLocale from lex V2 bot locale:", out.session.qnabotcontext.userPreferredLocale);
     } 
+    
+    //check if we pass in a qnabotUserId as a session attribute, if so, use it, else default
+    out._userId = _.get(event,"sessionState.sessionAttributes.qnabotUserId", out._userId);
+    qnabot.log("QnaBot User Id: " + out._userId);
+
     return out;
 }
 
