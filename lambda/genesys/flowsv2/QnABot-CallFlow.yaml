@@ -1,5 +1,5 @@
 inboundCall:
-  name: QnABotCallFlow
+  name: QnABot
   division: Home
   startUpRef: "/inboundCall/menus/menu[Main Menu_10]"
   defaultLanguage: en-us
@@ -13,6 +13,10 @@ inboundCall:
   initialGreeting:
     tts: Welcome.
   variables:
+    - stringVariable:
+        name: Flow.appContext
+        initialValue:
+          noValue: true
     - stringVariable:
         name: Flow.connect_nextPrompt
         initialValue:
@@ -35,10 +39,6 @@ inboundCall:
           noValue: true
     - stringVariable:
         name: Flow.nextAction
-        initialValue:
-          noValue: true
-    - stringVariable:
-        name: Flow.prompt
         initialValue:
           noValue: true
     - stringVariable:
@@ -120,14 +120,14 @@ inboundCall:
         seconds: 20
     minConfidenceLevel:
       lit: 50
-    asrCompanyDir: none
+    asrCompanyDir: startUpObject
     asrEnabledOnFlow: true
   menus:
     - menu:
         name: Main Menu
         refId: Main Menu_10
         audio:
-          tts: You are at the Main Menu, press 1 to go to the Q and A Bot demo, or press 9 to disconnect
+          tts: You are at the Main Menu, press 1 or say q and a bot to go to the Q and A Bot demo, or press 9 to disconnect
         settingsMenu:
           extensionDialingMaxDelay:
             noValue: true
@@ -196,16 +196,16 @@ inboundCall:
                                       variable: Flow.qnabot_gotanswer
                                   - outputSessionVariable:
                                       name:
-                                        lit: connect_nextPrompt
-                                      variable: Flow.prompt
-                                  - outputSessionVariable:
-                                      name:
                                         lit: nextAction
                                       variable: Flow.nextAction
                                   - outputSessionVariable:
                                       name:
                                         lit: connect_nextPrompt
                                       variable: Flow.connect_nextPrompt
+                                  - outputSessionVariable:
+                                      name:
+                                        lit: appContext
+                                      variable: Flow.appContext
                                 sessionVariables:
                                   - sessionVariable:
                                       name:
@@ -219,14 +219,29 @@ inboundCall:
                                         exp: Flow.qnabotcontext
                                   - sessionVariable:
                                       name:
-                                        lit: connect_nextPrompt
+                                        lit: qnabot_gotanswer
                                       value:
-                                        exp: Flow.prompt
+                                        exp: Flow.qnabot_gotanswer
                                   - sessionVariable:
                                       name:
                                         lit: connect_nextPrompt
                                       value:
                                         exp: Flow.connect_nextPrompt
+                                  - sessionVariable:
+                                      name:
+                                        lit: nextAction
+                                      value:
+                                        exp: Flow.nextAction
+                                  - sessionVariable:
+                                      name:
+                                        lit: appContext
+                                      value:
+                                        exp: Flow.appContext
+                                  - sessionVariable:
+                                      name:
+                                        lit: qnabotUserId
+                                      value:
+                                        exp: ToString(ToPhoneNumber(Call.Ani).subscriberNumber)
                                 lexBot:
                                   QNABOT_REGION:
                                     QNABOT_NAME:
@@ -281,6 +296,10 @@ inboundCall:
                         tts: This is embarrassing. I'm sorry I don't know the answer to your questions.  I'm still learning, so check back tomorrow.
                   - disconnect:
                       name: Disconnect
+              speechRecTerms:
+                en-us:
+                  terms:
+                    - q and a bot
         defaultChildMenuRef: "./choices/menuTask[QnABot Flow_28]"
   tasks:
     - task:
@@ -332,35 +351,14 @@ inboundCall:
                                   value:
                                     exp: Flow.nextAction=="AGENT"
                                   actions:
-                                    - transferToAcd:
-                                        name: Transfer to ACD
-                                        targetQueue:
-                                          lit:
-                                            name: Default Inbound
-                                        preTransferAudio:
-                                          tts: Transferring to Agent
-                                        failureTransferAudio:
-                                          tts: Failed to transfer to agent.
-                                        priority:
-                                          lit: 2
-                                        preferredAgents:
-                                          noValue: true
-                                        languageSkill:
-                                          noValue: true
-                                        failureOutputs:
-                                          errorType:
-                                            noValue: true
-                                          errorMessage:
-                                            noValue: true
-                                        outputs:
-                                          failure:
-                                            actions:
-                                              - playAudio:
-                                                  name: Play Audio
-                                                  audio:
-                                                    tts: There has been an issue transferring. Please call us again.
-                                              - disconnect:
-                                                  name: Disconnect
+                                    - playAudio:
+                                        name: Play Audio
+                                        audio:
+                                          tts: This is where you would be transferred to a queue.
+                                    - playAudio:
+                                        name: Play Audio
+                                        audio:
+                                          exp: AudioPlaybackOptions(ToAudioTTS(Flow.connect_nextPrompt), true)
                               - case:
                                   value:
                                     exp: Flow.nextAction=="END"
