@@ -6,6 +6,12 @@
           v-flex
             .title {{schema.title}}
             span.pl-3( :data-path="path" ) {{value}} 
+    span(v-if="schema.type==='number' && !empty")
+      v-container.pa-0.fluid
+        v-layout(:row="row" :column="column")
+          v-flex
+            .title {{schema.title}}
+            span.pl-3( :data-path="path" ) {{value}}
     span(v-if="schema.type==='array' && !empty")
       v-container.fluid.pa-0
         v-layout(:row="row" :column="column" )
