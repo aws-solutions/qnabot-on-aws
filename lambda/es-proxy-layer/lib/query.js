@@ -416,7 +416,14 @@ function update_res_with_hit(req, res, hit) {
     res.type = "PlainText";
     res.message = res.result.a;
     res.plainMessage = res.result.a;
-    
+
+    // add question defined session attributes to res with the exception of qnabotcontext and appContext
+    if (_.get(hit, "sa")){
+        hit.sa.map(obj=>{
+            _.set(res, `session.${obj.text}`, obj.value);
+        })
+    }
+
     // Add answerSource for query hits
     var ansSource = _.get(hit, "answersource", "unknown");
     if (ansSource==="Kendra FAQ") { // kendra fallback sets answerSource directly
