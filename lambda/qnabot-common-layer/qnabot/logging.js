@@ -4,6 +4,10 @@ module.exports = {
     log: function (...messages) {
         console.log(messages.map(message => filter(message)).join(" "))
     },
+    warn: function (...messages) {
+        console.warn(messages.map(message => filter(message)).join(" "))
+    },
+
     filter_comprehend_pii: filter_comprehend_pii,
     isPIIDetected: isPIIDetected,
     setPIIDetectionEnv: isPIIDetected //just to be idiomatic.

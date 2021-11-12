@@ -165,6 +165,13 @@ module.exports={
             maxLength:100,
             propertyOrder:12
         },
+        clientFilterValues:{
+            title:"Client Filters: Values",
+            description:"Enter list of terms. When specified, client must provide N matching terms in request session attribute 'QNAClientFilter' for this answer to be eligible for the response",
+            type:"string",
+            maxLength:100,
+            propertyOrder:10
+        },    
         botRouting:{
             title:"Bot Routing",
             description:"Use QnABot as a supervisory Bot and route to other Bots to handle the conversation. This parameter identifies a target Bot or Lambda with which to route communication.",

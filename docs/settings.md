@@ -68,3 +68,5 @@
 | BOT_ROUTER_WELCOME_BACK_MSG | text | The text used by QnABot when ending communication from a specialty bot
 | BOT_ROUTER_EXIT_MSGS | comma separated list | The exit phrases in comma separated list available for the a user to end communication with a specialty bot
 | RUN_LAMBDAHOOK_FROM_QUERY_STEP | true or false | Controls timing of execution for Lambda hooks
+| LAMBDA_PREPROCESS_HOOK | string | name of AWS Lambda to run before each question is processed. The name of the Lambda must start with "qna-" or "QNA-" to comply with the permissionss of the role attached to the Fulfillment Lambda .
+| LAMBDA_POSTPROCESS_HOOK | string | name of AWS Lambda to run after the question is processed. But before user profile information is saved. The name of the Lambda must start with "qna-" or "QNA-" to comply with the permissionss of the role attached to the Fulfillment Lambda .
