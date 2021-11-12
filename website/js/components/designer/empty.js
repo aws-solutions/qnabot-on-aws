@@ -1,6 +1,8 @@
 function empty(input){
     if(input.type==='string'){
         return ""
+    }else if (input.type==='boolean'){
+        return false;
     }else if(input.type==='array'){
         return [empty(input.items)]
     }else if(input.type==='object'){

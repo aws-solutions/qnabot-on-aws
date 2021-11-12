@@ -64,6 +64,7 @@ exports.translate_hit = async function(hit,usrLang,req){
     let ssml = _.get(hit, "alt.ssml");
     let rp = _.get(hit, "rp");
     let r = _.get(hit, "r");
+
     // catch and log errors before throwing exception.
     if (a && _.get(hit,'autotranslate.a')) {
         try {
@@ -130,6 +131,21 @@ exports.translate_hit = async function(hit,usrLang,req){
             throw (e);
         }
 
+    }
+    // session attributes
+    if (_.get(hit, "sa")){
+        hit_out.sa=[];
+        const promises = hit.sa.map(async obj=>{
+            if (obj.enableTranslate) {
+                try {
+                    hit_out.sa.push({text:obj.text, value: await get_translation(obj.value, usrLang, req), enableTranslate: obj.enableTranslate});
+                } catch (e) {
+                    qnabot.log("ERROR: Session Attributes caused Translation exception. Check syntax: ", obj.text);
+                    throw (e);
+                }
+            }
+        });
+        await Promise.all(promises);
     }
     qnabot.log("Preprocessed Result: ", hit_out);
     return hit_out;    
