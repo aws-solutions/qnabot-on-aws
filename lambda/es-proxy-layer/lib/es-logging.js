@@ -15,14 +15,14 @@ function processKeysForRegEx(obj, re) {
         if (_.isPlainObject(val)) {
             processKeysForRegEx(val, re);
         } else if ( key === "slot") {
-            obj[key] = val.replace(re,'XXXXX');
+            obj[key] = qnabot.filter_comprehend_pii(val).replace(re,'XXXXX');
         } else if ( key === "recentIntentSummaryView") {
             if (val) {
                 processKeysForRegEx(val, re);
             }
         } else {
             if (typeof val === 'string') {
-                obj[key] = val.replace(re,'XXXXX');
+                obj[key] = qnabot.filter_comprehend_pii(val).replace(re,'XXXXX');
             }
         }
     });
@@ -53,6 +53,13 @@ module.exports=function(event, context, callback){
     let redactEnabled = _.get(req, '_settings.ENABLE_REDACTING');
     let redactRegex = _.get(req, '_settings.REDACTING_REGEX', "\\b\\d{4}\\b(?![-])|\\b\\d{9}\\b|\\b\\d{3}-\\d{2}-\\d{4}\\b");
     let cloudwatchLoggingDisabled = _.get(req, '_settings.DISABLE_CLOUDWATCH_LOGGING');
+
+    qnabot.setPIIDetectionEnv(req._event.inputTranscript,
+        _.get(req, "_settings.PII_REJECTION_WITH_COMPREHEND",false),
+        _.get(req, "_settings.PII_REJECTION_REGEX",""),
+        _.get(req, "_settings.PII_REJECTION_ENTITY_TYPES",""),
+        _.get(req, "_settings.PII_REJECTION_CONFIDENCE_SCORE",.99)
+        ).then(() =>{
 
     if (cloudwatchLoggingDisabled) {
         qnabot.log("RESULT", "cloudwatch logging disabled");
@@ -101,6 +108,6 @@ module.exports=function(event, context, callback){
     firehose.putRecord(params, function(err, data) {
       if (err) qnabot.log(err, err.stack) // an error occurred
       else     qnabot.log(data)          // successful response
-    })
+    })})
    
 }

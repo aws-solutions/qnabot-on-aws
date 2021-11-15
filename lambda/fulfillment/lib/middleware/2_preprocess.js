@@ -67,49 +67,7 @@ async function update_userInfo(userId, req_userInfo) {
     return res_userInfo;
 }
 
-const comprehend_client = new AWS.Comprehend();
 
-const isPIIDetected = async (text, useComprehendForPII, piiRegex, pii_rejection_ignore_list) => {
-
-
-    qnabot.log("Testing redaction ")
-    let found_redacted_pii = false
-    if (piiRegex) {
-        let re = new RegExp(piiRegex, "g");
-        let redacted_text = text.replace(re, "XXXXXX");
-        found_redacted_pii = redacted_text != text;
-    } else {
-        qnabot.log("Warning: No value found for setting  PII_REJECTION_REGEX not using REGEX Matching")
-    }
-    let foundComprehendPII = false
-    if (!found_redacted_pii && useComprehendForPII ) {
-        var params = {
-            LanguageCode: "en",
-            Text: text
-        };
-        try {
-            var comprehendResult = await comprehend_client.detectPiiEntities(params).promise();
-            if (!("Entities" in comprehendResult) || comprehendResult.Entities.length == 0) {
-                qnabot.log("No PII found by Comprehend")
-                return false;
-            }
-            qnabot.log("Ignoring types for PII == " + pii_rejection_ignore_list)
-            pii_rejection_ignore_list = pii_rejection_ignore_list.toLowerCase().split(",")
-            let entitiesToFilter = comprehendResult.Entities.filter(entity => entity.Score > 0.90 && pii_rejection_ignore_list.indexOf(entity.Type.toLowerCase()) == -1)
-            foundComprehendPII = entitiesToFilter.length > 0;
-        } catch (exception) {
-            qnabot.log("Warning: Exception while trying to detect PII with Comprehend. All logging is disabled.");
-            qnabot.log("Exception " + exception);
-            process.env.DISABLECLOUDWATCHLOGGING = true //if there is an error during Comprehend PII detection, turn off all logging for this request
-            return false;
-        }
-
-    }
-    return foundComprehendPII  || found_redacted_pii;
-
-
-
-}
 
 
 
@@ -118,14 +76,22 @@ module.exports = async function preprocess(req, res) {
     let prehook = _.get(req, '_settings.LAMBDA_PREPROCESS_HOOK', undefined) || process.env.LAMBDA_PREPROCESS
     _.set(req, "_fulfillment.step", "preprocess")
     if (prehook) {
-        let result = await util.invokeLambda({
-            FunctionName: prehook,
-            req, res
-        })
-        _.set(req, "_fulfillment.step", undefined)
-        req = result.req
-        res = result.res
+        let regex = new RegExp("(^QNA-)|(^qna-)", "g");
+        if(!prehook.match(regex)){
+            qnabot.warn('The name of the Lambda for a preprocessing hook must start with either "QNA-" or "qna-". ' +
+                        'The preprocessing Lambda hook will NOT be run')
+        }else{
+
+            let arn = util.getLambdaArn(prehook)
+            let result = await util.invokeLambda({
+                FunctionName: arn,
+                req, res
+            })
+            req = result.req
+            res = result.res
+        }
     }
+    _.set(req, "_fulfillment.step", undefined)
     // lex-web-ui: If idtoken session attribute is present, decode it
     var idtoken = _.get(req, 'session.idtokenjwt');
     var idattrs = { "verifiedIdentity": "false" };
@@ -170,11 +136,13 @@ module.exports = async function preprocess(req, res) {
     }
     if (_.get(req, '_settings.PII_REJECTION_ENABLED')) {
         qnabot.log("Checking for PII")
-        let foundPii = await isPIIDetected(req.question,
-            _.get(req, "_settings.PII_REJECTION_WITH_COMPREHEND"),
-            _.get(req, "_settings.PII_REJECTION_REGEX"),
-            _.get(req, "_settings.PII_REJECTION_IGNORE_TYPES"))
-        if (_.get(req, "_settings.PII_REJECTION_QUESTION")) {
+        let foundPii = await qnabot.isPIIDetected(req.question,
+            _.get(req, "_settings.PII_REJECTION_WITH_COMPREHEND",false),
+            _.get(req, "_settings.PII_REJECTION_REGEX",""),
+            _.get(req, "_settings.PII_REJECTION_ENTITY_TYPES",""),
+            _.get(req, "_settings.PII_REJECTION_CONFIDENCE_SCORE",.99)
+            )
+            if (_.get(req, "_settings.PII_REJECTION_QUESTION")) {
             if (foundPii) {
                 qnabot.log("Found PII or REGEX Match - setting question to PII_REJECTION_QUESTION");
                 req.question = _.get(req, '_settings.PII_REJECTION_QUESTION');

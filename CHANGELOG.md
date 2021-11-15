@@ -10,7 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Architecture diagram and more details on [README.md](README.md)
 ### Fixed
-- Personally Identifiable Information (PII) redaction and rejection in bot response and Cloudwatch logs.
+- Regex Redaction in CloudWatch and Amazon OpenSearch Service.
 - Outdated NPM dependencies via Dependabot alerts and `npm audit` tool.
 ### Changed
 - License from Amazon Software License to Apache License 2

@@ -321,6 +321,18 @@ var apply_handlebars = async function (req, res, hit) {
             throw (e);
         }
     }
+    if (_.get(hit, "sa")){
+        hit_out.sa=[];
+        hit.sa.map(obj=>{
+            try {
+                const sa_value = Handlebars.compile(obj.value);
+                hit_out.sa.push({text:obj.text, value: sa_value(context), enableTranslate: obj.enableTranslate});
+            } catch (e) {
+                qnabot.log("ERROR: Session Attributes caused Handlebars exception. Check syntax: ", obj.text);
+                throw (e);
+            }
+        })
+    }
     qnabot.log("Preprocessed Result: ", hit_out);
     return hit_out;
 }
