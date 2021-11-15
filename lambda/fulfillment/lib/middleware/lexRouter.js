@@ -249,23 +249,20 @@ async function processResponse(req, res, hook, msg) {
             res.message = plainMessage;
         }
 
-        // do not build a card if we are in Connect Text. This is due to a bug(?) in the Connect web chat
-        if (req._clientType !== "LEX.AmazonConnect.Text") { 
-            res.card = {
-                "send": true,
-                "title": "Info",
-                "buttons": [
-                    {
-                        "text": "Yes",
-                        "value": "Yes"
-                    },
-                    {
-                        "text": "No",
-                        "value": "No"
-                    }
-                ]
-            };
-        }
+        res.card = {
+            "send": true,
+            "title": "Info",
+            "buttons": [
+                {
+                    "text": "Yes",
+                    "value": "Yes"
+                },
+                {
+                    "text": "No",
+                    "value": "No"
+                }
+            ]
+        };
     } else if (botResp.dialogState === 'Failed') {
         _.set(res,'session.qnabotcontext.elicitResponse.loopCount',++elicitResponseLoopCount);
         if (elicitResponseLoopCount >= maxElicitResponseLoopCount) {
