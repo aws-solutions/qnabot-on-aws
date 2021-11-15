@@ -123,7 +123,7 @@ async function up(stack,options){
                 var exp=await bootstrap()
                 var bucket=exp.Bucket
                 var prefix=exp.Prefix
-                var url=`http://${bucket}.s3.${region}.amazonaws.com/${prefix}/templates/${stack}.json`
+                var url=`https://${bucket}.s3.${region}.amazonaws.com/${prefix}/templates/${stack}.json`
                 await s3.putObject({
                     Bucket:bucket,
                     Key:`${prefix}/templates/${stack}.json`,
@@ -171,7 +171,7 @@ function update(stack,options){
                 var start=bootstrap().then(function(exp){
                     var bucket=exp.Bucket
                     var prefix=exp.Prefix
-                    var url=`http://${bucket}.s3.${region}.amazonaws.com/${prefix}/templates/${stack}.json`
+                    var url=`https://${bucket}.s3.${region}.amazonaws.com/${prefix}/templates/${stack}.json`
                     console.log(url)
                     return s3.putObject({
                         Bucket:bucket,
