@@ -4,7 +4,7 @@
       v-flex
         v-card
           v-card-title 
-            h3 Genesys Instructions
+            h3 Genesys Cloud CX Instructions
           v-card-text(class="pa-0")
             v-stepper(v-model="stepNumber" class="elevation-0")
               v-stepper-header
