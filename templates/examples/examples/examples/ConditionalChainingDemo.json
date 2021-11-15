@@ -65,7 +65,7 @@
       "qid": "40.chaining.demo.feedback",
       "a": "Please give us some feedback about this selection.",
       "alt": {
-        "markdown": "<br>\n***Please give us some feedback about this selection?***"
+        "markdown": "<br>\n***Please give us some feedback about this selection.***"
       },
       "rp": "Have you any feedback?",
       "elicitResponse": {
@@ -95,7 +95,7 @@
         ""
       ],
       "next": "",
-      "a": "Hi {{SessionAttributes.demo.name.FirstName}}.  Now tell me your age (in years) please?",
+      "a": "Hi {{SessionAttributes.demo.name.FirstName}}.  Now tell me your age (in years) please.",
       "r": {
         "buttons": [
           {
@@ -113,7 +113,7 @@
         "responsebot_hook": "QNAAge"
       },
       "alt": {
-        "markdown": "Hi {{SessionAttributes.demo.name.FirstName}}.  \nNow tell me your age (in years) please?",
+        "markdown": "Hi {{SessionAttributes.demo.name.FirstName}}.  \nNow tell me your age (in years) please.",
         "ssml": ""
       },
       "rp": "How old are you?",
