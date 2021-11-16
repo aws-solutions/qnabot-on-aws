@@ -4,23 +4,23 @@ const hook = require("lambda_hook_sdk/hooks")
 
 function create_buttons(event,start=0,stop=10) {
   let buttons = []
-  var settings = hook.list_settings(event);
-  var topicMap = {},
+  let settings = hook.list_settings(event);
+  let topicMap = {},
     topicKey;
-  for (var key of Object.keys(settings)) {
+  for (let key of Object.keys(settings)) {
     if (key.startsWith("topic::")) {
       [, topicKey] = key.split("::");
       console.log(topicKey);
       topicMap[topicKey] = settings[key];
     }
   }
-  var userTopics = hook.get_user_attribute(event, "recentTopics", []).sort((t1, t2) => {
+  let userTopics = hook.get_user_attribute(event, "recentTopics", []).sort((t1, t2) => {
     if (t1.dateTime == t2.dateTime) {
       return 0;
     }
     return t2.dateTime < t1.dateTime ? -1 : 1;
   });
-  for (var userTopic of userTopics.slice(start, stop)) {
+  for (let userTopic of userTopics.slice(start, stop)) {
     if (!(userTopic.topic in topicMap)) {
       continue;
     }
