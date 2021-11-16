@@ -96,8 +96,13 @@ function getClientType(req) {
     // Try to determine which Lex client is being used based on patterns in the req - best effort attempt.
     const voiceortext = (req._preferredResponseType == 'SSML') ? "Voice" : "Text" ;
 
+
     //for LexV1 channels -- check for x-amz-lex:channel-type requestAttribute
+    //more information on deploying an Amazon Lex V1 Bot on a Messaging Platform: https://docs.aws.amazon.com/lex/latest/dg/example1.html
+
     //for LexV2 channels -- check for x-amz-lex:channels:platform requestAttribute
+    //more information on deploying an Amazon Lex V2 Bot on a Messaging Platform: https://docs.aws.amazon.com/lexv2/latest/dg/deploying-messaging-platform.html
+
 
     if ((_.get(req,"_event.requestAttributes.x-amz-lex:channel-type") == "Slack") || (_.get(req,"_event.requestAttributes.x-amz-lex:channels:platform") == "Slack")) {
         return "LEX.Slack." + voiceortext ;
