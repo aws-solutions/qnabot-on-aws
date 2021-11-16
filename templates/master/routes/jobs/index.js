@@ -1,8 +1,9 @@
-var fs=require('fs')
-var resource=require('../util/resource')
-var lambda=require('../util/lambda')
-var mock=require('../util/mock')
-var _=require('lodash')
+var fs=require('fs');
+var resource=require('../util/resource');
+var lambda=require('../util/lambda');
+var mock=require('../util/mock');
+var _=require('lodash');
+const util = require('../../../util');
 
 module.exports={
     "Jobs": resource('jobs'),
@@ -158,7 +159,8 @@ module.exports={
             Key:"Type",
             Value:"Api"
         }]
-      }
+      },
+      "Metadata": util.cfnNag(["W92"])
     },
     "S3ListLambdaRole": {
       "Type": "AWS::IAM::Role",
@@ -176,12 +178,10 @@ module.exports={
           ]
         },
         "Path": "/",
-        "ManagedPolicyArns": [
-          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
-          "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole",
-          "arn:aws:iam::aws:policy/AWSXRayDaemonWriteAccess"
-        ],
         "Policies": [
+          util.basicLambdaExecutionPolicy(),
+          util.lambdaVPCAccessExecutionRole(),
+          util.xrayDaemonWriteAccess(),
           {
             "PolicyName" : "S3ListPolicy",
             "PolicyDocument" : {
@@ -196,7 +196,8 @@ module.exports={
             }
           }
         ]
-      }
+      },
+      "Metadata": util.cfnNag(["W11", "W12"])
     },
 };
 

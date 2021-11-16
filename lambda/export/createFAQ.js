@@ -1,9 +1,9 @@
 // createFAQ.js
-
-
 const AWSKendra = require('aws-sdk/clients/kendra');
 const AWSS3 = require('aws-sdk/clients/s3');
 const sleep = require('util').promisify(setTimeout)
+const qnabot = require("qnabot/logging")
+
 
 
 /**
@@ -16,12 +16,12 @@ function s3Uploader(s3Client,params) {
     return new Promise(function(resolve, reject) {
         s3Client.putObject(params, function(err, data) {
             if (err) {
-                console.log(err, err.stack); // an error occurred
+                qnabot.log(err, err.stack); // an error occurred
                 reject(err);
             }
             else {
-                console.log('Uploaded JSON to S3 successfully:');
-                console.log(data);           // successful response
+                qnabot.log('Uploaded JSON to S3 successfully:');
+                qnabot.log(data);           // successful response
                 resolve(data);
             }
             });
@@ -39,14 +39,14 @@ function faqConverter(kendraClient,params) {
     return new Promise(function(resolve, reject) {
         kendraClient.createFaq(params, function(err, data) {
             if (err) {
-                console.log(err, err.stack); // an error occurred
+                qnabot.log(err, err.stack); // an error occurred
                 reject(err);
             }
             else {
-                console.log('Converted JSON to FAQ successfully:');
-                console.log(data);           // successful response
+                qnabot.log('Converted JSON to FAQ successfully:');
+                qnabot.log(data);           // successful response
                 poll(() => kendraClient.describeFaq({IndexId: params.IndexId,Id:data.Id }).promise(),(result) => {
-                    console.log("describeFaq " + JSON.stringify(result));
+                    qnabot.log("describeFaq " + JSON.stringify(result));
                     var status = result.Status == "PENDING_CREATION" || result.Status == "CREATING";
                     return {
                         Status: status ?  "PENDING":result.Status,
@@ -73,12 +73,12 @@ function faqDeleter(kendraClient,params) {
     return new Promise(function(resolve, reject) {
         kendraClient.deleteFaq(params, function(err, data) {
             if (err) {
-                console.log(err, err.stack); // an error occurred
+                qnabot.log(err, err.stack); // an error occurred
                 reject(err);
             }
             else {
-                console.log('Deleted old FAQ successfully. New list of FAQs in index ' + params.IndexId + ':');
-                console.log("Delete parameters " + JSON.stringify(params));   
+                qnabot.log('Deleted old FAQ successfully. New list of FAQs in index ' + params.IndexId + ':');
+                qnabot.log("Delete parameters " + JSON.stringify(params));   
                 //describeFaq should cause an exception when the faq has been deleted.
                 poll(() => kendraClient.describeFaq(params).promise(),(result) => {return {Status:"PENDING"}},5000 ).then(() => resolve(data));        // successful response
                 
@@ -89,7 +89,7 @@ function faqDeleter(kendraClient,params) {
 
 function wait(ms = 1000) {
     return new Promise(resolve => {
-      console.log(`waiting ${ms} ms...`);
+      qnabot.log(`waiting ${ms} ms...`);
       setTimeout(resolve, ms);
     });
   }
@@ -131,12 +131,12 @@ function faqLister(kendraClient,params) {
     return new Promise(function(resolve, reject) {
         kendraClient.listFaqs(params, function(err, data) {
             if (err) {
-                console.log(err, err.stack); // an error occurred
+                qnabot.log(err, err.stack); // an error occurred
                 reject(err);
             }
             else {
-                console.log('Checked for pre-existing FAQ successfully. List of FAQs for index ' + params.IndexId + ':');
-                console.log(data);           // successful response
+                qnabot.log('Checked for pre-existing FAQ successfully. List of FAQs for index ' + params.IndexId + ':');
+                qnabot.log(data);           // successful response
                 resolve(data);
             }
             });
@@ -160,7 +160,7 @@ async function createFAQ(params) {
     let s3Client = (process.env.REGION ?
             new AWSS3({apiVersion:'2006-03-01', region:process.env.REGION}) :
             new AWSS3({apiVersion:'2006-03-01', region:params.region}));
-    console.log('clients created');
+    qnabot.log('clients created');
     
     
     // read in JSON and upload to S3 bucket
@@ -179,7 +179,7 @@ async function createFAQ(params) {
             count++;
         } catch (error) {
             if (error.code=='ThrottlingException') {
-                console.log(`Throttling exception: trying upload CSV again in 10 seconds`);
+                qnabot.log(`Throttling exception: trying upload CSV again in 10 seconds`);
                 await sleep(10000);
                 continue;
             } else {
@@ -203,7 +203,7 @@ async function createFAQ(params) {
             count++;
         } catch (error) {
             if (error.code=='ThrottlingException') {
-                console.log(`Throttling exception: trying list FAQs again in 10 seconds`);
+                qnabot.log(`Throttling exception: trying list FAQs again in 10 seconds`);
                 await sleep(10000);
                 continue;
             } else {
@@ -234,7 +234,7 @@ async function createFAQ(params) {
                 count++;
             } catch (error) {
                 if (error.code=='ThrottlingException') {
-                    console.log(`Throttling exception: trying delete FAQ again in 10 seconds`);
+                    qnabot.log(`Throttling exception: trying delete FAQ again in 10 seconds`);
                     await sleep(10000);
                     continue;
                 } else {
@@ -243,7 +243,7 @@ async function createFAQ(params) {
             }
         }
     } else {
-        console.log("No old FAQ to delete");
+        qnabot.log("No old FAQ to delete");
     }
     await sleep(10000);
     
@@ -268,7 +268,7 @@ async function createFAQ(params) {
             count++;
         } catch (error) {
             if (error.code=='ThrottlingException') {
-                console.log(`Throttling exception: trying convert to FAQ again in 10 seconds`);
+                qnabot.log(`Throttling exception: trying convert to FAQ again in 10 seconds`);
                 await sleep(10000);
                 continue;
             } else {

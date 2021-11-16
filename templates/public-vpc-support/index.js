@@ -1,16 +1,6 @@
 #! /usr/bin/env node
-/*
-Copyright 2017-2017 Amazon.com, Inc. or its affiliates. All Rights Reserved.
-
-Licensed under the Amazon Software License (the "License"). You may not use this file
-except in compliance with the License. A copy of the License is located at
-
-http://aws.amazon.com/asl/
-
-or in the "license" file accompanying this file. This file is distributed on an "AS IS"
-BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied. See the
-License for the specific language governing permissions and limitations under the License.
-*/
+// Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+// SPDX-License-Identifier: Apache-2.0
 
 var Promise=require('bluebird')
 var fs=Promise.promisifyAll(require('fs'))
@@ -35,7 +25,10 @@ module.exports=Promise.resolve(require('../master')).then(function(base){
         "LexV2Intent",
         "LexV2IntentFallback",
         "LexV2BotLocaleIds",
-        "FeedbackSNSTopic"
+        "FeedbackSNSTopic",
+        "ESProxyLambda",
+        "ElasticsearchEndpoint",
+        "ElasticsearchIndex"
     ])
     base.Parameters=_.pick(base.Parameters,[
         "Email",
@@ -45,6 +38,7 @@ module.exports=Promise.resolve(require('../master')).then(function(base){
         "PublicOrPrivate",
         "LexV2BotLocaleIds",
         "LexBotVersion",
+        "FulfillmentConcurrency",
         "ElasticSearchNodeCount",
         "KibanaDashboardRetentionMinutes",
         "VPCSubnetIdList",
@@ -83,7 +77,7 @@ module.exports=Promise.resolve(require('../master')).then(function(base){
                 },
                 {
                    "Label": {
-                        "default": "Amazon ElasticSearch"
+                        "default": "Amazon OpenSearch Service"
                    },
                    "Parameters": [
                         "ElasticSearchNodeCount",
@@ -114,11 +108,25 @@ module.exports=Promise.resolve(require('../master')).then(function(base){
                     { "Fn::Join": [ "", { "Ref": "VPCSecurityGroupIdList" } ] }
                 ] }
         ] }
-    
-    var out=JSON.stringify(base).replace(
-        /{"Ref":"BootstrapBucket"}/g,
-        '"'+config.publicBucket+'"')
-    
+
+    var out=JSON.stringify(base);
+
+    if(config.buildType == 'AWSSolutions') {
+        out=out.replace(
+            /{"Ref":"BootstrapBucket"}/g,
+            '{"Fn::Sub": "'+config.publicBucket+'-${AWS::Region}"}');
+        out=out.replace(
+            /\${BootstrapBucket}/g,
+            ''+config.publicBucket+'-${AWS::Region}');
+    } else {
+        out=out.replace(
+            /{"Ref":"BootstrapBucket"}/g,
+            '"'+config.publicBucket+'"');
+        out=out.replace(
+            /\${BootstrapBucket}/g,
+            ''+config.publicBucket+'');
+    }
+
     out=out.replace(
         /{"Ref":"ElasticsearchName"}/g,
         '"EMPTY"')
@@ -130,10 +138,6 @@ module.exports=Promise.resolve(require('../master')).then(function(base){
     out=out.replace(
         /\${BootstrapPrefix}/g,
         ''+config.publicPrefix+'')
-
-    out=out.replace(
-        /\${BootstrapBucket}/g,
-        ''+config.publicBucket+'')
 
     out=out.replace(
         /{"Ref":"BootstrapPrefix"}/g,

@@ -1,5 +1,7 @@
 var _=require('lodash')
 var util=require('./util')
+const qnabot = require("qnabot/logging")
+
 
 module.exports = async function hook(req,res) {
     
@@ -14,14 +16,15 @@ module.exports = async function hook(req,res) {
                 }
             ];
     }
-    
+     _.set(req,"_fulfillment.step","lambdahook")
+   
     var event = {req,res};
     var i=0;
     while (i<lambdahooks.length) {
         if (lambdahooks[i].l) {
             event.res.result.l = lambdahooks[i].l;
             event.res.result.args = lambdahooks[i].args ;
-            console.log("Lambda Hook ", i, ": ", lambdahooks[i].l, " => Args: ", lambdahooks[i].args);
+            qnabot.log("Lambda Hook ", i, ": ", lambdahooks[i].l, " => Args: ", lambdahooks[i].args);
             let arn=util.getLambdaArn(lambdahooks[i].l);
             if (arn) {
                 event = await util.invokeLambda({
@@ -33,5 +36,26 @@ module.exports = async function hook(req,res) {
         }  
         i=i+1 ;
     }
+    req = event.req
+    res = event.res
+
+    let posthook = _.get(req,'_settings.LAMBDA_POSTPROCESS_HOOK',undefined)
+    _.set(req,"_fulfillment.step","postprocess")
+    if(posthook){
+        let regex = new RegExp("(^QNA-)|(^qna-)", "g");
+        if(!posthook.match(regex)){
+            qnabot.warn('The name of the Lambda for a postprocessing hook must start with either "QNA-" or "qna-". ' +
+                        'The postprocessing Lambda hook will NOT be run')
+        }else{
+            let arn = util.getLambdaArn(posthook)
+            event = await util.invokeLambda({
+                FunctionName:arn,
+                req,res
+            })
+        }
+    }
+    
+        _.set(req,"_fulfillment.step","")
+
     return event;
 }

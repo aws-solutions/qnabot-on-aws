@@ -14,7 +14,7 @@
           v-card
             v-card-title.display-1.pa-2 Import
             v-card-text
-              p {{importWarning}}
+              <p> <span v-html=importWarning></span></p>
               p.title From File
               div.ml-4.mb-2
                 input(
@@ -78,18 +78,8 @@
 </template>
 
 <script>
-/*
-Copyright 2017-2017 Amazon.com, Inc. or its affiliates. All Rights Reserved.
-
-Licensed under the Amazon Software License (the "License"). You may not use this file
-except in compliance with the License. A copy of the License is located at
-
-http://aws.amazon.com/asl/
-
-or in the "license" file accompanying this file. This file is distributed on an "AS IS"
-BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied. See the
-License for the specific language governing permissions and limitations under the License.
-*/
+// Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+// SPDX-License-Identifier: Apache-2.0
 
 const Vuex = require('vuex')
 const Promise = require('bluebird')
@@ -102,7 +92,9 @@ const _ = require('lodash')
 module.exports = {
   data: function () {
     return {
-      importWarning: "Warning, Importing will over write existing QnAs with the same ID",
+      importWarning: "Warning, Importing will over write existing QnAs with the same ID </br>" +
+                     "You can import either a JSON file exported from QnABot or a properly </br> " +
+                     "formatted Excel file.  For the file format, see <a href='https://github.com/aws-samples/aws-ai-qna-bot/tree/master/docs/excel_import#readme'>here</a>.",
       loading: false,
       testing: false,
       url: "",
@@ -315,7 +307,7 @@ module.exports = {
         // Here is your object
         var XL_row_object = XLSX.utils.sheet_to_row_object_array(workbook.Sheets[sheetName]);
         var json_object = JSON.stringify(XL_row_object);
-        var question_number = 1
+        var question_number = 1       
         XL_row_object.forEach(question =>{
            console.log("Processing " + JSON.stringify(question))
            for(const property in header_mapping){
@@ -331,11 +323,14 @@ module.exports = {
             console.log("processing response title")
             question.r = {}
             question.r.title = question["cardtitle"]
+            delete question["cardtitle"]
             if(question["imageurl"] != undefined){
               question.r.imageUrl = question.imageurl
+              delete question.imageurl
             }
             if(question["cardsubtitle"] != undefined){
               question.r.subTitle = question.subtitle
+              delete question["cardsubtitle"] 
             }
             question.r.buttons = []
             let i = 1
@@ -371,6 +366,8 @@ module.exports = {
               }
               console.log("Adding button "+ JSON.stringify(button))
               question.r.buttons.push(button)
+              delete question[buttonFieldTextName]
+              delete question[buttonFieldValueName]
              }
            }
            let counter = 1
@@ -378,12 +375,18 @@ module.exports = {
            while(true){
              var userQuestion = question["question"+counter] 
               if(userQuestion != undefined){
-                question.q.push(userQuestion)
+              question.q.push(userQuestion.replace(/(\r\n|\n|\r)/gm," "))
+                delete question["question"+counter]
                 counter++
               }else{
                 break;
               }
            }
+          for(let property in question){
+            if(property.includes(".")){
+              _.set(question,property.split("."),question[property])            
+            }
+          }
           if(question.qid  == undefined){
             self.addError(`Warning: No QID found for line ${question_number}. The question will be skipped.`)
             return

@@ -29,6 +29,8 @@
               v-list-tile-title 
                 a(href="https://amazon.com/qnabot" target="_blank") General Instructions / QnABot Blog Post
               v-list-tile-title
+                a(href="https://qnabot.workshop.aws/" target="_blank") QnABot Workshop
+              v-list-tile-title
                 a(href="https://aws.amazon.com/blogs/machine-learning/creating-virtual-guided-navigation-using-a-question-and-answer-bot-with-amazon-lex-and-amazon-alexa/" target="_blank") Guided Navigation using QnABot
               v-list-tile-title
                 a(href="https://aws.amazon.com/blogs/machine-learning/create-a-questionnaire-bot-with-amazon-lex-and-amazon-alexa/" target="_blank") Create a questionnaire using QnABot
@@ -55,18 +57,8 @@
 </template>
 
 <script>
-/*
-Copyright 2017-2017 Amazon.com, Inc. or its affiliates. All Rights Reserved.
-
-Licensed under the Amazon Software License (the "License"). You may not use this file
-except in compliance with the License. A copy of the License is located at
-
-http://aws.amazon.com/asl/
-
-or in the "license" file accompanying this file. This file is distributed on an "AS IS"
-BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied. See the
-License for the specific language governing permissions and limitations under the License.
-*/
+// Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+// SPDX-License-Identifier: Apache-2.0
 
 var Vuex=require('vuex')
 var Promise=require('bluebird')
@@ -133,9 +125,9 @@ module.exports={
         href:"#/customTranslate"
       },
       {
-        title:"Kendra Web Page Indexing",
+        title:"Kendra Web Crawler",
         id:"kendraIndexing",
-        subTitle:"Index Web Pages with Kendra",
+        subTitle:"Crawl web pages with Kendra",
         icon:"search",
         href:"#/kendraIndex"
       },

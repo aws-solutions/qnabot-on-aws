@@ -9,7 +9,8 @@ module.exports={
   "Resources":_.assign.apply({},files),
   "Conditions": {},
   "AWSTemplateFormatVersion": "2010-09-09",
-  "Description": `QnABot with admin and client websites - (Master v${process.env.npm_package_version})`,
+  "Transform": "AWS::Serverless-2016-10-31",
+  "Description": `(SO0189) QnABot with admin and client websites - (Master v${process.env.npm_package_version})`,
   "Mappings": {},
   "Outputs": {
     "CognitoEndpoint":{
@@ -22,6 +23,7 @@ module.exports={
       "Value":{"Ref":"ImportBucket"}
     },
     "BotConsoleUrl":{
+      "Condition": "CreateLexV1Bots",
       "Value":{"Fn::Join":["",[
         "https://console.aws.amazon.com/lex/home?",
         "region=",{"Ref":"AWS::Region"},
@@ -166,7 +168,7 @@ module.exports={
     },
     "Encryption":{
         "Type":"String",
-        "Description":"Enables encryption at rest for S3 and ElasticSearch, and provisions c5.large.elasticsearch instances - recommended for production deployments. Selecting the unencrypted configuration provisions lower cost t3.small.elasticsearch instances. See https://aws.amazon.com/elasticsearch-service/pricing/.",
+        "Description":"Enables encryption at rest for S3 and ElasticSearch, and provisions m6g.large.elasticsearch instances - recommended for production deployments. Selecting the unencrypted configuration provisions lower cost t3.small.elasticsearch instances. See https://aws.amazon.com/elasticsearch-service/pricing/.",
         "AllowedValues": ["ENCRYPTED", "UNENCRYPTED"],
         "Default":"ENCRYPTED",
         "ConstraintDescription":"Allowed Values are UNENCRYPTED or ENCRYPTED"
@@ -206,7 +208,7 @@ module.exports={
         "Type":"String",
         "Description":"Choose whether access to the QnABot client should be publicly available or restricted to users in QnABot UserPool.",
         "AllowedValues" : ["PUBLIC", "PRIVATE"],
-        "Default":"PUBLIC"
+        "Default":"PRIVATE"
     },
     "ElasticSearchNodeCount":{
         "Type":"String",
@@ -214,18 +216,23 @@ module.exports={
         "AllowedValues" : ["2", "4"],
         "Default":"4"
     },
+    "FulfillmentConcurrency": {
+      "Type":"Number",
+      "Description":"The amount of provisioned concurrency for the fulfillment Lambda function",
+      "Default": 0
+    },
     "VPCSubnetIdList" : {
         "Type": "CommaDelimitedList",
-        "Description" : "Subnet IDs", 
+        "Description" : "Subnet IDs",
         "Default": ""
     },
     "VPCSecurityGroupIdList": {
         "Type": "CommaDelimitedList",
-        "Description" : "Security Group IDs", 
+        "Description" : "Security Group IDs",
         "Default": ""
     },
     "LexV2BotLocaleIds":{
-        "Description" : "Languages for QnABot voice interaction using LexV2. Specify as a comma separated list of valid Locale IDs - see https://docs.aws.amazon.com/lexv2/latest/dg/how-languages.html", 
+        "Description" : "Languages for QnABot voice interaction using LexV2. Specify as a comma separated list of valid Locale IDs - see https://docs.aws.amazon.com/lexv2/latest/dg/how-languages.html",
         "Type": "String",
         "Default": "en_US,es_US,fr_CA"
     },
@@ -233,7 +240,7 @@ module.exports={
         "Description" : "Lex versions to use for QnABot. Select 'LexV2 Only' to install QnABot in AWS reqions where LexV1 is not supported.",
         "Type":"String",
         "AllowedValues" : ["LexV1 and LexV2", "LexV2 Only"],
-        "Default":"LexV1 and LexV2"
+        "Default":"LexV2 Only"
     },
     "XraySetting":{
         "Type":"String",
@@ -262,7 +269,10 @@ module.exports={
               { "Fn::Equals": [ "",
                       { "Fn::Join": [ "", { "Ref": "VPCSecurityGroupIdList" } ] }
                   ] }
-          ] }
+          ] },
+    "CreateConcurrency":{ "Fn::Not": [
+      {"Fn::Equals":[{"Ref":"FulfillmentConcurrency"},"0"]}
+    ]}
   }
 }
 

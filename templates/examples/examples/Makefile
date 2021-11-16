@@ -5,11 +5,10 @@ all : py_build $(DST)
 .PHONY: all
 
 $(DST): index.js package.json cfn.js examples/* js/* py/*
-	echo "Building $(NAME)"; npm install && zip -r -q $(DST) .
+	echo "Building $(NAME)"; npm install -production && zip -r -q $(DST) .
 
 py_build:
-		pushd ./py ; \
+		cd ./py ; \
 		[ -f requirements.txt ] && \
 			python3 -m pip install --upgrade -r requirements.txt -t ./py_modules || true ; \
-		popd ; \
 

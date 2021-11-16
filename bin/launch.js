@@ -51,13 +51,13 @@ if (require.main === module) {
         })
         .parse(process.argv)
 
-    var options=argv
-    var stack=!options.input ? options.args[0] : options.input.split('/')
+    const options = argv.opts();
+    var stack=!options.input ? argv.args[0] : argv.input.split('/')
         .reverse()
         .filter(x=>x)
         .slice(0,2)
         .reverse().join('-').split('.')[0]
-    var op=options.operation || (options.input ? options.args[0] : options.args[1])
+    var op=options.operation || (options.input ? argv.args[0] : argv.args[1])
     try {
         if( stack && op){
             switch(op){
@@ -115,7 +115,7 @@ async function up(stack,options){
             if(Buffer.byteLength(template)<51200){
                 var create=await cf.createStack({
                     StackName,
-                    Capabilities:["CAPABILITY_NAMED_IAM"],
+                    Capabilities:["CAPABILITY_NAMED_IAM","CAPABILITY_AUTO_EXPAND"],
                     DisableRollback:true,
                     TemplateBody:template
                 }).promise()
@@ -131,7 +131,7 @@ async function up(stack,options){
                 }).promise()
                 var create=await cf.createStack({
                     StackName,
-                    Capabilities:["CAPABILITY_NAMED_IAM"],
+                    Capabilities:["CAPABILITY_NAMED_IAM","CAPABILITY_AUTO_EXPAND"],
                     DisableRollback:true,
                     TemplateURL:url
                 }).promise()
@@ -164,7 +164,7 @@ function update(stack,options){
             if(Buffer.byteLength(template)<51200){
                 var start=cf.updateStack({
                     StackName,
-                    Capabilities:["CAPABILITY_NAMED_IAM"],
+                    Capabilities:["CAPABILITY_NAMED_IAM","CAPABILITY_AUTO_EXPAND"],
                     TemplateBody:template
                 }).promise()
             }else{
@@ -180,7 +180,7 @@ function update(stack,options){
                     }).promise()
                     .then(()=>cf.updateStack({
                         StackName,
-                        Capabilities:["CAPABILITY_NAMED_IAM"],
+                        Capabilities:["CAPABILITY_NAMED_IAM","CAPABILITY_AUTO_EXPAND"],
                         TemplateURL:url
                     }).promise())
                 })

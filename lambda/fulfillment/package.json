@@ -10,20 +10,10 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "aws-sdk": "^2.913.0",
-    "bluebird": "^3.5.0",
-    "bodybuilder": "^2.2.6",
-    "elasticsearch": "^16.7.1",
-    "http-aws-es": "^6.0.0",
-    "intercept-stdout": "^0.1.2",
     "jsonschema": "^1.2.2",
     "jsonwebtoken": "^8.3.0",
     "jwks-rsa-promisified": "^1.0.2",
     "slackify-markdown": "4.1.0",
     "utf8": "3.0.0"
-  },
-  "devDependencies": {
-    "diff": "^4.0.2",
-    "nodeunit": "^0.11.3"
   }
 }

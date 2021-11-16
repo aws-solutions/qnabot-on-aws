@@ -1,3 +1,4 @@
+const util = require('../../util');
 module.exports={
     "UsersTable": {
         "Type" : "AWS::DynamoDB::Table",
@@ -6,7 +7,7 @@ module.exports={
             "AttributeDefinitions" : [
                 {
                 "AttributeName" : "UserId",
-                "AttributeType" : "S"   
+                "AttributeType" : "S"
                 },
             ],
             "KeySchema" : [
@@ -15,6 +16,7 @@ module.exports={
                 "KeyType" : "HASH"
                 }
             ]
-        }
+        },
+        "Metadata": util.cfnNag(["W74", "W78"])
     }
 }

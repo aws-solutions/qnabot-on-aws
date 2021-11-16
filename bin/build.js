@@ -25,15 +25,18 @@ if(!module.parent){
         .option('--output <output>',"output file")
         .parse(process.argv)
 
-    if( args.stack || (args.input && args.output)){
+    const options = argv.opts();
+    if (options.stack || (options.input && options.output)) {
         create({
-            silent:!args.verbose,
-            input:args.input,
-            output:args.output,
-            stack:args.stack
-        })
-    }else{
-        argv.outputHelp()
+            silent: !options.verbose,
+            input: options.input,
+            output: options.output,
+            stack: options.stack,
+        });
+    } else {
+        console.log(`error: required options not specified`);
+        argv.outputHelp();
+        process.exit(1);
     }
 }
 module.exports=create

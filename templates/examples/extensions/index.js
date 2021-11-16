@@ -1,6 +1,7 @@
-var fs=require('fs')
-var _=require('lodash')
-var fs=require('fs')
+var fs=require('fs');
+var _=require('lodash');
+const util = require('../../util');
+
 
 var js=fs.readdirSync(`${__dirname}/js_lambda_hooks`)
 .map(name=> {
@@ -84,6 +85,40 @@ module.exports=Object.assign(
           "BuildDate":(new Date()).toISOString()
       }
     },
+    JsLambdaHookSDKLambdaLayerCodeVersion: {
+      Type: "Custom::S3Version",
+      Properties: {
+        ServiceToken: {"Ref": "CFNLambda"},
+        Bucket: { Ref: "BootstrapBucket" },
+        Key: { "Fn::Sub": "${BootstrapPrefix}/lambda/js_lambda_hook_sdk.zip" },
+        BuildDate: new Date().toISOString(),
+      },
+    },
+    JsLambdaHookSDKLambdaLayer: {
+      Type: "AWS::Lambda::LayerVersion",
+      Properties: {
+        Content: {
+          S3Bucket: { Ref: "BootstrapBucket" },
+          S3Key: { "Fn::Sub": "${BootstrapPrefix}/lambda/js_lambda_hook_sdk.zip"  },
+          S3ObjectVersion: { Ref: "JsLambdaHookSDKLambdaLayerCodeVersion" },
+        },
+        LayerName:{
+          "Fn::Join": [
+            "-",
+            [
+              "JsLambdaHookSDK",
+              {
+                "Fn::Select": [
+                  2,
+                  {"Fn::Split": ["-", {Ref: "DefaultQnABotSettings"}]},
+                ],
+              },
+            ],
+          ],
+        },
+        CompatibleRuntimes: ["nodejs12.x"],
+      },
+    },
     "ExtensionsInvokePolicy": {
       "Type": "AWS::IAM::ManagedPolicy",
       "Properties": {
@@ -117,7 +152,11 @@ module.exports=Object.assign(
           ]
         },
         "Path": "/",
-        "Policies":[{ 
+        "Policies":[
+          util.basicLambdaExecutionPolicy(),
+          util.lambdaVPCAccessExecutionRole(),
+          util.xrayDaemonWriteAccess(),
+          {
           "PolicyName" : "LambdaFeedbackFirehoseQNALambda",
           "PolicyDocument" : {
           "Version": "2012-10-17",
@@ -127,7 +166,7 @@ module.exports=Object.assign(
                   "Action": [
         						"kms:Encrypt",
         						"kms:Decrypt",
-        					], 
+        					],
         					"Resource":{"Fn::GetAtt":["QuizKey","Arn"]}
                 },
                 {
@@ -138,7 +177,7 @@ module.exports=Object.assign(
                   "Resource": [
                     {"Fn::Join": ["",["arn:aws:lambda:",{ "Ref" : "AWS::Region" },":",{ "Ref" : "AWS::AccountId" },":function:qna-*"]]},
                     {"Fn::Join": ["",["arn:aws:lambda:",{ "Ref" : "AWS::Region" },":",{ "Ref" : "AWS::AccountId" },":function:QNA-*"]]},
-                    {"Ref":"QIDLambdaArn"} 
+                    {"Ref":"QIDLambdaArn"}
                   ]
                 },
                 {
@@ -163,21 +202,17 @@ module.exports=Object.assign(
                   "Effect": "Allow",
                   "Action": [
                       "lex:PostText"
-                   ],   
+                   ],
                   "Resource": [
                       {"Fn::Join": ["",["arn:aws:lex:",{ "Ref" : "AWS::Region" },":",{ "Ref" : "AWS::AccountId" },":bot:*",":qna*"]]},
                       {"Fn::Join": ["",["arn:aws:lex:",{ "Ref" : "AWS::Region" },":",{ "Ref" : "AWS::AccountId" },":bot:*",":QNA*"]]},
                   ]
               }
             ]
-          }          
+          }
         }],
-        "ManagedPolicyArns": [
-            "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
-            "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole",
-            "arn:aws:iam::aws:policy/AWSXRayDaemonWriteAccess"
-        ]
-      }
+      },
+      "Metadata": util.cfnNagXray()
     }
 });
 function jslambda(name){
@@ -211,6 +246,7 @@ function jslambda(name){
               "SecurityGroupIds": { "Fn::Split" : [ ",", {"Ref": "VPCSecurityGroupIdList"} ] },
           }, {"Ref" : "AWS::NoValue"} ]
       },
+      "Layers":[{"Ref":"JsLambdaHookSDKLambdaLayer"}],
       "TracingConfig" : {
           "Fn::If": [ "XRAYEnabled", {"Mode": "Active"},
               {"Ref" : "AWS::NoValue"} ]

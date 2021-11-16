@@ -1,7 +1,9 @@
-var fs=require('fs')
-var _=require('lodash')
-var fs=require('fs')
+var fs=require('fs');
+var _=require('lodash');
+const util = require('../../util');
 var responsebots=require('./responsebots.js').resources;
+var responsebots_lexv2=require('./responsebots-lexv2.js').resources;
+
 
 var js=fs.readdirSync(`${__dirname}/js`)
 .filter(x=>x.match(/(.*).js/))
@@ -11,8 +13,8 @@ var js=fs.readdirSync(`${__dirname}/js`)
         name:`ExampleJSLambda${name}`,
         resource:jslambda(name),
         id:`${name}JS`
-    }
-})
+    };
+});
 
 var py=fs.readdirSync(`${__dirname}/py`)
 .filter(x=>x.match(/(.*).py/))
@@ -22,12 +24,13 @@ var py=fs.readdirSync(`${__dirname}/py`)
         name:`ExamplePYTHONLambda${name}`,
         resource:pylambda(name),
         id:`${name}PY`
-    }
-})
+    };
+});
 
 
 module.exports=Object.assign(
     responsebots,
+    responsebots_lexv2,
     _.fromPairs(js.map(x=>[x.name,x.resource])),
     _.fromPairs(py.map(x=>[x.name,x.resource])),
     {
@@ -101,14 +104,14 @@ module.exports=Object.assign(
 					{
 						"Sid": "Enable IAM User Permissions",
 						"Effect": "Allow",
-						"Principal": {"AWS": 
+						"Principal": {"AWS":
                             {"Fn::Sub":"arn:aws:iam::${AWS::AccountId}:root"}
 						},
 						"Action": "kms:*",
 						"Resource": "*"
 					}
 				]
-			}                
+			}
         }
     },
     "LambdaHookExamples":{
@@ -147,7 +150,7 @@ module.exports=Object.assign(
         "MemorySize": "128",
         "Role":{"Ref":"CFNLambdaRole"} ,
         "Runtime": "nodejs12.x",
-        "Timeout": 300,        
+        "Timeout": 300,
         "VpcConfig" : {
           "Fn::If": [ "VPCEnabled", {
               "SubnetIds": { "Fn::Split" : [ ",", {"Ref": "VPCSubnetIdList"} ] },
@@ -162,7 +165,8 @@ module.exports=Object.assign(
             Key:"Type",
             Value:"CustomResource"
         }]
-      }
+      },
+      "Metadata": util.cfnNag(["W92"])
     },
     "ExampleLambdaRole":{
       "Type": "AWS::IAM::Role",
@@ -180,7 +184,12 @@ module.exports=Object.assign(
           ]
         },
         "Path": "/",
-        "Policies":[{
+        "Policies":[
+          util.basicLambdaExecutionPolicy(),
+          util.lambdaVPCAccessExecutionRole(),
+          util.xrayDaemonWriteAccess(),
+          util.amazonKendraReadOnlyAccess(),
+          {
           "PolicyName" : "LambdaFeedbackFirehoseQNALambda",
           "PolicyDocument" : {
           "Version": "2012-10-17",
@@ -190,7 +199,7 @@ module.exports=Object.assign(
                     "Action": [
 						"kms:Encrypt",
 						"kms:Decrypt",
-					], 
+					],
 					"Resource":{"Fn::GetAtt":["QuizKey","Arn"]}
                 },
                 {
@@ -201,7 +210,7 @@ module.exports=Object.assign(
                   "Resource": [
                     {"Fn::Join": ["",["arn:aws:lambda:",{ "Ref" : "AWS::Region" },":",{ "Ref" : "AWS::AccountId" },":function:qna-*"]]},
                     {"Fn::Join": ["",["arn:aws:lambda:",{ "Ref" : "AWS::Region" },":",{ "Ref" : "AWS::AccountId" },":function:QNA-*"]]},
-                    {"Ref":"QIDLambdaArn"} 
+                    {"Ref":"QIDLambdaArn"}
                   ]
                 },
                 {
@@ -217,7 +226,7 @@ module.exports=Object.assign(
             ]
           }
         },
-        { 
+        {
           "PolicyName" : "SNSQNALambda",
           "PolicyDocument" : {
           "Version": "2012-10-17",
@@ -232,7 +241,7 @@ module.exports=Object.assign(
             ]
           }
         },
-        { 
+        {
           "PolicyName" : "LexQNALambda",
           "PolicyDocument" : {
           "Version": "2012-10-17",
@@ -241,7 +250,7 @@ module.exports=Object.assign(
                   "Effect": "Allow",
                   "Action": [
                       "lex:PostText"
-                   ],   
+                   ],
                   "Resource": [
                       {"Fn::Join": ["",["arn:aws:lex:",{ "Ref" : "AWS::Region" },":",{ "Ref" : "AWS::AccountId" },":bot:*",":qna*"]]},
                       {"Fn::Join": ["",["arn:aws:lex:",{ "Ref" : "AWS::Region" },":",{ "Ref" : "AWS::AccountId" },":bot:*",":QNA*"]]},
@@ -293,15 +302,11 @@ module.exports=Object.assign(
             }
         }
         ],
-        "ManagedPolicyArns": [
-            "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
-            "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole",
-            "arn:aws:iam::aws:policy/AWSXRayDaemonWriteAccess",
-            "arn:aws:iam::aws:policy/AmazonKendraReadOnlyAccess"
-        ]
-      }
+      },
+      "Metadata": util.cfnNagXray()
     }
-})
+});
+
 function jslambda(name){
     return {
       "Type": "AWS::Lambda::Function",
@@ -337,7 +342,7 @@ function jslambda(name){
         "TracingConfig" : {
             "Fn::If": [ "XRAYEnabled", {"Mode": "Active"},
                 {"Ref" : "AWS::NoValue"} ]
-        },        
+        },
         "Tags":[{
             Key:"Type",
             Value:"Example"

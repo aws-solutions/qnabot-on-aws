@@ -1,6 +1,8 @@
 var _=require('lodash')
 const slackifyMarkdown = require('slackify-markdown');
 const utf8 = require('utf8');
+const qnabot = require("qnabot/logging")
+
 
 
 // PARSE FUNCTIONS
@@ -81,7 +83,7 @@ function parseLexV2Event(event) {
     if (mode == "Speech") {
         const lex_locale = _.get(event,'bot.localeId').split("_")[0];
         _.set(out,"session.qnabotcontext.userPreferredLocale", lex_locale);
-        console.log("LexV2 in voice mode - Set userPreferredLocale from lex V2 bot locale:", out.session.qnabotcontext.userPreferredLocale);
+        qnabot.log("LexV2 in voice mode - Set userPreferredLocale from lex V2 bot locale:", out.session.qnabotcontext.userPreferredLocale);
     } 
     return out;
 }
@@ -105,6 +107,8 @@ exports.parse=async function(req){
 }
 
 function filterButtons(response) {
+    qnabot.log("Before filterButtons " + JSON.stringify(response))
+
     var filteredButtons = _.get(response.card,"buttons",[]);
     if (filteredButtons) {
         for (var i = filteredButtons.length - 1; i >= 0; --i) {
@@ -114,6 +118,7 @@ function filterButtons(response) {
         }
         _.set(response.card,"buttons",filteredButtons) ;
     }
+    qnabot.log("Response from filterButtons " + JSON.stringify(response))
     return response;
 }
 
@@ -124,16 +129,13 @@ function slackifyResponse(response) {
     // Markdown conversion, and convert string to utf8 encoding for unicode support
     if (_.get(response,"result.alt.markdown")) {
         let md = response.result.alt.markdown;
-        console.log("Converting markdown response to Slack format.");
-        console.log("Original markdown: ", JSON.stringify(md));
+        qnabot.log("Converting markdown response to Slack format.");
+        qnabot.log("Original markdown: ", JSON.stringify(md));
         md = slackifyMarkdown(md);
         response.message = md ;
-        console.log("Converted markdown: ", JSON.stringify(md));
+        qnabot.log("Converted markdown: ", JSON.stringify(md));
     } 
-    console.log("Converting Slack message javascript string to utf8 (for multi-byte compatibility).");
-    let txt = response.message;
-    txt = utf8.encode(txt); // encode as utf8
-    response.message = txt; 
+    qnabot.log("Converting Slack message javascript string to utf8 (for multi-byte compatibility).");
     return response;
 }
 
@@ -194,8 +196,19 @@ function limitLexButtonCount(response) {
     // note when using lex-web-ui, this limitation is circumvented by use of the appContext session attribute above.
     let buttons = _.get(response.card,"buttons",[]) ;
     if (buttons && buttons.length > 5) {
-        console.log("WARNING: Truncating button list to contain only first 5 buttons to adhere to Lex limits.");
+        qnabot.log("WARNING: Truncating button list to contain only first 5 buttons to adhere to Lex limits.");
         _.set(response.card,"buttons",buttons.slice(0,5));
+    }
+    return response;
+}
+
+function limitLexDisplayTextLength(response) {
+    // Lex has limit of max 5 buttons in the responsecard.. if we have more than 5, use the first 5 only.
+    // note when using lex-web-ui, this limitation is circumvented by use of the appContext session attribute above.
+    let buttons = _.get(response.card,"buttons",[]) ;
+    for(let i=0;i<buttons.length;i++){
+        response.card.buttons[i].text = response.card.buttons[i].text.slice(0,50)
+        response.card.buttons[i].value = response.card.buttons[i].value.slice(0,50)
     }
     return response;
 }
@@ -249,16 +262,21 @@ exports.assemble=function(request,response){
     if (request._clientType == "LEX.Slack.Text") {
         response = slackifyResponse(response);
     }
+    qnabot.log("filterButtons")
     response = filterButtons(response);
+    qnabot.log("copyResponseCardToSessionAttributes")
     response = copyResponseCardtoSessionAttribute(response);
+    qnabot.log("limitLexButtonCounts")
     response = limitLexButtonCount(response);
+    qnabot.log("limitLexDisplayTextLength")
+    response = limitLexDisplayTextLength(response)
     let out;
     if (request._lexVersion === "V1") {
         out= assembleLexV1Response(response);        
     } else {
         out= assembleLexV2Response(response);
     }
-    console.log("Lex response:",JSON.stringify(out,null,2))
+    qnabot.log("Lex response:",JSON.stringify(out,null,2))
     return out
 }
 

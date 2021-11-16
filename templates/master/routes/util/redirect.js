@@ -1,5 +1,5 @@
 var fs=require('fs')
-
+const util = require('../../../util');
 module.exports=function(url,resource){
     return {
       "Type": "AWS::ApiGateway::Method",
@@ -28,7 +28,8 @@ module.exports=function(url,resource){
             }
         }],
         "RestApiId": {"Ref": "API"}
-      }
+      },
+      "Metadata": util.cfnNag(["W59"])
     }
 }
-    
+

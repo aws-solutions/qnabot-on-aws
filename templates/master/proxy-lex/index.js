@@ -1,4 +1,5 @@
-var fs=require('fs')
+var fs=require('fs');
+const util = require('../../util');
 
 module.exports={
     "LexProxyLambda": {
@@ -26,7 +27,8 @@ module.exports={
             Key:"Type",
             Value:"Api"
         }]
-      }
+      },
+      "Metadata": util.cfnNag(["W92"])
     },
     "LexStatusLambda": {
       "Type": "AWS::Lambda::Function",
@@ -39,7 +41,10 @@ module.exports={
                 STATUS_BUCKET:{"Ref":"BuildStatusBucket"},
                 STATUS_KEY:{"Fn::If": ["CreateLexV1Bots", "status.json", {"Ref":"AWS::NoValue"}]},
                 LEXV2_STATUS_KEY:"lexV2status.json",
-                FULFILLMENT_FUNCTION_ARN: {"Fn::GetAtt": ["FulfillmentLambda", "Arn"]},
+                FULFILLMENT_FUNCTION_ARN: {  "Fn::Join": [ ":", [
+                  {"Fn::GetAtt":["FulfillmentLambda","Arn"]},
+                  "live"
+                ]]},
                 FULFILLMENT_FUNCTION_ROLE: {"Ref": "FulfillmentLambdaRole"},
                 LEXV1_BOT_NAME: {"Fn::If": ["CreateLexV1Bots",{"Ref": "LexBot"},{"Ref": "AWS::NoValue"}]},
                 LEXV1_INTENT: {"Fn::If": ["CreateLexV1Bots",{"Ref": "Intent"},{"Ref": "AWS::NoValue"}]},
@@ -72,7 +77,8 @@ module.exports={
             Key:"Type",
             Value:"Api"
         }]
-      }
+      },
+      "Metadata": util.cfnNag(["W92"])
     },
     "LexProxyLambdaRole": {
       "Type": "AWS::IAM::Role",
@@ -90,13 +96,12 @@ module.exports={
           ]
         },
         "Path": "/",
-        "ManagedPolicyArns": [
-          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
-          "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole",
-          "arn:aws:iam::aws:policy/AmazonLexFullAccess",
-          "arn:aws:iam::aws:policy/AWSXRayDaemonWriteAccess",
-        ],
-        "Policies":[{
+        "Policies":[
+          util.basicLambdaExecutionPolicy(),
+          util.lambdaVPCAccessExecutionRole(),
+          util.lexFullAccess(),
+          util.xrayDaemonWriteAccess(),
+          {
             "PolicyName":"Access",
             "PolicyDocument": {
               "Version": "2012-10-17",
@@ -109,7 +114,8 @@ module.exports={
               }]
             }
         }]
-      }
+      },
+      "Metadata": util.cfnNag(["W11", "W12", "W76", "F3"])
     }
 }
 
