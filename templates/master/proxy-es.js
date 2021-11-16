@@ -178,7 +178,8 @@ module.exports={
         "Layers":[{"Ref":"AwsSdkLayerLambdaLayer"},
                   {"Ref":"CommonModulesLambdaLayer"},
                   {"Ref":"EsProxyLambdaLayer"},
-                  {"Ref":"QnABotCommonLambdaLayer"}],
+                  {"Ref":"QnABotCommonLambdaLayer"}
+                ],
         "Environment": {
           "Variables": {
             "FIREHOSE_NAME":{"Ref":"GeneralFirehose"},
@@ -401,6 +402,15 @@ module.exports={
                   "Resource": [
                     {"Fn::Join": ["",["arn:aws:lambda:",{ "Ref" : "AWS::Region" },":",{ "Ref" : "AWS::AccountId" },":function:qna-*"]]},
                     {"Fn::Join": ["",["arn:aws:lambda:",{ "Ref" : "AWS::Region" },":",{ "Ref" : "AWS::AccountId" },":function:QNA-*"]]},
+                  ]
+                },
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "comprehend:DetectPiiEntities"
+                  ],
+                  "Resource": [
+                    "*"
                   ]
                 },
                 {

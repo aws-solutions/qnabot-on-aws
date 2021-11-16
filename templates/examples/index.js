@@ -39,7 +39,6 @@ module.exports={
     "LexBotVersion": {"Type": "String"},
     "XraySetting": {"Type": "String"},
     "DefaultQnABotSettings": {"Type":"String"}
-
   },
    "Conditions": {
     "VPCEnabled": { "Fn::Not": [

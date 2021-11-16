@@ -1,21 +1,23 @@
-# VPC Support - Preview Mode
-(version 1.0 - December 2020)
+# VPC Support
+(version 1.0 - October 2021)
 
-This feature allows deployment of QnABot components within VPC infrastructure via a new template named public-vpc-support.json.
+This feature allows deployment of QnABot components within VPC infrastructure via a new template downloadable from 
+[aws-qnabot-vpc.template](https://solutions-reference.s3.amazonaws.com/aws-qnabot/latest/aws-qnabot-vpc.template) or by
+referencing the template in S3 using https://solutions-reference.s3.amazonaws.com/aws-qnabot/latest/aws-qnabot-vpc.template.
+
 This template is made available for use as a separate installation mechanism. It is not the default template utilized in the
-public distribution buckets. Please take care in deploying QnABot in VPC. The Elasticsearch Cluster
-becomes bound to the VPC as well as the Lambda's installed. The Elasticsearch cluster is no longer available
-outside of the VPC. All Lambdas are bound to the VPC to allow communication with the cluster. 
+public distribution. Please take care in deploying QnABot in VPC. The Elasticsearch Cluster becomes private to the VPC. In addition,
+the QnABot Lambda functions installed by the stack will be attached to subnets in the VPC. The Elasticsearch cluster is no longer available
+outside of the VPC. The Lambdas attached to the VPC allow communication with the cluster. 
 
 Two additional parameters are required by this template.
 
-- VPCSubnetIdList (two private subnets spread over two availability zones - see below)
+- VPCSubnetIdList (Important Note: two private subnets should be specified spread over two availability zones - see below)
 - VPCSecurityGroupIdList (see below)
 
 ### Requirements
 
-In order for deployment of resources attaching within a VPC two requirements
-must be met.
+In order for deployment of QnABot within a VPC two requirements must be met:
 
 1) A fully functioning VPC with a minimum of two private subnets spread over two availability zones is required. 
    These private VPC subnets should have access to AWS services. This can be accomplished using NAT Gateway with proper IGW 
@@ -34,12 +36,13 @@ using credentials for the target account.
 ```
 aws iam create-service-linked-role --aws-service-name es.amazonaws.com
 ```
-A new template has been created that supports deployment within a VPC named public-vpc-support.json. You'll find this template
-alongside the public.json template. In us-east-1 this S3 location would be
-```
-https://aws-bigdata-blog.s3.amazonaws.com/artifacts/aws-ai-qna-bot/templates/public-vpc-support.json
-```
-Launch from this template instead of the public.json template. 
+
+As mentioned earlier, a separate template is available that supports deployment within a VPC named aws-qnabot-vpc.template. You'll find this template
+alongside the standard qnabot template. You can download this template using 
+[aws-qnabot-vpc.template](https://solutions-reference.s3.amazonaws.com/aws-qnabot/latest/aws-qnabot-vpc.template) or
+reference the template in CloudFormation Launch Stack using https://solutions-reference.s3.amazonaws.com/aws-qnabot/latest/aws-qnabot-vpc.template.
+
+Launch from this template instead of the standard template. 
 
 **Note: Once QnABot has been deployed with or without VPC, the installation can't be switched. It needs
 to stay in VPC or out of VPC as first configured and can't be switched between the two. 

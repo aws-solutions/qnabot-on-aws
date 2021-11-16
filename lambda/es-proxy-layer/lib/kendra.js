@@ -30,6 +30,9 @@ function confidence_filter(minimum_score,kendra_result){
     return found
 }
 
+function response_filter(response_types,kendra_result){
+    return response_types.includes(kendra_result.Type)
+}
 function create_hit(answermessage,markdown,ssml,hit_count,debug_results,kendra){
     var hits =  {
                     "a": answermessage,
@@ -326,11 +329,12 @@ async function routeKendraRequest(event, context) {
     let faqanswerMessage = event.req["_settings"]["ALT_SEARCH_KENDRA_FAQ_MESSAGE"] + "\n\n"; //'Answer from Amazon Kendra FAQ.'
     let faqanswerMessageMd = event.req["_settings"]["ALT_SEARCH_KENDRA_FAQ_MESSAGE"]  == "" ? "" : `*${event.req["_settings"]["ALT_SEARCH_KENDRA_FAQ_MESSAGE"]}* \n`
     let minimum_score = event.req["_settings"]["ALT_SEARCH_KENDRA_FALLBACK_CONFIDENCE_SCORE"];
+    let useFullMessageForSpeech = _.get(event.req,"_settings.ALT_SEARCH_KENDRA_ABBREVIATE_MESSAGE_FOR_SSML","true").toString().toUpperCase() === "FALSE"
     let speechMessage = "";
     let helpfulLinksMsg = 'Source Link';
     let maxDocumentCount = _.get(event.req,'_settings.ALT_SEARCH_KENDRA_MAX_DOCUMENT_COUNT',2);
     var seenTop = false;
-
+    let searchTypes = _.get(event.req,"_settings.ALT_SEARCH_KENDRA_RESPONSE_TYPES","ANSWER,DOCUMENT,QUESTION_ANSWER").toUpperCase().split(",")
     let foundAnswerCount = 0;
     let foundDocumentCount = 0;
     let kendraQueryId;
@@ -343,6 +347,7 @@ async function routeKendraRequest(event, context) {
 
     var answerTextMd
     var debug_results = [];
+    let allFilteredMessages = [];
     resArray.forEach(function (res) {
 
         if (res && res.ResultItems.length > 0) {
@@ -350,7 +355,9 @@ async function routeKendraRequest(event, context) {
                 if(!confidence_filter(minimum_score,element)){
                     return;
                 }
-
+                if(!response_filter(searchTypes,element)){
+                    return;
+                }
                 if(seenTop){
                     return;
                 }
@@ -359,7 +366,7 @@ async function routeKendraRequest(event, context) {
                     element.AdditionalAttributes.length > 0 &&
                     element.AdditionalAttributes[0].Value.TextWithHighlightsValue.Text) {
                     answerMessage += '\n\n ' + element.AdditionalAttributes[0].Value.TextWithHighlightsValue.Text.replace(/\r?\n|\r/g, " ");
-                    
+                    allFilteredMessages.push(answerMessage)                    
                     // Emboldens the highlighted phrases returned by the Kendra response API in markdown format
                     answerTextMd = element.AdditionalAttributes[0].Value.TextWithHighlightsValue.Text.replace(/\r?\n|\r/g, " ");
                     // iterates over the answer highlights in sorted order of BeginOffset, merges the overlapping intervals
@@ -404,8 +411,9 @@ async function routeKendraRequest(event, context) {
 
                 } else if (element.Type === 'QUESTION_ANSWER' && element.AdditionalAttributes && element.AdditionalAttributes.length > 1) {
                     // There will be 2 elements - [0] - QuestionText, [1] - AnswerText
-                    answerMessage = faqanswerMessage + '\n\n ' + element.AdditionalAttributes[1].Value.TextWithHighlightsValue.Text.replace(/\r?\n|\r/g, " ");
-                    
+                    let message = element.AdditionalAttributes[1].Value.TextWithHighlightsValue.Text.replace(/\r?\n|\r/g, " ")
+                    answerMessage = faqanswerMessage + '\n\n ' + message;
+                    allFilteredMessages.push(message) 
                     seenTop = true; // if the answer is in the FAQ, don't show document extracts
                     answerDocumentUris=[];
                     let answerTextMd = element.AdditionalAttributes[1].Value.TextWithHighlightsValue.Text.replace(/\r?\n|\r/g, " ");
@@ -431,6 +439,7 @@ async function routeKendraRequest(event, context) {
                     // if topAnswer found, then do not show document excerpts
                     if (seenTop == false) {
                         docInfo.text = element.DocumentExcerpt.Text.replace(/\r?\n|\r/g, " ");
+                        allFilteredMessages.push(docInfo.text)
                         // iterates over the document excerpt highlights in sorted order of BeginOffset, merges overlapping intervals
                         var sorted_highlights = mergeIntervals(element.DocumentExcerpt.Highlights);
                         var j, elem;
@@ -527,7 +536,9 @@ async function routeKendraRequest(event, context) {
         });
     }
     var req = event.req;
-
+    if(useFullMessageForSpeech){
+        ssmlMessage = allFilteredMessages.length > 0 ? allFilteredMessages[0] : ssmlMessage
+    }
     hit = create_hit(message,markdown,ssmlMessage, foundAnswerCount + foundDocumentCount, debug_results,{
         kendraQueryId: kendraQueryId,
         kendraIndexId: kendraIndexId,

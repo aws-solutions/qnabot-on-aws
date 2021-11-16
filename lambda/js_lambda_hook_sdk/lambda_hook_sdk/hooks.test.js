@@ -142,7 +142,7 @@ const srcEvent = {
             "BOT_ROUTER_WELCOME_BACK_MSG": "Welcome back to QnABot.",
             "BOT_ROUTER_EXIT_MSGS": "exit,quit,goodbye,leave",
             "RUN_LAMBDAHOOK_FROM_QUERY_STEP": true,
-            "DEFAULT_USER_POOL_JWKS_URL": "https://cognito-idp.us-east-1.amazonaws.com/us-east-1_v5ufwxtwc/.well-known/jwks.json"
+            "DEFAULT_USER_POOL_JWKS_URL": "https://cognito-idp.us-east-1.amazonaws.com/us-east-1_aaabbbbcccc/.well-known/jwks.json"
         },
         "_type": "LEX",
         "_lexVersion": "V2",
@@ -354,14 +354,14 @@ const srcEvent2 = {
             "ALT_SEARCH_KENDRA_TOP_ANSWER_MESSAGE": "Amazon Kendra suggested answer.",
             "ALT_SEARCH_KENDRA_FAQ_MESSAGE": "Answer from Amazon Kendra FAQ.",
             "ALT_SEARCH_KENDRA_ANSWER_MESSAGE": "While I did not find an exact answer, these search results from Amazon Kendra might be helpful.",
-            "KENDRA_FAQ_INDEX": "56ed5cac-9e5c-44b9-a966-3d05cc4e3a64",
+            "KENDRA_FAQ_INDEX": "aaaabbbcccccccc",
             "KENDRA_FAQ_CONFIG_MAX_RETRIES": 8,
             "KENDRA_FAQ_CONFIG_RETRY_DELAY": 600,
             "KENDRA_FAQ_ES_FALLBACK": true,
             "ENABLE_KENDRA_WEB_INDEXER": true,
             "KENDRA_INDEXER_URLS": "https://aws.amazon.com/kendra/",
             "KENDRA_INDEXER_SCHEDULE": "rate(1 day)",
-            "KENDRA_WEB_PAGE_INDEX": "56ed5cac-9e5c-44b9-a966-3d05cc4e3a64",
+            "KENDRA_WEB_PAGE_INDEX": "aaaaaabbbbccccccc",
             "ERRORMESSAGE": "Unfortunately I encountered an error when searching for your answer. Please ask me again later.",
             "EMPTYMESSAGE": "You stumped me! Sadly I do not know how to answer your question.",
             "DEFAULT_ALEXA_LAUNCH_MESSAGE": "Hello, Please ask a question",
@@ -393,7 +393,7 @@ const srcEvent2 = {
             "BOT_ROUTER_WELCOME_BACK_MSG": "Welcome back to QnABot.",
             "BOT_ROUTER_EXIT_MSGS": "exit,quit,goodbye,leave",
             "RUN_LAMBDAHOOK_FROM_QUERY_STEP": true,
-            "DEFAULT_USER_POOL_JWKS_URL": "https://cognito-idp.us-east-1.amazonaws.com/us-east-1_v5ufwxtwc/.well-known/jwks.json"
+            "DEFAULT_USER_POOL_JWKS_URL": "https://cognito-idp.us-east-1.amazonaws.com/us-east-1_vaaabbbccc/.well-known/jwks.json"
         },
         "_type": "LEX",
         "_lexVersion": "V2",

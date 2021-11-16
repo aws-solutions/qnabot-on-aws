@@ -3,9 +3,9 @@ v-container#page-import(column, grid-list-md)
   v-layout(column)
     v-flex
       v-card
-        v-card-title.display-1.pa-2 Kendra Web Page Indexing
+        v-card-title.display-1.pa-2 Kendra Web Crawling
         v-card-text
-          h3 For more information about Kendra Indexing, see <a href="https://github.com/aws-samples/aws-ai-qna-bot/blob/master/docs/kendra_crawler_guide/README.md" target="_blank">here</a>
+          h3 For more information about Kendra Web Crawling, see <a href="https://github.com/aws-samples/aws-ai-qna-bot/blob/master/docs/kendra_crawler_guide/README.md" target="_blank">here</a>
         v-card-text(v-if="kendraIndexerEnabled == true")
           p Current Status {{ status }}
         v-card-text(v-if="!kendraIndexerEnabled")
@@ -18,9 +18,12 @@ v-container#page-import(column, grid-list-md)
           v-btn#btnKendraStartIndex(
             :disabled="status == 'PENDING' || status == 'STARTING' || !kendraIndexerEnabled",
             @click="start"
-          ) Start Indexing
+          ) Start Crawling
         v-flex(v-if="history && history.length > 0")
-          v-card-title.headline Kendra Indexing History
+          v-card-title.headline Kendra Crawling History
+          v-card-text
+            h3 <a :href="dashboard_url" target="_blank">View Web Crawling Errors in CloudWatch </a>
+
           v-card-text
             table.table
               tr
@@ -28,8 +31,10 @@ v-container#page-import(column, grid-list-md)
                 th(style="text-align: left") End Time
                 th(style="text-align: left") Status
                 th(style="text-align: left") Error Message
+                th(style="text-align: left") Documents Scanned
                 th(style="text-align: left") Documents Added
                 th(style="text-align: left") Documents Modified
+                th(style="text-align: left") Documents Deleted
                 th(style="text-align: left") Documents Failed
 
               template(v-for="(job, index) in history")
@@ -38,24 +43,16 @@ v-container#page-import(column, grid-list-md)
                   td {{ convertToLocalTime(job.EndTime) }}
                   td {{ job.Status }}
                   td {{ job.ErrorMessage }}
+                  td {{ job.Metrics.DocumentsScanned }}
                   td {{ job.Metrics.DocumentsAdded }}
                   td {{ job.Metrics.DocumentsModified }}
                   td {{ job.Metrics.DocumentsDeleted }}
+                  td {{ job.Metrics.DocumentsFailed }}
 </template>
 
 <script>
-/*
-Copyright 2017-2017 Amazon.com, Inc. or its affiliates. All Rights Reserved.
-
-Licensed under the Amazon Software License (the "License"). You may not use this file
-except in compliance with the License. A copy of the License is located at
-
-http://aws.amazon.com/asl/
-
-or in the "license" file accompanying this file. This file is distributed on an "AS IS"
-BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied. See the
-License for the specific language governing permissions and limitations under the License.
-*/
+// Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+// SPDX-License-Identifier: Apache-2.0
 
 var Vuex = require("vuex");
 var Promise = require("bluebird");
@@ -67,6 +64,7 @@ module.exports = {
     var self = this;
     return {
       status: "",
+      dashboard_url:"",
       history: {},
       dialog: false,
       text: false,
@@ -101,6 +99,7 @@ module.exports = {
               self.intervalBetweenPoll = 20000
               return
             }
+            self.dashboard_url = data.DashboardUrl;
             self.status = data.Status;
             self.history = data.History;
             self.intervalBetweenPoll = 10000
@@ -135,7 +134,7 @@ module.exports = {
   methods: {
     start: async function () {
       this.$store
-        .dispatch("api/startKendraIndexing")
+        .dispatch("api/startKendraV2Indexing")
         .catch((err) =>
           console.log(`error while trying to start indexing ` + err)
         );
@@ -152,6 +151,9 @@ module.exports = {
       return result;
     },
     convertToLocalTime: function (isoDateTime) {
+      if(isoDateTime == ""){
+        return ""
+      }
       var isoDateTime = new Date(isoDateTime);
       return (
         isoDateTime.toLocaleDateString() +
