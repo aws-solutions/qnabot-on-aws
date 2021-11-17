@@ -1,0 +1,128 @@
+{
+  "qna": [
+    {
+      "qid": "ClientFiltering.AnySchool.Academics.Majors.Engineering",
+      "a": "The following are undergraduate majors available for a Bachelor of Engineering degree:\nEnvironmental Engineering\nElectrical Engineering\nComputer Engineering\nIndustrial Engineering\nMechanical Engineering",
+      "alt": {
+        "ssml": "The following are undergraduate majors available for a Bachelor of Engineering degree:\nEnvironmental Engineering, Electrical Engineering, Computer Engineering, Industrial Engineering, and Mechanical Engineering",
+        "markdown": "The following are undergraduate majors available for a Bachelor of Engineering degree:\n- Environmental Engineering\n- Electrical Engineering\n- Computer Engineering\n- Industrial Engineering\n- Mechanical Engineering"
+      },
+      "clientFilterValues": "engineering",
+      "type": "qna",
+      "q": [
+        "What undergraduate majors are available?"
+      ]
+    },
+    {
+      "qid": "ClientFiltering.SetFilter.Engineering",
+      "a": "{{setSessionAttr 'QNAClientFilter' 'engineering'}} The filter has been set to engineering. You should now only get answers with the filter either not set at all, or set to engineering.",
+      "alt": {
+        "markdown": "{{setSessionAttr 'QNAClientFilter' 'engineering'}} The filter has been set to engineering. You should now only get answers with the filter either not set at all, or set to engineering."
+      },
+      "type": "qna",
+      "q": [
+        "Set SessionAttribute QNAClientFilter to: engineering"
+      ]
+    },
+    {
+      "qid": "ClientFiltering.Start",
+      "a": "Which department would you like to discuss?",
+      "r": {
+        "title": "Options",
+        "buttons": [
+          {
+            "text": "School of Engineering",
+            "value": "QID::ClientFiltering.SetFilter.Engineering"
+          },
+          {
+            "text": "School of Information Science",
+            "value": "QID::ClientFiltering.SetFilter.SCI"
+          },
+          {
+            "text": "Neither (Clear the client filter)",
+            "value": "QID::set.unfiltered"
+          }
+        ]
+      },
+      "type": "qna",
+      "q": [
+        "Hello"
+      ]
+    },
+    {
+      "qid": "ClientFiltering.SetFilter.SCI",
+      "a": "{{setSessionAttr 'QNAClientFilter' 'sci'}} The filter has been set to Information Science. You should now only get answers with the filter either not set at all, or set to science.",
+      "alt": {
+        "markdown": "{{setSessionAttr 'QNAClientFilter' 'sci'}} The filter has been set to science. You should now only get answers with the filter either not set at all, or set to science."
+      },
+      "type": "qna",
+      "q": [
+        "Set SessionAttribute QNAClientFilter  to Science"
+      ]
+    },
+    {
+      "qid": "set.unfiltered",
+      "a": "{{setSessionAttr 'QNAClientFilter' ''}} The filter has been cleared. You will now  only get answers that do NOT have a client filter set.",
+      "alt": {
+        "markdown": "{{setSessionAttr 'QNAClientFilter' ''}} The filter has been cleared. You will now  only get answers that do NOT have a client filter set."
+      },
+      "type": "qna",
+      "q": [
+        "Clear SessionAttribute QNAClientFilter"
+      ]
+    },
+    {
+      "qid": "ClientFiltering.AnySchool.Academics.Majors.SCI",
+      "a": "The following are undergraduate majors available for a Bachelor of Science degree:\nComputational Biology\nComputer Science\nData Science\nInformation Science",
+      "alt": {
+        "ssml": "The following are undergraduate majors available for a Bachelor of Science degree:\nComputational Biology, Computer Science, Data Science and Information Science",
+        "markdown": "The following are undergraduate majors available for a Bachelor of Science degree:\n- Computational Biology\n- Computer Science\n- Data Science\n- Information Science"
+      },
+      "clientFilterValues": "sci",
+      "type": "qna",
+      "q": [
+        "What undergraduate majors are available?"
+      ]
+    },
+    {
+      "qid": "ClientFiltering.AnySchool.Admin.Engineering",
+      "a": "The office of administration is located at: 123 Example Hall, AnyTown, WA 98101.\nPlease call (555)-012-3456 if you would like to speak with an administrator from the office before your visit.",
+      "alt": {
+        "ssml": "The AnySchool Office of Administration, is located at: 123 Example Hall, AnyTown WA, 98101.\nPlease call (555)-012-3456, if you would like to speak with an administrator from the office before your visit.",
+        "markdown": "The office of administration is located at: <addrss>123 Example Hall, AnyTown, WA 98101</address>. </br>\nPlease call (555)-012-3456 if you would like to speak with an administrator from the office before your visit."
+      },
+      "clientFilterValues": "engineering",
+      "type": "qna",
+      "q": [
+        "Where is the administration office"
+      ]
+    },
+    {
+      "qid": "ClientFiltering.AnySchool.Admin.SCI",
+      "a": "The office of administration is located at: Information Science Building, third floor 123 Main Street, AnyTown, WA 98101.\nPlease call 555-01-2346 if you would like to speak with an administrator from the office before your visit.",
+      "alt": {
+        "ssml": "The office of administration, is located at: Information Science Building, third floor, 123 Main Street, AnyTown, WA, 98101.\nPlease call 555-01-2346, if you would like to speak with an administrator from the office before your visit.",
+        "markdown": "The office of administration is located at: Information Science Building, third floor <address>123 Main Street, AnyTown, WA 98101</address>.\nPlease call 555-01-2346 if you would like to speak with an administrator from the office before your visit."
+      },
+      "clientFilterValues": "sci",
+      "type": "qna",
+      "q": [
+        "Where is the administration office"
+      ]
+    },
+    {
+      "qid": "ClientFiltering.AnySchool.FinancialAid",
+      "a": "Financial aid awards, scholarships, and payment plans can be accessed online at AnySchool.example.com.",
+      "alt": {
+        "markdown": "Financial aid awards, scholarships, and payment plans can be accessed online at  [our portal](https://anyschool.example.com)."
+      },
+      "clientFilterValues": "engineering sci",
+      "type": "qna",
+      "q": [
+        "Where can I access financial aid and scholarship information?",
+        "How do I apply for financial aid",
+        "How do i apply for scholarships"
+      ]
+    }
+  ]
+}

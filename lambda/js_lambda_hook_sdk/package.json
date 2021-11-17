@@ -1,0 +1,22 @@
+{
+  "name": "js_lambda_hook_sdk",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "directories": {
+    "lib": "lib"
+  },
+  "scripts": {
+    "test": "jest"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "lodash": "^4.17.21"
+  },
+  "devDependencies": {
+    "install": "^0.13.0",
+    "jest": "^27.0.6",
+    "npm": "^7.20.1"
+  }
+}
