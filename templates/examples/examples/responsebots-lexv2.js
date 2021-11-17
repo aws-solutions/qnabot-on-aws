@@ -53,7 +53,7 @@ exports.resources={
                         },
                         "declinationResponse": {
                             "messageGroups": [{
-                                "message": {"plainTextMessage": {"value": "Please let me what your wage was again?"}}
+                                "message": {"plainTextMessage": {"value": "Please tell me your wage again."}}
                             }]
                         }
                     }, 
@@ -151,7 +151,7 @@ exports.resources={
                         },
                         "declinationResponse": {
                             "messageGroups": [{
-                                "message": {"plainTextMessage": {"value": "Please let me know the social security number again?"}}
+                                "message": {"plainTextMessage": {"value": "Please let me know the social security number again."}}
                             }]
                         }
                     }, 
@@ -659,7 +659,7 @@ exports.resources={
                         },
                         "declinationResponse": {
                             "messageGroups": [{
-                                "message": {"plainTextMessage": {"value": "Please let me know the date again?"}}
+                                "message": {"plainTextMessage": {"value": "Please let me know the date again."}}
                             }]
                         }
                     }, 
@@ -883,7 +883,7 @@ exports.resources={
                         },
                         "declinationResponse": {
                             "messageGroups": [{
-                                "message": {"plainTextMessage": {"value": "Please let me know the day of the week again?"}}
+                                "message": {"plainTextMessage": {"value": "Please let me know the day of the week again."}}
                             }]
                         }
                     }, 
@@ -1054,7 +1054,7 @@ exports.resources={
                         },
                         "declinationResponse": {
                             "messageGroups": [{
-                                "message": {"plainTextMessage": {"value": "Please let me know the month again?"}}
+                                "message": {"plainTextMessage": {"value": "Please let me know the month again."}}
                             }]
                         }
                     }, 
@@ -1298,7 +1298,7 @@ exports.resources={
                         },
                         "declinationResponse": {
                             "messageGroups": [{
-                                "message": {"plainTextMessage": {"value": "Please let me know the number again?"}}
+                                "message": {"plainTextMessage": {"value": "Please let me know the number again."}}
                             }]
                         }
                     }, 
@@ -1465,7 +1465,7 @@ exports.resources={
                         },
                         "declinationResponse": {
                             "messageGroups": [{
-                                "message": {"plainTextMessage": {"value": "Please let me know the age again?"}}
+                                "message": {"plainTextMessage": {"value": "Please let me know the age again."}}
                             }]
                         }
                     }, 
@@ -1551,7 +1551,7 @@ exports.resources={
                         },
                         "declinationResponse": {
                             "messageGroups": [{
-                                "message": {"plainTextMessage": {"value": "Please let me know the phone number again?"}}
+                                "message": {"plainTextMessage": {"value": "Please let me know the phone number again."}}
                             }]
                         }
                     }, 
@@ -1711,7 +1711,7 @@ exports.resources={
                         },
                         "declinationResponse": {
                             "messageGroups": [{
-                                "message": {"plainTextMessage": {"value": "Please let me know the time again?"}}
+                                "message": {"plainTextMessage": {"value": "Please let me know the time again."}}
                             }]
                         }
                     }, 
@@ -1796,7 +1796,7 @@ exports.resources={
                         },
                         "declinationResponse": {
                             "messageGroups": [{
-                                "message": {"plainTextMessage": {"value": "Please let me know the email address again?"}}
+                                "message": {"plainTextMessage": {"value": "Please let me know the email address again."}}
                             }]
                         }
                     }, 
@@ -1886,7 +1886,7 @@ exports.resources={
                         },
                         "declinationResponse": {
                             "messageGroups": [{
-                                "message": {"plainTextMessage": {"value": "Please let me know your name again?"}}
+                                "message": {"plainTextMessage": {"value": "Please let me know your name again."}}
                             }]
                         }
                     }, 

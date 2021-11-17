@@ -103,7 +103,7 @@ exports.resources={
             rejectionStatement: {
                 messages: [
                     {
-                        content: "Please let me what your wage was again?",
+                        content: "Please let me know what your wage was again.",
                         contentType: "PlainText"
                     }
                 ]
@@ -230,7 +230,7 @@ exports.resources={
             rejectionStatement: {
                 messages: [
                     {
-                        content: "Please let me know the social security number again?",
+                        content: "Please let me know the social security number again.",
                         contentType: "PlainText"
                     }
                 ]
@@ -739,7 +739,7 @@ exports.resources={
             rejectionStatement: {
                 messages: [
                     {
-                        content: "Please let me know the date again?",
+                        content: "Please let me know the date again.",
                         contentType: "PlainText"
                     }
                 ]
@@ -945,7 +945,7 @@ exports.resources={
             rejectionStatement: {
                 messages: [
                     {
-                        content: "Please let me know the day again?",
+                        content: "Please let me know the day again.",
                         contentType: "PlainText"
                     }
                 ]
@@ -1054,7 +1054,7 @@ exports.resources={
             rejectionStatement: {
                 messages: [
                     {
-                        content: "Please let me know the month again?",
+                        content: "Please let me know the month again.",
                         contentType: "PlainText"
                     }
                 ]
@@ -1254,7 +1254,7 @@ exports.resources={
             rejectionStatement: {
                 messages: [
                     {
-                        content: "Please let me know the number again?",
+                        content: "Please let me know the number again.",
                         contentType: "PlainText"
                     }
                 ]
@@ -1461,7 +1461,7 @@ exports.resources={
             rejectionStatement: {
                 messages: [
                     {
-                        content: "Please let me know the age again?",
+                        content: "Please let me know the age again.",
                         contentType: "PlainText"
                     }
                 ]
@@ -1572,7 +1572,7 @@ exports.resources={
             rejectionStatement: {
                 messages: [
                     {
-                        content: "Please let me know the phone number again?",
+                        content: "Please let me know the phone number again.",
                         contentType: "PlainText"
                     }
                 ]
@@ -1771,7 +1771,7 @@ exports.resources={
             rejectionStatement: {
                 messages: [
                     {
-                        content: "Please let me know the time again?",
+                        content: "Please let me know the time again.",
                         contentType: "PlainText"
                     }
                 ]
@@ -1878,7 +1878,7 @@ exports.resources={
             rejectionStatement: {
                 messages: [
                     {
-                        content: "Please let me know the email address again?",
+                        content: "Please let me know the email address again.",
                         contentType: "PlainText"
                     }
                 ]
@@ -1990,7 +1990,7 @@ exports.resources={
             rejectionStatement: {
                 messages: [
                     {
-                        content: "Please let me know your name again?",
+                        content: "Please let me know your name again.",
                         contentType: "PlainText"
                     }
                 ]
