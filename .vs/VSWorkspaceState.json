@@ -1,0 +1,15 @@
+{
+  "ExpandedNodes": [
+    "",
+    "\\.github",
+    "\\assets",
+    "\\docs",
+    "\\templates",
+    "\\templates\\examples",
+    "\\templates\\examples\\examples",
+    "\\tuning_accuracy_guide",
+    "\\utility_scripts",
+    "\\website"
+  ],
+  "PreviewInSolutionExplorer": false
+}
