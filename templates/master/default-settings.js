@@ -42,7 +42,7 @@ var default_settings = {
     ENFORCE_VERIFIED_IDENTITY: "false", // set to true to make QnABot require verified identity from client
     NO_VERIFIED_IDENTITY_QUESTION: "no_verified_identity", // if user identity cannot be verified, replace question string with this. 
     ELICIT_RESPONSE_MAX_RETRIES: 3, // Number of times an elicitResponse LexBot can be called before giving up when the Bot returns Failed
-    ELICIT_RESPONSE_RETRY_MESSAGE: "Please try again?", // Default retry message when working with LexBot
+    ELICIT_RESPONSE_RETRY_MESSAGE: "Please try again.", // Default retry message when working with LexBot
     ELICIT_RESPONSE_BOT_FAILURE_MESSAGE: "Your response was not understood. Please start again.", // Message used when maximum number of retries is exceeded
     ELICIT_RESPONSE_DEFAULT_MSG: "Ok. ", // Ok. with an intentional blank space after the period
     CONNECT_IGNORE_WORDS: "", // Throw error if connect client sends individual characters not processable by elastic search
