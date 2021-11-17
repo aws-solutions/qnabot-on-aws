@@ -226,7 +226,7 @@ async function processResponse(req, res, hook, msg) {
     }
 
     const maxElicitResponseLoopCount = _.get(req, '_settings.ELICIT_RESPONSE_MAX_RETRIES', 5);
-    const elicit_Response_Retry_Message = _.get(req, '_settings.ELICIT_RESPONSE_RETRY_MESSAGE', "Please try again?");
+    const elicit_Response_Retry_Message = _.get(req, '_settings.ELICIT_RESPONSE_RETRY_MESSAGE', "Please try again.");
 
     let botResp = await handleRequest(req, res, hook, "live");
     qnabot.log("botResp: " + JSON.stringify(botResp,null,2));
