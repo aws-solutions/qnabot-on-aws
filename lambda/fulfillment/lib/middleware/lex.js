@@ -131,7 +131,15 @@ function slackifyResponse(response) {
         let md = response.result.alt.markdown;
         qnabot.log("Converting markdown response to Slack format.");
         qnabot.log("Original markdown: ", JSON.stringify(md));
+
+        md = md.replace(/<\/?span[^>]*>/g,"");  // remove any span tags (eg no-translate tags)
+        md = md.replace(/<\/?br *\/?>/g,"\n"); // replace br with \n
+
         md = slackifyMarkdown(md);
+
+        //decode URIs in markdown -- slackify-markdown encodes URI. If presented with an encoded URI, slackify-markdown is double encoding URIs
+        md = decodeURI (md); 
+
         response.message = md ;
         qnabot.log("Converted markdown: ", JSON.stringify(md));
     } 

@@ -148,6 +148,8 @@ function clean(obj){
         }
         var out=_.pickBy(obj)
         return _.keys(out).length ? out : null
+    }else if(typeof obj==="boolean"){
+      return obj
     }else if(obj.trim){
         return obj.trim() || null
     }else{

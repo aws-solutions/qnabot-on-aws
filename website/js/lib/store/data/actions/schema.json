@@ -15,6 +15,12 @@
                     "a":{
                         "type":"string"
                     },
+                    "sa":{
+                        "type": "array",
+                        "items": {
+                            "type":["object"]
+                        }
+                    },
                     "qid":{
                         "type":"string"
                     },
