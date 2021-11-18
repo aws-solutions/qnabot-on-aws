@@ -152,7 +152,14 @@ module.exports= async (event, context, callback) => {
         event.minimum_score = _.get(settings, 'ALT_SEARCH_KENDRA_FAQ_CONFIDENCE_SCORE', "MEDIUM")
         var question = _.get(event,'question','');
         var topic = _.get(event,'topic','');
-        let okKendraQuery = (question.length > 0 && topic.length == 0 && kendra_index != "") ;
+        // Use kendra only if 
+        // - question is not empty
+        // - question has two or more words
+        // - topic is not set
+        // - and a kendra index is specified
+        // NOTE: Logic must be consistent with query.js function isESOnly() to ensure Content Designer Test tab
+        // and runtime bot question handling behave consistently. 
+        let okKendraQuery = (question.length > 0 && question.split(" ").length  > 1 && topic.length == 0 && kendra_index != "") ;
         if ( okKendraQuery ) {
             var response = await run_query_kendra(event, kendra_index);
             // ES fallback if KendraFAQ fails
