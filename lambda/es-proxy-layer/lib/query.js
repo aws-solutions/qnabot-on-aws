@@ -428,6 +428,12 @@ function update_res_with_hit(req, res, hit) {
         })
     }
 
+    // Add tags to the res object
+    const tags = _.get(hit, "tags");
+    if (tags){
+        _.set(res, 'tags', tags);
+    }
+
     // Add answerSource for query hits
     var ansSource = _.get(hit, "answersource", "unknown");
     if (ansSource==="Kendra FAQ") { // kendra fallback sets answerSource directly

@@ -76,6 +76,7 @@ module.exports=function(event, context, callback){
         }
     }
 
+    // constructing the object to be logged in ES (to visualize in Kibana)
     let jsonData = {
         entireRequest: req,
         entireResponse: res,
@@ -85,8 +86,9 @@ module.exports=function(event, context, callback){
         topic: _.get(res.result, "t", ""),
         session: sessionAttributes,
         clientType: req._clientType,
+        tags: _.get(res, "tags", ""),
         datetime: now
-    }
+    };
 
     if (cloudwatchLoggingDisabled) {
         jsonData.entireRequest = undefined;
@@ -96,14 +98,14 @@ module.exports=function(event, context, callback){
     // encode to base64 string to put into firehose and
     // append new line for proper downstream kinesis processing in kibana and/or athena queries over s3
     var objJsonStr = JSON.stringify(jsonData) + '\n';
-    var firehose = new aws.Firehose()
+    var firehose = new aws.Firehose();
     
     var params = {
           DeliveryStreamName: process.env.FIREHOSE_NAME, /* required */
           Record: { /* required */
             Data: Buffer.from(objJsonStr) /* Strings will be Base-64 encoded on your behalf */ /* required */
         }
-    }
+    };
     
     firehose.putRecord(params, function(err, data) {
       if (err) qnabot.log(err, err.stack) // an error occurred
