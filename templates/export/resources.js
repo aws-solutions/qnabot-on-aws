@@ -109,7 +109,7 @@ module.exports = Object.assign(
         "Environment": {
           "Variables": {
             outputBucket: {"Ref": "ExportBucket"},
-            s3Prefix: "connect/",
+            s3Prefix: "genesys/",
             accountId: {"Ref": "AWS::AccountId"},
             region: {"Ref": "AWS::Region"},
             LexVersion: {"Ref": "LexVersion"},
