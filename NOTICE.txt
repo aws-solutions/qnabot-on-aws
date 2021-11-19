@@ -41,6 +41,7 @@ babel-preset-es2015-ie the Massachusetts Institute of Technology (MIT) license
 bluebird under the Massachusetts Institute of Technology (MIT) license
 body-parser under the Massachusetts Institute of Technology (MIT) license
 bowser under the Massachusetts Institute of Technology (MIT) license
+canvasapi under Massachusetts Institute of Technology (MIT) License
 cfn-response under the Amazon Software License
 chalk under the Massachusetts Institute of Technology (MIT) license
 chrome-aws-lambda under the Massachusetts Institute of Technology (MIT) license
@@ -55,6 +56,7 @@ exports-loader under the Massachusetts Institute of Technology (MIT) license
 express under the Massachusetts Institute of Technology (MIT) license
 faker under the Massachusetts Institute of Technology (MIT) license
 file-saver under the Massachusetts Institute of Technology (MIT) license
+fuzzywuzzy under GNU General Public License v2 (GPLv2) (GPLv2)
 handlebars under the Massachusetts Institute of Technology (MIT) license
 handlebars-loader under the Massachusetts Institute of Technology (MIT) license
 highlight.js under BSD-3-Clause license
@@ -88,6 +90,7 @@ pug under the Massachusetts Institute of Technology (MIT) license
 pug-loader under the Massachusetts Institute of Technology (MIT) license
 pug-plain-loader under the Massachusetts Institute of Technology (MIT) license
 pug-runtime under the Massachusetts Institute of Technology (MIT) license
+python-Levenshtein under GNU General Public License v2 or later (GPLv2+) (GPL)
 query-string under the Massachusetts Institute of Technology (MIT) license
 querystring under the Massachusetts Institute of Technology (MIT) license
 querystring-browser under the Massachusetts Institute of Technology (MIT) license
