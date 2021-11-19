@@ -21,12 +21,17 @@ from canvasapi import Canvas
 
 
 MATCHING_TOLERANCE_SCORE = 70   #used for matching accuracy with fuzzy match
+api_token = '' #variable to hold the value of API_Token stored in AWS Secrets Manager
+canvas = None   #variable to hold the Canvas object
 
-#----------------------------------------------------------------------
-# function: get_secret
-#----------------------------------------------------------------------
-def get_secret(secrets_id_name):
 
+"""
+function: get_secret from AWS Secrets Manager
+This function retrieves the secret string from AWS Secrets Manager. 
+We will retrieve the Canvas API Token using this function. 
+Refer to the readme for more details on how to store secret in AWS Secrets Manager, and configure QnABot with the secret key name. 
+"""
+def get_secret(secrets_name):
     region_name = os.environ['AWS_REGION']
 
     # Create a Secrets Manager client
@@ -42,162 +47,150 @@ def get_secret(secrets_id_name):
 
     try:
         get_secret_value_response = client.get_secret_value(
-            SecretId=secrets_id_name
+            SecretId=secrets_name
         )
-    except ClientError as e:
-        if e.response['Error']['Code'] == 'DecryptionFailureException':
-            # Secrets Manager can't decrypt the protected secret text using the provided KMS key.
-            # Deal with the exception here, and/or rethrow at your discretion.
-            raise e
-        elif e.response['Error']['Code'] == 'InternalServiceErrorException':
-            # An error occurred on the server side.
-            # Deal with the exception here, and/or rethrow at your discretion.
-            raise e
-        elif e.response['Error']['Code'] == 'InvalidParameterException':
-            # You provided an invalid value for a parameter.
-            # Deal with the exception here, and/or rethrow at your discretion.
-            raise e
-        elif e.response['Error']['Code'] == 'InvalidRequestException':
-            # You provided a parameter value that is not valid for the current state of the resource.
-            # Deal with the exception here, and/or rethrow at your discretion.
-            raise e
-        elif e.response['Error']['Code'] == 'ResourceNotFoundException':
-            # We can't find the resource that you asked for.
-            # Deal with the exception here, and/or rethrow at your discretion.
-            raise e
-    else:
         # Decrypts secret using the associated KMS CMK.
         # Depending on whether the secret is a string or binary, one of these fields will be populated.
         if 'SecretString' in get_secret_value_response:
             secret = get_secret_value_response['SecretString']
+            secret = json.loads(get_secret_value_response['SecretString'])['API_Token']
         else:
             decoded_binary_secret = base64.b64decode(get_secret_value_response['SecretBinary'])
+            secret = decoded_binary_secret.API_Token
+    except ClientError as e:
+        print ("ERROR: "+ str(e))  #print the exception
+        raise str(e)
 
     #return the API token
-    return json.loads(get_secret_value_response['SecretString'])['API_Token']
+    return secret
 
 
-#----------------------------------------------------------------------
-# function to get Canvas User by using  user_id to match with LMS SIS_ID
-#----------------------------------------------------------------------
-
+"""
+function to get Canvas User
+This function retrieves the Canvas user by using the SIS Login ID
+"""
 def getCanvasUser (param_canvas, param_user_name):
     user = param_canvas.get_user(param_user_name, 'sis_login_id')
     return user
 
-#----------------------------------------------------------------------
-# function: query_enrollments_for_student
-#----------------------------------------------------------------------
-def query_enrollments_for_student(canvas, student_user_name, userinput):
-    enrollments_for_student = 'You are not currently enrolled in any courses.'
 
+"""
+function: query_enrollments_for_student
+This function retrieves students' active enrollments 
+"""
+def query_enrollments_for_student(canvas, student_user_name, userinput):
     # Get the user using user_id to match with LMS SIS_ID
     user = getCanvasUser (canvas, student_user_name)
 
     if user:
         courses = user.get_courses(enrollment_status='active',include=['syllabus_body'])
 
-        course_name = []
+        course_names = []
         if courses: 
             # Loop through the courses.
-            for course in courses:
-                course_name.append(course.name)
+            course_names = [course.name for course in courses]
 
-    result = {"CourseNames": course_name}
+    result = {"CourseNames": course_names}
     return result
     
 
-#----------------------------------------------------------------------
-# function: query_choices_for_student
-#----------------------------------------------------------------------
-def query_choices_for_student(canvas, student_user_name, userinput):
+"""
+function: query_courses_for_student
+This function performs a fuzzy matching logic to find a matching course based on user input
+for example: more information about {course name}
+"""
+def query_courses_for_student(canvas, student_user_name, userinput):
     # Get the user using user_id to match with LMS SIS_ID
     user = getCanvasUser (canvas, student_user_name)
     
     if user:
         courses = user.get_courses(enrollment_status='active')
         if courses: 
-            course_name = []
+            course_names = []
             # Loop through the courses.
-            for course in courses:
-                course_name.append(course.name)
-            choice = process.extractOne(userinput, course_name, scorer=fuzz.token_set_ratio)
+            course_names = [course.name for course in courses]
+            choice = process.extractOne(userinput, course_names, scorer=fuzz.token_set_ratio)
 
     result = {"Choice": choice[0]}
     return result
 
 
-#----------------------------------------------------------------------
-# function: query_course_assignments_for_student
-#----------------------------------------------------------------------
+"""
+function: query_course_assignments_for_student
+This function retrieves assignment information across all active enrolled courses, or for a particular course, for the student
+Also performs a fuzzy matching logic to find a matching course based on user input
+for example: do i have any assignments due or do i have any assignments due in {course name}
+"""
 def query_course_assignments_for_student(canvas, student_user_name, userinput):
     course_assignments = ''
     blnHasAssignments = False
+    blnFoundMatch = False
 
     # Get the user using user_id to match with LMS SIS_ID
     user = getCanvasUser (canvas, student_user_name)
     
     if user:
-        course_list = []
+        course_names = []
         courses = user.get_courses(enrollment_status='active')
     
         # Loop through the courses.
-        for course in courses:
-            course_list.append(course.name)
-        choice = process.extractOne(userinput, course_list, scorer=fuzz.token_set_ratio)
+        course_names = [course.name for course in courses]
+        choice = process.extractOne(userinput, course_names, scorer=fuzz.token_set_ratio)
 
         for course in courses:
             blnHasAssignments = False
+            blnFoundMatch = False
+
             #check for matching userinput with course names
             if course.name == choice[0] and choice[1] > MATCHING_TOLERANCE_SCORE:
+                blnFoundMatch = True
+
+            if blnFoundMatch == True:
                 course_assignments = "<b>" + course.name + "</b> <ul>"
-                # Loop through the assignments that have not been submitted
-                for assignment in course.get_assignments(bucket='unsubmitted'):
-                    blnHasAssignments = True
-                    if assignment.due_at:
-                        due_date = datetime.datetime.strptime(assignment.due_at,'%Y-%m-%dT%H:%M:%SZ')
-                        due_date_string = '{0}, {1} {2}, {3}'.format(calendar.day_name[due_date.weekday()], due_date.strftime("%B"), due_date.strftime("%-d"), due_date.strftime("%Y"))
-                        course_assignments += "<li>{} -- is due: {}</li>".format(assignment.name, due_date_string)
-                    else:
-                        course_assignments += "<li>{} -- has no due date</li>".format(assignment.name)
-                break
             else:
-                # Loop through the assignments that have not been submitted
-                course_assignments += "<b>" + course.name + "</b> <ul>"
-                for assignment in course.get_assignments(bucket='unsubmitted'):
-                    blnHasAssignments = True
-                    if assignment.due_at:
-                        due_date = datetime.datetime.strptime(assignment.due_at,'%Y-%m-%dT%H:%M:%SZ')
-                        due_date_string = '{0}, {1} {2}, {3}'.format(calendar.day_name[due_date.weekday()], due_date.strftime("%B"), due_date.strftime("%-d"), due_date.strftime("%Y"))
-                        course_assignments += "<li>{} -- is due: {}</li>".format(assignment.name, due_date_string)
-                    else:
-                        course_assignments += "<li>{} -- has no due date</li>".format(assignment.name)
+                course_assignments += "<b>" + course.name + "</b> <ul>"                
+
+            # Loop through the assignments that have not been submitted
+            for assignment in course.get_assignments(bucket='unsubmitted'):
+                blnHasAssignments = True
+                if assignment.due_at:   #check if assignments have due dates
+                    due_date = datetime.datetime.strptime(assignment.due_at,'%Y-%m-%dT%H:%M:%SZ')
+                    due_date_string = '{0}, {1} {2}, {3}'.format(calendar.day_name[due_date.weekday()], due_date.strftime("%B"), due_date.strftime("%-d"), due_date.strftime("%Y"))
+                    course_assignments += "<li>{} -- is due: {}</li>".format(assignment.name, due_date_string)
+                else:
+                    course_assignments += "<li>{} -- has no due date</li>".format(assignment.name)
 
             if blnHasAssignments == False:
                 course_assignments += "There are no assignments for this course."
 
             course_assignments += "</ul><br>"
 
+            #if found a matching course based on fuzzy matching logic, then break from the course For loop
+            if blnFoundMatch == True:
+                break
+
     result = {"CourseAssignments": course_assignments}
     return result
 
 
-#----------------------------------------------------------------------
-# function: query_announcements_for_student
-#----------------------------------------------------------------------
+"""
+function: query_announcements_for_student
+This function retrieves any announcements across all active enrolled courses for the student
+for example: do i have any announcements
+"""
 def query_announcements_for_student(canvas, student_user_name, userinput):
     course_announcements = '<ul>'
 
     # Get the user using user_id to match with LMS SIS_ID
     user = getCanvasUser (canvas, student_user_name)
 
-    course_list = []
+    course_names = []
     if user:
         courses = user.get_courses(enrollment_status='active')
     
         # Loop through the courses.
         for course in courses:
-            course_list.append(course.name)
+            course_names.append(course.name)
             for discussion_topic in canvas.get_announcements(context_codes=[course.id]): 
                 if discussion_topic:
                     announcement_date = datetime.datetime.strftime(discussion_topic.posted_at_date,"%b %d %Y %-I:%M %p")
@@ -211,21 +204,25 @@ def query_announcements_for_student(canvas, student_user_name, userinput):
     result = {"Announcements": course_announcements}
     return result
 
-#----------------------------------------------------------------------
-# function: query_grades_for_student
-#----------------------------------------------------------------------
+
+"""
+function: query_grades_for_student
+This function retrieves grade information across all active enrolled courses, or for a particular course, for the student
+Also performs a fuzzy matching logic to find a matching course based on user input
+for example: tell me about my grades, or how did i do in {course name}
+"""
 def query_grades_for_student(canvas, student_user_name, userinput):
     course_grades = '<ul>'
     # Get the user using user_id to match with LMS SIS_ID
     user = getCanvasUser (canvas, student_user_name)
     
     if user:
-        course_list = []
+        course_names = []
         courses = user.get_courses(enrollment_status='active')
 
-        for course in courses:
-            course_list.append(course.name)
-        choice = process.extractOne(userinput, course_list, scorer=fuzz.token_set_ratio)
+        # Loop through the courses.
+        course_names = [course.name for course in courses]
+        choice = process.extractOne(userinput, course_names, scorer=fuzz.token_set_ratio)
         courses = user.get_enrollments(include='current_points', search_by='course')
 
         if courses: 
@@ -250,9 +247,13 @@ def query_grades_for_student(canvas, student_user_name, userinput):
     result = {"Grades": course_grades}
     return result
 
-#----------------------------------------------------------------------
-# function: query_syllabus_for_student
-#----------------------------------------------------------------------
+
+"""
+function: query_syllabus_for_student
+This function retrieves syllabus information across all active enrolled courses, or for a particular course, for the student
+Also performs a fuzzy matching logic to find a matching course based on user input
+for example: what is my syllabus, or tell me about my {course name} syllabus
+"""
 def query_syllabus_for_student(canvas, student_user_name, userinput):
     no_syllabus = 'There is no syllabus currently available for this course.'
     course_syllabus = ''
@@ -260,12 +261,12 @@ def query_syllabus_for_student(canvas, student_user_name, userinput):
     # Get the user using user_id to match with LMS SIS_ID
     user = getCanvasUser (canvas, student_user_name)
     if user:
-        course_list = []
+        course_names = []
         courses = user.get_courses(enrollment_status='active',include=['syllabus_body'])
-        
-        for course in courses:
-            course_list.append(course.name)
-        choice = process.extractOne(userinput, course_list, scorer=fuzz.token_set_ratio)
+
+        # Loop through the courses.
+        course_names = [course.name for course in courses]
+        choice = process.extractOne(userinput, course_names, scorer=fuzz.token_set_ratio)
 
         if courses: 
             # Loop through the courses.
@@ -288,9 +289,11 @@ def query_syllabus_for_student(canvas, student_user_name, userinput):
     return result
 
 
-#----------------------------------------------------------------------
-# function: validate_input
-#----------------------------------------------------------------------
+"""
+function: validate_input
+This function checks whether the user is logged in
+Additionally, also checks if the question in the QnABot designer include a {Query} parameter for the Lambda hook argument
+"""
 def validate_input(event):
     error_message = ''
 
@@ -310,12 +313,20 @@ def validate_input(event):
     return error_message
 
 
-#----------------------------------------------------------------------
-# function handler
-#----------------------------------------------------------------------
+"""
+function handler
+Main handler function
+This function processes:
+a. lambda hook arguments
+b. processes user input
+c. provides response back to the user
+"""
 def handler(event, context):
     userinput = event["req"]["_event"]["inputTranscript"]
     return_message = ''
+
+    global api_token
+    global canvas
 
     # Validate the required input.
     error_message = validate_input(event)
@@ -325,16 +336,18 @@ def handler(event, context):
         #event['res']['message'] = return_message
         event['res']['session']['appContext']['altMessages']['markdown'] = return_message
     else:
-        # Get the API domain. This will be need for API calls and for looking up the bearer token.
+        # Get the API domain. This will be needed for API calls and for looking up the bearer token.
         domain = event['req']['_settings']['CanvasDomainName']
-        secrets_id_name = event['req']['_settings']['CanvasAPIKey']
+        secrets_name = event['req']['_settings']['CanvasAPIKey']
 
-        # Get the bearer token from Secrets Manager.
-        api_token = get_secret(secrets_id_name)
+        # Get the API Token from AWS Secrets Manager
+        if api_token == '':
+            api_token = get_secret(secrets_name)
 
-        # Initialize a new Canvas object
-        canvas = Canvas(domain, api_token)
-        
+        # Initialize Canvas object
+        if canvas is None:
+            canvas = Canvas(domain, api_token)
+
         try:
             # Get the student's email address from the request.
             student_user_name = event['req']['_userInfo']['UserName']
@@ -375,9 +388,9 @@ def handler(event, context):
                 # Retrieve the course syllabus for this student.
                 result = query_syllabus_for_student(canvas, student_user_name, userinput)
                 event['res']['session']['appContext']['altMessages']['markdown'] = result['CourseSyllabus']
-            elif query == 'ChoicesForStudent':
+            elif query == 'CoursesForStudent':
                 # Retrieve the course options for this student.
-                result = query_choices_for_student(canvas, student_user_name, userinput)
+                result = query_courses_for_student(canvas, student_user_name, userinput)
                 returned_course = result['Choice']
                 genericattachment = ['assignments','syllabus','grades']
                 choicelist = []
@@ -398,8 +411,13 @@ def handler(event, context):
                 result = query_grades_for_student(canvas, student_user_name, userinput)
                 return_message = result['Grades']
                 event['res']['session']['appContext']['altMessages']['markdown'] = return_message
+            else: 
+                return_message = 'There was an error processing your request. For a list of available options, type or say <i>canvas menu</i>.' 
+                event['res']['session']['appContext']['altMessages']['markdown'] = return_message
         except ValueError as e:
-            return_message = str(e)
-  
+            print ("ERROR: "+ str(e))  #print the exception
+            return_message = 'There was an error processing your request. Please contact your administrator.'
+            event['res']['session']['appContext']['altMessages']['markdown'] = return_message
+
     # Return the result.
     return event

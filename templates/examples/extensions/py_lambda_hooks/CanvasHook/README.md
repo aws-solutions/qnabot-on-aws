@@ -1,6 +1,6 @@
 # Integration with Canvas LMS -- an early example implementation
 
-Students use their schools' learning management solution (LMS) to keep track of their assignments, grades, and working through their course work. To make it easier for students to stay on track and also have easy access to a knowledge base, and help with their learning progress, you can now integrate the open source AWS QnABot solution with Canvas LMS, and enable students with in-the-moment support. With this integration, students will be able to ask the chatbot about their grades, syllabus, enrollments, assignments, and announcements. 
+Students use their schools' learning management system (LMS) to keep track of their assignments, grades, and working through their course work. To make it easier for students to stay on track and also have easy access to a knowledge base, and help with their learning progress, you can now integrate the open source AWS QnABot solution with Canvas LMS, and enable students with in-the-moment support. With this integration, students will be able to ask the chatbot about their grades, syllabus, enrollments, assignments, and announcements. 
 
 
 ## Setup prerequisites
@@ -103,9 +103,13 @@ Try the below example questions:
   - *what courses have i enrolled in* 
 
 
+## Notes
+- This early example implementation supports English (en_US) language.
+- The `MATCHING_TOLERANCE_SCORE` variable in the implementation is currently set to a 70% matching tolerance score. This is used to set the `token_set_ratio` when using the fuzzywuzzy python library (https://pypi.org/project/fuzzywuzzy/). Any matching above this score is used to support the matching logic. This can be changed to a lower or higher value based on your experience on what best meets the matching criteria.
+
  
 ## Additional Reference
-The following Canvas APIs are being used for this integration, below is a list for reference. 
+The following Canvas APIs are being used for this integration: 
   - User Profile — to support authentication, and greeting the user
   - Grades --- student can ask questions such as “how did i do in my Math course”. This supports the overall grade information (out of 100) which is aggregated by course (not by assignments)
   - Course — students can ask questions such as: “what are my assignments for Biology 101”

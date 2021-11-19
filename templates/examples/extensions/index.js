@@ -190,8 +190,8 @@ module.exports=Object.assign(
                     "secretsmanager:DescribeSecret"
                    ],   
                   "Resource": [
-                      "arn:aws:secretsmanager:*:*:QNA-*",
-                      "arn:aws:secretsmanager:*:*:qna-*" 
+                    {"Fn::Join": ["",["arn:aws:secretsmanager:",{ "Ref" : "AWS::Region" },":",{ "Ref" : "AWS::AccountId" },":secret:qna-*"]]},
+                    {"Fn::Join": ["",["arn:aws:secretsmanager:",{ "Ref" : "AWS::Region" },":",{ "Ref" : "AWS::AccountId" },":secret:QNA-*"]]}
                   ]
               }
             ]

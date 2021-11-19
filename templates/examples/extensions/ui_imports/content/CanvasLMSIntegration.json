@@ -29,11 +29,11 @@
       ]
     },
     {
-      "qid": "canvas.class",
+      "qid": "canvas.course",
       "a": "Please select one of the options:",
       "l": "QNA:EXTCanvasHook",
       "args": [
-        "{\"Query\": \"ChoicesForStudent\"}"
+        "{\"Query\": \"CoursesForStudent\"}"
       ],
       "type": "qna",
       "q": [
