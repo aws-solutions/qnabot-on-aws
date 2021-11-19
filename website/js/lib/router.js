@@ -15,6 +15,11 @@ module.exports={
             name:"connect",
             component:require('../components/connect/index.vue').default
         },
+        {   
+            path:'/genesys',
+            name:"genesys",
+            component:require('../components/genesys/index.vue').default
+        },
         {   path:'/hooks',
             name:"hooks",
             component:require('../components/hooks/index.vue').default

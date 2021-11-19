@@ -278,6 +278,41 @@ def lexV2_qna_intent(intentName, slotTypeName, botId, botVersion, localeId):
     intentId = response["intentId"];
     print(f'Updated intent to add slot priority - intentId: {intentId}, slotId {slotId}')        
 
+
+def lexV2_genesys_intent(botId, botVersion, localeId):
+    intentName = "GenesysInitialIntent"
+    intentParams = {
+        "intentName": intentName,
+        "botId": botId,
+        "botVersion": botVersion,
+        "localeId": localeId,
+        "intentClosingSetting":{
+            'closingResponse': {
+                'messageGroups': [
+                    {
+                        'message': {
+                            'ssmlMessage': {
+                                'value': '<speak><break time="250ms"/></speak>'
+                            },
+                        },
+                    },
+                ],
+                'allowInterrupt': True
+            },
+            'active': True
+        },
+    }
+    intentId = get_intentId(intentName, botId, botVersion, localeId)
+    if intentId:
+        print(f"Updating intent: {intentName}, intentId {intentId}")
+        response = clientLEXV2.update_intent(intentId=intentId, **intentParams)
+        print(f'Updated intent - Id: {intentId}')        
+    else:
+        print(f"Creating intent: {intentName}")
+        response = clientLEXV2.create_intent(**intentParams)
+        intentId = response["intentId"];
+        print(f'Created intent - Id: {intentId}')        
+
 def lexV2_fallback_intent(botId, botVersion, localeId):
     intentName = "FallbackIntent"
     intentId = get_intentId(intentName, botId, botVersion, localeId)
@@ -544,6 +579,7 @@ def build_all(utterances):
             status("Updating bot locale: " + botLocaleId)
             lexV2_qna_locale(botId, LEXV2_BOT_DRAFT_VERSION, botLocaleId, voiceId=LEXV2_BOT_LOCALE_VOICES[botLocaleId])
             lexV2_fallback_intent(botId, LEXV2_BOT_DRAFT_VERSION, botLocaleId)
+            lexV2_genesys_intent(botId, LEXV2_BOT_DRAFT_VERSION, botLocaleId)
             lexV2_qna_slotTypeValues(SLOT_TYPE, botId, LEXV2_BOT_DRAFT_VERSION, botLocaleId, utterances)
             lexV2_qna_intent(INTENT, SLOT_TYPE, botId, LEXV2_BOT_DRAFT_VERSION, botLocaleId)
         status("Rebuilding bot locales: " + str(LEXV2_BOT_LOCALE_IDS))

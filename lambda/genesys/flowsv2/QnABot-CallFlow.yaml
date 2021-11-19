@@ -1,0 +1,381 @@
+inboundCall:
+  name: QnABotFlow
+  division: Home
+  startUpRef: "/inboundCall/menus/menu[Main Menu_10]"
+  defaultLanguage: en-us
+  supportedLanguages:
+    en-us:
+      defaultLanguageSkill:
+        noValue: true
+      textToSpeech:
+        Amazon Polly:
+          voice: Joanna
+  initialGreeting:
+    tts: Welcome.
+  variables:
+    - stringVariable:
+        name: Flow.appContext
+        initialValue:
+          noValue: true
+    - stringVariable:
+        name: Flow.connect_nextPrompt
+        initialValue:
+          noValue: true
+    - stringVariable:
+        name: Flow.defaultPrompt
+        initialValue:
+          noValue: true
+    - stringVariable:
+        name: Flow.ErrorMessage
+        initialValue:
+          noValue: true
+    - stringVariable:
+        name: Flow.ErrorType
+        initialValue:
+          noValue: true
+    - integerVariable:
+        name: Flow.LoopCount
+        initialValue:
+          noValue: true
+    - stringVariable:
+        name: Flow.nextAction
+        initialValue:
+          noValue: true
+    - stringVariable:
+        name: Flow.qnabot_gotanswer
+        initialValue:
+          noValue: true
+    - stringVariable:
+        name: Flow.qnabotcontext
+        initialValue:
+          noValue: true
+    - stringVariable:
+        name: Flow.topic
+        initialValue:
+          noValue: true
+  settingsActionDefaults:
+    playAudioOnSilence:
+      timeout:
+        lit:
+          seconds: 40
+    detectSilence:
+      timeout:
+        lit:
+          seconds: 40
+    callData:
+      processingPrompt:
+        noValue: true
+    callBridge:
+      processingPrompt:
+        noValue: true
+    collectInput:
+      noEntryTimeout:
+        lit:
+          seconds: 5
+    dialByExtension:
+      interDigitTimeout:
+        lit:
+          seconds: 6
+    transferToUser:
+      connectTimeout:
+        noValue: true
+    transferToNumber:
+      connectTimeout:
+        noValue: true
+    transferToGroup:
+      connectTimeout:
+        noValue: true
+    transferToFlowSecure:
+      connectTimeout:
+        lit:
+          seconds: 15
+  settingsErrorHandling:
+    errorHandling:
+      disconnect:
+        none: true
+    preHandlingAudio:
+      tts: Sorry, an error occurred. Please try your call again.
+  settingsMenu:
+    extensionDialingMaxDelay:
+      lit:
+        seconds: 1
+    listenForExtensionDialing:
+      lit: true
+    menuSelectionTimeout:
+      lit:
+        seconds: 10
+    repeatCount:
+      lit: 3
+  settingsPrompts:
+    ensureAudioInPrompts: false
+  settingsSpeechRec:
+    completeMatchTimeout:
+      lit:
+        ms: 100
+    incompleteMatchTimeout:
+      lit:
+        ms: 1500
+    maxSpeechLengthTimeout:
+      lit:
+        seconds: 20
+    minConfidenceLevel:
+      lit: 50
+    asrCompanyDir: startUpObject
+    asrEnabledOnFlow: true
+  menus:
+    - menu:
+        name: Main Menu
+        refId: Main Menu_10
+        audio:
+          tts: You are at the Main Menu, press 1 or say q and a bot to go to the Q and A Bot demo, or press 9 to disconnect
+        settingsMenu:
+          extensionDialingMaxDelay:
+            noValue: true
+          listenForExtensionDialing:
+            noValue: true
+          menuSelectionTimeout:
+            noValue: true
+          repeatCount:
+            noValue: true
+        settingsSpeechRec:
+          completeMatchTimeout:
+            noValue: true
+          incompleteMatchTimeout:
+            noValue: true
+          maxSpeechLengthTimeout:
+            noValue: true
+          minConfidenceLevel:
+            noValue: true
+        choices:
+          - menuTask:
+              name: QnABot Flow
+              refId: QnABot Flow_28
+              dtmf: digit_1
+              globalDtmf: false
+              globalSpeechRecTerms: false
+              task:
+                actions:
+                  - updateData:
+                      name: Update Data
+                      statements:
+                        - string:
+                            variable: Flow.defaultPrompt
+                            value:
+                              lit: Ask another question or say return to main menu.
+                        - string:
+                            variable: Flow.connect_nextPrompt
+                            value:
+                              exp: Flow.defaultPrompt
+                  - playAudio:
+                      name: Play Audio
+                      audio:
+                        tts: Hello. Welcome to QnA bot.  Ask me a question.
+                  - loop:
+                      name: Loop
+                      currentIndex:
+                        var: Flow.LoopCount
+                      loopCount:
+                        exp: ToInt(Flow.LoopCount) <= 3
+                      outputs:
+                        loop:
+                          actions:
+                            - callLexV2Bot:
+                                name: Call Lex V2 Bot
+                                outputSessionVariables:
+                                  - outputSessionVariable:
+                                      name:
+                                        lit: topic
+                                      variable: Flow.topic
+                                  - outputSessionVariable:
+                                      name:
+                                        lit: qnabotcontext
+                                      variable: Flow.qnabotcontext
+                                  - outputSessionVariable:
+                                      name:
+                                        lit: qnabot_gotanswer
+                                      variable: Flow.qnabot_gotanswer
+                                  - outputSessionVariable:
+                                      name:
+                                        lit: nextAction
+                                      variable: Flow.nextAction
+                                  - outputSessionVariable:
+                                      name:
+                                        lit: connect_nextPrompt
+                                      variable: Flow.connect_nextPrompt
+                                  - outputSessionVariable:
+                                      name:
+                                        lit: appContext
+                                      variable: Flow.appContext
+                                sessionVariables:
+                                  - sessionVariable:
+                                      name:
+                                        lit: topic
+                                      value:
+                                        exp: Flow.topic
+                                  - sessionVariable:
+                                      name:
+                                        lit: qnabotcontext
+                                      value:
+                                        exp: Flow.qnabotcontext
+                                  - sessionVariable:
+                                      name:
+                                        lit: qnabot_gotanswer
+                                      value:
+                                        exp: Flow.qnabot_gotanswer
+                                  - sessionVariable:
+                                      name:
+                                        lit: connect_nextPrompt
+                                      value:
+                                        exp: Flow.connect_nextPrompt
+                                  - sessionVariable:
+                                      name:
+                                        lit: nextAction
+                                      value:
+                                        exp: Flow.nextAction
+                                  - sessionVariable:
+                                      name:
+                                        lit: appContext
+                                      value:
+                                        exp: Flow.appContext
+                                  - sessionVariable:
+                                      name:
+                                        lit: qnabotUserId
+                                      value:
+                                        exp: ToString(ToPhoneNumber(Call.Ani).subscriberNumber)
+                                lexBot:
+                                  QNABOT_REGION:
+                                    QNABOT_NAME:
+                                      en-us:
+                                        QNABOT_ALIAS:
+                                          aliasInitialIntentName:
+                                            lit: GenesysInitialIntent
+                                          intents:
+                                            FallbackIntent:
+                                              none: true
+                                            QnaIntent:
+                                              qnaslot:
+                                                noValue: true
+                                            GenesysInitialIntent:
+                                              none: true
+                                          outputs:
+                                            intents:
+                                              FallbackIntent:
+                                                actions:
+                                                  - callTask:
+                                                      name: Call Task
+                                                      targetTaskRef: "/inboundCall/tasks/task[QnABot Task_98]"
+                                                  - loopNext:
+                                                      name: Next Loop
+                                              QnaIntent:
+                                                actions:
+                                                  - callTask:
+                                                      name: Call Task
+                                                      targetTaskRef: "/inboundCall/tasks/task[QnABot Task_98]"
+                                                  - loopNext:
+                                                      name: Next Loop
+                                            failure:
+                                              actions:
+                                                - playAudio:
+                                                    name: Play Audio
+                                                    audio:
+                                                      tts: Lex has an error.
+                                                - playAudio:
+                                                    name: Play Audio
+                                                    audio:
+                                                      exp: AudioPlaybackOptions(Append(ToAudioTTS(Flow.ErrorType), ToAudioTTS("The error message is"), ToAudioTTS(Flow.ErrorMessage)), true)
+                                                - disconnect:
+                                                    name: Disconnect
+                                          failureOutputs:
+                                            errorType:
+                                              var: Flow.ErrorType
+                                            errorMessage:
+                                              var: Flow.ErrorMessage
+                  - playAudio:
+                      name: Play Audio
+                      audio:
+                        tts: This is embarrassing. I'm sorry I don't know the answer to your questions.  I'm still learning, so check back tomorrow.
+                  - disconnect:
+                      name: Disconnect
+              speechRecTerms:
+                en-us:
+                  terms:
+                    - q and a bot
+        defaultChildMenuRef: "./choices/menuTask[QnABot Flow_28]"
+  tasks:
+    - task:
+        name: QnABot Task
+        refId: QnABot Task_98
+        actions:
+          - decision:
+              name: Decision
+              condition:
+                exp: Flow.qnabot_gotanswer == "true"
+              outputs:
+                yes:
+                  actions:
+                    - updateData:
+                        name: Update Data
+                        statements:
+                          - integer:
+                              variable: Flow.LoopCount
+                              value:
+                                exp: ToInt(Flow.LoopCount) - 1
+                    - switch:
+                        name: Switch
+                        evaluate:
+                          firstTrue:
+                            default:
+                              actions:
+                                - switch:
+                                    name: Switch
+                                    evaluate:
+                                      firstTrue:
+                                        cases:
+                                          - case:
+                                              value:
+                                                exp: IsSet(Flow.connect_nextPrompt)
+                                              actions:
+                                                - playAudio:
+                                                    name: Play Audio
+                                                    audio:
+                                                      exp: AudioPlaybackOptions(ToAudioTTS(Flow.connect_nextPrompt), true)
+                                - updateData:
+                                    name: Update Data
+                                    statements:
+                                      - string:
+                                          variable: Flow.connect_nextPrompt
+                                          value:
+                                            exp: Flow.defaultPrompt
+                            cases:
+                              - case:
+                                  value:
+                                    exp: Flow.nextAction=="AGENT"
+                                  actions:
+                                    - playAudio:
+                                        name: Play Audio
+                                        audio:
+                                          tts: This is where you would be transferred to a queue.
+                                    - playAudio:
+                                        name: Play Audio
+                                        audio:
+                                          exp: AudioPlaybackOptions(ToAudioTTS(Flow.connect_nextPrompt), true)
+                              - case:
+                                  value:
+                                    exp: Flow.nextAction=="END"
+                                  actions:
+                                    - playAudio:
+                                        name: Play Audio
+                                        audio:
+                                          tts: Thank you for using QnA Bot, Goodbye.
+                                    - disconnect:
+                                        name: Disconnect
+                              - case:
+                                  value:
+                                    exp: Flow.nextAction=="MENU"
+                                  actions:
+                                    - previousMenu:
+                                        name: Previous Menu
+          - endTask:
+              name: End Task
+              outputPath:
+                name: Default

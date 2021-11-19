@@ -40,6 +40,9 @@
         "connect":{
             "href":"$root/connect"
         },
+        "genesys":{
+            "href":"$root/genesys"
+        },
         "translate":{
             "href":"$root/translate"
         },

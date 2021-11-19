@@ -45,14 +45,20 @@ async function connect_response(req, res) {
         }
         _.set(res.session,nextPromptVarName,prompt);
     }
+    // If in elicit response, set next prompt to empty
+    if ( _.get(res,"session.qnabotcontext.elicitResponse.responsebot")) {
+        let nextPromptVarName = _.get(req,"_settings.CONNECT_NEXT_PROMPT_VARNAME",'nextPrompt') ;
+        _.set(res.session,nextPromptVarName,"");
+    }
+
     // Split multi-part sentences to enable barge in for long fulfillment messages when using Connect voice.. 
     // except when QnAbot is in ElicitResoonse mode.. in that case we keep the bot session with GetCustomerInput block open, so 
     // the Connect contact flow loop is not invoked (and CONNECT_NEXT_PROMPT would not be played)
-    if (req._clientType == "LEX.AmazonConnect.Voice" ) {
-        let nextPromptVarName = _.get(req,"_settings.CONNECT_NEXT_PROMPT_VARNAME",'nextPrompt') ;
+    if (req._clientType == "LEX.AmazonConnect.Voice") {
         if (! _.get(res,"session.qnabotcontext.elicitResponse.responsebot")) {
             // QnABot is not doing elicitResponse
             if (_.get(req,"_settings.CONNECT_ENABLE_VOICE_RESPONSE_INTERRUPT")) {
+                let nextPromptVarName = _.get(req,"_settings.CONNECT_NEXT_PROMPT_VARNAME",'nextPrompt') ;
                 qnabot.log("CONNECT_ENABLE_VOICE_RESPONSE_INTERRUPT is true. splitting response.")
                 // split multi sentence responses.. First sentence stays in response, remaining sentences get prepended to next prompt session attribute.
                 let message = res.message ;
@@ -73,11 +79,7 @@ async function connect_response(req, res) {
                 qnabot.log("Response message:", res.message);
                 qnabot.log("Reponse session var:", nextPromptVarName, ":", _.get(res.session,nextPromptVarName)) ;
             }
-        } else {
-            // QnABot is doing elicitResponse - disable Next_Prompt
-            _.set(res.session,nextPromptVarName,"");
-        }
-        
+        } 
     }
     return res ;
 }
