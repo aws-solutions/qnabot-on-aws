@@ -59,7 +59,7 @@ def get_secret(secrets_name):
             secret = decoded_binary_secret.API_Token
     except ClientError as e:
         print ("ERROR: "+ str(e))  #print the exception
-        raise str(e)
+        raise e
 
     #return the API token
     return secret
@@ -84,11 +84,8 @@ def query_enrollments_for_student(canvas, student_user_name, userinput):
 
     if user:
         courses = user.get_courses(enrollment_status='active',include=['syllabus_body'])
-
-        course_names = []
-        if courses: 
-            # Loop through the courses.
-            course_names = [course.name for course in courses]
+        # Loop through the courses.
+        course_names = [course.name for course in courses]
 
     result = {"CourseNames": course_names}
     return result
@@ -105,11 +102,9 @@ def query_courses_for_student(canvas, student_user_name, userinput):
     
     if user:
         courses = user.get_courses(enrollment_status='active')
-        if courses: 
-            course_names = []
-            # Loop through the courses.
-            course_names = [course.name for course in courses]
-            choice = process.extractOne(userinput, course_names, scorer=fuzz.token_set_ratio)
+        # Loop through the courses.
+        course_names = [course.name for course in courses]
+        choice = process.extractOne(userinput, course_names, scorer=fuzz.token_set_ratio)
 
     result = {"Choice": choice[0]}
     return result
@@ -130,7 +125,6 @@ def query_course_assignments_for_student(canvas, student_user_name, userinput):
     user = getCanvasUser (canvas, student_user_name)
     
     if user:
-        course_names = []
         courses = user.get_courses(enrollment_status='active')
     
         # Loop through the courses.
@@ -217,7 +211,6 @@ def query_grades_for_student(canvas, student_user_name, userinput):
     user = getCanvasUser (canvas, student_user_name)
     
     if user:
-        course_names = []
         courses = user.get_courses(enrollment_status='active')
 
         # Loop through the courses.
@@ -261,7 +254,6 @@ def query_syllabus_for_student(canvas, student_user_name, userinput):
     # Get the user using user_id to match with LMS SIS_ID
     user = getCanvasUser (canvas, student_user_name)
     if user:
-        course_names = []
         courses = user.get_courses(enrollment_status='active',include=['syllabus_body'])
 
         # Loop through the courses.
