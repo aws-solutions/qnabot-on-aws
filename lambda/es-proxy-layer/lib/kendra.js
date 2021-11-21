@@ -271,6 +271,7 @@ async function hasClientFilter(kendra_result){
             return true
         }
     }
+    return false;
 
 
 }
