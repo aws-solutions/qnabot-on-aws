@@ -2,6 +2,8 @@ var Promise=require('bluebird')
 var aws=require("aws-sdk")
 aws.config.setPromisesDependency(Promise)
 aws.config.region=process.env.AWS_REGION
+const qnabot = require("qnabot/logging")
+
 
 var s3=new aws.S3({apiVersion: "2006-03-01", region:process.env.REGION})
 var _=require('lodash')

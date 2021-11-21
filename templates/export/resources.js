@@ -375,6 +375,8 @@ module.exports = Object.assign(
             "REGION": {"Ref": "AWS::Region"}
           }
         },
+        "Layers":[
+        {"Ref":"QnABotCommonLambdaLayer"}],
         "Handler": "kendraSync.performSync",
         "MemorySize": "1024",
         "Role": {"Fn::GetAtt": ["KendraSyncRole", "Arn"]},
@@ -446,6 +448,7 @@ module.exports = Object.assign(
               "kendra:TagResource",
               "kendra:DeleteFaq",
               "kendra:DescribeFaq",
+              "kendra:DetectPiiEntities",
               "iam:passRole",
               "ssm:getParameter"
             ],
