@@ -54,22 +54,7 @@ function kendraRequester(kendraClient,params,resArray) {
 }
 
 
-/** Function that returns if a string has JSON structure
- * @param str - input string
- * @returns boolean true or false
- */
-function hasJsonStructure(str) {
-    if (typeof str !== 'string') return false;
-    try {
-        qnabot.log('hasJsonStructure ' + str)
-        const result = JSON.parse(str);
-        const type = Object.prototype.toString.call(result);
-        return type === '[object Object]' 
-            || type === '[object Array]';
-    } catch (err) {
-        return false;
-    }
-}
+
 
 
 async function asyncForEach(array, callback) {
@@ -148,7 +133,7 @@ async function routeKendraRequest(request_params) {
                 if (element.Type === 'QUESTION_ANSWER' && foundAnswerCount < request_params.size && element.AdditionalAttributes &&
                     element.AdditionalAttributes.length > 1) {
 
-                    if (!hasJsonStructure(element.DocumentURI)) {
+                    if (!open.es.hasJsonStructure(element.DocumentURI)) {
                         break;
                     }
                     var hit = JSON.parse(element.DocumentURI);

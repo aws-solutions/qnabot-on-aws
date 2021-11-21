@@ -33,7 +33,24 @@ async function run_qid_query_es(params, qid) {
     return es_response;
 }
 
+/** Function that returns if a string has JSON structure
+ * @param str - input string
+ * @returns boolean true or false
+ */
+ function hasJsonStructure(str) {
+    if (typeof str !== 'string') return false;
+    try {
+        const result = JSON.parse(str);
+        const type = Object.prototype.toString.call(result);
+        return type === '[object Object]' 
+            || type === '[object Array]';
+    } catch (err) {
+        return false;
+    }
+}
+
 module.exports = {
     run_query_es:run_query_es,
-    run_qid_query_es:run_qid_query_es
+    run_qid_query_es:run_qid_query_es,
+    hasJsonStructure:hasJsonStructure
 }
