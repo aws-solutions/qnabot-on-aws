@@ -5,12 +5,26 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [5.1.0]
+## [5.1.0] - 2021-12-06
 
 ### Added
 - Integration with Canvas Learning Management System (LMS) -- an early example implementation
+- Tags to questions in Content Designer and ability to create reports in Kibana.
+- Integration with Genesys call center platform.
+- Bot routing capability to have multiple-bot architecture (e.g., General bot routing questions to specialty bots).
+- Intelligent redaction of Personally Identifiable Information in logs with Amazon Comprehend.
+- Override qnabot's internal user id by passing qnabotUserId as session attribute
+- Support for pre and post processing AWS Lambda Hooks.
+
+### Fixed
+- Test tab in Content Designer to show same results as the web client.
+- Broken link in documentation for downloading CloudFormation template.
+- Integration with Slack on Amazon LexV2 bots.
+- Bug with response bots with Alexa. QnABot will set the sessionAttribute from CONNECT_NEXT_PROMPT_VARNAME to an empty string if QnABot is in a response bot in a voice channel
 
 
+### Changed
+- Client Filtering with Session Attributes (i.e., Support to allow the same set of questions to be answered differently based on a session attribute)
 
 ## [5.0.1] - 2021-10-20
 
