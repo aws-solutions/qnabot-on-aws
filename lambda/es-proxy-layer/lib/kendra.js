@@ -240,7 +240,7 @@ function longestInterval(intervals) {
 
 }
 
-async function hasClientFilter(kendra_result){
+async function isSyncedFromQnABot(kendra_result){
     var request_params = {
         kendra_faq_index:_.get(req, "_settings.KENDRA_FAQ_INDEX"),
         maxRetries:_.get(req, "_settings.KENDRA_FAQ_CONFIG_MAX_RETRIES"),
@@ -258,18 +258,8 @@ async function hasClientFilter(kendra_result){
 
     let hit = JSON.parse(element.DocumentURI);
     if (_.get(hit,"_source_qid")) {
-        let qid = hit._source_qid ;
-        // FAQ only references the QID but doesn't contain the full docunment.. retrieve it from ES
-        qnabot.log("Kendra matched qid: ", qid, ". Retrieving full document from Elasticsearch.");
-        let es_response = await open_es.run_qid_query_es(request_params, qid) ;
-        qnabot.log("Qid document from Kendra: ", JSON.stringify(hit));
-        hit = _.get(es_response, "hits.hits[0]._source"); //todo fix if null -- test from content designer
-        if(hit == null){
-            return false;
-        }
-        if(_.get(hit,"clientFilterValues","") == ""){
-            return true
-        }
+        qnabot.warn("The Kendra result was synced from QnABot. Skipping...")
+        retur true
     }
 
 
