@@ -261,6 +261,7 @@ async function isSyncedFromQnABot(kendra_result){
         qnabot.warn("The Kendra result was synced from QnABot. Skipping...")
         return true
     }
+    return false;
 
 
 }
