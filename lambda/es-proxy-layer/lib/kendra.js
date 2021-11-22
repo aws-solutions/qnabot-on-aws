@@ -259,7 +259,7 @@ async function isSyncedFromQnABot(kendra_result){
     let hit = JSON.parse(element.DocumentURI);
     if (_.get(hit,"_source_qid")) {
         qnabot.warn("The Kendra result was synced from QnABot. Skipping...")
-        retur true
+        return true
     }
 
 
