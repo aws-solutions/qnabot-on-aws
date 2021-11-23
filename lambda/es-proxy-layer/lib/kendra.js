@@ -438,7 +438,7 @@ async function routeKendraRequest(event, context) {
 
                 } else if (element.Type === 'QUESTION_ANSWER' && element.AdditionalAttributes && element.AdditionalAttributes.length > 1) {
                     // There will be 2 elements - [0] - QuestionText, [1] - AnswerText
-                    if(hasClientFilter){
+                    if(isSyncedFromQnABot(element)){
                         return;
                     }
                     let message = element.AdditionalAttributes[1].Value.TextWithHighlightsValue.Text.replace(/\r?\n|\r/g, " ")
