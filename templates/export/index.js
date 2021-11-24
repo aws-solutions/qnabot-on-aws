@@ -42,7 +42,8 @@ module.exports={
         "VPCSubnetIdList" : {"Type": "String"},
         "VPCSecurityGroupIdList": {"Type": "String"},
         "XraySetting": {"Type": "String"},
-        "KendraCrawlerSnsTopic":{"Type":"String"}
+        "KendraCrawlerSnsTopic":{"Type":"String"},
+        "QnABotCommonLambdaLayer":{"Type":"String"}
     },
     "Conditions": {
         "VPCEnabled": { "Fn::Not": [
