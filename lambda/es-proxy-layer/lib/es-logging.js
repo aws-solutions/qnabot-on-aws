@@ -54,11 +54,11 @@ module.exports=function(event, context, callback){
     let redactRegex = _.get(req, '_settings.REDACTING_REGEX', "\\b\\d{4}\\b(?![-])|\\b\\d{9}\\b|\\b\\d{3}-\\d{2}-\\d{4}\\b");
     let cloudwatchLoggingDisabled = _.get(req, '_settings.DISABLE_CLOUDWATCH_LOGGING');
 
-    qnabot.setPIIDetectionEnv(req._event.inputTranscript,
-        _.get(req, "_settings.PII_REJECTION_WITH_COMPREHEND",false),
-        _.get(req, "_settings.PII_REJECTION_REGEX",""),
-        _.get(req, "_settings.PII_REJECTION_ENTITY_TYPES",""),
-        _.get(req, "_settings.PII_REJECTION_CONFIDENCE_SCORE",.99)
+    qnabot.setPIIRedactionEnvironmentVars(req._event.inputTranscript,
+        _.get(req, "_settings.ENABLE_REDACTING_WITH_COMPREHEND",false),
+        _.get(req, "_settings.REDACTING_REGEX",""),
+        _.get(req, "_settings.COMPREHEND_REDACTING_ENTITY_TYPES",""),
+        _.get(req, "_settings.COMPREHEND_REDACTING_CONFIDENCE_SCORE",.99)
         ).then(() =>{
 
     if (cloudwatchLoggingDisabled) {

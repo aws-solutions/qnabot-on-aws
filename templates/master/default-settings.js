@@ -54,9 +54,11 @@ var default_settings = {
     CONNECT_NEXT_PROMPT_VARNAME: "connect_nextPrompt", // Name of session var to use for next prompt
     ENABLE_REDACTING: "false", // Enable the system to redact log output
     REDACTING_REGEX: "\\b\\d{4}\\b(?![-])|\\b\\d{9}\\b|\\b\\d{3}-\\d{2}-\\d{4}\\b", // default regex to use for redacting - redacts 4 digit numbers not followed by a '-', 9 digit numbers (SSN with no '-'s), and Standard SSN format
+    ENABLE_REDACTING_WITH_COMPREHEND: "false", //Enables redaction of PII using Comprehend
+    COMPREHEND_REDACTING_CONFIDENCE_SCORE: 0.99, //Only redact PII if the score is above the configured percentage
+    COMPREHEND_REDACTING_ENTITY_TYPES:"ADDRESS,EMAIL,SSN,PHONE,PASSWORD,BANK_ACCOUNT_NUMBER,BANK_ROUTING,CREDIT_DEBIT_NUMBER", //See https://aws.amazon.com/blogs/machine-learning/detecting-and-redacting-pii-using-amazon-comprehend/ for valid types
     PII_REJECTION_ENABLED: false, // Enables PII Rejection
     PII_REJECTION_QUESTION: "pii_rejection_question", // If PII is found, the user's request (question) will change to this phrase
-    PII_REJECTION_WITH_COMPREHEND: true, //When set to true, Comprehend will be used for PII detection in addition to matching  based on the PII_REJECTION_REGE
     PII_REJECTION_REGEX: "\\b\\d{4}\\b(?![-])|\\b\\d{9}\\b|\\b\\d{3}-\\d{2}-\\d{4}\\b", //Regex to use to find PII.,
     PII_REJECTION_ENTITY_TYPES:"ADDRESS,EMAIL,SSN,PHONE,PASSWORD,BANK_ACCOUNT_NUMBER,BANK_ROUTING,CREDIT_DEBIT_NUMBER", //See https://aws.amazon.com/blogs/machine-learning/detecting-and-redacting-pii-using-amazon-comprehend/ for valid types
     PII_REJECTION_CONFIDENCE_SCORE: .99,
