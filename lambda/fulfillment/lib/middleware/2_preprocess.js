@@ -133,10 +133,23 @@ module.exports = async function preprocess(req, res) {
             req.question = _.get(req, '_settings.NO_VERIFIED_IDENTITY_QUESTION', 'no_verified_identity');
         }
     }
+
+    if (_.get(req, '_settings.ENABLE_REDACTING_WITH_COMPREHEND')) {
+        qnabot.log("Looking for PII using Comprehend")
+        let foundPii = await qnabot.setPIIRedactionEnvironmentVars(req.question,
+            _.get(req, "_settings.ENABLE_REDACTING_WITH_COMPREHEND",false),
+            _.get(req, "_settings.REDACTING_REGEX",""),
+            _.get(req, "_settings.COMPREHEND_REDACTING_ENTITY_TYPES",""),
+            _.get(req, "_settings.COMPREHEND_REDACTING_CONFIDENCE_SCORE",.99)
+            )
+        }
+
+
+    
     if (_.get(req, '_settings.PII_REJECTION_ENABLED')) {
         qnabot.log("Checking for PII")
         let foundPii = await qnabot.isPIIDetected(req.question,
-            _.get(req, "_settings.PII_REJECTION_WITH_COMPREHEND",false),
+            true, //PII Rejection only works with Comprehend
             _.get(req, "_settings.PII_REJECTION_REGEX",""),
             _.get(req, "_settings.PII_REJECTION_ENTITY_TYPES",""),
             _.get(req, "_settings.PII_REJECTION_CONFIDENCE_SCORE",.99)

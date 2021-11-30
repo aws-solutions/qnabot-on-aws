@@ -1,6 +1,8 @@
 var _ = require('lodash');
 var translate = require("./translate");
 var linkify = require('linkifyjs');
+const open_es = require("./es_query")
+
 
 /**
  * optional environment variables - These are not used defined during setup of this function in QnABot but are
@@ -238,6 +240,31 @@ function longestInterval(intervals) {
 
 }
 
+async function isSyncedFromQnABot(kendra_result){
+    var request_params = {
+        kendra_faq_index:_.get(req, "_settings.KENDRA_FAQ_INDEX"),
+        maxRetries:_.get(req, "_settings.KENDRA_FAQ_CONFIG_MAX_RETRIES"),
+        retryDelay:_.get(req, "_settings.KENDRA_FAQ_CONFIG_RETRY_DELAY"),
+        minimum_score: _.get(req, "_settings.ALT_SEARCH_KENDRA_FAQ_CONFIDENCE_SCORE"),
+        size:1,
+        question: query_params.question,
+        es_address: req._info.es.address,
+        es_path: '/' + req._info.es.index + '/_doc/_search?search_type=dfs_query_then_fetch',
+    }
+
+    if (!open_es.hasJsonStructure(kendra_result.DocumentURI)) {
+        return false;
+    }
+
+    let hit = JSON.parse(element.DocumentURI);
+    if (_.get(hit,"_source_qid")) {
+        qnabot.warn("The Kendra result was synced from QnABot. Skipping...")
+        return true
+    }
+    return false;
+
+
+}
 
 /** Function that processes kendra requests and handles response. Decides whether to handle SNS
  * events or Lambda Hook events from QnABot.
@@ -411,6 +438,9 @@ async function routeKendraRequest(event, context) {
 
                 } else if (element.Type === 'QUESTION_ANSWER' && element.AdditionalAttributes && element.AdditionalAttributes.length > 1) {
                     // There will be 2 elements - [0] - QuestionText, [1] - AnswerText
+                    if(isSyncedFromQnABot(element)){
+                        return;
+                    }
                     let message = element.AdditionalAttributes[1].Value.TextWithHighlightsValue.Text.replace(/\r?\n|\r/g, " ")
                     answerMessage = faqanswerMessage + '\n\n ' + message;
                     allFilteredMessages.push(message) 
@@ -432,6 +462,7 @@ async function routeKendraRequest(event, context) {
                     kendraResultId = element.Id; // store off resultId to use as a session attribute for feedback
                     foundAnswerCount++;
                     debug_results.push(create_debug_object(element))
+
 
                   
                 } else if (element.Type === 'DOCUMENT' && element.DocumentExcerpt.Text && element.DocumentURI) {

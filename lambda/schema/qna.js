@@ -235,7 +235,13 @@ module.exports={
                 }
             }
         },
+        tags:{
+            type:"string",
+            description:"Specify tags for questions. Tags should be space separated. For multi-word tags please use underscore '_'.",
+            title:"Tags",
+            propertyOrder: 14
+        },
     },
     required:["qid","q","a"]
 
-}
+};

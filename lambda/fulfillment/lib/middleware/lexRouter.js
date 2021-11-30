@@ -248,6 +248,7 @@ async function processResponse(req, res, hook, msg) {
         } else {
             res.message = plainMessage;
         }
+
         res.card = {
             "send": true,
             "title": "Info",

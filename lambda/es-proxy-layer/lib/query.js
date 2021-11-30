@@ -2,13 +2,12 @@
 var _ = require('lodash');
 var safeEval = require('safe-eval');
 const aws = require('aws-sdk');
-var request = require('./request');
-var build_es_query = require('./esbodybuilder');
 var handlebars = require('./handlebars');
 var translate = require('./translate');
 var kendra = require('./kendraQuery');
 var kendra_fallback = require("./kendra");
 const qnabot = require("qnabot/logging")
+const open_es = require("./es_query")
 
 // const sleep = require('util').promisify(setTimeout);
 
@@ -27,7 +26,7 @@ async function run_query(req, query_params) {
         response= await run_query_kendra(req, query_params);
     } 
     else {
-        response= await run_query_es(req, query_params);
+        response= await open_es.run_query_es(req, query_params);
     }
     qnabot.log(`response ${JSON.stringify(response)}` )
     return response;
@@ -50,7 +49,7 @@ async function isESonly(req, query_params) {
         return true
     }
     // setting clientFilterValues should block Kendra FAQ indexing
-    if (_.get(query_params, 'clientFilterValues')!="") {
+    if (_.get(query_params, 'qnaClientFilter')!="") {
         return true
     }    
     //Don't send one word questions to Kendra
@@ -60,21 +59,7 @@ async function isESonly(req, query_params) {
     return false;
 }
 
-async function run_query_es(req, query_params) {
-    
-    var es_query = await build_es_query(query_params);
-    var es_response = await request({
-        url: `https://${req._info.es.address}/${req._info.es.index}/_doc/_search?search_type=dfs_query_then_fetch`,
-        method: "GET",
-        body: es_query
-    });
-    
-    if (_.get(es_response, "hits.hits[0]._source")) {
-        _.set(es_response, "hits.hits[0]._source.answersource", "ElasticSearch");
-    }
 
-    return es_response;
-}
 
 
 async function run_query_kendra(req, query_params) {
@@ -124,7 +109,7 @@ function getLambdaName(lambdaRef){
         return lambdaRef;
     }
 }
-// used to inoke either chaining rule lambda, or Lambda hook
+// used to invoke either chaining rule lambda, or Lambda hook
 async function invokeLambda (lambdaRef, req, res) {
     let lambdaName = getLambdaName(lambdaRef);
     qnabot.log("Calling Lambda:", lambdaName);
@@ -231,7 +216,7 @@ async function get_hit(req, res) {
     // ES fallback if KendraFAQ fails
     if (!hit && _.get(req, '_settings.KENDRA_FAQ_ES_FALLBACK', true)) {
         qnabot.log('ElasticSearch Fallback');
-        response = await run_query_es(req, query_params);
+        response = await open_es.run_query_es(req, query_params);
         if (_.get(response, "hits.hits[0]._source")) {
             _.set(response, "hits.hits[0]._source.answersource", "ElasticSearch Fallback");
         }
@@ -426,6 +411,12 @@ function update_res_with_hit(req, res, hit) {
         hit.sa.map(obj=>{
             _.set(res, `session.${obj.text}`, obj.value);
         })
+    }
+
+    // Add tags to the res object
+    const tags = _.get(hit, "tags");
+    if (tags){
+        _.set(res, 'tags', tags);
     }
 
     // Add answerSource for query hits

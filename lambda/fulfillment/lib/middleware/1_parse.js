@@ -68,7 +68,6 @@ async function get_settings() {
     const settings = _.merge(default_settings, custom_settings);
     _.set(settings, "DEFAULT_USER_POOL_JWKS_URL", default_jwks_url);
     qnabot.log(`Merged Settings: ${JSON.stringify(settings,null,2)}`);
-
     if (settings.ENABLE_REDACTING) {
         qnabot.log("redacting enabled");
         process.env.QNAREDACT="true";
@@ -85,6 +84,14 @@ async function get_settings() {
         qnabot.log("enable cloudwatch logging");
         process.env.DISABLECLOUDWATCHLOGGING="false";
     }
+    if(settings.ENABLE_REDACTING_WITH_COMPREHEND){
+        qnabot.log("enable Amazon Comprehend based redaction.")
+        process.env.ENABLE_REDACTING_WITH_COMPREHEND = "true"
+    } else {
+        qnabot.log("disable Amazon Comprehend based redaction.")
+        process.env.ENABLE_REDACTING_WITH_COMPREHEND = "false"
+    }
+
     return settings;
 }
 
@@ -111,6 +118,9 @@ function getClientType(req) {
     } else if (_.get(req,"_event.requestAttributes.x-amz-lex:accept-content-types")) {
         return "LEX.AmazonConnect." + voiceortext ;
     }
+    else if (_.get(req,"_event.requestAttributes.x-amz-lex:channels:platform") == "Genesys Cloud") {
+        return "LEX.GenesysCloud." + voiceortext;
+    }
     else if (/^.*-.*-\d:.*-.*-.*-.*$/.test(_.get(req,"_event.userId"))){
         // user id pattern to detect lex-web-uithrough use of cognito id as userId: e.g. us-east-1:a8e1f7b2-b20d-441c-9698-aff8b519d8d5
         // TODO: add another clientType indicator for lex-web-ui?
@@ -126,6 +136,8 @@ module.exports = async function parse(req, res) {
 
     // Add QnABot settings from Parameter Store
     const settings = await get_settings();
+    //Removed cached comprehend PII result used by the logging framework
+    process.env.comprehendResult = undefined
     _.set(req, "_settings", settings);
 
     req._type = req._event.version ? "ALEXA" : "LEX"
