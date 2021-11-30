@@ -122,7 +122,9 @@ exports.translate_hit = async function(hit,usrLang,req){
                         hit_out.r.buttons[x].text = await get_translation(hit_out.r.buttons[x].text, usrLang,req) ;
                     }
                     if (_.get(hit,'autotranslate.r.buttons[x].value')) {
-                        hit_out.r.buttons[x].value = await get_translation(hit_out.r.buttons[x].value, usrLang,req) ;
+                        if (! hit_out.r.buttons[x].value.toLowerCase().startsWith("qid::")) {
+                            hit_out.r.buttons[x].value = await get_translation(hit_out.r.buttons[x].value, usrLang, req);
+                        }
                     }                    
                 }
             }
