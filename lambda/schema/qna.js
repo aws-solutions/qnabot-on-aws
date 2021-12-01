@@ -180,7 +180,7 @@ module.exports={
         },
         conditionalChaining:{
             title:"Document Chaining: Chaining Rule",
-            description:"Automatically move on to another item based on the question string returned by this rule. Rule can be a single-quoted string, e.g. 'next question', or a JavaScript conditional expression that evaluates to a string, e.g. (SessionAttributes.namespace.Yes_No == \"Yes\" ) ? \"Yes question\" : \"No Question\", or a Lambda Function Name or ARN that returns a string specified as \"Lambda::FunctionName\". Function name must start with \"QNA\".",
+            description:"Automatically move on to another item based on the question string returned by this rule. Rule can be a single-quoted string, e.g. 'next question', or a JavaScript conditional expression that evaluates to a string, e.g. (SessionAttributes.namespace.Yes_No == \"Yes\" ) ? \"Yes question\" : \"No Question\", or a Lambda Function Name or ARN that returns a string specified as \"Lambda::FunctionName\". Function name must start with \"QNA-\".",
             type:"string",
             maxLength:4000,
             propertyOrder:11
@@ -207,7 +207,7 @@ module.exports={
             properties:{
                 specialty_bot:{
                     title:"Bot Routing: LexV1 BotName OR lexv2::Botid/BotAliasId/LocaleId OR Lambda Function",
-                    description:"The target specialty Lex Bot or Lambda Function to route requests to. For Lex V2 bot names use the format \"lexv2::BotId/BotAliasId/LocaleId\". For Lex V1 bot the names should start with \"QNA\". Lambda functions can be specified as \"Lambda::FunctionName\" or \"Lambda::FunctionARN\" - Lambda function names must start with \"QNA\".",
+                    description:"The target specialty Lex Bot or Lambda Function to route requests to. For Lex V2 bot names use the format \"lexv2::BotId/BotAliasId/LocaleId\". For Lex V1 bot the names should start with \"QNA\". Lambda functions can be specified as \"Lambda::FunctionName\" or \"Lambda::FunctionARN\" - Lambda function names must start with \"QNA-\".",
                     type:"string",
                     maxLength:100,
                     propertyOrder:0
