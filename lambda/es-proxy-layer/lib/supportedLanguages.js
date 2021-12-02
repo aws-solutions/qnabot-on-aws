@@ -3,6 +3,7 @@ const supportedLanguages = {
     "Albanian": "sq",
     "Amharic": "am",
     "Arabic": "ar",
+    "Armenian": "hy", 
     "Azerbaijani": "az",
     "Bengali": "bn",
     "Bosnian": "bs",
@@ -152,6 +153,10 @@ const languageErrorMessages = {
     "hu": {
         "language": "Hungarian",
         "errorMessage": "Sajnáljuk, a kért nyelv nem érhető el."
+    },
+    "hy": {
+        "language": "Armenian",
+        "errorMessage": "Ներեցեք, խնդրված լեզուն հասանելի չէ:"
     },
     "id": {
         "language": "Indonesian",
