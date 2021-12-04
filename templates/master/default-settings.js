@@ -1,5 +1,6 @@
 var default_settings = {
     ENABLE_DEBUG_RESPONSES: "false",  // Determines whethere to log original English responses and translated responses for debugging
+    ENABLE_DEBUG_LOGGING: "false",
     ES_USE_KEYWORD_FILTERS: "true", // Determines whether to detect keywords from Comprehend when searching for answers
     ES_EXPAND_CONTRACTIONS: `{"you're":"you are","I'm":"I am","can't":"cannot"}`,
     ES_KEYWORD_SYNTAX_TYPES: "NOUN,PROPN,VERB,INTJ", //Comprehend will return these parts of speech found by Amazon Comprehend
