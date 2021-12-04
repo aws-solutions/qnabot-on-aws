@@ -115,9 +115,9 @@ module.exports = async function parse(req, res) {
     // Add QnABot settings from Parameter Store
     const settings = await get_settings();
     qna_settings.set_environment_variables(settings)
-    //Removed cached comprehend PII result used by the logging framework
-    process.env.comprehendResult = undefined
     _.set(req, "_settings", settings);
+
+
 
     req._type = req._event.version ? "ALEXA" : "LEX"
 

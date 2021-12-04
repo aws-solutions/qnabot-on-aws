@@ -67,8 +67,8 @@ function set_environment_variables(settings){
         qnabot.log("disable Amazon Comprehend based redaction.")
         process.env.ENABLE_REDACTING_WITH_COMPREHEND = "false"
     }
-    if(settings.ENABLE_DEBUG_RESPONSE){
-        process.env.ENABLE_DEBUG_RESPONSE = "true"
+    if(settings.ENABLE_DEBUG_LOGGING){
+        process.env.ENABLE_DEBUG_LOGGING = "true"
     }
 }
 

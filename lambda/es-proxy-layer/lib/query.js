@@ -7,7 +7,7 @@ var translate = require('./translate');
 var kendra = require('./kendraQuery');
 var kendra_fallback = require("./kendra");
 const qnabot = require("qnabot/logging")
-const qna_settings = require("qnabot/setttings")
+const qna_settings = require("qnabot/settings")
 const open_es = require("./es_query")
 
 // const sleep = require('util').promisify(setTimeout);
@@ -131,7 +131,7 @@ async function invokeLambda (lambdaRef, req, res) {
     } catch (e) {
         // response is not JSON - noop
     }
-    qnabot.log("Lambda returned payload: ", JSON.stringify(payload));
+    qnabot.log("Lambda returned payload: ",payload);
     return [req, res, payload];
 }
 

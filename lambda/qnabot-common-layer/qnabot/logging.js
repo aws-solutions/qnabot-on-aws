@@ -10,6 +10,7 @@ function filter_comprehend_pii(text) {
     }
 
     let regex = process.env.found_comprehend_pii.split(",").map(pii => `(${pii})`).join("|")
+
     let re = new RegExp(regex, "g");
     return text.replace(re, "XXXXXX");
 }
@@ -80,7 +81,6 @@ async function _getPIIEntities(params){
         try{
            return JSON.parse(process.env.comprehendResult)
         }catch(e){
-            console.warn("invalid JSON in process.env.comprehend",e)
         }
     }
     return await comprehend_client.detectPiiEntities(params).promise();
@@ -131,7 +131,7 @@ module.exports = {
         console.warn(messages.map(message => filter(message)).join(" "))
     },
     debug: function(...messages){
-        if(process.env.ENABLE_DEBUG_RESPONSE == "true"){
+        if(process.env.ENABLE_DEBUG_LOGGING == "true"){
             console.log(messages)
         }
     },
