@@ -41,47 +41,37 @@ async function get_parameter(param_name) {
     return settings;
 }
 
-module.exports ={
-    
-    get_settings: async function() {
-        const default_jwks_param = process.env.DEFAULT_USER_POOL_JWKS_PARAM;
-        const default_settings_param = process.env.DEFAULT_SETTINGS_PARAM;
-        const custom_settings_param = process.env.CUSTOM_SETTINGS_PARAM;
-        const default_jwks_url 
-    
-        if(default_jwks_param){
-            qnabot.log("Getting Default JWKS URL from SSM Parameter Store: ", default_jwks_param);
-            const default_jwks_url = await get_parameter(default_jwks_param);
-        }
 
-        qnabot.log("Getting Default QnABot settings from SSM Parameter Store: ", default_settings_param);
-        const default_settings = await get_parameter(default_settings_param);
-        qnabot.log(`Default Settings: ${JSON.stringify(default_settings,null,2)}`);
-    
-        qnabot.log("Getting Custom QnABot settings from SSM Parameter Store: ", custom_settings_param);
-        const custom_settings = await get_parameter(custom_settings_param);
-        qnabot.log(`Custom Settings: ${JSON.stringify(custom_settings,null,2)}`);
-    
-        const settings = _.merge(default_settings, custom_settings);
-        _.set(settings, "DEFAULT_USER_POOL_JWKS_URL", default_jwks_url);
-        qnabot.log(`Merged Settings: ${JSON.stringify(settings,null,2)}`);
-    
-        if (settings.ENABLE_REDACTING) {
-            qnabot.log("redacting enabled");
-            process.env.QNAREDACT="true";
-            process.env.REDACTING_REGEX=settings.REDACTING_REGEX;
-        } else {
-            qnabot.log("redacting disabled");
-            process.env.QNAREDACT="false";
-            process.env.REDACTING_REGEX="";
-        }
-        if (settings.DISABLE_CLOUDWATCH_LOGGING) {
-            qnabot.log("disable cloudwatch logging");
-            process.env.DISABLECLOUDWATCHLOGGING="true";
-        } else {
-            qnabot.log("enable cloudwatch logging");
-            process.env.DISABLECLOUDWATCHLOGGING="false";
-        }
-        return settings;
+
+function set_environment_variables(settings){
+    if (settings.ENABLE_REDACTING) {
+        qnabot.log("redacting enabled");
+        process.env.QNAREDACT="true";
+        process.env.REDACTING_REGEX=settings.REDACTING_REGEX;
+    } else {
+        qnabot.log("redacting disabled");
+        process.env.QNAREDACT="false";
+        process.env.REDACTING_REGEX="";
     }
+    if (settings.DISABLE_CLOUDWATCH_LOGGING) {
+        qnabot.log("disable cloudwatch logging");
+        process.env.DISABLECLOUDWATCHLOGGING="true";
+    } else {
+        qnabot.log("enable cloudwatch logging");
+        process.env.DISABLECLOUDWATCHLOGGING="false";
+    }
+    if(settings.ENABLE_REDACTING_WITH_COMPREHEND){
+        qnabot.log("enable Amazon Comprehend based redaction.")
+        process.env.ENABLE_REDACTING_WITH_COMPREHEND = "true"
+    } else {
+        qnabot.log("disable Amazon Comprehend based redaction.")
+        process.env.ENABLE_REDACTING_WITH_COMPREHEND = "false"
+    }
+    if(settings.ENABLE_DEBUG_RESPONSE){
+        process.env.ENABLE_DEBUG_RESPONSE = "true"
+    }
+}
+
+module.exports ={
+    set_environment_variables:set_environment_variables 
 }
