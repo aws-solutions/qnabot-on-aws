@@ -132,7 +132,7 @@ module.exports = {
     },
     debug: function(...messages){
         if(process.env.ENABLE_DEBUG_LOGGING == "true"){
-            console.log(messages)
+            console.debug(messages.map(message => filter(message)).join(" "))
         }
     },
     redact_text: filter,
