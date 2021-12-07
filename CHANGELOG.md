@@ -21,6 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Broken link in documentation for downloading CloudFormation template.
 - Integration with Slack on Amazon LexV2 bots.
 - Bug with response bots with Alexa. QnABot will set the sessionAttribute from CONNECT_NEXT_PROMPT_VARNAME to an empty string if QnABot is in a response bot in a voice channel. This will prevent QnABot from saying the next prompt in the middle of a response bot flow.
+- Kendra FAQ sync where export Lambda was missing the Layer containing qnabot log.
 
 ### Changed
 - Bot routing capability to have multiple-bot architecture (e.g., General bot routing questions to specialty bots).
