@@ -133,7 +133,7 @@ async function routeKendraRequest(request_params) {
                 if (element.Type === 'QUESTION_ANSWER' && foundAnswerCount < request_params.size && element.AdditionalAttributes &&
                     element.AdditionalAttributes.length > 1) {
 
-                    if (!open.es.hasJsonStructure(element.DocumentURI)) {
+                    if (!open_es.hasJsonStructure(element.DocumentURI)) {
                         break;
                     }
                     var hit = JSON.parse(element.DocumentURI);
@@ -149,7 +149,7 @@ async function routeKendraRequest(request_params) {
                             continue;
 
                         }
-                        if(_.get(hit,"clientFilterValues","") == ""){
+                        if(_.get(hit,"QNAClientFilter")){
                             qnabot.log("Found an answer with a clientFilterValue set...skipping")
                             continue;
                         }
