@@ -1,14 +1,7 @@
 const _ = require("lodash")
 const qnabot = require('./logging')
+const utils = require('./utilities')
 
-function isJson(str) {
-    try {
-        JSON.parse(str);
-    } catch (e) {
-        return false;
-    }
-    return true;
-}
 
 function str2bool(settings) {
     var new_settings = _.mapValues(settings, x => {
@@ -34,7 +27,7 @@ async function get_parameter(param_name) {
     };
     var response = await ssm.getParameter(params).promise();
     var settings = response.Parameter.Value
-    if (isJson(settings)) {
+    if (utils.isJson(settings)) {
         settings = JSON.parse(response.Parameter.Value);
         settings = str2bool(settings) ;
     }
@@ -73,5 +66,6 @@ function set_environment_variables(settings){
 }
 
 module.exports ={
-    set_environment_variables:set_environment_variables 
+    set_environment_variables:set_environment_variables,
+
 }

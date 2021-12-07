@@ -1,4 +1,8 @@
 const AWS = require("aws-sdk")
+const utilities = require("./utilities")
+const utils = require('./utilities')
+const _ = require("lodash")
+
 
 
 function filter_comprehend_pii(text) {
@@ -65,8 +69,10 @@ async function setPIIRedactionEnvironmentVars(text, useComprehendForPII, piiRege
 
         let detectionResult = await _detectPii(text, useComprehendForPII, piiRegex, pii_entitites, pii_confidence_score)
         //Ugly hack to prevent Comprehend PII Detection from being called twice unnecessarily
-        process.env.comprehendResult = JSON.stringify(detectionResult.comprehendResult) 
-        process.env.found_comprehend_pii = detectionResult.foundPII
+        if(utils.isJson(_.get(detectionResult,"comprehendResult"))){
+            process.env.comprehendResult = JSON.stringify(detectionResult.comprehendResult) 
+        }
+        process.env.found_comprehend_pii = _.get(detectionResult,"foundPII","")
     }catch(e){
         console.warn("Warning: Exception while trying to detect PII with Comprehend. All logging is disabled.");
         console.warn("Exception ",e);
