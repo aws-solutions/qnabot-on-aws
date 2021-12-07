@@ -2,6 +2,40 @@
 let request = require('./request');
 let build_es_query = require('./esbodybuilder');
 let _ = require('lodash')
+const qnabot = require("qnabot/logging")
+
+async function  isESonly(req, query_params) {
+    // returns boolean whether question is supported only on ElasticSearch
+    // no_hits is ES only
+
+    var no_hits_question = _.get(req, '_settings.ES_NO_HITS_QUESTION', 'no_hits');
+    var ES_only_questions = [no_hits_question];
+    if (ES_only_questions.includes(query_params['question'])) {
+        return true
+    }
+    // QID querying is ES only
+    if (query_params.question.toLowerCase().startsWith("qid::")) {
+        return true
+    }
+    // setting topics is ES only
+    if (_.get(query_params, 'topic')!="") {
+        return true
+    }
+    // setting clientFilterValues should block Kendra FAQ indexing
+    if (_.get(query_params, 'qnaClientFilter')) {
+        return true
+    }    
+    if (_.get(query_params, 'kendraIndex') == "") {
+        return true
+    } 
+    //Don't send one word questions to Kendra
+    if(query_params.question.split(" ").length  < 2){
+
+        return true;
+    }
+
+    return false;
+}
 
 
 async function run_query_es(req, query_params) {
@@ -52,5 +86,6 @@ async function run_qid_query_es(params, qid) {
 module.exports = {
     run_query_es:run_query_es,
     run_qid_query_es:run_qid_query_es,
-    hasJsonStructure:hasJsonStructure
+    hasJsonStructure:hasJsonStructure,
+    isESonly:isESonly
 }
