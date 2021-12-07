@@ -8,6 +8,19 @@ This repository contains code for the QnABot, described in the AWS AI blog post 
 
 Refer to [Getting Started](#getting-started) to launch your own QnABot, or [Automated Deployment](https://docs.aws.amazon.com/solutions/latest/aws-qnabot/automated-deployment.html) for detailed implementation instructions.
 
+The 5.1.0 release of QnABot provides support for a new mechanism where a Question can set a Lex session attribute. 
+
+In prior versions, the use of handlebars in an answer could set a session attribute. For example, the following
+
+"{{setSessionAttr ‘attributeName' ‘attributeValue’}}""
+ 
+will set the an attribute called “attributeName” to the value “attributeValue”. The drawback in this approach is that the attribute value could not itself contain nested handle bars. 
+
+In 5.1.0, a Question can now define a set of name/value pairs to set as session attributes when the answer is returned. You’ll see a new field to set a name/value pair plus an “Add” button to define additional name/value pairs and a button to delete a name/value pair. The Value field can contain handlebar statements as well.
+
+The attribute name can be a simple name like “myAttribute” or a complex name like “myAttribute.subAttribute”. Using the dot notation an attribute several levels deep can be set. Note that one can overwrite reserved session attribute names. Avoid using “appContext” or “qnabotcontext” as attribute names. Setting these may have adverse effects on the system.  
+
+Note, the handlebar syntax still works just as it did before. The question configuration just has a new option.
 
 ## Architecture Overview
 ![Architecture](docs/architecture.png)

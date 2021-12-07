@@ -11,20 +11,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Integration with Canvas Learning Management System (LMS) -- an early example implementation
 - Tags to questions in Content Designer and ability to create reports in Kibana.
 - Integration with Genesys call center platform.
-- Bot routing capability to have multiple-bot architecture (e.g., General bot routing questions to specialty bots).
+- Client Filtering with Session Attributes (i.e., Support to allow the same set of questions to be answered differently based on a session attribute)
 - Intelligent redaction of Personally Identifiable Information in logs with Amazon Comprehend.
-- Override qnabot's internal user id by passing qnabotUserId as session attribute
+- A QnABot client (e.g. a Connect contact flow) can now  optionally provide a value for session attribute, `qnabotUserId`. When this session attribute is set, QnABot tracks user activity based on the provided value. If not set, QnABot continues to track user activity based on the request userId (LexV1) or sessionId (LexV2). NOTE: `qnabotUserId` value is not used when user authentication using JWTs is enabled - in this case users are securely identified and verified from the JWT.
 - Support for pre and post processing AWS Lambda Hooks.
 
 ### Fixed
-- Test tab in Content Designer to show same results as the web client.
+- Test tab in Content Designer to show same results as the web client when using Kendra FAQ.
 - Broken link in documentation for downloading CloudFormation template.
 - Integration with Slack on Amazon LexV2 bots.
-- Bug with response bots with Alexa. QnABot will set the sessionAttribute from CONNECT_NEXT_PROMPT_VARNAME to an empty string if QnABot is in a response bot in a voice channel
-
+- Bug with response bots with Alexa. QnABot will set the sessionAttribute from CONNECT_NEXT_PROMPT_VARNAME to an empty string if QnABot is in a response bot in a voice channel. This will prevent QnABot from saying the next prompt in the middle of a response bot flow.
 
 ### Changed
-- Client Filtering with Session Attributes (i.e., Support to allow the same set of questions to be answered differently based on a session attribute)
+- Bot routing capability to have multiple-bot architecture (e.g., General bot routing questions to specialty bots).
 
 ## [5.0.1] - 2021-10-20
 
