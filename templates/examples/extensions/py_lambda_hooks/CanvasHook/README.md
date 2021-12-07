@@ -64,7 +64,8 @@ c. Rule 3: if QnABot can’t find any answers that match these keyword filter ru
 We will set this setting to “false” (to enable support for Rule 3), as we need to accept free form input of  questions that do not exist in the knowledge bank, and have our Canvas LMS integration figure out the best match.
 To support the matching algorithm, we are using a fuzzy string matching python library FuzzyWuzzy --  https://pypi.org/project/fuzzywuzzy/,  and configuring with a matching tolerance score of 70%. 
 ```
-6. Scroll to the bottom of the Settings page and click `Save` button to update the setting.
+6. Update the `IDENTITY_PROVIDER_JWKS_URLS` setting to add trusted Identity Providers (for example: from your Lex-Web-UI Cloudformation Outputs, using the `CognitoUserPoolPubKey` value).
+7. Scroll to the bottom of the Settings page and click `Save` button to update the setting.
 
 
 
