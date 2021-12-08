@@ -552,7 +552,7 @@ module.exports = async function (req, res) {
             }
         }
         // prepend debug msg
-        qnabot.log("pre-debug " +JSON.stringify(req))
+        qnabot.debug("pre-debug " +JSON.stringify(req))
         if (_.get(req._settings, 'ENABLE_DEBUG_RESPONSES')) {
             var msg = "User Input: \"" + req.question + "\"";
 
@@ -587,6 +587,6 @@ module.exports = async function (req, res) {
     res.session.qnabot_gotanswer = (res['got_hits'] > 0) ? true : false ;
 
     var event = {req, res} ;
-    qnabot.log("RESULT", JSON.stringify(event));
+    qnabot.debug("RESULT", JSON.stringify(event));
     return event ;
 };

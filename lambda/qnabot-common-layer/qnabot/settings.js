@@ -37,6 +37,8 @@ async function get_parameter(param_name) {
 
 
 function set_environment_variables(settings){
+    process.env.comprehendResult = ""
+    
     if (settings.ENABLE_REDACTING) {
         qnabot.log("redacting enabled");
         process.env.QNAREDACT="true";
