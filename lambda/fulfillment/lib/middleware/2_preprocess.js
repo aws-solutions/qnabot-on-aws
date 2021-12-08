@@ -29,7 +29,10 @@ async function get_userInfo(userId, idattrs, userPrefs = undefined) {
     var req_userInfo = _.get(ddbResponse, "Item", default_userInfo);
     // append user identity attributes if known
     if (_.get(idattrs, 'preferred_username')) {
-        _.set(req_userInfo, 'UserName', _.get(idattrs, 'preferred_username'));
+        _.set(req_userInfo, 'preferred_username', _.get(idattrs, 'preferred_username'));
+    }
+    if (_.get(idattrs, 'cognito:username')) {
+        _.set(req_userInfo, 'UserName', _.get(idattrs, 'cognito:username'));
     }
     if (_.get(idattrs, 'given_name')) {
         _.set(req_userInfo, 'GivenName', _.get(idattrs, 'given_name'));
