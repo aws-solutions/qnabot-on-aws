@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Integration with Canvas Learning Management System (LMS) -- an early example implementation
 - Tags to questions in Content Designer and ability to create reports in Kibana.
 - Integration with Genesys call center platform.
-- Client Filtering with Session Attributes (i.e., Support to allow the same set of questions to be answered differently based on a session attribute)
+- Client Filtering with Session Attributes (i.e., Support to allow the same set of questions to be answered differently based on a session attribute).
 - Intelligent redaction of Personally Identifiable Information in logs with Amazon Comprehend.
 - A QnABot client (e.g. a Connect contact flow) can now  optionally provide a value for session attribute, `qnabotUserId`. When this session attribute is set, QnABot tracks user activity based on the provided value. If not set, QnABot continues to track user activity based on the request userId (LexV1) or sessionId (LexV2). NOTE: `qnabotUserId` value is not used when user authentication using JWTs is enabled - in this case users are securely identified and verified from the JWT.
 - Support for pre and post processing AWS Lambda Hooks.
@@ -20,8 +20,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Test tab in Content Designer to show same results as the web client when using Kendra FAQ.
 - Broken link in documentation for downloading CloudFormation template.
 - Integration with Slack on Amazon LexV2 bots.
-- Bug with response bots with Alexa. QnABot will set the sessionAttribute from CONNECT_NEXT_PROMPT_VARNAME to an empty string if QnABot is in a response bot in a voice channel. This will prevent QnABot from saying the next prompt in the middle of a response bot flow.
+- QnABot will set the sessionAttribute from CONNECT_NEXT_PROMPT_VARNAME to an empty string if QnABot is in a response bot in a voice channel. This will prevent QnABot from saying the next prompt in the middle of a response bot flow.
 - Kendra FAQ sync where export Lambda was missing the Layer containing qnabot log.
+- Bug with response bots with Alexa where QnABot was filling in a malformed reprompt.text in the response.
 
 ### Changed
 - Bot routing capability to have multiple-bot architecture (e.g., General bot routing questions to specialty bots).
