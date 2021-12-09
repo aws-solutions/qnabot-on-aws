@@ -20,10 +20,11 @@ var encryptor = require('simple-encryptor')(key);
 
 
 async function run_query(req, query_params) {
-    var onlyES = await isESonly(req, query_params);
+    query_params.kendraIndex = _.get(req, "_settings.KENDRA_FAQ_INDEX")
+    var onlyES = await open_es.isESonly(req, query_params);
     let response = "";
     // runs kendra query if question supported on Kendra and KENDRA_FAQ_INDEX is set
-   if (!onlyES && _.get(req, "_settings.KENDRA_FAQ_INDEX")!=""){
+   if (!onlyES){
         response= await run_query_kendra(req, query_params);
     } 
     else {
@@ -32,35 +33,6 @@ async function run_query(req, query_params) {
     qnabot.log(`response ${JSON.stringify(response)}` )
     return response;
 }
-
-async function isESonly(req, query_params) {
-    // returns boolean whether question is supported only on ElasticSearch
-    // no_hits is ES only
-    var no_hits_question = _.get(req, '_settings.ES_NO_HITS_QUESTION', 'no_hits');
-    var ES_only_questions = [no_hits_question];
-    if (ES_only_questions.includes(query_params['question'])) {
-        return true
-    }
-    // QID querying is ES only
-    if (query_params.question.toLowerCase().startsWith("qid::")) {
-        return true
-    }
-    // setting topics is ES only
-    if (_.get(query_params, 'topic')!="") {
-        return true
-    }
-    // setting clientFilterValues should block Kendra FAQ indexing
-    if (_.get(query_params, 'qnaClientFilter')!="") {
-        return true
-    }    
-    //Don't send one word questions to Kendra
-    if(query_params.question.split(" ").length  < 2){
-        return true;
-    }
-    return false;
-}
-
-
 
 
 async function run_query_kendra(req, query_params) {

@@ -291,19 +291,18 @@ def validate_input(event):
 
     try:
         if not error_message:
-            error_message = 'You must provide a question.'
+            error_message = 'There was an error processing your request. Please check the question setup and try again.'
             if json.loads(event['res']['result']['args'][0])['Query']:
                 error_message = ''
 
         if not error_message:
-            error_message = 'You are not logged in.'
-            if event['req']['_userInfo']['Email']:
+            error_message = 'There was an error processing your request. Please check your login and try again, or contact your administrator.'
+            if event['req']['_userInfo']['isVerifiedIdentity'] == "true": 
                 error_message = ''
     except:
         pass
 
     return error_message
-
 
 """
 function handler
@@ -341,7 +340,7 @@ def handler(event, context):
             canvas = Canvas(domain, api_token)
 
         try:
-            # Get the student's email address from the request.
+            # Get the student's profile from the request
             student_user_name = event['req']['_userInfo']['UserName']
             student_name = event['req']['_userInfo']['GivenName']
 

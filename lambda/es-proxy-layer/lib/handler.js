@@ -5,9 +5,10 @@ var _=require('lodash');
 var build_es_query=require('./esbodybuilder');
 var kendra = require('./kendraQuery');
 var AWS=require('aws-sdk');
-
 const qnabot = require("qnabot/logging")
 const qna_settings = require("qnabot/settings")
+const open_es = require("./es_query")
+
 
 
 function isJson(str) {
@@ -138,14 +139,18 @@ module.exports= async (event, context, callback) => {
         event.minimum_score = _.get(settings, 'ALT_SEARCH_KENDRA_FAQ_CONFIDENCE_SCORE', "MEDIUM")
         var question = _.get(event,'question','');
         var topic = _.get(event,'topic','');
-        // Use kendra only if 
-        // - question is not empty
-        // - question has two or more words
-        // - topic is not set
-        // - and a kendra index is specified
-        // NOTE: Logic must be consistent with query.js function isESOnly() to ensure Content Designer Test tab
-        // and runtime bot question handling behave consistently. 
-        let okKendraQuery = (question.length > 0 && question.split(" ").length  > 1 && topic.length == 0 && kendra_index != "") ;
+       
+        let req = {
+           question: question,    
+        }
+        //TODO: At some point we should expose a qnaClientFilter field in the
+        //Content Designer and pass the value here.
+        let params = {
+            topic: topic,
+            kendraIndex: kendra_index,
+            question: question
+        }
+        let okKendraQuery = !(await open_es.isESonly(req,params))
         if ( okKendraQuery ) {
             var response = await run_query_kendra(event, kendra_index);
             // ES fallback if KendraFAQ fails
@@ -161,12 +166,12 @@ module.exports= async (event, context, callback) => {
         qnabot.log("Query response: ", JSON.stringify(response,null,2));
         return callback(null, response);
     } catch (error) {
-        qnabot.log(`error is ${JSON.stringify(error, null,2)}`);
+        
         return callback(JSON.stringify({
-            type:error.response.status===404 ? "[NotFound]":"[InternalServiceError]",
-            status:error.response.status,
-            message:error.response.statusText,
-            data:error.response.data
+            type:_.get(error,"response.status") ===404 ? "[NotFound]":"[InternalServiceError]",
+            status:_.get(error,"response.status"),
+            message:_.get(error,"response.statusText"),
+            data:_.get(error,"response.data")
         }))
     }
 }
