@@ -6,6 +6,7 @@ const alexa = require('./alexa')
 const _ = require('lodash')
 const AWS = require('aws-sdk');
 const qnabot = require("qnabot/logging")
+const qna_settings = require("qnabot/settings")
 
 
 function isJson(str) {
@@ -68,29 +69,6 @@ async function get_settings() {
     const settings = _.merge(default_settings, custom_settings);
     _.set(settings, "DEFAULT_USER_POOL_JWKS_URL", default_jwks_url);
     qnabot.log(`Merged Settings: ${JSON.stringify(settings,null,2)}`);
-    if (settings.ENABLE_REDACTING) {
-        qnabot.log("redacting enabled");
-        process.env.QNAREDACT="true";
-        process.env.REDACTING_REGEX=settings.REDACTING_REGEX;
-    } else {
-        qnabot.log("redacting disabled");
-        process.env.QNAREDACT="false";
-        process.env.REDACTING_REGEX="";
-    }
-    if (settings.DISABLE_CLOUDWATCH_LOGGING) {
-        qnabot.log("disable cloudwatch logging");
-        process.env.DISABLECLOUDWATCHLOGGING="true";
-    } else {
-        qnabot.log("enable cloudwatch logging");
-        process.env.DISABLECLOUDWATCHLOGGING="false";
-    }
-    if(settings.ENABLE_REDACTING_WITH_COMPREHEND){
-        qnabot.log("enable Amazon Comprehend based redaction.")
-        process.env.ENABLE_REDACTING_WITH_COMPREHEND = "true"
-    } else {
-        qnabot.log("disable Amazon Comprehend based redaction.")
-        process.env.ENABLE_REDACTING_WITH_COMPREHEND = "false"
-    }
 
     return settings;
 }
@@ -136,9 +114,10 @@ module.exports = async function parse(req, res) {
 
     // Add QnABot settings from Parameter Store
     const settings = await get_settings();
-    //Removed cached comprehend PII result used by the logging framework
-    process.env.comprehendResult = undefined
+    qna_settings.set_environment_variables(settings)
     _.set(req, "_settings", settings);
+
+
 
     req._type = req._event.version ? "ALEXA" : "LEX"
 

@@ -7,6 +7,7 @@ var translate = require('./translate');
 var kendra = require('./kendraQuery');
 var kendra_fallback = require("./kendra");
 const qnabot = require("qnabot/logging")
+const qna_settings = require("qnabot/settings")
 const open_es = require("./es_query")
 
 // const sleep = require('util').promisify(setTimeout);
@@ -102,7 +103,7 @@ async function invokeLambda (lambdaRef, req, res) {
     } catch (e) {
         // response is not JSON - noop
     }
-    qnabot.log("Lambda returned payload: ", JSON.stringify(payload));
+    qnabot.log("Lambda returned payload: ",payload);
     return [req, res, payload];
 }
 
@@ -478,22 +479,10 @@ function update_res_with_hit(req, res, hit) {
 }
 
 module.exports = async function (req, res) {
-    let redactEnabled = _.get(req, '_settings.ENABLE_REDACTING');
-    let redactRegex = _.get(req, '_settings.REDACTING_REGEX', "\\b\\d{4}\\b(?![-])|\\b\\d{9}\\b|\\b\\d{3}-\\d{2}-\\d{4}\\b");
-    let cloudWatchLoggingDisabled = _.get(req, '_settings.DISABLE_CLOUDWATCH_LOGGING');
 
-    if (redactEnabled) {
-        process.env.QNAREDACT= "true";
-        process.env.REDACTING_REGEX = redactRegex;
-    } else {
-        process.env.QNAREDACT="false";
-        process.env.REDACTING_REGEX="";
-    }
-    if (cloudWatchLoggingDisabled) {
-        process.env.CLOUDWATCHLOGGINGDISABLED="true";
-    } else {
-        process.env.CLOUDWATCHLOGGINGDISABLED="false";
-    }
+
+    qna_settings.set_environment_variables(req._settings)
+    
     const elicitResponseChainingConfig = _.get(res, "session.qnabotcontext.elicitResponse.chainingConfig", undefined);
     const elicitResponseProgress = _.get(res, "session.qnabotcontext.elicitResponse.progress", undefined);
     let hit = undefined;
@@ -535,7 +524,7 @@ module.exports = async function (req, res) {
             }
         }
         // prepend debug msg
-        qnabot.log("pre-debug " +JSON.stringify(req))
+        qnabot.debug("pre-debug " +JSON.stringify(req))
         if (_.get(req._settings, 'ENABLE_DEBUG_RESPONSES')) {
             var msg = "User Input: \"" + req.question + "\"";
 
@@ -570,6 +559,6 @@ module.exports = async function (req, res) {
     res.session.qnabot_gotanswer = (res['got_hits'] > 0) ? true : false ;
 
     var event = {req, res} ;
-    qnabot.log("RESULT", JSON.stringify(event));
+    qnabot.debug("RESULT", JSON.stringify(event));
     return event ;
 };

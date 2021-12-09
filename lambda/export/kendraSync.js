@@ -3,6 +3,7 @@ var aws=require("aws-sdk")
 aws.config.setPromisesDependency(Promise)
 aws.config.region=process.env.AWS_REGION
 const qnabot = require("qnabot/logging")
+const qna_settings = require("qnabot/settings")
 
 
 var s3=new aws.S3({apiVersion: "2006-03-01", region:process.env.REGION})
@@ -84,22 +85,7 @@ async function get_settings() {
 
     console.log("Merged Settings: ", settings);
 
-    if (settings.ENABLE_REDACTING) {
-        console.log("redacting enabled");
-        process.env.QNAREDACT="true";
-        process.env.REDACTING_REGEX=settings.REDACTING_REGEX;
-    } else {
-        console.log("redacting disabled");
-        process.env.QNAREDACT="false";
-        process.env.REDACTING_REGEX="";
-    }
-    if (settings.DISABLE_CLOUDWATCH_LOGGING) {
-        qnabot.log("disable cloudwatch logging");
-        process.env.DISABLECLOUDWATCHLOGGING="true";
-    } else {
-        qnabot.log("enable cloudwatch logging");
-        process.env.DISABLECLOUDWATCHLOGGING="false";
-    }
+
     return settings;
 }
 
@@ -137,6 +123,8 @@ exports.performSync=async function(event,context,cb){
         
         // get QnABot settings to retrieve KendraFAQIndex
         var settings = await get_settings();
+        qna_settings.set_environment_variables(settings)
+
         var kendra_faq_index = _.get(settings, 'KENDRA_FAQ_INDEX', "");
         if (kendra_faq_index == "") {
             throw new Error(`No FAQ Index set: ${kendra_faq_index}`);

@@ -8,11 +8,19 @@ This repository contains code for the QnABot, described in the AWS AI blog post 
 
 Refer to [Getting Started](#getting-started) to launch your own QnABot, or [Automated Deployment](https://docs.aws.amazon.com/solutions/latest/aws-qnabot/automated-deployment.html) for detailed implementation instructions.
 
-**See all the new features list for 4.7.3** [Fulfillment Lambda Provisioned Concurrency](CHANGELOG.md#473---2021-08-04)
+The 5.1.0 release of QnABot provides support for a new mechanism where a Question can set a Lex session attribute. 
 
-**New features in 4.6.0** [Improved Kendra integration and Kibana dashboards. Additional settings to filter Kendra responses based on confidence levels](CHANGELOG.md#460---2021-04-30).
+In prior versions, the use of handlebars in an answer could set a session attribute. For example, the following
 
-**New features in 4.5.0** [Kendra Web Crawler, Comprehend PII Detection, Translate Custom Terminology, Increased deployment regions](CHANGELOG.md#450---2021-03-07).
+"{{setSessionAttr ‘attributeName' ‘attributeValue’}}""
+ 
+will set the an attribute called “attributeName” to the value “attributeValue”. The drawback in this approach is that the attribute value could not itself contain nested handle bars. 
+
+In 5.1.0, a Question can now define a set of name/value pairs to set as session attributes when the answer is returned. You’ll see a new field to set a name/value pair plus an “Add” button to define additional name/value pairs and a button to delete a name/value pair. The Value field can contain handlebar statements as well.
+
+The attribute name can be a simple name like “myAttribute” or a complex name like “myAttribute.subAttribute”. Using the dot notation an attribute several levels deep can be set. Note that one can overwrite reserved session attribute names. Avoid using “appContext” or “qnabotcontext” as attribute names. Setting these may have adverse effects on the system.  
+
+Note, the handlebar syntax still works just as it did before. The question configuration just has a new option.
 
 ## Architecture Overview
 ![Architecture](docs/architecture.png)

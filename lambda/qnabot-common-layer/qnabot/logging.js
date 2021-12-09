@@ -1,17 +1,9 @@
 const AWS = require("aws-sdk")
+const utilities = require("./utilities")
+const utils = require('./utilities')
+const _ = require("lodash")
 
-module.exports = {
-    log: function (...messages) {
-        console.log(messages.map(message => filter(message)).join(" "))
-    },
-    warn: function (...messages) {
-        console.warn(messages.map(message => filter(message)).join(" "))
-    },
 
-    filter_comprehend_pii: filter_comprehend_pii,
-    isPIIDetected: isPIIDetected,
-    setPIIRedactionEnvironmentVars: setPIIRedactionEnvironmentVars 
-}
 
 function filter_comprehend_pii(text) {
     if(process.env.ENABLE_REDACTING_WITH_COMPREHEND !== "true"){
@@ -22,12 +14,12 @@ function filter_comprehend_pii(text) {
     }
 
     let regex = process.env.found_comprehend_pii.split(",").map(pii => `(${pii})`).join("|")
-    let re = new RegExp(regex, "g");
 
+    let re = new RegExp(regex, "g");
     return text.replace(re, "XXXXXX");
 }
 
-const filter = text => {
+function filter(text){
 
     if (process.env.DISABLECLOUDWATCHLOGGING === "true") {
         return "cloudwatch logging disabled";
@@ -77,8 +69,10 @@ async function setPIIRedactionEnvironmentVars(text, useComprehendForPII, piiRege
 
         let detectionResult = await _detectPii(text, useComprehendForPII, piiRegex, pii_entitites, pii_confidence_score)
         //Ugly hack to prevent Comprehend PII Detection from being called twice unnecessarily
-        process.env.comprehendResult = JSON.stringify(detectionResult.comprehendResult) 
-        process.env.found_comprehend_pii = detectionResult.foundPII
+        if(utils.isJson(_.get(detectionResult,"comprehendResult"))){
+            process.env.comprehendResult = JSON.stringify(detectionResult.comprehendResult) 
+        }
+        process.env.found_comprehend_pii = _.get(detectionResult,"foundPII","")
     }catch(e){
         console.warn("Warning: Exception while trying to detect PII with Comprehend. All logging is disabled.");
         console.warn("Exception ",e);
@@ -93,7 +87,6 @@ async function _getPIIEntities(params){
         try{
            return JSON.parse(process.env.comprehendResult)
         }catch(e){
-            console.warn("invalid JSON in process.env.comprehend",e)
         }
     }
     return await comprehend_client.detectPiiEntities(params).promise();
@@ -136,5 +129,21 @@ async function _detectPii(text, useComprehendForPII, piiRegex, pii_rejection_ent
     }
 }
 
-
+module.exports = {
+    log: function (...messages) {
+        console.log(messages.map(message => filter(message)).join(" "))
+    },
+    warn: function (...messages) {
+        console.warn(messages.map(message => filter(message)).join(" "))
+    },
+    debug: function(...messages){
+        if(process.env.ENABLE_DEBUG_LOGGING == "true"){
+            console.debug(messages.map(message => filter(message)).join(" "))
+        }
+    },
+    redact_text: filter,
+    filter_comprehend_pii: filter_comprehend_pii,
+    isPIIDetected: isPIIDetected,
+    setPIIRedactionEnvironmentVars: setPIIRedactionEnvironmentVars 
+}
 

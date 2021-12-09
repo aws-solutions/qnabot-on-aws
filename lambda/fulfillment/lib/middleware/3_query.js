@@ -36,8 +36,8 @@ const qnabot = require("qnabot/logging")
  * @returns {Promise<any>}
  */
 module.exports=async function query(req,res) {
-    qnabot.log("Entry REQ:", JSON.stringify(req, null, 2));
-    qnabot.log("Entry RES:", JSON.stringify(res, null, 2));
+    qnabot.debug("Entry REQ:", JSON.stringify(req, null, 2));
+    qnabot.debug("Entry RES:", JSON.stringify(res, null, 2));
 
     /* These session variables may exist from a prior interaction with QnABot. They are
        used to control behavior of this function and divert the function away from the normal
