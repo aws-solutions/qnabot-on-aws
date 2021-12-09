@@ -20,31 +20,31 @@ function get_keywords_from_comprehend(params) {
     return(Promise.resolve(comprehend.detectSyntax(comprehend_params).promise()))
     .then(function(data) {
         for (var syntaxtoken of data.SyntaxTokens) {
-            qnabot.log(
+            qnabot.debug(
                 "WORD = '" + syntaxtoken.Text + "', "
                 + "PART OF SPEECH = " + syntaxtoken.PartOfSpeech.Tag + ", "
                 + "SCORE: " + syntaxtoken.PartOfSpeech.Score);
             if (keyword_syntax_types.split(",").indexOf(syntaxtoken.PartOfSpeech.Tag) != -1) {
                 if (stopwords.split(",").indexOf(syntaxtoken.Text.toLowerCase()) == -1) {
                     if (syntaxtoken.PartOfSpeech.Score >= syntax_confidence_limit) {
-                        qnabot.log("+KEYWORD: " + syntaxtoken.Text);
+                        qnabot.debug("+KEYWORD: " + syntaxtoken.Text);
                         if(!(syntaxtoken.Text.startsWith("'") || syntaxtoken.Text.startsWith("`"))){
                             keywords = keywords + syntaxtoken.Text + " ";
                         }else{
-                            qnabot.log("Not including " + syntaxtoken.Text)
+                            qnabot.debug("Not including " + syntaxtoken.Text)
                         }
                     } else {
-                        qnabot.log("X score < ", syntax_confidence_limit, " (threshold)");
+                        qnabot.debug("X score < ", syntax_confidence_limit, " (threshold)");
                     }
                 } else {
-                    qnabot.log("X '" + syntaxtoken.Text + "' is a stop word");
+                    qnabot.debug("X '" + syntaxtoken.Text + "' is a stop word");
                 }
             } else {
-                qnabot.log("X part of speech not in list:", keyword_syntax_types);
+                qnabot.debug("X part of speech not in list:", keyword_syntax_types);
             }
         }
-        if (keywords.length == 0) {qnabot.log("Keyword list empty - no query filter applied")}
-        else {qnabot.log("KEYWORDS:",keywords)}
+        if (keywords.length == 0) {qnabot.debug("Keyword list empty - no query filter applied")}
+        else {qnabot.debug("KEYWORDS:",keywords)}
         return keywords;
     });
 }

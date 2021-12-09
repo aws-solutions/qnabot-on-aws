@@ -7,6 +7,7 @@ var _=require('lodash')
 var myCredentials = new aws.EnvironmentCredentials('AWS'); 
 var request=require('./request')
 const qnabot = require("qnabot/logging")
+const qna_settings = require("qnabot/settings")
 
 
 function processKeysForRegEx(obj, re) {
@@ -15,14 +16,14 @@ function processKeysForRegEx(obj, re) {
         if (_.isPlainObject(val)) {
             processKeysForRegEx(val, re);
         } else if ( key === "slot") {
-            obj[key] = qnabot.filter_comprehend_pii(val).replace(re,'XXXXX');
+            obj[key] = qnabot.redact_text(val);
         } else if ( key === "recentIntentSummaryView") {
             if (val) {
                 processKeysForRegEx(val, re);
             }
         } else {
             if (typeof val === 'string') {
-                obj[key] = qnabot.filter_comprehend_pii(val).replace(re,'XXXXX');
+                obj[key] = qnabot.redact_text(val);
             }
         }
     });
@@ -54,6 +55,7 @@ module.exports=function(event, context, callback){
     let redactRegex = _.get(req, '_settings.REDACTING_REGEX', "\\b\\d{4}\\b(?![-])|\\b\\d{9}\\b|\\b\\d{3}-\\d{2}-\\d{4}\\b");
     let cloudwatchLoggingDisabled = _.get(req, '_settings.DISABLE_CLOUDWATCH_LOGGING');
 
+    qna_settings.set_environment_variables(req._settings)
     qnabot.setPIIRedactionEnvironmentVars(req._event.inputTranscript,
         _.get(req, "_settings.ENABLE_REDACTING_WITH_COMPREHEND",false),
         _.get(req, "_settings.REDACTING_REGEX",""),
@@ -70,9 +72,9 @@ module.exports=function(event, context, callback){
             processKeysForRegEx(req, re);
             processKeysForRegEx(res, re);
             processKeysForRegEx(sessionAttributes, re);
-            qnabot.log("RESULT", JSON.stringify(event).replace(re, 'XXXXX'));
+            qnabot.log("RESULT", event);
         } else {
-            qnabot.log("RESULT", JSON.stringify(event));
+            qnabot.log("RESULT", event);
         }
     }
 

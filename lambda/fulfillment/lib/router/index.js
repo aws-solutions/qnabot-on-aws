@@ -9,7 +9,7 @@ module.exports=class router {
     }
 
     async start(event,callback){
-        qnabot.log("Request:"+JSON.stringify(event,null,2))
+        qnabot.debug("Request:"+JSON.stringify(event,null,2))
         try{
             var res=await this._walk( {_event:event})
             qnabot.log("final:",JSON.stringify(res,null,2))
@@ -27,7 +27,7 @@ module.exports=class router {
         
     }
     async _walk(req,res={},index=0){
-        qnabot.log(JSON.stringify({req,res},null,2))
+        qnabot.debug(JSON.stringify({req,res},null,2))
 
         if(this.middleware[index]){
             qnabot.log(`middleware=${this.middleware[index].name}`)

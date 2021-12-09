@@ -7,7 +7,7 @@ const qnabot = require("qnabot/logging")
 
 function get_sentiment_from_comprehend(utterance) {
     // get sentiment and scores from utterance using Comprehend detectSentiment api
-    qnabot.log("detecting sentiment from utterance using Comprehend: ", utterance);
+    qnabot.debug("detecting sentiment from utterance using Comprehend: ", utterance);
     var keywords="";
     var comprehend = new aws.Comprehend();
     var comprehend_params = {

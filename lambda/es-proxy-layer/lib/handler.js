@@ -5,8 +5,8 @@ var _=require('lodash');
 var build_es_query=require('./esbodybuilder');
 var kendra = require('./kendraQuery');
 var AWS=require('aws-sdk');
-
 const qnabot = require("qnabot/logging")
+const qna_settings = require("qnabot/settings")
 const open_es = require("./es_query")
 
 
@@ -65,22 +65,6 @@ async function get_settings() {
 
     qnabot.log("Merged Settings: ", settings);
 
-    if (settings.ENABLE_REDACTING) {
-        qnabot.log("redacting enabled");
-        process.env.QNAREDACT="true";
-        process.env.REDACTING_REGEX=settings.REDACTING_REGEX;
-    } else {
-        qnabot.log("redacting disabled");
-        process.env.QNAREDACT="false";
-        process.env.REDACTING_REGEX="";
-    }
-    if (settings.DISABLE_CLOUDWATCH_LOGGING) {
-        qnabot.log("disable cloudwatch logging");
-        process.env.DISABLECLOUDWATCHLOGGING="true";
-    } else {
-        qnabot.log("enable cloudwatch logging");
-        process.env.DISABLECLOUDWATCHLOGGING="false";
-    }
     return settings;
 }
 
@@ -148,6 +132,7 @@ async function run_query_kendra(event, kendra_index) {
 module.exports= async (event, context, callback) => {
     try {
         var settings = await get_settings();
+        qna_settings.set_environment_variables(settings)
         qnabot.log('Received event:', JSON.stringify(event, null, 2));
 
         var kendra_index = _.get(settings, "KENDRA_FAQ_INDEX")
