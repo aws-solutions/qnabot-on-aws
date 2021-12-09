@@ -76,7 +76,7 @@ module.exports=function(event, context, callback){
         }
     }
 
-    // constructing the object to be logged in ES (to visualize in Kibana)
+    // constructing the object to be logged in OpenSearch (to visualize in Kibana)
     let jsonData = {
         entireRequest: req,
         entireResponse: res,
