@@ -8,7 +8,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [5.1.0] - 2021-12-09
 
 ### Added
-- Integration with Canvas Learning Management System (LMS)
 - Tags to questions in Content Designer and ability to create reports in Kibana.
 - Integration with Genesys call center platform.
 - Client Filtering with Session Attributes (i.e., Support to allow the same set of questions to be answered differently based on a session attribute).
