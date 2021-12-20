@@ -5,6 +5,31 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [5.1.0] - 2021-12-09
+
+### Added
+- Tags to questions in Content Designer and ability to create reports in Kibana.
+- Integration with Genesys call center platform.
+- Client Filtering with Session Attributes (i.e., Support to allow the same set of questions to be answered differently based on a session attribute).
+- Intelligent redaction of Personally Identifiable Information in logs with Amazon Comprehend.
+- A QnABot client (e.g. a Connect contact flow) can now  optionally provide a value for session attribute, `qnabotUserId`. When this session attribute is set, QnABot tracks user activity based on the provided value. If not set, QnABot continues to track user activity based on the request userId (LexV1) or sessionId (LexV2). NOTE: `qnabotUserId` value is not used when user authentication using JWTs is enabled - in this case users are securely identified and verified from the JWT.
+- Support for pre and post processing AWS Lambda Hooks.
+- Setting that determines whether Amazon Kendra responses are abbreviated when sent via SSML (`ALT_SEARCH_KENDRA_ABBREVIATE_MESSAGE_FOR_SSML`)
+- Setting that determines the types of responses that Amazon Kendra returns (`ALT_SEARCH_KENDRA_RESPONSE_TYPES`: `ANSWER`, `DOCUMENT`, `QUESTION_ANSWER`)
+
+### Fixed
+- Test tab in Content Designer to show same results as the web client when using Kendra FAQ.
+- Broken link in documentation for downloading CloudFormation template.
+- Integration with Slack on Amazon LexV2 bots.
+- QnABot will set the sessionAttribute from CONNECT_NEXT_PROMPT_VARNAME to an empty string if QnABot is in a response bot in a voice channel. This will prevent QnABot from saying the next prompt in the middle of a response bot flow.
+- Kendra FAQ sync where export Lambda was missing the Layer containing qnabot log.
+- Bug with response bots with Alexa where QnABot was filling in a malformed reprompt.text in the response.
+- Excel import improvements and bug fixes.
+
+### Changed
+- Bot routing capability to have multiple-bot architecture (e.g., General bot routing questions to specialty bots).
+- The built-in Amazon Kendra “web page indexer” with the new Kendra Web Crawler Datasource.
+
 ## [5.0.1] - 2021-10-20
 
 ### Added

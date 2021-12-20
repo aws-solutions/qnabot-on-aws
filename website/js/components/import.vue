@@ -307,7 +307,7 @@ module.exports = {
         // Here is your object
         var XL_row_object = XLSX.utils.sheet_to_row_object_array(workbook.Sheets[sheetName]);
         var json_object = JSON.stringify(XL_row_object);
-        var question_number = 1
+        var question_number = 1       
         XL_row_object.forEach(question =>{
            console.log("Processing " + JSON.stringify(question))
            for(const property in header_mapping){
@@ -323,11 +323,14 @@ module.exports = {
             console.log("processing response title")
             question.r = {}
             question.r.title = question["cardtitle"]
+            delete question["cardtitle"]
             if(question["imageurl"] != undefined){
               question.r.imageUrl = question.imageurl
+              delete question.imageurl
             }
             if(question["cardsubtitle"] != undefined){
               question.r.subTitle = question.subtitle
+              delete question["cardsubtitle"] 
             }
             question.r.buttons = []
             let i = 1
@@ -363,6 +366,8 @@ module.exports = {
               }
               console.log("Adding button "+ JSON.stringify(button))
               question.r.buttons.push(button)
+              delete question[buttonFieldTextName]
+              delete question[buttonFieldValueName]
              }
            }
            let counter = 1
@@ -370,12 +375,18 @@ module.exports = {
            while(true){
              var userQuestion = question["question"+counter] 
               if(userQuestion != undefined){
-                question.q.push(userQuestion)
+              question.q.push(userQuestion.replace(/(\r\n|\n|\r)/gm," "))
+                delete question["question"+counter]
                 counter++
               }else{
                 break;
               }
            }
+          for(let property in question){
+            if(property.includes(".")){
+              _.set(question,property.split("."),question[property])            
+            }
+          }
           if(question.qid  == undefined){
             self.addError(`Warning: No QID found for line ${question_number}. The question will be skipped.`)
             return

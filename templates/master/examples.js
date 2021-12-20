@@ -3,7 +3,7 @@ module.exports={
         "Type" : "AWS::CloudFormation::Stack",
         "Condition":"BuildExamples",
         "Properties" : {
-            "TemplateURL" :{"Fn::Sub":"http://${BootstrapBucket}.s3.${AWS::Region}.amazonaws.com/${BootstrapPrefix}/templates/examples.json"},
+            "TemplateURL" :{"Fn::Sub":"https://${BootstrapBucket}.s3.${AWS::Region}.amazonaws.com/${BootstrapPrefix}/templates/examples.json"},
             "Parameters" :{
                 "QnAType":{"Fn::GetAtt":["Var","QnAType"]},
                 "QuizType":{"Fn::GetAtt":["Var","QuizType"]},
@@ -25,6 +25,7 @@ module.exports={
                 "VPCSecurityGroupIdList": { "Fn::Join" : [ ",", {"Ref":"VPCSecurityGroupIdList"} ] },
                 "LexBotVersion": {"Ref": "LexBotVersion"},
                 "XraySetting":{"Ref": "XraySetting"},
+                "DefaultQnABotSettings": {"Ref":"DefaultQnABotSettings"}
             }
         }
     }

@@ -25,17 +25,21 @@ async function copyData(s3exportparms,s3importparms) {
 
 async function waitForImport(s3params, timeout){
     console.log("Checking the status of import job");
-    var now = Date.now();
-    var stoptime = now + timeout ;
-    var complete = false;
-    var timedout = false ;
-    var body;
+    const now = Date.now();
+    const stoptime = now + timeout ;
+    let complete = false;
+    let timedout = false ;
+    let body;
     do {
         await new Promise(resolve => setTimeout(resolve, 1000));
-        var res = await s3.getObject(s3params).promise() ;
-        body = JSON.parse(res.Body.toString()); 
-        console.log(body.status);
-        complete = (body.status == "Complete") ? true : false ;
+        try {
+            const res = await s3.getObject(s3params).promise();
+            body = JSON.parse(res.Body.toString());
+            console.log(body.status);
+            complete = (body.status == "Complete") ? true : false;
+        } catch (e) {
+            console.log(`Exception during s3.getObject: ${e}`);
+        }
         timedout = (Date.now() > stoptime) ? true : false ;
     } while( !complete && !timedout );
     if (!complete && timedout ) {

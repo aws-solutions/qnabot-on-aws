@@ -81,3 +81,9 @@ Let's add another question.
   - Click "Save"
 
 ![Add New Setting](./add_new_setting.png)
+
+## Technical Information
+
+If you would like to build your own Lambda hooks, please see the [documentation](../../templates/examples/extensions/README.md).  
+
+There is also a [Javascript Lambda Hook SDK layer](../lambda_hook_sdk.MD) that automatically gets attached to custom Javacript lambda hooks.

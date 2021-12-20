@@ -199,7 +199,7 @@ Handlebars.registerHelper('randomPick', function () {
 
 var apply_handlebars = async function (req, res, hit) {
     qnabot.log("apply handlebars");
-    qnabot.log('req is: ' + JSON.stringify(req,null,2));
+    qnabot.debug('req is: ' + JSON.stringify(req,null,2));
     qnabot.log('res is: ' + JSON.stringify(res,null,2));
     res_glbl = res; // shallow copy - allow modification by setSessionAttr helper
     req_glbl = req; // shallow copy - allow sessionAttributes retrieval by ifLang helper
@@ -320,6 +320,18 @@ var apply_handlebars = async function (req, res, hit) {
             qnabot.log("ERROR: response card fields format caused Handlebars exception. Check syntax: " + e );
             throw (e);
         }
+    }
+    if (_.get(hit, "sa")){
+        hit_out.sa=[];
+        hit.sa.map(obj=>{
+            try {
+                const sa_value = Handlebars.compile(obj.value);
+                hit_out.sa.push({text:obj.text, value: sa_value(context), enableTranslate: obj.enableTranslate});
+            } catch (e) {
+                qnabot.log("ERROR: Session Attributes caused Handlebars exception. Check syntax: ", obj.text);
+                throw (e);
+            }
+        })
     }
     qnabot.log("Preprocessed Result: ", hit_out);
     return hit_out;

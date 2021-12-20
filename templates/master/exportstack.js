@@ -23,6 +23,7 @@ module.exports={
                 "KendraCrawlerSnsTopic":{"Ref":"KendraCrawlerSnsTopic"},
                 "DefaultQnABotSettings":{"Ref":"DefaultQnABotSettings"},
                 "CustomQnABotSettings":{"Ref":"CustomQnABotSettings"},
+                "QnABotCommonLambdaLayer":{"Ref":"QnABotCommonLambdaLayer"},
                 "LexVersion": {"Fn::If": ["CreateLexV1Bots","V1","V2"]},
                 // Lex V1
                 "FallbackIntent": {"Fn::If": ["CreateLexV1Bots",{"Ref": "IntentFallback"},"LexV2Only_Mode"]},
@@ -34,6 +35,7 @@ module.exports={
                 "LexV2BotAlias": {"Fn::GetAtt":["LexV2Bot","botAlias"]},
                 "LexV2BotAliasId": {"Fn::GetAtt":["LexV2Bot","botAliasId"]},
                 "LexV2BotLocaleIds": {"Fn::GetAtt":["LexV2Bot","botLocaleIds"]},
+
             }
         }
     }

@@ -8,9 +8,8 @@
 
 var _ = require('lodash');
 const AWS = require('aws-sdk');
-var build_es_query = require('./esbodybuilder');
-var request = require('./request');
 const qnabot = require("qnabot/logging")
+const open_es = require("./es_query")
 
 
 function confidence_filter(minimum_score,kendra_result){
@@ -27,18 +26,7 @@ function confidence_filter(minimum_score,kendra_result){
 
 }
 
-async function run_query_es(params, qid) {
-    qnabot.log("run_query_es params: ", params);
-    let question = "qid::"+qid;
-    var es_query = await build_es_query({question:question});
-    var es_response = await request({
-        url: `https://${params.es_address}${params.es_path}`,
-        method: "GET",
-        body: es_query
-    });
-    qnabot.log("run_query_es result: ", JSON.stringify(es_response, null, 2));
-    return es_response;
-}
+
 
 /**
  * Function to query kendraClient and return results via Promise
@@ -66,22 +54,7 @@ function kendraRequester(kendraClient,params,resArray) {
 }
 
 
-/** Function that returns if a string has JSON structure
- * @param str - input string
- * @returns boolean true or false
- */
-function hasJsonStructure(str) {
-    if (typeof str !== 'string') return false;
-    try {
-        qnabot.log('hasJsonStructure ' + str)
-        const result = JSON.parse(str);
-        const type = Object.prototype.toString.call(result);
-        return type === '[object Object]' 
-            || type === '[object Array]';
-    } catch (err) {
-        return false;
-    }
-}
+
 
 
 async function asyncForEach(array, callback) {
@@ -160,7 +133,7 @@ async function routeKendraRequest(request_params) {
                 if (element.Type === 'QUESTION_ANSWER' && foundAnswerCount < request_params.size && element.AdditionalAttributes &&
                     element.AdditionalAttributes.length > 1) {
 
-                    if (!hasJsonStructure(element.DocumentURI)) {
+                    if (!open_es.hasJsonStructure(element.DocumentURI)) {
                         break;
                     }
                     var hit = JSON.parse(element.DocumentURI);
@@ -168,13 +141,17 @@ async function routeKendraRequest(request_params) {
                         let qid = hit._source_qid ;
                         // FAQ only references the QID but doesn't contain the full docunment.. retrieve it from ES
                         qnabot.log("Kendra matched qid: ", qid, ". Retrieving full document from Elasticsearch.");
-                        let es_response = await run_query_es(request_params, qid) ;
+                        let es_response = await open_es.run_qid_query_es(request_params, qid) ;
                         qnabot.log("Qid document from Kendra: ", JSON.stringify(hit));
                         hit = _.get(es_response, "hits.hits[0]._source"); //todo fix if null -- test from content designer
                         if(hit == null){
                             qnabot.log("WARNING: An answer was found in Kendrs FAQ, but a corresponding answer was not found in ElasticSearch for "+ hit)
                             continue;
 
+                        }
+                        if(_.get(hit,"QNAClientFilter")){
+                            qnabot.log("Found an answer with a clientFilterValue set...skipping")
+                            continue;
                         }
                     }
                     

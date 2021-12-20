@@ -6,6 +6,7 @@ const alexa = require('./alexa')
 const _ = require('lodash')
 const AWS = require('aws-sdk');
 const qnabot = require("qnabot/logging")
+const qna_settings = require("qnabot/settings")
 
 
 function isJson(str) {
@@ -69,22 +70,6 @@ async function get_settings() {
     _.set(settings, "DEFAULT_USER_POOL_JWKS_URL", default_jwks_url);
     qnabot.log(`Merged Settings: ${JSON.stringify(settings,null,2)}`);
 
-    if (settings.ENABLE_REDACTING) {
-        qnabot.log("redacting enabled");
-        process.env.QNAREDACT="true";
-        process.env.REDACTING_REGEX=settings.REDACTING_REGEX;
-    } else {
-        qnabot.log("redacting disabled");
-        process.env.QNAREDACT="false";
-        process.env.REDACTING_REGEX="";
-    }
-    if (settings.DISABLE_CLOUDWATCH_LOGGING) {
-        qnabot.log("disable cloudwatch logging");
-        process.env.DISABLECLOUDWATCHLOGGING="true";
-    } else {
-        qnabot.log("enable cloudwatch logging");
-        process.env.DISABLECLOUDWATCHLOGGING="false";
-    }
     return settings;
 }
 
@@ -95,12 +80,24 @@ function getClientType(req) {
     }
     // Try to determine which Lex client is being used based on patterns in the req - best effort attempt.
     const voiceortext = (req._preferredResponseType == 'SSML') ? "Voice" : "Text" ;
-    if (_.get(req,"_event.requestAttributes.x-amz-lex:channel-type") == "Slack") {
+
+
+    //for LexV1 channels -- check for x-amz-lex:channel-type requestAttribute
+    //more information on deploying an Amazon Lex V1 Bot on a Messaging Platform: https://docs.aws.amazon.com/lex/latest/dg/example1.html
+
+    //for LexV2 channels -- check for x-amz-lex:channels:platform requestAttribute
+    //more information on deploying an Amazon Lex V2 Bot on a Messaging Platform: https://docs.aws.amazon.com/lexv2/latest/dg/deploying-messaging-platform.html
+
+
+    if ((_.get(req,"_event.requestAttributes.x-amz-lex:channel-type") == "Slack") || (_.get(req,"_event.requestAttributes.x-amz-lex:channels:platform") == "Slack")) {
         return "LEX.Slack." + voiceortext ;
-    } else if (_.get(req,"_event.requestAttributes.x-amz-lex:channel-type") == "Twilio-SMS") {
+    } else if ((_.get(req,"_event.requestAttributes.x-amz-lex:channel-type") == "Twilio-SMS") || (_.get(req,"_event.requestAttributes.x-amz-lex:channels:platform") == "Twilio")) {
         return "LEX.TwilioSMS." + voiceortext ;
     } else if (_.get(req,"_event.requestAttributes.x-amz-lex:accept-content-types")) {
         return "LEX.AmazonConnect." + voiceortext ;
+    }
+    else if (_.get(req,"_event.requestAttributes.x-amz-lex:channels:platform") == "Genesys Cloud") {
+        return "LEX.GenesysCloud." + voiceortext;
     }
     else if (/^.*-.*-\d:.*-.*-.*-.*$/.test(_.get(req,"_event.userId"))){
         // user id pattern to detect lex-web-uithrough use of cognito id as userId: e.g. us-east-1:a8e1f7b2-b20d-441c-9698-aff8b519d8d5
@@ -117,7 +114,10 @@ module.exports = async function parse(req, res) {
 
     // Add QnABot settings from Parameter Store
     const settings = await get_settings();
+    qna_settings.set_environment_variables(settings)
     _.set(req, "_settings", settings);
+
+
 
     req._type = req._event.version ? "ALEXA" : "LEX"
 

@@ -2,13 +2,13 @@
 var _ = require('lodash');
 var safeEval = require('safe-eval');
 const aws = require('aws-sdk');
-var request = require('./request');
-var build_es_query = require('./esbodybuilder');
 var handlebars = require('./handlebars');
 var translate = require('./translate');
 var kendra = require('./kendraQuery');
 var kendra_fallback = require("./kendra");
 const qnabot = require("qnabot/logging")
+const qna_settings = require("qnabot/settings")
+const open_es = require("./es_query")
 
 // const sleep = require('util').promisify(setTimeout);
 
@@ -20,56 +20,18 @@ var encryptor = require('simple-encryptor')(key);
 
 
 async function run_query(req, query_params) {
-    var onlyES = await isESonly(req, query_params);
+    query_params.kendraIndex = _.get(req, "_settings.KENDRA_FAQ_INDEX")
+    var onlyES = await open_es.isESonly(req, query_params);
     let response = "";
     // runs kendra query if question supported on Kendra and KENDRA_FAQ_INDEX is set
-   if (!onlyES && _.get(req, "_settings.KENDRA_FAQ_INDEX")!=""){
+   if (!onlyES){
         response= await run_query_kendra(req, query_params);
     } 
     else {
-        response= await run_query_es(req, query_params);
+        response= await open_es.run_query_es(req, query_params);
     }
     qnabot.log(`response ${JSON.stringify(response)}` )
     return response;
-}
-
-async function isESonly(req, query_params) {
-    // returns boolean whether question is supported only on ElasticSearch
-    // no_hits is ES only
-    var no_hits_question = _.get(req, '_settings.ES_NO_HITS_QUESTION', 'no_hits');
-    var ES_only_questions = [no_hits_question];
-    if (ES_only_questions.includes(query_params['question'])) {
-        return true
-    }
-    // QID querying is ES only
-    if (query_params.question.toLowerCase().startsWith("qid::")) {
-        return true
-    }
-    // setting topics is ES only
-    if (_.get(query_params, 'topic')!="") {
-        return true
-    }
-    //Don't send one word questions to Kendra
-    if(query_params.question.split(" ").length  < 2){
-        return true;
-    }
-    return false;
-}
-
-async function run_query_es(req, query_params) {
-    
-    var es_query = await build_es_query(query_params);
-    var es_response = await request({
-        url: `https://${req._info.es.address}/${req._info.es.index}/_doc/_search?search_type=dfs_query_then_fetch`,
-        method: "GET",
-        body: es_query
-    });
-    
-    if (_.get(es_response, "hits.hits[0]._source")) {
-        _.set(es_response, "hits.hits[0]._source.answersource", "ElasticSearch");
-    }
-
-    return es_response;
 }
 
 
@@ -120,7 +82,7 @@ function getLambdaName(lambdaRef){
         return lambdaRef;
     }
 }
-// used to inoke either chaining rule lambda, or Lambda hook
+// used to invoke either chaining rule lambda, or Lambda hook
 async function invokeLambda (lambdaRef, req, res) {
     let lambdaName = getLambdaName(lambdaRef);
     qnabot.log("Calling Lambda:", lambdaName);
@@ -141,7 +103,7 @@ async function invokeLambda (lambdaRef, req, res) {
     } catch (e) {
         // response is not JSON - noop
     }
-    qnabot.log("Lambda returned payload: ", JSON.stringify(payload));
+    qnabot.log("Lambda returned payload: ",payload);
     return [req, res, payload];
 }
 
@@ -211,8 +173,8 @@ async function get_hit(req, res) {
         fuzziness: _.get(req, '_settings.ES_USE_FUZZY_MATCH'),
         es_expand_contractions: _.get(req,'_settings.ES_EXPAND_CONTRACTIONS'),
         kendra_indexes: _.get(req,'_settings.ALT_SEARCH_KENDRA_INDEXES'),
-        minimum_confidence_score: _.get(req,'_settings.ALT_SEARCH_KENDRA_FAQ_CONFIDENCE_SCORE')
-
+        minimum_confidence_score: _.get(req,'_settings.ALT_SEARCH_KENDRA_FAQ_CONFIDENCE_SCORE'),
+        qnaClientFilter: _.get(req, 'session.QNAClientFilter')
     };
     var no_hits_question = _.get(req, '_settings.ES_NO_HITS_QUESTION', 'no_hits');
     var response = await run_query(req, query_params);
@@ -227,7 +189,7 @@ async function get_hit(req, res) {
     // ES fallback if KendraFAQ fails
     if (!hit && _.get(req, '_settings.KENDRA_FAQ_ES_FALLBACK', true)) {
         qnabot.log('ElasticSearch Fallback');
-        response = await run_query_es(req, query_params);
+        response = await open_es.run_query_es(req, query_params);
         if (_.get(response, "hits.hits[0]._source")) {
             _.set(response, "hits.hits[0]._source.answersource", "ElasticSearch Fallback");
         }
@@ -416,7 +378,20 @@ function update_res_with_hit(req, res, hit) {
     res.type = "PlainText";
     res.message = res.result.a;
     res.plainMessage = res.result.a;
-    
+
+    // add question defined session attributes to res with the exception of qnabotcontext and appContext
+    if (_.get(hit, "sa")){
+        hit.sa.map(obj=>{
+            _.set(res, `session.${obj.text}`, obj.value);
+        })
+    }
+
+    // Add tags to the res object
+    const tags = _.get(hit, "tags");
+    if (tags){
+        _.set(res, 'tags', tags);
+    }
+
     // Add answerSource for query hits
     var ansSource = _.get(hit, "answersource", "unknown");
     if (ansSource==="Kendra FAQ") { // kendra fallback sets answerSource directly
@@ -504,22 +479,10 @@ function update_res_with_hit(req, res, hit) {
 }
 
 module.exports = async function (req, res) {
-    let redactEnabled = _.get(req, '_settings.ENABLE_REDACTING');
-    let redactRegex = _.get(req, '_settings.REDACTING_REGEX', "\\b\\d{4}\\b(?![-])|\\b\\d{9}\\b|\\b\\d{3}-\\d{2}-\\d{4}\\b");
-    let cloudWatchLoggingDisabled = _.get(req, '_settings.DISABLE_CLOUDWATCH_LOGGING');
 
-    if (redactEnabled) {
-        process.env.QNAREDACT= "true";
-        process.env.REDACTING_REGEX = redactRegex;
-    } else {
-        process.env.QNAREDACT="false";
-        process.env.REDACTING_REGEX="";
-    }
-    if (cloudWatchLoggingDisabled) {
-        process.env.CLOUDWATCHLOGGINGDISABLED="true";
-    } else {
-        process.env.CLOUDWATCHLOGGINGDISABLED="false";
-    }
+
+    qna_settings.set_environment_variables(req._settings)
+    
     const elicitResponseChainingConfig = _.get(res, "session.qnabotcontext.elicitResponse.chainingConfig", undefined);
     const elicitResponseProgress = _.get(res, "session.qnabotcontext.elicitResponse.progress", undefined);
     let hit = undefined;
@@ -561,7 +524,7 @@ module.exports = async function (req, res) {
             }
         }
         // prepend debug msg
-        qnabot.log("pre-debug " +JSON.stringify(req))
+        qnabot.debug("pre-debug " +JSON.stringify(req))
         if (_.get(req._settings, 'ENABLE_DEBUG_RESPONSES')) {
             var msg = "User Input: \"" + req.question + "\"";
 
@@ -596,6 +559,6 @@ module.exports = async function (req, res) {
     res.session.qnabot_gotanswer = (res['got_hits'] > 0) ? true : false ;
 
     var event = {req, res} ;
-    qnabot.log("RESULT", JSON.stringify(event));
+    qnabot.debug("RESULT", JSON.stringify(event));
     return event ;
 };

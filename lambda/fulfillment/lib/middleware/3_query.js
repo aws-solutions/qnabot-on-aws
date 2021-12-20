@@ -36,8 +36,8 @@ const qnabot = require("qnabot/logging")
  * @returns {Promise<any>}
  */
 module.exports=async function query(req,res) {
-    qnabot.log("Entry REQ:", JSON.stringify(req, null, 2));
-    qnabot.log("Entry RES:", JSON.stringify(res, null, 2));
+    qnabot.debug("Entry REQ:", JSON.stringify(req, null, 2));
+    qnabot.debug("Entry RES:", JSON.stringify(res, null, 2));
 
     /* These session variables may exist from a prior interaction with QnABot. They are
        used to control behavior of this function and divert the function away from the normal
@@ -152,6 +152,7 @@ module.exports=async function query(req,res) {
     const specialtybot_hook = _.get(postQuery.res,"result.botRouting.specialty_bot", undefined);
     const specialtybot_name = _.get(postQuery.res,"result.botRouting.specialty_bot_name", undefined);
     const specialtybot_alias = _.get(postQuery.res,"result.botRouting.specialty_bot_alias", undefined);
+    const specialtybot_attributes_to_merge = _.get(postQuery.res,"result.botRouting.specialty_bot_session_attributes_to_merge", undefined);
     if (responsebot_hook && responsebot_session_namespace) {
         if (_.get(postQuery,'res.session.qnabotcontext.elicitResponse.loopCount')) {
             _.set(postQuery,'res.session.qnabotcontext.elicitResponse.loopCount',0)
@@ -165,6 +166,7 @@ module.exports=async function query(req,res) {
         _.set(postQuery,'res.session.qnabotcontext.specialtyBot', specialtybot_hook);
         _.set(postQuery,'res.session.qnabotcontext.specialtyBotName', specialtybot_name);
         _.set(postQuery,'res.session.qnabotcontext.specialtyBotAlias', specialtybot_alias);
+        _.set(postQuery,'res.session.qnabotcontext.specialtyBotMergeAttributes', specialtybot_attributes_to_merge);
     }
 
     qnabot.log("Standard path return from 3_query: " + JSON.stringify(postQuery, null, 2));

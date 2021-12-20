@@ -5,8 +5,10 @@ var _=require('lodash');
 var build_es_query=require('./esbodybuilder');
 var kendra = require('./kendraQuery');
 var AWS=require('aws-sdk');
-
 const qnabot = require("qnabot/logging")
+const qna_settings = require("qnabot/settings")
+const open_es = require("./es_query")
+
 
 
 function isJson(str) {
@@ -63,22 +65,6 @@ async function get_settings() {
 
     qnabot.log("Merged Settings: ", settings);
 
-    if (settings.ENABLE_REDACTING) {
-        qnabot.log("redacting enabled");
-        process.env.QNAREDACT="true";
-        process.env.REDACTING_REGEX=settings.REDACTING_REGEX;
-    } else {
-        qnabot.log("redacting disabled");
-        process.env.QNAREDACT="false";
-        process.env.REDACTING_REGEX="";
-    }
-    if (settings.DISABLE_CLOUDWATCH_LOGGING) {
-        qnabot.log("disable cloudwatch logging");
-        process.env.DISABLECLOUDWATCHLOGGING="true";
-    } else {
-        qnabot.log("enable cloudwatch logging");
-        process.env.DISABLECLOUDWATCHLOGGING="false";
-    }
     return settings;
 }
 
@@ -146,13 +132,25 @@ async function run_query_kendra(event, kendra_index) {
 module.exports= async (event, context, callback) => {
     try {
         var settings = await get_settings();
+        qna_settings.set_environment_variables(settings)
         qnabot.log('Received event:', JSON.stringify(event, null, 2));
 
         var kendra_index = _.get(settings, "KENDRA_FAQ_INDEX")
         event.minimum_score = _.get(settings, 'ALT_SEARCH_KENDRA_FAQ_CONFIDENCE_SCORE', "MEDIUM")
         var question = _.get(event,'question','');
         var topic = _.get(event,'topic','');
-        let okKendraQuery = (question.length > 0 && topic.length == 0 && kendra_index != "") ;
+       
+        let req = {
+           question: question,    
+        }
+        //TODO: At some point we should expose a qnaClientFilter field in the
+        //Content Designer and pass the value here.
+        let params = {
+            topic: topic,
+            kendraIndex: kendra_index,
+            question: question
+        }
+        let okKendraQuery = !(await open_es.isESonly(req,params))
         if ( okKendraQuery ) {
             var response = await run_query_kendra(event, kendra_index);
             // ES fallback if KendraFAQ fails
@@ -168,12 +166,12 @@ module.exports= async (event, context, callback) => {
         qnabot.log("Query response: ", JSON.stringify(response,null,2));
         return callback(null, response);
     } catch (error) {
-        qnabot.log(`error is ${JSON.stringify(error, null,2)}`);
+        
         return callback(JSON.stringify({
-            type:error.response.status===404 ? "[NotFound]":"[InternalServiceError]",
-            status:error.response.status,
-            message:error.response.statusText,
-            data:error.response.data
+            type:_.get(error,"response.status") ===404 ? "[NotFound]":"[InternalServiceError]",
+            status:_.get(error,"response.status"),
+            message:_.get(error,"response.statusText"),
+            data:_.get(error,"response.data")
         }))
     }
 }

@@ -15,6 +15,17 @@
       auto-grow
       :counter="schema.maxLength"
     )
+    v-checkbox(
+      v-if="schema.type==='boolean'"
+      :label="schema.title"
+      :hint="schema.description"
+      persistent-hint
+      :required="required"
+      v-model="local"
+      :rules='[rules.required,rules.schema]'
+      :data-path="path"
+      @update:error="setValid"
+    )
     div(v-if="schema.type==='array'")
       .subheading {{schema.title}}
       span {{schema.description}}
@@ -76,6 +87,9 @@ module.exports={
       local:this.value,
       rules:{
         required:function(value){
+          if (typeof(value) === "boolean") {
+            return true;
+          }
           return (self.required ? 
             (value && value.trim ? value.trim().length>0 : false) 
             : true)  || "Required"

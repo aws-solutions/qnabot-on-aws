@@ -7,6 +7,7 @@ var _=require('lodash')
 var myCredentials = new aws.EnvironmentCredentials('AWS'); 
 var request=require('./request')
 const qnabot = require("qnabot/logging")
+const qna_settings = require("qnabot/settings")
 
 
 function processKeysForRegEx(obj, re) {
@@ -15,14 +16,14 @@ function processKeysForRegEx(obj, re) {
         if (_.isPlainObject(val)) {
             processKeysForRegEx(val, re);
         } else if ( key === "slot") {
-            obj[key] = val.replace(re,'XXXXX');
+            obj[key] = qnabot.redact_text(val);
         } else if ( key === "recentIntentSummaryView") {
             if (val) {
                 processKeysForRegEx(val, re);
             }
         } else {
             if (typeof val === 'string') {
-                obj[key] = val.replace(re,'XXXXX');
+                obj[key] = qnabot.redact_text(val);
             }
         }
     });
@@ -54,6 +55,14 @@ module.exports=function(event, context, callback){
     let redactRegex = _.get(req, '_settings.REDACTING_REGEX', "\\b\\d{4}\\b(?![-])|\\b\\d{9}\\b|\\b\\d{3}-\\d{2}-\\d{4}\\b");
     let cloudwatchLoggingDisabled = _.get(req, '_settings.DISABLE_CLOUDWATCH_LOGGING');
 
+    qna_settings.set_environment_variables(req._settings)
+    qnabot.setPIIRedactionEnvironmentVars(req._event.inputTranscript,
+        _.get(req, "_settings.ENABLE_REDACTING_WITH_COMPREHEND",false),
+        _.get(req, "_settings.REDACTING_REGEX",""),
+        _.get(req, "_settings.COMPREHEND_REDACTING_ENTITY_TYPES",""),
+        _.get(req, "_settings.COMPREHEND_REDACTING_CONFIDENCE_SCORE",.99)
+        ).then(() =>{
+
     if (cloudwatchLoggingDisabled) {
         qnabot.log("RESULT", "cloudwatch logging disabled");
     } else {
@@ -63,12 +72,13 @@ module.exports=function(event, context, callback){
             processKeysForRegEx(req, re);
             processKeysForRegEx(res, re);
             processKeysForRegEx(sessionAttributes, re);
-            qnabot.log("RESULT", JSON.stringify(event).replace(re, 'XXXXX'));
+            qnabot.log("RESULT", event);
         } else {
-            qnabot.log("RESULT", JSON.stringify(event));
+            qnabot.log("RESULT", event);
         }
     }
 
+    // constructing the object to be logged in OpenSearch (to visualize in Kibana)
     let jsonData = {
         entireRequest: req,
         entireResponse: res,
@@ -78,8 +88,9 @@ module.exports=function(event, context, callback){
         topic: _.get(res.result, "t", ""),
         session: sessionAttributes,
         clientType: req._clientType,
+        tags: _.get(res, "tags", ""),
         datetime: now
-    }
+    };
 
     if (cloudwatchLoggingDisabled) {
         jsonData.entireRequest = undefined;
@@ -89,18 +100,18 @@ module.exports=function(event, context, callback){
     // encode to base64 string to put into firehose and
     // append new line for proper downstream kinesis processing in kibana and/or athena queries over s3
     var objJsonStr = JSON.stringify(jsonData) + '\n';
-    var firehose = new aws.Firehose()
+    var firehose = new aws.Firehose();
     
     var params = {
           DeliveryStreamName: process.env.FIREHOSE_NAME, /* required */
           Record: { /* required */
             Data: Buffer.from(objJsonStr) /* Strings will be Base-64 encoded on your behalf */ /* required */
         }
-    }
+    };
     
     firehose.putRecord(params, function(err, data) {
       if (err) qnabot.log(err, err.stack) // an error occurred
       else     qnabot.log(data)          // successful response
-    })
+    })})
    
 }

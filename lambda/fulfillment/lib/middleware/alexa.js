@@ -100,7 +100,7 @@ exports.parse=async function(req){
  * 
  */
 exports.assemble=function(request,response){
-    return {
+    let res = {
         version:'1.0',
         response:{
             outputSpeech:_.pickBy({
@@ -121,18 +121,25 @@ exports.assemble=function(request,response){
                 title:_.get(response,"card.title") || request.question || "Image",
                 content:_.has(response.card,'subTitle')? response.card.subTitle +"\n\n" + response.plainMessage:response.plainMessage
             },
-            reprompt: {
-                outputSpeech: _.pickBy({
-                    type:response.reprompt.type,
-                    text:response.reprompt.type==='PlainText' ? response.reprompt.text : null,
-                    ssml:response.reprompt.type==='SSML' ? response.reprompt.text : null,
-                    playBehavior: 'REPLACE_ENQUEUED',
-                })
-            },
             shouldEndSession:false
         },
         sessionAttributes:_.get(response,'session',{})
-    } ;
+    };
+    
+    let repromptText = _.get(response, "reprompt.text", undefined);
+    
+    if(repromptText) {
+        _.set(res, "reprompt", {
+            outputSpeech: _.pickBy({
+                    type:_.get(response, "reprompt.type", null),
+                    text:_.get(response, "reprompt.type", null)==='PlainText' ? _.get(response, "reprompt.text", null) : null,
+                    ssml:_.get(response, "reprompt.type", null)==='SSML' ? _.get(response, "reprompt.text", null) : null,
+                    playBehavior: 'REPLACE_ENQUEUED',
+                })
+        });
+    }
+
+    return res;
 } ;
 
 function End(){

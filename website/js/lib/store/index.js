@@ -12,10 +12,12 @@ module.exports=new Vuex.Store({
             message:"",
             utterances:[],
             alexa:{},
-            connect:{}
+            connect:{}, 
+            genesys:{}
         },
         alexa:{},
         connect:{},
+        genesys:{},
         error:""
     },
     mutations:require('./mutations'),

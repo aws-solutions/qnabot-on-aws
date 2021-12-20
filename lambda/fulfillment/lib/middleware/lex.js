@@ -56,6 +56,11 @@ function parseLexV1Event(event) {
         ),
         channel: _.get(event, "requestAttributes.'x-amz-lex:channel-type'")
     }
+    
+    //check if we pass in a qnabotUserId as a session attribute, if so, use it, else default
+    out._userId = _.get(event,"sessionState.sessionAttributes.qnabotUserId", out._userId);
+    qnabot.log("QnaBot User Id: " + out._userId);
+
     return out;
 }
 
@@ -85,6 +90,11 @@ function parseLexV2Event(event) {
         _.set(out,"session.qnabotcontext.userPreferredLocale", lex_locale);
         qnabot.log("LexV2 in voice mode - Set userPreferredLocale from lex V2 bot locale:", out.session.qnabotcontext.userPreferredLocale);
     } 
+    
+    //check if we pass in a qnabotUserId as a session attribute, if so, use it, else default
+    out._userId = _.get(event,"sessionState.sessionAttributes.qnabotUserId", out._userId);
+    qnabot.log("QnaBot User Id: " + out._userId);
+
     return out;
 }
 
@@ -131,7 +141,15 @@ function slackifyResponse(response) {
         let md = response.result.alt.markdown;
         qnabot.log("Converting markdown response to Slack format.");
         qnabot.log("Original markdown: ", JSON.stringify(md));
+
+        md = md.replace(/<\/?span[^>]*>/g,"");  // remove any span tags (eg no-translate tags)
+        md = md.replace(/<\/?br *\/?>/g,"\n"); // replace br with \n
+
         md = slackifyMarkdown(md);
+
+        //decode URIs in markdown -- slackify-markdown encodes URI. If presented with an encoded URI, slackify-markdown is double encoding URIs
+        md = decodeURI (md); 
+
         response.message = md ;
         qnabot.log("Converted markdown: ", JSON.stringify(md));
     } 
@@ -259,7 +277,7 @@ function assembleLexV2Response(response) {
 }
     
 exports.assemble=function(request,response){
-    if (request._clientType == "LEX.Slack.Text") {
+    if (request._clientType === "LEX.Slack.Text") {
         response = slackifyResponse(response);
     }
     qnabot.log("filterButtons")

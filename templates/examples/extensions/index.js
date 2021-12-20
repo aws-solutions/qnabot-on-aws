@@ -85,6 +85,40 @@ module.exports=Object.assign(
           "BuildDate":(new Date()).toISOString()
       }
     },
+    JsLambdaHookSDKLambdaLayerCodeVersion: {
+      Type: "Custom::S3Version",
+      Properties: {
+        ServiceToken: {"Ref": "CFNLambda"},
+        Bucket: { Ref: "BootstrapBucket" },
+        Key: { "Fn::Sub": "${BootstrapPrefix}/lambda/js_lambda_hook_sdk.zip" },
+        BuildDate: new Date().toISOString(),
+      },
+    },
+    JsLambdaHookSDKLambdaLayer: {
+      Type: "AWS::Lambda::LayerVersion",
+      Properties: {
+        Content: {
+          S3Bucket: { Ref: "BootstrapBucket" },
+          S3Key: { "Fn::Sub": "${BootstrapPrefix}/lambda/js_lambda_hook_sdk.zip"  },
+          S3ObjectVersion: { Ref: "JsLambdaHookSDKLambdaLayerCodeVersion" },
+        },
+        LayerName:{
+          "Fn::Join": [
+            "-",
+            [
+              "JsLambdaHookSDK",
+              {
+                "Fn::Select": [
+                  2,
+                  {"Fn::Split": ["-", {Ref: "DefaultQnABotSettings"}]},
+                ],
+              },
+            ],
+          ],
+        },
+        CompatibleRuntimes: ["nodejs12.x"],
+      },
+    },
     "ExtensionsInvokePolicy": {
       "Type": "AWS::IAM::ManagedPolicy",
       "Properties": {
@@ -175,7 +209,7 @@ module.exports=Object.assign(
                   ]
               }
             ]
-          }
+          }          
         }],
       },
       "Metadata": util.cfnNagXray()
@@ -212,6 +246,7 @@ function jslambda(name){
               "SecurityGroupIds": { "Fn::Split" : [ ",", {"Ref": "VPCSecurityGroupIdList"} ] },
           }, {"Ref" : "AWS::NoValue"} ]
       },
+      "Layers":[{"Ref":"JsLambdaHookSDKLambdaLayer"}],
       "TracingConfig" : {
           "Fn::If": [ "XRAYEnabled", {"Mode": "Active"},
               {"Ref" : "AWS::NoValue"} ]
@@ -278,3 +313,4 @@ function codeVersion(name){
     }
   }
 }
+

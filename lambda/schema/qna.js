@@ -48,18 +48,45 @@ module.exports={
             },
             propertyOrder: 3
         },
+        sa:{
+            title: "Set Session Attributes",
+            type:"array",
+            items:{
+                title:"Name / Value Pair",
+                type:"object",
+                properties:{
+                    text: {
+                        title: "Session Attribute Name",
+                        type : "string",
+                        propertyOrder: 0
+                    },
+                    value: {
+                        title: "Session Attribute Value",
+                        maxLength:8000,
+                        type : "string",
+                        propertyOrder: 1
+                    },
+                    enableTranslate: {
+                        title: "Translate Value if multi-language is enabled",
+                        type : "boolean",
+                        propertyOrder: 2
+                    }
+                },
+            },
+            propertyOrder: 4
+        },
         rp:{
             type:"string",
             title:"Alexa Reprompt",
             description:"Enter the Alexa reprompt to returned if the user does not respond. (SSML autodetection with &lt;speak&gt;&lt;/speak&gt;)",
             maxLength:8000,
-            propertyOrder: 4
+            propertyOrder: 5
         },
         t:{
             type:"string",
             description:"Assign a topic to this item, to support follow up questions on the same topic. (Sets session attribute 'topic' in response)",
             title:"Topic",
-            propertyOrder: 5
+            propertyOrder: 6
         },
         r:{
             title:"Response card",
@@ -137,7 +164,7 @@ module.exports={
             properties:{
                 responsebot_hook:{
                     title:"Elicit Response: ResponseBot Hook",
-                    description:"To capture the next utterance as a response, provide the name of a Lex bot to parse the response and return at least one slot value, e.g. (QNAYesNo, QNADate, etc.). ResponseBot name must start with \"QNA\".",
+                    description:"To capture the next utterance as a response, provide the name of a Lex bot to parse the response and return at least one slot value, e.g. (QNAYesNo, QNADate, etc.). For Lex V2 use \"lexv2::Botid/BotAliasId/LocaleId\". For Lex V1 use a bot name starting with \"QNA\".",
                     type:"string",
                     maxLength:100,
                     propertyOrder:0
@@ -153,7 +180,7 @@ module.exports={
         },
         conditionalChaining:{
             title:"Document Chaining: Chaining Rule",
-            description:"Automatically move on to another item based on the question string returned by this rule. Rule can be a single-quoted string, e.g. 'next question', or a JavaScript conditional expression that evaluates to a string, e.g. (SessionAttributes.namespace.Yes_No == \"Yes\" ) ? \"Yes question\" : \"No Question\", or a Lambda Function Name or ARN that returns a string specified as \"Lambda::FunctionName\". Function name must start with \"QNA\".",
+            description:"Automatically move on to another item based on the question string returned by this rule. Rule can be a single-quoted string, e.g. 'next question', or a JavaScript conditional expression that evaluates to a string, e.g. (SessionAttributes.namespace.Yes_No == \"Yes\" ) ? \"Yes question\" : \"No Question\", or a Lambda Function Name or ARN that returns a string specified as \"Lambda::FunctionName\". Function name must start with \"QNA-\".",
             type:"string",
             maxLength:4000,
             propertyOrder:11
@@ -165,6 +192,13 @@ module.exports={
             maxLength:100,
             propertyOrder:12
         },
+        clientFilterValues:{
+            title:"Client Filters: Values",
+            description:"Enter list of terms. When specified, client must provide N matching terms in request session attribute 'QNAClientFilter' for this answer to be eligible for the response",
+            type:"string",
+            maxLength:100,
+            propertyOrder:10
+        },    
         botRouting:{
             title:"Bot Routing",
             description:"Use QnABot as a supervisory Bot and route to other Bots to handle the conversation. This parameter identifies a target Bot or Lambda with which to route communication.",
@@ -172,8 +206,8 @@ module.exports={
             propertyOrder:13,
             properties:{
                 specialty_bot:{
-                    title:"Bot Routing: Bot Name or Lambda",
-                    description:"The name of a Lex Bot (Specialty Bot) or Lambda Function to route requests to. Specialty Bot names must start with \"QNA\". Lambda functions can be specified as \"Lambda::FunctionName\" or \"Lambda::FunctionARN\" - Lambda function names must start with \"QNA\".",
+                    title:"Bot Routing: LexV1 BotName OR lexv2::Botid/BotAliasId/LocaleId OR Lambda Function",
+                    description:"The target specialty Lex Bot or Lambda Function to route requests to. For Lex V2 bot names use the format \"lexv2::BotId/BotAliasId/LocaleId\". For Lex V1 bot the names should start with \"QNA\". Lambda functions can be specified as \"Lambda::FunctionName\" or \"Lambda::FunctionARN\" - Lambda function names must start with \"QNA-\".",
                     type:"string",
                     maxLength:100,
                     propertyOrder:0
@@ -187,14 +221,27 @@ module.exports={
                 },
                 specialty_bot_alias:{
                     title:"The Bot alias to use for the Specialty Bot. (Required for other Lex/QnA Bot targets - Not utilized when Lambda Function is used.)",
-                    description:"Enter a string for the Specialty Bot's Lex alias.",
+                    description:"For Lex V2 leave empty. For Lex V1 specialty bots, enter a string for the Specialty Bot's Lex alias.",
                     type:"string",
                     maxLength:100,
                     propertyOrder:2
+                },
+                specialty_bot_session_attributes_to_merge:{
+                    title:"Session attributes to forward to a Lex specialty bot.",
+                    description:"An optional comma separated list of session attributes to pass to a Lex specialty bot. Default is an empty string.",
+                    type:"string",
+                    maxLength:100,
+                    propertyOrder:3
                 }
             }
+        },
+        tags:{
+            type:"string",
+            description:"Specify tags for questions. Tags should be space separated. For multi-word tags please use underscore '_'.",
+            title:"Tags",
+            propertyOrder: 14
         },
     },
     required:["qid","q","a"]
 
-}
+};

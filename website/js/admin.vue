@@ -125,9 +125,9 @@ module.exports={
         href:"#/customTranslate"
       },
       {
-        title:"Kendra Web Page Indexing",
+        title:"Kendra Web Crawler",
         id:"kendraIndexing",
-        subTitle:"Index Web Pages with Kendra",
+        subTitle:"Crawl web pages with Kendra",
         icon:"search",
         href:"#/kendraIndex"
       },
@@ -144,6 +144,13 @@ module.exports={
         subTitle:"Instructions for integrating with Connect",
         icon:"info",
         href:"#/connect"
+      },
+      {
+        title:"Genesys Cloud",
+        id:"genesys",
+        subTitle:"Instructions for integrating with Genesys Cloud",
+        icon:"info",
+        href:"#/genesys"
       },
       {
         title:"Lambda Hooks",
