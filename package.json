@@ -30,7 +30,9 @@
     "restart": "npm run stack dev/master restart",
     "down": "npm run stack dev/master down",
     "createKendraFaqIndex": "./utilities/create_kendra_faq_resources.js",
-    "countUserInteractions": "./utilities/count_user_interactions.js"
+    "countUserInteractions": "./utilities/count_user_interactions.js",
+    "code-linter": "./node_modules/eslint/bin/eslint.js . --ext .js",
+    "code-formatter": "./node_modules/prettier/bin-prettier.js --config .prettierrc.yml '**/*.js' --write"
   },
   "repository": {
     "type": "git",
@@ -137,11 +139,14 @@
     "babel-preset-env": "^1.7.0",
     "babel-preset-es2015": "^6.24.1",
     "copy-webpack-plugin": "^6.0.2",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-prettier": "^4.0.0",
     "html-webpack-plugin": "^3.2.0",
     "jsdom": "^16.2.2",
     "jsdom-global": "^3.0.2",
     "json-loader": "^0.5.7",
     "lodash-webpack-plugin": "^0.11.5",
+    "prettier": "^2.4.1",
     "progress-bar-webpack-plugin": "^1.11.0",
     "pug-plain-loader": "^1.1.0",
     "pug-runtime": "^3.0.1",
