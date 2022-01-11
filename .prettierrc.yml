@@ -1,0 +1,8 @@
+# .prettierrc or .prettierrc.yaml
+proseWrap: 'preserve'
+trailingComma: 'none'
+tabWidth: 4
+semi: true
+singleQuote: true
+quoteProps: 'preserve'
+printWidth: 120
