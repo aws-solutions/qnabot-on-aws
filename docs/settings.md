@@ -59,9 +59,8 @@
 | REDACTING_REGEX | regex expression | Redacts expressions matching regex from logs
 | PII_REJECTION_ENABLED | true or false | Enables PII Rejection
 | PII_REJECTION_QUESTION | text  | If PII is found, the user's request (question) will change to this phrase
-| PII_REJECTION_WITH_COMPREHEND: | true or false | Enable's [Personal Identifiable Information](https://aws.amazon.com/blogs/machine-learning/detecting-and-redacting-pii-using-amazon-comprehend/) detection with Amazon Comprehend
 | PII_REJECTION_REGEX | regex expression | Used to find PII based on a regex
-| PII_REJECTION_IGNORE_TYPES | comma separated list of [PII Entity Categories](https://aws.amazon.com/blogs/machine-learning/detecting-and-redacting-pii-using-amazon-comprehend/) | Do not detect the specified list of entity types
+| PII_REJECTION_ENTITY_TYPES | comma separated list of [PII Entity Categories](https://aws.amazon.com/blogs/machine-learning/detecting-and-redacting-pii-using-amazon-comprehend/) | Only recognize PII entity types in the list
 | DISABLE_CLOUDWATCH_LOGGING | true or false | Disable all logging in fulfillment es query handler lambda. does not disable logging from Lambda Hooks or Conditional Chaining Lambda functions
 | MINIMAL_ES_LOGGING | true or false | do not log utterances or session attributes to ElasticSearch for Kibana logging
 | S3_PUT_REQUEST_ENCRYPTION | text | enable header x-amz-server-side-encryption header and set with this value
