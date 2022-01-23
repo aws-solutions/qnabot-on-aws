@@ -38,7 +38,8 @@ LEXV2_BOT_LOCALE_VOICES = {
 	"fr_CA": "Chantal",
 	"fr_FR": "Mathieu",
 	"it_IT": "Bianca",
-	"ja_JP": "Mizuki"
+	"ja_JP": "Mizuki",
+	"ko_KR": "Seoyeon"
 }
 
 # if statusFile defined in lambda event, then log build status to specified S3 object
