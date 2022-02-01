@@ -78,7 +78,7 @@ no means of accessing kibana, and further actions are required to proceed in doi
 
 Since Kibana is already integrated with Cognito for authentication, the following actions can take
 place so access can be gained securely to Kibana. The actions revolve at the process of establishing
-a SSH SOCKS5 connextion with a host in the VPC, from your local machine.
+a SSH SOCKS5 connection with a host in the VPC, from your local machine.
 
 **Prerequisites:**
 An EC2 host needs to be used as a bridge between the local user, and Kibana. This EC2 machine needs to
