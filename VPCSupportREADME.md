@@ -144,16 +144,16 @@ Linux:
 macOS
 
 ```bash
-/usr/bin/google-chrome \
+"/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" \
     --user-data-dir="$HOME/proxy-profile" \
     --proxy-server="socks5://localhost:9200"
 ```
 
 Windows:
 
-```bash
-/usr/bin/google-chrome \
-    --user-data-dir="$HOME/proxy-profile" \
+```powershell
+"C:\Program Files (x86)\Google\Chrome\Application\chrome.exe" ^
+    --user-data-dir="%USERPROFILE%\proxy-profile" ^
     --proxy-server="socks5://localhost:9200"
 ```
 
