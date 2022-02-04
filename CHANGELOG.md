@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [5.1.1] - 2021-02-04
 
 ### Added
-- Expanded language support for voice and text interactions. See [supported languages](docs/multilanguage_support.md#supported-languages).
+- Expanded language support for voice and text interactions. Also included support for Neural voices for Lex language locales. See [supported languages](docs/multilanguage_support.md#supported-languages).
 - Expanded `config.json` to support `LexV2BotLocaleIds` parameter.
 - Updated `LexV2BotLocaleIds` parameter in CloudFormation template to include link to supported languages.
 - Updated [Multi Language Support readme](docs/multilanguage_support.md#supported-languages) and added supported languages section.
