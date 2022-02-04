@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+
+## [5.1.1] - 2021-02-04
+
+### Added
+- Expanded language support for voice and text interactions. See [supported languages](docs/multilanguage_support.md#supported-languages).
+- Expanded `config.json` to support `LexV2BotLocaleIds` parameter.
+- Updated `LexV2BotLocaleIds` parameter in CloudFormation template to include link to supported languages.
+- Updated [Multi Language Support readme](docs/multilanguage_support.md#supported-languages) and added supported languages section.
+- Updated `ENABLE_MULTI_LANGUAGE_SUPPORT` setting in [Settings readme](docs/settings.md) with link to supported languages.
+
+
 ## [5.1.0] - 2021-12-09
 
 ### Added

@@ -28,17 +28,78 @@ BOT_ALIAS = "live"
 LEXV2_BOT_DRAFT_VERSION = "DRAFT"
 LEXV2_TEST_BOT_ALIAS = "TestBotAlias"
 LEXV2_BOT_LOCALE_VOICES = {
-	"de_DE": "Hans",
-	"en_AU": "Nicole",
-	"en_GB": "Amy",
-	"en_US": "Joanna",
-	"es_419": "Mia",
-	"es_ES": "Conchita",
-	"es_US": "Lupe",
-	"fr_CA": "Chantal",
-	"fr_FR": "Mathieu",
-	"it_IT": "Bianca",
-	"ja_JP": "Mizuki"
+	"de_AT": [{
+	    "voiceId": "Vicki",
+	    "engine": "neural"
+	}], 
+	"de_DE": [{
+	    "voiceId": "Vicki",
+	    "engine": "neural"
+	}], 
+	"en_AU": [{
+	    "voiceId": "Olivia",
+	    "engine": "neural"
+	}], 
+	"en_GB": [{
+	    "voiceId": "Amy",
+	    "engine": "neural"
+	}], 
+	"en_IN": [{
+	    "voiceId": "Aditi",
+	    "engine": "standard"
+	}], 
+	"en_US": [{
+	    "voiceId": "Joanna",
+	    "engine": "neural"
+	}], 
+	"en_ZA": [{
+	    "voiceId": "Ayanda",
+	    "engine": "neural"
+	}], 
+	"es_419": [{
+	    "voiceId": "Mia",
+	    "engine": "standard"
+	}], 
+	"es_ES": [{
+	    "voiceId": "Lucia",
+	    "engine": "neural"
+	}], 
+	"es_US": [{
+	    "voiceId": "Lupe",
+	    "engine": "neural"
+	}], 
+	"fr_CA": [{
+	    "voiceId": "Gabrielle",
+	    "engine": "neural"
+	}], 
+	"fr_FR": [{
+	    "voiceId": "Lea",
+	    "engine": "neural"
+	}], 
+	"it_IT": [{
+	    "voiceId": "Bianca",
+	    "engine": "neural"
+	}], 
+	"ja_JP": [{
+	    "voiceId": "Takumi", 
+	    "engine": "neural"
+	}], 
+    "ko_KR": [{
+	    "voiceId": "Seoyeon", 
+	    "engine": "neural"
+	}], 
+    "pt_BR": [{
+	    "voiceId": "Camila", 
+	    "engine": "neural"
+	}], 
+    "pt_PT": [{
+	    "voiceId": "Cristiano", 
+	    "engine": "standard"
+	}], 
+    "zh_CN": [{
+	    "voiceId": "Zhiyu", 
+	    "engine": "standard"
+	}]
 }
 
 # if statusFile defined in lambda event, then log build status to specified S3 object
@@ -362,7 +423,7 @@ def localeIdExists(botId, botVersion, localeId):
     except:
         return False
 
-def lexV2_qna_locale(botId, botVersion, localeId, voiceId):
+def lexV2_qna_locale(botId, botVersion, localeId, voiceId, engine):
     if not localeIdExists(botId, botVersion, localeId):
         response = clientLEXV2.create_bot_locale(
             botId=botId,
@@ -370,7 +431,8 @@ def lexV2_qna_locale(botId, botVersion, localeId, voiceId):
             localeId=localeId,
             nluIntentConfidenceThreshold=0.40,
             voiceSettings={
-                'voiceId': voiceId
+                'voiceId': voiceId, 
+                'engine': engine
             }
         )
     wait_for_lexV2_qna_locale(botId, botVersion, localeId)
@@ -577,7 +639,7 @@ def build_all(utterances):
         print("Batch: " + str(botlocaleIdBatch))
         for botLocaleId in botlocaleIdBatch:
             status("Updating bot locale: " + botLocaleId)
-            lexV2_qna_locale(botId, LEXV2_BOT_DRAFT_VERSION, botLocaleId, voiceId=LEXV2_BOT_LOCALE_VOICES[botLocaleId])
+            lexV2_qna_locale(botId, LEXV2_BOT_DRAFT_VERSION, botLocaleId, voiceId=LEXV2_BOT_LOCALE_VOICES[botLocaleId][0]["voiceId"], engine=LEXV2_BOT_LOCALE_VOICES[botLocaleId][0]["engine"])
             lexV2_fallback_intent(botId, LEXV2_BOT_DRAFT_VERSION, botLocaleId)
             lexV2_genesys_intent(botId, LEXV2_BOT_DRAFT_VERSION, botLocaleId)
             lexV2_qna_slotTypeValues(SLOT_TYPE, botId, LEXV2_BOT_DRAFT_VERSION, botLocaleId, utterances)
