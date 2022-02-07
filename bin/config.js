@@ -11,6 +11,7 @@ module.exports={
     "devPublicOrPrivate": "PRIVATE",
     "namespace":"dev",
     "LexBotVersion":"LexV2 Only",
+    "LexV2BotLocaleIds": "en_US,es_US,fr_CA",
     "stackNamePrefix":"QNA",
     "skipCheckTemplate": false,
     "noStackOutput": false,
