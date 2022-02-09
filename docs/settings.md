@@ -70,3 +70,4 @@
 | RUN_LAMBDAHOOK_FROM_QUERY_STEP | true or false | Controls timing of execution for Lambda hooks
 | LAMBDA_PREPROCESS_HOOK | string | name of AWS Lambda to run before each question is processed. The name of the Lambda must start with "qna-" or "QNA-" to comply with the permissionss of the role attached to the Fulfillment Lambda .
 | LAMBDA_POSTPROCESS_HOOK | string | name of AWS Lambda to run after the question is processed. But before user profile information is saved. The name of the Lambda must start with "qna-" or "QNA-" to comply with the permissionss of the role attached to the Fulfillment Lambda .
+| SEARCH_REPLACE_QUESTION_SUBSTRINGS | string | replace words or phrases in user questions by defining search/replace pairs in a JSON object like: {"searchString":"replaceString"}. Add additional pairs separated by commas, like: {"searchString":"replaceString", "searchString2":"replaceString2"}.
