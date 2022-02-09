@@ -9,6 +9,7 @@ import logging
 kendra = boto3.client('kendra')
 ssm = boto3.client('ssm')
 cloudwatch = boto3.client('cloudwatch')
+logger = logging.getLogger().setLevel(logging.INFO)
 
 
 def create_cron_expression(schedule):
@@ -22,7 +23,7 @@ def create_cron_expression(schedule):
     elif schedule is None or schedule == "":
         return ""
     else:
-        logging.warn("The schedule must be specified as either rate(day(s) | week(s) | month(s)) or daily | weekly | monthly")
+        logger.warn("The schedule must be specified as either rate(day(s) | week(s) | month(s)) or daily | weekly | monthly")
         return "INVALID"
 
     now = datetime.datetime.now()
@@ -48,12 +49,12 @@ def create_cron_expression(schedule):
         cron[4] = "?"
 
     cron = "cron(" + " ".join(map(lambda i: str(i), cron)) + ")"
-    print(cron)
+    logger.info("cron schedule = " + cron)
     return cron
 
 
 def handler(event, context):
-    logging.info(event)
+    print(event)
     Name = os.environ.get('DATASOURCE_NAME')
     RoleArn = os.environ.get('ROLE_ARN')
 
@@ -65,21 +66,25 @@ def handler(event, context):
 
     schedule = create_cron_expression(schedule)
     if schedule == "INVALID":
-        logging.warn("The cron schedule specified by KENDRA_INDEXER_SCHEDULE " +
+        logger.warn("The cron schedule specified by KENDRA_INDEXER_SCHEDULE " +
                      "is invalid. Schedule: ${schedule}. Crawling will not be done on a schedule/")
         schedule = ""      
     data_source_id = get_data_source_id(IndexId, Name)
     current_schedule = get_data_source_schedule(IndexId, data_source_id)
 
-    schedule_parts = schedule.replace("cron(", "").replace(")", "").split(",")
-    current_schedule = schedule.replace("cron(", "").replace(")", "").split(",")
+    schedule_parts = schedule.replace("cron(", "").replace(")", "").split(" ")
+    current_schedule_parts = current_schedule.replace("cron(", "").replace(")", "").split(" ")
+ 
+    #The hour and minute are set dynamically.  This is to detect if the schedule changed between DAILY, WEEKLY, MONTHLY
+    if(not (schedule_parts[2] != current_schedule_parts[2] or
+       schedule_parts[3] != current_schedule_parts[3] or
+      ((schedule_parts[3] != current_schedule_parts[3]) and (schedule_parts[3] != "?" or current_schedule_parts[3] != "?")))):
+       
+        logger.info("No schedule changes detected.  Not updating schedulr")
+        schedule = current_schedule
 
-    # The hour and minute are set dynamically.  This is to detect if the schedule changed between DAILY, WEEKLY, MONTHLY
-    if(schedule_parts[2] != current_schedule[2] or
-       schedule_parts[3] != current_schedule[3] or
-       ((schedule_parts[3] != current_schedule[3]) and (schedule_parts[3] != "?" or current_schedule[3] != "?"))):
-
-        kendra_update_data_source(IndexId, data_source_id, URLs, RoleArn, schedule, crawl_depth)
+    logger.info("Updating index with schedule " + schedule + " crawl_depth" + crawl_depth)
+    kendra_update_data_source(IndexId, data_source_id, URLs, RoleArn, schedule, crawl_depth)
 
     return {"IndexId": IndexId, "DataSourceId": data_source_id}
 
@@ -128,26 +133,8 @@ def kendra_update_data_source(IndexId, data_source_id, URLs, RoleArn, schedule, 
                         'WebCrawlerMode': 'EVERYTHING'
                     }
                 },
-                'CrawlDepth': crawl_depth
+                'CrawlDepth': int(crawl_depth)
             }
         }
     )
     return response
-
-
-def create_dashboard(IndexId, data_source_id):
-
-    cwd = os.environ['LAMBDA_TASK_ROOT']
-    file = os.path.join(cwd, 'kendra-dashboard.json')
-
-    with open(file, 'r') as dashboard:
-        dashboard_body = dashboard.read()
-
-    dashboard_body = dashboard_body.replace('${IndexId}', IndexId)
-    dashboard_body = dashboard_body.replace('${data_source_id}', data_source_id)
-    dashboard_body = dashboard_body.replace('\n', '')
-
-    cloudwatch.put_dashboard(
-        DashboardName=os.environ.get('DASHBOARD_NAME'),
-        DashboardBody=dashboard_body
-    )
