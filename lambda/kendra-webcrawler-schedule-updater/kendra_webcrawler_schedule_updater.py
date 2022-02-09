@@ -54,7 +54,7 @@ def create_cron_expression(schedule):
 
 
 def handler(event, context):
-    print(event)
+    logger.info(event)
     Name = os.environ.get('DATASOURCE_NAME')
     RoleArn = os.environ.get('ROLE_ARN')
 
