@@ -124,7 +124,7 @@ def kendra_create_data_source(client, IndexId, Name, Type, RoleArn, Description,
                         'WebCrawlerMode': crawler_mode
                     }
                 },
-                'CrawlDepth': crawl_depth
+                'CrawlDepth': int(crawl_depth)
             }
         }
     )
@@ -154,7 +154,7 @@ def kendra_update_data_source(IndexId, data_source_id, URLs, RoleArn, schedule, 
                         'WebCrawlerMode': crawler_mode
                     }
                 },
-                'CrawlDepth': crawl_depth
+                'CrawlDepth': int(crawl_depth)
             }
         }
     )
