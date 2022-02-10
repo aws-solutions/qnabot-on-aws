@@ -2,8 +2,7 @@
 
 Chatbots are a great way to make information available for your users. With QnABot you can deploy a chatbot in just a few steps and have a fully functional chat experience setup in under an hour.
 
-
-Once the solution is deployed, you have a QnABot designer console where you can build and manage your question and answer bank. The question and answer bank become your knowledge base and the main source of information for QnABot to interact with to provide users' with relevant answers. 
+Once the solution is deployed, you have a QnABot designer console where you can build and manage your question and answer bank. The question and answer bank become your knowledge base and the main source of information for QnABot to interact with to provide users' with relevant answers.
 
 ## Solution architecture and how It works
 

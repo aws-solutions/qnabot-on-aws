@@ -56,18 +56,21 @@
 | CONNECT_ENABLE_VOICE_RESPONSE_INTERRUPT | true or false | Return bot response in session attribute to enable contact flow to use response as an interruptible prompt.
 | CONNECT_NEXT_PROMPT_VARNAME | text | Name of session var to use for next prompt
 | ENABLE_REDACTING | true or false | Enable the system to redact log output
+| ENABLE_REDACTING_WITH_COMPREHEND | true or false | Enables [Amazon Comprehend based PII Redacting](https://aws.amazon.com/blogs/machine-learning/detecting-and-redacting-pii-using-amazon-comprehend/)
+| COMPREHEND_REDACTING_ENTITY_TYPES | comma separated list | A list of [PII Entity Types](https://aws.amazon.com/blogs/machine-learning/detecting-and-redacting-pii-using-amazon-comprehend/)
+| COMPREHEND_REDACTING_CONFIDENCE_SCORE | number (0 to .99) | Only redact PII where Amazon Comprehend's confidence score is greater than this number
 | REDACTING_REGEX | regex expression | Redacts expressions matching regex from logs
 | PII_REJECTION_ENABLED | true or false | Enables PII Rejection
 | PII_REJECTION_QUESTION | text  | If PII is found, the user's request (question) will change to this phrase
-| PII_REJECTION_WITH_COMPREHEND: | true or false | Enable's [Personal Identifiable Information](https://aws.amazon.com/blogs/machine-learning/detecting-and-redacting-pii-using-amazon-comprehend/) detection with Amazon Comprehend
 | PII_REJECTION_REGEX | regex expression | Used to find PII based on a regex
-| PII_REJECTION_IGNORE_TYPES | comma separated list of [PII Entity Categories](https://aws.amazon.com/blogs/machine-learning/detecting-and-redacting-pii-using-amazon-comprehend/) | Do not detect the specified list of entity types
+| PII_REJECTION_ENTITY_TYPES | comma separated list of [PII Entity Categories](https://aws.amazon.com/blogs/machine-learning/detecting-and-redacting-pii-using-amazon-comprehend/) | Only recognize PII entity types in the list
+| PII_REJECTION_CONFIDENCE_SCORE | number (0 to 0.99) | Only reject PII where Amazon Comprehend's confidence score is greater than this number
 | DISABLE_CLOUDWATCH_LOGGING | true or false | Disable all logging in fulfillment es query handler lambda. does not disable logging from Lambda Hooks or Conditional Chaining Lambda functions
 | MINIMAL_ES_LOGGING | true or false | do not log utterances or session attributes to ElasticSearch for Kibana logging
 | S3_PUT_REQUEST_ENCRYPTION | text | enable header x-amz-server-side-encryption header and set with this value
 | BOT_ROUTER_WELCOME_BACK_MSG | text | The text used by QnABot when ending communication from a specialty bot
 | BOT_ROUTER_EXIT_MSGS | comma separated list | The exit phrases in comma separated list available for the a user to end communication with a specialty bot
 | RUN_LAMBDAHOOK_FROM_QUERY_STEP | true or false | Controls timing of execution for Lambda hooks
-| LAMBDA_PREPROCESS_HOOK | string | name of AWS Lambda to run before each question is processed. The name of the Lambda must start with "qna-" or "QNA-" to comply with the permissionss of the role attached to the Fulfillment Lambda .
-| LAMBDA_POSTPROCESS_HOOK | string | name of AWS Lambda to run after the question is processed. But before user profile information is saved. The name of the Lambda must start with "qna-" or "QNA-" to comply with the permissionss of the role attached to the Fulfillment Lambda .
+| LAMBDA_PREPROCESS_HOOK | string | name of AWS Lambda to run before each question is processed. The name of the Lambda must start with "qna-" or "QNA-" to comply with the permissions of the role attached to the Fulfillment Lambda .
+| LAMBDA_POSTPROCESS_HOOK | string | name of AWS Lambda to run after the question is processed. But before user profile information is saved. The name of the Lambda must start with "qna-" or "QNA-" to comply with the permissions of the role attached to the Fulfillment Lambda .
 | SEARCH_REPLACE_QUESTION_SUBSTRINGS | string | replace words or phrases in user questions by defining search/replace pairs in a JSON object like: {"searchString":"replaceString"}. Add additional pairs separated by commas, like: {"searchString":"replaceString", "searchString2":"replaceString2"}.

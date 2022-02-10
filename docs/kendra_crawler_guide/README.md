@@ -2,7 +2,7 @@
 
 Please read the [Amazon Kendra Integration](../../workshops/kendra/README.md) for instructions about configuring Kendra
 
-QnABot can now crawl your website with Kendra and answer questions based on what it has found.
+QnABot can crawl your website with Kendra and answer questions based on what it has found.
 
 Go to the Settings option in the Tools menu
 
