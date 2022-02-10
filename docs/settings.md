@@ -13,7 +13,7 @@
 | ES_PHRASE_BOOST | integer | If the user's question is a phrase match to a question in the knowledge then boost the score by this factor.
 | ES_SCORE_ANSWER_FIELD | true or false | Include the content of the answer field (not just the question fields) when determining the score for a match
 | ENABLE_SENTIMENT_SUPPORT | true or false | Enables [Amazon Comprehend](https://docs.aws.amazon.com/comprehend/latest/dg/how-sentiment.html) be used for sentiment analysis
-| ENABLE_MULTI_LANGUAGE_SUPPORT | true or false | Enable or Disable Amazon Translate support
+| ENABLE_MULTI_LANGUAGE_SUPPORT | true or false | Enable or Disable Amazon Translate support. See list of [Supported Languages](multilanguage_support.md#supported-languages)
 | ENABLE_CUSTOM_TERMINOLOGY| true or false |  Enable support for installed [Custom Terminology](https://aws.amazon.com/blogs/machine-learning/introducing-amazon-translate-custom-terminology/) files when using Amazon Translate
 | MINIMUM_CONFIDENCE_SCORE | decimal between 0.0 and 0,99 | The minimum confidence before Amazon Comprehend will determine the user's language
 | ALT_SEARCH_KENDRA_INDEXES | An Array of comma separated Ids |  A list of one or more [Amazon Kendra](https://aws.amazon.com/kendra/) indexes used for Kendra fallback
@@ -73,3 +73,4 @@
 | RUN_LAMBDAHOOK_FROM_QUERY_STEP | true or false | Controls timing of execution for Lambda hooks
 | LAMBDA_PREPROCESS_HOOK | string | name of AWS Lambda to run before each question is processed. The name of the Lambda must start with "qna-" or "QNA-" to comply with the permissions of the role attached to the Fulfillment Lambda .
 | LAMBDA_POSTPROCESS_HOOK | string | name of AWS Lambda to run after the question is processed. But before user profile information is saved. The name of the Lambda must start with "qna-" or "QNA-" to comply with the permissions of the role attached to the Fulfillment Lambda .
+| SEARCH_REPLACE_QUESTION_SUBSTRINGS | string | replace words or phrases in user questions by defining search/replace pairs in a JSON object like: {"searchString":"replaceString"}. Add additional pairs separated by commas, like: {"searchString":"replaceString", "searchString2":"replaceString2"}.

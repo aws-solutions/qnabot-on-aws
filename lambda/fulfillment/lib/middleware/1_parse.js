@@ -148,6 +148,28 @@ module.exports = async function parse(req, res) {
 
     req._clientType = getClientType(req) ;
 
+    // replace substrings in user's question
+    qnabot.log("checking for question search/replace setting 'SEARCH_REPLACE_QUESTION_SUBSTRINGS'.");
+    const SEARCH_REPLACE_QUESTION_SUBSTRINGS = _.get(settings, "SEARCH_REPLACE_QUESTION_SUBSTRINGS");
+    if (SEARCH_REPLACE_QUESTION_SUBSTRINGS) {
+        qnabot.log("processing user question per SEARCH_REPLACE_QUESTION_SUBSTRINGS setting:" + SEARCH_REPLACE_QUESTION_SUBSTRINGS);
+        let search_replace_question_substrings = {};
+        try{
+            search_replace_question_substrings = JSON.parse(SEARCH_REPLACE_QUESTION_SUBSTRINGS);
+        }catch{
+            qnabot.log("Improperly formatted JSON in SEARCH_REPLACE_QUESTION_SUBSTRINGS: " + SEARCH_REPLACE_QUESTION_SUBSTRINGS);
+        }
+        let question = req.question;
+        for(let pattern in search_replace_question_substrings)
+        {   
+            let replacement = search_replace_question_substrings[pattern];
+            qnabot.log("Search/replace: '" + pattern + "' with '" + replacement + "'");
+            question = question.replace(pattern, replacement);
+        }
+        req.question = question;
+    } else {
+        qnabot.log("question search/replace is not enabled.");
+    }  
 
     // multilanguage support 
     if (_.get(settings, 'ENABLE_MULTI_LANGUAGE_SUPPORT')) {

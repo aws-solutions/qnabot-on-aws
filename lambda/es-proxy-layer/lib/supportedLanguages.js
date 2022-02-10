@@ -8,9 +8,11 @@ const supportedLanguages = {
     "Bengali": "bn",
     "Bosnian": "bs",
     "Bulgarian": "bg",
+    "Catalan": "ca",
     "Chinese": "zh",
     "Chinese (Simplified)": "zh",
     "Chinese (Traditional)": "zh-TW",
+    "Creole": "ht",
     "Croatian": "hr",
     "Czech": "cs",
     "Danish": "da",
@@ -18,43 +20,64 @@ const supportedLanguages = {
     "Dutch": "nl",
     "English": "en",
     "Estonian": "et",
+    "Farsi (Persian)": "fa",
+    "Filipino, Tagalog": "tl",
     "Finnish": "fi",
     "French": "fr",
-    "French (Canadian)": "fr-CA",
+    "French (Canada)": "fr-CA",
     "Georgian": "ka",
     "German": "de",
     "Greek": "el",
+    "Gujarati": "gu",
+    "Haitian Creole": "ht",
     "Hausa": "ha",
     "Hebrew": "he",
     "Hindi": "hi",
     "Hungarian": "hu",
+    "Icelandic": "is",
     "Indonesian": "id",
+    "Irish": "ga",
     "Italian": "it",
     "Japanese": "ja",
+    "Kannada": "kn",
+    "Kazakh": "kk",
     "Korean": "ko",
     "Latvian": "lv",
+    "Lithuanian": "lt",
+    "Macedonian": "mk",
     "Malay": "ms",
+    "Malayalam": "ml",
+    "Maltese": "mt",
+    "Marathi": "mr",
+    "Mongolian": "mn",
     "Norwegian": "no",
-    "Persian": "fa",
     "Pashto": "ps",
+    "Persian": "fa", 
     "Polish": "pl",
     "Portuguese": "pt",
+    "Portuguese (Portugal)": "pt-PT",
+    "Punjabi": "pa",
     "Romanian": "ro",
     "Russian": "ru",
     "Serbian": "sr",
+    "Sinhala": "si",
     "Slovak": "sk",
     "Slovenian": "sl",
     "Somali": "so",
     "Spanish": "es",
+    "Spanish (Mexico)": "es-MX",
     "Swahili": "sw",
     "Swedish": "sv",
-    "Tagalog": "tl",
+    "Tagalog": "tl", 
     "Tamil": "ta",
+    "Telugu": "te",
     "Thai": "th",
     "Turkish": "tr",
     "Ukrainian": "uk",
     "Urdu": "ur",
-    "Vietnamese": "vi"
+    "Uzbek": "uz",
+    "Vietnamese": "vi", 
+    "Welsh": "cy"
 };
 
 const languageErrorMessages = {
@@ -86,9 +109,17 @@ const languageErrorMessages = {
         "language": "Bosnian",
         "errorMessage": "Žao nam je, traženi jezik nije dostupan."
     },
+    "ca": {
+        "language": "Catalan",
+        "errorMessage": "Ho sentim, l'idioma sol·licitat no està disponible."
+    },
     "cs": {
         "language": "Czech",
         "errorMessage": "Je nám líto, požadovaný jazyk není k dispozici."
+    },
+    "cy": {
+        "language": "Welsh",
+        "errorMessage": "Mae'n ddrwg gennym, nid yw'r iaith y gofynnwyd amdani ar gael."
     },
     "da": {
         "language": "Danish",
@@ -110,12 +141,16 @@ const languageErrorMessages = {
         "language": "Spanish",
         "errorMessage": "Lo sentimos, el idioma solicitado no está disponible."
     },
+    "es-MX": {
+        "language": "Spanish (Mexico)",
+        "errorMessage": "Lo sentimos, el idioma solicitado no está disponible."
+    },
     "et": {
         "language": "Estonian",
         "errorMessage": "Vabandame, soovitud keel pole saadaval."
     },
     "fa": {
-        "language": "Persian",
+        "language": "Farsi (Persian)",
         "errorMessage": "متأسفانه زبان درخواستی در دسترس نیست."
     },
     "fa-AF": {
@@ -131,8 +166,16 @@ const languageErrorMessages = {
         "errorMessage": "Désolé, la langue demandée n'est pas disponible."
     },
     "fr-CA": {
-        "language": "French (Canadian)",
+        "language": "French (Canada)",
         "errorMessage": "Désolé, la langue demandée n'est pas disponible."
+    },
+    "ga": {
+        "language": "Irish",
+        "errorMessage": "Tá brón orm, níl an teanga iarrtha ar fáil."
+    },
+    "gu": {
+        "language": "Gujarati",
+        "errorMessage": "માફ કરશો, વિનંતી કરેલી ભાષા ઉપલબ્ધ નથી."
     },
     "ha": {
         "language": "Hausa",
@@ -150,6 +193,10 @@ const languageErrorMessages = {
         "language": "Croatian",
         "errorMessage": "Nažalost, traženi jezik nije dostupan."
     },
+    "ht": {
+        "language": "Haitian Creole",
+        "errorMessage": "Padon, lang yo mande a pa disponib."
+    },
     "hu": {
         "language": "Hungarian",
         "errorMessage": "Sajnáljuk, a kért nyelv nem érhető el."
@@ -161,6 +208,10 @@ const languageErrorMessages = {
     "id": {
         "language": "Indonesian",
         "errorMessage": "Maaf, bahasa yang diminta tidak tersedia."
+    },
+    "is": {
+        "language": "Icelandic",
+        "errorMessage": "Því miður, umbeðið tungumál er ekki í boði."
     },
     "it": {
         "language": "Italian",
@@ -174,17 +225,49 @@ const languageErrorMessages = {
         "language": "Georgian",
         "errorMessage": "უკაცრავად, მოთხოვნილი ენა არ არის ხელმისაწვდომი."
     },
+    "kk": {
+        "language": "Kazakh",
+        "errorMessage": "Кешіріңіз, сұралған тіл қол жетімді емес."
+    },
+    "kn": {
+        "language": "Kannada",
+        "errorMessage": "ಕ್ಷಮಿಸಿ, ವಿನಂತಿಸಿದ ಭಾಷೆ ಲಭ್ಯವಿಲ್ಲ."
+    },
     "ko": {
         "language": "Korean",
         "errorMessage": "죄송합니다. 요청하신 언어를 사용할 수 없습니다."
+    },
+    "lt": {
+        "language": "Lithuanian",
+        "errorMessage": "Atsiprašome, prašomos kalbos nėra."
     },
     "lv": {
         "language": "Latvian",
         "errorMessage": "Atvainojiet, pieprasītā valoda nav pieejama."
     },
+    "mk": {
+        "language": "Macedonian",
+        "errorMessage": "Извинете, бараниот јазик не е достапен."
+    },
+    "ml": {
+        "language": "Malayalam",
+        "errorMessage": "ക്ഷമിക്കണം, അഭ്യർത്ഥിച്ച ഭാഷ ലഭ്യമല്ല."
+    },
+    "mn": {
+        "language": "Mongolian",
+        "errorMessage": "कУучлаарай, хүссэн хэл байхгүй байна."
+    },
+    "mr": {
+        "language": "Marathi",
+        "errorMessage": "क्षमस्व, विनंती केलेली भाषा उपलब्ध नाही."
+    },
     "ms": {
         "language": "Malay",
         "errorMessage": "Maaf, bahasa yang diminta tidak tersedia."
+    },
+    "mt": {
+        "language": "Maltese",
+        "errorMessage": "Jiddispjacini, il-lingwa mitluba mhix disponibbli."
     },
     "nl": {
         "language": "Dutch",
@@ -193,6 +276,10 @@ const languageErrorMessages = {
     "no": {
         "language": "Norwegian",
         "errorMessage": "Beklager, det forespurte språket er ikke tilgjengelig."
+    },
+    "pa": {
+        "language": "Punjabi",
+        "errorMessage": "ਮੁਆਫ ਕਰਨਾ, ਬੇਨਤੀ ਕੀਤੀ ਭਾਸ਼ਾ ਉਪਲਬਧ ਨਹੀਂ ਹੈ."
     },
     "pl": {
         "language": "Polish",
@@ -206,6 +293,10 @@ const languageErrorMessages = {
         "language": "Portuguese",
         "errorMessage": "Desculpe, o idioma solicitado não está disponível."
     },
+    "pt-PT": {
+        "language": "Portuguese (Portugal)",
+        "errorMessage": "Lamentamos, mas o idioma solicitado não está disponível."
+    },
     "ro": {
         "language": "Romanian",
         "errorMessage": "Ne pare rău, limba solicitată nu este disponibilă."
@@ -213,6 +304,10 @@ const languageErrorMessages = {
     "ru": {
         "language": "Russian",
         "errorMessage": "К сожалению, запрашиваемый язык недоступен."
+    },
+    "si": {
+        "language": "Sinhala",
+        "errorMessage": "කණගාටුයි, ඉල්ලූ භාෂාව ලබා ගත නොහැක."
     },
     "sk": {
         "language": "Slovak",
@@ -246,12 +341,16 @@ const languageErrorMessages = {
         "language": "Tamil",
         "errorMessage": "மன்னிக்கவும், கோரிய மொழி கிடைக்கவில்லை."
     },
+    "te": {
+        "language": "Telugu",
+        "errorMessage": "క్షమించండి, అభ్యర్థించిన భాష అందుబాటులో లేదు."
+    },
     "th": {
         "language": "Thai",
         "errorMessage": "ขออภัย ไม่มีภาษาที่ร้องขอ"
     },
     "tl": {
-        "language": "Tagalog",
+        "language": "Filipino, Tagalog",
         "errorMessage": "Paumanhin, hindi available ang hiniling na wika."
     },
     "tr": {
@@ -265,6 +364,10 @@ const languageErrorMessages = {
     "ur": {
         "language": "Urdu",
         "errorMessage": "معذرت، درخواست شدہ زبان دستیاب نہیں ہے۔"
+    },
+    "uz": {
+        "language": "Uzbek",
+        "errorMessage": "Kechirasiz, so'ralgan til mavjud emas."
     },
     "vi": {
         "language": "Vietnamese",
