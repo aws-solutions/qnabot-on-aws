@@ -62,6 +62,7 @@ def handler(event, context):
     IndexId = settings['KENDRA_WEB_PAGE_INDEX']
     URLs = settings['KENDRA_INDEXER_URLS'].replace(' ', '').split(',')
     schedule = settings["KENDRA_INDEXER_SCHEDULE"]
+    crawler_mode = settings["KENDRA_INDEXER_CRAWL_MODE"].upper()
     crawl_depth = settings["KENDRA_INDEXER_CRAWL_DEPTH"]
 
     schedule = create_cron_expression(schedule)
@@ -84,7 +85,7 @@ def handler(event, context):
         schedule = current_schedule
 
     logger.info("Updating index with schedule " + schedule + " crawl_depth" + crawl_depth)
-    kendra_update_data_source(IndexId, data_source_id, URLs, RoleArn, schedule, crawl_depth)
+    kendra_update_data_source(IndexId, data_source_id, URLs, RoleArn, schedule, crawler_mode, crawl_depth)
 
     return {"IndexId": IndexId, "DataSourceId": data_source_id}
 
@@ -119,7 +120,7 @@ def get_data_source_schedule(IndexId, datasource_id):
     return response["Schedule"]
 
 
-def kendra_update_data_source(IndexId, data_source_id, URLs, RoleArn, schedule, crawl_depth):
+def kendra_update_data_source(IndexId, data_source_id, URLs, RoleArn, schedule, crawler_mode, crawl_depth):
     response = kendra.update_data_source(
         Id=data_source_id,
         RoleArn=RoleArn,
@@ -130,10 +131,13 @@ def kendra_update_data_source(IndexId, data_source_id, URLs, RoleArn, schedule, 
                 'Urls': {
                     'SeedUrlConfiguration': {
                         'SeedUrls': URLs,
-                        'WebCrawlerMode': 'EVERYTHING'
+                        'WebCrawlerMode': crawler_mode
                     }
                 },
-                'CrawlDepth': int(crawl_depth)
+                'CrawlDepth': int(crawl_depth), 
+                'MaxLinksPerPage': 100, 
+                'MaxContentSizePerPageInMegaBytes': 50.0, 
+                'MaxUrlsPerMinuteCrawlRate': 300
             }
         }
     )
