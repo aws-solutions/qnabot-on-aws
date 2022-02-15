@@ -825,6 +825,9 @@ module.exports = Object.assign(
         "Integration": {
           "Type": "AWS",
           "IntegrationHttpMethod": "POST",
+          "RequestParameters": {
+            "integration.request.header.X-Amz-Invocation-Type": "'Event'"
+          }, 
           "Uri": {
             "Fn::Join": [
               "",
