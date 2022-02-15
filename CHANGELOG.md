@@ -15,6 +15,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Updated [Multi Language Support readme](docs/multilanguage_support.md#supported-languages) and added supported languages section.
 - Updated `ENABLE_MULTI_LANGUAGE_SUPPORT` setting in [Settings readme](docs/settings.md) with link to supported languages.
 
+### Fixed
+- Fixed Kendra Webcrawler data source sync issue by adding support to check for Kendra webcrawler data source {status} before initiating sync
+- Fixed issue where the Kendra Webcrawler data source {settings} page in Kendra console was resulting in a blank page - by updating configuraton parameters for data source create and update steps
+
 
 ## [5.1.0] - 2021-12-09
 
