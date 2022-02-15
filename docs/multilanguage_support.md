@@ -102,7 +102,7 @@ These language codes can also be used via the handlebar functionality.
 |English	|en                 |
 |Estonian	|et                 |
 |Farsi (Persian)	|fa         |
-|Filipino Tagalog	|tl         |
+|Filipino, Tagalog	|tl         |
 |Finnish	|fi                 |
 |French	|fr                     |
 |French (Canada)	|fr-CA      |

@@ -2,16 +2,22 @@
 # Automatically generates locales as specified by environment var LOCALES - from Cfn parameter.
 
 import os
+import os.path
 import json
-import boto3
 import time
+import sys
+
+#for boto3 path from py_modules
+root = os.environ["LAMBDA_TASK_ROOT"] + "/py_modules"
+sys.path.insert(0, root)
+import boto3
 from crhelper import CfnResource
+
 helper = CfnResource()
 clientLEXV2 = boto3.client('lexv2-models')
 clientIAM = boto3.client('iam')
 clientTRANSLATE = boto3.client('translate')
 s3 = boto3.resource('s3')
-
 
 # LEX QNABOT INFO
 FULFILLMENT_LAMBDA_ARN = os.environ["FULFILLMENT_LAMBDA_ARN"]
