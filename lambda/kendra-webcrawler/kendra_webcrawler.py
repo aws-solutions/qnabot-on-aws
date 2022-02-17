@@ -5,6 +5,7 @@ import re
 import datetime
 import calendar
 import logging
+import time
 
 client = boto3.client('kendra')
 ssm = boto3.client('ssm')
@@ -50,6 +51,34 @@ def create_cron_expression(schedule):
     print(cron)
     return cron
 
+"""
+function describe_data_source
+this function provides information about a Kendra index data source
+the function returns the {status} attribute for a given data source in a Kendra index
+"""
+def describe_data_source (data_source_id, IndexId): 
+    response = client.describe_data_source(
+        Id=data_source_id,
+        IndexId=IndexId
+    )
+    data_source_status = response["Status"]
+
+    return data_source_status
+
+
+"""
+function get_data_source_status
+this function polls describe_data_source to get the latest information on the {status}
+the function returns the latest value for the {status} attribute for a given data source in a Kendra index
+"""
+def get_data_source_status (data_source_id, IndexId):
+    data_source_status = describe_data_source (data_source_id, IndexId)
+    while data_source_status in ["CREATING", "UPDATING"]:   #checking for the data source status
+        time.sleep (5)  #wait for 5 seconds and check status again 
+        data_source_status = describe_data_source (data_source_id, IndexId)
+    
+    return data_source_status
+
 
 def handler(event, context):
     logging.info(event)
@@ -72,12 +101,23 @@ def handler(event, context):
     data_source_id = get_data_source_id(IndexId, Name)
 
     if data_source_id is None:
-        data_source_id = kendra_create_data_source(client, IndexId, Name, Type, RoleArn, Description, URLs, schedule, crawler_mode,crawl_depth)
-        kendra_sync_data_source(IndexId, data_source_id)
-        create_dashboard(IndexId, data_source_id)
+        data_source_id = kendra_create_data_source(client, IndexId, Name, Type, RoleArn, Description, URLs, schedule, crawler_mode, crawl_depth)
+        data_source_status = get_data_source_status (data_source_id, IndexId) # get current status of the data source
+        if data_source_status == 'ACTIVE':  #if the data source status is ACTIVE, then proceed to initiate a data source sync, and also create a Cloudwatch dashboard
+            kendra_sync_data_source(IndexId, data_source_id)    #sync data source
+            create_dashboard(IndexId, data_source_id)   #create Cloudwatch dashboard
+        else:
+            logging.info ("The Kendra WebCrawler data source: " + Name + " is in: " + data_source_status + " status.")
+            logging.info ("Kendra data source sync, and Cloudwatch dashboard creation step was skipped for the Kendra Index.")
     else:
-        kendra_update_data_source(IndexId, data_source_id, URLs, RoleArn, schedule, crawler_mode,crawl_depth)
-        kendra_sync_data_source(IndexId, data_source_id)
+        kendra_update_data_source(IndexId, data_source_id, URLs, RoleArn, schedule, crawler_mode, crawl_depth)
+        data_source_status = get_data_source_status (data_source_id, IndexId) # get current status of the data source
+        if data_source_status == 'ACTIVE':  #if the data source status is ACTIVE, then proceed to initiate a data source sync, and also create a Cloudwatch dashboard
+            kendra_sync_data_source(IndexId, data_source_id)    #sync data source
+        else:
+            logging.info ("The Kendra WebCrawler data source: " + Name + " is in: " + data_source_status + " status.")
+            logging.info ("Kendra data source sync update step was skipped for the Kendra Index.")
+
     return {"IndexId": IndexId, "DataSourceId": data_source_id}
 
 
@@ -124,7 +164,10 @@ def kendra_create_data_source(client, IndexId, Name, Type, RoleArn, Description,
                         'WebCrawlerMode': crawler_mode
                     }
                 },
-                'CrawlDepth': crawl_depth
+                'CrawlDepth': int(crawl_depth), 
+                'MaxLinksPerPage': 100, 
+                'MaxContentSizePerPageInMegaBytes': 50.0, 
+                'MaxUrlsPerMinuteCrawlRate': 300
             }
         }
     )
@@ -154,7 +197,10 @@ def kendra_update_data_source(IndexId, data_source_id, URLs, RoleArn, schedule, 
                         'WebCrawlerMode': crawler_mode
                     }
                 },
-                'CrawlDepth': crawl_depth
+                'CrawlDepth': int(crawl_depth), 
+                'MaxLinksPerPage': 100, 
+                'MaxContentSizePerPageInMegaBytes': 50.0, 
+                'MaxUrlsPerMinuteCrawlRate': 300
             }
         }
     )

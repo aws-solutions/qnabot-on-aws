@@ -1,6 +1,6 @@
 # Excel Workbook Import
 
-QnABot now supports importing questions and answers from Microsoft Excel (xlsx) workbooks.
+QnABot supports importing questions and answers from Microsoft Excel (xlsx) workbooks.
 
 A [sample](./sample.xlsx) Excel workbook is included. Each column in the Excel sheet maps to a field in the Content Designer.
 
