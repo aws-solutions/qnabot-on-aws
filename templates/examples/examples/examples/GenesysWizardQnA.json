@@ -121,7 +121,7 @@
     },
     {
       "qid": "GenesysHelper.ChannelCondition",
-      "a": "{{#ifCond SessionAttributes.ClientType '==' 'LEX.GenesysCloud.Text'}}\nYou can visit our blog post here:\nhttps://aws.amazon.com/blogs/machine-learning/creating-a-question-and-answer-bot-with-amazon-lex-and-amazon-alexa/\n{{else ifCond SessionAttributes.ClientType '==' 'LEX.GenesysCloud.Text'}}\nYou can visit aws.amazon.com and search for QnA bot. Once again, that's aws.amazon.com\n{{else}}\nYou can visit our blog post here:\nhttps://aws.amazon.com/blogs/machine-learning/creating-a-question-and-answer-bot-with-amazon-lex-and-amazon-alexa/\n{{/ifCond}}",
+      "a": "{{#ifCond SessionAttributes.ClientType '==' 'LEX.GenesysCloud.Text'}}\nYou can visit our blog post here:\nhttps://aws.amazon.com/blogs/machine-learning/creating-a-question-and-answer-bot-with-amazon-lex-and-amazon-alexa/\n{{else ifCond SessionAttributes.ClientType '==' 'LEX.GenesysCloud.Voice'}}\nYou can visit aws.amazon.com and search for QnA bot. Once again, that's aws.amazon.com\n{{else}}\nYou can visit our blog post here:\nhttps://aws.amazon.com/blogs/machine-learning/creating-a-question-and-answer-bot-with-amazon-lex-and-amazon-alexa/\n{{/ifCond}}",
       "type": "qna",
       "q": [
         "Where can I get additional information on QnABot?",
