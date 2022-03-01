@@ -1,1 +1,1 @@
-Imports package ‘ConnectWizardQnA’ which corresponds to the Connect Wizard's default Contact Flow example.
+Imports package ‘GenesysWizardQnA’ which corresponds to the Genesys Wizard's default Call Flow example.
