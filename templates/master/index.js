@@ -10,7 +10,7 @@ module.exports={
   "Conditions": {},
   "AWSTemplateFormatVersion": "2010-09-09",
   "Transform": "AWS::Serverless-2016-10-31",
-  "Description": `(SO0189) QnABot with admin and client websites - (Master v${process.env.npm_package_version})`,
+  "Description": `(SO0189-ext) QnABot with admin and client websites - (Version v${process.env.npm_package_version})`,
   "Mappings": {},
   "Outputs": {
     "CognitoEndpoint":{
