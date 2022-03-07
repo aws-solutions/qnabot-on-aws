@@ -18,7 +18,7 @@ inboundCall:
         initialValue:
           noValue: true
     - stringVariable:
-        name: Flow.connect_nextPrompt
+        name: Flow.genesys_nextPrompt
         initialValue:
           noValue: true
     - stringVariable:
@@ -163,7 +163,7 @@ inboundCall:
                             value:
                               lit: Ask another question or say return to main menu.
                         - string:
-                            variable: Flow.connect_nextPrompt
+                            variable: Flow.genesys_nextPrompt
                             value:
                               exp: Flow.defaultPrompt
                   - playAudio:
@@ -200,8 +200,8 @@ inboundCall:
                                       variable: Flow.nextAction
                                   - outputSessionVariable:
                                       name:
-                                        lit: connect_nextPrompt
-                                      variable: Flow.connect_nextPrompt
+                                        lit: genesys_nextPrompt
+                                      variable: Flow.genesys_nextPrompt
                                   - outputSessionVariable:
                                       name:
                                         lit: appContext
@@ -224,9 +224,9 @@ inboundCall:
                                         exp: Flow.qnabot_gotanswer
                                   - sessionVariable:
                                       name:
-                                        lit: connect_nextPrompt
+                                        lit: genesys_nextPrompt
                                       value:
-                                        exp: Flow.connect_nextPrompt
+                                        exp: Flow.genesys_nextPrompt
                                   - sessionVariable:
                                       name:
                                         lit: nextAction
@@ -333,17 +333,17 @@ inboundCall:
                                         cases:
                                           - case:
                                               value:
-                                                exp: IsSet(Flow.connect_nextPrompt)
+                                                exp: IsSet(Flow.genesys_nextPrompt)
                                               actions:
                                                 - playAudio:
                                                     name: Play Audio
                                                     audio:
-                                                      exp: AudioPlaybackOptions(ToAudioTTS(Flow.connect_nextPrompt), true)
+                                                      exp: AudioPlaybackOptions(ToAudioTTS(Flow.genesys_nextPrompt), true)
                                 - updateData:
                                     name: Update Data
                                     statements:
                                       - string:
-                                          variable: Flow.connect_nextPrompt
+                                          variable: Flow.genesys_nextPrompt
                                           value:
                                             exp: Flow.defaultPrompt
                             cases:
@@ -358,7 +358,7 @@ inboundCall:
                                     - playAudio:
                                         name: Play Audio
                                         audio:
-                                          exp: AudioPlaybackOptions(ToAudioTTS(Flow.connect_nextPrompt), true)
+                                          exp: AudioPlaybackOptions(ToAudioTTS(Flow.genesys_nextPrompt), true)
                               - case:
                                   value:
                                     exp: Flow.nextAction=="END"
