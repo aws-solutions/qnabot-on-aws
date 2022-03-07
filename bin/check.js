@@ -11,7 +11,6 @@ var region=require('../config').region
 var cf=new aws.CloudFormation()
 var s3=new aws.S3()
 var name=require('./name')
-var chalk=require('chalk')
 
 module.exports=Promise.method(run)
 

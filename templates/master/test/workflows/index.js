@@ -5,7 +5,6 @@ var query=require('query-string').stringify
 var _=require('lodash')
 var zlib=require('zlib')
 var Promise=require('bluebird')
-var axios=require('axios')
 var Url=require('url')
 var sign=require('aws4').sign
 var fs=require('fs')
