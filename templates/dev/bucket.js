@@ -91,7 +91,11 @@ module.exports = outputs('dev/bootstrap')
                 {
                   "Effect": "Allow",
                   "Action": [
-                    "s3:*"
+                    "s3:PutObject",
+                    "s3:GetObject",
+                    "s3:DeleteObjectVersion",
+                    "s3:DeleteObject",
+                    "s3:GetObjectVersion"
                   ],
                   "Resource": [
                     { "Fn::Sub": "arn:aws:s3:::${Bucket}*" },
