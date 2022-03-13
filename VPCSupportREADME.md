@@ -70,3 +70,110 @@ VPN or Direct Connect to the VPC.
 
 * The API Gateway used by the Designer UI is still available publicly and access is
 still authorized using Cognito. The Lambda's backing the API will run within the VPC.
+
+### Accessing Kibana in VPC
+
+This template deploys ElasticSearch and Kibana within a VPC's Private Subnets. By default, there are
+no means of accessing kibana, and further actions are required to proceed in doing so.
+
+Since Kibana is already integrated with Cognito for authentication, the following actions can take
+place so access can be gained securely to Kibana. The actions revolve at the process of establishing
+a SSH SOCKS5 connection with a host in the VPC, from your local machine.
+
+**Prerequisites:**
+An EC2 host needs to be used as a bridge between the local user, and Kibana. This EC2 machine needs to
+be deployed on the Public Subnet of the same VPC that chatbot is deployed. The following steps will
+also attach an ElasticIP to the EC2 host, in order to eliminate the manual process of identifying the
+host's IP, each time a SOCKS5 connection is desired.
+
+a. **Create an EC2 host**
+Create an EC2 host, and attach it to the VPC of the Chatbot, on a Public Subnet of it. Make sure that
+the EC2 host's Security Group is also the same as the VPC's.
+Make sure to securely save the Private.key of the host, so you can SSH into it.
+Amazon Linux 2 AMI, with t2.micro is advised.
+
+a.i. **Security Group Rules**
+
+- Allow the inbound traffic for SSH, from the public IP of your Local Machine.
+  If you are behind a trusted network, you can also use the IP/CIDR of your network. Setting the source
+  to `0.0.0.0/0` is not advised, as it will expose you to security risks.
+- Allow the inbound traffic for HTTPS and port 443, on the Security group itself.
+
+b. **ElasticIP**
+Create an ElasticIP and associate it with the above EC2 host.
+
+c. **SSH SOCKS5 Tunnel**
+
+From your local machine, create a SOCKS Proxy (The command has been tested successfully in macOS, and Windows/Powershell):
+
+```bash
+ssh -i "PRIVATE_KEY_PATH" ec2-user@ELASTIC_IP_ADDRESS -v -ND 9200
+```
+
+Note that:
+
+PRIVATE_KEY_PATH : Should be replaced by the path in which you stored the Private.key of the EC2 host from Step a.
+
+ELASTIC_IP_ADDRESS: The ElasticIP created in Step b.
+
+d. **Proxy on browser**
+Adjust your browser's Proxy setting, to use the SSH SOCKS tunnel.
+
+d.i. Firefox:
+
+- From the Hamburger Menu, click Setting/Preferences.
+- Scroll down to `Network Settings` group, and click the `Settings...` button.
+- In the pop up window, select `Manual Proxy configuration`, and `Proxy DNS when using SOCKS v5`.
+- In the SOCKS Host type `127.0.0.1` and at SOCKS Host Port `9200`.
+- Click OK
+
+Note that the above process will redirect all your browser's traffic through the EC2 machine. This is the downside of this
+approach, as the user needs to manually enable/disable this setting.
+
+d.ii. Chrome:
+Chrome uses the Operating System's default Proxy settings, but also has the ability to be launched with pre-defined proxy configurations.
+
+Linux:
+
+```bash
+/usr/bin/google-chrome \
+    --user-data-dir="$HOME/proxy-profile" \
+    --proxy-server="socks5://localhost:9200"
+```
+
+macOS
+
+```bash
+"/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" \
+    --user-data-dir="$HOME/proxy-profile" \
+    --proxy-server="socks5://localhost:9200"
+```
+
+Windows:
+
+```powershell
+"C:\Program Files (x86)\Google\Chrome\Application\chrome.exe" ^
+    --user-data-dir="%USERPROFILE%\proxy-profile" ^
+    --proxy-server="socks5://localhost:9200"
+```
+
+The new Launched Chrome instance, will be independent from the regular Chrome instances, and requires no further manual effort compared to the Firefox Solution.
+
+d.iii. Extra Mentions.
+There are plugins such as FoxyProxy and SwitchyOmega which can enable dynamically per domain the usage of a Proxy. Example configurations for FoxyProxy:
+
+In the Proxy Details tab, be sure that Manual Proxy Configuration is selected and then complete the following fields:
+
+- For Host or IP Address, enter localhost.
+- For Port, enter 9200
+- Select SOCKS proxy
+- Select SOCKS v5.
+  Choose the URL Patterns tab.
+  Choose Add new pattern and then complete the following fields:
+  For Pattern Name, enter a identifier of your choise.
+  For URL pattern, enter the VPC endpoint for Kibana. Whitelist URLs and Wildcards should be selected. URL pattern should look like: \*VPC-IDENTIFIER.REGION.es.amazonaws.com\*
+
+e. Access Kibana
+From the browser, which has been setup on step d, access the Kibana dashboard endpoint. You can find this at the Outputs of
+your Chatbot CloudFormation deployment.
+

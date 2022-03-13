@@ -10,7 +10,7 @@ module.exports={
   "Conditions": {},
   "AWSTemplateFormatVersion": "2010-09-09",
   "Transform": "AWS::Serverless-2016-10-31",
-  "Description": `(SO0189) QnABot with admin and client websites - (Master v${process.env.npm_package_version})`,
+  "Description": `(SO0189-ext) QnABot with admin and client websites - (Version v${process.env.npm_package_version})`,
   "Mappings": {},
   "Outputs": {
     "CognitoEndpoint":{
@@ -232,7 +232,7 @@ module.exports={
         "Default": ""
     },
     "LexV2BotLocaleIds":{
-        "Description" : "Languages for QnABot voice interaction using LexV2. Specify as a comma separated list of valid Locale IDs - see https://docs.aws.amazon.com/lexv2/latest/dg/how-languages.html",
+        "Description" : "Languages for QnABot voice interaction using LexV2. Specify as a comma separated list of valid Locale IDs without empty spaces - see https://github.com/aws-solutions/aws-qnabot/blob/main/docs/multilanguage_support.md#supported-languages",
         "Type": "String",
         "Default": "en_US,es_US,fr_CA"
     },

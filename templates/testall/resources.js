@@ -1,3 +1,5 @@
+/* eslint-disable quotes */
+/* eslint-disable indent */
 var fs=require('fs');
 var _=require('lodash');
 const util = require('../util');
@@ -53,7 +55,8 @@ module.exports=Object.assign(
             Key:"Type",
             Value:"TestAll"
         }]
-      }
+      },
+      "Metadata": util.cfnNag(["W92"])
     },
     "TestAllRole": {
       "Type": "AWS::IAM::Role",
@@ -82,7 +85,11 @@ module.exports=Object.assign(
               "Statement": [{
                   "Effect": "Allow",
                   "Action": [
-                    "s3:*"
+                    "s3:PutObject",
+                    "s3:GetObject",
+                    "s3:GetObjectVersion",
+                    "s3:DeleteObject",
+                    "s3:DeleteObjectVersion"
                   ],
                   "Resource":[{"Fn::Sub":"arn:aws:s3:::${TestAllBucket}*"}]
               },{
@@ -98,7 +105,7 @@ module.exports=Object.assign(
                       "lex:RecognizeText"
                   ],
                   "Resource": [
-                      "*"
+                    {"Fn::Sub": "arn:${AWS::Partition}:lex:${AWS::Region}:${AWS::AccountId}:bot-alias/*/*"}
                   ]
                 }
               ]
@@ -106,7 +113,7 @@ module.exports=Object.assign(
           }
         ]
       },
-      "Metadata": util.cfnNagXray()
+      "Metadata": util.cfnNag(["W11", "W12"])
     },
     "TestAllClear":{
         "Type": "Custom::S3Clear",

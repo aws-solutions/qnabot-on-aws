@@ -1,6 +1,5 @@
 #! /usr/bin/env node
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
-var chalk=require('chalk')
 var Promise=require('bluebird')
 var config=require('../../../config')
 

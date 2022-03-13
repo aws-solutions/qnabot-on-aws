@@ -1,5 +1,6 @@
+/* eslint-disable indent */
+/* eslint-disable quotes */
 var fs = require('fs');
-var _ = require('lodash');
 const util = require('../util');
 
 var files = fs.readdirSync(`${__dirname}`)
@@ -71,7 +72,8 @@ module.exports = Object.assign(
           Key: "Type",
           Value: "Export"
         }]
-      }
+      },
+      "Metadata": util.cfnNag(["W92"])
     },
     "ConnectApiResource": {
       "Type": "AWS::ApiGateway::Resource",
@@ -143,7 +145,8 @@ module.exports = Object.assign(
           Key: "Type",
           Value: "Export"
         }]
-      }
+      },
+      "Metadata": util.cfnNag(["W92"])
     },
     "GenesysApiResource": {
       "Type": "AWS::ApiGateway::Resource",
@@ -301,7 +304,8 @@ module.exports = Object.assign(
           Key: "Type",
           Value: "Export"
         }]
-      }
+      },
+      "Metadata": util.cfnNag(["W92"])
     },
     "ExportRole": {
       "Type": "AWS::IAM::Role",
@@ -328,7 +332,7 @@ module.exports = Object.assign(
           {"Ref": "ExportPolicy"}
         ]
       },
-      "Metadata": util.cfnNagXray()
+      "Metadata": util.cfnNag(["W11", "W12"])
     },
     "ExportPolicy": {
       "Type": "AWS::IAM::ManagedPolicy",
@@ -338,7 +342,11 @@ module.exports = Object.assign(
           "Statement": [{
             "Effect": "Allow",
             "Action": [
-              "s3:*"
+                "s3:PutObject",
+                "s3:GetObject",
+                "s3:DeleteObjectVersion",
+                "s3:DeleteObject",
+                "s3:GetObjectVersion"
             ],
             "Resource": [{"Fn::Sub": "arn:aws:s3:::${ExportBucket}*"}]
           }, {
@@ -396,7 +404,8 @@ module.exports = Object.assign(
           Key: "Type",
           Value: "Sync"
         }]
-      }
+      },
+      "Metadata": util.cfnNag(["W92"])
     },
     "KendraSyncRole": {
       "Type": "AWS::IAM::Role",
@@ -429,7 +438,7 @@ module.exports = Object.assign(
           {"Ref": "KendraSyncPolicy"}
         ]
       },
-      "Metadata": util.cfnNagXray()
+      "Metadata": util.cfnNag(["W11", "W12"])
     },
     "KendraSyncPolicy": {
       "Type": "AWS::IAM::ManagedPolicy",
@@ -495,7 +504,7 @@ module.exports = Object.assign(
           {"Ref": "KendraS3Policy"}
         ]
       },
-      "Metadata": util.cfnNagXray()
+      "Metadata": util.cfnNag(["W11", "W12"])
     },
     TranslatePost: {
       Type: "AWS::ApiGateway::Method",
@@ -559,6 +568,7 @@ module.exports = Object.assign(
           {Ref: "TranslatePolicy"},
         ],
       },
+      Metadata: util.cfnNag(["W11"])
     },
     TranslateCodeVersion: {
       Type: "Custom::S3Version",
@@ -603,6 +613,7 @@ module.exports = Object.assign(
           },
         ],
       },
+      "Metadata": util.cfnNag(["W92"])
     },
     TranslatePolicy: {
       Type: "AWS::IAM::ManagedPolicy",
@@ -621,6 +632,7 @@ module.exports = Object.assign(
           ],
         },
       },
+      Metadata: util.cfnNag(["W13"])
     },
     TranslateApiRootResource: {
       Type: "AWS::ApiGateway::Resource",
@@ -682,13 +694,17 @@ module.exports = Object.assign(
                     "logs:CreateLogGroup",
                     "logs:CreateLogStream",
                   ],
-                  Resource: "*",
+                  Resource: [
+                    {"Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:*"},
+                    {"Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:*:log-stream:*"}
+                  ],
                 },
               ],
             },
           },
         ],
       },
+      Metadata: util.cfnNag(["W11"])
     },
 
     ParameterChangeRuleKendraCrawlerPermission: {
@@ -825,6 +841,9 @@ module.exports = Object.assign(
         "Integration": {
           "Type": "AWS",
           "IntegrationHttpMethod": "POST",
+          "RequestParameters": {
+            "integration.request.header.X-Amz-Invocation-Type": "'Event'"
+          }, 
           "Uri": {
             "Fn::Join": [
               "",
@@ -948,6 +967,7 @@ module.exports = Object.assign(
           },
         ],
       },
+      "Metadata": util.cfnNag(["W92"])
     },
     "KendraNativeCrawlerLambdaStatusInvokePermission": {
       "Type": "AWS::Lambda::Permission",
@@ -1016,6 +1036,7 @@ module.exports = Object.assign(
           },
         ],
       },
+      "Metadata": util.cfnNag(["W92"])
     },
     KendraNativeCrawlerStatusLambda: {
       Type: "AWS::Lambda::Function",
@@ -1080,6 +1101,7 @@ module.exports = Object.assign(
           },
         ],
       },
+      "Metadata": util.cfnNag(["W92"])
     },
     KendraNativeCrawlerPassRole: {
       Type: "AWS::IAM::Role",
@@ -1111,10 +1133,10 @@ module.exports = Object.assign(
           util.lambdaVPCAccessExecutionRole()
         ],
         ManagedPolicyArns: [
-          //{Ref: "KendraNativeCrawlerPolicy"},
           {Ref: "KendraNativeCrawlerPassPolicy"},
         ],
       },
+      Metadata: util.cfnNag(["W11"])
     },
     KendraNativeCrawlerPolicy: {
       Type: "AWS::IAM::ManagedPolicy",
@@ -1125,7 +1147,7 @@ module.exports = Object.assign(
             {
               Effect: "Allow",
               Action: "cloudwatch:PutDashboard",
-              Resource: [{"Fn::Sub": "arn:aws:cloudwatch::${AWS::AccountId}:dashboard/QNA*"}]
+              Resource: [{"Fn::Sub": "arn:${AWS::Partition}:cloudwatch::${AWS::AccountId}:dashboard/QNA*"}]
             },
             {
               Effect: "Allow",
@@ -1139,7 +1161,10 @@ module.exports = Object.assign(
                 "kendra:UpdateDataSource",
 
               ],
-              Resource: ["*"],
+              Resource: [
+                {"Fn::Sub": "arn:${AWS::Partition}:kendra:${AWS::Region}:${AWS::AccountId}:index/*"},
+                {"Fn::Sub": "arn:${AWS::Partition}:kendra:${AWS::Region}:${AWS::AccountId}:index/*/data-source/*"}
+              ],
             },
             {
               Effect: "Allow",
@@ -1159,6 +1184,7 @@ module.exports = Object.assign(
           ],
         },
       },
+      Metadata: util.cfnNag(["W11"])
     },
     KendraNativeCrawlerPassPolicy: {
       Type: "AWS::IAM::ManagedPolicy",
@@ -1179,4 +1205,4 @@ module.exports = Object.assign(
       },
     },
   }
-)
+);

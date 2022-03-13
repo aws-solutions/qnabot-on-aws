@@ -5,6 +5,33 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [5.1.2] - 2022-03-14
+
+### Added
+
+- Logic to support Amazon Connect Interactive Messages
+- New set of example questions to be imported for Genesys Cloud CX.
+
+### Changed
+- Genesys Cloud CX Call Flow export wizard to use new session attributes referenced in example questions
+- Policies in nested templates by further scoping down policies and adding cfn_nag suppressions as appropriate
+- Node module dependencies for html-webpack-plugin(4.5.2), and chalk(3.2.0). Removed unused dependencies
+  for js-xlsx and read-excel-file.
+
+## [5.1.1] - 2022-02-04
+
+### Added
+- Expanded language support for voice and text interactions. Also included support for Neural voices for Lex language locales. See [supported languages](docs/multilanguage_support.md#supported-languages).
+- Expanded `config.json` to support `LexV2BotLocaleIds` parameter.
+- Updated `LexV2BotLocaleIds` parameter in CloudFormation template to include link to supported languages.
+- Updated [Multi Language Support readme](docs/multilanguage_support.md#supported-languages) and added supported languages section.
+- Updated `ENABLE_MULTI_LANGUAGE_SUPPORT` setting in [Settings readme](docs/settings.md) with link to supported languages.
+
+### Fixed
+- Fixed Kendra Webcrawler data source sync issue by adding support to check for Kendra webcrawler data source {status} before initiating sync
+- Fixed issue where the Kendra Webcrawler data source {settings} page in Kendra console was resulting in a blank page - by updating configuration parameters for data source create and update steps
+
+
 ## [5.1.0] - 2021-12-09
 
 ### Added

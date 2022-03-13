@@ -54,7 +54,7 @@ function get_keywords(params) {
         var contraction_list = JSON.parse(params.es_expand_contractions)
 
     }catch{
-        qnabot.log("Imporoperly formatted JSON in ES_EXPAND_CONTRACTIONS: " + params.es_expand_contractions)
+        qnabot.log("Improperly formatted JSON in ES_EXPAND_CONTRACTIONS: " + params.es_expand_contractions)
         contraction_list = {}
     }
     var new_question = "";

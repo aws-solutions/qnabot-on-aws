@@ -555,7 +555,7 @@ exports.esCognitoAccess = function() {
                 {
                     "Effect": "Allow",
                     "Action": "iam:PassRole",
-                    "Resource": "*",
+                    "Resource": [{"Fn::Sub": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/${AWS::StackName}-*"}],
                     "Condition": {
                         "StringLike": {
                             "iam:PassedToService": "cognito-identity.amazonaws.com"
@@ -631,6 +631,10 @@ exports.cfnNag = function(rules) {
             "id": "W57",
             "reason": "This IdentityPool has proper restrictions for unauthenticated users"
         },
+        "W58": {
+            "id": "W58",
+            "reason": "This Lambda already has permission to write cloudwatch logs via CFNLambdaRole"
+        },
         "W59": {
             "id": "W59",
             "reason": "This ApiGateway Method does not need authorization setup"
@@ -650,10 +654,6 @@ exports.cfnNag = function(rules) {
         "W76": {
             "id": "W76",
             "reason": "This role is required to have high SPCM"
-        },
-        "W78": {
-            "id": "W78",
-            "reason": "This DynamoDB table does not require to have backup enabled"
         },
         "W89": {
             "id": "W89",

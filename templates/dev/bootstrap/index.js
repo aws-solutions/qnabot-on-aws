@@ -89,7 +89,11 @@ module.exports = {
             {
               "Effect": "Allow",
               "Action": [
-                "s3:*"
+                "s3:PutObject",
+                "s3:GetObject",
+                "s3:GetObjectVersion",
+                "s3:DeleteObject",
+                "s3:DeleteObjectVersion"
               ],
               "Resource": [
                 { "Fn::Sub": "arn:aws:s3:::${Bucket}*" },
@@ -142,5 +146,3 @@ module.exports = {
     "Public": { "Fn::Equals": [{ "Ref": "Public" }, "PUBLIC"] }
   }
 };
-
-
