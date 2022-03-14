@@ -87,8 +87,11 @@ module.exports = {
           "Version": "2012-10-17",
           "Statement": [
             {
+              "Sid": "CFNLambdaS3Access",
               "Effect": "Allow",
               "Action": [
+                "s3:ListBucketVersions",
+                "s3:PutBucketNotification",
                 "s3:PutObject",
                 "s3:GetObject",
                 "s3:GetObjectVersion",
