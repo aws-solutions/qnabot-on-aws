@@ -11,10 +11,9 @@ var outputs=Object.assign(outputs1,outputs2,outputSNSTopic);
 
 module.exports={
   "Resources":resources,
-  "Conditions": {},
   "AWSTemplateFormatVersion": "2010-09-09",
   "Transform": "AWS::Serverless-2016-10-31",
-  "Description": "QnABot nested example resources",
+  "Description": "(SO0189n-example) QnABot nested example resources",
   "Mappings": {},
   "Outputs": outputs,
   "Parameters": {

@@ -62,7 +62,6 @@ js-cache under the Massachusetts Institute of Technology (MIT) license
 jsdom under the Massachusetts Institute of Technology (MIT) license
 jsdom-global under the Massachusetts Institute of Technology (MIT) license
 jsdom-loader under the Massachusetts Institute of Technology (MIT) license
-js-xlsx under the Apache License Version 2.0
 jsheader under the Apache License Version 2.0
 json-parse-better-errors under the Massachusetts Institute of Technology (MIT) license
 json-stringify-pretty-compact under the Massachusetts Institute of Technology (MIT) license
@@ -93,7 +92,6 @@ quick-lru under the Massachusetts Institute of Technology (MIT) license
 range under the Massachusetts Institute of Technology (MIT) license
 raw-loader under the Massachusetts Institute of Technology (MIT) license
 raw-text under the Massachusetts Institute of Technology (MIT) license
-read-excel-file under the Massachusetts Institute of Technology (MIT) license
 recursive-readdir under the Massachusetts Institute of Technology (MIT) license
 require-dir under the Massachusetts Institute of Technology (MIT) license
 roboto-fontface under the Apache License Version 2.0

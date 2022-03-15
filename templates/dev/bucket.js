@@ -89,9 +89,16 @@ module.exports = outputs('dev/bootstrap')
               "Version": "2012-10-17",
               "Statement": [
                 {
+                  "Sid": "CFNLambdaS3Access",
                   "Effect": "Allow",
                   "Action": [
-                    "s3:*"
+                    "s3:ListBucketVersions",
+                    "s3:PutBucketNotification",
+                    "s3:PutObject",
+                    "s3:GetObject",
+                    "s3:DeleteObjectVersion",
+                    "s3:DeleteObject",
+                    "s3:GetObjectVersion"
                   ],
                   "Resource": [
                     { "Fn::Sub": "arn:aws:s3:::${Bucket}*" },

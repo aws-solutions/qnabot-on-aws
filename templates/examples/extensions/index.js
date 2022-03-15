@@ -74,7 +74,8 @@ module.exports=Object.assign(
             Key:"Type",
             Value:"CustomResource"
         }]
-      }
+      },
+      "Metadata": util.cfnNag(["W92", "W58"])
     },
     "EXTUiImportVersion": {
       "Type": "Custom::S3Version",
@@ -164,10 +165,10 @@ module.exports=Object.assign(
                 {
                   "Effect": "Allow",
                   "Action": [
-        						"kms:Encrypt",
-        						"kms:Decrypt",
-        					],
-        					"Resource":{"Fn::GetAtt":["QuizKey","Arn"]}
+                    "kms:Encrypt",
+                    "kms:Decrypt",
+                  ],
+                  "Resource":{"Fn::GetAtt":["QuizKey","Arn"]}
                 },
                 {
                   "Effect": "Allow",
@@ -212,7 +213,7 @@ module.exports=Object.assign(
           }          
         }],
       },
-      "Metadata": util.cfnNagXray()
+      "Metadata": util.cfnNag(["W11", "W12"])
     }
 });
 function jslambda(name){
@@ -255,7 +256,8 @@ function jslambda(name){
           Key:"Type",
           Value:"LambdaHook"
       }]
-    }
+    },
+    "Metadata": util.cfnNag(["W92"])
   }
 }
 function pylambda(name){
@@ -298,7 +300,8 @@ function pylambda(name){
           Key:"Type",
           Value:"LambdaHook"
       }]
-    }
+    },
+    "Metadata": util.cfnNag(["W92"])
   }
 }
 
