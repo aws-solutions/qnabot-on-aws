@@ -87,8 +87,8 @@ Options:
 A successful import will output status with the below information:
 
 {
-    "number_of_lines_imported": <number>,
-    "number_of_lines_failed_to_import": <number>,
+    "number_of_qids_imported": <number>,
+    "number_of_qids_failed_to_import": <number>,
     "import_starttime": <datetime in UTC>,
     "import_endtime": <datetime in UTC>",
     "status": "Complete",
@@ -98,8 +98,8 @@ A successful import will output status with the below information:
 Example:
 
 {
-    "number_of_lines_imported": 9,
-    "number_of_lines_failed_to_import": 0,
+    "number_of_qids_imported": 9,
+    "number_of_qids_failed_to_import": 0,
     "import_starttime": "2022-03-20T21:39:28.455Z",
     "import_endtime": "2022-03-20T21:39:32.193Z",
     "status": "Complete",
@@ -130,6 +130,9 @@ Options:
   -qids, --export-filter TEXT     Export {qids} that start with this filter
                                   string. Exclude this option to export all
                                   {qids}
+  -fmt, --file-format [JSON|JSONL]
+                                  Provide the file format to use for export
+                                  [default: JSON]
   -h, --help                      Show this message and exit.
 
 
@@ -172,7 +175,7 @@ fi
 #### `export` Example
 ````
 #!/bin/bash
-shell_output=$(python qnabot_cli.py export -s qnabot-stack -f ../export/qna_export.json) 
+shell_output=$(python qnabot_cli.py export -s qnabot-stack -f ../export/qna_export.json -fmt json) 
 STATUS="${?}"
 if [ "${STATUS}" == 0 ];
 then

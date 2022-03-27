@@ -61,8 +61,9 @@ def qna_import (ctx, cloudformation_stack_name: str, source_filename: str, file_
 @click.option("-s", "--cloudformation-stack-name", type=click.STRING, help="Provide the name of the CloudFormation stack of your AWS QnABot deployment", required=True)
 @click.option("-f", "--export-filename", type=click.STRING, help="Provide the filename along with path where the exported file should be downloaded to", required=True)
 @click.option("-qids", "--export-filter", help="Export {qids} that start with this filter string. Exclude this option to export all {qids} ", required=False, default="")
+@click.option("-fmt", "--file-format", type=click.Choice(['JSON', 'JSONL'], case_sensitive=False), help="Provide the file format to use for export", required=False, default="JSON", show_default=True)
 @click.pass_context
-def qna_export (ctx, cloudformation_stack_name: str, export_filename: str, export_filter: str):
+def qna_export (ctx, cloudformation_stack_name: str, export_filename: str, export_filter: str, file_format: str):
     """
     Export QnABot questions and answers from your QnABot setup.\n
     This command requires two (2) parameters: <cloudformation-stack-name>, and <export-filename>.
@@ -114,7 +115,7 @@ def qna_export (ctx, cloudformation_stack_name: str, export_filename: str, expor
     }
     strExportConfig = json.dumps(strExportConfig, indent=4)
     try: 
-        response = initiate_export (bucket = strExportBucketName, export_filename = export_filename, export_config = strExportConfig) #proceed with initiating the export process
+        response = initiate_export (bucket = strExportBucketName, export_filename = export_filename, export_config = strExportConfig, file_format = file_format) #proceed with initiating the export process
         click.echo (response)
         sys.exit (0)
     except OSError as e: 
@@ -139,18 +140,20 @@ def initiate_import (bucket: str, source_filename: str, file_format: str):
     try:    #put object in S3 bucket
         s3_client = boto3.client('s3')
         if file_format == 'JSON': 
-            strFileContents = convert_json_to_jsonl (source_filename)
+            strFileContents = convert_json_to_jsonl (source_filename)   #convert to JSON Lines format (if input is JSON format)
             response = s3_client.put_object (
                 Bucket = bucket, 
                 Key = 'data/' + os.path.basename(source_filename), 
                 Body = strFileContents
             )
         else: 
-            s3_client.upload_file (
+            objFile = open (source_filename,"rb")   #open file object
+            response = s3_client.put_object (
                 Bucket = bucket, 
-                Filename = source_filename, 
-                Key = 'data/' + os.path.basename(source_filename)
+                Key = 'data/' + os.path.basename(source_filename), 
+                Body = objFile
             )
+            objFile.close() #close file object
 
         #check status of the file import
         response = get_import_status (bucket = bucket, source_filename = source_filename, importdatetime = importdatetime)
@@ -176,7 +179,7 @@ Initiate export process
 :param strExportConfig: contents of the config object
 :return: response status of the export request
 """
-def initiate_export (bucket: str, export_filename: str, export_config: str):
+def initiate_export (bucket: str, export_filename: str, export_config: str, file_format: str):
     exportdatetime = datetime.datetime.utcnow() #get current request date time in UTC timezone
 
     try:
@@ -196,11 +199,11 @@ def initiate_export (bucket: str, export_filename: str, export_config: str):
             response = get_export_status (bucket = bucket, export_filename = export_filename, exportdatetime = exportdatetime)
 
         #download the exported file
-        response = download_export (bucket = bucket, export_filename = export_filename, exportdatetime = exportdatetime)
+        response = download_export (bucket = bucket, export_filename = export_filename, exportdatetime = exportdatetime, file_format = file_format)
 
         while json.loads(response)["status"] != 'Downloaded':
             time.sleep (5)  #wait for 5 seconds and check status again
-            response = download_export (bucket = bucket, export_filename = export_filename, exportdatetime = exportdatetime)
+            response = download_export (bucket = bucket, export_filename = export_filename, exportdatetime = exportdatetime, file_format = file_format)
         return response
     except ClientError as e:
         error_response (
@@ -219,7 +222,7 @@ Download a file from the {export} S3 bucket
 :param exportdatetime: the date time of the request in UTC timezone
 :return: response status of the download request
 """
-def download_export (bucket: str, export_filename: str, exportdatetime: datetime):
+def download_export (bucket: str, export_filename: str, exportdatetime: datetime, file_format: str):
         try:
             s3_client = boto3.client('s3')
             #get object only if the object has changed since last request
@@ -229,6 +232,9 @@ def download_export (bucket: str, export_filename: str, exportdatetime: datetime
                 IfModifiedSince = exportdatetime
             )
             strFileContents = response["Body"].read().decode("utf-8")   #read object body
+            if file_format == 'JSON': 
+                strFileContents = convert_jsonl_to_json (strFileContents = strFileContents) #convert to JSON format (if input is JSON Lines format)
+
             try: 
                 os.makedirs (os.path.dirname(export_filename), exist_ok=True) #create export directory if does not exist
                 objFile = open(export_filename, "w")    #open file in write mode
@@ -289,8 +295,8 @@ def get_import_status (bucket: str, source_filename: str, importdatetime: dateti
         objStatusDetails = json.loads(response["Body"].read().decode("utf-8"))  #read object body
 
         returnResponse = {
-            'number_of_lines_imported': 'N/A' if objStatusDetails["status"] != 'Complete' else objStatusDetails["count"], 
-            'number_of_lines_failed_to_import': 'N/A' if objStatusDetails["status"] != 'Complete' else objStatusDetails["failed"], 
+            'number_of_qids_imported': 'N/A' if objStatusDetails["status"] != 'Complete' else objStatusDetails["count"], 
+            'number_of_qids_failed_to_import': 'N/A' if objStatusDetails["status"] != 'Complete' else objStatusDetails["failed"], 
             'import_starttime': objStatusDetails["time"]["start"], 
             'import_endtime': 'N/A' if objStatusDetails["status"] != 'Complete' else objStatusDetails["time"]["end"], 
             'status': objStatusDetails["status"], 
@@ -402,6 +408,26 @@ def convert_json_to_jsonl (source_filename: str):
             show_error = True
         )
 
+
+"""
+Convert to JSON format
+:param strFileContents: contents of JSON Lines file
+:return: processed JSON string output
+"""
+def convert_jsonl_to_json (strFileContents: str):
+    lines = strFileContents.splitlines()
+    strOutput = ''
+
+    for entry in lines:
+        if strOutput != '': 
+            strOutput = strOutput + ", " + entry
+        else:
+            strOutput = strOutput + entry
+
+    if strOutput != '': 
+        strOutput = '{"qna": [' + strOutput + "]}"
+
+    return strOutput
 
 """
 Error response
