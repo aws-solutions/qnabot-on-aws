@@ -182,6 +182,12 @@ Handlebars.registerHelper('getSessionAttr', function (attr, def, options) {
     return v;
 });
 
+Handlebars.registerHelper('getSlot', function (slotname, def, options) {
+    let v = _.get(req_glbl.slots, slotname, def);
+    qnabot.log("Return slot key, value: ", slotname, v);
+    return v;
+});
+
 Handlebars.registerHelper('signS3URL', function (s3url, options) {
     let signedUrl = signS3URL(s3url, 300) ;
     qnabot.log("Return signed S3 URL: ", signedUrl);
@@ -209,6 +215,7 @@ var apply_handlebars = async function (req, res, hit) {
         ClientType: req._clientType,
         UserInfo: req._userInfo,
         SessionAttributes: _.get(res, 'session'),
+        Slots: _.get(req, 'slots'),
         Settings: req._settings,
         Question: req.question,
         OrigQuestion: _.get(req,"_event.origQuestion",req.question),

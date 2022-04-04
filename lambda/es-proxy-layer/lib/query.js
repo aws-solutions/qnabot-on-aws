@@ -159,8 +159,14 @@ function merge_next(hit1, hit2) {
 }
 
 async function get_hit(req, res) {
+    let question = req.question;
+    let qid = _.get(req, 'qid');
+    if (qid) {
+        question = `QID::${qid}`;
+        console.log(`*** QID identified in request: ${qid}`)
+    }
     var query_params = {
-        question: req.question,
+        question: question,
         topic: _.get(req, 'session.topic', ''),
         from: 0,
         size: 1,
@@ -329,10 +335,13 @@ async function evaluateConditionalChaining(req, res, hit, conditionalChaining) {
         // create chaining rule safeEval context, aligned with Handlebars context
         const SessionAttributes = (arg) => _.get(SessionAttributes, arg, undefined);
         _.assign(SessionAttributes, res.session);
+        const Slots = (arg) => _.get(Slots, arg, undefined);
+        _.assign(Slots, req.slots);
         const context={
             LexOrAlexa: req._type,
             UserInfo:req._userInfo, 
             SessionAttributes,
+            Slots,
             Settings: req._settings,
             Question: req.question,
             OrigQuestion: _.get(req,"_event.origQuestion",req.question),
@@ -527,10 +536,12 @@ module.exports = async function (req, res) {
         qnabot.debug("pre-debug " +JSON.stringify(req))
         if (_.get(req._settings, 'ENABLE_DEBUG_RESPONSES')) {
             var msg = "User Input: \"" + req.question + "\"";
-
-
+            let qid = _.get(req, 'qid');
             if (usrLang != 'en') {
                 msg = "User Input: \"" + _.get(req,"_event.origQuestion","notdefined") + "\", Translated to: \"" + req.question + "\"";
+            }
+            if (qid) {
+                msg += ", Lex Intent matched QID \"" + qid + "\"" ;
             }
             if(req.debug)
             {

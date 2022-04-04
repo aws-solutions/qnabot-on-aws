@@ -3,7 +3,6 @@
 
 const Promise=require('bluebird')
 const run=require('./run')
-const getUtterances=require('./utterances')
 const Slot=require('./slot')
 const Intent=require('./intent')
 const IntentFallback=require('./intentFallback')

@@ -85,6 +85,10 @@ function parseLexV2Event(event) {
         _lexVersion: "V2",
         _userId: _.get(event, "sessionId", "Unknown Lex User"),
         intentname: _.get(event, 'sessionState.intent.name'),
+        slots: _.mapValues(
+            _.get(event,"sessionState.intent.slots",{}), 
+            x => { return _.get(x,"value.interpretedValue") } 
+        ),
         question: _.get(event, 'inputTranscript'),
         session: _.mapValues(
             _.get(event.sessionState, 'sessionAttributes', {}),
@@ -98,6 +102,19 @@ function parseLexV2Event(event) {
         ),
         channel: _.get(event, "requestAttributes.'x-amz-lex:channel-type'")
     };
+
+    // If Lex has already matched a QID specific intent, then use intent name to locate matching Qid
+    if ( ! ["QnaIntent", "FallbackIntent"].includes(out.intentname) ) {
+        if (out.intentname.startsWith("QID-")) {
+            console.log(`Lex intent created from QID by QnABot`);
+        } else {
+            console.log(`Custom Lex intent`);
+        }
+        let qid = out.intentname.replace(/^QID-/, "").replace(/_dot_/g, ".")
+        console.log(`*** Intentname "${out.intentname}" mapped to QID: "${qid}"`)
+        out.qid = qid
+    }
+
     // If voice, set userPreferredLocale from Lex locale in request (Voice input/output language should be aligned to bot locale)
     const mode = _.get(event,"inputMode") ;
     if (mode == "Speech") {

@@ -20,12 +20,17 @@ module.exports={
             },
             propertyOrder: 1
         },
+        enableLexIntent: {
+            title: "Create a dedicated Lex intent during LEX REBUILD - required if using slots in questions. Not compatible with Topics or ClientFilters.",
+            type : "boolean",
+            propertyOrder: 2
+        },
         a:{
             type:"string",
             title:"Answer",
             description:"Enter the answer you want to be returned when the user asks one of the above questions.",
             maxLength:8000,
-            propertyOrder: 2
+            propertyOrder: 3
         },
         alt:{
             type:"object",
@@ -46,7 +51,7 @@ module.exports={
                     propertyOrder: 0
                 },
             },
-            propertyOrder: 3
+            propertyOrder: 4
         },
         sa:{
             title: "Set Session Attributes",
@@ -73,20 +78,20 @@ module.exports={
                     }
                 },
             },
-            propertyOrder: 4
+            propertyOrder: 5
         },
         rp:{
             type:"string",
             title:"Alexa Reprompt",
             description:"Enter the Alexa reprompt to returned if the user does not respond. (SSML autodetection with &lt;speak&gt;&lt;/speak&gt;)",
             maxLength:8000,
-            propertyOrder: 5
+            propertyOrder: 6
         },
         t:{
             type:"string",
-            description:"Assign a topic to this item, to support follow up questions on the same topic. (Sets session attribute 'topic' in response)",
+            description:"Assign a topic to this item, to support follow up questions on the same topic. (Sets session attribute 'topic' in response). Topics cannot be used if enableLexIntent is enabled.",
             title:"Topic",
-            propertyOrder: 6
+            propertyOrder: 7
         },
         r:{
             title:"Response card",
@@ -136,14 +141,14 @@ module.exports={
                     propertyOrder: 3
                 }
             },
-            propertyOrder:7,
+            propertyOrder:8,
             required:["title"]
         },
         l:{
             type:"string",
             description:"Enter your lambda function name/ARN to dynamically create or modify answers, or to redirect to a different question.",
             title:"Lambda Hook",
-            propertyOrder:8
+            propertyOrder:9
         },
         args:{
             title:"Lambda Hook Arguments",
@@ -154,13 +159,13 @@ module.exports={
                 type:"string",
                 maxLength:2000
             },
-            propertyOrder:9
+            propertyOrder:10
         },
         elicitResponse:{
             title:"Elicit Response",
             description:"If your answer includes a question to the user, configure QnABot to process and capture the user's response as session attributes.",
             type:"object",
-            propertyOrder:10,
+            propertyOrder:11,
             properties:{
                 responsebot_hook:{
                     title:"Elicit Response: ResponseBot Hook",
@@ -183,27 +188,27 @@ module.exports={
             description:"Automatically move on to another item based on the question string returned by this rule. Rule can be a single-quoted string, e.g. 'next question', or a JavaScript conditional expression that evaluates to a string, e.g. (SessionAttributes.namespace.Yes_No == \"Yes\" ) ? \"Yes question\" : \"No Question\", or a Lambda Function Name or ARN that returns a string specified as \"Lambda::FunctionName\". Function name must start with \"QNA-\".",
             type:"string",
             maxLength:4000,
-            propertyOrder:11
+            propertyOrder:12
         },
         next:{
             title:"Guided Navigation: Next QID",
             description:"If applicable, enter the QID of the document(s) that is/are next in the sequence, otherwise leave blank. Be careful; if you set this field to an earlier document in the sequence, you might make your sequence loop forever, which would not be fun!  You can add more QIDs after the first, but they won't do anything at the moment.",
             type:"string",
             maxLength:100,
-            propertyOrder:12
+            propertyOrder:13
         },
         clientFilterValues:{
             title:"Client Filters: Values",
-            description:"Enter list of terms. When specified, client must provide N matching terms in request session attribute 'QNAClientFilter' for this answer to be eligible for the response",
+            description:"Enter list of terms. When specified, client must provide 1 or more matching terms in request session attribute 'QNAClientFilter' for this answer to be eligible for the response. Client filters cannot be used if enableLexIntent is enabled.",
             type:"string",
             maxLength:100,
-            propertyOrder:10
+            propertyOrder:14
         },    
         botRouting:{
             title:"Bot Routing",
             description:"Use QnABot as a supervisory Bot and route to other Bots to handle the conversation. This parameter identifies a target Bot or Lambda with which to route communication.",
             type:"object",
-            propertyOrder:13,
+            propertyOrder:15,
             properties:{
                 specialty_bot:{
                     title:"Bot Routing: LexV1 BotName OR lexv2::Botid/BotAliasId/LocaleId OR Lambda Function",
@@ -239,9 +244,9 @@ module.exports={
             type:"string",
             description:"Specify tags for questions. Tags should be space separated. For multi-word tags please use underscore '_'.",
             title:"Tags",
-            propertyOrder: 14
+            propertyOrder: 16
         },
     },
-    required:["qid","q","a"]
+    required:["qid","q","enableLexIntent","a"]
 
 };

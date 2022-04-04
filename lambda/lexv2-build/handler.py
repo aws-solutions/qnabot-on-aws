@@ -1,11 +1,13 @@
 # Creates or updates a Lex V2 QnABot bot
 # Automatically generates locales as specified by environment var LOCALES - from Cfn parameter.
 
+from configparser import DuplicateSectionError
 import os
 import os.path
 import json
 import time
 import sys
+import re
 
 #for boto3 path from py_modules
 root = os.environ["LAMBDA_TASK_ROOT"] + "/py_modules"
@@ -28,8 +30,9 @@ LEXV2_BOT_LOCALE_IDS.append("en_US")
 LEXV2_BOT_LOCALE_IDS = list(dict.fromkeys(LEXV2_BOT_LOCALE_IDS))
 
 BOT_NAME = STACKNAME + "_QnaBot"
-INTENT = "QnaIntent"
-SLOT_TYPE = "QnaSlotType"
+QNA_INTENT = "QnaIntent"
+QID_INTENT_PREFIX = "QID-"
+QNA_SLOT_TYPE = "QnaSlotType"
 BOT_ALIAS = "live"
 LEXV2_BOT_DRAFT_VERSION = "DRAFT"
 LEXV2_TEST_BOT_ALIAS = "TestBotAlias"
@@ -178,6 +181,32 @@ def get_slotId(slotName, intentId, botId, botVersion, localeId):
         raise Exception(f"Multiple matching slots for slotName: {slotName}")
     return slotId 
 
+def get_slotIds(intentId, botId, botVersion, localeId):
+    slotId = None
+    response = clientLEXV2.list_slots(
+        botId=botId,
+        botVersion=botVersion,
+        localeId=localeId,
+        intentId=intentId,
+        maxResults=1000
+    )
+    slotIds = [slotSummary["slotId"] for slotSummary in response["slotSummaries"] ]
+    return slotIds
+
+def delete_slots_for_intent(intentId, botId, botVersion, localeId):
+    slotIds = get_slotIds(intentId, botId, botVersion, localeId)
+    if slotIds:
+        print(f"Deleting slots {slotIds} for intent '{intentId}'")
+        for slotId in slotIds:
+            response = clientLEXV2.delete_slot(
+                slotId=slotId,
+                botId=botId,
+                botVersion=botVersion,
+                localeId=localeId,
+                intentId=intentId
+            )
+    else:
+        print(f"intent '{intentId}' has no slots")
 
 def get_botId(botName):
     botId = None
@@ -223,18 +252,33 @@ def get_intentId(intentName, botId, botVersion, localeId):
         raise Exception(f"Multiple matching intents for intentName: {intentName}")
     return intentId   
 
+def add_spantag_to_slots(utterance):
+    slots = re.findall(r'({.*?})',utterance)
+    for slot in slots:
+        utterance = utterance.replace(slot, f'<span translate="no">{slot}</span>')
+    return utterance
+
+def remove_spantag_from_slots(utterance):
+    slots = re.findall(r'<span translate="no">({.*?})</span>',utterance)
+    for slot in slots:
+        utterance = utterance.replace(f'<span translate="no">{slot}</span>', f" {slot} ")
+    return utterance
+
 def translate_utterances(localeId, utterances):
     translatedUtterances = []
     langCode = localeId.split("_")[0]
     for utterance in utterances:
         if len(utterance) > 1:
             try:
+                # don't translate slot names
+                span_utterance = add_spantag_to_slots(utterance)
                 response = clientTRANSLATE.translate_text(
-                    Text=utterance,
+                    Text=span_utterance,
                     SourceLanguageCode='auto',
                     TargetLanguageCode=langCode
                 )
                 translatedUtterance = response["TranslatedText"]
+                translatedUtterance = remove_spantag_from_slots(translatedUtterance)
             except Exception as e:
                 print(f"Auto translation failed for '{utterance}' - using original. Exception: {e}")
                 translatedUtterance = utterance
@@ -249,6 +293,7 @@ def translate_utterances(localeId, utterances):
         
     
 def lexV2_qna_slotTypeValues(slotTypeName, botId, botVersion, localeId, utterances):
+    print(f"SlotType {slotTypeName}")
     utterances = translate_utterances(localeId, utterances)
     slotTypeValues = get_qna_V2_slotTypeValues(slotTypeName, utterances)
     slotTypeId = get_slotTypeId(slotTypeName, botId, botVersion, localeId)
@@ -270,21 +315,24 @@ def lexV2_qna_slotTypeValues(slotTypeName, botId, botVersion, localeId, utteranc
         clientLEXV2.create_slot_type(**slotTypeParams)       
 
 
-def lexV2_qna_intent_slot(slotName, intentId, slotTypeId, botId, botVersion, localeId):
+def lexV2_intent_slot(slotName, intentId, slotTypeId, botId, botVersion, localeId, slotElicitationPrompt=None):
+    # if a prompt is provided, assume slot is required
+    slotConstraint = "Required" if slotElicitationPrompt else "Optional"
+    slotElicitationPrompt = slotElicitationPrompt or "What is the question?"
     valueElicitationSetting = {
         "promptSpecification": {
             "messageGroups": [
                 {
                     "message": {
                         "plainTextMessage": {
-                            "value": "What is the question?"
+                            "value": slotElicitationPrompt
                         }
                     }
                 }
             ], 
             "maxRetries": 4
         }, 
-        "slotConstraint": "Optional"
+        "slotConstraint": slotConstraint
     }
     slotParams = {
         "slotName": slotName,
@@ -313,6 +361,7 @@ def lexV2_qna_intent(intentName, slotTypeName, botId, botVersion, localeId):
     sampleUtterances = [{f"utterance": f"{{{slotName}}}"}]
     intentParams = {
             "intentName": intentName,
+            "description": f"({localeId}) Default QnABot intent.",
             "sampleUtterances":sampleUtterances,
             "fulfillmentCodeHook": {'enabled': True},
             "botId": botId,
@@ -330,7 +379,7 @@ def lexV2_qna_intent(intentName, slotTypeName, botId, botVersion, localeId):
         response = clientLEXV2.create_intent(**intentParams)
         intentId = response["intentId"];
         print(f'Created intent - Id: {intentId}')
-    slotId = lexV2_qna_intent_slot(slotName, intentId, slotTypeId, botId, botVersion, localeId)
+    slotId = lexV2_intent_slot(slotName, intentId, slotTypeId, botId, botVersion, localeId)
     print(f'Updating intent to add slot priority - intentId: {intentId}, slotId {slotId}')        
     response = clientLEXV2.update_intent(
         **intentParams,
@@ -345,11 +394,103 @@ def lexV2_qna_intent(intentName, slotTypeName, botId, botVersion, localeId):
     intentId = response["intentId"];
     print(f'Updated intent to add slot priority - intentId: {intentId}, slotId {slotId}')        
 
+def qid2intentname(qid):
+    return QID_INTENT_PREFIX + qid.replace(".", "_dot_")
+
+def intentname2qid(intentname):
+    return intentname.replace(QID_INTENT_PREFIX,"").replace("_dot_",".")
+
+def lexV2_qid_intent(qid, utterances, slots, botId, botVersion, localeId):
+    # make intentName from qid - replace . characters (not allowed in intent name)
+    intentName = qid2intentname(qid)
+    print(f"Creating intent: {intentName} for Qid: {qid}")
+    utterances  = translate_utterances(localeId, utterances)
+    sampleUtterances = [{"utterance": q} for q in utterances]
+    intentParams = {
+            "intentName": intentName,
+            "description": f"({localeId}) Intent for QnABot QID: '{qid}'",
+            "sampleUtterances":sampleUtterances,
+            "fulfillmentCodeHook": {'enabled': True},
+            "botId": botId,
+            "botVersion": botVersion,
+            "localeId": localeId
+    }
+    intentId = get_intentId(intentName, botId, botVersion, localeId)
+    if intentId:
+        print(f"Updating intent: {intentName}, intentId {intentId}")
+        response = clientLEXV2.update_intent(intentId=intentId, **intentParams)
+        print(f'Updated intent - Id: {intentId}')        
+    else:
+        print(f"Creating intent: {intentName}")
+        response = clientLEXV2.create_intent(**intentParams)
+        intentId = response["intentId"];
+        print(f'Created intent - Id: {intentId}')
+    intentId = response["intentId"];
+    slotPriorities = []
+    # delete any/all exiting slots
+    delete_slots_for_intent(intentId,botId,botVersion,localeId)
+    # create new slots
+    for slot in slots:
+        slotName = slots[slot]["name"]
+        slotTypeId = slots[slot]["type"]
+        prompt = slots[slot]["prompt"] if "prompt" in slots[slot] else None
+        slotId = lexV2_intent_slot(slotName, intentId, slotTypeId, botId, botVersion, localeId, prompt)
+        slotPriorities.append({
+            'priority': len(slotPriorities) + 1,
+            'slotId': slotId           
+        })
+    print(f'Updating intent to add slot priorities - intentId: {intentId}')        
+    response = clientLEXV2.update_intent(
+        **intentParams,
+        intentId=intentId,
+        slotPriorities=slotPriorities
+        )
+    intentId = response["intentId"];
+    print(f'Updated intent to add slot priorities - intentId: {intentId}')
+
+
+def get_qid_intents_to_delete(intents, botId, botVersion, localeId):
+    response = clientLEXV2.list_intents(
+        botId=botId,
+        botVersion=botVersion,
+        localeId=localeId,
+        filters=[
+            {
+                'name': 'IntentName',
+                'values': [
+                    "QID-",
+                ],
+                'operator': 'CO'
+            },
+        ],
+        maxResults=1000
+    )
+    intents_to_delete = []
+    for intentSummary in response["intentSummaries"]:
+        intentname = intentSummary["intentName"]
+        intentid = intentSummary["intentId"]
+        qid = intentname2qid(intentname)
+        if qid not in intents:
+            print(f"QID Intent '{intentname} : {intentid}' (QID '{qid}') has no corresponding lex enabled QIDs, and will be deleted.")
+            intents_to_delete.append(intentid)          
+    return intents_to_delete
+
+def lexV2_qid_delete_intents(intents, botId, botVersion, botLocaleId):
+    intents_to_delete = get_qid_intents_to_delete(intents, botId, botVersion, botLocaleId)
+    for intent in intents_to_delete:
+        response = clientLEXV2.delete_intent(
+            intentId=intent,
+            botId=botId,
+            botVersion=botVersion,
+            localeId=botLocaleId
+        )
+        print(f'Deleted intent - Id: {intent}')        
 
 def lexV2_genesys_intent(botId, botVersion, localeId):
     intentName = "GenesysInitialIntent"
     intentParams = {
         "intentName": intentName,
+        "description": f"({localeId}) Intent used only by Genesys Cloud CX integration",
         "botId": botId,
         "botVersion": botVersion,
         "localeId": localeId,
@@ -413,7 +554,7 @@ def wait_for_lexV2_qna_locale(botId, botVersion, localeId):
         time.sleep(5)
         botLocaleStatus = get_bot_locale_status(botId, botVersion, localeId)
         if botLocaleStatus not in ["NotBuilt","Built","Creating","Building","ReadyExpressTesting"]:
-            raise Exception(f"Invalid botLocaleStatus: {botLocaleStatus}")
+            raise Exception(f"Invalid botLocaleStatus for locale '{localeId}'): '{botLocaleStatus}'. Check for build errors in LexV2 console for bot '{BOT_NAME}'")
     print(f"Bot localeId {localeId}: {botLocaleStatus}")
     return botLocaleStatus
 
@@ -441,7 +582,7 @@ def lexV2_qna_locale(botId, botVersion, localeId, voiceId, engine):
                 'engine': engine
             }
         )
-    wait_for_lexV2_qna_locale(botId, botVersion, localeId)
+        wait_for_lexV2_qna_locale(botId, botVersion, localeId)
     return localeId
 
 
@@ -494,7 +635,7 @@ def lexV2_qna_bot(botName):
             idleSessionTTLInSeconds=300
         )
         botId = response["botId"]
-        print(f"Creates bot {botName} with ID {botId}")
+        print(f"Creating bot {botName} with ID {botId}")
     else:
         print(f"Bot {botName} exists with ID {botId}")
     wait_for_lexV2_qna_bot(botId)
@@ -635,10 +776,24 @@ def batches(lst, n):
     for i in range(0, len(lst), n):
         yield lst[i:i + n]
 
-def build_all(utterances):
+def get_bot_info():
+    botId = get_botId(BOT_NAME)
+    bot_aliasId = get_bot_aliasId(botId, BOT_ALIAS)
+    result = {
+        "botName": BOT_NAME,
+        "botId": get_botId(BOT_NAME),
+        "botAlias": BOT_ALIAS,
+        "botAliasId": bot_aliasId,
+        "botIntent": QNA_INTENT,
+        "botIntentFallback": "FallbackIntent",
+        "botLocaleIds": ",".join(LEXV2_BOT_LOCALE_IDS)
+    }
+    return result 
+
+def build_all(intents):
     status("Rebuilding bot")
     botId = lexV2_qna_bot(BOT_NAME)
-    # create of update bot for each locale
+    # create or update bot for each locale
     # process locales in batches to staty with service limit bot-locale-builds-per-account (default 5)
     botlocaleIdBatches = list(batches(LEXV2_BOT_LOCALE_IDS,5))
     for botlocaleIdBatch in botlocaleIdBatches:
@@ -648,8 +803,18 @@ def build_all(utterances):
             lexV2_qna_locale(botId, LEXV2_BOT_DRAFT_VERSION, botLocaleId, voiceId=LEXV2_BOT_LOCALE_VOICES[botLocaleId][0]["voiceId"], engine=LEXV2_BOT_LOCALE_VOICES[botLocaleId][0]["engine"])
             lexV2_fallback_intent(botId, LEXV2_BOT_DRAFT_VERSION, botLocaleId)
             lexV2_genesys_intent(botId, LEXV2_BOT_DRAFT_VERSION, botLocaleId)
-            lexV2_qna_slotTypeValues(SLOT_TYPE, botId, LEXV2_BOT_DRAFT_VERSION, botLocaleId, utterances)
-            lexV2_qna_intent(INTENT, SLOT_TYPE, botId, LEXV2_BOT_DRAFT_VERSION, botLocaleId)
+            for qid in intents:
+                utterances = intents[qid]["utterances"]
+                if qid == QNA_INTENT:
+                    # Standard QnABot slot type and intent
+                    lexV2_qna_slotTypeValues(QNA_SLOT_TYPE, botId, LEXV2_BOT_DRAFT_VERSION, botLocaleId, utterances)
+                    lexV2_qna_intent(QNA_INTENT, QNA_SLOT_TYPE, botId, LEXV2_BOT_DRAFT_VERSION, botLocaleId)
+                else:
+                    # Custom intent - one intent per Qid
+                    slots = intents[qid]["slots"]
+                    lexV2_qid_intent(qid, utterances, slots, botId, LEXV2_BOT_DRAFT_VERSION, botLocaleId)
+            # Delete QID mapped intents that are not in the current list
+            lexV2_qid_delete_intents(intents, botId, LEXV2_BOT_DRAFT_VERSION, botLocaleId)
         status("Rebuilding bot locales: " + str(LEXV2_BOT_LOCALE_IDS))
         for botLocaleId in botlocaleIdBatch:
             build_lexV2_qna_bot_locale(botId, LEXV2_BOT_DRAFT_VERSION, botLocaleId)
@@ -665,17 +830,9 @@ def build_all(utterances):
     status("Deleting old bot version(s)")
     lexV2_qna_delete_old_versions(botId)
     # return bot ids
-    result = {
-        "botName": BOT_NAME,
-        "botId": botId,
-        "botAlias": BOT_ALIAS,
-        "botAliasId": botAliasId,
-        "botIntent": INTENT,
-        "botIntentFallback": "FallbackIntent",
-        "botLocaleIds": ",".join(LEXV2_BOT_LOCALE_IDS)
-    }
+    result = get_bot_info()
     status("READY")
-    return result
+    return result   
 
 def delete_all():
     botId = get_botId(BOT_NAME)
@@ -687,14 +844,117 @@ def delete_all():
         )
     return response
 
+def duplicate_utterances(items):
+    qna_intent_utterances = {}
+    qid_intent_utterances = {}
+    dup_utterances = {}
+    dups = None
+    for item in items:
+        for utterance in item["q"]:
+            slots = {}
+            # get processed version of utterance with slot definitions replaced by lex slot references
+            [utterance, slots] = get_slots_in_utterance(utterance, item["qid"], slots)
+            utterance = utterance.lower()
+            if item["enableLexIntent"]:
+                if utterance not in qid_intent_utterances:
+                    qid_intent_utterances[utterance] = [item["qid"]]
+                else:
+                    qid_intent_utterances[utterance].append(item["qid"])
+            else: 
+                if utterance not in qna_intent_utterances:
+                    qna_intent_utterances[utterance] = [item["qid"]]
+                else:
+                    qna_intent_utterances[utterance].append(item["qid"])           
+    # We only care about duplicates in Lex mapped qids. Others are mapped to QNA_INTENT and deduplicated.
+    for utterance in qid_intent_utterances:
+        if utterance in qna_intent_utterances:
+            qid_intent_utterances[utterance].append(qna_intent_utterances[utterance])
+        if len(qid_intent_utterances[utterance]) > 1:
+            dup_utterances[utterance] = qid_intent_utterances[utterance]
+    if dup_utterances:
+        dups = "Duplicate questions not allowed in QIDs exported to Lex"
+        for dup_utterance in dup_utterances:
+            dups += f", '{dup_utterance}' in QIDs {dup_utterances[dup_utterance]}"
+    return dups
+    
+def get_slots_in_utterance(utterance, intent, slots):
+    # slot pattern is <<name[|slotType[|promptIfReqd]]}>>
+    slot_patterns = re.findall(r'<<(.*?)>>',utterance)
+    for slot_pattern in slot_patterns:
+        slot_attributes = slot_pattern.split("|")
+        if not slot_attributes:
+            raise ValueError(f"Badly formatted slot reference in QID '{intent}': '{utterance}' - expected '<<name[|slotType[|promptIfReqd]]>>'")            
+        name = slot_attributes[0]
+        if (name not in slots):
+            slots[name] = {"name": name}
+        if (len(slot_attributes) > 1):
+            type = slot_attributes[1]
+            if "type" in slots[name]:
+                raise ValueError(f"Slot type already defined for slot name '{name}' in QID '{intent}': '{utterance}'")
+            else:
+                slots[name]["type"] = type
+        if (len(slot_attributes) > 2):
+            prompt = slot_attributes[2]
+            if "prompt" in slots[name]:
+                raise ValueError(f"Slot prompt already defined for slot name '{name}' in QID '{intent}': '{utterance}'")
+            else:
+                slots[name]["prompt"] = prompt  
+        # Update utterance with proper slot reference for Lex
+        utterance = utterance.replace(f"<<{slot_pattern}>>", f"{{{name}}}")
+    return [utterance, slots]
+
+def process_intents(items):
+    # initialise intents dict
+    intents = {
+        QNA_INTENT: {
+            "utterances":set()
+        }
+    }
+    # build intents with set of unique utterances per intent
+    for item in items:
+        if item["enableLexIntent"]:
+            # QID gets its own Lex intent
+            intents[item["qid"]] = {"utterances":set(item["q"])}
+        else:
+            # Add QID utterances to default QnABot intent
+            intents[QNA_INTENT]["utterances"].update(item["q"])
+    # Need at least 1 utterance for default QNA_INTENT
+    if len(intents[QNA_INTENT]["utterances"]) < 1:
+        print(f"Intent {QNA_INTENT} has no utterances.. inserting dummy utterance")
+        intents[QNA_INTENT]["utterances"] = set(["dummy utterance"])
+    # identify and define slots (if any) for each intent, and modify utterance with Lex slot name syntax
+    for intent in intents:
+        slots = {}
+        utterances = []
+        for utterance in intents[intent]["utterances"]:
+            [utterance, slots] = get_slots_in_utterance(utterance, intent, slots)
+            utterances.append(utterance)
+        # any missing slot types?
+        for name in slots:
+            if "type" not in slots[name]:
+                raise ValueError(f"Slot name '{name}' has no defined slot type in an utterances in QID '{intent}'")
+        intents[intent]["utterances"] = utterances
+        intents[intent]["slots"] = slots
+    dups = duplicate_utterances(items)
+    if dups:
+        raise ValueError(dups)
+    return intents
 
 # cfnHelper functions
 @helper.create
-@helper.update
-def create_or_update_bot(event, _):
+def create_bot(event, _):
     utterances = event["ResourceProperties"]["utterances"]
-    result = build_all(utterances)
-    helper.Data.update(result)
+    # map all default utterances to standard Qna intent
+    intents = {QNA_INTENT: {"utterances":utterances}}
+    result = build_all(intents)
+    helper.Data.update(result)       
+
+@helper.update
+def update_bot(event, _):
+    print("Cloudformation update - make no changes to existing bot")
+    result = get_bot_info()
+    helper.Data.update(result) 
+
 @helper.delete
 def delete_bot(event, _):
     delete_all()
@@ -708,18 +968,31 @@ def handler(event, context):
         helper(event, context)
     else:
         print("Function not called from CloudFormation: " + json.dumps(event))
-        utterances = event["utterances"]
-        statusFile = event["statusFile"]
-        result = build_all(utterances)
-        print("LexV2 bot info: " + json.dumps(result))
-        return {
-            'statusCode': 200,
-            'body': json.dumps(result)
-        }
+        try:
+            statusFile = event["statusFile"]
+            items = event["items"]
+            intents = process_intents(items)
+            result = build_all(intents)
+            print("LexV2 bot info: " + json.dumps(result))
+        except Exception as e:
+            result = "FAILED: " + str(e)
+            status(result)
+            raise
 
 # for testing on terminal
 if __name__ == "__main__":
-    testutterances = ["what is the capital city of France?", "How great is Q and A bot?"]
-    result = build_all(testutterances)
+    items = [
+        {"qid":QNA_INTENT,  "enableLexIntent": True, "q":["what is the capital city of France?", "How great is Q and A bot?"]},
+        {"qid":"1.CustomIntent.test",  "enableLexIntent": True, "q":["What is your address?", "What is your phone number?"]},
+        {"qid":"2.CustomIntent.test",  "enableLexIntent": True, "q":["What is your name?", "What are you called?"]},
+        {"qid":"3.CustomIntent.test", "enableLexIntent": True, "q":["What are your opening hours?", "How do I contact you?"]},
+        {"qid":"4.CustomIntent.test", "enableLexIntent": True, "q":["<<name|AMAZON.FirstName|What is your first name>> <<lastname|AMAZON.LastName|What is your last name>>", "My name is <<name>> <<lastname>>"]},
+        #{"qid":"5.CustomIntent.test", "enableLexIntent": True, "q":["My name is <<name|AMAZON.FirstName|prompt>> <<lastname|AMAZON.LastName|prompt>>"]},
+    ]
+    event = {
+        "statusFile":None,
+        "items": items
+    }
+    result = handler(event,{})
     #result = delete_all()
     print(result)
