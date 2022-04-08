@@ -20,11 +20,6 @@ module.exports={
             },
             propertyOrder: 1
         },
-        enableLexIntent: {
-            title: "Create a dedicated Lex intent during LEX REBUILD - required if using slots in questions. Not compatible with Topics or ClientFilters.",
-            type : "boolean",
-            propertyOrder: 2
-        },
         a:{
             type:"string",
             title:"Answer",
@@ -53,6 +48,44 @@ module.exports={
             },
             propertyOrder: 4
         },
+        enableQidIntent: {
+            title: "Create a dedicated bot intent for this item during LEX REBUILD",
+            description: "Enable to support use of slots in questions. WARNING: Enabling Intents prevents use of QnABot Topics, ClientFilters, and multi-language text interactions when bot locale does not match user's language.",
+            type : "boolean",
+            propertyOrder: 5,
+        },
+        slots:{
+            title: "Slots",
+            description:"Define slots referenced in the questions above, if any.",
+            type:"array",
+            propertyOrder: 6,
+            items:{
+                type:"object",
+                properties:{
+                    slotRequired: {
+                        title: "Required for this intent",
+                        description: "The bot will prompt for this slot during the conversation if a value is not provided by the user.",
+                        type : "boolean",
+                        propertyOrder: 0,                            
+                    },
+                    slotName: {
+                        title: "Slot name, e.g. firstname",
+                        type : "string",
+                        propertyOrder: 1,
+                    },
+                    slotType: {
+                        title: "Slot Type, e.g. AMAZON.FirstName",
+                        type : "string",
+                        propertyOrder: 2,
+                    },
+                    slotPrompt: {
+                        title: "Slot elicitation prompt, e.g. What is your first name?",
+                        type : "string",
+                        propertyOrder: 3,
+                    },
+                },
+            },
+        },
         sa:{
             title: "Set Session Attributes",
             type:"array",
@@ -78,20 +111,20 @@ module.exports={
                     }
                 },
             },
-            propertyOrder: 5
+            propertyOrder: 7
         },
         rp:{
             type:"string",
             title:"Alexa Reprompt",
             description:"Enter the Alexa reprompt to returned if the user does not respond. (SSML autodetection with &lt;speak&gt;&lt;/speak&gt;)",
             maxLength:8000,
-            propertyOrder: 6
+            propertyOrder: 8
         },
         t:{
             type:"string",
             description:"Assign a topic to this item, to support follow up questions on the same topic. (Sets session attribute 'topic' in response). Topics cannot be used if enableLexIntent is enabled.",
             title:"Topic",
-            propertyOrder: 7
+            propertyOrder: 9
         },
         r:{
             title:"Response card",
@@ -141,14 +174,14 @@ module.exports={
                     propertyOrder: 3
                 }
             },
-            propertyOrder:8,
+            propertyOrder:10,
             required:["title"]
         },
         l:{
             type:"string",
             description:"Enter your lambda function name/ARN to dynamically create or modify answers, or to redirect to a different question.",
             title:"Lambda Hook",
-            propertyOrder:9
+            propertyOrder:11
         },
         args:{
             title:"Lambda Hook Arguments",
@@ -159,13 +192,13 @@ module.exports={
                 type:"string",
                 maxLength:2000
             },
-            propertyOrder:10
+            propertyOrder:12
         },
         elicitResponse:{
             title:"Elicit Response",
             description:"If your answer includes a question to the user, configure QnABot to process and capture the user's response as session attributes.",
             type:"object",
-            propertyOrder:11,
+            propertyOrder:13,
             properties:{
                 responsebot_hook:{
                     title:"Elicit Response: ResponseBot Hook",
@@ -188,27 +221,27 @@ module.exports={
             description:"Automatically move on to another item based on the question string returned by this rule. Rule can be a single-quoted string, e.g. 'next question', or a JavaScript conditional expression that evaluates to a string, e.g. (SessionAttributes.namespace.Yes_No == \"Yes\" ) ? \"Yes question\" : \"No Question\", or a Lambda Function Name or ARN that returns a string specified as \"Lambda::FunctionName\". Function name must start with \"QNA-\".",
             type:"string",
             maxLength:4000,
-            propertyOrder:12
+            propertyOrder:14
         },
         next:{
             title:"Guided Navigation: Next QID",
             description:"If applicable, enter the QID of the document(s) that is/are next in the sequence, otherwise leave blank. Be careful; if you set this field to an earlier document in the sequence, you might make your sequence loop forever, which would not be fun!  You can add more QIDs after the first, but they won't do anything at the moment.",
             type:"string",
             maxLength:100,
-            propertyOrder:13
+            propertyOrder:15
         },
         clientFilterValues:{
             title:"Client Filters: Values",
             description:"Enter list of terms. When specified, client must provide 1 or more matching terms in request session attribute 'QNAClientFilter' for this answer to be eligible for the response. Client filters cannot be used if enableLexIntent is enabled.",
             type:"string",
             maxLength:100,
-            propertyOrder:14
+            propertyOrder:16
         },    
         botRouting:{
             title:"Bot Routing",
             description:"Use QnABot as a supervisory Bot and route to other Bots to handle the conversation. This parameter identifies a target Bot or Lambda with which to route communication.",
             type:"object",
-            propertyOrder:15,
+            propertyOrder:17,
             properties:{
                 specialty_bot:{
                     title:"Bot Routing: LexV1 BotName OR lexv2::Botid/BotAliasId/LocaleId OR Lambda Function",
@@ -244,9 +277,8 @@ module.exports={
             type:"string",
             description:"Specify tags for questions. Tags should be space separated. For multi-word tags please use underscore '_'.",
             title:"Tags",
-            propertyOrder: 16
+            propertyOrder: 18
         },
     },
-    required:["qid","q","enableLexIntent","a"]
-
+    required:["qid","q","a"]
 };

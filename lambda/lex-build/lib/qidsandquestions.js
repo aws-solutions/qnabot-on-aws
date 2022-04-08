@@ -37,7 +37,7 @@ module.exports=function(params){
     })
     .then(function(result){
         return _.compact(_.uniq(_.flatten(result
-            .map(qa=>qa._source.questions ? {"qid":qa._source.qid, "enableLexIntent":_.get(qa._source, "enableLexIntent", false), "q":qa._source.questions.map(y=>y.q)} : [])
+            .map(qa=>qa._source.questions ? {"qid":qa._source.qid, "enableQidIntent":_.get(qa._source, "enableQidIntent", false), "q":qa._source.questions.map(y=>y.q), "slots":_.get(qa._source, "slots", [])} : [])
         )))
     })
 

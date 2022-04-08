@@ -431,9 +431,9 @@ def lexV2_qid_intent(qid, utterances, slots, botId, botVersion, localeId):
     delete_slots_for_intent(intentId,botId,botVersion,localeId)
     # create new slots
     for slot in slots:
-        slotName = slots[slot]["name"]
-        slotTypeId = slots[slot]["type"]
-        prompt = slots[slot]["prompt"] if "prompt" in slots[slot] else None
+        slotName = slot["slotName"]
+        slotTypeId = slot["slotType"]
+        prompt = slot["slotPrompt"]
         slotId = lexV2_intent_slot(slotName, intentId, slotTypeId, botId, botVersion, localeId, prompt)
         slotPriorities.append({
             'priority': len(slotPriorities) + 1,
@@ -811,7 +811,7 @@ def build_all(intents):
                     lexV2_qna_intent(QNA_INTENT, QNA_SLOT_TYPE, botId, LEXV2_BOT_DRAFT_VERSION, botLocaleId)
                 else:
                     # Custom intent - one intent per Qid
-                    slots = intents[qid]["slots"]
+                    slots = intents[qid]["slots"] if "slots" in intents[qid] else []
                     lexV2_qid_intent(qid, utterances, slots, botId, LEXV2_BOT_DRAFT_VERSION, botLocaleId)
             # Delete QID mapped intents that are not in the current list
             lexV2_qid_delete_intents(intents, botId, LEXV2_BOT_DRAFT_VERSION, botLocaleId)
@@ -851,11 +851,9 @@ def duplicate_utterances(items):
     dups = None
     for item in items:
         for utterance in item["q"]:
-            slots = {}
             # get processed version of utterance with slot definitions replaced by lex slot references
-            [utterance, slots] = get_slots_in_utterance(utterance, item["qid"], slots)
             utterance = utterance.lower()
-            if item["enableLexIntent"]:
+            if item["enableQidIntent"]:
                 if utterance not in qid_intent_utterances:
                     qid_intent_utterances[utterance] = [item["qid"]]
                 else:
@@ -877,31 +875,27 @@ def duplicate_utterances(items):
             dups += f", '{dup_utterance}' in QIDs {dup_utterances[dup_utterance]}"
     return dups
     
-def get_slots_in_utterance(utterance, intent, slots):
-    # slot pattern is <<name[|slotType[|promptIfReqd]]}>>
-    slot_patterns = re.findall(r'<<(.*?)>>',utterance)
-    for slot_pattern in slot_patterns:
-        slot_attributes = slot_pattern.split("|")
-        if not slot_attributes:
-            raise ValueError(f"Badly formatted slot reference in QID '{intent}': '{utterance}' - expected '<<name[|slotType[|promptIfReqd]]>>'")            
-        name = slot_attributes[0]
-        if (name not in slots):
-            slots[name] = {"name": name}
-        if (len(slot_attributes) > 1):
-            type = slot_attributes[1]
-            if "type" in slots[name]:
-                raise ValueError(f"Slot type already defined for slot name '{name}' in QID '{intent}': '{utterance}'")
-            else:
-                slots[name]["type"] = type
-        if (len(slot_attributes) > 2):
-            prompt = slot_attributes[2]
-            if "prompt" in slots[name]:
-                raise ValueError(f"Slot prompt already defined for slot name '{name}' in QID '{intent}': '{utterance}'")
-            else:
-                slots[name]["prompt"] = prompt  
-        # Update utterance with proper slot reference for Lex
-        utterance = utterance.replace(f"<<{slot_pattern}>>", f"{{{name}}}")
-    return [utterance, slots]
+def validate_slots(intents):
+    bad_slots = {}
+    msg = None
+    for qid in intents:
+        slot_dict = {}
+        if "slots" in intents[qid]:
+            for slot in intents[qid]["slots"]:
+                slotname = slot["slotName"]
+                slot_dict[slotname] = True
+            print(f"{slot_dict}")
+            print(f"{intents[qid]}")
+            for utterance in intents[qid]["utterances"]:
+                slotnames = re.findall(r'{(.*?)}',utterance)
+                for slot in slotnames:
+                    if slot not in slot_dict: 
+                        bad_slots[qid] = bad_slots.get(qid,[]) + [slot]
+    if bad_slots:
+        msg = "Undefined slot reference in QID"
+        for qid in bad_slots:
+            msg += f", '{qid}' {bad_slots[qid]}"
+    return msg
 
 def process_intents(items):
     # initialise intents dict
@@ -912,9 +906,11 @@ def process_intents(items):
     }
     # build intents with set of unique utterances per intent
     for item in items:
-        if item["enableLexIntent"]:
+        if item["enableQidIntent"]:
             # QID gets its own Lex intent
             intents[item["qid"]] = {"utterances":set(item["q"])}
+            if "slots" in item:
+                intents[item["qid"]]["slots"] = item["slots"]
         else:
             # Add QID utterances to default QnABot intent
             intents[QNA_INTENT]["utterances"].update(item["q"])
@@ -922,22 +918,13 @@ def process_intents(items):
     if len(intents[QNA_INTENT]["utterances"]) < 1:
         print(f"Intent {QNA_INTENT} has no utterances.. inserting dummy utterance")
         intents[QNA_INTENT]["utterances"] = set(["dummy utterance"])
-    # identify and define slots (if any) for each intent, and modify utterance with Lex slot name syntax
-    for intent in intents:
-        slots = {}
-        utterances = []
-        for utterance in intents[intent]["utterances"]:
-            [utterance, slots] = get_slots_in_utterance(utterance, intent, slots)
-            utterances.append(utterance)
-        # any missing slot types?
-        for name in slots:
-            if "type" not in slots[name]:
-                raise ValueError(f"Slot name '{name}' has no defined slot type in an utterances in QID '{intent}'")
-        intents[intent]["utterances"] = utterances
-        intents[intent]["slots"] = slots
+    # validate slots (if any) for each intent
     dups = duplicate_utterances(items)
     if dups:
         raise ValueError(dups)
+    bad_slots = validate_slots(intents)
+    if bad_slots:
+        raise ValueError(bad_slots)
     return intents
 
 # cfnHelper functions
@@ -982,12 +969,12 @@ def handler(event, context):
 # for testing on terminal
 if __name__ == "__main__":
     items = [
-        {"qid":QNA_INTENT,  "enableLexIntent": True, "q":["what is the capital city of France?", "How great is Q and A bot?"]},
-        {"qid":"1.CustomIntent.test",  "enableLexIntent": True, "q":["What is your address?", "What is your phone number?"]},
-        {"qid":"2.CustomIntent.test",  "enableLexIntent": True, "q":["What is your name?", "What are you called?"]},
-        {"qid":"3.CustomIntent.test", "enableLexIntent": True, "q":["What are your opening hours?", "How do I contact you?"]},
-        {"qid":"4.CustomIntent.test", "enableLexIntent": True, "q":["<<name|AMAZON.FirstName|What is your first name>> <<lastname|AMAZON.LastName|What is your last name>>", "My name is <<name>> <<lastname>>"]},
-        #{"qid":"5.CustomIntent.test", "enableLexIntent": True, "q":["My name is <<name|AMAZON.FirstName|prompt>> <<lastname|AMAZON.LastName|prompt>>"]},
+        {"qid":QNA_INTENT,  "enableQidIntent": True, "q":["what is the capital city of France?", "How great is Q and A bot?"]},
+        {"qid":"1.CustomIntent.test",  "enableQidIntent": True, "q":["What is your address?", "What is your phone number?"]},
+        {"qid":"2.CustomIntent.test",  "enableQidIntent": True, "q":["What is your name?", "What are you called?"]},
+        {"qid":"3.CustomIntent.test", "enableQidIntent": True, "q":["What are your opening hours?", "How do I contact you?"]},
+        {"qid":"4.CustomIntent.test", "enableQidIntent": True, "q":["My name is {firstname}"], "slots":[{"slotRequired": True,"slotName": "firstname","slotType": "AMAZON.FirstName", "slotPrompt": "What is your first name?"}]},
+        #{"qid":"5.CustomIntent.test", "enableQidIntent": True, "q":["My name is <<name|AMAZON.FirstName|prompt>> <<lastname|AMAZON.LastName|prompt>>"]},
     ]
     event = {
         "statusFile":None,
