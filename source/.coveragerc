@@ -1,0 +1,8 @@
+[run]
+omit =
+    tests/*
+source =
+    .
+
+[report]
+fail_under = 80.0
