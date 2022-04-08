@@ -430,11 +430,7 @@ function assembleLexV2Response(request, response) {
         let imageResponseCardV2 = buildImageResponseCardV2(response);
         if(imageResponseCardV2) {
               let imgUrlLength = imageResponseCardV2.imageUrl.length
-              qnabot.log("image URL length suraj : ")
-              qnabot.log(imgUrlLength)
               let client = _.get(request,"_clientType", undefined)
-              qnabot.log("Client Type suraj : ")
-              qnabot.log(client)
               if(imgUrlLength > 250){
                   qnabot.log("ResponseCard Image URL length is greater than the max limit (250 chars). Client is LexWebUI. Sending ResponseCard as session attribute rather than as Lex ImageresponseCard to avoid hitting the Lex URL length limit.")
               } else { 
