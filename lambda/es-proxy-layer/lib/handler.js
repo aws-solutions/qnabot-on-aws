@@ -68,9 +68,20 @@ async function get_settings() {
     return settings;
 }
 
+function isQuestionAllStopwords(question) {
+    // TODO define stopwords once in shared module
+    let stopwords = "a,an,and,are,as,at,be,but,by,for,if,in,into,is,it,not,of,on,or,such,that,the,their,then,there,these,they,this,to,was,will,with".split(",");
+    let questionwords = question.toLowerCase().match(/\b(\w+)\b/g)
+    let allStopwords = questionwords.every( x => { return stopwords.includes(x); });
+    return allStopwords;
+}
 
 async function get_es_query(event, settings) {
     var question = _.get(event,'question','');
+    if (isQuestionAllStopwords(question)) {
+        console.log(`Question '${question}' contains only stop words. Returning no_hits response.`);
+        question = _.get(settings, 'ES_NO_HITS_QUESTION', 'no_hits');       
+    }
     if (question.length > 0) {
         var query_params = {
             question: question,
@@ -85,9 +96,6 @@ async function get_es_query(event, settings) {
             score_answer_field: _.get(settings,'ES_SCORE_ANSWER_FIELD'),
             fuzziness: _.get(settings, 'ES_USE_FUZZY_MATCH'),
             es_expand_contractions: _.get(settings,"ES_EXPAND_CONTRACTIONS"),
-
-
-
         };
         return build_es_query(query_params);
     } else {
