@@ -160,16 +160,17 @@ function merge_next(hit1, hit2) {
 
 async function get_hit(req, res) {
     let question = req.question;
+    let size = 1;
     var no_hits_question = _.get(req, '_settings.ES_NO_HITS_QUESTION', 'no_hits');
     if (open_es.isQuestionAllStopwords(question)) {
-        console.log(`Question '${question}' contains only stop words. Returning no_hits response.`);
-        question = no_hits_question;       
+        console.log(`Question '${question}' contains only stop words. Forcing no hits.`);
+        size = 0;       
     }
     var query_params = {
         question: question,
         topic: _.get(req, 'session.topic', ''),
         from: 0,
-        size: 1,
+        size: size,
         minimum_should_match: _.get(req, '_settings.ES_MINIMUM_SHOULD_MATCH'),
         phrase_boost: _.get(req, '_settings.ES_PHRASE_BOOST'),
         use_keyword_filters: _.get(req, '_settings.ES_USE_KEYWORD_FILTERS'),
@@ -200,7 +201,12 @@ async function get_hit(req, res) {
         }
         hit = _.get(response, "hits.hits[0]._source");
     }
-    
+ 
+    if (response.hits.max_score == 0) {
+        qnabot.log("Max score is zero - no valid results. Set hit to null")
+        hit = null;
+    }
+
     if (hit) {
         res['got_hits'] = 1;  // response flag, used in logging / kibana
     } else if(query_params.kendra_indexes.length != 0) {
@@ -214,20 +220,16 @@ async function get_hit(req, res) {
             _.set(res,"message", hit.a);
             _.set(req,"debug",hit.debug)
             res['got_hits'] = 1;
-
         }
-
     }
     if(!hit)
     {
         qnabot.log("No hits from query - searching instead for: " + no_hits_question);
         query_params['question'] = no_hits_question;
+        query_params['size'] = 1;
         res['got_hits'] = 0;  // response flag, used in logging / kibana
-        
         response = await run_query(req, query_params);
-
         hit = _.get(response, "hits.hits[0]._source");
-
         qnabot.log("No hits response: " + JSON.stringify(hit))
     }
     // Do we have a hit?
