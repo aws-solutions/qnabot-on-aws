@@ -158,19 +158,10 @@ function merge_next(hit1, hit2) {
     return hit2;
 }
 
-// check if the question contains nothing but ES stopwords.
-function isQuestionAllStopwords(question) {
-    // TODO define stopwords once in shared module
-    let stopwords = "a,an,and,are,as,at,be,but,by,for,if,in,into,is,it,not,of,on,or,such,that,the,their,then,there,these,they,this,to,was,will,with".split(",");
-    let questionwords = question.toLowerCase().match(/\b(\w+)\b/g)
-    let allStopwords = questionwords.every( x => { return stopwords.includes(x); });
-    return allStopwords;
-}
-
 async function get_hit(req, res) {
     let question = req.question;
     var no_hits_question = _.get(req, '_settings.ES_NO_HITS_QUESTION', 'no_hits');
-    if (isQuestionAllStopwords(question)) {
+    if (open_es.isQuestionAllStopwords(question)) {
         console.log(`Question '${question}' contains only stop words. Returning no_hits response.`);
         question = no_hits_question;       
     }
