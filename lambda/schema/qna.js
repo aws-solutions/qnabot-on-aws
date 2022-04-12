@@ -63,23 +63,26 @@ module.exports={
                 type:"object",
                 properties:{
                     slotRequired: {
-                        title: "Required for this intent",
+                        title: "Slot required",
                         description: "The bot will prompt for this slot during the conversation if a value is not provided by the user.",
                         type : "boolean",
                         propertyOrder: 0,                            
                     },
                     slotName: {
-                        title: "Slot name, e.g. firstname",
+                        title: "Slot name",
+                        description: "Slot name, e.g. firstname.", 
                         type : "string",
                         propertyOrder: 1,
                     },
                     slotType: {
-                        title: "Slot Type, e.g. AMAZON.FirstName",
+                        title: "Slot type",
+                        description: "Slot type, e.g. AMAZON.FirstName (or custom slot type name).",
                         type : "string",
                         propertyOrder: 2,
                     },
                     slotPrompt: {
-                        title: "Slot elicitation prompt, e.g. What is your first name?",
+                        title: "Slot prompt",
+                        description: "Slot elicitation prompt, e.g. What is your first name?",
                         type : "string",
                         propertyOrder: 3,
                     },

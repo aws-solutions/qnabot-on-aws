@@ -36,9 +36,23 @@ module.exports=function(params){
         })
     })
     .then(function(result){
-        return _.compact(_.uniq(_.flatten(result
-            .map(qa=>qa._source.questions ? {"qid":qa._source.qid, "enableQidIntent":_.get(qa._source, "enableQidIntent", false), "q":qa._source.questions.map(y=>y.q), "slots":_.get(qa._source, "slots", [])} : [])
-        )))
+        return _.compact(_.uniq(_.flatten(result.map(qa=>{
+            return {
+                "qid":qa._source.qid, 
+                "type":qa._source.type,
+                "qna": qa._source.type === "qna" ? {
+                    "enableQidIntent":_.get(qa._source, "enableQidIntent", false), 
+                    "q":_.get(qa._source, "questions", []).map(y=>y.q), 
+                    "slots":_.get(qa._source, "slots", []),
+                } : {},
+                "slotType": qa._source.type === "slottype" ? {
+                    "descr": _.get(qa._source, "descr", ""),
+                    "resolutionStrategyRestrict": _.get(qa._source, "resolutionStrategyRestrict", false),
+                    "slotTypeValues": _.get(qa._source, "slotTypeValues", []),
+                    "useForCustomVocabulary": _.get(qa._source, "useForCustomVocabulary", false),
+                } : {},
+            };
+        }))))
     })
 
     return es_utterances

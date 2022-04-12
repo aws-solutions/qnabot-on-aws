@@ -105,12 +105,12 @@ function parseLexV2Event(event) {
 
     // If Lex has already matched a QID specific intent, then use intent name to locate matching Qid
     if ( ! ["QnaIntent", "FallbackIntent"].includes(out.intentname) ) {
-        if (out.intentname.startsWith("QID-")) {
+        if (out.intentname.startsWith("QID-INTENT-")) {
             console.log(`Lex intent created from QID by QnABot`);
         } else {
             console.log(`Custom Lex intent`);
         }
-        let qid = out.intentname.replace(/^QID-/, "").replace(/_dot_/g, ".")
+        let qid = out.intentname.replace(/^QID-INTENT-/, "").replace(/_dot_/g, ".")
         console.log(`*** Intentname "${out.intentname}" mapped to QID: "${qid}"`)
         out.qid = qid
     }
