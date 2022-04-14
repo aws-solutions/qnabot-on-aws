@@ -280,6 +280,44 @@ module.exports = {
       }
       this.errorList.push(error);
     },
+    parseMultivalueFields: function (question,fieldType,esField,srcName,srcValue,dstName,dstValue,dstField){
+            var i=1
+            while(true){
+              let button={}
+              console.log(`Processing ${fieldType} ${i}`)
+              var buttonFieldTextName = `${srcName}${i}`
+              var buttonFieldValueName = `${srcValue}${i}`
+
+              console.log(`Looking for ${buttonFieldTextName}:${buttonFieldValueName}`)
+              i++
+              var undefinedButtonFieldCount = (question[buttonFieldTextName] == undefined) + (question[buttonFieldValueName] == undefined)
+              console.log(`Name: ${question[buttonFieldTextName]} Value: ${question[buttonFieldValueName]}` )
+              console.log(`Undefined field count ${undefinedButtonFieldCount}`)
+
+              if(undefinedButtonFieldCount == 2){
+                break
+              }
+              if(undefinedButtonFieldCount == 1){
+                self.addError(`Warning:  Both ${buttonFieldTextName} and ${buttonFieldValueName} must be defined for qid: "${question.qid}"`)
+                continue;
+              }
+              console.log("Found two values")
+              if(question[buttonFieldValueName].length > 80){
+                self.addError(`Warning: ${buttonFieldValueName} must be less than or equal to 80 characters for qid:"${question.qid}"`)
+                continue;
+              }
+              if(question[buttonFieldTextName].length > 80){
+                self.addError(`Warning: ${buttonFieldTextName} must be less than or equal to 80 characters for qid:"${question.qid}"`)
+                continue;
+              }
+              button[dstName]=question[buttonFieldTextName]
+              button[dstValue]=question[buttonFieldValueName]
+              console.log(`Adding ${fieldType} ${JSON.stringify(button)}`)
+              dstField.push(button)
+              delete question[buttonFieldTextName]
+              delete question[buttonFieldValueName]
+             }
+    },
     parse: async function (content) {
       var header_mapping = {
         question: "q",
@@ -333,42 +371,10 @@ module.exports = {
               delete question["cardsubtitle"] 
             }
             question.r.buttons = []
-            let i = 1
-            while(true){
-
-              console.log("Processing Button"+i)
-              var buttonFieldTextName = "displaytext"+i
-              var buttonFieldValueName = "buttonvalue"+i
-              i++
-              var undefinedButtonFieldCount = (question[buttonFieldTextName] == undefined) + (question[buttonFieldValueName] == undefined)
-              console.log("ButtonName " + question[buttonFieldTextName] + " ButtonValue " + question[buttonFieldValueName] )
-              console.log("Undefined field count " + undefinedButtonFieldCount)
-
-              if(undefinedButtonFieldCount == 2){
-                break
-              }
-              if(undefinedButtonFieldCount == 1){
-                self.addError(`Warning:  Both ${buttonFieldTextName} and ${buttonFieldValueName} must be defined for qid: "${question.qid}"`)
-                continue;
-              }
-              console.log("Found two values")
-              if(question[buttonFieldValueName].length > 80){
-                self.addError(`Warning: ${buttonFieldValueName} must be less than or equal to 80 characters for qid:"${question.qid}"`)
-                continue;
-              }
-              if(question[buttonFieldTextName].length > 80){
-                self.addError(`Warning: ${buttonFieldTextName} must be less than or equal to 80 characters for qid:"${question.qid}"`)
-                continue;
-              }
-              var button = {
-                  "text":question[buttonFieldTextName],
-                  "value":question[buttonFieldValueName]
-              }
-              console.log("Adding button "+ JSON.stringify(button))
-              question.r.buttons.push(button)
-              delete question[buttonFieldTextName]
-              delete question[buttonFieldValueName]
-             }
+            self.parseMultivalueFields(question,"Button","buttons","displaytext","buttonvalue","text","value",question.r.buttons)
+            console.log("Processing Session Attributes")
+            question.sa = []
+            self.parseMultivalueFields(question,"Session Attribute","sa","sessionname","sessionvalue","text","value",question.sa)
            }
            let counter = 1
            question.q = question.q == undefined ? [] : question.q
