@@ -1,33 +1,24 @@
 import click
-import boto3
-from botocore.exceptions import ClientError
 import os
 import json
 import datetime
 import time
 import sys
-import io
-
-CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
-@click.group(context_settings=CONTEXT_SETTINGS)
-@click.pass_context
-def cli(ctx) -> None:
-    pass
+from botocore.exceptions import ClientError
+from aws_solutions.core.helpers import get_service_client
 
 
-@cli.command("import")
-@click.option("-s", "--cloudformation-stack-name", type=click.STRING, help="Provide the name of the CloudFormation stack of your AWS QnABot deployment", required=True)
-@click.option("-f", "--source-filename", type=click.STRING, help="Provide the filename along with path where the file to be imported is located", required=True)
-@click.option("-fmt", "--file-format", type=click.Choice(['JSON', 'JSONL', 'XLSX'], case_sensitive=False), help="Provide the file format to use for import", required=False, default="JSON", show_default=True)
-@click.pass_context
-def qna_import (ctx, cloudformation_stack_name: str, source_filename: str, file_format: str):
-    """
-    Import QnABot questions and answers to your QnABot setup.\n
-    This command requires two (2) parameters: <cloudformation-stack-name>, <source-filename>.
-    The cloudformation-stack-name parameter is used to know the AWS QnABot deployment to use to support the import process. \n
-    """
+"""
+Initiate import process
+:param bucket: Bucket to import to
+:param source_filename: import directory and filename
+:return: response status of the import request
+"""
+def initiate_import (cloudformation_stack_name: str, source_filename: str, file_format: str, delete_existing_content: bool):
+    importdatetime = datetime.datetime.utcnow() #get current request date time in UTC timezone
+    #get Import bucket name from the cloudformation stack
     try:
-        cfn_client = boto3.client('cloudformation')
+        cfn_client = get_service_client("cloudformation")   #boto3.client('cloudformation')
         #get Import bucket name from the cloudformation stack
         response = cfn_client.describe_stack_resource (
             StackName = cloudformation_stack_name,
@@ -43,35 +34,74 @@ def qna_import (ctx, cloudformation_stack_name: str, source_filename: str, file_
             show_error = True
         )
 
-    try: 
-        response = initiate_import (bucket = strImportBucketName, source_filename = source_filename, file_format = file_format) #proceed with upload file to Amazon S3
-        click.echo (response)
-        sys.exit (0)
-    except OSError as e: 
+    #create a options json config that includes import options that were used
+    strImportOptions = {
+        'source_filename': source_filename, 
+        'options': {
+            'delete_existing_content': delete_existing_content, 
+            'file_format': file_format
+        }, 
+        'import_datetime': str(importdatetime), 
+        'source_application': 'qnabot-cli'
+    }
+    strImportOptions = json.dumps(strImportOptions, indent=4)
+
+    try:    #put object in S3 bucket
+        s3_client = get_service_client("s3")    #boto3.client('s3')
+        #create a options json config file that includes import options that were used
+        response = s3_client.put_object (
+            Bucket = strImportBucketName, 
+            Key = 'options/' + os.path.basename(source_filename), 
+            Body = strImportOptions
+        )
+
+        if file_format == 'JSON': 
+            strFileContents = convert_json_to_jsonl (source_filename)   #convert to JSON Lines format (if input is JSON format)
+            #upload the contents of the converted json file to S3
+            response = s3_client.put_object (
+                Bucket = strImportBucketName, 
+                Key = 'data/' + os.path.basename(source_filename), 
+                Body = strFileContents
+            )
+        else: 
+            objFile = open (source_filename,"rb")   #open file object
+            #upload the contents of the json file to S3
+            response = s3_client.put_object (
+                Bucket = strImportBucketName, 
+                Key = 'data/' + os.path.basename(source_filename), 
+                Body = objFile
+            )
+            objFile.close() #close file object
+
+        #check status of the file import
+        response = get_import_status (bucket = strImportBucketName, source_filename = source_filename, importdatetime = importdatetime)
+
+        while json.loads(response)["status"] != 'Complete':
+            time.sleep (5)  #wait for 5 seconds and check status again
+            response = get_import_status (bucket = strImportBucketName, source_filename = source_filename, importdatetime = importdatetime)
+        return response
+    except ClientError as e:
         error_response (
-            error_code = e.errno, 
-            message = e.strerror, 
-            comments = source_filename + " not found. Check the path and try again.", 
+            error_code = e.response["Error"]["Code"], 
+            message = e.response["Error"]["Message"], 
+            comments = '', 
             status = 'Error', 
             show_error = True
         )
 
 
-@cli.command("export")
-@click.option("-s", "--cloudformation-stack-name", type=click.STRING, help="Provide the name of the CloudFormation stack of your AWS QnABot deployment", required=True)
-@click.option("-f", "--export-filename", type=click.STRING, help="Provide the filename along with path where the exported file should be downloaded to", required=True)
-@click.option("-qids", "--export-filter", help="Export {qids} that start with this filter string. Exclude this option to export all {qids} ", required=False, default="")
-@click.option("-fmt", "--file-format", type=click.Choice(['JSON', 'JSONL'], case_sensitive=False), help="Provide the file format to use for export", required=False, default="JSON", show_default=True)
-@click.pass_context
-def qna_export (ctx, cloudformation_stack_name: str, export_filename: str, export_filter: str, file_format: str):
-    """
-    Export QnABot questions and answers from your QnABot setup.\n
-    This command requires two (2) parameters: <cloudformation-stack-name>, and <export-filename>.
-    The cloudformation-stack-name parameter is used to know the AWS QnABot deployment to use to support the export process. \n
-    """
+"""
+Initiate export process
+:param bucket: Bucket to export to
+:param export_filename: export directory and filename
+:param strExportConfig: contents of the config object
+:return: response status of the export request
+"""
+def initiate_export (cloudformation_stack_name: str, export_filename: str, export_filter: str, file_format: str):
+    exportdatetime = datetime.datetime.utcnow() #get current request date time in UTC timezone
     #get Export bucket name from the cloudformation stack
     try:
-        cfn_client = boto3.client('cloudformation')
+        cfn_client = get_service_client("cloudformation")   #boto3.client('cloudformation')
         response = cfn_client.describe_stack_resource (
             StackName = cloudformation_stack_name,
             LogicalResourceId = 'ExportBucket'
@@ -92,6 +122,7 @@ def qna_export (ctx, cloudformation_stack_name: str, export_filename: str, expor
             StackName = cloudformation_stack_name,
             LogicalResourceId = 'Index'
         )
+        strOpenSearchIndex = response["StackResourceDetail"]["PhysicalResourceId"]
     except ClientError as e:
         error_response (
             error_code = e.response["Error"]["Code"], 
@@ -100,8 +131,6 @@ def qna_export (ctx, cloudformation_stack_name: str, export_filename: str, expor
             status = 'Error', 
             show_error = True
         )
-
-    strOpenSearchIndex = response["StackResourceDetail"]["PhysicalResourceId"]
 
     strExportConfig = {
         'bucket': strExportBucketName, 
@@ -114,96 +143,30 @@ def qna_export (ctx, cloudformation_stack_name: str, export_filename: str, expor
         'status': 'Started'
     }
     strExportConfig = json.dumps(strExportConfig, indent=4)
-    try: 
-        response = initiate_export (bucket = strExportBucketName, export_filename = export_filename, export_config = strExportConfig, file_format = file_format) #proceed with initiating the export process
-        click.echo (response)
-        sys.exit (0)
-    except OSError as e: 
-        error_response (
-            error_code = e.errno, 
-            message = e.strerror, 
-            comments = "There was an issue using: " + export_filename + " Check the path and try again.", 
-            status = 'Error', 
-            show_error = True
-        )
 
-
-"""
-Initiate import process
-:param bucket: Bucket to import to
-:param source_filename: import directory and filename
-:return: response status of the import request
-"""
-def initiate_import (bucket: str, source_filename: str, file_format: str):
-    importdatetime = datetime.datetime.utcnow() #get current request date time in UTC timezone
-
-    try:    #put object in S3 bucket
-        s3_client = boto3.client('s3')
-        if file_format == 'JSON': 
-            strFileContents = convert_json_to_jsonl (source_filename)   #convert to JSON Lines format (if input is JSON format)
-            response = s3_client.put_object (
-                Bucket = bucket, 
-                Key = 'data/' + os.path.basename(source_filename), 
-                Body = strFileContents
-            )
-        else: 
-            objFile = open (source_filename,"rb")   #open file object
-            response = s3_client.put_object (
-                Bucket = bucket, 
-                Key = 'data/' + os.path.basename(source_filename), 
-                Body = objFile
-            )
-            objFile.close() #close file object
-
-        #check status of the file import
-        response = get_import_status (bucket = bucket, source_filename = source_filename, importdatetime = importdatetime)
-
-        while json.loads(response)["status"] != 'Complete':
-            time.sleep (5)  #wait for 5 seconds and check status again
-            response = get_import_status (bucket = bucket, source_filename = source_filename, importdatetime = importdatetime)
-        return response
-    except ClientError as e:
-        error_response (
-            error_code = e.response["Error"]["Code"], 
-            message = e.response["Error"]["Message"], 
-            comments = '', 
-            status = 'Error', 
-            show_error = True
-        )
-
-
-"""
-Initiate export process
-:param bucket: Bucket to export to
-:param export_filename: export directory and filename
-:param strExportConfig: contents of the config object
-:return: response status of the export request
-"""
-def initiate_export (bucket: str, export_filename: str, export_config: str, file_format: str):
-    exportdatetime = datetime.datetime.utcnow() #get current request date time in UTC timezone
 
     try:
         #put a export config object in S3 bucket to initiate export
-        s3_client = boto3.client('s3')
+        s3_client = get_service_client("s3")    #boto3.client('s3')
         response = s3_client.put_object (
-            Body = export_config, 
-            Bucket = bucket, 
+            Body = strExportConfig, 
+            Bucket = strExportBucketName, 
             Key = 'status/' + os.path.basename(export_filename)
         )
 
         #check status of the file export
-        response = get_export_status (bucket = bucket, export_filename = export_filename, exportdatetime = exportdatetime)
+        response = get_export_status (bucket = strExportBucketName, export_filename = export_filename, exportdatetime = exportdatetime)
 
         while json.loads(response)["status"] != 'Completed':
             time.sleep (5)  #wait for 5 seconds and check status again
-            response = get_export_status (bucket = bucket, export_filename = export_filename, exportdatetime = exportdatetime)
+            response = get_export_status (bucket = strExportBucketName, export_filename = export_filename, exportdatetime = exportdatetime)
 
         #download the exported file
-        response = download_export (bucket = bucket, export_filename = export_filename, exportdatetime = exportdatetime, file_format = file_format)
+        response = download_export (bucket = strExportBucketName, export_filename = export_filename, exportdatetime = exportdatetime, file_format = file_format)
 
         while json.loads(response)["status"] != 'Downloaded':
             time.sleep (5)  #wait for 5 seconds and check status again
-            response = download_export (bucket = bucket, export_filename = export_filename, exportdatetime = exportdatetime, file_format = file_format)
+            response = download_export (bucket = strExportBucketName, export_filename = export_filename, exportdatetime = exportdatetime, file_format = file_format)
         return response
     except ClientError as e:
         error_response (
@@ -224,7 +187,7 @@ Download a file from the {export} S3 bucket
 """
 def download_export (bucket: str, export_filename: str, exportdatetime: datetime, file_format: str):
         try:
-            s3_client = boto3.client('s3')
+            s3_client = get_service_client("s3")    #boto3.client('s3')
             #get object only if the object has changed since last request
             response = s3_client.get_object (
                 Bucket = bucket, 
@@ -284,7 +247,7 @@ Get a file from a S3 bucket
 """
 def get_import_status (bucket: str, source_filename: str, importdatetime: datetime):
     try:
-        s3_client = boto3.client('s3')
+        s3_client = get_service_client("s3")    #boto3.client('s3')
         #get object only if the object has changed since last request
         response = s3_client.get_object (
             Bucket = bucket, 
@@ -332,7 +295,7 @@ Get a file from a S3 bucket
 """
 def get_export_status (bucket: str, export_filename: str, exportdatetime: datetime):
     try:
-        s3_client = boto3.client('s3')
+        s3_client = get_service_client("s3")    #boto3.client('s3')
         #get object only if the object has changed since last request
         response = s3_client.get_object (
             Bucket = bucket, 
@@ -451,7 +414,3 @@ def error_response (error_code: str, message: str, comments: str, status: str, s
         sys.exit (1)
     else: 
         return returnResponse
-
-
-if __name__ == "__main__":
-    cli()
