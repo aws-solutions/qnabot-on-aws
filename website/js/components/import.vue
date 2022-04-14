@@ -283,39 +283,39 @@ module.exports = {
     parseMultivalueFields: function (question,fieldType,esField,srcName,srcValue,dstName,dstValue,dstField){
             var i=1
             while(true){
-              let button={}
+              let fmtField={}
               console.log(`Processing ${fieldType} ${i}`)
-              var buttonFieldTextName = `${srcName}${i}`
-              var buttonFieldValueName = `${srcValue}${i}`
+              var xlsFieldName = `${srcName}${i}`
+              var xlsFieldValue = `${srcValue}${i}`
 
-              console.log(`Looking for ${buttonFieldTextName}:${buttonFieldValueName}`)
+              console.log(`Looking for ${xlsFieldName}:${xlsFieldValue}`)
               i++
-              var undefinedButtonFieldCount = (question[buttonFieldTextName] == undefined) + (question[buttonFieldValueName] == undefined)
-              console.log(`Name: ${question[buttonFieldTextName]} Value: ${question[buttonFieldValueName]}` )
-              console.log(`Undefined field count ${undefinedButtonFieldCount}`)
+              var undefinedFieldCount = (question[xlsFieldName] == undefined) + (question[xlsFieldValue] == undefined)
+              console.log(`Name: ${question[xlsFieldName]} Value: ${question[xlsFieldValue]}` )
+              console.log(`Undefined field count ${undefinedFieldCount}`)
 
-              if(undefinedButtonFieldCount == 2){
+              if(undefinedFieldCount == 2){
                 break
               }
-              if(undefinedButtonFieldCount == 1){
-                self.addError(`Warning:  Both ${buttonFieldTextName} and ${buttonFieldValueName} must be defined for qid: "${question.qid}"`)
+              if(undefinedFieldCount == 1){
+                self.addError(`Warning:  Both ${xlsFieldName} and ${xlsFieldValue} must be defined for qid: "${question.qid}"`)
                 continue;
               }
               console.log("Found two values")
-              if(question[buttonFieldValueName].length > 80){
-                self.addError(`Warning: ${buttonFieldValueName} must be less than or equal to 80 characters for qid:"${question.qid}"`)
+              if(question[xlsFieldValue].length > 80){
+                self.addError(`Warning: ${xlsFieldValue} must be less than or equal to 80 characters for qid:"${question.qid}"`)
                 continue;
               }
-              if(question[buttonFieldTextName].length > 80){
-                self.addError(`Warning: ${buttonFieldTextName} must be less than or equal to 80 characters for qid:"${question.qid}"`)
+              if(question[xlsFieldName].length > 80){
+                self.addError(`Warning: ${xlsFieldName} must be less than or equal to 80 characters for qid:"${question.qid}"`)
                 continue;
               }
-              button[dstName]=question[buttonFieldTextName]
-              button[dstValue]=question[buttonFieldValueName]
-              console.log(`Adding ${fieldType} ${JSON.stringify(button)}`)
-              dstField.push(button)
-              delete question[buttonFieldTextName]
-              delete question[buttonFieldValueName]
+              fmtField[dstName]=question[xlsFieldName]
+              fmtField[dstValue]=question[xlsFieldValue]
+              console.log(`Adding ${fieldType} ${JSON.stringify(fmtField)}`)
+              dstField.push(fmtField)
+              delete question[xlsFieldName]
+              delete question[xlsFieldValue]
              }
     },
     parse: async function (content) {
