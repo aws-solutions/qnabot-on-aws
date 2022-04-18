@@ -80,3 +80,5 @@ temp/
 **/deployment/global-s3-assets
 **/deployment/regional-s3-assets
 **/deployment/open-source
+docs/excel_import/~$sample.xlsx
+
