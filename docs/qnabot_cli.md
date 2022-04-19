@@ -7,9 +7,7 @@ The AWS QnABot CLI supports the capability to `import` and `export` questions an
 To use the CLI, the following prerequisites are required:
 - AWS Command Line Interface (CLI). For more information, refer to: https://aws.amazon.com/cli/
 - Python version 3.7 or higher. For more information on installing Python, refer to: https://docs.python.org/3/using/index.html
-- `boto3` Python module version 1.21.18. For more information, refer to: https://aws.amazon.com/sdk-for-python/
-- `Click` Python module version 8.0.4. For more information, refer to: https://pypi.org/project/click/
-- AWS IAM permissions having the below IAM policy. Replace the below values when creating the IAM policy:
+- AWS IAM permissions having the below IAM policy. Attach the below IAM policy to the IAM user or IAM Role that you are using for the AWS CLI. Replace the below values when creating the IAM policy:
 ````
 - AWS_REGION -- the AWS Region where you have deployed the AWS QnABot solution
 - AWS_ACCOUNT_ID -- the AWS Account ID where you have deployed the AWS QnABot solution
@@ -17,6 +15,7 @@ To use the CLI, the following prerequisites are required:
 - YOUR_QNABOT_EXPORT_BUCKET_NAME -- the name of the AWS QnABot export bucket name. This can be found by navigating to the Resources section (in AWS CloudFormation) of the deployed AWS QnABot CLoudformation template
 - YOUR_QNABOT_STACK_NAME -- the name of the AWS QnABot stack that you deployed via AWS CloudFormation
 ````
+
 
 ### IAM Policy
 ````
@@ -44,6 +43,32 @@ To use the CLI, the following prerequisites are required:
     ]
 }
 ````
+
+## Environment Setup 
+You can get started by creating a virtual environment and deploy the needed Python packages. 
+From the root directory of the AWS QnABot codebase, run the below commands: 
+````
+pip3 install virtualenv
+python3 -m virtualenv .venv
+source ./.venv/bin/activate
+cd ./source
+pip3 install -r requirements.txt
+````
+This will setup a virtual environment and install the below Python packages:
+- `boto3` Python module version 1.21.18. For more information, refer to: https://aws.amazon.com/sdk-for-python/
+- `Click` Python module version 8.0.4. For more information, refer to: https://pypi.org/project/click/
+
+
+
+### Set Environment variables
+
+Set the `AWS_Region` you will be using. For example, to use the `us-east-1` AWS region, run the below command: 
+
+`export AWS_REGION='us-east-1'`
+
+Set the `PYTHONPATH` using the below command. Change the `<project-base>` information to the path where you have setup the AWS QnABot codebase. 
+
+`export PYTHONPATH=<project-base>/source:$PYTHONPATH`
 
 
 ## Usage
@@ -81,6 +106,11 @@ Options:
   -fmt, --file-format [JSON|JSONL|XLSX]
                                   Provide the file format to use for import
                                   [default: JSON]
+  -d, --delete-existing-content BOOLEAN
+                                  Use this parameter if all existing QnABot
+                                  {qids} in your QnABot deployment should be
+                                  deleted before the import process.
+                                  [default: False]
   -h, --help                      Show this message and exit.
 
 
@@ -160,7 +190,8 @@ Example:
 #### `import` Example
 ````
 #!/bin/bash
-shell_output=$(python qnabot_cli.py import -s qnabot-stack -f ../import/qna_import.json -fmt json) 
+export AWS_REGION='us-east-1'
+shell_output=$(python3 qnabot_cli.py import -s qnabot-stack -f ../import/qna_import.json -fmt json) 
 STATUS="${?}"
 if [ "${STATUS}" == 0 ];
 then
@@ -175,7 +206,8 @@ fi
 #### `export` Example
 ````
 #!/bin/bash
-shell_output=$(python qnabot_cli.py export -s qnabot-stack -f ../export/qna_export.json -fmt json) 
+export AWS_REGION='us-east-1'
+shell_output=$(python3 qnabot_cli.py export -s qnabot-stack -f ../export/qna_export.json -fmt json) 
 STATUS="${?}"
 if [ "${STATUS}" == 0 ];
 then
