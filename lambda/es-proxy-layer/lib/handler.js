@@ -107,7 +107,7 @@ async function run_query_es(event, settings) {
         headers:event.headers,
         body:es_query,
     });
-    if (es_response.hits.max_score == 0) {
+    if (_.get(es_response, "hits.max_score") == 0) {
         qnabot.log("Max score is zero - no valid results")
         es_response.hits.hits = [] ;
     }
