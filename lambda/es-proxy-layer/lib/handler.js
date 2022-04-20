@@ -71,11 +71,11 @@ async function get_settings() {
 async function get_es_query(event, settings) {
     let question = _.get(event,'question','');
     let size = _.get(event,'size',1);
-    if (open_es.isQuestionAllStopwords(question)) {
-        console.log(`Question '${question}' contains only stop words. Forcing no hits.`);
-        size = 0;
-    }
     if (question.length > 0) {
+        if (open_es.isQuestionAllStopwords(question)) {
+            console.log(`Question '${question}' contains only stop words. Forcing no hits.`);
+            size = 0;
+        }
         var query_params = {
             question: question,
             topic: _.get(event,'topic',''),
@@ -99,8 +99,8 @@ async function get_es_query(event, settings) {
 
 
 async function run_query_es(event, settings) {
-    qnabot.log("ElasticSearch Query",JSON.stringify(es_query,null,2));
     var es_query = await get_es_query(event, settings);
+    qnabot.log("ElasticSearch Query",JSON.stringify(es_query,null,2));
     var es_response = await request({
         url:Url.resolve("https://"+event.endpoint,event.path),
         method:event.method,
