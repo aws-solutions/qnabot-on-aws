@@ -7,9 +7,9 @@ import boto3
 
 import aws_solutions.core.config
 
-_helpers_service_clients = dict()
-_helpers_service_resources = dict()
-_session = None
+_helpers_service_clients = {}
+_helpers_service_resources = {}
+_SESSION = None
 
 
 class EnvironmentVariableError(Exception):
@@ -43,22 +43,22 @@ def get_aws_partition():
     # China regions
     if region_name.startswith(china_region_name_prefix):
         return aws_china_regions_partition
+
     # AWS GovCloud(US) Regions
-    elif region_name.startswith(us_gov_cloud_region_name_prefix):
+    if region_name.startswith(us_gov_cloud_region_name_prefix):
         return aws_us_gov_cloud_regions_partition
-    else:
-        return aws_regions_partition
+
+    return aws_regions_partition
 
 
 def get_session():
-    global _session
-    if not _session:
-        _session = boto3.session.Session()
-    return _session
+    global _SESSION  # pylint: disable=global-statement
+    if not _SESSION:
+        _SESSION = boto3.session.Session()
+    return _SESSION
 
 
 def get_service_client(service_name):
-    global _helpers_service_clients
     config = aws_solutions.core.config.botocore_config
     session = get_session()
 
@@ -70,7 +70,6 @@ def get_service_client(service_name):
 
 
 def get_service_resource(service_name):
-    global _helpers_service_resources
     config = aws_solutions.core.config.botocore_config
     session = get_session()
 

@@ -14,7 +14,7 @@ logger = get_logger(__name__)
 
 SOLUTION_ID_RE = re.compile(r"^SO(?P<id>\d+)(?P<component>[a-zA-Z]*)$")  # NOSONAR
 SOLUTION_VERSION_RE = re.compile(
-    r"^v(?P<major>0|[1-9]\d*)\.(?P<minor>0|[1-9]\d*)\.(?P<patch>0|[1-9]\d*)(?:-(?P<prerelease>(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+(?P<buildmetadata>[0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$"  # NOSONAR
+    r"^v(?P<major>0|[1-9]\d*)\.(?P<minor>0|[1-9]\d*)\.(?P<patch>0|[1-9]\d*)(?:-(?P<prerelease>(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+(?P<buildmetadata>[0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$"  # NOSONAR # pylint: disable=line-too-long
 )
 
 
@@ -33,7 +33,8 @@ class SolutionConfigEnv:
         value = str(self._get_value_or_default())
         if self._regex and not self._regex.match(value):
             raise ValueError(
-                f"`{value}` received, but environment variable {self._env_var} (or default) must be set and match the pattern {self._regex.pattern}"
+                f"`{value}` received, but environment variable {self._env_var} "
+                + "(or default) must be set and match the pattern {self._regex.pattern}"
             )
         return value
 
@@ -41,7 +42,7 @@ class SolutionConfigEnv:
         self._value = value
 
 
-class Config:
+class Config:  # pylint: disable=too-few-public-methods
     """Stores information about the current solution"""
 
     id = SolutionConfigEnv("SOLUTION_ID", regex=SOLUTION_ID_RE)
