@@ -1,6 +1,6 @@
-import click
 import sys
 import os
+import click
 import qnabot_cli_helper
 
 CONTEXT_SETTINGS = dict(help_option_names=["-h", "--help"])
@@ -48,9 +48,7 @@ def cli(ctx) -> None:
     show_default=True,
 )
 @click.pass_context
-def qna_import(
-    ctx, cloudformation_stack_name: str, source_filename: str, file_format: str, delete_existing_content: bool
-):
+def qna_import(ctx, cloudformation_stack_name: str, source_filename: str, file_format: str, delete_existing_content: bool):
     """
     Import QnABot questions and answers to your QnABot setup.\n
     This command requires two (2) parameters: <cloudformation-stack-name>, <source-filename>.
@@ -66,10 +64,10 @@ def qna_import(
         )  # proceed with upload file to Amazon S3
         click.echo(response)
         sys.exit(0)
-    except OSError as e:
+    except OSError as err_exception:
         qnabot_cli_helper.error_response(
-            error_code=e.errno,
-            message=e.strerror,
+            error_code=err_exception.errno,
+            message=err_exception.strerror,
             comments=source_filename + " not found. Check the path and try again.",
             status="Error",
             show_error=True,
@@ -124,10 +122,10 @@ def qna_export(ctx, cloudformation_stack_name: str, export_filename: str, export
         )  # proceed with initiating the export process
         click.echo(response)
         sys.exit(0)
-    except OSError as e:
+    except OSError as err_exception:
         qnabot_cli_helper.error_response(
-            error_code=e.errno,
-            message=e.strerror,
+            error_code=err_exception.errno,
+            message=err_exception.strerror,
             comments="There was an issue using: " + export_filename + " Check the path and try again.",
             status="Error",
             show_error=True,
