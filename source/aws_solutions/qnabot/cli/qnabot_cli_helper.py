@@ -8,7 +8,9 @@ from botocore.exceptions import ClientError
 from aws_solutions.core.helpers import get_service_client
 
 
-def initiate_import(cloudformation_stack_name: str, source_filename: str, file_format: str, delete_existing_content: bool):
+def initiate_import(\
+    cloudformation_stack_name: str, source_filename: str, file_format: str, delete_existing_content: bool\
+):
     """
     Initiate import process
     :param bucket: Bucket to import to
@@ -26,10 +28,11 @@ def initiate_import(cloudformation_stack_name: str, source_filename: str, file_f
         )
         str_import_bucket_mame = response["StackResourceDetail"]["PhysicalResourceId"]
     except ClientError as err_exception:
-        error_response(
+        return error_response(
             error_code=err_exception.response["Error"]["Code"],
             message=err_exception.response["Error"]["Message"],
-            comments="Please check the CloudFormation Stack being used is for a QnABot deployment, and that the stack has deployed successfully.",
+            comments="Please check the CloudFormation Stack being used is for a QnABot deployment, "
+            + "and that the stack has deployed successfully.",
             status="Error",
             show_error=True,
         )
@@ -59,12 +62,11 @@ def initiate_import(cloudformation_stack_name: str, source_filename: str, file_f
                 Bucket=str_import_bucket_mame, Key="data/" + os.path.basename(source_filename), Body=str_file_contents
             )
         else:
-            obj_file = open(source_filename, "rb")  # open file object
-            # upload the contents of the json file to S3
-            response = s3_client.put_object(
-                Bucket=str_import_bucket_mame, Key="data/" + os.path.basename(source_filename), Body=obj_file
-            )
-            obj_file.close()  # close file object
+            with open(source_filename, "rb") as obj_file:  # open file object
+                # upload the contents of the json file to S3
+                response = s3_client.put_object(
+                    Bucket=str_import_bucket_mame, Key="data/" + os.path.basename(source_filename), Body=obj_file
+                )
 
         # check status of the file import
         response = get_import_status(
@@ -78,7 +80,7 @@ def initiate_import(cloudformation_stack_name: str, source_filename: str, file_f
             )
         return response
     except ClientError as err_exception:
-        error_response(
+        return error_response(
             error_code=err_exception.response["Error"]["Code"],
             message=err_exception.response["Error"]["Message"],
             comments="",
@@ -105,10 +107,11 @@ def initiate_export(cloudformation_stack_name: str, export_filename: str, export
         )
         str_export_bucket_name = response["StackResourceDetail"]["PhysicalResourceId"]
     except ClientError as err_exception:
-        error_response(
+        return error_response(
             error_code=err_exception.response["Error"]["Code"],
             message=err_exception.response["Error"]["Message"],
-            comments="Please check the CloudFormation Stack being used is for a QnABot deployment, and that the stack has deployed successfully.",
+            comments="Please check the CloudFormation Stack being used is for a QnABot deployment, "
+            + "and that the stack has deployed successfully.",
             status="Error",
             show_error=True,
         )
@@ -118,10 +121,11 @@ def initiate_export(cloudformation_stack_name: str, export_filename: str, export
         response = cfn_client.describe_stack_resource(StackName=cloudformation_stack_name, LogicalResourceId="Index")
         str_open_search_index = response["StackResourceDetail"]["PhysicalResourceId"]
     except ClientError as err_exception:
-        error_response(
+        return error_response(
             error_code=err_exception.response["Error"]["Code"],
             message=err_exception.response["Error"]["Message"],
-            comments="Please check the CloudFormation Stack being used is for a QnABot deployment, and that the stack has deployed successfully.",
+            comments="Please check the CloudFormation Stack being used is for a QnABot deployment, "
+            + "and that the stack has deployed successfully.",
             status="Error",
             show_error=True,
         )
@@ -174,7 +178,7 @@ def initiate_export(cloudformation_stack_name: str, export_filename: str, export
             )
         return response
     except ClientError as err_exception:
-        error_response(
+        return error_response(
             error_code=err_exception.response["Error"]["Code"],
             message=err_exception.response["Error"]["Message"],
             comments="",
@@ -206,9 +210,8 @@ def download_export(bucket: str, export_filename: str, exportdatetime: datetime,
 
         try:
             os.makedirs(os.path.dirname(export_filename), exist_ok=True)  # create export directory if does not exist
-            obj_file = open(export_filename, "w")  # open file in write mode
-            obj_file.write(str_file_contents)  # write to file
-            obj_file.close()  # close file object
+            with open(export_filename, "w", encoding='utf-8') as obj_file:  # open file in write mode
+                obj_file.write(str_file_contents)  # write to file
             return_response = {
                 "export_directory": export_filename,
                 "status": "Downloaded",
@@ -218,7 +221,7 @@ def download_export(bucket: str, export_filename: str, exportdatetime: datetime,
             return_response = json.dumps(return_response, indent=4)
             return return_response
         except OSError as err_exception:
-            error_response(
+            return error_response(
                 error_code=err_exception.errno,
                 message=err_exception.strerror,
                 comments="There was an issue using: " + export_filename + " Check the path and try again.",
@@ -226,22 +229,23 @@ def download_export(bucket: str, export_filename: str, exportdatetime: datetime,
                 show_error=True,
             )
     except ClientError as err_exception:
-        if err_exception.response["Error"]["Code"] in ("304", "NoSuchKey"):  # if object has not been modified (304) or the object is not available in S3 bucket yet (NoSuchKey)
+        # if object has not been modified (304) or the object is not available in S3 bucket yet (NoSuchKey)
+        if err_exception.response["Error"]["Code"] in ("304", "NoSuchKey"):
             return error_response(
                 error_code=err_exception.response["Error"]["Code"],
                 message=err_exception.response["Error"]["Message"],
-                comments="Please note: Export processing may take longer to process depending on the number of questions and size of the download file.",
+                comments="Please note: Export processing may take longer to process depending on the "
+                + "number of questions, and size of the download file.",
                 status="Pending",
                 show_error=False,
             )
-        else:
-            error_response(
-                error_code=err_exception.response["Error"]["Code"],
-                message=err_exception.response["Error"]["Message"],
-                comments="",
-                status="Error",
-                show_error=True,
-            )
+        return error_response(
+            error_code=err_exception.response["Error"]["Code"],
+            message=err_exception.response["Error"]["Message"],
+            comments="",
+            status="Error",
+            show_error=True,
+        )
 
 
 def get_import_status(bucket: str, source_filename: str, importdatetime: datetime):
@@ -263,17 +267,24 @@ def get_import_status(bucket: str, source_filename: str, importdatetime: datetim
         obj_status_details = json.loads(response["Body"].read().decode("utf-8"))  # read object body
 
         return_response = {
-            "number_of_qids_imported": "N/A" if obj_status_details["status"] != "Complete" else obj_status_details["count"],
-            "number_of_qids_failed_to_import": "N/A" if obj_status_details["status"] != "Complete" else obj_status_details["failed"],
+            "number_of_qids_imported": "N/A"\
+            if obj_status_details["status"] != "Complete"\
+            else obj_status_details["count"],
+            "number_of_qids_failed_to_import": "N/A"\
+            if obj_status_details["status"] != "Complete"\
+            else obj_status_details["failed"],
             "import_starttime": obj_status_details["time"]["start"],
-            "import_endtime": "N/A" if obj_status_details["status"] != "Complete" else obj_status_details["time"]["end"],
+            "import_endtime": "N/A"\
+            if obj_status_details["status"] != "Complete"\
+            else obj_status_details["time"]["end"],
             "status": obj_status_details["status"],
             "error_code": "none",
         }
         return_response = json.dumps(return_response, indent=4)
         return return_response
     except ClientError as err_exception:
-        if err_exception.response["Error"]["Code"] in ("304", "NoSuchKey"):  # if object has not been modified (304) or the object is not available in S3 bucket yet (NoSuchKey)
+        # if object has not been modified (304) or the object is not available in S3 bucket yet (NoSuchKey)
+        if err_exception.response["Error"]["Code"] in ("304", "NoSuchKey"):
             return error_response(
                 error_code=err_exception.response["Error"]["Code"],
                 message=err_exception.response["Error"]["Message"],
@@ -281,14 +292,13 @@ def get_import_status(bucket: str, source_filename: str, importdatetime: datetim
                 status="Pending",
                 show_error=False,
             )
-        else:
-            error_response(
-                error_code=err_exception.response["Error"]["Code"],
-                message=err_exception.response["Error"]["Message"],
-                comments="",
-                status="Error",
-                show_error=True,
-            )
+        return error_response(
+            error_code=err_exception.response["Error"]["Code"],
+            message=err_exception.response["Error"]["Message"],
+            comments="",
+            status="Error",
+            show_error=True,
+        )
 
 
 def get_export_status(bucket: str, export_filename: str, exportdatetime: datetime):
@@ -313,22 +323,23 @@ def get_export_status(bucket: str, export_filename: str, exportdatetime: datetim
         return_response = json.dumps(return_response, indent=4)
         return return_response
     except ClientError as err_exception:
-        if err_exception.response["Error"]["Code"] in ("304", "NoSuchKey"):  # if object has not been modified (304) or the object is not available in S3 bucket yet (NoSuchKey)
+        # if object has not been modified (304) or the object is not available in S3 bucket yet (NoSuchKey)
+        if err_exception.response["Error"]["Code"] in ("304", "NoSuchKey"):
             return error_response(
                 error_code=err_exception.response["Error"]["Code"],
                 message=err_exception.response["Error"]["Message"],
-                comments="Please note: Export processing may take longer to process depending on the number of questions.",
+                comments="Please note: Export processing may take longer to process "
+                + "depending on the number of questions.",
                 status="Pending",
                 show_error=False,
             )
-        else:
-            error_response(
-                error_code=err_exception.response["Error"]["Code"],
-                message=err_exception.response["Error"]["Message"],
-                comments="",
-                status="Error",
-                show_error=True,
-            )
+        return error_response(
+            error_code=err_exception.response["Error"]["Code"],
+            message=err_exception.response["Error"]["Message"],
+            comments="",
+            status="Error",
+            show_error=True,
+        )
 
 
 def convert_json_to_jsonl(source_filename: str):
@@ -339,9 +350,8 @@ def convert_json_to_jsonl(source_filename: str):
     """
 
     try:
-        obj_file = open(source_filename, "rb")  # open file in read mode
-        str_file_contents = obj_file.read()  # read from file
-        obj_file.close()  # close file object
+        with open(source_filename, "rb") as obj_file:   # open file in read mode
+            str_file_contents = obj_file.read()  # read from file
         try:
             str_file_contents = json.loads(str_file_contents)
             str_lines = ""
@@ -349,26 +359,38 @@ def convert_json_to_jsonl(source_filename: str):
                 str_lines = str_lines + json.dumps(entry) + "\n"
             return str_lines
         except json.decoder.JSONDecodeError as err_exception:
-            error_response(
+            return error_response(
                 error_code="",
                 message=err_exception.msg,
-                comments="There was an error reading the file " + source_filename + ". Check the path and try again",
+                comments="There was an error reading the file " + source_filename
+                + ". Check the file format and try again",
+                status="Error",
+                show_error=True,
+            )
+        except UnicodeDecodeError as err_exception:
+            return error_response(
+                error_code="",
+                message=err_exception.__doc__,
+                comments="There was an error reading the file " + source_filename
+                + ". Check the file format and try again",
                 status="Error",
                 show_error=True,
             )
         except TypeError as err_exception:
-            error_response(
+            return error_response(
                 error_code="",
                 message=err_exception.__doc__,
-                comments="There was an error reading the file " + source_filename + ". Check the path and try again",
+                comments="There was an error reading the file " + source_filename
+                + ". Check the file format and try again",
                 status="Error",
                 show_error=True,
             )
     except OSError as err_exception:
-        error_response(
+        return error_response(
             error_code=err_exception.errno,
             message=err_exception.strerror,
-            comments="There was an error reading the file " + source_filename + ". Check the path and try again",
+            comments="There was an error reading the file " + source_filename
+            + ". Check the path and try again",
             status="Error",
             show_error=True,
         )

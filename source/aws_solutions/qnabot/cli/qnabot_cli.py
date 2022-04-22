@@ -11,7 +11,6 @@ CONTEXT_SETTINGS = dict(help_option_names=["-h", "--help"])
 def cli(ctx) -> None:
     os.environ["SOLUTION_ID"] = "SO0189"
     os.environ["SOLUTION_VERSION"] = "v5.1.2"
-    pass
 
 
 @cli.command("import")
@@ -42,17 +41,21 @@ def cli(ctx) -> None:
     "-d",
     "--delete-existing-content",
     type=click.BOOL,
-    help="Use this parameter if all existing QnABot {qids} in your QnABot deployment should be deleted before the import process.",
+    help="Use this parameter if all existing QnABot {qids} "
+    + "in your QnABot deployment should be deleted before the import process.",
     required=False,
     default=False,
     show_default=True,
 )
 @click.pass_context
-def qna_import(ctx, cloudformation_stack_name: str, source_filename: str, file_format: str, delete_existing_content: bool):
+def qna_import(\
+    ctx, cloudformation_stack_name: str, source_filename: str, file_format: str, delete_existing_content: bool\
+):
     """
     Import QnABot questions and answers to your QnABot setup.\n
     This command requires two (2) parameters: <cloudformation-stack-name>, <source-filename>.
-    The cloudformation-stack-name parameter is used to know the AWS QnABot deployment to use to support the import process. \n
+    The cloudformation-stack-name parameter is used to know the AWS QnABot deployment
+    to use to support the import process. \n
     More information: https://github.com/aws-solutions/aws-qnabot/tree/main/docs/qnabot_cli.md
     """
     try:
@@ -110,7 +113,8 @@ def qna_export(ctx, cloudformation_stack_name: str, export_filename: str, export
     """
     Export QnABot questions and answers from your QnABot setup.\n
     This command requires two (2) parameters: <cloudformation-stack-name>, and <export-filename>.
-    The cloudformation-stack-name parameter is used to know the AWS QnABot deployment to use to support the export process. \n
+    The cloudformation-stack-name parameter is used to know the AWS QnABot deployment
+    to use to support the export process. \n
     More information: https://github.com/aws-solutions/aws-qnabot/tree/main/docs/qnabot_cli.md
     """
     try:
