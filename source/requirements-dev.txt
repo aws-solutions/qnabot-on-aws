@@ -1,5 +1,5 @@
-autopep8
-black
-flake8
-mypy
-pylint
+autopep8==1.6.0
+black==22.3.0
+flake8==4.0.1
+mypy==0.942
+pylint==2.13.5

@@ -1,15 +1,49 @@
+# Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# SPDX-License-Identifier: Apache-2.0
+
 import os
 import json
 import datetime
 import time
 import sys
+from enum import Enum
+
 import click
 from botocore.exceptions import ClientError
 from aws_solutions.core.helpers import get_service_client
+from aws_solutions.core.logging import get_logger
+
+logger = get_logger(__name__)
 
 
-def initiate_import(\
-    cloudformation_stack_name: str, source_filename: str, file_format: str, delete_existing_content: bool\
+class BucketType(Enum):
+    IMPORT_BUCKET = "ImportBucket"
+    EXPORT_BUCKET = "ExportBucket"
+
+
+def get_bucket_name(cloudformation_stack_name: str, bucket_type: BucketType):
+    """get bucket name from the cloudformation stack"""
+    try:
+        cfn_client = get_service_client("cloudformation")  # boto3.client('cloudformation')
+        # get bucket name from the cloudformation stack
+        response = cfn_client.describe_stack_resource(
+            StackName=cloudformation_stack_name, LogicalResourceId=bucket_type.value
+        )
+        bucket_name = response["StackResourceDetail"]["PhysicalResourceId"]
+    except ClientError as err_exception:
+        return error_response(
+            error_code=err_exception.response["Error"]["Code"],
+            message=err_exception.response["Error"]["Message"],
+            comments="Please check the CloudFormation Stack being used is for a QnABot deployment, "
+            + "and that the stack has deployed successfully.",
+            status="Error",
+            show_error=True,
+        )
+    return bucket_name
+
+
+def initiate_import(
+    cloudformation_stack_name: str, source_filename: str, file_format: str, delete_existing_content: bool
 ):
     """
     Initiate import process
@@ -20,22 +54,7 @@ def initiate_import(\
 
     importdatetime = datetime.datetime.utcnow()  # get current request date time in UTC timezone
     # get Import bucket name from the cloudformation stack
-    try:
-        cfn_client = get_service_client("cloudformation")  # boto3.client('cloudformation')
-        # get Import bucket name from the cloudformation stack
-        response = cfn_client.describe_stack_resource(
-            StackName=cloudformation_stack_name, LogicalResourceId="ImportBucket"
-        )
-        str_import_bucket_mame = response["StackResourceDetail"]["PhysicalResourceId"]
-    except ClientError as err_exception:
-        return error_response(
-            error_code=err_exception.response["Error"]["Code"],
-            message=err_exception.response["Error"]["Message"],
-            comments="Please check the CloudFormation Stack being used is for a QnABot deployment, "
-            + "and that the stack has deployed successfully.",
-            status="Error",
-            show_error=True,
-        )
+    str_import_bucket_name = get_bucket_name(cloudformation_stack_name, BucketType.IMPORT_BUCKET)
 
     # create a options json config that includes import options that were used
     str_import_options = {
@@ -50,7 +69,7 @@ def initiate_import(\
         s3_client = get_service_client("s3")  # boto3.client('s3')
         # create a options json config file that includes import options that were used
         response = s3_client.put_object(
-            Bucket=str_import_bucket_mame, Key="options/" + os.path.basename(source_filename), Body=str_import_options
+            Bucket=str_import_bucket_name, Key="options/" + os.path.basename(source_filename), Body=str_import_options
         )
 
         if file_format == "JSON":
@@ -59,24 +78,24 @@ def initiate_import(\
             )  # convert to JSON Lines format (if input is JSON format)
             # upload the contents of the converted json file to S3
             response = s3_client.put_object(
-                Bucket=str_import_bucket_mame, Key="data/" + os.path.basename(source_filename), Body=str_file_contents
+                Bucket=str_import_bucket_name, Key="data/" + os.path.basename(source_filename), Body=str_file_contents
             )
         else:
             with open(source_filename, "rb") as obj_file:  # open file object
                 # upload the contents of the json file to S3
                 response = s3_client.put_object(
-                    Bucket=str_import_bucket_mame, Key="data/" + os.path.basename(source_filename), Body=obj_file
+                    Bucket=str_import_bucket_name, Key="data/" + os.path.basename(source_filename), Body=obj_file
                 )
 
         # check status of the file import
         response = get_import_status(
-            bucket=str_import_bucket_mame, source_filename=source_filename, importdatetime=importdatetime
+            bucket=str_import_bucket_name, source_filename=source_filename, importdatetime=importdatetime
         )
 
         while json.loads(response)["status"] != "Complete":
             time.sleep(5)  # wait for 5 seconds and check status again
             response = get_import_status(
-                bucket=str_import_bucket_mame, source_filename=source_filename, importdatetime=importdatetime
+                bucket=str_import_bucket_name, source_filename=source_filename, importdatetime=importdatetime
             )
         return response
     except ClientError as err_exception:
@@ -100,22 +119,9 @@ def initiate_export(cloudformation_stack_name: str, export_filename: str, export
 
     exportdatetime = datetime.datetime.utcnow()  # get current request date time in UTC timezone
     # get Export bucket name from the cloudformation stack
-    try:
-        cfn_client = get_service_client("cloudformation")  # boto3.client('cloudformation')
-        response = cfn_client.describe_stack_resource(
-            StackName=cloudformation_stack_name, LogicalResourceId="ExportBucket"
-        )
-        str_export_bucket_name = response["StackResourceDetail"]["PhysicalResourceId"]
-    except ClientError as err_exception:
-        return error_response(
-            error_code=err_exception.response["Error"]["Code"],
-            message=err_exception.response["Error"]["Message"],
-            comments="Please check the CloudFormation Stack being used is for a QnABot deployment, "
-            + "and that the stack has deployed successfully.",
-            status="Error",
-            show_error=True,
-        )
+    str_export_bucket_name = get_bucket_name(cloudformation_stack_name, BucketType.EXPORT_BUCKET)
 
+    cfn_client = get_service_client("cloudformation")
     # get OpenSearch cluster Index name from the cloudformation stack
     try:
         response = cfn_client.describe_stack_resource(StackName=cloudformation_stack_name, LogicalResourceId="Index")
@@ -210,7 +216,7 @@ def download_export(bucket: str, export_filename: str, exportdatetime: datetime,
 
         try:
             os.makedirs(os.path.dirname(export_filename), exist_ok=True)  # create export directory if does not exist
-            with open(export_filename, "w", encoding='utf-8') as obj_file:  # open file in write mode
+            with open(export_filename, "w", encoding="utf-8") as obj_file:  # open file in write mode
                 obj_file.write(str_file_contents)  # write to file
             return_response = {
                 "export_directory": export_filename,
@@ -260,22 +266,22 @@ def get_import_status(bucket: str, source_filename: str, importdatetime: datetim
     try:
         s3_client = get_service_client("s3")  # boto3.client('s3')
         # get object only if the object has changed since last request
-        response = s3_client.get_object(
-            Bucket=bucket, Key="status/" + os.path.basename(source_filename), IfModifiedSince=importdatetime
-        )
+        key = "status/" + os.path.basename(source_filename)
+        logger.debug(f"Getting import status for {bucket=} {key=}")
+        response = s3_client.get_object(Bucket=bucket, Key=key, IfModifiedSince=importdatetime)
 
         obj_status_details = json.loads(response["Body"].read().decode("utf-8"))  # read object body
 
         return_response = {
-            "number_of_qids_imported": "N/A"\
-            if obj_status_details["status"] != "Complete"\
+            "number_of_qids_imported": "N/A"
+            if obj_status_details["status"] != "Complete"
             else obj_status_details["count"],
-            "number_of_qids_failed_to_import": "N/A"\
-            if obj_status_details["status"] != "Complete"\
+            "number_of_qids_failed_to_import": "N/A"
+            if obj_status_details["status"] != "Complete"
             else obj_status_details["failed"],
             "import_starttime": obj_status_details["time"]["start"],
-            "import_endtime": "N/A"\
-            if obj_status_details["status"] != "Complete"\
+            "import_endtime": "N/A"
+            if obj_status_details["status"] != "Complete"
             else obj_status_details["time"]["end"],
             "status": obj_status_details["status"],
             "error_code": "none",
@@ -350,7 +356,7 @@ def convert_json_to_jsonl(source_filename: str):
     """
 
     try:
-        with open(source_filename, "rb") as obj_file:   # open file in read mode
+        with open(source_filename, "rb") as obj_file:  # open file in read mode
             str_file_contents = obj_file.read()  # read from file
         try:
             str_file_contents = json.loads(str_file_contents)
@@ -362,7 +368,8 @@ def convert_json_to_jsonl(source_filename: str):
             return error_response(
                 error_code="",
                 message=err_exception.msg,
-                comments="There was an error reading the file " + source_filename
+                comments="There was an error reading the file "
+                + source_filename
                 + ". Check the file format and try again",
                 status="Error",
                 show_error=True,
@@ -371,7 +378,8 @@ def convert_json_to_jsonl(source_filename: str):
             return error_response(
                 error_code="",
                 message=err_exception.__doc__,
-                comments="There was an error reading the file " + source_filename
+                comments="There was an error reading the file "
+                + source_filename
                 + ". Check the file format and try again",
                 status="Error",
                 show_error=True,
@@ -380,7 +388,8 @@ def convert_json_to_jsonl(source_filename: str):
             return error_response(
                 error_code="",
                 message=err_exception.__doc__,
-                comments="There was an error reading the file " + source_filename
+                comments="There was an error reading the file "
+                + source_filename
                 + ". Check the file format and try again",
                 status="Error",
                 show_error=True,
@@ -389,8 +398,7 @@ def convert_json_to_jsonl(source_filename: str):
         return error_response(
             error_code=err_exception.errno,
             message=err_exception.strerror,
-            comments="There was an error reading the file " + source_filename
-            + ". Check the path and try again",
+            comments="There was an error reading the file " + source_filename + ". Check the path and try again",
             status="Error",
             show_error=True,
         )

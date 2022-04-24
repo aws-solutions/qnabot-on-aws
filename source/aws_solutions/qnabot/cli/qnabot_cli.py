@@ -1,7 +1,10 @@
+# Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# SPDX-License-Identifier: Apache-2.0
+
 import sys
 import os
 import click
-import qnabot_cli_helper
+from aws_solutions.qnabot.cli import qnabot_cli_helper
 
 CONTEXT_SETTINGS = dict(help_option_names=["-h", "--help"])
 
@@ -48,8 +51,8 @@ def cli(ctx) -> None:
     show_default=True,
 )
 @click.pass_context
-def qna_import(\
-    ctx, cloudformation_stack_name: str, source_filename: str, file_format: str, delete_existing_content: bool\
+def qna_import(
+    ctx, cloudformation_stack_name: str, source_filename: str, file_format: str, delete_existing_content: bool
 ):
     """
     Import QnABot questions and answers to your QnABot setup.\n
