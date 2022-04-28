@@ -287,7 +287,7 @@ async function routeKendraRequest(event, context) {
     let origQuestion = event.req["_event"]["origQuestion"];
     let question = event.req["question"];
     let useOriginalLanguageQuery = origQuestion && question && origQuestion!=question;
-    console.log("useOriginalLanguageQuery: " + useOriginalLanguageQuery);
+    qnabot.log("useOriginalLanguageQuery: " + useOriginalLanguageQuery);
 
     // if test environment, then use mock-up of kendraClient
     if (event.test) {
@@ -327,7 +327,7 @@ async function routeKendraRequest(event, context) {
     kendraIndexes.forEach(function (index, i) {
         // if results cached from KendraFAQ, skip index by pushing Promise to resolve cached results
         if (kendraResultsCached && index===kendraResultsCached.originalKendraIndexId && !useOriginalLanguageQuery) {
-            console.log(`retrieving cached kendra results`)
+            qnabot.log(`retrieving cached kendra results`)
             promises.push(new Promise(function(resolve, reject) {
                 var data = kendraResultsCached
                 _.set(event.req, "kendraResultsCached", "cached and retrieved");  // cleans the logs
@@ -584,8 +584,7 @@ async function routeKendraRequest(event, context) {
     })
 
     hit.autotranslate = useOriginalLanguageQuery ? false : true;
-    console.log("Returning event: ", JSON.stringify(hit, null, 2));
-
+    qnabot.log("Returning event: ", JSON.stringify(hit, null, 2));
     return hit;
 }
 

@@ -519,10 +519,10 @@ module.exports = async function (req, res) {
         if (_.get(req._settings, 'ENABLE_MULTI_LANGUAGE_SUPPORT')) {
             usrLang = _.get(req, 'session.qnabotcontext.userLocale');
             if (usrLang != 'en' && autotranslate) {
-                console.log("Autotranslate hit to usrLang: ", usrLang);
+                qnabot.log("Autotranslate hit to usrLang: ", usrLang);
                 hit = await translate.translate_hit(hit, usrLang,req);
             } else {
-                console.log("Autotranslate not required.");
+                qnabot.log("Autotranslate not required.");
             }
         }
         // prepend debug msg
