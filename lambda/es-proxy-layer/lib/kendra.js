@@ -283,7 +283,12 @@ async function routeKendraRequest(event, context) {
     let promises = [];
     let resArray = [];
     let kendraClient = undefined;
-    
+
+    let origQuestion = event.req["_event"]["origQuestion"];
+    let question = event.req["question"];
+    let useOriginalLanguageQuery = origQuestion && question && origQuestion!=question;
+    console.log("useOriginalLanguageQuery: " + useOriginalLanguageQuery);
+
     // if test environment, then use mock-up of kendraClient
     if (event.test) {
         var mockup = './test/mockClient' + event.test + '.js';
@@ -321,9 +326,8 @@ async function routeKendraRequest(event, context) {
     // Iterate through this area and perform queries against Kendra.
     kendraIndexes.forEach(function (index, i) {
         // if results cached from KendraFAQ, skip index by pushing Promise to resolve cached results
-        if (kendraResultsCached && index===kendraResultsCached.originalKendraIndexId) {
-            qnabot.log(`retrieving cached kendra results`)
-            
+        if (kendraResultsCached && index===kendraResultsCached.originalKendraIndexId && !useOriginalLanguageQuery) {
+            console.log(`retrieving cached kendra results`)
             promises.push(new Promise(function(resolve, reject) {
                 var data = kendraResultsCached
                 _.set(event.req, "kendraResultsCached", "cached and retrieved");  // cleans the logs
@@ -337,7 +341,7 @@ async function routeKendraRequest(event, context) {
         
         const params = {
             IndexId: index, /* required */
-            QueryText: event.req["question"], /* required */
+            QueryText: useOriginalLanguageQuery ? origQuestion: question, /* required */
         };
         let p = kendraRequester(kendraClient,params,resArray);
         promises.push(p);
@@ -578,7 +582,9 @@ async function routeKendraRequest(event, context) {
         kendraFoundDocumentCount: foundDocumentCount,
         maxDocuments: maxDocumentCount
     })
-    qnabot.log("Returning event: ", JSON.stringify(hit, null, 2));
+
+    hit.autotranslate = useOriginalLanguageQuery ? false : true;
+    console.log("Returning event: ", JSON.stringify(hit, null, 2));
 
     return hit;
 }
