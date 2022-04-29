@@ -85,9 +85,6 @@ async function get_es_query(event, settings) {
             score_answer_field: _.get(settings,'ES_SCORE_ANSWER_FIELD'),
             fuzziness: _.get(settings, 'ES_USE_FUZZY_MATCH'),
             es_expand_contractions: _.get(settings,"ES_EXPAND_CONTRACTIONS"),
-
-
-
         };
         return build_es_query(query_params);
     } else {
@@ -98,14 +95,12 @@ async function get_es_query(event, settings) {
 
 
 async function run_query_es(event, settings) {
-    qnabot.log("ElasticSearch Query",JSON.stringify(es_query,null,2));
     var es_query = await get_es_query(event, settings);
     var es_response = await request({
         url:Url.resolve("https://"+event.endpoint,event.path),
         method:event.method,
         headers:event.headers,
         body:es_query,
-
     });
     return es_response;
 }
