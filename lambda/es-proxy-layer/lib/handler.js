@@ -68,15 +68,19 @@ async function get_settings() {
     return settings;
 }
 
-
 async function get_es_query(event, settings) {
-    var question = _.get(event,'question','');
+    let question = _.get(event,'question','');
+    let size = _.get(event,'size',1);
     if (question.length > 0) {
+        if (open_es.isQuestionAllStopwords(question)) {
+            console.log(`Question '${question}' contains only stop words. Forcing no hits.`);
+            size = 0;
+        }
         var query_params = {
             question: question,
             topic: _.get(event,'topic',''),
             from: _.get(event,'from',0),
-            size: _.get(event,'size',1),
+            size: size,
             minimum_should_match: _.get(settings,'ES_MINIMUM_SHOULD_MATCH'),
             phrase_boost: _.get(settings, 'ES_PHRASE_BOOST'),
             use_keyword_filters: _.get(settings,'ES_USE_KEYWORD_FILTERS'),
@@ -96,12 +100,17 @@ async function get_es_query(event, settings) {
 
 async function run_query_es(event, settings) {
     var es_query = await get_es_query(event, settings);
+    qnabot.log("ElasticSearch Query",JSON.stringify(es_query,null,2));
     var es_response = await request({
         url:Url.resolve("https://"+event.endpoint,event.path),
         method:event.method,
         headers:event.headers,
         body:es_query,
     });
+    if (_.get(es_response, "hits.max_score") == 0) {
+        qnabot.log("Max score is zero - no valid results")
+        es_response.hits.hits = [] ;
+    }
     return es_response;
 }
 
@@ -116,8 +125,6 @@ async function run_query_kendra(event, kendra_index) {
         es_address: event.endpoint,
         es_path: event.path,
         minimum_score: event.minimum_score,
-
-        
     } ;
     var kendra_response = await kendra.handler(request_params);
     return kendra_response;
