@@ -213,6 +213,26 @@ async function get_hit(req, res) {
     }
 
     if (hit) {
+        // Check if answer field redirects to a targeted Kendra query
+        const a = _.get(hit, "a");
+        // TODO: add optional filter and boost params
+        const regex = /@@kendraRedirect *query="(.*?)" */
+        const m = a.match(regex);
+        if (m) {
+            const kendraRedirectCmd = m[0]
+            const kendraQuery = m[1];
+            qnabot.log("Answer redirects to Kendra: " + kendraRedirectCmd);
+            qnabot.log("Kendra redirect query: " + kendraQuery);
+            req.question = kendraQuery;
+            hit = await  kendra_fallback.handler({req,res})
+            if (hit) {
+                hit.answersource = "KENDRA REDIRECT"
+            } 
+            qnabot.log("Result from Kendra Redirect: " + JSON.stringify(hit));
+        }
+    }
+
+    if (hit) {
         res['got_hits'] = 1;  // response flag, used in logging / kibana
     } else if(query_params.kendra_indexes.length != 0) {
         qnabot.log("request entering kendra fallback " + JSON.stringify(req))
