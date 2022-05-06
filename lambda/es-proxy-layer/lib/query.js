@@ -220,6 +220,8 @@ async function get_hit(req, res) {
             qnabot.log(`Kendra redirect query: '${kendraRedirectQueryText}' - Args = '${kendraRedirectQueryArgs}'` );
             req.question = kendraRedirectQueryText;
             req.kendraQueryArgs = kendraRedirectQueryArgs;
+            // remove any cached results from FAQ query
+            delete res.kendraResultsCached ;
             hit = await  kendra_fallback.handler({req,res})
             if (hit) {
                 hit.answersource = "KENDRA REDIRECT"
