@@ -317,12 +317,14 @@ async function routeKendraRequest(event, context) {
         throw new Error('Undefined Kendra Indexes');
     }
 
-    qnabot.log("kendra settings: " + _.get(event.req["_settings"], "KENDRA_INDEXED_DOCUMENTS_LANGUAGES", ["empty"]));
     let kendraIndexedLanguages = _.get(event.req["_settings"],
         "KENDRA_INDEXED_DOCUMENTS_LANGUAGES",["en"]);
+    qnabot.log("Retrieved Kendra multi-language settings: " + kendraIndexedLanguages);
+
     let origQuestion = event.req["_event"]["origQuestion"];
     let question = event.req["question"];
-    let userDetectedLocale = event.req["session"]["userDetectedLocale"];
+    let userDetectedLocale = _.get(event.req, 'session.qnabotcontext.userLocale');
+
     let useOriginalLanguageQuery = kendraIndexedLanguages.includes(userDetectedLocale, 0)
         && origQuestion && question && origQuestion!=question;
     qnabot.log("useOriginalLanguageQuery: " + useOriginalLanguageQuery);
