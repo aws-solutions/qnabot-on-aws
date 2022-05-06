@@ -109,6 +109,7 @@ function isHighlightInLink(textIn,hlBeginOffset) {
  */
 function kendraRequester(kendraClient,params,resArray) {
     return new Promise(function(resolve, reject) {
+        qnabot.log("Kendra request params:" + JSON.stringify(params, null, 2));
         kendraClient.query(params, function(err, data) {
             let indexId = params.IndexId;
             if (err) {
@@ -335,10 +336,18 @@ async function routeKendraRequest(event, context) {
             return;
         }
         
-        const params = {
+        let params = {
             IndexId: index, /* required */
             QueryText: event.req["question"], /* required */
         };
+        let kendraQueryArgs = _.get(event.req, "kendraQueryArgs", [])
+        qnabot.log(`Kendra query args: ${kendraQueryArgs}`)
+        for (let argString of kendraQueryArgs) {
+            qnabot.log(`Adding parameter '${argString}'`);
+            let argJSON = `{ ${argString} }`; // convert k:v to a JSON obj
+            let arg = JSON.parse(argJSON);
+            params = _.assign(params, arg);
+        }
         let p = kendraRequester(kendraClient,params,resArray);
         promises.push(p);
     });

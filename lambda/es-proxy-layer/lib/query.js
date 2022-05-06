@@ -163,12 +163,12 @@ async function get_hit(req, res) {
     let qid = _.get(req, 'qid');
     if (qid) {
         question = `QID::${qid}`;
-        console.log(`*** QID identified in request: ${qid}`)
+        qnabot.log(`*** QID identified in request: ${qid}`)
     }
     let size = 1;
     var no_hits_question = _.get(req, '_settings.ES_NO_HITS_QUESTION', 'no_hits');
     if (open_es.isQuestionAllStopwords(question)) {
-        console.log(`Question '${question}' contains only stop words. Forcing no hits.`);
+        qnabot.log(`Question '${question}' contains only stop words. Forcing no hits.`);
         size = 0;       
     }
     var query_params = {
@@ -213,17 +213,13 @@ async function get_hit(req, res) {
     }
 
     if (hit) {
-        // Check if answer field redirects to a targeted Kendra query
-        const a = _.get(hit, "a");
-        // TODO: add optional filter and boost params
-        const regex = /@@kendraRedirect *query="(.*?)" */
-        const m = a.match(regex);
-        if (m) {
-            const kendraRedirectCmd = m[0]
-            const kendraQuery = m[1];
-            qnabot.log("Answer redirects to Kendra: " + kendraRedirectCmd);
-            qnabot.log("Kendra redirect query: " + kendraQuery);
-            req.question = kendraQuery;
+        // Check if item contains redirects to a targeted Kendra query
+        const kendraRedirectQueryText = _.get(hit, "kendraRedirectQueryText");
+        const kendraRedirectQueryArgs = _.get(hit, "kendraRedirectQueryArgs", []);
+        if (kendraRedirectQueryText) {
+            qnabot.log(`Kendra redirect query: '${kendraRedirectQueryText}' - Args = '${kendraRedirectQueryArgs}'` );
+            req.question = kendraRedirectQueryText;
+            req.kendraQueryArgs = kendraRedirectQueryArgs;
             hit = await  kendra_fallback.handler({req,res})
             if (hit) {
                 hit.answersource = "KENDRA REDIRECT"
@@ -513,11 +509,8 @@ function update_res_with_hit(req, res, hit) {
     return res;
 }
 
-module.exports = async function (req, res) {
-
-
-    qna_settings.set_environment_variables(req._settings)
-    
+async function processFulfillmentEvent(req,res) {
+    qnabot.log("Process Fulfillment Code Hook event");
     const elicitResponseChainingConfig = _.get(res, "session.qnabotcontext.elicitResponse.chainingConfig", undefined);
     const elicitResponseProgress = _.get(res, "session.qnabotcontext.elicitResponse.progress", undefined);
     let hit = undefined;
@@ -530,9 +523,7 @@ module.exports = async function (req, res) {
     } else {
         // elicitResponse is not involved. obtain the next question to serve up to the user.
         [req, res, hit] = await get_hit(req, res);
-        
     }
-
     if (hit) {
         // found a document in elastic search.
         var c=0;
@@ -595,7 +586,88 @@ module.exports = async function (req, res) {
     res.session.qnabot_qid = _.get(res.result, "qid", "") ;
     res.session.qnabot_gotanswer = (res['got_hits'] > 0) ? true : false ;
 
-    var event = {req, res} ;
+    let event = {req, res} ;
+    return event;    
+}
+
+function process_slots(req, res, hit) {
+    let qid_slots = _.get(hit,"slots");
+    let nextSlotToElicit;
+    for (let slot of qid_slots) {
+        let slotName = _.get(slot,"slotName");
+        let slotValue = _.get(req, `slots.${slotName}`);
+        let slotRequired = _.get(slot,"slotRequired",false);
+        let slotValueCached = _.get(slot, "slotValueCached");
+        let slot_sessionAttrName = 'qnabotcontext.slot.' + slotName ;
+        if (slotValue) {
+            qnabot.log(`Slot ${slotName} already filled: ${slotValue}`);
+            _.set(res, `slots.${slotName}`, slotValue);
+            if (slotValueCached) {
+                qnabot.log(`Slot value caching enabled for: '${slotName}' setting session attribute '${slot_sessionAttrName}'`);
+                _.set(res.session, slot_sessionAttrName, slotValue);
+            }
+        } 
+        if (!slotValue) {
+            if (slotValueCached) {
+                qnabot.log(`Slot value caching enabled for: '${slotName}' using session attribute '${slot_sessionAttrName}'`);
+                value = _.get(res.session, slot_sessionAttrName);
+                if (value) {
+                    qnabot.log(`Filling slot ${slotName} using cached value: ${value}`);
+                    _.set(res, `slots.${slotName}`, value);
+                } else {
+                    qnabot.log(`No cached value for slot ${slotName}`);
+                    _.set(res, `slots.${slotName}`, null);
+                    if (slotRequired && !nextSlotToElicit) {
+                        nextSlotToElicit = slotName;
+                    }
+                }
+            } else {
+                qnabot.log(`Slot value caching is not enabled for: ${slotName}`);
+                _.set(res, `slots.${slotName}`, null);
+                if (slotRequired && !nextSlotToElicit) {
+                    nextSlotToElicit = slotName;
+                }
+            }
+        }
+    }
+    qnabot.log(`Set next slot to elicit: ${nextSlotToElicit}`);
+    res.nextSlotToElicit = nextSlotToElicit;
+    // Placeholder to add optional lambda hook for slot validation / runtime hints, etc. (future)
+    return res;
+}
+
+async function processDialogEvent(req, res) {
+    qnabot.log("Process Dialog Code Hook event");
+    // retrieve QID item that was mapped to intent
+    let qid = _.get(req, 'qid');
+    if (qid) {
+        question = `QID::${qid}`;
+        qnabot.log(`QID identified in request: ${qid}`)
+        var query_params = {
+            question: question,
+            from: 0,
+            size: 1
+        };
+        var response = await open_es.run_query_es(req, query_params);
+        qnabot.log("QID query response: ", JSON.stringify(response,null,2));
+        var hit = _.get(response, "hits.hits[0]._source");
+        res = process_slots(req, res, hit);
+        _.set(res, "session.qnabot_qid", qid);
+    } else {
+        qnabot.error(`QID not identified in request. Intent name should have mapped to a QID. Unable to process Dialog Code Hook event`);
+    }
+    let event = {req, res} ;
+    return event; 
+}
+
+module.exports = async function (req, res) {
+    qna_settings.set_environment_variables(req._settings)
+    let event = {};
+    if (_.get(req,"invocationSource") === "DialogCodeHook") {
+        event = await processDialogEvent(req,res);
+    } else {
+        event = await processFulfillmentEvent(req,res);
+    } 
     qnabot.debug("RESULT", JSON.stringify(event));
     return event ;
 };

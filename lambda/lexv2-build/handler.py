@@ -29,6 +29,7 @@ LEXV2_BOT_LOCALE_IDS = os.environ["LOCALES"].replace(' ','').split(",")
 LEXV2_BOT_LOCALE_IDS.append("en_US")
 LEXV2_BOT_LOCALE_IDS = list(dict.fromkeys(LEXV2_BOT_LOCALE_IDS))
 
+INTENT_CONFIDENCE_THRESHOLD = 0.8
 BOT_NAME = STACKNAME + "_QnaBot"
 QNA_INTENT = "QnaIntent"
 QID_INTENT_PREFIX = "QID-INTENT-"
@@ -321,6 +322,8 @@ def translate_list(localeId, utterances):
         translatedUtterances.append(translatedUtterance)
     # deduplicate
     translatedUtterances = list(dict.fromkeys(translatedUtterances))
+    # remove any empty or whitespace only strings
+    translatedUtterances = [u for u in translatedUtterances if u.strip()]
     return translatedUtterances
         
     
@@ -414,7 +417,7 @@ def lexV2_qid_delete_slotTypes(slotTypes, botId, botVersion, botLocaleId):
         print(f'Deleted slot type - Id: {slotType}')  
 
 
-def lexV2_intent_slot(slotName, intentId, slotTypeId, botId, botVersion, localeId, slotElicitationPrompt=None):
+def lexV2_intent_slot(slotName, intentId, slotTypeId, slotSampleUtterances, botId, botVersion, localeId, slotElicitationPrompt=None):
     # if a prompt is provided, assume slot is required
     slotConstraint = "Required" if slotElicitationPrompt else "Optional"
     slotElicitationPrompt = slotElicitationPrompt or "What is the question?"
@@ -433,6 +436,9 @@ def lexV2_intent_slot(slotName, intentId, slotTypeId, botId, botVersion, localeI
         }, 
         "slotConstraint": slotConstraint
     }
+    if slotSampleUtterances:
+        sampleUtterances = slotSampleUtterances.split(",")
+        valueElicitationSetting["sampleUtterances"] = [ {"utterance": utterance} for utterance in sampleUtterances]
     slotParams = {
         "slotName": slotName,
         "slotTypeId": slotTypeId,
@@ -469,6 +475,7 @@ def lexV2_qna_intent(intentName, slotTypeName, botId, botVersion, localeId):
     }
     intentId = get_intentId(intentName, botId, botVersion, localeId)
     slotTypeId = get_slotTypeId(slotTypeName, botId, botVersion, localeId)
+    slotSampleUtterances = None
     if intentId:
         print(f"Updating intent: {intentName}, intentId {intentId}")
         response = clientLEXV2.update_intent(intentId=intentId, **intentParams)
@@ -478,7 +485,7 @@ def lexV2_qna_intent(intentName, slotTypeName, botId, botVersion, localeId):
         response = clientLEXV2.create_intent(**intentParams)
         intentId = response["intentId"];
         print(f'Created intent - Id: {intentId}')
-    slotId = lexV2_intent_slot(slotName, intentId, slotTypeId, botId, botVersion, localeId)
+    slotId = lexV2_intent_slot(slotName, intentId, slotTypeId, slotSampleUtterances, botId, botVersion, localeId)
     print(f'Updating intent to add slot priority - intentId: {intentId}, slotId {slotId}')        
     response = clientLEXV2.update_intent(
         **intentParams,
@@ -509,6 +516,7 @@ def lexV2_qid_intent(qid, utterances, slots, slotTypes, botId, botVersion, local
             "intentName": intentName,
             "description": f"({localeId}) Intent for QnABot QID: '{qid}'",
             "sampleUtterances":sampleUtterances,
+            "dialogCodeHook": {'enabled': True},
             "fulfillmentCodeHook": {'enabled': True},
             "botId": botId,
             "botVersion": botVersion,
@@ -532,6 +540,7 @@ def lexV2_qid_intent(qid, utterances, slots, slotTypes, botId, botVersion, local
     for slot in slots:
         slotName = slot["slotName"]
         slotType = slot["slotType"]
+        slotSampleUtterances = slot.get("slotSampleUtterances")
         slotTypeId = None
         if "AMAZON." in slotType:
             # Built-in type
@@ -545,7 +554,7 @@ def lexV2_qid_intent(qid, utterances, slots, slotTypes, botId, botVersion, local
         if not slotTypeId:
             raise ValueError(f"ERROR: Slot type '{slotType}' used in Qid '{qid}' is not a built-in or existing custom slot type (locale={localeId})")
         prompt = translate_text(localeId, slot["slotPrompt"])
-        slotId = lexV2_intent_slot(slotName, intentId, slotTypeId, botId, botVersion, localeId, prompt)
+        slotId = lexV2_intent_slot(slotName, intentId, slotTypeId, slotSampleUtterances, botId, botVersion, localeId, prompt)
         slotPriorities.append({
             'priority': len(slotPriorities) + 1,
             'slotId': slotId           
@@ -687,7 +696,7 @@ def lexV2_qna_locale(botId, botVersion, localeId, voiceId, engine):
             botId=botId,
             botVersion=botVersion,
             localeId=localeId,
-            nluIntentConfidenceThreshold=0.40,
+            nluIntentConfidenceThreshold=INTENT_CONFIDENCE_THRESHOLD,
             voiceSettings={
                 'voiceId': voiceId, 
                 'engine': engine
