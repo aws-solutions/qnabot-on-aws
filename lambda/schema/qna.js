@@ -23,7 +23,7 @@ module.exports={
         a:{
             type:"string",
             title:"Answer",
-            description:"Enter the answer you want to be returned when the user asks one of the above questions. To source answer from the results of a Kendra query, use '%%kendraRedirect query=\"query string here\"'. ",
+            description:"Enter the answer you want to be returned when the user asks one of the above questions.",
             maxLength:8000,
             propertyOrder: 3
         },
@@ -115,7 +115,7 @@ module.exports={
         },
         kendraRedirectQueryText:{
             type:"string",
-            description:"Enter QueryText to retrieve the answer from the Kendra Fallback index specified in Settings.",
+            description:"Enter QueryText to retrieve the answer from the Kendra Fallback index specified in Settings. Answer fields above are ignored when KendraRedirect query is used.",
             title:"Kendra Redirect: QueryText",
             propertyOrder:10
         },
