@@ -242,29 +242,11 @@ function longestInterval(intervals) {
 }
 
 async function isSyncedFromQnABot(kendra_result){
-    var request_params = {
-        kendra_faq_index:_.get(req, "_settings.KENDRA_FAQ_INDEX"),
-        maxRetries:_.get(req, "_settings.KENDRA_FAQ_CONFIG_MAX_RETRIES"),
-        retryDelay:_.get(req, "_settings.KENDRA_FAQ_CONFIG_RETRY_DELAY"),
-        minimum_score: _.get(req, "_settings.ALT_SEARCH_KENDRA_FAQ_CONFIDENCE_SCORE"),
-        size:1,
-        question: query_params.question,
-        es_address: req._info.es.address,
-        es_path: '/' + req._info.es.index + '/_doc/_search?search_type=dfs_query_then_fetch',
-    }
 
     if (!open_es.hasJsonStructure(kendra_result.DocumentURI)) {
         return false;
     }
-
-    let hit = JSON.parse(element.DocumentURI);
-    if (_.get(hit,"_source_qid")) {
-        qnabot.warn("The Kendra result was synced from QnABot. Skipping...")
-        return true
-    }
-    return false;
-
-
+    return true
 }
 
 /** Function that processes kendra requests and handles response. Decides whether to handle SNS
