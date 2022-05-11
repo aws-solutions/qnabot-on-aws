@@ -353,13 +353,16 @@ var apply_handlebars = async function (req, res, hit) {
         }
     }
     if (kendraRedirectQueryArgs) {
-        try {
-            const kendraRedirectQueryArgs_template = Handlebars.compile(kendraRedirectQueryArgs);
-            hit_out.kendraRedirectQueryArgs=kendraRedirectQueryArgs_template(context);
-        } catch (e) {
-            qnabot.log("ERROR: Answer caused Handlebars exception. Check syntax: ", kendraRedirectQueryArgs)
-            throw (e);
-        }
+        hit_out.kendraRedirectQueryArgs=[];
+        hit.kendraRedirectQueryArgs.map(arg=>{
+            try {
+                const arg_template = Handlebars.compile(arg);
+                hit_out.kendraRedirectQueryArgs.push(arg_template(context));
+            } catch (e) {
+                qnabot.log("ERROR: Answer caused Handlebars exception. Check syntax: ", arg)
+                throw (e);
+            }
+        })
     }
     qnabot.log("Preprocessed Result: ", hit_out);
     return hit_out;
