@@ -15,7 +15,7 @@ module.exports={
           ]]},
         LOCALES:{"Ref":"LexV2BotLocaleIds"},
         PYTHONPATH:"/var/task/py_modules:/var/runtime:/opt/python"
-    },"python3.7"),
+    },"python3.9"),
     "Lexv2BotCodeVersion":{
         "Type": "Custom::S3Version",
         "Properties": {
