@@ -1,6 +1,6 @@
 module.exports={
     type:"object",
-    description:"Quiz documents",
+    description:"SlotType documents",
     properties:{
         qid:{
             type:"string",
