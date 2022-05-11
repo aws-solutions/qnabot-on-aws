@@ -231,6 +231,9 @@ var apply_handlebars = async function (req, res, hit) {
     var ssml = _.get(hit, "alt.ssml");
     var rp = _.get(hit, "rp", _.get(req, '_settings.DEFAULT_ALEXA_REPROMPT'));
     var r = _.get(hit, "r");
+    var kendraRedirectQueryText = _.get(hit, "kendraRedirectQueryText");
+    var kendraRedirectQueryArgs = _.get(hit, "kendraRedirectQueryArgs");
+
 
     // catch and log errors before throwing exception.
     if (a) {
@@ -339,6 +342,24 @@ var apply_handlebars = async function (req, res, hit) {
                 throw (e);
             }
         })
+    }
+    if (kendraRedirectQueryText) {
+        try {
+            const kendraRedirectQueryText_template = Handlebars.compile(kendraRedirectQueryText);
+            hit_out.kendraRedirectQueryText=kendraRedirectQueryText_template(context);
+        } catch (e) {
+            qnabot.log("ERROR: Answer caused Handlebars exception. Check syntax: ", kendraRedirectQueryText)
+            throw (e);
+        }
+    }
+    if (kendraRedirectQueryArgs) {
+        try {
+            const kendraRedirectQueryArgs_template = Handlebars.compile(kendraRedirectQueryArgs);
+            hit_out.kendraRedirectQueryArgs=kendraRedirectQueryArgs_template(context);
+        } catch (e) {
+            qnabot.log("ERROR: Answer caused Handlebars exception. Check syntax: ", kendraRedirectQueryArgs)
+            throw (e);
+        }
     }
     qnabot.log("Preprocessed Result: ", hit_out);
     return hit_out;

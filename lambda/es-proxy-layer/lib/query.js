@@ -214,9 +214,11 @@ async function get_hit(req, res) {
 
     if (hit) {
         // Check if item contains redirects to a targeted Kendra query
-        const kendraRedirectQueryText = _.get(hit, "kendraRedirectQueryText");
-        const kendraRedirectQueryArgs = _.get(hit, "kendraRedirectQueryArgs", []);
-        if (kendraRedirectQueryText) {
+        if (_.get(hit, "kendraRedirectQueryText")) {
+            // process any handlebars before running Kendra redirect query
+            hit = await handlebars(req, res, hit);
+            const kendraRedirectQueryText = _.get(hit, "kendraRedirectQueryText");
+            const kendraRedirectQueryArgs = _.get(hit, "kendraRedirectQueryArgs", []);
             qnabot.log(`Kendra redirect query: '${kendraRedirectQueryText}' - Args = '${kendraRedirectQueryArgs}'` );
             req.question = kendraRedirectQueryText;
             req.kendraQueryArgs = kendraRedirectQueryArgs;
