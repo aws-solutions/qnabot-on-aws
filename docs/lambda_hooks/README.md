@@ -66,5 +66,5 @@ You can also add Lambda hooks globally that run before (preprocessing) and after
 ## [](#notes)NOTES
 
 - The `Makefile` residing in the extensions folder creates separate zip packages for each separate Lambda hook function
-- Lambda hook functions use nodejs12.x or python3.6 only at this time
+- Lambda hook functions use nodejs12.x or python3.9 only at this time
 - Lambda hook functions will be allocated 2048MB memory (defined in index.js)
