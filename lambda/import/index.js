@@ -7,6 +7,7 @@ var s3=new aws.S3()
 var lambda=new aws.Lambda()
 var stride=parseInt(process.env.STRIDE)
 var _=require('lodash')
+var delete_existing_content = require('delete_existing_content')
 
 exports.step=function(event,context,cb){
     console.log("step")
@@ -104,6 +105,7 @@ exports.step=function(event,context,cb){
 
                 return out.join('\n')+'\n'
             })
+            .then ((ES_formatted_content)=>delete_existing_content.delete_existing_content (esindex, config, ES_formatted_content))   //check and delete existing content (if parameter to delete has been passed in the options {file}
             .then(function(result){
                 var body={
                     endpoint:process.env.ES_ENDPOINT,
