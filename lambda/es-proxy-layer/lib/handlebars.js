@@ -231,6 +231,9 @@ var apply_handlebars = async function (req, res, hit) {
     var ssml = _.get(hit, "alt.ssml");
     var rp = _.get(hit, "rp", _.get(req, '_settings.DEFAULT_ALEXA_REPROMPT'));
     var r = _.get(hit, "r");
+    var kendraRedirectQueryText = _.get(hit, "kendraRedirectQueryText");
+    var kendraRedirectQueryArgs = _.get(hit, "kendraRedirectQueryArgs");
+
 
     // catch and log errors before throwing exception.
     if (a) {
@@ -336,6 +339,27 @@ var apply_handlebars = async function (req, res, hit) {
                 hit_out.sa.push({text:obj.text, value: sa_value(context), enableTranslate: obj.enableTranslate});
             } catch (e) {
                 qnabot.log("ERROR: Session Attributes caused Handlebars exception. Check syntax: ", obj.text);
+                throw (e);
+            }
+        })
+    }
+    if (kendraRedirectQueryText) {
+        try {
+            const kendraRedirectQueryText_template = Handlebars.compile(kendraRedirectQueryText);
+            hit_out.kendraRedirectQueryText=kendraRedirectQueryText_template(context);
+        } catch (e) {
+            qnabot.log("ERROR: Answer caused Handlebars exception. Check syntax: ", kendraRedirectQueryText)
+            throw (e);
+        }
+    }
+    if (kendraRedirectQueryArgs) {
+        hit_out.kendraRedirectQueryArgs=[];
+        hit.kendraRedirectQueryArgs.map(arg=>{
+            try {
+                const arg_template = Handlebars.compile(arg);
+                hit_out.kendraRedirectQueryArgs.push(arg_template(context));
+            } catch (e) {
+                qnabot.log("ERROR: Answer caused Handlebars exception. Check syntax: ", arg)
                 throw (e);
             }
         })
