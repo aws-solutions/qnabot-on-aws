@@ -5,9 +5,6 @@ var router=new (require('./lib/router'))()
 var fs=require('fs')
 const esWarmer=new (require('./lib/warmer'))();
 
-
-
-
 var middleware=fs.readdirSync(`${__dirname}/${lib}`)
     .filter(name=>name.match(/\d*_.*\.js/))
     .sort()
@@ -22,6 +19,11 @@ exports.handler=function(event,context,callback){
 exports.warmer=async function(event,context,callback) {
     await esWarmer.perform(event,context,callback);
     return "complete";
+}
+
+// Increment the return value to force a new version on update and adjust alias to the use the new version
+exports.version=async function() {
+    return "V2";
 }
 
 
