@@ -191,6 +191,12 @@ module.exports={
             title:"Kendra Redirect: QueryText",
             propertyOrder:10
         },
+        kendraRedirectQueryConfidenceThreshold:{
+            type:"string",
+            description:"Optional: LOW, MEDIUM, HIGH, or VERY HIGH. Defaults to the value of setting ALT_KENDRA_FALLBACK_CONFIDENCE_THRESHOLD.",
+            title:"Kendra Redirect Confidence score threshold.",
+            propertyOrder:11
+        },
         kendraRedirectQueryArgs:{
             title:"Kendra query arguments",
             description:"Optional key:value parameters, e.g. \"AttributeFilter\": {\"EqualsTo\": {\"Key\": \"City\", \"Value\": {\"StringValue\": \"Seattle\"}}}. Use handlebars to substitute values using session attributes or slots. See https://docs.aws.amazon.com/kendra/latest/dg/API_Query.html.",
@@ -200,13 +206,13 @@ module.exports={
                 type:"string",
                 maxLength:2000
             },
-            propertyOrder:11
+            propertyOrder:12
         },
         l:{
             type:"string",
             description:"Enter your lambda function name/ARN to dynamically create or modify answers, or to redirect to a different question.",
             title:"Lambda Hook",
-            propertyOrder:12
+            propertyOrder:13
         },
         args:{
             title:"Lambda Hook Arguments",
@@ -217,28 +223,28 @@ module.exports={
                 type:"string",
                 maxLength:2000
             },
-            propertyOrder:13
+            propertyOrder:14
         },
         conditionalChaining:{
             title:"Document Chaining: Chaining Rule",
             description:"Automatically move on to another item based on the question string returned by this rule. Rule can be a single-quoted string, e.g. 'next question', or a JavaScript conditional expression that evaluates to a string, e.g. (SessionAttributes.namespace.Yes_No == \"Yes\" ) ? \"Yes question\" : \"No Question\", or a Lambda Function Name or ARN that returns a string specified as \"Lambda::FunctionName\". Function name must start with \"QNA-\".",
             type:"string",
             maxLength:4000,
-            propertyOrder:14
+            propertyOrder:15
         },
         clientFilterValues:{
             title:"Client Filters: Values",
             description:"Enter list of terms. When specified, client must provide 1 or more matching terms in request session attribute 'QNAClientFilter' for this answer to be eligible for the response. Client filters cannot be used if enableLexIntent is enabled.",
             type:"string",
             maxLength:100,
-            propertyOrder:15
+            propertyOrder:16
         },    
         rp:{
             type:"string",
             title:"Alexa Reprompt",
             description:"Enter the Alexa reprompt to returned if the user does not respond. (SSML autodetection with &lt;speak&gt;&lt;/speak&gt;)",
             maxLength:8000,
-            propertyOrder: 16
+            propertyOrder: 17
         },
     },
     required:["qid","q","a"]
