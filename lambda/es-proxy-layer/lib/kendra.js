@@ -554,6 +554,7 @@ async function routeKendraRequest(event, context) {
                     element.uri = signS3URL(element.uri, expireSeconds)
                 }
                 markdown += `\n\n  ${helpfulLinksMsg}: <span translate=no>[${label}](${element.uri})</span>`;
+                message += `\n\n  ${helpfulLinksMsg}: ${element.uri}`;
             }
         });
     }

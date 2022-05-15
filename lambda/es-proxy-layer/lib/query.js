@@ -215,21 +215,37 @@ async function get_hit(req, res) {
     if (hit) {
         // Check if item contains redirects to a targeted Kendra query
         if (_.get(hit, "kendraRedirectQueryText")) {
+            let redirect = {
+                "kendraRedirectQueryText" : _.get(hit, "kendraRedirectQueryText"),
+                "kendraRedirectQueryArgs" : _.get(hit, "kendraRedirectQueryArgs", []),
+            }
             // process any handlebars before running Kendra redirect query
             qnabot.log(`Kendra redirect query: Process with handlebars before redirecting.` );
-            hit = await handlebars(req, res, hit);
-            const kendraRedirectQueryText = _.get(hit, "kendraRedirectQueryText");
-            const kendraRedirectQueryArgs = _.get(hit, "kendraRedirectQueryArgs", []);
+            redirect = await handlebars(req, res, redirect);
+            const kendraRedirectQueryText = _.get(redirect, "kendraRedirectQueryText");
+            const kendraRedirectQueryArgs = _.get(redirect, "kendraRedirectQueryArgs", []);
+            const kendraRedirectQueryConfidenceThreshold = _.get(
+                hit, "kendraRedirectQueryConfidenceThreshold", 
+                _.get(req,"_settings.ALT_SEARCH_KENDRA_FALLBACK_CONFIDENCE_SCORE")
+                );
             qnabot.log(`Kendra redirect query: '${kendraRedirectQueryText}' - Args = '${kendraRedirectQueryArgs}'` );
+            qnabot.log(`Kendra redirect query confidence threshold: '${kendraRedirectQueryConfidenceThreshold}'` );
             req.question = kendraRedirectQueryText;
             req.kendraQueryArgs = kendraRedirectQueryArgs;
+            req._settings.ALT_SEARCH_KENDRA_FALLBACK_CONFIDENCE_SCORE = kendraRedirectQueryConfidenceThreshold;
             // remove any cached results from FAQ query
-            delete res.kendraResultsCached ;
-            hit = await  kendra_fallback.handler({req,res})
-            if (hit) {
-                hit.answersource = "KENDRA REDIRECT"
-            } 
-            qnabot.log("Result from Kendra Redirect: " + JSON.stringify(hit));
+            delete res.kendraResultsCached;
+            let redirect_hit = await  kendra_fallback.handler({req,res})
+            if (redirect_hit) {
+                qnabot.log("Result from Kendra Redirect query: " + JSON.stringify(redirect_hit));
+                hit.answersource = "KENDRA REDIRECT" ;
+                hit.a = _.get(redirect_hit, "a");
+                hit.alt = _.get(redirect_hit, "alt");
+            } else {
+                qnabot.log("Kendra Redirect query returned no hits. Disable Kendra fallback query.");
+                query_params.kendra_indexes = "";
+                hit = null;
+            }
         }
     }
 
