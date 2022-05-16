@@ -193,9 +193,9 @@ module.exports = async function preprocess(req, res) {
     var res_userInfo = await update_userInfo(userId, req_userInfo);
     _.set(res, "_userInfo", res_userInfo);
 
-    // by default, remove tokens from session event to prevent accidental logging of token values
-    // to keep tokens, create custom setting "REMOVE_ID_TOKENS_FROM_SESSION" and set to "false"
-    if (_.get(req, '_settings.REMOVE_ID_TOKENS_FROM_SESSION', true)) {
+    // optionally, remove tokens from session event if custom setting "REMOVE_ID_TOKENS_FROM_SESSION" 
+    // is set to "true"
+    if (_.get(req, '_settings.REMOVE_ID_TOKENS_FROM_SESSION', false)) {
         qnabot.log("Removing id tokens from session event: idtokenjwt, accesstokenjwt, refreshtoken");
         delete req.session.idtokenjwt;
         delete req.session.accesstokenjwt;
