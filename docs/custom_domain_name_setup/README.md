@@ -54,13 +54,14 @@ The API Gateway endpoint will have the endpoint such as: `{api-id}.execute-api.{
 - Click the `{tick}` icon to update the value
 - And then click the `Save` button
 
-### Step 4: Update QnABot Cognito User Pool
+## Step 4: Update QnABot Cognito User Pool
 In order to access the QnABot Designer user interface, the deployment sets up authentication using Amazon Cognito. We will update the User pool settings to update the Callback URLs to use the custom domain name. 
-- Navigate to the Amazon Cogito console 
+- Navigate to the Amazon Cognito console 
 - Click on `User Pools`
 - Click the QnABot user pool
+
 The QnABot User Pool will be named with the same name as the CloudFormation Stack name you used when you deployed the AWS QnABot solution – such as: UserPool-{stack name}
-- Navigate to `App Integration` --> `App client settings`
+- Navigate to `App Integration` | `App client settings`
 
 #### Update the `Callback URL(s)` for App clients: `UserPool-{stackname}-client`
 - use the custom domain name instead of the API Gateway endpoint. For example: 
