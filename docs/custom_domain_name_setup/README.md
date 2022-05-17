@@ -87,7 +87,7 @@ Now that we have updated the configurations, we will now need to deploy the API 
 
 ## Step 6: Update the API Stage variables
 Once the API is deployed, you will be navigated to the Stage Editor page. 
-- Click the Stage Variables tab
+- Click the `Stage Variables` tab
 - Update the values for `ClientLoginUrl` and `DesignerLoginUrl` variables to use the custom domain name. 
 ![](stage_variables.png)
 
