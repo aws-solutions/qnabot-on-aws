@@ -78,6 +78,7 @@ Now that we have updated the configurations, we will now need to deploy the API 
 
 - Click the `Actions` button
 - Click `Deploy API`
+
 ![](deploy_api.png)
 
 - For the following: 
