@@ -1,5 +1,4 @@
-# Setup Custom Domain to use for QnABot Designer and Client
-
+# Setup Custom Domain Name for QnABot Designer and Client
 This readme provides information on how to setup a custom domain name and configure AWS QnABot solution to use the custom domain name for the Designer, and Client user interfaces. 
 The setup and configuration involve the following steps:
 
@@ -79,7 +78,7 @@ Now that we have updated the configurations, we will now need to deploy the API 
 - Click the `Actions` button
 - Click `Deploy API`
 
-![](deploy_api.png)
+![](deploy_api_action.png)
 
 - For the following: 
   - `Deployment stage`: select `prod`
