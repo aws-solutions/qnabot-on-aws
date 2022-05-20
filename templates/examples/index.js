@@ -28,8 +28,6 @@ module.exports={
     "FeedbackFirehoseName":{"Type":"String"},
     "CFNLambda":{"Type":"String"},
     "CFNLambdaRole":  {"Type":"String"},
-    "LexV2CFNLambdaARN": {"Type":"String"},
-    "LexV2ServiceLinkedRoleARN": {"Type":"String"},
     "ApiUrlName":{"Type":"String"},
     "AssetBucket":{"Type":"String"},
     "QIDLambdaArn":{"Type":"String"},
