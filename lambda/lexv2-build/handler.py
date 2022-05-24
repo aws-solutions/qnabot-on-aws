@@ -417,9 +417,9 @@ def lexV2_qid_delete_slotTypes(slotTypes, botId, botVersion, botLocaleId):
         print(f'Deleted slot type - Id: {slotType}')  
 
 
-def lexV2_intent_slot(slotName, intentId, slotTypeId, slotSampleUtterances, botId, botVersion, localeId, slotElicitationPrompt=None):
-    # if a prompt is provided, assume slot is required
-    slotConstraint = "Required" if slotElicitationPrompt else "Optional"
+def lexV2_intent_slot(slotName, intentId, slotTypeId, slotSampleUtterances, botId, botVersion, localeId, slotRequired=None, slotElicitationPrompt=None):
+    # if a slotRequired is provided, assume slot is required
+    slotConstraint = "Required" if slotRequired else "Optional"
     slotElicitationPrompt = slotElicitationPrompt or "What is the question?"
     valueElicitationSetting = {
         "promptSpecification": {
@@ -540,6 +540,10 @@ def lexV2_qid_intent(qid, utterances, slots, slotTypes, botId, botVersion, local
     for slot in slots:
         slotName = slot["slotName"]
         slotType = slot["slotType"]
+
+        #get slotRequired value if exists, otherwise return None
+        slotRequired = slot.get("slotRequired", None)
+
         slotSampleUtterances = slot.get("slotSampleUtterances")
         slotTypeId = None
         if "AMAZON." in slotType:
@@ -554,7 +558,7 @@ def lexV2_qid_intent(qid, utterances, slots, slotTypes, botId, botVersion, local
         if not slotTypeId:
             raise ValueError(f"ERROR: Slot type '{slotType}' used in Qid '{qid}' is not a built-in or existing custom slot type (locale={localeId})")
         prompt = translate_text(localeId, slot["slotPrompt"])
-        slotId = lexV2_intent_slot(slotName, intentId, slotTypeId, slotSampleUtterances, botId, botVersion, localeId, prompt)
+        slotId = lexV2_intent_slot(slotName, intentId, slotTypeId, slotSampleUtterances, botId, botVersion, localeId, slotRequired=slotRequired, slotElicitationPrompt=prompt)
         slotPriorities.append({
             'priority': len(slotPriorities) + 1,
             'slotId': slotId           
@@ -925,8 +929,6 @@ def build_all(intents, slotTypes={}):
             lexV2_genesys_intent(botId, LEXV2_BOT_DRAFT_VERSION, botLocaleId)
             for qid in slotTypes:
                 lexV2_qid_slotType(qid, botId, LEXV2_BOT_DRAFT_VERSION, botLocaleId, slotTypeDef=slotTypes[qid])
-            # Delete QID mapped slot types that are not in the current list
-            lexV2_qid_delete_slotTypes(slotTypes, botId, LEXV2_BOT_DRAFT_VERSION, botLocaleId)
             for qid in intents:
                 utterances = intents[qid]["utterances"]
                 if qid == QNA_INTENT:
@@ -939,6 +941,12 @@ def build_all(intents, slotTypes={}):
                     lexV2_qid_intent(qid, utterances, slots, slotTypes, botId, LEXV2_BOT_DRAFT_VERSION, botLocaleId)
             # Delete QID mapped intents that are not in the current list
             lexV2_qid_delete_intents(intents, botId, LEXV2_BOT_DRAFT_VERSION, botLocaleId)
+
+        #delete slot_types (QID mapped slot types that are not in the current list) after all referenced intents have been deleted. 
+        for botLocaleId in botlocaleIdBatch:
+            # Delete QID mapped slot types that are not in the current list
+            lexV2_qid_delete_slotTypes(slotTypes, botId, LEXV2_BOT_DRAFT_VERSION, botLocaleId)
+
         status("Rebuilding bot locales: " + str(LEXV2_BOT_LOCALE_IDS))
         for botLocaleId in botlocaleIdBatch:
             build_lexV2_qna_bot_locale(botId, LEXV2_BOT_DRAFT_VERSION, botLocaleId)
