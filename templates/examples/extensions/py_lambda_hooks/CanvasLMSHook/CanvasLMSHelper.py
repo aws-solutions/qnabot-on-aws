@@ -287,8 +287,6 @@ def query_grades_for_student(event, canvas, student_user_name, course_name_to_fi
     user = getCanvasUser (canvas, student_user_name)
 
     if user:
-        #courses = user.get_courses(enrollment_status='active')
-
         # Loop through the courses
         courses = user.get_enrollments(include='current_points', search_by='course')
 

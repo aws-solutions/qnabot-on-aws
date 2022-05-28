@@ -86,6 +86,10 @@ https://qnabot.workshop.aws/deployment/sso.html
 In the QnABot Designer, click on the menu link on the top left and select `Import`. 
 From the `Examples/Extensions` section, click `Load` for `CanvasLMSIntegration` to load sample Canvas questions. 
 
+## Lex Rebuild
+Once you have loaded the questions, click the `Edit` option from the `Tools` menu and choose `LEX REBUILD` from the top right edit card menu (⋮). 
+This will re-train Amazon Lex using the newly added questions as training data.
+
 ## Testing the Experience
 Launch the `WebAppUrl` URL as available in the Lex-Web-UI AWS CloudFormation Output and Login to the chatbot from the menu option. Use the test student Canvas LMS credential that you created in the earlier steps to login and test the setup. 
 

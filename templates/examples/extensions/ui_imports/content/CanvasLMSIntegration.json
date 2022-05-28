@@ -1,0 +1,413 @@
+{
+    "qna": [{
+            "qid": "CanvasLMS.assignments",
+            "a": "Here is a list of assignments:",
+            "enableQidIntent": true,
+            "slots": [{
+                "slotName": "CanvasLMS_course_name_slot",
+                "slotType": "CanvasLMS_course_names_slottype",
+                "slotPrompt": "For which course would you like to view assignments for?"
+            }],
+            "l": "QNA:EXTCanvasLMSHook",
+            "args": [
+                "{\"Query\": \"CourseAssignments\"}"
+            ],
+            "type": "qna",
+            "q": [
+                "tell me about my assignments",
+                "what assignments do i have due",
+                "what assignments do i have",
+                "what are my assignments",
+                "do i have any assignments",
+                "do i have any assignments due",
+                "tell me about my {CanvasLMS_course_name_slot} assignments"
+            ]
+        },
+        {
+            "qid": "CanvasLMS.syllabus",
+            "a": "Here is your syllabus:",
+            "enableQidIntent": true,
+            "slots": [{
+                "slotName": "CanvasLMS_course_name_slot",
+                "slotType": "CanvasLMS_course_names_slottype",
+                "slotPrompt": "For which course would you like to view syllabus for?"
+            }],
+            "l": "QNA:EXTCanvasLMSHook",
+            "args": [
+                "{\"Query\": \"SyllabusForCourse\"}"
+            ],
+            "type": "qna",
+            "q": [
+                "tell me about my syllabus",
+                "whats my syllabus",
+                "what is my syllabus",
+                "tell me about my {CanvasLMS_course_name_slot} syllabus"
+            ]
+        },
+        {
+            "qid": "CanvasLMS.menu",
+            "a": "Please select one of the options:",
+            "l": "QNA:EXTCanvasLMSHook",
+            "args": [
+                "{\"Query\": \"CanvasMenu\"}"
+            ],
+            "type": "qna",
+            "q": [
+                "canvas menu",
+                "canvas"
+            ]
+        },
+        {
+            "qid": "CanvasLMS.enrollments",
+            "a": "Here are the courses you are enrolled in:",
+            "l": "QNA:EXTCanvasLMSHook",
+            "args": [
+                "{\"Query\": \"CourseEnrollments\"}"
+            ],
+            "type": "qna",
+            "q": [
+                "tell me about my enrollments",
+                "what courses have i enrolled in",
+                "course enrollments"
+            ]
+        },
+        {
+            "qid": "CanvasLMS.announcements",
+            "a": "Here are your announcements:",
+            "l": "QNA:EXTCanvasLMSHook",
+            "args": [
+                "{\"Query\": \"AnnouncementsForStudent\"}"
+            ],
+            "type": "qna",
+            "q": [
+                "tell me about my announcements",
+                "do i have any announcements"
+            ]
+        },
+        {
+            "qid": "CanvasLMS_course_names_slottype",
+            "descr": "List of sample course names",
+            "resolutionStrategyRestrict": true,
+            "slotTypeValues": [{
+                    "samplevalue": "accounting",
+                    "synonyms": "accounting"
+                },
+                {
+                    "samplevalue": "american literature",
+                    "synonyms": "american literature"
+                },
+                {
+                    "samplevalue": "american literature history",
+                    "synonyms": "american literature history"
+                },
+                {
+                    "samplevalue": "american sign language",
+                    "synonyms": "american sign language"
+                },
+                {
+                    "samplevalue": "animal nutrition",
+                    "synonyms": "animal nutrition"
+                },
+                {
+                    "samplevalue": "anthropology ",
+                    "synonyms": "anthropology "
+                },
+                {
+                    "samplevalue": "business and marketing",
+                    "synonyms": "business and marketing"
+                },
+                {
+                    "samplevalue": "business communications",
+                    "synonyms": "business communications"
+                },
+                {
+                    "samplevalue": "business ethics",
+                    "synonyms": "business ethics"
+                },
+                {
+                    "samplevalue": "business law",
+                    "synonyms": "business law"
+                },
+                {
+                    "samplevalue": "business management",
+                    "synonyms": "business management"
+                },
+                {
+                    "samplevalue": "advertising design",
+                    "synonyms": "advertising design"
+                },
+                {
+                    "samplevalue": "aerospace engineering",
+                    "synonyms": "aerospace engineering"
+                },
+                {
+                    "samplevalue": "agriculture",
+                    "synonyms": "agriculture"
+                },
+                {
+                    "samplevalue": "algebra",
+                    "synonyms": "algebra"
+                },
+                {
+                    "samplevalue": "architectural design",
+                    "synonyms": "architectural design"
+                },
+                {
+                    "samplevalue": "art",
+                    "synonyms": "art"
+                },
+                {
+                    "samplevalue": "art history",
+                    "synonyms": "art history"
+                },
+                {
+                    "samplevalue": "astronomy",
+                    "synonyms": "astronomy"
+                },
+                {
+                    "samplevalue": "banking and finance",
+                    "synonyms": "banking and finance"
+                },
+                {
+                    "samplevalue": "biology",
+                    "synonyms": "biology"
+                },
+                {
+                    "samplevalue": "botany",
+                    "synonyms": "botany"
+                },
+                {
+                    "samplevalue": "chemistry",
+                    "synonyms": "chemistry"
+                },
+                {
+                    "samplevalue": "civics",
+                    "synonyms": "civics"
+                },
+                {
+                    "samplevalue": "civil engineering",
+                    "synonyms": "civil engineering"
+                },
+                {
+                    "samplevalue": "communications",
+                    "synonyms": "communications"
+                },
+                {
+                    "samplevalue": "computer and information technology",
+                    "synonyms": "computer and information technology"
+                },
+                {
+                    "samplevalue": "computer science",
+                    "synonyms": "computer science"
+                },
+                {
+                    "samplevalue": "cost accounting",
+                    "synonyms": "cost accounting"
+                },
+                {
+                    "samplevalue": "creative writing",
+                    "synonyms": "creative writing"
+                },
+                {
+                    "samplevalue": "criminal justice",
+                    "synonyms": "criminal justice"
+                },
+                {
+                    "samplevalue": "cybersecurity",
+                    "synonyms": "cybersecurity"
+                },
+                {
+                    "samplevalue": "earth and space science",
+                    "synonyms": "earth and space science"
+                },
+                {
+                    "samplevalue": "education",
+                    "synonyms": "education"
+                },
+                {
+                    "samplevalue": "electronics",
+                    "synonyms": "electronics"
+                },
+                {
+                    "samplevalue": "environmental science",
+                    "synonyms": "environmental science"
+                },
+                {
+                    "samplevalue": "fashion design",
+                    "synonyms": "fashion design"
+                },
+                {
+                    "samplevalue": "health science",
+                    "synonyms": "health science"
+                },
+                {
+                    "samplevalue": "humanities",
+                    "synonyms": "humanities"
+                },
+                {
+                    "samplevalue": "income tax accounting",
+                    "synonyms": "income tax accounting"
+                },
+                {
+                    "samplevalue": "industrial arts",
+                    "synonyms": "industrial arts"
+                },
+                {
+                    "samplevalue": "industrial design",
+                    "synonyms": "industrial design"
+                },
+                {
+                    "samplevalue": "information technology",
+                    "synonyms": "information technology"
+                },
+                {
+                    "samplevalue": "interactive design",
+                    "synonyms": "interactive design"
+                },
+                {
+                    "samplevalue": "journalism",
+                    "synonyms": "journalism"
+                },
+                {
+                    "samplevalue": "macro economics",
+                    "synonyms": "macroeconomics, macro economics"
+                },
+                {
+                    "samplevalue": "micro economics",
+                    "synonyms": "microeconomics, micro economics"
+                },
+                {
+                    "samplevalue": "microbiology",
+                    "synonyms": "microbiology"
+                },
+                {
+                    "samplevalue": "music",
+                    "synonyms": "music"
+                },
+                {
+                    "samplevalue": "nursing",
+                    "synonyms": "nursing"
+                },
+                {
+                    "samplevalue": "nutrition science",
+                    "synonyms": "nutrition science"
+                },
+                {
+                    "samplevalue": "philosophy",
+                    "synonyms": "philosophy"
+                },
+                {
+                    "samplevalue": "photography",
+                    "synonyms": "photography"
+                },
+                {
+                    "samplevalue": "physics",
+                    "synonyms": "physics"
+                },
+                {
+                    "samplevalue": "physiology",
+                    "synonyms": "physiology"
+                },
+                {
+                    "samplevalue": "political science",
+                    "synonyms": "political science"
+                },
+                {
+                    "samplevalue": "public policy",
+                    "synonyms": "public policy"
+                },
+                {
+                    "samplevalue": "public safety",
+                    "synonyms": "public safety"
+                },
+                {
+                    "samplevalue": "robotics",
+                    "synonyms": "robotics"
+                },
+                {
+                    "samplevalue": "science",
+                    "synonyms": "science"
+                },
+                {
+                    "samplevalue": "social media",
+                    "synonyms": "social media"
+                },
+                {
+                    "samplevalue": "social science",
+                    "synonyms": "social science"
+                },
+                {
+                    "samplevalue": "social studies",
+                    "synonyms": "social studies"
+                },
+                {
+                    "samplevalue": "statistics",
+                    "synonyms": "statistics"
+                },
+                {
+                    "samplevalue": "travel and tourism",
+                    "synonyms": "travel and tourism"
+                },
+                {
+                    "samplevalue": "visual arts",
+                    "synonyms": "visual arts"
+                },
+                {
+                    "samplevalue": "world history",
+                    "synonyms": "world history"
+                },
+                {
+                    "samplevalue": "zoology",
+                    "synonyms": "zoology"
+                }
+
+            ],
+            "type": "slottype",
+            "_id": "CanvasLMS_course_names_slottype"
+        },
+        {
+            "qid": "CanvasLMS.course",
+            "a": "Please select one of the options:",
+            "enableQidIntent": true,
+            "slots": [{
+                "slotRequired": true,
+                "slotName": "CanvasLMS_course_name_slot",
+                "slotType": "CanvasLMS_course_names_slottype",
+                "slotPrompt": "For which course would you like more information on?"
+            }],
+            "l": "QNA:EXTCanvasLMSHook",
+            "args": [
+                "{\"Query\": \"CoursesForStudent\"}"
+            ],
+            "type": "qna",
+            "q": [
+                "more info about my course",
+                "more information about my course",
+                "more information on {CanvasLMS_course_name_slot} course",
+                "more info on {CanvasLMS_course_name_slot}",
+                "more information about my {CanvasLMS_course_name_slot} course"
+            ]
+        },
+        {
+            "qid": "CanvasLMS.grades",
+            "a": "Here are your grades:",
+            "enableQidIntent": true,
+            "slots": [{
+                "slotName": "CanvasLMS_course_name_slot",
+                "slotType": "CanvasLMS_course_names_slottype",
+                "slotPrompt": "For which course would you like to view grades for?"
+            }],
+            "l": "QNA:EXTCanvasLMSHook",
+            "args": [
+                "{\"Query\": \"GradesForStudent\"}"
+            ],
+            "type": "qna",
+            "q": [
+                "tell me about my grades",
+                "what are my grades",
+                "how did i do in {CanvasLMS_course_name_slot}",
+                "tell me about my {CanvasLMS_course_name_slot} grades"
+            ]
+        }
+    ]
+}

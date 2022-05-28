@@ -35,9 +35,7 @@ def handler(event, context):
 
     if error_message:
         return_message = error_message
-        #event['res']['message'] = return_message
-        event['res']['session']['appContext']['altMessages']['markdown'] = return_message
-        event['res']['session']['appContext']['altMessages']['ssml'] = get_SSML_output (return_message)
+        set_alt_message (event, return_message)
     else:
         # get the API domain. This will be needed for API calls and for looking up the bearer token.
         domain = event['req']['_settings']['CanvasLMS_DomainName'].strip()
@@ -55,8 +53,7 @@ def handler(event, context):
 
         if (course_name_slot_resolved_input == '' and course_name_slot_input != ''):
             return_message = "Sorry, was unable to find the course you are looking for. Check the course name and try again."
-            event['res']['session']['appContext']['altMessages']['markdown'] = return_message
-            event['res']['session']['appContext']['altMessages']['ssml'] = get_SSML_output (return_message)
+            set_alt_message (event, return_message)
             return event
 
 
@@ -98,14 +95,12 @@ def handler(event, context):
                 return query_grades_for_student(event, canvas, student_user_name, course_name_to_filter)
             else: 
                 return_message = 'There was an error processing your request. For a list of available options, type or say <i>canvas menu</i>.' 
-                event['res']['session']['appContext']['altMessages']['markdown'] = return_message
-                event['res']['session']['appContext']['altMessages']['ssml'] = get_SSML_output (return_message)
+                set_alt_message (event, return_message)
                 return event
         except ValueError as e:
             print ("ERROR: "+ str(e))  #print the exception
             return_message = 'There was an error processing your request. Please contact your administrator.'
-            event['res']['session']['appContext']['altMessages']['markdown'] = return_message
-            event['res']['session']['appContext']['altMessages']['ssml'] = get_SSML_output (return_message)
+            set_alt_message (event, return_message)
             return event
 
     return event
