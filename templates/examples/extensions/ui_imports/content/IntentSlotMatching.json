@@ -1,0 +1,93 @@
+{
+  "qna": [
+    {
+      "qid": "IntentSlotMatching_Example_slottype_CarType",
+      "descr": "Example slot type",
+      "resolutionStrategyRestrict": true,
+      "slotTypeValues": [
+        {
+          "samplevalue": "economy",
+          "synonyms": "economy"
+        },
+        {
+          "samplevalue": "midsize",
+          "synonyms": "midsize"
+        },
+        {
+          "samplevalue": "luxury",
+          "synonyms": "luxury"
+        },
+        {
+          "samplevalue": "compact",
+          "synonyms": "compact"
+        }
+      ],
+      "type": "slottype",
+      "_id": "IntentSlotMatching_Example_slottype_CarType"
+    },
+    {
+      "qid": "IntentSlotMatching_Example_slottype_Confirmation",
+      "descr": "Example slot type",
+      "resolutionStrategyRestrict": true,
+      "slotTypeValues": [
+        {
+          "samplevalue": "yes",
+          "synonyms": "yep, yeah, yes please"
+        },
+        {
+          "samplevalue": "no",
+          "synonyms": "nope"
+        }
+      ],
+      "type": "slottype",
+      "_id": "IntentSlotMatching_Example_slottype_Confirmation"
+    },
+    {
+      "qid": "IntentSlotMatching.Example.Q1",
+      "a": "{{#ifCond Slots.ConfirmationSlot '==' 'yes'}}\nOkay, I have confirmed your reservation. The reservation details are below: \n- **Car Type**: {{Slots.CarType}}\n- **Pick up City:** {{Slots.PickUpCity}}\n- **Pick up Date**: {{Slots.PickUpDate}}\n- **Return Date**: {{Slots.ReturnDate}}\n{{else}}\nOkay, I have cancelled your reservation in progress.\n{{/ifCond}}",
+      "alt": {
+        "markdown": "{{#ifCond Slots.ConfirmationSlot '==' 'yes'}}\nOkay, I have confirmed your reservation. The reservation details are below: \n- **Car Type**: {{Slots.CarType}}\n- **Pick up City:** {{Slots.PickUpCity}}\n- **Pick up Date**: {{Slots.PickUpDate}}\n- **Return Date**: {{Slots.ReturnDate}}\n{{else}}\nOkay, I have cancelled your reservation in progress.\n{{/ifCond}}"
+      },
+      "enableQidIntent": true,
+      "slots": [
+        {
+          "slotRequired": true,
+          "slotName": "PickUpCity",
+          "slotType": "AMAZON.City",
+          "slotPrompt": "In what city do you need to rent a car?"
+        },
+        {
+          "slotRequired": true,
+          "slotName": "PickUpDate",
+          "slotType": "AMAZON.Date",
+          "slotPrompt": "What day do you want to start your rental?"
+        },
+        {
+          "slotRequired": true,
+          "slotName": "ReturnDate",
+          "slotType": "AMAZON.Date",
+          "slotPrompt": "What day do you want to return this car?"
+        },
+        {
+          "slotRequired": true,
+          "slotName": "CarType",
+          "slotType": "IntentSlotMatching_Example_slottype_CarType",
+          "slotPrompt": "What type of car would you like to rent? Our most popular options are economy, midsize, and luxury."
+        },
+        {
+          "slotRequired": true,
+          "slotName": "ConfirmationSlot",
+          "slotType": "IntentSlotMatching_Example_slottype_Confirmation",
+          "slotPrompt": "Okay, should I go ahead and book the reservation?"
+        }
+      ],
+      "type": "qna",
+      "q": [
+        "book a car",
+        "reserver a car",
+        "make a car reservation",
+        "book a car for {PickUpDate}"
+      ]
+    }
+  ]
+}
