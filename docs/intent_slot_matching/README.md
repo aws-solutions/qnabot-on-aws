@@ -25,11 +25,11 @@ The {qid} setup is made of the following attributes:
 - Slot(s) can be configured to be either required or optional. Should a conversation flow require user input, then check the `Slot Required` option. 
 - For each slot, you provide the Slot Type and one or more prompts that Amazon Lex V2 sends to the client to elicit values from the user. A user can reply with a slot value when input may be needed. You can create your own slot type, or you can use [built-in slot types](https://docs.aws.amazon.com/lexv2/latest/dg/howitworks-builtins-slots.html).
 
-![](./slottype_config.png)
+![](./qid_intent_slot_config.png)
 
 - To create a custom slot type, choose the new question of type `slottype`. 
 
-![](./qid_intent_slot_config.png)
+![](./slottype_config.png)
 
 
 ## Import Sample {qid} Intent and Slot Type
