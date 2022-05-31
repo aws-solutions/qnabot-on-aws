@@ -1,2 +1,2 @@
-boto3
-Click
+boto3==1.21.18
+Click==8.0.4
