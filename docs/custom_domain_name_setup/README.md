@@ -96,4 +96,8 @@ Once the API is deployed, you will be navigated to the Stage Editor page.
 Launch the QnABot designer in a new browser session using the custom domain name (`https://YOUR_CUSTOM_DOMAIN_NAME/prod/pages/designer`) to test the updates.
 
 
+## Known Limitation
+A Cloudformation stack update of QnABot performed after the above steps, will overwrite the changes made in Steps 3, 4, 5, and 6 above. 
+We are looking at best ways to automate this process, but in the meantime, if you perform a stack update after the above steps, you will need to manually re-apply the above steps 3, 4, 5, and 6 again. 
+
 -----
