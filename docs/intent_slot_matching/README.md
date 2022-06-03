@@ -3,8 +3,8 @@ QnABot supports different types of question and answer workflows. For example:
 - you can create a question and answer experience to help answer frequently asked questions. In this model, the user asks a question and QnABot responds with the most relevant answer to the question (from the list of created Item IDs). For more information: https://docs.aws.amazon.com/solutions/latest/qnabot-on-aws/create-chatbot-content-and-load-sample-qanda-data.html
 - build a diagnostic or questionnaire based workflow, where a question from a user can result with QnABot asking follow-up question(s). If you are creating a survey or building a diagnostic workflow where you may require inputs to different questions, you can use ResponseBots and Document Chaining capabilities of QnABot. For more information: https://docs.aws.amazon.com/solutions/latest/qnabot-on-aws/configuring-the-chatbot-to-ask-the-questions-and-use-response-bots.html
 
-Both of these options provide flexibility in creating a interactive chat experience. However, there are cases such as: accepting dynamic user input in a question, ability to automatically ask a question for a given input - without needing to setup document chaining, validating user input against an available list of options, provide a more richer conversational experience. 
-With this early implementation of Intent and Slot matching capability in QnABot, you can now build a more richer conversational experience. 
+Both of these options provide flexibility in creating a interactive chat experience. However, there are cases such as: accepting dynamic user input in a question, ability to automatically ask a question for a given input - without needing to setup document chaining, validating user input against an available list of options, provide a richer conversational experience. 
+With this early implementation of Intent and Slot matching capability in QnABot, you can now build a richer conversational experience. 
 For example, you might create an intent that makes a car reservation, or assists an agent during a live chat or call (via Amazon Connect). 
 
 The {Item ID} setup is made of the following attributes: 
@@ -106,9 +106,9 @@ Notice that the user is not prompted with the question `What day do you want to 
 - Topics, and ClientFilters are not supported when a Item ID is enabled with custom Intent. 
 - Bot locale must be set to user's locale for QnABot multi-language text interactions. 
 - Always initiate a LEX REBUILD when enabling Item IDs with custom intent and slots. This will create the custom intent(s), slot(s), and slot type(s) in Amazon Lex V2, and will also train Amazon Lex using the added/updated Item IDs as training data. 
+- The `Test All` or `Test` option will not work correctly for Item IDs with custom intent. 
 - As you are building your knowledge bank of questions, you may have a combination of FAQ based questions, Intent based questions. There may be instances where a wrong intent gets matched, or a FAQ question is matched instead. To troubleshoot this, below are couple of options that can help: 
   - Enable the `ENABLE_DEBUG_RESPONSES` setting in QnABot. This setting provides debug information to help understand what is processing the request (such as: Intent, ElasticSearch, Kendra)
-  - Using the `Test All` option helps you quickly test all your questions. `Test All` checks that QnABot matched the question to the expected item and provides a test result (which can be viewed in the browser or downloaded as a CSV file), with incorrect matches highlighted in red. 
 
 
 ## Additional Example Implementation
