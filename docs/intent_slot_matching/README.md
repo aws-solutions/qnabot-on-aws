@@ -4,8 +4,8 @@ QnABot supports different types of question and answer workflows. For example:
 - build a diagnostic or questionnaire based workflow, where a question from a user can result with QnABot asking follow-up question(s). If you are creating a survey or building a diagnostic workflow where you may require inputs to different questions, you can use ResponseBots and Document Chaining capabilities of QnABot. For more information: https://docs.aws.amazon.com/solutions/latest/qnabot-on-aws/configuring-the-chatbot-to-ask-the-questions-and-use-response-bots.html
 
 Both of these options provide flexibility in creating a interactive chat experience. However, there are cases such as: accepting dynamic user input in a question, ability to automatically ask a question for a given input - without needing to setup document chaining, validating user input against an available list of options, provide a richer conversational experience. 
-With this early implementation of Intent and Slot matching capability in QnABot, you can now build a richer conversational experience. 
-For example, you might create an intent that makes a car reservation, or assists an agent during a live chat or call (via Amazon Connect). 
+With this early implementation of Intent and Slot matching capability in QnABot, you can now build a richer conversational experience. For example, you might create an intent that makes a car reservation, or assists an agent during a live chat or call (via Amazon Connect). 
+You can use intent and slot matching also for cases where you may want better intent matching via Amazon Lex Natural Language Understanding (NLU) engine, as an alternative to QnABot default ElasticSearch queries.
 
 The {Item ID} setup is made of the following attributes: 
 
