@@ -11,7 +11,7 @@ With the Kendra Redirect feature, you can now include a Kendra query within a It
 ## Configuring a Item ID with Kendra Redirect
 - To get started, create a QnABot question as you would normally do by providing a `Item ID` and `Questions/Utterances`. 
 - Expand the `Advanced` option
-- `Kendra Redirect: Query Text` accepts a QueryText to search for (such as: `what is q and a bot`) to retrieve the answer from the Kendra Fallback index specified in Settings. Amazon Kendra searches your index for text content and question and answer (FAQ) content.
+- `Kendra Redirect: Query Text` accepts a QueryText to search for (such as: `what is q and a bot`) to retrieve the answer from the Kendra Fallback index specified in Settings. Amazon Kendra searches your index for text content and question and answer (FAQ) content. You can also use handlebars to substitute values using session attributes or slots to support dynamic queries. 
 - `Kendra Redirect: Confidence score threshold` provides a relative ranking that indicates how confident Amazon Kendra is that the response matches the query. This is a optional field having one of the values of: `LOW` | `MEDIUM` | `HIGH` | `VERY HIGH`. 
 If no value is provided, defaults to the value of setting `ALT_KENDRA_FALLBACK_CONFIDENCE_THRESHOLD`.
 - `Kendra query arguments` is a optional field which enables filtered searches based on document attributes. For example: 
