@@ -103,6 +103,7 @@ Notice that the user is not prompted with the question `What day do you want to 
 
 
 ## Notes and Considerations
+- Utterances must be unique across intents. Duplicate utterances across intents will cause the Lex build to fail. Suppose you have two intents (`OrderPizza` and `OrderDrink`) in your bot and both are configured with an `I want to order` utterance. This utterance does not map to a specific intent that Amazon Lex V2 can learn from while building the language model for the bot at build time. As a result, when a user inputs this utterance at runtime, Amazon Lex V2 can't pick an intent with a high degree of confidence. 
 - Topics, and ClientFilters are not supported when a Item ID is enabled with custom Intent. 
 - Bot locale must be set to user's locale for QnABot multi-language text interactions. 
 - Always initiate a LEX REBUILD when enabling Item IDs with custom intent and slots. This will create the custom intent(s), slot(s), and slot type(s) in Amazon Lex V2, and will also train Amazon Lex using the added/updated Item IDs as training data. 
