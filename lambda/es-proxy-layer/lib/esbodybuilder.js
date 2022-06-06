@@ -51,6 +51,11 @@ function build_query(params) {
         match_query.quniqueterms.fuzziness = "AUTO";
       }
       let query = bodybuilder();
+
+      // Exclude QIDs with enableQidIntent: true. They should be matched only by Lex
+      // as intents, not by ES match queries. 
+      query = query.notFilter('match', {"enableQidIntent": {"query": true}});
+
       if (keywords.length > 0) {
         if (_.get(params, 'score_answer_field')) {
           query = query
