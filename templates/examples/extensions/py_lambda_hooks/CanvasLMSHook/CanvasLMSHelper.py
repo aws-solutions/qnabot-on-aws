@@ -14,13 +14,14 @@ from bs4 import BeautifulSoup
 from botocore.exceptions import ClientError
 
 
-"""
-function: get_secret from AWS Secrets Manager
-This function retrieves the secret string from AWS Secrets Manager. 
-We will retrieve the Canvas API Token using this function. 
-Refer to the readme for more details on how to store secret in AWS Secrets Manager, and configure QnABot with the secret key name. 
-"""
 def get_secret(secrets_name):
+    """
+    function: get_secret from AWS Secrets Manager
+    This function retrieves the secret string from AWS Secrets Manager. 
+    We will retrieve the Canvas API Token using this function. 
+    Refer to the readme for more details on how to store secret in AWS Secrets Manager, and configure QnABot with the secret key name. 
+    """
+
     region_name = os.environ['AWS_REGION']
 
     # Create a Secrets Manager client
@@ -54,19 +55,21 @@ def get_secret(secrets_name):
     return secret
 
 
-"""
-function to get Canvas User
-This function retrieves the Canvas user by using the SIS Login ID
-"""
 def getCanvasUser (param_canvas, param_user_name):
+    """
+    function to get Canvas User
+    This function retrieves the Canvas user by using the SIS Login ID
+    """
+
     user = param_canvas.get_user(param_user_name, 'sis_login_id')
     return user
 
 
-"""
-function to get menu
-"""
 def query_menu (event, student_name):
+    """
+    function to get menu
+    """
+
     # provide a menu to choose from (announcements, enrollments, syllabus, assignments, grades)
     choicelist = [{'text':'Announcements','value':"tell me about my announcements"}, {'text':'Course Enrollments','value':"tell me about my enrollments"}, {'text':'Course Syllabus','value':"tell me about my syllabus"}, {'text':'Assignments','value':"tell me about my assignments"}, {'text':'Grades','value':"tell me about my grades"}]
     genericAttachments = {'version': '1','contentType': 'application/vnd.amazonaws.card.generic','genericAttachments':[{"title":"response buttons","buttons":choicelist}]}
@@ -85,13 +88,17 @@ def query_menu (event, student_name):
     return event
 
 
-"""
-function: query_enrollments_for_student
-This function retrieves students' active enrollments 
-"""
 def query_enrollments_for_student(event, canvas, student_user_name):
+    """
+    function: query_enrollments_for_student
+    This function retrieves students' active enrollments 
+    """
+
     # Get the user using user_id to match with LMS SIS_ID
-    user = getCanvasUser (canvas, student_user_name)
+    try: 
+        user = getCanvasUser (canvas, student_user_name)
+    except:
+        return user_not_found_error (event)
 
     if user:
         courses = user.get_courses(enrollment_status='active',include=['syllabus_body'])
@@ -124,14 +131,19 @@ def query_enrollments_for_student(event, canvas, student_user_name):
     return event
     
 
-"""
-function: query_courses_for_student
-This function retrieves course options across all active enrolled courses, or for a particular course, for the student
-for example: more information about {course name}
-"""
 def query_courses_for_student(event, canvas, student_user_name, course_name_to_filter):
+    """
+    function: query_courses_for_student
+    This function retrieves course options across all active enrolled courses, or for a particular course, for the student
+    for example: more information about {course name}
+    """
+
     # Get the user using user_id to match with LMS SIS_ID
-    user = getCanvasUser (canvas, student_user_name)
+    try: 
+        user = getCanvasUser (canvas, student_user_name)
+    except: 
+        return user_not_found_error (event)
+
     blnFoundCourse = False
     if user:
         courses = user.get_courses(enrollment_status='active')
@@ -171,18 +183,22 @@ def query_courses_for_student(event, canvas, student_user_name, course_name_to_f
     return event
 
 
-"""
-function: query_course_assignments_for_student
-This function retrieves assignment information across all active enrolled courses, or for a particular course, for the student
-for example: do i have any assignments due or tell me about by {course_name} assignments
-"""
 def query_course_assignments_for_student(event, canvas, student_user_name, course_name_to_filter):
+    """
+    function: query_course_assignments_for_student
+    This function retrieves assignment information across all active enrolled courses, or for a particular course, for the student
+    for example: do i have any assignments due or tell me about by {course_name} assignments
+    """
+
     course_assignments = ''
     blnHasAssignments = False
     blnFoundMatch = False
     no_records_message = 'There are no assignments for this course.'
     # Get the user using user_id to match with LMS SIS_ID
-    user = getCanvasUser (canvas, student_user_name)
+    try: 
+        user = getCanvasUser (canvas, student_user_name)
+    except:
+        return user_not_found_error (event)
     
     if user:
         courses = user.get_courses(enrollment_status='active')
@@ -234,17 +250,21 @@ def query_course_assignments_for_student(event, canvas, student_user_name, cours
     return event
 
 
-"""
-function: query_announcements_for_student
-This function retrieves any announcements across all active enrolled courses for the student
-for example: do i have any announcements
-"""
 def query_announcements_for_student(event, canvas, student_user_name):
+    """
+    function: query_announcements_for_student
+    This function retrieves any announcements across all active enrolled courses for the student
+    for example: do i have any announcements
+    """
+
     no_records_message = 'You currently have no announcements.'
     course_announcements = ''
 
     # Get the user using user_id to match with LMS SIS_ID
-    user = getCanvasUser (canvas, student_user_name)
+    try: 
+        user = getCanvasUser (canvas, student_user_name)
+    except:
+        return user_not_found_error (event)
 
     course_names = []
     if user:
@@ -253,13 +273,13 @@ def query_announcements_for_student(event, canvas, student_user_name):
         # Loop through the courses.
         for course in courses:
             course_names.append(course.name)
+            # get_announcements returns a list of discussion topics.
             for discussion_topic in canvas.get_announcements(context_codes=[course.id]): 
                 if discussion_topic:
                     announcement_date = datetime.datetime.strftime(discussion_topic.posted_at_date,"%b %d %Y %-I:%M %p")
                     course_announcements += '<li><b>{0}</b>: {1}: <br>{2}. </li>'.format(course.name, discussion_topic.title, discussion_topic.message)
                 else:
                     course_announcements += no_records_message
-            # get_announcements returns a list of discussion topics.
 
     if course_announcements != '':
         course_announcements = "<ul>" + course_announcements + "</ul>"
@@ -275,16 +295,20 @@ def query_announcements_for_student(event, canvas, student_user_name):
     return event
 
 
-"""
-function: query_grades_for_student
-This function retrieves grade information across all active enrolled courses, or for a particular course, for the student
-for example: tell me about my grades, or how did i do in {course name}
-"""
 def query_grades_for_student(event, canvas, student_user_name, course_name_to_filter):
+    """
+    function: query_grades_for_student
+    This function retrieves grade information across all active enrolled courses, or for a particular course, for the student
+    for example: tell me about my grades, or how did i do in {course name}
+    """
+
     no_records_message = "There are no enrolled courses."
     course_grades = '<ul>'
     # Get the user using user_id to match with LMS SIS_ID
-    user = getCanvasUser (canvas, student_user_name)
+    try: 
+        user = getCanvasUser (canvas, student_user_name)
+    except:
+        return user_not_found_error (event)
 
     if user:
         # Loop through the courses
@@ -320,17 +344,22 @@ def query_grades_for_student(event, canvas, student_user_name, course_name_to_fi
     return event
 
 
-"""
-function: query_syllabus_for_student
-This function retrieves syllabus information across all active enrolled courses, or for a particular course, for the student
-for example: what is my syllabus, or tell me about my {course name} syllabus
-"""
 def query_syllabus_for_student(event, canvas, student_user_name, course_name_to_filter):
+    """
+    function: query_syllabus_for_student
+    This function retrieves syllabus information across all active enrolled courses, or for a particular course, for the student
+    for example: what is my syllabus, or tell me about my {course name} syllabus
+    """
+
     no_records_message = 'There is no syllabus currently available for this course.'
     course_syllabus = ''
 
     # Get the user using user_id to match with LMS SIS_ID
-    user = getCanvasUser (canvas, student_user_name)
+    try: 
+        user = getCanvasUser (canvas, student_user_name)
+    except:
+        return user_not_found_error (event)
+
     if user:
         courses = user.get_courses(enrollment_status='active',include=['syllabus_body'])
 
@@ -362,12 +391,13 @@ def query_syllabus_for_student(event, canvas, student_user_name, course_name_to_
     return event
 
 
-"""
-function: validate_input
-This function checks whether the user is logged in
-Additionally, also checks if QnABot is configured with the required parameters
-"""
 def validate_input(event):
+    """
+    function: validate_input
+    This function checks whether the user is logged in
+    Additionally, also checks if QnABot is configured with the required parameters
+    """
+
     error_message = ''
 
     try:
@@ -386,10 +416,11 @@ def validate_input(event):
         return error_message
 
 
-"""
-function to remove HTML tags
-"""
 def remove_HTML_tags (strInput):
+    """
+    function to remove HTML tags
+    """
+
     #parse html input string
     objBSoup = BeautifulSoup(strInput, "html.parser")
 
@@ -401,19 +432,33 @@ def remove_HTML_tags (strInput):
     return ' '.join(objBSoup.stripped_strings)
 
 
-"""
-function to return SSML output
-"""
 def get_SSML_output (strInput):
+    """
+    function to return SSML output
+    """
+
     #parse html input string
     return "<speak>" + remove_HTML_tags(strInput) + "</speak>"
 
 
-"""
-function to set alt messages
-"""
 def set_alt_message (event, strInput):
+    """
+    function to set alt messages
+    """
+
     # set markdown output
     event['res']['session']['appContext']['altMessages']['markdown'] = strInput
     # set ssml output
     event['res']['session']['appContext']['altMessages']['ssml'] = get_SSML_output (strInput)
+
+
+def user_not_found_error(event): 
+    """
+    function to return error message when user id does not exist in Canvas LMS
+    """
+
+    print ("user_not_found_error")
+    return_message = "There was an error processing your request. Please check your login and try again, or contact your administrator."
+    set_alt_message (event, return_message)
+
+    return event

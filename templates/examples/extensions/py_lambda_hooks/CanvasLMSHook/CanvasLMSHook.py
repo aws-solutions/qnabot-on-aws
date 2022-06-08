@@ -13,15 +13,16 @@ api_token = '' #variable to hold the value of API_Token stored in AWS Secrets Ma
 canvas = None   #variable to hold the Canvas object
 
 
-"""
-function handler
-Main handler function
-This function processes:
-a. lambda hook arguments
-b. processes user input
-c. provides response back to the user
-"""
 def handler(event, context):
+    """
+    function handler
+    Main handler function
+    This function processes:
+    a. lambda hook arguments
+    b. processes user input
+    c. provides response back to the user
+    """
+
     global api_token
     global canvas
 
