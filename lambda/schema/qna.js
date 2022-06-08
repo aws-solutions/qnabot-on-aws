@@ -27,17 +27,44 @@ module.exports={
             maxLength:8000,
             propertyOrder: 3
         },
+        alt:{
+            type:"object",
+            description:"Alternate Answers",
+            properties:{
+                ssml:{
+                    type:"string",
+                    title:"SSML Answer",
+                    description:"Alternate SSML answer",
+                    maxLength:8000,
+                    propertyOrder: 1
+                },
+                markdown:{
+                    type:"string",
+                    title:"Markdown Answer",
+                    description:"Alternate Markdown answer",
+                    maxLength:8000,
+                    propertyOrder: 0
+                },
+            },
+            propertyOrder: 4
+        },
+        t:{
+            type:"string",
+            description:"Assign a topic to this item, to support follow up questions on the same topic. (Sets session attribute 'topic' in response). Topics cannot be used if enableLexIntent is enabled.",
+            title:"Topic",
+            propertyOrder: 5
+        },
         enableQidIntent: {
             title: "Create a dedicated bot intent for this item during LEX REBUILD",
             description: "Enable to support use of slots in questions. WARNING: Enabling Intents prevents use of QnABot Topics, ClientFilters, and multi-language text interactions when bot locale does not match user's language.",
             type : "boolean",
-            propertyOrder: 5,
+            propertyOrder: 6,
         },
         slots:{
             title: "Slots",
             description:"Define slots referenced in the questions above, if any.",
             type:"array",
-            propertyOrder: 6,
+            propertyOrder: 7,
             items:{
                 type:"object",
                 properties:{
@@ -105,13 +132,58 @@ module.exports={
                     }
                 },
             },
-            propertyOrder: 6
+            propertyOrder: 8
         },
-        t:{
-            type:"string",
-            description:"Assign a topic to this item, to support follow up questions on the same topic. (Sets session attribute 'topic' in response). Topics cannot be used if enableLexIntent is enabled.",
-            title:"Topic",
-            propertyOrder: 9
+        r:{
+            title:"Response card",
+            description:"Attach images and/or buttons to your answer. A reponse card must have an imageUrl or at least one button.",
+            type:"object",
+            properties:{
+                title:{
+                    type:"string",
+                    title:"Card Title",
+                    description:"Required - max length of 80 after handlebars processing",
+                    propertyOrder: 0
+                },
+                subTitle:{
+                    type:"string",
+                    title:"Card Subtitle",
+                    description:"Optional - max length of 80 after handlebars processing",
+                    propertyOrder: 1
+                },
+                imageUrl:{
+                    type:"string",
+                    description:"Optional",
+                    title:"Card Image Url",
+                    maxLength:2000,
+                    propertyOrder: 2
+                },
+                buttons:{
+                    title:"Lex Buttons",
+                    description:"Add buttons for Amazon Lex client users. NOTE: Standard Amazon Lex clients will display up to 5 buttons only (Lex limit) - this limit does not apply to Lex-Web-UI version 0.16 or later.",
+                    type:"array",
+                    items:{
+                        title:"Button",
+                        type:"object",
+                        properties:{
+                            text: {
+                                title: "Display Text",
+                                type : "string",
+                                propertyOrder: 0
+                            },
+                            value: {
+                                title: "Button Value",
+                                type : "string",
+                                propertyOrder: 1
+                            }
+                        },
+                        required:["text","value"]
+                    },   
+                    propertyOrder: 3
+                }
+            },
+            propertyOrder:9,
+            required:["title"]
         },
         kendraRedirectQueryText:{
             type:"string",
@@ -167,7 +239,13 @@ module.exports={
             maxLength:100,
             propertyOrder:16
         },    
-
+        rp:{
+            type:"string",
+            title:"Alexa Reprompt",
+            description:"Enter the Alexa reprompt to returned if the user does not respond. (SSML autodetection with &lt;speak&gt;&lt;/speak&gt;)",
+            maxLength:8000,
+            propertyOrder: 17
+        },
     },
     required:["qid","q","a"]
 };
