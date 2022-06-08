@@ -3,13 +3,14 @@
  * SlotTypes, Intents, and Bots for elicit response bots.
  *
  */
-const botDateVersion = process.env.npm_package_version + " - v1";  // CHANGE ME TO FORCE BOT REBUILD
+const botDateVersion = process.env.npm_package_version + " - v2";  // CHANGE ME TO FORCE BOT REBUILD
 
 var _ = require('lodash');
 
 exports.resources = {
     "BotRuntimeRole": {
         "Type": "AWS::IAM::Role",
+        "Condition": "CreateLexResponseBots",
         "Properties": {
             "AssumeRolePolicyDocument": {
                 "Version": "2012-10-17",
@@ -62,6 +63,7 @@ exports.resources = {
     },
     "ResponseBotQNAWageV2": {
         "Type": "AWS::Lex::Bot",
+        "Condition": "CreateLexResponseBots",
         "DependsOn": "BotRuntimeRole",
         "Properties": {
             "AutoBuildBotLocales": true,
@@ -145,6 +147,7 @@ exports.resources = {
         "DeletionPolicy": "Retain",
         "UpdateReplacePolicy": "Retain",
         "Type": "AWS::Lex::BotVersion",
+        "Condition": "CreateLexResponseBots",
         "Properties": {
             "BotId": {"Ref": "ResponseBotQNAWageV2"},
             "BotVersionLocaleSpecification": [{
@@ -159,6 +162,7 @@ exports.resources = {
     "ResponseBotQNAWageAliasV2": {
         "DeletionPolicy": "Retain",
         "Type": "AWS::Lex::BotAlias",
+        "Condition": "CreateLexResponseBots",
         "Properties": {
             "BotId": {"Ref": "ResponseBotQNAWageV2"},
             "BotAliasName": "live",
@@ -178,6 +182,7 @@ exports.resources = {
     "ResponseBotQNASocialSecurityV2": {
         "Type": "AWS::Lex::Bot",
         "DependsOn": ["BotRuntimeRole"],
+        "Condition": "CreateLexResponseBots",
         "Properties": {
             "Name": {"Fn::Sub": "ResponseBot-QNASocialSecurityV2-${AWS::StackName}"},
             "DataPrivacy": {"ChildDirected": false},
@@ -260,6 +265,7 @@ exports.resources = {
         "DeletionPolicy": "Retain",
         "UpdateReplacePolicy": "Retain",
         "Type": "AWS::Lex::BotVersion",
+        "Condition": "CreateLexResponseBots",
         "Properties": {
             "BotId": {"Ref": "ResponseBotQNASocialSecurityV2"},
             "BotVersionLocaleSpecification": [{
@@ -274,6 +280,7 @@ exports.resources = {
     "ResponseBotQNASocialSecurityAliasV2": {
         "DeletionPolicy": "Retain",
         "Type": "AWS::Lex::BotAlias",
+        "Condition": "CreateLexResponseBots",
         "Properties": {
             "BotId": {"Ref": "ResponseBotQNASocialSecurityV2"},
             "BotAliasName": "live",
@@ -293,6 +300,7 @@ exports.resources = {
     "ResponseBotQNAPinV2": {
         "Type": "AWS::Lex::Bot",
         "DependsOn": ["BotRuntimeRole"],
+        "Condition": "CreateLexResponseBots",
         "Properties": {
             "Name": {"Fn::Sub": "ResponseBot-QNAPinV2-${AWS::StackName}"},
             "DataPrivacy": {"ChildDirected": false},
@@ -375,6 +383,7 @@ exports.resources = {
         "DeletionPolicy": "Retain",
         "UpdateReplacePolicy": "Retain",
         "Type": "AWS::Lex::BotVersion",
+        "Condition": "CreateLexResponseBots",
         "Properties": {
             "BotId": {"Ref": "ResponseBotQNAPinV2"},
             "BotVersionLocaleSpecification": [{
@@ -389,6 +398,7 @@ exports.resources = {
     "ResponseBotQNAPinAliasV2": {
         "DeletionPolicy": "Retain",
         "Type": "AWS::Lex::BotAlias",
+        "Condition": "CreateLexResponseBots",
         "Properties": {
             "BotId": {"Ref": "ResponseBotQNAPinV2"},
             "BotAliasName": "live",
@@ -408,6 +418,7 @@ exports.resources = {
     "ResponseBotQNAPinNoConfirmV2": {
         "Type": "AWS::Lex::Bot",
         "DependsOn": ["BotRuntimeRole","ResponseBotQNAPinV2"],
+        "Condition": "CreateLexResponseBots",
         "Properties": {
             "Name": {"Fn::Sub": "ResponseBot-QNAPinNoConfirmV2-${AWS::StackName}"},
             "DataPrivacy": {"ChildDirected": false},
@@ -477,6 +488,7 @@ exports.resources = {
         "DeletionPolicy": "Retain",
         "UpdateReplacePolicy": "Retain",
         "Type": "AWS::Lex::BotVersion",
+        "Condition": "CreateLexResponseBots",
         "Properties": {
             "BotId": {"Ref": "ResponseBotQNAPinNoConfirmV2"},
             "BotVersionLocaleSpecification": [{
@@ -491,6 +503,7 @@ exports.resources = {
     "ResponseBotQNAPinNoConfirmAliasV2": {
         "DeletionPolicy": "Retain",
         "Type": "AWS::Lex::BotAlias",
+        "Condition": "CreateLexResponseBots",
         "Properties": {
             "BotId": {"Ref": "ResponseBotQNAPinNoConfirmV2"},
             "BotAliasName": "live",
@@ -510,6 +523,7 @@ exports.resources = {
     "ResponseBotQNAYesNoV2": {
         "Type": "AWS::Lex::Bot",
         "DependsOn": ["BotRuntimeRole","ResponseBotQNAPinV2"],
+        "Condition": "CreateLexResponseBots",
         "Properties": {
             "Name": {"Fn::Sub": "ResponseBot-QNAYesNoV2-${AWS::StackName}"},
             "DataPrivacy": {"ChildDirected": false},
@@ -603,6 +617,7 @@ exports.resources = {
         "DeletionPolicy": "Retain",
         "UpdateReplacePolicy": "Retain",
         "Type": "AWS::Lex::BotVersion",
+        "Condition": "CreateLexResponseBots",
         "Properties": {
             "BotId": {"Ref": "ResponseBotQNAYesNoV2"},
             "BotVersionLocaleSpecification": [{
@@ -617,6 +632,7 @@ exports.resources = {
     "ResponseBotQNAYesNoAliasV2": {
         "DeletionPolicy": "Retain",
         "Type": "AWS::Lex::BotAlias",
+        "Condition": "CreateLexResponseBots",
         "Properties": {
             "BotId": {"Ref": "ResponseBotQNAYesNoV2"},
             "BotAliasName": "live",
@@ -636,6 +652,7 @@ exports.resources = {
     "ResponseBotQNAYesNoExitV2": {
         "Type": "AWS::Lex::Bot",
         "DependsOn": ["BotRuntimeRole","ResponseBotQNAPinV2"],
+        "Condition": "CreateLexResponseBots",
         "Properties": {
             "Name": {"Fn::Sub": "ResponseBot-QNAYesNoExitV2-${AWS::StackName}"},
             "DataPrivacy": {"ChildDirected": false},
@@ -744,6 +761,7 @@ exports.resources = {
         "DeletionPolicy": "Retain",
         "UpdateReplacePolicy": "Retain",
         "Type": "AWS::Lex::BotVersion",
+        "Condition": "CreateLexResponseBots",
         "Properties": {
             "BotId": {"Ref": "ResponseBotQNAYesNoExitV2"},
             "BotVersionLocaleSpecification": [{
@@ -758,6 +776,7 @@ exports.resources = {
     "ResponseBotQNAYesNoExitAliasV2": {
         "DeletionPolicy": "Retain",
         "Type": "AWS::Lex::BotAlias",
+        "Condition": "CreateLexResponseBots",
         "Properties": {
             "BotId": {"Ref": "ResponseBotQNAYesNoExitV2"},
             "BotAliasName": "live",
@@ -775,6 +794,7 @@ exports.resources = {
     },
     "ResponseBotQNADateV2": {
         "Type": "AWS::Lex::Bot",
+        "Condition": "CreateLexResponseBots",
         "DependsOn": ["BotRuntimeRole","ResponseBotQNAYesNoExitV2"],
         "Properties": {
             "Name": {"Fn::Sub": "ResponseBot-QNADateV2-${AWS::StackName}"},
@@ -851,6 +871,7 @@ exports.resources = {
         "DeletionPolicy": "Retain",
         "UpdateReplacePolicy": "Retain",
         "Type": "AWS::Lex::BotVersion",
+        "Condition": "CreateLexResponseBots",
         "Properties": {
             "BotId": {"Ref": "ResponseBotQNADateV2"},
             "BotVersionLocaleSpecification": [{
@@ -865,6 +886,7 @@ exports.resources = {
     "ResponseBotQNADateAliasV2": {
         "DeletionPolicy": "Retain",
         "Type": "AWS::Lex::BotAlias",
+        "Condition": "CreateLexResponseBots",
         "Properties": {
             "BotId": {"Ref": "ResponseBotQNADateV2"},
             "BotAliasName": "live",
@@ -883,6 +905,7 @@ exports.resources = {
 
     "ResponseBotQNADateNoConfirmV2": {
         "Type": "AWS::Lex::Bot",
+        "Condition": "CreateLexResponseBots",
         "DependsOn": ["BotRuntimeRole","ResponseBotQNAYesNoExitV2"],
         "Properties": {
             "Name": {"Fn::Sub": "ResponseBot-QNADateNoConfirmV2-${AWS::StackName}"},
@@ -946,6 +969,7 @@ exports.resources = {
         "DeletionPolicy": "Retain",
         "UpdateReplacePolicy": "Retain",
         "Type": "AWS::Lex::BotVersion",
+        "Condition": "CreateLexResponseBots",
         "Properties": {
             "BotId": {"Ref": "ResponseBotQNADateNoConfirmV2"},
             "BotVersionLocaleSpecification": [{
@@ -960,6 +984,7 @@ exports.resources = {
     "ResponseBotQNADateNoConfirmAliasV2": {
         "DeletionPolicy": "Retain",
         "Type": "AWS::Lex::BotAlias",
+        "Condition": "CreateLexResponseBots",
         "Properties": {
             "BotId": {"Ref": "ResponseBotQNADateNoConfirmV2"},
             "BotAliasName": "live",
@@ -978,6 +1003,7 @@ exports.resources = {
 
     "ResponseBotQNADayOfWeekV2": {
         "Type": "AWS::Lex::Bot",
+        "Condition": "CreateLexResponseBots",
         "DependsOn": ["BotRuntimeRole","ResponseBotQNAYesNoExitV2"],
         "Properties": {
             "Name": {"Fn::Sub": "ResponseBot-QNADayOfWeekV2-${AWS::StackName}"},
@@ -1109,6 +1135,7 @@ exports.resources = {
         "DeletionPolicy": "Retain",
         "UpdateReplacePolicy": "Retain",
         "Type": "AWS::Lex::BotVersion",
+        "Condition": "CreateLexResponseBots",
         "Properties": {
             "BotId": {"Ref": "ResponseBotQNADayOfWeekV2"},
             "BotVersionLocaleSpecification": [{
@@ -1123,6 +1150,7 @@ exports.resources = {
     "ResponseBotQNADayOfWeekAliasV2": {
         "DeletionPolicy": "Retain",
         "Type": "AWS::Lex::BotAlias",
+        "Condition": "CreateLexResponseBots",
         "Properties": {
             "BotId": {"Ref": "ResponseBotQNADayOfWeekV2"},
             "BotAliasName": "live",
@@ -1141,6 +1169,7 @@ exports.resources = {
 
     "ResponseBotQNAMonthV2": {
         "Type": "AWS::Lex::Bot",
+        "Condition": "CreateLexResponseBots",
         "DependsOn": ["BotRuntimeRole","ResponseBotQNADayOfWeekV2"],
         "Properties": {
             "Name": {"Fn::Sub": "ResponseBot-QNAMonthV2-${AWS::StackName}"},
@@ -1297,6 +1326,7 @@ exports.resources = {
         "DeletionPolicy": "Retain",
         "UpdateReplacePolicy": "Retain",
         "Type": "AWS::Lex::BotVersion",
+        "Condition": "CreateLexResponseBots",
         "Properties": {
             "BotId": {"Ref": "ResponseBotQNAMonthV2"},
             "BotVersionLocaleSpecification": [{
@@ -1311,6 +1341,7 @@ exports.resources = {
     "ResponseBotQNAMonthAliasV2": {
         "DeletionPolicy": "Retain",
         "Type": "AWS::Lex::BotAlias",
+        "Condition": "CreateLexResponseBots",
         "Properties": {
             "BotId": {"Ref": "ResponseBotQNAMonthV2"},
             "BotAliasName": "live",
@@ -1329,6 +1360,7 @@ exports.resources = {
 
     "ResponseBotQNAMonthNoConfirmV2": {
         "Type": "AWS::Lex::Bot",
+        "Condition": "CreateLexResponseBots",
         "DependsOn": ["BotRuntimeRole","ResponseBotQNADayOfWeekV2"],
         "Properties": {
             "Name": {"Fn::Sub": "ResponseBot-QNAMonthNoConfirmV2-${AWS::StackName}"},
@@ -1472,6 +1504,7 @@ exports.resources = {
         "DeletionPolicy": "Retain",
         "UpdateReplacePolicy": "Retain",
         "Type": "AWS::Lex::BotVersion",
+        "Condition": "CreateLexResponseBots",
         "Properties": {
             "BotId": {"Ref": "ResponseBotQNAMonthNoConfirmV2"},
             "BotVersionLocaleSpecification": [{
@@ -1486,6 +1519,7 @@ exports.resources = {
     "ResponseBotQNAMonthNoConfirmAliasV2": {
         "DeletionPolicy": "Retain",
         "Type": "AWS::Lex::BotAlias",
+        "Condition": "CreateLexResponseBots",
         "Properties": {
             "BotId": {"Ref": "ResponseBotQNAMonthNoConfirmV2"},
             "BotAliasName": "live",
@@ -1504,6 +1538,7 @@ exports.resources = {
 
     "ResponseBotQNANumberV2": {
         "Type": "AWS::Lex::Bot",
+        "Condition": "CreateLexResponseBots",
         "DependsOn": ["BotRuntimeRole","ResponseBotQNADayOfWeekV2"],
         "Properties": {
             "Name": {"Fn::Sub": "ResponseBot-QNANumberV2-${AWS::StackName}"},
@@ -1575,6 +1610,7 @@ exports.resources = {
         "DeletionPolicy": "Retain",
         "UpdateReplacePolicy": "Retain",
         "Type": "AWS::Lex::BotVersion",
+        "Condition": "CreateLexResponseBots",
         "Properties": {
             "BotId": {"Ref": "ResponseBotQNANumberV2"},
             "BotVersionLocaleSpecification": [{
@@ -1589,6 +1625,7 @@ exports.resources = {
     "ResponseBotQNANumberAliasV2": {
         "DeletionPolicy": "Retain",
         "Type": "AWS::Lex::BotAlias",
+        "Condition": "CreateLexResponseBots",
         "Properties": {
             "BotId": {"Ref": "ResponseBotQNANumberV2"},
             "BotAliasName": "live",
@@ -1607,6 +1644,7 @@ exports.resources = {
 
     "ResponseBotQNANumberNoConfirmV2": {
         "Type": "AWS::Lex::Bot",
+        "Condition": "CreateLexResponseBots",
         "DependsOn": ["BotRuntimeRole","ResponseBotQNANumberV2"],
         "Properties": {
             "Name": {"Fn::Sub": "ResponseBot-QNANumberNoConfirmV2-${AWS::StackName}"},
@@ -1665,6 +1703,7 @@ exports.resources = {
         "DeletionPolicy": "Retain",
         "UpdateReplacePolicy": "Retain",
         "Type": "AWS::Lex::BotVersion",
+        "Condition": "CreateLexResponseBots",
         "Properties": {
             "BotId": {"Ref": "ResponseBotQNANumberNoConfirmV2"},
             "BotVersionLocaleSpecification": [{
@@ -1679,6 +1718,7 @@ exports.resources = {
     "ResponseBotQNANumberNoConfirmAliasV2": {
         "DeletionPolicy": "Retain",
         "Type": "AWS::Lex::BotAlias",
+        "Condition": "CreateLexResponseBots",
         "Properties": {
             "BotId": {"Ref": "ResponseBotQNANumberNoConfirmV2"},
             "BotAliasName": "live",
@@ -1697,6 +1737,7 @@ exports.resources = {
 
     "ResponseBotQNAAgeV2": {
         "Type": "AWS::Lex::Bot",
+        "Condition": "CreateLexResponseBots",
         "DependsOn": ["BotRuntimeRole","ResponseBotQNANumberV2"],
         "Properties": {
             "Name": {"Fn::Sub": "ResponseBot-QNAAgeV2-${AWS::StackName}"},
@@ -1776,6 +1817,7 @@ exports.resources = {
         "DeletionPolicy": "Retain",
         "UpdateReplacePolicy": "Retain",
         "Type": "AWS::Lex::BotVersion",
+        "Condition": "CreateLexResponseBots",
         "Properties": {
             "BotId": {"Ref": "ResponseBotQNAAgeV2"},
             "BotVersionLocaleSpecification": [{
@@ -1790,6 +1832,7 @@ exports.resources = {
     "ResponseBotQNAAgeAliasV2": {
         "DeletionPolicy": "Retain",
         "Type": "AWS::Lex::BotAlias",
+        "Condition": "CreateLexResponseBots",
         "Properties": {
             "BotId": {"Ref": "ResponseBotQNAAgeV2"},
             "BotAliasName": "live",
@@ -1809,6 +1852,7 @@ exports.resources = {
     "ResponseBotQNAAgeNoConfirmV2": {
         "Type": "AWS::Lex::Bot",
         "DependsOn": ["BotRuntimeRole","ResponseBotQNANumberV2"],
+        "Condition": "CreateLexResponseBots",
         "Properties": {
             "Name": {"Fn::Sub": "ResponseBot-QNAAgeNoConfirmV2-${AWS::StackName}"},
             "DataPrivacy": {"ChildDirected": false},
@@ -1874,6 +1918,7 @@ exports.resources = {
         "DeletionPolicy": "Retain",
         "UpdateReplacePolicy": "Retain",
         "Type": "AWS::Lex::BotVersion",
+        "Condition": "CreateLexResponseBots",
         "Properties": {
             "BotId": {"Ref": "ResponseBotQNAAgeNoConfirmV2"},
             "BotVersionLocaleSpecification": [{
@@ -1888,6 +1933,7 @@ exports.resources = {
     "ResponseBotQNAAgeNoConfirmAliasV2": {
         "DeletionPolicy": "Retain",
         "Type": "AWS::Lex::BotAlias",
+        "Condition": "CreateLexResponseBots",
         "Properties": {
             "BotId": {"Ref": "ResponseBotQNAAgeNoConfirmV2"},
             "BotAliasName": "live",
@@ -1906,6 +1952,7 @@ exports.resources = {
 
     "ResponseBotQNAPhoneNumberV2": {
         "Type": "AWS::Lex::Bot",
+        "Condition": "CreateLexResponseBots",
         "DependsOn": ["BotRuntimeRole","ResponseBotQNAAgeNoConfirmV2"],
         "Properties": {
             "Name": {"Fn::Sub": "ResponseBot-QNAPhoneNumberV2-${AWS::StackName}"},
@@ -1977,6 +2024,7 @@ exports.resources = {
         "DeletionPolicy": "Retain",
         "UpdateReplacePolicy": "Retain",
         "Type": "AWS::Lex::BotVersion",
+        "Condition": "CreateLexResponseBots",
         "Properties": {
             "BotId": {"Ref": "ResponseBotQNAPhoneNumberV2"},
             "BotVersionLocaleSpecification": [{
@@ -1991,6 +2039,7 @@ exports.resources = {
     "ResponseBotQNAPhoneNumberAliasV2": {
         "DeletionPolicy": "Retain",
         "Type": "AWS::Lex::BotAlias",
+        "Condition": "CreateLexResponseBots",
         "Properties": {
             "BotId": {"Ref": "ResponseBotQNAPhoneNumberV2"},
             "BotAliasName": "live",
@@ -2009,6 +2058,7 @@ exports.resources = {
 
     "ResponseBotQNAPhoneNumberNoConfirmV2": {
         "Type": "AWS::Lex::Bot",
+        "Condition": "CreateLexResponseBots",
         "DependsOn": ["BotRuntimeRole", "ResponseBotQNAAgeNoConfirmV2"],
         "Properties": {
             "Name": {"Fn::Sub": "ResponseBot-QNAPhoneNumberNoConfirmV2-${AWS::StackName}"},
@@ -2067,6 +2117,7 @@ exports.resources = {
         "DeletionPolicy": "Retain",
         "UpdateReplacePolicy": "Retain",
         "Type": "AWS::Lex::BotVersion",
+        "Condition": "CreateLexResponseBots",
         "Properties": {
             "BotId": {"Ref": "ResponseBotQNAPhoneNumberNoConfirmV2"},
             "BotVersionLocaleSpecification": [{
@@ -2081,6 +2132,7 @@ exports.resources = {
     "ResponseBotQNAPhoneNumberNoConfirmAliasV2": {
         "DeletionPolicy": "Retain",
         "Type": "AWS::Lex::BotAlias",
+        "Condition": "CreateLexResponseBots",
         "Properties": {
             "BotId": {"Ref": "ResponseBotQNAPhoneNumberNoConfirmV2"},
             "BotAliasName": "live",
@@ -2099,6 +2151,7 @@ exports.resources = {
 
     "ResponseBotQNATimeV2": {
         "Type": "AWS::Lex::Bot",
+        "Condition": "CreateLexResponseBots",
         "DependsOn": ["BotRuntimeRole","ResponseBotQNAAgeNoConfirmV2"],
         "Properties": {
             "Name": {"Fn::Sub": "ResponseBot-QNATimeV2-${AWS::StackName}"},
@@ -2171,6 +2224,7 @@ exports.resources = {
         "DeletionPolicy": "Retain",
         "UpdateReplacePolicy": "Retain",
         "Type": "AWS::Lex::BotVersion",
+        "Condition": "CreateLexResponseBots",
         "Properties": {
             "BotId": {"Ref": "ResponseBotQNATimeV2"},
             "BotVersionLocaleSpecification": [{
@@ -2185,6 +2239,7 @@ exports.resources = {
     "ResponseBotQNATimeAliasV2": {
         "DeletionPolicy": "Retain",
         "Type": "AWS::Lex::BotAlias",
+        "Condition": "CreateLexResponseBots",
         "Properties": {
             "BotId": {"Ref": "ResponseBotQNATimeV2"},
             "BotAliasName": "live",
@@ -2204,6 +2259,7 @@ exports.resources = {
     "ResponseBotQNAEmailAddressV2": {
         "Type": "AWS::Lex::Bot",
         "DependsOn": ["BotRuntimeRole","ResponseBotQNATimeV2"],
+        "Condition": "CreateLexResponseBots",
         "Properties": {
             "Name": {"Fn::Sub": "ResponseBot-QNAEmailAddressV2-${AWS::StackName}"},
             "DataPrivacy": {"ChildDirected": false},
@@ -2273,6 +2329,7 @@ exports.resources = {
         "DeletionPolicy": "Retain",
         "UpdateReplacePolicy": "Retain",
         "Type": "AWS::Lex::BotVersion",
+        "Condition": "CreateLexResponseBots",
         "Properties": {
             "BotId": {"Ref": "ResponseBotQNAEmailAddressV2"},
             "BotVersionLocaleSpecification": [{
@@ -2287,6 +2344,7 @@ exports.resources = {
     "ResponseBotQNAEmailAddressAliasV2": {
         "DeletionPolicy": "Retain",
         "Type": "AWS::Lex::BotAlias",
+        "Condition": "CreateLexResponseBots",
         "Properties": {
             "BotId": {"Ref": "ResponseBotQNAEmailAddressV2"},
             "BotAliasName": "live",
@@ -2305,6 +2363,7 @@ exports.resources = {
 
     "ResponseBotQNANameV2": {
         "Type": "AWS::Lex::Bot",
+        "Condition": "CreateLexResponseBots",
         "DependsOn": ["BotRuntimeRole","ResponseBotQNATimeV2"],
         "Properties": {
             "Name": {"Fn::Sub": "ResponseBot-QNANameV2-${AWS::StackName}"},
@@ -2396,6 +2455,7 @@ exports.resources = {
         "DeletionPolicy": "Retain",
         "UpdateReplacePolicy": "Retain",
         "Type": "AWS::Lex::BotVersion",
+        "Condition": "CreateLexResponseBots",
         "Properties": {
             "BotId": {"Ref": "ResponseBotQNANameV2"},
             "BotVersionLocaleSpecification": [{
@@ -2410,6 +2470,7 @@ exports.resources = {
     "ResponseBotQNANameAliasV2": {
         "DeletionPolicy": "Retain",
         "Type": "AWS::Lex::BotAlias",
+        "Condition": "CreateLexResponseBots",
         "Properties": {
             "BotId": {"Ref": "ResponseBotQNANameV2"},
             "BotAliasName": "live",
@@ -2436,6 +2497,5 @@ exports.names = [
 
 
 exports.outputs = _.fromPairs(exports.names.map(x => {
-    return [x, {Value: {"Fn::Join": ["", ["LexV2::", {"Ref": "ResponseBot" + x + "V2"}, "/", {"Fn::GetAtt": ["ResponseBot" + x + "AliasV2", "BotAliasId"]}, "/", "en_US"]]}}];
+    return [x, {Value: {"Fn::If": ["CreateLexResponseBots", {"Fn::Join": ["", ["LexV2::", {"Ref": "ResponseBot" + x + "V2"}, "/", {"Fn::GetAtt": ["ResponseBot" + x + "AliasV2", "BotAliasId"]}, "/", "en_US"]]}, "ReponseBots disabled during stack create/update"]}}];
 }));
-

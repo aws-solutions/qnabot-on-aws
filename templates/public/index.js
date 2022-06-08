@@ -43,6 +43,7 @@ module.exports=Promise.resolve(require('../master')).then(function(base){
         "PublicOrPrivate",
         "LexV2BotLocaleIds",
         "LexBotVersion",
+        "InstallLexResponseBots",
         "FulfillmentConcurrency",
         "XraySetting"
     ]);
