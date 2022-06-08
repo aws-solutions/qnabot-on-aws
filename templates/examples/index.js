@@ -28,8 +28,6 @@ module.exports={
     "FeedbackFirehoseName":{"Type":"String"},
     "CFNLambda":{"Type":"String"},
     "CFNLambdaRole":  {"Type":"String"},
-    "LexV2CFNLambdaARN": {"Type":"String"},
-    "LexV2ServiceLinkedRoleARN": {"Type":"String"},
     "ApiUrlName":{"Type":"String"},
     "AssetBucket":{"Type":"String"},
     "QIDLambdaArn":{"Type":"String"},
@@ -37,7 +35,8 @@ module.exports={
     "VPCSecurityGroupIdList": {"Type": "String"},
     "LexBotVersion": {"Type": "String"},
     "XraySetting": {"Type": "String"},
-    "DefaultQnABotSettings": {"Type":"String"}
+    "DefaultQnABotSettings": {"Type":"String"},
+    "InstallLexResponseBots": {"Type":"String"},
   },
    "Conditions": {
     "VPCEnabled": { "Fn::Not": [
@@ -45,6 +44,8 @@ module.exports={
       ] },
     "XRAYEnabled":{"Fn::Equals":[{"Ref":"XraySetting"},"TRUE"]},
     "CreateLexV1Bots":{"Fn::Equals":[{"Ref":"LexBotVersion"},"LexV1 and LexV2"]},
+    "CreateLexResponseBots":{"Fn::Equals":[{"Ref":"InstallLexResponseBots"},"true"]},
+    "CreateLexV1ResponseBots":{"Fn::And":[{"Condition":"CreateLexResponseBots"}, {"Condition":"CreateLexV1Bots"}]},
     }
   }
 

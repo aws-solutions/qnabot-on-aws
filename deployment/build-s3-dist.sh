@@ -107,7 +107,6 @@ cp build/templates/master.json $template_dist_dir/aws-qnabot-extended.template
 cp build/templates/export.json $template_dist_dir/export.template
 cp build/templates/import.json $template_dist_dir/import.template
 cp build/templates/testall.json $template_dist_dir/testall.template
-# 5th nested stack (LexV2CfnCr) is import from public SAR
 
 echo "------------------------------------------------------------------------------"
 echo "[Init] Copying lambda assets to regional-s3-assets/"
