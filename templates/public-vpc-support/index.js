@@ -107,6 +107,7 @@ module.exports=Promise.resolve(require('../master')).then(function(base){
     base.Conditions.BuildExamples={"Fn::Equals":[true,true]}
     base.Conditions.CreateDomain={"Fn::Equals":[true,true]}
     base.Conditions.DontCreateDomain={"Fn::Equals":[true,false]}
+    base.Conditions.SingleNode={"Fn::Equals":[{"Ref":"ElasticSearchNodeCount"},"1"]}
     base.Conditions.VPCEnabled={ "Fn::Not": [
             { "Fn::Equals": [ "",
                     { "Fn::Join": [ "", { "Ref": "VPCSecurityGroupIdList" } ] }
