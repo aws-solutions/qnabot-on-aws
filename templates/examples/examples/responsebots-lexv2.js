@@ -2490,10 +2490,12 @@ exports.resources = {
 };
 
 
+
 exports.names = [
     "QNAWage", "QNASocialSecurity", "QNAPinNoConfirm", "QNAPin", "QNAYesNo", "QNAYesNoExit", "QNADate", "QNADateNoConfirm", "QNADayOfWeek", "QNAMonth", "QNAMonthNoConfirm",
     "QNANumber", "QNANumberNoConfirm", "QNAAge", "QNAAgeNoConfirm", "QNAPhoneNumber", "QNAPhoneNumberNoConfirm", "QNATime", "QNAEmailAddress", "QNAName"
 ];
+
 
 
 exports.outputs = _.fromPairs(exports.names.map(x => {
