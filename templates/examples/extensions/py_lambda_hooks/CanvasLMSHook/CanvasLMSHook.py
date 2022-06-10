@@ -41,7 +41,7 @@ def handler(event, context):
         # get the API domain. This will be needed for API calls and for looking up the bearer token.
         domain = event['req']['_settings']['CanvasLMS_DomainName'].strip()
         secrets_name = event['req']['_settings']['CanvasLMS_APIKey'].strip()
-        course_name_slot = event['req']['_settings']['CanvasLMS_CourseNameSlot'].strip()
+        course_name_slot = 'CanvasLMS_course_name_slot'
 
         try: 
             # get slot value if present
@@ -53,7 +53,7 @@ def handler(event, context):
         course_name_to_filter = course_name_slot_resolved_input
 
         if (course_name_slot_resolved_input == '' and course_name_slot_input != ''):
-            return_message = "Sorry, was unable to find the course you are looking for. Check the course name and try again."
+            return_message = "Sorry, was unable to find the course you are looking for. Check the course name and try again. You can also ask <i>what courses have i enrolled in</i>, to get a list of enrolled courses."
             set_alt_message (event, return_message)
             return event
 

@@ -160,7 +160,7 @@ def query_courses_for_student(event, canvas, student_user_name, course_name_to_f
 
     returned_course = result['Choice']
     if returned_course == 'N/A': 
-        return_message = "Sorry, was unable to find the course you are looking for. Check the course name and try again."
+        return_message = "Sorry, was unable to find the course you are looking for. Check the course name and try again. You can also ask <i>what courses have i enrolled in</i>, to get a list of enrolled courses."
         set_alt_message (event, return_message)
     else: 
         genericattachment = ['assignments','syllabus','grades']
@@ -220,7 +220,7 @@ def query_course_assignments_for_student(event, canvas, student_user_name, cours
                 blnHasAssignments = True
                 if course_name_to_filter != '' and course.name.upper().strip() != course_name_to_filter.upper():
                     # if a slot value is provided, but does not have a matching course that the student is enrolled in
-                    course_assignments = "Sorry, was unable to find the course you are looking for. Check the course name and try again."
+                    course_assignments = "Sorry, was unable to find the course you are looking for. Check the course name and try again. You can also ask <i>what courses have i enrolled in</i>, to get a list of enrolled courses."
                     break
 
                 if assignment.due_at:   #check if assignments have due dates
@@ -328,7 +328,7 @@ def query_grades_for_student(event, canvas, student_user_name, course_name_to_fi
                     break
                 elif course_name_to_filter != '':
                     # if a slot value is provided, but does not have a matching course that the student is enrolled in
-                    course_grades = "Sorry, was unable to find the course you are looking for. Check the course name and try again."
+                    course_grades = "Sorry, was unable to find the course you are looking for. Check the course name and try again. You can also ask <i>what courses have i enrolled in</i>, to get a list of enrolled courses."
                 else:
                     course_grades += "<li>Grades for {} course: {}. </li>".format(course_name.name, grade_score)
         else:
@@ -376,7 +376,7 @@ def query_syllabus_for_student(event, canvas, student_user_name, course_name_to_
                     break
                 elif course_name_to_filter != '':
                     # if a slot value is provided, but does not have a matching course that the student is enrolled in
-                    course_syllabus = "Sorry, was unable to find the course you are looking for. Check the course name and try again."
+                    course_syllabus = "Sorry, was unable to find the course you are looking for. Check the course name and try again. You can also ask <i>what courses have i enrolled in</i>, to get a list of enrolled courses."
                 else:
                     if course.syllabus_body.strip() != '':
                         course_syllabus += '<b>{0}</b>: {1}. <br>'.format(course.name, course.syllabus_body)

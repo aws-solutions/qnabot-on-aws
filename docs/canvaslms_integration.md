@@ -51,17 +51,8 @@ Once you have deployed the AWS QnABot solution, you will have access to the QnAB
 
     c. Click `ADD` button to add the new QnABot setting
 
-5. Create another Setting
-
-    a. Name: enter `CanvasLMS_CourseNameSlot` as the name
-
-    b. Value: use the value of the Course Name Slot you are using in the {qids}. For example: `CanvasLMS_course_name_slot`
-
-    c. Click `ADD` button to add the new QnABot setting
-
-6. Update the `IDENTITY_PROVIDER_JWKS_URLS` setting to add trusted Identity Providers (for example: from your Lex-Web-UI Cloudformation Outputs, using the `CognitoUserPoolPubKey` value).
-7. Scroll to the bottom of the Settings page and click `Save` button to update the setting.
-
+5. Update the `IDENTITY_PROVIDER_JWKS_URLS` setting to add trusted Identity Providers (for example: from your Lex-Web-UI Cloudformation Outputs, using the `CognitoUserPoolPubKey` value).
+6. Scroll to the bottom of the Settings page and click `Save` button to update the setting.
 
 
 ## Enabling Authentication

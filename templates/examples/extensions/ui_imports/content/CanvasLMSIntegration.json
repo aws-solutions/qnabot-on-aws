@@ -68,7 +68,8 @@
             "q": [
                 "tell me about my enrollments",
                 "what courses have i enrolled in",
-                "course enrollments"
+                "course enrollments", 
+                "what are my courses"
             ]
         },
         {
@@ -89,276 +90,217 @@
             "descr": "List of sample course names",
             "resolutionStrategyRestrict": true,
             "slotTypeValues": [{
-                    "samplevalue": "accounting",
-                    "synonyms": "accounting"
+                    "samplevalue": "accounting"
                 },
                 {
-                    "samplevalue": "american literature",
-                    "synonyms": "american literature"
+                    "samplevalue": "american literature"
                 },
                 {
-                    "samplevalue": "american literature history",
-                    "synonyms": "american literature history"
+                    "samplevalue": "american literature history"
                 },
                 {
-                    "samplevalue": "american sign language",
-                    "synonyms": "american sign language"
+                    "samplevalue": "american sign language"
                 },
                 {
-                    "samplevalue": "animal nutrition",
-                    "synonyms": "animal nutrition"
+                    "samplevalue": "animal nutrition"
                 },
                 {
-                    "samplevalue": "anthropology ",
-                    "synonyms": "anthropology "
+                    "samplevalue": "anthropology "
                 },
                 {
-                    "samplevalue": "business and marketing",
-                    "synonyms": "business and marketing"
+                    "samplevalue": "business and marketing"
                 },
                 {
-                    "samplevalue": "business communications",
-                    "synonyms": "business communications"
+                    "samplevalue": "business communications"
                 },
                 {
-                    "samplevalue": "business ethics",
-                    "synonyms": "business ethics"
+                    "samplevalue": "business ethics"
                 },
                 {
-                    "samplevalue": "business law",
-                    "synonyms": "business law"
+                    "samplevalue": "business law"
                 },
                 {
-                    "samplevalue": "business management",
-                    "synonyms": "business management"
+                    "samplevalue": "business management"
                 },
                 {
                     "samplevalue": "advertising design",
-                    "synonyms": "advertising design"
+                    "synonyms": "advertising"
                 },
                 {
                     "samplevalue": "aerospace engineering",
-                    "synonyms": "aerospace engineering"
+                    "synonyms": "aerospace"
                 },
                 {
-                    "samplevalue": "agriculture",
-                    "synonyms": "agriculture"
+                    "samplevalue": "agriculture"
                 },
                 {
-                    "samplevalue": "algebra",
-                    "synonyms": "algebra"
+                    "samplevalue": "algebra"
                 },
                 {
-                    "samplevalue": "architectural design",
-                    "synonyms": "architectural design"
+                    "samplevalue": "architectural design"
                 },
                 {
-                    "samplevalue": "art",
-                    "synonyms": "art"
+                    "samplevalue": "art"
                 },
                 {
-                    "samplevalue": "art history",
-                    "synonyms": "art history"
+                    "samplevalue": "art history"
                 },
                 {
-                    "samplevalue": "astronomy",
-                    "synonyms": "astronomy"
+                    "samplevalue": "astronomy"
                 },
                 {
                     "samplevalue": "banking and finance",
-                    "synonyms": "banking and finance"
+                    "synonyms": "banking, finance"
                 },
                 {
-                    "samplevalue": "biology",
-                    "synonyms": "biology"
+                    "samplevalue": "biology"
                 },
                 {
-                    "samplevalue": "botany",
-                    "synonyms": "botany"
+                    "samplevalue": "botany"
                 },
                 {
-                    "samplevalue": "chemistry",
-                    "synonyms": "chemistry"
+                    "samplevalue": "chemistry"
                 },
                 {
-                    "samplevalue": "civics",
-                    "synonyms": "civics"
+                    "samplevalue": "civics"
                 },
                 {
-                    "samplevalue": "civil engineering",
-                    "synonyms": "civil engineering"
+                    "samplevalue": "civil engineering"
                 },
                 {
-                    "samplevalue": "communications",
-                    "synonyms": "communications"
+                    "samplevalue": "communications"
                 },
                 {
-                    "samplevalue": "computer and information technology",
-                    "synonyms": "computer and information technology"
+                    "samplevalue": "computer and information technology"
                 },
                 {
-                    "samplevalue": "computer science",
-                    "synonyms": "computer science"
+                    "samplevalue": "computer science"
                 },
                 {
-                    "samplevalue": "cost accounting",
-                    "synonyms": "cost accounting"
+                    "samplevalue": "cost accounting"
                 },
                 {
-                    "samplevalue": "creative writing",
-                    "synonyms": "creative writing"
+                    "samplevalue": "creative writing"
                 },
                 {
-                    "samplevalue": "criminal justice",
-                    "synonyms": "criminal justice"
+                    "samplevalue": "criminal justice"
                 },
                 {
-                    "samplevalue": "cybersecurity",
+                    "samplevalue": "cyber security",
                     "synonyms": "cybersecurity"
                 },
                 {
                     "samplevalue": "earth and space science",
-                    "synonyms": "earth and space science"
+                    "synonyms": "earth, space science"
                 },
                 {
-                    "samplevalue": "education",
-                    "synonyms": "education"
+                    "samplevalue": "education"
                 },
                 {
-                    "samplevalue": "electronics",
-                    "synonyms": "electronics"
+                    "samplevalue": "electronics"
                 },
                 {
-                    "samplevalue": "environmental science",
-                    "synonyms": "environmental science"
+                    "samplevalue": "environmental science"
                 },
                 {
-                    "samplevalue": "fashion design",
-                    "synonyms": "fashion design"
+                    "samplevalue": "fashion design"
                 },
                 {
-                    "samplevalue": "health science",
-                    "synonyms": "health science"
+                    "samplevalue": "health science"
                 },
                 {
-                    "samplevalue": "humanities",
-                    "synonyms": "humanities"
+                    "samplevalue": "humanities"
                 },
                 {
-                    "samplevalue": "income tax accounting",
-                    "synonyms": "income tax accounting"
+                    "samplevalue": "income tax accounting"
                 },
                 {
-                    "samplevalue": "industrial arts",
-                    "synonyms": "industrial arts"
+                    "samplevalue": "industrial arts"
                 },
                 {
-                    "samplevalue": "industrial design",
-                    "synonyms": "industrial design"
+                    "samplevalue": "industrial design"
                 },
                 {
-                    "samplevalue": "information technology",
-                    "synonyms": "information technology"
+                    "samplevalue": "information technology"
                 },
                 {
-                    "samplevalue": "interactive design",
-                    "synonyms": "interactive design"
+                    "samplevalue": "interactive design"
                 },
                 {
-                    "samplevalue": "journalism",
-                    "synonyms": "journalism"
+                    "samplevalue": "journalism"
                 },
                 {
                     "samplevalue": "macro economics",
-                    "synonyms": "macroeconomics, macro economics"
+                    "synonyms": "macroeconomics"
                 },
                 {
                     "samplevalue": "micro economics",
-                    "synonyms": "microeconomics, micro economics"
+                    "synonyms": "microeconomics"
                 },
                 {
-                    "samplevalue": "microbiology",
+                    "samplevalue": "micro biology",
                     "synonyms": "microbiology"
                 },
                 {
-                    "samplevalue": "music",
-                    "synonyms": "music"
+                    "samplevalue": "music"
                 },
                 {
-                    "samplevalue": "nursing",
-                    "synonyms": "nursing"
+                    "samplevalue": "nursing"
                 },
                 {
-                    "samplevalue": "nutrition science",
-                    "synonyms": "nutrition science"
+                    "samplevalue": "nutrition science"
                 },
                 {
-                    "samplevalue": "philosophy",
-                    "synonyms": "philosophy"
+                    "samplevalue": "philosophy"
                 },
                 {
-                    "samplevalue": "photography",
-                    "synonyms": "photography"
+                    "samplevalue": "photography"
                 },
                 {
-                    "samplevalue": "physics",
-                    "synonyms": "physics"
+                    "samplevalue": "physics"
                 },
                 {
-                    "samplevalue": "physiology",
-                    "synonyms": "physiology"
+                    "samplevalue": "physiology"
                 },
                 {
-                    "samplevalue": "political science",
-                    "synonyms": "political science"
+                    "samplevalue": "political science"
                 },
                 {
-                    "samplevalue": "public policy",
-                    "synonyms": "public policy"
+                    "samplevalue": "public policy"
                 },
                 {
-                    "samplevalue": "public safety",
-                    "synonyms": "public safety"
+                    "samplevalue": "public safety"
                 },
                 {
-                    "samplevalue": "robotics",
-                    "synonyms": "robotics"
+                    "samplevalue": "robotics"
                 },
                 {
-                    "samplevalue": "science",
-                    "synonyms": "science"
+                    "samplevalue": "science"
                 },
                 {
-                    "samplevalue": "social media",
-                    "synonyms": "social media"
+                    "samplevalue": "social media"
                 },
                 {
-                    "samplevalue": "social science",
-                    "synonyms": "social science"
+                    "samplevalue": "social science"
                 },
                 {
-                    "samplevalue": "social studies",
-                    "synonyms": "social studies"
+                    "samplevalue": "social studies"
                 },
                 {
-                    "samplevalue": "statistics",
-                    "synonyms": "statistics"
+                    "samplevalue": "statistics"
                 },
                 {
                     "samplevalue": "travel and tourism",
-                    "synonyms": "travel and tourism"
+                    "synonyms": "travel, tourism"
                 },
                 {
-                    "samplevalue": "visual arts",
-                    "synonyms": "visual arts"
+                    "samplevalue": "visual arts"
                 },
                 {
-                    "samplevalue": "world history",
-                    "synonyms": "world history"
+                    "samplevalue": "world history"
                 },
                 {
-                    "samplevalue": "zoology",
-                    "synonyms": "zoology"
+                    "samplevalue": "zoology"
                 }
 
             ],
