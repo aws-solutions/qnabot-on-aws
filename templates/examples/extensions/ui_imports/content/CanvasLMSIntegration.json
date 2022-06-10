@@ -60,6 +60,7 @@
         {
             "qid": "CanvasLMS.enrollments",
             "a": "Here are the courses you are enrolled in:",
+            "enableQidIntent": true,
             "l": "QNA:EXTCanvasLMSHook",
             "args": [
                 "{\"Query\": \"CourseEnrollments\"}"
@@ -75,6 +76,7 @@
         {
             "qid": "CanvasLMS.announcements",
             "a": "Here are your announcements:",
+            "enableQidIntent": true,
             "l": "QNA:EXTCanvasLMSHook",
             "args": [
                 "{\"Query\": \"AnnouncementsForStudent\"}"
