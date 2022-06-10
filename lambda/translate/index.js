@@ -3,7 +3,7 @@ const AWS = require("aws-sdk");
 exports.handler = async function(event, context) {
   try {
     console.log(event);
-    if (event["path"] == "/translate/list") {
+    if (event["requestContext"]["path"] == "/" + event["requestContext"]["stage"] + "/translate/list") {
       var translate = new AWS.Translate();
       var result = await translate.listTerminologies({}).promise();
       console.log(JSON.stringify(result));
@@ -23,7 +23,7 @@ exports.handler = async function(event, context) {
         isBase64Encoded: false,
       };
     }
-    if (event["path"] == "/translate/import") {
+    if (event["requestContext"]["path"] == "/" + event["requestContext"]["stage"] + "/translate/import") {
       var body = JSON.parse(event["body"]);
 
       var translate = new AWS.Translate();

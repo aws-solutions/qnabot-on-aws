@@ -131,7 +131,7 @@
 
 ## KMS
 - There is an optional utility script which adds KMS/CMK encryption to many resources.  The list below is for the default use cases
-- The quiz workflow - not used by RhodeIsland
+- The quiz workflow.
 
 ## CloudWatch Events
 - KendraCrawlerRule - Schedules the Kendra Crawler based on setting
