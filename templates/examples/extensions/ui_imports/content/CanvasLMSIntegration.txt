@@ -1,0 +1,1 @@
+Imports sample questions for interacting with Canvas LMS. More details: https://github.com/aws-solutions/aws-qnabot/blob/main/docs/canvaslms_integration.md
