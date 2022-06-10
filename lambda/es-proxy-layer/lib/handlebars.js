@@ -182,6 +182,12 @@ Handlebars.registerHelper('getSessionAttr', function (attr, def, options) {
     return v;
 });
 
+Handlebars.registerHelper('getSlot', function (slotname, def, options) {
+    let v = _.get(req_glbl.slots, slotname, def);
+    qnabot.log("Return slot key, value: ", slotname, v);
+    return v;
+});
+
 Handlebars.registerHelper('signS3URL', function (s3url, options) {
     let signedUrl = signS3URL(s3url, 300) ;
     qnabot.log("Return signed S3 URL: ", signedUrl);
@@ -209,6 +215,7 @@ var apply_handlebars = async function (req, res, hit) {
         ClientType: req._clientType,
         UserInfo: req._userInfo,
         SessionAttributes: _.get(res, 'session'),
+        Slots: _.get(req, 'slots'),
         Settings: req._settings,
         Question: req.question,
         OrigQuestion: _.get(req,"_event.origQuestion",req.question),
@@ -224,6 +231,9 @@ var apply_handlebars = async function (req, res, hit) {
     var ssml = _.get(hit, "alt.ssml");
     var rp = _.get(hit, "rp", _.get(req, '_settings.DEFAULT_ALEXA_REPROMPT'));
     var r = _.get(hit, "r");
+    var kendraRedirectQueryText = _.get(hit, "kendraRedirectQueryText");
+    var kendraRedirectQueryArgs = _.get(hit, "kendraRedirectQueryArgs");
+
 
     // catch and log errors before throwing exception.
     if (a) {
@@ -329,6 +339,27 @@ var apply_handlebars = async function (req, res, hit) {
                 hit_out.sa.push({text:obj.text, value: sa_value(context), enableTranslate: obj.enableTranslate});
             } catch (e) {
                 qnabot.log("ERROR: Session Attributes caused Handlebars exception. Check syntax: ", obj.text);
+                throw (e);
+            }
+        })
+    }
+    if (kendraRedirectQueryText) {
+        try {
+            const kendraRedirectQueryText_template = Handlebars.compile(kendraRedirectQueryText);
+            hit_out.kendraRedirectQueryText=kendraRedirectQueryText_template(context);
+        } catch (e) {
+            qnabot.log("ERROR: Answer caused Handlebars exception. Check syntax: ", kendraRedirectQueryText)
+            throw (e);
+        }
+    }
+    if (kendraRedirectQueryArgs) {
+        hit_out.kendraRedirectQueryArgs=[];
+        hit.kendraRedirectQueryArgs.map(arg=>{
+            try {
+                const arg_template = Handlebars.compile(arg);
+                hit_out.kendraRedirectQueryArgs.push(arg_template(context));
+            } catch (e) {
+                qnabot.log("ERROR: Answer caused Handlebars exception. Check syntax: ", arg)
                 throw (e);
             }
         })
