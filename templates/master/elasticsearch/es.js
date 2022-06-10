@@ -6,7 +6,7 @@ var properties={
        "DedicatedMasterEnabled": false,
        "InstanceCount": {"Ref":"ElasticSearchNodeCount"},
        "InstanceType": {"Fn::If": [ "Encrypted", "m6g.large.elasticsearch", "t3.small.elasticsearch"]},
-       "ZoneAwarenessEnabled": "true"
+       "ZoneAwarenessEnabled":  {"Fn::If": [ "SingleNode", false, true]}
     },
     "EBSOptions": {
        "EBSEnabled": true,

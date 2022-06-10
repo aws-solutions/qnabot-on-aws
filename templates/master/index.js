@@ -213,7 +213,7 @@ module.exports={
     "ElasticSearchNodeCount":{
         "Type":"String",
         "Description":"Number of nodes in ElasticSearch domain - '4' is recommended for fault tolerant production deployments.",
-        "AllowedValues" : ["2", "4"],
+        "AllowedValues" : ["1", "2", "4"],
         "Default":"4"
     },
     "FulfillmentConcurrency": {
