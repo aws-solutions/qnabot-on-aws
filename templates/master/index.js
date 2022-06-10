@@ -278,7 +278,8 @@ module.exports={
           ] },
     "CreateConcurrency":{ "Fn::Not": [
       {"Fn::Equals":[{"Ref":"FulfillmentConcurrency"},"0"]}
-    ]}
+    ]},
+    "SingleNode": {"Fn::Equals":[{"Ref":"ElasticSearchNodeCount"},"1"]}
   }
 }
 
