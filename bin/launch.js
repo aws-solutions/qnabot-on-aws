@@ -10,14 +10,12 @@ var region=require('../config').region
 var _=require('lodash')
 var fs=require('fs')
 var cf=new aws.CloudFormation()
-var chalk=require('chalk')
 var build=require('./build')
 var check=require('./check')
 var argv=require('commander')
 var name=require('./name')
 var wait=require('./wait')
 var s3=new aws.S3()
-var ran
 
 if (require.main === module) {
     var args=argv.version('1.0')

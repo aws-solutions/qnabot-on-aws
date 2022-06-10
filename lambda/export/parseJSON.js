@@ -2,6 +2,7 @@
 
 const { S3, FSx } = require('aws-sdk');
 var fs = require('fs');
+const _ = require('lodash');
 
 /**
  * Function to parse JSON of configurations/questions from QNA Content Designer and write an output Kendra JSON FAQ file
@@ -22,6 +23,9 @@ async function qnaJsontoKendraJsonParser(params){
   
   //const data = [];
   q_list.forEach(function(elem) {
+    // Exclude QIDs with enableQidIntent: true. They should be matched only by Lex
+    // as intents, not by Kendra FAQ queries.
+    if ( ! _.get(elem, "enableQidIntent", false)) {
       if (elem.q) {                           // qna type questions (standard)
         elem.q.forEach(function(ques){
           var entry = {
@@ -40,7 +44,7 @@ async function qnaJsontoKendraJsonParser(params){
       } else {
         console.log(`this element is not supported with KendraFAQ and was skipped in the sync: ${JSON.stringify(elem)}`);
       }
-      
+    }
   });
   console.log(`Kendra Data ${JSON.stringify(data)}`)
 

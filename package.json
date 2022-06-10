@@ -1,6 +1,6 @@
 {
   "name": "aws-ai-qna-bot",
-  "version": "5.1.0",
+  "version": "5.1.2-aa",
   "engines": {
     "node": ">=12.16.1",
     "npm": ">=7.8.0"
@@ -30,7 +30,9 @@
     "restart": "npm run stack dev/master restart",
     "down": "npm run stack dev/master down",
     "createKendraFaqIndex": "./utilities/create_kendra_faq_resources.js",
-    "countUserInteractions": "./utilities/count_user_interactions.js"
+    "countUserInteractions": "./utilities/count_user_interactions.js",
+    "code-linter": "./node_modules/eslint/bin/eslint.js . --ext .js",
+    "code-formatter": "./node_modules/prettier/bin-prettier.js --config .prettierrc.yml '**/*.js' --write"
   },
   "repository": {
     "type": "git",
@@ -57,7 +59,7 @@
     "body-parser": "^1.18.3",
     "bowser": "^1.9.3",
     "cfn-response": "^1.0.1",
-    "chalk": "^1.1.3",
+    "chalk": "^4.1.2",
     "chrome-aws-lambda": "^5.5.0",
     "clean-deep": "^3.0.2",
     "clipboard": "^1.7.1",
@@ -74,7 +76,6 @@
     "highlight.js": "^10.4.1",
     "idle-vue": "^2.0.5",
     "js-cache": "^1.0.3",
-    "js-xlsx": "^0.8.22",
     "jsheader": "0.0.2",
     "json-parse-better-errors": "^1.0.2",
     "json-stringify-pretty-compact": "^1.2.0",
@@ -101,7 +102,6 @@
     "range": "0.0.3",
     "raw-loader": "^0.5.1",
     "raw-text": "^1.1.0",
-    "read-excel-file": "^5.1.0",
     "recursive-readdir": "^2.2.2",
     "require-dir": "^0.3.2",
     "roboto-fontface": "^0.8.0",
@@ -137,11 +137,14 @@
     "babel-preset-env": "^1.7.0",
     "babel-preset-es2015": "^6.24.1",
     "copy-webpack-plugin": "^6.0.2",
-    "html-webpack-plugin": "^3.2.0",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-prettier": "^4.0.0",
+    "html-webpack-plugin": "^4.5.2",
     "jsdom": "^16.2.2",
     "jsdom-global": "^3.0.2",
     "json-loader": "^0.5.7",
     "lodash-webpack-plugin": "^0.11.5",
+    "prettier": "^2.4.1",
     "progress-bar-webpack-plugin": "^1.11.0",
     "pug-plain-loader": "^1.1.0",
     "pug-runtime": "^3.0.1",

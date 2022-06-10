@@ -48,31 +48,41 @@ def get_data_source_id(index_id, data_source_name):
 
 
 def kendra_list_data_source_sync_jobs(IndexId, data_source_id):
+    #get information about a Kendra index data source
+    response = client.describe_data_source(
+        Id=data_source_id,
+        IndexId=IndexId
+    )
+    data_source_status = response["Status"]
+
+    #get information on the data sync jobs for a given data source
     response = client.list_data_source_sync_jobs(
         Id=data_source_id,
-        IndexId=IndexId,
+        IndexId=IndexId
     )
-
     # get current status by sorting the result by start time descending order
-    # if status is equal to status in var status list, the status will be pending
-    pending_statuses = [
-        "SYNCING",
-        "STOPPING",
-        "SYNCING_INDEXING",
-    ]
+    if response['History'] != []:   #if there is data sync history
+        latest_history_item = functools.reduce(lambda x, y: x if x['StartTime'] > y['StartTime'] else y, response['History'])
 
-    latest_history_item = functools.reduce(lambda x, y: x if x['StartTime'] > y['StartTime'] else y, response['History'])
-    status = "PENDING" if latest_history_item['Status'] in pending_statuses else "SUCCEEDED"
-    print(status)
-    result = list(map(lambda item: {'StartTime': item['StartTime'].strftime("%m/%d/%Y, %H:%M:%S"),
+        result = list(map(lambda item: {'StartTime': item['StartTime'].strftime("%m/%d/%Y, %H:%M:%S"),
                                     'EndTime': item['EndTime'].strftime("%m/%d/%Y, %H:%M:%S") if 'EndTime' in item else '',
                                     'Status': item['Status'] if item['Status'] != "INCOMPLETE" else "COMPLETE WITH ERRORS",
                                     'ErrorMessage': item['ErrorMessage'] if 'ErrorMessage' in item else '',
                                     'Metrics': item['Metrics']
                                     }, response['History']))
+        status = latest_history_item['Status']
+    else: 
+        result = ''
+        status = data_source_status
+
+    if data_source_status != 'ACTIVE':
+        status = data_source_status
+
     response = {
                 "Status": status,
                 "History": result,
                 "DashboardUrl": f'https://console.aws.amazon.com/cloudwatch/home?region={os.environ.get("AWS_REGION")}#dashboards:name={os.environ.get("DASHBOARD_NAME")}'
                 }
     return response
+
+

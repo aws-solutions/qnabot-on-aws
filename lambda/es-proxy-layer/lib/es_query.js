@@ -83,9 +83,17 @@ async function run_qid_query_es(params, qid) {
     }
 }
 
+function isQuestionAllStopwords(question) {
+    let stopwords = "a,an,and,are,as,at,be,but,by,for,if,in,into,is,it,not,of,on,or,such,that,the,their,then,there,these,they,this,to,was,will,with".split(",");
+    let questionwords = question.toLowerCase().match(/\b(\w+)\b/g)
+    let allStopwords = questionwords.every( x => { return stopwords.includes(x); });
+    return allStopwords;
+}
+
 module.exports = {
     run_query_es:run_query_es,
     run_qid_query_es:run_qid_query_es,
     hasJsonStructure:hasJsonStructure,
-    isESonly:isESonly
+    isESonly:isESonly,
+    isQuestionAllStopwords:isQuestionAllStopwords
 }

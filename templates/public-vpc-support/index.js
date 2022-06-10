@@ -9,6 +9,9 @@ var path=require('path')
 
 var config=require('../../config')
 module.exports=Promise.resolve(require('../master')).then(function(base){
+    // customize description
+    base.Description = `(SO0189-vpc) QnABot with admin and client websites - (Version v${process.env.npm_package_version})`;
+
     base.Outputs=_.pick(base.Outputs,[
         "ContentDesignerURL",
         "ClientURL",
@@ -38,6 +41,7 @@ module.exports=Promise.resolve(require('../master')).then(function(base){
         "PublicOrPrivate",
         "LexV2BotLocaleIds",
         "LexBotVersion",
+        "InstallLexResponseBots",
         "FulfillmentConcurrency",
         "ElasticSearchNodeCount",
         "KibanaDashboardRetentionMinutes",
@@ -103,6 +107,7 @@ module.exports=Promise.resolve(require('../master')).then(function(base){
     base.Conditions.BuildExamples={"Fn::Equals":[true,true]}
     base.Conditions.CreateDomain={"Fn::Equals":[true,true]}
     base.Conditions.DontCreateDomain={"Fn::Equals":[true,false]}
+    base.Conditions.SingleNode={"Fn::Equals":[{"Ref":"ElasticSearchNodeCount"},"1"]}
     base.Conditions.VPCEnabled={ "Fn::Not": [
             { "Fn::Equals": [ "",
                     { "Fn::Join": [ "", { "Ref": "VPCSecurityGroupIdList" } ] }

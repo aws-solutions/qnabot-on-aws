@@ -35,7 +35,8 @@ module.exports=Object.assign(
     _.fromPairs(py.map(x=>[x.name,x.resource])),
     {
     "FeedbackSNS": {
-      "Type": "AWS::SNS::Topic"
+      "Type": "AWS::SNS::Topic",
+      Metadata: util.cfnNag(["W47"])
     },
     "feedbacksnspolicy" : {
         "Type" : "AWS::SNS::TopicPolicy",
@@ -166,7 +167,7 @@ module.exports=Object.assign(
             Value:"CustomResource"
         }]
       },
-      "Metadata": util.cfnNag(["W92"])
+      "Metadata": util.cfnNag(["W92", "W58"])
     },
     "ExampleLambdaRole":{
       "Type": "AWS::IAM::Role",
@@ -303,7 +304,7 @@ module.exports=Object.assign(
         }
         ],
       },
-      "Metadata": util.cfnNagXray()
+      "Metadata": util.cfnNag(["W11", "W12"])
     }
 });
 
@@ -347,7 +348,8 @@ function jslambda(name){
             Key:"Type",
             Value:"Example"
         }]
-      }
+      },
+      "Metadata": util.cfnNag(["W92"])
     }
 }
 function pylambda(name){
@@ -375,7 +377,7 @@ function pylambda(name){
         "Handler":`py/${name}.handler`,
         "MemorySize": "128",
         "Role": {"Fn::GetAtt": ["ExampleLambdaRole","Arn"]},
-        "Runtime": "python3.6",
+        "Runtime": "python3.9",
         "Timeout": 300,
                 "VpcConfig" : {
             "Fn::If": [ "VPCEnabled", {
@@ -391,6 +393,7 @@ function pylambda(name){
             Key:"Type",
             Value:"Example"
         }]
-      }
+      },
+      "Metadata": util.cfnNag(["W92"])
     }
 }

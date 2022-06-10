@@ -13,7 +13,7 @@
 | ES_PHRASE_BOOST | integer | If the user's question is a phrase match to a question in the knowledge then boost the score by this factor.
 | ES_SCORE_ANSWER_FIELD | true or false | Include the content of the answer field (not just the question fields) when determining the score for a match
 | ENABLE_SENTIMENT_SUPPORT | true or false | Enables [Amazon Comprehend](https://docs.aws.amazon.com/comprehend/latest/dg/how-sentiment.html) be used for sentiment analysis
-| ENABLE_MULTI_LANGUAGE_SUPPORT | true or false | Enable or Disable Amazon Translate support
+| ENABLE_MULTI_LANGUAGE_SUPPORT | true or false | Enable or Disable Amazon Translate support. See list of [Supported Languages](multilanguage_support.md#supported-languages)
 | ENABLE_CUSTOM_TERMINOLOGY| true or false |  Enable support for installed [Custom Terminology](https://aws.amazon.com/blogs/machine-learning/introducing-amazon-translate-custom-terminology/) files when using Amazon Translate
 | MINIMUM_CONFIDENCE_SCORE | decimal between 0.0 and 0,99 | The minimum confidence before Amazon Comprehend will determine the user's language
 | ALT_SEARCH_KENDRA_INDEXES | An Array of comma separated Ids |  A list of one or more [Amazon Kendra](https://aws.amazon.com/kendra/) indexes used for Kendra fallback
@@ -37,6 +37,7 @@
 | KENDRA_INDEXER_CRAWL_DEPTH | number | Sets the depth to the number of levels in a website from the seed level that you want to crawl
 | KENDRA_INDEXER_CRAWL_MODE | HOST_ONLY \| SUBDOMAINS \| EVERYTHING | Determines which addresses should be crawled
 | KENDRA_WEB_PAGE_INDEX | Kendra Index Id | The index to use for the web crawler, a [custom data source](https://docs.aws.amazon.com/kendra/latest/dg/data-source-custom.html) will automatically be added to the specified index.  
+| KENDRA_INDEXED_DOCUMENTS_LANGUAGES | comma separate list | Should be one of supported Kendra languages mentioned in [documentation](https://docs.aws.amazon.com/kendra/latest/dg/in-adding-languages.html)
 | ERRORMESSAGE | text | Response to the user when a processing error occurs
 | EMPTYMESSAGE | text | Response to the user when an answer could not be found
 | DEFAULT_ALEXA_LAUNCH_MESSAGE | text | Initial greeting when using Alexa
@@ -56,17 +57,21 @@
 | CONNECT_ENABLE_VOICE_RESPONSE_INTERRUPT | true or false | Return bot response in session attribute to enable contact flow to use response as an interruptible prompt.
 | CONNECT_NEXT_PROMPT_VARNAME | text | Name of session var to use for next prompt
 | ENABLE_REDACTING | true or false | Enable the system to redact log output
+| ENABLE_REDACTING_WITH_COMPREHEND | true or false | Enables [Amazon Comprehend based PII Redacting](https://aws.amazon.com/blogs/machine-learning/detecting-and-redacting-pii-using-amazon-comprehend/)
+| COMPREHEND_REDACTING_ENTITY_TYPES | comma separated list | A list of [PII Entity Types](https://aws.amazon.com/blogs/machine-learning/detecting-and-redacting-pii-using-amazon-comprehend/)
+| COMPREHEND_REDACTING_CONFIDENCE_SCORE | number (0 to .99) | Only redact PII where Amazon Comprehend's confidence score is greater than this number
 | REDACTING_REGEX | regex expression | Redacts expressions matching regex from logs
 | PII_REJECTION_ENABLED | true or false | Enables PII Rejection
 | PII_REJECTION_QUESTION | text  | If PII is found, the user's request (question) will change to this phrase
-| PII_REJECTION_WITH_COMPREHEND: | true or false | Enable's [Personal Identifiable Information](https://aws.amazon.com/blogs/machine-learning/detecting-and-redacting-pii-using-amazon-comprehend/) detection with Amazon Comprehend
 | PII_REJECTION_REGEX | regex expression | Used to find PII based on a regex
-| PII_REJECTION_IGNORE_TYPES | comma separated list of [PII Entity Categories](https://aws.amazon.com/blogs/machine-learning/detecting-and-redacting-pii-using-amazon-comprehend/) | Do not detect the specified list of entity types
+| PII_REJECTION_ENTITY_TYPES | comma separated list of [PII Entity Categories](https://aws.amazon.com/blogs/machine-learning/detecting-and-redacting-pii-using-amazon-comprehend/) | Only recognize PII entity types in the list
+| PII_REJECTION_CONFIDENCE_SCORE | number (0 to 0.99) | Only reject PII where Amazon Comprehend's confidence score is greater than this number
 | DISABLE_CLOUDWATCH_LOGGING | true or false | Disable all logging in fulfillment es query handler lambda. does not disable logging from Lambda Hooks or Conditional Chaining Lambda functions
 | MINIMAL_ES_LOGGING | true or false | do not log utterances or session attributes to ElasticSearch for Kibana logging
 | S3_PUT_REQUEST_ENCRYPTION | text | enable header x-amz-server-side-encryption header and set with this value
 | BOT_ROUTER_WELCOME_BACK_MSG | text | The text used by QnABot when ending communication from a specialty bot
 | BOT_ROUTER_EXIT_MSGS | comma separated list | The exit phrases in comma separated list available for the a user to end communication with a specialty bot
 | RUN_LAMBDAHOOK_FROM_QUERY_STEP | true or false | Controls timing of execution for Lambda hooks
-| LAMBDA_PREPROCESS_HOOK | string | name of AWS Lambda to run before each question is processed. The name of the Lambda must start with "qna-" or "QNA-" to comply with the permissionss of the role attached to the Fulfillment Lambda .
-| LAMBDA_POSTPROCESS_HOOK | string | name of AWS Lambda to run after the question is processed. But before user profile information is saved. The name of the Lambda must start with "qna-" or "QNA-" to comply with the permissionss of the role attached to the Fulfillment Lambda .
+| LAMBDA_PREPROCESS_HOOK | string | name of AWS Lambda to run before each question is processed. The name of the Lambda must start with "qna-" or "QNA-" to comply with the permissions of the role attached to the Fulfillment Lambda .
+| LAMBDA_POSTPROCESS_HOOK | string | name of AWS Lambda to run after the question is processed. But before user profile information is saved. The name of the Lambda must start with "qna-" or "QNA-" to comply with the permissions of the role attached to the Fulfillment Lambda .
+| SEARCH_REPLACE_QUESTION_SUBSTRINGS | string | replace words or phrases in user questions by defining search/replace pairs in a JSON object like: {"searchString":"replaceString"}. Add additional pairs separated by commas, like: {"searchString":"replaceString", "searchString2":"replaceString2"}.

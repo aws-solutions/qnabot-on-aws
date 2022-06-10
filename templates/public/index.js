@@ -9,6 +9,9 @@ var path=require('path')
 
 var config=require('../../config')
 module.exports=Promise.resolve(require('../master')).then(function(base){
+    // customize description
+    base.Description = `(SO0189) QnABot with admin and client websites - (Version v${process.env.npm_package_version})`;
+
     base.Outputs=_.pick(base.Outputs,[
         "ContentDesignerURL",
         "ClientURL",
@@ -40,6 +43,7 @@ module.exports=Promise.resolve(require('../master')).then(function(base){
         "PublicOrPrivate",
         "LexV2BotLocaleIds",
         "LexBotVersion",
+        "InstallLexResponseBots",
         "FulfillmentConcurrency",
         "XraySetting"
     ]);
