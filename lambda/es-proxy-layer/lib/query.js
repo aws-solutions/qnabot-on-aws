@@ -561,13 +561,15 @@ async function processFulfillmentEvent(req,res) {
         }
         // translate response
         var usrLang = 'en';
+        const autotranslate = _.get(hit, 'autotranslate', true);
+
         if (_.get(req._settings, 'ENABLE_MULTI_LANGUAGE_SUPPORT')) {
             usrLang = _.get(req, 'session.qnabotcontext.userLocale');
-            if (usrLang != 'en') {
+            if (usrLang != 'en' && autotranslate) {
                 qnabot.log("Autotranslate hit to usrLang: ", usrLang);
                 hit = await translate.translate_hit(hit, usrLang,req);
             } else {
-                qnabot.log("User Lang is en, Autotranslate not required.");
+                qnabot.log("Autotranslate not required.");
             }
         }
         // prepend debug msg
