@@ -14,9 +14,9 @@ var functionName=process.env.LEXV2_BUILD_LAMBDA;
 var bucket=process.env.STATUS_BUCKET;
 var lexV2StatusFile=process.env.LEXV2_STATUS_KEY;
 
-module.exports=async function(utterances){
-    const utterance_list = await utterances ; 
-    console.log(`Invoking ${functionName} with Utterances: ${utterance_list}`)
+module.exports=async function(qidsandquestions){
+    const qidsandquestions_list = await qidsandquestions ; 
+    console.log(`Invoking ${functionName} with Qids and Questions: ` + JSON.stringify(qidsandquestions_list))
     status("Starting LexV2 bot function")
     var result=await lambda.invoke({
         FunctionName:functionName,
@@ -24,7 +24,7 @@ module.exports=async function(utterances){
         Payload: JSON.stringify(
             {
                 "statusFile":{"Bucket":bucket, "Key":lexV2StatusFile},
-                "utterances":utterance_list
+                "items":qidsandquestions_list
             }
         )
     }).promise() ;

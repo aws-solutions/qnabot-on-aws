@@ -34,6 +34,7 @@ module.exports=Object.assign(
             method:opts.method.toUpperCase(),
             url:url.href,
             path:url.path,
+            service:'execute-api', 
             headers:opts.headers || {}
         }
         if(opts.body){

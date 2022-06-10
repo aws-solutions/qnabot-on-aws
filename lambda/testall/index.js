@@ -26,7 +26,8 @@ exports.step=function(event,context,cb){
     .then(function(config){
         if(config.status!=="Error" && config.status!=="Completed"){
             return Promise.try(function(){
-                console.log("Config:",JSON.stringify(config,null,2))
+                let config_redacted = Object.assign({}, config, { token: "REDACTED" });
+                console.log("Config:",JSON.stringify(config_redacted,null,2))
                 switch(config.status){
                     case 'Started':
                         return start(config);

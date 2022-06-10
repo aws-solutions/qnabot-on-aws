@@ -6,7 +6,7 @@ aws.config.region=process.env.AWS_REGION;
 const s3=new aws.S3();
 const lexv2 = new aws.LexRuntimeV2();
 
-function processWithLex(data, filter) {
+function processWithLex(data, filter, token) {
     const orig = JSON.parse(data);
     let res = 'Match(Yes/No), Question, Topic, QID, Returned QID, Returned Message' + '\n';
     return new Promise(async (resolve, reject) => {
@@ -21,7 +21,7 @@ function processWithLex(data, filter) {
                             botAliasId: process.env.LEXV2_BOT_ALIAS_ID,
                             localeId: "en_US",
                             sessionId: 'automated-tester1',
-                            sessionState: {'sessionAttributes':{'topic': topic}},
+                            sessionState: {'sessionAttributes':{'topic': topic, 'idtokenjwt':token}},
                             text: question
                         }).promise();
                         let res_qid = resp.sessionState.sessionAttributes.qnabot_qid;
@@ -48,7 +48,6 @@ function processWithLex(data, filter) {
 
 }
 module.exports = function(config){
-    console.log('config is: ' + JSON.stringify(config,null,2));
     return Promise.all(config.parts.map(part=>{
         return s3.getObject({
             Bucket:config.bucket,
@@ -59,7 +58,7 @@ module.exports = function(config){
     })).then(async parts=> {
         let qa = parts.toString();
         let arrayOfParts = `[${qa.replace(/\n/g,',\n')}]`;
-        const contents = await processWithLex(arrayOfParts,config.filter);
+        const contents = await processWithLex(arrayOfParts,config.filter, config.token);
         return s3.putObject({
             Bucket:config.bucket,
             Key:config.key,

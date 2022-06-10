@@ -149,9 +149,11 @@ data:function(){
           try{
               const now = new Date();
               const usableFilename = ( (this.filename && this.filename.length > 0) ? this.filename : 'TestAll');
+              const token = window.sessionStorage.getItem('id_token');
               await this.$store.dispatch('api/startTestAll',{
                   name:usableFilename + '-' + this.dateFormat(now) + '.csv',
-                  filter:this.filter
+                  filter:this.filter,
+                  token:token
               })
               await this.refresh()
           }catch(e){

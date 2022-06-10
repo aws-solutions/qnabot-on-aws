@@ -210,7 +210,27 @@ module.exports=Object.assign(
                   ]
               }
             ]
-          }          
+          }
+        }, 
+        { 
+          "PolicyName" : "QNASecretsManagerLambda",
+          "PolicyDocument" : {
+          "Version": "2012-10-17",
+            "Statement": [
+              {
+                  "Effect": "Allow",
+                  "Action": [
+                    "secretsmanager:GetResourcePolicy",
+                    "secretsmanager:GetSecretValue",
+                    "secretsmanager:DescribeSecret"
+                   ],   
+                  "Resource": [
+                    {"Fn::Join": ["",["arn:aws:secretsmanager:",{ "Ref" : "AWS::Region" },":",{ "Ref" : "AWS::AccountId" },":secret:qna-*"]]},
+                    {"Fn::Join": ["",["arn:aws:secretsmanager:",{ "Ref" : "AWS::Region" },":",{ "Ref" : "AWS::AccountId" },":secret:QNA-*"]]}
+                  ]
+              }
+            ]
+          }
         }],
       },
       "Metadata": util.cfnNag(["W11", "W12"])
@@ -284,7 +304,7 @@ function pylambda(name){
       "Handler":`${name}.handler`,
       "MemorySize": "2048",
       "Role": {"Fn::GetAtt": ["ExtensionLambdaRole","Arn"]},
-      "Runtime": "python3.6",
+      "Runtime": "python3.9",
       "Timeout": 300,
       "VpcConfig" : {
         "Fn::If": [ "VPCEnabled", {

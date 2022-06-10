@@ -377,7 +377,7 @@ function pylambda(name){
         "Handler":`py/${name}.handler`,
         "MemorySize": "128",
         "Role": {"Fn::GetAtt": ["ExampleLambdaRole","Arn"]},
-        "Runtime": "python3.6",
+        "Runtime": "python3.9",
         "Timeout": 300,
                 "VpcConfig" : {
             "Fn::If": [ "VPCEnabled", {
