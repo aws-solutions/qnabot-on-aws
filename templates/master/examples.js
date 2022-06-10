@@ -15,8 +15,6 @@ module.exports={
                 "FeedbackFirehoseName":{"Ref":"FeedbackFirehose"},
                 "CFNLambda":{"Fn::GetAtt":["CFNLambda","Arn"]},
                 "CFNLambdaRole":{"Fn::GetAtt":["CFNLambdaRole","Arn"]},
-                "LexV2CFNLambdaARN":{"Fn::GetAtt":["LexV2CfnCr","Outputs.LexV2CfnCrFunctionArn"]},
-                "LexV2ServiceLinkedRoleARN":{"Fn::GetAtt":["LexV2CfnCr","Outputs.LexServiceLinkedRole"]},
                 "ApiUrlName":{"Fn::GetAtt":["ApiUrl","Name"]},
                 "AssetBucket":{"Ref":"AssetBucket"},
                 "FulfillmentLambdaRole":{"Ref": "FulfillmentLambdaRole"},
@@ -25,7 +23,8 @@ module.exports={
                 "VPCSecurityGroupIdList": { "Fn::Join" : [ ",", {"Ref":"VPCSecurityGroupIdList"} ] },
                 "LexBotVersion": {"Ref": "LexBotVersion"},
                 "XraySetting":{"Ref": "XraySetting"},
-                "DefaultQnABotSettings": {"Ref":"DefaultQnABotSettings"}
+                "DefaultQnABotSettings": {"Ref":"DefaultQnABotSettings"},
+                "InstallLexResponseBots": {"Ref": "InstallLexResponseBots"},
             }
         }
     }

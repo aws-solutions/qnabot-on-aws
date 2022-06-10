@@ -3,7 +3,6 @@ var Promise=require('bluebird')
 process.env.AWS_PROFILE=require('../config').profile
 process.env.AWS_DEFAULT_REGION=require('../config').profile
 var aws=require('aws-sdk')
-var chalk=require('chalk')
 aws.config.setPromisesDependency(Promise)
 aws.config.region=require('../config').region
 var cf=new aws.CloudFormation()

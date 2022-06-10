@@ -5,7 +5,8 @@ exports.handler = (event, context, callback) => {
     console.log('Received event:', JSON.stringify(event, null, 2));
     var schema = {
         quiz: require('./quiz.js'),
-        qna: require('./qna.js')
+        qna: require('./qna.js'),
+        slottype: require('./slottype.js')
     }
     callback(null,schema);
 }

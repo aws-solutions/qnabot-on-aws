@@ -19,7 +19,7 @@ var config={
 
 exports.resources={
     "WageSlotType":{
-        "Condition": "CreateLexV1Bots",
+        "Condition": "CreateLexV1ResponseBots",
         "Type": "Custom::LexSlotType",
         "Properties": {
             "ServiceToken": {"Ref": "CFNLambda"},
@@ -37,7 +37,7 @@ exports.resources={
         }
     },
     "QNAWage": {
-        "Condition": "CreateLexV1Bots",
+        "Condition": "CreateLexV1ResponseBots",
         "Type": "Custom::LexBot",
         "DependsOn": "WageIntent",
         "Properties": {
@@ -71,7 +71,7 @@ exports.resources={
         }
     },
     "WageIntent": {
-        "Condition": "CreateLexV1Bots",
+        "Condition": "CreateLexV1ResponseBots",
         "Type": "Custom::LexIntent",
         "Properties": {
             "ServiceToken": {"Ref": "CFNLambda"},
@@ -133,7 +133,7 @@ exports.resources={
         },
     },
     "WageAliasV2": {
-        "Condition": "CreateLexV1Bots",
+        "Condition": "CreateLexV1ResponseBots",
         "Type": "Custom::LexAlias",
         "Properties": {
             "ServiceToken": {"Ref": "CFNLambda"},
@@ -145,7 +145,7 @@ exports.resources={
         }
     },
     "SocialSecuritySlotType":{
-        "Condition": "CreateLexV1Bots",
+        "Condition": "CreateLexV1ResponseBots",
         "Type": "Custom::LexSlotType",
         "Properties": {
             "ServiceToken": {"Ref": "CFNLambda"},
@@ -163,7 +163,7 @@ exports.resources={
         }
     },
     "QNASocialSecurity": {
-        "Condition": "CreateLexV1Bots",
+        "Condition": "CreateLexV1ResponseBots",
         "Type": "Custom::LexBot",
         "DependsOn": "SocialSecurityIntent",
         "Properties": {
@@ -197,7 +197,7 @@ exports.resources={
         }
     },
     "SocialSecurityIntent": {
-        "Condition": "CreateLexV1Bots",
+        "Condition": "CreateLexV1ResponseBots",
         "Type": "Custom::LexIntent",
         "Properties": {
             "ServiceToken": {"Ref": "CFNLambda"},
@@ -259,7 +259,7 @@ exports.resources={
         },
     },
     "SocialSecurityAliasV2": {
-        "Condition": "CreateLexV1Bots",
+        "Condition": "CreateLexV1ResponseBots",
         "Type": "Custom::LexAlias",
         "Properties": {
             "ServiceToken": {"Ref": "CFNLambda"},
@@ -271,7 +271,7 @@ exports.resources={
         }
     },
     "PinSlotType":{
-        "Condition": "CreateLexV1Bots",
+        "Condition": "CreateLexV1ResponseBots",
         "Type": "Custom::LexSlotType",
         "Properties": {
             "ServiceToken": {"Ref": "CFNLambda"},
@@ -289,7 +289,7 @@ exports.resources={
         }
     },
     "QNAPin": {
-        "Condition": "CreateLexV1Bots",
+        "Condition": "CreateLexV1ResponseBots",
         "Type": "Custom::LexBot",
         "DependsOn": "PinIntent",
         "Properties": {
@@ -323,7 +323,7 @@ exports.resources={
         }
     },
     "PinIntent": {
-        "Condition": "CreateLexV1Bots",
+        "Condition": "CreateLexV1ResponseBots",
         "Type": "Custom::LexIntent",
         "Properties": {
             "ServiceToken": {"Ref": "CFNLambda"},
@@ -386,7 +386,7 @@ exports.resources={
         },
     },
     "PinAliasV2": {
-        "Condition": "CreateLexV1Bots",
+        "Condition": "CreateLexV1ResponseBots",
         "Type": "Custom::LexAlias",
         "Properties": {
             "ServiceToken": {"Ref": "CFNLambda"},
@@ -398,7 +398,7 @@ exports.resources={
         }
     },
     "QNAPinNoConfirm": {
-        "Condition": "CreateLexV1Bots",
+        "Condition": "CreateLexV1ResponseBots",
         "Type": "Custom::LexBot",
         "DependsOn": "PinIntentNoConfirm",
         "Properties": {
@@ -432,7 +432,7 @@ exports.resources={
         }
     },
     "PinIntentNoConfirm": {
-        "Condition": "CreateLexV1Bots",
+        "Condition": "CreateLexV1ResponseBots",
         "Type": "Custom::LexIntent",
         "Properties": {
             "ServiceToken": {"Ref": "CFNLambda"},
@@ -478,7 +478,7 @@ exports.resources={
         },
     },
     "PinNoConfirmAliasV2": {
-        "Condition": "CreateLexV1Bots",
+        "Condition": "CreateLexV1ResponseBots",
         "Type": "Custom::LexAlias",
         "Properties": {
             "ServiceToken": {"Ref": "CFNLambda"},
@@ -490,7 +490,7 @@ exports.resources={
         }
     },
     "YesNoSlotType":{
-        "Condition": "CreateLexV1Bots",
+        "Condition": "CreateLexV1ResponseBots",
         "Type": "Custom::LexSlotType",
         "Properties": {
             "ServiceToken": {"Ref": "CFNLambda"},
@@ -505,7 +505,7 @@ exports.resources={
         }
     },
     "YesNoIntent": {
-        "Condition": "CreateLexV1Bots",
+        "Condition": "CreateLexV1ResponseBots",
         "Type": "Custom::LexIntent",
         "Properties": {
             "ServiceToken": {"Ref": "CFNLambda"},
@@ -548,7 +548,7 @@ exports.resources={
         },
     },
     "QNAYesNo": {
-        "Condition": "CreateLexV1Bots",
+        "Condition": "CreateLexV1ResponseBots",
         "Type": "Custom::LexBot",
         "DependsOn": ["YesNoSlotType", "YesNoIntent"],
         "Properties": {
@@ -582,7 +582,7 @@ exports.resources={
         }
     },
     "YesNoAliasV2": {
-        "Condition": "CreateLexV1Bots",
+        "Condition": "CreateLexV1ResponseBots",
         "Type": "Custom::LexAlias",
         "DependsOn": "QNAYesNo",
         "Properties": {
@@ -595,7 +595,7 @@ exports.resources={
         }
     },
     "YesNoExitSlotType":{
-        "Condition": "CreateLexV1Bots",
+        "Condition": "CreateLexV1ResponseBots",
         "Type": "Custom::LexSlotType",
         "Properties": {
             "ServiceToken": {"Ref": "CFNLambda"},
@@ -611,7 +611,7 @@ exports.resources={
         }
     },
     "YesNoExitIntent": {
-        "Condition": "CreateLexV1Bots",
+        "Condition": "CreateLexV1ResponseBots",
         "Type": "Custom::LexIntent",
         "Properties": {
             "ServiceToken": {"Ref": "CFNLambda"},
@@ -654,7 +654,7 @@ exports.resources={
         },
     },
     "QNAYesNoExit": {
-        "Condition": "CreateLexV1Bots",
+        "Condition": "CreateLexV1ResponseBots",
         "Type": "Custom::LexBot",
         "DependsOn": ["YesNoExitSlotType", "YesNoExitIntent"],
         "Properties": {
@@ -688,7 +688,7 @@ exports.resources={
         }
     },
     "YesNoExitAliasV2": {
-        "Condition": "CreateLexV1Bots",
+        "Condition": "CreateLexV1ResponseBots",
         "Type": "Custom::LexAlias",
         "DependsOn": "QNAYesNoExit",
         "Properties": {
@@ -701,7 +701,7 @@ exports.resources={
         }
     },
     "DateIntent": {
-        "Condition": "CreateLexV1Bots",
+        "Condition": "CreateLexV1ResponseBots",
         "Type": "Custom::LexIntent",
         "Properties": {
             "ServiceToken": {"Ref": "CFNLambda"},
@@ -767,7 +767,7 @@ exports.resources={
         },
     },
     "QNADate": {
-        "Condition": "CreateLexV1Bots",
+        "Condition": "CreateLexV1ResponseBots",
         "Type": "Custom::LexBot",
         "DependsOn": "DateIntent",
         "Properties": {
@@ -801,7 +801,7 @@ exports.resources={
         }
     },
     "DateAliasV2": {
-        "Condition": "CreateLexV1Bots",
+        "Condition": "CreateLexV1ResponseBots",
         "Type": "Custom::LexAlias",
         "DependsOn": "QNADate",
         "Properties": {
@@ -814,7 +814,7 @@ exports.resources={
         }
     },
     "DateIntentNoConfirm": {
-        "Condition": "CreateLexV1Bots",
+        "Condition": "CreateLexV1ResponseBots",
         "Type": "Custom::LexIntent",
         "Properties": {
             "ServiceToken": {"Ref": "CFNLambda"},
@@ -863,7 +863,7 @@ exports.resources={
         },
     },
     "QNADateNoConfirm": {
-        "Condition": "CreateLexV1Bots",
+        "Condition": "CreateLexV1ResponseBots",
         "Type": "Custom::LexBot",
         "DependsOn": "DateIntentNoConfirm",
         "Properties": {
@@ -897,7 +897,7 @@ exports.resources={
         }
     },
     "DateAliasNoConfirmV2": {
-        "Condition": "CreateLexV1Bots",
+        "Condition": "CreateLexV1ResponseBots",
         "Type": "Custom::LexAlias",
         "DependsOn": "QNADateNoConfirm",
         "Properties": {
@@ -910,7 +910,7 @@ exports.resources={
         }
     },
     "DayOfWeekIntent": {
-        "Condition": "CreateLexV1Bots",
+        "Condition": "CreateLexV1ResponseBots",
         "Type": "Custom::LexIntent",
         "Properties": {
             "ServiceToken": {"Ref": "CFNLambda"},
@@ -973,7 +973,7 @@ exports.resources={
         },
     },
     "QNADayOfWeek": {
-        "Condition": "CreateLexV1Bots",
+        "Condition": "CreateLexV1ResponseBots",
         "Type": "Custom::LexBot",
         "DependsOn": "DayOfWeekIntent",
         "Properties": {
@@ -1007,7 +1007,7 @@ exports.resources={
         }
     },
     "DayOfWeekAliasV2": {
-        "Condition": "CreateLexV1Bots",
+        "Condition": "CreateLexV1ResponseBots",
         "Type": "Custom::LexAlias",
         "DependsOn": "QNADayOfWeek",
         "Properties": {
@@ -1020,7 +1020,7 @@ exports.resources={
         }
     },
     "MonthIntent": {
-        "Condition": "CreateLexV1Bots",
+        "Condition": "CreateLexV1ResponseBots",
         "Type": "Custom::LexIntent",
         "Properties": {
             "ServiceToken": {"Ref": "CFNLambda"},
@@ -1082,7 +1082,7 @@ exports.resources={
         },
     },
     "QNAMonth": {
-        "Condition": "CreateLexV1Bots",
+        "Condition": "CreateLexV1ResponseBots",
         "Type": "Custom::LexBot",
         "DependsOn": "MonthIntent",
         "Properties": {
@@ -1116,7 +1116,7 @@ exports.resources={
         }
     },
     "MonthAliasV2": {
-        "Condition": "CreateLexV1Bots",
+        "Condition": "CreateLexV1ResponseBots",
         "Type": "Custom::LexAlias",
         "DependsOn": "QNAMonth",
         "Properties": {
@@ -1129,7 +1129,7 @@ exports.resources={
         }
     },
     "MonthIntentNoConfirm": {
-        "Condition": "CreateLexV1Bots",
+        "Condition": "CreateLexV1ResponseBots",
         "Type": "Custom::LexIntent",
         "Properties": {
             "ServiceToken": {"Ref": "CFNLambda"},
@@ -1174,7 +1174,7 @@ exports.resources={
         },
     },
     "QNAMonthNoConfirm": {
-        "Condition": "CreateLexV1Bots",
+        "Condition": "CreateLexV1ResponseBots",
         "Type": "Custom::LexBot",
         "DependsOn": "MonthIntentNoConfirm",
         "Properties": {
@@ -1208,7 +1208,7 @@ exports.resources={
         }
     },
     "MonthAliasNoConfirmV2": {
-        "Condition": "CreateLexV1Bots",
+        "Condition": "CreateLexV1ResponseBots",
         "Type": "Custom::LexAlias",
         "DependsOn": "QNAMonthNoConfirm",
         "Properties": {
@@ -1221,7 +1221,7 @@ exports.resources={
         }
     },
     "NumberIntent": {
-        "Condition": "CreateLexV1Bots",
+        "Condition": "CreateLexV1ResponseBots",
         "Type": "Custom::LexIntent",
         "Properties": {
             "ServiceToken": {"Ref": "CFNLambda"},
@@ -1282,7 +1282,7 @@ exports.resources={
         },
     },
     "QNANumber": {
-        "Condition": "CreateLexV1Bots",
+        "Condition": "CreateLexV1ResponseBots",
         "Type": "Custom::LexBot",
         "DependsOn": "NumberIntent",
         "Properties": {
@@ -1316,7 +1316,7 @@ exports.resources={
         }
     },
     "NumberAliasV2": {
-        "Condition": "CreateLexV1Bots",
+        "Condition": "CreateLexV1ResponseBots",
         "Type": "Custom::LexAlias",
         "DependsOn": "QNANumber",
         "Properties": {
@@ -1329,7 +1329,7 @@ exports.resources={
         }
     },
     "NumberIntentNoConfirm": {
-        "Condition": "CreateLexV1Bots",
+        "Condition": "CreateLexV1ResponseBots",
         "Type": "Custom::LexIntent",
         "Properties": {
             "ServiceToken": {"Ref": "CFNLambda"},
@@ -1373,7 +1373,7 @@ exports.resources={
         },
     },
     "QNANumberNoConfirm": {
-        "Condition": "CreateLexV1Bots",
+        "Condition": "CreateLexV1ResponseBots",
         "Type": "Custom::LexBot",
         "DependsOn": "NumberIntentNoConfirm",
         "Properties": {
@@ -1407,7 +1407,7 @@ exports.resources={
         }
     },
     "NumberAliasNoConfirmV2": {
-        "Condition": "CreateLexV1Bots",
+        "Condition": "CreateLexV1ResponseBots",
         "Type": "Custom::LexAlias",
         "DependsOn": "QNANumberNoConfirm",
         "Properties": {
@@ -1420,7 +1420,7 @@ exports.resources={
         }
     },
     "AgeIntent": {
-        "Condition": "CreateLexV1Bots",
+        "Condition": "CreateLexV1ResponseBots",
         "Type": "Custom::LexIntent",
         "Properties": {
             "ServiceToken": {"Ref": "CFNLambda"},
@@ -1489,7 +1489,7 @@ exports.resources={
         },
     },
     "QNAAge": {
-        "Condition": "CreateLexV1Bots",
+        "Condition": "CreateLexV1ResponseBots",
         "Type": "Custom::LexBot",
         "DependsOn": "AgeIntent",
         "Properties": {
@@ -1523,7 +1523,7 @@ exports.resources={
         }
     },
     "AgeAliasV2": {
-        "Condition": "CreateLexV1Bots",
+        "Condition": "CreateLexV1ResponseBots",
         "Type": "Custom::LexAlias",
         "DependsOn": "QNAAge",
         "Properties": {
@@ -1536,7 +1536,7 @@ exports.resources={
         }
     },
     "PhoneNumberIntent": {
-        "Condition": "CreateLexV1Bots",
+        "Condition": "CreateLexV1ResponseBots",
         "Type": "Custom::LexIntent",
         "Properties": {
             "ServiceToken": {"Ref": "CFNLambda"},
@@ -1600,7 +1600,7 @@ exports.resources={
         },
     },
     "QNAPhoneNumber": {
-        "Condition": "CreateLexV1Bots",
+        "Condition": "CreateLexV1ResponseBots",
         "Type": "Custom::LexBot",
         "DependsOn": "PhoneNumberIntent",
         "Properties": {
@@ -1634,7 +1634,7 @@ exports.resources={
         }
     },
     "PhoneNumberAliasV2": {
-        "Condition": "CreateLexV1Bots",
+        "Condition": "CreateLexV1ResponseBots",
         "Type": "Custom::LexAlias",
         "DependsOn": "QNAPhoneNumber",
         "Properties": {
@@ -1647,7 +1647,7 @@ exports.resources={
         }
     },
     "PhoneNumberIntentNoConfirm": {
-        "Condition": "CreateLexV1Bots",
+        "Condition": "CreateLexV1ResponseBots",
         "Type": "Custom::LexIntent",
         "Properties": {
             "ServiceToken": {"Ref": "CFNLambda"},
@@ -1691,7 +1691,7 @@ exports.resources={
         },
     },
     "QNAPhoneNumberNoConfirm": {
-        "Condition": "CreateLexV1Bots",
+        "Condition": "CreateLexV1ResponseBots",
         "Type": "Custom::LexBot",
         "DependsOn": "PhoneNumberIntentNoConfirm",
         "Properties": {
@@ -1725,7 +1725,7 @@ exports.resources={
         }
     },
     "PhoneNumberAliasNoConfirmV2": {
-        "Condition": "CreateLexV1Bots",
+        "Condition": "CreateLexV1ResponseBots",
         "Type": "Custom::LexAlias",
         "DependsOn": "QNAPhoneNumberNoConfirm",
         "Properties": {
@@ -1738,7 +1738,7 @@ exports.resources={
         }
     },
     "TimeIntent": {
-        "Condition": "CreateLexV1Bots",
+        "Condition": "CreateLexV1ResponseBots",
         "Type": "Custom::LexIntent",
         "Properties": {
             "ServiceToken": {"Ref": "CFNLambda"},
@@ -1799,7 +1799,7 @@ exports.resources={
         },
     },
     "QNATime": {
-        "Condition": "CreateLexV1Bots",
+        "Condition": "CreateLexV1ResponseBots",
         "Type": "Custom::LexBot",
         "DependsOn": "TimeIntent",
         "Properties": {
@@ -1833,7 +1833,7 @@ exports.resources={
         }
     },
     "TimeAliasV2": {
-        "Condition": "CreateLexV1Bots",
+        "Condition": "CreateLexV1ResponseBots",
         "Type": "Custom::LexAlias",
         "DependsOn": "QNATime",
         "Properties": {
@@ -1846,7 +1846,7 @@ exports.resources={
         }
     },
     "EmailAddressIntent": {
-        "Condition": "CreateLexV1Bots",
+        "Condition": "CreateLexV1ResponseBots",
         "Type": "Custom::LexIntent",
         "Properties": {
             "ServiceToken": {"Ref": "CFNLambda"},
@@ -1906,7 +1906,7 @@ exports.resources={
         },
     },
     "QNAEmailAddress": {
-        "Condition": "CreateLexV1Bots",
+        "Condition": "CreateLexV1ResponseBots",
         "Type": "Custom::LexBot",
         "DependsOn": "EmailAddressIntent",
         "Properties": {
@@ -1940,7 +1940,7 @@ exports.resources={
         }
     },
     "EmailAddressAliasV2": {
-        "Condition": "CreateLexV1Bots",
+        "Condition": "CreateLexV1ResponseBots",
         "Type": "Custom::LexAlias",
         "DependsOn": "QNAEmailAddress",
         "Properties": {
@@ -1953,7 +1953,7 @@ exports.resources={
         }
     },
     "NameIntent": {
-        "Condition": "CreateLexV1Bots",
+        "Condition": "CreateLexV1ResponseBots",
         "Type": "Custom::LexIntent",
         "Properties": {
             "ServiceToken": {"Ref": "CFNLambda"},
@@ -2034,7 +2034,7 @@ exports.resources={
         },
     },
     "QNAName": {
-        "Condition": "CreateLexV1Bots",
+        "Condition": "CreateLexV1ResponseBots",
         "Type": "Custom::LexBot",
         "DependsOn": "NameIntent",
         "Properties": {
@@ -2068,7 +2068,7 @@ exports.resources={
         }
     },
     "NameAliasV2": {
-        "Condition": "CreateLexV1Bots",
+        "Condition": "CreateLexV1ResponseBots",
         "Type": "Custom::LexAlias",
         "DependsOn": "QNAName",
         "Properties": {
@@ -2091,6 +2091,6 @@ exports.names=[
 
 
 exports.outputs=_.fromPairs(exports.names.map(x=>{
-    return [x,{Value:{"Fn::If": ["CreateLexV1Bots", {"Ref":x}, "ReponseBots not yet supported in LexV2-Only installations"]}}];
+    return [x,{Value:{"Fn::If": ["CreateLexV1ResponseBots", {"Ref":x}, "Lex V1 ReponseBots disabled during stack create/update"]}}];
 }));
 

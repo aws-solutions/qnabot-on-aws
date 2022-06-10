@@ -1,3 +1,5 @@
+/* eslint-disable indent */
+/* eslint-disable quotes */
 const util = require('../util');
 
 module.exports=Object.assign(
@@ -48,7 +50,8 @@ module.exports=Object.assign(
             Key:"Type",
             Value:"Import"
         }]
-      }
+      },
+      "Metadata": util.cfnNag(["W92"])
     },
     "ImportStepLambda": {
       "Type": "AWS::Lambda::Function",
@@ -86,7 +89,8 @@ module.exports=Object.assign(
             Key:"Type",
             Value:"Import"
         }]
-      }
+      },
+      "Metadata": util.cfnNag(["W92"])
     },
     "ImportRole": {
       "Type": "AWS::IAM::Role",
@@ -113,7 +117,7 @@ module.exports=Object.assign(
           {"Ref":"ImportPolicy"}
         ]
       },
-      "Metadata": util.cfnNagXray()
+      "Metadata": util.cfnNag(["W11", "W12"])
     },
     "ImportPolicy": {
       "Type": "AWS::IAM::ManagedPolicy",
@@ -123,7 +127,11 @@ module.exports=Object.assign(
           "Statement": [{
               "Effect": "Allow",
               "Action": [
-                "s3:*"
+                "s3:PutObject",
+                "s3:GetObject",
+                "s3:GetObjectVersion",
+                "s3:DeleteObject",
+                "s3:DeleteObjectVersion"
               ],
               "Resource":[{"Fn::Sub":"arn:aws:s3:::${ImportBucket}*"}]
           },{
@@ -143,5 +151,4 @@ module.exports=Object.assign(
             "Bucket":{"Ref":"ImportBucket"}
         }
     }
-})
-
+});

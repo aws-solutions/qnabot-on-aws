@@ -1,0 +1,44 @@
+AWSTemplateFormatVersion: '2010-09-09'
+
+Parameters:
+  Param1:
+      Description: Param1
+      Type: String
+
+Resources:
+  ImportBucket:
+    Type: AWS::S3::Bucket
+    BucketName: test_import_bucket
+  ExportBucket:
+    Type: AWS::S3::Bucket
+    BucketName: test_export_bucket
+  ESProxyLambdaRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+            Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+  ESCFNProxyLambda:
+    Type: AWS::Lambda::Function
+    Properties:
+      Code:
+        ZipFile: "mock"
+      Handler: mock
+      Role: !GetAtt ESProxyLambdaRole.Arn
+      Runtime: mock
+  Index:
+    Type: Custom::ESProxy
+    Properties:
+      ServiceToken: !Ref ESCFNProxyLambda
+
+Outputs:
+  ImportBucket:
+    Description: Use for testing
+    Value: !Ref ImportBucket
+  ExportBucket:
+    Description: Use for testing
+    Value: !Ref ExportBucket

@@ -26,10 +26,12 @@ module.exports={
             url:context.rootState.info._links.jobs.href,
             method:'get'
         })
+        let body = opts.filter ? {filter:`${opts.filter}.*`} : {}
+        body.token = `${opts.token}`
         var result=await context.dispatch('_request',{
             url:`${info._links.testall.href}/${opts.name}`,
             method:'put',
-            body:opts.filter ? {filter:`${opts.filter}.*`} : {}
+            body:body
         })
     },
     downloadTestAll:async function(context,opts){

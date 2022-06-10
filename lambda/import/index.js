@@ -8,6 +8,8 @@ var lambda = new aws.Lambda()
 var stride = parseInt(process.env.STRIDE)
 var _ = require('lodash')
 var convertxlsx = require('convert-xlsx')
+var delete_existing_content = require('delete_existing_content')
+
 
 exports.step = function (event, context, cb) {
     console.log("step")
@@ -180,6 +182,7 @@ exports.step = function (event, context, cb) {
             }
         })
         .catch(cb)
+
 }
 
 exports.start = function (event, context, cb) {

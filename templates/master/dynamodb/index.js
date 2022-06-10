@@ -4,6 +4,9 @@ module.exports={
         "Type" : "AWS::DynamoDB::Table",
         "Properties" : {
             "BillingMode" : "PAY_PER_REQUEST",
+            "PointInTimeRecoverySpecification": {
+                "PointInTimeRecoveryEnabled" : true
+            },
             "AttributeDefinitions" : [
                 {
                 "AttributeName" : "UserId",
@@ -17,6 +20,6 @@ module.exports={
                 }
             ]
         },
-        "Metadata": util.cfnNag(["W74", "W78"])
+        "Metadata": util.cfnNag(["W74"])
     }
 }

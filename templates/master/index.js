@@ -10,7 +10,7 @@ module.exports={
   "Conditions": {},
   "AWSTemplateFormatVersion": "2010-09-09",
   "Transform": "AWS::Serverless-2016-10-31",
-  "Description": `(SO0189) QnABot with admin and client websites - (Master v${process.env.npm_package_version})`,
+  "Description": `(SO0189-ext) QnABot with admin and client websites - (Version v${process.env.npm_package_version})`,
   "Mappings": {},
   "Outputs": {
     "CognitoEndpoint":{
@@ -242,6 +242,12 @@ module.exports={
         "AllowedValues" : ["LexV1 and LexV2", "LexV2 Only"],
         "Default":"LexV2 Only"
     },
+    "InstallLexResponseBots":{
+      "Description" : "If Elicit Response feature is not needed, choose 'false' to skip sample Lex Response Bot installation.",
+      "Type":"String",
+      "AllowedValues" : ["true", "false"],
+      "Default":"true"
+  },
     "XraySetting":{
         "Type":"String",
         "Description": "Configure Lambdas with X-Ray enabled",
