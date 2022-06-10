@@ -107,6 +107,9 @@ Notice that the user is not prompted with the question `What day do you want to 
 - Topics, and ClientFilters are not supported when a Item ID is enabled with custom Intent. 
 - Bot locale must be set to user's locale for QnABot multi-language text interactions. 
 - Always initiate a LEX REBUILD when enabling Item IDs with custom intent and slots. This will create the custom intent(s), slot(s), and slot type(s) in Amazon Lex V2, and will also train Amazon Lex using the added/updated Item IDs as training data. 
+- To take advantage of the additional features supported by Lex (such as: confirmation prompts, regular expression to validate the value of a slot etc.), you can also create the Lex Intents and Slottypes in the QnABot lex bot using the Amazon Lex console. 
+More information: https://docs.aws.amazon.com/lexv2/latest/dg/build-intents.html 
+- Even if the Lex Intents and Slottypes are created in the Amazon Lex console (i.e.: created outside of the QnABot designer), you can reference any SlotType defined in the bot in a QnABot Item ID, and also map a QID to a manually created Lex intent in QnABot. 
 - The `Test All` or `Test` option will not work correctly for Item IDs with custom intent. 
 - As you are building your knowledge bank of questions, you may have a combination of FAQ based questions, Intent based questions. There may be instances where a wrong intent gets matched, or a FAQ question is matched instead. To troubleshoot this, below are couple of options that can help: 
   - Enable the `ENABLE_DEBUG_RESPONSES` setting in QnABot. This setting provides debug information to help understand what is processing the request (such as: Intent, ElasticSearch, Kendra)

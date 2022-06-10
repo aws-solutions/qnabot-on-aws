@@ -6,20 +6,16 @@
       "resolutionStrategyRestrict": true,
       "slotTypeValues": [
         {
-          "samplevalue": "economy",
-          "synonyms": "economy"
+          "samplevalue": "economy"
         },
         {
-          "samplevalue": "midsize",
-          "synonyms": "midsize"
+          "samplevalue": "midsize"
         },
         {
-          "samplevalue": "luxury",
-          "synonyms": "luxury"
+          "samplevalue": "luxury"
         },
         {
-          "samplevalue": "compact",
-          "synonyms": "compact"
+          "samplevalue": "compact"
         }
       ],
       "type": "slottype",

@@ -156,10 +156,15 @@ def get_qid_V2_slotTypeValues(localeId, slotTypeDef):
             synonymValues = synonyms_str.split(",") if synonyms_str else []
             # append translated synonyms to original and de-dup
             synonymValues = list(set(synonymValues + translate_list(localeId, synonymValues)))
-            v2_slotTypeValue = {
-                'sampleValue': { 'value': sampleValue },
-                'synonyms' : [ {'value': value} for value in synonymValues]
-            }
+            if synonymValues == []: 
+                v2_slotTypeValue = {
+                    'sampleValue': { 'value': sampleValue }
+                }
+            else:
+                v2_slotTypeValue = {
+                    'sampleValue': { 'value': sampleValue },
+                    'synonyms' : [ {'value': value} for value in synonymValues]
+                }
         v2_slotTypeValues.append(v2_slotTypeValue)
     return v2_slotTypeValues
 

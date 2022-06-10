@@ -614,45 +614,47 @@ async function processFulfillmentEvent(req,res) {
 function process_slots(req, res, hit) {
     let qid_slots = _.get(hit,"slots");
     let nextSlotToElicit;
-    for (let slot of qid_slots) {
-        let slotName = _.get(slot,"slotName");
-        let slotValue = _.get(req, `slots.${slotName}`);
-        let slotRequired = _.get(slot,"slotRequired",false);
-        let slotValueCached = _.get(slot, "slotValueCached");
-        let slot_sessionAttrName = 'qnabotcontext.slot.' + slotName ;
-        if (slotValue) {
-            qnabot.log(`Slot ${slotName} already filled: ${slotValue}`);
-            _.set(res, `slots.${slotName}`, slotValue);
-            if (slotValueCached) {
-                qnabot.log(`Slot value caching enabled for: '${slotName}' setting session attribute '${slot_sessionAttrName}'`);
-                _.set(res.session, slot_sessionAttrName, slotValue);
-            }
-        } 
-        if (!slotValue) {
-            if (slotValueCached) {
-                qnabot.log(`Slot value caching enabled for: '${slotName}' using session attribute '${slot_sessionAttrName}'`);
-                value = _.get(res.session, slot_sessionAttrName);
-                if (value) {
-                    qnabot.log(`Filling slot ${slotName} using cached value: ${value}`);
-                    _.set(res, `slots.${slotName}`, value);
+    if (qid_slots) {
+        for (let slot of qid_slots) {
+            let slotName = _.get(slot,"slotName");
+            let slotValue = _.get(req, `slots.${slotName}`);
+            let slotRequired = _.get(slot,"slotRequired",false);
+            let slotValueCached = _.get(slot, "slotValueCached");
+            let slot_sessionAttrName = 'qnabotcontext.slot.' + slotName ;
+            if (slotValue) {
+                qnabot.log(`Slot ${slotName} already filled: ${slotValue}`);
+                _.set(res, `slots.${slotName}`, slotValue);
+                if (slotValueCached) {
+                    qnabot.log(`Slot value caching enabled for: '${slotName}' setting session attribute '${slot_sessionAttrName}'`);
+                    _.set(res.session, slot_sessionAttrName, slotValue);
+                }
+            } 
+            if (!slotValue) {
+                if (slotValueCached) {
+                    qnabot.log(`Slot value caching enabled for: '${slotName}' using session attribute '${slot_sessionAttrName}'`);
+                    value = _.get(res.session, slot_sessionAttrName);
+                    if (value) {
+                        qnabot.log(`Filling slot ${slotName} using cached value: ${value}`);
+                        _.set(res, `slots.${slotName}`, value);
+                    } else {
+                        qnabot.log(`No cached value for slot ${slotName}`);
+                        _.set(res, `slots.${slotName}`, null);
+                        if (slotRequired && !nextSlotToElicit) {
+                            nextSlotToElicit = slotName;
+                        }
+                    }
                 } else {
-                    qnabot.log(`No cached value for slot ${slotName}`);
+                    qnabot.log(`Slot value caching is not enabled for: ${slotName}`);
                     _.set(res, `slots.${slotName}`, null);
                     if (slotRequired && !nextSlotToElicit) {
                         nextSlotToElicit = slotName;
                     }
                 }
-            } else {
-                qnabot.log(`Slot value caching is not enabled for: ${slotName}`);
-                _.set(res, `slots.${slotName}`, null);
-                if (slotRequired && !nextSlotToElicit) {
-                    nextSlotToElicit = slotName;
-                }
             }
         }
+        qnabot.log(`Set next slot to elicit: ${nextSlotToElicit}`);
+        res.nextSlotToElicit = nextSlotToElicit;
     }
-    qnabot.log(`Set next slot to elicit: ${nextSlotToElicit}`);
-    res.nextSlotToElicit = nextSlotToElicit;
     // Placeholder to add optional lambda hook for slot validation / runtime hints, etc. (future)
     return res;
 }
