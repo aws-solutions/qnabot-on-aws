@@ -5,6 +5,7 @@ The AWS QnABot CLI supports the capability to `import` and `export` questions an
 
 ## Setup Prerequisites
 To use the CLI, the following prerequisites are required:
+- Downloaded codebase of AWS QnABot Solution (version 5.2.0 or higher) from [GitHub](https://github.com/aws-solutions/aws-qnabot)
 - AWS Command Line Interface (CLI). For more information, refer to: https://aws.amazon.com/cli/
 - Python version 3.7 or higher. For more information on installing Python, refer to: https://docs.python.org/3/using/index.html
 - AWS IAM permissions having the below IAM policy. Attach the below IAM policy to the IAM user or IAM Role that you are using for the AWS CLI. Replace the below values when creating the IAM policy:
@@ -46,18 +47,17 @@ To use the CLI, the following prerequisites are required:
 
 ## Environment Setup 
 You can get started by creating a virtual environment and deploy the needed Python packages. 
-From the root directory of the AWS QnABot codebase, run the below commands: 
+From a directory outside of the AWS QnABot codebase, run the below commands: 
 ````
 pip3 install virtualenv
 python3 -m virtualenv .venv
 source ./.venv/bin/activate
-cd ./source
+cd ./aws-qnabot/source
 pip3 install -r requirements.txt
 ````
 This will setup a virtual environment and install the below Python packages:
 - `boto3` Python module version 1.21.18. For more information, refer to: https://aws.amazon.com/sdk-for-python/
 - `Click` Python module version 8.0.4. For more information, refer to: https://pypi.org/project/click/
-
 
 
 ### Set Environment variables
@@ -66,9 +66,9 @@ Set the `AWS_Region` you will be using. For example, to use the `us-east-1` AWS 
 
 `export AWS_REGION='us-east-1'`
 
-Set the `PYTHONPATH` using the below command. Change the `<project-base>` information to the path where you have setup the AWS QnABot codebase. 
+Set the `PYTHONPATH` using the below command.
 
-`export PYTHONPATH=<project-base>/source:$PYTHONPATH`
+`export PYTHONPATH=${PWD}:$PYTHONPATH`
 
 
 ## Usage
