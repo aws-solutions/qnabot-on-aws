@@ -52,7 +52,7 @@ From a directory outside of the AWS QnABot codebase, run the below commands:
 pip3 install virtualenv
 python3 -m virtualenv .venv
 source ./.venv/bin/activate
-cd ./aws-qnabot/source
+cd source
 pip3 install -r requirements.txt
 ````
 This will setup a virtual environment and install the below Python packages:
