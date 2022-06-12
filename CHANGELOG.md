@@ -5,6 +5,36 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [5.2.0]
+
+### Added
+
+- Intent and Slot matching (an early implementation). This new capability supports creating dedicated custom Intents for a QnABot {Item ID}. You can extend QnABot to support one or more related intents. For example, you might create an intent that makes a car reservation, or assists an agent during a live chat or call (via Amazon Connect). More details in README: https://github.com/aws-solutions/aws-qnabot/blob/main/docs/intent_slot_matching/README.md
+- Support for using custom domain names for QnABot Designer and Client interfaces. More details in README: https://github.com/aws-solutions/aws-qnabot/blob/main/docs/custom_domain_name_setup/README.md
+- AWS QnABot Command Line Interface (CLI) - the AWS QnABot CLI supports the capability to import and export questions and answers via command line. More details in README: https://github.com/aws-solutions/aws-qnabot/blob/main/docs/qnabot_cli.md
+- Kendra Redirect - with the Kendra Redirect feature, you can now include a Kendra query within a Item ID. More details in README: https://github.com/aws-solutions/aws-qnabot/blob/main/docs/kendra_redirect/README.md
+- Integration with Canvas LMS (an early example implementation). Students use their schools' learning management system (LMS) to keep track of their assignments, grades, and their course work. With this integration, students will be able to ask QnABot about their grades, syllabus, enrollments, assignments, and announcements. 
+More details in README: https://github.com/aws-solutions/aws-qnabot/blob/main/docs/canvaslms_integration.md
+- Updated import functionality to support importing of QnABot questions and answers from a Excel file when uploaded to S3 data folder.
+- Added support for importing session attributes via Excel.
+- Updated runtime of Lambda functions (using Python runtime) to use Python runtime version 3.9.
+
+### Fixed
+
+- Client Type was not detected when using LexWebUI with LexV2.
+- Implemented small score boost for items with no topic when topic is not set in the query. This breaks the ties, and allows a predictable response for an ambiguous question when there is no topic, by preferring an answer that also has no topic.
+- `Test All` functionality when `ENFORCE_VERIFIED_IDENTITY` is `true`.
+- Queries containing only {stop words} should return no_hits instead of random answer.
+- Metric logging issue when field count exceeds index limit.
+- Kendra support for multilanguage content search match.
+- QnABot Client not displaying updated languag(es).
+- Updated es-warmer function to use qnabot common lib to pick up package for qnabot/logging. Without this, es-warmer immediately fails and does not complete keeping elasticsearch cache loaded with questions.
+- Addressed several issues related to presentation of Alexa skill cards. 
+- Updated public-vpc-support template to be usable from command line. 
+- Changed QnABot templates to use native Lex V2 Cloudformation template syntax for response bots.
+- Handling response card images with long URLs. 
+- Removing vendor.js as not needed. 
+
 ## [5.1.2] - 2022-03-14
 
 ### Added
