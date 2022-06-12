@@ -11,7 +11,8 @@ module.exports={
         main:["babel-polyfill","./entry.js"],
         check:["./js/browser-check.js"],
         client:["babel-polyfill","./js/client.js"],
-        test:["babel-polyfill","./js/test.js"]
+        test:["babel-polyfill","./js/test.js"],
+        vendor:["aws-sdk"]
     },
     output:{
         path:path.join(__dirname,'../build'),
@@ -28,7 +29,7 @@ module.exports={
         new HtmlWebpackPlugin({
             template:'./html/admin.pug',
             filename:'index.html',
-            chunks:["main","check"]
+            chunks:["main","check", "vendor"]
         }),
         new HtmlWebpackPlugin({
             template:'./html/test.ejs',
@@ -38,7 +39,7 @@ module.exports={
         new HtmlWebpackPlugin({
             template:'./html/client.pug',
             filename:'client.html',
-            chunks:["client"]
+            chunks:["client", "vendor"]
         }),
         new HtmlWebpackPlugin({
             filename:"health.html",
