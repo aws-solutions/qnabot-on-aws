@@ -100,14 +100,6 @@ exports.parse=async function(req){
  * 
  */
 exports.assemble=function(request,response){
-    let plainMessage = response.plainMessage;
-    if (plainMessage && plainMessage.includes("<speak>")) {
-        plainMessage = plainMessage.replace(/<\/?[^>]+(>|$)/g, "");
-    }
-    if (plainMessage.toLowerCase().startsWith("ok. ")) {
-        plainMessage = plainMessage.replace(/[Oo][Kk]. /g, "");
-    }
-    let subTitle = response.card && response.card.subTitle ? response.card.subTitle : undefined;
     let res = {
         version:'1.0',
         response:{
@@ -119,15 +111,15 @@ exports.assemble=function(request,response){
             card:_.get(response,"card.imageUrl") ? {
                 type:"Standard",
                 title:response.card.title || request.question,
-                text:subTitle !== undefined ? subTitle +"\n\n" + plainMessage : plainMessage,
+                text:_.has(response.card,'subTitle')? response.card.subTitle +"\n\n" + response.plainMessage:response.plainMessage,
                 image:{
                     smallImageUrl:response.card.imageUrl,
                     largeImageUrl:response.card.imageUrl
                 }
             } : {
                 type:"Simple",
-                title: _.get(response,"card.title") || request.question || "Image",
-                content: subTitle !== undefined ? subTitle +"\n\n" + plainMessage : plainMessage
+                title:_.get(response,"card.title") || request.question || "Image",
+                content:_.has(response.card,'subTitle')? response.card.subTitle +"\n\n" + response.plainMessage:response.plainMessage
             },
             shouldEndSession:false
         },

@@ -1521,87 +1521,6 @@ exports.resources={
         }
     },
 
-    "ResponseBotQNAAgeNoConfirm": {
-        "Type": "Custom::LexBot",
-        "Properties": {
-            "ServiceToken": { "Ref":"LexV2CFNLambdaARN" },
-            "botName": {"Fn::Sub":"ResponseBot-QNAAgeNoConfirm-${AWS::StackName}"},
-            "dataPrivacy": {"childDirected": "False"},
-            "description": "QNA Age No Confirm Bot - " + botDateVersion,
-            "idleSessionTTLInSeconds": "300",
-            "roleArn": { "Ref":"LexV2ServiceLinkedRoleARN" },
-            "CR.botLocales": [{
-                "localeId": "en_US",
-                "nluIntentConfidenceThreshold": "0.40",
-                "voiceSettings": {"voiceId":"Salli"},
-                "CR.intents": [{
-                    "intentName": "AgeNoConfirmIntent",
-                    "sampleUtterances": [
-                        {"utterance": "My age is {Age}"},
-                        {"utterance": "Age is {Age}"},
-                        {"utterance": "It is {Age}"},
-                        {"utterance": "I am {Age}"},
-                        {"utterance": "I am {Age} years old"},
-                        {"utterance": "His age is {Age}"},
-                        {"utterance": "He is {Age}"},
-                        {"utterance": "He is {Age} years old"},
-                        {"utterance": "Her age is {Age}"},
-                        {"utterance": "She is {Age}"},
-                        {"utterance": "She is {Age} years old"},
-                        {"utterance": "{Age}"}
-                    ],
-                    "intentClosingSetting": {
-                        "closingResponse": {
-                            "messageGroups": [{
-                                "message": {"plainTextMessage": {"value": "OK. "}}
-                            }]
-                        }
-                    },
-                    "CR.slots": [{
-                        "slotName": "Age",
-                        "CR.slotTypeName": "AMAZON.Number",
-                        "valueElicitationSetting": {
-                            "slotConstraint": "Required",
-                            "promptSpecification": {
-                                "messageGroups": [{
-                                    "message": { "plainTextMessage": {"value": "What age?"}}
-                                }],
-                                "maxRetries": 2,
-                                "allowInterrupt": "True"
-                            }
-                        }
-                    }]
-                }],
-            }]
-        }
-    },
-
-    "ResponseBotQNAAgeNoConfirmVersion": {
-        "DeletionPolicy": "Retain",
-        "UpdateReplacePolicy": "Retain",
-        "Type": "Custom::LexBotVersion",
-        "Properties": {
-            "ServiceToken": { "Ref":"LexV2CFNLambdaARN" },
-            "botId": { "Ref":"ResponseBotQNAAgeNoConfirm" },
-            "CR.botLocaleIds": {"Fn::GetAtt":["ResponseBotQNAAgeNoConfirm","botLocaleIds"]},
-            "CR.lastUpdatedDateTime": {"Fn::GetAtt":["ResponseBotQNAAgeNoConfirm","lastUpdatedDateTime"]}
-        }
-    },
-
-    "ResponseBotQNAAgeNoConfirmAlias": {
-        "DeletionPolicy": "Retain",
-        "Type": "Custom::LexBotAlias",
-        "Properties": {
-            "ServiceToken": { "Ref":"LexV2CFNLambdaARN" },
-            "botId": { "Ref":"ResponseBotQNAAgeNoConfirm" },
-            "botAliasName": "live",
-            "botVersion": { "Ref":"ResponseBotQNAAgeNoConfirmVersion" },
-            "botAliasLocaleSettings": {
-                "en_US": {"enabled": "True"}
-            }
-        }
-    },
-
     "ResponseBotQNAPhoneNumber": {
         "Type": "Custom::LexBot",
         "Properties": {
@@ -2041,7 +1960,7 @@ exports.resources={
 
 exports.names=[
     "QNAWage", "QNASocialSecurity", "QNAPinNoConfirm", "QNAPin", "QNAYesNo", "QNAYesNoExit", "QNADate", "QNADateNoConfirm", "QNADayOfWeek", "QNAMonthNoConfirm", "QNAMonthNoConfirm", 
-    "QNANumber", "QNANumberNoConfirm", "QNAAge", "QNAAgeNoConfirm", "QNAPhoneNumber", "QNAPhoneNumberNoConfirm", "QNATime", "QNAEmailAddress", "QNAName"
+    "QNANumber", "QNANumberNoConfirm", "QNAAge", "QNAPhoneNumber", "QNAPhoneNumberNoConfirm", "QNATime", "QNAEmailAddress", "QNAName"
 ] ;
 
 
