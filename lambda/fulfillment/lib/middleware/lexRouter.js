@@ -15,7 +15,6 @@ const QNADateNoConfirm = "QNADateNoConfirm";
 const QNADayOfWeek = "QNADayOfWeek";
 const QNAMonth = "QNAMonth"
 const QNAAge = "QNAAge";
-const QNAAgeNoConfirm = "QNAAgeNoConfirm";
 const QNAPhoneNumber = "QNAPhoneNumber";
 const QNAPhoneNumberNoConfirm = "QNAPhoneNumberNoConfirm";
 const QNATime = "QNATime";
