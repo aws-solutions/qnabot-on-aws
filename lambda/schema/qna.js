@@ -225,27 +225,98 @@ module.exports={
             },
             propertyOrder:14
         },
+        elicitResponse:{
+            title:"Elicit Response",
+            description:"If your answer includes a question to the user, configure QnABot to process and capture the user's response as session attributes.",
+            type:"object",
+            propertyOrder:15,
+            properties:{
+                responsebot_hook:{
+                    title:"Elicit Response: ResponseBot Hook",
+                    description:"To capture the next utterance as a response, provide the name of a Lex bot to parse the response and return at least one slot value, e.g. (QNAYesNo, QNADate, etc.). For Lex V2 use \"lexv2::Botid/BotAliasId/LocaleId\". For Lex V1 use a bot name starting with \"QNA\".",
+                    type:"string",
+                    maxLength:100,
+                    propertyOrder:0
+                },
+                response_sessionattr_namespace:{
+                    title:"Elicit Response: Response Session Attribute Namespace",
+                    description:"Required: Enter a string used as a name space for session attributes that will store returned slot values from the Response Bot.",
+                    type:"string",
+                    maxLength:100,
+                    propertyOrder:1
+                }
+            }
+        },
         conditionalChaining:{
             title:"Document Chaining: Chaining Rule",
             description:"Automatically move on to another item based on the question string returned by this rule. Rule can be a single-quoted string, e.g. 'next question', or a JavaScript conditional expression that evaluates to a string, e.g. (SessionAttributes.namespace.Yes_No == \"Yes\" ) ? \"Yes question\" : \"No Question\", or a Lambda Function Name or ARN that returns a string specified as \"Lambda::FunctionName\". Function name must start with \"QNA-\".",
             type:"string",
             maxLength:4000,
-            propertyOrder:15
+            propertyOrder:16
         },
         clientFilterValues:{
             title:"Client Filters: Values",
             description:"Enter list of terms. When specified, client must provide 1 or more matching terms in request session attribute 'QNAClientFilter' for this answer to be eligible for the response. Client filters cannot be used if enableLexIntent is enabled.",
             type:"string",
             maxLength:100,
-            propertyOrder:16
-        },    
+            propertyOrder:17
+        }, 
+        botRouting:{
+            title:"Bot Routing",
+            description:"Use QnABot as a supervisory Bot and route to other Bots to handle the conversation. This parameter identifies a target Bot or Lambda with which to route communication.",
+            type:"object",
+            propertyOrder:18,
+            properties:{
+                specialty_bot:{
+                    title:"Bot Routing: LexV1 BotName OR lexv2::Botid/BotAliasId/LocaleId OR Lambda Function",
+                    description:"The target specialty Lex Bot or Lambda Function to route requests to. For Lex V2 bot names use the format \"lexv2::BotId/BotAliasId/LocaleId\". For Lex V1 bot the names should start with \"QNA\". Lambda functions can be specified as \"Lambda::FunctionName\" or \"Lambda::FunctionARN\" - Lambda function names must start with \"QNA-\".",
+                    type:"string",
+                    maxLength:100,
+                    propertyOrder:0
+                },
+                specialty_bot_name:{
+                    title:"A simple name for the Specialty Bot that can optionally be presented in a user interface such as a bread crumb. (Required)",
+                    description:"Enter a string used as the Specialty Bot's simple name.",
+                    type:"string",
+                    maxLength:100,
+                    propertyOrder:1
+                },
+                specialty_bot_alias:{
+                    title:"The Bot alias to use for the Specialty Bot. (Required for other Lex/QnA Bot targets - Not utilized when Lambda Function is used.)",
+                    description:"For Lex V2 leave empty. For Lex V1 specialty bots, enter a string for the Specialty Bot's Lex alias.",
+                    type:"string",
+                    maxLength:100,
+                    propertyOrder:2
+                },
+                specialty_bot_session_attributes_to_merge:{
+                    title:"Session attributes to forward to a Lex specialty bot.",
+                    description:"An optional comma separated list of session attributes to pass to a Lex specialty bot. Default is an empty string.",
+                    type:"string",
+                    maxLength:100,
+                    propertyOrder:3
+                }
+            }
+        },
+        tags:{
+            type:"string",
+            description:"Specify tags for questions. Tags should be space separated. For multi-word tags please use underscore '_'.",
+            title:"Tags",
+            propertyOrder: 19
+        },  
         rp:{
             type:"string",
             title:"Alexa Reprompt",
             description:"Enter the Alexa reprompt to returned if the user does not respond. (SSML autodetection with &lt;speak&gt;&lt;/speak&gt;)",
             maxLength:8000,
-            propertyOrder: 17
+            propertyOrder: 20
         },
+        next:{
+            title:"Guided Navigation: Next QID",
+            description:"Use only for Guided Navigation feature. If applicable, enter the QID of the document(s) that is/are next in the sequence, otherwise leave blank. Be careful; if you set this field to an earlier document in the sequence, you might make your sequence loop forever, which would not be fun!  You can add more QIDs after the first, but they won't do anything at the moment.",
+            type:"string",
+            maxLength:100,
+            propertyOrder:21
+        }, 
     },
     required:["qid","q","a"]
 };
