@@ -240,7 +240,7 @@ module.exports={
                 },
                 response_sessionattr_namespace:{
                     title:"Elicit Response: Response Session Attribute Namespace",
-                    description:"Enter a string used as a name space for session attributes that will store returned slot values from the Response Bot.",
+                    description:"Required: Enter a string used as a name space for session attributes that will store returned slot values from the Response Bot.",
                     type:"string",
                     maxLength:100,
                     propertyOrder:1
