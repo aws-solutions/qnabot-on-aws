@@ -347,7 +347,7 @@ async function routeKendraRequest(event, context) {
             return;
         }
 
-        const params = {
+        let params = {
             IndexId: index, /* required */
             QueryText: useOriginalLanguageQuery ? origQuestion: question, /* required */
         };
@@ -599,7 +599,9 @@ async function routeKendraRequest(event, context) {
         maxDocuments: maxDocumentCount
     })
 
-    hit.autotranslate = useOriginalLanguageQuery ? false : true;
+    if (hit) {
+        hit.autotranslate = useOriginalLanguageQuery ? false : true;
+    }
     qnabot.log("Returning event: ", JSON.stringify(hit, null, 2));
     return hit;
 }
