@@ -46,7 +46,7 @@ async function run_query_es(req, query_params) {
         method: "GET",
         body: es_query
     });
-    
+
     qnabot.log(`Response from run_query_es => ${JSON.stringify(es_response)}` )
 
     if (_.get(es_response, "hits.hits[0]._source")) {
@@ -91,7 +91,7 @@ async function run_qid_query_es(params, qid) {
 
 function isQuestionAllStopwords(question) {
     let stopwords = "a,an,and,are,as,at,be,but,by,for,if,in,into,is,it,not,of,on,or,such,that,the,their,then,there,these,they,this,to,was,will,with".split(",");
-    let questionwords = question.toLowerCase().split(" ")
+    let questionwords = question.toLowerCase().split(/\s+/)
     let allStopwords = questionwords.every( x => { return stopwords.includes(x); });
     return allStopwords;
 }
