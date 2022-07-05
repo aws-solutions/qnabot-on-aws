@@ -30,7 +30,6 @@ async function run_query(req, query_params) {
     else {
         response= await open_es.run_query_es(req, query_params);
     }
-    qnabot.log(`response ${JSON.stringify(response)}` )
     return response;
 }
 
@@ -66,7 +65,7 @@ async function run_query_kendra(req, query_params) {
     }
 
     var kendra_response = await kendra.handler(request_params);
-    qnabot.log(kendra_response)
+    qnabot.log(`Response from run_query_kendra => ${JSON.stringify(kendra_response)}` )
     if (_.get(kendra_response, "hits.hits[0]._source")) {
         _.set(kendra_response, "hits.hits[0]._source.answersource", "Kendra FAQ");
     }
@@ -198,18 +197,13 @@ async function get_hit(req, res) {
     if (response.kendra_context) qnabot.log(`kendra context set in res session`);
     
     // ES fallback if KendraFAQ fails
-    if (!hit && _.get(req, '_settings.KENDRA_FAQ_ES_FALLBACK', true)) {
+    if (!hit && _.get(req, "_settings.KENDRA_FAQ_INDEX") && _.get(req, '_settings.KENDRA_FAQ_ES_FALLBACK', true)) {
         qnabot.log('ElasticSearch Fallback');
         response = await open_es.run_query_es(req, query_params);
         if (_.get(response, "hits.hits[0]._source")) {
             _.set(response, "hits.hits[0]._source.answersource", "ElasticSearch Fallback");
         }
         hit = _.get(response, "hits.hits[0]._source");
-    }
- 
-    if (response.hits.max_score == 0) {
-        qnabot.log("Max score is zero - no valid results. Set hit to null")
-        hit = null;
     }
 
     if (hit) {
