@@ -1,8 +1,8 @@
 # Contributing to the QnABot
 
 Contributions to the QnABot should be made via GitHub [pull
-requests](https://github.com/awslabs/aws-ai-qna-bot/pulls) and discussed using
-GitHub [issues](https://github.com/awslabs/aws-ai-qna-bot/issues).
+requests](https://github.com/aws-solutions/qna-bot-on-aws/pulls) and discussed using
+GitHub [issues](https://github.com/aws-solutions/qna-bot-on-aws/issues).
 
 ## Before you start
 
