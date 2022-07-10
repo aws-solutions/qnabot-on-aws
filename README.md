@@ -6,7 +6,7 @@
 
 This repository contains code for the QnABot, described in the AWS AI blog post [“Creating a Question and Answer Bot with Amazon Lex and Amazon Alexa”](https://aws.amazon.com/blogs/ai/creating-a-question-and-answer-bot-with-amazon-lex-and-amazon-alexa/).
 
-Refer to [Getting Started](#getting-started) to launch your own QnABot, or [Automated Deployment](https://docs.aws.amazon.com/solutions/latest/qna-bot-on-aws/automated-deployment.html) for detailed implementation instructions.
+Refer to [Getting Started](#getting-started) to launch your own QnABot, or [Automated Deployment](https://docs.aws.amazon.com/solutions/latest/qnabot-on-aws/automated-deployment.html) for detailed implementation instructions.
 
 The 5.1.0 release of QnABot provides support for a new mechanism where a Question can set a Lex session attribute.
 
@@ -72,7 +72,7 @@ Alternatively, you can download the template as a starting point for your
 own implementation. The template launches in the US East (N. Virginia) Region by default. To launch the solution in a
 different AWS Region, use the Region selector in the console navigation bar.
 
-<a target="_blank" href="https://us-east-1.console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/new?stackName=QnABot&templateURL=https://solutions-reference.s3.amazonaws.com/qna-bot-on-aws/latest/aws-qnabot-main.template"><span><img height="24px" src="https://s3.amazonaws.com/cloudformation-examples/cloudformation-launch-stack.png"/></span></a>
+<a target="_blank" href="https://us-east-1.console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/new?stackName=QnABot&templateURL=https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/latest/qnabot-on-aws-main.template"><span><img height="24px" src="https://s3.amazonaws.com/cloudformation-examples/cloudformation-launch-stack.png"/></span></a>
 
 The solution is supported in the following Regions:
 

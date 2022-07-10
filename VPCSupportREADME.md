@@ -3,8 +3,8 @@
 (version 1.0 - October 2021)
 
 This feature allows deployment of QnABot components within VPC infrastructure via a new template downloadable from
-[aws-qnabot-vpc.template](https://solutions-reference.s3.amazonaws.com/qna-bot-on-aws/latest/aws-qnabot-vpc.template) or by
-referencing the template in S3 using https://solutions-reference.s3.amazonaws.com/qna-bot-on-aws/latest/aws-qnabot-vpc.template.
+[qnabot-on-aws-vpc.template](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/latest/qnabot-on-aws-vpc.template) or by
+referencing the template in S3 using https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/latest/qnabot-on-aws-vpc.template.
 
 This template is made available for use as a separate installation mechanism. It is not the default template utilized in the
 public distribution. Please take care in deploying QnABot in VPC. The Elasticsearch Cluster becomes private to the VPC. In addition,
@@ -41,8 +41,8 @@ aws iam create-service-linked-role --aws-service-name es.amazonaws.com
 
 As mentioned earlier, a separate template is available that supports deployment within a VPC named aws-qnabot-vpc.template. You'll find this template
 alongside the standard qnabot template. You can download this template using
-[aws-qnabot-vpc.template](https://solutions-reference.s3.amazonaws.com/qna-bot-on-aws/latest/aws-qnabot-vpc.template) or
-reference the template in CloudFormation Launch Stack using https://solutions-reference.s3.amazonaws.com/qna-bot-on-aws/latest/aws-qnabot-vpc.template.
+[qnabot-on-aws-vpc.template](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/latest/qnabot-on-aws-vpc.template) or
+reference the template in CloudFormation Launch Stack using https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/latest/qnabot-on-aws-vpc.template.
 
 Launch from this template instead of the standard template.
 

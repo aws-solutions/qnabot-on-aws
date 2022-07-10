@@ -5,23 +5,23 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [5.2.0] - 2022-07-06
+## [5.2.0] - 2022-07-14
 
 ### Added
 
--   Intent and Slot matching (an early implementation). This new capability supports creating dedicated custom Intents for a QnABot {Item ID}. You can extend QnABot to support one or more related intents. For example, you might create an intent that makes a car reservation, or assists an agent during a live chat or call (via Amazon Connect). More details in README: https://github.com/aws-solutions/qna-bot-on-aws/blob/main/docs/intent_slot_matching/README.md
--   Support for using custom domain names for QnABot Designer and Client interfaces. More details in README: https://github.com/aws-solutions/qna-bot-on-aws/blob/main/docs/custom_domain_name_setup/README.md
--   AWS QnABot Command Line Interface (CLI) - the AWS QnABot CLI supports the capability to import and export questions and answers via command line. More details in README: https://github.com/aws-solutions/qna-bot-on-aws/blob/main/docs/qnabot_cli.md
--   Kendra Redirect - with the Kendra Redirect feature, you can now include a Kendra query within a Item ID. More details in README: https://github.com/aws-solutions/qna-bot-on-aws/blob/main/docs/kendra_redirect/README.md
+-   Intent and Slot matching (an early implementation). This new capability supports creating dedicated custom Intents for a QnABot {Item ID}. You can extend QnABot to support one or more related intents. For example, you might create an intent that makes a car reservation, or assists an agent during a live chat or call (via Amazon Connect). More details in README: https://github.com/aws-solutions/qnabot-on-aws/blob/main/docs/intent_slot_matching/README.md
+-   Support for using custom domain names for QnABot Designer and Client interfaces. More details in README: https://github.com/aws-solutions/qnabot-on-aws/blob/main/docs/custom_domain_name_setup/README.md
+-   AWS QnABot Command Line Interface (CLI) - the AWS QnABot CLI supports the capability to import and export questions and answers via command line. More details in README: https://github.com/aws-solutions/qnabot-on-aws/blob/main/docs/qnabot_cli.md
+-   Kendra Redirect - with the Kendra Redirect feature, you can now include a Kendra query within a Item ID. More details in README: https://github.com/aws-solutions/qnabot-on-aws/blob/main/docs/kendra_redirect/README.md
 -   Integration with Canvas LMS (an early example implementation). Students use their schools' learning management system (LMS) to keep track of their assignments, grades, and their course work. With this integration, students will be able to ask QnABot about their grades, syllabus, enrollments, assignments, and announcements.
-    More details in README: https://github.com/aws-solutions/qna-bot-on-aws/blob/main/docs/canvaslms_integration.md
+    More details in README: https://github.com/aws-solutions/qnabot-on-aws/blob/main/docs/canvaslms_integration.md
 -   Updated import functionality to support importing of QnABot questions and answers from a Excel file when uploaded to S3 data folder.
 -   Added support for importing session attributes via Excel.
 -   Updated runtime of Lambda functions (using Python runtime) to use Python runtime version 3.9.
 
 ### Changed
 
--   Solution name was changed to QnA Bot on AWS.
+-   Solution GitHub repository's name was changed to QnABot on AWS.
 
 ### Fixed
 
@@ -114,7 +114,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 -   AWS QnABot release as an AWS Solution Implementation
-    -   AWS QnABot now has a [landing page](https://aws.amazon.com/solutions/implementations/qna-bot-on-aws/) and [Implementation Guide](https://docs.aws.amazon.com/solutions/latest/qna-bot-on-aws/welcome.html)
+    -   AWS QnABot now has a [landing page](https://aws.amazon.com/solutions/implementations/qnabot-on-aws/) and [Implementation Guide](https://docs.aws.amazon.com/solutions/latest/qnabot-on-aws/welcome.html)
 
 ### Changed
 
