@@ -67,7 +67,7 @@ Two approaches can be used to get started. Deploy from pre-created repositories 
 ### Pre-created deployment
 
 Sign in to the AWS Management Console and select the button to launch
-the `aws-qnabot-main.template` AWS CloudFormation template.
+the `qnabot-onaws--main.template` AWS CloudFormation template.
 Alternatively, you can download the template as a starting point for your
 own implementation. The template launches in the US East (N. Virginia) Region by default. To launch the solution in a
 different AWS Region, use the Region selector in the console navigation bar.
@@ -117,7 +117,7 @@ Next, use the following command to launch a CloudFormation template to create th
 npm run bootstrap
 ```
 
-Finally, use the following command to launch template to deploy the QnA bot in your AWS account. When the stack has completed you will be able to log into the Designer UI (The URL is an output of the template). A temporary password to the email in your config.json:
+Finally, use the following command to launch template to deploy the QnAbot in your AWS account. When the stack has completed you will be able to log into the Designer UI (The URL is an output of the template). A temporary password to the email in your config.json:
 
 ```shell
 npm run up
