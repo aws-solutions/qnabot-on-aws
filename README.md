@@ -67,7 +67,7 @@ Two approaches can be used to get started. Deploy from pre-created repositories 
 ### Pre-created deployment
 
 Sign in to the AWS Management Console and select the button to launch
-the `qnabot-onaws--main.template` AWS CloudFormation template.
+the `qnabot-onaws-main.template` AWS CloudFormation template.
 Alternatively, you can download the template as a starting point for your
 own implementation. The template launches in the US East (N. Virginia) Region by default. To launch the solution in a
 different AWS Region, use the Region selector in the console navigation bar.
