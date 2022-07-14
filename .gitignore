@@ -81,6 +81,7 @@ temp/
 **/deployment/regional-s3-assets
 **/deployment/open-source
 
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -99,3 +100,7 @@ coverage.xml
 *.py,cover
 .hypothesis/
 .pytest_cache/
+
+docs/excel_import/~$sample.xlsx
+
+
