@@ -51,6 +51,11 @@ function build_query(params) {
         match_query.quniqueterms.fuzziness = "AUTO";
       }
       let query = bodybuilder();
+
+      // Exclude QIDs with enableQidIntent: true. They should be matched only by Lex
+      // as intents, not by ES match queries. 
+      query = query.notFilter('match', {"enableQidIntent": {"query": true}});
+
       if (keywords.length > 0) {
         if (_.get(params, 'score_answer_field')) {
           query = query
@@ -104,11 +109,40 @@ function build_query(params) {
       if (_.get(params, 'score_answer_field')) {
         query = query.orQuery('match', 'a', params.question);
       }
-      query = query.orQuery('match', 't', _.get(params, 'topic', ''))
+      let topic = _.get(params, 'topic');
+      if (topic) {
+        query = query.orQuery('match', 't', topic);
+      } else {
+        // no topic - query prefers answers with empty/missing topic field for predicable response
+        // NOTE: will not work in Kendra FAQ mode since we have no equivalent Kendra query
+        query = query.orQuery(
+          'bool', {
+            "should" : [
+              { 
+                "match_all": {
+                } 
+              },
+              {
+                "bool": {
+                  "must_not": [
+                      {
+                          "exists": {
+                              "field": "t"
+                          }
+                      }
+                  ]
+                }
+              }          
+            ],
+            "minimum_should_match" : 2
+          }      
+        ) ;
+      }
+      query = query
         .from(_.get(params, 'from', 0))
         .size(_.get(params, 'size', 1))
         .build();
-      qnabot.log("ElasticSearch Query", JSON.stringify(query, null, 2));
+      qnabot.log("ElasticSearch Query: ", JSON.stringify(query, null, 2));
       return new Promise.resolve(query);
     });
     }

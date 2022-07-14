@@ -11,7 +11,7 @@ module.exports=class ApiDeployment {
         if(!("ApiDeploymentId" in params))
         {
             run(()=>api.createDeployment(
-                    _.omit(params,["buildDate","stage","Encryption","ApiDeploymentId"])
+                    _.omit(params,["buildDate","stage","Encryption","ApiDeploymentId","LexV2BotLocaleIds"])
                 ).promise()
             )
             .tap(console.log)

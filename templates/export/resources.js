@@ -958,7 +958,7 @@ module.exports = Object.assign(
         Handler: "kendra_webcrawler.handler",
         MemorySize: "2048",
         Role: {"Fn::GetAtt": ["KendraNativeCrawlerRole", "Arn"]},
-        Runtime: "python3.7",
+        Runtime: "python3.9",
         Timeout: 900,
         Tags: [
           {
@@ -1027,7 +1027,7 @@ module.exports = Object.assign(
         Handler: "kendra_webcrawler_schedule_updater.handler",
         MemorySize: "2048",
         Role: {"Fn::GetAtt": ["KendraNativeCrawlerRole", "Arn"]},
-        Runtime: "python3.7",
+        Runtime: "python3.9",
         Timeout: 900,
         Tags: [
           {
@@ -1092,7 +1092,7 @@ module.exports = Object.assign(
         Handler: "kendra_webcrawler_status.handler",
         MemorySize: "2048",
         Role: {"Fn::GetAtt": ["KendraNativeCrawlerRole", "Arn"]},
-        Runtime: "python3.7",
+        Runtime: "python3.9",
         Timeout: 900,
         Tags: [
           {

@@ -8,6 +8,7 @@
     "tmp":"tmp/$input.params('proxy')",
     "key":"data/$input.params('proxy')",
     "filter":"$inputRoot.get('filter')",
+    "token":"$inputRoot.get('token')",
     "status":"Started"
 }
 

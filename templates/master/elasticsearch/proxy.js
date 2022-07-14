@@ -51,7 +51,7 @@ module.exports={
                 index:{"Fn::Sub":"${Var.MetricsIndex}"},
                 endpoint:{"Fn::GetAtt":["ESVar","ESAddress"]},
                 body:{"Fn::Sub":JSON.stringify({
-                    settings:{},
+                    settings:{"index.mapping.total_fields.limit":2000},
                 })}
             }
         }

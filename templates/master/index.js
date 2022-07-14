@@ -213,7 +213,7 @@ module.exports={
     "ElasticSearchNodeCount":{
         "Type":"String",
         "Description":"Number of nodes in ElasticSearch domain - '4' is recommended for fault tolerant production deployments.",
-        "AllowedValues" : ["2", "4"],
+        "AllowedValues" : ["1", "2", "4"],
         "Default":"4"
     },
     "FulfillmentConcurrency": {
@@ -242,6 +242,12 @@ module.exports={
         "AllowedValues" : ["LexV1 and LexV2", "LexV2 Only"],
         "Default":"LexV2 Only"
     },
+    "InstallLexResponseBots":{
+      "Description" : "If Elicit Response feature is not needed, choose 'false' to skip sample Lex Response Bot installation.",
+      "Type":"String",
+      "AllowedValues" : ["true", "false"],
+      "Default":"true"
+  },
     "XraySetting":{
         "Type":"String",
         "Description": "Configure Lambdas with X-Ray enabled",
@@ -272,7 +278,8 @@ module.exports={
           ] },
     "CreateConcurrency":{ "Fn::Not": [
       {"Fn::Equals":[{"Ref":"FulfillmentConcurrency"},"0"]}
-    ]}
+    ]},
+    "SingleNode": {"Fn::Equals":[{"Ref":"ElasticSearchNodeCount"},"1"]}
   }
 }
 

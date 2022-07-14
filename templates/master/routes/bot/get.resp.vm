@@ -1,4 +1,5 @@
-#set ( $root="https://${!context.apiId}.execute-api.${!stageVariables.Region}.amazonaws.com/${!context.stage}")
+#set ($root="https://${!context.domainName}/${!context.stage}")
+
 #set($inputRoot = $input.path('$'))
 
 {

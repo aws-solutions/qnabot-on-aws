@@ -29,7 +29,7 @@ module.exports={
         new HtmlWebpackPlugin({
             template:'./html/admin.pug',
             filename:'index.html',
-            chunks:["main","check","vendor"]
+            chunks:["main","check", "vendor"]
         }),
         new HtmlWebpackPlugin({
             template:'./html/test.ejs',
@@ -39,7 +39,7 @@ module.exports={
         new HtmlWebpackPlugin({
             template:'./html/client.pug',
             filename:'client.html',
-            chunks:["client","vendor"]
+            chunks:["client", "vendor"]
         }),
         new HtmlWebpackPlugin({
             filename:"health.html",

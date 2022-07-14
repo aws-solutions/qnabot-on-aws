@@ -84,7 +84,12 @@ function parseLexV2Event(event) {
         _type: "LEX",
         _lexVersion: "V2",
         _userId: _.get(event, "sessionId", "Unknown Lex User"),
+        invocationSource: _.get(event, 'invocationSource'), 
         intentname: _.get(event, 'sessionState.intent.name'),
+        slots: _.mapValues(
+            _.get(event,"sessionState.intent.slots",{}), 
+            x => { return _.get(x,"value.interpretedValue") } 
+        ),
         question: _.get(event, 'inputTranscript'),
         session: _.mapValues(
             _.get(event.sessionState, 'sessionAttributes', {}),
@@ -98,6 +103,21 @@ function parseLexV2Event(event) {
         ),
         channel: _.get(event, "requestAttributes.'x-amz-lex:channel-type'")
     };
+
+    qnabot.log(`Lex event type is: ${out.invocationSource}`)
+    // If Lex has already matched a QID specific intent, then use intent name to locate matching Qid
+    if ( ! ["QnaIntent", "FallbackIntent"].includes(out.intentname) ) {
+        if (out.intentname.startsWith("QID-INTENT-")) {
+            qnabot.log(`Lex intent created from QID by QnABot`);
+        } else {
+            qnabot.log(`Custom Lex intent`);
+        }
+        let qid = out.intentname.replace(/^QID-INTENT-/, "").replace(/_dot_/g, ".")
+        qnabot.log(`Intentname "${out.intentname}" mapped to QID: "${qid}"`)
+        out.qid = qid
+    }
+
+
     // If voice, set userPreferredLocale from Lex locale in request (Voice input/output language should be aligned to bot locale)
     const mode = _.get(event,"inputMode") ;
     if (mode == "Speech") {
@@ -392,6 +412,26 @@ function getV2ElicitTemplate(request, response){
     } ;
 }
 
+function getV2DialogCodeHookResponseTemplate(request, response){
+    nextSlot = _.get(response,"nextSlotToElicit");
+    return {
+        sessionState: {
+            sessionAttributes:_.get(response,'session',{}),
+            dialogAction:{
+                type: (nextSlot) ? "ElicitSlot" : "Delegate",
+                slotToElicit: nextSlot,
+            },
+            intent: {
+                name: response.intentname,
+                slots: _.mapValues(_.get(response,"slots"), value=>{
+                    return (value) ? {"value": {"interpretedValue": value}} : null ;
+                }),
+            },
+            state: (nextSlot) ? "InProgress" : "ReadyForFulfillment",
+        },
+    } ;
+}
+
 function assembleLexV1Response(request,response) {
     let out = {};
     if((isConnectClientChat(request) && isInteractiveMessage(response) && ! isFallbackIntent(request))){
@@ -417,13 +457,12 @@ function assembleLexV2Response(request, response) {
     if(isConnectClientChat(request) && isInteractiveMessage(response)){
         out = getV2ElicitTemplate(request, response);
         out.messages = buildV2InteractiveMessageResponse(request, response);
-        
     } else if (isElicitResponse(request, response)){
         out = getV2ElicitTemplate(request, response);
-        
+    } else if (_.get(request,"invocationSource") === "DialogCodeHook") {
+        out = getV2DialogCodeHookResponseTemplate(request, response);
     } else {
         out = getV2CloseTemplate(request, response); 
-        
     }
 
     if (!isConnectClient(request)){

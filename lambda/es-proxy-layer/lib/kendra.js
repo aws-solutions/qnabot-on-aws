@@ -82,7 +82,7 @@ function addMarkdownHighlights(textIn,hlBeginOffset,hlEndOffset,highlightOnly=fa
             textOut = '**' + highlight + '**';
         } else {
             textOut = beginning + '**' + highlight + '**' + rest;
-        }        
+        }
     }
     return textOut ;
 }
@@ -109,6 +109,7 @@ function isHighlightInLink(textIn,hlBeginOffset) {
  */
 function kendraRequester(kendraClient,params,resArray) {
     return new Promise(function(resolve, reject) {
+        qnabot.log("Kendra request params:" + JSON.stringify(params, null, 2));
         kendraClient.query(params, function(err, data) {
             let indexId = params.IndexId;
             if (err) {
@@ -152,7 +153,7 @@ function mergeIntervals(intervals) {
     // get the top element
     top = stack[stack.length - 1];
 
-    // if the current interval doesn't overlap with the 
+    // if the current interval doesn't overlap with the
     // stack top element, push it to the stack
     if (top.EndOffset < intervals[i].BeginOffset) {
       stack.push(intervals[i]);
@@ -172,7 +173,7 @@ function mergeIntervals(intervals) {
 
 
 function signS3URL(url, expireSecs) {
-    var bucket, key; 
+    var bucket, key;
     if (url.search(/\/s3[.-](\w{2}-\w{4,9}-\d\.)?amazonaws\.com/) != -1) {
       //bucket in path format
       bucket = url.split('/')[3];
@@ -201,7 +202,7 @@ function signS3URL(url, expireSecs) {
         }
     } else {
         qnabot.log("URL is not an S3 url - return unchanged: ",url);
-    }   
+    }
     return url;
 }
 
@@ -233,7 +234,7 @@ function longestInterval(intervals) {
   } else if (intervals.length == 1) {
     return intervals[0];
   }
-  
+
   // sort the intervals based on their length
   intervals.sort(function(a, b) {return (a[1]-a[0]) - (b[1]-b[0])});
   return intervals[0];
@@ -283,7 +284,7 @@ async function routeKendraRequest(event, context) {
     let promises = [];
     let resArray = [];
     let kendraClient = undefined;
-    
+
     // if test environment, then use mock-up of kendraClient
     if (event.test) {
         var mockup = './test/mockClient' + event.test + '.js';
@@ -316,14 +317,25 @@ async function routeKendraRequest(event, context) {
     if (kendraIndexes === undefined) {
         throw new Error('Undefined Kendra Indexes');
     }
-    
+
+    let kendraIndexedLanguages = _.get(event.req["_settings"],
+        "KENDRA_INDEXED_DOCUMENTS_LANGUAGES",["en"]);
+    qnabot.log("Retrieved Kendra multi-language settings: " + kendraIndexedLanguages);
+
+    let origQuestion = event.req["_event"]["origQuestion"];
+    let question = event.req["question"];
+    let userDetectedLocale = _.get(event.req, 'session.qnabotcontext.userLocale');
+
+    let useOriginalLanguageQuery = kendraIndexedLanguages.includes(userDetectedLocale, 0)
+        && origQuestion && question && origQuestion!=question;
+    qnabot.log("useOriginalLanguageQuery: " + useOriginalLanguageQuery);
+
     // This function can handle configuration with an array of kendraIndexes.
     // Iterate through this area and perform queries against Kendra.
     kendraIndexes.forEach(function (index, i) {
         // if results cached from KendraFAQ, skip index by pushing Promise to resolve cached results
-        if (kendraResultsCached && index===kendraResultsCached.originalKendraIndexId) {
+        if (kendraResultsCached && index===kendraResultsCached.originalKendraIndexId && !useOriginalLanguageQuery) {
             qnabot.log(`retrieving cached kendra results`)
-            
             promises.push(new Promise(function(resolve, reject) {
                 var data = kendraResultsCached
                 _.set(event.req, "kendraResultsCached", "cached and retrieved");  // cleans the logs
@@ -334,11 +346,19 @@ async function routeKendraRequest(event, context) {
             }));
             return;
         }
-        
-        const params = {
+
+        let params = {
             IndexId: index, /* required */
-            QueryText: event.req["question"], /* required */
+            QueryText: useOriginalLanguageQuery ? origQuestion: question, /* required */
         };
+        let kendraQueryArgs = _.get(event.req, "kendraQueryArgs", [])
+        qnabot.log(`Kendra query args: ${kendraQueryArgs}`)
+        for (let argString of kendraQueryArgs) {
+            qnabot.log(`Adding parameter '${argString}'`);
+            let argJSON = `{ ${argString} }`; // convert k:v to a JSON obj
+            let arg = JSON.parse(argJSON);
+            params = _.assign(params, arg);
+        }
         let p = kendraRequester(kendraClient,params,resArray);
         promises.push(p);
     });
@@ -393,7 +413,7 @@ async function routeKendraRequest(event, context) {
                     element.AdditionalAttributes.length > 0 &&
                     element.AdditionalAttributes[0].Value.TextWithHighlightsValue.Text) {
                     answerMessage += '\n\n ' + element.AdditionalAttributes[0].Value.TextWithHighlightsValue.Text.replace(/\r?\n|\r/g, " ");
-                    allFilteredMessages.push(answerMessage)                    
+                    allFilteredMessages.push(answerMessage)
                     // Emboldens the highlighted phrases returned by the Kendra response API in markdown format
                     answerTextMd = element.AdditionalAttributes[0].Value.TextWithHighlightsValue.Text.replace(/\r?\n|\r/g, " ");
                     // iterates over the answer highlights in sorted order of BeginOffset, merges the overlapping intervals
@@ -415,7 +435,7 @@ async function routeKendraRequest(event, context) {
                         }
                     }
                     answerMessageMd = answerMessageMd + '\n\n' + answerTextMd;
-                    
+
                     // Shortens the speech response to contain say the longest highlighted phrase ONLY IF top answer not found
                     if (seenTop == false) {
                         var longest_highlight = longestInterval(sorted_highlights);
@@ -426,7 +446,7 @@ async function routeKendraRequest(event, context) {
                         pattern.lastIndex = 0;  // must reset this property of regex object for searches
                         speechMessage = pattern.exec(answerText)[0]
                     }
-                    
+
                     // Convert S3 Object URLs to signed URLs
                     answerDocumentUris.add(element);
                     kendraQueryId = res.QueryId; // store off the QueryId to use as a session attribute for feedback
@@ -434,7 +454,7 @@ async function routeKendraRequest(event, context) {
                     kendraResultId = element.Id; // store off resultId to use as a session attribute for feedback
                     foundAnswerCount++;
                     debug_results.push(create_debug_object(element))
-    
+
 
                 } else if (element.Type === 'QUESTION_ANSWER' && element.AdditionalAttributes && element.AdditionalAttributes.length > 1) {
                     // There will be 2 elements - [0] - QuestionText, [1] - AnswerText
@@ -443,7 +463,7 @@ async function routeKendraRequest(event, context) {
                     }
                     let message = element.AdditionalAttributes[1].Value.TextWithHighlightsValue.Text.replace(/\r?\n|\r/g, " ")
                     answerMessage = faqanswerMessage + '\n\n ' + message;
-                    allFilteredMessages.push(message) 
+                    allFilteredMessages.push(message)
                     seenTop = true; // if the answer is in the FAQ, don't show document extracts
                     answerDocumentUris=[];
                     let answerTextMd = element.AdditionalAttributes[1].Value.TextWithHighlightsValue.Text.replace(/\r?\n|\r/g, " ");
@@ -456,7 +476,7 @@ async function routeKendraRequest(event, context) {
                         answerTextMd = addMarkdownHighlights(answerTextMd, elem.BeginOffset+offset, elem.EndOffset+offset, false) ;
                     }
                     answerMessageMd = faqanswerMessageMd + '\n\n' + answerTextMd;
-                    
+
                     kendraQueryId = res.QueryId; // store off the QueryId to use as a session attribute for feedback
                     kendraIndexId = res.originalKendraIndexId; // store off the Kendra IndexId to use as a session attribute for feedback
                     kendraResultId = element.Id; // store off resultId to use as a session attribute for feedback
@@ -464,7 +484,7 @@ async function routeKendraRequest(event, context) {
                     debug_results.push(create_debug_object(element))
 
 
-                  
+
                 } else if (element.Type === 'DOCUMENT' && element.DocumentExcerpt.Text && element.DocumentURI) {
                     const docInfo = {}
                     // if topAnswer found, then do not show document excerpts
@@ -482,7 +502,7 @@ async function routeKendraRequest(event, context) {
                             let rest = docInfo.text.substr(elem.EndOffset+offset);
                             docInfo.text = beginning + '**' + highlight + '**' + rest;
                         };
-                        
+
                         if (foundAnswerCount == 0 && foundDocumentCount == 0) {
                             speechMessage = element.DocumentExcerpt.Text.replace(/\r?\n|\r/g, " ");;
                             if (sorted_highlights.length > 0) {
@@ -524,13 +544,13 @@ async function routeKendraRequest(event, context) {
         if (speechMessage != "") {
             ssmlMessage = `${speechMessage.substring(0,600).replace(/\r?\n|\r/g, " ")}`;
         }
-        
+
         let lastIndex = ssmlMessage.lastIndexOf('.');
         if (lastIndex > 0) {
             ssmlMessage = ssmlMessage.substring(0,lastIndex);
         }
         ssmlMessage = `<speak> ${ssmlMessage} </speak>`;
-        
+
 
 
     }
@@ -544,7 +564,7 @@ async function routeKendraRequest(event, context) {
          markdown += `<span translate=no>[${element.DocumentTitle.Text}](${element.DocumentURI})</span>`;
       });
     }
-    
+
     let idx=foundAnswerCount;
     if (seenTop == false){
         helpfulDocumentsUris.forEach(function (element) {
@@ -552,7 +572,7 @@ async function routeKendraRequest(event, context) {
                 markdown += `\n\n`;
                 markdown += `***`;
                 markdown += `\n\n <br>`;
-                
+
                 if (element.text && element.text.length > 0 && event.req._preferredResponseType != "SSML") { //don't append doc search to SSML answers
                     markdown += `\n\n  ${element.text}`;
                      message += `\n\n  ${element.text}`;
@@ -563,6 +583,7 @@ async function routeKendraRequest(event, context) {
                     element.uri = signS3URL(element.uri, expireSeconds)
                 }
                 markdown += `\n\n  ${helpfulLinksMsg}: <span translate=no>[${label}](${element.uri})</span>`;
+                message += `\n\n  ${helpfulLinksMsg}: ${element.uri}`;
             }
         });
     }
@@ -578,8 +599,11 @@ async function routeKendraRequest(event, context) {
         kendraFoundDocumentCount: foundDocumentCount,
         maxDocuments: maxDocumentCount
     })
-    qnabot.log("Returning event: ", JSON.stringify(hit, null, 2));
 
+    if (hit) {
+        hit.autotranslate = useOriginalLanguageQuery ? false : true;
+    }
+    qnabot.log("Returning event: ", JSON.stringify(hit, null, 2));
     return hit;
 }
 

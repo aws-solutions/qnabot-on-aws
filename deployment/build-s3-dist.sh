@@ -94,9 +94,9 @@ echo "[Init] Copying templates to global-s3-assets/"
 echo "------------------------------------------------------------------------------"
 
 # Copying main templates to global assets directory
-cp build/templates/public.json $template_dist_dir/aws-qnabot-main.template
-cp build/templates/public-vpc-support.json $template_dist_dir/aws-qnabot-vpc.template
-cp build/templates/master.json $template_dist_dir/aws-qnabot-extended.template
+cp build/templates/public.json $template_dist_dir/qnabot-on-aws-main.template
+cp build/templates/public-vpc-support.json $template_dist_dir/qnabot-on-aws-vpc.template
+cp build/templates/master.json $template_dist_dir/qnabot-on-aws-extended.template
 
 # Copying nested templates to global assets directory for the benefit of cfn_nag finding the
 # nested templates
@@ -107,7 +107,6 @@ cp build/templates/master.json $template_dist_dir/aws-qnabot-extended.template
 cp build/templates/export.json $template_dist_dir/export.template
 cp build/templates/import.json $template_dist_dir/import.template
 cp build/templates/testall.json $template_dist_dir/testall.template
-# 5th nested stack (LexV2CfnCr) is import from public SAR
 
 echo "------------------------------------------------------------------------------"
 echo "[Init] Copying lambda assets to regional-s3-assets/"

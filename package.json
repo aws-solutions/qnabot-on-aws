@@ -1,6 +1,6 @@
 {
-  "name": "aws-ai-qna-bot",
-  "version": "5.1.2",
+  "name": "qnabot-on-aws",
+  "version": "5.2.0",
   "engines": {
     "node": ">=12.16.1",
     "npm": ">=7.8.0"
@@ -36,14 +36,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/awslabs/aws-ai-qna-bot.git"
+    "url": "https://github.com/aws-solutions/qnabot-on-aws.git"
   },
   "author": "AWS",
   "license": "SEE LICENSE IN LICENSE",
   "bugs": {
-    "url": "https://github.com/awslabs/aws-ai-qna-bot/issues"
+    "url": "https://github.com/aws-solutions/qnabot-on-aws/issues"
   },
-  "homepage": "https://github.com/awslabs/aws-ai-qna-bot#readme",
+  "homepage": "https://github.com/aws-solutions/qnabot-on-aws#readme",
   "dependencies": {
     "ajv": "^6.10.2",
     "alexa-sdk": "^1.0.25",
@@ -87,7 +87,7 @@
     "marked": "^0.7.0",
     "material-design-icons": "^3.0.1",
     "mini-css-extract-plugin": "^0.8.0",
-    "minimist": "1.2.5",
+    "minimist": "1.2.6",
     "moment": "^2.22.2",
     "morgan": "^1.9.0",
     "multer": "^1.4.2",
