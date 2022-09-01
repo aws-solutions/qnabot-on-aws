@@ -57,11 +57,21 @@ Add importable content packages in the `./ui_imports/content` folder using two f
 - \<name>.json -- the JSON representation of the QnA documents to be imported (can be a file that was previous exported from Content Designer.
 - \<name>.txt -- a short tagline description of the content that will be displayed in the Content Designer listing.
 
-## Preprocessing and postprocessing Lambda hooks
+## Pre-processing and post-processing Lambda hooks
+A Lambda hook can be called as the first step in the fulfillment pipeline (PREPROCESS), as part of processing a specific question (HOOK) or after processing has completed (POSTPROCESS ) and before the `userInfo` is saved to DynamoDB and the result has been sent back to the client. 
 
-You can also add Lambda hooks globally that run before (preprocessing) and after every question is run via the settings page.
+You can add pre-processing and post-processing Lambda hooks (that run before preprocessing and after every question is run) via the `Settings` page.
 
 ![settings hooks](./images/pre_post_hook.png)
+
+
+## Lambda Hook SDK (Javascript)
+Lambda hook SDK hides the internal and lower-level complexities of modifying the QnABot request and response, and provides a simple high-level code layer. 
+For more details on the supported methods refer to the [Lambda Hook SDK readme](../lambda_hook_sdk.MD). 
+
+Additionally, with a QnABot deployment, the Lambda Hook SDK (Javascript) is also available as a Lambda Layer (with the layer name as: `JsLambdaHookSDK`), which can be included in a custom Lambda function. 
+
+For an example implementation using Lambda Hook -- refer to this example [../../templates/examples/extensions/js_lambda_hooks/CreateRecentTopicsResponse/CreateRecentTopicsResponse.js] javascript file. 
 
 ## [](#notes)NOTES
 
