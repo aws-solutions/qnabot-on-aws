@@ -111,7 +111,7 @@ Currently the only browsers supported are:
 
 ## License
 
-Refer to [LICENSE.md](LICENSE.md) file for details.
+Refer to [LICENSE.txt](LICENSE.txt) file for details.
 
 ## New features
 
