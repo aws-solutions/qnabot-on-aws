@@ -10,6 +10,34 @@ QnABot on AWS is a multi-channel, multi-language conversational interface (chatb
 - Implement the latest machine learning technology to create engaging, human-like interactions for chatbots
 
 
+## Architecture Overview
+
+Deploying this solution with the default parameters builds the following environment in the AWS Cloud. 
+
+![Architecture](docs/architecture.png)
+
+Figure 1: QnABot on AWS architecture on AWS
+
+The AWS CloudFormation template deploys the following workflows and services:
+
+1. The admin deploys the solution into their AWS account, opens the Content Designer UI, and uses [Amazon Cognito](http://aws.amazon.com/cognito/) to authenticate.
+
+2. After authentication, [Amazon CloudFront](http://aws.amazon.com/cloudfront/) and [Amazon S3](http://aws.amazon.com/s3/) deliver the contents of the Content Designer UI.
+
+3. The admin configures questions and answers in the Content Designer and the UI sends requests to [Amazon API Gateway](http://aws.amazon.com/api-gateway/) to save the questions and answers.
+
+4. The `Content Designer` [AWS Lambda](http://aws.amazon.com/lambda/) function saves the input in [Amazon OpenSearch Service](http://aws.amazon.com/opensearch-service/) (successor to Amazon ElasticSearch Service) in a questions bank index.
+
+5. Users of the chatbot interact with [Amazon Lex](http://aws.amazon.com/lex/) via the web client UI or Amazon Connect.
+
+6. Amazon Lex forwards requests to the `Bot Fulfillment` AWS Lambda function. (Users can also send requests to this Lambda function via [Amazon Alexa](https://developer.amazon.com/en-US/alexa) devices).
+
+7. The `Bot Fulfillment` AWS Lambda function takes the users input and uses [Amazon Comprehend](http://aws.amazon.com/comprehend/) and [Amazon Translate](http://aws.amazon.com/translate/) (if necessary) to translate non-English requests to English and then looks up the answer in in Amazon OpenSearch Service. If Amazon Kendra index is configured and provided at the time of deployment, the Bot Fulfillment function also sends a request to the [Amazon Kendra](http://aws.amazon.com/kendra/) index.
+
+8. User interactions with the `Bot Fulfillment` function generate logs and metrics data, which is sent to [Amazon Kinesis Data Firehose](http://aws.amazon.com/kinesis/data-firehose/) then to Amazon S3 for later data analysis.
+
+
+
 Refer to the [implementation guide](https://docs.aws.amazon.com/solutions/latest/qnabot-on-aws) for detailed instructions on deploying QnABot in your AWS account. 
 
 
