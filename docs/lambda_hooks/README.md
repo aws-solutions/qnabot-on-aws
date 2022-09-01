@@ -71,7 +71,7 @@ For more details on the supported methods refer to the [Lambda Hook SDK readme](
 
 Additionally, with a QnABot deployment, the Lambda Hook SDK (Javascript) is also available as a Lambda Layer (with the layer name as: `JsLambdaHookSDK`), which can be included in a custom Lambda function. 
 
-For an example implementation using Lambda Hook -- refer to this example [../../templates/examples/extensions/js_lambda_hooks/CreateRecentTopicsResponse/CreateRecentTopicsResponse.js] javascript file. 
+For an example implementation using Lambda Hook -- refer to this (example)[../../templates/examples/extensions/js_lambda_hooks/CreateRecentTopicsResponse/CreateRecentTopicsResponse.js] javascript file. 
 
 ## [](#notes)NOTES
 
