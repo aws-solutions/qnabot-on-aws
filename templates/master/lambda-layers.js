@@ -32,7 +32,7 @@ module.exports = {
         },
         S3ObjectVersion: { Ref: "CommonModulesLayerCodeVersion" },
       },
-      CompatibleRuntimes: ["nodejs12.x"],
+      CompatibleRuntimes: ["nodejs16.x"],
     },
   },
   QnABotCommonLayerCodeVersion: {
@@ -68,7 +68,7 @@ module.exports = {
         },
         S3ObjectVersion: { Ref: "QnABotCommonLayerCodeVersion" },
       },
-      CompatibleRuntimes: ["nodejs12.x"],
+      CompatibleRuntimes: ["nodejs16.x"],
     },
   },
   AwsSdkLayerCodeVersion: {
@@ -102,7 +102,7 @@ module.exports = {
           ],
         ],
       },
-      CompatibleRuntimes: ["nodejs12.x"],
+      CompatibleRuntimes: ["nodejs16.x"],
     },
   },
   CfnLambdaLayerCodeVersion: {
@@ -136,7 +136,7 @@ module.exports = {
         S3Key: { "Fn::Sub": "${BootstrapPrefix}/lambda/cfn-lambda-layer.zip" },
         S3ObjectVersion: { Ref: "CfnLambdaLayerCodeVersion" },
       },
-      CompatibleRuntimes: ["nodejs12.x"],
+      CompatibleRuntimes: ["nodejs16.x"],
     },
   },
   EsProxyLayerCodeVersion: {
@@ -170,7 +170,7 @@ module.exports = {
         S3Key: { "Fn::Sub": "${BootstrapPrefix}/lambda/es-proxy-layer.zip" },
         S3ObjectVersion: { Ref: "EsProxyLayerCodeVersion" },
       },
-      CompatibleRuntimes: ["nodejs12.x"],
+      CompatibleRuntimes: ["nodejs16.x"],
     },
   },
 };

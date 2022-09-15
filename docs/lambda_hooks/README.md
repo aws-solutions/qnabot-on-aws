@@ -7,15 +7,12 @@ QnABot comes with a simple Lambda Hook function example that you can explore:
 1. Log in to the Content Designer, and choose **Import** from the tools menu ( ☰ ).
 2. Open Examples/Extensions, and choose **LOAD** from the ‘GreetingHook’ example.
 
-![Greeting Hook Example](./images/GreetingHookExample.jpg)
-3. When the import job has completed, return to the edit page, and examine the item “GreetingHookExample.” Note that the Lambda Hook field is populated with a Lambda function name.
-4. Use the Web UI to say “_What are lambda hooks?_”. Note that the answer is prepended with a dynamic greeting based on the current time of day – in this case ‘_good afternoon_’:
-    ![Greeting Hook Web UI Example](./images/WebUiGreetingHook.jpg)
-5. Inspect the example function (ExampleJSLambdahook) using the [AWS Lambda console](https://console.aws.amazon.com/lambda/home?region=us-east-1#/functions/qna-QnABot-hello?tab=graph).
+![Greeting Hook Example](./images/GreetingHookExample.jpg) 3. When the import job has completed, return to the edit page, and examine the item “GreetingHookExample.” Note that the Lambda Hook field is populated with a Lambda function name. 4. Use the Web UI to say “_What are lambda hooks?_”. Note that the answer is prepended with a dynamic greeting based on the current time of day – in this case ‘_good afternoon_’:
+![Greeting Hook Web UI Example](./images/WebUiGreetingHook.jpg) 5. Inspect the example function (ExampleJSLambdahook) using the [AWS Lambda console](https://console.aws.amazon.com/lambda/home?region=us-east-1#/functions/qna-QnABot-hello?tab=graph).
 
 Choose **Lambda Hooks** from the Content Designer tools menu ( **☰**) to display additional information to help you create your own Lambda hook functions.
 
----------
+---
 
 The Lambda hook receives the current QnABot response in the `res` attribute of the input event of your Lambda handler.
 You can override values from this event in your Lambda hook code.
@@ -45,7 +42,7 @@ def handler(event, context):
 
 In Content Designer, use the following syntax to reference your Lambda hook function:
 
-- QNA:EXT*LambdaHookName (e.g _QNA:EXTMyLambdaHook_)
+-   QNA:EXT\*LambdaHookName (e.g _QNA:EXTMyLambdaHook_)
 
 The ARN of your installed lambda hook will be referenced at runtime by the QnABot Fulfillment function using environment variables. I.e. the fulfillment function is set up (during installation) with environment variable `EXTMyLambdaHook` and the value is the ARN of your installed function.
 Using the environment variable indirection is preferable to using your function ARN, since you can maintain separate function instances for different QnABot stacks / environments, and you can easily export/import content that does not contain ARN references to specific function instances in specific accounts and regions.
@@ -54,17 +51,28 @@ Using the environment variable indirection is preferable to using your function 
 
 Add importable content packages in the `./ui_imports/content` folder using two files as follows:
 
-- \<name>.json -- the JSON representation of the QnA documents to be imported (can be a file that was previous exported from Content Designer.
-- \<name>.txt -- a short tagline description of the content that will be displayed in the Content Designer listing.
+-   \<name>.json -- the JSON representation of the QnA documents to be imported (can be a file that was previous exported from Content Designer.
+-   \<name>.txt -- a short tagline description of the content that will be displayed in the Content Designer listing.
 
-## Preprocessing and postprocessing Lambda hooks
+## Pre-processing and post-processing Lambda hooks
 
-You can also add Lambda hooks globally that run before (preprocessing) and after every question is run via the settings page.
+A Lambda hook can be called as the first step in the fulfillment pipeline (PREPROCESS), as part of processing a specific question (HOOK) or after processing has completed (POSTPROCESS ) and before the `userInfo` is saved to DynamoDB and the result has been sent back to the client.
+
+You can add pre-processing and post-processing Lambda hooks (that run before preprocessing and after every question is run) via the `Settings` page.
 
 ![settings hooks](./images/pre_post_hook.png)
 
+## Lambda Hook SDK (Javascript)
+
+Lambda hook SDK hides the internal and lower-level complexities of modifying the QnABot request and response, and provides a simple high-level code layer.
+For more details on the supported methods refer to the [Lambda Hook SDK readme](../lambda_hook_sdk.MD).
+
+Additionally, with a QnABot deployment, the Lambda Hook SDK (Javascript) is also available as a Lambda Layer (with the layer name as: `JsLambdaHookSDK`), which can be included in a custom Lambda function.
+
+For an example implementation using Lambda Hook -- refer to this [example](../../templates/examples/extensions/js_lambda_hooks/CreateRecentTopicsResponse/CreateRecentTopicsResponse.js) javascript file.
+
 ## [](#notes)NOTES
 
-- The `Makefile` residing in the extensions folder creates separate zip packages for each separate Lambda hook function
-- Lambda hook functions use nodejs12.x or python3.9 only at this time
-- Lambda hook functions will be allocated 2048MB memory (defined in index.js)
+-   The `Makefile` residing in the extensions folder creates separate zip packages for each separate Lambda hook function
+-   Lambda hook functions use nodejs12.x or python3.9 only at this time
+-   Lambda hook functions will be allocated 2048MB memory (defined in index.js)

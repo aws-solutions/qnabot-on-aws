@@ -25,7 +25,7 @@ module.exports={
         "Handler": "index.handler",
         "MemorySize": "128",
         "Role": {"Fn::GetAtt": ["LambdaRole","Arn"]},
-        "Runtime": "nodejs12.x",
+        "Runtime": "nodejs16.x",
         "Timeout": 300
       }
     },

@@ -79,8 +79,6 @@ mini-css-extract-plugin under the Massachusetts Institute of Technology (MIT) li
 minimist under the Massachusetts Institute of Technology (MIT) license
 moment under the Massachusetts Institute of Technology (MIT) license
 morgan under the Massachusetts Institute of Technology (MIT) license
-multer under the Massachusetts Institute of Technology (MIT) license
-node-sass under the Massachusetts Institute of Technology (MIT) license
 ora under the Massachusetts Institute of Technology (MIT) license
 progress-bar-webpack-plugin under the Massachusetts Institute of Technology (MIT) license
 pug under the Massachusetts Institute of Technology (MIT) license

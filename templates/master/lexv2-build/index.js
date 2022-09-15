@@ -125,7 +125,7 @@ module.exports={
     }
 }
 
-function lambda(code,variable={},runtime="nodejs12.x"){
+function lambda(code,variable={},runtime="nodejs16.x"){
     return {
       "Type": "AWS::Lambda::Function",
       "Properties": {
