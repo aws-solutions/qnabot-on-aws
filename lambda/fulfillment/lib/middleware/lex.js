@@ -505,5 +505,3 @@ exports.assemble=function(request,response){
     qnabot.log('Lex response:',JSON.stringify(out,null,2))
     return out
 }
-
-
