@@ -34,7 +34,7 @@ module.exports=Object.assign(
         "Handler": "index.start",
         "MemorySize": "1024",
         "Role": {"Fn::GetAtt": ["ImportRole","Arn"]},
-        "Runtime": "nodejs12.x",
+        "Runtime": "nodejs16.x",
         "Timeout": 300,
         "VpcConfig" : {
             "Fn::If": [ "VPCEnabled", {
@@ -73,7 +73,7 @@ module.exports=Object.assign(
         "Handler": "index.step",
         "MemorySize": "1024",
         "Role": {"Fn::GetAtt": ["ImportRole","Arn"]},
-        "Runtime": "nodejs12.x",
+        "Runtime": "nodejs16.x",
         "Timeout": 300,
         "VpcConfig" : {
             "Fn::If": [ "VPCEnabled", {

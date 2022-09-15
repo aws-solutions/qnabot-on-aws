@@ -52,7 +52,7 @@ module.exports = {
         "Handler": "index.handler",
         "MemorySize": "128",
         "Role": { "Fn::GetAtt": ["CFNLambdaRole", "Arn"] },
-        "Runtime": "nodejs12.x",
+        "Runtime": "nodejs16.x",
         "Timeout": 60
       },
       "Metadata": util.cfnNag(["W92"])

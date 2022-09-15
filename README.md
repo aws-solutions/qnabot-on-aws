@@ -1,18 +1,18 @@
 # QnABot on AWS
 
 ## Overview
+
 QnABot on AWS is a multi-channel, multi-language conversational interface (chatbot) that responds to your customer’s questions, answers, and feedback. It allows you to deploy a fully functional chatbot across multiple channels including chat, voice, SMS, and Amazon Alexa. The solution’s content management environment, and contact center integration wizard allow you to set up and customize an environment that provides the following benefits:
 
-- Enhance your customer’s experience by providing personalized tutorials and question and answer support with intelligent multi-part interaction
+-   Enhance your customer’s experience by providing personalized tutorials and question and answer support with intelligent multi-part interaction
 
-- Reduce call center wait times by automating customer support workflows
+-   Reduce call center wait times by automating customer support workflows
 
-- Implement the latest machine learning technology to create engaging, human-like interactions for chatbots
-
+-   Implement the latest machine learning technology to create engaging, human-like interactions for chatbots
 
 ## Architecture Overview
 
-Deploying this solution with the default parameters builds the following environment in the AWS Cloud. 
+Deploying this solution with the default parameters builds the following environment in the AWS Cloud.
 
 ![Architecture](docs/architecture.png)
 
@@ -36,26 +36,23 @@ The AWS CloudFormation template deploys the following workflows and services:
 
 8. User interactions with the `Bot Fulfillment` function generate logs and metrics data, which is sent to [Amazon Kinesis Data Firehose](http://aws.amazon.com/kinesis/data-firehose/) then to Amazon S3 for later data analysis.
 
+Refer to the [implementation guide](https://docs.aws.amazon.com/solutions/latest/qnabot-on-aws) for detailed instructions on deploying QnABot in your AWS account.
 
-
-Refer to the [implementation guide](https://docs.aws.amazon.com/solutions/latest/qnabot-on-aws) for detailed instructions on deploying QnABot in your AWS account. 
-
-
-Alternatively, if you want to custom deploy QnABot on AWS, refer to the details below. 
+Alternatively, if you want to custom deploy QnABot on AWS, refer to the details below.
 
 ## Custom deployment of QnABot on AWS
 
 ### Environment Prerequisites
 
 -   Run Linux. (tested on Amazon Linux)
--   Install npm >7.10.0 and node >12.15.1. ([instructions](https://nodejs.org/en/download/))
+-   Install npm >7.10.0 and node >16.X.X ([instructions](https://nodejs.org/en/download/))
 -   Clone this repo.
 -   Set up an AWS account. ([instructions](https://AWS.amazon.com/free/))
 -   Configure AWS CLI and a local credentials file. ([instructions](https://docs.AWS.amazon.com/cli/latest/userguide/cli-chap-welcome.html))
 
-
 ### Build a version
-Navigate to the root directory of QnABot (directory will be created once you have cloned this repo). 
+
+Navigate to the root directory of QnABot (directory will be created once you have cloned this repo).
 
 Install node.js moodules of QnABot:
 
@@ -69,7 +66,7 @@ Next, set up your configuration file:
 npm run config
 ```
 
-now edit `config.json` for the following parameters: 
+now edit `config.json` for the following parameters:
 
 | param              | description                                                                 |
 | ------------------ | --------------------------------------------------------------------------- |
