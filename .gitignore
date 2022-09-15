@@ -67,8 +67,8 @@ config.json
 .idea/
 
 
-
-
+# ignore VS Code specific configs and environments
+.devcontainer/
 .vscode/
 utilities/migration.md
 

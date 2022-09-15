@@ -1,6 +1,6 @@
 {
   "name": "qnabot-on-aws",
-  "version": "5.2.0",
+  "version": "5.2.1",
   "engines": {
     "node": ">=12.16.1",
     "npm": ">=7.8.0"
@@ -52,7 +52,7 @@
     "aws-lex-web-ui": "git+https://github.com/aws-samples/aws-lex-web-ui.git#semver:0.18.1",
     "aws-sdk": "^2.913.0",
     "aws4": "^1.7.0",
-    "axios": "0.21.1",
+    "axios": "^0.21.4",
     "babel-polyfill": "^6.26.0",
     "babel-preset-es2015-ie": "^6.7.0",
     "bluebird": "^3.5.1",
@@ -84,14 +84,12 @@
     "jsonwebtoken": "^8.3.0",
     "jszip": "^3.1.5",
     "lodash": "^4.17.21",
-    "marked": "^0.7.0",
+    "marked": "^4.1.0",
     "material-design-icons": "^3.0.1",
     "mini-css-extract-plugin": "^0.8.0",
     "minimist": "1.2.6",
     "moment": "^2.22.2",
     "morgan": "^1.9.0",
-    "multer": "^1.4.2",
-    "node-sass": "^6.0.1",
     "ora": "^1.4.0",
     "pug": "^3.0.2",
     "pug-loader": "^2.4.0",
@@ -105,10 +103,10 @@
     "recursive-readdir": "^2.2.2",
     "require-dir": "^0.3.2",
     "roboto-fontface": "^0.8.0",
+    "sass": "^1.54.7",
     "simple-encryptor": "^3.0.0",
     "slackify-markdown": "^4.1.0",
     "strip-ansi": "^4.0.0",
-    "style-loader": "^0.18.2",
     "urlcode-json": "0.0.5",
     "utf8": "^3.0.0",
     "vee-validate": "^2.0.9",
@@ -148,18 +146,29 @@
     "progress-bar-webpack-plugin": "^1.11.0",
     "pug-plain-loader": "^1.1.0",
     "pug-runtime": "^3.0.1",
-    "sass": "^1.38.1",
-    "sass-loader": "^6.0.7",
+    "sass-loader": "^7.3.1",
+    "style-loader": "^2.0.0",
     "stylus": "^0.54.7",
     "stylus-loader": "^3.0.2",
     "transform-runtime": "0.0.0",
     "vue-loader": "^15.7.1",
     "webpack": "^4.46.0",
     "webpack-archive-plugin": "^3.0.0",
-    "webpack-bundle-analyzer": "^3.9.0",
+    "webpack-bundle-analyzer": "^4.6.1",
     "webpack-cli": "^3.3.12",
     "webpack-dev-server": "^4.3.1",
     "webpack-merge": "^4.2.2",
     "webpack-s3-plugin": "^1.0.3"
+  },
+  "overrides": {
+    "html-minifier-terser": {
+      "terser": "^4.8.1"
+    },
+    "terser-webpack-plugin": {
+      "terser": "^4.8.1"
+    },
+    "chokidar@2.1.8": {
+      "glob-parent": "^5.1.2"
+    }
   }
 }

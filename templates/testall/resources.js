@@ -39,7 +39,7 @@ module.exports=Object.assign(
         "Handler": "index.step",
         "MemorySize": "1280",
         "Role": {"Fn::GetAtt": ["TestAllRole","Arn"]},
-        "Runtime": "nodejs12.x",
+        "Runtime": "nodejs16.x",
         "Timeout": 900,
         "VpcConfig" : {
           "Fn::If": [ "VPCEnabled", {

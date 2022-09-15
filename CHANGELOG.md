@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [5.2.1] - 2022-09-15
+
+### Updated
+
+-   Security patches for npm packages.
+-   `safe-eval` npm package was replaced by `vm2` package, and `node-sass` was replaced by `sass` package.
+-   `multer` npm package removed.
+-   Node.js Lambda runtime to Nodejs.16
+
+### Fixed
+
+-   Error when the image URL is not provided in the Response card.
+
 ## [5.2.0] - 2022-07-14
 
 ### Added
