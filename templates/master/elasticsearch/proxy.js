@@ -24,7 +24,7 @@ module.exports={
         "Handler": "resource.handler",
         "MemorySize": "1408",
         "Role": {"Fn::GetAtt": ["ESProxyLambdaRole","Arn"]},
-        "Runtime": "nodejs12.x",
+        "Runtime": "nodejs16.x",
         "Timeout": 300,
         "VpcConfig" : {
           "Fn::If": [ "VPCEnabled", {
@@ -51,7 +51,7 @@ module.exports={
                 index:{"Fn::Sub":"${Var.MetricsIndex}"},
                 endpoint:{"Fn::GetAtt":["ESVar","ESAddress"]},
                 body:{"Fn::Sub":JSON.stringify({
-                    settings:{},
+                    settings:{"index.mapping.total_fields.limit":2000},
                 })}
             }
         }

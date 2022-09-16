@@ -35,6 +35,7 @@ var default_settings = {
     KENDRA_INDEXER_CRAWL_MODE: "SUBDOMAINS", // Should be one of 'HOST_ONLY'|'SUBDOMAINS'|'EVERYTHING'
     KENDRA_INDEXER_SCHEDULE: "rate(1 day)",//See https://docs.aws.amazon.com/AmazonCloudWatch/latest/events/ScheduledEvents.html for valid expressions
     KENDRA_WEB_PAGE_INDEX: "${DefaultKendraIndexId}",//The index to use for the web crawler, a custom data source will automatically be added to the specified index.  The index will automatically be added to ALT_SEARCH_KENDRA_INDEXES
+    KENDRA_INDEXED_DOCUMENTS_LANGUAGES: "en", // Comma separated language list, Eg: "en,es,fr". Should be one of supported Kendra languages mentioned in https://docs.aws.amazon.com/kendra/latest/dg/in-adding-languages.html
     ERRORMESSAGE: "Unfortunately I encountered an error when searching for your answer. Please ask me again later.",
     EMPTYMESSAGE: "You stumped me! Sadly I do not know how to answer your question.",
     DEFAULT_ALEXA_LAUNCH_MESSAGE: "Hello, Please ask a question",

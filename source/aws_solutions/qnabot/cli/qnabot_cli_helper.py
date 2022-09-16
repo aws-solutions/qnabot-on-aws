@@ -267,7 +267,7 @@ def get_import_status(bucket: str, source_filename: str, importdatetime: datetim
         s3_client = get_service_client("s3")  # boto3.client('s3')
         # get object only if the object has changed since last request
         key = "status/" + os.path.basename(source_filename)
-        logger.debug(f"Getting import status for {bucket=} {key=}")
+        #logger.debug(f"Getting import status for {bucket=} {key=}")
         response = s3_client.get_object(Bucket=bucket, Key=key, IfModifiedSince=importdatetime)
 
         obj_status_details = json.loads(response["Body"].read().decode("utf-8"))  # read object body

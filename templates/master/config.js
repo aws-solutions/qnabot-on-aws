@@ -30,7 +30,8 @@ module.exports={
         "restApiId": {"Ref": "API"},
         "buildDate":new Date(),
         "stage":"prod",
-        "Encryption":{"Ref": "Encryption"}
+        "Encryption":{"Ref": "Encryption"}, 
+        "LexV2BotLocaleIds": {"Ref": "LexV2BotLocaleIds"}
     },
     "DependsOn":methods.concat(permissions)
 },

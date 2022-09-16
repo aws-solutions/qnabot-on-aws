@@ -139,6 +139,7 @@ module.exports={
             propertyOrder:7,
             required:["title"]
         }
-    }
+    },
+    required:["qid"]
 
 }

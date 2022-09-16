@@ -38,7 +38,8 @@ QnABot exposes the following content to the Handlebars context:
 |UserInfo.FamilyName               | Family Name: Authenticated users only - from token in session attribute 'accesstokenjwt' |
 |UserInfo.Email                    | Email address: Authenticated users only - from token in session attribute 'accesstokenjwt' |
 |UserInfo.isVerifiedIdentity       | true or false: Authenticated users only - verifies if token is signed by key in jwks from trusted identity provider per QnABot setting IDENTITY\_PROVIDER\_JWKS\_URLS |
-|SessionAttributes._name_          | all session attributes are available to the handlebars context |
+|SessionAttributes._name_          | all session attributes are available to the handlebars context - see helpers 'setSessionAttr' and 'getSessionAttr' |
+|Slots._name_                      | all slots filled by Lex are available to the handlebars context - see helper 'getSlot' |
 |Settings._name_                   | all settings values are available to the handlebars context |
 |Question                          | the users utterance, or question - translated to English if ENABLE\_MULTI\_LANGUAGE\_SUPPORT is true |
 |OrigQuestion                      | the users utterance, or question - before translation to English if ENABLE\_MULTI\_LANGUAGE\_SUPPORT is true |
@@ -55,6 +56,7 @@ QnABot also provides these additional helpers:
 |ifCond                  | Block helper for conditional output.<br>Supported comparison operators:<br>'==', '===', '!=' ,'!==', '<', '<=', '>', '>=', '&&','&#124;&#124;' |{{#ifCond LexOrAlexa '==' 'LEX'}}<br>_output if true_<br>{{else}}<br>_output if false_<br>{{/ifCond}}<br> |
 |getSessionAttr          | Returns named session attribute value if it is defined, or default value. | {{getSessionAttr '_attrName_' '_default_'}} |
 |setSessionAttr          | Sets a named session attribute to specified value. | {{setSessionAttr '_attrName_' '_value_'}} |
+|getSlot                 | Returns named slot value if it is defined, or default value. | {{getSlot '_slotName_' '_default_'}} |
 |randomPick              | Randomly return a string selected from a list. | {{randomPick<br>"Greetings."<br>"Hi there!"<br>"Howdy"<br>"Hello, how are you?"<br>"Whassup dude!"<br>}}|
 |signS3URL               | Converts S3 URL to a signed URL with 300 sec expiration. S3 bucket name must start with QNA or qna, or policy granting bucket read access must be added to ESProxyLambdaRole. | {{signS3URL 'https://qnabot-images.s3.amazonaws.com/testimage.png'}}|
 
@@ -90,6 +92,9 @@ Ask me a question. Try to stump me.
 
 {{!-- get nested Session Attribute, or default if attribute doesn't exist or is not defined --}}
 Previous answer was qid: {{getSessionAttr 'qnabotcontext.previous.qid' 'No previous response'}}
+
+{{!-- get Slot value, or default if slot doesn't exist or is not defined --}}
+Hi {{getSlot 'firstname' 'stranger'}}!
 
 {{!-- pick a random answer from list below --}}
 {{randomPick 

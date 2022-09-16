@@ -99,8 +99,8 @@ function getClientType(req) {
     else if (_.get(req,"_event.requestAttributes.x-amz-lex:channels:platform") == "Genesys Cloud") {
         return "LEX.GenesysCloud." + voiceortext;
     }
-    else if (/^.*-.*-\d:.*-.*-.*-.*$/.test(_.get(req,"_event.userId"))){
-        // user id pattern to detect lex-web-uithrough use of cognito id as userId: e.g. us-east-1:a8e1f7b2-b20d-441c-9698-aff8b519d8d5
+    else if (/^.*-.*-\d:.*-.*-.*-.*$/.test(_.get(req,"_event.sessionId",_.get(req,"_event.userId")))){
+        // sessionId (LexV2) or userId (LexV1) pattern to detect lex-web-uithrough use of cognito id as sessionId/userId: e.g. us-east-1:a8e1f7b2-b20d-441c-9698-aff8b519d8d5
         // TODO: add another clientType indicator for lex-web-ui?
         return "LEX.LexWebUI." + voiceortext ;
     } else {

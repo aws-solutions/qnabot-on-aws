@@ -1,4 +1,4 @@
-aws-qnabot
+qnabot-on-aws
 Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
 
 Licensed under the Apache License Version 2.0 (the 'License'). You may not use this file except in compliance
@@ -36,9 +36,11 @@ babel-polyfill the Massachusetts Institute of Technology (MIT) license
 babel-preset-env under the Massachusetts Institute of Technology (MIT) license
 babel-preset-es2015 under the Massachusetts Institute of Technology (MIT) license
 babel-preset-es2015-ie the Massachusetts Institute of Technology (MIT) license
+beautifulsoup under Massachusetts Institute of Technology (MIT) License
 bluebird under the Massachusetts Institute of Technology (MIT) license
 body-parser under the Massachusetts Institute of Technology (MIT) license
 bowser under the Massachusetts Institute of Technology (MIT) license
+canvasapi under Massachusetts Institute of Technology (MIT) License
 cfn-response under the Amazon Software License
 chalk under the Massachusetts Institute of Technology (MIT) license
 chrome-aws-lambda under the Massachusetts Institute of Technology (MIT) license
@@ -77,8 +79,6 @@ mini-css-extract-plugin under the Massachusetts Institute of Technology (MIT) li
 minimist under the Massachusetts Institute of Technology (MIT) license
 moment under the Massachusetts Institute of Technology (MIT) license
 morgan under the Massachusetts Institute of Technology (MIT) license
-multer under the Massachusetts Institute of Technology (MIT) license
-node-sass under the Massachusetts Institute of Technology (MIT) license
 ora under the Massachusetts Institute of Technology (MIT) license
 progress-bar-webpack-plugin under the Massachusetts Institute of Technology (MIT) license
 pug under the Massachusetts Institute of Technology (MIT) license

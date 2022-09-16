@@ -22,7 +22,7 @@ module.exports = {
     LEXV2_BUILD_LAMBDA: { "Ref": "Lexv2BotLambda" },
     ADDRESS: { "Fn::Join": ["", ["https://", { "Fn::GetAtt": ["ESVar", "ESAddress"] }]] },
     INDEX: { "Fn::GetAtt": ["Var", "index"] },
-  }, "nodejs12.x"),
+  }, "nodejs16.x"),
   "LexBuildLambdaStart": lambda({
     "ZipFile": fs.readFileSync(__dirname + '/start.js', 'utf8')
   }, {
@@ -206,7 +206,7 @@ module.exports = {
   }
 };
 
-function lambda(code, variable = {}, runtime = "nodejs12.x") {
+function lambda(code, variable = {}, runtime = "nodejs16.x") {
   return {
     "Type": "AWS::Lambda::Function",
     "Properties": {

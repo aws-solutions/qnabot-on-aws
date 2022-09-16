@@ -67,8 +67,8 @@ config.json
 .idea/
 
 
-
-
+# ignore VS Code specific configs and environments
+.devcontainer/
 .vscode/
 utilities/migration.md
 
@@ -80,6 +80,7 @@ temp/
 **/deployment/global-s3-assets
 **/deployment/regional-s3-assets
 **/deployment/open-source
+
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -99,3 +100,7 @@ coverage.xml
 *.py,cover
 .hypothesis/
 .pytest_cache/
+
+docs/excel_import/~$sample.xlsx
+
+

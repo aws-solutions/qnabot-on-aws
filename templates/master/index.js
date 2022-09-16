@@ -242,6 +242,12 @@ module.exports={
         "AllowedValues" : ["LexV1 and LexV2", "LexV2 Only"],
         "Default":"LexV2 Only"
     },
+    "InstallLexResponseBots":{
+      "Description" : "If Elicit Response feature is not needed, choose 'false' to skip sample Lex Response Bot installation.",
+      "Type":"String",
+      "AllowedValues" : ["true", "false"],
+      "Default":"true"
+  },
     "XraySetting":{
         "Type":"String",
         "Description": "Configure Lambdas with X-Ray enabled",
@@ -272,7 +278,8 @@ module.exports={
           ] },
     "CreateConcurrency":{ "Fn::Not": [
       {"Fn::Equals":[{"Ref":"FulfillmentConcurrency"},"0"]}
-    ]}
+    ]},
+    "SingleNode": {"Fn::Equals":[{"Ref":"ElasticSearchNodeCount"},"1"]}
   }
 }
 

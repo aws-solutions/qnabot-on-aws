@@ -81,7 +81,7 @@ module.exports = {
         }, {"Ref" : "AWS::NoValue"} ]
       },
       "Role": { "Fn::GetAtt": ["FulfillmentLambdaRole", "Arn"] },
-      "Runtime": "nodejs12.x",
+      "Runtime": "nodejs16.x",
       "Timeout": 300,
       "VpcConfig" : {
         "Fn::If": [ "VPCEnabled", {
@@ -281,7 +281,7 @@ module.exports = {
       "Handler": "index.warmer",
       "MemorySize": "512",
       "Role": { "Fn::GetAtt": ["WarmerLambdaRole", "Arn"] },
-      "Runtime": "nodejs12.x",
+      "Runtime": "nodejs16.x",
       "Timeout": 300,
       "Layers": [
         {"Ref": "AwsSdkLayerLambdaLayer"},

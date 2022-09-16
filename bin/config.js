@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 module.exports={
-    "region":"us-west-2",
+    "region":"us-east-1",
     "profile":"default",
     "publicBucket":"aws-bigdata-blog",
     "publicPrefix":"artifacts/aws-ai-qna-bot",
@@ -28,8 +28,8 @@ if (require.main === module) {
         module.exports.skipCheckTemplate = true;
         module.exports.noStackOutput = true;
     } else {
-        module.exports.devEmail=process.argv[2] || "bobp@tioth.com"
-        module.exports.region=process.argv[3] || "us-west-2"
+        module.exports.devEmail=process.argv[2] || "user@example.com"
+        module.exports.region=process.argv[3] || "us-east-1"
     }
     console.log(JSON.stringify(module.exports,null,2))
 }
