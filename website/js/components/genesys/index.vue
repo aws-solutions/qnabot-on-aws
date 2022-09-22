@@ -3,7 +3,7 @@
     v-layout(column )
       v-flex
         v-card
-          v-card-title 
+          v-card-title
             h3 Genesys Cloud CX Instructions
           v-card-text(class="pa-0")
             v-stepper(v-model="stepNumber" class="elevation-0")
@@ -25,9 +25,9 @@
                       v-layout(row)
                         v-flex(xs1)
                           v-btn(
-                            @click="stepNumber--" v-if="index>0" 
+                            @click="stepNumber--" v-if="index>0"
                             style="height:100%"
-                            left) 
+                            left)
                             v-icon keyboard_arrow_left
                         v-flex(xs10)
                           v-container
@@ -56,7 +56,7 @@
                           v-btn(
                             @click="stepNumber++" v-if="index+1<steps.length"
                             style="height:100%"
-                            right) 
+                            right)
                             v-icon keyboard_arrow_right
 </template>
 
@@ -72,7 +72,7 @@ var renderer=new markdown.Renderer()
 var axios=require('axios')
 
 renderer.link=function(href,title,text){
-  return `<a href="${href}" title="${title}" target="_blank">${text}</a>` 
+  return `<a href="${href}" title="${title}" target="_blank">${text}</a>`
 }
 renderer.table=function(header,body){
   return `<table class="pure-table"><thead>${header}</thead><tbody>${body}</tbody></table>`
@@ -101,11 +101,11 @@ module.exports={
     {
     steps:function(){
       var self=this
-      return _.map(this.stepsRaw,function(x){ 
+      return _.map(this.stepsRaw,function(x){
         var y=Object.assign({},x)
         if(x.text){
           var temp=handlebars.compile(x.text)
-          y.text=markdown(temp(self.$store.state.bot),{renderer})
+          y.text=markdown.parse(temp(self.$store.state.bot),{renderer})
         }
         return y
       })
@@ -131,7 +131,7 @@ module.exports={
           for (var i = 0, linksLength = links.length; i < linksLength; i++) {
             if (links[i].hostname != window.location.hostname) {
               links[i].target = '_blank';
-            } 
+            }
           }
           var button = document.getElementById("DownloadInboundCallFlow");
           if(button)
@@ -158,16 +158,16 @@ module.exports={
   },
 
    created:function(){
-     this.$store.dispatch('data/botinfo').catch(()=>null) 
+     this.$store.dispatch('data/botinfo').catch(()=>null)
    },
     methods:{
       copy:function(btn){
         btn.loading=true
         setTimeout(()=>btn.loading=false,1000)
       }
-    } 
+    }
 
-  } 
+  }
 
 
 </script>
