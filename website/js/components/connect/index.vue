@@ -3,7 +3,7 @@
     v-layout(column )
       v-flex
         v-card
-          v-card-title 
+          v-card-title
             h3 Connect Instructions
           v-card-text(class="pa-0")
             v-stepper(v-model="stepNumber" class="elevation-0")
@@ -25,9 +25,9 @@
                       v-layout(row)
                         v-flex(xs1)
                           v-btn(
-                            @click="stepNumber--" v-if="index>0" 
+                            @click="stepNumber--" v-if="index>0"
                             style="height:100%"
-                            left) 
+                            left)
                             v-icon keyboard_arrow_left
                         v-flex(xs10)
                           v-container
@@ -56,7 +56,7 @@
                           v-btn(
                             @click="stepNumber++" v-if="index+1<steps.length"
                             style="height:100%"
-                            right) 
+                            right)
                             v-icon keyboard_arrow_right
 </template>
 
@@ -72,7 +72,7 @@ var renderer=new markdown.Renderer()
 var axios=require('axios')
 
 renderer.link=function(href,title,text){
-  return `<a href="${href}" title="${title}" target="_blank">${text}</a>` 
+  return `<a href="${href}" title="${title}" target="_blank">${text}</a>`
 }
 renderer.table=function(header,body){
   return `<table class="pure-table"><thead>${header}</thead><tbody>${body}</tbody></table>`
@@ -111,11 +111,11 @@ module.exports={
     {
     steps:function(){
       var self=this
-      return _.map(this.stepsRaw,function(x){ 
+      return _.map(this.stepsRaw,function(x){
         var y=Object.assign({},x)
         if(x.text){
           var temp=handlebars.compile(x.text)
-          y.text=markdown(temp(self.$store.state.bot),{renderer})
+          y.text=markdown.parse(temp(self.$store.state.bot),{renderer})
         }
         return y
       })
@@ -125,7 +125,7 @@ module.exports={
   updated: function () {
       var self = this;
       this.$nextTick(function () {
-        
+
             const downloadBlobAsFile = (function closure_shell() {
             const a = document.createElement("a");
             return function downloadBlobAsFile(blob, filename) {
@@ -142,7 +142,7 @@ module.exports={
           for (var i = 0, linksLength = links.length; i < linksLength; i++) {
             if (links[i].hostname != window.location.hostname) {
               links[i].target = '_blank';
-            } 
+            }
           }
           var button = document.getElementById("DownloadContactFlow");
           if(button)
@@ -159,7 +159,7 @@ module.exports={
             }
           }
 
-    
+
           function poll(url){
             console.log(url)
             return self.$store.dispatch('api/getImport',{href: url})
@@ -177,9 +177,9 @@ module.exports={
                   ImportQuestionsStatus.innerHTML = "Complete";
 
                   btnImportQuestions.innerHTML = "Import Sample Questions and Answers";
- 
+
                 }).then( result => {})
-                .catch(e => 
+                .catch(e =>
                   ImportQuestionsStatus.innerHTML = "Error Rebuilding LexBot. Please return to the Content Designer, correct the errors and REBUILD LEXBOT </br>" +
                   "LexBot Rebuild Error " + e
                  )
@@ -192,7 +192,7 @@ module.exports={
           var btnImportQuestions = document.getElementById("ImportQuestions");
           var ImportQuestionsStatus = document.getElementById("ImportQuestionsStatus");
 
-          
+
           if(btnImportQuestions){
                   btnImportQuestions.onclick = function() {
                     btnImportQuestions.disabled = true;
@@ -218,7 +218,7 @@ module.exports={
                         return self.$store.dispatch('api/startImport',{
                         qa:result.qna,
                         name:self.contactFlow.QnaFile
-                      
+
                       })
                     })
                     .then(results => {
@@ -235,8 +235,8 @@ module.exports={
 
                     }
               }
-          
-          
+
+
 
           var spanBot = document.getElementById("spnBotname")
           if(spanBot)
@@ -248,16 +248,16 @@ module.exports={
   },
 
    created:function(){
-     this.$store.dispatch('data/botinfo').catch(()=>null) 
+     this.$store.dispatch('data/botinfo').catch(()=>null)
    },
     methods:{
       copy:function(btn){
         btn.loading=true
         setTimeout(()=>btn.loading=false,1000)
       }
-    } 
+    }
 
-  } 
+  }
 
 
 </script>
