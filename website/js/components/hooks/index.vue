@@ -3,7 +3,7 @@
     v-layout(column )
       v-flex
         v-card
-          v-card-title 
+          v-card-title
             h3 Lambda Hook Instructions
           v-card-text(class="pa-0")
             v-stepper(v-model="stepNumber" class="elevation-0")
@@ -59,7 +59,7 @@ markdown.setOptions({
 });
 var renderer=new markdown.Renderer()
 renderer.link=function(href,title,text){
-  return `<a href="${href}" title="${title}" target="_blank">${text}</a>` 
+  return `<a href="${href}" title="${title}" target="_blank">${text}</a>`
 }
 var handlebars=require('handlebars')
 var clipboard=require('clipboard')
@@ -81,14 +81,14 @@ module.exports={
     Vuex.mapState([
         'bot'
     ]),
-    
+
     {
     steps:function(){
       var self=this
-      return _.map(this.stepsRaw,function(x){ 
+      return _.map(this.stepsRaw,function(x){
         var temp=handlebars.compile(x.text)
         var y=Object.assign({},x)
-        y.text=markdown(temp(self.$store.state.bot),{renderer})
+        y.text=markdown.parse(temp(self.$store.state.bot),{renderer})
         return y
       })
     }
@@ -96,7 +96,7 @@ module.exports={
   ),
   created:function(){
     var self=this
-    this.$store.dispatch('data/botinfo').catch(()=>null) 
+    this.$store.dispatch('data/botinfo').catch(()=>null)
     var role=new clipboard('#Role',{
       text:function(){
         return self.$store.state.bot.lambdaRole
@@ -123,6 +123,6 @@ module.exports={
       btn.loading=true
       setTimeout(()=>btn.loading=false,1000)
     }
-  } 
+  }
 }
 </script>
