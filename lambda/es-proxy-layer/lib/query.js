@@ -156,6 +156,39 @@ function merge_next(hit1, hit2) {
     return hit2;
 }
 
+async function post_process_with_sagemaker_endpoint(question, hit, sagemaker_qa_prefix, sm_endpoint, sm_confidence_threshold) {
+    const sm = new aws.SageMakerRuntime({region:'us-east-1'});
+    const data = {
+        inputs: {
+            question: question,
+            context: hit.a,
+        }
+    };
+    const body = JSON.stringify(data);
+    var smres = await sm.invokeEndpoint({
+        EndpointName:sm_endpoint,
+        ContentType:'application/json',
+        Body:body,
+    }).promise();
+    const sm_body = JSON.parse(Buffer.from(smres.Body, 'utf-8').toString());
+    qnabot.log("Sagemaker QA response:", sm_body);
+    const sm_score = sm_body.score;
+    const sm_answer = sm_body.answer.trim();
+    if (sm_score >= sm_confidence_threshold) {
+        qnabot.log(`Sagemaker QA response confidence score ${sm_score} meets threshold ${sm_confidence_threshold}`);
+        // prepend sm answer to plaintext and markdown
+        hit.a = `${sagemaker_qa_prefix} (Confidence: ${sm_score.toFixed(3)})\n\n${sm_answer}\n\n${hit.a}`;
+        hit.alt.markdown = `*${sagemaker_qa_prefix} (Confidence: ${sm_score.toFixed(3)})*\n\n**${sm_answer}**\n\n${hit.alt.markdown}`;
+        // replace ssml with just the short answer for concise voice responses
+        hit.alt.ssml = sm_answer;
+        qnabot.log("modified hit:", JSON.stringify(hit));
+    } else {
+        hit = undefined;
+        qnabot.log(`Sagemaker QA response confidence score ${sm_score} does not meets threshold ${sm_confidence_threshold}. Kendra response not used.`);
+    }
+    return hit;
+}
+
 async function get_hit(req, res) {
     let question = req.question;
     let qid = _.get(req, 'qid');
@@ -245,9 +278,19 @@ async function get_hit(req, res) {
     if (hit) {
         res['got_hits'] = 1;  // response flag, used in logging / kibana
     } else if(query_params.kendra_indexes.length != 0) {
-        qnabot.log('request entering kendra fallback ' + JSON.stringify(req))
-        hit = await  kendra_fallback.handler({req,res})
-        qnabot.log('Result from Kendra ' + JSON.stringify(hit))
+        qnabot.log('request entering kendra fallback ' + JSON.stringify(req));
+        hit = await kendra_fallback.handler({req,res});
+        qnabot.log('Result from Kendra ' + JSON.stringify(hit));
+        if(hit &&  hit.hit_count != 0)
+        {
+            // Optionally post-process Kendra result with Sagemaker hosted Question_Answer model
+            const sm_endpoint = _.get(req, '_settings.KENDRA_FALLBACK_SAGEMAKER_QA_ENDPOINT');
+            if (sm_endpoint) {
+                sm_confidence_threshold = _.get(req, '_settings.KENDRA_FALLBACK_SAGEMAKER_QA_MIN_CONFIDENCE',0);
+                sagemaker_qa_prefix = _.get(req, '_settings.KENDRA_FALLBACK_SAGEMAKER_QA_PREFIX', "");
+                hit = await post_process_with_sagemaker_endpoint(req.question, hit, sagemaker_qa_prefix, sm_endpoint, sm_confidence_threshold);
+            }
+        }
         if(hit &&  hit.hit_count != 0)
         {
             _.set(res,'answersource','Kendra Fallback');
