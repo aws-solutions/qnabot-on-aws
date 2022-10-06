@@ -474,7 +474,7 @@ async function routeKendraRequest(event, context) {
 
 
 
-                } else if (element.Type === 'DOCUMENT' && element.DocumentExcerpt.Text && element.DocumentURI) {
+                } else if (element.Type === 'DOCUMENT' && element.DocumentExcerpt.Text ) {
                     const docInfo = {}
                     // if topAnswer found, then do not show document excerpts
                     if (seenTop == false) {
