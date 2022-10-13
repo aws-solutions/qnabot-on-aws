@@ -156,6 +156,35 @@ function merge_next(hit1, hit2) {
     return hit2;
 }
 
+async function prepend_cfaq_answer(query, hit, cfaq_prefix, cfaq_endpoint, cfaq_domain, cfaq_index) {
+    const sm = new aws.SageMakerRuntime({region:'us-east-1'});
+    const history = {history: {L: {}}};
+    const data = {
+        query: query,
+        dial_hist: history,
+        domain: cfaq_domain,
+        index_id: cfaq_index,
+    };
+    const body = JSON.stringify(data);
+    var smres = await sm.invokeEndpoint({
+        EndpointName:cfaq_endpoint,
+        ContentType:'text/csv',
+        Body:body,
+    }).promise();
+    const sm_body = JSON.parse(Buffer.from(smres.Body, 'utf-8').toString());
+    qnabot.log("CFAQ response:", sm_body);
+    const cfaq_answer = sm_body.text.trim();
+    if (true) {
+        // prepend sm answer to plaintext and markdown
+        hit.a = `${cfaq_prefix}\n\n${cfaq_answer}\n\n${hit.a}`;
+        hit.alt.markdown = `*${cfaq_prefix}*\n\n**${cfaq_answer}**\n\n${hit.alt.markdown}`;
+        // replace ssml with just the short answer for concise voice responses
+        hit.alt.ssml = cfaq_answer;
+        qnabot.log("modified hit:", JSON.stringify(hit));
+    }
+    return hit;
+}
+
 async function post_process_with_sagemaker_endpoint(question, hit, sagemaker_qa_prefix, sm_endpoint, sm_confidence_threshold) {
     const sm = new aws.SageMakerRuntime({region:'us-east-1'});
     const data = {
@@ -286,9 +315,20 @@ async function get_hit(req, res) {
             // Optionally post-process Kendra result with Sagemaker hosted Question_Answer model
             const sm_endpoint = _.get(req, '_settings.KENDRA_FALLBACK_SAGEMAKER_QA_ENDPOINT');
             if (sm_endpoint) {
-                sm_confidence_threshold = _.get(req, '_settings.KENDRA_FALLBACK_SAGEMAKER_QA_MIN_CONFIDENCE',0);
-                sagemaker_qa_prefix = _.get(req, '_settings.KENDRA_FALLBACK_SAGEMAKER_QA_PREFIX', "");
+                const sm_confidence_threshold = _.get(req, '_settings.KENDRA_FALLBACK_SAGEMAKER_QA_MIN_CONFIDENCE',0);
+                const sagemaker_qa_prefix = _.get(req, '_settings.KENDRA_FALLBACK_SAGEMAKER_QA_PREFIX', "");
                 hit = await post_process_with_sagemaker_endpoint(req.question, hit, sagemaker_qa_prefix, sm_endpoint, sm_confidence_threshold);
+            }
+        }
+        if(hit &&  hit.hit_count != 0)
+        {
+            // Optionally try new experimental Lex CFAQ model
+            const cfaq_endpoint = _.get(req, '_settings.CFAQ_SAGEMAKER_ENDPOINT');
+            if (cfaq_endpoint) {
+                const cfaq_domain = _.get(req, '_settings.CFAQ_DOMAIN');
+                const cfaq_prefix = _.get(req, '_settings.CFAQ_PREFIX', "");
+                const cfaq_index = _.get(req, '_settings.CFAQ_INDEX');
+                hit = await prepend_cfaq_answer(req.question, hit, cfaq_prefix, cfaq_endpoint, cfaq_domain, cfaq_index);
             }
         }
         if(hit &&  hit.hit_count != 0)
