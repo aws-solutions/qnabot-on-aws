@@ -72,7 +72,14 @@ var default_settings = {
     RUN_LAMBDAHOOK_FROM_QUERY_STEP: "true",
     LAMBDA_PREPROCESS_HOOK: "",
     LAMBDA_POSTPROCESS_HOOK: "",
-    SEARCH_REPLACE_QUESTION_SUBSTRINGS: ""
+    SEARCH_REPLACE_QUESTION_SUBSTRINGS: "",
+    KENDRA_FALLBACK_SAGEMAKER_QA_ENDPOINT: "",
+    KENDRA_FALLBACK_SAGEMAKER_QA_MIN_CONFIDENCE: 0,
+    KENDRA_FALLBACK_SAGEMAKER_QA_PREFIX: "Condensed answer from Kendra results using Sagemaker QA model: ",
+    CFAQ_SAGEMAKER_ENDPOINT: "",
+    CFAQ_INDEX: "",
+    CFAQ_DOMAIN: "",
+    CFAQ_PREFIX: "Answer from Lex CFAQ prototype model: ",
 };
 
 module.exports = {
