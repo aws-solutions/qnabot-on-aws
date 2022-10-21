@@ -194,6 +194,12 @@ module.exports={
         "Description":"Optional: Index ID of an existing Kendra index, used as the default index for QnABot's Kendra integration. You can use the QnABot Content Designer to reconfigure Kendra Index ID settings at any time.",
         "Default":""
     },
+    "DefaultKendraIndexAuth":{
+      "Type":"String",
+      "Description":"Optional: If true, this tells QnABot to pass authentication token to Kendra Index(es) if it is available. You can use the QnABot Content Designer to reconfigure ALT_SEARCH_KENDRA_INDEXES_TOKEN_AUTH settings at any time.",
+      "AllowedValues" : ["true", "false"],
+      "Default":"false"
+    },
     "BootstrapBucket":{
         "Type":"String"
     },

@@ -38,6 +38,7 @@ function filter(text){
         text = text.replace(/"accesstokenjwt":\s*"[^"]+?([^\/"]+)"/g, '"accesstokenjwt":"<token redacted>"');
         text = text.replace(/"idtokenjwt":\s*"[^"]+?([^\/"]+)"/g, '"idtokenjwt":"<token redacted>"');
         text = text.replace(/"refreshtoken":\s*"[^"]+?([^\/"]+)"/g, '"refreshtoken":"<token redacted>"');
+        text = text.replace(/"Token":\s*"[^"]+?([^\/"]+)"/g, '"Token":"<token redacted>"');
         text = filter_comprehend_pii(text)
     }
     if (process.env.QNAREDACT === "true") {

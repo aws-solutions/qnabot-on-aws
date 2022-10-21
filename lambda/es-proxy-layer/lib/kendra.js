@@ -330,6 +330,17 @@ async function routeKendraRequest(event, context) {
         && origQuestion && question && origQuestion!=question;
     qnabot.log("useOriginalLanguageQuery: " + useOriginalLanguageQuery);
 
+    // Add support for passing token based authentication to Kendra.  Note useKendraTokenAuth returns as a boolean value and isVerifiedIdentity a string.    
+    let useKendraTokenAuth = event.req["_settings"]["ALT_SEARCH_KENDRA_INDEXES_TOKEN_AUTH"] ? event.req["_settings"]["ALT_SEARCH_KENDRA_INDEXES_TOKEN_AUTH"] : false;
+    let isVerifiedIdentity = _.get(event.req["_userInfo"], "isVerifiedIdentity");
+    if (useKendraTokenAuth === true && isVerifiedIdentity === "true"){
+        qnabot.log(`PASSING TOKEN AUTH TO KENDRA:: isVerifiedIdentity: ${isVerifiedIdentity} and ALT_SEARCH_KENDRA_INDEXES_TOKEN_AUTH: ${useKendraTokenAuth}`);
+        let idtokenjwt = _.get(event.req["session"], "idtokenjwt");
+        var usrContext = {"Token" : idtokenjwt};
+    } else {
+        qnabot.log(`NOT PASSING TOKEN AUTH TO KENDRA:: isVerifiedIdentity: ${isVerifiedIdentity} and  ALT_SEARCH_KENDRA_INDEXES_TOKEN_AUTH: ${useKendraTokenAuth}`);
+    }
+
     // This function can handle configuration with an array of kendraIndexes.
     // Iterate through this area and perform queries against Kendra.
     kendraIndexes.forEach(function (index, i) {
@@ -351,6 +362,13 @@ async function routeKendraRequest(event, context) {
             IndexId: index, /* required */
             QueryText: useOriginalLanguageQuery ? origQuestion: question, /* required */
         };
+
+        // if ALT_SEARCH_KENDRA_INDEXES_TOKEN_AUTH===true && isVerifiedIdentity==="true", then pass the idtoken via UserContext to Kendra query params.
+        if (usrContext){
+            qnabot.log("Updating Kendra query params to include UserContext.");
+            params.UserContext = usrContext
+        }
+        
         let kendraQueryArgs = _.get(event.req, "kendraQueryArgs", [])
         qnabot.log(`Kendra query args: ${kendraQueryArgs}`)
         for (let argString of kendraQueryArgs) {
