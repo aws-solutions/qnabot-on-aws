@@ -61,6 +61,7 @@ exports.resources = {
             ]
         }
     },
+
     "ResponseBotQNAWageV2": {
         "Type": "AWS::Lex::Bot",
         "Condition": "CreateLexResponseBots",
@@ -488,6 +489,7 @@ exports.resources = {
         "DeletionPolicy": "Retain",
         "UpdateReplacePolicy": "Retain",
         "Type": "AWS::Lex::BotVersion",
+        "DependsOn": ["ResponseBotQNAPinVersionV2"],
         "Condition": "CreateLexResponseBots",
         "Properties": {
             "BotId": {"Ref": "ResponseBotQNAPinNoConfirmV2"},
@@ -617,6 +619,7 @@ exports.resources = {
         "DeletionPolicy": "Retain",
         "UpdateReplacePolicy": "Retain",
         "Type": "AWS::Lex::BotVersion",
+        "DependsOn": ["ResponseBotQNAPinVersionV2"],
         "Condition": "CreateLexResponseBots",
         "Properties": {
             "BotId": {"Ref": "ResponseBotQNAYesNoV2"},
@@ -761,6 +764,7 @@ exports.resources = {
         "DeletionPolicy": "Retain",
         "UpdateReplacePolicy": "Retain",
         "Type": "AWS::Lex::BotVersion",
+        "DependsOn": ["ResponseBotQNAPinVersionV2"],
         "Condition": "CreateLexResponseBots",
         "Properties": {
             "BotId": {"Ref": "ResponseBotQNAYesNoExitV2"},
@@ -871,6 +875,7 @@ exports.resources = {
         "DeletionPolicy": "Retain",
         "UpdateReplacePolicy": "Retain",
         "Type": "AWS::Lex::BotVersion",
+        "DependsOn": ["ResponseBotQNAYesNoExitVersionV2"],
         "Condition": "CreateLexResponseBots",
         "Properties": {
             "BotId": {"Ref": "ResponseBotQNADateV2"},
@@ -969,6 +974,7 @@ exports.resources = {
         "DeletionPolicy": "Retain",
         "UpdateReplacePolicy": "Retain",
         "Type": "AWS::Lex::BotVersion",
+        "DependsOn": ["ResponseBotQNAYesNoExitVersionV2"],
         "Condition": "CreateLexResponseBots",
         "Properties": {
             "BotId": {"Ref": "ResponseBotQNADateNoConfirmV2"},
@@ -1135,6 +1141,7 @@ exports.resources = {
         "DeletionPolicy": "Retain",
         "UpdateReplacePolicy": "Retain",
         "Type": "AWS::Lex::BotVersion",
+        "DependsOn": ["ResponseBotQNAYesNoExitVersionV2"],
         "Condition": "CreateLexResponseBots",
         "Properties": {
             "BotId": {"Ref": "ResponseBotQNADayOfWeekV2"},
@@ -1326,6 +1333,7 @@ exports.resources = {
         "DeletionPolicy": "Retain",
         "UpdateReplacePolicy": "Retain",
         "Type": "AWS::Lex::BotVersion",
+        "DependsOn": ["ResponseBotQNADayOfWeekVersionV2"],
         "Condition": "CreateLexResponseBots",
         "Properties": {
             "BotId": {"Ref": "ResponseBotQNAMonthV2"},
@@ -1504,6 +1512,7 @@ exports.resources = {
         "DeletionPolicy": "Retain",
         "UpdateReplacePolicy": "Retain",
         "Type": "AWS::Lex::BotVersion",
+        "DependsOn": ["ResponseBotQNADayOfWeekVersionV2"],
         "Condition": "CreateLexResponseBots",
         "Properties": {
             "BotId": {"Ref": "ResponseBotQNAMonthNoConfirmV2"},
@@ -1610,6 +1619,7 @@ exports.resources = {
         "DeletionPolicy": "Retain",
         "UpdateReplacePolicy": "Retain",
         "Type": "AWS::Lex::BotVersion",
+        "DependsOn": ["ResponseBotQNADayOfWeekVersionV2"],
         "Condition": "CreateLexResponseBots",
         "Properties": {
             "BotId": {"Ref": "ResponseBotQNANumberV2"},
@@ -1703,6 +1713,7 @@ exports.resources = {
         "DeletionPolicy": "Retain",
         "UpdateReplacePolicy": "Retain",
         "Type": "AWS::Lex::BotVersion",
+        "DependsOn": ["ResponseBotQNANumberVersionV2"],
         "Condition": "CreateLexResponseBots",
         "Properties": {
             "BotId": {"Ref": "ResponseBotQNANumberNoConfirmV2"},
@@ -1817,6 +1828,7 @@ exports.resources = {
         "DeletionPolicy": "Retain",
         "UpdateReplacePolicy": "Retain",
         "Type": "AWS::Lex::BotVersion",
+        "DependsOn": ["ResponseBotQNANumberVersionV2"],
         "Condition": "CreateLexResponseBots",
         "Properties": {
             "BotId": {"Ref": "ResponseBotQNAAgeV2"},
@@ -1918,6 +1930,7 @@ exports.resources = {
         "DeletionPolicy": "Retain",
         "UpdateReplacePolicy": "Retain",
         "Type": "AWS::Lex::BotVersion",
+        "DependsOn": ["ResponseBotQNANumberVersionV2"],
         "Condition": "CreateLexResponseBots",
         "Properties": {
             "BotId": {"Ref": "ResponseBotQNAAgeNoConfirmV2"},
@@ -2024,6 +2037,7 @@ exports.resources = {
         "DeletionPolicy": "Retain",
         "UpdateReplacePolicy": "Retain",
         "Type": "AWS::Lex::BotVersion",
+        "DependsOn": ["ResponseBotQNAAgeNoConfirmVersionV2"],
         "Condition": "CreateLexResponseBots",
         "Properties": {
             "BotId": {"Ref": "ResponseBotQNAPhoneNumberV2"},
@@ -2117,6 +2131,7 @@ exports.resources = {
         "DeletionPolicy": "Retain",
         "UpdateReplacePolicy": "Retain",
         "Type": "AWS::Lex::BotVersion",
+        "DependsOn": ["ResponseBotQNAAgeNoConfirmVersionV2"],
         "Condition": "CreateLexResponseBots",
         "Properties": {
             "BotId": {"Ref": "ResponseBotQNAPhoneNumberNoConfirmV2"},
@@ -2224,6 +2239,7 @@ exports.resources = {
         "DeletionPolicy": "Retain",
         "UpdateReplacePolicy": "Retain",
         "Type": "AWS::Lex::BotVersion",
+        "DependsOn": ["ResponseBotQNAAgeNoConfirmVersionV2"],
         "Condition": "CreateLexResponseBots",
         "Properties": {
             "BotId": {"Ref": "ResponseBotQNATimeV2"},
@@ -2329,6 +2345,7 @@ exports.resources = {
         "DeletionPolicy": "Retain",
         "UpdateReplacePolicy": "Retain",
         "Type": "AWS::Lex::BotVersion",
+        "DependsOn": ["ResponseBotQNATimeVersionV2"],
         "Condition": "CreateLexResponseBots",
         "Properties": {
             "BotId": {"Ref": "ResponseBotQNAEmailAddressV2"},
@@ -2455,6 +2472,7 @@ exports.resources = {
         "DeletionPolicy": "Retain",
         "UpdateReplacePolicy": "Retain",
         "Type": "AWS::Lex::BotVersion",
+        "DependsOn": ["ResponseBotQNATimeVersionV2"],
         "Condition": "CreateLexResponseBots",
         "Properties": {
             "BotId": {"Ref": "ResponseBotQNANameV2"},

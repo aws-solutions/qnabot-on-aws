@@ -5,6 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [5.2.2] - 2022-10-24
+
+### Updated
+
+-   Security patches for npm and pip packages
+-   `axios` npm package removed from lambda/cfn
+-   Add retries for elasticsearch api requests with 5xx error codes to improve stability of initial stack deployment
+-   Split the creation of Lex Bot Versions in CF templates into batches of 3 to improve stability of initial stack deployment
+
+
+### Fixed
+
+-   Lex rebuild failures when there is any single character utterance (#503)
+-   ElicitResponse bug causing bot to prompt 'What is the question?' (#506)
+
 ## [5.2.1] - 2022-09-15
 
 ### Updated

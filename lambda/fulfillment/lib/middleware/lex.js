@@ -28,7 +28,18 @@ function isConnectClientChat(req){
 }
 
 function isElicitResponse(request, response){
-    return _.get(response,'result.elicitResponse.responsebot_hook', undefined) !== undefined || _.get(request,'session.qnabotcontext.specialtyBot' ,undefined) !== undefined;
+    let result = false;
+    const qnabotcontextJSON = _.get(response,'session.qnabotcontext');
+    if (qnabotcontextJSON) {
+        const qnabotcontext = JSON.parse(qnabotcontextJSON);
+        if (_.get(qnabotcontext,'elicitResponse.responsebot')) {
+            result = true;
+        }
+        if (_.get(qnabotcontext,'specialtyBot')) {
+            result = true;
+        }
+    }
+    return result;
 }
 
 function trapIgnoreWords(req, transcript) {
@@ -395,9 +406,7 @@ function getV2ElicitTemplate(request, response){
         sessionState: {
             sessionAttributes:_.get(response,'session',{}),
             dialogAction:{
-                type:'ElicitSlot',
-                slotToElicit: 'qnaslot'
-            },
+                type:'ElicitIntent'            },
             intent: {
                 name: 'QnaIntent',
             },

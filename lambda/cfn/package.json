@@ -11,7 +11,6 @@
   "license": "ISC",
   "dependencies": {
     "aws-sdk": "^2.913.0",
-    "axios": "^0.21.1",
     "bluebird": "^3.5.0",
     "body-parser": "^1.18.2",
     "cfn-lambda": "^4.0.0",
@@ -29,6 +28,6 @@
   "devDependencies": {
     "diff": "^4.0.2",
     "tap": "^16.2.0",
-    "tap-mocha-reporter": "^5.0.1"
+    "tap-mocha-reporter": "^5.0.3"
   }
 }

@@ -1,7 +1,7 @@
 docker==6.0.0
 moto==4.0.1
 pytest==7.1.1
-pytest-cov==3.0.0
-pytest-env==0.6.2
-pytest-mock==3.8.2
+pytest-cov==4.0.0
+pytest-env==0.8.1
+pytest-mock==3.10.0
 pyyaml==6.0

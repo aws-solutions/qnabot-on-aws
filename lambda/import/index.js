@@ -64,7 +64,7 @@ exports.step = function (event, context, cb) {
                                     objects.push(questionStr)
                                 })
                                 config.buffer = ""
-                            } else { 
+                            } else {
                                 objects = config.buffer.split(/\n/)
                                 JSON.parse(objects[objects.length - 1])
                                 config.buffer = ""
@@ -140,7 +140,8 @@ exports.step = function (event, context, cb) {
                             endpoint: process.env.ES_ENDPOINT,
                             method: "POST",
                             path: "/_bulk",
-                            body: result
+                            body: result,
+                            headers: {'Content-Type': 'application/x-ndjson'}
                         }
 
                         return lambda.invoke({
