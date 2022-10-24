@@ -316,7 +316,7 @@ def translate_text(localeId, text):
             translatedText = text
     else:
         print(f"Utterance {text} too short to translate - using original.")
-        translatedUtterance = text
+        translatedText = text
     print(f"Translated utterance: {text} -> {translatedText}")
     return translatedText
 

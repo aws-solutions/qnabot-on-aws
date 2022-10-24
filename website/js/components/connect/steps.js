@@ -4,7 +4,7 @@ module.exports=[
     text:`
 <br/>
 Start by completing all 3 steps below to setup your Amazon Connect instance:
-<br/> 
+<br/>
 &#8291;1. <b><a href="https://docs.aws.amazon.com/connect/latest/adminguide/tutorial1-login-aws.html" target="_blank">Launch Amazon Connect</a> <br />
 &#8291;2. <b><a href="https://docs.aws.amazon.com/connect/latest/adminguide/tutorial1-create-instance.html" target="_blank">Create an instance</a> <br />
 &#8291;3. <b><a href="https://docs.aws.amazon.com/connect/latest/adminguide/tutorial1-claim-phone-number.html" target="_blank">Claim a phone number</a> <br />
@@ -72,9 +72,9 @@ Now we must make the QnABot accessible to our new call center.  Open the  <b><a 
     text:`
 <br /><br />
 &#8291;1. Choose <b>IMPORT SAMPLE QUESTIONS AND ANSWERS</b> below, it can take up to <b>2 minutes</b> to finish this process.<br/>
-&#8291;2. When Status is Complete, enable the new interruptable reponse feature: (i) From the Designer Tools menu (&#x2630;) choose <b>Settings</b>, (ii) set <b>CONNECT_ENABLE_VOICE_RESPONSE_INTERRUPT</b> to <b>true</b>, and (iii) save changes.<br/> 
+&#8291;2. When Status is Complete, enable the new interruptable reponse feature: (i) From the Designer Tools menu (&#x2630;) choose <b>Settings</b>, (ii) set <b>CONNECT_ENABLE_VOICE_RESPONSE_INTERRUPT</b> to <b>true</b>, and (iii) save changes.<br/>
 &#8291;3. You are ready to try your Bot! Call your new contact center phone number and try some of the questions below.<br/>
-For more information see our blog post <a href="https://github.com/aws-samples/aws-ai-qna-bot/blob/master/workshops/Connect/README.md">Build an AI powered agent for Amazon Connect using AWS QnABot</a></br>
+For more information see our blog post <a href="https://aws.amazon.com/blogs/contact-center/build-an-ai-powered-agent-for-amazon-connect-using-aws-qnabot/">Build an AI powered agent for Amazon Connect using AWS QnABot</a></br>
 
 <br/><span id="stsLabel"></span> <span id="ImportQuestionsStatus"/><br /><br />
 `
