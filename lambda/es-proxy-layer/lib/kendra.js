@@ -338,7 +338,7 @@ async function routeKendraRequest(event, context) {
         let idtokenjwt = _.get(event.req["session"], "idtokenjwt");
         var usrContext = {"Token" : idtokenjwt};
     } else {
-        qnabot.log(`NOT PASSING TOKEN AUTH TO KENDRA:: isVerifiedIdentity: ${isVerifiedIdentity} and  ALT_SEARCH_KENDRA_INDEXES_TOKEN_AUTH: ${useKendraTokenAuth}`);
+        qnabot.log(`NOT PASSING TOKEN AUTH TO KENDRA:: isVerifiedIdentity: ${isVerifiedIdentity} and ALT_SEARCH_KENDRA_INDEXES_TOKEN_AUTH: ${useKendraTokenAuth}`);
     }
 
     // This function can handle configuration with an array of kendraIndexes.
