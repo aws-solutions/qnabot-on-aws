@@ -51,7 +51,7 @@ async function specialtyBotInvocation(req, res) {
 
             // Set session response bot attributes to force chaining to work properly in query.js
             _.set(res,"session.qnabotcontext.elicitResponse.progress", "Fulfilled");
-            _.set(res, "session.qnabotcontext.elicitResponse.chainingConfig", sBChainingConfig);
+            _.set(res, "session.qnabotcontext.elicitResponse.chainingConfig", specialtyBotChainingConfig);
             // chainingConfig will be used in Query Lambda function
             // const arn = util.getLambdaArn(process.env.LAMBDA_DEFAULT_QUERY);
             const postQuery = await esquery(req, res)
