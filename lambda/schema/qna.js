@@ -294,6 +294,27 @@ module.exports={
                     type:"string",
                     maxLength:100,
                     propertyOrder:3
+                },
+                specialty_bot_start_up_text:{
+                    title:"Send initial utterance to bot",
+                    description:"An optional string to send to the bot for startup. Use ${relay} to send the user's current input text. Default is an empty string for no initial interaction.",
+                    type:"string",
+                    maxLength:100,
+                    propertyOrder:4
+                },
+                specialty_bot_session_attributes_to_receive:{
+                    title:"Session attributes to receive and merge from the Lex specialty bot",
+                    description:"An optional comma separated list of session attributes to receive from a Lex specialty bot. Default is an empty string.",
+                    type:"string",
+                    maxLength:100,
+                    propertyOrder:5
+                },
+                specialty_bot_session_attributes_to_receive_namespace:{
+                    title:"Namespace to use for session attributes being received",
+                    description:"An string specifying the namespace to use for received attributes. Default is an empty string. However, this must be specified if receiving session attributes.",
+                    type:"string",
+                    maxLength:100,
+                    propertyOrder:6
                 }
             }
         },

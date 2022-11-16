@@ -85,7 +85,7 @@ async function lambdaClientRequester(name, req) {
         req: {
             request: "message",
             inputText: _.get(req, "question"),
-            sessionAttributes: _.get(req, "session.qnabotcontext.specialtySessionAttributes", {}),
+            sessionAttributes: _.get(req, "session.qnabotcontext.sBSessionAttributes", {}),
             userId: getBotUserId(req)
         }
     }
@@ -134,14 +134,30 @@ function lexV2ClientRequester(params) {
 }
 
 function generateMergedAttributes(req) {
-    const mergedSessionAttributes = _.get(req, "session.qnabotcontext.specialtySessionAttributes", {});
-    const attributesToMerge = _.get(req, 'session.qnabotcontext.specialtyBotMergeAttributes', "").split(",");
+    const mergedSessionAttributes = _.get(req, "session.qnabotcontext.sBSessionAttributes", {});
+
+    // special handling if a qnabotcontext attribute is requested to be merged into the target
+    let sbQnaBotContext = undefined;
+    if (mergedSessionAttributes && mergedSessionAttributes.qnabotcontext) {
+        sbQnaBotContext = (isString(mergedSessionAttributes.qnabotcontext) ? JSON.parse(mergedSessionAttributes.qnabotcontext) : mergedSessionAttributes.qnabotcontext);
+        qnabot.log(`sbQnaBotContext is: ${JSON.stringify(sbQnaBotContext, null, 2)}`);
+    }
+    const attributesToMerge = _.get(req, 'session.qnabotcontext.sBMergeAttributes', "").split(",");
     attributesToMerge.map(attribute=>{
-        const value =_.get(req, `session.${attribute.trim()}`, "");
+        const targetAttribute = attribute.trim();
+        const value =_.get(req, `session.${targetAttribute}`, "");
         if (value.length > 0) {
-            mergedSessionAttributes[attribute.trim()] = value;
+            if (targetAttribute.split(".")[0] === "qnabotcontext") {
+                sbQnaBotContext = sbQnaBotContext ? sbQnaBotContext : {};
+                _.set(sbQnaBotContext,targetAttribute.split(".").slice(1).join('.'), value);
+            } else {
+                _.set(mergedSessionAttributes, attribute.trim(), value);
+            }
         }
     });
+    if (sbQnaBotContext) {
+        _.set(mergedSessionAttributes, "qnabotcontext", JSON.stringify(sbQnaBotContext));
+    }
     return mergedSessionAttributes;
 }
 
@@ -174,7 +190,7 @@ async function handleRequest(req, res, botName, botAlias) {
         let tempBotUserID = _.get(req, "_userInfo.UserId", "nouser");
         tempBotUserID = tempBotUserID.substring(0, 100); // Lex has max userId length of 100
 
-        // Determine if we using LexV1 or LexV2.. LexV2 bot is identified by "lexv2::BotId/BotAliasId/LocaleId"
+        // Determine if using LexV1 or LexV2. LexV2 bot is identified by "lexv2::BotId/BotAliasId/LocaleId"
         if (botIdentity.toLowerCase().startsWith("lexv2::")) {
             let res = {};
             const ids = botIdentity.split("::")[1];
@@ -192,10 +208,10 @@ async function handleRequest(req, res, botName, botAlias) {
             };
             const lexv2response = await lexV2ClientRequester(params);
 
-            res.intentName = lexv2response.sessionState.intent.name;
+            res.intentName = lexv2response.sessionState.intent ? lexv2response.sessionState.intent.name : undefined;
             res.sessionAttributes = lexv2response.sessionState.sessionAttributes;
-            res.dialogState = lexv2response.sessionState.intent.state;
-            res.slotToElicit = lexv2response.sessionState.dialogAction.slotToElicit;
+            res.dialogState = lexv2response.sessionState.dialogAction.type ? lexv2response.sessionState.dialogAction.type : undefined;
+            res.slotToElicit = lexv2response.sessionState.dialogAction.slotToElicit ? lexv2response.sessionState.dialogAction.slotToElicit : undefined;
             let finalMessage = "";
             if (lexv2response.messages && lexv2response.messages.length > 0) {
                 lexv2response.messages.forEach((mes) => {
@@ -213,11 +229,9 @@ async function handleRequest(req, res, botName, botAlias) {
             res.message = finalMessage.trim();
 
             // lex v2 FallbackIntent match means it failed to fill desired slot(s).
-            if (lexv2response.sessionState.intent.name === "FallbackIntent" ||
-                lexv2response.sessionState.intent.state === "Failed") {
+            if ( lexv2response.sessionState.intent && ( lexv2response.sessionState.intent.name === "FallbackIntent" ||
+                lexv2response.sessionState.intent.state === "Failed")) {
                 res.dialogState = "Failed";
-            } else {
-                res.dialogState = lexv2response.sessionState.dialogAction.type;
             }
             let slots = _.get(lexv2response,"sessionState.intent.slots");
             if (slots) {
@@ -249,11 +263,11 @@ function endUseOfSpecialtyBot(req, res, welcomeBackMessage) {
     delete res.session.qnabotcontext.specialtyBot;
     delete res.session.qnabotcontext.specialtyBotName;
     delete res.session.qnabotcontext.specialtyBotAlias;
-    delete res.session.qnabotcontext.specialtySessionAttributes;
+    delete res.session.qnabotcontext.sBSessionAttributes;
 
     if (welcomeBackMessage) {
-        let plaintextResp = welcomeBackMessage;
-        let htmlResp = `<i> ${welcomeBackMessage} </i>`;
+        let plaintextResp = _.get(res, "message", "") + " " + welcomeBackMessage;
+        let htmlResp = `${_.get(res, "message", "")} <i> ${welcomeBackMessage} </i>`;
         _.set(res, "message", plaintextResp);
         let altMessages = {
             'html': htmlResp
@@ -278,6 +292,11 @@ function endUseOfSpecialtyBot(req, res, welcomeBackMessage) {
 async function processResponse(req, res, hook, alias) {
     qnabot.log('specialtyBotRouter request: ' + JSON.stringify(req, null, 2));
     qnabot.log('specialtyBotRouter response: ' + JSON.stringify(res, null, 2));
+    let originalMessage = res.message ? res.message + " ": "";
+    let originalAppContext = undefined;
+    if (res.session && res.session.appContext) {
+        originalAppContext = (isString(res.session.appContext) ? JSON.parse(res.session.appContext) : res.session.appContext);
+    }
     const welcomeBackMessage = _.get(req._settings, 'BOT_ROUTER_WELCOME_BACK_MSG', 'Welcome back to QnABot.');
     const exitResponseDefault = _.get(req._settings, 'BOT_ROUTER_EXIT_MSGS', 'exit,quit,goodbye,leave');
     let exitResponses = exitResponseDefault.split(',');
@@ -303,14 +322,17 @@ async function processResponse(req, res, hook, alias) {
             let ssmlMessage = undefined;
             if (botResp.sessionAttributes && botResp.sessionAttributes.appContext) {
                 const appContext = ( isString(botResp.sessionAttributes.appContext) ? JSON.parse(botResp.sessionAttributes.appContext) : botResp.sessionAttributes.appContext);
-                // if alt.messsages contains SSML tags setup to return ssmlMessage
+                // if alt.messages contains SSML tags setup to return ssmlMessage
                 if (appContext && _.has(appContext,'altMessages.ssml') && appContext.altMessages.ssml.includes("<speak>")) {
                     ssmlMessage = appContext.altMessages.ssml;
                 }
+                if ( (appContext && _.has(appContext,'altMessages.markdown')) && (originalAppContext && _.has(originalAppContext,'altMessages.markdown')) ) {
+                    appContext.altMessages.markdown = originalAppContext.altMessages.markdown + " " + appContext.altMessages.markdown;
+                }
                 _.set(res.session, "appContext.altMessages", appContext.altMessages);
             }
-            _.set(res, "session.qnabotcontext.specialtySessionAttributes", botResp.sessionAttributes);
-            _.set(res, "message", botResp.message);
+            _.set(res, "session.qnabotcontext.sBSessionAttributes", botResp.sessionAttributes);
+            _.set(res, "message", originalMessage + botResp.message);
             _.set(res, "plainMessage", botResp.message);
             _.set(res, "messageFormat", botResp.messageFormat);
             if (_.get(botResp,'responseCard'))  {
@@ -328,13 +350,52 @@ async function processResponse(req, res, hook, alias) {
                 res.type = "SSML";
                 res.message = ssmlMessage;
             }
+
+            // merge attributes to receive
+            const attributesToMerge = _.get(req, 'session.qnabotcontext.sBAttributesToReceive', "").split(",");
+            qnabot.log(`attributes to merge back: ${attributesToMerge}`);
+            const namespace = _.get(req, 'session.qnabotcontext.sBAttributesToReceiveNamespace', "");
+            qnabot.log(`namespace to merge back: ${namespace}`);
+            if (namespace.length > 0) {
+                attributesToMerge.map(attribute => {
+                    qnabot.log(`merging: ${attribute}`);
+                    if (attribute.startsWith("appContext")) {
+                        qnabot.log(`merging from appContext`);
+                        const aName = attribute.split("appContext.")[1];
+                        if (botResp.sessionAttributes && botResp.sessionAttributes.appContext) {
+                            const appContext = ( isString(botResp.sessionAttributes.appContext) ? JSON.parse(botResp.sessionAttributes.appContext) : botResp.sessionAttributes.appContext);
+                            const value = _.get(appContext, aName);
+                            _.set(res, `session.${namespace}.${aName}`, value);
+                            qnabot.log(`merged: ${value} to session.${namespace}.${aName}`);
+                       }
+                    } else if (attribute.startsWith("qnabotcontext.")) {
+                        qnabot.log(`merging from qnabotcontext`);
+                        const aName = attribute.split("qnabotcontext.")[1];
+                        if (botResp.sessionAttributes && botResp.sessionAttributes.qnabotcontext) {
+                            const qnabotContext = ( isString(botResp.sessionAttributes.qnabotcontext) ? JSON.parse(botResp.sessionAttributes.qnabotcontext) : botResp.sessionAttributes.qnabotcontext);
+                            qnabot.log(`qnabotContext is: ${JSON.stringify(qnabotContext,null,2)}`);
+                            const value = _.get(qnabotContext, aName);
+                            _.set(res, `session.${namespace}.${aName}`, value);
+                            qnabot.log(`merged: ${value} to session.${namespace}.${aName}`);
+                        }
+                    } else {
+                        qnabot.log(`default merge`);
+                        const value = _.get(botResp, `session.${attribute.trim()}`, "");
+                        if (value.length > 0) {
+                            _.set(res, `session.${namespace}.${attribute.trim()}`, value);
+                            qnabot.log(`merged: ${value} to session.${namespace}.${attribute.trim()}`);
+                        }
+                    }
+                });
+            }
+
             const isFromQnABot = _.has(botResp, 'sessionAttributes.qnabot_gotanswer');
-            if (_.get(botResp,'dialogState', "") === 'Fulfilled' && !isFromQnABot) {
+            if ((_.get(botResp,'dialogState', "") === 'Fulfilled' || _.get(botResp,'dialogState', "") === 'Close' ) && !isFromQnABot) {
                 lexBotIsFulfilled = true;
             }
             if (botResp.sessionAttributes.QNABOT_END_ROUTING || lexBotIsFulfilled) {
                 qnabot.log("specialtyBot requested exit");
-                let resp = endUseOfSpecialtyBot(req, res, undefined);
+                let resp = endUseOfSpecialtyBot(req, res, welcomeBackMessage);
                 resp.res = await translate_res(resp.req, resp.res);
                 return resp;
             }

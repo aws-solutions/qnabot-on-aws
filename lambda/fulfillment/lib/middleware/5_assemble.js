@@ -86,14 +86,7 @@ async function connect_response(req, res) {
 
 function resetAttributes(req,res) {
     // Kendra attributes
-    let previous;
-    let prevQid;
     let kendraResponsibleQid;
-    previous = _.get(req._event.sessionAttributes,"previous");
-    if (previous) {
-        let obj = JSON.parse(previous);
-        prevQid = obj.qid;
-    }
     kendraResponsibleQid = _.get(res.session,"qnabotcontext.kendra.kendraResponsibleQid");
     if ( (res.result === undefined || res.result.qid === undefined) || ( kendraResponsibleQid && (res.result.qid !== kendraResponsibleQid))) {
         // remove any prior session attributes for kendra as they are no longer valid

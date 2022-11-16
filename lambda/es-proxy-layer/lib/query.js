@@ -542,9 +542,11 @@ async function processFulfillmentEvent(req,res) {
     if (hit) {
         // found a document in elastic search.
         var c=0;
-        while (_.get(hit, 'conditionalChaining') && _.get(hit, 'elicitResponse.responsebot_hook', '') === '' ) {
+        while (_.get(hit, 'conditionalChaining')
+            && _.get(hit, 'elicitResponse.responsebot_hook', '') === ''
+            && _.get(hit, 'botRouting.specialty_bot', '') === '') {
             c++;
-            // ElicitResonse is not involved and this document has conditionalChaining defined. Process the
+            // ElicitResponse and SpecialtyBot is not involved and this document has conditionalChaining defined. Process the
             // conditionalChaining in this case.
             [req, res, hit] = await evaluateConditionalChaining(req, res, hit, hit.conditionalChaining);
             qnabot.log('Chained doc count: ', c);
