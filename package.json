@@ -1,6 +1,6 @@
 {
   "name": "qnabot-on-aws",
-  "version": "5.2.3",
+  "version": "5.2.4",
   "engines": {
     "node": ">=12.16.1",
     "npm": ">=7.8.0"
@@ -171,6 +171,6 @@
       "glob-parent": "^5.1.2"
     },
     "minimatch": "3.0.5",
-    "loader-utils@<1.4.1": "^1.4.1"
+    "loader-utils@<1.4.2": "^1.4.2"
   }
 }
