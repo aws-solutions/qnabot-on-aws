@@ -80,7 +80,10 @@ function build_query(params) {
           },
           {
             "term": {
-              "clientFilterValues": qnaClientFilter
+              "clientFilterValues": {
+                "value": qnaClientFilter,
+                "case_insensitive": true
+              }
             }
           }
         ]
