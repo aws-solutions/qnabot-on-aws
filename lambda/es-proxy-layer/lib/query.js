@@ -246,7 +246,10 @@ async function get_hit(req, res) {
         es_expand_contractions: _.get(req,'_settings.ES_EXPAND_CONTRACTIONS'),
         kendra_indexes: _.get(req,'_settings.ALT_SEARCH_KENDRA_INDEXES'),
         minimum_confidence_score: _.get(req,'_settings.ALT_SEARCH_KENDRA_FAQ_CONFIDENCE_SCORE'),
-        qnaClientFilter: _.get(req, 'session.QNAClientFilter')
+        qnaClientFilter: _.get(req, 'session.QNAClientFilter'),
+        embeddings_enable: _.get(req,'_settings.EMBEDDINGS_ENABLE'),
+        embeddings_sagemaker_endpoint: _.get(req,'_settings.EMBEDDINGS_SAGEMAKER_ENDPOINT'),
+        embeddings_sagemaker_score_boost: _.get(req,'_settings.EMBEDDINGS_SAGEMAKER_SCORE_BOOST'),
     };
     var response = await run_query(req, query_params);
     qnabot.log('Query response: ', JSON.stringify(response,null,2));

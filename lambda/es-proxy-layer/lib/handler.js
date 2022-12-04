@@ -35,6 +35,9 @@ async function get_es_query(event, settings) {
             score_answer_field: _.get(settings,'ES_SCORE_ANSWER_FIELD'),
             fuzziness: _.get(settings, 'ES_USE_FUZZY_MATCH'),
             es_expand_contractions: _.get(settings,"ES_EXPAND_CONTRACTIONS"),
+            embeddings_enable: _.get(settings,'EMBEDDINGS_ENABLE'),
+            embeddings_sagemaker_endpoint: _.get(settings,'EMBEDDINGS_SAGEMAKER_ENDPOINT'),
+            embeddings_sagemaker_score_boost: _.get(settings,'EMBEDDINGS_SAGEMAKER_SCORE_BOOST'),
         };
         return build_es_query(query_params);
     } else {
@@ -75,7 +78,6 @@ async function run_query_kendra(event, kendra_index) {
     var kendra_response = await kendra.handler(request_params);
     return kendra_response;
 }
-
 
 module.exports= async (event, context, callback) => {
     try {

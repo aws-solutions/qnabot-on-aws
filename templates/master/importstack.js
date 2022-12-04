@@ -16,6 +16,8 @@ module.exports={
                 "VarIndex": {"Fn::GetAtt": ["Var", "QnaIndex"]},
                 "MetricsIndex": {"Fn::GetAtt": ["Var", "MetricsIndex"]},
                 "FeedbackIndex": {"Fn::GetAtt": ["Var", "FeedbackIndex"]},
+                "DefaultQnABotSettings":{"Ref":"DefaultQnABotSettings"},
+                "CustomQnABotSettings":{"Ref":"CustomQnABotSettings"},
                 "Encryption": {"Ref":"Encryption"},
                 "VPCSubnetIdList" : { "Fn::Join" : [ ",", {"Ref":"VPCSubnetIdList"} ] },
                 "VPCSecurityGroupIdList": { "Fn::Join" : [ ",", {"Ref":"VPCSecurityGroupIdList"} ] },

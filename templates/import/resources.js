@@ -28,7 +28,9 @@ module.exports=Object.assign(
                 ES_METRICSINDEX:{"Ref":"MetricsIndex"},
                 ES_FEEDBACKINDEX:{"Ref":"FeedbackIndex"},
                 ES_ENDPOINT:{"Ref":"EsEndpoint"},
-                ES_PROXY:{"Ref":"EsProxyLambda"}
+                ES_PROXY:{"Ref":"EsProxyLambda"},
+                DEFAULT_SETTINGS_PARAM: {Ref: "DefaultQnABotSettings"},
+                CUSTOM_SETTINGS_PARAM: {Ref: "CustomQnABotSettings"}
             }
         },
         "Handler": "index.start",
@@ -67,7 +69,9 @@ module.exports=Object.assign(
                 ES_METRICSINDEX:{"Ref":"MetricsIndex"},
                 ES_FEEDBACKINDEX:{"Ref":"FeedbackIndex"},
                 ES_ENDPOINT:{"Ref":"EsEndpoint"},
-                ES_PROXY:{"Ref":"EsProxyLambda"}
+                ES_PROXY:{"Ref":"EsProxyLambda"},
+                DEFAULT_SETTINGS_PARAM: {Ref: "DefaultQnABotSettings"},
+                CUSTOM_SETTINGS_PARAM: {Ref: "CustomQnABotSettings"}
             }
         },
         "Handler": "index.step",
@@ -112,6 +116,39 @@ module.exports=Object.assign(
           util.basicLambdaExecutionPolicy(),
           util.lambdaVPCAccessExecutionRole(),
           util.xrayDaemonWriteAccess(),
+          {
+            PolicyName: "SSMGetParameterAccess",
+            PolicyDocument: {
+              Version: "2012-10-17",
+              Statement: [
+                {
+                  Effect: "Allow",
+                  Action: [
+                    "ssm:GetParameter",
+                  ],
+                  Resource: [
+                    {"Fn::Join": ["", ["arn:aws:ssm:", {"Ref": "AWS::Region"}, ":", {"Ref": "AWS::AccountId"}, ":parameter/", {"Ref": "CustomQnABotSettings"}]]},
+                    {"Fn::Join": ["", ["arn:aws:ssm:", {"Ref": "AWS::Region"}, ":", {"Ref": "AWS::AccountId"}, ":parameter/", {"Ref": "DefaultQnABotSettings"}]]},
+                  ],
+                }
+              ]
+            }
+          },
+          {
+            "PolicyName" : "SagemakerInvokeEndpointAccess",
+            "PolicyDocument" : {
+            "Version": "2012-10-17",
+              "Statement": [
+                {
+                    "Effect": "Allow",
+                    "Action": [
+                        "sagemaker:InvokeEndpoint"
+                     ],
+                    "Resource": "*"
+                }
+              ]
+            }
+          },
         ],
         "ManagedPolicyArns": [
           {"Ref":"ImportPolicy"}
