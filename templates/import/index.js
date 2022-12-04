@@ -23,6 +23,8 @@ module.exports={
         "VarIndex": {"Type":"String"},
         "MetricsIndex": {"Type":"String"},
         "FeedbackIndex": {"Type":"String"},
+        "DefaultQnABotSettings": {"Type":"String"},
+        "CustomQnABotSettings": {"Type":"String"},
         "Encryption": {"Type":"String"},
         "VPCSubnetIdList" : {"Type": "String"},
         "VPCSecurityGroupIdList": {"Type": "String"},

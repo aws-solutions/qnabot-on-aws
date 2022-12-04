@@ -1,22 +1,91 @@
-var Promise = require('bluebird')
-var aws = require("aws-sdk")
-aws.config.setPromisesDependency(Promise)
-aws.config.region = process.env.AWS_REGION
+var Promise = require('bluebird');
+var aws = require("aws-sdk");
+aws.config.setPromisesDependency(Promise);
+aws.config.region = process.env.AWS_REGION;
 
-var s3 = new aws.S3()
-var lambda = new aws.Lambda()
-var stride = parseInt(process.env.STRIDE)
-var _ = require('lodash')
-var convertxlsx = require('convert-xlsx')
-var delete_existing_content = require('delete_existing_content')
+var s3 = new aws.S3();
+var lambda = new aws.Lambda();
+var stride = parseInt(process.env.STRIDE);
+var _ = require('lodash');
+var convertxlsx = require('convert-xlsx');
+var delete_existing_content = require('delete_existing_content');
 
+function isJson(str) {
+    try {
+        JSON.parse(str);
+    } catch (e) {
+        return false;
+    }
+    return true;
+}
+
+function str2bool(settings) {
+    var new_settings = _.mapValues(settings, x => {
+        if (_.isString(x)) {
+            x = x.replace(/^"(.+)"$/,'$1');  // remove wrapping quotes
+            if (x.toLowerCase() === "true") {
+                return true ;
+            }
+            if (x.toLowerCase() === "false") {
+                return false ;
+            }
+        }
+        return x;
+    });
+    return new_settings;
+}
+
+async function get_parameter(param_name) {
+    var ssm = new aws.SSM();
+    var params = {
+        Name: param_name,
+        WithDecryption: true
+    };
+    var response = await ssm.getParameter(params).promise();
+    var settings = response.Parameter.Value
+    if (isJson(settings)) {
+        settings = JSON.parse(response.Parameter.Value);
+        settings = str2bool(settings) ;
+    }
+    return settings;
+}
+
+const get_settings = async function get_settings() {
+    var default_settings_param = process.env.DEFAULT_SETTINGS_PARAM;
+    var custom_settings_param = process.env.CUSTOM_SETTINGS_PARAM;
+    console.log("Getting Default QnABot settings from SSM Parameter Store: ", default_settings_param);
+    var default_settings = await get_parameter(default_settings_param);
+    console.log("Getting Custom QnABot settings from SSM Parameter Store: ", custom_settings_param);
+    var custom_settings = await get_parameter(custom_settings_param);
+    var settings = _.merge(default_settings, custom_settings);
+    console.log("Merged Settings: ", settings);
+    return settings;
+}
+
+
+const get_embeddings = async function get_embeddings(sentence, settings) {
+    if (settings.EMBEDDINGS_ENABLE) {
+        console.log("Get embeddings for: ", sentence);
+        const sm = new aws.SageMakerRuntime({region:'us-east-1'});
+        const body = Buffer.from(JSON.stringify(sentence), 'utf-8').toString();
+        var smres = await sm.invokeEndpoint({
+            EndpointName:settings.EMBEDDINGS_SAGEMAKER_ENDPOINT,
+            ContentType:'application/x-text',
+            Body:body,
+        }).promise();
+        const sm_body = JSON.parse(Buffer.from(smres.Body, 'utf-8').toString());
+        return sm_body.embedding;
+    } else {
+        console.log("EMBEDDINGS_ENABLE (disabled): ", settings.EMBEDDINGS_ENABLE);
+        return undefined;
+    }
+}
 
 exports.step = function (event, context, cb) {
     console.log("step")
     console.log("Request", JSON.stringify(event, null, 2))
     var Bucket = event.Records[0].s3.bucket.name
     var Key = decodeURI(event.Records[0].s3.object.key)
-
     var progress
     console.log(Bucket, Key);
     s3.waitFor('objectExists', {
@@ -49,7 +118,8 @@ exports.step = function (event, context, cb) {
                         VersionId: config.version,
                         Range: `bytes=${config.start}-${config.end}`
                     }).promise()
-                    .then(function (result) {
+                    .then(async function (result) {
+                        const settings = await get_settings();
                         console.log('opening file')
                         var objects = []
                         try {
@@ -73,65 +143,71 @@ exports.step = function (event, context, cb) {
                             config.buffer=objects.pop()
                         }
                         var out = []
-                        objects.filter(x => x)
-                            .forEach(x => {
-                                console.log('inside import an object')
-                                try {
-                                    var obj = JSON.parse(x)
-                                    var timestamp = _.get(obj, 'datetime', "");
-                                    var docid;
-                                    if (timestamp === "") {
-                                        // only metrics and feedback items have datetime field.. This must be a qna item.
-                                        obj.type = obj.type || 'qna'
-                                        if(obj.type != 'slottype') {
-                                            obj.q = obj.q.map(x => {
-                                                x = x.replace(/\\*"/g, '');
-                                                return x
-                                            });
-                                        }
-                                        if (obj.type === 'qna') {
-                                            try {
-                                                obj.questions = obj.q.map(x => {
+                        for (const x of objects) {
+                            console.log('inside import an object')
+                            try {
+                                var obj = JSON.parse(x)
+                                var timestamp = _.get(obj, 'datetime', "");
+                                var docid;
+                                if (timestamp === "") {
+                                    // only metrics and feedback items have datetime field.. This must be a qna item.
+                                    obj.type = obj.type || 'qna'
+                                    if(obj.type != 'slottype') {
+                                        obj.q = obj.q.map(x => {
+                                            x = x.replace(/\\*"/g, '');
+                                            return x
+                                        });
+                                    }
+                                    if (obj.type === 'qna') {
+                                        try {
+                                            obj.questions = await Promise.all(obj.q.map(async x => {
+                                                const embeddings = await get_embeddings(x, settings);
+                                                if (embeddings) {
+                                                    return {
+                                                        q: x,
+                                                        q_vector: embeddings
+                                                    }
+                                                } else {
                                                     return {
                                                         q: x
-                                                    }
-                                                });
-                                                obj.quniqueterms = obj.q.join(" ");
-                                            } catch (err) {
-                                                console.log("skipping question invalid answer format")
-                                            }
-                                            delete obj.q
+                                                    }                                                       
+                                                }
+                                            }));
+                                            obj.quniqueterms = obj.q.join(" ");
+                                        } catch (err) {
+                                            console.log("skipping question due to exception", err);
                                         }
-                                        docid = obj._id || obj.qid;
-                                    } else {
-                                        docid = obj._id || obj.qid + "_upgrade_restore_" + timestamp;
-                                        // Stringify session attributes
-                                        var sessionAttrs = _.get(obj, "entireResponse.session", {});
-                                        for (var key of Object.keys(sessionAttrs)) {
-                                            if (typeof sessionAttrs[key] != 'string') {
-                                                sessionAttrs[key] = JSON.stringify(sessionAttrs[key]);
-                                            }
+                                        delete obj.q
+                                    }
+                                    docid = obj._id || obj.qid;
+                                } else {
+                                    docid = obj._id || obj.qid + "_upgrade_restore_" + timestamp;
+                                    // Stringify session attributes
+                                    var sessionAttrs = _.get(obj, "entireResponse.session", {});
+                                    for (var key of Object.keys(sessionAttrs)) {
+                                        if (typeof sessionAttrs[key] != 'string') {
+                                            sessionAttrs[key] = JSON.stringify(sessionAttrs[key]);
                                         }
                                     }
-                                    delete obj._id;
-                                    out.push(JSON.stringify({
-                                        index: {
-                                            "_index": esindex,
-                                            "_type": "_doc",
-                                            "_id": docid
-                                        }
-                                    }))
-                                    config.count += 1
-                                    out.push(JSON.stringify(obj))
-                                } catch (e) {
-                                    config.failed += 1
-                                    console.log("Failed to Parse:", e, x)
                                 }
-                            })
+                                delete obj._id;
+                                out.push(JSON.stringify({
+                                    index: {
+                                        "_index": esindex,
+                                        "_type": "_doc",
+                                        "_id": docid
+                                    }
+                                }))
+                                config.count += 1
+                                out.push(JSON.stringify(obj))
+                            } catch (e) {
+                                config.failed += 1
+                                console.log("Failed to Parse:", e, x)
+                            }
+                        }
                         console.log(result.ContentRange)
                         var tmp = result.ContentRange.match(/bytes (.*)-(.*)\/(.*)/)
                         progress = (parseInt(tmp[2]) + 1) / parseInt(tmp[3])
-
                         return out.join('\n') + '\n'
                     })
                     .then ((ES_formatted_content)=>delete_existing_content.delete_existing_content (esindex, config, ES_formatted_content))   //check and delete existing content (if parameter to delete has been passed in the options {file}
@@ -143,7 +219,6 @@ exports.step = function (event, context, cb) {
                             body: result,
                             headers: {'Content-Type': 'application/x-ndjson'}
                         }
-
                         return lambda.invoke({
                                 FunctionName: process.env.ES_PROXY,
                                 Payload: JSON.stringify(body)
@@ -186,7 +261,6 @@ exports.step = function (event, context, cb) {
             }
         })
         .catch(cb)
-
 }
 
 exports.start = function (event, context, cb) {

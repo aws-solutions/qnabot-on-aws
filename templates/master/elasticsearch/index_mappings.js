@@ -13,7 +13,11 @@ module.exports={
                 q:{
                     type:"text",
                     analyzer:"custom_english"
-                }
+                },
+                "q_vector": { 
+                    "type": "knn_vector",
+                    "dimension": 768
+                } 
             }
         },
         a:{

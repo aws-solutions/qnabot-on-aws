@@ -61,7 +61,7 @@ async function run_query_es(req, query_params) {
 }
 
 async function run_qid_query_es(params, qid) {
-    qnabot.log("run_query_es params: ", params);
+    qnabot.log("run_qid_query_es params: ", params);
     let question = "qid::"+qid;
     var es_query = await build_es_query({question:question});
     var es_response = await request({
@@ -69,7 +69,7 @@ async function run_qid_query_es(params, qid) {
         method: "GET",
         body: es_query
     });
-    qnabot.log("run_query_es result: ", JSON.stringify(es_response, null, 2));
+    qnabot.log("run_qid_query_es result: ", JSON.stringify(es_response, null, 2));
     return es_response;
 }
 

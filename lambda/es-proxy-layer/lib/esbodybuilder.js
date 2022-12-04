@@ -1,13 +1,28 @@
 //start connection
+const aws = require('aws-sdk');
 const Promise = require('bluebird');
 const bodybuilder = require('bodybuilder');
 const get_keywords = require('./keywords');
 const _ = require('lodash');
-
 const qnabot = require("qnabot/logging")
 
-
-
+const get_embeddings = async function get_embeddings(params) {
+  if (params.embeddings_enable) {
+      console.log("Fetch embeddings for: ", params.question);
+      const sm = new aws.SageMakerRuntime({region:'us-east-1'});
+      const body = Buffer.from(JSON.stringify(params.question), 'utf-8').toString();
+      var smres = await sm.invokeEndpoint({
+          EndpointName: params.embeddings_sagemaker_endpoint,
+          ContentType: 'application/x-text',
+          Body: body,
+      }).promise();
+      const sm_body = JSON.parse(Buffer.from(smres.Body, 'utf-8').toString());
+      return sm_body.embedding;
+  } else {
+      console.log("EMBEDDINGS_ENABLE (disabled): ", params.embeddings_enable);
+      return undefined;
+  }
+}
 
 function build_qid_query(params) {
   qnabot.log("Build_qid_query - params: ", JSON.stringify(params, null, 2));
@@ -24,7 +39,7 @@ function build_qid_query(params) {
 function build_query(params) {
   qnabot.log("Build_query - params: ", JSON.stringify(params, null, 2));
   return (get_keywords(params))
-    .then(function (keywords) {
+    .then(async function (keywords) {
       const filter_query_unique_terms = {
         'quniqueterms': {
           query: keywords,
@@ -65,10 +80,7 @@ function build_query(params) {
           query = query.filter('match', filter_query_unique_terms);
         }
       }
-      query = query.orQuery(
-        'match', match_query
-      );
-      
+    
       var qnaClientFilter = _.get(params, 'qnaClientFilter', "");
       query = query.orFilter(
         'bool', {
@@ -101,14 +113,38 @@ function build_query(params) {
         }
         ).filterMinimumShouldMatch(1);
 
-      query = query.orQuery(
-        'nested', {
-          score_mode: 'max',
-          boost: _.get(params, 'phrase_boost', 4),
-          path: 'questions'
-        },
-        q => q.query('match_phrase', 'questions.q', params.question)
-      );
+      if (_.get(params, 'embeddings_enable')) {
+        // do KNN embedding match for semantic similarity
+        query = query.orQuery(
+          'nested', {
+            score_mode: 'max',
+            boost: _.get(params, 'phrase_boost', 4),
+            path: 'questions',
+            query: {
+              knn: {
+                q_vector: {
+                  k: 10,
+                  vector: await get_embeddings(params)
+                }
+              }
+            }
+          }
+        );
+      } else {
+        // do terms and phrase matches on question instead
+        query = query.orQuery(
+          'match', match_query
+        );
+        query = query.orQuery(
+          'nested', {
+            score_mode: 'max',
+            boost: _.get(params, 'phrase_boost', 4),
+            path: 'questions'
+          },
+          q => q.query('match_phrase', 'questions.q', params.question)
+        );
+      }
+
       if (_.get(params, 'score_answer_field')) {
         query = query.orQuery('match', 'a', params.question);
       }

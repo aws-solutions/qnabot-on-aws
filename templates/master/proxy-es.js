@@ -328,6 +328,21 @@ module.exports={
           	}
           },
           {
+            "PolicyName" : "SagemakerInvokeEndpointAccess",
+            "PolicyDocument" : {
+            "Version": "2012-10-17",
+              "Statement": [
+                {
+                    "Effect": "Allow",
+                    "Action": [
+                        "sagemaker:InvokeEndpoint"
+                     ],
+                    "Resource": "*"
+                }
+              ]
+            }
+          },
+          {
             "PolicyName" : "S3QNABucketReadAccess",
             "PolicyDocument" : {
             "Version": "2012-10-17",
