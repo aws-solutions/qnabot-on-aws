@@ -13,7 +13,7 @@ provides a common language to describe and provision all the
 infrastructure resources in your AWS cloud environment. This AWS QnABot
 CloudFormation template will setup resources such as Amazon Lex, Amazon
 Elasticsearch Service, Amazon API Gateway, and AWS Lambda. Additionally,
-this solution is also available in [GitHub](https://github.com/aws-samples/aws-ai-qna-bot).
+this solution is also available in [GitHub](https://github.com/aws-solutions/qnabot-on-aws).
 
 Once the solution is deployed, you have a QnABot designer console where
 you can build and manage your question and answer bank. The question and

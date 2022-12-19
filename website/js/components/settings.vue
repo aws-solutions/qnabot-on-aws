@@ -13,7 +13,7 @@
           v-card-title 
             h2 Settings
           v-card-text
-            h3 For more information about settings, see <a href="https://github.com/aws-samples/aws-ai-qna-bot/blob/master/docs/settings.md" target="_blank">here</a>
+            h3 For more information about settings, see <a href="https://github.com/aws-solutions/qnabot-on-aws/blob/main/docs/settings.md" target="_blank">here</a>
           v-card-text
             v-list(three-line)
                 v-list-tile(v-for="(parameter,index) in mergedSettings" :key="index")

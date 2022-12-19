@@ -1,3 +1,6 @@
+// Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+// SPDX-License-Identifier: Apache-2.0
+
 module.exports={
     type:"object",
     description:"SlotType documents",
@@ -40,7 +43,7 @@ module.exports={
                         description: "Optional comma (',') separated list of synonyms, used only when 'Restrict slot values' is selected.",
                         type:"string",
                         maxLength:140,
-                        propertyOrder: 1,                       
+                        propertyOrder: 1,
                     }
                 }
             },

@@ -1,3 +1,6 @@
+// Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+// SPDX-License-Identifier: Apache-2.0
+
 module.exports={
     type:"object",
     description:"Question and Answer document",
@@ -72,17 +75,17 @@ module.exports={
                         title: "Slot required?",
                         description: "The bot will prompt for this slot during the conversation if a value has not been provided by the user.",
                         type : "boolean",
-                        propertyOrder: 0,                            
+                        propertyOrder: 0,
                     },
                     slotValueCached: {
                         title: "Cache slot value for re-use during session?",
                         description: "Save the slot value in session attribute 'qnabotcontext.slots.slotName', and use it automatically as the value for other slots with the same name without reprompting the user.",
                         type : "boolean",
-                        propertyOrder: 1,                            
+                        propertyOrder: 1,
                     },
                     slotName: {
                         title: "Slot name",
-                        description: "Slot name, e.g. firstname.", 
+                        description: "Slot name, e.g. firstname.",
                         type : "string",
                         propertyOrder: 2,
                     },
@@ -178,7 +181,7 @@ module.exports={
                             }
                         },
                         required:["text","value"]
-                    },   
+                    },
                     propertyOrder: 3
                 }
             },
@@ -260,7 +263,7 @@ module.exports={
             type:"string",
             maxLength:100,
             propertyOrder:17
-        }, 
+        },
         botRouting:{
             title:"Bot Routing",
             description:"Use QnABot as a supervisory Bot and route to other Bots to handle the conversation. This parameter identifies a target Bot or Lambda with which to route communication.",
@@ -302,7 +305,7 @@ module.exports={
             description:"Specify tags for questions. Tags should be space separated. For multi-word tags please use underscore '_'.",
             title:"Tags",
             propertyOrder: 19
-        },  
+        },
         rp:{
             type:"string",
             title:"Alexa Reprompt",
@@ -316,7 +319,7 @@ module.exports={
             type:"string",
             maxLength:100,
             propertyOrder:21
-        }, 
+        },
     },
     required:["qid","q","a"]
 };

@@ -5,7 +5,7 @@ v-container#page-import(column, grid-list-md)
       v-card
         v-card-title.display-1.pa-2 Kendra Web Crawling
         v-card-text
-          h3 For more information about Kendra Web Crawling, see <a href="https://github.com/aws-samples/aws-ai-qna-bot/blob/master/docs/kendra_crawler_guide/README.md" target="_blank">here</a>
+          h3 For more information about Kendra Web Crawling, see <a href="https://github.com/aws-solutions/qnabot-on-aws/blob/main/docs/kendra_crawler_guide/README.md" target="_blank">here</a>
         v-card-text(v-if="kendraIndexerEnabled == true")
           p Current Status: {{ status }}
         v-card-text(v-if="!kendraIndexerEnabled")

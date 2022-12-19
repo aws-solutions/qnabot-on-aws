@@ -20,7 +20,7 @@
       "r": {
         "title": "Hint",
         "subTitle": "",
-        "imageUrl": "https://raw.githubusercontent.com/aws-samples/aws-ai-qna-bot/develop/assets/examples/photos/klimage.jpg"
+        "imageUrl": "https://raw.githubusercontent.com/aws-solutions/qnabot-on-aws/develop/assets/examples/photos/klimage.jpg"
       },
       "quiz": "",
       "type": "quiz",

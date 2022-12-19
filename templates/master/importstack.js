@@ -3,7 +3,7 @@ module.exports={
         "Type" : "AWS::CloudFormation::Stack",
         "DependsOn":["PreUpgradeExport","ElasticsearchDomainUpdate"],
         "Properties" : {
-            "TemplateURL" :{"Fn::Sub":"http://${BootstrapBucket}.s3.${AWS::Region}.amazonaws.com/${BootstrapPrefix}/templates/import.json"},
+            "TemplateURL" :{"Fn::Sub":"https://${BootstrapBucket}.s3.${AWS::Region}.amazonaws.com/${BootstrapPrefix}/templates/import.json"},
             "Parameters" :{
                 "CFNLambda":{"Fn::GetAtt":["CFNLambda","Arn"]},
                 "CFNInvokePolicy":{"Ref":"CFNInvokePolicy"},

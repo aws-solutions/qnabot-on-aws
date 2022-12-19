@@ -1,11 +1,11 @@
 {
-  "name": "schema",
+  "name": "translate",
   "version": "1.0.0",
-  "description": "Lambda function used to provide the schemas for the various qid types",
+  "description": "Lambda function used to import custom terminologies into AWS Translate",
   "repository": {
     "type": "git",
     "url": "https://github.com/aws-solutions/qnabot-on-aws",
-    "directory": "lambda/schema"
+    "directory": "lambda/translate"
   },
   "main": "index.js",
   "directories": {
@@ -21,9 +21,10 @@
   },
   "license": "SEE LICENSE IN LICENSE",
   "dependencies": {
-    "aws-sdk": "^2.1276.0"
+    "aws-sdk": "^2.1273.0"
   },
   "devDependencies": {
+    "aws-sdk-mock": "^5.8.0",
     "jest": "^29.3.1"
   }
 }
