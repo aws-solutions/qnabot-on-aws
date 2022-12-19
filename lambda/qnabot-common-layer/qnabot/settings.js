@@ -1,10 +1,9 @@
 const _ = require("lodash")
 const qnabot = require('./logging')
-const utils = require('./utilities')
-
+const AWS = require("aws-sdk")
 
 function str2bool(settings) {
-    var new_settings = _.mapValues(settings, x => {
+    let new_settings = _.mapValues(settings, x => {
         if (_.isString(x)) {
             x = x.replace(/^"(.+)"$/,'$1');  // remove wrapping quotes
             if (x.toLowerCase() === "true") {
@@ -20,25 +19,41 @@ function str2bool(settings) {
 }
 
 async function get_parameter(param_name) {
-    var ssm = new AWS.SSM();
-    var params = {
+    const ssm = new AWS.SSM();
+    let params = {
         Name: param_name,
         WithDecryption: true
     };
-    var response = await ssm.getParameter(params).promise();
-    var settings = response.Parameter.Value
-    if (utils.isJson(settings)) {
-        settings = JSON.parse(response.Parameter.Value);
-        settings = str2bool(settings) ;
+
+    let response = await ssm.getParameter(params).promise()
+    let settings = response.Parameter.Value
+    try {
+        settings = JSON.parse(response.Parameter.Value)
+        settings = str2bool(settings)
+        return settings
     }
+    catch(e){
+        return settings;
+    }
+}
+
+async function merge_default_and_custom_settings() {
+    const default_settings_param = process.env.DEFAULT_SETTINGS_PARAM;
+    const custom_settings_param = process.env.CUSTOM_SETTINGS_PARAM;
+
+    qnabot.log("Getting Default QnABot settings from SSM Parameter Store: ", default_settings_param);
+    let default_settings = await get_parameter(default_settings_param);
+
+    qnabot.log("Getting Custom QnABot settings from SSM Parameter Store: ", custom_settings_param);
+    let custom_settings = await get_parameter(custom_settings_param);
+
+    let settings = _.merge(default_settings, custom_settings);
     return settings;
 }
 
-
-
 function set_environment_variables(settings){
     process.env.comprehendResult = ""
-    
+
     if (settings.ENABLE_REDACTING) {
         qnabot.log("redacting enabled");
         process.env.QNAREDACT="true";
@@ -68,6 +83,7 @@ function set_environment_variables(settings){
 }
 
 module.exports ={
+    get_parameter:get_parameter,
+    merge_default_and_custom_settings:merge_default_and_custom_settings,
     set_environment_variables:set_environment_variables,
-
 }

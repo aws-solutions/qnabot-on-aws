@@ -6,11 +6,11 @@ export $(aws cloudformation describe-stacks --stack-name $OUT_STACK --output tex
 export $(aws cloudformation describe-stacks --stack-name develop-branch-dev-dev-master-10 --output text --query 'Stacks[0].Outputs[].join(`=`, [join(`_`, [`CF`, `IN`, OutputKey]), OutputValue ])')
 
 sudo yum install
-git clone https://github.com/aws-samples/aws-ai-qna-bot.git
-cd aws-ai-qna-bot/
+git clone https://github.com/aws-solutions/qnabot-on-aws.git
+cd qnabot-on-aws/
 git branch kendra_translate
 npm install
-npm run  config
+npm run config
 
 nano config.json
 - Set namespace to blank

@@ -28,7 +28,7 @@ def handler(event, context):
 
 ## Adding your own Lambda hooks from the repository
 
-1. Navigate to the `aws-ai-qna-bot/templates/examples/extensions/` folder in your local repository.
+1. Navigate to the `qnabot-on-aws/templates/examples/extensions/` folder in your local repository.
 2. Create javascript (node.js) lambda hooks under `./js_lambda_hooks`.
 3. Create python3 lambda hooks under `./py_lambda_hooks`.
 4. Create a new subdirectory for your new lambda hook, e.g MyLambdaHook

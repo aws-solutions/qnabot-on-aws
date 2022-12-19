@@ -4,67 +4,13 @@ var request=require('./request');
 var _=require('lodash');
 var build_es_query=require('./esbodybuilder');
 var kendra = require('./kendraQuery');
-var AWS=require('aws-sdk');
 const qnabot = require("qnabot/logging")
 const qna_settings = require("qnabot/settings")
 const open_es = require("./es_query")
 
-
-
-function isJson(str) {
-    try {
-        JSON.parse(str);
-    } catch (e) {
-        return false;
-    }
-    return true;
-}
-
-function str2bool(settings) {
-    var new_settings = _.mapValues(settings, x => {
-        if (_.isString(x)) {
-            x = x.replace(/^"(.+)"$/,'$1');  // remove wrapping quotes
-            if (x.toLowerCase() === "true") {
-                return true ;
-            }
-            if (x.toLowerCase() === "false") {
-                return false ;
-            }
-        }
-        return x;
-    });
-    return new_settings;
-}
-
-async function get_parameter(param_name) {
-    var ssm = new AWS.SSM();
-    var params = {
-        Name: param_name,
-        WithDecryption: true
-    };
-    var response = await ssm.getParameter(params).promise();
-    var settings = response.Parameter.Value
-    if (isJson(settings)) {
-        settings = JSON.parse(response.Parameter.Value);
-        settings = str2bool(settings) ;
-    }
-    return settings;
-}
-
 async function get_settings() {
-    var default_settings_param = process.env.DEFAULT_SETTINGS_PARAM;
-    var custom_settings_param = process.env.CUSTOM_SETTINGS_PARAM;
-
-    qnabot.log("Getting Default QnABot settings from SSM Parameter Store: ", default_settings_param);
-    var default_settings = await get_parameter(default_settings_param);
-
-    qnabot.log("Getting Custom QnABot settings from SSM Parameter Store: ", custom_settings_param);
-    var custom_settings = await get_parameter(custom_settings_param);
-
-    var settings = _.merge(default_settings, custom_settings);
-
+    let settings = qna_settings.merge_default_and_custom_settings();
     qnabot.log("Merged Settings: ", settings);
-
     return settings;
 }
 
@@ -73,7 +19,7 @@ async function get_es_query(event, settings) {
     let size = _.get(event,'size',1);
     if (question.length > 0) {
         if (open_es.isQuestionAllStopwords(question)) {
-            console.log(`Question '${question}' contains only stop words. Forcing no hits.`);
+            qnabot.log(`Question '${question}' contains only stop words. Forcing no hits.`);
             size = 0;
         }
         var query_params = {
@@ -141,9 +87,9 @@ module.exports= async (event, context, callback) => {
         event.minimum_score = _.get(settings, 'ALT_SEARCH_KENDRA_FAQ_CONFIDENCE_SCORE', "MEDIUM")
         var question = _.get(event,'question','');
         var topic = _.get(event,'topic','');
-       
+
         let req = {
-           question: question,    
+           question: question,
         }
         //TODO: At some point we should expose a qnaClientFilter field in the
         //Content Designer and pass the value here.
@@ -153,22 +99,24 @@ module.exports= async (event, context, callback) => {
             question: question
         }
         let okKendraQuery = !(await open_es.isESonly(req,params))
+        let response
         if ( okKendraQuery ) {
-            var response = await run_query_kendra(event, kendra_index);
+            response = await run_query_kendra(event, kendra_index);
             // ES fallback if KendraFAQ fails
             var hit = _.get(response, "hits.hits[0]._source");
             if (!hit && _.get(settings, 'KENDRA_FAQ_ES_FALLBACK', false)){
                 qnabot.log("ES Fallback");
                 response = await run_query_es(event, settings);
             }
-        } else {
-            var response = await run_query_es(event, settings);
         }
-        
+        else {
+            response = await run_query_es(event, settings);
+        }
+
         qnabot.log("Query response: ", JSON.stringify(response,null,2));
         return callback(null, response);
     } catch (error) {
-        
+
         return callback(JSON.stringify({
             type:_.get(error,"response.status") ===404 ? "[NotFound]":"[InternalServiceError]",
             status:_.get(error,"response.status"),
