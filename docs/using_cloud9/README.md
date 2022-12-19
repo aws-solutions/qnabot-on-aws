@@ -97,7 +97,7 @@ git clone https://github.com/aws-solutions/aws-qnabot.git
 sudo yum install jq
 ```
 
-Follow the steps in the main readme [Clone the git repo and build a version](https://github.com/aws-samples/aws-ai-qna-bot#clone-the-git-repo-and-build-a-version)
+Follow the steps in the main readme [Clone the git repo and build a version](https://github.com/aws-solutions/qnabot-on-aws#build-a-version)
 
 ## Alternate QnABot Deployment using CloudFormation
 

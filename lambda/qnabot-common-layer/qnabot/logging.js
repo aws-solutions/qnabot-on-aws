@@ -1,9 +1,5 @@
 const AWS = require("aws-sdk")
-const utilities = require("./utilities")
-const utils = require('./utilities')
 const _ = require("lodash")
-
-
 
 function filter_comprehend_pii(text) {
     if(process.env.ENABLE_REDACTING_WITH_COMPREHEND !== "true"){
@@ -20,19 +16,20 @@ function filter_comprehend_pii(text) {
 }
 
 function filter(text){
-
     if (process.env.DISABLECLOUDWATCHLOGGING === "true") {
         return "cloudwatch logging disabled";
-    } else {
+    }
+    else {
+        if (text === undefined) {
+            return ""
+        }
+
         // always redact jwts
         if (typeof text === "object") {
             text = JSON.stringify(text)
         }
-        if (typeof text !== 'string') {
+        else if (typeof text !== 'string') {
             text = String(text)
-        }
-        if (text === undefined) {
-            return ""
         }
 
         text = text.replace(/"accesstokenjwt":\s*"[^"]+?([^\/"]+)"/g, '"accesstokenjwt":"<token redacted>"');
@@ -40,6 +37,7 @@ function filter(text){
         text = text.replace(/"refreshtoken":\s*"[^"]+?([^\/"]+)"/g, '"refreshtoken":"<token redacted>"');
         text = filter_comprehend_pii(text)
     }
+
     if (process.env.QNAREDACT === "true") {
         if (process.env.REDACTING_REGEX) {
             let re = new RegExp(process.env.REDACTING_REGEX, "g");
@@ -47,37 +45,37 @@ function filter(text){
         }
     }
     return text
-};
-
-const comprehend_client = new AWS.Comprehend();
+}
 
 async function isPIIDetected(text, useComprehendForPII, piiRegex, pii_entitites, pii_confidence_score = .99){
    try{
-    let detectionResult = await _detectPii(text, useComprehendForPII, piiRegex, pii_entitites, pii_confidence_score)
-    //Ugly hack to prevent Comprehend PII Detection from being called twice unnecessarily
-    process.env.comprehendResult = JSON.stringify(detectionResult.comprehendResult) 
-    return detectionResult.pii_detected
-   }catch(e){
+        let detectionResult = await _detectPii(text, useComprehendForPII, piiRegex, pii_entitites, pii_confidence_score)
+        //Ugly hack to prevent Comprehend PII Detection from being called twice unnecessarily
+        if(detectionResult.comprehendResult){
+            process.env.comprehendResult = JSON.stringify(detectionResult.comprehendResult)
+        }
+        return detectionResult.pii_detected
+   }
+   catch(e){
         console.warn("Error calling Amazon Comprehend ", e)
         return false;
    }
-
 }
 
 async function setPIIRedactionEnvironmentVars(text, useComprehendForPII, piiRegex, pii_entitites, pii_confidence_score = .99){
     try{
-
         let detectionResult = await _detectPii(text, useComprehendForPII, piiRegex, pii_entitites, pii_confidence_score)
         //Ugly hack to prevent Comprehend PII Detection from being called twice unnecessarily
-        if(utils.isJson(_.get(detectionResult,"comprehendResult"))){
-            process.env.comprehendResult = JSON.stringify(detectionResult.comprehendResult) 
+        if(detectionResult.comprehendResult){
+            process.env.comprehendResult = JSON.stringify(detectionResult.comprehendResult)
         }
         process.env.found_comprehend_pii = _.get(detectionResult,"foundPII","")
-    }catch(e){
+    }
+    catch(e){
         console.warn("Warning: Exception while trying to detect PII with Comprehend. All logging is disabled.");
         console.warn("Exception ",e);
         //if there is an error during Comprehend PII detection, turn off all logging for this request
-        process.env.DISABLECLOUDWATCHLOGGING = true 
+        process.env.DISABLECLOUDWATCHLOGGING = true
     }
 
  }
@@ -89,7 +87,9 @@ async function _getPIIEntities(params){
         }catch(e){
         }
     }
-    return await comprehend_client.detectPiiEntities(params).promise();
+    const comprehend = new AWS.Comprehend();
+    let comprehendResult = await comprehend.detectPiiEntities(params).promise()
+    return comprehendResult
 }
 
 function filterFoundEntities(comprehendResult,entity_allow_list,comprehend_confidence_score){
@@ -107,7 +107,7 @@ async function _detectPii(text, useComprehendForPII, piiRegex, pii_rejection_ent
         console.log("Warning: No value found for setting  PII_REJECTION_REGEX not using REGEX Matching")
     }
     if (useComprehendForPII) {
-        var params = {
+        let params = {
             LanguageCode: "en",
             Text: text
         };
@@ -144,6 +144,6 @@ module.exports = {
     redact_text: filter,
     filter_comprehend_pii: filter_comprehend_pii,
     isPIIDetected: isPIIDetected,
-    setPIIRedactionEnvironmentVars: setPIIRedactionEnvironmentVars 
+    setPIIRedactionEnvironmentVars: setPIIRedactionEnvironmentVars
 }
 

@@ -5,7 +5,7 @@
         v-card
           v-card-title.display-1.pa-2 Import Translate Custom Terminologies
           v-card-text
-            h3 For more information about Amazon Translate custom terminologies, see <a href="https://github.com/aws-samples/aws-ai-qna-bot/blob/master/docs/custom_terminology_guide/README.md" target="_blank">here</a>
+            h3 For more information about Amazon Translate custom terminologies, see <a href="https://github.com/aws-solutions/qnabot-on-aws/blob/main/docs/custom_terminology_guide/README.md" target="_blank">here</a>
           v-card-text(v-if="!IsCustomTerminologyEnabled")
             p Set ENABLE_CUSTOM_TERMINOLOGY to true in settings to enable the use of terminology files for Amazon Translate
 

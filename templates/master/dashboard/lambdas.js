@@ -5,11 +5,18 @@ var util=require('./util')
 var files=fs.readdirSync(`${__dirname}/..`)
     .filter(x=>!x.match(/README.md|Makefile|dashboard|index|test|.DS_Store/))
     .map(x=>require(`../${x}`))
-    
+
 var lambdas={}
 _.forEach(_.assign.apply({},files),(value,key)=>{
     if(value.Type==='AWS::Lambda::Function' && key!=="ESInfoLambda"){
         var type=_.fromPairs(value.Properties.Tags.map(x=>[x.Key,x.Value])).Type
+        if(!lambdas[type]){
+            lambdas[type]=[]
+        }
+        lambdas[type].push(key)
+    }
+    else if(value.Type==='AWS::Serverless::Function'){
+        var type = value.Properties.Tags.Type
         if(!lambdas[type]){
             lambdas[type]=[]
         }
@@ -27,8 +34,8 @@ module.exports=function(main_offset){
         var title=util.Title(`### ${current.name}`,accumulation.offset)
         accumulation.offset+=title.height
         accumulation.list.push(title)
-        
-        current.list.map(util.place(accumulation.offset))     
+
+        current.list.map(util.place(accumulation.offset))
             .forEach(x=>{accumulation.list.push(x)})
 
         accumulation.offset=Math.max(...accumulation.list.map(x=>x.y))+6

@@ -12,7 +12,7 @@
   "dependencies": {
     "aws-sdk": "^2.913.0",
     "bluebird": "^3.5.0",
-    "body-parser": "^1.18.2",
+    "body-parser": "^1.19.2",
     "cfn-lambda": "^4.0.0",
     "cfn-response": "^1.0.1",
     "deep-equal": "^1.0.1",
@@ -29,5 +29,8 @@
     "diff": "^4.0.2",
     "tap": "^16.2.0",
     "tap-mocha-reporter": "^5.0.3"
+  },
+  "overrides": {
+    "qs@<6.5.3": "^6.5.3"
   }
 }

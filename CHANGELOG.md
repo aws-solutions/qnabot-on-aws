@@ -5,6 +5,35 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [5.2.5] - 2022-12-19
+
+### Updated
+
+- Security patches for npm and pip packages
+- Added Support for latest LexV2 languages (see [Multi-language Support](docs/multilanguage_support.md))
+  - Updated:
+    - English (IN), Spanish (LATAM), Portuguese (PR), Mandarin (PRC) to use neural voice
+  - New languages:
+    - Cantonese
+    - Dutch
+    - Finnish
+    - Gulf Arabic
+    - Hindi
+    - Norwegian
+    - Polish
+    - Swedish
+- Added unit tests for translate lambda
+- Added unit tests for schema lambda
+- Added unit tests for qnabot-common-layer
+
+### Fixed
+
+- Fix undefined exception in kendra.js function
+- Readd fulfillment widget into CloudWatch dashboard (#495)
+- Convert template urls to https for nested stacks
+- Update URLs and references to old repo/branch name
+- Fix for case sensitivity on clientFilterValues (#518)
+
 ## [5.2.4] - 2022-11-19
 
 ### Updated
@@ -332,7 +361,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 -   Bug fixes for Kendra FAQ integration
--   Fix for exception - "Cannot convert undefined or null to object" when Session Attributes are no provided during Lex input. https://github.com/aws-samples/aws-ai-qna-bot/issues/229
+-   Fix for exception - "Cannot convert undefined or null to object" when Session Attributes are no provided during Lex input. https://github.com/aws-solutions/qnabot-on-aws/issues/229
 -   Package version updates to address current github dependabot alerts
 
 ## [4.3.0] - 2020-09-21
