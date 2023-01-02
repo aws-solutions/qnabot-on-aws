@@ -44,7 +44,7 @@ async function run_query_kendra(req, query_params) {
         size:1,
         question: query_params.question,
         es_address: req._info.es.address,
-        es_path: '/' + req._info.es.index + '/_doc/_search?search_type=dfs_query_then_fetch',
+        es_path: '/' + req._info.es.index + '/_search?search_type=dfs_query_then_fetch',
     } ;
 
     // optimize kendra queries for throttling by checking if KendraFallback idxs include KendraFAQIndex
@@ -248,8 +248,11 @@ async function get_hit(req, res) {
         minimum_confidence_score: _.get(req,'_settings.ALT_SEARCH_KENDRA_FAQ_CONFIDENCE_SCORE'),
         qnaClientFilter: _.get(req, 'session.QNAClientFilter'),
         embeddings_enable: _.get(req,'_settings.EMBEDDINGS_ENABLE'),
+        embeddings_score_threshold = _.get(req,'_settings.EMBEDDINGS_SCORE_THRESHOLD'),
         embeddings_sagemaker_endpoint: _.get(req,'_settings.EMBEDDINGS_SAGEMAKER_ENDPOINT'),
         embeddings_sagemaker_score_boost: _.get(req,'_settings.EMBEDDINGS_SAGEMAKER_SCORE_BOOST'),
+        embeddings_openai_model: _.get(req,'_settings.EMBEDDINGS_OPENAI_MODEL'),
+        openai_api_key: _.get(req,'_settings.OPENAI_API_KEY'),
     };
     var response = await run_query(req, query_params);
     qnabot.log('Query response: ', JSON.stringify(response,null,2));

@@ -8,15 +8,20 @@ module.exports={
 			analyzer: "custom_english_unique"
 		},
         questions:{
-            type:"nested",
-            properties:{
-                q:{
-                    type:"text",
-                    analyzer:"custom_english"
+            type: "nested",
+            properties: {
+                q: {
+                    type: "text",
+                    analyzer: "custom_english"
                 },
                 "q_vector": { 
                     "type": "knn_vector",
-                    "dimension": 768
+                    "dimension": 1536,
+                    "method": {
+                        "name": "hnsw",
+                        "space_type": "cosinesimil",
+                        "engine": "nmslib"
+                    }
                 } 
             }
         },

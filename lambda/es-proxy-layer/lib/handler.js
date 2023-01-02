@@ -7,12 +7,59 @@ var kendra = require('./kendraQuery');
 const qnabot = require("qnabot/logging")
 const qna_settings = require("qnabot/settings")
 const open_es = require("./es_query")
+const get_embeddings = require('./embeddings');
 
 async function get_settings() {
     let settings = await qna_settings.merge_default_and_custom_settings();
     qnabot.log("Merged Settings: ", settings);
     return settings;
 }
+
+// add embeddings for each question in an add or modify item PUT query
+async function build_additem_embeddings(event, settings) {
+    if (!_.get(settings,'EMBEDDINGS_ENABLE')) {
+        console.log("EMBEDDINGS_ENABLE (disabled) - query not modified");
+        return event.body;
+    }
+    var params = {
+        embeddings_enable: _.get(settings,'EMBEDDINGS_ENABLE'),
+        embeddings_sagemaker_endpoint: _.get(settings,'EMBEDDINGS_SAGEMAKER_ENDPOINT'),
+        embeddings_sagemaker_score_boost: _.get(settings,'EMBEDDINGS_SAGEMAKER_SCORE_BOOST'),
+        embeddings_openai_model: _.get(settings,'EMBEDDINGS_OPENAI_MODEL'),
+        openai_api_key: _.get(settings,'OPENAI_API_KEY'),        
+    }
+    var questions = _.get(event,"body.questions",[]);
+    var questions_with_embeddings = await Promise.all(questions.map(async x => {
+        params.question = x.q;
+        params.topic = _.get(event,"body.t");
+        const embeddings = await get_embeddings(params);
+            return {
+                q: x.q,
+                q_vector: embeddings
+            }
+    }));
+    event.body.questions = questions_with_embeddings;
+    return event.body;
+}
+
+/*
+{
+    "endpoint": "search-qnaos-d-elasti-55f9xbclw5ox-dnkbx36pzqpx6regs2sidghbnu.us-east-1.es.amazonaws.com",
+    "method": "PUT",
+    "path": "/qnaos-dev-dev-master-8/0.test?refresh=wait_for",
+    "body": {
+        "qid": "0.test",
+        "quniqueterms": " new question  ",
+        "questions": [
+            {
+                "q": "new question"
+            }
+        ],
+        "a": "answer",
+        "type": "qna"
+    }
+}
+*/
 
 async function get_es_query(event, settings) {
     let question = _.get(event,'question','');
@@ -38,9 +85,15 @@ async function get_es_query(event, settings) {
             embeddings_enable: _.get(settings,'EMBEDDINGS_ENABLE'),
             embeddings_sagemaker_endpoint: _.get(settings,'EMBEDDINGS_SAGEMAKER_ENDPOINT'),
             embeddings_sagemaker_score_boost: _.get(settings,'EMBEDDINGS_SAGEMAKER_SCORE_BOOST'),
+            embeddings_openai_model: _.get(settings,'EMBEDDINGS_OPENAI_MODEL'),
+            openai_api_key: _.get(settings,'OPENAI_API_KEY'), 
         };
         return build_es_query(query_params);
+    } else if (_.get(event,'method','') === 'PUT') {
+        // add or modify item query - add embeddings for questions list, if enabled
+        return await build_additem_embeddings(event, settings);
     } else {
+        // use query as-is
         return Promise.resolve(event.body);
     }
 }
@@ -123,7 +176,8 @@ module.exports= async (event, context, callback) => {
             type:_.get(error,"response.status") ===404 ? "[NotFound]":"[InternalServiceError]",
             status:_.get(error,"response.status"),
             message:_.get(error,"response.statusText"),
-            data:_.get(error,"response.data")
+            data:_.get(error,"response.data"),
+            error: error,
         }))
     }
 }
