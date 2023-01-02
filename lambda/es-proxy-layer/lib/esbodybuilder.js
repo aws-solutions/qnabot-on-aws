@@ -4,25 +4,8 @@ const Promise = require('bluebird');
 const bodybuilder = require('bodybuilder');
 const get_keywords = require('./keywords');
 const _ = require('lodash');
-const qnabot = require("qnabot/logging")
-
-const get_embeddings = async function get_embeddings(params) {
-  if (params.embeddings_enable) {
-      console.log("Fetch embeddings for: ", params.question);
-      const sm = new aws.SageMakerRuntime({region:'us-east-1'});
-      const body = Buffer.from(JSON.stringify(params.question), 'utf-8').toString();
-      var smres = await sm.invokeEndpoint({
-          EndpointName: params.embeddings_sagemaker_endpoint,
-          ContentType: 'application/x-text',
-          Body: body,
-      }).promise();
-      const sm_body = JSON.parse(Buffer.from(smres.Body, 'utf-8').toString());
-      return sm_body.embedding;
-  } else {
-      console.log("EMBEDDINGS_ENABLE (disabled): ", params.embeddings_enable);
-      return undefined;
-  }
-}
+const qnabot = require("qnabot/logging");
+const get_embeddings = require('./embeddings');
 
 function build_qid_query(params) {
   qnabot.log("Build_qid_query - params: ", JSON.stringify(params, null, 2));
@@ -122,8 +105,8 @@ function build_query(params) {
             path: 'questions',
             query: {
               knn: {
-                q_vector: {
-                  k: 10,
+                'questions.q_vector': {
+                  k: _.get(params, 'embeddings_knn_search_k', 10),
                   vector: await get_embeddings(params)
                 }
               }
@@ -131,7 +114,7 @@ function build_query(params) {
           }
         );
       } else {
-        // do terms and phrase matches on question instead
+        // do terms and phrase matches on question instead, and add topic filters
         query = query.orQuery(
           'match', match_query
         );
@@ -143,39 +126,38 @@ function build_query(params) {
           },
           q => q.query('match_phrase', 'questions.q', params.question)
         );
-      }
-
-      if (_.get(params, 'score_answer_field')) {
-        query = query.orQuery('match', 'a', params.question);
-      }
-      let topic = _.get(params, 'topic');
-      if (topic) {
-        query = query.orQuery('match', 't', topic);
-      } else {
-        // no topic - query prefers answers with empty/missing topic field for predicable response
-        // NOTE: will not work in Kendra FAQ mode since we have no equivalent Kendra query
-        query = query.orQuery(
-          'bool', {
-            "should" : [
-              { 
-                "match_all": {
-                } 
-              },
-              {
-                "bool": {
-                  "must_not": [
-                      {
-                          "exists": {
-                              "field": "t"
-                          }
-                      }
-                  ]
-                }
-              }          
-            ],
-            "minimum_should_match" : 2
-          }      
-        ) ;
+        if (_.get(params, 'score_answer_field')) {
+          query = query.orQuery('match', 'a', params.question);
+        }
+        let topic = _.get(params, 'topic');
+        if (topic) {
+          query = query.orQuery('match', 't', topic);
+        } else {
+          // no topic - query prefers answers with empty/missing topic field for predicable response
+          // NOTE: will not work in Kendra FAQ mode since we have no equivalent Kendra query
+          query = query.orQuery(
+            'bool', {
+              "should" : [
+                { 
+                  "match_all": {
+                  } 
+                },
+                {
+                  "bool": {
+                    "must_not": [
+                        {
+                            "exists": {
+                                "field": "t"
+                            }
+                        }
+                    ]
+                  }
+                }          
+              ],
+              "minimum_should_match" : 2
+            }      
+          ) ;
+        }
       }
       query = query
         .from(_.get(params, 'from', 0))

@@ -42,7 +42,7 @@ async function run_query_es(req, query_params) {
     
     var es_query = await build_es_query(query_params);
     var es_response = await request({
-        url: `https://${req._info.es.address}/${req._info.es.index}/_doc/_search?search_type=dfs_query_then_fetch`,
+        url: `https://${req._info.es.address}/${req._info.es.index}/_search?search_type=dfs_query_then_fetch`,
         method: "GET",
         body: es_query
     });
@@ -51,10 +51,20 @@ async function run_query_es(req, query_params) {
 
     if (_.get(es_response, "hits.hits[0]._source")) {
         _.set(es_response, "hits.hits[0]._source.answersource", "ElasticSearch");
-    }    
-    if (_.get(es_response, "hits.max_score", 0) <= 1) {
-        qnabot.log("Max score is 1 or less - no valid results. Remove hits.")
-        _.set(es_response, "hits.hits", [])
+    }  
+
+    if (_.get(query_params, 'embeddings_enable')) {
+        let threshold = _.get(query_params,'embeddings_score_threshold',0);
+        if (_.get(es_response, "hits.max_score", 0) <= threshold) {
+            qnabot.log(`Max score is ${threshold} or less for embeddings query - no valid results. Remove hits.`)
+            _.set(es_response, "hits.hits", [])
+        }
+    } else {
+        let threshold = 1;
+        if (_.get(es_response, "hits.max_score", 0) <= threshold) {
+            qnabot.log(`Max score is ${threshold} or less for non embeddings query - no valid results. Remove hits.`)
+            _.set(es_response, "hits.hits", [])
+        }
     }
 
     return es_response;

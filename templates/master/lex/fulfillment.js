@@ -286,7 +286,7 @@ module.exports = {
       "Environment": {
         "Variables": Object.assign({
           REPEAT_COUNT:  "4",
-          TARGET_PATH: "_doc/_search",
+          TARGET_PATH: "_search",
           TARGET_INDEX: { "Fn::GetAtt": ["Var","QnaIndex"] },
           TARGET_URL: { "Fn::GetAtt": ["ESVar", "ESAddress"] },
           DEFAULT_SETTINGS_PARAM: { "Ref": "DefaultQnABotSettings" },

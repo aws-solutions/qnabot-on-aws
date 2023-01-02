@@ -1,7 +1,6 @@
 module.exports={
     "number_of_shards" : "1",
     "index.knn": true,
-    "index.knn.space_type": "cosinesimil",
     analysis: {
       filter: {
         english_stop: {

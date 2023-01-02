@@ -84,8 +84,9 @@ var default_settings = {
     CFAQ_DOMAIN: '',
     CFAQ_PREFIX: 'Answer from Lex CFAQ prototype model: ',
     EMBEDDINGS_ENABLE: 'true',
-    EMBEDDINGS_SAGEMAKER_ENDPOINT: '',
-    EMBEDDINGS_SAGEMAKER_SCORE_BOOST: 4,
+    EMBEDDINGS_SCORE_THRESHOLD: 0.85,
+    OPENAI_API_KEY: '',
+    EMBEDDINGS_OPENAI_MODEL: 'text-embedding-ada-002',
 };
 
 module.exports = {
