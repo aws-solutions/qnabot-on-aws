@@ -79,7 +79,7 @@ module.exports={
             {"Fn::GetAtt":["ApiUrl","Name"]},
             "/static/client.html"
         ]]},
-        "Kibana":{"Fn::Sub":"${ESVar.ESAddress}/_plugin/kibana/"}
+        "Kibana":{"Fn::Sub":"${ESVar.ESAddress}/_dashboards/app/dashboards#/list"}
     }
 }
 }

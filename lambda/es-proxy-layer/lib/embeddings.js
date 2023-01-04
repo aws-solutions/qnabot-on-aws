@@ -37,7 +37,7 @@ const get_embeddings_sm = async function get_embeddings(params) {
 
 module.exports = async function (params) {
     if (params.embeddings_enable) {
-        if (params.embeddings_openai_model) {
+        if (params.openai_api_key) {
             return get_embeddings_openai(params);
         } else {
             return get_embeddings_sm(params);

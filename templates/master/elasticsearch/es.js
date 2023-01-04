@@ -2,10 +2,10 @@ const util = require('../../util');
 
 var properties={
 
-    "ElasticsearchClusterConfig": {
+    "ClusterConfig": {
        "DedicatedMasterEnabled": false,
        "InstanceCount": {"Ref":"ElasticSearchNodeCount"},
-       "InstanceType": {"Fn::If": [ "Encrypted", "m6g.large.elasticsearch", "t3.small.elasticsearch"]},
+       "InstanceType": {"Fn::If": [ "Encrypted", "m6g.large.search", "t3.small.search"]},
        "ZoneAwarenessEnabled":  {"Fn::If": [ "SingleNode", false, true]}
     },
     "EBSOptions": {
@@ -13,7 +13,7 @@ var properties={
        "VolumeSize": 10,
        "VolumeType": "gp2"
     },
-    "ElasticsearchVersion": "7.10",
+    "EngineVersion": "OpenSearch_1.3",
     "SnapshotOptions": {
        "AutomatedSnapshotStartHour": "0"
     },
@@ -39,7 +39,7 @@ var properties={
 
 module.exports={
     "ElasticsearchDomain": {
-        "Type": "AWS::Elasticsearch::Domain",
+        "Type": "AWS::OpenSearchService::Domain",
         "DependsOn":["PreUpgradeExport"],
         "Condition":"CreateDomain",
         "Properties":properties
