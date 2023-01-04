@@ -76,17 +76,15 @@ var default_settings = {
     LAMBDA_PREPROCESS_HOOK: '',
     LAMBDA_POSTPROCESS_HOOK: '',
     SEARCH_REPLACE_QUESTION_SUBSTRINGS: '',
-    KENDRA_FALLBACK_SAGEMAKER_QA_ENDPOINT: '',
-    KENDRA_FALLBACK_SAGEMAKER_QA_MIN_CONFIDENCE: 0,
-    KENDRA_FALLBACK_SAGEMAKER_QA_PREFIX: 'Condensed answer from Kendra results using Sagemaker QA model: ',
     CFAQ_SAGEMAKER_ENDPOINT: '',
     CFAQ_INDEX: '',
     CFAQ_DOMAIN: '',
     CFAQ_PREFIX: 'Answer from Lex CFAQ prototype model: ',
-    EMBEDDINGS_ENABLE: 'true',
-    EMBEDDINGS_SCORE_THRESHOLD: 0.85,
-    OPENAI_API_KEY: '',
-    EMBEDDINGS_OPENAI_MODEL: 'text-embedding-ada-002',
+    EMBEDDINGS_ENABLE: '${EmbeddingsEnable}', // Set to TRUE to enable QnABot Semantics Search using Embeddings from a Large Language Model. When TRUE, you must provide an OpenAI API Key (to use the text-embedding-ada-002 model) OR a Sagemaker Endpoint name (to use an embedding model hosted on SageMaker).
+    EMBEDDINGS_SCORE_THRESHOLD: 0.85, // If embedding similarity score is under threshold the match it srejected and QnABot reverts to Kendra fallback or no_hits
+    OPENAI_API_KEY: '${OpenAIApiKey}', // Optional: Provide an Api Key from OpenAI to use the OpenAI text-embedding-ada-002 model.
+    EMBEDDINGS_OPENAI_MODEL: 'text-embedding-ada-002', // Optional: OpenAI embeddings model to use - applies only if OPENAI_API_KEY is set.
+    EMBEDDINGS_SAGEMAKER_ENDPOINT: '${EmbeddingsSagemakerEndpoint}' // Optional: SageMaker Endpoint running a sentence embedding model.
 };
 
 module.exports = {

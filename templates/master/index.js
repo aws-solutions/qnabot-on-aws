@@ -259,6 +259,27 @@ module.exports={
         "Type":"Number",
         "Description": "To conserve storage in Amazon ElasticSearch, metrics and feedback data used to populate the Kibana dashboard are automatically deleted after this period (default 43200 minutes = 30 days). Monitor 'Free storage space' for your ElasticSearch domain to ensure that you have sufficient space available to store data for the desired retention period.",
         "Default":43200
+    },
+    "EmbeddingsEnable":{
+      "Type":"String",
+      "Description":"Set to TRUE to enable QnABot Semantics Search using Embeddings from a Large Language Model. When TRUE, you must provide an OpenAI API Key (to use the text-embedding-ada-002 model) OR a Sagemaker Endpoint name (to use an embedding model hosted on SageMaker).",
+      "AllowedValues": ["FALSE", "TRUE"],
+      "Default":"FALSE"
+    },
+    "EmbeddingsSagemakerEndpoint":{
+      "Type":"String",
+      "Description":"Optional: SageMaker Endpoint running a sentence embedding model.",
+      "Default":""
+    },
+    "OpenAIApiKey":{
+      "Type":"String",
+      "Description":"Optional: Provide an Api Key from OpenAI to use the OpenAI text-embedding-ada-002 model.",
+      "Default":""
+    },
+    "EmbeddingsDimensions":{
+      "Type":"String",
+      "Description":"Optional: Number of dimensions. Default (1536) works for OpenAI model - customize as needed for a SageMaker endpoint.",
+      "Default":"1536"
     }
   },
   "Conditions":{

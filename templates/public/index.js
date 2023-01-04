@@ -31,7 +31,7 @@ module.exports=Promise.resolve(require('../master')).then(function(base){
         "FeedbackSNSTopic",
         "ESProxyLambda",
         "ElasticsearchEndpoint",
-        "ElasticsearchIndex",
+        "ElasticsearchIndex"
     ])
     base.Parameters=_.pick(base.Parameters,[
         "Email",
@@ -45,7 +45,11 @@ module.exports=Promise.resolve(require('../master')).then(function(base){
         "LexBotVersion",
         "InstallLexResponseBots",
         "FulfillmentConcurrency",
-        "XraySetting"
+        "XraySetting",
+        "EmbeddingsEnable",
+        "EmbeddingsSagemakerEndpoint",
+        "OpenAIApiKey",
+        "EmbeddingsDimensions"
     ]);
     base.Metadata = {
         "AWS::CloudFormation::Interface": {
@@ -85,7 +89,17 @@ module.exports=Promise.resolve(require('../master')).then(function(base){
                    "Parameters": [
                         "LexV2BotLocaleIds"
                    ]
-                }
+                },
+                {
+                    "Label": {
+                         "default": "Semantic Search with Embeddings"
+                    },
+                    "Parameters": [
+                        "EmbeddingsEnable",
+                        "EmbeddingsSagemakerEndpoint",
+                        "OpenAIApiKey",
+                        "EmbeddingsDimensions"                    ]
+                 }
             ]
         }
     };
