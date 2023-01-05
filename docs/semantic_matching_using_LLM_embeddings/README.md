@@ -1,0 +1,49 @@
+# Semantic question matching, using Large Language Model Embeddings
+
+See the OpenAI embeddings docuemntation for an overview of text embeddings: https://beta.openai.com/docs/guides/embeddings
+
+QnABot can now use text embeddings to provide semantic search capability, providing improved accuracy with much less tuning.
+
+## Open AI Embeddings
+
+### Deploy stack for OpenAI Embeddings
+To enable OpenAI embeddings when you install QnABot:
+- set `EmbeddingsEnable` to TRUE
+- set `OpenAIApiKey` to the value of your OpenAI API Key - see https://beta.openai.com/account/api-keys
+- leave `EmbeddingsDimensions` at the default value of 1536 (compatible with OpenAI model)
+![CFN Params](./images/cfn_params.jpg)
+
+Deploy QnABot stack.
+
+### Settings
+
+When QnABot stack is installed, open Content Designer **Settings** page:
+
+- Disable Keyword filtest by change `ES_USE_KEYWORD_FILTERS` to `false`. While you can use keyword filters with embeddings based semantic queries, they significantly limit the power of semantic search by forcing keyword matches (preventing matches based on different words with similar meanings).
+
+Scroll to the bottom of the settings page and observe the new EMBEDDINGS settings:
+
+- to enable / disable use of semantic search using embeddings, toggle `EMBEDDINGS_ENABLE` to TRUE or FALSE
+- to customize the score threshold, change the value of `EMBEDDINGS_SCORE_THRESHOLD` - the default is 0.85.  Unlike regular elasticsearch queries, embeddings queries always return scores between 0 and 1, so we can apply a threshold to separate good from bad results. Results that score less than the threshold are not returned to the user. Use Content Designer TEST tab to see the scores for query results.
+
+## Sagemaker based embeddings
+
+You can also experiment with embeddings models deployed on SageMaker endpoints. 
+
+### Deploy Stack for SageMaker Embeddings
+
+- set `EmbeddingsEnable` to TRUE
+- set `EmbeddingsSageMakerEndpoint` to the name of your SageMaker inference endpoint where your embeddings model is running 
+- Set `EmbeddingsDimensions` to match the number of dimensions returned by your model
+
+*Note: SageMaker embeddings have been tested only with TensorFlow models from the SageMaker Text Embeddings JumpStart. Other models may possibly require code changes to invoke the model and process results.. the SageMaker interface code is in the file [embeddings.js](../../lambda/es-proxy-layer/lib/embeddings.js).*
+
+
+
+
+
+
+
+
+
+
