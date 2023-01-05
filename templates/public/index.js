@@ -112,6 +112,7 @@ module.exports=Promise.resolve(require('../master')).then(function(base){
     base.Conditions.DontCreateDomain={"Fn::Equals":[true,false]}
     base.Conditions.VPCEnabled={"Fn::Equals":[true,false]}
     base.Conditions.SingleNode={"Fn::Equals":[{"Ref":"ElasticSearchNodeCount"},"1"]}
+    base.Conditions.EmbeddingsEnable={"Fn::Equals":[{"Ref":"EmbeddingsEnable"},"TRUE"]}
 
     var out=JSON.stringify(base);
 
