@@ -126,6 +126,7 @@ module.exports=Promise.resolve(require('../master')).then(function(base){
                     { "Fn::Join": [ "", { "Ref": "VPCSecurityGroupIdList" } ] }
                 ] }
         ] }
+    base.Conditions.EmbeddingsEnable={"Fn::Equals":[{"Ref":"EmbeddingsEnable"},"TRUE"]}
 
     var out=JSON.stringify(base);
 

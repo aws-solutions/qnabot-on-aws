@@ -300,7 +300,8 @@ module.exports={
     "CreateConcurrency":{ "Fn::Not": [
       {"Fn::Equals":[{"Ref":"FulfillmentConcurrency"},"0"]}
     ]},
-    "SingleNode": {"Fn::Equals":[{"Ref":"ElasticSearchNodeCount"},"1"]}
+    "SingleNode": {"Fn::Equals":[{"Ref":"ElasticSearchNodeCount"},"1"]},
+    "EmbeddingsEnable":{"Fn::Equals":[{"Ref":"EmbeddingsEnable"},"TRUE"]}
   }
 }
 

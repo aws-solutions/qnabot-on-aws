@@ -1,7 +1,7 @@
 var default_settings = {
     ENABLE_DEBUG_RESPONSES: 'false', // Determines whethere to log original English responses and translated responses for debugging
     ENABLE_DEBUG_LOGGING: 'false',
-    ES_USE_KEYWORD_FILTERS: 'true', // Determines whether to detect keywords from Comprehend when searching for answers
+    ES_USE_KEYWORD_FILTERS: '${ES_USE_KEYWORD_FILTERS}', // Determines whether to detect keywords from Comprehend when searching for answers. Defaults to TRUE when not using Embeddings, and FALSE if using Embeddings.
     ES_EXPAND_CONTRACTIONS: `{"you're":"you are","I'm":"I am","can't":"cannot"}`,
     ES_KEYWORD_SYNTAX_TYPES: 'NOUN,PROPN,VERB,INTJ', //Comprehend will return these parts of speech found by Amazon Comprehend
     ES_SYNTAX_CONFIDENCE_LIMIT: '.20', //  Comprehend makes a best effort to determine the parts of speech  in a sentence. The keywords will only be used if the confidence limit is greater than this amount
@@ -101,7 +101,7 @@ module.exports = {
         "Properties": {
             "Description": "Default QnABot Settings - DO NOT MODIFY",
             "Type": "String",
-            "Value": { "Fn::Sub" : JSON.stringify(default_settings) } 
+            "Value": { "Fn::Sub" : [JSON.stringify(default_settings), {"ES_USE_KEYWORD_FILTERS" : {"Fn::If": ["EmbeddingsEnable", "FALSE", "TRUE"]}}]} 
         }
     },
     "CustomQnABotSettings": {
