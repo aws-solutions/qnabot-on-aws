@@ -247,7 +247,7 @@ async function get_hit(req, res) {
         kendra_indexes: _.get(req,'_settings.ALT_SEARCH_KENDRA_INDEXES'),
         minimum_confidence_score: _.get(req,'_settings.ALT_SEARCH_KENDRA_FAQ_CONFIDENCE_SCORE'),
         qnaClientFilter: _.get(req, 'session.QNAClientFilter'),
-        settings: req.settings,
+        settings: req._settings,
     };
     var response = await run_query(req, query_params);
     qnabot.log('Query response: ', JSON.stringify(response,null,2));
