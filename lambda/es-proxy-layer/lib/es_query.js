@@ -53,8 +53,8 @@ async function run_query_es(req, query_params) {
         _.set(es_response, "hits.hits[0]._source.answersource", "ElasticSearch");
     }  
 
-    if (_.get(query_params, 'embeddings_enable')) {
-        let threshold = _.get(query_params,'embeddings_score_threshold',0);
+    if (_.get(query_params, 'settings.EMBEDDINGS_API') != "DISABLED") {
+        let threshold = _.get(query_params,'settings.EMBEDDINGS_SCORE_THRESHOLD',0);
         if (_.get(es_response, "hits.max_score", 0) <= threshold) {
             qnabot.log(`Max score is ${threshold} or less for embeddings query - no valid results. Remove hits.`)
             _.set(es_response, "hits.hits", [])

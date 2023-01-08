@@ -46,9 +46,10 @@ module.exports=Promise.resolve(require('../master')).then(function(base){
         "InstallLexResponseBots",
         "FulfillmentConcurrency",
         "XraySetting",
-        "EmbeddingsEnable",
-        "EmbeddingsSagemakerEndpoint",
+        "EmbeddingsApi",
         "OpenAIApiKey",
+        "EmbeddingsSagemakerEndpoint",
+        "EmbeddingsLambdaArn",
         "EmbeddingsDimensions"
     ]);
     base.Metadata = {
@@ -95,10 +96,23 @@ module.exports=Promise.resolve(require('../master')).then(function(base){
                          "default": "Semantic Search with Embeddings"
                     },
                     "Parameters": [
-                        "EmbeddingsEnable",
-                        "EmbeddingsSagemakerEndpoint",
+                        "EmbeddingsApi",
                         "OpenAIApiKey",
-                        "EmbeddingsDimensions"                    ]
+                        "EmbeddingsSagemakerEndpoint",
+                        "EmbeddingsLambdaArn",
+                        "EmbeddingsDimensions"                   
+                    ]
+                 },
+                 {
+                    "Label": {
+                         "default": "Miscellaneous"
+                    },
+                    "Parameters": [
+                        "LexBotVersion",
+                        "InstallLexResponseBots",
+                        "FulfillmentConcurrency",
+                        "XraySetting"                  
+                    ]
                  }
             ]
         }
@@ -112,7 +126,9 @@ module.exports=Promise.resolve(require('../master')).then(function(base){
     base.Conditions.DontCreateDomain={"Fn::Equals":[true,false]}
     base.Conditions.VPCEnabled={"Fn::Equals":[true,false]}
     base.Conditions.SingleNode={"Fn::Equals":[{"Ref":"ElasticSearchNodeCount"},"1"]}
-    base.Conditions.EmbeddingsEnable={"Fn::Equals":[{"Ref":"EmbeddingsEnable"},"TRUE"]}
+    base.Conditions.EmbeddingsEnable= {"Fn::Not": [{ "Fn::Equals":[{"Ref":"EmbeddingsApi"},"DISABLED"]}]}
+    base.Conditions.EmbeddingsLambdaArn = {"Fn::Not": [{ "Fn::Equals":[{"Ref":"EmbeddingsLambdaArn"},""]}]}
+
 
     var out=JSON.stringify(base);
 

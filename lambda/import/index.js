@@ -2,7 +2,7 @@ var Promise = require('bluebird');
 var aws = require("aws-sdk");
 aws.config.setPromisesDependency(Promise);
 aws.config.region = process.env.AWS_REGION;
-const { Configuration, OpenAIApi } = require("openai");
+const get_embeddings = require('./embeddings');
 
 var s3 = new aws.S3();
 var lambda = new aws.Lambda();
@@ -62,45 +62,6 @@ const get_settings = async function get_settings() {
     console.log("Merged Settings: ", settings);
     return settings;
 }
-
-const get_embeddings_openai = async function get_embeddings(sentence, settings) {
-    console.log("Get embeddings from OpenAI for: ", sentence);
-    const openai = new OpenAIApi(new Configuration({
-        apiKey: settings.OPENAI_API_KEY,
-        }));
-    var openaires = await openai.createEmbedding({
-    model: settings.EMBEDDINGS_OPENAI_MODEL,
-    input: sentence,
-    });
-    return openaires.data.data[0].embedding;
-}
-
-const get_embeddings_sm = async function get_embeddings(sentence, settings) {
-    console.log("Get embeddings from Sagemaker for: ", sentence);
-    const sm = new aws.SageMakerRuntime({region:'us-east-1'});
-    const body = Buffer.from(JSON.stringify(sentence), 'utf-8').toString();
-    var smres = await sm.invokeEndpoint({
-        EndpointName:settings.EMBEDDINGS_SAGEMAKER_ENDPOINT,
-        ContentType:'application/x-text',
-        Body:body,
-    }).promise();
-    const sm_body = JSON.parse(Buffer.from(smres.Body, 'utf-8').toString());
-    return sm_body.embedding;
-}
-
-const get_embeddings = async function get_embeddings(sentence, settings) {
-    if (settings.EMBEDDINGS_ENABLE) {
-        if (_.get(settings,"EMBEDDINGS_OPENAI_MODEL")) {
-            return get_embeddings_openai(sentence, settings);
-        } else {
-            return get_embeddings_sm(sentence, settings);
-        }
-    } else {
-        console.log("EMBEDDINGS_ENABLE (disabled): ", settings.EMBEDDINGS_ENABLE);
-        return undefined;
-    }
-}
-
 
 exports.step = function (event, context, cb) {
     console.log("step")
@@ -183,8 +144,12 @@ exports.step = function (event, context, cb) {
                                         try {
                                             var topic = obj.t;
                                             obj.questions = await Promise.all(obj.q.map(async x => {
-                                                var q_with_topic = (topic) ? `${x} (Topic is ${topic})` : x;
-                                                const embeddings = await get_embeddings(q_with_topic, settings);
+                                                let params = {
+                                                    question: x,
+                                                    topic: topic,
+                                                    settings: settings
+                                                };
+                                                const embeddings = await get_embeddings(params);
                                                 if (embeddings) {
                                                     return {
                                                         q: x,

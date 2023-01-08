@@ -28,12 +28,14 @@ module.exports={
         "Encryption": {"Type":"String"},
         "VPCSubnetIdList" : {"Type": "String"},
         "VPCSecurityGroupIdList": {"Type": "String"},
-        "XraySetting": {"Type": "String"}
+        "XraySetting": {"Type": "String"},
+        "EmbeddingsLambdaArn": {"Type": "String"},
     },
     "Conditions": {
         "VPCEnabled": { "Fn::Not": [
                 { "Fn::Equals": [ "", { "Ref": "VPCSecurityGroupIdList" } ] }
             ] },
         "XRAYEnabled":{"Fn::Equals":[{"Ref":"XraySetting"},"TRUE"]},
+        "EmbeddingsLambdaArn":{"Fn::Not": [{ "Fn::Equals":[{"Ref":"EmbeddingsLambdaArn"},""]}]}
     }
 }

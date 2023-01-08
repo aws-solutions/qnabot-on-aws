@@ -260,25 +260,31 @@ module.exports={
         "Description": "To conserve storage in Amazon ElasticSearch, metrics and feedback data used to populate the Kibana dashboard are automatically deleted after this period (default 43200 minutes = 30 days). Monitor 'Free storage space' for your ElasticSearch domain to ensure that you have sufficient space available to store data for the desired retention period.",
         "Default":43200
     },
-    "EmbeddingsEnable":{
+    "EmbeddingsApi":{
       "Type":"String",
-      "Description":"Set to TRUE to enable QnABot Semantics Search using Embeddings from a Large Language Model. When TRUE, you must provide an OpenAI API Key (to use the text-embedding-ada-002 model) OR a Sagemaker Endpoint name (to use an embedding model hosted on SageMaker).",
-      "AllowedValues": ["FALSE", "TRUE"],
-      "Default":"FALSE"
-    },
-    "EmbeddingsSagemakerEndpoint":{
-      "Type":"String",
-      "Description":"Optional: SageMaker Endpoint running a sentence embedding model.",
-      "Default":""
+      "Description":"Set to enable QnABot Semantics Search using Embeddings from a Large Language Model. When TRUE, you must provide an OpenAI API Key, a Sagemaker Endpoint name, or a Lambda function ARN.",
+      "AllowedValues": ["DISABLED", "OPENAI", "SAGEMAKER", "LAMBDA"],
+      "Default":"DISABLED"
     },
     "OpenAIApiKey":{
       "Type":"String",
-      "Description":"Optional: Provide an Api Key from OpenAI to use the OpenAI text-embedding-ada-002 model.",
+      "Description":"Optional: if EmbeddingsApi is OPENAI, provide an Api Key from OpenAI to use the OpenAI text-embedding-ada-002 model.",
+      "Default":""
+    },
+    "EmbeddingsSagemakerEndpoint":{
+      "Type":"String",
+      "Description":"Optional: if EmbeddingsApi is SAGEMAKER, provide SageMaker Endpoint running a sentence embedding model.",
+      "Default":""
+    },
+    "EmbeddingsLambdaArn":{
+      "Type":"String",
+      "AllowedPattern": "^(|arn:aws:lambda:.*)$",
+      "Description":"Optional: if EmbeddingsApi is LAMBDA, provide ARN for a Lambda function that takes JSON {\"inputtext\":\"string\"}, and returns JSON {\"embedding\":[...]}",
       "Default":""
     },
     "EmbeddingsDimensions":{
       "Type":"String",
-      "Description":"Optional: Number of dimensions. Default (1536) works for OpenAI model - customize as needed for a SageMaker endpoint.",
+      "Description":"Number of embedding dimensions to provision Opensearch index. Default (1536) for OpenAI model - modify as needed for a SageMaker endpoint or Lambda function.",
       "Default":"1536"
     }
   },
@@ -301,7 +307,8 @@ module.exports={
       {"Fn::Equals":[{"Ref":"FulfillmentConcurrency"},"0"]}
     ]},
     "SingleNode": {"Fn::Equals":[{"Ref":"ElasticSearchNodeCount"},"1"]},
-    "EmbeddingsEnable":{"Fn::Equals":[{"Ref":"EmbeddingsEnable"},"TRUE"]}
+    "EmbeddingsEnable":{"Fn::Not": [{ "Fn::Equals":[{"Ref":"EmbeddingsApi"},"DISABLED"]}]},
+    "EmbeddingsLambdaArn":{"Fn::Not": [{ "Fn::Equals":[{"Ref":"EmbeddingsLambdaArn"},""]}]}
   }
 }
 

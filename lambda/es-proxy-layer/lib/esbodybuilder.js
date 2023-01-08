@@ -96,7 +96,7 @@ function build_query(params) {
         }
         ).filterMinimumShouldMatch(1);
 
-      if (_.get(params, 'embeddings_enable')) {
+      if (_.get(params, 'settings.EMBEDDINGS_API') != "DISABLED") {
         // do KNN embedding match for semantic similarity
         query = query.orQuery(
           'nested', {
@@ -106,7 +106,7 @@ function build_query(params) {
             query: {
               knn: {
                 'questions.q_vector': {
-                  k: _.get(params, 'embeddings_knn_search_k', 10),
+                  k: _.get(params, 'settings.EMBEDDINGS_KNN_K', 10),
                   vector: await get_embeddings(params)
                 }
               }
