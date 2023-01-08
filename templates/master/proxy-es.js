@@ -328,7 +328,7 @@ module.exports={
           	}
           },
           {
-            "PolicyName" : "SagemakerInvokeEndpointAccess",
+            "PolicyName" : "EmbeddingsPolicy",
             "PolicyDocument" : {
             "Version": "2012-10-17",
               "Statement": [
@@ -338,7 +338,20 @@ module.exports={
                         "sagemaker:InvokeEndpoint"
                      ],
                     "Resource": "*"
-                }
+                },
+                { 
+                  "Fn::If": [
+                    "EmbeddingsLambdaArn", 
+                    {
+                      "Effect": "Allow",
+                      "Action": [
+                        "lambda:InvokeFunction"
+                      ],
+                      "Resource":[{"Ref":"EmbeddingsLambdaArn"}]
+                    },
+                    {"Ref":"AWS::NoValue"}
+                  ]
+                },
               ]
             }
           },

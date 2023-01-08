@@ -17,16 +17,12 @@ async function get_settings() {
 
 // add embeddings for each question in an add or modify item PUT query
 async function build_additem_embeddings(event, settings) {
-    if (!_.get(settings,'EMBEDDINGS_ENABLE')) {
-        console.log("EMBEDDINGS_ENABLE (disabled) - query not modified");
+    if (settings.EMBEDDINGS_API === "DISABLED") {
+        console.log("EMBEDDINGS_API (disabled) - query not modified");
         return event.body;
     }
     var params = {
-        embeddings_enable: _.get(settings,'EMBEDDINGS_ENABLE'),
-        embeddings_sagemaker_endpoint: _.get(settings,'EMBEDDINGS_SAGEMAKER_ENDPOINT'),
-        embeddings_sagemaker_score_boost: _.get(settings,'EMBEDDINGS_SAGEMAKER_SCORE_BOOST'),
-        embeddings_openai_model: _.get(settings,'EMBEDDINGS_OPENAI_MODEL'),
-        openai_api_key: _.get(settings,'OPENAI_API_KEY'),        
+        settings: settings
     }
     var questions = _.get(event,"body.questions",[]);
     var questions_with_embeddings = await Promise.all(questions.map(async x => {
@@ -82,11 +78,7 @@ async function get_es_query(event, settings) {
             score_answer_field: _.get(settings,'ES_SCORE_ANSWER_FIELD'),
             fuzziness: _.get(settings, 'ES_USE_FUZZY_MATCH'),
             es_expand_contractions: _.get(settings,"ES_EXPAND_CONTRACTIONS"),
-            embeddings_enable: _.get(settings,'EMBEDDINGS_ENABLE'),
-            embeddings_sagemaker_endpoint: _.get(settings,'EMBEDDINGS_SAGEMAKER_ENDPOINT'),
-            embeddings_sagemaker_score_boost: _.get(settings,'EMBEDDINGS_SAGEMAKER_SCORE_BOOST'),
-            embeddings_openai_model: _.get(settings,'EMBEDDINGS_OPENAI_MODEL'),
-            openai_api_key: _.get(settings,'OPENAI_API_KEY'), 
+            settings: settings
         };
         return build_es_query(query_params);
     } else if (_.get(event,'method','') === 'PUT') {

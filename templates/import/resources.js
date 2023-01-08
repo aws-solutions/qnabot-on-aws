@@ -176,7 +176,7 @@ module.exports=Object.assign(
               "Action": [
                 "lambda:InvokeFunction"
               ],
-              "Resource":[{"Ref":"EsProxyLambda"}]
+              "Resource":[{"Ref":"EsProxyLambda"}, { "Fn::If": ["EmbeddingsLambdaArn", {"Ref":"EmbeddingsLambdaArn"}, {"Ref":"AWS::NoValue"}] }]
           }]
         }
       }

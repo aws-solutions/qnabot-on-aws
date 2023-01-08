@@ -120,6 +120,7 @@ module.exports = {
             { "Fn::GetAtt": ["ESProxyLambda", "Arn"] },
             { "Fn::GetAtt": ["ESLoggingLambda", "Arn"] },
             { "Fn::GetAtt": ["ESQidLambda", "Arn"] },
+            { "Fn::If": ["EmbeddingsLambdaArn", {"Ref":"EmbeddingsLambdaArn"}, {"Ref":"AWS::NoValue"}] },
           ].concat(require('../../examples/outputs').names
             .map(x => {
               return { "Fn::GetAtt": ["ExamplesStack", `Outputs.${x}`] }
