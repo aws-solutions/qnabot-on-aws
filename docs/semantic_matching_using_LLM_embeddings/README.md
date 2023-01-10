@@ -53,7 +53,7 @@ where the length of the embedding array matches the value you specify for the st
 
 
 
-### Settings
+## Settings
 
 When QnABot stack is installed, open Content Designer **Settings** page:
 
