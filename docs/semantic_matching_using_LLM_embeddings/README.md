@@ -4,11 +4,11 @@ QnABot can now use text embeddings to provide semantic search capability, provid
   
 QnaBot can now use 
 1. Embeddings from OpenAI text-embedding-ada-002 model - see https://beta.openai.com/docs/guides/embeddings
-2. Embeddings from a Text Embedding model hosted on a SageMaker endpoint - see https://github.com/aws/amazon-sagemaker-examples/blob/main/introduction_to_amazon_algorithms/jumpstart_text_embedding/Amazon_JumpStart_Text_Embedding.ipynb
+2. Embeddings from a Text Embedding model hosted on an Amazon SageMaker endpoint - see https://github.com/aws/amazon-sagemaker-examples/blob/main/introduction_to_amazon_algorithms/jumpstart_text_embedding/Amazon_JumpStart_Text_Embedding.ipynb
 3. Embeddings from a user provided Lambda function.
 
 
-## Open AI Embeddings
+## 1. Open AI
 
 ### Deploy stack for OpenAI Embeddings
 To enable OpenAI embeddings when you install QnABot:
@@ -19,9 +19,9 @@ To enable OpenAI embeddings when you install QnABot:
 
 Deploy QnABot stack.
 
-## Sagemaker based embeddings
+## 2. Amazon Sagemaker
 
-You can also experiment with embeddings models deployed on SageMaker endpoints. 
+You can also experiment with embeddings models deployed on your own SageMaker endpoints. 
 
 ### Deploy Stack for SageMaker Embeddings
 
@@ -31,7 +31,9 @@ You can also experiment with embeddings models deployed on SageMaker endpoints.
 
 *Note: SageMaker embeddings have been tested only with TensorFlow models from the SageMaker Text Embeddings JumpStart. Other models may possibly require code changes to invoke the model and process results.. OR use the LAMBDA option (below) instead to abstract your model. The SageMaker interface code is in the file [embeddings.js](../../lambda/es-proxy-layer/lib/embeddings.js).*
 
-### Deploy Stack for Other Embedding models using a Lambda Function
+## 3. Lambda function
+
+### Deploy Stack for Embedding models invoked by a custom Lambda Function
 
 Use a custom Lambda function to use any API or Embedding model on Sagemaker to generate embeddings.  
 
