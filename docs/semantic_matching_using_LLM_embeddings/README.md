@@ -5,6 +5,7 @@ QnABot can now use text embeddings to provide semantic search capability, provid
 QnaBot can now use 
 1. Embeddings from OpenAI text-embedding-ada-002 model - see https://beta.openai.com/docs/guides/embeddings
 2. Embeddings from a Text Embedding model hosted on a SageMaker endpoint - see https://github.com/aws/amazon-sagemaker-examples/blob/main/introduction_to_amazon_algorithms/jumpstart_text_embedding/Amazon_JumpStart_Text_Embedding.ipynb
+3. Embeddings from a user provided Lambda function.
 
 
 ## Open AI Embeddings
