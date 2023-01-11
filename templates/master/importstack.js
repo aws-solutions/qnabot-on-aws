@@ -23,6 +23,7 @@ module.exports={
                 "VPCSecurityGroupIdList": { "Fn::Join" : [ ",", {"Ref":"VPCSecurityGroupIdList"} ] },
                 "XraySetting":{"Ref": "XraySetting"},
                 "EmbeddingsLambdaArn":{"Ref": "EmbeddingsLambdaArn"},
+                "EmbeddingsDimensions":{"Ref": "EmbeddingsDimensions"}
             }
         }
     }

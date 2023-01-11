@@ -15,6 +15,7 @@ module.exports={
             id:exportfile,
             index:{"Fn::Sub":"${Var.QnaIndex}"},
             encryption:{"Ref":"Encryption"},
+            addl_export_triggers:{"Fn::Sub":"${EmbeddingsDimensions}"}
         }
     },
     "PreUpgradeExportMetrics":{
