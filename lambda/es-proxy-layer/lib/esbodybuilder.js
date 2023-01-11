@@ -98,14 +98,17 @@ function build_query(params) {
 
       if (_.get(params, 'settings.EMBEDDINGS_API') != "DISABLED") {
         // do KNN embedding match for semantic similarity
+        let vector = "questions.q_vector";
+        if (_.get(params, 'score_answer_field')) {
+          vector = "questions.qa_vector";
+        }
         query = query.orQuery(
           'nested', {
             score_mode: 'max',
-            boost: _.get(params, 'phrase_boost', 4),
             path: 'questions',
             query: {
               knn: {
-                'questions.q_vector': {
+                [vector]: {
                   k: _.get(params, 'settings.EMBEDDINGS_KNN_K', 10),
                   vector: await get_embeddings(params)
                 }
