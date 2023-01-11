@@ -4,4 +4,4 @@
 
 import pytest
 
-pytest.main()
+pytest.main(['--cov=.', '--cov-report=lcov'])

@@ -9,7 +9,7 @@ const qna_settings = require("qnabot/settings")
 const open_es = require("./es_query")
 
 async function get_settings() {
-    let settings = qna_settings.merge_default_and_custom_settings();
+    let settings = await qna_settings.merge_default_and_custom_settings();
     qnabot.log("Merged Settings: ", settings);
     return settings;
 }

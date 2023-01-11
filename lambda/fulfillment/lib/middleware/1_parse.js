@@ -13,7 +13,7 @@ async function get_settings() {
     qnabot.log("Getting Default JWKS URL from SSM Parameter Store: ", default_jwks_param);
     const default_jwks_url = await qna_settings.get_parameter(default_jwks_param);
 
-    let settings = qna_settings.merge_default_and_custom_settings();
+    let settings = await qna_settings.merge_default_and_custom_settings();
     _.set(settings, "DEFAULT_USER_POOL_JWKS_URL", default_jwks_url);
 
     qnabot.log(`Merged Settings: ${JSON.stringify(settings,null,2)}`);
