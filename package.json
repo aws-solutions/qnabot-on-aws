@@ -1,6 +1,6 @@
 {
   "name": "qnabot-on-aws",
-  "version": "5.2.5",
+  "version": "5.2.6",
   "engines": {
     "node": ">=12.16.1",
     "npm": ">=7.8.0"
@@ -81,7 +81,7 @@
     "json-stringify-pretty-compact": "^1.2.0",
     "JSONPath": "^0.11.2",
     "jsonschema": "^1.2.4",
-    "jsonwebtoken": "^8.3.0",
+    "jsonwebtoken": "^9.0.0",
     "jszip": "^3.1.5",
     "lodash": "^4.17.21",
     "marked": "^4.1.0",
@@ -171,6 +171,10 @@
       "glob-parent": "^5.1.2"
     },
     "minimatch": "3.0.5",
-    "loader-utils@<1.4.2": "^1.4.2"
+    "loader-utils@<1.4.2": "^1.4.2",
+    "json5@<1.0.2": "^1.0.2",
+    "aws-lex-web-ui": {
+      "jsonwebtoken@<9.0.0": "$jsonwebtoken"
+    }
   }
 }

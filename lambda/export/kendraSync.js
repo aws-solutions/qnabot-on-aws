@@ -16,7 +16,7 @@ var create=require('./createFAQ')
  * @returns {*}
  */
 async function get_settings() {
-    let settings = qna_settings.merge_default_and_custom_settings();
+    let settings = await qna_settings.merge_default_and_custom_settings();
     // TODO: investigate why this value is being 'set' to undefined instead of
     // being 'unset' or ignored all together
     _.set(settings, "DEFAULT_USER_POOL_JWKS_URL");
