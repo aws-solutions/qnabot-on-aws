@@ -15,7 +15,7 @@ module.exports={
             id:exportfile,
             index:{"Fn::Sub":"${Var.QnaIndex}"},
             encryption:{"Ref":"Encryption"},
-            addl_export_triggers:{"Fn::Sub":"${EmbeddingsDimensions}"}
+            PRE_UPGRADE_EXPORT_TRIGGERS:{"Fn::Sub":"${EmbeddingsApi} ${EmbeddingsDimensions} ${EmbeddingsLambdaArn} ${EmbeddingsSagemakerEndpoint}"}
         }
     },
     "PreUpgradeExportMetrics":{

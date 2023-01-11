@@ -8,6 +8,7 @@ const qnabot = require("qnabot/logging")
 const qna_settings = require("qnabot/settings")
 const open_es = require("./es_query")
 const get_embeddings = require('./embeddings');
+const { findLastKey } = require('lodash');
 
 async function get_settings() {
     let settings = await qna_settings.merge_default_and_custom_settings();
@@ -17,8 +18,8 @@ async function get_settings() {
 
 // add embeddings for each question in an add or modify item PUT query
 async function build_additem_embeddings(event, settings) {
-    if (settings.EMBEDDINGS_API === "DISABLED") {
-        console.log("EMBEDDINGS_API (disabled) - query not modified");
+    if (settings.EMBEDDINGS_ENABLE == false) {
+        console.log("EMBEDDINGS_ENABLE is false - query not modified");
         return event.body;
     }
     const topic = _.get(event,"body.t");
