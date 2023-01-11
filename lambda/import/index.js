@@ -143,17 +143,27 @@ exports.step = function (event, context, cb) {
                                     if (obj.type === 'qna') {
                                         try {
                                             var topic = obj.t;
+                                            var answer = obj.a;
                                             obj.questions = await Promise.all(obj.q.map(async x => {
-                                                let params = {
+                                                // get embeddings for questions
+                                                const q_params = {
                                                     question: x,
                                                     topic: topic,
                                                     settings: settings
                                                 };
-                                                const embeddings = await get_embeddings(params);
-                                                if (embeddings) {
+                                                const q_embeddings = await get_embeddings(q_params);
+                                                // get embeddings for question + answer field to support ES_SCORE_ANSWER_FIELD true mode.
+                                                const qa_params = {
+                                                    question: x + ". " + answer,
+                                                    topic: topic,
+                                                    settings: settings
+                                                };
+                                                const qa_embeddings = await get_embeddings(qa_params);
+                                                if (q_embeddings) {
                                                     return {
                                                         q: x,
-                                                        q_vector: embeddings
+                                                        q_vector: q_embeddings,
+                                                        qa_vector: qa_embeddings
                                                     }
                                                 } else {
                                                     return {
