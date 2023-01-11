@@ -77,7 +77,7 @@ var default_settings = {
     LAMBDA_POSTPROCESS_HOOK: '',
     SEARCH_REPLACE_QUESTION_SUBSTRINGS: '',
     EMBEDDINGS_API: '${EmbeddingsApi}', // valid values are DISABLED, OPENAI, SAGEMAKER, and LAMBDA
-    EMBEDDINGS_SCORE_THRESHOLD: 0.85, // If embedding similarity score is under threshold the match it srejected and QnABot reverts to Kendra fallback or no_hits
+    EMBEDDINGS_SCORE_THRESHOLD: 0.80, // If embedding similarity score is under threshold the match it srejected and QnABot reverts to Kendra fallback or no_hits
     OPENAI_API_KEY: '${OpenAIApiKey}', // Optional: Provide an Api Key from OpenAI to use the OpenAI text-embedding-ada-002 model.
     EMBEDDINGS_OPENAI_MODEL: 'text-embedding-ada-002', // Optional: OpenAI embeddings model to use - applies only if OPENAI_API_KEY is set.
     EMBEDDINGS_SAGEMAKER_ENDPOINT: '${EmbeddingsSagemakerEndpoint}', // Optional: SageMaker Endpoint running a sentence embedding model.

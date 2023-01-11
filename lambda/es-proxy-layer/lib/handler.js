@@ -21,18 +21,28 @@ async function build_additem_embeddings(event, settings) {
         console.log("EMBEDDINGS_API (disabled) - query not modified");
         return event.body;
     }
-    var params = {
-        settings: settings
-    }
-    var questions = _.get(event,"body.questions",[]);
+    const topic = _.get(event,"body.t");
+    const answer = _.get(event,"body.a");  
+    const questions = _.get(event,"body.questions",[]);
     var questions_with_embeddings = await Promise.all(questions.map(async x => {
-        params.question = x.q;
-        params.topic = _.get(event,"body.t");
-        const embeddings = await get_embeddings(params);
-            return {
-                q: x.q,
-                q_vector: embeddings
-            }
+        const q_params = {
+            question: x.q,
+            topic: topic,
+            settings: settings
+        };
+        const q_embeddings = await get_embeddings(q_params);
+        // get embeddings for question + answer field to support ES_SCORE_ANSWER_FIELD true mode.
+        const qa_params = {
+            question: x.q + ". " + answer,
+            topic: topic,
+            settings: settings
+        };
+        const qa_embeddings = await get_embeddings(qa_params);
+        return {
+            q: x.q,
+            q_vector: q_embeddings,
+            qa_vector: qa_embeddings
+        }
     }));
     event.body.questions = questions_with_embeddings;
     return event.body;

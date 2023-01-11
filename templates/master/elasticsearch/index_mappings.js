@@ -16,13 +16,22 @@ module.exports={
                 },
                 "q_vector": { 
                     "type": "knn_vector",
-                    "dimension": '${EmbeddingsDimensions}',  // Use Cfn Param (default 1536)
+                    "dimension": '${EmbeddingsDimensions}',  // Use Cfn Param
                     "method": {
                         "name": "hnsw",
                         "space_type": "cosinesimil",
                         "engine": "nmslib"
                     }
-                } 
+                },
+                "qa_vector": { 
+                    "type": "knn_vector",
+                    "dimension": '${EmbeddingsDimensions}',  // Use Cfn Param
+                    "method": {
+                        "name": "hnsw",
+                        "space_type": "cosinesimil",
+                        "engine": "nmslib"
+                    }
+                }  
             }
         },
         a:{
