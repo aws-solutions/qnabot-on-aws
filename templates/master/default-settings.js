@@ -76,10 +76,6 @@ var default_settings = {
     LAMBDA_PREPROCESS_HOOK: '',
     LAMBDA_POSTPROCESS_HOOK: '',
     SEARCH_REPLACE_QUESTION_SUBSTRINGS: '',
-    CFAQ_SAGEMAKER_ENDPOINT: '',
-    CFAQ_INDEX: '',
-    CFAQ_DOMAIN: '',
-    CFAQ_PREFIX: 'Answer from Lex CFAQ prototype model: ',
     EMBEDDINGS_API: '${EmbeddingsApi}', // valid values are DISABLED, OPENAI, SAGEMAKER, and LAMBDA
     EMBEDDINGS_SCORE_THRESHOLD: 0.85, // If embedding similarity score is under threshold the match it srejected and QnABot reverts to Kendra fallback or no_hits
     OPENAI_API_KEY: '${OpenAIApiKey}', // Optional: Provide an Api Key from OpenAI to use the OpenAI text-embedding-ada-002 model.
