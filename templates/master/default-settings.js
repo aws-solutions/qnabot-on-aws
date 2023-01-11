@@ -99,9 +99,10 @@ module.exports = {
             "Description": "Default QnABot Settings - DO NOT MODIFY",
             "Type": "String",
             "Value": { "Fn::Sub" : [
-                JSON.stringify(default_settings), 
-                {"ES_USE_KEYWORD_FILTERS" : {"Fn::If": ["EmbeddingsEnable", "FALSE", "TRUE"]}},
-                {"EMBEDDINGS_ENABLE" : {"Fn::If": ["EmbeddingsEnable", "TRUE", "FALSE"]}}
+                JSON.stringify(default_settings), {
+                    "ES_USE_KEYWORD_FILTERS" : {"Fn::If": ["EmbeddingsEnable", "FALSE", "TRUE"]},
+                    "EMBEDDINGS_ENABLE" : {"Fn::If": ["EmbeddingsEnable", "TRUE", "FALSE"]}
+                }
             ]} 
         }
     },
