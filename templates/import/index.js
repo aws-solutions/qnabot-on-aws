@@ -30,6 +30,7 @@ module.exports={
         "VPCSecurityGroupIdList": {"Type": "String"},
         "XraySetting": {"Type": "String"},
         "EmbeddingsLambdaArn": {"Type": "String"},
+        "EmbeddingsDimensions": {"Type": "String"},
     },
     "Conditions": {
         "VPCEnabled": { "Fn::Not": [
