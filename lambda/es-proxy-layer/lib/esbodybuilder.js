@@ -96,7 +96,7 @@ function build_query(params) {
         }
         ).filterMinimumShouldMatch(1);
 
-      if (_.get(params, 'settings.EMBEDDINGS_API') != "DISABLED") {
+      if (_.get(params, 'settings.EMBEDDINGS_ENABLE')) {
         // do KNN embedding match for semantic similarity
         let vector = "questions.q_vector";
         if (_.get(params, 'score_answer_field')) {
