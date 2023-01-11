@@ -8,7 +8,7 @@ const get_embeddings_openai = async function get_embeddings_openai(params) {
         apiKey: params.settings.OPENAI_API_KEY,
         }));
     var openaires = await openai.createEmbedding({
-    model: params.settings.EMBEDDINGS_OPENAI_MODEL,
+    model: 'text-embedding-ada-002',
     input: params.embedding_input,
     });
     return openaires.data.data[0].embedding;
@@ -44,14 +44,19 @@ module.exports = async function (params) {
     let topic = params.topic;
     let question = params.question;
     params.embedding_input = (topic) ? `${question} (Topic is ${topic})` : question;
-    if (settings.EMBEDDINGS_API === "OPENAI") {
-        return get_embeddings_openai(params);
-    } else if (settings.EMBEDDINGS_API === "SAGEMAKER") {
-        return get_embeddings_sm(params);
-    } else if (settings.EMBEDDINGS_API === "LAMBDA") {
-        return get_embeddings_lambda(params);
+    if (settings.EMBEDDINGS_ENABLE) {
+        if (settings.EMBEDDINGS_API === "OPENAI") {
+            return get_embeddings_openai(params);
+        } else if (settings.EMBEDDINGS_API === "SAGEMAKER") {
+            return get_embeddings_sm(params);
+        } else if (settings.EMBEDDINGS_API === "LAMBDA") {
+            return get_embeddings_lambda(params);
+        } else {
+            console.log("Unrecognized value for EMBEDDINGS_API - expected SAGEMAKER|OPENAI|LAMBA: ", settings.EMBEDDINGS_API);
+            return undefined;
+        }
     } else {
-        console.log("Embeddings disabled - EMBEDDINGS_ENABLE: ", settings.EMBEDDINGS_API);
+        console.log("Embeddings disabled - EMBEDDINGS_ENABLE: ", settings.EMBEDDINGS_ENABLE);
         return undefined;
     }
-  };
+};

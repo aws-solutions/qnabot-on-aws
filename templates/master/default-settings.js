@@ -76,10 +76,10 @@ var default_settings = {
     LAMBDA_PREPROCESS_HOOK: '',
     LAMBDA_POSTPROCESS_HOOK: '',
     SEARCH_REPLACE_QUESTION_SUBSTRINGS: '',
+    EMBEDDINGS_ENABLE: '${EMBEDDINGS_ENABLE}', // Set to TRUE or FALSE to enable or diable use of embeddings for semantic search
     EMBEDDINGS_API: '${EmbeddingsApi}', // valid values are DISABLED, OPENAI, SAGEMAKER, and LAMBDA
     EMBEDDINGS_SCORE_THRESHOLD: 0.80, // If embedding similarity score is under threshold the match it srejected and QnABot reverts to Kendra fallback or no_hits
     OPENAI_API_KEY: '${OpenAIApiKey}', // Optional: Provide an Api Key from OpenAI to use the OpenAI text-embedding-ada-002 model.
-    EMBEDDINGS_OPENAI_MODEL: 'text-embedding-ada-002', // Optional: OpenAI embeddings model to use - applies only if OPENAI_API_KEY is set.
     EMBEDDINGS_SAGEMAKER_ENDPOINT: '${EmbeddingsSagemakerEndpoint}', // Optional: SageMaker Endpoint running a sentence embedding model.
     EMBEDDINGS_LAMBDA_ARN: '${EmbeddingsLambdaArn}'  // Optional Stack parameter value. If modified, the function name must start with QNA* to avoid invoke policy failure
 };
@@ -98,7 +98,11 @@ module.exports = {
         "Properties": {
             "Description": "Default QnABot Settings - DO NOT MODIFY",
             "Type": "String",
-            "Value": { "Fn::Sub" : [JSON.stringify(default_settings), {"ES_USE_KEYWORD_FILTERS" : {"Fn::If": ["EmbeddingsEnable", "FALSE", "TRUE"]}}]} 
+            "Value": { "Fn::Sub" : [
+                JSON.stringify(default_settings), 
+                {"ES_USE_KEYWORD_FILTERS" : {"Fn::If": ["EmbeddingsEnable", "FALSE", "TRUE"]}},
+                {"EMBEDDINGS_ENABLE" : {"Fn::If": ["EmbeddingsEnable", "TRUE", "FALSE"]}}
+            ]} 
         }
     },
     "CustomQnABotSettings": {
