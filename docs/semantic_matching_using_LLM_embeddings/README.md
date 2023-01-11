@@ -61,18 +61,19 @@ When QnABot stack is installed, open Content Designer **Settings** page:
 
 **ES_SCORE_ANSWER_FIELD:** If set to true, QnABot executes embedding vector searches on embedding generated on the concetenate content of both question and answer fields. Only the plain text answer field is used (not the Markdown or SSML alternatives). This allows QnABot to find matches based on the contents on the answer field as well as the questions.
 
-Scroll to the bottom of the settings page and observe the new EMBEDDINGS settings:
+
+*Scroll to the bottom of the settings page and observe the new EMBEDDINGS settings:*
 
 **EMBEDDINGS_ENABLE:** to enable / disable use of semantic search using embeddings, set `EMBEDDINGS_ENABLE` to FALSE
   - If you disable embeddings, you will likely also want to re-enable keyword filters by setting `ES_USE_KEYWORD_FILTERS` to TRUE. 
   - If you add, modify, or import any items in Content Designer when set `EMBEDDINGS_ENABLE` is false, then embeddings won't get created and you'll have to reimport or re-save those items after reenabling embeddings again  
     
-**EMBEDDINGS_SCORE_THRESHOLD:** to customize the score threshold, change the value of `EMBEDDINGS_SCORE_THRESHOLD`. Unlike regular elasticsearch queries, embeddings queries always return scores between 0 and 1, so we can apply a threshold to separate good from bad results. If embedding similarity score is under threshold the match it's rejected and QnABot reverts to Kendra fallback or no_hits
-  - Results that score less than the threshold are not returned to the user. 
+**EMBEDDINGS_SCORE_THRESHOLD:** to customize the score threshold, change the value of `EMBEDDINGS_SCORE_THRESHOLD`. Unlike regular elasticsearch queries, embeddings queries always return scores between 0 and 1, so we can apply a threshold to separate good from bad results. 
+  - If embedding similarity score is under threshold the match it's rejected and QnABot reverts to Kendra fallback or no_hits
   - Use the Content Designer TEST tab to see the hits ranked by score for your query results.
   - The default is 0.80 for now but you may well need to modify this based on your embedding model and your experiments.
 
-**EMBEDDINGS_API:** Set during deployment based on stack parameter. Valid values are DISABLED, OPENAI, SAGEMAKER, and LAMBDA  
+**EMBEDDINGS_API:** Set during deployment based on stack parameter. Valid values are DISABLED, OPENAI, SAGEMAKER, and LAMBDA. Do not modify in Settings, but rather update your QnABot CloudFormation stack to set a new value for `EmbeddingsApi` and assciated parameters to ensure that permissions, index dimension settings are updated, and that stored embeddings are recomputed with the new model.  
 
 **OPENAI_API_KEY:** Modify if needed to update your OpenAI Api Key.
 
