@@ -18,7 +18,7 @@ module.exports={
             index:{"Ref":"VarIndex"},
             encryption:{"Ref":"Encryption"},
             es_endpoint:{"Ref":"EsEndpoint"},
-            addl_import_triggers:{"Fn::Sub":"${EmbeddingsDimensions}"}
+            POST_UPGRADE_IMPORT_TRIGGERS:{"Fn::Sub":"${EmbeddingsApi} ${EmbeddingsDimensions} ${EmbeddingsLambdaArn} ${EmbeddingsSagemakerEndpoint}"}
         }
     },
     "PostUpgradeImportMetrics":{
