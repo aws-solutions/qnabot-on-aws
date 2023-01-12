@@ -25,9 +25,7 @@
     "stack-utils": "^1.0.1"
   },
   "devDependencies": {
-    "diff": "^4.0.2",
-    "tap": "^16.2.0",
-    "tap-mocha-reporter": "^5.0.3"
+    "diff": "^4.0.2"
   },
   "overrides": {
     "qs@<6.5.3": "^6.5.3"
