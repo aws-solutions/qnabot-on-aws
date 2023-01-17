@@ -10,13 +10,13 @@ QnaBot can now use
 
 ## 1. Amazon Sagemaker (Preferred)
 
-QnABot provisions a single node ml.m5.xlarge Sagemaker endpoint running the Hugging Face el5-large model - see https://huggingface.co/intfloat/e5-large.
+QnABot provisions a single node ml.m5.xlarge Sagemaker endpoint running the Hugging Face el5-large model - see https://huggingface.co/intfloat/e5-large. Please check SageMaker pricing documentation for relevant costs.
 
 ### Deploy Stack for SageMaker Embeddings
 
 - set `EmbeddingsAPI` to SAGEMAKER
 
-No additional Embedding parameters are required. SageMaker endpoint provisioning is automated. Please check SageMaker pricing documentation for relevant costs.
+No additional Embedding parameters are required. SageMaker endpoint provisioning is automated. 
 
 ## 2. Open AI
 
