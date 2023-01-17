@@ -338,7 +338,7 @@ async function get_hit(req, res) {
                 const cfaq_domain = _.get(req, '_settings.CFAQ_DOMAIN');
                 const cfaq_prefix = _.get(req, '_settings.CFAQ_PREFIX', "");
                 const cfaq_index = _.get(req, '_settings.CFAQ_INDEX');
-                const cfaq_n_ctx = _.get(req, '_settings.CFAQ_VFAQ_N_CONTEXT', 0);
+                const cfaq_n_ctx = _.get(req, '_settings.CFAQ_N_CONTEXT', 0);
                 hit = await prepend_cfaq_answer(req.question, hit, cfaq_prefix, cfaq_endpoint, cfaq_domain, cfaq_index, cfaq_n_ctx);
             }
         }
