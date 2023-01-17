@@ -16,6 +16,8 @@ QnABot provisions a single node ml.m5.xlarge Sagemaker endpoint running the Hugg
 
 - set `EmbeddingsAPI` to SAGEMAKER
 
+![CFN Params](./images/CF_Params_Sagemaker.png)
+
 No additional Embedding parameters are required. SageMaker endpoint provisioning is automated. 
 
 ## 2. Open AI
@@ -26,8 +28,9 @@ Be aware that data will leave AWS as it is sent to OpenAI's text embedding API s
 ### Deploy stack for OpenAI Embeddings
 To enable OpenAI embeddings when you install QnABot:
 - set `EmbeddingsAPI` to OPENAI
-- set `OpenAIApiKey` to the value of your OpenAI API Key - see https://beta.openai.com/account/api-keys
-![CFN Params](./images/cfn_params.png)
+- set `OpenAIApiKey` to the value of your OpenAI API Key - see https://beta.openai.com/account/api-keys  
+
+![CFN Params](./images/CF_Params_OpenAI.png)
 
 Deploy QnABot stack.
   
@@ -41,6 +44,8 @@ Use a custom Lambda function to use any API or Embedding model on Sagemaker to g
 - set `EmbeddingsAPI` to LAMBDA
 - set `EmbeddingsLambdaArn` to the ARN of your Lambda function 
 - Set `EmbeddingsLambdaDimensions` to match the number of dimensions returned by your Lambda function
+
+![CFN Params](./images/CF_Params_Lambda.png)
 
 Your Lambda function is passed an event of the form:
 ```
