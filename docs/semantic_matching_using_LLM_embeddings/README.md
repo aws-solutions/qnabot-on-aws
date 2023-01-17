@@ -27,7 +27,7 @@ Be aware that data will leave AWS as it is sent to OpenAI's text embedding API s
 To enable OpenAI embeddings when you install QnABot:
 - set `EmbeddingsAPI` to OPENAI
 - set `OpenAIApiKey` to the value of your OpenAI API Key - see https://beta.openai.com/account/api-keys
-![CFN Params](./images/cfn_params.jpg)
+![CFN Params](./images/cfn_params.png)
 
 Deploy QnABot stack.
   
