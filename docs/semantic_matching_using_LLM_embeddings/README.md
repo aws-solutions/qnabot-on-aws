@@ -3,43 +3,44 @@
 QnABot can now use text embeddings to provide semantic search capability, providing improved accuracy with much less tuning.
   
 QnaBot can now use 
-1. Embeddings from OpenAI text-embedding-ada-002 model - see https://beta.openai.com/docs/guides/embeddings
-2. Embeddings from a Text Embedding model hosted on an Amazon SageMaker endpoint - see https://github.com/aws/amazon-sagemaker-examples/blob/main/introduction_to_amazon_algorithms/jumpstart_text_embedding/Amazon_JumpStart_Text_Embedding.ipynb
+1. Embeddings from a Text Embedding model hosted on an Amazon SageMaker endpoint - see https://huggingface.co/intfloat/e5-large
+2. Embeddings from OpenAI text-embedding-ada-002 model - see https://beta.openai.com/docs/guides/embeddings
 3. Embeddings from a user provided Lambda function.
 
 
-## 1. Open AI
+## 1. Amazon Sagemaker (Preferred)
+
+QnABot provisions a single node ml.m5.xlarge Sagemaker endpoint running the Hugging Face el5-large model - see https://huggingface.co/intfloat/e5-large.
+
+### Deploy Stack for SageMaker Embeddings
+
+- set `EmbeddingsAPI` to SAGEMAKER
+
+No additional Embedding parameters are required. SageMaker endpoint provisioning is automated. Please check SageMaker pricing documentation for relevant costs.
+
+## 2. Open AI
+
+QnABot provides easy access to OpenAI text embeddings for experimentation purposes.  
+Be aware that data will leave AWS as it is sent to OpenAI's text embedding API service. It is not recommended to use this option for sensitive data.
 
 ### Deploy stack for OpenAI Embeddings
 To enable OpenAI embeddings when you install QnABot:
 - set `EmbeddingsAPI` to OPENAI
 - set `OpenAIApiKey` to the value of your OpenAI API Key - see https://beta.openai.com/account/api-keys
-- leave `EmbeddingsDimensions` at the default value of 1536 (compatible with OpenAI model)
 ![CFN Params](./images/cfn_params.jpg)
 
 Deploy QnABot stack.
-
-## 2. Amazon Sagemaker
-
-You can also experiment with embeddings models deployed on your own SageMaker endpoints. 
-
-### Deploy Stack for SageMaker Embeddings
-
-- set `EmbeddingsAPI` to SAGEMAKER
-- set `EmbeddingsSageMakerEndpoint` to the name of your SageMaker inference endpoint where your embeddings model is running 
-- Set `EmbeddingsDimensions` to match the number of dimensions returned by your model
-
-*Note: SageMaker embeddings have been tested only with TensorFlow models from the SageMaker Text Embeddings JumpStart. Other models may possibly require code changes to invoke the model and process results.. OR use the LAMBDA option (below) instead to abstract your model. The SageMaker interface code is in the file [embeddings.js](../../lambda/es-proxy-layer/lib/embeddings.js).*
+  
 
 ## 3. Lambda function
 
-### Deploy Stack for Embedding models invoked by a custom Lambda Function
-
 Use a custom Lambda function to use any API or Embedding model on Sagemaker to generate embeddings.  
+
+### Deploy Stack for Embedding models invoked by a custom Lambda Function
 
 - set `EmbeddingsAPI` to LAMBDA
 - set `EmbeddingsLambdaArn` to the ARN of your Lambda function 
-- Set `EmbeddingsDimensions` to match the number of dimensions returned by your Lambda function
+- Set `EmbeddingsLambdaDimensions` to match the number of dimensions returned by your Lambda function
 
 Your Lambda function is passed an event of the form:
 ```
@@ -49,7 +50,7 @@ and must return a JSON structure of the form:
 ```
 {"embedding":[...]}
 ```
-where the length of the embedding array matches the value you specify for the stack parameter `EmbeddingsDimensions`.
+where the length of the embedding array matches the value you specify for the stack parameter `EmbeddingsLambdaDimensions`.
 
 
 
@@ -77,9 +78,9 @@ When QnABot stack is installed, open Content Designer **Settings** page:
 
 **OPENAI_API_KEY:** Modify if needed to update your OpenAI Api Key.
 
-**EMBEDDINGS_SAGEMAKER_ENDPOINT:** Set during deployment based on stack parameter. Do not modify in Settings, but rather update your QnABot CloudFormation stack to set a new value for `EmbeddingsSageMakerEndpoint` and `EmbeddingsDimensions` to ensure that permissions, index dimension settings are updated, and that stored embeddings are recomputed with the new model.
+**EMBEDDINGS_SAGEMAKER_ENDPOINT:** Set during deployment to the EndpointName of the provisioned SageMaker Embeddings Endpoint. Do not modify this setting.
 
-**EMBEDDINGS_LAMBDA_ARN:** Set during deployment based on stack parameter. Do not modify in Settings, but rather update your QnABot  CloudFormation stack to set a new value for `EmbeddingsLambdaArn` and `EmbeddingsDimensions` to ensure that permissions, index dimension settings are updated, and that stored embeddings are recomputed with the new Lambda.
+**EMBEDDINGS_LAMBDA_ARN:** Set during deployment based on stack parameter. Do not modify in Settings, but rather update your QnABot  CloudFormation stack to set a new value for `EmbeddingsLambdaArn` and `EmbeddingsLambdaDimensions` to ensure that permissions, index dimension settings are updated, and that stored embeddings are recomputed with the new Lambda.
 
 
 
