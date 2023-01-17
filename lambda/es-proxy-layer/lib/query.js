@@ -156,7 +156,7 @@ function merge_next(hit1, hit2) {
     return hit2;
 }
 
-async function prepend_cfaq_answer(query, hit, cfaq_prefix, cfaq_endpoint, cfaq_domain, cfaq_index, vfaq_n_ctx) {
+async function prepend_cfaq_answer(query, hit, cfaq_prefix, cfaq_endpoint, cfaq_domain, cfaq_index, cfaq_n_ctx) {
     const sm = new aws.SageMakerRuntime({region:'us-east-1'});
     const history = {history: {L: {}}};
     const data = {
@@ -164,7 +164,7 @@ async function prepend_cfaq_answer(query, hit, cfaq_prefix, cfaq_endpoint, cfaq_
         dial_hist: history,
         domain: cfaq_domain,
         index_id: cfaq_index,
-        n_ctx: vfaq_n_ctx,
+        n_ctx: cfaq_n_ctx,
     };
     const body = JSON.stringify(data);
     var cfaq_answer;
@@ -338,8 +338,8 @@ async function get_hit(req, res) {
                 const cfaq_domain = _.get(req, '_settings.CFAQ_DOMAIN');
                 const cfaq_prefix = _.get(req, '_settings.CFAQ_PREFIX', "");
                 const cfaq_index = _.get(req, '_settings.CFAQ_INDEX');
-                const vfaq_n_ctx = _.get(req, '_settings.CFAQ_VFAQ_N_CONTEXT', 0);
-                hit = await prepend_cfaq_answer(req.question, hit, cfaq_prefix, cfaq_endpoint, cfaq_domain, cfaq_index, vfaq_n_ctx);
+                const cfaq_n_ctx = _.get(req, '_settings.CFAQ_VFAQ_N_CONTEXT', 0);
+                hit = await prepend_cfaq_answer(req.question, hit, cfaq_prefix, cfaq_endpoint, cfaq_domain, cfaq_index, cfaq_n_ctx);
             }
         }
         if(hit &&  hit.hit_count != 0)
