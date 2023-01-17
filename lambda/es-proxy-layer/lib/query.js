@@ -156,24 +156,33 @@ function merge_next(hit1, hit2) {
     return hit2;
 }
 
-async function prepend_cfaq_answer(query, hit, cfaq_prefix, cfaq_endpoint, cfaq_domain, cfaq_index) {
+async function prepend_cfaq_answer(query, hit, cfaq_prefix, cfaq_endpoint, cfaq_domain, cfaq_index, vfaq_n_ctx) {
     const sm = new aws.SageMakerRuntime({region:'us-east-1'});
     const history = {history: {L: {}}};
     const data = {
-        query: query,
+        query: query.trim(),
         dial_hist: history,
         domain: cfaq_domain,
         index_id: cfaq_index,
+        n_ctx: vfaq_n_ctx,
     };
     const body = JSON.stringify(data);
-    var smres = await sm.invokeEndpoint({
-        EndpointName:cfaq_endpoint,
-        ContentType:'text/csv',
-        Body:body,
-    }).promise();
-    const sm_body = JSON.parse(Buffer.from(smres.Body, 'utf-8').toString());
-    qnabot.log("CFAQ response:", sm_body);
-    const cfaq_answer = sm_body.text.trim();
+    var cfaq_answer;
+    console.log("Invoking CFAQ SM Endpoint");
+    try {
+        var smres = await sm.invokeEndpoint({
+            EndpointName:cfaq_endpoint,
+            ContentType:'text/csv',
+            Body:body,
+        }).promise();
+        const sm_body = JSON.parse(Buffer.from(smres.Body, 'utf-8').toString());
+        qnabot.log("CFAQ response body:", sm_body);
+        cfaq_answer = sm_body.ctxs[0].text.trim();
+    } catch (e) {
+        console.log(e)
+        cfaq_answer = "CFAQ exception: " + e.message.substring(0, 250) + "...";
+    }
+    qnabot.log("CFAQ answer:", cfaq_answer);
     if (true) {
         // prepend sm answer to plaintext and markdown
         hit.a = `${cfaq_prefix}\n\n${cfaq_answer}\n\n${hit.a}`;
