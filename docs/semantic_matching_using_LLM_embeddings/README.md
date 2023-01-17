@@ -1,14 +1,15 @@
 # Semantic question matching, using Large Language Model Text Embeddings
 
-QnABot can now use text embeddings to provide semantic search capability, providing improved accuracy with much less tuning.
-  
-QnaBot can now use 
-1. Embeddings from a Text Embedding model hosted on an Amazon SageMaker endpoint - see https://huggingface.co/intfloat/e5-large
-2. Embeddings from OpenAI text-embedding-ada-002 model - see https://beta.openai.com/docs/guides/embeddings
-3. Embeddings from a user provided Lambda function.
+QnABot can now use text embeddings to provide semantic search capability, with the goal of improved accuracy with much less tuning compared to standard Opensearch keyword based matching.
 
+For now this is an Experimental feature. We encourage you to try it on non-production instances initially, to validate expected accuracy improvements, and to test for any regression issues. 
 
-## 1. Amazon Sagemaker (Preferred)
+With this release, QnaBot can now use 
+1. PREFERRED: Embeddings from a Text Embedding model hosted on an Amazon SageMaker endpoint - see https://huggingface.co/intfloat/e5-large
+2. NON PRODUCTION EXPERIMENTAL AND LOW VOLUME USE: Embeddings from OpenAI text-embedding-ada-002 model - see https://beta.openai.com/docs/guides/embeddings
+3. CUSTOMIZABLE: Embeddings from a user provided Lambda function - explore alternate pretrained and/or fine tuned embeddings models. 
+
+## 1. Amazon Sagemaker (PREFERRED)
 
 QnABot provisions a single node ml.m5.xlarge Sagemaker endpoint running the Hugging Face el5-large model - see https://huggingface.co/intfloat/e5-large. Please check SageMaker pricing documentation for relevant costs.
 
@@ -20,10 +21,13 @@ QnABot provisions a single node ml.m5.xlarge Sagemaker endpoint running the Hugg
 
 No additional Embedding parameters are required. SageMaker endpoint provisioning is automated. 
 
-## 2. Open AI
+## 2. Open AI (NON PRODUCTION EXPERIMENTAL AND LOW VOLUME USE)
 
-QnABot provides easy access to OpenAI text embeddings for experimentation purposes.  
-Be aware that data will leave AWS as it is sent to OpenAI's text embedding API service. It is not recommended to use this option for sensitive data.
+QnABot provides easy access to OpenAI text embeddings (text-embedding-ada-002 model) for experimentation purposes - see https://beta.openai.com/docs/guides/embeddings 
+Be aware that:
+ - data will leave AWS as it is sent to OpenAI's text embedding API service. It is not recommended to use this option for sensitive data.
+ - API calls are subject to rate limiting. 
+ - You incur costs from openAI (not AWS)
 
 ### Deploy stack for OpenAI Embeddings
 To enable OpenAI embeddings when you install QnABot:
