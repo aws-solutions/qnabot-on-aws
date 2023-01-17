@@ -262,18 +262,13 @@ module.exports={
     },
     "EmbeddingsApi":{
       "Type":"String",
-      "Description":"Set to enable QnABot Semantics Search using Embeddings from a Large Language Model. When TRUE, you must provide an OpenAI API Key, a Sagemaker Endpoint name, or a Lambda function ARN.",
-      "AllowedValues": ["DISABLED", "OPENAI", "SAGEMAKER", "LAMBDA"],
+      "Description":"Optionally enable (experimental) QnABot Semantics Search using Embeddings from a pre-trained Large Language Model. If set to SAGEMAKER, a single node ml.m5.xlarge Sagemaker endpoint is automatically provisioned with Hugging Face el5-large model. To use the OPENAI embeddings API or a custom LAMBDA function, provide additional parameters below.",
+      "AllowedValues": ["DISABLED", "SAGEMAKER", "OPENAI", "LAMBDA"],
       "Default":"DISABLED"
     },
     "OpenAIApiKey":{
       "Type":"String",
-      "Description":"Optional: if EmbeddingsApi is OPENAI, provide an Api Key from OpenAI to use the OpenAI text-embedding-ada-002 model.",
-      "Default":""
-    },
-    "EmbeddingsSagemakerEndpoint":{
-      "Type":"String",
-      "Description":"Optional: if EmbeddingsApi is SAGEMAKER, provide SageMaker Endpoint running a sentence embedding model.",
+      "Description":"Optional: if EmbeddingsApi is OPENAI, provide an Api Key from OpenAI to use the OpenAI text-embedding-ada-002 model. WARNING: your data will leave AWS - recommended for experimentation with non-sensitive data only.",
       "Default":""
     },
     "EmbeddingsLambdaArn":{
@@ -282,10 +277,10 @@ module.exports={
       "Description":"Optional: if EmbeddingsApi is LAMBDA, provide ARN for a Lambda function that takes JSON {\"inputtext\":\"string\"}, and returns JSON {\"embedding\":[...]}",
       "Default":""
     },
-    "EmbeddingsDimensions":{
-      "Type":"String",
-      "Description":"Number of embedding dimensions to provision Opensearch index. Default (1536) for OpenAI model - modify as needed for a SageMaker endpoint or Lambda function.",
-      "Default":"1536"
+    "EmbeddingsLambdaDimensions":{
+      "Type":"Number",
+      "Description":"Optional: if EmbeddingsApi is LAMBDA, provide number of dimensions for embeddings returned by the EmbeddingsLambda function specified above.",
+      "Default":4096
     }
   },
   "Conditions":{
@@ -308,6 +303,9 @@ module.exports={
     ]},
     "SingleNode": {"Fn::Equals":[{"Ref":"ElasticSearchNodeCount"},"1"]},
     "EmbeddingsEnable":{"Fn::Not": [{ "Fn::Equals":[{"Ref":"EmbeddingsApi"},"DISABLED"]}]},
+    "EmbeddingsSagemaker":{"Fn::Equals":[{"Ref":"EmbeddingsApi"},"SAGEMAKER"]},
+    "EmbeddingsOpenAI":{"Fn::Equals":[{"Ref":"EmbeddingsApi"},"OPENAI"]},
+    "EmbeddingsLambda":{"Fn::Equals":[{"Ref":"EmbeddingsApi"},"LAMBDA"]},
     "EmbeddingsLambdaArn":{"Fn::Not": [{ "Fn::Equals":[{"Ref":"EmbeddingsLambdaArn"},""]}]}
   }
 }

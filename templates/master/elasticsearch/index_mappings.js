@@ -16,7 +16,7 @@ module.exports={
                 },
                 "q_vector": { 
                     "type": "knn_vector",
-                    "dimension": '${EmbeddingsDimensions}',  // Use Cfn Param
+                    "dimension": '${EmbeddingsDimensions}', 
                     "method": {
                         "name": "hnsw",
                         "space_type": "cosinesimil",
