@@ -14,17 +14,20 @@ const get_embeddings_openai = async function get_embeddings_openai(params) {
     return openaires.data.data[0].embedding;
 }
 
+// input/output for endpoint running HF_MODEL intfloat/e5-large
+// See https://huggingface.co/intfloat/e5-large
+// Returns embedding with 1024 dimensions 
 const get_embeddings_sm = async function get_embeddings_sm(params) {
     console.log("Fetch embeddings from sagemaker for: ", params.embedding_input);
-    const sm = new aws.SageMakerRuntime({region:'us-east-1'});
-    const body = Buffer.from(JSON.stringify(params.embedding_input), 'utf-8').toString();
+    const sm = new aws.SageMakerRuntime({region: process.env.AWS_REGION || "us-east-1"});
+    const body = JSON.stringify({"inputs":params.embedding_input});
     var smres = await sm.invokeEndpoint({
         EndpointName: params.settings.EMBEDDINGS_SAGEMAKER_ENDPOINT,
-        ContentType: 'application/x-text',
+        ContentType: 'application/json',
         Body: body,
     }).promise();
     const sm_body = JSON.parse(Buffer.from(smres.Body, 'utf-8').toString());
-    return sm_body.embedding;
+    return sm_body[0][0];
 }
 
 const get_embeddings_lambda = async function get_embeddings_lambda(params) {

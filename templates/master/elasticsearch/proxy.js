@@ -76,10 +76,39 @@ module.exports={
             "create":{
                 index:{"Fn::Sub":"${Var.QnaIndex}"},
                 endpoint:{"Fn::GetAtt":["ESVar","ESAddress"]},
-                body:{"Fn::Sub":JSON.stringify({
-                    settings:require('./index_settings.js'),
-                    mappings:require('./index_mappings.js'),
-                })}
+                body:{"Fn::Sub": [
+                    JSON.stringify({
+                        settings:require('./index_settings.js'),
+                        mappings:require('./index_mappings.js'),
+                    }),
+                    {
+                        "EmbeddingsDimensions" : {
+                            "Fn::If": [
+                                "EmbeddingsEnable", 
+                                {
+                                    "Fn::If": [
+                                        "EmbeddingsSagemaker", 
+                                        "1024",
+                                        {
+                                            "Fn::If": [
+                                                "EmbeddingsOpenAI", 
+                                                "1536", 
+                                                {
+                                                    "Fn::If": [
+                                                        "EmbeddingsLambda", 
+                                                        {"Ref": "EmbeddingsLambdaDimensions"},
+                                                        "INVALID EMBEDDINGS API - Cannot determine dimensions" 
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }, 
+                                "1" // minimal default to use if embeddings are disabled
+                            ]
+                        }
+                    }
+                ]}
             }
         }
     },

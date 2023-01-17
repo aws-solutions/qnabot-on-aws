@@ -31,7 +31,7 @@ module.exports={
         "XraySetting": {"Type": "String"},
         "EmbeddingsLambdaArn": {"Type": "String"},
         "EmbeddingsApi": {"Type": "String"},
-        "EmbeddingsDimensions": {"Type": "String"},
+        "EmbeddingsLambdaDimensions": {"Type": "String"},
         "EmbeddingsLambdaArn": {"Type": "String"},
         "EmbeddingsSagemakerEndpoint": {"Type": "String"},
     },

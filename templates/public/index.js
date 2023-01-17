@@ -50,7 +50,7 @@ module.exports=Promise.resolve(require('../master')).then(function(base){
         "OpenAIApiKey",
         "EmbeddingsSagemakerEndpoint",
         "EmbeddingsLambdaArn",
-        "EmbeddingsDimensions"
+        "EmbeddingsLambdaDimensions"
     ]);
     base.Metadata = {
         "AWS::CloudFormation::Interface": {
@@ -100,7 +100,7 @@ module.exports=Promise.resolve(require('../master')).then(function(base){
                         "OpenAIApiKey",
                         "EmbeddingsSagemakerEndpoint",
                         "EmbeddingsLambdaArn",
-                        "EmbeddingsDimensions"                   
+                        "EmbeddingsLambdaDimensions"                   
                     ]
                  },
                  {
@@ -127,6 +127,9 @@ module.exports=Promise.resolve(require('../master')).then(function(base){
     base.Conditions.VPCEnabled={"Fn::Equals":[true,false]}
     base.Conditions.SingleNode={"Fn::Equals":[{"Ref":"ElasticSearchNodeCount"},"1"]}
     base.Conditions.EmbeddingsEnable= {"Fn::Not": [{ "Fn::Equals":[{"Ref":"EmbeddingsApi"},"DISABLED"]}]}
+    base.Conditions.EmbeddingsSagemaker = {"Fn::Equals":[{"Ref":"EmbeddingsApi"},"SAGEMAKER"]}
+    base.Conditions.EmbeddingsOpenAI = {"Fn::Equals":[{"Ref":"EmbeddingsApi"},"OPENAI"]}
+    base.Conditions.EmbeddingsLambda = {"Fn::Equals":[{"Ref":"EmbeddingsApi"},"LAMBDA"]}
     base.Conditions.EmbeddingsLambdaArn = {"Fn::Not": [{ "Fn::Equals":[{"Ref":"EmbeddingsLambdaArn"},""]}]}
 
 

@@ -24,9 +24,9 @@ module.exports={
                 "XraySetting":{"Ref": "XraySetting"},
                 "EmbeddingsLambdaArn":{"Ref": "EmbeddingsLambdaArn"},
                 "EmbeddingsApi": {"Ref": "EmbeddingsApi"},
-                "EmbeddingsDimensions": {"Ref": "EmbeddingsDimensions"},
+                "EmbeddingsLambdaDimensions": {"Ref": "EmbeddingsLambdaDimensions"},
                 "EmbeddingsLambdaArn": {"Ref": "EmbeddingsLambdaArn"},
-                "EmbeddingsSagemakerEndpoint": {"Ref": "EmbeddingsSagemakerEndpoint"},
+                "EmbeddingsSagemakerEndpoint": {"Fn::If": ["EmbeddingsSagemaker", {"Fn::GetAtt":["QnABotSMEmbeddingEndpoint","EndpointName"]}, ""]},
             }
         }
     }
