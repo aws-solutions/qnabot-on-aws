@@ -71,6 +71,9 @@ module.exports = {
           DEFAULT_USER_POOL_JWKS_PARAM: { "Ref": "DefaultUserPoolJwksUrl" },
           DEFAULT_SETTINGS_PARAM: { "Ref": "DefaultQnABotSettings" },
           CUSTOM_SETTINGS_PARAM: { "Ref": "CustomQnABotSettings" },
+          EMBEDDINGS_API: { "Ref": "EmbeddingsApi" },
+          EMBEDDINGS_SAGEMAKER_ENDPOINT : {"Fn::If": ["EmbeddingsSagemaker", {"Fn::GetAtt":["QnABotSMEmbeddingEndpoint","EndpointName"]}, ""]},
+          EMBEDDINGS_LAMBDA_ARN: { "Ref": "EmbeddingsLambdaArn" },
         }, examples, responsebots)
       },
       "Handler": "index.handler",

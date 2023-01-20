@@ -262,24 +262,24 @@ module.exports={
     },
     "EmbeddingsApi":{
       "Type":"String",
-      "Description":"Optionally enable (experimental) QnABot Semantics Search using Embeddings from a pre-trained Large Language Model. If set to SAGEMAKER, a single node ml.m5.xlarge Sagemaker endpoint is automatically provisioned with Hugging Face el5-large model. To use the OPENAI embeddings API or a custom LAMBDA function, provide additional parameters below.",
-      "AllowedValues": ["DISABLED", "SAGEMAKER", "OPENAI", "LAMBDA"],
+      "Description":"Optionally enable (experimental) QnABot Semantics Search using Embeddings from a pre-trained Large Language Model. If set to SAGEMAKER, an ml.m5.xlarge Sagemaker endpoint is automatically provisioned with Hugging Face e5-large model. To use a custom LAMBDA function, provide additional parameters below.",
+      "AllowedValues": ["DISABLED", "SAGEMAKER", "LAMBDA"],
       "Default":"DISABLED"
     },
-    "OpenAIApiKey":{
-      "Type":"String",
-      "Description":"Optional: if EmbeddingsApi is OPENAI, provide an Api Key from OpenAI to use the OpenAI text-embedding-ada-002 model. WARNING: your data will leave AWS - recommended for experimentation with non-sensitive data only.",
-      "Default":""
+    "SagemakerInitialInstanceCount":{
+      "Type":"Number",
+      "Description":"Optional: If EmbeddingsApi is SAGEMAKER, provide initial instance count. Set to '0' to enable Serverless Inference (for cold-start delay tolerant deployments only).",
+      "Default":1
     },
     "EmbeddingsLambdaArn":{
       "Type":"String",
       "AllowedPattern": "^(|arn:aws:lambda:.*)$",
-      "Description":"Optional: if EmbeddingsApi is LAMBDA, provide ARN for a Lambda function that takes JSON {\"inputtext\":\"string\"}, and returns JSON {\"embedding\":[...]}",
+      "Description":"Optional: If EmbeddingsApi is LAMBDA, provide ARN for a Lambda function that takes JSON {\"inputtext\":\"string\"}, and returns JSON {\"embedding\":[...]}",
       "Default":""
     },
     "EmbeddingsLambdaDimensions":{
       "Type":"Number",
-      "Description":"Optional: if EmbeddingsApi is LAMBDA, provide number of dimensions for embeddings returned by the EmbeddingsLambda function specified above.",
+      "Description":"Optional: If EmbeddingsApi is LAMBDA, provide number of dimensions for embeddings returned by the EmbeddingsLambda function specified above.",
       "Default":4096
     }
   },
@@ -304,7 +304,7 @@ module.exports={
     "SingleNode": {"Fn::Equals":[{"Ref":"ElasticSearchNodeCount"},"1"]},
     "EmbeddingsEnable":{"Fn::Not": [{ "Fn::Equals":[{"Ref":"EmbeddingsApi"},"DISABLED"]}]},
     "EmbeddingsSagemaker":{"Fn::Equals":[{"Ref":"EmbeddingsApi"},"SAGEMAKER"]},
-    "EmbeddingsOpenAI":{"Fn::Equals":[{"Ref":"EmbeddingsApi"},"OPENAI"]},
+    "EmbeddingsSagemakerServerless":{"Fn::Equals":[{"Ref":"SagemakerInitialInstanceCount"},0]},
     "EmbeddingsLambda":{"Fn::Equals":[{"Ref":"EmbeddingsApi"},"LAMBDA"]},
     "EmbeddingsLambdaArn":{"Fn::Not": [{ "Fn::Equals":[{"Ref":"EmbeddingsLambdaArn"},""]}]}
   }

@@ -71,7 +71,10 @@ module.exports=Object.assign(
                 ES_ENDPOINT:{"Ref":"EsEndpoint"},
                 ES_PROXY:{"Ref":"EsProxyLambda"},
                 DEFAULT_SETTINGS_PARAM: {Ref: "DefaultQnABotSettings"},
-                CUSTOM_SETTINGS_PARAM: {Ref: "CustomQnABotSettings"}
+                CUSTOM_SETTINGS_PARAM: {Ref: "CustomQnABotSettings"},
+                EMBEDDINGS_API: { "Ref": "EmbeddingsApi" },
+                EMBEDDINGS_SAGEMAKER_ENDPOINT : { "Ref": "EmbeddingsSagemakerEndpoint" },
+                EMBEDDINGS_LAMBDA_ARN: { "Ref": "EmbeddingsLambdaArn" },
             }
         },
         "Handler": "index.step",

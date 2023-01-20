@@ -1,18 +1,5 @@
 const aws = require('aws-sdk');
 const _ = require('lodash');
-const { Configuration, OpenAIApi } = require("openai");
-
-const get_embeddings_openai = async function get_embeddings_openai(params) {
-    console.log("Fetch embeddings from openai for: ", params.embedding_input);
-    const openai = new OpenAIApi(new Configuration({
-        apiKey: params.settings.OPENAI_API_KEY,
-        }));
-    var openaires = await openai.createEmbedding({
-    model: 'text-embedding-ada-002',
-    input: params.embedding_input,
-    });
-    return openaires.data.data[0].embedding;
-}
 
 // input/output for endpoint running HF_MODEL intfloat/e5-large
 // See https://huggingface.co/intfloat/e5-large
@@ -22,7 +9,7 @@ const get_embeddings_sm = async function get_embeddings_sm(params) {
     const sm = new aws.SageMakerRuntime({region: process.env.AWS_REGION || "us-east-1"});
     const body = JSON.stringify({"inputs":params.embedding_input});
     var smres = await sm.invokeEndpoint({
-        EndpointName: params.settings.EMBEDDINGS_SAGEMAKER_ENDPOINT,
+        EndpointName: process.env.EMBEDDINGS_SAGEMAKER_ENDPOINT,
         ContentType: 'application/json',
         Body: body,
     }).promise();
@@ -34,7 +21,7 @@ const get_embeddings_lambda = async function get_embeddings_lambda(params) {
     console.log("Fetch embeddings from Lambda for: ", params.embedding_input);
     var lambda= new aws.Lambda();
     var lambdares=await lambda.invoke({
-        FunctionName:params.settings.EMBEDDINGS_LAMBDA_ARN,
+        FunctionName:process.env.EMBEDDINGS_LAMBDA_ARN,
         InvocationType:'RequestResponse',
         Payload:JSON.stringify({inputText: params.embedding_input})
     }).promise();
@@ -48,14 +35,12 @@ module.exports = async function (params) {
     let question = params.question;
     params.embedding_input = (topic) ? `${question} (Topic is ${topic})` : question;
     if (settings.EMBEDDINGS_ENABLE) {
-        if (settings.EMBEDDINGS_API === "OPENAI") {
-            return get_embeddings_openai(params);
-        } else if (settings.EMBEDDINGS_API === "SAGEMAKER") {
+        if (process.env.EMBEDDINGS_API === "SAGEMAKER") {
             return get_embeddings_sm(params);
-        } else if (settings.EMBEDDINGS_API === "LAMBDA") {
+        } else if (process.env.EMBEDDINGS_API === "LAMBDA") {
             return get_embeddings_lambda(params);
         } else {
-            console.log("Unrecognized value for EMBEDDINGS_API - expected SAGEMAKER|OPENAI|LAMBA: ", settings.EMBEDDINGS_API);
+            console.log("Unrecognized value for env var EMBEDDINGS_API - expected SAGEMAKER|LAMBA: ", process.env.EMBEDDINGS_API);
             return undefined;
         }
     } else {
