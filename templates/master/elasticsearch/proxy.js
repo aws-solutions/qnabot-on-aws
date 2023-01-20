@@ -90,16 +90,11 @@ module.exports={
                                         "EmbeddingsSagemaker", 
                                         "1024",
                                         {
+
                                             "Fn::If": [
-                                                "EmbeddingsOpenAI", 
-                                                "1536", 
-                                                {
-                                                    "Fn::If": [
-                                                        "EmbeddingsLambda", 
-                                                        {"Ref": "EmbeddingsLambdaDimensions"},
-                                                        "INVALID EMBEDDINGS API - Cannot determine dimensions" 
-                                                    ]
-                                                }
+                                                "EmbeddingsLambda", 
+                                                {"Ref": "EmbeddingsLambdaDimensions"},
+                                                "INVALID EMBEDDINGS API - Cannot determine dimensions" 
                                             ]
                                         }
                                     ]

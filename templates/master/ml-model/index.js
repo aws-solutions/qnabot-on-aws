@@ -39,10 +39,20 @@ module.exports={
                             "ModelName"
                         ]
                     },
-                    "InitialInstanceCount": 1,
+                    "InitialInstanceCount": {"Fn::If": ["EmbeddingsSagemakerServerless", {"Ref":"AWS::NoValue"}, {"Ref":"SagemakerInitialInstanceCount"}]},
                     "InitialVariantWeight": 1,
-                    "InstanceType": "ml.m5.xlarge",
-                    "VariantName": "AllTraffic"
+                    "InstanceType": {"Fn::If": ["EmbeddingsSagemakerServerless", {"Ref":"AWS::NoValue"}, "ml.m5.xlarge"]},
+                    "VariantName": "AllTraffic",
+                    "ServerlessConfig": {
+                        "Fn::If": [
+                            "EmbeddingsSagemakerServerless",
+                            {
+                                "MaxConcurrency" : 50,
+                                "MemorySizeInMB" : 4096                               
+                            }, 
+                            {"Ref":"AWS::NoValue"}
+                        ]
+                    }
                 }
             ]
         }

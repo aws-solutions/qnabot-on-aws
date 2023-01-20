@@ -12,7 +12,6 @@
     "bluebird": "^3.5.1",
     "intercept-stdout": "^0.1.2",
     "lodash": "^4.17.19",
-    "xlsx": "^0.18.3",
-    "openai": "3.1.0"
+    "xlsx": "^0.18.3"
   }
 }

@@ -267,6 +267,9 @@ module.exports={
             ES_ADDRESS:{"Fn::GetAtt":["ESVar","ESAddress"]},
             DEFAULT_SETTINGS_PARAM:{"Ref":"DefaultQnABotSettings"},
             CUSTOM_SETTINGS_PARAM:{"Ref":"CustomQnABotSettings"},
+            EMBEDDINGS_API: { "Ref": "EmbeddingsApi" },
+            EMBEDDINGS_SAGEMAKER_ENDPOINT : {"Fn::If": ["EmbeddingsSagemaker", {"Fn::GetAtt":["QnABotSMEmbeddingEndpoint","EndpointName"]}, ""]},
+            EMBEDDINGS_LAMBDA_ARN: { "Ref": "EmbeddingsLambdaArn" },
           }
         },
         "Handler": "index.handler",
