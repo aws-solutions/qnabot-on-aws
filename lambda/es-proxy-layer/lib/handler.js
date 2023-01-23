@@ -87,9 +87,10 @@ async function run_query_es(event, settings) {
         qnabot.log("Max score is zero - no valid results")
         es_response.hits.hits = [] ;
     }
-    // apply topic tiebreaker to any equally ranked hits
-    if (es_response.hits.hits && es_response.hits.hits.length) {
-        const newhits = hits_topic_tiebreaker(query_params.topic, es_response.hits.hits);
+    // apply topic tiebreaker to any equally ranked hits in a question response
+    let question = _.get(event,'question','');
+    if (question.length > 0 && es_response.hits.hits && es_response.hits.hits.length) {
+        const newhits = hits_topic_tiebreaker(event.topic, es_response.hits.hits);
         es_response.hits.hits = newhits;
     }
     return es_response;
