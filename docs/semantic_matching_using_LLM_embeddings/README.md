@@ -55,7 +55,9 @@ When QnABot stack is installed, open Content Designer **Settings** page:
 
 **ES_USE_KEYWORD_FILTERS:** The setting `ES_USE_KEYWORD_FILTERS` should now default to `FALSE`. While you can use keyword filters with embeddings based semantic queries, they significantly limit the power of semantic search by forcing keyword matches (preventing matches based on different words with similar meanings).
 
-**ES_SCORE_ANSWER_FIELD:** If set to true, QnABot executes embedding vector searches on embedding generated on the concetenate content of both question and answer fields. Only the plain text answer field is used (not the Markdown or SSML alternatives). This allows QnABot to find matches based on the contents on the answer field as well as the questions.
+**ES_SCORE_ANSWER_FIELD:** If set to true, QnABot executes embedding vector searches on embeddings generated on answer field as well as question fields. This allows QnABot to find matches based on the contents on the answer field as well as the questions. Only the plain text answer field is used (not the Markdown or SSML alternatives). Scores for question match and answer match are added together to get the final score. Tune the relative weights of scores from question and answer respectively using additional settings:
+  - EMBEDDINGS_WEIGHT_QUESTION_FIELD - see below
+  - EMBEDDINGS_WEIGHT_ANSWER_FIELD - see below
 
 
 *Scroll to the bottom of the settings page and observe the new EMBEDDINGS settings:*
@@ -71,6 +73,8 @@ When QnABot stack is installed, open Content Designer **Settings** page:
   - Use the Content Designer TEST tab to see the hits ranked by score for your query results.
   - The default is 0.80 for now but you may well need to modify this based on your embedding model and your experiments.
 
+**EMBEDDINGS_WEIGHT_QUESTION_FIELD:** to tune weight for knn scores from question field matches. Modify the weight to scale question match scores up or down.
 
+**EMBEDDINGS_WEIGHT_ANSWER_FIELD:**  to tune weight for knn scores from answer field matches. Only applies when ES_SCORE_ANSWER_FIELD is true. Modify the weight to scale answer field match scores up or down.
 
 
