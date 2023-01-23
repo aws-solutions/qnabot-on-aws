@@ -1,14 +1,14 @@
-var Url=require('url');
-var Promise=require('bluebird');
-var request=require('./request');
-var _=require('lodash');
-var build_es_query=require('./esbodybuilder');
-var kendra = require('./kendraQuery');
+const Url=require('url');
+const Promise=require('bluebird');
+const request=require('./request');
+const _=require('lodash');
+const build_es_query=require('./esbodybuilder');
+const hits_topic_tiebreaker=require('./hits_topic_tiebreaker')
+const kendra = require('./kendraQuery');
 const qnabot = require("qnabot/logging")
 const qna_settings = require("qnabot/settings")
 const open_es = require("./es_query")
 const get_embeddings = require('./embeddings');
-const { findLastKey } = require('lodash');
 
 async function get_settings() {
     let settings = await qna_settings.merge_default_and_custom_settings();
@@ -16,57 +16,29 @@ async function get_settings() {
     return settings;
 }
 
-// add embeddings for each question in an add or modify item PUT query
+// add embeddings for each QID in an add or modify item PUT query
 async function build_additem_embeddings(event, settings) {
     if (settings.EMBEDDINGS_ENABLE == false) {
         console.log("EMBEDDINGS_ENABLE is false - query not modified");
         return event.body;
     }
-    const topic = _.get(event,"body.t");
-    const answer = _.get(event,"body.a");  
+    // question embeddings
     const questions = _.get(event,"body.questions",[]);
     var questions_with_embeddings = await Promise.all(questions.map(async x => {
-        const q_params = {
-            question: x.q,
-            topic: topic,
-            settings: settings
-        };
-        const q_embeddings = await get_embeddings(q_params);
-        // get embeddings for question + answer field to support ES_SCORE_ANSWER_FIELD true mode.
-        const qa_params = {
-            question: x.q + ". " + answer,
-            topic: topic,
-            settings: settings
-        };
-        const qa_embeddings = await get_embeddings(qa_params);
+        const q_embeddings = await get_embeddings(x.q, settings);
         return {
             q: x.q,
             q_vector: q_embeddings,
-            qa_vector: qa_embeddings
         }
     }));
     event.body.questions = questions_with_embeddings;
+    // answer embeddings
+    const answer = _.get(event,"body.a");
+    if (answer) {
+        event.body.a_vector = await get_embeddings(answer, settings);
+    }
     return event.body;
 }
-
-/*
-{
-    "endpoint": "search-qnaos-d-elasti-55f9xbclw5ox-dnkbx36pzqpx6regs2sidghbnu.us-east-1.es.amazonaws.com",
-    "method": "PUT",
-    "path": "/qnaos-dev-dev-master-8/0.test?refresh=wait_for",
-    "body": {
-        "qid": "0.test",
-        "quniqueterms": " new question  ",
-        "questions": [
-            {
-                "q": "new question"
-            }
-        ],
-        "a": "answer",
-        "type": "qna"
-    }
-}
-*/
 
 async function get_es_query(event, settings) {
     let question = _.get(event,'question','');
@@ -105,7 +77,6 @@ async function get_es_query(event, settings) {
 
 async function run_query_es(event, settings) {
     var es_query = await get_es_query(event, settings);
-    qnabot.log("ElasticSearch Query",JSON.stringify(es_query,null,2));
     var es_response = await request({
         url:Url.resolve("https://"+event.endpoint,event.path),
         method:event.method,
@@ -115,6 +86,11 @@ async function run_query_es(event, settings) {
     if (_.get(es_response, "hits.max_score") == 0) {
         qnabot.log("Max score is zero - no valid results")
         es_response.hits.hits = [] ;
+    }
+    // apply topic tiebreaker to any equally ranked hits
+    if (es_response.hits.hits && es_response.hits.hits.length) {
+        const newhits = hits_topic_tiebreaker(query_params.topic, es_response.hits.hits);
+        es_response.hits.hits = newhits;
     }
     return es_response;
 }
@@ -136,51 +112,37 @@ async function run_query_kendra(event, kendra_index) {
 }
 
 module.exports= async (event, context, callback) => {
-    try {
-        var settings = await get_settings();
-        qna_settings.set_environment_variables(settings)
-        qnabot.log('Received event:', JSON.stringify(event, null, 2));
+    var settings = await get_settings();
+    qna_settings.set_environment_variables(settings)
+    qnabot.log('Received event:', JSON.stringify(event, null, 2));
 
-        var kendra_index = _.get(settings, "KENDRA_FAQ_INDEX")
-        event.minimum_score = _.get(settings, 'ALT_SEARCH_KENDRA_FAQ_CONFIDENCE_SCORE', "MEDIUM")
-        var question = _.get(event,'question','');
-        var topic = _.get(event,'topic','');
-
-        let req = {
-           question: question,
-        }
-        //TODO: At some point we should expose a qnaClientFilter field in the
-        //Content Designer and pass the value here.
-        let params = {
-            topic: topic,
-            kendraIndex: kendra_index,
-            question: question
-        }
-        let okKendraQuery = !(await open_es.isESonly(req,params))
-        let response
-        if ( okKendraQuery ) {
-            response = await run_query_kendra(event, kendra_index);
-            // ES fallback if KendraFAQ fails
-            var hit = _.get(response, "hits.hits[0]._source");
-            if (!hit && _.get(settings, 'KENDRA_FAQ_ES_FALLBACK', false)){
-                qnabot.log("ES Fallback");
-                response = await run_query_es(event, settings);
-            }
-        }
-        else {
+    var kendra_index = _.get(settings, "KENDRA_FAQ_INDEX")
+    event.minimum_score = _.get(settings, 'ALT_SEARCH_KENDRA_FAQ_CONFIDENCE_SCORE', "MEDIUM")
+    var question = _.get(event,'question','');
+    var topic = _.get(event,'topic','');
+    
+    let req = {
+        question: question,    
+    }
+    //TODO: At some point we should expose a qnaClientFilter field in the
+    //Content Designer and pass the value here.
+    let params = {
+        topic: topic,
+        kendraIndex: kendra_index,
+        question: question
+    }
+    let okKendraQuery = !(await open_es.isESonly(req,params))
+    if ( okKendraQuery ) {
+        var response = await run_query_kendra(event, kendra_index);
+        // ES fallback if KendraFAQ fails
+        var hit = _.get(response, "hits.hits[0]._source");
+        if (!hit && _.get(settings, 'KENDRA_FAQ_ES_FALLBACK', false)){
+            qnabot.log("ES Fallback");
             response = await run_query_es(event, settings);
         }
-
-        qnabot.log("Query response: ", JSON.stringify(response,null,2));
-        return callback(null, response);
-    } catch (error) {
-
-        return callback(JSON.stringify({
-            type:_.get(error,"response.status") ===404 ? "[NotFound]":"[InternalServiceError]",
-            status:_.get(error,"response.status"),
-            message:_.get(error,"response.statusText"),
-            data:_.get(error,"response.data"),
-            error: error,
-        }))
+    } else {
+        var response = await run_query_es(event, settings);
     }
+    qnabot.log("Query response: ", JSON.stringify(response,null,2));
+    return callback(null, response);
 }

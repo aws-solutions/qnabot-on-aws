@@ -142,28 +142,13 @@ exports.step = function (event, context, cb) {
                                     }
                                     if (obj.type === 'qna') {
                                         try {
-                                            var topic = obj.t;
-                                            var answer = obj.a;
+                                            // question embeddings
                                             obj.questions = await Promise.all(obj.q.map(async x => {
-                                                // get embeddings for questions
-                                                const q_params = {
-                                                    question: x,
-                                                    topic: topic,
-                                                    settings: settings
-                                                };
-                                                const q_embeddings = await get_embeddings(q_params);
-                                                // get embeddings for question + answer field to support ES_SCORE_ANSWER_FIELD true mode.
-                                                const qa_params = {
-                                                    question: x + ". " + answer,
-                                                    topic: topic,
-                                                    settings: settings
-                                                };
-                                                const qa_embeddings = await get_embeddings(qa_params);
+                                                const q_embeddings = await get_embeddings(x, settings);
                                                 if (q_embeddings) {
                                                     return {
                                                         q: x,
                                                         q_vector: q_embeddings,
-                                                        qa_vector: qa_embeddings
                                                     }
                                                 } else {
                                                     return {
@@ -171,6 +156,11 @@ exports.step = function (event, context, cb) {
                                                     }                                                       
                                                 }
                                             }));
+                                            // answer embeddings
+                                            var answer = obj.a;
+                                            if (answer) {
+                                                obj.a_vector = await get_embeddings(answer, settings);
+                                            }
                                             obj.quniqueterms = obj.q.join(" ");
                                         } catch (err) {
                                             console.log("skipping question due to exception", err);
