@@ -26,7 +26,19 @@ module.exports={
                 "EmbeddingsApi": {"Ref": "EmbeddingsApi"},
                 "EmbeddingsLambdaDimensions": {"Ref": "EmbeddingsLambdaDimensions"},
                 "EmbeddingsLambdaArn": {"Ref": "EmbeddingsLambdaArn"},
-                "EmbeddingsSagemakerEndpoint": {"Fn::If": ["EmbeddingsSagemaker", {"Fn::GetAtt":["QnABotSMEmbeddingEndpoint","EndpointName"]}, ""]},
+                "EmbeddingsSagemakerEndpoint": {
+                    "Fn::If": [
+                        "EmbeddingsSagemakerProvisioned", 
+                        {"Fn::GetAtt":["QnABotSMProvisionedEmbeddingEndpoint","EndpointName"]}, 
+                        {
+                            "Fn::If": [
+                                "EmbeddingsSagemakerServerless", 
+                                {"Fn::GetAtt":["QnABotSMServerlessEmbeddingEndpoint","EndpointName"]},
+                                ""
+                            ]
+                        }
+                    ]
+                },
             }
         }
     }

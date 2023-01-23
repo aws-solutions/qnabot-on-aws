@@ -27,8 +27,8 @@ module.exports={
             }
         }
     },
-    "QnABotSMEmbeddingEndpointConfig": {
-        "Condition":"EmbeddingsSagemaker",
+    "QnABotSMProvisionedEmbeddingEndpointConfig": {
+        "Condition":"EmbeddingsSagemakerProvisioned",
         "Type": "AWS::SageMaker::EndpointConfig",
         "Properties": {
             "ProductionVariants": [
@@ -39,31 +39,55 @@ module.exports={
                             "ModelName"
                         ]
                     },
-                    "InitialInstanceCount": {"Fn::If": ["EmbeddingsSagemakerServerless", {"Ref":"AWS::NoValue"}, {"Ref":"SagemakerInitialInstanceCount"}]},
+                    "InitialInstanceCount": {"Ref":"SagemakerInitialInstanceCount"},
                     "InitialVariantWeight": 1,
-                    "InstanceType": {"Fn::If": ["EmbeddingsSagemakerServerless", {"Ref":"AWS::NoValue"}, "ml.m5.xlarge"]},
+                    "InstanceType": "ml.m5.xlarge",
+                    "VariantName": "AllTraffic",
+                }
+            ]
+        }
+    },
+    "QnABotSMServerlessEmbeddingEndpointConfig": {
+        "Condition":"EmbeddingsSagemakerServerless",
+        "Type": "AWS::SageMaker::EndpointConfig",
+        "Properties": {
+            "ProductionVariants": [
+                {
+                    "ModelName": {
+                        "Fn::GetAtt": [
+                            "QnABotSMEmbeddingModel",
+                            "ModelName"
+                        ]
+                    },
+                    "InitialVariantWeight": 1,
                     "VariantName": "AllTraffic",
                     "ServerlessConfig": {
-                        "Fn::If": [
-                            "EmbeddingsSagemakerServerless",
-                            {
-                                "MaxConcurrency" : 50,
-                                "MemorySizeInMB" : 4096                               
-                            }, 
-                            {"Ref":"AWS::NoValue"}
-                        ]
+                        "MaxConcurrency" : 50,
+                        "MemorySizeInMB" : 4096                               
                     }
                 }
             ]
         }
     },
-    "QnABotSMEmbeddingEndpoint": {
-        "Condition":"EmbeddingsSagemaker",
+    "QnABotSMProvisionedEmbeddingEndpoint": {
+        "Condition":"EmbeddingsSagemakerProvisioned",
         "Type": "AWS::SageMaker::Endpoint",
         "Properties": {
             "EndpointConfigName": {
                 "Fn::GetAtt": [
-                    "QnABotSMEmbeddingEndpointConfig",
+                    "QnABotSMProvisionedEmbeddingEndpointConfig",
+                    "EndpointConfigName"
+                ]
+            }
+        }
+    },
+    "QnABotSMServerlessEmbeddingEndpoint": {
+        "Condition":"EmbeddingsSagemakerServerless",
+        "Type": "AWS::SageMaker::Endpoint",
+        "Properties": {
+            "EndpointConfigName": {
+                "Fn::GetAtt": [
+                    "QnABotSMServerlessEmbeddingEndpointConfig",
                     "EndpointConfigName"
                 ]
             }

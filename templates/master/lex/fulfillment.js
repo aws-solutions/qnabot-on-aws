@@ -72,7 +72,19 @@ module.exports = {
           DEFAULT_SETTINGS_PARAM: { "Ref": "DefaultQnABotSettings" },
           CUSTOM_SETTINGS_PARAM: { "Ref": "CustomQnABotSettings" },
           EMBEDDINGS_API: { "Ref": "EmbeddingsApi" },
-          EMBEDDINGS_SAGEMAKER_ENDPOINT : {"Fn::If": ["EmbeddingsSagemaker", {"Fn::GetAtt":["QnABotSMEmbeddingEndpoint","EndpointName"]}, ""]},
+          EMBEDDINGS_SAGEMAKER_ENDPOINT : {
+            "Fn::If": [
+                "EmbeddingsSagemakerProvisioned", 
+                {"Fn::GetAtt":["QnABotSMProvisionedEmbeddingEndpoint","EndpointName"]}, 
+                {
+                    "Fn::If": [
+                        "EmbeddingsSagemakerServerless", 
+                        {"Fn::GetAtt":["QnABotSMServerlessEmbeddingEndpoint","EndpointName"]},
+                        ""
+                    ]
+                }
+            ]
+          },
           EMBEDDINGS_LAMBDA_ARN: { "Ref": "EmbeddingsLambdaArn" },
         }, examples, responsebots)
       },

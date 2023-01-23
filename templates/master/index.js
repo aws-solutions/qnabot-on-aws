@@ -304,7 +304,8 @@ module.exports={
     "SingleNode": {"Fn::Equals":[{"Ref":"ElasticSearchNodeCount"},"1"]},
     "EmbeddingsEnable":{"Fn::Not": [{ "Fn::Equals":[{"Ref":"EmbeddingsApi"},"DISABLED"]}]},
     "EmbeddingsSagemaker":{"Fn::Equals":[{"Ref":"EmbeddingsApi"},"SAGEMAKER"]},
-    "EmbeddingsSagemakerServerless":{"Fn::Equals":[{"Ref":"SagemakerInitialInstanceCount"},0]},
+    "EmbeddingsSagemakerServerless":{"Fn::And": [{"Condition": "EmbeddingsSagemaker"}, {"Fn::Equals":[{"Ref":"SagemakerInitialInstanceCount"},0]}]},
+    "EmbeddingsSagemakerProvisioned":{"Fn::And": [{"Condition": "EmbeddingsSagemaker"}, {"Fn::Not": [{"Fn::Equals":[{"Ref":"SagemakerInitialInstanceCount"},0]}]}]},
     "EmbeddingsLambda":{"Fn::Equals":[{"Ref":"EmbeddingsApi"},"LAMBDA"]},
     "EmbeddingsLambdaArn":{"Fn::Not": [{ "Fn::Equals":[{"Ref":"EmbeddingsLambdaArn"},""]}]}
   }

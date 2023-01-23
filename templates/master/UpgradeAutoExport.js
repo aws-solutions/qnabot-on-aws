@@ -19,7 +19,19 @@ module.exports={
                 "Fn::Sub":[
                     "${EmbeddingsApi} ${EmbeddingsLambdaDimensions} ${EmbeddingsLambdaArn} ${SMEmbeddingEndpoint}",
                     {
-                        "SMEmbeddingEndpoint": {"Fn::If": ["EmbeddingsSagemaker", {"Fn::GetAtt":["QnABotSMEmbeddingEndpoint","EndpointName"]}, ""]}
+                        "SMEmbeddingEndpoint": {
+                            "Fn::If": [
+                                "EmbeddingsSagemakerProvisioned", 
+                                {"Fn::GetAtt":["QnABotSMProvisionedEmbeddingEndpoint","EndpointName"]}, 
+                                {
+                                    "Fn::If": [
+                                        "EmbeddingsSagemakerServerless", 
+                                        {"Fn::GetAtt":["QnABotSMServerlessEmbeddingEndpoint","EndpointName"]},
+                                        ""
+                                    ]
+                                }
+                            ]
+                        }
                     }
                 ]
             }

@@ -142,7 +142,8 @@ module.exports=Promise.resolve(require('../master')).then(function(base){
         ] }
     base.Conditions.EmbeddingsEnable= {"Fn::Not": [{ "Fn::Equals":[{"Ref":"EmbeddingsApi"},"DISABLED"]}]}
     base.Conditions.EmbeddingsSagemaker = {"Fn::Equals":[{"Ref":"EmbeddingsApi"},"SAGEMAKER"]}
-    base.Conditions.EmbeddingsSagemakerServerless = {"Fn::Equals":[{"Ref":"SagemakerInitialInstanceCount"},0]}
+    base.Conditions.EmbeddingsSagemakerProvisioned = {"Fn::And": [{"Condition": "EmbeddingsSagemaker"}, {"Fn::Not": [{"Fn::Equals":[{"Ref":"SagemakerInitialInstanceCount"},0]}]}]}
+    base.Conditions.EmbeddingsSagemakerServerless = {"Fn::And": [{"Condition": "EmbeddingsSagemaker"}, {"Fn::Equals":[{"Ref":"SagemakerInitialInstanceCount"},0]}]}
     base.Conditions.EmbeddingsLambda = {"Fn::Equals":[{"Ref":"EmbeddingsApi"},"LAMBDA"]}
     base.Conditions.EmbeddingsLambdaArn = {"Fn::Not": [{ "Fn::Equals":[{"Ref":"EmbeddingsLambdaArn"},""]}]}
 
