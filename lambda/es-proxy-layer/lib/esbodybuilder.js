@@ -128,7 +128,6 @@ function build_query(params) {
                   a_vector: {
                     k: _.get(params, 'settings.EMBEDDINGS_KNN_K', 10),
                     vector: await get_embeddings(params.question, params.settings),
-                    boost: a_boost
                   }
                 }
               },
