@@ -1,6 +1,8 @@
 
+// returns true if score is withing tolerance of top_score
 function is_score_match(score, top_score) {
-    return (score == top_score);
+    const diff_tolerance = 0.0001;
+    return ((score + diff_tolerance) >= top_score);
 }
 
 // splits topic strings and checks for any word overlap indicating a topic match - case insensitive
@@ -44,6 +46,8 @@ function hits_topic_tiebreaker(topic, hits) {
     while (i < hits.length) {
         // compare score of each hit to score of topd ranked item (index 0)
         if (is_score_match(hits[i]._score, hits[0]._score)) {
+            // if score is within match tolerance, set it to equal top score
+            hits[i]._score = hits[0]._score;
             equal_hits.push(hits[i]);
         } else {
             break;
