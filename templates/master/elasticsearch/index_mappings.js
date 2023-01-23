@@ -22,21 +22,21 @@ module.exports={
                         "space_type": "cosinesimil",
                         "engine": "nmslib"
                     }
-                },
-                "qa_vector": { 
-                    "type": "knn_vector",
-                    "dimension": '${EmbeddingsDimensions}',  // Use Cfn Param
-                    "method": {
-                        "name": "hnsw",
-                        "space_type": "cosinesimil",
-                        "engine": "nmslib"
-                    }
-                }  
+                }
             }
         },
         a:{
             type:"text",
             analyzer:"custom_english"
+        },
+        a_vector: { 
+            "type": "knn_vector",
+            "dimension": '${EmbeddingsDimensions}', 
+            "method": {
+                "name": "hnsw",
+                "space_type": "cosinesimil",
+                "engine": "nmslib"
+            }
         },
         t:{
             type:'text',analyzer:"whitespace" 

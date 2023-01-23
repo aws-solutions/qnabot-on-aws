@@ -77,7 +77,9 @@ var default_settings = {
     LAMBDA_POSTPROCESS_HOOK: '',
     SEARCH_REPLACE_QUESTION_SUBSTRINGS: '',
     EMBEDDINGS_ENABLE: '${EMBEDDINGS_ENABLE}', // Set to TRUE or FALSE to enable or disable use of embeddings for semantic search
-    EMBEDDINGS_SCORE_THRESHOLD: 0.80, // If embedding similarity score is under threshold the match it srejected and QnABot reverts to Kendra fallback or no_hits
+    EMBEDDINGS_SCORE_THRESHOLD: 0.80, // If embedding similarity score is under threshold the match it is rejected and QnABot reverts to Kendra fallback or no_hits
+    EMBEDDINGS_WEIGHT_QUESTION_FIELD: 1.0, // Multiplier weight for knn scores from question field matches. 
+    EMBEDDINGS_WEIGHT_ANSWER_FIELD: 0.5, // Multiplier weight for knn scores from answer field matches. Only applies when ES_SCORE_ANSWER_FIELD is TRUE
 };
 
 module.exports = {

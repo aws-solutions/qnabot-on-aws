@@ -1,6 +1,7 @@
 
 let request = require('./request');
 let build_es_query = require('./esbodybuilder');
+let hits_topic_tiebreaker=require('./hits_topic_tiebreaker')
 let _ = require('lodash')
 const qnabot = require("qnabot/logging")
 
@@ -39,7 +40,11 @@ async function  isESonly(req, query_params) {
 
 
 async function run_query_es(req, query_params) {
-    
+    // if size is 1, change to 10 to allow for topic tiebreaking on results before choosing top hit
+    const size = query_params.size ;
+    if (size == 1) {
+        query_params.size = 10;
+    }
     var es_query = await build_es_query(query_params);
     var es_response = await request({
         url: `https://${req._info.es.address}/${req._info.es.index}/_search?search_type=dfs_query_then_fetch`,
@@ -47,7 +52,12 @@ async function run_query_es(req, query_params) {
         body: es_query
     });
 
-    qnabot.log(`Response from run_query_es => ${JSON.stringify(es_response)}` )
+    // apply topic tiebreaker to any equally ranked hits, and trim to desired size
+    if (es_response.hits.hits && es_response.hits.hits.length) {
+        const newhits = hits_topic_tiebreaker(query_params.topic, es_response.hits.hits);
+        es_response.hits.hits = newhits.slice(0,size);
+    }
+    qnabot.log(`Response from run_query_es, after applying topic tiebreaker => ${JSON.stringify(es_response)}` )
 
     if (_.get(es_response, "hits.hits[0]._source")) {
         _.set(es_response, "hits.hits[0]._source.answersource", "ElasticSearch");

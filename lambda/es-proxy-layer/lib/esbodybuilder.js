@@ -97,27 +97,47 @@ function build_query(params) {
         ).filterMinimumShouldMatch(1);
 
       if (_.get(params, 'settings.EMBEDDINGS_ENABLE')) {
-        // do KNN embedding match for semantic similarity
-        let vector = "questions.q_vector";
-        if (_.get(params, 'score_answer_field')) {
-          vector = "questions.qa_vector";
-        }
+        q_weight = _.get(params, 'settings.EMBEDDINGS_WEIGHT_QUESTION_FIELD', 1.0)
+        a_weight = _.get(params, 'settings.EMBEDDINGS_WEIGHT_ANSWER_FIELD', 0.5)
+        // do KNN embedding match on questions for semantic similarity
         query = query.orQuery(
-          'nested', {
-            score_mode: 'max',
-            path: 'questions',
+          'function_score', {
             query: {
-              knn: {
-                [vector]: {
-                  k: _.get(params, 'settings.EMBEDDINGS_KNN_K', 10),
-                  vector: await get_embeddings(params)
+              nested: {
+                score_mode: 'max',
+                path: 'questions',
+                query: {
+                  knn: {
+                    "questions.q_vector": {
+                      k: _.get(params, 'settings.EMBEDDINGS_KNN_K', 10),
+                      vector: await get_embeddings(params.question, params.settings)
+                    }
+                  }
                 }
               }
-            }
+            },
+            weight: q_weight
           }
         );
+        if (_.get(params, 'score_answer_field')) {
+          // add semantic query on answer field as well, with specified score weighting
+          query = query.orQuery(
+            'function_score', {
+              query: {
+                knn: {
+                  a_vector: {
+                    k: _.get(params, 'settings.EMBEDDINGS_KNN_K', 10),
+                    vector: await get_embeddings(params.question, params.settings),
+                    boost: a_boost
+                  }
+                }
+              },
+              weight: a_weight
+            }
+          );
+        }
       } else {
-        // do terms and phrase matches on question instead, and add topic filters
+        // do terms and phrase matches on question instead
         query = query.orQuery(
           'match', match_query
         );
@@ -132,35 +152,6 @@ function build_query(params) {
         if (_.get(params, 'score_answer_field')) {
           query = query.orQuery('match', 'a', params.question);
         }
-        let topic = _.get(params, 'topic');
-        if (topic) {
-          query = query.orQuery('match', 't', topic);
-        } else {
-          // no topic - query prefers answers with empty/missing topic field for predicable response
-          // NOTE: will not work in Kendra FAQ mode since we have no equivalent Kendra query
-          query = query.orQuery(
-            'bool', {
-              "should" : [
-                { 
-                  "match_all": {
-                  } 
-                },
-                {
-                  "bool": {
-                    "must_not": [
-                        {
-                            "exists": {
-                                "field": "t"
-                            }
-                        }
-                    ]
-                  }
-                }          
-              ],
-              "minimum_should_match" : 2
-            }      
-          ) ;
-        }
       }
       query = query
         .from(_.get(params, 'from', 0))
@@ -169,7 +160,7 @@ function build_query(params) {
       qnabot.log("ElasticSearch Query: ", JSON.stringify(query, null, 2));
       return new Promise.resolve(query);
     });
-    }
+  }
 
 
 module.exports = function (params) {
