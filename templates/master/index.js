@@ -268,6 +268,7 @@ module.exports={
     },
     "SagemakerInitialInstanceCount":{
       "Type":"Number",
+      "MinValue":0,
       "Description":"Optional: If EmbeddingsApi is SAGEMAKER, provide initial instance count. Set to '0' to enable Serverless Inference (for cold-start delay tolerant deployments only).",
       "Default":1
     },
@@ -279,6 +280,7 @@ module.exports={
     },
     "EmbeddingsLambdaDimensions":{
       "Type":"Number",
+      "MinValue":1,
       "Description":"Optional: If EmbeddingsApi is LAMBDA, provide number of dimensions for embeddings returned by the EmbeddingsLambda function specified above.",
       "Default":4096
     }
