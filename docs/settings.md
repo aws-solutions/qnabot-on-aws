@@ -77,5 +77,6 @@
 | SEARCH_REPLACE_QUESTION_SUBSTRINGS | string | replace words or phrases in user questions by defining search/replace pairs in a JSON object like: {"searchString":"replaceString"}. Add additional pairs separated by commas, like: {"searchString":"replaceString", "searchString2":"replaceString2"}.
 | EMBEDDINGS_ENABLE | true or false | Disable use of semantic search using embeddings. Set to TRIE only if QnABot stack was deployed with embeddings enabled.
 | EMBEDDINGS_SCORE_THRESHOLD | 0-1 | Unlike regular elasticsearch queries, embeddings queries always return scores between 0 and 1, so we can apply a threshold to separate good from bad results. If embedding similarity score is under threshold the match it's rejected and QnABot reverts to Kendra fallback or no_hits. Use the Content Designer TEST tab to see the hits ranked by score for your query results.
-
+| EMBEDDINGS_WEIGHT_QUESTION_FIELD | 0-N | Multiplier weight for knn scores from question field matches. Only applies when EMBEDDINGS_ENABLE is TRUE. 
+| EMBEDDINGS_WEIGHT_ANSWER_FIELD | 0-N | Multiplier weight for knn scores from answer field matches. Only applies when EMBEDDINGS_ENABLE and ES_SCORE_ANSWER_FIELD are both TRUE
 
