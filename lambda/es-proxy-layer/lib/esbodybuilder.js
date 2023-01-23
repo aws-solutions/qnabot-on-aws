@@ -136,7 +136,7 @@ function build_query(params) {
           );
         }
       } else {
-        // do terms and phrase matches on question instead
+        // do terms and phrase matches on question instead, and add topic filters
         query = query.orQuery(
           'match', match_query
         );
@@ -150,6 +150,35 @@ function build_query(params) {
         );
         if (_.get(params, 'score_answer_field')) {
           query = query.orQuery('match', 'a', params.question);
+        }
+        let topic = _.get(params, 'topic');
+        if (topic) {
+          query = query.orQuery('match', 't', topic);
+        } else {
+          // no topic - query prefers answers with empty/missing topic field for predicable response
+          // NOTE: will not work in Kendra FAQ mode since we have no equivalent Kendra query
+          query = query.orQuery(
+            'bool', {
+              "should" : [
+                { 
+                  "match_all": {
+                  } 
+                },
+                {
+                  "bool": {
+                    "must_not": [
+                        {
+                            "exists": {
+                                "field": "t"
+                            }
+                        }
+                    ]
+                  }
+                }          
+              ],
+              "minimum_should_match" : 2
+            }      
+          ) ;
         }
       }
       query = query
