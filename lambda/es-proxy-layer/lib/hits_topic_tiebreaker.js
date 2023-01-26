@@ -1,7 +1,7 @@
 
 // returns true if score is within tolerance of top_score
 function is_score_match(score, top_score) {
-    const diff_tolerance = 0.0001;
+    const diff_tolerance = process.env.TOPIC_TIEBREAKER_SCORE_DIFF_TOLERANCE || 0.001;  
     return ((score + diff_tolerance) >= top_score);
 }
 
