@@ -110,7 +110,7 @@ function build_query(params) {
                   knn: {
                     "questions.q_vector": {
                       k: _.get(params, 'settings.EMBEDDINGS_KNN_K', 10),
-                      vector: await get_embeddings(params.question, params.settings)
+                      vector: await get_embeddings("q", params.question, params.settings)
                     }
                   }
                 }
@@ -127,7 +127,7 @@ function build_query(params) {
                 knn: {
                   a_vector: {
                     k: _.get(params, 'settings.EMBEDDINGS_KNN_K', 10),
-                    vector: await get_embeddings(params.question, params.settings),
+                    vector: await get_embeddings("q", params.question, params.settings),
                   }
                 }
               },
