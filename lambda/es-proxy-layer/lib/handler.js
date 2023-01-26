@@ -25,7 +25,7 @@ async function build_additem_embeddings(event, settings) {
     // question embeddings
     const questions = _.get(event,"body.questions",[]);
     var questions_with_embeddings = await Promise.all(questions.map(async x => {
-        const q_embeddings = await get_embeddings(x.q, settings);
+        const q_embeddings = await get_embeddings("q", x.q, settings);
         return {
             q: x.q,
             q_vector: q_embeddings,
@@ -35,7 +35,7 @@ async function build_additem_embeddings(event, settings) {
     // answer embeddings
     const answer = _.get(event,"body.a");
     if (answer) {
-        event.body.a_vector = await get_embeddings(answer, settings);
+        event.body.a_vector = await get_embeddings("a", answer, settings);
     }
     return event.body;
 }

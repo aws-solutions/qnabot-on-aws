@@ -144,7 +144,7 @@ exports.step = function (event, context, cb) {
                                         try {
                                             // question embeddings
                                             obj.questions = await Promise.all(obj.q.map(async x => {
-                                                const q_embeddings = await get_embeddings(x, settings);
+                                                const q_embeddings = await get_embeddings("q", x, settings);
                                                 if (q_embeddings) {
                                                     return {
                                                         q: x,
@@ -159,7 +159,7 @@ exports.step = function (event, context, cb) {
                                             // answer embeddings
                                             var answer = obj.a;
                                             if (answer) {
-                                                obj.a_vector = await get_embeddings(answer, settings);
+                                                obj.a_vector = await get_embeddings("a", answer, settings);
                                             }
                                             obj.quniqueterms = obj.q.join(" ");
                                         } catch (err) {

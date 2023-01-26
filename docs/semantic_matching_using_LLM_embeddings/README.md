@@ -39,7 +39,10 @@ Use a custom Lambda function to use any Embedding API or embedding model on Sage
 
 Your Lambda function is passed an event of the form:
 ```
-{"inputtext":"string"}
+{
+  "inputtype": "string", // value 'q' for question, 'a' for answer
+  "inputtext":"string"   // string of question of answer to use to generate embeddings 
+}
 ```
 and must return a JSON structure of the form:
 ```
