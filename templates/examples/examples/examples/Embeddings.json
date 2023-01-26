@@ -1,0 +1,23 @@
+﻿{
+  "qna": [
+    {
+      "qid": "Enbeddings.WhiteHouse",
+      "a": "1700 Pennsylvania ave.",
+      "type": "qna",
+      "q": [
+        "What is the location of the white house"
+      ]
+    },
+    {
+      "qid": "Embeddings.Agent",
+      "a": "Ok. Let me route you to a representative who can assist you. {{setSessionAttr 'nextAction' 'AGENT'}}",
+      "type": "qna",
+      "q": [
+        "I want to speak to an agent",
+        "Representative",
+        "Operator please",
+        "zero"
+      ]
+    }
+  ]
+}
