@@ -137,21 +137,27 @@ module.exports=Object.assign(
               ]
             }
           },
-          {
-            "PolicyName" : "SagemakerInvokeEndpointAccess",
-            "PolicyDocument" : {
-            "Version": "2012-10-17",
-              "Statement": [
-                {
-                    "Effect": "Allow",
-                    "Action": [
-                        "sagemaker:InvokeEndpoint"
-                     ],
-                    "Resource": "*"
+          { 
+            "Fn::If": [
+              "EmbeddingsSagemaker",
+              {
+                "PolicyName" : "SagemakerEmbeddingsPolicy",
+                "PolicyDocument" : {
+                "Version": "2012-10-17",
+                  "Statement": [ 
+                    {
+                        "Effect": "Allow",
+                        "Action": [
+                            "sagemaker:InvokeEndpoint"
+                        ],
+                        "Resource": {"Ref":"EmbeddingsSagemakerEndpointArn"}
+                    }
+                  ]
                 }
-              ]
-            }
-          },
+              },
+              {"Ref":"AWS::NoValue"}
+            ]
+          }
         ],
         "ManagedPolicyArns": [
           {"Ref":"ImportPolicy"}

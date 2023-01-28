@@ -39,6 +39,19 @@ module.exports={
                         }
                     ]
                 },
+                "EmbeddingsSagemakerEndpointArn": {
+                    "Fn::If": [
+                        "EmbeddingsSagemakerProvisioned", 
+                        {"Ref":"QnABotSMProvisionedEmbeddingEndpoint"}, 
+                        {
+                            "Fn::If": [
+                                "EmbeddingsSagemakerServerless", 
+                                {"Ref":"QnABotSMServerlessEmbeddingEndpoint"},
+                                ""
+                            ]
+                        }
+                    ]
+                },
             }
         }
     }
