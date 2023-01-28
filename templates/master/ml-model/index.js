@@ -11,10 +11,9 @@ module.exports={
                 "Image": {
                     "Fn::Sub": "763104351884.dkr.ecr.${AWS::Region}.amazonaws.com/huggingface-pytorch-inference:1.10.2-transformers4.17.0-cpu-py38-ubuntu20.04"
                 },
+                "ModelDataUrl":{"Fn::Sub":"s3://${BootstrapBucket}/${BootstrapPrefix}/ml_model/e5-large.tar.gz"},
                 "Mode": "SingleModel",
                 "Environment": {
-                    "HF_MODEL_ID":"intfloat/e5-large",
-                    "HF_TASK":"feature-extraction",
                     "SAGEMAKER_CONTAINER_LOG_LEVEL":"20",
                     "SAGEMAKER_REGION":{"Ref":"AWS::Region"},
                 }
