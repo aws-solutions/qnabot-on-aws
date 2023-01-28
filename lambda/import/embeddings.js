@@ -20,7 +20,7 @@ const get_embeddings_sm = async function get_embeddings_sm(type_q_or_a, input, s
         Body: body,
     }).promise();
     const sm_body = JSON.parse(Buffer.from(smres.Body, 'utf-8').toString());
-    return sm_body[0][0];
+    return sm_body.vectors;
 }
 
 const get_embeddings_lambda = async function get_embeddings_lambda(type_q_or_a, input, settings) {

@@ -1,13 +1,13 @@
 TEMPLATES=$(shell for l in $$(ls ./templates | egrep -v "util|lib|README.md");do echo templates/$$l;done)
 
-All: assets templates lambda website make_directories
+All: ml_model assets templates lambda website make_directories
 
 build: All
 
 make_directories:
-	mkdir -p build/lambda build/documents build/templates/test  build/templates/dev
+	mkdir -p build/ml_model build/lambda build/documents build/templates/test  build/templates/dev
 
-.PHONY: lambda templates upload website test bootstrap assets config.aws-solutions.json
+.PHONY: ml_model lambda templates upload website test bootstrap assets config.aws-solutions.json
 .PHONY: $(TEMPLATES)
 
 config.json:
@@ -15,6 +15,9 @@ config.json:
 
 config.aws-solutions.json:
 	node bin/config.js buildType=AWSSolutions > config.json
+
+ml_model:  make_directories
+	make -C ./ml_model
 
 lambda:  make_directories
 	make -C ./lambda
@@ -36,7 +39,7 @@ assets: make_directories
 samples:docs/blog-samples.json make_directories
 	cp docs/blog-samples.json build/documents
 
-upload: templates lambda website make_directories assets
+upload: ml_model templates lambda website make_directories assets
 	./bin/upload.sh
 
 test: make_directories
