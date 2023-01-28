@@ -342,33 +342,51 @@ module.exports={
           		}]
           	}
           },
-          {
-            "PolicyName" : "EmbeddingsPolicy",
-            "PolicyDocument" : {
-            "Version": "2012-10-17",
-              "Statement": [
-                {
-                    "Effect": "Allow",
-                    "Action": [
-                        "sagemaker:InvokeEndpoint"
-                     ],
-                    "Resource": "*"
-                },
-                { 
-                  "Fn::If": [
-                    "EmbeddingsLambdaArn", 
-                    {
-                      "Effect": "Allow",
-                      "Action": [
-                        "lambda:InvokeFunction"
-                      ],
-                      "Resource":[{"Ref":"EmbeddingsLambdaArn"}]
+          { 
+            "Fn::If": [
+              "EmbeddingsEnable",
+              {
+                "PolicyName" : "EmbeddingsPolicy",
+                "PolicyDocument" : {
+                "Version": "2012-10-17",
+                  "Statement": [
+                    { 
+                      "Fn::If": [
+                        "EmbeddingsSagemaker", 
+                        {
+                            "Effect": "Allow",
+                            "Action": [
+                                "sagemaker:InvokeEndpoint"
+                            ],
+                            "Resource": {
+                              "Fn::If": [
+                                  "EmbeddingsSagemakerProvisioned", 
+                                  {"Ref":"QnABotSMProvisionedEmbeddingEndpoint"}, 
+                                  {"Ref":"QnABotSMServerlessEmbeddingEndpoint"}
+                              ]
+                          }
+                        },
+                        {"Ref":"AWS::NoValue"}
+                      ]
                     },
-                    {"Ref":"AWS::NoValue"}
+                    { 
+                      "Fn::If": [
+                        "EmbeddingsLambdaArn", 
+                        {
+                          "Effect": "Allow",
+                          "Action": [
+                            "lambda:InvokeFunction"
+                          ],
+                          "Resource":[{"Ref":"EmbeddingsLambdaArn"}]
+                        },
+                        {"Ref":"AWS::NoValue"}
+                      ]
+                    },
                   ]
-                },
-              ]
-            }
+                }
+              },
+              {"Ref":"AWS::NoValue"}
+            ]
           },
           {
             "PolicyName" : "S3QNABucketReadAccess",

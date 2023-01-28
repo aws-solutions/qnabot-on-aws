@@ -34,12 +34,14 @@ module.exports={
         "EmbeddingsLambdaDimensions": {"Type": "String"},
         "EmbeddingsLambdaArn": {"Type": "String"},
         "EmbeddingsSagemakerEndpoint": {"Type": "String"},
+        "EmbeddingsSagemakerEndpointArn": {"Type": "String"}
     },
     "Conditions": {
         "VPCEnabled": { "Fn::Not": [
                 { "Fn::Equals": [ "", { "Ref": "VPCSecurityGroupIdList" } ] }
             ] },
         "XRAYEnabled":{"Fn::Equals":[{"Ref":"XraySetting"},"TRUE"]},
-        "EmbeddingsLambdaArn":{"Fn::Not": [{ "Fn::Equals":[{"Ref":"EmbeddingsLambdaArn"},""]}]}
+        "EmbeddingsLambdaArn":{"Fn::Not": [{ "Fn::Equals":[{"Ref":"EmbeddingsLambdaArn"},""]}]},
+        "EmbeddingsSagemaker":{"Fn::Not": [{ "Fn::Equals":[{"Ref":"EmbeddingsSagemakerEndpointArn"},""]}]}
     }
 }

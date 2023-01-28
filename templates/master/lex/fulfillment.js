@@ -254,20 +254,32 @@ module.exports = {
             }]
           }
         },
-        {
-          "PolicyName" : "SagemakerInvokeEndpointAccess",
-          "PolicyDocument" : {
-          "Version": "2012-10-17",
-            "Statement": [
-              {
-                  "Effect": "Allow",
-                  "Action": [
-                      "sagemaker:InvokeEndpoint"
-                   ],
-                  "Resource": "*"
+        { 
+          "Fn::If": [
+            "EmbeddingsSagemaker", 
+            {
+              "PolicyName" : "SagemakerInvokeEndpointAccess",
+              "PolicyDocument" : {
+              "Version": "2012-10-17",
+                "Statement": [
+                  { 
+                    "Effect": "Allow",
+                    "Action": [
+                        "sagemaker:InvokeEndpoint"
+                    ],
+                    "Resource": {
+                      "Fn::If": [
+                          "EmbeddingsSagemakerProvisioned", 
+                          {"Ref":"QnABotSMProvisionedEmbeddingEndpoint"}, 
+                          {"Ref":"QnABotSMServerlessEmbeddingEndpoint"}
+                      ]
+                    }
+                  }
+                ]
               }
-            ]
-          }
+            },
+            {"Ref":"AWS::NoValue"}
+          ]
         },
         {
           "PolicyName" : "S3QNABucketReadAccess",
