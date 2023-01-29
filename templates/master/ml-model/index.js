@@ -3,6 +3,15 @@ var _=require('lodash');
 const util = require('../../util');
 
 module.exports={
+    "QnABotSMModelTarVersion": {
+        "Type": "Custom::S3Version",
+        "Properties": {
+          "ServiceToken": { "Fn::GetAtt": ["CFNLambda", "Arn"] },
+          "Bucket": { "Ref": "BootstrapBucket" },
+          "Key": { "Fn::Sub": "${BootstrapPrefix}/ml_model/e5-large.tar.gz" },
+          "BuildDate": (new Date()).toISOString()
+        }
+      },
     "QnABotSMEmbeddingModel": {
         "Condition":"EmbeddingsSagemaker",
         "Type": "AWS::SageMaker::Model",
@@ -16,6 +25,7 @@ module.exports={
                 "Environment": {
                     "SAGEMAKER_CONTAINER_LOG_LEVEL":"20",
                     "SAGEMAKER_REGION":{"Ref":"AWS::Region"},
+                    "S3_MODEL_DATA_VERSION": {"Ref":"QnABotSMModelTarVersion"}, // force model replace when new version of tar file is available
                 }
             },
             "ExecutionRoleArn": {

@@ -2,6 +2,7 @@ import time
 import torch
 from torch import Tensor
 from transformers import AutoTokenizer, AutoModel
+import torch.nn.functional as F
 
 def model_fn(model_dir):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -23,13 +24,16 @@ def embed_tformer(model, tokenizer, sentences):
     #Compute token embeddings
     with torch.no_grad():
         model_output = model(**encoded_input)
-    sentence_embeddings = average_pool(model_output.last_hidden_state, encoded_input['attention_mask'])
-    return sentence_embeddings
+    embeddings = average_pool(model_output.last_hidden_state, encoded_input['attention_mask'])
+    # Normalize  embeddings
+    embeddings = F.normalize(embeddings, p=2, dim=1)
+    return embeddings
 
 def predict_fn(data, model):
     start_time = time.time()
     sentences = data.pop("inputs", data)
-    sentence_embeddings = embed_tformer(model['model'], model['tokenizer'], sentences)
+    embeddings = embed_tformer(model['model'], model['tokenizer'], sentences)
     print("--- Inference time: %s seconds ---" % (time.time() - start_time))
-    response = sentence_embeddings[0].tolist()
-    return {"vectors": sentence_embeddings[0].tolist()}
+    response = embeddings[0].tolist()
+    print("--- Inference + Normalization time: %s seconds ---" % (time.time() - start_time))
+    return {"vectors": response}
