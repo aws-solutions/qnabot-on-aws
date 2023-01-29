@@ -126,7 +126,6 @@ exports.step = function (event, context, cb) {
                         }
                         var out = []
                         for (const x of objects) {
-                            console.log('inside import an object')
                             try {
                                 var obj = JSON.parse(x)
                                 var timestamp = _.get(obj, 'datetime', "");
