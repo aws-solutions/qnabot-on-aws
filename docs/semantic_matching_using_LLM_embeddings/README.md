@@ -74,10 +74,11 @@ When QnABot stack is installed, open Content Designer **Settings** page:
 **EMBEDDINGS_SCORE_THRESHOLD:** to customize the score threshold, change the value of `EMBEDDINGS_SCORE_THRESHOLD`. Unlike regular elasticsearch queries, embeddings queries always return scores between 0 and 1, so we can apply a threshold to separate good from bad results. 
   - If embedding similarity score is under threshold the match it's rejected and QnABot reverts to Kendra fallback or no_hits
   - Use the Content Designer TEST tab to see the hits ranked by score for your query results.
-  - The default is 0.80 for now but you may well need to modify this based on your embedding model and your experiments.
+  - The default is 0.85 for now but you may well need to modify this based on your embedding model and your experiments.
 
 **EMBEDDINGS_WEIGHT_QUESTION_FIELD:** to tune weight for knn scores from question field matches. Modify the weight to scale question match scores up or down.
 
 **EMBEDDINGS_WEIGHT_ANSWER_FIELD:**  to tune weight for knn scores from answer field matches. Only applies when ES_SCORE_ANSWER_FIELD is true. Modify the weight to scale answer field match scores up or down.
 
+**EMBEDDINGS_QUERY_PASSAGE_PREFIX_STRINGS:** if 'true', strings are prefixed by 'query: ' for questions, and 'passage: ' for answers - see examples at https://huggingface.co/intfloat/e5-large. Applies only when using SAGEMAKER EmbeddingsApi. The default is currently 'false' since we seen better distance in scores between correct and incorrect answers. Please Experiment! If you use ES_SCORE_ANSWER_FIELD 'true' you'll get better scoring consistency from answer matches if this setting is 'true'.  When changing this setting value, you must regenerate stored embeddings by exporting/importing all items.
 
