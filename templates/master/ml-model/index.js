@@ -123,6 +123,25 @@ module.exports={
                 "Version": "2012-10-17"
             },
             "Path": "/",
+            "Policies": [
+                {
+                    "PolicyName": "S3Policy",
+                    "PolicyDocument": {
+                        "Version": "2012-10-17",
+                        "Statement": [
+                            {
+                                "Effect": "Allow",
+                                "Action": [
+                                    "s3:GetObject"
+                                 ],
+                                "Resource": [
+                                    {"Fn::Sub":"arn:aws:s3:::${BootstrapBucket}/${BootstrapPrefix}/ml_model/e5-large.tar.gz"}
+                                ]                      
+                            }
+                        ]
+                    }
+                }                
+            ],
             "ManagedPolicyArns": [
                 "arn:aws:iam::aws:policy/AmazonSageMakerFullAccess"
             ]
