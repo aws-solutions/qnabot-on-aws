@@ -11,6 +11,7 @@ function build_qid_query(params) {
   qnabot.log("Build_qid_query - params: ", JSON.stringify(params, null, 2));
   const query = bodybuilder()
     .orQuery('match', 'qid', params.qid)
+    .rawOption("_source",{"exclude": ["questions.q_vector", "a_vector"]})
     .from(0)
     .size(1)
     .build();
@@ -182,6 +183,7 @@ function build_query(params) {
         }
       }
       query = query
+        .rawOption("_source",{"exclude": ["questions.q_vector", "a_vector"]})
         .from(_.get(params, 'from', 0))
         .size(_.get(params, 'size', 1))
         .build();

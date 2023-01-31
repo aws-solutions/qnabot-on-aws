@@ -27,7 +27,6 @@ module.exports=function(config,body){
                     out.q=out.questions.map(y=>y.q)
                     delete out.questions
                     delete out.quniqueterms;
-                    delete out.a_vector;
                 }else{
                     out._id=x._id;
                 }
