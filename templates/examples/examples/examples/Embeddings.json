@@ -1,11 +1,11 @@
-﻿{
+{
   "qna": [
     {
-      "qid": "Enbeddings.WhiteHouse",
-      "a": "1700 Pennsylvania ave.",
+      "qid": "Embeddings.WhiteHouse",
+      "a": "1600 Pennsylvania Avenue NW, Washington, DC 20500",
       "type": "qna",
       "q": [
-        "What is the location of the white house"
+        "What is the address of the White House?"
       ]
     },
     {
