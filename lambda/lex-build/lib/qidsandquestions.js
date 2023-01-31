@@ -13,6 +13,9 @@ module.exports=function(params){
         index:process.env.INDEX,
         scroll:'10s',
         body: {
+            _source: {
+                "exclude": ["questions.q_vector", "a_vector"]
+            },
             query: {match_all: {}}
         }
     })
