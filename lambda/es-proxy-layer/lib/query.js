@@ -177,7 +177,7 @@ async function prepend_cfaq_answer(query, hit, cfaq_prefix, cfaq_endpoint, cfaq_
         }).promise();
         const sm_body = JSON.parse(Buffer.from(smres.Body, 'utf-8').toString());
         qnabot.log("CFAQ response body:", sm_body);
-        cfaq_answer = sm_body.ctxs[0].text.trim();
+        cfaq_answer = sm_body.text.trim();
     } catch (e) {
         console.log(e)
         cfaq_answer = "CFAQ exception: " + e.message.substring(0, 250) + "...";
