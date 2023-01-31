@@ -45,6 +45,9 @@
         #else
         "size":"$perpage",
         "from":"$from",
+        "_source": {
+            "exclude": ["questions.q_vector", "a_vector"]
+        },
         "query": {
             "bool":{
                 #if($input.params('filter').length()==0)
