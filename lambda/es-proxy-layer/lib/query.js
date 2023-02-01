@@ -9,14 +9,10 @@ const qnabot = require('qnabot/logging')
 const qna_settings = require('qnabot/settings')
 const open_es = require('./es_query')
 const {VM} = require('vm2');
-// const sleep = require('util').promisify(setTimeout);
-
 
 // use DEFAULT_SETTINGS_PARAM as random encryption key unique to this QnABot installation
 var key = _.get(process.env, 'DEFAULT_SETTINGS_PARAM', 'fdsjhf98fd98fjh9 du98fjfd 8ud8fjdf');
 var encryptor = require('simple-encryptor')(key);
-
-
 
 async function run_query(req, query_params) {
     query_params.kendraIndex = _.get(req, '_settings.KENDRA_FAQ_INDEX')
@@ -31,7 +27,6 @@ async function run_query(req, query_params) {
     }
     return response;
 }
-
 
 async function run_query_kendra(req, query_params) {
     qnabot.log('Querying Kendra FAQ index: ' + _.get(req, '_settings.KENDRA_FAQ_INDEX'));
@@ -80,6 +75,7 @@ function getLambdaName(lambdaRef){
         return lambdaRef;
     }
 }
+
 // used to invoke either chaining rule lambda, or Lambda hook
 async function invokeLambda (lambdaRef, req, res) {
     let lambdaName = getLambdaName(lambdaRef);
@@ -167,10 +163,10 @@ async function prepend_cfaq_answer(query, hit, cfaq_prefix, cfaq_endpoint, cfaq_
         n_ctx: cfaq_n_ctx,
     };
     const body = JSON.stringify(data);
-    var cfaq_answer;
+    let cfaq_answer;
     console.log("Invoking CFAQ SM Endpoint");
     try {
-        var smres = await sm.invokeEndpoint({
+        let smres = await sm.invokeEndpoint({
             EndpointName:cfaq_endpoint,
             ContentType:'text/csv',
             Body:body,
@@ -183,14 +179,14 @@ async function prepend_cfaq_answer(query, hit, cfaq_prefix, cfaq_endpoint, cfaq_
         cfaq_answer = "CFAQ exception: " + e.message.substring(0, 250) + "...";
     }
     qnabot.log("CFAQ answer:", cfaq_answer);
-    if (true) {
-        // prepend sm answer to plaintext and markdown
-        hit.a = `${cfaq_prefix}\n\n${cfaq_answer}\n\n${hit.a}`;
-        hit.alt.markdown = `*${cfaq_prefix}*\n\n**${cfaq_answer}**\n\n${hit.alt.markdown}`;
-        // replace ssml with just the short answer for concise voice responses
-        hit.alt.ssml = cfaq_answer;
-        qnabot.log("modified hit:", JSON.stringify(hit));
-    }
+
+    // prepend sm answer to plaintext and markdown
+    hit.a = `${cfaq_prefix}\n\n${cfaq_answer}\n\n${hit.a}`;
+    hit.alt.markdown = `*${cfaq_prefix}*\n\n**${cfaq_answer}**\n\n${hit.alt.markdown}`;
+    // replace ssml with just the short answer for concise voice responses
+    hit.alt.ssml = cfaq_answer;
+    qnabot.log("modified hit:", JSON.stringify(hit));
+
     return hit;
 }
 
@@ -203,7 +199,7 @@ async function post_process_with_sagemaker_endpoint(question, hit, sagemaker_qa_
         }
     };
     const body = JSON.stringify(data);
-    var smres = await sm.invokeEndpoint({
+    let smres = await sm.invokeEndpoint({
         EndpointName:sm_endpoint,
         ContentType:'application/json',
         Body:body,

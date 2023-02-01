@@ -1,10 +1,9 @@
 const aws = require('aws-sdk');
-const { truncate } = require('lodash');
 const _ = require('lodash');
 
 // input/output for endpoint running HF_MODEL intfloat/e5-large
 // See https://huggingface.co/intfloat/e5-large
-// Returns embedding with 1024 dimensions 
+// Returns embedding with 1024 dimensions
 const get_embeddings_sm = async function get_embeddings_sm(type_q_or_a, input, settings) {
     const sm = new aws.SageMakerRuntime({region: process.env.AWS_REGION || "us-east-1"});
     // prefix input text with 'query:' or 'passage:' to generate suitable embeddings per https://huggingface.co/intfloat/e5-large
@@ -17,7 +16,7 @@ const get_embeddings_sm = async function get_embeddings_sm(type_q_or_a, input, s
     }
     console.log(`Fetch embeddings from SageMaker for type: '${type_q_or_a}' - InputText: ${input}`);
     const body = JSON.stringify({"inputs":input});
-    var smres = await sm.invokeEndpoint({
+    let smres = await sm.invokeEndpoint({
         EndpointName: process.env.EMBEDDINGS_SAGEMAKER_ENDPOINT,
         ContentType: 'application/json',
         Body: body,
@@ -28,8 +27,8 @@ const get_embeddings_sm = async function get_embeddings_sm(type_q_or_a, input, s
 
 const get_embeddings_lambda = async function get_embeddings_lambda(type_q_or_a, input, settings) {
     console.log(`Fetch embeddings from Lambda for type: '${type_q_or_a}' - InputText: ${input}`);
-    var lambda= new aws.Lambda();
-    var lambdares=await lambda.invoke({
+    let lambda= new aws.Lambda();
+    let lambdares=await lambda.invoke({
         FunctionName:process.env.EMBEDDINGS_LAMBDA_ARN,
         InvocationType:'RequestResponse',
         Payload:JSON.stringify({inputType: type_q_or_a, inputText: input})
