@@ -25,8 +25,6 @@ def embed_tformer(model, tokenizer, sentences):
     with torch.no_grad():
         model_output = model(**encoded_input)
     embeddings = average_pool(model_output.last_hidden_state, encoded_input['attention_mask'])
-    # Normalize  embeddings
-    embeddings = F.normalize(embeddings, p=2, dim=1)
     return embeddings
 
 def predict_fn(data, model):
