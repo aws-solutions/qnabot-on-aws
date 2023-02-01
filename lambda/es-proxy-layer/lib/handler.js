@@ -18,13 +18,13 @@ async function get_settings() {
 
 // add embeddings for each QID in an add or modify item PUT query
 async function build_additem_embeddings(event, settings) {
-    if (settings.EMBEDDINGS_ENABLE == false) {
+    if (!settings.EMBEDDINGS_ENABLE) {
         console.log("EMBEDDINGS_ENABLE is false - query not modified");
         return event.body;
     }
     // question embeddings
     const questions = _.get(event,"body.questions",[]);
-    var questions_with_embeddings = await Promise.all(questions.map(async x => {
+    let questions_with_embeddings = await Promise.all(questions.map(async x => {
         const q_embeddings = await get_embeddings("q", x.q, settings);
         return {
             q: x.q,
@@ -48,7 +48,7 @@ async function get_es_query(event, settings) {
             qnabot.log(`Question '${question}' contains only stop words. Forcing no hits.`);
             size = 0;
         }
-        var query_params = {
+        let query_params = {
             question: question,
             topic: _.get(event,'topic',''),
             from: _.get(event,'from',0),
@@ -66,7 +66,8 @@ async function get_es_query(event, settings) {
         return build_es_query(query_params);
     } else if (_.get(event,'method','') === 'PUT') {
         // add or modify item query - add embeddings for questions list, if enabled
-        return await build_additem_embeddings(event, settings);
+        let embeddings = await build_additem_embeddings(event, settings);
+        return embeddings;
     } else {
         // use query as-is
         return Promise.resolve(event.body);
@@ -76,8 +77,8 @@ async function get_es_query(event, settings) {
 
 
 async function run_query_es(event, settings) {
-    var es_query = await get_es_query(event, settings);
-    var es_response = await request({
+    let es_query = await get_es_query(event, settings);
+    let es_response = await request({
         url:Url.resolve("https://"+event.endpoint,event.path),
         method:event.method,
         headers:event.headers,
@@ -100,7 +101,7 @@ async function run_query_es(event, settings) {
 async function run_query_kendra(event, kendra_index) {
     qnabot.log("Kendra FAQ Query index:" + kendra_index);
     qnabot.log(event)
-    var request_params = {
+    let request_params = {
         kendra_faq_index:kendra_index,
         question:event.question,
         size:10, // limit kendra hits to 10 max to avoid pagination issues
@@ -108,22 +109,22 @@ async function run_query_kendra(event, kendra_index) {
         es_path: event.path,
         minimum_score: event.minimum_score,
     } ;
-    var kendra_response = await kendra.handler(request_params);
+    let kendra_response = await kendra.handler(request_params);
     return kendra_response;
 }
 
 module.exports= async (event, context, callback) => {
-    var settings = await get_settings();
+    let settings = await get_settings();
     qna_settings.set_environment_variables(settings)
     qnabot.log('Received event:', JSON.stringify(event, null, 2));
 
-    var kendra_index = _.get(settings, "KENDRA_FAQ_INDEX")
+    let kendra_index = _.get(settings, "KENDRA_FAQ_INDEX")
     event.minimum_score = _.get(settings, 'ALT_SEARCH_KENDRA_FAQ_CONFIDENCE_SCORE', "MEDIUM")
-    var question = _.get(event,'question','');
-    var topic = _.get(event,'topic','');
-    
+    let question = _.get(event,'question','');
+    let topic = _.get(event,'topic','');
+
     let req = {
-        question: question,    
+        question: question,
     }
     //TODO: At some point we should expose a qnaClientFilter field in the
     //Content Designer and pass the value here.
@@ -132,17 +133,19 @@ module.exports= async (event, context, callback) => {
         kendraIndex: kendra_index,
         question: question
     }
+
+    let response
     let okKendraQuery = !(await open_es.isESonly(req,params))
     if ( okKendraQuery ) {
-        var response = await run_query_kendra(event, kendra_index);
+        response = await run_query_kendra(event, kendra_index);
         // ES fallback if KendraFAQ fails
-        var hit = _.get(response, "hits.hits[0]._source");
+        let hit = _.get(response, "hits.hits[0]._source");
         if (!hit && _.get(settings, 'KENDRA_FAQ_ES_FALLBACK', false)){
             qnabot.log("ES Fallback");
             response = await run_query_es(event, settings);
         }
     } else {
-        var response = await run_query_es(event, settings);
+        response = await run_query_es(event, settings);
     }
     qnabot.log("Query response: ", JSON.stringify(response,null,2));
     return callback(null, response);

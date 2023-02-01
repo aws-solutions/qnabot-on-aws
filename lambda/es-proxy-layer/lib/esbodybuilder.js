@@ -1,5 +1,3 @@
-//start connection
-const aws = require('aws-sdk');
 const Promise = require('bluebird');
 const bodybuilder = require('bodybuilder');
 const get_keywords = require('./keywords');
@@ -52,7 +50,7 @@ function build_query(params) {
       let query = bodybuilder();
 
       // Exclude QIDs with enableQidIntent: true. They should be matched only by Lex
-      // as intents, not by ES match queries. 
+      // as intents, not by ES match queries.
       query = query.notFilter('match', {"enableQidIntent": {"query": true}});
 
       if (keywords.length > 0) {
@@ -64,8 +62,8 @@ function build_query(params) {
           query = query.filter('match', filter_query_unique_terms);
         }
       }
-    
-      var qnaClientFilter = _.get(params, 'qnaClientFilter', "");
+
+      let qnaClientFilter = _.get(params, 'qnaClientFilter', "");
       query = query.orFilter(
         'bool', {
         "must": [
@@ -98,8 +96,8 @@ function build_query(params) {
         ).filterMinimumShouldMatch(1);
 
       if (_.get(params, 'settings.EMBEDDINGS_ENABLE')) {
-        q_weight = _.get(params, 'settings.EMBEDDINGS_WEIGHT_QUESTION_FIELD', 1.0)
-        a_weight = _.get(params, 'settings.EMBEDDINGS_WEIGHT_ANSWER_FIELD', 0.5)
+        const q_weight = _.get(params, 'settings.EMBEDDINGS_WEIGHT_QUESTION_FIELD', 1.0)
+        const a_weight = _.get(params, 'settings.EMBEDDINGS_WEIGHT_ANSWER_FIELD', 0.5)
         // do KNN embedding match on questions for semantic similarity
         query = query.orQuery(
           'function_score', {
@@ -161,9 +159,9 @@ function build_query(params) {
           query = query.orQuery(
             'bool', {
               "should" : [
-                { 
+                {
                   "match_all": {
-                  } 
+                  }
                 },
                 {
                   "bool": {
@@ -175,10 +173,10 @@ function build_query(params) {
                         }
                     ]
                   }
-                }          
+                }
               ],
               "minimum_should_match" : 2
-            }      
+            }
           ) ;
         }
       }
@@ -203,14 +201,3 @@ module.exports = function (params) {
     return build_query(params);
   }
 };
-
-
-/*
-var testparams = {
-    question: "what is an example user question",
-    topic: "optional_topic",
-    from: 0,
-    size: 0
-};
-build_query(testparams)
-*/
