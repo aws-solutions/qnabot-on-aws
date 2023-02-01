@@ -2,7 +2,6 @@ import time
 import torch
 from torch import Tensor
 from transformers import AutoTokenizer, AutoModel
-import torch.nn.functional as F
 
 def model_fn(model_dir):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
