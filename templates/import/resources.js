@@ -23,7 +23,7 @@ module.exports=Object.assign(
         },
         "Environment": {
             "Variables": {
-                STRIDE:"10000",
+                STRIDE:"50000",
                 ES_INDEX:{"Ref":"VarIndex"},
                 ES_METRICSINDEX:{"Ref":"MetricsIndex"},
                 ES_FEEDBACKINDEX:{"Ref":"FeedbackIndex"},
@@ -44,6 +44,12 @@ module.exports=Object.assign(
                 "SecurityGroupIds": { "Fn::Split" : [ ",", {"Ref": "VPCSecurityGroupIdList"} ] },
             }, {"Ref" : "AWS::NoValue"} ]
         },
+        "Layers":[
+          {"Ref":"AwsSdkLayerLambdaLayer"},
+          {"Ref":"CommonModulesLambdaLayer"},
+          {"Ref":"EsProxyLambdaLayer"},
+          {"Ref":"QnABotCommonLambdaLayer"}
+        ],
         "TracingConfig" : {
             "Fn::If": [ "XRAYEnabled", {"Mode": "Active"},
                 {"Ref" : "AWS::NoValue"} ]
@@ -88,6 +94,12 @@ module.exports=Object.assign(
                 "SecurityGroupIds": { "Fn::Split" : [ ",", {"Ref": "VPCSecurityGroupIdList"} ] },
             }, {"Ref" : "AWS::NoValue"} ]
         },
+        "Layers":[
+          {"Ref":"AwsSdkLayerLambdaLayer"},
+          {"Ref":"CommonModulesLambdaLayer"},
+          {"Ref":"EsProxyLambdaLayer"},
+          {"Ref":"QnABotCommonLambdaLayer"}
+        ],
         "TracingConfig" : {
             "Fn::If": [ "XRAYEnabled", {"Mode": "Active"},
                 {"Ref" : "AWS::NoValue"} ]
@@ -186,8 +198,15 @@ module.exports=Object.assign(
                 "lambda:InvokeFunction"
               ],
               "Resource":[{"Ref":"EsProxyLambda"}, { "Fn::If": ["EmbeddingsLambdaArn", {"Ref":"EmbeddingsLambdaArn"}, {"Ref":"AWS::NoValue"}] }]
-          }]
-        }
+          },
+          {
+              "Effect": "Allow",
+              "Action": [
+                "es:ESHttpPost",
+              ],
+              "Resource": [{"Fn::Join": ["", [{"Ref":"EsArn"}, "/*"]]}]
+          }
+        ]}
       }
     },
     "ImportClear":{
