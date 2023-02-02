@@ -1,70 +1,24 @@
-var Promise = require('bluebird');
-var aws = require("aws-sdk");
+const Promise = require('bluebird');
+const aws = require("aws-sdk");
 aws.config.setPromisesDependency(Promise);
 aws.config.region = process.env.AWS_REGION;
 // import from es-proxy-layer
 const get_embeddings = require('/opt/lib/embeddings.js');
 const request=require('/opt/lib/request.js');
+const qnabot = require("qnabot/logging")
+const qna_settings = require("qnabot/settings")
 
-var s3 = new aws.S3();
-var lambda = new aws.Lambda();
-var stride = parseInt(process.env.STRIDE);
-var _ = require('lodash');
-var convertxlsx = require('convert-xlsx');
-var delete_existing_content = require('delete_existing_content');
+const s3 = new aws.S3();
+const stride = parseInt(process.env.STRIDE);
+const _ = require('lodash');
+const convertxlsx = require('convert-xlsx');
+const delete_existing_content = require('delete_existing_content');
 
-function isJson(str) {
-    try {
-        JSON.parse(str);
-    } catch (e) {
-        return false;
-    }
-    return true;
-}
-
-function str2bool(settings) {
-    var new_settings = _.mapValues(settings, x => {
-        if (_.isString(x)) {
-            x = x.replace(/^"(.+)"$/,'$1');  // remove wrapping quotes
-            if (x.toLowerCase() === "true") {
-                return true ;
-            }
-            if (x.toLowerCase() === "false") {
-                return false ;
-            }
-        }
-        return x;
-    });
-    return new_settings;
-}
-
-async function get_parameter(param_name) {
-    var ssm = new aws.SSM();
-    var params = {
-        Name: param_name,
-        WithDecryption: true
-    };
-    var response = await ssm.getParameter(params).promise();
-    var settings = response.Parameter.Value
-    if (isJson(settings)) {
-        settings = JSON.parse(response.Parameter.Value);
-        settings = str2bool(settings) ;
-    }
+async function get_settings() {
+    let settings = await qna_settings.merge_default_and_custom_settings();
+    qnabot.log("Merged Settings: ", settings);
     return settings;
 }
-
-const get_settings = async function get_settings() {
-    var default_settings_param = process.env.DEFAULT_SETTINGS_PARAM;
-    var custom_settings_param = process.env.CUSTOM_SETTINGS_PARAM;
-    console.log("Getting Default QnABot settings from SSM Parameter Store: ", default_settings_param);
-    var default_settings = await get_parameter(default_settings_param);
-    console.log("Getting Custom QnABot settings from SSM Parameter Store: ", custom_settings_param);
-    var custom_settings = await get_parameter(custom_settings_param);
-    var settings = _.merge(default_settings, custom_settings);
-    console.log("Merged Settings: ", settings);
-    return settings;
-}
-
 
 async function es_bulk_load(body) {
     const es_response = await request({
@@ -73,17 +27,17 @@ async function es_bulk_load(body) {
         headers:{'Content-Type': 'application/x-ndjson'},
         body:body,
     });
-    console.log("Response (first 500 chars): ", JSON.stringify(es_response,null,2).slice(0,500));
+    qnabot.log("Response (first 500 chars): ", JSON.stringify(es_response,null,2).slice(0,500));
     return es_response;
 }
 
 exports.step = function (event, context, cb) {
-    console.log("step")
-    console.log("Request", JSON.stringify(event, null, 2))
-    var Bucket = event.Records[0].s3.bucket.name
-    var Key = decodeURI(event.Records[0].s3.object.key)
-    var progress
-    console.log(Bucket, Key);
+    qnabot.log("step")
+    qnabot.log("Request", JSON.stringify(event, null, 2))
+    let Bucket = event.Records[0].s3.bucket.name
+    let Key = decodeURI(event.Records[0].s3.object.key)
+    let progress
+    qnabot.log(Bucket, Key);
     s3.waitFor('objectExists', {
             Bucket,
             Key
@@ -94,20 +48,20 @@ exports.step = function (event, context, cb) {
         }).promise())
         .then(x => JSON.parse(x.Body.toString()))
         .then(function (config) {
-            console.log("Config:", JSON.stringify(config, null, 2));
+            qnabot.log("Config:", JSON.stringify(config, null, 2));
             if (config.status === "InProgress") {
                 // TODO - design a more robust way to identify target ES index for auto import of metrics and feedback
                 // Filenames must match across:
                 // aws-ai-qna-bot/templates/import/UpgradeAutoImport.js
                 // aws-ai-qna-bot/templates/master/UpgradeAutoExport.js
                 // and pattern in /aws-ai-qna-bot/lambda/import/index.js
-                var esindex = process.env.ES_INDEX;
+                let esindex = process.env.ES_INDEX;
                 if (Key.match(/.*ExportAll_QnABot_.*_metrics\.json/)) {
                     esindex = process.env.ES_METRICSINDEX;
                 } else if (Key.match(/.*ExportAll_QnABot_.*_feedback\.json/)) {
                     esindex = process.env.ES_FEEDBACKINDEX;
                 }
-                console.log("Importing to index: ", esindex);
+                qnabot.log("Importing to index: ", esindex);
                 return s3.getObject({
                         Bucket: config.bucket,
                         Key: config.key,
@@ -116,17 +70,17 @@ exports.step = function (event, context, cb) {
                     }).promise()
                     .then(async function (result) {
                         const settings = await get_settings();
-                        console.log('opening file')
-                        var objects = []
+                        qnabot.log('opening file')
+                        let objects = []
                         try {
                             config.buffer += result.Body.toString()
                             if(config.buffer.startsWith('PK')) {
-                                console.log('starts with PK, must be an xlsx')
+                                qnabot.log('starts with PK, must be an xlsx')
                                 let questionArray = convertxlsx.convertxlsx(result.Body)
-                                console.log('number of items processed: ', questionArray.length)
+                                qnabot.log('number of items processed: ', questionArray.length)
                                 questionArray.forEach(question => {
                                     let questionStr = JSON.stringify(question)
-                                    console.log(questionStr)
+                                    qnabot.log(questionStr)
                                     objects.push(questionStr)
                                 })
                                 config.buffer = ""
@@ -138,12 +92,12 @@ exports.step = function (event, context, cb) {
                         } catch (e) {
                             config.buffer=objects.pop()
                         }
-                        var out = []
+                        let out = []
                         for (const x of objects) {
                             try {
-                                var obj = JSON.parse(x)
-                                var timestamp = _.get(obj, 'datetime', "");
-                                var docid;
+                                let obj = JSON.parse(x)
+                                let timestamp = _.get(obj, 'datetime', "");
+                                let docid;
                                 if (timestamp === "") {
                                     // only metrics and feedback items have datetime field.. This must be a qna item.
                                     obj.type = obj.type || 'qna'
@@ -166,17 +120,17 @@ exports.step = function (event, context, cb) {
                                                 } else {
                                                     return {
                                                         q: x
-                                                    }                                                       
+                                                    }
                                                 }
                                             }));
                                             // answer embeddings
-                                            var answer = obj.a;
+                                            let answer = obj.a;
                                             if (answer) {
                                                 obj.a_vector = await get_embeddings("a", answer, settings);
                                             }
                                             obj.quniqueterms = obj.q.join(" ");
                                         } catch (err) {
-                                            console.log("skipping question due to exception", err);
+                                            qnabot.log("skipping question due to exception", err);
                                         }
                                         delete obj.q
                                     }
@@ -184,8 +138,8 @@ exports.step = function (event, context, cb) {
                                 } else {
                                     docid = obj._id || obj.qid + "_upgrade_restore_" + timestamp;
                                     // Stringify session attributes
-                                    var sessionAttrs = _.get(obj, "entireResponse.session", {});
-                                    for (var key of Object.keys(sessionAttrs)) {
+                                    let sessionAttrs = _.get(obj, "entireResponse.session", {});
+                                    for (let key of Object.keys(sessionAttrs)) {
                                         if (typeof sessionAttrs[key] != 'string') {
                                             sessionAttrs[key] = JSON.stringify(sessionAttrs[key]);
                                         }
@@ -202,11 +156,11 @@ exports.step = function (event, context, cb) {
                                 out.push(JSON.stringify(obj))
                             } catch (e) {
                                 config.failed += 1
-                                console.log("Failed to Parse:", e, x)
+                                qnabot.log("Failed to Parse:", e, x)
                             }
                         }
-                        console.log(result.ContentRange)
-                        var tmp = result.ContentRange.match(/bytes (.*)-(.*)\/(.*)/)
+                        qnabot.log(result.ContentRange)
+                        let tmp = result.ContentRange.match(/bytes (.*)-(.*)\/(.*)/)
                         progress = (parseInt(tmp[2]) + 1) / parseInt(tmp[3])
                         return out.join('\n') + '\n'
                     })
@@ -228,7 +182,7 @@ exports.step = function (event, context, cb) {
                             config.time.end = (new Date()).toISOString()
                         }
 
-                        console.log("EndConfig:", JSON.stringify(config, null, 2))
+                        qnabot.log("EndConfig:", JSON.stringify(config, null, 2))
                         return s3.putObject({
                                 Bucket: Bucket,
                                 Key: Key,
@@ -237,7 +191,7 @@ exports.step = function (event, context, cb) {
                             .then(result => cb(null))
                     })
                     .catch(error => {
-                        console.log(error)
+                        qnabot.log(error)
                         config.status = "Error"
                         config.message = JSON.stringify(error)
                         return s3.putObject({
@@ -253,12 +207,12 @@ exports.step = function (event, context, cb) {
 }
 
 exports.start = function (event, context, cb) {
-    console.log("starting")
-    console.log("Request", JSON.stringify(event, null, 2))
-    var bucket = event.Records[0].s3.bucket.name
-    var key = decodeURI(event.Records[0].s3.object.key)
-    console.log(bucket, key)
-    var config = {
+    qnabot.log("starting")
+    qnabot.log("Request", JSON.stringify(event, null, 2))
+    let bucket = event.Records[0].s3.bucket.name
+    let key = decodeURI(event.Records[0].s3.object.key)
+    qnabot.log(bucket, key)
+    let config = {
         stride,
         start: 0,
         end: stride,
@@ -276,9 +230,9 @@ exports.start = function (event, context, cb) {
         key,
         version: event.Records[0].s3.object.versionId,
     }
-    console.log("Config: ", JSON.stringify(config));
-    var out_key = "status/" + decodeURI(event.Records[0].s3.object.key.split('/').pop())
-    console.log(bucket, out_key)
+    qnabot.log("Config: ", JSON.stringify(config));
+    let out_key = "status/" + decodeURI(event.Records[0].s3.object.key.split('/').pop())
+    qnabot.log(bucket, out_key)
     s3.putObject({
             Bucket: bucket,
             Key: out_key,
