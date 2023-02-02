@@ -17,6 +17,7 @@ module.exports={
         "BootstrapBucket":{"Type":"String"},
         "BootstrapPrefix":{"Type":"String"},
         "EsEndpoint": {"Type":"String"},
+        "EsArn": {"Type":"String"},
         "EsProxyLambda": {"Type":"String"},
         "ImportBucket": {"Type":"String"},
         "ExportBucket": {"Type":"String"},
@@ -34,7 +35,11 @@ module.exports={
         "EmbeddingsLambdaDimensions": {"Type": "String"},
         "EmbeddingsLambdaArn": {"Type": "String"},
         "EmbeddingsSagemakerEndpoint": {"Type": "String"},
-        "EmbeddingsSagemakerEndpointArn": {"Type": "String"}
+        "EmbeddingsSagemakerEndpointArn": {"Type": "String"},
+        "AwsSdkLayerLambdaLayer": {"Type": "String"},
+        "CommonModulesLambdaLayer": {"Type": "String"},
+        "EsProxyLambdaLayer": {"Type": "String"},
+        "QnABotCommonLambdaLayer": {"Type": "String"},
     },
     "Conditions": {
         "VPCEnabled": { "Fn::Not": [

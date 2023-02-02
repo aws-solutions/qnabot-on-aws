@@ -2,7 +2,9 @@ var Promise = require('bluebird');
 var aws = require("aws-sdk");
 aws.config.setPromisesDependency(Promise);
 aws.config.region = process.env.AWS_REGION;
-const get_embeddings = require('./embeddings');
+// import from es-proxy-layer
+const get_embeddings = require('/opt/lib/embeddings.js');
+const request=require('/opt/lib/request.js');
 
 var s3 = new aws.S3();
 var lambda = new aws.Lambda();
@@ -61,6 +63,18 @@ const get_settings = async function get_settings() {
     var settings = _.merge(default_settings, custom_settings);
     console.log("Merged Settings: ", settings);
     return settings;
+}
+
+
+async function es_bulk_load(body) {
+    const es_response = await request({
+        url:"https://" + process.env.ES_ENDPOINT + "/_bulk",
+        method:"POST",
+        headers:{'Content-Type': 'application/x-ndjson'},
+        body:body,
+    });
+    console.log("Response (first 500 chars): ", JSON.stringify(es_response,null,2).slice(0,500));
+    return es_response;
 }
 
 exports.step = function (event, context, cb) {
@@ -198,20 +212,9 @@ exports.step = function (event, context, cb) {
                     })
                     .then ((ES_formatted_content)=>delete_existing_content.delete_existing_content (esindex, config, ES_formatted_content))   //check and delete existing content (if parameter to delete has been passed in the options {file}
                     .then(function (result) {
-                        var body = {
-                            endpoint: process.env.ES_ENDPOINT,
-                            method: "POST",
-                            path: "/_bulk",
-                            body: result,
-                            headers: {'Content-Type': 'application/x-ndjson'}
-                        }
-                        return lambda.invoke({
-                                FunctionName: process.env.ES_PROXY,
-                                Payload: JSON.stringify(body)
-                            }).promise()
-                            .tap(console.log)
+                        return es_bulk_load(result)
                             .then(x => {
-                                config.EsErrors.push(JSON.parse(_.get(x, "Payload", "{}")).errors)
+                                config.EsErrors.push(x.errors)
                             })
                     })
                     .then(() => {
