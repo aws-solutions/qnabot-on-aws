@@ -23,7 +23,7 @@ module.exports=Object.assign(
         },
         "Environment": {
             "Variables": {
-                STRIDE:"50000",
+                STRIDE:"20000",
                 ES_INDEX:{"Ref":"VarIndex"},
                 ES_METRICSINDEX:{"Ref":"MetricsIndex"},
                 ES_FEEDBACKINDEX:{"Ref":"FeedbackIndex"},
