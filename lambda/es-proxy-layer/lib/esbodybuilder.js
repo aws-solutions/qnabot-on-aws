@@ -54,10 +54,8 @@ function build_query(params) {
       query = query.notFilter('match', {"enableQidIntent": {"query": true}});
 
       if (keywords.length > 0) {
-        if (_.get(params, 'score_answer_field')) {
-          query = query
-            .orFilter('match', filter_query_unique_terms)
-            .orFilter('match', filter_query_a);
+        if (_.get(params, 'score_answer')) {
+          query = query.filter('match', filter_query_a);
         } else {
           query = query.filter('match', filter_query_unique_terms);
         }
@@ -66,89 +64,85 @@ function build_query(params) {
       let qnaClientFilter = _.get(params, 'qnaClientFilter', "");
       query = query.orFilter(
         'bool', {
-        "must": [
-          {
-            "exists": {
-              "field": "clientFilterValues"
-            }
-          },
-          {
-            "term": {
-              "clientFilterValues": {
-                "value": qnaClientFilter,
-                "case_insensitive": true
-              }
-            }
-          }
-        ]
-      }
-      )
-        .orFilter(
-          'bool', {
-          "must_not": [
+          "must": [
             {
               "exists": {
                 "field": "clientFilterValues"
               }
+            },
+            {
+              "term": {
+                "clientFilterValues": {
+                  "value": qnaClientFilter,
+                  "case_insensitive": true
+                }
+              }
             }
           ]
         }
-        ).filterMinimumShouldMatch(1);
+      )
+      .orFilter(
+        'bool', {
+        "must_not": [
+          {
+            "exists": {
+              "field": "clientFilterValues"
+            }
+          }
+        ]
+      }
+      ).filterMinimumShouldMatch(1);
 
       if (_.get(params, 'settings.EMBEDDINGS_ENABLE')) {
         const q_weight = _.get(params, 'settings.EMBEDDINGS_WEIGHT_QUESTION_FIELD', 1.0)
         const a_weight = _.get(params, 'settings.EMBEDDINGS_WEIGHT_ANSWER_FIELD', 0.5)
-        // do KNN embedding match on questions for semantic similarity
-        query = query.orQuery(
-          'function_score', {
-            query: {
-              nested: {
-                score_mode: 'max',
-                path: 'questions',
-                query: {
-                  knn: {
-                    "questions.q_vector": {
-                      k: _.get(params, 'settings.EMBEDDINGS_KNN_K', 10),
-                      vector: await get_embeddings("q", params.question, params.settings)
-                    }
+        // do KNN embedding match for semantic similarity
+        if ( ! _.get(params, 'score_answer')) {
+          // match on q_vector (score_answer is false)
+          query = query.orQuery(
+            "nested", {
+              score_mode: 'max',
+              path: 'questions',
+              query: {
+                knn: {
+                  "questions.q_vector": {
+                    k: _.get(params, 'settings.EMBEDDINGS_KNN_K', 10),
+                    vector: await get_embeddings("q", params.question, params.settings)
                   }
                 }
               }
-            },
-            weight: q_weight
-          }
-        );
-        if (_.get(params, 'score_answer_field')) {
-          // add semantic query on answer field as well, with specified score weighting
+            }
+          );
+        } else {
+          // match on a_vector (score_answer is true)
           query = query.orQuery(
-            'function_score', {
-              query: {
-                knn: {
-                  a_vector: {
-                    k: _.get(params, 'settings.EMBEDDINGS_KNN_K', 10),
-                    vector: await get_embeddings("q", params.question, params.settings),
-                  }
-                }
-              },
-              weight: a_weight
+            "knn", {
+              a_vector: {
+                k: _.get(params, 'settings.EMBEDDINGS_KNN_K', 10),
+                vector: await get_embeddings("q", params.question, params.settings),
+              }
             }
           );
         }
       } else {
-        // do terms and phrase matches on question instead, and add topic filters
-        query = query.orQuery(
-          'match', match_query
-        );
-        query = query.orQuery(
-          'nested', {
-            score_mode: 'max',
-            boost: _.get(params, 'phrase_boost', 4),
-            path: 'questions'
-          },
-          q => q.query('match_phrase', 'questions.q', params.question)
-        );
-        if (_.get(params, 'score_answer_field')) {
+        // No embeddings. Do terms and phrase matches instead, and add topic filters
+        if ( ! _.get(params, 'score_answer')) {
+          // match on questions (score_answer is false)
+          query = query.orQuery(
+            'match', match_query
+          );
+          query = query.orQuery(
+            'nested', {
+              score_mode: 'max',
+              boost: _.get(params, 'phrase_boost', 4),
+              path: 'questions'
+            },
+            q => q.query('match_phrase', 'questions.q', params.question)
+          );
+        } else {
+          // match on answers (score_answer is true)
           query = query.orQuery('match', 'a', params.question);
+          query = query.orQuery('match_phrase', 'a', params.question, { boost: _.get(params, 'phrase_boost', 4)});
         }
         let topic = _.get(params, 'topic');
         if (topic) {

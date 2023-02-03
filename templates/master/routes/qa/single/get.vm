@@ -35,6 +35,18 @@
     "topic": "",
     #end
 
+    #if ($input.params('client_filter'))
+    "client_filter": "$util.urlDecode($input.params('client_filter'))",
+    #else
+    "client_filter": "",
+    #end
+
+    #if ($input.params('score_answer'))
+    "score_answer": "$util.urlDecode($input.params('score_answer'))",
+    #else
+    "score_answer": "",
+    #end
+
     "size":"$perpage",
     "from":"$from",
 

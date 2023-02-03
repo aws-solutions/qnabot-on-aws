@@ -25,7 +25,11 @@ async function  isESonly(req, query_params) {
     // setting clientFilterValues should block Kendra FAQ indexing
     if (_.get(query_params, 'qnaClientFilter')) {
         return true
-    }    
+    } 
+    // setting score_answer should block Kendra FAQ indexing
+    if (_.get(query_params, 'score_answer')) {
+        return true
+    } 
     if (_.get(query_params, 'kendraIndex') == "") {
         return true
     } 
@@ -39,18 +43,33 @@ async function  isESonly(req, query_params) {
 }
 
 
+function score_threshold_check(resp, threshold) {
+    if (_.get(resp, "hits.max_score", 0) <= threshold) {
+        qnabot.log(`Max score is ${threshold} or less for non embeddings query - no valid results. Remove hits.`)
+        _.set(resp, "hits.hits", [])
+    }
+    return resp;
+}
+
 async function run_query_es(req, query_params) {
     // if size is 1, change to 10 to allow for topic tiebreaking on results before choosing top hit
     const size = query_params.size ;
     if (size == 1) {
         query_params.size = 10;
     }
-    var es_query = await build_es_query(query_params);
-    var es_response = await request({
+    const es_query = await build_es_query(query_params);
+    let es_response = await request({
         url: `https://${req._info.es.address}/${req._info.es.index}/_search?search_type=dfs_query_then_fetch`,
         method: "GET",
         body: es_query
     });
+
+    // check threshold 
+    let threshold = (_.get(query_params, 'settings.EMBEDDINGS_ENABLE')) ? _.get(query_params,'settings.EMBEDDINGS_SCORE_THRESHOLD',0) : 1
+    es_response = score_threshold_check(es_response, threshold)
+
+    // TODO - ES_SCORE_ANSWER_MODE
+    // XXXXX
 
     // apply topic tiebreaker to any equally ranked hits, and trim to desired size
     if (es_response.hits.hits && es_response.hits.hits.length) {
@@ -62,20 +81,6 @@ async function run_query_es(req, query_params) {
     if (_.get(es_response, "hits.hits[0]._source")) {
         _.set(es_response, "hits.hits[0]._source.answersource", "ElasticSearch");
     }  
-
-    if (_.get(query_params, 'settings.EMBEDDINGS_ENABLE')) {
-        let threshold = _.get(query_params,'settings.EMBEDDINGS_SCORE_THRESHOLD',0);
-        if (_.get(es_response, "hits.max_score", 0) <= threshold) {
-            qnabot.log(`Max score is ${threshold} or less for embeddings query - no valid results. Remove hits.`)
-            _.set(es_response, "hits.hits", [])
-        }
-    } else {
-        let threshold = 1;
-        if (_.get(es_response, "hits.max_score", 0) <= threshold) {
-            qnabot.log(`Max score is ${threshold} or less for non embeddings query - no valid results. Remove hits.`)
-            _.set(es_response, "hits.hits", [])
-        }
-    }
 
     return es_response;
 }

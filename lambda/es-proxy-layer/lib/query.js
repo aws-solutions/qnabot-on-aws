@@ -246,7 +246,6 @@ async function get_hit(req, res) {
         use_keyword_filters: _.get(req, '_settings.ES_USE_KEYWORD_FILTERS'),
         keyword_syntax_types: _.get(req, '_settings.ES_KEYWORD_SYNTAX_TYPES'),
         syntax_confidence_limit: _.get(req, '_settings.ES_SYNTAX_CONFIDENCE_LIMIT'),
-        score_answer_field: _.get(req, '_settings.ES_SCORE_ANSWER_FIELD'),
         fuzziness: _.get(req, '_settings.ES_USE_FUZZY_MATCH'),
         es_expand_contractions: _.get(req,'_settings.ES_EXPAND_CONTRACTIONS'),
         kendra_indexes: _.get(req,'_settings.ALT_SEARCH_KENDRA_INDEXES'),

@@ -58,9 +58,10 @@ async function get_es_query(event, settings) {
             use_keyword_filters: _.get(settings,'ES_USE_KEYWORD_FILTERS'),
             keyword_syntax_types: _.get(settings,'ES_KEYWORD_SYNTAX_TYPES'),
             syntax_confidence_limit: _.get(settings,'ES_SYNTAX_CONFIDENCE_LIMIT'),
-            score_answer_field: _.get(settings,'ES_SCORE_ANSWER_FIELD'),
             fuzziness: _.get(settings, 'ES_USE_FUZZY_MATCH'),
             es_expand_contractions: _.get(settings,"ES_EXPAND_CONTRACTIONS"),
+            qnaClientFilter: _.get(event,'client_filter',''),
+            score_answer: _.get(event,'score_answer',''),
             settings: settings
         };
         return build_es_query(query_params);
@@ -126,14 +127,14 @@ module.exports= async (event, context, callback) => {
     let req = {
         question: question,
     }
-    //TODO: At some point we should expose a qnaClientFilter field in the
-    //Content Designer and pass the value here.
+
     let params = {
         topic: topic,
         kendraIndex: kendra_index,
-        question: question
+        question: question,
+        qnaClientFilter: _.get(event,'client_filter',''),
+        score_answer: _.get(event,'score_answer','')
     }
-
     let response
     let okKendraQuery = !(await open_es.isESonly(req,params))
     if ( okKendraQuery ) {
