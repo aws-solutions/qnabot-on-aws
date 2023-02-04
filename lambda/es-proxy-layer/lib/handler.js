@@ -61,7 +61,7 @@ async function get_es_query(event, settings) {
             fuzziness: _.get(settings, 'ES_USE_FUZZY_MATCH'),
             es_expand_contractions: _.get(settings,"ES_EXPAND_CONTRACTIONS"),
             qnaClientFilter: _.get(event,'client_filter',''),
-            score_answer: _.get(event,'score_answer',''),
+            score_answer: (_.get(event,'score_answer','false') === "true") ? true : false,
             settings: settings
         };
         return build_es_query(query_params);

@@ -142,7 +142,7 @@ function build_query(params) {
         } else {
           // match on answers (score_answer is true)
           query = query.orQuery('match', 'a', params.question);
-          query = query.orQuery('match_phrase', 'a', params.question, { boost: _.get(params, 'phrase_boost', 4)});
+          query = query.orQuery('match_phrase', 'a', params.question);
         }
         let topic = _.get(params, 'topic');
         if (topic) {
