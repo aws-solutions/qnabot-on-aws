@@ -72,7 +72,12 @@ async function run_query_es(req, query_params) {
     qnabot.log(`Score threshold for question matches is: ${threshold}.`)
     es_response = score_threshold_check(es_response, threshold)
     let gothits = _.get(es_response, 'hits.hits.length');
-    let matched_field = (gothits) ? "questions" : "";
+    let matched_field;
+    if (query_params.question.toLowerCase().startsWith("qid::")) {
+        matched_field = (gothits) ? "QID" : "";
+    } else {
+        matched_field = (gothits) ? "questions" : "";
+    }
 
     // if ES_SCORE_ANSWER_MODE is true, AND no hits were returned from default "questions" query, run 
     // second query to match the item answers field.
