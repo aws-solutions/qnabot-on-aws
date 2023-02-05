@@ -270,15 +270,9 @@ module.exports={
             EMBEDDINGS_API: { "Ref": "EmbeddingsApi" },
             EMBEDDINGS_SAGEMAKER_ENDPOINT : {
               "Fn::If": [
-                  "EmbeddingsSagemakerProvisioned", 
-                  {"Fn::GetAtt":["QnABotSMProvisionedEmbeddingEndpoint","EndpointName"]}, 
-                  {
-                      "Fn::If": [
-                          "EmbeddingsSagemakerServerless", 
-                          {"Fn::GetAtt":["QnABotSMServerlessEmbeddingEndpoint","EndpointName"]},
-                          ""
-                      ]
-                  }
+                  "EmbeddingsSagemaker", 
+                  {"Fn::GetAtt": ["SagemakerEmbeddingsStack", "Outputs.EmbeddingsSagemakerEndpoint"] }, 
+                  ""
               ]
             },
             EMBEDDINGS_LAMBDA_ARN: { "Ref": "EmbeddingsLambdaArn" },
@@ -358,13 +352,7 @@ module.exports={
                             "Action": [
                                 "sagemaker:InvokeEndpoint"
                             ],
-                            "Resource": {
-                              "Fn::If": [
-                                  "EmbeddingsSagemakerProvisioned", 
-                                  {"Ref":"QnABotSMProvisionedEmbeddingEndpoint"}, 
-                                  {"Ref":"QnABotSMServerlessEmbeddingEndpoint"}
-                              ]
-                          }
+                            "Resource": {"Fn::GetAtt": ["SagemakerEmbeddingsStack", "Outputs.EmbeddingsSagemakerEndpointArn"]}
                         },
                         {"Ref":"AWS::NoValue"}
                       ]

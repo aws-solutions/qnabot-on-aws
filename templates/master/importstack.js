@@ -33,30 +33,18 @@ module.exports={
                 "EmbeddingsLambdaArn": {"Ref": "EmbeddingsLambdaArn"},
                 "EmbeddingsSagemakerEndpoint": {
                     "Fn::If": [
-                        "EmbeddingsSagemakerProvisioned", 
-                        {"Fn::GetAtt":["QnABotSMProvisionedEmbeddingEndpoint","EndpointName"]}, 
-                        {
-                            "Fn::If": [
-                                "EmbeddingsSagemakerServerless", 
-                                {"Fn::GetAtt":["QnABotSMServerlessEmbeddingEndpoint","EndpointName"]},
-                                ""
-                            ]
-                        }
+                        "EmbeddingsSagemaker", 
+                        {"Fn::GetAtt": ["SagemakerEmbeddingsStack", "Outputs.EmbeddingsSagemakerEndpoint"] }, 
+                        ""
                     ]
                 },
                 "EmbeddingsSagemakerEndpointArn": {
                     "Fn::If": [
-                        "EmbeddingsSagemakerProvisioned", 
-                        {"Ref":"QnABotSMProvisionedEmbeddingEndpoint"}, 
-                        {
-                            "Fn::If": [
-                                "EmbeddingsSagemakerServerless", 
-                                {"Ref":"QnABotSMServerlessEmbeddingEndpoint"},
-                                ""
-                            ]
-                        }
+                        "EmbeddingsSagemaker", 
+                        {"Fn::GetAtt": ["SagemakerEmbeddingsStack", "Outputs.EmbeddingsSagemakerEndpointArn"] }, 
+                        ""
                     ]
-                },
+                  }
             }
         }
     }

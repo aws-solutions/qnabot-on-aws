@@ -21,17 +21,11 @@ module.exports={
                     {
                         "SMEmbeddingEndpoint": {
                             "Fn::If": [
-                                "EmbeddingsSagemakerProvisioned", 
-                                {"Fn::GetAtt":["QnABotSMProvisionedEmbeddingEndpoint","EndpointName"]}, 
-                                {
-                                    "Fn::If": [
-                                        "EmbeddingsSagemakerServerless", 
-                                        {"Fn::GetAtt":["QnABotSMServerlessEmbeddingEndpoint","EndpointName"]},
-                                        ""
-                                    ]
-                                }
+                                "EmbeddingsSagemaker", 
+                                {"Fn::GetAtt": ["SagemakerEmbeddingsStack", "Outputs.EmbeddingsSagemakerEndpoint"] }, 
+                                ""
                             ]
-                        }
+                          },
                     }
                 ]
             }

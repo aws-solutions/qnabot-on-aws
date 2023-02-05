@@ -203,6 +203,7 @@ module.exports=Object.assign(
               "Effect": "Allow",
               "Action": [
                 "es:ESHttpPost",
+                "es:ESHttpPut"
               ],
               "Resource": [{"Fn::Join": ["", [{"Ref":"EsArn"}, "/*"]]}]
           }

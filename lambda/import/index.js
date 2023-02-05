@@ -31,6 +31,17 @@ async function es_bulk_load(body) {
     return es_response;
 }
 
+async function es_store_doc(index, id, body) {
+    const es_response = await request({
+        url:`https://${process.env.ES_ENDPOINT}/${index}/_doc/${id}`, 
+        method:"PUT",
+        headers:{'Content-Type': 'application/json'},
+        body:body,
+    });
+    qnabot.log("Response: ", JSON.stringify(es_response,null,2).slice(0,500));
+    return es_response;
+}
+
 exports.step = function (event, context, cb) {
     qnabot.log("step")
     qnabot.log("Request", JSON.stringify(event, null, 2))
@@ -154,6 +165,11 @@ exports.step = function (event, context, cb) {
                                 }))
                                 config.count += 1
                                 out.push(JSON.stringify(obj))
+                                
+                                // Save docs one at a time, for now, due to issues with k-nn index after bulk load
+                                // TODO - revert back to bulk (more efficient) when we move to OpenSearch 2.3
+                                await es_store_doc(esindex, docid, obj);
+
                             } catch (e) {
                                 config.failed += 1
                                 qnabot.log("Failed to Parse:", e, x)
@@ -165,12 +181,16 @@ exports.step = function (event, context, cb) {
                         return out.join('\n') + '\n'
                     })
                     .then ((ES_formatted_content)=>delete_existing_content.delete_existing_content (esindex, config, ES_formatted_content))   //check and delete existing content (if parameter to delete has been passed in the options {file}
+                    /*
+                    // Disable bulk load.. Instead save docs one at a time, for now, due to issues with k-nn index after bulk load
+                    // TODO - revert back to bulk (more efficient) when we move to OpenSearch 2.3
                     .then(function (result) {
                         return es_bulk_load(result)
                             .then(x => {
                                 config.EsErrors.push(x.errors)
                             })
                     })
+                    */
                     .then(() => {
                         config.start = (config.end + 1)
                         config.end = config.start + config.stride
