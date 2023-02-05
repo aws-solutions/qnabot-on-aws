@@ -87,7 +87,7 @@ module.exports=Object.assign(
         "MemorySize": "1024",
         "Role": {"Fn::GetAtt": ["ImportRole","Arn"]},
         "Runtime": "nodejs16.x",
-        "Timeout": 300,
+        "Timeout": 900,
         "VpcConfig" : {
             "Fn::If": [ "VPCEnabled", {
                 "SubnetIds": { "Fn::Split" : [ ",", {"Ref": "VPCSubnetIdList"} ] },
