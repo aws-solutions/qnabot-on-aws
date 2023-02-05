@@ -133,7 +133,7 @@ module.exports= async (event, context, callback) => {
         kendraIndex: kendra_index,
         question: question,
         qnaClientFilter: _.get(event,'client_filter',''),
-        score_answer: _.get(event,'score_answer','')
+        score_answer: (_.get(event,'score_answer','false') === "true") ? true : false
     }
     let response
     let okKendraQuery = !(await open_es.isESonly(req,params))
