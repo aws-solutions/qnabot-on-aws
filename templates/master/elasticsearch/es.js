@@ -38,13 +38,13 @@ var properties={
 }
 
 module.exports={
-    "ElasticsearchDomain": {
+    "OpensearchDomain": {
         "Type": "AWS::OpenSearchService::Domain",
         "DependsOn":["PreUpgradeExport"],
         "Condition":"CreateDomain",
         "Properties":properties
     },
-    "ElasticsearchDomainUpdate": {
+    "OpensearchDomainUpdate": {
          "Type": "Custom::ElasticSearchUpdate",
          "DependsOn":["CognitoDomain"],
          "Properties":{

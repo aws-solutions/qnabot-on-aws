@@ -1,7 +1,7 @@
 module.exports={
     "ImportStack":{
         "Type" : "AWS::CloudFormation::Stack",
-        "DependsOn":["PreUpgradeExport","ElasticsearchDomainUpdate"],
+        "DependsOn":["PreUpgradeExport","OpensearchDomainUpdate"],
         "Properties" : {
             "TemplateURL" :{"Fn::Sub":"https://${BootstrapBucket}.s3.${AWS::Region}.amazonaws.com/${BootstrapPrefix}/templates/import.json"},
             "Parameters" :{
