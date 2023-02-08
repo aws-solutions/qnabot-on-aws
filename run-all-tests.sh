@@ -37,6 +37,7 @@ CLEAN="${CLEAN:-true}"
 
 echo "Starting Lambda unit tests"
 
+run_javascript_lambda_test js_lambda_hook_sdk "JS Lambda Hook SDK Unit Tests"
 run_javascript_lambda_test translate "Translate Lambda Unit Tests"
 run_javascript_lambda_test schema "Schema Lambda Unit Tests"
 run_javascript_lambda_test qnabot-common-layer "QnaBot Common Layer Lambda Unit Tests"
