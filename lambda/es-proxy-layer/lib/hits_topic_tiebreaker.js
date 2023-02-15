@@ -25,15 +25,16 @@ function is_topic_match(topic1, topic2) {
 }
 
 function sort_hits_by_topic_match(topic, hits) {
-    let sorted_hits=[];
+    let same_topic=[];
+    let different_topic=[];
     for (let i=0; i < hits.length; i++) {
         if (is_topic_match(topic, hits[i]._source.t)) {
-            sorted_hits.unshift(hits[i]);
+            same_topic.push(hits[i]);
         } else {
-            sorted_hits.push(hits[i]);
+            different_topic.push(hits[i]);
         }
     }
-    return sorted_hits;
+    return same_topic.concat(different_topic);
 }
 
 function hits_topic_tiebreaker(topic, hits) {
