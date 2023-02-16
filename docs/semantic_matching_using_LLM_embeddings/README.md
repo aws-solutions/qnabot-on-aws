@@ -1,7 +1,12 @@
 # Semantic question matching, using Large Language Model Text Embeddings
 
-QnABot can now use text embeddings to provide semantic search capability, with the goal of improved accuracy with much less tuning compared to standard Opensearch keyword based matching.
+QnABot can now use text embeddings to provide semantic search capability, with the goal of improved accuracy with much less tuning compared to standard Opensearch keyword based matching. Some of the benefits include:
+- Improved FAQ accuracy from semantic matching vs. keyword matching (comparing the meaning vs. comparing individual words)
+- Less training utterances required to match a diverse set of queries.
+- Better multi-language support, since translated utterances only need to match the meaning of the stored text, not the wording.
 
+Example: With semantic matching enabled, *"What's the address of the White House?"* matches *"Where does the President live?"*, and *"How old are you?"* matches *"What is your age"*. These examples do not match using keywords as they do not share any of the same words.
+  
 For now this is an Experimental feature. We encourage you to try it on non-production instances initially, to validate expected accuracy improvements, and to test for any regression issues. 
 
 With this release, QnaBot can now use 
