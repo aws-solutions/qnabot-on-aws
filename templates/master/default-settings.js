@@ -17,6 +17,7 @@ var default_settings = {
     ALT_SEARCH_KENDRA_FALLBACK_CONFIDENCE_SCORE: "HIGH", //Should be one of 'VERY_HIGH'|'HIGH'|'MEDIUM'|'LOW'
     ALT_SEARCH_KENDRA_FAQ_CONFIDENCE_SCORE: "HIGH", //Should be one of 'VERY_HIGH'|'HIGH'|'MEDIUM'|'LOW'
     ALT_SEARCH_KENDRA_INDEXES: "${DefaultKendraIndexId}", // Add Kendra index to array to enable Amazon Kendra as a fallback source of answers
+    ALT_SEARCH_KENDRA_INDEXES_TOKEN_AUTH: "${DefaultKendraIndexAuth}", // If true and _userinfo.verifiedIdentity is true, then pass idtoken to Kendra Index to enable pass through authentication.
     ALT_SEARCH_KENDRA_S3_SIGNED_URLS: "true", // If S3 document URL is in the search result, convert to signed URL. Make sure IAM ExtensionLambdaRole has access to S3 objects in Kendra index (default role grants access to buckets starting with name QNA or qna).
     ALT_SEARCH_KENDRA_S3_SIGNED_URL_EXPIRE_SECS: 300, // Expiry time for signed URLs
     ALT_SEARCH_KENDRA_MAX_DOCUMENT_COUNT: 2, // limit number of document search results returned by Kendra fallback\
