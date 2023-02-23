@@ -39,17 +39,17 @@ module.exports={
         "ServiceToken": { "Fn::GetAtt" : ["CFNLambda", "Arn"] },
         "ESArn": {"Fn::If":[
             "CreateDomain",
-            {"Fn::GetAtt":["ElasticsearchDomain","DomainArn"]},
+            {"Fn::GetAtt":["OpensearchDomain","DomainArn"]},
             {"Fn::GetAtt":["ESInfo","Arn"]}
         ]},
         "ESAddress":{"Fn::If":[
             "CreateDomain",
-            {"Fn::GetAtt":["ElasticsearchDomain","DomainEndpoint"]},
+            {"Fn::GetAtt":["OpensearchDomain","DomainEndpoint"]},
             {"Fn::GetAtt":["ESInfo","Endpoint"]}
         ]},
         "ESDomain":{"Fn::If":[
             "CreateDomain",
-            {"Ref":"ElasticsearchDomain"},
+            {"Ref":"OpensearchDomain"},
             {"Ref":"ElasticsearchName"}
         ]}
     }
@@ -79,7 +79,7 @@ module.exports={
             {"Fn::GetAtt":["ApiUrl","Name"]},
             "/static/client.html"
         ]]},
-        "Kibana":{"Fn::Sub":"${ESVar.ESAddress}/_plugin/kibana/"}
+        "Kibana":{"Fn::Sub":"${ESVar.ESAddress}/_dashboards/app/dashboards#/list"}
     }
 }
 }

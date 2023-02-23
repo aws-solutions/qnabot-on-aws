@@ -267,6 +267,15 @@ module.exports={
             ES_ADDRESS:{"Fn::GetAtt":["ESVar","ESAddress"]},
             DEFAULT_SETTINGS_PARAM:{"Ref":"DefaultQnABotSettings"},
             CUSTOM_SETTINGS_PARAM:{"Ref":"CustomQnABotSettings"},
+            EMBEDDINGS_API: { "Ref": "EmbeddingsApi" },
+            EMBEDDINGS_SAGEMAKER_ENDPOINT : {
+              "Fn::If": [
+                  "EmbeddingsSagemaker", 
+                  {"Fn::GetAtt": ["SagemakerEmbeddingsStack", "Outputs.EmbeddingsSagemakerEndpoint"] }, 
+                  ""
+              ]
+            },
+            EMBEDDINGS_LAMBDA_ARN: { "Ref": "EmbeddingsLambdaArn" },
           }
         },
         "Handler": "index.handler",
@@ -326,6 +335,46 @@ module.exports={
           			"Resource": "*"
           		}]
           	}
+          },
+          { 
+            "Fn::If": [
+              "EmbeddingsEnable",
+              {
+                "PolicyName" : "EmbeddingsPolicy",
+                "PolicyDocument" : {
+                "Version": "2012-10-17",
+                  "Statement": [
+                    { 
+                      "Fn::If": [
+                        "EmbeddingsSagemaker", 
+                        {
+                            "Effect": "Allow",
+                            "Action": [
+                                "sagemaker:InvokeEndpoint"
+                            ],
+                            "Resource": {"Fn::GetAtt": ["SagemakerEmbeddingsStack", "Outputs.EmbeddingsSagemakerEndpointArn"]}
+                        },
+                        {"Ref":"AWS::NoValue"}
+                      ]
+                    },
+                    { 
+                      "Fn::If": [
+                        "EmbeddingsLambdaArn", 
+                        {
+                          "Effect": "Allow",
+                          "Action": [
+                            "lambda:InvokeFunction"
+                          ],
+                          "Resource":[{"Ref":"EmbeddingsLambdaArn"}]
+                        },
+                        {"Ref":"AWS::NoValue"}
+                      ]
+                    },
+                  ]
+                }
+              },
+              {"Ref":"AWS::NoValue"}
+            ]
           },
           {
             "PolicyName" : "S3QNABucketReadAccess",

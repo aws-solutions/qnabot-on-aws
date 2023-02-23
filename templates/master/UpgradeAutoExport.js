@@ -15,6 +15,20 @@ module.exports={
             id:exportfile,
             index:{"Fn::Sub":"${Var.QnaIndex}"},
             encryption:{"Ref":"Encryption"},
+            PRE_UPGRADE_EXPORT_TRIGGERS:{
+                "Fn::Sub":[
+                    "${EmbeddingsApi} ${EmbeddingsLambdaDimensions} ${EmbeddingsLambdaArn} ${SMEmbeddingEndpoint}",
+                    {
+                        "SMEmbeddingEndpoint": {
+                            "Fn::If": [
+                                "EmbeddingsSagemaker", 
+                                {"Fn::GetAtt": ["SagemakerEmbeddingsStack", "Outputs.EmbeddingsSagemakerEndpoint"] }, 
+                                ""
+                            ]
+                          },
+                    }
+                ]
+            }
         }
     },
     "PreUpgradeExportMetrics":{

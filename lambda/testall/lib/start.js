@@ -25,6 +25,9 @@ module.exports=function(config){
 function query(filter){
     return {
         size:1000,
+        _source: {
+            "exclude": ["questions.q_vector", "a_vector"]
+        },
         query:{
             bool:_.pickBy({
                 "must":{"match_all":{}},

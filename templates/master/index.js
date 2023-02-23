@@ -259,6 +259,30 @@ module.exports={
         "Type":"Number",
         "Description": "To conserve storage in Amazon ElasticSearch, metrics and feedback data used to populate the Kibana dashboard are automatically deleted after this period (default 43200 minutes = 30 days). Monitor 'Free storage space' for your ElasticSearch domain to ensure that you have sufficient space available to store data for the desired retention period.",
         "Default":43200
+    },
+    "EmbeddingsApi":{
+      "Type":"String",
+      "Description":"Optionally enable (experimental) QnABot Semantics Search using Embeddings from a pre-trained Large Language Model. If set to SAGEMAKER, an ml.m5.xlarge Sagemaker endpoint is automatically provisioned with Hugging Face e5-large model. To use a custom LAMBDA function, provide additional parameters below.",
+      "AllowedValues": ["DISABLED", "SAGEMAKER", "LAMBDA"],
+      "Default":"DISABLED"
+    },
+    "SagemakerInitialInstanceCount":{
+      "Type":"Number",
+      "MinValue":0,
+      "Description":"Optional: If EmbeddingsApi is SAGEMAKER, provide initial instance count. Set to '0' to enable Serverless Inference (for cold-start delay tolerant deployments only).",
+      "Default":1
+    },
+    "EmbeddingsLambdaArn":{
+      "Type":"String",
+      "AllowedPattern": "^(|arn:aws:lambda:.*)$",
+      "Description":"Optional: If EmbeddingsApi is LAMBDA, provide ARN for a Lambda function that takes JSON {\"inputtext\":\"string\"}, and returns JSON {\"embedding\":[...]}",
+      "Default":""
+    },
+    "EmbeddingsLambdaDimensions":{
+      "Type":"Number",
+      "MinValue":1,
+      "Description":"Optional: If EmbeddingsApi is LAMBDA, provide number of dimensions for embeddings returned by the EmbeddingsLambda function specified above.",
+      "Default":4096
     }
   },
   "Conditions":{
@@ -279,7 +303,11 @@ module.exports={
     "CreateConcurrency":{ "Fn::Not": [
       {"Fn::Equals":[{"Ref":"FulfillmentConcurrency"},"0"]}
     ]},
-    "SingleNode": {"Fn::Equals":[{"Ref":"ElasticSearchNodeCount"},"1"]}
+    "SingleNode": {"Fn::Equals":[{"Ref":"ElasticSearchNodeCount"},"1"]},
+    "EmbeddingsEnable":{"Fn::Not": [{ "Fn::Equals":[{"Ref":"EmbeddingsApi"},"DISABLED"]}]},
+    "EmbeddingsSagemaker":{"Fn::Equals":[{"Ref":"EmbeddingsApi"},"SAGEMAKER"]},
+    "EmbeddingsLambda":{"Fn::Equals":[{"Ref":"EmbeddingsApi"},"LAMBDA"]},
+    "EmbeddingsLambdaArn":{"Fn::Not": [{ "Fn::Equals":[{"Ref":"EmbeddingsLambdaArn"},""]}]}
   }
 }
 

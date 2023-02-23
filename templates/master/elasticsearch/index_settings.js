@@ -1,5 +1,6 @@
 module.exports={
     "number_of_shards" : "1",
+    "index.knn": true,
     analysis: {
       filter: {
         english_stop: {
@@ -34,18 +35,18 @@ module.exports={
                 "english_stemmer"
             ]
         },
-		"custom_english_unique": {
-			"type": "custom",
-			"tokenizer": "standard",
-			"filter": [
-			    "english_possessive_stemmer", 
-			    "lowercase", 
-			    "english_stop", 
-			    "english_keywords", 
-			    "english_stemmer", 
-			    "unique"
-		    ]
-		}
+        "custom_english_unique": {
+          "type": "custom",
+          "tokenizer": "standard",
+          "filter": [
+              "english_possessive_stemmer", 
+              "lowercase", 
+              "english_stop", 
+              "english_keywords", 
+              "english_stemmer", 
+              "unique"
+            ]
+        }
       }
     }
 }          

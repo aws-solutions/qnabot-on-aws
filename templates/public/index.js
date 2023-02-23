@@ -31,7 +31,7 @@ module.exports=Promise.resolve(require('../master')).then(function(base){
         "FeedbackSNSTopic",
         "ESProxyLambda",
         "ElasticsearchEndpoint",
-        "ElasticsearchIndex",
+        "ElasticsearchIndex"
     ])
     base.Parameters=_.pick(base.Parameters,[
         "Email",
@@ -45,7 +45,12 @@ module.exports=Promise.resolve(require('../master')).then(function(base){
         "LexBotVersion",
         "InstallLexResponseBots",
         "FulfillmentConcurrency",
-        "XraySetting"
+        "XraySetting",
+        "EmbeddingsApi",
+        "EmbeddingsSagemakerEndpoint",
+        "SagemakerInitialInstanceCount",
+        "EmbeddingsLambdaArn",
+        "EmbeddingsLambdaDimensions"
     ]);
     base.Metadata = {
         "AWS::CloudFormation::Interface": {
@@ -85,7 +90,30 @@ module.exports=Promise.resolve(require('../master')).then(function(base){
                    "Parameters": [
                         "LexV2BotLocaleIds"
                    ]
-                }
+                },
+                {
+                    "Label": {
+                         "default": "Semantic Search with Embeddings"
+                    },
+                    "Parameters": [
+                        "EmbeddingsApi",
+                        "EmbeddingsSagemakerEndpoint",
+                        "SagemakerInitialInstanceCount",
+                        "EmbeddingsLambdaArn",
+                        "EmbeddingsLambdaDimensions"                   
+                    ]
+                 },
+                 {
+                    "Label": {
+                         "default": "Miscellaneous"
+                    },
+                    "Parameters": [
+                        "LexBotVersion",
+                        "InstallLexResponseBots",
+                        "FulfillmentConcurrency",
+                        "XraySetting"                  
+                    ]
+                 }
             ]
         }
     };
@@ -98,6 +126,10 @@ module.exports=Promise.resolve(require('../master')).then(function(base){
     base.Conditions.DontCreateDomain={"Fn::Equals":[true,false]}
     base.Conditions.VPCEnabled={"Fn::Equals":[true,false]}
     base.Conditions.SingleNode={"Fn::Equals":[{"Ref":"ElasticSearchNodeCount"},"1"]}
+    base.Conditions.EmbeddingsEnable= {"Fn::Not": [{ "Fn::Equals":[{"Ref":"EmbeddingsApi"},"DISABLED"]}]}
+    base.Conditions.EmbeddingsSagemaker = {"Fn::Equals":[{"Ref":"EmbeddingsApi"},"SAGEMAKER"]}
+    base.Conditions.EmbeddingsLambda = {"Fn::Equals":[{"Ref":"EmbeddingsApi"},"LAMBDA"]}
+    base.Conditions.EmbeddingsLambdaArn = {"Fn::Not": [{ "Fn::Equals":[{"Ref":"EmbeddingsLambdaArn"},""]}]}
 
     var out=JSON.stringify(base);
 
