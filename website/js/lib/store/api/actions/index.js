@@ -198,6 +198,8 @@ module.exports=Object.assign(
             url:context.rootState.info._links.questions.href+'?'+query({
                 query:opts.query,
                 topic:opts.topic || "",
+                client_filter:opts.client_filter || "",
+                score_answer:opts.score_answer || "false",
                 from:opts.from || 0
             }),
             method:'get',

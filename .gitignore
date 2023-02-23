@@ -30,6 +30,7 @@ node_modules/
 jspm_packages/
 py_modules/
 crhelper*/
+model_repo/
 
 # Typescript v1 declaration files
 typings/

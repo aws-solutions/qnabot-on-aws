@@ -71,6 +71,16 @@ module.exports = {
           DEFAULT_USER_POOL_JWKS_PARAM: { "Ref": "DefaultUserPoolJwksUrl" },
           DEFAULT_SETTINGS_PARAM: { "Ref": "DefaultQnABotSettings" },
           CUSTOM_SETTINGS_PARAM: { "Ref": "CustomQnABotSettings" },
+          EMBEDDINGS_API: { "Ref": "EmbeddingsApi" },
+          EMBEDDINGS_SAGEMAKER_ENDPOINT : {
+            "Fn::If": [
+                "EmbeddingsSagemaker", 
+                {"Fn::GetAtt": ["SagemakerEmbeddingsStack", "Outputs.EmbeddingsSagemakerEndpoint"] }, 
+                ""
+            ]
+          },
+          EMBEDDINGS_SAGEMAKER_INSTANCECOUNT : { "Ref": "SagemakerInitialInstanceCount" }, // force new fn version when instance count changes
+          EMBEDDINGS_LAMBDA_ARN: { "Ref": "EmbeddingsLambdaArn" },
         }, examples, responsebots)
       },
       "Handler": "index.handler",
@@ -120,6 +130,7 @@ module.exports = {
             { "Fn::GetAtt": ["ESProxyLambda", "Arn"] },
             { "Fn::GetAtt": ["ESLoggingLambda", "Arn"] },
             { "Fn::GetAtt": ["ESQidLambda", "Arn"] },
+            { "Fn::If": ["EmbeddingsLambdaArn", {"Ref":"EmbeddingsLambdaArn"}, {"Ref":"AWS::NoValue"}] },
           ].concat(require('../../examples/outputs').names
             .map(x => {
               return { "Fn::GetAtt": ["ExamplesStack", `Outputs.${x}`] }
@@ -238,6 +249,27 @@ module.exports = {
             }]
           }
         },
+        { 
+          "Fn::If": [
+            "EmbeddingsSagemaker", 
+            {
+              "PolicyName" : "SagemakerInvokeEndpointAccess",
+              "PolicyDocument" : {
+              "Version": "2012-10-17",
+                "Statement": [
+                  { 
+                    "Effect": "Allow",
+                    "Action": [
+                        "sagemaker:InvokeEndpoint"
+                    ],
+                    "Resource": {"Fn::GetAtt": ["SagemakerEmbeddingsStack", "Outputs.EmbeddingsSagemakerEndpointArn"]}
+                  }
+                ]
+              }
+            },
+            {"Ref":"AWS::NoValue"}
+          ]
+        },
         {
           "PolicyName" : "S3QNABucketReadAccess",
           "PolicyDocument" : {
@@ -271,7 +303,7 @@ module.exports = {
       "Environment": {
         "Variables": Object.assign({
           REPEAT_COUNT:  "4",
-          TARGET_PATH: "_doc/_search",
+          TARGET_PATH: "_search",
           TARGET_INDEX: { "Fn::GetAtt": ["Var","QnaIndex"] },
           TARGET_URL: { "Fn::GetAtt": ["ESVar", "ESAddress"] },
           DEFAULT_SETTINGS_PARAM: { "Ref": "DefaultQnABotSettings" },

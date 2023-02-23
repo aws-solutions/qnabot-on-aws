@@ -23,12 +23,14 @@ module.exports=Object.assign(
         },
         "Environment": {
             "Variables": {
-                STRIDE:"1000000",
+                STRIDE:"20000",
                 ES_INDEX:{"Ref":"VarIndex"},
                 ES_METRICSINDEX:{"Ref":"MetricsIndex"},
                 ES_FEEDBACKINDEX:{"Ref":"FeedbackIndex"},
                 ES_ENDPOINT:{"Ref":"EsEndpoint"},
-                ES_PROXY:{"Ref":"EsProxyLambda"}
+                ES_PROXY:{"Ref":"EsProxyLambda"},
+                DEFAULT_SETTINGS_PARAM: {Ref: "DefaultQnABotSettings"},
+                CUSTOM_SETTINGS_PARAM: {Ref: "CustomQnABotSettings"}
             }
         },
         "Handler": "index.start",
@@ -42,6 +44,12 @@ module.exports=Object.assign(
                 "SecurityGroupIds": { "Fn::Split" : [ ",", {"Ref": "VPCSecurityGroupIdList"} ] },
             }, {"Ref" : "AWS::NoValue"} ]
         },
+        "Layers":[
+          {"Ref":"AwsSdkLayerLambdaLayer"},
+          {"Ref":"CommonModulesLambdaLayer"},
+          {"Ref":"EsProxyLambdaLayer"},
+          {"Ref":"QnABotCommonLambdaLayer"}
+        ],
         "TracingConfig" : {
             "Fn::If": [ "XRAYEnabled", {"Mode": "Active"},
                 {"Ref" : "AWS::NoValue"} ]
@@ -67,20 +75,31 @@ module.exports=Object.assign(
                 ES_METRICSINDEX:{"Ref":"MetricsIndex"},
                 ES_FEEDBACKINDEX:{"Ref":"FeedbackIndex"},
                 ES_ENDPOINT:{"Ref":"EsEndpoint"},
-                ES_PROXY:{"Ref":"EsProxyLambda"}
+                ES_PROXY:{"Ref":"EsProxyLambda"},
+                DEFAULT_SETTINGS_PARAM: {Ref: "DefaultQnABotSettings"},
+                CUSTOM_SETTINGS_PARAM: {Ref: "CustomQnABotSettings"},
+                EMBEDDINGS_API: { "Ref": "EmbeddingsApi" },
+                EMBEDDINGS_SAGEMAKER_ENDPOINT : { "Ref": "EmbeddingsSagemakerEndpoint" },
+                EMBEDDINGS_LAMBDA_ARN: { "Ref": "EmbeddingsLambdaArn" },
             }
         },
         "Handler": "index.step",
         "MemorySize": "1024",
         "Role": {"Fn::GetAtt": ["ImportRole","Arn"]},
         "Runtime": "nodejs16.x",
-        "Timeout": 300,
+        "Timeout": 900,
         "VpcConfig" : {
             "Fn::If": [ "VPCEnabled", {
                 "SubnetIds": { "Fn::Split" : [ ",", {"Ref": "VPCSubnetIdList"} ] },
                 "SecurityGroupIds": { "Fn::Split" : [ ",", {"Ref": "VPCSecurityGroupIdList"} ] },
             }, {"Ref" : "AWS::NoValue"} ]
         },
+        "Layers":[
+          {"Ref":"AwsSdkLayerLambdaLayer"},
+          {"Ref":"CommonModulesLambdaLayer"},
+          {"Ref":"EsProxyLambdaLayer"},
+          {"Ref":"QnABotCommonLambdaLayer"}
+        ],
         "TracingConfig" : {
             "Fn::If": [ "XRAYEnabled", {"Mode": "Active"},
                 {"Ref" : "AWS::NoValue"} ]
@@ -112,6 +131,45 @@ module.exports=Object.assign(
           util.basicLambdaExecutionPolicy(),
           util.lambdaVPCAccessExecutionRole(),
           util.xrayDaemonWriteAccess(),
+          {
+            PolicyName: "SSMGetParameterAccess",
+            PolicyDocument: {
+              Version: "2012-10-17",
+              Statement: [
+                {
+                  Effect: "Allow",
+                  Action: [
+                    "ssm:GetParameter",
+                  ],
+                  Resource: [
+                    {"Fn::Join": ["", ["arn:aws:ssm:", {"Ref": "AWS::Region"}, ":", {"Ref": "AWS::AccountId"}, ":parameter/", {"Ref": "CustomQnABotSettings"}]]},
+                    {"Fn::Join": ["", ["arn:aws:ssm:", {"Ref": "AWS::Region"}, ":", {"Ref": "AWS::AccountId"}, ":parameter/", {"Ref": "DefaultQnABotSettings"}]]},
+                  ],
+                }
+              ]
+            }
+          },
+          { 
+            "Fn::If": [
+              "EmbeddingsSagemaker",
+              {
+                "PolicyName" : "SagemakerEmbeddingsPolicy",
+                "PolicyDocument" : {
+                "Version": "2012-10-17",
+                  "Statement": [ 
+                    {
+                        "Effect": "Allow",
+                        "Action": [
+                            "sagemaker:InvokeEndpoint"
+                        ],
+                        "Resource": {"Ref":"EmbeddingsSagemakerEndpointArn"}
+                    }
+                  ]
+                }
+              },
+              {"Ref":"AWS::NoValue"}
+            ]
+          }
         ],
         "ManagedPolicyArns": [
           {"Ref":"ImportPolicy"}
@@ -139,9 +197,17 @@ module.exports=Object.assign(
               "Action": [
                 "lambda:InvokeFunction"
               ],
-              "Resource":[{"Ref":"EsProxyLambda"}]
-          }]
-        }
+              "Resource":[{"Ref":"EsProxyLambda"}, { "Fn::If": ["EmbeddingsLambdaArn", {"Ref":"EmbeddingsLambdaArn"}, {"Ref":"AWS::NoValue"}] }]
+          },
+          {
+              "Effect": "Allow",
+              "Action": [
+                "es:ESHttpPost",
+                "es:ESHttpPut"
+              ],
+              "Resource": [{"Fn::Join": ["", [{"Ref":"EsArn"}, "/*"]]}]
+          }
+        ]}
       }
     },
     "ImportClear":{

@@ -17,21 +17,36 @@ module.exports={
         "BootstrapBucket":{"Type":"String"},
         "BootstrapPrefix":{"Type":"String"},
         "EsEndpoint": {"Type":"String"},
+        "EsArn": {"Type":"String"},
         "EsProxyLambda": {"Type":"String"},
         "ImportBucket": {"Type":"String"},
         "ExportBucket": {"Type":"String"},
         "VarIndex": {"Type":"String"},
         "MetricsIndex": {"Type":"String"},
         "FeedbackIndex": {"Type":"String"},
+        "DefaultQnABotSettings": {"Type":"String"},
+        "CustomQnABotSettings": {"Type":"String"},
         "Encryption": {"Type":"String"},
         "VPCSubnetIdList" : {"Type": "String"},
         "VPCSecurityGroupIdList": {"Type": "String"},
-        "XraySetting": {"Type": "String"}
+        "XraySetting": {"Type": "String"},
+        "EmbeddingsLambdaArn": {"Type": "String"},
+        "EmbeddingsApi": {"Type": "String"},
+        "EmbeddingsLambdaDimensions": {"Type": "String"},
+        "EmbeddingsLambdaArn": {"Type": "String"},
+        "EmbeddingsSagemakerEndpoint": {"Type": "String"},
+        "EmbeddingsSagemakerEndpointArn": {"Type": "String"},
+        "AwsSdkLayerLambdaLayer": {"Type": "String"},
+        "CommonModulesLambdaLayer": {"Type": "String"},
+        "EsProxyLambdaLayer": {"Type": "String"},
+        "QnABotCommonLambdaLayer": {"Type": "String"},
     },
     "Conditions": {
         "VPCEnabled": { "Fn::Not": [
                 { "Fn::Equals": [ "", { "Ref": "VPCSecurityGroupIdList" } ] }
             ] },
         "XRAYEnabled":{"Fn::Equals":[{"Ref":"XraySetting"},"TRUE"]},
+        "EmbeddingsLambdaArn":{"Fn::Not": [{ "Fn::Equals":[{"Ref":"EmbeddingsLambdaArn"},""]}]},
+        "EmbeddingsSagemaker":{"Fn::Not": [{ "Fn::Equals":[{"Ref":"EmbeddingsSagemakerEndpointArn"},""]}]}
     }
 }

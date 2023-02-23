@@ -5,6 +5,25 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [5.3.0] - 2023-02-23
+
+__*Note: we recommend that you first deploy these changes in a non-production environment. This is true for all releases, but especially important for minor and major releases.*__
+
+### Added
+
+- New (optional) text embeddings feature to enable built-in semantic search capabilities. Details at [README](docs/semantic_matching_using_LLM_embeddings/README.md)
+  - In order to provide this functionality, the solution will provision an inference endpoint hosted on Amazon SageMaker
+  - If enabled, this has cost implications. Please [refer to the IG](https://docs.aws.amazon.com/solutions/latest/qnabot-on-aws/plan-your-deployment.html#cost) to see cost estimates
+
+### Updated
+
+- Migrated solution from ElasticSearch v7.10 to OpenSearch v1.3
+- Updated TEST tab to include support for clientfilters
+- Security patches for npm and pip packages
+- Added/Updated unit tests for JS Lambda Hook SDK
+- Added unit tests for connect lambda
+- Added unit tests for genesys lambda
+
 ## [5.2.7] - 2023-02-08
 
 ### Updated

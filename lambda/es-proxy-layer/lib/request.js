@@ -37,7 +37,7 @@ module.exports=function(opts){
         request.body=opts.body
         request.data=opts.body
     }
-    qnabot.log("request",JSON.stringify(request,null,2))
+    qnabot.log("request (first 2000 chars):",JSON.stringify(request,null,2).slice(0,2000));
 
     return new Promise(function(res,rej){
         function next(count){

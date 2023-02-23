@@ -605,7 +605,7 @@ exports.cfnNagXray = function() {
     };
 };
 
-exports.cfnNag = function(rules) {
+exports.cfnNag = function(rules, reason="") {
     suppressed_rules = {
         "W11": {
             "id": "W11",
@@ -679,7 +679,15 @@ exports.cfnNag = function(rules) {
 
     return {
         "cfn_nag": {
-            "rules_to_suppress": rules.map((rule) => suppressed_rules[rule])
+            "rules_to_suppress": rules.map((rule) => {
+                let supression = suppressed_rules[rule]
+
+                //if caller provides a reason, replace the default message
+                if(reason){
+                    supression.reason = reason
+                }
+                return supression
+            })
         }
     };
 };
