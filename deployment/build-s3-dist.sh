@@ -100,12 +100,10 @@ cp build/templates/master.json $template_dist_dir/qnabot-on-aws-extended.templat
 
 # Copying nested templates to global assets directory for the benefit of cfn_nag finding the
 # nested templates
-# TODO: cfn_nag does not understand customer resources with properties with `.` (dot) which is valid. Example, "CR.botLocales". Plan to convert lex cutom resource
-#       to cloudformation lex resource. Due to cfn_nag limitation, we skip the `cp build/templates/examples.json $template_dist_dir/examples.template` which is just placed
-#       global-s3-assets folder for cfn_nag to find nested templates. Instead we run cfn_nag on examples.template manually locally after replace CR. with CR_ in
-#       next CloudFormation template.
+cp build/templates/examples.json $template_dist_dir/examples.template
 cp build/templates/export.json $template_dist_dir/export.template
 cp build/templates/import.json $template_dist_dir/import.template
+cp build/templates/sagemaker-embeddings.json $template_dist_dir/sagemaker-embeddings.template
 cp build/templates/testall.json $template_dist_dir/testall.template
 
 echo "------------------------------------------------------------------------------"
@@ -115,6 +113,10 @@ echo "--------------------------------------------------------------------------
 mkdir -p $build_dist_dir/lambda
 cp build/lambda/*.zip $build_dist_dir/lambda/
 cp build/*.zip $build_dist_dir/
+
+# Add embeddings model used to instantiate the sagemaker endpoint into global s3 bucket
+mkdir -p $build_dist_dir/ml_model
+cp build/ml_model/e5-large.tar.gz $build_dist_dir/ml_model/e5-large.tar.gz
 
 # put a copy of all templates in the regional buckets, especially useful
 # for the nested templates

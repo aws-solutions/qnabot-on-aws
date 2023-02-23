@@ -1,9 +1,4 @@
-var fs=require('fs')
-var _=require('lodash')
-
-var files=fs.readdirSync(`${__dirname}`)
-    .filter(x=>!x.match(/README.md|Makefile|index|test|outputs|.DS_Store/))
-    .map(x=>require(`./${x}`))
+const util = require('../util');
 
 module.exports={
     "AWSTemplateFormatVersion": "2010-09-09",
@@ -13,11 +8,14 @@ module.exports={
         "BootstrapPrefix":{"Type":"String"},
         "CFNLambda":{"Type":"String"},
         "SagemakerInitialInstanceCount":{"Type":"Number"},
+        "VPCSubnetIdList":{"Type": "String"},
+        "VPCSecurityGroupIdList":{"Type": "String"},
     },
 
     "Conditions": {
         "EmbeddingsSagemakerServerless":{"Fn::Equals":[{"Ref":"SagemakerInitialInstanceCount"},0]},
-        "EmbeddingsSagemakerProvisioned":{"Fn::Not": [{"Fn::Equals":[{"Ref":"SagemakerInitialInstanceCount"},0]}]},
+        "EmbeddingsSagemakerProvisioned":{"Fn::Not":[{"Fn::Equals":[{"Ref":"SagemakerInitialInstanceCount"},0]}]},
+        "VPCEnabled": {"Fn::Not":[{"Fn::Equals":["",{ "Ref": "VPCSecurityGroupIdList"}]}]},
     },
 
     "Resources": {
@@ -50,6 +48,16 @@ module.exports={
                         "QnABotSMEmbeddingModelExecutionRole",
                         "Arn"
                     ]
+                },
+                "VpcConfig" : {
+                    "Fn::If": [
+                        "VPCEnabled",
+                        {
+                            "Subnets": {"Fn::Split":[",",{"Ref":"VPCSubnetIdList"}]},
+                            "SecurityGroupIds":{"Fn::Split":[",",{"Ref":"VPCSecurityGroupIdList"}]},
+                        },
+                        {"Ref" : "AWS::NoValue"}
+                    ]
                 }
             }
         },
@@ -71,6 +79,16 @@ module.exports={
                         "VariantName": "AllTraffic",
                     }
                 ]
+            },
+            "Metadata": {
+                "cfn_nag": {
+                    "rules_to_suppress": [
+                        {
+                            "id": "W1200",
+                            "reason": "Default transient keys used by SageMaker for encryption is sufficient for use case"
+                        }
+                    ]
+                }
             }
         },
         "QnABotSMServerlessEmbeddingEndpointConfig": {
@@ -89,11 +107,22 @@ module.exports={
                         "VariantName": "AllTraffic",
                         "ServerlessConfig": {
                             "MaxConcurrency" : 50,
-                            "MemorySizeInMB" : 4096                               
+                            "MemorySizeInMB" : 4096
                         }
                     }
                 ]
+            },
+            "Metadata": {
+                "cfn_nag": {
+                    "rules_to_suppress": [
+                        {
+                            "id": "W1200",
+                            "reason": "Default transient keys used by SageMaker for encryption is sufficient for use case"
+                        }
+                    ]
+                }
             }
+
         },
         "QnABotSMProvisionedEmbeddingEndpoint": {
             "Condition":"EmbeddingsSagemakerProvisioned",
@@ -123,6 +152,7 @@ module.exports={
             "Type": "AWS::IAM::Role",
             "Properties": {
                 "AssumeRolePolicyDocument": {
+                    "Version": "2012-10-17",
                     "Statement": [
                         {
                             "Action": [
@@ -135,8 +165,7 @@ module.exports={
                                 ]
                             }
                         }
-                    ],
-                    "Version": "2012-10-17"
+                    ]
                 },
                 "Path": "/",
                 "Policies": [
@@ -151,25 +180,94 @@ module.exports={
                                         "s3:GetObject"
                                      ],
                                     "Resource": [
-                                        {"Fn::Sub":"arn:aws:s3:::${BootstrapBucket}/${BootstrapPrefix}/ml_model/e5-large.tar.gz"}
-                                    ]                      
+                                        {"Fn::Sub":"arn:${AWS::Partition}:s3:::${BootstrapBucket}/${BootstrapPrefix}/ml_model/e5-large.tar.gz"}
+                                    ]
+                                },
+                                {
+                                    "Effect": "Allow",
+                                    "Action": [
+                                        "logs:CreateLogStream",
+                                        "logs:CreateLogGroup",
+                                        "logs:DescribeLogStreams",
+                                    ],
+                                    "Resource": [
+                                        {"Fn::Sub":"arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/sagemaker/*"}
+                                    ]
+                                },
+                                {
+                                    "Effect": "Allow",
+                                    "Action": [
+                                        "logs:PutLogEvents",
+                                    ],
+                                    "Resource": [
+                                        {"Fn::Sub":"arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/sagemaker/*:log-stream:*"}
+                                    ]
+                                },
+                                {
+                                    "Effect": "Allow",
+                                    "Action": [
+                                        "cloudwatch:PutMetricData",
+                                        "ecr:GetAuthorizationToken"
+                                    ],
+                                    "Resource": [
+                                        // these actions cannot be bound to resources other than *
+                                        "*"
+                                    ]
+                                },
+                                {
+                                    "Effect": "Allow",
+                                    "Action": [
+                                        "ecr:BatchCheckLayerAvailability",
+                                        "ecr:GetDownloadUrlForLayer",
+                                        "ecr:BatchGetImage"
+                                    ],
+                                    "Resource": [
+                                        {"Fn::Sub":"arn:${AWS::Partition}:ecr:${AWS::Region}:*:repository/huggingface-pytorch-inference"}
+                                    ]
+                                },
+
+                                //ec2 permissions required for VPC access
+                                {
+                                    "Action": [
+                                        "ec2:DescribeVpcEndpoints",
+                                        "ec2:DescribeDhcpOptions",
+                                        "ec2:DescribeVpcs",
+                                        "ec2:DescribeSubnets",
+                                        "ec2:DescribeSecurityGroups",
+                                        "ec2:DescribeNetworkInterfaces"
+                                    ],
+                                    "Resource": [
+                                        // these actions cannot be bound to resources other than *
+                                        "*"
+                                    ],
+                                    "Effect": "Allow"
+                                },
+                                {
+                                    "Action": [
+                                        "ec2:CreateNetworkInterface",
+                                        "ec2:CreateNetworkInterfacePermission"
+                                    ],
+                                    "Resource": [
+                                        {"Fn::Sub":"arn:${AWS::Partition}:ec2:${AWS::Region}:${AWS::AccountId}:network-interface/*"},
+                                        {"Fn::Sub":"arn:${AWS::Partition}:ec2:${AWS::Region}:${AWS::AccountId}:subnet/*"},
+                                        {"Fn::Sub":"arn:${AWS::Partition}:ec2:${AWS::Region}:${AWS::AccountId}:security-group/*"}
+                                    ],
+                                    "Effect": "Allow"
                                 }
                             ]
                         }
-                    }                
-                ],
-                "ManagedPolicyArns": [
-                    "arn:aws:iam::aws:policy/AmazonSageMakerFullAccess"
+                    }
                 ]
-            }
+            },
+            "Metadata": util.cfnNag(["W11"], "cloudwatch:PutMetricData, ecr:GetAuthorizationToken, and ec2:Describe* actions cannot be bound to a resource")
         }
     },
     "Outputs": {
         "EmbeddingsSagemakerEndpoint": {
             "Value": {
                 "Fn::If": [
-                    "EmbeddingsSagemakerProvisioned", 
-                    {"Fn::GetAtt":["QnABotSMProvisionedEmbeddingEndpoint","EndpointName"]}, 
+                    "EmbeddingsSagemakerProvisioned",
+                    {"Fn::GetAtt":["QnABotSMProvisionedEmbeddingEndpoint","EndpointName"]},
                     {"Fn::GetAtt":["QnABotSMServerlessEmbeddingEndpoint","EndpointName"]}
                 ]
             }
@@ -177,8 +275,8 @@ module.exports={
         "EmbeddingsSagemakerEndpointArn": {
             "Value":{
                 "Fn::If": [
-                    "EmbeddingsSagemakerProvisioned", 
-                    {"Ref":"QnABotSMProvisionedEmbeddingEndpoint"}, 
+                    "EmbeddingsSagemakerProvisioned",
+                    {"Ref":"QnABotSMProvisionedEmbeddingEndpoint"},
                     {"Ref":"QnABotSMServerlessEmbeddingEndpoint"}
                 ]
             }

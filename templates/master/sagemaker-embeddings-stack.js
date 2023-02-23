@@ -9,6 +9,8 @@ module.exports={
                 "BootstrapBucket":{"Ref":"BootstrapBucket"},
                 "BootstrapPrefix":{"Ref":"BootstrapPrefix"},
                 "SagemakerInitialInstanceCount":{"Ref":"SagemakerInitialInstanceCount"},
+                "VPCSubnetIdList":{"Fn::Join":[",",{"Ref":"VPCSubnetIdList"}]},
+                "VPCSecurityGroupIdList":{"Fn::Join":[",",{"Ref":"VPCSecurityGroupIdList"}]},
             }
         }
     }

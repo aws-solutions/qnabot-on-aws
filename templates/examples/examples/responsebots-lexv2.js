@@ -5,7 +5,8 @@
  */
 const botDateVersion = process.env.npm_package_version + " - v2";  // CHANGE ME TO FORCE BOT REBUILD
 
-var _ = require('lodash');
+const _ = require('lodash');
+const util = require('../../util');
 
 exports.resources = {
     "BotRuntimeRole": {
@@ -38,7 +39,7 @@ exports.resources = {
                                 "Action": [
                                     "polly:SynthesizeSpeech"
                                 ],
-                                "Resource": "*"
+                                "Resource": {"Fn::Sub":"arn:${AWS::Partition}:polly:${AWS::Region}:${AWS::AccountId}:lexicon/*"}
                             }
                         ]
                     }
@@ -59,7 +60,8 @@ exports.resources = {
                     }
                 }
             ]
-        }
+        },
+        "Metadata": util.cfnNag(["W11"], "comprehend:DetectSentiment action cannot be bound to a resource")
     },
 
     "ResponseBotQNAWageV2": {

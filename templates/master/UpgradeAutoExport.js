@@ -21,8 +21,8 @@ module.exports={
                     {
                         "SMEmbeddingEndpoint": {
                             "Fn::If": [
-                                "EmbeddingsSagemaker", 
-                                {"Fn::GetAtt": ["SagemakerEmbeddingsStack", "Outputs.EmbeddingsSagemakerEndpoint"] }, 
+                                "EmbeddingsSagemaker",
+                                {"Fn::GetAtt": ["SagemakerEmbeddingsStack", "Outputs.EmbeddingsSagemakerEndpoint"] },
                                 ""
                             ]
                           },
@@ -39,6 +39,20 @@ module.exports={
             id:exportfile_metrics,
             index:{"Fn::Sub":"${Var.MetricsIndex}"},
             encryption:{"Ref":"Encryption"},
+            PRE_UPGRADE_EXPORT_TRIGGERS:{
+                "Fn::Sub":[
+                    "${EmbeddingsApi} ${EmbeddingsLambdaDimensions} ${EmbeddingsLambdaArn} ${SMEmbeddingEndpoint}",
+                    {
+                        "SMEmbeddingEndpoint": {
+                            "Fn::If": [
+                                "EmbeddingsSagemaker",
+                                {"Fn::GetAtt": ["SagemakerEmbeddingsStack", "Outputs.EmbeddingsSagemakerEndpoint"] },
+                                ""
+                            ]
+                          },
+                    }
+                ]
+            }
         }
     },
     "PreUpgradeExportFeedback":{
@@ -49,6 +63,20 @@ module.exports={
             id:exportfile_feedback,
             index:{"Fn::Sub":"${Var.FeedbackIndex}"},
             encryption:{"Ref":"Encryption"},
+            PRE_UPGRADE_EXPORT_TRIGGERS:{
+                "Fn::Sub":[
+                    "${EmbeddingsApi} ${EmbeddingsLambdaDimensions} ${EmbeddingsLambdaArn} ${SMEmbeddingEndpoint}",
+                    {
+                        "SMEmbeddingEndpoint": {
+                            "Fn::If": [
+                                "EmbeddingsSagemaker",
+                                {"Fn::GetAtt": ["SagemakerEmbeddingsStack", "Outputs.EmbeddingsSagemakerEndpoint"] },
+                                ""
+                            ]
+                          },
+                    }
+                ]
+            }
         }
     },
 }

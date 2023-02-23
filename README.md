@@ -12,27 +12,27 @@ QnABot on AWS is a multi-channel, multi-language conversational interface (chatb
 
 ## Architecture Overview
 
-Deploying this solution with the default parameters builds the following environment in the AWS Cloud.
+Deploying this solution with the default parameters deploys the following components in your AWS account (bordered components are optional).
 
 ![Architecture](docs/architecture.png)
 
-Figure 1: QnABot on AWS architecture on AWS
+Figure 1: QnABot on AWS architecture
 
-The AWS CloudFormation template deploys the following workflows and services:
+The high-level process flow for the solution components deployed with the AWS CloudFormation template is as follows:
 
-1. The admin deploys the solution into their AWS account, opens the Content Designer UI, and uses [Amazon Cognito](http://aws.amazon.com/cognito/) to authenticate.
+1.	The admin deploys the solution into their AWS account, opens the Content Designer UI or [Amazon Lex](https://aws.amazon.com/lex/) web client, and uses [Amazon Cognito](https://aws.amazon.com/cognito/) to authenticate.
 
 2. After authentication, [Amazon CloudFront](http://aws.amazon.com/cloudfront/) and [Amazon S3](http://aws.amazon.com/s3/) deliver the contents of the Content Designer UI.
 
 3. The admin configures questions and answers in the Content Designer and the UI sends requests to [Amazon API Gateway](http://aws.amazon.com/api-gateway/) to save the questions and answers.
 
-4. The `Content Designer` [AWS Lambda](http://aws.amazon.com/lambda/) function saves the input in [Amazon OpenSearch Service](http://aws.amazon.com/opensearch-service/) (successor to Amazon ElasticSearch Service) in a questions bank index.
+4. The `Content Designer` [AWS Lambda](http://aws.amazon.com/lambda/) function saves the input in [Amazon OpenSearch Service](http://aws.amazon.com/opensearch-service/) in a questions bank index. If using [text embeddings](docs/semantic_matching_using_LLM_embeddings/README.md), these requests will first pass through a ML model hosted on [Amazon SageMaker](https://aws.amazon.com/sagemaker/) to generate embeddings before being saved into the question bank on OpenSearch.
 
-5. Users of the chatbot interact with [Amazon Lex](http://aws.amazon.com/lex/) via the web client UI or Amazon Connect.
+5. Users of the chatbot interact with Amazon Lex via the web client UI or [Amazon Connect](https://aws.amazon.com/connect/).
 
-6. Amazon Lex forwards requests to the `Bot Fulfillment` AWS Lambda function. (Users can also send requests to this Lambda function via [Amazon Alexa](https://developer.amazon.com/en-US/alexa) devices).
+6. Amazon Lex forwards requests to the `Bot Fulfillment` AWS Lambda function. Users can also send requests to this Lambda function via [Amazon Alexa](https://developer.amazon.com/en-US/alexa) devices.
 
-7. The `Bot Fulfillment` AWS Lambda function takes the users input and uses [Amazon Comprehend](http://aws.amazon.com/comprehend/) and [Amazon Translate](http://aws.amazon.com/translate/) (if necessary) to translate non-English requests to English and then looks up the answer in in Amazon OpenSearch Service. If Amazon Kendra index is configured and provided at the time of deployment, the Bot Fulfillment function also sends a request to the [Amazon Kendra](http://aws.amazon.com/kendra/) index.
+7. The `Bot Fulfillment` AWS Lambda function takes the users input and uses [Amazon Comprehend](https://aws.amazon.com/comprehend/) and [Amazon Translate](https://aws.amazon.com/translate/) (if necessary) to translate non-English requests to English and then looks up the answer in in Amazon OpenSearch Service. If using [text embeddings](docs/semantic_matching_using_LLM_embeddings/README.md), these requests will first pass through a ML model hosted on Amazon SageMaker to generate an embedding to compare with those saved in the question bank on OpenSearch. If an [Amazon Kendra](https://aws.amazon.com/kendra/) index is configured, the `Bot Fulfillment` function also sends a request to that index.
 
 8. User interactions with the `Bot Fulfillment` function generate logs and metrics data, which is sent to [Amazon Kinesis Data Firehose](http://aws.amazon.com/kinesis/data-firehose/) then to Amazon S3 for later data analysis.
 
@@ -46,6 +46,7 @@ Alternatively, if you want to custom deploy QnABot on AWS, refer to the details 
 
 -   Run Linux. (tested on Amazon Linux)
 -   Install npm >7.10.0 and node >16.X.X ([instructions](https://nodejs.org/en/download/))
+-   Install and configure git lfs ([instructions](https://git-lfs.com/))
 -   Clone this repo.
 -   Set up an AWS account. ([instructions](https://AWS.amazon.com/free/))
 -   Configure AWS CLI and a local credentials file. ([instructions](https://docs.AWS.amazon.com/cli/latest/userguide/cli-chap-welcome.html))

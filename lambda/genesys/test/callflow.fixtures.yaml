@@ -246,10 +246,10 @@ inboundCall:
                                       value:
                                         exp: ToString(ToPhoneNumber(Call.Ani).subscriberNumber)
                                 lexBot:
-                                  QNABOT_REGION:
-                                    QNABOT_NAME:
+                                  ca-central-1:
+                                    QnABot-Test-Name:
                                       en-us:
-                                        QNABOT_ALIAS:
+                                        live:
                                           aliasInitialIntentName:
                                             lit: GenesysInitialIntent
                                           intents:

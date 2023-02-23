@@ -1,33 +1,12 @@
 // Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-exports.srcEvent = {
+exports.event = {
     "req": {
-        _fullfillment:{
-            step: "preproccess"
-        },
         "_event": {
-            "sessionId": "test-sessionId",
-            "inputTranscript": "What is the client answer",
+            "sessionId": "us-east-1:24ac4405-504c-4787-9b11-aa5633788026",
+            "inputTranscript": "Trigger Lambda",
             "interpretations": [
-                {
-                    "intent": {
-                        "slots": {
-                            "qnaslot": {
-                                "shape": "Scalar",
-                                "value": {
-                                    "originalValue": "What is the client answer",
-                                    "resolvedValues": [],
-                                    "interpretedValue": "What is the client answer"
-                                }
-                            }
-                        },
-                        "confirmationState": "None",
-                        "name": "QnaIntent",
-                        "state": "ReadyForFulfillment"
-                    },
-                    "nluConfidence": 0.93
-                },
                 {
                     "intent": {
                         "slots": {},
@@ -35,50 +14,65 @@ exports.srcEvent = {
                         "name": "FallbackIntent",
                         "state": "ReadyForFulfillment"
                     }
+                },
+                {
+                    "intent": {
+                        "slots": {
+                            "qnaslot": {
+                                "shape": "Scalar",
+                                "value": {
+                                    "originalValue": "Trigger Lambda",
+                                    "resolvedValues": [],
+                                    "interpretedValue": "Trigger Lambda"
+                                }
+                            }
+                        },
+                        "confirmationState": "None",
+                        "name": "QnaIntent",
+                        "state": "ReadyForFulfillment"
+                    },
+                    "nluConfidence": 0.7
                 }
             ],
+            "sessionState": {
+                "sessionAttributes": {
+                    "idtokenjwt": "<token redacted>"
+                },
+                "intent": {
+                    "slots": {},
+                    "confirmationState": "None",
+                    "name": "FallbackIntent",
+                    "state": "ReadyForFulfillment"
+                },
+                "originatingRequestId": "a9a1bbba-551e-4c9c-a344-2ab0540f0665"
+            },
             "responseContentType": "text/plain; charset=utf-8",
             "invocationSource": "FulfillmentCodeHook",
             "messageVersion": "1.0",
-            "sessionState": {
-                "sessionAttributes": {
-                    "qnabot_qid": "set.client2",
-                    "qnabot_gotanswer": "true",
-                    "qnabotcontext": "{\"previous\":{\"qid\":\"set.client2\",\"q\":\"set client2\"},\"navigation\":{\"next\":\"\",\"previous\":[],\"hasParent\":true}}",
-                    "QNAClientFilter": "client2",
-
-                },
-                "activeContexts": [],
-                "intent": {
-                    "slots": {
-                        "qnaslot": {
-                            "shape": "Scalar",
-                            "value": {
-                                "originalValue": "What is the client answer",
-                                "resolvedValues": [],
-                                "interpretedValue": "What is the client answer"
-                            }
-                        }
+            "transcriptions": [
+                {
+                    "resolvedContext": {
+                        "intent": "FallbackIntent"
                     },
-                    "confirmationState": "None",
-                    "name": "QnaIntent",
-                    "state": "ReadyForFulfillment"
-                },
-                "originatingRequestId": "originalRequestID-AAAABBBBB"
-            },
+                    "transcription": "Trigger Lambda",
+                    "resolvedSlots": {},
+                    "transcriptionConfidence": 1
+                }
+            ],
             "inputMode": "Text",
             "bot": {
-                "aliasId": "6E0OEAQD5Y",
+                "aliasId": "EGTLBGKGBP",
                 "aliasName": "live",
-                "name": "QNA-clientfilter-dev-master-1_QnaBot",
-                "version": "1",
+                "name": "v526-golden_QnaBot",
+                "version": "2",
                 "localeId": "en_US",
-                "id": "9MGCBPJAZM"
+                "id": "QFH46TWJQQ"
             },
             "errorFound": false
         },
         "_settings": {
-            "ENABLE_DEBUG_RESPONSES": false,
+            "ENABLE_DEBUG_RESPONSES": true,
+            "ENABLE_DEBUG_LOGGING": false,
             "ES_USE_KEYWORD_FILTERS": true,
             "ES_EXPAND_CONTRACTIONS": "{\"you're\":\"you are\",\"I'm\":\"I am\",\"can't\":\"cannot\"}",
             "ES_KEYWORD_SYNTAX_TYPES": "NOUN,PROPN,VERB,INTJ",
@@ -86,7 +80,6 @@ exports.srcEvent = {
             "ES_MINIMUM_SHOULD_MATCH": "2<75%",
             "ES_NO_HITS_QUESTION": "no_hits",
             "ES_USE_FUZZY_MATCH": false,
-            "ES_ENABLE_CLIENT_FILTERS": true,
             "ES_PHRASE_BOOST": "4",
             "ES_SCORE_ANSWER_FIELD": false,
             "ENABLE_SENTIMENT_SUPPORT": true,
@@ -102,14 +95,19 @@ exports.srcEvent = {
             "ALT_SEARCH_KENDRA_TOP_ANSWER_MESSAGE": "Amazon Kendra suggested answer.",
             "ALT_SEARCH_KENDRA_FAQ_MESSAGE": "Answer from Amazon Kendra FAQ.",
             "ALT_SEARCH_KENDRA_ANSWER_MESSAGE": "While I did not find an exact answer, these search results from Amazon Kendra might be helpful.",
+            "ALT_SEARCH_KENDRA_RESPONSE_TYPES": "ANSWER,DOCUMENT,QUESTION_ANSWER",
+            "ALT_SEARCH_KENDRA_ABBREVIATE_MESSAGE_FOR_SSML": true,
             "KENDRA_FAQ_INDEX": "",
             "KENDRA_FAQ_CONFIG_MAX_RETRIES": 8,
             "KENDRA_FAQ_CONFIG_RETRY_DELAY": 600,
             "KENDRA_FAQ_ES_FALLBACK": true,
             "ENABLE_KENDRA_WEB_INDEXER": false,
             "KENDRA_INDEXER_URLS": "",
+            "KENDRA_INDEXER_CRAWL_DEPTH": 3,
+            "KENDRA_INDEXER_CRAWL_MODE": "SUBDOMAINS",
             "KENDRA_INDEXER_SCHEDULE": "rate(1 day)",
             "KENDRA_WEB_PAGE_INDEX": "",
+            "KENDRA_INDEXED_DOCUMENTS_LANGUAGES": "en",
             "ERRORMESSAGE": "Unfortunately I encountered an error when searching for your answer. Please ask me again later.",
             "EMPTYMESSAGE": "You stumped me! Sadly I do not know how to answer your question.",
             "DEFAULT_ALEXA_LAUNCH_MESSAGE": "Hello, Please ask a question",
@@ -122,7 +120,7 @@ exports.srcEvent = {
             "ENFORCE_VERIFIED_IDENTITY": false,
             "NO_VERIFIED_IDENTITY_QUESTION": "no_verified_identity",
             "ELICIT_RESPONSE_MAX_RETRIES": 3,
-            "ELICIT_RESPONSE_RETRY_MESSAGE": "Please try again?",
+            "ELICIT_RESPONSE_RETRY_MESSAGE": "Please try again.",
             "ELICIT_RESPONSE_BOT_FAILURE_MESSAGE": "Your response was not understood. Please start again.",
             "ELICIT_RESPONSE_DEFAULT_MSG": "Ok. ",
             "CONNECT_IGNORE_WORDS": "",
@@ -130,80 +128,79 @@ exports.srcEvent = {
             "CONNECT_NEXT_PROMPT_VARNAME": "connect_nextPrompt",
             "ENABLE_REDACTING": false,
             "REDACTING_REGEX": "\\b\\d{4}\\b(?![-])|\\b\\d{9}\\b|\\b\\d{3}-\\d{2}-\\d{4}\\b",
+            "ENABLE_REDACTING_WITH_COMPREHEND": false,
+            "COMPREHEND_REDACTING_CONFIDENCE_SCORE": 0.99,
+            "COMPREHEND_REDACTING_ENTITY_TYPES": "ADDRESS,EMAIL,SSN,PHONE,PASSWORD,BANK_ACCOUNT_NUMBER,BANK_ROUTING,CREDIT_DEBIT_NUMBER",
             "PII_REJECTION_ENABLED": false,
             "PII_REJECTION_QUESTION": "pii_rejection_question",
-            "PII_REJECTION_WITH_COMPREHEND": true,
             "PII_REJECTION_REGEX": "\\b\\d{4}\\b(?![-])|\\b\\d{9}\\b|\\b\\d{3}-\\d{2}-\\d{4}\\b",
-            "PII_REJECTION_IGNORE_TYPES": "Name,Address",
+            "PII_REJECTION_ENTITY_TYPES": "ADDRESS,EMAIL,SSN,PHONE,PASSWORD,BANK_ACCOUNT_NUMBER,BANK_ROUTING,CREDIT_DEBIT_NUMBER",
+            "PII_REJECTION_CONFIDENCE_SCORE": 0.99,
             "DISABLE_CLOUDWATCH_LOGGING": false,
             "MINIMAL_ES_LOGGING": false,
             "S3_PUT_REQUEST_ENCRYPTION": "",
             "BOT_ROUTER_WELCOME_BACK_MSG": "Welcome back to QnABot.",
             "BOT_ROUTER_EXIT_MSGS": "exit,quit,goodbye,leave",
             "RUN_LAMBDAHOOK_FROM_QUERY_STEP": true,
-            "DEFAULT_USER_POOL_JWKS_URL": "https://cognito-idp.us-east-1.amazonaws.com/us-east-1_aaabbbbcccc/.well-known/jwks.json"
+            "LAMBDA_PREPROCESS_HOOK": "",
+            "LAMBDA_POSTPROCESS_HOOK": "",
+            "SEARCH_REPLACE_QUESTION_SUBSTRINGS": "",
+            "DEFAULT_USER_POOL_JWKS_URL": "https://cognito-idp.us-east-1.amazonaws.com/us-east-1_Zlne3mlEd/.well-known/jwks.json"
         },
         "_type": "LEX",
         "_lexVersion": "V2",
-        "_userId": "testUserId",
-        "intentname": "QnaIntent",
-        "question": "What is the client answer",
+        "_userId": "us-east-1:24ac4405-504c-4787-9b11-aa5633788026",
+        "invocationSource": "FulfillmentCodeHook",
+        "intentname": "FallbackIntent",
+        "slots": {},
+        "question": "Trigger Lambda",
         "session": {
-            "qnabot_qid": "set.client2",
-            "qnabot_gotanswer": true,
-            "qnabotcontext": {
-                "previous": {
-                    "qid": "set.client2",
-                    "q": "set client2"
-                },
-                "navigation": {
-                    "next": "",
-                    "previous": [],
-                    "hasParent": true
-                }
-            },
-            "QNAClientFilter": "client2"
+            "idtokenjwt": "<token redacted>",
+            "userPrefs": {},
+            "qnabotcontext": {}
         },
         "_preferredResponseType": "PlainText",
-        "_clientType": "LEX.Text",
+        "_clientType": "LEX.LexWebUI.Text",
         "sentiment": "NEUTRAL",
         "sentimentScore": {
-            "Positive": 0.07607905566692352,
-            "Negative": 0.3219950497150421,
-            "Neutral": 0.5718414187431335,
-            "Mixed": 0.030084457248449326
+            "Positive": 0.008091084659099579,
+            "Negative": 0.19534291326999664,
+            "Neutral": 0.7965446710586548,
+            "Mixed": 0.000021379006284405477
         },
+        "_fulfillment": {},
         "_userInfo": {
-            "UserId": "aaaaaaaaaa",
-            "InteractionCount": 5,
-            "FirstSeen": "Sat Jul 24 2021 14:08:51 GMT+0000 (Coordinated Universal Time)",
-            "LastSeen": "Sat Jul 24 2021 14:09:51 GMT+0000 (Coordinated Universal Time)",
-            "TimeSinceLastInteraction": 10.182,
+            "UserId": "Admin",
+            "InteractionCount": 44,
+            "FirstSeen": "Mon Jan 16 2023 20:30:35 GMT+0000 (Coordinated Universal Time)",
+            "LastSeen": "Sun Jan 22 2023 19:35:30 GMT+0000 (Coordinated Universal Time)",
+            "TimeSinceLastInteraction": 727.513,
             "recentTopics": [],
-            "isVerifiedIdentity": "false"
+            "UserName": "Admin",
+            "Email": "fake@example.com",
+            "isVerifiedIdentity": "true"
         },
         "_info": {
             "es": {
-                "address": "test-elasticSearchID",
-                "index": "qna-clientfilter-dev-master-1",
+                "address": "search-v526-go-elasti-1untrq0wvwpfj-u4ab5klv2lnz4bvsh5veec4m7m.us-east-1.es.amazonaws.com",
+                "index": "v526-golden",
                 "type": "qna",
                 "service": {
-                    "qid": "test-qid",
-                    "proxy": "test-proxy-lambda"
+                    "qid": "v526-golden-ESQidLambda-CQzDoRuaYFrb",
+                    "proxy": "v526-golden-ESProxyLambda-synsri1S3dw4"
                 }
             }
         }
     },
     "res": {
         "type": "PlainText",
-        "message": "this is the client2 answer",
+        "message": "Hello from QnABot!",
         "session": {
-            "qnabot_qid": "client2.1",
-            "qnabot_gotanswer": true,
+            "idtokenjwt": "<token redacted>",
             "qnabotcontext": {
                 "previous": {
-                    "qid": "client2.1",
-                    "q": "What is the client answer"
+                    "qid": "Lambda.Test",
+                    "q": "Trigger Lambda"
                 },
                 "navigation": {
                     "next": "",
@@ -211,292 +208,69 @@ exports.srcEvent = {
                     "hasParent": true
                 }
             },
-            "QNAClientFilter": "client2",
             "appContext": {
-                "altMessages": {}
-            }
+                "altMessages": {
+                    "ssml": "<speak>Hello! from Q-N-A Bot!</speak>",
+                    "markdown": "Hello from __QnABot__!"
+                }
+            },
+            "qnabot_qid": "Lambda.Test",
+            "qnabot_gotanswer": true
         },
         "card": {
             "send": true,
-            "title": "Office.Dental",
+            "title": "LambdaImage",
             "text": "",
             "url": "",
+            "imageUrl": "https://d1.awsstatic.com/product-marketing/Lambda/Diagrams/product-page-diagram_Lambda-WebApplications%202.c7f8cf38e12cb1daae9965ca048e10d676094dc1.png",
             "buttons": [
                 {
-                    "text": "School of Dental Medicine",
-                    "value": "QID::Office.Dental"
-                },
-                {
-                    "text": "School of Engineering",
-                    "value": "QID::Office.Engineering"
+                    "text": "Help",
+                    "value": "QID::Help"
                 }
             ]
         },
-        "intentname": "QnaIntent",
+        "intentname": "FallbackIntent",
         "_userInfo": {
-            "UserId": "test-userid",
-            "InteractionCount": 6,
-            "FirstSeen": "Sat Jul 24 2021 14:08:51 GMT+0000 (Coordinated Universal Time)",
-            "LastSeen": "Sat Jul 24 2021 14:10:01 GMT+0000 (Coordinated Universal Time)",
-            "TimeSinceLastInteraction": 10.182,
+            "UserId": "Admin",
+            "InteractionCount": 45,
+            "FirstSeen": "Mon Jan 16 2023 20:30:35 GMT+0000 (Coordinated Universal Time)",
+            "LastSeen": "Sun Jan 22 2023 19:47:37 GMT+0000 (Coordinated Universal Time)",
+            "TimeSinceLastInteraction": 727.513,
             "recentTopics": [],
-            "isVerifiedIdentity": "false"
+            "UserName": "Admin",
+            "Email": "fake@example.com",
+            "isVerifiedIdentity": "true"
         },
         "got_hits": 1,
         "result": {
-            "qid": "client2.1",
-            "a": "this is the client2 answer",
-            "clientFilterValues": "client2",
-            "type": "qna",
+            "qid": "Lambda.Test",
+            "quniqueterms": " Trigger Lambda  ",
             "questions": [
                 {
-                    "q": "what is the client answer"
+                    "q": "Trigger Lambda"
                 }
             ],
-            "quniqueterms": "what is the client answer",
-            "answersource": "ElasticSearch",
-            "autotranslate": {
-                "a": true,
-                "rp": true
-            },
-            "rp": "Please either answer the question, ask another question or say Goodbye to end the conversation.",
-            "l": "",
-            "args": ["{ \"test1\":\"A\",\"test2\":\"B\",\"test3\":\"C\"}","string test"]
-        },
-        "plainMessage": "this is the client2 answer",
-        "answerSource": "ELASTICSEARCH",
-        "reprompt": {
-            "type": "PlainText",
-            "text": "Please either answer the question, ask another question or say Goodbye to end the conversation."
-        }
-    }
-}
-
-exports.srcEvent2 = {
-    "req": {
-        "_event": {
-            "sessionId": "test-session2",
-            "inputTranscript": "QID::Office.Dental",
-            "interpretations": [
-                {
-                    "intent": {
-                        "slots": {},
-                        "confirmationState": "None",
-                        "name": "FallbackIntent",
-                        "state": "ReadyForFulfillment"
-                    }
-                },
-                {
-                    "intent": {
-                        "slots": {
-                            "qnaslot": null
-                        },
-                        "confirmationState": "None",
-                        "name": "QnaIntent",
-                        "state": "ReadyForFulfillment"
-                    },
-                    "nluConfidence": 0.47
-                }
-            ],
-            "responseContentType": "text/plain; charset=utf-8",
-            "invocationSource": "FulfillmentCodeHook",
-            "messageVersion": "1.0",
-            "sessionState": {
-                "sessionAttributes": {
-                    "qnabot_qid": "Office.Dental",
-                    "qnabot_gotanswer": "true",
-                    "qnabotcontext": "{\"previous\":{\"qid\":\"Office.Dental\",\"q\":\"QID::Office.Dental\"},\"navigation\":{\"next\":\"\",\"previous\":[],\"hasParent\":true}}",
-                    "topic": "Dental"
-                },
-                "activeContexts": [],
-                "intent": {
-                    "slots": {},
-                    "confirmationState": "None",
-                    "name": "FallbackIntent",
-                    "state": "ReadyForFulfillment"
-                },
-                "originatingRequestId": "test-request-id"
-            },
-            "inputMode": "Text",
-            "bot": {
-                "aliasId": "6E0OEAQD5Y",
-                "aliasName": "live",
-                "name": "qna-client-5",
-                "version": "1",
-                "localeId": "en_US",
-                "id": "9MGCBPJAZM"
-            },
-            "errorFound": false
-        },
-        "_settings": {
-            "ENABLE_DEBUG_RESPONSES": false,
-            "ES_USE_KEYWORD_FILTERS": true,
-            "ES_EXPAND_CONTRACTIONS": "{\"you're\":\"you are\",\"I'm\":\"I am\",\"can't\":\"cannot\"}",
-            "ES_KEYWORD_SYNTAX_TYPES": "NOUN,PROPN,VERB,INTJ",
-            "ES_SYNTAX_CONFIDENCE_LIMIT": ".20",
-            "ES_MINIMUM_SHOULD_MATCH": "2<75%",
-            "ES_NO_HITS_QUESTION": "no_hits",
-            "ES_USE_FUZZY_MATCH": false,
-            "ES_ENABLE_CLIENT_FILTERS": true,
-            "ES_PHRASE_BOOST": "4",
-            "ES_SCORE_ANSWER_FIELD": false,
-            "ENABLE_SENTIMENT_SUPPORT": true,
-            "ENABLE_MULTI_LANGUAGE_SUPPORT": false,
-            "ENABLE_CUSTOM_TERMINOLOGY": false,
-            "MINIMUM_CONFIDENCE_SCORE": 0.6,
-            "ALT_SEARCH_KENDRA_FALLBACK_CONFIDENCE_SCORE": "HIGH",
-            "ALT_SEARCH_KENDRA_FAQ_CONFIDENCE_SCORE": "HIGH",
-            "ALT_SEARCH_KENDRA_INDEXES": "56ed5cac-9e5c-44b9-a966-3d05cc4e3a64",
-            "ALT_SEARCH_KENDRA_S3_SIGNED_URLS": true,
-            "ALT_SEARCH_KENDRA_S3_SIGNED_URL_EXPIRE_SECS": 300,
-            "ALT_SEARCH_KENDRA_MAX_DOCUMENT_COUNT": 2,
-            "ALT_SEARCH_KENDRA_TOP_ANSWER_MESSAGE": "Amazon Kendra suggested answer.",
-            "ALT_SEARCH_KENDRA_FAQ_MESSAGE": "Answer from Amazon Kendra FAQ.",
-            "ALT_SEARCH_KENDRA_ANSWER_MESSAGE": "While I did not find an exact answer, these search results from Amazon Kendra might be helpful.",
-            "KENDRA_FAQ_INDEX": "aaaabbbcccccccc",
-            "KENDRA_FAQ_CONFIG_MAX_RETRIES": 8,
-            "KENDRA_FAQ_CONFIG_RETRY_DELAY": 600,
-            "KENDRA_FAQ_ES_FALLBACK": true,
-            "ENABLE_KENDRA_WEB_INDEXER": true,
-            "KENDRA_INDEXER_URLS": "https://aws.amazon.com/kendra/",
-            "KENDRA_INDEXER_SCHEDULE": "rate(1 day)",
-            "KENDRA_WEB_PAGE_INDEX": "aaaaaabbbbccccccc",
-            "ERRORMESSAGE": "Unfortunately I encountered an error when searching for your answer. Please ask me again later.",
-            "EMPTYMESSAGE": "You stumped me! Sadly I do not know how to answer your question.",
-            "DEFAULT_ALEXA_LAUNCH_MESSAGE": "Hello, Please ask a question",
-            "DEFAULT_ALEXA_REPROMPT": "Please either answer the question, ask another question or say Goodbye to end the conversation.",
-            "DEFAULT_ALEXA_STOP_MESSAGE": "Goodbye",
-            "SMS_HINT_REMINDER_ENABLE": true,
-            "SMS_HINT_REMINDER": " (Feedback? Reply THUMBS UP or THUMBS DOWN. Ask HELP ME at any time)",
-            "SMS_HINT_REMINDER_INTERVAL_HRS": "24",
-            "IDENTITY_PROVIDER_JWKS_URLS": [],
-            "ENFORCE_VERIFIED_IDENTITY": false,
-            "NO_VERIFIED_IDENTITY_QUESTION": "no_verified_identity",
-            "ELICIT_RESPONSE_MAX_RETRIES": 3,
-            "ELICIT_RESPONSE_RETRY_MESSAGE": "Please try again?",
-            "ELICIT_RESPONSE_BOT_FAILURE_MESSAGE": "Your response was not understood. Please start again.",
-            "ELICIT_RESPONSE_DEFAULT_MSG": "Ok. ",
-            "CONNECT_IGNORE_WORDS": "",
-            "CONNECT_ENABLE_VOICE_RESPONSE_INTERRUPT": false,
-            "CONNECT_NEXT_PROMPT_VARNAME": "connect_nextPrompt",
-            "ENABLE_REDACTING": false,
-            "REDACTING_REGEX": "\\b\\d{4}\\b(?![-])|\\b\\d{9}\\b|\\b\\d{3}-\\d{2}-\\d{4}\\b",
-            "PII_REJECTION_ENABLED": false,
-            "PII_REJECTION_QUESTION": "pii_rejection_question",
-            "PII_REJECTION_WITH_COMPREHEND": true,
-            "PII_REJECTION_REGEX": "\\b\\d{4}\\b(?![-])|\\b\\d{9}\\b|\\b\\d{3}-\\d{2}-\\d{4}\\b",
-            "PII_REJECTION_IGNORE_TYPES": "Name,Address",
-            "DISABLE_CLOUDWATCH_LOGGING": false,
-            "MINIMAL_ES_LOGGING": false,
-            "S3_PUT_REQUEST_ENCRYPTION": "",
-            "BOT_ROUTER_WELCOME_BACK_MSG": "Welcome back to QnABot.",
-            "BOT_ROUTER_EXIT_MSGS": "exit,quit,goodbye,leave",
-            "RUN_LAMBDAHOOK_FROM_QUERY_STEP": true,
-            "DEFAULT_USER_POOL_JWKS_URL": "https://cognito-idp.us-east-1.amazonaws.com/us-east-1_vaaabbbccc/.well-known/jwks.json"
-        },
-        "_type": "LEX",
-        "_lexVersion": "V2",
-        "_userId": "12345678",
-        "intentname": "FallbackIntent",
-        "question": "QID::Office.Dental",
-        "session": {
-            "qnabot_qid": "Office.Dental",
-            "qnabot_gotanswer": true,
-            "qnabotcontext": {
-                "previous": {
-                    "qid": "Office.Dental",
-                    "q": "QID::Office.Dental"
-                },
-                "navigation": {
-                    "next": "",
-                    "previous": [],
-                    "hasParent": true
-                }
-            },
-            "topic": "Dental"
-        },
-        "_preferredResponseType": "PlainText",
-        "_clientType": "LEX.Text",
-        "sentiment": "NEUTRAL",
-        "sentimentScore": {
-            "Positive": 0.0006423206650651991,
-            "Negative": 0.0036459837574511766,
-            "Neutral": 0.9957062602043152,
-            "Mixed": 0.000005430766577774193
-        },
-        "_userInfo": {
-            "UserId": "1234565",
-            "InteractionCount": 3,
-            "FirstSeen": "Tue Jul 27 2021 00:17:55 GMT+0000 (Coordinated Universal Time)",
-            "LastSeen": "Tue Jul 27 2021 00:41:15 GMT+0000 (Coordinated Universal Time)",
-            "TimeSinceLastInteraction": 59.677,
-            "recentTopics": [
-                {
-                    "dateTime": "2021-07-27T00:41:15.492Z",
-                    "topic": "Dental"
-                }
-            ],
-            "isVerifiedIdentity": "false"
-        },
-        "_info": {
-            "es": {
-                "address": "12345678",
-                "index": "qna-clientfilter-dev-master-1",
-                "type": "qna",
-                "service": {
-                    "qid": "1234567",
-                    "proxy": "12345678"
-                }
-            }
-        }
-    },
-    "res": {
-        "type": "PlainText",
-        "message": "ABC Street",
-        "session": {
-            "qnabot_qid": "Office.Dental",
-            "qnabot_gotanswer": "true",
-            "qnabotcontext": "{\"previous\":{\"qid\":\"Office.Dental\",\"q\":\"QID::Office.Dental\"},\"navigation\":{\"next\":\"\",\"previous\":[],\"hasParent\":true}}",
-            "topic": "Dental",
-            "appContext": "{\"altMessages\":{\"ssml\":\"<loud>ABC Street</loud>\",\"markdown\":\"*ABC Street*\"}}"
-        },
-        "card": {
-            "send": false,
-            "title": "",
-            "text": "",
-            "url": "",
-            "buttons": []
-        },
-        "intentname": "FallbackIntent",
-        "_userInfo": {
-            "UserId": "1234567",
-            "InteractionCount": 4,
-            "FirstSeen": "Tue Jul 27 2021 00:17:55 GMT+0000 (Coordinated Universal Time)",
-            "LastSeen": "Tue Jul 27 2021 00:42:14 GMT+0000 (Coordinated Universal Time)",
-            "TimeSinceLastInteraction": 59.677,
-            "recentTopics": [
-                {
-                    "topic": "Dental",
-                    "dateTime": "2021-07-27T00:42:14.724Z"
-                }
-            ],
-            "isVerifiedIdentity": "false"
-        },
-        "got_hits": 1,
-        "result": {
-            "qid": "Office.Dental",
-            "quniqueterms": " Where is the School of Dental Medicine office located?  ",
-            "questions": [
-                {
-                    "q": "Where is the School of Dental Medicine office located?"
-                }
-            ],
-            "a": "ABC Street",
+            "a": "Hello from QnABot!",
             "alt": {
-                "ssml": "<loud>ABC Street</loud>",
-                "markdown": "*ABC Street*"
+                "ssml": "<speak>Hello! from Q-N-A Bot!</speak>",
+                "markdown": "Hello from __QnABot__!"
             },
-            "t": "Dental",
+            "r": {
+                "title": "LambdaImage",
+                "imageUrl": "https://d1.awsstatic.com/product-marketing/Lambda/Diagrams/product-page-diagram_Lambda-WebApplications%202.c7f8cf38e12cb1daae9965ca048e10d676094dc1.png",
+                "buttons": [
+                    {
+                        "text": "Help",
+                        "value": "QID::Help"
+                    }
+                ]
+            },
+            "l": "qna-TestLambdaHook",
+            "args": [
+                "parameter1",
+                "{ \"key\": \"value\" }"
+            ],
             "type": "qna",
             "answersource": "ElasticSearch",
             "autotranslate": {
@@ -505,41 +279,97 @@ exports.srcEvent2 = {
                     "markdown": true,
                     "ssml": true
                 },
-                "rp": true
+                "rp": true,
+                "r": {
+                    "title": true,
+                    "buttons": {
+                        "x": {
+                            "text": true,
+                            "value": true
+                        }
+                    }
+                }
             },
-            "rp": "Please either answer the question, ask another question or say Goodbye to end the conversation.",
-            "l": "",
-            "args": []
+            "rp": "Please either answer the question, ask another question or say Goodbye to end the conversation."
         },
-        "plainMessage": "ABC Street",
+        "plainMessage": "Hello from QnABot!",
         "answerSource": "ELASTICSEARCH",
         "reprompt": {
             "type": "PlainText",
             "text": "Please either answer the question, ask another question or say Goodbye to end the conversation."
-        },
-        "out": {
-            "sessionState": {
-                "sessionAttributes": {
-                    "qnabot_qid": "Office.Dental",
-                    "qnabot_gotanswer": "true",
-                    "qnabotcontext": "{\"previous\":{\"qid\":\"Office.Dental\",\"q\":\"QID::Office.Dental\"},\"navigation\":{\"next\":\"\",\"previous\":[],\"hasParent\":true}}",
-                    "topic": "Dental",
-                    "appContext": "{\"altMessages\":{\"ssml\":\"<loud>ABC Street</loud>\",\"markdown\":\"*ABC Street*\"}}"
-                },
-                "dialogAction": {
-                    "type": "Close"
-                },
-                "intent": {
-                    "name": "FallbackIntent",
-                    "state": "Fulfilled"
-                }
-            },
-            "messages": [
-                {
-                    "contentType": "PlainText",
-                    "content": "ABC Street"
-                }
-            ]
         }
     }
+}
+
+exports.mockArgs = [
+    //args attributes from event object above
+    "parameter1",
+    { "key": "value" }
+]
+
+exports.mockMessage = {
+    plainText: this.event["res"]["result"]["a"],
+    markDown: this.event["res"]["result"]["alt"]["markdown"],
+    ssml: this.event["res"]["result"]["alt"]["ssml"]
+}
+
+exports.mockSessionAttributes = {
+    //request attributes from event object above
+    "idtokenjwt": "<token redacted>",
+    "userPrefs": {},
+    "qnabotcontext": {},
+
+    //response attributes from event object above
+    //response keys should override the request attributes
+    "idtokenjwt": "<token redacted>",
+    "qnabotcontext": {
+        "previous": {
+            "qid": "Lambda.Test",
+            "q": "Trigger Lambda"
+        },
+        "navigation": {
+            "next": "",
+            "previous": [],
+            "hasParent": true
+        }
+    },
+    "appContext": {
+        "altMessages": {
+            "ssml": "<speak>Hello! from Q-N-A Bot!</speak>",
+            "markdown": "Hello from __QnABot__!"
+        }
+    },
+    "qnabot_qid": "Lambda.Test",
+    "qnabot_gotanswer": true,
+
+    //custom attributes for test
+    "unit-test": "testValue"
+}
+
+exports.mockUserAttributes = {
+    //request attributes from event object above
+    "UserId": "Admin",
+    "InteractionCount": 44,
+    "FirstSeen": "Mon Jan 16 2023 20:30:35 GMT+0000 (Coordinated Universal Time)",
+    "LastSeen": "Sun Jan 22 2023 19:35:30 GMT+0000 (Coordinated Universal Time)",
+    "TimeSinceLastInteraction": 727.513,
+    "recentTopics": [],
+    "UserName": "Admin",
+    "Email": "fake@example.com",
+    "isVerifiedIdentity": "true",
+
+    //response attributes from event object above
+    //response keys should override the request attributes
+    "UserId": "Admin",
+    "InteractionCount": 45,
+    "FirstSeen": "Mon Jan 16 2023 20:30:35 GMT+0000 (Coordinated Universal Time)",
+    "LastSeen": "Sun Jan 22 2023 19:47:37 GMT+0000 (Coordinated Universal Time)",
+    "TimeSinceLastInteraction": 727.513,
+    "recentTopics": [],
+    "UserName": "Admin",
+    "Email": "fake@example.com",
+    "isVerifiedIdentity": "true",
+
+    //custom attributes for test
+    "unit-test": "testValue"
 }
