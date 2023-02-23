@@ -1,3 +1,6 @@
+// Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+// SPDX-License-Identifier: Apache-2.0
+
 const _ = require("lodash");
 
 module.exports = {
@@ -15,7 +18,6 @@ module.exports = {
     get_user_attribute: function (event, property, default_value = undefined) {
         return _.get(event, "res._userInfo." + property, default_value)
     },
-
 
     list_user_attributes: function(event){
         //Session attributes may have been added to the response object in addition to what are in
@@ -72,11 +74,10 @@ module.exports = {
     },
 
     set_message: function (event, message) {
-        _.set(event, "res.result.a", message.plainText != undefined ? message.plainText : _.get(event, "res.a"))
-        _.set(event, "res.result.alt.markdown", message.markDown != undefined ? message.markDown : _.get(event, "res.markdown"))
-        _.set(event, "res.result.alt.ssml", message.ssml != undefined ? message.ssml : _.get(event, "res.ssml"))
+        _.set(event, "res.result.a", message.plainText)
+        _.set(event, "res.result.alt.markdown", message.markDown)
+        _.set(event, "res.result.alt.ssml", message.ssml)
     },
-
 
     get_es_result: function (event) {
         return _.get(event, "res.result")
@@ -146,7 +147,7 @@ module.exports = {
     },
 
     get_response_card_imageurl: function (event) {
-        _.get(event, "res.card.imageUrl", undefined)
+        return _.get(event, "res.card.imageUrl", undefined)
     },
 
     set_response_card_title: function (event, title, overwrrite = true) {
@@ -161,7 +162,7 @@ module.exports = {
         let card = _.get(event, "res.card", undefined)
 
         if (!card) {
-            return card
+            return event
         }
 
         if (card.title == undefined) {
@@ -169,11 +170,12 @@ module.exports = {
         }
 
         let buttons = this.list_response_card_buttons(event)
-
         let imageUrl = this.get_response_card_imageurl(event)
+
         if (buttons.length == 0 && imageUrl == undefined) {
             throw new Error("If a response card is defined, either the imageUrl or buttons must be defined")
         }
+
         return event
     }
 }
