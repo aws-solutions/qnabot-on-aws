@@ -79,6 +79,17 @@ var default_settings = {
     EMBEDDINGS_ENABLE: '${EMBEDDINGS_ENABLE}', // Set to TRUE or FALSE to enable or disable use of embeddings for semantic search
     EMBEDDINGS_SCORE_THRESHOLD: 0.85, // If embedding similarity score is under threshold the match is rejected and QnABot reverts to scoring answer field (if ES_SCORE_ANSWER_FIELD is true) or Kendra fallback or no_hits
     EMBEDDINGS_SCORE_ANSWER_THRESHOLD: 0.80, // Applies only when if ES_SCORE_ANSWER_FIELD is true. If embedding similarity score on answer field is under threshold the match is rejected and QnABot reverts to Kendra fallback or no_hits
+    QA_SUMMARY_SAGEMAKER_ENABLE: '${QA_SUMMARY_SAGEMAKER_ENABLE}', // Set to TRUE or FALSE to enable or disable SAGEMAKER summarization
+    QA_SUMMARY_SAGEMAKER_PROMPT_FORMAT: 'Answer the last question based on the following text, or answer I dont know.<br><CONTEXT><br><QUESTION><br>Answer:', 
+    QA_SUMMARY_SAGEMAKER_MODEL_PARAMS: '{"early_stopping":true,"length_penalty":2,"max_new_tokens":100,"temperature":0}',
+    QA_SUMMARY_SAGEMAKER_PREFIX_MESSAGE: 'Answer from Flan-T5-XXL model:',
+    QA_SUMMARY_LAMBDA_ENABLE: '${QA_SUMMARY_LAMBDA_ENABLE}', // Set to TRUE or FALSE to enable or disable LAMBDA summarization
+    QA_SUMMARY_LAMBDA_PROMPT_FORMAT: 'Answer the last question based on the following text, or answer I dont know.<br><CONTEXT><br><QUESTION><br>Answer:', 
+    QA_SUMMARY_LAMBDA_MODEL_PARAMS: '{"model_params":"tbd"}',
+    QA_SUMMARY_LAMBDA_PREFIX_MESSAGE: 'Answer from Lambda model:',
+    QA_SUMMARY_CFAQ_ENABLE: '${QA_SUMMARY_CFAQ_ENABLE}', // Set to TRUE or FALSE to enable or disable CFAQ summarization
+    QA_SUMMARY_CFAQ_MODEL_PARAMS: '{"index_type":"kendra","index_id":"${DefaultKendraIndexId}","is_single":true,"is_rerank":true}',
+    QA_SUMMARY_CFAQ_PREFIX_MESSAGE: 'Answer from Lex CFAQ prototype model:',
 };
 module.exports = {
     "DefaultUserPoolJwksUrl": {
@@ -94,10 +105,14 @@ module.exports = {
         "Properties": {
             "Description": "Default QnABot Settings - DO NOT MODIFY",
             "Type": "String",
+            "Tier": "Advanced",  // Advanced tier required to accomodate number of settings
             "Value": { "Fn::Sub" : [
                 JSON.stringify(default_settings), {
                     "ES_USE_KEYWORD_FILTERS" : {"Fn::If": ["EmbeddingsEnable", "FALSE", "TRUE"]},
-                    "EMBEDDINGS_ENABLE" : {"Fn::If": ["EmbeddingsEnable", "TRUE", "FALSE"]}
+                    "EMBEDDINGS_ENABLE" : {"Fn::If": ["EmbeddingsEnable", "TRUE", "FALSE"]},
+                    "QA_SUMMARY_SAGEMAKER_ENABLE" : {"Fn::If": ["QASummarizeSagemaker", "TRUE", "FALSE"]},
+                    "QA_SUMMARY_LAMBDA_ENABLE" : {"Fn::If": ["QASummarizeLambda", "TRUE", "FALSE"]},
+                    "QA_SUMMARY_CFAQ_ENABLE" : {"Fn::If": ["QASummarizeCFAQ", "TRUE", "FALSE"]},
                 }
             ]} 
         }

@@ -361,7 +361,7 @@ async function routeKendraRequest(event, context) {
     let topAnswerMessage = event.req["_settings"]["ALT_SEARCH_KENDRA_TOP_ANSWER_MESSAGE"] + "\n\n"; //"Amazon Kendra suggested answer. \n\n ";
     let topAnswerMessageMd = event.req["_settings"]["ALT_SEARCH_KENDRA_TOP_ANSWER_MESSAGE"] == "" ? "" : `*${event.req["_settings"]["ALT_SEARCH_KENDRA_TOP_ANSWER_MESSAGE"]}* \n `;
     let answerMessage = event.req["_settings"]["ALT_SEARCH_KENDRA_ANSWER_MESSAGE"];
-    let answerMessageMd = event.req["_settings"]["ALT_SEARCH_KENDRA_ANSWER_MESSAGE"] == "" ? "" : `*${answerMessage}* \n `;
+    let answerMessageMd = event.req["_settings"]["ALT_SEARCH_KENDRA_ANSWER_MESSAGE"] == "" ? "" : `**${answerMessage}** \n `;
     let faqanswerMessage = event.req["_settings"]["ALT_SEARCH_KENDRA_FAQ_MESSAGE"] + "\n\n"; //'Answer from Amazon Kendra FAQ.'
     let faqanswerMessageMd = event.req["_settings"]["ALT_SEARCH_KENDRA_FAQ_MESSAGE"]  == "" ? "" : `*${event.req["_settings"]["ALT_SEARCH_KENDRA_FAQ_MESSAGE"]}* \n`
     let minimum_score = event.req["_settings"]["ALT_SEARCH_KENDRA_FALLBACK_CONFIDENCE_SCORE"];

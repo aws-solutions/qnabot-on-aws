@@ -1,4 +1,3 @@
-var config = require('./config');
 var _ = require('lodash');
 var crypto = require('crypto')
 var fs = require('fs')
@@ -81,6 +80,23 @@ module.exports = {
           },
           EMBEDDINGS_SAGEMAKER_INSTANCECOUNT : { "Ref": "SagemakerInitialInstanceCount" }, // force new fn version when instance count changes
           EMBEDDINGS_LAMBDA_ARN: { "Ref": "EmbeddingsLambdaArn" },
+          QA_SUMMARIZE_API: { "Ref": "QASummarizeApi" },
+          QA_SUMMARIZE_SAGEMAKER_ENDPOINT : {
+            "Fn::If": [
+                "QASummarizeSagemaker", 
+                {"Fn::GetAtt": ["SageMakerQASummarizeStack", "Outputs.QASummarizeSagemakerEndpoint"] }, 
+                ""
+            ]
+          },
+          CFAQ_SAGEMAKER_ENDPOINT : {
+            "Fn::If": [
+                "QASummarizeCFAQ", 
+                {"Fn::GetAtt": ["SageMakerCFAQStack", "Outputs.CFAQSagemakerEndpoint"] }, 
+                ""
+            ]
+          },
+          QA_SUMMARIZE_SAGEMAKER_INSTANCECOUNT : { "Ref": "SagemakerQASummarizeInitialInstanceCount" }, // force new fn version when instance count changes
+          QA_SUMMARIZE_LAMBDA_ARN: { "Ref": "QASummarizeLambdaArn" },
         }, examples, responsebots)
       },
       "Handler": "index.handler",
@@ -253,7 +269,7 @@ module.exports = {
           "Fn::If": [
             "EmbeddingsSagemaker", 
             {
-              "PolicyName" : "SagemakerInvokeEndpointAccess",
+              "PolicyName" : "EmbeddingsSagemakerInvokeEndpointAccess",
               "PolicyDocument" : {
               "Version": "2012-10-17",
                 "Statement": [
@@ -263,6 +279,48 @@ module.exports = {
                         "sagemaker:InvokeEndpoint"
                     ],
                     "Resource": {"Fn::GetAtt": ["SagemakerEmbeddingsStack", "Outputs.EmbeddingsSagemakerEndpointArn"]}
+                  }
+                ]
+              }
+            },
+            {"Ref":"AWS::NoValue"}
+          ]
+        },
+        { 
+          "Fn::If": [
+            "QASummarizeSagemaker", 
+            {
+              "PolicyName" : "QASummarizeSagemakerInvokeEndpointAccess",
+              "PolicyDocument" : {
+              "Version": "2012-10-17",
+                "Statement": [
+                  { 
+                    "Effect": "Allow",
+                    "Action": [
+                        "sagemaker:InvokeEndpoint"
+                    ],
+                    "Resource": {"Fn::GetAtt": ["SageMakerQASummarizeStack", "Outputs.QASummarizeSagemakerEndpointArn"]}
+                  }
+                ]
+              }
+            },
+            {"Ref":"AWS::NoValue"}
+          ]
+        },
+        { 
+          "Fn::If": [
+            "QASummarizeCFAQ", 
+            {
+              "PolicyName" : "CFAQSagemakerInvokeEndpointAccess",
+              "PolicyDocument" : {
+              "Version": "2012-10-17",
+                "Statement": [
+                  { 
+                    "Effect": "Allow",
+                    "Action": [
+                        "sagemaker:InvokeEndpoint"
+                    ],
+                    "Resource": {"Fn::GetAtt": ["SageMakerCFAQStack", "Outputs.CFAQSagemakerEndpointArn"]}
                   }
                 ]
               }

@@ -5,9 +5,10 @@ var handlebars = require('./handlebars');
 var translate = require('./translate');
 var kendra = require('./kendraQuery');
 var kendra_fallback = require('./kendra');
-const qnabot = require('qnabot/logging')
-const qna_settings = require('qnabot/settings')
-const open_es = require('./es_query')
+const qnabot = require('qnabot/logging');
+const qna_settings = require('qnabot/settings');
+const open_es = require('./es_query');
+const qa_summarize = require('./qa_summarize');
 const {VM} = require('vm2');
 
 // use DEFAULT_SETTINGS_PARAM as random encryption key unique to this QnABot installation
@@ -152,74 +153,13 @@ function merge_next(hit1, hit2) {
     return hit2;
 }
 
-async function prepend_cfaq_answer(query, hit, cfaq_prefix, cfaq_endpoint, cfaq_domain, cfaq_index, cfaq_n_ctx) {
-    const sm = new aws.SageMakerRuntime({region:'us-east-1'});
-    const history = {history: {L: {}}};
-    const data = {
-        query: query.trim(),
-        dial_hist: history,
-        domain: cfaq_domain,
-        index_id: cfaq_index,
-        n_ctx: cfaq_n_ctx,
-    };
-    const body = JSON.stringify(data);
-    let cfaq_answer;
-    console.log("Invoking CFAQ SM Endpoint");
-    try {
-        let smres = await sm.invokeEndpoint({
-            EndpointName:cfaq_endpoint,
-            ContentType:'text/csv',
-            Body:body,
-        }).promise();
-        const sm_body = JSON.parse(Buffer.from(smres.Body, 'utf-8').toString());
-        qnabot.log("CFAQ response body:", sm_body);
-        cfaq_answer = sm_body.text.trim();
-    } catch (e) {
-        console.log(e)
-        cfaq_answer = "CFAQ exception: " + e.message.substring(0, 250) + "...";
-    }
-    qnabot.log("CFAQ answer:", cfaq_answer);
-
+function prepend_qa_summary_answer(prefix, qa_answer, hit) {
     // prepend sm answer to plaintext and markdown
-    hit.a = `${cfaq_prefix}\n\n${cfaq_answer}\n\n${hit.a}`;
-    hit.alt.markdown = `*${cfaq_prefix}*\n\n**${cfaq_answer}**\n\n${hit.alt.markdown}`;
+    hit.a = `${prefix}\n\n${qa_answer}\n\n${hit.a}`;
+    hit.alt.markdown = `**${prefix}**\n\n${qa_answer}\n\n${hit.alt.markdown}`;
     // replace ssml with just the short answer for concise voice responses
-    hit.alt.ssml = cfaq_answer;
+    hit.alt.ssml = qa_answer;
     qnabot.log("modified hit:", JSON.stringify(hit));
-
-    return hit;
-}
-
-async function post_process_with_sagemaker_endpoint(question, hit, sagemaker_qa_prefix, sm_endpoint, sm_confidence_threshold) {
-    const sm = new aws.SageMakerRuntime({region:'us-east-1'});
-    const data = {
-        inputs: {
-            question: question,
-            context: hit.a,
-        }
-    };
-    const body = JSON.stringify(data);
-    let smres = await sm.invokeEndpoint({
-        EndpointName:sm_endpoint,
-        ContentType:'application/json',
-        Body:body,
-    }).promise();
-    const sm_body = JSON.parse(Buffer.from(smres.Body, 'utf-8').toString());
-    qnabot.log("Sagemaker QA response:", sm_body);
-    const sm_score = sm_body.score;
-    const sm_answer = sm_body.answer.trim();
-    if (sm_score >= sm_confidence_threshold) {
-        qnabot.log(`Sagemaker QA response confidence score ${sm_score} meets threshold ${sm_confidence_threshold}`);
-        // prepend sm answer to plaintext and markdown
-        hit.a = `${sagemaker_qa_prefix} (Confidence: ${sm_score.toFixed(3)})\n\n${sm_answer}\n\n${hit.a}`;
-        hit.alt.markdown = `*${sagemaker_qa_prefix} (Confidence: ${sm_score.toFixed(3)})*\n\n**${sm_answer}**\n\n${hit.alt.markdown}`;
-        // replace ssml with just the short answer for concise voice responses
-        hit.alt.ssml = sm_answer;
-        qnabot.log("modified hit:", JSON.stringify(hit));
-    } else {
-        hit = undefined;
-        qnabot.log(`Sagemaker QA response confidence score ${sm_score} does not meets threshold ${sm_confidence_threshold}. Kendra response not used.`);
-    }
     return hit;
 }
 
@@ -315,27 +255,30 @@ async function get_hit(req, res) {
         qnabot.log('request entering kendra fallback ' + JSON.stringify(req));
         hit = await kendra_fallback.handler({req,res});
         qnabot.log('Result from Kendra ' + JSON.stringify(hit));
+        // Run any/all configured QA Summarize LLM model option(s)
         if(hit &&  hit.hit_count != 0)
         {
-            // Optionally post-process Kendra result with Sagemaker hosted Question_Answer model
-            const sm_endpoint = _.get(req, '_settings.KENDRA_FALLBACK_SAGEMAKER_QA_ENDPOINT');
-            if (sm_endpoint) {
-                const sm_confidence_threshold = _.get(req, '_settings.KENDRA_FALLBACK_SAGEMAKER_QA_MIN_CONFIDENCE',0);
-                const sagemaker_qa_prefix = _.get(req, '_settings.KENDRA_FALLBACK_SAGEMAKER_QA_PREFIX', "");
-                hit = await post_process_with_sagemaker_endpoint(req.question, hit, sagemaker_qa_prefix, sm_endpoint, sm_confidence_threshold);
+            // Optionally post-process Kendra result with QA Summarize Sagemaker model
+            if (req._settings.QA_SUMMARY_SAGEMAKER_ENABLE) {
+                const sagemaker_qa_prefix = req._settings.QA_SUMMARY_SAGEMAKER_PREFIX_MESSAGE || 'Answer from QA Summary model:';
+                const answer = await qa_summarize.get_qa_summary_sm(req.question, hit.a, req._settings); 
+                hit = prepend_qa_summary_answer(sagemaker_qa_prefix, answer, hit);
             }
-        }
-        if(hit &&  hit.hit_count != 0)
-        {
-            // Optionally try new experimental Lex CFAQ model
-            const cfaq_endpoint = _.get(req, '_settings.CFAQ_SAGEMAKER_ENDPOINT');
-            if (cfaq_endpoint) {
-                const cfaq_domain = _.get(req, '_settings.CFAQ_DOMAIN');
-                const cfaq_prefix = _.get(req, '_settings.CFAQ_PREFIX', "");
-                const cfaq_index = _.get(req, '_settings.CFAQ_INDEX');
-                const cfaq_n_ctx = _.get(req, '_settings.CFAQ_N_CONTEXT', 0);
-                hit = await prepend_cfaq_answer(req.question, hit, cfaq_prefix, cfaq_endpoint, cfaq_domain, cfaq_index, cfaq_n_ctx);
+
+            // Optionally post-process Kendra result with QA Summarize Lambda model
+            if (req._settings.QA_SUMMARY_LAMBDA_ENABLE && process.env.QA_SUMMARIZE_LAMBDA_ARN) {
+                const lambda_qa_prefix = req._settings.QA_SUMMARY_LAMBDA_PREFIX_MESSAGE || 'Answer from Lambda model:';
+                const answer = await qa_summarize.get_qa_summary_lambda(req.question, hit.a, req._settings); 
+                hit = prepend_qa_summary_answer(lambda_qa_prefix, answer, hit);
             }
+
+            // Optionally try Lex CFAQ model
+            if (req._settings.QA_SUMMARY_CFAQ_ENABLE) {
+                const cfaq_qa_prefix = req._settings.QA_SUMMARY_CFAQ_PREFIX_MESSAGE || 'Answer from Lex CFAQ prototype model:';
+                const answer = await qa_summarize.get_qa_summary_cfaq(req.question, hit.a, req._settings); 
+                hit = prepend_qa_summary_answer(cfaq_qa_prefix, answer, hit);
+            }
+
         }
         if(hit &&  hit.hit_count != 0)
         {
@@ -717,7 +660,7 @@ function process_slots(req, res, hit) {
             if (!slotValue) {
                 if (slotValueCached) {
                     qnabot.log(`Slot value caching enabled for: '${slotName}' using session attribute '${slot_sessionAttrName}'`);
-                    value = _.get(res.session, slot_sessionAttrName);
+                    let value = _.get(res.session, slot_sessionAttrName);
                     if (value) {
                         qnabot.log(`Filling slot ${slotName} using cached value: ${value}`);
                         _.set(res, `slots.${slotName}`, value);
@@ -749,7 +692,7 @@ async function processDialogEvent(req, res) {
     // retrieve QID item that was mapped to intent
     let qid = _.get(req, 'qid');
     if (qid) {
-        question = `QID::${qid}`;
+        let question = `QID::${qid}`;
         qnabot.log(`QID identified in request: ${qid}`)
         var query_params = {
             question: question,

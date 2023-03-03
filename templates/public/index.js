@@ -3,9 +3,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 var Promise=require('bluebird')
-var fs=Promise.promisifyAll(require('fs'))
 var _=require('lodash')
-var path=require('path')
 
 var config=require('../../config')
 module.exports=Promise.resolve(require('../master')).then(function(base){
@@ -13,123 +11,141 @@ module.exports=Promise.resolve(require('../master')).then(function(base){
     base.Description = `(SO0189) QnABot with admin and client websites - (Version v${process.env.npm_package_version})`;
 
     base.Outputs=_.pick(base.Outputs,[
-        "ContentDesignerURL",
-        "ClientURL",
-        "DashboardURL",
-        "UserPoolURL",
-        "LexV1BotName",
-        "LexV1BotAlias",
-        "LexV1Intent",
-        "LexV1IntentFallback",
-        "LexV2BotName",
-        "LexV2BotId",
-        "LexV2BotAlias",
-        "LexV2BotAliasId",
-        "LexV2Intent",
-        "LexV2IntentFallback",
-        "LexV2BotLocaleIds",
-        "FeedbackSNSTopic",
-        "ESProxyLambda",
-        "ElasticsearchEndpoint",
-        "ElasticsearchIndex"
+        'ContentDesignerURL',
+        'ClientURL',
+        'DashboardURL',
+        'UserPoolURL',
+        'LexV1BotName',
+        'LexV1BotAlias',
+        'LexV1Intent',
+        'LexV1IntentFallback',
+        'LexV2BotName',
+        'LexV2BotId',
+        'LexV2BotAlias',
+        'LexV2BotAliasId',
+        'LexV2Intent',
+        'LexV2IntentFallback',
+        'LexV2BotLocaleIds',
+        'FeedbackSNSTopic',
+        'ESProxyLambda',
+        'ElasticsearchEndpoint',
+        'ElasticsearchIndex'
     ])
     base.Parameters=_.pick(base.Parameters,[
-        "Email",
-        "Username",
-        "DefaultKendraIndexId",
-        "Encryption",
-        "ElasticSearchNodeCount",
-        "KibanaDashboardRetentionMinutes",
-        "PublicOrPrivate",
-        "LexV2BotLocaleIds",
-        "LexBotVersion",
-        "InstallLexResponseBots",
-        "FulfillmentConcurrency",
-        "XraySetting",
-        "EmbeddingsApi",
-        "EmbeddingsSagemakerEndpoint",
-        "SagemakerInitialInstanceCount",
-        "EmbeddingsLambdaArn",
-        "EmbeddingsLambdaDimensions"
+        'Email',
+        'Username',
+        'DefaultKendraIndexId',
+        'Encryption',
+        'ElasticSearchNodeCount',
+        'KibanaDashboardRetentionMinutes',
+        'PublicOrPrivate',
+        'LexV2BotLocaleIds',
+        'LexBotVersion',
+        'InstallLexResponseBots',
+        'FulfillmentConcurrency',
+        'XraySetting',
+        'EmbeddingsApi',
+        'EmbeddingsSagemakerEndpoint',
+        'SagemakerInitialInstanceCount',
+        'EmbeddingsLambdaArn',
+        'EmbeddingsLambdaDimensions',
+        'QASummarizeApi',
+        'SagemakerQASummarizeInitialInstanceCount',
+        'QASummarizeLambdaArn'
     ]);
     base.Metadata = {
-        "AWS::CloudFormation::Interface": {
-            "ParameterGroups": [
+        'AWS::CloudFormation::Interface': {
+            'ParameterGroups': [
                 {
-                   "Label": {
-                        "default": "Authentication"
-                   },
-                   "Parameters": [
-                        "Email",
-                        "Username",
-                        "PublicOrPrivate"
-                   ]
-                },
-                {
-                   "Label": {
-                        "default": "Amazon Kendra Integration"
-                   },
-                   "Parameters": [
-                        "DefaultKendraIndexId"
-                   ]
-                },
-                {
-                   "Label": {
-                        "default": "Amazon OpenSearch Service"
-                   },
-                   "Parameters": [
-                        "ElasticSearchNodeCount",
-                        "Encryption",
-                        "KibanaDashboardRetentionMinutes"
-                   ]
-                },
-                {
-                   "Label": {
-                        "default": "Amazon LexV2"
-                   },
-                   "Parameters": [
-                        "LexV2BotLocaleIds"
-                   ]
-                },
-                {
-                    "Label": {
-                         "default": "Semantic Search with Embeddings"
+                    'Label': {
+                        'default': 'Authentication'
                     },
-                    "Parameters": [
-                        "EmbeddingsApi",
-                        "EmbeddingsSagemakerEndpoint",
-                        "SagemakerInitialInstanceCount",
-                        "EmbeddingsLambdaArn",
-                        "EmbeddingsLambdaDimensions"                   
+                    'Parameters': [
+                        'Email',
+                        'Username',
+                        'PublicOrPrivate'
                     ]
-                 },
-                 {
-                    "Label": {
-                         "default": "Miscellaneous"
+                },
+                {
+                    'Label': {
+                        'default': 'Amazon Kendra Integration'
                     },
-                    "Parameters": [
-                        "LexBotVersion",
-                        "InstallLexResponseBots",
-                        "FulfillmentConcurrency",
-                        "XraySetting"                  
+                    'Parameters': [
+                        'DefaultKendraIndexId'
                     ]
-                 }
+                },
+                {
+                    'Label': {
+                        'default': 'Amazon OpenSearch Service'
+                    },
+                    'Parameters': [
+                        'ElasticSearchNodeCount',
+                        'Encryption',
+                        'KibanaDashboardRetentionMinutes'
+                    ]
+                },
+                {
+                    'Label': {
+                        'default': 'Amazon LexV2'
+                    },
+                    'Parameters': [
+                        'LexV2BotLocaleIds'
+                    ]
+                },
+                {
+                    'Label': {
+                        'default': 'Semantic Search with Embeddings'
+                    },
+                    'Parameters': [
+                        'EmbeddingsApi',
+                        'EmbeddingsSagemakerEndpoint',
+                        'SagemakerInitialInstanceCount',
+                        'EmbeddingsLambdaArn',
+                        'EmbeddingsLambdaDimensions'                   
+                    ]
+                },
+                {
+                    'Label': {
+                        'default': 'QA Summarization with Large Language Model'
+                    },
+                    'Parameters': [
+                        'QASummarizeApi',
+                        'SagemakerQASummarizeInitialInstanceCount',
+                        'QASummarizeLambdaArn'                 
+                    ]
+                },
+                {
+                    'Label': {
+                        'default': 'Miscellaneous'
+                    },
+                    'Parameters': [
+                        'LexBotVersion',
+                        'InstallLexResponseBots',
+                        'FulfillmentConcurrency',
+                        'XraySetting'                  
+                    ]
+                }
             ]
         }
     };
-    base.Conditions.Public={"Fn::Equals":[{"Ref":"PublicOrPrivate"},"PUBLIC"]}
-    base.Conditions.Encrypted={"Fn::Equals":[{"Ref":"Encryption"},"ENCRYPTED"]}
-    base.Conditions.AdminSignUp={"Fn::Equals":[true,true]}
-    base.Conditions.Domain={"Fn::Equals":[true,false]}
-    base.Conditions.BuildExamples={"Fn::Equals":[true,true]}
-    base.Conditions.CreateDomain={"Fn::Equals":[true,true]}
-    base.Conditions.DontCreateDomain={"Fn::Equals":[true,false]}
-    base.Conditions.VPCEnabled={"Fn::Equals":[true,false]}
-    base.Conditions.SingleNode={"Fn::Equals":[{"Ref":"ElasticSearchNodeCount"},"1"]}
-    base.Conditions.EmbeddingsEnable= {"Fn::Not": [{ "Fn::Equals":[{"Ref":"EmbeddingsApi"},"DISABLED"]}]}
-    base.Conditions.EmbeddingsSagemaker = {"Fn::Equals":[{"Ref":"EmbeddingsApi"},"SAGEMAKER"]}
-    base.Conditions.EmbeddingsLambda = {"Fn::Equals":[{"Ref":"EmbeddingsApi"},"LAMBDA"]}
-    base.Conditions.EmbeddingsLambdaArn = {"Fn::Not": [{ "Fn::Equals":[{"Ref":"EmbeddingsLambdaArn"},""]}]}
+    base.Conditions.Public={'Fn::Equals':[{'Ref':'PublicOrPrivate'},'PUBLIC']}
+    base.Conditions.Encrypted={'Fn::Equals':[{'Ref':'Encryption'},'ENCRYPTED']}
+    base.Conditions.AdminSignUp={'Fn::Equals':[true,true]}
+    base.Conditions.Domain={'Fn::Equals':[true,false]}
+    base.Conditions.BuildExamples={'Fn::Equals':[true,true]}
+    base.Conditions.CreateDomain={'Fn::Equals':[true,true]}
+    base.Conditions.DontCreateDomain={'Fn::Equals':[true,false]}
+    base.Conditions.VPCEnabled={'Fn::Equals':[true,false]}
+    base.Conditions.SingleNode={'Fn::Equals':[{'Ref':'ElasticSearchNodeCount'},'1']}
+    base.Conditions.EmbeddingsEnable={'Fn::Not': [{ 'Fn::Equals':[{'Ref':'EmbeddingsApi'},'DISABLED']}]}
+    base.Conditions.EmbeddingsSagemaker={'Fn::Equals':[{'Ref':'EmbeddingsApi'},'SAGEMAKER']}
+    base.Conditions.EmbeddingsLambda={'Fn::Equals':[{'Ref':'EmbeddingsApi'},'LAMBDA']}
+    base.Conditions.EmbeddingsLambdaArn={'Fn::Not': [{ 'Fn::Equals':[{'Ref':'EmbeddingsLambdaArn'},'']}]}
+    base.Conditions.QASummarizeEnable={'Fn::Not': [{ 'Fn::Equals':[{'Ref':'QASummarizeApi'},'DISABLED']}]}
+    base.Conditions.QASummarizeSagemaker={'Fn::Or': [{'Fn::Equals':[{'Ref':'QASummarizeApi'},'SAGEMAKER']}, {'Fn::Equals':[{'Ref':'QASummarizeApi'},'ALL']}]}
+    base.Conditions.QASummarizeCFAQ={'Fn::Or': [{'Fn::Equals':[{'Ref':'QASummarizeApi'},'CFAQ']}, {'Fn::Equals':[{'Ref':'QASummarizeApi'},'ALL']}]}
+    base.Conditions.QASummarizeLambda={'Fn::Or': [{'Fn::Equals':[{'Ref':'QASummarizeApi'},'LAMBDA']}, {'Fn::Equals':[{'Ref':'QASummarizeApi'},'ALL']}]}
+    base.Conditions.QASummarizeLambdaArn={'Fn::Not': [{ 'Fn::Equals':[{'Ref':'QASummarizeLambdaArn'},'']}]}
 
     var out=JSON.stringify(base);
 
