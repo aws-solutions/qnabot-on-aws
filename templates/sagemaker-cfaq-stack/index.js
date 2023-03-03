@@ -186,7 +186,7 @@ module.exports={
                                         "s3:GetObject"
                                      ],
                                     "Resource": [
-                                        {"Fn::Sub":"arn:${AWS::Partition}:s3:::${BootstrapBucket}/${BootstrapPrefix}/ml_model/e5-large.tar.gz"}
+                                        {"Fn::Sub":"arn:${AWS::Partition}:s3:::${BootstrapBucket}/${BootstrapPrefix}/ml_model/cfaq.tar.gz"}
                                     ]
                                 },
                                 {
