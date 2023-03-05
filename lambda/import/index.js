@@ -110,7 +110,7 @@ exports.step = function (event, context, cb) {
                                 let timestamp = _.get(obj, 'datetime', "");
                                 let docid;
                                 if (timestamp === "") {
-                                    // only metrics and feedback items have datetime field.. This must be a qna item.
+                                    // only metrics and feedback items have datetime field.. This must be a qna, quiz, or text item.
                                     obj.type = obj.type || 'qna'
                                     if(obj.type != 'slottype' && obj.type != 'text') {
                                         obj.q = obj.q.map(x => {
@@ -144,6 +144,12 @@ exports.step = function (event, context, cb) {
                                             qnabot.log("skipping question due to exception", err);
                                         }
                                         delete obj.q
+                                    } else if (obj.type === 'text') {
+                                        // text field embeddings
+                                        const text = obj.a;
+                                        if (text) {
+                                            obj.a_vector = await get_embeddings("a", text, settings);
+                                        }
                                     }
                                     docid = obj._id || obj.qid;
                                 } else {
