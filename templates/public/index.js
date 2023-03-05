@@ -142,8 +142,8 @@ module.exports=Promise.resolve(require('../master')).then(function(base){
     base.Conditions.EmbeddingsLambda={'Fn::Equals':[{'Ref':'EmbeddingsApi'},'LAMBDA']}
     base.Conditions.EmbeddingsLambdaArn={'Fn::Not': [{ 'Fn::Equals':[{'Ref':'EmbeddingsLambdaArn'},'']}]}
     base.Conditions.QASummarizeEnable={'Fn::Not': [{ 'Fn::Equals':[{'Ref':'QASummarizeApi'},'DISABLED']}]}
-    base.Conditions.QASummarizeSagemaker={'Fn::Or': [{'Fn::Equals':[{'Ref':'QASummarizeApi'},'SAGEMAKER']}, {'Fn::Equals':[{'Ref':'QASummarizeApi'},'ALL']}]}
-    base.Conditions.QASummarizeCFAQ={'Fn::Or': [{'Fn::Equals':[{'Ref':'QASummarizeApi'},'CFAQ']}, {'Fn::Equals':[{'Ref':'QASummarizeApi'},'ALL']}]}
+    base.Conditions.QASummarizeSagemakerLLM={'Fn::Or': [{'Fn::Equals':[{'Ref':'QASummarizeApi'},'SAGEMAKER LLM']}, {'Fn::Equals':[{'Ref':'QASummarizeApi'},'ALL']}]}
+    base.Conditions.QASummarizeSageMakerCFAQ={'Fn::Or': [{'Fn::Equals':[{'Ref':'QASummarizeApi'},'SAGEMAKER CFAQ']}, {'Fn::Equals':[{'Ref':'QASummarizeApi'},'ALL']}]}
     base.Conditions.QASummarizeLambda={'Fn::Or': [{'Fn::Equals':[{'Ref':'QASummarizeApi'},'LAMBDA']}, {'Fn::Equals':[{'Ref':'QASummarizeApi'},'ALL']}]}
     base.Conditions.QASummarizeLambdaArn={'Fn::Not': [{ 'Fn::Equals':[{'Ref':'QASummarizeLambdaArn'},'']}]}
 

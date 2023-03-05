@@ -90,7 +90,7 @@ async function run_query_es(req, query_params) {
             method: "GET",
             body: es_query_an_answer
         });
-        // check threshold - always '1' is not using embeddings
+        // check threshold - always '1' if not using embeddings
         let threshold = (_.get(query_params, 'settings.EMBEDDINGS_ENABLE')) ? _.get(query_params,'settings.EMBEDDINGS_SCORE_ANSWER_THRESHOLD',0) : 1
         qnabot.log(`Score threshold for answer matches is: ${threshold}.`)
         es_response = score_threshold_check(es_response, threshold)

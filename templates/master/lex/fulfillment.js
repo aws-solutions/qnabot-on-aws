@@ -83,15 +83,15 @@ module.exports = {
           QA_SUMMARIZE_API: { "Ref": "QASummarizeApi" },
           QA_SUMMARIZE_SAGEMAKER_ENDPOINT : {
             "Fn::If": [
-                "QASummarizeSagemaker", 
-                {"Fn::GetAtt": ["SageMakerQASummarizeStack", "Outputs.QASummarizeSagemakerEndpoint"] }, 
+                "QASummarizeSagemakerLLM", 
+                {"Fn::GetAtt": ["SageMakerQASummarizeLLMStack", "Outputs.QASummarizeSagemakerLLMEndpoint"] }, 
                 ""
             ]
           },
           CFAQ_SAGEMAKER_ENDPOINT : {
             "Fn::If": [
-                "QASummarizeCFAQ", 
-                {"Fn::GetAtt": ["SageMakerCFAQStack", "Outputs.CFAQSagemakerEndpoint"] }, 
+                "QASummarizeSageMakerCFAQ", 
+                {"Fn::GetAtt": ["SageMakerQASummarizeCFAQStack", "Outputs.CFAQSagemakerEndpoint"] }, 
                 ""
             ]
           },
@@ -288,9 +288,9 @@ module.exports = {
         },
         { 
           "Fn::If": [
-            "QASummarizeSagemaker", 
+            "QASummarizeSagemakerLLM", 
             {
-              "PolicyName" : "QASummarizeSagemakerInvokeEndpointAccess",
+              "PolicyName" : "QASummarizeSagemakerLLMInvokeEndpointAccess",
               "PolicyDocument" : {
               "Version": "2012-10-17",
                 "Statement": [
@@ -299,7 +299,7 @@ module.exports = {
                     "Action": [
                         "sagemaker:InvokeEndpoint"
                     ],
-                    "Resource": {"Fn::GetAtt": ["SageMakerQASummarizeStack", "Outputs.QASummarizeSagemakerEndpointArn"]}
+                    "Resource": {"Fn::GetAtt": ["SageMakerQASummarizeLLMStack", "Outputs.QASummarizeSagemakerLLMEndpointArn"]}
                   }
                 ]
               }
@@ -309,7 +309,7 @@ module.exports = {
         },
         { 
           "Fn::If": [
-            "QASummarizeCFAQ", 
+            "QASummarizeSageMakerCFAQ", 
             {
               "PolicyName" : "CFAQSagemakerInvokeEndpointAccess",
               "PolicyDocument" : {
@@ -320,7 +320,7 @@ module.exports = {
                     "Action": [
                         "sagemaker:InvokeEndpoint"
                     ],
-                    "Resource": {"Fn::GetAtt": ["SageMakerCFAQStack", "Outputs.CFAQSagemakerEndpointArn"]}
+                    "Resource": {"Fn::GetAtt": ["SageMakerQASummarizeCFAQStack", "Outputs.CFAQSagemakerEndpointArn"]}
                   }
                 ]
               }

@@ -155,11 +155,77 @@ function merge_next(hit1, hit2) {
 
 function prepend_qa_summary_answer(prefix, qa_answer, hit) {
     // prepend sm answer to plaintext and markdown
-    hit.a = `${prefix}\n\n${qa_answer}\n\n${hit.a}`;
+    prefix = prefix.trim();
+    hit.a = `${prefix} \n\n${qa_answer} \n\n${hit.a}`;
     hit.alt.markdown = `**${prefix}**\n\n${qa_answer}\n\n${hit.alt.markdown}`;
     // replace ssml with just the short answer for concise voice responses
     hit.alt.ssml = qa_answer;
     qnabot.log("modified hit:", JSON.stringify(hit));
+    return hit;
+}
+
+function isQaSummaryEnabled(req) {
+    if (req._settings.QA_SUMMARY_LAMBDA_ENABLE && process.env.QA_SUMMARIZE_LAMBDA_ARN) {
+        return true;
+    }
+    if (req._settings.QA_SUMMARY_SAGEMAKER_LLM_ENABLE) {
+        return true;
+    }
+    if (req._settings.QA_SUMMARY_SAGEMAKER_CFAQ_ENABLE) {
+        return true;
+    }
+    return false;
+}
+
+async function run_qa_summary(req, hit) {
+    const debug = req._settings.ENABLE_DEBUG_RESPONSES;
+
+    const context = hit.a;
+
+    if (isQaSummaryEnabled(req) && req._settings.QA_SUMMARY_SHOW_CONTEXT_TEXT == false) {
+        // remove context text.. hit will contain only the QA Summary output
+        hit.a = "";
+        hit.alt.markdown = "";
+        hit.alt.ssml = "";
+    } else {
+        hit.a = `Context: ${hit.a}`;
+        hit.alt.markdown = `**Context**\n\n${hit.alt.markdown}`;
+        hit.alt.ssml = "";  // Context provided only in text channels     
+    }
+
+    // Optionally post-process answer with QA Summarize Lambda model
+    if (req._settings.QA_SUMMARY_LAMBDA_ENABLE && process.env.QA_SUMMARIZE_LAMBDA_ARN) {
+        const start = Date.now();
+        const answer = await qa_summarize.get_qa_summary_lambda(req.question, context, req._settings);
+        const end = Date.now();
+        const timing = (debug) ? `(${end - start} ms)` : ''; 
+        const lambda_qa_prefix = `${req._settings.QA_SUMMARY_LAMBDA_PREFIX_MESSAGE} ${timing}` ;
+        hit = prepend_qa_summary_answer(lambda_qa_prefix, answer, hit);
+        hit.debug.push("QA Summary: Lambda");
+    }
+
+    // Optionally post-process answer with QA Summarize Sagemaker model
+    if (req._settings.QA_SUMMARY_SAGEMAKER_LLM_ENABLE) {
+        const start = Date.now();
+        const answer = await qa_summarize.get_qa_summary_sm(req.question, context, req._settings); 
+        const end = Date.now();
+        const timing = (debug) ? `(${end - start} ms)` : ''; 
+        const sagemaker_qa_prefix = `${req._settings.QA_SUMMARY_SAGEMAKER_LLM_PREFIX_MESSAGE} ${timing}` ;
+        hit = prepend_qa_summary_answer(sagemaker_qa_prefix, answer, hit);
+        hit.debug.push("QA Summary: SageMaker LLM");
+    }
+
+    // Optionally post-process answer with Lex CFAQ model
+    if (req._settings.QA_SUMMARY_SAGEMAKER_CFAQ_ENABLE) {
+        const start = Date.now();
+        const answer = await qa_summarize.get_qa_summary_cfaq(req.question, context, req._settings); 
+        const end = Date.now();
+        const timing = (debug) ? `(${end - start} ms)` : ''; 
+        const cfaq_qa_prefix = `${req._settings.QA_SUMMARY_SAGEMAKER_CFAQ_PREFIX_MESSAGE} ${timing}` ;
+        hit = prepend_qa_summary_answer(cfaq_qa_prefix, answer, hit);
+        hit.debug.push("QA Summary: CFAQ");
+    }
+
     return hit;
 }
 
@@ -251,37 +317,28 @@ async function get_hit(req, res) {
 
     if (hit) {
         res['got_hits'] = 1;  // response flag, used in logging / kibana
+        if (! hit.debug) {
+            hit.debug=[];
+        }
+        if (! _.get(hit, "alt.markdown")) {
+            _.set(hit, "alt.markdown", hit.a);
+        }
+        if (! _.get(hit, "alt.ssml")) {
+            _.set(hit, "alt.ssml", hit.a);
+        }
+        if (hit.type === 'text') {
+            // Run any configured QA Summary options on the result
+            hit = await run_qa_summary(req, hit);
+        }
     } else if(query_params.kendra_indexes.length != 0) {
         qnabot.log('request entering kendra fallback ' + JSON.stringify(req));
         hit = await kendra_fallback.handler({req,res});
         qnabot.log('Result from Kendra ' + JSON.stringify(hit));
-        // Run any/all configured QA Summarize LLM model option(s)
         if(hit &&  hit.hit_count != 0)
         {
-            // Optionally post-process Kendra result with QA Summarize Sagemaker model
-            if (req._settings.QA_SUMMARY_SAGEMAKER_ENABLE) {
-                const sagemaker_qa_prefix = req._settings.QA_SUMMARY_SAGEMAKER_PREFIX_MESSAGE || 'Answer from QA Summary model:';
-                const answer = await qa_summarize.get_qa_summary_sm(req.question, hit.a, req._settings); 
-                hit = prepend_qa_summary_answer(sagemaker_qa_prefix, answer, hit);
-            }
+            // Run any configured QA Summary LLM model options on Kendra results
+            hit = await run_qa_summary(req, hit);
 
-            // Optionally post-process Kendra result with QA Summarize Lambda model
-            if (req._settings.QA_SUMMARY_LAMBDA_ENABLE && process.env.QA_SUMMARIZE_LAMBDA_ARN) {
-                const lambda_qa_prefix = req._settings.QA_SUMMARY_LAMBDA_PREFIX_MESSAGE || 'Answer from Lambda model:';
-                const answer = await qa_summarize.get_qa_summary_lambda(req.question, hit.a, req._settings); 
-                hit = prepend_qa_summary_answer(lambda_qa_prefix, answer, hit);
-            }
-
-            // Optionally try Lex CFAQ model
-            if (req._settings.QA_SUMMARY_CFAQ_ENABLE) {
-                const cfaq_qa_prefix = req._settings.QA_SUMMARY_CFAQ_PREFIX_MESSAGE || 'Answer from Lex CFAQ prototype model:';
-                const answer = await qa_summarize.get_qa_summary_cfaq(req.question, hit.a, req._settings); 
-                hit = prepend_qa_summary_answer(cfaq_qa_prefix, answer, hit);
-            }
-
-        }
-        if(hit &&  hit.hit_count != 0)
-        {
             _.set(res,'answersource','Kendra Fallback');
             _.set(res,'session.qnabot_gotanswer',true) ;
             _.set(res,'message', hit.a);
@@ -609,7 +666,7 @@ async function processFulfillmentEvent(req,res) {
             if (qid) {
                 msg += ', Lex Intent matched QID "' + qid + '"' ;
             }
-            if(req.debug)
+            if(req.debug && req.debug.length)
             {
                 msg += JSON.stringify(req.debug,2)
             }

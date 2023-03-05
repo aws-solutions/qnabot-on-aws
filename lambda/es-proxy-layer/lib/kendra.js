@@ -42,7 +42,7 @@ function create_hit(answermessage,markdown,ssml,hit_count,debug_results,kendra){
                         "markdown": markdown,
                         "ssml":ssml
                     },
-                    "type": "qna",
+                    "type": "text",
                     "questions": [
                     ],
                     "answersource": "KENDRA FALLBACK",

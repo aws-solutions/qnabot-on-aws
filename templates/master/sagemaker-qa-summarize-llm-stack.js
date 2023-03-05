@@ -1,9 +1,9 @@
 module.exports={
-    "SageMakerQASummarizeStack":{
+    "SageMakerQASummarizeLLMStack":{
         "Type" : "AWS::CloudFormation::Stack",
-        "Condition":"QASummarizeSagemaker",
+        "Condition":"QASummarizeSagemakerLLM",
         "Properties" : {
-            "TemplateURL" :{"Fn::Sub":"https://${BootstrapBucket}.s3.${AWS::Region}.amazonaws.com/${BootstrapPrefix}/templates/sagemaker-qa-summarize-stack.json"},
+            "TemplateURL" :{"Fn::Sub":"https://${BootstrapBucket}.s3.${AWS::Region}.amazonaws.com/${BootstrapPrefix}/templates/sagemaker-qa-summarize-llm.json"},
             "Parameters" :{
                 "CFNLambda":{"Fn::GetAtt":["CFNLambda","Arn"]},
                 "BootstrapBucket":{"Ref":"BootstrapBucket"},

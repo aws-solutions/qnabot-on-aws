@@ -13,8 +13,8 @@ const get_qa_summary_sm = async function get_qa_summary_sm(question, context, se
     const sm = new aws.SageMakerRuntime({region: process.env.AWS_REGION || 'us-east-1'});
     context = clean_context(context);
     qnabot.log(`Fetch QA Summary from SageMaker for question: '${question}' - Context: ${context}`);
-    const model_params = JSON.parse(settings.QA_SUMMARY_SAGEMAKER_MODEL_PARAMS);
-    const prompt_format = settings.QA_SUMMARY_SAGEMAKER_PROMPT_FORMAT || 
+    const model_params = JSON.parse(settings.QA_SUMMARY_SAGEMAKER_LLM_MODEL_PARAMS);
+    const prompt_format = settings.QA_SUMMARY_SAGEMAKER_LLM_PROMPT_FORMAT || 
         'Answer the last question based on the following text, or answer I dont know.\n<CONTEXT>\n<QUESTION>\nAnswer:';
     const prompt = prompt_format.replace(/<CONTEXT>/mg, context).replace(/<QUESTION>/mg, question).replace(/<br>/mg, "\n");
     qnabot.log(`Prompt: \n${prompt}`);
@@ -44,7 +44,7 @@ async function get_qa_summary_cfaq(question, context, settings) {
     const sm = new aws.SageMakerRuntime({region:'us-east-1'});
     // context not currently used.. CFAQ does it's own Kendra query. Discussing with Lex team is CFAQ can optionally 
     // take context (list of passages) in place of Kendra query
-    let data = JSON.parse(settings.QA_SUMMARY_CFAQ_MODEL_PARAMS);
+    let data = JSON.parse(settings.QA_SUMMARY_SAGEMAKER_CFAQ_MODEL_PARAMS);
     data.query = question.trim()
     const body = JSON.stringify(data);
     let answer;
@@ -59,6 +59,7 @@ async function get_qa_summary_cfaq(question, context, settings) {
         qnabot.log('CFAQ response body:', sm_body);
         answer = sm_body.text.trim();
         answer = answer.split("#### CFAQ-PASSAGE")[0]; // remove text coming after CFAQ PASSAGE
+        answer = answer.replace(/CFAQ-ANSWER: /mg, "");
     } catch (e) {
         console.log(e)
         answer = 'CFAQ exception: ' + e.message.substring(0, 500) + '...';

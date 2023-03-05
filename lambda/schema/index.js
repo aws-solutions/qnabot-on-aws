@@ -9,8 +9,10 @@ exports.handler = (event, context, callback) => {
     var schema = {
         quiz: require('./quiz.js'),
         qna: require('./qna.js'),
-        slottype: require('./slottype.js')
+        slottype: require('./slottype.js'),
+        text: require('./text.js')
     }
+    console.log('Returned schema:', JSON.stringify(schema, null, 2));
     callback(null,schema);
 }
 

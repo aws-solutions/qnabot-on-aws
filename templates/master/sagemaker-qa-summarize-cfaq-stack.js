@@ -1,9 +1,9 @@
 module.exports={
-    "SageMakerCFAQStack":{
+    "SageMakerQASummarizeCFAQStack":{
         "Type" : "AWS::CloudFormation::Stack",
-        "Condition":"QASummarizeCFAQ",
+        "Condition":"QASummarizeSageMakerCFAQ",
         "Properties" : {
-            "TemplateURL" :{"Fn::Sub":"https://${BootstrapBucket}.s3.${AWS::Region}.amazonaws.com/${BootstrapPrefix}/templates/sagemaker-cfaq-stack.json"},
+            "TemplateURL" :{"Fn::Sub":"https://${BootstrapBucket}.s3.${AWS::Region}.amazonaws.com/${BootstrapPrefix}/templates/sagemaker-qa-summarize-cfaq.json"},
             "Parameters" :{
                 "CFNLambda":{"Fn::GetAtt":["CFNLambda","Arn"]},
                 "BootstrapBucket":{"Ref":"BootstrapBucket"},

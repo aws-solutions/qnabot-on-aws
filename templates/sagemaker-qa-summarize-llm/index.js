@@ -1,12 +1,12 @@
 const util = require('../util');
 
-// Sagemaker Serverless Inference doesn't currently support the CFAQ model
+// Sagemaker Serverless Inference doesn't currently support the flan-t5-xxl model
 // so although this nested template supports serverless provisioning, the main template enforces
 // only provisioned endpoints by disallowing a value of '0' for SagemakerInitialInstanceCount
 
 module.exports={
     "AWSTemplateFormatVersion": "2010-09-09",
-    "Description": "(SO0189n-sagemaker) QnABot nested sagemaker CFAQ resources",
+    "Description": "(SO0189n-sagemaker) QnABot nested sagemaker QA summarization resources",
     "Parameters": {
         "BootstrapBucket":{"Type":"String"},
         "BootstrapPrefix":{"Type":"String"},
@@ -23,35 +23,33 @@ module.exports={
     },
 
     "Resources": {
-        "QnABotCFAQModelTarVersion": {
+        "QnABotModelTarVersion": {
             "Type": "Custom::S3Version",
             "Properties": {
                 "ServiceToken": { "Ref": "CFNLambda" },
                 "Bucket": { "Ref": "BootstrapBucket" },
-                "Key": { "Fn::Sub": "${BootstrapPrefix}/ml_model/cfaq.tar.gz" },
+                "Key": { "Fn::Sub": "${BootstrapPrefix}/ml_model/flan-t5-xxl-sharded-fp16.tar.gz" },
                 "BuildDate": (new Date()).toISOString()
             }
         },
-        "QnABotSMCFAQModel": {
+        "QnABotQASummarizeLLMModel": {
             "Type": "AWS::SageMaker::Model",
             "Properties": {
                 "PrimaryContainer": {
                     "Image": {
-                        "Fn::Sub": "763104351884.dkr.ecr.${AWS::Region}.amazonaws.com/pytorch-inference:1.10-gpu-py38"
+                        "Fn::Sub": "763104351884.dkr.ecr.${AWS::Region}.amazonaws.com/huggingface-pytorch-inference:1.10-transformers4.17-gpu-py38-cu113-ubuntu20.04"
                     },
-                    "ModelDataUrl":{"Fn::Sub":"s3://${BootstrapBucket}/${BootstrapPrefix}/ml_model/cfaq.tar.gz"},
+                    "ModelDataUrl":{"Fn::Sub":"s3://${BootstrapBucket}/${BootstrapPrefix}/ml_model/flan-t5-xxl-sharded-fp16.tar.gz"},
                     "Mode": "SingleModel",
                     "Environment": {
                         "SAGEMAKER_CONTAINER_LOG_LEVEL":"20",
-                        "SAGEMAKER_PROGRAM": "main.py",
                         "SAGEMAKER_REGION":{"Ref":"AWS::Region"},
-                        "SAGEMAKER_SUBMIT_DIRECTORY": "/opt/ml/model/code",
-                        "S3_MODEL_DATA_VERSION": {"Ref":"QnABotCFAQModelTarVersion"}, // force model replace when new version of tar file is available
+                        "S3_MODEL_DATA_VERSION": {"Ref":"QnABotModelTarVersion"}, // force model replace when new version of tar file is available
                     }
                 },
                 "ExecutionRoleArn": {
                     "Fn::GetAtt": [
-                        "QnABotSMCFAQModelExecutionRole",
+                        "QnABotQASummarizeLLMModelExecutionRole",
                         "Arn"
                     ]
                 },
@@ -67,7 +65,7 @@ module.exports={
                 }
             }
         },
-        "QnABotSMProvisionedCFAQEndpointConfig": {
+        "QnABotProvisionedQASummarizeLLMEndpointConfig": {
             "Condition":"SagemakerProvisioned",
             "Type": "AWS::SageMaker::EndpointConfig",
             "Properties": {
@@ -75,13 +73,13 @@ module.exports={
                     {
                         "ModelName": {
                             "Fn::GetAtt": [
-                                "QnABotSMCFAQModel",
+                                "QnABotQASummarizeLLMModel",
                                 "ModelName"
                             ]
                         },
                         "InitialInstanceCount": {"Ref":"SagemakerInitialInstanceCount"},
                         "InitialVariantWeight": 1,
-                        "InstanceType": "ml.p3.2xlarge",
+                        "InstanceType": "ml.g5.xlarge",
                         "VariantName": "AllTraffic",
                     }
                 ]
@@ -97,7 +95,7 @@ module.exports={
                 }
             }
         },
-        "QnABotSMServerlessCFAQEndpointConfig": {
+        "QnABotServerlessQASummarizeLLMEndpointConfig": {
             "Condition":"SagemakerServerless",
             "Type": "AWS::SageMaker::EndpointConfig",
             "Properties": {
@@ -105,7 +103,7 @@ module.exports={
                     {
                         "ModelName": {
                             "Fn::GetAtt": [
-                                "QnABotSMCFAQModel",
+                                "QnABotQASummarizeLLMModel",
                                 "ModelName"
                             ]
                         },
@@ -130,31 +128,31 @@ module.exports={
             }
 
         },
-        "QnABotSMProvisionedCFAQEndpoint": {
+        "QnABotProvisionedQASummarizeLLMEndpoint": {
             "Condition":"SagemakerProvisioned",
             "Type": "AWS::SageMaker::Endpoint",
             "Properties": {
                 "EndpointConfigName": {
                     "Fn::GetAtt": [
-                        "QnABotSMProvisionedCFAQEndpointConfig",
+                        "QnABotProvisionedQASummarizeLLMEndpointConfig",
                         "EndpointConfigName"
                     ]
                 }
             }
         },
-        "QnABotSMServerlessCFAQEndpoint": {
+        "QnABotServerlessQASummarizeLLMEndpoint": {
             "Condition":"SagemakerServerless",
             "Type": "AWS::SageMaker::Endpoint",
             "Properties": {
                 "EndpointConfigName": {
                     "Fn::GetAtt": [
-                        "QnABotSMServerlessCFAQEndpointConfig",
+                        "QnABotServerlessQASummarizeLLMEndpointConfig",
                         "EndpointConfigName"
                     ]
                 }
             }
         },
-        "QnABotSMCFAQModelExecutionRole": {
+        "QnABotQASummarizeLLMModelExecutionRole": {
             "Type": "AWS::IAM::Role",
             "Properties": {
                 "AssumeRolePolicyDocument": {
@@ -186,16 +184,7 @@ module.exports={
                                         "s3:GetObject"
                                      ],
                                     "Resource": [
-                                        {"Fn::Sub":"arn:${AWS::Partition}:s3:::${BootstrapBucket}/${BootstrapPrefix}/ml_model/cfaq.tar.gz"}
-                                    ]
-                                },
-                                {
-                                    "Effect": "Allow",
-                                    "Action": [
-                                      "kendra:Query"
-                                    ],
-                                    "Resource":[
-                                      {"Fn::Sub":"arn:aws:kendra:${AWS::Region}:${AWS::AccountId}:index/*"},
+                                        {"Fn::Sub":"arn:${AWS::Partition}:s3:::${BootstrapBucket}/${BootstrapPrefix}/ml_model/flan-t5-xxl-sharded-fp16.tar.gz"}
                                     ]
                                 },
                                 {
@@ -237,7 +226,7 @@ module.exports={
                                         "ecr:BatchGetImage"
                                     ],
                                     "Resource": [
-                                        {"Fn::Sub":"arn:${AWS::Partition}:ecr:${AWS::Region}:*:repository/pytorch-inference"}
+                                        {"Fn::Sub":"arn:${AWS::Partition}:ecr:${AWS::Region}:*:repository/huggingface-pytorch-inference"}
                                     ]
                                 },
 
@@ -278,21 +267,21 @@ module.exports={
         }
     },
     "Outputs": {
-        "CFAQSagemakerEndpoint": {
+        "QASummarizeSagemakerLLMEndpoint": {
             "Value": {
                 "Fn::If": [
                     "SagemakerProvisioned",
-                    {"Fn::GetAtt":["QnABotSMProvisionedCFAQEndpoint","EndpointName"]},
-                    {"Fn::GetAtt":["QnABotSMServerlessCFAQEndpoint","EndpointName"]}
+                    {"Fn::GetAtt":["QnABotProvisionedQASummarizeLLMEndpoint","EndpointName"]},
+                    {"Fn::GetAtt":["QnABotServerlessQASummarizeLLMEndpoint","EndpointName"]}
                 ]
             }
         },
-        "CFAQSagemakerEndpointArn": {
+        "QASummarizeSagemakerLLMEndpointArn": {
             "Value":{
                 "Fn::If": [
                     "SagemakerProvisioned",
-                    {"Ref":"QnABotSMProvisionedCFAQEndpoint"},
-                    {"Ref":"QnABotSMServerlessCFAQEndpoint"}
+                    {"Ref":"QnABotProvisionedQASummarizeLLMEndpoint"},
+                    {"Ref":"QnABotServerlessQASummarizeLLMEndpoint"}
                 ]
             }
         }

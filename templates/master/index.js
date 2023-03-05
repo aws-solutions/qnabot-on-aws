@@ -286,8 +286,8 @@ module.exports={
         },
         'QASummarizeApi':{
             'Type':'String',
-            'Description':'Optionally enable (experimental) QnABot passage aggregation and question answering from pre-trained Large Language Model. If set to SAGEMAKER, a Sagemaker endpoint (ml.g5.xlarge) is automatically provisioned. To use a custom LAMBDA function, provide additional parameters below.',
-            'AllowedValues': ['DISABLED', 'CFAQ', 'SAGEMAKER', 'LAMBDA', 'ALL'],
+            'Description':'Optionally enable (experimental) QnABot passage aggregation and question answering. If set to SAGEMAKER LLM or CFAQ, a Sagemaker endpoint is automatically provisioned. To use a custom LAMBDA function, provide additional parameters below.',
+            'AllowedValues': ['DISABLED', 'SAGEMAKER CFAQ', 'SAGEMAKER LLM', 'LAMBDA', 'ALL'],
             'Default':'DISABLED'
         },
         'SagemakerQASummarizeInitialInstanceCount':{
@@ -327,8 +327,8 @@ module.exports={
         'EmbeddingsLambda':{'Fn::Equals':[{'Ref':'EmbeddingsApi'},'LAMBDA']},
         'EmbeddingsLambdaArn':{'Fn::Not': [{ 'Fn::Equals':[{'Ref':'EmbeddingsLambdaArn'},'']}]},
         'QASummarizeEnable':{'Fn::Not': [{ 'Fn::Equals':[{'Ref':'QASummarizeApi'},'DISABLED']}]},
-        'QASummarizeSagemaker': {'Fn::Or': [{'Fn::Equals':[{'Ref':'QASummarizeApi'},'SAGEMAKER']}, {'Fn::Equals':[{'Ref':'QASummarizeApi'},'ALL']}]},
-        'QASummarizeCFAQ':{'Fn::Or': [{'Fn::Equals':[{'Ref':'QASummarizeApi'},'CFAQ']}, {'Fn::Equals':[{'Ref':'QASummarizeApi'},'ALL']}]},
+        'QASummarizeSagemakerLLM': {'Fn::Or': [{'Fn::Equals':[{'Ref':'QASummarizeApi'},'SAGEMAKER LLM']}, {'Fn::Equals':[{'Ref':'QASummarizeApi'},'ALL']}]},
+        'QASummarizeSageMakerCFAQ':{'Fn::Or': [{'Fn::Equals':[{'Ref':'QASummarizeApi'},'SAGEMAKER CFAQ']}, {'Fn::Equals':[{'Ref':'QASummarizeApi'},'ALL']}]},
         'QASummarizeLambda':{'Fn::Or': [{'Fn::Equals':[{'Ref':'QASummarizeApi'},'LAMBDA']}, {'Fn::Equals':[{'Ref':'QASummarizeApi'},'ALL']}]},
         'QASummarizeLambdaArn':{'Fn::Not': [{ 'Fn::Equals':[{'Ref':'QASummarizeLambdaArn'},'']}]},
     }

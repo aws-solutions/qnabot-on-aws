@@ -19,7 +19,7 @@ module.exports={
     },
 
     "Resources": {
-        "QnABotSMModelTarVersion": {
+        "QnABotModelTarVersion": {
             "Type": "Custom::S3Version",
             "Properties": {
                 "ServiceToken": { "Ref": "CFNLambda" },
@@ -28,7 +28,7 @@ module.exports={
                 "BuildDate": (new Date()).toISOString()
             }
         },
-        "QnABotSMEmbeddingModel": {
+        "QnABotEmbeddingModel": {
             "Type": "AWS::SageMaker::Model",
             "Properties": {
                 "PrimaryContainer": {
@@ -40,12 +40,12 @@ module.exports={
                     "Environment": {
                         "SAGEMAKER_CONTAINER_LOG_LEVEL":"20",
                         "SAGEMAKER_REGION":{"Ref":"AWS::Region"},
-                        "S3_MODEL_DATA_VERSION": {"Ref":"QnABotSMModelTarVersion"}, // force model replace when new version of tar file is available
+                        "S3_MODEL_DATA_VERSION": {"Ref":"QnABotModelTarVersion"}, // force model replace when new version of tar file is available
                     }
                 },
                 "ExecutionRoleArn": {
                     "Fn::GetAtt": [
-                        "QnABotSMEmbeddingModelExecutionRole",
+                        "QnABotEmbeddingModelExecutionRole",
                         "Arn"
                     ]
                 },
@@ -61,7 +61,7 @@ module.exports={
                 }
             }
         },
-        "QnABotSMProvisionedEmbeddingEndpointConfig": {
+        "QnABotProvisionedEmbeddingEndpointConfig": {
             "Condition":"EmbeddingsSagemakerProvisioned",
             "Type": "AWS::SageMaker::EndpointConfig",
             "Properties": {
@@ -69,7 +69,7 @@ module.exports={
                     {
                         "ModelName": {
                             "Fn::GetAtt": [
-                                "QnABotSMEmbeddingModel",
+                                "QnABotEmbeddingModel",
                                 "ModelName"
                             ]
                         },
@@ -91,7 +91,7 @@ module.exports={
                 }
             }
         },
-        "QnABotSMServerlessEmbeddingEndpointConfig": {
+        "QnABotServerlessEmbeddingEndpointConfig": {
             "Condition":"EmbeddingsSagemakerServerless",
             "Type": "AWS::SageMaker::EndpointConfig",
             "Properties": {
@@ -99,7 +99,7 @@ module.exports={
                     {
                         "ModelName": {
                             "Fn::GetAtt": [
-                                "QnABotSMEmbeddingModel",
+                                "QnABotEmbeddingModel",
                                 "ModelName"
                             ]
                         },
@@ -124,31 +124,31 @@ module.exports={
             }
 
         },
-        "QnABotSMProvisionedEmbeddingEndpoint": {
+        "QnABotProvisionedEmbeddingEndpoint": {
             "Condition":"EmbeddingsSagemakerProvisioned",
             "Type": "AWS::SageMaker::Endpoint",
             "Properties": {
                 "EndpointConfigName": {
                     "Fn::GetAtt": [
-                        "QnABotSMProvisionedEmbeddingEndpointConfig",
+                        "QnABotProvisionedEmbeddingEndpointConfig",
                         "EndpointConfigName"
                     ]
                 }
             }
         },
-        "QnABotSMServerlessEmbeddingEndpoint": {
+        "QnABotServerlessEmbeddingEndpoint": {
             "Condition":"EmbeddingsSagemakerServerless",
             "Type": "AWS::SageMaker::Endpoint",
             "Properties": {
                 "EndpointConfigName": {
                     "Fn::GetAtt": [
-                        "QnABotSMServerlessEmbeddingEndpointConfig",
+                        "QnABotServerlessEmbeddingEndpointConfig",
                         "EndpointConfigName"
                     ]
                 }
             }
         },
-        "QnABotSMEmbeddingModelExecutionRole": {
+        "QnABotEmbeddingModelExecutionRole": {
             "Type": "AWS::IAM::Role",
             "Properties": {
                 "AssumeRolePolicyDocument": {
@@ -267,8 +267,8 @@ module.exports={
             "Value": {
                 "Fn::If": [
                     "EmbeddingsSagemakerProvisioned",
-                    {"Fn::GetAtt":["QnABotSMProvisionedEmbeddingEndpoint","EndpointName"]},
-                    {"Fn::GetAtt":["QnABotSMServerlessEmbeddingEndpoint","EndpointName"]}
+                    {"Fn::GetAtt":["QnABotProvisionedEmbeddingEndpoint","EndpointName"]},
+                    {"Fn::GetAtt":["QnABotServerlessEmbeddingEndpoint","EndpointName"]}
                 ]
             }
         },
@@ -276,8 +276,8 @@ module.exports={
             "Value":{
                 "Fn::If": [
                     "EmbeddingsSagemakerProvisioned",
-                    {"Ref":"QnABotSMProvisionedEmbeddingEndpoint"},
-                    {"Ref":"QnABotSMServerlessEmbeddingEndpoint"}
+                    {"Ref":"QnABotProvisionedEmbeddingEndpoint"},
+                    {"Ref":"QnABotServerlessEmbeddingEndpoint"}
                 ]
             }
         }
