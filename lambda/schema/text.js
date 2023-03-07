@@ -12,7 +12,7 @@ module.exports={
             maxLength:100,
             propertyOrder: 0
         },
-        a:{
+        passage:{
             type:"string",
             title:"Passage",
             description:"Enter a short text passage/paragraph with information on a topic that a user may ask about.",
@@ -171,5 +171,5 @@ module.exports={
             propertyOrder: 20
         },
     },
-    required:["qid","a"]
+    required:["qid","passage"]
 };

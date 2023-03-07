@@ -145,10 +145,10 @@ exports.step = function (event, context, cb) {
                                         }
                                         delete obj.q
                                     } else if (obj.type === 'text') {
-                                        // text field embeddings
-                                        const text = obj.a;
-                                        if (text) {
-                                            obj.a_vector = await get_embeddings("a", text, settings);
+                                        // passage field embeddings
+                                        const passage = obj.passage;
+                                        if (passage) {
+                                            obj.passage_vector = await get_embeddings("a", passage, settings);
                                         }
                                     }
                                     docid = obj._id || obj.qid;

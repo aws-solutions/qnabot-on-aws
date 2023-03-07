@@ -320,6 +320,10 @@ async function get_hit(req, res) {
         if (! hit.debug) {
             hit.debug=[];
         }
+        if (hit.passage && !hit.a) {
+            // Set the answer (a) field to match the text item passage field.
+            hit.a = hit.passage; 
+        }
         if (! _.get(hit, "alt.markdown")) {
             _.set(hit, "alt.markdown", hit.a);
         }
@@ -327,7 +331,7 @@ async function get_hit(req, res) {
             _.set(hit, "alt.ssml", hit.a);
         }
         if (hit.type === 'text') {
-            // Run any configured QA Summary options on the result
+            // Run any configured QA Summary options on the text passage result
             hit = await run_qa_summary(req, hit);
         }
     } else if(query_params.kendra_indexes.length != 0) {

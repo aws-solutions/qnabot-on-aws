@@ -47,6 +47,12 @@
     "score_answer": "",
     #end
 
+    #if ($input.params('score_text_passage'))
+    "score_text_passage": "$util.urlDecode($input.params('score_text_passage'))",
+    #else
+    "score_text_passage": "",
+    #end
+
     "size":"$perpage",
     "from":"$from",
 

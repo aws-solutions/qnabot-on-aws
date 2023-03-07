@@ -10,10 +10,17 @@
           @keyup.enter="simulate"
           clearable 
         )
-      v-flex(xs5)
+      v-flex(xs2)
         v-checkbox(
-          label="Score on answer field (instead of questions)"
+          label="Score qna item answer field"
           v-model="score_answer"
+          true-value="true"
+          false-value="false"
+        )
+      v-flex(xs2)
+        v-checkbox(
+          label="Score text item passage field"
+          v-model="score_text_passage"
           true-value="true"
           false-value="false"
         )
@@ -56,7 +63,8 @@ module.exports={
       query:"",
       topic:"",
       client_filter:"",
-      score_answer:"false"
+      score_answer:"false",
+      score_text_passage:"false"
     }
   },
   components:{
@@ -68,7 +76,8 @@ module.exports={
         query:this.query,
         topic:this.topic,
         client_filter:this.client_filter,
-        score_answer:this.score_answer
+        score_answer:this.score_answer,
+        score_text_passage:this.score_text_passage
       })
     },500,{trailing:false,leading:true})
   }

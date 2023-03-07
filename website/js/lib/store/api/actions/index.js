@@ -200,6 +200,7 @@ module.exports=Object.assign(
                 topic:opts.topic || "",
                 client_filter:opts.client_filter || "",
                 score_answer:opts.score_answer || "false",
+                score_text_passage:opts.score_text_passage || "false",
                 from:opts.from || 0
             }),
             method:'get',

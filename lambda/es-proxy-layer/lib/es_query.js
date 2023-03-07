@@ -67,7 +67,7 @@ async function run_query_es(req, query_params) {
         body: es_query
     });
 
-    // check threshold - always '1' is not using embeddings
+    // check threshold - always '1' if not using embeddings
     let threshold = (_.get(query_params, 'settings.EMBEDDINGS_ENABLE')) ? _.get(query_params,'settings.EMBEDDINGS_SCORE_THRESHOLD',0) : 1
     qnabot.log(`Score threshold for question matches is: ${threshold}.`)
     es_response = score_threshold_check(es_response, threshold)
@@ -84,14 +84,33 @@ async function run_query_es(req, query_params) {
     if ( !gothits && _.get(query_params, 'settings.ES_SCORE_ANSWER_FIELD')) {
         qnabot.log("ES_SCORE_ANSWER_FIELD is true. Rerun query to check for matches on answer field.")
         query_params.score_answer = true;
-        let es_query_an_answer = await build_es_query(query_params);
+        let es_query_on_answer = await build_es_query(query_params);
         es_response = await request({
             url: `https://${req._info.es.address}/${req._info.es.index}/_search?search_type=dfs_query_then_fetch`,
             method: "GET",
-            body: es_query_an_answer
+            body: es_query_on_answer
         });
         // check threshold - always '1' if not using embeddings
         let threshold = (_.get(query_params, 'settings.EMBEDDINGS_ENABLE')) ? _.get(query_params,'settings.EMBEDDINGS_SCORE_ANSWER_THRESHOLD',0) : 1
+        qnabot.log(`Score threshold for answer matches is: ${threshold}.`)
+        es_response = score_threshold_check(es_response, threshold)
+        gothits = _.get(es_response, 'hits.hits.length');
+        matched_field = (gothits) ? "answer" : "";
+    }
+
+    // if EMBEDDINGS_ENABLE_TEXT_PASSAGE_QUERIES is true, AND no hits were returned from previous query(s), run 
+    // another query to match the item text passage field (applicable on for items of type 'text').
+    if ( !gothits && _.get(query_params, 'settings.ES_SCORE_TEXT_ITEM_PASSAGES')) {
+        qnabot.log("ES_SCORE_TEXT_ITEM_PASSAGES is true. Rerun query to check for matches on text field.")
+        query_params.score_text_passage = true;
+        let es_query_on_text_passage = await build_es_query(query_params);
+        es_response = await request({
+            url: `https://${req._info.es.address}/${req._info.es.index}/_search?search_type=dfs_query_then_fetch`,
+            method: "GET",
+            body: es_query_on_text_passage
+        });
+        // check threshold - always '1' if not using embeddings
+        let threshold = (_.get(query_params, 'settings.EMBEDDINGS_ENABLE')) ? _.get(query_params,'settings.EMBEDDINGS_TEXT_PASSAGE_SCORE_THRESHOLD',0) : 1
         qnabot.log(`Score threshold for answer matches is: ${threshold}.`)
         es_response = score_threshold_check(es_response, threshold)
         gothits = _.get(es_response, 'hits.hits.length');
