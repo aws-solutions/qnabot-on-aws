@@ -199,8 +199,8 @@ module.exports=Object.assign(
                 query:opts.query,
                 topic:opts.topic || "",
                 client_filter:opts.client_filter || "",
-                score_answer:opts.score_answer || "false",
-                score_text_passage:opts.score_text_passage || "false",
+                score_answer: (opts.score_on === 'qna item answer') ? 'true' : 'false',
+                score_text_passage: (opts.score_on === 'text item passage') ? 'true' : 'false',
                 from:opts.from || 0
             }),
             method:'get',

@@ -287,7 +287,7 @@ module.exports={
         'QASummarizeApi':{
             'Type':'String',
             'Description':'Optionally enable (experimental) QnABot passage aggregation and question answering. If set to SAGEMAKER LLM or CFAQ, a Sagemaker endpoint is automatically provisioned. To use a custom LAMBDA function, provide additional parameters below.',
-            'AllowedValues': ['DISABLED', 'SAGEMAKER CFAQ', 'SAGEMAKER LLM', 'LAMBDA', 'ALL'],
+            'AllowedValues': ['DISABLED', 'SAGEMAKER LLM', 'SAGEMAKER CFAQ', 'LAMBDA', 'ALL'],
             'Default':'DISABLED'
         },
         'SagemakerQASummarizeInitialInstanceCount':{

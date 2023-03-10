@@ -36,6 +36,13 @@ function build_query(params) {
           zero_terms_query: 'all',
         }
       };
+      const filter_query_passage = {
+        'passage': {
+          query: keywords,
+          minimum_should_match: _.get(params, 'minimum_should_match', '2<75%'),
+          zero_terms_query: 'all',
+        }
+      };
       const match_query = {
         'quniqueterms': {
           query: params.question,
@@ -45,6 +52,7 @@ function build_query(params) {
       if (_.get(params, 'fuzziness')) {
         filter_query_unique_terms.quniqueterms.fuzziness = "AUTO";
         filter_query_a.a.fuzziness = "AUTO";
+        filter_query_passage.passage.fuzziness = 'AUTO';
         match_query.quniqueterms.fuzziness = "AUTO";
       }
       let query = bodybuilder();
@@ -56,6 +64,8 @@ function build_query(params) {
       if (keywords.length > 0) {
         if (_.get(params, 'score_answer')) {
           query = query.filter('match', filter_query_a);
+        } else if (_.get(params, 'score_text_passage')) {
+          query = query.filter('match', filter_query_passage);
         } else {
           query = query.filter('match', filter_query_unique_terms);
         }
@@ -134,8 +144,8 @@ function build_query(params) {
           query = query.orQuery('match_phrase', 'a', params.question);
         } else if (params.score_text_passage) {
           // match on text (score_text_passage is true)
-          query = query.orQuery('match', 'text', params.question);
-          query = query.orQuery('match_phrase', 'text', params.question);
+          query = query.orQuery('match', 'passage', params.question);
+          query = query.orQuery('match_phrase', 'passage', params.question);
         } else {
           // match on questions (default)
           query = query.orQuery(
@@ -181,7 +191,7 @@ function build_query(params) {
         }
       }
       query = query
-        .rawOption("_source",{"exclude": ["questions.q_vector", "a_vector"]})
+        .rawOption("_source",{"exclude": ["questions.q_vector", "a_vector", "passage_vector"]})
         .from(_.get(params, 'from', 0))
         .size(_.get(params, 'size', 1))
         .build();

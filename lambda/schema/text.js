@@ -21,7 +21,7 @@ module.exports={
         },
         t:{
             type:"string",
-            description:"Assign a topic to this item, to support follow up questions on the same topic. (Sets session attribute 'topic' in response). Topics cannot be used if enableLexIntent is enabled.",
+            description:"Assign a topic to this item, to support follow up questions on the same topic.",
             title:"Topic",
             propertyOrder: 5
         },
@@ -50,6 +50,13 @@ module.exports={
                     }
                 },
             },
+            propertyOrder: 7
+        },
+        refMarkdown:{
+            type:"string",
+            title:"Reference Links",
+            description:"Attach optional markdown to your answer, e.g.: [Title](url)",
+            maxLength:2000,
             propertyOrder: 8
         },
         r:{

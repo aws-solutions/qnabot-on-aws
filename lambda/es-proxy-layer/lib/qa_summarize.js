@@ -74,7 +74,7 @@ const get_qa_summary_lambda = async function get_qa_summary_lambda(question, con
     let lambdares =await lambda.invoke({
         FunctionName:process.env.QA_SUMMARIZE_LAMBDA_ARN,
         InvocationType:'RequestResponse',
-        Payload:JSON.stringify({question: question, context: context})
+        Payload:JSON.stringify({question: question, context: context, settings: settings})
     }).promise();
     let payload=JSON.parse(lambdares.Payload);
     let answer = payload.generated_text;

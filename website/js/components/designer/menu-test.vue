@@ -11,18 +11,10 @@
           clearable 
         )
       v-flex(xs2)
-        v-checkbox(
-          label="Score qna item answer field"
-          v-model="score_answer"
-          true-value="true"
-          false-value="false"
-        )
-      v-flex(xs2)
-        v-checkbox(
-          label="Score text item passage field"
-          v-model="score_text_passage"
-          true-value="true"
-          false-value="false"
+        v-select(
+          label="Match on:"
+          :items="['qna item questions', 'qna item answer', 'text item passage']"
+          v-model="score_on"
         )
     v-layout(row)
       v-flex(xs5)
@@ -63,8 +55,7 @@ module.exports={
       query:"",
       topic:"",
       client_filter:"",
-      score_answer:"false",
-      score_text_passage:"false"
+      score_on:"qna item questions"
     }
   },
   components:{
@@ -77,7 +68,7 @@ module.exports={
         topic:this.topic,
         client_filter:this.client_filter,
         score_answer:this.score_answer,
-        score_text_passage:this.score_text_passage
+        score_on:this.score_on
       })
     },500,{trailing:false,leading:true})
   }
