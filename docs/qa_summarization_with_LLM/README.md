@@ -49,7 +49,7 @@ By default a 1-node ml.g5.xlarge endpoint is automatically provisioned. For larg
 
 - *(for Kendra Fallback)* set `DefaultKendraIndexId` to the Index Id (a GUID) of your existing Kendra index containing ingested documents 
 - *(for text passage queries)* set `QASummarizeApi` to SAGEMAKER LLM or LAMBDA (see  [Semantic Search using Text Embeddings](../semantic_matching_using_LLM_embeddings/README.md))
-- for `InstallLexResponseBots` choose `false` - if you don't plan to use Response bots, this speeds up teh stack installation.
+- for `InstallLexResponseBots` choose `false` - if you don't plan to use Response bots, this speeds up the stack installation.
 
 ![CFN Params](./images/CF_Params_SageMaker_LLM.png)
 
@@ -66,7 +66,7 @@ By default a 1-node ml.t3.2xlarge endpoint is automatically provisioned. For lar
 
 - *(for Kendra Fallback)* set `DefaultKendraIndexId` to the Index Id (a GUID) of your existing Kendra index containing ingested documents 
 - set `QASummarizeApi` to SAGEMAKER CFAQ
-- for `InstallLexResponseBots` choose `false` - if you don't plan to use Response bots, this speeds up teh stack installation.
+- for `InstallLexResponseBots` choose `false` - if you don't plan to use Response bots, this speeds up the stack installation.
 
 
 ![CFN Params](./images/CF_Params_SageMaker_CFAQ.png)
@@ -82,7 +82,7 @@ Use a custom Lambda function to experiment with LLMs of your choice. Provide you
 - *(for text passage queries)* set `QASummarizeApi` to SAGEMAKER LLM or LAMBDA (see  [Semantic Search using Text Embeddings](../semantic_matching_using_LLM_embeddings/README.md))
 - set `QASummarizeApi` to LAMBDA
 - set `QASummarizeLambdaArn` to the ARN of your Lambda function 
-- for `InstallLexResponseBots` choose `false` - if you don't plan to use Response bots, this speeds up teh stack installation.
+- for `InstallLexResponseBots` choose `false` - if you don't plan to use Response bots, this speeds up the stack installation.
 
 ![CFN Params](./images/CF_Params_Lambda.png)
 
