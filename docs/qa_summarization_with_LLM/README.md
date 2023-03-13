@@ -3,24 +3,26 @@
 QnABot can now use a large language model to generate answers from Kendra search results, or from text passges created or imported directly into QnAbot. Some of the benefits include:
 - Generated answers allow you to reduce the number of FAQs you need to maintain since you can now synthesize concise answers from your existing documents in a Kendra index, or from document passages stored in QnABot as 'text' items.
 - Generated answers can be short, concise, and suitable for voice channel contact center bots as well as website / text bots.
-- Generated answers are fully comnpatible with QnABot's multi-language support - ie user can intereact in multiple languages and recieve generated answers in their own language.
+- Generated answers are fully comnpatible with QnABot's multi-language support - users can interact in their chosen languages and recieve generated answers in the same language.
 
 Examples:
-With the new QA Summarization feature enabled, QnABot can answer questions from the [AWS WhitePapers in a Kendra index](https://catalog.us-east-1.prod.workshops.aws/workshops/df64824d-abbe-4b0d-8b31-8752bceabade/en-US/200-ingesting-documents/230-using-the-s3-connector/231-ingesting-documents) such as:
-- *"What is Dynamo DB?"* -> **Amazon’s Highly Available Key-value Store** or 
+With the new QA Summarization feature enabled, QnABot can answer questions from the [AWS WhitePapers](https://catalog.us-east-1.prod.workshops.aws/workshops/df64824d-abbe-4b0d-8b31-8752bceabade/en-US/200-ingesting-documents/230-using-the-s3-connector/231-ingesting-documents) such as:
+- *"What is Dynamo DB?"* -> **Amazon’s Highly Available Key-value Store** 
+
+  ![Example1](./images/example_dynamodb.png)
+
 - *"What frameworks does AWS have to help people design good architectures?"* -> **Well-Architected Framework**  
 
 It can even generate answers to yes/no questions, like:
 - *"Is Lambda a database service?"* -> **No**. 
 
-    ![Example1](./images/example_dynamodb.png)
 
 Even if you aren't (yet) using AWS Kendra (and you should!) QnABot can answer questions based on passages created or imported into Content Designer, such as:
 - *"Where did Humpty Dumpty sit?"* -> **On the wall**, 
 - *"Did Humpty Dumpty sit on the wall?"* -> **yes**, 
 - *"Did Humpty Dumpty sit on the ground"* -> **No**  
 
-all from a text passage item that contains the nursery rhyme. For best results when using native passage retrieval in QnABot, be sure to enable [Semantic Search using Text Embeddings](../semantic_matching_using_LLM_embeddings/README.md).
+all from a text passage item that contains the nursery rhyme.  
 
 ![Example2](./images/example_Humpty_Dumpty.png)
   
@@ -94,7 +96,7 @@ Your Lambda function is passed an event of the form:
   "settings":{"key":value, ...} // settings object containing key / value pairs for all QnABot settings
 }
 ```
-and must return a JSON structure of the form:
+and returns a JSON structure of the form:
 ```
 {"generated_text":"string"}
 ```
@@ -170,11 +172,11 @@ In Content Designer, choose **Add**, select **text**, enter an Item ID and a Pas
 
 ![CFN Params](./images/TextItem_JackHorner.png)
 
-QnABot saves your passage, along with the text embeddings if you have Embeddings enabled as discussed above. 
+QnABot saves your passage, along with the text embeddings; for best results when using native passage retrieval in QnABot, be sure to enable [Semantic Search using Text Embeddings](../semantic_matching_using_LLM_embeddings/README.md).
 
 Test your queries match the desired text item using the TEST tab in Content Designer. To test matches for text item passages, select the appropriate drop down before choosing SEARCH. Compare scores on "qna questions" to the configured threshold setting `EMBEDDINGS_SCORE_THTRESHOLD` and for passages to the threshold setting `EMBEDDINGS_TEXT_PASSAGE_SCORE_THRESHOLD`. You may need to adjust thresholds to get the desired behavior when using the bot with the web client.
 
-You can also import your passages from a JSON file using Contemt Designer import. From the Tools menu on the top left, choose **Import**, open **Examples/Extensions** and choose the LOAD button next to **TextPassage-NurseryRhymeExamples** to import two nursery rhyme text items.
+You can also import your passages from a JSON file using Content Designer import. From the Tools menu on the top left, choose **Import**, open **Examples/Extensions** and choose the LOAD button next to **TextPassage-NurseryRhymeExamples** to import two nursery rhyme text items.
 To import your own passages create and import a JSON file with the structure similar to below:
 ```
 {
