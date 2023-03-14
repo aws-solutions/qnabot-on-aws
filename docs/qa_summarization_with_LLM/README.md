@@ -3,7 +3,7 @@
 QnABot can now use a large language model to generate answers from Kendra search results, or from text passges created or imported directly into QnAbot. Some of the benefits include:
 - Generated answers allow you to reduce the number of FAQs you need to maintain since you can now synthesize concise answers from your existing documents in a Kendra index, or from document passages stored in QnABot as 'text' items.
 - Generated answers can be short, concise, and suitable for voice channel contact center bots as well as website / text bots.
-- Generated answers are fully comnpatible with QnABot's multi-language support - users can interact in their chosen languages and recieve generated answers in the same language.
+- Generated answers are fully compatible with QnABot's multi-language support - users can interact in their chosen languages and recieve generated answers in the same language.
 
 Examples:
 With the new QA Summarization feature enabled, QnABot can answer questions from the [AWS WhitePapers](https://catalog.us-east-1.prod.workshops.aws/workshops/df64824d-abbe-4b0d-8b31-8752bceabade/en-US/200-ingesting-documents/230-using-the-s3-connector/231-ingesting-documents) such as:
@@ -32,7 +32,7 @@ all from a text passage item that contains the nursery rhyme.
 - We encourage you to try it on non-production instances to validate accuracy and business value.
 - Try different LLM models and APIs
 - Experiment with different LLM prompts and inference parameters (easily adjusted using QnABot Settings - discussed below)
-- Run throughtput testing and inference endpoint scale testing to properly estimate deployment size/costs.. NOTE we do not yet have any scale/costing guidelines.
+- Run throughput testing and inference endpoint scale testing to properly estimate deployment size/costs.. NOTE we do not yet have any scale/costing guidelines, so please share your findings.
   
 
 With this release, QnaBot can use:  
