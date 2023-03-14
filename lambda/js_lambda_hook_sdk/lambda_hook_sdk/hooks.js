@@ -1,3 +1,6 @@
+// Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+// SPDX-License-Identifier: Apache-2.0
+
 const _ = require("lodash");
 
 module.exports = {
@@ -16,7 +19,6 @@ module.exports = {
         return _.get(event, "res._userInfo." + property, default_value)
     },
 
-
     list_user_attributes: function(event){
         //Session attributes may have been added to the response object in addition to what are in
         //the request object or they may have not been copied to the response on
@@ -34,8 +36,6 @@ module.exports = {
         return this.list_user_attributes(event)
     },
 
-
-
     list_settings: function (event) {
         return _.get(event, "req._settings", {})
     },
@@ -49,13 +49,16 @@ module.exports = {
     },
 
     get_args: function (event) {
-        var args = _.get(event, "res.result.args");
+        let args = _.get(event, "res.result.args");
         let results = [];
         args.forEach(element => {
-            if (_isJson(element)) {
-                results.push(JSON.parse(element))
+            try{
+                let jsonResult = JSON.parse(element)
+                results.push(jsonResult)
             }
-            else{
+            catch(e){
+                //exception thrown during parse means it's not JSON
+                //just push onto results
                 results.push(element)
             }
         })
@@ -71,18 +74,14 @@ module.exports = {
     },
 
     set_message: function (event, message) {
-        _.set(event, "res,result.a", message.plainText != undefined ? message.plainText : _.get(event, "res.a")),
-        _.set(event, "res.result.alt.markdown", message.markDown != undefined ? message.markDown : _.get(event, "res.markdown"))
-        _.set(event, "res.result.alt.ssml", message.ssml != undefined ? message.ssml : _.get(event, "res.ssml"))
-
+        _.set(event, "res.result.a", message.plainText)
+        _.set(event, "res.result.alt.markdown", message.markDown)
+        _.set(event, "res.result.alt.ssml", message.ssml)
     },
-
 
     get_es_result: function (event) {
         return _.get(event, "res.result")
     },
-
- 
 
     get_answer_source: function(event){
         return _.get(event,"res.result.answerSource")
@@ -103,7 +102,6 @@ module.exports = {
         _.set(event,"res.session."+key,value)
         return this.list_session_attributes(event)
     },
-
 
     add_response_card_button: function (event, text, value, isQID = false, prepend = false) {
         let buttons = _.get(event, "res.card.buttons", undefined)
@@ -139,8 +137,8 @@ module.exports = {
 
     get_sentiment:function(event){
         return {
-            sentiment:_.get(event,"req.sentiment"),
-            score: _.get(event,"req.sentimenScore")
+            sentiment: _.get(event,"req.sentiment"),
+            score: _.get(event,"req.sentimentScore")
         }
     },
 
@@ -149,7 +147,7 @@ module.exports = {
     },
 
     get_response_card_imageurl: function (event) {
-        _.get(event, "res.card.imageUrl", undefined)
+        return _.get(event, "res.card.imageUrl", undefined)
     },
 
     set_response_card_title: function (event, title, overwrrite = true) {
@@ -164,28 +162,20 @@ module.exports = {
         let card = _.get(event, "res.card", undefined)
 
         if (!card) {
-            return card
+            return event
         }
 
         if (card.title == undefined) {
-            throw ("A response card was created without a title.  Set the title using set_response_card_title()")
+            throw new Error("A response card was created without a title.  Set the title using set_response_card_title()")
         }
 
         let buttons = this.list_response_card_buttons(event)
-
         let imageUrl = this.get_response_card_imageurl(event)
-        if (buttons.length == 0 && imageUrl == undefined) {
-            throw ("If a response card is defined, either the imageUrl or buttons must be defined")
-        }
-        return event
-    }
-}
 
-function _isJson(jsonString) {
-    try {
-        JSON.parse(jsonString);
-        return true; // It's a valid JSON format
-    } catch (e) {
-        return false; // It's not a valid JSON format
+        if (buttons.length == 0 && imageUrl == undefined) {
+            throw new Error("If a response card is defined, either the imageUrl or buttons must be defined")
+        }
+
+        return event
     }
 }

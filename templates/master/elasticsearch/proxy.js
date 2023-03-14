@@ -76,10 +76,34 @@ module.exports={
             "create":{
                 index:{"Fn::Sub":"${Var.QnaIndex}"},
                 endpoint:{"Fn::GetAtt":["ESVar","ESAddress"]},
-                body:{"Fn::Sub":JSON.stringify({
-                    settings:require('./index_settings.js'),
-                    mappings:require('./index_mappings.js'),
-                })}
+                body:{"Fn::Sub": [
+                    JSON.stringify({
+                        settings:require('./index_settings.js'),
+                        mappings:require('./index_mappings.js'),
+                    }),
+                    {
+                        "EmbeddingsDimensions" : {
+                            "Fn::If": [
+                                "EmbeddingsEnable", 
+                                {
+                                    "Fn::If": [
+                                        "EmbeddingsSagemaker", 
+                                        "1024",
+                                        {
+
+                                            "Fn::If": [
+                                                "EmbeddingsLambda", 
+                                                {"Ref": "EmbeddingsLambdaDimensions"},
+                                                "INVALID EMBEDDINGS API - Cannot determine dimensions" 
+                                            ]
+                                        }
+                                    ]
+                                }, 
+                                "1" // minimal default to use if embeddings are disabled
+                            ]
+                        }
+                    }
+                ]}
             }
         }
     },
@@ -90,9 +114,9 @@ module.exports={
             "ServiceToken": { "Fn::GetAtt" : ["ESCFNProxyLambda", "Arn"] },
             "create":{
                 endpoint:{"Fn::GetAtt":["ESVar","ESAddress"]},
-                path:"/_plugin/kibana/api/kibana/dashboards/import?force=true",
+                path:"/_dashboards/api/opensearch-dashboards/dashboards/import?force=true",
                 method:"POST",
-                headers:{"kbn-xsrf":"kibana"},
+                headers:{"osd-xsrf":"true"},
                 body:require('./kibana/QnABotDashboard'),
                 replaceTokenInBody:[
                     {f:"<INDEX_QNA>",r:{"Fn::Sub":"${Var.QnaIndex}"}},

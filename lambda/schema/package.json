@@ -1,8 +1,29 @@
 {
   "name": "schema",
   "version": "1.0.0",
-  "description": "",
+  "description": "Lambda function used to provide the schemas for the various qid types",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/aws-solutions/qnabot-on-aws",
+    "directory": "lambda/schema"
+  },
   "main": "index.js",
-  "author": "",
-  "license": "ISC"
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "clean": "rm -rf node_modules",
+    "test": "jest"
+  },
+  "author": {
+    "name": "Amazon Web Services",
+    "url": "https://aws.amazon.com/solutions"
+  },
+  "license": "SEE LICENSE IN LICENSE",
+  "dependencies": {
+    "aws-sdk": "^2.1276.0"
+  },
+  "devDependencies": {
+    "jest": "^29.3.1"
+  }
 }

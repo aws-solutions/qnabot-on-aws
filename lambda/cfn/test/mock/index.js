@@ -1,5 +1,4 @@
 #! /usr/bin/env node
-var JWT=require('jsonwebtoken')
 var fs = require('fs');
 var express = require('express');
 var https = require('https');
@@ -19,7 +18,7 @@ app.use(bodyParser.json({type:()=>true}))
 var callback
 exports.register=function(fnc){
     console.log("registered")
-    callback=fnc 
+    callback=fnc
 }
 exports.server=function(test){
     app.put('/*', function (req, res) {

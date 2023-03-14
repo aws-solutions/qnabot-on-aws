@@ -2,24 +2,23 @@
   "name": "js_lambda_hook_sdk",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
   "directories": {
-    "lib": "lib"
+    "lambda_hook_sdk": "lambda_hook_sdk",
+    "test": "test"
   },
   "scripts": {
+    "clean": "rm -rf node_modules",
     "test": "jest"
   },
-  "author": "",
-  "license": "ISC",
+  "author": {
+    "name": "Amazon Web Services",
+    "url": "https://aws.amazon.com/solutions"
+  },
+  "license": "SEE LICENSE IN LICENSE",
   "dependencies": {
     "lodash": "^4.17.21"
   },
   "devDependencies": {
-    "install": "^0.13.0",
-    "jest": "^27.0.6",
-    "npm": "^8.10.0"
-  },
-  "overrides": {
-    "minimatch@<3.0.5": "3.0.5"
+    "jest": "^29.3.1"
   }
 }

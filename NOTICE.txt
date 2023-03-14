@@ -117,7 +117,6 @@ vue-template-compiler under the Massachusetts Institute of Technology (MIT) lice
 vuetify under the Massachusetts Institute of Technology (MIT) license
 vuex under the Massachusetts Institute of Technology (MIT) license
 vuex-router-sync under the Massachusetts Institute of Technology (MIT) license
-webdriverio under the Massachusetts Institute of Technology (MIT) license
 webpack under the Massachusetts Institute of Technology (MIT) license
 webpack-archive-plugin under the Massachusetts Institute of Technology (MIT) license
 webpack-bundle-analyzer under the Massachusetts Institute of Technology (MIT) license

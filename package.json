@@ -1,6 +1,6 @@
 {
   "name": "qnabot-on-aws",
-  "version": "5.2.3",
+  "version": "5.3.0",
   "engines": {
     "node": ">=12.16.1",
     "npm": ">=7.8.0"
@@ -81,8 +81,7 @@
     "json-stringify-pretty-compact": "^1.2.0",
     "JSONPath": "^0.11.2",
     "jsonschema": "^1.2.4",
-    "jsonwebtoken": "^8.3.0",
-    "jszip": "^3.1.5",
+    "jsonwebtoken": "^9.0.0",
     "lodash": "^4.17.21",
     "marked": "^4.1.0",
     "material-design-icons": "^3.0.1",
@@ -120,7 +119,6 @@
     "vuetify": "1.0.19",
     "vuex": "^3.0.1",
     "vuex-router-sync": "^5.0.0",
-    "webdriverio": "^6.1.16",
     "xlsx": "^0.17.0"
   },
   "devDependencies": {
@@ -171,6 +169,10 @@
       "glob-parent": "^5.1.2"
     },
     "minimatch": "3.0.5",
-    "loader-utils@<1.4.1": "^1.4.1"
+    "loader-utils@<1.4.2": "^1.4.2",
+    "json5@<1.0.2": "^1.0.2",
+    "aws-lex-web-ui": {
+      "jsonwebtoken@<9.0.0": "$jsonwebtoken"
+    }
   }
 }

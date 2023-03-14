@@ -47,7 +47,12 @@ module.exports=Promise.resolve(require('../master')).then(function(base){
         "KibanaDashboardRetentionMinutes",
         "VPCSubnetIdList",
         "VPCSecurityGroupIdList",
-        "XraySetting"
+        "XraySetting",
+        "EmbeddingsApi",
+        "EmbeddingsSagemakerEndpoint",
+        "SagemakerInitialInstanceCount",
+        "EmbeddingsLambdaArn",
+        "EmbeddingsLambdaDimensions" 
     ]);
     base.Metadata = {
         "AWS::CloudFormation::Interface": {
@@ -96,7 +101,30 @@ module.exports=Promise.resolve(require('../master')).then(function(base){
                    "Parameters": [
                         "LexV2BotLocaleIds"
                    ]
-                }
+                },
+                {
+                    "Label": {
+                         "default": "Semantic Search with Embeddings"
+                    },
+                    "Parameters": [
+                        "EmbeddingsApi",
+                        "EmbeddingsSagemakerEndpoint",
+                        "EmbeddingsLambdaArn",
+                        "EmbeddingsLambdaDimensions",
+                        "SagemakerInitialInstanceCount"
+                    ]
+                 },
+                 {
+                    "Label": {
+                         "default": "Miscellaneous"
+                    },
+                    "Parameters": [
+                        "LexBotVersion",
+                        "InstallLexResponseBots",
+                        "FulfillmentConcurrency",
+                        "XraySetting"                  
+                    ]
+                 }
             ]
         }
     };
@@ -112,6 +140,10 @@ module.exports=Promise.resolve(require('../master')).then(function(base){
                     { "Fn::Join": [ "", { "Ref": "VPCSecurityGroupIdList" } ] }
                 ] }
         ] }
+    base.Conditions.EmbeddingsEnable= {"Fn::Not": [{ "Fn::Equals":[{"Ref":"EmbeddingsApi"},"DISABLED"]}]}
+    base.Conditions.EmbeddingsSagemaker = {"Fn::Equals":[{"Ref":"EmbeddingsApi"},"SAGEMAKER"]}
+    base.Conditions.EmbeddingsLambda = {"Fn::Equals":[{"Ref":"EmbeddingsApi"},"LAMBDA"]}
+    base.Conditions.EmbeddingsLambdaArn = {"Fn::Not": [{ "Fn::Equals":[{"Ref":"EmbeddingsLambdaArn"},""]}]}
 
     var out=JSON.stringify(base);
 

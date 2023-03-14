@@ -1,24 +1,54 @@
-var Promise = require('bluebird')
-var aws = require("aws-sdk")
-aws.config.setPromisesDependency(Promise)
-aws.config.region = process.env.AWS_REGION
+const Promise = require('bluebird');
+const aws = require("aws-sdk");
+aws.config.setPromisesDependency(Promise);
+aws.config.region = process.env.AWS_REGION;
+// import from es-proxy-layer
+const get_embeddings = require('/opt/lib/embeddings.js');
+const request=require('/opt/lib/request.js');
+const qnabot = require("qnabot/logging")
+const qna_settings = require("qnabot/settings")
 
-var s3 = new aws.S3()
-var lambda = new aws.Lambda()
-var stride = parseInt(process.env.STRIDE)
-var _ = require('lodash')
-var convertxlsx = require('convert-xlsx')
-var delete_existing_content = require('delete_existing_content')
+const s3 = new aws.S3();
+const stride = parseInt(process.env.STRIDE);
+const _ = require('lodash');
+const convertxlsx = require('convert-xlsx');
+const delete_existing_content = require('delete_existing_content');
 
+async function get_settings() {
+    let settings = await qna_settings.merge_default_and_custom_settings();
+    qnabot.log("Merged Settings: ", settings);
+    return settings;
+}
+
+async function es_bulk_load(body) {
+    const es_response = await request({
+        url:"https://" + process.env.ES_ENDPOINT + "/_bulk",
+        method:"POST",
+        headers:{'Content-Type': 'application/x-ndjson'},
+        body:body,
+    });
+    qnabot.log("Response (first 500 chars): ", JSON.stringify(es_response,null,2).slice(0,500));
+    return es_response;
+}
+
+async function es_store_doc(index, id, body) {
+    const es_response = await request({
+        url:`https://${process.env.ES_ENDPOINT}/${index}/_doc/${id}`, 
+        method:"PUT",
+        headers:{'Content-Type': 'application/json'},
+        body:body,
+    });
+    qnabot.log("Response: ", JSON.stringify(es_response,null,2).slice(0,500));
+    return es_response;
+}
 
 exports.step = function (event, context, cb) {
-    console.log("step")
-    console.log("Request", JSON.stringify(event, null, 2))
-    var Bucket = event.Records[0].s3.bucket.name
-    var Key = decodeURI(event.Records[0].s3.object.key)
-
-    var progress
-    console.log(Bucket, Key);
+    qnabot.log("step")
+    qnabot.log("Request", JSON.stringify(event, null, 2))
+    let Bucket = event.Records[0].s3.bucket.name
+    let Key = decodeURI(event.Records[0].s3.object.key)
+    let progress
+    qnabot.log(Bucket, Key);
     s3.waitFor('objectExists', {
             Bucket,
             Key
@@ -29,38 +59,39 @@ exports.step = function (event, context, cb) {
         }).promise())
         .then(x => JSON.parse(x.Body.toString()))
         .then(function (config) {
-            console.log("Config:", JSON.stringify(config, null, 2));
+            qnabot.log("Config:", JSON.stringify(config, null, 2));
             if (config.status === "InProgress") {
                 // TODO - design a more robust way to identify target ES index for auto import of metrics and feedback
                 // Filenames must match across:
                 // aws-ai-qna-bot/templates/import/UpgradeAutoImport.js
                 // aws-ai-qna-bot/templates/master/UpgradeAutoExport.js
                 // and pattern in /aws-ai-qna-bot/lambda/import/index.js
-                var esindex = process.env.ES_INDEX;
+                let esindex = process.env.ES_INDEX;
                 if (Key.match(/.*ExportAll_QnABot_.*_metrics\.json/)) {
                     esindex = process.env.ES_METRICSINDEX;
                 } else if (Key.match(/.*ExportAll_QnABot_.*_feedback\.json/)) {
                     esindex = process.env.ES_FEEDBACKINDEX;
                 }
-                console.log("Importing to index: ", esindex);
+                qnabot.log("Importing to index: ", esindex);
                 return s3.getObject({
                         Bucket: config.bucket,
                         Key: config.key,
                         VersionId: config.version,
                         Range: `bytes=${config.start}-${config.end}`
                     }).promise()
-                    .then(function (result) {
-                        console.log('opening file')
-                        var objects = []
+                    .then(async function (result) {
+                        const settings = await get_settings();
+                        qnabot.log('opening file')
+                        let objects = []
                         try {
                             config.buffer += result.Body.toString()
                             if(config.buffer.startsWith('PK')) {
-                                console.log('starts with PK, must be an xlsx')
+                                qnabot.log('starts with PK, must be an xlsx')
                                 let questionArray = convertxlsx.convertxlsx(result.Body)
-                                console.log('number of items processed: ', questionArray.length)
+                                qnabot.log('number of items processed: ', questionArray.length)
                                 questionArray.forEach(question => {
                                     let questionStr = JSON.stringify(question)
-                                    console.log(questionStr)
+                                    qnabot.log(questionStr)
                                     objects.push(questionStr)
                                 })
                                 config.buffer = ""
@@ -72,87 +103,94 @@ exports.step = function (event, context, cb) {
                         } catch (e) {
                             config.buffer=objects.pop()
                         }
-                        var out = []
-                        objects.filter(x => x)
-                            .forEach(x => {
-                                console.log('inside import an object')
-                                try {
-                                    var obj = JSON.parse(x)
-                                    var timestamp = _.get(obj, 'datetime', "");
-                                    var docid;
-                                    if (timestamp === "") {
-                                        // only metrics and feedback items have datetime field.. This must be a qna item.
-                                        obj.type = obj.type || 'qna'
-                                        if(obj.type != 'slottype') {
-                                            obj.q = obj.q.map(x => {
-                                                x = x.replace(/\\*"/g, '');
-                                                return x
-                                            });
-                                        }
-                                        if (obj.type === 'qna') {
-                                            try {
-                                                obj.questions = obj.q.map(x => {
+                        let out = []
+                        for (const x of objects) {
+                            try {
+                                let obj = JSON.parse(x)
+                                let timestamp = _.get(obj, 'datetime', "");
+                                let docid;
+                                if (timestamp === "") {
+                                    // only metrics and feedback items have datetime field.. This must be a qna item.
+                                    obj.type = obj.type || 'qna'
+                                    if(obj.type != 'slottype') {
+                                        obj.q = obj.q.map(x => {
+                                            x = x.replace(/\\*"/g, '');
+                                            return x
+                                        });
+                                    }
+                                    if (obj.type === 'qna') {
+                                        try {
+                                            // question embeddings
+                                            obj.questions = await Promise.all(obj.q.map(async x => {
+                                                const q_embeddings = await get_embeddings("q", x, settings);
+                                                if (q_embeddings) {
+                                                    return {
+                                                        q: x,
+                                                        q_vector: q_embeddings,
+                                                    }
+                                                } else {
                                                     return {
                                                         q: x
                                                     }
-                                                });
-                                                obj.quniqueterms = obj.q.join(" ");
-                                            } catch (err) {
-                                                console.log("skipping question invalid answer format")
+                                                }
+                                            }));
+                                            // answer embeddings
+                                            let answer = obj.a;
+                                            if (answer) {
+                                                obj.a_vector = await get_embeddings("a", answer, settings);
                                             }
-                                            delete obj.q
+                                            obj.quniqueterms = obj.q.join(" ");
+                                        } catch (err) {
+                                            qnabot.log("skipping question due to exception", err);
                                         }
-                                        docid = obj._id || obj.qid;
-                                    } else {
-                                        docid = obj._id || obj.qid + "_upgrade_restore_" + timestamp;
-                                        // Stringify session attributes
-                                        var sessionAttrs = _.get(obj, "entireResponse.session", {});
-                                        for (var key of Object.keys(sessionAttrs)) {
-                                            if (typeof sessionAttrs[key] != 'string') {
-                                                sessionAttrs[key] = JSON.stringify(sessionAttrs[key]);
-                                            }
+                                        delete obj.q
+                                    }
+                                    docid = obj._id || obj.qid;
+                                } else {
+                                    docid = obj._id || obj.qid + "_upgrade_restore_" + timestamp;
+                                    // Stringify session attributes
+                                    let sessionAttrs = _.get(obj, "entireResponse.session", {});
+                                    for (let key of Object.keys(sessionAttrs)) {
+                                        if (typeof sessionAttrs[key] != 'string') {
+                                            sessionAttrs[key] = JSON.stringify(sessionAttrs[key]);
                                         }
                                     }
-                                    delete obj._id;
-                                    out.push(JSON.stringify({
-                                        index: {
-                                            "_index": esindex,
-                                            "_type": "_doc",
-                                            "_id": docid
-                                        }
-                                    }))
-                                    config.count += 1
-                                    out.push(JSON.stringify(obj))
-                                } catch (e) {
-                                    config.failed += 1
-                                    console.log("Failed to Parse:", e, x)
                                 }
-                            })
-                        console.log(result.ContentRange)
-                        var tmp = result.ContentRange.match(/bytes (.*)-(.*)\/(.*)/)
-                        progress = (parseInt(tmp[2]) + 1) / parseInt(tmp[3])
+                                delete obj._id;
+                                out.push(JSON.stringify({
+                                    index: {
+                                        "_index": esindex,
+                                        "_id": docid
+                                    }
+                                }))
+                                config.count += 1
+                                out.push(JSON.stringify(obj))
+                                
+                                // Save docs one at a time, for now, due to issues with k-nn index after bulk load
+                                // TODO - revert back to bulk (more efficient) when we move to OpenSearch 2.3
+                                await es_store_doc(esindex, docid, obj);
 
+                            } catch (e) {
+                                config.failed += 1
+                                qnabot.log("Failed to Parse:", e, x)
+                            }
+                        }
+                        qnabot.log(result.ContentRange)
+                        let tmp = result.ContentRange.match(/bytes (.*)-(.*)\/(.*)/)
+                        progress = (parseInt(tmp[2]) + 1) / parseInt(tmp[3])
                         return out.join('\n') + '\n'
                     })
                     .then ((ES_formatted_content)=>delete_existing_content.delete_existing_content (esindex, config, ES_formatted_content))   //check and delete existing content (if parameter to delete has been passed in the options {file}
+                    /*
+                    // Disable bulk load.. Instead save docs one at a time, for now, due to issues with k-nn index after bulk load
+                    // TODO - revert back to bulk (more efficient) when we move to OpenSearch 2.3
                     .then(function (result) {
-                        var body = {
-                            endpoint: process.env.ES_ENDPOINT,
-                            method: "POST",
-                            path: "/_bulk",
-                            body: result,
-                            headers: {'Content-Type': 'application/x-ndjson'}
-                        }
-
-                        return lambda.invoke({
-                                FunctionName: process.env.ES_PROXY,
-                                Payload: JSON.stringify(body)
-                            }).promise()
-                            .tap(console.log)
+                        return es_bulk_load(result)
                             .then(x => {
-                                config.EsErrors.push(JSON.parse(_.get(x, "Payload", "{}")).errors)
+                                config.EsErrors.push(x.errors)
                             })
                     })
+                    */
                     .then(() => {
                         config.start = (config.end + 1)
                         config.end = config.start + config.stride
@@ -164,7 +202,7 @@ exports.step = function (event, context, cb) {
                             config.time.end = (new Date()).toISOString()
                         }
 
-                        console.log("EndConfig:", JSON.stringify(config, null, 2))
+                        qnabot.log("EndConfig:", JSON.stringify(config, null, 2))
                         return s3.putObject({
                                 Bucket: Bucket,
                                 Key: Key,
@@ -173,7 +211,7 @@ exports.step = function (event, context, cb) {
                             .then(result => cb(null))
                     })
                     .catch(error => {
-                        console.log(error)
+                        qnabot.log(error)
                         config.status = "Error"
                         config.message = JSON.stringify(error)
                         return s3.putObject({
@@ -186,16 +224,15 @@ exports.step = function (event, context, cb) {
             }
         })
         .catch(cb)
-
 }
 
 exports.start = function (event, context, cb) {
-    console.log("starting")
-    console.log("Request", JSON.stringify(event, null, 2))
-    var bucket = event.Records[0].s3.bucket.name
-    var key = decodeURI(event.Records[0].s3.object.key)
-    console.log(bucket, key)
-    var config = {
+    qnabot.log("starting")
+    qnabot.log("Request", JSON.stringify(event, null, 2))
+    let bucket = event.Records[0].s3.bucket.name
+    let key = decodeURI(event.Records[0].s3.object.key)
+    qnabot.log(bucket, key)
+    let config = {
         stride,
         start: 0,
         end: stride,
@@ -213,9 +250,9 @@ exports.start = function (event, context, cb) {
         key,
         version: event.Records[0].s3.object.versionId,
     }
-    console.log("Config: ", JSON.stringify(config));
-    var out_key = "status/" + decodeURI(event.Records[0].s3.object.key.split('/').pop())
-    console.log(bucket, out_key)
+    qnabot.log("Config: ", JSON.stringify(config));
+    let out_key = "status/" + decodeURI(event.Records[0].s3.object.key.split('/').pop())
+    qnabot.log(bucket, out_key)
     s3.putObject({
             Bucket: bucket,
             Key: out_key,

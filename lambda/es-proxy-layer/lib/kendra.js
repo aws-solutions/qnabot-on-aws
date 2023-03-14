@@ -76,7 +76,7 @@ function addMarkdownHighlights(textIn,hlBeginOffset,hlEndOffset,highlightOnly=fa
     let highlight = textIn.substring(hlBeginOffset, hlEndOffset);
     let rest = textIn.substr(hlEndOffset);
     let textOut = textIn; //default
-    // add markdown only if highlight is not in the middle of a url/link.. 
+    // add markdown only if highlight is not in the middle of a url/link..
     if (! isHighlightInLink(textIn,hlBeginOffset)) {
         if (highlightOnly) {
             textOut = '**' + highlight + '**';
@@ -241,18 +241,7 @@ function longestInterval(intervals) {
 
 }
 
-async function isSyncedFromQnABot(kendra_result){
-    var request_params = {
-        kendra_faq_index:_.get(req, "_settings.KENDRA_FAQ_INDEX"),
-        maxRetries:_.get(req, "_settings.KENDRA_FAQ_CONFIG_MAX_RETRIES"),
-        retryDelay:_.get(req, "_settings.KENDRA_FAQ_CONFIG_RETRY_DELAY"),
-        minimum_score: _.get(req, "_settings.ALT_SEARCH_KENDRA_FAQ_CONFIDENCE_SCORE"),
-        size:1,
-        question: query_params.question,
-        es_address: req._info.es.address,
-        es_path: '/' + req._info.es.index + '/_doc/_search?search_type=dfs_query_then_fetch',
-    }
-
+function isSyncedFromQnABot(kendra_result){
     if (!open_es.hasJsonStructure(kendra_result.DocumentURI)) {
         return false;
     }
@@ -485,7 +474,7 @@ async function routeKendraRequest(event, context) {
 
 
 
-                } else if (element.Type === 'DOCUMENT' && element.DocumentExcerpt.Text && element.DocumentURI) {
+                } else if (element.Type === 'DOCUMENT' && element.DocumentExcerpt.Text ) {
                     const docInfo = {}
                     // if topAnswer found, then do not show document excerpts
                     if (seenTop == false) {

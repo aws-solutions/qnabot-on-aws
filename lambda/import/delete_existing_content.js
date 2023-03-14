@@ -27,9 +27,7 @@ async function delete_existing_content (esindex, config, ES_formatted_content) {
         await objS3.waitFor('objectExists', params).promise(); //check if the options file exists for the Import request. This is currently only available when the Import process is initiated via the QnABot CLI
     }
     catch (e) {
-        console.log (e.code + ": " + e.message);
-        console.log ("The Import process does not include a " + params.Key + " file in the request. This option is currently only supported when the Import process is initiated via the QnABot CLI.");
-        console.log ("Safe to ignore if the Import process was not initiated using the QnABot CLI.");
+        console.log ("No import options file (" + params.Key + ") - expected only if import process is initiated via the QnABot CLI.");
         return ES_formatted_content;
     }
     var data = await objS3.getObject(params).promise(); //get the options file 

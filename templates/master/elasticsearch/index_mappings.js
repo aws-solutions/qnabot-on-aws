@@ -8,17 +8,35 @@ module.exports={
 			analyzer: "custom_english_unique"
 		},
         questions:{
-            type:"nested",
-            properties:{
-                q:{
-                    type:"text",
-                    analyzer:"custom_english"
+            type: "nested",
+            properties: {
+                q: {
+                    type: "text",
+                    analyzer: "custom_english"
+                },
+                "q_vector": { 
+                    "type": "knn_vector",
+                    "dimension": '${EmbeddingsDimensions}', 
+                    "method": {
+                        "name": "hnsw",
+                        "space_type": "cosinesimil",
+                        "engine": "nmslib"
+                    }
                 }
             }
         },
         a:{
             type:"text",
             analyzer:"custom_english"
+        },
+        a_vector: { 
+            "type": "knn_vector",
+            "dimension": '${EmbeddingsDimensions}', 
+            "method": {
+                "name": "hnsw",
+                "space_type": "cosinesimil",
+                "engine": "nmslib"
+            }
         },
         t:{
             type:'text',analyzer:"whitespace" 

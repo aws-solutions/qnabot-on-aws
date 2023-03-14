@@ -7,3 +7,6 @@ source =
 
 [report]
 fail_under = 80.0
+
+[lcov]
+output = coverage/lcov.info

@@ -9,14 +9,10 @@ const qnabot = require('qnabot/logging')
 const qna_settings = require('qnabot/settings')
 const open_es = require('./es_query')
 const {VM} = require('vm2');
-// const sleep = require('util').promisify(setTimeout);
-
 
 // use DEFAULT_SETTINGS_PARAM as random encryption key unique to this QnABot installation
 var key = _.get(process.env, 'DEFAULT_SETTINGS_PARAM', 'fdsjhf98fd98fjh9 du98fjfd 8ud8fjdf');
 var encryptor = require('simple-encryptor')(key);
-
-
 
 async function run_query(req, query_params) {
     query_params.kendraIndex = _.get(req, '_settings.KENDRA_FAQ_INDEX')
@@ -32,7 +28,6 @@ async function run_query(req, query_params) {
     return response;
 }
 
-
 async function run_query_kendra(req, query_params) {
     qnabot.log('Querying Kendra FAQ index: ' + _.get(req, '_settings.KENDRA_FAQ_INDEX'));
     // calls kendraQuery function which duplicates KendraFallback code, but only searches through FAQs
@@ -44,7 +39,7 @@ async function run_query_kendra(req, query_params) {
         size:1,
         question: query_params.question,
         es_address: req._info.es.address,
-        es_path: '/' + req._info.es.index + '/_doc/_search?search_type=dfs_query_then_fetch',
+        es_path: '/' + req._info.es.index + '/_search?search_type=dfs_query_then_fetch',
     } ;
 
     // optimize kendra queries for throttling by checking if KendraFallback idxs include KendraFAQIndex
@@ -80,6 +75,7 @@ function getLambdaName(lambdaRef){
         return lambdaRef;
     }
 }
+
 // used to invoke either chaining rule lambda, or Lambda hook
 async function invokeLambda (lambdaRef, req, res) {
     let lambdaName = getLambdaName(lambdaRef);
@@ -156,6 +152,77 @@ function merge_next(hit1, hit2) {
     return hit2;
 }
 
+async function prepend_cfaq_answer(query, hit, cfaq_prefix, cfaq_endpoint, cfaq_domain, cfaq_index, cfaq_n_ctx) {
+    const sm = new aws.SageMakerRuntime({region:'us-east-1'});
+    const history = {history: {L: {}}};
+    const data = {
+        query: query.trim(),
+        dial_hist: history,
+        domain: cfaq_domain,
+        index_id: cfaq_index,
+        n_ctx: cfaq_n_ctx,
+    };
+    const body = JSON.stringify(data);
+    let cfaq_answer;
+    console.log("Invoking CFAQ SM Endpoint");
+    try {
+        let smres = await sm.invokeEndpoint({
+            EndpointName:cfaq_endpoint,
+            ContentType:'text/csv',
+            Body:body,
+        }).promise();
+        const sm_body = JSON.parse(Buffer.from(smres.Body, 'utf-8').toString());
+        qnabot.log("CFAQ response body:", sm_body);
+        cfaq_answer = sm_body.text.trim();
+    } catch (e) {
+        console.log(e)
+        cfaq_answer = "CFAQ exception: " + e.message.substring(0, 250) + "...";
+    }
+    qnabot.log("CFAQ answer:", cfaq_answer);
+
+    // prepend sm answer to plaintext and markdown
+    hit.a = `${cfaq_prefix}\n\n${cfaq_answer}\n\n${hit.a}`;
+    hit.alt.markdown = `*${cfaq_prefix}*\n\n**${cfaq_answer}**\n\n${hit.alt.markdown}`;
+    // replace ssml with just the short answer for concise voice responses
+    hit.alt.ssml = cfaq_answer;
+    qnabot.log("modified hit:", JSON.stringify(hit));
+
+    return hit;
+}
+
+async function post_process_with_sagemaker_endpoint(question, hit, sagemaker_qa_prefix, sm_endpoint, sm_confidence_threshold) {
+    const sm = new aws.SageMakerRuntime({region:'us-east-1'});
+    const data = {
+        inputs: {
+            question: question,
+            context: hit.a,
+        }
+    };
+    const body = JSON.stringify(data);
+    let smres = await sm.invokeEndpoint({
+        EndpointName:sm_endpoint,
+        ContentType:'application/json',
+        Body:body,
+    }).promise();
+    const sm_body = JSON.parse(Buffer.from(smres.Body, 'utf-8').toString());
+    qnabot.log("Sagemaker QA response:", sm_body);
+    const sm_score = sm_body.score;
+    const sm_answer = sm_body.answer.trim();
+    if (sm_score >= sm_confidence_threshold) {
+        qnabot.log(`Sagemaker QA response confidence score ${sm_score} meets threshold ${sm_confidence_threshold}`);
+        // prepend sm answer to plaintext and markdown
+        hit.a = `${sagemaker_qa_prefix} (Confidence: ${sm_score.toFixed(3)})\n\n${sm_answer}\n\n${hit.a}`;
+        hit.alt.markdown = `*${sagemaker_qa_prefix} (Confidence: ${sm_score.toFixed(3)})*\n\n**${sm_answer}**\n\n${hit.alt.markdown}`;
+        // replace ssml with just the short answer for concise voice responses
+        hit.alt.ssml = sm_answer;
+        qnabot.log("modified hit:", JSON.stringify(hit));
+    } else {
+        hit = undefined;
+        qnabot.log(`Sagemaker QA response confidence score ${sm_score} does not meets threshold ${sm_confidence_threshold}. Kendra response not used.`);
+    }
+    return hit;
+}
+
 async function get_hit(req, res) {
     let question = req.question;
     let qid = _.get(req, 'qid');
@@ -179,12 +246,12 @@ async function get_hit(req, res) {
         use_keyword_filters: _.get(req, '_settings.ES_USE_KEYWORD_FILTERS'),
         keyword_syntax_types: _.get(req, '_settings.ES_KEYWORD_SYNTAX_TYPES'),
         syntax_confidence_limit: _.get(req, '_settings.ES_SYNTAX_CONFIDENCE_LIMIT'),
-        score_answer_field: _.get(req, '_settings.ES_SCORE_ANSWER_FIELD'),
         fuzziness: _.get(req, '_settings.ES_USE_FUZZY_MATCH'),
         es_expand_contractions: _.get(req,'_settings.ES_EXPAND_CONTRACTIONS'),
         kendra_indexes: _.get(req,'_settings.ALT_SEARCH_KENDRA_INDEXES'),
         minimum_confidence_score: _.get(req,'_settings.ALT_SEARCH_KENDRA_FAQ_CONFIDENCE_SCORE'),
-        qnaClientFilter: _.get(req, 'session.QNAClientFilter')
+        qnaClientFilter: _.get(req, 'session.QNAClientFilter'),
+        settings: req._settings,
     };
     var response = await run_query(req, query_params);
     qnabot.log('Query response: ', JSON.stringify(response,null,2));
@@ -245,9 +312,31 @@ async function get_hit(req, res) {
     if (hit) {
         res['got_hits'] = 1;  // response flag, used in logging / kibana
     } else if(query_params.kendra_indexes.length != 0) {
-        qnabot.log('request entering kendra fallback ' + JSON.stringify(req))
-        hit = await  kendra_fallback.handler({req,res})
-        qnabot.log('Result from Kendra ' + JSON.stringify(hit))
+        qnabot.log('request entering kendra fallback ' + JSON.stringify(req));
+        hit = await kendra_fallback.handler({req,res});
+        qnabot.log('Result from Kendra ' + JSON.stringify(hit));
+        if(hit &&  hit.hit_count != 0)
+        {
+            // Optionally post-process Kendra result with Sagemaker hosted Question_Answer model
+            const sm_endpoint = _.get(req, '_settings.KENDRA_FALLBACK_SAGEMAKER_QA_ENDPOINT');
+            if (sm_endpoint) {
+                const sm_confidence_threshold = _.get(req, '_settings.KENDRA_FALLBACK_SAGEMAKER_QA_MIN_CONFIDENCE',0);
+                const sagemaker_qa_prefix = _.get(req, '_settings.KENDRA_FALLBACK_SAGEMAKER_QA_PREFIX', "");
+                hit = await post_process_with_sagemaker_endpoint(req.question, hit, sagemaker_qa_prefix, sm_endpoint, sm_confidence_threshold);
+            }
+        }
+        if(hit &&  hit.hit_count != 0)
+        {
+            // Optionally try new experimental Lex CFAQ model
+            const cfaq_endpoint = _.get(req, '_settings.CFAQ_SAGEMAKER_ENDPOINT');
+            if (cfaq_endpoint) {
+                const cfaq_domain = _.get(req, '_settings.CFAQ_DOMAIN');
+                const cfaq_prefix = _.get(req, '_settings.CFAQ_PREFIX', "");
+                const cfaq_index = _.get(req, '_settings.CFAQ_INDEX');
+                const cfaq_n_ctx = _.get(req, '_settings.CFAQ_N_CONTEXT', 0);
+                hit = await prepend_cfaq_answer(req.question, hit, cfaq_prefix, cfaq_endpoint, cfaq_domain, cfaq_index, cfaq_n_ctx);
+            }
+        }
         if(hit &&  hit.hit_count != 0)
         {
             _.set(res,'answersource','Kendra Fallback');

@@ -12,7 +12,7 @@
   "dependencies": {
     "aws-sdk": "^2.913.0",
     "bluebird": "^3.5.0",
-    "body-parser": "^1.18.2",
+    "body-parser": "^1.19.2",
     "cfn-lambda": "^4.0.0",
     "cfn-response": "^1.0.1",
     "deep-equal": "^1.0.1",
@@ -20,14 +20,14 @@
     "http-aws-es": "^6.0.0",
     "intercept-stdout": "^0.1.2",
     "json-stringify-pretty-compact": "^1.0.4",
-    "jsonwebtoken": "^8.0.1",
-    "jszip": "^3.1.4",
+    "jszip": "^3.10.1",
     "lodash": "^4.17.21",
     "stack-utils": "^1.0.1"
   },
   "devDependencies": {
-    "diff": "^4.0.2",
-    "tap": "^16.2.0",
-    "tap-mocha-reporter": "^5.0.3"
+    "diff": "^4.0.2"
+  },
+  "overrides": {
+    "qs@<6.5.3": "^6.5.3"
   }
 }
