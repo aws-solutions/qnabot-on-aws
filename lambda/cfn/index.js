@@ -1,37 +1,41 @@
-var cfnLambda=require('cfn-lambda')
-var response=require('./lib/util/response')
-var _=require('lodash')
+// Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+// SPDX-License-Identifier: Apache-2.0
+
+const cfnLambda=require('cfn-lambda')
+const response=require('./lib/util/response')
+const _=require('lodash')
 
 exports.handler=function(event,context,cb){
     dispatch(event,context,cb)
 }
 
-var targets={
-    CognitoRole:require('./lib/CognitoRole'),
-    CognitoLogin:require('./lib/CognitoLogin'),
-    CognitoDomain:require('./lib/CognitoDomain'),
-    CognitoUrl:require('./lib/CognitoUrl'),
-    S3Clear:require('./lib/S3Clear'),
-    S3Version:require('./lib/S3Version'),
-    S3Lambda:require('./lib/S3Lambda'),
-    S3Unzip:require('./lib/S3Unzip'),
-    Variable:require('./lib/Variable'),
+const targets={
     ApiDeployment:require('./lib/ApiDeployment'),
+    CognitoDomain:require('./lib/CognitoDomain'),
+    CognitoLogin:require('./lib/CognitoLogin'),
+    CognitoRole:require('./lib/CognitoRole'),
+    CognitoUrl:require('./lib/CognitoUrl'),
     ElasticSearchUpdate:require('./lib/ElasticSearchUpdate'),
     ESCognitoClient:require('./lib/ESCognitoClient'),
-    PreUpgradeExport:require('./lib/PreUpgradeExport'),
-    PostUpgradeImport:require('./lib/PostUpgradeImport'),
+    LambdaVersion:require('./lib/LambdaVersion'),
     Kibana:require('./lib/base'),  // Kibana custom resource deprecated.. preserve entry here to avoid resource delete failure on stack upgrade.
+    PostUpgradeImport:require('./lib/PostUpgradeImport'),
+    PreUpgradeExport:require('./lib/PreUpgradeExport'),
+    S3Clear:require('./lib/S3Clear'),
+    S3Lambda:require('./lib/S3Lambda'),
+    S3Unzip:require('./lib/S3Unzip'),
+    S3Version:require('./lib/S3Version'),
+    Variable:require('./lib/Variable'),
 }
-var Lex=require('./lib/lex')
+const Lex=require('./lib/lex')
 
 function dispatch(event,context,cb){
     console.log("event",JSON.stringify(event,null,2))
-    var type=event.ResourceType.match(/Custom::(.*)/)
-    var Lextype=event.ResourceType.match(/Custom::Lex(Bot|Alias|SlotType|Intent)/)
+    let type=event.ResourceType.match(/Custom::(.*)/)
+    let Lextype=event.ResourceType.match(/Custom::Lex(Bot|Alias|SlotType|Intent)/)
     if(_.get(Lextype,1)==='Alias') Lextype[1]='BotAlias'
-    console.log(targets[type[1]]) 
-    
+    console.log(targets[type[1]])
+
     if(Lextype){
         /* change to fix 4.4.0 installs where QNAPin and QNAPinNoConfirm elicit response bots inadvertently included a
          * bad character in clarificationPrompt and rejectionStatement which would break further updates.
@@ -57,8 +61,8 @@ function dispatch(event,context,cb){
         return cfnLambda(new targets[type[1]])(event,context,cb)
     }else{
         response.send({
-            event, 
-            context, 
+            event,
+            context,
             reason:"Invalid resource type:"+event.ResourceType,
             responseStatus:response.FAILED
         })

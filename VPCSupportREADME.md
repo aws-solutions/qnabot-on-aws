@@ -27,6 +27,8 @@ In order to deploy QnABot within a VPC two requirements must be met:
        - [Give SageMaker Hosted Endpoints Access to Resources in Your Amazon VPC](https://docs.aws.amazon.com/sagemaker/latest/dg/host-vpc.html)
        - [Connect to SageMaker Through a VPC Interface Endpoint](https://docs.aws.amazon.com/sagemaker/latest/dg/interface-vpc-endpoint.html)
        - [AWS PrivateLink pricing](https://aws.amazon.com/privatelink/pricing/)
+       - [Serverless Inference Feature Exclusions](https://docs.aws.amazon.com/sagemaker/latest/dg/serverless-endpoints.html)
+         - _Note: until VPC confirguration is supported for SageMaker Serverless Inference, your deployment will fail if trying to create/update a stack in a VPC with `SagemakerInitialInstanceCount` set to `0`_
 
 2. A pre-configured VPC security group that
     1. allows inbound connections on port 443 from other addresses in the VPC CIDR block. For example,

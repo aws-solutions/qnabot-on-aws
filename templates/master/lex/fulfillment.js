@@ -1,29 +1,19 @@
-var config = require('./config');
-var _ = require('lodash');
-var crypto = require('crypto')
-var fs = require('fs')
+// Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+// SPDX-License-Identifier: Apache-2.0
+
+const _ = require('lodash');
 const util = require('../../util');
 
-var examples = _.fromPairs(require('../../examples/outputs')
+const examples = _.fromPairs(require('../../examples/outputs')
   .names
   .map(x => {
     return [x, { "Fn::GetAtt": ["ExamplesStack", `Outputs.${x}`] }]
   }))
-var responsebots = _.fromPairs(require('../../examples/examples/responsebots-lexv2')
+const responsebots = _.fromPairs(require('../../examples/examples/responsebots-lexv2')
   .names
   .map(x => {
     return [x, { "Fn::GetAtt": ["ExamplesStack", `Outputs.${x}`] }]
   }))
-
-const filesToHash = ['fulfillment.zip', 'es-proxy-layer.zip','common-modules-layer.zip','aws-sdk-layer.zip','qnabot-common-layer.zip']
-const comboHash = filesToHash.map(x => {
-    let filePath = (fs.existsSync("../../build/lambda/" + x) ? "../../" : "./") + "build/lambda/" + x
-    let fileBuffer = fs.readFileSync(filePath);
-    return crypto.createHash("sha256").update(fileBuffer).digest("hex")
-  }).reduce((a,b) => {
-    return a + b;
-  });
-const fulfillmentHash =  crypto.createHash("sha256").update(comboHash).digest("hex")
 
 module.exports = {
   "Alexa": {
@@ -48,16 +38,16 @@ module.exports = {
     }
   },
   "FulfillmentLambda": {
-    "Type": "AWS::Serverless::Function",
+    "Type": "AWS::Lambda::Function",
     "DependsOn": "FulfillmentCodeVersion",
     "Properties": {
-      "AutoPublishAlias":"live",
-      "AutoPublishCodeSha256": fulfillmentHash,
-      "CodeUri": {
-        "Bucket": { "Ref": "BootstrapBucket" },
-        "Key": { "Fn::Sub": "${BootstrapPrefix}/lambda/fulfillment.zip" },
-        "Version": { "Ref": "FulfillmentCodeVersion" }
+      "Code": {
+        "S3Bucket": {"Ref": "BootstrapBucket"},
+        "S3Key": {"Fn::Sub": "${BootstrapPrefix}/lambda/fulfillment.zip"},
+        "S3ObjectVersion": {"Ref": "FulfillmentCodeVersion"}
       },
+      //Note: updates to this lambda function do not automatically generate a new version
+      //if making changes here, be sure to update FulfillmentLambdaVersionGenerator as appropriate
       "Environment": {
         "Variables": Object.assign({
           ES_TYPE: { "Fn::GetAtt": ["Var", "QnAType"] },
@@ -74,44 +64,101 @@ module.exports = {
           EMBEDDINGS_API: { "Ref": "EmbeddingsApi" },
           EMBEDDINGS_SAGEMAKER_ENDPOINT : {
             "Fn::If": [
-                "EmbeddingsSagemaker", 
-                {"Fn::GetAtt": ["SagemakerEmbeddingsStack", "Outputs.EmbeddingsSagemakerEndpoint"] }, 
+                "EmbeddingsSagemaker",
+                {"Fn::GetAtt": ["SagemakerEmbeddingsStack", "Outputs.EmbeddingsSagemakerEndpoint"] },
                 ""
             ]
           },
-          EMBEDDINGS_SAGEMAKER_INSTANCECOUNT : { "Ref": "SagemakerInitialInstanceCount" }, // force new fn version when instance count changes
+          EMBEDDINGS_SAGEMAKER_INSTANCECOUNT : { "Ref": "SagemakerInitialInstanceCount" },
           EMBEDDINGS_LAMBDA_ARN: { "Ref": "EmbeddingsLambdaArn" },
         }, examples, responsebots)
       },
       "Handler": "index.handler",
+      "Layers":[
+        {"Ref":"AwsSdkLayerLambdaLayer"},
+        {"Ref":"CommonModulesLambdaLayer"},
+        {"Ref":"EsProxyLambdaLayer"},
+        {"Ref":"QnABotCommonLambdaLayer"}
+      ],
       "MemorySize": 1408,
-      "ProvisionedConcurrencyConfig": {
-        "Fn::If": [ "CreateConcurrency", {
-          "ProvisionedConcurrentExecutions" : {"Ref": "FulfillmentConcurrency"}
-        }, {"Ref" : "AWS::NoValue"} ]
-      },
-      "Role": { "Fn::GetAtt": ["FulfillmentLambdaRole", "Arn"] },
+      "Role": {"Fn::GetAtt": ["FulfillmentLambdaRole", "Arn"]},
       "Runtime": "nodejs16.x",
       "Timeout": 300,
+      "TracingConfig": {
+        "Mode": {
+          "Fn::If": [
+            "XRAYEnabled",
+            "Active",
+            "PassThrough"
+          ]
+        }
+      },
+      "Tags": [
+        {
+          "Key": "Type",
+          "Value": "Fulfillment"
+        }
+      ],
       "VpcConfig" : {
-        "Fn::If": [ "VPCEnabled", {
-          "SubnetIds": {"Ref": "VPCSubnetIdList"},
-          "SecurityGroupIds": {"Ref": "VPCSecurityGroupIdList"}
-        }, {"Ref" : "AWS::NoValue"} ]
-      },
-      "Tracing" : {
-        "Fn::If": [ "XRAYEnabled", "Active",
-          "PassThrough" ]
-      },
-      "Layers":[{"Ref":"AwsSdkLayerLambdaLayer"},
-                {"Ref":"CommonModulesLambdaLayer"},
-                {"Ref":"EsProxyLambdaLayer"},
-                {"Ref":"QnABotCommonLambdaLayer"}],
-      "Tags": {
-        "Type": "Fulfillment"
+        "Fn::If": [
+          "VPCEnabled",
+          {
+            "SubnetIds": {"Ref": "VPCSubnetIdList"},
+            "SecurityGroupIds": {"Ref": "VPCSecurityGroupIdList"}
+          },
+          {"Ref" : "AWS::NoValue"}
+        ]
       }
     },
     "Metadata": util.cfnNag(["W89", "W92"])
+  },
+  "FulfillmentLambdaVersionGenerator": {
+    "Type": "Custom::LambdaVersion",
+    //this custom resource takes no action on deletes as we keep all versions
+    //the lambda versions will be deleted along with it's parent Lambda Function
+    //setting DeletionPolicy of Retain to prevent CFNLambda failures on rollbacks to old versions
+    "DeletionPolicy" : "Retain",
+    "Properties": {
+      "ServiceToken": { "Fn::GetAtt": ["CFNLambda", "Arn"] },
+      "FunctionName": {"Ref": "FulfillmentLambda"},
+      "Triggers": { //The set of triggers to kick off a Custom Resource Update event
+        "FulfillmentCodeVersionTrigger": [
+          {"Ref": "FulfillmentCodeVersion"}
+        ],
+        "LayersTrigger": [
+          {"Ref": "AwsSdkLayerLambdaLayer"},
+          {"Ref": "CommonModulesLambdaLayer"},
+          {"Ref": "EsProxyLambdaLayer"},
+          {"Ref": "QnABotCommonLambdaLayer"}
+        ],
+        "EmbeddingsTrigger": [
+          {"Ref": "EmbeddingsApi"},
+          {"Ref": "SagemakerInitialInstanceCount"},
+          {"Fn::If": [
+              "EmbeddingsSagemaker",
+              {"Fn::GetAtt": ["SagemakerEmbeddingsStack", "Outputs.EmbeddingsSagemakerEndpoint"]},
+              ""
+          ]},
+          {"Ref": "EmbeddingsLambdaArn"}
+        ]
+      }
+    }
+  },
+  "FulfillmentLambdaAliaslive": {
+    "Type": "AWS::Lambda::Alias",
+    "DependsOn": "FulfillmentLambdaVersionGenerator",
+    "Properties": {
+      "FunctionName": {"Ref": "FulfillmentLambda"},
+      "FunctionVersion": {"Fn::GetAtt": ["FulfillmentLambdaVersionGenerator", "Version"]},
+      "Name": "live",
+      "ProvisionedConcurrencyConfig": {
+        "Fn::If": [
+          "CreateConcurrency",
+          {"ProvisionedConcurrentExecutions": {"Ref": "FulfillmentConcurrency"}},
+          {"Ref" : "AWS::NoValue"}
+        ]
+      },
+    }
   },
   "InvokePolicy": {
     "Type": "AWS::IAM::ManagedPolicy",
@@ -249,15 +296,15 @@ module.exports = {
             }]
           }
         },
-        { 
+        {
           "Fn::If": [
-            "EmbeddingsSagemaker", 
+            "EmbeddingsSagemaker",
             {
               "PolicyName" : "SagemakerInvokeEndpointAccess",
               "PolicyDocument" : {
               "Version": "2012-10-17",
                 "Statement": [
-                  { 
+                  {
                     "Effect": "Allow",
                     "Action": [
                         "sagemaker:InvokeEndpoint"
