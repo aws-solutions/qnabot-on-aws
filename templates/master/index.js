@@ -1,7 +1,10 @@
-var fs=require('fs')
-var _=require('lodash')
+// Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+// SPDX-License-Identifier: Apache-2.0
 
-var files=fs.readdirSync(`${__dirname}`)
+const fs=require('fs')
+const _=require('lodash')
+
+const files=fs.readdirSync(`${__dirname}`)
     .filter(x=>!x.match(/README.md|Makefile|index|test|.DS_Store/))
     .map(x=>require(`./${x}`))
 
@@ -9,7 +12,6 @@ module.exports={
   "Resources":_.assign.apply({},files),
   "Conditions": {},
   "AWSTemplateFormatVersion": "2010-09-09",
-  "Transform": "AWS::Serverless-2016-10-31",
   "Description": `(SO0189-ext) QnABot with admin and client websites - (Version v${process.env.npm_package_version})`,
   "Mappings": {},
   "Outputs": {
@@ -310,8 +312,3 @@ module.exports={
     "EmbeddingsLambdaArn":{"Fn::Not": [{ "Fn::Equals":[{"Ref":"EmbeddingsLambdaArn"},""]}]}
   }
 }
-
-
-
-
-

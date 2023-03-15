@@ -1,22 +1,18 @@
-var fs=require('fs')
-var _=require('lodash')
-var util=require('./util')
+// Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+// SPDX-License-Identifier: Apache-2.0
 
-var files=fs.readdirSync(`${__dirname}/..`)
+const fs=require('fs')
+const _=require('lodash')
+const util=require('./util')
+
+const files=fs.readdirSync(`${__dirname}/..`)
     .filter(x=>!x.match(/README.md|Makefile|dashboard|index|test|.DS_Store/))
     .map(x=>require(`../${x}`))
 
-var lambdas={}
+const lambdas={}
 _.forEach(_.assign.apply({},files),(value,key)=>{
     if(value.Type==='AWS::Lambda::Function' && key!=="ESInfoLambda"){
-        var type=_.fromPairs(value.Properties.Tags.map(x=>[x.Key,x.Value])).Type
-        if(!lambdas[type]){
-            lambdas[type]=[]
-        }
-        lambdas[type].push(key)
-    }
-    else if(value.Type==='AWS::Serverless::Function'){
-        var type = value.Properties.Tags.Type
+        let type=_.fromPairs(value.Properties.Tags.map(x=>[x.Key,x.Value])).Type
         if(!lambdas[type]){
             lambdas[type]=[]
         }
@@ -26,12 +22,12 @@ _.forEach(_.assign.apply({},files),(value,key)=>{
 
 
 module.exports=function(main_offset){
-    var Lambda_title=util.Title("## Lambda Function",main_offset+6)
+    let Lambda_title=util.Title("## Lambda Function",main_offset+6)
 
-    var lambda_widgets=_.map(lambdas,(value,key)=>{
+    let lambda_widgets=_.map(lambdas,(value,key)=>{
         return {list:value.map(util.lambda),name:key}
     }).reduce((accumulation,current)=>{
-        var title=util.Title(`### ${current.name}`,accumulation.offset)
+        let title=util.Title(`### ${current.name}`,accumulation.offset)
         accumulation.offset+=title.height
         accumulation.list.push(title)
 
