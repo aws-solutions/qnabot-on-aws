@@ -44,6 +44,7 @@ module.exports=Promise.resolve(require('../master')).then(function(base){
         "InstallLexResponseBots",
         "FulfillmentConcurrency",
         "ElasticSearchNodeCount",
+        "ElasticSearchEBSVolumeSize",
         "KibanaDashboardRetentionMinutes",
         "VPCSubnetIdList",
         "VPCSecurityGroupIdList",
@@ -90,6 +91,7 @@ module.exports=Promise.resolve(require('../master')).then(function(base){
                    },
                    "Parameters": [
                         "ElasticSearchNodeCount",
+                        "ElasticSearchEBSVolumeSize",
                         "Encryption",
                         "KibanaDashboardRetentionMinutes"
                    ]
