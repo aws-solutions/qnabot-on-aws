@@ -235,6 +235,11 @@ module.exports={
         "AllowedValues" : ["1", "2", "4"],
         "Default":"4"
     },
+    "ElasticSearchEBSVolumeSize":{
+        "Type":"Number",
+        "Description":"Size in GB of each EBS volume attached to OpenSearch node instances - '10' is the minimum default volume size.",
+        "Default":10
+    },
     "FulfillmentConcurrency": {
       "Type":"Number",
       "Description":"The amount of provisioned concurrency for the fulfillment Lambda function",

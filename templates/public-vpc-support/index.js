@@ -105,6 +105,15 @@ module.exports=Promise.resolve(require('../master')).then(function(base){
                     ]
                 },
                 {
+                   "Label": {
+                        "default": "Amazon OpenSearch Service"
+                   },
+                   "Parameters": [
+                        "ElasticSearchNodeCount",
+                        "ElasticSearchEBSVolumeSize",
+                        "Encryption",
+                        "KibanaDashboardRetentionMinutes"
+                   ]
                     'Label': {
                         'default': 'Amazon LexV2'
                     },

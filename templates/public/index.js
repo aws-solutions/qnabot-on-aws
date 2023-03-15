@@ -56,6 +56,24 @@ module.exports=Promise.resolve(require('../master')).then(function(base){
         'LLMSagemakerInitialInstanceCount',
         'LLMLambdaArn',
         'LLMThirdPartyApiKey'
+        "Email",
+        "Username",
+        "DefaultKendraIndexId",
+        "Encryption",
+        "ElasticSearchNodeCount",
+        "ElasticSearchEBSVolumeSize",
+        "KibanaDashboardRetentionMinutes",
+        "PublicOrPrivate",
+        "LexV2BotLocaleIds",
+        "LexBotVersion",
+        "InstallLexResponseBots",
+        "FulfillmentConcurrency",
+        "XraySetting",
+        "EmbeddingsApi",
+        "EmbeddingsSagemakerEndpoint",
+        "SagemakerInitialInstanceCount",
+        "EmbeddingsLambdaArn",
+        "EmbeddingsLambdaDimensions"
     ]);
     base.Metadata = {
         'AWS::CloudFormation::Interface': {
@@ -98,6 +116,15 @@ module.exports=Promise.resolve(require('../master')).then(function(base){
                     'Parameters': [
                         'LexV2BotLocaleIds'
                     ]
+                   "Label": {
+                        "default": "Amazon OpenSearch Service"
+                   },
+                   "Parameters": [
+                        "ElasticSearchNodeCount",
+                        "ElasticSearchEBSVolumeSize",
+                        "Encryption",
+                        "KibanaDashboardRetentionMinutes"
+                   ]
                 },
                 {
                     'Label': {
