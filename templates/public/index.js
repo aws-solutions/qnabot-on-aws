@@ -31,7 +31,8 @@ module.exports=Promise.resolve(require('../master')).then(function(base){
         "FeedbackSNSTopic",
         "ESProxyLambda",
         "ElasticsearchEndpoint",
-        "ElasticsearchIndex"
+        "ElasticsearchIndex",
+        "MetricsBucket"
     ])
     base.Parameters=_.pick(base.Parameters,[
         "Email",

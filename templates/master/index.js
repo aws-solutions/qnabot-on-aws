@@ -155,7 +155,10 @@ module.exports={
     },
     "FeedbackSNSTopic": {
         "Value":{"Fn::GetAtt": ["ExamplesStack", "Outputs.FeedbackSNSTopic"]}
-    }
+    },
+    "MetricsBucket": {
+        "Value":{"Ref":"MetricsBucket"}
+      }
   },
   "Parameters": {
     "ElasticsearchName":{
