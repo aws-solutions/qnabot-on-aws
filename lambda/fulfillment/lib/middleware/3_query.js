@@ -179,7 +179,7 @@ module.exports=async function query(req,res) {
         _.set(postQuery,'res.session.qnabotcontext.specialtyBot', specialtybot_hook);
         _.set(postQuery,'res.session.qnabotcontext.specialtyBotName', specialtybot_name);
         _.set(postQuery,'res.session.qnabotcontext.specialtyBotAlias', specialtybot_alias);
-        _.set(postQuery,'res.session.qnabotcontext.sBMergeAttributes', specialtybot_attributes_to_merge);
+        _.set(postQuery,'res.session.qnabotcontext.specialtyBotMergeAttributes', specialtybot_attributes_to_merge);
         _.set(postQuery,'res.session.qnabotcontext.sBChainingConfig',chaining_configuration);
         _.set(postQuery,'res.session.qnabotcontext.sBAttributesToReceive',specialtybot_attributes_to_receive);
         _.set(postQuery,'res.session.qnabotcontext.sBAttributesToReceiveNamespace',specialtybot_receive_namespace);
