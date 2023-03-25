@@ -35,6 +35,36 @@ const qnabot = require("qnabot/logging")
  * @param res
  * @returns {Promise<any>}
  */
+
+async function specialtyBotInvocation(req, res) {
+    let specialtyBot = _.get(req,"session.qnabotcontext.specialtyBot", undefined);
+    let specialtyBotAlias = _.get(req,"session.qnabotcontext.specialtyBotAlias", undefined);
+    let specialtyBotChainingConfig = _.get(req,"session.qnabotcontext.sBChainingConfig", undefined);
+    qnabot.log('Handling specialtyBot');
+    let resp = await specialtyBotRouter.routeRequest(req, res, specialtyBot, specialtyBotAlias);
+    qnabot.log("SpecialtyBotRouterResp: " + JSON.stringify(resp, null, 2));
+    let isSpecialtyBotComplete = _.get(resp, "res.session.qnabotcontext.specialtyBot", "") === "";
+    if (isSpecialtyBotComplete) {
+        // Specialty bot has completed. See if we need, to using chaining to go to another question
+        if (specialtyBotChainingConfig) {
+            qnabot.log("Conditional chaining: " + specialtyBotChainingConfig);
+
+            // Set session response bot attributes to force chaining to work properly in query.js
+            _.set(res,"session.qnabotcontext.elicitResponse.progress", "Fulfilled");
+            _.set(res, "session.qnabotcontext.elicitResponse.chainingConfig", specialtyBotChainingConfig);
+            // chainingConfig will be used in Query Lambda function
+            // const arn = util.getLambdaArn(process.env.LAMBDA_DEFAULT_QUERY);
+            const postQuery = await esquery(req, res)
+            _.set(postQuery,'res.session.qnabotcontext.elicitResponse.progress',undefined);
+            _.set(postQuery,'res.session.qnabotcontext.elicitResponse.chainingConfig',undefined);
+            qnabot.log("After chaining the following response is being made: " + JSON.stringify(postQuery,null,2));
+            return postQuery;
+        }
+    }
+    qnabot.log("No chaining. The following response is being made: " + JSON.stringify(resp,null,2));
+    return resp;
+}
+
 module.exports=async function query(req,res) {
     qnabot.debug("Entry REQ:", JSON.stringify(req, null, 2));
     qnabot.debug("Entry RES:", JSON.stringify(res, null, 2));
@@ -57,31 +87,10 @@ module.exports=async function query(req,res) {
     let chainingConfig = _.get(req,"session.qnabotcontext.elicitResponse.chainingConfig", undefined);
 
     if (specialtyBot) {
-        qnabot.log('Handling specialtyBot');
-        let resp = await specialtyBotRouter.routeRequest(req, res, specialtyBot, specialtyBotAlias);
-        if (resp.res.session.specialtyBotProgress === 'Complete' ||
-            resp.res.session.specialtyBotProgress === 'Failed') {
-            // Specialty bot has completed. See if we need to using chaining to go to another question
-            if (chainingConfig) {
-                qnabot.log("Conditional chaining: " + chainingConfig);
-                // chainingConfig will be used in Query Lambda function
-                const arn = util.getLambdaArn(process.env.LAMBDA_DEFAULT_QUERY);
-                const postQuery = await esquery(req,res)
-
-                // specialtyBot processing is done. Remove the flag for now.
-                _.set(postQuery, 'res.session.qnabotcontext.specialtyBotProgress', undefined);
-                qnabot.log("After chaining the following response is being made: " + JSON.stringify(postQuery,null,2));
-                return postQuery;
-            } else {
-                // no chaining. continue on with response from standard fulfillment path.
-                _set(res,'session.qnabotcontext.specialtyBotProgress', undefined);
-            }
-        }
-        qnabot.log("No chaining. The following response is being made: " + JSON.stringify(resp,null,2));
-        return resp;
+        return await specialtyBotInvocation(req, res);
     } else if (elicitResponse) {
         qnabot.log('Handling elicitResponse');
-        let resp = await lexRouter.elicitResponse(req,res, elicitResponse);
+        let resp = await lexRouter.elicitResponse(req, res, elicitResponse);
         let progress = _.get(resp,"res.session.qnabotcontext.elicitResponse.progress", undefined);
         if (progress === 'Fulfilled' || progress === 'ReadyForFulfillment' || progress === 'Close' || progress === 'Failed') {
             qnabot.log("Bot was fulfilled");
@@ -153,6 +162,10 @@ module.exports=async function query(req,res) {
     const specialtybot_name = _.get(postQuery.res,"result.botRouting.specialty_bot_name", undefined);
     const specialtybot_alias = _.get(postQuery.res,"result.botRouting.specialty_bot_alias", undefined);
     const specialtybot_attributes_to_merge = _.get(postQuery.res,"result.botRouting.specialty_bot_session_attributes_to_merge", undefined);
+    const specialtybot_start_up_text = _.get(postQuery.res, "result.botRouting.specialty_bot_start_up_text", undefined);
+    const specialtybot_attributes_to_receive = _.get(postQuery.res, "result.botRouting.specialty_bot_session_attributes_to_receive", undefined);
+    const specialtybot_receive_namespace = _.get(postQuery.res, "result.botRouting.specialty_bot_session_attributes_to_receive_namespace", undefined);
+
     if (responsebot_hook && responsebot_session_namespace) {
         if (_.get(postQuery,'res.session.qnabotcontext.elicitResponse.loopCount')) {
             _.set(postQuery,'res.session.qnabotcontext.elicitResponse.loopCount',0)
@@ -167,6 +180,25 @@ module.exports=async function query(req,res) {
         _.set(postQuery,'res.session.qnabotcontext.specialtyBotName', specialtybot_name);
         _.set(postQuery,'res.session.qnabotcontext.specialtyBotAlias', specialtybot_alias);
         _.set(postQuery,'res.session.qnabotcontext.specialtyBotMergeAttributes', specialtybot_attributes_to_merge);
+        _.set(postQuery,'res.session.qnabotcontext.sBChainingConfig',chaining_configuration);
+        _.set(postQuery,'res.session.qnabotcontext.sBAttributesToReceive',specialtybot_attributes_to_receive);
+        _.set(postQuery,'res.session.qnabotcontext.sBAttributesToReceiveNamespace',specialtybot_receive_namespace);
+
+        if (specialtybot_start_up_text) {
+            _.set(postQuery,'req.session.qnabotcontext.specialtyBot', specialtybot_hook);
+            _.set(postQuery,'req.session.qnabotcontext.specialtyBotName', specialtybot_name);
+            _.set(postQuery,'req.session.qnabotcontext.specialtyBotAlias', specialtybot_alias);
+            _.set(postQuery,'req.session.qnabotcontext.sBMergeAttributes', specialtybot_attributes_to_merge);
+            _.set(postQuery,'req.session.qnabotcontext.sBChainingConfig',chaining_configuration);
+            _.set(postQuery,'req.session.qnabotcontext.sBAttributesToReceive',specialtybot_attributes_to_receive);
+            _.set(postQuery,'req.session.qnabotcontext.sBAttributesToReceiveNamespace',specialtybot_receive_namespace);
+            if (specialtybot_start_up_text === "${relay}") {
+                _.set(postQuery,'req.question', _.get(req, "question"));
+            } else {
+                _.set(postQuery,'req.question', specialtybot_start_up_text);
+            }
+            return await specialtyBotInvocation(postQuery.req, postQuery.res);
+        }
     }
 
     qnabot.log("Standard path return from 3_query: " + JSON.stringify(postQuery, null, 2));

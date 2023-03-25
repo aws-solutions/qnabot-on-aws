@@ -1,5 +1,5 @@
-# Bot Routing - Preview Mode
-(version 1.1 - November 2021)
+# Bot Routing 
+(version 1.2 - November 2022)
 
 Bots exist to perform a variety of automation tasks. Usually they take
 as input a message from a human and respond performing
@@ -45,7 +45,7 @@ enterprise level can direct users to answers from any of their Bots.
 
 #### Configuration
 
-Configuration is simple. Each question in QnAbot now contains an optional section which
+Configuration is simple. Each question in QnABot now contains an optional section which
 allows configuration of a BotRouter.
 
 **Note: This is optional. Please leave empty and QnABot will not act as a
@@ -73,9 +73,18 @@ list of session attribute names can be specified. The session attributes
 will be passed on each request to the specialty bot. They will override
 any session attributes which might have been returned from the specialty bot
 on the prior request. 
-  
-The example image shows an integration we've developed which communicates
-with the Nutritionix Bot.
+
+* The initial utterance to send to the target bot. You can specify this as ${relay} in which
+case QnABot will send the input utterance matching this qid to the target bot or specify
+a different string to send on startup. Leave this field blank to not send an utterance 
+to the specialty bot on startup. 
+
+* Lex session attributes to return from the specialty bot. A comma separated list
+of session attribute names can be specified that will be returned on each interaction
+with the specialty bot.
+
+* If Lex session attributes are being returned from the specialty bot, a namespace with
+which to scope the returned attributes must be specified. 
 
 *Note: when integrating with other Lex Bots or Lambdas, the permission to 
 communicate with the target Lex bot or with a new BotRouter (Lambda) need to
