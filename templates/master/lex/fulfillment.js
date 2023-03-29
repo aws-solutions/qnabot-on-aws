@@ -157,6 +157,16 @@ module.exports = {
               ""
           ]},
           {"Ref": "EmbeddingsLambdaArn"}
+        ],
+        "QASummarizeTrigger": [
+          {"Ref": "QASummarizeApi"},
+          {"Ref": "SagemakerInitialInstanceCount"},
+          {"Fn::If": [
+                "QASummarizeSagemakerLLM", 
+                {"Fn::GetAtt": ["SageMakerQASummarizeLLMStack", "Outputs.QASummarizeSagemakerLLMEndpoint"] }, 
+                ""
+          ]},
+          {"Ref": "QASummarizeLambdaArn"}
         ]
       }
     }

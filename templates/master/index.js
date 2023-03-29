@@ -285,6 +285,24 @@ module.exports={
       "MinValue":1,
       "Description":"Optional: If EmbeddingsApi is LAMBDA, provide number of dimensions for embeddings returned by the EmbeddingsLambda function specified above.",
       "Default":4096
+    },
+    'QASummarizeApi':{
+      'Type':'String',
+      'Description':'Optionally enable (experimental) QnABot passage aggregation and question answering. If set to SAGEMAKER LLM or CFAQ, a Sagemaker endpoint is automatically provisioned. To use a custom LAMBDA function, provide additional parameters below.',
+      'AllowedValues': ['DISABLED', 'SAGEMAKER LLM', 'SAGEMAKER CFAQ', 'LAMBDA', 'ALL'],
+      'Default':'DISABLED'
+    },
+    'SagemakerQASummarizeInitialInstanceCount':{
+      'Type':'Number',
+      'MinValue':1,
+      'Description':'Optional: If QASummarizeApi is SAGEMAKER, provide initial instance count. Serverless Inference is not currently available for the built-in QA Summarization model.',
+      'Default':1
+    },
+    'QASummarizeLambdaArn':{
+      'Type':'String',
+      'AllowedPattern': '^(|arn:aws:lambda:.*)$',
+      'Description':'Optional: If QASummarizeApi is LAMBDA, provide ARN for a Lambda function that takes JSON {"question":"string","context":"string"}, and returns JSON {"generated_text":"string"}',
+      'Default':''
     }
   },
   "Conditions":{
@@ -309,6 +327,11 @@ module.exports={
     "EmbeddingsEnable":{"Fn::Not": [{ "Fn::Equals":[{"Ref":"EmbeddingsApi"},"DISABLED"]}]},
     "EmbeddingsSagemaker":{"Fn::Equals":[{"Ref":"EmbeddingsApi"},"SAGEMAKER"]},
     "EmbeddingsLambda":{"Fn::Equals":[{"Ref":"EmbeddingsApi"},"LAMBDA"]},
-    "EmbeddingsLambdaArn":{"Fn::Not": [{ "Fn::Equals":[{"Ref":"EmbeddingsLambdaArn"},""]}]}
+    "EmbeddingsLambdaArn":{"Fn::Not": [{ "Fn::Equals":[{"Ref":"EmbeddingsLambdaArn"},""]}]},
+    'QASummarizeEnable':{'Fn::Not': [{ 'Fn::Equals':[{'Ref':'QASummarizeApi'},'DISABLED']}]},
+    'QASummarizeSagemakerLLM': {'Fn::Or': [{'Fn::Equals':[{'Ref':'QASummarizeApi'},'SAGEMAKER LLM']}, {'Fn::Equals':[{'Ref':'QASummarizeApi'},'ALL']}]},
+    'QASummarizeSageMakerCFAQ':{'Fn::Or': [{'Fn::Equals':[{'Ref':'QASummarizeApi'},'SAGEMAKER CFAQ']}, {'Fn::Equals':[{'Ref':'QASummarizeApi'},'ALL']}]},
+    'QASummarizeLambda':{'Fn::Or': [{'Fn::Equals':[{'Ref':'QASummarizeApi'},'LAMBDA']}, {'Fn::Equals':[{'Ref':'QASummarizeApi'},'ALL']}]},
+    'QASummarizeLambdaArn':{'Fn::Not': [{ 'Fn::Equals':[{'Ref':'QASummarizeLambdaArn'},'']}]},
   }
 }
