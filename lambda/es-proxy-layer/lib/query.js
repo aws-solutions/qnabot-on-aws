@@ -193,6 +193,10 @@ async function run_qa_summary(req, hit) {
         hit.alt.ssml = "";  // Context provided only in text channels     
     }
 
+    if (isQaSummaryEnabled(req) && hit.refMarkdown) {
+        hit.alt.markdown = `${hit.alt.markdown}\n${hit.refMarkdown}`;
+    }
+
     // Optionally post-process answer with QA Summarize Lambda model
     if (req._settings.QA_SUMMARY_LAMBDA_ENABLE && process.env.QA_SUMMARIZE_LAMBDA_ARN) {
         const start = Date.now();
