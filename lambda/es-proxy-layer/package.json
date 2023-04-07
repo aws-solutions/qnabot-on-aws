@@ -11,6 +11,6 @@
     "handlebars": "^4.7.2",
     "linkifyjs": "^3.0.0-beta.3",
     "simple-encryptor": "^3.0.0",
-    "vm2": "^3.9.11"
+    "vm2": "^3.9.15"
   }
 }
