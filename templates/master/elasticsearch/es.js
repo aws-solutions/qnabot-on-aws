@@ -10,7 +10,7 @@ var properties={
     },
     "EBSOptions": {
        "EBSEnabled": true,
-       "VolumeSize": 10,
+       "VolumeSize": {"Ref":"ElasticSearchEBSVolumeSize"},
        "VolumeType": "gp2"
     },
     "EngineVersion": "OpenSearch_1.3",
