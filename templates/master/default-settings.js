@@ -89,8 +89,8 @@ var default_settings = {
     QA_SUMMARY_SAGEMAKER_CFAQ_MODEL_PARAMS: '{"index_type":"kendra","index_id":"${DefaultKendraIndexId}","is_single":true,"is_rerank":true}',
     QA_SUMMARY_SAGEMAKER_CFAQ_PREFIX_MESSAGE: 'QA Summary CFAQ:',
     QA_SUMMARY_LAMBDA_ENABLE: '${QA_SUMMARY_LAMBDA_ENABLE}', // Set to TRUE or FALSE to enable or disable LAMBDA summarization
-    QA_SUMMARY_LAMBDA_PROMPT_FORMAT: 'Answer the question based on the following context, or answer "I don\'t know".<br>Context: <CONTEXT><br>Question: <QUESTION><br>Answer:', 
-    QA_SUMMARY_LAMBDA_MODEL_PARAMS: '{"model_params":"tbd"}',
+    QA_SUMMARY_LAMBDA_PROMPT_FORMAT: '\n\nHuman: Answer the question based on the following text only, or say \"I dont know.\".\n<CONTEXT>\n<QUESTION>\n\nAssistant: ', 
+    QA_SUMMARY_LAMBDA_MODEL_PARAMS: '{}',
     QA_SUMMARY_LAMBDA_PREFIX_MESSAGE: 'QA Summary Lambda:',
     QA_SUMMARY_SHOW_CONTEXT_TEXT: "TRUE"
 };

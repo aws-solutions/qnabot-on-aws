@@ -17,7 +17,10 @@ module.exports={
     "noStackOutput": false,
     "multiBucketDeployment": false,
     "buildType": "Custom",
-    "FulfillmentConcurrency":1
+    "FulfillmentConcurrency":1,
+    "EmbeddingsApi": "SAGEMAKER",
+    "QASummarizeApi": "SAGEMAKER LLM",
+    "InstallLexResponseBots": true
 }
 
 if (require.main === module) {
