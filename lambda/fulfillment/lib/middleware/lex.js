@@ -1,30 +1,25 @@
-var _=require('lodash')
+// Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+// SPDX-License-Identifier: Apache-2.0
+
+const _=require('lodash')
 const slackifyMarkdown = require('slackify-markdown');
-const utf8 = require('utf8');
 const qnabot = require('qnabot/logging')
 
-
-
 // PARSE FUNCTIONS
-
-// When using QnABot in Amazon Connect call center, filter out 'filler' words that callers sometimes use
-// filler words are defined in setting CONNECT_IGNORE_WORDS
-// If inPutTranscript contains only filler words, return true.
 function isConnectClient(req) {
-    if (_.get(req,'_clientType', undefined) === 'LEX.AmazonConnect.Text') {
-        return true;
-    }
-    if (_.get(req,'_clientType', undefined) === 'LEX.AmazonConnect.Voice') {
-        return true;
-    }
-    return false;
+    return isConnectClientChat(req) || isConnectClientVoice(req);
 }
 
 function isConnectClientChat(req){
-    if (_.get(req,'_clientType', undefined) === 'LEX.AmazonConnect.Text') {
-        return true;
-    }
-    return false;
+    return _.get(req,'_clientType') === 'LEX.AmazonConnect.Text'
+}
+
+function isConnectClientVoice(req){
+    return _.get(req,'_clientType') === 'LEX.AmazonConnect.Voice'
+}
+
+function isLexV1(req){
+    return req._lexVersion === 'V1';
 }
 
 function isElicitResponse(request, response){
@@ -42,12 +37,15 @@ function isElicitResponse(request, response){
     return result;
 }
 
+// When using QnABot in Amazon Connect call center, callers sometimes use 'filler' words before asking their question
+// If the inputTranscript contains only filler words, return true here and the handler will throw an error
+// filler words are defined in the setting CONNECT_IGNORE_WORDS
 function trapIgnoreWords(req, transcript) {
-    const ignoreWordsArr = _.get(req, '_settings.CONNECT_IGNORE_WORDS', '').split(',');
+    const ignoreWordsArr = _.get(req, '_settings.CONNECT_IGNORE_WORDS', '').toLowerCase().split(',');
     if (ignoreWordsArr.length === 0 || !isConnectClient(req)) {
         return false;
     }
-    const wordsInTranscript = transcript.split(' ');
+    const wordsInTranscript = transcript.toLowerCase().split(' ');
     let trs = '';
     const wordCount = wordsInTranscript.length;
     for (let i = 0; i < wordCount; i++) {
@@ -56,11 +54,8 @@ function trapIgnoreWords(req, transcript) {
             trs += wordsInTranscript[i];
         }
     }
-    if (trs.trim().length === 0) {
-        return true;
-    } else {
-        return false;
-    }
+
+    return trs.trim().length === 0
 }
 
 function parseLexV1Event(event) {
@@ -145,29 +140,30 @@ function parseLexV2Event(event) {
 }
 
 exports.parse=async function(req){
-    var event = req._event;
+    let event = req._event;
     if (event.inputTranscript === undefined || event.inputTranscript === '') {
         // trap invalid input from Lex and and return an error if there is no inputTranscript.
         throw new Error('Error - inputTranscript string is empty.');
-    } else if (trapIgnoreWords(req, event.inputTranscript)) {
-        throw new Error(`Error - inputTranscript contains only words specified in setting CONNECT_IGNORE_WORDS: "${event.inputTranscript}"`);
-    } else {
-        var out;
-        if ( ! _.get(event,'sessionId')) {
-            out = parseLexV1Event(event);
-        } else {
-            out = parseLexV2Event(event);
-        }
-        return out;
     }
+    else if (trapIgnoreWords(req, event.inputTranscript)) {
+        throw new Error(`Error - inputTranscript contains only words specified in setting CONNECT_IGNORE_WORDS: "${event.inputTranscript}"`);
+    }
+
+    let out;
+    if ( ! _.get(event,'sessionId')) {
+        out = parseLexV1Event(event);
+    } else {
+        out = parseLexV2Event(event);
+    }
+    return out;
 };
 
 function filterButtons(response) {
     qnabot.log('Before filterButtons ' + JSON.stringify(response));
 
-    var filteredButtons = _.get(response.card,'buttons',[]);
+    let filteredButtons = _.get(response.card,'buttons',[]);
     if (filteredButtons) {
-        for (var i = filteredButtons.length - 1; i >= 0; --i) {
+        for (let i = filteredButtons.length - 1; i >= 0; --i) {
             if (!(filteredButtons[i].text && filteredButtons[i].value)){
                 filteredButtons.splice(i,1);
             }
@@ -222,8 +218,8 @@ function buildResponseCardV1(response) {
             version:'1',
             contentType:'application/vnd.amazonaws.card.generic',
             genericAttachments:[_.pickBy({
-                title:_.get(response,'card.title','Title'),
-                subTitle:_.get(response.card,'subTitle'),
+                title:_.get(response,'card.title','Title').slice(0,80), //LexV1 title limit
+                subTitle:_.get(response.card,'subTitle').slice(0,80),
                 imageUrl:_.get(response.card,'imageUrl'),
                 buttons:_.get(response.card,'buttons')
             })]
@@ -235,10 +231,17 @@ function buildResponseCardV1(response) {
 function buildImageResponseCardV2(response) {
     let imageResponseCardV2 = null;
     if (isCard(response.card) && (_.get(response.card,'imageUrl','').trim() || (_.get(response.card,'buttons',[]).length > 0))) {
+        let imageUrl = _.get(response.card,'imageUrl')?.trim()
+        if(imageUrl && imageUrl.length > 250){
+            qnabot.log('Warning: the Image URL length is greater than the Lex ImageResponseCard limit of 250 chars. Removing image from response.')
+            qnabot.log('If using LexWebUI, try sending ResponseCard as session attribute rather than as a Lex ImageResponseCard to avoid hitting the Lex URL length limit.')
+            imageUrl = undefined
+        }
+
         imageResponseCardV2 = {
-            title:_.get(response,'card.title','Title'),
-            subTitle:_.get(response.card,'subTitle'),
-            imageUrl:_.get(response.card,'imageUrl'),
+            title:_.get(response,'card.title','Title').slice(0,250), //LexV2 title limit
+            subTitle:_.get(response.card,'subTitle').slice(0,250),
+            imageUrl: imageUrl,
             buttons: _.get(response.card,'buttons')
         };
     }
@@ -250,10 +253,10 @@ function buildInteractiveMessageElements(elements){
 }
 
 function buildInteractiveMessageTemplate(response){
-    response = limitInteractiveMessagesDisplayTextLength(response);
+    response = applyConnectInteractiveMessageButtonLimits(response);
 
-    if(response.message.length > 100){
-        qnabot.log('WARNING: Truncating message content to Interactive Message Title limit of 100 characters');
+    if(response.message.length > 400){
+        qnabot.log('WARNING: Truncating message content to Interactive Message Title limit of 400 characters');
     }
 
     let template = {
@@ -261,20 +264,25 @@ function buildInteractiveMessageTemplate(response){
         version: '1.0',
         data: {
             content: {
-                title: response.message.slice(0,99),
+                title: response.message.slice(0,400),
                 elements: buildInteractiveMessageElements(_.get(response.card,'buttons')),
             },
         },
     };
-    if(_.get(response,'card.title',undefined)!== undefined){
-        if( _.get(response,'card.title').length > 200){
-            qnabot.log('WARNING: Truncating Card Title to Interactive Message Subtitle limit of 200 characters');
+    if(_.get(response,'card.title')){
+        if( _.get(response,'card.title').length > 400){
+            qnabot.log('WARNING: Truncating Card Title to Interactive Message Subtitle limit of 400 characters');
         }
-        template.data.content.subtitle = _.get(response,'card.title').slice(0,199);
+        template.data.content.subtitle = _.get(response,'card.title').slice(0,400);
     }
-    if(_.get(response,'card.imageUrl',undefined)!== undefined){
-        template.data.content.imageType = 'URL';
-        template.data.content.imageData = _.get(response,'card.imageUrl');
+    if(_.get(response,'card.imageUrl')){
+        if( _.get(response,'card.imageUrl').length > 200){
+            qnabot.log('Warning: the Image URL length is greater than the Connect InteractiveMessage limit of 200 chars. Removing image from response.')
+        }
+        else{
+            template.data.content.imageType = 'URL';
+            template.data.content.imageData = _.get(response,'card.imageUrl');
+        }
     }
 
     return JSON.stringify(template);
@@ -314,39 +322,42 @@ function copyResponseCardtoSessionAttribute(response) {
     return response;
 }
 
-function limitLexButtonCount(response) {
-    // Lex has limit of max 5 buttons in the responsecard.. if we have more than 5, use the first 5 only.
+function applyLexResponseCardButtonLimits(request, response) {
+    // Lex has limit of max 5 buttons in the responsecard. if we have more than 5, use the first 5 only.
     // note when using lex-web-ui, this limitation is circumvented by use of the appContext session attribute above.
-    let buttons = _.get(response.card,'buttons',[]) ;
+    let buttons = _.get(response.card,'buttons',[]);
     if (buttons && buttons.length > 5) {
         qnabot.log('WARNING: Truncating button list to contain only first 5 buttons to adhere to Lex limits.');
         _.set(response.card,'buttons',buttons.slice(0,5));
+        buttons = _.get(response.card,'buttons',[]);
     }
-    return response;
-}
 
-function limitLexDisplayTextLength(response) {
-    // Lex has limit of max 5 buttons in the responsecard.. if we have more than 5, use the first 5 only.
-    // note when using lex-web-ui, this limitation is circumvented by use of the appContext session attribute above.
-    let buttons = _.get(response.card,'buttons',[]) ;
+    //LexV1 and V2 have different limits for button text so enforce them here
+    //NOTE: LexV1 documentation formally states that 15 is the max limit for
+    //button title; however, empirical testing shows that 80 characters are supported
+    let textLimit  = isLexV1(request) ? 80 : 50
+    let valueLimit = isLexV1(request) ? 1000 : 50
+    qnabot.log(`Limiting button text to first ${textLimit} characters to adhere to Lex limits.`);
     for(let i=0;i<buttons.length;i++){
-        response.card.buttons[i].text = response.card.buttons[i].text.slice(0,50);
-        response.card.buttons[i].value = response.card.buttons[i].value.slice(0,50);
+        response.card.buttons[i].text = response.card.buttons[i].text.slice(0,textLimit);
+        response.card.buttons[i].value = response.card.buttons[i].value.slice(0,valueLimit);
     }
     return response;
 }
 
-function limitInteractiveMessagesDisplayTextLength(response) {
-    // Interactive Message has limit of max 6 buttons in the responsecard.. and a display length of 100.
-    let buttons = _.get(response.card,'buttons',[]) ;
+function applyConnectInteractiveMessageButtonLimits(response) {
+    // Interactive Message has max limit of 6 buttons in the responsecard and a title length of 400.
+    let buttons = _.get(response.card,'buttons',[]);
     if (buttons && buttons.length > 6) {
-        qnabot.log('WARNING: Truncating button list to contain only first 5 buttons to adhere to Lex limits.');
-        _.set(response.card,'buttons',buttons.slice(0,5));
+        qnabot.log('WARNING: Truncating button list to contain only first 6 buttons to adhere to Connect limits.');
+        _.set(response.card,'buttons',buttons.slice(0,6));
+        buttons = _.get(response.card,'buttons',[]);
     }
 
+    qnabot.log('Limiting button text to first 400 characters to adhere to Connect limits.');
     for(let i=0;i<buttons.length;i++){
-        response.card.buttons[i].text = response.card.buttons[i].text.slice(0,99);
-        response.card.buttons[i].value = response.card.buttons[i].value.slice(0,99);
+        response.card.buttons[i].text = response.card.buttons[i].text.slice(0,400);
+        response.card.buttons[i].value = response.card.buttons[i].value.slice(0,400);
     }
     return response;
 }
@@ -422,7 +433,7 @@ function getV2ElicitTemplate(request, response){
 }
 
 function getV2DialogCodeHookResponseTemplate(request, response){
-    nextSlot = _.get(response,'nextSlotToElicit');
+    let nextSlot = _.get(response,'nextSlotToElicit');
     return {
         sessionState: {
             sessionAttributes:_.get(response,'session',{}),
@@ -443,53 +454,52 @@ function getV2DialogCodeHookResponseTemplate(request, response){
 
 function assembleLexV1Response(request,response) {
     let out = {};
-    if((isConnectClientChat(request) && isInteractiveMessage(response) && ! isFallbackIntent(request))){
+
+    if((isConnectClientChat(request) && isInteractiveMessage(response) && !isFallbackIntent(request))){
         out = getV1ElicitTemplate(request, response);
         out.dialogAction.message = buildV1InteractiveMessageResponse(request, response);
-
-    } else if(isElicitResponse(request, response) && ! isFallbackIntent(request)) {
+    }
+    else if(isElicitResponse(request, response) && ! isFallbackIntent(request)){
         out = getV1ElicitTemplate(request, response);
-
-    } else {
+    }
+    else{
         out = getV1CloseTemplate(request, response);
     }
 
-    if (! isConnectClient(request) ){
+    if(!isConnectClient(request)){
+        response = applyLexResponseCardButtonLimits(request, response)
         out.dialogAction.responseCard = buildResponseCardV1(response);
     }
     return out;
 }
 
-function assembleLexV2Response(request, response) {
+function assembleLexV2Response(request, response){
     let out = {};
 
     if(isConnectClientChat(request) && isInteractiveMessage(response)){
         out = getV2ElicitTemplate(request, response);
         out.messages = buildV2InteractiveMessageResponse(request, response);
-    } else if (isElicitResponse(request, response)){
+    }
+    else if(isElicitResponse(request, response)){
         out = getV2ElicitTemplate(request, response);
-    } else if (_.get(request,'invocationSource') === 'DialogCodeHook') {
+    }
+    else if(_.get(request,'invocationSource') === 'DialogCodeHook'){
         out = getV2DialogCodeHookResponseTemplate(request, response);
-    } else {
+    }
+    else{
         out = getV2CloseTemplate(request, response);
     }
 
     if (!isConnectClient(request)){
+        response = applyLexResponseCardButtonLimits(request, response)
         let imageResponseCardV2 = buildImageResponseCardV2(response);
         if(imageResponseCardV2) {
-            let imgUrlLength = imageResponseCardV2.imageUrl ? imageResponseCardV2.imageUrl.length : 0;
-            let client = _.get(request,'_clientType', undefined)
-            if(imgUrlLength > 250){
-                qnabot.log('ResponseCard Image URL length is greater than the max limit (250 chars). Client is LexWebUI. Sending ResponseCard as session attribute rather than as Lex ImageresponseCard to avoid hitting the Lex URL length limit.')
-            } else {
-                out.messages[out.messages.length] = {
-                    'contentType': 'ImageResponseCard',
-                    'imageResponseCard': imageResponseCardV2
-                };
-            }
+            out.messages[out.messages.length] = {
+                'contentType': 'ImageResponseCard',
+                'imageResponseCard': imageResponseCardV2
+            };
         }
     }
-
     return out;
 }
 
@@ -497,20 +507,20 @@ exports.assemble=function(request,response){
     if (request._clientType === 'LEX.Slack.Text') {
         response = slackifyResponse(response);
     }
+
     qnabot.log('filterButtons')
     response = filterButtons(response);
+
     qnabot.log('copyResponseCardToSessionAttributes')
     response = copyResponseCardtoSessionAttribute(response);
-    qnabot.log('limitLexButtonCounts')
-    response = limitLexButtonCount(response);
-    qnabot.log('')
-    response = limitLexDisplayTextLength(response)
+
     let out;
-    if (request._lexVersion === 'V1') {
-        out= assembleLexV1Response(request,response);
+    if (isLexV1(request)) {
+        out = assembleLexV1Response(request,response);
     } else {
-        out= assembleLexV2Response(request, response);
+        out = assembleLexV2Response(request, response);
     }
+
     qnabot.log('Lex response:',JSON.stringify(out,null,2))
     return out
 }

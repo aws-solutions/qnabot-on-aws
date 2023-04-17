@@ -17,7 +17,6 @@
   },
   "author": "",
   "dependencies": {
-    "aws-sdk": "^2.1277.0",
     "lodash": "^4.17.21"
   },
   "devDependencies": {

@@ -21,7 +21,7 @@
   },
   "license": "SEE LICENSE IN LICENSE",
   "dependencies": {
-    "aws-sdk": "^2.1276.0"
+    "aws-sdk": "^2.1354.0"
   },
   "devDependencies": {
     "jest": "^29.3.1"

@@ -43,6 +43,7 @@ module.exports={
         "VPCSecurityGroupIdList": {"Type": "String"},
         "XraySetting": {"Type": "String"},
         "KendraCrawlerSnsTopic":{"Type":"String"},
+        "AwsSdkLayerLambdaLayer": {"Type": "String"},
         "QnABotCommonLambdaLayer":{"Type":"String"}
     },
     "Conditions": {

@@ -45,7 +45,7 @@ exports.parse=async function(req){
     var welcome_message;
     var stop_message;
     var err_message;
-    
+
     switch(_.get(event,"request.type")){
         case "LaunchRequest":
             qnabot.log("INFO: LaunchRequest.");
@@ -67,8 +67,8 @@ exports.parse=async function(req){
                     throw new AlexaMessage(stop_message, true) ;
                 case "AMAZON.FallbackIntent":
                     qnabot.log("ERROR: FallbackIntent. This shouldn't happen - we can't get the utterance. Ask user to try again.");
-                    err_message = await translate.translateText("Sorry, I do not understand. Please try again.",'en',alexa_locale); 
-                    throw new AlexaMessage(err_message, false) ;  
+                    err_message = await translate.translateText("Sorry, I do not understand. Please try again.",'en',alexa_locale);
+                    throw new AlexaMessage(err_message, false) ;
                 case "AMAZON.RepeatIntent":
                     welcome_message = await get_welcome_message(req,alexa_locale);
                     qnabot.log("At Repeat Intent") ;
@@ -83,13 +83,13 @@ exports.parse=async function(req){
                     break ;
                 default:
                     qnabot.log("ERROR: Unhandled Intent - ", _.get(event,"request.intent.name"));
-                    err_message = await translate.translateText("The skill is unable to process the request.",'en',alexa_locale); 
-                    throw new AlexaMessage(err_message, true) ;                    
+                    err_message = await translate.translateText("The skill is unable to process the request.",'en',alexa_locale);
+                    throw new AlexaMessage(err_message, true) ;
             }
     }
     if (out.question === "") {
         qnabot.log("ERROR: No value found for QnA_slot") ;
-        err_message = await translate.translateText("The skill is unable to process the request.",'en',alexa_locale); 
+        err_message = await translate.translateText("The skill is unable to process the request.",'en',alexa_locale);
         throw new AlexaMessage(err_message, true) ;
     }
     return out ;
@@ -97,11 +97,11 @@ exports.parse=async function(req){
 
 /**
  * @see https://developer.amazon.com/en-US/docs/alexa/custom-skills/request-and-response-json-reference.html#response-format
- * 
+ *
  */
 exports.assemble=function(request,response){
-    let plainMessage = response.plainMessage;
-    if (plainMessage && plainMessage.includes("<speak>")) {
+    let plainMessage = response.plainMessage || "";
+    if (plainMessage.includes("<speak>")) {
         plainMessage = plainMessage.replace(/<\/?[^>]+(>|$)/g, "");
     }
     if (plainMessage.toLowerCase().startsWith("ok. ")) {
@@ -133,11 +133,11 @@ exports.assemble=function(request,response){
         },
         sessionAttributes:_.get(response,'session',{})
     };
-    
+
     let repromptText = _.get(response, "reprompt.text", undefined);
-    
+
     if(repromptText) {
-        _.set(res, "reprompt", {
+        _.set(res, "response.reprompt", {
             outputSpeech: _.pickBy({
                     type:_.get(response, "reprompt.type", null),
                     text:_.get(response, "reprompt.type", null)==='PlainText' ? _.get(response, "reprompt.text", null) : null,
@@ -172,7 +172,7 @@ function AlexaMessage(message,endSession){
             shouldEndSession:endSession
         }
     } ;
-} 
+}
 
 function Respond(message){
     this.action="RESPOND" ;

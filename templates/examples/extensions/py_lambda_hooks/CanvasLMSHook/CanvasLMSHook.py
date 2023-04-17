@@ -1,9 +1,7 @@
 # Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
 # SPDX-License-Identifier: Apache-2.0
 
-
 # Import the Canvas class
-import canvasapi
 from canvasapi import Canvas
 
 from CanvasLMSHelper import *
@@ -43,7 +41,7 @@ def handler(event, context):
         secrets_name = event['req']['_settings']['CanvasLMS_APIKey'].strip()
         course_name_slot = 'CanvasLMS_course_name_slot'
 
-        try: 
+        try:
             # get slot value if present
             course_name_slot_input = event["req"]["_event"]["interpretations"][0]["intent"]["slots"][course_name_slot]["value"].get("originalValue", '')
         except:
@@ -94,8 +92,8 @@ def handler(event, context):
             elif query == 'GradesForStudent':
                 # retrieve the course grades for this student.
                 return query_grades_for_student(event, canvas, student_user_name, course_name_to_filter)
-            else: 
-                return_message = 'There was an error processing your request. For a list of available options, type or say <i>canvas menu</i>.' 
+            else:
+                return_message = 'There was an error processing your request. For a list of available options, type or say <i>canvas menu</i>.'
                 set_alt_message (event, return_message)
                 return event
         except ValueError as e:

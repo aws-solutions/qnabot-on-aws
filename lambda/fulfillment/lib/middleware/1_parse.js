@@ -67,6 +67,7 @@ module.exports = async function parse(req, res) {
     await qna_settings.set_alias_environment_variables();
 
     req._type = req._event.version ? "ALEXA" : "LEX"
+    req._clientType = getClientType(req)
 
     switch (req._type) {
         case 'LEX':
@@ -91,9 +92,6 @@ module.exports = async function parse(req, res) {
             _.set(req,"_preferredResponseType","SSML") ;
             break;
     }
-
-
-    req._clientType = getClientType(req) ;
 
     // replace substrings in user's question
     qnabot.log("checking for question search/replace setting 'SEARCH_REPLACE_QUESTION_SUBSTRINGS'.");
