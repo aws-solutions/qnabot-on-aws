@@ -1,2 +1,0 @@
-# Example requirements.txt
-beautifulsoup4==4.11.1
