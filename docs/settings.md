@@ -36,7 +36,7 @@
 | KENDRA_INDEXER_SCHEDULE | [CloudWatch Rate Syntax](https://docs.aws.amazon.com/AmazonCloudWatch/latest/events/ScheduledEvents.html) | Interval Indexer should crawl
 | KENDRA_INDEXER_CRAWL_DEPTH | number | Sets the depth to the number of levels in a website from the seed level that you want to crawl
 | KENDRA_INDEXER_CRAWL_MODE | HOST_ONLY \| SUBDOMAINS \| EVERYTHING | Determines which addresses should be crawled
-| KENDRA_WEB_PAGE_INDEX | Kendra Index Id | The index to use for the web crawler, a [custom data source](https://docs.aws.amazon.com/kendra/latest/dg/data-source-custom.html) will automatically be added to the specified index.  
+| KENDRA_WEB_PAGE_INDEX | Kendra Index Id | The index to use for the web crawler, a [custom data source](https://docs.aws.amazon.com/kendra/latest/dg/data-source-custom.html) will automatically be added to the specified index.
 | KENDRA_INDEXED_DOCUMENTS_LANGUAGES | comma separate list | Should be one of supported Kendra languages mentioned in [documentation](https://docs.aws.amazon.com/kendra/latest/dg/in-adding-languages.html)
 | ERRORMESSAGE | text | Response to the user when a processing error occurs
 | EMPTYMESSAGE | text | Response to the user when an answer could not be found
@@ -53,7 +53,7 @@
 | ELICIT_RESPONSE_RETRY_MESSAGE | text |  Default retry message when working with LexBot
 | ELICIT_RESPONSE_BOT_FAILURE_MESSAGE | text |  Message used when maximum number of retries is exceeded
 | ELICIT_RESPONSE_DEFAULT_MSG| text |
-| CONNECT_IGNORE_WORDS | comma separated list | Throw error if connect client sends individual characters not processable by elastic search
+| CONNECT_IGNORE_WORDS | comma separated list | Throw an error if the transcript provided by connect __only__ contains the words in this list (case insensitive). This is useful if you find many missed utterances due to the use of filler words before a proper utterance (e.g. "a", "e", "umm", "like", etc.). This setting can not be used as a transcript filter (see `LAMBDA_PREPROCESS_HOOK` or `LAMBDA_POSTPROCESS_HOOK` if you wish to apply custom processing to questions/answers)
 | CONNECT_ENABLE_VOICE_RESPONSE_INTERRUPT | true or false | Return bot response in session attribute to enable contact flow to use response as an interruptible prompt.
 | CONNECT_NEXT_PROMPT_VARNAME | text | Name of session var to use for next prompt
 | ENABLE_REDACTING | true or false | Enable the system to redact log output

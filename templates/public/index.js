@@ -31,7 +31,8 @@ module.exports=Promise.resolve(require('../master')).then(function(base){
         "FeedbackSNSTopic",
         "ESProxyLambda",
         "ElasticsearchEndpoint",
-        "ElasticsearchIndex"
+        "ElasticsearchIndex",
+        "MetricsBucket"
     ])
     base.Parameters=_.pick(base.Parameters,[
         "Email",
@@ -39,6 +40,7 @@ module.exports=Promise.resolve(require('../master')).then(function(base){
         "DefaultKendraIndexId",
         "Encryption",
         "ElasticSearchNodeCount",
+        "ElasticSearchEBSVolumeSize",
         "KibanaDashboardRetentionMinutes",
         "PublicOrPrivate",
         "LexV2BotLocaleIds",
@@ -79,6 +81,7 @@ module.exports=Promise.resolve(require('../master')).then(function(base){
                    },
                    "Parameters": [
                         "ElasticSearchNodeCount",
+                        "ElasticSearchEBSVolumeSize",
                         "Encryption",
                         "KibanaDashboardRetentionMinutes"
                    ]

@@ -155,7 +155,10 @@ module.exports={
     },
     "FeedbackSNSTopic": {
         "Value":{"Fn::GetAtt": ["ExamplesStack", "Outputs.FeedbackSNSTopic"]}
-    }
+    },
+    "MetricsBucket": {
+        "Value":{"Ref":"MetricsBucket"}
+      }
   },
   "Parameters": {
     "ElasticsearchName":{
@@ -217,6 +220,11 @@ module.exports={
         "Description":"Number of nodes in ElasticSearch domain - '4' is recommended for fault tolerant production deployments.",
         "AllowedValues" : ["1", "2", "4"],
         "Default":"4"
+    },
+    "ElasticSearchEBSVolumeSize":{
+        "Type":"Number",
+        "Description":"Size in GB of each EBS volume attached to OpenSearch node instances - '10' is the minimum default volume size.",
+        "Default":10
     },
     "FulfillmentConcurrency": {
       "Type":"Number",

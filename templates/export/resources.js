@@ -384,7 +384,9 @@ module.exports = Object.assign(
           }
         },
         "Layers":[
-        {"Ref":"QnABotCommonLambdaLayer"}],
+          {"Ref":"AwsSdkLayerLambdaLayer"},
+          {"Ref":"QnABotCommonLambdaLayer"}
+        ],
         "Handler": "kendraSync.performSync",
         "MemorySize": "1024",
         "Role": {"Fn::GetAtt": ["KendraSyncRole", "Arn"]},
@@ -744,7 +746,7 @@ module.exports = Object.assign(
         ],
       },
     },
-    
+
 
     KendraNativeCrawlerRole: {
       Type: "AWS::IAM::Role",
@@ -843,7 +845,7 @@ module.exports = Object.assign(
           "IntegrationHttpMethod": "POST",
           "RequestParameters": {
             "integration.request.header.X-Amz-Invocation-Type": "'Event'"
-          }, 
+          },
           "Uri": {
             "Fn::Join": [
               "",

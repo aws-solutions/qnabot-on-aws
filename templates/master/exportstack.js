@@ -23,6 +23,7 @@ module.exports={
                 "KendraCrawlerSnsTopic":{"Ref":"KendraCrawlerSnsTopic"},
                 "DefaultQnABotSettings":{"Ref":"DefaultQnABotSettings"},
                 "CustomQnABotSettings":{"Ref":"CustomQnABotSettings"},
+                "AwsSdkLayerLambdaLayer":{"Ref":"AwsSdkLayerLambdaLayer"},
                 "QnABotCommonLambdaLayer":{"Ref":"QnABotCommonLambdaLayer"},
                 "LexVersion": {"Fn::If": ["CreateLexV1Bots","V1","V2"]},
                 // Lex V1

@@ -4,4 +4,4 @@ canvasapi==3.0.0
 idna==2.10
 pytz==2021.1
 requests==2.26.0
-beautifulsoup4==4.11.1
+beautifulsoup4==4.12.0

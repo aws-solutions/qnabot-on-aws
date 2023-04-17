@@ -31,7 +31,8 @@ module.exports=Promise.resolve(require('../master')).then(function(base){
         "FeedbackSNSTopic",
         "ESProxyLambda",
         "ElasticsearchEndpoint",
-        "ElasticsearchIndex"
+        "ElasticsearchIndex",
+        "MetricsBucket"
     ])
     base.Parameters=_.pick(base.Parameters,[
         "Email",
@@ -44,6 +45,7 @@ module.exports=Promise.resolve(require('../master')).then(function(base){
         "InstallLexResponseBots",
         "FulfillmentConcurrency",
         "ElasticSearchNodeCount",
+        "ElasticSearchEBSVolumeSize",
         "KibanaDashboardRetentionMinutes",
         "VPCSubnetIdList",
         "VPCSecurityGroupIdList",
@@ -90,6 +92,7 @@ module.exports=Promise.resolve(require('../master')).then(function(base){
                    },
                    "Parameters": [
                         "ElasticSearchNodeCount",
+                        "ElasticSearchEBSVolumeSize",
                         "Encryption",
                         "KibanaDashboardRetentionMinutes"
                    ]

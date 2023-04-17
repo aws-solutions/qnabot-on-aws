@@ -53,7 +53,7 @@ var default_settings = {
     ELICIT_RESPONSE_RETRY_MESSAGE: 'Please try again.', // Default retry message when working with LexBot
     ELICIT_RESPONSE_BOT_FAILURE_MESSAGE: 'Your response was not understood. Please start again.', // Message used when maximum number of retries is exceeded
     ELICIT_RESPONSE_DEFAULT_MSG: 'Ok. ', // Ok. with an intentional blank space after the period
-    CONNECT_IGNORE_WORDS: '', // Throw error if connect client sends individual characters not processable by elastic search
+    CONNECT_IGNORE_WORDS: '', // Throw an error if the transcript provided by connect only contains the words in this list (case insensitive)
     CONNECT_ENABLE_VOICE_RESPONSE_INTERRUPT: 'false', // Return bot response in session attribute to enable contact flow to use response as an interruptible prompt.
     CONNECT_NEXT_PROMPT_VARNAME: 'connect_nextPrompt', // Name of session var to use for next prompt
     ENABLE_REDACTING: 'false', // Enable the system to redact log output
@@ -99,7 +99,7 @@ module.exports = {
                     "ES_USE_KEYWORD_FILTERS" : {"Fn::If": ["EmbeddingsEnable", "FALSE", "TRUE"]},
                     "EMBEDDINGS_ENABLE" : {"Fn::If": ["EmbeddingsEnable", "TRUE", "FALSE"]}
                 }
-            ]} 
+            ]}
         }
     },
     "CustomQnABotSettings": {
