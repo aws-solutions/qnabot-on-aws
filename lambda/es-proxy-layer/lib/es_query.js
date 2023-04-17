@@ -25,14 +25,14 @@ async function  isESonly(req, query_params) {
     // setting clientFilterValues should block Kendra FAQ indexing
     if (_.get(query_params, 'qnaClientFilter')) {
         return true
-    } 
+    }
     // setting score_answer should block Kendra FAQ indexing
     if (_.get(query_params, 'score_answer')) {
         return true
-    } 
+    }
     if (_.get(query_params, 'kendraIndex') == "") {
         return true
-    } 
+    }
     //Don't send one word questions to Kendra
     if(query_params.question.split(" ").length  < 2){
 
@@ -67,19 +67,29 @@ async function run_query_es(req, query_params) {
         body: es_query
     });
 
-    // check threshold - always '1' is not using embeddings
-    let threshold = (_.get(query_params, 'settings.EMBEDDINGS_ENABLE')) ? _.get(query_params,'settings.EMBEDDINGS_SCORE_THRESHOLD',0) : 1
+    //default threshold is 1 for opensearch based queries where a score of 1 is returned for no matches
+    let threshold = 1;
+    let isQID = query_params.question.toLowerCase().startsWith("qid::")
+    if(isQID){
+        //if the utterance is a QID, then there should only be 1 match, so set threshold to 0
+        threshold = 0
+    }
+    else if(_.get(query_params, 'settings.EMBEDDINGS_ENABLE')){
+        //if embeddings in enabled, then allow user to set custom threshold score
+        threshold = _.get(query_params,'settings.EMBEDDINGS_SCORE_THRESHOLD',0)
+    }
+
     qnabot.log(`Score threshold for question matches is: ${threshold}.`)
     es_response = score_threshold_check(es_response, threshold)
     let gothits = _.get(es_response, 'hits.hits.length');
     let matched_field;
-    if (query_params.question.toLowerCase().startsWith("qid::")) {
+    if (isQID) {
         matched_field = (gothits) ? "QID" : "";
     } else {
         matched_field = (gothits) ? "questions" : "";
     }
 
-    // if ES_SCORE_ANSWER_MODE is true, AND no hits were returned from default "questions" query, run 
+    // if ES_SCORE_ANSWER_MODE is true, AND no hits were returned from default "questions" query, run
     // second query to match the item answers field.
     if ( !gothits && _.get(query_params, 'settings.ES_SCORE_ANSWER_FIELD')) {
         qnabot.log("ES_SCORE_ANSWER_FIELD is true. Rerun query to check for matches on answer field.")
@@ -130,7 +140,7 @@ async function run_qid_query_es(params, qid) {
     try {
         const result = JSON.parse(str);
         const type = Object.prototype.toString.call(result);
-        return type === '[object Object]' 
+        return type === '[object Object]'
             || type === '[object Array]';
     } catch (err) {
         return false;

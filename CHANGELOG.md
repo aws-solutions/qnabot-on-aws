@@ -5,6 +5,26 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [5.3.2] - 2023-04-17
+
+### Added
+
+- Added new parameter for configurable Opensearch EBS Volume Size (#567)
+- Added MetricsBucket to stack outputs (#571)
+
+### Fixed
+
+- Fix Lambda Embeddings documentation with correct event definition (#576)
+- Fix broken urls in prairielinetrail tour example (#577)
+- Fix bug causing CONNECT_IGNORE_WORDS from working correctly (#589)
+- Fix QIDs not matching correctly when the score is less than 1 (#592)
+- Improved handling of Lex and Connect response limits (#593)
+
+### Updated
+
+- Security patches for npm and pip packages
+- Update Connect Interactive Message limits
+
 ## [5.3.1] - 2023-03-15
 
 ### Fixed

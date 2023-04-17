@@ -687,6 +687,7 @@ async function processFulfillmentEvent(req,res) {
         // no hit found
         res.type = 'PlainText';
         res.message = _.get(req, '_settings.EMPTYMESSAGE', 'You stumped me!');
+        res.plainMessage = res.message;
     }
     // add session attributes for qid and no_hits - useful for Amazon Connect integration
     res.session.qnabot_qid = _.get(res.result, 'qid', '') ;

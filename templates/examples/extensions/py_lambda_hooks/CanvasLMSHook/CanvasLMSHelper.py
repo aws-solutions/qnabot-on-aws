@@ -7,8 +7,6 @@ import boto3
 import base64
 import datetime
 import calendar
-import urllib3
-import urllib.parse
 
 from bs4 import BeautifulSoup
 from botocore.exceptions import ClientError
@@ -17,9 +15,9 @@ from botocore.exceptions import ClientError
 def get_secret(secrets_name):
     """
     function: get_secret from AWS Secrets Manager
-    This function retrieves the secret string from AWS Secrets Manager. 
-    We will retrieve the Canvas API Token using this function. 
-    Refer to the readme for more details on how to store secret in AWS Secrets Manager, and configure QnABot with the secret key name. 
+    This function retrieves the secret string from AWS Secrets Manager.
+    We will retrieve the Canvas API Token using this function.
+    Refer to the readme for more details on how to store secret in AWS Secrets Manager, and configure QnABot with the secret key name.
     """
 
     region_name = os.environ['AWS_REGION']
@@ -78,8 +76,8 @@ def query_menu (event, student_name):
 
     intCounter = 0
     strChoiceList = ""
-    for items in choicelist: 
-        if strChoiceList != '': 
+    for items in choicelist:
+        if strChoiceList != '':
             strChoiceList = strChoiceList + ", "
         strChoiceList = strChoiceList + choicelist[intCounter]['text']
         intCounter = intCounter + 1
@@ -91,11 +89,11 @@ def query_menu (event, student_name):
 def query_enrollments_for_student(event, canvas, student_user_name):
     """
     function: query_enrollments_for_student
-    This function retrieves students' active enrollments 
+    This function retrieves students' active enrollments
     """
 
     # Get the user using user_id to match with LMS SIS_ID
-    try: 
+    try:
         user = getCanvasUser (canvas, student_user_name)
     except:
         return user_not_found_error (event)
@@ -118,8 +116,8 @@ def query_enrollments_for_student(event, canvas, student_user_name):
 
         intCounter = 0
         strChoiceList = ""
-        for items in choicelist: 
-            if strChoiceList != '': 
+        for items in choicelist:
+            if strChoiceList != '':
                 strChoiceList = strChoiceList + ", "
             strChoiceList = strChoiceList + choicelist[intCounter]['text']
             intCounter = intCounter + 1
@@ -129,7 +127,7 @@ def query_enrollments_for_student(event, canvas, student_user_name):
         set_alt_message (event, return_message)
 
     return event
-    
+
 
 def query_courses_for_student(event, canvas, student_user_name, course_name_to_filter):
     """
@@ -139,9 +137,9 @@ def query_courses_for_student(event, canvas, student_user_name, course_name_to_f
     """
 
     # Get the user using user_id to match with LMS SIS_ID
-    try: 
+    try:
         user = getCanvasUser (canvas, student_user_name)
-    except: 
+    except:
         return user_not_found_error (event)
 
     blnFoundCourse = False
@@ -155,14 +153,14 @@ def query_courses_for_student(event, canvas, student_user_name, course_name_to_f
                 break
         if blnFoundCourse == False:
             result = {"Choice": 'N/A'}
-    else: 
+    else:
         result = {"Choice": 'N/A'}
 
     returned_course = result['Choice']
-    if returned_course == 'N/A': 
+    if returned_course == 'N/A':
         return_message = "Sorry, was unable to find the course you are looking for. Check the course name and try again. You can also ask <i>what courses have i enrolled in</i>, to get a list of enrolled courses."
         set_alt_message (event, return_message)
-    else: 
+    else:
         genericattachment = ['assignments','syllabus','grades']
         choicelist = []
         for i in genericattachment:
@@ -173,8 +171,8 @@ def query_courses_for_student(event, canvas, student_user_name, course_name_to_f
 
         intCounter = 0
         strChoiceList = ""
-        for items in choicelist: 
-            if strChoiceList != '': 
+        for items in choicelist:
+            if strChoiceList != '':
                 strChoiceList = strChoiceList + ", "
             strChoiceList = strChoiceList + choicelist[intCounter]['text']
             intCounter = intCounter + 1
@@ -195,11 +193,11 @@ def query_course_assignments_for_student(event, canvas, student_user_name, cours
     blnFoundMatch = False
     no_records_message = 'There are no assignments for this course.'
     # Get the user using user_id to match with LMS SIS_ID
-    try: 
+    try:
         user = getCanvasUser (canvas, student_user_name)
     except:
         return user_not_found_error (event)
-    
+
     if user:
         courses = user.get_courses(enrollment_status='active')
         for course in courses:
@@ -213,7 +211,7 @@ def query_course_assignments_for_student(event, canvas, student_user_name, cours
             if blnFoundMatch == True:
                 course_assignments = "<b>" + course.name + ": </b> <ul>"
             else:
-                course_assignments += "<b>" + course.name + ": </b> <ul>"                
+                course_assignments += "<b>" + course.name + ": </b> <ul>"
 
             # Loop through the assignments that have not been submitted
             for assignment in course.get_assignments(bucket='unsubmitted'):
@@ -261,7 +259,7 @@ def query_announcements_for_student(event, canvas, student_user_name):
     course_announcements = ''
 
     # Get the user using user_id to match with LMS SIS_ID
-    try: 
+    try:
         user = getCanvasUser (canvas, student_user_name)
     except:
         return user_not_found_error (event)
@@ -269,12 +267,12 @@ def query_announcements_for_student(event, canvas, student_user_name):
     course_names = []
     if user:
         courses = user.get_courses(enrollment_status='active')
-    
+
         # Loop through the courses.
         for course in courses:
             course_names.append(course.name)
             # get_announcements returns a list of discussion topics.
-            for discussion_topic in canvas.get_announcements(context_codes=[course.id]): 
+            for discussion_topic in canvas.get_announcements(context_codes=[course.id]):
                 if discussion_topic:
                     announcement_date = datetime.datetime.strftime(discussion_topic.posted_at_date,"%b %d %Y %-I:%M %p")
                     course_announcements += '<li><b>{0}</b>: {1}: <br>{2}. </li>'.format(course.name, discussion_topic.title, discussion_topic.message)
@@ -305,7 +303,7 @@ def query_grades_for_student(event, canvas, student_user_name, course_name_to_fi
     no_records_message = "There are no enrolled courses."
     course_grades = '<ul>'
     # Get the user using user_id to match with LMS SIS_ID
-    try: 
+    try:
         user = getCanvasUser (canvas, student_user_name)
     except:
         return user_not_found_error (event)
@@ -314,7 +312,7 @@ def query_grades_for_student(event, canvas, student_user_name, course_name_to_fi
         # Loop through the courses
         courses = user.get_enrollments(include='current_points', search_by='course')
 
-        if courses: 
+        if courses:
             for grade in courses:
                 course_name = canvas.get_course(grade.course_id)
                 if grade.grades['current_score'] != '':
@@ -355,7 +353,7 @@ def query_syllabus_for_student(event, canvas, student_user_name, course_name_to_
     course_syllabus = ''
 
     # Get the user using user_id to match with LMS SIS_ID
-    try: 
+    try:
         user = getCanvasUser (canvas, student_user_name)
     except:
         return user_not_found_error (event)
@@ -364,7 +362,7 @@ def query_syllabus_for_student(event, canvas, student_user_name, course_name_to_
         courses = user.get_courses(enrollment_status='active',include=['syllabus_body'])
 
         # Loop through the courses
-        if courses: 
+        if courses:
             # Loop through the courses.
             for course in courses:
                 #check for matching course_name_slot_input with course names
@@ -402,10 +400,10 @@ def validate_input(event):
 
     try:
         if json.loads(event['res']['result']['args'][0])['Query'] == '':
-            error_message = 'There was an error processing your request. Please check the question setup and try again.' 
+            error_message = 'There was an error processing your request. Please check the question setup and try again.'
             return error_message
 
-        if event['req']['_userInfo']['isVerifiedIdentity'] != "true": 
+        if event['req']['_userInfo']['isVerifiedIdentity'] != "true":
             error_message = 'There was an error processing your request. Please check your login and try again, or contact your administrator.'
             return error_message
 
@@ -427,7 +425,7 @@ def remove_HTML_tags (strInput):
     for data in objBSoup (['style', 'script']):
         #remove html tags
         data.decompose()
-  
+
     # return
     return ' '.join(objBSoup.stripped_strings)
 
@@ -452,7 +450,7 @@ def set_alt_message (event, strInput):
     event['res']['session']['appContext']['altMessages']['ssml'] = get_SSML_output (strInput)
 
 
-def user_not_found_error(event): 
+def user_not_found_error(event):
     """
     function to return error message when user id does not exist in Canvas LMS
     """
