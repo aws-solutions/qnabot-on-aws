@@ -219,7 +219,7 @@ function buildResponseCardV1(response) {
             contentType:'application/vnd.amazonaws.card.generic',
             genericAttachments:[_.pickBy({
                 title:_.get(response,'card.title','Title').slice(0,80), //LexV1 title limit
-                subTitle:_.get(response.card,'subTitle').slice(0,80),
+                subTitle:_.get(response.card,'subTitle')?.slice(0,80),
                 imageUrl:_.get(response.card,'imageUrl'),
                 buttons:_.get(response.card,'buttons')
             })]
@@ -240,7 +240,7 @@ function buildImageResponseCardV2(response) {
 
         imageResponseCardV2 = {
             title:_.get(response,'card.title','Title').slice(0,250), //LexV2 title limit
-            subTitle:_.get(response.card,'subTitle').slice(0,250),
+            subTitle:_.get(response.card,'subTitle')?.slice(0,250),
             imageUrl: imageUrl,
             buttons: _.get(response.card,'buttons')
         };
