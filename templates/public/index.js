@@ -40,6 +40,7 @@ module.exports=Promise.resolve(require('../master')).then(function(base){
         "DefaultKendraIndexId",
         "Encryption",
         "ElasticSearchNodeCount",
+        "ElasticSearchInstanceType",
         "ElasticSearchEBSVolumeSize",
         "KibanaDashboardRetentionMinutes",
         "PublicOrPrivate",

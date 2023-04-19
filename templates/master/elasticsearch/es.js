@@ -5,7 +5,7 @@ var properties={
     "ClusterConfig": {
        "DedicatedMasterEnabled": false,
        "InstanceCount": {"Ref":"ElasticSearchNodeCount"},
-       "InstanceType": {"Fn::If": [ "Encrypted", "m6g.large.search", "t3.small.search"]},
+       "InstanceType": {"Ref":"ElasticSearchInstanceType"},
        "ZoneAwarenessEnabled":  {"Fn::If": [ "SingleNode", false, true]}
     },
     "EBSOptions": {
