@@ -167,7 +167,8 @@ module.exports={
     },
     "ElasticSearchInstanceType": {
       "Type":"String",
-      "Description": "OpenSearch instance type to use for domain.",
+      "Description":"OpenSearch instance type to use for domain.",
+      "Default":"t3.small.search",
       "AllowedValues": [
         "c5.large.search",
         "c5.xlarge.search",
