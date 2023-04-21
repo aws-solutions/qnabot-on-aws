@@ -36,12 +36,16 @@ all from a text passage item that contains the nursery rhyme.
   
 
 With this release, QnaBot can use:  
-1. A State of the Art open source LLM model hosted on an Amazon SageMaker endpoint - see https://huggingface.co/philschmid/flan-t5-xxl-sharded-fp16 
-2. An experimental model called "Conversational FAQ", or CFAQ - see https://github.com/aws-samples/aws-lex-sample-conversational-faq
-3. Use any LLM model or API you like via a user provided Lambda function to explore alternate pretrained LLM models and APIs.
-4. ALL of the above - enable all these options to compare and contrast their accuracy and effectiveness.
+1. Amazon Bedrock (Coming soon!)
+2. An open source LLM model hosted on an Amazon SageMaker endpoint - see https://huggingface.co/philschmid/flan-t5-xxl-sharded-fp16 
+3. Third Party LLM Services: Anthropic Claude v1, OpenAI GPT3.5 or GPT4
+4. Any other LLM model or API you like via a user provided Lambda function.
 
-### 1. Amazon Sagemaker LLM
+### 1. Amazon Bedrock 
+
+Coming Soon!
+
+### 2. Amazon Sagemaker LLM
 
 QnABot provisions a Sagemaker endpoint running the Hugging Face flan-t5-xxl-sharded-fp16 model - see https://huggingface.co/philschmid/flan-t5-xxl-sharded-fp16. 
   
@@ -55,26 +59,11 @@ By default a 1-node ml.g5.xlarge endpoint is automatically provisioned. For larg
 
 ![CFN Params](./images/CF_Params_SageMaker_LLM.png)
 
-  
-### 2. Amazon Sagemaker CFAQ
+### 3. Third Party LLM Services: Anthropic Claude v1, OpenAI GPT3.5 or GPT4
 
-QnABot provisions a Sagemaker endpoint running the AWS experimental CFAQ model - see https://github.com/aws-samples/aws-lex-sample-conversational-faq.
+Configure QnABot to use 3rd party LLM services from Anthropic or OpenAI by selecting 'ANTHROPIC-CLAUDEv1', 'OPENAI-GPT3.5', or 'OPENAI-GPT4', and providing an API key issues by the third party provider. Note that when using third party providers, your data will leave you AWS account and the AWS network and will be sent in the payload of the API requests to the third party provider. 
 
-*NOTE: Currently the CFAQ model is optimized to summarize Kendra Fallback queries. It does not work with QnAbot text passage documents. This may change in later builds.*
-
-By default a 1-node ml.t3.2xlarge endpoint is automatically provisioned. For large volume deployments, add additional nodes by setting the parameter `SagemakerQASummarizeInitialInstanceCount`. Please check [SageMaker pricing documentation](https://aws.amazon.com/sagemaker/pricing/) for relevant costs and information on Free Tier eligibility. 
-
-#### Deploy Stack for SageMaker CFAQ
-
-- *(for Kendra Fallback)* set `DefaultKendraIndexId` to the Index Id (a GUID) of your existing Kendra index containing ingested documents 
-- set `QASummarizeApi` to SAGEMAKER CFAQ
-- for `InstallLexResponseBots` choose `false` - if you don't plan to use Response bots, this speeds up the stack installation.
-
-
-![CFN Params](./images/CF_Params_SageMaker_CFAQ.png)
-
-
-### 3. Lambda function
+### 4. Lambda function
 
 Use a custom Lambda function to experiment with LLMs of your choice. Provide your own lambda function that takes a *question*, *context*, and a QnABot *settings* object. Your Lambda function can invoke any LLM you choose, and return the prediction in a JSON object containing the key, `generated_text`. You provide the ARN for your Lambda function when you deploy or update QnABot.  
 
@@ -91,8 +80,7 @@ Use a custom Lambda function to experiment with LLMs of your choice. Provide you
 Your Lambda function is passed an event of the form:
 ```
 {
-  "question": "string", // utterance / question from bot user
-  "context":"string",   // context of kendra query results or QnABot passage tect - the context from which the LLM should answer 
+  "prompt": "string", // prompt for the LLM
   "settings":{"key":value, ...} // settings object containing key / value pairs for all QnABot settings
 }
 ```
@@ -103,16 +91,16 @@ and returns a JSON structure of the form:
 
 The *settings* object passed to your Lambda function has all the settings that you see in QnAbot Content Designer **Settings** page, including (but not limimted to):
 
-- **QA_SUMMARY_LAMBDA_PROMPT_FORMAT**: `'Answer the question based on the following context, or answer "I don\'t know".<br>Context: <CONTEXT><br>Question: <QUESTION><br>Answer:'`
+- **LLM_LAMBDA_PROMPT_FORMAT**: `'Answer the question based on the following context, or answer "I don\'t know".<br>Context: <CONTEXT><br>Question: <QUESTION><br>Answer:'`
   - Use this setting to configure how your lambda constructs a prompt for the LLM
-- **QA_SUMMARY_LAMBDA_MODEL_PARAMS**: `'{"model_params":"tbd"}'`
+- **LLM_LAMBDA_MODEL_PARAMS**: `'{"model_params":"tbd"}'`
   - Use this setting to configure LLM specific parameter values so you can experiment and optimize your LLM behavior without making code changes.
 
 Here's an example of a minimal Lambda function for testing. Of course you need to extend it to actually invoke your LLM!
 ```
 def lambda_handler(event, context):
     print(event)
-    prompt_format = event["settings"]["QA_SUMMARY_LAMBDA_PROMPT_FORMAT"]
+    prompt_format = event["settings"]["LLM_LAMBDA_PROMPT_FORMAT"]
     prompt = prompt_format.replace("<CONTEXT>",event["context"]).replace("<QUESTION>",event["question"])
     generated_text = f"This is the prompt: {prompt}" # REPLACE WITH LLM INFERENCE API CALL
     return {
@@ -146,15 +134,15 @@ When QnABot stack is installed, open Content Designer **Settings** page:
 
 - **ALT_SEARCH_KENDRA_MAX_DOCUMENT_COUNT:** the number of passages from Kendra to provide in the input context for the LLM.
 
-*Scroll to the bottom of the settings page and observe the new QA_SUMMARY settings:*
+*Scroll to the bottom of the settings page and observe the new LLM settings:*
 
-- **QA_SUMMARY_SAGEMAKER_LLM_ENABLE:**  Set to TRUE or FALSE to enable or disable SAGEMAKER LLM QA summarization.. There are similar settings to enable/disable Qa Summary with SAGEMAKER CFAQ (`QA_SUMMARY_SAGEMAKER_CFAQ_ENABLE`) and LAMBDA (`QA_SUMMARY_LAMBDA_ENABLE`).  *Note: Disable/Enable the feature only if you initially installed the stack with it enabled.. If you enable it in Settings without having depoloyed it, QnABot will error.*
+- **LLM_SAGEMAKER_ENABLE:**  Set to TRUE or FALSE to enable or disable SAGEMAKER LLM QA summarization.. There are similar settings to enable/disable Qa Summary with LAMBDA (`LLM_LAMBDA_ENABLE`).  *Note: Disable/Enable the feature only if you initially installed the stack with it enabled.. If you enable it in Settings without having depoloyed it, QnABot will error.*
 
-- **QA_SUMMARY_SAGEMAKER_LLM_PROMPT_FORMAT:** Configure the prompt used for the SageMaker LLM (Flan-T5-XXL). There is a similar setting to configure the prompt when you provide your own LAMBDA (`QA_SUMMARY_LAMBDA_PROMPT_FORMAT`)- see example above.
+- **LLM_SAGEMAKER_PROMPT_FORMAT:** Configure the prompt used for the SageMaker LLM (Flan-T5-XXL). There is a similar setting to configure the prompt when you provide your own LAMBDA (`LLM_LAMBDA_PROMPT_FORMAT`)- see example above.
 
-- **QA_SUMMARY_SAGEMAKER_LLM_MODEL_PARAMS:** A JSON object representing LLM configuration parameters. There are similar settings for SAGEMAKER CFAQ (`QA_SUMMARY_SAGEMAKER_CFAQ_MODEL_PARAMS`) and LAMBDA (`QA_SUMMARY_LAMBDA_MODEL_PARAMS`).
+- **LLM_SAGEMAKER_MODEL_PARAMS:** A JSON object representing LLM configuration parameters. There are similar settings for LAMBDA (`LLM_LAMBDA_MODEL_PARAMS`).
 
-- **QA_SUMMARY_SAGEMAKER_LLM_PREFIX_MESSAGE:** A message that is displayed as a prefix to the generated text from the model. There are similar settings for the prefixes used for SAGEMAKER CFAQ (`QA_SUMMARY_SAGEMAKER_CFAQ_PREFIX_MESSAGE`) and LAMBDA (`QA_SUMMARY_LAMBDA_PREFIX_MESSAGE`)
+- **LLM_SAGEMAKER_PREFIX_MESSAGE:** A message that is displayed as a prefix to the generated text from the model. There are similar settings for the prefixes used for LAMBDA (`LLM_LAMBDA_PREFIX_MESSAGE`)
 
   
   

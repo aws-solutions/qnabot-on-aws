@@ -49,9 +49,10 @@ module.exports=Promise.resolve(require('../master')).then(function(base){
         'SagemakerInitialInstanceCount',
         'EmbeddingsLambdaArn',
         'EmbeddingsLambdaDimensions',
-        'QASummarizeApi',
-        'SagemakerQASummarizeInitialInstanceCount',
-        'QASummarizeLambdaArn'
+        'LLMApi',
+        'LLMSagemakerInitialInstanceCount',
+        'LLMLambdaArn',
+        'LLMThirdPartyApiKey'
     ]);
     base.Metadata = {
         'AWS::CloudFormation::Interface': {
@@ -106,12 +107,13 @@ module.exports=Promise.resolve(require('../master')).then(function(base){
                 },
                 {
                     'Label': {
-                        'default': 'QA Summarization with Large Language Model'
+                        'default': 'LLM integration for contextual followup and generative answers'
                     },
                     'Parameters': [
-                        'QASummarizeApi',
-                        'SagemakerQASummarizeInitialInstanceCount',
-                        'QASummarizeLambdaArn'                 
+                        'LLMApi',
+                        'LLMSagemakerInitialInstanceCount',
+                        'LLMLambdaArn',
+                        'LLMThirdPartyApiKey'         
                     ]
                 },
                 {
@@ -141,11 +143,13 @@ module.exports=Promise.resolve(require('../master')).then(function(base){
     base.Conditions.EmbeddingsSagemaker={'Fn::Equals':[{'Ref':'EmbeddingsApi'},'SAGEMAKER']}
     base.Conditions.EmbeddingsLambda={'Fn::Equals':[{'Ref':'EmbeddingsApi'},'LAMBDA']}
     base.Conditions.EmbeddingsLambdaArn={'Fn::Not': [{ 'Fn::Equals':[{'Ref':'EmbeddingsLambdaArn'},'']}]}
-    base.Conditions.QASummarizeEnable={'Fn::Not': [{ 'Fn::Equals':[{'Ref':'QASummarizeApi'},'DISABLED']}]}
-    base.Conditions.QASummarizeSagemakerLLM={'Fn::Or': [{'Fn::Equals':[{'Ref':'QASummarizeApi'},'SAGEMAKER LLM']}, {'Fn::Equals':[{'Ref':'QASummarizeApi'},'ALL']}]}
-    base.Conditions.QASummarizeSageMakerCFAQ={'Fn::Or': [{'Fn::Equals':[{'Ref':'QASummarizeApi'},'SAGEMAKER CFAQ']}, {'Fn::Equals':[{'Ref':'QASummarizeApi'},'ALL']}]}
-    base.Conditions.QASummarizeLambda={'Fn::Or': [{'Fn::Equals':[{'Ref':'QASummarizeApi'},'LAMBDA']}, {'Fn::Equals':[{'Ref':'QASummarizeApi'},'ALL']}]}
-    base.Conditions.QASummarizeLambdaArn={'Fn::Not': [{ 'Fn::Equals':[{'Ref':'QASummarizeLambdaArn'},'']}]}
+    base.Conditions.LLMEnable={'Fn::Not': [{ 'Fn::Equals':[{'Ref':'LLMApi'},'DISABLED']}]}
+    base.Conditions.LLMSagemaker={'Fn::Or': [{'Fn::Equals':[{'Ref':'LLMApi'},'SAGEMAKER LLM']}, {'Fn::Equals':[{'Ref':'LLMApi'},'ALL']}]}
+    base.Conditions.LLMLambda={'Fn::Or': [{'Fn::Equals':[{'Ref':'LLMApi'},'LAMBDA']}, {'Fn::Equals':[{'Ref':'LLMApi'},'ALL']}]}
+    base.Conditions.LLMLambdaArn={'Fn::Not': [{ 'Fn::Equals':[{'Ref':'LLMLambdaArn'},'']}]}
+    base.Conditions.LLMOpenAI={'Fn::Or': [{'Fn::Equals':[{'Ref':'LLMApi'},'OPENAI']}, {'Fn::Equals':[{'Ref':'LLMApi'},'ALL']}]}
+    base.Conditions.LLMAnthropicClaude={'Fn::Or': [{'Fn::Equals':[{'Ref':'LLMApi'},'ANTHROPIC-CLAUDE']}, {'Fn::Equals':[{'Ref':'LLMApi'},'ALL']}]}
+    base.Conditions.LLMThirdPartyApiKey={'Fn::Not': [{ 'Fn::Equals':[{'Ref':'LLMThirdPartyApiKey'},'']}]}
 
     var out=JSON.stringify(base);
 

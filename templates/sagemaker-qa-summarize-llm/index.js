@@ -267,7 +267,7 @@ module.exports={
         }
     },
     "Outputs": {
-        "QASummarizeSagemakerLLMEndpoint": {
+        "LLMSagemakerEndpoint": {
             "Value": {
                 "Fn::If": [
                     "SagemakerProvisioned",
@@ -276,7 +276,7 @@ module.exports={
                 ]
             }
         },
-        "QASummarizeSagemakerLLMEndpointArn": {
+        "LLMSagemakerEndpointArn": {
             "Value":{
                 "Fn::If": [
                     "SagemakerProvisioned",

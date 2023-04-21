@@ -37,6 +37,54 @@ module.exports = {
       "BuildDate": (new Date()).toISOString()
     }
   },
+  "LangchainTestLambda": {
+    "Type": "AWS::Lambda::Function",
+    "DependsOn": "FulfillmentCodeVersion",
+    "Properties": {
+      "Code": {
+        "S3Bucket": {"Ref": "BootstrapBucket"},
+        "S3Key": {"Fn::Sub": "${BootstrapPrefix}/lambda/fulfillment.zip"},
+        "S3ObjectVersion": {"Ref": "FulfillmentCodeVersion"}
+      },
+      "Handler": "langchaintest.handler",
+      "Layers":[
+        {"Ref":"AwsSdkLayerLambdaLayer"},
+        {"Ref":"CommonModulesLambdaLayer"},
+        {"Ref":"EsProxyLambdaLayer"},
+        {"Ref":"QnABotCommonLambdaLayer"}
+      ],
+      "MemorySize": 1408,
+      "Role": {"Fn::GetAtt": ["FulfillmentLambdaRole", "Arn"]},
+      "Runtime": "nodejs18.x",
+      "Timeout": 300,
+      "TracingConfig": {
+        "Mode": {
+          "Fn::If": [
+            "XRAYEnabled",
+            "Active",
+            "PassThrough"
+          ]
+        }
+      },
+      "Tags": [
+        {
+          "Key": "Type",
+          "Value": "Fulfillment"
+        }
+      ],
+      "VpcConfig" : {
+        "Fn::If": [
+          "VPCEnabled",
+          {
+            "SubnetIds": {"Ref": "VPCSubnetIdList"},
+            "SecurityGroupIds": {"Ref": "VPCSecurityGroupIdList"}
+          },
+          {"Ref" : "AWS::NoValue"}
+        ]
+      }
+    },
+    "Metadata": util.cfnNag(["W89", "W92"])
+  },
   "FulfillmentLambda": {
     "Type": "AWS::Lambda::Function",
     "DependsOn": "FulfillmentCodeVersion",
@@ -71,23 +119,16 @@ module.exports = {
           },
           EMBEDDINGS_SAGEMAKER_INSTANCECOUNT : { "Ref": "SagemakerInitialInstanceCount" },
           EMBEDDINGS_LAMBDA_ARN: { "Ref": "EmbeddingsLambdaArn" },
-          QA_SUMMARIZE_API: { "Ref": "QASummarizeApi" },
-          QA_SUMMARIZE_SAGEMAKER_ENDPOINT : {
+          LLM_API: { "Ref": "LLMApi" },
+          LLM_SAGEMAKERENDPOINT : {
             "Fn::If": [
-                "QASummarizeSagemakerLLM", 
-                {"Fn::GetAtt": ["SageMakerQASummarizeLLMStack", "Outputs.QASummarizeSagemakerLLMEndpoint"] }, 
+                "LLMSagemaker", 
+                {"Fn::GetAtt": ["SageMakerQASummarizeLLMStack", "Outputs.LLMSagemakerEndpoint"] }, 
                 ""
             ]
           },
-          CFAQ_SAGEMAKER_ENDPOINT : {
-            "Fn::If": [
-                "QASummarizeSageMakerCFAQ", 
-                {"Fn::GetAtt": ["SageMakerQASummarizeCFAQStack", "Outputs.CFAQSagemakerEndpoint"] }, 
-                ""
-            ]
-          },
-          QA_SUMMARIZE_SAGEMAKER_INSTANCECOUNT : { "Ref": "SagemakerQASummarizeInitialInstanceCount" }, // force new fn version when instance count changes
-          QA_SUMMARIZE_LAMBDA_ARN: { "Ref": "QASummarizeLambdaArn" },
+          LLM_SAGEMAKERINSTANCECOUNT : { "Ref": "LLMSagemakerInitialInstanceCount" }, // force new fn version when instance count changes
+          LLM_LAMBDA_ARN: { "Ref": "LLMLambdaArn" },
         }, examples, responsebots)
       },
       "Handler": "index.handler",
@@ -99,7 +140,7 @@ module.exports = {
       ],
       "MemorySize": 1408,
       "Role": {"Fn::GetAtt": ["FulfillmentLambdaRole", "Arn"]},
-      "Runtime": "nodejs16.x",
+      "Runtime": "nodejs18.x",
       "Timeout": 300,
       "TracingConfig": {
         "Mode": {
@@ -159,14 +200,14 @@ module.exports = {
           {"Ref": "EmbeddingsLambdaArn"}
         ],
         "QASummarizeTrigger": [
-          {"Ref": "QASummarizeApi"},
+          {"Ref": "LLMApi"},
           {"Ref": "SagemakerInitialInstanceCount"},
           {"Fn::If": [
-                "QASummarizeSagemakerLLM", 
-                {"Fn::GetAtt": ["SageMakerQASummarizeLLMStack", "Outputs.QASummarizeSagemakerLLMEndpoint"] }, 
+                "LLMSagemaker", 
+                {"Fn::GetAtt": ["SageMakerQASummarizeLLMStack", "Outputs.LLMSagemakerEndpoint"] }, 
                 ""
           ]},
-          {"Ref": "QASummarizeLambdaArn"}
+          {"Ref": "LLMLambdaArn"}
         ]
       }
     }
@@ -205,7 +246,7 @@ module.exports = {
             { "Fn::GetAtt": ["ESLoggingLambda", "Arn"] },
             { "Fn::GetAtt": ["ESQidLambda", "Arn"] },
             { "Fn::If": ["EmbeddingsLambdaArn", {"Ref":"EmbeddingsLambdaArn"}, {"Ref":"AWS::NoValue"}] },
-            { "Fn::If": ["QASummarizeLambdaArn", {"Ref":"QASummarizeLambdaArn"}, {"Ref":"AWS::NoValue"}] },
+            { "Fn::If": ["LLMLambdaArn", {"Ref":"LLMLambdaArn"}, {"Ref":"AWS::NoValue"}] },
           ].concat(require('../../examples/outputs').names
             .map(x => {
               return { "Fn::GetAtt": ["ExamplesStack", `Outputs.${x}`] }
@@ -347,9 +388,9 @@ module.exports = {
         },
         { 
           "Fn::If": [
-            "QASummarizeSagemakerLLM", 
+            "LLMSagemaker", 
             {
-              "PolicyName" : "QASummarizeSagemakerLLMInvokeEndpointAccess",
+              "PolicyName" : "LLMSagemakerInvokeEndpointAccess",
               "PolicyDocument" : {
               "Version": "2012-10-17",
                 "Statement": [
@@ -358,28 +399,7 @@ module.exports = {
                     "Action": [
                         "sagemaker:InvokeEndpoint"
                     ],
-                    "Resource": {"Fn::GetAtt": ["SageMakerQASummarizeLLMStack", "Outputs.QASummarizeSagemakerLLMEndpointArn"]}
-                  }
-                ]
-              }
-            },
-            {"Ref":"AWS::NoValue"}
-          ]
-        },
-        { 
-          "Fn::If": [
-            "QASummarizeSageMakerCFAQ", 
-            {
-              "PolicyName" : "CFAQSagemakerInvokeEndpointAccess",
-              "PolicyDocument" : {
-              "Version": "2012-10-17",
-                "Statement": [
-                  { 
-                    "Effect": "Allow",
-                    "Action": [
-                        "sagemaker:InvokeEndpoint"
-                    ],
-                    "Resource": {"Fn::GetAtt": ["SageMakerQASummarizeCFAQStack", "Outputs.CFAQSagemakerEndpointArn"]}
+                    "Resource": {"Fn::GetAtt": ["SageMakerQASummarizeLLMStack", "Outputs.LLMSagemakerEndpointArn"]}
                   }
                 ]
               }

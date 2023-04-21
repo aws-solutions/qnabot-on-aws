@@ -286,24 +286,30 @@ module.exports={
       "Description":"Optional: If EmbeddingsApi is LAMBDA, provide number of dimensions for embeddings returned by the EmbeddingsLambda function specified above.",
       "Default":4096
     },
-    'QASummarizeApi':{
+    'LLMApi':{
       'Type':'String',
-      'Description':'Optionally enable (experimental) QnABot passage aggregation and question answering. If set to SAGEMAKER LLM or CFAQ, a Sagemaker endpoint is automatically provisioned. To use a custom LAMBDA function, provide additional parameters below.',
-      'AllowedValues': ['DISABLED', 'SAGEMAKER LLM', 'SAGEMAKER CFAQ', 'LAMBDA', 'ALL'],
+      'Description':'Optionally enable (experimental) QnABot question disambiguation and generative question answering using an LLM. If set to SAGEMAKER LLM, a Sagemaker endpoint is automatically provisioned. To use a custom LAMBDA function, provide additional parameters below. To use a supported third party service, enter the API key below.',
+      'AllowedValues': ['DISABLED', 'SAGEMAKER LLM', 'LAMBDA', 'OPENAI', 'ANTHROPIC'],
       'Default':'DISABLED'
     },
-    'SagemakerQASummarizeInitialInstanceCount':{
+    'LLMSagemakerInitialInstanceCount':{
       'Type':'Number',
       'MinValue':1,
-      'Description':'Optional: If QASummarizeApi is SAGEMAKER, provide initial instance count. Serverless Inference is not currently available for the built-in QA Summarization model.',
+      'Description':'Optional: If LLMApi is SAGEMAKER, provide initial instance count. Serverless Inference is not currently available for the built-in LLM model.',
       'Default':1
     },
-    'QASummarizeLambdaArn':{
+    'LLMLambdaArn':{
       'Type':'String',
       'AllowedPattern': '^(|arn:aws:lambda:.*)$',
-      'Description':'Optional: If QASummarizeApi is LAMBDA, provide ARN for a Lambda function that takes JSON {"question":"string","context":"string"}, and returns JSON {"generated_text":"string"}',
+      'Description':'Optional: If LLMApi is LAMBDA, provide ARN for a Lambda function that takes JSON {"prompt":"string", "settings":{key:value,..}}, and returns JSON {"generated_text":"string"}',
       'Default':''
-    }
+    },
+    'LLMThirdPartyApiKey':{
+      'Type':'String',
+      'Description':'Optional: If LLMApi is ANTHROPIC or OPENAI, enter the provider API Key from . ** Data will leave your AWS account **',
+      'Default':'',
+      'NoEcho': true
+    },
   },
   "Conditions":{
     "Public":{"Fn::Equals":[{"Ref":"PublicOrPrivate"},"PUBLIC"]},
@@ -328,10 +334,12 @@ module.exports={
     "EmbeddingsSagemaker":{"Fn::Equals":[{"Ref":"EmbeddingsApi"},"SAGEMAKER"]},
     "EmbeddingsLambda":{"Fn::Equals":[{"Ref":"EmbeddingsApi"},"LAMBDA"]},
     "EmbeddingsLambdaArn":{"Fn::Not": [{ "Fn::Equals":[{"Ref":"EmbeddingsLambdaArn"},""]}]},
-    'QASummarizeEnable':{'Fn::Not': [{ 'Fn::Equals':[{'Ref':'QASummarizeApi'},'DISABLED']}]},
-    'QASummarizeSagemakerLLM': {'Fn::Or': [{'Fn::Equals':[{'Ref':'QASummarizeApi'},'SAGEMAKER LLM']}, {'Fn::Equals':[{'Ref':'QASummarizeApi'},'ALL']}]},
-    'QASummarizeSageMakerCFAQ':{'Fn::Or': [{'Fn::Equals':[{'Ref':'QASummarizeApi'},'SAGEMAKER CFAQ']}, {'Fn::Equals':[{'Ref':'QASummarizeApi'},'ALL']}]},
-    'QASummarizeLambda':{'Fn::Or': [{'Fn::Equals':[{'Ref':'QASummarizeApi'},'LAMBDA']}, {'Fn::Equals':[{'Ref':'QASummarizeApi'},'ALL']}]},
-    'QASummarizeLambdaArn':{'Fn::Not': [{ 'Fn::Equals':[{'Ref':'QASummarizeLambdaArn'},'']}]},
+    'LLMEnable':{'Fn::Not': [{ 'Fn::Equals':[{'Ref':'LLMApi'},'DISABLED']}]},
+    'LLMSagemaker': {'Fn::Or': [{'Fn::Equals':[{'Ref':'LLMApi'},'SAGEMAKER LLM']}, {'Fn::Equals':[{'Ref':'LLMApi'},'ALL']}]},
+    'LLMLambda':{'Fn::Or': [{'Fn::Equals':[{'Ref':'LLMApi'},'LAMBDA']}, {'Fn::Equals':[{'Ref':'LLMApi'},'ALL']}]},
+    'LLMLambdaArn':{'Fn::Not': [{ 'Fn::Equals':[{'Ref':'LLMLambdaArn'},'']}]},
+    'LLMOpenAI':{'Fn::Or': [{'Fn::Equals':[{'Ref':'LLMApi'},'OPENAI']}, {'Fn::Equals':[{'Ref':'LLMApi'},'ALL']}]},
+    'LLMAnthropic':{'Fn::Or': [{'Fn::Equals':[{'Ref':'LLMApi'},'ANTHROPIC-CLAUDE']}, {'Fn::Equals':[{'Ref':'LLMApi'},'ALL']}]},
+    'LLMThirdPartyApiKey':{'Fn::Not': [{ 'Fn::Equals':[{'Ref':'LLMThirdPartyApiKey'},'']}]},
   }
 }

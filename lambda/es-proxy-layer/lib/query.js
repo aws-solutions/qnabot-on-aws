@@ -8,8 +8,9 @@ var kendra_fallback = require('./kendra');
 const qnabot = require('qnabot/logging');
 const qna_settings = require('qnabot/settings');
 const open_es = require('./es_query');
-const qa_summarize = require('./qa_summarize');
+const llm = require('./llm');
 const {VM} = require('vm2');
+
 
 // use DEFAULT_SETTINGS_PARAM as random encryption key unique to this QnABot installation
 var key = _.get(process.env, 'DEFAULT_SETTINGS_PARAM', 'fdsjhf98fd98fjh9 du98fjfd 8ud8fjdf');
@@ -164,70 +165,36 @@ function prepend_qa_summary_answer(prefix, qa_answer, hit) {
     return hit;
 }
 
-function isQaSummaryEnabled(req) {
-    if (req._settings.QA_SUMMARY_LAMBDA_ENABLE && process.env.QA_SUMMARIZE_LAMBDA_ARN) {
-        return true;
-    }
-    if (req._settings.QA_SUMMARY_SAGEMAKER_LLM_ENABLE) {
-        return true;
-    }
-    if (req._settings.QA_SUMMARY_SAGEMAKER_CFAQ_ENABLE) {
-        return true;
-    }
-    return false;
-}
-
-async function run_qa_summary(req, hit) {
+async function run_llm_qa(req, hit) {
     const debug = req._settings.ENABLE_DEBUG_RESPONSES;
 
     const context = hit.a;
 
-    if (isQaSummaryEnabled(req) && req._settings.QA_SUMMARY_SHOW_CONTEXT_TEXT == false) {
+    if (req._settings.LLM_QA_ENABLE && req._settings.LLM_SHOW_CONTEXT_TEXT == false) {
         // remove context text.. hit will contain only the QA Summary output
         hit.a = "";
         hit.alt.markdown = "";
         hit.alt.ssml = "";
     } else {
-        hit.a = `Context: ${hit.a}`;
+        // Context provided only in markdown channel (excluded from chat memory) 
+        hit.a = "";
         hit.alt.markdown = `**Context**\n\n${hit.alt.markdown}`;
-        hit.alt.ssml = "";  // Context provided only in text channels     
+        hit.alt.ssml = "";     
     }
 
-    if (isQaSummaryEnabled(req) && hit.refMarkdown) {
+    if (req._settings.LLM_QA_ENABLE && hit.refMarkdown) {
         hit.alt.markdown = `${hit.alt.markdown}\n${hit.refMarkdown}`;
     }
 
-    // Optionally post-process answer with QA Summarize Lambda model
-    if (req._settings.QA_SUMMARY_LAMBDA_ENABLE && process.env.QA_SUMMARIZE_LAMBDA_ARN) {
+    // Optionally post-process answer with LLM QA model
+    if (req._settings.LLM_QA_ENABLE) {
         const start = Date.now();
-        const answer = await qa_summarize.get_qa_summary_lambda(req.question, context, req._settings);
+        const answer = await llm.get_qa(req, context);
         const end = Date.now();
         const timing = (debug) ? `(${end - start} ms)` : ''; 
-        const lambda_qa_prefix = `${req._settings.QA_SUMMARY_LAMBDA_PREFIX_MESSAGE} ${timing}` ;
-        hit = prepend_qa_summary_answer(lambda_qa_prefix, answer, hit);
-        hit.debug.push("QA Summary: Lambda");
-    }
-
-    // Optionally post-process answer with QA Summarize Sagemaker model
-    if (req._settings.QA_SUMMARY_SAGEMAKER_LLM_ENABLE) {
-        const start = Date.now();
-        const answer = await qa_summarize.get_qa_summary_sm(req.question, context, req._settings); 
-        const end = Date.now();
-        const timing = (debug) ? `(${end - start} ms)` : ''; 
-        const sagemaker_qa_prefix = `${req._settings.QA_SUMMARY_SAGEMAKER_LLM_PREFIX_MESSAGE} ${timing}` ;
-        hit = prepend_qa_summary_answer(sagemaker_qa_prefix, answer, hit);
-        hit.debug.push("QA Summary: SageMaker LLM");
-    }
-
-    // Optionally post-process answer with Lex CFAQ model
-    if (req._settings.QA_SUMMARY_SAGEMAKER_CFAQ_ENABLE) {
-        const start = Date.now();
-        const answer = await qa_summarize.get_qa_summary_cfaq(req.question, context, req._settings); 
-        const end = Date.now();
-        const timing = (debug) ? `(${end - start} ms)` : ''; 
-        const cfaq_qa_prefix = `${req._settings.QA_SUMMARY_SAGEMAKER_CFAQ_PREFIX_MESSAGE} ${timing}` ;
-        hit = prepend_qa_summary_answer(cfaq_qa_prefix, answer, hit);
-        hit.debug.push("QA Summary: CFAQ");
+        const llm_qa_prefix = `${req._settings.LLM_QA_PREFIX_MESSAGE} ${timing}` ;
+        hit = prepend_qa_summary_answer(llm_qa_prefix, answer, hit);
+        hit.debug.push("LLM: ", req._settings.LLM_API);
     }
 
     return hit;
@@ -336,7 +303,7 @@ async function get_hit(req, res) {
         }
         if (hit.type === 'text') {
             // Run any configured QA Summary options on the text passage result
-            hit = await run_qa_summary(req, hit);
+            hit = await run_llm_qa(req, hit);
         }
     } else if(query_params.kendra_indexes.length != 0) {
         qnabot.log('request entering kendra fallback ' + JSON.stringify(req));
@@ -345,7 +312,7 @@ async function get_hit(req, res) {
         if(hit &&  hit.hit_count != 0)
         {
             // Run any configured QA Summary LLM model options on Kendra results
-            hit = await run_qa_summary(req, hit);
+            hit = await run_llm_qa(req, hit);
 
             _.set(res,'answersource','Kendra Fallback');
             _.set(res,'session.qnabot_gotanswer',true) ;
@@ -634,10 +601,13 @@ async function processFulfillmentEvent(req,res) {
         [req, res, hit] = await evaluateConditionalChaining(req, res, fakeHit, elicitResponseChainingConfig);
     } else {
         // elicitResponse is not involved. obtain the next question to serve up to the user.
+        if (req._settings.LLM_DISABIGUATE_ENABLE) {
+            req = await llm.disambiguate_question(req);
+        }
         [req, res, hit] = await get_hit(req, res);
     }
     if (hit) {
-        // found a document in elastic search.
+        // found a result.
         var c=0;
         while (_.get(hit, 'conditionalChaining') && _.get(hit, 'elicitResponse.responsebot_hook', '') === '' ) {
             c++;
@@ -650,6 +620,15 @@ async function processFulfillmentEvent(req,res) {
                 break ;
             }
         }
+        // update conversation memory in userInfo (will be automatically persisted later to DynamoDB userinfo table)
+        // TODO 
+        // - add max history length, or summarize
+        // - add ability to clear history (maybe a QAUtility QID can do it)
+        const chatMemoryHistory = await llm.chatMemoryParse(_.get(req._userInfo, "chatMemoryHistory","[]"), req._settings.LLM_CHAT_HISTORY_MAX_MESSAGES);
+        chatMemoryHistory.addUserMessage(req.question);
+        chatMemoryHistory.addAIChatMessage(hit.a || "<empty>");
+        res._userInfo.chatMemoryHistory = await llm.chatMemorySerialise(chatMemoryHistory);
+
         // translate response
         var usrLang = 'en';
         const autotranslate = _.get(hit, 'autotranslate', true);
@@ -664,13 +643,31 @@ async function processFulfillmentEvent(req,res) {
             }
         }
         // prepend debug msg
-        qnabot.debug('pre-debug ' +JSON.stringify(req))
         if (_.get(req._settings, 'ENABLE_DEBUG_RESPONSES')) {
-            var msg = 'User Input: "' + req.question + '"';
-            let qid = _.get(req, 'qid');
-            if (usrLang != 'en') {
-                msg = 'User Input: "' + _.get(req,'_event.origQuestion','notdefined') + '", Translated to: "' + req.question + '"';
+            let original_input, translated_input, disambiguated_input;
+            if (req.llm_disambiguate) {
+                if (usrLang != 'en') {
+                    original_input = _.get(req,'_event.origQuestion','notdefined');
+                    translated_input = req.llm_disambiguate.orig;
+                    disambiguated_input = req.question;
+                    msg = `User Input: "${original_input}", Translated to: "${translated_input}", Disambiguated to: "${disambiguated_input}"`
+                } else {
+                    original_input = req.llm_disambiguate.orig;
+                    disambiguated_input = req.question;
+                    msg = `User Input: "${original_input}", Disambiguated to: "${disambiguated_input}"`;
+                }
+            } else {
+                if (usrLang != 'en') {
+                    original_input = _.get(req,'_event.origQuestion','notdefined');
+                    translated_input = req.question;
+                    msg = `User Input: "${original_input}", Translated to: "${translated_input}"`;
+                } else {
+                    original_input = req.question;
+                    msg = `User Input: "${original_input}"`;
+                }               
             }
+
+            let qid = _.get(req, 'qid');
             if (qid) {
                 msg += ', Lex Intent matched QID "' + qid + '"' ;
             }

@@ -81,18 +81,17 @@ var default_settings = {
     EMBEDDINGS_SCORE_THRESHOLD: 0.85, // If embedding similarity score is under threshold the match is rejected and QnABot reverts to scoring answer field (if ES_SCORE_ANSWER_FIELD is true).
     EMBEDDINGS_SCORE_ANSWER_THRESHOLD: 0.80, // Applies only when if ES_SCORE_ANSWER_FIELD is true. If embedding similarity score on answer field is under threshold the match is rejected.
     EMBEDDINGS_TEXT_PASSAGE_SCORE_THRESHOLD: 0.80, // Applies only when if ES_SCORE_TEXT_ITEM_PASSAGES is true. If embedding similarity score on text item field is under threshold the match is rejected.
-    QA_SUMMARY_SAGEMAKER_LLM_ENABLE: '${QA_SUMMARY_SAGEMAKER_LLM_ENABLE}', // Set to TRUE or FALSE to enable or disable SAGEMAKER summarization
-    QA_SUMMARY_SAGEMAKER_LLM_PROMPT_FORMAT: 'Answer the question based on the following context, or answer "I don\'t know".<br>Context: <CONTEXT><br>Question: <QUESTION><br>Answer:', 
-    QA_SUMMARY_SAGEMAKER_LLM_MODEL_PARAMS: '{"early_stopping":true,"length_penalty":2,"max_new_tokens":100,"temperature":0}',
-    QA_SUMMARY_SAGEMAKER_LLM_PREFIX_MESSAGE: 'QA Summary LLM::',
-    QA_SUMMARY_SAGEMAKER_CFAQ_ENABLE: '${QA_SUMMARY_SAGEMAKER_CFAQ_ENABLE}', // Set to TRUE or FALSE to enable or disable CFAQ summarization
-    QA_SUMMARY_SAGEMAKER_CFAQ_MODEL_PARAMS: '{"index_type":"kendra","index_id":"${DefaultKendraIndexId}","is_single":true,"is_rerank":true}',
-    QA_SUMMARY_SAGEMAKER_CFAQ_PREFIX_MESSAGE: 'QA Summary CFAQ:',
-    QA_SUMMARY_LAMBDA_ENABLE: '${QA_SUMMARY_LAMBDA_ENABLE}', // Set to TRUE or FALSE to enable or disable LAMBDA summarization
-    QA_SUMMARY_LAMBDA_PROMPT_FORMAT: '\n\nHuman: Answer the question based on the following text only, or say \"I dont know.\".\n<CONTEXT>\n<QUESTION>\n\nAssistant: ', 
-    QA_SUMMARY_LAMBDA_MODEL_PARAMS: '{}',
-    QA_SUMMARY_LAMBDA_PREFIX_MESSAGE: 'QA Summary Lambda:',
-    QA_SUMMARY_SHOW_CONTEXT_TEXT: "TRUE"
+    LLM_API: '${LLMApi}',
+    LLM_THIRD_PARTY_API_KEY: '${LLMThirdPartyApiKey}',
+    LLM_DISABIGUATE_ENABLE: '${LLM_DISABIGUATE_ENABLE}',
+    LLM_DISABIGUATE_PROMPT_TEMPLATE: 'Given the following conversation and a follow up input, if the follow up input is a question please rephrase that question to be a standalone question, otherwise return the input unchanged.\n\nChat History:\n{history}\n\nFollow Up Input: {input}\nStandalone question:', 
+    LLM_DISABIGUATE_MODEL_PARAMS: '{"temperature":0}',
+    LLM_QA_ENABLE: '${LLM_QA_ENABLE}', // Set to TRUE or FALSE to enable or disable SAGEMAKER summarization
+    LLM_QA_PROMPT_TEMPLATE: 'Use the following pieces of context to answer the question at the end. If you don\'t know the answer, just say that you don\'t know, don\'t try to make up an answer.\n\n{context}\n\nQuestion: {question}\nHelpful Answer:', 
+    LLM_QA_MODEL_PARAMS: '{"temperature":0}',
+    LLM_QA_PREFIX_MESSAGE: 'LLM Answer:',
+    LLM_QA_SHOW_CONTEXT_TEXT: "TRUE",
+    LLM_CHAT_HISTORY_MAX_MESSAGES: 50,
 };
 module.exports = {
     "DefaultUserPoolJwksUrl": {
@@ -113,9 +112,8 @@ module.exports = {
                 JSON.stringify(default_settings), {
                     "ES_USE_KEYWORD_FILTERS" : {"Fn::If": ["EmbeddingsEnable", "FALSE", "TRUE"]},
                     "EMBEDDINGS_ENABLE" : {"Fn::If": ["EmbeddingsEnable", "TRUE", "FALSE"]},
-                    "QA_SUMMARY_SAGEMAKER_LLM_ENABLE" : {"Fn::If": ["QASummarizeSagemakerLLM", "TRUE", "FALSE"]},
-                    "QA_SUMMARY_SAGEMAKER_CFAQ_ENABLE" : {"Fn::If": ["QASummarizeSageMakerCFAQ", "TRUE", "FALSE"]},
-                    "QA_SUMMARY_LAMBDA_ENABLE" : {"Fn::If": ["QASummarizeLambda", "TRUE", "FALSE"]},
+                    "LLM_DISABIGUATE_ENABLE" : {"Fn::If": ["LLMEnable", "TRUE", "FALSE"]},
+                    "LLM_QA_ENABLE" : {"Fn::If": ["LLMEnable", "TRUE", "FALSE"]},
                 }
             ]} 
         }
