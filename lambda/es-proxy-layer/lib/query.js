@@ -154,7 +154,7 @@ function merge_next(hit1, hit2) {
     return hit2;
 }
 
-function prepend_qa_summary_answer(prefix, qa_answer, hit) {
+function prepend_llm_qa_answer(prefix, qa_answer, hit) {
     // prepend sm answer to plaintext and markdown
     prefix = prefix.trim();
     hit.a = `${prefix} \n\n${qa_answer} \n\n${hit.a}`;
@@ -192,11 +192,18 @@ async function run_llm_qa(req, hit) {
         const answer = await llm.get_qa(req, context);
         const end = Date.now();
         const timing = (debug) ? `(${end - start} ms)` : ''; 
-        const llm_qa_prefix = `${req._settings.LLM_QA_PREFIX_MESSAGE} ${timing}` ;
-        hit = prepend_qa_summary_answer(llm_qa_prefix, answer, hit);
-        hit.debug.push("LLM: ", req._settings.LLM_API);
+        // check for +'don't know' response from LLM and convert to no_hits behavior
+        const no_hits_regex = req._settings.LLM_QA_NO_HITS_REGEX || `Sorry, I don't know`;
+        const no_hits_res = answer.search(new RegExp(no_hits_regex, 'g'));
+        if (no_hits_res < 0) {
+            const llm_qa_prefix = `${req._settings.LLM_QA_PREFIX_MESSAGE} ${timing}` ;
+            hit = prepend_llm_qa_answer(llm_qa_prefix, answer, hit);
+            hit.debug.push("LLM: ", req._settings.LLM_API);
+        } else {
+            qnabot.log(`No Hits pattern returned by LLM: ${no_hits_regex}`);
+            hit = undefined;
+        }
     }
-
     return hit;
 }
 
@@ -313,12 +320,13 @@ async function get_hit(req, res) {
         {
             // Run any configured QA Summary LLM model options on Kendra results
             hit = await run_llm_qa(req, hit);
-
-            _.set(res,'answersource','Kendra Fallback');
-            _.set(res,'session.qnabot_gotanswer',true) ;
-            _.set(res,'message', hit.a);
-            _.set(req,'debug',hit.debug)
-            res['got_hits'] = 1;
+            if (hit) {
+                _.set(res,'answersource','Kendra Fallback');
+                _.set(res,'session.qnabot_gotanswer',true) ;
+                _.set(res,'message', hit.a);
+                _.set(req,'debug',hit.debug)
+                res['got_hits'] = 1;
+            }
         }
     }
     if(!hit)
@@ -622,12 +630,11 @@ async function processFulfillmentEvent(req,res) {
         }
         // update conversation memory in userInfo (will be automatically persisted later to DynamoDB userinfo table)
         // TODO 
-        // - add max history length, or summarize
         // - add ability to clear history (maybe a QAUtility QID can do it)
         const chatMemoryHistory = await llm.chatMemoryParse(_.get(req._userInfo, "chatMemoryHistory","[]"), req._settings.LLM_CHAT_HISTORY_MAX_MESSAGES);
         chatMemoryHistory.addUserMessage(req.question);
         chatMemoryHistory.addAIChatMessage(hit.a || "<empty>");
-        res._userInfo.chatMemoryHistory = await llm.chatMemorySerialise(chatMemoryHistory);
+        res._userInfo.chatMemoryHistory = await llm.chatMemorySerialise(chatMemoryHistory, req._settings.LLM_CHAT_HISTORY_MAX_MESSAGES);
 
         // translate response
         var usrLang = 'en';

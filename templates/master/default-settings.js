@@ -84,14 +84,15 @@ var default_settings = {
     LLM_API: '${LLMApi}',
     LLM_THIRD_PARTY_API_KEY: '${LLMThirdPartyApiKey}',
     LLM_DISABIGUATE_ENABLE: '${LLM_DISABIGUATE_ENABLE}',
-    LLM_DISABIGUATE_PROMPT_TEMPLATE: 'Given the following conversation and a follow up input, if the follow up input is a question please rephrase that question to be a standalone question, otherwise return the input unchanged.\n\nChat History:\n{history}\n\nFollow Up Input: {input}\nStandalone question:', 
+    LLM_DISABIGUATE_PROMPT_TEMPLATE: 'Human: Given the following conversation and a follow up input, if the follow up input is a question please rephrase that question to be a standalone question, otherwise return the input unchanged.<br><br>Chat History:<br?{history}<br><br>Follow Up Input: {input}<br>Assistant:', 
     LLM_DISABIGUATE_MODEL_PARAMS: '{"temperature":0}',
     LLM_QA_ENABLE: '${LLM_QA_ENABLE}', // Set to TRUE or FALSE to enable or disable SAGEMAKER summarization
-    LLM_QA_PROMPT_TEMPLATE: 'Use the following pieces of context to answer the question at the end. If you don\'t know the answer, just say that you don\'t know, don\'t try to make up an answer.\n\n{context}\n\nQuestion: {question}\nHelpful Answer:', 
+    LLM_QA_PROMPT_TEMPLATE: `Human: Carefully read the following pieces of context labelled 'Context:' and then answer the question at the end labelled 'Question:'. If the answer cannot be determined from the context, reply saying "Sorry, I don't know". Do not try to make up an answer.<br><br>Context:{context}<br><br>Question: {input}<br>Assistant:`, 
+    LLM_QA_NO_HITS_REGEX: `Sorry, I don't know //DISABLED - remove to enable`,
     LLM_QA_MODEL_PARAMS: '{"temperature":0}',
     LLM_QA_PREFIX_MESSAGE: 'LLM Answer:',
     LLM_QA_SHOW_CONTEXT_TEXT: "TRUE",
-    LLM_CHAT_HISTORY_MAX_MESSAGES: 50,
+    LLM_CHAT_HISTORY_MAX_MESSAGES: 20,
 };
 module.exports = {
     "DefaultUserPoolJwksUrl": {

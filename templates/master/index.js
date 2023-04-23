@@ -288,8 +288,8 @@ module.exports={
     },
     'LLMApi':{
       'Type':'String',
-      'Description':'Optionally enable (experimental) QnABot question disambiguation and generative question answering using an LLM. If set to SAGEMAKER LLM, a Sagemaker endpoint is automatically provisioned. To use a custom LAMBDA function, provide additional parameters below. To use a supported third party service, enter the API key below.',
-      'AllowedValues': ['DISABLED', 'SAGEMAKER LLM', 'LAMBDA', 'OPENAI', 'ANTHROPIC'],
+      'Description':'Optionally enable (experimental) QnABot question disambiguation and generative question answering using an LLM. If set to SAGEMAKER, a Sagemaker endpoint is automatically provisioned. To use a custom LAMBDA function, provide additional parameters below. To use a supported third party service, enter the API key below.',
+      'AllowedValues': ['DISABLED', 'SAGEMAKER', 'LAMBDA', 'OPENAI', 'ANTHROPIC'],
       'Default':'DISABLED'
     },
     'LLMSagemakerInitialInstanceCount':{
@@ -335,7 +335,7 @@ module.exports={
     "EmbeddingsLambda":{"Fn::Equals":[{"Ref":"EmbeddingsApi"},"LAMBDA"]},
     "EmbeddingsLambdaArn":{"Fn::Not": [{ "Fn::Equals":[{"Ref":"EmbeddingsLambdaArn"},""]}]},
     'LLMEnable':{'Fn::Not': [{ 'Fn::Equals':[{'Ref':'LLMApi'},'DISABLED']}]},
-    'LLMSagemaker': {'Fn::Or': [{'Fn::Equals':[{'Ref':'LLMApi'},'SAGEMAKER LLM']}, {'Fn::Equals':[{'Ref':'LLMApi'},'ALL']}]},
+    'LLMSagemaker': {'Fn::Or': [{'Fn::Equals':[{'Ref':'LLMApi'},'SAGEMAKER']}, {'Fn::Equals':[{'Ref':'LLMApi'},'ALL']}]},
     'LLMLambda':{'Fn::Or': [{'Fn::Equals':[{'Ref':'LLMApi'},'LAMBDA']}, {'Fn::Equals':[{'Ref':'LLMApi'},'ALL']}]},
     'LLMLambdaArn':{'Fn::Not': [{ 'Fn::Equals':[{'Ref':'LLMLambdaArn'},'']}]},
     'LLMOpenAI':{'Fn::Or': [{'Fn::Equals':[{'Ref':'LLMApi'},'OPENAI']}, {'Fn::Equals':[{'Ref':'LLMApi'},'ALL']}]},
