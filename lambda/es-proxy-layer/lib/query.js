@@ -598,6 +598,11 @@ function update_res_with_hit(req, res, hit) {
 
 async function processFulfillmentEvent(req,res) {
     qnabot.log('Process Fulfillment Code Hook event');
+    // reset chatMemoryHistory if this is a new session...
+    if (_.get(res,'session.qnabotcontext.previous') == undefined) {
+        qnabot.log("New chat session - qnabotcontext is empty. Reset previous chatMemoryHistory"); 
+        req._userInfo.chatMessageHistory = "[]";
+    }
     const elicitResponseChainingConfig = _.get(res, 'session.qnabotcontext.elicitResponse.chainingConfig', undefined);
     const elicitResponseProgress = _.get(res, 'session.qnabotcontext.elicitResponse.progress', undefined);
     let hit = undefined;
@@ -629,12 +634,10 @@ async function processFulfillmentEvent(req,res) {
             }
         }
         // update conversation memory in userInfo (will be automatically persisted later to DynamoDB userinfo table)
-        // TODO 
-        // - add ability to clear history (maybe a QAUtility QID can do it)
-        const chatMemoryHistory = await llm.chatMemoryParse(_.get(req._userInfo, "chatMemoryHistory","[]"), req._settings.LLM_CHAT_HISTORY_MAX_MESSAGES);
-        chatMemoryHistory.addUserMessage(req.question);
-        chatMemoryHistory.addAIChatMessage(hit.a || "<empty>");
-        res._userInfo.chatMemoryHistory = await llm.chatMemorySerialise(chatMemoryHistory, req._settings.LLM_CHAT_HISTORY_MAX_MESSAGES);
+        const chatMessageHistory = await llm.chatMemoryParse(_.get(req._userInfo, "chatMessageHistory","[]"), req._settings.LLM_CHAT_HISTORY_MAX_MESSAGES);
+        chatMessageHistory.addUserMessage(req.question);
+        chatMessageHistory.addAIChatMessage(hit.a || "<empty>");
+        res._userInfo.chatMessageHistory = await llm.chatMemorySerialise(chatMessageHistory, req._settings.LLM_CHAT_HISTORY_MAX_MESSAGES);
 
         // translate response
         var usrLang = 'en';

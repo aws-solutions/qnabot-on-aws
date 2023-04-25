@@ -65,8 +65,8 @@ async function get_qa_langchain(req, promptTemplateStr, context) {
 async function disambiguate_question_langchain(req, promptTemplateStr) {
     let response;
     try {
-        const chatMemoryHistory = await chatMemoryParse(_.get(req._userInfo, "chatMemoryHistory","[]"), req._settings.LLM_CHAT_HISTORY_MAX_MESSAGES);
-        const memory = new BufferMemory({ chatHistory: chatMemoryHistory });
+        const chatMessageHistory = await chatMemoryParse(_.get(req._userInfo, "chatMessageHistory","[]"), req._settings.LLM_CHAT_HISTORY_MAX_MESSAGES);
+        const memory = new BufferMemory({ chatHistory: chatMessageHistory });
         const promptTemplate = new PromptTemplate({
             template: promptTemplateStr,
             inputVariables: ["history", "input"],
@@ -116,8 +116,8 @@ async function invoke_sagemaker(prompt, model_params) {
 async function disambiguate_question_sagemaker(req, promptTemplateStr) {
     const model_params = JSON.parse(req._settings.LLM_DISABIGUATE_MODEL_PARAMS || default_params_stg);
     // parse and serialise chat history to manage max messages
-    const chatMemoryHistory = await chatMemoryParse(_.get(req._userInfo, "chatMemoryHistory","[]"), req._settings.LLM_CHAT_HISTORY_MAX_MESSAGES);
-    const history = await chatMemorySerialise(chatMemoryHistory, req._settings.LLM_CHAT_HISTORY_MAX_MESSAGES);
+    const chatMessageHistory = await chatMemoryParse(_.get(req._userInfo, "chatMessageHistory","[]"), req._settings.LLM_CHAT_HISTORY_MAX_MESSAGES);
+    const history = await chatMemorySerialise(chatMessageHistory, req._settings.LLM_CHAT_HISTORY_MAX_MESSAGES);
     // format prompt and invoke model
     const prompt = promptTemplateStr.replace(/{history}/mg, history).replace(/{input}/mg, req.question);
     return invoke_sagemaker(prompt, model_params);
@@ -157,8 +157,8 @@ async function invoke_lambda(prompt, model_params) {
 async function disambiguate_question_lambda(req, promptTemplateStr) {
     const model_params = JSON.parse(req._settings.LLM_DISABIGUATE_MODEL_PARAMS || default_params_stg);
     // parse and serialise chat history to manage max messages
-    const chatMemoryHistory = await chatMemoryParse(_.get(req._userInfo, "chatMemoryHistory","[]"), req._settings.LLM_CHAT_HISTORY_MAX_MESSAGES);
-    const history = await chatMemorySerialise(chatMemoryHistory, req._settings.LLM_CHAT_HISTORY_MAX_MESSAGES);
+    const chatMessageHistory = await chatMemoryParse(_.get(req._userInfo, "chatMessageHistory","[]"), req._settings.LLM_CHAT_HISTORY_MAX_MESSAGES);
+    const history = await chatMemorySerialise(chatMessageHistory, req._settings.LLM_CHAT_HISTORY_MAX_MESSAGES);
     // format prompt and invoke model
     const prompt = promptTemplateStr.replace(/{history}/mg, history).replace(/{input}/mg, req.question);
     return invoke_lambda(prompt, model_params);
