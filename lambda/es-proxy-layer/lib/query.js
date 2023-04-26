@@ -192,7 +192,7 @@ async function run_llm_qa(req, hit) {
         const answer = await llm.get_qa(req, context);
         const end = Date.now();
         const timing = (debug) ? `(${end - start} ms)` : ''; 
-        // check for +'don't know' response from LLM and convert to no_hits behavior
+        // check for 'don't know' response from LLM and convert to no_hits behavior if pattern matches
         const no_hits_regex = req._settings.LLM_QA_NO_HITS_REGEX || `Sorry, I don't know`;
         const no_hits_res = answer.search(new RegExp(no_hits_regex, 'g'));
         if (no_hits_res < 0) {
@@ -614,8 +614,8 @@ async function processFulfillmentEvent(req,res) {
         [req, res, hit] = await evaluateConditionalChaining(req, res, fakeHit, elicitResponseChainingConfig);
     } else {
         // elicitResponse is not involved. obtain the next question to serve up to the user.
-        if (req._settings.LLM_DISABIGUATE_ENABLE) {
-            req = await llm.disambiguate_question(req);
+        if (req._settings.LLM_GENERATE_QUERY_ENABLE) {
+            req = await llm.generate_query(req);
         }
         [req, res, hit] = await get_hit(req, res);
     }
@@ -635,8 +635,11 @@ async function processFulfillmentEvent(req,res) {
         }
         // update conversation memory in userInfo (will be automatically persisted later to DynamoDB userinfo table)
         const chatMessageHistory = await llm.chatMemoryParse(_.get(req._userInfo, "chatMessageHistory","[]"), req._settings.LLM_CHAT_HISTORY_MAX_MESSAGES);
-        chatMessageHistory.addUserMessage(req.question);
-        chatMessageHistory.addAIChatMessage(hit.a || "<empty>");
+        chatMessageHistory.addUserMessage(llm.get_question(req));
+        let aiMessage = hit.a || "<empty>";
+        // remove prefix message and timing debug info, if any, before storing message
+        aiMessage = aiMessage.replace(new RegExp(req._settings.LLM_QA_PREFIX_MESSAGE + "\\s*(\\(.*?\\))*", 'g'), '').trim();
+        chatMessageHistory.addAIChatMessage(aiMessage || "<empty>");
         res._userInfo.chatMessageHistory = await llm.chatMemorySerialise(chatMessageHistory, req._settings.LLM_CHAT_HISTORY_MAX_MESSAGES);
 
         // translate response
@@ -654,17 +657,17 @@ async function processFulfillmentEvent(req,res) {
         }
         // prepend debug msg
         if (_.get(req._settings, 'ENABLE_DEBUG_RESPONSES')) {
-            let original_input, translated_input, disambiguated_input;
-            if (req.llm_disambiguate) {
+            let original_input, translated_input, llm_generated_query;
+            if (req.llm_generated_query) {
                 if (usrLang != 'en') {
                     original_input = _.get(req,'_event.origQuestion','notdefined');
-                    translated_input = req.llm_disambiguate.orig;
-                    disambiguated_input = req.question;
-                    msg = `User Input: "${original_input}", Translated to: "${translated_input}", Disambiguated to: "${disambiguated_input}"`
+                    translated_input = req.llm_generated_query.orig;
+                    llm_generated_query = req.llm_generated_query.result;
+                    msg = `User Input: "${original_input}", Translated to: "${translated_input}", LLM generated query: "${llm_generated_query}"`
                 } else {
-                    original_input = req.llm_disambiguate.orig;
-                    disambiguated_input = req.question;
-                    msg = `User Input: "${original_input}", Disambiguated to: "${disambiguated_input}"`;
+                    original_input = req.llm_generated_query.orig;
+                    llm_generated_query = req.llm_generated_query.result;
+                    msg = `User Input: "${original_input}", LLM generated query: "${llm_generated_query}"`;
                 }
             } else {
                 if (usrLang != 'en') {

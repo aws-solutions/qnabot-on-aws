@@ -83,16 +83,15 @@ var default_settings = {
     EMBEDDINGS_TEXT_PASSAGE_SCORE_THRESHOLD: 0.80, // Applies only when if ES_SCORE_TEXT_ITEM_PASSAGES is true. If embedding similarity score on text item field is under threshold the match is rejected.
     LLM_API: '${LLMApi}',
     LLM_THIRD_PARTY_API_KEY: '${LLMThirdPartyApiKey}',
-    LLM_DISABIGUATE_ENABLE: '${LLM_DISABIGUATE_ENABLE}',
-    LLM_DISABIGUATE_PROMPT_TEMPLATE: 'Human: Given the following conversation and a follow up input, if the follow up input is a question please rephrase that question to be a standalone question, otherwise return the input unchanged.<br><br>Chat History:<br?{history}<br><br>Follow Up Input: {input}<br>Assistant:', 
-    LLM_DISABIGUATE_MODEL_PARAMS: '{"temperature":0}',
+    LLM_GENERATE_QUERY_ENABLE: '${LLM_GENERATE_QUERY_ENABLE}',
+    LLM_GENERATE_QUERY_PROMPT_TEMPLATE: '<br><br>Human: Given the following conversation and a follow up input, if the follow up input is a question please rephrase that question to be a standalone question, otherwise return the input unchanged.<br><br>Chat History:<br?{history}<br><br>Follow Up Input: {input}<br><br>Assistant:', 
+    LLM_GENERATE_QUERY_MODEL_PARAMS: '{"temperature":0}',
     LLM_QA_ENABLE: '${LLM_QA_ENABLE}', // Set to TRUE or FALSE to enable or disable SAGEMAKER summarization
-    LLM_QA_PROMPT_TEMPLATE: `Human: Carefully read the following pieces of context labelled 'Context:' and then answer the question at the end labelled 'Question:'. If the answer cannot be determined from the context, reply saying "Sorry, I don't know". Do not try to make up an answer.<br><br>Context:{context}<br><br>Question: {input}<br>Assistant:`, 
-    LLM_QA_NO_HITS_REGEX: `Sorry, I don't know //DISABLED - remove to enable`,
+    LLM_QA_PROMPT_TEMPLATE: `<br><br>Human: You are an AI chatbot. Carefully read the following context and conversation history and then provide a short answer to question at the end. If the answer cannot be determined from the history or the context, reply saying "Sorry, I don't know". <br><br>Context: {context}<br><br>History: <br>{history}<br><br>Human: {input}<br><br>Assistant:`,
     LLM_QA_MODEL_PARAMS: '{"temperature":0}',
     LLM_QA_PREFIX_MESSAGE: 'LLM Answer:',
     LLM_QA_SHOW_CONTEXT_TEXT: "TRUE",
-    LLM_CHAT_HISTORY_MAX_MESSAGES: 20,
+    LLM_CHAT_HISTORY_MAX_MESSAGES: 5,
 };
 module.exports = {
     "DefaultUserPoolJwksUrl": {
@@ -113,7 +112,7 @@ module.exports = {
                 JSON.stringify(default_settings), {
                     "ES_USE_KEYWORD_FILTERS" : {"Fn::If": ["EmbeddingsEnable", "FALSE", "TRUE"]},
                     "EMBEDDINGS_ENABLE" : {"Fn::If": ["EmbeddingsEnable", "TRUE", "FALSE"]},
-                    "LLM_DISABIGUATE_ENABLE" : {"Fn::If": ["LLMEnable", "TRUE", "FALSE"]},
+                    "LLM_GENERATE_QUERY_ENABLE" : {"Fn::If": ["LLMEnable", "TRUE", "FALSE"]},
                     "LLM_QA_ENABLE" : {"Fn::If": ["LLMEnable", "TRUE", "FALSE"]},
                 }
             ]} 

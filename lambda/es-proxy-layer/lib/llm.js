@@ -37,14 +37,19 @@ function get_llm_model(api, params_stg, api_key) {
 async function get_qa_langchain(req, promptTemplateStr, context) {
     let response;
     try {
+        const chatMessageHistory = await chatMemoryParse(_.get(req._userInfo, "chatMessageHistory","[]"), req._settings.LLM_CHAT_HISTORY_MAX_MESSAGES);
+        const memory = new BufferMemory({ chatHistory: chatMessageHistory });
+        const history = (await memory.loadMemoryVariables()).history;
+        const input = get_question(req);
         const promptTemplate = new PromptTemplate({
             template: promptTemplateStr,
-            inputVariables: ["context", "input"],
+            inputVariables: ["history", "context", "input"],
         });
         // compute and log prompt value - for prompt troubleshooting only
         const prompt = await promptTemplate.format({
+            history: history,
             context: context,
-            input: req.question,
+            input: input,
         });
         qnabot.log(`Prompt: \nPROMPT==>\n${prompt}\n<==PROMPT`);
         // end logging
@@ -54,7 +59,7 @@ async function get_qa_langchain(req, promptTemplateStr, context) {
             req._settings.LLM_THIRD_PARTY_API_KEY
         );
         const chain = new LLMChain({ llm: model, prompt: promptTemplate});
-        const llm_res = await chain.call({ context: context, input: req.question });
+        const llm_res = await chain.call({ history: history, context: context, input: input });
         response = llm_res.text.trim();
     } catch (e) {
         qnabot.log("EXCEPTION:", e.stack);
@@ -62,7 +67,7 @@ async function get_qa_langchain(req, promptTemplateStr, context) {
     }
     return response;
 }
-async function disambiguate_question_langchain(req, promptTemplateStr) {
+async function generate_query_langchain(req, promptTemplateStr) {
     let response;
     try {
         const chatMessageHistory = await chatMemoryParse(_.get(req._userInfo, "chatMessageHistory","[]"), req._settings.LLM_CHAT_HISTORY_MAX_MESSAGES);
@@ -71,9 +76,16 @@ async function disambiguate_question_langchain(req, promptTemplateStr) {
             template: promptTemplateStr,
             inputVariables: ["history", "input"],
         });
+        // compute and log prompt value - for prompt troubleshooting only
+        const prompt = await promptTemplate.format({
+            history: (await memory.loadMemoryVariables()).history,
+            input: req.question,
+          });
+        qnabot.log(`Prompt: \nPROMPT==>\n${prompt}\n<==PROMPT`);
+        // end logging
         const model = get_llm_model(
             req._settings.LLM_API,
-            req._settings.LLM_DISABIGUATE_MODEL_PARAMS,
+            req._settings.LLM_GENERATE_QUERY_MODEL_PARAMS,
             req._settings.LLM_THIRD_PARTY_API_KEY
         );
         const chain = new ConversationChain({ llm: model, memory: memory, prompt: promptTemplate });
@@ -113,8 +125,8 @@ async function invoke_sagemaker(prompt, model_params) {
     }
     return response;
 }
-async function disambiguate_question_sagemaker(req, promptTemplateStr) {
-    const model_params = JSON.parse(req._settings.LLM_DISABIGUATE_MODEL_PARAMS || default_params_stg);
+async function generate_query_sagemaker(req, promptTemplateStr) {
+    const model_params = JSON.parse(req._settings.LLM_GENERATE_QUERY_MODEL_PARAMS || default_params_stg);
     // parse and serialise chat history to manage max messages
     const chatMessageHistory = await chatMemoryParse(_.get(req._userInfo, "chatMessageHistory","[]"), req._settings.LLM_CHAT_HISTORY_MAX_MESSAGES);
     const history = await chatMemorySerialise(chatMessageHistory, req._settings.LLM_CHAT_HISTORY_MAX_MESSAGES);
@@ -124,7 +136,10 @@ async function disambiguate_question_sagemaker(req, promptTemplateStr) {
 }
 async function get_qa_sagemaker(req, promptTemplateStr, context) {
     const model_params = JSON.parse(req._settings.LLM_QA_MODEL_PARAMS || default_params_stg);
-    const prompt = promptTemplateStr.replace(/{context}/mg, context).replace(/{input}/mg, req.question);
+    // parse and serialise chat history to manage max messages
+    const chatMessageHistory = await chatMemoryParse(_.get(req._userInfo, "chatMessageHistory","[]"), req._settings.LLM_CHAT_HISTORY_MAX_MESSAGES);
+    const history = await chatMemorySerialise(chatMessageHistory, req._settings.LLM_CHAT_HISTORY_MAX_MESSAGES);
+    const prompt = promptTemplateStr.replace(/{history}/mg, history).replace(/{context}/mg, context).replace(/{input}/mg, get_question(req));
     return invoke_sagemaker(prompt, model_params);
 }
 
@@ -154,8 +169,8 @@ async function invoke_lambda(prompt, model_params) {
     }
     return response;
 }
-async function disambiguate_question_lambda(req, promptTemplateStr) {
-    const model_params = JSON.parse(req._settings.LLM_DISABIGUATE_MODEL_PARAMS || default_params_stg);
+async function generate_query_lambda(req, promptTemplateStr) {
+    const model_params = JSON.parse(req._settings.LLM_GENERATE_QUERY_MODEL_PARAMS || default_params_stg);
     // parse and serialise chat history to manage max messages
     const chatMessageHistory = await chatMemoryParse(_.get(req._userInfo, "chatMessageHistory","[]"), req._settings.LLM_CHAT_HISTORY_MAX_MESSAGES);
     const history = await chatMemorySerialise(chatMessageHistory, req._settings.LLM_CHAT_HISTORY_MAX_MESSAGES);
@@ -165,7 +180,10 @@ async function disambiguate_question_lambda(req, promptTemplateStr) {
 }
 async function get_qa_lambda(req, promptTemplateStr, context) {
     const model_params = JSON.parse(req._settings.LLM_QA_MODEL_PARAMS || default_params_stg);
-    const prompt = promptTemplateStr.replace(/{context}/mg, context).replace(/{input}/mg, req.question);
+    // parse and serialise chat history to manage max messages
+    const chatMessageHistory = await chatMemoryParse(_.get(req._userInfo, "chatMessageHistory","[]"), req._settings.LLM_CHAT_HISTORY_MAX_MESSAGES);
+    const history = await chatMemorySerialise(chatMessageHistory, req._settings.LLM_CHAT_HISTORY_MAX_MESSAGES);
+    const prompt = promptTemplateStr.replace(/{history}/mg, history).replace(/{context}/mg, context).replace(/{input}/mg, get_question(req));
     return invoke_lambda(prompt, model_params);
 }
 
@@ -231,35 +249,40 @@ async function chatMemoryParse(json_messages, max=50) {
     return chatMessageHistory;
   }
 
+  // return the question to use in the QA prompt
+function get_question(req) {
+    const question = _.get(req,"llm_generated_query.orig", req.question);
+    return question;
+}
 
-// disambiguate_question: re-write utterance using chat history if needed, to make it standalone from prior conversation context.
-const disambiguate_question = async function disambiguate_question(req) {
-    qnabot.log(`Use LLM (${req._settings.LLM_API}) to convert a follow up question to a standalone question containing required context from chat history`);
+// generate_query: re-write utterance using chat history if needed, to make it standalone from prior conversation context.
+const generate_query = async function generate_query(req) {
+    qnabot.log(`Use LLM (${req._settings.LLM_API}) to convert a follow up question to a standalone search query containing required context from chat history`);
     const origQuestion = req.question;
     // TODO - Can this also tell me if a query is needed, or if the LLM/chatHistory already has the answer
-    let promptTemplateStr = req._settings.LLM_DISABIGUATE_PROMPT_TEMPLATE || `Given the following conversation and a follow up input, if the follow up input is a question please rephrase that question to be a standalone question, otherwise return the input unchanged.<br><br>Chat History:<br>{history}<br><br>Follow Up Input: {input}<br>Standalone question:`;
+    let promptTemplateStr = req._settings.LLM_GENERATE_QUERY_PROMPT_TEMPLATE || `<br><br>Human: Given the following conversation and a follow up input, if the follow up input is a question please rephrase that question to be a standalone question, otherwise return the input unchanged.<br><br>Chat History:<br?{history}<br><br>Follow Up Input: {input}<br><br>Assistant:`;
     promptTemplateStr = promptTemplateStr.replace(/<br>/mg, "\n");
-    let newQuestion;
+    let newQuery;
     if (req._settings.LLM_API == "SAGEMAKER") {
         // TODO refactor when langchainJS supports Sagemaker
-        newQuestion = await disambiguate_question_sagemaker(req, promptTemplateStr);
+        newQuery = await generate_query_sagemaker(req, promptTemplateStr);
     } else if (req._settings.LLM_API == "LAMBDA") {
-        newQuestion = await disambiguate_question_lambda(req, promptTemplateStr);
+        newQuery = await generate_query_lambda(req, promptTemplateStr);
     } else { // LangChain for all other LLM options
-        newQuestion = await disambiguate_question_langchain(req, promptTemplateStr);
+        newQuery = await generate_query_langchain(req, promptTemplateStr);
     }
-    qnabot.log(`Original question: ${origQuestion} => New question: ${newQuestion}`);
-    req.question = newQuestion;
-    req.llm_disambiguate = {
+    qnabot.log(`Original question: ${origQuestion} => New question: ${newQuery}`);
+    req.question = newQuery;
+    req.llm_generated_query = {
         orig: origQuestion,
-        result: newQuestion
+        result: newQuery
     };
     return req;
 }
 
 const get_qa = async function get_qa(req, context) {
     qnabot.log(`LLM (${req._settings.LLM_API}) Retrieval Augmented Generation (RAG) to answer user's question from search result context.`);
-    let promptTemplateStr = req._settings.LLM_QA_PROMPT_TEMPLATE || `Human: Carefully read the following pieces of context labelled 'Context:' and then answer the question at the end labelled 'Question:'. If the answer cannot be determined from the context, reply saying "Sorry, I don't know". Do not try to make up an answer.<br><br>Context:{context}<br><br>Question: {input}<br>Assistant:`;
+    let promptTemplateStr = req._settings.LLM_QA_PROMPT_TEMPLATE || `<br><br>Human: You are an AI chatbot. Carefully read the following context and conversation history and then provide a short answer to question at the end. If the answer cannot be determined from the history or the context, reply saying "Sorry, I don't know". <br><br>Context: {context}<br><br>History: <br>{history}<br><br>Human: {input}<br><br>Assistant:`;
     promptTemplateStr = promptTemplateStr.replace(/<br>/mg, "\n");
     context = clean_context(context, req);
     let answer;
@@ -280,6 +303,7 @@ const get_qa = async function get_qa(req, context) {
 module.exports = {
     chatMemorySerialise:chatMemorySerialise,
     chatMemoryParse:chatMemoryParse,
-    disambiguate_question:disambiguate_question,
+    get_question:get_question,
+    generate_query:generate_query,
     get_qa:get_qa
 }

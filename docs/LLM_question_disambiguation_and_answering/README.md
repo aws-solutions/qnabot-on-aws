@@ -149,9 +149,9 @@ When QnABot stack is installed, open Content Designer **Settings** page:
 
 - **LLM_API:** one of SAGEMAKER, LAMBDA, ANTHROPIC, OPENAI - based on the value chosen when you last dfeployed or updated the QnABot Stack.   
 - **LLM_THIRD_PARTY_API_KEY:** Your third party provider API key - required if you have selected ANTHROPIC or OPENAI.  NOTE - the API key is displayed in clear text, and is visible to the QnABot Designer admin user.
-- **LLM_DISABIGUATE_ENABLE:** set to TRUE or FALSE to enable or disable question disambiguation.
-- **LLM_DISABIGUATE_PROMPT_TEMPLATE:** the prompt template used to construct a prompt for the LLM to disabiguate a followup question. The template MUST retain the placeholders `{history}` and `{input}`.
-- **LLM_DISABIGUATE_MODEL_PARAMS:** parameters sent to the LLM model when disambiguating follow-up questions. Default: `{"temperature":0}`. Check model documentation for additional values that your model provider accepts. Example - to use OpenAI's GPT4 insteast of GPT3.5, specify: `{"temperature":0, "modelName":"gpt-4"}`.
+- **LLM_GENERATE_QUERY_ENABLE:** set to TRUE or FALSE to enable or disable question disambiguation.
+- **LLM_GENERATE_QUERY_PROMPT_TEMPLATE:** the prompt template used to construct a prompt for the LLM to disabiguate a followup question. The template MUST retain the placeholders `{history}` and `{input}`.
+- **LLM_GENERATE_QUERY_MODEL_PARAMS:** parameters sent to the LLM model when disambiguating follow-up questions. Default: `{"temperature":0}`. Check model documentation for additional values that your model provider accepts. Example - to use OpenAI's GPT4 insteast of GPT3.5, specify: `{"temperature":0, "modelName":"gpt-4"}`.
 - **LLM_QA_ENABLE:** set to TRUE or FALSE to enable or disable generative answers from passages retreived via embeddings or Kendra fallback (when no FAQ match its found). NOTE LLM based generative answers are not applied when an FAQ / QID matches the question.
 - **LLM_QA_PROMPT_TEMPLATE:**  the prompt template used to construct a prompt for the LLM to generate an answer from the context of a retrieved passages (from Kendra or Embeddings). The template MUST retain the placeholders `{context}` and `{input}`.
 - **LLM_QA_NO_HITS_REGEX:** when the pattern specified matches the response from the LLM, e.g. `Sorry, I don't know`, then the response is treated as no_hits, and the default `EMPTYMESSAGE` or Custom Don't Know ('no_hits') item is returned instead. Disabled by default, since enabling it prevents easy debugging of LLM don't know responses.
