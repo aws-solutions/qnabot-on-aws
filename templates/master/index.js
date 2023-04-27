@@ -289,7 +289,7 @@ module.exports={
     'LLMApi':{
       'Type':'String',
       'Description':'Optionally enable (experimental) QnABot question disambiguation and generative question answering using an LLM. If set to SAGEMAKER, a Sagemaker endpoint is automatically provisioned. To use a custom LAMBDA function, provide additional parameters below. To use a supported third party service, enter the API key below.',
-      'AllowedValues': ['DISABLED', 'SAGEMAKER', 'LAMBDA', 'OPENAI', 'ANTHROPIC'],
+      'AllowedValues': ['DISABLED', 'SAGEMAKER', 'LAMBDA', 'ANTHROPIC'],
       'Default':'DISABLED'
     },
     'LLMSagemakerInitialInstanceCount':{
@@ -306,7 +306,7 @@ module.exports={
     },
     'LLMThirdPartyApiKey':{
       'Type':'String',
-      'Description':'Optional: If LLMApi is ANTHROPIC or OPENAI, enter the provider API Key from . ** Data will leave your AWS account **',
+      'Description':'Optional: If LLMApi is ANTHROPIC, enter the provider API Key from . ** Data will leave your AWS account **',
       'Default':'',
       'NoEcho': true
     },
@@ -338,7 +338,6 @@ module.exports={
     'LLMSagemaker': {'Fn::Or': [{'Fn::Equals':[{'Ref':'LLMApi'},'SAGEMAKER']}, {'Fn::Equals':[{'Ref':'LLMApi'},'ALL']}]},
     'LLMLambda':{'Fn::Or': [{'Fn::Equals':[{'Ref':'LLMApi'},'LAMBDA']}, {'Fn::Equals':[{'Ref':'LLMApi'},'ALL']}]},
     'LLMLambdaArn':{'Fn::Not': [{ 'Fn::Equals':[{'Ref':'LLMLambdaArn'},'']}]},
-    'LLMOpenAI':{'Fn::Or': [{'Fn::Equals':[{'Ref':'LLMApi'},'OPENAI']}, {'Fn::Equals':[{'Ref':'LLMApi'},'ALL']}]},
     'LLMAnthropic':{'Fn::Or': [{'Fn::Equals':[{'Ref':'LLMApi'},'ANTHROPIC-CLAUDE']}, {'Fn::Equals':[{'Ref':'LLMApi'},'ALL']}]},
     'LLMThirdPartyApiKey':{'Fn::Not': [{ 'Fn::Equals':[{'Ref':'LLMThirdPartyApiKey'},'']}]},
   }

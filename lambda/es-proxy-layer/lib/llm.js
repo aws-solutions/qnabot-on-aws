@@ -22,11 +22,11 @@ function get_llm_model(api, params_stg, api_key) {
     const params = JSON.parse(params_stg);
     let model;
     if (api === 'OPENAI') {
-        process.env.OPENAI_API_KEY = api_key || process.env.OPENAI_API_KEY;
+        process.env.OPENAI_API_KEY = api_key;
         model = new ChatOpenAI(params);
     }
     else if (api === 'ANTHROPIC') {
-        process.env.ANTHROPIC_API_KEY = api_key || process.env.ANTHROPIC_API_KEY;
+        process.env.ANTHROPIC_API_KEY = api_key;
         model = new ChatAnthropic(params);
     } 
     else {

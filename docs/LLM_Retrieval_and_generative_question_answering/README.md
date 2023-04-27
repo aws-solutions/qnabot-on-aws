@@ -54,7 +54,7 @@ You can use disambiguation and generative question answering, as shown below:
 With this release, you can choose with LLM to use with QnABot:  
 1. Amazon Bedrock (Coming soon!)
 2. An open source LLM model automtically deployed and hosted on an Amazon SageMaker endpoint - see https://huggingface.co/philschmid/flan-t5-xxl-sharded-fp16 
-3. Third Party LLM Services: Anthropic Claude, or OpenAI.
+3. Third Party LLM Services: Anthropic Claude. Others may be added in future.
 4. Any other LLM model or API you like via a user provided Lambda function.
 
 ### 1. Amazon Bedrock 
@@ -76,17 +76,17 @@ By default a 1-node ml.g5.xlarge endpoint is automatically provisioned. For larg
 
 ![CFN Params](./images/CF_Params_SageMaker.png)
 
-### 3. Third Party LLM Services: Anthropic Claude, or OpenAI
+### 3. Third Party LLM Services: Anthropic Claude
 
-Configure QnABot to use 3rd party LLM services from Anthropic or OpenAI by selecting 'ANTHROPIC', or 'OPENAI', and providing an API key issues by the third party provider. Note that when using third party providers, your data will leave you AWS account and the AWS network and will be sent in the payload of the API requests to the third party provider. 
-QnABot uses the LangChain JS NPM packages to establish communication with the provider APIs. When using Anthropic, the latest Claude-v1 model is used by default. When using OpenAI, the gpt-3.5-turbo is the default.  To select a different model, add `modelName` key to the LLM model parameters in Settings - discussed below.
+Configure QnABot to use 3rd party LLM services from Anthropic by selecting 'ANTHROPIC', and providing an API key issues by the third party provider. Note that when using third party providers, your data will leave you AWS account and the AWS network and will be sent in the payload of the API requests to the third party provider. 
+QnABot uses the LangChain JS NPM packages to establish communication with the provider APIs. When using Anthropic, the latest Claude-v1 model is used by default. To select a different model, add `modelName` key to the LLM model parameters in Settings - discussed below.
 
-#### Deploy Stack for ANTHROPIC or OPENAI
+#### Deploy Stack for ANTHROPIC
 
 - *(for Kendra Fallback)* set `DefaultKendraIndexId` to the Index Id (a GUID) of your existing Kendra index containing ingested documents 
 - *(for text passage queries)* set `EmbeddingsApi` to SAGEMAKER or LAMBDA (see  [Semantic Search using Text Embeddings](../semantic_matching_using_LLM_embeddings/README.md))
-- set `LLMApi` to ANTHROPIC or OPENAI
-- set `LLMThirdPartyApiKey` to your Anthropic or OpenAI key (see provider web sites for information on obtaining keys.) 
+- set `LLMApi` to ANTHROPIC
+- set `LLMThirdPartyApiKey` to your Anthropic key (see provider web sites for information on obtaining keys.) 
 - for `InstallLexResponseBots` choose `false` - if you don't plan to use Response bots, this speeds up the stack installation.
 
 ![CFN Params](./images/CF_Params_Anthropic.png)
@@ -146,13 +146,13 @@ When QnABot stack is installed, open Content Designer **Settings** page:
 
 *Scroll to the bottom of the settings page and observe the new LLM settings:*
 
-- **LLM_API:** one of SAGEMAKER, LAMBDA, ANTHROPIC, OPENAI - based on the value chosen when you last dfeployed or updated the QnABot Stack.   
-- **LLM_THIRD_PARTY_API_KEY:** Your third party provider API key - required if you have selected ANTHROPIC or OPENAI.  NOTE - the API key is displayed in clear text, and is visible to the QnABot Designer admin user.
+- **LLM_API:** one of SAGEMAKER, LAMBDA, ANTHROPIC - based on the value chosen when you last dfeployed or updated the QnABot Stack.   
+- **LLM_THIRD_PARTY_API_KEY:** Your third party provider API key - required if you have selected ANTHROPIC.  NOTE - the API key is displayed in clear text, and is visible to the QnABot Designer admin user.
 - **LLM_GENERATE_QUERY_ENABLE:** set to TRUE or FALSE to enable or disable question disambiguation.
 - **LLM_GENERATE_QUERY_PROMPT_TEMPLATE:** the prompt template used to construct a prompt for the LLM to disabiguate a followup question. The template may use the placeholders:
   - `{history}` - placeholder for the last `LLM_CHAT_HISTORY_MAX_MESSAGES` messages in the conversational history, to provide conversational context.
   - `{input}` - placeholder for the current user utterance / question
-- **LLM_GENERATE_QUERY_MODEL_PARAMS:** parameters sent to the LLM model when disambiguating follow-up questions. Default: `{"temperature":0}`. Check model documentation for additional values that your model provider accepts. Example - to use OpenAI's GPT4 insteast of GPT3.5, specify: `{"temperature":0, "modelName":"gpt-4"}`.
+- **LLM_GENERATE_QUERY_MODEL_PARAMS:** parameters sent to the LLM model when disambiguating follow-up questions. Default: `{"temperature":0}`. Check model documentation for additional values that your model provider accepts. 
 - **LLM_QA_ENABLE:** set to TRUE or FALSE to enable or disable generative answers from passages retreived via embeddings or Kendra fallback (when no FAQ match its found). NOTE LLM based generative answers are not applied when an FAQ / QID matches the question.
 - **LLM_QA_PROMPT_TEMPLATE:**  the prompt template used to construct a prompt for the LLM to generate an answer from the context of a retrieved passages (from Kendra or Embeddings). The template may use the placeholders:
   - `{context}` - placeholder for passages retrieved from the seartch query - either a QnABot 'Text' item passage, or the Top `ALT_SEARCH_KENDRA_MAX_DOCUMENT_COUNT` Kendra passages
@@ -160,9 +160,10 @@ When QnABot stack is installed, open Content Designer **Settings** page:
   - `{input}` - placeholder for the current user utterance / question
   - `{query}` - placeholder for the generated (disambiguated) query created by the generate query feature. NOTE the default prompt does not use `query` in the qa prompt, as it provides the conversation history and current user input instead, but you can change the prompt to use `query` inseatd of, or in addiotion to `input` and `history` to tune the LLM answers.
 - **LLM_QA_NO_HITS_REGEX:** when the pattern specified matches the response from the LLM, e.g. `Sorry, I don't know`, then the response is treated as no_hits, and the default `EMPTYMESSAGE` or Custom Don't Know ('no_hits') item is returned instead. Disabled by default, since enabling it prevents easy debugging of LLM don't know responses.
-- **LLM_QA_MODEL_PARAMS:** parameters sent to the LLM model when generating answers to questions. Default: `{"temperature":0}`. Check model documentation for additional values that your model provider accepts. Example - to use OpenAI's GPT4 insteast of GPT3.5, specify: `{"temperature":0, "modelName":"gpt-4"}`.
+- **LLM_QA_MODEL_PARAMS:** parameters sent to the LLM model when generating answers to questions. Default: `{"temperature":0}`. Check model documentation for additional values that your model provider accepts. 
 - **LLM_QA_PREFIX_MESSAGE:** Message use to prefix LLM generated answer. May be be empty.
 - **LLM_QA_SHOW_CONTEXT_TEXT:** set to TRUE or FALSE to enable or disable inclusion of the passages (from Kendra or Embeddings) used as context for LLM generated answers.
+- **LLM_QA_SHOW_SOURCE_LINKS:** set to TRUE or FALSE to enable or disable Kendra Source Links or passage refMarkdown links (doc references) in markdown answers.
 - **LLM_CHAT_HISTORY_MAX_MESSAGES:** the number of previous questions and answers (chat history) to maintain (in the QnABot DynamoDB UserTable). Chat History is necessary for QnABot to disambiguate follow up questions from previous question and answer context.
   
   

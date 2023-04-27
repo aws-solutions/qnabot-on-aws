@@ -165,12 +165,24 @@ function prepend_llm_qa_answer(prefix, qa_answer, hit) {
     return hit;
 }
 
+function get_sourceLinks_from_passages(inputText) {
+    const sourceLinkPattern = /^\s*Source Link:(.*)$/gm;
+    let matches, sourceLinks = [];
+    
+    while ((matches = sourceLinkPattern.exec(inputText)) !== null) {
+        sourceLinks.push(matches[1].trim().replace(/^"|"$/g, ''));
+    }
+    console.log(sourceLinks);
+    const uniqueLinks = [...new Set(sourceLinks)];
+    return `Source Links: ${uniqueLinks.join(', ')}`;
+    }
+
 async function run_llm_qa(req, hit) {
     const debug = req._settings.ENABLE_DEBUG_RESPONSES;
 
     const context = hit.a;
 
-    if (req._settings.LLM_QA_ENABLE && req._settings.LLM_SHOW_CONTEXT_TEXT == false) {
+    if (req._settings.LLM_QA_ENABLE && req._settings.LLM_QA_SHOW_CONTEXT_TEXT == false) {
         // remove context text.. hit will contain only the QA Summary output
         hit.a = "";
         hit.alt.markdown = "";
@@ -178,7 +190,7 @@ async function run_llm_qa(req, hit) {
     } else {
         // Context provided only in markdown channel (excluded from chat memory) 
         hit.a = "";
-        hit.alt.markdown = `**Context**\n\n${hit.alt.markdown}`;
+        hit.alt.markdown = `**Context**\n\n${hit.alt.markdown}\n`;
         hit.alt.ssml = "";     
     }
 
@@ -316,6 +328,7 @@ async function get_hit(req, res) {
         qnabot.log('request entering kendra fallback ' + JSON.stringify(req));
         hit = await kendra_fallback.handler({req,res});
         qnabot.log('Result from Kendra ' + JSON.stringify(hit));
+        hit.refMarkdown = get_sourceLinks_from_passages(hit.alt.markdown);
         if(hit &&  hit.hit_count != 0)
         {
             // Run any configured QA Summary LLM model options on Kendra results
