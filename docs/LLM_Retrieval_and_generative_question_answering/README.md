@@ -1,10 +1,9 @@
-# Large Language Model - Question Disambiguation and Passage retreival based Question Answering
+# Large Language Model - Query Disambiguation for Conversational Retrieval, and Generative Question Answering
 
-QnABot can now use a large language model (LLM) to **(1) Disambiguate follow up questions** and/or **(2) Generate answers to questions from retrieved FAQS or passages**.
+QnABot can now use a large language model (LLM) to **(1) Disambiguate follow up questions to generate good search queries** and/or **(2) Generate answers to questions from retrieved FAQS or passages**.
 
 
-
-**(1) Disambiguate follow up questions** that rely on preceding conversation context. The new disambiguated, or standalone, question can then be used to retrieve the best FAQ, passage or Kendra match. 
+**(1) Disambiguate follow up questions** that rely on preceding conversation context. The new disambiguated, or standalone, question can then be used as search queries to retrieve the best FAQ, passage or Kendra match. 
 
 Example:
 
@@ -30,13 +29,13 @@ With the new LLM QA feature enabled, QnABot can answer questions from the [AWS W
 - *"What frameworks does AWS have to help people design good architectures?"* -> **Well-Architected Framework**  
 
 It can even generate answers to yes/no questions, like:
-- *"Is Lambda a database service?"* -> **No**. 
+- *"Is Lambda a database service?"* -> **No, Lambda is not a database service.**. 
 
 
 Even if you aren't (yet) using AWS Kendra (and you should!) QnABot can answer questions based on passages created or imported into Content Designer, such as:
 - *"Where did Humpty Dumpty sit?"* -> **On the wall**, 
 - *"Did Humpty Dumpty sit on the wall?"* -> **yes**, 
-- *"Did Humpty Dumpty sit on the ground when he fell?"* -> **No**  
+- *"Were the king's horses able to fix Humpty Dumpty?"* -> **No**  
 
 all from a text passage item that contains the nursery rhyme.  
 
@@ -66,7 +65,7 @@ Not yet available. Coming Soon!
 
 QnABot provisions a Sagemaker endpoint running the Hugging Face flan-t5-xxl-sharded-fp16 model - see https://huggingface.co/philschmid/flan-t5-xxl-sharded-fp16. 
   
-By default a 1-node ml.g5.xlarge endpoint is automatically provisioned. For large volume deployments, add additional nodes by setting the parameter `SagemakerQASummarizeInitialInstanceCount`. Please check [SageMaker pricing documentation](https://aws.amazon.com/sagemaker/pricing/) for relevant costs and information on Free Tier eligibility.
+By default a 1-node ml.g5.xlarge endpoint is automatically provisioned. For large volume deployments, add additional nodes by setting the parameter `LLMSagemakerInitialInstanceCount`. Please check [SageMaker pricing documentation](https://aws.amazon.com/sagemaker/pricing/) for relevant costs and information on Free Tier eligibility.
 
 #### Deploy Stack for SAGEMAKER
 
@@ -150,10 +149,16 @@ When QnABot stack is installed, open Content Designer **Settings** page:
 - **LLM_API:** one of SAGEMAKER, LAMBDA, ANTHROPIC, OPENAI - based on the value chosen when you last dfeployed or updated the QnABot Stack.   
 - **LLM_THIRD_PARTY_API_KEY:** Your third party provider API key - required if you have selected ANTHROPIC or OPENAI.  NOTE - the API key is displayed in clear text, and is visible to the QnABot Designer admin user.
 - **LLM_GENERATE_QUERY_ENABLE:** set to TRUE or FALSE to enable or disable question disambiguation.
-- **LLM_GENERATE_QUERY_PROMPT_TEMPLATE:** the prompt template used to construct a prompt for the LLM to disabiguate a followup question. The template MUST retain the placeholders `{history}` and `{input}`.
+- **LLM_GENERATE_QUERY_PROMPT_TEMPLATE:** the prompt template used to construct a prompt for the LLM to disabiguate a followup question. The template may use the placeholders:
+  - `{history}` - placeholder for the last `LLM_CHAT_HISTORY_MAX_MESSAGES` messages in the conversational history, to provide conversational context.
+  - `{input}` - placeholder for the current user utterance / question
 - **LLM_GENERATE_QUERY_MODEL_PARAMS:** parameters sent to the LLM model when disambiguating follow-up questions. Default: `{"temperature":0}`. Check model documentation for additional values that your model provider accepts. Example - to use OpenAI's GPT4 insteast of GPT3.5, specify: `{"temperature":0, "modelName":"gpt-4"}`.
 - **LLM_QA_ENABLE:** set to TRUE or FALSE to enable or disable generative answers from passages retreived via embeddings or Kendra fallback (when no FAQ match its found). NOTE LLM based generative answers are not applied when an FAQ / QID matches the question.
-- **LLM_QA_PROMPT_TEMPLATE:**  the prompt template used to construct a prompt for the LLM to generate an answer from the context of a retrieved passages (from Kendra or Embeddings). The template MUST retain the placeholders `{context}` and `{input}`.
+- **LLM_QA_PROMPT_TEMPLATE:**  the prompt template used to construct a prompt for the LLM to generate an answer from the context of a retrieved passages (from Kendra or Embeddings). The template may use the placeholders:
+  - `{context}` - placeholder for passages retrieved from the seartch query - either a QnABot 'Text' item passage, or the Top `ALT_SEARCH_KENDRA_MAX_DOCUMENT_COUNT` Kendra passages
+  - `{history}` - placeholder for the last `LLM_CHAT_HISTORY_MAX_MESSAGES` messages in the conversational history, to provide conversational context.
+  - `{input}` - placeholder for the current user utterance / question
+  = `{query}` - placeholder for the generated (disambiguated) query created by the generate query feature. NOTE the default prompt does not use `query` in the qa prompt, as it provides the conversation history and current user input instead, but you can change the prompt to use `query` inseatd of, or in addiotion to `input` and `history` to tune the LLM answers.
 - **LLM_QA_NO_HITS_REGEX:** when the pattern specified matches the response from the LLM, e.g. `Sorry, I don't know`, then the response is treated as no_hits, and the default `EMPTYMESSAGE` or Custom Don't Know ('no_hits') item is returned instead. Disabled by default, since enabling it prevents easy debugging of LLM don't know responses.
 - **LLM_QA_MODEL_PARAMS:** parameters sent to the LLM model when generating answers to questions. Default: `{"temperature":0}`. Check model documentation for additional values that your model provider accepts. Example - to use OpenAI's GPT4 insteast of GPT3.5, specify: `{"temperature":0, "modelName":"gpt-4"}`.
 - **LLM_QA_PREFIX_MESSAGE:** Message use to prefix LLM generated answer. May be be empty.

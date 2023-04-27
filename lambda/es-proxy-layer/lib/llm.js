@@ -41,15 +41,17 @@ async function get_qa_langchain(req, promptTemplateStr, context) {
         const memory = new BufferMemory({ chatHistory: chatMessageHistory });
         const history = (await memory.loadMemoryVariables()).history;
         const input = get_question(req);
+        const query = get_query(req);
         const promptTemplate = new PromptTemplate({
             template: promptTemplateStr,
-            inputVariables: ["history", "context", "input"],
+            inputVariables: ["history", "context", "input", "query"],
         });
         // compute and log prompt value - for prompt troubleshooting only
         const prompt = await promptTemplate.format({
             history: history,
             context: context,
             input: input,
+            query: query,
         });
         qnabot.log(`Prompt: \nPROMPT==>\n${prompt}\n<==PROMPT`);
         // end logging
@@ -59,7 +61,7 @@ async function get_qa_langchain(req, promptTemplateStr, context) {
             req._settings.LLM_THIRD_PARTY_API_KEY
         );
         const chain = new LLMChain({ llm: model, prompt: promptTemplate});
-        const llm_res = await chain.call({ history: history, context: context, input: input });
+        const llm_res = await chain.call({ history: history, context: context, input: input, query: query });
         response = llm_res.text.trim();
     } catch (e) {
         qnabot.log("EXCEPTION:", e.stack);
@@ -136,10 +138,12 @@ async function generate_query_sagemaker(req, promptTemplateStr) {
 }
 async function get_qa_sagemaker(req, promptTemplateStr, context) {
     const model_params = JSON.parse(req._settings.LLM_QA_MODEL_PARAMS || default_params_stg);
+    const input = get_question(req);
+    const query = get_query(req);
     // parse and serialise chat history to manage max messages
     const chatMessageHistory = await chatMemoryParse(_.get(req._userInfo, "chatMessageHistory","[]"), req._settings.LLM_CHAT_HISTORY_MAX_MESSAGES);
     const history = await chatMemorySerialise(chatMessageHistory, req._settings.LLM_CHAT_HISTORY_MAX_MESSAGES);
-    const prompt = promptTemplateStr.replace(/{history}/mg, history).replace(/{context}/mg, context).replace(/{input}/mg, get_question(req));
+    const prompt = promptTemplateStr.replace(/{history}/mg, history).replace(/{context}/mg, context).replace(/{input}/mg, input).replace(/{query}/mg, query);
     return invoke_sagemaker(prompt, model_params);
 }
 
@@ -181,12 +185,13 @@ async function generate_query_lambda(req, promptTemplateStr) {
 async function get_qa_lambda(req, promptTemplateStr, context) {
     const model_params = JSON.parse(req._settings.LLM_QA_MODEL_PARAMS || default_params_stg);
     // parse and serialise chat history to manage max messages
+    const input = get_question(req);
+    const query = get_query(req);
     const chatMessageHistory = await chatMemoryParse(_.get(req._userInfo, "chatMessageHistory","[]"), req._settings.LLM_CHAT_HISTORY_MAX_MESSAGES);
     const history = await chatMemorySerialise(chatMessageHistory, req._settings.LLM_CHAT_HISTORY_MAX_MESSAGES);
-    const prompt = promptTemplateStr.replace(/{history}/mg, history).replace(/{context}/mg, context).replace(/{input}/mg, get_question(req));
+    const prompt = promptTemplateStr.replace(/{history}/mg, history).replace(/{context}/mg, context).replace(/{input}/mg, input).replace(/{query}/mg, query);
     return invoke_lambda(prompt, model_params);
 }
-
 
 // clean unwanted text artifacts from the provided context..
 function clean_context(context, req) {
@@ -253,6 +258,10 @@ async function chatMemoryParse(json_messages, max=50) {
 function get_question(req) {
     const question = _.get(req,"llm_generated_query.orig", req.question);
     return question;
+}
+function get_query(req) {
+    const query = _.get(req,"llm_generated_query.result", req.question);
+    return query;
 }
 
 // generate_query: re-write utterance using chat history if needed, to make it standalone from prior conversation context.
