@@ -320,7 +320,7 @@ async function routeKendraRequest(event, context) {
         && origQuestion && question && origQuestion!=question;
     if (standalone_query) {
         useOriginalLanguageQuery = false;
-        qnabot.log("LLM generated standalone query detected. Not using original language query.");")
+        qnabot.log("LLM generated standalone query detected. Not using original language query.");
     }
     qnabot.log("useOriginalLanguageQuery: " + useOriginalLanguageQuery);
 
