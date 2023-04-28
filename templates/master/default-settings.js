@@ -92,7 +92,7 @@ var default_settings = {
     LLM_QA_PREFIX_MESSAGE: 'LLM Answer:',
     LLM_QA_SHOW_CONTEXT_TEXT: "TRUE",
     LLM_QA_SHOW_SOURCE_LINKS: "TRUE",
-    LLM_CHAT_HISTORY_MAX_MESSAGES: 5,
+    LLM_CHAT_HISTORY_MAX_MESSAGES: 10,
 };
 module.exports = {
     "DefaultUserPoolJwksUrl": {
