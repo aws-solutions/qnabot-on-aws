@@ -314,9 +314,14 @@ async function routeKendraRequest(event, context) {
     let origQuestion = event.req["_event"]["origQuestion"];
     let question = event.req["question"];
     let userDetectedLocale = _.get(event.req, 'session.qnabotcontext.userLocale');
+    let standalone_query = _.get(event.req, 'llm_generated_query.result');
 
     let useOriginalLanguageQuery = kendraIndexedLanguages.includes(userDetectedLocale, 0)
         && origQuestion && question && origQuestion!=question;
+    if (standalone_query) {
+        useOriginalLanguageQuery = false;
+        qnabot.log("LLM generated standalone query detected. Not using original language query.");")
+    }
     qnabot.log("useOriginalLanguageQuery: " + useOriginalLanguageQuery);
 
     // This function can handle configuration with an array of kendraIndexes.
