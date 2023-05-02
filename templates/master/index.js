@@ -338,7 +338,7 @@ module.exports={
     'LLMSagemaker': {'Fn::Or': [{'Fn::Equals':[{'Ref':'LLMApi'},'SAGEMAKER']}, {'Fn::Equals':[{'Ref':'LLMApi'},'ALL']}]},
     'LLMLambda':{'Fn::Or': [{'Fn::Equals':[{'Ref':'LLMApi'},'LAMBDA']}, {'Fn::Equals':[{'Ref':'LLMApi'},'ALL']}]},
     'LLMLambdaArn':{'Fn::Not': [{ 'Fn::Equals':[{'Ref':'LLMLambdaArn'},'']}]},
-    'LLMAnthropic':{'Fn::Or': [{'Fn::Equals':[{'Ref':'LLMApi'},'ANTHROPIC-CLAUDE']}, {'Fn::Equals':[{'Ref':'LLMApi'},'ALL']}]},
+    'LLMAnthropic':{'Fn::Or': [{'Fn::Equals':[{'Ref':'LLMApi'},'ANTHROPIC']}, {'Fn::Equals':[{'Ref':'LLMApi'},'ALL']}]},
     'LLMThirdPartyApiKey':{'Fn::Not': [{ 'Fn::Equals':[{'Ref':'LLMThirdPartyApiKey'},'']}]},
   }
 }

@@ -163,7 +163,7 @@ module.exports=Promise.resolve(require('../master')).then(function(base){
     base.Conditions.LLMSagemaker={'Fn::Or': [{'Fn::Equals':[{'Ref':'LLMApi'},'SAGEMAKER']}, {'Fn::Equals':[{'Ref':'LLMApi'},'ALL']}]}
     base.Conditions.LLMLambda={'Fn::Or': [{'Fn::Equals':[{'Ref':'LLMApi'},'LAMBDA']}, {'Fn::Equals':[{'Ref':'LLMApi'},'ALL']}]}
     base.Conditions.LLMLambdaArn={'Fn::Not': [{ 'Fn::Equals':[{'Ref':'LLMLambdaArn'},'']}]}
-    base.Conditions.LLMAnthropicClaude={'Fn::Or': [{'Fn::Equals':[{'Ref':'LLMApi'},'ANTHROPIC-CLAUDE']}, {'Fn::Equals':[{'Ref':'LLMApi'},'ALL']}]}
+    base.Conditions.LLMAnthropic={'Fn::Or': [{'Fn::Equals':[{'Ref':'LLMApi'},'ANTHROPIC']}, {'Fn::Equals':[{'Ref':'LLMApi'},'ALL']}]}
     base.Conditions.LLMThirdPartyApiKey={'Fn::Not': [{ 'Fn::Equals':[{'Ref':'LLMThirdPartyApiKey'},'']}]}
 
     var out=JSON.stringify(base);
