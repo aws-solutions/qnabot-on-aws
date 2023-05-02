@@ -85,7 +85,7 @@ var default_settings = {
     LLM_THIRD_PARTY_API_KEY: '${LLMThirdPartyApiKey}',
     LLM_GENERATE_QUERY_ENABLE: '${LLM_GENERATE_QUERY_ENABLE}',
     LLM_GENERATE_QUERY_PROMPT_TEMPLATE: '<br><br>Human: Given the following conversation and a follow up input, if the follow up input is a question please rephrase that question to be a standalone question, otherwise return the input unchanged.<br><br>Chat History:<br>{history}<br><br>Follow Up Input: {input}<br><br>Assistant:', 
-    LLM_GENERATE_QUERY_MODEL_PARAMS: '${LLM_GENERATE_QUERY_MODEL_PARAMS}' ,
+    LLM_GENERATE_QUERY_MODEL_PARAMS: '${LLM_GENERATE_QUERY_MODEL_PARAMS}',
     LLM_QA_ENABLE: '${LLM_QA_ENABLE}', // Set to TRUE or FALSE to enable or disable SAGEMAKER summarization
     LLM_QA_PROMPT_TEMPLATE: `<br><br>Human: You are an AI chatbot. Carefully read the following context and conversation history and then provide a short answer to question at the end. If the answer cannot be determined from the history or the context, reply saying "Sorry, I don't know". <br><br>Context: {context}<br><br>History: <br>{history}<br><br>Human: {input}<br><br>Assistant:`,
     LLM_QA_MODEL_PARAMS: '${LLM_QA_MODEL_PARAMS}',
