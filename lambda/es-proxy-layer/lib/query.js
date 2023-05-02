@@ -328,9 +328,9 @@ async function get_hit(req, res) {
         qnabot.log('request entering kendra fallback ' + JSON.stringify(req));
         hit = await kendra_fallback.handler({req,res});
         qnabot.log('Result from Kendra ' + JSON.stringify(hit));
-        hit.refMarkdown = get_sourceLinks_from_passages(hit.alt.markdown);
         if(hit &&  hit.hit_count != 0)
         {
+            hit.refMarkdown = get_sourceLinks_from_passages(hit.alt.markdown);
             // Run any configured QA Summary LLM model options on Kendra results
             hit = await run_llm_qa(req, hit);
             if (hit) {
