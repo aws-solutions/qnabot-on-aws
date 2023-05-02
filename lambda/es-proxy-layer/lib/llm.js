@@ -195,9 +195,9 @@ async function get_qa_lambda(req, promptTemplateStr, context) {
 
 // clean unwanted text artifacts from the provided context..
 function clean_context(context, req) {
-    let clean_context;
+    let clean_context = context;
     // remove URLS from Kendra passages
-    clean_context = context.replace(/^ *Source Link:.*$/mg, '');
+    clean_context = clean_context.replace(/^ *Source Link:.*$/mg, '');
     // remove Kendra prefix messages
     if (req._settings.ALT_SEARCH_KENDRA_ANSWER_MESSAGE) {
       clean_context = clean_context.replace(new RegExp(req._settings.ALT_SEARCH_KENDRA_ANSWER_MESSAGE, 'g'), '');
@@ -209,8 +209,25 @@ function clean_context(context, req) {
       clean_context = clean_context.replace(new RegExp(req._settings.ALT_SEARCH_KENDRA_TOP_ANSWER_MESSAGE, 'g'), '');
     }
     return clean_context;
-  }
+}
 
+function clean_standalone_query(query) {
+    let clean_query = query;
+    // remove preamble, if any
+    clean_query = clean_query.replace(/^Here .*? the standalone question.*$/img, '');
+    // remove newlines
+    clean_query = clean_query.replace(/\n/g, ' ');
+    // No more than 1000 characters - for Kendra query compatability - https://docs.aws.amazon.com/kendra/latest/dg/API_Query.html
+    clean_query = clean_query.slice(0,1000);
+    // limit output to one question.. truncate any runaway answers that shouldn't be included in the query.
+    const q_pos = clean_query.indexOf('?');
+    if (q_pos > -1) {
+        clean_query = clean_query.slice(0,q_pos + 1);
+    }
+    // trim leading or trailing whitespace
+    clean_query = clean_query.trim();
+    return clean_query;
+}
 
 //
 // Exported functions
@@ -280,6 +297,8 @@ const generate_query = async function generate_query(req) {
     } else { // LangChain for all other LLM options
         newQuery = await generate_query_langchain(req, promptTemplateStr);
     }
+    qnabot.log(`LLM response before running clean_standalone_query(): ${newQuery}`);
+    newQuery = clean_standalone_query(newQuery);
     qnabot.log(`Original question: ${origQuestion} => New question: ${newQuery}`);
     req.question = newQuery;
     req.llm_generated_query = {
