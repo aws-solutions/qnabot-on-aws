@@ -92,8 +92,11 @@ var default_settings = {
     LLM_QA_PREFIX_MESSAGE: 'LLM Answer:',
     LLM_QA_SHOW_CONTEXT_TEXT: "TRUE",
     LLM_QA_SHOW_SOURCE_LINKS: "TRUE",
-    LLM_CHAT_HISTORY_MAX_MESSAGES: 10,
+    LLM_CHAT_HISTORY_MAX_MESSAGES: 6,
+    LLM_QA_NO_HITS_REGEX: 'Sorry, I don\'t know //remove comment to enable custom no match (no_hits) when LLM does not know the answer.',
 };
+const defaultModelParams = `{\\"temperature\\":0}`;
+const anthropicModelParams = `{\\"temperature\\":0, \\"modelName\\":\\"claude-instant-v1\\"}`;
 module.exports = {
     "DefaultUserPoolJwksUrl": {
         "Type": "AWS::SSM::Parameter",
@@ -115,8 +118,8 @@ module.exports = {
                     "EMBEDDINGS_ENABLE" : {"Fn::If": ["EmbeddingsEnable", "TRUE", "FALSE"]},
                     "LLM_GENERATE_QUERY_ENABLE" : {"Fn::If": ["LLMEnable", "TRUE", "FALSE"]},
                     "LLM_QA_ENABLE" : {"Fn::If": ["LLMEnable", "TRUE", "FALSE"]},
-                    "LLM_GENERATE_QUERY_MODEL_PARAMS": {"Fn::If": ["LLMAnthropic", '{"temperature":0, "modelName":"claude-instant-v1"}', '{"temperature":0}']},
-                    "LLM_QA_MODEL_PARAMS": {"Fn::If": ["LLMAnthropic", '{"temperature":0, "modelName":"claude-instant-v1"}', '{"temperature":0}']},
+                    "LLM_GENERATE_QUERY_MODEL_PARAMS": {"Fn::If": ["LLMAnthropic", anthropicModelParams, defaultModelParams]},
+                    "LLM_QA_MODEL_PARAMS": {"Fn::If": ["LLMAnthropic", anthropicModelParams, defaultModelParams]},
                 }
             ]} 
         }
