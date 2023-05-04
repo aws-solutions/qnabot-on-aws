@@ -346,6 +346,7 @@ async function get_hit(req, res) {
     {
         qnabot.log('No hits from query - searching instead for: ' + no_hits_question);
         query_params['question'] = no_hits_question;
+        query_params['score_text_passage'] = false;
         query_params['size'] = 1;
         res['got_hits'] = 0;  // response flag, used in logging / kibana
         response = await run_query(req, query_params);
