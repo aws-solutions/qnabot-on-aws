@@ -289,6 +289,7 @@ const generate_query = async function generate_query(req) {
     let promptTemplateStr = req._settings.LLM_GENERATE_QUERY_PROMPT_TEMPLATE || `<br><br>Human: Given the following conversation and a follow up input, if the follow up input is a question please rephrase that question to be a standalone question, otherwise return the input unchanged.<br><br>Chat History:<br?{history}<br><br>Follow Up Input: {input}<br><br>Assistant:`;
     promptTemplateStr = promptTemplateStr.replace(/<br>/mg, "\n");
     let newQuery;
+    const start = Date.now(); 
     if (req._settings.LLM_API == "SAGEMAKER") {
         // TODO refactor when langchainJS supports Sagemaker
         newQuery = await generate_query_sagemaker(req, promptTemplateStr);
@@ -297,13 +298,16 @@ const generate_query = async function generate_query(req) {
     } else { // LangChain for all other LLM options
         newQuery = await generate_query_langchain(req, promptTemplateStr);
     }
+    const end = Date.now();
+    const timing = `${end - start} ms`;
     qnabot.log(`LLM response before running clean_standalone_query(): ${newQuery}`);
     newQuery = clean_standalone_query(newQuery);
     qnabot.log(`Original question: ${origQuestion} => New question: ${newQuery}`);
     req.question = newQuery;
     req.llm_generated_query = {
         orig: origQuestion,
-        result: newQuery
+        result: newQuery,
+        timing: timing
     };
     return req;
 }

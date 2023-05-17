@@ -675,13 +675,15 @@ async function processFulfillmentEvent(req,res) {
             if (req.llm_generated_query) {
                 if (usrLang != 'en') {
                     original_input = _.get(req,'_event.origQuestion','notdefined');
-                    translated_input = req.llm_generated_query.orig;
-                    llm_generated_query = req.llm_generated_query.result;
-                    msg = `User Input: "${original_input}", Translated to: "${translated_input}", LLM generated query: "${llm_generated_query}"`
+                    const translated_input = req.llm_generated_query.orig;
+                    const llm_generated_query = req.llm_generated_query.result;
+                    const timing = req.llm_generated_query.timing;
+                    msg = `User Input: "${original_input}", Translated to: "${translated_input}", LLM generated query (${timing}): "${llm_generated_query}"`
                 } else {
                     original_input = req.llm_generated_query.orig;
                     llm_generated_query = req.llm_generated_query.result;
-                    msg = `User Input: "${original_input}", LLM generated query: "${llm_generated_query}"`;
+                    const timing = req.llm_generated_query.timing;
+                    msg = `User Input: "${original_input}", LLM generated query (${timing}): "${llm_generated_query}"`;
                 }
             } else {
                 if (usrLang != 'en') {
