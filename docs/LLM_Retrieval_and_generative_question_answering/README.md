@@ -78,8 +78,8 @@ By default a 1-node ml.g5.xlarge endpoint is automatically provisioned. For larg
 
 ### 3. Third Party LLM Services: Anthropic Claude
 
-Configure QnABot to use 3rd party LLM services from Anthropic by selecting 'ANTHROPIC', and providing an API key issues by the third party provider. Note that when using third party providers, your data will leave you AWS account and the AWS network and will be sent in the payload of the API requests to the third party provider. 
-QnABot uses the LangChain JS NPM packages to establish communication with the provider APIs. When using Anthropic, the latest Claude-v1 model is used by default. To select a different model, add `modelName` key to the LLM model parameters in Settings - discussed below.
+Configure QnABot to use 3rd party LLM services from Anthropic by selecting 'ANTHROPIC', and providing an API key issued by the third party provider. Note that when using third party providers, your data will leave your AWS account and the AWS network and will be sent in the payload of the API requests to the third party provider. 
+QnABot uses the LangChain JS NPM packages to establish communication with the provider APIs. When using Anthropic, the latest Claude-v1-instant model is used by default. To select a different model, add `modelName` key to the LLM model parameters in Settings - discussed below.
 
 #### Deploy Stack for ANTHROPIC
 
