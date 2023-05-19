@@ -96,7 +96,7 @@ var default_settings = {
     LLM_QA_NO_HITS_REGEX: 'Sorry, I don\'t know //remove comment to enable custom no match (no_hits) when LLM does not know the answer.',
 };
 const defaultModelParams = `{\\"temperature\\":0}`;
-const anthropicModelParams = `{\\"temperature\\":0, \\"modelName\\":\\"claude-instant-v1\\"}`;
+const anthropicModelParams = `{\\"temperature\\":0, \\"modelName\\":\\"claude-instant-v1-100k\\"}`;
 module.exports = {
     "DefaultUserPoolJwksUrl": {
         "Type": "AWS::SSM::Parameter",
