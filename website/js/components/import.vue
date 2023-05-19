@@ -1,3 +1,8 @@
+<!--
+    Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+    SPDX-License-Identifier: Apache-2.0
+ -->
+
 <template lang='pug'>
 span.wrapper
     v-dialog(v-model='error', scrollable, width='auto')
@@ -72,15 +77,9 @@ span.wrapper
 </template>
 
 <script>
-// Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
-// SPDX-License-Identifier: Apache-2.0
-
-const Vuex = require('vuex');
 const Promise = require('bluebird');
-const saveAs = require('file-saver').saveAs;
-const axios = require('axios');
 const parseJson = require('json-parse-better-errors');
-var XLSX = require('xlsx');
+const XLSX = require('read-excel-file');
 const _ = require('lodash');
 
 module.exports = {
@@ -203,7 +202,7 @@ module.exports = {
                     self.addError(e ? e : 'Unknown error on Getfile');
                 });
         },
-        Geturl: function (event) {
+        Geturl: function () {
             const self = this;
             this.loading = true;
             try {
@@ -318,11 +317,11 @@ module.exports = {
                     let xlsColumnName = `${element.xlsFieldname}${i}`;
                     let xlsColumnValue = question[xlsColumnName] !== undefined ? question[xlsColumnName] : element.default;
                     console.log(`Value2 of ${xlsColumnName} is ${xlsColumnValue}`);
-                    
+
                     if(element.type == "boolean" && typeof xlsColumnValue !== "boolean"){
                       self.addError(
                             `Warning: ${xlsColumnName} must have a value of true or false for  qid:"${question.qid}": defaulting to ${element.default}`
-                        );                    
+                        );
                          xlsColumnValue= element.default
                         }
                     if (element.maxSize && xlsColumnValue.length > element.maxSize) {
@@ -339,7 +338,9 @@ module.exports = {
             }
         },
         parse: async function (content) {
-            var header_mapping = {
+            //this headermap enabled customers to more conveniently
+            //map some of the more common fields using a 'friendly' name
+            let headerMapping = {
                 question: 'q',
                 topic: 't',
                 markdown: 'alt.markdown',
@@ -347,44 +348,120 @@ module.exports = {
                 'Answer': 'a',
                 ssml: 'alt.ssml'
             };
-            var self = this;
+            let self = this;
             try {
                 const enc = new TextDecoder('utf-8');
-                var jsonText = enc.decode(new Uint8Array(content));
+                let jsonText = enc.decode(new Uint8Array((content)));
                 return Promise.resolve(parseJson(jsonText));
             } catch (err) {
                 try {
                     console.log('File is not a valid JSON file. Trying to parse as CSV file');
-                    var workbook = XLSX.read(content, {
-                        type: 'array'
-                    });
+                    let sheetNames = await XLSX.readSheetNames(content)
                     var valid_questions = [];
-                    workbook.SheetNames.forEach(function (sheetName) {
+                    for(let i = 0; i < sheetNames.length; i++){
                         // Here is your object
-                        var XL_row_object = XLSX.utils.sheet_to_row_object_array(workbook.Sheets[sheetName]);
-                        var json_object = JSON.stringify(XL_row_object);
-                        var question_number = 1;
-                        XL_row_object.forEach((question) => {
+                        let rows = await XLSX.default(content, {sheet: sheetNames[i]})
+                        let headerRow = rows.shift()
+                        let excelRowNumber = 1; //excel sheets start at index 1, which for us is the header
+                        rows.forEach((question) => {
                             console.log('Processing ' + JSON.stringify(question));
-                            for (const property in header_mapping) {
-                                var dest_property = header_mapping[property];
+                            excelRowNumber++;
+
+                            //first let's remap the current row entry from an index array
+                            //to a key value map for easier processing
+                            let questionMap = {}
+                            for(let j = 0; j < headerRow.length; j++){
+                                questionMap[headerRow[j]] = question[j]
+                            }
+                            question = questionMap
+
+                            //let's try and map a couple friendly column names into their
+                            //actual property names using the header mapping (e.g. 'topic' to 't')
+                            for (const property in headerMapping) {
+                                let dest_property = headerMapping[property];
                                 if (question[dest_property] == undefined) {
-                                    _.set(question, dest_property.split('.'), question[property]);
                                     console.log('Assigning value for ' + dest_property);
+                                    _.set(question, dest_property, question[property]);
                                     delete question[property];
                                 }
                             }
-                            question_number++;
-                            if (question['cardtitle'] != undefined) {
+
+
+                            //lets try to extract all of the user questions
+                            question.q = question.q ? [question.q] : []
+                            let counter = 1;
+                            while (true) {
+                                //users can import multiple utterances, be appending sequential numbers to
+                                //the column 'question', e.g. question8
+                                var userQuestion = question['question' + counter];
+                                if(!userQuestion) {
+                                    //break on the first instance of missing question number. For example,
+                                    //if user has question1 and question3 in their excel file, but no question2
+                                    //then we would never look at question3 because question2 is missing
+                                    break
+                                }
+                                question.q.push(userQuestion.replace(/(\r\n|\n|\r)/gm, ' '));
+                                delete question['question' + counter];
+                                counter++;
+                            }
+
+                            //validate mandatory fields of qid, question, and answer
+                            //qid must exist
+                            if (!question.qid) {
+                                self.addError(
+                                    `Warning: No QID found for line ${excelRowNumber}. The question will be skipped.`
+                                );
+                                return;
+                            }
+                            //must have atleast 1 question
+                            if (question.q.length == 0) {
+                                self.addError(
+                                    'Warning: No questions found for QID: "' +
+                                        question.qid +
+                                        '". The question will be skipped.'
+                                );
+                                return;
+                            }
+                            //answer must exist and include valid characters
+                            if (!question.a || question.a.replace(/[^a-zA-Z0-9-_]/g, '').trim().length == 0) {
+                                self.addError(
+                                    'Warning: No answer found for QID:"' +
+                                        question.qid +
+                                        '". The question will be skipped.'
+                                );
+                                return;
+                            }
+
+                            console.log('Processing Session Attributes');
+                            question.sa = [];
+                            let arrayMappings = [
+                                {
+                                    xlsFieldname: 'attributename',
+                                    esFieldname: 'text'
+                                },
+                                {
+                                    xlsFieldname: 'attributevalue',
+                                    esFieldname: 'value'
+                                },
+                                {
+                                    xlsFieldname: 'enabletranslation',
+                                    esFieldname: 'enableTranslate',
+                                    default:true,
+                                    type:"boolean"
+                                },
+                            ];
+                            self.parseMultivalueFields(question, 'Session Attribute', arrayMappings, question.sa);
+
+                            if (question['cardtitle']) {
                                 console.log('processing response title');
                                 question.r = {};
                                 question.r.title = question['cardtitle'];
                                 delete question['cardtitle'];
-                                if (question['imageurl'] != undefined) {
+                                if (question['imageurl']) {
                                     question.r.imageUrl = question.imageurl;
                                     delete question.imageurl;
                                 }
-                                if (question['cardsubtitle'] != undefined) {
+                                if (question['cardsubtitle']) {
                                     question.r.subTitle = question.subtitle;
                                     delete question['cardsubtitle'];
                                 }
@@ -404,73 +481,30 @@ module.exports = {
                                     }
                                 ];
                                 self.parseMultivalueFields(question, 'Button', arrayMappings, question.r.buttons);
-                                console.log('Processing Session Attributes');
-                                question.sa = [];
-                                let arrayMappings = [
-                                    {
-                                        xlsFieldname: 'attributename',
-                                        esFieldname: 'text'
-                                    },
-                                    {
-                                        xlsFieldname: 'attributevalue',
-                                        esFieldname: 'value'
-                                    },
-                                    {
-                                        xlsFieldname: 'enabletranslation',
-                                        esFieldname: 'enableTranslate',
-                                        default:true,
-                                        type:"boolean"
-                                    },
-                                ];
-                                self.parseMultivalueFields(question, 'Session Attribute', arrayMappings, question.sa);
-                            }
-                            let counter = 1;
-                            question.q = question.q == undefined ? [] : question.q;
-                            while (true) {
-                                var userQuestion = question['question' + counter];
-                                if (userQuestion != undefined) {
-                                    question.q.push(userQuestion.replace(/(\r\n|\n|\r)/gm, ' '));
-                                    delete question['question' + counter];
-                                    counter++;
-                                } else {
-                                    break;
-                                }
-                            }
-                            for (let property in question) {
-                                if (property.includes('.')) {
-                                    _.set(question, property.split('.'), question[property]);
-                                }
-                            }
-                            if (question.qid == undefined) {
-                                self.addError(
-                                    `Warning: No QID found for line ${question_number}. The question will be skipped.`
-                                );
-                                return;
                             }
 
-                            if (
-                                question.a == undefined ||
-                                question.a.replace(/[^a-zA-Z0-9-_]/g, '').trim().length == 0
-                            ) {
-                                self.addError(
-                                    'Warning: No answer found for QID:"' +
-                                        question.qid +
-                                        '". The question will be skipped.'
-                                );
-                                return;
+                            //properties with a '.' should be treated as nested properties
+                            //let's set any that we find into their proper destination within the object
+                            //e.g. 'botRouting.specialty_bot' ==> 'botRouting': { 'specialty_bot': value }
+                            for (let property in question) {
+                                if (property.includes('.')) {
+                                    let value = question[property]
+                                    //need to delete the property first to ensure lodash treats the property
+                                    //variable as a path, and not just as a string key
+                                    delete question[property];
+                                    if(value != null){
+                                        _.set(question, property, value);
+                                    }
+                                }
                             }
-                            if (question.q.length == 0) {
-                                self.addError(
-                                    'Warning: No questions found for QID: "' +
-                                        question.qid +
-                                        '". The question will be skipped.'
-                                );
-                                return;
-                            }
+
+                            //Note that at this point we have stopped processing the excel file and any additional
+                            //fields will be left as is. This means that new or more advanced fields can be imported
+                            //by directly referencing their schema id (e.g. 'kendraRedirectQueryArgs')
                             console.log('Processed ' + JSON.stringify(question));
                             valid_questions.push(question);
                         });
-                    });
+                    };
                     self.error = self.errorList.length != 0;
                     return {
                         qna: valid_questions
