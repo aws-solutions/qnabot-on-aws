@@ -33,7 +33,7 @@ async function es_bulk_load(body) {
 
 async function es_store_doc(index, id, body) {
     const es_response = await request({
-        url:`https://${process.env.ES_ENDPOINT}/${index}/_doc/${id}`, 
+        url:`https://${process.env.ES_ENDPOINT}/${index}/_doc/${id}`,
         method:"PUT",
         headers:{'Content-Type': 'application/json'},
         body:body,
@@ -87,7 +87,7 @@ exports.step = function (event, context, cb) {
                             config.buffer += result.Body.toString()
                             if(config.buffer.startsWith('PK')) {
                                 qnabot.log('starts with PK, must be an xlsx')
-                                let questionArray = convertxlsx.convertxlsx(result.Body)
+                                let questionArray = await convertxlsx.convertxlsx(result.Body)
                                 qnabot.log('number of items processed: ', questionArray.length)
                                 questionArray.forEach(question => {
                                     let questionStr = JSON.stringify(question)
@@ -171,7 +171,7 @@ exports.step = function (event, context, cb) {
                                 }))
                                 config.count += 1
                                 out.push(JSON.stringify(obj))
-                                
+
                                 // Save docs one at a time, for now, due to issues with k-nn index after bulk load
                                 // TODO - revert back to bulk (more efficient) when we move to OpenSearch 2.3
                                 await es_store_doc(esindex, docid, obj);

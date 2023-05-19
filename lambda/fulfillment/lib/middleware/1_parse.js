@@ -67,11 +67,9 @@ module.exports = async function parse(req, res) {
     await qna_settings.set_alias_environment_variables();
 
     req._type = req._event.version ? "ALEXA" : "LEX"
-    req._clientType = getClientType(req)
 
     switch (req._type) {
         case 'LEX':
-            Object.assign(req, await lex.parse(req))
             _.set(req,"_preferredResponseType","PlainText") ;
             // Determine preferred response message type - PlainText, or SSML
             const outputDialogMode = _.get(req,"_event.outputDialogMode") || _.get(req,"_event.inputMode") ;
@@ -86,10 +84,13 @@ module.exports = async function parse(req, res) {
             } else {
                 qnabot.log("WARNING: Unrecognised value for outputDialogMode:", outputDialogMode);
             }
+            req._clientType = getClientType(req)
+            Object.assign(req, await lex.parse(req))
             break;
         case 'ALEXA':
+            _.set(req,"_preferredResponseType","SSML")
+            req._clientType = getClientType(req)
             Object.assign(req, await alexa.parse(req))
-            _.set(req,"_preferredResponseType","SSML") ;
             break;
     }
 
