@@ -31,7 +31,6 @@ With the new LLM QA feature enabled, QnABot can answer questions from the [AWS W
 It can even generate answers to yes/no questions, like:
 - *"Is Lambda a database service?"* -> **No, Lambda is not a database service.**. 
 
-
 Even if you aren't (yet) using AWS Kendra (and you should!) QnABot can answer questions based on passages created or imported into Content Designer, such as:
 - *"Where did Humpty Dumpty sit?"* -> **On the wall**, 
 - *"Did Humpty Dumpty sit on the wall?"* -> **yes**, 
@@ -56,6 +55,8 @@ With this release, you can choose with LLM to use with QnABot:
 2. An open source LLM model automtically deployed and hosted on an Amazon SageMaker endpoint - see https://huggingface.co/philschmid/flan-t5-xxl-sharded-fp16 
 3. Third Party LLM Services: Anthropic Claude. Others may be added in future.
 4. Any other LLM model or API you like via a user provided Lambda function.
+
+> <mark>**_NOTE: Optimize Kendra:_** When using Kendra, we recommend requesting a larger document excerpt to be returned from queries. In the browser window you are using for AWS Management Console navigate to [Kendra Service Quota](https://console.aws.amazon.com/servicequotas/home/services/kendra/quotas/L-196E775D), choose Request quota increase, and change quota value to a number up to a max of 750.</mark>
 
 ### 1. Amazon Bedrock 
 
