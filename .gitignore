@@ -1,5 +1,7 @@
 build
 
+codescan-*
+
 # Logs
 logs
 *.log
@@ -63,9 +65,10 @@ config.json
 .vscode/
 utilities/migration.md
 
-# Temporary folders
+# Temporary folders and backup files
 tmp/
 temp/
+*.bak
 
 # derived build assets
 **/deployment/global-s3-assets
