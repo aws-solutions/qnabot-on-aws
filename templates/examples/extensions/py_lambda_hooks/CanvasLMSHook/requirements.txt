@@ -3,5 +3,5 @@ urllib3==1.26.5
 canvasapi==3.1.0
 idna==2.10
 pytz==2021.1
-requests==2.26.0
+requests==2.31.0
 beautifulsoup4==4.12.0
