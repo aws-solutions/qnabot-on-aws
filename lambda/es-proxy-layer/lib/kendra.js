@@ -246,7 +246,7 @@ function isSyncedFromQnABot(kendra_result){
         return false;
     }
 
-    let hit = JSON.parse(element.DocumentURI);
+    let hit = JSON.parse(kendra_result.DocumentURI);
     if (_.get(hit,"_source_qid")) {
         qnabot.warn("The Kendra result was synced from QnABot. Skipping...")
         return true
