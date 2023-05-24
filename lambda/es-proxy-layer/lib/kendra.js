@@ -27,7 +27,7 @@ function confidence_filter(minimum_score,kendra_result){
         return true;
     }
     confidences = confidences.slice(index)
-    qnabot.log("Testing confidences: Allowed - " + JSON.stringify(confidences) + " Actual - " + _.get(kendra_result,"ScoreAttributes.ScoreConfidence") )
+    qnabot.log("Filtering by confidence: Allowed - " + JSON.stringify(confidences) + " Actual - " + _.get(kendra_result,"ScoreAttributes.ScoreConfidence") + " Passage: " + _.get(kendra_result,"DocumentExcerpt.Text"))
     const found = confidences.find(element => element == _.get(kendra_result,"ScoreAttributes.ScoreConfidence")) != undefined
     return found
 }
@@ -118,7 +118,7 @@ function kendraRequester(kendraClient,params,resArray) {
             }
             else {
                 data.originalKendraIndexId = indexId;
-                qnabot.log("Data from Kendra request:" + JSON.stringify(data, null, 2));
+                qnabot.log("Kendra response:" + JSON.stringify(data, null, 2));
                 resArray.push(data);
                 resolve(data);
             }
@@ -320,7 +320,7 @@ async function routeKendraRequest(event, context) {
         && origQuestion && question && origQuestion!=question;
     if (standalone_query) {
         useOriginalLanguageQuery = false;
-        qnabot.log("LLM generated standalone query detected. Not using original language query.");
+        qnabot.log("Using LLM generated standalone query: " + standalone_query);
     }
     qnabot.log("useOriginalLanguageQuery: " + useOriginalLanguageQuery);
 
@@ -597,7 +597,7 @@ async function routeKendraRequest(event, context) {
     if (hit) {
         hit.autotranslate = useOriginalLanguageQuery ? false : true;
     }
-    qnabot.log("Returning event: ", JSON.stringify(hit, null, 2));
+    qnabot.debug("Kendra Fallback result: ", JSON.stringify(hit, null, 2));
     return hit;
 }
 

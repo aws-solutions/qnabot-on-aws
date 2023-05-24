@@ -20,7 +20,7 @@ function confidence_filter(minimum_score,kendra_result){
         return true;
     }
     confidences = confidences.slice(index)
-    qnabot.log("Testing confidences: Allowed - " + JSON.stringify(confidences) + " Actual - " + _.get(kendra_result,"ScoreAttributes.ScoreConfidence") )
+    qnabot.log("Filtering by confidence: Allowed - " + JSON.stringify(confidences) + " Actual - " + _.get(kendra_result,"ScoreAttributes.ScoreConfidence") + " Passage: " + _.get(kendra_result,"DocumentExcerpt.Text"))
     const found = confidences.find(element => element == _.get(kendra_result,"ScoreAttributes.ScoreConfidence")) != undefined
     return found
 
@@ -45,7 +45,7 @@ function kendraRequester(kendraClient,params,resArray) {
             }
             else {
                 data.originalKendraIndexId = indexId;
-                qnabot.log("Data from Kendra request:" + JSON.stringify(data, null, 2));
+                qnabot.log("Kendra response:" + JSON.stringify(data, null, 2));
                 resArray.push(data);
                 resolve(data);
             }
@@ -214,11 +214,11 @@ async function routeKendraRequest(request_params) {
         hits_struct['kendraResultsCached'] = resArray[0];
     }
     
-    qnabot.log("RETURN: " + JSON.stringify(hits_struct));
+    qnabot.debug("RETURN: " + JSON.stringify(hits_struct));
     return hits_struct;
 }
 
 exports.handler = async (request_params) => {
-    qnabot.log("kendra query request: " + JSON.stringify(request_params));
+    qnabot.log("Kendra request params: " + JSON.stringify(request_params));
     return routeKendraRequest(request_params);
 };

@@ -53,7 +53,7 @@ async function get_qa_langchain(req, promptTemplateStr, context) {
             input: input,
             query: query,
         });
-        qnabot.log(`Prompt: \nPROMPT==>\n${prompt}\n<==PROMPT`);
+        qnabot.log(`QUESTION ANSWERING PROMPT: \nPROMPT==>\n${prompt}\n<==PROMPT`);
         // end logging
         const model = get_llm_model(
             req._settings.LLM_API,
@@ -83,7 +83,7 @@ async function generate_query_langchain(req, promptTemplateStr) {
             history: (await memory.loadMemoryVariables()).history,
             input: req.question,
           });
-        qnabot.log(`Prompt: \nPROMPT==>\n${prompt}\n<==PROMPT`);
+        qnabot.log(`Prompt: \nGENERATE QUERY PROMPT==>\n${prompt}\n<==PROMPT`);
         // end logging
         const model = get_llm_model(
             req._settings.LLM_API,
@@ -92,7 +92,6 @@ async function generate_query_langchain(req, promptTemplateStr) {
         );
         const chain = new ConversationChain({ llm: model, memory: memory, prompt: promptTemplate });
         const llm_res = await chain.call({ input: req.question });
-        console.log(llm_res);
         response = llm_res.response.trim();
     } catch (e) {
         qnabot.log("EXCEPTION:", e.stack);
@@ -300,13 +299,15 @@ const generate_query = async function generate_query(req) {
     }
     const end = Date.now();
     const timing = `${end - start} ms`;
-    qnabot.log(`LLM response before running clean_standalone_query(): ${newQuery}`);
+    qnabot.debug(`LLM response before running clean_standalone_query(): ${newQuery}`);
     newQuery = clean_standalone_query(newQuery);
-    qnabot.log(`Original question: ${origQuestion} => New question: ${newQuery}`);
-    req.question = newQuery;
+    const concatQuery = `${origQuestion} / ${newQuery}`;
+    qnabot.log(`Original question: ${origQuestion} => New question: ${newQuery}. Use concenation for retrieval query: ${concatQuery}`);
+    req.question = concatQuery;
     req.llm_generated_query = {
         orig: origQuestion,
         result: newQuery,
+        concatenated: concatQuery,
         timing: timing
     };
     return req;

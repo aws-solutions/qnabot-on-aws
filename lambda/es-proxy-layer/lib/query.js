@@ -56,12 +56,11 @@ async function run_query_kendra(req, query_params) {
         }
     }
     if (alt_kendra_idxs.includes(request_params.kendra_faq_index)) {
-        qnabot.log('optimizing for KendraFallback');
+        qnabot.debug('optimizing for KendraFallback');
         request_params['same_index'] = true ;
     }
 
     var kendra_response = await kendra.handler(request_params);
-    qnabot.log(`Response from run_query_kendra => ${JSON.stringify(kendra_response)}` )
     if (_.get(kendra_response, 'hits.hits[0]._source')) {
         _.set(kendra_response, 'hits.hits[0]._source.answersource', 'Kendra FAQ');
     }
@@ -107,7 +106,7 @@ function merge_next(hit1, hit2) {
     if (hit1 === undefined) {
         return hit2;
     }
-    qnabot.log('Merge chained items');
+    qnabot.debug('Merge chained items');
     // merge plaintext answer
     if (hit1 && hit1.a) {
         hit2.a = hit1.a + hit2.a;
@@ -118,7 +117,7 @@ function merge_next(hit1, hit2) {
     if (md1 && md2) {
         _.set(hit2, 'alt.markdown', md1 + '\n' + md2);
     } else {
-        qnabot.log('Markdown field missing from one or both items; skip markdown merge');
+        qnabot.debug('Markdown field missing from one or both items; skip markdown merge');
     }
     // merge SSML, if present in both items
     var ssml1 = _.get(hit1, 'alt.ssml');
@@ -130,7 +129,7 @@ function merge_next(hit1, hit2) {
         // concatenate, and re-wrap with <speak> tags
         _.set(hit2, 'alt.ssml', '<speak>' + ssml1 + ' ' + ssml2 + '</speak>');
     } else {
-        qnabot.log('SSML field missing from one or both items; skip SSML merge');
+        qnabot.debug('SSML field missing from one or both items; skip SSML merge');
     }
     // build arrays of Lambda Hooks and arguments
     var lambdahooks = _.get(hit1, 'lambdahooks',[]);
@@ -150,7 +149,7 @@ function merge_next(hit1, hit2) {
     _.set(hit2, 'lambdahooks', lambdahooks);
 
     // all other fields inherited from item 2
-    qnabot.log('Chained items merged:', hit2);
+    qnabot.debug('Items merged:', hit2);
     return hit2;
 }
 
@@ -172,7 +171,6 @@ function get_sourceLinks_from_passages(inputText) {
     while ((matches = sourceLinkPattern.exec(inputText)) !== null) {
         sourceLinks.push(matches[1].trim().replace(/^"|"$/g, ''));
     }
-    console.log(sourceLinks);
     const uniqueLinks = [...new Set(sourceLinks)];
     return `Source Links: ${uniqueLinks.join(', ')}`;
     }
@@ -213,7 +211,7 @@ async function run_llm_qa(req, hit) {
             hit = prepend_llm_qa_answer(llm_qa_prefix, answer, hit);
             hit.debug.push("LLM: ", req._settings.LLM_API);
         } else {
-            qnabot.log(`No Hits pattern returned by LLM: ${no_hits_regex}`);
+            qnabot.log(`No Hits pattern returned by LLM: "${no_hits_regex}"`);
             hit = undefined;
         }
     }
@@ -255,7 +253,7 @@ async function get_hit(req, res) {
     var hit = _.get(response, 'hits.hits[0]._source');
 
     _.set(res, 'kendraResultsCached', response.kendraResultsCached);
-    if (response.kendraResultsCached) qnabot.log('kendra results cached in res structure');
+    if (response.kendraResultsCached) qnabot.debug('kendra results cached in res structure');
     _.set(req, 'session.qnabotcontext.kendra', response.kendra_context);
     if (response.kendra_context) qnabot.log('kendra context set in res session');
 
@@ -326,9 +324,9 @@ async function get_hit(req, res) {
             hit = await run_llm_qa(req, hit);
         }
     } else if(query_params.kendra_indexes.length != 0) {
-        qnabot.log('request entering kendra fallback ' + JSON.stringify(req));
+        qnabot.log('Query Kendra Fallback ' + JSON.stringify(req));
         hit = await kendra_fallback.handler({req,res});
-        qnabot.log('Result from Kendra ' + JSON.stringify(hit));
+        qnabot.log('Result from Kendra Fallback ' + JSON.stringify(hit));
         if(hit &&  hit.hit_count != 0)
         {
             hit.refMarkdown = get_sourceLinks_from_passages(hit.alt.markdown);
