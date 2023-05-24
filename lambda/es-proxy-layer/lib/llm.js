@@ -193,24 +193,6 @@ async function get_qa_lambda(req, promptTemplateStr, context) {
     return invoke_lambda(prompt, model_params);
 }
 
-// clean unwanted text artifacts from the provided context..
-function clean_context(context, req) {
-    let clean_context = context;
-    // remove URLS from Kendra passages
-    clean_context = clean_context.replace(/^ *Source Link:.*$/mg, '');
-    // remove Kendra prefix messages
-    if (req._settings.ALT_SEARCH_KENDRA_ANSWER_MESSAGE) {
-      clean_context = clean_context.replace(new RegExp(req._settings.ALT_SEARCH_KENDRA_ANSWER_MESSAGE, 'g'), '');
-    }
-    if (req._settings.ALT_SEARCH_KENDRA_FAQ_MESSAGE) {
-      clean_context = clean_context.replace(new RegExp(req._settings.ALT_SEARCH_KENDRA_FAQ_MESSAGE, 'g'), '');
-    }
-    if (req._settings.ALT_SEARCH_KENDRA_TOP_ANSWER_MESSAGE) {
-      clean_context = clean_context.replace(new RegExp(req._settings.ALT_SEARCH_KENDRA_TOP_ANSWER_MESSAGE, 'g'), '');
-    }
-    return clean_context;
-}
-
 function clean_standalone_query(query) {
     let clean_query = query;
     // remove preamble, if any
@@ -232,6 +214,24 @@ function clean_standalone_query(query) {
 //
 // Exported functions
 //
+
+// clean unwanted text artifacts from the provided context..
+const clean_context = function clean_context(context, req) {
+    let clean_context = context;
+    // remove URLS from Kendra passages
+    clean_context = clean_context.replace(/^ *Source Link:.*$/mg, '');
+    // remove Kendra prefix messages
+    if (req._settings.ALT_SEARCH_KENDRA_ANSWER_MESSAGE) {
+      clean_context = clean_context.replace(new RegExp(req._settings.ALT_SEARCH_KENDRA_ANSWER_MESSAGE, 'g'), '');
+    }
+    if (req._settings.ALT_SEARCH_KENDRA_FAQ_MESSAGE) {
+      clean_context = clean_context.replace(new RegExp(req._settings.ALT_SEARCH_KENDRA_FAQ_MESSAGE, 'g'), '');
+    }
+    if (req._settings.ALT_SEARCH_KENDRA_TOP_ANSWER_MESSAGE) {
+      clean_context = clean_context.replace(new RegExp(req._settings.ALT_SEARCH_KENDRA_TOP_ANSWER_MESSAGE, 'g'), '');
+    }
+    return clean_context;
+}
 
 // LangChain chatMessageHistory serialize (to JSON) and parse (from JSON)
 // Chat history persistance is maintained via userInfo, managed from query.js, and stored in DynamoDB with other userInfo.
@@ -333,6 +333,7 @@ const get_qa = async function get_qa(req, context) {
 }
 
 module.exports = {
+    clean_context:clean_context,
     chatMemorySerialise:chatMemorySerialise,
     chatMemoryParse:chatMemoryParse,
     get_question:get_question,

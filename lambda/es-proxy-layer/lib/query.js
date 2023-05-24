@@ -190,7 +190,8 @@ async function run_llm_qa(req, hit) {
     } else {
         // Context provided only in markdown channel (excluded from chat memory) 
         hit.a = "";
-        hit.alt.markdown = `**Context**\n\n${hit.alt.markdown}\n`;
+        const ctx = llm.clean_context(hit.alt.markdown, req);
+        hit.alt.markdown = `**Context**\n\n${ctx}\n`;
         hit.alt.ssml = "";     
     }
 
