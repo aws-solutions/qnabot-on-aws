@@ -84,10 +84,10 @@ var default_settings = {
     LLM_API: '${LLMApi}',
     LLM_THIRD_PARTY_API_KEY: '${LLMThirdPartyApiKey}',
     LLM_GENERATE_QUERY_ENABLE: '${LLM_GENERATE_QUERY_ENABLE}',
-    LLM_GENERATE_QUERY_PROMPT_TEMPLATE: '<br><br>Human: Here is a chat history in <chatHistory> tags:<br><chatHistory><br>{history}<br></chatHistory><br>Human: And here is a follow up question or statement from the human in <followUpMessage> tags:<br><followUpMessage><br>{input}<br></followUpMessage><br>Human: Rephrase the follow up question or statement as a standalone question or statement that makes sense without reading the chat history.<br><br>Assistant: Here is the rephrased follow up question or statement:',
+    LLM_GENERATE_QUERY_PROMPT_TEMPLATE: '${LLM_GENERATE_QUERY_PROMPT_TEMPLATE}',
     LLM_GENERATE_QUERY_MODEL_PARAMS: '${LLM_GENERATE_QUERY_MODEL_PARAMS}',
     LLM_QA_ENABLE: '${LLM_QA_ENABLE}', // Set to TRUE or FALSE to enable or disable SAGEMAKER summarization
-    LLM_QA_PROMPT_TEMPLATE: `{history}<br><br>Human: Here is a follow up question or statement from the human in <followUpMessage> tags:<br><followUpMessage>{input}<br></followUpMessage><br>Here are reference passages in <references> tags:<br><references><br>{context}<br></references><br>Carefully read the references to find out if they contain information you can use to respond to the the human's follow up question or statement.<br>- If the references contain the information needed to respond, then write a friendly and confident response in under 50 words, quoting the relevant references. <br>- Else, if the answer is not explicit in the references, but you can make an informed guess, then write a friendly response in under 50 words, stating your assumptions.<br>- Else, if you cannot respond with either a confident answer or an educated guess based on the references, then reply saying "Sorry, I don't know".<br><br>Assistant: According to the context, in under 50 words: `,
+    LLM_QA_PROMPT_TEMPLATE: '${LLM_QA_PROMPT_TEMPLATE}',
     LLM_QA_MODEL_PARAMS: '${LLM_QA_MODEL_PARAMS}',
     LLM_QA_PREFIX_MESSAGE: 'LLM Answer:',
     LLM_QA_SHOW_CONTEXT_TEXT: "TRUE",
@@ -95,8 +95,13 @@ var default_settings = {
     LLM_CHAT_HISTORY_MAX_MESSAGES: 12,
     LLM_QA_NO_HITS_REGEX: 'Sorry,  //remove comment to enable custom no match (no_hits) when LLM does not know the answer.',
 };
+const defaultGenerateQueryPromptTemplate = 'Given the following conversation and a follow up question, rephrase the follow up question to be a standalone question.<br>Chat History: <br>{history}<br>Follow Up Input: {input}<br>Standalone question:';
+const defaultQAPromptTemplate = `Use the following pieces of context to answer the question at the end. If you don't know the answer, just say that you don't know, don't try to make up an answer. Write the answer in up to 5 complete sentences.<br><br>{context}<br><br>Question: {query}<br>Helpful Answer:`;
 const defaultModelParams = `{\\"temperature\\":0}`;
+const anthropicGenerateQueryPromptTemplate = '<br><br>Human: Here is a chat history in <chatHistory> tags:<br><chatHistory><br>{history}<br></chatHistory><br>Human: And here is a follow up question or statement from the human in <followUpMessage> tags:<br><followUpMessage><br>{input}<br></followUpMessage><br>Human: Rephrase the follow up question or statement as a standalone question or statement that makes sense without reading the chat history.<br><br>Assistant: Here is the rephrased follow up question or statement:';
+const anthropicQAPromptTemplate = `{history}<br><br>Human: Here is a follow up question or statement from the human in <followUpMessage> tags:<br><followUpMessage>{input}<br></followUpMessage><br>Here are reference passages in <references> tags:<br><references><br>{context}<br></references><br>Carefully read the references to find out if they contain information you can use to respond to the the human's follow up question or statement.<br>- If the references contain the information needed to respond, then write a friendly and confident response in under 50 words, quoting the relevant references. <br>- Else, if the answer is not explicit in the references, but you can make an informed guess, then write a friendly response in under 50 words, stating your assumptions.<br>- Else, if you cannot respond with either a confident answer or an educated guess based on the references, then reply saying "Sorry, I don't know".<br><br>Assistant: According to the context, in under 50 words: `;
 const anthropicModelParams = `{\\"temperature\\":0, \\"modelName\\":\\"claude-instant-v1-100k\\"}`;
+
 module.exports = {
     "DefaultUserPoolJwksUrl": {
         "Type": "AWS::SSM::Parameter",
@@ -118,6 +123,8 @@ module.exports = {
                     "EMBEDDINGS_ENABLE" : {"Fn::If": ["EmbeddingsEnable", "TRUE", "FALSE"]},
                     "LLM_GENERATE_QUERY_ENABLE" : {"Fn::If": ["LLMEnable", "TRUE", "FALSE"]},
                     "LLM_QA_ENABLE" : {"Fn::If": ["LLMEnable", "TRUE", "FALSE"]},
+                    "LLM_GENERATE_QUERY_PROMPT_TEMPLATE": {"Fn::If": ["LLMAnthropic", anthropicGenerateQueryPromptTemplate, defaultGenerateQueryPromptTemplate]},
+                    "LLM_QA_PROMPT_TEMPLATE": {"Fn::If": ["LLMAnthropic", anthropicQAPromptTemplate, defaultQAPromptTemplate]},
                     "LLM_GENERATE_QUERY_MODEL_PARAMS": {"Fn::If": ["LLMAnthropic", anthropicModelParams, defaultModelParams]},
                     "LLM_QA_MODEL_PARAMS": {"Fn::If": ["LLMAnthropic", anthropicModelParams, defaultModelParams]},
                 }
