@@ -16,6 +16,39 @@ const ChatOpenAI = require("langchain/chat_models/openai").ChatOpenAI;
 
 const default_params_stg = `{"temperature":0}`;
 
+// make QA prompt from template
+async function make_qa_prompt(req, promptTemplateStr, context, input, query) {
+    const chatMessageHistory = await chatMemoryParse(_.get(req._userInfo, "chatMessageHistory","[]"), req._settings.LLM_CHAT_HISTORY_MAX_MESSAGES);
+    const memory = new BufferMemory({ chatHistory: chatMessageHistory });
+    const history = (await memory.loadMemoryVariables()).history;
+    const promptTemplate = new PromptTemplate({
+        template: promptTemplateStr,
+        inputVariables: ["history", "context", "input", "query"],
+    });
+    const prompt = await promptTemplate.format({
+        history: history,
+        context: context,
+        input: input,
+        query: query,
+    });
+    return [memory, history, promptTemplate, prompt];
+}
+// make generate query prompt from template
+async function make_qenerate_query_prompt(req, promptTemplateStr) {
+    const chatMessageHistory = await chatMemoryParse(_.get(req._userInfo, "chatMessageHistory","[]"), req._settings.LLM_CHAT_HISTORY_MAX_MESSAGES);
+    const memory = new BufferMemory({ chatHistory: chatMessageHistory });
+    const history = (await memory.loadMemoryVariables()).history;
+    const promptTemplate = new PromptTemplate({
+        template: promptTemplateStr,
+        inputVariables: ["history", "input"],
+    });
+    const prompt = await promptTemplate.format({
+        history: history,
+        input: req.question,
+      });
+    return [memory, history, promptTemplate, prompt];
+}
+
 // Invoke LLM via LangChain 
 function get_llm_model(api, params_stg, api_key) {
     params_stg = params_stg || default_params_stg;
@@ -37,22 +70,9 @@ function get_llm_model(api, params_stg, api_key) {
 async function get_qa_langchain(req, promptTemplateStr, context) {
     let response;
     try {
-        const chatMessageHistory = await chatMemoryParse(_.get(req._userInfo, "chatMessageHistory","[]"), req._settings.LLM_CHAT_HISTORY_MAX_MESSAGES);
-        const memory = new BufferMemory({ chatHistory: chatMessageHistory });
-        const history = (await memory.loadMemoryVariables()).history;
         const input = get_question(req);
         const query = get_query(req);
-        const promptTemplate = new PromptTemplate({
-            template: promptTemplateStr,
-            inputVariables: ["history", "context", "input", "query"],
-        });
-        // compute and log prompt value - for prompt troubleshooting only
-        const prompt = await promptTemplate.format({
-            history: history,
-            context: context,
-            input: input,
-            query: query,
-        });
+        const [memory, history, promptTemplate, prompt] = await make_qa_prompt(req, promptTemplateStr, context, input, query);
         qnabot.log(`QUESTION ANSWERING PROMPT: \nPROMPT==>\n${prompt}\n<==PROMPT`);
         // end logging
         const model = get_llm_model(
@@ -72,17 +92,7 @@ async function get_qa_langchain(req, promptTemplateStr, context) {
 async function generate_query_langchain(req, promptTemplateStr) {
     let response;
     try {
-        const chatMessageHistory = await chatMemoryParse(_.get(req._userInfo, "chatMessageHistory","[]"), req._settings.LLM_CHAT_HISTORY_MAX_MESSAGES);
-        const memory = new BufferMemory({ chatHistory: chatMessageHistory });
-        const promptTemplate = new PromptTemplate({
-            template: promptTemplateStr,
-            inputVariables: ["history", "input"],
-        });
-        // compute and log prompt value - for prompt troubleshooting only
-        const prompt = await promptTemplate.format({
-            history: (await memory.loadMemoryVariables()).history,
-            input: req.question,
-          });
+        const [memory, history, promptTemplate, prompt] = await make_qenerate_query_prompt(req, promptTemplateStr);
         qnabot.log(`Prompt: \nGENERATE QUERY PROMPT==>\n${prompt}\n<==PROMPT`);
         // end logging
         const model = get_llm_model(
@@ -109,7 +119,6 @@ async function invoke_sagemaker(prompt, model_params) {
         'parameters': model_params
     });
     let response;
-    qnabot.log(`Prompt: \nPROMPT==>\n${prompt}\n<==PROMPT`);
     qnabot.log(`Invoking SageMaker endpoint: ${process.env.LLM_SAGEMAKERENDPOINT}`);
     try {
         let smres = await sm.invokeEndpoint({
@@ -128,21 +137,16 @@ async function invoke_sagemaker(prompt, model_params) {
 }
 async function generate_query_sagemaker(req, promptTemplateStr) {
     const model_params = JSON.parse(req._settings.LLM_GENERATE_QUERY_MODEL_PARAMS || default_params_stg);
-    // parse and serialise chat history to manage max messages
-    const chatMessageHistory = await chatMemoryParse(_.get(req._userInfo, "chatMessageHistory","[]"), req._settings.LLM_CHAT_HISTORY_MAX_MESSAGES);
-    const history = await chatMemorySerialise(chatMessageHistory, req._settings.LLM_CHAT_HISTORY_MAX_MESSAGES);
-    // format prompt and invoke model
-    const prompt = promptTemplateStr.replace(/{history}/mg, history).replace(/{input}/mg, req.question);
+    const [memory, history, promptTemplate, prompt] = await make_qenerate_query_prompt(req, promptTemplateStr);
+    qnabot.log(`Prompt: \nGENERATE QUERY PROMPT==>\n${prompt}\n<==PROMPT`);
     return invoke_sagemaker(prompt, model_params);
 }
 async function get_qa_sagemaker(req, promptTemplateStr, context) {
     const model_params = JSON.parse(req._settings.LLM_QA_MODEL_PARAMS || default_params_stg);
     const input = get_question(req);
     const query = get_query(req);
-    // parse and serialise chat history to manage max messages
-    const chatMessageHistory = await chatMemoryParse(_.get(req._userInfo, "chatMessageHistory","[]"), req._settings.LLM_CHAT_HISTORY_MAX_MESSAGES);
-    const history = await chatMemorySerialise(chatMessageHistory, req._settings.LLM_CHAT_HISTORY_MAX_MESSAGES);
-    const prompt = promptTemplateStr.replace(/{history}/mg, history).replace(/{context}/mg, context).replace(/{input}/mg, input).replace(/{query}/mg, query);
+    const [memory, history, promptTemplate, prompt] = await make_qa_prompt(req, promptTemplateStr, context, input, query);
+    qnabot.log(`QUESTION ANSWERING PROMPT: \nPROMPT==>\n${prompt}\n<==PROMPT`);
     return invoke_sagemaker(prompt, model_params);
 }
 
@@ -155,7 +159,6 @@ async function invoke_lambda(prompt, model_params) {
         'parameters': model_params
     });
     let response;
-    qnabot.log(`Prompt: \nPROMPT==>\n${prompt}\n<==PROMPT`);
     qnabot.log(`Invoking Lambda: ${process.env.LLM_LAMBDA_ARN}`);
     try {
         let lambdares =await lambda.invoke({
@@ -174,11 +177,8 @@ async function invoke_lambda(prompt, model_params) {
 }
 async function generate_query_lambda(req, promptTemplateStr) {
     const model_params = JSON.parse(req._settings.LLM_GENERATE_QUERY_MODEL_PARAMS || default_params_stg);
-    // parse and serialise chat history to manage max messages
-    const chatMessageHistory = await chatMemoryParse(_.get(req._userInfo, "chatMessageHistory","[]"), req._settings.LLM_CHAT_HISTORY_MAX_MESSAGES);
-    const history = await chatMemorySerialise(chatMessageHistory, req._settings.LLM_CHAT_HISTORY_MAX_MESSAGES);
-    // format prompt and invoke model
-    const prompt = promptTemplateStr.replace(/{history}/mg, history).replace(/{input}/mg, req.question);
+    const [memory, history, promptTemplate, prompt] = await make_qenerate_query_prompt(req, promptTemplateStr);
+    qnabot.log(`Prompt: \nGENERATE QUERY PROMPT==>\n${prompt}\n<==PROMPT`);
     return invoke_lambda(prompt, model_params);
 }
 async function get_qa_lambda(req, promptTemplateStr, context) {
@@ -186,9 +186,8 @@ async function get_qa_lambda(req, promptTemplateStr, context) {
     // parse and serialise chat history to manage max messages
     const input = get_question(req);
     const query = get_query(req);
-    const chatMessageHistory = await chatMemoryParse(_.get(req._userInfo, "chatMessageHistory","[]"), req._settings.LLM_CHAT_HISTORY_MAX_MESSAGES);
-    const history = await chatMemorySerialise(chatMessageHistory, req._settings.LLM_CHAT_HISTORY_MAX_MESSAGES);
-    const prompt = promptTemplateStr.replace(/{history}/mg, history).replace(/{context}/mg, context).replace(/{input}/mg, input).replace(/{query}/mg, query);
+    const [memory, history, promptTemplate, prompt] = await make_qa_prompt(req, promptTemplateStr, context, input, query);
+    qnabot.log(`QUESTION ANSWERING PROMPT: \nPROMPT==>\n${prompt}\n<==PROMPT`);
     return invoke_lambda(prompt, model_params);
 }
 
