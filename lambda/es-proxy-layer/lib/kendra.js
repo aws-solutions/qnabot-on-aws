@@ -18,6 +18,18 @@ const { filter } = require('bluebird');
 let kendraIndexes = undefined;
 const qnabot = require("qnabot/logging")
 
+function allow_kendra_result(kendra_result, minimum_score, response_types){
+    if (!type_filter(response_types,kendra_result)) {
+        qnabot.log(`Result removed: Type [${kendra_result.Type}] not in allowed types [${response_types}] - Passage: ${_.get(kendra_result,"DocumentExcerpt.Text")}`);
+        return false;
+    }
+    if (!confidence_filter(minimum_score,kendra_result)) {
+        qnabot.log(`Result removed: ScoreConfidence [${_.get(kendra_result,"ScoreAttributes.ScoreConfidence")}] below threshold [${minimum_score}] - Passage: ${_.get(kendra_result,"DocumentExcerpt.Text")}`);
+        return false;
+    }
+    qnabot.log(`Result allowed: Type [${kendra_result.Type}], ScoreConfidence [${_.get(kendra_result,"ScoreAttributes.ScoreConfidence")}] - Passage: ${_.get(kendra_result,"DocumentExcerpt.Text")}`);
+    return true;
+}
 
 function confidence_filter(minimum_score,kendra_result){
     var confidences = ["LOW","MEDIUM","HIGH","VERY_HIGH"]
@@ -27,12 +39,11 @@ function confidence_filter(minimum_score,kendra_result){
         return true;
     }
     confidences = confidences.slice(index)
-    qnabot.log("Filtering by confidence: Allowed - " + JSON.stringify(confidences) + " Actual - " + _.get(kendra_result,"ScoreAttributes.ScoreConfidence") + " Passage: " + _.get(kendra_result,"DocumentExcerpt.Text"))
     const found = confidences.find(element => element == _.get(kendra_result,"ScoreAttributes.ScoreConfidence")) != undefined
     return found
 }
 
-function response_filter(response_types,kendra_result){
+function type_filter(response_types,kendra_result){
     return response_types.includes(kendra_result.Type)
 }
 function create_hit(answermessage,markdown,ssml,hit_count,debug_results,kendra){
@@ -201,7 +212,7 @@ function signS3URL(url, expireSecs) {
               qnabot.log("Error signing S3 URL (returning original URL): ", err) ;
         }
     } else {
-        qnabot.log("URL is not an S3 url - return unchanged: ",url);
+        qnabot.debug("URL is not an S3 url - return unchanged: ",url);
     }
     return url;
 }
@@ -314,7 +325,7 @@ async function routeKendraRequest(event, context) {
     let origQuestion = event.req["_event"]["origQuestion"];
     let question = event.req["question"];
     let userDetectedLocale = _.get(event.req, 'session.qnabotcontext.userLocale');
-    let standalone_query = _.get(event.req, 'llm_generated_query.result');
+    let standalone_query = _.get(event.req, 'llm_generated_query.concatenated');
 
     let useOriginalLanguageQuery = kendraIndexedLanguages.includes(userDetectedLocale, 0)
         && origQuestion && question && origQuestion!=question;
@@ -323,6 +334,10 @@ async function routeKendraRequest(event, context) {
         qnabot.log("Using LLM generated standalone query: " + standalone_query);
     }
     qnabot.log("useOriginalLanguageQuery: " + useOriginalLanguageQuery);
+    // when not using LLM QA, if Kendra results contain topAnswer we return that, and ignore all else..
+    // BUT this is not helpful when using the LLM to generate an answer.. in this case we should not apply
+    // any special handling for 'top answer'
+    const returnTopAnswer = (_.get(event.req._settings, "LLM_QA_ENABLE")) ? false : true;
 
     // This function can handle configuration with an array of kendraIndexes.
     // Iterate through this area and perform queries against Kendra.
@@ -393,13 +408,10 @@ async function routeKendraRequest(event, context) {
 
         if (res && res.ResultItems.length > 0) {
             res.ResultItems.forEach(function (element, i) {
-                if(!confidence_filter(minimum_score,element)){
+                if(!allow_kendra_result(element, minimum_score, searchTypes)){
                     return;
                 }
-                if(!response_filter(searchTypes,element)){
-                    return;
-                }
-                if(seenTop){
+                if(returnTopAnswer && seenTop){
                     return;
                 }
                 /* Note - only the first answer will be provided back to the requester */
@@ -417,7 +429,7 @@ async function routeKendraRequest(event, context) {
                         elem = sorted_highlights[j];
                         let offset = 4*j;
 
-                        if (elem.TopAnswer == true) {   // if top answer is found, then answer is abbreviated to this phrase
+                        if (returnTopAnswer && elem.TopAnswer == true) {   // if top answer is found, then answer is abbreviated to this phrase
                             seenTop = true;
                             answerMessageMd = topAnswerMessageMd;
                             answerTextMd = addMarkdownHighlights(answerTextMd, elem.BeginOffset+offset, elem.EndOffset+offset, true) ;
