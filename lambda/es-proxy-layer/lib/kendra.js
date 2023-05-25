@@ -197,8 +197,7 @@ function signS3URL(url, expireSecs) {
       key = url.split('/').slice(3).join('/');
     }
     if (bucket && key) {
-        qnabot.log("Attempt to convert S3 url to a signed URL: ",url);
-        qnabot.log("Bucket: ", bucket, " Key: ", key) ;
+        qnabot.debug("Convert S3 url to a signed URL: ",url, "Bucket: ", bucket, " Key: ", key);
         try {
             const s3 = new AWS.S3() ;
             const signedurl = s3.getSignedUrl('getObject', {
