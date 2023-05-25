@@ -172,7 +172,7 @@ function get_sourceLinks_from_passages(inputText) {
         sourceLinks.push(matches[1].trim().replace(/^"|"$/g, ''));
     }
     const uniqueLinks = [...new Set(sourceLinks)];
-    return `Source Links: ${uniqueLinks.join(', ')}`;
+    return `Sources: ${uniqueLinks.join(', ')}`;
     }
 
 async function run_llm_qa(req, hit) {
