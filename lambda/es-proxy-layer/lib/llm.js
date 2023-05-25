@@ -301,7 +301,7 @@ const generate_query = async function generate_query(req) {
     qnabot.debug(`LLM response before running clean_standalone_query(): ${newQuery}`);
     newQuery = clean_standalone_query(newQuery);
     const concatQuery = `${origQuestion} / ${newQuery}`;
-    qnabot.log(`Original question: ${origQuestion} => New question: ${newQuery}. Use concenation for retrieval query: ${concatQuery}`);
+    qnabot.log(`Original question: ${origQuestion} => New question: ${newQuery}. Use concatenation for retrieval query: ${concatQuery}`);
     req.question = concatQuery;
     req.llm_generated_query = {
         orig: origQuestion,
