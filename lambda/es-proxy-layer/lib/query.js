@@ -679,13 +679,13 @@ async function processFulfillmentEvent(req,res) {
                     original_input = _.get(req,'_event.origQuestion','notdefined');
                     const translated_input = req.llm_generated_query.orig;
                     const llm_generated_query = req.llm_generated_query.result;
-                    const search_string = req.llm_generated_query.concatQuery;
+                    const search_string = req.llm_generated_query.concatenated;
                     const timing = req.llm_generated_query.timing;
                     msg = `User Input: "${original_input}", Translated to: "${translated_input}", LLM generated query (${timing}): "${llm_generated_query}", Search string: "${search_string}"`
                 } else {
                     original_input = req.llm_generated_query.orig;
                     llm_generated_query = req.llm_generated_query.result;
-                    const search_string = req.llm_generated_query.concatQuery;
+                    const search_string = req.llm_generated_query.concatenated;
                     const timing = req.llm_generated_query.timing;
                     msg = `User Input: "${original_input}", LLM generated query (${timing}): "${llm_generated_query}", Search string: "${search_string}"`;
                 }
