@@ -176,11 +176,16 @@ function get_sourceLinks_from_passages(inputText) {
     }
 
 async function run_llm_qa(req, hit) {
+
+    if ( ! req._settings.LLM_QA_ENABLE ) {
+        // nothing to do
+        return hit;
+    }
+
+    // LLM_QA_ENABLE is TRUE
     const debug = req._settings.ENABLE_DEBUG_RESPONSES;
-
     const context = hit.a;
-
-    if (req._settings.LLM_QA_ENABLE && req._settings.LLM_QA_SHOW_CONTEXT_TEXT == false) {
+    if (req._settings.LLM_QA_SHOW_CONTEXT_TEXT == false) {
         // remove context text.. hit will contain only the QA Summary output
         hit.a = "";
         hit.alt.markdown = "";
@@ -193,28 +198,26 @@ async function run_llm_qa(req, hit) {
         hit.alt.ssml = "";     
     }
 
-    if (req._settings.LLM_QA_ENABLE && hit.refMarkdown) {
+    if (hit.refMarkdown) {
         hit.alt.markdown = `${hit.alt.markdown}\n${hit.refMarkdown}`;
     }
 
-    // Optionally post-process answer with LLM QA model
-    if (req._settings.LLM_QA_ENABLE) {
-        const start = Date.now();
-        const answer = await llm.get_qa(req, context);
-        const end = Date.now();
-        const timing = (debug) ? `(${end - start} ms)` : ''; 
-        // check for 'don't know' response from LLM and convert to no_hits behavior if pattern matches
-        const no_hits_regex = req._settings.LLM_QA_NO_HITS_REGEX || `Sorry, I don't know`;
-        const no_hits_res = answer.search(new RegExp(no_hits_regex, 'g'));
-        if (no_hits_res < 0) {
-            const llm_qa_prefix = `${req._settings.LLM_QA_PREFIX_MESSAGE} ${timing}` ;
-            hit = prepend_llm_qa_answer(llm_qa_prefix, answer, hit);
-            hit.debug.push("LLM: ", req._settings.LLM_API);
-        } else {
-            qnabot.log(`No Hits pattern returned by LLM: "${no_hits_regex}"`);
-            hit = undefined;
-        }
+    const start = Date.now();
+    const answer = await llm.get_qa(req, context);
+    const end = Date.now();
+    const timing = (debug) ? `(${end - start} ms)` : ''; 
+    // check for 'don't know' response from LLM and convert to no_hits behavior if pattern matches
+    const no_hits_regex = req._settings.LLM_QA_NO_HITS_REGEX || `Sorry, I don't know`;
+    const no_hits_res = answer.search(new RegExp(no_hits_regex, 'g'));
+    if (no_hits_res < 0) {
+        const llm_qa_prefix = `${req._settings.LLM_QA_PREFIX_MESSAGE} ${timing}` ;
+        hit = prepend_llm_qa_answer(llm_qa_prefix, answer, hit);
+        hit.debug.push("LLM: ", req._settings.LLM_API);
+    } else {
+        qnabot.log(`No Hits pattern returned by LLM: "${no_hits_regex}"`);
+        hit = undefined;
     }
+
     return hit;
 }
 
@@ -676,13 +679,15 @@ async function processFulfillmentEvent(req,res) {
                     original_input = _.get(req,'_event.origQuestion','notdefined');
                     const translated_input = req.llm_generated_query.orig;
                     const llm_generated_query = req.llm_generated_query.result;
+                    const search_string = req.llm_generated_query.concatQuery;
                     const timing = req.llm_generated_query.timing;
-                    msg = `User Input: "${original_input}", Translated to: "${translated_input}", LLM generated query (${timing}): "${llm_generated_query}"`
+                    msg = `User Input: "${original_input}", Translated to: "${translated_input}", LLM generated query (${timing}): "${llm_generated_query}", Search string: "${search_string}"`
                 } else {
                     original_input = req.llm_generated_query.orig;
                     llm_generated_query = req.llm_generated_query.result;
+                    const search_string = req.llm_generated_query.concatQuery;
                     const timing = req.llm_generated_query.timing;
-                    msg = `User Input: "${original_input}", LLM generated query (${timing}): "${llm_generated_query}"`;
+                    msg = `User Input: "${original_input}", LLM generated query (${timing}): "${llm_generated_query}", Search string: "${search_string}"`;
                 }
             } else {
                 if (usrLang != 'en') {
