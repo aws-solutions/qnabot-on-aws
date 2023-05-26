@@ -415,7 +415,15 @@ async function get_hit(req, res) {
     return [req, res, hit];
 }
 
-
+function isQidQuery(req) {
+    if (req.question.toLowerCase().startsWith("qid::")) {
+        return true;
+    }
+    if (_.get(req, 'qid')) {
+        return true;
+    }
+    return false;
+}
 
 /**
  * Central location to evaluate conditional chaining. Chaining can take place either when an elicitResponse is
@@ -631,7 +639,11 @@ async function processFulfillmentEvent(req,res) {
     } else {
         // elicitResponse is not involved. obtain the next question to serve up to the user.
         if (req._settings.LLM_GENERATE_QUERY_ENABLE) {
-            req = await llm.generate_query(req);
+            if (! isQidQuery(req)) {
+                req = await llm.generate_query(req);
+            } else {
+                qnabot.debug("QID specified in query - do not generate LLM query.");
+            }
         }
         [req, res, hit] = await get_hit(req, res);
     }
