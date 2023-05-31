@@ -110,7 +110,8 @@ Your Lambda function is passed an event of the form:
 ```
 {
   "prompt": "string", // prompt for the LLM
-  "parameters":{"temperature":0,...} // model parameters object containing key / value pairs for the model parameters setting (defined in QnABot settings - see below)
+  "parameters":{"temperature":0,...}, // model parameters object containing key / value pairs for the model parameters setting (defined in QnABot settings - see below)
+  "settings":{"key1":"value1",...} // settings object containing all default and custom QnAbot settings
 }
 ```
 and returns a JSON structure of the form:
@@ -124,6 +125,7 @@ def lambda_handler(event, context):
     print(event)
     prompt = event["prompt"]
     model_params = event["parameters"]
+    settings = event["settings"]
     generated_text = f"This is the prompt: {prompt}" # REPLACE WITH LLM INFERENCE API CALL
     return {
         'generated_text': generated_text

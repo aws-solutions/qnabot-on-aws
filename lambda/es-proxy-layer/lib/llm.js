@@ -152,11 +152,12 @@ async function get_qa_sagemaker(req, promptTemplateStr, context) {
 
 
 // Invoke LLM via custom Lambda abstraction
-async function invoke_lambda(prompt, model_params) {
+async function invoke_lambda(prompt, model_params, settings) {
     const lambda= new aws.Lambda({region: process.env.AWS_REGION || "us-east-1"});
     const body = JSON.stringify({
         'prompt': prompt,
-        'parameters': model_params
+        'parameters': model_params,
+        'settings': settings
     });
     let response;
     qnabot.log(`Invoking Lambda: ${process.env.LLM_LAMBDA_ARN}`);
@@ -177,18 +178,20 @@ async function invoke_lambda(prompt, model_params) {
 }
 async function generate_query_lambda(req, promptTemplateStr) {
     const model_params = JSON.parse(req._settings.LLM_GENERATE_QUERY_MODEL_PARAMS || default_params_stg);
+    const settings = req._settings;
     const [memory, history, promptTemplate, prompt] = await make_qenerate_query_prompt(req, promptTemplateStr);
     qnabot.log(`Prompt: \nGENERATE QUERY PROMPT==>\n${prompt}\n<==PROMPT`);
-    return invoke_lambda(prompt, model_params);
+    return invoke_lambda(prompt, model_params, settings);
 }
 async function get_qa_lambda(req, promptTemplateStr, context) {
     const model_params = JSON.parse(req._settings.LLM_QA_MODEL_PARAMS || default_params_stg);
+    const settings = req._settings;
     // parse and serialise chat history to manage max messages
     const input = get_question(req);
     const query = get_query(req);
     const [memory, history, promptTemplate, prompt] = await make_qa_prompt(req, promptTemplateStr, context, input, query);
     qnabot.log(`QUESTION ANSWERING PROMPT: \nPROMPT==>\n${prompt}\n<==PROMPT`);
-    return invoke_lambda(prompt, model_params);
+    return invoke_lambda(prompt, model_params, settings);
 }
 
 function clean_standalone_query(query) {
