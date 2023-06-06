@@ -172,6 +172,7 @@ async function invoke_lambda(prompt, model_params, settings, function_name) {
         if (payload.generated_text) {
             response = payload.generated_text;
         } else {
+            qnabot.log('ERROR: Lambda response error:', payload);
             if (payload.errorMessage) {
                 response = payload.errorMessage;
             } else {

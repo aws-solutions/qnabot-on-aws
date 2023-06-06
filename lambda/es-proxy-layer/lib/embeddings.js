@@ -27,6 +27,7 @@ const get_embeddings_sm = async function get_embeddings_sm(type_q_or_a, input, s
 
 const get_embeddings_lambda = async function get_embeddings_lambda(type_q_or_a, input, settings, function_name) {
     console.log(`Fetch embeddings from Lambda for type: '${type_q_or_a}' - InputText: ${input}`);
+    let embedding;
     let lambda= new aws.Lambda();
     let lambdares=await lambda.invoke({
         FunctionName:function_name,
@@ -34,7 +35,13 @@ const get_embeddings_lambda = async function get_embeddings_lambda(type_q_or_a, 
         Payload:JSON.stringify({inputType: type_q_or_a, inputText: input})
     }).promise();
     let payload=JSON.parse(lambdares.Payload);
-    return payload.embedding;
+    if (payload.embedding) {
+        embedding = payload.embedding;
+    } else {
+        qnabot.log('ERROR: Embedding Lambda response error:', payload);
+        embedding = undefined;
+    }
+    return embedding;
 }
 
 module.exports = async function (type_q_or_a, input, settings) {
