@@ -38,8 +38,11 @@ const get_embeddings_lambda = async function get_embeddings_lambda(type_q_or_a, 
     if (payload.embedding) {
         embedding = payload.embedding;
     } else {
-        qnabot.log('ERROR: Embedding Lambda response error:', payload);
-        embedding = undefined;
+        console.log('ERROR: Embedding Lambda response error:', payload);
+        if (payload.errorMessage && payload.errorMessage.includes("ValidationException")) {
+            console.log('ERROR: ValidationException - Most likely reason is payload length exceeds limit - check embedding API documentation for input token length limits.');
+        } 
+        throw "ERROR: Embedding Lambda response error";
     }
     return embedding;
 }

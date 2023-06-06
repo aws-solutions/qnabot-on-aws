@@ -80,7 +80,7 @@ var default_settings = {
     EMBEDDINGS_ENABLE: '${EMBEDDINGS_ENABLE}', // Set to TRUE or FALSE to enable or disable use of embeddings for semantic search
     EMBEDDINGS_SCORE_THRESHOLD: 0.85, // If embedding similarity score is under threshold the match is rejected and QnABot reverts to scoring answer field (if ES_SCORE_ANSWER_FIELD is true).
     EMBEDDINGS_SCORE_ANSWER_THRESHOLD: 0.80, // Applies only when if ES_SCORE_ANSWER_FIELD is true. If embedding similarity score on answer field is under threshold the match is rejected.
-    EMBEDDINGS_TEXT_PASSAGE_SCORE_THRESHOLD: 0.80, // Applies only when if ES_SCORE_TEXT_ITEM_PASSAGES is true. If embedding similarity score on text item field is under threshold the match is rejected.
+    EMBEDDINGS_TEXT_PASSAGE_SCORE_THRESHOLD: 0.70, // Applies only when if ES_SCORE_TEXT_ITEM_PASSAGES is true. If embedding similarity score on text item field is under threshold the match is rejected.
     LLM_API: '${LLMApi}',
     LLM_THIRD_PARTY_API_KEY: '${LLMThirdPartyApiKey}',
     LLM_GENERATE_QUERY_ENABLE: '${LLM_GENERATE_QUERY_ENABLE}',
