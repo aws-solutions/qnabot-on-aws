@@ -11,7 +11,8 @@ For now this is an Experimental feature. We encourage you to try it on non-produ
 
 With this release, QnaBot can now use 
 1. PREFERRED: Embeddings from a Text Embedding model hosted on an Amazon SageMaker endpoint - see https://huggingface.co/intfloat/e5-large
-2. CUSTOMIZABLE: Embeddings from a user provided Lambda function - explore alternate pretrained and/or fine tuned embeddings models. 
+2. CUSTOMIZABLE: Embeddings from a user provided Lambda function - explore alternate pretrained and/or fine tuned embeddings models.
+3. BEDROCK: Amazon Bedrock is in limited preview; users need to request access and be added to an allowlist in order to start using the BEDROCK option for embeddings - Visit https://aws.amazon.com/bedrock to request access and to learn more about the Amazon Bedrock service. 
 
 ## 1. Amazon Sagemaker (PREFERRED)
 
@@ -30,7 +31,7 @@ By setting the parameter `SagemakerInitialInstanceCount` to `0`, a [Serverless S
 ![CFN Params](./images/CF_Params_Sagemaker.png)
 
 
-## 3. Lambda function
+## 2. Lambda function
 
 Use a custom Lambda function to use any Embedding API or embedding model on Sagemaker to generate embeddings.  
 
@@ -55,6 +56,14 @@ and must return a JSON structure of the form:
 ```
 where the length of the embedding array matches the value you specify for the stack parameter `EmbeddingsLambdaDimensions`.
 
+## 3. Amazon Bedrock (Limited preview only)
+
+Amazon Bedrock is in limited preview; users need to request access and be added to an allowlist in order to start using the BEDROCK option for embeddings - Visit https://aws.amazon.com/bedrock to request access and to learn more about the Amazon Bedrock service.
+
+### Deploy Stack for Bedrock Embeddings
+
+If your account is allow listed for the Amazon Bedrock limited preview, then
+- set `EmbeddingsAPI` to BEDROCK
 
 
 ## Settings

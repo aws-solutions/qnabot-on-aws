@@ -51,18 +51,14 @@ You can use disambiguation and generative question answering, as shown below:
   
 
 With this release, you can choose with LLM to use with QnABot:  
-1. Amazon Bedrock (Coming soon!)
-2. An open source LLM model automtically deployed and hosted on an Amazon SageMaker endpoint - see https://huggingface.co/philschmid/flan-t5-xxl-sharded-fp16 
-3. Third Party LLM Services: Anthropic Claude. Others may be added in future.
-4. Any other LLM model or API you like via a user provided Lambda function.
+1. An open source LLM model automtically deployed and hosted on an Amazon SageMaker endpoint - see https://huggingface.co/philschmid/flan-t5-xxl-sharded-fp16 
+2. Third Party LLM Services: Anthropic Claude. Others may be added in future.
+3. Any other LLM model or API you like via a user provided Lambda function.
+4. Amazon Bedrock: Bedrock is in limited preview; users need to request access and be added to an allowlist in order to start using the BEDROCK option for embeddings - Visit https://aws.amazon.com/bedrock to request access and to learn more about the Amazon Bedrock service. 
 
 > <mark>**_NOTE: Optimize Kendra:_** When using Kendra, we recommend requesting a larger document excerpt to be returned from queries. In the browser window you are using for AWS Management Console navigate to [Kendra Service Quota](https://console.aws.amazon.com/servicequotas/home/services/kendra/quotas/L-196E775D), choose Request quota increase, and change quota value to a number up to a max of 750.</mark>
 
-### 1. Amazon Bedrock 
-
-Not yet available. Coming Soon!
-
-### 2. Amazon SAGEMAKER
+### 1. Amazon SAGEMAKER
 
 QnABot provisions a Sagemaker endpoint running the Hugging Face flan-t5-xxl-sharded-fp16 model - see https://huggingface.co/philschmid/flan-t5-xxl-sharded-fp16. 
   
@@ -77,7 +73,7 @@ By default a 1-node ml.g5.xlarge endpoint is automatically provisioned. For larg
 
 ![CFN Params](./images/CF_Params_SageMaker.png)
 
-### 3. Third Party LLM Services: Anthropic Claude
+### 2. Third Party LLM Services: Anthropic Claude
 
 Configure QnABot to use 3rd party LLM services from Anthropic by selecting 'ANTHROPIC', and providing an API key issued by the third party provider. Note that when using third party providers, your data will leave your AWS account and the AWS network and will be sent in the payload of the API requests to the third party provider. 
 QnABot uses the LangChain JS NPM packages to establish communication with the provider APIs. When using Anthropic, the latest Claude-v1-instant model is used by default. To select a different model, add `modelName` key to the LLM model parameters in Settings - discussed below.
@@ -92,7 +88,7 @@ QnABot uses the LangChain JS NPM packages to establish communication with the pr
 
 ![CFN Params](./images/CF_Params_Anthropic.png)
 
-### 4. Lambda function
+### 3. Lambda function
 
 Use a custom Lambda function to experiment with LLMs of your choice. Provide your own lambda function that takes a *question*, *context*, and a QnABot *settings* object. Your Lambda function can invoke any LLM you choose, and return the prediction in a JSON object containing the key, `generated_text`. You provide the ARN for your Lambda function when you deploy or update QnABot.  
 
@@ -131,6 +127,19 @@ def lambda_handler(event, context):
         'generated_text': generated_text
     }
 ```
+
+### 4. Amazon Bedrock (Limited preview only)
+
+Amazon Bedrock is in limited preview; users need to request access and be added to an allowlist in order to start using the BEDROCK option for embeddings - Visit https://aws.amazon.com/bedrock to request access and to learn more about the Amazon Bedrock service.
+
+By default, the Amazon Titan `amazon.titan-tg1-large` model is used. You can configure QnABot to use a different Bedrock model by editing the Content Designer settings for `LLM_GENERATE_QUERY_MODEL_PARAMS` and `LLM_QA_MODEL_PARAMS` - see below.
+
+#### Deploy Stack for BEDROCK
+
+- *(for Kendra Fallback)* set `DefaultKendraIndexId` to the Index Id (a GUID) of your existing Kendra index containing ingested documents 
+- *(for text passage queries)* set `EmbeddingsApi` to BEDROCK (see  [Semantic Search using Text Embeddings](../semantic_matching_using_LLM_embeddings/README.md))
+- set `LLMApi` to BEDROCK
+- for `InstallLexResponseBots` choose `false` - if you don't plan to use Response bots, this speeds up the stack installation.
 
 
 ### Relevant Settings
