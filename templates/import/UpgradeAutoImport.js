@@ -18,7 +18,7 @@ module.exports={
             index:{"Ref":"VarIndex"},
             encryption:{"Ref":"Encryption"},
             es_endpoint:{"Ref":"EsEndpoint"},
-            POST_UPGRADE_IMPORT_TRIGGERS:{"Fn::Sub":"${EmbeddingsApi} ${EmbeddingsLambdaDimensions} ${EmbeddingsLambdaArn} ${EmbeddingsSagemakerEndpoint}"}
+            POST_UPGRADE_IMPORT_TRIGGERS:{"Fn::Sub":"${EmbeddingsApi} ${EmbeddingsLambdaDimensions} ${EmbeddingsLambdaArn} ${BedrockEmbeddingsLambdaArn} ${EmbeddingsSagemakerEndpoint}"}
         }
     },
     "PostUpgradeImportMetrics":{

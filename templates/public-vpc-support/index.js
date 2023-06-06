@@ -159,13 +159,16 @@ module.exports=Promise.resolve(require('../master')).then(function(base){
     base.Conditions.EmbeddingsSagemaker={'Fn::Equals':[{'Ref':'EmbeddingsApi'},'SAGEMAKER']}
     base.Conditions.EmbeddingsLambda={'Fn::Equals':[{'Ref':'EmbeddingsApi'},'LAMBDA']}
     base.Conditions.EmbeddingsLambdaArn={'Fn::Not': [{ 'Fn::Equals':[{'Ref':'EmbeddingsLambdaArn'},'']}]}
+    base.Conditions.EmbeddingsBedrock={"Fn::Equals":[{"Ref":"EmbeddingsApi"},"BEDROCK"]}
     base.Conditions.LLMEnable={'Fn::Not': [{ 'Fn::Equals':[{'Ref':'LLMApi'},'DISABLED']}]}
     base.Conditions.LLMSagemaker={'Fn::Or': [{'Fn::Equals':[{'Ref':'LLMApi'},'SAGEMAKER']}, {'Fn::Equals':[{'Ref':'LLMApi'},'ALL']}]}
     base.Conditions.LLMLambda={'Fn::Or': [{'Fn::Equals':[{'Ref':'LLMApi'},'LAMBDA']}, {'Fn::Equals':[{'Ref':'LLMApi'},'ALL']}]}
     base.Conditions.LLMLambdaArn={'Fn::Not': [{ 'Fn::Equals':[{'Ref':'LLMLambdaArn'},'']}]}
     base.Conditions.LLMAnthropic={'Fn::Or': [{'Fn::Equals':[{'Ref':'LLMApi'},'ANTHROPIC']}, {'Fn::Equals':[{'Ref':'LLMApi'},'ALL']}]}
     base.Conditions.LLMThirdPartyApiKey={'Fn::Not': [{ 'Fn::Equals':[{'Ref':'LLMThirdPartyApiKey'},'']}]}
-
+    base.Conditions.LLMBedrock={'Fn::Or': [{'Fn::Equals':[{'Ref':'LLMApi'},'BEDROCK']}, {'Fn::Equals':[{'Ref':'LLMApi'},'BEDROCK']}]}
+    base.Conditions.Bedrock={'Fn::Or': [{'Condition':'EmbeddingsBedrock'},{'Condition':'LLMBedrock'}]}
+    
     var out=JSON.stringify(base);
 
     if(config.buildType == 'AWSSolutions') {

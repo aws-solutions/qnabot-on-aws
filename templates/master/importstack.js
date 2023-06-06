@@ -30,7 +30,13 @@ module.exports={
                 "EmbeddingsLambdaArn":{"Ref": "EmbeddingsLambdaArn"},
                 "EmbeddingsApi": {"Ref": "EmbeddingsApi"},
                 "EmbeddingsLambdaDimensions": {"Ref": "EmbeddingsLambdaDimensions"},
-                "EmbeddingsLambdaArn": {"Ref": "EmbeddingsLambdaArn"},
+                "BedrockEmbeddingsLambdaArn": {
+                    "Fn::If": [
+                        "EmbeddingsBedrock", 
+                        {"Fn::GetAtt": ["BedrockStack", "Outputs.BedrockEmbeddingsLambdaArn"] }, 
+                        ""
+                    ]
+                  },
                 "EmbeddingsSagemakerEndpoint": {
                     "Fn::If": [
                         "EmbeddingsSagemaker", 

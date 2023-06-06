@@ -276,6 +276,13 @@ module.exports={
               ]
             },
             EMBEDDINGS_LAMBDA_ARN: { "Ref": "EmbeddingsLambdaArn" },
+            BEDROCK_EMBEDDINGS_LAMBDA_ARN: {
+              "Fn::If": [
+                  "EmbeddingsBedrock", 
+                  {"Fn::GetAtt": ["BedrockStack", "Outputs.BedrockEmbeddingsLambdaArn"] }, 
+                  ""
+              ]
+            },
           }
         },
         "Handler": "index.handler",
@@ -366,6 +373,19 @@ module.exports={
                             "lambda:InvokeFunction"
                           ],
                           "Resource":[{"Ref":"EmbeddingsLambdaArn"}]
+                        },
+                        {"Ref":"AWS::NoValue"}
+                      ]
+                    },
+                    { 
+                      "Fn::If": [
+                        "EmbeddingsBedrock", 
+                        {
+                          "Effect": "Allow",
+                          "Action": [
+                            "lambda:InvokeFunction"
+                          ],
+                          "Resource":[{"Fn::GetAtt": ["BedrockStack", "Outputs.BedrockEmbeddingsLambdaArn"] }]
                         },
                         {"Ref":"AWS::NoValue"}
                       ]

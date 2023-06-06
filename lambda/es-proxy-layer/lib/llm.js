@@ -151,8 +151,8 @@ async function get_qa_sagemaker(req, promptTemplateStr, context) {
 }
 
 
-// Invoke LLM via custom Lambda abstraction
-async function invoke_lambda(prompt, model_params, settings) {
+// Invoke LLM via Lambda
+async function invoke_lambda(prompt, model_params, settings, function_name) {
     const lambda= new aws.Lambda({region: process.env.AWS_REGION || "us-east-1"});
     const body = JSON.stringify({
         'prompt': prompt,
@@ -163,27 +163,35 @@ async function invoke_lambda(prompt, model_params, settings) {
     qnabot.log(`Invoking Lambda: ${process.env.LLM_LAMBDA_ARN}`);
     try {
         let lambdares =await lambda.invoke({
-            FunctionName:process.env.LLM_LAMBDA_ARN,
+            FunctionName:function_name,
             InvocationType:'RequestResponse',
             Payload: body,
         }).promise();
         let payload=JSON.parse(lambdares.Payload);
         qnabot.log('Lambda response payload:', payload);
-        response = payload.generated_text;
+        if (payload.generated_text) {
+            response = payload.generated_text;
+        } else {
+            if (payload.errorMessage) {
+                response = payload.errorMessage;
+            } else {
+                response = "LLM inference failed."
+            }
+        }
     } catch (e) {
         qnabot.log("EXCEPTION:", e.stack);
         response = 'Lambda exception: ' + e.message.substring(0, 500) + '...';
     }
     return response;
 }
-async function generate_query_lambda(req, promptTemplateStr) {
+async function generate_query_lambda(req, promptTemplateStr, function_name) {
     const model_params = JSON.parse(req._settings.LLM_GENERATE_QUERY_MODEL_PARAMS || default_params_stg);
     const settings = req._settings;
     const [memory, history, promptTemplate, prompt] = await make_qenerate_query_prompt(req, promptTemplateStr);
     qnabot.log(`Prompt: \nGENERATE QUERY PROMPT==>\n${prompt}\n<==PROMPT`);
-    return invoke_lambda(prompt, model_params, settings);
+    return invoke_lambda(prompt, model_params, settings, function_name);
 }
-async function get_qa_lambda(req, promptTemplateStr, context) {
+async function get_qa_lambda(req, promptTemplateStr, context, function_name) {
     const model_params = JSON.parse(req._settings.LLM_QA_MODEL_PARAMS || default_params_stg);
     const settings = req._settings;
     // parse and serialise chat history to manage max messages
@@ -191,7 +199,7 @@ async function get_qa_lambda(req, promptTemplateStr, context) {
     const query = get_query(req);
     const [memory, history, promptTemplate, prompt] = await make_qa_prompt(req, promptTemplateStr, context, input, query);
     qnabot.log(`QUESTION ANSWERING PROMPT: \nPROMPT==>\n${prompt}\n<==PROMPT`);
-    return invoke_lambda(prompt, model_params, settings);
+    return invoke_lambda(prompt, model_params, settings, function_name);
 }
 
 function clean_standalone_query(query) {
@@ -295,7 +303,9 @@ const generate_query = async function generate_query(req) {
         // TODO refactor when langchainJS supports Sagemaker
         newQuery = await generate_query_sagemaker(req, promptTemplateStr);
     } else if (req._settings.LLM_API == "LAMBDA") {
-        newQuery = await generate_query_lambda(req, promptTemplateStr);
+        newQuery = await generate_query_lambda(req, promptTemplateStr, process.env.LLM_LAMBDA_ARN);
+    } else if (req._settings.LLM_API == "BEDROCK") {
+        newQuery = await generate_query_lambda(req, promptTemplateStr, process.env.BEDROCK_LLM_LAMBDA_ARN);
     } else { // LangChain for all other LLM options
         newQuery = await generate_query_langchain(req, promptTemplateStr);
     }
@@ -325,7 +335,9 @@ const get_qa = async function get_qa(req, context) {
         // TODO refactor when langchainJS supports Sagemaker
         answer = await get_qa_sagemaker(req, promptTemplateStr, context);
     } else if (req._settings.LLM_API == "LAMBDA") {
-        answer = await get_qa_lambda(req, promptTemplateStr, context);
+        answer = await get_qa_lambda(req, promptTemplateStr, context, process.env.LLM_LAMBDA_ARN);
+    } else if (req._settings.LLM_API == "BEDROCK") {
+        answer = await get_qa_lambda(req, promptTemplateStr, context, process.env.BEDROCK_LLM_LAMBDA_ARN);
     } else { // LangChain for all other LLM options
         answer = await get_qa_langchain(req, promptTemplateStr, context);
     }

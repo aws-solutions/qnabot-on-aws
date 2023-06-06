@@ -81,6 +81,7 @@ module.exports=Object.assign(
                 EMBEDDINGS_API: { "Ref": "EmbeddingsApi" },
                 EMBEDDINGS_SAGEMAKER_ENDPOINT : { "Ref": "EmbeddingsSagemakerEndpoint" },
                 EMBEDDINGS_LAMBDA_ARN: { "Ref": "EmbeddingsLambdaArn" },
+                BEDROCK_EMBEDDINGS_LAMBDA_ARN: { "Ref": "BedrockEmbeddingsLambdaArn" },
             }
         },
         "Handler": "index.step",
@@ -197,9 +198,12 @@ module.exports=Object.assign(
               "Action": [
                 "lambda:InvokeFunction"
               ],
-              "Resource":[{"Ref":"EsProxyLambda"}, { "Fn::If": ["EmbeddingsLambdaArn", {"Ref":"EmbeddingsLambdaArn"}, {"Ref":"AWS::NoValue"}] }]
-          },
-          {
+              "Resource":[
+                {"Ref":"EsProxyLambda"}, 
+                { "Fn::If": ["EmbeddingsLambdaArn", {"Ref":"EmbeddingsLambdaArn"}, {"Ref":"AWS::NoValue"}]},
+                { "Fn::If": ["BedrockEmbeddingsLambdaArn", {"Ref":"BedrockEmbeddingsLambdaArn"}, {"Ref":"AWS::NoValue"}]}
+              ]
+          },{
               "Effect": "Allow",
               "Action": [
                 "es:ESHttpPost",

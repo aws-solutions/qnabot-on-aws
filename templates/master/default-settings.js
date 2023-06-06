@@ -86,7 +86,7 @@ var default_settings = {
     LLM_GENERATE_QUERY_ENABLE: '${LLM_GENERATE_QUERY_ENABLE}',
     LLM_GENERATE_QUERY_PROMPT_TEMPLATE: '${LLM_GENERATE_QUERY_PROMPT_TEMPLATE}',
     LLM_GENERATE_QUERY_MODEL_PARAMS: '${LLM_GENERATE_QUERY_MODEL_PARAMS}',
-    LLM_QA_ENABLE: '${LLM_QA_ENABLE}', // Set to TRUE or FALSE to enable or disable SAGEMAKER summarization
+    LLM_QA_ENABLE: '${LLM_QA_ENABLE}',
     LLM_QA_PROMPT_TEMPLATE: '${LLM_QA_PROMPT_TEMPLATE}',
     LLM_QA_MODEL_PARAMS: '${LLM_QA_MODEL_PARAMS}',
     LLM_QA_PREFIX_MESSAGE: 'LLM Answer:',
@@ -101,6 +101,9 @@ const defaultModelParams = `{\\"temperature\\":0}`;
 const anthropicGenerateQueryPromptTemplate = `<br><br>Human: Here is a chat history in <chatHistory> tags:<br><chatHistory><br>{history}<br></chatHistory><br>Human: And here is a follow up question or statement from the human in <followUpMessage> tags:<br><followUpMessage><br>{input}<br></followUpMessage><br>Human: Rephrase the follow up question or statement as a standalone question or statement that makes sense without reading the chat history.<br><br>Assistant: Here is the rephrased follow up question or statement:`;
 const anthropicQAPromptTemplate = `{history}<br><br>Human: Here is a follow up question or statement from the human in <followUpMessage> tags:<br><followUpMessage>{input}<br></followUpMessage><br>Here are reference passages in <references> tags:<br><references><br>{context}<br></references><br>Carefully read the references to find out if they contain information you can use to respond to the the human's follow up question or statement.<br>- If the references contain the information needed to respond, then write a friendly and confident response in under 50 words, quoting the relevant references. <br>- Else, if the answer is not explicit in the references, but you can make an informed guess, then write a friendly response in under 50 words, stating your assumptions.<br>- Else, if you cannot respond with either a confident answer or an educated guess based on the references, then reply saying \\"Sorry, I don't know\\".<br><br>Assistant: According to the context, in under 50 words: `;
 const anthropicModelParams = `{\\"temperature\\":0, \\"modelName\\":\\"claude-instant-v1-100k\\"}`;
+const bedrockGenerateQueryPromptTemplate = defaultGenerateQueryPromptTemplate;
+const bedrockQAPromptTemplate = `{history}<br><br>Human: Here is a follow up question or statement from the human in <followUpMessage> tags:<br><followUpMessage>{input}<br></followUpMessage><br>Here are reference passages in <references> tags:<br><references><br>{context}<br></references><br>Carefully read the references to find out if they contain information you can use to respond to the the human's follow up question or statement.<br>- If the references contain the information needed to respond, then write a friendly and confident response in under 50 words, quoting the relevant references. <br>- Else, if the answer is not explicit in the references, but you can make an informed guess, then write a friendly response in under 50 words, stating your assumptions.<br>- Else, if you cannot respond with either a confident answer or an educated guess based on the references, then reply saying \\"Sorry, I don't know\\".<br><br>Assistant: According to the context, in under 50 words: `;
+const bedrockModelParams = `{\\"modelId\\":\\"amazon.titan-tg1-large\\", \\"textGenerationConfig\\":{\\"temperature\\":0, \\"maxTokenCount\\":512}}`;
 
 module.exports = {
     "DefaultUserPoolJwksUrl": {
@@ -123,10 +126,42 @@ module.exports = {
                     "EMBEDDINGS_ENABLE" : {"Fn::If": ["EmbeddingsEnable", "TRUE", "FALSE"]},
                     "LLM_GENERATE_QUERY_ENABLE" : {"Fn::If": ["LLMEnable", "TRUE", "FALSE"]},
                     "LLM_QA_ENABLE" : {"Fn::If": ["LLMEnable", "TRUE", "FALSE"]},
-                    "LLM_GENERATE_QUERY_PROMPT_TEMPLATE": {"Fn::If": ["LLMAnthropic", anthropicGenerateQueryPromptTemplate, defaultGenerateQueryPromptTemplate]},
-                    "LLM_QA_PROMPT_TEMPLATE": {"Fn::If": ["LLMAnthropic", anthropicQAPromptTemplate, defaultQAPromptTemplate]},
-                    "LLM_GENERATE_QUERY_MODEL_PARAMS": {"Fn::If": ["LLMAnthropic", anthropicModelParams, defaultModelParams]},
-                    "LLM_QA_MODEL_PARAMS": {"Fn::If": ["LLMAnthropic", anthropicModelParams, defaultModelParams]},
+                    "LLM_GENERATE_QUERY_PROMPT_TEMPLATE": {"Fn::If": [
+                        "LLMAnthropic", 
+                        anthropicGenerateQueryPromptTemplate,
+                        {"Fn::If": [
+                            "LLMBedrock",
+                            bedrockGenerateQueryPromptTemplate,
+                            defaultGenerateQueryPromptTemplate
+                        ]}
+                    ]},
+                    "LLM_QA_PROMPT_TEMPLATE": {"Fn::If": [
+                        "LLMAnthropic", 
+                        anthropicQAPromptTemplate,
+                        {"Fn::If": [
+                            "LLMBedrock",
+                            bedrockQAPromptTemplate,
+                            defaultQAPromptTemplate
+                        ]}
+                    ]},
+                    "LLM_GENERATE_QUERY_MODEL_PARAMS": {"Fn::If": [
+                        "LLMAnthropic", 
+                        anthropicModelParams, 
+                        {"Fn::If": [
+                            "LLMBedrock",
+                            bedrockModelParams,
+                            defaultModelParams
+                        ]}
+                    ]},
+                    "LLM_QA_MODEL_PARAMS": {"Fn::If": [
+                        "LLMAnthropic", 
+                        anthropicModelParams, 
+                        {"Fn::If": [
+                            "LLMBedrock",
+                            bedrockModelParams,
+                            defaultModelParams
+                        ]}
+                    ]},
                 }
             ]} 
         }

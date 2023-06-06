@@ -264,8 +264,8 @@ module.exports={
     },
     "EmbeddingsApi":{
       "Type":"String",
-      "Description":"Optionally enable (experimental) QnABot Semantics Search using Embeddings from a pre-trained Large Language Model. If set to SAGEMAKER, an ml.m5.xlarge Sagemaker endpoint is automatically provisioned with Hugging Face e5-large model. To use a custom LAMBDA function, provide additional parameters below.",
-      "AllowedValues": ["DISABLED", "SAGEMAKER", "LAMBDA"],
+      "Description":"Optionally enable (experimental) QnABot Semantics Search using Embeddings from a pre-trained Large Language Model. If set to SAGEMAKER, an ml.m5.xlarge Sagemaker endpoint is automatically provisioned with Hugging Face e5-large model. To use a custom LAMBDA function, provide additional parameters below. Amazon Bedrock is in limited preview; users need to request access and be added to an allowlist in order to start using the BEDROCK option - Visit https://aws.amazon.com/bedrock to request access and to learn more about the Amazon Bedrock service.",
+      "AllowedValues": ["DISABLED", "SAGEMAKER", "LAMBDA", "BEDROCK"],
       "Default":"DISABLED"
     },
     "SagemakerInitialInstanceCount":{
@@ -288,8 +288,8 @@ module.exports={
     },
     'LLMApi':{
       'Type':'String',
-      'Description':'Optionally enable (experimental) QnABot question disambiguation and generative question answering using an LLM. If set to SAGEMAKER, a Sagemaker endpoint is automatically provisioned. To use a custom LAMBDA function, provide additional parameters below. To use a supported third party service, enter the API key below.',
-      'AllowedValues': ['DISABLED', 'SAGEMAKER', 'LAMBDA', 'ANTHROPIC'],
+      'Description':'Optionally enable (experimental) QnABot question disambiguation and generative question answering using an LLM. If set to SAGEMAKER, a Sagemaker endpoint is automatically provisioned. To use a custom LAMBDA function, provide additional parameters below. To use a supported third party service, enter the API key below. Amazon Bedrock is in limited preview; users need to request access and be added to an allowlist in order to start using the BEDROCK option - Visit https://aws.amazon.com/bedrock to request access and to learn more about the Amazon Bedrock service.',
+      'AllowedValues': ['DISABLED', 'SAGEMAKER', 'LAMBDA', 'ANTHROPIC', 'BEDROCK'],
       'Default':'DISABLED'
     },
     'LLMSagemakerInitialInstanceCount':{
@@ -334,11 +334,14 @@ module.exports={
     "EmbeddingsSagemaker":{"Fn::Equals":[{"Ref":"EmbeddingsApi"},"SAGEMAKER"]},
     "EmbeddingsLambda":{"Fn::Equals":[{"Ref":"EmbeddingsApi"},"LAMBDA"]},
     "EmbeddingsLambdaArn":{"Fn::Not": [{ "Fn::Equals":[{"Ref":"EmbeddingsLambdaArn"},""]}]},
+    "EmbeddingsBedrock":{"Fn::Equals":[{"Ref":"EmbeddingsApi"},"BEDROCK"]},
     'LLMEnable':{'Fn::Not': [{ 'Fn::Equals':[{'Ref':'LLMApi'},'DISABLED']}]},
     'LLMSagemaker': {'Fn::Or': [{'Fn::Equals':[{'Ref':'LLMApi'},'SAGEMAKER']}, {'Fn::Equals':[{'Ref':'LLMApi'},'ALL']}]},
     'LLMLambda':{'Fn::Or': [{'Fn::Equals':[{'Ref':'LLMApi'},'LAMBDA']}, {'Fn::Equals':[{'Ref':'LLMApi'},'ALL']}]},
     'LLMLambdaArn':{'Fn::Not': [{ 'Fn::Equals':[{'Ref':'LLMLambdaArn'},'']}]},
     'LLMAnthropic':{'Fn::Or': [{'Fn::Equals':[{'Ref':'LLMApi'},'ANTHROPIC']}, {'Fn::Equals':[{'Ref':'LLMApi'},'ALL']}]},
     'LLMThirdPartyApiKey':{'Fn::Not': [{ 'Fn::Equals':[{'Ref':'LLMThirdPartyApiKey'},'']}]},
+    'LLMBedrock': {'Fn::Or': [{'Fn::Equals':[{'Ref':'LLMApi'},'BEDROCK']}, {'Fn::Equals':[{'Ref':'LLMApi'},'BEDROCK']}]},
+    'Bedrock': {'Fn::Or': [{'Condition':'EmbeddingsBedrock'},{'Condition':'LLMBedrock'}]},
   }
 }

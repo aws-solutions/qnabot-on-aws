@@ -25,11 +25,11 @@ const get_embeddings_sm = async function get_embeddings_sm(type_q_or_a, input, s
     return sm_body.vectors;
 }
 
-const get_embeddings_lambda = async function get_embeddings_lambda(type_q_or_a, input, settings) {
+const get_embeddings_lambda = async function get_embeddings_lambda(type_q_or_a, input, settings, function_name) {
     console.log(`Fetch embeddings from Lambda for type: '${type_q_or_a}' - InputText: ${input}`);
     let lambda= new aws.Lambda();
     let lambdares=await lambda.invoke({
-        FunctionName:process.env.EMBEDDINGS_LAMBDA_ARN,
+        FunctionName:function_name,
         InvocationType:'RequestResponse',
         Payload:JSON.stringify({inputType: type_q_or_a, inputText: input})
     }).promise();
@@ -42,9 +42,11 @@ module.exports = async function (type_q_or_a, input, settings) {
         if (process.env.EMBEDDINGS_API === "SAGEMAKER") {
             return get_embeddings_sm(type_q_or_a, input, settings);
         } else if (process.env.EMBEDDINGS_API === "LAMBDA") {
-            return get_embeddings_lambda(type_q_or_a, input, settings);
-        } else {
-            console.log("Unrecognized value for env var EMBEDDINGS_API - expected SAGEMAKER|LAMBA: ", process.env.EMBEDDINGS_API);
+            return get_embeddings_lambda(type_q_or_a, input, settings, process.env.EMBEDDINGS_LAMBDA_ARN);
+        } else if (process.env.EMBEDDINGS_API === "BEDROCK") {
+            return get_embeddings_lambda(type_q_or_a, input, settings, process.env.BEDROCK_EMBEDDINGS_LAMBDA_ARN);
+        }else {
+            console.log("Unrecognized value for env var EMBEDDINGS_API - expected SAGEMAKER|LAMBA|BEDROCK: ", process.env.EMBEDDINGS_API);
             return undefined;
         }
     } else {

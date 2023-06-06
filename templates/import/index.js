@@ -33,7 +33,7 @@ module.exports={
         "EmbeddingsLambdaArn": {"Type": "String"},
         "EmbeddingsApi": {"Type": "String"},
         "EmbeddingsLambdaDimensions": {"Type": "String"},
-        "EmbeddingsLambdaArn": {"Type": "String"},
+        "BedrockEmbeddingsLambdaArn": {"Type": "String"},
         "EmbeddingsSagemakerEndpoint": {"Type": "String"},
         "EmbeddingsSagemakerEndpointArn": {"Type": "String"},
         "AwsSdkLayerLambdaLayer": {"Type": "String"},
@@ -47,6 +47,7 @@ module.exports={
             ] },
         "XRAYEnabled":{"Fn::Equals":[{"Ref":"XraySetting"},"TRUE"]},
         "EmbeddingsLambdaArn":{"Fn::Not": [{ "Fn::Equals":[{"Ref":"EmbeddingsLambdaArn"},""]}]},
-        "EmbeddingsSagemaker":{"Fn::Not": [{ "Fn::Equals":[{"Ref":"EmbeddingsSagemakerEndpointArn"},""]}]}
+        "EmbeddingsSagemaker":{"Fn::Not": [{ "Fn::Equals":[{"Ref":"EmbeddingsSagemakerEndpointArn"},""]}]},
+        "BedrockEmbeddingsLambdaArn":{"Fn::Not": [{ "Fn::Equals":[{"Ref":"BedrockEmbeddingsLambdaArn"},""]}]}
     }
 }

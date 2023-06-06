@@ -92,9 +92,15 @@ module.exports={
                                         {
 
                                             "Fn::If": [
-                                                "EmbeddingsLambda", 
-                                                {"Ref": "EmbeddingsLambdaDimensions"},
-                                                "INVALID EMBEDDINGS API - Cannot determine dimensions" 
+                                                "EmbeddingsBedrock", 
+                                                "4096",
+                                                {
+                                                    "Fn::If": [
+                                                        "EmbeddingsLambda", 
+                                                        {"Ref": "EmbeddingsLambdaDimensions"},
+                                                        "INVALID EMBEDDINGS API - Cannot determine dimensions" 
+                                                    ]
+                                                }
                                             ]
                                         }
                                     ]

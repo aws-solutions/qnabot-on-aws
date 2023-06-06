@@ -119,6 +119,13 @@ module.exports = {
           },
           EMBEDDINGS_SAGEMAKER_INSTANCECOUNT : { "Ref": "SagemakerInitialInstanceCount" },
           EMBEDDINGS_LAMBDA_ARN: { "Ref": "EmbeddingsLambdaArn" },
+          BEDROCK_EMBEDDINGS_LAMBDA_ARN: {
+            "Fn::If": [
+                "EmbeddingsBedrock", 
+                {"Fn::GetAtt": ["BedrockStack", "Outputs.BedrockEmbeddingsLambdaArn"] }, 
+                ""
+            ]
+          },
           LLM_API: { "Ref": "LLMApi" },
           LLM_SAGEMAKERENDPOINT : {
             "Fn::If": [
@@ -129,6 +136,13 @@ module.exports = {
           },
           LLM_SAGEMAKERINSTANCECOUNT : { "Ref": "LLMSagemakerInitialInstanceCount" }, // force new fn version when instance count changes
           LLM_LAMBDA_ARN: { "Ref": "LLMLambdaArn" },
+          BEDROCK_LLM_LAMBDA_ARN : {
+            "Fn::If": [
+                "LLMBedrock", 
+                {"Fn::GetAtt": ["BedrockStack", "Outputs.BedrockLLMLambdaArn"] }, 
+                ""
+            ]
+          },
         }, examples, responsebots)
       },
       "Handler": "index.handler",
@@ -197,7 +211,12 @@ module.exports = {
               {"Fn::GetAtt": ["SagemakerEmbeddingsStack", "Outputs.EmbeddingsSagemakerEndpoint"]},
               ""
           ]},
-          {"Ref": "EmbeddingsLambdaArn"}
+          {"Ref": "EmbeddingsLambdaArn"},
+          {"Fn::If": [
+            "EmbeddingsBedrock",
+            {"Fn::GetAtt": ["BedrockStack", "Outputs.BedrockEmbeddingsLambdaArn"]},
+            ""
+          ]},          
         ],
         "QASummarizeTrigger": [
           {"Ref": "LLMApi"},
@@ -246,6 +265,7 @@ module.exports = {
             { "Fn::GetAtt": ["ESLoggingLambda", "Arn"] },
             { "Fn::GetAtt": ["ESQidLambda", "Arn"] },
             { "Fn::If": ["EmbeddingsLambdaArn", {"Ref":"EmbeddingsLambdaArn"}, {"Ref":"AWS::NoValue"}] },
+            { "Fn::If": ["EmbeddingsBedrock", {"Fn::GetAtt": ["BedrockStack", "Outputs.BedrockEmbeddingsLambdaArn"]}, {"Ref":"AWS::NoValue"}] },
             { "Fn::If": ["LLMLambdaArn", {"Ref":"LLMLambdaArn"}, {"Ref":"AWS::NoValue"}] },
           ].concat(require('../../examples/outputs').names
             .map(x => {

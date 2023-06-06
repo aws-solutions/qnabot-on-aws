@@ -17,7 +17,7 @@ module.exports={
             encryption:{"Ref":"Encryption"},
             PRE_UPGRADE_EXPORT_TRIGGERS:{
                 "Fn::Sub":[
-                    "${EmbeddingsApi} ${EmbeddingsLambdaDimensions} ${EmbeddingsLambdaArn} ${SMEmbeddingEndpoint}",
+                    "${EmbeddingsApi} ${EmbeddingsLambdaDimensions} ${EmbeddingsLambdaArn} ${SMEmbeddingEndpoint} ${BedrockEmbeddingsLambdaArn}",
                     {
                         "SMEmbeddingEndpoint": {
                             "Fn::If": [
@@ -26,6 +26,13 @@ module.exports={
                                 ""
                             ]
                           },
+                          "BedrockEmbeddingsLambdaArn": {
+                            "Fn::If": [
+                                "EmbeddingsBedrock",
+                                {"Fn::GetAtt": ["BedrockStack", "Outputs.BedrockEmbeddingsLambdaArn"] },
+                                ""
+                            ]
+                        },
                     }
                 ]
             }
@@ -41,7 +48,7 @@ module.exports={
             encryption:{"Ref":"Encryption"},
             PRE_UPGRADE_EXPORT_TRIGGERS:{
                 "Fn::Sub":[
-                    "${EmbeddingsApi} ${EmbeddingsLambdaDimensions} ${EmbeddingsLambdaArn} ${SMEmbeddingEndpoint}",
+                    "${EmbeddingsApi} ${EmbeddingsLambdaDimensions} ${EmbeddingsLambdaArn} ${SMEmbeddingEndpoint} ${BedrockEmbeddingsLambdaArn}",
                     {
                         "SMEmbeddingEndpoint": {
                             "Fn::If": [
@@ -50,6 +57,13 @@ module.exports={
                                 ""
                             ]
                           },
+                        "BedrockEmbeddingsLambdaArn": {
+                            "Fn::If": [
+                                "EmbeddingsBedrock",
+                                {"Fn::GetAtt": ["BedrockStack", "Outputs.BedrockEmbeddingsLambdaArn"] },
+                                ""
+                            ]
+                        },
                     }
                 ]
             }
@@ -65,7 +79,7 @@ module.exports={
             encryption:{"Ref":"Encryption"},
             PRE_UPGRADE_EXPORT_TRIGGERS:{
                 "Fn::Sub":[
-                    "${EmbeddingsApi} ${EmbeddingsLambdaDimensions} ${EmbeddingsLambdaArn} ${SMEmbeddingEndpoint}",
+                    "${EmbeddingsApi} ${EmbeddingsLambdaDimensions} ${EmbeddingsLambdaArn} ${SMEmbeddingEndpoint} ${BedrockEmbeddingsLambdaArn}",
                     {
                         "SMEmbeddingEndpoint": {
                             "Fn::If": [
@@ -74,7 +88,14 @@ module.exports={
                                 ""
                             ]
                           },
-                    }
+                          "BedrockEmbeddingsLambdaArn": {
+                            "Fn::If": [
+                                "EmbeddingsBedrock",
+                                {"Fn::GetAtt": ["BedrockStack", "Outputs.BedrockEmbeddingsLambdaArn"] },
+                                ""
+                            ]
+                        },
+                    },
                 ]
             }
         }
