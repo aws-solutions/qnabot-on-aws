@@ -1,6 +1,6 @@
 const util = require('../util');
 
-// Sagemaker Serverless Inference doesn't currently support the flan-t5-xxl model
+// Sagemaker Serverless Inference doesn't currently support the Falcon40B-Instruct model
 // so although this nested template supports serverless provisioning, the main template enforces
 // only provisioned endpoints by disallowing a value of '0' for SagemakerInitialInstanceCount
 
@@ -23,28 +23,19 @@ module.exports={
     },
 
     "Resources": {
-        "QnABotModelTarVersion": {
-            "Type": "Custom::S3Version",
-            "Properties": {
-                "ServiceToken": { "Ref": "CFNLambda" },
-                "Bucket": { "Ref": "BootstrapBucket" },
-                "Key": { "Fn::Sub": "${BootstrapPrefix}/ml_model/flan-t5-xxl-sharded-fp16.tar.gz" },
-                "BuildDate": (new Date()).toISOString()
-            }
-        },
         "QnABotQASummarizeLLMModel": {
             "Type": "AWS::SageMaker::Model",
             "Properties": {
                 "PrimaryContainer": {
                     "Image": {
-                        "Fn::Sub": "763104351884.dkr.ecr.${AWS::Region}.amazonaws.com/huggingface-pytorch-inference:1.10-transformers4.17-gpu-py38-cu113-ubuntu20.04"
+                        "Fn::Sub": "763104351884.dkr.ecr.${AWS::Region}.amazonaws.com/huggingface-pytorch-tgi-inference:2.0.0-tgi0.8.2-gpu-py39-cu118-ubuntu20.04"
                     },
-                    "ModelDataUrl":{"Fn::Sub":"s3://${BootstrapBucket}/${BootstrapPrefix}/ml_model/flan-t5-xxl-sharded-fp16.tar.gz"},
                     "Mode": "SingleModel",
                     "Environment": {
                         "SAGEMAKER_CONTAINER_LOG_LEVEL":"20",
                         "SAGEMAKER_REGION":{"Ref":"AWS::Region"},
-                        "S3_MODEL_DATA_VERSION": {"Ref":"QnABotModelTarVersion"}, // force model replace when new version of tar file is available
+                        "HF_MODEL_ID": "tiiuae/falcon-40b-instruct",
+                        "SM_NUM_GPUS":"4"
                     }
                 },
                 "ExecutionRoleArn": {
@@ -79,7 +70,7 @@ module.exports={
                         },
                         "InitialInstanceCount": {"Ref":"SagemakerInitialInstanceCount"},
                         "InitialVariantWeight": 1,
-                        "InstanceType": "ml.g5.xlarge",
+                        "InstanceType": "ml.g5.12xlarge",
                         "VariantName": "AllTraffic",
                     }
                 ]
@@ -181,15 +172,6 @@ module.exports={
                                 {
                                     "Effect": "Allow",
                                     "Action": [
-                                        "s3:GetObject"
-                                     ],
-                                    "Resource": [
-                                        {"Fn::Sub":"arn:${AWS::Partition}:s3:::${BootstrapBucket}/${BootstrapPrefix}/ml_model/flan-t5-xxl-sharded-fp16.tar.gz"}
-                                    ]
-                                },
-                                {
-                                    "Effect": "Allow",
-                                    "Action": [
                                         "logs:CreateLogStream",
                                         "logs:CreateLogGroup",
                                         "logs:DescribeLogStreams",
@@ -226,7 +208,7 @@ module.exports={
                                         "ecr:BatchGetImage"
                                     ],
                                     "Resource": [
-                                        {"Fn::Sub":"arn:${AWS::Partition}:ecr:${AWS::Region}:*:repository/huggingface-pytorch-inference"}
+                                        {"Fn::Sub":"arn:${AWS::Partition}:ecr:${AWS::Region}:*:repository/huggingface-pytorch-tgi-inference"},
                                     ]
                                 },
 

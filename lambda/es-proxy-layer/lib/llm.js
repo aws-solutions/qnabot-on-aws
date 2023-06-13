@@ -111,7 +111,7 @@ async function generate_query_langchain(req, promptTemplateStr) {
 }
 
 
-// Invoke LLM via SageMaker endpoint running HF_MODEL philschmid/flan-t5-xxl-sharded-fp16
+// Invoke LLM via SageMaker endpoint running HF_MODEL tiiuae/falcon-40b-instruct
 async function invoke_sagemaker(prompt, model_params) {
     const sm = new aws.SageMakerRuntime({region: process.env.AWS_REGION || 'us-east-1'});
     const body = JSON.stringify({
