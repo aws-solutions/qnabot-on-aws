@@ -1,0 +1,296 @@
+AWSTemplateFormatVersion: "2010-09-09"
+
+Description: Lambda Layer for boto3 Amazon Kendra Retrieval SDK extensions.
+
+Parameters:
+
+  AssetBucket:
+    Type: String
+    Description: Amazon S3 Bucket for holding layer zip file 
+
+Resources:
+
+  KendraBoto3ZipFunctionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      Policies:
+        - PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 's3:PutObject'
+                  - 's3:DeleteObject'
+                  - 's3:ListBucket'
+                Resource: 
+                  !Sub 'arn:aws:s3:::${AssetBucket}*'
+          PolicyName: S3Policy
+
+  KendraBoto3ZipFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      Handler: index.handler
+      Runtime: python3.10
+      Role: !GetAtt 'KendraBoto3ZipFunctionRole.Arn'
+      Timeout: 60
+      MemorySize: 512
+      Environment:
+        Variables:
+          BOTO3_BUCKET: !Ref AssetBucket
+      Code:
+        ZipFile: |
+          import os
+          import sys
+          import shutil
+          import subprocess
+          import boto3
+          import zipfile
+          from datetime import datetime
+          import cfnresponse
+          boto3_bucket = os.environ['BOTO3_BUCKET']
+
+          def upload_file_to_s3(file_path, bucket, key):
+              s3 = boto3.client('s3')
+              s3.upload_file(file_path, bucket, key)
+              print(f"Upload successful. {file_path} uploaded to {bucket}/{key}")
+
+          def make_zip_filename():
+            now = datetime.now()
+            timestamp = now.strftime('%Y%m%d_%H%M%S')
+            filename = f'KendraBoto3SDK_{timestamp}.zip'
+            return filename
+
+          def zipdir(path, zipname):
+            zipf = zipfile.ZipFile(zipname, 'w', zipfile.ZIP_DEFLATED)
+            for root, dirs, files in os.walk(path):
+                for file in files:
+                    zipf.write(os.path.join(root, file),
+                              os.path.relpath(os.path.join(root, file), 
+                                              os.path.join(path, '..')))
+            zipf.close()
+
+          def empty_bucket(bucket_name):
+              s3_client = boto3.client('s3')
+              response = s3_client.list_objects_v2(Bucket=bucket_name)
+              if 'Contents' in response:
+                  keys = [{'Key': obj['Key']} for obj in response['Contents']]
+                  s3_client.delete_objects(Bucket=bucket_name, Delete={'Objects': keys})
+              return
+
+          def handler(event, context):
+            print("Event: ", event)
+            responseData={}
+            reason=""
+            status = cfnresponse.SUCCESS
+            try: 
+              if event['RequestType'] != 'Delete':
+                os.chdir('/tmp')
+                if os.path.exists("python"):
+                  shutil.rmtree("python")
+                os.mkdir("python")
+                print(f"running pip install boto3")
+                subprocess.check_call([sys.executable, "-m", "pip", "install", "boto3", "-t", "python" ])
+                boto3_zip_name = make_zip_filename()
+                zipdir("python",boto3_zip_name)
+                print(f"uploading {boto3_zip_name} to s3 bucket {boto3_bucket}")
+                upload_file_to_s3(boto3_zip_name, boto3_bucket, boto3_zip_name)
+                responseData = {"Bucket": boto3_bucket, "Key": boto3_zip_name}
+              else:
+                # delete - empty the bucket so it can be deleted by the stack.
+                empty_bucket(boto3_bucket)
+            except Exception as e:
+              print(e)
+              status = cfnresponse.FAILED
+              reason = f"Exception thrown: {e}"
+            cfnresponse.send(event, context, status, responseData, reason=reason)
+      
+  KendraBoto3Zip:
+    Type: Custom::KendraBoto3Zip
+    Properties:
+      ServiceToken: !GetAtt KendraBoto3ZipFunction.Arn
+      # Rerun KendraBoto3ZipFunction if any of the following parameters change
+      BOTO3_BUCKET: !Ref AssetBucket
+
+  KendraBoto3Layer:
+    Type: "AWS::Lambda::LayerVersion"
+    Properties:
+      Content:
+        S3Bucket: !GetAtt KendraBoto3Zip.Bucket
+        S3Key: !GetAtt KendraBoto3Zip.Key
+      CompatibleRuntimes:
+        - python3.10
+
+  KendraLambdaFunctionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      Policies:
+        - PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - "kendra:*"
+                Resource: "*"
+          PolicyName: KendraPolicy
+
+  KendraRetrieveLambdaFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      Handler: index.handler
+      Role: !GetAtt 'KendraLambdaFunctionRole.Arn'
+      Runtime: python3.10
+      Layers: 
+        - !Ref KendraBoto3Layer
+      Timeout: 60
+      MemorySize: 512
+      Code:
+        ZipFile: |
+          import boto3
+          import json
+          import os
+          import re
+
+          def sign_s3_url(url, expire_secs):
+              bucket = None
+              key = None
+              if re.search(r'/\/s3[.-](\w{2}-\w{4,9}-\d\.)?amazonaws\.com/', url) != None:
+                  # bucket in path format
+                  bucket = url.split('/')[3]
+                  key = '/'.join(url.split('/')[4:])
+              if re.search(r'\.s3[.-](\w{2}-\w{4,9}-\d\.)?amazonaws\.com/', url) != None:
+                  # bucket in hostname format
+                  hostname = url.split('/')[2]
+                  bucket = hostname.split('.')[0]
+                  key = '/'.join(url.split('/')[3:])
+              if bucket and key:
+                  print("Convert S3 URL to a signed URL:", url, "Bucket:", bucket, "Key:", key)
+                  try:
+                      s3 = boto3.client('s3')
+                      signed_url = s3.generate_presigned_url(
+                          'get_object',
+                          Params={
+                              'Bucket': bucket,
+                              'Key': key
+                          },
+                          ExpiresIn=expire_secs
+                      )
+                      print("Signed URL:", signed_url)
+                      url = signed_url
+                  except Exception as e:
+                      print("Error signing S3 URL (returning original URL):", str(e))
+              else:
+                  print("URL is not an S3 URL - returning unchanged:", url)
+              return url
+
+          def create_hit(docs, hit_count):
+              hit = {
+                  "a": docs,
+                  "alt": {
+                      "markdown": docs,
+                      "ssml": ""
+                  },
+                  "type": "text",
+                  "questions": [],
+                  "answersource": "KENDRA RETRIEVE API",
+                  "hit_count": hit_count,
+                  "debug": []
+              }
+              print("create_hit: ", json.dumps(hit))
+              return hit if hit_count > 0 else None
+
+          def get_query_string(req):
+              """
+              replicate logic from aws-qnabot/lambda/es-proxy-layer/lib/kendra.js
+              """
+              origQuestion = req["_event"].get("origQuestion")
+              question = req["question"]
+              userDetectedLocale = req.get('session', {}).get('qnabotcontext', {}).get('userLocale',"")
+              standalone_query = req.get('llm_generated_query', {}).get('concatenated')
+              kendraIndexedLanguages = req["_settings"].get("KENDRA_INDEXED_DOCUMENTS_LANGUAGES", ["en"])
+              print("Retrieved Kendra multi-language settings: " + str(kendraIndexedLanguages))
+              useOriginalLanguageQuery = userDetectedLocale in kendraIndexedLanguages and origQuestion and question and origQuestion != question
+              if standalone_query:
+                  useOriginalLanguageQuery = False
+                  print("Using LLM generated standalone query: " + standalone_query)
+              print("useOriginalLanguageQuery: " + str(useOriginalLanguageQuery))
+              query = origQuestion if useOriginalLanguageQuery else question
+              return query
+
+          def get_index_ids(req):
+              indexes = req["_settings"].get("ALT_SEARCH_KENDRA_INDEXES",[])
+              parsed_indexes = []
+              try:
+                  parsed_indexes = json.loads(indexes)
+                  if not isinstance(parsed_indexes, list):
+                      parsed_indexes = [parsed_indexes]
+              except ValueError:
+                  parsed_indexes = [indexes]
+              return parsed_indexes
+          
+          def get_result(resp, index, signS3Urls, expireSeconds):
+              r = resp["ResultItems"][index]
+              doc_excerpt = r["Content"]
+              doc_title = r["DocumentTitle"]
+              doc_uri = r["DocumentURI"]
+              if (signS3Urls):
+                doc_uri = sign_s3_url(doc_uri, expireSeconds)
+              link = f'<span translate=no>[{doc_title}]({doc_uri})</span>'
+              result = f'{doc_excerpt}\n\nSource Link: {link}'
+              return result
+
+          def kendra_retrieve(kclient, req):
+              kquery = get_query_string(req)
+              kcount = req["_settings"].get("ALT_SEARCH_KENDRA_MAX_DOCUMENT_COUNT",2)
+              kindex_ids = get_index_ids(req)
+              signS3Urls = req["_settings"].get("ALT_SEARCH_KENDRA_S3_SIGNED_URLS",True)
+              expireSeconds = req["_settings"].get("ALT_SEARCH_KENDRA_S3_SIGNED_URL_EXPIRE_SECS",300)
+              response = kclient.retrieve(IndexId=kindex_ids[0], QueryText=kquery.strip(), PageSize=kcount)
+              print("Debug: Retrieve API response: ", json.dumps(response))
+              resp_len = len(response["ResultItems"])
+              print("Debug: Retrieve response length: ", resp_len)
+              #process the results of the retrieve API
+              if resp_len > kcount:
+                  r_count = kcount
+              else:
+                  r_count = resp_len
+              results = [get_result(response, i, signS3Urls, expireSeconds) for i in range(0, r_count)]
+              docs = "\n\n".join(results)
+              hit = create_hit(docs, r_count)
+              return hit
+
+          def handler(event, context):
+              print("Boto3 version:", boto3.__version__)
+              print("Event:", json.dumps(event))
+              kclient = boto3.client('kendra')
+              req = event["req"]
+              hit = kendra_retrieve(kclient, req)
+              return hit
+
+Outputs:
+
+  KendraBoto3Layer:
+    Description: Lambda layer for Boto3 Kendra SDK extensions
+    Value: !Ref KendraBoto3Layer
+
+  KendraRetrieveLambdaArn:
+    Description: Lambda function for Kendra Retrieval
+    Value: !GetAtt 'KendraRetrieveLambdaFunction.Arn'
+  

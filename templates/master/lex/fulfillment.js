@@ -126,6 +126,7 @@ module.exports = {
                 ""
             ]
           },
+          KENDRA_RETRIEVAL_LAMBDA_ARN: {"Fn::GetAtt": ["KendraRetrievalStack", "Outputs.KendraRetrieveLambdaArn"] },
           LLM_API: { "Ref": "LLMApi" },
           LLM_SAGEMAKERENDPOINT : {
             "Fn::If": [
@@ -266,6 +267,7 @@ module.exports = {
             { "Fn::GetAtt": ["ESQidLambda", "Arn"] },
             { "Fn::If": ["EmbeddingsLambdaArn", {"Ref":"EmbeddingsLambdaArn"}, {"Ref":"AWS::NoValue"}] },
             { "Fn::If": ["EmbeddingsBedrock", {"Fn::GetAtt": ["BedrockStack", "Outputs.BedrockEmbeddingsLambdaArn"]}, {"Ref":"AWS::NoValue"}] },
+            { "Fn::GetAtt": ["KendraRetrievalStack", "Outputs.KendraRetrieveLambdaArn"] },
             { "Fn::If": ["LLMLambdaArn", {"Ref":"LLMLambdaArn"}, {"Ref":"AWS::NoValue"}] },
           ].concat(require('../../examples/outputs').names
             .map(x => {

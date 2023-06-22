@@ -327,9 +327,17 @@ async function get_hit(req, res) {
             hit = await run_llm_qa(req, hit);
         }
     } else if(query_params.kendra_indexes.length != 0) {
-        qnabot.log('Query Kendra Fallback ' + JSON.stringify(req));
-        hit = await kendra_fallback.handler({req,res});
-        qnabot.log('Result from Kendra Fallback ' + JSON.stringify(hit));
+        // If enabled, try Kendra Retrieval API
+        if (req._settings.LLM_QA_USE_KENDRA_RETRIEVAL_API) {
+            qnabot.log('Invoke Kendra Retrieve Lambda ' + JSON.stringify(req));
+            kendraRetrieveLambdaArn = _.get(process.env, 'KENDRA_RETRIEVAL_LAMBDA_ARN', 'ERR');
+            [req, res, hit] = await invokeLambda(kendraRetrieveLambdaArn, req, res);           
+        }
+        if (!hit) {
+            qnabot.log('Query Kendra Fallback ' + JSON.stringify(req));
+            hit = await kendra_fallback.handler({req,res});
+            qnabot.log('Result from Kendra Fallback ' + JSON.stringify(hit));
+        }
         if(hit &&  hit.hit_count != 0)
         {
             hit.refMarkdown = get_sourceLinks_from_passages(hit.alt.markdown);
