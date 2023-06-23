@@ -272,7 +272,7 @@ Resources:
               else:
                   r_count = resp_len
               results = [get_result(response, i, signS3Urls, expireSeconds) for i in range(0, r_count)]
-              docs = "\n\n".join(results)
+              docs = "\n---\n".join(results)
               hit = create_hit(docs, r_count)
               return hit
 
