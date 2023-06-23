@@ -328,7 +328,7 @@ async function get_hit(req, res) {
         }
     } else if(query_params.kendra_indexes.length != 0) {
         // If enabled, try Kendra Retrieval API
-        if (req._settings.LLM_QA_USE_KENDRA_RETRIEVAL_API) {
+        if (req._settings.LLM_QA_ENABLE && req._settings.LLM_QA_USE_KENDRA_RETRIEVAL_API) {
             qnabot.log('Invoke Kendra Retrieve Lambda ' + JSON.stringify(req));
             kendraRetrieveLambdaArn = _.get(process.env, 'KENDRA_RETRIEVAL_LAMBDA_ARN', 'ERR');
             [req, res, hit] = await invokeLambda(kendraRetrieveLambdaArn, req, res);           
