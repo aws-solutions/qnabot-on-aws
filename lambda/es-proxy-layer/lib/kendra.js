@@ -321,7 +321,7 @@ async function routeKendraRequest(event, context) {
         "KENDRA_INDEXED_DOCUMENTS_LANGUAGES",["en"]);
     qnabot.log("Retrieved Kendra multi-language settings: " + kendraIndexedLanguages);
 
-    let origQuestion = req["_event"].get("origQuestion")
+    let origQuestion = event.req["_event"]["origQuestion"];
     let question = event.req["question"];
     let userDetectedLocale = _.get(event.req, 'session.qnabotcontext.userLocale');
     let standalone_query = _.get(event.req, 'llm_generated_query.concatenated');
