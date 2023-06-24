@@ -63,8 +63,8 @@ module.exports = async function parse(req, res) {
     const settings = await get_settings();
     qna_settings.set_environment_variables(settings)
     _.set(req, "_settings", settings);
-
-
+    // set example lambda and response bot aliases as environment variables
+    await qna_settings.set_alias_environment_variables();
 
     req._type = req._event.version ? "ALEXA" : "LEX"
 

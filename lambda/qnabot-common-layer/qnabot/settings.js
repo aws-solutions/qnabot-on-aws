@@ -82,8 +82,19 @@ function set_environment_variables(settings){
     }
 }
 
+async function set_alias_environment_variables(){
+    // set environment vars for all example lambda hook and responsebot aliases
+    const alias_settings_param = process.env.ALIAS_SETTINGS_PARAM;
+    let alias_settings = await get_parameter(alias_settings_param);
+    qnabot.log("Setting example lambda hook and responsebot aliases from SSM Parameter Store: ", alias_settings_param, "values:", alias_settings);
+    Object.entries(alias_settings).forEach(([key, value]) => {
+        process.env[key] = value;
+    });
+}
+
 module.exports ={
     get_parameter:get_parameter,
     merge_default_and_custom_settings:merge_default_and_custom_settings,
     set_environment_variables:set_environment_variables,
+    set_alias_environment_variables:set_alias_environment_variables,
 }

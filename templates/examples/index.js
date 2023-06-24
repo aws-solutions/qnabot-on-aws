@@ -3,11 +3,67 @@
 
 const examples=require(`./examples`);
 const extensions=require(`./extensions`);
-const resources=Object.assign(examples,extensions);
-const outputs1=require('./outputs').outputs;
-const outputs2=require('./examples/responsebots-lexv2').outputs;
+const exampleOutputs=require('./outputs').outputs;
+const responsebotOutputs=require('./examples/responsebots-lexv2').outputs;
 const outputSNSTopic={"FeedbackSNSTopic":{"Value":{"Fn::GetAtt":["FeedbackSNS","TopicName"]}}};
-const outputs=Object.assign(outputs1,outputs2,outputSNSTopic);
+
+/*
+ SSM param to capture mappings:  
+ - example lambda function aliases to fucntion names, and 
+ - response bot aliases to BotId/BotAliasId/lang
+Used by Fulfillment handler function (in parse.js) to set environments valiables
+later referenced when invoking lambda hooks, or responsebots
+*/
+const aliases=Object.assign(exampleOutputs,responsebotOutputs);
+const aliasKeyValues=Object.entries(aliases).reduce((acc, [key, value]) => ({ ...acc, [key]: value.Value }), {});
+const aliasSettings = {
+  "AliasSettings": {
+    "Type": "AWS::SSM::Parameter",
+    "Properties": {
+      "Description": "Settings for example lambda and responsebot aliases",
+      "Type": "String",
+      "Tier": "Advanced",  // Advanced tier required to accomodate number of settings
+      "Value": { "Fn::Sub" : [ 
+        JSON.stringify(
+          Object.fromEntries(Object.entries(aliasKeyValues).map(([key, value]) => [key, `\${${key}}`]))
+        ),
+        aliasKeyValues
+      ]}
+    }
+  },
+  "AliasSettingsPolicy": {
+    "Type": "AWS::IAM::ManagedPolicy",
+    "Properties": {
+      "PolicyDocument": {
+        "Version": "2012-10-17",
+        "Statement": [{
+          "Effect": "Allow",
+          "Action": [
+            "ssm:GetParameter",
+            "ssm:GetParameters"
+          ],
+          "Resource": {
+            "Fn::Join": [
+              "", [
+                "arn:aws:ssm:",
+                { "Fn::Sub": "${AWS::Region}:" },
+                { "Fn::Sub": "${AWS::AccountId}:" },
+                "parameter/",
+                { "Ref": "AliasSettings" }
+              ]
+            ]
+          }
+        }]
+      },
+      "Roles": [{"Ref": "FulfillmentLambdaRole"}]
+    }
+  }
+}
+const outputAliasSettings={"AliasSettings":{"Value":{"Ref":"AliasSettings"}}};
+
+const resources=Object.assign(examples,extensions, aliasSettings);
+const outputs=Object.assign(exampleOutputs,responsebotOutputs,outputSNSTopic,outputAliasSettings);
+
 
 module.exports={
   "Resources":resources,

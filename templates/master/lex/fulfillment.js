@@ -109,6 +109,7 @@ module.exports = {
           DEFAULT_USER_POOL_JWKS_PARAM: { "Ref": "DefaultUserPoolJwksUrl" },
           DEFAULT_SETTINGS_PARAM: { "Ref": "DefaultQnABotSettings" },
           CUSTOM_SETTINGS_PARAM: { "Ref": "CustomQnABotSettings" },
+          ALIAS_SETTINGS_PARAM: { "Fn::GetAtt": ["ExamplesStack", "Outputs.AliasSettings"] },
           EMBEDDINGS_API: { "Ref": "EmbeddingsApi" },
           EMBEDDINGS_SAGEMAKER_ENDPOINT : {
             "Fn::If": [
@@ -144,7 +145,7 @@ module.exports = {
                 ""
             ]
           },
-        }, examples, responsebots)
+        })
       },
       "Handler": "index.handler",
       "Layers":[
