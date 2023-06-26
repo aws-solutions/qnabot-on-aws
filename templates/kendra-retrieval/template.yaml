@@ -258,10 +258,10 @@ Resources:
 
           def kendra_retrieve(kclient, req):
               kquery = get_query_string(req)
-              kcount = req["_settings"].get("ALT_SEARCH_KENDRA_MAX_DOCUMENT_COUNT",2)
+              kcount = int(req["_settings"].get("ALT_SEARCH_KENDRA_MAX_DOCUMENT_COUNT",2))
               kindex_ids = get_index_ids(req)
               signS3Urls = req["_settings"].get("ALT_SEARCH_KENDRA_S3_SIGNED_URLS",True)
-              expireSeconds = req["_settings"].get("ALT_SEARCH_KENDRA_S3_SIGNED_URL_EXPIRE_SECS",300)
+              expireSeconds = int(req["_settings"].get("ALT_SEARCH_KENDRA_S3_SIGNED_URL_EXPIRE_SECS",300))
               response = kclient.retrieve(IndexId=kindex_ids[0], QueryText=kquery.strip(), PageSize=kcount)
               print("Debug: Retrieve API response: ", json.dumps(response))
               resp_len = len(response["ResultItems"])
