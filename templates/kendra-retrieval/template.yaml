@@ -149,6 +149,12 @@ Resources:
                 Action:
                   - "kendra:*"
                 Resource: "*"
+              - Effect: Allow
+                Action:
+                  - "kendra:*"
+                Resource:
+                  - "arn:aws:s3:::QNA*/*"
+                  - "arn:aws:s3:::qna*/*"
           PolicyName: KendraPolicy
 
   KendraRetrieveLambdaFunction:
