@@ -56,7 +56,6 @@ With this release, you can choose with LLM to use with QnABot:
 3. Any other LLM model or API you like via a user provided Lambda function.
 4. Amazon Bedrock: Bedrock is in limited preview; users need to request access and be added to an allowlist in order to start using the BEDROCK option for embeddings - Visit https://aws.amazon.com/bedrock to request access and to learn more about the Amazon Bedrock service. 
 
-> <mark>**_NOTE: Optimize Kendra:_** When using Kendra, we recommend requesting a larger document excerpt to be returned from queries. In the browser window you are using for AWS Management Console navigate to [Kendra Service Quota](https://console.aws.amazon.com/servicequotas/home/services/kendra/quotas/L-196E775D), choose Request quota increase, and change quota value to a number up to a max of 750.</mark>
 
 ### 1. Amazon SAGEMAKER
 
@@ -166,6 +165,7 @@ When QnABot stack is installed, open Content Designer **Settings** page:
   - `{input}` - placeholder for the current user utterance / question
 - **LLM_GENERATE_QUERY_MODEL_PARAMS:** parameters sent to the LLM model when disambiguating follow-up questions. Default: `{"temperature":0}`. Check model documentation for additional values that your model provider accepts. 
 - **LLM_QA_ENABLE:** set to TRUE or FALSE to enable or disable generative answers from passages retreived via embeddings or Kendra fallback (when no FAQ match its found). NOTE LLM based generative answers are not applied when an FAQ / QID matches the question.
+- **LLM_QA_USE_KENDRA_RETRIEVAL_API:** set to TRUE or FALSE to enable or disable use of Kenda's new retrieval API. When enabled, QnABot uses Kendra Retrieve api to retrieve semantically relevant passages of up to 200 token words from the documents (not FAQs) in your index. When disabled, QnAbot use Kendra Query to retrieve shorter passages or answers. Takes effect only when LLM_QA_ENABLE is TRUE. The default is TRUE (recommended) when LLM QA is enabled. See https://docs.aws.amazon.com/kendra/latest/APIReference/API_Retrieve.html
 - **LLM_QA_PROMPT_TEMPLATE:**  the prompt template used to construct a prompt for the LLM to generate an answer from the context of a retrieved passages (from Kendra or Embeddings). The template may use the placeholders:
   - `{context}` - placeholder for passages retrieved from the seartch query - either a QnABot 'Text' item passage, or the Top `ALT_SEARCH_KENDRA_MAX_DOCUMENT_COUNT` Kendra passages
   - `{history}` - placeholder for the last `LLM_CHAT_HISTORY_MAX_MESSAGES` messages in the conversational history, to provide conversational context.
