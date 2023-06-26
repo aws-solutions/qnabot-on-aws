@@ -564,7 +564,7 @@ async function routeKendraRequest(event, context) {
       answerDocumentUris.forEach(function(element) {
         // Convert S3 Object URLs to signed URLs
         if (signS3Urls) {
-          element.DocumentURI = signS3URL(element.DocumentURI, expireSeconds);
+          element.DocumentURI = signS3URL(element.DocumentURI, parseInt(expireSeconds));
         }
          markdown += `<span translate=no>[${element.DocumentTitle.Text}](${element.DocumentURI})</span>`;
       });
