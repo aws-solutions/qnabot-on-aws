@@ -4,15 +4,10 @@ Description: Lambda Layer for boto3 Amazon Bedrock SDK extensions - requires acc
 
 Parameters:
 
-  BedrockPreviewAssetsBucket:
+  BedrockPreviewSdkUrl:
     Type: String
-    Default: amazon-bedrock-limited-preview-documents
-    Description: Amazon S3 Bucket containing Bedrock SDK zip file (Bedrock preview access only)
-
-  BedrockSDKZipFileKey:
-    Type: String
-    Default: Documentation/SDK/bedrock-python-sdk.zip
-    Description: Prefix/Key for Bedrock SDK zip file (Bedrock preview access only)
+    Default: https://preview.documentation.bedrock.aws.dev/Documentation/SDK/bedrock-python-sdk.zip
+    Description: URL for the Bedrock SDK zip file (Bedrock preview access only)
 
 Resources:
 
@@ -42,11 +37,6 @@ Resources:
                   - 's3:ListBucket'
                 Resource: 
                   !Sub 'arn:aws:s3:::${BedrockBoto3Bucket}*'
-              - Effect: Allow
-                Action:
-                  - 's3:GetObject'
-                Resource: 
-                  !Sub 'arn:aws:s3:::${BedrockPreviewAssetsBucket}/${BedrockSDKZipFileKey}'
           PolicyName: S3Policy
 
   BedrockBoto3ZipFunction:
@@ -59,8 +49,7 @@ Resources:
       MemorySize: 512
       Environment:
         Variables:
-          SDK_DOWNLOAD_BUCKET: !Ref BedrockPreviewAssetsBucket
-          SDK_DOWNLOAD_KEY: !Ref BedrockSDKZipFileKey
+          SDK_DOWNLOAD_URL: !Ref BedrockPreviewSdkUrl
           BOTOCORE_WHL_FILE: botocore-1.29.142-py3-none-any.whl
           BOTO3_WHL_FILE: boto3-1.26.142-py3-none-any.whl
           BOTO3_BUCKET: !Ref BedrockBoto3Bucket
@@ -72,18 +61,24 @@ Resources:
           import subprocess
           import boto3
           import zipfile
+          import urllib3
           from datetime import datetime
           import cfnresponse
-          bedrock_sdk_bucket = os.environ['SDK_DOWNLOAD_BUCKET']
-          bedrock_sdk_key = os.environ['SDK_DOWNLOAD_KEY']
+          bedrock_sdk_url = os.environ['SDK_DOWNLOAD_URL']
           botocore_whl_file = os.environ['BOTOCORE_WHL_FILE']
           boto3_whl_file = os.environ['BOTO3_WHL_FILE']
           boto3_bucket = os.environ['BOTO3_BUCKET']
 
-          def download_file_from_s3(bucket, key, local_path):
-              s3 = boto3.client('s3')
-              s3.download_file(bucket, key, local_path)
-              print(f"Successfully downloaded {bucket}/{key} to {local_path}")
+          def download_file_from_url(url, local_path):
+              """Download a file from a URL to a local save path."""
+              http = urllib3.PoolManager()
+              response = http.request('GET', url)
+              if response.status == 200:
+                  with open(local_path, 'wb') as file:
+                      file.write(response.data)
+                  print("File downloaded successfully.")
+              else:
+                  print("Failed to download the file.", response)
 
           def upload_file_to_s3(file_path, bucket, key):
               s3 = boto3.client('s3')
@@ -128,8 +123,8 @@ Resources:
                 os.chdir('/tmp')
                 # download Bedrock SDK
                 zip_file_name='bedrock-python-sdk.zip'
-                print(f"downloading from {bedrock_sdk_bucket}/{bedrock_sdk_key} to {zip_file_name}")
-                download_file_from_s3(bedrock_sdk_bucket, bedrock_sdk_key, zip_file_name)
+                print(f"downloading from {bedrock_sdk_url} to {zip_file_name}")
+                download_file_from_url(bedrock_sdk_url, zip_file_name)
                 extract_file_from_zip(zip_file_name, botocore_whl_file)
                 extract_file_from_zip(zip_file_name, boto3_whl_file)
                 if os.path.exists("python"):
@@ -158,8 +153,7 @@ Resources:
     Properties:
       ServiceToken: !GetAtt BedrockBoto3ZipFunction.Arn
       # Rerun BedrockBoto3ZipFunction if any of the following parameters change
-      SDK_DOWNLOAD_BUCKET: !Ref BedrockPreviewAssetsBucket
-      SDK_DOWNLOAD_KEY: !Ref BedrockSDKZipFileKey
+      SDK_DOWNLOAD_URL: !Ref BedrockPreviewSdkUrl
       BOTOCORE_WHL_FILE: botocore-1.29.142-py3-none-any.whl
       BOTO3_WHL_FILE: boto3-1.26.142-py3-none-any.whl
       BOTO3_BUCKET: !Ref BedrockBoto3Bucket
