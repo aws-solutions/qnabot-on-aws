@@ -51,7 +51,7 @@ You can use disambiguation and generative question answering, as shown below:
   
 
 With this release, you can choose with LLM to use with QnABot:  
-1. An open source LLM model automtically deployed and hosted on an Amazon SageMaker endpoint - see https://huggingface.co/philschmid/flan-t5-xxl-sharded-fp16 
+1. An open source LLM model automtically deployed and hosted on an Amazon SageMaker endpoint - see https://medium.com/mlearning-ai/unlocking-the-future-of-chatbots-with-falcon-hugging-face-and-amazon-sagemaker-cf6bd8aeba54  
 2. Third Party LLM Services: Anthropic Claude. Others may be added in future.
 3. Any other LLM model or API you like via a user provided Lambda function.
 4. Amazon Bedrock: Bedrock is in limited preview; users need to request access and be added to an allowlist in order to start using the BEDROCK option for embeddings - Visit https://aws.amazon.com/bedrock to request access and to learn more about the Amazon Bedrock service. 
@@ -59,9 +59,9 @@ With this release, you can choose with LLM to use with QnABot:
 
 ### 1. Amazon SAGEMAKER
 
-QnABot provisions a Sagemaker endpoint running the Hugging Face flan-t5-xxl-sharded-fp16 model - see https://huggingface.co/philschmid/flan-t5-xxl-sharded-fp16. 
+QnABot provisions a Sagemaker endpoint running the Hugging Face falcon-40b-instruct model - see https://huggingface.co/tiiuae/falcon-40b-instruct. 
   
-By default a 1-node ml.g5.xlarge endpoint is automatically provisioned. For large volume deployments, add additional nodes by setting the parameter `LLMSagemakerInitialInstanceCount`. Please check [SageMaker pricing documentation](https://aws.amazon.com/sagemaker/pricing/) for relevant costs and information on Free Tier eligibility.
+By default a 1-node ml.g5.12xlarge endpoint is automatically provisioned. For large volume deployments, add additional nodes by setting the parameter `LLMSagemakerInitialInstanceCount`. Please check [SageMaker pricing documentation](https://aws.amazon.com/sagemaker/pricing/) for relevant costs and information on Free Tier eligibility.
 
 #### Deploy Stack for SAGEMAKER
 
