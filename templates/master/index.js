@@ -194,8 +194,25 @@ module.exports={
     "DefaultKendraIndexId":{
         "Type":"String",
         "Description":"Optional: Index ID of an existing Kendra index, used as the default index for QnABot's Kendra integration. You can use the QnABot Content Designer to reconfigure Kendra Index ID settings at any time.",
-        "Default":""
+        "Default":"",
+        "AllowedPattern": "^(|[0-9a-fA-F]{8}-([0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12})$"
     },
+    "CreateKendraIndex":{
+      "Type":"String",
+      "Description":"Optional: Automatically create a new Kendra index, used as the default index for QnABot's Kendra integration.",
+      "AllowedValues": ["NONE", "DEVELOPER_EDITION", "ENTERPRISE_EDITION"],
+      "Default":"NONE"
+    },
+    "KendraWebCrawlerURLs":{
+      "Type":"String",
+      "Description":"Optional: Comma separated list of urls for Kendra to automatically crawl and index.",
+      "Default":""
+    },
+    "KendraWebCrawlerDepth":{
+      "Type":"Number",
+      "Default": 3,
+      "Description":"Optional: The 'depth' or number of levels from the top level to crawl (0-10)",
+    }, 
     "BootstrapBucket":{
         "Type":"String"
     },
@@ -343,5 +360,7 @@ module.exports={
     'LLMThirdPartyApiKey':{'Fn::Not': [{ 'Fn::Equals':[{'Ref':'LLMThirdPartyApiKey'},'']}]},
     'LLMBedrock': {'Fn::Or': [{'Fn::Equals':[{'Ref':'LLMApi'},'BEDROCK']}, {'Fn::Equals':[{'Ref':'LLMApi'},'BEDROCK']}]},
     'Bedrock': {'Fn::Or': [{'Condition':'EmbeddingsBedrock'},{'Condition':'LLMBedrock'}]},
+    'CreateKendraIndex': {"Fn::Not": [{ "Fn::Equals":[{"Ref":"CreateKendraIndex"},"NONE"]}]},
+    'RunKendraWebCrawler': {'Fn::Not': [{ 'Fn::Equals':[{'Ref':'KendraWebCrawlerURLs'},'']}]},
   }
 }

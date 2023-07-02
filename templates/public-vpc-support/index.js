@@ -37,6 +37,9 @@ module.exports=Promise.resolve(require('../master')).then(function(base){
         'Email',
         'Username',
         'DefaultKendraIndexId',
+        'CreateKendraIndex',
+        'KendraWebCrawlerURLs',
+        'KendraWebCrawlerDepth',
         'Encryption',
         'PublicOrPrivate',
         'LexV2BotLocaleIds',
@@ -85,7 +88,10 @@ module.exports=Promise.resolve(require('../master')).then(function(base){
                         'default': 'Amazon Kendra Integration'
                     },
                     'Parameters': [
-                        'DefaultKendraIndexId'
+                        'DefaultKendraIndexId',
+                        'CreateKendraIndex',
+                        'KendraWebCrawlerURLs',
+                        'KendraWebCrawlerDepth'
                     ]
                 },
                 {
@@ -168,6 +174,8 @@ module.exports=Promise.resolve(require('../master')).then(function(base){
     base.Conditions.LLMThirdPartyApiKey={'Fn::Not': [{ 'Fn::Equals':[{'Ref':'LLMThirdPartyApiKey'},'']}]}
     base.Conditions.LLMBedrock={'Fn::Or': [{'Fn::Equals':[{'Ref':'LLMApi'},'BEDROCK']}, {'Fn::Equals':[{'Ref':'LLMApi'},'BEDROCK']}]}
     base.Conditions.Bedrock={'Fn::Or': [{'Condition':'EmbeddingsBedrock'},{'Condition':'LLMBedrock'}]}
+    base.Conditions.CreateKendraIndex={"Fn::Not": [{ "Fn::Equals":[{"Ref":"CreateKendraIndex"},"NONE"]}]}
+    base.Conditions.RunKendraWebCrawler={'Fn::Not': [{ 'Fn::Equals':[{'Ref':'KendraWebCrawlerURLs'},'']}]}
     
     var out=JSON.stringify(base);
 
