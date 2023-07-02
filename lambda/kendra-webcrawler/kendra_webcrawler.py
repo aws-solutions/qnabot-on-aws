@@ -6,6 +6,8 @@ import datetime
 import calendar
 import logging
 import time
+import cfnresponse
+
 
 client = boto3.client('kendra')
 ssm = boto3.client('ssm')
@@ -88,35 +90,47 @@ def handler(event, context):
     Type = 'WEBCRAWLER'
     Description = 'QnABot WebCrawler Index'
 
-    settings = get_settings()
-    IndexId = settings['KENDRA_WEB_PAGE_INDEX']
-    URLs = settings['KENDRA_INDEXER_URLS'].replace(' ', '').split(',')
-    schedule = settings["KENDRA_INDEXER_SCHEDULE"]
-    crawler_mode = settings["KENDRA_INDEXER_CRAWL_MODE"].upper()
-    crawl_depth = settings["KENDRA_INDEXER_CRAWL_DEPTH"]
+    cfn_reason=""
+    cfn_event = event.get('RequestType') # None unless fn is invoked from CloudFormation 'StartKendraWebCrawler' custom resource
+    if (cfn_event != "Delete"):
+        try:
+            settings = get_settings()
+            IndexId = settings['KENDRA_WEB_PAGE_INDEX']
+            URLs = settings['KENDRA_INDEXER_URLS'].replace(' ', '').split(',')
+            schedule = settings["KENDRA_INDEXER_SCHEDULE"]
+            crawler_mode = settings["KENDRA_INDEXER_CRAWL_MODE"].upper()
+            crawl_depth = settings["KENDRA_INDEXER_CRAWL_DEPTH"]
 
-    schedule = create_cron_expression(schedule)
-    if schedule == "INVALID":
-        schedule = ""
-    data_source_id = get_data_source_id(IndexId, Name)
+            schedule = create_cron_expression(schedule)
+            if schedule == "INVALID":
+                schedule = ""
+            data_source_id = get_data_source_id(IndexId, Name)
 
-    if data_source_id is None:
-        data_source_id = kendra_create_data_source(client, IndexId, Name, Type, RoleArn, Description, URLs, schedule, crawler_mode, crawl_depth)
-        data_source_status = get_data_source_status (data_source_id, IndexId) # get current status of the data source
-        if data_source_status == 'ACTIVE':  #if the data source status is ACTIVE, then proceed to initiate a data source sync, and also create a Cloudwatch dashboard
-            kendra_sync_data_source(IndexId, data_source_id)    #sync data source
-            create_dashboard(IndexId, data_source_id)   #create Cloudwatch dashboard
-        else:
-            logging.info ("The Kendra WebCrawler data source: " + Name + " is in: " + data_source_status + " status.")
-            logging.info ("Kendra data source sync, and Cloudwatch dashboard creation step was skipped for the Kendra Index.")
-    else:
-        kendra_update_data_source(IndexId, data_source_id, URLs, RoleArn, schedule, crawler_mode, crawl_depth)
-        data_source_status = get_data_source_status (data_source_id, IndexId) # get current status of the data source
-        if data_source_status == 'ACTIVE':  #if the data source status is ACTIVE, then proceed to initiate a data source sync, and also create a Cloudwatch dashboard
-            kendra_sync_data_source(IndexId, data_source_id)    #sync data source
-        else:
-            logging.info ("The Kendra WebCrawler data source: " + Name + " is in: " + data_source_status + " status.")
-            logging.info ("Kendra data source sync update step was skipped for the Kendra Index.")
+            if data_source_id is None:
+                data_source_id = kendra_create_data_source(client, IndexId, Name, Type, RoleArn, Description, URLs, schedule, crawler_mode, crawl_depth)
+                data_source_status = get_data_source_status (data_source_id, IndexId) # get current status of the data source
+                if data_source_status == 'ACTIVE':  #if the data source status is ACTIVE, then proceed to initiate a data source sync, and also create a Cloudwatch dashboard
+                    kendra_sync_data_source(IndexId, data_source_id)    #sync data source
+                    create_dashboard(IndexId, data_source_id)   #create Cloudwatch dashboard
+                else:
+                    logging.info ("The Kendra WebCrawler data source: " + Name + " is in: " + data_source_status + " status.")
+                    logging.info ("Kendra data source sync, and Cloudwatch dashboard creation step was skipped for the Kendra Index.")
+            else:
+                kendra_update_data_source(IndexId, data_source_id, URLs, RoleArn, schedule, crawler_mode, crawl_depth)
+                data_source_status = get_data_source_status (data_source_id, IndexId) # get current status of the data source
+                if data_source_status == 'ACTIVE':  #if the data source status is ACTIVE, then proceed to initiate a data source sync, and also create a Cloudwatch dashboard
+                    kendra_sync_data_source(IndexId, data_source_id)    #sync data source
+                else:
+                    logging.info ("The Kendra WebCrawler data source: " + Name + " is in: " + data_source_status + " status.")
+                    logging.info ("Kendra data source sync update step was skipped for the Kendra Index.")
+            cfn_reason = "Kendra WebCrawler data source: " + Name + " was successfully created."
+        except Exception as e:
+            logging.error("ERROR: Caught exception: " + str(e))
+            cfn_reason = "Kendra WebCrawler data source: " + Name + " could not be created. " + str(e)
+
+    if (cfn_event):
+        # Always return SUCCESS to prevent stack failure.. 
+        cfnresponse.send(event, context, cfnresponse.SUCCESS, {}, reason=cfn_reason)
 
     return {"IndexId": IndexId, "DataSourceId": data_source_id}
 
