@@ -65,7 +65,7 @@ By default a 1-node ml.g5.12xlarge endpoint is automatically provisioned. For la
 
 #### Deploy Stack for SAGEMAKER
 
-- *(for Kendra Fallback)* set `DefaultKendraIndexId` to the Index Id (a GUID) of your existing Kendra index containing ingested documents 
+- *(for Kendra Fallback)* set `DefaultKendraIndexId` to the Index Id (a GUID) of your existing Kendra index containing ingested documents, or use `CreateKendraIndex` and `KendraWebCrawlerURLs` to automatically create and populate a new Kendra index. 
 - *(for text passage queries)* set `EmbeddingsApi` to SAGEMAKER or LAMBDA (see  [Semantic Search using Text Embeddings](../semantic_matching_using_LLM_embeddings/README.md))
 - set `LLMApi` to SAGEMAKER
 - for `InstallLexResponseBots` choose `false` - if you don't plan to use Response bots, this speeds up the stack installation.
@@ -79,7 +79,7 @@ QnABot uses the LangChain JS NPM packages to establish communication with the pr
 
 #### Deploy Stack for ANTHROPIC
 
-- *(for Kendra Fallback)* set `DefaultKendraIndexId` to the Index Id (a GUID) of your existing Kendra index containing ingested documents 
+- *(for Kendra Fallback)* set `DefaultKendraIndexId` to the Index Id (a GUID) of your existing Kendra index containing ingested documents, or use `CreateKendraIndex` and `KendraWebCrawlerURLs` to automatically create and populate a new Kendra index. 
 - *(for text passage queries)* set `EmbeddingsApi` to SAGEMAKER or LAMBDA (see  [Semantic Search using Text Embeddings](../semantic_matching_using_LLM_embeddings/README.md))
 - set `LLMApi` to ANTHROPIC
 - set `LLMThirdPartyApiKey` to your Anthropic key (see provider web sites for information on obtaining keys.) 
@@ -93,7 +93,7 @@ Use a custom Lambda function to experiment with LLMs of your choice. Provide you
 
 #### Deploy Stack for Embedding models invoked by a custom Lambda Function
 
-- *(for Kendra Fallback)* set `DefaultKendraIndexId` to the Index Id (a GUID) of your existing Kendra index containing ingested documents 
+- *(for Kendra Fallback)* set `DefaultKendraIndexId` to the Index Id (a GUID) of your existing Kendra index containing ingested documents, or use `CreateKendraIndex` and `KendraWebCrawlerURLs` to automatically create and populate a new Kendra index. 
 - *(for text passage queries)* set `EmbeddingsApi` to SAGEMAKER or LAMBDA (see  [Semantic Search using Text Embeddings](../semantic_matching_using_LLM_embeddings/README.md))
 - set `LLMApi` to LAMBDA
 - set `LLMLambdaArn` to the ARN of your Lambda function 

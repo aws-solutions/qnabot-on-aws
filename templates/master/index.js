@@ -199,7 +199,7 @@ module.exports={
     },
     "CreateKendraIndex":{
       "Type":"String",
-      "Description":"Optional: Automatically create a new Kendra index, used as the default index for QnABot's Kendra integration.",
+      "Description":"Optional: Automatically create a new Kendra index, used as the default index for QnABot's Kendra integration. Leave DefaultKendraIndexId empty if you select this option.",
       "AllowedValues": ["NONE", "DEVELOPER_EDITION", "ENTERPRISE_EDITION"],
       "Default":"NONE"
     },
