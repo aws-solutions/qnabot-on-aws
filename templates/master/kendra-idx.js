@@ -18,6 +18,14 @@ module.exports={
         "DependsOn": "DefaultQnABotSettings",
         "Properties": {
             "ServiceToken": { "Fn::GetAtt" : ["ExportStack", "Outputs.KendraWebCrawlerLambdaArn"] },
+            // invoke if any of the following params change
+            "KendraIndexId": {"Fn::If": [
+                "CreateKendraIndex", 
+                {"Fn::GetAtt": ["KendraIndexStack", "Outputs.KendraIndexId"]}, 
+                {"Ref": "DefaultKendraIndexId"}
+            ]},
+            "KendraWebCrawlerURLs": { "Ref": "KendraWebCrawlerURLs"},
+            "KendraWebCrawlerDepth": { "Ref": "KendraWebCrawlerDepth"},
         }
     },
 }
