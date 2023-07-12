@@ -55,7 +55,7 @@ module.exports={
     },
     "User":{
         "Type" : "AWS::Cognito::UserPoolUser",
-        "DependsOn":["SignupPermision","MessagePermision","OpensearchDomainUpdate","KibanaRoleAttachment","RoleAttachment"],
+        "DependsOn":["SignupPermision","MessagePermision","KibanaRoleAttachment","RoleAttachment"],
         "Properties" : {
             "DesiredDeliveryMediums":["EMAIL"],
             "UserAttributes":[{
@@ -184,7 +184,6 @@ module.exports={
     },
     "KibanaClient":{
         "Type": "Custom::ESCognitoClient",
-        "DependsOn":["OpensearchDomainUpdate"],
         "Properties": {
             "ServiceToken": { "Fn::GetAtt" : ["CFNLambda", "Arn"] },
             "UserPool":{"Ref":"UserPool"},
