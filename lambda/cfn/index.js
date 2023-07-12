@@ -15,7 +15,6 @@ const targets={
     CognitoLogin:require('./lib/CognitoLogin'),
     CognitoRole:require('./lib/CognitoRole'),
     CognitoUrl:require('./lib/CognitoUrl'),
-    ElasticSearchUpdate:require('./lib/ElasticSearchUpdate'),
     ESCognitoClient:require('./lib/ESCognitoClient'),
     LambdaVersion:require('./lib/LambdaVersion'),
     Kibana:require('./lib/base'),  // Kibana custom resource deprecated.. preserve entry here to avoid resource delete failure on stack upgrade.

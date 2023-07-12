@@ -1,6 +1,6 @@
 {
   "name": "qnabot-on-aws",
-  "version": "5.3.4-llm1",
+  "version": "5.3.5-llm1",
   "engines": {
     "node": ">=12.16.1",
     "npm": ">=7.8.0"
