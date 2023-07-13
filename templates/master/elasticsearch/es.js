@@ -1,7 +1,12 @@
 const util = require('../../util');
 
 var properties={
-
+    "CognitoOptions":{
+        "Enabled": true,
+        "IdentityPoolId": {"Ref":"KibanaIdPool"},
+        "RoleArn":{"Fn::GetAtt":["ESCognitoRole","Arn"]},
+        "UserPoolId": {"Ref":"UserPool"}
+    },
     "ClusterConfig": {
        "DedicatedMasterEnabled": false,
        "InstanceCount": {"Ref":"ElasticSearchNodeCount"},
@@ -43,34 +48,6 @@ module.exports={
         "DependsOn":["PreUpgradeExport"],
         "Condition":"CreateDomain",
         "Properties":properties
-    },
-    "OpensearchDomainUpdate": {
-         "Type": "Custom::ElasticSearchUpdate",
-         "DependsOn":["CognitoDomain"],
-         "Properties":{
-            "ServiceToken": { "Fn::GetAtt" : ["CFNLambda", "Arn"] },
-            "DomainName":{"Fn::GetAtt":["ESVar","ESDomain"]},
-            "CognitoOptions":{
-                Enabled: true ,
-                IdentityPoolId: {"Ref":"KibanaIdPool"},
-                RoleArn:{"Fn::GetAtt":["ESCognitoRole","Arn"]},
-                UserPoolId: {"Ref":"UserPool"}
-            },
-            "AccessPolicies": {"Fn::Sub":JSON.stringify({
-               "Version": "2012-10-17",
-               "Statement": [
-                  {
-                     "Sid": "CognitoAuth",
-                     "Principal": {
-                        "AWS":"${KibanaRole.Arn}"
-                     },
-                     "Effect": "Allow",
-                     "Action": "es:ESHttp*",
-                     "Resource":"${ESVar.ESArn}/*"
-                  }
-               ]
-            })},
-        }
     },
     "ESCognitoRole": {
       "Type": "AWS::IAM::Role",
