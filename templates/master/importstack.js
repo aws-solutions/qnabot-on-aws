@@ -1,7 +1,7 @@
 module.exports={
     "ImportStack":{
         "Type" : "AWS::CloudFormation::Stack",
-        "DependsOn":["PreUpgradeExport","OpensearchDomainUpdate"],
+        "DependsOn":["PreUpgradeExport"],
         "Properties" : {
             "TemplateURL" :{"Fn::Sub":"https://${BootstrapBucket}.s3.${AWS::Region}.amazonaws.com/${BootstrapPrefix}/templates/import.json"},
             "Parameters" :{
@@ -33,15 +33,15 @@ module.exports={
                 "EmbeddingsLambdaArn": {"Ref": "EmbeddingsLambdaArn"},
                 "EmbeddingsSagemakerEndpoint": {
                     "Fn::If": [
-                        "EmbeddingsSagemaker", 
-                        {"Fn::GetAtt": ["SagemakerEmbeddingsStack", "Outputs.EmbeddingsSagemakerEndpoint"] }, 
+                        "EmbeddingsSagemaker",
+                        {"Fn::GetAtt": ["SagemakerEmbeddingsStack", "Outputs.EmbeddingsSagemakerEndpoint"] },
                         ""
                     ]
                 },
                 "EmbeddingsSagemakerEndpointArn": {
                     "Fn::If": [
-                        "EmbeddingsSagemaker", 
-                        {"Fn::GetAtt": ["SagemakerEmbeddingsStack", "Outputs.EmbeddingsSagemakerEndpointArn"] }, 
+                        "EmbeddingsSagemaker",
+                        {"Fn::GetAtt": ["SagemakerEmbeddingsStack", "Outputs.EmbeddingsSagemakerEndpointArn"] },
                         ""
                     ]
                   }
