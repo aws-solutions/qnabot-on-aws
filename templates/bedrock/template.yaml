@@ -50,13 +50,12 @@ Resources:
       Environment:
         Variables:
           SDK_DOWNLOAD_URL: !Ref BedrockPreviewSdkUrl
-          BOTOCORE_WHL_FILE: botocore-1.29.142-py3-none-any.whl
-          BOTO3_WHL_FILE: boto3-1.26.142-py3-none-any.whl
           BOTO3_BUCKET: !Ref BedrockBoto3Bucket
       Code:
         ZipFile: |
           import os
           import sys
+          import re
           import shutil
           import subprocess
           import boto3
@@ -65,8 +64,6 @@ Resources:
           from datetime import datetime
           import cfnresponse
           bedrock_sdk_url = os.environ['SDK_DOWNLOAD_URL']
-          botocore_whl_file = os.environ['BOTOCORE_WHL_FILE']
-          boto3_whl_file = os.environ['BOTO3_WHL_FILE']
           boto3_bucket = os.environ['BOTO3_BUCKET']
 
           def download_file_from_url(url, local_path):
@@ -89,6 +86,16 @@ Resources:
               with zipfile.ZipFile(zip_file_path, 'r') as zip_ref:
                 zip_ref.extract(file_name)
                 print(f"Successfully extracted {file_name} from {zip_file_path}")
+
+          def find_boto_wheels(zipname):
+            zipf = zipfile.ZipFile(zipname, 'r')
+            zip_files = zipf.namelist()
+            b = re.compile('boto3(.*)\.whl')
+            bc = re.compile('botocore(.*)\.whl')
+            boto3_whl_file = [ s for s in zip_files if b.match(s) ][0]
+            botocore_whl_file = [ s for s in zip_files if bc.match(s) ][0]
+            
+            return boto3_whl_file, botocore_whl_file
 
           def make_zip_filename():
             now = datetime.now()
@@ -125,6 +132,7 @@ Resources:
                 zip_file_name='bedrock-python-sdk.zip'
                 print(f"downloading from {bedrock_sdk_url} to {zip_file_name}")
                 download_file_from_url(bedrock_sdk_url, zip_file_name)
+                boto3_whl_file, botocore_whl_file = find_boto_wheels(zip_file_name)
                 extract_file_from_zip(zip_file_name, botocore_whl_file)
                 extract_file_from_zip(zip_file_name, boto3_whl_file)
                 if os.path.exists("python"):
@@ -154,8 +162,6 @@ Resources:
       ServiceToken: !GetAtt BedrockBoto3ZipFunction.Arn
       # Rerun BedrockBoto3ZipFunction if any of the following parameters change
       SDK_DOWNLOAD_URL: !Ref BedrockPreviewSdkUrl
-      BOTOCORE_WHL_FILE: botocore-1.29.142-py3-none-any.whl
-      BOTO3_WHL_FILE: boto3-1.26.142-py3-none-any.whl
       BOTO3_BUCKET: !Ref BedrockBoto3Bucket
 
   BedrockBoto3Layer:
