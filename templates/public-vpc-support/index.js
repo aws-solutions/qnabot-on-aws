@@ -42,15 +42,14 @@ module.exports=Promise.resolve(require('../master')).then(function(base){
         'KendraWebCrawlerURLs',
         'KendraWebCrawlerDepth',
         'Encryption',
+        'ElasticSearchNodeCount',
+        'ElasticSearchEBSVolumeSize',
+        'KibanaDashboardRetentionMinutes',
         'PublicOrPrivate',
         'LexV2BotLocaleIds',
         'LexBotVersion',
         'InstallLexResponseBots',
         'FulfillmentConcurrency',
-        'ElasticSearchNodeCount',
-        'KibanaDashboardRetentionMinutes',
-        'VPCSubnetIdList',
-        'VPCSecurityGroupIdList',
         'XraySetting',
         'EmbeddingsApi',
         'EmbeddingsSagemakerEndpoint',
@@ -106,20 +105,21 @@ module.exports=Promise.resolve(require('../master')).then(function(base){
                     ]
                 },
                 {
-                   "Label": {
-                        "default": "Amazon OpenSearch Service"
-                   },
-                   "Parameters": [
-                        "ElasticSearchNodeCount",
-                        "ElasticSearchEBSVolumeSize",
-                        "Encryption",
-                        "KibanaDashboardRetentionMinutes"
-                   ]
-                    'Label': {
-                        'default': 'Amazon LexV2'
+                    "Label": {
+                         "default": "Amazon Kendra Integration"
                     },
-                    'Parameters': [
-                        'LexV2BotLocaleIds'
+                    "Parameters": [
+                         "DefaultKendraIndexId"
+                    ]
+                },
+                {
+                    "Label": {
+                         "default": "Amazon OpenSearch Service"
+                    },
+                    "Parameters": [
+                         "ElasticSearchNodeCount",
+                         "Encryption",
+                         "KibanaDashboardRetentionMinutes"
                     ]
                 },
                 {
