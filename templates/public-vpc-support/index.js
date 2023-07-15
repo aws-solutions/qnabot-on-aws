@@ -45,6 +45,8 @@ module.exports=Promise.resolve(require('../master')).then(function(base){
         'ElasticSearchNodeCount',
         'ElasticSearchEBSVolumeSize',
         'KibanaDashboardRetentionMinutes',
+        'VPCSubnetIdList',
+        'VPCSecurityGroupIdList',
         'PublicOrPrivate',
         'LexV2BotLocaleIds',
         'LexBotVersion',
@@ -99,27 +101,10 @@ module.exports=Promise.resolve(require('../master')).then(function(base){
                         'default': 'Amazon OpenSearch Service'
                     },
                     'Parameters': [
-                        'ElasticSearchNodeCount',
-                        'Encryption',
-                        'KibanaDashboardRetentionMinutes'
-                    ]
-                },
-                {
-                    "Label": {
-                         "default": "Amazon Kendra Integration"
-                    },
-                    "Parameters": [
-                         "DefaultKendraIndexId"
-                    ]
-                },
-                {
-                    "Label": {
-                         "default": "Amazon OpenSearch Service"
-                    },
-                    "Parameters": [
-                         "ElasticSearchNodeCount",
-                         "Encryption",
-                         "KibanaDashboardRetentionMinutes"
+                        "ElasticSearchNodeCount",
+                        "ElasticSearchEBSVolumeSize",
+                        "Encryption",
+                        "KibanaDashboardRetentionMinutes"
                     ]
                 },
                 {
