@@ -11,6 +11,9 @@
     "handlebars": "^4.7.2",
     "linkifyjs": "^3.0.0-beta.3",
     "simple-encryptor": "^3.0.0",
-    "vm2": "^3.9.18"
+    "vm2": "^3.9.18",
+    "langchain": "^0.0.63",
+    "openai": "^3.2.1",
+    "anthropic-api": "^1.0.0"
   }
 }
