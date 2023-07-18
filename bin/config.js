@@ -19,7 +19,7 @@ module.exports={
     "buildType": "Custom",
     "FulfillmentConcurrency":1,
     "EmbeddingsApi": "SAGEMAKER",
-    "QASummarizeApi": "SAGEMAKER",
+    "LLMApi": "SAGEMAKER",
     "InstallLexResponseBots": true
 }
 
