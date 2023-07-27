@@ -1,12 +1,12 @@
 #! /usr/bin/env node
 var Promise=require('bluebird')
 var fs=Promise.promisifyAll(require('fs'))
-process.env.AWS_PROFILE=require('../config').profile
-process.env.AWS_DEFAULT_REGION=require('../config').profile
+process.env.AWS_PROFILE=require('../config.json').profile
+process.env.AWS_DEFAULT_REGION=require('../config.json').profile
 var aws=require('aws-sdk')
 var chalk=require('chalk')
 aws.config.setPromisesDependency(Promise)
-aws.config.region=require('../config').region
+aws.config.region=require('../config.json').region
 var cf=new aws.CloudFormation()
 var s3=new aws.S3()
 var stringify=require("json-stringify-pretty-compact")
@@ -48,7 +48,7 @@ async function create(options){
     try {
         var temp=await Promise.resolve(require(file))
         var template_string=typeof temp ==="object" ? JSON.stringify(temp) : temp
-        
+
         log("writing to "+output,!options.silent)
 
         await fs.writeFileAsync(output,stringify(JSON.parse(template_string)))

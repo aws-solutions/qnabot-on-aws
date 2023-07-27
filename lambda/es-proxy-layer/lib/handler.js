@@ -37,6 +37,11 @@ async function build_additem_embeddings(event, settings) {
     if (answer) {
         event.body.a_vector = await get_embeddings("a", answer, settings);
     }
+    // text item passage embeddings
+    const passage = _.get(event,"body.passage");
+    if (passage) {
+        event.body.passage_vector = await get_embeddings("a", passage, settings);
+    }
     return event.body;
 }
 
@@ -50,18 +55,19 @@ async function get_es_query(event, settings) {
         }
         let query_params = {
             question: question,
-            topic: _.get(event,'topic',''),
-            from: _.get(event,'from',0),
+            topic: _.get(event, 'topic', ''),
+            from: _.get(event, 'from', 0),
             size: size,
-            minimum_should_match: _.get(settings,'ES_MINIMUM_SHOULD_MATCH'),
+            minimum_should_match: _.get(settings, 'ES_MINIMUM_SHOULD_MATCH'),
             phrase_boost: _.get(settings, 'ES_PHRASE_BOOST'),
-            use_keyword_filters: _.get(settings,'ES_USE_KEYWORD_FILTERS'),
-            keyword_syntax_types: _.get(settings,'ES_KEYWORD_SYNTAX_TYPES'),
-            syntax_confidence_limit: _.get(settings,'ES_SYNTAX_CONFIDENCE_LIMIT'),
+            use_keyword_filters: _.get(settings, 'ES_USE_KEYWORD_FILTERS'),
+            keyword_syntax_types: _.get(settings, 'ES_KEYWORD_SYNTAX_TYPES'),
+            syntax_confidence_limit: _.get(settings, 'ES_SYNTAX_CONFIDENCE_LIMIT'),
             fuzziness: _.get(settings, 'ES_USE_FUZZY_MATCH'),
-            es_expand_contractions: _.get(settings,"ES_EXPAND_CONTRACTIONS"),
-            qnaClientFilter: _.get(event,'client_filter',''),
-            score_answer: (_.get(event,'score_answer','false') === "true") ? true : false,
+            es_expand_contractions: _.get(settings, 'ES_EXPAND_CONTRACTIONS'),
+            qnaClientFilter: _.get(event, 'client_filter', ''),
+            score_answer: _.get(event, 'score_answer', 'false') === 'true' ? true : false,
+            score_text_passage: _.get(event, 'score_text_passage', 'false') === 'true' ? true : false,
             settings: settings
         };
         return build_es_query(query_params);
@@ -133,7 +139,8 @@ module.exports= async (event, context, callback) => {
         kendraIndex: kendra_index,
         question: question,
         qnaClientFilter: _.get(event,'client_filter',''),
-        score_answer: (_.get(event,'score_answer','false') === "true") ? true : false
+        score_answer: (_.get(event,'score_answer','false') === "true") ? true : false,
+        score_text_passage: _.get(event, 'score_text_passage', 'false') === 'true' ? true : false,
     }
     let response
     let okKendraQuery = !(await open_es.isESonly(req,params))

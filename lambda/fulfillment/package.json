@@ -7,8 +7,11 @@
     "test": "nodeunit ./test/index.js",
     "unit": "nodeunit ./test/index.js -t"
   },
-  "author": "",
-  "license": "ISC",
+  "author": {
+    "name": "Amazon Web Services",
+    "url": "https://aws.amazon.com/solutions"
+  },
+  "license": "Apache-2.0",
   "dependencies": {
     "jsonschema": "^1.2.2",
     "jsonwebtoken": "^9.0.0",

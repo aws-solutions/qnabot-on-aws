@@ -1,5 +1,5 @@
 #! /usr/bin/env node
-var config=require('../config')
+var config=require('../config.json')
 var fs=require('fs')
 var _=require('lodash')
 process.env.AWS_PROFILE=config.profile
@@ -17,7 +17,7 @@ if (require.main === module) {
         .option('--inc',"increment value")
         .option('-s --set <value>',"set the value")
         .option('-n --namespace <name>',"stack namespace")
-        .option('-p --prefix',"get stacks prefix") 
+        .option('-p --prefix',"get stacks prefix")
         .action(function(stack,options){
             if(stack || options.prefix) ran=true
             console.log(run(stack,options))
@@ -42,7 +42,7 @@ function run(stack,options={}){
             var increments={}
         }
     }
-    
+
     var stackname=stack.replace('/','-')
     var full=`${namespace}-${stackname}`
     var path=`["${config.profile}"].["${namespace}"].["${stackname}"]`

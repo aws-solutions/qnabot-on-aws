@@ -20,47 +20,8 @@ _.forEach(_.assign.apply({},files),(value,key)=>{
 })
 
 module.exports=Object.assign(
-    _.fromPairs(lambdas),
-{"LambdaAccessRole": {
-      "Type": "AWS::IAM::Role",
-      "Properties": {
-        "AssumeRolePolicyDocument": {
-          "Version": "2012-10-17",
-          "Statement": [
-            {
-              "Effect": "Allow",
-              "Principal": {
-                "Service": "apigateway.amazonaws.com"
-              },
-              "Action": "sts:AssumeRole"
-            }
-          ]
-        },
-        "Path": "/",
-        "Policies": [
-          util.basicLambdaExecutionPolicy(),
-          util.lambdaVPCAccessExecutionRole(),
-          util.xrayDaemonWriteAccess(),
-          {
-            "PolicyName" : "LambdaPolicy",
-            "PolicyDocument" : {
-              "Version": "2012-10-17",
-              "Statement": [
-                {
-                  "Effect": "Allow",
-                  "Action": [
-                    "lambda:*"
-                  ],
-                  "Resource":["*"]
-                }
-              ]
-            }
-          }
-        ]
-      },
-      "Metadata": util.cfnNag(["W11", "W12", "F3"])
-  },
-})
+    _.fromPairs(lambdas)
+)
 
 function permission(name){
     return {

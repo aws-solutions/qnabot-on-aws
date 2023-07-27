@@ -57,7 +57,7 @@ module.exports = Object.assign(
         "Handler": "index.handler",
         "MemorySize": "1024",
         "Role": {"Fn::GetAtt": ["ExportRole", "Arn"]},
-        "Runtime": "nodejs16.x",
+        "Runtime": process.env.npm_package_config_lambdaRuntime,
         "Timeout": 300,
         "VpcConfig": {
           "Fn::If": ["VPCEnabled", {
@@ -68,6 +68,9 @@ module.exports = Object.assign(
         "TracingConfig": {
           "Fn::If": ["XRAYEnabled", {"Mode": "Active"}, {"Ref": "AWS::NoValue"}]
         },
+        "Layers":[
+          {"Ref":"AwsSdkLayerLambdaLayer"}
+        ],
         "Tags": [{
           Key: "Type",
           Value: "Export"
@@ -130,7 +133,7 @@ module.exports = Object.assign(
         "Handler": "index.handler",
         "MemorySize": "1024",
         "Role": {"Fn::GetAtt": ["ExportRole", "Arn"]},
-        "Runtime": "nodejs16.x",
+        "Runtime": process.env.npm_package_config_lambdaRuntime,
         "Timeout": 300,
         "VpcConfig": {
           "Fn::If": ["VPCEnabled", {
@@ -141,6 +144,9 @@ module.exports = Object.assign(
         "TracingConfig": {
           "Fn::If": ["XRAYEnabled", {"Mode": "Active"}, {"Ref": "AWS::NoValue"}]
         },
+        "Layers":[
+          {"Ref":"AwsSdkLayerLambdaLayer"}
+        ],
         "Tags": [{
           Key: "Type",
           Value: "Export"
@@ -288,7 +294,7 @@ module.exports = Object.assign(
         "Handler": "index.step",
         "MemorySize": "1024",
         "Role": {"Fn::GetAtt": ["ExportRole", "Arn"]},
-        "Runtime": "nodejs16.x",
+        "Runtime": process.env.npm_package_config_lambdaRuntime,
         "Timeout": 300,
         "VpcConfig": {
           "Fn::If": ["VPCEnabled", {
@@ -300,6 +306,9 @@ module.exports = Object.assign(
           "Fn::If": ["XRAYEnabled", {"Mode": "Active"},
             {"Ref": "AWS::NoValue"}]
         },
+        "Layers":[
+          {"Ref":"AwsSdkLayerLambdaLayer"}
+        ],
         "Tags": [{
           Key: "Type",
           Value: "Export"
@@ -390,7 +399,7 @@ module.exports = Object.assign(
         "Handler": "kendraSync.performSync",
         "MemorySize": "1024",
         "Role": {"Fn::GetAtt": ["KendraSyncRole", "Arn"]},
-        "Runtime": "nodejs16.x",
+        "Runtime": process.env.npm_package_config_lambdaRuntime,
         "Timeout": 300,
         "VpcConfig": {
           "Fn::If": ["VPCEnabled", {
@@ -597,7 +606,7 @@ module.exports = Object.assign(
         Handler: "index.handler",
         MemorySize: "1024",
         Role: {"Fn::GetAtt": ["TranslateRole", "Arn"]},
-        Runtime: "nodejs16.x",
+        Runtime: process.env.npm_package_config_lambdaRuntime,
         Timeout: 300,
         "VpcConfig": {
           "Fn::If": ["VPCEnabled", {
@@ -608,6 +617,9 @@ module.exports = Object.assign(
         "TracingConfig": {
           "Fn::If": ["XRAYEnabled", {"Mode": "Active"}, {"Ref": "AWS::NoValue"}]
         },
+        "Layers":[
+          {"Ref":"AwsSdkLayerLambdaLayer"}
+        ],
         Tags: [
           {
             Key: "Type",
@@ -960,7 +972,7 @@ module.exports = Object.assign(
         Handler: "kendra_webcrawler.handler",
         MemorySize: "2048",
         Role: {"Fn::GetAtt": ["KendraNativeCrawlerRole", "Arn"]},
-        Runtime: "python3.9",
+        Runtime: process.env.npm_package_config_pythonRuntime,
         Timeout: 900,
         Tags: [
           {
@@ -1029,7 +1041,7 @@ module.exports = Object.assign(
         Handler: "kendra_webcrawler_schedule_updater.handler",
         MemorySize: "2048",
         Role: {"Fn::GetAtt": ["KendraNativeCrawlerRole", "Arn"]},
-        Runtime: "python3.9",
+        Runtime: process.env.npm_package_config_pythonRuntime,
         Timeout: 900,
         Tags: [
           {
@@ -1094,7 +1106,7 @@ module.exports = Object.assign(
         Handler: "kendra_webcrawler_status.handler",
         MemorySize: "2048",
         Role: {"Fn::GetAtt": ["KendraNativeCrawlerRole", "Arn"]},
-        Runtime: "python3.9",
+        Runtime: process.env.npm_package_config_pythonRuntime,
         Timeout: 900,
         Tags: [
           {

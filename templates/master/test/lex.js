@@ -1,4 +1,4 @@
-var config = require('../../../config')
+var config = require('../../../config.json')
 process.env.AWS_PROFILE = config.profile
 process.env.AWS_DEFAULT_REGION = config.region
 var query = require('query-string').stringify
@@ -18,7 +18,7 @@ var api = require('./util').api
 
 
 module.exports = {
-    
+
     setUp: function(cb) {
         var self = this
         outputs('dev/master').then(function(output) {
@@ -219,7 +219,7 @@ module.exports = {
     navigation1: async function(test) {
         try {
             var args = await outputs('dev/master')
-            
+
             await api({
                     path: "questions/navigation.1",
                     method: "PUT",
@@ -250,7 +250,7 @@ module.exports = {
             console.log(response)
             sessionAttributes = response.sessionAttributes
             test.equal(response.message, "Unable to go to the next room...")
-            
+
             response = await this.lex.postText({
                 sessionAttributes: sessionAttributes,
                 inputText: "previous"
@@ -258,7 +258,7 @@ module.exports = {
             console.log(response)
             sessionAttributes = response.sessionAttributes
             test.equal(response.message, "Unable to go to the previous room...")
-            
+
         }
         catch (e) {
             test.ifError(e)
@@ -312,7 +312,7 @@ module.exports = {
                             next: "navigation.4"
                         }
                     })
-                
+
                await api({
                     path: "questions/navigation.4",
                     method: "PUT",
@@ -354,7 +354,7 @@ module.exports = {
             console.log(response)
             sessionAttributes = response.sessionAttributes
             test.equal(response.message, "One")
-            
+
             response = await this.lex.postText({
                 sessionAttributes:sessionAttributes,
                 inputText: "Two"
@@ -362,7 +362,7 @@ module.exports = {
             console.log(response)
             sessionAttributes = response.sessionAttributes
             test.equal(response.message, "Two")
-            
+
             response = await this.lex.postText({
                 sessionAttributes:sessionAttributes,
                 inputText: "next"
@@ -370,7 +370,7 @@ module.exports = {
             console.log(response)
             sessionAttributes = response.sessionAttributes
             test.equal(response.message, "Three")
-            
+
             response = await this.lex.postText({
                 sessionAttributes:sessionAttributes,
                 inputText: "previous"
@@ -378,7 +378,7 @@ module.exports = {
             console.log(response)
             sessionAttributes = response.sessionAttributes
             test.equal(response.message, "Two")
-            
+
             response = await this.lex.postText({
                 sessionAttributes:sessionAttributes,
                 inputText: "Two"
@@ -386,7 +386,7 @@ module.exports = {
             console.log(response)
             sessionAttributes = response.sessionAttributes
             test.equal(response.message, "Two")
-            
+
             response = await this.lex.postText({
                 sessionAttributes:sessionAttributes,
                 inputText: "previous"
@@ -394,7 +394,7 @@ module.exports = {
             console.log(response)
             sessionAttributes = response.sessionAttributes
             test.equal(response.message, "One")
-            
+
         }
         catch (e) {
             test.ifError(e)
@@ -516,7 +516,7 @@ module.exports = {
             console.log(response)
             sessionAttributes = response.sessionAttributes
             test.equal(response.message, "One")
-            
+
             response = await this.lex.postText({
                 sessionAttributes:sessionAttributes,
                 inputText: "next"
@@ -524,7 +524,7 @@ module.exports = {
             console.log(response)
             sessionAttributes = response.sessionAttributes
             test.equal(response.message, "hook")
-            
+
             response = await this.lex.postText({
                 sessionAttributes:sessionAttributes,
                 inputText: "next"
@@ -532,7 +532,7 @@ module.exports = {
             console.log(response)
             sessionAttributes = response.sessionAttributes
             test.equal(response.message, "Three")
-            
+
             response = await this.lex.postText({
                 sessionAttributes:sessionAttributes,
                 inputText: "previous"
@@ -540,7 +540,7 @@ module.exports = {
             console.log(response)
             sessionAttributes = response.sessionAttributes
             test.equal(response.message, "hook")
-            
+
             response = await this.lex.postText({
                 sessionAttributes:sessionAttributes,
                 inputText: "previous"
@@ -606,7 +606,7 @@ module.exports = {
                             a: "One"
                         }
                     })
-              
+
             var sessionAttributes = {}
             var response
             response = await this.lex.postText({
@@ -616,7 +616,7 @@ module.exports = {
             console.log(response)
             sessionAttributes = response.sessionAttributes
             test.equal(response.message, "There is no question to leave feedback on, please ask a question before attempting to leave feedback")
-            
+
             response = await this.lex.postText({
                 sessionAttributes:sessionAttributes,
                 inputText: "One"
@@ -624,7 +624,7 @@ module.exports = {
             console.log(response)
             sessionAttributes = response.sessionAttributes
             test.equal(response.message, "One")
-            
+
             response = await this.lex.postText({
                 sessionAttributes:sessionAttributes,
                 inputText: "feedback"
@@ -632,7 +632,7 @@ module.exports = {
             console.log(response)
             sessionAttributes = response.sessionAttributes
             test.ok(response.message.includes("\"One\""))
-            
+
             response = await this.lex.postText({
                 sessionAttributes:sessionAttributes,
                 inputText: "goodbye"
@@ -640,7 +640,7 @@ module.exports = {
             console.log(response)
             sessionAttributes = response.sessionAttributes
             test.ok(response.message.includes("\"One\""))
-            
+
             response = await this.lex.postText({
                 sessionAttributes:sessionAttributes,
                 inputText: "a"
@@ -648,7 +648,7 @@ module.exports = {
             console.log(response)
             sessionAttributes = response.sessionAttributes
             test.ok(response.message.includes("Thank you for leaving the feedback"))
-            
+
             response = await this.lex.postText({
                 sessionAttributes:sessionAttributes,
                 inputText: "feedback"
@@ -656,7 +656,7 @@ module.exports = {
             console.log(response)
             sessionAttributes = response.sessionAttributes
             test.ok(response.message.includes("\"One\""))
-            
+
             response = await this.lex.postText({
                 sessionAttributes:sessionAttributes,
                 inputText: "C"
@@ -664,7 +664,7 @@ module.exports = {
             console.log(response)
             sessionAttributes = response.sessionAttributes
             test.ok(response.message.includes("Canceled Feedback"))
-            
+
         }
         catch (e) {
             test.ifError(e)

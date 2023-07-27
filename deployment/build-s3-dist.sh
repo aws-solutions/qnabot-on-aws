@@ -67,12 +67,6 @@ echo "[Init] Install dependencies and build"
 echo "------------------------------------------------------------------------------"
 cd $source_dir
 
-# workaround for Config file confusing make and node import of "config.js"
-# renaming Config temporarily
-if [[ -f "Config" ]]; then
-    mv Config Config_renamed
-fi
-
 npm install
 
 npm run configAwsSolutions
@@ -82,12 +76,6 @@ do_replace "config.json" %%SOLUTION_NAME%% $solution_name
 do_replace "config.json" %%VERSION%% $version
 
 npm run build
-
-# workaround for Config file confusing make and node import of "config.js"
-# by renaming back to Config
-if [[ -f "Config_renamed" ]]; then
-    mv Config_renamed Config
-fi
 
 echo "------------------------------------------------------------------------------"
 echo "[Init] Copying templates to global-s3-assets/"

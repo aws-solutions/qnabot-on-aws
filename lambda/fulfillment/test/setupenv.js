@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 var Promise=require('bluebird')
-var config=require('../../../config')
+var config=require('../../../config.json')
 var aws=require('aws-sdk')
 var outputs=require('../../../bin/exports')
 const qnabot = require("qnabot/logging")

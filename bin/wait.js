@@ -1,10 +1,10 @@
 #! /usr/bin/env node
 var Promise=require('bluebird')
-process.env.AWS_PROFILE=require('../config').profile
-process.env.AWS_DEFAULT_REGION=require('../config').profile
+process.env.AWS_PROFILE=require('../config.json').profile
+process.env.AWS_DEFAULT_REGION=require('../config.json').profile
 var aws=require('aws-sdk')
 aws.config.setPromisesDependency(Promise)
-aws.config.region=require('../config').region
+aws.config.region=require('../config.json').region
 var cf=new aws.CloudFormation()
 const ora = require('ora');
 var name=require('./name')
@@ -33,7 +33,7 @@ function wait(stackname,options){
                     "UPDATE_ROLLBACK_COMPLETE",
                     "DELETE_COMPLETE"
                 ].includes(status)){
-                    spinner.succeed(StackName+":"+status) 
+                    spinner.succeed(StackName+":"+status)
                     res()
                 }else if([
                     "UPDATE_IN_PROGRESS",

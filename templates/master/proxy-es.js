@@ -41,7 +41,7 @@ module.exports={
         "Handler": "index.utterances",
         "MemorySize": "1408",
         "Role": {"Fn::GetAtt": ["ESProxyLambdaRole","Arn"]},
-        "Runtime": "nodejs16.x",
+        "Runtime": process.env.npm_package_config_lambdaRuntime,
         "Timeout": 300,
         "VpcConfig" : {
             "Fn::If": [ "VPCEnabled", {
@@ -69,7 +69,7 @@ module.exports={
             "S3ObjectVersion":{"Ref":"ESProxyCodeVersion"}
         },
         "Layers":[{"Ref":"AwsSdkLayerLambdaLayer"},
-                  {"Ref":"CommonModulesLambdaLayer"}, 
+                  {"Ref":"CommonModulesLambdaLayer"},
                   {"Ref":"EsProxyLambdaLayer"},
                   {"Ref":"QnABotCommonLambdaLayer"}],
         "Environment": {
@@ -85,7 +85,7 @@ module.exports={
         "Handler": "index.qid",
         "MemorySize": "1408",
         "Role": {"Fn::GetAtt": ["ESProxyLambdaRole","Arn"]},
-        "Runtime": "nodejs16.x",
+        "Runtime": process.env.npm_package_config_lambdaRuntime,
         "Timeout": 300,
         "VpcConfig" : {
             "Fn::If": [ "VPCEnabled", {
@@ -127,7 +127,7 @@ module.exports={
         "Handler": "index.cleanmetrics",
         "MemorySize": "1408",
         "Role": {"Fn::GetAtt": ["ESProxyLambdaRole","Arn"]},
-        "Runtime": "nodejs16.x",
+        "Runtime": process.env.npm_package_config_lambdaRuntime,
         "Timeout": 300,
         "VpcConfig" : {
             "Fn::If": [ "VPCEnabled", {
@@ -188,7 +188,7 @@ module.exports={
         "Handler": "index.logging",
         "MemorySize": "1408",
         "Role": {"Fn::GetAtt": ["ESLoggingLambdaRole","Arn"]},
-        "Runtime": "nodejs16.x",
+        "Runtime": process.env.npm_package_config_lambdaRuntime,
         "Timeout": 300,
         "VpcConfig" : {
             "Fn::If": [ "VPCEnabled", {
@@ -228,7 +228,7 @@ module.exports={
         "Handler": "index.query",
         "MemorySize": "1408",
         "Role": {"Fn::GetAtt": ["ESProxyLambdaRole","Arn"]},
-        "Runtime": "nodejs16.x",
+        "Runtime": process.env.npm_package_config_lambdaRuntime,
         "Timeout": 300,
         "VpcConfig" : {
             "Fn::If": [ "VPCEnabled", {
@@ -270,8 +270,8 @@ module.exports={
             EMBEDDINGS_API: { "Ref": "EmbeddingsApi" },
             EMBEDDINGS_SAGEMAKER_ENDPOINT : {
               "Fn::If": [
-                  "EmbeddingsSagemaker", 
-                  {"Fn::GetAtt": ["SagemakerEmbeddingsStack", "Outputs.EmbeddingsSagemakerEndpoint"] }, 
+                  "EmbeddingsSagemaker",
+                  {"Fn::GetAtt": ["SagemakerEmbeddingsStack", "Outputs.EmbeddingsSagemakerEndpoint"] },
                   ""
               ]
             },
@@ -281,7 +281,7 @@ module.exports={
         "Handler": "index.handler",
         "MemorySize": "1408",
         "Role": {"Fn::GetAtt": ["ESProxyLambdaRole","Arn"]},
-        "Runtime": "nodejs16.x",
+        "Runtime": process.env.npm_package_config_lambdaRuntime,
         "Timeout": 300,
         "VpcConfig" : {
             "Fn::If": [ "VPCEnabled", {
@@ -336,7 +336,7 @@ module.exports={
           		}]
           	}
           },
-          { 
+          {
             "Fn::If": [
               "EmbeddingsEnable",
               {
@@ -344,9 +344,9 @@ module.exports={
                 "PolicyDocument" : {
                 "Version": "2012-10-17",
                   "Statement": [
-                    { 
+                    {
                       "Fn::If": [
-                        "EmbeddingsSagemaker", 
+                        "EmbeddingsSagemaker",
                         {
                             "Effect": "Allow",
                             "Action": [
@@ -357,9 +357,9 @@ module.exports={
                         {"Ref":"AWS::NoValue"}
                       ]
                     },
-                    { 
+                    {
                       "Fn::If": [
-                        "EmbeddingsLambdaArn", 
+                        "EmbeddingsLambdaArn",
                         {
                           "Effect": "Allow",
                           "Action": [
@@ -493,7 +493,8 @@ module.exports={
             },{
               "Effect": "Allow",
               "Action": [
-                "kendra:Query"
+                "kendra:Query",
+                "kendra:Retrieve"
               ],
               "Resource":[
                 {"Fn::Sub":"arn:aws:kendra:${AWS::Region}:${AWS::AccountId}:index/*"},

@@ -22,6 +22,7 @@ This software includes third party software subject to the following copyrights:
 @babel/preset-stage-2 under the Massachusetts Institute of Technology (MIT) license
 ajv under the Massachusetts Institute of Technology (MIT) license
 alexa-sdk under the Apache License Version 2.0
+arrow under the Apache License Version 2.0
 async-mutex under the Massachusetts Institute of Technology (MIT) license
 autosize under the Massachusetts Institute of Technology (MIT) license
 aws-lex-web-ui under the Amazon Software License
@@ -37,10 +38,14 @@ babel-preset-env under the Massachusetts Institute of Technology (MIT) license
 babel-preset-es2015 under the Massachusetts Institute of Technology (MIT) license
 babel-preset-es2015-ie the Massachusetts Institute of Technology (MIT) license
 beautifulsoup under Massachusetts Institute of Technology (MIT) License
+beautifulsoup4 under the Massachusetts Institute of Technology (MIT) license
 bluebird under the Massachusetts Institute of Technology (MIT) license
 body-parser under the Massachusetts Institute of Technology (MIT) license
+boto3 under the Apache License Version 2.0
+botocore under the Apache License Version 2.0
 bowser under the Massachusetts Institute of Technology (MIT) license
 canvasapi under Massachusetts Institute of Technology (MIT) License
+cfn-lambda under the Massachusetts Institute of Technology (MIT) license
 cfn-response under the Amazon Software License
 chalk under the Massachusetts Institute of Technology (MIT) license
 chrome-aws-lambda under the Massachusetts Institute of Technology (MIT) license
@@ -48,18 +53,24 @@ clean-deep under the Massachusetts Institute of Technology (MIT) license
 clipboard under the Massachusetts Institute of Technology (MIT) license
 commander under the Massachusetts Institute of Technology (MIT) license
 copy-webpack-plugin under the Massachusetts Institute of Technology (MIT) license
-crypto-js under the Massachusetts Institute of Technology (MIT) license
+crhelper under the Apache License Version 2.0
 css-loader under the Massachusetts Institute of Technology (MIT) license
+defusedxml under the Python Software Foundation License Version 2
 dir-loader under the Massachusetts Institute of Technology (MIT) license
+elasticsearch under the Apache License Version 2.0
 exports-loader under the Massachusetts Institute of Technology (MIT) license
 express under the Massachusetts Institute of Technology (MIT) license
 faker under the Massachusetts Institute of Technology (MIT) license
 file-saver under the Massachusetts Institute of Technology (MIT) license
+filelock under the Unlicense license
 handlebars under the Massachusetts Institute of Technology (MIT) license
 handlebars-loader under the Massachusetts Institute of Technology (MIT) license
 highlight.js under BSD-3-Clause license
 html-webpack-plugin under the Massachusetts Institute of Technology (MIT) license
+http-aws-es under the Massachusetts Institute of Technology (MIT) license
 idle-vue under the Massachusetts Institute of Technology (MIT) license
+intercept-stdout under the Massachusetts Institute of Technology (MIT) license
+jmespath under the Massachusetts Institute of Technology (MIT) license
 js-cache under the Massachusetts Institute of Technology (MIT) license
 jsdom under the Massachusetts Institute of Technology (MIT) license
 jsdom-global under the Massachusetts Institute of Technology (MIT) license
@@ -71,6 +82,8 @@ JSONPath under the Massachusetts Institute of Technology (MIT) license
 jsonschema under the Massachusetts Institute of Technology (MIT) license
 jsonwebtoken under the Massachusetts Institute of Technology (MIT) license
 jszip under the Massachusetts Institute of Technology (MIT) license
+jwks-rsa under the Massachusetts Institute of Technology (MIT) license
+langchain under the Massachusetts Institute of Technology (MIT) license
 lodash under the Massachusetts Institute of Technology (MIT) license
 lodash-webpack-plugin under the Massachusetts Institute of Technology (MIT) license
 marked under the Massachusetts Institute of Technology (MIT) license
@@ -85,6 +98,9 @@ pug under the Massachusetts Institute of Technology (MIT) license
 pug-loader under the Massachusetts Institute of Technology (MIT) license
 pug-plain-loader under the Massachusetts Institute of Technology (MIT) license
 pug-runtime under the Massachusetts Institute of Technology (MIT) license
+py-serializable under the Apache License Version 2.0
+python-dateutil under the Apache License Version 2.0 and BSD License
+pytz under the Massachusetts Institute of Technology (MIT) license
 query-string under the Massachusetts Institute of Technology (MIT) license
 querystring under the Massachusetts Institute of Technology (MIT) license
 querystring-browser under the Massachusetts Institute of Technology (MIT) license
@@ -92,13 +108,17 @@ quick-lru under the Massachusetts Institute of Technology (MIT) license
 range under the Massachusetts Institute of Technology (MIT) license
 raw-loader under the Massachusetts Institute of Technology (MIT) license
 raw-text under the Massachusetts Institute of Technology (MIT) license
+read-excel-file under the Massachusetts Institute of Technology (MIT) license
 recursive-readdir under the Massachusetts Institute of Technology (MIT) license
 require-dir under the Massachusetts Institute of Technology (MIT) license
 roboto-fontface under the Apache License Version 2.0
+s3transfer under the Apache License Version 2.0
 sass under the Massachusetts Institute of Technology (MIT) license
 sass-loader under the Massachusetts Institute of Technology (MIT) license
 simple-encryptor under the Massachusetts Institute of Technology (MIT) license
 slackify-markdown under the Massachusetts Institute of Technology (MIT) license
+soupsieve under the Massachusetts Institute of Technology (MIT) license
+static-eval under the Massachusetts Institute of Technology (MIT) license
 strip-ansi under the Massachusetts Institute of Technology (MIT) license
 style-loader under the Massachusetts Institute of Technology (MIT) license
 stylus under the Massachusetts Institute of Technology (MIT) license
@@ -124,4 +144,3 @@ webpack-cli under the Massachusetts Institute of Technology (MIT) license
 webpack-dev-server under the Massachusetts Institute of Technology (MIT) license
 webpack-merge under the Massachusetts Institute of Technology (MIT) license
 webpack-s3-plugin under the Massachusetts Institute of Technology (MIT) license
-xlsx under the Apache License Version 2.0

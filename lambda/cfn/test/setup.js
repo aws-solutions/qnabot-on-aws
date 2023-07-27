@@ -1,7 +1,7 @@
 #! /usr/bin/env node
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 var Promise=require('bluebird')
-var config=require('../../../config')
+var config=require('../../../config.json')
 
 var outputs=require('../../../bin/exports')
 var fs=Promise.promisifyAll(require('fs'))
@@ -14,10 +14,10 @@ module.exports=function(event){
     process.env.AWS_SECRET_ACCESS_KEY=aws.config.credentials.secretAccessKey
     process.env.AWS_REGION=config.region
 
-    
+
     return Promise.join(
         event,
-        outputs('dev/lambda') 
+        outputs('dev/lambda')
     ).spread(function(ev,output){
         return new Promise(function(res,rej){
             require('../index.js').handler(ev,{

@@ -15,7 +15,7 @@ module.exports={
           ]]},
         LOCALES:{"Ref":"LexV2BotLocaleIds"},
         PYTHONPATH:"/var/task/py_modules:/var/runtime:/opt/python"
-    },"python3.9"),
+    },process.env.npm_package_config_pythonRuntime),
     "Lexv2BotCodeVersion":{
         "Type": "Custom::S3Version",
         "Properties": {
@@ -125,7 +125,7 @@ module.exports={
     }
 }
 
-function lambda(code,variable={},runtime="nodejs16.x"){
+function lambda(code, variable, runtime){
     return {
       "Type": "AWS::Lambda::Function",
       "Properties": {

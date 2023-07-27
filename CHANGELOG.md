@@ -5,6 +5,23 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [5.4.0] - 2023-07-27
+
+__*Note: we recommend that you first deploy these changes in a non-production environment. This is true for all releases, but especially important for minor and major releases.*__
+
+### Added
+
+- New (optional) query disambiguation and text generation features through the use of Large Language Models (LLMs) to enable enhanced conversational chat and response synthesis. Details at [README](docs/LLM_Retrieval_and_generative_question_answering/README.md)
+  - In order to provide this functionality, the solution will provision an inference endpoint hosted on Amazon SageMaker
+  - If enabled, this has cost implications. Please [refer to the IG](https://docs.aws.amazon.com/solutions/latest/qnabot-on-aws/plan-your-deployment.html#cost) to see cost estimates
+- [App Registry integration](https://docs.aws.amazon.com/servicecatalog/latest/arguide/intro-app-registry.html), QnABot will now register an application in System Manager to enable various application management tools
+
+### Updated
+
+- Lambda runtimes updated to NodeJS 18
+- Python runtimes updated to Python 3.10
+- Security patches for npm and pip packages
+
 ## [5.3.5] - 2023-07-12
 
 ### Updated

@@ -55,26 +55,26 @@ function set_environment_variables(settings){
     process.env.comprehendResult = ""
 
     if (settings.ENABLE_REDACTING) {
-        qnabot.log("redacting enabled");
+        qnabot.debug("redacting enabled");
         process.env.QNAREDACT="true";
         process.env.REDACTING_REGEX=settings.REDACTING_REGEX;
     } else {
-        qnabot.log("redacting disabled");
+        qnabot.debug("redacting disabled");
         process.env.QNAREDACT="false";
         process.env.REDACTING_REGEX="";
     }
     if (settings.DISABLE_CLOUDWATCH_LOGGING) {
-        qnabot.log("disable cloudwatch logging");
+        qnabot.debug("disable cloudwatch logging");
         process.env.DISABLECLOUDWATCHLOGGING="true";
     } else {
-        qnabot.log("enable cloudwatch logging");
+        qnabot.debug("enable cloudwatch logging");
         process.env.DISABLECLOUDWATCHLOGGING="false";
     }
     if(settings.ENABLE_REDACTING_WITH_COMPREHEND){
-        qnabot.log("enable Amazon Comprehend based redaction.")
+        qnabot.debug("enable Amazon Comprehend based redaction.")
         process.env.ENABLE_REDACTING_WITH_COMPREHEND = "true"
     } else {
-        qnabot.log("disable Amazon Comprehend based redaction.")
+        qnabot.debug("disable Amazon Comprehend based redaction.")
         process.env.ENABLE_REDACTING_WITH_COMPREHEND = "false"
     }
     if(settings.ENABLE_DEBUG_LOGGING){

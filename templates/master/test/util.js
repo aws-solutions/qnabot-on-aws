@@ -1,4 +1,4 @@
-var config=require('../../../config')
+var config=require('../../../config.json')
 process.env.AWS_PROFILE=config.profile
 process.env.AWS_DEFAULT_REGION=config.region
 var query=require('query-string').stringify
@@ -51,11 +51,11 @@ function  api(opts){
         }
         console.log("Request",JSON.stringify(request,null,2))
 
-        var credentials=aws.config.credentials 
-        var signed=sign(request,credentials)        
+        var credentials=aws.config.credentials
+        var signed=sign(request,credentials)
         delete request.headers["Host"]
-        delete request.headers["Content-Length"]        
-        
+        delete request.headers["Content-Length"]
+
         return Promise.resolve(axios(signed))
         .get('data')
         .tap(x=>console.log("response:",JSON.stringify(x,null,2)))

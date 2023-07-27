@@ -1,4 +1,4 @@
-var config = require('../../../config')
+var config = require('../../../config.json')
 process.env.AWS_PROFILE = config.profile
 process.env.AWS_DEFAULT_REGION = config.region
 var query = require('query-string').stringify
@@ -171,7 +171,7 @@ module.exports = {
                  "Furniture used during the Lincoln administration.",
                  "Engraved frames."
              ];
-            
+
              var matchIndex;
              for (var i = 1; i < splitArray.length; i++) {
                  if (matchIndex === -1) {

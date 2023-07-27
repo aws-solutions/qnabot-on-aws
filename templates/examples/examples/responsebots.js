@@ -2091,6 +2091,6 @@ exports.names=[
 
 
 exports.outputs=_.fromPairs(exports.names.map(x=>{
-    return [x,{Value:{"Fn::If": ["CreateLexV1ResponseBots", {"Ref":x}, "Lex V1 ReponseBots disabled during stack create/update"]}}];
+    return [x,{Value:{"Fn::If": ["CreateLexV1ResponseBots", {"Ref":x}, "LexV2 only"]}}];
 }));
 

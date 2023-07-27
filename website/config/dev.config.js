@@ -1,6 +1,6 @@
 // Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
 // SPDX-License-Identifier: Apache-2.0
-var config=require('../../config')
+var config=require('../../config.json')
 
 var path=require('path')
 var S3Plugin = require('webpack-s3-plugin')

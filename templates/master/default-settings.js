@@ -9,7 +9,8 @@ var default_settings = {
     ES_NO_HITS_QUESTION: 'no_hits', // The QID of the question when no answers could be found for a user's question
     ES_USE_FUZZY_MATCH: 'false', // Refer to https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-fuzzy-query.html
     ES_PHRASE_BOOST: '4',
-    ES_SCORE_ANSWER_FIELD: 'false',
+    ES_SCORE_ANSWER_FIELD: 'false', // If no 'qna' answer meets the score threshold, then query the answer field of qna items
+    ES_SCORE_TEXT_ITEM_PASSAGES: "true",  // If no 'qna' answer meets the score threshold, then query the text field of 'text' items
     ENABLE_SENTIMENT_SUPPORT: 'true', //Determines whether to use Comprehend for sentiment analysis.  Refer to https://docs.aws.amazon.com/comprehend/latest/dg/how-sentiment.html
     ENABLE_MULTI_LANGUAGE_SUPPORT: 'false', //User can override and set to true to Enable Multilanguage support
     ENABLE_CUSTOM_TERMINOLOGY: 'false',
@@ -77,9 +78,27 @@ var default_settings = {
     LAMBDA_POSTPROCESS_HOOK: '',
     SEARCH_REPLACE_QUESTION_SUBSTRINGS: '',
     EMBEDDINGS_ENABLE: '${EMBEDDINGS_ENABLE}', // Set to TRUE or FALSE to enable or disable use of embeddings for semantic search
-    EMBEDDINGS_SCORE_THRESHOLD: 0.85, // If embedding similarity score is under threshold the match is rejected and QnABot reverts to scoring answer field (if ES_SCORE_ANSWER_FIELD is true) or Kendra fallback or no_hits
-    EMBEDDINGS_SCORE_ANSWER_THRESHOLD: 0.80, // Applies only when if ES_SCORE_ANSWER_FIELD is true. If embedding similarity score on answer field is under threshold the match is rejected and QnABot reverts to Kendra fallback or no_hits
+    EMBEDDINGS_SCORE_THRESHOLD: 0.85, // If embedding similarity score is under threshold the match is rejected and QnABot reverts to scoring answer field (if ES_SCORE_ANSWER_FIELD is true).
+    EMBEDDINGS_SCORE_ANSWER_THRESHOLD: 0.80, // Applies only when if ES_SCORE_ANSWER_FIELD is true. If embedding similarity score on answer field is under threshold the match is rejected.
+    EMBEDDINGS_TEXT_PASSAGE_SCORE_THRESHOLD: 0.80, // Applies only when if ES_SCORE_TEXT_ITEM_PASSAGES is true. If embedding similarity score on text item field is under threshold the match is rejected.
+    LLM_API: '${LLMApi}',
+    LLM_GENERATE_QUERY_ENABLE: '${LLM_GENERATE_QUERY_ENABLE}',
+    LLM_GENERATE_QUERY_PROMPT_TEMPLATE: '${LLM_GENERATE_QUERY_PROMPT_TEMPLATE}',
+    LLM_GENERATE_QUERY_MODEL_PARAMS: '${LLM_GENERATE_QUERY_MODEL_PARAMS}',
+    LLM_QA_ENABLE: '${LLM_QA_ENABLE}', // Set to TRUE or FALSE to enable or disable SAGEMAKER summarization
+    LLM_QA_USE_KENDRA_RETRIEVAL_API: '${LLM_QA_ENABLE}',
+    LLM_QA_PROMPT_TEMPLATE: '${LLM_QA_PROMPT_TEMPLATE}',
+    LLM_QA_MODEL_PARAMS: '${LLM_QA_MODEL_PARAMS}',
+    LLM_QA_PREFIX_MESSAGE: 'LLM Answer:',
+    LLM_QA_SHOW_CONTEXT_TEXT: "TRUE",
+    LLM_QA_SHOW_SOURCE_LINKS: "TRUE",
+    LLM_CHAT_HISTORY_MAX_MESSAGES: 12,
+    LLM_QA_NO_HITS_REGEX: 'Sorry,  //remove comment to enable custom no match (no_hits) when LLM does not know the answer.',
 };
+const defaultGenerateQueryPromptTemplate = 'Given the following conversation and a follow up question, rephrase the follow up question to be a standalone question.<br>Chat History: <br>{history}<br>Follow Up Input: {input}<br>Standalone question:';
+const defaultQAPromptTemplate = `Use the following pieces of context to answer the question at the end. If you don't know the answer, just say that you don't know, don't try to make up an answer. Write the answer in up to 5 complete sentences.<br><br>{context}<br><br>Question: {query}<br>Helpful Answer:`;
+const defaultModelParams = `{\\"temperature\\":0.01, \\"return_full_text\\":false, \\"max_new_tokens\\": 150}`;
+
 module.exports = {
     "DefaultUserPoolJwksUrl": {
         "Type": "AWS::SSM::Parameter",
@@ -94,10 +113,17 @@ module.exports = {
         "Properties": {
             "Description": "Default QnABot Settings - DO NOT MODIFY",
             "Type": "String",
+            "Tier": "Advanced",  // Advanced tier required to accomodate number of settings
             "Value": { "Fn::Sub" : [
                 JSON.stringify(default_settings), {
                     "ES_USE_KEYWORD_FILTERS" : {"Fn::If": ["EmbeddingsEnable", "FALSE", "TRUE"]},
-                    "EMBEDDINGS_ENABLE" : {"Fn::If": ["EmbeddingsEnable", "TRUE", "FALSE"]}
+                    "EMBEDDINGS_ENABLE" : {"Fn::If": ["EmbeddingsEnable", "TRUE", "FALSE"]},
+                    "LLM_GENERATE_QUERY_ENABLE" : {"Fn::If": ["LLMEnable", "TRUE", "FALSE"]},
+                    "LLM_QA_ENABLE" : {"Fn::If": ["LLMEnable", "TRUE", "FALSE"]},
+                    "LLM_GENERATE_QUERY_PROMPT_TEMPLATE": defaultGenerateQueryPromptTemplate,
+                    "LLM_QA_PROMPT_TEMPLATE": defaultQAPromptTemplate,
+                    "LLM_GENERATE_QUERY_MODEL_PARAMS": defaultModelParams,
+                    "LLM_QA_MODEL_PARAMS": defaultModelParams,
                 }
             ]}
         }

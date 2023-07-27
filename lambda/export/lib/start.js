@@ -26,7 +26,7 @@ function query(filter){
     return {
         size:1000,
         _source: {
-            "exclude": ["questions.q_vector", "a_vector"]
+            "exclude": ["questions.q_vector", "a_vector", "passage_vector"]
         },
         query:{
             bool:_.pickBy({

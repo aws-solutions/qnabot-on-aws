@@ -1,4 +1,4 @@
-var config=require('../../../../config')
+var config=require('../../../../config.json')
 process.env.AWS_PROFILE=config.profile
 process.env.AWS_DEFAULT_REGION=config.region
 var query=require('query-string').stringify
@@ -195,7 +195,7 @@ module.exports={
                             method:"GET"
                         })
                         .tap(x=>console.log(JSON.stringify(x,null,2)))
-                        .then(x=>x.jobs.map(y=>y.id).includes(name) ? 
+                        .then(x=>x.jobs.map(y=>y.id).includes(name) ?
                             setTimeout(()=>next(--i),2000) : res(x) )
                         .catch(x=>x.statusCode===404,
                             ()=>setTimeout(()=>next(--i),2000))
@@ -218,7 +218,7 @@ module.exports={
                         })
                         .tap(x=>console.log(JSON.stringify(x,null,2)))
                         .tapCatch(console.log)
-                        .then(x=>x.status==="InProgress" ? 
+                        .then(x=>x.status==="InProgress" ?
                             setTimeout(()=>next(--i),2000) : res(x) )
                         .catch(x=>x.response.status===404,
                             ()=>setTimeout(()=>next(--i),2000))

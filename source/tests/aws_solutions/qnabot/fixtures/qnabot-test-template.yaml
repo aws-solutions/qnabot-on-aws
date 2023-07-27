@@ -9,9 +9,21 @@ Resources:
   ImportBucket:
     Type: AWS::S3::Bucket
     BucketName: test_import_bucket
+    BucketEncryption:
+      ServerSideEncryptionConfiguration:
+        ServerSideEncryptionByDefault:
+          SSEAlgorithm: AES256
+    VersioningConfiguration:
+      Status: Enabled
   ExportBucket:
     Type: AWS::S3::Bucket
     BucketName: test_export_bucket
+    BucketEncryption:
+      ServerSideEncryptionConfiguration:
+        ServerSideEncryptionByDefault:
+          SSEAlgorithm: AES256
+    VersioningConfiguration:
+      Status: Enabled
   ESProxyLambdaRole:
     Type: AWS::IAM::Role
     Properties:
