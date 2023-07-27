@@ -1,5 +1,5 @@
 var _=require('lodash')
-var config=require('../../../config')
+var config=require('../../../config.json')
 var Promise=require('bluebird')
 var outputs=require('../../../bin/exports')
 var api=require('./util').api

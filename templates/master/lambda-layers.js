@@ -32,7 +32,7 @@ module.exports = {
         },
         S3ObjectVersion: { Ref: "CommonModulesLayerCodeVersion" },
       },
-      CompatibleRuntimes: ["nodejs16.x"],
+      CompatibleRuntimes: [process.env.npm_package_config_lambdaRuntime],
     },
   },
   QnABotCommonLayerCodeVersion: {
@@ -68,7 +68,7 @@ module.exports = {
         },
         S3ObjectVersion: { Ref: "QnABotCommonLayerCodeVersion" },
       },
-      CompatibleRuntimes: ["nodejs16.x"],
+      CompatibleRuntimes: [process.env.npm_package_config_lambdaRuntime],
     },
   },
   AwsSdkLayerCodeVersion: {
@@ -86,7 +86,7 @@ module.exports = {
       Content: {
         S3Bucket: { Ref: "BootstrapBucket" },
         S3Key: { "Fn::Sub": "${BootstrapPrefix}/lambda/aws-sdk-layer.zip" },
-        S3ObjectVersion: { Ref: "AwsSdkLayerCodeVersion" },
+        S3ObjectVersion: { Ref: "AwsSdkLayerCodeVersion" }
       },
       LayerName:{
         "Fn::Join": [
@@ -102,7 +102,7 @@ module.exports = {
           ],
         ],
       },
-      CompatibleRuntimes: ["nodejs16.x"],
+      CompatibleRuntimes: [process.env.npm_package_config_lambdaRuntime],
     },
   },
   CfnLambdaLayerCodeVersion: {
@@ -136,7 +136,7 @@ module.exports = {
         S3Key: { "Fn::Sub": "${BootstrapPrefix}/lambda/cfn-lambda-layer.zip" },
         S3ObjectVersion: { Ref: "CfnLambdaLayerCodeVersion" },
       },
-      CompatibleRuntimes: ["nodejs16.x"],
+      CompatibleRuntimes: [process.env.npm_package_config_lambdaRuntime],
     },
   },
   EsProxyLayerCodeVersion: {
@@ -170,7 +170,7 @@ module.exports = {
         S3Key: { "Fn::Sub": "${BootstrapPrefix}/lambda/es-proxy-layer.zip" },
         S3ObjectVersion: { Ref: "EsProxyLayerCodeVersion" },
       },
-      CompatibleRuntimes: ["nodejs16.x"],
+      CompatibleRuntimes: [process.env.npm_package_config_lambdaRuntime],
     },
   },
 };

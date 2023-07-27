@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 var aws=require('aws-sdk')
-var cfnLambda=require('cfn-lambda')
 var Promise=require('bluebird')
 aws.config.region=process.env.REGION
 aws.config.setPromisesDependency(Promise)
@@ -514,12 +513,12 @@ class Lex {
             reply(null,ID)
         }
     }
-    
+
     Delete(ID,params,reply){
         var arg={name:ID}
 
         if(this.type==="BotAlias") arg.botName=params.botName
-        
+
         return run(this.delete_method,arg)
         .then(msg=>reply(null,msg.name,null))
         .catch(function(error){

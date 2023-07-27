@@ -1,7 +1,7 @@
 // Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-process.env.REGION=require('../../../config').region
+process.env.REGION=require('../../../config.json').region
 var lex=require('../lib/lex')
 var Promise=require('bluebird')
 

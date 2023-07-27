@@ -7,10 +7,12 @@
     "test": "nodeunit ./test/index.js",
     "unit": "nodeunit ./test/index.js -t"
   },
-  "author": "",
-  "license": "ISC",
+  "author": {
+    "name": "Amazon Web Services",
+    "url": "https://aws.amazon.com/solutions"
+  },
+  "license": "Apache-2.0",
   "dependencies": {
-    "aws-sdk": "^2.1354.0",
     "bluebird": "^3.7.2",
     "elasticsearch": "^16.7.1",
     "http-aws-es": "^6.0.0",

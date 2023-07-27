@@ -36,7 +36,7 @@ module.exports=Object.assign(
         "Handler": "index.start",
         "MemorySize": "1024",
         "Role": {"Fn::GetAtt": ["ImportRole","Arn"]},
-        "Runtime": "nodejs16.x",
+        "Runtime": process.env.npm_package_config_lambdaRuntime,
         "Timeout": 300,
         "VpcConfig" : {
             "Fn::If": [ "VPCEnabled", {
@@ -86,7 +86,7 @@ module.exports=Object.assign(
         "Handler": "index.step",
         "MemorySize": "1024",
         "Role": {"Fn::GetAtt": ["ImportRole","Arn"]},
-        "Runtime": "nodejs16.x",
+        "Runtime": process.env.npm_package_config_lambdaRuntime,
         "Timeout": 900,
         "VpcConfig" : {
             "Fn::If": [ "VPCEnabled", {
@@ -149,14 +149,14 @@ module.exports=Object.assign(
               ]
             }
           },
-          { 
+          {
             "Fn::If": [
               "EmbeddingsSagemaker",
               {
                 "PolicyName" : "SagemakerEmbeddingsPolicy",
                 "PolicyDocument" : {
                 "Version": "2012-10-17",
-                  "Statement": [ 
+                  "Statement": [
                     {
                         "Effect": "Allow",
                         "Action": [

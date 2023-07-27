@@ -18,6 +18,18 @@ const { filter } = require('bluebird');
 let kendraIndexes = undefined;
 const qnabot = require("qnabot/logging")
 
+function allow_kendra_result(kendra_result, minimum_score, response_types){
+    if (!type_filter(response_types,kendra_result)) {
+        qnabot.log(`Result removed: Type [${kendra_result.Type}] not in allowed types [${response_types}] - Passage: ${_.get(kendra_result,"DocumentExcerpt.Text")}`);
+        return false;
+    }
+    if (!confidence_filter(minimum_score,kendra_result)) {
+        qnabot.log(`Result removed: ScoreConfidence [${_.get(kendra_result,"ScoreAttributes.ScoreConfidence")}] below threshold [${minimum_score}] - Passage: ${_.get(kendra_result,"DocumentExcerpt.Text")}`);
+        return false;
+    }
+    qnabot.log(`Result allowed: Type [${kendra_result.Type}], ScoreConfidence [${_.get(kendra_result,"ScoreAttributes.ScoreConfidence")}] - Passage: ${_.get(kendra_result,"DocumentExcerpt.Text")}`);
+    return true;
+}
 
 function confidence_filter(minimum_score,kendra_result){
     var confidences = ["LOW","MEDIUM","HIGH","VERY_HIGH"]
@@ -27,12 +39,11 @@ function confidence_filter(minimum_score,kendra_result){
         return true;
     }
     confidences = confidences.slice(index)
-    qnabot.log("Testing confidences: Allowed - " + JSON.stringify(confidences) + " Actual - " + _.get(kendra_result,"ScoreAttributes.ScoreConfidence") )
     const found = confidences.find(element => element == _.get(kendra_result,"ScoreAttributes.ScoreConfidence")) != undefined
     return found
 }
 
-function response_filter(response_types,kendra_result){
+function type_filter(response_types,kendra_result){
     return response_types.includes(kendra_result.Type)
 }
 function create_hit(answermessage,markdown,ssml,hit_count,debug_results,kendra){
@@ -42,7 +53,7 @@ function create_hit(answermessage,markdown,ssml,hit_count,debug_results,kendra){
                         "markdown": markdown,
                         "ssml":ssml
                     },
-                    "type": "qna",
+                    "type": "text",
                     "questions": [
                     ],
                     "answersource": "KENDRA FALLBACK",
@@ -118,7 +129,7 @@ function kendraRequester(kendraClient,params,resArray) {
             }
             else {
                 data.originalKendraIndexId = indexId;
-                qnabot.log("Data from Kendra request:" + JSON.stringify(data, null, 2));
+                qnabot.log("Kendra response:" + JSON.stringify(data, null, 2));
                 resArray.push(data);
                 resolve(data);
             }
@@ -186,8 +197,7 @@ function signS3URL(url, expireSecs) {
       key = url.split('/').slice(3).join('/');
     }
     if (bucket && key) {
-        qnabot.log("Attempt to convert S3 url to a signed URL: ",url);
-        qnabot.log("Bucket: ", bucket, " Key: ", key) ;
+        qnabot.debug("Convert S3 url to a signed URL: ",url, "Bucket: ", bucket, " Key: ", key);
         try {
             const s3 = new AWS.S3() ;
             const signedurl = s3.getSignedUrl('getObject', {
@@ -201,7 +211,7 @@ function signS3URL(url, expireSecs) {
               qnabot.log("Error signing S3 URL (returning original URL): ", err) ;
         }
     } else {
-        qnabot.log("URL is not an S3 url - return unchanged: ",url);
+        qnabot.debug("URL is not an S3 url - return unchanged: ",url);
     }
     return url;
 }
@@ -246,7 +256,7 @@ function isSyncedFromQnABot(kendra_result){
         return false;
     }
 
-    let hit = JSON.parse(element.DocumentURI);
+    let hit = JSON.parse(kendra_result.DocumentURI);
     if (_.get(hit,"_source_qid")) {
         qnabot.warn("The Kendra result was synced from QnABot. Skipping...")
         return true
@@ -314,10 +324,19 @@ async function routeKendraRequest(event, context) {
     let origQuestion = event.req["_event"]["origQuestion"];
     let question = event.req["question"];
     let userDetectedLocale = _.get(event.req, 'session.qnabotcontext.userLocale');
+    let standalone_query = _.get(event.req, 'llm_generated_query.concatenated');
 
     let useOriginalLanguageQuery = kendraIndexedLanguages.includes(userDetectedLocale, 0)
         && origQuestion && question && origQuestion!=question;
+    if (standalone_query) {
+        useOriginalLanguageQuery = false;
+        qnabot.log("Using LLM generated standalone query: " + standalone_query);
+    }
     qnabot.log("useOriginalLanguageQuery: " + useOriginalLanguageQuery);
+    // when not using LLM QA, if Kendra results contain topAnswer we return that, and ignore all else..
+    // BUT this is not helpful when using the LLM to generate an answer.. in this case we should not apply
+    // any special handling for 'top answer'
+    const returnTopAnswer = (_.get(event.req._settings, "LLM_QA_ENABLE")) ? false : true;
 
     // This function can handle configuration with an array of kendraIndexes.
     // Iterate through this area and perform queries against Kendra.
@@ -361,7 +380,7 @@ async function routeKendraRequest(event, context) {
     let topAnswerMessage = event.req["_settings"]["ALT_SEARCH_KENDRA_TOP_ANSWER_MESSAGE"] + "\n\n"; //"Amazon Kendra suggested answer. \n\n ";
     let topAnswerMessageMd = event.req["_settings"]["ALT_SEARCH_KENDRA_TOP_ANSWER_MESSAGE"] == "" ? "" : `*${event.req["_settings"]["ALT_SEARCH_KENDRA_TOP_ANSWER_MESSAGE"]}* \n `;
     let answerMessage = event.req["_settings"]["ALT_SEARCH_KENDRA_ANSWER_MESSAGE"];
-    let answerMessageMd = event.req["_settings"]["ALT_SEARCH_KENDRA_ANSWER_MESSAGE"] == "" ? "" : `*${answerMessage}* \n `;
+    let answerMessageMd = event.req["_settings"]["ALT_SEARCH_KENDRA_ANSWER_MESSAGE"] == "" ? "" : `**${answerMessage}** \n `;
     let faqanswerMessage = event.req["_settings"]["ALT_SEARCH_KENDRA_FAQ_MESSAGE"] + "\n\n"; //'Answer from Amazon Kendra FAQ.'
     let faqanswerMessageMd = event.req["_settings"]["ALT_SEARCH_KENDRA_FAQ_MESSAGE"]  == "" ? "" : `*${event.req["_settings"]["ALT_SEARCH_KENDRA_FAQ_MESSAGE"]}* \n`
     let minimum_score = event.req["_settings"]["ALT_SEARCH_KENDRA_FALLBACK_CONFIDENCE_SCORE"];
@@ -388,13 +407,10 @@ async function routeKendraRequest(event, context) {
 
         if (res && res.ResultItems.length > 0) {
             res.ResultItems.forEach(function (element, i) {
-                if(!confidence_filter(minimum_score,element)){
+                if(!allow_kendra_result(element, minimum_score, searchTypes)){
                     return;
                 }
-                if(!response_filter(searchTypes,element)){
-                    return;
-                }
-                if(seenTop){
+                if(returnTopAnswer && seenTop){
                     return;
                 }
                 /* Note - only the first answer will be provided back to the requester */
@@ -412,7 +428,7 @@ async function routeKendraRequest(event, context) {
                         elem = sorted_highlights[j];
                         let offset = 4*j;
 
-                        if (elem.TopAnswer == true) {   // if top answer is found, then answer is abbreviated to this phrase
+                        if (returnTopAnswer && elem.TopAnswer == true) {   // if top answer is found, then answer is abbreviated to this phrase
                             seenTop = true;
                             answerMessageMd = topAnswerMessageMd;
                             answerTextMd = addMarkdownHighlights(answerTextMd, elem.BeginOffset+offset, elem.EndOffset+offset, true) ;
@@ -592,7 +608,7 @@ async function routeKendraRequest(event, context) {
     if (hit) {
         hit.autotranslate = useOriginalLanguageQuery ? false : true;
     }
-    qnabot.log("Returning event: ", JSON.stringify(hit, null, 2));
+    qnabot.debug("Kendra Fallback result: ", JSON.stringify(hit, null, 2));
     return hit;
 }
 

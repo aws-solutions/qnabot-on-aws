@@ -12,8 +12,18 @@ module.exports={
   "Resources":_.assign.apply({},files),
   "Conditions": {},
   "AWSTemplateFormatVersion": "2010-09-09",
-  "Description": `(SO0189-ext) QnABot with admin and client websites - (Version v${process.env.npm_package_version})`,
-  "Mappings": {},
+  "Description": `(SO0189-ext) QnABot with admin and client websites - Version v${process.env.npm_package_version}`,
+  "Mappings": {
+    "Solution": {
+      "Data": {
+        "ID": "SO0189",
+        "Version": process.env.npm_package_version,
+        "AppRegistryApplicationName": "qnabot",
+        "SolutionName": "QnABot on AWS",
+        "ApplicationType": "AWS-Solutions"
+      }
+    }
+  },
   "Outputs": {
     "CognitoEndpoint":{
         "Value":{"Fn::GetAtt":["DesignerLogin","Domain"]}
@@ -257,7 +267,7 @@ module.exports={
       "Type":"String",
       "AllowedValues" : ["true", "false"],
       "Default":"true"
-  },
+    },
     "XraySetting":{
         "Type":"String",
         "Description": "Configure Lambdas with X-Ray enabled",
@@ -293,6 +303,30 @@ module.exports={
       "MinValue":1,
       "Description":"Optional: If EmbeddingsApi is LAMBDA, provide number of dimensions for embeddings returned by the EmbeddingsLambda function specified above.",
       "Default":4096
+    },
+    'LLMApi':{
+      'Type':'String',
+      'Description':'Optionally enable (experimental) QnABot question disambiguation and generative question answering using an LLM. If set to SAGEMAKER, a Sagemaker endpoint is automatically provisioned. To use a custom LAMBDA function, provide additional parameters below.',
+      'AllowedValues': ['DISABLED', 'SAGEMAKER', 'LAMBDA'],
+      'Default':'DISABLED'
+    },
+    'LLMSagemakerInstanceType':{
+      'Type':'String',
+      'AllowedPattern':'^ml.*$',
+      'Description':'Optional: If LLMApi is SAGEMAKER, provide the SageMaker endpoint instance type. Defaults to ml.g5.12xlarge. Check account and region availability through the Service Quotas service before deploying',
+      'Default':'ml.g5.12xlarge'
+    },
+    'LLMSagemakerInitialInstanceCount':{
+      'Type':'Number',
+      'MinValue':1,
+      'Description':'Optional: If LLMApi is SAGEMAKER, provide initial instance count. Serverless Inference is not currently available for the built-in LLM model.',
+      'Default':1
+    },
+    'LLMLambdaArn':{
+      'Type':'String',
+      'AllowedPattern': '^(|arn:aws:lambda:.*)$',
+      'Description':'Optional: If LLMApi is LAMBDA, provide ARN for a Lambda function that takes JSON {"prompt":"string", "settings":{key:value,..}}, and returns JSON {"generated_text":"string"}',
+      'Default':''
     }
   },
   "Conditions":{
@@ -317,6 +351,10 @@ module.exports={
     "EmbeddingsEnable":{"Fn::Not": [{ "Fn::Equals":[{"Ref":"EmbeddingsApi"},"DISABLED"]}]},
     "EmbeddingsSagemaker":{"Fn::Equals":[{"Ref":"EmbeddingsApi"},"SAGEMAKER"]},
     "EmbeddingsLambda":{"Fn::Equals":[{"Ref":"EmbeddingsApi"},"LAMBDA"]},
-    "EmbeddingsLambdaArn":{"Fn::Not": [{ "Fn::Equals":[{"Ref":"EmbeddingsLambdaArn"},""]}]}
+    "EmbeddingsLambdaArn":{"Fn::Not": [{ "Fn::Equals":[{"Ref":"EmbeddingsLambdaArn"},""]}]},
+    'LLMEnable':{'Fn::Not': [{ 'Fn::Equals':[{'Ref':'LLMApi'},'DISABLED']}]},
+    "LLMSagemaker":{"Fn::Equals":[{"Ref":"LLMApi"},"SAGEMAKER"]},
+    "LLMLambda":{"Fn::Equals":[{"Ref":"LLMApi"},"LAMBDA"]},
+    'LLMLambdaArn':{'Fn::Not': [{ 'Fn::Equals':[{'Ref':'LLMLambdaArn'},'']}]},
   }
 }

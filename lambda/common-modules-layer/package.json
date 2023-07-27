@@ -13,6 +13,9 @@
     "intercept-stdout": "^0.1.2",
     "lodash": "^4.17.21"
   },
-  "author": "",
-  "license": "ISC"
+  "author": {
+    "name": "Amazon Web Services",
+    "url": "https://aws.amazon.com/solutions"
+  },
+  "license": "Apache-2.0"
 }

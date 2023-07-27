@@ -1,4 +1,4 @@
-var config=require('../../../../config')
+var config=require('../../../../config.json')
 process.env.AWS_PROFILE=config.profile
 process.env.AWS_DEFAULT_REGION=config.region
 var _=require('lodash')
@@ -36,7 +36,7 @@ module.exports={
                             path:"jobs/imports",
                             method:"GET"
                         })
-                        .then(x=>x.jobs.map(y=>y.id).includes(name) ? 
+                        .then(x=>x.jobs.map(y=>y.id).includes(name) ?
                             setTimeout(()=>next(--i),2000) : res(x) )
                         .catch(x=>x.statusCode===404,
                             ()=>setTimeout(()=>next(--i),2000))
@@ -58,7 +58,7 @@ module.exports={
                             method:"GET"
                         })
                         .tapCatch(console.log)
-                        .then(x=>x.status==="InProgress" ? 
+                        .then(x=>x.status==="InProgress" ?
                             setTimeout(()=>next(--i),2000) : res(x) )
                         .catch(x=>x.response.status===404,
                             ()=>setTimeout(()=>next(--i),2000))
@@ -83,7 +83,7 @@ module.exports={
             method:"PUT",
             body:{}
         })
-        try{ 
+        try{
             var completed=await new Promise(async function(res,rej){
                 next(100)
                 async function next(count){
@@ -122,7 +122,7 @@ module.exports={
             href:`${info._links.exports.href}/test-all`,
             method:"DELETE",
         })
-        test.done()             
+        test.done()
     },
     filter:async function(test){
         var info=await api({
@@ -133,10 +133,10 @@ module.exports={
             href:`${info._links.exports.href}/test-filter`,
             method:"PUT",
             body:{
-                filter:"none.*" 
+                filter:"none.*"
             }
         })
-        try{ 
+        try{
             var completed=await new Promise(async function(res,rej){
                 next(100)
                 async function next(count){
@@ -166,7 +166,7 @@ module.exports={
             href:`${info._links.exports.href}/test-filter`,
             method:"DELETE",
         })
-        test.done()             
+        test.done()
     },
     tearDown:async function(done){
         await api({

@@ -150,21 +150,24 @@ module.exports=Object.assign(
         "Handler": "cfn.handler",
         "MemorySize": "128",
         "Role":{"Ref":"CFNLambdaRole"} ,
-        "Runtime": "nodejs16.x",
+        "Runtime": process.env.npm_package_config_lambdaRuntime,
         "Timeout": 300,
         "VpcConfig" : {
           "Fn::If": [ "VPCEnabled", {
               "SubnetIds": { "Fn::Split" : [ ",", {"Ref": "VPCSubnetIdList"} ] },
               "SecurityGroupIds": { "Fn::Split" : [ ",", {"Ref": "VPCSecurityGroupIdList"} ] },
           }, {"Ref" : "AWS::NoValue"} ]
-      },
-      "TracingConfig" : {
-          "Fn::If": [ "XRAYEnabled", {"Mode": "Active"},
-          {"Ref" : "AWS::NoValue"} ]
-      },
+        },
+        "TracingConfig" : {
+            "Fn::If": [ "XRAYEnabled", {"Mode": "Active"},
+            {"Ref" : "AWS::NoValue"} ]
+        },
+        "Layers":[
+          {"Ref":"AwsSdkLayerLambdaLayer"}
+        ],
         "Tags":[{
-            Key:"Type",
-            Value:"CustomResource"
+              Key:"Type",
+              Value:"CustomResource"
         }]
       },
       "Metadata": util.cfnNag(["W92", "W58"])
@@ -332,7 +335,7 @@ function jslambda(name){
         "Handler":`js/${name}.handler`,
         "MemorySize": "128",
         "Role": {"Fn::GetAtt": ["ExampleLambdaRole","Arn"]},
-        "Runtime": "nodejs16.x",
+        "Runtime": process.env.npm_package_config_lambdaRuntime,
         "Timeout": 300,
         "VpcConfig" : {
             "Fn::If": [ "VPCEnabled", {
@@ -344,6 +347,9 @@ function jslambda(name){
             "Fn::If": [ "XRAYEnabled", {"Mode": "Active"},
                 {"Ref" : "AWS::NoValue"} ]
         },
+        "Layers":[
+          {"Ref":"AwsSdkLayerLambdaLayer"}
+        ],
         "Tags":[{
             Key:"Type",
             Value:"Example"
@@ -377,7 +383,7 @@ function pylambda(name){
         "Handler":`py/${name}.handler`,
         "MemorySize": "128",
         "Role": {"Fn::GetAtt": ["ExampleLambdaRole","Arn"]},
-        "Runtime": "python3.9",
+        "Runtime": process.env.npm_package_config_pythonRuntime,
         "Timeout": 300,
                 "VpcConfig" : {
             "Fn::If": [ "VPCEnabled", {

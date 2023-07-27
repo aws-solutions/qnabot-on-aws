@@ -1,0 +1,1 @@
+Imports sample text passage items for testing passage embeddings and LLM QA Summarization.

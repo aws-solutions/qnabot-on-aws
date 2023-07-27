@@ -22,7 +22,7 @@ module.exports = {
     LEXV2_BUILD_LAMBDA: { "Ref": "Lexv2BotLambda" },
     ADDRESS: { "Fn::Join": ["", ["https://", { "Fn::GetAtt": ["ESVar", "ESAddress"] }]] },
     INDEX: { "Fn::GetAtt": ["Var", "index"] },
-  }, "nodejs16.x"),
+  }, process.env.npm_package_config_lambdaRuntime),
   "LexBuildLambdaStart": lambda({
     "ZipFile": fs.readFileSync(__dirname + '/start.js', 'utf8')
   }, {
@@ -30,14 +30,14 @@ module.exports = {
     STATUS_KEY: { "Fn::If": ["CreateLexV1Bots", "status.json", { "Ref": "AWS::NoValue" }] },
     LEXV2_STATUS_KEY: "lexV2status.json",
     BUILD_FUNCTION: { "Fn::GetAtt": ["LexBuildLambda", "Arn"] }
-  }),
+  }, process.env.npm_package_config_lambdaRuntime),
   "LexBuildLambdaPoll": lambda({
     "ZipFile": fs.readFileSync(__dirname + '/poll.js', 'utf8')
   }, {
     STATUS_KEY: { "Fn::If": ["CreateLexV1Bots", "status.json", { "Ref": "AWS::NoValue" }] },
     STATUS_BUCKET: { "Ref": "BuildStatusBucket" },
     BOT_NAME: { "Fn::If": ["CreateLexV1Bots", { "Ref": "LexBot" }, { "Ref": "AWS::NoValue" }] },
-  }),
+  }, process.env.npm_package_config_lambdaRuntime),
   "LexBuildCodeVersion": {
     "Type": "Custom::S3Version",
     "Properties": {
@@ -206,7 +206,7 @@ module.exports = {
   }
 };
 
-function lambda(code, variable = {}, runtime = "nodejs16.x") {
+function lambda(code, variable, runtime) {
   return {
     "Type": "AWS::Lambda::Function",
     "Properties": {
@@ -229,6 +229,9 @@ function lambda(code, variable = {}, runtime = "nodejs16.x") {
         "Fn::If": ["XRAYEnabled", { "Mode": "Active" },
           { "Ref": "AWS::NoValue" }]
       },
+      "Layers":[
+        {"Ref":"AwsSdkLayerLambdaLayer"}
+      ],
       "Tags": [{
         Key: "Type",
         Value: "Api"

@@ -12,7 +12,7 @@ const outputs=Object.assign(outputs1,outputs2,outputSNSTopic);
 module.exports={
   "Resources":resources,
   "AWSTemplateFormatVersion": "2010-09-09",
-  "Description": "(SO0189n-example) QnABot nested example resources",
+  "Description": `(SO0189n-example) QnABot nested example resources - Version v${process.env.npm_package_version}`,
   "Mappings": {},
   "Outputs": outputs,
   "Parameters": {
@@ -26,7 +26,7 @@ module.exports={
     "FeedbackFirehose":{"Type":"String"},
     "FeedbackFirehoseName":{"Type":"String"},
     "CFNLambda":{"Type":"String"},
-    "CFNLambdaRole":  {"Type":"String"},
+    "CFNLambdaRole":{"Type":"String"},
     "ApiUrlName":{"Type":"String"},
     "AssetBucket":{"Type":"String"},
     "QIDLambdaArn":{"Type":"String"},
@@ -36,6 +36,7 @@ module.exports={
     "XraySetting": {"Type": "String"},
     "DefaultQnABotSettings": {"Type":"String"},
     "InstallLexResponseBots": {"Type":"String"},
+    "AwsSdkLayerLambdaLayer":{"Type":"String"},
   },
    "Conditions": {
     "VPCEnabled": { "Fn::Not": [

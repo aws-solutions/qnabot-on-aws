@@ -6,10 +6,13 @@
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1"
     },
-    "author": "",
-    "license": "ISC",
+    "author": {
+        "name": "Amazon Web Services",
+        "url": "https://aws.amazon.com/solutions"
+    },
+    "license": "Apache-2.0",
     "dependencies": {
-        "aws-sdk": "^2.1354.0",
+        "aws-sdk": "^2.1404.0",
         "http-aws-es": "^6.0.0"
     }
 }
