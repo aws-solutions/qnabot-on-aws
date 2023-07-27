@@ -1,4 +1,4 @@
-var config=require('../../../config')
+var config=require('../../../config.json')
 process.env.AWS_PROFILE=config.profile
 process.env.AWS_DEFAULT_REGION=config.region
 

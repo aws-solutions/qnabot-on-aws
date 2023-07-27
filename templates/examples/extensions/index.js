@@ -58,7 +58,7 @@ module.exports=Object.assign(
         "Handler": "ui_import.handler",
         "MemorySize": "128",
         "Role":{"Ref":"CFNLambdaRole"} ,
-        "Runtime": "nodejs16.x",
+        "Runtime": process.env.npm_package_config_lambdaRuntime,
         "Timeout": 300,
         "VpcConfig" : {
             "Fn::If": [ "VPCEnabled", {
@@ -70,6 +70,9 @@ module.exports=Object.assign(
             "Fn::If": [ "XRAYEnabled", {"Mode": "Active"},
                 {"Ref" : "AWS::NoValue"} ]
         },
+        "Layers":[
+          {"Ref":"AwsSdkLayerLambdaLayer"}
+        ],
         "Tags":[{
             Key:"Type",
             Value:"CustomResource"
@@ -117,7 +120,7 @@ module.exports=Object.assign(
             ],
           ],
         },
-        CompatibleRuntimes: ["nodejs16.x"],
+        CompatibleRuntimes: [process.env.npm_package_config_lambdaRuntime],
       },
     },
     "ExtensionsInvokePolicy": {
@@ -211,8 +214,8 @@ module.exports=Object.assign(
               }
             ]
           }
-        }, 
-        { 
+        },
+        {
           "PolicyName" : "QNASecretsManagerLambda",
           "PolicyDocument" : {
           "Version": "2012-10-17",
@@ -223,7 +226,7 @@ module.exports=Object.assign(
                     "secretsmanager:GetResourcePolicy",
                     "secretsmanager:GetSecretValue",
                     "secretsmanager:DescribeSecret"
-                   ],   
+                   ],
                   "Resource": [
                     {"Fn::Join": ["",["arn:aws:secretsmanager:",{ "Ref" : "AWS::Region" },":",{ "Ref" : "AWS::AccountId" },":secret:qna-*"]]},
                     {"Fn::Join": ["",["arn:aws:secretsmanager:",{ "Ref" : "AWS::Region" },":",{ "Ref" : "AWS::AccountId" },":secret:QNA-*"]]}
@@ -259,7 +262,7 @@ function jslambda(name){
       "Handler":`${name}.handler`,
       "MemorySize": "2048",
       "Role": {"Fn::GetAtt": ["ExtensionLambdaRole","Arn"]},
-      "Runtime": "nodejs16.x",
+      "Runtime": process.env.npm_package_config_lambdaRuntime,
       "Timeout": 300,
       "VpcConfig" : {
           "Fn::If": [ "VPCEnabled", {
@@ -267,12 +270,15 @@ function jslambda(name){
               "SecurityGroupIds": { "Fn::Split" : [ ",", {"Ref": "VPCSecurityGroupIdList"} ] },
           }, {"Ref" : "AWS::NoValue"} ]
       },
-      "Layers":[{"Ref":"JsLambdaHookSDKLambdaLayer"}],
+      "Layers":[
+        {"Ref":"AwsSdkLayerLambdaLayer"},
+        {"Ref":"JsLambdaHookSDKLambdaLayer"}
+      ],
       "TracingConfig" : {
           "Fn::If": [ "XRAYEnabled", {"Mode": "Active"},
               {"Ref" : "AWS::NoValue"} ]
       },
-            "Tags":[{
+      "Tags":[{
           Key:"Type",
           Value:"LambdaHook"
       }]
@@ -304,18 +310,18 @@ function pylambda(name){
       "Handler":`${name}.handler`,
       "MemorySize": "2048",
       "Role": {"Fn::GetAtt": ["ExtensionLambdaRole","Arn"]},
-      "Runtime": "python3.9",
+      "Runtime": process.env.npm_package_config_pythonRuntime,
       "Timeout": 300,
       "VpcConfig" : {
         "Fn::If": [ "VPCEnabled", {
             "SubnetIds": { "Fn::Split" : [ ",", {"Ref": "VPCSubnetIdList"} ] },
             "SecurityGroupIds": { "Fn::Split" : [ ",", {"Ref": "VPCSecurityGroupIdList"} ] },
         }, {"Ref" : "AWS::NoValue"} ]
-    },
-    "TracingConfig" : {
-        "Fn::If": [ "XRAYEnabled", {"Mode": "Active"},
-            {"Ref" : "AWS::NoValue"} ]
-    },
+      },
+      "TracingConfig" : {
+          "Fn::If": [ "XRAYEnabled", {"Mode": "Active"},
+              {"Ref" : "AWS::NoValue"} ]
+      },
       "Tags":[{
           Key:"Type",
           Value:"LambdaHook"

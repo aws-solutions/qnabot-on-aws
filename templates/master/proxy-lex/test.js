@@ -1,6 +1,6 @@
-process.env.AWS_PROFILE=require('../../../config').profile
-process.env.AWS_DEFAULT_REGION=require('../../../config').region
-process.env.AWS_REGION=require('../../../config').region
+process.env.AWS_PROFILE=require('../../../config.json').profile
+process.env.AWS_DEFAULT_REGION=require('../../../config.json').region
+process.env.AWS_REGION=require('../../../config.json').region
 
 var handler=require('./handler').handler
 module.exports={

@@ -10,7 +10,7 @@ module.exports={
       "Properties": {
         "Action": "lambda:InvokeFunction",
         "FunctionName": {  "Fn::Join": [ ":", [
-          {"Fn::GetAtt":["FulfillmentLambda","Arn"]}, 
+          {"Fn::GetAtt":["FulfillmentLambda","Arn"]},
           "live"
         ]]},
         "Principal": "lex.amazonaws.com"
@@ -51,7 +51,7 @@ module.exports={
           "type": "CodeHook",
           "codeHook": {
             "uri": {  "Fn::Join": [ ":", [
-              {"Fn::GetAtt":["FulfillmentLambda","Arn"]}, 
+              {"Fn::GetAtt":["FulfillmentLambda","Arn"]},
               "live"
             ]]},
             "messageVersion": "1.0"
@@ -74,7 +74,7 @@ module.exports={
               "type": "CodeHook",
               "codeHook": {
                   "uri": {  "Fn::Join": [ ":", [
-                    {"Fn::GetAtt":["FulfillmentLambda","Arn"]}, 
+                    {"Fn::GetAtt":["FulfillmentLambda","Arn"]},
                     "live"
                   ]]},
                   "messageVersion": "1.0"

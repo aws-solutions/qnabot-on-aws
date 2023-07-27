@@ -71,6 +71,16 @@ module.exports = {
           },
           EMBEDDINGS_SAGEMAKER_INSTANCECOUNT : { "Ref": "SagemakerInitialInstanceCount" },
           EMBEDDINGS_LAMBDA_ARN: { "Ref": "EmbeddingsLambdaArn" },
+          LLM_API: { "Ref": "LLMApi" },
+          LLM_SAGEMAKERENDPOINT : {
+            "Fn::If": [
+                "LLMSagemaker",
+                {"Fn::GetAtt": ["SageMakerQASummarizeLLMStack", "Outputs.LLMSagemakerEndpoint"] },
+                ""
+            ]
+          },
+          LLM_SAGEMAKERINSTANCECOUNT : { "Ref": "LLMSagemakerInitialInstanceCount" }, // force new fn version when instance count changes
+          LLM_LAMBDA_ARN: { "Ref": "LLMLambdaArn" },
         }, examples, responsebots)
       },
       "Handler": "index.handler",
@@ -82,7 +92,7 @@ module.exports = {
       ],
       "MemorySize": 1408,
       "Role": {"Fn::GetAtt": ["FulfillmentLambdaRole", "Arn"]},
-      "Runtime": "nodejs16.x",
+      "Runtime": process.env.npm_package_config_lambdaRuntime,
       "Timeout": 300,
       "TracingConfig": {
         "Mode": {
@@ -140,6 +150,16 @@ module.exports = {
               ""
           ]},
           {"Ref": "EmbeddingsLambdaArn"}
+        ],
+        "QASummarizeTrigger": [
+          {"Ref": "LLMApi"},
+          {"Ref": "SagemakerInitialInstanceCount"},
+          {"Fn::If": [
+                "LLMSagemaker",
+                {"Fn::GetAtt": ["SageMakerQASummarizeLLMStack", "Outputs.LLMSagemakerEndpoint"] },
+                ""
+          ]},
+          {"Ref": "LLMLambdaArn"}
         ]
       }
     }
@@ -178,6 +198,7 @@ module.exports = {
             { "Fn::GetAtt": ["ESLoggingLambda", "Arn"] },
             { "Fn::GetAtt": ["ESQidLambda", "Arn"] },
             { "Fn::If": ["EmbeddingsLambdaArn", {"Ref":"EmbeddingsLambdaArn"}, {"Ref":"AWS::NoValue"}] },
+            { "Fn::If": ["LLMLambdaArn", {"Ref":"LLMLambdaArn"}, {"Ref":"AWS::NoValue"}] },
           ].concat(require('../../examples/outputs').names
             .map(x => {
               return { "Fn::GetAtt": ["ExamplesStack", `Outputs.${x}`] }
@@ -300,7 +321,7 @@ module.exports = {
           "Fn::If": [
             "EmbeddingsSagemaker",
             {
-              "PolicyName" : "SagemakerInvokeEndpointAccess",
+              "PolicyName" : "EmbeddingsSagemakerInvokeEndpointAccess",
               "PolicyDocument" : {
               "Version": "2012-10-17",
                 "Statement": [
@@ -310,6 +331,27 @@ module.exports = {
                         "sagemaker:InvokeEndpoint"
                     ],
                     "Resource": {"Fn::GetAtt": ["SagemakerEmbeddingsStack", "Outputs.EmbeddingsSagemakerEndpointArn"]}
+                  }
+                ]
+              }
+            },
+            {"Ref":"AWS::NoValue"}
+          ]
+        },
+        {
+          "Fn::If": [
+            "LLMSagemaker",
+            {
+              "PolicyName" : "LLMSagemakerInvokeEndpointAccess",
+              "PolicyDocument" : {
+              "Version": "2012-10-17",
+                "Statement": [
+                  {
+                    "Effect": "Allow",
+                    "Action": [
+                        "sagemaker:InvokeEndpoint"
+                    ],
+                    "Resource": {"Fn::GetAtt": ["SageMakerQASummarizeLLMStack", "Outputs.LLMSagemakerEndpointArn"]}
                   }
                 ]
               }
@@ -360,7 +402,7 @@ module.exports = {
       "Handler": "index.warmer",
       "MemorySize": "512",
       "Role": { "Fn::GetAtt": ["WarmerLambdaRole", "Arn"] },
-      "Runtime": "nodejs16.x",
+      "Runtime": process.env.npm_package_config_lambdaRuntime,
       "Timeout": 300,
       "Layers": [
         {"Ref": "AwsSdkLayerLambdaLayer"},

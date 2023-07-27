@@ -1,4 +1,4 @@
-var config=require('../../../../config')
+var config=require('../../../../config.json')
 process.env.AWS_REGION=config.region
 
 module.exports=function(type,stage,properties){

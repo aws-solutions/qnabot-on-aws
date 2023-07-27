@@ -25,6 +25,7 @@ module.exports={
                 "XraySetting":{"Ref": "XraySetting"},
                 "DefaultQnABotSettings": {"Ref":"DefaultQnABotSettings"},
                 "InstallLexResponseBots": {"Ref": "InstallLexResponseBots"},
+                "AwsSdkLayerLambdaLayer":{"Ref":"AwsSdkLayerLambdaLayer"},
             }
         }
     }

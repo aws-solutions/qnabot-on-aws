@@ -5,6 +5,7 @@ const lambda = require('../index');
 const quiz = require('../quiz.js')
 const qna = require('../qna.js')
 const slottype = require('../slottype.js');
+const text = require('../text.js');
 
 describe('when invoking lambda to obtain schema', () => {
     it("should return a correctly formatted object", async () => {
@@ -17,6 +18,7 @@ describe('when invoking lambda to obtain schema', () => {
             quiz: quiz,
             qna: qna,
             slottype: slottype,
+            text: text,
         });
 	});
 });

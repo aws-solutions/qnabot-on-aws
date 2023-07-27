@@ -8,12 +8,13 @@ module.exports={
       "Type": "AWS::Lambda::Function",
       "Properties": {
         "Code": {
-            "ZipFile":fs.readFileSync(__dirname+'/handler.js','utf-8' ) + fs.readFileSync(resplib,'utf-8')
+          //join files by new line to ensure valid javascript
+          "ZipFile":fs.readFileSync(__dirname+'/handler.js','utf-8' ) + "\n" + fs.readFileSync(resplib,'utf-8')
         },
         "Handler": "index.handler",
         "MemorySize": "3008",
         "Role": {"Fn::GetAtt": ["CFNLambdaRole","Arn"]},
-        "Runtime": "nodejs16.x",
+        "Runtime": process.env.npm_package_config_lambdaRuntime,
         "Timeout": 60,
         "VpcConfig" : {
             "Fn::If": [ "VPCEnabled", {
@@ -55,7 +56,7 @@ module.exports={
         "Handler": "index.handler",
         "MemorySize": "3008",
         "Role": {"Fn::GetAtt": ["CFNLambdaRole","Arn"]},
-        "Runtime": "nodejs16.x",
+        "Runtime": process.env.npm_package_config_lambdaRuntime,
         "Timeout": 180,
         "VpcConfig" : {
           "Fn::If": [ "VPCEnabled", {

@@ -9,7 +9,7 @@ module.exports={
     "Resources":_.assign.apply({},files),
     "Conditions": {},
     "AWSTemplateFormatVersion": "2010-09-09",
-    "Description": "(SO0189n-export) QnABot nested export resources",
+    "Description": `(SO0189n-export) QnABot nested export resources - Version v${process.env.npm_package_version}`,
     "Outputs": require('./outputs'),
     "Parameters": {
         "CFNLambda":{"Type":"String"},

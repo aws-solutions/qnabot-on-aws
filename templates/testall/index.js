@@ -9,7 +9,7 @@ module.exports={
     "Resources":_.assign.apply({},files),
     "Conditions": {},
     "AWSTemplateFormatVersion": "2010-09-09",
-    "Description": "(SO0189n-testall) QnABot nested testall resources",
+    "Description": `(SO0189n-testall) QnABot nested testall resources - Version v${process.env.npm_package_version}`,
     "Outputs": require('./outputs'),
     "Parameters": {
         "CFNLambda":{"Type":"String"},
@@ -24,7 +24,8 @@ module.exports={
         "TestAllBucket": {"Type":"String"},
         "VPCSubnetIdList" : {"Type": "String"},
         "VPCSecurityGroupIdList": {"Type": "String"},
-        "XraySetting": {"Type": "String"}
+        "XraySetting": {"Type": "String"},
+        "AwsSdkLayerLambdaLayer":{"Type":"String"},
     },
     "Conditions": {
         "VPCEnabled": { "Fn::Not": [

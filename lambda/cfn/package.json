@@ -7,25 +7,18 @@
     "test": "nodeunit ./test/index.js",
     "unit": "nodeunit ./test/index.js -t"
   },
-  "author": "",
-  "license": "ISC",
+  "author": {
+    "name": "Amazon Web Services",
+    "url": "https://aws.amazon.com/solutions"
+  },
+  "license": "Apache-2.0",
   "dependencies": {
-    "aws-sdk": "^2.1354.0",
+    "aws-sdk": "^2.1404.0",
     "bluebird": "^3.5.0",
     "body-parser": "^1.19.2",
-    "cfn-lambda": "^4.0.0",
-    "cfn-response": "^1.0.1",
-    "deep-equal": "^1.0.1",
-    "elasticsearch": "^16.7.1",
-    "http-aws-es": "^6.0.0",
-    "intercept-stdout": "^0.1.2",
-    "json-stringify-pretty-compact": "^1.0.4",
+    "cfn-lambda": "^5.1.0",
     "jszip": "^3.10.1",
-    "lodash": "^4.17.21",
-    "stack-utils": "^1.0.1"
-  },
-  "devDependencies": {
-    "diff": "^4.0.2"
+    "lodash": "^4.17.21"
   },
   "overrides": {
     "qs@<6.5.3": "^6.5.3"

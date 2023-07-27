@@ -1,4 +1,4 @@
-var config=require('../../../config')
+var config=require('../../../config.json')
 process.env.STRIDE="10000"
 process.env.AWS_PROFILE=config.profile
 process.env.AWS_DEFAULT_REGION=config.region
@@ -22,7 +22,7 @@ module.exports={
             process.env.ES_PROXY=master.ESProxyLambda
             process.env.ES_TYPE=master.ElasticsearchType
             process.env.ES_INDEX=master.ElasticsearchIndex
-            
+
             return handler.startAsync({
                 Records:[{
                     s3:{
@@ -39,7 +39,7 @@ module.exports={
                         bucket:{name:bucket}
                     }
                 }]
-            },null))    
+            },null))
             .delay(1000)
             .then(()=>handler.stepAsync({
                 Records:[{
@@ -48,7 +48,7 @@ module.exports={
                         bucket:{name:bucket}
                     }
                 }]
-            },null))    
+            },null))
         })
         .catch(test.ifError)
         .finally(()=>test.done())

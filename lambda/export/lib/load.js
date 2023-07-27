@@ -22,15 +22,19 @@ module.exports=function(config,body){
         const documents=_.get(result,"hits.hits",[])
         if(documents.length){
             const body=documents.map(x=>{
-                const out=x._source
-                if(out.type==='qna' && _.has(out,"questions")){
-                    out.q=out.questions.map(y=>y.q)
-                    delete out.questions
-                    delete out.quniqueterms;
-                }else{
-                    out._id=x._id;
+                const out = x._source;
+                // remap nested questions array for JSON file backward compatability
+                if (out.type === 'qna' && _.has(out, 'questions')) {
+                    out.q = out.questions.map((y) => y.q);
                 }
-                return JSON.stringify(out)
+                // if item has a qid, we don;t need the _id field, so we can delete it.
+                if (!_.has(out, 'qid')) {
+                    out._id = x._id;
+                }
+                // delete fields that we don't need in the exported JSON
+                delete out.questions;
+                delete out.quniqueterms;
+                return JSON.stringify(out);
             }).join('\n')
             const key=`${config.tmp}/${config.parts.length+1}`
             return s3.putObject({

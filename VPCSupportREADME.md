@@ -7,8 +7,8 @@ This feature allows deployment of QnABot components within VPC infrastructure vi
 referencing the template in S3 using https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/latest/qnabot-on-aws-vpc.template.
 
 This template is made available for use as a separate installation mechanism. It is not the default template utilized in the
-public distribution. Please take care in deploying QnABot in VPC. The Elasticsearch Cluster becomes private to the VPC. In addition,
-the QnABot Lambda functions installed by the stack will be attached to subnets in the VPC. The Elasticsearch cluster is no longer available
+public distribution. Please take care in deploying QnABot in VPC. The OpenSearch Cluster becomes private to the VPC. In addition,
+the QnABot Lambda functions installed by the stack will be attached to subnets in the VPC. The OpenSearch cluster is no longer available
 outside of the VPC. The Lambdas attached to the VPC allow communication with the cluster.
 
 Two additional parameters are required by this template.
@@ -23,7 +23,7 @@ In order to deploy QnABot within a VPC two requirements must be met:
 1. A fully functioning VPC with a minimum of two private subnets spread over two availability zones is required.
    These private VPC subnets should have access to AWS services. This can be accomplished using NAT Gateway with proper IGW
    configuration / routing. Other third party gateway implementations can be used that provide access to AWS services.
-     - if using Sagemaker based [text embeddings](docs/semantic_matching_using_LLM_embeddings/README.md) you will need to create a VPC Gateway Endpoint for S3 (this is __required__ to enable SageMaker to download the model) and a VPC Interface Endpoint for SageMaker (this is _optional_; however, enables invocations of the SageMaker Runtime endpoint to remain on the VPC). Additional resources to help with configuration can be found at:
+     - if using Sagemaker based [text embeddings](docs/semantic_matching_using_LLM_embeddings/README.md) or [text generation](docs/LLM_Retrieval_and_generative_question_answering/README.md) you will need to create a VPC Gateway Endpoint for S3 (this is __required__ to enable SageMaker to download the model) and a VPC Interface Endpoint for SageMaker (this is _optional_; however, enables invocations of the SageMaker Runtime endpoint to remain on the VPC). Additional resources to help with configuration can be found at:
        - [Give SageMaker Hosted Endpoints Access to Resources in Your Amazon VPC](https://docs.aws.amazon.com/sagemaker/latest/dg/host-vpc.html)
        - [Connect to SageMaker Through a VPC Interface Endpoint](https://docs.aws.amazon.com/sagemaker/latest/dg/interface-vpc-endpoint.html)
        - [AWS PrivateLink pricing](https://aws.amazon.com/privatelink/pricing/)
@@ -38,7 +38,7 @@ In order to deploy QnABot within a VPC two requirements must be met:
 
 ### Deployment
 
-Deploying Elasticsearch cluster into a VPC requires creating a service linked role for es. You can execute the following command
+Deploying OpenSearch cluster into a VPC requires creating a service linked role for es. You can execute the following command
 using credentials for the target account.
 
 ```
@@ -58,8 +58,8 @@ To switch to a different mode, you would need to perform a fresh install.**
 
 Two new parameters are required when deploying within a VPC
 
-Select a pre-configured security group. This security group must enables inbound communication to
-the Elasticsearch cluster on port 443.
+Select a pre-configured security group. This security group must enable inbound communication to
+the OpenSearch cluster on port 443.
 
 Select a minimum of two Private Subnets spread over two availability zones. These private
 subnets must have NAT configured to allow communication to other AWS services. Do not
@@ -69,10 +69,10 @@ Once these are configured, launch the template.
 
 ### Behavior of the system after deployment
 
--   This template attaches the Elasticsearch cluster and Lambdas to the private subnets. Communication
+-   This template attaches the OpenSearch cluster and Lambdas to the private subnets. Communication
     between these components occurs within the VPC.
 
--   The Kibana dashboard provided within the Elasticsearch cluster is only available
+-   The Kibana dashboard provided within the OpenSearch cluster is only available
     within the VPC. Users desiring access to the Kibana dashboard must have access via
     VPN or Direct Connect to the VPC.
 
@@ -81,7 +81,7 @@ Once these are configured, launch the template.
 
 ### Accessing Kibana in VPC
 
-This template deploys ElasticSearch and Kibana within a VPC's Private Subnets. By default, there are
+This template deploys OpenSearch and Kibana within a VPC's Private Subnets. By default, there are
 no means of accessing kibana, and further actions are required to proceed in doing so.
 
 Since Kibana is already integrated with Cognito for authentication, the following actions can take

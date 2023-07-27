@@ -24,7 +24,7 @@ module.exports={
         "Handler": "resource.handler",
         "MemorySize": "1408",
         "Role": {"Fn::GetAtt": ["ESProxyLambdaRole","Arn"]},
-        "Runtime": "nodejs16.x",
+        "Runtime": process.env.npm_package_config_lambdaRuntime,
         "Timeout": 300,
         "VpcConfig" : {
           "Fn::If": [ "VPCEnabled", {
@@ -84,21 +84,21 @@ module.exports={
                     {
                         "EmbeddingsDimensions" : {
                             "Fn::If": [
-                                "EmbeddingsEnable", 
+                                "EmbeddingsEnable",
                                 {
                                     "Fn::If": [
-                                        "EmbeddingsSagemaker", 
+                                        "EmbeddingsSagemaker",
                                         "1024",
                                         {
 
                                             "Fn::If": [
-                                                "EmbeddingsLambda", 
+                                                "EmbeddingsLambda",
                                                 {"Ref": "EmbeddingsLambdaDimensions"},
-                                                "INVALID EMBEDDINGS API - Cannot determine dimensions" 
+                                                "INVALID EMBEDDINGS API - Cannot determine dimensions"
                                             ]
                                         }
                                     ]
-                                }, 
+                                },
                                 "1" // minimal default to use if embeddings are disabled
                             ]
                         }

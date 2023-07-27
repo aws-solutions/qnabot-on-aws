@@ -1,12 +1,12 @@
 #! /usr/bin/env node
-var config=require('../config')
+var config=require('../config.json')
 process.env.AWS_PROFILE=config.profile
 process.env.AWS_DEFAULT_REGION=config.profile
 var aws=require('aws-sdk')
 var Promise=require('bluebird')
 aws.config.setPromisesDependency(Promise)
-aws.config.region=require('../config').region
-var region=require('../config').region
+aws.config.region=require('../config.json').region
+var region=require('../config.json').region
 var _=require('lodash')
 var fs=require('fs')
 var cf=new aws.CloudFormation()
@@ -33,7 +33,7 @@ if (require.main === module) {
         .option('--no-interactive',"omit interactive elements of output (spinners etc.)")
         .on('--help',()=>{
             log(
-`  
+`
   Operations:
 
     up:         launch a stack
@@ -184,7 +184,7 @@ function update(stack,options){
                 })
             }
 
-            return start.then(x=>{  
+            return start.then(x=>{
                 log(`stackname: ${StackName}`,options)
                 log(`stackId: ${x.StackId}`,options)
                 if(options.wait){
@@ -202,7 +202,7 @@ async function down(stack,options){
     var StackName=options.stackName ? options.stackName : name(stack)
     log("terminating stack",options)
     if(options.dryRun){
-        return 
+        return
     }
     try{
         var down=await cf.describeStacks({
@@ -230,7 +230,7 @@ async function down(stack,options){
 async function sure(stack,options={}){
     var StackName=options.stackName ? options.stackName : name(stack)
     log(`making sure stack ${stack} is up`,options)
-    try{ 
+    try{
         await cf.describeStacks({StackName}).promise()
         await wait(stack,{show:options.interactive && !options.silent})
         log(`${stack} is up as ${StackName}`,options)

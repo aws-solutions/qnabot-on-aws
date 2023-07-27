@@ -1,13 +1,13 @@
 #! /usr/bin/env node
-var config=require('../config')
+var config=require('../config.json')
 var fs=require('fs')
 process.env.AWS_PROFILE=config.profile
 process.env.AWS_DEFAULT_REGION=config.profile
 var aws=require('aws-sdk')
 var Promise=require('bluebird')
 aws.config.setPromisesDependency(Promise)
-aws.config.region=require('../config').region
-var region=require('../config').region
+aws.config.region=require('../config.json').region
+var region=require('../config.json').region
 var cf=new aws.CloudFormation()
 var s3=new aws.S3()
 var name=require('./name')

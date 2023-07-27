@@ -37,48 +37,9 @@ module.exports={
             "Path":"/bot"
         },
         "Properties" :JSON.stringify({
-           description:""  
+           description:""
         }),
         "RestApiId" : {"Ref":"API"}
     }
 }
 }
-function config(opts){
-    return {
-      "Type": "AWS::ApiGateway::Method",
-      "Properties": {
-        "AuthorizationType": "AWS_IAM",
-        "HttpMethod":opts.method,
-        "Integration":_.pickBy({
-            "Type": "AWS",
-            "IntegrationHttpMethod":opts.method,
-            "Credentials":{"Fn::GetAtt":["LambdaAccessRole","Arn"]},
-            "Uri": {"Fn::Join": ["",[
-                "arn:aws:apigateway:",
-                {"Ref": "AWS::Region"},
-                ":lambda:path/2015-03-31/functions/",
-                { "Fn::Join": [ ":", [
-                    {"Fn::GetAtt":["FulfillmentLambda","Arn"]},
-                    "live"
-                  ]]},
-                "/configuration"
-            ]]},
-            "IntegrationResponses": [{
-                "StatusCode":200,
-                "ResponseTemplates":{
-                    "application/json":{"Fn::Sub":opts.response}
-                }
-            }],
-            "RequestTemplates":opts.request ? {
-                "application/json":{"Fn::Sub":opts.request}
-            } : null
-        }),
-        "ResourceId":{"Ref":"Hooks"},
-        "MethodResponses": [
-          {"StatusCode": 200},
-          {"StatusCode": 400}
-        ],
-        "RestApiId": {"Ref": "API"}
-      }
-    }
-} 

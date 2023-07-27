@@ -2519,5 +2519,5 @@ exports.names = [
 
 
 exports.outputs = _.fromPairs(exports.names.map(x => {
-    return [x, {Value: {"Fn::If": ["CreateLexResponseBots", {"Fn::Join": ["", ["LexV2::", {"Ref": "ResponseBot" + x + "V2"}, "/", {"Fn::GetAtt": ["ResponseBot" + x + "AliasV2", "BotAliasId"]}, "/", "en_US"]]}, "ReponseBots disabled during stack create/update"]}}];
+    return [x, {Value: {"Fn::If": ["CreateLexResponseBots", {"Fn::Join": ["", ["LexV2::", {"Ref": "ResponseBot" + x + "V2"}, "/", {"Fn::GetAtt": ["ResponseBot" + x + "AliasV2", "BotAliasId"]}, "/", "en_US"]]}, "ReponseBots disabled"]}}];
 }));

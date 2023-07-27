@@ -1,6 +1,6 @@
 // Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
 // SPDX-License-Identifier: Apache-2.0
-var config=require('../../config')
+var config=require('../../config.json')
 var path=require('path')
 var CopyWebpackPlugin = require('copy-webpack-plugin');
 var HtmlWebpackPlugin = require('html-webpack-plugin');
@@ -49,9 +49,9 @@ module.exports={
               }
             }
           },
-          { 
-            test: /\.(png|woff|woff2|eot|ttf|svg)$/, 
-            loader: 'url-loader?limit=100000' 
+          {
+            test: /\.(png|woff|woff2|eot|ttf|svg)$/,
+            loader: 'url-loader?limit=100000'
           },
           {
             test: /\.pug$/,
@@ -69,7 +69,7 @@ module.exports={
             test: /\.scss$/,
             use: extractSass.extract({
                 use:[
-                    {loader: "css-loader" }, 
+                    {loader: "css-loader" },
                     {loader: "sass-loader" }
                 ]
             })

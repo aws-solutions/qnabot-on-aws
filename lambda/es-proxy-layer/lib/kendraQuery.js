@@ -12,18 +12,25 @@ const qnabot = require("qnabot/logging")
 const open_es = require("./es_query")
 
 
+function allow_kendra_result(kendra_result, minimum_score){
+    if (!confidence_filter(minimum_score,kendra_result)) {
+        qnabot.log(`Result removed: ScoreConfidence [${_.get(kendra_result,"ScoreAttributes.ScoreConfidence")}] below threshold [${minimum_score}] - Passage: ${_.get(kendra_result,"DocumentExcerpt.Text")}`);
+        return false;
+    }
+    qnabot.log(`Result allowed: Type [${kendra_result.Type}], ScoreConfidence [${_.get(kendra_result,"ScoreAttributes.ScoreConfidence")}] - Passage: ${_.get(kendra_result,"DocumentExcerpt.Text")}`);
+    return true;
+}
+
 function confidence_filter(minimum_score,kendra_result){
     var confidences = ["LOW","MEDIUM","HIGH","VERY_HIGH"]
     var index = confidences.findIndex( i => i == minimum_score.toUpperCase())
     if(index == undefined){
-        qnabot.log("Warning: ALT_SEARCH_KENDRA_CONFIDENCE_SCORE should be one of 'VERY_HIGH'|'HIGH'|'MEDIUM'|'LOW'")
+        qnabot.log("Warning: ALT_SEARCH_KENDRA_FALLBACK_CONFIDENCE_SCORE should be one of 'VERY_HIGH'|'HIGH'|'MEDIUM'|'LOW'")
         return true;
     }
     confidences = confidences.slice(index)
-    qnabot.log("Testing confidences: Allowed - " + JSON.stringify(confidences) + " Actual - " + _.get(kendra_result,"ScoreAttributes.ScoreConfidence") )
     const found = confidences.find(element => element == _.get(kendra_result,"ScoreAttributes.ScoreConfidence")) != undefined
     return found
-
 }
 
 
@@ -45,7 +52,7 @@ function kendraRequester(kendraClient,params,resArray) {
             }
             else {
                 data.originalKendraIndexId = indexId;
-                qnabot.log("Data from Kendra request:" + JSON.stringify(data, null, 2));
+                qnabot.log("Kendra response:" + JSON.stringify(data, null, 2));
                 resArray.push(data);
                 resolve(data);
             }
@@ -126,7 +133,7 @@ async function routeKendraRequest(request_params) {
             for (i=0; i<res.ResultItems.length; i++) {
                 element = res.ResultItems[i];
 
-                if(!confidence_filter(request_params.minimum_score,element))
+                if(!allow_kendra_result(element, request_params.minimum_score))
                     continue;
 
                 /* Note - only FAQ format will be provided back to the requester */
@@ -214,11 +221,11 @@ async function routeKendraRequest(request_params) {
         hits_struct['kendraResultsCached'] = resArray[0];
     }
     
-    qnabot.log("RETURN: " + JSON.stringify(hits_struct));
+    qnabot.debug("RETURN: " + JSON.stringify(hits_struct));
     return hits_struct;
 }
 
 exports.handler = async (request_params) => {
-    qnabot.log("kendra query request: " + JSON.stringify(request_params));
+    qnabot.log("Kendra request params: " + JSON.stringify(request_params));
     return routeKendraRequest(request_params);
 };

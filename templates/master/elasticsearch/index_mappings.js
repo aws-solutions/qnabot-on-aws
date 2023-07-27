@@ -1,8 +1,10 @@
 module.exports={
     properties:{
+        // all doc types have qid
         qid:{
             type:"keyword"
         },
+        // 'qna' doc type fields
 		quniqueterms: {
 			type: "text",
 			analyzer: "custom_english_unique"
@@ -37,7 +39,7 @@ module.exports={
                 "space_type": "cosinesimil",
                 "engine": "nmslib"
             }
-        },
+        },      
         t:{
             type:'text',analyzer:"whitespace" 
         },
@@ -50,7 +52,20 @@ module.exports={
         l:{
             type:"keyword"
         },
-        // quiz type fields
+        // 'text' doc type fields
+        passage:{
+            type:'text',analyzer:"custom_english" 
+        },
+        passage_vector: { 
+            "type": "knn_vector",
+            "dimension": '${EmbeddingsDimensions}', 
+            "method": {
+                "name": "hnsw",
+                "space_type": "cosinesimil",
+                "engine": "nmslib"
+            }
+        },  
+        // 'quiz' doc type fields
         question:{
             type:"text",
             analyzer:"custom_english"
