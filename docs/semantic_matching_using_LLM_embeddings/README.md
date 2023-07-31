@@ -34,7 +34,7 @@ By setting the parameter `SagemakerInitialInstanceCount` to `0`, a [Serverless S
 
 Use a custom Lambda function to use any Embedding API or embedding model on Sagemaker to generate embeddings.
 
-*See [QnABot on AWS Sample Plugins](https://github.com/aws-samples/qnabot-on-aws-plugin-samples/blob/develop/README.md) for a plugins to integrate QnABot with our Amazon Bedrock service (in preview) for embeddings.*
+*See [QnABot on AWS Sample Plugins](https://github.com/aws-samples/qnabot-on-aws-plugin-samples/blob/develop/README.md) for a plugin to integrate QnABot with our Amazon Bedrock service (in preview) for embeddings.*
 
 ### Deploy Stack for Embedding models invoked by a custom Lambda Function
 
