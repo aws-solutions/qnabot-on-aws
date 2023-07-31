@@ -51,10 +51,8 @@ You can use disambiguation and generative question answering, as shown below:
 
 
 With this release, you can choose with LLM to use with QnABot:
-1. An open source LLM model automtically deployed and hosted on an Amazon SageMaker endpoint - see https://huggingface.co/tiiuae/falcon-40b-instruct
+1. An open source LLM model automatically deployed and hosted on an Amazon SageMaker endpoint - see https://huggingface.co/tiiuae/falcon-40b-instruct
 2. Any other LLM model or API you like via a user provided Lambda function.
-
-_**NOTE: Optimize Kendra:** When using Kendra, we recommend requesting a larger document excerpt to be returned from queries. In the browser window you are using for AWS Management Console navigate to [Kendra Service Quota](https://console.aws.amazon.com/servicequotas/home/services/kendra/quotas/L-196E775D), choose Request quota increase, and change quota value to a number up to a max of 750._
 
 ### 1. Amazon SAGEMAKER
 
@@ -73,6 +71,8 @@ By default a 1-node ml.g5.12xlarge endpoint is automatically provisioned. For la
 ### 2. Lambda function
 
 Use a custom Lambda function to experiment with LLMs of your choice. Provide your own lambda function that takes a *question*, *context*, and a QnABot *settings* object. Your Lambda function can invoke any LLM you choose, and return the prediction in a JSON object containing the key, `generated_text`. You provide the ARN for your Lambda function when you deploy or update QnABot.
+
+*See [QnABot on AWS Sample Plugins](https://github.com/aws-samples/qnabot-on-aws-plugin-samples/blob/develop/README.md) for some sample customizable plugins to integrate QnABot with your choice of leading LLM providers including our own Amazon Bedrock service (in preview), Anthropic, and AI21.*
 
 #### Deploy Stack for Embedding models invoked by a custom Lambda Function
 
@@ -138,7 +138,7 @@ When QnABot stack is installed, open Content Designer **Settings** page:
   - `{context}` - placeholder for passages retrieved from the seartch query - either a QnABot 'Text' item passage, or the Top `ALT_SEARCH_KENDRA_MAX_DOCUMENT_COUNT` Kendra passages
   - `{history}` - placeholder for the last `LLM_CHAT_HISTORY_MAX_MESSAGES` messages in the conversational history, to provide conversational context.
   - `{input}` - placeholder for the current user utterance / question
-  - `{query}` - placeholder for the generated (disambiguated) query created by the generate query feature. NOTE the default prompt does not use `query` in the qa prompt, as it provides the conversation history and current user input instead, but you can change the prompt to use `query` inseatd of, or in addiotion to `input` and `history` to tune the LLM answers.
+  - `{query}` - placeholder for the generated (disambiguated) query created by the generate query feature. NOTE the default prompt does not use `query` in the qa prompt, as it provides the conversation history and current user input instead, but you can change the prompt to use `query` instead of, or in addition to `input` and `history` to tune the LLM answers.
 - **LLM_QA_NO_HITS_REGEX:** when the pattern specified matches the response from the LLM, e.g. `Sorry, I don't know`, then the response is treated as no_hits, and the default `EMPTYMESSAGE` or Custom Don't Know ('no_hits') item is returned instead. Disabled by default, since enabling it prevents easy debugging of LLM don't know responses.
 - **LLM_QA_MODEL_PARAMS:** parameters sent to the LLM model when generating answers to questions. Default: `{"temperature":0}`. Check model documentation for additional values that your model provider accepts.
 - **LLM_QA_PREFIX_MESSAGE:** Message use to prefix LLM generated answer. May be be empty.
