@@ -1,6 +1,6 @@
 # Large Language Model - Query Disambiguation for Conversational Retrieval, and Generative Question Answering
 
-QnABot can now use a large language model (LLM) to **(1) Disambiguate follow up questions to generate good search queries** and/or **(2) Generate answers to questions from retrieved FAQS or passages**.
+QnABot can now use a large language model (LLM) to **(1) Disambiguate follow up questions to generate good search queries** and/or **(2) Generate answers to questions from retrieved search results or text passages**.
 
 
 **(1) Disambiguate follow up questions** that rely on preceding conversation context. The new disambiguated, or standalone, question can then be used as search queries to retrieve the best FAQ, passage or Kendra match.
