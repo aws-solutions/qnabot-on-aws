@@ -15,7 +15,7 @@ QnAbot can rewrite that question to provide all the context required to search f
 `Did Little Bo Peep find her sheep again?`.
 
 
-**(2) Generate answers to questions** from context provided by Kendra search results, or from text passges created or imported directly into QnAbot. Some of the benefits include:
+**(2) Generate answers to questions** from context provided by Kendra search results, or from text passages created or imported directly into QnABot. Some of the benefits include:
 - Generated answers allow you to reduce the number of FAQs you need to maintain since you can now synthesize concise answers from your existing documents in a Kendra index, or from document passages stored in QnABot as 'text' items.
 - Generated answers can be short, concise, and suitable for voice channel contact center bots as well as website / text bots.
 - Generated answers are fully compatible with QnABot's multi-language support - users can interact in their chosen languages and recieve generated answers in the same language.
