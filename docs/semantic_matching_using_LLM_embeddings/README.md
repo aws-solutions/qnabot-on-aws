@@ -11,7 +11,7 @@ For now this is an Experimental feature. We encourage you to try it on non-produ
 
 With this release, QnaBot can now use 
 1. PREFERRED: Embeddings from a Text Embedding model hosted on an Amazon SageMaker endpoint - see https://huggingface.co/intfloat/e5-large
-2. CUSTOMIZABLE: Embeddings from a user provided Lambda function - explore alternate pretrained and/or fine tuned embeddings models. 
+2. CUSTOMIZABLE: Embeddings from a user provided Lambda function - explore alternate pre-trained and/or fine tuned embeddings models. 
 
 ## 1. Amazon Sagemaker (PREFERRED)
 
@@ -30,9 +30,11 @@ By setting the parameter `SagemakerInitialInstanceCount` to `0`, a [Serverless S
 ![CFN Params](./images/CF_Params_Sagemaker.png)
 
 
-## 3. Lambda function
+## 2. Lambda function
 
-Use a custom Lambda function to use any Embedding API or embedding model on Sagemaker to generate embeddings.  
+Use a custom Lambda function to use any Embedding API or embedding model on Sagemaker to generate embeddings.
+
+*See [QnABot on AWS Sample Plugins](https://github.com/aws-samples/qnabot-on-aws-plugin-samples/blob/develop/README.md) for a plugin to integrate QnABot with our Amazon Bedrock service (in preview) for embeddings. Note that the plugin project is listed here for reference only and is a separate project from the QnABot project.*
 
 ### Deploy Stack for Embedding models invoked by a custom Lambda Function
 
@@ -72,20 +74,25 @@ When QnABot stack is installed, open Content Designer **Settings** page:
 
 **EMBEDDINGS_ENABLE:** to enable / disable use of semantic search using embeddings, set `EMBEDDINGS_ENABLE` to FALSE.
   - Set to FALSE to disable the use of embeddings based queries. 
-  - Set to TRUE to re-enble the use of embeddings based queries after previously setting it to FALSE. NOTE - Setting TRUE when the stack has `EmbeddingsAPI` set to DISABLED will cause failures, since the QnABot stack isn't provisioned to support generation of embeddings. 
+  - Set to TRUE to re-enable the use of embeddings based queries after previously setting it to FALSE. NOTE - Setting TRUE when the stack has `EmbeddingsAPI` set to DISABLED will cause failures, since the QnABot stack isn't provisioned to support generation of embeddings. 
   - If you disable embeddings, you will likely also want to re-enable keyword filters by setting `ES_USE_KEYWORD_FILTERS` to TRUE. 
   - If you add, modify, or import any items in Content Designer when set `EMBEDDINGS_ENABLE` is false, then embeddings won't get created and you'll have to reimport or re-save those items after reenabling embeddings again  
     
 **EMBEDDINGS_SCORE_THRESHOLD:** to customize the score threshold, change the value of `EMBEDDINGS_SCORE_THRESHOLD`. Unlike regular elasticsearch queries, embeddings queries always return scores between 0 and 1, so we can apply a threshold to separate good from bad results. 
   - If embedding similarity score is under threshold the match it's rejected and QnABot reverts to
-     - Trying to find a match on the answer field, only if ES_SCORE_ANSWER_FIELD is set to TRUE (see above). 
+     - Trying to find a match on the answer field, only if ES_SCORE_ANSWER_FIELD is set to TRUE (see above).
+     - Text item passage query 
      - Kendra fallback 
      - or no_hits
   - Use the Content Designer TEST tab to see the hits ranked by score for your query results.
-  - The default is 0.85 for now but you may well need to modify this based on your embedding model and your experiments.
+  - The default is 0.85 for now but you will likely need to modify this based on your embedding model and your experiments.
 
 **EMBEDDINGS_SCORE_ANSWER_THRESHOLD:** to customize the answer score threshold, used only when ES_SCORE_ANSWER_FIELD is TRUE (see above), change the value of `EMBEDDINGS_SCORE_ANSWER_THRESHOLD`. 
-  - If embedding similarity score for answer field query is under threshold the match it's rejected and QnABot reverts to Kendra fallback or no_hits
-  - Use the Content Designer TEST tab to see the hits ranked by score for your answer field query results. Select to "Score on answer field" checkbox to see answer field scores.
-  - The default is 0.80 for now but you may well need to modify this based on your embedding model and your experiments.
+  - If embedding similarity score for answer field query is under threshold the match it's rejected and QnABot reverts to Text item passage query, Kendra fallback or no_hits
+  - Use the Content Designer TEST tab to see the hits ranked by score for your answer field query results. For **Match on**, choose *qna item answer* to see answer field scores.
+  - The default is 0.80 for now but you will likely need to modify this based on your embedding model and your experiments.
 
+**EMBEDDINGS_TEXT_PASSAGE_SCORE_THRESHOLD:** to customize the passage score threshold, change the value of `EMBEDDINGS_TEXT_PASSAGE_SCORE_THRESHOLD`. 
+  - If embedding similarity score for text item passage field query is under threshold the match it's rejected and QnABot reverts to Kendra fallback or no_hits
+  - Use the Content Designer TEST tab to see the hits ranked by score for your answer field query results. For **Match on**, choose *text item passage* to see passage field scores.
+  - The default is 0.80 for now but you will need likely to modify this based on your embedding model and your experiments.
