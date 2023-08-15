@@ -24,7 +24,7 @@ To get the version of the solution, you can look at the description of the creat
 - [ ] Region: [e.g. us-east-1]
 - [ ] Was the solution modified from the version published on this repository?
 - [ ] If the answer to the previous question was yes, are the changes available on GitHub?
-- [ ] Have you checked your [service quotas](https://docs.aws.amazon.com/general/latest/gr/aws_service_limits.html) for the sevices this solution uses?
+- [ ] Have you checked your [service quotas](https://docs.aws.amazon.com/general/latest/gr/aws_service_limits.html) for the services this solution uses?
 - [ ] Were there any errors in the CloudWatch Logs?
 
 **Screenshots**
