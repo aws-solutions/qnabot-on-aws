@@ -10,7 +10,7 @@
  *
  * The above copyright notice and this permission notice shall be
  * included in all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
  * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -26,24 +26,24 @@
  *
  */
 String.prototype.csvToArray = function (o) {
-    var od = {
-        'fSep': ',',
-        'rSep': '\r\n',
-        'quot': '"',
-        'head': false,
-        'trim': false
-    }
+    const od = {
+        fSep: ',',
+        rSep: '\r\n',
+        quot: '"',
+        head: false,
+        trim: false,
+    };
     if (o) {
-        for (var i in od) {
+        for (const i in od) {
             if (!o[i]) o[i] = od[i];
         }
     } else {
         o = od;
     }
-    var a = [
-        ['']
+    const a = [
+        [''],
     ];
-    for (var r = f = p = q = 0; p < this.length; p++) {
+    for (let r = f = p = q = 0; p < this.length; p++) {
         switch (c = this.charAt(p)) {
         case o.quot:
             if (q && this.charAt(p + 1) == o.quot) {
@@ -82,10 +82,10 @@ String.prototype.csvToArray = function (o) {
         }
     }
     if (o.head) {
-        a.shift()
+        a.shift();
     }
     if (a[a.length - 1].length < a[0].length) {
-        a.pop()
+        a.pop();
     }
     return a;
-}
+};

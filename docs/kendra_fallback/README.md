@@ -23,17 +23,17 @@ The value of ALT\_SEARCH\_KENDRA\_INDEXES should be either a single index id, or
 "857710ab-example-do-not-copy" OR ["857710ab-example1-do-not-copy","857710ab-example2-do-not-copy"]
 ```
 
-#### ALT\_SEARCH\_KENDRA\_MAX\_DOCUMENT\_COUNT
+### ALT\_SEARCH\_KENDRA\_MAX\_DOCUMENT\_COUNT
 
 Number - Overrides the maximum number of discovered text links
 to display in markdown result. Default is 4.
 
-#### ALT_SEARCH_KENDRA_S3_SIGNED_URLS  
+### ALT_SEARCH_KENDRA_S3_SIGNED_URLS  
   
 If set **true** then if S3 document URL is in the search result, convert to a signed URL.
 IMPORTANT: S3 Bucket names must start with qna (e.g. qnabot-mydocs), otherwise make sure IAM Role *...ESProxyLambdaRole...* (used by the Query function) has been granted S3:GetObject access to S3 objects in the Kendra index (otherwise the signed URLS will not have access)
 
-#### ALT\_SEARCH\_KENDRA\_S3\_SIGNED\_URL\_EXPIRE\_SECS  
+### ALT\_SEARCH\_KENDRA\_S3\_SIGNED\_URL\_EXPIRE\_SECS  
   
 Value determines the expiration of the S3 URL - default 300 seconds.
 

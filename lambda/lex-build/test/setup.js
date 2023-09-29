@@ -1,14 +1,24 @@
 #! /usr/bin/env node
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
-var Promise=require('bluebird')
-var config=require('../../../config.json')
+/*********************************************************************************************************************
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.                                                *
+ *                                                                                                                    *
+ *  Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance    *
+ *  with the License. A copy of the License is located at                                                             *
+ *                                                                                                                    *
+ *      http://www.apache.org/licenses/                                                                               *
+ *                                                                                                                    *
+ *  or in the 'license' file accompanying this file. This file is distributed on an 'AS IS' BASIS, WITHOUT WARRANTIES *
+ *  OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions    *
+ *  and limitations under the License.                                                                                *
+ *********************************************************************************************************************/
 
-var fs=Promise.promisifyAll(require('fs'))
-var aws=require('aws-sdk')
-var outputs=require('../../../bin/exports')
-aws.config.setPromisesDependency(Promise)
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
+const config=require('../../../config.json')
+
+const aws=require('aws-sdk')
+const outputs=require('../../../bin/exports')
 aws.config.region=config.region
-var s3=new aws.S3()
+const s3=new aws.S3()
 
 module.exports=Promise.method(async function(event){
     process.env.AWS_ACCESS_KEY_ID=aws.config.credentials.accessKeyId
@@ -16,7 +26,7 @@ module.exports=Promise.method(async function(event){
     process.env.AWS_REGION=config.region
 
     process.env.SALT='salt'
-    var envs=await outputs('dev/bucket',{wait:true})
+    const envs=await outputs('dev/bucket',{wait:true})
     process.env.UTTERANCE_BUCKET=envs.Bucket
     process.env.STATUS_BUCKET=envs.Bucket
     process.env.STATUS_KEY="status.json"
@@ -33,7 +43,7 @@ module.exports=Promise.method(async function(event){
         Body:JSON.stringify({})
     }).promise()
 
-    await Promise.promisify(require('../index.js').handler)(event,{})
+    await require('../index.js').handler(event,{})
     return true
 })
 

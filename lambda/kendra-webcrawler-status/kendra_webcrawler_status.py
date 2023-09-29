@@ -1,3 +1,16 @@
+######################################################################################################################
+#  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.                                                #
+#                                                                                                                    #
+#  Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance    #
+#  with the License. A copy of the License is located at                                                             #
+#                                                                                                                    #
+#      http://www.apache.org/licenses/LICENSE-2.0                                                                    #
+#                                                                                                                    #
+#  or in the 'license' file accompanying this file. This file is distributed on an 'AS IS' BASIS, WITHOUT WARRANTIES #
+#  OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions    #
+#  and limitations under the License.                                                                                #
+######################################################################################################################
+
 import os
 import json
 import boto3
@@ -8,17 +21,17 @@ client = boto3.client('kendra')
 ssm = boto3.client('ssm')
 
 
-def handler(event, context):
-    Name = os.environ.get('DATASOURCE_NAME')
+def handler(event, handler):
+    name = os.environ.get('DATASOURCE_NAME')
     settings = get_settings()
-    IndexId = settings['KENDRA_WEB_PAGE_INDEX']
+    index_id = settings['KENDRA_WEB_PAGE_INDEX']
     
-    data_source_id = get_data_source_id(IndexId, Name)
+    data_source_id = get_data_source_id(index_id, name)
 
     if data_source_id is None:
         return {"Status": 'NOTINDEXED'}
     else:
-        return kendra_list_data_source_sync_jobs(IndexId, data_source_id)
+        return kendra_list_data_source_sync_jobs(index_id, data_source_id)
 
 
 def get_settings():
@@ -40,25 +53,24 @@ def get_data_source_id(index_id, data_source_name):
         MaxResults=5
     )
 
-    # filtered = filter(lambda item: item['Name'] == data_source_name, response['SummaryItems'])
     for item in response['SummaryItems']:
         if item['Name'] == data_source_name:
             return item['Id']
     return None
 
 
-def kendra_list_data_source_sync_jobs(IndexId, data_source_id):
+def kendra_list_data_source_sync_jobs(index_id, data_source_id):
     #get information about a Kendra index data source
     response = client.describe_data_source(
         Id=data_source_id,
-        IndexId=IndexId
+        IndexId=index_id
     )
     data_source_status = response["Status"]
 
     #get information on the data sync jobs for a given data source
     response = client.list_data_source_sync_jobs(
         Id=data_source_id,
-        IndexId=IndexId
+        IndexId=index_id
     )
     # get current status by sorting the result by start time descending order
     if response['History'] != []:   #if there is data sync history

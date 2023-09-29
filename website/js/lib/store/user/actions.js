@@ -1,140 +1,150 @@
-// Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
-// SPDX-License-Identifier: Apache-2.0
+/*********************************************************************************************************************
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.                                                *
+ *                                                                                                                    *
+ *  Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance    *
+ *  with the License. A copy of the License is located at                                                             *
+ *                                                                                                                    *
+ *      http://www.apache.org/licenses/                                                                               *
+ *                                                                                                                    *
+ *  or in the 'license' file accompanying this file. This file is distributed on an 'AS IS' BASIS, WITHOUT WARRANTIES *
+ *  OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions    *
+ *  and limitations under the License.                                                                                *
+ *********************************************************************************************************************/
 
-var Promise=require('bluebird')
-var axios=require('axios')
-var jwt=require('jsonwebtoken')
-var aws=require('aws-sdk')
-var _=require('lodash')
-var set=require('vue').set
-var query=require('query-string')
+const Promise = require('bluebird');
+const axios = require('axios');
+const jwt = require('jsonwebtoken');
+const aws = require('aws-sdk');
+const _ = require('lodash');
+const { set } = require('vue');
+const query = require('query-string');
 
-module.exports={
-    refreshTokens:async function(context){
-        console.log("refreshing tokens")
-        var refresh_token=window.sessionStorage.getItem('refresh_token')
-        var endpoint=context.rootState.info._links.CognitoEndpoint.href
-        var clientId=context.rootState.info.ClientIdDesigner 
-        
+module.exports = {
+    async refreshTokens(context) {
+        console.log('refreshing tokens');
+        const refresh_token = window.sessionStorage.getItem('refresh_token');
+        const endpoint = context.rootState.info._links.CognitoEndpoint.href;
+        const clientId = context.rootState.info.ClientIdDesigner;
+
         try {
-            var tokens=await axios({
-                method:"POST",
-                url:`${endpoint}/oauth2/token`,
-                headers:{
-                    "Content-Type":'application/x-www-form-urlencoded'
+            const tokens = await axios({
+                method: 'POST',
+                url: `${endpoint}/oauth2/token`,
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
                 },
-                data:query.stringify({ 
-                    grant_type:'refresh_token',
-                    client_id:clientId,
-                    refresh_token:refresh_token
-                })
-            })
-            console.log("token",tokens)
-            window.sessionStorage.setItem('id_token',tokens.data.id_token)
-            window.sessionStorage.setItem('access_token',tokens.data.access_token)
-            window.sessionStorage.setItem('refresh_token',tokens.data.refresh_token)
-            set(context.state,'token',tokens.data.id_token)
-        }catch(e){
-            var login=_.get(context,"rootState.info._links.DesignerLogin.href")
-            var result=window.confirm("Your credentials have expired, please log back in. Click Ok to be redirected to the login page.") 
-            if(result){
-                context.dispatch('logout')  
-                window.window.location.href=login
+                data: query.stringify({
+                    grant_type: 'refresh_token',
+                    client_id: clientId,
+                    refresh_token,
+                }),
+            });
+            console.log('token', tokens);
+            window.sessionStorage.setItem('id_token', tokens.data.id_token);
+            window.sessionStorage.setItem('access_token', tokens.data.access_token);
+            window.sessionStorage.setItem('refresh_token', tokens.data.refresh_token);
+            set(context.state, 'token', tokens.data.id_token);
+        } catch (e) {
+            const login = _.get(context, 'rootState.info._links.DesignerLogin.href');
+            const result = window.confirm('Your credentials have expired, please log back in. Click Ok to be redirected to the login page.');
+            if (result) {
+                context.dispatch('logout');
+                window.window.location.href = login;
             }
         }
     },
-    getCredentials:Promise.method(async function(context){
+    getCredentials: async (context) => {
+        let credentials;
         try {
-            if(!_.get(context,'state.credentials')){
-                let credentials = await getCredentials(context)
-                return credentials
-            }else if(context.state.credentials.needsRefresh()){
-                let  credentials = await getCredentials(context)
-                return 
-            }else{
-                return context.state.credentials
+            if (!_.get(context, 'state.credentials')) {
+                credentials = await getCredentials(context);
+                return credentials;
             }
-        }catch(e){
-            console.log(e)
-            if(e.message.match('Token expired') || e.message.match('inactive')){
-                await context.dispatch('refreshTokens')     
-                return await getCredentials(context)
-            }else{
-                throw e
+            if (context.state.credentials.needsRefresh()) {
+                credentials = await getCredentials(context);
+                return credentials;
             }
+            return context.state.credentials;
+        } catch (e) {
+            console.log(e);
+            if (e.message.match('Token expired') || e.message.match('inactive')) {
+                await context.dispatch('refreshTokens');
+                return await getCredentials(context);
+            }
+            throw e;
         }
-    }),
-    logout:function(context){
-        window.sessionStorage.clear()
     },
-    login:async function(context){
-        aws.config.region=context.rootState.info.region
-        
-        var id_token=window.sessionStorage.getItem('id_token')
-            
-        if(id_token && id_token!=="undefined"){
-            var token=jwt.decode(id_token)
-            set(context.state,'token',id_token)
-        }else{
-            var code=query.parse(window.location.search).code
-            var token=jwt.decode(await getTokens(context,code))
+    logout(context) {
+        window.sessionStorage.clear();
+    },
+    async login(context) {
+        aws.config.region = context.rootState.info.region;
+
+        const id_token = window.sessionStorage.getItem('id_token');
+        let token;
+        if (id_token && id_token !== 'undefined') {
+            token = jwt.decode(id_token);
+            set(context.state, 'token', id_token);
+        } else {
+            const { code } = query.parse(window.location.search);
+            token = jwt.decode(await getTokens(context, code));
         }
-        
-        set(context.state,'name',token["cognito:username"])
-        set(context.state,'groups',token["cognito:groups"])
-        
-        if(!context.state.groups || !context.state.groups.includes('Admins')){
-            var login=_.get(context.rootState,"info._links.DesignerLogin.href")
-            window.alert("You must be an administrative user to view this page") 
-            window.window.location.href=login
+
+        set(context.state, 'name', token['cognito:username']);
+        set(context.state, 'groups', token['cognito:groups']);
+
+        if (!context.state.groups || !context.state.groups.includes('Admins')) {
+            const login = _.get(context.rootState, 'info._links.DesignerLogin.href');
+            window.alert('You must be an administrative user to view this page');
+            window.window.location.href = login;
         }
-    }
-}
-async function getCredentials(context){
-    var Logins={}
+    },
+};
+async function getCredentials(context) {
+    const Logins = {};
     Logins[[
         'cognito-idp.',
         context.rootState.info.region,
         '.amazonaws.com/',
         context.rootState.info.UserPool,
-        ].join('')]=context.state.token
-    
-    set(context.state,"credentials",new aws.CognitoIdentityCredentials({
-        IdentityPoolId:context.rootState.info.PoolId,
-        RoleSessionName:context.state.name,
-        Logins
-    }))
-    await context.state.credentials.getPromise()
-    return context.state.credentials
+    ].join('')] = context.state.token;
+
+    set(context.state, 'credentials', new aws.CognitoIdentityCredentials({
+        IdentityPoolId: context.rootState.info.PoolId,
+        RoleSessionName: context.state.name,
+        Logins,
+    }));
+    await context.state.credentials.getPromise();
+    return context.state.credentials;
 }
-async function getTokens(context,code){
-    var endpoint=context.rootState.info._links.CognitoEndpoint.href
-    var clientId=context.rootState.info.ClientIdDesigner 
+async function getTokens(context, code) {
+    const endpoint = context.rootState.info._links.CognitoEndpoint.href;
+    const clientId = context.rootState.info.ClientIdDesigner;
     try {
-        var tokens=await axios({
-            method:'POST',
-            url:`${endpoint}/oauth2/token`,
-            headers:{
-                "Content-Type":'application/x-www-form-urlencoded'
+        const tokens = await axios({
+            method: 'POST',
+            url: `${endpoint}/oauth2/token`,
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
             },
-            data:query.stringify({
-                grant_type:'authorization_code',
-                client_id:clientId,
-                code:code,
-                redirect_uri:window.location.origin+window.location.pathname
-            })
-        })
-        window.sessionStorage.setItem('id_token',tokens.data.id_token)
-        window.sessionStorage.setItem('access_token',tokens.data.access_token)
-        window.sessionStorage.setItem('refresh_token',tokens.data.refresh_token)
-        set(context.state,'token',tokens.data.id_token)
-        return tokens.data.id_token 
-    }catch(e){
-        var login=_.get(context,"rootState.info._links.DesignerLogin.href")
-        var result=window.confirm("Unable to fetch credentials, please log back in. Click Ok to be redirected to the login page.") 
-        if(result){
-            context.dispatch('logout')  
-            window.window.location.href=login
+            data: query.stringify({
+                grant_type: 'authorization_code',
+                client_id: clientId,
+                code,
+                redirect_uri: window.location.origin + window.location.pathname,
+            }),
+        });
+        window.sessionStorage.setItem('id_token', tokens.data.id_token);
+        window.sessionStorage.setItem('access_token', tokens.data.access_token);
+        window.sessionStorage.setItem('refresh_token', tokens.data.refresh_token);
+        set(context.state, 'token', tokens.data.id_token);
+        return tokens.data.id_token;
+    } catch (e) {
+        const login = _.get(context, 'rootState.info._links.DesignerLogin.href');
+        const result = window.confirm('Unable to fetch credentials, please log back in. Click Ok to be redirected to the login page.');
+        if (result) {
+            context.dispatch('logout');
+            window.window.location.href = login;
         }
     }
 }

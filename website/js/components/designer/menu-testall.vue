@@ -1,5 +1,17 @@
+/*********************************************************************************************************************
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.                                                *
+ *                                                                                                                    *
+ *  Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance    *
+ *  with the License. A copy of the License is located at                                                             *
+ *                                                                                                                    *
+ *      http://www.apache.org/licenses/                                                                               *
+ *                                                                                                                    *
+ *  or in the 'license' file accompanying this file. This file is distributed on an 'AS IS' BASIS, WITHOUT WARRANTIES *
+ *  OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions    *
+ *  and limitations under the License.                                                                                *
+ *********************************************************************************************************************/
 <template lang="pug">
-  v-container(column grid-list-md)
+v-container(column grid-list-md)
     v-layout(row)
       v-flex(xs5)
         v-text-field(
@@ -51,15 +63,11 @@
 </template>
 
 <script>
-/*
-Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
-SPDX-License-Identifier: Apache-2.0
-*/
 
-var Vuex=require('vuex')
-var saveAs=require('file-saver').saveAs
-var Promise=require('bluebird')
-var _=require('lodash');
+const Vuex=require('vuex')
+const saveAs=require('file-saver').saveAs
+const Promise=require('bluebird')
+const _=require('lodash');
 
 import modal from './modal.vue';
 import { EventBus } from './event-bus.js';
@@ -67,7 +75,6 @@ import { EventBus } from './event-bus.js';
 module.exports={
 
 data:function(){
-    var self=this
     return {
         isModalVisible:false,
         loading:false,
@@ -126,17 +133,17 @@ data:function(){
           return [year, month, day, hours, minutes, milliseconds].join('-');
       },
       refresh:async function(){
-          var self=this
-          var testalls=await this.$store.dispatch('api/listTestAll');
+          const self=this
+          const testalls=await this.$store.dispatch('api/listTestAll');
           this.testjobs=testalls.jobs;
           this.testjobs.map(async (job,index,coll)=>{
-              var info=await this.$store.dispatch('api/getTestAll',job)
-              var out={}
+              const info=await this.$store.dispatch('api/getTestAll',job)
+              const out={}
               Object.assign(out,coll[index],info)
               coll.splice(index,1,out)
               poll()
               async function poll(){
-                  var status=await self.$store.dispatch('api/getTestAll',job)
+                  const status=await self.$store.dispatch('api/getTestAll',job)
                   Object.assign(out,coll[index],status)
                   if(status.status!=="Completed" && status.status!=="Error"){
                       setTimeout(()=>poll(),1000)
@@ -145,7 +152,6 @@ data:function(){
           })
       },
       start:async function(){
-          var self=this
           try{
               const now = new Date();
               const usableFilename = ( (this.filename && this.filename.length > 0) ? this.filename : 'TestAll');
@@ -158,7 +164,6 @@ data:function(){
               await this.refresh()
           }catch(e){
               this.error=err
-          }finally{
           }
       },
       remove:async function(index){
@@ -166,30 +171,25 @@ data:function(){
           await this.refresh()
       },
       download:async function(index){
-          var raw=await this.$store.dispatch('api/downloadTestAll',this.testjobs[index])
-          var blob = new Blob(
+          const raw=await this.$store.dispatch('api/downloadTestAll',this.testjobs[index])
+          const blob = new Blob(
               [raw],
               {type: "text/plain;charset=utf-8"}
           );
-          var name=this.testjobs[index].id
+          const name=this.testjobs[index].id
           return Promise.resolve(saveAs(blob,name))
       },
       quickview:async function(index){
-          var raw=await this.$store.dispatch('api/downloadTestAll',this.testjobs[index])
-          var blob = new Blob(
-              [raw],
-              {type: "text/plain;charset=utf-8"}
-          );
-          var name=this.testjobs[index].id;
+          const raw=await this.$store.dispatch('api/downloadTestAll',this.testjobs[index])
           const rows = raw.split('\n');
           const dataRows=[];
           for (let idx=1; idx<rows.length; idx++) {
               if (rows[idx].length>0) {
-                  let currentRow = rows[idx].split(',');
+                  const currentRow = rows[idx].split(',');
                   if (currentRow.length > 6) {
                       // handle case where ',' appears in last column and join into a single column'
-                      let revisedRow = currentRow.slice(0,5);
-                      let additions = currentRow.slice(5);
+                      const revisedRow = currentRow.slice(0,5);
+                      const additions = currentRow.slice(5);
                       revisedRow.push(additions.join(","));
                       dataRows.push(revisedRow);
                   } else {

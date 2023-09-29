@@ -1,0 +1,54 @@
+/*********************************************************************************************************************
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.                                                *
+ *                                                                                                                    *
+ *  Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance    *
+ *  with the License. A copy of the License is located at                                                             *
+ *                                                                                                                    *
+ *      http://www.apache.org/licenses/                                                                               *
+ *                                                                                                                    *
+ *  or in the 'license' file accompanying this file. This file is distributed on an 'AS IS' BASIS, WITHOUT WARRANTIES *
+ *  OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions    *
+ *  and limitations under the License.                                                                                *
+ *********************************************************************************************************************/
+
+const _ = require('lodash');
+const qnabot = require('qnabot/logging');
+const kendra = require('../kendraQuery');
+
+async function runKendraQuery(req, query_params) {
+    qnabot.log(`Querying Kendra FAQ index: ${_.get(req, '_settings.KENDRA_FAQ_INDEX')}`);
+    // calls kendraQuery function which duplicates KendraFallback code, but only searches through FAQs
+    const request_params = {
+        kendra_faq_index: _.get(req, '_settings.KENDRA_FAQ_INDEX'),
+        maxRetries: _.get(req, '_settings.KENDRA_FAQ_CONFIG_MAX_RETRIES'),
+        retryDelay: _.get(req, '_settings.KENDRA_FAQ_CONFIG_RETRY_DELAY'),
+        minimum_score: _.get(req, '_settings.ALT_SEARCH_KENDRA_FAQ_CONFIDENCE_SCORE'),
+        size: 1,
+        question: query_params.question,
+        es_address: req._info.es.address,
+        es_path: `/${req._info.es.index}/_search?search_type=dfs_query_then_fetch`,
+    };
+
+    // optimize kendra queries for throttling by checking if KendraFallback idxs include KendraFAQIndex
+    let alt_kendra_idxs = _.get(req, '_settings.ALT_SEARCH_KENDRA_INDEXES');
+    if (alt_kendra_idxs && alt_kendra_idxs.length) {
+        try {
+            // parse JSON array of kendra indexes
+            alt_kendra_idxs = JSON.parse(alt_kendra_idxs);
+        } catch (err) {
+            // assume setting is a string containing single index
+            alt_kendra_idxs = [alt_kendra_idxs];
+        }
+    }
+    if (alt_kendra_idxs.includes(request_params.kendra_faq_index)) {
+        qnabot.debug('optimizing for KendraFallback');
+        request_params.same_index = true;
+    }
+
+    const kendra_response = await kendra.handler(request_params);
+    if (_.get(kendra_response, 'hits.hits[0]._source')) {
+        _.set(kendra_response, 'hits.hits[0]._source.answersource', 'Kendra FAQ');
+    }
+    return kendra_response;
+}
+exports.runKendraQuery = runKendraQuery;

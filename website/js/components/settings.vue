@@ -1,5 +1,17 @@
+/*********************************************************************************************************************
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.                                                *
+ *                                                                                                                    *
+ *  Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance    *
+ *  with the License. A copy of the License is located at                                                             *
+ *                                                                                                                    *
+ *      http://www.apache.org/licenses/                                                                               *
+ *                                                                                                                    *
+ *  or in the 'license' file accompanying this file. This file is distributed on an 'AS IS' BASIS, WITHOUT WARRANTIES *
+ *  OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions    *
+ *  and limitations under the License.                                                                                *
+ *********************************************************************************************************************/
 <template lang='pug'>
-  v-container(grid-list-md)
+v-container(grid-list-md)
     v-dialog(v-model="showAlert" scrollable width="auto")
         v-card(id="error-modal")
           v-card-title(primary-title) {{alertTitle}}
@@ -44,15 +56,12 @@
 </template>
 
 <script>
-// Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
-// SPDX-License-Identifier: Apache-2.0
-var Vuex = require('vuex')
-var Promise = require('bluebird')
-var _ = require('lodash')
+const Vuex = require('vuex')
+const Promise = require('bluebird')
+const _ = require('lodash')
 
 module.exports = {
     data: function () {
-        var self = this
         return {
             showAddModal: false,
             mergedSettings: {},
@@ -76,19 +85,19 @@ module.exports = {
 
         _get_custom_settings: function(){
             // update current customSettings with new values from settingsHolder
-            for (let key in this.customSettings) {
+            for (const key in this.customSettings) {
                 this.customSettings[key] = this.settingsHolder[key];
             }
 
             // place in customSettings any differences from defaultSettings
-            for (let key in this.settingsHolder) {
+            for (const key in this.settingsHolder) {
                 if (this.settingsHolder[key] !== this.defaultSettings[key]) {
                     this.customSettings[key] = this.settingsHolder[key];
                 }
             }
 
             // remove any custom settings that are identical to default settings
-            for (let key in this.customSettings) {
+            for (const key in this.customSettings) {
                 if (this.customSettings[key] === this.defaultSettings[key]) {
                     delete this.customSettings[key];
                 }
@@ -105,7 +114,7 @@ module.exports = {
                 this.settingsHolder = _.clone(settings[2]);
         },
         SaveSettings: async function () {
-            var cloned_custom = this._get_custom_settings()
+            const cloned_custom = this._get_custom_settings()
             await this._save_settings(cloned_custom)
             this.showAlert = true;
             this.alertMessage = "Successfully saved settings!"
@@ -116,7 +125,7 @@ module.exports = {
         _save_settings:async function(settings){
             settings = Object.assign(settings,this.customSettings)
             console.log("settings " + JSON.stringify(settings))
-            let response = await this.$store.dispatch('api/updateSettings', settings);
+            const response = await this.$store.dispatch('api/updateSettings', settings);
             if (response) {
                 window.scrollTo(0, 0);
             }
@@ -124,7 +133,6 @@ module.exports = {
         onFilePicked:function (event) {
                console.log("onFilePicked")
                 const files = event.target.files
-                let filename = files[0].name
                 const fileReader = new FileReader()
                 fileReader.addEventListener('loadend', (event) => {
                     console.log(event.target.result)
@@ -161,18 +169,18 @@ module.exports = {
             };
           })(),
         ExportSettings: function(){
-            var settings = this._get_custom_settings()
+            const settings = this._get_custom_settings()
             this.downloadBlobAsFile(new Blob(
                   [JSON.stringify(settings)],
                   {type: "text/json"}
               ), "settings.json");
             this.showAlert = true;
-            this.alertMessage = "Successfully exported settings.",
+            this.alertMessage = "Successfully exported settings.";
             this.alertTitle = "Success"
         },
         resetToDefaults: async function () {
-            let customOverride = {};
-            let response = await this.$store.dispatch('api/updateSettings', customOverride);
+            const customOverride = {};
+            const response = await this.$store.dispatch('api/updateSettings', customOverride);
             if (response) {
                 this.customSettings = {};
                 this.settingsHolder = _.clone(this.defaultSettings);

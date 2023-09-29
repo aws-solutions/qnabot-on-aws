@@ -6,7 +6,7 @@ module.exports = {
     env: {
         node: true
     },
-    extends: ['eslint:recommended'],
+    extends: ['eslint:recommended', 'plugin:vue/recommended', 'airbnb-base'],
     rules: {
         indent: ['warn', 4],
         quotes: ['warn', 'single']

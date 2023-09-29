@@ -20,7 +20,7 @@
                 >
                     <slot name="body">
                         <div class="tablebody">
-                            <table class="modaltable">
+                            <table aria-label="testAllTable" class="modaltable">
                                 <tr class="modalrow">
                                     <th class="modalheader" v-for="item in tableHeader">{{ item }}</th>
                                 </tr>
@@ -93,7 +93,6 @@
     }
 
     .modaltable {
-        align: center;
         margin: auto;
         background-color: lightgrey;
     }

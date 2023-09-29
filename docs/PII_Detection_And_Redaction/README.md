@@ -1,10 +1,10 @@
-# Personally Identifiable Information Rejection and redaction
+# Personally Identifiable Information (PII) Rejection and Redaction
 
 QnABot can now detect and redact Personally Identifiable Information (PII) using [Amazon Comprehend](https://docs.aws.amazon.com/comprehend/latest/dg/how-pii.html) and regular expressions.
 
-If ENABLE_REDACTION is set to "true", the Comprehend detected PII entities will also be redacted from Amazon CloudWatch logs and Amazon Opensearch logs.
+If ENABLE_REDACTING is set to "true", the Comprehend detected PII entities will also be redacted from Amazon CloudWatch logs and Amazon Opensearch logs.
 
-![settings image](./settings.png)
+![settings image](./images/settings.png)
 
 |Setting | Type of Value | Description |
 --------|---------------|-------------|

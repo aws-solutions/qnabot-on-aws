@@ -1,5 +1,17 @@
+/*********************************************************************************************************************
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.                                                *
+ *                                                                                                                    *
+ *  Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance    *
+ *  with the License. A copy of the License is located at                                                             *
+ *                                                                                                                    *
+ *      http://www.apache.org/licenses/                                                                               *
+ *                                                                                                                    *
+ *  or in the 'license' file accompanying this file. This file is distributed on an 'AS IS' BASIS, WITHOUT WARRANTIES *
+ *  OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions    *
+ *  and limitations under the License.                                                                                *
+ *********************************************************************************************************************/
 <template lang='pug'>
-  v-container(column grid-list-md)
+v-container(column grid-list-md)
     v-layout(column)
       v-flex
         v-card
@@ -39,18 +51,15 @@
 </template>
 
 <script>
-// Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
-// SPDX-License-Identifier: Apache-2.0
 
-var Vuex=require('vuex')
-var Promise=require('bluebird')
-var saveAs=require('file-saver').saveAs
-var axios=require('axios')
-var _=require('lodash')
+const Vuex=require('vuex')
+const Promise=require('bluebird')
+const saveAs=require('file-saver').saveAs
+const axios=require('axios')
+const _=require('lodash')
 
 module.exports={
   data:function(){
-    var self=this
     return {
       loading:false,
       error:"",
@@ -68,17 +77,17 @@ module.exports={
   },
   methods:{
     refresh:async function(){
-      var self=this
-      var exports=await this.$store.dispatch('api/listExports')
+      const self=this
+      const exports=await this.$store.dispatch('api/listExports')
       this.exports=exports.jobs
       this.exports.map(async (job,index,coll)=>{
-        var info=await this.$store.dispatch('api/getExport',job)
-        var out={}
+        const info=await this.$store.dispatch('api/getExport',job)
+        const out={}
         Object.assign(out,coll[index],info)
         coll.splice(index,1,out)
         poll()
         async function poll(){
-          var status=await self.$store.dispatch('api/getExport',job)
+          const status=await self.$store.dispatch('api/getExport',job)
           Object.assign(out,coll[index],status)
           console.log(status.status)
           if(status.status!=="Completed" && status.status!=="Error" && status.status!='Sync Complete'){
@@ -88,7 +97,6 @@ module.exports={
       })
     },
     start:async function(){
-      var self=this
       try{
         await this.$store.dispatch('api/startExport',{
           name:this.filename,
@@ -97,7 +105,6 @@ module.exports={
         await this.refresh()
       }catch(e){
         this.error=e
-      }finally{
       }
     },
     remove:async function(index){
@@ -105,12 +112,12 @@ module.exports={
       await this.refresh()
     },
     download:async function(index){
-      var raw=await this.$store.dispatch('api/downloadExport',this.exports[index])
-      var blob = new Blob(
+      const raw=await this.$store.dispatch('api/downloadExport',this.exports[index])
+      const blob = new Blob(
         [JSON.stringify(JSON.parse(raw),null,2)], 
         {type: "text/plain;charset=utf-8"}
       );
-      var name=this.exports[index].id
+      const name=this.exports[index].id
       return Promise.resolve(saveAs(blob,name))
     }
   }
