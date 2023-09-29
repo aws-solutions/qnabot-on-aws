@@ -8,7 +8,7 @@ The most straightforward method to run the commands below is via [AWS CloudShell
 
 Log into the AWS Console and click on the Cloudshell icon.
 
-![CloudShell](./cloudshell.png)
+![CloudShell](./images/cloudshell.png)
 
 ## Creating the AWS Cloud9 environment
 
@@ -70,18 +70,18 @@ aws ec2 modify-volume --size 25 --volume-id $VOLUME_ID
 aws ec2 reboot-instances --instance-ids $INSTANCE_ID 
 ```
 
-## Install Node v12 and the latest version of npm
+## Install Node v18 and the latest version of npm
 
 Log into your AWS Account and go to [AWS Cloud 9 Service home page](https://console.aws.amazon.com/cloud9/home#). Choose "Open IDE".
 
-QnABot requires [Node v12](https://nodejs.org/en/about/releases/) and npm 7.  
+QnABot requires [Node v18](https://nodejs.org/en/about/releases/) and npm 8.  
 
-Check to see which version of Node installed by typing ```node -v``` in the terminal.  If the version is not 12, type the folowing commands
+Check to see which version of Node installed by typing ```node -v``` in the terminal.  If the version is not 18, type the folowing commands
 
 ```bash
 sudo yum -y update
 curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.0/install.sh | bash        
-nvm install v12
+nvm install v18
 ```
 
 And now install the latest version of [npm](https://www.npmjs.com/).

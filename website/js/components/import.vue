@@ -1,8 +1,15 @@
-<!--
-    Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
-    SPDX-License-Identifier: Apache-2.0
- -->
-
+/*********************************************************************************************************************
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.                                                *
+ *                                                                                                                    *
+ *  Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance    *
+ *  with the License. A copy of the License is located at                                                             *
+ *                                                                                                                    *
+ *      http://www.apache.org/licenses/                                                                               *
+ *                                                                                                                    *
+ *  or in the 'license' file accompanying this file. This file is distributed on an 'AS IS' BASIS, WITHOUT WARRANTIES *
+ *  OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions    *
+ *  and limitations under the License.                                                                                *
+ *********************************************************************************************************************/
 <template lang='pug'>
 span.wrapper
     v-dialog(v-model='error', scrollable, width='auto')
@@ -169,10 +176,10 @@ module.exports = {
         Getfile: function (event) {
             const self = this;
             this.loading = true;
-            const files_raw = self.$refs.file.files;
+            const rawFiles = self.$refs.file.files;
             const files = [];
-            for (let i = 0; i < files_raw.length; i++) {
-                files.push(files_raw[i]);
+            for (const rawFile of rawFiles) {
+                files.push(rawFile);
             }
             Promise.all(
                 files.map((file) => {
@@ -243,7 +250,7 @@ module.exports = {
             if (data) {
                 new Promise(function (res, rej) {
                     if (data.qna.length) {
-                        var id = name.replace(/[^a-zA-Z0-9-_\.]/g, ''); //removes all non URL safe characters
+                        const id = name.replace(/[^a-zA-Z0-9-_\.]/g, ''); //removes all non URL safe characters
                         self.$store
                             .dispatch('api/startImport', {
                                 qa: data.qna,
@@ -272,7 +279,7 @@ module.exports = {
             }
         },
         addError: function (error) {
-            if (this.errorMsg == true) {
+            if (this.errorMsg) {
                 //The error dialog has already been shown. Clear the errorList
                 this.errorList = [];
                 this.errorMsg = false;
@@ -280,18 +287,18 @@ module.exports = {
             this.errorList.push(error);
         },
         parseMultivalueFields: function (question, fieldType, arrayMapping, dstField) {
-            var i = 0;
-            let self = this;
+            let i = 0;
+            const self = this;
             let keepProcessing = true;
             while (keepProcessing) {
                 i++;
                 //Validate all of the required fields are available for this entry -- ie sessionAttributeName1,sessionValue1
                 let foundColumn = undefined;
 
-                for (let element of arrayMapping) {
+                for (const element of arrayMapping) {
                     console.log('Processing ', element);
                     console.log("Processing question ",question)
-                    let xlsColumnName = `${element.xlsFieldname}${i}`;
+                    const xlsColumnName = `${element.xlsFieldname}${i}`;
                     console.log(`Value of ${xlsColumnName} is ${question[xlsColumnName]}`);
 
                     if (question[xlsColumnName] == undefined) {
@@ -312,9 +319,9 @@ module.exports = {
                 if (!keepProcessing) {
                     break;
                 }
-                let fmtField = {};
-                for (let element of arrayMapping) {
-                    let xlsColumnName = `${element.xlsFieldname}${i}`;
+                const fmtField = {};
+                for (const element of arrayMapping) {
+                    const xlsColumnName = `${element.xlsFieldname}${i}`;
                     let xlsColumnValue = question[xlsColumnName] !== undefined ? question[xlsColumnName] : element.default;
                     console.log(`Value2 of ${xlsColumnName} is ${xlsColumnValue}`);
 
@@ -340,7 +347,7 @@ module.exports = {
         parse: async function (content) {
             //this headermap enabled customers to more conveniently
             //map some of the more common fields using a 'friendly' name
-            let headerMapping = {
+            const headerMapping = {
                 question: 'q',
                 topic: 't',
                 markdown: 'alt.markdown',
@@ -348,20 +355,20 @@ module.exports = {
                 'Answer': 'a',
                 ssml: 'alt.ssml'
             };
-            let self = this;
+            const self = this;
             try {
                 const enc = new TextDecoder('utf-8');
-                let jsonText = enc.decode(new Uint8Array((content)));
+                const jsonText = enc.decode(new Uint8Array((content)));
                 return Promise.resolve(parseJson(jsonText));
             } catch (err) {
                 try {
                     console.log('File is not a valid JSON file. Trying to parse as CSV file');
-                    let sheetNames = await XLSX.readSheetNames(content)
-                    var valid_questions = [];
-                    for(let i = 0; i < sheetNames.length; i++){
+                    const sheetNames = await XLSX.readSheetNames(content)
+                    const valid_questions = [];
+                    for(const sheetName of sheetNames){
                         // Here is your object
-                        let rows = await XLSX.default(content, {sheet: sheetNames[i]})
-                        let headerRow = rows.shift()
+                        const rows = await XLSX.default(content, {sheet: sheetName})
+                        const headerRow = rows.shift()
                         let excelRowNumber = 1; //excel sheets start at index 1, which for us is the header
                         rows.forEach((question) => {
                             console.log('Processing ' + JSON.stringify(question));
@@ -369,7 +376,7 @@ module.exports = {
 
                             //first let's remap the current row entry from an index array
                             //to a key value map for easier processing
-                            let questionMap = {}
+                            const questionMap = {}
                             for(let j = 0; j < headerRow.length; j++){
                                 questionMap[headerRow[j]] = question[j]
                             }
@@ -378,7 +385,7 @@ module.exports = {
                             //let's try and map a couple friendly column names into their
                             //actual property names using the header mapping (e.g. 'topic' to 't')
                             for (const property in headerMapping) {
-                                let dest_property = headerMapping[property];
+                                const dest_property = headerMapping[property];
                                 if (question[dest_property] == undefined) {
                                     console.log('Assigning value for ' + dest_property);
                                     _.set(question, dest_property, question[property]);
@@ -393,7 +400,7 @@ module.exports = {
                             while (true) {
                                 //users can import multiple utterances, be appending sequential numbers to
                                 //the column 'question', e.g. question8
-                                var userQuestion = question['question' + counter];
+                                const userQuestion = question['question' + counter];
                                 if(!userQuestion) {
                                     //break on the first instance of missing question number. For example,
                                     //if user has question1 and question3 in their excel file, but no question2
@@ -486,9 +493,9 @@ module.exports = {
                             //properties with a '.' should be treated as nested properties
                             //let's set any that we find into their proper destination within the object
                             //e.g. 'botRouting.specialty_bot' ==> 'botRouting': { 'specialty_bot': value }
-                            for (let property in question) {
+                            for (const property in question) {
                                 if (property.includes('.')) {
-                                    let value = question[property]
+                                    const value = question[property]
                                     //need to delete the property first to ensure lodash treats the property
                                     //variable as a path, and not just as a string key
                                     delete question[property];

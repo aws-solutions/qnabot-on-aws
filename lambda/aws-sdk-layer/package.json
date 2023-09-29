@@ -1,7 +1,7 @@
 {
     "name": "aws-layer",
-    "version": "1.0.0",
-    "description": "",
+    "version": "5.4.2",
+    "description": "QnABot Lambda aws-sdk-layer",
     "main": "index.js",
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1"

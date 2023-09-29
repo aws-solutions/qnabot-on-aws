@@ -1,23 +1,41 @@
-const aws=require('./aws')
-const s3=new aws.S3()
+/*********************************************************************************************************************
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.                                                *
+ *                                                                                                                    *
+ *  Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance    *
+ *  with the License. A copy of the License is located at                                                             *
+ *                                                                                                                    *
+ *      http://www.apache.org/licenses/                                                                               *
+ *                                                                                                                    *
+ *  or in the 'license' file accompanying this file. This file is distributed on an 'AS IS' BASIS, WITHOUT WARRANTIES *
+ *  OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions    *
+ *  and limitations under the License.                                                                                *
+ *********************************************************************************************************************/
 
-var bucket=process.env.STATUS_BUCKET;
-var lexV1StatusFile=process.env.STATUS_KEY;
+const aws = require('./aws');
+
+const s3 = new aws.S3();
+
+const bucket=process.env.STATUS_BUCKET;
+const lexV1StatusFile=process.env.STATUS_KEY;
     
-module.exports=function(status,message){
-    return s3.getObject({
-        Bucket:bucket,
-        Key:lexV1StatusFile,
-    }).promise()
-    .then(x=>JSON.parse(x.Body.toString()))
-    .then(result=>{
+module.exports=async function(status,message){
+    try {
+        const res = await s3.getObject({
+            Bucket:bucket,
+            Key:lexV1StatusFile,
+        }).promise()
+        const result = JSON.parse(res.Body.toString())
         if(message) result.message=message;
         result.status=status;
         console.log(result);
-        return s3.putObject({
+        await s3.putObject({
             Bucket:bucket,
             Key:lexV1StatusFile,
             Body:JSON.stringify(result)
         }).promise();
-    });
+        
+    } catch (error) {
+        console.error("An error occured in statusv1: ", error)
+        throw new Error(error)
+    }
 };

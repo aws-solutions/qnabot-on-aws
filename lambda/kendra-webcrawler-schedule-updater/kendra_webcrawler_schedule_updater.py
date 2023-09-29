@@ -1,3 +1,16 @@
+######################################################################################################################
+#  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.                                                #
+#                                                                                                                    #
+#  Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance    #
+#  with the License. A copy of the License is located at                                                             #
+#                                                                                                                    #
+#      http://www.apache.org/licenses/LICENSE-2.0                                                                    #
+#                                                                                                                    #
+#  or in the 'license' file accompanying this file. This file is distributed on an 'AS IS' BASIS, WITHOUT WARRANTIES #
+#  OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions    #
+#  and limitations under the License.                                                                                #
+######################################################################################################################
+
 import os
 import json
 import boto3
@@ -9,7 +22,8 @@ import logging
 kendra = boto3.client('kendra')
 ssm = boto3.client('ssm')
 cloudwatch = boto3.client('cloudwatch')
-logger = logging.getLogger().setLevel(logging.INFO)
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
 
 
 def create_cron_expression(schedule):
@@ -55,12 +69,12 @@ def create_cron_expression(schedule):
 
 def handler(event, context):
     logger.info(event)
-    Name = os.environ.get('DATASOURCE_NAME')
-    RoleArn = os.environ.get('ROLE_ARN')
+    name = os.environ.get('DATASOURCE_NAME')
+    role_arn = os.environ.get('ROLE_ARN')
 
     settings = get_settings()
-    IndexId = settings['KENDRA_WEB_PAGE_INDEX']
-    URLs = settings['KENDRA_INDEXER_URLS'].replace(' ', '').split(',')
+    index_id = settings['KENDRA_WEB_PAGE_INDEX']
+    urls = settings['KENDRA_INDEXER_URLS'].replace(' ', '').split(',')
     schedule = settings["KENDRA_INDEXER_SCHEDULE"]
     crawler_mode = settings["KENDRA_INDEXER_CRAWL_MODE"].upper()
     crawl_depth = settings["KENDRA_INDEXER_CRAWL_DEPTH"]
@@ -70,8 +84,8 @@ def handler(event, context):
         logger.warn("The cron schedule specified by KENDRA_INDEXER_SCHEDULE " +
                      "is invalid. Schedule: ${schedule}. Crawling will not be done on a schedule/")
         schedule = ""      
-    data_source_id = get_data_source_id(IndexId, Name)
-    current_schedule = get_data_source_schedule(IndexId, data_source_id)
+    data_source_id = get_data_source_id(index_id, name)
+    current_schedule = get_data_source_schedule(index_id, data_source_id)
 
     schedule_parts = schedule.replace("cron(", "").replace(")", "").split(" ")
     current_schedule_parts = current_schedule.replace("cron(", "").replace(")", "").split(" ")
@@ -85,9 +99,9 @@ def handler(event, context):
         schedule = current_schedule
 
     logger.info("Updating index with schedule " + schedule + " crawl_depth" + crawl_depth)
-    kendra_update_data_source(IndexId, data_source_id, URLs, RoleArn, schedule, crawler_mode, crawl_depth)
+    kendra_update_data_source(index_id, data_source_id, urls, role_arn, schedule, crawler_mode, crawl_depth)
 
-    return {"IndexId": IndexId, "DataSourceId": data_source_id}
+    return {"IndexId": index_id, "DataSourceId": data_source_id}
 
 
 def get_settings():
@@ -107,30 +121,28 @@ def get_data_source_id(index_id, data_source_name):
         IndexId=index_id,
         MaxResults=5
     )
-
-    # filtered = filter(lambda item: item['Name'] == data_source_name, response['SummaryItems'])
     for item in response['SummaryItems']:
         if item['Name'] == data_source_name:
             return item['Id']
     return None
 
 
-def get_data_source_schedule(IndexId, datasource_id):
-    response = kendra.describe_data_source(Id=datasource_id, IndexId=IndexId)
+def get_data_source_schedule(index_id, datasource_id):
+    response = kendra.describe_data_source(Id=datasource_id, IndexId=index_id)
     return response["Schedule"]
 
 
-def kendra_update_data_source(IndexId, data_source_id, URLs, RoleArn, schedule, crawler_mode, crawl_depth):
+def kendra_update_data_source(index_id, data_source_id, urls, role_arn, schedule, crawler_mode, crawl_depth):
     response = kendra.update_data_source(
         Id=data_source_id,
-        RoleArn=RoleArn,
+        RoleArn=role_arn,
         Schedule=schedule,
-        IndexId=IndexId,
+        IndexId=index_id,
         Configuration={
             'WebCrawlerConfiguration': {
                 'Urls': {
                     'SeedUrlConfiguration': {
-                        'SeedUrls': URLs,
+                        'SeedUrls': urls,
                         'WebCrawlerMode': crawler_mode
                     }
                 },

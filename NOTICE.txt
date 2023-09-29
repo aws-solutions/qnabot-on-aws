@@ -20,6 +20,9 @@ This software includes third party software subject to the following copyrights:
 @babel/plugin-transform-runtime under the Massachusetts Institute of Technology (MIT) license
 @babel/preset-env under the Massachusetts Institute of Technology (MIT) license
 @babel/preset-stage-2 under the Massachusetts Institute of Technology (MIT) license
+@fontsource/material-icons under the Apache License Version 2.0
+@fontsource/roboto under the Apache License Version 2.0
+@fontsource/varela-round under the Open Font License (OFL) 1.1
 ajv under the Massachusetts Institute of Technology (MIT) license
 alexa-sdk under the Apache License Version 2.0
 arrow under the Apache License Version 2.0
@@ -61,6 +64,7 @@ elasticsearch under the Apache License Version 2.0
 exports-loader under the Massachusetts Institute of Technology (MIT) license
 express under the Massachusetts Institute of Technology (MIT) license
 faker under the Massachusetts Institute of Technology (MIT) license
+file-loader under the Massachusetts Institute of Technology (MIT) license
 file-saver under the Massachusetts Institute of Technology (MIT) license
 filelock under the Unlicense license
 handlebars under the Massachusetts Institute of Technology (MIT) license
@@ -144,3 +148,6 @@ webpack-cli under the Massachusetts Institute of Technology (MIT) license
 webpack-dev-server under the Massachusetts Institute of Technology (MIT) license
 webpack-merge under the Massachusetts Institute of Technology (MIT) license
 webpack-s3-plugin under the Massachusetts Institute of Technology (MIT) license
+typing_extensions under Python Software Foundation License
+boolean.py under BSD-2-Clause
+license-expression under Apache License Version 2.0

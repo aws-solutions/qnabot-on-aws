@@ -204,7 +204,7 @@
       "t": "QnABot",
       "alt": {
         "markdown": "# QnaBot\nThe Q and A Bot uses [Amazon Lex](https://aws.amazon.com/lex) and [Alexa](https://developer.amazon.com/alexa) to provide a natural language interface for your FAQ knowledge base. Now your users can just ask a *question* and get a quick and relevant *answer*.",
-        "ssml": "<speak>QnABot is <emphasis level=\"strong\">great</emphasis>. But I want to tell you a secret. <amazon:effect name=\"whispered\">I am not a real human.</amazon:effect>. Can you believe it? </speak>"
+        "ssml": "<speak>AWS <sub alias=\"Q and A\">QnA</sub> Bot is <amazon:effect name=\"drc\">great</amazon:effect>. <sub alias=\"Q and A\">QnA</sub> Bot supports <sub alias=\"Speech Synthesis Markup Language\">SSML</sub> using Polly's neural voice. <prosody rate=\"150%\">I can speak very fast</prosody>, <prosody rate=\"75%\">or very slowly</prosody>. <prosody volume=\"-16dB\">I can speak quietly</prosody>, <amazon:effect name=\"drc\">or speak loud and clear</amazon:effect>. I can say <phoneme alphabet=\"ipa\" ph=\"təˈmɑːtəʊ\">tomato</phoneme> and tomato. Visit docs.aws.amazon.com/polly/latest/dg/supportedtags for more information.</speak>"
       },
       "l": "",
       "qid": "QnABot.001",

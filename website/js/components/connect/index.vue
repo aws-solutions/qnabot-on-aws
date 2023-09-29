@@ -1,75 +1,85 @@
+/*********************************************************************************************************************
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.                                                *
+ *                                                                                                                    *
+ *  Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance    *
+ *  with the License. A copy of the License is located at                                                             *
+ *                                                                                                                    *
+ *      http://www.apache.org/licenses/                                                                               *
+ *                                                                                                                    *
+ *  or in the 'license' file accompanying this file. This file is distributed on an 'AS IS' BASIS, WITHOUT WARRANTIES *
+ *  OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions    *
+ *  and limitations under the License.                                                                                *
+ *********************************************************************************************************************/
 <template lang='pug'>
-  v-container(grid-list-md)
-    v-layout(column )
-      v-flex
-        v-card
-          v-card-title
-            h3 Connect Instructions
-          v-card-text(class="pa-0")
-            v-stepper(v-model="stepNumber" class="elevation-0")
-              v-stepper-header
-                template(v-for="(step,index) in steps")
-                  v-divider(v-if='index>0')
-                  v-stepper-step(
-                    :key="index"
-                    :step="index+1"
-                    :complete="stepNumber>index") {{step.title}}
-                      small(v-if="step.optional") optional
-              v-stepper-items
-                v-stepper-content(
-                  v-for="(step,index) in steps"
+v-container(grid-list-md)
+  v-layout(column )
+    v-flex
+      v-card
+        v-card-title
+          h3 Connect Instructions
+        v-card-text(class="pa-0")
+          v-stepper(v-model="stepNumber" class="elevation-0")
+            v-stepper-header
+              template(v-for="(step,index) in steps")
+                v-divider(v-if='index>0')
+                v-stepper-step(
                   :key="index"
-                  :step="index+1")
-                  v-card
-                    v-container
-                      v-layout(row)
-                        v-flex(xs1)
-                          v-btn(
-                            @click="stepNumber--" v-if="index>0"
-                            style="height:100%"
-                            left)
-                            v-icon keyboard_arrow_left
-                        v-flex(xs10)
-                          v-container
-                            v-layout(column)
-                              v-flex(xs12)
-                                v-card-text
-                                  .headline.text-xs-center {{step.title}}
-                                  span(v-html="step.text")
-                                v-card-actions
-                                  v-btn(v-for="(y,x) in step.buttons"
-                                    :id="y.id"
-                                    :key="x"
-                                    :loading="y.loading"
-                                    @click="copy(y)") {{y.text}}
+                  :step="index+1"
+                  :complete="stepNumber>index") {{step.title}}
+                    small(v-if="step.optional") optional
+            v-stepper-items
+              v-stepper-content(
+                v-for="(step,index) in steps"
+                :key="index"
+                :step="index+1")
+                v-card
+                  v-container
+                    v-layout(row)
+                      v-flex(xs1)
+                        v-btn(
+                          @click="stepNumber--" v-if="index>0"
+                          style="height:100%"
+                          left)
+                          v-icon keyboard_arrow_left
+                      v-flex(xs10)
+                        v-container
+                          v-layout(column)
+                            v-flex(xs12)
+                              v-card-text
+                                .headline.text-xs-center {{step.title}}
+                                span(v-html="step.text")
+                              v-card-actions
+                                v-btn(v-for="(y,x) in step.buttons"
+                                  :id="y.id"
+                                  :key="x"
+                                  :loading="y.loading"
+                                  @click="copy(y)") {{y.text}}
 
 
 
-                              v-flex(xs12)
-                                img(
-                                  :src="step.image"
-                                  style="max-width:75%;display:block;margin:auto;"
-                                  contain
-                                  v-if="step.image"
-                                )
-                        v-flex(xs1)
-                          v-btn(
-                            @click="stepNumber++" v-if="index+1<steps.length"
-                            style="height:100%"
-                            right)
-                            v-icon keyboard_arrow_right
+                            v-flex(xs12)
+                              img(
+                                :src="step.image"
+                                style="max-width:75%;display:block;margin:auto;"
+                                contain
+                                v-if="step.image"
+                              )
+                      v-flex(xs1)
+                        v-btn(
+                          @click="stepNumber++" v-if="index+1<steps.length"
+                          style="height:100%"
+                          right)
+                          v-icon keyboard_arrow_right
 </template>
 
 <script>
-// Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
-// SPDX-License-Identifier: Apache-2.0
 
-var Vuex=require('vuex')
-var Promise=require('bluebird')
-var markdown=require('marked')
-var saveAs=require('file-saver').saveAs
-var renderer=new markdown.Renderer()
-var axios=require('axios')
+const Vuex=require('vuex')
+const Promise=require('bluebird')
+const markdown=require('marked')
+const saveAs=require('file-saver').saveAs
+const renderer=new markdown.Renderer()
+const axios=require('axios')
 
 renderer.link=function(href,title,text){
   return `<a href="${href}" title="${title}" target="_blank">${text}</a>`
@@ -78,14 +88,14 @@ renderer.table=function(header,body){
   return `<table class="pure-table"><thead>${header}</thead><tbody>${body}</tbody></table>`
 }
 
-var handlebars=require('handlebars')
-var clipboard=require('clipboard')
-var _=require('lodash')
+const handlebars=require('handlebars')
+const clipboard=require('clipboard')
+const _=require('lodash')
 const { stringify }=require('querystring')
 
 module.exports={
   data:function(){
-    var self=this
+    const self=this
     return {
       visible:false,
       stepNumber:1,
@@ -110,11 +120,11 @@ module.exports={
     ]),
     {
     steps:function(){
-      var self=this
+      const self=this
       return _.map(this.stepsRaw,function(x){
-        var y=Object.assign({},x)
+        const y=Object.assign({},x)
         if(x.text){
-          var temp=handlebars.compile(x.text)
+          const temp=handlebars.compile(x.text)
           y.text=markdown.parse(temp(self.$store.state.bot),{renderer})
         }
         return y
@@ -123,7 +133,7 @@ module.exports={
     }
   ),
   updated: function () {
-      var self = this;
+      const self = this;
       this.$nextTick(function () {
 
             const downloadBlobAsFile = (function closure_shell() {
@@ -137,19 +147,19 @@ module.exports={
             };
           })();
 
-          var links = document.links;
+          const links = document.links;
 
-          for (var i = 0, linksLength = links.length; i < linksLength; i++) {
+          for (let i = 0, linksLength = links.length; i < linksLength; i++) {
             if (links[i].hostname != window.location.hostname) {
               links[i].target = '_blank';
             }
           }
-          var button = document.getElementById("DownloadContactFlow");
+          const button = document.getElementById("DownloadContactFlow");
           if(button)
           {
             button.onclick = function()
             {
-              var result = self.$store.dispatch('api/getContactFlow').then((result) => {
+              self.$store.dispatch('api/getContactFlow').then((result) => {
               downloadBlobAsFile(new Blob(
                   [JSON.stringify(result.CallFlow)],
                   {type: "text/json"}
@@ -189,8 +199,8 @@ module.exports={
           }
 
           //Attach function to ImportQuestions button
-          var btnImportQuestions = document.getElementById("ImportQuestions");
-          var ImportQuestionsStatus = document.getElementById("ImportQuestionsStatus");
+          const btnImportQuestions = document.getElementById("ImportQuestions");
+          const ImportQuestionsStatus = document.getElementById("ImportQuestionsStatus");
 
 
           if(btnImportQuestions){
@@ -208,7 +218,7 @@ module.exports={
                     })
                     .then(result =>  {
                         ImportQuestionsStatus.innerHTML = "Importing Questions (Step 3)..."
-                        let  exampleUrl = result.filter(example => self.contactFlow.QnaFile == example.document.href.split("/").slice(-1)[0] )[0];
+                        const exampleUrl = result.filter(example => self.contactFlow.QnaFile == example.document.href.split("/").slice(-1)[0] )[0];
                         return self.$store.dispatch('api/getImport',{href: exampleUrl.document.href})
                     })
                     .then(result =>  {
@@ -238,7 +248,7 @@ module.exports={
 
 
 
-          var spanBot = document.getElementById("spnBotname")
+          const spanBot = document.getElementById("spnBotname")
           if(spanBot)
           {
             self.$store.dispatch("api/botinfo").then((result) => spanBot.innerHTML = result.lexV2botname );

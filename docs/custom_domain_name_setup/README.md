@@ -79,7 +79,7 @@ Now that we have updated the configurations, we will now need to deploy the API 
 - Click the `Actions` button
 - Click `Deploy API`
 
-![](deploy_api_action.png)
+![](./images/deploy_api_action.png)
 
 - For the following: 
   - `Deployment stage`: select `prod`
@@ -90,7 +90,7 @@ Now that we have updated the configurations, we will now need to deploy the API 
 Once the API is deployed, you will be navigated to the Stage Editor page. 
 - Click the `Stage Variables` tab
 - Update the values for `ClientLoginUrl` and `DesignerLoginUrl` variables to use the custom domain name. 
-![](stage_variables.png)
+![](./images/stage_variables.png)
 
 ## Step 7: Test the updates using the custom domain name
 Launch the QnABot designer in a new browser session using the custom domain name (`https://YOUR_CUSTOM_DOMAIN_NAME/prod/pages/designer`) to test the updates.

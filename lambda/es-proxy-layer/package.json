@@ -1,7 +1,7 @@
 {
   "name": "proxy-es",
-  "version": "1.0.0",
-  "description": "",
+  "version": "5.4.2",
+  "description": "QnABot Lambda managing querying of data store",
   "main": "index.js",
   "author": {
     "name": "Amazon Web Services",
@@ -9,6 +9,7 @@
   },
   "license": "Apache-2.0",
   "dependencies": {
+    "@dqbd/tiktoken": "^1.0.7",
     "aws4": "^1.6.0",
     "axios": "^0.26.0",
     "handlebars": "^4.7.2",

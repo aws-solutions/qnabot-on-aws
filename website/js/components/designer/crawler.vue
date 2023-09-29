@@ -1,61 +1,71 @@
+/*********************************************************************************************************************
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.                                                *
+ *                                                                                                                    *
+ *  Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance    *
+ *  with the License. A copy of the License is located at                                                             *
+ *                                                                                                                    *
+ *      http://www.apache.org/licenses/                                                                               *
+ *                                                                                                                    *
+ *  or in the 'license' file accompanying this file. This file is distributed on an 'AS IS' BASIS, WITHOUT WARRANTIES *
+ *  OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions    *
+ *  and limitations under the License.                                                                                *
+ *********************************************************************************************************************/
 <template lang="pug">
-  v-dialog(v-model='dialog' persistent max-width='50%')
-    template
-      v-btn.block(flat slot="activator" :disabled="!(kendraIndexerEnabled)") Kendra Web Page Indexer
-    v-card(id="alexa-modal")
-      v-card-title(primary-title)
-        .headline Kendra Web Page Indexer
-      v-card-text
-        p Current Status {{status}}
-      v-card-actions
-        v-btn(
-          id="btnKendraStartIndex" 
-          :disabled="status == 'PENDING' || status=='STARTING'"
-          @click="start"
-        ) Start Indexing
+v-dialog(v-model='dialog' persistent max-width='50%')
+  template
+    v-btn.block(flat slot="activator" :disabled="!(kendraIndexerEnabled)") Kendra Web Page Indexer
+  v-card(id="alexa-modal")
+    v-card-title(primary-title)
+      .headline Kendra Web Page Indexer
+    v-card-text
+      p Current Status {{status}}
+    v-card-actions
+      v-btn(
+        id="btnKendraStartIndex" 
+        :disabled="status == 'PENDING' || status=='STARTING'"
+        @click="start"
+      ) Start Indexing
 
-      
-      v-flex(v-if="history && history.length>0")
-        v-card
-          table.table
-            caption <h3>Sync History</h3>
-            tr
-              th(style="text-align:left") Start Time
-              th(style="text-align:left") End Time
-              th(style="text-align:left") Status
-              th(style="text-align:left") Error Message
-              th(style="text-align:left") Documents Added
-              th(style="text-align:left") Documents Modified
-              th(style="text-align:left") Documents Failed
+    
+    v-flex(v-if="history && history.length>0")
+      v-card
+        table.table
+          caption <h3>Sync History</h3>
+          tr
+            th(style="text-align:left") Start Time
+            th(style="text-align:left") End Time
+            th(style="text-align:left") Status
+            th(style="text-align:left") Error Message
+            th(style="text-align:left") Documents Added
+            th(style="text-align:left") Documents Modified
+            th(style="text-align:left") Documents Failed
 
 
-            template(v-for="(job,index) in history")
-                tr
-                  td {{job.StartTime}}
-                  td {{job.EndTime}}
-                  td {{job.Status}}
-                  td {{job.ErrorMessage}}
-                  td {{job.Metrics.DocumentsAdded}}
-                  td {{job.Metrics.DocumentsModified}}
-                  td {{job.Metrics.DocumentsDeleted}}
+          template(v-for="(job,index) in history")
+              tr
+                td {{job.StartTime}}
+                td {{job.EndTime}}
+                td {{job.Status}}
+                td {{job.ErrorMessage}}
+                td {{job.Metrics.DocumentsAdded}}
+                td {{job.Metrics.DocumentsModified}}
+                td {{job.Metrics.DocumentsDeleted}}
 
-      v-card-actions
-        v-spacer
-        v-btn(@click='dialog = false') Close
+    v-card-actions
+      v-spacer
+      v-btn(@click='dialog = false') Close
 </template>
 
 <script>
-// Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
-// SPDX-License-Identifier: Apache-2.0
 
-var Vuex=require('vuex')
-var Promise=require('bluebird')
-var _=require('lodash')
-var Promise=require('bluebird')
+const Vuex=require('vuex')
+const Promise=require('bluebird')
+const _=require('lodash')
+
+
 
 module.exports={
   data:function(){
-    var self=this
     return {
       status: "",
       history: {},
@@ -74,15 +84,15 @@ module.exports={
   },
   updated:function(){
     console.log("created");
-    var self = this;;
+    const self = this;
     this.poll( () => {
       console.log("polling")
       console.log("last status check " + Date.now())
       if(!this.lastStatusCheck || Date.now() - this.lastStatusCheck > 9000){
         self.getKendraIndexingStatus().then((data) => {
           self.status = data.Status;
-          self.history = data.History,
-          console.log("History " + JSON.stringify(self.history))
+          self.history = data.History;
+          console.log("History " + JSON.stringify(self.history));
           self.lastStatusCheck = Date.now();
 
         })
@@ -113,16 +123,16 @@ module.exports={
     },
 
     getKendraIndexingStatus: async function(){
-      var result = await this.$store.dispatch("api/getKendraIndexingStatus")
+      const result = await this.$store.dispatch("api/getKendraIndexingStatus")
       return result;},
 
     poll: function(fn, timeout, interval) {
-    var endTime = Number(new Date()) + (timeout || 2000);
+    /*const endTime = Number(new Date()) + (timeout || 2000);*/
     interval = interval || 100;
 
-    var checkCondition = function(resolve, reject) {
+    const checkCondition = function(resolve, reject) {
         // If the condition is met, we're done! 
-        var result = fn();
+        const result = fn();
         if(result) {
             resolve(result);
         }

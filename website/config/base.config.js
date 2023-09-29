@@ -1,10 +1,20 @@
-// Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
-// SPDX-License-Identifier: Apache-2.0
-var path=require('path')
+/*********************************************************************************************************************
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.                                                *
+ *                                                                                                                    *
+ *  Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance    *
+ *  with the License. A copy of the License is located at                                                             *
+ *                                                                                                                    *
+ *      http://www.apache.org/licenses/                                                                               *
+ *                                                                                                                    *
+ *  or in the 'license' file accompanying this file. This file is distributed on an 'AS IS' BASIS, WITHOUT WARRANTIES *
+ *  OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions    *
+ *  and limitations under the License.                                                                                *
+ *********************************************************************************************************************/
+const path = require('path');
 const VueLoaderPlugin = require('vue-loader/lib/plugin');
-var CopyWebpackPlugin = require('copy-webpack-plugin');
-var HtmlWebpackPlugin = require('html-webpack-plugin');
-var _=require('lodash');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const _ = require('lodash');
 
 module.exports={
     entry:{
@@ -22,6 +32,7 @@ module.exports={
     plugins:_.compact([
         new VueLoaderPlugin(),
         new CopyWebpackPlugin({ patterns: [{from:'./assets',to:"assets"}] }),
+        new CopyWebpackPlugin({ patterns: [{from:'./styles',to:"styles"}] }),
         new CopyWebpackPlugin({ patterns: [{
             from:'../node_modules/aws-lex-web-ui/dist/wav-worker.min.js',
             to:"wav-worker.js"
@@ -87,8 +98,16 @@ module.exports={
                 }
             },
             {
-                test: /\.(png|woff|woff2|eot|ttf|svg)$/,
+                test: /\.(png|eot|ttf|svg)$/,
                 loader: 'url-loader?limit=100000'
+            },
+            {
+                test: /\.(woff|woff2)$/,
+                loader: 'file-loader?limit=100000',
+                options: {
+                    name: '[name].[ext]',
+                    outputPath: 'fonts/'
+                }
             },
             {
                 test: /\.pug$/,

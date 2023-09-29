@@ -1,75 +1,73 @@
 #! /usr/bin/env node
-var config=require('../config.json')
-var fs=require('fs')
-var _=require('lodash')
-process.env.AWS_PROFILE=config.profile
-process.env.AWS_DEFAULT_REGION=config.profile
+const fs = require('fs');
+const _ = require('lodash');
+const config = require('../config.json');
 
-module.exports=run
+process.env.AWS_PROFILE = config.profile;
+process.env.AWS_DEFAULT_REGION = config.profile;
+
+module.exports = run;
 
 if (require.main === module) {
-    var argv=require('commander')
-    var ran
-    var args=argv.version('1.0')
+    const argv = require('commander');
+    let ran;
+    const args = argv.version('1.0')
         .name(process.argv[1].split('/').reverse()[0])
         .arguments('[stack]')
-        .usage("[stack] [options]")
-        .option('--inc',"increment value")
-        .option('-s --set <value>',"set the value")
-        .option('-n --namespace <name>',"stack namespace")
-        .option('-p --prefix',"get stacks prefix")
-        .action(function(stack,options){
-            if(stack || options.prefix) ran=true
-            console.log(run(stack,options))
+        .usage('[stack] [options]')
+        .option('--inc', 'increment value')
+        .option('-s --set <value>', 'set the value')
+        .option('-n --namespace <name>', 'stack namespace')
+        .option('-p --prefix', 'get stacks prefix')
+        .action((stack, options) => {
+            if (stack || options.prefix) ran = true;
+            console.log(run(stack, options));
         })
-        .parse(process.argv)
-    if(!ran){
-        argv.outputHelp()
+        .parse(process.argv);
+    if (!ran) {
+        argv.outputHelp();
     }
 }
 
-function run(stack,options={}){
-    var namespace=options.namespace || config.namespace
-
+function run(stack, options = {}) {
+    const namespace = options.namespace || config.namespace;
+    let increments;
     try {
-        var increments=require('../build/inc.json')
-    } catch(e){
+        increments = require('../build/inc.json');
+    } catch (e) {
         try {
-            var increments=require('./.inc.json')
-            fs.unlinkSync(`${__dirname}/.inc.json`)
-            fs.writeFileSync(__dirname+'/../build/inc.json',JSON.stringify(increments,null,2))
-        } catch(e){
-            var increments={}
+            increments = require('./.inc.json');
+            fs.unlinkSync(`${__dirname}/.inc.json`);
+            fs.writeFileSync(`${__dirname}/../build/inc.json`, JSON.stringify(increments, null, 2));
+        } catch (e) {
+            increments = {};
         }
     }
 
-    var stackname=stack.replace('/','-')
-    var full=`${namespace}-${stackname}`
-    var path=`["${config.profile}"].["${namespace}"].["${stackname}"]`
+    const stackname = stack.replace('/', '-');
+    const full = `${namespace}-${stackname}`;
+    const path = `["${config.profile}"].["${namespace}"].["${stackname}"]`;
 
-    if(options.hasOwnProperty("set")){
-        increment=options.set
-        set(increment)
-    }else{
-        increment=_.get(increments,path,0)
+    if (options.hasOwnProperty('set')) {
+        increment = options.set;
+        set(increment);
+    } else {
+        increment = _.get(increments, path, 0);
     }
 
-    if(options.inc){
-        set(++increment)
+    if (options.inc) {
+        set(++increment);
     }
 
     config.stackNamePrefix = config.stackNamePrefix ? config.stackNamePrefix : 'QNA';
 
-    if(options.prefix){
-        return `${config.stackNamePrefix}-${full}`
-    }else{
-        return `${config.stackNamePrefix}-${full}-${increment}`
+    if (options.prefix) {
+        return `${config.stackNamePrefix}-${full}`;
     }
+    return `${config.stackNamePrefix}-${full}-${increment}`;
 
-    function set(value){
-        _.set(increments,path,parseInt(value))
-        fs.writeFileSync(__dirname+'/../build/inc.json',JSON.stringify(increments,null,2))
+    function set(value) {
+        _.set(increments, path, parseInt(value));
+        fs.writeFileSync(`${__dirname}/../build/inc.json`, JSON.stringify(increments, null, 2));
     }
 }
-
-

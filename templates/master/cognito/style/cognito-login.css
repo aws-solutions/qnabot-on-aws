@@ -1,5 +1,5 @@
 body {
-    font-family: "Arial";
+    font-family: "Arial", serif;
     color: #3B3B3B;
     background: #909090;
 }
@@ -199,7 +199,6 @@ body {
     color: #fff;
     background-color: #5bc0de;
     border-color: #46b8da;
-    width: 100%;
 }
 
 .idpButton-customizable:hover {

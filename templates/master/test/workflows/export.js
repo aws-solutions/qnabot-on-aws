@@ -1,20 +1,31 @@
-var config=require('../../../../config.json')
+/*********************************************************************************************************************
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.                                                *
+ *                                                                                                                    *
+ *  Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance    *
+ *  with the License. A copy of the License is located at                                                             *
+ *                                                                                                                    *
+ *      http://www.apache.org/licenses/                                                                               *
+ *                                                                                                                    *
+ *  or in the 'license' file accompanying this file. This file is distributed on an 'AS IS' BASIS, WITHOUT WARRANTIES *
+ *  OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions    *
+ *  and limitations under the License.                                                                                *
+ *********************************************************************************************************************/
+
+const config=require('../../../../config.json')
 process.env.AWS_PROFILE=config.profile
 process.env.AWS_DEFAULT_REGION=config.region
-var _=require('lodash')
-var Promise=require('bluebird')
-var api=require('../util').api
-var faker=require('faker').lorem
-var range=require('range').range
-var aws=require('aws-sdk')
-aws.config.setPromisesDependency(Promise)
+const _=require('lodash')
+const api=require('../util').api
+const faker=require('faker').lorem
+const range=require('range').range
+const aws=require('aws-sdk')
 aws.config.region=config.region
-var s3=new aws.S3()
+const s3=new aws.S3()
 
 module.exports={
     setUp:function(done){
-        var count=10000
-        var name=(new Date()).getTime()
+        const count=10000
+        const name=(new Date()).getTime()
         this.name=name
         this.count=count
         api({
@@ -22,12 +33,12 @@ module.exports={
             method:"GET"
         })
         .then(x=>x._links.imports)
-        .tap(info=>s3.putObject({
+        .then(info=>s3.putObject({
             Bucket:info.bucket,
             Key:info.uploadPrefix+name,
             Body:range(0,count).map(qna).join('\n')
         }).promise())
-        .tap(function(info){
+        .then(function(info){
             return new Promise(function(res,rej){
                 function next(i){
                     console.log("tries left:"+i)
@@ -54,14 +65,16 @@ module.exports={
                     console.log("tries left:"+i)
                     if(i>0){
                         api({
-                            path:"jobs/imports/"+name,
+                            path:"jobs/imports/" + name,
                             method:"GET"
+                        }).catch(e => {
+                            console.log(e);
+                            throw e;
                         })
-                        .tapCatch(console.log)
-                        .then(x=>x.status==="InProgress" ?
-                            setTimeout(()=>next(--i),2000) : res(x) )
-                        .catch(x=>x.response.status===404,
-                            ()=>setTimeout(()=>next(--i),2000))
+                        .then(x => x.status === "InProgress" ?
+                            setTimeout(() => next(--i), 2000) : res(x) )
+                        .catch(x => x.response.status === 404,
+                            () => setTimeout(() => next(--i), 2000))
                         .catch(rej)
                     }else{
                         rej("timeout")
@@ -73,21 +86,21 @@ module.exports={
         .finally(done)
     },
     all:async function(test){
-        var info=await api({
+        const info=await api({
             path:"jobs",
             method:"GET"
         })
 
-        var start=await api({
+        const start=await api({
             href:`${info._links.exports.href}/test-all`,
             method:"PUT",
             body:{}
         })
         try{
-            var completed=await new Promise(async function(res,rej){
+            const completed=await new Promise(async function(res,rej){
                 next(100)
                 async function next(count){
-                    var status=await api({
+                    const status=await api({
                         href:`${info._links.exports.href}/test-all`,
                         method:"GET",
                     })
@@ -100,7 +113,7 @@ module.exports={
                     }
                 }
             })
-            var data=(await s3.getObject({
+            const data=(await s3.getObject({
                 Bucket:completed.bucket,
                 Key:completed.key,
             }).promise()).Body.toString().split('\n')
@@ -125,11 +138,11 @@ module.exports={
         test.done()
     },
     filter:async function(test){
-        var info=await api({
+        const info=await api({
             path:"jobs",
             method:"GET"
         })
-        var start=await api({
+        const start=await api({
             href:`${info._links.exports.href}/test-filter`,
             method:"PUT",
             body:{
@@ -137,10 +150,10 @@ module.exports={
             }
         })
         try{
-            var completed=await new Promise(async function(res,rej){
+            const completed=await new Promise(async function(res,rej){
                 next(100)
                 async function next(count){
-                    var status=await api({
+                    const status=await api({
                         href:`${info._links.exports.href}/test-filter`,
                         method:"GET",
                     })
@@ -153,7 +166,7 @@ module.exports={
                     }
                 }
             })
-            var data=(await s3.getObject({
+            const data=(await s3.getObject({
                 Bucket:completed.bucket,
                 Key:completed.key,
             }).promise()).Body.toString().split('\n')

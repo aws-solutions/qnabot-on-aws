@@ -8,20 +8,17 @@
  * See <https://github.com/trentm/json> and <https://trentm.com/json/>
  */
 
-var VERSION = '9.0.6';
+const VERSION = '9.0.6';
+const util = require('util');
+const assert = require('assert');
+const path = require('path');
+const vm = require('vm');
+const fs = require('fs');
 
-var p = console.warn;
-var util = require('util');
-var assert = require('assert');
-var path = require('path');
-var vm = require('vm');
-var fs = require('fs');
-var warn = console.warn;
-var EventEmitter = require('events').EventEmitter;
+const { warn } = console;
+const { EventEmitter } = require('events');
 
-
-
-//--- exports for module usage
+// --- exports for module usage
 
 exports.main = main;
 exports.getVersion = getVersion;
@@ -31,25 +28,21 @@ exports.parseLookup = parseLookup;
 exports.lookupDatum = lookupDatum;
 exports.printDatum = printDatum; // DEPRECATED
 
-
-
-//---- globals and constants
+// ---- globals and constants
 
 // Output modes.
-var OM_JSONY = 1;
-var OM_JSON = 2;
-var OM_INSPECT = 3;
-var OM_COMPACT = 4;
-var OM_FROM_NAME = {
-    'jsony': OM_JSONY,
-    'json': OM_JSON,
-    'inspect': OM_INSPECT,
-    'compact': OM_COMPACT
+const OM_JSONY = 1;
+const OM_JSON = 2;
+const OM_INSPECT = 3;
+const OM_COMPACT = 4;
+const OM_FROM_NAME = {
+    jsony: OM_JSONY,
+    json: OM_JSON,
+    inspect: OM_INSPECT,
+    compact: OM_COMPACT,
 };
 
-
-
-//---- support functions
+// ---- support functions
 
 function getVersion() {
     return VERSION;
@@ -61,12 +54,12 @@ function getVersion() {
  * Only support objects that you get out of JSON, i.e. no functions.
  */
 function objCopy(obj) {
-    var copy;
+    let copy;
     if (Array.isArray(obj)) {
         copy = obj.slice();
     } else if (typeof (obj) === 'object') {
         copy = {};
-        Object.keys(obj).forEach(function (k) {
+        Object.keys(obj).forEach((k) => {
             copy[k] = obj[k];
         });
     } else {
@@ -79,23 +72,22 @@ if (util.format) {
     format = util.format;
 } else {
     // From <https://github.com/joyent/node/blob/master/lib/util.js#L22>:
-    var formatRegExp = /%[sdj%]/g;
+    const formatRegExp = /%[sdj%]/g;
 
     function format(f) {
-        var i;
+        let i;
         if (typeof (f) !== 'string') {
-            var objects = [];
+            const objects = [];
             for (i = 0; i < arguments.length; i++) {
                 objects.push(util.inspect(arguments[i]));
             }
             return objects.join(' ');
         }
         i = 1;
-        var args = arguments;
-        var len = args.length;
-        var str = String(f).replace(formatRegExp, function (x) {
-            if (i >= len)
-              return x;
+        const args = arguments;
+        const len = args.length;
+        let str = String(f).replace(formatRegExp, (x) => {
+            if (i >= len) return x;
             switch (x) {
             case '%s':
                 return String(args[i++]);
@@ -109,11 +101,11 @@ if (util.format) {
                 return x;
             }
         });
-        for (var x = args[i]; i < len; x = args[++i]) {
+        for (let x = args[i]; i < len; x = args[++i]) {
             if (x === null || typeof (x) !== 'object') {
-                str += ' ' + x;
+                str += ` ${x}`;
             } else {
-                str += ' ' + util.inspect(x);
+                str += ` ${util.inspect(x)}`;
             }
         }
         return str;
@@ -125,20 +117,28 @@ if (util.format) {
  */
 function _parseString(s) {
     /* JSSTYLED */
-    var quoted = '"' + s.replace(/\\"/, '"').replace('"', '\\"') + '"';
+    const quoted = `"${s.replace(/\\"/, '"').replace('"', '\\"')}"`;
     return eval(quoted);
 }
 
 // json_parse.js (<https://github.com/douglascrockford/JSON-js>)
 /* BEGIN JSSTYLED */
 // START json_parse
-var json_parse=function(){"use strict";var a,b,c={'"':'"',"\\":"\\","/":"/",b:"\b",f:"\f",n:"\n",r:"\r",t:"\t"},d,e=function(b){throw{name:"SyntaxError",message:b,at:a,text:d}},f=function(c){return c&&c!==b&&e("Expected '"+c+"' instead of '"+b+"'"),b=d.charAt(a),a+=1,b},g=function(){var a,c="";b==="-"&&(c="-",f("-"));while(b>="0"&&b<="9")c+=b,f();if(b==="."){c+=".";while(f()&&b>="0"&&b<="9")c+=b}if(b==="e"||b==="E"){c+=b,f();if(b==="-"||b==="+")c+=b,f();while(b>="0"&&b<="9")c+=b,f()}a=+c;if(!isFinite(a))e("Bad number");else return a},h=function(){var a,d,g="",h;if(b==='"')while(f()){if(b==='"')return f(),g;if(b==="\\"){f();if(b==="u"){h=0;for(d=0;d<4;d+=1){a=parseInt(f(),16);if(!isFinite(a))break;h=h*16+a}g+=String.fromCharCode(h)}else if(typeof c[b]=="string")g+=c[b];else break}else g+=b}e("Bad string")},i=function(){while(b&&b<=" ")f()},j=function(){switch(b){case"t":return f("t"),f("r"),f("u"),f("e"),!0;case"f":return f("f"),f("a"),f("l"),f("s"),f("e"),!1;case"n":return f("n"),f("u"),f("l"),f("l"),null}e("Unexpected '"+b+"'")},k,l=function(){var a=[];if(b==="["){f("["),i();if(b==="]")return f("]"),a;while(b){a.push(k()),i();if(b==="]")return f("]"),a;f(","),i()}}e("Bad array")},m=function(){var a,c={};if(b==="{"){f("{"),i();if(b==="}")return f("}"),c;while(b){a=h(),i(),f(":"),Object.hasOwnProperty.call(c,a)&&e('Duplicate key "'+a+'"'),c[a]=k(),i();if(b==="}")return f("}"),c;f(","),i()}}e("Bad object")};return k=function(){i();switch(b){case"{":return m();case"[":return l();case'"':return h();case"-":return g();default:return b>="0"&&b<="9"?g():j()}},function(c,f){var g;return d=c,a=0,b=" ",g=k(),i(),b&&e("Syntax error"),typeof f=="function"?function h(a,b){var c,d,e=a[b];if(e&&typeof e=="object")for(c in e)Object.prototype.hasOwnProperty.call(e,c)&&(d=h(e,c),d!==undefined?e[c]=d:delete e[c]);return f.call(a,b,e)}({"":g},""):g}}();
+const json_parse = (function () {
+    let a; let b; const c = {
+        '"': '"', '\\': '\\', '/': '/', b: '\b', f: '\f', n: '\n', r: '\r', t: '\t',
+    }; let d; const e = function (b) {
+        throw {
+            name: 'SyntaxError', message: b, at: a, text: d,
+        };
+    }; const f = function (c) { return c && c !== b && e(`Expected '${c}' instead of '${b}'`), b = d.charAt(a), a += 1, b; }; const g = function () { let a; let c = ''; b === '-' && (c = '-', f('-')); while (b >= '0' && b <= '9')c += b, f(); if (b === '.') { c += '.'; while (f() && b >= '0' && b <= '9')c += b; } if (b === 'e' || b === 'E') { c += b, f(); if (b === '-' || b === '+')c += b, f(); while (b >= '0' && b <= '9')c += b, f(); }a = +c; if (!isFinite(a))e('Bad number'); else return a; }; const h = function () { let a; let d; let g = ''; let h; if (b === '"') while (f()) { if (b === '"') return f(), g; if (b === '\\') { f(); if (b === 'u') { h = 0; for (d = 0; d < 4; d += 1) { a = parseInt(f(), 16); if (!isFinite(a)) break; h = h * 16 + a; }g += String.fromCharCode(h); } else if (typeof c[b] === 'string')g += c[b]; else break; } else g += b; }e('Bad string'); }; const i = function () { while (b && b <= ' ')f(); }; const j = function () { switch (b) { case 't': return f('t'), f('r'), f('u'), f('e'), !0; case 'f': return f('f'), f('a'), f('l'), f('s'), f('e'), !1; case 'n': return f('n'), f('u'), f('l'), f('l'), null; }e(`Unexpected '${b}'`); }; let k; const l = function () { const a = []; if (b === '[') { f('['), i(); if (b === ']') return f(']'), a; while (b) { a.push(k()), i(); if (b === ']') return f(']'), a; f(','), i(); } }e('Bad array'); }; const m = function () { let a; const c = {}; if (b === '{') { f('{'), i(); if (b === '}') return f('}'), c; while (b) { a = h(), i(), f(':'), Object.hasOwnProperty.call(c, a) && e(`Duplicate key "${a}"`), c[a] = k(), i(); if (b === '}') return f('}'), c; f(','), i(); } }e('Bad object'); }; return k = function () { i(); switch (b) { case '{': return m(); case '[': return l(); case '"': return h(); case '-': return g(); default: return b >= '0' && b <= '9' ? g() : j(); } }, function (c, f) { let g; return d = c, a = 0, b = ' ', g = k(), i(), b && e('Syntax error'), typeof f === 'function' ? (function h(a, b) { let c; let d; const e = a[b]; if (e && typeof e === 'object') for (c in e)Object.prototype.hasOwnProperty.call(e, c) && (d = h(e, c), d !== undefined ? e[c] = d : delete e[c]); return f.call(a, b, e); }({ '': g }, '')) : g; };
+}());
 // END json_parse
 /* END JSSTYLED */
 
 function printHelp() {
     /* BEGIN JSSTYLED */
-    var w = console.log;
+    const w = console.log;
     w('Usage:');
     w('  <something generating JSON on stdout> | json [OPTIONS] [LOOKUPS...]');
     w('  json -f FILE [OPTIONS] [LOOKUPS...]');
@@ -202,7 +202,7 @@ function printHelp() {
     w('     $ echo \'{"name": "trent", "age": 38}\' | json name');
     w('     trent');
     w('');
-    w("  Use '-j' or '-o json' for explicit JSON, '-o json-N' for N-space indent:");
+    w('  Use \'-j\' or \'-o json\' for explicit JSON, \'-o json-N\' for N-space indent:');
     w('     $ echo \'{"name": "trent", "age": 38}\' | json -o json-0');
     w('     {"name":"trent","age":38}');
     w('');
@@ -222,7 +222,7 @@ function printHelp() {
     w('  --merge       Merge adjacent objects into one. Keys in last ');
     w('                object win.');
     w('  --deep-merge  Same as "--merge", but will recurse into objects ');
-    w('                under the same key in both.')
+    w('                under the same key in both.');
     w('  -a, --array   Process input as an array of separate inputs');
     w('                and output in tabular form.');
     w('  -A            Process input as a single object, i.e. stop');
@@ -266,7 +266,6 @@ function printHelp() {
     /* END JSSTYLED */
 }
 
-
 /**
  * Parse the command-line options and arguments into an object.
  *
@@ -280,7 +279,7 @@ function printHelp() {
  * @throws {Error} If there is an error parsing argv.
  */
 function parseArgv(argv) {
-    var parsed = {
+    const parsed = {
         args: [],
         help: false,
         quiet: false,
@@ -298,30 +297,29 @@ function parseArgv(argv) {
         merge: null, // --merge -> 'shallow', --deep-merge -> 'deep'
         inputFiles: [],
         validate: false,
-        inPlace: false
+        inPlace: false,
     };
 
     // Turn '-iH' into '-i -H', except for argument-accepting options.
-    var args = argv.slice(2); // drop ['node', 'scriptname']
-    var newArgs = [];
-    var optTakesArg = {
-        'd': true,
-        'o': true,
-        'D': true
+    let args = argv.slice(2); // drop ['node', 'scriptname']
+    let newArgs = [];
+    const optTakesArg = {
+        d: true,
+        o: true,
+        D: true,
     };
-    for (var i = 0; i < args.length; i++) {
+    for (let i = 0; i < args.length; i++) {
         if (args[i] === '--') {
             newArgs = newArgs.concat(args.slice(i));
             break;
         }
-        if (args[i].charAt(0) === '-' && args[i].charAt(1) !== '-' &&
-            args[i].length > 2)
-        {
-            var splitOpts = args[i].slice(1).split('');
-            for (var j = 0; j < splitOpts.length; j++) {
-                newArgs.push('-' + splitOpts[j])
+        if (args[i].charAt(0) === '-' && args[i].charAt(1) !== '-'
+            && args[i].length > 2) {
+            const splitOpts = args[i].slice(1).split('');
+            for (let j = 0; j < splitOpts.length; j++) {
+                newArgs.push(`-${splitOpts[j]}`);
                 if (optTakesArg[splitOpts[j]]) {
-                    var optArg = splitOpts.slice(j + 1).join('');
+                    const optArg = splitOpts.slice(j + 1).join('');
                     if (optArg.length) {
                         newArgs.push(optArg);
                     }
@@ -336,7 +334,7 @@ function parseArgv(argv) {
 
     endOfOptions = false;
     while (args.length > 0) {
-        var arg = args.shift();
+        const arg = args.shift();
         if (endOfOptions) {
             parsed.args.push(arg);
             break;
@@ -361,13 +359,13 @@ function parseArgv(argv) {
             break;
         case '-o':
         case '--output':
-            var name = args.shift();
+            let name = args.shift();
             if (!name) {
                 throw new Error('no argument given for "-o|--output" option');
             }
-            var idx = name.lastIndexOf('-');
+            const idx = name.lastIndexOf('-');
             if (idx !== -1) {
-                var indent = name.slice(idx + 1);
+                const indent = name.slice(idx + 1);
                 if (/^\d+$/.test(indent)) {
                     parsed.jsonIndent = Number(indent);
                     name = name.slice(0, idx);
@@ -378,7 +376,7 @@ function parseArgv(argv) {
             }
             parsed.outputMode = OM_FROM_NAME[name];
             if (parsed.outputMode === undefined) {
-                throw new Error('unknown output mode: "' + name + '"');
+                throw new Error(`unknown output mode: "${name}"`);
             }
             break;
         case '-0':
@@ -415,15 +413,16 @@ function parseArgv(argv) {
             if (parsed.lookupDelim.length !== 1) {
                 throw new Error(format(
                     'invalid lookup delim "%s" (must be a single char)',
-                    parsed.lookupDelim));
+                    parsed.lookupDelim,
+                ));
             }
             break;
         case '-e':
-        case '-E':  // DEPRECATED in v9
+        case '-E': // DEPRECATED in v9
             parsed.exeSnippets.push(args.shift());
             break;
         case '-c':
-        case '-C':  // DEPRECATED in v9
+        case '-C': // DEPRECATED in v9
             parsed.condSnippets.push(args.shift());
             break;
         case '-M':
@@ -453,7 +452,7 @@ function parseArgv(argv) {
             break;
         default: // arguments
             if (!endOfOptions && arg.length > 0 && arg[0] === '-') {
-                throw new Error('unknown option "' + arg + '"');
+                throw new Error(`unknown option "${arg}"`);
             }
             parsed.args.push(arg);
             break;
@@ -465,21 +464,20 @@ function parseArgv(argv) {
     }
     if (parsed.outputKeys && parsed.args.length > 0) {
         throw new Error(
-            'cannot use -k|--keys option and lookup arguments together');
+            'cannot use -k|--keys option and lookup arguments together',
+        );
     }
     if (parsed.inPlace && parsed.inputFiles.length !== 1) {
-        throw new Error('must specify exactly one file with "-f FILE" to ' +
-            'use -I/--in-place');
+        throw new Error('must specify exactly one file with "-f FILE" to '
+            + 'use -I/--in-place');
     }
     if (parsed.inPlace && parsed.args.length > 0) {
-        throw new Error('lookups cannot be specified with in-place editing ' +
-            '(-I/--in-place), too easy to lose content');
+        throw new Error('lookups cannot be specified with in-place editing '
+            + '(-I/--in-place), too easy to lose content');
     }
 
     return parsed;
 }
-
-
 
 /**
  * Streams chunks from given file paths or stdin.
@@ -493,18 +491,18 @@ function parseArgv(argv) {
  *    - `emit('end')` when all streams are done
  */
 function chunkEmitter(opts) {
-    var emitter = new EventEmitter();
-    var streaming = true;
-    var chunks = [];
-    var leftover = '';
-    var finishedHeaders = false;
+    const emitter = new EventEmitter();
+    let streaming = true;
+    const chunks = [];
+    let leftover = '';
+    let finishedHeaders = false;
 
     function stripHeaders(s) {
         // Take off a leading HTTP header if any and pass it through.
         while (true) {
             if (s.slice(0, 5) === 'HTTP/') {
-                var index = s.indexOf('\r\n\r\n');
-                var sepLen = 4;
+                const index = s.indexOf('\r\n\r\n');
+                const sepLen = 4;
                 if (index == -1) {
                     index = s.indexOf('\n\n');
                     sepLen = 2;
@@ -513,7 +511,7 @@ function chunkEmitter(opts) {
                     if (!opts.dropHeaders) {
                         emit(s.slice(0, index + sepLen));
                     }
-                    var is100Continue = (
+                    const is100Continue = (
                         s.slice(0, 21) === 'HTTP/1.1 100 Continue');
                     s = s.slice(index + sepLen);
                     if (is100Continue) {
@@ -526,15 +524,15 @@ function chunkEmitter(opts) {
             }
             break;
         }
-        //console.warn('stripHeaders done, finishedHeaders=%s', finishedHeaders)
+        // console.warn('stripHeaders done, finishedHeaders=%s', finishedHeaders)
         return s;
     }
 
     function emitChunks(block, emitter) {
-        //console.warn('emitChunks start: block="%s"', block)
+        // console.warn('emitChunks start: block="%s"', block)
         /* JSSTYLED */
-        var splitter = /(})(\s*\n\s*)?({\s*")/;
-        var leftTrimmedBlock = block.trimLeft();
+        const splitter = /(})(\s*\n\s*)?({\s*")/;
+        const leftTrimmedBlock = block.trimLeft();
         if (leftTrimmedBlock && leftTrimmedBlock[0] !== '{') {
             // Currently only support streaming consecutive *objects*.
             streaming = false;
@@ -554,8 +552,8 @@ function chunkEmitter(opts) {
          *   '{"',
          *   'a":"b"}' ]
          */
-        var bits = block.split(splitter);
-        //console.warn('emitChunks: bits (length %d): %j', bits.length, bits);
+        const bits = block.split(splitter);
+        // console.warn('emitChunks: bits (length %d): %j', bits.length, bits);
         if (bits.length === 1) {
             /*
              * An unwanted side-effect of using a regex to find
@@ -586,9 +584,9 @@ function chunkEmitter(opts) {
              */
             // An object must end with '}'. This is an early out to avoid
             // `JSON.parse` which I'm *presuming* is slower.
-            var trimmed = block.split(/\s*\r?\n/)[0];
+            const trimmed = block.split(/\s*\r?\n/)[0];
             if (trimmed[trimmed.length - 1] === '}') {
-                var obj;
+                let obj;
                 try {
                     obj = JSON.parse(block);
                 } catch (e) {
@@ -601,22 +599,21 @@ function chunkEmitter(opts) {
                 }
             }
             return block;
-        } else {
-            var n = bits.length - 2;
-            var s;
-            s = bits[0] + bits[1];
-            emitter.emit('chunk', s, JSON.parse(s));
-            for (var i = 3; i < n; i += 4) {
-                s = bits[i] + bits[i + 1] + bits[i + 2];
-                emitter.emit('chunk', s, JSON.parse(s));
-            }
-            return bits[n] + bits[n + 1];
         }
+        const n = bits.length - 2;
+        let s;
+        s = bits[0] + bits[1];
+        emitter.emit('chunk', s, JSON.parse(s));
+        for (let i = 3; i < n; i += 4) {
+            s = bits[i] + bits[i + 1] + bits[i + 2];
+            emitter.emit('chunk', s, JSON.parse(s));
+        }
+        return bits[n] + bits[n + 1];
     }
 
     function addDataListener(stream) {
-        stream.on('data', function (chunk) {
-            var s = leftover + chunk;
+        stream.on('data', (chunk) => {
+            let s = leftover + chunk;
             if (!finishedHeaders) {
                 s = stripHeaders(s);
             }
@@ -638,23 +635,25 @@ function chunkEmitter(opts) {
 
     if (opts.inputFiles.length > 0) {
         // Stream each file in order.
-        var i = 0;
+        let i = 0;
 
         function addErrorListener(file) {
-            file.on('error', function (err) {
+            file.on('error', (err) => {
                 emitter.emit(
                     'error',
-                    format('could not read "%s": %s', opts.inputFiles[i], e)
+                    format('could not read "%s": %s', opts.inputFiles[i], e),
                 );
             });
         }
 
         function addEndListener(file) {
-            file.on('end', function () {
+            file.on('end', () => {
                 if (i < opts.inputFiles.length) {
-                    var next = opts.inputFiles[i++];
-                    var nextFile = fs.createReadStream(next,
-                        {encoding: 'utf8'});
+                    const next = opts.inputFiles[i++];
+                    const nextFile = fs.createReadStream(
+                        next,
+                        { encoding: 'utf8' },
+                    );
                     addErrorListener(nextFile);
                     addEndListener(nextFile);
                     addDataListener(nextFile);
@@ -669,17 +668,19 @@ function chunkEmitter(opts) {
                 }
             });
         }
-        var first = fs.createReadStream(opts.inputFiles[i++],
-            {encoding: 'utf8'});
+        const first = fs.createReadStream(
+            opts.inputFiles[i++],
+            { encoding: 'utf8' },
+        );
         addErrorListener(first);
         addEndListener(first);
         addDataListener(first);
     } else {
         // Streaming from stdin.
-        var stdin = process.openStdin();
+        const stdin = process.openStdin();
         stdin.setEncoding('utf8');
         addDataListener(stdin);
-        stdin.on('end', function () {
+        stdin.on('end', () => {
             if (!streaming) {
                 emitter.emit('chunk', chunks.join(''));
             } else if (leftover) {
@@ -705,21 +706,21 @@ function chunkEmitter(opts) {
 function getInput(opts, callback) {
     if (opts.inputFiles.length === 0) {
         // Read from stdin.
-        var chunks = [];
+        const chunks = [];
 
-        var stdin = process.openStdin();
+        const stdin = process.openStdin();
         stdin.setEncoding('utf8');
-        stdin.on('data', function (chunk) {
+        stdin.on('data', (chunk) => {
             chunks.push(chunk);
         });
 
-        stdin.on('end', function () {
+        stdin.on('end', () => {
             callback(null, chunks.join(''));
         });
     } else if (opts.inPlace) {
-        for (var i = 0; i < opts.inputFiles.length; i++) {
-            var file = opts.inputFiles[i];
-            var content;
+        for (let i = 0; i < opts.inputFiles.length; i++) {
+            const file = opts.inputFiles[i];
+            let content;
             try {
                 content = fs.readFileSync(file, 'utf8');
             } catch (e) {
@@ -731,26 +732,28 @@ function getInput(opts, callback) {
         }
     } else {
         // Read input files.
-        var i = 0;
-        var chunks = [];
+        let i = 0;
+        const chunks = [];
         try {
             for (; i < opts.inputFiles.length; i++) {
                 chunks.push(fs.readFileSync(opts.inputFiles[i], 'utf8'));
             }
         } catch (e) {
             return callback(
-                format('could not read "%s": %s', opts.inputFiles[i], e));
+                format('could not read "%s": %s', opts.inputFiles[i], e),
+            );
         }
-        callback(null, chunks.join(''),
-            (opts.inputFiles.length === 1 ? opts.inputFiles[0] : undefined));
+        callback(
+            null,
+            chunks.join(''),
+            (opts.inputFiles.length === 1 ? opts.inputFiles[0] : undefined),
+        );
     }
 }
-
 
 function isInteger(s) {
     return (s.search(/^-?[0-9]+$/) == 0);
 }
-
 
 /**
  * Parse a lookup string into a list of lookup bits. E.g.:
@@ -762,24 +765,24 @@ function isInteger(s) {
  * Optionally receives an alternative lookup delimiter (other than '.')
  */
 function parseLookup(lookup, lookupDelim) {
-    var debug = function () {};
-    //var debug = console.warn;
+    const debug = function () {};
+    // const debug = console.warn;
 
-    var bits = [];
-    debug('\n*** ' + lookup + ' ***');
+    let bits = [];
+    debug(`\n*** ${lookup} ***`);
 
     bits = [];
     lookupDelim = lookupDelim || '.';
-    var bit = '';
-    var states = [null];
-    var escaped = false;
-    var ch = null;
-    for (var i = 0; i < lookup.length; ++i) {
-        var escaped = (!escaped && ch === '\\');
-        var ch = lookup[i];
-        debug('-- i=' + i + ', ch=' + JSON.stringify(ch) + ' escaped=' +
-            JSON.stringify(escaped));
-        debug('states: ' + JSON.stringify(states));
+    let bit = '';
+    const states = [null];
+    let escaped = false;
+    let ch = null;
+    for (let i = 0; i < lookup.length; ++i) {
+        escaped = (!escaped && ch === '\\');
+        ch = lookup[i];
+        debug(`-- i=${i}, ch=${JSON.stringify(ch)} escaped=${
+            JSON.stringify(escaped)}`);
+        debug(`states: ${JSON.stringify(states)}`);
 
         if (escaped) {
             bit += ch;
@@ -798,14 +801,14 @@ function parseLookup(lookup, lookupDelim) {
                 states.push(ch);
                 if (bit !== '') {
                     bits.push(bit);
-                    bit = ''
+                    bit = '';
                 }
                 bit += ch;
                 break;
             case lookupDelim:
                 if (bit !== '') {
                     bits.push(bit);
-                    bit = ''
+                    bit = '';
                 }
                 break;
             default:
@@ -825,10 +828,9 @@ function parseLookup(lookup, lookupDelim) {
             case ']':
                 states.pop();
                 if (states[states.length - 1] === null) {
-                    var evaled = vm.runInNewContext(
-                        '(' + bit.slice(1, -1) + ')', {}, '<lookup>');
+                    const evaled = vm.runInNewContext(`(${bit.slice(1, -1)})`, {}, '<lookup>');
                     bits.push(evaled);
-                    bit = ''
+                    bit = '';
                 }
                 break;
             }
@@ -841,7 +843,7 @@ function parseLookup(lookup, lookupDelim) {
                 states.pop();
                 if (states[states.length - 1] === null) {
                     bits.push(bit);
-                    bit = ''
+                    bit = '';
                 }
                 break;
             }
@@ -854,34 +856,33 @@ function parseLookup(lookup, lookupDelim) {
                 states.pop();
                 if (states[states.length - 1] === null) {
                     bits.push(bit);
-                    bit = ''
+                    bit = '';
                 }
                 break;
             }
             break;
         }
-        debug('bit: ' + JSON.stringify(bit));
-        debug('bits: ' + JSON.stringify(bits));
+        debug(`bit: ${JSON.stringify(bit)}`);
+        debug(`bits: ${JSON.stringify(bits)}`);
     }
 
     if (bit !== '') {
         bits.push(bit);
-        bit = ''
+        bit = '';
     }
 
     // Negative-intify: strings that are negative ints we change to a Number for
     // special handling in `lookupDatum`: Python-style negative array indexing.
-    var negIntPat = /^-\d+$/;
-    for (var i = 0; i < bits.length; i++) {
+    const negIntPat = /^-\d+$/;
+    for (let i = 0; i < bits.length; i++) {
         if (negIntPat.test(bits[i])) {
             bits[i] = Number(bits[i]);
         }
     }
 
-    debug(JSON.stringify(lookup) + ' -> ' + JSON.stringify(bits));
-    return bits
+    debug(`${JSON.stringify(lookup)} -> ${JSON.stringify(bits)}`);
+    return bits;
 }
-
 
 /**
  * Parse the given stdin input into:
@@ -902,9 +903,9 @@ function parseLookup(lookup, lookupDelim) {
 function parseInput(buffer, obj, group, merge) {
     if (obj) {
         return {
-            datum: obj
+            datum: obj,
         };
-    } else if (group) {
+    } if (group) {
         /**
          * Special case: Grouping (previously called auto-arrayification)
          * of unjoined list of objects:
@@ -934,90 +935,88 @@ function parseInput(buffer, obj, group, merge) {
          *   because <https://github.com/trentm/json/issues/55> shows that that
          *   is not safe.
          */
-        var newBuffer = buffer;
+        let newBuffer = buffer;
         /* JSSTYLED */
-        [/(})\s*\n\s*({)/g, /(})({")/g].forEach(function (pat) {
+        [/(})\s*\n\s*({)/g, /(})({")/g].forEach((pat) => {
             newBuffer = newBuffer.replace(pat, '$1,\n$2');
         });
-        [/(\])\s*\n\s*(\[)/g].forEach(function (pat) {
+        [/(\])\s*\n\s*(\[)/g].forEach((pat) => {
             newBuffer = newBuffer.replace(pat, ',\n');
         });
         newBuffer = newBuffer.trim();
         if (newBuffer[0] !== '[') {
-            newBuffer = '[\n' + newBuffer;
+            newBuffer = `[\n${newBuffer}`;
         }
         if (newBuffer.slice(-1) !== ']') {
-            newBuffer = newBuffer + '\n]\n';
+            newBuffer += '\n]\n';
         }
         try {
             return {
-                datum: JSON.parse(newBuffer)
+                datum: JSON.parse(newBuffer),
             };
         } catch (e2) {
             return {
-                error: e2
+                error: e2,
             };
         }
     } else if (merge) {
         // See the 'Rules' above for limitations on boundaries for 'adjacent'
         // objects: KISS.
-        var newBuffer = buffer;
+        let newBuffer = buffer;
         /* JSSTYLED */
-        [/(})\s*\n\s*({)/g, /(})({")/g].forEach(function (pat) {
+        [/(})\s*\n\s*({)/g, /(})({")/g].forEach((pat) => {
             newBuffer = newBuffer.replace(pat, '$1,\n$2');
         });
-        newBuffer = '[\n' + newBuffer + '\n]\n';
-        var objs;
+        newBuffer = `[\n${newBuffer}\n]\n`;
+        let objs;
         try {
             objs = JSON.parse(newBuffer);
         } catch (e) {
             return {
-                error: e
+                error: e,
             };
         }
-        var merged = objs[0];
+        const merged = objs[0];
         if (merge === 'shallow') {
-            for (var i = 1; i < objs.length; i++) {
-                var obj = objs[i];
-                Object.keys(obj).forEach(function (k) {
+            for (let i = 1; i < objs.length; i++) {
+                const obj = objs[i];
+                Object.keys(obj).forEach((k) => {
                     merged[k] = obj[k];
                 });
             }
         } else if (merge === 'deep') {
             function deepExtend(a, b) {
-                Object.keys(b).forEach(function (k) {
-                    if (a[k] && b[k] &&
-                        toString.call(a[k]) === '[object Object]' &&
-                        toString.call(b[k]) === '[object Object]')
-                    {
-                        deepExtend(a[k], b[k])
+                Object.keys(b).forEach((k) => {
+                    if (a[k] && b[k]
+                        && toString.call(a[k]) === '[object Object]'
+                        && toString.call(b[k]) === '[object Object]') {
+                        deepExtend(a[k], b[k]);
                     } else {
                         a[k] = b[k];
                     }
                 });
             }
-            for (var i = 1; i < objs.length; i++) {
+            for (let i = 1; i < objs.length; i++) {
                 deepExtend(merged, objs[i]);
             }
         } else {
             throw new Error(format('unknown value for "merge": "%s"', merge));
         }
         return {
-            datum: merged
+            datum: merged,
         };
     } else {
         try {
             return {
-                datum: JSON.parse(buffer)
+                datum: JSON.parse(buffer),
             };
         } catch (e) {
             return {
-                error: e
+                error: e,
             };
         }
     }
 }
-
 
 /**
  * Apply a lookup to the given datum.
@@ -1028,12 +1027,12 @@ function parseInput(buffer, obj, group, merge) {
  * @returns {Object} The result of the lookup.
  */
 function lookupDatum(datum, lookup) {
-    var d = datum;
-    for (var i = 0; i < lookup.length; i++) {
-        var bit = lookup[i];
+    let d = datum;
+    for (let i = 0; i < lookup.length; i++) {
+        const bit = lookup[i];
         if (d === null) {
             return undefined;
-        } else if (typeof (bit) === 'number' && bit < 0) {
+        } if (typeof (bit) === 'number' && bit < 0) {
             d = d[d.length + bit];
         } else {
             d = d[bit];
@@ -1044,7 +1043,6 @@ function lookupDatum(datum, lookup) {
     }
     return d;
 }
-
 
 /**
  * Output the given datasets.
@@ -1058,24 +1056,32 @@ function lookupDatum(datum, lookup) {
  * @param opts {Object} Parsed tool options.
  */
 function printDatasets(datasets, filename, headers, opts) {
-    var isTTY = (filename ? false : process.stdout.isTTY)
-    var write = emit;
+    const isTTY = (filename ? false : process.stdout.isTTY);
+    let write = emit;
     if (filename) {
-        var tmpPath = path.resolve(path.dirname(filename),
-            format('.%s-json-%s-%s.tmp', path.basename(filename), process.pid,
-                Date.now()));
-        var stats = fs.statSync(filename);
-        var f = fs.createWriteStream(tmpPath,
-            {encoding: 'utf8', mode: stats.mode});
+        const tmpPath = path.resolve(
+            path.dirname(filename),
+            format(
+                '.%s-json-%s-%s.tmp',
+                path.basename(filename),
+                process.pid,
+                Date.now(),
+            ),
+        );
+        const stats = fs.statSync(filename);
+        const f = fs.createWriteStream(
+            tmpPath,
+            { encoding: 'utf8', mode: stats.mode },
+        );
         write = f.write.bind(f);
     }
     if (headers && headers.length > 0) {
-        write(headers)
+        write(headers);
     }
-    for (var i = 0; i < datasets.length; i++) {
-        var dataset = datasets[i];
-        var output = stringifyDatum(dataset[0], opts, isTTY);
-        var sep = dataset[1];
+    for (let i = 0; i < datasets.length; i++) {
+        const dataset = datasets[i];
+        const output = stringifyDatum(dataset[0], opts, isTTY);
+        const sep = dataset[1];
         if (output && output.length) {
             write(output);
             write(sep);
@@ -1084,7 +1090,7 @@ function printDatasets(datasets, filename, headers, opts) {
         }
     }
     if (filename) {
-        f.on('open', function () {
+        f.on('open', () => {
             f.end();
             fs.renameSync(tmpPath, filename);
             if (!opts.quiet) {
@@ -1094,12 +1100,11 @@ function printDatasets(datasets, filename, headers, opts) {
     }
 }
 
-
 /**
  * Stringify the given datum according to the given output options.
  */
 function stringifyDatum(datum, opts, isTTY) {
-    var output = null;
+    let output = null;
     switch (opts.outputMode) {
     case OM_INSPECT:
         output = util.inspect(datum, false, Infinity, isTTY);
@@ -1116,15 +1121,15 @@ function stringifyDatum(datum, opts, isTTY) {
         if (datum === undefined) {
             // pass
         } else if (Array.isArray(datum)) {
-            var bits = ['[\n'];
-            datum.forEach(function (d) {
-                bits.push('  ')
+            const bits = ['[\n'];
+            datum.forEach((d) => {
+                bits.push('  ');
                 bits.push(JSON.stringify(d, null, 0).replace(
                     /* JSSTYLED */
                     /,"(?![,:])/g, ', "'));
                 bits.push(',\n');
             });
-            bits.push(bits.pop().slice(0, -2) + '\n') // drop last comma
+            bits.push(`${bits.pop().slice(0, -2)}\n`); // drop last comma
             bits.push(']');
             output = bits.join('');
         } else {
@@ -1139,11 +1144,10 @@ function stringifyDatum(datum, opts, isTTY) {
         }
         break;
     default:
-        throw new Error('unknown output mode: ' + opts.outputMode);
+        throw new Error(`unknown output mode: ${opts.outputMode}`);
     }
     return output;
 }
-
 
 /**
  * Print out a single result, considering input options.
@@ -1151,7 +1155,7 @@ function stringifyDatum(datum, opts, isTTY) {
  * @deprecated
  */
 function printDatum(datum, opts, sep, alwaysPrintSep) {
-    var output = stringifyDatum(datum, opts);
+    const output = stringifyDatum(datum, opts);
     if (output && output.length) {
         emit(output);
         emit(sep);
@@ -1160,8 +1164,7 @@ function printDatum(datum, opts, sep, alwaysPrintSep) {
     }
 }
 
-
-var stdoutFlushed = true;
+let stdoutFlushed = true;
 function emit(s) {
     // TODO:PERF If this is try/catch is too slow (too granular): move up to
     //    mainline and be sure to only catch this particular error.
@@ -1175,16 +1178,15 @@ function emit(s) {
     }
 }
 
-process.stdout.on('error', function (err) {
+process.stdout.on('error', (err) => {
     if (err.code === 'EPIPE') {
         // See <https://github.com/trentm/json/issues/9>.
         drainStdoutAndExit(0);
     } else {
-        warn(err)
+        warn(err);
         drainStdoutAndExit(1);
     }
 });
-
 
 /**
  * A hacked up version of 'process.exit' that will first drain stdout
@@ -1196,23 +1198,22 @@ process.stdout.on('error', function (err) {
  * refer to regular files or TTY file descriptors." However, this hack might
  * still be necessary in a shell pipeline.
  */
-var drainingStdout = false;
+let drainingStdout = false;
 function drainStdoutAndExit(code) {
     if (drainingStdout) {
         return;
     }
     drainingStdout = true;
-    process.stdout.on('drain', function () {
+    process.stdout.on('drain', () => {
         process.exit(code);
     });
-    process.stdout.on('close', function () {
+    process.stdout.on('close', () => {
         process.exit(code);
     });
     if (stdoutFlushed) {
         process.exit(code);
     }
 }
-
 
 /**
  * Return a function for the given JS code that returns.
@@ -1227,103 +1228,102 @@ function funcWithReturnFromSnippet(js) {
         if (js.substring(js.length - 1) === ';') {
             js = js.substring(0, js.length - 1);
         }
-        js = 'return (' + js + ')';
+        js = `return (${js})`;
     }
     return (new Function(js));
 }
 
-
-
-//---- mainline
+// ---- mainline
 
 function main(argv) {
-    var opts;
+    let opts;
     try {
         opts = parseArgv(argv);
     } catch (e) {
-        warn('json: error: %s', e.message)
+        warn('json: error: %s', e.message);
         return drainStdoutAndExit(1);
     }
-    //warn(opts);
+    // warn(opts);
     if (opts.help) {
         printHelp();
         return;
     }
     if (opts.version) {
         if (opts.outputMode === OM_JSON) {
-            var v = {
+            const v = {
                 version: getVersion(),
                 author: 'Trent Mick',
-                project: 'https://github.com/trentm/json'
+                project: 'https://github.com/trentm/json',
             };
             console.log(JSON.stringify(v, null, opts.jsonIndent));
         } else {
-            console.log('json ' + getVersion());
+            console.log(`json ${getVersion()}`);
             console.log('written by Trent Mick');
             console.log('https://github.com/trentm/json');
         }
         return;
     }
-    var lookupStrs = opts.args;
+    const lookupStrs = opts.args;
 
     // Prepare condition and execution funcs (and vm scripts) for -c/-e.
-    var execVm = Boolean(process.env.JSON_EXEC &&
-        process.env.JSON_EXEC === 'vm');
-    var i;
-    var condFuncs = [];
+    const execVm = Boolean(process.env.JSON_EXEC
+        && process.env.JSON_EXEC === 'vm');
+    let i;
+    const condFuncs = [];
     if (!execVm) {
         for (i = 0; i < opts.condSnippets.length; i++) {
             condFuncs[i] = funcWithReturnFromSnippet(opts.condSnippets[i]);
         }
     }
-    var condScripts = [];
+    const condScripts = [];
     if (execVm) {
         for (i = 0; i < opts.condSnippets.length; i++) {
             condScripts[i] = vm.createScript(opts.condSnippets[i]);
         }
     }
-    var cond = Boolean(condFuncs.length + condScripts.length);
-    var exeFuncs = [];
+    const cond = Boolean(condFuncs.length + condScripts.length);
+    const exeFuncs = [];
     if (!execVm) {
         for (i = 0; i < opts.exeSnippets.length; i++) {
             exeFuncs[i] = new Function(opts.exeSnippets[i]);
         }
     }
-    var exeScripts = [];
+    const exeScripts = [];
     if (execVm) {
         for (i = 0; i < opts.exeSnippets.length; i++) {
             exeScripts[i] = vm.createScript(opts.exeSnippets[i]);
         }
     }
-    var exe = Boolean(exeFuncs.length + exeScripts.length);
+    const exe = Boolean(exeFuncs.length + exeScripts.length);
 
-    var lookups = lookupStrs.map(function (lookup) {
-        return parseLookup(lookup, opts.lookupDelim);
-    });
+    const lookups = lookupStrs.map((lookup) => parseLookup(lookup, opts.lookupDelim));
 
     if (opts.group && opts.array && opts.outputMode !== OM_JSON) {
         // streaming
-        var chunker = chunkEmitter(opts);
-        chunker.on('error', function (error) {
+        const chunker = chunkEmitter(opts);
+        chunker.on('error', (error) => {
             warn('json: error: %s', err.message);
             return drainStdoutAndExit(1);
         });
         chunker.on('chunk', parseChunk);
     } else if (opts.inPlace) {
-        assert.equal(opts.inputFiles.length, 1,
-            'cannot handle more than one file with -I');
-        getInput(opts, function (err, content, filename) {
+        assert.equal(
+            opts.inputFiles.length,
+            1,
+            'cannot handle more than one file with -I',
+        );
+        getInput(opts, (err, content, filename) => {
             if (err) {
-                warn('json: error: %s', err.message)
+                warn('json: error: %s', err.message);
                 return drainStdoutAndExit(1);
             }
 
             // Take off a leading HTTP header if any and pass it through.
-            var headers = [];
+            const headers = [];
             while (true) {
                 if (content.slice(0, 5) === 'HTTP/') {
-                    var index = content.indexOf('\r\n\r\n');
-                    var sepLen = 4;
+                    let index = content.indexOf('\r\n\r\n');
+                    let sepLen = 4;
                     if (index == -1) {
                         index = content.indexOf('\n\n');
                         sepLen = 2;
@@ -1332,7 +1332,7 @@ function main(argv) {
                         if (!opts.dropHeaders) {
                             headers.push(content.slice(0, index + sepLen));
                         }
-                        var is100Continue = (
+                        const is100Continue = (
                             content.slice(0, 21) === 'HTTP/1.1 100 Continue');
                         content = content.slice(index + sepLen);
                         if (is100Continue) {
@@ -1346,16 +1346,16 @@ function main(argv) {
         });
     } else {
         // not streaming
-        getInput(opts, function (err, buffer, filename) {
+        getInput(opts, (err, buffer, filename) => {
             if (err) {
-                warn('json: error: %s', err.message)
+                warn('json: error: %s', err.message);
                 return drainStdoutAndExit(1);
             }
             // Take off a leading HTTP header if any and pass it through.
             while (true) {
                 if (buffer.slice(0, 5) === 'HTTP/') {
-                    var index = buffer.indexOf('\r\n\r\n');
-                    var sepLen = 4;
+                    let index = buffer.indexOf('\r\n\r\n');
+                    let sepLen = 4;
                     if (index == -1) {
                         index = buffer.indexOf('\n\n');
                         sepLen = 2;
@@ -1364,7 +1364,7 @@ function main(argv) {
                         if (!opts.dropHeaders) {
                             emit(buffer.slice(0, index + sepLen));
                         }
-                        var is100Continue = (
+                        const is100Continue = (
                             buffer.slice(0, 21) === 'HTTP/1.1 100 Continue');
                         buffer = buffer.slice(index + sepLen);
                         if (is100Continue) {
@@ -1397,22 +1397,23 @@ function main(argv) {
             return;
         }
         // parseInput() -> {datum: <input object>, error: <error object>}
-        var input = parseInput(chunk, obj, opts.group, opts.merge);
+        const input = parseInput(chunk, obj, opts.group, opts.merge);
         if (input.error) {
             // Doesn't look like JSON. Just print it out and move on.
             if (!opts.quiet) {
                 // Use JSON-js' "json_parse" parser to get more detail on the
                 // syntax error.
-                var details = '';
-                var normBuffer = chunk.replace(/\r\n|\n|\r/, '\n');
+                let details = '';
+                const normBuffer = chunk.replace(/\r\n|\n|\r/, '\n');
                 try {
                     json_parse(normBuffer);
                     details = input.error;
                 } catch (err) {
                     // err.at has the position. Get line/column from that.
-                    var at = err.at - 1; // `err.at` looks to be 1-based.
-                    var lines = chunk.split('\n');
-                    var line, col, pos = 0;
+                    const at = err.at - 1; // `err.at` looks to be 1-based.
+                    const lines = chunk.split('\n');
+                    let line; let col; let
+                        pos = 0;
                     for (line = 0; line < lines.length; line++) {
                         pos += lines[line].length + 1;
                         if (pos > at) {
@@ -1420,16 +1421,19 @@ function main(argv) {
                             break;
                         }
                     }
-                    var spaces = '';
-                    for (var i = 0; i < col; i++) {
+                    let spaces = '';
+                    for (let i = 0; i < col; i++) {
                         spaces += '.';
                     }
-                    details = err.message + ' at line ' + (line + 1) +
-                        ', column ' + (col + 1) + ':\n        ' +
-                        lines[line] + '\n        ' + spaces + '^';
+                    details = `${err.message} at line ${line + 1
+                    }, column ${col + 1}:\n        ${
+                        lines[line]}\n        ${spaces}^`;
                 }
-                warn('json: error: %s is not JSON: %s',
-                    filename ? '"' + filename + '"' : 'input', details);
+                warn(
+                    'json: error: %s is not JSON: %s',
+                    filename ? `"${filename}"` : 'input',
+                    details,
+                );
             }
             if (!opts.validate) {
                 emit(chunk);
@@ -1442,18 +1446,18 @@ function main(argv) {
         if (opts.validate) {
             return drainStdoutAndExit(0);
         }
-        var data = input.datum;
+        let data = input.datum;
 
         // Process: items (-M, --items)
         if (opts.items) {
             if (!Array.isArray(data)) {
-                var key;
-                var array = [];
+                let key;
+                const array = [];
                 for (key in data) {
                     if (data.hasOwnProperty(key)) {
                         array.push({
-                          key: key,
-                          value: data[key]
+                            key,
+                            value: data[key],
                         });
                     }
                 }
@@ -1462,17 +1466,18 @@ function main(argv) {
         }
 
         // Process: executions (-e, -E)
-        var i, j;
+        let i; let
+            j;
         if (!exe) {
             /* pass */
         } else if (opts.array || (opts.array === null && Array.isArray(data))) {
-            var arrayified = false;
+            let arrayified = false;
             if (!Array.isArray(data)) {
                 arrayified = true;
                 data = [data];
             }
             for (i = 0; i < data.length; i++) {
-                var datum = data[i];
+                const datum = data[i];
                 for (j = 0; j < exeFuncs.length; j++) {
                     exeFuncs[j].call(datum);
                 }
@@ -1496,16 +1501,16 @@ function main(argv) {
         if (!cond) {
             /* pass */
         } else if (opts.array || (opts.array === null && Array.isArray(data))) {
-            var arrayified = false;
+            let arrayified = false;
             if (!Array.isArray(data)) {
                 arrayified = true;
                 data = [data];
             }
-            var filtered = [];
+            const filtered = [];
             for (i = 0; i < data.length; i++) {
-                var datum = data[i];
-                var datumCopy = objCopy(datum);
-                var keep = true;
+                const datum = data[i];
+                const datumCopy = objCopy(datum);
+                let keep = true;
                 // TODO(perf): Perhaps drop the 'datumCopy'? "this is a gun"
                 for (j = 0; j < condFuncs.length; j++) {
                     if (!condFuncs[j].call(datumCopy)) {
@@ -1531,8 +1536,8 @@ function main(argv) {
                 data = filtered;
             }
         } else {
-            var keep = true;
-            var dataCopy = objCopy(data);
+            let keep = true;
+            const dataCopy = objCopy(data);
             for (j = 0; j < condFuncs.length; j++) {
                 // TODO(perf): Perhaps drop the 'dataCopy'? "this is a gun"
                 if (!condFuncs[j].call(dataCopy)) {
@@ -1554,17 +1559,17 @@ function main(argv) {
         }
 
         // Process: lookups
-        var lookupsAreIndeces = false;
+        let lookupsAreIndeces = false;
         if (lookups.length) {
             if (opts.array) {
                 if (!Array.isArray(data)) data = [data];
-                var table = [];
+                const table = [];
                 for (j = 0; j < data.length; j++) {
-                    var datum = data[j];
-                    var row = {};
+                    const datum = data[j];
+                    const row = {};
                     for (i = 0; i < lookups.length; i++) {
-                        var lookup = lookups[i];
-                        var value = lookupDatum(datum, lookup);
+                        const lookup = lookups[i];
+                        const value = lookupDatum(datum, lookup);
                         if (value !== undefined) {
                             row[lookup.join('.')] = value;
                         }
@@ -1579,18 +1584,17 @@ function main(argv) {
                 if (Array.isArray(data)) {
                     lookupsAreIndeces = true;
                     for (i = 0; i < lookups.length; i++) {
-                        if (lookups[i].length !== 1 ||
-                            isNaN(Number(lookups[i])))
-                        {
+                        if (lookups[i].length !== 1
+                            || isNaN(Number(lookups[i]))) {
                             lookupsAreIndeces = false;
                             break;
                         }
                     }
                 }
-                var row = {};
+                const row = {};
                 for (i = 0; i < lookups.length; i++) {
-                    var lookup = lookups[i];
-                    var value = lookupDatum(data, lookup);
+                    const lookup = lookups[i];
+                    const value = lookupDatum(data, lookup);
                     if (value !== undefined) {
                         row[lookup.join('.')] = value;
                     }
@@ -1601,11 +1605,11 @@ function main(argv) {
 
         // --keys
         if (opts.outputKeys) {
-            var data = Object.keys(data);
+            const data = Object.keys(data);
         }
 
         // Output
-        var datasets = [];
+        const datasets = [];
         if (opts.outputMode === OM_JSON) {
             if (lookups.length === 1 && !opts.array) {
                 /**
@@ -1625,11 +1629,11 @@ function main(argv) {
                  * array are more likely to be wanted as an array of selected
                  * items rather than a 'JSON table' thing that we use otherwise.
                  */
-                var flattened = [];
+                const flattened = [];
                 for (i = 0; i < lookups.length; i++) {
-                    var lookupStr = lookups[i].join('.');
+                    const lookupStr = lookups[i].join('.');
                     if (data.hasOwnProperty(lookupStr)) {
-                        flattened.push(data[lookupStr])
+                        flattened.push(data[lookupStr]);
                     }
                 }
                 data = flattened;
@@ -1641,7 +1645,7 @@ function main(argv) {
             if (opts.array) {
                 // Output `data` as a 'table' of lookup results.
                 for (j = 0; j < data.length; j++) {
-                    var row = data[j];
+                    const row = data[j];
                     for (i = 0; i < lookups.length - 1; i++) {
                         datasets.push([row[lookups[i].join('.')],
                             opts.delim, true]);
@@ -1672,9 +1676,9 @@ if (require.main === module) {
     // place. The real fix is that `.end()` shouldn't be called on stdout
     // in node core. Hopefully node v0.6.9 will fix that. Only guard
     // for v0.6.0..v0.6.8.
-    var nodeVer = process.versions.node.split('.').map(Number);
+    const nodeVer = process.versions.node.split('.').map(Number);
     if ([0, 6, 0] <= nodeVer && nodeVer <= [0, 6, 8]) {
-        var stdout = process.stdout;
+        const { stdout } = process;
         stdout.end = stdout.destroy = stdout.destroySoon = function () {
             /* pass */
         };

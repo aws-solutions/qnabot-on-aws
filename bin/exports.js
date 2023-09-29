@@ -1,83 +1,89 @@
 #! /usr/bin/env node
-// Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
-// SPDX-License-Identifier: Apache-2.0
-var config=require('../config.json')
-var fs=require('fs')
-process.env.AWS_PROFILE=config.profile
-process.env.AWS_DEFAULT_REGION=config.profile
-var aws=require('aws-sdk')
-var Promise=require('bluebird')
-aws.config.setPromisesDependency(Promise)
-aws.config.region=require('../config.json').region
-var name=require('./name')
-var launch=require('./launch')
-var _=require('lodash')
-var cf=new aws.CloudFormation()
+/*********************************************************************************************************************
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.                                                *
+ *                                                                                                                    *
+ *  Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance    *
+ *  with the License. A copy of the License is located at                                                             *
+ *                                                                                                                    *
+ *      http://www.apache.org/licenses/                                                                               *
+ *                                                                                                                    *
+ *  or in the 'license' file accompanying this file. This file is distributed on an 'AS IS' BASIS, WITHOUT WARRANTIES *
+ *  OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions    *
+ *  and limitations under the License.                                                                                *
+ *********************************************************************************************************************/
+const config = require('../config.json');
 
-module.exports=_.memoize(function(stack,options={}){
-    if(!stack){
+process.env.AWS_PROFILE = config.profile;
+process.env.AWS_DEFAULT_REGION = config.profile;
+const aws = require('aws-sdk');
+aws.config.region = require('../config.json').region;
+const name = require('./name');
+const launch = require('./launch');
+const _ = require('lodash');
 
-        var exports={}
+const cf = new aws.CloudFormation();
 
-        return cf.listExports().promise()
-        .get('Exports')
-        .each(exp=>exports[exp.Name]=exp.Value)
-        .return(exports)
-    }else{
-        var outputs={}
-        if (config.noStackOutput){
-            return new Promise((resolve, reject) => {
-                resolve({
-                    Bucket : config.publicBucket,
-                    Prefix : config.publicPrefix,
-                });
-            });
-        } else {
-            return new Promise(function(res,rej){
-                next()
-                function next(){
-                    cf.describeStacks({
-                        StackName:name(stack,{})
-                    }).promise()
-                    .catch(x=>x.message.match(/does not exist/),
-                        ()=>launch.sure(stack,{wait:true})
-                        .then(()=>cf.describeStacks({
-                            StackName:name(stack,{})
-                        }).promise())
-                    )
-                    .then(function(result){
-                        var stack=result.Stacks[0]
-                        if(["CREATE_COMPLETE",
-                            "UPDATE_COMPLETE",
-                            "UPDATE_ROLLBACK_COMPLETE"
-                            ].includes(stack.StackStatus)){
-                            res(result)
-                        }else if([
-                            "CREATE_IN_PROGRESS",
-                            "UPDATE_IN_PROGRESS",
-                            "UPDATE_COMPLETE_CLEANUP_IN_PROGRESS",
-                            "UPDATE_ROLLBACK_IN_PROGRESS",
-                            "UPDATE_ROLLBACK_COMPLETE_CLEANUP_IN_PROGRESS",
-                            "REVIEW_IN_PROGRESS"
-                            ].includes(stack.StackStatus)){
-                            setTimeout(()=>next(),5*1000)
-                        }else{
-                            rej(stack.StackStatus)
-                        }
-                    })
-                }
-            })
-            .then(x=>x.Stacks[0].Outputs)
-            .map(x=>outputs[x.OutputKey]=x.OutputValue)
-            .return(outputs)
-        }
+module.exports = _.memoize(async (stack, options = {}) => {
+    if (!stack) {
+        const exports = {};
+        const listExportsData = await cf.listExports().promise();
+        listExportsData.Exports.forEach((exp) => exports[exp.Name] = exp.Value);
+        return exports;
     }
-},(stack,options)=>stack)
+    const outputs = {};
+    if (config.noStackOutput) {
+        return {
+            Bucket: config.publicBucket,
+            Prefix: config.publicPrefix,
+        };
+    }
+    const result = await new Promise(async (res, rej) => {
+        next();
+        async function next() {
+            try {
+                const stackResult = await cf.describeStacks({
+                    StackName: name(stack, {}),
+                }).promise();
+                const stackStatus = stackResult.Stacks[0].StackStatus;
+                if (['CREATE_COMPLETE',
+                    'UPDATE_COMPLETE',
+                    'UPDATE_ROLLBACK_COMPLETE',
+                ].includes(stackStatus)) {
+                    res(stackResult);
+                } else if ([
+                    'CREATE_IN_PROGRESS',
+                    'UPDATE_IN_PROGRESS',
+                    'UPDATE_COMPLETE_CLEANUP_IN_PROGRESS',
+                    'UPDATE_ROLLBACK_IN_PROGRESS',
+                    'UPDATE_ROLLBACK_COMPLETE_CLEANUP_IN_PROGRESS',
+                    'REVIEW_IN_PROGRESS',
+                ].includes(stackStatus)) {
+                    setTimeout(() => next(), 5 * 1000);
+                } else {
+                    rej(stackStatus);
+                }
+            } catch (x) {
+                if (x.message.match(/does not exist/)) {
+                    await launch.sure(stack, { wait: true });
+                    const stackResult = await cf.describeStacks({ StackName: name(stack, {}) }).promise();
+                    res(stackResult);
+                } else {
+                    throw x;
+                }
+            }
+        }
+    });
+    result.Stacks[0].Outputs.forEach((x) => outputs[x.OutputKey] = x.OutputValue);
+    return outputs;
+}, (stack, options) => stack);
 
-if(!module.parent){
-    module.exports(process.argv[2],{silent:true,quick:true})
-    .then(exports=>console.log(JSON.stringify(exports,null,4)))
-    .catch(x=>console.log("error"+x))
+if (!module.parent) {
+    (async () => {
+        try {
+            const exports = await module.exports(process.argv[2], { silent: true, quick: true });
+            console.log(JSON.stringify(exports, null, 4));
+        } catch (x) {
+            console.log(`error${x}`);
+        }
+    })();
 }
-
-

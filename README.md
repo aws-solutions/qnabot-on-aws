@@ -57,7 +57,7 @@ Alternatively, if you want to custom deploy QnABot on AWS, refer to the details 
 
 Navigate to the root directory of QnABot (directory will be created once you have cloned this repo).
 
-Install node.js moodules of QnABot:
+Install node.js modules of QnABot:
 
 ```shell
 npm install
@@ -117,8 +117,12 @@ Refer to [LICENSE.txt](LICENSE.txt) file for details.
 
 Refer to [CHANGELOG.md](CHANGELOG.md) file for details of new features in each version.
 
-A [workshop](https://qnabot.workshop.aws) is also available
-that walks you through QnABot features.
+A [workshop](https://qnabot.workshop.aws) is also available that walks you through QnABot features.
+
+## Anonymous Metrics
+This solution collects anonymous operational metrics to help AWS improve the
+quality of features of the solution. For more information, including how to disable
+this capability, please see the [implementation guide](https://docs.aws.amazon.com/solutions/latest/qnabot-on-aws/general-reference.html).
 
 ---
 
