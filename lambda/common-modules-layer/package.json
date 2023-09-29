@@ -1,7 +1,7 @@
 {
   "name": "common-modules-layer",
-  "version": "1.0.0",
-  "description": "",
+  "version": "5.4.2",
+  "description": "QnABot Common-modules-layer lambda",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"

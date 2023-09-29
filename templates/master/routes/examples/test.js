@@ -1,54 +1,53 @@
-var fs=require('fs')
-process.argv.push('--debug')
-var Velocity=require('velocity')
-var run=require('../util/temp-test').run
-var input=require('../util/temp-test').input
+const fs = require('fs');
 
-module.exports={
-    list:test=>run(__dirname+'/'+"list",input({
-        perpage:100,
-        token:""
-    }),test),
-    list:test=>run(__dirname+'/'+"photos",input({
-        perpage:100,
-        token:""
-    }),test),
-    handler:async function(test){
-        var output=await require('../../../../bin/exports')('dev/bucket')
-        try{
+process.argv.push('--debug');
+const Velocity = require('velocity');
+const { run } = require('../util/temp-test');
+const { input } = require('../util/temp-test');
+
+module.exports = {
+    list: (test) => run(`${__dirname}/` + 'list', input({
+        perpage: 100,
+        token: '',
+    }), test),
+    list: (test) => run(`${__dirname}/` + 'photos', input({
+        perpage: 100,
+        token: '',
+    }), test),
+    async handler(test) {
+        const output = await require('../../../../bin/exports')('dev/bucket');
+        try {
             require('./handler').documents({
-                bucket:output.Bucket,
-                prefix:"",
-                root:"example.com"
-            },{},function(err,result){
-                console.log(result)
-                test.ifError(err)
-                test.ok(result)
-                test.done()
-            })
-        }catch(e){
-            test.ifError(e)
-            test.done()
+                bucket: output.Bucket,
+                prefix: '',
+                root: 'example.com',
+            }, {}, (err, result) => {
+                console.log(result);
+                test.ifError(err);
+                test.ok(result);
+                test.done();
+            });
+        } catch (e) {
+            test.ifError(e);
+            test.done();
         }
     },
-    handlerPhoto:async function(test){
-        var output=await require('../../../../bin/exports')('dev/bucket')
-        try{
+    async handlerPhoto(test) {
+        const output = await require('../../../../bin/exports')('dev/bucket');
+        try {
             require('./handler').photos({
-                bucket:output.Bucket,
-                prefix:"",
-                root:"example.com"
-            },{},function(err,result){
-                console.log(result)
-                test.ifError(err)
-                test.ok(result)
-                test.done()
-            })
-        }catch(e){
-            test.ifError(e)
-            test.done()
+                bucket: output.Bucket,
+                prefix: '',
+                root: 'example.com',
+            }, {}, (err, result) => {
+                console.log(result);
+                test.ifError(err);
+                test.ok(result);
+                test.done();
+            });
+        } catch (e) {
+            test.ifError(e);
+            test.done();
         }
-    }
-}
-
-
+    },
+};

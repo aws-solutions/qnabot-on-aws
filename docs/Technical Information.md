@@ -5,7 +5,7 @@
   - [Firehose](#firehose)
   - [APIGateway](#apigateway)
   - [DynamoDB](#dynamodb)
-  - [ElasticSearch](#elasticsearch)
+  - [OpenSearch](#opensearch)
   - [Lambda (42 functions)](#lambda-42-functions)
   - [Lex](#lex)
   - [SNS](#sns)
@@ -114,7 +114,7 @@
 - SNS - APIGW has a 30 second timeout. The Kendra web crawler takes longer than 30 seconds.  The Content Designer calls the Crawler API to trigger an SNS message that starts the crawler Lambda
 ## DynamoDB
 - Stores user session information.
-## ElasticSearch
+## OpenSearch
 - Stores curated questions and answers
 - Stores usage metrics
 
@@ -144,7 +144,7 @@
 ## Comprehend
 - Sentiment Analysis - detects whether a question was positive, negative, neutral or mixed
 - Language Detection - detects the user’s language, translates the text to English and translates the response from English to the user’s language
-- Analyze Syntax - detects parts of speech in a sentence and searches for questions in ElasticSearch based on words that match specified parts of speech – i.e, Nouns, Adjectives, Verbs, etc
+- Analyze Syntax - detects parts of speech in a sentence and searches for questions in OpenSearch based on words that match specified parts of speech – i.e, Nouns, Adjectives, Verbs, etc
 - PII Detection - detects whether a question contains Personally Identifiable Information and allows an administrator  to instruct QnABot to reject a question that contains certain types of PII.
 ## Kendra
 - Kendra FAQ - Questions entered into QnABot are synchronized with Kendra FAQ for better matching
@@ -168,7 +168,7 @@ e default by the user.  QnABot merges DefaultQnABotSettings and CustomQnABotSett
 - Convert voice to text
 - Convert text to voice
 ## Kinesis Firehose
-- Transfers messages from fulfillment lambda to Kinesis Firehose to the ElasticSearch index for Kibana and S3.
+- Transfers messages from fulfillment lambda to Kinesis Firehose to the OpenSearch index for Kibana and S3.
 - Used to store feedback from the client to Kibana
 
 # Roles
@@ -184,7 +184,7 @@ e default by the user.  QnABot merges DefaultQnABotSettings and CustomQnABotSett
 
 - Deploys APIGateway resources
 - Creates and manages Cognito Identity Pools
-- Updates ElasticSearch resources 
+- Updates OpenSearch resources 
 - Creates LexBot
 
 S3 –  Unzips assets stored in S3
@@ -219,11 +219,11 @@ S3 –  Unzips assets stored in S3
 - Uses KMS  to decrypt sessions encrypted by the quiz functionality 
 
 ### ESCleaningLambda 
-*Scheduled job to expire metrics data from ElasticSearch*
+*Scheduled job to expire metrics data from OpenSearch*
 
 ### ESCFNProxyLambda 
 
-*Proxies requests from API Gateway to ElasticSearch*
+*Proxies requests from API Gateway to OpenSearch*
 
 ### ESQidLambda 
 *Designed to just return a question ID – may be used by guided navigation package – research whether it is deprecated*
@@ -237,7 +237,7 @@ S3 –  Unzips assets stored in S3
 ## ESLoginLambdaRole
 
 ### ESLoggingLambda
-*Sends events to ElasticSearch using Firehose*
+*Sends events to OpenSearch using Firehose*
 
 ## ExampleLambdaRole
 
@@ -283,7 +283,7 @@ S3 –  Unzips assets stored in S3
 *This role will be used for all “extensions” to the question processing pipeline. Currently we have the Lambda(s) below configured*
 
 ### KendraFallback
-*When enabled, if a question cannot be answered via the ElasticSearch query, QnABot searches the configured Kendra index(es)*
+*When enabled, if a question cannot be answered via the OpenSearch query, QnABot searches the configured Kendra index(es)*
 
 - Uses XRay for request tracing
 - When configured via the PublicOrPrivate CF parameter, it is attached to a VPC
@@ -312,7 +312,7 @@ S3 –  Unzips assets stored in S3
 
 ### KendraSyncLambda
 
-*Syncs curated questions stored in ElasticSearch to Kendra FAQ*
+*Syncs curated questions stored in OpenSearch to Kendra FAQ*
 
 - Reads settings from ParameterStore
 - Reads JSON FAQ file from S3
@@ -356,7 +356,7 @@ S3 –  Unzips assets stored in S3
 
 ### LexBuildLambda 
 *Generates additional NLP training data for Lex using questions from questions added via the content designer*
-- Reads questions from ElasticSearch to rebuild Lex model
+- Reads questions from OpenSearch to rebuild Lex model
 
 ### LexBuildLambdaPoll 
 *Polls Lex service to determine build completion status*
@@ -386,7 +386,7 @@ Reads status of the Lex Build process from status file S3 object and returns the
 
 ## SchemaLambda 
 *Supports the quiz functionality*
-- ElasticSearchService
+- OpenSearchService
 
 ## TestAllRole
 

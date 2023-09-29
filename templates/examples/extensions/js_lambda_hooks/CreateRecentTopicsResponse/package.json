@@ -1,7 +1,7 @@
 {
   "name": "createrecenttopicsresponse",
-  "version": "1.0.0",
-  "description": "",
+  "version": "5.4.2",
+  "description": "Lambda hook that creates recent topic response",
   "main": "CreateRecentTopicResponse.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"

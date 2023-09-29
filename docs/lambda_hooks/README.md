@@ -7,8 +7,15 @@ QnABot comes with a simple Lambda Hook function example that you can explore:
 1. Log in to the Content Designer, and choose **Import** from the tools menu ( ☰ ).
 2. Open Examples/Extensions, and choose **LOAD** from the ‘GreetingHook’ example.
 
-![Greeting Hook Example](./images/GreetingHookExample.jpg) 3. When the import job has completed, return to the edit page, and examine the item “GreetingHookExample.” Note that the Lambda Hook field is populated with a Lambda function name. 4. Use the Web UI to say “_What are lambda hooks?_”. Note that the answer is prepended with a dynamic greeting based on the current time of day – in this case ‘_good afternoon_’:
-![Greeting Hook Web UI Example](./images/WebUiGreetingHook.jpg) 5. Inspect the example function (ExampleJSLambdahook) using the [AWS Lambda console](https://console.aws.amazon.com/lambda/home?region=us-east-1#/functions/qna-QnABot-hello?tab=graph).
+![Greeting Hook Example](./images/GreetingHookExample.jpg) 
+
+3. When the import job has completed, return to the edit page, and examine the item “GreetingHookExample.” Note that the Lambda Hook field is populated with a Lambda function name. 
+
+4. Use the Web UI to say “_What are lambda hooks?_”. Note that the answer is prepended with a dynamic greeting based on the current time of day – in this case ‘_good afternoon_’:
+
+![Greeting Hook Web UI Example](./images/WebUiGreetingHook.jpg) 
+
+5. Inspect the example function (ExampleJSLambdahook) using the [AWS Lambda console](https://console.aws.amazon.com/lambda/home?region=us-east-1#/functions/qna-QnABot-hello?tab=graph).
 
 Choose **Lambda Hooks** from the Content Designer tools menu ( **☰**) to display additional information to help you create your own Lambda hook functions.
 
@@ -65,7 +72,7 @@ You can add pre-processing and post-processing Lambda hooks (that run before pre
 ## Lambda Hook SDK (Javascript)
 
 Lambda hook SDK hides the internal and lower-level complexities of modifying the QnABot request and response, and provides a simple high-level code layer.
-For more details on the supported methods refer to the [Lambda Hook SDK readme](../lambda_hook_sdk.MD).
+For more details on the supported methods refer to the [Lambda Hook SDK readme](./lambda_hook_sdk.MD).
 
 Additionally, with a QnABot deployment, the Lambda Hook SDK (Javascript) is also available as a Lambda Layer (with the layer name as: `JsLambdaHookSDK`), which can be included in a custom Lambda function.
 
@@ -74,5 +81,5 @@ For an example implementation using Lambda Hook -- refer to this [example](../..
 ## [](#notes)NOTES
 
 -   The `Makefile` residing in the extensions folder creates separate zip packages for each separate Lambda hook function
--   Lambda hook functions use nodejs12.x or python3.9 only at this time
+-   Lambda hook functions use nodejs18.x or python3.10 only at this time
 -   Lambda hook functions will be allocated 2048MB memory (defined in index.js)

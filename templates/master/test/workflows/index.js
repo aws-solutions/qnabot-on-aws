@@ -1,27 +1,38 @@
-var config=require('../../../../config.json')
+/*********************************************************************************************************************
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.                                                *
+ *                                                                                                                    *
+ *  Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance    *
+ *  with the License. A copy of the License is located at                                                             *
+ *                                                                                                                    *
+ *      http://www.apache.org/licenses/                                                                               *
+ *                                                                                                                    *
+ *  or in the 'license' file accompanying this file. This file is distributed on an 'AS IS' BASIS, WITHOUT WARRANTIES *
+ *  OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions    *
+ *  and limitations under the License.                                                                                *
+ *********************************************************************************************************************/
+
+const config=require('../../../../config.json')
 process.env.AWS_PROFILE=config.profile
 process.env.AWS_DEFAULT_REGION=config.region
-var query=require('query-string').stringify
-var _=require('lodash')
-var zlib=require('zlib')
-var Promise=require('bluebird')
-var Url=require('url')
-var sign=require('aws4').sign
-var fs=require('fs')
-var aws=require('aws-sdk')
-aws.config.setPromisesDependency(Promise)
+const query=require('query-string').stringify
+const _=require('lodash')
+const zlib=require('zlib')
+const Url=require('url')
+const sign=require('aws4').sign
+const fs=require('fs')
+const aws=require('aws-sdk')
 aws.config.region=config.region
-var s3=new aws.S3()
-var outputs=require('../../../../bin/exports')
-var exists=require('./../util').exists
-var run=require('./../util').run
-var api=require('./../util').api
-var faker=require('faker').lorem
-var range=require('range').range
+const s3=new aws.S3()
+const outputs=require('../../../../bin/exports')
+const exists=require('./../util').exists
+const run=require('./../util').run
+const api=require('./../util').api
+const faker=require('faker').lorem
+const range=require('range').range
 
 module.exports={
     question:function(test){
-        var id="unit-test.1"
+        const id="unit-test.1"
         exists(id,test,false)
         .then(()=>api({
             path:"questions/"+id,
@@ -44,9 +55,9 @@ module.exports={
     },
     delete:{
         all:function(test){
-            var id1="unit-test.1"
-            var id2="unit-test.2"
-            var one=api({
+            const id1="unit-test.1"
+            const id2="unit-test.2"
+            const one=api({
                 path:"questions/"+id1,
                 method:"PUT",
                 body:{
@@ -57,7 +68,7 @@ module.exports={
                 }
             })
 
-            var two=api({
+            const two=api({
                 path:"questions/"+id2,
                 method:"PUT",
                 body:{
@@ -68,7 +79,7 @@ module.exports={
                 }
             })
 
-            return Promise.join(one,two)
+            return Promise.all[(one,two)]
             .then(()=>api({
                 path:"questions",
                 method:"DELETE",
@@ -81,9 +92,9 @@ module.exports={
             .finally(()=>test.done())
         },
         query:function(test){
-            var id1="one.test"
-            var id2="two.test"
-            var one=api({
+            const id1="one.test"
+            const id2="two.test"
+            const one=api({
                 path:"questions/"+id1,
                 method:"PUT",
                 body:{
@@ -94,7 +105,7 @@ module.exports={
                 }
             })
 
-            var two=api({
+            const two=api({
                 path:"questions/"+id2,
                 method:"PUT",
                 body:{
@@ -105,7 +116,7 @@ module.exports={
                 }
             })
 
-            return Promise.join(one,two)
+            return Promise.all[(one,two)]
             .then(()=>api({
                 path:"questions",
                 method:"DELETE",
@@ -125,9 +136,9 @@ module.exports={
             .finally(()=>test.done())
         },
         list:function(test){
-            var id1="one.test"
-            var id2="two.test"
-            var one=api({
+            const id1="one.test"
+            const id2="two.test"
+            const one=api({
                 path:"questions/"+id1,
                 method:"PUT",
                 body:{
@@ -138,7 +149,7 @@ module.exports={
                 }
             })
 
-            var two=api({
+            const two=api({
                 path:"questions/"+id2,
                 method:"PUT",
                 body:{
@@ -149,7 +160,7 @@ module.exports={
                 }
             })
 
-            return Promise.join(one,two)
+            return Promise.all[(one,two)]
             .then(()=>api({
                 path:"questions",
                 method:"DELETE",
@@ -172,20 +183,20 @@ module.exports={
     },
     export:require('./export'),
     import:function(test){
-        var count=20000
-        var name=(new Date()).getTime()
+        const count=20000
+        const name=(new Date()).getTime()
         console.log(name)
         api({
             path:"jobs",
             method:"GET"
         })
         .then(x=>x._links.imports)
-        .tap(info=>s3.putObject({
+        .then(info=>s3.putObject({
             Bucket:info.bucket,
             Key:info.uploadPrefix+name,
             Body:range(0,count).map(qna).join('\n')
         }).promise())
-        .tap(function(info){
+        .then(function(info){
             return new Promise(function(res,rej){
                 function next(i){
                     console.log("tries left:"+i)
@@ -194,12 +205,19 @@ module.exports={
                             path:"jobs/imports",
                             method:"GET"
                         })
-                        .tap(x=>console.log(JSON.stringify(x,null,2)))
-                        .then(x=>x.jobs.map(y=>y.id).includes(name) ?
-                            setTimeout(()=>next(--i),2000) : res(x) )
-                        .catch(x=>x.statusCode===404,
-                            ()=>setTimeout(()=>next(--i),2000))
-                        .catch(rej)
+                        .then(x => {
+                            console.log(JSON.stringify(x, null, 2))
+                            x.jobs.map(y=>y.id).includes(name) ?
+                            setTimeout(()=>next(--i),2000) : res(x) 
+                        })
+                        .catch(x=> { 
+                            console.log(x);
+                            if (x.response.status === 404) {
+                                setTimeout(() => next(--i), 2000)
+                            } else {
+                                rej(x)
+                            }
+                        })
                     }else{
                         rej("timeout")
                     }
@@ -216,13 +234,19 @@ module.exports={
                             path:"jobs/imports/"+name,
                             method:"GET"
                         })
-                        .tap(x=>console.log(JSON.stringify(x,null,2)))
-                        .tapCatch(console.log)
-                        .then(x=>x.status==="InProgress" ?
-                            setTimeout(()=>next(--i),2000) : res(x) )
-                        .catch(x=>x.response.status===404,
-                            ()=>setTimeout(()=>next(--i),2000))
-                        .catch(rej)
+                        .then(x => { 
+                            console.log(JSON.stringify(x,null,2))
+                            x.status==="InProgress" ?
+                            setTimeout(()=>next(--i),2000) : res(x)
+                        })
+                        .catch(x=> { 
+                            console.log(x);
+                            if (x.response.status === 404) {
+                                setTimeout(() => next(--i), 2000)
+                            } else {
+                                rej(x)
+                            }
+                        })
                     }else{
                         rej("timeout")
                     }
@@ -230,8 +254,8 @@ module.exports={
                 next(100)
             })
         })
-        .tap(console.log)
-        .tap(x=>{
+        .then(x=>{
+            console.log(x)
             test.equal(x.status,"Complete")
             test.equal(x.count,count)
         })

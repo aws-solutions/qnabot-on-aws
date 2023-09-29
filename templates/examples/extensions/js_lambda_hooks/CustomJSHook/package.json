@@ -1,7 +1,7 @@
 {
   "name": "examples",
-  "version": "1.0.0",
-  "description": "",
+  "version": "5.4.2",
+  "description": "Creates custom JS Lambda Hooks",
   "main": "index.js",
   "scripts": {
     "test": "nodeunit test.js"

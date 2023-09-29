@@ -1,26 +1,37 @@
-// Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
-// SPDX-License-Identifier: Apache-2.0
+/*********************************************************************************************************************
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.                                                *
+ *                                                                                                                    *
+ *  Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance    *
+ *  with the License. A copy of the License is located at                                                             *
+ *                                                                                                                    *
+ *      http://www.apache.org/licenses/                                                                               *
+ *                                                                                                                    *
+ *  or in the 'license' file accompanying this file. This file is distributed on an 'AS IS' BASIS, WITHOUT WARRANTIES *
+ *  OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions    *
+ *  and limitations under the License.                                                                                *
+ *********************************************************************************************************************/
 
-const Promise=require('bluebird')
-const _=require('lodash')
-const run=require('./run.js')
+const _ = require('lodash');
+const run = require('./run.js');
 
-exports.bot=function(name,version){
-    return Promise.all(run('getBotVersions',{name}).get('bots')
-    .map(x=>x.version)
-    .filter(x=>!_.includes(["$LATEST",version],x))
-    .map(x=>run('deleteBotVersion',{name,version:x})))
-}
-exports.intent=function(name,version){
-    return Promise.all(run('getIntentVersions',{name,}).get('intents')
-    .map(x=>x.version)
-    .filter(x=>!_.includes(["$LATEST",version],x))
-    .map(x=>run('deleteIntentVersion',{name,version:x})))
-}
-exports.slot=function(name,version){
-    return Promise.all(run('getSlotTypeVersions',{name}).get('slotTypes')
-    .map(x=>x.version)
-    .filter(x=>!_.includes(["$LATEST",version],x))
-    .map(x=>run('deleteSlotTypeVersion',{name,version:x})))
-}
-
+exports.bot = async function (name, version) {
+    const res =  run('getBotVersions', { name })
+    const versions = res.bots.map(x => x.version)
+    const latestVersions = versions.filter(x => !_.includes(['$LATEST', version], x))
+    const deleteBotVersion = latestVersions.map(x => run('deleteBotVersion', { name, version: x }))
+    return await Promise.all(deleteBotVersion)
+};
+exports.intent = async function (name, version) {
+    const res =  run('getIntentVersions', { name })
+    const versions = res.intents.map(x => x.version)
+    const latestVersions = versions.filter(x => !_.includes(['$LATEST', version], x))
+    const deleteIntentVersion = latestVersions.map(x => run('deleteIntentVersion', { name, version: x }))
+    return await Promise.all(deleteIntentVersion)
+};
+exports.slot = async function (name, version) {
+    const res =  run('getSlotTypeVersions', { name })
+    const versions = res.slotTypes.map(x => x.version)
+    const latestVersions = versions.filter(x => !_.includes(['$LATEST', version], x))
+    const deleteSlotTypeVersion = latestVersions.map(x => run('deleteSlotTypeVersion', { name, version: x }))
+    return await Promise.all(deleteSlotTypeVersion)
+};

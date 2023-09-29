@@ -23,7 +23,7 @@ The {Item ID} setup is made of the following attributes:
 - Slot(s) can be configured to be either required or optional. Should a conversation flow require user input, then check the `Slot Required` option. 
 - For each slot, you provide the Slot Type and one or more prompts that Amazon Lex V2 sends to the client to elicit values from the user. A user can reply with a slot value when input may be needed. You can create your own custom slot type, or you can use [built-in slot types](https://docs.aws.amazon.com/lexv2/latest/dg/howitworks-builtins-slots.html).
 
-![](./qid_intent_slot_config.png)
+![](./images/qid_intent_slot_config.png)
 
   - A slot can also include optional sample utterances. These are phrases that a user might use to provide the slot value. A comprehensive set of pre-defined utterances is included (via built-in slot type or a custom slot type). You can add more if required. In most cases, Amazon Lex can understand user utterances. If you know a specific pattern that users might respond to an Amazon Lex request for a slot value, you can provide those utterances to improve accuracy. In most cases, you won't need to provide any utterances.
 
@@ -37,7 +37,7 @@ In addition to using built-in slot types, you can also create custom slot types.
 
 - Slot value resolution – determines how slot values are resolved. If you choose not to Restrict to slot values, Amazon Lex V2 uses the values as representative values for training. If you choose to Restrict to slot values, the allowed values for the slot are restricted to the ones that you provide.
 
-![](./slottype_config.png)
+![](./images/slottype_config.png)
 
 
 ## Accessing Slot Values
@@ -117,6 +117,6 @@ More information: https://docs.aws.amazon.com/lexv2/latest/dg/build-intents.html
 
 ## Additional Example Implementation
 Also take a look at an example implementation showcasing the use of Intent and Slot matching. 
-- Integration with Canvas LMS -- an early example implementation - https://github.com/aws-solutions/aws-qnabot/blob/main/docs/canvaslms_integration.md
+- [Integration with Canvas LMS](../canvaslms_integration/README.md)
 
 ----

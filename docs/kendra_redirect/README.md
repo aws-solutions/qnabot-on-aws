@@ -20,7 +20,7 @@ You can also use handlebars to substitute values using session attributes or slo
 
 More information on using Kendra query arguments: https://docs.aws.amazon.com/kendra/latest/dg/API_Query.html
 
-![](./kendra_redirect.png)
+![](./images/kendra_redirect.png)
 
 
 ## Notes

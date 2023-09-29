@@ -1,7 +1,7 @@
 {
   "name": "testall",
-  "version": "1.0.0",
-  "description": "",
+  "version": "5.4.2",
+  "description": "Lambda function that reads QnAs from opensearch and performs test validation against each question defined in qna against current Lex bot",
   "main": "index.js",
   "scripts": {
     "test": "nodeunit test"

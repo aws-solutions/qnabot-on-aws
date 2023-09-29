@@ -31,8 +31,8 @@ To use the CLI, the following prerequisites are required:
                 "s3:GetObject"
             ],
             "Resource": [
-                "arn:aws:s3:AWS_REGION:AWS_ACCOUNT_ID:YOUR_QNABOT_IMPORT_BUCKET_NAME/*",
-                "arn:aws:s3:AWS_REGION:AWS_ACCOUNT_ID:YOUR_QNABOT_EXPORT_BUCKET_NAME/*",
+                "arn:aws:s3:::YOUR_QNABOT_IMPORT_BUCKET_NAME/*",
+                "arn:aws:s3:::YOUR_QNABOT_EXPORT_BUCKET_NAME/*",
             ]
         },
         {

@@ -1,3 +1,15 @@
+/*********************************************************************************************************************
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.                                                *
+ *                                                                                                                    *
+ *  Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance    *
+ *  with the License. A copy of the License is located at                                                             *
+ *                                                                                                                    *
+ *      http://www.apache.org/licenses/                                                                               *
+ *                                                                                                                    *
+ *  or in the 'license' file accompanying this file. This file is distributed on an 'AS IS' BASIS, WITHOUT WARRANTIES *
+ *  OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions    *
+ *  and limitations under the License.                                                                                *
+ *********************************************************************************************************************/
 <template lang="pug">
   span
     span(v-if="schema.type==='string' && !empty")
@@ -40,15 +52,13 @@
 </template>
 
 <script>
-// Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
-// SPDX-License-Identifier: Apache-2.0
-var Vuex=require('vuex')
-var saveAs=require('file-saver').saveAs
-var Promise=require('bluebird')
-var _=require('lodash')
-var empty=require('./empty')
-var Ajv=require('ajv')
-var ajv=new Ajv()
+const Vuex=require('vuex')
+const saveAs=require('file-saver').saveAs
+const Promise=require('bluebird')
+const _=require('lodash')
+const empty=require('./empty')
+const Ajv=require('ajv')
+const ajv=new Ajv()
 
 module.exports={
   props:["schema","value","name","row","column","path"],
@@ -68,12 +78,12 @@ module.exports={
       }
     },
     properties:function(){
-      var self=this
+      const self=this
       function helperSort(nextDepth){
         return Object.keys(nextDepth)
         .filter(x=>Object.keys(self.value).includes(x))
         .map(function(x){
-          var out=_.cloneDeep(nextDepth[x])
+          const out=_.cloneDeep(nextDepth[x])
           out.name=x
           return out
         })
@@ -83,23 +93,21 @@ module.exports={
       }
       function recurseDown(currentDepth){
           if(_.has(currentDepth,"properties")){
-            for(var key in Object.keys(currentDepth.properties)){
+            for(const key in Object.keys(currentDepth.properties)){
               recurseDown(key)
             }
             return helperSort(currentDepth.properties)
           }
           if(_.has(currentDepth,"items.properties")){
-            for(var key in Object.keys(currentDepth.items.properties)){
+            for(const key in Object.keys(currentDepth.items.properties)){
               recurseDown(key)
             }
             return helperSort(currentDepth.properties)
           }
         return currentDepth
       } 
-      if(this.schema.properties){
-        return recurseDown(this.schema)
-      }else{
-        []
+      if (this.schema.properties) {
+        return recurseDown(this.schema);
       }
     },
   },

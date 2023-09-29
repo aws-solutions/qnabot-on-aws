@@ -1,39 +1,52 @@
 #! /usr/bin/env node
-var config=require('../config.json')
-process.env.AWS_PROFILE=config.profile
-process.env.AWS_DEFAULT_REGION=config.profile
-var aws=require('aws-sdk')
-var Promise=require('bluebird')
-aws.config.setPromisesDependency(Promise)
-aws.config.region=require('../config.json').region
-var region=require('../config.json').region
-var _=require('lodash')
-var fs=require('fs')
-var cf=new aws.CloudFormation()
-var build=require('./build')
-var check=require('./check')
-var argv=require('commander')
-var name=require('./name')
-var wait=require('./wait')
-var s3=new aws.S3()
+/*********************************************************************************************************************
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.                                                *
+ *                                                                                                                    *
+ *  Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance    *
+ *  with the License. A copy of the License is located at                                                             *
+ *                                                                                                                    *
+ *      http://www.apache.org/licenses/                                                                               *
+ *                                                                                                                    *
+ *  or in the 'license' file accompanying this file. This file is distributed on an 'AS IS' BASIS, WITHOUT WARRANTIES *
+ *  OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions    *
+ *  and limitations under the License.                                                                                *
+ *********************************************************************************************************************/
+
+const config = require('../config.json');
+
+process.env.AWS_PROFILE = config.profile;
+process.env.AWS_DEFAULT_REGION = config.profile;
+const aws = require('aws-sdk');
+aws.config.region = require('../config.json').region;
+const { region } = require('../config.json');
+const _ = require('lodash');
+const fs = require('fs');
+
+const cf = new aws.CloudFormation();
+const build = require('./build');
+const check = require('./check');
+const argv = require('commander');
+const name = require('./name');
+const wait = require('./wait');
+
+const s3 = new aws.S3();
 
 if (require.main === module) {
-    var args=argv.version('1.0')
-        .description("Manage Cloudformation stacks. stack name is path to template file relative to /templates")
-        .name("npm run stack")
+    const args = argv.version('1.0')
+        .description('Manage Cloudformation stacks. stack name is path to template file relative to /templates')
+        .name('npm run stack')
         .arguments('[stack] [op] [options]')
-        .option('-v, --verbose',"print additional debuging information")
-        .option('-d, --dry-run',"run command but do not launch any stacks")
-        .option('--no-check',"do not check stack syntax")
-        .option('-q --silent',"do output information")
-        .option('--operation <op>',"the opteration to do")
-        .option('--input <input>',"input template")
-        .option('--stack-name <StackName>',"stack name of the launched template")
-        .option('--no-wait',"do not wait for stack to complete")
-        .option('--no-interactive',"omit interactive elements of output (spinners etc.)")
-        .on('--help',()=>{
-            log(
-`
+        .option('-v, --verbose', 'print additional debuging information')
+        .option('-d, --dry-run', 'run command but do not launch any stacks')
+        .option('--no-check', 'do not check stack syntax')
+        .option('-q --silent', 'do output information')
+        .option('--operation <op>', 'the opteration to do')
+        .option('--input <input>', 'input template')
+        .option('--stack-name <StackName>', 'stack name of the launched template')
+        .option('--no-wait', 'do not wait for stack to complete')
+        .option('--no-interactive', 'omit interactive elements of output (spinners etc.)')
+        .on('--help', () => {
+            log(`
   Operations:
 
     up:         launch a stack
@@ -45,221 +58,217 @@ if (require.main === module) {
   Examples:
     npm run stack dev/bootstrap up -- --no-wait --verbose
     npm run stack -- --input ./test/cfn --operation make-sure --dry-run
-`,{})
+`, {});
         })
-        .parse(process.argv)
+        .parse(process.argv);
 
     const options = argv.opts();
-    var stack=!options.input ? argv.args[0] : argv.input.split('/')
+    const stack = !options.input ? argv.args[0] : argv.input.split('/')
         .reverse()
-        .filter(x=>x)
-        .slice(0,2)
-        .reverse().join('-').split('.')[0]
-    var op=options.operation || (options.input ? argv.args[0] : argv.args[1])
+        .filter((x) => x)
+        .slice(0, 2)
+        .reverse()
+        .join('-')
+        .split('.')[0];
+    const op = options.operation || (options.input ? argv.args[0] : argv.args[1]);
     try {
-        if( stack && op){
-            switch(op){
-                case "up":
-                    up(stack,options || {})
-                    break;
-                case "update":
-                    update(stack,options || {})
-                    break;
-                case "down":
-                    down(stack,options || {})
-                    break;
-                case "restart":
-                    log("restarting stack",options||{})
-                    down(stack,options || {}).then(()=>up(stack,options || {}))
-                    break;
-                case "make-sure":
-                    sure(stack,options)
-                    break;
-                default:
-                    argv.outputHelp()
+        if (stack && op) {
+            switch (op) {
+            case 'up':
+                up(stack, options || {});
+                break;
+            case 'update':
+                update(stack, options || {});
+                break;
+            case 'down':
+                down(stack, options || {});
+                break;
+            case 'restart':
+                log('restarting stack', options || {});
+                down(stack, options || {}).then(() => up(stack, options || {}));
+                break;
+            case 'make-sure':
+                sure(stack, options);
+                break;
+            default:
+                argv.outputHelp();
             }
-        }else{
-            argv.outputHelp()
+        } else {
+            argv.outputHelp();
         }
-    }catch(e){
-            log(e.message,options)
+    } catch (e) {
+        log(e.message, options);
     }
 }
-async function syntax(stack,options){
-    if(options.check){
-        try{
-            await check(stack,options)
-            log("Template Valid",options)
-        }catch(e){
-            log(e.message,options)
+async function syntax(stack, options) {
+    if (options.check) {
+        try {
+            await check(stack, options);
+            log('Template Valid', options);
+        } catch (e) {
+            log(e.message, options);
         }
-    }else{
-        return Promise.resolve()
     }
 }
-async function up(stack,options){
+async function up(stack, options) {
     await build({
-        stack:stack,
-        input:options.input,
-        silent:options.silent
-    })
+        stack,
+        input: options.input,
+        silent: options.silent,
+    });
     try {
-        var StackName=options.stackName ? options.stackName : name(stack,{inc:true})
-        log(`launching stack:${stack}`,options)
-        if(!options.dryRun){
-            var template=fs.readFileSync(
-                `${__dirname}/../build/templates/${stack}.json`
-            ,'utf-8')
-            if(Buffer.byteLength(template)<51200){
-                var create=await cf.createStack({
+        const StackName = options.stackName ? options.stackName : name(stack, { inc: true });
+        log(`launching stack:${stack}`, options);
+        if (!options.dryRun) {
+            const template = fs.readFileSync(
+                `${__dirname}/../build/templates/${stack}.json`,
+                'utf-8',
+            );
+
+            let create;
+            if (Buffer.byteLength(template) < 51200) {
+                create = await cf.createStack({
                     StackName,
-                    Capabilities:["CAPABILITY_NAMED_IAM","CAPABILITY_AUTO_EXPAND"],
-                    DisableRollback:true,
-                    TemplateBody:template
-                }).promise()
-            }else{
-                var exp=await bootstrap()
-                var bucket=exp.Bucket
-                var prefix=exp.Prefix
-                var url=`https://${bucket}.s3.${region}.amazonaws.com/${prefix}/templates/${stack}.json`
+                    Capabilities: ['CAPABILITY_NAMED_IAM', 'CAPABILITY_AUTO_EXPAND'],
+                    DisableRollback: true,
+                    TemplateBody: template,
+                }).promise();
+            } else {
+                const exp = await bootstrap();
+                const bucket = exp.Bucket;
+                const prefix = exp.Prefix;
+                const url = `https://${bucket}.s3.${region}.amazonaws.com/${prefix}/templates/${stack}.json`;
                 await s3.putObject({
-                    Bucket:bucket,
-                    Key:`${prefix}/templates/${stack}.json`,
-                    Body:template
-                }).promise()
-                var create=await cf.createStack({
+                    Bucket: bucket,
+                    Key: `${prefix}/templates/${stack}.json`,
+                    Body: template,
+                }).promise();
+                create = await cf.createStack({
                     StackName,
-                    Capabilities:["CAPABILITY_NAMED_IAM","CAPABILITY_AUTO_EXPAND"],
-                    DisableRollback:true,
-                    TemplateURL:url
-                }).promise()
+                    Capabilities: ['CAPABILITY_NAMED_IAM', 'CAPABILITY_AUTO_EXPAND'],
+                    DisableRollback: true,
+                    TemplateURL: url,
+                }).promise();
             }
 
-            log(`stackname: ${StackName}`,options)
-            log(`stackId: ${create.StackId}`,options)
-            if(options.wait){
-                return wait(stack,{show:!options.silent})
+            log(`stackname: ${StackName}`, options);
+            log(`stackId: ${create.StackId}`, options);
+            if (options.wait) {
+                return wait(stack, { show: !options.silent });
             }
         }
-    }catch(e){
-        log("failed:"+e,options)
-        process.exit(1)
+    } catch (e) {
+        log(`failed:${e}`, options);
+        process.exit(1);
     }
 }
-function update(stack,options){
-    return build({
-        stack:stack,
-        input:options.input,
-        silent:options.silent
-    })
-    .then(()=>{
-        var StackName=options.stackName ? options.stackName : name(stack)
-        log(`updating stack:${stack}`,options)
-        if(!options.dryRun){
-            var template=fs.readFileSync(
-                `${__dirname}/../build/templates/${stack}.json`
-            ,'utf-8')
-            if(Buffer.byteLength(template)<51200){
-                var start=cf.updateStack({
+async function update(stack, options) {
+    await build({
+        stack,
+        input: options.input,
+        silent: options.silent,
+    });
+    try {
+        const StackName = options.stackName ? options.stackName : name(stack);
+        log(`updating stack:${stack}`, options);
+        if (!options.dryRun) {
+            const template = fs.readFileSync(`${__dirname}/../build/templates/${stack}.json`, 'utf-8');
+            let start;
+            if (Buffer.byteLength(template) < 51200) {
+                start = await cf.updateStack({
                     StackName,
-                    Capabilities:["CAPABILITY_NAMED_IAM","CAPABILITY_AUTO_EXPAND"],
-                    TemplateBody:template
-                }).promise()
-            }else{
-                var start=bootstrap().then(function(exp){
-                    var bucket=exp.Bucket
-                    var prefix=exp.Prefix
-                    var url=`https://${bucket}.s3.${region}.amazonaws.com/${prefix}/templates/${stack}.json`
-                    console.log(url)
-                    return s3.putObject({
-                        Bucket:bucket,
-                        Key:`${prefix}/templates/${stack}.json`,
-                        Body:template
-                    }).promise()
-                    .then(()=>cf.updateStack({
-                        StackName,
-                        Capabilities:["CAPABILITY_NAMED_IAM","CAPABILITY_AUTO_EXPAND"],
-                        TemplateURL:url
-                    }).promise())
-                })
+                    Capabilities: ['CAPABILITY_NAMED_IAM', 'CAPABILITY_AUTO_EXPAND'],
+                    TemplateBody: template,
+                }).promise();
+            } else {
+                const exp = await bootstrap();
+                const bucket = exp.Bucket;
+                const prefix = exp.Prefix;
+                const url = `https://${bucket}.s3.${region}.amazonaws.com/${prefix}/templates/${stack}.json`;
+                console.log(url);
+                await s3.putObject({
+                    Bucket: bucket,
+                    Key: `${prefix}/templates/${stack}.json`,
+                    Body: template,
+                }).promise();
+                start = await cf.updateStack({
+                    StackName,
+                    Capabilities: ['CAPABILITY_NAMED_IAM', 'CAPABILITY_AUTO_EXPAND'],
+                    TemplateURL: url,
+                }).promise();
             }
-
-            return start.then(x=>{
-                log(`stackname: ${StackName}`,options)
-                log(`stackId: ${x.StackId}`,options)
-                if(options.wait){
-                    return wait(stack,{show:!options.silent})
-                }
-            })
+            const result = await start;
+            log(`stackname: ${StackName}`, options);
+            log(`stackId: ${result.StackId}`, options);
+            if (options.wait) {
+                return wait(stack, { show: !options.silent });
+            }
         }
-    })
-    .catch(x=>{
-        log("failed"+x,options)
-        process.exit(1)
-    })
-}
-async function down(stack,options){
-    var StackName=options.stackName ? options.stackName : name(stack)
-    log("terminating stack",options)
-    if(options.dryRun){
-        return
+    } catch (err) {
+        log(`failed${err}`, options);
+        process.exit(1);
     }
-    try{
-        var down=await cf.describeStacks({
-            StackName
-        }).promise()
-        var id=down.Stacks[0].StackId
+}
+async function down(stack, options) {
+    const StackName = options.stackName ? options.stackName : name(stack);
+    log('terminating stack', options);
+    if (options.dryRun) {
+        return;
+    }
+    try {
+        const down = await cf.describeStacks({
+            StackName,
+        }).promise();
+        const id = down.Stacks[0].StackId;
         await cf.deleteStack({
-            StackName:id
-        }).promise()
-        if(options.wait){
-            return wait(stack,{
-                Id:id,
-                show:options.interactive
-            })
+            StackName: id,
+        }).promise();
+        if (options.wait) {
+            return wait(stack, {
+                Id: id,
+                show: options.interactive,
+            });
         }
-    }catch(e){
-        console.log(e)
-        if(!_.get(e,"message","").match(/.*does not exist$/)){
-            log(e,options)
-            process.exit(1)
-        }
-    }
-}
-
-async function sure(stack,options={}){
-    var StackName=options.stackName ? options.stackName : name(stack)
-    log(`making sure stack ${stack} is up`,options)
-    try{
-        await cf.describeStacks({StackName}).promise()
-        await wait(stack,{show:options.interactive && !options.silent})
-        log(`${stack} is up as ${StackName}`,options)
-    }catch(e){
-        if(_.get(e,"message","").match(/.*does not exist$/)){
-            log("Stack does not exist",options)
-            return up(stack,options)
-        }else{
-            throw e
+    } catch (e) {
+        console.log(e);
+        if (!_.get(e, 'message', '').match(/.*does not exist$/)) {
+            log(e, options);
+            process.exit(1);
         }
     }
 }
 
-function log(message,options){
-    if(!options.silent){
-        console.log(message)
+async function sure(stack, options = {}) {
+    const StackName = options.stackName ? options.stackName : name(stack);
+    log(`making sure stack ${stack} is up`, options);
+    try {
+        await cf.describeStacks({ StackName }).promise();
+        await wait(stack, { show: options.interactive && !options.silent });
+        log(`${stack} is up as ${StackName}`, options);
+    } catch (e) {
+        if (_.get(e, 'message', '').match(/.*does not exist$/)) {
+            log('Stack does not exist', options);
+            return up(stack, options);
+        }
+        throw e;
     }
 }
 
-function bootstrap(){
-    var outputs={}
-    return cf.describeStacks({
-        StackName:name("dev/bootstrap",{})
-    }).promise()
-    .then(x=>x.Stacks[0].Outputs)
-    .map(x=>outputs[x.OutputKey]=x.OutputValue)
-    .return(outputs)
+function log(message, options) {
+    if (!options.silent) {
+        console.log(message);
+    }
 }
-exports.up=up
-exports.down=down
-exports.sure=sure
-exports.update=update
+
+async function bootstrap() {
+    const outputs = {};
+    const tmp = await cf.describeStacks({
+        StackName: name('dev/bootstrap', {}),
+    }).promise();
+    tmp.Stacks[0].Outputs.forEach((x) => outputs[x.OutputKey] = x.OutputValue);
+    return outputs;
+}
+exports.up = up;
+exports.down = down;
+exports.sure = sure;
+exports.update = update;

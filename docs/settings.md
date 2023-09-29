@@ -13,7 +13,7 @@
 | ES_PHRASE_BOOST | integer | If the user's question is a phrase match to a question in the knowledge then boost the score by this factor.
 | ES_SCORE_ANSWER_FIELD | true or false | Search the content of the answer field as a 2nd pass query (if there's no good match from 1st pass query on question fields).
 | ENABLE_SENTIMENT_SUPPORT | true or false | Enables [Amazon Comprehend](https://docs.aws.amazon.com/comprehend/latest/dg/how-sentiment.html) be used for sentiment analysis
-| ENABLE_MULTI_LANGUAGE_SUPPORT | true or false | Enable or Disable Amazon Translate support. See list of [Supported Languages](multilanguage_support.md#supported-languages)
+| ENABLE_MULTI_LANGUAGE_SUPPORT | true or false | Enable or Disable Amazon Translate support. See list of [Supported Languages](multilanguage_support/README.md#supported-languages)
 | ENABLE_CUSTOM_TERMINOLOGY| true or false |  Enable support for installed [Custom Terminology](https://aws.amazon.com/blogs/machine-learning/introducing-amazon-translate-custom-terminology/) files when using Amazon Translate
 | MINIMUM_CONFIDENCE_SCORE | decimal between 0.0 and 0,99 | The minimum confidence before Amazon Comprehend will determine the user's language
 | ALT_SEARCH_KENDRA_INDEXES | An Array of comma separated Ids |  A list of one or more [Amazon Kendra](https://aws.amazon.com/kendra/) indexes used for Kendra fallback
@@ -92,3 +92,4 @@
 | LLM_QA_SHOW_CONTEXT_TEXT                 | TRUE or FALSE                                               | Enables or disables inclusion of the passages used as context for LLM-generated answers.      |
 | LLM_QA_SHOW_SOURCE_LINKS                 | TRUE or FALSE                                               | Enables or disables Kendra Source Links or passage refMarkdown links (document references) in markdown answers.  |
 | LLM_CHAT_HISTORY_MAX_MESSAGES            | Positive integer  | Specifies the maximum number of previous messages maintained in the QnABot DynamoDB UserTable for conversational context and follow-up question disambiguation.         |
+| LLM_PROMPT_MAX_TOKEN_LIMIT                | Positive integer  | Specifies the maximum number of tokens in the prompt message that can be sent to the LLM. QnABot will selectively truncate the prompt by history and context to shorten the total length. |

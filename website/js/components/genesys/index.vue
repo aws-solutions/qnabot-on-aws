@@ -1,5 +1,17 @@
+/*********************************************************************************************************************
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.                                                *
+ *                                                                                                                    *
+ *  Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance    *
+ *  with the License. A copy of the License is located at                                                             *
+ *                                                                                                                    *
+ *      http://www.apache.org/licenses/                                                                               *
+ *                                                                                                                    *
+ *  or in the 'license' file accompanying this file. This file is distributed on an 'AS IS' BASIS, WITHOUT WARRANTIES *
+ *  OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions    *
+ *  and limitations under the License.                                                                                *
+ *********************************************************************************************************************/
 <template lang='pug'>
-  v-container(grid-list-md)
+v-container(grid-list-md)
     v-layout(column )
       v-flex
         v-card
@@ -61,15 +73,13 @@
 </template>
 
 <script>
-// Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
-// SPDX-License-Identifier: Apache-2.0
 
-var Vuex=require('vuex')
-var Promise=require('bluebird')
-var markdown=require('marked')
-var saveAs=require('file-saver').saveAs
-var renderer=new markdown.Renderer()
-var axios=require('axios')
+const Vuex=require('vuex')
+const Promise=require('bluebird')
+const markdown=require('marked')
+const saveAs=require('file-saver').saveAs
+const renderer=new markdown.Renderer()
+const axios=require('axios')
 
 renderer.link=function(href,title,text){
   return `<a href="${href}" title="${title}" target="_blank">${text}</a>`
@@ -78,14 +88,13 @@ renderer.table=function(header,body){
   return `<table class="pure-table"><thead>${header}</thead><tbody>${body}</tbody></table>`
 }
 
-var handlebars=require('handlebars')
-var clipboard=require('clipboard')
-var _=require('lodash')
+const handlebars=require('handlebars')
+const clipboard=require('clipboard')
+const _=require('lodash')
 const { stringify }=require('querystring')
 
 module.exports={
   data:function(){
-    var self=this
     return {
       visible:false,
       stepNumber:1,
@@ -100,11 +109,11 @@ module.exports={
     ]),
     {
     steps:function(){
-      var self=this
+      const self=this
       return _.map(this.stepsRaw,function(x){
-        var y=Object.assign({},x)
+        const y=Object.assign({},x)
         if(x.text){
-          var temp=handlebars.compile(x.text)
+          const temp=handlebars.compile(x.text)
           y.text=markdown.parse(temp(self.$store.state.bot),{renderer})
         }
         return y
@@ -113,7 +122,7 @@ module.exports={
     }
   ),
   updated: function () {
-      var self = this;
+      const self = this;
       this.$nextTick(function () {
           const downloadBlobAsFile = (function closure_shell() {
             const a = document.createElement("a");
@@ -126,19 +135,19 @@ module.exports={
             };
           })();
 
-          var links = document.links;
+          const links = document.links;
 
-          for (var i = 0, linksLength = links.length; i < linksLength; i++) {
+          for (let i = 0, linksLength = links.length; i < linksLength; i++) {
             if (links[i].hostname != window.location.hostname) {
               links[i].target = '_blank';
             }
           }
-          var button = document.getElementById("DownloadInboundCallFlow");
+          const button = document.getElementById("DownloadInboundCallFlow");
           if(button)
           {
             button.onclick = function()
             {
-              var result = self.$store.dispatch('api/getGenesysCallFlow').then((result) => {
+              self.$store.dispatch('api/getGenesysCallFlow').then((result) => {
               downloadBlobAsFile(new Blob(
                   [result],
                   {type: "text/yaml"}
@@ -148,7 +157,7 @@ module.exports={
             }
           }
 
-          var spanBot = document.getElementById("spnBotname")
+          const spanBot = document.getElementById("spnBotname")
           if(spanBot)
           {
             self.$store.dispatch("api/botinfo").then((result) => spanBot.innerHTML = result.lexV2botname );

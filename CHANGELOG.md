@@ -5,6 +5,26 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [5.4.2] - 2023-09-30
+### Added
+- Self-hosting web fonts. Font files used by QnABot UI are now served from QnABot server instead of using third party font provider.
+
+### Updated
+
+- Security patches for npm and pip packages
+- Lambda runtimes updated to NodeJS 18 for CFN Bootstrap Lambda
+- SonarQube Quality Gates fix
+- Bluebird Promise Migration (Partial)
+    - Utilize native promises supported in JavaScript
+    - Full migration planned for v5.5.0. Done as a prerequisite for JavaScript SDK v3 migration planned for v6.0.0
+    - Remaining changes to be implemented in v5.5.0 include ./website, ./cfn, & ./templates
+
+### Fixed
+- Fixed request signing issue when using Custom domain ([issue #605](https://github.com/aws-solutions/qnabot-on-aws/issues/605))
+- Fixed voice integration with LLM response
+- Fixed unsupported SSML tags
+- Fixed Kendra API retrieval bug
+
 ## [5.4.1] - 2023-07-27
 ### Updated
 
@@ -122,7 +142,7 @@ __*Note: we recommend that you first deploy these changes in a non-production en
 ### Updated
 
 - Security patches for npm and pip packages
-- Added Support for latest LexV2 languages (see [Multi-language Support](docs/multilanguage_support.md))
+- Added Support for latest LexV2 languages (see [Multi-language Support](docs/multilanguage_support/README.md))
   - Updated:
     - English (IN), Spanish (LATAM), Portuguese (PR), Mandarin (PRC) to use neural voice
   - New languages:
@@ -192,10 +212,10 @@ __*Note: we recommend that you first deploy these changes in a non-production en
 
 -   Intent and Slot matching (an early implementation). This new capability supports creating dedicated custom Intents for a QnABot {Item ID}. You can extend QnABot to support one or more related intents. For example, you might create an intent that makes a car reservation, or assists an agent during a live chat or call (via Amazon Connect). More details in README: https://github.com/aws-solutions/qnabot-on-aws/blob/main/docs/intent_slot_matching/README.md
 -   Support for using custom domain names for QnABot Designer and Client interfaces. More details in README: https://github.com/aws-solutions/qnabot-on-aws/blob/main/docs/custom_domain_name_setup/README.md
--   AWS QnABot Command Line Interface (CLI) - the AWS QnABot CLI supports the capability to import and export questions and answers via command line. More details in README: https://github.com/aws-solutions/qnabot-on-aws/blob/main/docs/qnabot_cli.md
+-   AWS QnABot Command Line Interface (CLI) - the AWS QnABot CLI supports the capability to import and export questions and answers via command line. More details in README: https://github.com/aws-solutions/qnabot-on-aws/blob/main/docs/qnabot_cli/README.md
 -   Kendra Redirect - with the Kendra Redirect feature, you can now include a Kendra query within a Item ID. More details in README: https://github.com/aws-solutions/qnabot-on-aws/blob/main/docs/kendra_redirect/README.md
 -   Integration with Canvas LMS (an early example implementation). Students use their schools' learning management system (LMS) to keep track of their assignments, grades, and their course work. With this integration, students will be able to ask QnABot about their grades, syllabus, enrollments, assignments, and announcements.
-    More details in README: https://github.com/aws-solutions/qnabot-on-aws/blob/main/docs/canvaslms_integration.md
+    More details in README: https://github.com/aws-solutions/qnabot-on-aws/blob/main/docs/canvaslms_integration/README.md
 -   Updated import functionality to support importing of QnABot questions and answers from a Excel file when uploaded to S3 data folder.
 -   Added support for importing session attributes via Excel.
 -   Updated runtime of Lambda functions (using Python runtime) to use Python runtime version 3.9.
@@ -236,10 +256,10 @@ __*Note: we recommend that you first deploy these changes in a non-production en
 
 ### Added
 
--   Expanded language support for voice and text interactions. Also included support for Neural voices for Lex language locales. See [supported languages](docs/multilanguage_support.md#supported-languages).
+-   Expanded language support for voice and text interactions. Also included support for Neural voices for Lex language locales. See [supported languages](docs/multilanguage_support/README.md#supported-languages).
 -   Expanded `config.json` to support `LexV2BotLocaleIds` parameter.
 -   Updated `LexV2BotLocaleIds` parameter in CloudFormation template to include link to supported languages.
--   Updated [Multi Language Support readme](docs/multilanguage_support.md#supported-languages) and added supported languages section.
+-   Updated [Multi Language Support readme](docs/multilanguage_support/README.md#supported-languages) and added supported languages section.
 -   Updated `ENABLE_MULTI_LANGUAGE_SUPPORT` setting in [Settings readme](docs/settings.md) with link to supported languages.
 
 ### Fixed

@@ -1,7 +1,7 @@
 #!/bin/bash
 # download and package
 USAGE="$0 <target model tar.gz file>"
-REPO="https://huggingface.co/intfloat/e5-large"
+REPO="https://huggingface.co/intfloat/e5-large-v2"
 
 DST=$1
 [ -z "$DST" ] && echo "Target tar.gz file path/name is a required parameter. Usage $USAGE" && exit 1

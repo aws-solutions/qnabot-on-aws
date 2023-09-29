@@ -51,7 +51,7 @@ allows configuration of a BotRouter.
 **Note: This is optional. Please leave empty and QnABot will not act as a
 BotRouter for the question being edited.**
 
-![Configuration](./docs/botroutingconfig.png)
+![Configuration](./images/botroutingconfig.png)
 
 * Bot Name or Lambda - You can configure and existing Lex Bot or configure
 a specialty BotRouter implemented via a Lambda function. QnABot route 

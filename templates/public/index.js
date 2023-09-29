@@ -1,16 +1,25 @@
 #! /usr/bin/env node
-// Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
-// SPDX-License-Identifier: Apache-2.0
+/*********************************************************************************************************************
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.                                                *
+ *                                                                                                                    *
+ *  Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance    *
+ *  with the License. A copy of the License is located at                                                             *
+ *                                                                                                                    *
+ *      http://www.apache.org/licenses/                                                                               *
+ *                                                                                                                    *
+ *  or in the 'license' file accompanying this file. This file is distributed on an 'AS IS' BASIS, WITHOUT WARRANTIES *
+ *  OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions    *
+ *  and limitations under the License.                                                                                *
+ *********************************************************************************************************************/
 
-var Promise=require('bluebird')
-var _=require('lodash')
+const _ = require('lodash');
 
-var config=require('../../config.json')
-module.exports=Promise.resolve(require('../master')).then(function(base){
+const config = require('../../config.json');
+module.exports = Promise.resolve(require('../master')).then((base) => {
     // customize description
     base.Description = `(SO0189) QnABot with admin and client websites - Version v${process.env.npm_package_version}`;
 
-    base.Outputs=_.pick(base.Outputs,[
+    base.Outputs = _.pick(base.Outputs, [
         'ContentDesignerURL',
         'ClientURL',
         'DashboardURL',
@@ -30,9 +39,9 @@ module.exports=Promise.resolve(require('../master')).then(function(base){
         'ESProxyLambda',
         'ElasticsearchEndpoint',
         'ElasticsearchIndex',
-        'MetricsBucket'
-    ])
-    base.Parameters=_.pick(base.Parameters,[
+        'MetricsBucket',
+    ]);
+    base.Parameters = _.pick(base.Parameters, [
         'Email',
         'Username',
         'DefaultKendraIndexId',
@@ -53,141 +62,151 @@ module.exports=Promise.resolve(require('../master')).then(function(base){
         'LLMApi',
         'LLMSagemakerInstanceType',
         'LLMSagemakerInitialInstanceCount',
-        'LLMLambdaArn'
+        'LLMLambdaArn',
     ]);
     base.Metadata = {
         'AWS::CloudFormation::Interface': {
-            'ParameterGroups': [
+            ParameterGroups: [
                 {
-                    'Label': {
-                        'default': 'Authentication'
+                    Label: {
+                        default: 'Authentication',
                     },
-                    'Parameters': [
+                    Parameters: [
                         'Email',
                         'Username',
-                        'PublicOrPrivate'
-                    ]
+                        'PublicOrPrivate',
+                    ],
                 },
                 {
-                    'Label': {
-                        'default': 'Amazon Kendra Integration'
+                    Label: {
+                        default: 'Amazon Kendra Integration',
                     },
-                    'Parameters': [
-                        'DefaultKendraIndexId'
-                    ]
+                    Parameters: [
+                        'DefaultKendraIndexId',
+                    ],
                 },
                 {
-                    'Label': {
-                        'default': 'Amazon OpenSearch Service'
+                    Label: {
+                        default: 'Amazon OpenSearch Service',
                     },
-                    'Parameters': [
+                    Parameters: [
                         'ElasticSearchNodeCount',
                         'ElasticSearchEBSVolumeSize',
                         'Encryption',
-                        'KibanaDashboardRetentionMinutes'
-                    ]
+                        'KibanaDashboardRetentionMinutes',
+                    ],
                 },
                 {
-                    'Label': {
-                        'default': 'Amazon LexV2'
+                    Label: {
+                        default: 'Amazon LexV2',
                     },
-                    'Parameters': [
-                        'LexV2BotLocaleIds'
-                    ]
+                    Parameters: [
+                        'LexV2BotLocaleIds',
+                    ],
                 },
                 {
-                    'Label': {
-                        'default': 'Semantic Search with Embeddings'
+                    Label: {
+                        default: 'Semantic Search with Embeddings',
                     },
-                    'Parameters': [
+                    Parameters: [
                         'EmbeddingsApi',
                         'SagemakerInitialInstanceCount',
                         'EmbeddingsLambdaArn',
-                        'EmbeddingsLambdaDimensions'
-                    ]
+                        'EmbeddingsLambdaDimensions',
+                    ],
                 },
                 {
-                    'Label': {
-                        'default': 'LLM integration for contextual followup and generative answers'
+                    Label: {
+                        default: 'LLM integration for contextual followup and generative answers',
                     },
-                    'Parameters': [
+                    Parameters: [
                         'LLMApi',
                         'LLMSagemakerInstanceType',
                         'LLMSagemakerInitialInstanceCount',
-                        'LLMLambdaArn'
-                    ]
+                        'LLMLambdaArn',
+                    ],
                 },
                 {
-                    'Label': {
-                        'default': 'Miscellaneous'
+                    Label: {
+                        default: 'Miscellaneous',
                     },
-                    'Parameters': [
+                    Parameters: [
                         'LexBotVersion',
                         'InstallLexResponseBots',
                         'FulfillmentConcurrency',
-                        'XraySetting'
-                    ]
-                }
-            ]
-        }
+                        'XraySetting',
+                    ],
+                },
+            ],
+        },
     };
-    base.Conditions.Public={'Fn::Equals':[{'Ref':'PublicOrPrivate'},'PUBLIC']}
-    base.Conditions.Encrypted={'Fn::Equals':[{'Ref':'Encryption'},'ENCRYPTED']}
-    base.Conditions.AdminSignUp={'Fn::Equals':[true,true]}
-    base.Conditions.Domain={'Fn::Equals':[true,false]}
-    base.Conditions.BuildExamples={'Fn::Equals':[true,true]}
-    base.Conditions.CreateDomain={'Fn::Equals':[true,true]}
-    base.Conditions.DontCreateDomain={'Fn::Equals':[true,false]}
-    base.Conditions.VPCEnabled={'Fn::Equals':[true,false]}
-    base.Conditions.SingleNode={'Fn::Equals':[{'Ref':'ElasticSearchNodeCount'},'1']}
-    base.Conditions.EmbeddingsEnable={'Fn::Not': [{ 'Fn::Equals':[{'Ref':'EmbeddingsApi'},'DISABLED']}]}
-    base.Conditions.EmbeddingsSagemaker={'Fn::Equals':[{'Ref':'EmbeddingsApi'},'SAGEMAKER']}
-    base.Conditions.EmbeddingsLambda={'Fn::Equals':[{'Ref':'EmbeddingsApi'},'LAMBDA']}
-    base.Conditions.EmbeddingsLambdaArn={'Fn::Not': [{ 'Fn::Equals':[{'Ref':'EmbeddingsLambdaArn'},'']}]}
+    base.Conditions.Public = { 'Fn::Equals': [{ Ref: 'PublicOrPrivate' }, 'PUBLIC'] };
+    base.Conditions.Encrypted = { 'Fn::Equals': [{ Ref: 'Encryption' }, 'ENCRYPTED'] };
+    base.Conditions.AdminSignUp = { 'Fn::Equals': [true, true] };
+    base.Conditions.Domain = { 'Fn::Equals': [true, false] };
+    base.Conditions.BuildExamples = { 'Fn::Equals': [true, true] };
+    base.Conditions.CreateDomain = { 'Fn::Equals': [true, true] };
+    base.Conditions.DontCreateDomain = { 'Fn::Equals': [true, false] };
+    base.Conditions.VPCEnabled = { 'Fn::Equals': [true, false] };
+    base.Conditions.SingleNode = { 'Fn::Equals': [{ Ref: 'ElasticSearchNodeCount' }, '1'] };
+    base.Conditions.EmbeddingsEnable = { 'Fn::Not': [{ 'Fn::Equals': [{ Ref: 'EmbeddingsApi' }, 'DISABLED'] }] };
+    base.Conditions.EmbeddingsSagemaker = { 'Fn::Equals': [{ Ref: 'EmbeddingsApi' }, 'SAGEMAKER'] };
+    base.Conditions.EmbeddingsLambda = { 'Fn::Equals': [{ Ref: 'EmbeddingsApi' }, 'LAMBDA'] };
+    base.Conditions.EmbeddingsLambdaArn = { 'Fn::Not': [{ 'Fn::Equals': [{ Ref: 'EmbeddingsLambdaArn' }, ''] }] };
 
-    var out=JSON.stringify(base);
+    let out = JSON.stringify(base);
 
-    if(config.buildType == 'AWSSolutions') {
-        out=out.replace(
+    if (config.buildType == 'AWSSolutions') {
+        out = out.replace(
             /{"Ref":"BootstrapBucket"}/g,
-            '{"Fn::Sub": "'+config.publicBucket+'-${AWS::Region}"}');
-        out=out.replace(
+            `{"Fn::Sub": "${config.publicBucket}-\${AWS::Region}"}`,
+        );
+        out = out.replace(
             /\${BootstrapBucket}/g,
-            ''+config.publicBucket+'-${AWS::Region}');
+            `${config.publicBucket}-\${AWS::Region}`,
+        );
     } else {
-        out=out.replace(
+        out = out.replace(
             /{"Ref":"BootstrapBucket"}/g,
-            '"'+config.publicBucket+'"');
-        out=out.replace(
+            `"${config.publicBucket}"`,
+        );
+        out = out.replace(
             /\${BootstrapBucket}/g,
-            ''+config.publicBucket+'');
+            `${config.publicBucket}`,
+        );
     }
 
-    out=out.replace(
+    out = out.replace(
         /{"Ref":"ElasticsearchName"}/g,
-        '"EMPTY"')
+        '"EMPTY"',
+    );
 
-    out=out.replace(
+    out = out.replace(
         /{"Ref":"ApprovedDomain"}/g,
-        '"EMPTY"')
+        '"EMPTY"',
+    );
 
-    out=out.replace(
+    out = out.replace(
         /\${BootstrapPrefix}/g,
-        ''+config.publicPrefix+'')
+        `${config.publicPrefix}`,
+    );
 
-    out=out.replace(
+    out = out.replace(
         /{"Ref":"BootstrapPrefix"}/g,
-        '"'+config.publicPrefix+'"')
+        `"${config.publicPrefix}"`,
+    );
 
-    out=out.replace(
+    out = out.replace(
         /{"Ref":"VPCSubnetIdList"}/g,
-        '[{"Ref":"AWS::NoValue"}]')
+        '[{"Ref":"AWS::NoValue"}]',
+    );
 
-    out=out.replace(
+    out = out.replace(
         /{"Ref":"VPCSecurityGroupIdList"}/g,
-        '[{"Ref":"AWS::NoValue"}]')
+        '[{"Ref":"AWS::NoValue"}]',
+    );
 
-    return JSON.parse(out)
-})
+    return JSON.parse(out);
+});
 
 // "VPCSubnetIdList" : { "Fn::Join" : [ ",", {"Ref":"VPCSubnetIdList"} ] }

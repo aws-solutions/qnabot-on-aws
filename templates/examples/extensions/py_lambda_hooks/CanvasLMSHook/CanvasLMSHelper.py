@@ -1,5 +1,15 @@
-# Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
-# SPDX-License-Identifier: Apache-2.0
+######################################################################################################################
+#  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.                                                #
+#                                                                                                                    #
+#  Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance    #
+#  with the License. A copy of the License is located at                                                             #
+#                                                                                                                    #
+#      http://www.apache.org/licenses/LICENSE-2.0                                                                    #
+#                                                                                                                    #
+#  or in the 'license' file accompanying this file. This file is distributed on an 'AS IS' BASIS, WITHOUT WARRANTIES #
+#  OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions    #
+#  and limitations under the License.                                                                                #
+######################################################################################################################
 
 import json
 import os
@@ -11,6 +21,10 @@ import calendar
 from bs4 import BeautifulSoup
 from botocore.exceptions import ClientError
 
+CONTENT_TYPE = 'application/vnd.amazonaws.card.generic'
+TITLE = 'response buttons'
+SSML_PREOUTPUT = 'Please select one of these options: '
+NOT_FOUND_RESP = 'Sorry, was unable to find the course you are looking for. Check the course name and try again. You can also ask <i>what courses have i enrolled in</i>, to get a list of enrolled courses.'
 
 def get_secret(secrets_name):
     """
@@ -53,7 +67,7 @@ def get_secret(secrets_name):
     return secret
 
 
-def getCanvasUser (param_canvas, param_user_name):
+def get_canvas_user (param_canvas, param_user_name):
     """
     function to get Canvas User
     This function retrieves the Canvas user by using the SIS Login ID
@@ -70,18 +84,18 @@ def query_menu (event, student_name):
 
     # provide a menu to choose from (announcements, enrollments, syllabus, assignments, grades)
     choicelist = [{'text':'Announcements','value':"tell me about my announcements"}, {'text':'Course Enrollments','value':"tell me about my enrollments"}, {'text':'Course Syllabus','value':"tell me about my syllabus"}, {'text':'Assignments','value':"tell me about my assignments"}, {'text':'Grades','value':"tell me about my grades"}]
-    genericAttachments = {'version': '1','contentType': 'application/vnd.amazonaws.card.generic','genericAttachments':[{"title":"response buttons","buttons":choicelist}]}
-    event['res']['session']['appContext']['responseCard'] = genericAttachments
+    generic_attachments = {'version': '1','contentType': CONTENT_TYPE,'genericAttachments':[{"title": TITLE,"buttons":choicelist}]}
+    event['res']['session']['appContext']['responseCard'] = generic_attachments
     event['res']['session']['appContext']['altMessages']['markdown'] = "Please select one of the options below:"
 
-    intCounter = 0
-    strChoiceList = ""
+    int_counter = 0
+    str_choice_list = ""
     for items in choicelist:
-        if strChoiceList != '':
-            strChoiceList = strChoiceList + ", "
-        strChoiceList = strChoiceList + choicelist[intCounter]['text']
-        intCounter = intCounter + 1
-    event['res']['session']['appContext']['altMessages']['ssml'] = get_SSML_output("Please select one of these options: " + strChoiceList)
+        if str_choice_list != '':
+            str_choice_list = str_choice_list + ", "
+        str_choice_list = str_choice_list + choicelist[int_counter]['text']
+        int_counter = int_counter + 1
+    event['res']['session']['appContext']['altMessages']['ssml'] = get_ssml_output(SSML_PREOUTPUT + str_choice_list)
 
     return event
 
@@ -94,7 +108,7 @@ def query_enrollments_for_student(event, canvas, student_user_name):
 
     # Get the user using user_id to match with LMS SIS_ID
     try:
-        user = getCanvasUser (canvas, student_user_name)
+        user = get_canvas_user (canvas, student_user_name)
     except:
         return user_not_found_error (event)
 
@@ -110,24 +124,45 @@ def query_enrollments_for_student(event, canvas, student_user_name):
         choicelist = []
         for i in return_courses:
             choicelist.append({'text':i,'value':"more information about my {} course".format(i)})
-        genericAttachments = {'version': '1','contentType': 'application/vnd.amazonaws.card.generic','genericAttachments':[{"title":"response buttons","buttons":choicelist}]}
-        event['res']['session']['appContext']['responseCard'] = genericAttachments
+        generic_attachments = {'version': '1','contentType': CONTENT_TYPE,'genericAttachments':[{"title":TITLE,"buttons":choicelist}]}
+        event['res']['session']['appContext']['responseCard'] = generic_attachments
         event['res']['session']['appContext']['altMessages']['markdown'] = "Please select one of the options below:"
 
-        intCounter = 0
-        strChoiceList = ""
+        int_counter = 0
+        str_choice_list = ""
         for items in choicelist:
-            if strChoiceList != '':
-                strChoiceList = strChoiceList + ", "
-            strChoiceList = strChoiceList + choicelist[intCounter]['text']
-            intCounter = intCounter + 1
-        event['res']['session']['appContext']['altMessages']['ssml'] = get_SSML_output("Please select one of these options: " + strChoiceList)
+            if str_choice_list != '':
+                str_choice_list = str_choice_list + ", "
+            str_choice_list = str_choice_list + choicelist[int_counter]['text']
+            int_counter = int_counter + 1
+        event['res']['session']['appContext']['altMessages']['ssml'] = get_ssml_output(SSML_PREOUTPUT + str_choice_list)
     else:
         return_message = "You are not currently enrolled in any courses."
         set_alt_message (event, return_message)
 
     return event
 
+def is_not_filtered_course(course_name_to_filter, course):
+    return course_name_to_filter != '' and course.name.upper().strip() != course_name_to_filter.upper()
+
+def is_filtered_course(course_name_to_filter, course):
+    return course_name_to_filter != '' and course.name.upper().strip() == course_name_to_filter.upper()
+
+def get_course_result(course_name_to_filter, user):
+    bln_found_course = False
+    if user:
+        courses = user.get_courses(enrollment_status='active')
+        # Loop through the courses.
+        for course in courses:
+            if is_filtered_course(course_name_to_filter, course):
+                result = {"Choice": course.name}
+                bln_found_course = True
+                break
+        if bln_found_course == False:
+            result = {"Choice": 'N/A'}
+    else:
+        result = {"Choice": 'N/A'}
+    return result
 
 def query_courses_for_student(event, canvas, student_user_name, course_name_to_filter):
     """
@@ -138,48 +173,83 @@ def query_courses_for_student(event, canvas, student_user_name, course_name_to_f
 
     # Get the user using user_id to match with LMS SIS_ID
     try:
-        user = getCanvasUser (canvas, student_user_name)
+        user = get_canvas_user (canvas, student_user_name)
     except:
         return user_not_found_error (event)
 
-    blnFoundCourse = False
-    if user:
-        courses = user.get_courses(enrollment_status='active')
-        # Loop through the courses.
-        for course in courses:
-            if course_name_to_filter != '' and course.name.upper().strip() == course_name_to_filter.upper():
-                result = {"Choice": course.name}
-                blnFoundCourse = True
-                break
-        if blnFoundCourse == False:
-            result = {"Choice": 'N/A'}
-    else:
-        result = {"Choice": 'N/A'}
+    result = get_course_result(course_name_to_filter, user)
 
     returned_course = result['Choice']
     if returned_course == 'N/A':
-        return_message = "Sorry, was unable to find the course you are looking for. Check the course name and try again. You can also ask <i>what courses have i enrolled in</i>, to get a list of enrolled courses."
+        return_message = NOT_FOUND_RESP
+
         set_alt_message (event, return_message)
     else:
-        genericattachment = ['assignments','syllabus','grades']
-        choicelist = []
-        for i in genericattachment:
-            choicelist.append({'text':'{} {}'.format(returned_course,i),'value':'tell me about my {} {}'.format(returned_course,i)})
-        genericAttachments = {'version': '1','contentType': 'application/vnd.amazonaws.card.generic','genericAttachments':[{"title":"response buttons","buttons":choicelist}]}
-        event['res']['session']['appContext']['responseCard'] = genericAttachments
+        generic_attachment = ['assignments','syllabus','grades']
+        choice_list = []
+        for i in generic_attachment:
+            choice_list.append({'text':'{} {}'.format(returned_course,i),'value':'tell me about my {} {}'.format(returned_course,i)})
+        generic_attachments = {'version': '1','contentType': CONTENT_TYPE,'genericAttachments':[{"title":TITLE,"buttons":choice_list}]}
+        event['res']['session']['appContext']['responseCard'] = generic_attachments
         event['res']['session']['appContext']['altMessages']['markdown'] = "Please select one of the options below:"
 
-        intCounter = 0
-        strChoiceList = ""
-        for items in choicelist:
-            if strChoiceList != '':
-                strChoiceList = strChoiceList + ", "
-            strChoiceList = strChoiceList + choicelist[intCounter]['text']
-            intCounter = intCounter + 1
-        event['res']['session']['appContext']['altMessages']['ssml'] = get_SSML_output("Please select one of these options: " + strChoiceList)
+        int_counter = 0
+        str_choice_list = ""
+        for items in choice_list:
+            if str_choice_list != '':
+                str_choice_list = str_choice_list + ", "
+            str_choice_list = str_choice_list + choice_list[int_counter]['text']
+            int_counter = int_counter + 1
+        event['res']['session']['appContext']['altMessages']['ssml'] = get_ssml_output(SSML_PREOUTPUT + str_choice_list)
 
     return event
 
+def append_assignment_due_date(assignment):
+    if assignment.due_at:   #check if assignments have due dates
+        due_date = datetime.datetime.strptime(assignment.due_at,'%Y-%m-%dT%H:%M:%SZ')
+        due_date_string = '{0}, {1} {2}, {3}'.format(calendar.day_name[due_date.weekday()], due_date.strftime("%B"), due_date.strftime("%-d"), due_date.strftime("%Y"))
+        return "<li>{} -- is due: {}. </li>".format(assignment.name, due_date_string)
+    else:
+        return "<li>{} -- has no due date. </li>".format(assignment.name)
+
+def get_course_assignments(course_name_to_filter, no_records_message, user):
+    course_assignments = ''
+    bln_has_assignments = False
+    bln_found_match = False
+    courses = user.get_courses(enrollment_status='active')
+
+    for course in courses:
+        bln_has_assignments = False
+        bln_found_match = False
+
+            #check for matching course_name_slot_input with course names
+        if is_filtered_course(course_name_to_filter, course):
+            bln_found_match = True
+
+        if bln_found_match == True:
+            course_assignments = "<b>" + course.name + ": </b> <ul>"
+        else:
+            course_assignments += "<b>" + course.name + ": </b> <ul>"
+
+            # Loop through the assignments that have not been submitted
+        for assignment in course.get_assignments(bucket='unsubmitted'):
+            bln_has_assignments = True
+            if is_not_filtered_course(course_name_to_filter, course):
+                    # if a slot value is provided, but does not have a matching course that the student is enrolled in
+                course_assignments = NOT_FOUND_RESP
+                break
+
+            course_assignments += append_assignment_due_date(assignment)
+
+        if bln_has_assignments == False:
+            course_assignments += no_records_message
+
+        course_assignments += "</ul><br>"
+
+            #if found a matching course, then break from the course For loop
+        if bln_found_match == True:
+            break
+    return course_assignments
 
 def query_course_assignments_for_student(event, canvas, student_user_name, course_name_to_filter):
     """
@@ -188,54 +258,15 @@ def query_course_assignments_for_student(event, canvas, student_user_name, cours
     for example: do i have any assignments due or tell me about by {course_name} assignments
     """
 
-    course_assignments = ''
-    blnHasAssignments = False
-    blnFoundMatch = False
     no_records_message = 'There are no assignments for this course.'
     # Get the user using user_id to match with LMS SIS_ID
     try:
-        user = getCanvasUser (canvas, student_user_name)
+        user = get_canvas_user (canvas, student_user_name)
     except:
         return user_not_found_error (event)
 
     if user:
-        courses = user.get_courses(enrollment_status='active')
-        for course in courses:
-            blnHasAssignments = False
-            blnFoundMatch = False
-
-            #check for matching course_name_slot_input with course names
-            if course_name_to_filter != '' and course.name.upper().strip() == course_name_to_filter.upper():
-                blnFoundMatch = True
-
-            if blnFoundMatch == True:
-                course_assignments = "<b>" + course.name + ": </b> <ul>"
-            else:
-                course_assignments += "<b>" + course.name + ": </b> <ul>"
-
-            # Loop through the assignments that have not been submitted
-            for assignment in course.get_assignments(bucket='unsubmitted'):
-                blnHasAssignments = True
-                if course_name_to_filter != '' and course.name.upper().strip() != course_name_to_filter.upper():
-                    # if a slot value is provided, but does not have a matching course that the student is enrolled in
-                    course_assignments = "Sorry, was unable to find the course you are looking for. Check the course name and try again. You can also ask <i>what courses have i enrolled in</i>, to get a list of enrolled courses."
-                    break
-
-                if assignment.due_at:   #check if assignments have due dates
-                    due_date = datetime.datetime.strptime(assignment.due_at,'%Y-%m-%dT%H:%M:%SZ')
-                    due_date_string = '{0}, {1} {2}, {3}'.format(calendar.day_name[due_date.weekday()], due_date.strftime("%B"), due_date.strftime("%-d"), due_date.strftime("%Y"))
-                    course_assignments += "<li>{} -- is due: {}. </li>".format(assignment.name, due_date_string)
-                else:
-                    course_assignments += "<li>{} -- has no due date. </li>".format(assignment.name)
-
-            if blnHasAssignments == False:
-                course_assignments += no_records_message
-
-            course_assignments += "</ul><br>"
-
-            #if found a matching course, then break from the course For loop
-            if blnFoundMatch == True:
-                break
+        course_assignments = get_course_assignments(course_name_to_filter, no_records_message, user)
 
     result = {"CourseAssignments": course_assignments}
     if result['CourseAssignments']:
@@ -246,7 +277,6 @@ def query_course_assignments_for_student(event, canvas, student_user_name, cours
         set_alt_message (event, return_message)
 
     return event
-
 
 def query_announcements_for_student(event, canvas, student_user_name):
     """
@@ -260,7 +290,7 @@ def query_announcements_for_student(event, canvas, student_user_name):
 
     # Get the user using user_id to match with LMS SIS_ID
     try:
-        user = getCanvasUser (canvas, student_user_name)
+        user = get_canvas_user (canvas, student_user_name)
     except:
         return user_not_found_error (event)
 
@@ -292,6 +322,12 @@ def query_announcements_for_student(event, canvas, student_user_name):
 
     return event
 
+def get_grade_score(grade):
+    if grade.grades['current_score'] != '':
+        grade_score = grade.grades['current_score']
+    else:
+        grade_score = "N/A"
+    return grade_score
 
 def query_grades_for_student(event, canvas, student_user_name, course_name_to_filter):
     """
@@ -304,7 +340,7 @@ def query_grades_for_student(event, canvas, student_user_name, course_name_to_fi
     course_grades = '<ul>'
     # Get the user using user_id to match with LMS SIS_ID
     try:
-        user = getCanvasUser (canvas, student_user_name)
+        user = get_canvas_user (canvas, student_user_name)
     except:
         return user_not_found_error (event)
 
@@ -315,18 +351,15 @@ def query_grades_for_student(event, canvas, student_user_name, course_name_to_fi
         if courses:
             for grade in courses:
                 course_name = canvas.get_course(grade.course_id)
-                if grade.grades['current_score'] != '':
-                    grade_score = grade.grades['current_score']
-                else:
-                    grade_score = "N/A"
+                grade_score = get_grade_score(grade)
 
                 #check for matching course_name_slot_input with course names
-                if course_name_to_filter != '' and course_name.name.upper().strip() == course_name_to_filter.upper():
+                if is_filtered_course(course_name_to_filter, course_name):
                     course_grades = "<li>Grades for {} course: {}. </li>".format(course_name.name, grade_score)
                     break
                 elif course_name_to_filter != '':
                     # if a slot value is provided, but does not have a matching course that the student is enrolled in
-                    course_grades = "Sorry, was unable to find the course you are looking for. Check the course name and try again. You can also ask <i>what courses have i enrolled in</i>, to get a list of enrolled courses."
+                    course_grades = NOT_FOUND_RESP
                 else:
                     course_grades += "<li>Grades for {} course: {}. </li>".format(course_name.name, grade_score)
         else:
@@ -341,7 +374,6 @@ def query_grades_for_student(event, canvas, student_user_name, course_name_to_fi
 
     return event
 
-
 def query_syllabus_for_student(event, canvas, student_user_name, course_name_to_filter):
     """
     function: query_syllabus_for_student
@@ -354,32 +386,30 @@ def query_syllabus_for_student(event, canvas, student_user_name, course_name_to_
 
     # Get the user using user_id to match with LMS SIS_ID
     try:
-        user = getCanvasUser (canvas, student_user_name)
+        user = get_canvas_user (canvas, student_user_name)
     except:
         return user_not_found_error (event)
 
     if user:
         courses = user.get_courses(enrollment_status='active',include=['syllabus_body'])
 
-        # Loop through the courses
-        if courses:
-            # Loop through the courses.
-            for course in courses:
-                #check for matching course_name_slot_input with course names
-                if course_name_to_filter != '' and course.name.upper().strip() == course_name_to_filter.upper():
-                    if course.syllabus_body.strip() != '':
-                        course_syllabus = '<b>{0}</b>: {1}<br>'.format(course.name, course.syllabus_body)
-                    else:
-                        course_syllabus = no_records_message
-                    break
-                elif course_name_to_filter != '':
-                    # if a slot value is provided, but does not have a matching course that the student is enrolled in
-                    course_syllabus = "Sorry, was unable to find the course you are looking for. Check the course name and try again. You can also ask <i>what courses have i enrolled in</i>, to get a list of enrolled courses."
-                else:
-                    if course.syllabus_body.strip() != '':
-                        course_syllabus += '<b>{0}</b>: {1}. <br>'.format(course.name, course.syllabus_body)
-                    else:
-                        course_syllabus += '<b>{0}</b>: {1}. <br>'.format(course.name, no_records_message)
+    # Loop through the courses.
+    for course in courses:
+        #check for matching course_name_slot_input with course names
+        if is_filtered_course(course_name_to_filter, course):
+            if course.syllabus_body.strip() != '':
+                course_syllabus = '<b>{0}</b>: {1}<br>'.format(course.name, course.syllabus_body)
+            else:
+                course_syllabus = no_records_message
+            break
+        elif course_name_to_filter != '':
+            # if a slot value is provided, but does not have a matching course that the student is enrolled in
+            course_syllabus = NOT_FOUND_RESP
+        else:
+            if course.syllabus_body.strip() != '':
+                course_syllabus += '<b>{0}</b>: {1}. <br>'.format(course.name, course.syllabus_body)
+            else:
+                course_syllabus += '<b>{0}</b>: {1}. <br>'.format(course.name, no_records_message)
 
     result = {"CourseSyllabus": course_syllabus}
 
@@ -414,40 +444,40 @@ def validate_input(event):
         return error_message
 
 
-def remove_HTML_tags (strInput):
+def remove_html_tags (str_input):
     """
     function to remove HTML tags
     """
 
     #parse html input string
-    objBSoup = BeautifulSoup(strInput, "html.parser")
+    obj_b_soup = BeautifulSoup(str_input, "html.parser")
 
-    for data in objBSoup (['style', 'script']):
+    for data in obj_b_soup (['style', 'script']):
         #remove html tags
         data.decompose()
 
     # return
-    return ' '.join(objBSoup.stripped_strings)
+    return ' '.join(obj_b_soup.stripped_strings)
 
 
-def get_SSML_output (strInput):
+def get_ssml_output (str_input):
     """
     function to return SSML output
     """
 
     #parse html input string
-    return "<speak>" + remove_HTML_tags(strInput) + "</speak>"
+    return "<speak>" + remove_html_tags(str_input) + "</speak>"
 
 
-def set_alt_message (event, strInput):
+def set_alt_message (event, str_input):
     """
     function to set alt messages
     """
 
     # set markdown output
-    event['res']['session']['appContext']['altMessages']['markdown'] = strInput
+    event['res']['session']['appContext']['altMessages']['markdown'] = str_input
     # set ssml output
-    event['res']['session']['appContext']['altMessages']['ssml'] = get_SSML_output (strInput)
+    event['res']['session']['appContext']['altMessages']['ssml'] = get_ssml_output (str_input)
 
 
 def user_not_found_error(event):

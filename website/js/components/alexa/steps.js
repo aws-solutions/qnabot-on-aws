@@ -1,42 +1,55 @@
-module.exports=[{
-    title:"Signin/Signup",
-    text:`
+/*********************************************************************************************************************
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.                                                *
+ *                                                                                                                    *
+ *  Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance    *
+ *  with the License. A copy of the License is located at                                                             *
+ *                                                                                                                    *
+ *      http://www.apache.org/licenses/                                                                               *
+ *                                                                                                                    *
+ *  or in the 'license' file accompanying this file. This file is distributed on an 'AS IS' BASIS, WITHOUT WARRANTIES *
+ *  OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions    *
+ *  and limitations under the License.                                                                                *
+ *********************************************************************************************************************/
+
+module.exports = [{
+    title: 'Signin/Signup',
+    text: `
 - create an Amazon developer account at [Amazon Developer Console](https://developer.amazon.com/home.html)
     `,
-    image:"../images/alexa_sign-in.png"
-},{
-    title:"Create Skill part 1",
-    test:" ",
-    image:"../images/alexa_create-skill.png"
-},{
-    title:"Create Skill part 2",
-    test:" ",
-    image:"../images/alexa_select.png"
+    image: '../images/alexa_sign-in.png',
+}, {
+    title: 'Create Skill part 1',
+    test: ' ',
+    image: '../images/alexa_create-skill.png',
+}, {
+    title: 'Create Skill part 2',
+    test: ' ',
+    image: '../images/alexa_select.png',
 },
 {
-    title:"Configure Skill Lambda",
-    test:" ",
-    image:"../images/alexa_lambda-config.png",
-    buttons:[{
-        text:"Copy Lambda Arn to clipboard",
-        id:"LambdaArn",
-        loading:false
-    }]
+    title: 'Configure Skill Lambda',
+    test: ' ',
+    image: '../images/alexa_lambda-config.png',
+    buttons: [{
+        text: 'Copy Lambda Arn to clipboard',
+        id: 'LambdaArn',
+        loading: false,
+    }],
 },
 {
-    title:"Configure Skill Schema",
-    test:" ",
-    image:"../images/alexa_schema-config.png",
-    buttons:[{
-        text:"Copy Schema to clipBoard",
-        id:"Schema",
-        loading:false
-    }]
+    title: 'Configure Skill Schema',
+    test: ' ',
+    image: '../images/alexa_schema-config.png',
+    buttons: [{
+        text: 'Copy Schema to clipBoard',
+        id: 'Schema',
+        loading: false,
+    }],
 },
 {
-    title:"Test",
-    image:"../images/alexa_enable.png",
-    text:`
+    title: 'Test',
+    image: '../images/alexa_enable.png',
+    text: `
 Congratulations! Your QnABot skill is now ready to be used. 
 
 Enable testing (as shown below) and use the test page to try and test your new skill. 
@@ -47,6 +60,6 @@ To access your unpublished skill, register your Alexa device to the same account
 Ask questions in the form: *\"Alexa, ask Q and A, How do I use Q and A Bot?\"*  (Assuming your device wake word is 'Alexa')
 
 Publish your skill if you want to make it available for others to use from their own Amazon accounts.
-`
-}
-]
+`,
+},
+];
