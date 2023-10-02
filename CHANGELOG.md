@@ -21,6 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - Fixed request signing issue when using Custom domain ([issue #605](https://github.com/aws-solutions/qnabot-on-aws/issues/605))
+- Fixed Sagemaker LLM deployment ([issue #635](https://github.com/aws-solutions/qnabot-on-aws/issues/635))
 - Fixed voice integration with LLM response
 - Fixed unsupported SSML tags
 - Fixed Kendra API retrieval bug
