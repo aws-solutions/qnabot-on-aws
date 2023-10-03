@@ -47,7 +47,7 @@ Alternatively, if you want to custom deploy QnABot on AWS, refer to the details 
 ### Environment Prerequisites
 
 -   Run Linux. (tested on Amazon Linux)
--   Install npm >7.10.0 and node >16.X.X ([instructions](https://nodejs.org/en/download/))
+-   Install npm >8.6.0 and node >18.X.X ([instructions](https://nodejs.org/en/download/))
 -   Install and configure git lfs ([instructions](https://git-lfs.com/))
 -   Clone this repo.
 -   Set up an AWS account. ([instructions](https://AWS.amazon.com/free/))

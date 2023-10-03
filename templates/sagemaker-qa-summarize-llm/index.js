@@ -42,7 +42,7 @@ module.exports = {
             Properties: {
                 PrimaryContainer: {
                     Image: {
-                        'Fn::Sub': '763104351884.dkr.ecr.${AWS::Region}.amazonaws.com/huggingface-pytorch-tgi-inference:2.0.0-tgi0.8.2-gpu-py39-cu118-ubuntu20.04',
+                        'Fn::Sub': '763104351884.dkr.ecr.${AWS::Region}.amazonaws.com/huggingface-pytorch-tgi-inference:2.0.0-tgi0.8.2-gpu-py39-cu118-ubuntu20.04-v1.0-2023-06-07-00-13-01',
                     },
                     Mode: 'SingleModel',
                     Environment: {
@@ -50,6 +50,7 @@ module.exports = {
                         SAGEMAKER_REGION: { Ref: 'AWS::Region' },
                         HF_MODEL_ID: 'tiiuae/falcon-40b-instruct',
                         SM_NUM_GPUS: '4',
+                        HF_MODEL_REVISION: 'ca78eac0ed45bf64445ff0687fabba1598daebf3',
                     },
                 },
                 ExecutionRoleArn: {

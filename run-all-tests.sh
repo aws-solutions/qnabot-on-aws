@@ -32,6 +32,33 @@ run_javascript_lambda_test() {
 		exit 1
 	fi
     [ "${CLEAN:-true}" = "true" ] && rm -rf coverage/lcov-report
+
+	cd $source_dir
+}
+
+run_python_unit_test() {
+	directory=$1
+	description=$2
+	echo "------------------------------------------------------------------------------"
+	echo "[Test] Python: $directory, $description"
+	echo "------------------------------------------------------------------------------"
+	cd $source_dir/$directory
+	python3 -m virtualenv venv
+	source ./venv/bin/activate
+	if [ -f "requirements.txt" ]
+	then
+		pip install -r requirements.txt
+	fi
+
+	if [ -f "requirements-test.txt" ]
+	then
+		pip install -r requirements-test.txt
+	fi
+
+	pytest -v
+	deactivate
+	[ "${CLEAN:-true}" = "true" ] && rm -rf coverage/lcov.info
+	cd $source_dir
 }
 
 # Save the current working directory and set source directory
@@ -45,7 +72,7 @@ cd $source_dir
 #
 CLEAN="${CLEAN:-true}"
 
-echo "Starting Lambda unit tests"
+# echo "Starting Lambda unit tests"
 
 run_javascript_lambda_test connect "Connect Lambda Unit Tests"
 run_javascript_lambda_test genesys "Genesys Lambda Unit Tests"
@@ -53,3 +80,7 @@ run_javascript_lambda_test js_lambda_hook_sdk "JS Lambda Hook SDK Unit Tests"
 run_javascript_lambda_test qnabot-common-layer "QnaBot Common Layer Lambda Unit Tests"
 run_javascript_lambda_test schema "Schema Lambda Unit Tests"
 run_javascript_lambda_test translate "Translate Lambda Unit Tests"
+
+echo "Starting Source unit tests"
+
+run_python_unit_test source "QnABot CLI"
