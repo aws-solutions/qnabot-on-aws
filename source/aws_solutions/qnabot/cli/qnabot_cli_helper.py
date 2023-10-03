@@ -79,7 +79,7 @@ def initiate_import(
         s3_client = get_service_client("s3")  # boto3.client('s3')
         # create a options json config file that includes import options that were used
         response = s3_client.put_object(
-            Bucket=str_import_bucket_name, Key="options/" + os.path.basename(source_filename), Body=str_import_options
+            Bucket=str_import_bucket_name, Key=f"options/{os.path.basename(source_filename)}", Body=str_import_options
         )
 
         if file_format == "JSON":
@@ -88,13 +88,13 @@ def initiate_import(
             )  # convert to JSON Lines format (if input is JSON format)
             # upload the contents of the converted json file to S3
             response = s3_client.put_object(
-                Bucket=str_import_bucket_name, Key="data/" + os.path.basename(source_filename), Body=str_file_contents
+                Bucket=str_import_bucket_name, Key=f"data/{os.path.basename(source_filename)}", Body=str_file_contents
             )
         else:
             with open(source_filename, "rb") as obj_file:  # open file object
                 # upload the contents of the json file to S3
                 response = s3_client.put_object(
-                    Bucket=str_import_bucket_name, Key="data/" + os.path.basename(source_filename), Body=obj_file
+                    Bucket=str_import_bucket_name, Key=f"data/{os.path.basename(source_filename)}", Body=obj_file
                 )
 
         # check status of the file import
@@ -150,9 +150,9 @@ def initiate_export(cloudformation_stack_name: str, export_filename: str, export
         "bucket": str_export_bucket_name,
         "index": str_open_search_index,
         "id": os.path.basename(export_filename),
-        "config": "status/" + os.path.basename(export_filename),
-        "tmp": "tmp/" + os.path.basename(export_filename),
-        "key": "data/" + os.path.basename(export_filename),
+        "config": f"status/{os.path.basename(export_filename)}",
+        "tmp": f"tmp/{os.path.basename(export_filename)}",
+        "key": f"data/{os.path.basename(export_filename)}",
         "filter": export_filter,
         "status": "Started",
     }
@@ -162,7 +162,7 @@ def initiate_export(cloudformation_stack_name: str, export_filename: str, export
         # put a export config object in S3 bucket to initiate export
         s3_client = get_service_client("s3")  # boto3.client('s3')
         response = s3_client.put_object(
-            Body=str_export_config, Bucket=str_export_bucket_name, Key="status/" + os.path.basename(export_filename)
+            Body=str_export_config, Bucket=str_export_bucket_name, Key=f"status/{os.path.basename(export_filename)}"
         )
 
         # check status of the file export
@@ -216,7 +216,7 @@ def download_export(bucket: str, export_filename: str, exportdatetime: datetime,
         s3_client = get_service_client("s3")  # boto3.client('s3')
         # get object only if the object has changed since last request
         response = s3_client.get_object(
-            Bucket=bucket, Key="data/" + os.path.basename(export_filename), IfModifiedSince=exportdatetime
+            Bucket=bucket, Key=f"data/{os.path.basename(export_filename)}", IfModifiedSince=exportdatetime
         )
         str_file_contents = response["Body"].read().decode("utf-8")  # read object body
         if file_format == "JSON":
@@ -240,7 +240,7 @@ def download_export(bucket: str, export_filename: str, exportdatetime: datetime,
             return error_response(
                 error_code=err_exception.errno,
                 message=err_exception.strerror,
-                comments="There was an issue using: " + export_filename + " Check the path and try again.",
+                comments=f"There was an issue using: {export_filename} Check the path and try again.",
                 status="Error",
                 show_error=True,
             )
@@ -276,7 +276,7 @@ def get_import_status(bucket: str, source_filename: str, importdatetime: datetim
     try:
         s3_client = get_service_client("s3")  # boto3.client('s3')
         # get object only if the object has changed since last request
-        key = "status/" + os.path.basename(source_filename)
+        key = f"status/{os.path.basename(source_filename)}"
         #logger.debug(f"Getting import status for {bucket=} {key=}")
         response = s3_client.get_object(Bucket=bucket, Key=key, IfModifiedSince=importdatetime)
 
@@ -330,7 +330,7 @@ def get_export_status(bucket: str, export_filename: str, exportdatetime: datetim
         s3_client = get_service_client("s3")  # boto3.client('s3')
         # get object only if the object has changed since last request
         response = s3_client.get_object(
-            Bucket=bucket, Key="status/" + os.path.basename(export_filename), IfModifiedSince=exportdatetime
+            Bucket=bucket, Key=f"status/{os.path.basename(export_filename)}", IfModifiedSince=exportdatetime
         )
 
         obj_status_details = json.loads(response["Body"].read().decode("utf-8"))  # read object body
@@ -365,6 +365,8 @@ def convert_json_to_jsonl(source_filename: str):
     :return: file contents
     """
 
+    error_msg = f"There was an error reading the file. {source_filename}. Check the file format and try again."
+
     try:
         with open(source_filename, "rb") as obj_file:  # open file in read mode
             str_file_contents = obj_file.read()  # read from file
@@ -378,9 +380,7 @@ def convert_json_to_jsonl(source_filename: str):
             return error_response(
                 error_code="",
                 message=err_exception.msg,
-                comments="There was an error reading the file "
-                + source_filename
-                + ". Check the file format and try again",
+                comments=error_msg,
                 status="Error",
                 show_error=True,
             )
@@ -388,9 +388,7 @@ def convert_json_to_jsonl(source_filename: str):
             return error_response(
                 error_code="",
                 message=err_exception.__doc__,
-                comments="There was an error reading the file "
-                + source_filename
-                + ". Check the file format and try again",
+                comments=error_msg,
                 status="Error",
                 show_error=True,
             )
@@ -398,9 +396,7 @@ def convert_json_to_jsonl(source_filename: str):
             return error_response(
                 error_code="",
                 message=err_exception.__doc__,
-                comments="There was an error reading the file "
-                + source_filename
-                + ". Check the file format and try again",
+                comments=error_msg,
                 status="Error",
                 show_error=True,
             )
@@ -408,7 +404,7 @@ def convert_json_to_jsonl(source_filename: str):
         return error_response(
             error_code=err_exception.errno,
             message=err_exception.strerror,
-            comments="There was an error reading the file " + source_filename + ". Check the path and try again",
+            comments=f"There was an error reading the file {source_filename}. Check the path and try again",
             status="Error",
             show_error=True,
         )
@@ -450,7 +446,7 @@ def error_response(error_code: str, message: str, comments: str, status: str, sh
     return_response = json.dumps(return_response, indent=4)
 
     if show_error:
-        click.echo("[Error] " + str(error_code) + ": " + message + ". " + comments)
+        click.echo(f"[Error] {str(error_code)}: {message}. {comments}")
         sys.exit(1)
     else:
         return return_response
