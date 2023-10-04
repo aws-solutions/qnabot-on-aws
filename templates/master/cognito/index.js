@@ -74,10 +74,6 @@ module.exports = {
             DesiredDeliveryMediums: ['EMAIL'],
             UserAttributes: [
                 {
-                    Name: 'email_verified',
-                    Value: 'True',
-                },
-                {
                     Name: 'email',
                     Value: { Ref: 'Email' },
                 },
