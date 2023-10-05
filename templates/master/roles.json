@@ -6,16 +6,16 @@
           "Version": "2012-10-17",
           "Statement": [
             {
-				"Effect": "Allow",
-				"Principal": {
-					"Federated": "cognito-identity.amazonaws.com"
-				},
-				"Action": "sts:AssumeRoleWithWebIdentity",
-				"Condition": {
-				    "StringEquals": {
-				        "cognito-identity.amazonaws.com:aud":{"Ref":"KibanaIdPool"}
-				    }
-				}
+              "Effect": "Allow",
+              "Principal": {
+                "Federated": "cognito-identity.amazonaws.com"
+              },
+              "Action": "sts:AssumeRoleWithWebIdentity",
+              "Condition": {
+                "StringEquals": {
+                  "cognito-identity.amazonaws.com:aud":{"Ref":"KibanaIdPool"}
+                }
+              }
             }
           ]
         },
@@ -45,16 +45,16 @@
           "Version": "2012-10-17",
           "Statement": [
             {
-				"Effect": "Allow",
-				"Principal": {
-					"Federated": "cognito-identity.amazonaws.com"
-				},
-				"Action": "sts:AssumeRoleWithWebIdentity",
-				"Condition": {
-				    "StringEquals": {
-				        "cognito-identity.amazonaws.com:aud":{"Ref":"IdPool"}
-				    }
-				}
+              "Effect": "Allow",
+              "Principal": {
+                "Federated": "cognito-identity.amazonaws.com"
+              },
+              "Action": "sts:AssumeRoleWithWebIdentity",
+              "Condition": {
+                "StringEquals": {
+                  "cognito-identity.amazonaws.com:aud":{"Ref":"IdPool"}
+                }
+              }
             }
           ]
         },
@@ -133,14 +133,14 @@
             {
               "Effect": "Allow",
               "Principal": {
-                    "Federated": "cognito-identity.amazonaws.com"
+                "Federated": "cognito-identity.amazonaws.com"
               },
               "Action": "sts:AssumeRoleWithWebIdentity",
-                "Condition": {
-				    "StringEquals": {
-				        "cognito-identity.amazonaws.com:aud":{"Ref":"IdPool"}
-				    }
-				}
+              "Condition": {
+                "StringEquals": {
+                  "cognito-identity.amazonaws.com:aud":{"Ref":"IdPool"}
+                }
+              }
             }
           ]
         },
