@@ -53,6 +53,9 @@
               "Condition": {
                 "StringEquals": {
                   "cognito-identity.amazonaws.com:aud":{"Ref":"IdPool"}
+                },
+                "ForAnyValue:StringLike": {
+                  "cognito-identity.amazonaws.com:amr": "authenticated"
                 }
               }
             }
@@ -139,6 +142,9 @@
               "Condition": {
                 "StringEquals": {
                   "cognito-identity.amazonaws.com:aud":{"Ref":"IdPool"}
+                },
+                "ForAnyValue:StringLike": {
+                  "cognito-identity.amazonaws.com:amr": "authenticated"
                 }
               }
             }
@@ -162,6 +168,9 @@
               "Condition": {
                 "StringEquals": {
                     "cognito-identity.amazonaws.com:aud":{"Ref":"IdPool"}
+                },
+                "ForAnyValue:StringLike": {
+                  "cognito-identity.amazonaws.com:amr": "unauthenticated"
                 }
               }
             }
