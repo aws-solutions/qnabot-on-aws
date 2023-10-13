@@ -109,6 +109,14 @@ async function run_query_es(req, query_params) {
     // another query to match the item text passage field (applicable on for items of type 'text').
     if (!gothits && _.get(query_params, 'settings.ES_SCORE_TEXT_ITEM_PASSAGES')) {
         qnabot.log('ES_SCORE_TEXT_ITEM_PASSAGES is true. Rerun query to check for matches on text field.');
+        
+        /*  prevent querying the item answers field because:
+            1. it was already attempted before
+            2. it will then polute the returned results and, combined with (a potentially lower) EMBEDDINGS_TEXT_PASSAGE_SCORE_THRESHOLD,
+               it may lead to have the answer item returned to the user, with no LLM processing (and mixed with the wrong threshold)
+        */
+        query_params.score_answer = false;
+        
         query_params.score_text_passage = true;
         const es_query_on_text_passage = await build_es_query(query_params);
         es_response = await request({
