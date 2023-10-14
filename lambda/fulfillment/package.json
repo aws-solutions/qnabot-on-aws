@@ -1,22 +1,22 @@
 {
-  "name": "fulfillment",
-  "version": "5.4.2",
-  "description": "QnABot Lambda handling fulfillment of user requests",
-  "main": "handler.js",
-  "scripts": {
-    "test": "nodeunit ./test/index.js",
-    "unit": "nodeunit ./test/index.js -t"
-  },
-  "author": {
-    "name": "Amazon Web Services",
-    "url": "https://aws.amazon.com/solutions"
-  },
-  "license": "Apache-2.0",
-  "dependencies": {
-    "jsonschema": "^1.2.2",
-    "jsonwebtoken": "^9.0.0",
-    "jwks-rsa": "^3.0.0",
-    "slackify-markdown": "4.1.0",
-    "utf8": "3.0.0"
-  }
+    "name": "fulfillment",
+    "version": "5.4.3",
+    "description": "QnABot Lambda handling fulfillment of user requests",
+    "main": "handler.js",
+    "scripts": {
+        "test": "nodeunit ./test/index.js",
+        "unit": "nodeunit ./test/index.js -t"
+    },
+    "author": {
+        "name": "Amazon Web Services",
+        "url": "https://aws.amazon.com/solutions"
+    },
+    "license": "Apache-2.0",
+    "dependencies": {
+        "jsonschema": "^1.2.2",
+        "jsonwebtoken": "^9.0.0",
+        "jwks-rsa": "^3.0.0",
+        "slackify-markdown": "4.1.0",
+        "utf8": "3.0.0"
+    }
 }

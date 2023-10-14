@@ -1,21 +1,21 @@
 {
-  "name": "common-modules-layer",
-  "version": "5.4.2",
-  "description": "QnABot Common-modules-layer lambda",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "dependencies": {
-    "bluebird": "^3.7.2",
-    "bodybuilder": "^2.4.0",
-    "elasticsearch": "^16.7.2",
-    "intercept-stdout": "^0.1.2",
-    "lodash": "^4.17.21"
-  },
-  "author": {
-    "name": "Amazon Web Services",
-    "url": "https://aws.amazon.com/solutions"
-  },
-  "license": "Apache-2.0"
+    "name": "common-modules-layer",
+    "version": "5.4.3",
+    "description": "QnABot Common-modules-layer lambda",
+    "main": "index.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "dependencies": {
+        "bluebird": "^3.7.2",
+        "bodybuilder": "^2.4.0",
+        "elasticsearch": "^16.7.2",
+        "intercept-stdout": "^0.1.2",
+        "lodash": "^4.17.21"
+    },
+    "author": {
+        "name": "Amazon Web Services",
+        "url": "https://aws.amazon.com/solutions"
+    },
+    "license": "Apache-2.0"
 }

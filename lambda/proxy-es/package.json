@@ -1,11 +1,11 @@
 {
-  "name": "proxy-es",
-  "version": "5.4.2",
-  "description": "QnABot Lambda function is used to proxy request from apigateway to elasticsearch",
-  "main": "index.js",
-  "author": {
-    "name": "Amazon Web Services",
-    "url": "https://aws.amazon.com/solutions"
-  },
-  "license": "Apache-2.0"
+    "name": "proxy-es",
+    "version": "5.4.3",
+    "description": "QnABot Lambda function is used to proxy request from apigateway to elasticsearch",
+    "main": "index.js",
+    "author": {
+        "name": "Amazon Web Services",
+        "url": "https://aws.amazon.com/solutions"
+    },
+    "license": "Apache-2.0"
 }
