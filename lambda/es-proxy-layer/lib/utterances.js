@@ -10,12 +10,15 @@
  *  OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions    *
  *  and limitations under the License.                                                                                *
  *********************************************************************************************************************/
-const AWS = require('./aws.js');
-const myCredentials = new AWS.EnvironmentCredentials('AWS');
+
 const _ = require('lodash');
 const Promise = require('bluebird');
-
-const s3 = new AWS.S3();
+const aws = require('aws-sdk');
+aws.config.region = process.env.AWS_REGION || 'us-east-1';
+aws.config.signatureVersion = 'v4';
+aws.config.logger = console;
+const s3 = new aws.S3();
+const myCredentials = new aws.EnvironmentCredentials('AWS');
 const qnabot = require('qnabot/logging');
 
 const con = _.memoize((esAddress) => {
@@ -39,40 +42,46 @@ const con = _.memoize((esAddress) => {
 module.exports = async function (event, context, callback) {
     try {
         const es = con(process.env.ES_ADDRESS);
-        const searchResults = await es.search({
+        const esUtterances = es.search({
             index: process.env.ES_INDEX,
             scroll: '10s',
             body: {
                 query: { match_all: {} },
             },
         })
-        const scrollId = searchResults._scroll_id;
-        const result = searchResults.hits.hits;
-        while (true) { 
-            const scrollResults = await es.scroll({
-                    scrollId,
-                    scroll: '10s'
-                })
-            const hits=scrollResults.hits.hits;;
-            hits.forEach(x => result.push(x));
-            if (!hits.length) break
-        };
+        .then((results) => {
+            const scroll_id = results._scroll_id;
+            const out = results.hits.hits;
+            return new Promise((resolve, reject) => {
+                const next = function () {
+                    es.scroll({
+                        scrollId: scroll_id,
+                        scroll: '10s',
+                    })
+                        .then((scroll_results) => {
+                            const { hits } = scroll_results.hits;
+                            hits.forEach((x) => out.push(x));
+                            hits.length ? next() : resolve(out);
+                        })
+                        .catch(reject);
+                };
+                next();
+            });
+        })
+        .then((result) => _.compact(_.uniq(_.flatten(result
+            .map((qa) => (qa._source.questions ? qa._source.questions.map((y) => y.q) : []))))));
 
-        const esUtterances = _.compact(_.uniq(_.flatten(result
-            .map(qa=>qa._source.questions ? qa._source.questions.map(y=>y.q) : [])
-        )));
+        const s3Utterances = s3.getObject({
+            Bucket: process.env.UTTERANCE_BUCKET,
+            Key: process.env.UTTERANCE_KEY,
+        }).promise()
+            .then((x) => {
+                qnabot.log(x);
+                return JSON.parse(x.Body.toString());
+            });
 
-        const s3Response=await s3.getObject({
- 		        Bucket:process.env.UTTERANCE_BUCKET,
- 		        Key:process.env.UTTERANCE_KEY
-            }).promise()
- 		console.log(s3Response)
-
-        const s3Utterances=JSON.parse(s3Response.Body.toString())
-        const combinedUtterances= [esUtterances, s3Utterances ]
-        const utterances=_.compact(_.uniq(_.flatten(combinedUtterances)))
-
-        return utterances
+        return Promise.all([esUtterances, s3Utterances])
+            .then(([esResults, s3Results]) => ({ utterances: _.compact(_.uniq(_.flatten([esResults, s3Results]))) }));
     } catch (e) {
         qnabot.log(e);
         callback(e);
