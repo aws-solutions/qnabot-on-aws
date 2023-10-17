@@ -1,26 +1,26 @@
 {
-  "name": "cfn",
-  "version": "5.4.2",
-  "description": "QnABot Cfn Lambda",
-  "main": "index.js",
-  "scripts": {
-    "test": "nodeunit ./test/index.js",
-    "unit": "nodeunit ./test/index.js -t"
-  },
-  "author": {
-    "name": "Amazon Web Services",
-    "url": "https://aws.amazon.com/solutions"
-  },
-  "license": "Apache-2.0",
-  "dependencies": {
-    "aws-sdk": "^2.1404.0",
-    "bluebird": "^3.5.0",
-    "body-parser": "^1.19.2",
-    "cfn-lambda": "^5.1.0",
-    "jszip": "^3.10.1",
-    "lodash": "^4.17.21"
-  },
-  "overrides": {
-    "qs@<6.5.3": "^6.5.3"
-  }
+    "name": "cfn",
+    "version": "5.4.3",
+    "description": "QnABot Cfn Lambda",
+    "main": "index.js",
+    "scripts": {
+        "test": "nodeunit ./test/index.js",
+        "unit": "nodeunit ./test/index.js -t"
+    },
+    "author": {
+        "name": "Amazon Web Services",
+        "url": "https://aws.amazon.com/solutions"
+    },
+    "license": "Apache-2.0",
+    "dependencies": {
+        "aws-sdk": "^2.1404.0",
+        "bluebird": "^3.5.0",
+        "body-parser": "^1.19.2",
+        "cfn-lambda": "^5.1.0",
+        "jszip": "^3.10.1",
+        "lodash": "^4.17.21"
+    },
+    "overrides": {
+        "qs@<6.5.3": "^6.5.3"
+    }
 }

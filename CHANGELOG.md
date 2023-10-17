@@ -5,6 +5,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [5.4.3] - 2023-10-13
+ ### Fixed
+- Fixed issue where Alexa schema was not exporting the utterances list.
+
 ## [5.4.2] - 2023-09-30
 ### Added
 - Self-hosting web fonts. Font files used by QnABot UI are now served from QnABot server instead of using third party font provider.
