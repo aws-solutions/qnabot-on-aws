@@ -1,15 +1,15 @@
 {
-  "name": "import",
-  "version": "5.4.2",
-  "description": "QnABot Lambda handling export of QIDs",
-  "main": "index.js",
-  "author": {
-    "name": "Amazon Web Services",
-    "url": "https://aws.amazon.com/solutions"
-  },
-  "license": "Apache-2.0",
-  "dependencies": {
-    "bluebird": "^3.5.1",
-    "lodash": "^4.17.21"
-  }
+    "name": "import",
+    "version": "5.4.3",
+    "description": "QnABot Lambda handling export of QIDs",
+    "main": "index.js",
+    "author": {
+        "name": "Amazon Web Services",
+        "url": "https://aws.amazon.com/solutions"
+    },
+    "license": "Apache-2.0",
+    "dependencies": {
+        "bluebird": "^3.5.1",
+        "lodash": "^4.17.21"
+    }
 }
