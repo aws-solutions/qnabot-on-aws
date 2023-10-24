@@ -98,7 +98,7 @@ async function runPreProcessLambda(req, res) {
             });
             const lambdaResultReq = result.req;
             const lambdaResultRes = result.res;
-            return { lambdaResultReq, lambdaResultRes };
+            return { "req": lambdaResultReq, "res": lambdaResultRes };
         }
     }
     return { req, res };

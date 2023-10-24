@@ -31,6 +31,7 @@ module.exports = async function (config) {
         });
     } catch (error) {
         console.error('An error occurred while starting: ', error);
+        throw error;
     }
 };
 function query(filter) {

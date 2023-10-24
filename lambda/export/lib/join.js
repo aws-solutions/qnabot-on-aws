@@ -35,6 +35,7 @@ module.exports=async function(config){
         }).promise()
         config.status='Clean'
     } catch (error) {
-        console.error("An error occurred while joining parts", error)
+        console.error("An error occurred while joining parts", error);
+        throw error;
     }
 }

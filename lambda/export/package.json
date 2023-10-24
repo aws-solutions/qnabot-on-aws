@@ -1,6 +1,6 @@
 {
     "name": "import",
-    "version": "5.4.3",
+    "version": "5.4.4",
     "description": "QnABot Lambda handling export of QIDs",
     "main": "index.js",
     "author": {

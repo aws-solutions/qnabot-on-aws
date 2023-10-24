@@ -28,5 +28,6 @@ module.exports = async function (config) {
         return await load(config, body);
     } catch (error) {
         console.error('An error occurred in step task: ', error);
+        throw error;
     }
 };
