@@ -26,6 +26,7 @@ module.exports=async function(status){
         return response
  
     } catch (error) {
-        console.error("An error invoking lambda in wait: ", error)
+        console.error("An error invoking lambda in wait: ", error);
+        throw error;
     }
 }

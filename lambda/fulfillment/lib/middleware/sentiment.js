@@ -29,7 +29,8 @@ async function get_sentiment_from_comprehend(utterance) {
         qnabot.log(JSON.stringify(data))
         return data
     } catch (error) {
-        qnabot.log("An error occured in detecting sentiment: ", error)
+        qnabot.log("An error occured in detecting sentiment: ", error);
+        throw error;
     }
 }
 

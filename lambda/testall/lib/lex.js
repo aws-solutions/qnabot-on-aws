@@ -71,5 +71,6 @@ module.exports = async function (config) {
         config.status = 'Clean';
     } catch (error) {
         console.error('An error occured in lex task: ', error);
+        throw error;
     }
 };
