@@ -57,6 +57,7 @@ module.exports = async function (config, body) {
         return config;
     } catch (error) {
         console.error('An error occured while executing loading tasks: ', error);
+        throw error;
     }
 };
 function query(filter) {

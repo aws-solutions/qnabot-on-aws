@@ -1,6 +1,6 @@
 {
     "name": "lex-build",
-    "version": "5.4.3",
+    "version": "5.4.4",
     "description": "QnABot lambda for rebuilding Amazon Lex bots",
     "main": "handler.js",
     "scripts": {

@@ -154,6 +154,7 @@ module.exports = async function assemble(req, res) {
     
         return { req, res };
     } catch (error) {
-        qnabot.log('An error occured in assemble: ', error)
+        qnabot.log('An error occured in assemble: ', error);
+        throw error
     }
 };

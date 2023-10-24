@@ -31,6 +31,7 @@ module.exports = async function (config) {
         }
         config.status = 'Completed';
     } catch (error) {
-        console.error("An error occured while cleaning S3 objects: ", error)
+        console.error("An error occured while cleaning S3 objects: ", error);
+        throw error;
     }
 };
