@@ -119,6 +119,66 @@ Refer to [CHANGELOG.md](CHANGELOG.md) file for details of new features in each v
 
 A [workshop](https://qnabot.workshop.aws) is also available that walks you through QnABot features.
 
+## QnABot Deployable Solution Versions
+
+As QnABot evolves over the years, it makes use of various services and functionality which may go in and out of support. This section serves as a reference to the deployable solution versions along with links to their Public and VPC CloudFormation templates.
+
+_Note: **Deployable solution versions** refers to the ability to deploy the version of QnABot in their AWS accounts. **Actively supported versions** for QnABot is only available for the latest version of QnABot._
+
+### Deployable Versions
+
+- [v5.4.5](https://github.com/aws-solutions/qnabot-on-aws/releases/tag/v5.4.5) - [Public](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v5.4.5/qnabot-on-aws-main.template)/[VPC](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v5.4.5/qnabot-on-aws-vpc.template)
+  - _For those upgrading from `v5.4.X` to later versions, if you are upgrading from a deployment with LLMApi set to SAGEMAKER then set this value to DISABLED before upgrading. After upgrading, return this value back to SAGEMAKER.._
+- [v5.4.4](https://github.com/aws-solutions/qnabot-on-aws/releases/tag/v5.4.4) - [Public](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v5.4.4/qnabot-on-aws-main.template)/[VPC](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v5.4.4/qnabot-on-aws-vpc.template)
+- [v5.4.3](https://github.com/aws-solutions/qnabot-on-aws/releases/tag/v5.4.3) - [Public](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v5.4.3/qnabot-on-aws-main.template)/[VPC](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v5.4.3/qnabot-on-aws-vpc.template)
+  - _We do not recommend to use this version due to a potential issue with the testall functionality which may introduce a high number of versions stored in the testall S3 bucket. Please use the latest version available or v5.4.4+_
+- [v5.4.2](https://github.com/aws-solutions/qnabot-on-aws/releases/tag/v5.4.2) - [Public](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v5.4.2/qnabot-on-aws-main.template)/[VPC](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v5.4.2/qnabot-on-aws-vpc.template)
+  - _We do not recommend to use this version due to a potential issue with the testall functionality which may introduce a high number of versions stored in the testall S3 bucket. Please use the latest version available or v5.4.4+_
+- [v5.4.1](https://github.com/aws-solutions/qnabot-on-aws/releases/tag/v5.4.1) - [Public](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v5.4.1/qnabot-on-aws-main.template)/[VPC](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v5.4.1/qnabot-on-aws-vpc.template)
+- [v5.4.0](https://github.com/aws-solutions/qnabot-on-aws/releases/tag/v5.4.0) - [Public](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v5.4.0/qnabot-on-aws-main.template)/[VPC](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v5.4.0/qnabot-on-aws-vpc.template)
+  - _Note: Lambda Runtimes have been updated this release. Solution now uses: [nodejs18 and python3.10]_
+- [v5.3.4](https://github.com/aws-solutions/qnabot-on-aws/releases/tag/v5.3.4) - [Public](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v5.3.4/qnabot-on-aws-main.template)/[VPC](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v5.3.4/qnabot-on-aws-vpc.template)
+- [v5.3.3](https://github.com/aws-solutions/qnabot-on-aws/releases/tag/v5.3.3) - [Public](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v5.3.3/qnabot-on-aws-main.template)/[VPC](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v5.3.3/qnabot-on-aws-vpc.template)
+- [v5.3.2](https://github.com/aws-solutions/qnabot-on-aws/releases/tag/v5.3.2) - [Public](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v5.3.2/qnabot-on-aws-main.template)/[VPC](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v5.3.2/qnabot-on-aws-vpc.template)
+- [v5.3.1](https://github.com/aws-solutions/qnabot-on-aws/releases/tag/v5.3.1) - [Public](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v5.3.1/qnabot-on-aws-main.template)/[VPC](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v5.3.1/qnabot-on-aws-vpc.template)
+- [v5.3.0](https://github.com/aws-solutions/qnabot-on-aws/releases/tag/v5.3.0) - [Public](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v5.3.0/qnabot-on-aws-main.template)/[VPC](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v5.3.0/qnabot-on-aws-vpc.template)
+- [v5.2.7](https://github.com/aws-solutions/qnabot-on-aws/releases/tag/v5.2.7) - [Public](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v5.2.7/qnabot-on-aws-main.template)/[VPC](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v5.2.7/qnabot-on-aws-vpc.template)
+- [v5.2.6](https://github.com/aws-solutions/qnabot-on-aws/releases/tag/v5.2.6) - [Public](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v5.2.6/qnabot-on-aws-main.template)/[VPC](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v5.2.6/qnabot-on-aws-vpc.template)
+- [v5.2.5](https://github.com/aws-solutions/qnabot-on-aws/releases/tag/v5.2.5) - [Public](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v5.2.5/qnabot-on-aws-main.template)/[VPC](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v5.2.5/qnabot-on-aws-vpc.template)
+- [v5.2.4](https://github.com/aws-solutions/qnabot-on-aws/releases/tag/v5.2.4) - [Public](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v5.2.4/qnabot-on-aws-main.template)/[VPC](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v5.2.4/qnabot-on-aws-vpc.template)
+- [v5.2.3](https://github.com/aws-solutions/qnabot-on-aws/releases/tag/v5.2.3) - [Public](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v5.2.3/qnabot-on-aws-main.template)/[VPC](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v5.2.3/qnabot-on-aws-vpc.template)
+- [v5.2.2](https://github.com/aws-solutions/qnabot-on-aws/releases/tag/v5.2.2) - [Public](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v5.2.2/qnabot-on-aws-main.template)/[VPC](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v5.2.2/qnabot-on-aws-vpc.template)
+- [v5.2.1](https://github.com/aws-solutions/qnabot-on-aws/releases/tag/v5.2.1) - [Public](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v5.2.1/qnabot-on-aws-main.template)/[VPC](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v5.2.1/qnabot-on-aws-vpc.template)
+  - _Note: Lambda Runtimes have been updated this release. Solution now uses: [nodejs16 and python3.9]_
+
+### Undeployable Versions
+- All solutions less than `v5.2.1` are no longer deployable due to Lambda Runtime deprecations.
+- **Upcoming/Recent deprecations**
+  - nodejs16 will enter [Phase 1 deprecation](https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtimes.html#runtime-support-policy) on Mar 11, 2024.
+
+### Why would a solution version no longer be deployable?
+For QnABot, the most common reason is due to [AWS Lambda Runtimes being deprecated](https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtimes.html#runtime-support-policy). When a Lambda runtime has been marked as deprecated, customers can no longer create new Lambda functions in their AWS account. This means that older versions of our solutions that make use of those runtimes will fail to deploy. This makes it hard for the community to provide support as we are unable to deploy a similar environment to investigate issues and reproduce bug reports.
+
+### What should I do if my version of the solution is no longer deployable?
+If you've currently got an existing deployment working for you, there is nothing requiring you to update. However, it is **_strongly_** recommended that you build a plan to test and migrate production deployments to a supported version. The further away a deployment gets from `latest` the greater risk it is at to experiencing instability (especially with regards to deployment).
+
+And for those looking to get started with the solution for the first time, it is always recommended you use the latest version. It is the most secure, stable, and feature-rich version of QnABot!
+
+### How do I update my solution version?
+In most cases, a simple [Update Stack operation](https://docs.aws.amazon.com/solutions/latest/qnabot-on-aws/update-the-solution.html) should allow you to migrate your instance onto a newer version while maintaining your data on the new deployment.
+
+> Note: For those upgrading from `v5.4.X` to later versions, if you are upgrading from a deployment with LLMApi set to SAGEMAKER then set this value to DISABLED before upgrading. After upgrading, return this value back to SAGEMAKER.
+
+The team _**strongly**_ recommends that any upgrades (especially between minor/major versions) first be tested on a non-production instance to check for any regressions. This is critical if you have made custom modifications to your deployment, integrate with external services, or are jumping between multiple versions.
+
+Some additional precautions you can take are:
+
+ - export all of your questions using the Content Designer UI ([instructions](https://docs.aws.amazon.com/solutions/latest/qnabot-on-aws/use-qnabot-on-aws.html#importing-and-exporting-chatbot-answers))
+ - export all of your settings using the Content Designer UI (click `Export Settings` at the bottom of settings page)
+ - backup DynamoDB table ([instructions](https://docs.aws.amazon.com/solutions/latest/qnabot-on-aws/amazon-dynamodb-backups.html)) 
+ - create a manual snapshot of your OpenSearch Domain ([instructions](https://docs.aws.amazon.com/opensearch-service/latest/developerguide/managedomains-snapshots.html))
+
+ ---
 ## Anonymous Metrics
 This solution collects anonymous operational metrics to help AWS improve the
 quality of features of the solution. For more information, including how to disable

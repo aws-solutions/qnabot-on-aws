@@ -5,11 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [5.4.5] - 2023-11-1
+### Updated
+- Security patch for browserify-sign
+
 ## [5.4.4] - 2023-10-24
- ### Updated
- - Security patch for urllib3
+### Updated
+- Security patch for urllib3
  
- ### Fixed
+### Fixed
 - Fixed fulfillment throws an exception when a Preprocessing Lambda Hook is configured([issue #651](https://github.com/aws-solutions/qnabot-on-aws/issues/651))
 - Improved error handling
 
