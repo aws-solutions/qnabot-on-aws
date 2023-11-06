@@ -123,6 +123,19 @@ function getQuery(req) {
     return useOriginalLanguageQuery ? origQuestion : question;
 }
 
+function addKendraQueryArgs(params, req) {
+    // add kendra query args if there are any to params
+    const kendraQueryArgs = _.get(req, 'kendraQueryArgs', []);
+    qnabot.log(`Kendra query args: ${kendraQueryArgs}`);
+    for (const argString of kendraQueryArgs) {
+        qnabot.log(`Adding parameter '${argString}'`);
+        const argJSON = `{ ${argString} }`; // convert k:v to a JSON obj
+        const arg = JSON.parse(argJSON);
+        params = _.assign(params, arg);
+    }
+    return params;
+}
+
 async function kendraRetrieve(kendraClient, req) {
     const kcount = _.get(req._settings, 'ALT_SEARCH_KENDRA_MAX_DOCUMENT_COUNT', 2);
     const signS3Urls = _.get(req._settings, 'ALT_SEARCH_KENDRA_S3_SIGNED_URLS', true);
@@ -130,11 +143,16 @@ async function kendraRetrieve(kendraClient, req) {
 
     const kindexIDs = getIndexIDs(req);
     const kquery = getQuery(req);
-    const response = await kendraClient.retrieve({
+
+    let params = {
         IndexId: kindexIDs[0],
         QueryText: kquery.trim(),
         PageSize: kcount,
-    }).promise();
+    };
+
+    params = addKendraQueryArgs(params, req);
+
+    const response = await kendraClient.retrieve(params).promise();
     qnabot.log('Debug: Retrieve API response: ', JSON.stringify(response, null, 2));
 
     const respLen = response.ResultItems.length;
