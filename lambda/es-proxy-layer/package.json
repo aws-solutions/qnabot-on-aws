@@ -11,7 +11,7 @@
     "dependencies": {
         "@dqbd/tiktoken": "^1.0.7",
         "aws4": "^1.6.0",
-        "axios": "^0.26.0",
+        "axios": "^1.6.0",
         "handlebars": "^4.7.2",
         "langchain": "^0.0.63",
         "linkifyjs": "^3.0.0-beta.3",
