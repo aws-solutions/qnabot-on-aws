@@ -12,36 +12,36 @@ en | fr | de | es |
 
 Then go to the Tools menu and choose **Import Custom Terminology**
 
-![Tools](./tools.png)
+![Tools](./images/tools.png)
 
 You will then see the following dialog
 
-![Terminology](./terminology1.png)
+![Terminology](./images/terminology1.png)
 
 Enter a description and click on **Choose File**
 
-![Upload Terminology](./uploadterminology.png)
+![Upload Terminology](./images/uploadterminology.png)
 
 Once the file is successfully uploaded, you should see the following
 
-![Terminology Uploaded](./terminology_uploaded.png)
+![Terminology Uploaded](./images/terminology_uploaded.png)
 
 Now let's see what it does...
 
 Let's go back to the Content Designer and enter a question.
 
-![Translation Question](./translate_question.png)
+![Translation Question](./images/translate_question.png)
 
 And let's ask the question in Spanish
 
-![Custom Terminology Disabled](./custom_terminology_disabled.png)
+![Custom Terminology Disabled](./images/custom_terminology_disabled.png)
 
 We consider "custom terminology" to be a branded feature that shouldn't be translated.  We have already uploaded a custom terminology file.  But, we still need to enable custom terminology support.
 
 Go to settings in the **Tools** menu and enable custom terminology sources
 
-![Settings](./settings.png)
+![Settings](./images/settings.png)
 
 And now let's ask the question again, and see that our file worked...
 
-![Custom Terminology Enabled](./custom_terminology_enabled.png)
+![Custom Terminology Enabled](./images/custom_terminology_enabled.png)

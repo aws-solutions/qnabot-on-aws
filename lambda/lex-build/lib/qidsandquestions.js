@@ -1,64 +1,58 @@
-// Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
-// SPDX-License-Identifier: Apache-2.0
+/*********************************************************************************************************************
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.                                                *
+ *                                                                                                                    *
+ *  Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance    *
+ *  with the License. A copy of the License is located at                                                             *
+ *                                                                                                                    *
+ *      http://www.apache.org/licenses/                                                                               *
+ *                                                                                                                    *
+ *  or in the 'license' file accompanying this file. This file is distributed on an 'AS IS' BASIS, WITHOUT WARRANTIES *
+ *  OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions    *
+ *  and limitations under the License.                                                                                *
+ *********************************************************************************************************************/
 
-const Promise=require('bluebird')
-const aws=require('./aws')
-const s3=new aws.S3()
 const con=require('./connection')
 const _=require('lodash')
 
-module.exports=function(params){
-    const es=con(params.address)
-    const es_utterances=es.search({
-        index:process.env.INDEX,
-        scroll:'10s',
+module.exports = async function (params) {
+    const es = con(params.address);
+    const results = await es.search({
+        index: process.env.INDEX,
+        scroll: '10s',
         body: {
             _source: {
-                "exclude": ["questions.q_vector", "a_vector"]
+                exclude: ['questions.q_vector', 'a_vector'],
             },
-            query: {match_all: {}}
-        }
+            query: { match_all: {} },
+        },
     })
-    .then(function(results){
-        const scroll_id=results._scroll_id
-        const out=results.hits.hits
-        return new Promise(function(resolve,reject){
-            const next=function(){
-                es.scroll({
-                   scrollId:scroll_id,
-                   scroll:'10s'
-                })
-                .then(function(scroll_results){
-                    const hits=scroll_results.hits.hits
-                    hits.forEach(x=>out.push(x))
-                    hits.length ? next() : resolve(out)
-                })
-                .catch(reject)
-            }
-            next()
+    const scrollId = results._scroll_id;
+    const result = results.hits.hits;
+    while (true) {
+        const scrollResults = await es.scroll({
+            scrollId,
+            scroll: '10s',
         })
-    })
-    .then(function(result){
-        return _.compact(_.uniq(_.flatten(result.map(qa=>{
-            return {
-                "qid":qa._source.qid, 
-                "type":qa._source.type,
-                "qna": qa._source.type === "qna" ? {
-                    "enableQidIntent":_.get(qa._source, "enableQidIntent", false), 
-                    "q":_.get(qa._source, "questions", []).map(y=>y.q), 
-                    "slots":_.get(qa._source, "slots", []),
-                } : {},
-                "slotType": qa._source.type === "slottype" ? {
-                    "descr": _.get(qa._source, "descr", ""),
-                    "resolutionStrategyRestrict": _.get(qa._source, "resolutionStrategyRestrict", false),
-                    "slotTypeValues": _.get(qa._source, "slotTypeValues", []),
-                    "useForCustomVocabulary": _.get(qa._source, "useForCustomVocabulary", false),
-                } : {},
-            };
-        }))))
-    })
-
-    return es_utterances
-    .then(utterances=>_.compact(_.uniq(_.flatten(utterances))))
-}
-
+        const hits = scrollResults.hits.hits
+        hits.forEach((x) => result.push(x));
+        if (!hits.length) break
+    }
+    const esUtterances = _.compact(_.uniq(_.flatten(result.map((qa) => ({
+            qid: qa._source.qid,
+            type: qa._source.type,
+            qna: qa._source.type === 'qna' ? {
+                enableQidIntent: _.get(qa._source, 'enableQidIntent', false),
+                q: _.get(qa._source, 'questions', []).map((y) => y.q),
+                slots: _.get(qa._source, 'slots', []),
+            } : {},
+            slotType: qa._source.type === 'slottype' ? {
+                descr: _.get(qa._source, 'descr', ''),
+                resolutionStrategyRestrict: _.get(qa._source, 'resolutionStrategyRestrict', false),
+                slotTypeValues: _.get(qa._source, 'slotTypeValues', []),
+                useForCustomVocabulary: _.get(qa._source, 'useForCustomVocabulary', false),
+            } : {},
+        })))));
+    
+    const utterances = _.compact(_.uniq(_.flatten(esUtterances)))
+    return utterances
+};

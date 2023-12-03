@@ -1,3 +1,15 @@
+/*********************************************************************************************************************
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.                                                *
+ *                                                                                                                    *
+ *  Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance    *
+ *  with the License. A copy of the License is located at                                                             *
+ *                                                                                                                    *
+ *      http://www.apache.org/licenses/                                                                               *
+ *                                                                                                                    *
+ *  or in the 'license' file accompanying this file. This file is distributed on an 'AS IS' BASIS, WITHOUT WARRANTIES *
+ *  OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions    *
+ *  and limitations under the License.                                                                                *
+ *********************************************************************************************************************/
 <template lang="pug">
   v-container(fluid)
     v-layout(row)
@@ -10,12 +22,11 @@
           @keyup.enter="simulate"
           clearable 
         )
-      v-flex(xs5)
-        v-checkbox(
-          label="Score on answer field (instead of questions)"
-          v-model="score_answer"
-          true-value="true"
-          false-value="false"
+      v-flex(xs2)
+        v-select(
+          label="Match on:"
+          :items="['qna item questions', 'qna item answer', 'text item passage']"
+          v-model="score_on"
         )
     v-layout(row)
       v-flex(xs5)
@@ -42,13 +53,11 @@
 </template>
 
 <script>
-// Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
-// SPDX-License-Identifier: Apache-2.0
 
-var Vuex=require('vuex')
-var saveAs=require('file-saver').saveAs
-var Promise=require('bluebird')
-var _=require('lodash')
+const Vuex=require('vuex')
+const saveAs=require('file-saver').saveAs
+const Promise=require('bluebird')
+const _=require('lodash')
 
 module.exports={
   data:function(){
@@ -56,7 +65,7 @@ module.exports={
       query:"",
       topic:"",
       client_filter:"",
-      score_answer:"false"
+      score_on:"qna item questions"
     }
   },
   components:{
@@ -68,7 +77,8 @@ module.exports={
         query:this.query,
         topic:this.topic,
         client_filter:this.client_filter,
-        score_answer:this.score_answer
+        score_answer:this.score_answer,
+        score_on:this.score_on
       })
     },500,{trailing:false,leading:true})
   }

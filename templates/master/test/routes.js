@@ -1,19 +1,30 @@
-var config=require('../../../config')
+/*********************************************************************************************************************
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.                                                *
+ *                                                                                                                    *
+ *  Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance    *
+ *  with the License. A copy of the License is located at                                                             *
+ *                                                                                                                    *
+ *      http://www.apache.org/licenses/                                                                               *
+ *                                                                                                                    *
+ *  or in the 'license' file accompanying this file. This file is distributed on an 'AS IS' BASIS, WITHOUT WARRANTIES *
+ *  OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions    *
+ *  and limitations under the License.                                                                                *
+ *********************************************************************************************************************/
+
+const config=require('../../../config.json')
 process.env.AWS_PROFILE=config.profile
 process.env.AWS_DEFAULT_REGION=config.region
-var query=require('query-string').stringify
-var _=require('lodash')
-var zlib=require('zlib')
-var Promise=require('bluebird')
-var Url=require('url')
-var sign=require('aws4').sign
-var fs=require('fs')
-var aws=require('aws-sdk')
-aws.config.setPromisesDependency(Promise)
+const query=require('query-string').stringify
+const _=require('lodash')
+const zlib=require('zlib')
+const Url=require('url')
+const sign=require('aws4').sign
+const fs=require('fs')
+const aws=require('aws-sdk')
 aws.config.region=config.region
-var exists=require('./util').exists
-var run=require('./util').run
-var api=require('./util').api
+const exists=require('./util').exists
+const run=require('./util').run
+const api=require('./util').api
 
 module.exports={
     root:{
@@ -22,18 +33,22 @@ module.exports={
                 path:"/",
                 method:"get"
             })
-            .tap(console.log)
-            .tap(test.ok)
-            .then(function(result){
+            .then((result) => {
+                console.log(result);
+                test.ok(result);
                 return Promise.all(_.values(result._links).map(x=>{
                     return api({
                         href:x.href,
                         method:"get"
                     })
-                    .tap(test.ok)
-                    .tapCatch(()=>console.log("error",x.href))
-                    .catch(test.ifError)
-                    
+                    .then(res => {
+                        test.ok(res)
+                        return res
+                    })
+                    .catch(error => {
+                        console.log("error", x.href)
+                        test.ifError(error)
+                    })
                 }))
             })
             .catch(test.ifError)
@@ -46,18 +61,25 @@ module.exports={
                 path:"bot",
                 method:"get"
             })
-            .tap(console.log)
-            .tap(test.ok)
-            .then(function(result){
+            .then((result) => {
+                console.log(result);
+                test.ok(result);
                 return Promise.all(_.values(result._links).map(x=>api({
                     href:x.href,
                     method:"get"
-                }).tap(test.ok).catch(test.ifError)
+                }).then(res => {
+                    test.ok(res);
+                    return res
+                })
+                .catch(error => {
+                    console.log("error", x.href)
+                    test.ifError(error)
+                    })
                 ))
             })
             .catch(test.ifError)
             .finally(()=>test.done())
-        } 
+        }
     },
     health:{
         get:test=>run({
@@ -109,12 +131,12 @@ module.exports={
     },
     examples:{
         documents:async test=>{
-            var exampleHrefs=await api({
+            const exampleHrefs = await api({
                 path:"examples",
                 method:"get"
             })
-           
-            var documents=await api({
+
+            const documents = await api({
                 href:exampleHrefs._links.documents.href,
                 method:"get"
             })
@@ -126,15 +148,15 @@ module.exports={
                     })
                 })
             )
-            test.done()    
+            test.done()
         },
         photos:async test=>{
-            var exampleHrefs=await api({
+            const exampleHrefs=await api({
                 path:"examples",
                 method:"get"
             })
-           
-            var photos=await api({
+
+            const photos=await api({
                 href:exampleHrefs._links.photos.href,
                 method:"get"
             })
@@ -149,7 +171,7 @@ module.exports={
                     })
                 })
             )
-            test.done()    
+            test.done()
         }
     },
     jobs:{
@@ -158,13 +180,13 @@ module.exports={
                 path:"/jobs",
                 method:"get"
             })
-            .tap(console.log)
-            .tap(test.ok)
-            .then(function(result){
+            .then((result) => {
+                console.log(result);
+                test.ok(result);
                 return Promise.all(_.values(result._links).map(x=>api({
                     href:x.href,
                     method:"get"
-                }).tap(test.ok).catch(test.ifError)
+                }).then(test.ok).catch(test.ifError)
                 ))
             })
             .catch(test.ifError)

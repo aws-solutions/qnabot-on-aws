@@ -20,7 +20,22 @@
           ]
         },
         "Path": "/",
-        "Policies":[]
+        "Policies":[
+          {
+            "PolicyName": "KibanaOpenSearchAccessPolicy",
+            "PolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement":[
+                {
+                  "Sid":"CognitoAuth",
+                  "Effect":"Allow",
+                  "Action":"es:ESHttp*",
+                  "Resource": {"Fn::Sub": "${ESVar.ESArn}/*"}
+                }
+              ]
+            }
+          }
+        ]
       }
     },
     "AdminRole": {

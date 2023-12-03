@@ -1,63 +1,76 @@
-var config=require('../../../config')
+/*********************************************************************************************************************
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.                                                *
+ *                                                                                                                    *
+ *  Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance    *
+ *  with the License. A copy of the License is located at                                                             *
+ *                                                                                                                    *
+ *      http://www.apache.org/licenses/                                                                               *
+ *                                                                                                                    *
+ *  or in the 'license' file accompanying this file. This file is distributed on an 'AS IS' BASIS, WITHOUT WARRANTIES *
+ *  OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions    *
+ *  and limitations under the License.                                                                                *
+ *********************************************************************************************************************/
+
+const config=require('../../../config.json')
 process.env.AWS_PROFILE=config.profile
 process.env.AWS_DEFAULT_REGION=config.region
-var query=require('query-string').stringify
-var _=require('lodash')
-var zlib=require('zlib')
-var Promise=require('bluebird')
-var axios=require('axios')
-var Url=require('url')
-var sign=require('aws4').sign
-var fs=require('fs')
-var aws=require('aws-sdk')
-aws.config.setPromisesDependency(Promise)
+const query=require('query-string').stringify
+const _=require('lodash')
+const zlib=require('zlib')
+const axios=require('axios')
+const Url=require('url')
+const sign=require('aws4').sign
+const fs=require('fs')
+const aws=require('aws-sdk')
 aws.config.region=config.region
-var outputs=require('../../../bin/exports')
+const outputs=require('../../../bin/exports')
 
-exports.exists=function(id,test,not=true){
-    return api({
-        path:"questions/"+id,
-        method:"HEAD"
-    })
-    .then(()=>not ? test.ok(true) : test.ifError(true))
-    .catch(()=>!not ? test.ok(true) : test.ifError(true))
+exports.exists=async function(id,test,not=true){
+    try {
+        await api({
+            path: "questions/" + id,
+            method: "HEAD"
+        })
+        return not ? test.ok(true) : test.ifError(true)
+    } catch {
+        return !not ? test.ok(true) : test.ifError(true)
+    }
 }
-exports.run=function(opts,test,not=true){
-    return api(opts)
-    .then(result=>{
-        test.ok(opts.method.toUpperCase()==='HEAD' ? true : result)
-    })
-    .then(()=>not ? test.ok(true) : test.ifError(true))
-    .catch(()=>!not ? test.ok(true) : test.ifError(true))
-    .finally(()=>test.done())
+exports.run=async function(opts,test,not=true){
+    try {
+        const result = await api(opts)
+        test.ok(opts.method.toUpperCase() === 'HEAD' ? true : result)
+        return not ? test.ok(true) : test.ifError(true)
+    } catch {
+        return !not ? test.ok(true) : test.ifError(true)
+    } finally {
+        return test.done()
+    }
 }
 exports.api=api
-function  api(opts){
-    return outputs('dev/master',{wait:true}).then(function(output){
-        var href=opts.path ? output.ApiEndpoint+'/'+opts.path : opts.href
-        console.log(opts)
-        var url=Url.parse(href)
-        var request={
-            host:url.hostname,
-            method:opts.method.toUpperCase(),
-            url:url.href,
-            path:url.path,
-            headers:opts.headers || {}
-        }
-        if(opts.body){
-            request.body=JSON.stringify(opts.body),
-            request.data=opts.body,
-            request.headers['content-type']='application/json'
-        }
-        console.log("Request",JSON.stringify(request,null,2))
-
-        var credentials=aws.config.credentials 
-        var signed=sign(request,credentials)        
-        delete request.headers["Host"]
-        delete request.headers["Content-Length"]        
-        
-        return Promise.resolve(axios(signed))
-        .get('data')
-        .tap(x=>console.log("response:",JSON.stringify(x,null,2)))
-    })
+async function  api(opts){
+    const output = await outputs('dev/master', { wait: true })
+    const href = opts.path ? output.ApiEndpoint + '/' + opts.path : opts.href
+    console.log(opts)
+    const url = Url.parse(href)
+    const request = {
+        host: url.hostname,
+        method: opts.method.toUpperCase(),
+        url: url.href,
+        path: url.path,
+        headers: opts.headers || {}
+    }
+    if (opts.body) {
+        request.body = JSON.stringify(opts.body),
+            request.data = opts.body,
+            request.headers['content-type'] = 'application/json'
+    }
+    console.log("Request", JSON.stringify(request, null, 2))
+    const credentials = aws.config.credentials
+    const signed = sign(request, credentials)
+    delete request.headers["Host"]
+    delete request.headers["Content-Length"]
+    const x = axios(signed);
+    console.log("response:",JSON.stringify(x.data, null, 2))
+    return x.data
 }

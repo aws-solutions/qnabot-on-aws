@@ -1,26 +1,37 @@
-var config = require('../../../config')
+/*********************************************************************************************************************
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.                                                *
+ *                                                                                                                    *
+ *  Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance    *
+ *  with the License. A copy of the License is located at                                                             *
+ *                                                                                                                    *
+ *      http://www.apache.org/licenses/                                                                               *
+ *                                                                                                                    *
+ *  or in the 'license' file accompanying this file. This file is distributed on an 'AS IS' BASIS, WITHOUT WARRANTIES *
+ *  OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions    *
+ *  and limitations under the License.                                                                                *
+ *********************************************************************************************************************/
+
+const config = require('../../../config.json')
 process.env.AWS_PROFILE = config.profile
 process.env.AWS_DEFAULT_REGION = config.region
-var query = require('query-string').stringify
-var _ = require('lodash')
-var zlib = require('zlib')
-var Promise = require('bluebird')
-var Url = require('url')
-var sign = require('aws4').sign
-var fs = require('fs')
-var aws = require('aws-sdk')
-aws.config.setPromisesDependency(Promise)
+const query = require('query-string').stringify
+const _ = require('lodash')
+const zlib = require('zlib')
+const Url = require('url')
+const sign = require('aws4').sign
+const fs = require('fs')
+const aws = require('aws-sdk')
 aws.config.region = config.region
-var outputs = require('../../../bin/exports')
-var exists = require('./util').exists
-var run = require('./util').run
-var api = require('./util').api
+const outputs = require('../../../bin/exports')
+const exists = require('./util').exists
+const run = require('./util').run
+const api = require('./util').api
 
 
 module.exports = {
-    
+
     setUp: function(cb) {
-        var self = this
+        const self = this
         outputs('dev/master').then(function(output) {
                 self.lex = new aws.LexRuntime({
                     region: config.region,
@@ -45,7 +56,7 @@ module.exports = {
                     a: "i am the unit"
                 }
             })
-            var response = await this.lex.postText({
+            const response = await this.lex.postText({
                 inputText: "hello"
             }).promise()
             console.log(response)
@@ -67,22 +78,26 @@ module.exports = {
         this.lex.postText({
                 inputText: "zzzzzzzzzzzzzzzzzzz"
             }).promise()
-            .tap(x => test.equal(x.dialogState, "ElicitIntent"))
-            .then(console.log)
+            .then(x => { 
+                test.equal(x.dialogState, "ElicitIntent");
+                console.log(x);
+            })
             .finally(test.done)
     },
     empty: function(test) {
         this.lex.postText({
                 inputText: "help"
             }).promise()
-            .tap(x => test.equal(x.dialogState, "Fulfilled"))
-            .then(console.log)
+            .then(x => {
+                test.equal(x.dialogState, "Fulfilled");
+                console.log(x);
+            })
             .finally(test.done)
     },
     card: function(test) {
-        var self = this
-        var id = "unit-test.1"
-        var id2 = "unit-test.2"
+        const self = this
+        const id = "unit-test.1"
+        const id2 = "unit-test.2"
         api({
                 path: "questions/" + id,
                 method: "PUT",
@@ -110,13 +125,17 @@ module.exports = {
             .then(() => self.lex.postText({
                 inputText: "who am i"
             }).promise())
-            .tap(x => test.ok(x.responseCard))
-            .then(console.log)
+            .then(x => { 
+                test.ok(x.responseCard)
+                console.log(x)
+            })
             .then(() => self.lex.postText({
                 inputText: "who are you"
             }).promise())
-            .tap(x => test.ok(!x.responseCard))
-            .then(console.log)
+            .then(x => { 
+                test.ok(!x.responseCard)
+                console.log(x)
+            })
             .then(() => api({
                 path: "questions/unit-test.1",
                 method: "DELETE"
@@ -129,10 +148,10 @@ module.exports = {
             .finally(() => test.done())
     },
     topic: function(test) {
-        var self = this
-        var id1 = "unit-test.1"
-        var id2 = "unit-test.2"
-        return Promise.join(
+        const self = this
+        const id1 = "unit-test.1"
+        const id2 = "unit-test.2"
+        return Promise.all([
                 api({
                     path: `questions/${id1}`,
                     method: "PUT",
@@ -155,34 +174,46 @@ module.exports = {
                         t: "humans"
                     }
                 })
-            )
-            .then(() => self.lex.postText({
-                inputText: "what do zombies eat",
-                sessionAttributes: {}
-            }).promise().tap(console.log))
+             ])
+            .then(() => {
+                const result = self.lex.postText({
+                    inputText: "what do zombies eat",
+                    sessionAttributes: {}
+                }).promise();
+                console.log(result);
+                return result;
+            })
             .then(res => test.equal(res.sessionAttributes.topic, "zombies"))
-            .then(() => self.lex.postText({
+            .then(() => {
+                const result  = self.lex.postText({
                 inputText: "what do they eat",
                 sessionAttributes: {
                     topic: "zombies"
                 }
-            }).promise().tap(console.log))
+                }).promise()
+                console.log(result);
+                return result;
+            })
             .then(res => test.equal(res.sessionAttributes.topic, "zombies"))
-            .then(() => self.lex.postText({
-                inputText: "what do humans eat",
-                sessionAttributes: {}
-            }).promise().tap(console.log))
+            .then(() => {
+                const result = self.lex.postText({
+                    inputText: "what do humans eat",
+                    sessionAttributes: {}
+                }).promise()
+                console.log(result)
+                return result;
+            })
             .then(res => test.equal(res.sessionAttributes.topic, "humans"))
             .finally(() => test.done())
     },
     hook: function(test) {
-        var self = this
-        var id1 = 'unit-test.1'
-        var id2 = "unit-test.2"
-        var lambda = new aws.Lambda({
+        const self = this
+        const id1 = 'unit-test.1'
+        const id2 = "unit-test.2"
+        const lambda = new aws.Lambda({
             region: config.region
         })
-        var func = outputs('dev/lambda').tap(function(output) {
+        const func = outputs('dev/lambda').then(function(output) {
                 return lambda.updateFunctionCode({
                     FunctionName: output.lambda,
                     Publish: true,
@@ -200,10 +231,13 @@ module.exports = {
                     l: output.lambda
                 }
             }))
-            .then(() => self.lex.postText({
-                inputText: "what do zombies eat",
-                sessionAttributes: {}
-            }).promise().tap(console.log))
+            .then(() => {
+                const result = self.lex.postText({
+                    inputText: "what do zombies eat",
+                    sessionAttributes: {}
+                }).promise()
+                console.log(result)
+            })
             .then(res => test.equal(res.message, "hook"))
             .then(() => api({
                 path: "questions/" + id1,
@@ -218,8 +252,7 @@ module.exports = {
     // Guided Navigation tests
     navigation1: async function(test) {
         try {
-            var args = await outputs('dev/master')
-            
+            const args = await outputs('dev/master')
             await api({
                     path: "questions/navigation.1",
                     method: "PUT",
@@ -242,15 +275,15 @@ module.exports = {
                         l: "QNA:ExamplePYTHONLambdaPrevious"
                     }
                 })
-            var sessionAttributes = {}
-            var response = await this.lex.postText({
+            let sessionAttributes = {}
+            let response = await this.lex.postText({
                 sessionAttributes: sessionAttributes,
                 inputText: "next"
             }).promise()
             console.log(response)
             sessionAttributes = response.sessionAttributes
             test.equal(response.message, "Unable to go to the next room...")
-            
+
             response = await this.lex.postText({
                 sessionAttributes: sessionAttributes,
                 inputText: "previous"
@@ -258,7 +291,7 @@ module.exports = {
             console.log(response)
             sessionAttributes = response.sessionAttributes
             test.equal(response.message, "Unable to go to the previous room...")
-            
+
         }
         catch (e) {
             test.ifError(e)
@@ -277,76 +310,75 @@ module.exports = {
     },
     navigation2: async function(test) {
         try {
-            var args = await outputs('dev/master')
+            const args = await outputs('dev/master')
+            await api({
+                    path: "questions/navigation.7",
+                    method: "PUT",
+                    body: {
+                        qid: "navigation.7",
+                        type: "qna",
+                        q: ["Next"],
+                        a: "no next room",
+                        l: "QNA:ExamplePYTHONLambdaNext"
+                    }
+                })
+            await  api({
+                    path: "questions/navigation.8",
+                    method: "PUT",
+                    body: {
+                        qid: "navigation.8",
+                        type: "qna",
+                        q: ["Previous"],
+                        a: "no previous room",
+                        l: "QNA:ExamplePYTHONLambdaPrevious"
+                    }
+                })
+            await api({
+                    path: "questions/navigation.3",
+                    method: "PUT",
+                    body: {
+                        qid: "navigation.3",
+                        type: "qna",
+                        q: ["One"],
+                        a: "One",
+                        next: "navigation.4"
+                    }
+                })
 
-                await api({
-                        path: "questions/navigation.7",
-                        method: "PUT",
-                        body: {
-                            qid: "navigation.7",
-                            type: "qna",
-                            q: ["Next"],
-                            a: "no next room",
-                            l: "QNA:ExamplePYTHONLambdaNext"
-                        }
-                    })
-                await  api({
-                        path: "questions/navigation.8",
-                        method: "PUT",
-                        body: {
-                            qid: "navigation.8",
-                            type: "qna",
-                            q: ["Previous"],
-                            a: "no previous room",
-                            l: "QNA:ExamplePYTHONLambdaPrevious"
-                        }
-                    })
-               await api({
-                        path: "questions/navigation.3",
-                        method: "PUT",
-                        body: {
-                            qid: "navigation.3",
-                            type: "qna",
-                            q: ["One"],
-                            a: "One",
-                            next: "navigation.4"
-                        }
-                    })
-                
-               await api({
-                    path: "questions/navigation.4",
-                    method: "PUT",
-                    body: {
-                        qid: "navigation.4",
-                        type: "qna",
-                        q: ["Two"],
-                        a: "Two",
-                        next: "navigation.5"
-                    }
-                })
-                await api({
-                    path: "questions/navigation.5",
-                    method: "PUT",
-                    body: {
-                        qid: "navigation.5",
-                        type: "qna",
-                        q: ["Three"],
-                        a: "Three",
-                        next: "navigation.6"
-                    }
-                })
-                await api({
-                    path: "questions/navigation.6",
-                    method: "PUT",
-                    body: {
-                        qid: "navigation.6",
-                        type: "qna",
-                        q: ["End"],
-                        a: "End",
-                    }
-                })
-            var sessionAttributes = {}
-            var response
+            await api({
+                path: "questions/navigation.4",
+                method: "PUT",
+                body: {
+                    qid: "navigation.4",
+                    type: "qna",
+                    q: ["Two"],
+                    a: "Two",
+                    next: "navigation.5"
+                }
+            })
+            await api({
+                path: "questions/navigation.5",
+                method: "PUT",
+                body: {
+                    qid: "navigation.5",
+                    type: "qna",
+                    q: ["Three"],
+                    a: "Three",
+                    next: "navigation.6"
+                }
+            })
+            await api({
+                path: "questions/navigation.6",
+                method: "PUT",
+                body: {
+                    qid: "navigation.6",
+                    type: "qna",
+                    q: ["End"],
+                    a: "End",
+                }
+            })
+            let sessionAttributes = {}
+            let response
             response = await this.lex.postText({
                 sessionAttributes:sessionAttributes,
                 inputText: "One"
@@ -354,7 +386,7 @@ module.exports = {
             console.log(response)
             sessionAttributes = response.sessionAttributes
             test.equal(response.message, "One")
-            
+
             response = await this.lex.postText({
                 sessionAttributes:sessionAttributes,
                 inputText: "Two"
@@ -362,7 +394,7 @@ module.exports = {
             console.log(response)
             sessionAttributes = response.sessionAttributes
             test.equal(response.message, "Two")
-            
+
             response = await this.lex.postText({
                 sessionAttributes:sessionAttributes,
                 inputText: "next"
@@ -370,7 +402,7 @@ module.exports = {
             console.log(response)
             sessionAttributes = response.sessionAttributes
             test.equal(response.message, "Three")
-            
+
             response = await this.lex.postText({
                 sessionAttributes:sessionAttributes,
                 inputText: "previous"
@@ -378,7 +410,7 @@ module.exports = {
             console.log(response)
             sessionAttributes = response.sessionAttributes
             test.equal(response.message, "Two")
-            
+
             response = await this.lex.postText({
                 sessionAttributes:sessionAttributes,
                 inputText: "Two"
@@ -386,7 +418,7 @@ module.exports = {
             console.log(response)
             sessionAttributes = response.sessionAttributes
             test.equal(response.message, "Two")
-            
+
             response = await this.lex.postText({
                 sessionAttributes:sessionAttributes,
                 inputText: "previous"
@@ -394,7 +426,7 @@ module.exports = {
             console.log(response)
             sessionAttributes = response.sessionAttributes
             test.equal(response.message, "One")
-            
+
         }
         catch (e) {
             test.ifError(e)
@@ -429,86 +461,85 @@ module.exports = {
     },
     navigation3: async function(test) {
         try {
-            var args = await outputs('dev/master')
-            var lambda = new aws.Lambda({
+            const args = await outputs('dev/master')
+            const lambda = new aws.Lambda({
                 region: config.region
             })
-            var func = await outputs('dev/lambda').tap(function(output) {
-                    return lambda.updateFunctionCode({
-                        FunctionName: output.lambda,
-                        Publish: true,
-                        ZipFile: fs.readFileSync(__dirname + '/hook.zip')
-                    })
-                })
-
-                await api({
-                        path: "questions/navigationlambda.1",
-                        method: "PUT",
-                        body: {
-                            qid: "navigationlambda.1",
-                            type: "qna",
-                            q: ["Next"],
-                            a: "no next room",
-                            l: "QNA:ExamplePYTHONLambdaNext"
-                        }
-                    })
-                await  api({
-                        path: "questions/navigationlambda.2",
-                        method: "PUT",
-                        body: {
-                            qid: "navigationlambda.2",
-                            type: "qna",
-                            q: ["Previous"],
-                            a: "no previous room",
-                            l: "QNA:ExamplePYTHONLambdaPrevious"
-                        }
-                    })
-              await api({
-                        path: "questions/navigationlambda.3",
-                        method: "PUT",
-                        body: {
-                            qid: "navigationlambda.3",
-                            type: "qna",
-                            q: ["One"],
-                            a: "One",
-                            next: "navigationlambda.4"
-                        }
-                    })
-              await api({
-                    path: "questions/navigationlambda.4",
+            const output = await outputs('dev/lambda');
+            await lambda.updateFunctionCode({
+                FunctionName: output.lambda,
+                Publish: true,
+                ZipFile: fs.readFileSync(__dirname + '/hook.zip')
+            })
+            const func = output;
+            await api({
+                    path: "questions/navigationlambda.1",
                     method: "PUT",
                     body: {
-                        qid: "navigationlambda.4",
+                        qid: "navigationlambda.1",
                         type: "qna",
-                        q: ["Two"],
-                        a: "Two",
-                        l: func.lambda,
-                        next: "navigationlambda.5"
+                        q: ["Next"],
+                        a: "no next room",
+                        l: "QNA:ExamplePYTHONLambdaNext"
                     }
                 })
-                await api({
-                    path: "questions/navigationlambda.5",
+            await  api({
+                    path: "questions/navigationlambda.2",
                     method: "PUT",
                     body: {
-                        qid: "navigationlambda.5",
+                        qid: "navigationlambda.2",
                         type: "qna",
-                        q: ["Three"],
-                        a: "Three",
-                        next: "navigationlambda.6"
+                        q: ["Previous"],
+                        a: "no previous room",
+                        l: "QNA:ExamplePYTHONLambdaPrevious"
                     }
                 })
-                await api({
-                    path: "questions/navigationlambda.6",
+            await api({
+                    path: "questions/navigationlambda.3",
                     method: "PUT",
                     body: {
-                        qid: "navigationlambda.6",
+                        qid: "navigationlambda.3",
                         type: "qna",
-                        q: ["End"],
-                        a: "End",
+                        q: ["One"],
+                        a: "One",
+                        next: "navigationlambda.4"
                     }
                 })
-            var sessionAttributes = {}
-            var response
+            await api({
+                path: "questions/navigationlambda.4",
+                method: "PUT",
+                body: {
+                    qid: "navigationlambda.4",
+                    type: "qna",
+                    q: ["Two"],
+                    a: "Two",
+                    l: func.lambda,
+                    next: "navigationlambda.5"
+                }
+            })
+            await api({
+                path: "questions/navigationlambda.5",
+                method: "PUT",
+                body: {
+                    qid: "navigationlambda.5",
+                    type: "qna",
+                    q: ["Three"],
+                    a: "Three",
+                    next: "navigationlambda.6"
+                }
+            })
+            await api({
+                path: "questions/navigationlambda.6",
+                method: "PUT",
+                body: {
+                    qid: "navigationlambda.6",
+                    type: "qna",
+                    q: ["End"],
+                    a: "End",
+                }
+            })
+            let sessionAttributes = {}
+            let response
             response = await this.lex.postText({
                 sessionAttributes:sessionAttributes,
                 inputText: "One"
@@ -516,7 +547,7 @@ module.exports = {
             console.log(response)
             sessionAttributes = response.sessionAttributes
             test.equal(response.message, "One")
-            
+
             response = await this.lex.postText({
                 sessionAttributes:sessionAttributes,
                 inputText: "next"
@@ -524,7 +555,7 @@ module.exports = {
             console.log(response)
             sessionAttributes = response.sessionAttributes
             test.equal(response.message, "hook")
-            
+
             response = await this.lex.postText({
                 sessionAttributes:sessionAttributes,
                 inputText: "next"
@@ -532,7 +563,7 @@ module.exports = {
             console.log(response)
             sessionAttributes = response.sessionAttributes
             test.equal(response.message, "Three")
-            
+
             response = await this.lex.postText({
                 sessionAttributes:sessionAttributes,
                 inputText: "previous"
@@ -540,7 +571,7 @@ module.exports = {
             console.log(response)
             sessionAttributes = response.sessionAttributes
             test.equal(response.message, "hook")
-            
+
             response = await this.lex.postText({
                 sessionAttributes:sessionAttributes,
                 inputText: "previous"
@@ -583,32 +614,32 @@ module.exports = {
     //feedback tests
     feedback1: async function(test) {
         try {
-            var args = await outputs('dev/master')
-            var defaultResp = "unable to leave feedback"
-                await api({
-                        path: "questions/feedback.1",
-                        method: "PUT",
-                        body: {
-                            qid: "feedback.1",
-                            type: "qna",
-                            q: ["feedback"],
-                            a: defaultResp,
-                            l: "QNA:ExamplePYTHONLambdaFeedback"
-                        }
-                    })
-                await  api({
-                        path: "questions/feedback.2",
-                        method: "PUT",
-                        body: {
-                            qid: "feedback.2",
-                            type: "qna",
-                            q: ["One"],
-                            a: "One"
-                        }
-                    })
-              
-            var sessionAttributes = {}
-            var response
+            const args = await outputs('dev/master')
+            const defaultResp = "unable to leave feedback"
+            await api({
+                    path: "questions/feedback.1",
+                    method: "PUT",
+                    body: {
+                        qid: "feedback.1",
+                        type: "qna",
+                        q: ["feedback"],
+                        a: defaultResp,
+                        l: "QNA:ExamplePYTHONLambdaFeedback"
+                    }
+                })
+            await  api({
+                    path: "questions/feedback.2",
+                    method: "PUT",
+                    body: {
+                        qid: "feedback.2",
+                        type: "qna",
+                        q: ["One"],
+                        a: "One"
+                    }
+                })
+
+            let sessionAttributes = {}
+            let response
             response = await this.lex.postText({
                 sessionAttributes:sessionAttributes,
                 inputText: "feedback"
@@ -616,7 +647,7 @@ module.exports = {
             console.log(response)
             sessionAttributes = response.sessionAttributes
             test.equal(response.message, "There is no question to leave feedback on, please ask a question before attempting to leave feedback")
-            
+
             response = await this.lex.postText({
                 sessionAttributes:sessionAttributes,
                 inputText: "One"
@@ -624,7 +655,7 @@ module.exports = {
             console.log(response)
             sessionAttributes = response.sessionAttributes
             test.equal(response.message, "One")
-            
+
             response = await this.lex.postText({
                 sessionAttributes:sessionAttributes,
                 inputText: "feedback"
@@ -632,7 +663,7 @@ module.exports = {
             console.log(response)
             sessionAttributes = response.sessionAttributes
             test.ok(response.message.includes("\"One\""))
-            
+
             response = await this.lex.postText({
                 sessionAttributes:sessionAttributes,
                 inputText: "goodbye"
@@ -640,7 +671,7 @@ module.exports = {
             console.log(response)
             sessionAttributes = response.sessionAttributes
             test.ok(response.message.includes("\"One\""))
-            
+
             response = await this.lex.postText({
                 sessionAttributes:sessionAttributes,
                 inputText: "a"
@@ -648,7 +679,7 @@ module.exports = {
             console.log(response)
             sessionAttributes = response.sessionAttributes
             test.ok(response.message.includes("Thank you for leaving the feedback"))
-            
+
             response = await this.lex.postText({
                 sessionAttributes:sessionAttributes,
                 inputText: "feedback"
@@ -656,7 +687,7 @@ module.exports = {
             console.log(response)
             sessionAttributes = response.sessionAttributes
             test.ok(response.message.includes("\"One\""))
-            
+
             response = await this.lex.postText({
                 sessionAttributes:sessionAttributes,
                 inputText: "C"
@@ -664,7 +695,7 @@ module.exports = {
             console.log(response)
             sessionAttributes = response.sessionAttributes
             test.ok(response.message.includes("Canceled Feedback"))
-            
+
         }
         catch (e) {
             test.ifError(e)

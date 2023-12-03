@@ -1,66 +1,77 @@
-var Promise=require('bluebird')
-var aws=require("aws-sdk")
-aws.config.setPromisesDependency(Promise)
-aws.config.region=process.env.AWS_REGION
+/*********************************************************************************************************************
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.                                                *
+ *                                                                                                                    *
+ *  Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance    *
+ *  with the License. A copy of the License is located at                                                             *
+ *                                                                                                                    *
+ *      http://www.apache.org/licenses/                                                                               *
+ *                                                                                                                    *
+ *  or in the 'license' file accompanying this file. This file is distributed on an 'AS IS' BASIS, WITHOUT WARRANTIES *
+ *  OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions    *
+ *  and limitations under the License.                                                                                *
+ *********************************************************************************************************************/
 
-var s3=new aws.S3()
-var lambda=new aws.Lambda()
-var stride=parseInt(process.env.STRIDE)
-var _=require('lodash')
+const aws = require('aws-sdk');
 
-module.exports=function(config,body){
-    console.log('payload for testall es proxy is: ' + JSON.stringify(body));
-    return lambda.invoke({
-        FunctionName:process.env.ES_PROXY,
-        Payload:JSON.stringify(body)
-    }).promise()
-    .then(x=>JSON.parse(x.Payload))
-    .tap(console.log)
-    .then(function(result){
-        config.scroll_id=result._scroll_id 
-        config.status="InProgress"
-        console.log('result from parsing load is: ' + JSON.stringify(result,null,2));
-        var documents=_.get(result,"hits.hits",[])
-        if(documents.length){
-            var body=documents.map(x=>{
-                var out=x._source
-                if(out.type==='qna'){ 
-                    out.q=out.questions.map(y=>y.q)
-                    delete out.questions
-                }else{
+aws.config.region = process.env.AWS_REGION;
+const s3 = new aws.S3();
+const lambda = new aws.Lambda();
+const _ = require('lodash');
+
+module.exports = async function (config, body) {
+    try {
+        console.log(`payload for testall es proxy is: ${JSON.stringify(body)}`);
+        const response = await lambda.invoke({
+            FunctionName: process.env.ES_PROXY,
+            Payload: JSON.stringify(body),
+        }).promise();
+        const result = JSON.parse(response.Payload);
+        console.log(result);
+        config.scroll_id = result._scroll_id;
+        config.status = 'InProgress';
+        console.log(`result from parsing load is: ${JSON.stringify(result, null, 2)}`);
+        const documents = _.get(result, 'hits.hits', []);
+        if (documents.length) {
+            const body = documents.map((x) => {
+                const out = x._source;
+                if (out.type === 'qna') {
+                    out.q = out.questions.map((y) => y.q);
+                    delete out.questions;
                 }
-                return JSON.stringify(out)
-            }).join('\n')
-            var key=`${config.tmp}/${config.parts.length+1}` 
-            return s3.putObject({
-                Body:body,
-                Bucket:config.bucket,
-                Key:key
-            }).promise()
-            .then(upload_result=>{
-                config.parts.push({
-                    version:upload_result.VersionId,
-                    key:key
-                })
-            })
-        }else{
-            config.status="Lex"
+                return JSON.stringify(out);
+            }).join('\n');
+            const key = `${config.tmp}/${config.parts.length + 1}`;
+            const upload_result = await s3.putObject({
+                Body: body,
+                Bucket: config.bucket,
+                Key: key,
+            }).promise();
+
+            config.parts.push({
+                version: upload_result.VersionId,
+                key,
+            });
+        } else {
+            config.status = 'Lex';
         }
-    })
-}
-function query(filter){
-    return {
-        size:1000,
-        query:{
-            bool:_.pickBy({
-                "must":{"match_all":{}},
-                "filter":filter ? {"regexp":{
-                    qid:filter
-                }}:null
-            })
-        }
+        return config;
+    } catch (error) {
+        console.error('An error occured while executing loading tasks: ', error);
+        throw error;
     }
+};
+function query(filter) {
+    return {
+        size: 1000,
+        query: {
+            bool: _.pickBy({
+                must: { match_all: {} },
+                filter: filter ? {
+                    regexp: {
+                        qid: filter,
+                    },
+                } : null,
+            }),
+        },
+    };
 }
-
-
-

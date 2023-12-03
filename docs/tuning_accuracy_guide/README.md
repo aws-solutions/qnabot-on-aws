@@ -12,7 +12,7 @@ the infrastructure for the chat environment. A CloudFormation template
 provides a common language to describe and provision all the
 infrastructure resources in your AWS cloud environment. This AWS QnABot
 CloudFormation template will setup resources such as Amazon Lex, Amazon
-Elasticsearch Service, Amazon API Gateway, and AWS Lambda. Additionally,
+OpenSearch Service, Amazon API Gateway, and AWS Lambda. Additionally,
 this solution is also available in [GitHub](https://github.com/aws-solutions/qnabot-on-aws).
 
 Once the solution is deployed, you have a QnABot designer console where
@@ -32,7 +32,7 @@ the chatbot to get better over time.
 ### Solution architecture and how It works
 
 When the QnABot solution is deployed, resources such as Amazon Lex,
-Amazon Elasticsearch Service (Amazon ES), Amazon API Gateway, and AWS
+Amazon OpenSearch Service (Amazon OS), Amazon API Gateway, and AWS
 Lambda are provisioned and setup in your AWS account.
 
 Two key AWS services are at the core of the solution:
@@ -45,11 +45,11 @@ Two key AWS services are at the core of the solution:
     enable you to build applications with highly engaging user
     experiences and lifelike conversational interactions.
 
-- **Amazon ES** is an open-source search and analytics engine for use
+- **Amazon OS** is an open-source search and analytics engine for use
     cases such as log analytics, real-time application monitoring, and
-    clickstream analysis. Amazon ES is a managed service that makes it
-    simple to deploy, operate, and scale Elasticsearch clusters in the
-    AWS Cloud. The service offers open-source Amazon ES APIs, managed
+    clickstream analysis. Amazon OS is a managed service that makes it
+    simple to deploy, operate, and scale OpenSearch clusters in the
+    AWS Cloud. The service offers open-source Amazon OS APIs, managed
     Kibana, and integrations with Logstash and other AWS services,
     enabling you to securely ingest data from any source and search,
     analyze, and visualize it in real time.
@@ -57,7 +57,7 @@ Two key AWS services are at the core of the solution:
 Let's take a closer look at these two services and how they help power
 the AWS QnABot solution.
 
-![Solution architecture and data flow](image2.png)
+![Solution architecture and data flow](./images/image2.png)
 *Figure 1.0 -- Solution architecture and data flow*
 
 When you ask QnABot a question, a few things happen:
@@ -121,7 +121,7 @@ When you ask QnABot a question, a few things happen:
        default, but if it causes problems for you, you can customize its
        settings, or disable it altogether - see [Modifying configuration settings](https://www.amazon.com/qnabot/#config-settings)
 
-    - The Bot fulfillment Lambda function generates an Amazon ES query
+    - The Bot fulfillment Lambda function generates an Amazon OS query
     containing the transcribed question. The query attempts to find the best
     match from all the questions and answers you’ve previously provided,
     filtering items to apply the keyword filters and using Amazon ES
@@ -133,9 +133,9 @@ When you ask QnABot a question, a few things happen:
     to increase the overall relevance score when topic value (field t) matches.
     The following example shows the query:
 
-       ![ElasticSearch Query Example](image3.png)  
+       ![OpenSearch Query Example](./images/image3.png)  
 
-       *Figure 2.0 -- Example Elasticsearch query*
+       *Figure 2.0 -- Example OpenSearch query*
 
       - If an item has a large number of questions representing many unique
       words, you might find that a short question (one or two words) might not
@@ -152,7 +152,7 @@ When you ask QnABot a question, a few things happen:
 
           c.  Scroll to the bottom and choose Save.
 
-      - QnABot now supports Elasticsearch fuzzy matching which makes it more
+      - QnABot now supports OpenSearch fuzzy matching which makes it more
       tolerant of misspellings and typing errors in the user input. Enable
       this feature in the Settings page:
 
@@ -217,13 +217,13 @@ You can solve this in a couple of ways:
 
     - Choose the TEST ALL button and wait for the tests to complete.
 
-      ![icon](image5.png)
+      ![icon](./images/image5.png)
 
     - Choose the view results icon
-    (![Test all](image6.png)) on the far right to view the test
+    (![Test all](./images/image6.png)) on the far right to view the test
     results.
 
-      ![Test all](image7.png)
+      ![Test all](./images/image7.png)
 
       Behind the scenes, a test function sends every question for every item to the QnABot via Amazon Lex and checks that the QnABot matched the question to the expected item. Any incorrect matches are highlighted in red. Test results can be viewed in the browser or downloaded as a CSV file.
 
@@ -234,12 +234,12 @@ You can solve this in a couple of ways:
     cases. It offers powerful and easy-to-use features such as
     histograms, line graphs, pie charts, heat maps, and built-in
     geospatial support. Also, it provides tight integration with
-    Elasticsearch, which makes Kibana the default choice for visualizing
-    data stored in Elasticsearch.
+    Opensearch, which makes Kibana the default choice for visualizing
+    data stored in Opensearch.
 
     This visualization tool is available from the QnABot designer console.
 
-    ![menu](image8.png)
+    ![menu](./images/image8.png)
 
     The Kibana dashboard can be used to view usage history, logged
 utterances, no hits utterances, positive user feedback, and negative
@@ -253,7 +253,7 @@ no question and answer exists in the knowledge base. This can be another
 way to see how well the chatbot is performing. You can then augment the
 knowledge base where needed.
 
-![Kibana Dashboard](image9.png)
+![Kibana Dashboard](./images/image9.png)
 
 *Figure 4.0 -- Kibana dashboard showing* No Hits *report*
 
@@ -270,14 +270,14 @@ question. In the below example, you can see there are many variations of
 the same question that can be included to further train the bot to
 understand user input.
 
-![no hits](image10.png)
+![no hits](./images/image10.png)
 
 _Figure 5.0 -- Example question variations_
 
 In previous releases (before v4.0.0) repeated terms like "*how
 do I use*" could skew scoring toward items with higher numbers of repeating words.
 In QnABot 4.0.0 and onward, this problem has been eliminated by changing the
-elasticsearch index and query to score now only on unique (not repeating) word
+OpenSearch index and query to score now only on unique (not repeating) word
 matches. Previously we recommended to avoid repeating phrases in multiple
 questions by putting all the alternatives into a single question like
 `"How do I use Q&A / q and a chatbot?"`. This practice is no longer recommended.

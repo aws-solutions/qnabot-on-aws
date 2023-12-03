@@ -1,17 +1,19 @@
 {
-  "name": "testall",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "test": "nodeunit test"
-  },
-  "author": "",
-  "license": "ISC",
-  "dependencies": {
-    "aws-sdk": "^2.913.0",
-    "bluebird": "^3.5.1",
-    "intercept-stdout": "^0.1.2",
-    "lodash": "^4.17.21"
-  }
+    "name": "testall",
+    "version": "5.4.5",
+    "description": "Lambda function that reads QnAs from opensearch and performs test validation against each question defined in qna against current Lex bot",
+    "main": "index.js",
+    "scripts": {
+        "test": "nodeunit test"
+    },
+    "author": {
+        "name": "Amazon Web Services",
+        "url": "https://aws.amazon.com/solutions"
+    },
+    "license": "Apache-2.0",
+    "dependencies": {
+        "bluebird": "^3.5.1",
+        "intercept-stdout": "^0.1.2",
+        "lodash": "^4.17.21"
+    }
 }

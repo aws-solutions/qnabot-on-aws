@@ -1,13 +1,23 @@
-// Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
-// SPDX-License-Identifier: Apache-2.0
-var config=require('../../config')
-var path=require('path')
-var CopyWebpackPlugin = require('copy-webpack-plugin');
-var HtmlWebpackPlugin = require('html-webpack-plugin');
-var LodashModuleReplacementPlugin = require('lodash-webpack-plugin');
-var FaviconPlugin=require('favicons-webpack-plugin')
-var webpack=require('webpack')
-var _=require('lodash')
+/*********************************************************************************************************************
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.                                                *
+ *                                                                                                                    *
+ *  Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance    *
+ *  with the License. A copy of the License is located at                                                             *
+ *                                                                                                                    *
+ *      http://www.apache.org/licenses/                                                                               *
+ *                                                                                                                    *
+ *  or in the 'license' file accompanying this file. This file is distributed on an 'AS IS' BASIS, WITHOUT WARRANTIES *
+ *  OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions    *
+ *  and limitations under the License.                                                                                *
+ *********************************************************************************************************************/
+const config = require('../../config.json');
+const path = require('path');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const LodashModuleReplacementPlugin = require('lodash-webpack-plugin');
+const FaviconPlugin = require('favicons-webpack-plugin');
+const webpack = require('webpack');
+const _ = require('lodash');
 const ExtractTextPlugin = require("extract-text-webpack-plugin");
 
 const extractSass = new ExtractTextPlugin({
@@ -49,9 +59,9 @@ module.exports={
               }
             }
           },
-          { 
-            test: /\.(png|woff|woff2|eot|ttf|svg)$/, 
-            loader: 'url-loader?limit=100000' 
+          {
+            test: /\.(png|woff|woff2|eot|ttf|svg)$/,
+            loader: 'url-loader?limit=100000'
           },
           {
             test: /\.pug$/,
@@ -69,7 +79,7 @@ module.exports={
             test: /\.scss$/,
             use: extractSass.extract({
                 use:[
-                    {loader: "css-loader" }, 
+                    {loader: "css-loader" },
                     {loader: "sass-loader" }
                 ]
             })

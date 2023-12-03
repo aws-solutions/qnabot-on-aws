@@ -22,9 +22,9 @@ The high-level process flow for the solution components deployed with the AWS Cl
 
 1.	The admin deploys the solution into their AWS account, opens the Content Designer UI or [Amazon Lex](https://aws.amazon.com/lex/) web client, and uses [Amazon Cognito](https://aws.amazon.com/cognito/) to authenticate.
 
-2. After authentication, [Amazon CloudFront](http://aws.amazon.com/cloudfront/) and [Amazon S3](http://aws.amazon.com/s3/) deliver the contents of the Content Designer UI.
+2. After authentication, [Amazon API Gateway](http://aws.amazon.com/api-gateway/) and [Amazon S3](http://aws.amazon.com/s3/) deliver the contents of the Content Designer UI.
 
-3. The admin configures questions and answers in the Content Designer and the UI sends requests to [Amazon API Gateway](http://aws.amazon.com/api-gateway/) to save the questions and answers.
+3. The admin configures questions and answers in the Content Designer and the UI sends requests to Amazon API Gateway to save the questions and answers.
 
 4. The `Content Designer` [AWS Lambda](http://aws.amazon.com/lambda/) function saves the input in [Amazon OpenSearch Service](http://aws.amazon.com/opensearch-service/) in a questions bank index. If using [text embeddings](docs/semantic_matching_using_LLM_embeddings/README.md), these requests will first pass through a ML model hosted on [Amazon SageMaker](https://aws.amazon.com/sagemaker/) to generate embeddings before being saved into the question bank on OpenSearch.
 
@@ -32,9 +32,11 @@ The high-level process flow for the solution components deployed with the AWS Cl
 
 6. Amazon Lex forwards requests to the `Bot Fulfillment` AWS Lambda function. Users can also send requests to this Lambda function via [Amazon Alexa](https://developer.amazon.com/en-US/alexa) devices.
 
-7. The `Bot Fulfillment` AWS Lambda function takes the users input and uses [Amazon Comprehend](https://aws.amazon.com/comprehend/) and [Amazon Translate](https://aws.amazon.com/translate/) (if necessary) to translate non-English requests to English and then looks up the answer in in Amazon OpenSearch Service. If using [text embeddings](docs/semantic_matching_using_LLM_embeddings/README.md), these requests will first pass through a ML model hosted on Amazon SageMaker to generate an embedding to compare with those saved in the question bank on OpenSearch. If an [Amazon Kendra](https://aws.amazon.com/kendra/) index is configured, the `Bot Fulfillment` function also sends a request to that index.
+7. The `Bot Fulfillment` AWS Lambda function takes the users input and uses [Amazon Comprehend](https://aws.amazon.com/comprehend/) and [Amazon Translate](https://aws.amazon.com/translate/) (if necessary) to translate non-English requests to English and then looks up the answer in in Amazon OpenSearch Service. If using LLM features such as [text generation](docs/LLM_Retrieval_and_generative_question_answering/README.md) and  [text embeddings](docs/semantic_matching_using_LLM_embeddings/README.md), these requests will first pass through various ML models hosted on Amazon SageMaker to generate the search query and embeddings to compare with those saved in the question bank on OpenSearch.
 
-8. User interactions with the `Bot Fulfillment` function generate logs and metrics data, which is sent to [Amazon Kinesis Data Firehose](http://aws.amazon.com/kinesis/data-firehose/) then to Amazon S3 for later data analysis.
+8.	If an [Amazon Kendra](https://aws.amazon.com/kendra/) index is [configured for fallback](docs/Kendra_Fallback_README.md), the `Bot Fulfillment` AWS Lambda function forwards the request to Kendra if no matches were returned from the OpenSearch question bank. The text generation LLM can optionally be used to create the search query and to synthesize a response given the returned document excerpts.
+
+9. User interactions with the `Bot Fulfillment` function generate logs and metrics data, which is sent to [Amazon Kinesis Data Firehose](http://aws.amazon.com/kinesis/data-firehose/) then to Amazon S3 for later data analysis.
 
 Refer to the [implementation guide](https://docs.aws.amazon.com/solutions/latest/qnabot-on-aws) for detailed instructions on deploying QnABot in your AWS account.
 
@@ -45,7 +47,7 @@ Alternatively, if you want to custom deploy QnABot on AWS, refer to the details 
 ### Environment Prerequisites
 
 -   Run Linux. (tested on Amazon Linux)
--   Install npm >7.10.0 and node >16.X.X ([instructions](https://nodejs.org/en/download/))
+-   Install npm >8.6.0 and node >18.X.X ([instructions](https://nodejs.org/en/download/))
 -   Install and configure git lfs ([instructions](https://git-lfs.com/))
 -   Clone this repo.
 -   Set up an AWS account. ([instructions](https://AWS.amazon.com/free/))
@@ -55,7 +57,7 @@ Alternatively, if you want to custom deploy QnABot on AWS, refer to the details 
 
 Navigate to the root directory of QnABot (directory will be created once you have cloned this repo).
 
-Install node.js moodules of QnABot:
+Install node.js modules of QnABot:
 
 ```shell
 npm install
@@ -115,8 +117,72 @@ Refer to [LICENSE.txt](LICENSE.txt) file for details.
 
 Refer to [CHANGELOG.md](CHANGELOG.md) file for details of new features in each version.
 
-A [workshop](https://qnabot.workshop.aws) is also available
-that walks you through QnABot features.
+A [workshop](https://qnabot.workshop.aws) is also available that walks you through QnABot features.
+
+## QnABot Deployable Solution Versions
+
+As QnABot evolves over the years, it makes use of various services and functionality which may go in and out of support. This section serves as a reference to the deployable solution versions along with links to their Public and VPC CloudFormation templates.
+
+_Note: **Deployable solution versions** refers to the ability to deploy the version of QnABot in their AWS accounts. **Actively supported versions** for QnABot is only available for the latest version of QnABot._
+
+### Deployable Versions
+
+- [v5.4.5](https://github.com/aws-solutions/qnabot-on-aws/releases/tag/v5.4.5) - [Public](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v5.4.5/qnabot-on-aws-main.template)/[VPC](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v5.4.5/qnabot-on-aws-vpc.template)
+  - _For those upgrading from `v5.4.X` to later versions, if you are upgrading from a deployment with LLMApi set to SAGEMAKER then set this value to DISABLED before upgrading. After upgrading, return this value back to SAGEMAKER.._
+- [v5.4.4](https://github.com/aws-solutions/qnabot-on-aws/releases/tag/v5.4.4) - [Public](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v5.4.4/qnabot-on-aws-main.template)/[VPC](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v5.4.4/qnabot-on-aws-vpc.template)
+- [v5.4.3](https://github.com/aws-solutions/qnabot-on-aws/releases/tag/v5.4.3) - [Public](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v5.4.3/qnabot-on-aws-main.template)/[VPC](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v5.4.3/qnabot-on-aws-vpc.template)
+  - _We do not recommend to use this version due to a potential issue with the testall functionality which may introduce a high number of versions stored in the testall S3 bucket. Please use the latest version available or v5.4.4+_
+- [v5.4.2](https://github.com/aws-solutions/qnabot-on-aws/releases/tag/v5.4.2) - [Public](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v5.4.2/qnabot-on-aws-main.template)/[VPC](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v5.4.2/qnabot-on-aws-vpc.template)
+  - _We do not recommend to use this version due to a potential issue with the testall functionality which may introduce a high number of versions stored in the testall S3 bucket. Please use the latest version available or v5.4.4+_
+- [v5.4.1](https://github.com/aws-solutions/qnabot-on-aws/releases/tag/v5.4.1) - [Public](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v5.4.1/qnabot-on-aws-main.template)/[VPC](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v5.4.1/qnabot-on-aws-vpc.template)
+- [v5.4.0](https://github.com/aws-solutions/qnabot-on-aws/releases/tag/v5.4.0) - [Public](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v5.4.0/qnabot-on-aws-main.template)/[VPC](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v5.4.0/qnabot-on-aws-vpc.template)
+  - _Note: Lambda Runtimes have been updated this release. Solution now uses: [nodejs18 and python3.10]_
+- [v5.3.4](https://github.com/aws-solutions/qnabot-on-aws/releases/tag/v5.3.4) - [Public](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v5.3.4/qnabot-on-aws-main.template)/[VPC](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v5.3.4/qnabot-on-aws-vpc.template)
+- [v5.3.3](https://github.com/aws-solutions/qnabot-on-aws/releases/tag/v5.3.3) - [Public](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v5.3.3/qnabot-on-aws-main.template)/[VPC](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v5.3.3/qnabot-on-aws-vpc.template)
+- [v5.3.2](https://github.com/aws-solutions/qnabot-on-aws/releases/tag/v5.3.2) - [Public](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v5.3.2/qnabot-on-aws-main.template)/[VPC](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v5.3.2/qnabot-on-aws-vpc.template)
+- [v5.3.1](https://github.com/aws-solutions/qnabot-on-aws/releases/tag/v5.3.1) - [Public](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v5.3.1/qnabot-on-aws-main.template)/[VPC](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v5.3.1/qnabot-on-aws-vpc.template)
+- [v5.3.0](https://github.com/aws-solutions/qnabot-on-aws/releases/tag/v5.3.0) - [Public](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v5.3.0/qnabot-on-aws-main.template)/[VPC](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v5.3.0/qnabot-on-aws-vpc.template)
+- [v5.2.7](https://github.com/aws-solutions/qnabot-on-aws/releases/tag/v5.2.7) - [Public](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v5.2.7/qnabot-on-aws-main.template)/[VPC](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v5.2.7/qnabot-on-aws-vpc.template)
+- [v5.2.6](https://github.com/aws-solutions/qnabot-on-aws/releases/tag/v5.2.6) - [Public](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v5.2.6/qnabot-on-aws-main.template)/[VPC](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v5.2.6/qnabot-on-aws-vpc.template)
+- [v5.2.5](https://github.com/aws-solutions/qnabot-on-aws/releases/tag/v5.2.5) - [Public](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v5.2.5/qnabot-on-aws-main.template)/[VPC](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v5.2.5/qnabot-on-aws-vpc.template)
+- [v5.2.4](https://github.com/aws-solutions/qnabot-on-aws/releases/tag/v5.2.4) - [Public](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v5.2.4/qnabot-on-aws-main.template)/[VPC](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v5.2.4/qnabot-on-aws-vpc.template)
+- [v5.2.3](https://github.com/aws-solutions/qnabot-on-aws/releases/tag/v5.2.3) - [Public](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v5.2.3/qnabot-on-aws-main.template)/[VPC](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v5.2.3/qnabot-on-aws-vpc.template)
+- [v5.2.2](https://github.com/aws-solutions/qnabot-on-aws/releases/tag/v5.2.2) - [Public](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v5.2.2/qnabot-on-aws-main.template)/[VPC](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v5.2.2/qnabot-on-aws-vpc.template)
+- [v5.2.1](https://github.com/aws-solutions/qnabot-on-aws/releases/tag/v5.2.1) - [Public](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v5.2.1/qnabot-on-aws-main.template)/[VPC](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v5.2.1/qnabot-on-aws-vpc.template)
+  - _Note: Lambda Runtimes have been updated this release. Solution now uses: [nodejs16 and python3.9]_
+
+### Undeployable Versions
+- All solutions less than `v5.2.1` are no longer deployable due to Lambda Runtime deprecations.
+- **Upcoming/Recent deprecations**
+  - nodejs16 will enter [Phase 1 deprecation](https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtimes.html#runtime-support-policy) on Mar 11, 2024.
+
+### Why would a solution version no longer be deployable?
+For QnABot, the most common reason is due to [AWS Lambda Runtimes being deprecated](https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtimes.html#runtime-support-policy). When a Lambda runtime has been marked as deprecated, customers can no longer create new Lambda functions in their AWS account. This means that older versions of our solutions that make use of those runtimes will fail to deploy. This makes it hard for the community to provide support as we are unable to deploy a similar environment to investigate issues and reproduce bug reports.
+
+### What should I do if my version of the solution is no longer deployable?
+If you've currently got an existing deployment working for you, there is nothing requiring you to update. However, it is **_strongly_** recommended that you build a plan to test and migrate production deployments to a supported version. The further away a deployment gets from `latest` the greater risk it is at to experiencing instability (especially with regards to deployment).
+
+And for those looking to get started with the solution for the first time, it is always recommended you use the latest version. It is the most secure, stable, and feature-rich version of QnABot!
+
+### How do I update my solution version?
+In most cases, a simple [Update Stack operation](https://docs.aws.amazon.com/solutions/latest/qnabot-on-aws/update-the-solution.html) should allow you to migrate your instance onto a newer version while maintaining your data on the new deployment.
+
+> Note: For those upgrading from `v5.4.X` to later versions, if you are upgrading from a deployment with LLMApi set to SAGEMAKER then set this value to DISABLED before upgrading. After upgrading, return this value back to SAGEMAKER.
+
+The team _**strongly**_ recommends that any upgrades (especially between minor/major versions) first be tested on a non-production instance to check for any regressions. This is critical if you have made custom modifications to your deployment, integrate with external services, or are jumping between multiple versions.
+
+Some additional precautions you can take are:
+
+ - export all of your questions using the Content Designer UI ([instructions](https://docs.aws.amazon.com/solutions/latest/qnabot-on-aws/use-qnabot-on-aws.html#importing-and-exporting-chatbot-answers))
+ - export all of your settings using the Content Designer UI (click `Export Settings` at the bottom of settings page)
+ - backup DynamoDB table ([instructions](https://docs.aws.amazon.com/solutions/latest/qnabot-on-aws/amazon-dynamodb-backups.html)) 
+ - create a manual snapshot of your OpenSearch Domain ([instructions](https://docs.aws.amazon.com/opensearch-service/latest/developerguide/managedomains-snapshots.html))
+
+ ---
+## Anonymous Metrics
+This solution collects anonymous operational metrics to help AWS improve the
+quality of features of the solution. For more information, including how to disable
+this capability, please see the [implementation guide](https://docs.aws.amazon.com/solutions/latest/qnabot-on-aws/general-reference.html).
 
 ---
 

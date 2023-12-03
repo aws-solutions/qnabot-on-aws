@@ -1,24 +1,35 @@
-var config = require('../../../config')
+/*********************************************************************************************************************
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.                                                *
+ *                                                                                                                    *
+ *  Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance    *
+ *  with the License. A copy of the License is located at                                                             *
+ *                                                                                                                    *
+ *      http://www.apache.org/licenses/                                                                               *
+ *                                                                                                                    *
+ *  or in the 'license' file accompanying this file. This file is distributed on an 'AS IS' BASIS, WITHOUT WARRANTIES *
+ *  OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions    *
+ *  and limitations under the License.                                                                                *
+ *********************************************************************************************************************/
+
+const config = require('../../../config.json')
 process.env.AWS_PROFILE = config.profile
 process.env.AWS_DEFAULT_REGION = config.region
-var query = require('query-string').stringify
-var _ = require('lodash')
-var zlib = require('zlib')
-var Promise = require('bluebird')
-var Url = require('url')
-var sign = require('aws4').sign
-var fs = require('fs')
-var aws = require('aws-sdk')
-aws.config.setPromisesDependency(Promise)
+const query = require('query-string').stringify
+const _ = require('lodash')
+const zlib = require('zlib')
+const Url = require('url')
+const sign = require('aws4').sign
+const fs = require('fs')
+const aws = require('aws-sdk')
 aws.config.region = config.region
-var outputs = require('../../../bin/exports')
-var exists = require('./util').exists
-var run = require('./util').run
-var api = require('./util').api
+const outputs = require('../../../bin/exports')
+const exists = require('./util').exists
+const run = require('./util').run
+const api = require('./util').api
 
 module.exports = {
     setUp: function(cb) {
-        var self = this
+        const self = this
         outputs('dev/master').then(function(output) {
                 self.lex = new aws.LexRuntime({
                     region: config.region,
@@ -33,7 +44,7 @@ module.exports = {
     },
     quiz: async function(test) {
          try {
-             var args = await outputs('dev/master')
+             const args = await outputs('dev/master')
              await api({
                  path: "questions/quizbot.1",
                  method: "PUT",
@@ -157,23 +168,23 @@ module.exports = {
                      "t": ""
                  }
              })
-             var response = await this.lex.postText({
+             const response = await this.lex.postText({
                  inputText: "Take the White House quiz."
              }).promise();
              console.log(response);
-             var splitArray = response.message.split(/ (?=[A-Z]\.)/);
+             const splitArray = response.message.split(/ (?=[A-Z]\.)/);
 
              test.ok(splitArray[0].includes('Starting'));
 
-             var expectedAnswerArray = [
+             const expectedAnswerArray = [
                  "Ceramics, glass, and silver.",
                  "Artifacts from the War of 1812.",
                  "Furniture used during the Lincoln administration.",
                  "Engraved frames."
              ];
-            
-             var matchIndex;
-             for (var i = 1; i < splitArray.length; i++) {
+
+             let matchIndex;
+             for (let i = 1; i < splitArray.length; i++) {
                  if (matchIndex === -1) {
                      test.fail('Did not find following string in expected answers: ' + splitArray[i].substring(3));
                      break;

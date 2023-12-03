@@ -1,121 +1,141 @@
-var fs=require('fs');
+/*********************************************************************************************************************
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.                                                *
+ *                                                                                                                    *
+ *  Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance    *
+ *  with the License. A copy of the License is located at                                                             *
+ *                                                                                                                    *
+ *      http://www.apache.org/licenses/                                                                               *
+ *                                                                                                                    *
+ *  or in the 'license' file accompanying this file. This file is distributed on an 'AS IS' BASIS, WITHOUT WARRANTIES *
+ *  OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions    *
+ *  and limitations under the License.                                                                                *
+ *********************************************************************************************************************/
+
+const fs = require('fs');
 const util = require('../../util');
 
-module.exports={
-    "LexProxyLambda": {
-      "Type": "AWS::Lambda::Function",
-      "Properties": {
-        "Code": {
-            "ZipFile":fs.readFileSync(__dirname+'/handler.js','utf8')
+module.exports = {
+    LexProxyLambda: {
+        Type: 'AWS::Lambda::Function',
+        Properties: {
+            Code: {
+                ZipFile: fs.readFileSync(`${__dirname}/handler.js`, 'utf8'),
+            },
+            Handler: 'index.handler',
+            MemorySize: '128',
+            Role: { 'Fn::GetAtt': ['LexProxyLambdaRole', 'Arn'] },
+            Runtime: process.env.npm_package_config_lambdaRuntime,
+            Timeout: 300,
+            VpcConfig: {
+                'Fn::If': ['VPCEnabled', {
+                    SubnetIds: { Ref: 'VPCSubnetIdList' },
+                    SecurityGroupIds: { Ref: 'VPCSecurityGroupIdList' },
+                }, { Ref: 'AWS::NoValue' }],
+            },
+            TracingConfig: {
+                'Fn::If': ['XRAYEnabled', { Mode: 'Active' },
+                    { Ref: 'AWS::NoValue' }],
+            },
+            Layers: [
+                { Ref: 'AwsSdkLayerLambdaLayer' },
+            ],
+            Tags: [{
+                Key: 'Type',
+                Value: 'Api',
+            }],
         },
-        "Handler": "index.handler",
-        "MemorySize": "128",
-        "Role": {"Fn::GetAtt": ["LexProxyLambdaRole","Arn"]},
-        "Runtime": "nodejs16.x",
-        "Timeout": 300,
-        "VpcConfig" : {
-            "Fn::If": [ "VPCEnabled", {
-                "SubnetIds": {"Ref": "VPCSubnetIdList"},
-                "SecurityGroupIds": {"Ref": "VPCSecurityGroupIdList"}
-            }, {"Ref" : "AWS::NoValue"} ]
-        },
-        "TracingConfig" : {
-            "Fn::If": [ "XRAYEnabled", {"Mode": "Active"},
-                {"Ref" : "AWS::NoValue"} ]
-        },
-        "Tags":[{
-            Key:"Type",
-            Value:"Api"
-        }]
-      },
-      "Metadata": util.cfnNag(["W92"])
+        Metadata: util.cfnNag(['W92']),
     },
-    "LexStatusLambda": {
-      "Type": "AWS::Lambda::Function",
-      "Properties": {
-        "Code": {
-            "ZipFile":fs.readFileSync(__dirname+'/status.js','utf8')
+    LexStatusLambda: {
+        Type: 'AWS::Lambda::Function',
+        Properties: {
+            Code: {
+                ZipFile: fs.readFileSync(`${__dirname}/status.js`, 'utf8'),
+            },
+            Environment: {
+                Variables: {
+                    STATUS_BUCKET: { Ref: 'BuildStatusBucket' },
+                    STATUS_KEY: { 'Fn::If': ['CreateLexV1Bots', 'status.json', { Ref: 'AWS::NoValue' }] },
+                    LEXV2_STATUS_KEY: 'lexV2status.json',
+                    FULFILLMENT_FUNCTION_ARN: {
+                        'Fn::Join': [':', [
+                            { 'Fn::GetAtt': ['FulfillmentLambda', 'Arn'] },
+                            'live',
+                        ]],
+                    },
+                    FULFILLMENT_FUNCTION_ROLE: { Ref: 'FulfillmentLambdaRole' },
+                    LEXV1_BOT_NAME: { 'Fn::If': ['CreateLexV1Bots', { Ref: 'LexBot' }, { Ref: 'AWS::NoValue' }] },
+                    LEXV1_INTENT: { 'Fn::If': ['CreateLexV1Bots', { Ref: 'Intent' }, { Ref: 'AWS::NoValue' }] },
+                    LEXV1_INTENT_FALLBACK: { 'Fn::If': ['CreateLexV1Bots', { Ref: 'IntentFallback' }, { Ref: 'AWS::NoValue' }] },
+                    LEXV2_BOT_NAME: { 'Fn::GetAtt': ['LexV2Bot', 'botName'] },
+                    LEXV2_BOT_ID: { 'Fn::GetAtt': ['LexV2Bot', 'botId'] },
+                    LEXV2_BOT_ALIAS: { 'Fn::GetAtt': ['LexV2Bot', 'botAlias'] },
+                    LEXV2_BOT_ALIAS_ID: { 'Fn::GetAtt': ['LexV2Bot', 'botAliasId'] },
+                    LEXV2_INTENT: { 'Fn::GetAtt': ['LexV2Bot', 'botIntent'] },
+                    LEXV2_INTENT_FALLBACK: { 'Fn::GetAtt': ['LexV2Bot', 'botIntentFallback'] },
+                    LEXV2_BOT_LOCALE_IDS: { 'Fn::GetAtt': ['LexV2Bot', 'botLocaleIds'] },
+                },
+            },
+            Handler: 'index.handler',
+            MemorySize: '128',
+            Role: { 'Fn::GetAtt': ['LexProxyLambdaRole', 'Arn'] },
+            Runtime: process.env.npm_package_config_lambdaRuntime,
+            Timeout: 300,
+            VpcConfig: {
+                'Fn::If': ['VPCEnabled', {
+                    SubnetIds: { Ref: 'VPCSubnetIdList' },
+                    SecurityGroupIds: { Ref: 'VPCSecurityGroupIdList' },
+                }, { Ref: 'AWS::NoValue' }],
+            },
+            TracingConfig: {
+                'Fn::If': ['XRAYEnabled', { Mode: 'Active' },
+                    { Ref: 'AWS::NoValue' }],
+            },
+            Layers: [
+                { Ref: 'AwsSdkLayerLambdaLayer' },
+            ],
+            Tags: [{
+                Key: 'Type',
+                Value: 'Api',
+            }],
         },
-        "Environment": {
-            "Variables":{
-                STATUS_BUCKET:{"Ref":"BuildStatusBucket"},
-                STATUS_KEY:{"Fn::If": ["CreateLexV1Bots", "status.json", {"Ref":"AWS::NoValue"}]},
-                LEXV2_STATUS_KEY:"lexV2status.json",
-                FULFILLMENT_FUNCTION_ARN: {  "Fn::Join": [ ":", [
-                  {"Fn::GetAtt":["FulfillmentLambda","Arn"]},
-                  "live"
-                ]]},
-                FULFILLMENT_FUNCTION_ROLE: {"Ref": "FulfillmentLambdaRole"},
-                LEXV1_BOT_NAME: {"Fn::If": ["CreateLexV1Bots",{"Ref": "LexBot"},{"Ref": "AWS::NoValue"}]},
-                LEXV1_INTENT: {"Fn::If": ["CreateLexV1Bots",{"Ref": "Intent"},{"Ref": "AWS::NoValue"}]},
-                LEXV1_INTENT_FALLBACK: {"Fn::If": ["CreateLexV1Bots",{"Ref": "IntentFallback"},{"Ref": "AWS::NoValue"}]},
-                LEXV2_BOT_NAME: {"Fn::GetAtt": ["LexV2Bot", "botName"]},
-                LEXV2_BOT_ID: {"Fn::GetAtt": ["LexV2Bot", "botId"]},
-                LEXV2_BOT_ALIAS: {"Fn::GetAtt": ["LexV2Bot", "botAlias"]},
-                LEXV2_BOT_ALIAS_ID: {"Fn::GetAtt": ["LexV2Bot", "botAliasId"]},
-                LEXV2_INTENT: {"Fn::GetAtt": ["LexV2Bot", "botIntent"]},
-                LEXV2_INTENT_FALLBACK: {"Fn::GetAtt": ["LexV2Bot", "botIntentFallback"]},
-                LEXV2_BOT_LOCALE_IDS: {"Fn::GetAtt": ["LexV2Bot", "botLocaleIds"]}
-            }
-        },
-        "Handler": "index.handler",
-        "MemorySize": "128",
-        "Role": {"Fn::GetAtt": ["LexProxyLambdaRole","Arn"]},
-        "Runtime": "nodejs16.x",
-        "Timeout": 300,
-        "VpcConfig" : {
-            "Fn::If": [ "VPCEnabled", {
-                "SubnetIds": {"Ref": "VPCSubnetIdList"},
-                "SecurityGroupIds": {"Ref": "VPCSecurityGroupIdList"}
-            }, {"Ref" : "AWS::NoValue"} ]
-        },
-        "TracingConfig" : {
-            "Fn::If": [ "XRAYEnabled", {"Mode": "Active"},
-                {"Ref" : "AWS::NoValue"} ]
-        },
-        "Tags":[{
-            Key:"Type",
-            Value:"Api"
-        }]
-      },
-      "Metadata": util.cfnNag(["W92"])
+        Metadata: util.cfnNag(['W92']),
     },
-    "LexProxyLambdaRole": {
-      "Type": "AWS::IAM::Role",
-      "Properties": {
-        "AssumeRolePolicyDocument": {
-          "Version": "2012-10-17",
-          "Statement": [
-            {
-              "Effect": "Allow",
-              "Principal": {
-                "Service": "lambda.amazonaws.com"
-              },
-              "Action": "sts:AssumeRole"
-            }
-          ]
+    LexProxyLambdaRole: {
+        Type: 'AWS::IAM::Role',
+        Properties: {
+            AssumeRolePolicyDocument: {
+                Version: '2012-10-17',
+                Statement: [
+                    {
+                        Effect: 'Allow',
+                        Principal: {
+                            Service: 'lambda.amazonaws.com',
+                        },
+                        Action: 'sts:AssumeRole',
+                    },
+                ],
+            },
+            Path: '/',
+            Policies: [
+                util.basicLambdaExecutionPolicy(),
+                util.lambdaVPCAccessExecutionRole(),
+                util.lexFullAccess(),
+                util.xrayDaemonWriteAccess(),
+                {
+                    PolicyName: 'Access',
+                    PolicyDocument: {
+                        Version: '2012-10-17',
+                        Statement: [{
+                            Effect: 'Allow',
+                            Action: [
+                                's3:Get*',
+                            ],
+                            Resource: [{ 'Fn::Sub': 'arn:aws:s3:::${BuildStatusBucket}*' }],
+                        }],
+                    },
+                }],
         },
-        "Path": "/",
-        "Policies":[
-          util.basicLambdaExecutionPolicy(),
-          util.lambdaVPCAccessExecutionRole(),
-          util.lexFullAccess(),
-          util.xrayDaemonWriteAccess(),
-          {
-            "PolicyName":"Access",
-            "PolicyDocument": {
-              "Version": "2012-10-17",
-              "Statement": [{
-                    "Effect": "Allow",
-                    "Action": [
-                        "s3:Get*"
-                    ],
-                    "Resource":[{"Fn::Sub":"arn:aws:s3:::${BuildStatusBucket}*"}]
-              }]
-            }
-        }]
-      },
-      "Metadata": util.cfnNag(["W11", "W12", "W76", "F3"])
-    }
-}
-
+        Metadata: util.cfnNag(['W11', 'W12', 'W76', 'F3']),
+    },
+};

@@ -1,14 +1,17 @@
 {
-  "name": "createrecenttopicsresponse",
-  "version": "1.0.0",
-  "description": "",
-  "main": "CreateRecentTopicResponse.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "author": "",
-  "license": "ISC",
-  "dependencies": {
-    "lodash": "^4.17.21"
-  }
+    "name": "createrecenttopicsresponse",
+    "version": "5.4.5",
+    "description": "Lambda hook that creates recent topic response",
+    "main": "CreateRecentTopicResponse.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "author": {
+        "name": "Amazon Web Services",
+        "url": "https://aws.amazon.com/solutions"
+    },
+    "license": "Apache-2.0",
+    "dependencies": {
+        "lodash": "^4.17.21"
+    }
 }

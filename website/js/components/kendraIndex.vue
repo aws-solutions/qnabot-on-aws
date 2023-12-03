@@ -1,3 +1,15 @@
+/*********************************************************************************************************************
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.                                                *
+ *                                                                                                                    *
+ *  Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance    *
+ *  with the License. A copy of the License is located at                                                             *
+ *                                                                                                                    *
+ *      http://www.apache.org/licenses/                                                                               *
+ *                                                                                                                    *
+ *  or in the 'license' file accompanying this file. This file is distributed on an 'AS IS' BASIS, WITHOUT WARRANTIES *
+ *  OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions    *
+ *  and limitations under the License.                                                                                *
+ *********************************************************************************************************************/
 <template lang='pug'>
 v-container#page-import(column, grid-list-md)
   v-layout(column)
@@ -51,17 +63,13 @@ v-container#page-import(column, grid-list-md)
 </template>
 
 <script>
-// Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
-// SPDX-License-Identifier: Apache-2.0
 
-var Vuex = require("vuex");
-var Promise = require("bluebird");
-var _ = require("lodash");
-var Promise = require("bluebird");
+const Vuex = require("vuex");
+const Promise = require("bluebird");
+const _ = require("lodash");
 
 module.exports = {
   data: function () {
-    var self = this;
     return {
       status: "",
       dashboard_url:"",
@@ -79,7 +87,7 @@ module.exports = {
   computed: {},
   updated: function () {
     console.log("updated");
-    var self = this;
+    const self = this;
     if(!self.kendraIndexerEnabled){
       self.IsKendraEnabled().then((data) => {
         self.kendraIndexerEnabled = data;
@@ -106,7 +114,7 @@ module.exports = {
           });
         }
         //if the Kendra Start Index isn't displayed -- stop syncing
-        var shouldPoll = (
+        const shouldPoll = (
           document.getElementById("btnKendraStartIndex") &&
           document.getElementById("btnKendraStartIndex").offsetWidth == 0
         ) == null;
@@ -118,15 +126,13 @@ module.exports = {
     ).catch((error) => console.log("Error trying to retrieve status " + error));
   },
   mounted: function () {
-    var self = this;
-
-
+    
     console.log("updated");
-    var self = this;
+    const self = this;
     self.getKendraIndexingStatus().then((data) => {
       self.status = data.Status;
-      (self.history = data.History),
-        console.log("History " + JSON.stringify(self.history));
+      self.history = data.History;
+      console.log("History " + JSON.stringify(self.history));
       self.lastStatusCheck = Date.now();
     });
     self.$forceUpdate();
@@ -147,14 +153,14 @@ module.exports = {
     },
 
     getKendraIndexingStatus: async function () {
-      var result = await this.$store.dispatch("api/getKendraIndexingStatus");
+      const result = await this.$store.dispatch("api/getKendraIndexingStatus");
       return result;
     },
     convertToLocalTime: function (isoDateTime) {
       if(isoDateTime == ""){
         return ""
       }
-      var isoDateTime = new Date(isoDateTime);
+      isoDateTime = new Date(isoDateTime);
       return (
         isoDateTime.toLocaleDateString() +
         " " +
@@ -172,12 +178,12 @@ module.exports = {
     
 
     poll: function (fn, timeout, interval) {
-      var endTime = Number(new Date()) + (timeout || 2000);
+      /* const endTime = Number(new Date()) + (timeout || 2000);*/
       interval = interval || 100;
 
-      var checkCondition = function (resolve, reject) {
+      const checkCondition = function (resolve, reject) {
         // If the condition is met, we're done!
-        var result = fn();
+        const result = fn();
         if (result) {
           resolve(result);
         }

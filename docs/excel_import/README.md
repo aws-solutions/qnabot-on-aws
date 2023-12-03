@@ -6,7 +6,7 @@ A [sample](./sample.xlsx) Excel workbook is included. Each column in the Excel s
 
 ## Basic Fields
 
-![Designer Part 1](./DesignerMapping1.png)
+![Designer Part 1](./images/DesignerMapping1.png)
 
 Excel Column | Content Designer Field| Description
 ---------|----------|---------
@@ -18,7 +18,7 @@ Excel Column | Content Designer Field| Description
 
 ## Topics and Response Cards
 
-![Designer Part 2](./DesignerMapping2.png)
+![Designer Part 2](./images/DesignerMapping2.png)
 
 Excel Column | Content Designer Field| Description
 ---------|----------|---------
@@ -38,7 +38,7 @@ can be imported by specifying the JSON path as the column.
 
 ### Example of a field on the root level
 
-![Schema snippet](schema2.png)
+![Schema snippet](./images/schema2.png)
 
 Excel Column | Content Designer Field
 -------------|-----------------------
@@ -47,7 +47,7 @@ clientFilterValues | Client Filter: Values
 
 ### Examples of nested fields
 
-![Schema snippet](schema.png)
+![Schema snippet](./images/schema.png)
 
 Excel Column | Content Designer Field (title in the schema.json) 
 -------------|------------------------
@@ -58,8 +58,8 @@ elicitResponse.response_sessionattr_namespace |  Response Session Attribute Name
 
 Choose *Import* from the Menu and then choose *From File*
 
-![Import](./import.png)
+![Import](./images/import.png)
 
 After your import is complete, a dialog showing any import errors will be displayed.
 
-![Import](./afterimport.png)
+![Import](./images/afterimport.png)

@@ -1,133 +1,146 @@
-var fs=require('fs')
-process.argv.push('--debug')
-var Velocity=require('velocity')
-var run=require('../util/temp-test').run
-var input=require('../util/temp-test').input
+/*********************************************************************************************************************
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.                                                *
+ *                                                                                                                    *
+ *  Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance    *
+ *  with the License. A copy of the License is located at                                                             *
+ *                                                                                                                    *
+ *      http://www.apache.org/licenses/                                                                               *
+ *                                                                                                                    *
+ *  or in the 'license' file accompanying this file. This file is distributed on an 'AS IS' BASIS, WITHOUT WARRANTIES *
+ *  OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions    *
+ *  and limitations under the License.                                                                                *
+ *********************************************************************************************************************/
+
+const fs = require('fs');
+process.argv.push('--debug');
+const Velocity = require('velocity');
+const run = require('../util/temp-test').run;
+const input = require('../util/temp-test').input;
 module.exports={
     single:{
         head:{
-            send:test=>run(__dirname+'/'+"single/head",static(),test),
-            resp:test=>run(__dirname+'/'+"single/head.resp",static(),test)
+            send:test=>run(__dirname+'/'+'single/head',static(),test),
+            resp:test=>run(__dirname+'/'+'single/head.resp',static(),test)
         },
         delete:{
-            send:test=>run(__dirname+'/'+"single/delete",static(),test),
+            send:test=>run(__dirname+'/'+'single/delete',static(),test),
             resp:function(test){
-                var body={
-                    "_shards":{
+                const body={
+                    '_shards':{
                         successful:2
                     },
-                    "_id":2,
-                    result:"delete"
+                    '_id':2,
+                    result:'delete'
                 }
-                run(__dirname+'/'+"single/delete.resp",input(body),test)
+                run(__dirname+'/'+'single/delete.resp',input(body),test)
             }
         },
         put:{
             send:function(test){
-                var body={  
-                    qid:"adad",
-                    q:["b","c"],
+                const body={  
+                    qid:'adad',
+                    q:['b','c'],
                     card:{
-                        title:""
+                        title:''
                     }
                 }
-                run(__dirname+'/'+"single/put",input(body),test)
+                run(__dirname+'/'+'single/put',input(body),test)
             },
             resp:function(test){
-                var body={
-                    "_shards":{
+                const body={
+                    '_shards':{
                         successful:2
                     },
-                    "_id":2,
-                    result:"created"
+                    '_id':2,
+                    result:'created'
                 }
-                run(__dirname+'/'+"single/put.resp",input(body),test)
+                run(__dirname+'/'+'single/put.resp',input(body),test)
             }
         }
     },
     collection:{
         options:{
             send:function(test){
-                run(__dirname+'/'+"single/options",input({}),test)
+                run(__dirname+'/'+'single/options',input({}),test)
             }
         },
         delete:{
             sendQuery:function(test){
-                var body={query:".*"}
-                run(__dirname+'/'+"collection/delete",input(body),test)
+                const body={query:'.*'}
+                run(__dirname+'/'+'collection/delete',input(body),test)
             },
             sendList:function(test){
-                var body={list:["ad","Ad"]}
-                run(__dirname+'/'+"collection/delete",input(body),test)
+                const body={list:['ad','Ad']}
+                run(__dirname+'/'+'collection/delete',input(body),test)
             },
-            resp:test=>run(__dirname+'/'+"collection/delete.resp",input({
+            resp:test=>run(__dirname+'/'+'collection/delete.resp',input({
                 deleted:100
             }),test),
         },
-        get:test=>run(__dirname+'/'+"single/get",{
+        get:test=>run(__dirname+'/'+'single/get',{
             input:{
                 body:'{}',
                 params:name=>{return {
-                    from:"",
-                    filter:"",
-                    query:"",
-                    perpage:"0"
+                    from:'',
+                    filter:'',
+                    query:'',
+                    perpage:'0'
                 }[name]}
             }
         },test),
-        list:test=>run(__dirname+'/'+"single/get",{
+        list:test=>run(__dirname+'/'+'single/get',{
             input:{
                 body:'{}',
                 params:name=>{return {
-                    from:"",
-                    filter:"filter",
-                    query:"",
-                    perpage:""
+                    from:'',
+                    filter:'filter',
+                    query:'',
+                    perpage:''
                 }[name]}
             }
         },test),
-        search:test=>run(__dirname+'/'+"single/get",{
+        search:test=>run(__dirname+'/'+'single/get',{
             input:{
                 body:'{}',
                 params:name=>{return {
-                    from:"",
-                    filter:"",
-                    query:"search",
-                    perpage:"",
-                    topic:""
+                    from:'',
+                    filter:'',
+                    query:'search',
+                    perpage:'',
+                    topic:''
                 }[name] }
             }
         },test),
         resp:function(test){
-            var body={
+            const body={
                 hits:{
                     total:10,
                     hits:[{
                         _score:10,
-                        _id:"1",
+                        _id:'1',
                         _source:{
-                            questions:[{q:"1"},{q:"2"}],
-                            qid:"",
+                            questions:[{q:'1'},{q:'2'}],
+                            qid:'',
                             card:{
-                                a:"1"
+                                a:'1'
                             }
                         }
                     },{
                         _score:9,
-                        _id:"2",
+                        _id:'2',
                         _source:{
-                            questions:[{q:"1"},{q:"2"}],
-                            qid:"",
+                            questions:[{q:'1'},{q:'2'}],
+                            qid:'',
                             card:{
-                                a:"1"
+                                a:'1'
                             }
                         }
                     }]
                 }
             }
-            run(__dirname+'/'+"single/get.resp",input(body),test)
+            run(__dirname+'/'+'single/get.resp',input(body),test)
         },
-        import:test=>run(__dirname+'/'+"single/put",{
+        import:test=>run(__dirname+'/'+'single/put',{
             input:{
                 body:'{}',
                 json:()=>'{}',

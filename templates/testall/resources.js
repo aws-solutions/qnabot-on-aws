@@ -1,126 +1,141 @@
+/*********************************************************************************************************************
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.                                                *
+ *                                                                                                                    *
+ *  Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance    *
+ *  with the License. A copy of the License is located at                                                             *
+ *                                                                                                                    *
+ *      http://www.apache.org/licenses/                                                                               *
+ *                                                                                                                    *
+ *  or in the 'license' file accompanying this file. This file is distributed on an 'AS IS' BASIS, WITHOUT WARRANTIES *
+ *  OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions    *
+ *  and limitations under the License.                                                                                *
+ *********************************************************************************************************************/
+
 /* eslint-disable quotes */
 /* eslint-disable indent */
-var fs=require('fs');
-var _=require('lodash');
+const fs = require('fs');
+const _ = require('lodash');
 const util = require('../util');
 
-var files=fs.readdirSync(`${__dirname}`)
-    .filter(x=>!x.match(/README.md|Makefile|index|test|outputs|.DS_Store/))
-    .map(x=>require(`./${x}`))
+const files = fs
+    .readdirSync(`${__dirname}`)
+    .filter((x) => !x.match(/README.md|Makefile|index|test|outputs|.DS_Store/))
+    .map((x) => require(`./${x}`));
 
-module.exports=Object.assign(
-    {
-    "TestAllCodeVersion":{
-        "Type": "Custom::S3Version",
-        "Properties": {
-            "ServiceToken": { "Ref" : "CFNLambda" },
-            "Bucket": {"Ref":"BootstrapBucket"},
-            "Key": {"Fn::Sub":"${BootstrapPrefix}/lambda/testall.zip"},
-            "BuildDate":(new Date()).toISOString()
-        }
+module.exports = {
+    TestAllCodeVersion: {
+        Type: "Custom::S3Version",
+        Properties: {
+            ServiceToken: { Ref: "CFNLambda" },
+            Bucket: { Ref: "BootstrapBucket" },
+            Key: { "Fn::Sub": "${BootstrapPrefix}/lambda/testall.zip" },
+            BuildDate: (new Date()).toISOString(),
+        },
     },
-    "TestAllStepLambda": {
-      "Type": "AWS::Lambda::Function",
-      "Properties": {
-        "Code": {
-            "S3Bucket": {"Ref":"BootstrapBucket"},
-            "S3Key": {"Fn::Sub":"${BootstrapPrefix}/lambda/testall.zip"},
-            "S3ObjectVersion":{"Ref":"TestAllCodeVersion"}
+    TestAllStepLambda: {
+      Type: "AWS::Lambda::Function",
+      Properties: {
+        Code: {
+            S3Bucket: { Ref: "BootstrapBucket" },
+            S3Key: { "Fn::Sub": "${BootstrapPrefix}/lambda/testall.zip" },
+            S3ObjectVersion: { Ref: "TestAllCodeVersion" },
         },
-        "Environment": {
-            "Variables": {
-                ES_INDEX:{"Ref":"VarIndex"},
-                ES_ENDPOINT:{"Ref":"EsEndpoint"},
-                ES_PROXY:{"Ref":"EsProxyLambda"},
-                LEXV2_BOT_ID:{"Ref":"LexV2BotId"},
-                LEXV2_BOT_ALIAS_ID:{"Ref":"LexV2BotAliasId"}
-            }
+        Environment: {
+            Variables: {
+                ES_INDEX: { Ref: "VarIndex" },
+                ES_ENDPOINT: { Ref: "EsEndpoint" },
+                ES_PROXY: { Ref: "EsProxyLambda" },
+                LEXV2_BOT_ID: { Ref: "LexV2BotId" },
+                LEXV2_BOT_ALIAS_ID: { Ref: "LexV2BotAliasId" },
+            },
         },
-        "Handler": "index.step",
-        "MemorySize": "1280",
-        "Role": {"Fn::GetAtt": ["TestAllRole","Arn"]},
-        "Runtime": "nodejs16.x",
-        "Timeout": 900,
-        "VpcConfig" : {
-          "Fn::If": [ "VPCEnabled", {
-              "SubnetIds": { "Fn::Split" : [ ",", {"Ref": "VPCSubnetIdList"} ] },
-              "SecurityGroupIds": { "Fn::Split" : [ ",", {"Ref": "VPCSecurityGroupIdList"} ] },
-          }, {"Ref" : "AWS::NoValue"} ]
+        Handler: "index.step",
+        MemorySize: "1280",
+        Role: { "Fn::GetAtt": ["TestAllRole", "Arn"] },
+        Runtime: process.env.npm_package_config_lambdaRuntime,
+        Timeout: 900,
+        VpcConfig: {
+          "Fn::If": ["VPCEnabled", {
+              SubnetIds: { "Fn::Split": [",", { Ref: "VPCSubnetIdList" }] },
+              SecurityGroupIds: { "Fn::Split": [",", { Ref: "VPCSecurityGroupIdList" }] },
+          }, { Ref: "AWS::NoValue" }],
         },
-        "TracingConfig" : {
-            "Fn::If": [ "XRAYEnabled", {"Mode": "Active"},
-                {"Ref" : "AWS::NoValue"} ]
+        TracingConfig: {
+            "Fn::If": ["XRAYEnabled", { Mode: "Active" },
+                { Ref: "AWS::NoValue" }],
         },
-        "Tags":[{
-            Key:"Type",
-            Value:"TestAll"
-        }]
+        Layers: [
+          { Ref: "AwsSdkLayerLambdaLayer" },
+        ],
+        Tags: [{
+            Key: "Type",
+            Value: "TestAll",
+        }],
       },
-      "Metadata": util.cfnNag(["W92"])
+      Metadata: util.cfnNag(["W92"]),
     },
-    "TestAllRole": {
-      "Type": "AWS::IAM::Role",
-      "Properties": {
-        "AssumeRolePolicyDocument": {
-          "Version": "2012-10-17",
-          "Statement": [
+    TestAllRole: {
+      Type: "AWS::IAM::Role",
+      Properties: {
+        AssumeRolePolicyDocument: {
+          Version: "2012-10-17",
+          Statement: [
             {
-              "Effect": "Allow",
-              "Principal": {
-                "Service": "lambda.amazonaws.com"
+              Effect: "Allow",
+              Principal: {
+                Service: "lambda.amazonaws.com",
               },
-              "Action": "sts:AssumeRole"
-            }
-          ]
+              Action: "sts:AssumeRole",
+            },
+          ],
         },
-        "Path": "/",
-        "Policies": [
+        Path: "/",
+        Policies: [
           util.basicLambdaExecutionPolicy(),
           util.lambdaVPCAccessExecutionRole(),
           util.xrayDaemonWriteAccess(),
           {
-            "PolicyName" : "TestAllPolicy",
-            "PolicyDocument" : {
-              "Version": "2012-10-17",
-              "Statement": [{
-                  "Effect": "Allow",
-                  "Action": [
+            PolicyName: "TestAllPolicy",
+            PolicyDocument: {
+              Version: "2012-10-17",
+              Statement: [{
+                  Effect: "Allow",
+                  Action: [
                     "s3:PutObject",
                     "s3:GetObject",
                     "s3:GetObjectVersion",
                     "s3:DeleteObject",
-                    "s3:DeleteObjectVersion"
+                    "s3:DeleteObjectVersion",
                   ],
-                  "Resource":[{"Fn::Sub":"arn:aws:s3:::${TestAllBucket}*"}]
-              },{
-                  "Effect": "Allow",
-                  "Action": [
-                    "lambda:InvokeFunction"
+                  Resource: [{ "Fn::Sub": "arn:aws:s3:::${TestAllBucket}*" }],
+              }, {
+                  Effect: "Allow",
+                  Action: [
+                    "lambda:InvokeFunction",
                   ],
-                  "Resource":[{"Ref":"EsProxyLambda"}]
+                  Resource: [{ Ref: "EsProxyLambda" }],
               },
                 {
-                  "Effect": "Allow",
-                  "Action": [
-                      "lex:RecognizeText"
+                  Effect: "Allow",
+                  Action: [
+                      "lex:RecognizeText",
                   ],
-                  "Resource": [
-                    {"Fn::Sub": "arn:${AWS::Partition}:lex:${AWS::Region}:${AWS::AccountId}:bot-alias/*/*"}
-                  ]
-                }
-              ]
-            }
-          }
-        ]
+                  Resource: [
+                    { "Fn::Sub": "arn:${AWS::Partition}:lex:${AWS::Region}:${AWS::AccountId}:bot-alias/*/*" },
+                  ],
+                },
+              ],
+            },
+          },
+        ],
       },
-      "Metadata": util.cfnNag(["W11", "W12"])
+      Metadata: util.cfnNag(["W11", "W12"]),
     },
-    "TestAllClear":{
-        "Type": "Custom::S3Clear",
-        "Properties": {
-            "ServiceToken": { "Ref" : "CFNLambda" },
-            "Bucket":{"Ref":"TestAllBucket"}
-        }
-    }
-})
-
+    TestAllClear: {
+        Type: "Custom::S3Clear",
+        Properties: {
+            ServiceToken: { Ref: "CFNLambda" },
+            Bucket: { Ref: "TestAllBucket" },
+        },
+    },
+};
