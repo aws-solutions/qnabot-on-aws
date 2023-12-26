@@ -220,7 +220,7 @@ module.exports = async function preprocess(req, res) {
     // Add _userInfo to res, with updated timestamps
     // May be further modified by lambda hooks
     // Will be saved back to DynamoDB in userInfo.js
-    const ttlDays = _.get(req, '_settings.DYNAMODB_TTL_DAYS', 0)
+    const ttlDays = _.get(req, '_settings.USERINFO_TTL_DAYS', 0)
     const res_userInfo = await update_userInfo(userId, req_userInfo, ttlDays);
     _.set(res, '_userInfo', res_userInfo);
 
