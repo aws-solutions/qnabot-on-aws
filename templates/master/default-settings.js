@@ -109,6 +109,7 @@ const default_settings = {
     LLM_QA_NO_HITS_REGEX:
         'Sorry,  //remove comment to enable custom no match (no_hits) when LLM does not know the answer.',
     LLM_PROMPT_MAX_TOKEN_LIMIT: '${LLM_PROMPT_MAX_TOKEN_LIMIT}',
+    DYNAMODB_TTL_DAYS: 0, // Set to 0 to disable setting a ttl property in DyanmoDB
 };
 
 const defaultGenerateQueryPromptTemplate =
