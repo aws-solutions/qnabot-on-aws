@@ -396,11 +396,23 @@ const languageErrorMessages = {
     },
 };
 
+const comprehendSyntaxSupportedLanguages = {
+    English: 'en',
+    French: 'fr',
+    German: 'de',
+    Italian: 'it',
+    Portuguese: 'pt',
+    Spanish: 'es',
+};
+
 module.exports = {
     getSupportedLanguages() {
         return supportedLanguages;
     },
     getLanguageErrorMessages() {
         return languageErrorMessages;
+    },
+    getComprehendSyntaxSupportedLanguages() {
+        return comprehendSyntaxSupportedLanguages;
     },
 };

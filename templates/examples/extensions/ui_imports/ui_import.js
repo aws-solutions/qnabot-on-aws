@@ -1,4 +1,4 @@
-/*********************************************************************************************************************
+/** *******************************************************************************************************************
  *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.                                                *
  *                                                                                                                    *
  *  Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance    *
@@ -9,15 +9,16 @@
  *  or in the 'license' file accompanying this file. This file is distributed on an 'AS IS' BASIS, WITHOUT WARRANTIES *
  *  OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions    *
  *  and limitations under the License.                                                                                *
- *********************************************************************************************************************/
+ ******************************************************************************************************************** */
 
 const fs = require('fs');
 const response = require('cfn-response');
-const aws = require('aws-sdk');
+const { S3Client, PutObjectCommand } = require('@aws-sdk/client-s3');
+const customSdkConfig = require('sdk-config/customSdkConfig');
 const handlebars = require('handlebars');
 
-aws.config.region = process.env.AWS_REGION;
-const s3 = new aws.S3();
+const region = process.env.AWS_REGION;
+const s3 = new S3Client(customSdkConfig('C018', { region }));
 
 exports.handler = function (event, context, cb) {
     console.log(JSON.stringify(event, null, 2));
@@ -37,11 +38,13 @@ exports.handler = function (event, context, cb) {
                     const temp = handlebars.compile(temp_text);
                     text = temp(event.ResourceProperties);
                 }
-                return s3.putObject({
+                const params = {
                     Bucket: event.ResourceProperties.Bucket,
                     Key: `examples/documents/${name}`,
                     Body: text,
-                }).promise();
+                };
+                const putObjectCmd = new PutObjectCommand(params);
+                return s3.send(putObjectCmd);
             }))
                 .then((result) => {
                     console.log(result);

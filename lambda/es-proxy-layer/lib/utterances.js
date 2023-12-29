@@ -10,16 +10,14 @@
  *  OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions    *
  *  and limitations under the License.                                                                                *
  *********************************************************************************************************************/
-
 const _ = require('lodash');
-const Promise = require('bluebird');
-const aws = require('aws-sdk');
-aws.config.region = process.env.AWS_REGION || 'us-east-1';
-aws.config.signatureVersion = 'v4';
-aws.config.logger = console;
-const s3 = new aws.S3();
-const myCredentials = new aws.EnvironmentCredentials('AWS');
+const region = process.env.AWS_REGION || 'us-east-1';
+const { S3Client, GetObjectCommand } = require('@aws-sdk/client-s3');
+const customSdkConfig = require('../lib/util/customSdkConfig');
+const s3 = new S3Client(customSdkConfig('C021', { region, logger: console  }));
+const { fromEnv } = require('@aws-sdk/credential-providers');
 const qnabot = require('qnabot/logging');
+const myCredentials = fromEnv();
 
 const con = _.memoize((esAddress) => {
     const opts = {
@@ -28,7 +26,13 @@ const con = _.memoize((esAddress) => {
         hosts: esAddress,
         connectionClass: require('http-aws-es'),
         defer() {
-            return Promise.defer();
+            let resolve, reject;
+            const promise = new Promise((res, rej) => {
+                resolve = res;
+                reject = rej;
+            
+            });
+	        return { promise, resolve, reject };
         },
         amazonES: {
             region: process.env.AWS_REGION,
@@ -49,35 +53,36 @@ module.exports = async function (event, context, callback) {
                 query: { match_all: {} },
             },
         })
-        .then((results) => {
-            const scroll_id = results._scroll_id;
-            const out = results.hits.hits;
-            return new Promise((resolve, reject) => {
-                const next = function () {
-                    es.scroll({
-                        scrollId: scroll_id,
-                        scroll: '10s',
-                    })
-                        .then((scroll_results) => {
-                            const { hits } = scroll_results.hits;
-                            hits.forEach((x) => out.push(x));
-                            hits.length ? next() : resolve(out);
+            .then((results) => {
+                const scrollId = results._scroll_id;
+                const out = results.hits.hits;
+                return new Promise((resolve, reject) => {
+                    const next = function () {
+                        es.scroll({
+                            scrollId,
+                            scroll: '10s',
                         })
-                        .catch(reject);
-                };
-                next();
-            });
-        })
-        .then((result) => _.compact(_.uniq(_.flatten(result
-            .map((qa) => (qa._source.questions ? qa._source.questions.map((y) => y.q) : []))))));
+                            .then((scrollResults) => {
+                                const { hits } = scrollResults.hits;
+                                hits.forEach((x) => out.push(x));
+                                hits.length ? next() : resolve(out);
+                            })
+                            .catch(reject);
+                    };
+                    next();
+                });
+            })
+            .then((result) => _.compact(_.uniq(_.flatten(result
+                .map((qa) => (qa._source.questions ? qa._source.questions.map((y) => y.q) : []))))));
 
-        const s3Utterances = s3.getObject({
+        const s3Utterances = s3.send(new GetObjectCommand({
             Bucket: process.env.UTTERANCE_BUCKET,
             Key: process.env.UTTERANCE_KEY,
-        }).promise()
-            .then((x) => {
-                qnabot.log(x);
-                return JSON.parse(x.Body.toString());
+        }))
+            .then(async (result) => {
+                const response = await result.Body.transformToString();
+                qnabot.log("S3 utterances response: ", response);
+                return JSON.parse(response);
             });
 
         return Promise.all([esUtterances, s3Utterances])

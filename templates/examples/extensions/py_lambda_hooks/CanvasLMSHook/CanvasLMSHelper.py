@@ -17,6 +17,7 @@ import boto3
 import base64
 import datetime
 import calendar
+from botocore import config
 
 from bs4 import BeautifulSoup
 from botocore.exceptions import ClientError
@@ -40,8 +41,8 @@ def get_secret(secrets_name):
     session = boto3.session.Session()
     client = session.client(
         service_name='secretsmanager',
-        region_name=region_name
-    )
+        config= config.Config(region_name=region_name,
+            user_agent_extra = f"AWSSOLUTION/{os.environ['SOLUTION_ID']}/{os.environ['SOLUTION_VERSION']} AWSSOLUTION-CAPABILITY/{os.environ['SOLUTION_ID']}-C018/{os.environ['SOLUTION_VERSION']}"))
 
     # In this sample we only handle the specific exceptions for the 'GetSecretValue' API.
     # See https://docs.aws.amazon.com/secretsmanager/latest/apireference/API_GetSecretValue.html
@@ -77,7 +78,7 @@ def get_canvas_user (param_canvas, param_user_name):
     return user
 
 
-def query_menu (event, student_name):
+def query_menu (event, student_name):  # NOSONAR param passed from upstream
     """
     function to get menu
     """
@@ -86,11 +87,11 @@ def query_menu (event, student_name):
     choicelist = [{'text':'Announcements','value':"tell me about my announcements"}, {'text':'Course Enrollments','value':"tell me about my enrollments"}, {'text':'Course Syllabus','value':"tell me about my syllabus"}, {'text':'Assignments','value':"tell me about my assignments"}, {'text':'Grades','value':"tell me about my grades"}]
     generic_attachments = {'version': '1','contentType': CONTENT_TYPE,'genericAttachments':[{"title": TITLE,"buttons":choicelist}]}
     event['res']['session']['appContext']['responseCard'] = generic_attachments
-    event['res']['session']['appContext']['altMessages']['markdown'] = "Please select one of the options below:"
+    event['res']['session']['appContext']['altMessages']['markdown'] = "Please select one of the options below:"  # NOSONAR Do not need a literal
 
     int_counter = 0
     str_choice_list = ""
-    for items in choicelist:
+    for _ in choicelist:
         if str_choice_list != '':
             str_choice_list = str_choice_list + ", "
         str_choice_list = str_choice_list + choicelist[int_counter]['text']
@@ -109,7 +110,7 @@ def query_enrollments_for_student(event, canvas, student_user_name):
     # Get the user using user_id to match with LMS SIS_ID
     try:
         user = get_canvas_user (canvas, student_user_name)
-    except:
+    except:  # NOSONAR Function to log exception already implemented
         return user_not_found_error (event)
 
     if user:
@@ -130,7 +131,7 @@ def query_enrollments_for_student(event, canvas, student_user_name):
 
         int_counter = 0
         str_choice_list = ""
-        for items in choicelist:
+        for _ in choicelist:
             if str_choice_list != '':
                 str_choice_list = str_choice_list + ", "
             str_choice_list = str_choice_list + choicelist[int_counter]['text']
@@ -174,7 +175,7 @@ def query_courses_for_student(event, canvas, student_user_name, course_name_to_f
     # Get the user using user_id to match with LMS SIS_ID
     try:
         user = get_canvas_user (canvas, student_user_name)
-    except:
+    except:  # NOSONAR Function to log exception already implemented
         return user_not_found_error (event)
 
     result = get_course_result(course_name_to_filter, user)
@@ -195,13 +196,12 @@ def query_courses_for_student(event, canvas, student_user_name, course_name_to_f
 
         int_counter = 0
         str_choice_list = ""
-        for items in choice_list:
+        for _ in choice_list:
             if str_choice_list != '':
                 str_choice_list = str_choice_list + ", "
             str_choice_list = str_choice_list + choice_list[int_counter]['text']
             int_counter = int_counter + 1
         event['res']['session']['appContext']['altMessages']['ssml'] = get_ssml_output(SSML_PREOUTPUT + str_choice_list)
-
     return event
 
 def append_assignment_due_date(assignment):
@@ -262,12 +262,11 @@ def query_course_assignments_for_student(event, canvas, student_user_name, cours
     # Get the user using user_id to match with LMS SIS_ID
     try:
         user = get_canvas_user (canvas, student_user_name)
-    except:
+    except:  # NOSONAR Function to log exception already implemented
         return user_not_found_error (event)
 
     if user:
         course_assignments = get_course_assignments(course_name_to_filter, no_records_message, user)
-
     result = {"CourseAssignments": course_assignments}
     if result['CourseAssignments']:
         return_message = result['CourseAssignments']
@@ -291,7 +290,7 @@ def query_announcements_for_student(event, canvas, student_user_name):
     # Get the user using user_id to match with LMS SIS_ID
     try:
         user = get_canvas_user (canvas, student_user_name)
-    except:
+    except:  # NOSONAR Function to log exception already implemented
         return user_not_found_error (event)
 
     course_names = []
@@ -304,7 +303,7 @@ def query_announcements_for_student(event, canvas, student_user_name):
             # get_announcements returns a list of discussion topics.
             for discussion_topic in canvas.get_announcements(context_codes=[course.id]):
                 if discussion_topic:
-                    announcement_date = datetime.datetime.strftime(discussion_topic.posted_at_date,"%b %d %Y %-I:%M %p")
+                    announcement_date = datetime.datetime.strftime(discussion_topic.posted_at_date,"%b %d %Y %-I:%M %p")  # NOSONAR storing the date in string
                     course_announcements += '<li><b>{0}</b>: {1}: <br>{2}. </li>'.format(course.name, discussion_topic.title, discussion_topic.message)
                 else:
                     course_announcements += no_records_message
@@ -341,7 +340,7 @@ def query_grades_for_student(event, canvas, student_user_name, course_name_to_fi
     # Get the user using user_id to match with LMS SIS_ID
     try:
         user = get_canvas_user (canvas, student_user_name)
-    except:
+    except:  # NOSONAR Function to log exception already implemented
         return user_not_found_error (event)
 
     if user:
@@ -387,7 +386,7 @@ def query_syllabus_for_student(event, canvas, student_user_name, course_name_to_
     # Get the user using user_id to match with LMS SIS_ID
     try:
         user = get_canvas_user (canvas, student_user_name)
-    except:
+    except:  # NOSONAR Function to log exception already implemented
         return user_not_found_error (event)
 
     if user:
@@ -440,7 +439,10 @@ def validate_input(event):
         if event['req']['_settings']['CanvasDomainName'].strip() == '' or event['req']['_settings']['CanvasAPIKey'].strip() == '' or event['req']['_settings']['CanvasCourseNameSlot'].strip() == '':
             error_message = 'There was an error processing your request. Please check the QnABot custom setting names/values and try again.'
             return error_message
-    except:
+    except Exception as e:
+        print("validate_input exception")
+        print(e)
+        error_message = 'There was an error processing your request. Please check the question setup and try again.'
         return error_message
 
 

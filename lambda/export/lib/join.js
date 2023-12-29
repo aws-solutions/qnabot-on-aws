@@ -11,29 +11,32 @@
  *  and limitations under the License.                                                                                *
  *********************************************************************************************************************/
 
-const aws = require('aws-sdk');
-aws.config.region = process.env.AWS_REGION;
+const { S3Client, GetObjectCommand, PutObjectCommand } = require('@aws-sdk/client-s3');
+const customSdkConfig = require('sdk-config/customSdkConfig');
+const region = process.env.AWS_REGION;
+const s3 = new S3Client(customSdkConfig('C011', { region }));
 
-const s3 = new aws.S3();
-
-module.exports=async function(config){
+module.exports = async function(config){
     try {
-        const parts =[]
+        const parts =[];
         for (const part of config.parts){
-            console.log(`getting part ${part.key}`)
-            const response = await s3.getObject({
-                Bucket:config.bucket,
-                Key:part.key,
-                VersionId:config.version
-            }).promise()
-            parts.push(response.Body.toString())
-        }
-        await s3.putObject({
+            console.log(`getting part ${part.key}`);
+            const params = {
+                Bucket: config.bucket,
+                Key: part.key,
+                VersionId: config.version
+            };
+            const response = await s3.send(new GetObjectCommand(params));
+            const readableStream = Buffer.concat(await response.Body.toArray());
+            parts.push(readableStream);
+        };
+        const putParams = {
             Bucket:config.bucket,
             Key:config.key,
             Body:parts.join('\n')
-        }).promise()
-        config.status='Clean'
+        };
+        await s3.send(new PutObjectCommand(putParams));
+        config.status='Clean';
     } catch (error) {
         console.error("An error occurred while joining parts", error);
         throw error;

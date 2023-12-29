@@ -16,20 +16,21 @@ const config = require('../config.json');
 
 process.env.AWS_PROFILE = config.profile;
 process.env.AWS_DEFAULT_REGION = config.profile;
-const aws = require('aws-sdk');
-aws.config.region = require('../config.json').region;
+const { CloudFormationClient, CreateStackCommand, UpdateStackCommand, DescribeStacksCommand, DeleteStackCommand } = require('@aws-sdk/client-cloudformation');
+const { S3Client, PutObjectCommand } = require('@aws-sdk/client-s3');
+
 const { region } = require('../config.json');
 const _ = require('lodash');
 const fs = require('fs');
 
-const cf = new aws.CloudFormation();
+const cf = new CloudFormationClient({ region });
 const build = require('./build');
 const check = require('./check');
 const argv = require('commander');
 const name = require('./name');
 const wait = require('./wait');
 
-const s3 = new aws.S3();
+const s3 = new S3Client({ region });
 
 if (require.main === module) {
     const args = argv.version('1.0')
@@ -127,28 +128,32 @@ async function up(stack, options) {
 
             let create;
             if (Buffer.byteLength(template) < 51200) {
-                create = await cf.createStack({
+                const createCmd = new CreateStackCommand({
                     StackName,
                     Capabilities: ['CAPABILITY_NAMED_IAM', 'CAPABILITY_AUTO_EXPAND'],
                     DisableRollback: true,
                     TemplateBody: template,
-                }).promise();
+                });
+                create = await cf.send(createCmd);
             } else {
                 const exp = await bootstrap();
                 const bucket = exp.Bucket;
                 const prefix = exp.Prefix;
                 const url = `https://${bucket}.s3.${region}.amazonaws.com/${prefix}/templates/${stack}.json`;
-                await s3.putObject({
+                const params = {
                     Bucket: bucket,
                     Key: `${prefix}/templates/${stack}.json`,
                     Body: template,
-                }).promise();
-                create = await cf.createStack({
+                };
+                const putCmd = new PutObjectCommand(params)
+                await s3.send(putCmd);
+                const createCmd = new CreateStackCommand({
                     StackName,
                     Capabilities: ['CAPABILITY_NAMED_IAM', 'CAPABILITY_AUTO_EXPAND'],
                     DisableRollback: true,
                     TemplateURL: url,
-                }).promise();
+                });
+                create = await cf.send(createCmd);
             }
 
             log(`stackname: ${StackName}`, options);
@@ -175,27 +180,33 @@ async function update(stack, options) {
             const template = fs.readFileSync(`${__dirname}/../build/templates/${stack}.json`, 'utf-8');
             let start;
             if (Buffer.byteLength(template) < 51200) {
-                start = await cf.updateStack({
+                const updateParams = {
                     StackName,
                     Capabilities: ['CAPABILITY_NAMED_IAM', 'CAPABILITY_AUTO_EXPAND'],
                     TemplateBody: template,
-                }).promise();
+                };
+                const updateCmd = new UpdateStackCommand(updateParams);
+                start = await cf.send(updateCmd);
             } else {
                 const exp = await bootstrap();
                 const bucket = exp.Bucket;
                 const prefix = exp.Prefix;
                 const url = `https://${bucket}.s3.${region}.amazonaws.com/${prefix}/templates/${stack}.json`;
                 console.log(url);
-                await s3.putObject({
+                const params = {
                     Bucket: bucket,
                     Key: `${prefix}/templates/${stack}.json`,
                     Body: template,
-                }).promise();
-                start = await cf.updateStack({
+                };
+                const putCmd = new PutObjectCommand(params)
+                await s3.send(putCmd);
+                const updateParams = {
                     StackName,
                     Capabilities: ['CAPABILITY_NAMED_IAM', 'CAPABILITY_AUTO_EXPAND'],
                     TemplateURL: url,
-                }).promise();
+                };
+                const updateCmd = new UpdateStackCommand(updateParams)
+                start = await cf.send(updateCmd);
             }
             const result = await start;
             log(`stackname: ${StackName}`, options);
@@ -216,13 +227,15 @@ async function down(stack, options) {
         return;
     }
     try {
-        const down = await cf.describeStacks({
+        const describeCmd = new DescribeStacksCommand({
             StackName,
-        }).promise();
+        });
+        const down = await cf.send(describeCmd);
         const id = down.Stacks[0].StackId;
-        await cf.deleteStack({
+        const deleteCmd = new DeleteStackCommand({
             StackName: id,
-        }).promise();
+        });
+        await cf.send(deleteCmd);
         if (options.wait) {
             return wait(stack, {
                 Id: id,
@@ -242,7 +255,8 @@ async function sure(stack, options = {}) {
     const StackName = options.stackName ? options.stackName : name(stack);
     log(`making sure stack ${stack} is up`, options);
     try {
-        await cf.describeStacks({ StackName }).promise();
+        const describeCmd = new DescribeStacksCommand({ StackName });
+        await cf.send(describeCmd);
         await wait(stack, { show: options.interactive && !options.silent });
         log(`${stack} is up as ${StackName}`, options);
     } catch (e) {
@@ -262,9 +276,10 @@ function log(message, options) {
 
 async function bootstrap() {
     const outputs = {};
-    const tmp = await cf.describeStacks({
+    const describeCmd = new DescribeStacksCommand({
         StackName: name('dev/bootstrap', {}),
-    }).promise();
+    });
+    const tmp = await cf.send(describeCmd);
     tmp.Stacks[0].Outputs.forEach((x) => outputs[x.OutputKey] = x.OutputValue);
     return outputs;
 }

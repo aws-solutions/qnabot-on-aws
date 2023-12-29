@@ -11,32 +11,18 @@
  *  and limitations under the License.                                                                                *
  *********************************************************************************************************************/
 <template lang='pug'>
-  div(id="qna-client")
-    v-toolbar(color="cyan" v-if="$store.state.username")
-      v-toolbar-title {{title}}
-      v-spacer
-      v-toolbar-items
-        v-btn(flat :href="$store.state.Login" 
-          v-if="$store.state.Login && $store.state.username") LogOut
-    lex-web-ui
+div(id="qna-client")
+  lex-web-ui
 </template>
 
 <script>
-
-require("babel-polyfill");
-const Vuex = require('vuex');
-
-module.exports={
-  data:()=>{return {}},
-  components:{},
-  computed:{
-    title:function(){
-      const name=this.$store.state.Username
-      return name ? 'QnABot: '+name : "QnABot"
-    }
-  },
-  methods:{}
-}
+module.exports = {
+    data: () => ({}),
+    components: {},
+    computed: {
+    },
+    methods: {},
+};
 </script>
 
 <style lang='scss'>
@@ -45,5 +31,8 @@ module.exports={
   }
   nav {
     z-index:1;
+  }
+  .v-toolbar.v-toolbar--density-default.bg-cyan {
+    color:white !important;
   }
 </style>

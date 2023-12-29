@@ -5,6 +5,39 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [5.5.0] - 2023-12-27
+### Added
+- Added Core-Language parameter to the QnABot deployment. This parameter allows the user to select during the deployment a core language which will be used by the OpenSearch language analyzers to look for question and answers. With this update, QnABot can now be deployed natively in 33 Languages with a more syntactical accuracy for matching questions and answers
+- Bot routing enhancements including passing initial utterance to specialty bot and receive session attributes from specialty bot ([issue #376](https://github.com/aws-solutions/qnabot-on-aws/issues/376)) - contributed by ([@bobpskier](https://github.com/bobpskier))
+- Improved error handling. Added custom error handling question to QnaUtility and some errors are appended to chat client message when ENABLE_DEBUG_RESPONSES is set to 'true'
+- Added 'PROTECTED_UTTERANCES' setting which allows the user to configure a comma-separated list of utterances that will be ignored by LLM query disambiguation and translation. This fixes a bug where feedback (thumbs up/thumbs down) and language selection would be disambiguated instead of triggering the respective workflow
+- Added 'getQuestion' handlebar that returns the original matched question without hard-coding ([issue #397](https://github.com/aws-solutions/qnabot-on-aws/issues/397))
+- Added functional test collection for verifying deployed QnABots
+- Added Service API Usage Tracking 
+- Added deployment parameter to enable selection of opensearch instance type ([issue #599](https://github.com/aws-solutions/qnabot-on-aws/issues/599)) 
+
+### Updated 
+- Migrated out of Bluebird promises to native promises
+- Migrated to AWS SDK for JavaScript v3
+- Upgraded to Webpack 5
+- Upgraded to Vue3
+- Upgraded to Vuetify 3
+- Upgraded to latest LLM Image
+- Code Quality improvements based on SonarQube analysis
+- Security patches for npm
+
+### Fixed
+- Fixed chaining not working when combined with bot routing ([issue #508](https://github.com/aws-solutions/qnabot-on-aws/issues/508)) - contributed by ([@bobpskier](https://github.com/bobpskier))
+- Fixed issue with chaining causing QnABot to become unresponsive when chaining rule evaluation fails. Improved error reporting when debugging is enabled.
+- Fixed issue preventing lambda hooks defined in the templates/extensions directory from being executed by the fulfillment lambda.
+- Fixed issue where LLM errors return 'no_hits' response instead of error message.
+- Fixed bug where positive feedback is not published to SNS.
+- Fixed content designer settings using different casing standard for boolean values ([issue #666](https://github.com/aws-solutions/qnabot-on-aws/issues/666))
+- Fixed inclusion of OpenSearch QnA results in text passages ([issue #669](https://github.com/aws-solutions/qnabot-on-aws/issues/669)) - contributed by ([@cristi-constantin](https://github.com/cristi-constantin))
+- Fixed issue where session attributes become undefined when translate isn't enabled.
+- Fixed issue where settings were being evaluated as strings instead of numbers. Settings that are saved as stings that represent positive, negative, whole, or decimal numbers will be parsed as numbers.
+- Fixed issue where kendra redirect does not use redirect query when users locale matches kendra index locale
+
 ## [5.4.5] - 2023-11-1
 ### Updated
 - Security patch for browserify-sign
@@ -18,7 +51,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Improved error handling
 
 ## [5.4.3] - 2023-10-13
- ### Fixed
+### Fixed
 - Fixed issue where Alexa schema was not exporting the utterances list.
 
 ## [5.4.2] - 2023-09-30

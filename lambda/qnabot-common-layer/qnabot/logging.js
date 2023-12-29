@@ -11,8 +11,12 @@
  *  and limitations under the License.                                                                                *
  *********************************************************************************************************************/
 
-const AWS = require('aws-sdk');
+const { ComprehendClient, DetectPiiEntitiesCommand } = require('@aws-sdk/client-comprehend');
+const customSdkConfig = require('./util/customSdkConfig');
+const region = process.env.AWS_REGION;
 const _ = require('lodash');
+
+const comprehend = new ComprehendClient(customSdkConfig('C022', { region }));
 
 function filter_comprehend_pii(text) {
     if (process.env.ENABLE_REDACTING_WITH_COMPREHEND !== 'true') {
@@ -44,9 +48,9 @@ function filter(text) {
         text = String(text);
     }
 
-    text = text.replace(/"accesstokenjwt":\s*"[^"]+?([^\/"]+)"/g, '"accesstokenjwt":"<token redacted>"');
-    text = text.replace(/"idtokenjwt":\s*"[^"]+?([^\/"]+)"/g, '"idtokenjwt":"<token redacted>"');
-    text = text.replace(/"refreshtoken":\s*"[^"]+?([^\/"]+)"/g, '"refreshtoken":"<token redacted>"');
+    text = text.replace(/"accesstokenjwt":\s*"[^"]+?([^\/"]+)"/g, '"accesstokenjwt":"<token redacted>"'); // NOSONAR - javascript:S5852 - input is user controlled and we have a limit on the number of characters
+    text = text.replace(/"idtokenjwt":\s*"[^"]+?([^\/"]+)"/g, '"idtokenjwt":"<token redacted>"');  // NOSONAR - javascript:S5852 - input is user controlled and we have a limit on the number of characters
+    text = text.replace(/"refreshtoken":\s*"[^"]+?([^\/"]+)"/g, '"refreshtoken":"<token redacted>"');  // NOSONAR - javascript:S5852 - input is user controlled and we have a limit on the number of characters
     text = filter_comprehend_pii(text);
 
     if (process.env.QNAREDACT === 'true') {
@@ -97,8 +101,8 @@ async function _getPIIEntities(params) {
             return { Entities: [] };
         }
     }
-    const comprehend = new AWS.Comprehend();
-    const comprehendResult = await comprehend.detectPiiEntities(params).promise();
+    const detectPiiEntitiesCmd = new DetectPiiEntitiesCommand(params);
+    const comprehendResult = await comprehend.send(detectPiiEntitiesCmd);
     return comprehendResult;
 }
 

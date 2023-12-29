@@ -1,4 +1,4 @@
-/*********************************************************************************************************************
+/** *******************************************************************************************************************
  *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.                                                *
  *                                                                                                                    *
  *  Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance    *
@@ -9,7 +9,7 @@
  *  or in the 'license' file accompanying this file. This file is distributed on an 'AS IS' BASIS, WITHOUT WARRANTIES *
  *  OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions    *
  *  and limitations under the License.                                                                                *
- *********************************************************************************************************************/
+ ******************************************************************************************************************** */
 
 const fs = require('fs');
 const _ = require('lodash');
@@ -88,6 +88,11 @@ module.exports = {
             Code: {
                 ZipFile: fs.readFileSync(`${__dirname}/handler.js`, 'utf8'),
             },
+            Environment: {
+                Variables: {
+                    ...util.getCommonEnvironmentVariables()
+                }
+            },
             Handler: 'index.documents',
             MemorySize: '128',
             Role: { 'Fn::GetAtt': ['S3ListLambdaRole', 'Arn'] },
@@ -118,6 +123,11 @@ module.exports = {
         Properties: {
             Code: {
                 ZipFile: fs.readFileSync(`${__dirname}/handler.js`, 'utf8'),
+            },
+            Environment: {
+                Variables: {
+                    ...util.getCommonEnvironmentVariables()
+                }
             },
             Handler: 'index.photos',
             MemorySize: '128',

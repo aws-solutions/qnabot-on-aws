@@ -1,15 +1,11 @@
 # Kendra Fallback Function
 
-Provides a Lambda Hook for the no_hits question to search a set of Kendra indexes
-as a fallback mechanism to provide answers.
+This feature searches a set of Kendra indexes as a fallback mechanism to provide answers when an answer is not found in OpenSearch.
 
 Kendra provides a number of innovative features. This Kendra Fallback function performs a query against a
 set of Kendra indexes and will return the first answer that Kendra identifies. Kendra can return multiple
 answers however to keep responses limited in scope the first answer is provided through QnABot. Links to
-documents stored in S3 buckets that Kendra indexes are also provided. The security of the S3 bucket governs
-whether this link is usable. In addition Kendra can return discovered text with links to these documents as well.
-This function returns a default of four discovered texts/links. The maximum number of returned links is
-configurable.
+documents stored in S3 buckets that Kendra indexes are also provided. The security of the S3 bucket governs whether this link is usable. In addition Kendra can return discovered text with links to these documents as well. This function returns a default of four discovered texts/links. The maximum number of returned links is configurable.
 
 ## Configure Kendra Fallback using the following settings in Content designer Setting page
 
@@ -36,28 +32,3 @@ IMPORTANT: S3 Bucket names must start with qna (e.g. qnabot-mydocs), otherwise m
 ### ALT\_SEARCH\_KENDRA\_S3\_SIGNED\_URL\_EXPIRE\_SECS  
   
 Value determines the expiration of the S3 URL - default 300 seconds.
-
-## Installation
-
-### Step 1
-
-Set the ALT\_SEARCH\_KENDRA\_INDEXES setting in QnABot Designer UI Settings page
-
-### Step 2
-
-Using QnABot Designer UI, use the import menu and expand the Examples/Extensions block. Then look
-for the extension named KendraFallback. Load this extension.
-
-### Step 3
-
-Once loaded you will update the question with the qid  "KendraFallback" changing its question from
-"no_hits_alternative" to "no_hits".
-
-### Step 4
-
-If you have previously loaded the QnAUtility.json from Examples/Extensions you need to either remove
-the question with the ID "CustomNoMatches" or change the question for this ID from "no_hits" to "no_hits_original"
-
-Once the new question, "KendraFallback" is configured as the response for "no_hits", the Kendra index will be
-searched for an answer whenever a curated answer can not be found. Once setup, Kendra provides a fallback
-mechanism prior to telling the user an answer could not be found.

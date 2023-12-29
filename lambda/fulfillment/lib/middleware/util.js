@@ -12,9 +12,10 @@
  *********************************************************************************************************************/
 
 const _ = require('lodash');
-const aws = require('../aws');
-
-const lambda = new aws.Lambda();
+const { Lambda } = require('@aws-sdk/client-lambda');
+const customSdkConfig = require('sdk-config/customSdkConfig');
+const region = process.env.AWS_REGION || 'us-east-1';
+const lambda = new Lambda(customSdkConfig('C013', { region }));
 const qnabot = require('qnabot/logging');
 
 exports.getLambdaArn = function (name) {
@@ -37,18 +38,18 @@ exports.invokeLambda = async function (params) {
         FunctionName: params.FunctionName,
         InvocationType: params.InvocationType || 'RequestResponse',
         Payload: payload,
-    }).promise();
+    });
 
-    qnabot.log(result);
     if (!result.FunctionError) {
         try {
-            if (result.Payload) {
-                const parsed = JSON.parse(result.Payload);
+            if (result.Payload && Object.keys(result.Payload).length !== 0) {
+                const payloadObj = Buffer.from(result.Payload).toString();
+                const parsed = JSON.parse(payloadObj);
                 qnabot.log('Response', JSON.stringify(parsed, null, 2));
                 return parsed;
             }
         } catch (e) {
-            qnabot.log(e);
+            qnabot.log("An error occurred while parsing payload: ", e);
             throw e;
         }
     } else {

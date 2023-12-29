@@ -1,4 +1,4 @@
-/*********************************************************************************************************************
+/** *******************************************************************************************************************
  *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.                                                *
  *                                                                                                                    *
  *  Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance    *
@@ -9,7 +9,7 @@
  *  or in the 'license' file accompanying this file. This file is distributed on an 'AS IS' BASIS, WITHOUT WARRANTIES *
  *  OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions    *
  *  and limitations under the License.                                                                                *
- *********************************************************************************************************************/
+ ******************************************************************************************************************** */
 
 const fs = require('fs');
 const _ = require('lodash');
@@ -35,6 +35,7 @@ module.exports = {
         LEXV2_BUILD_LAMBDA: { Ref: 'Lexv2BotLambda' },
         ADDRESS: { 'Fn::Join': ['', ['https://', { 'Fn::GetAtt': ['ESVar', 'ESAddress'] }]] },
         INDEX: { 'Fn::GetAtt': ['Var', 'index'] },
+        ...util.getCommonEnvironmentVariables()
     }, process.env.npm_package_config_lambdaRuntime),
     LexBuildLambdaStart: lambda({
         ZipFile: fs.readFileSync(`${__dirname}/start.js`, 'utf8'),
@@ -43,6 +44,7 @@ module.exports = {
         STATUS_KEY: { 'Fn::If': ['CreateLexV1Bots', 'status.json', { Ref: 'AWS::NoValue' }] },
         LEXV2_STATUS_KEY: 'lexV2status.json',
         BUILD_FUNCTION: { 'Fn::GetAtt': ['LexBuildLambda', 'Arn'] },
+        ...util.getCommonEnvironmentVariables()
     }, process.env.npm_package_config_lambdaRuntime),
     LexBuildLambdaPoll: lambda({
         ZipFile: fs.readFileSync(`${__dirname}/poll.js`, 'utf8'),
@@ -50,6 +52,7 @@ module.exports = {
         STATUS_KEY: { 'Fn::If': ['CreateLexV1Bots', 'status.json', { Ref: 'AWS::NoValue' }] },
         STATUS_BUCKET: { Ref: 'BuildStatusBucket' },
         BOT_NAME: { 'Fn::If': ['CreateLexV1Bots', { Ref: 'LexBot' }, { Ref: 'AWS::NoValue' }] },
+        ...util.getCommonEnvironmentVariables()
     }, process.env.npm_package_config_lambdaRuntime),
     LexBuildCodeVersion: {
         Type: 'Custom::S3Version',

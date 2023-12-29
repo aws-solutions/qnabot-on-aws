@@ -1,0 +1,57 @@
+{
+  "qna": [
+    {
+      "a": "From the import page.",
+      "r": {
+        "buttons": [
+          {
+            "text": "Tell me about the Alexa Show.",
+            "value": "The Echo Show"
+          },
+          {
+            "text": "Tell me about the Echo Dot",
+            "value": "The Echo Dot"
+          }
+        ],
+        "imageUrl": "https://images-na.ssl-images-amazon.com/images/I/61bze1WJhfL._AC_SL1024_.jpg",
+        "title": "Alexa"
+      },
+      "t": "import",
+      "elicitResponse": {
+        "responsebot_hook": "QnAYesNoBot"
+      },
+      "alt": {
+        "markdown": "*From the import page.*",
+        "ssml": "<speak>From the import page.</speak>"
+      },
+      "type": "qna",
+      "qid": "Import.002",
+      "sa": [
+        {
+          "enableTranslate": false,
+          "text": "TestName",
+          "value": "TestValue"
+        },
+        {
+          "enableTranslate": true,
+          "text": "TestName2",
+          "value": "TestValue2"
+        }
+      ],
+      "clientFilterValues": "Test",
+      "q": [
+        "How do I import questions in content designer?",
+        "How do I import questions using QnA Bot?"
+      ]
+    },
+    {
+      "a": "Of course!",
+      "type": "qna",
+      "qid": "Import.003",
+      "q": [
+        "Can I import multiple answers when I import with excel?",
+        "Can I import multiple answers when I import with excel using QnA Bot?"
+      ]
+    }
+  ]
+}

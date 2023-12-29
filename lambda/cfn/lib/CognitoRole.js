@@ -11,17 +11,18 @@
  *  and limitations under the License.                                                                                *
  *********************************************************************************************************************/
 
-const Promise = require('./util/promise');
-const aws = require('./util/aws');
+const { CognitoIdentityClient, GetIdentityPoolRolesCommand, SetIdentityPoolRolesCommand } = require('@aws-sdk/client-cognito-identity');
+const customSdkConfig = require('./util/customSdkConfig');
 
-const cognito = new aws.CognitoIdentity();
+const region = process.env.AWS_REGION || 'us-east-1';
+const cognito = new CognitoIdentityClient(customSdkConfig({ region }));
 
 module.exports = class CognitoRole extends require('./base') {
     constructor() {
         super();
     }
 
-    Create(params, reply) {
+    async Create(params, reply) {
         const RoleMappings = {};
 
         params.RoleMappings.map((x) => {
@@ -30,44 +31,40 @@ module.exports = class CognitoRole extends require('./base') {
             delete x.UserPool;
             RoleMappings[id] = x;
         });
-
-        cognito.getIdentityPoolRoles({
-            IdentityPoolId: params.IdentityPoolId,
-        }).promise().tap(console.log)
-            .then((result) => {
-            // result.Roles=Object.assign(result.Roles || {},params.Roles)
-            // result.RoleMappings=Object.assign(result.RoleMappings || {},RoleMappings)
-            // Overwrite any existing roles and mappings with new ones - existing mappings may no longer be valid after an upgrade.
-                result.Roles = params.Roles;
-                result.RoleMappings = RoleMappings;
-                console.log(result);
-
-                return cognito.setIdentityPoolRoles(result).promise();
-            })
-            .tap(console.log)
-            .then(() => reply(null, 'RoleMapping'))
-            .catch(reply);
+        try {
+            const result = await cognito.send(new GetIdentityPoolRolesCommand({
+                IdentityPoolId: params.IdentityPoolId,
+            }));
+            console.log(result);
+            result.Roles = params.Roles;
+            result.RoleMappings = RoleMappings;
+            console.log(result);
+            await cognito.send(new SetIdentityPoolRolesCommand(result));
+            reply(null, 'RoleMapping');
+        } catch (e) {
+            reply(e);
+        }
     }
 
-    Update(ID, params, oldparams, reply) {
-        this.Create(params, reply);
+    async Update(ID, params, oldparams, reply) {
+        await this.Create(params, reply);
     }
 
-    Delete(ID, params, reply) {
+    async Delete(ID, params, reply) {
         const ids = params.RoleMappings.map((x) => `cognito-idp.${process.env.AWS_REGION || 'us-east-1'}.amazonaws.com/${x.UserPool}:${x.ClientId}`);
-
-        cognito.getIdentityPoolRoles({
-            IdentityPoolId: params.IdentityPoolId,
-        }).promise().tap(console.log)
-            .then((result) => {
-                ids.forEach((x) => {
-                    delete result.RoleMappings[x];
-                });
-                console.log(result);
-                return cognito.setIdentityPoolRoles(result).promise();
-            })
-            .tap(console.log)
-            .then(() => reply(null, 'RoleMapping'))
-            .catch(reply);
+        try {
+            const result = await cognito.send(new GetIdentityPoolRolesCommand({
+                IdentityPoolId: params.IdentityPoolId,
+            }));
+            console.log(result);
+            ids.forEach((x) => {
+                delete result.RoleMappings[x];
+            });
+            console.log(result);
+            await cognito.send(new SetIdentityPoolRolesCommand(result));
+            reply(null, 'RoleMapping');
+        } catch (e) {
+            reply(e);
+        }
     }
 };

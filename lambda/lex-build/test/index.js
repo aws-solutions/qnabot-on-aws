@@ -17,7 +17,6 @@ const run=function(params,test){
     return lambda(params)
         .then(msg=>console.log(JSON.stringify(msg)))
         .then(test.ok)
-        .error(test.ifError)
         .catch(test.ifError)
         .finally(test.done)
 }

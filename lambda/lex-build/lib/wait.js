@@ -11,18 +11,21 @@
  *  and limitations under the License.                                                                                *
  *********************************************************************************************************************/
 
-const aws = require('./aws');
+const region = process.env.AWS_REGION || 'us-east-1';
+const { LambdaClient, InvokeCommand } = require('@aws-sdk/client-lambda');
+const customSdkConfig = require('sdk-config/customSdkConfig');
+const lambda = new LambdaClient(customSdkConfig('C001', { region }));
 
-const lambda = new aws.Lambda();
-
-module.exports=async function(status){
+module.exports = async function(status){
     console.log('calling poll lambda')
     try {
-        const response = await lambda.invoke({
+        const params = {
             FunctionName:process.env.POLL_LAMBDA,
             InvocationType:'Event',
             Payload:'{}'
-        }).promise()
+        }
+        const invokeCmd = new InvokeCommand(params)
+        const response = await lambda.send(invokeCmd)
         return response
  
     } catch (error) {

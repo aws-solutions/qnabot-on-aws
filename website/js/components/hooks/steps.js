@@ -1,4 +1,5 @@
-/*********************************************************************************************************************
+/* eslint-disable max-len */
+/** *******************************************************************************************************************
  *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.                                                *
  *                                                                                                                    *
  *  Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance    *
@@ -9,12 +10,12 @@
  *  or in the 'license' file accompanying this file. This file is distributed on an 'AS IS' BASIS, WITHOUT WARRANTIES *
  *  OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions    *
  *  and limitations under the License.                                                                                *
- *********************************************************************************************************************/
+ ******************************************************************************************************************** */
 
 const stringify = require('json-stringify-pretty-compact');
-const example = stringify(require('./example.js'));
-const codeJS = require('raw-loader!./code.js');
-const codePY = require('raw-loader!./code.py');
+const example = stringify(require('./example'));
+const codeJS = require('./codejs.txt');
+const codePY = require('./codepy.txt');
 
 module.exports = [{
     title: 'Create Lambda Function',
@@ -39,21 +40,29 @@ module.exports = [{
     text: `
 A minimal function would look like this
 
-##### node.js
+### Node.js Code
 ~~~js
 ${codeJS}
-~~~  
+~~~
 
-##### python
+<br />
+
+### Python Code
 ~~~python
 ${codePY}
-~~~  
+~~~
+
+<br />
 
 The event object has two properties
 1. \`event.req\` the normalized request object
 1. \`event.res\` the normalized response object (edit this to change the response)
 
 The lambda handler must return the modified event object. 
+
+<br />
+
+### Example Event
 ~~~json 
 ${example}
 ~~~

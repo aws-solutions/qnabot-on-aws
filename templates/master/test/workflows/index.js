@@ -20,9 +20,9 @@ const zlib=require('zlib')
 const Url=require('url')
 const sign=require('aws4').sign
 const fs=require('fs')
-const aws=require('aws-sdk')
-aws.config.region=config.region
-const s3=new aws.S3()
+const { S3Client, PutObjectCommand } = require('@aws-sdk/client-s3');
+const region = config.region
+const s3 = new S3Client({ region })
 const outputs=require('../../../../bin/exports')
 const exists=require('./../util').exists
 const run=require('./../util').run
@@ -191,11 +191,11 @@ module.exports={
             method:"GET"
         })
         .then(x=>x._links.imports)
-        .then(info=>s3.putObject({
+        .then(info=>s3.send(new PutObjectCommand({
             Bucket:info.bucket,
             Key:info.uploadPrefix+name,
             Body:range(0,count).map(qna).join('\n')
-        }).promise())
+        })))
         .then(function(info){
             return new Promise(function(res,rej){
                 function next(i){

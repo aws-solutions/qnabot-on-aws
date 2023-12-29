@@ -54,6 +54,7 @@ QnABot also provides these additional helpers:
 |Helper                  | Descr                                      | Example                                                                                     |
 |------------------------|--------------------------------------------|---------------------------------------------------------------------------------------------|
 |ifCond                  | Block helper for conditional output.<br>Supported comparison operators:<br>'==', '===', '!=' ,'!==', '<', '<=', '>', '>=', '&&','&#124;&#124;' |{{#ifCond LexOrAlexa '==' 'LEX'}}<br>_output if true_<br>{{else}}<br>_output if false_<br>{{/ifCond}}<br> |
+|getQuestion             | Returns the first question from the matched result. | {{getQuestion}} |
 |getSessionAttr          | Returns named session attribute value if it is defined, or default value. | {{getSessionAttr '_attrName_' '_default_'}} |
 |setSessionAttr          | Sets a named session attribute to specified value. | {{setSessionAttr '_attrName_' '_value_'}} |
 |getSlot                 | Returns named slot value if it is defined, or default value. | {{getSlot '_slotName_' '_default_'}} |
@@ -80,6 +81,9 @@ Use the handlebars comment syntax to make your handlebars easier to understand..
    You've been gone for a while. I missed you!
 {{/ifCond}}
 Ask me a question. Try to stump me. 
+
+{{!-- get the original question --}}
+It seems like you are asking: {{getQuestion}}
 
 {{!-- check and set session Attribute --}}
 {{#if SessionAttributes.testAttr}}

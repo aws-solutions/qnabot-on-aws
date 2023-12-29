@@ -12,43 +12,52 @@
  *********************************************************************************************************************/
 
 const _ = require('lodash');
-const AWS = require('aws-sdk');
+const { Translate } = require('@aws-sdk/client-translate');
+const customSdkConfig = require('../lib/util/customSdkConfig');
 const qnabot = require('qnabot/logging');
+const { getSupportedLanguages } = require('./supportedLanguages');
+const region = process.env.AWS_REGION || 'us-east-1';
 
 async function get_terminologies(sourceLang) {
-    const translate = new AWS.Translate();
+    const translate = new Translate(customSdkConfig('C015', { region }));
     qnabot.log('Getting registered custom terminologies');
-    const configuredTerminologies = await translate.listTerminologies({}).promise();
+    const configuredTerminologies = await translate.listTerminologies({});
     qnabot.log(`terminology response ${JSON.stringify(configuredTerminologies)}`);
     const sources = configuredTerminologies.TerminologyPropertiesList.filter((t) => t.SourceLanguageCode == sourceLang).map((s) => s.Name);
     qnabot.log(`Filtered Sources ${JSON.stringify(sources)}`);
     return sources;
 }
 
-async function get_translation(englishText, targetLang, req) {
-    qnabot.log('get_translation:', targetLang, 'InputText: ', englishText);
-    if (targetLang === 'en') {
-        qnabot.log('get_translation: target is en, translation not required. Return english text');
-        return englishText;
+async function get_translation(userText, targetLang, req) {
+    qnabot.log('get_translation:', targetLang, 'InputText: ', userText);
+    const nativeLang = _.get(req._settings, 'NATIVE_LANGUAGE', 'English');
+    const supportedLangMap = getSupportedLanguages();
+    const nativeLangCode = supportedLangMap[nativeLang];
+    if (targetLang === nativeLangCode) {
+        qnabot.log('get_translation: target is the same language that was chosen by the user for this deployment.');
+        return userText;
     }
 
-    const translateClient = new AWS.Translate();
+    const translateClient = new Translate(customSdkConfig('C015', { region }));
     try {
         const customTerminologyEnabled = _.get(req._settings, 'ENABLE_CUSTOM_TERMINOLOGY');
         qnabot.log(`get translation request ${JSON.stringify(req)}`);
 
         const params = {
-            SourceLanguageCode: 'en', /* required */
+            SourceLanguageCode: 'auto', /* required */
             TargetLanguageCode: targetLang, /* required */
-            Text: englishText, /* required */
+            Text: userText, /* required */
         };
         if (customTerminologyEnabled) {
-            const customTerminologies = await get_terminologies('en');
+            const nativeLanguage = _.get(req._settings, 'NATIVE_LANGUAGE', 'English');
+            const languageMap = getSupportedLanguages();
+            const nativeLanguageCode = languageMap[nativeLanguage];
+            const customTerminologies = await get_terminologies(nativeLanguageCode);
             params.TerminologyNames = customTerminologies;
         }
 
-        qnabot.log('input text:', englishText);
-        const translation = await translateClient.translateText(params).promise();
+        qnabot.log('input text:', userText);
+        const translation = await translateClient.translateText(params);
         qnabot.log('translation:', translation);
         const regex = /\s\*\s+$/m;
         translation.TranslatedText = translation.TranslatedText.replace(regex, '*\n\n'); // Translate adds a space between the "*" causing incorrect Markdown
@@ -56,17 +65,10 @@ async function get_translation(englishText, targetLang, req) {
         return translation.TranslatedText;
     } catch (err) {
         qnabot.log('warning - error during translation: ', err);
-        return englishText;
+        return userText;
     }
 }
 
-function escapeRegExp(string) {
-    return string.replace(/[.*+\-?^${}()|[\]\\]/g, '\\$&'); // $& means the whole matched string
-}
-
-function replaceAll(str, find, replace) {
-    return str.replace(new RegExp(escapeRegExp(find), 'g'), replace);
-}
 
 async function translateField(field, hit, usrLang, req) {
     const fieldValue = _.get(hit, field);
@@ -125,14 +127,16 @@ exports.translate_hit = async function (hit, usrLang, req) {
     if (_.get(hit, 'sa')) {
         hit_out.sa = [];
         const promises = hit.sa.map(async (obj) => {
+            const objOut = { ...obj };
             if (obj.enableTranslate) {
                 try {
-                    hit_out.sa.push({ text: obj.text, value: await get_translation(obj.value, usrLang, req), enableTranslate: obj.enableTranslate });
+                    objOut.value = await get_translation(obj.value, usrLang, req);
                 } catch (e) {
                     qnabot.log('ERROR: Session Attributes caused Translation exception. Check syntax: ', obj.text);
                     throw (e);
                 }
             }
+            hit_out.sa.push(objOut);
         });
         await Promise.all(promises);
     }

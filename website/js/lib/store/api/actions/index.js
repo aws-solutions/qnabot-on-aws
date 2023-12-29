@@ -1,4 +1,4 @@
-/*********************************************************************************************************************
+/** *******************************************************************************************************************
  *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.                                                *
  *                                                                                                                    *
  *  Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance    *
@@ -9,24 +9,15 @@
  *  or in the 'license' file accompanying this file. This file is distributed on an 'AS IS' BASIS, WITHOUT WARRANTIES *
  *  OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions    *
  *  and limitations under the License.                                                                                *
- *********************************************************************************************************************/
+ ******************************************************************************************************************** */
 const query = require('query-string').stringify;
 const _ = require('lodash');
-const Promise = require('bluebird');
 const axios = require('axios');
 const Url = require('url');
 const { sign } = require('aws4');
-const path = require('path');
 const { Mutex } = require('async-mutex');
 
 const mutex = new Mutex();
-
-const reason = function (r) {
-    return (err) => {
-        console.log(err);
-        Promise.reject(r);
-    };
-};
 
 let failed = false;
 
@@ -61,7 +52,7 @@ function handleError(e, context, opts) {
             status: _.get(e, 'response.status'),
         };
         if (status === 404 && opts.ignore404) {
-            throw 'does-not-exist';
+            throw new Error('does-not-exist');
         } else {
             window.alert('Request Failed: error response from endpoint');
             throw message;
@@ -78,8 +69,9 @@ module.exports = Object.assign(
     require('./genesys'),
     require('./testall'),
     {
-        _request: Promise.method(async (context, opts) => {
-            const url = Url.parse(opts.url);
+        _request: async (context, opts) => {
+            const url = Url.parse(opts.url); // NOSONAR
+            //TODO: Added a task to remove parse deprecated API: https://app.asana.com/0/0/1206231954078906/f
             const request = {
                 host: url.hostname,
                 method: opts.method.toUpperCase(),
@@ -87,7 +79,7 @@ module.exports = Object.assign(
                 path: url.path,
                 service: 'execute-api',
                 headers: opts.headers || {},
-                region: context.rootState.info.region
+                region: context.rootState.info.region,
             };
             if (opts.body) {
                 request.body = JSON.stringify(opts.body);
@@ -107,8 +99,10 @@ module.exports = Object.assign(
                 console.log(JSON.stringify(_.get(e, 'response', e), null, 2));
                 if (e.response) {
                     handleError(e, context, opts);
-                } else if (e.code === 'CredentialTimeout') {
+                } else if (e.name === 'CredentialTimeout') {
                     handleTimeout(context, e);
+                } else if (e.name === 'NotAuthorizedException') {
+                    console.log('This user is not an authorized user.');
                 } else {
                     window.alert('Unknown Error');
                     throw e;
@@ -116,7 +110,7 @@ module.exports = Object.assign(
             } finally {
                 context.commit('loading', false);
             }
-        }),
+        },
         botinfo(context) {
             return context.dispatch('_request', {
                 url: context.rootState.info._links.bot.href,
@@ -152,16 +146,22 @@ module.exports = Object.assign(
                 reason: `Failed to get page:${opts.page}`,
             });
         },
-        check(context, qid) {
-            return context.dispatch('_request', {
-                url: `${context.rootState.info._links.questions.href}/${encodeURIComponent(qid)}`,
-                method: 'head',
-                reason: `${qid} does not exists`,
-                ignore404: true,
-            })
-                .then(() => true)
-                .tapCatch(console.log)
-                .catch((x) => x === 'does-not-exist', () => false);
+        async check(context, qid) {
+            try {
+                await context.dispatch('_request', {
+                    url: `${context.rootState.info._links.questions.href}/${encodeURIComponent(qid)}`,
+                    method: 'head',
+                    reason: `${qid} does not exists`,
+                    ignore404: true,
+                });
+                return true;
+            } catch (x) {
+                if (x.message === 'does-not-exist') {
+                    return false;
+                }
+                console.log(x);
+                throw x;
+            }
         },
         add(context, payload) {
             return context.dispatch('update', payload);

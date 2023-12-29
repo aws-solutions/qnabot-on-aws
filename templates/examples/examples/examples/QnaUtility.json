@@ -51,6 +51,14 @@
 			]
 		},
 		{
+			"a": "{{Settings.ERRORMESSAGE}}",
+			"qid": "CustomError",
+			"type": "qna",
+			"q": [
+				"error_msg"
+			]
+		},
+		{
 			"a": "Sorry, your identity cannot be verified - please log in.",
 			"qid": "CustomNoVerifiedIdentity",
 			"type": "qna",

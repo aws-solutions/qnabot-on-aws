@@ -16,6 +16,9 @@ import json
 import boto3
 import os
 import logging
+from botocore.config import Config
+
+sdk_config = Config(user_agent_extra = f"AWSSOLUTION/{os.environ['SOLUTION_ID']}/{os.environ['SOLUTION_VERSION']} AWSSOLUTION-CAPABILITY/{os.environ['SOLUTION_ID']}-C018/{os.environ['SOLUTION_VERSION']}")
 
 stackoutputs = None
 stackname = os.getenv('CFSTACK')
@@ -23,11 +26,11 @@ stackname = os.getenv('CFSTACK')
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
-def handler(event, context):
+def handler(event, context): # NOSONAR Lambda Handler
 
     print("INPUT: ",json.dumps(event))
-    
-    # check we aren't calling this function before any document have been returned to the client and that 
+
+    # check we aren't calling this function before any document have been returned to the client and that
     try:
         #Because "sub documents", like a sofa document that is connected to a room document, does not have a next, the in built query lambda attempts to figure out a parent document and will give the necessary information to perform room iteration
         navigation_to_json = event["req"]["session"]["qnabotcontext"]["navigation"]
@@ -35,11 +38,11 @@ def handler(event, context):
         logger.info(k)
         navigation_to_json = {}
     qid_list = navigation_to_json.get("previous",[])
-    
-    
+
+
     # check that there aren't any previous rooms to go to
     if len(qid_list) > 0:
-        client = boto3.client('lambda')
+        client = boto3.client('lambda', config=sdk_config)
         #Invoke the prepackaged function that Queries ElasticSearch using a document qid
         temp = qid_list[-1]
         resp = client.invoke(
@@ -47,9 +50,9 @@ def handler(event, context):
             Payload = json.dumps({'qid':temp,'type':"qid"}),
             InvocationType = "RequestResponse"
         )
-        # Because the payload is of a streamable type object, we must explicitly read it and load JSON 
+        # Because the payload is of a streamable type object, we must explicitly read it and load JSON
         response = json.loads(resp['Payload'].read())
-        #uncomment below if you want to see the response 
+        #uncomment below if you want to see the response
         #print(json.dumps(response))
 
         # Do not call lambdafunction from the next item if the link points to ourselves
@@ -59,7 +62,7 @@ def handler(event, context):
             event = update_result(event,response)
             if "args" in response:
                 event["res"]["result"]["args"] = response["args"]
-            client = boto3.client('lambda')
+            client = boto3.client('lambda', config=sdk_config)
             targetname = response.get('l', '')
             if targetname.startswith('arn') != True:
                 targetname = map_to_arn(targetname, stackname)
@@ -87,7 +90,7 @@ def map_to_arn(name,stack):
     res = name
     global stackoutputs
     if stackoutputs is None:
-        cf = boto3.client('cloudformation')
+        cf = boto3.client('cloudformation', config=sdk_config)
         r = cf.describe_stacks(StackName=stack)
         stack, = r['Stacks']
         stackoutputs = stack['Outputs']
@@ -105,6 +108,7 @@ def update_lambda_hook(event,hook_event,response):
     temp_list.pop()
     if "session" not in hook_event["res"]:
         hook_event["res"]["session"] = {}
+        hook_event["res"]["session"]["qnabotcontext"] = {}
     hook_event["res"]["session"]["qnabotcontext"]["previous"] ={"qid":response["qid"],"a":response["a"],"alt":response.get("alt",{}),"q":event["req"]["question"]}
     hook_event["res"]["session"]["qnabotcontext"]["navigation"]={"next":response["next"],"previous":temp_list,"hasParent":navigation_to_json["hasParent"]}
     return hook_event
@@ -118,8 +122,10 @@ def build_card_from_response(event, response):
             event["res"]["card"]["title"] = card["title"]
             try:
                 event["res"]["card"]["text"] = card["text"]
-            except:
+            except:  # NOSONAR the case is handled and no need for an exception
                 event["res"]["card"]["text"] = ""
+            if 'subTitle' in card:
+                event["res"]["card"]["subTitle"] = card["subTitle"]
             if 'imageUrl' in card:
                 event["res"]["card"]["imageUrl"] = card["imageUrl"]
             if 'buttons' in card:

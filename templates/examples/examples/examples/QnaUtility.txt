@@ -1,1 +1,1 @@
-Basic utility QIDS every bot should support: 1) no_hits 2) no_verified_identity 3) Help 4) Repeat 5) Feedback - Thumbs up and Down. 
+Basic utility QIDS every bot should support: 1) no_hits 2) error_msg 3) no_verified_identity 4) Help 5) Repeat 6) Feedback - Thumbs up and Down. 

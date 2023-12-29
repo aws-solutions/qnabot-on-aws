@@ -28,11 +28,11 @@ The high-level process flow for the solution components deployed with the AWS Cl
 
 4. The `Content Designer` [AWS Lambda](http://aws.amazon.com/lambda/) function saves the input in [Amazon OpenSearch Service](http://aws.amazon.com/opensearch-service/) in a questions bank index. If using [text embeddings](docs/semantic_matching_using_LLM_embeddings/README.md), these requests will first pass through a ML model hosted on [Amazon SageMaker](https://aws.amazon.com/sagemaker/) to generate embeddings before being saved into the question bank on OpenSearch.
 
-5. Users of the chatbot interact with Amazon Lex via the web client UI or [Amazon Connect](https://aws.amazon.com/connect/).
+5. Users of the chatbot interact with Amazon Lex via the web client UI, [Amazon Alexa](https://developer.amazon.com/en-US/alexa) or [Amazon Connect](https://aws.amazon.com/connect/).
 
-6. Amazon Lex forwards requests to the `Bot Fulfillment` AWS Lambda function. Users can also send requests to this Lambda function via [Amazon Alexa](https://developer.amazon.com/en-US/alexa) devices.
+6. Amazon Lex forwards requests to the `Bot Fulfillment` AWS Lambda function. Users can also send requests to this Lambda function via Amazon Alexa devices.
 
-7. The `Bot Fulfillment` AWS Lambda function takes the users input and uses [Amazon Comprehend](https://aws.amazon.com/comprehend/) and [Amazon Translate](https://aws.amazon.com/translate/) (if necessary) to translate non-English requests to English and then looks up the answer in in Amazon OpenSearch Service. If using LLM features such as [text generation](docs/LLM_Retrieval_and_generative_question_answering/README.md) and  [text embeddings](docs/semantic_matching_using_LLM_embeddings/README.md), these requests will first pass through various ML models hosted on Amazon SageMaker to generate the search query and embeddings to compare with those saved in the question bank on OpenSearch.
+7. The `Bot Fulfillment` AWS Lambda function takes the users input and uses [Amazon Comprehend](https://aws.amazon.com/comprehend/) and [Amazon Translate](https://aws.amazon.com/translate/) (if necessary) to translate non-Native Language requests to the Native Language selected by the user during the deployment and then looks up the answer in in Amazon OpenSearch Service. If using LLM features such as [text generation](docs/LLM_Retrieval_and_generative_question_answering/README.md) and  [text embeddings](docs/semantic_matching_using_LLM_embeddings/README.md), these requests will first pass through various ML models hosted on Amazon SageMaker to generate the search query and embeddings to compare with those saved in the question bank on OpenSearch.
 
 8.	If an [Amazon Kendra](https://aws.amazon.com/kendra/) index is [configured for fallback](docs/Kendra_Fallback_README.md), the `Bot Fulfillment` AWS Lambda function forwards the request to Kendra if no matches were returned from the OpenSearch question bank. The text generation LLM can optionally be used to create the search query and to synthesize a response given the returned document excerpts.
 
@@ -96,13 +96,186 @@ If you have an existing stack you can run the following to update your stack:
 npm run update
 ```
 
+## Testing
+
+### Running Unit Tests
+
+To run unit tests execute the following command from the root folder:
+
+```shell
+npm test
+```
+
+To update the test snapshots when modifying the /website or /templates directory, execute the following command:
+
+```shell
+npm run test:update:snapshot
+```
+
+### Running Regression Tests
+
+**NOTE: Running regression tests will create, modify, and delete content and settings from the Content Designer. Only run regression tests on non-production bots where loss or modification of content and settings is acceptable.**
+
+This runs integration tests against a deployed QnABot deployment in your account. Before running the tests follow the above steps to build and deploy a version or deploy using the template from the QnABot landing page: [Launch QnABot](https://docs.aws.amazon.com/solutions/latest/qnabot-on-aws/step-1-launch-the-stack.html). 
+
+
+
+1. Start from the /.nightswatch directory:
+```bash
+cd .nightswatch
+```
+
+2. Install the dependencies of the automated testing:
+
+```bash
+brew install python@3
+brew install geckodriver
+brew install --cask chromedriver
+pip3 install virtualenv
+```
+
+3. Set up a virtual environment for testing, and install the project dependencies into it.
+
+```bash
+python3 -m virtualenv venv
+source ./venv/bin/activate
+pip install -r requirements.txt
+```
+
+4. Ensure you are logged in to the AWS CLI.
+
+Set the following environment variables to point to the a QnA Bot deployment under test:
+
+```bash
+export CURRENT_STACK_REGION='<QNA BOT Region>'
+export CURRENT_STACK_NAME='<QNA BOT Cloudformation Stack Name>'
+export EMAIL='<admin user e-mail>
+```
+
+Optionally provide a username and password for an Admin user to test with. If these environment variables are not set then a default 'QnaAdmin' user will be created during the initial test. If you want to run a specific test then provide a username since the default user will only be created in the initial test.
+
+```bash
+export USER='<QNA BOT existing admin user>'
+export PASSWORD='<QNA BOT existing admin password>'
+```
+
+If you'd like to launch the browser while running tests then also set the below env variable:
+
+```bash
+export HEADLESS_BROWSER='false'
+```
+
+If you'd like to see to start and end time for each test:
+
+```bash
+export TIMESTAMPS='true'
+```
+
+5. The LLM and Kendra tests will only run if the deployed bot has these features enabled. Follow the steps in the Implementation Guide to enable these features to test them:
+ - LLM
+   - Set LLMApi to SAGEMAKER. For more information, please [Enabling LLM support](https://docs.aws.amazon.com/solutions/latest/qnabot-on-aws/enabling-llm-support.html). If stack update fails, check your quota for __ml.g5.12xlarge for endpoint__ usage as mentioned in the note of this article.
+ - Kendra 
+   - Create an index and note the Index ID. For IAM role, you can create a custom new role for this from the dropdown. [Creating an index](https://docs.aws.amazon.com/kendra/latest/dg/create-index.html)
+   - Update deployed stack's parameter DefaultKendraIndexId with Index ID created in the previous step.
+
+6. Run the regression tests from within the test folder:
+
+```bash
+cd functional
+pytest -v
+```
+
+## Publishing
+Power users interested in releasing a custom QnABot can use the following instructions for publishing the deployment artifacts available to external users.
+
+Create an S3 bucket to host the templates from (see $DIST_OUTPUT_BUCKET below). You will also need regional buckets for each region your users will deploy from. The regional buckets must be named $DIST_OUTPUT_BUCKET-$AWS_REGION. You will need to provide appropriate access permissions to the buckets for your targeted users. Please refer to the below links for buckets security and access control best practices:
+- https://docs.aws.amazon.com/AmazonS3/latest/userguide/access-control-block-public-access.html#access-control-block-public-access-policy-status
+- https://docs.aws.amazon.com/AmazonS3/latest/userguide/access-control-best-practices.html
+- https://docs.aws.amazon.com/AmazonS3/latest/userguide/security.html
+
+**NOTE: All buckets must have versioning enabled, otherwise the stack will fail to deploy.**
+
+Set the following environment variables for your custom QnABot:
+
+```shell
+export DIST_OUTPUT_BUCKET='<name of the bucket to upload artifacts to>'
+export SOLUTION_NAME='<name of your custom bot>'
+export VERSION='<bot version>'
+export AWS_REGIONS=("us-east-1" "us-west-2" "ap-southeast-1" "ap-southeast-2" "ca-central-1" "eu-west-1" "ap-northeast-1" "eu-central-1" "eu-west-2" "ap-northeast-2")
+```
+
+The above variables will determine the bucket URL path where your bot will be hosted from. The AWS_REGIONS array is a list of all regions QnABot supports. The list can be modified as necessary if your bot version will not be deployed in certain regions.
+
+Run the following commands to upload the current local version to the specified bucket:
+```shell
+cd deployment
+./build-s3-dist.sh $DIST_OUTPUT_BUCKET $SOLUTION_NAME $VERSION
+aws s3 cp global-s3-assets/  s3://$DIST_OUTPUT_BUCKET/$SOLUTION_NAME/$VERSION/ --recursive --acl bucket-owner-full-control
+```
+
+Create S3 buckets for each region if they do not already exist. These buckets will need to be configured for public use:
+```shell
+for region in "${AWS_REGIONS[@]}";
+do
+  if aws s3api head-bucket --bucket "$DIST_OUTPUT_BUCKET-$region" 2>/dev/null
+  then 
+    echo "Bucket exists: s3://$DIST_OUTPUT_BUCKET-$region"
+  else 
+    aws s3api create-bucket --bucket "$DIST_OUTPUT_BUCKET-$region"
+    echo "Created bucket: s3://$DIST_OUTPUT_BUCKET-$region"
+  fi
+done
+```
+
+Run the below command for each region:
+```shell
+for region in "${AWS_REGIONS[@]}";
+do
+  if aws s3api head-bucket --bucket "$DIST_OUTPUT_BUCKET-$region" 2>/dev/null
+  then 
+    aws s3 cp regional-s3-assets/ s3://$DIST_OUTPUT_BUCKET-$region/$SOLUTION_NAME/$VERSION/ --recursive --acl bucket-owner-full-control 
+  else 
+    echo "Bucket not found: s3://$DIST_OUTPUT_BUCKET-$region"
+  fi
+done
+
+```
+
+The template can be deployed from the following URL for all regions:
+```shell
+echo https://$DIST_OUTPUT_BUCKET.s3.amazonaws.com/$SOLUTION_NAME/$VERSION/qnabot-on-aws-main.template
+```
+
+### Publishing best practices
+1. Never overwrite a published artifact when it is available to external users. Increment the version to upload new artifacts and keep previous versions immutable. Enable bucket versioning to recover artifacts. You may also decide to have a 'latest' version which will always contain the latest version of your bot.
+1. After uploading the artifacts, deploy and test from the S3 URL before releasing to any external users.
+
+## Run Webpack in Development Mode
+
+In order to run Webpack in Development Mode, make sure to have the following
+- Existing deployment of QnABot on AWS
+
+Navigate to the root directory of QnABot (directory will be created once you have cloned this repo).
+
+```shell
+npm install
+```
+
+Next, assign the environment variable, `ASSET_BUCKET_NAME` located in package.json in the npm script `dev mode`. This is the name of the bucket QnABot loads ./website assets to and is usually named \<stack-name\>-bucket-\<randomly-generated-chars\>.
+
+Once set up correctly, run
+```shell
+npm run dev-mode
+```
+
+This should set Webpack to development mode and upload assets in ./website/build to `ASSET_BUCKET_NAME`. This will also watch for any changes in ./website and reload assets into your bucket if the assets change.
+
 ## Designer UI Compatibility
 
 Currently the only browsers supported are:
 
 -   Chrome
 -   Firefox
-    We are currently working on adding Microsoft Edge support.
 
 ## Built With
 
@@ -126,7 +299,7 @@ As QnABot evolves over the years, it makes use of various services and functiona
 _Note: **Deployable solution versions** refers to the ability to deploy the version of QnABot in their AWS accounts. **Actively supported versions** for QnABot is only available for the latest version of QnABot._
 
 ### Deployable Versions
-
+- [v5.5.0](https://github.com/aws-solutions/qnabot-on-aws/releases/tag/v5.5.0) - [Public](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v5.5.0/qnabot-on-aws-main.template)/[VPC](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v5.5.0/qnabot-on-aws-vpc.template)
 - [v5.4.5](https://github.com/aws-solutions/qnabot-on-aws/releases/tag/v5.4.5) - [Public](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v5.4.5/qnabot-on-aws-main.template)/[VPC](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v5.4.5/qnabot-on-aws-vpc.template)
   - _For those upgrading from `v5.4.X` to later versions, if you are upgrading from a deployment with LLMApi set to SAGEMAKER then set this value to DISABLED before upgrading. After upgrading, return this value back to SAGEMAKER.._
 - [v5.4.4](https://github.com/aws-solutions/qnabot-on-aws/releases/tag/v5.4.4) - [Public](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v5.4.4/qnabot-on-aws-main.template)/[VPC](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v5.4.4/qnabot-on-aws-vpc.template)

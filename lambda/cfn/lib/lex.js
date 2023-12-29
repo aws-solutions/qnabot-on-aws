@@ -11,20 +11,19 @@
  *  and limitations under the License.                                                                                *
  *********************************************************************************************************************/
 
-const aws = require('aws-sdk');
-
-const Promise = require('bluebird');
-
-aws.config.region = process.env.REGION;
-aws.config.setPromisesDependency(Promise);
-const lex = new aws.LexModelBuildingService();
-const iam = new aws.IAM();
+const region = process.env.REGION;
+const customSdkConfig = require('./util/customSdkConfig');
+const { parseIntFromLexRequestObject } = require('./util/parseIntFromLexRequestObject');
+const { LexModelBuildingService } = require('@aws-sdk/client-lex-model-building-service');
+const { IAM } = require('@aws-sdk/client-iam');
+const lex = new LexModelBuildingService(customSdkConfig({ region }));
+const iam = new IAM(customSdkConfig({ region }));
 
 function makeid(prefix) {
     let text = '';
     const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
 
-    for (let i = 0; i < 5; i++) { text += possible.charAt(Math.floor(Math.random() * possible.length)); }
+    for (let i = 0; i < 5; i++) { text += possible.charAt(Math.floor(Math.random() * possible.length)); }  // NOSONAR It is safe to use random generator here
     return text;
 }
 
@@ -32,7 +31,7 @@ function id(length) {
     let text = '';
     const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
 
-    for (let i = 0; i < length; i++) { text += possible.charAt(Math.floor(Math.random() * possible.length)); }
+    for (let i = 0; i < length; i++) { text += possible.charAt(Math.floor(Math.random() * possible.length)); }  // NOSONAR It is safe to use random generator here
     return text;
 }
 
@@ -57,33 +56,35 @@ function clean(name) {
 
 function run(fnc, params) {
     console.log(`${fnc}:request:${JSON.stringify(params, null, 3)}`);
+    parseIntFromLexRequestObject(params);
     return new Promise((res, rej) => {
         const next = function (count) {
             console.log(`tries-left:${count}`);
             const request = lex[fnc](params);
-            request.promise()
-                .tap((x) => console.log(`${fnc}:result:${JSON.stringify(x, null, 3)}`))
-                .then(res)
+            request
+                .then((x) => {
+                    console.log(`${fnc}:result:${JSON.stringify(x, null, 3)}`);
+                    res(x);
+                })
                 .catch((err) => {
-                    console.log(`${fnc}:${err.code}`);
-                    const retry = err.retryDelay || 5;
+                    console.log(`${fnc}:error:${err?.name}`);
+                    const retry = err?.retryAfterSeconds || 5;
                     console.log(`retry in ${retry}`);
-
-                    switch (err.code) {
-                    case 'ConflictException':
-                    case 'ResourceInUseException':
-                        count === 0 ? rej('Error') : setTimeout(() => next(--count), retry * 1000);
-                        break;
-                    case 'LimitExceededException':
-                    case 'AccessDeniedException':
-                        setTimeout(() => next(count), retry * 1000);
-                        break;
-                    default:
-                        rej(`${err.code}:${err.message}`);
+                    switch (err?.name) {
+                        case 'ConflictException':
+                        case 'ResourceInUseException':
+                            count === 0 ? rej('Error') : setTimeout(() => next(--count), retry * 2000);
+                            break;
+                        case 'LimitExceededException':
+                        case 'AccessDeniedException':
+                            setTimeout(() => next(count), retry * 1000);
+                            break;
+                        default:
+                            rej(`${err?.name}:${err?.message}`);
                     }
                 });
         };
-        next(10);
+        next(50);
     });
 }
 
@@ -100,21 +101,24 @@ class Lex {
         return lex[this.get_method]({
             name: id,
             versionOrAlias: version,
-        }).promise().get('checksum');
+        })
+        .then(result => result.checksum);
     }
 
     checksumIntentOrSlotType(id, version) {
         return lex[this.get_method]({
             name: id,
             version,
-        }).promise().get('checksum');
+        })
+        .then(result => result.checksum);
     }
 
     checksumBotAlias(botName, name) {
         return lex[this.get_method]({
             botName,
             name,
-        }).promise().get('checksum');
+        })
+        .then(result => result.checksum);
     }
 
     /**
@@ -128,7 +132,7 @@ class Lex {
         return lex.getSlotTypeVersions({
             name: id,
             maxResults: 50,
-        }).promise();
+        });
     }
 
     /**
@@ -142,7 +146,7 @@ class Lex {
         return lex.getIntentVersions({
             name: id,
             maxResults: 50,
-        }).promise();
+        });
     }
 
     /**
@@ -183,7 +187,8 @@ class Lex {
         return lex.getBotVersions({
             name: id,
             maxResults: 50,
-        }).promise().get('bots');
+        })
+        .then(result => result.bots);
     }
 
     /**
@@ -287,7 +292,6 @@ class Lex {
                 console.log('caught', error);
                 reply(error);
             })
-            .error(reply)
             .catch(reply));
     }
 
@@ -297,9 +301,14 @@ class Lex {
         startRole = iam.createServiceLinkedRole({
             AWSServiceName: 'lex.amazonaws.com',
             Description: 'Service linked role for lex',
-        }).promise()
-            .tap(console.log)
-            .catch(console.log);
+        })
+            .then(result => {
+                console.log(result);
+                return result;
+            })
+            .catch(e => {
+                console.log(e);
+            });
         if (params.intents) {
             this.mapForIntentVersions(params.intents).then((map) => {
                 params.intents.forEach((element) => {
@@ -313,7 +322,6 @@ class Lex {
                         console.log('caught', error);
                         reply(error);
                     })
-                    .error(reply)
                     .catch(reply));
             }).catch((error) => {
                 console.log('caught', error);
@@ -326,7 +334,6 @@ class Lex {
                     console.log('caught', error);
                     reply(error);
                 })
-                .error(reply)
                 .catch(reply));
         }
         return startRole;
@@ -347,7 +354,6 @@ class Lex {
                         console.log('caught', error);
                         reply(error);
                     })
-                    .error(reply)
                     .catch(reply));
             }).catch((error) => {
                 console.log('caught', error);
@@ -360,7 +366,6 @@ class Lex {
                     console.log('caught', error);
                     reply(error);
                 })
-                .error(reply)
                 .catch(reply);
         }
     }
@@ -373,7 +378,6 @@ class Lex {
             start.then(() => run(self.create_method, params))
                 .then((msg) => reply(null, msg.name, null))
                 .catch((error) => { console.log('caught', error); reply(error); })
-                .error(reply)
                 .catch(reply);
         }).catch((error) => { console.log('caught', error); reply(error); });
     }
@@ -399,7 +403,8 @@ class Lex {
         console.log(`Type: ${this.type}`);
         delete params.prefix;
         const self = this;
-        if (this.type !== 'Alias') {
+
+        if (this.type === 'Alias') {
             // The type of Alias should not be updated.
             reply(null, ID);
             return;
@@ -446,7 +451,6 @@ class Lex {
             run(self.update_method, params)
                 .then((msg) => reply(null, msg.name, null))
                 .catch((error) => { console.log('caught', error); reply(error); })
-                .error(reply)
                 .catch(reply);
         } catch (err) {
             console.log(`Exception detected: ${err}`);
@@ -464,7 +468,6 @@ class Lex {
                     run(self.update_method, params)
                         .then((msg) => reply(null, msg.name, null))
                         .catch((error) => { console.log('caught', error); reply(error); })
-                        .error(reply)
                         .catch(reply);
                 }).catch((error) => { console.log('caught', error); reply(error); });
             }).catch((error) => { console.log('caught', error); reply(error); });
@@ -474,17 +477,16 @@ class Lex {
         }
     }
 
-    async updateSlotType(params, ID, self, reply) {
+    updateSlotType(params, ID, self, reply) {
         params.name = ID;
-        try {
-            await this.slotTypeVersions(ID).then((versions) => {
+        try { // NOSONAR - javascript:S3800 - this is existing pattern in this file
+            this.slotTypeVersions(ID).then((versions) => {
                 this.checksumIntentOrSlotType(ID, '$LATEST').then((cksum) => {
                     params.checksum = cksum;
                     console.log(`Slot parameters for update are: ${JSON.stringify(params, null, 2)}`);
                     run(self.update_method, params)
                         .then((msg) => reply(null, msg.name, null))
                         .catch((error) => { console.log('caught', error); reply(error); })
-                        .error(reply)
                         .catch(reply);
                 }).catch((error) => { console.log('caught', error); reply(error); });
             });
@@ -514,7 +516,6 @@ class Lex {
                                 console.log('caught', error);
                                 reply(error);
                             })
-                            .error(reply)
                             .catch(reply);
                     }).catch((error) => {
                         console.log('caught', error);
@@ -528,7 +529,6 @@ class Lex {
                             console.log('caught', error);
                             reply(error);
                         })
-                        .error(reply)
                         .catch(reply);
                 }
             }).catch((error) => { console.log('caught', error); reply(error); });
@@ -558,7 +558,6 @@ class Lex {
                             console.log('caught', error);
                             reply(error);
                         })
-                        .error(reply)
                         .catch(reply);
                 }).catch((error) => {
                     console.log('caught', error);
@@ -572,10 +571,9 @@ class Lex {
     }
 
     Delete(ID, params, reply) {
+        console.log(`Delete Lex ID: ${ID}`);
         const arg = { name: ID };
-
         if (this.type === 'BotAlias') arg.botName = params.botName;
-
         return run(this.delete_method, arg)
             .then((msg) => reply(null, msg.name, null))
             .catch((error) => {

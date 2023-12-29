@@ -1,6 +1,6 @@
 {
     "name": "examples",
-    "version": "5.4.5",
+    "version": "5.5.0",
     "description": "Lambda contains a collection of lambda hooks for QnABot and a custom resource to create the example documents",
     "main": "index.js",
     "scripts": {
@@ -12,7 +12,6 @@
     },
     "license": "Apache-2.0",
     "dependencies": {
-        "bluebird": "^3.5.1",
         "cfn-response": "^1.0.1",
         "handlebars": "^4.7.7",
         "lodash": "^4.17.21"

@@ -1,6 +1,6 @@
 {
     "name": "proxy-es",
-    "version": "5.4.5",
+    "version": "5.5.0",
     "description": "QnABot Lambda function is used to proxy request from apigateway to elasticsearch",
     "main": "index.js",
     "author": {

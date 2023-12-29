@@ -11,41 +11,43 @@
  *  and limitations under the License.                                                                                *
  *********************************************************************************************************************/
 
-const aws=require('./aws')
-const lex=new aws.LexModelBuildingService()
+const region = process.env.AWS_REGION || 'us-east-1';
+const { LexModelBuildingService } = require('@aws-sdk/client-lex-model-building-service');
+const customSdkConfig = require('sdk-config/customSdkConfig');
+const lex = new LexModelBuildingService(customSdkConfig('C001', { region }));
 
-module.exports=async function run(fnc,params){
-    console.log(fnc+':request:'+JSON.stringify(params,null,3))
-    const next=async function(count){
-        console.log('tries-left:'+count)
+module.exports = async function run(fnc, params){
+    console.log(fnc + ':request:' + JSON.stringify(params, null, 3));
+    const next = async function(count){
+        console.log('tries-left:' + count);
         try {
-            const response= await lex[fnc](params).promise()
-            console.log(fnc+':result:'+JSON.stringify(response,null,3))
+            const response = await lex[fnc](params);
+            console.log(fnc + ':result:'+ JSON.stringify(response, null, 3));
             return response
         } catch (err) {
-            console.log(fnc+':'+err.code)
-            const retry = err.retryDelay || 5
-            console.log('retry in '+retry)
+            console.log(fnc + ':' + err?.name);
+            const retry = err?.retryAfterSeconds || 5;
+            console.log('retry in ' + retry);
 
-            if(err.code==='ConflictException'){
-                if(count===0) throw new Error('Error');
-                await retryPromise(retry*1000)
-                return next(--count);
-            }else if(err.code==='ResourceInUseException'){
-                if(count===0) throw new Error('Error');
-                await retryPromise(retry*1000)
-                return next(--count);
-            }else if(err.code==='LimitExceededException'){
-                await retryPromise(retry*1000)
-                return next(count);
+            if(err?.name === 'ConflictException'){
+                if(count === 0) throw new Error('Error');
+                await retryPromise(retry*1000);
+                await next(--count);
+            }else if(err?.name === 'ResourceInUseException'){
+                if(count === 0) throw new Error('Error');
+                await retryPromise(retry*1000);
+                await next(--count);
+            }else if(err?.name === 'LimitExceededException'){  // NOSONAR easier for code understanding
+                await retryPromise(retry*1000);
+                await next(count);
             }else{
-                throw new Error(err.code+':'+err.message)
-            }  
+                throw new Error(err?.name + ':' + err?.message);
+            }
         }
     }
-    return await next(200)
+    return await next(200);
 }
 
-function retryPromise(ms) {
-    return new Promise(res => setTimeout(res, ms))
+async function retryPromise(ms) {
+    return new Promise(res => setTimeout(res, ms));
 }

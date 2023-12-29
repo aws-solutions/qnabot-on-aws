@@ -20,8 +20,9 @@ const zlib = require('zlib')
 const Url = require('url')
 const sign = require('aws4').sign
 const fs = require('fs')
-const aws = require('aws-sdk')
-aws.config.region = config.region
+const { LambdaClient, UpdateFunctionCodeCommand } = require('@aws-sdk/client-lambda');
+const { LexRuntimeServiceClient: LexRuntime, PostTextCommand } = require('@aws-sdk/client-lex-runtime-service');
+const region = config.region
 const outputs = require('../../../bin/exports')
 const exists = require('./util').exists
 const run = require('./util').run
@@ -33,8 +34,8 @@ module.exports = {
     setUp: function(cb) {
         const self = this
         outputs('dev/master').then(function(output) {
-                self.lex = new aws.LexRuntime({
-                    region: config.region,
+                self.lex = new LexRuntime({
+                    region,
                     params: {
                         botAlias: output.BotAlias,
                         botName: output.BotName,
@@ -56,9 +57,9 @@ module.exports = {
                     a: "i am the unit"
                 }
             })
-            const response = await this.lex.postText({
+            const response = await this.lex.send(new PostTextCommand({
                 inputText: "hello"
-            }).promise()
+            }))
             console.log(response)
             test.ok(response.sessionAttributes.previous)
         }
@@ -75,9 +76,9 @@ module.exports = {
         }
     },
     miss: function(test) {
-        this.lex.postText({
+        this.lex.send(new PostTextCommand({
                 inputText: "zzzzzzzzzzzzzzzzzzz"
-            }).promise()
+            }))
             .then(x => { 
                 test.equal(x.dialogState, "ElicitIntent");
                 console.log(x);
@@ -85,9 +86,9 @@ module.exports = {
             .finally(test.done)
     },
     empty: function(test) {
-        this.lex.postText({
+        this.lex.send(new PostTextCommand({
                 inputText: "help"
-            }).promise()
+            }))
             .then(x => {
                 test.equal(x.dialogState, "Fulfilled");
                 console.log(x);
@@ -122,16 +123,16 @@ module.exports = {
                     a: "you are the test"
                 }
             }))
-            .then(() => self.lex.postText({
+            .then(() => self.lex.send(new PostTextCommand({
                 inputText: "who am i"
-            }).promise())
+            })))
             .then(x => { 
                 test.ok(x.responseCard)
                 console.log(x)
             })
-            .then(() => self.lex.postText({
+            .then(() => self.lex.send(new PostTextCommand({
                 inputText: "who are you"
-            }).promise())
+            })))
             .then(x => { 
                 test.ok(!x.responseCard)
                 console.log(x)
@@ -176,30 +177,30 @@ module.exports = {
                 })
              ])
             .then(() => {
-                const result = self.lex.postText({
+                const result = self.lex.send(new PostTextCommand({
                     inputText: "what do zombies eat",
                     sessionAttributes: {}
-                }).promise();
+                }));
                 console.log(result);
                 return result;
             })
             .then(res => test.equal(res.sessionAttributes.topic, "zombies"))
             .then(() => {
-                const result  = self.lex.postText({
+                const result  = self.lex.send(new PostTextCommand({
                 inputText: "what do they eat",
                 sessionAttributes: {
                     topic: "zombies"
                 }
-                }).promise()
+                }))
                 console.log(result);
                 return result;
             })
             .then(res => test.equal(res.sessionAttributes.topic, "zombies"))
             .then(() => {
-                const result = self.lex.postText({
+                const result = self.lex.send(new PostTextCommand({
                     inputText: "what do humans eat",
                     sessionAttributes: {}
-                }).promise()
+                }))
                 console.log(result)
                 return result;
             })
@@ -210,15 +211,15 @@ module.exports = {
         const self = this
         const id1 = 'unit-test.1'
         const id2 = "unit-test.2"
-        const lambda = new aws.Lambda({
-            region: config.region
+        const lambda = new LambdaClient({
+            region
         })
         const func = outputs('dev/lambda').then(function(output) {
-                return lambda.updateFunctionCode({
+                return lambda.send(new UpdateFunctionCodeCommand({
                     FunctionName: output.lambda,
                     Publish: true,
                     ZipFile: fs.readFileSync(__dirname + '/hook.zip')
-                }).promise()
+                }));
             })
             .then(output => api({
                 path: `questions/${id1}`,
@@ -232,10 +233,10 @@ module.exports = {
                 }
             }))
             .then(() => {
-                const result = self.lex.postText({
+                const result = self.lex.send(new PostTextCommand({
                     inputText: "what do zombies eat",
                     sessionAttributes: {}
-                }).promise()
+                }))
                 console.log(result)
             })
             .then(res => test.equal(res.message, "hook"))
@@ -276,18 +277,18 @@ module.exports = {
                     }
                 })
             let sessionAttributes = {}
-            let response = await this.lex.postText({
+            let response = await this.lex.send(new PostTextCommand({
                 sessionAttributes: sessionAttributes,
                 inputText: "next"
-            }).promise()
+            }))
             console.log(response)
             sessionAttributes = response.sessionAttributes
             test.equal(response.message, "Unable to go to the next room...")
 
-            response = await this.lex.postText({
+            response = await this.lex.send(new PostTextCommand({
                 sessionAttributes: sessionAttributes,
                 inputText: "previous"
-            }).promise()
+            }))
             console.log(response)
             sessionAttributes = response.sessionAttributes
             test.equal(response.message, "Unable to go to the previous room...")
@@ -379,50 +380,50 @@ module.exports = {
             })
             let sessionAttributes = {}
             let response
-            response = await this.lex.postText({
+            response = await this.lex.send(new PostTextCommand({
                 sessionAttributes:sessionAttributes,
                 inputText: "One"
-            }).promise()
+            }))
             console.log(response)
             sessionAttributes = response.sessionAttributes
             test.equal(response.message, "One")
 
-            response = await this.lex.postText({
+            response = await this.lex.send(new PostTextCommand({
                 sessionAttributes:sessionAttributes,
                 inputText: "Two"
-            }).promise()
+            }))
             console.log(response)
             sessionAttributes = response.sessionAttributes
             test.equal(response.message, "Two")
 
-            response = await this.lex.postText({
+            response = await this.lex.send(new PostTextCommand({
                 sessionAttributes:sessionAttributes,
                 inputText: "next"
-            }).promise()
+            }))
             console.log(response)
             sessionAttributes = response.sessionAttributes
             test.equal(response.message, "Three")
 
-            response = await this.lex.postText({
+            response = await this.lex.send(new PostTextCommand({
                 sessionAttributes:sessionAttributes,
                 inputText: "previous"
-            }).promise()
+            }))
             console.log(response)
             sessionAttributes = response.sessionAttributes
             test.equal(response.message, "Two")
 
-            response = await this.lex.postText({
+            response = await this.lex.send(new PostTextCommand({
                 sessionAttributes:sessionAttributes,
                 inputText: "Two"
-            }).promise()
+            }))
             console.log(response)
             sessionAttributes = response.sessionAttributes
             test.equal(response.message, "Two")
 
-            response = await this.lex.postText({
+            response = await this.lex.send(new PostTextCommand({
                 sessionAttributes:sessionAttributes,
                 inputText: "previous"
-            }).promise()
+            }))
             console.log(response)
             sessionAttributes = response.sessionAttributes
             test.equal(response.message, "One")
@@ -462,15 +463,15 @@ module.exports = {
     navigation3: async function(test) {
         try {
             const args = await outputs('dev/master')
-            const lambda = new aws.Lambda({
-                region: config.region
+            const lambda = new LambdaClient({
+                region
             })
             const output = await outputs('dev/lambda');
-            await lambda.updateFunctionCode({
+            await lambda.send(new UpdateFunctionCodeCommand({
                 FunctionName: output.lambda,
                 Publish: true,
                 ZipFile: fs.readFileSync(__dirname + '/hook.zip')
-            })
+            }))
             const func = output;
             await api({
                     path: "questions/navigationlambda.1",
@@ -540,42 +541,42 @@ module.exports = {
             })
             let sessionAttributes = {}
             let response
-            response = await this.lex.postText({
+            response = await this.lex.send(new PostTextCommand({
                 sessionAttributes:sessionAttributes,
                 inputText: "One"
-            }).promise()
+            }))
             console.log(response)
             sessionAttributes = response.sessionAttributes
             test.equal(response.message, "One")
 
-            response = await this.lex.postText({
+            response = await this.lex.send(new PostTextCommand({
                 sessionAttributes:sessionAttributes,
                 inputText: "next"
-            }).promise()
+            }))
             console.log(response)
             sessionAttributes = response.sessionAttributes
             test.equal(response.message, "hook")
 
-            response = await this.lex.postText({
+            response = await this.lex.send(new PostTextCommand({
                 sessionAttributes:sessionAttributes,
                 inputText: "next"
-            }).promise()
+            }))
             console.log(response)
             sessionAttributes = response.sessionAttributes
             test.equal(response.message, "Three")
 
-            response = await this.lex.postText({
+            response = await this.lex.send(new PostTextCommand({
                 sessionAttributes:sessionAttributes,
                 inputText: "previous"
-            }).promise()
+            }))
             console.log(response)
             sessionAttributes = response.sessionAttributes
             test.equal(response.message, "hook")
 
-            response = await this.lex.postText({
+            response = await this.lex.send(new PostTextCommand({
                 sessionAttributes:sessionAttributes,
                 inputText: "previous"
-            }).promise()
+            }))
             console.log(response)
             sessionAttributes = response.sessionAttributes
             test.equal(response.message, "One")
@@ -640,58 +641,58 @@ module.exports = {
 
             let sessionAttributes = {}
             let response
-            response = await this.lex.postText({
+            response = await this.lex.send(new PostTextCommand({
                 sessionAttributes:sessionAttributes,
                 inputText: "feedback"
-            }).promise()
+            }))
             console.log(response)
             sessionAttributes = response.sessionAttributes
             test.equal(response.message, "There is no question to leave feedback on, please ask a question before attempting to leave feedback")
 
-            response = await this.lex.postText({
+            response = await this.lex.send(new PostTextCommand({
                 sessionAttributes:sessionAttributes,
                 inputText: "One"
-            }).promise()
+            }))
             console.log(response)
             sessionAttributes = response.sessionAttributes
             test.equal(response.message, "One")
 
-            response = await this.lex.postText({
+            response = await this.lex.send(new PostTextCommand({
                 sessionAttributes:sessionAttributes,
                 inputText: "feedback"
-            }).promise()
+            }))
             console.log(response)
             sessionAttributes = response.sessionAttributes
             test.ok(response.message.includes("\"One\""))
 
-            response = await this.lex.postText({
+            response = await this.lex.send(new PostTextCommand({
                 sessionAttributes:sessionAttributes,
                 inputText: "goodbye"
-            }).promise()
+            }))
             console.log(response)
             sessionAttributes = response.sessionAttributes
             test.ok(response.message.includes("\"One\""))
 
-            response = await this.lex.postText({
+            response = await this.lex.send(new PostTextCommand({
                 sessionAttributes:sessionAttributes,
                 inputText: "a"
-            }).promise()
+            }))
             console.log(response)
             sessionAttributes = response.sessionAttributes
             test.ok(response.message.includes("Thank you for leaving the feedback"))
 
-            response = await this.lex.postText({
+            response = await this.lex.send(new PostTextCommand({
                 sessionAttributes:sessionAttributes,
                 inputText: "feedback"
-            }).promise()
+            }))
             console.log(response)
             sessionAttributes = response.sessionAttributes
             test.ok(response.message.includes("\"One\""))
 
-            response = await this.lex.postText({
+            response = await this.lex.send(new PostTextCommand({
                 sessionAttributes:sessionAttributes,
                 inputText: "C"
-            }).promise()
+            }))
             console.log(response)
             sessionAttributes = response.sessionAttributes
             test.ok(response.message.includes("Canceled Feedback"))

@@ -11,25 +11,30 @@
  *  and limitations under the License.                                                                                *
  *********************************************************************************************************************/
 
-const aws = require('./util/aws');
+const { LambdaClient, PublishVersionCommand } = require('@aws-sdk/client-lambda');
+const customSdkConfig = require('./util/customSdkConfig');
 
-const lambda = new aws.Lambda();
+const region = process.env.AWS_REGION || 'us-east-1';
+const lambda = new LambdaClient(customSdkConfig({ region }));
 
 module.exports = class LambdaVersion extends require('./base') {
     constructor() {
         super();
     }
 
-    Create(params, reply) {
-        lambda.publishVersion({
-            FunctionName: params.FunctionName,
-        }).promise()
-            .tap(console.log)
-            .then((result) => reply(null, result.Version, { Version: result.Version }))
-            .catch(reply);
+    async Create(params, reply) {
+        try {
+            const result = await lambda.send(new PublishVersionCommand({
+                FunctionName: params.FunctionName,
+            }));
+            console.log(result);
+            reply(null, result.Version, { Version: result.Version });
+        } catch (e) {
+            reply(e);
+        }
     }
 
-    Update(ID, params, oldparams, reply) {
-        this.Create(params, reply);
+    async Update(ID, params, oldparams, reply) {
+        await this.Create(params, reply);
     }
 };

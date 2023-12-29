@@ -16,6 +16,7 @@ const qnabot = require('qnabot/logging');
 const request = require('./request');
 const build_es_query = require('./esbodybuilder');
 const hits_topic_tiebreaker = require('./hits_topic_tiebreaker');
+const { utteranceIsQid } = require('./fulfillment-event/qid');
 
 async function isESonly(req, query_params) {
     // returns boolean whether question is supported only on ElasticSearch
@@ -26,12 +27,14 @@ async function isESonly(req, query_params) {
     if (ES_only_questions.includes(query_params.question)) {
         return true;
     }
+
     // QID querying is ES only
-    if (query_params.question.toLowerCase().startsWith('qid::')) {
+    if (utteranceIsQid(query_params.question)) {
         return true;
     }
+
     // setting topics is ES only
-    if (_.get(query_params, 'topic') != '') {
+    if (_.get(query_params, 'topic', '') != '') {
         return true;
     }
     // setting clientFilterValues should block Kendra FAQ indexing
@@ -46,7 +49,7 @@ async function isESonly(req, query_params) {
         return true;
     }
     // Don't send one word questions to Kendra
-    if (query_params.question.split(' ').length < 2) {
+    if (query_params.question.split(' ').length < 2) { // NOSONAR Does not improve readability
         return true;
     }
 
@@ -69,6 +72,9 @@ async function run_query_es(req, query_params) {
         query_params.size = 10;
     }
 
+    query_params.locale = _.get(req, '_locale.localeIdentified');
+    query_params.translation = _.get(req, '_translation.QuestionInBackupLanguage');
+
     // build query to check for match on stored questions (default)
     const es_query = await build_es_query(query_params);
     let es_response = await request({
@@ -77,7 +83,7 @@ async function run_query_es(req, query_params) {
         body: es_query,
     });
 
-    const isQID = query_params.question.toLowerCase().startsWith('qid::');
+    const isQID = utteranceIsQid(query_params.question);
 
     const threshold = getThreshold(isQID, query_params);
 
@@ -109,7 +115,15 @@ async function run_query_es(req, query_params) {
     // another query to match the item text passage field (applicable on for items of type 'text').
     if (!gothits && _.get(query_params, 'settings.ES_SCORE_TEXT_ITEM_PASSAGES')) {
         qnabot.log('ES_SCORE_TEXT_ITEM_PASSAGES is true. Rerun query to check for matches on text field.');
+
+        /*  prevent querying the item answers field because:
+            1. it was already attempted before
+            2. it will then pollute the returned results and, combined with (a potentially lower) EMBEDDINGS_TEXT_PASSAGE_SCORE_THRESHOLD,
+               it may lead to have the answer item returned to the user, with no LLM processing (and mixed with the wrong threshold)
+        */
+        query_params.score_answer = false;
         query_params.score_text_passage = true;
+
         const es_query_on_text_passage = await build_es_query(query_params);
         es_response = await request({
             url: `https://${req._info.es.address}/${req._info.es.index}/_search?search_type=dfs_query_then_fetch`,

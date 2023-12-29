@@ -11,52 +11,19 @@
  *  and limitations under the License.                                                                                *
  *********************************************************************************************************************/
 
-const aws = require('aws-sdk');
 const qnabot = require('qnabot/logging');
+const { signS3URL } = require('./signS3URL');
 
 // start connection
 const _ = require('lodash');
 const Handlebars = require('handlebars');
-const supportedLanguages = require('./supportedLanguages');
+const { getSupportedLanguages, getLanguageErrorMessages } = require('./supportedLanguages');
 
 let res_glbl = {};
 let req_glbl = {};
+let hit_glbl = {};
 let autotranslate;
 
-// used by signS3Url helper
-function signS3URL(url, expireSecs) {
-    let bucket; let
-        key;
-    if (url.search(/\/s3[.-](\w{2}-\w{4,9}-\d\.)?amazonaws\.com/) != -1) {
-        // bucket in path format
-        bucket = url.split('/')[3];
-        key = url.split('/').slice(4).join('/');
-    }
-    if (url.search(/\.s3[.-](\w{2}-\w{4,9}-\d\.)?amazonaws\.com/) != -1) {
-        // bucket in hostname format
-        const hostname = url.split('/')[2];
-        bucket = hostname.split('.')[0];
-        key = url.split('/').slice(3).join('/');
-    }
-    if (bucket && key) {
-        qnabot.log('Attempt to convert S3 url to a signed URL: ', url);
-        qnabot.log('Bucket: ', bucket, ' Key: ', key);
-        try {
-            const s3 = new aws.S3();
-            const signedurl = s3.getSignedUrl('getObject', {
-                Bucket: bucket,
-                Key: key,
-                Expires: expireSecs,
-            });
-            url = signedurl;
-        } catch (err) {
-            qnabot.log('Error signing S3 URL (returning original URL): ', err);
-        }
-    } else {
-        qnabot.log('URL is not an S3 url - return unchanged: ', url);
-    }
-    return url;
-}
 
 function convertOperatorToFunc(operator) {
     switch (operator) {
@@ -118,17 +85,11 @@ Handlebars.registerHelper('defaultLang', function (options) {
         autotranslate = true;
         return options.fn(this);
     }
-    if (previousMatchLang === undefined) {
-        // case three. Hitting the default lang response and no previous lang has been encountered. Return default value
-        // but set matchlang to false for next processing. Enable autotranslation.
-        _.set(req_glbl.session, 'matchlang', 'false');
-        autotranslate = true;
-        return options.fn(this);
-    }
-    if (previousMatchLang === undefined) {
-        _.set(req_glbl.session, 'matchlang', 'false');
-    }
-    return options.inverse(this);
+    // case three. Hitting the default lang response and no previous lang has been encountered. Return default value
+    // but set matchlang to false for next processing. Enable autotranslation.
+    _.set(req_glbl.session, 'matchlang', 'false');
+    autotranslate = true;
+    return options.fn(this);
 });
 
 Handlebars.registerHelper('setLang', function (lang, last, options) {
@@ -141,11 +102,14 @@ Handlebars.registerHelper('setLang', function (lang, last, options) {
     const userLocaleKey = 'session.qnabotcontext.userLocale';
     const currentPreferredLocale = _.get(res_glbl, userPreferredLocaleKey);
     const currentUserLocale = _.get(res_glbl, userLocaleKey);
+    const backupLanguage = _.get(res_glbl.Settings, 'BACKUP_LANGUAGE', 'English');
+    const supportedLangMap = getSupportedLanguages();
+    const langCode = supportedLangMap[backupLanguage];
     let errorLocale;
     if (currentPreferredLocale) {
         errorLocale = currentPreferredLocale;
     } else {
-        errorLocale = currentUserLocale || 'en';
+        errorLocale = currentUserLocale || langCode;
     }
     const capitalize = (s) => {
         if (typeof s !== 'string') return '';
@@ -153,9 +117,8 @@ Handlebars.registerHelper('setLang', function (lang, last, options) {
     };
     const errorFound = _.get(req_glbl._event, 'errorFound');
     const userLanguage = capitalize(_.get(req_glbl._event, 'inputTranscript'));
-    const supported_languages = supportedLanguages.getSupportedLanguages();
-    const languageErrorMessages = supportedLanguages.getLanguageErrorMessages();
-    const userLanguageCode = supported_languages[userLanguage];
+    const languageErrorMessages = getLanguageErrorMessages();
+    const userLanguageCode = supportedLangMap[userLanguage];
 
     if (userLanguageCode === undefined && !errorFound) {
         qnabot.log('no language mapping for user utterance');
@@ -199,6 +162,12 @@ Handlebars.registerHelper('setSessionAttr', function () {
     return '';
 });
 
+Handlebars.registerHelper('getQuestion', () => {
+    const question = hit_glbl.questions[0].q;
+    qnabot.log('Return question matched from hit: ', question);
+    return question;
+});
+
 Handlebars.registerHelper('getSessionAttr', (attr, def, options) => {
     const v = _.get(res_glbl.session, attr, def);
     qnabot.log('Return session attribute key, value: ', attr, v);
@@ -212,7 +181,10 @@ Handlebars.registerHelper('getSlot', (slotname, def, options) => {
 });
 
 Handlebars.registerHelper('signS3URL', (s3url, options) => {
-    const signedUrl = signS3URL(s3url, 300);
+    let signedUrl;
+    signS3URL(s3url, 300, (url) => {
+        signedUrl = url;
+    });
     qnabot.log('Return signed S3 URL: ', signedUrl);
     // return SafeString to prevent unwanted url escaping
     return new Handlebars.SafeString(signedUrl);
@@ -221,7 +193,7 @@ Handlebars.registerHelper('signS3URL', (s3url, options) => {
 Handlebars.registerHelper('randomPick', function () {
     const argcount = arguments.length - 1; // ignore final 'options' argument
     qnabot.log('Select randomly from ', argcount, 'inputs: ', arguments);
-    const item = arguments[Math.floor(Math.random() * argcount)];
+    const item = arguments[Math.floor(Math.random() * argcount)];  // NOSONAR It is safe to use random generator here
     qnabot.log('Selected: ', item);
     return item;
 });
@@ -360,8 +332,10 @@ const apply_handlebars = async function (req, res, hit) {
     qnabot.log('apply handlebars');
     qnabot.debug(`req is: ${JSON.stringify(req, null, 2)}`);
     qnabot.log(`res is: ${JSON.stringify(res, null, 2)}`);
+    qnabot.log(`hit is: ${JSON.stringify(hit, null, 2)}`);
     res_glbl = res; // shallow copy - allow modification by setSessionAttr helper
     req_glbl = req; // shallow copy - allow sessionAttributes retrieval by ifLang helper
+    hit_glbl = hit; // shallow copy - allow getQuestion retrieval
     _.set(req_glbl._event, 'errorFound', false);
     const context = {
         LexOrAlexa: req._type,

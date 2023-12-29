@@ -69,6 +69,7 @@ You can add pre-processing and post-processing Lambda hooks (that run before pre
 
 ![settings hooks](./images/pre_post_hook.png)
 
+You can define your own lambda hook within the /templates/extensions directory (see /templates/extensions/js_lambda_hooks/CustomJSHook and /templates/extensions/py_lambda_hooks/CustomPYHook for examples). Adding lambdas to this directory will append the lambda hook arn to the fulfillment lambda role invocation policy.
 ## Lambda Hook SDK (Javascript)
 
 Lambda hook SDK hides the internal and lower-level complexities of modifying the QnABot request and response, and provides a simple high-level code layer.

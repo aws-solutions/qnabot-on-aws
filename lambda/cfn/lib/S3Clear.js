@@ -11,10 +11,15 @@
  *  and limitations under the License.                                                                                *
  *********************************************************************************************************************/
 
-const Promise = require('bluebird');
-const aws = require('./util/aws');
+const aws = require('aws-sdk');
 
-const s3 = new aws.S3();
+aws.config.region = process.env.AWS_REGION || 'us-east-1';
+aws.config.signatureVersion = 'v4';
+const region = process.env.AWS_REGION || 'us-east-1';
+const { S3Client, ListObjectVersionsCommand, DeleteObjectsCommand } = require('@aws-sdk/client-s3');
+const customSdkConfig = require('./util/customSdkConfig');
+
+const s3 = new S3Client(customSdkConfig({ region }));
 
 module.exports = class S3Clear extends require('./base') {
     constructor() {
@@ -41,26 +46,32 @@ module.exports = class S3Clear extends require('./base') {
 };
 
 function del(params) {
-    return s3.listObjectVersions({
+    return s3.send(new ListObjectVersionsCommand({
         Bucket: params.Bucket,
         Prefix: params.Prefix,
-    }).promise().tap(console.log)
-        .then((x) => x.Versions.concat(x.DeleteMarkers))
-        .tap((x) => console.log('Files', x))
-        .then((files) => files.map((file) => ({
-            Key: file.Key,
-            VersionId: file.VersionId,
-        })))
-        .tap((x) => console.log('going to delete', x))
-        .then((keys) => {
-            if (keys.length > 0) {
-                return s3.deleteObjects({
+    }))
+        .then((x) => [...(x.Versions || []), ...(x.DeleteMarkers || [])])
+        .then(files => {
+            console.log("Files: ", files);
+            return files.map((file) => ({
+                Key: file.Key,
+                VersionId: file.VersionId,
+            }));
+        
+        })
+        .then((keys) => { // NOSONAR - javascript:S3800 - this is existing pattern where thenable response returns true
+            console.log("Keys: ", keys);
+            if (keys?.length > 0) {
+                return s3.send(new DeleteObjectsCommand({
                     Bucket: params.Bucket,
                     Delete: {
                         Objects: keys,
                     },
-                }).promise()
-                    .return(true);
+                }))
+                    .then((response) => {
+                        console.log("Delete Response Status Code: ", response?.$metadata?.httpStatusCode);
+                        return true;  
+                    });
             }
             return false;
         });

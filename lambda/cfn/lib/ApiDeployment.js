@@ -11,11 +11,11 @@
  *  and limitations under the License.                                                                                *
  *********************************************************************************************************************/
 
-const aws = require('./util/aws');
-const Promise = require('./util/promise');
-
-aws.config.maxRetries = 10;
-const api = new aws.APIGateway();
+const { APIGatewayClient, CreateDeploymentCommand, UpdateStageCommand, DeleteDeploymentCommand } = require('@aws-sdk/client-api-gateway');
+const customSdkConfig = require('./util/customSdkConfig');
+const maxRetries = 10;
+const region = process.env.AWS_REGION || 'us-east-1';
+const api = new APIGatewayClient(customSdkConfig({ maxRetries, region }));
 const _ = require('lodash');
 
 module.exports = class ApiDeployment {
@@ -24,11 +24,13 @@ module.exports = class ApiDeployment {
         // If we want to add an API resource to a nested stack we have to redeploy the same API
         // from the nested stack.  CF will send a Create, but we need to treat it like an Update
         if (!('ApiDeploymentId' in params)) {
-            run(() => api.createDeployment(
-                _.omit(params, ['buildDate', 'stage', 'Encryption', 'ApiDeploymentId', 'LexV2BotLocaleIds']),
-            ).promise())
-                .tap(console.log)
-                .then((x) => reply(null, x.id))
+            run(() => api.send(new CreateDeploymentCommand(
+                _.omit(params, ['buildDate', 'stage', 'Encryption', 'ApiDeploymentId', 'LexV2BotLocaleIds'])
+            )))
+                .then(x => {
+                    console.log(x);
+                    reply(null, x.id);
+                })
                 .catch(reply);
         } else {
             console.log(`Updating ${params.ApiDeploymentId} as part of 'Create'`);
@@ -39,15 +41,13 @@ module.exports = class ApiDeployment {
     }
 
     Update(ID, params, oldparams, reply) {
-        const self = this;
         new Promise((res, rej) => {
             console.log('Creating new deployment as part of \'Update\'');
-
-            self.Create(params, (error, id) => {
+            this.Create(params, (error, id) => {
                 error ? rej(error) : setTimeout(() => res(id), 2000);
             });
         })
-            .then((id) => run(() => api.updateStage({
+            .then((id) => run(() => api.send(new UpdateStageCommand({
                 restApiId: params.restApiId,
                 stageName: params.stage,
                 patchOperations: [{
@@ -55,7 +55,7 @@ module.exports = class ApiDeployment {
                     path: '/deploymentId',
                     value: id,
                 }],
-            }).promise()
+            }))
                 .then(() => id)))
             .then((id) => reply(null, id))
             .catch((x) => {
@@ -66,10 +66,10 @@ module.exports = class ApiDeployment {
     }
 
     Delete(ID, params, reply) {
-        run(() => api.deleteDeployment({
+        run(() => api.send(new DeleteDeploymentCommand({
             deploymentId: ID,
             restApiId: params.restApiId,
-        }).promise())
+        })))
             .finally((x) => reply(null, ID));
     }
 };
@@ -82,11 +82,14 @@ function run(fnc) {
             if (count > 0) {
                 fnc()
                     .then(res)
-                    .catch((x) => x.statusCode === 429, (x) => {
-                        console.log(`retry in ${x.retryDelay}`);
-                        setTimeout(() => next(--count), x.retryDelay * 1000);
+                    .catch(x => {
+                        if (x.statusCode === 429) {
+                            console.log(`retry in ${x.retryDelay}`);
+                            setTimeout(() => next(--count), x.retryDelay * 1000);
+                        } else {
+                            rej(x);
+                        }
                     })
-                    .catch(rej);
             } else {
                 rej('timeout');
             }

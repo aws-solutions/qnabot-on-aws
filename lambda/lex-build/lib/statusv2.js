@@ -11,29 +11,32 @@
  *  and limitations under the License.                                                                                *
  *********************************************************************************************************************/
 
-const aws = require('./aws');
+const region = process.env.AWS_REGION || 'us-east-1';
+const { S3Client, GetObjectCommand, PutObjectCommand } = require('@aws-sdk/client-s3');
+const customSdkConfig = require('sdk-config/customSdkConfig');
+const s3 = new S3Client(customSdkConfig('C002', { region }));
 
-const s3 = new aws.S3();
-
-const bucket=process.env.STATUS_BUCKET;
-const lexV2StatusFile=process.env.LEXV2_STATUS_KEY;
-    
 module.exports=async function(status,message){
+    const bucket = process.env.STATUS_BUCKET;
+    const lexV2StatusFile = process.env.LEXV2_STATUS_KEY;
     try {
-        const res = await s3.getObject({
+        const res = await s3.send(new GetObjectCommand({
             Bucket:bucket,
             Key:lexV2StatusFile,
-        }).promise()
-        const result = JSON.parse(res.Body.toString())
+        }))
+        const readableStream = Buffer.concat(await res.Body.toArray());
+        const result = JSON.parse(readableStream);
         if(message) result.message=message;
         result.status=status;
         console.log(result);
-        await s3.putObject({
+        const params = {
             Bucket:bucket,
             Key:lexV2StatusFile,
             Body:JSON.stringify(result)
-        }).promise();
-        
+        }
+        const putObjCmd = new PutObjectCommand(params)
+        await s3.send(putObjCmd);
+
     } catch (error) {
         console.error("An error occured in statusv2: ", error)
         throw new Error(error)
