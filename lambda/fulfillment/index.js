@@ -16,7 +16,7 @@ const fs = require('fs');
 const esWarmer = new (require('./lib/warmer'))();
 
 const middleware = fs.readdirSync(`${__dirname}/${lib}`)
-    .filter((name) => name.match(/\d*_.*\.js/))
+    .filter((name) => name.match(/\d*_.*\.js/))  // NOSONAR - javascript:S5852 - input is user controlled and we have a limit on the number of characters
     .sort()
     .forEach((name) => {
         router.add(require(`${lib}/${name}`));

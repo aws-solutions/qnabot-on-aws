@@ -11,10 +11,10 @@
  *  and limitations under the License.                                                                                *
  *********************************************************************************************************************/
 
-const aws = require('aws-sdk');
-
-aws.config.region = process.env.AWS_REGION;
-const s3 = new aws.S3();
+const { S3Client, waitUntilObjectExists, GetObjectCommand, PutObjectCommand } = require('@aws-sdk/client-s3');
+const customSdkConfig = require('sdk-config/customSdkConfig');
+const region = process.env.AWS_REGION;
+const s3 = new S3Client(customSdkConfig('C012', { region }));
 const _ = require('lodash');
 const start = require('./lib/start');
 const step = require('./lib/step');
@@ -29,9 +29,14 @@ exports.step = async function (event, context, cb) {
     const VersionId = _.get(event, 'Records[0].s3.object.versionId');
     console.log(Bucket, Key);
     try {
-        await s3.waitFor('objectExists', { Bucket, Key, VersionId }).promise();
-        const s3GetObj = await s3.getObject({ Bucket, Key, VersionId }).promise();
-        const config = JSON.parse(s3GetObj.Body.toString());
+        await waitUntilObjectExists({
+            client: s3,
+            maxWaitTime: 30
+        }, { Bucket, Key, VersionId });
+        const getObjCmd = new GetObjectCommand({ Bucket, Key, VersionId });
+        const s3GetObj = await s3.send(getObjCmd);
+        const readableStream = Buffer.concat(await s3GetObj.Body.toArray());
+        const config = JSON.parse(readableStream);
 
         if (config.status !== 'Error' && config.status !== 'Completed') {
             try {
@@ -57,7 +62,8 @@ exports.step = async function (event, context, cb) {
                 config.status = 'Error';
                 config.message = _.get(err, 'message', JSON.stringify(err));
             }
-            await s3.putObject({ Bucket, Key, Body: JSON.stringify(config) }).promise();
+            const putObjCmd = new PutObjectCommand({ Bucket, Key, Body: JSON.stringify(config) })
+            await s3.send(putObjCmd);
         }
     } catch (error) {
         console.error('An error occured in S3 operations: ', error);

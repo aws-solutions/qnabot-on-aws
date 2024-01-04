@@ -1,4 +1,4 @@
-/*********************************************************************************************************************
+/** *******************************************************************************************************************
  *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.                                                *
  *                                                                                                                    *
  *  Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance    *
@@ -9,13 +9,15 @@
  *  or in the 'license' file accompanying this file. This file is distributed on an 'AS IS' BASIS, WITHOUT WARRANTIES *
  *  OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions    *
  *  and limitations under the License.                                                                                *
- *********************************************************************************************************************/
+ ******************************************************************************************************************** */
 
-const aws = require('aws-sdk');
+const { LambdaClient, InvokeCommand } = require('@aws-sdk/client-lambda');
+const { S3Client, PutObjectCommand } = require('@aws-sdk/client-s3');
+const customSdkConfig = require('sdk-config/customSdkConfig');
 
-aws.config.region = process.env.AWS_REGION;
-const lambda = new aws.Lambda();
-const s3 = new aws.S3();
+const region = process.env.AWS_REGION;
+const lambda = new LambdaClient(customSdkConfig('C002', { region }));
+const s3 = new S3Client(customSdkConfig('C022', { region }));
 const crypto = require('crypto');
 
 exports.handler = async function (event, context, callback) {
@@ -28,27 +30,32 @@ exports.handler = async function (event, context, callback) {
 
     if (lexV1StatusFile) {
         console.log('Initializing ', bucket, lexV1StatusFile);
-        await s3.putObject({
+        const params = {
             Bucket: bucket,
             Key: lexV1StatusFile,
             Body: body,
-        }).promise();
+        };
+        const putObjectCmdV1 = new PutObjectCommand(params);
+        await s3.send(putObjectCmdV1);
     }
 
     console.log('Initializing ', bucket, lexV2StatusFile);
-    await s3.putObject({
+    const params = {
         Bucket: bucket,
         Key: lexV2StatusFile,
         Body: body,
-    }).promise();
+    };
+    const putObjectCmdV2 = new PutObjectCommand(params);
+    await s3.send(putObjectCmdV2);
 
     // The BUILD_FUNCTION takes care of rebuilding Lex V2 bot, and (unless QnABot is set to V2 only) Lex V1 bot
     console.log('Invoking ', functionName);
-    await lambda.invoke({
+    const invokeParams = {
         FunctionName: functionName,
         InvocationType: 'Event',
         Payload: '{}',
-    }).promise();
-
+    };
+    const invokeCmd = new InvokeCommand(invokeParams);
+    await lambda.send(invokeCmd);
     callback(null, { token });
 };

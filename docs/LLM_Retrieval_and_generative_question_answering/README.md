@@ -114,7 +114,7 @@ def lambda_handler(event, context):
 
 When QnABot stack is installed, open Content Designer **Settings** page:
 
-- **ENABLE_DEBUG_RESPONSES** set to TRUE to add additional debug information to the QnABot response, including any language translations (if using multi language mode), question disambiguation (before and after), and inference times for your LLM model(s).
+- **ENABLE_DEBUG_RESPONSES** set to true to add additional debug information to the QnABot response, including any language translations (if using multi language mode), question disambiguation (before and after), and inference times for your LLM model(s).
 
 - **ES_SCORE_TEXT_ITEM_PASSAGES:** should be "true" to enable the new QnABot text passage items to be retrieved and used as input context for generative QA Summary answers. NOTE - 'qna' items are queried first, and in none meet the score threshold, then QnABot queries the text field of 'text' items
 
@@ -127,13 +127,13 @@ When QnABot stack is installed, open Content Designer **Settings** page:
 *Scroll to the bottom of the settings page and observe the new LLM settings:*
 
 - **LLM_API:** one of SAGEMAKER, LAMBDA - based on the value chosen when you last deployed or updated the QnABot Stack.
-- **LLM_GENERATE_QUERY_ENABLE:** set to TRUE or FALSE to enable or disable question disambiguation.
+- **LLM_GENERATE_QUERY_ENABLE:** set to true or false to enable or disable question disambiguation.
 - **LLM_GENERATE_QUERY_PROMPT_TEMPLATE:** the prompt template used to construct a prompt for the LLM to disambiguate a followup question. The template may use the placeholders:
   - `{history}` - placeholder for the last `LLM_CHAT_HISTORY_MAX_MESSAGES` messages in the conversational history, to provide conversational context.
   - `{input}` - placeholder for the current user utterance / question
 - **LLM_GENERATE_QUERY_MODEL_PARAMS:** parameters sent to the LLM model when disambiguating follow-up questions. Default: `{"temperature":0}`. Check model documentation for additional values that your model provider accepts.
-- **LLM_QA_ENABLE:** set to TRUE or FALSE to enable or disable generative answers from passages retrieved via embeddings or Kendra fallback (when no FAQ match its found). NOTE LLM based generative answers are not applied when an FAQ / QID matches the question.
-- **LLM_QA_USE_KENDRA_RETRIEVAL_API:** set to TRUE or FALSE to enable or disable the use of Kendra's retrieval API. When enabled, QnABot uses Kendra's Retrieve api to retrieve semantically relevant passages of up to 200 token words from the documents in your index (not FAQs). When disabled, QnABot use the default Kendra Query API to search documents and FAQs. Takes effect only when LLM_QA_ENABLE is TRUE. The default is TRUE (recommended) when LLM QA is enabled. Note: this feature will only search the first configured index. See https://docs.aws.amazon.com/kendra/latest/APIReference/API_Retrieve.html
+- **LLM_QA_ENABLE:** set to true or false to enable or disable generative answers from passages retrieved via embeddings or Kendra fallback (when no FAQ match its found). NOTE LLM based generative answers are not applied when an FAQ / QID matches the question.
+- **LLM_QA_USE_KENDRA_RETRIEVAL_API:** set to true or false to enable or disable the use of Kendra's retrieval API. When enabled, QnABot uses Kendra's Retrieve api to retrieve semantically relevant passages of up to 200 token words from the documents in your index (not FAQs). When disabled, QnABot use the default Kendra Query API to search documents and FAQs. Takes effect only when LLM_QA_ENABLE is true. The default is true (recommended) when LLM QA is enabled. Note: this feature will only search the first configured index. See https://docs.aws.amazon.com/kendra/latest/APIReference/API_Retrieve.html
 - **LLM_QA_PROMPT_TEMPLATE:**  the prompt template used to construct a prompt for the LLM to generate an answer from the context of a retrieved passages (from Kendra or Embeddings). The template may use the placeholders:
   - `{context}` - placeholder for passages retrieved from the search query - either a QnABot 'Text' item passage, or the Top `ALT_SEARCH_KENDRA_MAX_DOCUMENT_COUNT` Kendra passages
   - `{history}` - placeholder for the last `LLM_CHAT_HISTORY_MAX_MESSAGES` messages in the conversational history, to provide conversational context.
@@ -142,8 +142,8 @@ When QnABot stack is installed, open Content Designer **Settings** page:
 - **LLM_QA_NO_HITS_REGEX:** when the pattern specified matches the response from the LLM, e.g. `Sorry, I don't know`, then the response is treated as no_hits, and the default `EMPTYMESSAGE` or Custom Don't Know ('no_hits') item is returned instead. Disabled by default, since enabling it prevents easy debugging of LLM don't know responses.
 - **LLM_QA_MODEL_PARAMS:** parameters sent to the LLM model when generating answers to questions. Default: `{"temperature":0}`. Check model documentation for additional values that your model provider accepts.
 - **LLM_QA_PREFIX_MESSAGE:** Message use to prefix LLM generated answer. May be be empty.
-- **LLM_QA_SHOW_CONTEXT_TEXT:** set to TRUE or FALSE to enable or disable inclusion of the passages (from Kendra or Embeddings) used as context for LLM generated answers.
-- **LLM_QA_SHOW_SOURCE_LINKS:** set to TRUE or FALSE to enable or disable Kendra Source Links or passage refMarkdown links (doc references) in markdown answers.
+- **LLM_QA_SHOW_CONTEXT_TEXT:** set to true or false to enable or disable inclusion of the passages (from Kendra or Embeddings) used as context for LLM generated answers.
+- **LLM_QA_SHOW_SOURCE_LINKS:** set to true or false to enable or disable Kendra Source Links or passage refMarkdown links (doc references) in markdown answers.
 - **LLM_CHAT_HISTORY_MAX_MESSAGES:** the number of previous questions and answers (chat history) to maintain (in the QnABot DynamoDB UserTable). Chat History is necessary for QnABot to disambiguate follow up questions from previous question and answer context.
 - **LLM_PROMPT_MAX_TOKEN_LIMIT:** the maximum number of tokens that can be sent to the LLM. QnABot will selectively truncate the prompt by chat history (first) and context (second) to shorten the prompt length. **NOTE:** The tokenizer uses gt2 encoding to estimate the token count and is only an approximation. The value for this setting should be set lower than the max number of tokens supported by the LLM model and may require calibration.
 

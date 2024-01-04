@@ -1,3 +1,4 @@
+<!-- eslint-disable max-len -->
 /*********************************************************************************************************************
  *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.                                                *
  *                                                                                                                    *
@@ -10,167 +11,207 @@
  *  OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions    *
  *  and limitations under the License.                                                                                *
  *********************************************************************************************************************/
+ // To Do L 83
 <template lang="pug">
 span(class="wrapper")
-  v-dialog(v-model="loading" persistent)
+  v-dialog(
+    v-model="loading"
+    persistent
+    max-width="60%"
+  )
     v-card
-      v-card-title(primary-title) Creating {{data.qid}}
-      v-card-text
-        v-subheader.error--text(v-if='error' id="add-error") {{error}}
-        v-subheader.success--text(v-if='success' id="add-success") {{success}}
-        v-progress-linear(v-if='!error && !success' indeterminate)
+      v-card-title Creating {{ data.qid }}
+      v-card-text.my-3
+        v-list-subheader.text-error(
+          v-if="error"
+          id="add-error"
+        ) {{ error }}
+        v-list-subheader.text-success(
+          v-if="success"
+          id="add-success"
+        ) {{ success }}
+        v-progress-linear(
+          v-if="!error && !success"
+          indeterminate
+        )
       v-card-actions
         v-spacer
-          v-btn(@click='cancel' flat id="add-close") close
-  v-dialog(persistent v-model='dialog' max-width='50%' ref="dialog")
-    v-btn(slot="activator" @click='reset' id="add-question-btn") Add
+        v-btn.font-weight-bold(
+          id="add-close"
+          flat
+          @click="cancel"
+        ) close
+  v-dialog(
+    ref="dialog"
+    v-model="dialog"
+    persistent
+    max-width="60%"
+  )
+    template(v-slot:activator="{ props }")
+      v-btn.ma-2(
+        id="add-question-btn"
+        v-bind="props"
+        @click="reset"
+      ) Add
     v-card(id="add-question-form")
-      v-card-title(primary-title)
-        .headline {{title}}
+      v-card-title
+        .text-h5 {{ title }}
       v-card-text.pb-0
-        .title document type
-        v-radio-group(v-model="type" row)
-          v-radio(v-for="t in types" v-bind:key='t' :label='t' :value="t")
+        .text-h6 Document Type
+        v-radio-group(
+          v-model="type"
+          inline
+          color="accent"
+        )
+          v-radio.mr-8(
+            v-for="t in types"
+            :key="t"
+            :label="t"
+            :value="t"
+          )
       v-card-text.pt-0
         v-form(v-if="dialog")
-          schema-input( 
-            v-model="data[type]"
-            :valid.sync="valid.required"
-            :schema="schema" 
-            :pick="required"
-            path="add"
+          schema-input(
             ref="requiredInput"
+            v-model="data[type]"
+            v-model:valid="valid.required"
+            :schema="schema"
+            :pick="required"
+            :path="type"
           )
-          v-expansion-panel.elevation-0
-            v-expansion-panel-content
-              div( slot="header") Advanced
-              schema-input( 
-                v-model="data[type]"
-                :valid.sync="valid.optional"
-                :schema="schema" 
-                :omit="schema.required"
-                ref="optionalInput"
-                path="add"
-              )
-        small *indicates required field
-        v-subheader.error--text(v-if='error') {{error}}
+          v-expansion-panels
+            v-expansion-panel.mt-3(elevation="0" )
+              v-expansion-panel-title Advanced
+              v-expansion-panel-text
+                schema-input(
+                  ref="optionalInput"
+                  v-model="data[type]"
+                  v-model:valid="valid.optional"
+                  :schema="schema"
+                  :omit="schema.required"
+                  :path="type"
+                )
+        small * indicates required field
+        v-list-subheader.text-error(v-if="error") {{ error }}
       v-card-actions
         v-spacer
-        v-btn(@click='cancel' id="add-question-cancel") Cancel
-        v-btn(@click='add' :disabled='!valid' id="add-question-submit") Create
+        v-btn(
+          id="add-question-cancel"
+          @click="cancel"
+        ) Cancel
+        v-btn(
+          id="add-question-submit"
+          :disabled="!valid"
+          @click="add"
+        ) Create
 </template>
 
 <script>
 
-const Vuex=require('vuex')
-const saveAs=require('file-saver').saveAs
-const Promise=require('bluebird')
-const _=require('lodash')
-const empty=require('./empty')
-const Ajv=require('ajv')
-const ajv=new Ajv()
+require('vuex');
+const _ = require('lodash');
+const Ajv = require('ajv');
+const empty = require('./empty');
 
-module.exports={
-  data:function(){
-    return {
-      title:"Add New Item",
-      error:'',
-      success:'',
-      type:'qna',
-      dialog:false,
-      loading:false,
-      valid:{
-        required:false,
-        optional:false
-      },
-      data:{}
-    }
-  },
-  components:{
-    "schema-input":require('./input.vue').default
-  },
-  computed:{
-    types:function(){
-      return Object.keys(this.$store.state.data.schema).sort()
-    },
-    schema:function(){
-      return _.get(this,`$store.state.data.schema[${this.type}]`,{type:"object"})
-    },
-    required:function(){
-      return _.get(this,'schema.required',[])
-    }
-  },
-  methods:{
-    cancel:function(){
-      this.reset()
-      this.loading=false
-      this.dialog=false
-      this.error=false
-    },
-    reset:function(){
-      this.data=_.mapValues(this.$store.state.data.schema,(value,key)=>{
-        return empty(value) 
-      }) 
-      this.$refs.dialog.$refs.dialog.scrollTo(0,0)
-    },
-    validate:function(){
-      const data=this.data[this.type]
-      return !!validate(value) || validate.errors.map(x=>x.message).join('. ')
-    },
-    add:async function(){
-      const self=this
-      this.error=false
-      const data=clean(_.cloneDeep(this.data[this.type]))
-      const validate=ajv.compile(this.schema || true)
-      console.log(data)
-      const valid=validate(data)
+const ajv = new Ajv();
 
-      if(valid){
-        this.loading=true
-        this.dialog=false
-        try{ 
-          const exists=await this.$store.dispatch('api/check',data.qid)
-          if(exists){
-            self.error='Question already exists'
-            self.loading=false
-            self.dialog=true
-          }else{
-            self.$refs.dialog.$refs.dialog.scrollTo(0,0)
-            data.type=this.type
-            await self.$store.dispatch('data/add',data)
-            self.success='Success!'
-            self.$store.commit('data/addQA',_.cloneDeep(data))
-            self.reset()
-          }
-        }catch(e){
-          console.log(e)
-          self.error=e 
-        }
-      }else{
-        this.error=validate.errors.map(x=>x.message).join('. ')
-      }
-    }
-  }
-}
+module.exports = {
+    data() {
+        return {
+            title: 'Add New Item',
+            error: '',
+            success: '',
+            type: 'qna',
+            dialog: false,
+            loading: false,
+            valid: {
+                required: false,
+                optional: false,
+            },
+            data: {},
+        };
+    },
+    components: {
+        'schema-input': require('./input.vue').default,
+    },
+    computed: {
+        types() {
+            return Object.keys(this.$store.state.data.schema).sort();
+        },
+        schema() {
+            return _.get(this, `$store.state.data.schema[${this.type}]`, { type: 'object' });
+        },
+        required() {
+            return _.get(this, 'schema.required', []);
+        },
+    },
+    methods: {
+        cancel() {
+            this.reset();
+            this.loading = false;
+            this.dialog = false;
+            this.error = false;
+        },
+        reset() {
+            this.data = _.mapValues(this.$store.state.data.schema, (value, key) => empty(value));
+        },
+        validate() {
+            return !!validate(value) || validate.errors.map((x) => x.message).join('. ');
+        },
+        async add() {
+            const self = this;
+            this.error = false;
+            const data = clean(_.cloneDeep(this.data[this.type]));
+            const validate = ajv.compile(this.schema || true);
+            console.log(data);
+            const valid = validate(data);
 
-function clean(obj){
-    if(Array.isArray(obj)){
-        for(let i=0; i<obj.length; i++){
-            obj[i]=clean(obj[i])
+            if (valid) {
+                this.loading = true;
+                this.dialog = false;
+                try {
+                    const exists = await this.$store.dispatch('api/check', data.qid);
+                    if (exists) {
+                        self.error = 'Question already exists';
+                        self.loading = false;
+                        self.dialog = true;
+                    } else {
+                        data.type = this.type;
+                        await self.$store.dispatch('data/add', data);
+                        self.success = 'Success!';
+                        self.$store.commit('data/addQA', _.cloneDeep(data));
+                        self.reset();
+                    }
+                } catch (e) {
+                    console.log(e);
+                    self.error = e;
+                }
+            } else {
+                this.error = validate.errors.map((x) => x.message).join('. ');
+            }
+        },
+    },
+};
+
+function clean(obj) {
+    if (Array.isArray(obj)) {
+        for (let i = 0; i < obj.length; i++) {
+            obj[i] = clean(obj[i]);
         }
-        const out=_.compact(obj)
-        return out.length ? out : null
-    }else if(typeof obj==="object"){
-        for (const key in obj){
-            obj[key]=clean(obj[key])
-        }
-        const out=_.pickBy(obj)
-        return _.keys(out).length ? out : null
-    }else if(obj.trim){
-        return obj.trim() || null
-    }else{
-        return obj
+        const out = _.compact(obj);
+        return out.length ? out : null;
     }
+    if (typeof obj === 'object') {
+        for (const key in obj) {
+            obj[key] = clean(obj[key]);
+        }
+        const out = _.pickBy(obj);
+        return _.keys(out).length ? out : null;
+    }
+    if (obj.trim) {
+        return obj.trim() || null;
+    }
+    return obj;
 }
 </script>
 
@@ -179,4 +220,3 @@ function clean(obj){
     display:inline-block;
   }
 </style>
-

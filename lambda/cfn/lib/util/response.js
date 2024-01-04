@@ -11,8 +11,6 @@
  *  and limitations under the License.                                                                                *
  *********************************************************************************************************************/
 
-const Promise = require('./promise');
-
 exports.SUCCESS = 'SUCCESS';
 exports.FAILED = 'FAILED';
 
@@ -31,13 +29,12 @@ exports.send = function (params, cb) {
         console.log('Response body:\n', responseBody);
 
         const https = require('https');
-        const url = require('url');
-
-        const parsedUrl = url.parse(params.event.ResponseURL);
+        const { URL } = require('url');
+        const parsedUrl = new URL(params.event.ResponseURL);
         const options = {
             hostname: parsedUrl.hostname,
             port: parsedUrl.port,
-            path: parsedUrl.path,
+            path: parsedUrl.pathname + parsedUrl.search,
             method: 'PUT',
             headers: {
                 'content-type': '',

@@ -14,8 +14,9 @@
 
 (async () => {
     process.env.AWS_SDK_LOAD_CONFIG = true;
-    const AWS = require('aws-sdk');
-    const dynamodb = new AWS.DynamoDB();
+    const region = process.env.AWS_REGION;
+    const { DynamoDBClient, ScanCommand } = require('@aws-sdk/client-dynamodb');
+    const dynamodb = new DynamoDBClient({ region });
     args = process.argv.slice(2);
 
     if (args.length != 1) {
@@ -28,7 +29,8 @@
             if (startKey) {
                 params.ExclusiveStartKey = startKey;
             }
-            return dynamodb.scan(params).promise();
+            const scanCmd = new ScanCommand(params);
+            return dynamodb.send(scanCmd);
         };
         let lastEvaluatedKey = null;
         let rows = [];

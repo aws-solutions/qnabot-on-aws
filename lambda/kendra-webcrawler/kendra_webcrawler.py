@@ -19,10 +19,14 @@ import datetime
 import calendar
 import logging
 import time
+from botocore.config import Config
 
-client = boto3.client('kendra')
-ssm = boto3.client('ssm')
-cloudwatch = boto3.client('cloudwatch')
+sdk_config = Config(user_agent_extra = f"AWSSOLUTION/{os.environ['SOLUTION_ID']}/{os.environ['SOLUTION_VERSION']} AWSSOLUTION-CAPABILITY/{os.environ['SOLUTION_ID']}-C007/{os.environ['SOLUTION_VERSION']}")
+
+
+client = boto3.client('kendra', config=sdk_config)
+ssm = boto3.client('ssm', config=sdk_config)
+cloudwatch = boto3.client('cloudwatch', config=sdk_config)
 
 
 def create_cron_expression(schedule):
@@ -69,7 +73,7 @@ function describe_data_source
 this function provides information about a Kendra index data source
 the function returns the {status} attribute for a given data source in a Kendra index
 """
-def describe_data_source (data_source_id, index_id): 
+def describe_data_source (data_source_id, index_id):
     response = client.describe_data_source(
         Id=data_source_id,
         IndexId=index_id
@@ -87,13 +91,13 @@ the function returns the latest value for the {status} attribute for a given dat
 def get_data_source_status (data_source_id, index_id):
     data_source_status = describe_data_source (data_source_id, index_id)
     while data_source_status in ["CREATING", "UPDATING"]:   #checking for the data source status
-        time.sleep (5)  #wait for 5 seconds and check status again 
+        time.sleep (5)  #wait for 5 seconds and check status again
         data_source_status = describe_data_source (data_source_id, index_id)
-    
+
     return data_source_status
 
 
-def handler(event, context):
+def handler(event, context):  # NOSONAR Lambda handler
     logging.info(event)
 
     name = os.environ.get('DATASOURCE_NAME')
@@ -176,9 +180,9 @@ def kendra_create_data_source(client, index_id, name, type, role_arn, descriptio
                         'WebCrawlerMode': crawler_mode
                     }
                 },
-                'CrawlDepth': int(crawl_depth), 
-                'MaxLinksPerPage': 100, 
-                'MaxContentSizePerPageInMegaBytes': 50.0, 
+                'CrawlDepth': int(crawl_depth),
+                'MaxLinksPerPage': 100,
+                'MaxContentSizePerPageInMegaBytes': 50.0,
                 'MaxUrlsPerMinuteCrawlRate': 300
             }
         }
@@ -209,9 +213,9 @@ def kendra_update_data_source(index_id, data_source_id, urls, role_arn, schedule
                         'WebCrawlerMode': crawler_mode
                     }
                 },
-                'CrawlDepth': int(crawl_depth), 
-                'MaxLinksPerPage': 100, 
-                'MaxContentSizePerPageInMegaBytes': 50.0, 
+                'CrawlDepth': int(crawl_depth),
+                'MaxLinksPerPage': 100,
+                'MaxContentSizePerPageInMegaBytes': 50.0,
                 'MaxUrlsPerMinuteCrawlRate': 300
             }
         }

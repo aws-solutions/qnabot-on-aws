@@ -63,7 +63,7 @@ where the length of the embedding array matches the value you specify for the st
 
 When QnABot stack is installed, open Content Designer **Settings** page:
 
-**ES_USE_KEYWORD_FILTERS:** The setting `ES_USE_KEYWORD_FILTERS` should now default to `FALSE`. While you can use keyword filters with embeddings based semantic queries, they significantly limit the power of semantic search by forcing keyword matches (preventing matches based on different words with similar meanings).
+**ES_USE_KEYWORD_FILTERS:** The setting `ES_USE_KEYWORD_FILTERS` should now default to `false`. While you can use keyword filters with embeddings based semantic queries, they significantly limit the power of semantic search by forcing keyword matches (preventing matches based on different words with similar meanings).
 
 **ES_SCORE_ANSWER_FIELD:** If set to true, QnABot executes embedding vector searches on embeddings generated on answer field if no match is found (above EMBEDDINGS_SCORE_THRESHOLD) on question fields. This allows QnABot to find matches based on the contents on the answer field as well as the questions. Only the plain text answer field is used (not the Markdown or SSML alternatives). Matches on the answer field must score above EMBEDDINGS_SCORE_ANSWER_THRESHOLD.
   - EMBEDDINGS_SCORE_THRESHOLD - see below
@@ -72,22 +72,22 @@ When QnABot stack is installed, open Content Designer **Settings** page:
 
 *Scroll to the bottom of the settings page and observe the new EMBEDDINGS settings:*
 
-**EMBEDDINGS_ENABLE:** to enable / disable use of semantic search using embeddings, set `EMBEDDINGS_ENABLE` to FALSE.
-  - Set to FALSE to disable the use of embeddings based queries. 
-  - Set to TRUE to re-enable the use of embeddings based queries after previously setting it to FALSE. NOTE - Setting TRUE when the stack has `EmbeddingsAPI` set to DISABLED will cause failures, since the QnABot stack isn't provisioned to support generation of embeddings. 
-  - If you disable embeddings, you will likely also want to re-enable keyword filters by setting `ES_USE_KEYWORD_FILTERS` to TRUE. 
+**EMBEDDINGS_ENABLE:** to enable / disable use of semantic search using embeddings, set `EMBEDDINGS_ENABLE` to false.
+  - Set to false to disable the use of embeddings based queries. 
+  - Set to true to re-enable the use of embeddings based queries after previously setting it to false. NOTE - Setting true when the stack has `EmbeddingsAPI` set to DISABLED will cause failures, since the QnABot stack isn't provisioned to support generation of embeddings. 
+  - If you disable embeddings, you will likely also want to re-enable keyword filters by setting `ES_USE_KEYWORD_FILTERS` to true. 
   - If you add, modify, or import any items in Content Designer when set `EMBEDDINGS_ENABLE` is false, then embeddings won't get created and you'll have to reimport or re-save those items after reenabling embeddings again  
     
 **EMBEDDINGS_SCORE_THRESHOLD:** to customize the score threshold, change the value of `EMBEDDINGS_SCORE_THRESHOLD`. Unlike regular elasticsearch queries, embeddings queries always return scores between 0 and 1, so we can apply a threshold to separate good from bad results. 
   - If embedding similarity score is under threshold the match it's rejected and QnABot reverts to
-     - Trying to find a match on the answer field, only if ES_SCORE_ANSWER_FIELD is set to TRUE (see above).
+     - Trying to find a match on the answer field, only if ES_SCORE_ANSWER_FIELD is set to true (see above).
      - Text item passage query 
      - Kendra fallback 
      - or no_hits
   - Use the Content Designer TEST tab to see the hits ranked by score for your query results.
   - The default is 0.85 for now but you will likely need to modify this based on your embedding model and your experiments.
 
-**EMBEDDINGS_SCORE_ANSWER_THRESHOLD:** to customize the answer score threshold, used only when ES_SCORE_ANSWER_FIELD is TRUE (see above), change the value of `EMBEDDINGS_SCORE_ANSWER_THRESHOLD`. 
+**EMBEDDINGS_SCORE_ANSWER_THRESHOLD:** to customize the answer score threshold, used only when ES_SCORE_ANSWER_FIELD is true (see above), change the value of `EMBEDDINGS_SCORE_ANSWER_THRESHOLD`. 
   - If embedding similarity score for answer field query is under threshold the match it's rejected and QnABot reverts to Text item passage query, Kendra fallback or no_hits
   - Use the Content Designer TEST tab to see the hits ranked by score for your answer field query results. For **Match on**, choose *qna item answer* to see answer field scores.
   - The default is 0.80 for now but you will likely need to modify this based on your embedding model and your experiments.

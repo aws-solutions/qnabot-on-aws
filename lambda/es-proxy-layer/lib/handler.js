@@ -81,6 +81,8 @@ async function get_es_query(event, settings) {
             score_answer: _.get(event, 'score_answer', 'false') === 'true',
             score_text_passage: _.get(event, 'score_text_passage', 'false') === 'true',
             settings,
+            locale: _.get(event, '_locale.localeIdentified'),
+            translation: _.get(event, '_translation.QuestionInBackupLanguage'),
         };
         return build_es_query(query_params);
     }

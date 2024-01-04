@@ -20,17 +20,20 @@ const { mergeNext } = require('./mergeNext');
 const { updateResWithHit } = require('./updateResWithHit');
 const { getHit } = require('./getHit');
 const { evaluateConditionalChaining } = require('./evaluateConditionalChaining');
-
-function isQidQuery(req) {
-    return req.question.toLowerCase().startsWith('qid::') || !!_.get(req, 'qid');
-}
+const { inIgnoreUtterances } = require('./utterance');
+const { utteranceIsQid } = require('./qid');
+const { getSupportedLanguages } = require('../supportedLanguages');
 
 async function executeConditionalChaining(hit, req, res) {
     let c = 0;
     let errors = [];
-    while (_.get(hit, 'conditionalChaining') && _.get(hit, 'elicitResponse.responsebot_hook', '') === '') {
+    while (
+        _.get(hit, 'conditionalChaining')
+        && _.get(hit, 'elicitResponse.responsebot_hook', '') === ''
+        && _.get(hit, 'botRouting.specialty_bot', '') === ''
+    ) {
         c++;
-        // ElicitResonse is not involved and this document has conditionalChaining defined. Process the
+        // ElicitResponse and SpecialtyBot is not involved and this document has conditionalChaining defined. Process the
         // conditionalChaining in this case.
         [req, res, hit, errors] = await evaluateConditionalChaining(req, res, hit, hit.conditionalChaining);
         qnabot.log('Chained doc count: ', c);
@@ -55,14 +58,33 @@ async function updateChatHistory(req, LLM_CHAT_HISTORY_MAX_MESSAGES, message, LL
             .replace(new RegExp(`${LLM_QA_PREFIX_MESSAGE}\\s*(\\(.*?\\))*`, 'g'), '')
             .trim();
     }
-    chatMessageHistory.addAIChatMessage(aiMessage || '<empty>');
+    chatMessageHistory.addAIChatMessage(aiMessage);
     return llm.chatMemorySerialise(
         chatMessageHistory,
         LLM_CHAT_HISTORY_MAX_MESSAGES,
     );
 }
 
-async function getInitialHit(res, req, LLM_GENERATE_QUERY_ENABLE) {
+function shouldGenerateQuery(req) {
+    const {
+        LLM_GENERATE_QUERY_ENABLE,
+        PROTECTED_UTTERANCES,
+    } = req._settings;
+    const { question } = req;
+
+    if (utteranceIsQid(question) || !!_.get(req, 'qid')) {
+        qnabot.log('QID specified in query - do not generate LLM query.');
+        return false;
+    }
+    if (inIgnoreUtterances(question, PROTECTED_UTTERANCES)) {
+        qnabot.log('Utterance is in ignore list - do not generate LLM query.');
+        return false;
+    }
+
+    return LLM_GENERATE_QUERY_ENABLE;
+}
+
+async function getInitialHit(res, req) {
     const elicitResponseChainingConfig = _.get(res, 'session.qnabotcontext.elicitResponse.chainingConfig', undefined);
     const elicitResponseProgress = _.get(res, 'session.qnabotcontext.elicitResponse.progress', undefined);
     if (elicitResponseChainingConfig
@@ -77,53 +99,48 @@ async function getInitialHit(res, req, LLM_GENERATE_QUERY_ENABLE) {
         return evaluateConditionalChaining(req, res, fakeHit, elicitResponseChainingConfig);
     }
     // elicitResponse is not involved. obtain the next question to serve up to the user.
-    if (LLM_GENERATE_QUERY_ENABLE) {
-        if (!isQidQuery(req)) {
-            req = await llm.generate_query(req);
-        } else {
-            qnabot.debug('QID specified in query - do not generate LLM query.');
-        }
+    if (shouldGenerateQuery(req)) {
+        req = await llm.generate_query(req);
     }
+
     return getHit(req, res);
 }
 
-async function translateResponse(hit, ENABLE_MULTI_LANGUAGE_SUPPORT, usrLang, req) {
+async function translateResponse(hit, ENABLE_MULTI_LANGUAGE_SUPPORT, usrLang, nativeLangCode, req) {
     const autotranslate = _.get(hit, 'autotranslate', true);
 
     if (ENABLE_MULTI_LANGUAGE_SUPPORT) {
-        if (usrLang != 'en' && autotranslate) {
-            qnabot.log('Autotranslate hit to usrLang: ', usrLang);
+        if (usrLang != nativeLangCode && autotranslate) {
+            qnabot.log('Native Language in the deployment does not correspond to the same language the user is speaking in, Autotranslate hit to usrLang: ', usrLang);
             hit = await translate.translate_hit(hit, usrLang, req);
-        } else {
-            qnabot.log('Autotranslate not required.');
+            return hit;
+        } 
+        else {
+            qnabot.log('Autotranslate not required in TranslateResponse in ProcessFulfillment');
         }
     }
     return hit;
 }
 
-function prependDebugMsg(req, usrLang, hit, errors) {
-    let original_input; let translated_input; let llm_generated_query; let
-        msg;
-    if (req.llm_generated_query && usrLang !== 'en') {
-        original_input = _.get(req, '_event.origQuestion', 'notdefined');
-        const translated_input = req.llm_generated_query.orig;
-        const llm_generated_query = req.llm_generated_query.result;
-        const search_string = req.llm_generated_query.concatenated;
-        const { timing } = req.llm_generated_query;
-        msg = `User Input: "${original_input}", Translated to: "${translated_input}", LLM generated query (${timing}): "${llm_generated_query}", Search string: "${search_string}"`;
+function prependDebugMsg(req, usrLang, nativeLangCode, hit, errors) {
+    let originalInput;
+    let translatedInput;
+    let msg;
+
+    if (req.llm_generated_query && usrLang !== nativeLangCode) {
+        originalInput = _.get(req, '_event.origQuestion', 'notdefined');
+        const { orig, result, concatenated, timing } = req.llm_generated_query;
+        msg = `User Input: "${originalInput}", Translated to: "${orig}", LLM generated query (${timing}): "${result}", Search string: "${concatenated}"`;
     } else if (req.llm_generated_query) {
-        original_input = req.llm_generated_query.orig;
-        llm_generated_query = req.llm_generated_query.result;
-        const search_string = req.llm_generated_query.concatenated;
-        const { timing } = req.llm_generated_query;
-        msg = `User Input: "${original_input}", LLM generated query (${timing}): "${llm_generated_query}", Search string: "${search_string}"`;
-    } else if (!req.llm_generated_query && usrLang !== 'en') {
-        original_input = _.get(req, '_event.origQuestion', 'notdefined');
-        translated_input = req.question;
-        msg = `User Input: "${original_input}", Translated to: "${translated_input}"`;
+        const { orig, result, concatenated, timing } = req.llm_generated_query;
+        msg = `User Input: "${orig}", LLM generated query (${timing}): "${result}", Search string: "${concatenated}"`;
+    } else if (!req.llm_generated_query && usrLang !== nativeLangCode) {
+        originalInput = _.get(req, '_event.origQuestion', 'notdefined');
+        translatedInput = req.question;
+        msg = `User Input: "${originalInput}", Translated to: "${translatedInput}"`;
     } else {
-        original_input = req.question;
-        msg = `User Input: "${original_input}"`;
+        originalInput = req.question;
+        msg = `User Input: "${originalInput}"`;
     }
 
     const qid = _.get(req, 'qid');
@@ -139,7 +156,7 @@ function prependDebugMsg(req, usrLang, hit, errors) {
         msg += `, Errors: ${JSON.stringify(errors)}`;
     }
 
-    const debug_msg = {
+    const debugMsg = {
         a: `[${msg}] `,
         alt: {
             markdown: `*[${msg}]*  \n`,
@@ -147,7 +164,7 @@ function prependDebugMsg(req, usrLang, hit, errors) {
         },
         rp: `[${_.get(hit, 'rp')}] `,
     };
-    hit = mergeNext(debug_msg, hit);
+    hit = mergeNext(debugMsg, hit);
     return hit;
 }
 
@@ -160,20 +177,26 @@ async function processFulfillmentEvent(req, res) {
     }
 
     const {
-        LLM_GENERATE_QUERY_ENABLE,
         LLM_CHAT_HISTORY_MAX_MESSAGES,
         LLM_QA_PREFIX_MESSAGE,
         ENABLE_MULTI_LANGUAGE_SUPPORT,
         ENABLE_DEBUG_RESPONSES,
     } = req._settings;
 
-    const usrLang = _.get(req, 'session.qnabotcontext.userLocale', 'en');
+    const backupLang = _.get(req._settings, 'BACKUP_LANGUAGE', 'English');
+    const languageMapping  = getSupportedLanguages();
+
+    let usrLang = _.get(req, 'session.qnabotcontext.userLocale', languageMapping[backupLang]);
+    qnabot.log('user Language in the ProcessFulfillment Lambda is: ', usrLang);
 
     let hit;
     const errors = [];
     let getInitialHitErrors = [];
-    [req, res, hit, getInitialHitErrors] = await getInitialHit(res, req, LLM_GENERATE_QUERY_ENABLE);
+    [req, res, hit, getInitialHitErrors] = await getInitialHit(res, req);
     getInitialHitErrors.forEach((e) => errors.push(e));
+
+    const nativeLanguage = _.get(req._settings, 'NATIVE_LANGUAGE', 'English');
+    const nativeLangCode  = languageMapping[nativeLanguage];
 
     if (hit) {
         let executeConditionalChainingErrors = [];
@@ -183,7 +206,7 @@ async function processFulfillmentEvent(req, res) {
         // (will be automatically persisted later to DynamoDB userinfo table)
         res._userInfo.chatMessageHistory = await updateChatHistory(req, LLM_CHAT_HISTORY_MAX_MESSAGES, hit.a, LLM_QA_PREFIX_MESSAGE);
 
-        hit = await translateResponse(hit, ENABLE_MULTI_LANGUAGE_SUPPORT, usrLang, req);
+        hit = await translateResponse(hit, ENABLE_MULTI_LANGUAGE_SUPPORT, usrLang, nativeLangCode, req);
     } else {
         hit = {};
         hit.a = _.get(req, '_settings.EMPTYMESSAGE', 'You stumped me!');
@@ -194,7 +217,7 @@ async function processFulfillmentEvent(req, res) {
     }
 
     if (ENABLE_DEBUG_RESPONSES) {
-        hit = prependDebugMsg(req, usrLang, hit, errors);
+        hit = prependDebugMsg(req, usrLang, nativeLangCode, hit, errors);
     }
 
     res = updateResWithHit(req, res, hit);

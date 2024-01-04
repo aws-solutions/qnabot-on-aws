@@ -14,7 +14,6 @@
 // parseJSON.js
 
 const fs = require('fs');
-const { S3, FSx } = require('aws-sdk');
 const _ = require('lodash');
 
 /**

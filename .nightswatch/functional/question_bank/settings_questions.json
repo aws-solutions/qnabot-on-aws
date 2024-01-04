@@ -1,0 +1,12 @@
+{
+    "qna": [
+      {
+        "a": "You stumped me, I don't currently know the answer to that question.",
+        "type": "qna",
+        "qid": "CustomNoMatches",
+        "q": [
+          "no_hits"
+        ]
+      }
+    ]
+}

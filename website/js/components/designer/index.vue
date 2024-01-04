@@ -1,3 +1,4 @@
+<!-- eslint-disable max-len -->
 /*********************************************************************************************************************
  *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.                                                *
  *                                                                                                                    *
@@ -10,239 +11,339 @@
  *  OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions    *
  *  and limitations under the License.                                                                                *
  *********************************************************************************************************************/
-<template lang='pug'>
-  v-card.root-card
-    v-card-title.pa-0.cyan
-      v-layout(row)
-        v-tabs(
-          v-model="active" 
-          slide-color="accent"
-          color="primary" 
-          light
-        )
-          v-tab.title(ripple href="#questions" id="questions-tab") Questions
-          v-tab.title(ripple href="#test" id="test-tab") Test
-          v-tab.title(ripple href="#testAll" id="testAll-tab") Test All
-        v-spacer
-        v-menu(bottom left)
-          v-btn.white--text(icon slot="activator" id="edit-sub-menu")
+<template lang="pug">
+v-card.root-card
+  v-card-title.pa-0.bg-cyan
+    v-layout(row)
+      v-tabs.tabs__item(
+        v-model="active"
+        slider-color="accent"
+      )
+        v-tab.text-h6(
+          id="questions-tab"
+          ripple
+          value="questions"
+        ) QUESTIONS
+        v-tab.text-h6(
+          id="test-tab"
+          ripple
+          value="test"
+        ) TEST
+        v-tab.text-h6(
+          id="testAll-tab"
+          ripple
+          value="testAll"
+        ) TEST ALL
+      v-spacer
+      v-menu(
+        location="bottom"
+      )
+        template(#activator="{ props }")
+          v-btn.icon-button.text-white(
+            id="edit-sub-menu"
+            v-bind="props"
+            icon
+          )
             v-icon more_vert
-          v-list
-            v-list-tile
-              alexa
-            v-list-tile
-              build
-            v-list-tile
-              sync
+        v-list
+          v-list-item
+            alexa
+          v-list-item
+            build
+          v-list-item
+            sync
 
-    span
-      questions(@filter="get(pagination)" v-if="active==='questions'")
-      test(v-if="active==='test'")
-      testAll(v-if="active==='testAll'")
-    v-data-table(
-      v-if="active!=='testAll'"
-      :headers="headers"
-      :items="QAs"
-      :search="search"
-      :pagination.sync="pagination"
-      :total-items="total"
-      :loading="loading"
-      :rows-per-page-items="perpage"
-      :class="empty"
-      v-model="selected"
-      select-all
-      item-key="qid"
+  span
+    questions(
+      v-if="active==='questions'"
+      @filter="get()"
+      @refresh="refresh()"
     )
-      template(slot='headers' slot-scope='props')
-        tr
-          th.shrink(v-if="active==='questions'" id="select-all")
+    test(v-if="active==='test'")
+    testAll(v-if="active==='testAll'")
+  v-data-table-server(
+    v-if="active!=='testAll'"
+    v-model:items-per-page="itemsPerPage"
+    v-model:expanded="expanded"
+    :headers="headers"
+    :items="QAs"
+    :search="search"
+    :items-length="total"
+    :items-per-page-options="perpage"
+    :sort-by="sortBy"
+    :loading="loading"
+    item-value="qid"
+    color="primary"
+    must-sort
+    @update:options="loadItems"
+  )
+    template(#headers="{columns, getSortIcon, toggleSort}")
+      tr
+        th.shrink.text-h6(v-if="active==='test'") score
+        template(
+          v-for="column in columns"
+          :key="column.key")
+          th.shrink(
+            v-if="active==='questions' && column.title==='SelectAll'"
+            id="select-all"
+          )
             v-checkbox(
-              :indeterminate="QAs.length===0" v-model='selectAll' 
-              tabindex='-1'
-              color="primary" @change="toggleSelectAll" 
+              v-model="selectAll"
+              :indeterminate="QAs.length===0"
+              tabindex="-1"
+              color="primary"
+              @change="toggleSelectAll"
             )
-          th.shrink.title(v-if="active==='test'") score
-          th.text-xs-left.title( v-for="header in props.headers" 
-            :key='header.text'
-            :class="['column', header.sortable ? 'sortable' : '', pagination.descending ? 'desc' : 'asc', header.value === pagination.sortBy ? 'active' : '']"
-            @click="header.sortable ? changeSort(header.value) : null") 
-              v-icon(v-if="tab==='questions' && header.sortable") arrow_upward
-              span {{header.text}}
-          th.d-flex.pa-0
-            span(v-if="selectAll | selectedMultiple" id="delete-all")
-              delete(:selectAll="selectAll" :selected="selected")
-      template(slot='items' slot-scope='props')
-        tr( 
-          v-on:click="expand(props)"
-          :id="'qa-'+props.item.qid"
+          th.text-xs-left.text-h6(
+            v-if="column.title !=='SelectAll' && column.title !=='RowOptions'"
+            :key="column.title"
+            :class="['column', column.sortable ? 'sortable' : '']")
+            span(
+              class="mr-2 cursor-pointer"
+              @click="column.sortable && toggleSort(column)"
+              ) {{ column.title }}
+            v-icon(
+                  v-if="active==='questions' && column.sortable"
+                  size="small"
+                  :icon="getSortIcon(column)"
+                )
+          th.flex-grow-1.pa-0(v-if="column.title ==='RowOptions'")
+            span(
+              v-if="selectAll | selectedMultiple"
+              id="delete-all"
+            )
+              delete(
+                :select-all="selectAll"
+                :selected="selected"
+                @handle-delete="handleDelete"
+              )
+    template(#item="props")
+      tr(
+        :id="'qa-'+props.item.qid"
+        @click="props.toggleExpand(props.internalItem)"
+      )
+        td.shrink(
+          v-if="active==='questions'"
+          @click.stop=""
         )
-          td.shrink(v-on:click.stop="" v-if="active==='questions'")
-            v-checkbox(@change="checkSelect"
-              v-model="props.item.select" tabindex='-1' color="primary" 
-              :id="'qa-'+props.item.qid+'-select'"
-            )
-          td.text-xs-left.shrink.primary--text.title(
-            v-if="active==='test'"
-          ) {{props.item._score || '-'}}
-          td.text-xs-left.shrink.title 
-            b(:id="props.item.qid") {{props.item.qid}}
-          td.text-xs-left.title {{props.item.type || 'qna'}}
-          td.text-xs-left.title {{props.item.q[0] || props.item.question}}
-          td.d-flex.pa-0.pr-1
-            edit(
-              :data.sync="props.item" 
-              v-on:filter="get(pagination)"
-              @click.native.stop=""
-              :id="'qa-'+props.item.qid+'-edit'"
-            )
-            delete( :data="props.item" 
-              @click.native.stop=""
-              :id="'qa-'+props.item.qid+'-delete'"
-            )
-      template(slot="expand" slot-scope='props')
-        qa(:data="props.item")
+          v-checkbox(
+            :id="'qa-'+props.item.qid+'-select'"
+            v-model="props.item.select"
+            color="primary"
+            tabindex="-1"
+            @change="checkSelect"
+          )
+        td.text-xs-left.shrink.primary--text.text-h6(
+          v-if="active==='test'"
+        ) {{ props.item._score || '-' }}
+        td.text-xs-left.shrink.text-h6
+          b(:id="props.item.qid") {{ props.item.qid }}
+        td.text-xs-left.text-h6.font-weight-regular {{ props.item.type || 'qna' }}
+        td.text-xs-left.text-h6.font-weight-regular {{ (props.item.q && props.item.q[0]) ? props.item.q[0] : (props.item.question ? props.item.question: '') }}
+        td.flex-grow-1.pa-0.pr-1
+          edit(
+            :id="'qa-'+props.item.qid+'-edit'"
+            v-model:data="props.item"
+            @filter="get()"
+            @click.stop=""
+          )
+          delete(
+            :id="'qa-'+props.item.qid+'-delete'"
+            :data="props.item"
+            @handle-delete="handleDelete"
+          )
+    template(#expanded-row="{ columns, item }")
+      tr
+        td(:colspan="columns.length+2")
+          qa(:data="item")
+  v-dialog(v-model="deleteLoading" persistent id="delete-loading" max-width='60%')
+    v-card(title="Deleting")
+      v-card-text(v-if="!selectAll")
+        ul.my-3
+          li(v-for="id in deleteIds") {{id}}
+      v-card-text
+        v-list-subheader.text-error(v-if='deleteError' id="delete-error") {{deleteError}}
+        v-list-subheader.text-success(v-if='deleteSuccess' id="delete-success") {{deleteSuccess}}
+        v-progress-linear(v-if='!deleteError && !deleteSuccess' indeterminate)
+      v-card-actions
+        v-spacer
+        v-btn.font-weight-bold(@click='deleteClose' flat) close
 </template>
 
 <script>
-const Vuex=require('vuex')
-const Promise=require('bluebird')
-const _=require('lodash')
-module.exports={
-  data:()=>{return {
-    drawer:false,
-    active:null,
-    tab:"",
-    search:'',
-    selected:[],
-    selectAll:false,
-    perpage:[
-      "5","10","15","50","100"
-    ],
-    pagination:{
-      page:1,
-      rowsPerPage:"100",
-      sortBy:'qid'
-    },
-    headers:[{
-      text:'Id',
-      value:'qid',
-      align:'left',
-      sortable:true
-    },
-    {
-      text:'Type',
-      value:'type',
-      align:'left'
-    },
-    {
-      text:'First Question',
-      value:'q[0] || a',
-      align:'left'
-    }]
-  }},
-  components:{
-    qa:require('./qa.vue').default,
-    questions:require('./menu-questions.vue').default,
-    test:require('./menu-test.vue').default,
-    testAll:require('./menu-testall.vue').default,
-    delete:require('./delete.vue').default,
-    edit:require('./edit.vue').default,
-    build:require('./rebuild.vue').default,
-    alexa:require('./alexa.vue').default,
-    sync:require('./synckendra.vue').default,
+require('vuex');
+const _ = require('lodash');
 
-  },
-  computed:{
-    empty:function(){
-      return {empty:!this.total}
+module.exports = {
+    data: () => ({
+        drawer: false,
+        active: null,
+        tab: '',
+        search: '',
+        selected: [],
+        selectAll: false,
+        expanded: [],
+        deleteLoading: false,
+        deleteError: '',
+        deleteSuccess: '',
+        deleteIds: [],
+        itemsPerPage: 100,
+        page: 1,
+        sortBy: [],
+        perpage: [
+            { value: 5, title: '5' },
+            { value: 10, title: '10' },
+            { value: 25, title: '25' },
+            { value: 50, title: '50' },
+            { value: 100, title: '100' },
+        ],
+        pagination: {
+            page: 1,
+            rowsPerPage: '100',
+            sortBy: 'qid',
+        },
+        headers: [
+            {
+                title: 'SelectAll',
+                align: 'left',
+                sortable: false,
+            },
+            {
+                title: 'Id',
+                value: 'qid',
+                align: 'left',
+                sortable: true,
+            },
+            {
+                title: 'Type',
+                value: 'type',
+                align: 'left',
+                sortable: false,
+            },
+            {
+                title: 'First Question',
+                value: 'q[0] || a',
+                align: 'left',
+                sortable: false,
+            },
+            {
+                title: 'RowOptions',
+                align: 'left',
+                sortable: false,
+            },
+        ],
+    }),
+    components: {
+        qa: require('./qa.vue').default,
+        questions: require('./menu-questions.vue').default,
+        test: require('./menu-test.vue').default,
+        testAll: require('./menu-testall.vue').default,
+        delete: require('./delete.vue').default,
+        edit: require('./edit.vue').default,
+        build: require('./rebuild.vue').default,
+        alexa: require('./alexa.vue').default,
+        sync: require('./synckendra.vue').default,
+
     },
-    loading:function(){
-      return this.$store.state.api.loading 
+    computed: {
+        empty() {
+            return { empty: !this.total };
+        },
+        loading() {
+            return this.$store.state.data.loading;
+        },
+        QAs() {
+            return this.$store.state.data.QAs;
+        },
+        total() {
+            return this.$store.state.page.total;
+        },
+        selectedMultiple() {
+            return this.QAs.map((x) => x.select).includes(true);
+        },
     },
-    QAs:function(){
-      return this.$store.state.data.QAs
+    async created() {
+        await this.$store.dispatch('data/schema');
+        this.$store.dispatch('data/botinfo').catch((err) => console.log(`error while obtaining botinfo: ${err}`));
+        await this.get();
     },
-    total:function(){
-      return this.$store.state.page.total
+    watch: {
+        active(tab) {
+            if (tab === 'test') {
+                this.sortBy = [{ key: 'score', order: 'desc'}];
+            } else {
+                this.sortBy = [{ key: 'qid', order: 'asc' }];
+                this.get();
+            }
+        },
     },
-    selectedMultiple:function(){
-      return this.QAs.map(x=>x.select).includes(true)
-    }
-  },
-  created:async function(){
-    await this.$store.dispatch('data/schema')
-    await this.get(1)
-  },
-  watch:{
-    tab:function(tab){
-      if(tab==='test'){
-        this.pagination.sortBy='score'
-        this.pagination.descending=true
-      }else{
-        this.pagination.sortBy='qid'
-        this.pagination.descending=false
-        return this.get(this.pagination)
-      }
+    methods: {
+        loadItems({ page, sortBy }) {
+            this.page = page;
+            this.sortBy = sortBy;
+            this.get();
+        },
+        refresh() {
+            this.itemsPerPage = 100;
+            this.sortBy = [];
+            this.page = 1;
+            this.get();
+        },
+        get: _.debounce(async function () {
+            if (this.active === 'questions') {
+                this.selectAll = false;
+                await this.$store.dispatch('data/get', {
+                    page: this.page - 1,
+                    perpage: this.itemsPerPage,
+                    order: this.sortBy[0] ? this.sortBy[0].order : 'asc',
+                });
+            }
+        }, 100, { trailing: true, leading: false }),
+        checkSelect(value) {
+            this.selectAll = this.selectAll && value;
+        },
+        toggleSelectAll() {
+            this.$store.commit('data/selectAll', this.selectAll);
+        },
+        deleteClose() {
+            this.deleteLoading = false;
+            this.deleteError = '';
+            this.deleteSuccess = '';
+            this.deleteIds = [];
+        },
+        handleDelete(questions) {
+          const self = this;
+          this.deleteLoading = true;
+          this.deleteIds = questions.map((x) => x.qid);
+          return (async () => {
+                if (self.selectAll) {
+                    return self.$store
+                        .dispatch('data/removeFilter')
+                        .then(() => self.selectAll = false);
+                }
+                return (async () => {
+                    if (questions.length === 1) {
+                        return self.$store.dispatch('data/removeQA', questions[0]);
+                    }
+
+                    return self.$store.dispatch('data/removeQAs', questions);
+                })();
+            })()
+                .then(() => self.$store.commit('data/selectAll', false))
+                .then(() => this.deleteSuccess = 'Success!')
+                .catch((error) => this.deleteError = error);
+        },
+        edit: console.log,
     },
-    "pagination.page":function(event){
-      return this.get(this.pagination)      
-    },
-    "pagination.descending":function(event){
-      return this.get(this.pagination)      
-    },
-    "pagination.rowsPerPage":function(event){
-      return this.get(this.pagination)      
-    },
-    "pagination.sortBy":function(event){
-      return this.get(this.pagination)  
-		}
-  },
-  methods:{
-    get:_.debounce(async function(event){
-        if (this.active === 'questions') {
-            this.selectAll = false
-            await this.$store.dispatch('data/get', {
-                page: event.page - 1,
-                perpage: event.rowsPerPage,
-                order: event.descending ? 'desc' : 'asc'
-            })
-        }
-    },100,{trailing:true,leading:false}),
-    changeSort:_.debounce(function(column) {
-      if(this.tab==='questions'){
-        if (this.pagination.sortBy === column) {
-          this.pagination.descending = !this.pagination.descending
-        } else {
-          this.pagination.sortBy = column
-          this.pagination.descending = false
-        }
-        this.get(this.pagination)
-      }
-    },500,{trailing:false,leading:true}),
-    checkSelect:function(value){
-      this.selectAll=this.selectAll && value
-    },
-    toggleSelectAll:function(value){
-      this.$store.commit('data/selectAll',value)
-      this.selectAll=value
-    },
-    expand:_.debounce(function(prop) {
-      prop.expanded = !prop.expanded
-    },100,{trailing:true,leading:false}),
-    edit:console.log
-  }
-}
+};
 </script>
 <style lang='scss'>
   .tabs__item {
-    color:white !important; 
-  }
-  .empty .datatable__actions__pagination {
-    display:none;
+    color:white !important;
   }
 </style>
 <style lang='scss' scoped>
-  
+
   .shrink {
     width:10%;
   }
@@ -264,5 +365,10 @@ module.exports={
   tr {
     position:relative;
   }
+  .icon-button {
+    background: transparent;
+    box-shadow: none !important;
+    border-radius: 50%;
+    justify-content: center;
+  }
 </style>
-

@@ -18,11 +18,11 @@ const query=require('query-string').stringify
 const _=require('lodash')
 const zlib=require('zlib')
 const axios=require('axios')
-const Url=require('url')
+const { URL } = require('url');
 const sign=require('aws4').sign
 const fs=require('fs')
-const aws=require('aws-sdk')
-aws.config.region=config.region
+const region=config.region
+const { fromEnv } = require('@aws-sdk/credential-providers');
 const outputs=require('../../../bin/exports')
 
 exports.exists=async function(id,test,not=true){
@@ -52,12 +52,12 @@ async function  api(opts){
     const output = await outputs('dev/master', { wait: true })
     const href = opts.path ? output.ApiEndpoint + '/' + opts.path : opts.href
     console.log(opts)
-    const url = Url.parse(href)
+    const url = new URL(href)
     const request = {
-        host: url.hostname,
+        host: url.host,
         method: opts.method.toUpperCase(),
         url: url.href,
-        path: url.path,
+        path: url.pathname + url.search,
         headers: opts.headers || {}
     }
     if (opts.body) {
@@ -66,7 +66,7 @@ async function  api(opts){
             request.headers['content-type'] = 'application/json'
     }
     console.log("Request", JSON.stringify(request, null, 2))
-    const credentials = aws.config.credentials
+    const credentials = fromEnv()
     const signed = sign(request, credentials)
     delete request.headers["Host"]
     delete request.headers["Content-Length"]

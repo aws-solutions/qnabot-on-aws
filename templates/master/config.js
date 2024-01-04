@@ -1,4 +1,4 @@
-/*********************************************************************************************************************
+/** *******************************************************************************************************************
  *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.                                                *
  *                                                                                                                    *
  *  Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance    *
@@ -9,13 +9,13 @@
  *  or in the 'license' file accompanying this file. This file is distributed on an 'AS IS' BASIS, WITHOUT WARRANTIES *
  *  OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions    *
  *  and limitations under the License.                                                                                *
- *********************************************************************************************************************/
+ ******************************************************************************************************************** */
 
 const _ = require('lodash');
 
 const methods = [];
 _.forEach(require('./routes'), (value, key) => {
-    value.Type === 'AWS::ApiGateway::Method' ? methods.push(key) : null;
+    value.Type === 'AWS::ApiGateway::Method' ? methods.push(key) : null;  // NOSONAR used iterative expression
 });
 const permissions = _.keys(require('./lambda'))
     .filter((x) => x.match(/^InvokePermission/))
@@ -33,7 +33,7 @@ module.exports = {
         Properties: {
             Name: { Ref: 'AWS::StackName' },
             Description: 'An Api interface for the admin actions on the QNA bot',
-            BinaryMediaTypes: ['image/png','font/woff','font/woff2'],
+            BinaryMediaTypes: ['image/png', 'font/woff', 'font/woff2'],
             MinimumCompressionSize: 500000,
         },
     },

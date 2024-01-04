@@ -14,24 +14,44 @@
 const _ = require('lodash');
 const run = require('./run.js');
 
-exports.bot = async function (name, version) {
-    const res =  run('getBotVersions', { name })
-    const versions = res.bots.map(x => x.version)
-    const latestVersions = versions.filter(x => !_.includes(['$LATEST', version], x))
-    const deleteBotVersion = latestVersions.map(x => run('deleteBotVersion', { name, version: x }))
-    return await Promise.all(deleteBotVersion)
+exports.bot = async function(name, version) {
+    try {
+        const res = await run('getBotVersions', { name });
+        const versions = res.bots
+            .map(x => x.version)
+            .filter(x => !_.includes(['$LATEST', version], x))
+            .map(x => run('deleteBotVersion', { name, version: x }));
+        return await Promise.all(versions); 
+    } catch (error) {
+        console.error("An error occurred during getBotVersions: ", error);
+        throw error;
+    }
 };
-exports.intent = async function (name, version) {
-    const res =  run('getIntentVersions', { name })
-    const versions = res.intents.map(x => x.version)
-    const latestVersions = versions.filter(x => !_.includes(['$LATEST', version], x))
-    const deleteIntentVersion = latestVersions.map(x => run('deleteIntentVersion', { name, version: x }))
-    return await Promise.all(deleteIntentVersion)
+
+exports.intent = async function(name, version) {
+    try {
+        const res = await run('getIntentVersions', { name });
+        const versions = res.intents
+            .map(x => x.version)
+            .filter(x => !_.includes(['$LATEST', version], x))
+            .map(x => run('deleteIntentVersion', { name, version: x }));
+        return await Promise.all(versions);
+    } catch (error) {
+        console.error("An error occurred during getIntentVersions: ", error);
+        throw error;
+    }
 };
-exports.slot = async function (name, version) {
-    const res =  run('getSlotTypeVersions', { name })
-    const versions = res.slotTypes.map(x => x.version)
-    const latestVersions = versions.filter(x => !_.includes(['$LATEST', version], x))
-    const deleteSlotTypeVersion = latestVersions.map(x => run('deleteSlotTypeVersion', { name, version: x }))
-    return await Promise.all(deleteSlotTypeVersion)
+
+exports.slot = async function(name, version) {
+    try {
+        const res = await run('getSlotTypeVersions', { name });
+        const versions = res.slotTypes
+            .map(x => x.version)
+            .filter(x => !_.includes(['$LATEST', version], x))
+            .map(x => run('deleteSlotTypeVersion', { name, version: x }));
+        return await Promise.all(versions);
+    } catch (error) {
+        console.error("An error occurred during getSlotTypeVersions: ", error); 
+        throw error;
+    }
 };

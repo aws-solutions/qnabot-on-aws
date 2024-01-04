@@ -16,6 +16,8 @@ const _ = require('lodash');
 const qnabot = require('qnabot/logging');
 const get_keywords = require('./keywords');
 const get_embeddings = require('./embeddings');
+const { inIgnoreUtterances } = require('./fulfillment-event/utterance');
+const { utteranceIsQid } = require('./fulfillment-event/qid');
 
 function build_qid_query(params) {
     qnabot.log('Build_qid_query - params: ', JSON.stringify(params, null, 2));
@@ -104,7 +106,7 @@ function build_query(params) {
                     ],
                 }).filterMinimumShouldMatch(1);
 
-            if (_.get(params, 'settings.EMBEDDINGS_ENABLE')) {
+            if (_.get(params, 'settings.EMBEDDINGS_ENABLE') && !inIgnoreUtterances(params.question, _.get(params, 'settings.PROTECTED_UTTERANCES'))) {
                 // do KNN embedding match for semantic similarity
                 if (params.score_answer) {
                     // match on a_vector (score_answer is true)
@@ -200,7 +202,7 @@ function build_query(params) {
 
 module.exports = function (params) {
     // if question starts with "QID::" then build a Qid targeted query, else build question matching query.
-    if (params.question.toLowerCase().startsWith('qid::')) {
+    if (utteranceIsQid(params.question)) {
     // question specifies targeted Qid
         params.qid = params.question.split('::')[1];
         return build_qid_query(params);

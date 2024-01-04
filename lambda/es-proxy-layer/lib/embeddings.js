@@ -11,14 +11,17 @@
  *  and limitations under the License.                                                                                *
  *********************************************************************************************************************/
 
-const aws = require('aws-sdk');
+const { Lambda } = require('@aws-sdk/client-lambda');
+const { SageMakerRuntime } = require('@aws-sdk/client-sagemaker-runtime');
 const _ = require('lodash');
+const region = process.env.AWS_REGION || 'us-east-1';
+const customSdkConfig = require('../lib/util/customSdkConfig');
 
 // input/output for endpoint running HF_MODEL intfloat/e5-large
 // See https://huggingface.co/intfloat/e5-large
 // Returns embedding with 1024 dimensions
 const get_embeddings_sm = async function get_embeddings_sm(type_q_or_a, input, settings) {
-    const sm = new aws.SageMakerRuntime({ region: process.env.AWS_REGION || 'us-east-1' });
+    const sm = new SageMakerRuntime(customSdkConfig('C003', { region }));
     // prefix input text with 'query:' or 'passage:' to generate suitable embeddings per https://huggingface.co/intfloat/e5-large
     if (_.get(settings, 'EMBEDDINGS_QUERY_PASSAGE_PREFIX_STRINGS', true)) {
         if (type_q_or_a === 'a') {
@@ -33,20 +36,21 @@ const get_embeddings_sm = async function get_embeddings_sm(type_q_or_a, input, s
         EndpointName: process.env.EMBEDDINGS_SAGEMAKER_ENDPOINT,
         ContentType: 'application/json',
         Body: body,
-    }).promise();
+    });
     const sm_body = JSON.parse(Buffer.from(smres.Body, 'utf-8').toString());
     return sm_body.vectors;
 };
 
 const get_embeddings_lambda = async function get_embeddings_lambda(type_q_or_a, input, settings) {
     console.log(`Fetch embeddings from Lambda for type: '${type_q_or_a}' - InputText: ${input}`);
-    const lambda = new aws.Lambda();
+    const lambda = new Lambda(customSdkConfig('C004', { region }));
     const lambdares = await lambda.invoke({
         FunctionName: process.env.EMBEDDINGS_LAMBDA_ARN,
         InvocationType: 'RequestResponse',
         Payload: JSON.stringify({ inputType: type_q_or_a, inputText: input }),
-    }).promise();
-    const payload = JSON.parse(lambdares.Payload);
+    });
+    const payloadObj = Buffer.from(lambdares.Payload).toString();
+    const payload = JSON.parse(payloadObj);
     return payload.embedding;
 };
 

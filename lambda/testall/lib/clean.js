@@ -11,16 +11,17 @@
  *  and limitations under the License.                                                                                *
  *********************************************************************************************************************/
 
-const aws = require('aws-sdk');
+const { S3Client, DeleteObjectsCommand } = require('@aws-sdk/client-s3');
+const customSdkConfig = require('sdk-config/customSdkConfig');
 
-aws.config.region = process.env.AWS_REGION;
-const s3 = new aws.S3();
+const region = process.env.AWS_REGION;
+const s3 = new S3Client(customSdkConfig('C012', { region }));
 const _ = require('lodash');
 
 module.exports = async function (config) {
     if (config.parts.length > 0) {
         try {
-            await s3.deleteObjects({
+            await s3.send(new DeleteObjectsCommand({
                 Bucket: config.bucket,
                 Delete: {
                     Objects: config.parts.map((part) => ({
@@ -29,7 +30,7 @@ module.exports = async function (config) {
                     })),
                     Quiet: true,
                 },
-            }).promise();
+            }));
             config.status = 'Completed';
         } catch (error) {
             console.error('An error occurred while clean task : ', error);

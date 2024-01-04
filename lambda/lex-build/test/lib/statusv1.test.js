@@ -1,0 +1,138 @@
+/*********************************************************************************************************************
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.                                                *
+ *                                                                                                                    *
+ *  Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance    *
+ *  with the License. A copy of the License is located at                                                             *
+ *                                                                                                                    *
+ *      http://www.apache.org/licenses/                                                                               *
+ *                                                                                                                    *
+ *  or in the 'license' file accompanying this file. This file is distributed on an 'AS IS' BASIS, WITHOUT WARRANTIES *
+ *  OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions    *
+ *  and limitations under the License.                                                                                *
+ *********************************************************************************************************************/
+
+
+const { S3Client, GetObjectCommand, PutObjectCommand } = require('@aws-sdk/client-s3');
+const { mockClient } = require('aws-sdk-client-mock');
+const s3Mock = mockClient(S3Client);
+require('aws-sdk-client-mock-jest');
+const statusV1 = require('../../lib/statusv1');
+const {sdkStreamMixin} = require('@aws-sdk/util-stream-node');
+const {Readable} = require('stream');
+
+describe('When calling statusV1 function', () => {
+    beforeEach(() => {
+        s3Mock.reset();
+        process.env.STATUS_KEY = 'testKey';
+        process.env.STATUS_BUCKET = 'testBucket';
+    });
+
+    test('Should successfully send PutObjectCommand to s3 with no errors with status and message', async () => {
+        const message = 'test-message';
+        const status = 'success';
+        const mockResponse = {
+            'name': 'test-statusv1',
+            'lastUpdatedDate': '12/03/2023',
+            'createdDate': '10/27/2023',
+            'version': '2.0'};
+
+        const stream = new Readable();
+        stream.push(JSON.stringify(mockResponse));
+        stream.push(null);
+
+        s3Mock.on(GetObjectCommand).resolves(
+            {
+                Body: sdkStreamMixin(stream)
+            }
+        );
+
+        const verifyMessage = {};
+
+        //Add status and message fields to mockResponse if required
+        const statusAndMessageMock = jest.fn().mockImplementation(() => {
+                if(message) verifyMessage.message=message;
+                verifyMessage.status=status;
+                return verifyMessage;
+        })
+
+        await statusV1(status, message);
+
+        const putParams = {
+            Body: "{\"name\":\"test-statusv1\",\"lastUpdatedDate\":\"12/03/2023\",\"createdDate\":\"10/27/2023\",\"version\":\"2.0\",\"message\":\"test-message\",\"status\":\"success\"}",
+            Bucket: 'testBucket',
+            Key: 'testKey'
+        };
+        expect(s3Mock).toHaveReceivedCommandTimes(GetObjectCommand, 1);
+        expect(s3Mock).toHaveReceivedCommandWith(GetObjectCommand, {"Bucket": "testBucket", "Key": "testKey"});
+        expect(s3Mock).toHaveReceivedCommandTimes(PutObjectCommand, 1);
+        expect(s3Mock).toHaveReceivedCommandWith(PutObjectCommand, putParams);
+
+        //Verify Status and message present
+        expect(statusAndMessageMock().status).toEqual(status);
+        expect(statusAndMessageMock().message).toEqual(message)
+
+    });
+
+    test('Should successfully send PutObjectCommand to s3 with no errors with status only', async () => {
+        const message = undefined;
+        const status = 'success';
+        const mockResponse = {
+            'name': 'test-statusv1-noMessage',
+            'lastUpdatedDate': '12/03/2023',
+            'createdDate': '10/27/2023',
+            'version': '2.0'};
+
+        const stream = new Readable();
+        stream.push(JSON.stringify(mockResponse));
+        stream.push(null);
+
+        s3Mock.on(GetObjectCommand).resolves(
+            {
+                Body: sdkStreamMixin(stream)
+            }
+        );
+
+        const verifyMessage = {};
+
+        //Add status and message fields to mockResponse if required
+        const statusAndMessageMock = jest.fn().mockImplementation(() => {
+                if(message) verifyMessage.message=message;
+                verifyMessage.status=status;
+                return verifyMessage;
+        })
+
+        await statusV1(status, message);
+
+        const putParams = {
+            Body: "{\"name\":\"test-statusv1-noMessage\",\"lastUpdatedDate\":\"12/03/2023\",\"createdDate\":\"10/27/2023\",\"version\":\"2.0\",\"status\":\"success\"}",
+            Bucket: 'testBucket',
+            Key: 'testKey'
+        };
+        expect(s3Mock).toHaveReceivedCommandTimes(GetObjectCommand, 1);
+        expect(s3Mock).toHaveReceivedCommandWith(GetObjectCommand, {"Bucket": "testBucket", "Key": "testKey"});
+        expect(s3Mock).toHaveReceivedCommandTimes(PutObjectCommand, 1);
+        expect(s3Mock).toHaveReceivedCommandWith(PutObjectCommand, putParams);
+
+
+        //Verify Status and message present
+        expect(statusAndMessageMock().status).toEqual(status);
+        expect(statusAndMessageMock().message).toBeUndefined();
+    });
+
+
+    test('Should throw error', async () => {
+        const message = 'test-message';
+        const status = 'success';
+
+        s3Mock.on(GetObjectCommand).rejects(new Error("Error with PutObject Command"));
+
+        await expect(async () => {
+            await statusV1(status, message)
+        }).rejects.toThrowError();
+
+        expect(s3Mock).toHaveReceivedCommandTimes(GetObjectCommand, 1);
+        expect(s3Mock).toHaveReceivedCommandWith(GetObjectCommand, {"Bucket": "testBucket", "Key": "testKey"});
+        expect(s3Mock).toHaveReceivedCommandTimes(PutObjectCommand, 0);
+    });
+
+});

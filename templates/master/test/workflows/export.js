@@ -18,9 +18,9 @@ const _=require('lodash')
 const api=require('../util').api
 const faker=require('faker').lorem
 const range=require('range').range
-const aws=require('aws-sdk')
-aws.config.region=config.region
-const s3=new aws.S3()
+const { S3Client, PutObjectCommand, GetObjectCommand } = require('@aws-sdk/client-s3');
+const region = config.region
+const s3 = new S3Client({ region })
 
 module.exports={
     setUp:function(done){
@@ -33,11 +33,11 @@ module.exports={
             method:"GET"
         })
         .then(x=>x._links.imports)
-        .then(info=>s3.putObject({
+        .then(info=>s3.send(new PutObjectCommand({
             Bucket:info.bucket,
             Key:info.uploadPrefix+name,
             Body:range(0,count).map(qna).join('\n')
-        }).promise())
+        })))
         .then(function(info){
             return new Promise(function(res,rej){
                 function next(i){
@@ -113,10 +113,10 @@ module.exports={
                     }
                 }
             })
-            const data=(await s3.getObject({
+            const data=(await s3.send(new GetObjectCommand({
                 Bucket:completed.bucket,
                 Key:completed.key,
-            }).promise()).Body.toString().split('\n')
+            }))).Body.toString().split('\n')
             console.log(data.length,this.count)
             test.ok(data.length>=this.count)
             data.forEach(x=>{
@@ -166,10 +166,10 @@ module.exports={
                     }
                 }
             })
-            const data=(await s3.getObject({
+            const data=(await s3.send(new GetObjectCommand({
                 Bucket:completed.bucket,
                 Key:completed.key,
-            }).promise()).Body.toString().split('\n')
+            }))).Body.toString().split('\n')
             test.equal(data.length,1)
         }catch(e){
             console.log(e)

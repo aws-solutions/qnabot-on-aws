@@ -1,0 +1,45 @@
+{
+	"intentName": "sayHello",
+	"localeId": "en_US",
+	"sampleUtterances": [
+		{
+			"utterance": "Hello"
+		},
+		{
+			"utterance": "Hi"
+		},
+		{
+			"utterance": "Greetings"
+		}
+	],
+	"fulfillmentCodeHook": {
+		"active": true,
+		"enabled": false,
+		"postFulfillmentStatusSpecification": {
+			"failureResponse": {
+				"allowInterrupt": true,
+				"messageGroups": [
+					{
+						"message": {
+							"plainTextMessage": {
+								"value": "I BROKE"
+							}
+						}
+					}
+				]
+			},
+			"successResponse": {
+				"allowInterrupt": true,
+				"messageGroups": [
+					{
+						"message": {
+							"plainTextMessage": {
+								"value": "GREETINGS, I AM TEST BOT"
+							}
+						}
+					}
+				]
+			}
+		}
+	}
+}

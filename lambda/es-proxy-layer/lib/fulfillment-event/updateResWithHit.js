@@ -22,7 +22,7 @@ function updateSessionNavigation(res, req) {
         && !(_.get(navigationJson, 'hasParent', true))
         && req._info.es.type == 'qna') {
         if (previousArray.length == 0) {
-            previousArray.push(previousQid);
+            previousArray.push(previousQid); // NOSONAR Reduces Cog complexity
         } else if (previousArray[previousArray.length - 1] != previousQid) {
             previousArray.push(previousQid);
         }

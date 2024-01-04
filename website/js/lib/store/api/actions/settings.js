@@ -1,4 +1,4 @@
-/*********************************************************************************************************************
+/** *******************************************************************************************************************
  *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.                                                *
  *                                                                                                                    *
  *  Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance    *
@@ -9,7 +9,7 @@
  *  or in the 'license' file accompanying this file. This file is distributed on an 'AS IS' BASIS, WITHOUT WARRANTIES *
  *  OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions    *
  *  and limitations under the License.                                                                                *
- *********************************************************************************************************************/
+ ******************************************************************************************************************** */
 const query = require('query-string').stringify;
 const _ = require('lodash');
 const axios = require('axios');
@@ -17,7 +17,8 @@ const Url = require('url');
 const { sign } = require('aws4');
 const path = require('path');
 const { Mutex } = require('async-mutex');
-const aws = require('aws-sdk');
+const { SSM } = require('@aws-sdk/client-ssm');
+const util = require('./util');
 
 const mutex = new Mutex();
 
@@ -69,13 +70,15 @@ function saveParameters(ssm, params) {
     });
 }
 
-const failed = false;
 module.exports = {
     async listSettings(context) {
-        aws.config.credentials = context.rootState.user.credentials;
+        const credentials = context.rootState.user.credentials;
         const customParams = context.rootState.info.CustomQnABotSettings;
         const defaultParams = context.rootState.info.DefaultQnABotSettings;
-        const ssm = new aws.SSM({ region: context.rootState.info.region });
+        const ssm = new SSM({
+            customUserAgent : util.getUserAgentString(context.rootState.info.Version, 'C022'),
+            region: context.rootState.info.region, credentials
+        });
         const query = {
             Names: [customParams, defaultParams],
             WithDecryption: true,
@@ -84,9 +87,12 @@ module.exports = {
         return response;
     },
     async updateSettings(context, settings) {
-        aws.config.credentials = context.rootState.user.credentials;
+        const credentials = context.rootState.user.credentials;
         const customParams = context.rootState.info.CustomQnABotSettings;
-        const ssm = new aws.SSM({ region: context.rootState.info.region });
+        const ssm = new SSM({
+            customUserAgent: util.getUserAgentString(context.rootState.info.Version, 'C022'),
+            region: context.rootState.info.region, credentials
+        });
         // Note type is not required in params if the parameter exists. Some customers require this parameter
         // to be a SecureString and set this type post deploy of QnABot. Removing type supports
         // this setting.

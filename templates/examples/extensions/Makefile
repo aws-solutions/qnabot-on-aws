@@ -27,7 +27,7 @@ $(PY_LAMBDAS):
 	rm -fr py_modules $(DSTDIR)/EXT$@.zip ; \
 	[ -f requirements.txt ] && \
 		python3 -m pip install --upgrade -r requirements.txt -t ./py_modules ; \
-	zip -r -q $(DSTDIR)/EXT$@.zip .
+	zip -r -q $(DSTDIR)/EXT$@.zip *.py requirements.txt py_modules --exclude __tests__/*
 
 pkg_imports:
 	cd ui_imports; \

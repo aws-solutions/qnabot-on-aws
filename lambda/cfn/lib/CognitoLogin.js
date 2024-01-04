@@ -11,47 +11,52 @@
  *  and limitations under the License.                                                                                *
  *********************************************************************************************************************/
 
-const Promise = require('./util/promise');
-const aws = require('./util/aws');
+const { CognitoIdentityProvider } = require('@aws-sdk/client-cognito-identity-provider');
+const { S3 } = require('@aws-sdk/client-s3');
+const customSdkConfig = require('./util/customSdkConfig');
 
-const cognito = new aws.CognitoIdentityServiceProvider();
-const crypto = Promise.promisifyAll(require('crypto'));
+const region = process.env.AWS_REGION || 'us-east-1';
+const cognito = new CognitoIdentityProvider(customSdkConfig({ region }));
+const s3 = new S3(customSdkConfig({ region }));
 
 module.exports = class CognitoLogin extends require('./base') {
     constructor() {
         super();
     }
 
-    Create(params, reply) {
+    async Create(params, reply) {
         const url = params.CallbackUrl;
+        try {
+            const userParams = {
+                ClientId: params.ClientId,
+                UserPoolId: params.UserPool,
+                CallbackURLs: params.LoginCallbackUrls,
+                LogoutURLs: params.LogoutCallbackUrls,
+                ExplicitAuthFlows: ['ADMIN_NO_SRP_AUTH'],
+                RefreshTokenValidity: 1,
+                SupportedIdentityProviders: ['COGNITO'],
+                AllowedOAuthFlows: ['code', 'implicit'],
+                AllowedOAuthScopes: ['phone', 'email', 'openid', 'profile'],
+                AllowedOAuthFlowsUserPoolClient: true,
+            }
+            await cognito.updateUserPoolClient(userParams);
 
-        return cognito.updateUserPoolClient({
-            ClientId: params.ClientId,
-            UserPoolId: params.UserPool,
-            CallbackURLs: params.LoginCallbackUrls,
-            LogoutURLs: params.LogoutCallbackUrls,
-            ExplicitAuthFlows: ['ADMIN_NO_SRP_AUTH'],
-            RefreshTokenValidity: 1,
-            SupportedIdentityProviders: ['COGNITO'],
-            AllowedOAuthFlows: ['code', 'implicit'],
-            AllowedOAuthScopes: ['phone', 'email', 'openid', 'profile'],
-            AllowedOAuthFlowsUserPoolClient: true,
-        }).promise()
-            .then(() => {
-                if (params.ImageBucket && params.ImageKey) {
-                    return (new aws.S3()).getObject({
-                        Bucket: params.ImageBucket,
-                        Key: params.ImageKey,
-                    }).promise().get('content')
-                        .then((x) => params.Image = x);
-                }
-            })
-            .then(() => cognito.setUICustomization({
+            if (params.ImageBucket && params.ImageKey) {
+                const result = await s3.getObject({
+                    Bucket: params.ImageBucket,
+                    Key: params.ImageKey,
+                });
+                params.Image = await result.Body.transformToByteArray();
+            }
+            await cognito.setUICustomization({
                 ClientId: params.ClientId,
                 UserPoolId: params.UserPool,
                 CSS: params.CSS,
-            }))
-            .then(() => reply(null, url))
-            .catch(reply);
+            });
+            reply(null, url);
+        } catch (e) {
+            console.error('An error occured in CognitoLogin: ', e);
+            reply(e);
+        }
     }
 };

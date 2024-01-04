@@ -1,0 +1,58 @@
+{
+	"intentName": "GetAttribute",
+	"localeId": "en_US",
+	"sampleUtterances": [
+		{
+			"utterance": "Do I have an attribute?"
+		}
+	],
+	"initialResponseSetting": {
+		"conditional": {
+			"active": true,
+			"conditionalBranches": [
+				{
+					"condition": {
+						"expressionString": "[myAttribute] = \"test\""
+					},
+					"name": "hasAttribute",
+					"nextStep": {
+						"dialogAction": {
+							"type": "EndConversation"
+						}
+					},
+					"response": {
+						"allowInterrupt": true,
+						"messageGroups": [
+							{
+								"message": {
+									"plainTextMessage": {
+										"value": "TRUE - YOUR ATTRIBUTE IS CONFIGURED CORRECTLY"
+									}
+								}
+							}
+						]
+					}
+				}
+			],
+			"defaultBranch": {
+				"nextStep": {
+					"dialogAction": {
+						"type": "EndConversation"
+					}
+				},
+				"response": {
+					"allowInterrupt": true,
+					"messageGroups": [
+						{
+							"message": {
+								"plainTextMessage": {
+									"value": "FALSE - YOUR ATTRIBUTE IS NOT CONFIGURED CORRECTLY"
+								}
+							}
+						}
+					]
+				}
+			}
+		}
+	}
+}

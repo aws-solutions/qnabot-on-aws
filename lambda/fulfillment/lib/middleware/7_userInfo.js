@@ -12,8 +12,11 @@
  *********************************************************************************************************************/
 
 const _ = require('lodash');
-const AWS = require('aws-sdk');
+const { DynamoDBDocument} = require('@aws-sdk/lib-dynamodb');
+const { DynamoDB } = require('@aws-sdk/client-dynamodb');
 const qnabot = require('qnabot/logging');
+const customSdkConfig = require('sdk-config/customSdkConfig');
+const region = process.env.AWS_REGION || 'us-east-1';
 
 function getDistinctValues(list, objectId, sortField) {
     let distinctItems = [...new Set(list.map((item) => item[objectId]))];
@@ -34,7 +37,7 @@ async function update_userInfo(res) {
     const userId = _.get(res, '_userInfo.UserName') && _.get(res, '_userInfo.isVerifiedIdentity') == 'true' ? _.get(res, '_userInfo.UserName') : _.get(res, '_userInfo.UserId');
     _.set(res, '_userInfo.UserId', userId);
     const usersTable = process.env.DYNAMODB_USERSTABLE;
-    const docClient = new AWS.DynamoDB.DocumentClient({ apiVersion: '2012-08-10' });
+    const docClient = DynamoDBDocument.from(new DynamoDB(customSdkConfig('C013', { apiVersion: '2012-08-10', region })));
     const params = {
         TableName: usersTable,
         Item: res._userInfo,
@@ -42,7 +45,7 @@ async function update_userInfo(res) {
     qnabot.log('Saving response user info to DynamoDB: ', params);
     let ddbResponse = {};
     try {
-        ddbResponse = await docClient.put(params).promise();
+        ddbResponse = await docClient.put(params);
     } catch (e) {
         qnabot.log('ERROR: DDB Exception caught - can\'t save userInfo: ', e);
     }

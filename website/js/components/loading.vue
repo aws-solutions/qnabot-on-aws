@@ -11,30 +11,31 @@
  *  and limitations under the License.                                                                                *
  *********************************************************************************************************************/
 <template lang='pug'>
-  v-card
+v-card
     v-progress-linear(indeterminate)
 </template>
 
 <script>
 
-const Vuex=require('vuex')
-const Promise=require('bluebird')
+require('vuex');
 
-module.exports={
-  data:function(){
-    return {}
-  },
-  components:{
-  },
-  created:function(){
-    const self=this
-    this.$store.dispatch('bootstrap')
-    .then(()=>self.$store.dispatch('user/login'))
-    .then(()=>self.$router.replace('/edit'))
-    .tapCatch(console.log)
-    .catch(()=>self.$router.replace('/error'))
-  },
-  methods:{
-  }
-}
+module.exports = {
+    data() {
+        return {};
+    },
+    components: {
+    },
+    created() {
+        const self = this;
+        this.$store.dispatch('bootstrap')
+            .then(() => self.$store.dispatch('user/login'))
+            .then(() => self.$router.replace('/edit'))
+            .catch((error) => {
+                console.log(error);
+                self.$router.replace('/error');
+            });
+    },
+    methods: {
+    },
+};
 </script>

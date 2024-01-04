@@ -1,4 +1,4 @@
-/*********************************************************************************************************************
+/** *******************************************************************************************************************
  *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.                                                *
  *                                                                                                                    *
  *  Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance    *
@@ -9,15 +9,14 @@
  *  or in the 'license' file accompanying this file. This file is distributed on an 'AS IS' BASIS, WITHOUT WARRANTIES *
  *  OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions    *
  *  and limitations under the License.                                                                                *
- *********************************************************************************************************************/
+ ******************************************************************************************************************** */
 
-const Promise = require('bluebird');
 const axios = require('axios');
 const jwt = require('jsonwebtoken');
-const aws = require('aws-sdk');
 const _ = require('lodash');
 const { set } = require('vue');
 const query = require('query-string');
+const { fromCognitoIdentityPool } = require('@aws-sdk/credential-providers');
 
 module.exports = {
     async refreshTokens(context) {
@@ -43,7 +42,7 @@ module.exports = {
             window.sessionStorage.setItem('id_token', tokens.data.id_token);
             window.sessionStorage.setItem('access_token', tokens.data.access_token);
             window.sessionStorage.setItem('refresh_token', tokens.data.refresh_token);
-            set(context.state, 'token', tokens.data.id_token);
+            context.state.token = tokens.data.id_token;
         } catch (e) {
             const login = _.get(context, 'rootState.info._links.DesignerLogin.href');
             const result = window.confirm('Your credentials have expired, please log back in. Click Ok to be redirected to the login page.');
@@ -60,7 +59,7 @@ module.exports = {
                 credentials = await getCredentials(context);
                 return credentials;
             }
-            if (context.state.credentials.needsRefresh()) {
+            if (context.state.credentials.expiration && new Date(context.state.credentials.expiration) <= new Date()) {
                 credentials = await getCredentials(context);
                 return credentials;
             }
@@ -78,20 +77,18 @@ module.exports = {
         window.sessionStorage.clear();
     },
     async login(context) {
-        aws.config.region = context.rootState.info.region;
-
         const id_token = window.sessionStorage.getItem('id_token');
         let token;
         if (id_token && id_token !== 'undefined') {
             token = jwt.decode(id_token);
-            set(context.state, 'token', id_token);
+            context.state.token = id_token;
         } else {
             const { code } = query.parse(window.location.search);
             token = jwt.decode(await getTokens(context, code));
         }
 
-        set(context.state, 'name', token['cognito:username']);
-        set(context.state, 'groups', token['cognito:groups']);
+        context.state.name = token['cognito:username'];
+        context.state.groups = token['cognito:groups'];
 
         if (!context.state.groups || !context.state.groups.includes('Admins')) {
             const login = _.get(context.rootState, 'info._links.DesignerLogin.href');
@@ -108,13 +105,13 @@ async function getCredentials(context) {
         '.amazonaws.com/',
         context.rootState.info.UserPool,
     ].join('')] = context.state.token;
-
-    set(context.state, 'credentials', new aws.CognitoIdentityCredentials({
-        IdentityPoolId: context.rootState.info.PoolId,
-        RoleSessionName: context.state.name,
-        Logins,
-    }));
-    await context.state.credentials.getPromise();
+    const credentialProvider = await fromCognitoIdentityPool({
+        identityPoolId: context.rootState.info.PoolId,
+        logins: Logins,
+        clientConfig: { region: context.rootState.info.region },
+    })
+    const credentials = await credentialProvider();
+    context.state.credentials = credentials;
     return context.state.credentials;
 }
 async function getTokens(context, code) {
@@ -137,7 +134,7 @@ async function getTokens(context, code) {
         window.sessionStorage.setItem('id_token', tokens.data.id_token);
         window.sessionStorage.setItem('access_token', tokens.data.access_token);
         window.sessionStorage.setItem('refresh_token', tokens.data.refresh_token);
-        set(context.state, 'token', tokens.data.id_token);
+        context.state.token = tokens.data.id_token;
         return tokens.data.id_token;
     } catch (e) {
         const login = _.get(context, 'rootState.info._links.DesignerLogin.href');

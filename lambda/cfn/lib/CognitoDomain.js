@@ -11,39 +11,44 @@
  *  and limitations under the License.                                                                                *
  *********************************************************************************************************************/
 
-const Promise = require('./util/promise');
-const aws = require('./util/aws');
+const { CognitoIdentityProviderClient, CreateUserPoolDomainCommand, DeleteUserPoolDomainCommand } = require('@aws-sdk/client-cognito-identity-provider');
+const customSdkConfig = require('./util/customSdkConfig');
 
-const cognito = new aws.CognitoIdentityServiceProvider();
-const crypto = Promise.promisifyAll(require('crypto'));
+const region = process.env.AWS_REGION || 'us-east-1';
+const cognito = new CognitoIdentityProviderClient(customSdkConfig({ region }));
 
 module.exports = class CognitoDomain extends require('./base') {
     constructor() {
         super();
     }
 
-    Create(params, reply) {
+    async Create(params, reply) {
         const domain = generate(12);
-
-        cognito.createUserPoolDomain({
-            Domain: domain,
-            UserPoolId: params.UserPool,
-        }).promise()
-            .then(() => reply(null, domain, {}))
-            .catch(reply);
+        try {
+            await cognito.send(new CreateUserPoolDomainCommand({
+                Domain: domain,
+                UserPoolId: params.UserPool,
+            }));
+            reply(null, domain, {});
+        } catch (e) {
+            reply(e);
+        }
     }
 
-    Update(ID, params, oldparams, reply) {
-        this.Create(params, reply);
+    async Update(ID, params, oldparams, reply) {
+        await this.Create(params, reply);
     }
 
-    Delete(ID, params, reply) {
-        cognito.deleteUserPoolDomain({
-            Domain: ID,
-            UserPoolId: params.UserPool,
-        }).promise()
-            .then(() => reply(null, ID))
-            .catch(reply);
+    async Delete(ID, params, reply) {
+        try {
+            await cognito.send(new DeleteUserPoolDomainCommand({
+                Domain: ID,
+                UserPoolId: params.UserPool,
+            }));
+            reply(null, ID);
+        } catch (e) {
+            reply(e);
+        }
     }
 };
 
@@ -51,10 +56,10 @@ function generate(n) {
     const add = 1; let
         max = 12 - add;
     if (n > max) {
-        	return generate(max) + generate(n - max);
+        return generate(max) + generate(n - max);
     }
     max = 10 ** (n + add);
     const min = max / 10; // Math.pow(10, n) basically
-    const number = Math.floor(Math.random() * (max - min + 1)) + min;
+    const number = Math.floor(Math.random() * (max - min + 1)) + min;  // NOSONAR It is safe to use random generator here
     return (`${number}`).substring(add);
 }

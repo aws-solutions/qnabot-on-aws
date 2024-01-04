@@ -1,4 +1,4 @@
-/*********************************************************************************************************************
+/** *******************************************************************************************************************
  *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.                                                *
  *                                                                                                                    *
  *  Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance    *
@@ -9,7 +9,7 @@
  *  or in the 'license' file accompanying this file. This file is distributed on an 'AS IS' BASIS, WITHOUT WARRANTIES *
  *  OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions    *
  *  and limitations under the License.                                                                                *
- *********************************************************************************************************************/
+ ******************************************************************************************************************** */
 
 module.exports = {
     type: 'object',
@@ -307,6 +307,28 @@ module.exports = {
                     type: 'string',
                     maxLength: 100,
                     propertyOrder: 3,
+                },
+                specialty_bot_start_up_text: {
+                    title: 'Send initial utterance to bot',
+                    // eslint-disable-next-line no-template-curly-in-string
+                    description: 'An optional string to send to the bot for startup. Use ${utterance} to send the user\'s current input text. Default is an empty string for no initial interaction.',
+                    type: 'string',
+                    maxLength: 100,
+                    propertyOrder: 4,
+                },
+                specialty_bot_session_attributes_to_receive: {
+                    title: 'Session attributes to receive and merge from the Lex specialty bot',
+                    description: 'An optional comma separated list of session attributes to receive from a Lex specialty bot. Default is an empty string.',
+                    type: 'string',
+                    maxLength: 100,
+                    propertyOrder: 5,
+                },
+                specialty_bot_session_attributes_to_receive_namespace: {
+                    title: 'Namespace to use for session attributes being received',
+                    description: 'An string specifying the namespace to use for received attributes. Default is "specialtyBotSessionAttributes".',
+                    type: 'string',
+                    maxLength: 100,
+                    propertyOrder: 6,
                 },
             },
         },
