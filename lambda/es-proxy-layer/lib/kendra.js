@@ -15,6 +15,10 @@
 const _ = require('lodash');
 const linkify = require('linkifyjs');
 const open_es = require('./es_query');
+const { queryKendra } = require('./kendraClient');
+const qnabot = require('qnabot/logging');
+const { signUrls } = require('./signS3URL');
+const { getSupportedLanguages } = require('./supportedLanguages');
 
 /**
  * optional environment variables - These are not used defined during setup of this function in QnABot but are
@@ -25,10 +29,6 @@ const open_es = require('./es_query');
  *
  */
 
-const AWS = require('aws-sdk');
-
-let kendraIndexes;
-const qnabot = require('qnabot/logging');
 
 function allow_kendra_result(kendra_result, minimumScore, response_types) {
     if (!type_filter(response_types, kendra_result)) {
@@ -46,7 +46,7 @@ function allow_kendra_result(kendra_result, minimumScore, response_types) {
 function confidence_filter(minimumScore, kendra_result) {
     let confidences = ['LOW', 'MEDIUM', 'HIGH', 'VERY_HIGH'];
     const index = confidences.findIndex((i) => i == minimumScore.toUpperCase());
-    if (index == undefined) {
+    if (index === -1) {
         qnabot.log('Warning: ALT_SEARCH_KENDRA_FALLBACK_CONFIDENCE_SCORE should be one of \'VERY_HIGH\'|\'HIGH\'|\'MEDIUM\'|\'LOW\'');
         return true;
     }
@@ -93,7 +93,7 @@ function create_debug_object(kendra_result) {
  * @param {boolean} highlightOnly
  * @returns {string}
  */
-function addMarkdownHighlights(textIn, hlBeginOffset, hlEndOffset, highlightOnly = false) {
+function addMarkdownHighlights(textIn, hlBeginOffset, hlEndOffset, highlightOnly) {
     const beginning = textIn.substring(0, hlBeginOffset);
     const highlight = textIn.substring(hlBeginOffset, hlEndOffset);
     const rest = textIn.substring(hlEndOffset);
@@ -123,31 +123,6 @@ function isHighlightInLink(textIn, hlBeginOffset) {
 }
 
 /**
- * Function to query kendraClient and return results via Promise
- * @param kendraClient
- * @param params
- * @param resArray
- * @returns {*}
- */
-function kendraRequester(kendraClient, params, resArray) {
-    return new Promise((resolve, reject) => {
-        qnabot.log(`Kendra request params:${JSON.stringify(params, null, 2)}`);
-        kendraClient.query(params, (err, data) => {
-            const indexId = params.IndexId;
-            if (err) {
-                qnabot.log(err, err.stack);
-                reject(`Error from Kendra query request:${err}`);
-            } else {
-                data.originalKendraIndexId = indexId;
-                qnabot.log(`Kendra response:${JSON.stringify(data, null, 2)}`);
-                resArray.push(data);
-                resolve(data);
-            }
-        });
-    });
-}
-
-/**
  * Function to sort and merge overlapping intervals
  * @param intervals
  * @returns [*]
@@ -170,7 +145,6 @@ function mergeIntervals(intervals) {
     for (let i = 1; i < intervals.length; i++) {
     // get the top element
         top = stack[stack.length - 1];
-
         // if the current interval doesn't overlap with the
         // stack top element, push it to the stack
         if (top.EndOffset < intervals[i].BeginOffset) {
@@ -186,55 +160,6 @@ function mergeIntervals(intervals) {
     }
 
     return stack;
-}
-
-function signS3URL(url, expireSecs) {
-    let bucket; let
-        key;
-    if (url.search(/\/s3[.-](\w{2}-\w{4,9}-\d\.)?amazonaws\.com/) != -1) {
-        // bucket in path format
-        bucket = url.split('/')[3];
-        key = url.split('/').slice(4).join('/');
-    }
-    if (url.search(/\.s3[.-](\w{2}-\w{4,9}-\d\.)?amazonaws\.com/) != -1) {
-        // bucket in hostname format
-        const hostname = url.split('/')[2];
-        bucket = hostname.split('.')[0];
-        key = url.split('/').slice(3).join('/');
-    }
-    if (bucket && key) {
-        qnabot.debug('Convert S3 url to a signed URL: ', url, 'Bucket: ', bucket, ' Key: ', key);
-        try {
-            const s3 = new AWS.S3();
-            const signedurl = s3.getSignedUrl('getObject', {
-                Bucket: bucket,
-                Key: key,
-                Expires: expireSecs,
-            });
-            qnabot.log('Signed URL: ', signedurl);
-            url = signedurl;
-        } catch (err) {
-            qnabot.log('Error signing S3 URL (returning original URL): ', err);
-        }
-    } else {
-        qnabot.debug('URL is not an S3 url - return unchanged: ', url);
-    }
-    return url;
-}
-
-// get document name from URL
-// last element of path with any params removed
-function docName(uri) {
-    if (uri.DocumentTitle) {
-        return uri.Title;
-    }
-    if (uri.Uri) {
-        uri = uri.Uri;
-    }
-    const x = uri.split('/');
-    const y = x[x.length - 1];
-    const n = y.split('?')[0];
-    return n;
 }
 
 /**
@@ -283,20 +208,23 @@ async function routeKendraRequest(event, context) {
 
     const promises = [];
     const resArray = [];
-    const kendraClient = getKendraClient(event);
 
     // process query against Kendra for QnABot
     const kendraIndexes = getKendraIndexes(event);
+    const maxRetries = _.get(event.req._settings, 'KENDRA_FAQ_CONFIG_MAX_RETRIES');
+    const retryDelay =  _.get(event.req._settings, 'KENDRA_FAQ_CONFIG_RETRY_DELAY');
 
     const kendraResultsCached = _.get(event.res, 'kendraResultsCached');
 
     const { origQuestion } = event.req._event;
     const { question } = event.req;
     const useOriginalLanguageQuery = shouldUseOriginalLanguageQuery(event, origQuestion, question);
+    const kendraQuery = useOriginalLanguageQuery ? origQuestion : question;
+    const kendraQueryArgs = _.get(event.req, 'kendraQueryArgs', []);
 
     // This function can handle configuration with an array of kendraIndexes.
     // Iterate through this area and perform queries against Kendra.
-    kendraIndexes.forEach((index, i) => {
+    kendraIndexes.forEach((index) => {
         // if results cached from KendraFAQ, skip index by pushing Promise to resolve cached results
         if (kendraResultsCached && index === kendraResultsCached.originalKendraIndexId && !useOriginalLanguageQuery) {
             qnabot.log('retrieving cached kendra results');
@@ -311,8 +239,7 @@ async function routeKendraRequest(event, context) {
             return;
         }
 
-        const params = getKendraParams(index, useOriginalLanguageQuery, origQuestion, question, event);
-        const p = kendraRequester(kendraClient, params, resArray);
+        const p = queryKendra(resArray, index, kendraQuery, kendraQueryArgs, maxRetries, retryDelay);
         promises.push(p);
     });
 
@@ -328,7 +255,7 @@ exports.handler = async (event, context) => {
     return routeKendraRequest(event, context);
 };
 
-function getAnswerMsg(element, returnTopAnswer, seenTop, answerMessageMd, topAnswerMessageMd, answerMessage, topAnswerMessage, speechMessage) {
+function getAnswerMsg(element, returnTopAnswer, seenTop, answerMessageMd, topAnswerMessageMd, answerMessage, topAnswerMessage, speechMessage) {  // NOSONAR Need all parameters
     // Emboldens the highlighted phrases returned by the Kendra response API in markdown format
     let answerTextMd = element.AdditionalAttributes[0].Value.TextWithHighlightsValue.Text.replace(/\r?\n|\r/g, ' ');
     // iterates over the answer highlights in sorted order of BeginOffset, merges the overlapping intervals
@@ -341,7 +268,8 @@ function getAnswerMsg(element, returnTopAnswer, seenTop, answerMessageMd, topAns
 
         answerTextMd = addMarkdownHighlights(answerTextMd, elem.BeginOffset + offset, elem.EndOffset + offset, true);
 
-        if (returnTopAnswer && elem.TopAnswer == true) { // if top answer is found, then answer is abbreviated to this phrase
+        if (returnTopAnswer && elem.TopAnswer == true) { // NOSONAR Code readability is not improved with removing boolean literals here
+            // if top answer is found, then answer is abbreviated to this phrase
             seenTop = true;
             answerMessageMd = topAnswerMessageMd;
             answerMessage = `${topAnswerMessage + answerTextMd}.`;
@@ -381,51 +309,29 @@ function buildDocInfoAndSpeechMsg(seenTop, element, allFilteredMessages, foundAn
             speechMessage = element.DocumentExcerpt.Text.replace(/\r?\n|\r/g, ' ');
             if (sorted_highlights.length > 0) {
                 const highlight = speechMessage.substring(sorted_highlights[0].BeginOffset, sorted_highlights[0].EndOffset);
-                const pattern = new RegExp(`[^.]* ${highlight}[^.]*\.[^.]*\.`);
+                const pattern = new RegExp(`[^.]*${highlight}[^.]*.[^.]*.`);
                 pattern.lastIndex = 0; // must reset this property of regex object for searches
-                const regexMatch = pattern.exec(speechMessage);
-                // NOSONAR TODO: Investigate this.  Should this be a nohits scenerio?
-                if (regexMatch) {
-                    speechMessage = regexMatch[0];
-                }
+                speechMessage = pattern.exec(speechMessage)[0];
             }
         }
     }
     // but even if topAnswer is found, show URL in markdown
     docInfo.uri = `${element.DocumentURI}`;
-
-    if (element.DocumentTitle && element.DocumentTitle.Text) {
+    if (element.DocumentTitle?.Text) {
         docInfo.Title = element.DocumentTitle.Text;
     }
     return { docInfo, speechMessage };
 }
 
-
 function shortenSpeechMsg(seenTop, sorted_highlights, element, speechMessage) {
     if (!seenTop) {
         const longest_highlight = longestInterval(sorted_highlights);
         const answerText = element.AdditionalAttributes[0].Value.TextWithHighlightsValue.Text.replace(/\r?\n|\r/g, ' ');
-        const pattern = new RegExp(`[^.]* ${longest_highlight}[^.]*\.[^.]*\.`);
+        const pattern = new RegExp(`[^.]*${longest_highlight}[^.]*.[^.]*.`);
         pattern.lastIndex = 0; // must reset this property of regex object for searches
         speechMessage = pattern.exec(answerText)[0];
     }
     return speechMessage;
-}
-
-function getKendraParams(index, useOriginalLanguageQuery, origQuestion, question, event) {
-    let params = {
-        IndexId: index,
-        QueryText: useOriginalLanguageQuery ? origQuestion : question, /* required */
-    };
-    const kendraQueryArgs = _.get(event.req, 'kendraQueryArgs', []);
-    qnabot.log(`Kendra query args: ${kendraQueryArgs}`);
-    for (const argString of kendraQueryArgs) {
-        qnabot.log(`Adding parameter '${argString}'`);
-        const argJSON = `{ ${argString} }`; // convert k:v to a JSON obj
-        const arg = JSON.parse(argJSON);
-        params = _.assign(params, arg);
-    }
-    return params;
 }
 
 function getAnswerTextMd(element) {
@@ -442,29 +348,7 @@ function getAnswerTextMd(element) {
     return answerTextMd;
 }
 
-function getKendraClient(event) {
-    let kendraClient;
-
-    // if test environment, then use mock-up of kendraClient
-    if (event.test) {
-        const mockup = `./test/mockClient${event.test}.js`;
-        kendraClient = require(mockup);
-    } else {
-        AWS.config.update({
-            maxRetries: _.get(event.req._settings, 'KENDRA_FAQ_CONFIG_MAX_RETRIES'),
-            retryDelayOptions: {
-                base: _.get(event.req._settings, 'KENDRA_FAQ_CONFIG_RETRY_DELAY'),
-            },
-        });
-        kendraClient = (process.env.REGION
-            ? new AWS.Kendra({ apiVersion: '2019-02-03', region: process.env.REGION })
-            : new AWS.Kendra({ apiVersion: '2019-02-03' })
-        );
-    }
-    return kendraClient;
-}
-
-function getMarkdownMessage(answerMessageMd, answerMessage, event, answerDocumentUris, foundAnswerCount, seenTop, helpfulDocumentsUris, maxDocumentCount) {
+async function getMarkdownMessage(answerMessageMd, answerMessage, event, answerDocumentUris, foundAnswerCount, seenTop, helpfulDocumentsUris, maxDocumentCount) {  // NOSONAR Need all params
     let markdown = answerMessageMd;
     let message = answerMessage;
 
@@ -473,12 +357,14 @@ function getMarkdownMessage(answerMessageMd, answerMessage, event, answerDocumen
     const expireSeconds = _.get(event.req, '_settings.ALT_SEARCH_KENDRA_S3_SIGNED_URL_EXPIRE_SECS', 300);
     if (answerDocumentUris.size > 0) {
         markdown += `\n\n ${helpfulLinksMsg}: `;
-        answerDocumentUris.forEach((element) => {
-            // Convert S3 Object URLs to signed URLs
-            if (signS3Urls) {
-                element.DocumentURI = signS3URL(element.DocumentURI, expireSeconds);
-            }
-            markdown += `<span translate=no>[${element.DocumentTitle.Text}](${element.DocumentURI})</span>`;
+        let urls = [];
+        answerDocumentUris.forEach((element) => urls.push(element.DocumentURI));
+
+        if (signS3Urls) {
+            urls = await signUrls(urls, expireSeconds);
+        }
+        Array.from(answerDocumentUris).forEach((element, i) => {
+            markdown += `<span translate=no>[${element.DocumentTitle.Text}](${urls[i]})</span>`;
         });
     }
 
@@ -487,23 +373,26 @@ function getMarkdownMessage(answerMessageMd, answerMessage, event, answerDocumen
     }
 
     let idx = foundAnswerCount;
-    helpfulDocumentsUris.forEach((element) => {
+
+    let urls = [];
+    helpfulDocumentsUris.forEach((element) => urls.push(element.uri));
+    if (signS3Urls) {
+        urls = await signUrls(urls, expireSeconds);
+    }
+
+    Array.from(helpfulDocumentsUris).forEach((element, i) => {
         if (idx++ < maxDocumentCount) {
             markdown += '\n\n';
             markdown += '***';
             markdown += '\n\n <br>';
-
             if (element.text && event.req._preferredResponseType != 'SSML') { // don't append doc search to SSML answers
                 markdown += `\n\n  ${element.text}`;
                 message += `\n\n  ${element.text}`;
             }
             const label = element.Title;
-            // Convert S3 Object URLs to signed URLs
-            if (signS3Urls) {
-                element.uri = signS3URL(element.uri, expireSeconds);
-            }
-            markdown += `\n\n  ${helpfulLinksMsg}: <span translate=no>[${label}](${element.uri})</span>`;
-            message += `\n\n  ${helpfulLinksMsg}: ${element.uri}`;
+
+            markdown += `\n\n  ${helpfulLinksMsg}: <span translate=no>[${label}](${urls[i]})</span>`;
+            message += `\n\n  ${helpfulLinksMsg}: ${urls[i]}`;
         }
     });
 
@@ -522,22 +411,25 @@ function getSsmlMessage(foundAnswerCount, foundDocumentCount, answerMessage, spe
         if (lastIndex > 0) {
             ssmlMessage = ssmlMessage.substring(0, lastIndex);
         }
-        ssmlMessage = `<speak> ${ssmlMessage} </speak>`;
     }
+
     if (useFullMessageForSpeech) {
         ssmlMessage = allFilteredMessages.length > 0 ? allFilteredMessages[0] : ssmlMessage;
     }
+    ssmlMessage = `<speak> ${ssmlMessage} </speak>`;
     return ssmlMessage;
 }
 
 function shouldUseOriginalLanguageQuery(event, origQuestion, question) {
     const userDetectedLocale = _.get(event.req, 'session.qnabotcontext.userLocale');
     const standaloneQuery = _.get(event.req, 'llm_generated_query.concatenated');
+    const backupLang = _.get(event.req, '_settings.BACKUP_LANGUAGE', 'English');
+    const supportedLangMap = getSupportedLanguages();
+    const backupLangCode = supportedLangMap[backupLang];
     const kendraIndexedLanguages = _.get(
         event.req._settings,
         'KENDRA_INDEXED_DOCUMENTS_LANGUAGES',
-
-        ['en'],
+        [backupLangCode],
     );
     qnabot.log(`Retrieved Kendra multi-language settings: ${kendraIndexedLanguages}`);
 
@@ -547,12 +439,18 @@ function shouldUseOriginalLanguageQuery(event, origQuestion, question) {
         useOriginalLanguageQuery = false;
         qnabot.log(`Using LLM generated standalone query: ${standaloneQuery}`);
     }
+    if (event.req.kendraRedirect) {
+        useOriginalLanguageQuery = false;
+        qnabot.log('Kendra redirect detected, not using original language query');
+    }
     qnabot.log(`useOriginalLanguageQuery: ${useOriginalLanguageQuery}`);
     return useOriginalLanguageQuery;
 }
 
 function getKendraIndexes(event) {
     const indexes = event.req._settings.ALT_SEARCH_KENDRA_INDEXES ? event.req._settings.ALT_SEARCH_KENDRA_INDEXES : process.env.KENDRA_INDEXES;
+    let kendraIndexes;
+
     if (indexes && indexes.length) {
         try {
             // parse JSON array of kendra indexes
@@ -562,6 +460,7 @@ function getKendraIndexes(event) {
             kendraIndexes = [indexes];
         }
     }
+
     if (kendraIndexes === undefined) {
         throw new Error('Undefined Kendra Indexes');
     }
@@ -599,7 +498,7 @@ function getResultItems(resArray, minimumScore, searchTypes) {
     return elements.filter((element) => allow_kendra_result(element, minimumScore, searchTypes));
 }
 
-function generateAnswerFromKendra(event, resArray, useOriginalLanguageQuery) {
+async function generateAnswerFromKendra(event, resArray, useOriginalLanguageQuery) {
     // when not using LLM QA, if Kendra results contain topAnswer we return that, and ignore all else..
     // BUT this is not helpful when using the LLM to generate an answer.. in this case we should not apply
     // any special handling for 'top answer'
@@ -630,8 +529,8 @@ function generateAnswerFromKendra(event, resArray, useOriginalLanguageQuery) {
     const allFilteredMessages = [];
 
     const filteredElements = getResultItems(resArray, minimumScore, searchTypes);
-
     filteredElements.forEach((element) => {
+
         if (returnTopAnswer && seenTop) {
             return;
         }
@@ -665,6 +564,7 @@ function generateAnswerFromKendra(event, resArray, useOriginalLanguageQuery) {
             foundAnswerCount += 1;
             debugResults.push(create_debug_object(element));
         } else if (isQaType(element)) {
+
             // There will be 2 elements - [0] - QuestionText, [1] - AnswerText
             const message = element.AdditionalAttributes[1].Value.TextWithHighlightsValue.Text.replace(/\r?\n|\r/g, ' ');
             answerMessage = `${faqanswerMessage}\n\n ${message}`;
@@ -690,7 +590,7 @@ function generateAnswerFromKendra(event, resArray, useOriginalLanguageQuery) {
 
     // update QnABot answer content for ssml, markdown, and text
     const ssmlMessage = getSsmlMessage(foundAnswerCount, foundDocumentCount, answerMessage, speechMessage, useFullMessageForSpeech, allFilteredMessages);
-    const [message, markdown] = getMarkdownMessage(answerMessageMd, answerMessage, event, answerDocumentUris, foundAnswerCount, seenTop, helpfulDocumentsUris, maxDocumentCount);
+    const [message, markdown] = await getMarkdownMessage(answerMessageMd, answerMessage, event, answerDocumentUris, foundAnswerCount, seenTop, helpfulDocumentsUris, maxDocumentCount);
 
     const hit = create_hit(message, markdown, ssmlMessage, foundAnswerCount + foundDocumentCount, debugResults, {
         kendraQueryId,

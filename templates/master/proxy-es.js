@@ -1,4 +1,4 @@
-/*********************************************************************************************************************
+/** *******************************************************************************************************************
  *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.                                                *
  *                                                                                                                    *
  *  Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance    *
@@ -9,7 +9,7 @@
  *  or in the 'license' file accompanying this file. This file is distributed on an 'AS IS' BASIS, WITHOUT WARRANTIES *
  *  OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions    *
  *  and limitations under the License.                                                                                *
- *********************************************************************************************************************/
+ ******************************************************************************************************************** */
 
 const _ = require('lodash');
 const util = require('../util');
@@ -47,6 +47,7 @@ module.exports = {
                     ES_ADDRESS: { 'Fn::Join': ['', ['https://', { 'Fn::GetAtt': ['ESVar', 'ESAddress'] }]] },
                     UTTERANCE_BUCKET: { Ref: 'AssetBucket' },
                     UTTERANCE_KEY: 'default-utterances.json',
+                    ...util.getCommonEnvironmentVariables()
                 },
             },
             Handler: 'index.utterances',
@@ -87,6 +88,7 @@ module.exports = {
                 Variables: {
                     ES_INDEX: { 'Fn::GetAtt': ['Var', 'QnaIndex'] },
                     ES_ADDRESS: { 'Fn::GetAtt': ['ESVar', 'ESAddress'] },
+                    ...util.getCommonEnvironmentVariables()
                 },
             },
             Handler: 'index.qid',
@@ -129,6 +131,7 @@ module.exports = {
                     ES_ADDRESS: { 'Fn::GetAtt': ['ESVar', 'ESAddress'] },
                     FEEDBACK_DELETE_RANGE_MINUTES: { Ref: 'KibanaDashboardRetentionMinutes' },
                     METRICS_DELETE_RANGE_MINUTES: { Ref: 'KibanaDashboardRetentionMinutes' },
+                    ...util.getCommonEnvironmentVariables(),
                 },
             },
             Handler: 'index.cleanmetrics',
@@ -190,6 +193,7 @@ module.exports = {
             Environment: {
                 Variables: {
                     FIREHOSE_NAME: { Ref: 'GeneralFirehose' },
+                    ...util.getCommonEnvironmentVariables()
                 },
             },
             Handler: 'index.logging',
@@ -227,6 +231,7 @@ module.exports = {
                     DEFAULT_SETTINGS_PARAM: { Ref: 'DefaultQnABotSettings' },
                     CUSTOM_SETTINGS_PARAM: { Ref: 'CustomQnABotSettings' },
                     ...examples,
+                    ...util.getCommonEnvironmentVariables()
                 },
             },
             Layers: [{ Ref: 'AwsSdkLayerLambdaLayer' },
@@ -284,6 +289,7 @@ module.exports = {
                         ],
                     },
                     EMBEDDINGS_LAMBDA_ARN: { Ref: 'EmbeddingsLambdaArn' },
+                    ...util.getCommonEnvironmentVariables()
                 },
             },
             Handler: 'index.handler',

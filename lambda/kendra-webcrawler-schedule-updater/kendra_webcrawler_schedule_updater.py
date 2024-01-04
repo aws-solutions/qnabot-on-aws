@@ -18,10 +18,14 @@ import re
 import datetime
 import calendar
 import logging
+from botocore.config import Config
 
-kendra = boto3.client('kendra')
-ssm = boto3.client('ssm')
-cloudwatch = boto3.client('cloudwatch')
+sdk_config = Config(user_agent_extra = f"AWSSOLUTION/{os.environ['SOLUTION_ID']}/{os.environ['SOLUTION_VERSION']} AWSSOLUTION-CAPABILITY/{os.environ['SOLUTION_ID']}-C007/{os.environ['SOLUTION_VERSION']}")
+
+
+kendra = boto3.client('kendra', config=sdk_config)
+ssm = boto3.client('ssm', config=sdk_config)
+cloudwatch = boto3.client('cloudwatch', config=sdk_config)
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
@@ -62,12 +66,12 @@ def create_cron_expression(schedule):
         cron[3] = "*"
         cron[4] = "?"
 
-    cron = "cron(" + " ".join(map(lambda i: str(i), cron)) + ")"
+    cron = "cron(" + " ".join(map(lambda i: str(i), cron)) + ")"  # NOSONAR Need cron schedule in this format
     logger.info("cron schedule = " + cron)
     return cron
 
 
-def handler(event, context):
+def handler(event, context):  # NOSONAR Lambda handler
     logger.info(event)
     name = os.environ.get('DATASOURCE_NAME')
     role_arn = os.environ.get('ROLE_ARN')
@@ -83,18 +87,18 @@ def handler(event, context):
     if schedule == "INVALID":
         logger.warn("The cron schedule specified by KENDRA_INDEXER_SCHEDULE " +
                      "is invalid. Schedule: ${schedule}. Crawling will not be done on a schedule/")
-        schedule = ""      
+        schedule = ""
     data_source_id = get_data_source_id(index_id, name)
     current_schedule = get_data_source_schedule(index_id, data_source_id)
 
     schedule_parts = schedule.replace("cron(", "").replace(")", "").split(" ")
     current_schedule_parts = current_schedule.replace("cron(", "").replace(")", "").split(" ")
- 
+
     #The hour and minute are set dynamically.  This is to detect if the schedule changed between DAILY, WEEKLY, MONTHLY
     if(not (schedule_parts[2] != current_schedule_parts[2] or
        schedule_parts[3] != current_schedule_parts[3] or
       ((schedule_parts[3] != current_schedule_parts[3]) and (schedule_parts[3] != "?" or current_schedule_parts[3] != "?")))):
-       
+
         logger.info("No schedule changes detected.  Not updating schedulr")
         schedule = current_schedule
 
@@ -146,9 +150,9 @@ def kendra_update_data_source(index_id, data_source_id, urls, role_arn, schedule
                         'WebCrawlerMode': crawler_mode
                     }
                 },
-                'CrawlDepth': int(crawl_depth), 
-                'MaxLinksPerPage': 100, 
-                'MaxContentSizePerPageInMegaBytes': 50.0, 
+                'CrawlDepth': int(crawl_depth),
+                'MaxLinksPerPage': 100,
+                'MaxContentSizePerPageInMegaBytes': 50.0,
                 'MaxUrlsPerMinuteCrawlRate': 300
             }
         }

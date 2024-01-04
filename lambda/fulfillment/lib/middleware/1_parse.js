@@ -15,7 +15,7 @@ const _ = require('lodash');
 const qnabot = require('qnabot/logging');
 const qna_settings = require('qnabot/settings');
 const lex = require('./lex');
-const multilanguage = require('./multilanguage');
+const { set_multilang_env } = require('./multilanguage');
 const get_sentiment = require('./sentiment');
 const alexa = require('./alexa');
 
@@ -58,7 +58,7 @@ function getClientType(req) {
     if (_.get(req, '_event.requestAttributes.x-amz-lex:channels:platform') == 'Genesys Cloud') {
         return `LEX.GenesysCloud.${voiceortext}`;
     }
-    if (/^.*-.*-\d:.*-.*-.*-.*$/.test(_.get(req, '_event.sessionId', _.get(req, '_event.userId')))) {
+    if (/^.*-.*-\d:.*-.*-.*-.*$/.test(_.get(req, '_event.sessionId', _.get(req, '_event.userId')))) {  // NOSONAR - javascript:S5852 - input is user controlled and we have a limit on the number of characters
         // sessionId (LexV2) or userId (LexV1) pattern to detect lex-web-uithrough use of cognito id as sessionId/userId: e.g. us-east-1:a8e1f7b2-b20d-441c-9698-aff8b519d8d5
         // NOSONAR TODO: add another clientType indicator for lex-web-ui?
         return `LEX.LexWebUI.${voiceortext}`;
@@ -144,7 +144,7 @@ module.exports = async function parse(req, res) {
 
     // multilanguage support
     if (ENABLE_MULTI_LANGUAGE_SUPPORT) {
-        req = await multilanguage.set_multilang_env(req);
+        req = await set_multilang_env(req);
     }
     // end of multilanguage support
 

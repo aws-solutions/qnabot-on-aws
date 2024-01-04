@@ -20,7 +20,7 @@ from moto import mock_sts, mock_s3
 
 from aws_solutions.core.logging import get_logger
 from aws_solutions.qnabot.cli import qnabot_cli_helper
-from tests.aws_solutions.qnabot.fixtures.cloudformation_fixtures import (  # NOSONAR # pylint: disable=unused-import
+from tests.aws_solutions.qnabot.fixtures.cloudformation_fixtures import (  # NOSONAR 
     cloudformation_stacks_fixture,
 )
 from tests.aws_solutions.qnabot.fixtures.s3_fixtures import (
@@ -35,7 +35,7 @@ logger = get_logger(__name__)
 @mock_sts
 @mock_s3
 @pytest.mark.skip(reason='Test fails in pipeline; passes locally.')
-def test_qna_import_json(  # NOSONAR # pylint: disable=unused-argument, redefined-outer-name
+def test_qna_import_json(  # NOSONAR 
     cloudformation_stacks_fixture,
 ):
     cloudformation_stack_name = "test_stack"
@@ -66,7 +66,7 @@ def test_qna_import_json(  # NOSONAR # pylint: disable=unused-argument, redefine
 @mock_sts
 @mock_s3
 @pytest.mark.skip(reason='Test fails in pipeline; passes locally.')
-def test_qna_export_json(  # NOSONAR # pylint: disable=unused-argument, redefined-outer-name
+def test_qna_export_json(  # NOSONAR 
     cloudformation_stacks_fixture,
 ):
     cloudformation_stack_name = "test_stack"
@@ -100,7 +100,7 @@ def test_qna_export_json(  # NOSONAR # pylint: disable=unused-argument, redefine
 @mock_sts
 @mock_s3
 @pytest.mark.skip(reason='Test fails in pipeline; passes locally.')
-def test_qna_import_invalid_stack(  # NOSONAR # pylint: disable=unused-argument, redefined-outer-name
+def test_qna_import_invalid_stack(  # NOSONAR 
     cloudformation_stacks_fixture,
 ):
     cloudformation_stack_name = "non-existing-stack"

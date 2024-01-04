@@ -37,7 +37,7 @@ async function runLlmQa(req, hit) {
         return [hit, errors];
     }
 
-    // LLM_QA_ENABLE is TRUE
+    // LLM_QA_ENABLE is true
     const debug = req._settings.ENABLE_DEBUG_RESPONSES;
     const context = hit.a;
     if (!req._settings.LLM_QA_SHOW_CONTEXT_TEXT) {
@@ -69,7 +69,6 @@ async function runLlmQa(req, hit) {
         answer = await llm.get_qa(req, context);
     } catch (e) {
         qnabot.warn(`[ERROR] Fatal LLM Exception, please check logs for details: ${e.message}`);
-        qnabot.warn('[INFO] Setting hits to undefined to trigger no_hits workflow');
         hit = undefined;
         errors.push(e.message);
         qnabot.log(`Error Log Errors: ${JSON.stringify(errors)}`);

@@ -1,4 +1,4 @@
-/*********************************************************************************************************************
+/** *******************************************************************************************************************
  *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.                                                *
  *                                                                                                                    *
  *  Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance    *
@@ -9,13 +9,15 @@
  *  or in the 'license' file accompanying this file. This file is distributed on an 'AS IS' BASIS, WITHOUT WARRANTIES *
  *  OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions    *
  *  and limitations under the License.                                                                                *
- *********************************************************************************************************************/
+ ******************************************************************************************************************** */
 
-const aws = require('aws-sdk');
+const { LexModelsV2Client, DescribeBotCommand } = require('@aws-sdk/client-lex-models-v2');
+const { S3Client, GetObjectCommand } = require('@aws-sdk/client-s3');
+const customSdkConfig = require('sdk-config/customSdkConfig');
+const region = process.env.AWS_REGION;
+const s3 = new S3Client(customSdkConfig('C022', { region }));
+const lexv2 = new LexModelsV2Client(customSdkConfig('C002', { region }));
 
-aws.config.region = process.env.AWS_REGION;
-const s3 = new aws.S3();
-const lexv2 = new aws.LexModelsV2();
 
 function getStatusResponse(response, build) {
     const botStatus = (response.botStatus == 'Available') ? 'READY' : response.botStatus;
@@ -50,12 +52,16 @@ exports.handler = async (event, context, callback) => {
     let response;
 
     try {
-        response = await s3.getObject({ Bucket: bucket, Key: lexV2StatusFile }).promise();
-        build = JSON.parse(response.Body.toString());
+        const getObjCmd = new GetObjectCommand({ Bucket: bucket, Key: lexV2StatusFile });
+        response = await s3.send(getObjCmd);
+        const readableStreamV2 = Buffer.concat(await response.Body.toArray());
+        build = JSON.parse(readableStreamV2);
         // combine build status with v1 bot, if defined.. If both are READY then status is READY
         if (lexV1StatusFile) {
-            response = await s3.getObject({ Bucket: bucket, Key: lexV1StatusFile }).promise();
-            const v1build = JSON.parse(response.Body.toString());
+            const getObjCmd = new GetObjectCommand({ Bucket: bucket, Key: lexV1StatusFile });
+            response = await s3.send(getObjCmd);
+            const readableStreamV2 = Buffer.concat(await response.Body.toArray());
+            const v1build = JSON.parse(readableStreamV2);
             if (v1build.status != 'READY' || build.status != 'READY') {
                 build.status = `LEX V2: ${build.status} / LEX V1: ${v1build.status}`;
             }
@@ -64,9 +70,10 @@ exports.handler = async (event, context, callback) => {
         console.log('Unable to read S3 lex bot status file - perhaps it doesn\'t yet exist. Returning READY');
     }
 
-    response = await lexv2.describeBot({
+    const describeBotCmd = new DescribeBotCommand({
         botId: process.env.LEXV2_BOT_ID,
-    }).promise();
+    });
+    response = await lexv2.send(describeBotCmd);
     // Match LexV1 bot status for code compatibility (Available = READY)
     const statusResponse = getStatusResponse(response, build);
     return statusResponse;

@@ -11,21 +11,22 @@
  *  and limitations under the License.                                                                                *
  *********************************************************************************************************************/
 
-const Promise = require('bluebird');
-const aws = require('./util/aws');
+const { S3Client, GetObjectCommand, PutObjectCommand } = require('@aws-sdk/client-s3');
+const customSdkConfig = require('./util/customSdkConfig');
 
-const s3 = new aws.S3();
+const region = process.env.AWS_REGION || 'us-east-1';
+const s3 = new S3Client(customSdkConfig({ region }));
 
 async function copyData(s3exportparms, s3importparms) {
     console.log('Reading previously exported data');
     try {
-        const res = await s3.getObject(s3exportparms).promise();
-        const data_json = res.Body.toString();
+        const res = await s3.send(new GetObjectCommand (s3exportparms));
+        const data_json = await res.Body.transformToString();
         const count = data_json.length;
         if (count > 0) {
             console.log(`Copy data to import bucket: length: ${count}`);
             s3importparms.Body = data_json;
-            await s3.putObject(s3importparms).promise();
+            await s3.send(new PutObjectCommand(s3importparms));
         } else {
             console.log('Export file has no data - skipping import');
         }
@@ -45,8 +46,9 @@ async function waitForImport(s3params, timeout) {
     do {
         await new Promise((resolve) => setTimeout(resolve, 1000));
         try {
-            const res = await s3.getObject(s3params).promise();
-            const body = JSON.parse(res.Body.toString());
+            const res = await s3.send(new GetObjectCommand(s3params));
+            const readableStream = Buffer.concat(await res.Body.toArray())
+            const body = JSON.parse(readableStream);
             console.log(body.status);
             complete = (body.status == 'Complete');
         } catch (e) {
@@ -112,11 +114,11 @@ module.exports = class PostUpgradeImport extends require('./base') {
         super();
     }
 
-    Create(params, reply) {
-        run_import(params, reply);
+    async Create(params, reply) {
+        await run_import(params, reply);
     }
 
-    Update(ID, params, oldparams, reply) {
-        run_import(params, reply);
+    async Update(ID, params, oldparams, reply) {
+        await run_import(params, reply);
     }
 };

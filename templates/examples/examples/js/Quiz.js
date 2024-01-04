@@ -1,4 +1,4 @@
-/*********************************************************************************************************************
+/** *******************************************************************************************************************
  *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.                                                *
  *                                                                                                                    *
  *  Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance    *
@@ -9,14 +9,16 @@
  *  or in the 'license' file accompanying this file. This file is distributed on an 'AS IS' BASIS, WITHOUT WARRANTIES *
  *  OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions    *
  *  and limitations under the License.                                                                                *
- *********************************************************************************************************************/
+ ******************************************************************************************************************** */
 
 const _ = require('lodash');
-const aws = require('aws-sdk');
+const { KMSClient, DecryptCommand, EncryptCommand } = require('@aws-sdk/client-kms');
+const { LambdaClient, InvokeCommand } = require('@aws-sdk/client-lambda');
+const customSdkConfig = require('sdk-config/customSdkConfig');
 
-aws.config.region = process.env.AWS_REGION;
-const lambda = new aws.Lambda();
-const kms = new aws.KMS();
+const region = process.env.AWS_REGION;
+const lambda = new LambdaClient(customSdkConfig('C018', { region }));
+const kms = new KMSClient(customSdkConfig('C018', { region }));
 const handlebars = require('handlebars');
 const fs = require('fs');
 
@@ -40,13 +42,16 @@ exports.handler = async function (event, context, callback) {
         quizBot;
     try {
         if (event.res.session.quizBot) {
-            const decrypt = await kms.decrypt({
+            const params = {
                 CiphertextBlob: Buffer.from(event.res.session.quizBot, 'base64'),
                 EncryptionContext: {
                     userId: event.req._event.userId,
                 },
-            }).promise();
-            quizBot = JSON.parse(decrypt.Plaintext.toString('utf8'));
+            };
+            const decryptCmd = new DecryptCommand(params);
+            const decrypt = await kms.send(decryptCmd);
+            const decryptPlaintext = Buffer.from(decrypt.Plaintext).toString();
+            quizBot = JSON.parse(decryptPlaintext);
         } else {
             quizBot = {
                 questionCount: 0,
@@ -103,16 +108,18 @@ exports.handler = async function (event, context, callback) {
             quizBot.prev = quizBot.next;
             quizBot.next = _.get(nextDocument, 'next[0]', false);
 
-            const encrypt = await kms.encrypt({
+            const params = {
                 KeyId: process.env.QUIZ_KMS_KEY,
-                Plaintext: JSON.stringify(quizBot),
+                Plaintext: Buffer.from(JSON.stringify(quizBot)),
                 EncryptionContext: {
                     userId: event.req._event.userId,
                 },
-            }).promise();
+            };
+            const encryptCmd = new EncryptCommand(params);
+            const encrypt = await kms.send(encryptCmd);
             console.log(encrypt);
 
-            event.res.session.quizBot = encrypt.CiphertextBlob.toString('base64');
+            event.res.session.quizBot = Buffer.from(encrypt.CiphertextBlob).toString('base64');
             if (_.get(nextDocument, 'r.imageUrl')) {
                 event.res.card = nextDocument.r;
                 event.res.card.send = true;
@@ -131,7 +138,7 @@ exports.handler = async function (event, context, callback) {
         render(event, templateParams);
     } catch (e) {
         let params;
-        switch (e) {
+        switch (e.message) {
         case 'exit':
             params = {
                 exit: true,
@@ -157,26 +164,30 @@ exports.handler = async function (event, context, callback) {
     }
 };
 async function getPrevDoc(event, quizBot) {
-    const prev = await lambda.invoke({
+    const params = {
         FunctionName: event.req._info.es.service.qid,
         InvocationType: 'RequestResponse',
         Payload: JSON.stringify({ qid: quizBot.prev }),
-    }).promise();
-
-    const prevDocument = JSON.parse(prev.Payload);
+    };
+    const invokeCmd = new InvokeCommand(params);
+    const prev = await lambda.send(invokeCmd);
+    const payload = Buffer.from(prev.Payload).toString();
+    const prevDocument = JSON.parse(payload);
     console.log(JSON.stringify(prevDocument, null, 2));
     if (!prevDocument) throw new Error(`Next Document not Found:${quizBot.prev}`);
     return prevDocument;
 }
 
 async function getNextDoc(event, quizBot) {
-    const result = await lambda.invoke({
+    const params = {
         FunctionName: event.req._info.es.service.qid,
         InvocationType: 'RequestResponse',
         Payload: JSON.stringify({ qid: quizBot.next }),
-    }).promise();
-
-    const nextDocument = JSON.parse(result.Payload);
+    };
+    const invokeCmd = new InvokeCommand(params);
+    const result = await lambda.send(invokeCmd);
+    const payload = Buffer.from(result.Payload).toString();
+    const nextDocument = JSON.parse(payload);
     console.log(JSON.stringify(nextDocument, null, 2));
     if (!nextDocument) throw new Error(`Next Document not Found:${quizBot.next}`);
     return nextDocument;

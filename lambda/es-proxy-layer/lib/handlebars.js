@@ -11,52 +11,19 @@
  *  and limitations under the License.                                                                                *
  *********************************************************************************************************************/
 
-const aws = require('aws-sdk');
 const qnabot = require('qnabot/logging');
+const { signUrls } = require('./signS3URL');
 
 // start connection
 const _ = require('lodash');
 const Handlebars = require('handlebars');
-const supportedLanguages = require('./supportedLanguages');
+const { getSupportedLanguages, getLanguageErrorMessages } = require('./supportedLanguages');
 
 let res_glbl = {};
 let req_glbl = {};
+let hit_glbl = {};
 let autotranslate;
 
-// used by signS3Url helper
-function signS3URL(url, expireSecs) {
-    let bucket; let
-        key;
-    if (url.search(/\/s3[.-](\w{2}-\w{4,9}-\d\.)?amazonaws\.com/) != -1) {
-        // bucket in path format
-        bucket = url.split('/')[3];
-        key = url.split('/').slice(4).join('/');
-    }
-    if (url.search(/\.s3[.-](\w{2}-\w{4,9}-\d\.)?amazonaws\.com/) != -1) {
-        // bucket in hostname format
-        const hostname = url.split('/')[2];
-        bucket = hostname.split('.')[0];
-        key = url.split('/').slice(3).join('/');
-    }
-    if (bucket && key) {
-        qnabot.log('Attempt to convert S3 url to a signed URL: ', url);
-        qnabot.log('Bucket: ', bucket, ' Key: ', key);
-        try {
-            const s3 = new aws.S3();
-            const signedurl = s3.getSignedUrl('getObject', {
-                Bucket: bucket,
-                Key: key,
-                Expires: expireSecs,
-            });
-            url = signedurl;
-        } catch (err) {
-            qnabot.log('Error signing S3 URL (returning original URL): ', err);
-        }
-    } else {
-        qnabot.log('URL is not an S3 url - return unchanged: ', url);
-    }
-    return url;
-}
 
 function convertOperatorToFunc(operator) {
     switch (operator) {
@@ -118,17 +85,11 @@ Handlebars.registerHelper('defaultLang', function (options) {
         autotranslate = true;
         return options.fn(this);
     }
-    if (previousMatchLang === undefined) {
-        // case three. Hitting the default lang response and no previous lang has been encountered. Return default value
-        // but set matchlang to false for next processing. Enable autotranslation.
-        _.set(req_glbl.session, 'matchlang', 'false');
-        autotranslate = true;
-        return options.fn(this);
-    }
-    if (previousMatchLang === undefined) {
-        _.set(req_glbl.session, 'matchlang', 'false');
-    }
-    return options.inverse(this);
+    // case three. Hitting the default lang response and no previous lang has been encountered. Return default value
+    // but set matchlang to false for next processing. Enable autotranslation.
+    _.set(req_glbl.session, 'matchlang', 'false');
+    autotranslate = true;
+    return options.fn(this);
 });
 
 Handlebars.registerHelper('setLang', function (lang, last, options) {
@@ -141,11 +102,14 @@ Handlebars.registerHelper('setLang', function (lang, last, options) {
     const userLocaleKey = 'session.qnabotcontext.userLocale';
     const currentPreferredLocale = _.get(res_glbl, userPreferredLocaleKey);
     const currentUserLocale = _.get(res_glbl, userLocaleKey);
+    const backupLanguage = _.get(res_glbl.Settings, 'BACKUP_LANGUAGE', 'English');
+    const supportedLangMap = getSupportedLanguages();
+    const langCode = supportedLangMap[backupLanguage];
     let errorLocale;
     if (currentPreferredLocale) {
         errorLocale = currentPreferredLocale;
     } else {
-        errorLocale = currentUserLocale || 'en';
+        errorLocale = currentUserLocale || langCode;
     }
     const capitalize = (s) => {
         if (typeof s !== 'string') return '';
@@ -153,9 +117,8 @@ Handlebars.registerHelper('setLang', function (lang, last, options) {
     };
     const errorFound = _.get(req_glbl._event, 'errorFound');
     const userLanguage = capitalize(_.get(req_glbl._event, 'inputTranscript'));
-    const supported_languages = supportedLanguages.getSupportedLanguages();
-    const languageErrorMessages = supportedLanguages.getLanguageErrorMessages();
-    const userLanguageCode = supported_languages[userLanguage];
+    const languageErrorMessages = getLanguageErrorMessages();
+    const userLanguageCode = supportedLangMap[userLanguage];
 
     if (userLanguageCode === undefined && !errorFound) {
         qnabot.log('no language mapping for user utterance');
@@ -199,6 +162,12 @@ Handlebars.registerHelper('setSessionAttr', function () {
     return '';
 });
 
+Handlebars.registerHelper('getQuestion', () => {
+    const question = hit_glbl.questions[0].q;
+    qnabot.log('Return question matched from hit: ', question);
+    return question;
+});
+
 Handlebars.registerHelper('getSessionAttr', (attr, def, options) => {
     const v = _.get(res_glbl.session, attr, def);
     qnabot.log('Return session attribute key, value: ', attr, v);
@@ -212,19 +181,40 @@ Handlebars.registerHelper('getSlot', (slotname, def, options) => {
 });
 
 Handlebars.registerHelper('signS3URL', (s3url, options) => {
-    const signedUrl = signS3URL(s3url, 300);
-    qnabot.log('Return signed S3 URL: ', signedUrl);
+    qnabot.log('Return signed S3 URL: ', s3url);
+    // Url should already be signed. Passing as output to resolve handlebar.
     // return SafeString to prevent unwanted url escaping
-    return new Handlebars.SafeString(signedUrl);
+    return new Handlebars.SafeString(s3url);
 });
 
 Handlebars.registerHelper('randomPick', function () {
     const argcount = arguments.length - 1; // ignore final 'options' argument
     qnabot.log('Select randomly from ', argcount, 'inputs: ', arguments);
-    const item = arguments[Math.floor(Math.random() * argcount)];
+    const item = arguments[Math.floor(Math.random() * argcount)];  // NOSONAR It is safe to use random generator here
     qnabot.log('Selected: ', item);
     return item;
 });
+
+async function replaceAsync(str, regex) {
+    let m;
+    let matches = [];
+    while ((m = regex.exec(str)) !== null) {
+        if (m.index === regex.lastIndex) {
+            regex.lastIndex += 1;
+        }
+        matches.push(m[2]);
+    }
+
+    const signedUrls = await signUrls(matches);
+    return str.replace(regex, () => `{{signS3URL '${signedUrls.shift()}'}}`);
+}
+
+// Handlebars only work synchronously so we need to sign S3 urls and replace them before passing to handlebars
+async function handleSignS3(str) {
+    const signS3Regex = /({{signS3URL ')(.*?)('}})/gm;
+    return replaceAsync(str, signS3Regex)
+        .then(replacedString => replacedString);
+}
 
 function handleSa(hit_out, hit, context) {
     hit_out.sa = [];
@@ -240,7 +230,7 @@ function handleSa(hit_out, hit, context) {
     return hit_out;
 }
 
-function handleR(r, hit_out, context) {
+async function handleR(r, hit_out, context) {
     try {
         if (r.subTitle && r.subTitle.length > 0) {
             const subTitle_template = Handlebars.compile(r.subTitle);
@@ -257,15 +247,18 @@ function handleR(r, hit_out, context) {
             }
         }
         if (r.text && r.text.length > 0) {
-            const text_template = Handlebars.compile(r.text);
+            const text = await handleSignS3(r.text);
+            const text_template = Handlebars.compile(text);
             hit_out.r.text = text_template(context);
         }
         if (r.imageUrl && r.imageUrl.length > 0) {
-            const imageUrl_template = Handlebars.compile(r.imageUrl);
+            const text = await handleSignS3(r.imageUrl);
+            const imageUrl_template = Handlebars.compile(text);
             hit_out.r.imageUrl = imageUrl_template(context);
         }
         if (r.url && r.url.length > 0) {
-            const url_template = Handlebars.compile(r.url);
+            const text = await handleSignS3(r.url);
+            const url_template = Handlebars.compile(text);
             hit_out.r.url = url_template(context);
         }
         hit_out = handleButtons(r, hit_out, context);
@@ -311,9 +304,10 @@ function handleRp(rp, hit_out, context) {
     return hit_out;
 }
 
-function handleSsml(ssml, hit_out, context) {
+async function handleSsml(ssml, hit_out, context) {
     try {
-        const ssml_template = Handlebars.compile(ssml);
+        const text = await handleSignS3(ssml);
+        const ssml_template = Handlebars.compile(text);
         hit_out.alt.ssml = ssml_template(context);
         if (autotranslate) {
             _.set(hit_out, 'autotranslate.alt.ssml', true);
@@ -326,9 +320,10 @@ function handleSsml(ssml, hit_out, context) {
     return hit_out;
 }
 
-function handleMarkdown(markdown, hit_out, context) {
+async function handleMarkdown(markdown, hit_out, context) {
     try {
-        const markdown_template = Handlebars.compile(markdown);
+        const text = await handleSignS3(markdown);
+        const markdown_template = Handlebars.compile(text);
         hit_out.alt.markdown = markdown_template(context);
         if (autotranslate) {
             _.set(hit_out, 'autotranslate.alt.markdown', true);
@@ -341,9 +336,10 @@ function handleMarkdown(markdown, hit_out, context) {
     return hit_out;
 }
 
-function handleA(a, hit_out, context) {
+async function handleA(a, hit_out, context) {
     try {
-        const a_template = Handlebars.compile(a);
+        const text = await handleSignS3(a);
+        const a_template = Handlebars.compile(text);
         hit_out.a = a_template(context);
         if (autotranslate) {
             _.set(hit_out, 'autotranslate.a', true);
@@ -360,8 +356,10 @@ const apply_handlebars = async function (req, res, hit) {
     qnabot.log('apply handlebars');
     qnabot.debug(`req is: ${JSON.stringify(req, null, 2)}`);
     qnabot.log(`res is: ${JSON.stringify(res, null, 2)}`);
+    qnabot.log(`hit is: ${JSON.stringify(hit, null, 2)}`);
     res_glbl = res; // shallow copy - allow modification by setSessionAttr helper
     req_glbl = req; // shallow copy - allow sessionAttributes retrieval by ifLang helper
+    hit_glbl = hit; // shallow copy - allow getQuestion retrieval
     _.set(req_glbl._event, 'errorFound', false);
     const context = {
         LexOrAlexa: req._type,
@@ -389,19 +387,19 @@ const apply_handlebars = async function (req, res, hit) {
 
     // catch and log errors before throwing exception.
     if (a) {
-        hit_out = handleA(a, hit_out, context);
+        hit_out = await handleA(a, hit_out, context);
     }
     if (markdown) {
-        hit_out = handleMarkdown(markdown, hit_out, context);
+        hit_out = await handleMarkdown(markdown, hit_out, context);
     }
     if (ssml) {
-        hit_out = handleSsml(ssml, hit_out, context);
+        hit_out = await handleSsml(ssml, hit_out, context);
     }
     if (rp) {
         hit_out = handleRp(rp, hit_out, context);
     }
     if (r) {
-        hit_out = handleR(r, hit_out, context);
+        hit_out = await handleR(r, hit_out, context);
     }
     if (_.get(hit, 'sa')) {
         hit_out = handleSa(hit_out, hit, context);

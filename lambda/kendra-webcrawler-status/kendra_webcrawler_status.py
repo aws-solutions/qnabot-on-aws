@@ -15,17 +15,19 @@ import os
 import json
 import boto3
 import functools
+from botocore.config import Config
+
+sdk_config = Config(user_agent_extra = f"AWSSOLUTION/{os.environ['SOLUTION_ID']}/{os.environ['SOLUTION_VERSION']} AWSSOLUTION-CAPABILITY/{os.environ['SOLUTION_ID']}-C007/{os.environ['SOLUTION_VERSION']}")
+
+client = boto3.client('kendra', config=sdk_config)
+ssm = boto3.client('ssm', config=sdk_config)
 
 
-client = boto3.client('kendra')
-ssm = boto3.client('ssm')
-
-
-def handler(event, handler):
+def handler(event, handler):  # NOSONAR Need these 2 params
     name = os.environ.get('DATASOURCE_NAME')
     settings = get_settings()
     index_id = settings['KENDRA_WEB_PAGE_INDEX']
-    
+
     data_source_id = get_data_source_id(index_id, name)
 
     if data_source_id is None:
@@ -83,7 +85,7 @@ def kendra_list_data_source_sync_jobs(index_id, data_source_id):
                                     'Metrics': item['Metrics']
                                     }, response['History']))
         status = latest_history_item['Status']
-    else: 
+    else:
         result = ''
         status = data_source_status
 

@@ -1,4 +1,4 @@
-/*********************************************************************************************************************
+/** *******************************************************************************************************************
  *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.                                                *
  *                                                                                                                    *
  *  Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance    *
@@ -9,9 +9,8 @@
  *  or in the 'license' file accompanying this file. This file is distributed on an 'AS IS' BASIS, WITHOUT WARRANTIES *
  *  OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions    *
  *  and limitations under the License.                                                                                *
- *********************************************************************************************************************/
+ ******************************************************************************************************************** */
 
-const Promise = require('bluebird');
 const validator = new (require('jsonschema').Validator)();
 const axios = require('axios');
 const util = require('./util');
@@ -25,12 +24,15 @@ module.exports = {
             context.dispatch('goToPage', context.state.current);
         }
     },
-    goToPage(context, index) {
+    async goToPage(context, index) {
         context.commit('data/clearQA', null, { root: true });
         context.commit('setPage', index);
-        return context.dispatch('data/get', index, { root: true })
-            .tapCatch((e) => console.log('Error:', e))
-            .catchThrow('Failed to Build');
+        try {
+            await context.dispatch('data/get', index, { root: true });
+        } catch (error) {
+            console.log('Error:', error);
+            throw new Error(('Failed to Build'));
+        }
     },
     nextPage(context) {
         let index = context.state.current + 1;

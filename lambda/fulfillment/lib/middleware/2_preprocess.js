@@ -12,10 +12,13 @@
  *********************************************************************************************************************/
 
 const _ = require('lodash');
-const AWS = require('aws-sdk');
+const { DynamoDBDocument } = require('@aws-sdk/lib-dynamodb');
+const { DynamoDB } = require('@aws-sdk/client-dynamodb');
+const region = process.env.AWS_REGION || 'us-east-1';
 const qnabot = require('qnabot/logging');
 const util = require('./util');
 const jwt = require('./jwt');
+const customSdkConfig = require('sdk-config/customSdkConfig');
 
 async function get_userInfo(userId, idattrs, userPrefs = undefined) {
     const default_userInfo = {
@@ -23,7 +26,7 @@ async function get_userInfo(userId, idattrs, userPrefs = undefined) {
         InteractionCount: 1,
     };
     const usersTable = process.env.DYNAMODB_USERSTABLE;
-    const docClient = new AWS.DynamoDB.DocumentClient({ apiVersion: '2012-08-10' });
+    const docClient = DynamoDBDocument.from(new DynamoDB(customSdkConfig('C013', { apiVersion: '2012-08-10', region })));
     const params = {
         TableName: usersTable,
         Key: {
@@ -33,7 +36,7 @@ async function get_userInfo(userId, idattrs, userPrefs = undefined) {
     qnabot.log('Getting user info for user: ', userId, 'from DynamoDB table: ', usersTable);
     let ddbResponse = {};
     try {
-        ddbResponse = await docClient.get(params).promise();
+        ddbResponse = await docClient.get(params);
     } catch (e) {
         qnabot.log('DDB Exception caught.. can\'t retrieve userInfo: ', e);
     }
@@ -85,20 +88,19 @@ async function update_userInfo(userId, req_userInfo) {
 async function runPreProcessLambda(req, res) {
     const prehook = _.get(req, '_settings.LAMBDA_PREPROCESS_HOOK', undefined) || process.env.LAMBDA_PREPROCESS;
     if (prehook) {
-        const regex = /(^QNA-)|(^qna-)/g;
-        if (!prehook.match(regex)) {
-            qnabot.warn('The name of the Lambda for a preprocessing hook must start with either "QNA-" or "qna-". '
-                + 'The preprocessing Lambda hook will NOT be run');
-        } else {
-            const arn = util.getLambdaArn(prehook);
+        const arn = util.getLambdaArn(prehook);
+        try {
             const result = await util.invokeLambda({
                 FunctionName: arn,
                 req,
                 res,
             });
-            const lambdaResultReq = result.req;
-            const lambdaResultRes = result.res;
-            return { "req": lambdaResultReq, "res": lambdaResultRes };
+
+            req = result.req;
+            res = result.res;
+        } catch (e) {
+            qnabot.log(`Error invoking pre-processing lambda: ${arn}`);
+            qnabot.log(JSON.stringify(e));
         }
     }
     return { req, res };

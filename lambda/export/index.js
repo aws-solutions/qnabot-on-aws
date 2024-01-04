@@ -11,10 +11,10 @@
  *  and limitations under the License.                                                                                *
  *********************************************************************************************************************/
 
-const aws = require('aws-sdk');
-aws.config.region = process.env.AWS_REGION;
-
-const s3 = new aws.S3();
+const { S3Client, GetObjectCommand, PutObjectCommand, waitUntilObjectExists } = require('@aws-sdk/client-s3');
+const region = process.env.AWS_REGION;
+const customSdkConfig = require('sdk-config/customSdkConfig');
+const s3 = new S3Client(customSdkConfig('C011', { region }));
 const _ = require('lodash');
 const start = require('./lib/start');
 const step = require('./lib/step');
@@ -29,9 +29,13 @@ exports.step=async function(event,context,cb){
     const VersionId=_.get(event,'Records[0].s3.object.versionId')
     console.log(Bucket,Key) 
     try {
-        await s3.waitFor('objectExists',{Bucket,Key,VersionId}).promise()
-        const res = await s3.getObject({Bucket,Key,VersionId}).promise()
-        const config = JSON.parse(res.Body.toString())
+        await waitUntilObjectExists({
+            client: s3,
+            maxWaitTime: 10
+        }, {Bucket,Key,VersionId})
+        const res = await s3.send(new GetObjectCommand({Bucket,Key,VersionId}))
+        const readableStream = Buffer.concat(await res.Body.toArray());
+        const config = JSON.parse(readableStream);
         const step_status_ignore = ['Error', 'Completed', 'Sync Complete', 'Parsing content JSON', 'Creating FAQ']
         if (step_status_ignore.includes(config.status)===false) {
             try {
@@ -55,7 +59,7 @@ exports.step=async function(event,context,cb){
                 config.status='Error'
                 config.message=_.get(err,'message',JSON.stringify(err))
             }
-            await s3.putObject({Bucket,Key,Body:JSON.stringify(config)}).promise()
+            await s3.send(new PutObjectCommand({Bucket,Key,Body:JSON.stringify(config)}));
         }
     } catch (error) {
         console.error("An error occured in S3 operations: ", error)

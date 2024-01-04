@@ -11,11 +11,14 @@
  *  and limitations under the License.                                                                                *
  *********************************************************************************************************************/
 
-const aws = require('./util/aws');
-const Promise = require('./util/promise');
+const { S3Client, PutBucketNotificationConfigurationCommand } = require('@aws-sdk/client-s3');
+const customSdkConfig = require('./util/customSdkConfig');
+
+const region = process.env.AWS_REGION || 'us-east-1';
+const nativePromise = require('./util/promise');
 const base = require('./base.js');
 
-const s3 = new aws.S3();
+const s3 = new S3Client(customSdkConfig({ region }));
 
 module.exports = class S3Lambda extends base {
     constructor() {
@@ -23,8 +26,8 @@ module.exports = class S3Lambda extends base {
     }
 
     Create(params, reply) {
-        Promise.retry(
-            () => s3.putBucketNotificationConfiguration(params).promise(),
+        nativePromise.retry(
+            () => s3.send(new PutBucketNotificationConfigurationCommand(params)),
         )
             .then(() => reply(null))
             .catch(reply);

@@ -11,80 +11,61 @@
  *  and limitations under the License.                                                                                *
  *********************************************************************************************************************/
 
-const url = require('url');
-const AWS = require('aws-sdk');
+const { URL } = require('url');
+const { fromEnv } = require('@aws-sdk/credential-providers');
+const { HttpRequest } = require('@smithy/protocol-http');
+const { Sha256 } = require('@aws-crypto/sha256-js');
+const { NodeHttpHandler } = require('@smithy/node-http-handler');
+const { SignatureV4 } = require('@smithy/signature-v4');
 const qnabot = require('qnabot/logging');
 
 let credentials;
 
-const getMetadataCredentials = async function () {
-    credentials = new AWS.EC2MetadataCredentials();
-    return await credentials.getPromise();
-};
-
+// using built-in AWS access keys from Lambda environment to create new AWS credentials to sign request
 const getCredentials = async function () {
-    const profile = process.env.AWS_PROFILE;
-    if (process.env.AWS_ACCESS_KEY_ID && process.env.AWS_SECRET_ACCESS_KEY && !profile) {
-        credentials = new AWS.EnvironmentCredentials('AWS');
-        return;
+    if (process.env.AWS_ACCESS_KEY_ID && process.env.AWS_SECRET_ACCESS_KEY) {
+        credentials = await fromEnv('AWS')();
+    } else {
+        qnabot.warn('Unable to retrieve AWS access keys');
     }
-
-    if (!profile) {
-        try {
-            await getMetadataCredentials();
-            return;
-        } catch (err) {
-            console.error('Unable to access metadata service.', err.message);
-        }
-    }
-
-    credentials = new AWS.SharedIniFileCredentials({
-        profile: profile || 'default',
-        // the filename to use when loading credentials
-        // use of AWS_SHARED_CREDENTIALS_FILE environment variable
-        // see also 'The Shared Credentials File' http://docs.aws.amazon.com/cli/latest/topic/config-vars.html
-        filename: process.env.AWS_SHARED_CREDENTIALS_FILE,
-    });
-    return await credentials.getPromise();
 };
 
-const execute = function (endpoint, region, path, method, body) {
-    return new Promise((resolve, reject) => {
-        const req = new AWS.HttpRequest(endpoint);
-        req.method = method || 'GET';
-        req.path = path;
-        req.region = region;
-
+const execute = async function (url, region, method, body) {
+        const req = new HttpRequest({
+            body: body ? JSON.stringify(body) : '',
+            hostname : url.hostname,
+            method : method || 'GET',
+            path : url.pathname + url.search,
+            region
+        });
         if (body) {
             if (typeof body === 'object') {
                 req.body = JSON.stringify(body);
             } else {
                 req.body = body;
             }
+        } else {
+            req.body = '';      
         }
-
-        req.headers['presigned-expires'] = false;
         req.headers['content-type'] = 'application/json';
-        req.headers['content-length'] = Buffer.byteLength(req.body);
-        req.headers.Host = endpoint.host;
-
-        const signer = new AWS.Signers.V4(req, 'es');
-        signer.addAuthorization(credentials, new Date());
-
-        const send = new AWS.NodeHttpClient();
-        send.handleRequest(req, null, (httpResp) => {
-            let body = '';
-            httpResp.on('data', (chunk) => {
-                body += chunk;
-            });
-            httpResp.on('end', (chunk) => {
-                resolve(body);
-            });
-        }, (err) => {
-            qnabot.log(`Error: ${err}`);
-            reject(err);
+        req.headers['presigned-expires'] = 'false';
+        req.headers['content-length'] = Buffer.byteLength(req.body).toString();
+        req.headers['Host'] = url.host;
+        const signer = new SignatureV4({
+            credentials,
+            region,
+            service: 'es',
+            sha256: Sha256,
         });
-    });
+       const signed = await signer.sign(req);
+       const httpHandler = new NodeHttpHandler();
+       const { response } = await httpHandler.handle(signed);
+       let res = '';
+       for await (const chunk of response.body) {
+           res += chunk;
+       }
+       return res;
+
 };
 
 const main = async function () {
@@ -98,9 +79,8 @@ const main = async function () {
 
     const input = '';
     if (maybeUrl && maybeUrl.indexOf('http') === 0) {
-        const uri = url.parse(maybeUrl);
+        const url = new URL(maybeUrl);
         const d1 = new Date();
-        const endpoint = new AWS.Endpoint(uri.host);
         const d2 = new Date();
         const time1 = {};
         time1.metric = 'EndPointSetup';
@@ -109,7 +89,7 @@ const main = async function () {
         time1.duration = d2.getTime() - d1.getTime();
         qnabot.log(`${JSON.stringify(time1)}`);
         const e1 = new Date();
-        res = await execute(endpoint, region, uri.path, method, input);
+        res = await execute(url, region, method, input);
         const e2 = new Date();
         const time2 = {};
         time2.metric = 'TotalESQueryTime';

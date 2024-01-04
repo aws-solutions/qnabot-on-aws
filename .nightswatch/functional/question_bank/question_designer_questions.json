@@ -1,0 +1,214 @@
+{
+	"qna": [
+		{
+			"qid": "Designer.001",
+			"type": "qna",
+			"q": ["What is delicious?"],
+			"a": "candy"
+		},
+		{
+			"qid": "Quiz.001",
+			"type": "quiz",
+			"question": "Which celestial object is a planet?",
+			"correctAnswers": ["Earth", "Mars"],
+			"incorrectAnswers": ["Pluto", "Moon"]
+		},
+		{
+			"qid": "Quiz.002",
+			"type": "qna",
+			"q": ["Quiz start"],
+			"a": "Let's start the quiz:",
+			"l": "QNA:ExampleJSLambdaQuiz",
+			"args": "Quiz.001"
+		},
+		{
+			"a": "{{#ifCond Slots.Confirmation '==' 'yes'}}\nOkay, I have confirmed your reservation. The reservation details are below:\n- **Name**: {{Slots.Name}}\n- **Departing City:** {{Slots.DepartureCity}}\n- **Destination**: {{Slots.ArrivalCity}}\n- **Date**: {{Slots.Date}}\n- **Time**: {{Slots.Time}}\n{{else}}\nOkay, I have cancelled your reservation in progress.\n{{/ifCond}}",
+			"slots": [
+				{
+					"slotName": "Name",
+					"slotPrompt": "What is the name of the passenger?",
+					"slotRequired": true,
+					"slotType": "AMAZON.FirstName"
+				},
+				{
+					"slotName": "Date",
+					"slotPrompt": "What date do you want to book the flight?",
+					"slotRequired": true,
+					"slotType": "AMAZON.Date"
+				},
+				{
+					"slotName": "DepartureCity",
+					"slotPrompt": "What city are you departing from?",
+					"slotRequired": true,
+					"slotType": "AMAZON.City"
+				},
+				{
+					"slotName": "ArrivalCity",
+					"slotPrompt": "What city are you traveling to?",
+					"slotRequired": true,
+					"slotType": "AMAZON.City"
+				},
+				{
+					"slotName": "Time",
+					"slotPrompt": "What time do you wish to depart? The available times are 0800, 1200, 1400.",
+					"slotRequired": true,
+					"slotType": "Slot.003"
+				},
+				{
+					"slotName": "Confirmation",
+					"slotPrompt": "Should I confirm the reservation?",
+					"slotRequired": true,
+					"slotType": "Slot.002"
+				}
+			],
+			"enableQidIntent": true,
+			"type": "qna",
+			"qid": "Slot.001",
+			"q": ["I want to book a flight"]
+		},
+		{
+			"descr": "Confirmation phrases",
+			"resolutionStrategyRestrict": true,
+			"questions": [],
+			"type": "slottype",
+			"qid": "Slot.002",
+			"slotTypeValues": [
+				{
+					"synonyms": "yep,Y,yeah,please do,yes please,confirm,sure",
+					"samplevalue": "yes"
+				},
+				{
+					"synonyms": "nope,cancel,N",
+					"samplevalue": "no"
+				}
+			],
+			"_id": "Slot.002"
+		},
+		{
+			"descr": "Available flight times",
+			"resolutionStrategyRestrict": true,
+			"questions": [],
+			"type": "slottype",
+			"qid": "Slot.003",
+			"slotTypeValues": [
+				{
+					"synonyms": "8:00,8am,8:00am",
+					"samplevalue": "0800"
+				},
+				{
+					"synonyms": "12:00,12pm,12:00pm",
+					"samplevalue": "1200"
+				},
+				{
+					"synonyms": "2:00,2pm,2:00pm",
+					"samplevalue": "1400"
+				}
+			],
+			"_id": "Slot.003"
+		},
+		{
+			"a": "Echo Show brings you everything you love about Alexa, and now she can show you things. She is the perfect companion for Q and A Bot.",
+			"r": {
+				"buttons": [
+					{
+						"text": "Tell me more",
+						"value": "Tell me more"
+					},
+					{
+						"text": "Not interested",
+						"value": "Not interested"
+					}
+				],
+				"subTitle": "Echo Show",
+				"imageUrl": "https://images-na.ssl-images-amazon.com/images/I/61OddH8ddDL._SL1000_.jpg",
+				"title": "Echo Show"
+			},
+			"type": "qna",
+			"qid": "Card.001",
+			"q": ["What is the Echo Show?"]
+		},
+		{
+			"a": "A household robot for home monitoring.",
+			"t": "Astro",
+			"type": "qna",
+			"qid": "Topic.001",
+			"q": ["What is Amazon Astro?"]
+		},
+		{
+			"a": "$1,599.99",
+			"t": "Astro",
+			"type": "qna",
+			"qid": "Topic.002",
+			"q": ["How much does it cost?"]
+		},
+		{
+			"a": "An automatic soap dispenser that counts down for you.",
+			"t": "Soap",
+			"type": "qna",
+			"qid": "Topic.003",
+			"q": ["What is Amazon Smart Soap Dispenser?"]
+		},
+		{
+			"a": "$34.99",
+			"t": "Soap",
+			"type": "qna",
+			"qid": "Topic.004",
+			"q": ["How much does it cost?"]
+		},
+		{
+			"a": "You have interacted with me {{UserInfo.InteractionCount}} times.",
+			"type": "qna",
+			"qid": "Handlebars.001",
+			"q": ["What is my interaction count?"]
+		},
+		{
+			"a": "It seems like you are asking about: {{getQuestion}}",
+			"type": "qna",
+			"qid": "Handlebars.002",
+			"q": ["How do I use handlebars to return a matched question?"]
+		},
+		{
+			"a": "Hello. Can you give me your First Name and Last Name please.",
+			"elicitResponse": {
+				"response_sessionattr_namespace": "name_of_user",
+				"responsebot_hook": "QNAName"
+			},
+			"type": "qna",
+			"qid": "Elicit.001",
+			"q": ["Ask my name"]
+		},
+		{
+			"a": "Hello {{SessionAttributes.name_of_user.FirstName}} – What is your age in years?",
+			"elicitResponse": {
+				"response_sessionattr_namespace": "age_of_user",
+				"responsebot_hook": "QNAAge"
+			},
+			"type": "qna",
+			"qid": "Elicit.002",
+			"q": ["Ask my age"]
+		},
+		{
+			"a": "You are young!",
+			"type": "qna",
+			"qid": "Elicit.003",
+			"q": ["Under 18"]
+		},
+		{
+			"a": "You are old!",
+			"type": "qna",
+			"qid": "Elicit.004",
+			"q": ["Over 18 answer"]
+		},
+		{
+			"a": "Don't use this answer.",
+			"alt": {
+				"markdown": "# Markdown\nYou can use the [Markdown Cheat Sheet](https://www.markdownguide.org/cheat-sheet/) to make your answers *dynamic*.\n\nHere are some examples:\n**bold text**\n\n> blockquote\n\n1. First item\n2. Second item\n3. Third item\n---\n- First item\n- Second item\n- Third item\n---\n`code`\n\n| Syntax | Description |\n| ----------- | ----------- |\n| Header | Title |\n| Paragraph | Text |\n\n```\n{\n  \"firstName\": \"John\",\n  \"lastName\": \"Smith\",\n  \"age\": 25\n}\n```\n\n- [x] Write the press release\n- [ ] Update the website\n- [ ] Contact the media\n\n![West Coast Grocery](https://github.com/aws-solutions/qnabot-on-aws/blob/main/assets/examples/photos/west%20coast%20grocery.jpg?raw=true)\n<iframe src=\"https://www.youtube.com/embed/OE4MrFx2XCs\"></iframe>"
+			},
+			"type": "qna",
+			"qid": "Markdown.001",
+			"q": [
+			  "How do I use rich text in my answers?"
+			]
+		}
+	]
+}

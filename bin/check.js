@@ -17,12 +17,11 @@ const fs = require('fs').promises;
 
 process.env.AWS_PROFILE = config.profile;
 process.env.AWS_DEFAULT_REGION = config.profile;
-const aws = require('aws-sdk');
-aws.config.region = require('../config.json').region;
+const { CloudFormationClient, ValidateTemplateCommand, DescribeStacksCommand } = require('@aws-sdk/client-cloudformation');
+const { S3Client, PutObjectCommand } = require('@aws-sdk/client-s3');
 const { region } = require('../config.json');
-
-const cf = new aws.CloudFormation();
-const s3 = new aws.S3();
+const cf = new CloudFormationClient({ region });
+const s3 = new S3Client({ region });
 const name = require('./name');
 
 module.exports = run;
@@ -77,19 +76,21 @@ async function run(stack, options = {}) {
         const Key = `${prefix}/templates/${stack}.json`;
         const TemplateURL = `https://${Bucket}.s3.${region}.amazonaws.com/${Key}`;
         console.log(TemplateURL);
-        await s3.putObject({ Bucket, Key, Body: template }).promise();
-        return cf.validateTemplate({ TemplateURL }).promise();
+        const putCmd = new PutObjectCommand({Bucket, Key, Body:template});
+        await s3.send(putCmd);
+        const validateCmd = new ValidateTemplateCommand({ TemplateURL })
+        return cf.send(validateCmd);
     }
-    return cf.validateTemplate({
-        TemplateBody: template,
-    }).promise();
+    const validateCmd = new ValidateTemplateCommand({ TemplateBody:template })
+    return cf.send(validateCmd);
 }
 
 async function bootstrap() {
     const outputs = {};
-    const tmp = await cf.describeStacks({
-        StackName: name('dev/bootstrap', {}),
-    }).promise();
+    const describeCmd = new DescribeStacksCommand({
+        StackName:name("dev/bootstrap",{})
+    })
+    const tmp = await cf.send(describeCmd);
 
     tmp.Stacks[0].Outputs.forEach((x) => outputs[x.OutputKey] = x.OutputValue);
     return outputs;

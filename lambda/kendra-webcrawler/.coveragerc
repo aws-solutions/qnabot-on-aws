@@ -1,0 +1,8 @@
+[run]
+omit =
+    .venv-*/*
+    test/*
+    */__init__.py
+    py_modules/*
+source =
+    .

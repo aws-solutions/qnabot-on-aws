@@ -13,9 +13,10 @@
 
 // createFAQ.js
 const sleep = require('util').promisify(setTimeout);
-const AWSKendra = require('aws-sdk/clients/kendra');
-const AWSS3 = require('aws-sdk/clients/s3');
+const { KendraClient, CreateFaqCommand, DescribeFaqCommand, DeleteFaqCommand, ListFaqsCommand } = require('@aws-sdk/client-kendra');
+const { S3Client, PutObjectCommand } = require('@aws-sdk/client-s3');
 const qnabot = require('qnabot/logging');
+const customSdkConfig = require('sdk-config/customSdkConfig');
 
 /**
  * Function to upload JSON to S3 bucket, return Promise
@@ -23,19 +24,15 @@ const qnabot = require('qnabot/logging');
  * @param params
  * @returns {*}
  */
-function s3Uploader(s3Client, params) {
-    return new Promise((resolve, reject) => {
-        s3Client.putObject(params, (err, data) => {
-            if (err) {
-                qnabot.log(err, err.stack); // an error occurred
-                reject(err);
-            } else {
-                qnabot.log('Uploaded JSON to S3 successfully:');
-                qnabot.log(data); // successful response
-                resolve(data);
-            }
-        });
-    });
+async function s3Uploader(s3Client, params) {
+    try {
+        const data = await s3Client.send(new PutObjectCommand(params));
+        qnabot.log('Uploaded JSON to S3 successfully:', data);
+        return data;
+    } catch (error) {
+        qnabot.log(error, error.stack);
+        throw error;
+    }
 }
 
 /**
@@ -44,28 +41,28 @@ function s3Uploader(s3Client, params) {
  * @param params
  * @returns {*}
  */
-function faqConverter(kendraClient, params) {
-    return new Promise((resolve, reject) => {
-        kendraClient.createFaq(params, (err, data) => {
-            if (err) {
-                qnabot.log(err, err.stack); // an error occurred
-                reject(err);
-            } else {
-                qnabot.log('Converted JSON to FAQ successfully:');
-                qnabot.log(data); // successful response
-                poll(() => kendraClient.describeFaq({ IndexId: params.IndexId, Id: data.Id }).promise(), (result) => {
-                    qnabot.log(`describeFaq ${JSON.stringify(result)}`);
-                    const status = result.Status == 'PENDING_CREATION' || result.Status == 'CREATING';
-                    return {
-                        Status: status ? 'PENDING' : result.Status,
-                        Message: result.Status == 'FAILED' ? result.ErrorMessage : null,
-                    };
-                }, 5000)
-                    .then(() => resolve(data))
-                    .catch(() => reject('Could not sync Kendra FAQ')); // successful response
-            }
-        });
-    });
+async function faqConverter(kendraClient, params) {
+    try {
+        const data = await kendraClient.send(new CreateFaqCommand(params));
+        qnabot.log('Converted JSON to FAQ successfully:', data);
+        try {
+            await poll(async () => await kendraClient.send(new DescribeFaqCommand({ IndexId: params.IndexId, Id: data.Id })), (result) => {
+                qnabot.log(`describeFaq ${JSON.stringify(result)}`);
+                const status = result.Status == 'PENDING_CREATION' || result.Status == 'CREATING';
+                return {
+                    Status: status ? 'PENDING' : result.Status,
+                    Message: result.Status == 'FAILED' ? result.ErrorMessage : null,
+                };
+            }, 5000);
+            return data;
+        } catch (err) {
+            qnabot.log(err, err.stack);
+            throw new Error('Could not sync Kendra FAQ');
+        }
+      } catch (error) {
+        qnabot.log(error, error.stack);
+        throw error;
+      }
 }
 
 /**
@@ -74,20 +71,24 @@ function faqConverter(kendraClient, params) {
  * @param params
  * @returns {*}
  */
-function faqDeleter(kendraClient, params) {
-    return new Promise((resolve, reject) => {
-        kendraClient.deleteFaq(params, (err, data) => {
-            if (err) {
-                qnabot.log(err, err.stack); // an error occurred
-                reject(err);
-            } else {
-                qnabot.log(`Deleted old FAQ successfully. New list of FAQs in index ${params.IndexId}:`);
-                qnabot.log(`Delete parameters ${JSON.stringify(params)}`);
-                // describeFaq should cause an exception when the faq has been deleted.
-                poll(() => kendraClient.describeFaq(params).promise(), (result) => ({ Status: 'PENDING' }), 5000).then(() => resolve(data)); // successful response
-            }
-        });
-    });
+async function faqDeleter(kendraClient, params) {
+    try {
+        const data = await kendraClient.send(new DeleteFaqCommand(params));
+        qnabot.log(`Deleted old FAQ successfully. New list of FAQs in index ${params.IndexId}:`);
+        qnabot.log(`Delete parameters ${JSON.stringify(params)}`);
+        // describeFaq should cause an exception when the faq has been deleted.
+        await poll(async () => await kendraClient.send(new DescribeFaqCommand(params)), (result) => {
+            const status = result.Status == 'PENDING_DELETION' || result.Status == 'DELETING';
+            return {
+                Status: status ? 'PENDING' : result.Status,
+                Message: result.Status == 'FAILED' ? result.ErrorMessage : null,
+            };
+         }, 5000); // successful response
+        return data;
+    } catch (error) {
+        qnabot.log(error, error.stack);
+        throw error;
+    }
 }
 
 function wait(ms = 1000) {
@@ -109,7 +110,6 @@ async function poll(fn, fnCondition, ms) {
             if (e.Propragate) {
                 throw (e.Message);
             }
-
             return e;
         }
     }
@@ -125,19 +125,15 @@ async function poll(fn, fnCondition, ms) {
  * @param params
  * @returns {*}
  */
-function faqLister(kendraClient, params) {
-    return new Promise((resolve, reject) => {
-        kendraClient.listFaqs(params, (err, data) => {
-            if (err) {
-                qnabot.log(err, err.stack); // an error occurred
-                reject(err);
-            } else {
-                qnabot.log(`Checked for pre-existing FAQ successfully. List of FAQs for index ${params.IndexId}:`);
-                qnabot.log(data); // successful response
-                resolve(data);
-            }
-        });
-    });
+async function faqLister(kendraClient, params) {
+    try {
+        const data = await kendraClient.send(new ListFaqsCommand(params));
+        qnabot.log(`Checked for pre-existing FAQ successfully. List of FAQs for index ${params.IndexId}:`, data);// successful response
+        return data;
+    } catch (error) {
+        qnabot.log(error, error.stack);
+        throw error;
+    };
 }
 
 async function execFuncHandleThrottleException(func, client, params) {
@@ -145,7 +141,7 @@ async function execFuncHandleThrottleException(func, client, params) {
         try {
             return await func(client, params);
         } catch (error) {
-            if (error.code == 'ThrottlingException') {
+            if (error.name == 'ThrottlingException') {
                 qnabot.log(`Throttling exception: trying ${func.name} again in 10 seconds`);
                 await sleep(10000);
                 continue;
@@ -164,8 +160,8 @@ async function execFuncHandleThrottleException(func, client, params) {
 async function createFAQ(params) {
     // create kendra and s3 clients
     const region = process.env.REGION || params.region;
-    const kendraClient = new AWSKendra({ apiVersion: '2019-02-03', region });
-    const s3Client = new AWSS3({ apiVersion: '2006-03-01', region });
+    const kendraClient = new KendraClient(customSdkConfig('C007', { apiVersion: '2019-02-03', region }));
+    const s3Client = new S3Client(customSdkConfig('C007', { apiVersion: '2006-03-01', region }));
     qnabot.log('clients created');
 
     // read in JSON and upload to S3 bucket
@@ -183,7 +179,7 @@ async function createFAQ(params) {
     // if FAQ exists already, delete the old one and update it
     const index_params = {
         IndexId: params.faq_index_id,
-        MaxResults: '30', // default max number of FAQs in developer edition
+        MaxResults: 30, // default max number of FAQs in developer edition
     };
 
     const list_faq_response = await execFuncHandleThrottleException(faqLister, kendraClient, index_params);
@@ -191,7 +187,7 @@ async function createFAQ(params) {
 
     let elem;
     let index = null;
-    for (let j = 0; j < list_faq_response.FaqSummaryItems.length; j += 1) {
+    for (let j = 0; j < list_faq_response.FaqSummaryItems.length; j += 1) {  // NOSONAR Helps with Readability
         elem = list_faq_response.FaqSummaryItems[j];
         if (elem.Name == params.faq_name) {
             index = elem.Id;

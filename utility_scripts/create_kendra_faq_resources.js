@@ -15,11 +15,14 @@
 (async () => {
     process.env.AWS_SDK_LOAD_CONFIG = true;
 
-    const AWS = require('aws-sdk');
-    const sts = new AWS.STS();
-    const { region } = AWS.config;
+    const { IAMClient, GetPolicyCommand, CreatePolicyCommand, GetRoleCommand, CreateRoleCommand, AttachRolePolicyCommand } = require('@aws-sdk/client-iam');
+    const { KendraClient, CreateIndexCommand } = require('@aws-sdk/client-kendra');
+    const { STSClient, GetCallerIdentityCommand } = require('@aws-sdk/client-sts');
+    const region = process.env.AWS_REGION;
+    const sts = new STSClient({ region });
 
-    const account = (await sts.getCallerIdentity({}).promise()).Account;
+    const getCallerIdentityCmd = new GetCallerIdentityCommand({});
+    const account = (await sts.send(getCallerIdentityCmd)).Account;
     let policy = {
         Version: '2012-10-17',
         Statement: [
@@ -55,27 +58,29 @@
         PolicyArn: `arn:aws:iam::${account}:policy/AmazonKendra-${region}-QnABot`
     };
 
-    const iam = new AWS.IAM();
+    const iam = new IAMClient({ region });
     let doesPolicyExist = false;
     try {
-        policy = await iam.getPolicy(getPolicyParams).promise();
+        const policyCmd = new GetPolicyCommand(getPolicyParams);
+        policy = await iam.send(policyCmd);
         doesPolicyExist = true;
     } catch {}
 
     if (!doesPolicyExist) {
-        await iam
-            .createPolicy({
-                PolicyDocument: JSON.stringify(policy),
-                PolicyName: `AmazonKendra-${region}-QnABot`,
-                Description: 'Policy for Kendra - Created by QnABot'
-            })
-            .promise();
+        const params = {
+            PolicyDocument: JSON.stringify(policy),
+            PolicyName: `AmazonKendra-${region}-QnABot`,
+            Description: 'Policy for Kendra - Created by QnABot'
+        };
+        const createPolicyCmd = new CreatePolicyCommand(params);
+        await iam.send(createPolicyCmd);
     }
 
     let doesRoleExist = false;
 
     try {
-        await iam.getRole({ RoleName: `AmazonKendra-${region}-QnaBot` }).promise();
+        const getRoleCmd = new GetRoleCommand({ RoleName: `AmazonKendra-${region}-QnaBot` });
+        await iam.send(getRoleCmd);
         doesRoleExist = true;
     } catch {}
 
@@ -98,18 +103,20 @@
             Path: '/',
             RoleName: `AmazonKendra-${region}-QnaBot`
         };
-        await iam.createRole(params).promise();
+        const createRoleCmd = new CreateRoleCommand(params);
+        await iam.send(createRoleCmd);
     }
 
     const params = {
         PolicyArn: `arn:aws:iam::${account}:policy/AmazonKendra-${region}-QnABot`,
         RoleName: `AmazonKendra-${region}-QnaBot`
     };
-    await iam.attachRolePolicy(params).promise();
+    const attachRoleCmd = new AttachRolePolicyCommand(params)
+    await iam.send(attachRoleCmd);
 
-    const kendra = new AWS.Kendra();
+    const kendra = new KendraClient({ region });
 
-    const indexResult = await kendra.listIndices().promise();
+    const indexResult = await kendra.listIndices();
     const indexCount = indexResult.IndexConfigurationSummaryItems.length;
     let createdIndex = null;
     if (indexCount == 0) {
@@ -119,7 +126,8 @@
             Description: 'Created by QnABot',
             Edition: 'ENTERPRISE_EDITION'
         };
-        createdIndex = await kendra.createIndex(kendraCreateIndexParams).promise().Id;
+        const createIndexCmd = new CreateIndexCommand(kendraCreateIndexParams)
+        createdIndex = await kendra.send(createIndexCmd).Id;
     } else {
         console.log('WARNING:Existing Kendra indexes found.  Did not create a new index');
     }

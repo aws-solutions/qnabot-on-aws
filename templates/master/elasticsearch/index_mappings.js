@@ -1,4 +1,4 @@
-/*********************************************************************************************************************
+/** *******************************************************************************************************************
  *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.                                                *
  *                                                                                                                    *
  *  Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance    *
@@ -20,14 +20,14 @@ module.exports = {
         // 'qna' doc type fields
         quniqueterms: {
             type: 'text',
-            analyzer: 'custom_english_unique',
+            analyzer: '${Language}' === 'English' ? 'rebuilt_english_unique' : 'rebuilt_${Language}',
         },
         questions: {
             type: 'nested',
             properties: {
                 q: {
                     type: 'text',
-                    analyzer: 'custom_english',
+                    analyzer: 'rebuilt_${Language}',
                 },
                 q_vector: {
                     type: 'knn_vector',
@@ -42,7 +42,7 @@ module.exports = {
         },
         a: {
             type: 'text',
-            analyzer: 'custom_english',
+            analyzer: 'rebuilt_${Language}',
         },
         a_vector: {
             type: 'knn_vector',
@@ -67,7 +67,7 @@ module.exports = {
         },
         // 'text' doc type fields
         passage: {
-            type: 'text', analyzer: 'custom_english',
+            type: 'text', analyzer: 'rebuilt_${Language}',
         },
         passage_vector: {
             type: 'knn_vector',
@@ -81,15 +81,15 @@ module.exports = {
         // 'quiz' doc type fields
         question: {
             type: 'text',
-            analyzer: 'custom_english',
+            analyzer: 'rebuilt_${Language}',
         },
         incorrectAnswers: {
             type: 'text',
-            analyzer: 'custom_english',
+            analyzer: 'rebuilt_${Language}',
         },
         correctAnswers: {
             type: 'text',
-            analyzer: 'custom_english',
+            analyzer: 'rebuilt_${Language}',
         },
     },
 };

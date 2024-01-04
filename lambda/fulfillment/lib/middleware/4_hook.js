@@ -38,11 +38,16 @@ module.exports = async function hook(req, res) {
             qnabot.log('Lambda Hook ', i, ': ', lambdahooks[i].l, ' => Args: ', lambdahooks[i].args);
             const arn = util.getLambdaArn(lambdahooks[i].l);
             if (arn) {
-                event = await util.invokeLambda({
-                    FunctionName: arn,
-                    req: event.req,
-                    res: event.res,
-                });
+                try {
+                    event = await util.invokeLambda({
+                        FunctionName: arn,
+                        req: event.req,
+                        res: event.res,
+                    });
+                } catch (e) {
+                    qnabot.log(`Error invoking lambda hook: ${arn}`);
+                    qnabot.log(JSON.stringify(e));
+                }
             }
         }
         i += 1;
@@ -53,17 +58,17 @@ module.exports = async function hook(req, res) {
     const posthook = _.get(req, '_settings.LAMBDA_POSTPROCESS_HOOK', undefined);
     _.set(req, '_fulfillment.step', 'postprocess');
     if (posthook) {
-        const regex = /(^QNA-)|(^qna-)/g;
-        if (!posthook.match(regex)) {
-            qnabot.warn('The name of the Lambda for a postprocessing hook must start with either "QNA-" or "qna-". '
-                        + 'The postprocessing Lambda hook will NOT be run');
-        } else {
-            const arn = util.getLambdaArn(posthook);
+        const arn = util.getLambdaArn(posthook);
+
+        try {
             event = await util.invokeLambda({
                 FunctionName: arn,
                 req,
                 res,
             });
+        } catch (e) {
+            qnabot.log(`Error invoking post-processing lambda: ${arn}`);
+            qnabot.log(JSON.stringify(e));
         }
     }
 

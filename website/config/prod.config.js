@@ -10,17 +10,13 @@
  *  OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions    *
  *  and limitations under the License.                                                                                *
  *********************************************************************************************************************/
-const ArchivePlugin = require('webpack-archive-plugin');
+const ZipPlugin = require('zip-webpack-plugin');
 module.exports = {
-    resolve:{
-        alias:{
-            vue$:'vue/dist/vue.js'
-        }
-    },
+    mode: 'production',
     plugins:[
-        new ArchivePlugin({
-            output:"../build/website",
-            format:"zip"
+        new ZipPlugin({
+            path: '../../build',
+            filename: 'website.zip',
         })
     ]
 }

@@ -1,84 +1,97 @@
 <template>
-    <transition name="modal-fade">
-        <div class="modal-backdrop">
-            <div class="modal"
-                 role="dialog"
-                 aria-labelledby="modalTitle"
-                 aria-describedby="modalDescription"
-            >
-                <header
-                        class="modal-header"
-                        id="modalTitle"
+  <transition name="modal-fade">
+    <div class="modal-backdrop">
+      <div
+        class="modal"
+        role="dialog"
+        aria-labelledby="modalTitle"
+        aria-describedby="modalDescription"
+      >
+        <header
+          id="modalTitle"
+          class="modal-header"
+        >
+          <slot name="header">
+            Test All Results
+          </slot>
+        </header>
+        <section
+          id="modalDescription"
+          class="modal-body"
+        >
+          <slot name="body">
+            <div class="tablebody">
+              <table
+                aria-label="testAllTable"
+                class="modaltable"
+              >
+                <tr class="modalrow">
+                  <th
+                    v-for="item in tableHeader"
+                    class="modalheader"
+                  >
+                    {{ item }}
+                  </th>
+                </tr>
+                <tr
+                  v-for="item in tableData"
+                  :class="getClass(item)"
                 >
-                    <slot name="header">
-                        Test All Results
-                    </slot>
-                </header>
-                <section
-                        class="modal-body"
-                        id="modalDescription"
-                >
-                    <slot name="body">
-                        <div class="tablebody">
-                            <table aria-label="testAllTable" class="modaltable">
-                                <tr class="modalrow">
-                                    <th class="modalheader" v-for="item in tableHeader">{{ item }}</th>
-                                </tr>
-                                <tr v-for="item in tableData" v-bind:class="getClass(item)">
-                                    <td class="modaldata" v-for="d in item">
-                                        {{ d }}
-                                    </td>
-                                </tr>
-                            </table>
-                        </div>
-                    </slot>
-                </section>
-                <footer class="modal-footer">
-                    <slot name="footer">
-                        <button
-                                type="button"
-                                class="btn-green"
-                                @click="close"
-                                aria-label="Close modal"
-                        >
-                            Close
-                        </button>
-                    </slot>
-                </footer>
+                  <td
+                    v-for="d in item"
+                    class="modaldata"
+                  >
+                    {{ d }}
+                  </td>
+                </tr>
+              </table>
             </div>
-        </div>
-    </transition>
+          </slot>
+        </section>
+        <footer class="modal-footer">
+          <slot name="footer">
+            <button
+              type="button"
+              class="btn-green"
+              aria-label="Close modal"
+              @click="close"
+            >
+              Close
+            </button>
+          </slot>
+        </footer>
+      </div>
+    </div>
+  </transition>
 </template>
 
 <script>
-    /*
+/*
     Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
-    SPDX-License-Identifier: Apache-2.0    
+    SPDX-License-Identifier: Apache-2.0
 
     VUE template to present test all results in a modal view
     */
 
-    import { EventBus } from './event-bus.js';
-    export default {
-        name: 'modal',
-        props: {
-            tableContent: String,
-            tableHeader: Array,
-            tableData: Array,
+module.exports = {
+    name: 'Modal',
+    props: {
+        tableContent: String,
+        tableHeader: Array,
+        tableData: Array,
+    },
+    methods: {
+        close() {
+            this.$emit('closemodal');
         },
-        methods: {
-            close() {
-                EventBus.$emit('closemodal');
-            },
-            getClass(value){
-                if (value[0].toLowerCase() === 'no'){
-                    return 'errorcell';
-                } else {
-                    return 'modalrow';
-                }
+        getClass(value) {
+            if (value[0].toLowerCase() === 'no') {
+                return 'errorcell';
             }
+            return 'modalrow';
         },
-    };
+    },
+};
 </script>
 
 <style>
@@ -86,6 +99,7 @@
     .modalheader, .modaldata {
         padding: 15px;
         text-align: left;
+        font-size: 14px;
     }
 
     .modalheader {
@@ -95,6 +109,8 @@
     .modaltable {
         margin: auto;
         background-color: lightgrey;
+        table-layout: fixed;
+        width: 100%;
     }
 
     .modalrow {

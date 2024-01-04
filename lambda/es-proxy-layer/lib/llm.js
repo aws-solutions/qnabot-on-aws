@@ -13,14 +13,17 @@
 
 /* eslint-disable max-len, no-underscore-dangle */
 const _ = require('lodash');
-const aws = require('aws-sdk');
+const { Lambda } = require('@aws-sdk/client-lambda');
+const { SageMakerRuntime } = require('@aws-sdk/client-sagemaker-runtime');
+const customSdkConfig = require('../lib/util/customSdkConfig');
 const qnabot = require('qnabot/logging');
+const region = process.env.AWS_REGION || 'us-east-1';
 
-const { ChatMessageHistory } = require('langchain/memory');
-const { BufferMemory } = require('langchain/memory');
+const { ChatMessageHistory, BufferMemory } = require('langchain/memory');
 const { PromptTemplate } = require('langchain/prompts');
 const { TokenTextSplitter } = require('langchain/text_splitter');
 const { get_encoding } = require('@dqbd/tiktoken');
+
 //
 // Private functions
 //
@@ -59,7 +62,7 @@ async function createTruncatedPrompt(promptTemplateStr, promptTemplate, history,
     const promptTokenCount = countTokens(prompt);
     if (maxLength && promptTokenCount > maxLength) {
         qnabot.log(
-            `Prompt token count is ${promptTokenCount}, which is more than the setting limit: ${maxLength}. Truncating...`
+            `Prompt token count is ${promptTokenCount}, which is more than the setting limit: ${maxLength}. Truncating...`,
         );
         const diff = promptTokenCount - maxLength;
 
@@ -74,7 +77,7 @@ async function createTruncatedPrompt(promptTemplateStr, promptTemplate, history,
                 query,
             });
         }
-        qnabot.log(`Selectively removing history from prompt, since it is ${historyTokenCount} words long.`);
+        qnabot.log(`Selectively removing history from prompt, since it is ${historyTokenCount} tokens long.`);
 
         const contextTokenCount = promptTemplateStr.includes('{context}') ? countTokens(context) : 0;
         if (historyTokenCount + contextTokenCount > diff) {
@@ -89,7 +92,7 @@ async function createTruncatedPrompt(promptTemplateStr, promptTemplate, history,
         }
 
         throw new Error(
-            `Unable to truncate prompt to be less than ${maxLength} words long. Please check your prompt template and settings.`
+            `Unable to truncate prompt to be less than ${maxLength} tokens long. Please check your prompt template and settings.`,
         );
     }
 
@@ -100,7 +103,7 @@ async function createTruncatedPrompt(promptTemplateStr, promptTemplate, history,
 async function make_qa_prompt(req, promptTemplateStr, context, input, query) {
     const chatMessageHistory = await chatMemoryParse(
         _.get(req._userInfo, 'chatMessageHistory', '[]'),
-        req._settings.LLM_CHAT_HISTORY_MAX_MESSAGES
+        req._settings.LLM_CHAT_HISTORY_MAX_MESSAGES,
     );
     const memory = new BufferMemory({ chatHistory: chatMessageHistory });
     const { history } = await memory.loadMemoryVariables();
@@ -108,8 +111,7 @@ async function make_qa_prompt(req, promptTemplateStr, context, input, query) {
         template: promptTemplateStr,
         inputVariables: ['history', 'context', 'input', 'query'],
     });
-
-    const maxLength = req._settings.LLM_PROMPT_MAX_TOKEN_LIMIT;
+    const maxLength = parseInt(req._settings.LLM_PROMPT_MAX_TOKEN_LIMIT, 10);
     const prompt = await createTruncatedPrompt(
         promptTemplateStr,
         promptTemplate,
@@ -119,33 +121,41 @@ async function make_qa_prompt(req, promptTemplateStr, context, input, query) {
         query,
         maxLength,
     );
+
     return [memory, history, promptTemplate, prompt];
 }
 // make generate query prompt from template
 async function make_qenerate_query_prompt(req, promptTemplateStr) {
     const chatMessageHistory = await chatMemoryParse(
         _.get(req._userInfo, 'chatMessageHistory', '[]'),
-        req._settings.LLM_CHAT_HISTORY_MAX_MESSAGES
+        req._settings.LLM_CHAT_HISTORY_MAX_MESSAGES,
     );
     const memory = new BufferMemory({ chatHistory: chatMessageHistory });
     const { history } = await memory.loadMemoryVariables();
     const promptTemplate = new PromptTemplate({
         template: promptTemplateStr,
-        inputVariables: ['history', 'input']
+        inputVariables: ['history', 'input'],
     });
-    const prompt = await promptTemplate.format({
+    const maxLength = req._settings.LLM_PROMPT_MAX_TOKEN_LIMIT;
+    const prompt = await createTruncatedPrompt(
+        promptTemplateStr,
+        promptTemplate,
         history,
-        input: req.question
-    });
+        '',
+        req.question,
+        '',
+        maxLength,
+    );
+
     return [memory, history, promptTemplate, prompt];
 }
 
 // Invoke LLM via SageMaker endpoint running HF_MODEL tiiuae/falcon-40b-instruct
 async function invoke_sagemaker(prompt, model_params) {
-    const sm = new aws.SageMakerRuntime({ region: process.env.AWS_REGION || 'us-east-1' });
+    const sm = new SageMakerRuntime(customSdkConfig('C005', { region }));
     const body = JSON.stringify({
         inputs: prompt,
-        parameters: model_params
+        parameters: model_params,
     });
     let response;
     qnabot.log(`Invoking SageMaker endpoint: ${process.env.LLM_SAGEMAKERENDPOINT}`);
@@ -154,9 +164,8 @@ async function invoke_sagemaker(prompt, model_params) {
             .invokeEndpoint({
                 EndpointName: process.env.LLM_SAGEMAKERENDPOINT,
                 ContentType: 'application/json',
-                Body: body
-            })
-            .promise();
+                Body: body,
+            });
         const sm_body = JSON.parse(Buffer.from(smres.Body, 'utf-8').toString());
         qnabot.log('SM response body:', sm_body);
         response = sm_body[0].generated_text;
@@ -166,6 +175,7 @@ async function invoke_sagemaker(prompt, model_params) {
     }
     return response;
 }
+
 async function generate_query_sagemaker(req, promptTemplateStr) {
     const model_params = JSON.parse(req._settings.LLM_GENERATE_QUERY_MODEL_PARAMS || default_params_stg);
     const [, , , prompt] = await make_qenerate_query_prompt(req, promptTemplateStr);
@@ -183,11 +193,11 @@ async function get_qa_sagemaker(req, promptTemplateStr, context) {
 
 // Invoke LLM via custom Lambda abstraction
 async function invoke_lambda(prompt, model_params, settings) {
-    const lambda = new aws.Lambda({ region: process.env.AWS_REGION || 'us-east-1' });
+    const lambda = new Lambda(customSdkConfig('C006', { region }));
     const body = JSON.stringify({
         prompt,
         parameters: model_params,
-        settings
+        settings,
     });
 
     qnabot.log(`Invoking Lambda: ${process.env.LLM_LAMBDA_ARN}`);
@@ -196,12 +206,12 @@ async function invoke_lambda(prompt, model_params, settings) {
             .invoke({
                 FunctionName: process.env.LLM_LAMBDA_ARN,
                 InvocationType: 'RequestResponse',
-                Payload: body
-            })
-            .promise();
-        const payload = JSON.parse(lambdares.Payload);
-        qnabot.log('Lambda response payload:', payload);
+                Payload: body,
+            });
 
+        const payloadObj = Buffer.from(lambdares.Payload).toString();
+        const payload = JSON.parse(payloadObj);
+        qnabot.log('Lambda response payload:', payload);
         if (payload.generated_text) {
             return payload.generated_text;
         }
@@ -240,7 +250,7 @@ function clean_standalone_query(query) {
     clean_query = clean_query.replace(/^Here .*? the standalone question.*$/gim, '');
     // remove newlines
     clean_query = clean_query.replace(/\n/g, ' ');
-    // No more than 1000 characters - for Kendra query compatability - https://docs.aws.amazon.com/kendra/latest/dg/API_Query.html
+    // No more than 1000 characters - for Kendra query compatibility - https://docs.aws.amazon.com/kendra/latest/dg/API_Query.html
     clean_query = clean_query.slice(0, 1000);
     // limit output to one question.. truncate any runaway answers that shouldn't be included in the query.
     const q_pos = clean_query.indexOf('?');
@@ -260,7 +270,7 @@ function clean_standalone_query(query) {
 const clean_context = function clean_context(context, req) {
     let clean_context = context;
     // remove URLS from Kendra passages
-    clean_context = clean_context.replace(/^\s*Source Link:.*$/gm, '');
+    clean_context = clean_context.replace(/^\s*Source Link:.*$/gm, ''); // NOSONAR - javascript:S5852 - input is user controlled and we have a limit on the number of characters
     // remove Kendra prefix messages
     if (req._settings.ALT_SEARCH_KENDRA_ANSWER_MESSAGE) {
         clean_context = clean_context.replace(new RegExp(req._settings.ALT_SEARCH_KENDRA_ANSWER_MESSAGE, 'g'), '');
@@ -327,14 +337,14 @@ const generate_query = async function generate_query(req) {
     // NOSONAR TODO - Can this also tell me if a query is needed, or if the LLM/chatHistory already has the answer
     let promptTemplateStr =
         req._settings.LLM_GENERATE_QUERY_PROMPT_TEMPLATE ||
-        '<br><br>Human: Given the following conversation and a follow up input, if the follow up input is a question please rephrase that question to be a standalone question, otherwise return the input unchanged.<br><br>Chat History:<br?{history}<br><br>Follow Up Input: {input}<br><br>Assistant:';
+        '<br><br>Human: Given the following conversation and a follow up input, if the follow up input is a question please rephrase that question to be a standalone question, otherwise return the input unchanged.<br><br>Chat History:<br>{history}<br><br>Follow Up Input: {input}<br><br>Assistant:';
     promptTemplateStr = promptTemplateStr.replace(/<br>/gm, '\n');
     let newQuery;
     const start = Date.now();
-    if (req._settings.LLM_API == 'SAGEMAKER') {
+    if (req._settings.LLM_API === 'SAGEMAKER') {
         // NOSONAR TODO refactor when langchainJS supports Sagemaker
         newQuery = await generate_query_sagemaker(req, promptTemplateStr);
-    } else if (req._settings.LLM_API == 'LAMBDA') {
+    } else if (req._settings.LLM_API === 'LAMBDA') {
         newQuery = await generate_query_lambda(req, promptTemplateStr);
     } else {
         throw new Error(`Error: Unsupported LLM_API type: ${req._settings.LLM_API}`);

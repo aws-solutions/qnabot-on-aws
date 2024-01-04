@@ -16,13 +16,13 @@ const qnabot = require('qnabot/logging');
 const lex = require('./lex');
 const alexa = require('./alexa');
 const util = require('./util');
-const translate = require('./multilanguage.js');
+const {get_translation} = require('./multilanguage.js');
 
 function sms_hint(req, res) {
     let hint = '';
     if (_.get(req, '_event.requestAttributes.x-amz-lex:channel-type') == 'Twilio-SMS') {
         if (_.get(req, '_settings.SMS_HINT_REMINDER_ENABLE')) {
-            const interval_hrs = parseInt(_.get(req, '_settings.SMS_HINT_REMINDER_INTERVAL_HRS', '24'));
+            const interval_hrs = parseInt(_.get(req, '_settings.SMS_HINT_REMINDER_INTERVAL_HRS', 24));
             const hint_message = _.get(req, '_settings.SMS_HINT_REMINDER', '');
             const hours = req._userInfo.TimeSinceLastInteraction / 36e5;
             if (hours >= interval_hrs) {
@@ -50,7 +50,7 @@ async function connect_response(req, res) {
         const nextPromptVarName = _.get(req, '_settings.CONNECT_NEXT_PROMPT_VARNAME', 'nextPrompt');
         let prompt = _.get(res.session, nextPromptVarName, '');
         if (prompt) {
-            prompt = await translate.get_translation(prompt, 'auto', locale, req);
+            prompt = await get_translation(prompt, 'auto', locale, req);
         }
         _.set(res.session, nextPromptVarName, prompt);
     }
@@ -98,7 +98,7 @@ function resetAttributes(req, res) {
     const previous = _.get(req._event.sessionAttributes, 'previous');
     if (previous) {
         const obj = JSON.parse(previous);
-        const prevQid = obj.qid;
+        const prevQid = obj.qid;  // NOSONAR Need prevQid to reset attribute
     }
     const kendraResponsibleQid = _.get(res.session, 'qnabotcontext.kendra.kendraResponsibleQid');
     if ((res.result === undefined || res.result.qid === undefined) || (kendraResponsibleQid && (res.result.qid !== kendraResponsibleQid))) {
@@ -120,28 +120,28 @@ module.exports = async function assemble(req, res) {
                 res,
             });
         }
-    
+
         if (process.env.LAMBDA_RESPONSE) {
             const result = await util.invokeLambda({
                 FunctionName: process.env.LAMBDA_RESPONSE,
                 InvocationType: 'RequestResponse',
                 Payload: JSON.stringify(res),
             });
-    
+
             _.merge(res, result);
         }
-    
+
         // append hint to SMS message (if it's been a while since user last interacted)
         res.message += sms_hint(req, res);
-    
+
         // enable interruptable bot response for Connect
         res = await connect_response(req, res);
-    
+
         res.session = _.mapValues(
             _.get(res, 'session', {}),
             (x) => (_.isString(x) ? x : JSON.stringify(x)),
         );
-    
+
         resetAttributes(req, res);
         switch (req._type) {
         case 'LEX':
@@ -151,7 +151,7 @@ module.exports = async function assemble(req, res) {
             res.out = alexa.assemble(req, res);
             break;
         }
-    
+
         return { req, res };
     } catch (error) {
         qnabot.log('An error occured in assemble: ', error);

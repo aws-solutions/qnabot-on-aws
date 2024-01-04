@@ -11,12 +11,14 @@
  *  and limitations under the License.                                                                                *
  *********************************************************************************************************************/
 
-const AWS = require('aws-sdk-mock');
+const awsMock = require('aws-sdk-client-mock');
 const settings = require('../qnabot/settings');
 const settingsFixture = require('./settings.fixtures')
-
+const { SSMClient, GetParameterCommand } = require('@aws-sdk/client-ssm');
+const ssmMock = awsMock.mockClient(SSMClient);
 describe('when calling set_environment_variables', () => {
     afterEach(() => {
+        ssmMock.restore()
         delete process.env.QNAREDACT
         delete process.env.REDACTING_REGEX
         delete process.env.DISABLECLOUDWATCHLOGGING
@@ -63,12 +65,13 @@ describe('when calling set_environment_variables', () => {
 
 describe('when calling merge_default_and_custom_settings function', () => {
     beforeAll(() => {
-        AWS.mock('SSM', 'getParameter', function (params, callback){
+        ssmMock.reset();
+        ssmMock.on(GetParameterCommand).callsFake((params)=> {
             let result = settingsFixture.defaultSettingsMock
             if(params.Name === 'custom'){
                 result = settingsFixture.customSettingsMock
             }
-            callback(null, { Parameter: {Value: result} });
+            return { Parameter: {Value: result} };
         });
     });
 
@@ -82,17 +85,20 @@ describe('when calling merge_default_and_custom_settings function', () => {
 	});
 
     afterAll(() => {
-        AWS.restore('SSM', 'getParameter')
+        ssmMock.restore();
     });
 });
 
 describe('when calling get_parameter function', () => {
+    beforeEach(() => {
+        ssmMock.reset();
+    });
     it("should return the raw settings when setting non JSON, simple string", async () => {
-        AWS.mock('SSM', 'getParameter', function (params, callback){
-            callback(null, { Parameter: {Value: "simple string value"} });
+        ssmMock.on(GetParameterCommand).callsFake((params) =>{
+            return { Parameter: {Value: "simple string value"} };
         });
         let result = await settings.get_parameter('mock')
         expect(result).toEqual("simple string value");
-        AWS.restore('SSM', 'getParameter')
+        ssmMock.restore();
 	});
 });

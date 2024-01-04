@@ -16,6 +16,39 @@ THIRD PARTY COMPONENTS
 **********************
 This software includes third party software subject to the following copyrights:
 
+@aws-sdk/client-api-gateway under the Apache License Version 2.0
+@aws-sdk/client-cognito-identity under the Apache License Version 2.0
+@aws-crypto/sha256-js under the Apache License Version 2.0
+@aws-sdk/client-api-gateway under the Apache License Version 2.0
+@aws-sdk/client-cloudformation under the Apache License Version 2.0
+@aws-sdk/client-cognito-identity under the Apache License Version 2.0
+@aws-sdk/client-cognito-identity-provider under the Apache License Version 2.0
+@aws-sdk/client-comprehend under the Apache License Version 2.0
+@aws-sdk/client-dynamodb under the Apache License Version 2.0
+@aws-sdk/client-elasticsearch-service under the Apache License Version 2.0
+@aws-sdk/client-firehose under the Apache License Version 2.0
+@aws-sdk/client-iam under the Apache License Version 2.0
+@aws-sdk/client-kendra under the Apache License Version 2.0
+@aws-sdk/client-kms under the Apache License Version 2.0
+@aws-sdk/client-lambda under the Apache License Version 2.0
+@aws-sdk/client-lex-model-building-service under the Apache License Version 2.0
+@aws-sdk/client-lex-models-v2 under the Apache License Version 2.0
+@aws-sdk/client-lex-runtime-service under the Apache License Version 2.0
+@aws-sdk/client-lex-runtime-v2 under the Apache License Version 2.0
+@aws-sdk/client-polly under the Apache License Version 2.0
+@aws-sdk/client-s3 under the Apache License Version 2.0
+@aws-sdk/client-sagemaker-runtime under the Apache License Version 2.0
+@aws-sdk/client-ssm under the Apache License Version 2.0
+@aws-sdk/client-sts under the Apache License Version 2.0
+@aws-sdk/client-translate under the Apache License Version 2.0
+@aws-sdk/credential-providers under the Apache License Version 2.0
+@aws-sdk/lib-dynamodb under the Apache License Version 2.0
+@aws-sdk/s3-request-presigner under the Apache License Version 2.0
+@aws-sdk/util-stream-node under the Apache License Version 2.0
+@smithy/node-http-handler under the Apache License Version
+@smithy/protocol-http under the Apache License Version 2.0
+@smithy/signature-v4 under the Apache License Version 2.0
+@smithy/util-retry under the Apache License Version 2.0
 @babel/core under the Massachusetts Institute of Technology (MIT) license
 @babel/plugin-transform-runtime under the Massachusetts Institute of Technology (MIT) license
 @babel/preset-env under the Massachusetts Institute of Technology (MIT) license
@@ -26,27 +59,26 @@ This software includes third party software subject to the following copyrights:
 ajv under the Massachusetts Institute of Technology (MIT) license
 alexa-sdk under the Apache License Version 2.0
 arrow under the Apache License Version 2.0
-astroid under the GNU Lesser General Public License v2 (LGPLv2)
 async-mutex under the Massachusetts Institute of Technology (MIT) license
 attrs under the Massachusetts Institute of Technology (MIT) license
 autopep8 under the Massachusetts Institute of Technology (MIT) license
 autosize under the Massachusetts Institute of Technology (MIT) license
 aws-lex-web-ui under the Amazon Software License
 aws-sdk under the Apache License Version 2.0
-aws4 the Massachusetts Institute of Technology (MIT) license
-axios the Massachusetts Institute of Technology (MIT) license
+aws-sdk-client-mock under the Massachusetts Institute of Technology (MIT) license
+aws-sdk-client-mock-jest under the Massachusetts Institute of Technology (MIT) license
+aws4 under the Massachusetts Institute of Technology (MIT) license
+axios under the Massachusetts Institute of Technology (MIT) license
 babel-core under the Massachusetts Institute of Technology (MIT) license
 babel-loader under the Massachusetts Institute of Technology (MIT) license
 babel-plugin-syntax-flow under the Massachusetts Institute of Technology (MIT) license
 babel-plugin-transform-flow-strip-types under the Massachusetts Institute of Technology (MIT) license
-babel-polyfill the Massachusetts Institute of Technology (MIT) license
+babel-polyfill under the Massachusetts Institute of Technology (MIT) license
 babel-preset-env under the Massachusetts Institute of Technology (MIT) license
 babel-preset-es2015 under the Massachusetts Institute of Technology (MIT) license
 babel-preset-es2015-ie the Massachusetts Institute of Technology (MIT) license
 beautifulsoup under Massachusetts Institute of Technology (MIT) License
 beautifulsoup4 under the Massachusetts Institute of Technology (MIT) license
-black under the Massachusetts Institute of Technology (MIT) license
-bluebird under the Massachusetts Institute of Technology (MIT) license
 body-parser under the Massachusetts Institute of Technology (MIT) license
 boolean.py under BSD-2-Clause
 boto3 under the Apache License Version 2.0
@@ -80,6 +112,7 @@ file-loader under the Massachusetts Institute of Technology (MIT) license
 file-saver under the Massachusetts Institute of Technology (MIT) license
 filelock under the Unlicense license
 flake8 under the Massachusetts Institute of Technology (MIT) license
+h11 under the Massachusetts Institute of Technology (MIT) license
 handlebars under the Massachusetts Institute of Technology (MIT) license
 handlebars-loader under the Massachusetts Institute of Technology (MIT) license
 highlight.js under BSD-3-Clause license
@@ -91,6 +124,7 @@ intercept-stdout under the Massachusetts Institute of Technology (MIT) license
 iniconfig under the Massachusetts Institute of Technology (MIT) license
 isort under the Massachusetts Institute of Technology (MIT) license
 Jinja2 under the BSD License (BSD-3-Clause)
+jest under the Massachusetts Institute of Technology (MIT) license
 jmespath under the Massachusetts Institute of Technology (MIT) license
 js-cache under the Massachusetts Institute of Technology (MIT) license
 jsdom under the Massachusetts Institute of Technology (MIT) license
@@ -124,8 +158,8 @@ mypy-extensions under the Massachusetts Institute of Technology (MIT) license
 openapi-schema-validator under the BSD License
 openapi-spec-validator under the Apache License Version 2.0
 ora under the Massachusetts Institute of Technology (MIT) license
+outcome under the Apache License Version 2.0 and the the Massachusetts Institute of Technology (MIT) license
 pathable under the Apache License Version 2.0
-pathspec under the Mozilla Public License 2.0 (MPL 2.0)
 platformdirs under the Massachusetts Institute of Technology (MIT) license
 pluggy under the Massachusetts Institute of Technology (MIT) license
 progress-bar-webpack-plugin under the Massachusetts Institute of Technology (MIT) license
@@ -136,13 +170,14 @@ pug-runtime under the Massachusetts Institute of Technology (MIT) license
 pycodestyle under the Massachusetts Institute of Technology (MIT) license
 pycparser under the BSD License
 pyflakes under the Massachusetts Institute of Technology (MIT) license
-pylint under the GNU General Public License v2 (GPLv2)
 pyrsistent under the Massachusetts Institute of Technology (MIT) license
 pytest under the Massachusetts Institute of Technology (MIT) license
 pytest-cov under the Massachusetts Institute of Technology (MIT) license
 pytest-env under the Massachusetts Institute of Technology (MIT) license
+pytest-json under the Massachusetts Institute of Technology (MIT) license
 pytest-mock under the Massachusetts Institute of Technology (MIT) license
 py-serializable under the Apache License Version 2.0
+PySocks under the BSD License 
 python-dateutil under the Apache License Version 2.0 and BSD License
 pytz under the Massachusetts Institute of Technology (MIT) license
 query-string under the Massachusetts Institute of Technology (MIT) license
@@ -156,12 +191,15 @@ read-excel-file under the Massachusetts Institute of Technology (MIT) license
 recursive-readdir under the Massachusetts Institute of Technology (MIT) license
 require-dir under the Massachusetts Institute of Technology (MIT) license
 responses under the Apache License Version 2.0
+rfc3339-validator under the Massachusetts Institute of Technology (MIT) license
 roboto-fontface under the Apache License Version 2.0
 s3transfer under the Apache License Version 2.0
 sass under the Massachusetts Institute of Technology (MIT) license
 sass-loader under the Massachusetts Institute of Technology (MIT) license
+selenium under the Apache License Version 2.0
 simple-encryptor under the Massachusetts Institute of Technology (MIT) license
 slackify-markdown under the Massachusetts Institute of Technology (MIT) license
+sniffio under the Apache License Version 2.0 and the the Massachusetts Institute of Technology (MIT) license
 soupsieve under the Massachusetts Institute of Technology (MIT) license
 static-eval under the Massachusetts Institute of Technology (MIT) license
 strip-ansi under the Massachusetts Institute of Technology (MIT) license
@@ -170,6 +208,8 @@ stylus under the Massachusetts Institute of Technology (MIT) license
 stylus-loader under the Massachusetts Institute of Technology (MIT) license
 tomli under the Massachusetts Institute of Technology (MIT) license
 tomlkit under the Massachusetts Institute of Technology (MIT) license
+trio under the Apache License Version 2.0 and the the Massachusetts Institute of Technology (MIT) license
+trio-websocket under the Massachusetts Institute of Technology (MIT) license
 types-PyYAML under the Apache License Version 2.0
 types-python-dateutil under the Apache License Version 2.0
 typing_extensions under Python Software Foundation License
@@ -196,4 +236,5 @@ webpack-merge under the Massachusetts Institute of Technology (MIT) license
 webpack-s3-plugin under the Massachusetts Institute of Technology (MIT) license
 websocket-client under the Apache License Version 2.0
 Werkzeug under the BSD License
+wsproto under the Massachusetts Institute of Technology (MIT) license
 xmltodict under the Massachusetts Institute of Technology (MIT) license

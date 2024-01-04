@@ -1,0 +1,12 @@
+﻿{
+	"qna": [
+		{
+			"a": "Check out these links:",
+			"kendraRedirectQueryText": "alexa AND \"custom skill\"",
+			"type": "qna",
+			"qid": "Kendra.001",
+			"kendraRedirectQueryConfidenceThreshold": "LOW",
+			"q": ["Unrelated question about Kindle"]
+		}
+	]
+}
