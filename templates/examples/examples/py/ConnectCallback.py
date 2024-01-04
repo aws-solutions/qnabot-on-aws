@@ -12,13 +12,15 @@
 ######################################################################################################################
 
 import json
+import os
 import boto3
 import logging
+from botocore.config import Config
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
-def handler(event, context):
+def handler(event, context):  # NOSONAR Lambda Handler
     #logger.info(event)
 
     #checking for Lambda Hook Arguments from QnA Bot
@@ -36,7 +38,7 @@ def handler(event, context):
 
 
     #initialize client object for AWS Connect
-    client = boto3.client('connect', region_name=aws_region)
+    client = boto3.client('connect', config = Config(region_name=aws_region, user_agent_extra = f"AWSSOLUTION/{os.environ['SOLUTION_ID']}/{os.environ['SOLUTION_VERSION']} AWSSOLUTION-CAPABILITY/{os.environ['SOLUTION_ID']}-C019/{os.environ['SOLUTION_VERSION']}"))
 
     #store the values of QnA Bot session variables
     qnabot_contact_name = event["res"]["session"]["contact_name"]["FirstName"]

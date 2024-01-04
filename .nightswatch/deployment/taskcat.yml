@@ -1,0 +1,216 @@
+######################################################################################################################
+#  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.                                                #
+#                                                                                                                    #
+#  Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance    #
+#  with the License. A copy of the License is located at                                                             #
+#                                                                                                                    #
+#      http://www.apache.org/licenses/LICENSE-2.0                                                                    #
+#                                                                                                                    #
+#  or in the 'license' file accompanying this file. This file is distributed on an 'AS IS' BASIS, WITHOUT WARRANTIES #
+#  OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions    #
+#  and limitations under the License.                                                                                #
+######################################################################################################################
+
+general:
+  auth:
+    default: 'QnABot_Profile' # Your aws profile should be defined inside scripts/env.sh file.
+project:
+  name: qnabot
+  shorten_stack_name: true
+  template: qnabot-on-aws-main.template
+tests:
+  qnabot-t1:
+    parameters:
+      DefaultKendraIndexId: '650682ba-baee-4bb9-9d04-322e4834f894'
+      ElasticSearchNodeCount: '4'
+      Email: 'test@example.com'
+      Encryption: 'ENCRYPTED'
+      KibanaDashboardRetentionMinutes: '43200'
+      LexBotVersion: 'LexV1 and LexV2'
+      LexV2BotLocaleIds: 'en_US,es_US,fr_CA'
+      PublicOrPrivate: 'PRIVATE'
+      Username: 'Admin'
+      XraySetting: 'FALSE'
+      FulfillmentConcurrency: '0'
+      EmbeddingsApi: SAGEMAKER
+      SagemakerInitialInstanceCount: 1
+      LLMSagemakerInitialInstanceCount: 1
+      LLMApi: SAGEMAKER
+      LLMSagemakerInstanceType: ml.g5.12xlarge
+    regions:
+      - us-east-1
+  qnabot-t2:
+    parameters:
+      DefaultKendraIndexId: '95fab795-bf1c-47b7-a561-31c3cb60ceb0'
+      ElasticSearchNodeCount: '4'
+      Email: 'test@example.com'
+      Encryption: 'ENCRYPTED'
+      KibanaDashboardRetentionMinutes: '43200'
+      LexBotVersion: 'LexV1 and LexV2'
+      LexV2BotLocaleIds: 'en_US,es_US,fr_CA'
+      PublicOrPrivate: 'PRIVATE'
+      Username: 'Admin'
+      XraySetting: 'FALSE'
+      FulfillmentConcurrency: '0'
+      EmbeddingsApi: SAGEMAKER
+      SagemakerInitialInstanceCount: 1
+      LLMSagemakerInitialInstanceCount: 1
+      LLMApi: SAGEMAKER
+      LLMSagemakerInstanceType: ml.g5.12xlarge
+    regions:
+      - us-west-2
+  qnabot-t3:
+    parameters:
+      DefaultKendraIndexId: '18c53754-0a24-42eb-85d9-ad65aa24f891'
+      ElasticSearchNodeCount: '4'
+      Email: 'test@example.com'
+      Encryption: 'ENCRYPTED'
+      KibanaDashboardRetentionMinutes: '43200'
+      LexBotVersion: 'LexV1 and LexV2'
+      LexV2BotLocaleIds: 'en_US,es_US,fr_CA'
+      PublicOrPrivate: 'PRIVATE'
+      Username: 'Admin'
+      XraySetting: 'FALSE'
+      FulfillmentConcurrency: '0'
+      EmbeddingsApi: SAGEMAKER
+      SagemakerInitialInstanceCount: 1
+    regions:
+      - ap-southeast-1
+  qnabot-t4:
+    parameters:
+      DefaultKendraIndexId: '50849777-a352-4708-aa0d-f40046b1bdc7'
+      ElasticSearchNodeCount: '4'
+      Email: 'test@example.com'
+      Encryption: 'ENCRYPTED'
+      KibanaDashboardRetentionMinutes: '43200'
+      LexBotVersion: 'LexV1 and LexV2'
+      LexV2BotLocaleIds: 'en_US,es_US,fr_CA'
+      PublicOrPrivate: 'PRIVATE'
+      Username: 'Admin'
+      XraySetting: 'FALSE'
+      FulfillmentConcurrency: '0'
+      EmbeddingsApi: SAGEMAKER
+      SagemakerInitialInstanceCount: 1
+      LLMSagemakerInitialInstanceCount: 1
+      LLMApi: SAGEMAKER
+      LLMSagemakerInstanceType: ml.g5.12xlarge
+    regions:
+      - ap-southeast-2
+  qnabot-t5:
+    parameters:
+      DefaultKendraIndexId: '72be0d99-fe41-4dda-b89c-acba05ea1282'
+      ElasticSearchNodeCount: '4'
+      Email: 'test@example.com'
+      Encryption: 'ENCRYPTED'
+      KibanaDashboardRetentionMinutes: '43200'
+      LexBotVersion: 'LexV2 Only'
+      LexV2BotLocaleIds: 'en_US,es_US,fr_CA'
+      PublicOrPrivate: 'PRIVATE'
+      Username: 'Admin'
+      XraySetting: 'FALSE'
+      FulfillmentConcurrency: '0'
+      EmbeddingsApi: SAGEMAKER
+      SagemakerInitialInstanceCount: 1
+      LLMSagemakerInitialInstanceCount: 1
+      LLMApi: SAGEMAKER
+      LLMSagemakerInstanceType: ml.g5.12xlarge
+    regions:
+      - ca-central-1
+  qnabot-t6:
+    parameters:
+      DefaultKendraIndexId: 'e647d178-347c-48cb-9386-4dcb2f73ebae'
+      ElasticSearchNodeCount: '4'
+      Email: 'test@example.com'
+      Encryption: 'ENCRYPTED'
+      KibanaDashboardRetentionMinutes: '43200'
+      LexBotVersion: 'LexV1 and LexV2'
+      LexV2BotLocaleIds: 'en_US,es_US,fr_CA'
+      PublicOrPrivate: 'PRIVATE'
+      Username: 'Admin'
+      XraySetting: 'FALSE'
+      FulfillmentConcurrency: '0'
+      EmbeddingsApi: SAGEMAKER
+      SagemakerInitialInstanceCount: 1
+      LLMSagemakerInitialInstanceCount: 1
+      LLMApi: SAGEMAKER
+      LLMSagemakerInstanceType: ml.g5.12xlarge
+    regions:
+      - eu-west-1
+  qnabot-t7:
+    parameters:
+      DefaultKendraIndexId: ''
+      ElasticSearchNodeCount: '4'
+      Email: 'test@example.com'
+      Encryption: 'ENCRYPTED'
+      KibanaDashboardRetentionMinutes: '43200'
+      LexBotVersion: 'LexV1 and LexV2'
+      LexV2BotLocaleIds: 'en_US,es_US,fr_CA'
+      PublicOrPrivate: 'PRIVATE'
+      Username: 'Admin'
+      XraySetting: 'FALSE'
+      FulfillmentConcurrency: '0'
+      EmbeddingsApi: SAGEMAKER
+      SagemakerInitialInstanceCount: 1
+    regions:
+      - ap-northeast-1
+  qnabot-t8:
+    parameters:
+      DefaultKendraIndexId: ''
+      ElasticSearchNodeCount: '4'
+      Email: 'test@example.com'
+      Encryption: 'ENCRYPTED'
+      KibanaDashboardRetentionMinutes: '43200'
+      LexBotVersion: 'LexV1 and LexV2'
+      LexV2BotLocaleIds: 'en_US,es_US,fr_CA'
+      PublicOrPrivate: 'PRIVATE'
+      Username: 'Admin'
+      XraySetting: 'FALSE'
+      FulfillmentConcurrency: '0'
+      EmbeddingsApi: SAGEMAKER
+      SagemakerInitialInstanceCount: 1
+      LLMSagemakerInitialInstanceCount: 1
+      LLMApi: SAGEMAKER
+      LLMSagemakerInstanceType: ml.g5.12xlarge
+    regions:
+      - eu-central-1
+  qnabot-t9:
+    parameters:
+      DefaultKendraIndexId: ''
+      ElasticSearchNodeCount: '4'
+      Email: 'test@example.com'
+      Encryption: 'ENCRYPTED'
+      KibanaDashboardRetentionMinutes: '43200'
+      LexBotVersion: 'LexV1 and LexV2'
+      LexV2BotLocaleIds: 'en_US,es_US,fr_CA'
+      PublicOrPrivate: 'PRIVATE'
+      Username: 'Admin'
+      XraySetting: 'FALSE'
+      FulfillmentConcurrency: '0'
+      EmbeddingsApi: SAGEMAKER
+      SagemakerInitialInstanceCount: 1
+      LLMSagemakerInitialInstanceCount: 1
+      LLMApi: SAGEMAKER
+      LLMSagemakerInstanceType: ml.g5.12xlarge
+    regions:
+      - eu-west-2
+  qnabot-t10:
+    parameters:
+      DefaultKendraIndexId: ''
+      ElasticSearchNodeCount: '4'
+      Email: 'test@example.com'
+      Encryption: 'ENCRYPTED'
+      KibanaDashboardRetentionMinutes: '43200'
+      LexBotVersion: 'LexV2 Only'
+      LexV2BotLocaleIds: 'en_US,es_US,fr_CA'
+      PublicOrPrivate: 'PRIVATE'
+      Username: 'Admin'
+      XraySetting: 'FALSE'
+      FulfillmentConcurrency: '0'
+      EmbeddingsApi: SAGEMAKER
+      SagemakerInitialInstanceCount: 1
+      LLMSagemakerInitialInstanceCount: 1
+      LLMApi: SAGEMAKER
+      LLMSagemakerInstanceType: ml.g5.12xlarge
+    regions:
+      - ap-northeast-2
+##ca-central-1 only supports Lexv2 not Lexv1

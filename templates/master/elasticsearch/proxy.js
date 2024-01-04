@@ -1,4 +1,4 @@
-/*********************************************************************************************************************
+/** *******************************************************************************************************************
  *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.                                                *
  *                                                                                                                    *
  *  Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance    *
@@ -9,7 +9,7 @@
  *  or in the 'license' file accompanying this file. This file is distributed on an 'AS IS' BASIS, WITHOUT WARRANTIES *
  *  OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions    *
  *  and limitations under the License.                                                                                *
- *********************************************************************************************************************/
+ ******************************************************************************************************************** */
 
 const _ = require('lodash');
 const util = require('../../util');
@@ -27,10 +27,10 @@ module.exports = {
                 Variables: {
                     DEFAULT_SETTINGS_PARAM: { Ref: 'DefaultQnABotSettings' },
                     CUSTOM_SETTINGS_PARAM: { Ref: 'CustomQnABotSettings' },
+                    ...util.getCommonEnvironmentVariables(),
                 },
             },
-            Layers: [{ Ref: 'AwsSdkLayerLambdaLayer' },
-                { Ref: 'CommonModulesLambdaLayer' },
+            Layers: [{ Ref: 'CommonModulesLambdaLayer' },
                 { Ref: 'CfnLambdaLayer' },
                 { Ref: 'EsProxyLambdaLayer' },
                 { Ref: 'QnABotCommonLambdaLayer' }],
@@ -58,6 +58,7 @@ module.exports = {
     },
     MetricsIndex: {
         Type: 'Custom::ESProxy',
+        DependsOn: ['OpensearchDomain'],
         Properties: {
             ServiceToken: { 'Fn::GetAtt': ['ESCFNProxyLambda', 'Arn'] },
             create: {
@@ -73,6 +74,7 @@ module.exports = {
     },
     FeedbackIndex: {
         Type: 'Custom::ESProxy',
+        DependsOn: ['OpensearchDomain'],
         Properties: {
             ServiceToken: { 'Fn::GetAtt': ['ESCFNProxyLambda', 'Arn'] },
             create: {
@@ -88,6 +90,7 @@ module.exports = {
     },
     Index: {
         Type: 'Custom::ESProxy',
+        DependsOn: ['OpensearchDomain'],
         Properties: {
             ServiceToken: { 'Fn::GetAtt': ['ESCFNProxyLambda', 'Arn'] },
             create: {

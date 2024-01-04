@@ -12,120 +12,131 @@
  *********************************************************************************************************************/
 <template lang="pug">
 span(class="wrapper")
-    v-btn.block(
-      :disabled="!(kendraFaqEnabled && !loading)" @click="start" slot="activator"
-      flat id="kendra-sync") Sync Kendra FAQ
     v-dialog(
-      persistent
       v-model="snackbar"
+      persistent
     )
+      template(#activator="{ props }")
+        v-btn(
+          id="kendra-sync"
+          :disabled="!(kendraFaqEnabled && !loading)"
+          block
+          v-bind="props"
+          variant="text"
+          @click="start"
+          ) Sync Kendra FAQ
       v-card(id="kendra-syncing")
-        v-card-title(primary-title) Syncing: {{request_status}}
+        v-card-title Syncing: {{ request_status }}
         v-card-text
-          v-subheader.error--text(v-if='error' id="error") {{error}}
-          v-subheader.success--text(v-if='success' id="success") Success!
-          v-progress-linear(v-if='!error && !success' indeterminate)
+          v-list-subheader.text-error(
+            v-if="error"
+            id="error") {{ error }}
+          v-list-subheader.text-success(
+            v-if="success"
+            id="success") Success!
+          v-progress-linear(
+            v-if="!error && !success"
+            indeterminate
+          )
         v-card-actions
           v-spacer
-          v-btn(@click='cancel' flat id="kendra-close") close
+          v-btn(id="kendra-close"
+            flat
+            @click="cancel"
+          ) Close
 </template>
 
 <script>
 
-const Vuex=require('vuex')
-const Promise=require('bluebird')
-const _=require('lodash')
-const sleep = require('util').promisify(setTimeout)
+require('vuex');
+const _ = require('lodash');
 
-module.exports={
-  data:function(){
-    return {
-      snackbar:false,
-      loading:false,
-      success:false,
-      error:'',
-      request_status:"Ready",
-      filename:'qna-kendra-faq.txt', // do not change because same key needed for UI status updates in lambda/export/kendraSync
-      kendraFaqEnabled:false,
-    }
-  },
-  computed:{
-  },
-  created:function(){
-  },
-  mounted:function(){
-    const self=this
-    setTimeout(async function() {
-      const settings=await self.$store.dispatch('api/listSettings');
-      self.kendraFaqEnabled = _.get(settings[2],"KENDRA_FAQ_INDEX")!=="";
-    }, 2000);
-  },
-  methods:{
-    cancel:function(){
-      const self=this
-      self.success=false
-      self.snackbar=false
-      self.loading=false
+module.exports = {
+    data() {
+        return {
+            snackbar: false,
+            loading: false,
+            success: false,
+            error: '',
+            request_status: 'Ready',
+            filename: 'qna-kendra-faq.txt', // do not change because same key needed for UI status updates in lambda/export/kendraSync
+            kendraFaqEnabled: false,
+        };
     },
-    refresh:async function(){
-      const self=this
-      const exports=await this.$store.dispatch('api/listExports')
-      this.exports=exports.jobs
-      const info = await this.$store.dispatch('api/getExportByJobId', 'qna-kendra-faq.txt');
-      
-      if (info.status !== 'Sync Complete') {
-        await poll();
-      }
-      
-      async function poll(){
-        // console.log('poll starting');
-        // get status file
-        const status = await self.$store.dispatch('api/getExportByJobId', 'qna-kendra-faq.txt');
-        console.log(status.status);
-        
-        // if export status is completed, switch to running kendra sync
-        if (status.status == 'Completed') status.status = 'Export finished. Running KendraSync'   // this just masks it in the UI
-        
-        self.request_status = status.status
-        
-        // if job is not complete and not error, poll again
-        if(status.status!=="Sync Complete" && status.status!=="Error"){
-          setTimeout(()=>poll(),1000)
-        }
-        
-        if (self.request_status==='Sync Complete'){
-          self.success = true
-        } else if (self.request_status==='Error'){
-          self.error='Error!'
-        }
-        self.loading=false
-      }
-    },    
-    start:async function(){
-      this.loading=true
-      this.snackbar=true
-      this.success=false
-      this.error=''
-      this.request_status="Ready"
-      try{
-        await this.$store.dispatch('api/startKendraSyncExport',{
-          name:this.filename,
-          filter:''
-        })
-        await this.refresh()
-      }catch(e){
-        // never enters this block
-      }finally{
-        // never enters this block
-      }
-    }
-  }
-}
+    computed: {
+    },
+    created() {
+    },
+    mounted() {
+        const self = this;
+        const settings = self.$store.dispatch('api/listSettings');
+        self.kendraFaqEnabled = _.get(settings[2], 'KENDRA_FAQ_INDEX') !== '';
+    },
+    methods: {
+        cancel() {
+            const self = this;
+            self.success = false;
+            self.snackbar = false;
+            self.loading = false;
+        },
+        async refresh() {
+            const self = this;
+            const exports = await this.$store.dispatch('api/listExports');
+            this.exports = exports.jobs;
+            const info = await this.$store.dispatch('api/getExportByJobId', 'qna-kendra-faq.txt');
+
+            if (info.status !== 'Sync Complete') {
+                await poll();
+            }
+
+            async function poll() {
+                // console.log('poll starting');
+                // get status file
+                const status = await self.$store.dispatch('api/getExportByJobId', 'qna-kendra-faq.txt');
+                console.log(status.status);
+
+                // if export status is completed, switch to running kendra sync
+                if (status.status == 'Completed') status.status = 'Export finished. Running KendraSync'; // this just masks it in the UI
+
+                self.request_status = status.status;
+
+                // if job is not complete and not error, poll again
+                if (status.status !== 'Sync Complete' && status.status !== 'Error') {
+                    setTimeout(() => poll(), 1000);
+                }
+
+                if (self.request_status === 'Sync Complete') {
+                    self.success = true;
+                } else if (self.request_status === 'Error') {
+                    self.error = 'Error!';
+                }
+                self.loading = false;
+            }
+        },
+        async start() {
+            this.loading = true;
+            this.snackbar = true;
+            this.success = false;
+            this.error = '';
+            this.request_status = 'Ready';
+            try {
+                await this.$store.dispatch('api/startKendraSyncExport', {
+                    name: this.filename,
+                    filter: '',
+                });
+                await this.refresh();
+            } catch (e) {
+                // never enters this block
+            } finally {
+                // never enters this block
+            }
+        },
+    },
+};
 </script>
 
 <style lang='scss' scoped>
   .refresh {
-    flex:0; 
+    flex:0;
   }
 </style>
-

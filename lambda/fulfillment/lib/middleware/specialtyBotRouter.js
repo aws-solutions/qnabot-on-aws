@@ -18,9 +18,16 @@
  * session attributes, and returns results to QnABot fulfillment handler.
  */
 const _ = require('lodash');
-const AWS = require('aws-sdk');
+const { Lambda } = require('@aws-sdk/client-lambda');
+const { LexRuntimeService: LexRuntime } = require('@aws-sdk/client-lex-runtime-service');
+const { LexRuntimeV2 } = require('@aws-sdk/client-lex-runtime-v2');
+const customSdkConfig = require('sdk-config/customSdkConfig');
+const region = process.env.AWS_REGION || 'us-east-1';
 const qnabot = require('qnabot/logging');
-const translate = require('./multilanguage.js');
+const {get_userLanguages , get_translation} = require('./multilanguage.js');
+const helper = require('../../../../../../../../../../opt/lib/supportedLanguages');
+
+const DEFAULT_SPECIALTY_BOT_RECEIVING_NAMESPACE = 'specialtyBotSessionAttributes';
 
 /**
  * Identifies the user to pass on for requests to Lex or other bots
@@ -42,26 +49,66 @@ function isString(val) {
     return (!!((typeof val === 'string' || val instanceof String)));
 }
 
+async function batchTagTranslation(res, responseLangCode, locale, req) {
+    const regex = /(<[^>]*>)|null/; // NOSONAR - javascript:S5852 - input is user controlled and we have a limit on the number of characters 
+    if (!res.message.match(regex))
+    {
+        res.message = await get_translation(res.message, responseLangCode, locale, req);
+        return res.message;
+    }
+    const inputArr = res.message.split(regex);
+    const promises = [];
+    inputArr.forEach(async element => {
+        if( !(element).match(regex) ) {
+            qnabot.log('matched with : ', element);
+            const translatedElement = get_translation(element, responseLangCode, locale, req);
+            promises.push(translatedElement);
+        }
+        else {
+            promises.push(element);
+        }
+    }); 
+
+    return (await Promise.all(promises)).join('');
+}
+
 async function translate_res(req, res) {
     const locale = _.get(req, 'session.userLocale');
+
+    const nativeLanguage = _.get(req._settings, 'NATIVE_LANGUAGE', 'English');
+    const languageMapper = helper.getSupportedLanguages();
+    const nativeLanguageCode = languageMapper[nativeLanguage];
+
+    // get the language of the response 
+    let responseLang = await get_userLanguages(res.message);
+    let responseLangCode = responseLang.Languages[0].LanguageCode;
+    qnabot.log('response language is ', responseLangCode);
+
+    // if the response language is the same as the Native Language, return the response without translating
+    if (responseLangCode == nativeLanguageCode) {
+        return res;
+    }
+
+    qnabot.log('We need to translate the response since the native language in the deployment is different from the language that the user is communicating with');
+
     if (_.get(req._settings, 'ENABLE_MULTI_LANGUAGE_SUPPORT')) {
         if (_.get(res, 'message')) {
-            res.message = await translate.get_translation(res.message, 'en', locale, req);
+            res.message = await batchTagTranslation(res, responseLangCode, locale, req);
         }
         if (_.get(res, 'plainMessage')) {
-            res.plainMessage = await translate.get_translation(res.plainMessage, 'en', locale, req);
+            res.plainMessage = await get_translation(res.plainMessage, responseLangCode, locale, req);
         }
         if (_.get(res, 'card')) {
-            res.card.title = await translate.get_translation(res.card.title, 'en', locale, req);
+            res.card.title = await get_translation(res.card.title, responseLangCode, locale, req);
         }
         if (_.get(res, 'card.buttons')) {
             res.card.buttons.forEach(async (button) => {
-                button.text = await translate.get_translation(button.text, 'en', locale, req);
+                button.text = await get_translation(button.text, responseLangCode, locale, req);
                 // NOSONAR TODO Address multilanguage issues with translating button values for use in confirmation prompts
                 // Disable translate of button value
                 // button.value = await translate.translateText(button.value,'en',locale);
             });
-            res.plainMessage = await translate.get_translation(res.plainMessage, 'en', locale, req);
+            res.plainMessage = await get_translation(res.plainMessage, responseLangCode, locale, req);
         }
     }
     return res;
@@ -92,7 +139,7 @@ async function translate_res(req, res) {
  * @returns Payload object returned by Bot Router
  */
 async function lambdaClientRequester(name, req) {
-    const lambda = new AWS.Lambda();
+    const lambda = new Lambda(customSdkConfig('C014', { region }));
     const payload = {
         req: {
             request: 'message',
@@ -105,14 +152,15 @@ async function lambdaClientRequester(name, req) {
         FunctionName: name,
         InvocationType: 'RequestResponse',
         Payload: JSON.stringify(payload),
-    }).promise();
-    const obj = JSON.parse(result.Payload);
+    });
+    const payloadObj = Buffer.from(result.Payload).toString();
+    const obj = JSON.parse(payloadObj);
     qnabot.log(`lambda payload obj is : ${JSON.stringify(obj, null, 2)}`);
     return obj;
 }
 
 function lexV1ClientRequester(params) {
-    const lexV1Client = new AWS.LexRuntime({ apiVersion: '2016-11-28' });
+    const lexV1Client = new LexRuntime(customSdkConfig('C014', { apiVersion: '2016-11-28', region }));
     return new Promise((resolve, reject) => {
         lexV1Client.postText(params, (err, data) => {
             if (err) {
@@ -127,8 +175,7 @@ function lexV1ClientRequester(params) {
 }
 
 function lexV2ClientRequester(params) {
-    qnabot.log(`aws sdk version is ${AWS.VERSION}`);
-    const lexV2Client = new AWS.LexRuntimeV2();
+    const lexV2Client = new LexRuntimeV2(customSdkConfig('C014', { region }));
     return new Promise((resolve, reject) => {
         qnabot.log(`V2 params are ${JSON.stringify(params, null, 2)}`);
         lexV2Client.recognizeText(params, (err, data) => {
@@ -262,6 +309,8 @@ function endUseOfSpecialtyBot(req, res, welcomeBackMessage) {
     delete res.session.qnabotcontext.specialtyBotName;
     delete res.session.qnabotcontext.specialtyBotAlias;
     delete res.session.qnabotcontext.specialtySessionAttributes;
+    delete res.session.qnabotcontext.sBAttributesToReceive;
+    delete res.session.qnabotcontext.sBAttributesToReceiveNamespace;
 
     if (welcomeBackMessage) {
         const plaintextResp = welcomeBackMessage;
@@ -279,6 +328,20 @@ function endUseOfSpecialtyBot(req, res, welcomeBackMessage) {
     return resp;
 }
 
+function receiveSpecialtyBotAttributes(res, specialtyBotSessionAttributes) {
+    const attributesToReceiveArray = _.get(res.session, 'qnabotcontext.sBAttributesToReceive', '').split(',').map((attribute) => attribute.trim());
+
+    const receivedSpecialtyBotSessionAttributes = {};
+
+    attributesToReceiveArray
+        .filter((attribute) => (attribute in specialtyBotSessionAttributes))
+        .forEach((attribute) => {
+            receivedSpecialtyBotSessionAttributes[attribute] = specialtyBotSessionAttributes[attribute];
+        });
+
+    return receivedSpecialtyBotSessionAttributes;
+}
+
 function processBotRespMessage(botResp, res, _preferredResponseType) {
     let lexBotIsFulfilled = false;
     if (_.get(botResp, 'dialogState', '') === 'ReadyForFulfillment') {
@@ -294,10 +357,17 @@ function processBotRespMessage(botResp, res, _preferredResponseType) {
         }
         _.set(res.session, 'appContext.altMessages', appContext.altMessages);
     }
+
+    const receivingNamespace = _.get(res.session, 'qnabotcontext.sBAttributesToReceiveNamespace', DEFAULT_SPECIALTY_BOT_RECEIVING_NAMESPACE);
+    const receivedSpecialtyBotSessionAttributes = receiveSpecialtyBotAttributes(res, botResp.sessionAttributes);
+
+    _.set(res.session, `${receivingNamespace}`, receivedSpecialtyBotSessionAttributes);
     _.set(res, 'session.qnabotcontext.specialtySessionAttributes', botResp.sessionAttributes);
+
     _.set(res, 'message', botResp.message);
     _.set(res, 'plainMessage', botResp.message);
     _.set(res, 'messageFormat', botResp.messageFormat);
+
     if (_.get(botResp, 'responseCard')) {
         const botRespAttachments = getRespCard(botResp);
         _.set(res, 'result.r', botRespAttachments);
@@ -374,3 +444,4 @@ async function processResponse(req, res, hook, alias) {
 }
 
 exports.routeRequest = processResponse;
+exports.batchTagTranslation = batchTagTranslation;

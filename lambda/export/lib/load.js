@@ -11,28 +11,31 @@
  *  and limitations under the License.                                                                                *
  *********************************************************************************************************************/
 
-const aws = require('aws-sdk');
-aws.config.region = process.env.AWS_REGION;
+const { LambdaClient, InvokeCommand } = require('@aws-sdk/client-lambda');
+const { S3Client, PutObjectCommand } = require('@aws-sdk/client-s3');
+const region = process.env.AWS_REGION;
+const customSdkConfig = require('sdk-config/customSdkConfig');
 
-const s3 = new aws.S3();
-const lambda = new aws.Lambda();
+const s3 = new S3Client(customSdkConfig('C011', { region }));
+const lambda = new LambdaClient(customSdkConfig('C011', { region }));
 const _ = require('lodash');
 
 module.exports=async function(config,body){
-    const res = await lambda.invoke({
+    const invokeCmd = new InvokeCommand({
         FunctionName:process.env.ES_PROXY,
         Payload:JSON.stringify(body)
-    }).promise()
-
-    const result = JSON.parse(res.Payload)
+    });
+    const res = await lambda.send(invokeCmd);
+    const payload = Buffer.from(res.Payload).toString();
+    const result = JSON.parse(payload)
     console.log(result)
 
     config.scroll_id=result._scroll_id 
     config.status='InProgress'
 
-    const documents=_.get(result,'hits.hits',[])
+    const documents = _.get(result, 'hits.hits', [])
     if(documents.length){
-        const body=documents.map(x=>{
+        const body = documents.map(x => {
             const out = x._source;
             // remap nested questions array for JSON file backward compatability
             if (out.type === 'qna' && _.has(out, 'questions')) {
@@ -49,13 +52,13 @@ module.exports=async function(config,body){
         }).join('\n')
 
         const key=`${config.tmp}/${config.parts.length+1}`
-
-        const s3Respose = await s3.putObject({
-            Body:body,
-            Bucket:config.bucket,
-            Key:key
-        }).promise()
-        
+        const params = {
+            Body: body,
+            Bucket: config.bucket,
+            Key: key,
+        };
+        const putObjCmd = new PutObjectCommand(params);
+        const s3Respose = await s3.send(putObjCmd);
         config.parts.push({
             version:s3Respose.VersionId,
             key:key

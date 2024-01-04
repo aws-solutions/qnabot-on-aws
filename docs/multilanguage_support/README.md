@@ -168,3 +168,28 @@ These language codes can also be used via the handlebar functionality.
 |Uzbek                 |uz           |
 |Vietnamese            |vi           |
 |Welsh                 |cy           |
+
+
+# Core Language Support
+When deploying the AWS QnABot solution (version 5.5.0 and higher) CloudFormation template, you will see a parameter `Language` in which you have the option of selecting one of the 33 languages. This Language parameter is used as the core Language for your QnABot deployment. The Language Analyzer for your Opensearch index setting will use the Language that you have specified in this parameter. In the case that your input has a low confidence rate it will default to English as that is the Backup Language that will be used. 
+
+Some other Information about the addition:
+- Custom Terminology will also support your Native Language
+- For the LLM, Falcon 40B is supported in the following languages (English, German, Spanish, French, with limited capabilities also in in Italian, Portuguese, Polish, Dutch, Romanian, Czech, Swedish.). If you are using one of the  languages listed below then be sure to change your Prompt into your Language. Otherwise if the Language is not supported then you will need to use your own lambda and LLM. 
+- For the embeddings, el5-large model only supports English, If you are using a non-English Native language then you should use your own embeddings model and provide the Lambda in your deployment.
+- If using the Thumbs up and down feature, you should translate Thumbs up and down into your native language and put that phrase in the PROTECTED_UTTERANCES setting. This is to prevent that to be treated as a question by the qnabot. to do this you can do the following steps:
+
+    1. Use the AWS translate API to translate Thumbs up and Thumbs down to your deployment Language if it is not English
+
+    2. Add the translation of Thumbs up and down in the website client config inside your qnabot code and deploy 
+
+    3. Add the translation of the Thumbs up and down as a question in your QnABot deployment
+
+    4. Go to the content designer and click on the top left and click on settings 
+
+    5. Find the PROTECTED_UTTERANCES variable and insert that phrase in by adding a `,` and then enter in the translation
+
+- PII redaction will still be for Engish as that is still accurate with other languages 
+
+- Changing the NATIVE_LANGUAGE should always be done from the Cloudformation Stack by changing the `Language` Parameter
+

@@ -11,12 +11,6 @@
  *  and limitations under the License.                                                                                *
  *********************************************************************************************************************/
 
-const Promise = require('./util/promise');
-const aws = require('./util/aws');
-
-const cognito = new aws.CognitoIdentityServiceProvider();
-const crypto = Promise.promisifyAll(require('crypto'));
-
 module.exports = class CognitoUrl extends require('./base') {
     constructor() {
         super();

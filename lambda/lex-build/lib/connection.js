@@ -11,10 +11,7 @@
  *  and limitations under the License.                                                                                *
  *********************************************************************************************************************/
 
-const AWS = require('./aws.js');
-const Promise = require('bluebird');
-
-const myCredentials = new AWS.EnvironmentCredentials('AWS');
+const { fromEnv } = require('@aws-sdk/credential-providers');
 const _ = require('lodash');
 
 module.exports = _.memoize((address) => require('elasticsearch').Client({
@@ -23,10 +20,16 @@ module.exports = _.memoize((address) => require('elasticsearch').Client({
         hosts: process.env.ADDRESS,
         connectionClass: require('http-aws-es'),
         defer() {
-	        return Promise.defer();
+            let resolve, reject;
+            const promise = new Promise((res, rej) => {
+                resolve = res;
+                reject = rej;
+            
+            });
+	        return { promise, resolve, reject };
         },
         amazonES: {
             region: process.env.AWS_REGION,
-            credentials: myCredentials
+            credentials: fromEnv()
         }
     }));

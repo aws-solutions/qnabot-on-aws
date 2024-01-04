@@ -11,8 +11,6 @@
  *  and limitations under the License.                                                                                *
  *********************************************************************************************************************/
 
-const aws = require('aws-sdk');
-aws.config.region = process.env.AWS_REGION;
 const load = require('./load');
 
 module.exports = function (config) {

@@ -97,8 +97,11 @@ coverage.xml
 *.py,cover
 .hypothesis/
 .pytest_cache/
+**/.venv-test/
 
 docs/excel_import/~$sample.xlsx
+.nightswatch/functional/files/~$import-pass.xlsx
+.nightswatch/functional/files/~$import-fail.xlsx
 
 # pipenv lock files
 Pipfile

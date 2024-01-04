@@ -9,6 +9,7 @@ $(DST): index.js package.json cfn.js examples/* js/* py/*
 
 py_build:
 		cd ./py ; \
+		rm -fr py_modules $(DST) ; \
 		[ -f requirements.txt ] && \
 			python3 -m pip install --upgrade -r requirements.txt -t ./py_modules || true ; \
 

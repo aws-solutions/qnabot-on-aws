@@ -1,0 +1,30 @@
+{
+	"intentName": "SetAttribute",
+	"localeId": "en_US",
+	"sampleUtterances": [
+		{
+			"utterance": "Give me an attribute"
+		}
+	],
+	"initialResponseSetting": {
+		"initialResponse": { 
+			"messageGroups": [ 
+			   { 
+				  "message": { 
+					 "plainTextMessage": { 
+						"value": "HERE IS A SESSION ATTRIBUTE"
+					 }
+				  }
+			   }
+			]
+		},
+		"nextStep": {
+			"dialogAction": { 
+				"type": "EndConversation"
+			},
+			"sessionAttributes": { 
+				"botAttribute" : "test" 
+			}
+		}
+	}
+}

@@ -14,9 +14,7 @@
 
 process.env.AWS_PROFILE = require('../config.json').profile;
 process.env.AWS_DEFAULT_REGION = require('../config.json').profile;
-const aws = require('aws-sdk');
 const chalk = require('chalk');
-aws.config.region = require('../config.json').region;
 const stringify = require('json-stringify-pretty-compact');
 const check = require('./check');
 const fs = require('fs').promises;

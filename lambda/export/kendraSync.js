@@ -11,12 +11,13 @@
  *  and limitations under the License.                                                                                *
  *********************************************************************************************************************/
 
-const aws = require('aws-sdk');
-aws.config.region = process.env.AWS_REGION;
+const { S3Client, GetObjectCommand, PutObjectCommand, waitUntilObjectExists } = require('@aws-sdk/client-s3');
+const customSdkConfig = require('sdk-config/customSdkConfig');
+const region = process.env.REGION;
 const qnabot = require('qnabot/logging');
 const qna_settings = require('qnabot/settings');
 
-const s3 = new aws.S3({ apiVersion: '2006-03-01', region: process.env.REGION });
+const s3 = new S3Client(customSdkConfig('C007', { apiVersion: '2006-03-01', region }));
 const _ = require('lodash');
 const parse = require('./parseJSON');
 const create = require('./createFAQ');
@@ -51,9 +52,13 @@ exports.performSync = async function (event, context, cb) {
         qnabot.log(Bucket, Key);
 
         // triggered by export file, waits to be uploaded
-        await s3.waitFor('objectExists', { Bucket, Key, VersionId }).promise();
-        const x = await s3.getObject({ Bucket, Key, VersionId }).promise();
-        const content = x.Body.toString();
+        await waitUntilObjectExists({
+            client: s3,
+            maxWaitTime: 30
+        }, { Bucket, Key, VersionId });
+        const getObjCmd = new GetObjectCommand({ Bucket, Key, VersionId });
+        const x = await s3.send(getObjCmd);
+        const content = await x.Body.transformToString();
 
         // parse JSON into Kendra format
         const parseJSONparams = {
@@ -111,11 +116,12 @@ async function update_status(bucket, new_stat) {
     };
 
     // NOSONAR TODO: check the return value of the object in case of an error...
-    let x = await s3.getObject(status_params).promise();
-    const config = JSON.parse(x.Body.toString());
+    let x = await s3.send(new GetObjectCommand(status_params));
+    const readableStream = Buffer.concat(await x.Body.toArray());
+    const config = JSON.parse(readableStream);
     config.status = new_stat;
     status_params.Body = JSON.stringify(config);
-    x = await s3.putObject(status_params).promise();
+    x = await s3.send(new PutObjectCommand(status_params));
     qnabot.log(`updated config file status to ${new_stat}`);
     return x;
 }

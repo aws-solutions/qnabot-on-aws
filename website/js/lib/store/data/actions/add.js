@@ -1,4 +1,4 @@
-/*********************************************************************************************************************
+/** *******************************************************************************************************************
  *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.                                                *
  *                                                                                                                    *
  *  Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance    *
@@ -9,76 +9,71 @@
  *  or in the 'license' file accompanying this file. This file is distributed on an 'AS IS' BASIS, WITHOUT WARRANTIES *
  *  OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions    *
  *  and limitations under the License.                                                                                *
- *********************************************************************************************************************/
+ ******************************************************************************************************************** */
 
-const Promise = require('bluebird');
-const validator = new (require('jsonschema').Validator)();
-const axios = require('axios');
 const util = require('./util');
 
 const { api } = util;
 
-const next = function (count, res, rej, context, result) {
-    api(context, 'botinfo')
-        .then((info) => {
-            if (info.build.token === result.token) {
-                context.rootState.bot.status = info.build.status;
-                context.rootState.bot.build.message = info.build.message;
-                if (info.build.status === 'READY') {
-                    res();
-                } else if (info.build.status === 'Failed') {
-                    rej(`build failed:${info.build.message}`);
-                } else {
-                    count > 0 ? setTimeout(() => next(--count, res, rej, context, result), 1000)
-                        : rej(' build timed out');
-                }
+async function next(count, res, rej, context, result) {
+    try {
+        const info = await api(context, 'botinfo');
+        if (info.build.token === result.token) {
+            context.rootState.bot.status = info.build.status;
+            context.rootState.bot.build.message = info.build.message;
+            if (info.build.status === 'READY') {
+                res();
+            } else if (info.build.status === 'Failed') {
+                rej(`build failed:${info.build.message}`);
             } else {
-                context.rootState.bot.status = 'Waiting';
-                count > 0 ? setTimeout(() => next(--count, res, rej, context, result), 1000)
+                count > 0 ? setTimeout(async () => await next(--count, res, rej, context, result), 1000)
                     : rej(' build timed out');
             }
-        })
-        .catch(rej);
-};
+        } else {
+            context.rootState.bot.status = 'Waiting';
+            count > 0 ? setTimeout(async () => await next(--count, res, rej, context, result), 1000)
+                : rej(' build timed out');
+        }
+    } catch (e) {
+        rej(e);
+    }
+}
 
 module.exports = {
-    build(context) {
+    async build(context) {
         context.rootState.bot.status = 'Submitting';
         context.rootState.bot.build.message = '';
         context.rootState.bot.build.token = '';
         context.rootState.bot.build.status = '';
-        return api(context, 'botinfo')
-            .then((result) => {
-                if (result.status === 'READY') {
-                    return api(context, 'build')
-                        .then((result) => {
-                            context.rootState.bot.build.token = result.token;
-                            return result;
-                        });
-                } 
-                if (result.status === 'BUILDING') {
-
-                } else {
-                    return Promise.reject(`cannot build, bot in state ${result.status}`);
-                }
-            })
-            .delay(200)
-            .then((result) => {
+        try {
+            let result = await api(context, 'botinfo');
+            if (result.status === 'READY') {
+                result = await api(context, 'build');
                 context.rootState.bot.build.token = result.token;
-                return new Promise((res, rej) => {
-                    next(60 * 5, res, rej, context, result);
-                });
-            })
-            .tapCatch(util.handle.bind(context)('Failed to Build'));
+            } else if (result.status === 'BUILDING') {
+                return;
+            } else {
+                return Promise.reject(`cannot build, bot in state ${result.status}`);
+            }
+            await new Promise((res) => setTimeout(res, 200));
+            context.rootState.bot.build.token = result.token;
+            await new Promise((res, rej) => {
+                next(60 * 5, res, rej, context, result);
+            });
+        } catch (e) {
+            util.handle.bind(context)('Failed to Build')(e);
+            throw e;
+        }
     },
-    update(context, qa) {
-        return api(context, 'update', clean(_.omit(qa, ['select', '_score'])));
+    async update(context, qa) {
+        return await api(context, 'update', clean(_.omit(qa, ['select', '_score'])));
     },
-    add(context, qa) {
-        return api(context, 'update', clean(qa))
-            .tap(() => context.commit('page/incrementTotal', null, { root: true }));
+    async add(context, qa) {
+        await api(context, 'update', clean(qa));
+        context.commit('page/incrementTotal', null, { root: true });
     },
 };
+
 function clean(obj) {
     if (typeof obj === 'object') {
         for (const key in obj) {

@@ -11,8 +11,9 @@
  *  and limitations under the License.                                                                                *
  *********************************************************************************************************************/
 
-const XLSX = require('read-excel-file');
+const XLSX = require('read-excel-file/node');
 const _ = require('lodash');
+const qnabot = require('qnabot/logging');
 
 exports.convertxlsx = async function (content) {
     // this headermap enabled customers to more conveniently
@@ -26,7 +27,7 @@ exports.convertxlsx = async function (content) {
         ssml: 'alt.ssml',
     };
 
-    console.log('inside convert json');
+    qnabot.log('inside convert json');
     try {
         const sheetNames = await XLSX.readSheetNames(content);
         const valid_questions = [];
@@ -36,7 +37,7 @@ exports.convertxlsx = async function (content) {
             const headerRow = rows.shift();
             let excelRowNumber = 1; // excel sheets start at index 1, which for us is the header
             rows.forEach((question) => {
-                console.log(`Processing ${JSON.stringify(question)}`);
+                qnabot.log(`Processing ${JSON.stringify(question)}`);
                 excelRowNumber++;
 
                 question = mapQuestions(headerRow, question);
@@ -56,14 +57,14 @@ exports.convertxlsx = async function (content) {
                 // Note that at this point we have stopped processing the excel file and any additional
                 // fields will be left as is. This means that new or more advanced fields can be imported
                 // by directly referencing their schema id (e.g. 'kendraRedirectQueryArgs')
-                console.log(`Processed ${JSON.stringify(question)}`);
+                qnabot.log(`Processed ${JSON.stringify(question)}`);
                 valid_questions.push(question);
             });
         }
         return valid_questions;
     } catch (err) {
-        console.log('Parse error');
-        console.log(err);
+        qnabot.log('Parse error');
+        qnabot.log(err);
         throw err;
     }
 };
@@ -87,7 +88,7 @@ function addDotProperties(question) {
 }
 
 function addQuestionCard(question) {
-    console.log('processing response title');
+    qnabot.log('processing response title');
     question.r = {};
     question.r.title = question.cardtitle;
     delete question.cardtitle;
@@ -111,7 +112,7 @@ function mapProperties(headerMapping, question) {
     for (const property in headerMapping) {
         const dest_property = headerMapping[property];
         if (question[dest_property] == undefined) {
-            console.log(`Assigning value for ${dest_property}`);
+            qnabot.log(`Assigning value for ${dest_property}`);
             _.set(question, dest_property, question[property]);
             delete question[property];
         }
@@ -151,22 +152,22 @@ function questionIsValid(question, excelRowNumber) {
     // validate mandatory fields of qid, question, and answer
     // qid must exist
     if (!question.qid) {
-        console.log(
+        qnabot.log(
             `Warning: No QID found for line ${excelRowNumber}. The question will be skipped.`,
         );
         return false;
     }
     // must have atleast 1 question
     if (question.q.length == 0) {
-        console.log(
-            `Warning: No questions found for QID: "${question.qid}". The question will be skipped.`,
+        qnabot.log(
+            `Warning: No questions found for QID: ${question.qid}. The question will be skipped.`,
         );
         return false;
     }
     // answer must exist and include valid characters
     if (!question.a || question.a.replace(/[^a-zA-Z0-9-_]/g, '').trim().length == 0) {
-        console.log(
-            `Warning: No answer found for QID:"${question.qid}". The question will be skipped.`,
+        qnabot.log(
+            `Warning: No answer found for QID: ${question.qid}. The question will be skipped.`,
         );
         return false;
     }
@@ -179,35 +180,35 @@ function processButtons(question) {
     const buttons = [];
     let i = 1;
     while (true) {
-        console.log(`Processing Button${i}`);
+        qnabot.log(`Processing Button${i}`);
         const buttonFieldTextName = `displaytext${i}`;
         const buttonFieldValueName = `buttonvalue${i}`;
         i++;
         const undefinedButtonFieldCount = (question[buttonFieldTextName] == undefined) + (question[buttonFieldValueName] == undefined);
-        console.log(`ButtonName ${question[buttonFieldTextName]} ButtonValue ${question[buttonFieldValueName]}`);
-        console.log(`Undefined field count ${undefinedButtonFieldCount}`);
+        qnabot.log(`ButtonName ${question[buttonFieldTextName]} ButtonValue ${question[buttonFieldValueName]}`);
+        qnabot.log(`Undefined field count ${undefinedButtonFieldCount}`);
 
         if (undefinedButtonFieldCount == 2) {
             break;
         }
         if (undefinedButtonFieldCount == 1) {
-            console.log(`Warning:  Both ${buttonFieldTextName} and ${buttonFieldValueName} must be defined for qid: "${question.qid}"`);
+            qnabot.log(`Warning:  Both ${buttonFieldTextName} and ${buttonFieldValueName} must be defined for qid: ${question.qid}`);
             continue;
         }
-        console.log('Found two values');
+        qnabot.log('Found two values');
         if (question[buttonFieldValueName].length > 80) {
-            console.log(`Warning: ${buttonFieldValueName} must be less than or equal to 80 characters for qid:"${question.qid}"`);
+            qnabot.log(`Warning: ${buttonFieldValueName} must be less than or equal to 80 characters for qid: ${question.qid}`);
             continue;
         }
         if (question[buttonFieldTextName].length > 80) {
-            console.log(`Warning: ${buttonFieldTextName} must be less than or equal to 80 characters for qid:"${question.qid}"`);
+            qnabot.log(`Warning: ${buttonFieldTextName} must be less than or equal to 80 characters for qid: ${question.qid}`);
             continue;
         }
         const button = {
             text: question[buttonFieldTextName],
             value: question[buttonFieldValueName],
         };
-        console.log(`Adding button ${JSON.stringify(button)}`);
+        qnabot.log(`Adding button ${JSON.stringify(button)}`);
         buttons.push(button);
         delete question[buttonFieldTextName];
         delete question[buttonFieldValueName];

@@ -17,7 +17,10 @@
  * Handle response from Lex Bot and update session attributes as needed.
  */
 const _ = require('lodash');
-const AWS = require('aws-sdk');
+const { LexRuntimeService: LexRuntime } = require('@aws-sdk/client-lex-runtime-service')
+const { LexRuntimeV2 } = require('@aws-sdk/client-lex-runtime-v2');
+const customSdkConfig = require('sdk-config/customSdkConfig');
+const region = process.env.AWS_REGION || 'us-east-1';
 
 const FREE_TEXT_ELICIT_RESPONSE_NAME = 'QNAFreeText';
 const QNANumber = 'QNANumber';
@@ -39,7 +42,10 @@ const QNAYesNo = 'QNAYesNo';
 const QNAYesNoExit = 'QNAYesNoExit';
 const qnabot = require('qnabot/logging');
 
-const translate = require('./multilanguage.js');
+const {get_userLanguages , get_translation} = require('./multilanguage.js');
+const helper = require('../../../../../../../../../../opt/lib/supportedLanguages');
+const {batchTagTranslation} = require('./specialtyBotRouter.js');
+
 
 function isConnectClient(req) {
     return !!_.get(req, '_event.requestAttributes.x-amz-lex:accept-content-types', undefined);
@@ -47,24 +53,41 @@ function isConnectClient(req) {
 
 async function translate_res(req, res) {
     const locale = _.get(req, 'session.qnabotcontext.userLocale');
+
+    const nativeLanguage = _.get(req._settings, 'NATIVE_LANGUAGE', 'English');
+    const languageMapper = helper.getSupportedLanguages();
+    const nativeLanguageCode = languageMapper[nativeLanguage];
+
+    // get the language of the response
+    let responseLang = await get_userLanguages(res.message);
+    let responseLangCode = responseLang.Languages[0].LanguageCode;
+    qnabot.log('response language is ', responseLangCode);
+
+    // if the response language is the same as the Native Language, return the response without translating
+    if (responseLangCode == nativeLanguageCode) {
+        return res;
+    }
+
+    qnabot.log('We need to translate the response since the native language in the deployment is different from the language that the user is communicating with');
+
     if (_.get(req._settings, 'ENABLE_MULTI_LANGUAGE_SUPPORT')) {
         if (_.get(res, 'message')) {
-            res.message = await translate.get_translation(res.message, 'en', locale, req);
+            res.message = await batchTagTranslation(res, responseLangCode, locale, req);
         }
         if (_.get(res, 'plainMessage')) {
-            res.plainMessage = await translate.get_translation(res.plainMessage, 'en', locale, req);
+            res.plainMessage = await get_translation(res.plainMessage, responseLangCode, locale, req);
         }
         if (_.get(res, 'card')) {
-            res.card.title = await translate.get_translation(res.card.title, 'en', locale, req);
+            res.card.title = await get_translation(res.card.title, responseLangCode, locale, req);
         }
         if (_.get(res, 'card.buttons')) {
             res.card.buttons.forEach(async (button) => {
-                button.text = await translate.get_translation(button.text, 'en', locale, req);
+                button.text = await get_translation(button.text, responseLangCode, locale, req);
                 // NOSONAR TODO Address multilanguage issues with translating button values for use in confirmation prompts
                 // Disable translate of button value
                 // button.value = await translate.translateText(button.value,'en',locale);
             });
-            res.plainMessage = await translate.get_translation(res.plainMessage, 'en', locale, req);
+            res.plainMessage = await get_translation(res.plainMessage, responseLangCode, locale, req);
         }
     }
     return res;
@@ -77,7 +100,7 @@ async function translate_res(req, res) {
  * @returns {*}
  */
 function lexV1ClientRequester(params) {
-    const lexV1Client = new AWS.LexRuntime({ apiVersion: '2016-11-28' });
+    const lexV1Client = new LexRuntime(customSdkConfig('C001', { apiVersion: '2016-11-28', region }));
     return new Promise((resolve, reject) => {
         lexV1Client.postText(params, (err, data) => {
             if (err) {
@@ -91,8 +114,7 @@ function lexV1ClientRequester(params) {
     });
 }
 function lexV2ClientRequester(params) {
-    qnabot.log(`aws sdk version is ${AWS.VERSION}`);
-    const lexV2Client = new AWS.LexRuntimeV2();
+    const lexV2Client = new LexRuntimeV2(customSdkConfig('C002', { region }));
     return new Promise((resolve, reject) => {
         lexV2Client.recognizeText(params, (err, data) => {
             if (err) {
@@ -260,7 +282,7 @@ async function processResponse(req, res, hook, msg) {
     // if messsage contains SSML tags, strip tags for plain text, but preserve tags for SSML
     if (plainMessage?.includes('<speak>')) {
         ssmlMessage = botResp.message;
-        plainMessage = plainMessage.replace(/<\/?[^>]+(>|$)/g, '');
+        plainMessage = plainMessage.replace(/<\/?[^>]+(>|$)/g, '');  // NOSONAR - javascript:S5852 - input is user controlled and we have a limit on the number of characters
     }
     let elicitResponseLoopCount = _.get(res, 'session.qnabotcontext.elicitResponse.loopCount', 0);
 

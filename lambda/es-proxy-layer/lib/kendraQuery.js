@@ -20,9 +20,9 @@
  */
 
 const _ = require('lodash');
-const AWS = require('aws-sdk');
 const qnabot = require('qnabot/logging');
 const open_es = require('./es_query');
+const { queryKendra } = require('./kendraClient');
 
 function allow_kendra_result(kendra_result, minimum_score) {
     if (!confidence_filter(minimum_score, kendra_result)) {
@@ -36,37 +36,13 @@ function allow_kendra_result(kendra_result, minimum_score) {
 function confidence_filter(minimum_score, kendra_result) {
     let confidences = ['LOW', 'MEDIUM', 'HIGH', 'VERY_HIGH'];
     const index = confidences.findIndex((i) => i == minimum_score.toUpperCase());
-    if (index == undefined) {
+    if (index === -1) {
         qnabot.log('Warning: ALT_SEARCH_KENDRA_FALLBACK_CONFIDENCE_SCORE should be one of \'VERY_HIGH\'|\'HIGH\'|\'MEDIUM\'|\'LOW\'');
         return true;
     }
     confidences = confidences.slice(index);
     const found = confidences.find((element) => element == _.get(kendra_result, 'ScoreAttributes.ScoreConfidence')) != undefined;
     return found;
-}
-
-/**
- * Function to query kendraClient and return results via Promise
- * @param kendraClient
- * @param params
- * @param resArray
- * @returns {*}
- */
-function kendraRequester(kendraClient, params, resArray) {
-    return new Promise((resolve, reject) => {
-        kendraClient.query(params, (err, data) => {
-            const indexId = params.IndexId;
-            if (err) {
-                qnabot.log(err, err.stack);
-                reject(`Error from Kendra query request:${err}`);
-            } else {
-                data.originalKendraIndexId = indexId;
-                qnabot.log(`Kendra response:${JSON.stringify(data, null, 2)}`);
-                resArray.push(data);
-                resolve(data);
-            }
-        });
-    });
 }
 
 async function asyncForEach(array, callback) {
@@ -144,17 +120,7 @@ async function getHitFromOpensearch(element, request_params) {
  * @returns {Promise<*>} - returns the response in event.res
  */
 async function routeKendraRequest(request_params) {
-    AWS.config.update({
-        maxRetries: request_params.maxRetries,
-        retryDelayOptions: {
-            base: request_params.retryDelay,
-        },
-    });
-
-    const kendraClient = (process.env.REGION
-        ? new AWS.Kendra({ apiVersion: '2019-02-03', region: process.env.REGION })
-        : new AWS.Kendra({ apiVersion: '2019-02-03' })
-    );
+    const { maxRetries, retryDelay } = request_params;
 
     const promises = [];
     const resArray = [];
@@ -167,11 +133,7 @@ async function routeKendraRequest(request_params) {
     }
     // Iterate through this area and perform queries against Kendra.
     kendraIndexes.forEach((index) => {
-        const params = {
-            IndexId: index, /* required */
-            QueryText: request_params.question,
-        };
-        const p = kendraRequester(kendraClient, params, resArray);
+        const p = queryKendra(resArray, index, request_params.question, [], maxRetries, retryDelay);
         promises.push(p);
     });
     await Promise.all(promises);

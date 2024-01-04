@@ -1,4 +1,4 @@
-/*********************************************************************************************************************
+/** *******************************************************************************************************************
  *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.                                                *
  *                                                                                                                    *
  *  Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance    *
@@ -9,8 +9,7 @@
  *  or in the 'license' file accompanying this file. This file is distributed on an 'AS IS' BASIS, WITHOUT WARRANTIES *
  *  OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions    *
  *  and limitations under the License.                                                                                *
- *********************************************************************************************************************/
-const { set } = require('vue');
+ ******************************************************************************************************************** */
 
 module.exports = {
     close(store) {
@@ -43,7 +42,7 @@ module.exports = {
         store.filter = null;
     },
     addQA(state, qa) {
-        set(qa, 'selected', false);
+        qa.selected = false;
         state.QAs.unshift(qa);
     },
     schema(state, schema) {
@@ -59,4 +58,7 @@ module.exports = {
     results(state, new_results) {
         state.results = new_results;
     },
+    loading(state, val) {
+        state.loading = val;
+    }
 };

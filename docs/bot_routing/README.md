@@ -1,5 +1,5 @@
 # Bot Routing - Preview Mode
-(version 1.1 - November 2021)
+(version 1.2 - December 2023)
 
 Bots exist to perform a variety of automation tasks. Usually they take
 as input a message from a human and respond performing
@@ -74,8 +74,17 @@ will be passed on each request to the specialty bot. They will override
 any session attributes which might have been returned from the specialty bot
 on the prior request. 
   
-The example image shows an integration we've developed which communicates
-with the Nutritionix Bot.
+* The initial utterance to send to the target bot. You can specify this as ${utterance} in which
+case QnABot will send the input utterance matching this qid to the target bot or specify
+a different string to send on startup. Leave this field blank to not send an utterance 
+to the specialty bot on startup. 
+
+* Lex session attributes to return from the specialty bot. A comma separated list
+of session attribute names can be specified that will be returned on each interaction
+with the specialty bot.
+
+* If Lex session attributes are being returned from the specialty bot, a namespace with
+which to scope the returned attributes must be specified. 
 
 *Note: when integrating with other Lex Bots or Lambdas, the permission to 
 communicate with the target Lex bot or with a new BotRouter (Lambda) need to
@@ -87,7 +96,7 @@ The input json payload to the target Lambda will be the following:
     req: {
         request: "message",
         inputText: <String>,
-        sessionAttributes: <Object>),
+        sessionAttributes: <Object>,
         userId: <String>
     }
 ```

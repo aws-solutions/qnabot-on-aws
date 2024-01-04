@@ -15,10 +15,9 @@ const _=require('lodash')
 const config=require('../../../config.json')
 const outputs=require('../../../bin/exports')
 const api=require('./util').api
-const aws=require('aws-sdk')
-const outputs=require('../../../bin/exports')
-aws.config.region=config.region
-const lambda=new aws.Lambda()
+const { LambdaClient, InvokeCommand } = require('@aws-sdk/client-lambda');
+const region = config.region
+const lambda = new LambdaClient({ region })
 
 module.exports={
     setUp:async function(done){
@@ -29,27 +28,32 @@ module.exports={
         done()
     },
     qid:async function(test){
-        const result=await lambda.invoke({
+        const result=await lambda.send(new InvokeCommand({
             FunctionName:this.services.elasticsearch.qid,
             Payload:JSON.stringify({qid:'test.1'}),
             InvocationType:"RequestResponse"
-        }).promise()
+        }))
         test.equal(result.StatusCode, 200)
         test.done()
     },
     proxy:async function(test){
         const output=await outputs('dev/master')
-        const result=await lambda.invoke({
-            FunctionName:this.services.elasticsearch.proxy,
-            Payload:JSON.stringify({
-                endpoint:output.ElasticsearchEndpoint,
-                path:'/',
-                method:"GET"
-            }),
-            InvocationType:"RequestResponse"
-        }).promise()
-        test.equal(result.StatusCode,200)
-        test.done()
+        try {
+            const result=await lambda.send(new InvokeCommand({
+                FunctionName:this.services.elasticsearch.proxy,
+                Payload:JSON.stringify({
+                    endpoint:output.ElasticsearchEndpoint,
+                    path:'/',
+                    method:"GET"
+                }),
+                InvocationType:"RequestResponse"
+            }))
+            test.equal(result.StatusCode,200)
+            test.done()
+        } catch (error) {
+            console.error("An error occurred in invoking test services: ", error);
+            throw error;
+        }
     }
 }
 

@@ -11,10 +11,11 @@
  *  and limitations under the License.                                                                                *
  *********************************************************************************************************************/
 
-const AWS = require('aws-sdk-mock');
 const logger = require('../qnabot/logging');
 const loggingFixture = require('./logging.fixtures')
-
+const awsMock = require('aws-sdk-client-mock');
+const { ComprehendClient, DetectPiiEntitiesCommand } = require('@aws-sdk/client-comprehend');
+const comprehendMock = awsMock.mockClient(ComprehendClient);
 describe('when calling basic log functions', () => {
     beforeEach(() => {
         delete process.env.ENABLE_DEBUG_LOGGING
@@ -79,8 +80,13 @@ describe('when calling redact_text function', () => {
 
 describe('when calling filter_comprehend_pii function', () => {
     beforeEach(() => {
+        comprehendMock.reset();
         process.env.ENABLE_REDACTING_WITH_COMPREHEND = "true"
         process.env.found_comprehend_pii = JSON.stringify(loggingFixture.mockComprehendDetectPII)
+    });
+
+    afterEach(() => {
+        comprehendMock.restore();
     });
 
     it("should return back with input text if comprehend redactiong is disabled", async () => {
@@ -104,15 +110,19 @@ describe('when calling filter_comprehend_pii function', () => {
 
 describe('when calling setPIIRedactionEnvironmentVars function', () => {
     beforeEach(() => {
+        comprehendMock.reset();
         delete process.env.DISABLECLOUDWATCHLOGGING
         delete process.env.comprehendResult
         delete process.env.found_comprehend_pii
         delete process.env.ENABLE_REDACTING_WITH_COMPREHEND
     });
+    afterEach(() => {
+        comprehendMock.restore();
+    });
 
     it("should disable cloud watch logging if an error is thrown by Comprehend", async () => {
-        AWS.mock('Comprehend', 'detectPiiEntities', function (params, callback){
-            callback(new Error("should disable cloudwatch"), null)
+        comprehendMock.on(DetectPiiEntitiesCommand).callsFake((params) => {
+            throw new Error("should disable cloudwatch");
         });
 
         await logger.setPIIRedactionEnvironmentVars(
@@ -122,13 +132,11 @@ describe('when calling setPIIRedactionEnvironmentVars function', () => {
             null
         );
         expect(process.env.DISABLECLOUDWATCHLOGGING).toEqual("true");
-
-        AWS.restore('Comprehend', 'detectPiiEntities')
 	});
 
     test("when PII found in Comprehend results", async () => {
-        AWS.mock('Comprehend', 'detectPiiEntities', function (params, callback){
-            callback(null, loggingFixture.mockComprehendDetectPIIResponse)
+        comprehendMock.on(DetectPiiEntitiesCommand).callsFake((params) =>{
+            return loggingFixture.mockComprehendDetectPIIResponse;
         });
 
         await logger.setPIIRedactionEnvironmentVars(
@@ -148,13 +156,13 @@ describe('when calling setPIIRedactionEnvironmentVars function', () => {
         let redactedResult = logger.filter_comprehend_pii(loggingFixture.comprehendDetectPIITestObject.Text)
         expect(redactedResult).toEqual(loggingFixture.comprehendDetectPIIRedactedTestObject.Text)
 
-        AWS.restore('Comprehend', 'detectPiiEntities')
 	});
 
     test("when PII is not found in Comprehend result", async () => {
-        AWS.mock('Comprehend', 'detectPiiEntities', function (params, callback){
-            callback(null, loggingFixture.mockComprehendDetectPIIEmptyResponse)
+        comprehendMock.on(DetectPiiEntitiesCommand).callsFake((params) =>{
+            return loggingFixture.mockComprehendDetectPIIEmptyResponse;
         });
+
 
         await logger.setPIIRedactionEnvironmentVars(
             loggingFixture.comprehendDetectPIITestObject.Text,
@@ -170,18 +178,20 @@ describe('when calling setPIIRedactionEnvironmentVars function', () => {
         //no need to test if filter_comprehend_pii correctly returns the text as is
         //as we already have a test case above for when found_comprehend_pii is empty string
 
-        AWS.restore('Comprehend', 'detectPiiEntities')
 	});
 });
 
 describe('when calling isPIIDetected function', () => {
     beforeEach(() => {
+        comprehendMock.reset();
         delete process.env.comprehendResult
     });
-
+    afterEach(() => {
+        comprehendMock.restore();
+    });
     it("should return false if an error is thrown by Comprehend", async () => {
-        AWS.mock('Comprehend', 'detectPiiEntities', function (params, callback){
-            callback(new Error("should disable cloudwatch"), null)
+        comprehendMock.on(DetectPiiEntitiesCommand).callsFake((params) => {
+            throw Error("should disable cloudwatch");
         });
 
         let result = await logger.isPIIDetected(
@@ -193,13 +203,12 @@ describe('when calling isPIIDetected function', () => {
         expect(result).toEqual(false);
         expect(process.env).not.toHaveProperty("comprehendResult")
 
-        AWS.restore('Comprehend', 'detectPiiEntities')
 	});
 
     test("when PII found in Comprehend results", async () => {
         let spyComprehend = jest.fn(() => loggingFixture.mockComprehendDetectPIIResponse);
-        AWS.mock('Comprehend', 'detectPiiEntities', function (params, callback){
-            callback(null, spyComprehend())
+        comprehendMock.on(DetectPiiEntitiesCommand).callsFake((params) => {
+            return spyComprehend();
         });
 
         let result = await logger.isPIIDetected(
@@ -224,13 +233,13 @@ describe('when calling isPIIDetected function', () => {
         expect(result).toEqual(true);
         expect(process.env.comprehendResult).toEqual(JSON.stringify(loggingFixture.mockComprehendDetectPIIResponse))
 
-        AWS.restore('Comprehend', 'detectPiiEntities')
 	});
 
     test("when PII is not found in Comprehend result", async () => {
-        AWS.mock('Comprehend', 'detectPiiEntities', function (params, callback){
-            callback(null, loggingFixture.mockComprehendDetectPIIEmptyResponse)
+        comprehendMock.on(DetectPiiEntitiesCommand).callsFake((params) => {
+            return loggingFixture.mockComprehendDetectPIIEmptyResponse;
         });
+
 
         let result = await logger.isPIIDetected(
             loggingFixture.comprehendDetectPIITestObject.Text,
@@ -242,6 +251,5 @@ describe('when calling isPIIDetected function', () => {
         expect(result).toEqual(false);
         expect(process.env.comprehendResult).toEqual(JSON.stringify(loggingFixture.mockComprehendDetectPIIEmptyResponse))
 
-        AWS.restore('Comprehend', 'detectPiiEntities')
 	});
 });

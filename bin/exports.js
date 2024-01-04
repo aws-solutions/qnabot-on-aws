@@ -15,18 +15,19 @@ const config = require('../config.json');
 
 process.env.AWS_PROFILE = config.profile;
 process.env.AWS_DEFAULT_REGION = config.profile;
-const aws = require('aws-sdk');
-aws.config.region = require('../config.json').region;
+const { CloudFormationClient, ListExportsCommand, DescribeStacksCommand } = require('@aws-sdk/client-cloudformation');
+const region = require('../config.json').region;
 const name = require('./name');
 const launch = require('./launch');
 const _ = require('lodash');
 
-const cf = new aws.CloudFormation();
+const cf = new CloudFormationClient({ region });
 
 module.exports = _.memoize(async (stack, options = {}) => {
     if (!stack) {
         const exports = {};
-        const listExportsData = await cf.listExports().promise();
+        const listExportsCmd = new ListExportsCommand();
+        const listExportsData = await cf.send(listExportsCmd);
         listExportsData.Exports.forEach((exp) => exports[exp.Name] = exp.Value);
         return exports;
     }
@@ -41,9 +42,10 @@ module.exports = _.memoize(async (stack, options = {}) => {
         next();
         async function next() {
             try {
-                const stackResult = await cf.describeStacks({
+                const describeCmd = new DescribeStacksCommand({
                     StackName: name(stack, {}),
-                }).promise();
+                });
+                const stackResult = await cf.send(describeCmd);
                 const stackStatus = stackResult.Stacks[0].StackStatus;
                 if (['CREATE_COMPLETE',
                     'UPDATE_COMPLETE',
@@ -65,7 +67,8 @@ module.exports = _.memoize(async (stack, options = {}) => {
             } catch (x) {
                 if (x.message.match(/does not exist/)) {
                     await launch.sure(stack, { wait: true });
-                    const stackResult = await cf.describeStacks({ StackName: name(stack, {}) }).promise();
+                    const describeCmd = new DescribeStacksCommand({ StackName: name(stack, {}) });
+                    const stackResult = await cf.send(describeCmd);
                     res(stackResult);
                 } else {
                     throw x;

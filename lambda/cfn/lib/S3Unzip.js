@@ -11,49 +11,47 @@
  *  and limitations under the License.                                                                                *
  *********************************************************************************************************************/
 
-const Promise = require('./util/promise');
-const aws = require('./util/aws');
+const { S3Client, PutObjectCommand, GetObjectCommand } = require('@aws-sdk/client-s3');
+const customSdkConfig = require('./util/customSdkConfig');
 
-const s3 = new aws.S3();
+const region = process.env.AWS_REGION || 'us-east-1';
+const s3 = new S3Client(customSdkConfig({ region }));
 const mime = require('mime-types');
-
 const JSZip = require('jszip');
-
-JSZip.external.Promise = Promise;
+JSZip.external.Promise = global.Promise;
 const jszip = new JSZip();
 
 module.exports = class S3Unzip extends require('./base') {
     constructor() {
         super();
     }
-
-    Create(params, reply) {
+    async Create(params, reply) {
         console.log('params', params);
-
-        getFiles(params)
-            .map((file) => {
+        try {
+            const files = await getFiles(params);
+            const results = await Promise.all(files.map(async (file) => {
                 const type = mime.lookup(file);
                 console.log(`${file}:${type}`);
-
-                return jszip.file(file).async('nodebuffer')
-                    .then((content) => {
-                        const param = {
-                            Bucket: params.DstBucket,
-                            Key: file,
-                            Body: content,
-                            ContentType: type || null,
-                        };
-                        console.log(param);
-                        return s3.putObject(param).promise();
-                    });
-            })
-            .map(console.log)
-            .then(() => reply(null, `${params.SrcBucket}/${params.Key}`))
-            .catch((err) => reply(err, `${params.SrcBucket}/${params.Key}`));
+                const content = await jszip.file(file).async('nodebuffer');
+                const param = {
+                    Bucket: params.DstBucket,
+                    Key: file,
+                    Body: content,
+                    ContentType: type || null
+                };
+                console.log(param);
+                await s3.send(new PutObjectCommand(param));
+                console.log(file);
+            }))
+            console.log(results);
+            reply(null, `${params.SrcBucket}/${params.Key}`);
+        } catch (err) {
+            reply(err, `${params.SrcBucket}/${params.Key}`);
+        }
     }
 
-    Update(ID, params, oldparams, reply) {
-        this.Create(params, reply);
+    async Update(ID, params, oldparams, reply) {
+        await this.Create(params, reply);
     }
 
     Delete(ID, params, reply) {
@@ -61,19 +59,20 @@ module.exports = class S3Unzip extends require('./base') {
     }
 };
 
-function getFiles(params) {
+async function getFiles(params) {
     const param = {
         Bucket: params.SrcBucket,
-        Key: params.Key,
+        Key: params.Key
     };
     console.log('get param', param);
-    return s3.getObject(param).promise()
-        .get('Body')
-        .then((buff) => jszip.loadAsync(buff)
-            .get('files')
-            .then((files) => Object.keys(files)
-                .map((key) => files[key])
-                .filter((file) => !file.dir)
-                .map((file) => file.name))
-            .tap(console.log));
+    try {
+        const s3Object = await s3.send(new GetObjectCommand(param));
+        const jszipContent = await jszip.loadAsync(await s3Object.Body.transformToByteArray());
+        const files = jszipContent.files;
+        const fileNames = Object.keys(files).map(key => files[key]).filter(file => !file.dir).map(file => file.name);
+        console.log(fileNames);
+        return fileNames;
+    } catch (e) {
+        console.error('An error occured in getFiles: ', e);
+    }
 }

@@ -1,0 +1,12 @@
+{
+	"qna": [
+		{
+			"a": "1600 Pennsylvania Ave., NW, Washington, DC 20500",
+			"type": "qna",
+			"qid": "Embed.001",
+			"q": [
+			  "What is the address of the White House?"
+			]
+		  }
+	]
+}

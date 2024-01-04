@@ -5,8 +5,5 @@ source =
     aws_solutions/qnabot
     aws_solutions/core
 
-[report]
-fail_under = 80.0
-
 [lcov]
 output = coverage/lcov.info

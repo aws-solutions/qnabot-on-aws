@@ -11,14 +11,17 @@
  *  and limitations under the License.                                                                                *
  *********************************************************************************************************************/
 
-const AWS = require('aws-sdk');
+const { TranslateClient, ListTerminologiesCommand, ImportTerminologyCommand } = require('@aws-sdk/client-translate');
+const customSdkConfig = require('sdk-config/customSdkConfig');
+const region = process.env.AWS_REGION;
 
 exports.handler = async function (event, context) {
     try {
         console.log(event);
         if (event.requestContext.path == `/${event.requestContext.stage}/translate/list`) {
-            const translate = new AWS.Translate();
-            const result = await translate.listTerminologies({}).promise();
+            const translate = new TranslateClient(customSdkConfig('C016', { region }));
+            const listTerminologiesCmd = new ListTerminologiesCommand({});
+            const result = await translate.send(listTerminologiesCmd);
             console.log(JSON.stringify(result));
             const mappedResult = result.TerminologyPropertiesList.map((data) => ({
                 Name: data.Name,
@@ -37,11 +40,11 @@ exports.handler = async function (event, context) {
         if (event.requestContext.path == `/${event.requestContext.stage}/translate/import`) {
             const body = JSON.parse(event.body);
 
-            const translate = new AWS.Translate();
+            const translate = new TranslateClient(customSdkConfig('C016', { region }));
 
             console.log(body.file);
-            const csvFile = Buffer.from(body.file, 'base64').toString('ascii');
-            const response = await translate.importTerminology({
+            const csvFile = Buffer.from(body.file, 'base64');
+            const params = {
                 Name: body.name,
                 MergeStrategy: 'OVERWRITE',
                 Description: body.description,
@@ -49,7 +52,9 @@ exports.handler = async function (event, context) {
                     File: csvFile,
                     Format: 'CSV',
                 },
-            }).promise();
+            };
+            const importTerminologyCmd = new ImportTerminologyCommand(params);
+            const response = await translate.send(importTerminologyCmd);
             return {
                 statusCode: 200,
                 body: JSON.stringify({

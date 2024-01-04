@@ -1,4 +1,4 @@
-/*********************************************************************************************************************
+/** *******************************************************************************************************************
  *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.                                                *
  *                                                                                                                    *
  *  Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance    *
@@ -9,7 +9,7 @@
  *  or in the 'license' file accompanying this file. This file is distributed on an 'AS IS' BASIS, WITHOUT WARRANTIES *
  *  OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions    *
  *  and limitations under the License.                                                                                *
- *********************************************************************************************************************/
+ ******************************************************************************************************************** */
 
 exports.httpsOnlyBucketPolicy = function (bucketName = 'Bucket') {
     return {
@@ -599,10 +599,6 @@ exports.cfnNag = function (rules, reason = '') {
             id: 'W35',
             reason: 'Access logging is not required for this Bucket.',
         },
-        W47: {
-            id: 'W47',
-            reason: 'This SNS Topic does not need KmsMasterKeyId property.',
-        },
         W57: {
             id: 'W57',
             reason: 'This IdentityPool has proper restrictions for unauthenticated users',
@@ -665,5 +661,13 @@ exports.cfnNag = function (rules, reason = '') {
                 return supression;
             }),
         },
+    };
+};
+
+
+exports.getCommonEnvironmentVariables = function () {
+    return {
+        "SOLUTION_ID": "SO0189",
+        "SOLUTION_VERSION": `v${process.env.npm_package_version}`
     };
 };
