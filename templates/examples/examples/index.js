@@ -1,4 +1,4 @@
-/*********************************************************************************************************************
+/** *******************************************************************************************************************
  *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.                                                *
  *                                                                                                                    *
  *  Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance    *
@@ -9,7 +9,7 @@
  *  or in the 'license' file accompanying this file. This file is distributed on an 'AS IS' BASIS, WITHOUT WARRANTIES *
  *  OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions    *
  *  and limitations under the License.                                                                                *
- *********************************************************************************************************************/
+ ******************************************************************************************************************** */
 
 const fs = require('fs');
 const _ = require('lodash');
@@ -18,9 +18,10 @@ const responsebots = require('./responsebots.js').resources;
 const responsebots_lexv2 = require('./responsebots-lexv2.js').resources;
 
 const js = fs.readdirSync(`${__dirname}/js`)
-    .filter((x) => x.match(/(.*).js/))
+    .filter((x) => !x.match(/(.*).(test|fixtures).js/)) // NOSONAR - javascript:S5852 - Cannot expose DOS attacks since this regex is only used during deployment
+    .filter((x) => x.match(/(.*).js/)) // NOSONAR - javascript:S5852 - Cannot expose DOS attacks since this regex is only used during deployment
     .map((file) => {
-        const name = file.match(/(.*).js/)[1];
+        const name = file.match(/(.*).js/)[1]; // NOSONAR - javascript:S5852 - Cannot expose DOS attacks since this regex is only used during deployment
         return {
             name: `ExampleJSLambda${name}`,
             resource: jslambda(name),
@@ -28,10 +29,12 @@ const js = fs.readdirSync(`${__dirname}/js`)
         };
     });
 
-const py = fs.readdirSync(`${__dirname}/py`)
-    .filter((x) => x.match(/(.*).py/))
+const py = fs.readdirSync(`${__dirname}/py`, { withFileTypes: true })
+    .filter((x) => x.isFile())
+    .map((x) => x.name)
+    .filter((x) => x.match(/(.*).py/)) // NOSONAR - javascript:S5852 - Cannot expose DOS attacks since this regex is only used during deployment
     .map((file) => {
-        const name = file.match(/(.*).py/)[1];
+        const name = file.match(/(.*).py/)[1]; // NOSONAR - javascript:S5852 - Cannot expose DOS attacks since this regex is only used during deployment
         return {
             name: `ExamplePYTHONLambda${name}`,
             resource: pylambda(name),
@@ -47,7 +50,9 @@ module.exports = Object.assign(
     {
         FeedbackSNS: {
             Type: 'AWS::SNS::Topic',
-            Metadata: util.cfnNag(['W47']),
+            Properties: {
+                KmsMasterKeyId : 'alias/aws/sns',
+            },
         },
         feedbacksnspolicy: {
             Type: 'AWS::SNS::TopicPolicy',
@@ -161,6 +166,11 @@ module.exports = Object.assign(
                         ]],
                     },
                     S3ObjectVersion: { Ref: 'ExampleCodeVersion' },
+                },
+                Environment: {
+                    Variables: {
+                        ...util.getCommonEnvironmentVariables()
+                    }
                 },
                 Handler: 'cfn.handler',
                 MemorySize: '128',
@@ -348,6 +358,7 @@ function jslambda(name) {
                     ES_ADDRESS: { Ref: 'ESAddress' },
                     QUIZ_KMS_KEY: { Ref: 'QuizKey' },
                     CFSTACK: { Ref: 'AWS::StackName' },
+                    ...util.getCommonEnvironmentVariables()
                 },
             },
             Handler: `js/${name}.handler`,
@@ -398,6 +409,7 @@ function pylambda(name) {
                     QUIZ_KMS_KEY: { Ref: 'QuizKey' },
                     SNS_TOPIC_ARN: { Ref: 'FeedbackSNS' },
                     CFSTACK: { Ref: 'AWS::StackName' },
+                    ...util.getCommonEnvironmentVariables()
                 },
             },
             Handler: `py/${name}.handler`,

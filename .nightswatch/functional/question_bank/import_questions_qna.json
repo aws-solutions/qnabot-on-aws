@@ -1,0 +1,86 @@
+{
+    "qna": [
+      {
+        "next": "NextQid",
+        "a": "Answer",
+        "enableQidIntent": true,
+        "kendraRedirectQueryText": "KendraRedirect",
+        "elicitResponse": {
+          "response_sessionattr_namespace": "Namespace",
+          "responsebot_hook": "QNAYesNo"
+        },
+        "alt": {
+          "markdown": "markdown",
+          "ssml": "SSML"
+        },
+        "conditionalChaining": "DocumentChaining",
+        "l": "LambdaHook",
+        "type": "qna",
+        "qid": "Import.004",
+        "sa": [
+          {
+            "enableTranslate": true,
+            "text": "AttributeName1",
+            "value": "AttributeValue1"
+          },
+          {
+            "text": "AttributeName2",
+            "value": "AttributeValue2"
+          }
+        ],
+        "kendraRedirectQueryConfidenceThreshold": "LOW",
+        "clientFilterValues": "ClientFilter",
+        "tags": "Tags",
+        "args": [
+          "HookArg1",
+          "HookArg2"
+        ],
+        "slots": [
+          {
+            "slotName": "SlotName1",
+            "slotPrompt": "SlotPrompt1",
+            "slotRequired": true,
+            "slotType": "SlotType1",
+            "slotValueCached": true,
+            "slotSampleUtterances": "SlotUtterances1"
+          },
+          {
+            "slotName": "SlotName2",
+            "slotPrompt": "SlotPrompt2",
+            "slotType": "SlotType2",
+            "slotSampleUtterances": "SlotUtterances2"
+          }
+        ],
+        "r": {
+          "buttons": [
+            {
+              "text": "ButtonText1",
+              "value": "ButtonValue1"
+            },
+            {
+              "text": "ButtonText2",
+              "value": "ButtonValue2"
+            }
+          ],
+          "subTitle": "CardSubtitle",
+          "imageUrl": "CardUrl",
+          "title": "CardTitle"
+        },
+        "t": "Topic",
+        "kendraRedirectQueryArgs": [
+          "KendraArg1",
+          "KendraArg2"
+        ],
+        "botRouting": {
+          "specialty_bot": "lexv2::7T1CYCPYVK",
+          "specialty_bot_name": "Testbot",
+          "specialty_bot_session_attributes_to_merge": "1,2,3"
+        },
+        "rp": "AlexaReprompt",
+        "q": [
+          "Question1",
+          "Question2"
+        ]
+      }
+    ]
+}

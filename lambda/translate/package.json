@@ -1,6 +1,6 @@
 {
     "name": "translate",
-    "version": "5.4.5",
+    "version": "5.5.0",
     "description": "Lambda function used to import custom terminologies into AWS Translate",
     "repository": {
         "type": "git",
@@ -21,7 +21,10 @@
     },
     "license": "Apache-2.0",
     "devDependencies": {
-        "aws-sdk-mock": "^5.8.0",
+        "aws-sdk-client-mock": "^3.0.0",
         "jest": "^29.7.0"
+    },
+    "dependencies": {
+        "@aws-sdk/client-translate": "^3.414.0"
     }
 }

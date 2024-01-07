@@ -10,58 +10,56 @@
  *  OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions    *
  *  and limitations under the License.                                                                                *
  *********************************************************************************************************************/
-const aws = require('aws-sdk');
 
-aws.config.region = process.env.AWS_REGION;
 const axios = require('axios');
+const { fromEnv } = require('@aws-sdk/credential-providers');
 const { sign } = require('aws4');
-const Url = require('url');
+const { URL } = require('url');
 const qnabot = require('qnabot/logging');
 
 function next(count, res, rej, request) {
-    if (count > 0) {
-        qnabot.log(`Tries left:${count}`);
-        const { credentials } = aws.config;
-        const signed = sign(request, credentials);
-        axios(signed)
-            .then(response => {
-                qnabot.log(response.status)
-                res(response.data)
-            })
-            .catch((error) => {
-            // if the server responded with an actual HTTP response then log and retry on 5xx codes
-                if (error.response) {
-                    qnabot.log(error.response.data);
-                    qnabot.log(error.response.status);
-                    if (error.response.status >= 500) {
-                        qnabot.log('Received 500 error code, retrying...');
-                        setTimeout(() => next(--count, res, rej, request), 1000);
-                    } else {
-                    // any non 5xx failure codes should be rejected as normal
-                        rej(error);
-                    }
-                }
-                // in some cases, the axios client does not return a fully formatted response object
-                // in those cases, the message property may contain useful debugging information
-                else if (error.message) {
-                    qnabot.log(error.message);
-                    rej(error);
-                } else {
-                    rej(error);
-                }
-            });
-    } else {
-        rej('Retry limits exceeded. See logs for additional information.');
+    if (count <= 0) {
+        return rej('Retry limits exceeded. See logs for additional information.');
     }
+    qnabot.log(`Tries left:${count}`);
+    const { credentials } = fromEnv();
+    const signed = sign(request, credentials);
+    axios(signed)
+        .then(response => {
+            qnabot.log(response.status)
+            res(response.data)
+        })
+        .catch((error) => {
+        // if the server responded with an actual HTTP response then log and retry on 5xx codes
+            if (error.response) {
+                qnabot.log(error.response.data);
+                qnabot.log(error.response.status);
+                if (error.response.status >= 500) {
+                    qnabot.log('Received 500 error code, retrying...');
+                    setTimeout(() => next(--count, res, rej, request), 1000);
+                } else {
+                // any non 5xx failure codes should be rejected as normal
+                    rej(error);
+                }
+            }
+            // in some cases, the axios client does not return a fully formatted response object
+            // in those cases, the message property may contain useful debugging information
+            else if (error.message) {
+                qnabot.log(error.message);
+                rej(error);
+            } else {
+                rej(error);
+            }
+        });
 }
 
 module.exports = function (opts) {
-    const url = Url.parse(opts.url);
+    const url = new URL(opts.url);
     const request = {
         host: url.hostname,
         method: opts.method.toUpperCase(),
         url: url.href,
-        path: url.path,
+        path: url.pathname + url.search,
         headers: opts.headers || {},
     };
     request.headers.Host = request.host;

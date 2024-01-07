@@ -22,15 +22,18 @@ import collections
 from collections import defaultdict
 import botocore.response as br
 import datetime
+from botocore.config import Config
+
+sdk_config = Config(user_agent_extra = f"AWSSOLUTION/{os.environ['SOLUTION_ID']}/{os.environ['SOLUTION_VERSION']} AWSSOLUTION-CAPABILITY/{os.environ['SOLUTION_ID']}-C018/{os.environ['SOLUTION_VERSION']}")
 
 
-def handler(event, context):
+def handler(event, context):  # NOSONAR Lambda Handler
 
     #uncomment below if you want to see the JSON that is being passed to the Lambda Function
     # jsondump = json.dumps(event)
     # print(jsondump)
-    
-    #the utterances to exit the bot broker 
+
+    #the utterances to exit the bot broker
     exit_responses={'quit','exit','return'}
     current_utterance = event["req"]["question"].lower()
     print (current_utterance)
@@ -76,8 +79,8 @@ def build_event_from_response(event, response):
 
 #handle the brokerage between Lex bots
 def middleman(event, initial_connection):
-    lex_client = boto3.client('lex-runtime')
-    
+    lex_client = boto3.client('lex-runtime', config=sdk_config)
+
     session_attrib = {}
     #for Lex
     if "sessionAttributes" in event["req"]["_event"]:
@@ -85,7 +88,7 @@ def middleman(event, initial_connection):
     #for Alexa
     else:
         session_attrib = event["req"]["_event"].get("session").get("attributes", {})
-    
+
     temp_bot_name = session_attrib.get("botName" , None)
     temp_bot_alias = session_attrib.get("botAlias", None)
     temp_bot_user_id = session_attrib.get("brokerUID", None)
@@ -97,7 +100,7 @@ def middleman(event, initial_connection):
         temp_bot_user_id = event["req"]["_event"].get("userId") or event["req"]["_event"]["session"]["sessionId"]
         if not(len(event["res"]["result"]["args"]) < 3 or event["res"]["result"]["args"][2].lower() == "remember"):
             temp_bot_user_id ='{0}{1}'.format(temp_bot_user_id,int(round(time.time() * 1000)))
-    print (temp_bot_user_id) 
+    print (temp_bot_user_id)
     if not initial_connection:
         #if we don't unset the queryLambda here and we call another QnABot, we will run into a processing error and an infinite loop of Lambda calls
         session_attrib.pop("queryLambda",None)

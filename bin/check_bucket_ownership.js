@@ -12,14 +12,17 @@
  *********************************************************************************************************************/
 
 const commander = require('commander');
-const aws = require('aws-sdk');
+const { region } = require('../config.json');
+const { S3Client, HeadBucketCommand } = require('@aws-sdk/client-s3');
+const { STSClient, GetCallerIdentityCommand } = require('@aws-sdk/client-sts');
 
 async function getAccountId() {
     let statusCode;
     let account_id = '';
     try {
-        const sts = new aws.STS();
-        const identity = await sts.getCallerIdentity().promise();
+        const sts = new STSClient({ region });
+        const command = new GetCallerIdentityCommand();
+        const identity = await sts.send(command);
         account_id = identity.Account;
         statusCode = 200;
     } catch (error) {
@@ -42,8 +45,9 @@ async function checkBucketOwner(bucket) {
             Bucket: bucket,
             ExpectedBucketOwner: accountResp.account_id,
         };
-        const s3 = new aws.S3();
-        await s3.headBucket(params).promise();
+        const s3 = new S3Client({ region });
+        const command = new HeadBucketCommand(params);
+        await s3.send(command);
         console.info(`Bucket ownership validation for bucket ${bucket} passed`);
     } catch (error) {
         resp = { statusCode: error.statusCode };

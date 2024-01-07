@@ -11,36 +11,37 @@
  *  and limitations under the License.                                                                                *
  *********************************************************************************************************************/
 
-const aws = require('aws-sdk');
-aws.config.region = process.env.AWS_REGION;
-// import from es-proxy-layer
-const qnabot = require('qnabot/logging');
-const qna_settings = require('qnabot/settings');
-
-const s3 = new aws.S3();
+const { S3Client, waitUntilObjectExists, PutObjectCommand, GetObjectCommand } = require('@aws-sdk/client-s3');
+const customSdkConfig = require('sdk-config/customSdkConfig');
+const region = process.env.AWS_REGION;
+const s3 = new S3Client(customSdkConfig('C010', { region }));
 const stride = parseInt(process.env.STRIDE);
 const _ = require('lodash');
-const convertxlsx = require('convert-xlsx');
-const delete_existing_content = require('delete_existing_content');
-const request = require('../../../../../../../../opt/lib/request.js');
-const get_embeddings = require('../../../../../../../../opt/lib/embeddings.js');
+const qnabot = require('qnabot/logging');
+const qna_settings = require('qnabot/settings');
+const convertxlsx = require('./convert-xlsx');
+const delete_existing_content = require('./delete_existing_content');
+// imports from es-proxy-layer
+const get_embeddings = require('/opt/lib/embeddings.js');
+const request = require('/opt/lib/request.js');
 
 async function get_settings() {
     const settings = await qna_settings.merge_default_and_custom_settings();
     qnabot.log('Merged Settings: ', settings);
     return settings;
-}
-
-async function es_bulk_load(body) {
-    const es_response = await request({
-        url: `https://${process.env.ES_ENDPOINT}/_bulk`,
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-ndjson' },
-        body,
-    });
-    qnabot.log('Response (first 500 chars): ', JSON.stringify(es_response, null, 2).slice(0, 500));
-    return es_response;
-}
+};
+// async function es_bulk_load(body) {
+    // Disable bulk load.. Instead save docs one at a time, for now, due to issues with k-nn index after bulk load
+    // NOSONAR TODO - revert back to bulk (more efficient) when we move to OpenSearch 2.3
+//     const es_response = await request({
+//         url: `https://${process.env.ES_ENDPOINT}/_bulk`,
+//         method: 'POST',
+//         headers: { 'Content-Type': 'application/x-ndjson' },
+//         body,
+//     });
+//     qnabot.log('Response (first 500 chars): ', JSON.stringify(es_response, null, 2).slice(0, 500));
+//     return es_response;
+// };
 
 async function es_store_doc(index, id, body) {
     const es_response = await request({
@@ -51,7 +52,7 @@ async function es_store_doc(index, id, body) {
     });
     qnabot.log('Response: ', JSON.stringify(es_response, null, 2).slice(0, 500));
     return es_response;
-}
+};
 
 exports.step = async function (event, context, cb) {
     try {
@@ -61,15 +62,16 @@ exports.step = async function (event, context, cb) {
         const Key = decodeURI(event.Records[0].s3.object.key);
         let progress;
         qnabot.log(Bucket, Key);
-        await s3.waitFor('objectExists', {
+        await waitUntilObjectExists({
+            client: s3,
+            maxWaitTime: 10
+        }, {
             Bucket,
             Key,
-        }).promise()
-        const x = await s3.getObject({
-                Bucket,
-                Key,
-            }).promise()
-        const config = JSON.parse(x.Body.toString())
+        });
+        const x = await s3.send(new GetObjectCommand({ Bucket, Key }));
+        const res = await x.Body.transformToString();
+        const config = JSON.parse(res);
         qnabot.log('Config:', JSON.stringify(config, null, 2));
         if (config.status === 'InProgress') {
             // NOSONAR TODO - design a more robust way to identify target ES index for auto import of metrics and feedback
@@ -80,20 +82,23 @@ exports.step = async function (event, context, cb) {
             const esindex = getOsIndex(Key);
             qnabot.log('Importing to index: ', esindex);
             try {
-                const result = await s3.getObject({
+                const params = {
                     Bucket: config.bucket,
                     Key: config.key,
                     VersionId: config.version,
                     Range: `bytes=${config.start}-${config.end}`,
-                }).promise()
+                };
+                const result = await s3.send(new GetObjectCommand(params));
+                const response = await result.Body.transformToString();
                 const settings = await get_settings();
                 qnabot.log('opening file');
                 let objects = [];
                 try {
-                    config.buffer += result.Body.toString();
+                    config.buffer += response;
                     if (config.buffer.startsWith('PK')) {
                         qnabot.log('starts with PK, must be an xlsx');
-                        const questionArray = await convertxlsx.convertxlsx(result.Body);
+                        const readableStreamFile = Buffer.concat(await result.Body.toArray());
+                        const questionArray = await convertxlsx.convertxlsx(readableStreamFile);
                         qnabot.log('number of items processed: ', questionArray.length);
                         questionArray.forEach((question) => {
                             const questionStr = JSON.stringify(question);
@@ -107,15 +112,14 @@ exports.step = async function (event, context, cb) {
                         config.buffer = '';
                     }
                 } catch (e) {
-                    qnabot.log("An error occured while processing question array: ", e)
+                    qnabot.log('An error occured while processing question array: ', e)
                     config.buffer = objects.pop();
-                }
+                };
                 const { out, success, failed } = await processQuestionObjects(objects, settings, esindex, config);
                 config.count = success;
                 config.failed = failed;
-                
-                qnabot.log(result.ContentRange);
-                const tmp = result.ContentRange.match(/bytes (.*)-(.*)\/(.*)/);
+                qnabot.log("ContentRange: ", result.ContentRange);
+                const tmp = result.ContentRange.match(/bytes (.*)-(.*)\/(.*)/);  // NOSONAR - javascript:S5852 - input is user controlled and we have a limit on the number of characters
                 progress = (parseInt(tmp[2]) + 1) / parseInt(tmp[3]);
                 const ES_formatted_content = `${out.join('\n')}\n`;
                 await delete_existing_content.delete_existing_content(esindex, config, ES_formatted_content) // check and delete existing content (if parameter to delete has been passed in the options {file}
@@ -128,7 +132,7 @@ exports.step = async function (event, context, cb) {
                                 config.EsErrors.push(x.errors)
                             })
                     })
-                    */ 
+                    */
                 config.start = (config.end + 1);
                 config.end = config.start + config.stride;
                 config.progress = progress;
@@ -138,27 +142,19 @@ exports.step = async function (event, context, cb) {
                     config.time.end = (new Date()).toISOString();
                 }
                 qnabot.log('EndConfig:', JSON.stringify(config, null, 2));
-                await s3.putObject({
-                            Bucket,
-                            Key,
-                            Body: JSON.stringify(config),
-                        }).promise()
+                await s3.send(new PutObjectCommand({ Bucket, Key, Body: JSON.stringify(config) }));
                 cb(null);
             }
             catch(error) {
-                qnabot.log("An error occured while config status was InProgress: ", error);
+                qnabot.log('An error occured while config status was InProgress: ', error);
                 config.status = 'Error';
                 config.message = JSON.stringify(error);
-                await s3.putObject({
-                    Bucket,
-                    Key,
-                    Body: JSON.stringify(config),
-                }).promise()
+                await s3.send(new PutObjectCommand({ Bucket, Key, Body: JSON.stringify(config) }));
                 cb(error);
             };
         }
     } catch (err) {
-        qnabot.log("An error occured while getting parsing for config", err)
+        qnabot.log('An error occured while getting parsing for config: ', err)
         cb(err)
     }
 };
@@ -191,20 +187,22 @@ exports.start = async function (event, context, cb) {
         qnabot.log('Config: ', JSON.stringify(config));
         const out_key = `status/${decodeURI(event.Records[0].s3.object.key.split('/').pop())}`;
         qnabot.log(bucket, out_key);
-        await s3.putObject({
+        const putParams = {
             Bucket: bucket,
             Key: out_key,
             Body: JSON.stringify(config),
-        }).promise()
+        };
+        await s3.send(new PutObjectCommand(putParams));
         cb(null)
     } catch (x) {
-        qnabot.log("An error occured in start function: ", x)
+        qnabot.log('An error occured in start function: ', x)
         cb(JSON.stringify({
             type: '[InternalServiceError]',
             data: x,
         }))
     }
 };
+
 async function processQuestionObjects(objects, settings, esindex, config) {
     const out = [];
     let success = config.count || 0;
@@ -221,7 +219,7 @@ async function processQuestionObjects(objects, settings, esindex, config) {
                 docid = obj._id || obj.qid;
             } else {
                 docid = obj._id || `${obj.qid}_upgrade_restore_${timestamp}`;
-                const sessionAttrs = stringifySessionAttributes(obj);
+                stringifySessionAttributes(obj);
             }
             delete obj._id;
             out.push(JSON.stringify({
@@ -242,12 +240,12 @@ async function processQuestionObjects(objects, settings, esindex, config) {
         }
     }
     return { out, success, failed };
-}
+};
 
 async function handleQuestionByType(obj, settings) {
     if (obj.type != 'slottype' && obj.type != 'text') {
         obj.q = obj.q.map((x) => {
-            x = x.replace(/\\*"/g, '');
+            x = x.replace(/\\*"/g, '');  // NOSONAR - javascript:S5852 - input is user controlled and we have a limit on the number of characters
             return x;
         });
     }
@@ -266,7 +264,7 @@ async function handleQuestionByType(obj, settings) {
         }
     }
     return obj;
-}
+};
 
 async function handleEmbeddings(obj, settings) {
     // question embeddings
@@ -290,7 +288,7 @@ async function handleEmbeddings(obj, settings) {
     }
     obj.quniqueterms = obj.q.join(' ');
     return obj;
-}
+};
 
 function stringifySessionAttributes(obj) {
     const sessionAttrs = _.get(obj, 'entireResponse.session', {});
@@ -299,15 +297,14 @@ function stringifySessionAttributes(obj) {
             sessionAttrs[key] = JSON.stringify(sessionAttrs[key]);
         }
     }
-    return sessionAttrs;
-}
+};
 
 function getOsIndex(Key) {
     let esindex = process.env.ES_INDEX;
-    if (Key.match(/.*ExportAll_QnABot_.*_metrics\.json/)) {
+    if (Key.match(/.*ExportAll_QnABot_.*_metrics\.json/)) {  // NOSONAR - javascript:S5852 - input is user controlled and we have a limit on the number of characters
         esindex = process.env.ES_METRICSINDEX;
-    } else if (Key.match(/.*ExportAll_QnABot_.*_feedback\.json/)) {
+    } else if (Key.match(/.*ExportAll_QnABot_.*_feedback\.json/)) {  // NOSONAR - javascript:S5852 - input is user controlled and we have a limit on the number of characters
         esindex = process.env.ES_FEEDBACKINDEX;
     }
     return esindex;
-}
+};

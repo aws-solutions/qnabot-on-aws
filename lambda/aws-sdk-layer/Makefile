@@ -8,5 +8,6 @@ $(DST): $(RESOURCES)
 	npm install -production
 	rm -r ./nodejs || true
 	mkdir ./nodejs 
-	mv node_modules ./nodejs/node_modules 
+	mv node_modules ./nodejs/node_modules
+	cp -r sdk-config ./nodejs/node_modules/
 	zip -r $(DST) .

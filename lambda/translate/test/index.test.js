@@ -12,8 +12,10 @@
  *********************************************************************************************************************/
 
 const lambda = require('../index');
-const AWS = require('aws-sdk-mock');
-const translateFixture = require('./translate.fixtures')
+const translateFixture = require('./translate.fixtures');
+const awsMock = require('aws-sdk-client-mock');
+const { TranslateClient, ListTerminologiesCommand, ImportTerminologyCommand } = require('@aws-sdk/client-translate');
+const translateMock = awsMock.mockClient(TranslateClient);
 
 describe('when invoking lambda with an invalid event', () => {
     it("should return a 200 code but provide an error message in the response body", async () => {
@@ -38,9 +40,11 @@ describe('when invoking lambda with an invalid path', () => {
 
 describe('when invoking lambda to list terminologies', () => {
     beforeAll(() => {
-        AWS.mock('Translate', 'listTerminologies', function (params, callback){
-            callback(null, translateFixture.listData.listTerminologiesResponseMock);
+        translateMock.reset();
+        translateMock.on(ListTerminologiesCommand).callsFake((params) => {
+            return translateFixture.listData.listTerminologiesResponseMock;
         });
+
     });
 
     it("should return a 200 code with the listed terminologies in the response body", async () => {
@@ -54,14 +58,15 @@ describe('when invoking lambda to list terminologies', () => {
 	});
 
     afterAll(() => {
-        AWS.restore('Translate', 'listTerminologies')
+        translateMock.restore();
     });
 });
 
 describe('when invoking lambda to import terminologies', () => {
     beforeAll(() => {
-        AWS.mock('Translate', 'importTerminology', function (params, callback){
-            callback(null, translateFixture.importData.importTerminologiesResponseMock);
+        translateMock.reset();
+        translateMock.on(ImportTerminologyCommand).callsFake((params) => {
+            return translateFixture.importData.importTerminologiesResponseMock;
         });
     });
 
@@ -79,6 +84,6 @@ describe('when invoking lambda to import terminologies', () => {
 	});
 
     afterAll(() => {
-        AWS.restore('Translate', 'importTerminology')
+        translateMock.restore();
     });
 });

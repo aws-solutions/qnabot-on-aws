@@ -38,8 +38,8 @@ module.exports = async function (versionobj, data) {
     });
     const new_version = result.version;
 
-    await new Promise((res, rej) => {
-        next(100);
+    await new Promise(async (res, rej) => {
+        await next(100);
         async function next(count) {
             const tmp = await run('getBot', {
                 name: data.name,
@@ -49,9 +49,9 @@ module.exports = async function (versionobj, data) {
                 throw new Error('Build timeout');
             } else if (tmp.status === 'READY') {
                 res();
-            } else if (tmp.status === 'BUILDING') {
+            } else if (tmp.status === 'BUILDING' || tmp.status === 'READY_BASIC_TESTING') {
                 await delay(5000);
-                next(--count);
+                await next(--count);
             } else {
                 throw tmp;
             }
@@ -59,6 +59,6 @@ module.exports = async function (versionobj, data) {
     });
     return new_version;
 };
-function delay(ms) {
+async function delay(ms) {
     return new Promise(res => setTimeout(res, ms))
 }

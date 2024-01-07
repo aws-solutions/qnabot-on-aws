@@ -21,6 +21,9 @@ import json
 import time
 import sys
 import re
+from botocore.config import Config
+
+sdk_config = Config(user_agent_extra = f"AWSSOLUTION/{os.environ['SOLUTION_ID']}/{os.environ['SOLUTION_VERSION']} AWSSOLUTION-CAPABILITY/{os.environ['SOLUTION_ID']}-C002/{os.environ['SOLUTION_VERSION']}")
 
 #for boto3 path from py_modules
 root = os.environ["LAMBDA_TASK_ROOT"] + "/py_modules"
@@ -29,10 +32,10 @@ import boto3
 from crhelper import CfnResource
 
 helper = CfnResource()
-clientLEXV2 = boto3.client('lexv2-models')
-clientIAM = boto3.client('iam')
-clientTRANSLATE = boto3.client('translate')
-s3 = boto3.resource('s3')
+clientLEXV2 = boto3.client('lexv2-models', config=sdk_config)
+clientIAM = boto3.client('iam', config=sdk_config)
+clientTRANSLATE = boto3.client('translate', config=sdk_config)
+s3 = boto3.resource('s3', config=sdk_config)
 
 # LEX QNABOT INFO
 FULFILLMENT_LAMBDA_ARN = os.environ["FULFILLMENT_LAMBDA_ARN"]
@@ -233,7 +236,7 @@ def get_slot_type_id_v2(slot_type_name, bot_id, bot_version, locale_id):
     if len(response["slotTypeSummaries"]) == 1:
         slot_type_id = response["slotTypeSummaries"][0]["slotTypeId"]
     elif len(response["slotTypeSummaries"]) > 1:
-        raise Exception(f"Multiple matching slotTypes for slotTypeName: {slot_type_name}")
+        raise Exception(f"Multiple matching slotTypes for slotTypeName: {slot_type_name}")  # NOSONAR The exception message is specific enough for user to debug
     return slot_type_id
 
 def get_slot_id(slot_name, intent_id, bot_id, bot_version, locale_id):
@@ -257,7 +260,7 @@ def get_slot_id(slot_name, intent_id, bot_id, bot_version, locale_id):
     if len(response["slotSummaries"]) == 1:
         slot_id = response["slotSummaries"][0]["slotId"]
     elif len(response["slotSummaries"]) > 1:
-        raise Exception(f"Multiple matching slots for slotName: {slot_name}")
+        raise Exception(f"Multiple matching slots for slotName: {slot_name}")  # NOSONAR The exception message is specific enough for user to debug
     return slot_id
 
 def get_slot_ids(intent_id, bot_id, bot_version, locale_id):
@@ -303,7 +306,7 @@ def get_bot_id(bot_name):
     if len(response["botSummaries"]) == 1:
         bot_id = response["botSummaries"][0]["botId"]
     elif len(response["botSummaries"]) > 1:
-        raise Exception(f"Multiple matching bots for botName: {bot_name}")
+        raise Exception(f"Multiple matching bots for botName: {bot_name}")  # NOSONAR The exception message is specific enough for user to debug
     return bot_id
 
 
@@ -327,17 +330,17 @@ def get_intent_id(intent_name, bot_id, bot_version, locale_id):
     if len(response["intentSummaries"]) == 1:
         intent_id = response["intentSummaries"][0]["intentId"]
     elif len(response["intentSummaries"]) > 1:
-        raise Exception(f"Multiple matching intents for intentName: {intent_name}")
+        raise Exception(f"Multiple matching intents for intentName: {intent_name}")  # NOSONAR The exception message is specific enough for user to debug
     return intent_id
 
 def add_spantag_to_slots(utterance):
-    slots = re.findall(r'({.*?})',utterance)
+    slots = re.findall(r'({.*?})',utterance)  # NOSONAR require the specific pattern of regex
     for slot in slots:
         utterance = utterance.replace(slot, f'<span translate="no">{slot}</span>')
     return utterance
 
 def remove_spantag_from_slots(utterance):
-    slots = re.findall(r'<span translate="no">({.*?})</span>',utterance)
+    slots = re.findall(r'<span translate="no">({.*?})</span>',utterance)  # NOSONAR require the specific pattern of regex
     for slot in slots:
         utterance = utterance.replace(f'<span translate="no">{slot}</span>', f" {slot} ")
     return utterance
@@ -733,7 +736,7 @@ def wait_for_lex_v2_qna_locale(bot_id, bot_version, locale_id):
         time.sleep(5)
         bot_locale_status = get_bot_locale_status(bot_id, bot_version, locale_id)
         if bot_locale_status not in ["NotBuilt","Built","Creating","Building","ReadyExpressTesting"]:
-            raise Exception(f"Invalid botLocaleStatus for locale '{locale_id}'): '{bot_locale_status}'. Check for build errors in LexV2 console for bot '{BOT_NAME}'")
+            raise Exception(f"Invalid botLocaleStatus for locale '{locale_id}'): '{bot_locale_status}'. Check for build errors in LexV2 console for bot '{BOT_NAME}'")   # NOSONAR The exception message is specific enough for user to debug
     print(f"Bot localeId {locale_id}: {bot_locale_status}")
     return bot_locale_status
 
@@ -745,7 +748,7 @@ def locale_id_exists(bot_id, bot_version, locale_id):
             localeId=locale_id
         )
         return True
-    except:
+    except:  # NOSONAR exceptions already handled and logged
         return False
 
 def lex_v2_qna_locale(bot_id, bot_version, locale_id, voice_id, engine):
@@ -775,7 +778,7 @@ def get_or_create_lex_v2_service_linked_role(bot_name):
             RoleName=role_name
         )
         role_arn = response["Role"]["Arn"]
-    except:
+    except:  # NOSONAR exceptions already handled and logged
         response = clientIAM.create_service_linked_role(
             AWSServiceName='lexv2.amazonaws.com',
             Description=f'Service role for QnABot - {bot_name}',
@@ -796,7 +799,7 @@ def wait_for_lex_v2_qna_bot(bot_id):
         time.sleep(5)
         bot_status = get_bot_status(bot_id)
         if bot_status not in ["Available","Creating","Versioning"]:
-            raise Exception(f"Invalid botStatus: {bot_status}")
+            raise Exception(f"Invalid botStatus: {bot_status}")   # NOSONAR The exception message is specific enough for user to debug
     return bot_status
 
 def lex_v2_qna_bot(bot_name):
@@ -829,12 +832,18 @@ def get_bot_version_status(bot_id, bot_version):
     return bot_status
 
 def wait_for_lex_v2_qna_version(bot_id, bot_version):
-    bot_status = get_bot_version_status(bot_id, bot_version)
+    bot_status = 'Unknown'
+    # Wait for bot version to be available
+    time.sleep(5)
     while bot_status != 'Available':
         time.sleep(5)
-        bot_status = get_bot_version_status(bot_id, bot_version)
+        try:
+            bot_status = get_bot_version_status(bot_id, bot_version)
+        except Exception as e:
+            print(f'Error getting bot status: {e}')
+            bot_status = 'Not Created'
         if bot_status not in ["Available","Creating","Versioning"]:
-            raise Exception(f"Invalid botStatus: {bot_status}")
+            raise Exception(f"Invalid botStatus: {bot_status}")   # NOSONAR The exception message is specific enough for user to debug
     return bot_status
 
 def lex_v2_qna_version(bot_id, bot_draft_version, bot_locale_ids):
@@ -852,7 +861,6 @@ def lex_v2_qna_version(bot_id, bot_draft_version, bot_locale_ids):
     bot_version = response["botVersion"]
     bot_status = response["botStatus"]
     print(f"Created bot version {bot_version} - {bot_status}")
-    time.sleep(5)
     wait_for_lex_v2_qna_version(bot_id, bot_version)
     return bot_version
 
@@ -882,7 +890,7 @@ def wait_for_lex_v2_qna_alias(bot_id, bot_alias_id):
         time.sleep(5)
         bot_alias_status = get_bot_alias_status(bot_id, bot_alias_id)
         if bot_alias_status not in ["Available","Creating","Versioning"]:
-            raise Exception(f"Invalid botStatus: {bot_alias_status}")
+            raise Exception(f"Invalid botStatus: {bot_alias_status}")   # NOSONAR The exception message is specific enough for user to debug
     return bot_alias_status
 
 def lex_v2_qna_alias(bot_id, bot_version, bot_alias_name, bot_locale_ids, bot_fulfillment_lambda_arn):

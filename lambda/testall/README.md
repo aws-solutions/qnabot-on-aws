@@ -1,4 +1,4 @@
-# Import Lambda
+# Testall Lambda
 This lambda reads current QnAs from OpenSearch using the same processing as the 
 export function and then performs a test validation against each question defined in the qna
 against the current lex bot.
@@ -15,4 +15,8 @@ If processing results in an error, the last column will also contain the error o
 the system. 
 
 
-
+## Tests
+test are run using:
+```shell
+npm test
+```

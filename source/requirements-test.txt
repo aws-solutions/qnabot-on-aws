@@ -1,8 +1,8 @@
-docker==6.1.2
-moto==4.1.0
-openapi-spec-validator==0.5.1
-pytest==7.3.1
-pytest-cov==4.1.0
-pytest-env==1.0.0
-pytest-mock==3.11.1
-pyyaml==6.0
+docker~=6.1.2
+moto~=4.1.0
+openapi-spec-validator~=0.5.1
+pytest~=7.3.1
+pytest-cov~=4.1.0
+pytest-env~=1.0.0
+pytest-mock~=3.11.1
+pyyaml~=6.0

@@ -13,14 +13,12 @@
 const config = require('../../config.json');
 process.env.AWS_PROFILE = config.profile;
 process.env.AWS_DEFAULT_REGION = config.profile;
-const Promise = require('bluebird');
-const merge = require('webpack-merge').smart;
+const { merge } = require('webpack-merge');
 const path = require('path');
 const webpack = require('webpack');
-const _ = require('lodash');
+const base = require('./base.config');
+const dev = require('./dev.config');
+const prod = require('./prod.config');
 
-module.exports = Promise.join(
-    require('./base.config'),
-    process.env.NODE_ENV==='dev' ? require('./dev.config') : {},
-    process.env.NODE_ENV==='prod' ? require('./prod.config') : {}
-).then(merge)
+module.exports = process.env.NODE_ENV==='dev' ? merge(base, dev) : merge(base, prod);
+

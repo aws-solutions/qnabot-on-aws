@@ -11,95 +11,93 @@
  *  and limitations under the License.                                                                                *
  *********************************************************************************************************************/
 <template lang="pug">
-  v-container(fluid v-chosen)
-    v-layout(column)
-      v-flex
-        v-container
-          v-layout(row)
-            v-flex(xs12)
-              v-text-field(
-                name="filter" 
-                label="Filter items by ID prefix" 
-                v-model="$store.state.data.filter"
-                @input="filter"
-                id="filter"
-                clearable 
-              )
-            v-flex
-              v-btn(@click='emit' class="ma-2 refresh" 
-                :disabled="!$store.state.data.filter" 
-              ) 
-                span() Filter
-            v-flex
-              v-btn(@click='emit' class="ma-2 refresh" ) 
-                span Refresh
-            v-flex
-              add
-    v-dialog(v-model="error")
-        v-card(id="error-modal")
-          v-card-title(primary-title) Error Loading Content
-          v-card-text
-            v-subheader.error--text(v-if='error' id="add-error") {{errorMsg}}
-          v-card-actions
-            v-spacer
-            v-btn.lighten-3(@click="error=false;errorMsg='';" :class="{ teal: success}" ) close
+v-container(fluid)
+  v-row.mx-5(align="center"
+        align-content="center")
+    v-col.pr-0(cols="6")
+      v-text-field(
+        id="filter"
+        v-model="$store.state.data.filter"
+        name="filter"
+        label="Filter items by ID prefix"
+        variant="underlined"
+        color="primary"
+        clearable
+        persistent-clear
+        prepend-inner-icon="search"
+        @input="filter"
+        @click:clear="filter"
+      )
+    v-col.pl-2()
+      div(class="d-flex flex-row")
+        v-btn(
+          class="ma-2 refresh"
+          @click="refresh"
+        )
+          span Refresh
+        add
+  v-dialog(v-model="error")
+      v-card(id="error-modal")
+        v-card-title(primary-title) Error Loading Content
+        v-card-text
+          v-list-subheader.text-error(v-if='error' id="add-error") {{errorMsg}}
+        v-card-actions
+          v-spacer
+          v-btn.lighten-3(@click="error=false;errorMsg='';" :class="{ teal: success}" ) close
 </template>
 
 <script>
 
-    const Vuex = require('vuex')
-    const saveAs = require('file-saver').saveAs
-    const Promise = require('bluebird')
-    const _ = require('lodash')
-    module.exports = {
-        data: function () {
-            return {
-                dialog: false,
-                building: false,
-                success: false,
-                error: false,
-                errorMsg: ''
-            }
-        },
-        components: {
-            add: require('./add.vue').default,
-            delete: require('./delete.vue').default
-        },
-        directives: {
-            chosen: {
-                // directive definition - this calls the emit function to request filters be reapplied to
-                // the current question view. This resets any changes made in the test tab.
-                inserted: (el, binding, vnode) => {
-                    vnode.context.emit();
-                }
-            }
-        },
-        computed: {},
-        methods: {
-            filter: function (event) {
-                this.emit()
+require('vuex');
+require('file-saver');
+const _ = require('lodash');
+
+module.exports = {
+    data() {
+        return {
+            dialog: false,
+            building: false,
+            success: false,
+            error: false,
+            errorMsg: '',
+            search: '',
+        };
+    },
+    components: {
+        add: require('./add.vue').default,
+    },
+    directives: {
+        chosen: {
+            // directive definition - this calls the emit function to request filters be reapplied to
+            // the current question view. This resets any changes made in the test tab.
+            inserted: (el, binding, vnode) => {
+                vnode.context.emit();
             },
-            emit: _.debounce(function () {
-                this.$emit('filter')
-            }, 100, {leading: true, trailing: false}),
-            build: function () {
-                const self = this
-                this.building = true
+        },
+    },
+    computed: {},
+    methods: {
+        filter() {
+            this.emit();
+        },
+        refresh() {
+          this.$emit('refresh');
+        },
+        emit: _.debounce(function () {
+            this.$emit('filter');
+        }, 100, { leading: true, trailing: false }),
+        build() {
+            const self = this;
+            this.building = true;
 
-                this.$store.dispatch('data/build')
-                    .then(function () {
-                        self.success = true
-                        setTimeout(() => self.success = false, 2000)
-                    })
-                    .catch(e => {self.error=true; self.errorMsg = e})
-                    .then(() => self.building = false)
-            }
-        }
-    }
+            this.$store.dispatch('data/build')
+                .then(() => {
+                    self.success = true;
+                    setTimeout(() => self.success = false, 2000);
+                })
+                .catch((e) => { self.error = true; self.errorMsg = e; })
+                .then(() => self.building = false);
+        },
+    },
+};
 </script>
-
-<style lang='scss' scoped>
-    .refresh {
-        flex: 0;
-    }
-</style>

@@ -36,7 +36,7 @@ async function runQuery(req, query_params, kendraIndex) {
     return response;
 }
 function getSourceLinksFromPassages(inputText) {
-    const sourceLinkPattern = /^\s*Source Link:(.*)$/gm;
+    const sourceLinkPattern = /^\s*Source Link:(.*)$/gm; // NOSONAR - javascript:S5852 - input is user controlled and we have a limit on the number of characters
     let matches;
     const sourceLinks = [];
 
@@ -61,6 +61,7 @@ async function kendraFallback(req, hit, res) {
         hit = await kendra_fallback.handler({ req, res });
         qnabot.log(`Result from Kendra Fallback ${JSON.stringify(hit)}`);
     }
+
     if (hit && hit.hit_count != 0) {
         hit.refMarkdown = getSourceLinksFromPassages(hit.alt.markdown);
         // Run any configured QA Summary LLM model options on Kendra results
@@ -86,12 +87,17 @@ function encryptConditionalChainingIfSet(hit) {
     return hit;
 }
 
-async function getNoHitsResponse(noHitsQuestion, query_params, res, req, KENDRA_FAQ_INDEX) {
-    qnabot.log(`No hits from query - searching instead for: ${noHitsQuestion}`);
-    query_params.question = noHitsQuestion;
+async function getNoHitsResponse(query_params, res, req, errors, KENDRA_FAQ_INDEX) {
+    const noHitsQuestion = _.get(req, '_settings.ES_NO_HITS_QUESTION', 'no_hits');
+    const errorQuestion = _.get(req, '_settings.ES_ERROR_QUESTION', 'error_msg');
+
+    query_params.question = errors.length > 0 ? errorQuestion : noHitsQuestion;
     query_params.score_text_passage = false;
     query_params.size = 1;
     res.got_hits = 0; // response flag, used in logging / kibana
+
+    qnabot.log(`No hits from query - searching instead for: ${query_params.question}`);
+
     const response = await runQuery(req, query_params, KENDRA_FAQ_INDEX);
     const noHitsRes = _.get(response, 'hits.hits[0]._source');
     qnabot.log(`No hits response: ${JSON.stringify(noHitsRes)}`);
@@ -198,6 +204,7 @@ async function kendraRedirect(hit, req, res, ALT_SEARCH_KENDRA_FALLBACK_CONFIDEN
     qnabot.log(`Kendra redirect query confidence threshold: '${kendraRedirectQueryConfidenceThreshold}'`);
     req.question = kendraRedirectQueryText;
     req.kendraQueryArgs = kendraRedirectQueryArgs;
+    req.kendraRedirect = true;
     req._settings.ALT_SEARCH_KENDRA_FALLBACK_CONFIDENCE_SCORE = kendraRedirectQueryConfidenceThreshold;
     // remove any cached results from FAQ query
     delete res.kendraResultsCached;
@@ -229,7 +236,7 @@ function getQuestion(req) {
 async function getHit(req, res) {
     const question = getQuestion(req);
     let size = 1;
-    const noHitsQuestion = _.get(req, '_settings.ES_NO_HITS_QUESTION', 'no_hits');
+
     if (open_es.isQuestionAllStopwords(question)) {
         qnabot.log(`Question '${question}' contains only stop words. Forcing no hits.`);
         size = 0;
@@ -268,6 +275,8 @@ async function getHit(req, res) {
         minimum_confidence_score: ALT_SEARCH_KENDRA_FAQ_CONFIDENCE_SCORE,
         qnaClientFilter: _.get(req, 'session.QNAClientFilter'),
         settings: req._settings,
+        locale: _.get(req, '_locale.localeIdentified'),
+        translation: _.get(req, '_translation.QuestionInBackupLanguage'),
     };
 
     let hit;
@@ -300,7 +309,7 @@ async function getHit(req, res) {
     }
 
     if (!hit) {
-        hit = await getNoHitsResponse(noHitsQuestion, query_params, res, req, KENDRA_FAQ_INDEX);
+        hit = await getNoHitsResponse(query_params, res, req, errors, KENDRA_FAQ_INDEX);
     }
 
     if (hit) {

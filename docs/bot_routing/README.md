@@ -1,5 +1,5 @@
-# Bot Routing 
-(version 1.2 - November 2022)
+# Bot Routing - Preview Mode
+(version 1.2 - December 2023)
 
 Bots exist to perform a variety of automation tasks. Usually they take
 as input a message from a human and respond performing
@@ -45,7 +45,7 @@ enterprise level can direct users to answers from any of their Bots.
 
 #### Configuration
 
-Configuration is simple. Each question in QnABot now contains an optional section which
+Configuration is simple. Each question in QnAbot now contains an optional section which
 allows configuration of a BotRouter.
 
 **Note: This is optional. Please leave empty and QnABot will not act as a
@@ -73,8 +73,8 @@ list of session attribute names can be specified. The session attributes
 will be passed on each request to the specialty bot. They will override
 any session attributes which might have been returned from the specialty bot
 on the prior request. 
-
-* The initial utterance to send to the target bot. You can specify this as ${relay} in which
+  
+* The initial utterance to send to the target bot. You can specify this as ${utterance} in which
 case QnABot will send the input utterance matching this qid to the target bot or specify
 a different string to send on startup. Leave this field blank to not send an utterance 
 to the specialty bot on startup. 
@@ -96,7 +96,7 @@ The input json payload to the target Lambda will be the following:
     req: {
         request: "message",
         inputText: <String>,
-        sessionAttributes: <Object>),
+        sessionAttributes: <Object>,
         userId: <String>
     }
 ```

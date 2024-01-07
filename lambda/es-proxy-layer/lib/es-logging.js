@@ -12,8 +12,10 @@
  *********************************************************************************************************************/
 
 // start connection
-const aws = require('aws-sdk');
+const { Firehose } = require('@aws-sdk/client-firehose');
+const customSdkConfig = require('../lib/util/customSdkConfig');
 const _ = require('lodash');
+const region = process.env.AWS_REGION || 'us-east-1';
 
 const qnabot = require('qnabot/logging');
 const qna_settings = require('qnabot/settings');
@@ -104,7 +106,7 @@ module.exports = function (event, context, callback) {
         // encode to base64 string to put into firehose and
         // append new line for proper downstream kinesis processing in kibana and/or athena queries over s3
         const objJsonStr = `${JSON.stringify(jsonData)}\n`;
-        const firehose = new aws.Firehose();
+        const firehose = new Firehose(customSdkConfig('C009', { region }));
 
         const params = {
             DeliveryStreamName: process.env.FIREHOSE_NAME, /* required */
@@ -113,7 +115,7 @@ module.exports = function (event, context, callback) {
             },
         };
         try {
-            const data= await firehose.putRecord(params).promise()
+            const data = await firehose.putRecord(params)
             qnabot.log(data)
         } catch (err) {
             qnabot.log(err.data)

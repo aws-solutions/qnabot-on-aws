@@ -34,7 +34,7 @@ async function processDialogEvent(req, res) {
         res = processSlots(req, res, hit);
         _.set(res, 'session.qnabot_qid', qid);
     } else {
-        qnabot.error(
+        qnabot.warn(
             'QID not identified in request. Intent name should have mapped to a QID. Unable to process Dialog Code Hook event',
         );
     }

@@ -14,10 +14,10 @@
 
 process.env.AWS_PROFILE = require('../config.json').profile;
 process.env.AWS_DEFAULT_REGION = require('../config.json').profile;
-const aws = require('aws-sdk');
-aws.config.region = require('../config.json').region;
+const { CloudFormationClient, DescribeStacksCommand } = require('@aws-sdk/client-cloudformation');
+const region = require('../config.json').region;
 
-const cf = new aws.CloudFormation();
+const cf = new CloudFormationClient({ region });
 const ora = require('ora');
 const name = require('./name');
 
@@ -34,7 +34,8 @@ async function wait(stackname, options) {
     const spinner = new Spinner(options.show);
     try {
         while (true) {
-            const response = await cf.describeStacks({ StackName: options.Id || StackName }).promise();
+            const describeCmd = new DescribeStacksCommand({ StackName: options.Id || StackName });
+            const response = await cf.send(describeCmd);
             const status = response.Stacks[0].StackStatus;
             spinner.update(status);
             if (['UPDATE_COMPLETE',

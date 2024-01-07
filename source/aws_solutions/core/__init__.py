@@ -15,7 +15,7 @@ from aws_solutions.core.config import Config
 
 config = Config()
 
-from aws_solutions.core.helpers import (  # pylint: disable=wrong-import-position
+from aws_solutions.core.helpers import ( 
     get_aws_region,
     get_aws_partition,
     get_service_client,

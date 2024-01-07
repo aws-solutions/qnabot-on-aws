@@ -62,7 +62,7 @@ def get_aws_partition():
 
 
 def get_session():
-    global _SESSION  # pylint: disable=global-statement
+    global _SESSION 
     if not _SESSION:
         _SESSION = boto3.session.Session()
     return _SESSION

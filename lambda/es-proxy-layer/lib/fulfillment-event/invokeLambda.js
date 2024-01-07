@@ -12,8 +12,10 @@
  *********************************************************************************************************************/
 
 const _ = require('lodash');
-const aws = require('aws-sdk');
+const { Lambda } = require('@aws-sdk/client-lambda');
+const customSdkConfig = require('../../lib/util/customSdkConfig');
 const qnabot = require('qnabot/logging');
+const region = process.env.AWS_REGION || 'us-east-1';
 
 // resolves Lambda function name for bundled example lambdas refernced in env.
 function getLambdaName(lambdaRef) {
@@ -29,17 +31,18 @@ async function invokeLambda(lambdaRef, req, res) {
     const lambdaName = getLambdaName(lambdaRef);
     qnabot.log('Calling Lambda:', lambdaName);
     const event = { req, res };
-    const lambda = new aws.Lambda();
+    const lambda = new Lambda(customSdkConfig('C024', { region }));
     const lambdares = await lambda
         .invoke({
             FunctionName: lambdaName,
             InvocationType: 'RequestResponse',
             Payload: JSON.stringify(event),
-        })
-        .promise();
+        });
     let payload = lambdares.Payload;
+    
     try {
-        payload = JSON.parse(payload);
+        const payloadObj = Buffer.from(payload).toString();
+        payload = JSON.parse(payloadObj);
         if (_.get(payload, 'req') && _.get(payload, 'res')) {
             req = _.get(payload, 'req');
             res = _.get(payload, 'res');

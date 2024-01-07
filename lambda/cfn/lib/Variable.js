@@ -11,8 +11,7 @@
  *  and limitations under the License.                                                                                *
  *********************************************************************************************************************/
 
-const Promise = require('./util/promise');
-const crypto = Promise.promisifyAll(require('crypto'));
+const crypto = require('crypto');
 const _ = require('lodash');
 
 module.exports = class Variable extends require('./base') {

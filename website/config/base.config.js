@@ -11,102 +11,106 @@
  *  and limitations under the License.                                                                                *
  *********************************************************************************************************************/
 const path = require('path');
-const VueLoaderPlugin = require('vue-loader/lib/plugin');
+const {VueLoaderPlugin} = require('vue-loader');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const _ = require('lodash');
+const NodePolyfillPlugin = require('node-polyfill-webpack-plugin');
+const TerserPlugin = require('terser-webpack-plugin');
+const webpack = require('webpack');
 
 module.exports={
     entry:{
-        main:["babel-polyfill","./entry.js"],
-        check:["./js/browser-check.js"],
-        client:["babel-polyfill","./js/client.js"],
-        test:["babel-polyfill","./js/test.js"],
-        vendor:["aws-sdk"]
+        main:['./entry.js'],
+        check:['./js/browser-check.js'],
+        client:['./js/client.js'],
+        test:['./js/test.js'],
     },
     output:{
         path:path.join(__dirname,'../build'),
-        filename:"[name].js",
+        filename:'[name].js',
         chunkFilename: '[name].js', 
     },
-    plugins:_.compact([
+    plugins:[
         new VueLoaderPlugin(),
-        new CopyWebpackPlugin({ patterns: [{from:'./assets',to:"assets"}] }),
-        new CopyWebpackPlugin({ patterns: [{from:'./styles',to:"styles"}] }),
+        new NodePolyfillPlugin(),
+        new CopyWebpackPlugin({ patterns: [{from:'./assets',to:'assets'}] }),
+        new CopyWebpackPlugin({ patterns: [{from:'./styles',to:'styles'}] }),
         new CopyWebpackPlugin({ patterns: [{
             from:'../node_modules/aws-lex-web-ui/dist/wav-worker.min.js',
-            to:"wav-worker.js"
+            to:'wav-worker.js'
         }]}),
         new HtmlWebpackPlugin({
             template:'./html/admin.pug',
             filename:'index.html',
-            chunks:["main","check", "vendor"]
+            chunks:['main','check', 'vendor'],
         }),
         new HtmlWebpackPlugin({
             template:'./html/test.ejs',
             filename:'test.html',
-            chunks:["main","test","check"]
+            chunks:['main','test','check'],
         }),
         new HtmlWebpackPlugin({
             template:'./html/client.pug',
             filename:'client.html',
-            chunks:["client", "vendor"]
+            chunks:['client', 'vendor'],
         }),
         new HtmlWebpackPlugin({
-            filename:"health.html",
-            templateContent:"ok\n",
+            filename:'health.html',
+            templateContent:'ok\n',
             inject:false
+        }),
+        new TerserPlugin({
+            terserOptions: {
+                output: {
+                    ascii_only: true
+                }
+            }
+        }),
+        new webpack.DefinePlugin({
+            __VUE_PROD_DEVTOOLS__: JSON.stringify(true),
+            __VUE_OPTIONS_API__: JSON.stringify(true),
         })
-    ]),
+    ],
     resolve: {
         modules: [path.resolve(__dirname, '../../'), 'node_modules'],
         extensions: [ '.js', '.vue', '.pug', '.styl', '.scss', '.css' ],
         alias: {
-            vue$:'vue/dist/vue.js',
             handlebars: 'handlebars/dist/handlebars.min.js',
-            querystring: 'querystring-browser'
-        }
+            Vue: 'vue',
+            Vuex: 'vuex',
+            Vuetify: 'vuetify',
+        },
     },
     module: {
         rules: [
             {
                 test: /\.js$/,
-                exclude:/node_modules/,
+                exclude: [
+                    /node_modules/,
+                    /__tests__/,
+                ],
                 loader: 'babel-loader',
-                query: {
-                    presets: ['env']
+                options: {
+                    presets: ['@babel/preset-env']
                 }
             },
             {
                 test: /\.(md|txt)$/,
-                loader: 'raw-loader'
+                type: 'asset/source'
             },
             {
                 test: /\.vue$/,
                 loader: 'vue-loader',
-                options: {
-                    loaders: {
-                        'scss': 'vue-style-loader!css-loader!sass-loader',
-                        'sass': 'vue-style-loader!css-loader!sass-loader?indentedSyntax',
-                        js:{
-                            loader:'babel-loader',
-                            options:{
-                                presets: ['env']
-                            }
-                        }
-                    }
-                }
             },
             {
                 test: /\.(png|eot|ttf|svg)$/,
-                loader: 'url-loader?limit=100000'
+                type: 'asset/resource'
             },
             {
                 test: /\.(woff|woff2)$/,
-                loader: 'file-loader?limit=100000',
-                options: {
-                    name: '[name].[ext]',
-                    outputPath: 'fonts/'
+                type: 'asset/resource',
+                generator : {
+                    filename : './fonts/[name][ext]'
                 }
             },
             {
@@ -117,13 +121,14 @@ module.exports={
                         use: ['pug-plain-loader'],
                     },
                     {
-                        use: ['raw-loader', 'pug-plain-loader']
+                        type: 'asset/source',
+                        loader: 'pug-plain-loader'
                     }
                 ]
             },
             {
                 test: /\.css$/,
-                use: ['vue-style-loader', 'css-loader']
+                use: ['style-loader', 'css-loader']
             },
             {
                 test: /\.styl$/,
@@ -132,12 +137,38 @@ module.exports={
 
             {
                 test: /\.scss$/,
-                use:[
-                    {loader: "vue-style-loader"},
-                    {loader: "css-loader" },
-                    {loader: "sass-loader" }
-                ]
+                use:['style-loader', 'css-loader', 'sass-loader']
             }
         ]
-    }
+    },
+    performance: {
+        hints: false,
+        maxEntrypointSize: 512000,
+        maxAssetSize: 512000
+    },
+    optimization: {
+        splitChunks: {
+            cacheGroups: {
+                'vendor-aws-sdk': {
+                    name: 'vendor-aws-sdk',
+                    test: /[\\/]node_modules[\\/]aws-sdk/,
+                    chunks: 'initial',
+                    idHint: 'vendor-aws-sdk',
+                },
+                'vendor-aws-lex-web-ui': {
+                    name: 'vendor-aws-lex-web-ui',
+                    test: /[\\/]node_modules[\\/]aws-lex-web-ui/,
+                    chunks: 'initial',
+                    idHint: 'aws-lex-web-ui',
+                },
+                'vendor-vue-vuetify': {
+                    name: 'vendor-vue-vuetify',
+                    test: /[\\/]node_modules[\\/](vuetify|vue)/,
+                    chunks: 'initial',
+                    idHint: 'vendor-vue-vuetify',
+                }
+
+            }
+        }
+    },
 }

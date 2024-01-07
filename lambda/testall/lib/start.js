@@ -10,9 +10,7 @@
  *  OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions    *
  *  and limitations under the License.                                                                                *
  *********************************************************************************************************************/
-const aws = require('aws-sdk');
 
-aws.config.region = process.env.AWS_REGION;
 const _ = require('lodash');
 const load = require('./load');
 

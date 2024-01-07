@@ -19,8 +19,11 @@ import collections
 from collections import defaultdict
 import botocore.response as br
 import datetime
+from botocore.config import Config
 
-def handler(event, context):
+sdk_config = Config(user_agent_extra = f"AWSSOLUTION/{os.environ['SOLUTION_ID']}/{os.environ['SOLUTION_VERSION']} AWSSOLUTION-CAPABILITY/{os.environ['SOLUTION_ID']}-C009/{os.environ['SOLUTION_VERSION']}")
+
+def handler(event, context):  # NOSONAR Lambda Handler
 
     print(json.dumps(event))
 
@@ -38,21 +41,22 @@ def handler(event, context):
         print("no kendra information present in session attribute qnabotcontext")
 
     try:
-        #get the Question ID (qid) of the previous document that was returned to the web client 
+        #get the Question ID (qid) of the previous document that was returned to the web client
         previous = event["req"]["session"]["qnabotcontext"]["previous"]
         previous_qid = previous["qid"] if "qid" in previous else "Answer via Kendra Fallback (no Qid matched)"
         previous_question = previous["q"]
         feedback_arg = event["res"]["result"]["args"][0]
         user_info = event["req"]["_userInfo"]
 
-        # - Check feedbackArg from the UI payload. Parse for "thumbs_down_arg" feedback. Based on user action, sendFeedback through SNS, and log in Firehose. 
+        # - Check feedbackArg from the UI payload. Parse for "thumbs_down_arg" feedback. Based on user action, sendFeedback through SNS, and log in Firehose.
+        send_feedback_notification(previous_qid, previous_question, feedback_arg, user_info)
+        print("SNS notification sent")
         if feedback_arg == "incorrect":
-            send_feedback_notification(previous_qid, previous_question, feedback_arg, user_info)
             if (kendra_index_id is not None) and (kendra_responsible_qid==previous_qid or kendra_responsible_qid=='KendraFAQ'):
                 print("submitting NOT_RELEVANT to Kendra Feedback")
                 submit_feedback_for_kendra(kendra_index_id, kendra_query_id, kendra_result_id, "NOT_RELEVANT")
             log_feedback(previous_qid, previous_question, feedback_arg, user_info)
-            print("Negative feedback logged, and SNS notification sent")
+            print("Negative feedback logged")
         else:
             if (kendra_index_id is not None) and (kendra_responsible_qid==previous_qid or kendra_responsible_qid=='KendraFAQ'):
                 print("submitting RELEVANT to Kendra Feedback")
@@ -73,7 +77,7 @@ def log_feedback(qid, question, feedback_arg, user_info):
         "userInfo":user_info
     }
     jsondump=json.dumps(json_data,ensure_ascii=False)
-    client = boto3.client('firehose')
+    client = boto3.client('firehose', config=sdk_config)
     response = client.put_record(
         DeliveryStreamName=os.environ['FIREHOSE_NAME'],
         Record={
@@ -88,18 +92,18 @@ def send_feedback_notification(qid, question, feedback_arg, user_info):
     if ("GivenName" in user_info):
         user += user_info["GivenName"]
     if ("FamilyName" in user_info):
-        user += " " + user_info["FamilyName"]  
+        user += " " + user_info["FamilyName"]
     if ("Email" in user_info):
         user += " <" + user_info["Email"] + ">"
     if feedback_arg == "incorrect":
         message = "Negative feedback (Thumbs Down) received on QnABot answer:\n"
-    else: 
+    else:
         message = "Positive feedback (Thumbs Up) received on QnABot answer:\n"
     notification_body = f"\n{message}\n\tTimestamp: {datetime.datetime.now().isoformat()} \n\tQuestion ID: {qid} \n\tQuestion: {question} \n\tUser: {user} \n\tFeedback: {feedback_arg}"
     print("Publishing SNS message: ", notification_body)
-    client = boto3.client('sns')
+    client = boto3.client('sns', config=sdk_config)
     response = client.publish(
-        TargetArn=  os.environ['SNS_TOPIC_ARN'], 
+        TargetArn=  os.environ['SNS_TOPIC_ARN'],
         Message=json.dumps({'default': notification_body
         }),
         Subject='QnABot - Feedback received',
@@ -109,7 +113,7 @@ def send_feedback_notification(qid, question, feedback_arg, user_info):
 
 # - Sends feedback notification for Kendra feedback.
 def submit_feedback_for_kendra(kendra_index_id, kendra_query_id, kendra_result_id, kendra_relevancy):
-    client = boto3.client('kendra')
+    client = boto3.client('kendra', config=sdk_config)
     response = client.submit_feedback(
         IndexId=kendra_index_id,
         QueryId=kendra_query_id,

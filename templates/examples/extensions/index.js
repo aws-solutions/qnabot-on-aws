@@ -1,4 +1,4 @@
-/*********************************************************************************************************************
+/** *******************************************************************************************************************
  *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.                                                *
  *                                                                                                                    *
  *  Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance    *
@@ -9,7 +9,7 @@
  *  or in the 'license' file accompanying this file. This file is distributed on an 'AS IS' BASIS, WITHOUT WARRANTIES *
  *  OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions    *
  *  and limitations under the License.                                                                                *
- *********************************************************************************************************************/
+ ******************************************************************************************************************** */
 
 const fs = require('fs');
 const _ = require('lodash');
@@ -67,6 +67,11 @@ module.exports = Object.assign(
                         ]],
                     },
                     S3ObjectVersion: { Ref: 'EXTUiImportVersion' },
+                },
+                Environment: {
+                    Variables: {
+                        ...util.getCommonEnvironmentVariables()
+                    },
                 },
                 Handler: 'ui_import.handler',
                 MemorySize: '128',
@@ -323,6 +328,7 @@ function pylambda(name) {
                     ES_ADDRESS: { Ref: 'ESAddress' },
                     QUIZ_KMS_KEY: { Ref: 'QuizKey' },
                     PYTHONPATH: '/var/task/py_modules:/var/runtime:/opt/python',
+                    ...util.getCommonEnvironmentVariables()
                 },
             },
             Handler: `${name}.handler`,

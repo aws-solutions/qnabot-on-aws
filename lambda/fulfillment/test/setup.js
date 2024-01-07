@@ -13,7 +13,7 @@
  *********************************************************************************************************************/
 
 const config = require('../../../config.json');
-const aws = require('aws-sdk');
+const { fromEnv } = require('@aws-sdk/credential-providers');
 const outputs = require('../../../bin/exports');
 const qnabot = require('qnabot/logging');
 
@@ -34,8 +34,9 @@ module.exports = async function (event) {
     process.env.LAMBDA_DEFAULT_QUERY=lambda.lambda;
     process.env.LAMBDA_LOG=lambda.lambda;
 
-    process.env.AWS_ACCESS_KEY_ID=aws.config.credentials.accessKeyId;
-    process.env.AWS_SECRET_ACCESS_KEY=aws.config.credentials.secretAccessKey;
+    const credentials = fromEnv();
+    process.env.AWS_ACCESS_KEY_ID=credentials.accessKeyId;
+    process.env.AWS_SECRET_ACCESS_KEY=credentials.secretAccessKey;
     process.env.AWS_REGION=config.region;
     process.env.ERRORMESSAGE="error";
     process.env.EMPTYMESSAGE="empty";

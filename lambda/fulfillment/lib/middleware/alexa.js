@@ -13,19 +13,19 @@
 
 const _ = require('lodash');
 const qnabot = require('qnabot/logging');
-const translate = require('./multilanguage.js');
+const {get_translation} = require('./multilanguage.js');
 
 async function get_welcome_message(req, locale) {
     const welcome_message = _.get(req, '_settings.DEFAULT_ALEXA_LAUNCH_MESSAGE', 'Hello, Please ask a question');
     if (_.get(req._settings, 'ENABLE_MULTI_LANGUAGE_SUPPORT')) {
-        return await translate.get_translation(welcome_message, 'en', locale, req);
+        return await get_translation(welcome_message, 'auto', locale, req);
     }
     return welcome_message;
 }
 async function get_stop_message(req, locale) {
     const stop_message = _.get(req, '_settings.DEFAULT_ALEXA_STOP_MESSAGE', 'Goodbye');
     if (_.get(req._settings, 'ENABLE_MULTI_LANGUAGE_SUPPORT')) {
-        return await translate.get_translation(stop_message, 'en', locale, req);
+        return await get_translation(stop_message, 'auto', locale, req);
     }
     return stop_message;
 }
@@ -77,7 +77,7 @@ exports.parse = async function (req) {
             throw new AlexaMessage(stop_message, true);
         case 'AMAZON.FallbackIntent':
             qnabot.log('ERROR: FallbackIntent. This shouldn\'t happen - we can\'t get the utterance. Ask user to try again.');
-            err_message = await translate.translateText('Sorry, I do not understand. Please try again.', 'en', alexa_locale);
+            err_message = await get_translation('Sorry, I do not understand. Please try again.', 'en', alexa_locale);
             throw new AlexaMessage(err_message, false);
         case 'AMAZON.RepeatIntent':
             welcome_message = await get_welcome_message(req, alexa_locale);
@@ -93,13 +93,13 @@ exports.parse = async function (req) {
             break;
         default:
             qnabot.log('ERROR: Unhandled Intent - ', _.get(event, 'request.intent.name'));
-            err_message = await translate.translateText('The skill is unable to process the request.', 'en', alexa_locale);
+            err_message = await get_translation('The skill is unable to process the request.', 'en', alexa_locale);
             throw new AlexaMessage(err_message, true);
         }
     }
     if (out.question === '') {
         qnabot.log('ERROR: No value found for QnA_slot');
-        err_message = await translate.translateText('The skill is unable to process the request.', 'en', alexa_locale);
+        err_message = await get_translation('The skill is unable to process the request.', 'en', alexa_locale);
         throw new AlexaMessage(err_message, true);
     }
     return out;
@@ -112,7 +112,7 @@ exports.parse = async function (req) {
 exports.assemble = function (request, response) {
     let plainMessage = response.plainMessage || '';
     if (plainMessage.includes('<speak>')) {
-        plainMessage = plainMessage.replace(/<\/?[^>]+(>|$)/g, '');
+        plainMessage = plainMessage.replace(/<\/?[^>]+(>|$)/g, '');  // NOSONAR - javascript:S5852 - input is user controlled and we have a limit on the number of characters
     }
     if (plainMessage.toLowerCase().startsWith('ok. ')) {
         plainMessage = plainMessage.replace(/[Oo][Kk]. /g, '');

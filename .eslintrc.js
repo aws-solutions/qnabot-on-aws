@@ -6,9 +6,10 @@ module.exports = {
     env: {
         node: true
     },
-    extends: ['eslint:recommended', 'plugin:vue/recommended', 'airbnb-base'],
+    extends: ['eslint:recommended', 'plugin:vue/vue3-recommended', 'airbnb-base', 'plugin:vue-pug/vue3-recommended'],
     rules: {
         indent: ['warn', 4],
-        quotes: ['warn', 'single']
+        quotes: ['warn', 'single'],
+        'vue/no-deprecated-slot-attribute': 'off'
     }
 };

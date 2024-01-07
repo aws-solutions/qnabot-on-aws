@@ -11,22 +11,26 @@
  *  and limitations under the License.                                                                                *
  *********************************************************************************************************************/
 
-const aws = require('aws-sdk');
+const { LambdaClient, InvokeCommand } = require('@aws-sdk/client-lambda');
+const { S3Client, PutObjectCommand } = require('@aws-sdk/client-s3');
+const customSdkConfig = require('sdk-config/customSdkConfig');
 
-aws.config.region = process.env.AWS_REGION;
-const s3 = new aws.S3();
-const lambda = new aws.Lambda();
+const region = process.env.AWS_REGION;
+const s3 = new S3Client(customSdkConfig('C012', { region }));
+const lambda = new LambdaClient(customSdkConfig('C012', { region }));
 const _ = require('lodash');
 
 module.exports = async function (config, body) {
     try {
         console.log(`payload for testall es proxy is: ${JSON.stringify(body)}`);
-        const response = await lambda.invoke({
+        const invokeCmd = new InvokeCommand({
             FunctionName: process.env.ES_PROXY,
             Payload: JSON.stringify(body),
-        }).promise();
-        const result = JSON.parse(response.Payload);
-        console.log(result);
+        });
+        const response = await lambda.send(invokeCmd);
+        const payload = Buffer.from(response.Payload).toString();
+        const result = JSON.parse(payload)
+        console.log(result)
         config.scroll_id = result._scroll_id;
         config.status = 'InProgress';
         console.log(`result from parsing load is: ${JSON.stringify(result, null, 2)}`);
@@ -41,11 +45,13 @@ module.exports = async function (config, body) {
                 return JSON.stringify(out);
             }).join('\n');
             const key = `${config.tmp}/${config.parts.length + 1}`;
-            const upload_result = await s3.putObject({
+            const params = {
                 Body: body,
                 Bucket: config.bucket,
                 Key: key,
-            }).promise();
+            };
+            const putObjCmd = new PutObjectCommand(params);
+            const upload_result = await s3.send(putObjCmd);
 
             config.parts.push({
                 version: upload_result.VersionId,
@@ -60,18 +66,3 @@ module.exports = async function (config, body) {
         throw error;
     }
 };
-function query(filter) {
-    return {
-        size: 1000,
-        query: {
-            bool: _.pickBy({
-                must: { match_all: {} },
-                filter: filter ? {
-                    regexp: {
-                        qid: filter,
-                    },
-                } : null,
-            }),
-        },
-    };
-}

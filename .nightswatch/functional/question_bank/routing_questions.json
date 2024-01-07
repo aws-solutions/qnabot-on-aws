@@ -1,0 +1,54 @@
+{
+	"qna": [
+		{
+			"a": "One second. Let me get him for you...",
+			"type": "qna",
+			"qid": "Routing.001",
+			"botRouting": {
+				"specialty_bot": "lexv2::7T1CYCPYVK/TSTALIASID/en_US",
+				"specialty_bot_name": "test_bot",
+				"specialty_bot_session_attributes_to_merge": "myAttribute"
+			},
+			"sa": [
+				{
+					"text": "myAttribute",
+					"value": "test"
+				}
+			],
+			"q": ["I want to talk to test bot"]
+		},
+		{
+			"a": "One second. Let me get test bot for you...",
+			"conditionalChaining": "(SessionAttributes.specialtyBot.botAttribute == \"test\") ? \"Specialty Bot Attribute\" : \"No Specialty Bot Attribute\"",
+			"type": "qna",
+			"qid": "Routing.002",
+			"botRouting": {
+				"specialty_bot": "lexv2::7T1CYCPYVK/TSTALIASID/en_US",
+				"specialty_bot_name": "test_bot",
+				"specialty_bot_session_attributes_to_merge": "myAttribute",
+				"specialty_bot_start_up_text": "${utterance}",
+				"specialty_bot_session_attributes_to_receive": "botAttribute",
+				"specialty_bot_session_attributes_to_receive_namespace": "specialtyBot"
+			},
+			"sa": [
+				{
+					"text": "myAttribute",
+					"value": "test"
+				}
+			],
+			"q": ["Give me an attribute"]
+		},
+		{
+			"a": "You just received a session attribute from test bot.",
+			"type": "qna",
+			"qid": "Routing.003",
+			"q": ["Specialty Bot Attribute"]
+		},
+		{
+			"a": "Something went wrong.",
+			"type": "qna",
+			"qid": "Routing.004",
+			"q": ["No Specialty Bot Attribute"]
+		}
+	]
+}

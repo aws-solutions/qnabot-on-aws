@@ -16,6 +16,9 @@ import json
 import boto3
 import os
 import logging
+from botocore.config import Config
+
+sdk_config = Config(user_agent_extra = f"AWSSOLUTION/{os.environ['SOLUTION_ID']}/{os.environ['SOLUTION_VERSION']} AWSSOLUTION-CAPABILITY/{os.environ['SOLUTION_ID']}-C018/{os.environ['SOLUTION_VERSION']}")
 
 stackoutputs = None
 stackname = os.getenv('CFSTACK')
@@ -23,7 +26,7 @@ stackname = os.getenv('CFSTACK')
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
-def handler(event, context):
+def handler(event, context):  # NOSONAR Lambda Handler
 
     jsondump = json.dumps(event)
     print(jsondump)
@@ -40,13 +43,13 @@ def handler(event, context):
         event["res"]["session"]["qnabotcontext"]["previous"]={}
         event["res"]["session"]["qnabotcontext"]["navigation"]={}
         return event
-    
+
     #for now we only go to the first document in list of next documents, change later when we add functionality for branching and converging paths
     if isinstance(next_doc,list):
         response = qid_lambda(event, next_doc[0])
     else:
         response = qid_lambda(event, next_doc)
-    #uncomment below if you want to see the response 
+    #uncomment below if you want to see the response
     #print(json.dumps(response))
 
     # Do not call lambdafunction from the next item if the link points to ourselves
@@ -56,7 +59,7 @@ def handler(event, context):
         event = update_result(event,response)
         if "args" in response:
             event["res"]["result"]["args"] = response["args"]
-        client = boto3.client('lambda')
+        client = boto3.client('lambda', config= sdk_config)
         targetname = response.get('l', '')
         if targetname.startswith('arn') != True:
             targetname = map_to_arn(targetname, stackname)
@@ -75,23 +78,22 @@ def handler(event, context):
         #if the response has no answer we must have hit the end of the guided navigation for this segment
         #if unable to find anything, set the previous attribute back to the document qid that was previously returned,since we don't want this document to be in history
         event["res"]["session"]["qnabotcontext"]["previous"]={"qid":qid,"q":previous_to_json["q"]}
-        event["res"]["session"]["qnabotcontext"]["navigation"]={"next":navigation_to_json["next"],"previous":navigation_to_json["previous"],"hasParent":navigation_to_json["hasParent"]} 
+        event["res"]["session"]["qnabotcontext"]["navigation"]={"next":navigation_to_json["next"],"previous":navigation_to_json["previous"],"hasParent":navigation_to_json["hasParent"]}
     print(json.dumps(event))
     return event
 
 
 #Invoke the prepackaged function that Queries ElasticSearch using a document qid
 def qid_lambda(event,next_qid):
-    client = boto3.client('lambda')
+    client = boto3.client('lambda', config=sdk_config)
     #Invoke the prepackaged function that Queries ElasticSearch using a document qid
     resp = client.invoke(
         FunctionName = event["req"]["_info"]["es"]["service"]["qid"],
         Payload = json.dumps({'qid':next_qid}),
         InvocationType = "RequestResponse"
     )
-    # Because the payload is of a streamable type object, we must explicitly read it and load JSON 
+    # Because the payload is of a streamable type object, we must explicitly read it and load JSON
     temp_response = resp['Payload'].read()
-    print(temp_response)
     response = json.loads(temp_response)
     return response
 
@@ -100,7 +102,7 @@ def map_to_arn(name,stack):
     res = name
     global stackoutputs
     if stackoutputs is None:
-        cf = boto3.client('cloudformation')
+        cf = boto3.client('cloudformation', config=sdk_config)
         r = cf.describe_stacks(StackName=stack)
         stack, = r['Stacks']
         stackoutputs = stack['Outputs']
@@ -128,6 +130,7 @@ def update_lambda_hook(event,hook_event,response):
         temp_list.pop(0)
     if "session" not in hook_event["res"]:
         hook_event["res"]["session"] = {}
+        hook_event["res"]["session"]["qnabotcontext"] = {}
     hook_event["res"]["session"]["qnabotcontext"]["previous"] ={"qid":response["qid"],"q":event["req"]["question"]}
     hook_event["res"]["session"]["qnabotcontext"]["navigation"]={"next":response.get("next",""),"previous":temp_list,"hasParent":False}
     return hook_event
@@ -141,7 +144,7 @@ def build_card_from_response(event, response):
             event["res"]["card"]["title"] = card["title"]
             try:
                 event["res"]["card"]["text"] = card["text"]
-            except:
+            except:  # NOSONAR the case is handled and no need for an exception
                 event["res"]["card"]["text"] = ""
             if 'subTitle' in card:
                 event["res"]["card"]["subTitle"] = card["subTitle"]
@@ -163,7 +166,7 @@ def update_result(event, response):
         if response.get("alt",False) and "ssml" in response["alt"] and len(response["alt"]["ssml"])>0:
             event["res"]["type"]="SSML"
             event["res"]["message"]=response["alt"]["ssml"].replace('\n',' ')
-            
+
     if "r" in response:
         event = build_card_from_response(event, response)
     if 't' in response:
@@ -184,6 +187,6 @@ def update_result(event, response):
         #setting limit to 10 elements in previous stack since ,since lex has a max header size and we want to save that for other functions, same max size is set in the query lambda
         temp_list.pop(0)
     event["res"]["session"]["qnabotcontext"]["previous"] ={"qid":response["qid"],"q":event["req"]["question"]}
-    event["res"]["session"]["qnabotcontext"]["navigation"]={"next":response.get("next",""),"previous":temp_list,"hasParent":False} 
+    event["res"]["session"]["qnabotcontext"]["navigation"]={"next":response.get("next",""),"previous":temp_list,"hasParent":False}
     return event
 

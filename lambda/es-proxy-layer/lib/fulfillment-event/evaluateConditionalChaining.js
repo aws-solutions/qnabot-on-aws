@@ -39,6 +39,7 @@ async function evaluateConditionalChaining(req, res, hit, conditionalChaining) {
     conditionalChaining = encryptor.decrypt(conditionalChaining);
     qnabot.log('Decrypted Chained document rule specified:', conditionalChaining);
     let next_q;
+    let errors = [];
     // If chaining rule a lambda, or an expression?
     if (conditionalChaining.toLowerCase().startsWith('lambda::')) {
         // Chaining rule is a Lambda function
@@ -49,7 +50,13 @@ async function evaluateConditionalChaining(req, res, hit, conditionalChaining) {
         try {
             payload = JSON.parse(payload);
         } catch (e) {
-            // response is not JSON
+            const message = `Parsing Lambda response payload returned from ${lambdaName} failed.`;
+
+            qnabot.log(message);
+            const error = {
+                message,
+            };
+            errors.push(error);
         }
         if (_.get(payload, 'req') && _.get(payload, 'res')) {
             next_q = _.get(payload, 'req.question');
@@ -75,13 +82,25 @@ async function evaluateConditionalChaining(req, res, hit, conditionalChaining) {
         qnabot.debug('Sandbox:', JSON.stringify(sandbox, null, 2));
         // safely evaluate conditionalChaining expression.. throws an exception if there is a syntax error
         const ast = esprimaParse(conditionalChaining).body[0].expression;
-        next_q = staticEval(ast, sandbox);
+        try {
+            next_q = staticEval(ast, sandbox);
+        } catch (e) {
+            const message = `Syntax Error evaluating conditional chaining rule: ${conditionalChaining}`
+            qnabot.log(message);
+
+            const error = {
+                message,
+            };
+            errors.push(error);
+        }
     }
     qnabot.log('Chained document rule evaluated to:', next_q);
-    req.question = next_q;
+
     let hit2;
-    let errors = [];
-    [req, res, hit2, errors] = await getHit(req, res);
+    if (next_q) {
+        req.question = next_q;
+        [req, res, hit2, errors] = await getHit(req, res);
+    }
     // if the question we are chaining to, also has conditional chaining, be sure to navigate set up
     // next user input to elicitResponse from this lex Bot.
     if (hit2) {
@@ -89,15 +108,15 @@ async function evaluateConditionalChaining(req, res, hit, conditionalChaining) {
         const responsebot_session_namespace = _.get(hit2, 'elicitResponse.response_sessionattr_namespace', undefined);
         const chaining_configuration = _.get(hit2, 'conditionalChaining', undefined);
         const elicitResponse = {};
+
+        elicitResponse.responsebot = undefined;
+        elicitResponse.namespace = undefined;
+        elicitResponse.chainingConfig = chaining_configuration;
+
         if (responsebot_hook && responsebot_session_namespace) {
             elicitResponse.responsebot = responsebot_hook;
             elicitResponse.namespace = responsebot_session_namespace;
-            elicitResponse.chainingConfig = chaining_configuration;
             _.set(res.session, `${res.session.elicitResponseNamespace}.boterror`, undefined);
-        } else {
-            elicitResponse.responsebot = undefined;
-            elicitResponse.namespace = undefined;
-            elicitResponse.chainingConfig = chaining_configuration;
         }
         _.set(res.session, 'qnabotcontext.elicitResponse', elicitResponse);
         const mergedhit = mergeNext(hit, hit2);

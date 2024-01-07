@@ -21,7 +21,7 @@ api_token = '' #variable to hold the value of API_Token stored in AWS Secrets Ma
 canvas = None   #variable to hold the Canvas object
 
 
-def handler(event, context):
+def handler(event, context):  # NOSONAR Lambda Handler
     """
     function handler
     Main handler function
@@ -54,7 +54,7 @@ def handler(event, context):
         try:
             # get slot value if present
             course_name_slot_input = event["req"]["_event"]["interpretations"][0]["intent"]["slots"][course_name_slot]["value"].get("originalValue", '')
-        except:
+        except: # NOSONAR the case is handled and no exception is needed
             course_name_slot_input = ''
 
         course_name_slot_resolved_input = event["req"]["slots"].get(course_name_slot, '')

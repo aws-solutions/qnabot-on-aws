@@ -20,8 +20,8 @@ const zlib = require('zlib')
 const Url = require('url')
 const sign = require('aws4').sign
 const fs = require('fs')
-const aws = require('aws-sdk')
-aws.config.region = config.region
+const { LexRuntimeServiceClient: LexRuntime, PostTextCommand } = require('@aws-sdk/client-lex-runtime-service');
+const region = config.region
 const outputs = require('../../../bin/exports')
 const exists = require('./util').exists
 const run = require('./util').run
@@ -31,8 +31,8 @@ module.exports = {
     setUp: function(cb) {
         const self = this
         outputs('dev/master').then(function(output) {
-                self.lex = new aws.LexRuntime({
-                    region: config.region,
+                self.lex = new LexRuntime({
+                    region,
                     params: {
                         botAlias: "$LATEST",
                         botName: output.BotName,
@@ -168,9 +168,9 @@ module.exports = {
                      "t": ""
                  }
              })
-             const response = await this.lex.postText({
+             const response = await this.lex.send(new PostTextCommand({
                  inputText: "Take the White House quiz."
-             }).promise();
+             }));
              console.log(response);
              const splitArray = response.message.split(/ (?=[A-Z]\.)/);
 

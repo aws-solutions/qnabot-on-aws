@@ -11,16 +11,24 @@
  *  and limitations under the License.                                                                                *
  *********************************************************************************************************************/
 const config = require('../../config.json');
-
 const path = require('path');
 const S3Plugin = require('webpack-s3-plugin');
-const ProgressBarPlugin = require('progress-bar-webpack-plugin');
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
+const ProgressBarPlugin = require('progress-bar-webpack-plugin');
 const _ = require('lodash');
-const aws = require('aws-sdk');
+const LodashModuleReplacementPlugin = require('lodash-webpack-plugin');
+const { fromEnv } = require('@aws-sdk/credential-providers');
+const { credentials } = fromEnv();
+let assetBucketName;
+if (process.env.ASSET_BUCKET_NAME === '') {
+    throw new Error('ASSET_BUCKET_NAME must be set. See README.md for instruction');
+} else {
+    assetBucketName = process.env.ASSET_BUCKET_NAME;
+}
 
-module.exports = require('../../bin/exports')('dev/master').then(function(result){
-    return {
+
+module.exports = {
+    mode: 'development',
     watch: true,
     watchOptions:{
         aggregateTimeout:500
@@ -29,34 +37,14 @@ module.exports = require('../../bin/exports')('dev/master').then(function(result
         new BundleAnalyzerPlugin(),
         new S3Plugin({
             s3Options: {
-                accessKeyId:aws.config.credentials.accesskeyId,
-                secretAccessKey:aws.config.credentials.secretAccessKey,
+                credentials,
                 region:config.region
             },
             s3UploadOptions:{
-                Bucket:result.Bucket
+                Bucket: assetBucketName,
+                ACL: 'private'
             }
         }),
         new ProgressBarPlugin(),
     ]),
-    resolve:{
-        alias:{
-            vue$:'vue/dist/vue.js',
-        }
-    },
-    module: {
-        rules: [
-          {
-            test: /\.vue$/,
-            loader: 'vue-loader',
-            options: {
-              loaders: {
-                'scss': 'vue-style-loader!css-loader!sass-loader',
-                'sass': 'vue-style-loader!css-loader!sass-loader?indentedSyntax'
-              }
-            }
-          }
-        ]
-    }
-    }
-})
+}

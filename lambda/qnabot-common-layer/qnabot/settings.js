@@ -12,8 +12,12 @@
  *********************************************************************************************************************/
 
 const _ = require('lodash');
-const AWS = require('aws-sdk');
+const { SSMClient, GetParameterCommand } = require('@aws-sdk/client-ssm');
+const customSdkConfig = require('./util/customSdkConfig');
 const qnabot = require('./logging');
+const region = process.env.AWS_REGION;
+
+const ssm = new SSMClient(customSdkConfig('C022', { region }));
 
 function str2bool(settings) {
     const new_settings = _.mapValues(settings, (x) => {
@@ -31,18 +35,38 @@ function str2bool(settings) {
     return new_settings;
 }
 
+function str2int(settings) {
+    const new_settings = _.mapValues(settings, (x) => {
+        if (_.isString(x)) {
+            // replace with number if string contains only numbers
+            const regex = /^-?[0-9]\d*(\.\d+)?$/;  // NOSONAR regex has to be precise, contains /d syntax class too
+            const isNumber = regex.test(x);
+
+            if (isNumber) {
+                const converted = Number(x, 10);
+                if (!Number.isNaN(converted)) {
+                    return converted;
+                }
+            }
+        }
+        return x;
+    });
+    return new_settings;
+}
+
 async function get_parameter(param_name) {
-    const ssm = new AWS.SSM();
     const params = {
         Name: param_name,
         WithDecryption: true,
     };
 
-    const response = await ssm.getParameter(params).promise();
+    const getParamCmd = new GetParameterCommand(params);
+    const response = await ssm.send(getParamCmd);
     let settings = response.Parameter.Value;
     try {
         settings = JSON.parse(response.Parameter.Value);
         settings = str2bool(settings);
+        settings = str2int(settings);
         return settings;
     } catch (e) {
         return settings;
