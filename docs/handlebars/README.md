@@ -60,6 +60,9 @@ QnABot also provides these additional helpers:
 |getSlot                 | Returns named slot value if it is defined, or default value. | {{getSlot '_slotName_' '_default_'}} |
 |randomPick              | Randomly return a string selected from a list. | {{randomPick<br>"Greetings."<br>"Hi there!"<br>"Howdy"<br>"Hello, how are you?"<br>"Whassup dude!"<br>}}|
 |signS3URL               | Converts S3 URL to a signed URL with 300 sec expiration. S3 bucket name must start with QNA or qna, or policy granting bucket read access must be added to ESProxyLambdaRole. | {{signS3URL 'https://qnabot-images.s3.amazonaws.com/testimage.png'}}|
+|`toUpperCase`           | Convert a string to UPPER CASE | `{{toUpperCase 'hello, world!'}}` |
+|`toLowerCase`           | Convert a string to lower case | `{{toLowerCase 'hello, world!'}}` |
+|`toTitleCase`           | Convert a string to Title Case | `{{toTitleCase 'hello, world!'}}` |
 
 ## Comments
 Use the handlebars comment syntax to make your handlebars easier to understand..
@@ -127,4 +130,3 @@ Here is a link to my S3 doc: [link]({{signS3URL 'https://qnabot-docs.s3.amazonaw
 
 
 ```
-

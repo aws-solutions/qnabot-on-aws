@@ -195,6 +195,32 @@ Handlebars.registerHelper('randomPick', function () {
     return item;
 });
 
+Handlebars.registerHelper('toLowerCase', function(str) {
+  if (str === null)
+    return false;
+
+  str = str.toString();
+  return str.toLowerCase();
+});
+
+Handlebars.registerHelper('toUpperCase', function(str) {
+  if (str === null)
+    return false;
+
+  str = str.toString();
+  return str.toUpperCase();
+});
+
+Handlebars.registerHelper('toTitleCase', function(str) {
+  if (str === null)
+    return false;
+
+  str = str.toString();
+  return str.toLowerCase().split(' ').map(function (word) {
+    return (word.charAt(0).toUpperCase() + word.slice(1));
+  }).join(' ');
+});
+
 async function replaceAsync(str, regex) {
     let m;
     let matches = [];
