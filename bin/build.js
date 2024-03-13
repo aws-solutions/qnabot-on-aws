@@ -61,6 +61,7 @@ async function create(options) {
         log(`finished building ${stack}`, !options.silent);
     } catch (error) {
         log(chalk.red(`${stack} failed:${error}`), !options.silent);
+        process.exit(1)
     }
 }
 
