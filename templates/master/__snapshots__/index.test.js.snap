@@ -741,8 +741,8 @@ exports[`renders master template correctly 1`] = `
     },
     "SagemakerInitialInstanceCount": {
       "Default": 1,
-      "Description": "Optional: If EmbeddingsApi is SAGEMAKER, provide initial instance count. Set to '0' to enable Serverless Inference (for cold-start delay tolerant deployments only).",
-      "MinValue": 0,
+      "Description": "Optional: If EmbeddingsApi is SAGEMAKER, provide initial instance count. Serverless Inference is not currently available for the built-in embedding model.",
+      "MinValue": 1,
       "Type": "Number",
     },
     "Username": {
@@ -2462,7 +2462,7 @@ exports[`renders master template correctly 1`] = `
             "Arn",
           ],
         },
-        "response_type": "token",
+        "response_type": "code",
       },
       "Type": "Custom::CognitoUrl",
     },

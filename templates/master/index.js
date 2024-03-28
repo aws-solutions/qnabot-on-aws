@@ -350,9 +350,9 @@ module.exports = {
         },
         SagemakerInitialInstanceCount: {
             Type: 'Number',
-            MinValue: 0,
+            MinValue: 1,
             Description:
-                'Optional: If EmbeddingsApi is SAGEMAKER, provide initial instance count. Set to \'0\' to enable Serverless Inference (for cold-start delay tolerant deployments only).',
+                'Optional: If EmbeddingsApi is SAGEMAKER, provide initial instance count. Serverless Inference is not currently available for the built-in embedding model.',
             Default: 1,
         },
         EmbeddingsLambdaArn: {

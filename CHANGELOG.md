@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [5.5.1] - 2024-03-29
+### Fixed
+- Document chaining was not working when using Lambda functions for chaining. This has been resolved. ([issue #687](https://github.com/aws-solutions/qnabot-on-aws/issues/687))
+- ESWarmer lambda was generating a big amount of log data in CloudWatch. This is now fixed. ([issue #692](https://github.com/aws-solutions/qnabot-on-aws/issues/692))
+
+### Updated
+- QnaBot Client to now use code grant instead of implicit grant for Cognito Authorization
+- Security patch for webpack-dev-middleware
+- Template to ensure an embedding instance size of 1 is at least choosen since serverless is no longer available for the embedding model
+
 ## [5.5.0] - 2024-01-04
 ### Added
 - Added Core-Language parameter to the QnABot deployment. This parameter allows the user to select during the deployment a core language which will be used by the OpenSearch language analyzers to look for question and answers. With this update, QnABot can now be deployed natively in 33 Languages with a more syntactical accuracy for matching questions and answers

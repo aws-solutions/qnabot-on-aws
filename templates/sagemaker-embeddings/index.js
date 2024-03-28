@@ -13,6 +13,10 @@
 
 const util = require('../util');
 
+// Sagemaker Serverless Inference doesn't currently support the current embedding model
+// so although this nested template supports serverless provisioning, the main template enforces
+// only provisioned endpoints by disallowing a value of '0' for SagemakerInitialInstanceCount
+
 module.exports = {
     AWSTemplateFormatVersion: '2010-09-09',
     Description: `(SO0189n-sagemaker) QnABot nested sagemaker embeddings resources - Version v${process.env.npm_package_version}`,
