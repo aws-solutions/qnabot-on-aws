@@ -1,6 +1,6 @@
 id: SO0189
 name: qnabot-on-aws
-version: v5.5.0
+version: v5.5.1
 cloudformation_templates:
   - template: qnabot-on-aws-main.template
     main_template: true

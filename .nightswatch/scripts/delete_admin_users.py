@@ -12,6 +12,10 @@
 ######################################################################################################################
 
 import boto3
+import os
+
+profile_name = os.environ.get('TEST_ACCOUNT_PROFILE_NAMES')
+boto3.setup_default_session(profile_name=profile_name)
 
 cloudformation_client = boto3.client('cloudformation', region_name=region)
 cognito_idp_client = boto3.client('cognito-idp', region_name=region)

@@ -171,6 +171,12 @@ If you'd like to see to start and end time for each test:
 export TIMESTAMPS='true'
 ```
 
+If you want to use a specific AWS profile for the test. If not set, the regression test will use the current AWS session that it's running in.
+
+```bash
+export TEST_ACCOUNT_PROFILE_NAMES=<AWS profile name>
+```
+
 5. The LLM and Kendra tests will only run if the deployed bot has these features enabled. Follow the steps in the Implementation Guide to enable these features to test them:
  - LLM
    - Set LLMApi to SAGEMAKER. For more information, please [Enabling LLM support](https://docs.aws.amazon.com/solutions/latest/qnabot-on-aws/enabling-llm-support.html). If stack update fails, check your quota for __ml.g5.12xlarge for endpoint__ usage as mentioned in the note of this article.
@@ -299,6 +305,7 @@ As QnABot evolves over the years, it makes use of various services and functiona
 _Note: **Deployable solution versions** refers to the ability to deploy the version of QnABot in their AWS accounts. **Actively supported versions** for QnABot is only available for the latest version of QnABot._
 
 ### Deployable Versions
+- [v5.5.1](https://github.com/aws-solutions/qnabot-on-aws/releases/tag/v5.5.1) - [Public](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v5.5.1/qnabot-on-aws-main.template)/[VPC](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v5.5.1/qnabot-on-aws-vpc.template)
 - [v5.5.0](https://github.com/aws-solutions/qnabot-on-aws/releases/tag/v5.5.0) - [Public](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v5.5.0/qnabot-on-aws-main.template)/[VPC](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v5.5.0/qnabot-on-aws-vpc.template)
   - _Vue has been upgraded from Vue 2 to 3. We highly recommend to use or upgrade to this version due to Vue 2 reaching End of Life (EOL), which affects all previous versions of QnABot. For more information, see [below](#upcomingrecent-deprecations)._
 - [v5.4.5](https://github.com/aws-solutions/qnabot-on-aws/releases/tag/v5.4.5) - [Public](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v5.4.5/qnabot-on-aws-main.template)/[VPC](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v5.4.5/qnabot-on-aws-vpc.template)

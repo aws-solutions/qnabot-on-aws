@@ -1,6 +1,6 @@
 {
     "name": "proxy-es",
-    "version": "5.5.0",
+    "version": "5.5.1",
     "description": "QnABot Lambda managing querying of data store",
     "main": "index.js",
     "scripts": {
@@ -26,7 +26,7 @@
         "@dqbd/tiktoken": "^1.0.7",
         "@smithy/util-retry": "^2.0.2",
         "aws4": "^1.6.0",
-        "axios": "^1.6.2",
+        "axios": "^1.6.5",
         "bodybuilder": "^2.5.1",
         "handlebars": "^4.7.2",
         "langchain": "^0.0.209",

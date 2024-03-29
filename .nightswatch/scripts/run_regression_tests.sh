@@ -25,16 +25,21 @@ cd ${NIGHTSWATCH_TEST_DIR}/functional/
 
 aws configure list
 
-### Issue: Test are taking too long to run sequentially and tests fail when run in parallel when Selenium operating within the same browser instance.
-### Action: So running functional test in one random regions 
-REGIONS=($(${NIGHTSWATCH_TEST_DIR}/scripts/utils/listregions.py yaml-filename=taskcat.yml | tr -d "[],'"))
-NUMBER_OF_REGIONS=${#REGIONS[@]}
-RANDOM_NUM=$(( $RANDOM % $NUMBER_OF_REGIONS ))
-echo "Regression test selected for region: ${REGIONS[RANDOM_NUM]}"
+if [ -z "$CURRENT_STACK_REGION" ]; then
+    ### Issue: Test are taking too long to run sequentially and tests fail when run in parallel when Selenium operating within the same browser instance.
+    ### Action: So running functional test in one random regions 
+    chmod +x ${NIGHTSWATCH_TEST_DIR}/scripts/utils/listregions.py
+    REGIONS=($(${NIGHTSWATCH_TEST_DIR}/scripts/utils/listregions.py yaml-filename=taskcat.yml | tr -d "[],'"))
+    NUMBER_OF_REGIONS=${#REGIONS[@]}
+    RANDOM_NUM=$(( $RANDOM % $NUMBER_OF_REGIONS ))
+    CURRENT_STACK_REGION=${REGIONS[RANDOM_NUM]}
+fi
+
+echo "Regression test selected for region: ${CURRENT_STACK_REGION}"
 
 function runRegressionTest {
     export STACK_FILE_NAME=$1
-    regex="(.*)-(${REGIONS[RANDOM_NUM]})-cfnlogs.txt"
+    regex="(.*)-(${CURRENT_STACK_REGION})-cfnlogs.txt"
     if [[ $STACK_FILE_NAME =~ $regex ]];
         then
             export CURRENT_STACK_NAME=${BASH_REMATCH[1]};

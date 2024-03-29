@@ -1,6 +1,6 @@
 {
     "name": "qnabot-on-aws",
-    "version": "5.5.0",
+    "version": "5.5.1",
     "engines": {
         "node": ">=18.0.0",
         "npm": ">=7.8.0"
@@ -97,7 +97,7 @@
         "aws-lex-web-ui": "git+https://github.com/aws-samples/aws-lex-web-ui.git#feature/vue3",
         "aws-sdk": "^2.1354.0",
         "aws4": "^1.7.0",
-        "axios": "^1.6.2",
+        "axios": "^1.6.5",
         "body-parser": "^1.18.3",
         "bowser": "^1.9.3",
         "cfn-response": "^1.0.1",
@@ -204,7 +204,7 @@
         "webpack": "^5.88.2",
         "webpack-bundle-analyzer": "^4.9.1",
         "webpack-cli": "^5.1.4",
-        "webpack-dev-server": "^4.15.1",
+        "webpack-dev-server": "^4.15.2",
         "webpack-merge": "^5.10.0",
         "webpack-s3-plugin": "^1.2.0-rc.0",
         "zip-webpack-plugin": "^4.0.1"
