@@ -251,7 +251,7 @@ async function get_qa_lambda(req, promptTemplateStr, context) {
     // Extract sessionId and sessionAttributes from the request
     const sessionId = req._event.sessionId;
     const sessionAttributes = req._event.sessionState.sessionAttributes;
-    return invoke_lambda(prompt, model_params, settings);
+    return invoke_lambda(prompt, model_params, settings, sessionId, sessionAttributes);
 }
 
 function clean_standalone_query(query) {
