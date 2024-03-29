@@ -12,8 +12,6 @@
 #  and limitations under the License.                                                                                #
 ######################################################################################################################
 
-set -e -x
-
 python3 ${NIGHTSWATCH_TEST_DIR}/scripts/delete_s3_bucket.py
 sleep 20
 
