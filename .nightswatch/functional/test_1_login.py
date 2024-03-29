@@ -53,10 +53,12 @@ class TestLogin:
 
         assert title == 'Signin'
 
-    def test_client_login(self, client_login):
+    def test_client_login(self, client_login, dom_operator: DomOperator):
         """
         Test login to client
         """
         title = client_login
+        url = dom_operator.get_current_url()
         assert title == 'QnABot Client'
+        assert 'code' in url
 

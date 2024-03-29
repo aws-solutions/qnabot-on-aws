@@ -35,7 +35,7 @@ module.exports = class CognitoLogin extends require('./base') {
                 ExplicitAuthFlows: ['ADMIN_NO_SRP_AUTH'],
                 RefreshTokenValidity: 1,
                 SupportedIdentityProviders: ['COGNITO'],
-                AllowedOAuthFlows: ['code', 'implicit'],
+                AllowedOAuthFlows: ['code'],
                 AllowedOAuthScopes: ['phone', 'email', 'openid', 'profile'],
                 AllowedOAuthFlowsUserPoolClient: true,
             }

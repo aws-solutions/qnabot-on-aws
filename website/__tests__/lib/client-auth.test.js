@@ -10,54 +10,199 @@
  *  OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions    *
  *  and limitations under the License.                                                                                *
  ******************************************************************************************************************** */
-import clientAuthModule from '../../js/lib/client-auth';
-
+const axios = require('axios');
+const aws = require('aws-sdk');
 const jwt = require('jsonwebtoken');
+const queryString = require('query-string');
+const clientAuth = require('../../js/lib/client-auth');
 
-jest.mock('aws-sdk', () => ({
-    config: {
-        region: '',
-    },
-    CognitoIdentityCredentials: class {},
-}));
+jest.mock('axios');
+jest.mock('aws-sdk');
+jest.mock('jsonwebtoken');
+jest.mock('query-string');
 
-jest.mock('axios', () => ({
-    head: jest.fn().mockReturnValue(Promise.resolve({
-        headers: {
-            'api-stage': 'dev',
-        },
-    })),
-    get: jest.fn().mockReturnValue(Promise.resolve({
-        data: {
-            region: 'us-weast-1',
-            UserPool: 'test-user-pool',
-            PoolId: 'test-pool-id',
-        },
-    })),
-}));
+describe('clientAuth', () => {
+  let windowMock;
 
-jest.mock('jsonwebtoken', () => ({
-    decode: jest.fn().mockReturnValue({
-        'cognito:username': 'test-username',
-    }),
-}));
-
-jest.mock('query-string', () => ({
-    parse: jest.fn().mockReturnValue({ id_token: 'test-token' }),
-}));
-
-describe('js lib client-auth module', () => {
-    const windowSpy = jest.spyOn(window, 'window', 'get');
-    windowSpy.mockReturnValue({
-        location: {
-            href: '',
-            hash: 'test-hash',
-        },
+  beforeEach(() => {
+    jest.clearAllMocks();
+    windowMock = {
+      alert: jest.fn(),
+      confirm: jest.fn(),
+      sessionStorage: {
+        getItem: jest.fn(),
+        setItem: jest.fn(),
+        clear: jest.fn(),
+      },
+      location: {
+        href: 'http://localhost/',
+        origin: 'http://localhost',
+        pathname: '/',
+        search: '?code=123456',
+      },
+    };
+    global.window = windowMock;
+    queryString.parse.mockReturnValue({ code: '123456' });
+    queryString.stringify.mockImplementation((obj) => {
+      const params = new URLSearchParams();
+      for (const [key, value] of Object.entries(obj)) {
+        params.append(key, value);
+      }
+      return params.toString();
     });
+  });
 
-    test('client auths', async () => {
-        await clientAuthModule().catch(() => {});
-        expect(jwt.decode).toHaveBeenCalledTimes(1);
-        expect(jwt.decode).toHaveBeenCalledWith('test-token');
+  afterEach(() => {
+    global.window = global.window;
+  });
+
+  it('should fetch tokens and credentials when code is present', async () => {
+    const mockHeadResponse = { headers: { 'api-stage': 'test' } };
+    const mockGetResponse = {
+      data: {
+        region: 'us-east-1',
+        UserPool: 'pool-id',
+        PoolId: 'pool-id',
+        ClientIdClient: 'client-id',
+        _links: {
+          CognitoEndpoint: { href: 'https://cognito-endpoint.com' },
+          ClientLogin: { href: 'https://login.com' },
+        },
+      },
+    };
+    const mockTokenResponse = {
+      data: {
+        id_token: 'id-token',
+        refresh_token: 'refresh-token',
+      },
+    };
+    
+    const testToken = {
+      'cognito:username': 'test-user',
+      'cognito:groups': 'testgroup',
+  };
+
+    axios.head.mockResolvedValue(mockHeadResponse);
+    axios.get.mockResolvedValue(mockGetResponse);
+    axios.mockResolvedValue(mockTokenResponse);
+
+    jwt.decode.mockReturnValue(testToken);
+   
+  
+    const result = await clientAuth().catch(() => {});
+
+    result.username = testToken['cognito:username'];
+    expect(axios.head).toHaveBeenCalledWith('http://localhost/');
+    expect(axios.get).toHaveBeenCalledWith('/test');
+    expect(axios).toHaveBeenCalledWith(
+      {"data": "grant_type=authorization_code&client_id=client-id&code=123456&redirect_uri=http%3A%2F%2Flocalhost%2F", "headers": {"Content-Type": "application/x-www-form-urlencoded"}, "method": "POST", "url": "https://cognito-endpoint.com/oauth2/token"}
+    );
+  
+    expect(jwt.decode).toHaveBeenCalledWith('id-token');
+    expect(result).toEqual({
+      config: {
+        region: 'us-east-1',
+        credentials: expect.any(Object),
+      },
+      lex: expect.any(Object),
+      polly: expect.any(Object),
+      username: 'test-user',
+      Login: 'https://login.com',
+      idtoken: 'id-token',
     });
-});
+  });
+
+  it('should refresh tokens when refresh token is present', async () => {
+    const mockHeadResponse = { headers: { 'api-stage': 'test' } };
+    const mockGetResponse = {
+      data: {
+        region: 'us-east-1',
+        UserPool: 'pool-id',
+        PoolId: 'pool-id',
+        ClientIdClient: 'client-id',
+        _links: {
+          CognitoEndpoint: { href: 'https://cognito-endpoint.com' },
+          ClientLogin: { href: 'https://login.com' },
+        },
+      },
+    };
+    const mockTokenResponse = {
+      data: {
+        id_token: 'new-id-token',
+      },
+    };
+
+    windowMock.sessionStorage.getItem.mockReturnValue('refresh-token');
+    queryString.parse.mockReturnValue({ code: '123456' });
+
+
+    axios.head.mockResolvedValue(mockHeadResponse);
+    axios.get.mockResolvedValue(mockGetResponse);
+    axios.mockResolvedValue(mockTokenResponse);
+    const result = await clientAuth().catch(() => {});
+
+    expect(axios.head).toHaveBeenCalledWith('http://localhost/');
+    expect(axios.get).toHaveBeenCalledWith('/test');
+    expect(axios).toHaveBeenCalledWith(
+      {"data": "grant_type=refresh_token&client_id=client-id&refresh_token=refresh-token", "headers": {"Content-Type": "application/x-www-form-urlencoded"}, "method": "POST", "url": "https://cognito-endpoint.com/oauth2/token"}
+    );
+    const testToken = {
+      'cognito:username': 'test-user',
+      'cognito:groups': 'testgroup',
+    };
+
+    result.username = testToken['cognito:username'];
+    expect(result).toEqual({
+      config: {
+        region: 'us-east-1',
+        credentials: expect.any(Object),
+      },
+      lex: expect.any(Object),
+      polly: expect.any(Object),
+      username: 'test-user',
+      Login: 'https://login.com',
+      idtoken: 'new-id-token',
+    });
+  });
+
+  it('should use Cognito identity credentials when no code is present', async () => {
+    windowMock.location.href = 'http://localhost/';
+    windowMock.location.search = '';
+    queryString.parse.mockReturnValue({});
+
+    const mockHeadResponse = { headers: { 'api-stage': 'test' } };
+    const mockGetResponse = {
+      data: {
+        region: 'us-east-1',
+        UserPool: 'pool-id',
+        PoolId: 'pool-id',
+        ClientIdClient: 'client-id',
+        _links: {
+          CognitoEndpoint: { href: 'https://cognito-endpoint.com' },
+          ClientLogin: { href: 'https://login.com' },
+        },
+      },
+    };
+
+    axios.head.mockResolvedValue(mockHeadResponse);
+    axios.get.mockResolvedValue(mockGetResponse);
+
+    const result = await clientAuth().catch(() => {});
+
+    expect(axios.head).toHaveBeenCalledWith('http://localhost/');
+    expect(axios.get).toHaveBeenCalledWith('/test');
+    expect(axios.post).not.toHaveBeenCalled();
+    expect(windowMock.sessionStorage.getItem).not.toHaveBeenCalled();
+    expect(result).toEqual({
+      config: {
+        region: 'us-east-1',
+        credentials: expect.any(Object),
+      },
+      lex: expect.any(Object),
+      polly: expect.any(Object),
+      username: undefined,
+      Login: 'https://login.com',
+      idtoken: undefined,
+    });
+  });
+}); 

@@ -14,6 +14,7 @@
 from typing import Optional
 import boto3
 import re
+import os
 
 class ParameterFetcher:
     """
@@ -34,6 +35,9 @@ class ParameterFetcher:
         """
         self.region = region
         self.stack_name = stack_name
+        profile_name = os.environ.get('TEST_ACCOUNT_PROFILE_NAMES')
+        if profile_name is not None and profile_name != '':
+            boto3.setup_default_session(profile_name=profile_name)
         self.cloudformation_client = boto3.client('cloudformation', region_name=region)
 
     def get_user_pool_id(self) -> Optional[str]:

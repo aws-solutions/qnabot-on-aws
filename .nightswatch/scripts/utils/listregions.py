@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 ######################################################################################################################
 #  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.                                                #
 #                                                                                                                    #
@@ -10,7 +11,6 @@
 #  OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions    #
 #  and limitations under the License.                                                                                #
 ######################################################################################################################
-#!/usr/bin/env python3
 
 import os
 import yaml
