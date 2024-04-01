@@ -15,11 +15,15 @@
 
 # Deletes S3 buckets created by stack deployment
 
+import boto3
 import logging
+import os
 import time
 
-import boto3
 from botocore.exceptions import ClientError
+
+profile_name = os.environ.get('TEST_ACCOUNT_PROFILE_NAMES')
+boto3.setup_default_session(profile_name=profile_name)
 
 s3 = boto3.resource("s3")
 

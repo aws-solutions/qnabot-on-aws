@@ -87,7 +87,7 @@ const main = async function () {
         time1.t1 = d1.getTime();
         time1.t2 = d2.getTime();
         time1.duration = d2.getTime() - d1.getTime();
-        qnabot.log(`${JSON.stringify(time1)}`);
+        qnabot.debug(`${JSON.stringify(time1)}`);
         const e1 = new Date();
         res = await execute(url, region, method, input);
         const e2 = new Date();
@@ -96,7 +96,7 @@ const main = async function () {
         time2.t1 = e1.getTime();
         time2.t2 = e2.getTime();
         time2.duration = e2.getTime() - e1.getTime();
-        qnabot.log(`${JSON.stringify(time2)}`);
+        qnabot.debug(`${JSON.stringify(time2)}`);
     }
     return res;
 };
@@ -104,16 +104,15 @@ const main = async function () {
 module.exports = class warmer {
     async perform(event, context, callback) {
         const count = process.env.REPEAT_COUNT ? parseInt(process.env.REPEAT_COUNT) : 4;
-        qnabot.log(`Incoming payload: ${JSON.stringify(event, null, 2)}`);
+        qnabot.log(`ESWarmer Incoming payload: ${JSON.stringify(event, null, 2)}`);
         try {
             for (let i = 0; i < count; i++) {
-                qnabot.log(`main ${i}`);
-                const res = await main();
-                qnabot.log(res);
+                await main();
             }
+            qnabot.log('ESWarmer lambda executed sucessfully')
             return ('success');
         } catch (e) {
-            qnabot.log(`Error detected ${e}`);
+            qnabot.log('An error was detected in ESWarmer lambda: ', e);
             return ('failure');
         }
     }

@@ -18,8 +18,6 @@ With this release, QnaBot can now use
 QnABot provisions a Sagemaker endpoint running the Hugging Face el5-large model - see https://huggingface.co/intfloat/e5-large. 
   
 By default a 1-node ml.m5.xlarge endpoint is automatically provisioned. For large volume deployments, add additional nodes by setting the parameter `SagemakerInitialInstanceCount`. Please check [SageMaker pricing documentation](https://aws.amazon.com/sagemaker/pricing/) for relevant costs and information on Free Tier eligibility. 
-  
-By setting the parameter `SagemakerInitialInstanceCount` to `0`, a [Serverless Sagemaker endpoint](https://docs.aws.amazon.com/sagemaker/latest/dg/serverless-endpoints.html) is enabled. A serverless endpoint can save you money by scaling down to zero when not in use, however, there is a 'cold start' time of approximately 2 minutes during which QnABot requests, imports, or add/modify items operations will time out or be delayed. QnABot creates the endpoint with default 4GB model memory, and max concurrency of 50 requests.  
 
 
 ### Deploy Stack for SageMaker Embeddings
