@@ -23,7 +23,7 @@ from helpers.website_model.chat_page import ChatPage
 QUESTION_FILEPATH = './question_bank/llm_questions.json'
 
 region = os.environ.get('CURRENT_STACK_REGION')
-g5_instance_regions = ['us-east-1', 'us-west-2', 'ap-northeast-2', 'ap-northeast-1', 'ap-southeast-2', 'ca-central-1', 'eu-central-1', 'eu-west-1', 'eu-west-2']
+g5_instance_regions = ['us-east-1', 'us-west-2', 'ap-northeast-1', 'ca-central-1', 'eu-central-1', 'eu-west-1']
 unsupported_region_reason = 'Region Not Supported'
 
 @pytest.mark.skipif(region not in g5_instance_regions, reason=unsupported_region_reason)

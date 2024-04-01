@@ -51,6 +51,6 @@ async function invokeLambda(lambdaRef, req, res) {
         // response is not JSON - noop
     }
     qnabot.log('Lambda returned payload: ', payload);
-    return [req, res];
+    return [req, res, payload];
 }
 exports.invokeLambda = invokeLambda;

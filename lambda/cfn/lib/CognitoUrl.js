@@ -27,7 +27,7 @@ module.exports = class CognitoUrl extends require('./base') {
         reply(null, params.Domain, {
             Domain,
             loginUrl,
-            logoutUrl: `${Domain}/logout?redirect_uri=${encodeURIComponent(loginUrl)}&response_type=token&client_id=${params.ClientId}`,
+            logoutUrl: `${Domain}/logout?redirect_uri=${encodeURIComponent(loginUrl)}&response_type=${params.response_type}&client_id=${params.ClientId}`,
         });
     }
 };
