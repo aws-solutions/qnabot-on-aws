@@ -99,6 +99,11 @@ async function evaluateConditionalChaining(req, res, hit, conditionalChaining) {
     let hit2;
     if (next_q) {
         req.question = next_q;
+        if (next_q.toLowerCase().startsWith('qid::')) {
+            _.set(req,'qid', next_q.substr(5));
+        } else {
+            _.set(req,'qid', undefined);
+        }
         [req, res, hit2, errors] = await getHit(req, res);
     }
     // if the question we are chaining to, also has conditional chaining, be sure to navigate set up
