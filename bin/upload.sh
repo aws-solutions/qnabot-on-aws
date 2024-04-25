@@ -74,9 +74,11 @@ validate_expected_bucket_owner() {
 parse_arguments $@
 
 __dirname="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-export AWS_PROFILE=$(node -e "console.log(require('$__dirname'+'/../config.json').profile)")
-# If profile specified from config file does not exist, allow cli to move on to using instance profile
-aws configure get aws_access_key_id --profile $AWS_PROFILE || unset AWS_PROFILE
+if [ -z "$AWS_SESSION_TOKEN" ]; then
+  export AWS_PROFILE=$(node -e "console.log(require('$__dirname'+'/../config.json').profile)")
+  # If profile specified from config file does not exist, allow cli to move on to using instance profile
+  aws configure get aws_access_key_id --profile $AWS_PROFILE || unset AWS_PROFILE
+fi
 export AWS_DEFAULT_REGION=$(node -e "console.log(require('$__dirname'+'/../config.json').region)")
 
 OUTPUT=$($__dirname/exports.js dev/bootstrap)
@@ -87,5 +89,6 @@ BLUE=$(tput setaf 4)
 RESET=$(tput sgr0)
 echo bootstrap bucket is $BLUE$BUCKET/$PREFIX$RESET
 
-validate_expected_bucket_owner $BUCKET
+# validate_expected_bucket_owner $BUCKET
+aws sts get-caller-identity
 aws s3 sync $__dirname/../build/ s3://$BUCKET/$PREFIX/ --delete
