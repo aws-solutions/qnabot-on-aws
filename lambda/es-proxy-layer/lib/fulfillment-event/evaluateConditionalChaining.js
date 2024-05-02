@@ -96,11 +96,17 @@ async function evaluateConditionalChaining(req, res, hit, conditionalChaining) {
     }
     qnabot.log('Chained document rule evaluated to:', next_q);
 
+    // Remove qid if set by slots - this would override the chained item
+    if(req.hasOwnProperty('qid')) {
+        delete req['qid'];
+    }
+
     let hit2;
     if (next_q) {
         req.question = next_q;
         [req, res, hit2, errors] = await getHit(req, res);
     }
+
     // if the question we are chaining to, also has conditional chaining, be sure to navigate set up
     // next user input to elicitResponse from this lex Bot.
     if (hit2) {
