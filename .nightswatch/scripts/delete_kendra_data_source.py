@@ -12,6 +12,10 @@
 ######################################################################################################################
 
 import boto3
+import os
+
+profile_name = os.environ.get('TEST_ACCOUNT_PROFILE_NAMES')
+boto3.setup_default_session(profile_name=profile_name)
 
 kendra_regions = ['us-east-1', 'us-west-2', 'ap-southeast-1', 'ap-southeast-2', 'ca-central-1', 'eu-west-1']
 

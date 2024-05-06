@@ -64,7 +64,7 @@ module.exports = {
             ClientId: { Ref: 'ClientClient' },
             Domain: { Ref: 'CognitoDomain' },
             LoginRedirectUrl: { 'Fn::GetAtt': ['Urls', 'Client'] },
-            response_type: 'token',
+            response_type: 'code',
         },
     },
     User: {

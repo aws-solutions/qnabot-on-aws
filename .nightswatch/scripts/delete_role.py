@@ -12,8 +12,11 @@
 ######################################################################################################################
 
 import boto3
+import os
 import sys
 
+profile_name = os.environ.get('TEST_ACCOUNT_PROFILE_NAMES')
+boto3.setup_default_session(profile_name=profile_name)
 client = boto3.client('iam')
 
 def delete_role():

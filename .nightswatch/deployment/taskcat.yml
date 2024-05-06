@@ -91,9 +91,6 @@ tests:
       FulfillmentConcurrency: '0'
       EmbeddingsApi: SAGEMAKER
       SagemakerInitialInstanceCount: 1
-      LLMSagemakerInitialInstanceCount: 1
-      LLMApi: SAGEMAKER
-      LLMSagemakerInstanceType: ml.g5.12xlarge
     regions:
       - ap-southeast-2
   qnabot-t5:
@@ -188,9 +185,6 @@ tests:
       FulfillmentConcurrency: '0'
       EmbeddingsApi: SAGEMAKER
       SagemakerInitialInstanceCount: 1
-      LLMSagemakerInitialInstanceCount: 1
-      LLMApi: SAGEMAKER
-      LLMSagemakerInstanceType: ml.g5.12xlarge
     regions:
       - eu-west-2
   qnabot-t10:
@@ -208,9 +202,6 @@ tests:
       FulfillmentConcurrency: '0'
       EmbeddingsApi: SAGEMAKER
       SagemakerInitialInstanceCount: 1
-      LLMSagemakerInitialInstanceCount: 1
-      LLMApi: SAGEMAKER
-      LLMSagemakerInstanceType: ml.g5.12xlarge
     regions:
       - ap-northeast-2
 ##ca-central-1 only supports Lexv2 not Lexv1
