@@ -59,7 +59,7 @@ describe('when calling clean function', () => {
             version: 'testVersion'
         }
         await clean(config);
-        expect(clean.status).toBe(undefined);
+        expect(config.status).toBe('Completed');
         expect(s3Mock).toHaveReceivedCommandTimes(DeleteObjectsCommand, 0);
 	});
 });
