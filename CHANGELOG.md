@@ -5,6 +5,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [5.5.2] - 2024-05-08
+### Fixed
+- Fixed an issue with the testall functionality which may introduce a high number of versions stored in the testall S3 bucket when the Content designer has no Q&As.
+
 ## [5.5.1] - 2024-04-01
 ### Fixed
 - Document chaining was not working when using Lambda functions for chaining. This has been resolved. ([issue #687](https://github.com/aws-solutions/qnabot-on-aws/issues/687))
