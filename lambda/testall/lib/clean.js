@@ -31,10 +31,10 @@ module.exports = async function (config) {
                     Quiet: true,
                 },
             }));
-            config.status = 'Completed';
         } catch (error) {
             console.error('An error occurred while clean task : ', error);
             throw error;
         }
     }
+    config.status = 'Completed';
 };
