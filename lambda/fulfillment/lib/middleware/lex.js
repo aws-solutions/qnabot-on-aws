@@ -426,8 +426,9 @@ function getV2ElicitTemplate(request, response) {
             dialogAction: { type: 'ElicitIntent' },
             intent: {
                 name: 'QnaIntent',
+                state: 'InProgress',
+                slots: _.mapValues(_.get(response, 'slots'), (value) => ((value) ? { value: { interpretedValue: value } } : null)),
             },
-            state: 'InProgress',
         },
         messages: [
             {
@@ -449,9 +450,9 @@ function getV2DialogCodeHookResponseTemplate(request, response) {
             },
             intent: {
                 name: response.intentname,
+                state: (nextSlot) ? 'InProgress' : 'ReadyForFulfillment',
                 slots: _.mapValues(_.get(response, 'slots'), (value) => ((value) ? { value: { interpretedValue: value } } : null)),
             },
-            state: (nextSlot) ? 'InProgress' : 'ReadyForFulfillment',
         },
     };
 }

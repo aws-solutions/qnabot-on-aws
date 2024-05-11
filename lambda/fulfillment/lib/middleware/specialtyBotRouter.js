@@ -30,6 +30,23 @@ const helper = require('../../../../../../../../../../opt/lib/supportedLanguages
 const DEFAULT_SPECIALTY_BOT_RECEIVING_NAMESPACE = 'specialtyBotSessionAttributes';
 
 /**
+ * Extract content between <speak> tags and returns string
+ * @param ssml
+ * @returns {string}
+ */
+function extractSSMLContent(ssml) {
+    let ssmlContent = '';
+    if (ssml) {
+        const ssmlRegex = /<speak>(.*?)<\/speak>/s;
+        const ssmlMatch = ssml.match(ssmlRegex);
+        if (ssmlMatch && ssmlMatch.length > 1) {
+            ssmlContent = ssmlMatch[1];
+        }
+    }
+    return ssmlContent;
+}
+
+/**
  * Identifies the user to pass on for requests to Lex or other bots
  * @param req
  * @returns {string}
@@ -421,9 +438,16 @@ function processBotRespMessage(botResp, req, res, _preferredResponseType) {
     let ssmlMessage;
     if (botResp.sessionAttributes?.appContext) {
         const appContext = (isString(botResp.sessionAttributes.appContext) ? JSON.parse(botResp.sessionAttributes.appContext) : botResp.sessionAttributes.appContext);
-        // if alt.messages contains SSML tags setup to return ssmlMessage
         if ( (appContext && _.has(appContext,'altMessages.markdown')) && (originalAppContext && _.has(originalAppContext,'altMessages.markdown')) ) {
             appContext.altMessages.markdown = originalAppContext.altMessages.markdown + " " + appContext.altMessages.markdown;
+        }
+        if ((appContext && _.has(appContext,'altMessages.ssml')) ) {
+            ssmlMessage = appContext.altMessages.ssml;
+        }
+        if ( (appContext && _.has(appContext,'altMessages.ssml')) && (originalAppContext && _.has(originalAppContext,'altMessages.ssml')) ) {
+            ssmlMessage = "<speak>" + extractSSMLContent(originalAppContext.altMessages.ssml) + " " + extractSSMLContent(appContext.altMessages.ssml) + "</speak>";
+            // need to concatenate the ssml tags within the <speak> tags if supplied
+            appContext.altMessages.ssml = ssmlMessage;
         }
         _.set(res.session, 'appContext.altMessages', appContext.altMessages);
     }
@@ -505,7 +529,7 @@ async function processResponse(req, res, hook, alias) {
         ({ res, lexBotIsFulfilled } = processBotRespMessage(botResp, req, res, _preferredResponseType));
         if (botResp.sessionAttributes.QNABOT_END_ROUTING || lexBotIsFulfilled) {
             qnabot.log('specialtyBot requested exit');
-            const resp = endUseOfSpecialtyBot(req, res, undefined);
+            const resp = endUseOfSpecialtyBot(req, res, welcomeBackMessage);
             resp.res = await translate_res(resp.req, resp.res);
             return resp;
         }
