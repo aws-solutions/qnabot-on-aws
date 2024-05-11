@@ -308,7 +308,10 @@ async function handleSsml(ssml, hit_out, context) {
     try {
         const text = await handleSignS3(ssml);
         const ssml_template = Handlebars.compile(text);
-        hit_out.alt.ssml = ssml_template(context);
+        // Make sure any \n newlines in the template response are removed as Lex will not handle producing a valid
+        // audio response if embedded newlines creep into the output from the template. The ssml_template may be
+        // organized with new lines to allow easier editing and understanding in the Designer UI.
+        hit_out.alt.ssml = ssml_template(context).replaceAll("\n","");
         if (autotranslate) {
             _.set(hit_out, 'autotranslate.alt.ssml', true);
         }
