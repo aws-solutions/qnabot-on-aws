@@ -266,10 +266,15 @@ async function handleRequest(req, res, botName, botAlias) {
         };
         const lexv2response = await lexV2ClientRequester(params);
 
-        res.intentName = lexv2response.sessionState.intent.name;
+        // Note that an intent and hence intent name might not be provided in the Lex V2 response.
+        // Ask the Lex team why this is. Never got a good answer but in some cases this is true. The next
+        // line checks for this case. If an intent is not provided, then res.intentName bust be undefined.
+        res.intentName = lexv2response.sessionState.intent ? lexv2response.sessionState.intent.name : undefined;
+
         res.sessionAttributes = lexv2response.sessionState.sessionAttributes;
-        res.dialogState = lexv2response.sessionState.intent.state;
-        res.slotToElicit = lexv2response.sessionState.dialogAction.slotToElicit;
+        res.dialogState = lexv2response.sessionState.dialogAction.type ? lexv2response.sessionState.dialogAction.type : undefined;
+        res.slotToElicit = lexv2response.sessionState.dialogAction.slotToElicit ? lexv2response.sessionState.dialogAction.slotToElicit : undefined;
+
         let finalMessage = '';
         if (lexv2response.messages?.length > 0) {
             lexv2response.messages.forEach((mes) => {
@@ -306,12 +311,14 @@ async function handleRequest(req, res, botName, botAlias) {
 }
 
 function getDialogState(lexv2response) {
-    // lex v2 FallbackIntent match means it failed to fill desired slot(s).
-    if (lexv2response.sessionState.intent.name === 'FallbackIntent'
-        || lexv2response.sessionState.intent.state === 'Failed') {
+    // lex v2 FallbackIntent match means it failed to fill desired slot(s). Need to check to see if intent
+    // exists again.
+    if ( lexv2response.sessionState.intent && ( lexv2response.sessionState.intent.name === "FallbackIntent" ||
+        lexv2response.sessionState.intent.state === "Failed")) {
         return 'Failed';
-    }
+    } else {
     return lexv2response.sessionState.dialogAction.type;
+}
 }
 
 /**
@@ -330,8 +337,8 @@ function endUseOfSpecialtyBot(req, res, welcomeBackMessage) {
     delete res.session.qnabotcontext.sBAttributesToReceiveNamespace;
 
     if (welcomeBackMessage) {
-        const plaintextResp = welcomeBackMessage;
-        const htmlResp = `<i> ${welcomeBackMessage} </i>`;
+        const plaintextResp = _.get(res, 'message', '') + ' ' + welcomeBackMessage;
+        const htmlResp = `${_.get(res, 'message', '')} <i> ${welcomeBackMessage} </i>`;
         _.set(res, 'message', plaintextResp);
         const altMessages = {
             html: htmlResp,
@@ -345,22 +352,85 @@ function endUseOfSpecialtyBot(req, res, welcomeBackMessage) {
     return resp;
 }
 
-function receiveSpecialtyBotAttributes(res, specialtyBotSessionAttributes) {
-    const attributesToReceiveArray = _.get(res.session, 'qnabotcontext.sBAttributesToReceive', '').split(',').map((attribute) => attribute.trim());
-
-    const receivedSpecialtyBotSessionAttributes = {};
-
-    attributesToReceiveArray
-        .filter((attribute) => (attribute in specialtyBotSessionAttributes))
-        .forEach((attribute) => {
-            receivedSpecialtyBotSessionAttributes[attribute] = specialtyBotSessionAttributes[attribute];
+/**
+ * Merge session attributes identified in req from the specialty botResp to the res structure.
+ * @param req - request input structure that contains a list of attributes to merge into res. This list
+ * is contained in session.qnabotcontext.sBAttributesToReceive.
+ * @param res - response output structure where the merged attributes will be stored.
+ * @param botResp - the response from the specialty bot
+ *
+ * There are two special cases that need to be handled both provided by a standard QnABot. These are attributes
+ * that are embedded in the "appContext" and attribute tthat are embedded in a "qnabotcontext".  QnABot stores
+ * attributes in "appContext" that it uses to in the general context of QnABot. Attributes are stored in "qnabotcontext"
+ * used when QnABot is integrated with Amazon Connect. In both of these cases, "appContext" and "qnabotcontext" are
+ * themselves strings but contain json payload as well with attributes themselves. Special handling will
+ * extract any values from the attributes embedded in these strings.
+ */
+function mergeAttributesToReceive(req, res, botResp) {
+    // merge attributes to receive
+    const attributesToMerge = _.get(req, 'session.qnabotcontext.sBAttributesToReceive', "").split(",");
+    qnabot.log(`attributes to merge back: ${attributesToMerge}`);
+    const namespace = _.get(req, 'session.qnabotcontext.sBAttributesToReceiveNamespace', DEFAULT_SPECIALTY_BOT_RECEIVING_NAMESPACE);
+    qnabot.log(`namespace to merge back: ${namespace}`);
+    if (namespace.length > 0) {
+        attributesToMerge.map(attribute => {
+            const attr = attribute.trim();
+            qnabot.log(`merging: ${attr}`);
+            if (attr.startsWith("appContext")) {
+                qnabot.log(`merging from appContext`);
+                const aName = attr.split("appContext.")[1];
+                if (botResp.sessionAttributes && botResp.sessionAttributes.appContext) {
+                    const appContext = ( isString(botResp.sessionAttributes.appContext) ? JSON.parse(botResp.sessionAttributes.appContext) : botResp.sessionAttributes.appContext);
+                    const value = _.get(appContext, aName);
+                    _.set(res, `session.${namespace}.${aName}`, value);
+                    qnabot.log(`merged: ${value} to session.${namespace}.${aName}`);
+                }
+            } else if (attr.startsWith("qnabotcontext.")) {
+                qnabot.log(`merging from qnabotcontext`);
+                const aName = attr.split("qnabotcontext.")[1];
+                if (botResp.sessionAttributes && botResp.sessionAttributes.qnabotcontext) {
+                    const qnabotContext = ( isString(botResp.sessionAttributes.qnabotcontext) ? JSON.parse(botResp.sessionAttributes.qnabotcontext) : botResp.sessionAttributes.qnabotcontext);
+                    qnabot.log(`qnabotContext is: ${JSON.stringify(qnabotContext,null,2)}`);
+                    const value = _.get(qnabotContext, aName);
+                    _.set(res, `session.${namespace}.${aName}`, value);
+                    qnabot.log(`merged: ${value} to session.${namespace}.${aName}`);
+                }
+            } else {
+                qnabot.log(`default merge`);
+                const value = _.get(botResp, `sessionAttributes.${attribute.trim()}`, "");
+                if (value.length > 0) {
+                    _.set(res, `session.${namespace}.${attr}`, value);
+                    qnabot.log(`merged: ${value} to session.${namespace}.${attr}`);
+                }
+            }
         });
-
-    return receivedSpecialtyBotSessionAttributes;
+    }
 }
 
-function processBotRespMessage(botResp, res, _preferredResponseType) {
+/**
+ * Perform processing to return a response from the specialty bot. Utilize the original answer from the QID which
+ * started Bot routing and append this to the beginning of the first response message. Also handle the case when
+ * a Lex V2 bot has indicated that fulfillment is complete. Bot routing will automatically terminate when this
+ * occurs.
+ *
+ * However, special processing is needed if the target LexV2 bot is a QnABot. It always indicates that fulfillment is
+ * complete for each question however Bot Routing should not terminate in this case. Instead, the target LexV2 specialty
+ * QnABot can signal that bot routing should terminate or the user can issue the configured utterance to termiante
+ * bot routing.
+ *
+ * @param botResp
+ * @param req
+ * @param res
+ * @param _preferredResponseType
+ * @returns {{res, lexBotIsFulfilled: boolean}}
+ */
+function processBotRespMessage(botResp, req, res, _preferredResponseType) {
     let lexBotIsFulfilled = false;
+    let originalMessage = res.message ? res.message + " ": "";
+    let originalAppContext = undefined;
+    if (res.session && res.session.appContext) {
+        originalAppContext = (isString(res.session.appContext) ? JSON.parse(res.session.appContext) : res.session.appContext);
+    }
     if (_.get(botResp, 'dialogState', '') === 'ReadyForFulfillment') {
         botResp.message = JSON.stringify(botResp.slots, null, 2);
         lexBotIsFulfilled = true;
@@ -368,9 +438,8 @@ function processBotRespMessage(botResp, res, _preferredResponseType) {
     let ssmlMessage;
     if (botResp.sessionAttributes?.appContext) {
         const appContext = (isString(botResp.sessionAttributes.appContext) ? JSON.parse(botResp.sessionAttributes.appContext) : botResp.sessionAttributes.appContext);
-        // if alt.messsages contains SSML tags setup to return ssmlMessage
-        if (appContext?.altMessages.ssml?.includes('<speak>')) {
-            ssmlMessage = appContext.altMessages.ssml;
+        if ( (appContext && _.has(appContext,'altMessages.markdown')) && (originalAppContext && _.has(originalAppContext,'altMessages.markdown')) ) {
+            appContext.altMessages.markdown = originalAppContext.altMessages.markdown + " " + appContext.altMessages.markdown;
         }
         if ((appContext && _.has(appContext,'altMessages.ssml')) ) {
             ssmlMessage = appContext.altMessages.ssml;
@@ -383,13 +452,8 @@ function processBotRespMessage(botResp, res, _preferredResponseType) {
         _.set(res.session, 'appContext.altMessages', appContext.altMessages);
     }
 
-    const receivingNamespace = _.get(res.session, 'qnabotcontext.sBAttributesToReceiveNamespace', DEFAULT_SPECIALTY_BOT_RECEIVING_NAMESPACE);
-    const receivedSpecialtyBotSessionAttributes = receiveSpecialtyBotAttributes(res, botResp.sessionAttributes);
-
-    _.set(res.session, `${receivingNamespace}`, receivedSpecialtyBotSessionAttributes);
     _.set(res, 'session.qnabotcontext.specialtySessionAttributes', botResp.sessionAttributes);
-
-    _.set(res, 'message', botResp.message);
+    _.set(res, "message", originalMessage + botResp.message);
     _.set(res, 'plainMessage', botResp.message);
     _.set(res, 'messageFormat', botResp.messageFormat);
 
@@ -404,18 +468,29 @@ function processBotRespMessage(botResp, res, _preferredResponseType) {
         res.type = 'SSML';
         res.message = ssmlMessage;
     }
+
+    mergeAttributesToReceive(req, res, botResp);
+
     const isFromQnABot = _.has(botResp, 'sessionAttributes.qnabot_gotanswer');
-    if (_.get(botResp, 'dialogState', '') === 'Fulfilled' && !isFromQnABot) {
+    if ((_.get(botResp,'dialogState', "") === 'Fulfilled' || _.get(botResp,'dialogState', "") === 'Close' ) && !isFromQnABot) {
         lexBotIsFulfilled = true;
     }
     return { res, lexBotIsFulfilled };
 }
 
+/**
+ * returns the first response card from the LexV2 bot. Note that original versions of this function checked
+ * null and subsequent versions checked for undefined values of the following and instead returned empty strings
+ * for each. Empty strings for these caused runtime errors when handling the fulfillment response from lambda.
+ * If not set, the following attributes should remain unset.
+ * botResp.responseCard.genericAttachments[0].subTitle
+ * botResp.responseCard.genericAttachments[0].attachmentLinkUrl
+ * botResp.responseCard.genericAttachments[0].imageUrl = bot
+ * @param botResp
+ * @returns {*}
+ */
 function getRespCard(botResp) {
     qnabot.log('found a response card. attached to res. only one / first response card will be used');
-    botResp.responseCard.genericAttachments[0].subTitle = botResp.responseCard.genericAttachments[0].subTitle || '';
-    botResp.responseCard.genericAttachments[0].attachmentLinkUrl = botResp.responseCard.genericAttachments[0].attachmentLinkUrl || '';
-    botResp.responseCard.genericAttachments[0].imageUrl = botResp.responseCard.genericAttachments[0].imageUrl || '';
     return botResp.responseCard.genericAttachments[0];
 }
 
@@ -450,7 +525,7 @@ async function processResponse(req, res, hook, alias) {
     qnabot.log(`specialty botResp: ${JSON.stringify(botResp, null, 2)}`);
     if (botResp.message || _.get(botResp, 'dialogState', '') === 'ReadyForFulfillment') {
         let lexBotIsFulfilled;
-        ({ res, lexBotIsFulfilled } = processBotRespMessage(botResp, res, _preferredResponseType));
+        ({ res, lexBotIsFulfilled } = processBotRespMessage(botResp, req, res, _preferredResponseType));
         if (botResp.sessionAttributes.QNABOT_END_ROUTING || lexBotIsFulfilled) {
             qnabot.log('specialtyBot requested exit');
             const resp = endUseOfSpecialtyBot(req, res, welcomeBackMessage);
