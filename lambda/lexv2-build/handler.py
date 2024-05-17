@@ -60,7 +60,7 @@ LEXV2_BOT_LOCALE_VOICES = {
         "engine": "standard"
     }],
     "de_AT": [{ #German (AT)
-        "voiceId": "Vicki",
+        "voiceId": "Hannah",
         "engine": "neural"
     }],
     "de_DE": [{ #German (DE)
