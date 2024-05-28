@@ -226,6 +226,13 @@ async function processFulfillmentEvent(req, res) {
     res.session.qnabot_qid = _.get(res.result, 'qid', '');
     res.session.qnabot_gotanswer = res.got_hits > 0;
 
+    // add session attibute to count consecutive missed utterances
+    if (res.got_hits > 0) {
+        res.session.no_hits_counter = 0;
+    } else {
+        res.session.no_hits_counter = res.session.no_hits_counter ? res.session.no_hits_counter + 1 : 1;
+    }
+
     const event = { req, res };
     return event;
 }
