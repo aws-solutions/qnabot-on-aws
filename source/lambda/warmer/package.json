@@ -1,0 +1,23 @@
+{
+  "name": "warmer",
+  "version": "5.5.0",
+  "description": "QnABot lambda to enhance OpenSearch Index performance",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest --coverage --silent --verbose",
+    "unit": "nodeunit ./test/index.js -t",
+    "clean": "rm -rf node_modules"
+  },
+  "author": {
+    "name": "Amazon Web Services",
+    "url": "https://aws.amazon.com/solutions"
+  },
+  "license": "Apache-2.0",
+  "dependencies": {
+    "@aws-crypto/sha256-js": "^5.2.0",
+    "@smithy/node-http-handler": "^2.3.1",
+    "@smithy/protocol-http": "^3.1.1",
+    "@smithy/signature-v4": "^2.1.1",
+    "@smithy/util-retry": "^2.1.1"
+  }
+}

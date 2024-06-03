@@ -25,7 +25,7 @@ This software includes third party software subject to the following copyrights:
 @aws-sdk/client-cognito-identity-provider under the Apache License Version 2.0
 @aws-sdk/client-comprehend under the Apache License Version 2.0
 @aws-sdk/client-dynamodb under the Apache License Version 2.0
-@aws-sdk/client-elasticsearch-service under the Apache License Version 2.0
+@aws-sdk/client-opensearch under the Apache License Version 2.0
 @aws-sdk/client-firehose under the Apache License Version 2.0
 @aws-sdk/client-iam under the Apache License Version 2.0
 @aws-sdk/client-kendra under the Apache License Version 2.0
@@ -45,10 +45,6 @@ This software includes third party software subject to the following copyrights:
 @aws-sdk/lib-dynamodb under the Apache License Version 2.0
 @aws-sdk/s3-request-presigner under the Apache License Version 2.0
 @aws-sdk/util-stream-node under the Apache License Version 2.0
-@smithy/node-http-handler under the Apache License Version
-@smithy/protocol-http under the Apache License Version 2.0
-@smithy/signature-v4 under the Apache License Version 2.0
-@smithy/util-retry under the Apache License Version 2.0
 @babel/core under the Massachusetts Institute of Technology (MIT) license
 @babel/plugin-transform-runtime under the Massachusetts Institute of Technology (MIT) license
 @babel/preset-env under the Massachusetts Institute of Technology (MIT) license
@@ -56,6 +52,13 @@ This software includes third party software subject to the following copyrights:
 @fontsource/material-icons under the Apache License Version 2.0
 @fontsource/roboto under the Apache License Version 2.0
 @fontsource/varela-round under the Open Font License (OFL) 1.1
+@opensearch-project/opensearch under the Apache License Version 2.0
+@smithy/node-http-handler under the Apache License Version
+@smithy/protocol-http under the Apache License Version 2.0
+@smithy/signature-v4 under the Apache License Version 2.0
+@smithy/util-retry under the Apache License Version 2.0
+@vue/compat under the Massachusetts Institute of Technology (MIT) license
+@vue/eslint-config-standard under the Massachusetts Institute of Technology (MIT) license
 ajv under the Massachusetts Institute of Technology (MIT) license
 alexa-sdk under the Apache License Version 2.0
 arrow under the Apache License Version 2.0
@@ -103,7 +106,7 @@ defusedxml under the Python Software Foundation License Version 2
 dill under the BSD License (BSD-3-Clause)
 dir-loader under the Massachusetts Institute of Technology (MIT) license
 docker under the Apache License Version 2.0
-elasticsearch under the Apache License Version 2.0
+eslint-plugin-vue under the Massachusetts Institute of Technology (MIT) license
 exceptiongroup under the Massachusetts Institute of Technology (MIT) license
 exports-loader under the Massachusetts Institute of Technology (MIT) license
 express under the Massachusetts Institute of Technology (MIT) license
@@ -117,7 +120,7 @@ handlebars under the Massachusetts Institute of Technology (MIT) license
 handlebars-loader under the Massachusetts Institute of Technology (MIT) license
 highlight.js under BSD-3-Clause license
 html-webpack-plugin under the Massachusetts Institute of Technology (MIT) license
-http-aws-es under the Massachusetts Institute of Technology (MIT) license
+idle-js under the Massachusetts Institute of Technology (MIT) license
 idle-vue under the Massachusetts Institute of Technology (MIT) license
 importlib-resources under the Apache Software License
 intercept-stdout under the Massachusetts Institute of Technology (MIT) license
@@ -126,6 +129,7 @@ isort under the Massachusetts Institute of Technology (MIT) license
 Jinja2 under the BSD License (BSD-3-Clause)
 jest under the Massachusetts Institute of Technology (MIT) license
 jmespath under the Massachusetts Institute of Technology (MIT) license
+jose under the Massachusetts Institute of Technology (MIT) license
 js-cache under the Massachusetts Institute of Technology (MIT) license
 jsdom under the Massachusetts Institute of Technology (MIT) license
 jsdom-global under the Massachusetts Institute of Technology (MIT) license
@@ -177,7 +181,7 @@ pytest-env under the Massachusetts Institute of Technology (MIT) license
 pytest-json under the Massachusetts Institute of Technology (MIT) license
 pytest-mock under the Massachusetts Institute of Technology (MIT) license
 py-serializable under the Apache License Version 2.0
-PySocks under the BSD License 
+PySocks under the Apache License Version 2.0
 python-dateutil under the Apache License Version 2.0 and BSD License
 pytz under the Massachusetts Institute of Technology (MIT) license
 query-string under the Massachusetts Institute of Technology (MIT) license
@@ -194,6 +198,7 @@ responses under the Apache License Version 2.0
 rfc3339-validator under the Massachusetts Institute of Technology (MIT) license
 roboto-fontface under the Apache License Version 2.0
 s3transfer under the Apache License Version 2.0
+sanitize-html under the Massachusetts Institute of Technology (MIT) license
 sass under the Massachusetts Institute of Technology (MIT) license
 sass-loader under the Massachusetts Institute of Technology (MIT) license
 selenium under the Apache License Version 2.0
@@ -208,6 +213,8 @@ stylus under the Massachusetts Institute of Technology (MIT) license
 stylus-loader under the Massachusetts Institute of Technology (MIT) license
 tomli under the Massachusetts Institute of Technology (MIT) license
 tomlkit under the Massachusetts Institute of Technology (MIT) license
+torch under the BSD 3-Clause License
+transformers under the Massachusetts Institute of Technology (MIT) license
 trio under the Apache License Version 2.0 and the the Massachusetts Institute of Technology (MIT) license
 trio-websocket under the Massachusetts Institute of Technology (MIT) license
 types-PyYAML under the Apache License Version 2.0

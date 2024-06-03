@@ -1,0 +1,26 @@
+{
+    "name": "connect",
+    "version": "6.0.0",
+    "description": "Lambda function used to support the Connect setup wizard",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/aws-solutions/qnabot-on-aws",
+        "directory": "lambda/connect"
+    },
+    "main": "index.js",
+    "directories": {
+        "test": "test"
+    },
+    "scripts": {
+        "clean": "rm -rf node_modules",
+        "test": "jest"
+    },
+    "author": {
+        "name": "Amazon Web Services",
+        "url": "https://aws.amazon.com/solutions"
+    },
+    "license": "Apache-2.0",
+    "devDependencies": {
+        "jest": "^29.7.0"
+    }
+}

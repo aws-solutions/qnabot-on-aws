@@ -5,6 +5,36 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [6.0.0] - 2024-06-06
+### Added
+- Integration with Amazon Bedrock
+- Integration with Amazon Bedrock Knowledge Base
+- Content Designer UI improvements (grouped fields)
+- Anonymized operational metrics
+- Forgot password functionality for Content Designer login
+
+### Updated
+- Migrated AWS JavaScript SDK from v2 to v3
+- Upgraded OpenSearch and migrate from ElasticSearch client to OpenSearch client
+- Changed SageMaker LLM model from Falcon-40b to Llama-2-13b-chat and Sagemaker embedding model intfloat/e5-large-v2 now uses the Jumpstart version of the model.
+- Rewrote and migrate S3 object deletion custom resources from JavaScript to Python to address 3rd party security vulnerability
+- Updated CloudFormation template parameter groupings
+- Kendra index configuration has been moved from Content Designer settings to CloudFormation parameters to restrict IAM permissions. The CloudFormation parameter DefaultKendraIndex has been replaced with three separate parameters: KendraWebPageIndexId, KendraFaqIndexId, and AltSearchKendraIndexes.
+- Added feature to enable Kendra based authentication utilizing QnABot idToken. New AltSearchKendraIndexAuth CloudFormation parameter has been added.
+([PR #513](https://github.com/aws-solutions/qnabot-on-aws/pull/513)) - contributed by ([@JasonHammett](https://github.com/JasonHammett))
+- Added additional question validation when importing or creating questions in Content Designer.
+- Kendra Webcrawler will now create data source in the native language if supported by Kendra. Kendra can now query in different languages. ([issue #713](https://github.com/aws-solutions/qnabot-on-aws/issues/713))
+- Standardized folder structure
+- Made logging enhancements for OpenSearch and Firehose
+- Added case conversion handlebars helpers
+- Consolidated common AWS SDK dependencies to reduce overall solution artifact size
+- Patched security vulnerabilities and and integrated with CloudFormation Guard evaluation tool
+
+### Fixed
+- Chat client will now prompt the user after credentials are expired
+- Bot routing from a supervisory bot to a specialty bot ([PR #678](https://github.com/aws-solutions/qnabot-on-aws/pull/678)) - contributed by ([@bobpskier](https://github.com/bobpskier))
+- Secured Cognito roles ([PR #670](https://github.com/aws-solutions/qnabot-on-aws/pull/670)) - contributed by ([@amendlik](https://github.com/amendlik))
+
 ## [5.5.2] - 2024-05-08
 ### Fixed
 - Fixed an issue with the testall functionality which may introduce a high number of versions stored in the testall S3 bucket when the Content designer has no Q&As.

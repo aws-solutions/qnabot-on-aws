@@ -26,6 +26,7 @@ class TestLambdaHooks:
         menu = MenuNav(dom_operator)
         settings_page = menu.open_settings_page()
         settings_page.reset_settings()
+        settings_page.expand_all_subgroups()
         assert 'Success' in settings_page.disable_embeddings()
         assert 'Success' in settings_page.set_post_processing_lambda('')
 
@@ -39,6 +40,7 @@ class TestLambdaHooks:
 
         menu = MenuNav(dom_operator)
         settings_page = menu.open_settings_page()
+        settings_page.expand_all_subgroups()
 
         assert 'Success' in settings_page.set_pre_processing_lambda(lambda_hook_example_arn)
 
@@ -58,6 +60,7 @@ class TestLambdaHooks:
 
         menu = MenuNav(dom_operator)
         settings_page = menu.open_settings_page()
+        settings_page.expand_all_subgroups()
 
         assert 'Success' in settings_page.set_post_processing_lambda(lambda_hook_example_arn)
 
@@ -74,6 +77,7 @@ class TestLambdaHooks:
         """
         menu = MenuNav(dom_operator)
         settings_page = menu.open_settings_page()
+        settings_page.expand_all_subgroups()
 
         assert 'Success' in settings_page.set_pre_processing_lambda('')
         assert 'Success' in settings_page.set_post_processing_lambda('')

@@ -1,4 +1,0 @@
-{
-    "comment": "API mapping no-op since ES 7.x upgrade. Schema now returned directly from SchemaLambda, rather than from Elasticsearch metadata"
-}
-

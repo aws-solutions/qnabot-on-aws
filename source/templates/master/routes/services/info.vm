@@ -1,0 +1,7 @@
+{
+    "opensearch":{
+        "qid":"${ESQidLambda.Arn}",
+        "proxy":"${ESProxyLambda.Arn}"
+    }
+}
+

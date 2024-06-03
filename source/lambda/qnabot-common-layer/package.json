@@ -1,0 +1,31 @@
+{
+    "name": "qnabot-common-layer",
+    "version": "6.0.0",
+    "description": "Lambda layers used to provide common logging and utility functions",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/aws-solutions/qnabot-on-aws",
+        "directory": "lambda/qnabot-common-layer"
+    },
+    "directories": {
+        "test": "test",
+        "qnabot": "qnabot"
+    },
+    "scripts": {
+        "clean": "rm -rf node_modules",
+        "test": "jest"
+    },
+    "author": {
+        "name": "Amazon Web Services",
+        "url": "https://aws.amazon.com/solutions"
+    },
+    "license": "Apache-2.0",
+    "dependencies": {
+        "@aws-sdk/client-ssm": "^3.511.0",
+        "lodash": "^4.17.21"
+    },
+    "devDependencies": {
+        "aws-sdk-client-mock": "^3.0.1",
+        "jest": "^29.7.0"
+    }
+}

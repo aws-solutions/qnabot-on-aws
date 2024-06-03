@@ -1,7 +1,0 @@
-{
-    "elasticsearch":{
-        "qid":"${ESQidLambda.Arn}",
-        "proxy":"${ESProxyLambda.Arn}"
-    }
-}
-

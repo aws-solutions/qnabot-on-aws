@@ -220,6 +220,22 @@ class DomOperator():
             return element
         except NoSuchElementException as e:
             raise RuntimeError(f'Element with XPath {xpath} not found.')
+        
+    def wait_for_element_attribute(self, id: str, attribute: str, value: str, delay: int = 10):
+        """
+        Wait for the element with the given ID to have the given attribute with the given value.
+
+        :param id: The ID of the element.
+        :param attribute: The name of the attribute.
+        :param value: The value of the attribute.
+        :param delay: The maximum time in seconds to wait for the element.
+        :return: The element if it appears within the wait time, None otherwise.
+        """
+
+        try:
+            return WebDriverWait(self.driver, delay).until(EC.text_to_be_present_in_element_attribute((By.ID, id), attribute, value))
+        except TimeoutException:
+            print(f'TimeoutException: element id: "{id}" waited {delay}s to load.')
 
     def wait_for_element_by_id(self, id: str, delay: int = 10):
         """

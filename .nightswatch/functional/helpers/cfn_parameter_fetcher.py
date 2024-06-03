@@ -127,7 +127,7 @@ class ParameterFetcher:
             if output['OutputKey'] == key:
                 return output['OutputValue']
 
-    def get_kendra_index(self) -> Optional[str]:
+    def get_kendra_webpage_index(self) -> Optional[str]:
         """
         Retrieves the Kendra Index from the stack parameters.
 
@@ -136,8 +136,30 @@ class ParameterFetcher:
             The Kendra Index if found, otherwise None.
         """
 
-        kendra_index_id = self.__get_cfn_param('DefaultKendraIndexId')
-        return kendra_index_id
+        return self.__get_cfn_param('KendraWebPageIndexId')
+    
+    def get_kendra_faq_index(self) -> Optional[str]:
+        """
+        Retrieves the Kendra Index from the stack parameters.
+
+        Returns:
+        -------
+            The Kendra Index if found, otherwise None.
+        """
+
+        return self.__get_cfn_param('KendraFaqIndexId')
+
+    def get_bedrock_knowledge_base_id(self) -> Optional[str]:
+        """
+        Retrieves the ID of the Bedrock Knowledge Base from the stack parameters.
+
+        Returns:
+        -------
+            The Knowledge Base ID if found, otherwise None.
+        """
+
+        knowledge_base_id = self.__get_cfn_param('BedrockKnowledgeBaseId')
+        return knowledge_base_id
 
     def get_designer_client_id(self) -> Optional[str]:
         """
@@ -183,8 +205,19 @@ class ParameterFetcher:
         -------
             True if the kendra index is set.
         """
-        kendra_index_id = self.get_kendra_index()
+        kendra_index_id = self.get_kendra_faq_index()
         return kendra_index_id != None and kendra_index_id != ''
+
+    def bedrock_knowledge_base_is_enabled(self) -> bool:
+        """
+        Identifies if a Bedrock Knowledge Base is configured for the deployment.
+
+        Returns:
+        -------
+            True if the knowledge base parameter is set.
+        """
+        bedrock_knowledge_base = self.get_bedrock_knowledge_base_id()
+        return bedrock_knowledge_base != None and bedrock_knowledge_base != ''
 
     def llm_is_enabled(self) -> bool:
         """

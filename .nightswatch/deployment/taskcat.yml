@@ -21,85 +21,92 @@ project:
 tests:
   qnabot-t1:
     parameters:
-      DefaultKendraIndexId: '650682ba-baee-4bb9-9d04-322e4834f894'
-      ElasticSearchNodeCount: '4'
+      BedrockKnowledgeBaseId: JS2IUH5KR8
+      BedrockKnowledgeBaseModel: anthropic.claude-3-haiku-v1
+      OpenSearchNodeCount: '4'
       Email: 'test@example.com'
-      Encryption: 'ENCRYPTED'
-      KibanaDashboardRetentionMinutes: '43200'
+      OpenSearchDashboardsRetentionMinutes: '43200'
       LexBotVersion: 'LexV1 and LexV2'
       LexV2BotLocaleIds: 'en_US,es_US,fr_CA'
       PublicOrPrivate: 'PRIVATE'
       Username: 'Admin'
       XraySetting: 'FALSE'
       FulfillmentConcurrency: '0'
-      EmbeddingsApi: SAGEMAKER
-      SagemakerInitialInstanceCount: 1
-      LLMSagemakerInitialInstanceCount: 1
-      LLMApi: SAGEMAKER
-      LLMSagemakerInstanceType: ml.g5.12xlarge
+      EmbeddingsApi: BEDROCK
+      EmbeddingsBedrockModelId: cohere.embed-english-v3
+      LLMApi: BEDROCK
+      LLMBedrockModelId: ai21.j2-ultra-v1
+      VPCSubnetIdList: 'subnet-09016e4baba00ae3b,subnet-03912dbebb5322782'
+      VPCSecurityGroupIdList: 'sg-00f1c41d5ed85225e'
     regions:
       - us-east-1
   qnabot-t2:
     parameters:
-      DefaultKendraIndexId: '95fab795-bf1c-47b7-a561-31c3cb60ceb0'
-      ElasticSearchNodeCount: '4'
+      BedrockKnowledgeBaseId: M5BOFMMHJY
+      BedrockKnowledgeBaseModel: anthropic.claude-3-sonnet-v1
+      OpenSearchNodeCount: '4'
       Email: 'test@example.com'
-      Encryption: 'ENCRYPTED'
-      KibanaDashboardRetentionMinutes: '43200'
+      OpenSearchDashboardsRetentionMinutes: '43200'
       LexBotVersion: 'LexV1 and LexV2'
       LexV2BotLocaleIds: 'en_US,es_US,fr_CA'
       PublicOrPrivate: 'PRIVATE'
       Username: 'Admin'
       XraySetting: 'FALSE'
       FulfillmentConcurrency: '0'
-      EmbeddingsApi: SAGEMAKER
-      SagemakerInitialInstanceCount: 1
-      LLMSagemakerInitialInstanceCount: 1
-      LLMApi: SAGEMAKER
-      LLMSagemakerInstanceType: ml.g5.12xlarge
+      EmbeddingsApi: BEDROCK
+      EmbeddingsBedrockModelId: cohere.embed-multilingual-v3
+      LLMApi: BEDROCK
+      LLMBedrockModelId: meta.llama3-8b-instruct-v1
     regions:
       - us-west-2
   qnabot-t3:
     parameters:
-      DefaultKendraIndexId: '18c53754-0a24-42eb-85d9-ad65aa24f891'
-      ElasticSearchNodeCount: '4'
+      KendraWebPageIndexId: '18c53754-0a24-42eb-85d9-ad65aa24f891'
+      KendraFaqIndexId: '18c53754-0a24-42eb-85d9-ad65aa24f891'
+      AltSearchKendraIndexes: '18c53754-0a24-42eb-85d9-ad65aa24f891'
+      OpenSearchNodeCount: '4'
       Email: 'test@example.com'
-      Encryption: 'ENCRYPTED'
-      KibanaDashboardRetentionMinutes: '43200'
+      OpenSearchDashboardsRetentionMinutes: '43200'
       LexBotVersion: 'LexV1 and LexV2'
       LexV2BotLocaleIds: 'en_US,es_US,fr_CA'
       PublicOrPrivate: 'PRIVATE'
       Username: 'Admin'
       XraySetting: 'FALSE'
       FulfillmentConcurrency: '0'
-      EmbeddingsApi: SAGEMAKER
-      SagemakerInitialInstanceCount: 1
+      EmbeddingsApi: BEDROCK
+      EmbeddingsBedrockModelId: cohere.embed-english-v3
     regions:
       - ap-southeast-1
   qnabot-t4:
     parameters:
-      DefaultKendraIndexId: '50849777-a352-4708-aa0d-f40046b1bdc7'
-      ElasticSearchNodeCount: '4'
+      KendraWebPageIndexId: '50849777-a352-4708-aa0d-f40046b1bdc7'
+      KendraFaqIndexId: '50849777-a352-4708-aa0d-f40046b1bdc7'
+      AltSearchKendraIndexes: '50849777-a352-4708-aa0d-f40046b1bdc7'
+      OpenSearchNodeCount: '4'
       Email: 'test@example.com'
-      Encryption: 'ENCRYPTED'
-      KibanaDashboardRetentionMinutes: '43200'
+      OpenSearchDashboardsRetentionMinutes: '43200'
       LexBotVersion: 'LexV1 and LexV2'
       LexV2BotLocaleIds: 'en_US,es_US,fr_CA'
       PublicOrPrivate: 'PRIVATE'
       Username: 'Admin'
       XraySetting: 'FALSE'
       FulfillmentConcurrency: '0'
-      EmbeddingsApi: SAGEMAKER
-      SagemakerInitialInstanceCount: 1
+      EmbeddingsApi: BEDROCK
+      EmbeddingsBedrockModelId: cohere.embed-multilingual-v3
+      LLMApi: BEDROCK
+      LLMBedrockModelId: anthropic.claude-3-sonnet-v1
+      VPCSubnetIdList: 'subnet-048a8cb68d4d8a82b,subnet-063f619193954f0f5'
+      VPCSecurityGroupIdList: 'sg-05917a3b934d1482a'
     regions:
       - ap-southeast-2
   qnabot-t5:
     parameters:
-      DefaultKendraIndexId: '72be0d99-fe41-4dda-b89c-acba05ea1282'
-      ElasticSearchNodeCount: '4'
+      KendraWebPageIndexId: '72be0d99-fe41-4dda-b89c-acba05ea1282'
+      KendraFaqIndexId: '72be0d99-fe41-4dda-b89c-acba05ea1282'
+      AltSearchKendraIndexes: '72be0d99-fe41-4dda-b89c-acba05ea1282'
+      OpenSearchNodeCount: '4'
       Email: 'test@example.com'
-      Encryption: 'ENCRYPTED'
-      KibanaDashboardRetentionMinutes: '43200'
+      OpenSearchDashboardsRetentionMinutes: '43200'
       LexBotVersion: 'LexV2 Only'
       LexV2BotLocaleIds: 'en_US,es_US,fr_CA'
       PublicOrPrivate: 'PRIVATE'
@@ -111,15 +118,18 @@ tests:
       LLMSagemakerInitialInstanceCount: 1
       LLMApi: SAGEMAKER
       LLMSagemakerInstanceType: ml.g5.12xlarge
+      VPCSubnetIdList: 'subnet-0ace0b2f3a0fb4661,subnet-026e33480b28fe999'
+      VPCSecurityGroupIdList: 'sg-030bfbe5f4d12ef8c'
     regions:
       - ca-central-1
   qnabot-t6:
     parameters:
-      DefaultKendraIndexId: 'e647d178-347c-48cb-9386-4dcb2f73ebae'
-      ElasticSearchNodeCount: '4'
+      KendraWebPageIndexId: 'e647d178-347c-48cb-9386-4dcb2f73ebae'
+      KendraFaqIndexId: 'e647d178-347c-48cb-9386-4dcb2f73ebae'
+      AltSearchKendraIndexes: 'e647d178-347c-48cb-9386-4dcb2f73ebae'
+      OpenSearchNodeCount: '4'
       Email: 'test@example.com'
-      Encryption: 'ENCRYPTED'
-      KibanaDashboardRetentionMinutes: '43200'
+      OpenSearchDashboardsRetentionMinutes: '43200'
       LexBotVersion: 'LexV1 and LexV2'
       LexV2BotLocaleIds: 'en_US,es_US,fr_CA'
       PublicOrPrivate: 'PRIVATE'
@@ -135,48 +145,47 @@ tests:
       - eu-west-1
   qnabot-t7:
     parameters:
-      DefaultKendraIndexId: ''
-      ElasticSearchNodeCount: '4'
+      OpenSearchNodeCount: '4'
       Email: 'test@example.com'
-      Encryption: 'ENCRYPTED'
-      KibanaDashboardRetentionMinutes: '43200'
+      OpenSearchDashboardsRetentionMinutes: '43200'
       LexBotVersion: 'LexV1 and LexV2'
       LexV2BotLocaleIds: 'en_US,es_US,fr_CA'
       PublicOrPrivate: 'PRIVATE'
       Username: 'Admin'
       XraySetting: 'FALSE'
       FulfillmentConcurrency: '0'
-      EmbeddingsApi: SAGEMAKER
-      SagemakerInitialInstanceCount: 1
+      EmbeddingsApi: BEDROCK
+      EmbeddingsBedrockModelId: amazon.titan-embed-text-v1
+      LLMApi: BEDROCK
+      LLMBedrockModelId: amazon.titan-text-express-v1
+      VPCSubnetIdList: 'subnet-02b3970087aaace45,subnet-0daa7ab958294273b'
+      VPCSecurityGroupIdList: 'sg-0823036a7c1bfdc0f'
     regions:
       - ap-northeast-1
   qnabot-t8:
     parameters:
-      DefaultKendraIndexId: ''
-      ElasticSearchNodeCount: '4'
+      OpenSearchNodeCount: '4'
       Email: 'test@example.com'
-      Encryption: 'ENCRYPTED'
-      KibanaDashboardRetentionMinutes: '43200'
+      OpenSearchDashboardsRetentionMinutes: '43200'
       LexBotVersion: 'LexV1 and LexV2'
       LexV2BotLocaleIds: 'en_US,es_US,fr_CA'
       PublicOrPrivate: 'PRIVATE'
       Username: 'Admin'
       XraySetting: 'FALSE'
       FulfillmentConcurrency: '0'
-      EmbeddingsApi: SAGEMAKER
-      SagemakerInitialInstanceCount: 1
-      LLMSagemakerInitialInstanceCount: 1
-      LLMApi: SAGEMAKER
-      LLMSagemakerInstanceType: ml.g5.12xlarge
+      EmbeddingsApi: BEDROCK
+      EmbeddingsBedrockModelId: amazon.titan-embed-text-v1
+      LLMApi: BEDROCK
+      LLMBedrockModelId: anthropic.claude-v2.1
+      VPCSubnetIdList: 'subnet-06454e84cf01bf878,subnet-0eceb4b2e65713a25'
+      VPCSecurityGroupIdList: 'sg-0ab555e1803bfee76'
     regions:
       - eu-central-1
   qnabot-t9:
     parameters:
-      DefaultKendraIndexId: ''
-      ElasticSearchNodeCount: '4'
+      OpenSearchNodeCount: '4'
       Email: 'test@example.com'
-      Encryption: 'ENCRYPTED'
-      KibanaDashboardRetentionMinutes: '43200'
+      OpenSearchDashboardsRetentionMinutes: '43200'
       LexBotVersion: 'LexV1 and LexV2'
       LexV2BotLocaleIds: 'en_US,es_US,fr_CA'
       PublicOrPrivate: 'PRIVATE'
@@ -189,11 +198,9 @@ tests:
       - eu-west-2
   qnabot-t10:
     parameters:
-      DefaultKendraIndexId: ''
-      ElasticSearchNodeCount: '4'
+      OpenSearchNodeCount: '4'
       Email: 'test@example.com'
-      Encryption: 'ENCRYPTED'
-      KibanaDashboardRetentionMinutes: '43200'
+      OpenSearchDashboardsRetentionMinutes: '43200'
       LexBotVersion: 'LexV2 Only'
       LexV2BotLocaleIds: 'en_US,es_US,fr_CA'
       PublicOrPrivate: 'PRIVATE'
