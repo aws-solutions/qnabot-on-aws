@@ -4,7 +4,7 @@ const _ = require('lodash');
 const config = require('../config.json');
 
 process.env.AWS_PROFILE = config.profile;
-process.env.AWS_DEFAULT_REGION = config.profile;
+process.env.AWS_DEFAULT_REGION = config.region;
 
 module.exports = run;
 

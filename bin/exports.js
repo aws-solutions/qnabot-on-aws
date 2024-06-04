@@ -14,7 +14,7 @@
 const config = require('../config.json');
 
 process.env.AWS_PROFILE = config.profile;
-process.env.AWS_DEFAULT_REGION = config.profile;
+process.env.AWS_DEFAULT_REGION = config.region;
 const { CloudFormationClient, ListExportsCommand, DescribeStacksCommand } = require('@aws-sdk/client-cloudformation');
 const region = require('../config.json').region;
 const name = require('./name');

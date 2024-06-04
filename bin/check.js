@@ -16,7 +16,7 @@ const config = require('../config.json');
 const fs = require('fs').promises;
 
 process.env.AWS_PROFILE = config.profile;
-process.env.AWS_DEFAULT_REGION = config.profile;
+process.env.AWS_DEFAULT_REGION = config.region;
 const { CloudFormationClient, ValidateTemplateCommand, DescribeStacksCommand } = require('@aws-sdk/client-cloudformation');
 const { S3Client, PutObjectCommand } = require('@aws-sdk/client-s3');
 const { region } = require('../config.json');
