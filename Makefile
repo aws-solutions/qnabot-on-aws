@@ -1,4 +1,8 @@
-TEMPLATES=$(shell for l in $$(ls ./templates | egrep -v "util|lib|README.md|jest.config.js|package.json|package-lock.json|node_modules|coverage|__tests__|.pytest_cache|.venv-test|pytest.ini|requirements.txt|requirements-test.txt");do echo templates/$$l;done)
+ifeq ($(command -v lsblk >/dev/null 2>&1), Linux)
+        TEMPLATES=$(for l in `ls ./templates | egrep -v "util|lib|README.md|jest.config.js|package.json|package-lock.json|node_modules|coverage|__tests__|.pytest_cache|.venv-test|pytest.ini|requirements.txt|requirements-test.txt"`; do echo templates/$l ; done )
+else
+        TEMPLATES=$(shell for l in $$(ls ./templates | egrep -v "util|lib|README.md|jest.config.js|package.json|package-lock.json|node_modules|coverage|__tests__|.pytest_cache|.venv-test|pytest.ini|requirements.txt|requirements-test.txt");do echo templates/$$l;done)
+endif
 
 All: ml_model assets templates lambda website make_directories
 
