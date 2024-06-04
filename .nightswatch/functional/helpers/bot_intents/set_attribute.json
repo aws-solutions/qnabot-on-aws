@@ -12,7 +12,7 @@
 			   { 
 				  "message": { 
 					 "plainTextMessage": { 
-						"value": "HERE IS A SESSION ATTRIBUTE"
+						"value": "HERE IS A SESSION ATTRIBUTE."
 					 }
 				  }
 			   }

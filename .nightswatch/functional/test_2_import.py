@@ -112,6 +112,7 @@ class TestImport:
         assert 'Warning: No questions found for QID: "NoQuestionWarning". The question will be skipped.' in error
         assert 'Warning: No answer found for QID:"NoAnswerWarning". The question will be skipped.' in error
         assert 'Warning: No QID found for line 4. The question will be skipped.' in error
+        assert 'Warning: QID found for line 5 must have no spaces. The question will be skipped.' in error
 
     def test_designer_import_questions_qna(self, designer_login, dom_operator: DomOperator):
         """
@@ -136,6 +137,24 @@ class TestImport:
         assert edit_page.match_question_field_values(**expected_question)
         # Need to clean up after test since the question is hidden in the DOM and can still be selected in other tests
         edit_page.delete_question_by_qid(expected_question['qid'])
+
+    def test_designer_import_questions_fail(self, designer_login, dom_operator: DomOperator):
+        """
+        Test that designer validates import questions from the import page using JSON format.
+
+        """
+        menu = MenuNav(dom_operator)
+        import_page = menu.open_import_page()
+
+        json_file = f'{pathlib.Path().resolve()}/files/import-fail-expected.json'
+        import_page.import_file(json_file)
+        error = import_page.get_import_file_error()
+        
+        assert 'Error Loading Content' in error
+        assert 'Error: No QID found for question number: 1. The JSON file will not be imported. Please fix and import the file again.' in error
+        assert 'Error: QID: "No Spaces.001", found for question number: 2 must have no spaces. The JSON file will not be imported. Please fix and import the file again.' in error
+        assert 'Error: No questions found for QID: "NoQuestion.001". The JSON file will not be imported. Please fix and import the file again.' in error
+        assert 'Error: No answer found for QID: "NoAnswer.001". Make sure that it also includes valid characters (/[^a-zA-Z0-9-_]/g). The JSON file will not be imported. Please fix and import the file again.' in error
 
     @pytest.mark.skip(reason='Bug in import page')
     def test_designer_import_questions_quiz(self, designer_login, dom_operator: DomOperator):

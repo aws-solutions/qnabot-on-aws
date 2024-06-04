@@ -56,6 +56,7 @@ class TestSettings:
 
         edit_page.edit_question_by_qid(**edit_question)
         settings_page = menu.open_settings_page()
+        settings_page.expand_all_subgroups()
         settings_page.customize_empty_message(custom_empty_message)
         settings_page.disable_kendra_fallback()
 
@@ -107,7 +108,7 @@ class TestSettings:
         """
         Tests the PII rejection setting can be set.
 
-        See: https://w.amazon.com/bin/view/AWS/Solutions/SolutionsTeam/SolutionsImplementations/AWS_QnABot/Test_Plan/#HTC37.VerifyPIIrejectionfeature
+        See: https://docs.aws.amazon.com/solutions/latest/qnabot-on-aws/modifying-configuration-settings.html
         """
         pass
 
@@ -116,6 +117,6 @@ class TestSettings:
         """
         Tests that custom terms are redacted in logs.
 
-        See: https://w.amazon.com/bin/view/AWS/Solutions/SolutionsTeam/SolutionsImplementations/AWS_QnABot/Test_Plan/#HTC38.Verifyredactionfeature-v5.0.1
+        See: https://docs.aws.amazon.com/solutions/latest/qnabot-on-aws/modifying-configuration-settings.html
         """
         pass

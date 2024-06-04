@@ -1,9 +1,0 @@
-[run]
-omit =
-    tests/*
-source =
-    aws_solutions/qnabot
-    aws_solutions/core
-
-[lcov]
-output = coverage/lcov.info

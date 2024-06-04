@@ -50,6 +50,7 @@ class TestSessionAttribute():
 
         settings_page = menu.open_settings_page()
         settings_page.reset_settings()
+        settings_page.expand_all_subgroups()
         # Needs to be enabled, otherwise all questions fallback
         assert 'Success' in settings_page.enable_kendra_fallback()
         assert 'Success' in settings_page.disable_embeddings()

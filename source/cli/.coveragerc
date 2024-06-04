@@ -1,0 +1,10 @@
+[run]
+omit =
+    tests/*
+    ./run-pytest.py
+source =
+    aws_solutions/qnabot
+    aws_solutions/core
+
+[lcov]
+output = coverage/lcov.info
