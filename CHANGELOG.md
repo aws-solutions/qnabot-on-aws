@@ -5,6 +5,49 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [6.0.0] - 2024-06-07
+### Added
+- Integration with Amazon Bedrock
+- Integration with Amazon Bedrock Knowledge Base
+- Enabled Fine Grain Access Control in Amazon OpenSearch Service by default. A new `OpenSearchFineGrainAccessControl` CloudFormation parameter has been added
+- Content Designer UI improvements (grouped fields)
+- Anonymized operational metrics
+- Enabled Kendra based authentication utilizing QnABot idToken. A new `AltSearchKendraIndexAuth` CloudFormation parameter has been added
+([PR #513](https://github.com/aws-solutions/qnabot-on-aws/pull/513)) - contributed by ([@JasonHammett](https://github.com/JasonHammett))
+
+### Updated
+- Migrated AWS JavaScript SDK from v2 to v3 for [Amazon Lex Web UI](https://aws.amazon.com/blogs/machine-learning/deploy-a-web-ui-for-your-chatbot/) Integration
+- Upgraded Amazon OpenSearch Service domain from 1.3 to 2.11 unlocking features such as snapshot management via OpenSearch Dashboards (for more information see [Amazon OpenSearch release history](https://docs.aws.amazon.com/opensearch-service/latest/developerguide/release-notes.html))
+- [Renamed](https://docs.aws.amazon.com/opensearch-service/latest/developerguide/rename.html) Elasticsearch to Opensearch and Kibana to OpenSearch Dashboards
+- Migrated from ElasticSearch client to [OpenSearch client](https://opensearch.org/docs/latest/clients/javascript/index/)
+- Changed SageMaker LLM model from `Falcon-40b` to `Llama-2-13b-chat` and Sagemaker embedding model intfloat/e5-large-v2 now uses the Jumpstart version of the model
+- Removed the cloudformation parameter `Encryption` to prevent disabling of Amazon OpenSearch Service domain and Amazon S3 encryptions
+- Updated Amazon OpenSearch Service domain minimum TLS policy to 1.2
+- Rewrote and migrate S3 object deletion custom resources from JavaScript to Python to address 3rd party security vulnerability
+- Updated CloudFormation template parameter groupings
+- Kendra index configuration has been moved from Content Designer settings to CloudFormation parameters to restrict IAM permissions. The CloudFormation parameter `DefaultKendraIndex` has been replaced with three separate parameters: `KendraWebPageIndexId`, `KendraFaqIndexId`, and `AltSearchKendraIndexes`.
+- Updated question validation when importing or creating questions in Content Designer
+- Kendra Webcrawler will now create data source in the native language if supported by Kendra. Kendra can now query in different languages. ([issue #713](https://github.com/aws-solutions/qnabot-on-aws/issues/713))
+- Standardized folder structure
+- Made logging enhancements for Amazon OpenSearch Service and Amazon Data Firehose
+- Added case conversion handlebars helpers([PRs #719](https://github.com/aws-solutions/qnabot-on-aws/pull/719)) - contributed by ([@amendlik](https://github.com/amendlik))
+- Consolidated common AWS SDK dependencies to reduce overall solution artifact size and lambdas deployment package size
+- Patched security vulnerabilities and and integrated with CloudFormation Guard evaluation tool
+- Added ability to TestAll in a selected locale, the locales to be tested should be defined in the template parameter `LexV2BotLocaleIds` 
+- Improved security for LLM inputs and outputs
+
+### Fixed
+- Forgot password functionality for Content Designer login
+- Chat client will now prompt the user after credentials are expired
+- Specialty bot routing fixes, Lex Intent state fixes, handlebar processing of SSML injects "\n" into response ([PRs #726](https://github.com/aws-solutions/qnabot-on-aws/pull/726)) - contributed by ([@bobpskier](https://github.com/bobpskier))
+- Secured Cognito roles ([PR #670](https://github.com/aws-solutions/qnabot-on-aws/pull/670)) - contributed by ([@amendlik](https://github.com/amendlik))
+- Improved error messages for embeddings ([issue #665](https://github.com/aws-solutions/qnabot-on-aws/issues/665))
+- AWS environment variable for region is wrongly set ([issue #714](https://github.com/aws-solutions/qnabot-on-aws/issues/714))
+- Fixed testall lambda timing out during status "Lex" when testing against large set of Q&As - contributed by ([@jeve7](https://github.com/jeve7))
+- Fix Austrian German neural voice name ([PR #729](https://github.com/aws-solutions/qnabot-on-aws/pull/729)) - contributed by ([@malte-aws](https://github.com/malte-aws))
+- Fix npm update command ([PR #681](https://github.com/aws-solutions/qnabot-on-aws/pull/681)) - contributed by ([@zherink](https://github.com/zherink))
+- Fix build exits with code 1, if a CF template is invalid ([PR #733](https://github.com/aws-solutions/qnabot-on-aws/pull/733)) - contributed by ([@richhaase](https://github.com/richhaase))
+
 ## [5.5.2] - 2024-05-08
 ### Fixed
 - Fixed an issue with the testall functionality which may introduce a high number of versions stored in the testall S3 bucket when the Content designer has no Q&As.

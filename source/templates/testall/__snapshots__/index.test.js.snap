@@ -1,0 +1,466 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`renders testall template correctly 1`] = `
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Conditions": {
+    "VPCEnabled": {
+      "Fn::Not": [
+        {
+          "Fn::Equals": [
+            "",
+            {
+              "Ref": "VPCSecurityGroupIdList",
+            },
+          ],
+        },
+      ],
+    },
+    "XRAYEnabled": {
+      "Fn::Equals": [
+        {
+          "Ref": "XraySetting",
+        },
+        "TRUE",
+      ],
+    },
+  },
+  "Description": "(SO0189n-testall) QnABot nested testall resources - Version vx.x.x",
+  "Outputs": {},
+  "Parameters": {
+    "AwsSdkLayerLambdaLayer": {
+      "Type": "String",
+    },
+    "BootstrapBucket": {
+      "Type": "String",
+    },
+    "BootstrapPrefix": {
+      "Type": "String",
+    },
+    "CFNInvokePolicy": {
+      "Type": "String",
+    },
+    "CFNLambda": {
+      "Type": "String",
+    },
+    "CommonModulesLambdaLayer": {
+      "Type": "String",
+    },
+    "EsEndpoint": {
+      "Type": "String",
+    },
+    "EsProxyLambda": {
+      "Type": "String",
+    },
+    "LexV2BotAliasId": {
+      "Type": "String",
+    },
+    "LexV2BotId": {
+      "Type": "String",
+    },
+    "S3Clean": {
+      "Type": "String",
+    },
+    "TestAllBucket": {
+      "Type": "String",
+    },
+    "VPCSecurityGroupIdList": {
+      "Type": "String",
+    },
+    "VPCSubnetIdList": {
+      "Type": "String",
+    },
+    "VarIndex": {
+      "Type": "String",
+    },
+    "XraySetting": {
+      "Type": "String",
+    },
+  },
+  "Resources": {
+    "TestAllClean": {
+      "Properties": {
+        "Bucket": {
+          "Ref": "TestAllBucket",
+        },
+        "ServiceToken": {
+          "Ref": "S3Clean",
+        },
+      },
+      "Type": "Custom::S3Clean",
+    },
+    "TestAllCodeVersion": {
+      "Properties": {
+        "Bucket": {
+          "Ref": "BootstrapBucket",
+        },
+        "BuildDate": Any<String>,
+        "Key": {
+          "Fn::Sub": "\${BootstrapPrefix}/lambda/testall.zip",
+        },
+        "ServiceToken": {
+          "Ref": "CFNLambda",
+        },
+      },
+      "Type": "Custom::S3Version",
+    },
+    "TestAllRole": {
+      "Metadata": {
+        "cfn_nag": {
+          "rules_to_suppress": [
+            {
+              "id": "W11",
+              "reason": "This IAM role requires to have * resource on its permission policy",
+            },
+            {
+              "id": "W12",
+              "reason": "Lambda needs the following minimum required permissions to send trace data to X-Ray",
+            },
+          ],
+        },
+        "guard": {
+          "SuppressedRules": [
+            "IAM_NO_INLINE_POLICY_CHECK",
+          ],
+        },
+      },
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": "sts:AssumeRole",
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "lambda.amazonaws.com",
+              },
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+        "Path": "/",
+        "Policies": [
+          {
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Action": [
+                    "logs:CreateLogGroup",
+                    "logs:CreateLogStream",
+                    "logs:PutLogEvents",
+                  ],
+                  "Effect": "Allow",
+                  "Resource": {
+                    "Fn::Join": [
+                      "",
+                      [
+                        "arn:",
+                        {
+                          "Ref": "AWS::Partition",
+                        },
+                        ":logs:",
+                        {
+                          "Ref": "AWS::Region",
+                        },
+                        ":",
+                        {
+                          "Ref": "AWS::AccountId",
+                        },
+                        ":log-group:/aws/lambda/*",
+                      ],
+                    ],
+                  },
+                },
+              ],
+              "Version": "2012-10-17",
+            },
+            "PolicyName": "LambdaFunctionServiceRolePolicy",
+          },
+          {
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Action": [
+                    "logs:CreateLogGroup",
+                    "logs:CreateLogStream",
+                    "logs:PutLogEvents",
+                  ],
+                  "Effect": "Allow",
+                  "Resource": {
+                    "Fn::Join": [
+                      "",
+                      [
+                        "arn:",
+                        {
+                          "Ref": "AWS::Partition",
+                        },
+                        ":logs:",
+                        {
+                          "Ref": "AWS::Region",
+                        },
+                        ":",
+                        {
+                          "Ref": "AWS::AccountId",
+                        },
+                        ":log-group:/aws/lambda/*",
+                      ],
+                    ],
+                  },
+                },
+                {
+                  "Action": [
+                    "ec2:CreateNetworkInterface",
+                    "ec2:AssignPrivateIpAddresses",
+                    "ec2:UnassignPrivateIpAddresses",
+                    "ec2:DescribeNetworkInterfaces",
+                    "ec2:DeleteNetworkInterface",
+                  ],
+                  "Effect": "Allow",
+                  "Resource": "*",
+                },
+              ],
+              "Version": "2012-10-17",
+            },
+            "PolicyName": "lambdaVPCAccessExecutionRole",
+          },
+          {
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Action": [
+                    "xray:PutTraceSegments",
+                    "xray:PutTelemetryRecords",
+                    "xray:GetSamplingRules",
+                    "xray:GetSamplingTargets",
+                    "xray:GetSamplingStatisticSummaries",
+                  ],
+                  "Effect": "Allow",
+                  "Resource": [
+                    "*",
+                  ],
+                },
+              ],
+              "Version": "2012-10-17",
+            },
+            "PolicyName": "xrayDaemonWriteAccess",
+          },
+          {
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Action": [
+                    "s3:PutObject",
+                    "s3:GetObject",
+                    "s3:GetObjectVersion",
+                    "s3:DeleteObject",
+                    "s3:DeleteObjectVersion",
+                  ],
+                  "Effect": "Allow",
+                  "Resource": [
+                    {
+                      "Fn::Sub": "arn:aws:s3:::\${TestAllBucket}*",
+                    },
+                  ],
+                },
+                {
+                  "Action": [
+                    "lambda:InvokeFunction",
+                  ],
+                  "Effect": "Allow",
+                  "Resource": [
+                    {
+                      "Ref": "EsProxyLambda",
+                    },
+                  ],
+                },
+                {
+                  "Action": [
+                    "lex:RecognizeText",
+                  ],
+                  "Effect": "Allow",
+                  "Resource": [
+                    {
+                      "Fn::Sub": "arn:\${AWS::Partition}:lex:\${AWS::Region}:\${AWS::AccountId}:bot-alias/*/*",
+                    },
+                  ],
+                },
+              ],
+              "Version": "2012-10-17",
+            },
+            "PolicyName": "TestAllPolicy",
+          },
+        ],
+      },
+      "Type": "AWS::IAM::Role",
+    },
+    "TestAllStepLambda": {
+      "Metadata": {
+        "cfn_nag": {
+          "rules_to_suppress": [
+            {
+              "id": "W92",
+              "reason": "This lambda function does not require to have ReservedConcurrentExecutions",
+            },
+          ],
+        },
+        "guard": {
+          "SuppressedRules": [
+            "LAMBDA_CONCURRENCY_CHECK",
+            "LAMBDA_INSIDE_VPC",
+          ],
+        },
+      },
+      "Properties": {
+        "Code": {
+          "S3Bucket": {
+            "Ref": "BootstrapBucket",
+          },
+          "S3Key": {
+            "Fn::Sub": "\${BootstrapPrefix}/lambda/testall.zip",
+          },
+          "S3ObjectVersion": {
+            "Ref": "TestAllCodeVersion",
+          },
+        },
+        "Environment": {
+          "Variables": {
+            "ES_ENDPOINT": {
+              "Ref": "EsEndpoint",
+            },
+            "ES_INDEX": {
+              "Ref": "VarIndex",
+            },
+            "ES_PROXY": {
+              "Ref": "EsProxyLambda",
+            },
+            "LEXV2_BOT_ALIAS_ID": {
+              "Ref": "LexV2BotAliasId",
+            },
+            "LEXV2_BOT_ID": {
+              "Ref": "LexV2BotId",
+            },
+            "SOLUTION_ID": "SO0189",
+            "SOLUTION_VERSION": "vx.x.x",
+          },
+        },
+        "Handler": "index.step",
+        "Layers": [
+          {
+            "Ref": "AwsSdkLayerLambdaLayer",
+          },
+          {
+            "Ref": "CommonModulesLambdaLayer",
+          },
+        ],
+        "MemorySize": "1280",
+        "Role": {
+          "Fn::GetAtt": [
+            "TestAllRole",
+            "Arn",
+          ],
+        },
+        "Runtime": "nodejs",
+        "Tags": [
+          {
+            "Key": "Type",
+            "Value": "TestAll",
+          },
+        ],
+        "Timeout": 900,
+        "TracingConfig": {
+          "Fn::If": [
+            "XRAYEnabled",
+            {
+              "Mode": "Active",
+            },
+            {
+              "Ref": "AWS::NoValue",
+            },
+          ],
+        },
+        "VpcConfig": {
+          "Fn::If": [
+            "VPCEnabled",
+            {
+              "SecurityGroupIds": {
+                "Fn::Split": [
+                  ",",
+                  {
+                    "Ref": "VPCSecurityGroupIdList",
+                  },
+                ],
+              },
+              "SubnetIds": {
+                "Fn::Split": [
+                  ",",
+                  {
+                    "Ref": "VPCSubnetIdList",
+                  },
+                ],
+              },
+            },
+            {
+              "Ref": "AWS::NoValue",
+            },
+          ],
+        },
+      },
+      "Type": "AWS::Lambda::Function",
+    },
+    "TestAllStepPermission": {
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "FunctionName": {
+          "Fn::GetAtt": [
+            "TestAllStepLambda",
+            "Arn",
+          ],
+        },
+        "Principal": "s3.amazonaws.com",
+        "SourceAccount": {
+          "Ref": "AWS::AccountId",
+        },
+        "SourceArn": {
+          "Fn::Sub": "arn:aws:s3:::\${TestAllBucket}",
+        },
+      },
+      "Type": "AWS::Lambda::Permission",
+    },
+    "TestAllTrigger": {
+      "Properties": {
+        "Bucket": {
+          "Ref": "TestAllBucket",
+        },
+        "NotificationConfiguration": {
+          "LambdaFunctionConfigurations": [
+            {
+              "Events": [
+                "s3:ObjectCreated:*",
+              ],
+              "Filter": {
+                "Key": {
+                  "FilterRules": [
+                    {
+                      "Name": "prefix",
+                      "Value": "status",
+                    },
+                  ],
+                },
+              },
+              "LambdaFunctionArn": {
+                "Fn::GetAtt": [
+                  "TestAllStepLambda",
+                  "Arn",
+                ],
+              },
+            },
+          ],
+        },
+        "ServiceToken": {
+          "Ref": "CFNLambda",
+        },
+      },
+      "Type": "Custom::S3Lambda",
+    },
+  },
+}
+`;

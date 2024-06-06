@@ -68,7 +68,7 @@ run_python_unit_test() {
 		exit 1
 	fi
 	echo "source dir is $source_dir"
-	sed -i -e "s,<source>$source_dir/,<source>,g" $coverage_report_path
+	sed -i -e "s,<source>$source_dir,<source>source,g" $coverage_report_path
 	echo "deactivate virtual environment"
 	deactivate
 
@@ -146,7 +146,7 @@ run_website_tests() {
 
 # Save the current working directory and set source directory
 starting_dir=$PWD
-cd ..
+cd ../source
 source_dir=$PWD
 
 # Option to clean or not clean the unit test environment before and after running tests.
@@ -200,14 +200,16 @@ run_javascript_lambda_test testall "Testall Lambda Unit Tests"
 run_javascript_lambda_test export "Export Lambdas Unit Tests"
 run_javascript_lambda_test import "Import Lambdas Unit Tests"
 
-echo "Running Source unit tests"
-cd $source_dir/source
-run_python_unit_test source "QnABot CLI"
+echo "Running CLI unit tests"
+cd $source_dir/cli
+run_python_unit_test cli "QnABot CLI"
 
 echo "Starting Templates unit tests"
 run_templates_test
 
 echo "Running Templates Python unit tests"
+## NOTICE: Canvas LMS integration with QnABot on AWS is deprecated in this release and no longer be supported. Customers may fork the code needed for their specific use case from previous versions. The integration code will be removed in the next release.
+ 
 python_directories=("$source_dir/templates/examples/examples/py" "$source_dir/templates/examples/extensions/py_lambda_hooks/CustomPYHook" "$source_dir/templates/examples/extensions/py_lambda_hooks/CanvasLMSHook")
 for folder in "${python_directories[@]}" ; do
     cd "$folder"

@@ -1,0 +1,26 @@
+{
+    "name": "lex-build",
+    "version": "6.0.0",
+    "description": "QnABot lambda for rebuilding Amazon Lex bots",
+    "main": "handler.js",
+    "scripts": {
+        "test": "jest --coverage --silent --verbose",
+        "unit": "nodeunit ./test/index.js -t",
+        "clean": "rm -rf node_modules"
+    },
+    "author": {
+        "name": "Amazon Web Services",
+        "url": "https://aws.amazon.com/solutions"
+    },
+    "license": "Apache-2.0",
+    "devDependencies": {
+        "@smithy/util-stream": "^2.1.1",
+        "aws-sdk-client-mock": "^3.0.1",
+        "aws-sdk-client-mock-jest": "^3.0.1",
+        "diff": "^4.0.2",
+        "jest": "^29.7.0"
+    },
+    "dependencies": {
+        "@aws-sdk/client-lex-model-building-service": "^3.511.0"
+    }
+}

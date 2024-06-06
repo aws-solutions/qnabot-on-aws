@@ -1,0 +1,20 @@
+{
+    "name": "cfn-lambda-layer",
+    "version": "6.0.0",
+    "description": "QnABot Cfn Lambda Layer",
+    "main": "index.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "author": {
+        "name": "Amazon Web Services",
+        "url": "https://aws.amazon.com/solutions"
+    },
+    "license": "Apache-2.0",
+    "dependencies": {
+        "cfn-lambda": "^5.1.0"
+    },
+    "overrides": {
+        "minimatch@<3.0.5": "^3.0.5"
+    }
+}

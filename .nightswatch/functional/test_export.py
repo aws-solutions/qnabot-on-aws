@@ -25,5 +25,5 @@ class TestExport:
         """
         menu = MenuNav(dom_operator)
         export_page = menu.open_export_page()
-        export_page.generate_export('export', 'Export')
+        export_page.generate_export('export.json', 'Export')
 

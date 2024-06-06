@@ -16,6 +16,8 @@ from helpers.website_model.dom_operator import DomOperator
 
 KENDRA_INDEXING_BUTTON_XPATH = '//*[@id="btnKendraStartIndex"]'
 
+KENDRA_INDEXING_BUTTON_ID = 'btnKendraStartIndex'
+
 KENDRA_IMPORT_XPATH = '//div[@id="page-import"]//p'
 
 SYNCING_TEXT = 'Current Status: SYNCING'
@@ -59,7 +61,8 @@ class KendraPage:
         """
         
         # self.operator.wait_for_element_by_xpath(KENDRA_INDEXING_BUTTON_XPATH)
-        self.operator.select_xpath(KENDRA_INDEXING_BUTTON_XPATH, wait=30, click=True)
+        time.sleep(2)
+        self.operator.click_element_by_id(KENDRA_INDEXING_BUTTON_ID)
         self.operator.wait_for_element_by_xpath_text(KENDRA_IMPORT_XPATH, SYNCING_TEXT, delay=360)
         status = self.operator.select_xpath(KENDRA_IMPORT_XPATH).text
         return status
