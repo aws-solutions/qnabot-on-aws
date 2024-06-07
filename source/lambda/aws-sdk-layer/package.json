@@ -1,0 +1,23 @@
+{
+    "name": "aws-layer",
+    "version": "6.0.0",
+    "description": "QnABot Lambda aws-sdk-layer",
+    "main": "index.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "author": {
+        "name": "Amazon Web Services",
+        "url": "https://aws.amazon.com/solutions"
+    },
+    "license": "Apache-2.0",
+    "dependencies": {
+        "@aws-sdk/client-bedrock-agent-runtime": "3.511.0",
+        "@aws-sdk/client-bedrock-runtime": "3.511.0",
+        "@aws-sdk/client-comprehend": "3.511.0",
+        "@aws-sdk/client-kendra": "3.511.0",
+        "@aws-sdk/client-lambda": "3.511.0",
+        "@aws-sdk/client-s3": "3.511.0",
+        "@aws-sdk/client-translate": "3.511.0"
+    }
+}

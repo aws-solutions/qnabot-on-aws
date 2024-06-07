@@ -53,6 +53,7 @@ class TestTranslate:
         menu = MenuNav(dom_operator)
         settings_page = menu.open_settings_page()
         settings_page.reset_settings()
+        settings_page.expand_all_subgroups()
         # Needs to be enabled, otherwise all questions fallback
         assert 'Success' in settings_page.enable_kendra_fallback()
         assert 'Success' in settings_page.disable_embeddings()
@@ -110,7 +111,7 @@ class TestTranslate:
 
         chat_page = menu.open_chat_page()
 
-        # French language currently has an issue with custom terminology see: https://t.corp.amazon.com/V998365774/overview
+        # French language currently has an issue with custom terminology.
         call = translate_client.translate(question['q'][0], 'es')
         response = translate_client.translate(question['a'], 'es')
     

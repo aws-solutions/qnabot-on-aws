@@ -48,6 +48,7 @@ class TestQuestionDesigner:
         menu = MenuNav(dom_operator)
         settings_page = menu.open_settings_page()
         settings_page.reset_settings()
+        settings_page.expand_all_subgroups()
         # Needs to be enabled, otherwise all questions fallback
         assert 'Success' in settings_page.enable_kendra_fallback()
         assert 'Success' in settings_page.disable_embeddings()
@@ -430,6 +431,7 @@ class TestQuestionDesigner:
         self.__create_question(question, edit_page)
 
         settings_page = menu.open_settings_page()
+        settings_page.expand_all_subgroups()
         settings_page.enable_filter()
         settings_page.set_match_criteria('2<75%')
 

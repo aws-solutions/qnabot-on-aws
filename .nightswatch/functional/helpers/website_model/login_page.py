@@ -87,7 +87,11 @@ class LoginPage:
         else:
             EditPage(self.operator)
 
-        if self.operator.element_exists_by_id('loginErrorMessage'):
-            raise RuntimeError(self.operator.select_id('loginErrorMessage').text)
+        output = self.operator.get_title()
         
-        return self.operator.get_title()
+        if self.operator.element_exists_by_id('loginErrorMessage'):
+            if password == 'invalidPassword':
+                output = (output, self.operator.select_id('loginErrorMessage').text)
+            else:
+                raise RuntimeError(self.operator.select_id('loginErrorMessage').text)
+        return output

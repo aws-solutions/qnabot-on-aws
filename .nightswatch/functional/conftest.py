@@ -89,7 +89,7 @@ def param_fetcher(region: str, stack_name: str) -> ParameterFetcher:
 
 @pytest.fixture
 def kendra_client(region: str, param_fetcher: ParameterFetcher) -> KendraClient:
-    return KendraClient(region, param_fetcher.get_kendra_index())
+    return KendraClient(region, param_fetcher.get_kendra_faq_index(), param_fetcher.get_kendra_webpage_index())
 
 @pytest.fixture
 def lex_client(region: str) -> LexClient:
@@ -128,6 +128,13 @@ def dom_operator():
     dom_operator.end_session()
 
 @pytest.fixture
+def invalid_designer_login(dom_operator: DomOperator, param_fetcher: ParameterFetcher, username: str, password: str):
+    designer_url = param_fetcher.get_designer_url()
+    login_page = LoginPage(dom_operator, designer_url)
+    password = 'invalidPassword'
+    return login_page.login(username, password)
+
+@pytest.fixture
 def designer_login(dom_operator: DomOperator, param_fetcher: ParameterFetcher, username: str, password: str):
     designer_url = param_fetcher.get_designer_url()
     login_page = LoginPage(dom_operator, designer_url)
@@ -137,6 +144,13 @@ def designer_login(dom_operator: DomOperator, param_fetcher: ParameterFetcher, u
 def client_login(dom_operator: DomOperator, param_fetcher: ParameterFetcher, username: str, password: str):
     client_url = param_fetcher.get_client_url()
     login_page = LoginPage(dom_operator, client_url)
+    return login_page.login(username, password)
+
+@pytest.fixture
+def invalid_client_login(dom_operator: DomOperator, param_fetcher: ParameterFetcher, username: str, password: str):
+    client_url = param_fetcher.get_client_url()
+    login_page = LoginPage(dom_operator, client_url)
+    password = 'invalidPassword'
     return login_page.login(username, password)
 
 @pytest.fixture
@@ -155,12 +169,24 @@ if test_time_flag:
 def kendra_is_enabled(param_fetcher: ParameterFetcher):
     return param_fetcher.kendra_is_enabled()
 
+
 @pytest.fixture(autouse=True)
 def skip_kendra(request, kendra_is_enabled):
     if request.node.get_closest_marker('skipif_kendra_not_enabled'):
         # if True:
         if not kendra_is_enabled:
             pytest.skip('Kendra is not configured for this environment. Skipping...')
+
+@pytest.fixture
+def knowledge_base_is_enabled(param_fetcher: ParameterFetcher):
+    return param_fetcher.bedrock_knowledge_base_is_enabled()
+
+@pytest.fixture(autouse=True)
+def skip_knowledge_base(request, knowledge_base_is_enabled):
+    if request.node.get_closest_marker('skipif_knowledge_base_not_enabled'):
+        # if True:
+        if not knowledge_base_is_enabled:
+            pytest.skip('Knowledge bases are not configured for this environment. Skipping...')
 
 @pytest.fixture
 def llm_is_enabled(param_fetcher: ParameterFetcher):

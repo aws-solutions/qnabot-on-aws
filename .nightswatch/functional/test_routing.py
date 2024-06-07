@@ -31,7 +31,6 @@ region = os.environ.get('CURRENT_STACK_REGION')
 lexv2_regions = [
     'us-east-1',
     'us-west-2',
-    'af-south-1',
     'ap-northeast-2',
     'ap-southeast-1',
     'ap-southeast-2',
@@ -82,6 +81,7 @@ class TestRouting:
 
         settings_page = menu.open_settings_page()
         settings_page.reset_settings()
+        settings_page.expand_all_subgroups()
         # Needs to be enabled, otherwise all questions fallback
         assert 'Success' in settings_page.enable_kendra_fallback()
         assert 'Success' in settings_page.disable_embeddings()
@@ -106,7 +106,7 @@ class TestRouting:
 
     def test_bot_routing(self, client_login, loaded_questions: list[dict], dom_operator: DomOperator, cw_client: CloudWatchClient):
         """
-        Tests the bot routes to the specialty bot.
+        Tests the bot routes to the specialty bot and exits the specialty bot.
         """
         qid = 'Routing.001'
         question = self.__get_question_by_qid(qid, loaded_questions)
@@ -117,7 +117,23 @@ class TestRouting:
         chat_page.send_message('Hi')
         answer = chat_page.get_messages()
         assert question['a'] in answer
-        assert 'GREETINGS, I AM TEST BOT' in answer
+        assert 'GREETINGS, I AM TEST BOT. Welcome back to QnABot.' in answer
+        cw_client.print_fulfillment_lambda_logs()
+    
+    def test_bot_routing_exit_utterance(self, client_login, loaded_questions: list[dict], dom_operator: DomOperator, cw_client: CloudWatchClient):
+        """
+        Tests the bot routes to the specialty bot but exits after one of the exit message is set by BOT_ROUTER_EXIT_MSGS.
+        """
+        qid = 'Routing.001'
+        question = self.__get_question_by_qid(qid, loaded_questions)
+
+        chat_page = ChatPage(dom_operator)
+
+        chat_page.send_message(question['q'][0])
+        chat_page.send_message('exit')
+        answer = chat_page.get_messages()
+        assert question['a'] in answer
+        assert 'Welcome back to QnABot.' in answer
         cw_client.print_fulfillment_lambda_logs()
 
     def test_pass_attribute_to_specialty_bot(self, client_login, loaded_questions: list[dict], dom_operator: DomOperator, cw_client: CloudWatchClient):
@@ -132,7 +148,7 @@ class TestRouting:
         chat_page.send_message(question['q'][0])
         chat_page.send_message('Do I have an attribute?')
         answer = chat_page.get_messages()
-        assert 'TRUE - YOUR ATTRIBUTE IS CONFIGURED CORRECTLY' in answer
+        assert 'TRUE - YOUR ATTRIBUTE IS CONFIGURED CORRECTLY. Welcome back to QnABot.' in answer
         cw_client.print_fulfillment_lambda_logs()
 
     @pytest.mark.skipif_version_less_than('5.5.0')
@@ -148,11 +164,8 @@ class TestRouting:
         chat_page = ChatPage(dom_operator)
 
         chat_page.send_message(question['q'][0])
-        chat_page.send_message('exit')
         answer = chat_page.get_messages()
-        assert 'HERE IS A SESSION ATTRIBUTE' in answer
-        assert 'Welcome back to QnABot.' in answer
-        assert 'You just received a session attribute from test bot.' in answer
+        assert 'HERE IS A SESSION ATTRIBUTE. Welcome back to QnABot.You just received a session attribute from test bot.' in answer
         cw_client.print_fulfillment_lambda_logs()
 
     def test_bot_cleanup(self, lex_client: LexClient, iam_client: IamClient):

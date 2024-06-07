@@ -1,0 +1,136 @@
+{
+"LexAccessPolicy":{
+  "Type": "AWS::IAM::ManagedPolicy",
+  "Properties": {
+    "PolicyDocument": {
+      "Version": "2012-10-17",
+      "Statement": [{
+          "Effect": "Allow",
+          "Action": [
+            "lex:PostContent",
+            "lex:PostText",
+            "lex:RecognizeText",
+            "lex:RecognizeUtterance"
+          ],
+          "Resource": [
+            {
+              "Fn::Sub": "arn:${AWS::Partition}:lex:${AWS::Region}:${AWS::AccountId}:*"
+            }
+          ]
+        },{
+          "Effect": "Allow",
+          "Action": [
+            "polly:SynthesizeSpeech"
+          ],
+          "Resource": [
+            {
+              "Fn::Sub": "arn:${AWS::Partition}:polly:${AWS::Region}:${AWS::AccountId}:*"
+            }
+          ]
+        }]
+    },
+    "Roles":{"Fn::If":[
+        "Public",
+        [{"Ref":"AdminRole"},{"Ref":"UnauthenticatedRole"},{"Ref":"UserRole"}],
+        [{"Ref":"AdminRole"},{"Ref":"UserRole"}]
+    ]}
+  },
+  "Metadata": {
+    "cfn_nag": {
+      "rules_to_suppress": [{
+        "id": "W13",
+        "reason": "This policy is required to have * resource"
+      }]
+    }
+  }
+},
+"ApiGatewayCloudWatchLogsRole": {
+  "Type": "AWS::IAM::Role",
+  "Properties": {
+    "AssumeRolePolicyDocument": {
+      "Version": "2012-10-17",
+      "Statement": [
+        {
+          "Effect": "Allow",
+          "Principal": {
+            "Service": [
+              "apigateway.amazonaws.com"
+            ]
+          },
+          "Action": [
+            "sts:AssumeRole"
+          ]
+        }
+      ]
+    },
+    "Policies": [
+      {
+        "PolicyName": "ApiGatewayLogsPolicy",
+        "PolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Action": [
+                "logs:DescribeLogGroups"
+            ],
+              "Resource": ["*"]
+            },
+            {
+              "Effect": "Allow",
+              "Action": [
+                "logs:CreateLogGroup",
+                "logs:CreateLogStream",
+                "logs:DescribeLogStreams",
+                "logs:PutLogEvents",
+                "logs:GetLogEvents",
+                "logs:FilterLogEvents"
+             ],
+              "Resource": [
+                {
+                  "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:*"
+                }
+              ]
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "Metadata":{
+    "cfn_nag": {
+      "rules_to_suppress": [{
+        "id": "W11",
+        "reason": "This IAM role requires to have * resource on its permission policy"
+      }]
+    },
+    "guard": {
+      "SuppressedRules": ["IAM_NO_INLINE_POLICY_CHECK"]
+    }
+  }
+},
+"ApiGatewayRole": {
+  "Type": "AWS::IAM::Role",
+  "Metadata": {
+    "guard": { "SuppressedRules": ["IAM_NO_INLINE_POLICY_CHECK"] }
+  },
+  "Properties": {
+    "AssumeRolePolicyDocument": {
+      "Version": "2012-10-17",
+      "Statement": [
+        {
+          "Effect": "Allow",
+          "Principal": {
+            "Service": [
+              "apigateway.amazonaws.com"
+            ]
+          },
+          "Action": [
+            "sts:AssumeRole"
+          ]
+        }
+      ]
+    }
+  }
+}
+}

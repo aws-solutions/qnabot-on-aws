@@ -1,0 +1,34 @@
+{
+  "qna": [
+    {
+      "a": "You cannot leave your QID blank",
+      "type": "qna",
+      "qid": "",
+      "q": [
+        "Can I leave my QID Blank?"
+      ]
+    },
+    {
+      "a": "You cannot have spaces in your Item ID, Quiz Question ID, or Slot type name.",
+      "type": "qna",
+      "qid": "No Spaces.001",
+      "q": [
+        "Can I add spaces in my qid?"
+      ]
+    },
+    {
+      "a": "You cannot have an with no question",
+      "type": "qna",
+      "qid": "NoQuestion.001",
+      "q": []
+    },
+    {
+      "a": "",
+      "type": "qna",
+      "qid": "NoAnswer.001",
+      "q": [
+        "Can I have a question but no answer?"
+      ]
+    }
+  ]
+}
