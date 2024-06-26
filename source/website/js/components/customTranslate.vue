@@ -17,7 +17,7 @@ v-container(id="page-import")
       v-card
         v-card-title.text-h4.pa-6 Import Translate Custom Terminologies
         v-card-text.pb-0.pl-6.pr-6
-          h3 For more information about Amazon Translate custom terminologies, see <!-- NOSONAR-start --><!-- This link is safe --><a href="https://github.com/aws-solutions/qnabot-on-aws/blob/main/docs/custom_terminology_guide/README.md" target="_blank">here</a><!-- NOSONAR-end -->
+          h3 For more information about Amazon Translate custom terminologies, see <!-- NOSONAR-start --><!-- This link is safe --><a href="https://github.com/aws-solutions/qnabot-on-aws/blob/main/source/docs/custom_terminology_guide/README.md" target="_blank">here</a><!-- NOSONAR-end -->
         v-card-text(v-if="!IsCustomTerminologyEnabled")
           p Set ENABLE_CUSTOM_TERMINOLOGY to true in settings to enable the use of terminology files for Amazon Translate
         v-card-text.pl-6.pr-6(v-if="IsCustomTerminologyEnabled")

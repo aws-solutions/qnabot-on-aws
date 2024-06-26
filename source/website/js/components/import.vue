@@ -103,7 +103,7 @@ module.exports = {
             importWarning:
                 'Warning, Importing will over write existing QnAs with the same ID </br>'
                 + 'You can import either a JSON file exported from QnABot or a properly </br> '
-                + 'formatted Excel file.  For the file format, see <a href=\'https://github.com/aws-solutions/qnabot-on-aws/tree/main/docs/excel_import#readme\' target="_blank">here</a>.',
+                + 'formatted Excel file.  For the file format, see <a href=\'https://github.com/aws-solutions/qnabot-on-aws/blob/main/source/docs/excel_import/README.md\' target="_blank">here</a>.',
             loading: false,
             testing: false,
             url: '',

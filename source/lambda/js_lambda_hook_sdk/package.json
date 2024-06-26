@@ -1,6 +1,6 @@
 {
     "name": "js_lambda_hook_sdk",
-    "version": "6.0.0",
+    "version": "6.0.1",
     "description": "QnABot convenience layer, allowing users to create custom lambda hooks",
     "directories": {
         "lambda_hook_sdk": "lambda_hook_sdk",

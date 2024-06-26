@@ -41,8 +41,8 @@ QnABot exposes the following content to the Handlebars context:
 |SessionAttributes._name_          | all session attributes are available to the handlebars context - see helpers 'setSessionAttr' and 'getSessionAttr' |
 |Slots._name_                      | all slots filled by Lex are available to the handlebars context - see helper 'getSlot' |
 |Settings._name_                   | all settings values are available to the handlebars context |
-|Question                          | the users utterance, or question - translated to English if ENABLE\_MULTI\_LANGUAGE\_SUPPORT is true |
-|OrigQuestion                      | the users utterance, or question - before translation to English if ENABLE\_MULTI\_LANGUAGE\_SUPPORT is true |
+|Question                          | the users utterance, or question - translated as appropriate if ENABLE_MULTI_LANGUAGE_SUPPORT is true |
+|OrigQuestion                      | the users utterance, or question - before translation if ENABLE_MULTI_LANGUAGE_SUPPORT is true |
 |PreviousQuestion                  | the users previous utterance, or question |
 |Sentiment                         | the detected sentiment value of user's question/utterance (POSITIVE\|NEGATIVE\|NEUTRAL\|MIXED)|
 

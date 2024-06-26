@@ -2,7 +2,7 @@
   "OpenSearchDashboardsRole": {
     "Type": "AWS::IAM::Role",
     "Metadata": {
-      "guard": { "SuppressedRules": ["IAM_NO_INLINE_POLICY_CHECK"] }
+      "guard": { "SuppressedRules": ["IAM_NO_INLINE_POLICY_CHECK", "CFN_NO_EXPLICIT_RESOURCE_NAMES"] }
     },
     "Properties": {
       "AssumeRolePolicyDocument": {
@@ -24,6 +24,30 @@
           }
         ]
       },
+      "RoleName": {                  
+        "Fn::Join": [
+        "",
+        [
+            {
+              "Fn::Select": ["0", 
+              { 
+                "Fn::Split": ["-", 
+                { 
+                  "Fn::Select" : [2, 
+                  {
+                    "Fn::Split": ["/",
+                    {
+                      "Ref": "AWS::StackId"
+                    }
+                    ]   
+                  }
+                ]
+                }]
+              }]
+          },
+          "-OpenSearchDashboardsRole"
+        ]
+    ]},
       "Path": "/",
       "Policies": [
         {
@@ -71,6 +95,30 @@
         ]
       },
       "Path": "/",
+      "RoleName": {                  
+        "Fn::Join": [
+        "",
+        [
+            {
+              "Fn::Select": ["0", 
+              { 
+                "Fn::Split": ["-", 
+                { 
+                  "Fn::Select" : [2, 
+                  {
+                    "Fn::Split": ["/",
+                    {
+                      "Ref": "AWS::StackId"
+                    }
+                    ]   
+                  }
+                ]
+                }]
+              }]
+          },
+          "-AdminRole"
+        ]
+    ]},
       "Policies": [
         {
           "PolicyName": "apiAccess",
@@ -176,13 +224,13 @@
           }
         ]
       },
-      "guard": { "SuppressedRules": ["IAM_NO_INLINE_POLICY_CHECK"] }
+      "guard": { "SuppressedRules": ["IAM_NO_INLINE_POLICY_CHECK", "CFN_NO_EXPLICIT_RESOURCE_NAMES"] }
     }
   },
   "UserRole": {
     "Type": "AWS::IAM::Role",
     "Metadata": {
-      "guard": { "SuppressedRules": ["IAM_NO_INLINE_POLICY_CHECK"] }
+      "guard": { "SuppressedRules": ["IAM_NO_INLINE_POLICY_CHECK", "CFN_NO_EXPLICIT_RESOURCE_NAMES"] }
     },
     "Properties": {
       "AssumeRolePolicyDocument": {
@@ -207,13 +255,37 @@
           }
         ]
       },
-      "Path": "/"
+      "Path": "/",
+      "RoleName": {                  
+        "Fn::Join": [
+        "",
+        [
+            {
+              "Fn::Select": ["0", 
+              { 
+                "Fn::Split": ["-", 
+                { 
+                  "Fn::Select" : [2, 
+                  {
+                    "Fn::Split": ["/",
+                    {
+                      "Ref": "AWS::StackId"
+                    }
+                    ]   
+                  }
+                ]
+                }]
+              }]
+          },
+          "-UserRole"
+        ]
+    ]}
     }
   },
   "UnauthenticatedRole": {
     "Type": "AWS::IAM::Role",
     "Metadata": {
-      "guard": { "SuppressedRules": ["IAM_NO_INLINE_POLICY_CHECK"] }
+      "guard": { "SuppressedRules": ["IAM_NO_INLINE_POLICY_CHECK","CFN_NO_EXPLICIT_RESOURCE_NAMES"] }
     },
     "Properties": {
       "AssumeRolePolicyDocument": {
@@ -238,7 +310,31 @@
           }
         ]
       },
-      "Path": "/"
+      "Path": "/",
+      "RoleName": {                  
+        "Fn::Join": [
+        "",
+        [
+            {
+              "Fn::Select": ["0", 
+              { 
+                "Fn::Split": ["-", 
+                { 
+                  "Fn::Select" : [2, 
+                  {
+                    "Fn::Split": ["/",
+                    {
+                      "Ref": "AWS::StackId"
+                    }
+                    ]   
+                  }
+                ]
+                }]
+              }]
+          },
+          "-UnauthenticatedRole"
+        ]
+    ]}
     }
   },
   "CFNLambdaRole": {
@@ -344,11 +440,41 @@
                 "Action": [
                   "iam:PassRole"
                 ],
-                "Resource": [
-                  {
-                    "Fn::Sub": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/${AWS::StackName}-*"
-                  }
-                ]
+                "Resource": {
+                  "Fn::Join": [
+                      "",
+                      [
+                          "arn:",
+                          {
+                              "Ref": "AWS::Partition"
+                          },
+                          ":iam::",
+                          {
+                              "Ref": "AWS::AccountId"
+                          },
+                          ":role/",
+                          {
+                            "Fn::Select": ["0", 
+                            { 
+                              "Fn::Split": ["-", 
+                              { 
+                                "Fn::Select" : [2, 
+                                {
+                                  "Fn::Split": ["/",
+                                  {
+                                    "Ref": "AWS::StackId"
+                                  }
+                                  ]   
+                                }
+                              ]
+                              }]
+                            }]
+                        },
+                        "-*"
+                      ]
+                  ]
+              }
+                
               },
               {
                 "Effect": "Allow",

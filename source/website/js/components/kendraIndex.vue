@@ -17,7 +17,7 @@ v-container#page-import
       v-card
         v-card-title.text-h4.pa-6 Kendra Web Crawling
         v-card-text.pb-0.pl-6.pr-6
-          h3 For more information about Kendra Web Crawling, see <!-- NOSONAR-start --><!-- This link is safe --><a href="https://github.com/aws-solutions/qnabot-on-aws/blob/main/docs/kendra_crawler_guide/README.md" target="_blank">here</a><!-- NOSONAR-end -->
+          h3 For more information about Kendra Web Crawling, see <!-- NOSONAR-start --><!-- This link is safe --><a href="https://github.com/aws-solutions/qnabot-on-aws/blob/main/source/docs/kendra_crawler_guide/README.md" target="_blank">here</a><!-- NOSONAR-end -->
         v-card-text(v-if="!kendraIndexerEnabled").pa-6
           h4 To Enable Kendra Web Crawling, following configuration is required.
           br

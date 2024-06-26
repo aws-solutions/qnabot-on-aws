@@ -245,6 +245,9 @@ module.exports = {
             },
             Roles: [{ Ref: 'FulfillmentLambdaRole' }],
         },
+        Metadata: {
+            guard: util.cfnGuard('IAM_POLICY_NON_COMPLIANT_ARN'),
+        },
     },
     FulfillmentLambdaRole: {
         Type: 'AWS::IAM::Role',

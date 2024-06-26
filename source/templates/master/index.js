@@ -382,7 +382,7 @@ module.exports = {
         },
         LexV2BotLocaleIds: {
             Description:
-                'Languages for QnABot on AWS voice interaction using LexV2. Specify as a comma separated list of valid Locale IDs without empty spaces - see https://github.com/aws-solutions/aws-qnabot/blob/main/docs/multilanguage_support/README.md#supported-languages',
+                'Languages for QnABot on AWS voice interaction using LexV2. Specify as a comma separated list of valid Locale IDs without empty spaces - see https://github.com/aws-solutions/qnabot-on-aws/blob/main/source/docs/multilanguage_support/README.md#supported-languages',
             Type: 'String',
             Default: 'en_US,es_US,fr_CA',
             AllowedPattern: '[^ ]+',

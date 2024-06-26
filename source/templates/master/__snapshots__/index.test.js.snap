@@ -1091,7 +1091,7 @@ exports[`Verify master template is correct renders master template correctly 1`]
       "AllowedPattern": "[^ ]+",
       "ConstraintDescription": "Must be a valid comma separated list of Locale IDs",
       "Default": "en_US,es_US,fr_CA",
-      "Description": "Languages for QnABot on AWS voice interaction using LexV2. Specify as a comma separated list of valid Locale IDs without empty spaces - see https://github.com/aws-solutions/aws-qnabot/blob/main/docs/multilanguage_support/README.md#supported-languages",
+      "Description": "Languages for QnABot on AWS voice interaction using LexV2. Specify as a comma separated list of valid Locale IDs without empty spaces - see https://github.com/aws-solutions/qnabot-on-aws/blob/main/source/docs/multilanguage_support/README.md#supported-languages",
       "Type": "String",
     },
     "OpenSearchDashboardsRetentionMinutes": {
@@ -1216,6 +1216,7 @@ exports[`Verify master template is correct renders master template correctly 1`]
         "guard": {
           "SuppressedRules": [
             "IAM_NO_INLINE_POLICY_CHECK",
+            "CFN_NO_EXPLICIT_RESOURCE_NAMES",
           ],
         },
       },
@@ -1338,6 +1339,37 @@ exports[`Verify master template is correct renders master template correctly 1`]
             "PolicyName": "apiAccess",
           },
         ],
+        "RoleName": {
+          "Fn::Join": [
+            "",
+            [
+              {
+                "Fn::Select": [
+                  "0",
+                  {
+                    "Fn::Split": [
+                      "-",
+                      {
+                        "Fn::Select": [
+                          2,
+                          {
+                            "Fn::Split": [
+                              "/",
+                              {
+                                "Ref": "AWS::StackId",
+                              },
+                            ],
+                          },
+                        ],
+                      },
+                    ],
+                  },
+                ],
+              },
+              "-AdminRole",
+            ],
+          ],
+        },
       },
       "Type": "AWS::IAM::Role",
     },
@@ -2832,11 +2864,46 @@ exports[`Verify master template is correct renders master template correctly 1`]
                     "iam:PassRole",
                   ],
                   "Effect": "Allow",
-                  "Resource": [
-                    {
-                      "Fn::Sub": "arn:\${AWS::Partition}:iam::\${AWS::AccountId}:role/\${AWS::StackName}-*",
-                    },
-                  ],
+                  "Resource": {
+                    "Fn::Join": [
+                      "",
+                      [
+                        "arn:",
+                        {
+                          "Ref": "AWS::Partition",
+                        },
+                        ":iam::",
+                        {
+                          "Ref": "AWS::AccountId",
+                        },
+                        ":role/",
+                        {
+                          "Fn::Select": [
+                            "0",
+                            {
+                              "Fn::Split": [
+                                "-",
+                                {
+                                  "Fn::Select": [
+                                    2,
+                                    {
+                                      "Fn::Split": [
+                                        "/",
+                                        {
+                                          "Ref": "AWS::StackId",
+                                        },
+                                      ],
+                                    },
+                                  ],
+                                },
+                              ],
+                            },
+                          ],
+                        },
+                        "-*",
+                      ],
+                    ],
+                  },
                 },
                 {
                   "Action": [
@@ -10337,6 +10404,13 @@ exports.documents = (event, context, callback) => {
       "Type": "Custom::LexBot",
     },
     "LexBotPolicy": {
+      "Metadata": {
+        "guard": {
+          "SuppressedRules": [
+            "IAM_POLICY_NON_COMPLIANT_ARN",
+          ],
+        },
+      },
       "Properties": {
         "PolicyDocument": {
           "Statement": [
@@ -13598,6 +13672,7 @@ function message(code, name) {
         "guard": {
           "SuppressedRules": [
             "IAM_NO_INLINE_POLICY_CHECK",
+            "CFN_NO_EXPLICIT_RESOURCE_NAMES",
           ],
         },
       },
@@ -13640,6 +13715,37 @@ function message(code, name) {
             "PolicyName": "OpenSearchDashboardsAccessPolicy",
           },
         ],
+        "RoleName": {
+          "Fn::Join": [
+            "",
+            [
+              {
+                "Fn::Select": [
+                  "0",
+                  {
+                    "Fn::Split": [
+                      "-",
+                      {
+                        "Fn::Select": [
+                          2,
+                          {
+                            "Fn::Split": [
+                              "/",
+                              {
+                                "Ref": "AWS::StackId",
+                              },
+                            ],
+                          },
+                        ],
+                      },
+                    ],
+                  },
+                ],
+              },
+              "-OpenSearchDashboardsRole",
+            ],
+          ],
+        },
       },
       "Type": "AWS::IAM::Role",
     },
@@ -18023,6 +18129,7 @@ exports.handler = (event, context, callback) => {
         "guard": {
           "SuppressedRules": [
             "IAM_NO_INLINE_POLICY_CHECK",
+            "CFN_NO_EXPLICIT_RESOURCE_NAMES",
           ],
         },
       },
@@ -18050,6 +18157,37 @@ exports.handler = (event, context, callback) => {
           "Version": "2012-10-17",
         },
         "Path": "/",
+        "RoleName": {
+          "Fn::Join": [
+            "",
+            [
+              {
+                "Fn::Select": [
+                  "0",
+                  {
+                    "Fn::Split": [
+                      "-",
+                      {
+                        "Fn::Select": [
+                          2,
+                          {
+                            "Fn::Split": [
+                              "/",
+                              {
+                                "Ref": "AWS::StackId",
+                              },
+                            ],
+                          },
+                        ],
+                      },
+                    ],
+                  },
+                ],
+              },
+              "-UnauthenticatedRole",
+            ],
+          ],
+        },
       },
       "Type": "AWS::IAM::Role",
     },
@@ -18226,6 +18364,7 @@ exports.handler = (event, context, callback) => {
         "guard": {
           "SuppressedRules": [
             "IAM_NO_INLINE_POLICY_CHECK",
+            "CFN_NO_EXPLICIT_RESOURCE_NAMES",
           ],
         },
       },
@@ -18253,6 +18392,37 @@ exports.handler = (event, context, callback) => {
           "Version": "2012-10-17",
         },
         "Path": "/",
+        "RoleName": {
+          "Fn::Join": [
+            "",
+            [
+              {
+                "Fn::Select": [
+                  "0",
+                  {
+                    "Fn::Split": [
+                      "-",
+                      {
+                        "Fn::Select": [
+                          2,
+                          {
+                            "Fn::Split": [
+                              "/",
+                              {
+                                "Ref": "AWS::StackId",
+                              },
+                            ],
+                          },
+                        ],
+                      },
+                    ],
+                  },
+                ],
+              },
+              "-UserRole",
+            ],
+          ],
+        },
       },
       "Type": "AWS::IAM::Role",
     },

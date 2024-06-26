@@ -23,7 +23,7 @@ CONTEXT_SETTINGS = dict(help_option_names=["-h", "--help"])
 @click.pass_context
 def cli(ctx) -> None:
     os.environ["SOLUTION_ID"] = "SO0189"
-    os.environ["SOLUTION_VERSION"] = "v6.0.0"
+    os.environ["SOLUTION_VERSION"] = "v6.0.1"
 
 
 @cli.command("import")
@@ -69,7 +69,7 @@ def qna_import(
     This command requires two (2) parameters: <cloudformation-stack-name>, <source-filename>.
     The cloudformation-stack-name parameter is used to know the AWS QnABot deployment
     to use to support the import process. \n
-    More information: https://github.com/aws-solutions/aws-qnabot/tree/main/docs/qnabot_cli.md
+    More information: https://github.com/aws-solutions/qnabot-on-aws/tree/main/source/docs/qnabot_cli/README.md
     """
     try:
         response = qnabot_cli_helper.initiate_import(
@@ -128,7 +128,7 @@ def qna_export(ctx, cloudformation_stack_name: str, export_filename: str, export
     This command requires two (2) parameters: <cloudformation-stack-name>, and <export-filename>.
     The cloudformation-stack-name parameter is used to know the AWS QnABot deployment
     to use to support the export process. \n
-    More information: https://github.com/aws-solutions/aws-qnabot/tree/main/docs/qnabot_cli.md
+    More information: https://github.com/aws-solutions/qnabot-on-aws/tree/main/source/docs/qnabot_cli/README.md
     """
     try:
         response = qnabot_cli_helper.initiate_export(

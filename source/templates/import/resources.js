@@ -200,7 +200,11 @@ module.exports = Object.assign(require('./bucket'), {
                         Action: [
                             "bedrock:InvokeModel",
                         ],
-                        Resource: { 'Fn::Sub': 'arn:${AWS::Partition}:bedrock:${AWS::Region}::foundation-model/${EmbeddingsBedrockModelId}' },
+                        Resource: [
+                          { 'Fn::Sub': 'arn:${AWS::Partition}:bedrock:${AWS::Region}::foundation-model/amazon.titan-embed-text-v1' },
+                          { 'Fn::Sub': 'arn:${AWS::Partition}:bedrock:${AWS::Region}::foundation-model/cohere.embed-english-v3' },
+                          { 'Fn::Sub': 'arn:${AWS::Partition}:bedrock:${AWS::Region}::foundation-model/cohere.embed-multilingual-v3' },
+                      ],
                     },
                   ],
                 },
