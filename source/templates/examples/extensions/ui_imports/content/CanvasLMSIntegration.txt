@@ -1,4 +1,4 @@
 NOTICE: Canvas LMS integration with QnABot on AWS is deprecated in this release and no longer be supported. Customers may fork the code needed for their specific use case from previous versions. The integration code will be removed in the next release.
 
 
-Imports sample questions for interacting with Canvas LMS. More details: https://github.com/aws-solutions/aws-qnabot/blob/main/docs/canvaslms_integration.md
+Imports sample questions for interacting with Canvas LMS. More details: https://github.com/aws-solutions/qnabot-on-aws/blob/main/docs/canvaslms_integration.md

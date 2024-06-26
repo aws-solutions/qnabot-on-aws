@@ -111,6 +111,11 @@ async function evaluateConditionalChaining(req, res, hit, conditionalChaining) {
     next_q = await evaluateNextQuestion(conditionalChaining, req, res, errors, next_q);
     qnabot.log('Chained document rule evaluated to:', next_q);
 
+    // Remove qid if set by slots - this would override the chained item
+    if(req.hasOwnProperty('qid')) {
+        delete req['qid'];
+    }
+
     let hit2;
     if (next_q) {
         req.question = next_q;

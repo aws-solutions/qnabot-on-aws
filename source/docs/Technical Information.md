@@ -103,6 +103,9 @@
 - ExportBucket - Used for staging files exported from QnABot.  API Gateway is used a proxy for the bucket
 - ImportBucket - Used for staging files imported into QnABot
 - MetricsBucket - All captured usage data is sent to both OpenSearch and this bucket via Kinesis 
+- MainAccessLogBucket - Access log bucket for the AssetBucket, BuildStatusBucket, ExportBucket, ImportBucket and MetricsBucket
+- devBootStrapAccessLogsBucket - Access log bucket for the dev Bootstrap bucket
+- devAccessLogsBucket - Access Log bucket for the dev bucket
 
 ## Firehose
 - TestAllBucket - Results from “Test all” functionality

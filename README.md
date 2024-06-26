@@ -325,6 +325,7 @@ As QnABot evolves over the years, it makes use of various services and functiona
 _Note: **Deployable solution versions** refers to the ability to deploy the version of QnABot in their AWS accounts. **Actively supported versions** for QnABot is only available for the latest version of QnABot._
 
 ### Deployable Versions
+- [v6.0.1](https://github.com/aws-solutions/qnabot-on-aws/releases/tag/v6.0.1) - [Public](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v6.0.1/qnabot-on-aws-main.template)/[VPC](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v6.0.1/qnabot-on-aws-vpc.template)
 - [v6.0.0](https://github.com/aws-solutions/qnabot-on-aws/releases/tag/v6.0.0) - [Public](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v6.0.0/qnabot-on-aws-main.template)/[VPC](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v6.0.0/qnabot-on-aws-vpc.template)
 - [v5.5.2](https://github.com/aws-solutions/qnabot-on-aws/releases/tag/v5.5.2) - [Public](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v5.5.2/qnabot-on-aws-main.template)/[VPC](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v5.5.2md/qnabot-on-aws-vpc.template)
   - We recommend to upgrade to this version as it fixes an issue with the testall functionality which may introduce a high number of versions stored in the testall S3 bucket when Content Designer has no Q&As.

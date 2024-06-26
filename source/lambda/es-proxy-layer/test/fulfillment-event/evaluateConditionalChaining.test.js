@@ -46,7 +46,7 @@ describe('evaluateConditionalChaining', () => {
     expect(errors).toEqual([]);
     expect(invokeLambda).toHaveBeenCalledTimes(0)
     expect(getHit).toHaveBeenCalledTimes(0)
-    expect(updatedReq.qid).toStrictEqual('Text.003')
+    expect(updatedReq.qid).toStrictEqual(undefined)
   });
 
   test('evaluates a Lambda-based chaining rule', async () => {
@@ -65,7 +65,7 @@ describe('evaluateConditionalChaining', () => {
     expect(errors).toEqual([]);
     expect(invokeLambda).toHaveBeenCalledTimes(1)
     expect(getHit).toHaveBeenCalledTimes(1)
-    expect(updatedReq.qid).toStrictEqual('Text.003')
+    expect(updatedReq.qid).toStrictEqual(undefined)
   });
 
 });

@@ -5,7 +5,7 @@ The AWS QnABot CLI supports the capability to `import` and `export` questions an
 
 ## Setup Prerequisites
 To use the CLI, the following prerequisites are required:
-- Download the `source` directory from codebase of AWS QnABot Solution (version 5.2.0 or higher) in [GitHub](https://github.com/aws-solutions/aws-qnabot)
+- Download the `source` directory from codebase of AWS QnABot Solution (version 5.2.0 or higher) in [GitHub](https://github.com/aws-solutions/qnabot-on-aws)
 - AWS Command Line Interface (CLI). For more information, refer to: https://aws.amazon.com/cli/
 - Python version 3.7 or higher. For more information on installing Python, refer to: https://docs.python.org/3/using/index.html
 - AWS IAM permissions having the below IAM policy. Attach the below IAM policy to the IAM user or IAM Role that you are using for the AWS CLI. Replace the below values when creating the IAM policy:

@@ -93,7 +93,7 @@ npm install latest-version
 ## Initialize the environment
 
 ```bash
-git clone https://github.com/aws-solutions/aws-qnabot.git
+git clone https://github.com/aws-solutions/qnabot-on-aws.git
 sudo yum install jq
 ```
 

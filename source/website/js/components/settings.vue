@@ -25,7 +25,7 @@ v-container()
           v-card-title
             h2 Settings
           v-card-text
-            h3 For more information about settings, see <!-- NOSONAR-start --><!-- This link is safe --><a href="https://github.com/aws-solutions/qnabot-on-aws/blob/main/docs/settings.md" target="_blank">here</a><!-- NOSONAR-end -->
+            h3 For more information about settings, see <!-- NOSONAR-start --><!-- This link is safe --><a href="https://github.com/aws-solutions/qnabot-on-aws/blob/main/source/docs/settings.md" target="_blank">here</a><!-- NOSONAR-end -->
           template(
             v-for="(headerSetting,headerIndex) in settingsMap"
             :key="headerIndex"

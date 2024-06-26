@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [6.0.1] - 2024-06-26
+### Fixed
+- Fixed bug that was restricting stack names to be below 26 characters. [Issue #741](https://github.com/aws-solutions/qnabot-on-aws/issues/741)
+- Fixed a looping issue when using slots and chaining #721 ([PR #721](https://github.com/aws-solutions/qnabot-on-aws/pull/721)) - contributed by ([@amendlik](https://github.com/amendlik))
+- Github links with incorrect paths.
+
+### Updated
+- Security patches for braces, urllib3, and ws.  
+- Improved latency of IAM policy propagation when switching the Bedrock embedding model.
+
 ## [6.0.0] - 2024-06-07
 ### Added
 - Integration with Amazon Bedrock
@@ -30,7 +40,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Kendra Webcrawler will now create data source in the native language if supported by Kendra. Kendra can now query in different languages. ([issue #713](https://github.com/aws-solutions/qnabot-on-aws/issues/713))
 - Standardized folder structure
 - Made logging enhancements for Amazon OpenSearch Service and Amazon Data Firehose
-- Added case conversion handlebars helpers([PRs #719](https://github.com/aws-solutions/qnabot-on-aws/pull/719)) - contributed by ([@amendlik](https://github.com/amendlik))
+- Added case conversion handlebars helpers([PR #719](https://github.com/aws-solutions/qnabot-on-aws/pull/719)) - contributed by ([@amendlik](https://github.com/amendlik))
 - Consolidated common AWS SDK dependencies to reduce overall solution artifact size and lambdas deployment package size
 - Patched security vulnerabilities and and integrated with CloudFormation Guard evaluation tool
 - Added ability to TestAll in a selected locale, the locales to be tested should be defined in the template parameter `LexV2BotLocaleIds` 
@@ -320,12 +330,12 @@ __*Note: we recommend that you first deploy these changes in a non-production en
 
 ### Added
 
--   Intent and Slot matching (an early implementation). This new capability supports creating dedicated custom Intents for a QnABot {Item ID}. You can extend QnABot to support one or more related intents. For example, you might create an intent that makes a car reservation, or assists an agent during a live chat or call (via Amazon Connect). More details in README: https://github.com/aws-solutions/qnabot-on-aws/blob/main/docs/intent_slot_matching/README.md
--   Support for using custom domain names for QnABot Designer and Client interfaces. More details in README: https://github.com/aws-solutions/qnabot-on-aws/blob/main/docs/custom_domain_name_setup/README.md
--   AWS QnABot Command Line Interface (CLI) - the AWS QnABot CLI supports the capability to import and export questions and answers via command line. More details in README: https://github.com/aws-solutions/qnabot-on-aws/blob/main/docs/qnabot_cli/README.md
--   Kendra Redirect - with the Kendra Redirect feature, you can now include a Kendra query within a Item ID. More details in README: https://github.com/aws-solutions/qnabot-on-aws/blob/main/docs/kendra_redirect/README.md
+-   Intent and Slot matching (an early implementation). This new capability supports creating dedicated custom Intents for a QnABot {Item ID}. You can extend QnABot to support one or more related intents. For example, you might create an intent that makes a car reservation, or assists an agent during a live chat or call (via Amazon Connect). More details in README: https://github.com/aws-solutions/qnabot-on-aws/blob/v5.2.0/docs/intent_slot_matching/README.md
+-   Support for using custom domain names for QnABot Designer and Client interfaces. More details in README: https://github.com/aws-solutions/qnabot-on-aws/blob/v5.2.0/docs/custom_domain_name_setup/README.md
+-   AWS QnABot Command Line Interface (CLI) - the AWS QnABot CLI supports the capability to import and export questions and answers via command line. More details in README: https://github.com/aws-solutions/qnabot-on-aws/blob/v5.2.0/docs/qnabot_cli.md
+-   Kendra Redirect - with the Kendra Redirect feature, you can now include a Kendra query within a Item ID. More details in README: https://github.com/aws-solutions/qnabot-on-aws/blob/v5.2.0/docs/kendra_redirect/README.md
 -   Integration with Canvas LMS (an early example implementation). Students use their schools' learning management system (LMS) to keep track of their assignments, grades, and their course work. With this integration, students will be able to ask QnABot about their grades, syllabus, enrollments, assignments, and announcements.
-    More details in README: https://github.com/aws-solutions/qnabot-on-aws/blob/main/docs/canvaslms_integration/README.md
+    More details in README: https://github.com/aws-solutions/qnabot-on-aws/blob/v5.2.0/docs/canvaslms_integration.md
 -   Updated import functionality to support importing of QnABot questions and answers from a Excel file when uploaded to S3 data folder.
 -   Added support for importing session attributes via Excel.
 -   Updated runtime of Lambda functions (using Python runtime) to use Python runtime version 3.9.
