@@ -172,7 +172,7 @@ function questionIsValid(question, excelRowNumber) {
         return false;
     }
     // answer must exist and include valid characters
-    if (!question.a || question.a.replace(/[^a-zA-Z0-9-_]/g, '').trim().length == 0) {
+    if (!question.a || question.a.replace(/\s/g, '').length == 0) {
         qnabot.log(
             `Warning: No answer found for QID: ${question.qid}. The question will be skipped.`,
         );

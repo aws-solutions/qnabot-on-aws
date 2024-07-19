@@ -57,9 +57,13 @@ class TestLogin:
         time.sleep(10)
         menu.logout()
         time.sleep(3)
-        title =  dom_operator.get_title()
+        current_url = dom_operator.get_current_url()
+        element = dom_operator.select_css('span.textDescription-customizable')
 
+        title = dom_operator.get_title()
         assert title == 'Signin'
+        assert 'login' in current_url
+        assert element.text == 'Sign in with your username and password'
 
     def test_client_login(self, client_login, dom_operator: DomOperator):
         """

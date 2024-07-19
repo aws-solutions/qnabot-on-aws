@@ -167,7 +167,7 @@ class TestKendra:
         """
         Test that the Kendra fallback is used when no answer is found.
 
-        See: https://github.com/aws-solutions/aws-qnabot/blob/main/docs/Kendra_Fallback_README.md
+        See: https://github.com/aws-solutions/qnabot-on-aws/blob/main/source/docs/kendra_fallback/README.md
         """
         menu = MenuNav(dom_operator)
         kendra_page = menu.open_kendra_page()
@@ -193,7 +193,7 @@ class TestKendra:
         """
         Test the Kendra query contained in the qna is used instead of Kendra fallback when there is a question match.
 
-        See: https://github.com/aws-solutions/qnabot-on-aws/tree/main/docs/kendra_redirect
+        See: https://github.com/aws-solutions/qnabot-on-aws/blob/main/source/docs/kendra_redirect/README.md
         """
         qid = 'Kendra.001'
         question = self.__get_question_by_qid(qid, loaded_questions)

@@ -5,10 +5,28 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [6.0.2] - 2024-07-22
+
+### Added
+- Added a migration [documentation](./source/docs/update_or_migrate_deployment/README.md) for Migrating QnABot configurations and data from existing deployment to new deployment
+- Added a [documentation](./source/docs/bedrock_knowledgebase_rag/README.md) for Bedrock Knowledge Base 
+
+### Fixed
+- Improve logout functionality which signs out the user and invalidates the access and refresh tokens that Amazon Cognito issued to a user. [Issue #747](https://github.com/aws-solutions/qnabot-on-aws/issues/747)
+- Fixed bug that restricted import of questions with answers that consisted of only double-byte characters. [Issue #731](https://github.com/aws-solutions/qnabot-on-aws/issues/731)
+- Fixed bug with chained questions causing errors in the fulfillment lambda.
+
+### Updated
+- Removed aws-sdk (JavaScript V2) from dependency list.
+- Updated parameter description for elicit response bot settings in the content designer settings. [Issue #745](https://github.com/aws-solutions/qnabot-on-aws/issues/745)
+- Removed LLM models `meta.llama2-70b-chat-v1` and `meta.llama2-13b-chat-v1` from the list of models in the Cloudformation parameter `LLMBedrockModelId` since these models will be [unavailable on Amazon Bedrock](https://docs.aws.amazon.com/bedrock/latest/userguide/model-lifecycle.html#versions-for-eol) starting from August 12, 2024.
+- Updated the setting `LLM_QA_NO_HITS_REGEX` in the Content Designer to include a default pattern `Sorry, I don't know` in prompts specified through the setting `LLM_QA_PROMPT_TEMPLATE` and other patterns returned by LLMs in their responses. 
+- Constrainted the query made to Bedrock Knowledge Base to maximum of 1000 characters input query as per the [input requirements](https://docs.aws.amazon.com/bedrock/latest/APIReference/API_agent-runtime_RetrieveAndGenerateInput.html#API_agent-runtime_RetrieveAndGenerateInput_Contents).
+
 ## [6.0.1] - 2024-06-26
 ### Fixed
 - Fixed bug that was restricting stack names to be below 26 characters. [Issue #741](https://github.com/aws-solutions/qnabot-on-aws/issues/741)
-- Fixed a looping issue when using slots and chaining #721 ([PR #721](https://github.com/aws-solutions/qnabot-on-aws/pull/721)) - contributed by ([@amendlik](https://github.com/amendlik))
+- Fixed a looping issue when using slots and chaining ([PR #721](https://github.com/aws-solutions/qnabot-on-aws/pull/721)) - contributed by ([@amendlik](https://github.com/amendlik))
 - Github links with incorrect paths.
 
 ### Updated

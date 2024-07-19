@@ -477,8 +477,6 @@ module.exports = {
                 'anthropic.claude-3-sonnet-v1',
                 'anthropic.claude-3-haiku-v1',
                 'cohere.command-text-v14',
-                'meta.llama2-13b-chat-v1',
-                'meta.llama2-70b-chat-v1',
                 'meta.llama3-8b-instruct-v1'
             ],
             Default: 'anthropic.claude-instant-v1',

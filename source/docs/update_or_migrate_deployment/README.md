@@ -73,6 +73,80 @@ D. Post-migration verification and cleaning:
             
         b. After validating, you may proceed to delete your existing deployment by selecting your existing QnABot on AWS CloudFormation stack > Delete.
 
+ ### Migrating Feedback and Metrics Indices from OpenSearch (Optional):
+
+Migrating indices is not required. QnABot has export and import functionalities that will assist you in exporting and importing QnAs, as mentioned in `D. Exporting and Import QnAs`.However, if you would like to keep feedback and metrics in the OpenSearch Dashboards > QnABot Dashboard of your new deployment, you will need to migrate data from the feedback and metrics indices from your old OpenSearch domain to the new one by utilizing the [snapshot backups stored in Amazon S3](https://docs.aws.amazon.com/opensearch-service/latest/developerguide/managedomains-snapshots.html#managedomains-snapshot-prerequisites) using this procedure:
+
+
+ - A. Getting access to Security plugin in OpenSearch Dashboards:
+
+    Since QnABot by default is configured with [Fine Grain Access Control](https://docs.aws.amazon.com/opensearch-service/latest/developerguide/fgac.html), you won't have default access to security plugin. This will provide you access OpenSearch Dashboard > Management > Security to map roles with OpenSearch. 
+
+    ![Security Plug](./images/unlocking_security_plugin.png)
+    
+    To do this:
+
+    1. In Content Designer > select the tools menu ( ☰ ) > click on OpenSearch Dashboard. 
+    2. In OpenSearch Dashboards, click on top right icon of your login > View roles and Identities> Backend roles > Copy ARN of your OpenSearch Dashboard role. 
+    2. Navigate to Amazon OpenSearch Service > Domains > New Deployment's Domain > Security Configuration > Edit > Fine-grained access control > Set IAM ARN as master user > Paste ARN of OpenSearchDashboards role copied in step 1.
+
+- B. Setting up Amazon S3 Bucket and providing IAM permissions for backup:
+
+    Here we will set up a S3 bucket which will be connected to both OpenSearch instances. The existing domain will write snapshot to this bucket while new deployment's domain will read snapshot from this bucket. To achieve this: 
+
+    1. Create a S3 bucket listed in pre-requisiste table [here](https://docs.aws.amazon.com/opensearch-service/latest/developerguide/managedomains-snapshots.html#managedomains-snapshot-prerequisites)
+    2.  Create a IAM role listed in pre-requisiste table [here](https://docs.aws.amazon.com/opensearch-service/latest/developerguide/managedomains-snapshots.html#managedomains-snapshot-prerequisites)
+    3.  Create a IAM role listed in pre-requisiste table [here](https://docs.aws.amazon.com/opensearch-service/latest/developerguide/managedomains-snapshots.html#managedomains-snapshot-prerequisites). Note that you will provide you will put permission for existing domain only since we are adding snapshot to this bucket from existing domain. Thus, you will input its ARN accordingly.
+
+- C. Registering a manual snapshot repository:
+
+    To take manual snapshots, you will need to register a repository. To do this:
+    
+    1. You will map the snapshot role using OpenSearch Dashboards as mentioned in [Step 1: Map the snapshot role in OpenSearch Dashboards (if using fine-grained access control) ](https://docs.aws.amazon.com/opensearch-service/latest/developerguide/managedomains-snapshots.html#managedomains-snapshot-registerdirectory)
+    2. You will need run a part of Python script "Register repository" as mentioned in [Step 2: Register a repository](https://docs.aws.amazon.com/opensearch-service/latest/developerguide/managedomains-snapshots.html#managedomains-snapshot-registerdirectory) > Domain Migration. 
+    3. When running this script, please carefully note the payload in the script. To register repository for existing deployment and new deployment, you can run this script for both domains by filling necessary values such region, endpoint (obtained in Amazon OpenSearch Service > Domains > Click on the Domain) but keep repository name same in both. Also, for new deployment domain, also make sure to add "readonly": "true" to the "settings" object in the payload.
+
+- D. Taking manual snapshots
+    1. Once you have created a repository for manual snapshots, you can take a snapshot in existing deplyoment by navigating to OpenSearch Dashboards > click menu ( ☰ ) > Management > Snapshot Management (available in QnA 6.0.0 and above versions only) > Snapshots > Take a Snasphot (see screenshot) > Provide Name and Indices > Add. 
+
+        ![Taking Snapshot](./images/take_snapshot.png)
+
+    2. Once the snapshot is completed, please verify if it is available in new QnA deployment > OpenSearch Dashboards click menu ( ☰ ) > Management > Snapshot Management, please verify if snapshot is available in another deployment as well. If it is not available then check if you have missed any previous steps such as the repository in new deployment as well.
+
+
+- E. Restoring Snapshot and Indices
+
+    1. Once you have the snapshot available in new deployment, you will need to restore these snapshots using OpenSearch Dashboards click menu ( ☰ ) > Management > Snapshot Management > Snapshots > Restore. In this step, you can restore all indices or specific indices as per your needs (see below).
+
+        ![Restore Snapshots](./images/restore_snapshot.png)
+
+    2. Once you have restored snapshot, you will navigate to  OpenSearch Dashboards click menu ( ☰ ) > Management > Dev Tools. Here you will reindex all the documents from new deployment's index (destination) with index you restored from snapshot (source)
+
+    ```
+        POST _reindex
+
+        {
+        "source":{
+            "index":"source"
+            },
+        "dest":{
+            "index":"destination"
+            },
+        }
+    ```
+
+- F. Verify the data is available
+
+    Once you have reindex Opensearch feedback and metrics indices using either of methods, you can validate it under OpenSearch Dashboards click menu ( ☰ ) > Dashboards > QnABot Dashboard. You can also compare both of these instances to make sure the data is matched as show below.
+
+    Existing Deployment           |  New Deployment
+    :-------------------------:|:-------------------------:
+    ![Existing Deployment](./images/original_deployment.png)  |  ![New Deployment](./images/new_deployment.png)
+
+
+
+
+
 
  ### Frequently Asked Questions (FAQs):
 - Do I need to back-up and migrate Amazon DynamoDb database table?

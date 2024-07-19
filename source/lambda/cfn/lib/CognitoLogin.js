@@ -11,14 +11,13 @@
  *  and limitations under the License.                                                                                *
  *********************************************************************************************************************/
 
-const { CognitoIdentityProvider } = require('@aws-sdk/client-cognito-identity-provider');
-const { S3 } = require('@aws-sdk/client-s3');
+const { CognitoIdentityProviderClient, UpdateUserPoolClientCommand, SetUICustomizationCommand } = require('@aws-sdk/client-cognito-identity-provider');
+const { S3Client, GetObjectCommand } = require('@aws-sdk/client-s3');
 const customSdkConfig = require('./util/customSdkConfig');
 
 const region = process.env.AWS_REGION || 'us-east-1';
-const cognito = new CognitoIdentityProvider(customSdkConfig({ region }));
-const s3 = new S3(customSdkConfig({ region }));
-
+const s3Client = new S3Client(customSdkConfig({ region }));
+const cognitoClient = new CognitoIdentityProviderClient(customSdkConfig({ region }));
 module.exports = class CognitoLogin extends require('./base') {
     constructor() {
         super();
@@ -34,29 +33,43 @@ module.exports = class CognitoLogin extends require('./base') {
                 LogoutURLs: params.LogoutCallbackUrls,
                 ExplicitAuthFlows: ['ADMIN_NO_SRP_AUTH'],
                 RefreshTokenValidity: 1,
+                TokenValidityUnits: { RefreshToken: 'days' },
                 SupportedIdentityProviders: ['COGNITO'],
                 AllowedOAuthFlows: ['code'],
                 AllowedOAuthScopes: ['phone', 'email', 'openid', 'profile'],
                 AllowedOAuthFlowsUserPoolClient: true,
             }
-            await cognito.updateUserPoolClient(userParams);
+            console.log(`Cognito User Params: ${JSON.stringify(userParams, null, 2)}`);
+
+            const updateUserPoolClientCmd = new UpdateUserPoolClientCommand(userParams);
+            await cognitoClient.send(updateUserPoolClientCmd);
 
             if (params.ImageBucket && params.ImageKey) {
-                const result = await s3.getObject({
-                    Bucket: params.ImageBucket,
-                    Key: params.ImageKey,
-                });
+                const s3Params = { 
+                    Bucket: params.ImageBucket, 
+                    Key: params.ImageKey 
+                };
+                const getObjCmd = new GetObjectCommand(s3Params);
+                const result = await s3Client.send(getObjCmd);
                 params.Image = await result.Body.transformToByteArray();
             }
-            await cognito.setUICustomization({
+
+            const uiParams = {
                 ClientId: params.ClientId,
                 UserPoolId: params.UserPool,
                 CSS: params.CSS,
-            });
+            }
+            const uiCustomizationCmd = new SetUICustomizationCommand(uiParams);
+            await cognitoClient.send(uiCustomizationCmd);
+
             reply(null, url);
         } catch (e) {
             console.error('An error occured in CognitoLogin: ', e);
             reply(e);
         }
+    }
+
+    async Update(ID, params, oldparams, reply) {
+        await this.Create(params, reply);
     }
 };

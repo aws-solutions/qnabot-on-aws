@@ -142,6 +142,17 @@
               {
                 "Effect": "Allow",
                 "Action": [
+                  "cognito-idp:AdminUserGlobalSignOut"
+                ],
+                "Resource": [
+                  {
+                    "Fn::Sub": "arn:aws:cognito-idp:${AWS::Region}:${AWS::AccountId}:userpool/${UserPool}" 
+                  }
+                ]
+              },
+              {
+                "Effect": "Allow",
+                "Action": [
                   "execute-api:*"
                 ],
                 "Resource": [

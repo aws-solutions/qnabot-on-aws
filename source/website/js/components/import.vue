@@ -395,7 +395,7 @@ module.exports = {
                 return true;
             }
             // answer must exist and include valid characters
-            if (!question.a || question.a.replace(/[^a-zA-Z0-9-_]/g, '').trim().length == 0) {
+            if (!question.a || question.a.replace(/\s/g, '').length == 0) {
                 self.addError(
                     `Warning: No answer found for QID:"${question.qid
                     }". The question will be skipped.`,
@@ -434,7 +434,7 @@ module.exports = {
                 return true;
             }
             // answer must exist and include valid characters
-            if (!question.a || question.a.replace(/[^a-zA-Z0-9-_]/g, '').trim().length == 0) {
+            if (!question.a || question.a.replace(/\s/g, '').length == 0) {
                 self.addError(
                     `Error: No answer found for QID: "${question.qid}". Make sure that it also includes valid characters (/[^a-zA-Z0-9-_]/g). The JSON file will not be imported. Please fix and import the file again.`,
                 );

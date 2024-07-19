@@ -41,7 +41,7 @@ class TestSettings:
         """
         Tests the custom empty response setting can be overwritten.
 
-        See: https://docs.aws.amazon.com/solutions/latest/qnabot-on-aws/keyword-filters-and-custom-dont-know-answers.html
+        See: https://docs.aws.amazon.com/solutions/latest/qnabot-on-aws/using-keyword-filters-for.html
         """
         custom_empty_message = "Sorry, I don't know that"
         edit_qid = 'CustomNoMatches'

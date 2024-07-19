@@ -1,5 +1,5 @@
 # QnABot CLI
-The QnABot on AWS CLI supports the capability to import and export questions and answers from your QnABot setup. For more information on using QnaBot CLI, please refer to [Using QnABot on the AWS Command Line Interface (CLI)](https://docs.aws.amazon.com/solutions/latest/qnabot-on-aws/use-qnabot-on-aws-command-line-interface-cli.html)
+The QnABot on AWS CLI supports the capability to import and export questions and answers from your QnABot setup. For more information on using QnaBot CLI, please refer to [Using QnABot on the AWS Command Line Interface (CLI)](https://docs.aws.amazon.com/solutions/latest/qnabot-on-aws/using-qnabot-on-aws-command-line-interface-cli.html)
 
 ## Unit Tests
 1. Get started by creating a virtual environment and deploy the needed Python packages.

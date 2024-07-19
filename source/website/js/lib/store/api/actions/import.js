@@ -12,7 +12,7 @@
  ******************************************************************************************************************** */
 const _ = require('lodash');
 const { S3Client, PutObjectCommand } = require('@aws-sdk/client-s3');
-const util = require('./util');
+const util = require('./../../../../capability/util');
 
 module.exports = {
     async listExamples(context) {

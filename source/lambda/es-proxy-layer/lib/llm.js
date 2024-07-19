@@ -30,6 +30,8 @@ const { sanitize } = require('./sanitizeOutput');
 //
 
 const default_params_stg = '{"temperature":0}';
+const default_human_prefix = 'Human';
+const default_ai_prefix = 'AI';
 
 // make QA prompt from template
 async function make_qa_prompt(req, promptTemplateStr, context, input, query) {
@@ -192,9 +194,9 @@ const clean_context = function clean_context(context, req) {
 
 // LangChain chatMessageHistory serialize (to JSON) and parse (from JSON)
 // Chat history persistance is maintained via userInfo, managed from query.js, and stored in DynamoDB with other userInfo.
-async function chatMemorySerialise(chatMessageHistory, max = 50, human_prefix = 'Human', ai_prefix = 'AI') {
+async function chatMemorySerialise(chatMessageHistory, max = 50, human_prefix = default_human_prefix, ai_prefix = default_ai_prefix) {
     const messages = await chatMessageHistory.getMessages();
-    const obj_messages = [];
+    const obj_messages = [];    
     for (const m of messages) {
         let role;
         if (m._getType() === 'human') {
@@ -213,12 +215,12 @@ async function chatMemoryParse(json_messages, max = 50) {
     const obj_messages = JSON.parse(json_messages).slice(-max);
     qnabot.log(`Chat Message History (capped at ${max}): `, json_messages);
     for (const m of obj_messages) {
-        if (m.Human) {
+        if (default_human_prefix in m) {
             chatMessageHistory.addUserMessage(m.Human);
-        } else if (m.AI) {
+        } else if (default_ai_prefix in m) {
             chatMessageHistory.addAIChatMessage(m.AI);
         } else {
-            throw new Error(`Got unsupported message type: ${m}`);
+            throw new Error(`Got unsupported message type: ${JSON.stringify(m)}`);
         }
     }
     return chatMessageHistory;

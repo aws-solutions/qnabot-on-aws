@@ -52,6 +52,14 @@
         "Can I import multiple answers when I import with excel?",
         "Can I import multiple answers when I import with excel using QnA Bot?"
       ]
+    },
+    {
+      "a": "今日は晴れです。",
+      "type": "qna",
+      "qid": "DoubleByteCharacters.001",
+      "q": [
+        "今日の天気を教えてください."
+      ]
     }
   ]
 }

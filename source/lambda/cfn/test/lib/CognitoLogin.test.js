@@ -15,40 +15,66 @@ const { mockClient } = require('aws-sdk-client-mock');
 const { S3Client, GetObjectCommand } = require('@aws-sdk/client-s3');
 const { Readable } = require('stream');
 const { sdkStreamMixin } = require('@smithy/util-stream');
-const { CognitoIdentityProvider, UpdateUserPoolClientCommand, SetUICustomizationCommand } = require('@aws-sdk/client-cognito-identity-provider');
+const {
+    CognitoIdentityProviderClient,
+    UpdateUserPoolClientCommand,
+    SetUICustomizationCommand
+} = require('@aws-sdk/client-cognito-identity-provider');
 const originalEnv = process.env;
-const cognitoLogin = require("../../lib/CognitoLogin");
+const cognitoLogin = require('../../lib/CognitoLogin');
 const cognitoLoginFixtures = require('./CognitoLogin.fixtures');
-const cognitoIdentityProviderMock = mockClient(CognitoIdentityProvider);
+const cognitoIdentityProviderMock = mockClient(CognitoIdentityProviderClient);
 const s3ClientMock = mockClient(S3Client);
-
+require('aws-sdk-client-mock-jest');
 describe('test CognitoLogin class', () => {
     beforeEach(() => {
         process.env = {
-            ...originalEnv,
+            ...originalEnv
         };
 
         cognitoIdentityProviderMock.reset();
+        s3ClientMock.reset();
     });
-    
+
     afterEach(() => {
         jest.clearAllMocks();
     });
 
-    it("should be able to create a new user pool domain with no S3 on Create", async () => {
+    it('should be able to create a new user pool domain with no S3 on Create', async () => {
         const cognitoLoginCut = new cognitoLogin();
         const params = cognitoLoginFixtures.userPoolClientParamsObject();
-        
+        cognitoIdentityProviderMock.on(UpdateUserPoolClientCommand).resolves({});
         cognitoIdentityProviderMock.on(SetUICustomizationCommand).resolves({});
-        
-        const callback = (error, result) => {
-            expect(result).toBe('mock_callback_url'); 
-        };
-        
-        await cognitoLoginCut.Create(params, callback);
-    });  
 
-    it ("should be able to create a new user pool domain with S3 on Create", async() => {
+        const callback = (error, result) => {
+            expect(result).toBe('mock_callback_url');
+        };
+
+        await cognitoLoginCut.Create(params, callback);
+        expect(cognitoIdentityProviderMock).toHaveReceivedCommandTimes(UpdateUserPoolClientCommand, 1);
+        expect(cognitoIdentityProviderMock).toHaveReceivedCommandWith(UpdateUserPoolClientCommand, {
+            'AllowedOAuthFlows': ['code'],
+            'AllowedOAuthFlowsUserPoolClient': true,
+            'AllowedOAuthScopes': ['phone', 'email', 'openid', 'profile'],
+            'CallbackURLs': ['mock_login_url'],
+            'ClientId': 'mock_client_id',
+            'ExplicitAuthFlows': ['ADMIN_NO_SRP_AUTH'],
+            'LogoutURLs': ['mock_logout_callback_url'],
+            'RefreshTokenValidity': 1,
+            'SupportedIdentityProviders': ['COGNITO'],
+            'TokenValidityUnits': { 'RefreshToken': 'days' },
+            'UserPoolId': 'mock_user_pool'
+        });
+        expect(cognitoIdentityProviderMock).toHaveReceivedCommandTimes(SetUICustomizationCommand, 1);
+        expect(s3ClientMock).toHaveReceivedCommandTimes(GetObjectCommand, 0)
+        expect(cognitoIdentityProviderMock).toHaveReceivedCommandWith(SetUICustomizationCommand, {
+            'ClientId': 'mock_client_id',
+            'UserPoolId': 'mock_user_pool',
+            'CSS': 'mock_css'
+        });
+    });
+
+    it('should be able to create a new user pool domain with S3 on Create', async () => {
         const cognitoLoginCut = new cognitoLogin();
         const params = cognitoLoginFixtures.userPoolClientWithS3ParamsObject();
 
@@ -56,16 +82,41 @@ describe('test CognitoLogin class', () => {
         stream.push(JSON.stringify(params));
         stream.push(null); // end of stream
         const sdkStream = sdkStreamMixin(stream);
-        
+
         s3ClientMock.on(GetObjectCommand).resolves({ Body: sdkStream });
 
         cognitoIdentityProviderMock.on(SetUICustomizationCommand).resolves({});
 
         const callback = (error, result) => {
-            expect(result).toBe('mock_callback_url'); 
+            expect(result).toBe('mock_callback_url');
         };
-        
+
         await cognitoLoginCut.Create(params, callback);
+        expect(cognitoIdentityProviderMock).toHaveReceivedCommandTimes(UpdateUserPoolClientCommand, 1);
+        expect(cognitoIdentityProviderMock).toHaveReceivedCommandWith(UpdateUserPoolClientCommand, {
+            'AllowedOAuthFlows': ['code'],
+            'AllowedOAuthFlowsUserPoolClient': true,
+            'AllowedOAuthScopes': ['phone', 'email', 'openid', 'profile'],
+            'CallbackURLs': ['mock_login_url'],
+            'ClientId': 'mock_client_id',
+            'ExplicitAuthFlows': ['ADMIN_NO_SRP_AUTH'],
+            'LogoutURLs': ['mock_logout_callback_url'],
+            'RefreshTokenValidity': 1,
+            'SupportedIdentityProviders': ['COGNITO'],
+            'TokenValidityUnits': { 'RefreshToken': 'days' },
+            'UserPoolId': 'mock_user_pool'
+        });
+        expect(cognitoIdentityProviderMock).toHaveReceivedCommandTimes(SetUICustomizationCommand, 1);
+        expect(s3ClientMock).toHaveReceivedCommandTimes(GetObjectCommand, 1)
+        expect(s3ClientMock).toHaveReceivedCommandWith(GetObjectCommand, {
+            'Bucket': 'mock_image_bucket',
+            'Key': 'mock_image_key'
+        });
+        expect(cognitoIdentityProviderMock).toHaveReceivedCommandWith(SetUICustomizationCommand, {
+            'ClientId': 'mock_client_id',
+            'UserPoolId': 'mock_user_pool',
+            'CSS': 'mock_css'
+        });
     });
 
     it("should return error if exception occurred on Create", async () => {

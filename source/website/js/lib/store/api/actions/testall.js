@@ -12,7 +12,7 @@
  ******************************************************************************************************************** */
 
 const { S3Client, GetObjectCommand } = require('@aws-sdk/client-s3');
-const util = require('./util');
+const util = require('../../../../capability/util');
 
 module.exports = {
     async startTestAll(context, opts) {

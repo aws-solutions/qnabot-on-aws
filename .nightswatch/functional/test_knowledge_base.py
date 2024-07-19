@@ -30,9 +30,23 @@ class TestKnowledgeBase:
         settings_page.reset_settings()
         settings_page.expand_all_subgroups()
 
+    def test_knowledge_base_returns_custom_no_hits_message(self, designer_login, dom_operator: DomOperator, cw_client: CloudWatchClient):
+        """
+        Test Bedrock Knowledge Base integration returns CustomNoMatches defined in the designer when irrelevant question is asked.
+        https://docs.aws.amazon.com/solutions/latest/qnabot-on-aws/using-keyword-filters-for.html#custom-dont-know-answers
+        """
+        menu = MenuNav(dom_operator)
+        chat_page = menu.open_chat_page()
+
+        chat_page.send_message('Who will win next Cricket world cup?')
+        answer = chat_page.get_last_message_text()
+        assert 'You stumped me, I don\'t currently know the answer to that question' in answer
+        cw_client.print_fulfillment_lambda_logs()
+
     def test_knowledge_base_fallback(self, designer_login, dom_operator: DomOperator, cw_client: CloudWatchClient):
         """
-        Test that the Knowledge Base fallback is used when no answer is found. LLM should respond with correct answer as well as source links and context which should be enabled by default.
+        Test that the Knowledge Base fallback is used when no answer is found. LLM should respond with correct answer
+        as well as source links and context which should be enabled by default.
 
         """
         menu = MenuNav(dom_operator)
