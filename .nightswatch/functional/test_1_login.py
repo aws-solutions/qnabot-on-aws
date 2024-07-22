@@ -34,6 +34,14 @@ class TestLogin:
         
         assert admin_user_code_create_auth == 200
 
+    def test_invalid_designer_login(self, invalid_designer_login):
+        """
+        Test invalid login to designer
+        """
+        title = invalid_designer_login
+        assert title[0] == 'Signin'
+        assert title[1] == 'Incorrect username or password.'
+
     def test_designer_login(self, designer_login):
         """
         Test login to designer
@@ -49,9 +57,13 @@ class TestLogin:
         time.sleep(10)
         menu.logout()
         time.sleep(3)
-        title =  dom_operator.get_title()
+        current_url = dom_operator.get_current_url()
+        element = dom_operator.select_css('span.textDescription-customizable')
 
+        title = dom_operator.get_title()
         assert title == 'Signin'
+        assert 'login' in current_url
+        assert element.text == 'Sign in with your username and password'
 
     def test_client_login(self, client_login, dom_operator: DomOperator):
         """
@@ -61,4 +73,12 @@ class TestLogin:
         url = dom_operator.get_current_url()
         assert title == 'QnABot Client'
         assert 'code' in url
+
+    def test_invalid_client_login(self, invalid_client_login):
+        """
+        Test invalid login to client
+        """
+        title = invalid_client_login
+        assert title[0] == 'Signin'
+        assert title[1] == 'Incorrect username or password.'
 

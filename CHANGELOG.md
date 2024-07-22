@@ -5,6 +5,77 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [6.0.2] - 2024-07-22
+
+### Added
+- Added a migration [documentation](./source/docs/update_or_migrate_deployment/README.md) for Migrating QnABot configurations and data from existing deployment to new deployment
+- Added a [documentation](./source/docs/bedrock_knowledgebase_rag/README.md) for Bedrock Knowledge Base 
+
+### Fixed
+- Improve logout functionality which signs out the user and invalidates the access and refresh tokens that Amazon Cognito issued to a user. [Issue #747](https://github.com/aws-solutions/qnabot-on-aws/issues/747)
+- Fixed bug that restricted import of questions with answers that consisted of only double-byte characters. [Issue #731](https://github.com/aws-solutions/qnabot-on-aws/issues/731)
+- Fixed bug with chained questions causing errors in the fulfillment lambda.
+
+### Updated
+- Removed aws-sdk (JavaScript V2) from dependency list.
+- Updated parameter description for elicit response bot settings in the content designer settings. [Issue #745](https://github.com/aws-solutions/qnabot-on-aws/issues/745)
+- Removed LLM models `meta.llama2-70b-chat-v1` and `meta.llama2-13b-chat-v1` from the list of models in the Cloudformation parameter `LLMBedrockModelId` since these models will be [unavailable on Amazon Bedrock](https://docs.aws.amazon.com/bedrock/latest/userguide/model-lifecycle.html#versions-for-eol) starting from August 12, 2024.
+- Updated the setting `LLM_QA_NO_HITS_REGEX` in the Content Designer to include a default pattern `Sorry, I don't know` in prompts specified through the setting `LLM_QA_PROMPT_TEMPLATE` and other patterns returned by LLMs in their responses. 
+- Constrainted the query made to Bedrock Knowledge Base to maximum of 1000 characters input query as per the [input requirements](https://docs.aws.amazon.com/bedrock/latest/APIReference/API_agent-runtime_RetrieveAndGenerateInput.html#API_agent-runtime_RetrieveAndGenerateInput_Contents).
+
+## [6.0.1] - 2024-06-26
+### Fixed
+- Fixed bug that was restricting stack names to be below 26 characters. [Issue #741](https://github.com/aws-solutions/qnabot-on-aws/issues/741)
+- Fixed a looping issue when using slots and chaining ([PR #721](https://github.com/aws-solutions/qnabot-on-aws/pull/721)) - contributed by ([@amendlik](https://github.com/amendlik))
+- Github links with incorrect paths.
+
+### Updated
+- Security patches for braces, urllib3, and ws.  
+- Improved latency of IAM policy propagation when switching the Bedrock embedding model.
+
+## [6.0.0] - 2024-06-07
+### Added
+- Integration with Amazon Bedrock
+- Integration with Amazon Bedrock Knowledge Base
+- Enabled Fine Grain Access Control in Amazon OpenSearch Service by default. A new `OpenSearchFineGrainAccessControl` CloudFormation parameter has been added
+- Content Designer UI improvements (grouped fields)
+- Anonymized operational metrics
+- Enabled Kendra based authentication utilizing QnABot idToken. A new `AltSearchKendraIndexAuth` CloudFormation parameter has been added
+([PR #513](https://github.com/aws-solutions/qnabot-on-aws/pull/513)) - contributed by ([@JasonHammett](https://github.com/JasonHammett))
+
+### Updated
+- Migrated AWS JavaScript SDK from v2 to v3 for [Amazon Lex Web UI](https://aws.amazon.com/blogs/machine-learning/deploy-a-web-ui-for-your-chatbot/) Integration
+- Upgraded Amazon OpenSearch Service domain from 1.3 to 2.11 unlocking features such as snapshot management via OpenSearch Dashboards (for more information see [Amazon OpenSearch release history](https://docs.aws.amazon.com/opensearch-service/latest/developerguide/release-notes.html))
+- [Renamed](https://docs.aws.amazon.com/opensearch-service/latest/developerguide/rename.html) Elasticsearch to Opensearch and Kibana to OpenSearch Dashboards
+- Migrated from ElasticSearch client to [OpenSearch client](https://opensearch.org/docs/latest/clients/javascript/index/)
+- Changed SageMaker LLM model from `Falcon-40b` to `Llama-2-13b-chat` and Sagemaker embedding model intfloat/e5-large-v2 now uses the Jumpstart version of the model
+- Removed the cloudformation parameter `Encryption` to prevent disabling of Amazon OpenSearch Service domain and Amazon S3 encryptions
+- Updated Amazon OpenSearch Service domain minimum TLS policy to 1.2
+- Rewrote and migrate S3 object deletion custom resources from JavaScript to Python to address 3rd party security vulnerability
+- Updated CloudFormation template parameter groupings
+- Kendra index configuration has been moved from Content Designer settings to CloudFormation parameters to restrict IAM permissions. The CloudFormation parameter `DefaultKendraIndex` has been replaced with three separate parameters: `KendraWebPageIndexId`, `KendraFaqIndexId`, and `AltSearchKendraIndexes`.
+- Updated question validation when importing or creating questions in Content Designer
+- Kendra Webcrawler will now create data source in the native language if supported by Kendra. Kendra can now query in different languages. ([issue #713](https://github.com/aws-solutions/qnabot-on-aws/issues/713))
+- Standardized folder structure
+- Made logging enhancements for Amazon OpenSearch Service and Amazon Data Firehose
+- Added case conversion handlebars helpers([PR #719](https://github.com/aws-solutions/qnabot-on-aws/pull/719)) - contributed by ([@amendlik](https://github.com/amendlik))
+- Consolidated common AWS SDK dependencies to reduce overall solution artifact size and lambdas deployment package size
+- Patched security vulnerabilities and and integrated with CloudFormation Guard evaluation tool
+- Added ability to TestAll in a selected locale, the locales to be tested should be defined in the template parameter `LexV2BotLocaleIds` 
+- Improved security for LLM inputs and outputs
+
+### Fixed
+- Forgot password functionality for Content Designer login
+- Chat client will now prompt the user after credentials are expired
+- Specialty bot routing fixes, Lex Intent state fixes, handlebar processing of SSML injects "\n" into response ([PRs #726](https://github.com/aws-solutions/qnabot-on-aws/pull/726)) - contributed by ([@bobpskier](https://github.com/bobpskier))
+- Secured Cognito roles ([PR #670](https://github.com/aws-solutions/qnabot-on-aws/pull/670)) - contributed by ([@amendlik](https://github.com/amendlik))
+- Improved error messages for embeddings ([issue #665](https://github.com/aws-solutions/qnabot-on-aws/issues/665))
+- AWS environment variable for region is wrongly set ([issue #714](https://github.com/aws-solutions/qnabot-on-aws/issues/714))
+- Fixed testall lambda timing out during status "Lex" when testing against large set of Q&As - contributed by ([@jeve7](https://github.com/jeve7))
+- Fix Austrian German neural voice name ([PR #729](https://github.com/aws-solutions/qnabot-on-aws/pull/729)) - contributed by ([@malte-aws](https://github.com/malte-aws))
+- Fix npm update command ([PR #681](https://github.com/aws-solutions/qnabot-on-aws/pull/681)) - contributed by ([@zherink](https://github.com/zherink))
+- Fix build exits with code 1, if a CF template is invalid ([PR #733](https://github.com/aws-solutions/qnabot-on-aws/pull/733)) - contributed by ([@richhaase](https://github.com/richhaase))
+
 ## [5.5.2] - 2024-05-08
 ### Fixed
 - Fixed an issue with the testall functionality which may introduce a high number of versions stored in the testall S3 bucket when the Content designer has no Q&As.
@@ -277,12 +348,12 @@ __*Note: we recommend that you first deploy these changes in a non-production en
 
 ### Added
 
--   Intent and Slot matching (an early implementation). This new capability supports creating dedicated custom Intents for a QnABot {Item ID}. You can extend QnABot to support one or more related intents. For example, you might create an intent that makes a car reservation, or assists an agent during a live chat or call (via Amazon Connect). More details in README: https://github.com/aws-solutions/qnabot-on-aws/blob/main/docs/intent_slot_matching/README.md
--   Support for using custom domain names for QnABot Designer and Client interfaces. More details in README: https://github.com/aws-solutions/qnabot-on-aws/blob/main/docs/custom_domain_name_setup/README.md
--   AWS QnABot Command Line Interface (CLI) - the AWS QnABot CLI supports the capability to import and export questions and answers via command line. More details in README: https://github.com/aws-solutions/qnabot-on-aws/blob/main/docs/qnabot_cli/README.md
--   Kendra Redirect - with the Kendra Redirect feature, you can now include a Kendra query within a Item ID. More details in README: https://github.com/aws-solutions/qnabot-on-aws/blob/main/docs/kendra_redirect/README.md
+-   Intent and Slot matching (an early implementation). This new capability supports creating dedicated custom Intents for a QnABot {Item ID}. You can extend QnABot to support one or more related intents. For example, you might create an intent that makes a car reservation, or assists an agent during a live chat or call (via Amazon Connect). More details in README: https://github.com/aws-solutions/qnabot-on-aws/blob/v5.2.0/docs/intent_slot_matching/README.md
+-   Support for using custom domain names for QnABot Designer and Client interfaces. More details in README: https://github.com/aws-solutions/qnabot-on-aws/blob/v5.2.0/docs/custom_domain_name_setup/README.md
+-   AWS QnABot Command Line Interface (CLI) - the AWS QnABot CLI supports the capability to import and export questions and answers via command line. More details in README: https://github.com/aws-solutions/qnabot-on-aws/blob/v5.2.0/docs/qnabot_cli.md
+-   Kendra Redirect - with the Kendra Redirect feature, you can now include a Kendra query within a Item ID. More details in README: https://github.com/aws-solutions/qnabot-on-aws/blob/v5.2.0/docs/kendra_redirect/README.md
 -   Integration with Canvas LMS (an early example implementation). Students use their schools' learning management system (LMS) to keep track of their assignments, grades, and their course work. With this integration, students will be able to ask QnABot about their grades, syllabus, enrollments, assignments, and announcements.
-    More details in README: https://github.com/aws-solutions/qnabot-on-aws/blob/main/docs/canvaslms_integration/README.md
+    More details in README: https://github.com/aws-solutions/qnabot-on-aws/blob/v5.2.0/docs/canvaslms_integration.md
 -   Updated import functionality to support importing of QnABot questions and answers from a Excel file when uploaded to S3 data folder.
 -   Added support for importing session attributes via Excel.
 -   Updated runtime of Lambda functions (using Python runtime) to use Python runtime version 3.9.

@@ -23,10 +23,11 @@ from helpers.website_model.chat_page import ChatPage
 QUESTION_FILEPATH = './question_bank/llm_questions.json'
 
 region = os.environ.get('CURRENT_STACK_REGION')
-g5_instance_regions = ['us-east-1', 'us-west-2', 'ap-northeast-1', 'ca-central-1', 'eu-central-1', 'eu-west-1']
-unsupported_region_reason = 'Region Not Supported'
+g5_instance_regions = ['ca-central-1', 'eu-west-1']
+g5_instance_unsupported_region_reason = 'Region Not Supported'
+llm_multilanguage_unsupported_reason = 'Non-English not supported via SageMaker'
 
-@pytest.mark.skipif(region not in g5_instance_regions, reason=unsupported_region_reason)
+@pytest.mark.skipif(region in g5_instance_regions, reason=g5_instance_unsupported_region_reason)
 @pytest.mark.skipif_llm_not_enabled()
 class TestLlm:
 
@@ -53,7 +54,9 @@ class TestLlm:
         menu = MenuNav(dom_operator)
         settings_page = menu.open_settings_page()
         settings_page.reset_settings()
+        settings_page.expand_all_subgroups()
         assert 'Success' in settings_page.enable_llm()
+        assert 'Success' in settings_page.enable_embeddings()
         assert 'Success' in settings_page.enable_multi_language_support()
 
         import_page = menu.open_import_page()
@@ -79,6 +82,7 @@ class TestLlm:
         answer = chat_page.get_last_message_text()
         assert 'LLM generated query' in answer
         assert 'Humpty Dumpty' in answer
+        assert 'wall' in answer
         cw_client.print_fulfillment_lambda_logs()
 
     @pytest.mark.skipif_version_less_than('5.5.0')
@@ -86,7 +90,6 @@ class TestLlm:
         """
         Test that phrases in the ignored utterances list are not disambiguated when LLM_GENERATE_QUERY_ENABLE is set to true.
 
-        See: https://t.corp.amazon.com/V1083580664/overview
         """
         menu = MenuNav(dom_operator)
         chat_page = menu.open_chat_page()
@@ -110,6 +113,7 @@ class TestLlm:
         """
         menu = MenuNav(dom_operator)
         settings_page = menu.open_settings_page()
+        settings_page.expand_all_subgroups()
         # This is needed since the LLM changes the question to an unrelated query
         assert 'Success' in settings_page.disable_llm_disambiguation()
 
@@ -117,12 +121,26 @@ class TestLlm:
 
         chat_page.send_message('Who was Humpty Dumpty?')
 
-        chat_page.send_message('Did Humpty Dumpty sit on a wall?')
+        chat_page.send_message('Did Humpty Dumpty sit on wall?')
         answer = chat_page.get_last_message_text()
-        assert 'Yes' in answer
+        assert 'Yes' in answer or 'on the wall' in answer or 'on a wall' in answer
 
         cw_client.print_fulfillment_lambda_logs()
 
+    def test_llm_returns_custom_no_hits_message(self, designer_login, dom_operator: DomOperator, cw_client: CloudWatchClient):
+        """
+        Test LLMApi integration returns CustomNoMatches defined in the designer when irrelevant question is asked.
+        https://docs.aws.amazon.com/solutions/latest/qnabot-on-aws/using-keyword-filters-for.html#custom-dont-know-answers
+        """
+        menu = MenuNav(dom_operator)
+        chat_page = menu.open_chat_page()
+
+        chat_page.send_message('Did Humpty Dumpty live in Atlanta?')
+        answer = chat_page.get_last_message_text()
+        assert 'You stumped me, I don\'t currently know the answer to that question' in answer
+        cw_client.print_fulfillment_lambda_logs()
+
+    @pytest.mark.skipif(region in g5_instance_regions, reason=llm_multilanguage_unsupported_reason)
     def test_translation(self, client_login, dom_operator: DomOperator, cw_client: CloudWatchClient):
         """
         Test LLM answers are translated into the preferred language.

@@ -48,6 +48,7 @@ class TestEmbeddings:
         menu = MenuNav(dom_operator)
         settings_page = menu.open_settings_page()
         settings_page.reset_settings()
+        settings_page.expand_all_subgroups()
         assert 'Success' in settings_page.disable_llm()
         assert 'Success' in settings_page.disable_filter()
         assert 'Success' in settings_page.enable_embeddings()

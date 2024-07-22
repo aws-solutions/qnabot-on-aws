@@ -57,6 +57,7 @@ class TestKendra:
         menu = MenuNav(dom_operator)
         settings_page = menu.open_settings_page()
         settings_page.reset_settings()
+        settings_page.expand_all_subgroups()
         assert 'Success' in  settings_page.enable_filter()
         assert 'Success' in settings_page.disable_embeddings()
         assert 'Success' in settings_page.disable_llm()
@@ -166,7 +167,7 @@ class TestKendra:
         """
         Test that the Kendra fallback is used when no answer is found.
 
-        See: https://github.com/aws-solutions/aws-qnabot/blob/main/docs/Kendra_Fallback_README.md
+        See: https://github.com/aws-solutions/qnabot-on-aws/blob/main/source/docs/kendra_fallback/README.md
         """
         menu = MenuNav(dom_operator)
         kendra_page = menu.open_kendra_page()
@@ -192,7 +193,7 @@ class TestKendra:
         """
         Test the Kendra query contained in the qna is used instead of Kendra fallback when there is a question match.
 
-        See: https://github.com/aws-solutions/qnabot-on-aws/tree/main/docs/kendra_redirect
+        See: https://github.com/aws-solutions/qnabot-on-aws/blob/main/source/docs/kendra_redirect/README.md
         """
         qid = 'Kendra.001'
         question = self.__get_question_by_qid(qid, loaded_questions)
@@ -215,11 +216,11 @@ class TestKendra:
         Test the Kendra LLM retrieval. This test is meant to catch a bug with Kendra LLM retrieval where the message 
         sent to the LLM has too many tokens. 
 
-        See: https://t.corp.amazon.com/P96661817/overview
         """
         start_time = time.time()
         menu = MenuNav(dom_operator)
         settings_page = menu.open_settings_page()
+        settings_page.expand_all_subgroups()
         assert 'Success' in settings_page.enable_llm()
         no_hits_response = settings_page.get_no_hits_response()
 

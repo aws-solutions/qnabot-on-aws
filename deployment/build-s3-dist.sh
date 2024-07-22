@@ -53,7 +53,7 @@ fi
 template_dir="$PWD"
 template_dist_dir="$template_dir/global-s3-assets"
 build_dist_dir="$template_dir/regional-s3-assets"
-source_dir="$template_dir/../"
+source_dir="$template_dir/../source"
 
 # Grabbing input parameters
 bucket_name="$1"
@@ -111,10 +111,6 @@ echo "--------------------------------------------------------------------------
 mkdir -p $build_dist_dir/lambda
 cp build/lambda/*.zip $build_dist_dir/lambda/
 cp build/*.zip $build_dist_dir/
-
-# Add embeddings model used to instantiate the sagemaker endpoint into global s3 bucket
-mkdir -p $build_dist_dir/ml_model
-cp build/ml_model/e5-large.tar.gz $build_dist_dir/ml_model/e5-large.tar.gz
 
 # put a copy of all templates in the regional buckets, especially useful
 # for the nested templates

@@ -1,0 +1,19 @@
+{
+    "name": "examples",
+    "version": "6.0.2",
+    "description": "Creates custom JS Lambda Hooks",
+    "main": "index.js",
+    "scripts": {
+        "test": "nodeunit test.js"
+    },
+    "author": {
+        "name": "Amazon Web Services",
+        "url": "https://aws.amazon.com/solutions"
+    },
+    "license": "Apache-2.0",
+    "dependencies": {
+        "cfn-response": "^1.0.1",
+        "handlebars": "^4.7.7",
+        "lodash": "^4.17.21"
+    }
+}

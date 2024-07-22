@@ -1,0 +1,36 @@
+{
+    "name": "fulfillment",
+    "version": "6.0.2",
+    "description": "QnABot Lambda handling fulfillment of user requests",
+    "main": "handler.js",
+    "scripts": {
+        "test": "jest --coverage --silent --verbose",
+        "unit": "nodeunit ./test/index.js -t",
+        "clean": "rm -rf node_modules"
+    },
+    "author": {
+        "name": "Amazon Web Services",
+        "url": "https://aws.amazon.com/solutions"
+    },
+    "license": "Apache-2.0",
+    "dependencies": {
+        "@aws-sdk/client-dynamodb": "^3.511.0",
+        "@aws-sdk/client-lex-models-v2": "^3.511.0",
+        "@aws-sdk/client-lex-runtime-service": "^3.511.0",
+        "@aws-sdk/client-lex-runtime-v2": "^3.511.0",
+        "@aws-sdk/lib-dynamodb": "^3.511.0",
+        "jsonschema": "^1.2.2",
+        "jsonwebtoken": "^9.0.0",
+        "jwks-rsa": "^3.1.0",
+        "slackify-markdown": "4.1.0",
+        "utf8": "3.0.0"
+    },
+    "devDependencies": {
+        "aws-sdk-client-mock": "^3.0.1",
+        "aws-sdk-client-mock-jest": "^3.0.1",
+        "jest": "^29.7.0"
+    },
+    "overrides": {
+        "jose": "^4.15.5"
+    }
+}
