@@ -13,7 +13,7 @@
 const _ = require('lodash');
 const { S3Client, GetObjectCommand } = require('@aws-sdk/client-s3');
 const { SSM } = require('@aws-sdk/client-ssm');
-const util = require('./util');
+const util = require('./../../../../capability/util');
 
 function getParameters(ssm, params) {
     return new Promise((resolve, reject) => {

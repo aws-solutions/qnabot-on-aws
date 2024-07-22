@@ -10,24 +10,9 @@
  *  OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions    *
  *  and limitations under the License.                                                                                *
  ******************************************************************************************************************** */
-const query = require('query-string').stringify;
 const _ = require('lodash');
-const axios = require('axios');
-const Url = require('url');
-const { sign } = require('aws4');
-const path = require('path');
-const { Mutex } = require('async-mutex');
-const { SSM, SSMClient, GetParameterCommand, GetParametersCommand, PutParameterCommand } = require('@aws-sdk/client-ssm');
-const util = require('./util');
-
-const mutex = new Mutex();
-
-const reason = function (r) {
-    return (err) => {
-        console.log(err);
-        Promise.reject(r);
-    };
-};
+const { SSMClient, GetParameterCommand, GetParametersCommand, PutParameterCommand } = require('@aws-sdk/client-ssm');
+const util = require('../../../../capability/util');
 
 const chatbotTestingIndex = 0;
 const languageSettingsIndex = 1;
@@ -70,7 +55,7 @@ const settingsMap = {
                     {
                         id: 'ENABLE_MULTI_LANGUAGE_SUPPORT',
                         type: 'boolean',
-                        hint: 'Enable or Disable Amazon Translate support.',
+                        hint: 'Enable or Disable Amazon Translate support',
                     },
                     {
                         id: 'MINIMUM_CONFIDENCE_SCORE',
@@ -101,7 +86,7 @@ const settingsMap = {
                     {
                         id: 'ES_SCORE_ANSWER_FIELD',
                         type: 'boolean',
-                        hint: 'Search the content of the answer field as a 2nd pass query (if there\'s no good match from 1st pass query on question fields).',
+                        hint: 'Search the content of the answer field as a 2nd pass query (if there\'s no good match from 1st pass query on question fields)',
                     },
                     {
                         id: 'ES_SCORE_TEXT_ITEM_PASSAGES',
@@ -134,7 +119,7 @@ const settingsMap = {
                     },
                     {
                         id: 'NO_VERIFIED_IDENTITY_QUESTION',
-                        hint: 'If user identity cannot be verified, replace question string with this.',
+                        hint: 'If user identity cannot be verified, replace question string with this',
                     },
                     {
                         id: 'ENABLE_REDACTING',
@@ -204,7 +189,7 @@ const settingsMap = {
                 members: [
                     {
                         id: 'SEARCH_REPLACE_QUESTION_SUBSTRINGS',
-                        hint: 'replace words or phrases in user questions by defining search/replace pairs in a JSON object like: {"searchString":"replaceString"}. Add additional pairs separated by commas, like: {"searchString":"replaceString", "searchString2":"replaceString2"}.',
+                        hint: 'replace words or phrases in user questions by defining search/replace pairs in a JSON object like: {"searchString":"replaceString"}. Add additional pairs separated by commas, like: {"searchString":"replaceString", "searchString2":"replaceString2"}',
                     },
                     {
                         id: 'PROTECTED_UTTERANCES',
@@ -213,22 +198,22 @@ const settingsMap = {
                     {
                         id: 'EMBEDDINGS_ENABLE',
                         type: 'boolean',
-                        hint: 'Disable use of semantic search using embeddings. Set to TRUE only if QnABot stack was deployed with embeddings enabled.',
+                        hint: 'Disable use of semantic search using embeddings. Set to TRUE only if QnABot stack was deployed with embeddings enabled',
                     },
                     {
                         id: 'EMBEDDINGS_SCORE_THRESHOLD',
                         type: 'number',
-                        hint: 'Enter a number between 0.0 and 1.0. If embedding similarity score is under threshold the match is rejected and QnABot reverts to scoring answer field (if ES_SCORE_ANSWER_FIELD is true).',
+                        hint: 'Enter a number between 0.0 and 1.0. If embedding similarity score is under threshold the match is rejected and QnABot reverts to scoring answer field (if ES_SCORE_ANSWER_FIELD is true)',
                     },
                     {
                         id: 'EMBEDDINGS_SCORE_ANSWER_THRESHOLD',
                         type: 'number',
-                        hint: 'Enter a number between 0.0 and 1.0. Applies only when if ES_SCORE_ANSWER_FIELD is true. If embedding similarity score on answer field is under threshold the match is rejected.',
+                        hint: 'Enter a number between 0.0 and 1.0. Applies only when if ES_SCORE_ANSWER_FIELD is true. If embedding similarity score on answer field is under threshold the match is rejected',
                     },
                     {
                         id: 'EMBEDDINGS_TEXT_PASSAGE_SCORE_THRESHOLD',
                         type: 'number',
-                        hint: 'Enter a number between 0.0 and 1.0. Applies only when if ES_SCORE_TEXT_ITEM_PASSAGES is true. If embedding similarity score on text item field is under threshold the match is rejected.',
+                        hint: 'Enter a number between 0.0 and 1.0. Applies only when if ES_SCORE_TEXT_ITEM_PASSAGES is true. If embedding similarity score on text item field is under threshold the match is rejected',
                     },
                     {
                         id: 'LLM_GENERATE_QUERY_ENABLE',
@@ -242,7 +227,7 @@ const settingsMap = {
                     },
                     {
                         id: 'LLM_GENERATE_QUERY_MODEL_PARAMS',
-                        hint: 'Parameters sent to the LLM model when disambiguating follow-up questions (e.g anthropic model parameters can be customized as `{"temperature":0.1}` or `{"temperature":0.3, "max_tokens": 262, "top_k": 240, "top_p":0.9 }`). Please check LLM model documentation for values that your model provider accepts.',
+                        hint: 'Parameters sent to the LLM model when disambiguating follow-up questions (e.g anthropic model parameters can be customized as `{"temperature":0.1}` or `{"temperature":0.3, "max_tokens": 262, "top_k": 240, "top_p":0.9 }`). Please check LLM model documentation for values that your model provider accepts',
                     },
                 ],
             },
@@ -253,7 +238,7 @@ const settingsMap = {
                 members: [
                     {
                         id: 'ES_EXPAND_CONTRACTIONS',
-                        hint: 'Expand contractions to resolve problems with keyword filters.',
+                        hint: 'Expand contractions to resolve problems with keyword filters',
                     },
                     {
                         id: 'ES_KEYWORD_SYNTAX_TYPES',
@@ -275,7 +260,7 @@ const settingsMap = {
                     {
                         id: 'ES_PHRASE_BOOST',
                         type: 'number',
-                        hint: 'If the user\'s question is a phrase match to a question in the knowledge then boost the score by this factor.',
+                        hint: 'If the user\'s question is a phrase match to a question in the knowledge then boost the score by this factor',
                     },
                     {
                         id: 'ENABLE_SENTIMENT_SUPPORT',
@@ -319,7 +304,7 @@ const settingsMap = {
                     },
                     {
                         id: 'KENDRA_INDEXER_URLS',
-                        hint: 'Enter comma-separated values. List of web addresses QnABot should crawl and index with Kendra.',
+                        hint: 'Enter comma-separated values. List of web addresses QnABot should crawl and index with Kendra',
                     },
                     {
                         id: 'KENDRA_INDEXER_CRAWL_DEPTH',
@@ -334,7 +319,7 @@ const settingsMap = {
                     },
                     {
                         id: 'KENDRA_INDEXER_SCHEDULE',
-                        hint: 'See https://docs.aws.amazon.com/AmazonCloudWatch/latest/events/ScheduledEvents.html for CloudWatch Rate Syntax. Interval Indexer should crawl.',
+                        hint: 'See https://docs.aws.amazon.com/AmazonCloudWatch/latest/events/ScheduledEvents.html for CloudWatch Rate Syntax. Interval Indexer should crawl',
                     },
                     {
                         id: 'KENDRA_INDEXED_DOCUMENTS_LANGUAGES',
@@ -361,11 +346,11 @@ const settingsMap = {
                     },
                     {
                         id: 'LAMBDA_PREPROCESS_HOOK',
-                        hint: 'name of AWS Lambda to run before each question is processed. The name of the Lambda must start with "qna-" or "QNA-" to comply with the permissions of the role attached to the Fulfillment Lambda.',
+                        hint: 'name of AWS Lambda to run before each question is processed. The name of the Lambda must start with "qna-" or "QNA-" to comply with the permissions of the role attached to the Fulfillment Lambda',
                     },
                     {
                         id: 'LAMBDA_POSTPROCESS_HOOK',
-                        hint: 'name of AWS Lambda to run after the question is processed. But before user profile information is saved. The name of the Lambda must start with "qna-" or "QNA-" to comply with the permissions of the role attached to the Fulfillment Lambda.',
+                        hint: 'name of AWS Lambda to run after the question is processed. But before user profile information is saved. The name of the Lambda must start with "qna-" or "QNA-" to comply with the permissions of the role attached to the Fulfillment Lambda',
                     },
                     {
                         id: 'EMBEDDINGS_MAX_TOKEN_LIMIT',
@@ -373,7 +358,7 @@ const settingsMap = {
                     },
                     {
                         id: 'LLM_PROMPT_MAX_TOKEN_LIMIT',
-                        hint: 'Specifies the maximum number of tokens in the prompt message that can be sent to the LLM. QnABot will selectively truncate the prompt by history and context to shorten the total length.',
+                        hint: 'Specifies the maximum number of tokens in the prompt message that can be sent to the LLM. QnABot will selectively truncate the prompt by history and context to shorten the total length',
                     },
                 ],
             },
@@ -391,19 +376,19 @@ const settingsMap = {
                     {
                         id: 'ELICIT_RESPONSE_MAX_RETRIES',
                         type: 'number',
-                        hint: 'Number of times an elicitResponse LexBot can be called before giving up when the Bot returns Failed',
+                        hint: 'Number of times an elicitResponse LexBot can fail before QnaBot gives up and does not ask the user to start the elicitResponse LexBot workflow again',
                     },
                     {
                         id: 'ELICIT_RESPONSE_RETRY_MESSAGE',
-                        hint: 'Default retry message when working with LexBot',
+                        hint: 'Retry message displayed by QnABot when the elicitResponse LexBot workflow fails and the user has to start again',
                     },
                     {
                         id: 'ELICIT_RESPONSE_BOT_FAILURE_MESSAGE',
-                        hint: 'Message used when maximum number of retries is exceeded',
+                        hint: 'Failure message displayed by QnaBot when the maximum number of retries of the elicitResponse LexBot workflow is exceeded',
                     },
                     {
                         id: 'ELICIT_RESPONSE_DEFAULT_MSG',
-                        hint: 'Default response message when working with LexBot',
+                        hint: 'Default closing response message used by QnAbot when the elicitResponse LexBot does not return a closing response to QnABot',
                     },
                     {
                         id: 'BOT_ROUTER_WELCOME_BACK_MSG',
@@ -427,7 +412,7 @@ const settingsMap = {
                     {
                         id: 'CONNECT_ENABLE_VOICE_RESPONSE_INTERRUPT',
                         type: 'boolean',
-                        hint: 'Return bot response in session attribute to enable contact flow to use response as an interruptible prompt.',
+                        hint: 'Return bot response in session attribute to enable contact flow to use response as an interruptible prompt',
                     },
                     {
                         id: 'CONNECT_NEXT_PROMPT_VARNAME',
@@ -468,16 +453,16 @@ const settingsMap = {
                     {
                         id: 'LLM_QA_ENABLE',
                         type: 'boolean',
-                        hint: 'Enables or disables generative answers from passages retrieved via embeddings or Kendra fallback when no FAQ match is found. Applied only to passages and Kendra results - does not apply when an FAQ/QID matches the question.',
+                        hint: 'Enables or disables generative answers from passages retrieved via embeddings or Kendra fallback when no FAQ match is found. Applied only to passages and Kendra results - does not apply when an FAQ/QID matches the question',
                     },
                     {
                         id: 'LLM_QA_PROMPT_TEMPLATE',
                         type: 'textarea',
-                        hint: 'The template used to construct a prompt for LLM to generate an answer from the context of retrieved passages (from Kendra or Text Item passages).',
+                        hint: 'The template used to construct a prompt for LLM to generate an answer from the context of retrieved passages (from Kendra or Text Item passages)',
                     },
                     {
                         id: 'LLM_QA_MODEL_PARAMS',
-                        hint: 'Parameters sent to the LLM model when generating answers to questions (e.g. anthropic model parameters can be customized as `{"temperature":0.1}` or `{"temperature":0.3, "max_tokens": 262, "top_k": 240, "top_p":0.9 }`). Please check LLM model documentation for values that your model provider accepts.',
+                        hint: 'Parameters sent to the LLM model when generating answers to questions (e.g. anthropic model parameters can be customized as `{"temperature":0.1}` or `{"temperature":0.3, "max_tokens": 262, "top_k": 240, "top_p":0.9 }`). Please check LLM model documentation for values that your model provider accepts',
                     },
                     {
                         id: 'LLM_QA_PREFIX_MESSAGE',
@@ -486,21 +471,21 @@ const settingsMap = {
                     {
                         id: 'LLM_QA_SHOW_CONTEXT_TEXT',
                         type: 'boolean',
-                        hint: 'Enables or disables inclusion of the passages used as context for LLM-generated answers.',
+                        hint: 'Enables or disables inclusion of the passages used as context for LLM-generated answers',
                     },
                     {
                         id: 'LLM_QA_SHOW_SOURCE_LINKS',
                         type: 'boolean',
-                        hint: 'Enables or disables Kendra Source Links or passage refMarkdown links (document references) in markdown answers.',
+                        hint: 'Enables or disables Kendra Source Links or passage refMarkdown links (document references) in markdown answers',
                     },
                     {
                         id: 'LLM_CHAT_HISTORY_MAX_MESSAGES',
                         type: 'number',
-                        hint: 'Specifies the maximum number of previous messages maintained in the QnABot DynamoDB UserTable for conversational context and follow-up question disambiguation.',
+                        hint: 'Specifies the maximum number of previous messages maintained in the QnABot DynamoDB UserTable for conversational context and follow-up question disambiguation',
                     },
                     {
                         id: 'LLM_QA_NO_HITS_REGEX',
-                        hint: 'Enter a regular expression. If the LLM response matches the specified pattern (e.g., "Sorry, I don\'t know"), the response is treated as no_hits, and the default EMPTYMESSAGE or a custom \'no_hits\' item is returned instead. Disabled by default, since enabling it prevents easy debugging of LLM don\'t know responses.',
+                        hint: 'Enter a regular expression. If the LLM response matches the specified pattern (e.g., "Sorry, I don\'t know"), the response is treated as no_hits, and the default EMPTYMESSAGE or a custom \'no_hits\' item is returned instead. Disabled by default, since enabling it prevents easy debugging of LLM don\'t know responses',
                     },
                 ],
             },
@@ -518,17 +503,17 @@ const settingsMap = {
                         id: 'ALT_SEARCH_KENDRA_FALLBACK_CONFIDENCE_SCORE',
                         type: 'enum',
                         enums: ['VERY_HIGH', 'HIGH', 'MEDIUM', 'LOW'],
-                        hint: 'Answers will only be returned that or at or above the specified confidence level (https://aws.amazon.com/about-aws/whats-new/2020/09/amazon-kendra-launches-confidence-scores/) when using Kendra Fallback. This setting does not affect the filtering of results for Kendra retrieval used when an LLM is enabled.',
+                        hint: 'Answers will only be returned that or at or above the specified confidence level (https://aws.amazon.com/about-aws/whats-new/2020/09/amazon-kendra-launches-confidence-scores/) when using Kendra Fallback. This setting does not affect the filtering of results for Kendra retrieval used when an LLM is enabled',
                     },
                     {
                         id: 'ALT_SEARCH_KENDRA_S3_SIGNED_URLS',
                         type: 'boolean',
-                        hint: 'Enables signed S3 (https://docs.aws.amazon.com/AmazonS3/latest/userguide/ShareObjectPreSignedURL.html) Urls for Amazon Kendra results.  If enabled, allows support for Kendra documents which are not publicly accessible. Please ensure IAM FulfillmentLambdaRole has access to S3 objects in Kendra index (default role grants access to buckets starting with name QNA or qna).',
+                        hint: 'Enables signed S3 (https://docs.aws.amazon.com/AmazonS3/latest/userguide/ShareObjectPreSignedURL.html) Urls for Amazon Kendra results.  If enabled, allows support for Kendra documents which are not publicly accessible. Please ensure IAM FulfillmentLambdaRole has access to S3 objects in Kendra index (default role grants access to buckets starting with name QNA or qna)',
                     },
                     {
                         id: 'ALT_SEARCH_KENDRA_S3_SIGNED_URL_EXPIRE_SECS',
                         type: 'number',
-                        hint: 'Determines length of time in seconds for the validity of signed S3 Urls in Kendra fallback.',
+                        hint: 'Determines length of time in seconds for the validity of signed S3 Urls in Kendra fallback',
                     },
                     {
                         id: 'ALT_SEARCH_KENDRA_MAX_DOCUMENT_COUNT',
@@ -550,7 +535,7 @@ const settingsMap = {
                     {
                         id: 'ALT_SEARCH_KENDRA_ABBREVIATE_MESSAGE_FOR_SSML',
                         type: 'boolean',
-                        hint: 'If a set to "true", an abbreviate Amazon Kendra response will be sent via voice.  If set to "false", the full text of the Kendra fallback response will be sent when using voice.',
+                        hint: 'If a set to "true", an abbreviate Amazon Kendra response will be sent via voice.  If set to "false", the full text of the Kendra fallback response will be sent when using voice',
                     },
                 ],
             },
@@ -566,7 +551,7 @@ const settingsMap = {
                     {
                         id: 'KNOWLEDGE_BASE_SHOW_REFERENCES',
                         type: 'boolean',
-                        hint: 'Enables or disables inclusion of the passages used as context for Bedrock Knowledge Base generated answers.',
+                        hint: 'Enables or disables inclusion of the passages used as context for Bedrock Knowledge Base generated answers',
                     },
                     {
                         id: 'KNOWLEDGE_BASE_S3_SIGNED_URLS',
@@ -618,7 +603,7 @@ module.exports = {
         const customParams = context.rootState.info.CustomQnABotSettings;
         const defaultParams = context.rootState.info.DefaultQnABotSettings;
         const ssm = new SSMClient({
-            customUserAgent : util.getUserAgentString(context.rootState.info.Version, 'C022'),
+            customUserAgent: util.getUserAgentString(context.rootState.info.Version, 'C022'),
             region: context.rootState.info.region, credentials
         });
         const query = {
@@ -653,7 +638,7 @@ module.exports = {
     async updateSettings(context, settings) {
         const credentials = context.rootState.user.credentials;
         const customParams = context.rootState.info.CustomQnABotSettings;
-        const ssm = new SSM({
+        const ssm = new SSMClient({
             customUserAgent: util.getUserAgentString(context.rootState.info.Version, 'C022'),
             region: context.rootState.info.region, credentials
         });

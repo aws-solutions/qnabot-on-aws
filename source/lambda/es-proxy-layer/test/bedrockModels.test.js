@@ -139,19 +139,7 @@ const llmModelBodies = {
         k: 0,
         prompt: 'test prompt',
     },
-    'meta.llama2-13b-chat-v1': {
-        max_gen_len: 512,
-        temperature: 0,
-        top_p: 0.9,
-        prompt: 'test prompt',
-    },
-    'meta.llama2-70b-chat-v1': {
-        max_gen_len: 512,
-        temperature: 0,
-        top_p: 0.9,
-        prompt: 'test prompt',
-    },
-    'meta.llama3-8b-instruct-v1:0': {
+    'meta.llama3-8b-instruct-v1': {
         max_gen_len: 512,
         temperature: 0,
         top_p: 0.9,
@@ -270,21 +258,7 @@ const llmModelResponses = {
             })
         )
     },
-    'meta.llama2-13b-chat-v1': {
-        body: Buffer.from(
-            JSON.stringify({
-                generation: 'test response'
-            })
-        )
-    },
-    'meta.llama2-70b-chat-v1': {
-        body: Buffer.from(
-            JSON.stringify({
-                generation: 'test response'
-            })
-        )
-    },
-    'meta.llama3-8b-instruct-v1:0': {
+    'meta.llama3-8b-instruct-v1': {
         body: Buffer.from(
             JSON.stringify({
                 generation: 'test response'

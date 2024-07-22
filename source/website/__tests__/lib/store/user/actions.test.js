@@ -19,8 +19,13 @@ const actionsModule = require('../../../../js/lib/store/user/actions');
 const axios = require('axios');
 const query = require('query-string');
 const jwt = require('jsonwebtoken');
+const { mockClient } = require('aws-sdk-client-mock');
+const { CognitoIdentityProviderClient, AdminUserGlobalSignOutCommand } = require('@aws-sdk/client-cognito-identity-provider');
+const cognitoIdentityProviderClientMock = mockClient(CognitoIdentityProviderClient);
+require('aws-sdk-client-mock-jest');
 
 jest.mock('@aws-sdk/credential-providers');
+jest.mock('@aws-sdk/client-cognito-identity-provider')
 jest.mock('axios');
 jest.mock('jsonwebtoken');
 
@@ -49,12 +54,17 @@ describe('user actions test', () => {
                 origin: 'test.origin',
                 pathname: '/test/path',
             },
+            localStorage: {
+                clear: jest.fn(),
+            },
         });
+        cognitoIdentityProviderClientMock.reset();
     });
 
     afterEach(() => {
         windowSpy.mockRestore();
         jest.resetAllMocks();
+        cognitoIdentityProviderClientMock.restore();
     });
 
     test('refresh tokens', async () => {
@@ -139,8 +149,7 @@ describe('user actions test', () => {
         expect(axios).toHaveBeenCalledTimes(1);
         expect(mockedContext.dispatch).toHaveBeenCalledTimes(1);
         expect(mockedContext.dispatch).toHaveBeenCalledWith('logout');
-        expect(window.window.location.href)
-            .toEqual(mockedContext.rootState.info._links.DesignerLogin.href);
+        expect(window.location.href) .toEqual(mockedContext.rootState.info._links.DesignerLogin.href);
     });
 
     test('refresh tokens -- expired credentials 2', async () => {
@@ -373,9 +382,6 @@ describe('user actions test', () => {
                 },
             },
         };
-        const mockedNewCredentials = {
-            expiration: new Date(Date.now() + 1000),
-        };
         const unexpectedError = new Error('Some other error');
         const logins = {};
         logins[[
@@ -399,9 +405,134 @@ describe('user actions test', () => {
         expect(mockedContext.dispatch).toHaveBeenCalledTimes(0);
     });
 
-    test('logout', () => {
-        actionsModule.logout();
+    test('is able to logout and global sign out', async () => {
+        const expectedCredentials = {
+            accessKeyId: 'mock-access-key',
+            secretAccessKey: 'mock-secret-key',
+            sessionToken: 'mock-session-token',
+            expiration: new Date(Date.now() - 1000)
+        };
+
+        const mockedContext = {
+            rootState: {
+                info: {
+                    region: 'mock-region',
+                    UserPool: 'mock-user-pool-id',
+                    ClientIdDesigner: 'mock-client-id',
+                    _links: {
+                        CognitoEndpoint: {
+                            href: 'some.cognito.endpoint',
+                        },
+                        DesignerLogin: {
+                            href: 'some.login.endpoint',
+                        },
+                    },
+                },
+                user: {
+                    name: 'some-user',
+                }
+            },
+            state: {
+                token: 'test-token',
+                credentials: {
+                    expiration: new Date(Date.now() - 1000),
+                },
+            }
+        };
+        fromCognitoIdentityPool.mockReturnValueOnce(jest.fn().mockReturnValueOnce(expectedCredentials));
+        cognitoIdentityProviderClientMock.on(AdminUserGlobalSignOutCommand).resolvesOnce({
+            $metadata: {
+              httpStatusCode: 200, // successful response
+            }
+        })
+
+        const expectedLogoutUrl = `${mockedContext.rootState.info._links.CognitoEndpoint.href}/logout?response_type=code&client_id=${mockedContext.rootState.info.ClientIdDesigner}&redirect_uri=test.origin/test/path`
+
+        await actionsModule.logout(mockedContext);
+        expect(cognitoIdentityProviderClientMock).toHaveReceivedCommandTimes(AdminUserGlobalSignOutCommand, 1);
         expect(window.sessionStorage.clear).toHaveBeenCalledTimes(1);
+        expect(window.localStorage.clear).toHaveBeenCalledTimes(1);
+        expect(window.location.href).toEqual(expectedLogoutUrl);
+    });
+
+    test('can logout when error occurs in credentials provider', async () => {
+        const mockedContext = {
+            rootState: {
+                info: {
+                    region: 'mock-region',
+                    UserPool: 'mock-user-pool-id',
+                    ClientIdDesigner: 'mock-client-id',
+                    _links: {
+                        CognitoEndpoint: {
+                            href: 'some.cognito.endpoint',
+                        },
+                        DesignerLogin: {
+                            href: 'some.login.endpoint',
+                        },
+                    },
+                },
+                user: {
+                    name: 'some-user',
+                }
+            },
+        };
+        fromCognitoIdentityPool
+        .mockReturnValueOnce(jest.fn().mockImplementation(() => {
+            throw new Error('unexpected credentials error');
+        }))
+
+        const expectedLogoutUrl = `${mockedContext.rootState.info._links.CognitoEndpoint.href}/logout?response_type=code&client_id=${mockedContext.rootState.info.ClientIdDesigner}&redirect_uri=test.origin/test/path`
+
+        await actionsModule.logout(mockedContext);
+        expect(cognitoIdentityProviderClientMock).toHaveReceivedCommandTimes(AdminUserGlobalSignOutCommand, 0);
+        expect(window.sessionStorage.clear).toHaveBeenCalledTimes(1);
+        expect(window.localStorage.clear).toHaveBeenCalledTimes(1);
+        expect(window.location.href).toEqual(expectedLogoutUrl);
+    });
+
+    test('can logout when error occurs during global signout', async () => {
+        const expectedCredentials = {
+            accessKeyId: 'mock-access-key',
+            secretAccessKey: 'mock-secret-key',
+            sessionToken: 'mock-session-token',
+            expiration: new Date(Date.now() - 1000)
+        };
+
+        const mockedContext = {
+            rootState: {
+                info: {
+                    region: 'mock-region',
+                    UserPool: 'mock-user-pool-id',
+                    ClientIdDesigner: 'mock-client-id',
+                    _links: {
+                        CognitoEndpoint: {
+                            href: 'some.cognito.endpoint',
+                        },
+                        DesignerLogin: {
+                            href: 'some.login.endpoint',
+                        },
+                    },
+                },
+                user: {
+                    name: 'some-user',
+                }
+            },
+            state: {
+                token: 'test-token',
+                credentials: {
+                    expiration: new Date(Date.now() - 1000),
+                },
+            }
+        };
+        fromCognitoIdentityPool.mockReturnValueOnce(jest.fn().mockReturnValueOnce(expectedCredentials));
+        cognitoIdentityProviderClientMock.on(AdminUserGlobalSignOutCommand).rejectsOnce(new Error('unexpected global signout error'));
+
+        const expectedLogoutUrl = `${mockedContext.rootState.info._links.CognitoEndpoint.href}/logout?response_type=code&client_id=${mockedContext.rootState.info.ClientIdDesigner}&redirect_uri=test.origin/test/path`
+        await actionsModule.logout(mockedContext);
+        expect(cognitoIdentityProviderClientMock).toHaveReceivedCommandTimes(AdminUserGlobalSignOutCommand, 1);
+        expect(window.sessionStorage.clear).toHaveBeenCalledTimes(1);
+        expect(window.localStorage.clear).toHaveBeenCalledTimes(1);
+        expect(window.location.href).toEqual(expectedLogoutUrl);
     });
 
     test('login -- id_token exists', async () => {
@@ -500,8 +631,7 @@ describe('user actions test', () => {
         expect(mockedContext.state.name).toEqual(testToken['cognito:username']);
         expect(mockedContext.state.groups).toEqual(testToken['cognito:groups']);
         expect(window.alert).toHaveBeenCalledTimes(1);
-        expect(window.window.location.href)
-            .toEqual(mockedContext.rootState.info._links.DesignerLogin.href);
+        expect(window.location.href).toEqual(mockedContext.rootState.info._links.DesignerLogin.href);
 
         // The assertions below become true when the getTokens function is called.
         expect(axios).toHaveBeenCalledTimes(1);

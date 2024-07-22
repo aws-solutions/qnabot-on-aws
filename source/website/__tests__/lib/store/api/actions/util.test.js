@@ -10,7 +10,7 @@
  *  OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions    *
  *  and limitations under the License.                                                                                *
  *********************************************************************************************************************/
-import { getUserAgentString } from "../../../../../js/lib/store/api/actions/util";
+import { getUserAgentString } from "../../../../../js/capability/util";
 
 describe("getUserAgentString", () => {
     test('Returns the correct user agent string', () => {

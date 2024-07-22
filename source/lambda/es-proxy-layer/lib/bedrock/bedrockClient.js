@@ -27,8 +27,6 @@ const capabilityMapping = {
     'anthropic.claude-3-haiku-v1': 'C031',
     'anthropic.claude-3-sonnet-v1': 'C032',
     'cohere.command-text-v14': 'C033',
-    'meta.llama2-13b-chat-v1': 'C034',
-    'meta.llama2-70b-chat-v1': 'C035',
     'amazon.titan-embed-text-v1': 'C037',
     'cohere.embed-english-v3': 'C038',
     'cohere.embed-multilingual-v3': 'C039',

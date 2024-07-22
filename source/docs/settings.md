@@ -4,29 +4,29 @@
 |---------|--------------|--------------|
 | ENABLE_DEBUG_RESPONSES | true or false | Determines whether to log original English responses and translated responses for debugging
 | ES_USE_KEYWORD_FILTERS | true or false | Determines whether to detect keywords from Comprehend when searching for answers
-| ES_EXPAND_CONTRACTIONS | JSON format   | Expand contractions to resolve problems with keyword filters.
+| ES_EXPAND_CONTRACTIONS | JSON format   | Expand contractions to resolve problems with keyword filters
 | ES_KEYWORD_SYNTAX_TYPES | comma separate list <br/> See [Analyze Syntax](https://docs.aws.amazon.com/comprehend/latest/dg/how-syntax.html) | A list of tokens representing parts of speech identified by Amazon Comprehend for matching questions
 | ES_SYNTAX_CONFIDENCE_LIMIT | decimal between 0 and 0.99 | Amazon Comprehend makes a best effort to determine the parts of speech  in a sentence. The keywords will only be used if the confidence limit is greater than this amount
 | ES_MINIMUM_SHOULD_MATCH |"2<75%" <br/> See [query-dsl-minimum-should-match](https://opensearch.org/docs/latest/query-dsl/minimum-should-match/) for syntax |  Determines how close a question should match to return a hit
 | ES_NO_HITS_QUESTION | text | The question QnABot should use when it cannot find an answer
 | ES_ERROR_QUESTION | text | The question QnABot should use when a backend error ocurred
 | ES_USE_FUZZY_MATCH  | true or false | Determines whether QnABot should return answers similar to the question asked. See [Fuzzy Query](https://opensearch.org/docs/latest/query-dsl/term/fuzzy/) for more information
-| ES_PHRASE_BOOST | integer | If the user's question is a phrase match to a question in the knowledge then boost the score by this factor.
-| ES_SCORE_ANSWER_FIELD | true or false | Search the content of the answer field as a 2nd pass query (if there's no good match from 1st pass query on question fields).
+| ES_PHRASE_BOOST | integer | If the user's question is a phrase match to a question in the knowledge then boost the score by this factor
+| ES_SCORE_ANSWER_FIELD | true or false | Search the content of the answer field as a 2nd pass query (if there's no good match from 1st pass query on question fields)
 | ENABLE_SENTIMENT_SUPPORT | true or false | Enables [Amazon Comprehend](https://docs.aws.amazon.com/comprehend/latest/dg/how-sentiment.html) be used for sentiment analysis
 | ENABLE_MULTI_LANGUAGE_SUPPORT | true or false | Enable or Disable Amazon Translate support. See list of [Supported Languages](multilanguage_support/README.md#supported-languages)
 | ENABLE_CUSTOM_TERMINOLOGY| true or false |  Enable support for installed [Custom Terminology](https://aws.amazon.com/blogs/machine-learning/introducing-amazon-translate-custom-terminology/) files when using Amazon Translate
 | MINIMUM_CONFIDENCE_SCORE | decimal between 0.0 and 0,99 | The minimum confidence before Amazon Comprehend will determine the user's language
-| ALT_SEARCH_KENDRA_FALLBACK_CONFIDENCE_SCORE | VERY_HIGH \| HIGH \| MEDIUM \| LOW |  Answers will only be returned that or at or above the specified [confidence level](https://aws.amazon.com/about-aws/whats-new/2020/09/amazon-kendra-launches-confidence-scores/) when using Kendra Fallback. This setting does not affect the filtering of results for Kendra retrieval used when an LLM is enabled.
+| ALT_SEARCH_KENDRA_FALLBACK_CONFIDENCE_SCORE | VERY_HIGH \| HIGH \| MEDIUM \| LOW |  Answers will only be returned that or at or above the specified [confidence level](https://aws.amazon.com/about-aws/whats-new/2020/09/amazon-kendra-launches-confidence-scores/) when using Kendra Fallback. This setting does not affect the filtering of results for Kendra retrieval used when an LLM is enabled
 | ALT_SEARCH_KENDRA_FAQ_CONFIDENCE_SCORE: | VERY_HIGH \| HIGH \| MEDIUM \| LOW |  Minimum Kendra [confidence level](https://aws.amazon.com/about-aws/whats-new/2020/09/amazon-kendra-launches-confidence-scores/) threshold for Kendra FAQ
-| ALT_SEARCH_KENDRA_S3_SIGNED_URLS | true or false | Enables [signed S3](https://docs.aws.amazon.com/AmazonS3/latest/userguide/ShareObjectPreSignedURL.html) Urls for Amazon Kendra results.  If enabled, allows support for Kendra documents which are not publicly accessible. Please ensure IAM FulfillmentLambdaRole has access to S3 objects in Kendra index (default role grants access to buckets starting with name QNA or qna).
-| ALT_SEARCH_KENDRA_S3_SIGNED_URL_EXPIRE_SECS | integer | Determines length of time in seconds for the validity of signed S3 Urls in Kendra fallback.
+| ALT_SEARCH_KENDRA_S3_SIGNED_URLS | true or false | Enables [signed S3](https://docs.aws.amazon.com/AmazonS3/latest/userguide/ShareObjectPreSignedURL.html) Urls for Amazon Kendra results.  If enabled, allows support for Kendra documents which are not publicly accessible. Please ensure IAM FulfillmentLambdaRole has access to S3 objects in Kendra index (default role grants access to buckets starting with name QNA or qna)
+| ALT_SEARCH_KENDRA_S3_SIGNED_URL_EXPIRE_SECS | integer | Determines length of time in seconds for the validity of signed S3 Urls in Kendra fallback
 | ALT_SEARCH_KENDRA_MAX_DOCUMENT_COUNT | integer | Number of documents returned by Amazon Kendra fallback
-| ALT_SEARCH_KENDRA_FAQ_MESSAGE | string | Heading when a [Frequently Asked Question](https://docs.aws.amazon.com/kendra/latest/dg/response-types.html) is found by Amazon Kendra.
+| ALT_SEARCH_KENDRA_FAQ_MESSAGE | string | Heading when a [Frequently Asked Question](https://docs.aws.amazon.com/kendra/latest/dg/response-types.html) is found by Amazon Kendra
 | ALT_SEARCH_KENDRA_TOP_ANSWER_MESSAGE | string | Heading when the [top answer](https://docs.aws.amazon.com/kendra/latest/dg/response-types.html) is found by Amazon Kendra
 | ALT_SEARCH_KENDRA_ANSWER_MESSAGE | string | Heading when a [Document](https://docs.aws.amazon.com/kendra/latest/dg/response-types.html) is returned by Amazon Kendra
 | ALT_SEARCH_KENDRA_RESPONSE_TYPES | Comma separated list. One or more valid [Amazon Kendra response type](https://docs.aws.amazon.com/kendra/latest/dg/response-types.html) | Kendra fallback will only return responses of the listed types
-| ALT_SEARCH_KENDRA_ABBREVIATE_MESSAGE_FOR_SSML | boolean | If a set to "true", an abbreviate Amazon Kendra response will be sent via voice.  If set to "false", the full text of the Kendra fallback response will be sent when using voice.
+| ALT_SEARCH_KENDRA_ABBREVIATE_MESSAGE_FOR_SSML | boolean | If a set to "true", an abbreviate Amazon Kendra response will be sent via voice.  If set to "false", the full text of the Kendra fallback response will be sent when using voice
 | KENDRA_FAQ_CONFIG_MAX_RETRIES | integer | Number of times to retry syncing FAQ's when a throttling error occurs
 | KENDRA_FAQ_CONFIG_RETRY_DELAY | integer | Amount of time to wait in seconds between attempts to retry syncing
 | KENDRA_FAQ_ES_FALLBACK | true or false | When Kendra FAQ is enabled, but does not return an answer then query OpenSearch
@@ -46,13 +46,13 @@
 | SMS_HINT_REMINDER_INTERVAL_HRS | integer | The amount of time in hours when to send SMS_HINT_REMINDER
 | IDENTITY_PROVIDER_JWKS_URLS | array of urls |  User can override this empty list to add trusted IdPs (eg from Lex-Web-UI CognitoUserPoolPubKey)
 | ENFORCE_VERIFIED_IDENTITY | true or false |  Set to true to make QnABot require verified identity from client
-| NO_VERIFIED_IDENTITY_QUESTION | text | If user identity cannot be verified, replace question string with this.
-| ELICIT_RESPONSE_MAX_RETRIES | integer | Number of times an elicitResponse LexBot can be called before giving up when the Bot returns Failed
-| ELICIT_RESPONSE_RETRY_MESSAGE | text |  Default retry message when working with LexBot
-| ELICIT_RESPONSE_BOT_FAILURE_MESSAGE | text |  Message used when maximum number of retries is exceeded
-| ELICIT_RESPONSE_DEFAULT_MSG| text | Default response message when working with LexBot
+| NO_VERIFIED_IDENTITY_QUESTION | text | If user identity cannot be verified, replace question string with this
+| ELICIT_RESPONSE_MAX_RETRIES | integer | Number of times an elicitResponse LexBot can fail before QnaBot gives up and does not ask the user to start the elicitResponse LexBot workflow again
+| ELICIT_RESPONSE_RETRY_MESSAGE | text |  Retry message displayed by QnABot when the elicitResponse LexBot workflow fails and the user has to start again
+| ELICIT_RESPONSE_BOT_FAILURE_MESSAGE | text |  Failure message displayed by QnaBot when the maximum number of retries of the elicitResponse LexBot workflow is exceeded
+| ELICIT_RESPONSE_DEFAULT_MSG| text | Default closing response message used by QnAbot when the elicitResponse LexBot does not return a closing response to QnABot
 | CONNECT_IGNORE_WORDS | comma separated list | Throw an error if the transcript provided by connect __only__ contains the words in this list (case insensitive). This is useful if you find many missed utterances due to the use of filler words before a proper utterance (e.g. "a", "e", "umm", "like", etc.). This setting can not be used as a transcript filter (see `LAMBDA_PREPROCESS_HOOK` or `LAMBDA_POSTPROCESS_HOOK` if you wish to apply custom processing to questions/answers)
-| CONNECT_ENABLE_VOICE_RESPONSE_INTERRUPT | true or false | Return bot response in session attribute to enable contact flow to use response as an interruptible prompt.
+| CONNECT_ENABLE_VOICE_RESPONSE_INTERRUPT | true or false | Return bot response in session attribute to enable contact flow to use response as an interruptible prompt
 | CONNECT_NEXT_PROMPT_VARNAME | text | Name of session var to use for next prompt
 | ENABLE_REDACTING | true or false | Enable the system to redact log output
 | ENABLE_REDACTING_WITH_COMPREHEND | true or false | Enables [Amazon Comprehend based PII Redacting](https://aws.amazon.com/blogs/machine-learning/detecting-and-redacting-pii-using-amazon-comprehend/)
@@ -70,13 +70,13 @@
 | BOT_ROUTER_WELCOME_BACK_MSG | text | The text used by QnABot when ending communication from a specialty bot
 | BOT_ROUTER_EXIT_MSGS | comma separated list | The exit phrases in comma separated list available for the a user to end communication with a specialty bot
 | RUN_LAMBDAHOOK_FROM_QUERY_STEP | true or false | Controls timing of execution for Lambda hooks
-| LAMBDA_PREPROCESS_HOOK | string | name of AWS Lambda to run before each question is processed. The name of the Lambda must start with "qna-" or "QNA-" to comply with the permissions of the role attached to the Fulfillment Lambda .
-| LAMBDA_POSTPROCESS_HOOK | string | name of AWS Lambda to run after the question is processed. But before user profile information is saved. The name of the Lambda must start with "qna-" or "QNA-" to comply with the permissions of the role attached to the Fulfillment Lambda .
-| SEARCH_REPLACE_QUESTION_SUBSTRINGS | string | replace words or phrases in user questions by defining search/replace pairs in a JSON object like: {"searchString":"replaceString"}. Add additional pairs separated by commas, like: {"searchString":"replaceString", "searchString2":"replaceString2"}.
+| LAMBDA_PREPROCESS_HOOK | string | name of AWS Lambda to run before each question is processed. The name of the Lambda must start with "qna-" or "QNA-" to comply with the permissions of the role attached to the Fulfillment Lambda
+| LAMBDA_POSTPROCESS_HOOK | string | name of AWS Lambda to run after the question is processed. But before user profile information is saved. The name of the Lambda must start with "qna-" or "QNA-" to comply with the permissions of the role attached to the Fulfillment Lambda 
+| SEARCH_REPLACE_QUESTION_SUBSTRINGS | string | replace words or phrases in user questions by defining search/replace pairs in a JSON object like: {"searchString":"replaceString"}. Add additional pairs separated by commas, like: {"searchString":"replaceString", "searchString2":"replaceString2"}
 | PROTECTED_UTTERANCES | text | A comma-separated list of utterances that will not be translated or disambiguated by QnABot. Each phrase is not case sensitive and ignores common punctuation characters: .,!;-?
-| EMBEDDINGS_ENABLE | true or false | Disable use of semantic search using embeddings. Set to TRUE only if QnABot stack was deployed with embeddings enabled.
-| EMBEDDINGS_SCORE_THRESHOLD | 0-1 | Unlike regular OpenSearch queries, embeddings queries always return scores between 0 and 1, so we can apply a threshold to separate good from bad results. If embedding similarity score is under the threshold then the match is rejected and QnABot reverts to try to find a match on the answer field (only if ES_SCORE_ANSWER_FIELD is set to true), Text item passage query, Kendra fallback or no_hits. Use the Content Designer TEST tab to see the hits ranked by score for your query results.
-| EMBEDDINGS_SCORE_ANSWER_THRESHOLD | 0-1 | Used only when ES_SCORE_ANSWER_FIELD is true. If embedding similarity score for the answer field query is under the threshold the match is rejected and QnABot reverts to the Text item passage query, Kendra fallback or no_hits. Use the Content Designer TEST tab to see the hits ranked by score for your answer field query results. For **Match on**, choose *qna item answer* to see answer field scores.
+| EMBEDDINGS_ENABLE | true or false | Disable use of semantic search using embeddings. Set to TRUE only if QnABot stack was deployed with embeddings enabled
+| EMBEDDINGS_SCORE_THRESHOLD | 0-1 | Unlike regular OpenSearch queries, embeddings queries always return scores between 0 and 1, so we can apply a threshold to separate good from bad results. If embedding similarity score is under the threshold then the match is rejected and QnABot reverts to try to find a match on the answer field (only if ES_SCORE_ANSWER_FIELD is set to true), Text item passage query, Kendra fallback or no_hits. Use the Content Designer TEST tab to see the hits ranked by score for your query results
+| EMBEDDINGS_SCORE_ANSWER_THRESHOLD | 0-1 | Used only when ES_SCORE_ANSWER_FIELD is true. If embedding similarity score for the answer field query is under the threshold the match is rejected and QnABot reverts to the Text item passage query, Kendra fallback or no_hits. Use the Content Designer TEST tab to see the hits ranked by score for your answer field query results. For **Match on**, choose *qna item answer* to see answer field scores
 | EMBEDDINGS_TEXT_PASSAGE_SCORE_THRESHOLD | 0-1 | If embedding similarity score for text item passage field query is under threshold the match it's rejected and QnABot reverts to Kendra fallback or no_hits. Use the Content Designer TEST tab to see the hits ranked by score for your answer field query results. For **Match on**, choose *text item passage* to see passage field scores. |
 | LLM_API                                  | SAGEMAKER, LAMBDA   | Specifies the LLM (Language Model) API used by the QnABot Stack based on the chosen value during deployment or update.                                                                                                              |
 | LLM_GENERATE_QUERY_ENABLE                | true or false   | Enables or disables question disambiguation using the LLM model.                                                                                                       |

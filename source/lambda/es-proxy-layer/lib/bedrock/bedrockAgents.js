@@ -127,7 +127,8 @@ async function bedrockRetrieveAndGenerate(req, res) {
     } = req._settings;
     
     const client = new BedrockAgentRuntimeClient(customSdkConfig('C41', { region }));
-    const { question } = req;
+    let { question } = req;
+    question = question.slice(0, 1000)
 
     let retrieveAndGenerateInput, retrieveAndGenerateSessionInput, response;
 

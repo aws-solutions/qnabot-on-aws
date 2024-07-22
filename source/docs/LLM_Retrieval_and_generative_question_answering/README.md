@@ -48,14 +48,20 @@ With QnABot you can use three different data sources to generate responses from:
 
 ![CFN Params](./images/TextItem_JackHorner.png)
 
-2. Kendra - Generates responses from the from web pages that you've crawled or documents that you've ingested using a Kendra data source connector. If you're not sure how to load documents into Kendra, see the Kendra Essentials Workshop: [Ingesting AWS WhitePapers into a Kendra index](https://catalog.us-east-1.prod.workshops.aws/workshops/df64824d-abbe-4b0d-8b31-8752bceabade/en-US/200-ingesting-documents/230-using-the-s3-connector/231-ingesting-documents).
-**NOTE:** It is only possible to use Kendra or Bedrock Knowledge Bases as a fallback data source, and not both. When ALT_SEARCH_KENDRA_INDEXES is not empty, i.e. an index is provided, Kendra will be the default data source even if a Bedrock knowledge base is configured. 
-3. Bedrock Knowledge Bases - You can also create your own knowledge base from files stored in an S3 bucket. Bedrock knowledge bases do not require an LLM or embeddings model to function, since the embeddings and generative response are already provided by the knowledge base. Choose this option if you prefer not to manage and configure a Kendra index or LLM models. To enable this option, create a [Bedrock Knowledge Base](https://docs.aws.amazon.com/bedrock/latest/userguide/knowledge-base-create.html) and copy your Knowledge Base ID into the Cloudformation parameter `BedrockKnowledgeBaseId`. IMPORTANT: If you want to enable S3 presigned URLs, S3 bucket names must start with qna (e.g. qnabot-mydocs), otherwise make sure IAM Role *...FulfillmentLambdaRole...* has been granted S3:GetObject access to the Bedrock Knowledge Base bucket (otherwise the signed URLS will not have access). In addition, you can encrypt the transient messages using your own KMS key; ensure that when creating the KMS key that the IAM Role *...FulfillmentLambdaRole...* is a key user.
+2. Amazon Kendra - Generates responses from the from web pages that you've crawled or documents that you've ingested using a Kendra data source connector. If you're not sure how to load documents into Kendra, see the Kendra Essentials Workshop: [Ingesting AWS WhitePapers into a Kendra index](https://catalog.us-east-1.prod.workshops.aws/workshops/df64824d-abbe-4b0d-8b31-8752bceabade/en-US/200-ingesting-documents/230-using-the-s3-connector/231-ingesting-documents).
+**NOTE:** It is only possible to use Amazon Kendra or Amazon Bedrock Knowledge Bases as a fallback data source, and not both. When Cloudformation parameter `AltSearchKendraIndexes` is not empty, i.e. an index is provided, Kendra will be the default data source even if a Amazon Bedrock knowledge base is configured. 
+3. Amazon Bedrock Knowledge Base - You can also create your own knowledge base from files stored in an S3 bucket. Bedrock knowledge bases do not require an LLM or embeddings model to function, since the embeddings and generative response are already provided by the knowledge base. Choose this option if you prefer not to manage and configure a Kendra index or LLM models. To enable this option, [create a Bedrock Knowledge Base](https://docs.aws.amazon.com/bedrock/latest/userguide/knowledge-base-create.html) and copy your Knowledge Base ID into the Cloudformation parameter.`BedrockKnowledgeBaseId`. For additional details, please refer to [Retrieval Augmentation Generation (RAG) using Amazon Bedrock Knowledge Base](../bedrock_knowledgebase_rag/README.md)
+
+    > **_NOTE:_** If you want to enable S3 presigned URLs, S3 bucket names must start with `qna` (e.g. qnabot-mydocs), otherwise make sure IAM Role *...FulfillmentLambdaRole...* has been granted S3:GetObject access to the Bedrock Knowledge Base bucket (otherwise the signed URLS will not have access). In addition, you can encrypt the transient messages using your own KMS key; ensure that when creating the KMS key that the IAM Role *...FulfillmentLambdaRole...* is a key user.
+
+![RAG using Amazon Bedrock Knowledge Base](./images/Bedrock_KB.png)
+
+
 
 You can also choose which LLM to use with QnABot:
-1. BEDROCK: Select from several LLM models provided by Amazon Bedrock using the LLMBedrockModelId Cloudformation parameter. These models provide the best performance and operate on a pay-per-request model. Bedrock is currently only supported in the following regions: us-east-1, us-west-2, ap-southeast-1, ap-northeast-1, eu-central-1.
-1. SAGEMAKER: Deploys a dedicated SageMaker Jumpstart model hosted on an Amazon SageMaker endpoint - see https://llama.meta.com/llama2. This option provides the best compatibility with all Lex supported regions, except for ap-southeast-1 where the default ml.g5.12xlarge instance is not available. Pricing is determined by the number and types of instances that are deployed.
-1. LAMBDA: LLM model from a user provided Lambda function. This option provides a custom option for advanced users who wish to deploy their own model.
+1. BEDROCK: Select from several LLM models provided by Amazon Bedrock using the LLMBedrockModelId Cloudformation parameter. These models provide the best performance and operate on a pay-per-request model. For more information, please refer to [Bedrock Supported AWS Regions](https://docs.aws.amazon.com/bedrock/latest/userguide/bedrock-regions.html).
+2. SAGEMAKER: Deploys a dedicated SageMaker Jumpstart model hosted on an Amazon SageMaker endpoint - see https://llama.meta.com/llama2. This option provides the best compatibility with all Lex supported regions, except for ap-southeast-1 where the default ml.g5.12xlarge instance is not available. Pricing is determined by the number and types of instances that are deployed.
+3. LAMBDA: LLM model from a user provided Lambda function. This option provides a custom option for advanced users who wish to deploy their own model.
 
 ### 1. Amazon Bedrock (PREFERRED)
 Utilizes one of the Amazon Bedrock foundation models to generate text. Currently, the following models are supported by QnA Bot:
@@ -68,9 +74,6 @@ Utilizes one of the Amazon Bedrock foundation models to generate text. Currently
 - [AI21 Jurassic-2 Ultra](https://us-east-1.console.aws.amazon.com/bedrock/home?region=us-east-1#/providers?model=ai21.j2-ultra-v1)
 - [AI21 Jurassic-2 Mid](https://us-east-1.console.aws.amazon.com/bedrock/home?region=us-east-1#/providers?model=ai21.j2-mid-v1)
 - [Cohere Command](https://us-east-1.console.aws.amazon.com/bedrock/home?region=us-east-1#/providers?model=cohere.command-text-v14)
-- [Cohere Command Lite](https://us-east-1.console.aws.amazon.com/bedrock/home?region=us-east-1#/providers?model=cohere.command-light-text-v14)
-- [Meta Llama 2 Chat 13B](https://us-east-1.console.aws.amazon.com/bedrock/home?region=us-east-1#/providers?model=meta.llama2-13b-chat-v1)
-- [Meta Llama 2 Chat 70B](https://us-east-1.console.aws.amazon.com/bedrock/home?region=us-east-1#/providers?model=meta.llama2-70b-chat-v1)
 - [Meta Llama 3 8B Instruct](https://us-east-1.console.aws.amazon.com/bedrock/home?region=us-east-1#/providers?model=meta.llama3-8b-instruct-v1:0)
 
 #### Requesting Access to Amazon Bedrock Models
@@ -95,7 +98,7 @@ By default a 1-node ml.g5.12xlarge endpoint is automatically provisioned. For la
 
 #### Deploy Stack for SAGEMAKER
 
-- *(for Kendra Fallback)* set `DefaultKendraIndexId` to the Index Id (a GUID) of your existing Kendra index containing ingested documents
+- *(for Kendra Fallback)* set `AltSearchKendraIndexes` to the Index Id (a GUID) of your existing Kendra index containing ingested documents
 - *(for text passage queries)* set `EmbeddingsApi` to BEDROCK, SAGEMAKER, or LAMBDA (see  [Semantic Search using Text Embeddings](../semantic_matching_using_LLM_embeddings/README.md))
 - set `LLMApi` to SAGEMAKER
 
@@ -108,7 +111,7 @@ Use a custom Lambda function to experiment with LLMs of your choice. Provide you
 
 #### Deploy Stack for Embedding models invoked by a custom Lambda Function
 
-- *(for Kendra Fallback)* set `DefaultKendraIndexId` to the Index Id (a GUID) of your existing Kendra index containing ingested documents
+- *(for Kendra Fallback)* set `AltSearchKendraIndexes` to the Index Id (a GUID) of your existing Kendra index containing ingested documents
 - *(for text passage queries)* set `EmbeddingsApi` to BEDROCK, SAGEMAKER, or LAMBDA (see  [Semantic Search using Text Embeddings](../semantic_matching_using_LLM_embeddings/README.md))
 - set `LLMApi` to LAMBDA
 - set `LLMLambdaArn` to the ARN of your Lambda function
@@ -178,7 +181,3 @@ When QnABot stack is installed, open Content Designer **Settings** page:
 - **LLM_QA_SHOW_SOURCE_LINKS:** set to true or false to enable or disable Kendra Source Links or passage refMarkdown links (doc references) in markdown answers.
 - **LLM_CHAT_HISTORY_MAX_MESSAGES:** the number of previous questions and answers (chat history) to maintain (in the QnABot DynamoDB UserTable). Chat History is necessary for QnABot to disambiguate follow up questions from previous question and answer context.
 - **LLM_PROMPT_MAX_TOKEN_LIMIT:** the maximum number of tokens that can be sent to the LLM. QnABot will selectively truncate the prompt by chat history (first) and context (second) to shorten the prompt length. **NOTE:** The tokenizer uses gt2 encoding to estimate the token count and is only an approximation. The value for this setting should be set lower than the max number of tokens supported by the LLM model and may require calibration.
-- **KNOWLEDGE_BASE_PREFIX_MESSAGE:** Message to append in the chat client when the knowledge base generates a response.
-- **KNOWLEDGE_BASE_SHOW_REFERENCES:** Enables or disables inclusion of the passages used as context for Bedrock Knowledge Base generated answers.
-- **KNOWLEDGE_BASE_S3_SIGNED_URLS:** Enables or disables S3 presigned URL signing for Bedrock Knowledge Base answers.
-- **KNOWLEDGE_BASE_S3_SIGNED_URL_EXPIRE_SECS:** Determines length of time in seconds for the validity of signed S3 Urls for Bedrock Knowledge Base answers.

@@ -127,6 +127,19 @@ class TestLlm:
 
         cw_client.print_fulfillment_lambda_logs()
 
+    def test_llm_returns_custom_no_hits_message(self, designer_login, dom_operator: DomOperator, cw_client: CloudWatchClient):
+        """
+        Test LLMApi integration returns CustomNoMatches defined in the designer when irrelevant question is asked.
+        https://docs.aws.amazon.com/solutions/latest/qnabot-on-aws/using-keyword-filters-for.html#custom-dont-know-answers
+        """
+        menu = MenuNav(dom_operator)
+        chat_page = menu.open_chat_page()
+
+        chat_page.send_message('Did Humpty Dumpty live in Atlanta?')
+        answer = chat_page.get_last_message_text()
+        assert 'You stumped me, I don\'t currently know the answer to that question' in answer
+        cw_client.print_fulfillment_lambda_logs()
+
     @pytest.mark.skipif(region in g5_instance_regions, reason=llm_multilanguage_unsupported_reason)
     def test_translation(self, client_login, dom_operator: DomOperator, cw_client: CloudWatchClient):
         """

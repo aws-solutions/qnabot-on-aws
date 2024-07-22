@@ -43,6 +43,9 @@ module.exports = {
             LoginCallbackUrls: [
                 { 'Fn::GetAtt': ['Urls', 'Designer'] },
             ],
+            LogoutCallbackUrls: [
+                { 'Fn::GetAtt': ['Urls', 'Designer'] },
+            ],
             CSS: require('./style').designer,
         },
     },

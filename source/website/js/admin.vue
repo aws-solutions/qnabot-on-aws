@@ -70,7 +70,6 @@ v-app
         router-view
   v-footer
 </template>
-
 <script>
 
 require('vuex');
@@ -192,7 +191,6 @@ module.exports = {
     methods: {
         logout() {
             this.$store.dispatch('user/logout');
-            window.location = this.login;
         },
     },
 };

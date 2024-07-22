@@ -2,7 +2,7 @@
   "region": "us-east-1",
   "profile": "default",
   "publicBucket": "solutions",
-  "publicPrefix": "qnabot-on-aws/v6.0.1",
+  "publicPrefix": "qnabot-on-aws/v6.0.2",
   "devEmail": "",
   "ApprovedDomain": "NONE",
   "Username": "Admin",
