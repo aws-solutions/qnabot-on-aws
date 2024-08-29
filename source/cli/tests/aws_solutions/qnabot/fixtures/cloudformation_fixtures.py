@@ -15,7 +15,7 @@ import os
 import logging
 
 import pytest
-from moto import mock_cloudformation
+from moto import mock_aws
 
 from aws_solutions.core import get_service_client
 
@@ -48,6 +48,6 @@ def cloudformation_stacks():
 
 @pytest.fixture
 def cloudformation_stacks_fixture():
-    with mock_cloudformation():
+    with mock_aws():
         cloudformation_stacks()
         yield

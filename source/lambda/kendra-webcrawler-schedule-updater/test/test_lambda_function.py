@@ -14,9 +14,9 @@ import os
 import unittest
 import boto3
 from unittest.mock import patch, MagicMock, ANY
-from moto import mock_ssm
+from moto import mock_aws
 
-@mock_ssm
+@mock_aws
 class TestLambdaFunction(unittest.TestCase):
     def setUp(self):
         self.ssm_client = boto3.client("ssm")

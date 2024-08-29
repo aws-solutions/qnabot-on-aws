@@ -14,6 +14,30 @@
 const util = require('../../util');
 
 module.exports = {
+    ESCFNProxyLambdaLogGroup:{
+        Type: 'AWS::Logs::LogGroup',
+        Properties: {
+            LogGroupName: {
+                'Fn::Join': [
+                    '-',
+                    [
+                        { 'Fn::Sub': '/aws/lambda/${AWS::StackName}-ESCFNProxyLambda' },
+                        { 'Fn::Select': ['2', { 'Fn::Split': ['/', { Ref: 'AWS::StackId' }] }] },
+                    ],
+                ],
+            },
+            RetentionInDays: {
+                'Fn::If': [
+                    'LogRetentionPeriodIsNotZero',
+                    { Ref: 'LogRetentionPeriod' },
+                    { Ref: 'AWS::NoValue' },
+                ],
+            },
+        },
+        Metadata: {
+            guard: util.cfnGuard('CLOUDWATCH_LOG_GROUP_ENCRYPTED', 'CW_LOGGROUP_RETENTION_PERIOD_CHECK'),
+        },
+    },
     ESCFNProxyLambda: {
         Type: 'AWS::Lambda::Function',
         Properties: {
@@ -36,6 +60,9 @@ module.exports = {
                 { Ref: 'EsProxyLambdaLayer' },
                 { Ref: 'QnABotCommonLambdaLayer' }],
             Handler: 'resource.handler',
+            LoggingConfig: {
+                LogGroup: { Ref: 'ESCFNProxyLambdaLogGroup' },
+            },
             MemorySize: '1408',
             Role: { 'Fn::GetAtt': ['ESProxyLambdaRole', 'Arn'] },
             Runtime: process.env.npm_package_config_lambdaRuntime,
@@ -121,7 +148,7 @@ module.exports = {
                                                     {
                                                         'Fn::If': [
                                                             'EmbeddingsBedrock',
-                                                            { 'Fn::FindInMap': ['BedrockDefaults', {'Ref' : 'EmbeddingsBedrockModelId'}, 'EmbeddingsDimensions'] },
+                                                            { 'Fn::FindInMap': ['BedrockDefaults', {Ref : 'EmbeddingsBedrockModelId'}, 'EmbeddingsDimensions'] },
                                                             'INVALID EMBEDDINGS API - Cannot determine dimensions',
                                                         ],
                                                     },

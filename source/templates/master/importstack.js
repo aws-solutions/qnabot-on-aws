@@ -18,6 +18,7 @@ module.exports = {
         Properties: {
             TemplateURL: { 'Fn::Sub': 'https://${BootstrapBucket}.s3.${AWS::Region}.amazonaws.com/${BootstrapPrefix}/templates/import.json' },
             Parameters: {
+                ContentDesignerOutputBucket: { Ref: 'ContentDesignerOutputBucket' },
                 CFNLambda: { 'Fn::GetAtt': ['CFNLambda', 'Arn'] },
                 CFNInvokePolicy: { Ref: 'CFNInvokePolicy' },
                 S3Clean: { 'Fn::GetAtt': ['S3Clean', 'Arn'] },
@@ -59,6 +60,7 @@ module.exports = {
                     ],
                 },
                 EmbeddingsBedrockModelId: { 'Fn::FindInMap': ['BedrockDefaults', {'Ref' : 'EmbeddingsBedrockModelId'}, 'ModelID'] },
+                LogRetentionPeriod: { Ref: 'LogRetentionPeriod' },
             },
         },
     },

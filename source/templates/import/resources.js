@@ -25,6 +25,30 @@ module.exports = Object.assign(require('./bucket'), {
             BuildDate: (new Date()).toISOString(),
         },
     },
+    ImportStartLambdaLogGroup: {
+      Type: 'AWS::Logs::LogGroup',
+      Properties: {
+        LogGroupName: {
+          'Fn::Join': [
+            '-',
+            [
+              { 'Fn::Sub': '/aws/lambda/${AWS::StackName}-ImportStartLambda' },
+              { 'Fn::Select': ['2', { 'Fn::Split': ['/', { Ref: 'AWS::StackId' }] }] },
+            ],
+          ],
+        },
+          RetentionInDays: {
+            'Fn::If': [
+                'LogRetentionPeriodIsNotZero',
+                { Ref: 'LogRetentionPeriod' },
+                { Ref: 'AWS::NoValue' },
+            ],
+        },
+      },
+      Metadata: {
+        guard: util.cfnGuard('CLOUDWATCH_LOG_GROUP_ENCRYPTED', 'CW_LOGGROUP_RETENTION_PERIOD_CHECK'),
+      },
+    },
     ImportStartLambda: {
       Type: "AWS::Lambda::Function",
       Properties: {
@@ -44,10 +68,14 @@ module.exports = Object.assign(require('./bucket'), {
                 DEFAULT_SETTINGS_PARAM: { Ref: "DefaultQnABotSettings" },
                 PRIVATE_SETTINGS_PARAM: { Ref: "PrivateQnABotSettings" },
                 CUSTOM_SETTINGS_PARAM: { Ref: "CustomQnABotSettings" },
-                ...util.getCommonEnvironmentVariables()
+                OUTPUT_S3_BUCKET: { Ref: "ContentDesignerOutputBucket"},
+                ...util.getCommonEnvironmentVariables(),
             },
         },
         Handler: "index.start",
+        LoggingConfig: {
+          LogGroup: { Ref: 'ImportStartLambdaLogGroup' },
+        },
         MemorySize: "1024",
         Role: { "Fn::GetAtt": ["ImportRole", "Arn"] },
         Runtime: process.env.npm_package_config_lambdaRuntime,
@@ -75,6 +103,30 @@ module.exports = Object.assign(require('./bucket'), {
       },
       Metadata: { cfn_nag: util.cfnNag(["W92"]) },
     },
+    ImportStepLambdaLogGroup: {
+      Type: 'AWS::Logs::LogGroup',
+      Properties: {
+        LogGroupName: {
+          'Fn::Join': [
+            '-',
+            [
+              { 'Fn::Sub': '/aws/lambda/${AWS::StackName}-ImportStepLambda' },
+              { 'Fn::Select': ['2', { 'Fn::Split': ['/', { Ref: 'AWS::StackId' }] }] },
+            ],
+          ],
+        },
+          RetentionInDays: {
+            'Fn::If': [
+                'LogRetentionPeriodIsNotZero',
+                { Ref: 'LogRetentionPeriod' },
+                { Ref: 'AWS::NoValue' },
+            ],
+        },
+      },
+      Metadata: {
+        guard: util.cfnGuard('CLOUDWATCH_LOG_GROUP_ENCRYPTED', 'CW_LOGGROUP_RETENTION_PERIOD_CHECK'),
+      },
+    },
     ImportStepLambda: {
       Type: "AWS::Lambda::Function",
       Properties: {
@@ -96,10 +148,14 @@ module.exports = Object.assign(require('./bucket'), {
                 EMBEDDINGS_API: { Ref: "EmbeddingsApi" },
                 EMBEDDINGS_SAGEMAKER_ENDPOINT: { Ref: "EmbeddingsSagemakerEndpoint" },
                 EMBEDDINGS_LAMBDA_ARN: { Ref: "EmbeddingsLambdaArn" },
-                ...util.getCommonEnvironmentVariables()
+                OUTPUT_S3_BUCKET: { Ref: "ContentDesignerOutputBucket"},
+                ...util.getCommonEnvironmentVariables(),
             },
         },
         Handler: "index.step",
+        LoggingConfig: {
+          LogGroup: { Ref: 'ImportStepLambdaLogGroup' },
+        },
         MemorySize: "1024",
         Role: { "Fn::GetAtt": ["ImportRole", "Arn"] },
         Runtime: process.env.npm_package_config_lambdaRuntime,
@@ -204,6 +260,7 @@ module.exports = Object.assign(require('./bucket'), {
                           { 'Fn::Sub': 'arn:${AWS::Partition}:bedrock:${AWS::Region}::foundation-model/amazon.titan-embed-text-v1' },
                           { 'Fn::Sub': 'arn:${AWS::Partition}:bedrock:${AWS::Region}::foundation-model/cohere.embed-english-v3' },
                           { 'Fn::Sub': 'arn:${AWS::Partition}:bedrock:${AWS::Region}::foundation-model/cohere.embed-multilingual-v3' },
+                          { 'Fn::Sub': 'arn:${AWS::Partition}:bedrock:${AWS::Region}::foundation-model/amazon.titan-embed-text-v2:0' },
                       ],
                     },
                   ],
@@ -233,7 +290,7 @@ module.exports = Object.assign(require('./bucket'), {
                 "s3:DeleteObject",
                 "s3:DeleteObjectVersion",
               ],
-              Resource: [{ "Fn::Sub": "arn:aws:s3:::${ImportBucket}*" }],
+              Resource: [{ "Fn::Sub": "arn:aws:s3:::${ImportBucket}*" }, { "Fn::Sub": "arn:aws:s3:::${ContentDesignerOutputBucket}*" }],
           }, {
               Effect: "Allow",
               Action: [

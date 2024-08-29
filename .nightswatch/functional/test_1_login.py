@@ -82,3 +82,13 @@ class TestLogin:
         assert title[0] == 'Signin'
         assert title[1] == 'Incorrect username or password.'
 
+    def test_test_all_before_import(self, designer_login, dom_operator: DomOperator):
+        """
+        Tests the test all functionality before importing questions.
+        """
+        menu = MenuNav(dom_operator)
+        edit_page = menu.open_edit_page()
+        edit_page.select_test_all_tab()
+        report_status = edit_page.generate_test_report()
+        assert 'Completed' in report_status.text
+

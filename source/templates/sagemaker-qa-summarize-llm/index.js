@@ -43,11 +43,11 @@ module.exports = {
             Properties: {
                 PrimaryContainer: {
                     Image: {
-                        'Fn::Sub': '763104351884.dkr.ecr.${AWS::Region}.amazonaws.com/huggingface-pytorch-tgi-inference:2.0.1-tgi1.1.0-gpu-py39-cu118-ubuntu20.04'
+                        'Fn::Sub': '763104351884.dkr.ecr.${AWS::Region}.amazonaws.com/huggingface-pytorch-tgi-inference:2.3.0-tgi2.2.0-gpu-py310-cu121-ubuntu22.04-v2.0'
                     },
                     ModelDataSource: {
                         S3DataSource: {
-                            S3Uri: {'Fn::Sub': 's3://jumpstart-private-cache-prod-${AWS::Region}/meta-textgeneration/meta-textgeneration-llama-2-13b-f/artifacts/inference-prepack/v1.0.0/' },
+                            S3Uri: {'Fn::Sub': 's3://jumpstart-private-cache-prod-${AWS::Region}/meta-textgeneration/meta-textgeneration-llama-2-13b-f/artifacts/inference-prepack/v1.1.0/' },
                             S3DataType: "S3Prefix",
                             CompressionType: "None",
                             ModelAccessConfig: {

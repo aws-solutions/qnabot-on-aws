@@ -269,7 +269,7 @@ module.exports = {
                     this.alertTitle = 'Error';
                 }
             });
-            fileReader.readAsBinaryString(files[0]);
+            fileReader.readAsText(files[0]);
         },
         downloadBlobAsFile: (function closure_shell() {
             const a = document.createElement('a');

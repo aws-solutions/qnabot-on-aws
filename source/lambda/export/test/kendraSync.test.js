@@ -35,7 +35,7 @@ const event = {
                     name: 'exportBucket'
                 },
                 object: {
-                    key: 'status/testExport.csv',
+                    key: 'status-export/testExport.csv',
                     versionId: 'tLkWAhY8v2rsaSPWqg2m'
                 }
             }
@@ -110,39 +110,39 @@ describe('when calling performSync function', () => {
         expect(s3Mock).toHaveReceivedCommandTimes(GetObjectCommand, 4);
         expect(s3Mock).toHaveReceivedNthCommandWith(2, GetObjectCommand, {
             'Bucket': 'exportBucket',
-            'Key': 'status/testExport.csv',
+            'Key': 'status-export/testExport.csv',
             'VersionId': 'tLkWAhY8v2rsaSPWqg2m'
         });
         expect(s3Mock).toHaveReceivedNthCommandWith(3, GetObjectCommand, {
             'Body': '{"status":"Parsing content JSON"}',
             'Bucket': 'testExportBucket',
-            'Key': 'status/qna-kendra-faq.txt'
+            'Key': 'status-export/qna-kendra-faq.txt'
         });
         expect(s3Mock).toHaveReceivedNthCommandWith(5, GetObjectCommand, {
             'Body': '{"status":"Creating FAQ"}',
             'Bucket': 'testExportBucket',
-            'Key': 'status/qna-kendra-faq.txt'
+            'Key': 'status-export/qna-kendra-faq.txt'
         });
         expect(s3Mock).toHaveReceivedNthCommandWith(7, GetObjectCommand, {
             'Body': '{"status":"Sync Complete"}',
             'Bucket': 'testExportBucket',
-            'Key': 'status/qna-kendra-faq.txt'
+            'Key': 'status-export/qna-kendra-faq.txt'
         });
         expect(s3Mock).toHaveReceivedCommandTimes(PutObjectCommand, 3);
         expect(s3Mock).toHaveReceivedNthCommandWith(4, PutObjectCommand, {
             'Body': '{"status":"Parsing content JSON"}',
             'Bucket': 'testExportBucket',
-            'Key': 'status/qna-kendra-faq.txt'
+            'Key': 'status-export/qna-kendra-faq.txt'
         });
         expect(s3Mock).toHaveReceivedNthCommandWith(6, PutObjectCommand, {
             'Body': '{"status":"Creating FAQ"}',
             'Bucket': 'testExportBucket',
-            'Key': 'status/qna-kendra-faq.txt'
+            'Key': 'status-export/qna-kendra-faq.txt'
         });
         expect(s3Mock).toHaveReceivedNthCommandWith(8, PutObjectCommand, {
             'Body': '{"status":"Sync Complete"}',
             'Bucket': 'testExportBucket',
-            'Key': 'status/qna-kendra-faq.txt'
+            'Key': 'status-export/qna-kendra-faq.txt'
         });
     });
 
@@ -193,29 +193,29 @@ describe('when calling performSync function', () => {
         expect(s3Mock).toHaveReceivedCommandTimes(GetObjectCommand, 3);
         expect(s3Mock).toHaveReceivedNthCommandWith(2, GetObjectCommand, {
             'Bucket': 'exportBucket',
-            'Key': 'status/testExport.csv',
+            'Key': 'status-export/testExport.csv',
             'VersionId': 'tLkWAhY8v2rsaSPWqg2m'
         });
         expect(s3Mock).toHaveReceivedNthCommandWith(3, GetObjectCommand, {
             'Body': '{"status":"Parsing content JSON"}',
             'Bucket': 'testExportBucket',
-            'Key': 'status/qna-kendra-faq.txt'
+            'Key': 'status-export/qna-kendra-faq.txt'
         });
         expect(s3Mock).toHaveReceivedNthCommandWith(5, GetObjectCommand, {
             'Body': '{"status":"Error"}',
             'Bucket': 'testExportBucket',
-            'Key': 'status/qna-kendra-faq.txt'
+            'Key': 'status-export/qna-kendra-faq.txt'
         });
         expect(s3Mock).toHaveReceivedCommandTimes(PutObjectCommand, 2);
         expect(s3Mock).toHaveReceivedNthCommandWith(4, PutObjectCommand, {
             'Body': '{"status":"Parsing content JSON"}',
             'Bucket': 'testExportBucket',
-            'Key': 'status/qna-kendra-faq.txt'
+            'Key': 'status-export/qna-kendra-faq.txt'
         });
         expect(s3Mock).toHaveReceivedNthCommandWith(6, PutObjectCommand, {
             'Body': '{"status":"Error"}',
             'Bucket': 'testExportBucket',
-            'Key': 'status/qna-kendra-faq.txt'
+            'Key': 'status-export/qna-kendra-faq.txt'
         });
     });
 

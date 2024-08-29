@@ -54,10 +54,6 @@ exports.createRequestObject = function (question, clientType, lexVersion, curren
         "question": question
     };
 
-
-    if (lexVersion === "V1") {
-        request._event.sessionAttributes = { "idtokenjwt": "<token redacted>" }
-    }
     if (lexVersion === "V2") {
         request._event.invocationSource = "FulfillmentCodeHook";
         request._event.sessionState.sessionAttributes = { "idtokenjwt": "<token redacted>" };

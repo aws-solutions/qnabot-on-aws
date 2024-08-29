@@ -1,6 +1,6 @@
 {
     "name": "qnabot-on-aws",
-    "version": "6.0.2",
+    "version": "6.1.0",
     "engines": {
         "node": ">=18.0.0",
         "npm": ">=10.0.0"
@@ -76,12 +76,11 @@
         "@vue/compat": "^3.3.8",
         "@vue/eslint-config-standard": "^8.0.1",
         "ajv": "^6.10.2",
-        "alexa-sdk": "^1.0.25",
         "async-mutex": "^0.1.3",
         "autosize": "^3.0.21",
         "aws-lex-web-ui": "git+https://github.com/aws-samples/aws-lex-web-ui.git#feature/qnabot-sdkv3",
         "aws4": "^1.7.0",
-        "axios": "^1.6.8",
+        "axios": "^1.7.4",
         "body-parser": "^1.18.3",
         "bowser": "^1.9.3",
         "cfn-response": "^1.0.1",
@@ -95,7 +94,7 @@
         "express": "^4.19.2",
         "faker": "^4.1.0",
         "file-saver": "^1.3.8",
-        "handlebars": "^4.7.7",
+        "handlebars": "^4.7.8",
         "handlebars-loader": "^1.7.3",
         "highlight.js": "^10.4.1",
         "idle-js": "^1.2.0",
@@ -122,7 +121,7 @@
         "quick-lru": "^1.1.0",
         "range": "0.0.3",
         "raw-text": "^1.1.0",
-        "read-excel-file": "^5.7.1",
+        "read-excel-file": "^5.8.5",
         "recursive-readdir": "^2.2.2",
         "require-dir": "^0.3.2",
         "roboto-fontface": "^0.8.0",
@@ -204,10 +203,12 @@
         "semver@6.3.0": "^6.3.1",
         "semver@7.0.0 - 7.5.2": "^7.5.2",
         "@vue/cli-plugin-unit-jest": {
-            "@vue/vue3-jest": "$@vue/vue3-jest",
-            "postcss": "8.4.32"
+            "@vue/vue3-jest": "$@vue/vue3-jest"
         },
-        "follow-redirects": "^1.15.6"
+        "follow-redirects": "^1.15.6",
+        "postcss": "^8.4.32",
+        "elliptic": "^6.5.7",
+        "uglify-js": "^3.19.2"
     },
     "jest": {
         "globals": {

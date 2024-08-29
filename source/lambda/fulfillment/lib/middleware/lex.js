@@ -28,10 +28,6 @@ function isConnectClientVoice(req) {
     return _.get(req, '_clientType') === 'LEX.AmazonConnect.Voice';
 }
 
-function isLexV1(req) {
-    return req._lexVersion === 'V1';
-}
-
 function isElicitResponse(request, response) {
     let result = false;
     const qnabotcontextJSON = _.get(response, 'session.qnabotcontext');
@@ -66,33 +62,6 @@ function trapIgnoreWords(req, transcript) {
     }
 
     return trs.trim().length === 0;
-}
-
-function parseLexV1Event(event) {
-    const out = {
-        _type: 'LEX',
-        _lexVersion: 'V1',
-        _userId: _.get(event, 'userId', 'Unknown Lex User'),
-        intentname: _.get(event, 'sessionState.intent.name'),
-        question: _.get(event, 'inputTranscript').trim(),
-        session: _.mapValues(
-            _.get(event, 'sessionAttributes', {}),
-            (x) => {
-                try {
-                    return JSON.parse(x);
-                } catch (e) {
-                    return x;
-                }
-            },
-        ),
-        channel: _.get(event, 'requestAttributes.\'x-amz-lex:channel-type\''),
-    };
-
-    // check if we pass in a qnabotUserId as a session attribute, if so, use it, else default
-    out._userId = _.get(event, 'sessionState.sessionAttributes.qnabotUserId', out._userId);
-    qnabot.log(`QnaBot User Id: ${out._userId}`);
-
-    return out;
 }
 
 function parseLexV2Event(event) {
@@ -157,12 +126,7 @@ exports.parse = async function (req) {
         throw new Error(`Error - inputTranscript contains only words specified in setting CONNECT_IGNORE_WORDS: "${event.inputTranscript}"`);
     }
 
-    let out;
-    if (!_.get(event, 'sessionId')) {
-        out = parseLexV1Event(event);
-    } else {
-        out = parseLexV2Event(event);
-    }
+    const out = parseLexV2Event(event);
     return out;
 };
 
@@ -213,27 +177,6 @@ function isCard(card) {
 
 function isInteractiveMessage(response) {
     return (isCard(response.card) && (_.get(response.card, 'imageUrl', '').trim() || (_.get(response.card, 'buttons', []).length > 0)));
-}
-
-function isFallbackIntent(request) {
-    return (_.get(request, '_event.currentIntent.name', '').toLowerCase()).includes('fallback');
-}
-
-function buildResponseCardV1(response) {
-    let responseCardV1 = null;
-    if (isCard(response.card) && (_.get(response.card, 'imageUrl', '').trim() || (_.get(response.card, 'buttons', []).length > 0))) {
-        responseCardV1 = {
-            version: '1',
-            contentType: 'application/vnd.amazonaws.card.generic',
-            genericAttachments: [_.pickBy({
-                title: _.get(response, 'card.title', 'Title').slice(0, 80), // LexV1 title limit
-                subTitle: _.get(response.card, 'subTitle')?.slice(0, 80),
-                imageUrl: _.get(response.card, 'imageUrl'),
-                buttons: _.get(response.card, 'buttons'),
-            })],
-        };
-    }
-    return responseCardV1;
 }
 
 function buildImageResponseCardV2(response) {
@@ -295,13 +238,6 @@ function buildInteractiveMessageTemplate(response) {
     return JSON.stringify(template);
 }
 
-function buildV1InteractiveMessageResponse(request, response) {
-    return {
-        contentType: 'CustomPayload',
-        content: buildInteractiveMessageTemplate(response),
-    };
-}
-
 function buildV2InteractiveMessageResponse(request, response) {
     return [
         {
@@ -311,23 +247,6 @@ function buildV2InteractiveMessageResponse(request, response) {
     ];
 }
 
-function copyResponseCardtoSessionAttribute(response) {
-    const responseCardV1 = buildResponseCardV1(response);
-    if (responseCardV1) {
-        // copy Lex v1 response card to appContext session attribute used by lex-web-ui
-        //  - allows repsonse card display even when using postContent (voice) with Lex (not otherwise supported by Lex)
-        //  - allows Lex limit of 5 buttons to be exceeded when using lex-web-ui
-        let tmp;
-        try {
-            tmp = JSON.parse(_.get(response, 'session.appContext', '{}'));
-        } catch (e) {
-            tmp = _.get(response, 'session.appContext', '{}');
-        }
-        tmp.responseCard = responseCardV1;
-        response.session.appContext = JSON.stringify(tmp);
-    }
-    return response;
-}
 
 function applyLexResponseCardButtonLimits(request, response) {
     // Lex has limit of max 5 buttons in the responsecard. if we have more than 5, use the first 5 only.
@@ -339,11 +258,9 @@ function applyLexResponseCardButtonLimits(request, response) {
         buttons = _.get(response.card, 'buttons', []);
     }
 
-    // LexV1 and V2 have different limits for button text so enforce them here
-    // NOTE: LexV1 documentation formally states that 15 is the max limit for
-    // button title; however, empirical testing shows that 80 characters are supported
-    const textLimit = isLexV1(request) ? 80 : 50;
-    const valueLimit = isLexV1(request) ? 1000 : 50;
+    // LexV2 Limits for button text
+    const textLimit = 50;
+    const valueLimit = 50;
     qnabot.log(`Limiting button text to first ${textLimit} characters to adhere to Lex limits.`);
     for (let i = 0; i < buttons.length; i++) {
         response.card.buttons[i].text = response.card.buttons[i].text.slice(0, textLimit);
@@ -367,35 +284,6 @@ function applyConnectInteractiveMessageButtonLimits(response) {
         response.card.buttons[i].value = response.card.buttons[i].value.slice(0, 400);
     }
     return response;
-}
-
-function getV1CloseTemplate(request, response) {
-    return {
-        sessionAttributes: _.get(response, 'session', {}),
-        dialogAction: _.pickBy({
-            type: 'Close',
-            fulfillmentState: 'Fulfilled',
-            message: {
-                contentType: response.type,
-                content: response.message,
-            },
-        }),
-    };
-}
-
-function getV1ElicitTemplate(request, response) {
-    return {
-        sessionAttributes: _.get(response, 'session', {}),
-        dialogAction: {
-            type: 'ElicitSlot',
-            intentName: _.get(request, '_event.currentIntent.name'),
-            slotToElicit: 'slot',
-            message: {
-                contentType: response.type,
-                content: response.message,
-            },
-        },
-    };
 }
 
 function getV2CloseTemplate(request, response) {
@@ -457,25 +345,6 @@ function getV2DialogCodeHookResponseTemplate(request, response) {
     };
 }
 
-function assembleLexV1Response(request, response) {
-    let out = {};
-
-    if ((isConnectClientChat(request) && isInteractiveMessage(response) && !isFallbackIntent(request))) {
-        out = getV1ElicitTemplate(request, response);
-        out.dialogAction.message = buildV1InteractiveMessageResponse(request, response);
-    } else if (isElicitResponse(request, response) && !isFallbackIntent(request)) {
-        out = getV1ElicitTemplate(request, response);
-    } else {
-        out = getV1CloseTemplate(request, response);
-    }
-
-    if (!isConnectClient(request)) {
-        response = applyLexResponseCardButtonLimits(request, response);
-        out.dialogAction.responseCard = buildResponseCardV1(response);
-    }
-    return out;
-}
-
 function assembleLexV2Response(request, response) {
     let out = {};
 
@@ -511,15 +380,7 @@ exports.assemble = function (request, response) {
     qnabot.log('filterButtons');
     response = filterButtons(response);
 
-    qnabot.log('copyResponseCardToSessionAttributes');
-    response = copyResponseCardtoSessionAttribute(response);
-
-    let out;
-    if (isLexV1(request)) {
-        out = assembleLexV1Response(request, response);
-    } else {
-        out = assembleLexV2Response(request, response);
-    }
+    const out = assembleLexV2Response(request, response);
 
     qnabot.log('Lex response:', JSON.stringify(out, null, 2));
     return out;

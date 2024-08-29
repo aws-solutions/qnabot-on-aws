@@ -59,6 +59,8 @@ exports.step = async function (event, context, cb) {
         qnabot.log('Request', JSON.stringify(event, null, 2));
         const Bucket = event.Records[0].s3.bucket.name;
         const Key = decodeURI(event.Records[0].s3.object.key);
+        const output_bucket = process.env.OUTPUT_S3_BUCKET;
+        const output_key = `status-import/${Key.split('/').pop()}`
         let progress;
         await waitUntilObjectExists(
             {
@@ -74,85 +76,73 @@ exports.step = async function (event, context, cb) {
         const res = await x.Body.transformToString();
         const config = JSON.parse(res);
         qnabot.log('Config:', JSON.stringify(config, null, 2));
-        if (config.status === 'InProgress') {
-            // NOSONAR TODO - design a more robust way to identify target ES index for auto import of metrics and feedback
-            // Filenames must match across:
-            // aws-ai-qna-bot/templates/import/UpgradeAutoImport.js
-            // aws-ai-qna-bot/templates/master/UpgradeAutoExport.js
-            // and pattern in /aws-ai-qna-bot/lambda/import/index.js
-            const esindex = getOsIndex(Key);
-            qnabot.log('Importing to index: ', esindex);
-            try {
-                const params = {
-                    Bucket: config.bucket,
-                    Key: config.key,
-                    VersionId: config.version,
-                    Range: `bytes=${config.start}-${config.end}`
-                };
-                const result = await s3.send(new GetObjectCommand(params));
-                const response = await result.Body.transformToString();
-                const settings = await get_settings();
-                qnabot.log('opening file');
-                let objects = [];
+        while (config.progress < 1 && config.time.rounds < 15) {
+            if (config.status === 'InProgress') {
+                // NOSONAR TODO - design a more robust way to identify target ES index for auto import of metrics and feedback
+                // Filenames must match across:
+                // aws-ai-qna-bot/templates/import/UpgradeAutoImport.js
+                // aws-ai-qna-bot/templates/master/UpgradeAutoExport.js
+                // and pattern in /aws-ai-qna-bot/lambda/import/index.js
+                const esindex = getOsIndex(Key);
+                qnabot.log('Importing to index: ', esindex);
                 try {
-                    config.buffer += response;
-                    if (config.buffer.startsWith('PK')) {
-                        qnabot.log('starts with PK, must be an xlsx');
-                        const s3Object = await s3.send(new GetObjectCommand(params));
-                        const readableStreamFile = Buffer.concat(await s3Object.Body.toArray())
-                        const questionArray = await convertxlsx.convertxlsx(readableStreamFile);
-                        qnabot.log('number of items processed: ', questionArray.length);
-                        questionArray.forEach((question) => {
-                            const questionStr = JSON.stringify(question);
-                            qnabot.log(questionStr);
-                            objects.push(questionStr);
-                        });
-                        config.buffer = '';
-                    } else {
-                        objects = config.buffer.split(/\n/);
-                        JSON.parse(objects[objects.length - 1]);
-                        config.buffer = '';
-                    }
-                } catch (e) {
-                    qnabot.log('An error occured while processing question array: ', e);
-                    config.buffer = objects.pop();
-                }
-                const { out, success, failed } = await processQuestionObjects(objects, settings, esindex, config);
-                config.count = success;
-                config.failed = failed;
-                qnabot.log('ContentRange: ', result.ContentRange);
-                const tmp = result.ContentRange.match(/bytes (.*)-(.*)\/(.*)/); // NOSONAR - javascript:S5852 - input is user controlled and we have a limit on the number of characters
-                progress = (parseInt(tmp[2]) + 1) / parseInt(tmp[3]);
-                const ES_formatted_content = `${out.join('\n')}\n`;
-                await delete_existing_content.delete_existing_content(esindex, config, ES_formatted_content); // check and delete existing content (if parameter to delete has been passed in the options {file}
-                /*
-                    // Disable bulk load.. Instead save docs one at a time, for now, due to issues with k-nn index after bulk load
-                    .then(function (result) {
-                        return es_bulk_load(result)
-                            .then(x => {
-                                config.EsErrors.push(x.errors)
-                            })
-                    })
-                    */
-                config.start = config.end + 1;
-                config.end = config.start + config.stride;
-                config.progress = progress;
-                config.time.rounds += 1;
-                if (config.progress >= 1) {
-                    config.status = 'Complete';
-                    config.time.end = new Date().toISOString();
-                }
-                qnabot.log('EndConfig:', JSON.stringify(config, null, 2));
-                await s3.send(new PutObjectCommand({ Bucket, Key, Body: JSON.stringify(config) }));
-                cb(null);
+                    const params = {
+                        Bucket: config.bucket,
+                        Key: config.key,
+                        VersionId: config.version,
+                        Range: `bytes=${config.start}-${config.end}`
+                    };
+                    const result = await s3.send(new GetObjectCommand(params));
+                    const response = await result.Body.transformToString();
+                    const settings = await get_settings();
+                    qnabot.log('opening file');
+
+                    const {buffer, objects} = await processQuestionArray(config, response, s3, params)
+                    config.buffer = buffer;
+
+                    const { out, success, failed } = await processQuestionObjects(objects, settings, esindex, config);
+                    config.count = success;
+                    config.failed = failed;
+                    qnabot.log('ContentRange: ', result.ContentRange);
+                    const tmp = result.ContentRange.match(/bytes (.*)-(.*)\/(.*)/); // NOSONAR - javascript:S5852 - input is user controlled and we have a limit on the number of characters
+                    progress = (parseInt(tmp[2]) + 1) / parseInt(tmp[3]);
+                    const ES_formatted_content = `${out.join('\n')}\n`;
+                    await delete_existing_content.delete_existing_content(esindex, config, ES_formatted_content); // check and delete existing content (if parameter to delete has been passed in the options {file}
+                    /*
+                        // Disable bulk load.. Instead save docs one at a time, for now, due to issues with k-nn index after bulk load
+                        .then(function (result) {
+                            return es_bulk_load(result)
+                                .then(x => {
+                                    config.EsErrors.push(x.errors)
+                                })
+                        })
+                        */
+                    config.start = config.end + 1;
+                    config.end = config.start + config.stride;
+                    config.progress = progress;
+                    config.time.rounds += 1;
             } catch (error) {
                 qnabot.log('An error occured while config status was InProgress: ', error);
                 config.status = error.message || 'Error'
                 config.message = JSON.stringify(error);
-                await s3.send(new PutObjectCommand({ Bucket, Key, Body: JSON.stringify(config) }));
+                await s3.send(new PutObjectCommand({ Bucket: output_bucket, Key: output_key, Body: JSON.stringify(config) }));
                 cb(error);
+                break;
             }
         }
+    }
+    try {
+        if (config.progress >= 1 && config.status == "InProgress") {
+            config.status = 'Complete';
+            config.time.end = new Date().toISOString();
+            qnabot.log('EndConfig:', JSON.stringify(config, null, 2));
+            await s3.send(new PutObjectCommand({ Bucket: output_bucket, Key: output_key, Body: JSON.stringify(config) }));
+            cb(null);
+        }
+    } catch (err) {
+        qnabot.log('An error occured while finalizing config: ', err);
+        cb(err);
+    }
     } catch (err) {
         qnabot.log('An error occured while getting parsing for config: ', err);
         cb(err);
@@ -193,6 +183,9 @@ exports.start = async function (event, context, cb) {
             Body: JSON.stringify(config)
         };
         await s3.send(new PutObjectCommand(putParams));
+        putParams.Bucket = process.env.OUTPUT_S3_BUCKET;
+        putParams.Key = `status-import/${decodeURI(event.Records[0].s3.object.key.split('/').pop())}`;
+        await s3.send(new PutObjectCommand(putParams));
         cb(null);
     } catch (x) {
         qnabot.log('An error occured in start function: ', x);
@@ -204,6 +197,37 @@ exports.start = async function (event, context, cb) {
         );
     }
 };
+
+async function processQuestionArray(config, response, s3, s3Params) {
+    let objects = [];
+    try {
+        config.buffer += response;
+        if (config.buffer.startsWith('PK')) {
+            qnabot.log('starts with PK, must be an xlsx');
+            const s3Object = await s3.send(new GetObjectCommand(s3Params));
+            const readableStreamFile = Buffer.concat(await s3Object.Body.toArray())
+            const questionArray = await convertxlsx.convertxlsx(readableStreamFile);
+            qnabot.log('number of items processed: ', questionArray.length);
+            questionArray.forEach((question) => {
+                const questionStr = JSON.stringify(question);
+                qnabot.log(questionStr);
+                objects.push(questionStr);
+            });
+            config.buffer = '';
+        } else {
+            objects = config.buffer.split(/\n/);
+            JSON.parse(objects[objects.length - 1]);
+            config.buffer = '';
+        }
+        const modifiedBuffer = config.buffer
+        return {modifiedBuffer, objects};
+    } catch (e) {
+        qnabot.log('An error occured while processing question array: ', e);
+        config.buffer = objects.pop();
+        const modifiedBuffer = config.buffer
+        return {modifiedBuffer, objects};
+    }
+}
 
 async function processQuestionObjects(objects, settings, esindex, config) {
     const out = [];

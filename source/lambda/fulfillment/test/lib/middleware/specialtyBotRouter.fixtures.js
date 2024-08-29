@@ -189,23 +189,6 @@ exports.createResponseObject = function (message) {
     return response;
 };
 
-exports.getLexV1Response = function (dialogState, message) {
-    const response = {
-        "botVersion": "live",
-        "dialogState": dialogState,
-        "intentName": "mockIntent",
-        "message": message ? message : "Mock Response",
-        "sentimentResponse": {
-            "sentimentLabel": "mockLabel",
-        },
-        "sessionAttributes": [],
-        "slots": {
-            "testSlot": {"shape":"Scalar", "value": {"originalValue": "Test Value"}}
-        }
-    }
-    return response;
-};
-
 exports.getLexV2Response = function (dialogState, message, intentName, slots) {
     const response =  {
         "sessionState": {

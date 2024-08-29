@@ -33,6 +33,68 @@ module.exports = {
                 util.basicLambdaExecutionPolicy(),
                 util.lambdaVPCAccessExecutionRole(),
                 util.xrayDaemonWriteAccess(),
+                {
+                    PolicyName: 'GetParameterPolicy',
+                    PolicyDocument: {
+                        Version: '2012-10-17',
+                        Statement: [{
+                            Effect: 'Allow',
+                            Action: ['ssm:GetParameter'],
+                            Resource: [
+                                {
+                                    'Fn::Join': [
+                                        '', [
+                                            'arn:',
+                                            { 'Fn::Sub': '${AWS::Partition}:' },
+                                            'ssm:',
+                                            { 'Fn::Sub': '${AWS::Region}:' },
+                                            { 'Fn::Sub': '${AWS::AccountId}:' },
+                                            'parameter/',
+                                            { Ref: 'SolutionHelperParameter' },
+                                        ],
+                                    ],
+                                },                                {
+                                    'Fn::Join': [
+                                        '', [
+                                            'arn:',
+                                            { 'Fn::Sub': '${AWS::Partition}:' },
+                                            'ssm:',
+                                            { 'Fn::Sub': '${AWS::Region}:' },
+                                            { 'Fn::Sub': '${AWS::AccountId}:' },
+                                            'parameter/',
+                                            { Ref: 'CustomQnABotSettings' },
+                                        ],
+                                    ],
+                                },
+                            ],
+                        }],
+                    },
+                },
+                {
+                    PolicyName: 'PutParameterPolicy',
+                    PolicyDocument: {
+                        Version: '2012-10-17',
+                        Statement: [{
+                            Effect: 'Allow',
+                            Action: ['ssm:PutParameter'],
+                            Resource: [
+                                {
+                                    'Fn::Join': [
+                                        '', [
+                                            'arn:',
+                                            { 'Fn::Sub': '${AWS::Partition}:' },
+                                            'ssm:',
+                                            { 'Fn::Sub': '${AWS::Region}:' },
+                                            { 'Fn::Sub': '${AWS::AccountId}:' },
+                                            'parameter/',
+                                            { Ref: 'SolutionHelperParameter' },
+                                        ],
+                                    ],
+                                },
+                            ],
+                        }],
+                    },
+                },
             ],
         },
         Metadata: {
@@ -49,6 +111,30 @@ module.exports = {
             BuildDate: (new Date()).toISOString(),
         },
     },
+    SolutionHelperLogGroup: {
+        Type: 'AWS::Logs::LogGroup',
+        Properties: {
+            LogGroupName: {
+                'Fn::Join': [
+                    '-',
+                    [
+                        { 'Fn::Sub': '/aws/lambda/${AWS::StackName}-SolutionHelper' },
+                        { 'Fn::Select': ['2', { 'Fn::Split': ['/', { Ref: 'AWS::StackId' }] }] },
+                    ],
+                ],
+            },
+            RetentionInDays: {
+                'Fn::If': [
+                    'LogRetentionPeriodIsNotZero',
+                    { Ref: 'LogRetentionPeriod' },
+                    { Ref: 'AWS::NoValue' },
+                ],
+            },
+        },
+        Metadata: {
+            guard: util.cfnGuard('CLOUDWATCH_LOG_GROUP_ENCRYPTED', 'CW_LOGGROUP_RETENTION_PERIOD_CHECK'),
+        },
+    },
     SolutionHelper: {
         Type: 'AWS::Lambda::Function',
         Properties: {
@@ -59,8 +145,18 @@ module.exports = {
             },
             Description: 'This function generates UUID for each deployment and sends anonymized data to the AWS Solutions team',
             Handler: 'lambda_function.handler',
+            LoggingConfig: {
+                LogGroup: { Ref: 'SolutionHelperLogGroup' },
+            },
             Role: {
                 'Fn::GetAtt': ['SolutionHelperRole', 'Arn'],
+            },
+            Environment: {
+                Variables: {
+                    SOLUTION_PARAMETER: { Ref: 'SolutionHelperParameter' },
+                    CUSTOM_SETTINGS: { Ref: 'CustomQnABotSettings' },
+                    SOLUTION_ID : util.getCommonEnvironmentVariables().SOLUTION_ID,
+                },
             },
             Runtime: process.env.npm_package_config_pythonRuntime,
             Timeout: 300,
@@ -152,7 +248,6 @@ module.exports = {
                 ],
             },
             FulfillmentConcurrency: { Ref: 'FulfillmentConcurrency' },
-            LexBotVersion: { Ref: 'LexBotVersion' },
             InstallLexResponseBots: { Ref: 'InstallLexResponseBots' },
             EmbeddingsApi: { Ref: 'EmbeddingsApi' },
             EmbeddingsBedrockModelId: {

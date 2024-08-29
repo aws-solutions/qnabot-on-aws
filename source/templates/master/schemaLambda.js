@@ -23,6 +23,30 @@ module.exports = {
             BuildDate: (new Date()).toISOString(),
         },
     },
+    SchemaLambdaLogGroup: {
+        Type: 'AWS::Logs::LogGroup',
+        Properties: {
+            LogGroupName: {
+                'Fn::Join': [
+                    '-',
+                    [
+                        { 'Fn::Sub': '/aws/lambda/${AWS::StackName}-SchemaLambda' },
+                        { 'Fn::Select': ['2', { 'Fn::Split': ['/', { Ref: 'AWS::StackId' }] }] },
+                    ],
+                ],
+            },
+            RetentionInDays: {
+                'Fn::If': [
+                    'LogRetentionPeriodIsNotZero',
+                    { Ref: 'LogRetentionPeriod' },
+                    { Ref: 'AWS::NoValue' },
+                ],
+            },
+        },
+        Metadata: {
+            guard: util.cfnGuard('CLOUDWATCH_LOG_GROUP_ENCRYPTED', 'CW_LOGGROUP_RETENTION_PERIOD_CHECK'),
+        },
+    },
     SchemaLambda: {
         Type: 'AWS::Lambda::Function',
         Properties: {
@@ -32,6 +56,9 @@ module.exports = {
                 S3ObjectVersion: { Ref: 'SchemaLambdaCodeVersion' },
             },
             Handler: 'index.handler',
+            LoggingConfig: {
+                LogGroup: { Ref: 'SchemaLambdaLogGroup' },
+            },
             MemorySize: '128',
             Role: { 'Fn::GetAtt': ['SchemaLambdaRole', 'Arn'] },
             Runtime: process.env.npm_package_config_lambdaRuntime,

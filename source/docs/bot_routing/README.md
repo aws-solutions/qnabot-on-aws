@@ -1,5 +1,5 @@
 # Bot Routing - Preview Mode
-(version 1.2 - December 2023)
+(version 1.3 - July 2024)
 
 Bots exist to perform a variety of automation tasks. Usually they take
 as input a message from a human and respond performing
@@ -55,18 +55,12 @@ BotRouter for the question being edited.**
 
 * Bot Name or Lambda - You can configure and existing Lex Bot or configure
 a specialty BotRouter implemented via a Lambda function. QnABot route 
-requests to a Lex Version 1 or Version 2 bot. The syntax is different
-depending on the target version. For Lex version 2 bots use the syntax
-lexv2::BotId/BotAliasId/LocaleId. For Lex version 1 bots use just the 
-BotName. Note that QnABot can be installed as either Lex V1 or Lex V2
-bot. It is important to check your QnABot configuration and select the
+requests to a Lex Version 2 bot. For Lex version 2 bots use the syntax
+lexv2::BotId/BotAliasId/LocaleId. It is important to check your QnABot configuration and select the
 appropriate identifiers when you want to use QnABot as a specialty bot.
   
 * Simple name - A short string that we expect web User Interfaces to use as
 a breadcrumb to identify where in an enterprise the user is interacting.
-  
-* Lex Alias - If your specialty bot is a Lex version 1 bot, specify the Lex version 1
-alias used to communicate with the target bot.
 
 * Lex session attributes to forward to the specialty bot. A comma separated
 list of session attribute names can be specified. The session attributes

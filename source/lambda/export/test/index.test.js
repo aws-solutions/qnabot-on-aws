@@ -36,13 +36,103 @@ const event = {
                     name: "exportBucket",
                 },
                 object: {
-                    key: "status/Export.csv",
+                    key: "status-export/Export.csv",
                     versionId: "tLkWAhY8v2rsaSPWqg2m",
                 }
             }
         }
     ]
 };
+
+function generateConfigAndVersionId(currentStatus) {
+    const config = { status : currentStatus };
+    const versionId = Math.random().toString(36).substring(3,9);
+    return { config: config, versionId: versionId }
+}
+
+function initializeStartStepMocks() {
+    const startConfig = generateConfigAndVersionId('Started');
+    s3Mock.on(PutObjectCommand, {"Body": "{\"status\":\"Started\"}", "Bucket": "contentdesigneroutputbucket", "Key": "status-export/Export.csv"}).resolves(
+    {
+            '$metadata': {
+              httpStatusCode: 200,
+              requestId: '',
+              extendedRequestId: '',
+              cfId: undefined,
+              attempts: 1,
+              totalRetryDelay: 0
+            },
+            Expiration: '',
+            ETag: '""',
+            ServerSideEncryption: '',
+            VersionId: startConfig.versionId
+    })
+    mockStream(startConfig.config, s3Mock, {"Bucket": "exportBucket", "Key": "status-export/Export.csv", "VersionId": "tLkWAhY8v2rsaSPWqg2m"})
+    return { versionId: startConfig.versionId, config: startConfig.config }
+}
+
+function initializeInProgressStepMocks(startVersionId) {
+    const stepConfig = generateConfigAndVersionId('InProgress');
+    s3Mock.on(PutObjectCommand, {"Body": "{\"status\":\"InProgress\"}", "Bucket": "contentdesigneroutputbucket", "Key": "status-export/Export.csv"}).resolves(
+    {
+            '$metadata': {
+              httpStatusCode: 200,
+              requestId: '',
+              extendedRequestId: '',
+              cfId: undefined,
+              attempts: 1,
+              totalRetryDelay: 0
+            },
+            Expiration: '',
+            ETag: '""',
+            ServerSideEncryption: '',
+            VersionId: stepConfig.versionId
+    })
+    mockStream(stepConfig.config, s3Mock, {"Bucket": "contentdesigneroutputbucket", "Key": "status-export/Export.csv", "VersionId": startVersionId});
+    return { versionId: stepConfig.versionId, config: stepConfig.config }
+}
+
+function initializeJoinStepMocks(inProgressVersionId) {
+    const joinConfig = generateConfigAndVersionId('Join');
+    s3Mock.on(PutObjectCommand, {"Body": "{\"status\":\"Join\"}", "Bucket": "contentdesigneroutputbucket", "Key": "status-export/Export.csv"}).resolves(
+    {
+            '$metadata': {
+              httpStatusCode: 200,
+              requestId: '',
+              extendedRequestId: '',
+              cfId: undefined,
+              attempts: 1,
+              totalRetryDelay: 0
+            },
+            Expiration: '',
+            ETag: '""',
+            ServerSideEncryption: '',
+            VersionId: joinConfig.versionId
+    })
+    mockStream(joinConfig.config, s3Mock, {"Bucket": "contentdesigneroutputbucket", "Key": "status-export/Export.csv", "VersionId": inProgressVersionId});
+    return { versionId: joinConfig.versionId, config: joinConfig.config }
+}
+
+function initializeCleanStepMocks(lexVersionId) {
+    const cleanConfig = generateConfigAndVersionId('Clean');
+    s3Mock.on(PutObjectCommand, {"Body": "{\"status\":\"Clean\"}", "Bucket": "contentdesigneroutputbucket", "Key": "status-export/Export.csv"}).resolves(
+    {
+            '$metadata': {
+              httpStatusCode: 200,
+              requestId: '',
+              extendedRequestId: '',
+              cfId: undefined,
+              attempts: 1,
+              totalRetryDelay: 0
+            },
+            Expiration: '',
+            ETag: '""',
+            ServerSideEncryption: '',
+            VersionId: cleanConfig.versionId
+    })
+    mockStream(cleanConfig.config, s3Mock, {"Bucket": "contentdesigneroutputbucket", "Key": "status-export/Export.csv", "VersionId": lexVersionId});
+    return { versionId: cleanConfig.versionId, config: cleanConfig.config }
+}
 
 describe('when calling index function', () => {
 
@@ -55,58 +145,28 @@ describe('when calling index function', () => {
         jest.clearAllMocks();
     });
 
-    it('should call start and update status correctly', async () => {
-        const config = { status : 'Started' };
-        mockStream(config, s3Mock);
+    it('should call the different steps and update status as expected', async () => {
+        const startStepInfo = initializeStartStepMocks();
+        const inProgressStepInfo = initializeInProgressStepMocks(startStepInfo.versionId);
+        const joinStepInfo = initializeJoinStepMocks(inProgressStepInfo.versionId);
+        const cleanStepInfo = initializeCleanStepMocks(joinStepInfo.versionId);
         await index.step(event, null, jest.fn());
         expect(start).toHaveBeenCalledTimes(1);
-        expect(start).toHaveBeenCalledWith(config);
-        expect(step).toHaveBeenCalledTimes(0);
-        expect(join).toHaveBeenCalledTimes(0);
-        expect(clean).toHaveBeenCalledTimes(0);
-        expect(s3Mock).toHaveReceivedCommandTimes(GetObjectCommand, 1);
-        expect(s3Mock).toHaveReceivedCommandWith(GetObjectCommand, {"Bucket": "exportBucket", "Key": "status/Export.csv", "VersionId": "tLkWAhY8v2rsaSPWqg2m"});
-        expect(s3Mock).toHaveReceivedCommandTimes(PutObjectCommand, 1);
-        expect(s3Mock).toHaveReceivedCommandWith(PutObjectCommand, {"Body": "{\"status\":\"Started\"}", "Bucket": "exportBucket", "Key": "status/Export.csv"});
-    });
-
-    it('should call step and update status correctly', async () => {
-        const config = { status : 'InProgress' };
-        mockStream(config, s3Mock);
-        await index.step(event, null, jest.fn());
+        expect(start).toHaveBeenCalledWith(startStepInfo.config);
+        expect(s3Mock).toHaveReceivedNthSpecificCommandWith(1,GetObjectCommand, {"Bucket": "exportBucket", "Key": "status-export/Export.csv", "VersionId": "tLkWAhY8v2rsaSPWqg2m"});
+        expect(s3Mock).toHaveReceivedNthSpecificCommandWith(1,PutObjectCommand, {"Body": "{\"status\":\"Started\"}", "Bucket": "contentdesigneroutputbucket", "Key": "status-export/Export.csv"});
         expect(step).toHaveBeenCalledTimes(1);
-        expect(step).toHaveBeenCalledWith(config);
-        expect(join).toHaveBeenCalledTimes(0);
-        expect(clean).toHaveBeenCalledTimes(0);
-        expect(s3Mock).toHaveReceivedCommandTimes(GetObjectCommand, 1);
-        expect(s3Mock).toHaveReceivedCommandWith(GetObjectCommand, {"Bucket": "exportBucket", "Key": "status/Export.csv", "VersionId": "tLkWAhY8v2rsaSPWqg2m"});
-        expect(s3Mock).toHaveReceivedCommandTimes(PutObjectCommand, 1);
-        expect(s3Mock).toHaveReceivedCommandWith(PutObjectCommand, {"Body": "{\"status\":\"InProgress\"}", "Bucket": "exportBucket", "Key": "status/Export.csv"});
-    });
-
-    it('should call join and update status correctly', async () => {
-        const config = { status : 'Join' };
-        mockStream(config, s3Mock);
-        await index.step(event, null, jest.fn());
+        expect(step).toHaveBeenCalledWith(inProgressStepInfo.config);
+        expect(s3Mock).toHaveReceivedNthSpecificCommandWith(2,GetObjectCommand, {"Bucket": "contentdesigneroutputbucket", "Key": "status-export/Export.csv", "VersionId": startStepInfo.versionId});
+        expect(s3Mock).toHaveReceivedNthSpecificCommandWith(2,PutObjectCommand, {"Body": "{\"status\":\"InProgress\"}", "Bucket": "contentdesigneroutputbucket", "Key": "status-export/Export.csv"});
         expect(join).toHaveBeenCalledTimes(1);
-        expect(join).toHaveBeenCalledWith(config);
-        expect(clean).toHaveBeenCalledTimes(0);
-        expect(s3Mock).toHaveReceivedCommandTimes(GetObjectCommand, 1);
-        expect(s3Mock).toHaveReceivedCommandWith(GetObjectCommand, {"Bucket": "exportBucket", "Key": "status/Export.csv", "VersionId": "tLkWAhY8v2rsaSPWqg2m"});
-        expect(s3Mock).toHaveReceivedCommandTimes(PutObjectCommand, 1);
-        expect(s3Mock).toHaveReceivedCommandWith(PutObjectCommand, {"Body": "{\"status\":\"Join\"}", "Bucket": "exportBucket", "Key": "status/Export.csv"});
-    });
-
-    it('should call clean and update status correctly', async () => {
-        const config = { status : 'Clean' };
-        mockStream(config, s3Mock);
-        await index.step(event, null, jest.fn());
+        expect(join).toHaveBeenCalledWith(joinStepInfo.config);
+        expect(s3Mock).toHaveReceivedNthSpecificCommandWith(3,GetObjectCommand, {"Bucket": "contentdesigneroutputbucket", "Key": "status-export/Export.csv", "VersionId": inProgressStepInfo.versionId});
+        expect(s3Mock).toHaveReceivedNthSpecificCommandWith(3,PutObjectCommand, {"Body": "{\"status\":\"Join\"}", "Bucket": "contentdesigneroutputbucket", "Key": "status-export/Export.csv"});
         expect(clean).toHaveBeenCalledTimes(1);
-        expect(clean).toHaveBeenCalledWith(config);
-        expect(s3Mock).toHaveReceivedCommandTimes(GetObjectCommand, 1);
-        expect(s3Mock).toHaveReceivedCommandWith(GetObjectCommand, {"Bucket": "exportBucket", "Key": "status/Export.csv", "VersionId": "tLkWAhY8v2rsaSPWqg2m"});
-        expect(s3Mock).toHaveReceivedCommandTimes(PutObjectCommand, 1);
-        expect(s3Mock).toHaveReceivedCommandWith(PutObjectCommand, {"Body": "{\"status\":\"Clean\"}", "Bucket": "exportBucket", "Key": "status/Export.csv"});
+        expect(clean).toHaveBeenCalledWith(cleanStepInfo.config);
+        expect(s3Mock).toHaveReceivedNthSpecificCommandWith(4,GetObjectCommand, {"Bucket": "contentdesigneroutputbucket", "Key": "status-export/Export.csv", "VersionId": joinStepInfo.versionId});
+        expect(s3Mock).toHaveReceivedNthSpecificCommandWith(4,PutObjectCommand, {"Body": "{\"status\":\"Clean\"}", "Bucket": "contentdesigneroutputbucket", "Key": "status-export/Export.csv"});
     });
 
     it('should handle an error', async () => {

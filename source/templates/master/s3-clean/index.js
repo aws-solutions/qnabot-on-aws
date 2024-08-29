@@ -22,6 +22,30 @@ module.exports = {
             BuildDate: (new Date()).toISOString(),
         },
     },
+    S3CleanLambdaLogGroup: {
+        Type: 'AWS::Logs::LogGroup',
+        Properties: {
+            LogGroupName: {
+                'Fn::Join': [
+                    '-',
+                    [
+                        { 'Fn::Sub': '/aws/lambda/${AWS::StackName}-S3CleanLambda' },
+                        { 'Fn::Select': ['2', { 'Fn::Split': ['/', { Ref: 'AWS::StackId' }] }] },
+                    ],
+                ],
+            },
+            RetentionInDays: {
+                'Fn::If': [
+                    'LogRetentionPeriodIsNotZero',
+                    { Ref: 'LogRetentionPeriod' },
+                    { Ref: 'AWS::NoValue' },
+                ],
+            },
+        },
+        Metadata: {
+            guard: util.cfnGuard('CLOUDWATCH_LOG_GROUP_ENCRYPTED', 'CW_LOGGROUP_RETENTION_PERIOD_CHECK'),
+        },
+    },
     S3Clean: {
         Type: 'AWS::Lambda::Function',
         Metadata: { guard: util.cfnGuard('LAMBDA_CONCURRENCY_CHECK', 'LAMBDA_INSIDE_VPC') },
@@ -32,11 +56,14 @@ module.exports = {
             },
             Environment: {
                 Variables: {
-                    ...util.getCommonEnvironmentVariables()
+                    ...util.getCommonEnvironmentVariables(),
                 },
             },
             Description: 'This function clears all S3 objects from the bucket of a given S3-based resource',
             Handler: 'lambda_function.handler',
+            LoggingConfig: {
+                LogGroup: { Ref: 'S3CleanLambdaLogGroup' },
+            },
             Role: {
                 'Fn::GetAtt': ['CFNLambdaRole', 'Arn'],
             },

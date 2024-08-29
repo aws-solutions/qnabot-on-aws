@@ -23,3 +23,7 @@ module.exports = {
     ],
     testTimeout: 200000
 };
+
+process.env = Object.assign(process.env, {
+    OUTPUT_S3_BUCKET: 'contentdesigneroutputbucket'
+});

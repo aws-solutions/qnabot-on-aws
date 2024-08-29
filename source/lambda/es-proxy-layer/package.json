@@ -1,6 +1,6 @@
 {
     "name": "proxy-es",
-    "version": "6.0.2",
+    "version": "6.1.0",
     "description": "QnABot Lambda managing querying of data store",
     "main": "index.js",
     "scripts": {
@@ -14,14 +14,16 @@
     },
     "license": "Apache-2.0",
     "dependencies": {
+        "@aws-sdk/client-bedrock-agent-runtime": "^3.616.0",
+        "@aws-sdk/client-bedrock-runtime": "^3.616.0",
         "@aws-sdk/client-firehose": "^3.511.0",
         "@aws-sdk/client-sagemaker-runtime": "^3.511.0",
         "@aws-sdk/s3-request-presigner": "^3.511.0",
         "@dqbd/tiktoken": "^1.0.7",
         "aws4": "^1.6.0",
-        "axios": "^1.6.8",
+        "axios": "^1.7.4",
         "bodybuilder": "^2.5.1",
-        "handlebars": "^4.7.2",
+        "handlebars": "^4.7.8",
         "langchain": "^0.0.209",
         "linkifyjs": "^3.0.0-beta.3",
         "sanitize-html": "^2.13.0",
@@ -33,5 +35,9 @@
         "aws-sdk-client-mock-jest": "^3.0.1",
         "cfn-lambda": "^5.1.0",
         "jest": "^29.7.0"
+    },
+    "overrides": {
+        "fast-xml-parser": "^4.4.1",
+        "uglify-js": "^3.19.2"
     }
 }

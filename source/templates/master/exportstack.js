@@ -17,6 +17,7 @@ module.exports = {
         Properties: {
             TemplateURL: { 'Fn::Sub': 'https://${BootstrapBucket}.s3.${AWS::Region}.amazonaws.com/${BootstrapPrefix}/templates/export.json' },
             Parameters: {
+                ContentDesignerOutputBucket: { Ref: 'ContentDesignerOutputBucket' },
                 CFNLambda: { 'Fn::GetAtt': ['CFNLambda', 'Arn'] },
                 CFNInvokePolicy: { Ref: 'CFNInvokePolicy' },
                 S3Clean: { 'Fn::GetAtt': ['S3Clean', 'Arn'] },
@@ -39,11 +40,7 @@ module.exports = {
                 CustomQnABotSettings: { Ref: 'CustomQnABotSettings' },
                 AwsSdkLayerLambdaLayer: { Ref: 'AwsSdkLayerLambdaLayer' },
                 QnABotCommonLambdaLayer: { Ref: 'QnABotCommonLambdaLayer' },
-                LexVersion: { 'Fn::If': ['CreateLexV1Bots', 'V1', 'V2'] },
-                // Lex V1
-                FallbackIntent: { 'Fn::If': ['CreateLexV1Bots', { Ref: 'IntentFallback' }, 'LexV2Only_Mode'] },
-                Intent: { 'Fn::If': ['CreateLexV1Bots', { Ref: 'Intent' }, 'LexV2Only_Mode'] },
-                BotName: { 'Fn::If': ['CreateLexV1Bots', { Ref: 'LexBot' }, 'LexV2Only_Mode'] },
+                LexVersion: 'V2',
                 // Lex V2
                 LexV2BotName: { 'Fn::GetAtt': ['LexV2Bot', 'botName'] },
                 LexV2BotId: { 'Fn::GetAtt': ['LexV2Bot', 'botId'] },
@@ -52,6 +49,7 @@ module.exports = {
                 LexV2BotLocaleIds: { 'Fn::GetAtt': ['LexV2Bot', 'botLocaleIds'] },
                 KendraFaqIndexId: { Ref: 'KendraFaqIndexId' },
                 KendraWebPageIndexId: { Ref: 'KendraWebPageIndexId' },
+                LogRetentionPeriod: { Ref: 'LogRetentionPeriod' },
             },
         },
     },

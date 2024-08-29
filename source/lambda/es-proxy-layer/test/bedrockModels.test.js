@@ -22,13 +22,28 @@ jest.mock('qnabot/settings');
 jest.mock('qnabot/logging');
 jest.mock('@aws-sdk/client-bedrock-runtime');
 
+const guardrails = { 
+    guardrailIdentifier: 'test_id',
+    guardrailVersion: 1
+};
+
 const llmModelBodies = {
     'amazon.titan-text-express-v1': {
-        textGenerationConfig: { maxTokenCount: 4096, stopSequences: [], temperature: 0, topP: 1 },
+        textGenerationConfig: { maxTokenCount: 256, stopSequences: [], temperature: 0, topP: 1 },
         inputText: 'test prompt',
     },
     'amazon.titan-text-lite-v1': {
-        textGenerationConfig: { maxTokenCount: 4096, stopSequences: [], temperature: 0, topP: 1 },
+        textGenerationConfig: { maxTokenCount: 256, stopSequences: [], temperature: 0, topP: 1 },
+        inputText: 'test prompt',
+    },
+    'amazon.titan-embed-text-v1': {
+        inputText: 'test prompt',
+    },
+    'amazon.titan-embed-text-v2': {
+        inputText: 'test prompt',
+    },
+    'amazon.titan-text-premier-v1': {
+        textGenerationConfig: { maxTokenCount: 256, stopSequences: [], temperature: 0, topP: 1 },
         inputText: 'test prompt',
     },
     'ai21.j2-ultra-v1': {
@@ -91,7 +106,7 @@ const llmModelBodies = {
             }
         ],
     },
-    'anthropic.claude-3-sonnet-20240229-v1:0': {
+    'anthropic.claude-3-sonnet-20240229-v1': {
         max_tokens: 256,
         temperature: 0,
         top_k: 250,
@@ -111,7 +126,7 @@ const llmModelBodies = {
             }
         ],
     },
-    'anthropic.claude-3-haiku-20240307-v1:0': {
+    'anthropic.claude-3-haiku-20240307-v1': {
         max_tokens: 256,
         temperature: 0,
         top_k: 250,
@@ -145,9 +160,6 @@ const llmModelBodies = {
         top_p: 0.9,
         prompt: 'test prompt',
     },
-    'amazon.titan-embed-text-v1': {
-        inputText: 'test prompt',
-    },
     'cohere.embed-english-v3': {
         texts: ['test prompt'],
         input_type: 'search_document',
@@ -159,6 +171,20 @@ const llmModelBodies = {
 };
 
 const llmModelResponses = {
+    'amazon.titan-embed-text-v1': {
+        body: Buffer.from(
+            JSON.stringify({
+                embedding: 'test response',
+            })
+        )
+    },    
+    'amazon.titan-embed-text-v2': {
+        body: Buffer.from(
+            JSON.stringify({
+                embedding: 'test response',
+            })
+        )
+    },
     'amazon.titan-text-express-v1': {
         body: Buffer.from(
             JSON.stringify({
@@ -171,6 +197,17 @@ const llmModelResponses = {
         )
     },
     'amazon.titan-text-lite-v1': {
+        body: Buffer.from(
+            JSON.stringify({
+                results: [
+                    {
+                        outputText: 'test response'
+                    }
+                ]
+            })
+        )
+    },
+    'amazon.titan-text-premier-v1': {
         body: Buffer.from(
             JSON.stringify({
                 results: [
@@ -225,7 +262,7 @@ const llmModelResponses = {
             })
         )
     },
-    'anthropic.claude-3-haiku-20240307-v1:0': {
+    'anthropic.claude-3-haiku-20240307-v1': {
         body: Buffer.from(
             JSON.stringify({
                 content: [
@@ -236,7 +273,7 @@ const llmModelResponses = {
             })
         )
     },
-    'anthropic.claude-3-sonnet-20240229-v1:0': {
+    'anthropic.claude-3-sonnet-20240229-v1': {
         body: Buffer.from(
             JSON.stringify({
                 content: [
@@ -265,13 +302,6 @@ const llmModelResponses = {
             })
         )
     },
-    'amazon.titan-embed-text-v1': {
-        body: Buffer.from(
-            JSON.stringify({
-                embedding: 'test response',
-            })
-        )
-    },
     'cohere.embed-english-v3': {
         body: Buffer.from(
             JSON.stringify({
@@ -286,6 +316,10 @@ const llmModelResponses = {
             })
         )
     },
+};
+
+function isEmbedding(modelId) {
+    return modelId.includes('embed');
 };
 
 
@@ -308,7 +342,7 @@ describe('bedrockModels', () => {
         e.name = 'ResourceNotFoundException';
         bedRockMock.on(InvokeModelCommand).rejects(e);
         const error = new Error('{\"message\":\"Bedrock anthropic.claude-v1 returned ResourceNotFoundException: Could not resolve the foundation model from the provided model identifier. Please retry after selecting different Bedrock model in Cloudformation stack.\",\"type\":\"Error\"}')
-        await expect(invokeBedrockModel(modelId, textGenerationConfig, inputText)).rejects.toThrowError(error);
+        await expect(invokeBedrockModel(modelId, textGenerationConfig, inputText, guardrails)).rejects.toThrowError(error);
     });
 
     test('invokeBedrockModel returns correct body', async () => {
@@ -319,6 +353,11 @@ describe('bedrockModels', () => {
                 body: JSON.stringify(llmModelBodies[modelId]),
                 contentType: 'application/json',
                 modelId,
+            }
+
+            if (!isEmbedding(modelId)) { 
+                expectedCall.guardrailIdentifier = "test_id",
+                expectedCall.guardrailVersion = 1
             }
 
             const sendMock = jest.fn().mockImplementation(() => {
@@ -334,7 +373,7 @@ describe('bedrockModels', () => {
                 };
             });
 
-            const response = await invokeBedrockModel(modelId, {}, prompt);
+            const response = await invokeBedrockModel(modelId, {}, prompt, guardrails);
 
             expect(response).toEqual('test response');
             expect(InvokeModelCommand).toHaveBeenCalledWith(expectedCall);
@@ -351,6 +390,8 @@ describe('bedrockModels', () => {
             body: JSON.stringify({...llmModelBodies[modelId], textGenerationConfig:{...llmModelBodies[modelId].textGenerationConfig, ...params}}),
             contentType: 'application/json',
             modelId,
+            guardrailIdentifier: "test_id",
+            guardrailVersion: 1,
         }
         const body = llmModelResponses[modelId].body;
 
@@ -366,7 +407,7 @@ describe('bedrockModels', () => {
             };
         });
 
-        const response = await invokeBedrockModel(modelId, params, prompt);
+        const response = await invokeBedrockModel(modelId, params, prompt, guardrails);
         
         expect(response).toEqual('test response');
         expect(InvokeModelCommand).toHaveBeenCalledWith(expectedCall);
@@ -388,6 +429,8 @@ describe('bedrockModels', () => {
             body: JSON.stringify({...llmModelBodies[modelId], ...params}),
             contentType: 'application/json',
             modelId,
+            guardrailIdentifier: "test_id",
+            guardrailVersion: 1,
         }
         const body = llmModelResponses[modelId].body;
 
@@ -403,7 +446,7 @@ describe('bedrockModels', () => {
             };
         });
 
-        const response = await invokeBedrockModel(modelId, params, prompt);
+        const response = await invokeBedrockModel(modelId, params, prompt, guardrails);
         
         expect(response).toEqual('test response');
         expect(InvokeModelCommand).toHaveBeenCalledWith(expectedCall);
@@ -416,7 +459,7 @@ describe('bedrockModels', () => {
         const modelId = 'unsupported.provider';
 
         try {
-            await invokeBedrockModel(modelId, {}, prompt);
+            await invokeBedrockModel(modelId, {}, prompt, guardrails);
             expect(true).toEqual(false);
         } catch (err) {
             expect(err.message).toEqual(`Unsupported model provider: unsupported`);
@@ -437,11 +480,11 @@ describe('bedrockModels', () => {
         });
 
         try {
-            await invokeBedrockModel(modelId, {});
+            await invokeBedrockModel(modelId, {}, guardrails);
             expect(true).toEqual(false);
         } catch (err) {
             expect(err.message).toEqual(
-                `Exception parsing response body: The first argument must be of type string or an instance of Buffer, ArrayBuffer, or Array or an Array-like Object. Received undefined`
+                `Cannot read properties of undefined (reading 'guardrailIdentifier')`
             );
         }
     });

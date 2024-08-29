@@ -62,7 +62,7 @@ describe('test PostUpgradeImport class', () => {
             expect(result).toBe('PostUpgradeImport');
         };
 
-        await postUpgradeImportCut.Create(params, callback);
+        await postUpgradeImportCut.AsyncCreate(params, callback);
     });  
 
     it("should be equivalent to Create when Update is called", async () => {
@@ -90,7 +90,7 @@ describe('test PostUpgradeImport class', () => {
             expect(result).toBe('PostUpgradeImport');
         };
 
-        await postUpgradeImportCut.Update('mock_id', params, {}, callback);
+        await postUpgradeImportCut.AsyncUpdate('mock_id', params, {}, callback);
     });
 
     it("should catch error and passthrough when s3 error occurs in Create", async () => {
@@ -108,6 +108,6 @@ describe('test PostUpgradeImport class', () => {
             expect(result).toBe('PostUpgradeImport');
         };
 
-        await postUpgradeImportCut.Create(params, callback);
+        await postUpgradeImportCut.AsyncCreate(params, callback);
     });
 });

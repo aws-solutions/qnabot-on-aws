@@ -26,8 +26,7 @@ The high-level process flow for the solution components deployed with the AWS Cl
 
 3. The admin configures questions and answers in the Content Designer and the UI sends requests to Amazon API Gateway to save the questions and answers.
 
-4. The `Content Designer` [AWS Lambda](http://aws.amazon.com/lambda/) function saves the input in [Amazon OpenSearch Service](http://aws.amazon.com/opensearch-service/) in a questions bank index. 
-If using [text embeddings](source/docs/semantic_matching_using_LLM_embeddings/README.md), these requests will first pass through a LLM model hosted on [Amazon Bedrock](https://aws.amazon.com/bedrock/) or [Amazon SageMaker](https://aws.amazon.com/sagemaker/) to generate embeddings before being saved into the question bank on OpenSearch.
+4. The `Content Designer` [AWS Lambda](http://aws.amazon.com/lambda/) function saves the input in [Amazon OpenSearch Service](http://aws.amazon.com/opensearch-service/) in a questions bank index. If using [text embeddings](source/docs/semantic_matching_using_LLM_embeddings/README.md), these requests will first pass through a LLM model hosted on [Amazon Bedrock](https://aws.amazon.com/bedrock/) or [Amazon SageMaker](https://aws.amazon.com/sagemaker/) to generate embeddings before being saved into the question bank on OpenSearch. In addition, the `Content Designer` saves default and custom [configuration settings](https://docs.aws.amazon.com/solutions/latest/qnabot-on-aws/modifying-configuration-settings.html) in [AWS Systems Manager Parameter Store](https://aws.amazon.com/systems-manager/features/#Parameter_Store). 
 
 5. Users of the chatbot interact with Amazon Lex via the web client UI, [Amazon Alexa](https://developer.amazon.com/en-US/alexa) or [Amazon Connect](https://aws.amazon.com/connect/). 
 
@@ -60,7 +59,7 @@ Alternatively, if you want to custom deploy QnABot on AWS, refer to the details 
 
 ### Environment Prerequisites
 
--   Run Linux. (tested on Amazon Linux)
+-   Run Linux. (tested on Amazon Linux 2)
 -   Install npm >10.0.0 and node >18.X.X ([instructions](https://nodejs.org/en/download/))
 -   Install and configure git lfs ([instructions](https://git-lfs.com/))
 -   Clone this repo.
@@ -75,6 +74,11 @@ Start from the /source directory.
 
 ```shell
 cd source
+```
+
+Install virtualenv:
+```shell
+pip3 install virtualenv
 ```
 
 Install node.js modules of QnABot:
@@ -177,6 +181,13 @@ Optionally provide a username and password for an Admin user to test with. If th
 ```bash
 export USER='<QNA BOT existing admin user>'
 export PASSWORD='<QNA BOT existing admin password>'
+```
+
+Optionally provide Bedrock Guardrails Identifier and Version to test with. If these environment variables are not set then testing for Bedrock Guardrails in test_knowledge_base.py and test_llm.py will be skipped.
+
+```bash
+export BEDROCK_GUARDRAIL_IDENTIFIER='<Pre-configurated Guardrail Identifier in your AWS account>'
+export BEDROCK_GUARDRAIL_VERSION='<Pre-configurated Guardrail Version in your AWS account>'
 ```
 
 If you'd like to launch the browser while running tests then also set the below env variable:
@@ -325,21 +336,26 @@ As QnABot evolves over the years, it makes use of various services and functiona
 _Note: **Deployable solution versions** refers to the ability to deploy the version of QnABot in their AWS accounts. **Actively supported versions** for QnABot is only available for the latest version of QnABot._
 
 ### Deployable Versions
+- [v6.1.0](https://github.com/aws-solutions/qnabot-on-aws/releases/tag/v6.1.0) - [Public](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v6.1.0/qnabot-on-aws-main.template)/[VPC](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v6.1.0/qnabot-on-aws-vpc.template)
+- [v6.0.3](https://github.com/aws-solutions/qnabot-on-aws/releases/tag/v6.0.3) - [Public](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v6.0.3/qnabot-on-aws-main.template)/[VPC](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v6.0.3/qnabot-on-aws-vpc.template)
 - [v6.0.2](https://github.com/aws-solutions/qnabot-on-aws/releases/tag/v6.0.2) - [Public](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v6.0.2/qnabot-on-aws-main.template)/[VPC](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v6.0.2/qnabot-on-aws-vpc.template)
 - [v6.0.1](https://github.com/aws-solutions/qnabot-on-aws/releases/tag/v6.0.1) - [Public](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v6.0.1/qnabot-on-aws-main.template)/[VPC](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v6.0.1/qnabot-on-aws-vpc.template)
 - [v6.0.0](https://github.com/aws-solutions/qnabot-on-aws/releases/tag/v6.0.0) - [Public](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v6.0.0/qnabot-on-aws-main.template)/[VPC](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v6.0.0/qnabot-on-aws-vpc.template)
 - [v5.5.2](https://github.com/aws-solutions/qnabot-on-aws/releases/tag/v5.5.2) - [Public](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v5.5.2/qnabot-on-aws-main.template)/[VPC](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v5.5.2md/qnabot-on-aws-vpc.template)
-  - We recommend to upgrade to this version as it fixes an issue with the testall functionality which may introduce a high number of versions stored in the testall S3 bucket when Content Designer has no Q&As.
 - [v5.5.1](https://github.com/aws-solutions/qnabot-on-aws/releases/tag/v5.5.1) - [Public](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v5.5.1/qnabot-on-aws-main.template)/[VPC](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v5.5.1/qnabot-on-aws-vpc.template)
+  > _We do not recommend to use this version due to a potential issue with the testall functionality which may introduce a high number of versions stored in the testall S3 bucket when Content Designer has no Q&As. Please use the latest version available._
 - [v5.5.0](https://github.com/aws-solutions/qnabot-on-aws/releases/tag/v5.5.0) - [Public](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v5.5.0/qnabot-on-aws-main.template)/[VPC](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v5.5.0/qnabot-on-aws-vpc.template)
-  - _Vue has been upgraded from Vue 2 to 3. We highly recommend to use or upgrade to this version due to Vue 2 reaching End of Life (EOL), which affects all previous versions of QnABot. For more information, see [below](#upcomingrecent-deprecations)._
-- [v5.4.5](https://github.com/aws-solutions/qnabot-on-aws/releases/tag/v5.4.5) - [Public](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v5.4.5/qnabot-on-aws-main.template)/[VPC](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v5.4.5/qnabot-on-aws-vpc.template)
+  > _We do not recommend to use this version due to a potential issue with the testall functionality which may introduce a high number of versions stored in the testall S3 bucket when Content Designer has no Q&As. Please use the latest version available._
+  - _Vue has been upgraded from Vue 2 to 3. We highly recommend to use or upgrade to a version `v5.5.0+` due to Vue 2 reaching End of Life (EOL), which affects all previous versions of QnABot. For more information, see [below](#upcomingrecent-deprecations)._
   - _For those upgrading from `v5.4.X` to later versions, if you are upgrading from a deployment with LLMApi set to SAGEMAKER then set this value to DISABLED before upgrading. After upgrading, return this value back to SAGEMAKER._
+- [v5.4.5](https://github.com/aws-solutions/qnabot-on-aws/releases/tag/v5.4.5) - [Public](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v5.4.5/qnabot-on-aws-main.template)/[VPC](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v5.4.5/qnabot-on-aws-vpc.template)
+  > _We do not recommend to use this version due to a potential issue with the testall functionality which may introduce a high number of versions stored in the testall S3 bucket when Content Designer has no Q&As. Please use the latest version available._
 - [v5.4.4](https://github.com/aws-solutions/qnabot-on-aws/releases/tag/v5.4.4) - [Public](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v5.4.4/qnabot-on-aws-main.template)/[VPC](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v5.4.4/qnabot-on-aws-vpc.template)
+  > _We do not recommend to use this version due to a potential issue with the testall functionality which may introduce a high number of versions stored in the testall S3 bucket when Content Designer has no Q&As. Please use the latest version available._
 - [v5.4.3](https://github.com/aws-solutions/qnabot-on-aws/releases/tag/v5.4.3) - [Public](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v5.4.3/qnabot-on-aws-main.template)/[VPC](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v5.4.3/qnabot-on-aws-vpc.template)
-  - _We do not recommend to use this version due to a potential issue with the testall functionality which may introduce a high number of versions stored in the testall S3 bucket. Please use the latest version available._
+  > _We do not recommend to use this version due to a potential issue with the testall functionality which may introduce a high number of versions stored in the testall S3 bucket. Please use the latest version available._
 - [v5.4.2](https://github.com/aws-solutions/qnabot-on-aws/releases/tag/v5.4.2) - [Public](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v5.4.2/qnabot-on-aws-main.template)/[VPC](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v5.4.2/qnabot-on-aws-vpc.template)
-  - _We do not recommend to use this version due to a potential issue with the testall functionality which may introduce a high number of versions stored in the testall S3 bucket. Please use the latest version available._
+  > _We do not recommend to use this version due to a potential issue with the testall functionality which may introduce a high number of versions stored in the testall S3 bucket. Please use the latest version available._
 - [v5.4.1](https://github.com/aws-solutions/qnabot-on-aws/releases/tag/v5.4.1) - [Public](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v5.4.1/qnabot-on-aws-main.template)/[VPC](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v5.4.1/qnabot-on-aws-vpc.template)
 - [v5.4.0](https://github.com/aws-solutions/qnabot-on-aws/releases/tag/v5.4.0) - [Public](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v5.4.0/qnabot-on-aws-main.template)/[VPC](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v5.4.0/qnabot-on-aws-vpc.template)
   - _Note: Lambda Runtimes have been updated this release. Solution now uses: [nodejs18 and python3.10]_
@@ -358,11 +374,10 @@ _Note: **Deployable solution versions** refers to the ability to deploy the vers
   - _Note: Lambda Runtimes have been updated this release. Solution now uses: [nodejs16 and python3.9]_
 
 ### Undeployable Versions
-- All solutions less than `v5.2.1` are no longer deployable due to Lambda Runtime deprecations.
+- All solutions less than `v5.2.1` are no longer deployable due to Lambda Runtime deprecations. This information is provided as is and you are strongly encouraged to check the deprecation calendar and end of life of the frameworks used in the solution.
 
 ### Upcoming/Recent deprecations
-- nodejs16 will enter [Phase 1 deprecation](https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtimes.html#runtime-support-policy) on Mar 11, 2024.
-- Vue 2 will reach [End of Life](https://v2.vuejs.org/lts/) (EOL) on December 31st, 2023.
+- nodejs16 has entered [Phase 1 deprecation](https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtimes.html#runtime-support-policy) on Jun 12, 2024.
 
 ### Why would a solution version no longer be deployable?
 For QnABot, the most common reason is due to [AWS Lambda Runtimes being deprecated](https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtimes.html#runtime-support-policy). When a Lambda runtime has been marked as deprecated, customers can no longer create new Lambda functions in their AWS account. This means that older versions of our solutions that make use of those runtimes will fail to deploy. This makes it hard for the community to provide support as we are unable to deploy a similar environment to investigate issues and reproduce bug reports.

@@ -1,6 +1,6 @@
 {
     "name": "aws-layer",
-    "version": "6.0.2",
+    "version": "6.1.0",
     "description": "QnABot Lambda aws-sdk-layer",
     "main": "index.js",
     "scripts": {
@@ -12,12 +12,10 @@
     },
     "license": "Apache-2.0",
     "dependencies": {
-        "@aws-sdk/client-bedrock-agent-runtime": "3.511.0",
-        "@aws-sdk/client-bedrock-runtime": "3.511.0",
-        "@aws-sdk/client-comprehend": "3.511.0",
-        "@aws-sdk/client-kendra": "3.511.0",
-        "@aws-sdk/client-lambda": "3.511.0",
-        "@aws-sdk/client-s3": "3.511.0",
-        "@aws-sdk/client-translate": "3.511.0"
+        "@aws-sdk/client-comprehend": "^3.621.0",
+        "@aws-sdk/client-kendra": "^3.621.0",
+        "@aws-sdk/client-lambda": "^3.621.0",
+        "@aws-sdk/client-s3": "^3.621.0",
+        "@aws-sdk/client-translate": "^3.621.0"
     }
 }

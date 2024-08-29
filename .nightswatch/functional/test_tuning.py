@@ -13,22 +13,33 @@
 
 import pytest
 import time
+from datetime import datetime
+from selenium.webdriver.common.by import By
 
+from helpers.s3_client import S3Client
 from helpers.website_model.menu_nav import MenuNav
 from helpers.website_model.dom_operator import DomOperator
+
+TEST_ALL_DEFAULT_ID_PREFIX = "test-job-TestAll-"
+
 
 class TestTuning:
 # https://docs.aws.amazon.com/solutions/latest/aws-qnabot/tuning-testing-and-troubleshooting.html
 
-    def test_test_all(self, designer_login, dom_operator: DomOperator):
+    def test_test_all(self, designer_login, dom_operator: DomOperator, s3_client: S3Client, content_designer_output_bucket_name):
         """
         Tests the test all functionality.
         """
         menu = MenuNav(dom_operator)
         edit_page = menu.open_edit_page()
         edit_page.select_test_all_tab()
-        report_status = edit_page.generate_test_report()
+        testall_response = edit_page.generate_test_report()
+        report_status = testall_response.text
         assert 'Completed' in report_status
+        file_name = f'status-testall/{testall_response.get_property("id").split("test-job-")[1]}'
+        number_of_versions = s3_client.get_file_versions_count(content_designer_output_bucket_name, file_name)
+        assert number_of_versions == 4
+
 
     def test_test_single(self, designer_login, dom_operator: DomOperator):
         """

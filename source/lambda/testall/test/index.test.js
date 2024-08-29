@@ -36,7 +36,7 @@ const event = {
                     name: "testallbucket",
                 },
                 object: {
-                    key: "status/TestAll.csv",
+                    key: "status-testall/TestAll.csv",
                     versionId: "tLkWAhY8v2rsaSPWqg2m",
                 }
             }
@@ -44,7 +44,99 @@ const event = {
     ]
 };
 
+function generateConfigAndVersionId(currentStatus) {
+    const config = { status : currentStatus };
+    const versionId = Math.random().toString(36).substring(3,9);
+    return { config: config, versionId: versionId }
+}
+
+function initializeStartStepMocks() {
+    const startConfig = generateConfigAndVersionId('Started');
+    s3Mock.on(PutObjectCommand, {"Body": "{\"status\":\"Started\"}", "Bucket": "contentdesigneroutputbucket", "Key": "status-testall/TestAll.csv"}).resolves(
+    {
+            '$metadata': {
+              httpStatusCode: 200,
+              requestId: '',
+              extendedRequestId: '',
+              cfId: undefined,
+              attempts: 1,
+              totalRetryDelay: 0
+            },
+            Expiration: '',
+            ETag: '""',
+            ServerSideEncryption: '',
+            VersionId: startConfig.versionId
+    })
+    mockStream(startConfig.config, s3Mock, {"Bucket": "testallbucket", "Key": "status-testall/TestAll.csv", "VersionId": "tLkWAhY8v2rsaSPWqg2m"})
+    return { versionId: startConfig.versionId, config: startConfig.config }
+}
+
+function initializeInProgressStepMocks(startVersionId) {
+    const stepConfig = generateConfigAndVersionId('InProgress');
+    s3Mock.on(PutObjectCommand, {"Body": "{\"status\":\"InProgress\"}", "Bucket": "contentdesigneroutputbucket", "Key": "status-testall/TestAll.csv"}).resolves(
+    {
+            '$metadata': {
+              httpStatusCode: 200,
+              requestId: '',
+              extendedRequestId: '',
+              cfId: undefined,
+              attempts: 1,
+              totalRetryDelay: 0
+            },
+            Expiration: '',
+            ETag: '""',
+            ServerSideEncryption: '',
+            VersionId: stepConfig.versionId
+    })
+    mockStream(stepConfig.config, s3Mock, {"Bucket": "contentdesigneroutputbucket", "Key": "status-testall/TestAll.csv", "VersionId": startVersionId});
+    return { versionId: stepConfig.versionId, config: stepConfig.config }
+}
+
+function initializeLexStepMocks(inProgressVersionId) {
+    const lexConfig = generateConfigAndVersionId('Lex');
+    s3Mock.on(PutObjectCommand, {"Body": "{\"status\":\"Lex\"}", "Bucket": "contentdesigneroutputbucket", "Key": "status-testall/TestAll.csv"}).resolves(
+    {
+            '$metadata': {
+              httpStatusCode: 200,
+              requestId: '',
+              extendedRequestId: '',
+              cfId: undefined,
+              attempts: 1,
+              totalRetryDelay: 0
+            },
+            Expiration: '',
+            ETag: '""',
+            ServerSideEncryption: '',
+            VersionId: lexConfig.versionId
+    })
+    mockStream(lexConfig.config, s3Mock, {"Bucket": "contentdesigneroutputbucket", "Key": "status-testall/TestAll.csv", "VersionId": inProgressVersionId});
+    return { versionId: lexConfig.versionId, config: lexConfig.config }
+}
+
+function initializeCleanStepMocks(lexVersionId) {
+    const cleanConfig = generateConfigAndVersionId('Clean');
+    s3Mock.on(PutObjectCommand, {"Body": "{\"status\":\"Clean\"}", "Bucket": "contentdesigneroutputbucket", "Key": "status-testall/TestAll.csv"}).resolves(
+    {
+            '$metadata': {
+              httpStatusCode: 200,
+              requestId: '',
+              extendedRequestId: '',
+              cfId: undefined,
+              attempts: 1,
+              totalRetryDelay: 0
+            },
+            Expiration: '',
+            ETag: '""',
+            ServerSideEncryption: '',
+            VersionId: cleanConfig.versionId
+    })
+    mockStream(cleanConfig.config, s3Mock, {"Bucket": "contentdesigneroutputbucket", "Key": "status-testall/TestAll.csv", "VersionId": lexVersionId});
+    return { versionId: cleanConfig.versionId, config: cleanConfig.config }
+}
+
+
 describe('when calling index function', () => {
+
 
     beforeEach(() => {
         s3Mock.reset();
@@ -55,58 +147,28 @@ describe('when calling index function', () => {
         jest.clearAllMocks();
     });
 
-    it('should call start and update status correctly', async () => {
-        const config = { status : 'Started' };
-        mockStream(config, s3Mock);
+    it('should call the different steps and update status as expected', async () => {
+        const startStepInfo = initializeStartStepMocks();
+        const inProgressStepInfo = initializeInProgressStepMocks(startStepInfo.versionId);
+        const lexStepInfo = initializeLexStepMocks(inProgressStepInfo.versionId);
+        const cleanStepInfo = initializeCleanStepMocks(lexStepInfo.versionId);
         await index.step(event, null, jest.fn());
         expect(start).toHaveBeenCalledTimes(1);
-        expect(start).toHaveBeenCalledWith(config);
-        expect(step).toHaveBeenCalledTimes(0);
-        expect(lex).toHaveBeenCalledTimes(0);
-        expect(clean).toHaveBeenCalledTimes(0);
-        expect(s3Mock).toHaveReceivedCommandTimes(GetObjectCommand, 1);
-        expect(s3Mock).toHaveReceivedCommandWith(GetObjectCommand, {"Bucket": "testallbucket", "Key": "status/TestAll.csv", "VersionId": "tLkWAhY8v2rsaSPWqg2m"});
-        expect(s3Mock).toHaveReceivedCommandTimes(PutObjectCommand, 1);
-        expect(s3Mock).toHaveReceivedCommandWith(PutObjectCommand, {"Body": "{\"status\":\"Started\"}", "Bucket": "testallbucket", "Key": "status/TestAll.csv"});
-    });
-
-    it('should call step and update status correctly', async () => {
-        const config = { status : 'InProgress' };
-        mockStream(config, s3Mock);
-        await index.step(event, null, jest.fn());
+        expect(start).toHaveBeenCalledWith(startStepInfo.config);
+        expect(s3Mock).toHaveReceivedNthSpecificCommandWith(1, GetObjectCommand, {"Bucket": "testallbucket", "Key": "status-testall/TestAll.csv", "VersionId": "tLkWAhY8v2rsaSPWqg2m"});
+        expect(s3Mock).toHaveReceivedNthSpecificCommandWith(1, PutObjectCommand, {"Body": "{\"status\":\"Started\"}", "Bucket": "contentdesigneroutputbucket", "Key": "status-testall/TestAll.csv"});
         expect(step).toHaveBeenCalledTimes(1);
-        expect(step).toHaveBeenCalledWith(config);
-        expect(lex).toHaveBeenCalledTimes(0);
-        expect(clean).toHaveBeenCalledTimes(0);
-        expect(s3Mock).toHaveReceivedCommandTimes(GetObjectCommand, 1);
-        expect(s3Mock).toHaveReceivedCommandWith(GetObjectCommand, {"Bucket": "testallbucket", "Key": "status/TestAll.csv", "VersionId": "tLkWAhY8v2rsaSPWqg2m"});
-        expect(s3Mock).toHaveReceivedCommandTimes(PutObjectCommand, 1);
-        expect(s3Mock).toHaveReceivedCommandWith(PutObjectCommand, {"Body": "{\"status\":\"InProgress\"}", "Bucket": "testallbucket", "Key": "status/TestAll.csv"});
-    });
-
-    it('should call lex and update status correctly', async () => {
-        const config = { status : 'Lex' };
-        mockStream(config, s3Mock);
-        await index.step(event, null, jest.fn());
+        expect(step).toHaveBeenCalledWith(inProgressStepInfo.config);
+        expect(s3Mock).toHaveReceivedNthSpecificCommandWith(2, GetObjectCommand, {"Bucket": "contentdesigneroutputbucket", "Key": "status-testall/TestAll.csv", "VersionId": startStepInfo.versionId});
+        expect(s3Mock).toHaveReceivedNthSpecificCommandWith(2, PutObjectCommand, {"Body": "{\"status\":\"InProgress\"}", "Bucket": "contentdesigneroutputbucket", "Key": "status-testall/TestAll.csv"});
         expect(lex).toHaveBeenCalledTimes(1);
-        expect(lex).toHaveBeenCalledWith(config);
-        expect(clean).toHaveBeenCalledTimes(0);
-        expect(s3Mock).toHaveReceivedCommandTimes(GetObjectCommand, 1);
-        expect(s3Mock).toHaveReceivedCommandWith(GetObjectCommand, {"Bucket": "testallbucket", "Key": "status/TestAll.csv", "VersionId": "tLkWAhY8v2rsaSPWqg2m"});
-        expect(s3Mock).toHaveReceivedCommandTimes(PutObjectCommand, 1);
-        expect(s3Mock).toHaveReceivedCommandWith(PutObjectCommand, {"Body": "{\"status\":\"Lex\"}", "Bucket": "testallbucket", "Key": "status/TestAll.csv"});
-    });
-
-    it('should call clean and update status correctly', async () => {
-        const config = { status : 'Clean' };
-        mockStream(config, s3Mock);
-        await index.step(event, null, jest.fn());
+        expect(lex).toHaveBeenCalledWith(lexStepInfo.config);
+        expect(s3Mock).toHaveReceivedNthSpecificCommandWith(3, GetObjectCommand, {"Bucket": "contentdesigneroutputbucket", "Key": "status-testall/TestAll.csv", "VersionId": inProgressStepInfo.versionId});
+        expect(s3Mock).toHaveReceivedNthSpecificCommandWith(3, PutObjectCommand, {"Body": "{\"status\":\"Lex\"}", "Bucket": "contentdesigneroutputbucket", "Key": "status-testall/TestAll.csv"});
         expect(clean).toHaveBeenCalledTimes(1);
-        expect(clean).toHaveBeenCalledWith(config);
-        expect(s3Mock).toHaveReceivedCommandTimes(GetObjectCommand, 1);
-        expect(s3Mock).toHaveReceivedCommandWith(GetObjectCommand, {"Bucket": "testallbucket", "Key": "status/TestAll.csv", "VersionId": "tLkWAhY8v2rsaSPWqg2m"});
-        expect(s3Mock).toHaveReceivedCommandTimes(PutObjectCommand, 1);
-        expect(s3Mock).toHaveReceivedCommandWith(PutObjectCommand, {"Body": "{\"status\":\"Clean\"}", "Bucket": "testallbucket", "Key": "status/TestAll.csv"});
+        expect(clean).toHaveBeenCalledWith(cleanStepInfo.config);
+        expect(s3Mock).toHaveReceivedNthSpecificCommandWith(4,GetObjectCommand, {"Bucket": "contentdesigneroutputbucket", "Key": "status-testall/TestAll.csv", "VersionId": lexStepInfo.versionId});
+        expect(s3Mock).toHaveReceivedNthSpecificCommandWith(4, PutObjectCommand, {"Body": "{\"status\":\"Clean\"}", "Bucket": "contentdesigneroutputbucket", "Key": "status-testall/TestAll.csv"});
     });
 
     it('should handle an error', async () => {

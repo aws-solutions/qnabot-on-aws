@@ -32,7 +32,12 @@ class BedrockModelProviderPrototype {
 
     parseResponseBody(response) {
         try {
-            return JSON.parse(Buffer.from(response.body, 'utf-8').toString());
+            const parsedBody = JSON.parse(Buffer.from(response.body, 'utf-8').toString());
+            const guardRailAction = parsedBody['amazon-bedrock-guardrailAction'];
+            if (guardRailAction) {
+                qnabot.log(`Guardrail Action in Bedrock LLM Response: ${guardRailAction}`)
+            };
+            return parsedBody;
         } catch (e) {
             qnabot.warn('EXCEPTION:', e.stack);
             throw new Error(`Exception parsing response body: ${e.message}`);

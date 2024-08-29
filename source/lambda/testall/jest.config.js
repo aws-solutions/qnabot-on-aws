@@ -9,3 +9,7 @@ module.exports = {
         "<rootDir>/../aws-sdk-layer/"
     ]
 };
+
+process.env = Object.assign(process.env, {
+    OUTPUT_S3_BUCKET: 'contentdesigneroutputbucket'
+});

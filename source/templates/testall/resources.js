@@ -26,6 +26,31 @@ module.exports = {
             BuildDate: new Date().toISOString(),
         },
     },
+    TestAllStepLambdaLogGroup: {
+        Type: 'AWS::Logs::LogGroup',
+        Properties: {
+            LogGroupName: {
+                'Fn::Join': [
+                  '-',
+                  [
+                    { 'Fn::Sub': '/aws/lambda/${AWS::StackName}-TestAllStepLambda' },
+                    { 'Fn::Select': ['2', { 'Fn::Split': ['/', { Ref: 'AWS::StackId' }] }] },
+                  ],
+                ],
+              },
+
+            RetentionInDays: {
+                'Fn::If': [
+                    'LogRetentionPeriodIsNotZero',
+                    { Ref: 'LogRetentionPeriod' },
+                    { Ref: 'AWS::NoValue' },
+                ],
+            },
+        },
+        Metadata: {
+            guard: util.cfnGuard('CLOUDWATCH_LOG_GROUP_ENCRYPTED', 'CW_LOGGROUP_RETENTION_PERIOD_CHECK'),
+        },
+    },
     TestAllStepLambda: {
         Type: 'AWS::Lambda::Function',
         Properties: {
@@ -41,10 +66,14 @@ module.exports = {
                     ES_PROXY: { Ref: 'EsProxyLambda' },
                     LEXV2_BOT_ID: { Ref: 'LexV2BotId' },
                     LEXV2_BOT_ALIAS_ID: { Ref: 'LexV2BotAliasId' },
-                    ...util.getCommonEnvironmentVariables()
+                    OUTPUT_S3_BUCKET: { Ref: 'ContentDesignerOutputBucket'},
+                    ...util.getCommonEnvironmentVariables(),
                 },
             },
             Handler: 'index.step',
+            LoggingConfig: {
+                LogGroup: { Ref: 'TestAllStepLambdaLogGroup' },
+            },
             MemorySize: '1280',
             Role: { 'Fn::GetAtt': ['TestAllRole', 'Arn'] },
             Runtime: process.env.npm_package_config_lambdaRuntime,
@@ -64,7 +93,7 @@ module.exports = {
             },
             Layers: [
                 { Ref: 'AwsSdkLayerLambdaLayer' },
-                { Ref: 'CommonModulesLambdaLayer' }
+                { Ref: 'CommonModulesLambdaLayer' },
             ],
             Tags: [
                 {
@@ -112,7 +141,10 @@ module.exports = {
                                     's3:DeleteObject',
                                     's3:DeleteObjectVersion',
                                 ],
-                                Resource: [{ 'Fn::Sub': 'arn:aws:s3:::${TestAllBucket}*' }],
+                                Resource: [
+                                    { 'Fn::Sub': 'arn:aws:s3:::${TestAllBucket}*' },
+                                    { 'Fn::Sub': 'arn:aws:s3:::${ContentDesignerOutputBucket}*' },
+                                ],
                             },
                             {
                                 Effect: 'Allow',

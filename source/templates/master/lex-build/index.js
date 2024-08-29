@@ -15,6 +15,30 @@ const fs = require('fs');
 const util = require('../../util');
 
 module.exports = {
+    LexBuildLambdaLogGroup:{
+        Type: 'AWS::Logs::LogGroup',
+        Properties: {
+            LogGroupName: {
+                'Fn::Join': [
+                    '-',
+                    [
+                        { 'Fn::Sub': '/aws/lambda/${AWS::StackName}-LexBuildLambda' },
+                        { 'Fn::Select': ['2', { 'Fn::Split': ['/', { Ref: 'AWS::StackId' }] }] },
+                    ],
+                ],
+            },
+            RetentionInDays: {
+                'Fn::If': [
+                    'LogRetentionPeriodIsNotZero',
+                    { Ref: 'LogRetentionPeriod' },
+                    { Ref: 'AWS::NoValue' },
+                ],
+            },
+        },
+        Metadata: {
+            guard: util.cfnGuard('CLOUDWATCH_LOG_GROUP_ENCRYPTED', 'CW_LOGGROUP_RETENTION_PERIOD_CHECK'),
+        },
+    },
     LexBuildLambda: lambda({
         S3Bucket: { Ref: 'BootstrapBucket' },
         S3Key: { 'Fn::Sub': '${BootstrapPrefix}/lambda/lex-build.zip' },
@@ -24,35 +48,84 @@ module.exports = {
         UTTERANCE_KEY: 'default-utterances.json',
         POLL_LAMBDA: { 'Fn::GetAtt': ['LexBuildLambdaPoll', 'Arn'] },
         STATUS_BUCKET: { Ref: 'BuildStatusBucket' },
-        STATUS_KEY: { 'Fn::If': ['CreateLexV1Bots', 'status.json', { Ref: 'AWS::NoValue' }] },
         LEXV2_STATUS_KEY: 'lexV2status.json',
-        BOTNAME: { 'Fn::If': ['CreateLexV1Bots', { Ref: 'LexBot' }, { Ref: 'AWS::NoValue' }] },
-        BOTALIAS: { 'Fn::If': ['CreateLexV1Bots', { Ref: 'VersionAlias' }, { Ref: 'AWS::NoValue' }] },
-        SLOTTYPE: { 'Fn::If': ['CreateLexV1Bots', { Ref: 'SlotType' }, { Ref: 'AWS::NoValue' }] },
-        INTENT: { 'Fn::If': ['CreateLexV1Bots', { Ref: 'Intent' }, { Ref: 'AWS::NoValue' }] },
-        INTENTFALLBACK: { 'Fn::If': ['CreateLexV1Bots', { Ref: 'IntentFallback' }, { Ref: 'AWS::NoValue' }] },
         LEXV2_BUILD_LAMBDA: { Ref: 'Lexv2BotLambda' },
         ADDRESS: { 'Fn::Join': ['', ['https://', { 'Fn::GetAtt': ['ESVar', 'ESAddress'] }]] },
         INDEX: { 'Fn::GetAtt': ['Var', 'index'] },
-        ...util.getCommonEnvironmentVariables()
-    }, process.env.npm_package_config_lambdaRuntime),
+        ...util.getCommonEnvironmentVariables(),
+    }, process.env.npm_package_config_lambdaRuntime,
+    {
+        LogGroup: { Ref: 'LexBuildLambdaLogGroup' },
+    },
+    ),
+    LexBuildLambdaStartLogGroup:{
+        Type: 'AWS::Logs::LogGroup',
+        Properties: {
+            LogGroupName: {
+                'Fn::Join': [
+                    '-',
+                    [
+                        { 'Fn::Sub': '/aws/lambda/${AWS::StackName}-LexBuildLambdaStart' },
+                        { 'Fn::Select': ['2', { 'Fn::Split': ['/', { Ref: 'AWS::StackId' }] }] },
+                    ],
+                ],
+            },
+            RetentionInDays: {
+                'Fn::If': [
+                    'LogRetentionPeriodIsNotZero',
+                    { Ref: 'LogRetentionPeriod' },
+                    { Ref: 'AWS::NoValue' },
+                ],
+            },
+        },
+        Metadata: {
+            guard: util.cfnGuard('CLOUDWATCH_LOG_GROUP_ENCRYPTED', 'CW_LOGGROUP_RETENTION_PERIOD_CHECK'),
+        },
+    },
     LexBuildLambdaStart: lambda({
         ZipFile: fs.readFileSync(`${__dirname}/start.js`, 'utf8'),
     }, {
         STATUS_BUCKET: { Ref: 'BuildStatusBucket' },
-        STATUS_KEY: { 'Fn::If': ['CreateLexV1Bots', 'status.json', { Ref: 'AWS::NoValue' }] },
         LEXV2_STATUS_KEY: 'lexV2status.json',
         BUILD_FUNCTION: { 'Fn::GetAtt': ['LexBuildLambda', 'Arn'] },
-        ...util.getCommonEnvironmentVariables()
-    }, process.env.npm_package_config_lambdaRuntime),
+        ...util.getCommonEnvironmentVariables(),
+    }, process.env.npm_package_config_lambdaRuntime,
+    {
+        LogGroup: { Ref: 'LexBuildLambdaStartLogGroup' },
+    }),
+    LexBuildLambdaPollLogGroup:{
+        Type: 'AWS::Logs::LogGroup',
+        Properties: {
+            LogGroupName: {
+                'Fn::Join': [
+                    '-',
+                    [
+                        { 'Fn::Sub': '/aws/lambda/${AWS::StackName}-LexBuildLambdaPoll' },
+                        { 'Fn::Select': ['2', { 'Fn::Split': ['/', { Ref: 'AWS::StackId' }] }] },
+                    ],
+                ],
+            },
+            RetentionInDays: {
+                'Fn::If': [
+                    'LogRetentionPeriodIsNotZero',
+                    { Ref: 'LogRetentionPeriod' },
+                    { Ref: 'AWS::NoValue' },
+                ],
+            },
+        },
+        Metadata: {
+            guard: util.cfnGuard('CLOUDWATCH_LOG_GROUP_ENCRYPTED', 'CW_LOGGROUP_RETENTION_PERIOD_CHECK'),
+        },
+    },
     LexBuildLambdaPoll: lambda({
         ZipFile: fs.readFileSync(`${__dirname}/poll.js`, 'utf8'),
     }, {
-        STATUS_KEY: { 'Fn::If': ['CreateLexV1Bots', 'status.json', { Ref: 'AWS::NoValue' }] },
         STATUS_BUCKET: { Ref: 'BuildStatusBucket' },
-        BOT_NAME: { 'Fn::If': ['CreateLexV1Bots', { Ref: 'LexBot' }, { Ref: 'AWS::NoValue' }] },
-        ...util.getCommonEnvironmentVariables()
-    }, process.env.npm_package_config_lambdaRuntime),
+        ...util.getCommonEnvironmentVariables(),
+    }, process.env.npm_package_config_lambdaRuntime,
+    {
+        LogGroup: { Ref: 'LexBuildLambdaPollLogGroup' },
+    }),
     LexBuildCodeVersion: {
         Type: 'Custom::S3Version',
         Properties: {
@@ -160,7 +233,7 @@ module.exports = {
             LoggingConfiguration: {
                 DestinationBucketName: { Ref: 'MainAccessLogBucket' },
                 LogFilePrefix: {"Fn::Join": ["", [{Ref: 'MainAccessLogBucket'},"/BuildStatus/"]]},
-             }, 
+            },
             BucketEncryption: {
                 ServerSideEncryptionConfiguration: [{
                     ServerSideEncryptionByDefault: {
@@ -201,7 +274,7 @@ module.exports = {
                                         '/*',
                                     ],
                                 ],
-                            },                            
+                            },
                             {
                                 'Fn::Join': [
                                     '',
@@ -214,7 +287,7 @@ module.exports = {
                                         },
                                     ],
                                 ],
-                            }
+                            },
                         ],
                         Sid: 'HttpsOnly',
                     },
@@ -236,7 +309,7 @@ module.exports = {
     },
 };
 
-function lambda(code, variable, runtime) {
+function lambda(code, variable, runtime, loggingConfig) {
     return {
         Type: 'AWS::Lambda::Function',
         Properties: {
@@ -245,6 +318,7 @@ function lambda(code, variable, runtime) {
                 Variables: variable,
             },
             Handler: 'index.handler',
+            LoggingConfig: loggingConfig,
             MemorySize: '1024',
             Role: { 'Fn::GetAtt': ['LexBuildLambdaRole', 'Arn'] },
             Runtime: runtime,
@@ -261,7 +335,7 @@ function lambda(code, variable, runtime) {
             },
             Layers: [
                 { Ref: 'AwsSdkLayerLambdaLayer' },
-                { Ref: 'CommonModulesLambdaLayer' }
+                { Ref: 'CommonModulesLambdaLayer' },
             ],
             Tags: [{
                 Key: 'Type',

@@ -29,6 +29,7 @@ logger = get_logger(__name__)
 class BucketType(Enum):
     IMPORT_BUCKET = "ImportBucket"
     EXPORT_BUCKET = "ExportBucket"
+    CONTENT_BUCKET = "ContentDesignerOutputBucket"
 
 
 def get_bucket_name(cloudformation_stack_name: str, bucket_type: BucketType):
@@ -62,9 +63,10 @@ def initiate_import(
     :return: response status of the import request
     """
 
-    importdatetime = datetime.datetime.utcnow()  # get current request date time in UTC timezone
+    importdatetime = datetime.datetime.now(datetime.timezone.utc)  # get current request date time in UTC timezone
     # get Import bucket name from the cloudformation stack
     str_import_bucket_name = get_bucket_name(cloudformation_stack_name, BucketType.IMPORT_BUCKET)
+    str_content_bucket_name = get_bucket_name(cloudformation_stack_name, BucketType.CONTENT_BUCKET)
 
     # create an options json config that includes import options that were used
     str_import_options = {
@@ -99,13 +101,13 @@ def initiate_import(
 
         # check status of the file import
         response = get_import_status(
-            bucket=str_import_bucket_name, source_filename=source_filename, importdatetime=importdatetime
+            bucket=str_content_bucket_name, source_filename=source_filename, importdatetime=importdatetime
         )
         seconds = 0
         while json.loads(response)["status"] != "Complete" and seconds < 90:
             time.sleep(5)  # wait for 5 seconds and check status again
             response = get_import_status(
-                bucket=str_import_bucket_name, source_filename=source_filename, importdatetime=importdatetime
+                bucket=str_content_bucket_name, source_filename=source_filename, importdatetime=importdatetime
             )
             seconds += 5
         return response
@@ -128,9 +130,10 @@ def initiate_export(cloudformation_stack_name: str, export_filename: str, export
     :return: response status of the export request
     """
 
-    exportdatetime = datetime.datetime.utcnow()  # get current request date time in UTC timezone
+    exportdatetime = datetime.datetime.now(datetime.timezone.utc)  # get current request date time in UTC timezone
     # get Export bucket name from the cloudformation stack
     str_export_bucket_name = get_bucket_name(cloudformation_stack_name, BucketType.EXPORT_BUCKET)
+    str_content_bucket_name = get_bucket_name(cloudformation_stack_name, BucketType.CONTENT_BUCKET)
 
     cfn_client = get_service_client("cloudformation")
     # get OpenSearch cluster Index name from the cloudformation stack
@@ -151,9 +154,9 @@ def initiate_export(cloudformation_stack_name: str, export_filename: str, export
         "bucket": str_export_bucket_name,
         "index": str_open_search_index,
         "id": os.path.basename(export_filename),
-        "config": f"status/{os.path.basename(export_filename)}",
+        "config": f"status-export/{os.path.basename(export_filename)}",
         "tmp": f"tmp/{os.path.basename(export_filename)}",
-        "key": f"data/{os.path.basename(export_filename)}",
+        "key": f"data-export/{os.path.basename(export_filename)}",
         "filter": export_filter,
         "status": "Started",
     }
@@ -163,23 +166,23 @@ def initiate_export(cloudformation_stack_name: str, export_filename: str, export
         # put a export config object in S3 bucket to initiate export
         s3_client = get_service_client("s3")  # boto3.client('s3')
         response = s3_client.put_object(
-            Body=str_export_config, Bucket=str_export_bucket_name, Key=f"status/{os.path.basename(export_filename)}"
+            Body=str_export_config, Bucket=str_export_bucket_name, Key=f"status-export/{os.path.basename(export_filename)}"
         )
 
         # check status of the file export
         response = get_export_status(
-            bucket=str_export_bucket_name, export_filename=export_filename, exportdatetime=exportdatetime
+            bucket=str_content_bucket_name, export_filename=export_filename, exportdatetime=exportdatetime
         )
 
         while json.loads(response)["status"] != "Completed":
             time.sleep(5)  # wait for 5 seconds and check status again
             response = get_export_status(
-                bucket=str_export_bucket_name, export_filename=export_filename, exportdatetime=exportdatetime
+                bucket=str_content_bucket_name, export_filename=export_filename, exportdatetime=exportdatetime
             )
 
         # download the exported file
         response = download_export(
-            bucket=str_export_bucket_name,
+            bucket=str_content_bucket_name,
             export_filename=export_filename,
             exportdatetime=exportdatetime,
             file_format=file_format,
@@ -188,7 +191,7 @@ def initiate_export(cloudformation_stack_name: str, export_filename: str, export
         while json.loads(response)["status"] != "Downloaded":
             time.sleep(5)  # wait for 5 seconds and check status again
             response = download_export(
-                bucket=str_export_bucket_name,
+                bucket=str_content_bucket_name,
                 export_filename=export_filename,
                 exportdatetime=exportdatetime,
                 file_format=file_format,
@@ -217,7 +220,7 @@ def download_export(bucket: str, export_filename: str, exportdatetime: datetime,
         s3_client = get_service_client("s3")  # boto3.client('s3')
         # get object only if the object has changed since last request
         response = s3_client.get_object(
-            Bucket=bucket, Key=f"data/{os.path.basename(export_filename)}", IfModifiedSince=exportdatetime
+            Bucket=bucket, Key=f"data-export/{os.path.basename(export_filename)}", IfModifiedSince=exportdatetime
         )
         str_file_contents = response["Body"].read().decode("utf-8")  # read object body
         if file_format == "JSON":
@@ -277,7 +280,7 @@ def get_import_status(bucket: str, source_filename: str, importdatetime: datetim
     try:
         s3_client = get_service_client("s3")  # boto3.client('s3')
         # get object only if the object has changed since last request
-        key = f"status/{os.path.basename(source_filename)}"
+        key = f"status-import/{os.path.basename(source_filename)}"
         #logger.debug(f"Getting import status for {bucket=} {key=}")
         response = s3_client.get_object(Bucket=bucket, Key=key, IfModifiedSince=importdatetime)
 
@@ -331,7 +334,7 @@ def get_export_status(bucket: str, export_filename: str, exportdatetime: datetim
         s3_client = get_service_client("s3")  # boto3.client('s3')
         # get object only if the object has changed since last request
         response = s3_client.get_object(
-            Bucket=bucket, Key=f"status/{os.path.basename(export_filename)}", IfModifiedSince=exportdatetime
+            Bucket=bucket, Key=f"status-export/{os.path.basename(export_filename)}", IfModifiedSince=exportdatetime
         )
 
         obj_status_details = json.loads(response["Body"].read().decode("utf-8"))  # read object body

@@ -82,6 +82,30 @@ module.exports = {
         },
         authorization: 'AWS_IAM',
     }),
+    ExampleS3ListLambdaLogGroup: {
+        Type: 'AWS::Logs::LogGroup',
+        Properties: {
+            LogGroupName: {
+                'Fn::Join': [
+                    '-',
+                    [
+                        { 'Fn::Sub': '/aws/lambda/${AWS::StackName}-ExampleS3ListLambda' },
+                        { 'Fn::Select': ['2', { 'Fn::Split': ['/', { Ref: 'AWS::StackId' }] }] },
+                    ],
+                ],
+            },
+            RetentionInDays: {
+                'Fn::If': [
+                    'LogRetentionPeriodIsNotZero',
+                    { Ref: 'LogRetentionPeriod' },
+                    { Ref: 'AWS::NoValue' },
+                ],
+            },
+        },
+        Metadata: {
+            guard: util.cfnGuard('CLOUDWATCH_LOG_GROUP_ENCRYPTED', 'CW_LOGGROUP_RETENTION_PERIOD_CHECK'),
+        },
+    },
     ExampleS3ListLambda: {
         Type: 'AWS::Lambda::Function',
         Properties: {
@@ -94,6 +118,9 @@ module.exports = {
                 }
             },
             Handler: 'index.documents',
+            LoggingConfig: {
+                LogGroup: { Ref: 'ExampleS3ListLambdaLogGroup' },
+            },
             MemorySize: '128',
             Role: { 'Fn::GetAtt': ['S3ListLambdaRole', 'Arn'] },
             Runtime: process.env.npm_package_config_lambdaRuntime,
@@ -121,6 +148,30 @@ module.exports = {
             guard: util.cfnGuard('LAMBDA_CONCURRENCY_CHECK', 'LAMBDA_INSIDE_VPC'),
         },
     },
+    ExampleS3ListPhotoLambdaLogGroup: {
+        Type: 'AWS::Logs::LogGroup',
+        Properties: {
+            LogGroupName: {
+                'Fn::Join': [
+                    '-',
+                    [
+                        { 'Fn::Sub': '/aws/lambda/${AWS::StackName}-ExampleS3ListPhotoLambda' },
+                        { 'Fn::Select': ['2', { 'Fn::Split': ['/', { Ref: 'AWS::StackId' }] }] },
+                    ],
+                ],
+            },
+            RetentionInDays: {
+                'Fn::If': [
+                    'LogRetentionPeriodIsNotZero',
+                    { Ref: 'LogRetentionPeriod' },
+                    { Ref: 'AWS::NoValue' },
+                ],
+            },
+        },
+        Metadata: {
+            guard: util.cfnGuard('CLOUDWATCH_LOG_GROUP_ENCRYPTED', 'CW_LOGGROUP_RETENTION_PERIOD_CHECK'),
+        },
+    },
     ExampleS3ListPhotoLambda: {
         Type: 'AWS::Lambda::Function',
         Properties: {
@@ -133,6 +184,9 @@ module.exports = {
                 }
             },
             Handler: 'index.photos',
+            LoggingConfig: {
+                LogGroup: { Ref: 'ExampleS3ListPhotoLambdaLogGroup' },
+            },
             MemorySize: '128',
             Role: { 'Fn::GetAtt': ['S3ListLambdaRole', 'Arn'] },
             Runtime: process.env.npm_package_config_lambdaRuntime,

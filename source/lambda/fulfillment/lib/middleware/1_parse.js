@@ -40,9 +40,6 @@ function getClientType(req) {
     // Try to determine which Lex client is being used based on patterns in the req - best effort attempt.
     const voiceortext = req._preferredResponseType == 'SSML' ? 'Voice' : 'Text';
 
-    // for LexV1 channels -- check for x-amz-lex:channel-type requestAttribute
-    // more information on deploying an Amazon Lex V1 Bot on a Messaging Platform: https://docs.aws.amazon.com/lex/latest/dg/example1.html
-
     // for LexV2 channels -- check for x-amz-lex:channels:platform requestAttribute
     // more information on deploying an Amazon Lex V2 Bot on a Messaging Platform: https://docs.aws.amazon.com/lexv2/latest/dg/deploying-messaging-platform.html
 
@@ -65,7 +62,7 @@ function getClientType(req) {
         return `LEX.GenesysCloud.${voiceortext}`;
     }
     if (/^.*-.*-\d:.*-.*-.*-.*$/.test(_.get(req, '_event.sessionId', _.get(req, '_event.userId')))) { // NOSONAR - javascript:S5852 - input is user controlled and we have a limit on the number of characters
-        // sessionId (LexV2) or userId (LexV1) pattern to detect lex-web-uithrough use of cognito id as sessionId/userId: e.g. us-east-1:a8e1f7b2-b20d-441c-9698-aff8b519d8d5
+        // sessionId (LexV2) pattern to detect lex-web-uithrough use of cognito id as sessionId/userId: e.g. us-east-1:a8e1f7b2-b20d-441c-9698-aff8b519d8d5
         // NOSONAR TODO: add another clientType indicator for lex-web-ui?
         return `LEX.LexWebUI.${voiceortext}`;
     }

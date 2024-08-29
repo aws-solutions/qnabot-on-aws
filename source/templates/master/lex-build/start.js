@@ -23,21 +23,9 @@ const crypto = require('crypto');
 exports.handler = async function (event, context, callback) {
     const token = crypto.randomBytes(16).toString('base64');
     const bucket = process.env.STATUS_BUCKET;
-    const lexV1StatusFile = process.env.STATUS_KEY;
     const lexV2StatusFile = process.env.LEXV2_STATUS_KEY;
     const functionName = process.env.BUILD_FUNCTION;
     const body = JSON.stringify({ status: 'Starting', token });
-
-    if (lexV1StatusFile) {
-        console.log('Initializing ', bucket, lexV1StatusFile);
-        const params = {
-            Bucket: bucket,
-            Key: lexV1StatusFile,
-            Body: body,
-        };
-        const putObjectCmdV1 = new PutObjectCommand(params);
-        await s3.send(putObjectCmdV1);
-    }
 
     console.log('Initializing ', bucket, lexV2StatusFile);
     const params = {
@@ -48,7 +36,7 @@ exports.handler = async function (event, context, callback) {
     const putObjectCmdV2 = new PutObjectCommand(params);
     await s3.send(putObjectCmdV2);
 
-    // The BUILD_FUNCTION takes care of rebuilding Lex V2 bot, and (unless QnABot is set to V2 only) Lex V1 bot
+    // The BUILD_FUNCTION takes care of rebuilding Lex V2 bot
     console.log('Invoking ', functionName);
     const invokeParams = {
         FunctionName: functionName,

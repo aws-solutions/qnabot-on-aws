@@ -57,7 +57,7 @@ describe('test PreUpgradeExport class', () => {
             expect(result).toBe('PreUpgradeExport'); 
         };
 
-        await preUpgradeExportCut.Create(params, callback);
+        await preUpgradeExportCut.AsyncCreate(params, callback);
     });  
 
     it("should be equivalent to Create when Update is called", async () => {
@@ -78,6 +78,6 @@ describe('test PreUpgradeExport class', () => {
             expect(result).toBe('PreUpgradeExport'); 
         };
         
-        await preUpgradeExportCut.Update('mock_id', params, {}, callback);
+        await preUpgradeExportCut.AsyncUpdate('mock_id', params, {}, callback);
     });
 });

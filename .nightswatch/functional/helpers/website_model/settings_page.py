@@ -12,7 +12,7 @@
 ######################################################################################################################
 
 import time
-
+import os
 import selenium
 
 from helpers.utils.textbox import Textbox
@@ -64,6 +64,15 @@ AMAZON_KENDRA_SUBGROUP_ID = 'amazon_kendra_subgroup'
 TEXT_GENERATION_GENERAL_SUBGROUP_ID = 'text_generation_general_subgroup'
 AMAZON_BEDROCK_KNOWLEDGE_BASES_SUBGROUP_ID = 'amazon_bedrock_knowledge_bases_subgroup'
 
+KNOWLEDGE_BASE_SEARCH_TYPE_ID = 'KNOWLEDGE_BASE_SEARCH_TYPE'
+KNOWLEDGE_BASE_MAX_NUMBER_OF_RETRIEVED_RESULTS_ID = 'KNOWLEDGE_BASE_MAX_NUMBER_OF_RETRIEVED_RESULTS'
+KNOWLEDGE_BASE_MODEL_PARAMS_ID = 'KNOWLEDGE_BASE_MODEL_PARAMS'
+KNOWLEDGE_BASE_PROMPT_TEMPLATE_ID = 'KNOWLEDGE_BASE_PROMPT_TEMPLATE'
+
+BEDROCK_GUARDRAIL_IDENTIFIER_ID = 'BEDROCK_GUARDRAIL_IDENTIFIER'
+BEDROCK_GUARDRAIL_VERSION_ID = 'BEDROCK_GUARDRAIL_VERSION'
+BEDROCK_GUARDRAIL_SUBGROUP_ID = 'text_generation_guardrail_subgroup'
+
 class SettingsPage:
     """
     Class representing a Settings Page.
@@ -89,7 +98,7 @@ class SettingsPage:
 
         self.operator.select_xpath(SAVE_XPATH, click=True)
         self.operator.wait_for_element_by_xpath(SAVE_MODAL_CLOSE_XPATH)
-        time.sleep(1)
+        time.sleep(2)
 
         status = self.operator.select_css(SAVE_STATUS_CSS).text
         self.operator.select_xpath(SAVE_MODAL_CLOSE_XPATH, click=True)
@@ -154,6 +163,19 @@ class SettingsPage:
         customize_empty_message = self.operator.select_id(EMPTY_MESSAGE_ID)
         self.__set_element_value(customize_empty_message, message)
         return self.save_settings()
+    
+    def enable_debug_response(self) -> str:
+        """
+        Enables debug responses during the chat conversation and saves the changes.
+
+        Returns:
+            The status of the save operation.
+        """
+
+        enable_debug = self.operator.select_id(ENABLE_DEBUG_RESPONSES_ID)
+        self.__set_element_value(enable_debug, 'true')
+        return self.save_settings()
+    
 
     def enable_multi_language_support(self) -> str:
         """
@@ -317,6 +339,39 @@ class SettingsPage:
         self.__set_element_value(enable_generative_query, 'false')
 
         return self.save_settings()
+    
+    def enable_bedrock_guardrail(self, region, guardrail_identifier, guardrail_version):
+        """
+        Enables the Bedrock guardrail for functional tests based on the nightswatch or local environment. 
+
+        Args:
+            region (str): The region for the guardrail.
+
+        Returns:
+            The status of the save operation.
+        """
+
+        mappings = {
+            'us-east-1': ('6wptcgn6mi7x', 2),
+            'us-west-2': ('nnbn5202wy5g', 2),
+            'eu-west-2': ('jsj81qgv3ky5', 2),
+            'ap-northeast-1': ('672yn8u1u3v5', 1)
+        }
+
+        if os.getenv('NIGHTSWATCH_TEST_DIR'):
+            guardrail_identifier = mappings[region][0]
+            guardrail_version = mappings[region][1]
+
+        if not guardrail_identifier or not guardrail_version:
+            return self.save_settings()
+        
+        get_guardrail_identifier = self.operator.select_id(BEDROCK_GUARDRAIL_IDENTIFIER_ID)
+        self.__set_element_value(get_guardrail_identifier, guardrail_identifier)
+
+        get_guardrail_version = self.operator.select_id(BEDROCK_GUARDRAIL_VERSION_ID)
+        self.__set_element_value(get_guardrail_version, guardrail_version)
+
+        return self.save_settings()
 
     def enable_custom_terminology(self) -> str:
         """
@@ -410,6 +465,40 @@ class SettingsPage:
         post_processing_lambda = self.operator.select_id(POST_PROCESSING_LAMBDA_ID)
         self.__set_element_value(post_processing_lambda, l)
         return self.save_settings()
+
+    def disable_kb_prompt(self) -> str:
+        """
+        Disables prompt for knowledge base which is enabled by default
+
+        Returns:
+            The status of the save operation.
+        """
+        kb_prompt = self.operator.select_id(KNOWLEDGE_BASE_PROMPT_TEMPLATE_ID)
+        self.__set_element_value(kb_prompt, '')
+
+        return self.save_settings()
+    def enable_kb_advanced(self, knowledge_base_model) -> str:
+        """
+        Enables advanced settings for the knowledge base
+
+        Returns:
+            The status of the save operation.
+        """
+        kb_search_type = self.operator.select_id(KNOWLEDGE_BASE_SEARCH_TYPE_ID)
+        kb_max_results = self.operator.select_id(KNOWLEDGE_BASE_MAX_NUMBER_OF_RETRIEVED_RESULTS_ID)
+        kb_model_params = self.operator.select_id(KNOWLEDGE_BASE_MODEL_PARAMS_ID)
+
+        if knowledge_base_model.startswith('anthropic'):
+            self.__set_element_value(kb_search_type, 'HYBRID')
+            self.__set_element_value(kb_max_results, 3)
+            self.__set_element_value(kb_model_params, '{"temperature": 0.3, "maxTokens": 245, "topP": 0.9, "top_k": 240 }')
+        else:
+            self.__set_element_value(kb_search_type, 'HYBRID')
+            self.__set_element_value(kb_max_results, 5)
+            self.__set_element_value(kb_model_params, '{"temperature": 0.1, "maxTokens": 264, "topP": 0.9 }')
+            
+
+        return self.save_settings()
     
     def expand_all_subgroups(self) -> None:
         """
@@ -476,6 +565,11 @@ class SettingsPage:
             if amazon_bedrock_knowledge_bases_subgroup.get_attribute('aria-expanded') == 'false':
                 amazon_bedrock_knowledge_bases_subgroup.click()
                 self.operator.wait_for_element_attribute(AMAZON_BEDROCK_KNOWLEDGE_BASES_SUBGROUP_ID, 'aria-expanded', 'true')
+
+            bedrock_guardrail_general_subgroup = self.operator.select_id(BEDROCK_GUARDRAIL_SUBGROUP_ID)
+            if bedrock_guardrail_general_subgroup.get_attribute('aria-expanded') == 'false':
+                bedrock_guardrail_general_subgroup.click()
+                self.operator.wait_for_element_attribute(BEDROCK_GUARDRAIL_SUBGROUP_ID, 'aria-expanded', 'true')
 
         except selenium.common.exceptions.ElementClickInterceptedException:
             # The exception above happens when a window obscures the settings page,
