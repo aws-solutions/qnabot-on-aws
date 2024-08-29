@@ -147,10 +147,18 @@ async function invoke_lambda(prompt, model_params, settings) {
 
 async function invoke_bedrock(prompt, model_params, settings) {
     const modelId = settings.LLM_MODEL_ID;
-    const response = await invokeBedrockModel(modelId, model_params, prompt);
-    qnabot.debug(`Bedrock LLM response: ${response}`);
+    const guardrails = {};
+    const guardrailIdentifier = settings.BEDROCK_GUARDRAIL_IDENTIFIER.trim();
+    const guardrailVersion = settings.BEDROCK_GUARDRAIL_VERSION.toString();
+
+    if (guardrailIdentifier !== '' && guardrailVersion !== '') {
+        guardrails.guardrailIdentifier = guardrailIdentifier;
+        guardrails.guardrailVersion = guardrailVersion;
+    };  
+    const response = await invokeBedrockModel(modelId, model_params, prompt, guardrails);
+    qnabot.log(`Bedrock Invoke LLM Response: ${response}`);
     return sanitize(response);
-}
+};
 
 function clean_standalone_query(query) {
     let clean_query = query;

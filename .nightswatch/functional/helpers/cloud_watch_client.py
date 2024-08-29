@@ -21,7 +21,7 @@ class CloudWatchClient:
     Interacts with CloudWatch using Boto3.
     This class provides methods for pulling logs from log groups based on matches.
     """
-    def __init__(self, region: str, fulfillment_lambda_name: str):
+    def __init__(self, region: str, stack_id: str, stack_name: str):
         """
         Initializes the CloudWatchClient.
         :param region: The AWS region to connect to.
@@ -29,7 +29,7 @@ class CloudWatchClient:
         """
         self.client = boto3.client('logs', region_name=region)
         self.region = region
-        self.fulfillment_lambda_log_group = f'/aws/lambda/{fulfillment_lambda_name}'
+        self.fulfillment_lambda_log_group = f'/aws/lambda/{stack_name}-FulfillmentLambda-{stack_id}'
         self.start_time = int(time.time() * 1000)
 
     def __get_logs(self, log_group_name: str, start_time: int, filter_pattern: str) -> dict:

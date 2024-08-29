@@ -18,6 +18,7 @@
     "PrivateQnABotSettings":"${PrivateQnABotSettings}",
     "CustomQnABotSettings":"${CustomQnABotSettings}",
     "KendraCrawlerSnsTopic":"${KendraCrawlerSnsTopic}",
+    "SolutionHelper": "${SolutionHelper}",
     "Id":"$stageVariables.Id",
     "_links":{
         "root":{

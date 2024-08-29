@@ -33,6 +33,31 @@ module.exports = {
             SourceArn: { 'Fn::GetAtt': ['UserPool', 'Arn'] },
         },
     },
+    MessageLambdaLogGroup: {
+        Type: 'AWS::Logs::LogGroup',
+        Properties: {
+            LogGroupName: {
+                'Fn::Join': [
+                    '-',
+                    [
+                        { 'Fn::Sub': '/aws/lambda/${AWS::StackName}-MessageLambda' },
+                        { 'Fn::Select': ['2', { 'Fn::Split': ['/', { Ref: 'AWS::StackId' }] }] },
+                    ],
+                ],
+            },
+
+            RetentionInDays: {
+                'Fn::If': [
+                    'LogRetentionPeriodIsNotZero',
+                    { Ref: 'LogRetentionPeriod' },
+                    { Ref: 'AWS::NoValue' },
+                ],
+            },
+        },
+        Metadata: {
+            guard: util.cfnGuard('CLOUDWATCH_LOG_GROUP_ENCRYPTED', 'CW_LOGGROUP_RETENTION_PERIOD_CHECK'),
+        },
+    },
     MessageLambda: {
         Type: 'AWS::Lambda::Function',
         Properties: {
@@ -40,6 +65,9 @@ module.exports = {
                 ZipFile: fs.readFileSync(`${__dirname}/message.js`, 'utf8'),
             },
             Handler: 'index.handler',
+            LoggingConfig: {
+                LogGroup: { Ref: 'MessageLambdaLogGroup' },
+            },
             MemorySize: '128',
             Environment: {
                 Variables: {
@@ -84,6 +112,30 @@ module.exports = {
             guard: util.cfnGuard('LAMBDA_CONCURRENCY_CHECK', 'LAMBDA_INSIDE_VPC'),
         },
     },
+    SignupLambdaLogGroup: {
+        Type: 'AWS::Logs::LogGroup',
+        Properties: {
+            LogGroupName: {
+                'Fn::Join': [
+                    '-',
+                    [
+                        { 'Fn::Sub': '/aws/lambda/${AWS::StackName}-SignupLambda' },
+                        { 'Fn::Select': ['2', { 'Fn::Split': ['/', { Ref: 'AWS::StackId' }] }] },
+                    ],
+                ],
+            },
+            RetentionInDays: {
+                'Fn::If': [
+                    'LogRetentionPeriodIsNotZero',
+                    { Ref: 'LogRetentionPeriod' },
+                    { Ref: 'AWS::NoValue' },
+                ],
+            },
+        },
+        Metadata: {
+            guard: util.cfnGuard('CLOUDWATCH_LOG_GROUP_ENCRYPTED', 'CW_LOGGROUP_RETENTION_PERIOD_CHECK'),
+        },
+    },
     SignupLambda: {
         Type: 'AWS::Lambda::Function',
         Properties: {
@@ -91,6 +143,9 @@ module.exports = {
                 ZipFile: fs.readFileSync(`${__dirname}/signup.js`, 'utf8'),
             },
             Handler: 'index.handler',
+            LoggingConfig: {
+                LogGroup: { Ref: 'SignupLambdaLogGroup' },
+            },
             MemorySize: '128',
             Environment: {
                 Variables: {

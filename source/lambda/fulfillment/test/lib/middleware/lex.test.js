@@ -38,36 +38,6 @@ describe('when calling parse function', () => {
             rejects.toThrowError('Error - inputTranscript contains only words specified in setting CONNECT_IGNORE_WORDS: "MockIgnore1 MockIgnore2"');
     });
 
-    test('should able to parse Lexv1 request successfully', async () => {
-        let parsedRequest = await lex.parse(lexFixtures.createRequestObject("What is QnABot", "LEX.LexWebUI.Text"));
-        expect(parsedRequest.question).toEqual("What is QnABot");
-        expect(parsedRequest._lexVersion).toEqual("V1");
-        expect(parsedRequest._userId).toEqual("mock_user_id");
-        expect(parsedRequest.intentname).toEqual("mockIntent");
-
-        //Request containing some ignore words
-        const mockRequest = lexFixtures.createRequestObject("MockIgnore1 MockIgnore2", "LEX.AmazonConnect.Text", "V1");
-        mockRequest._settings.CONNECT_IGNORE_WORDS = "MockIgnore1"
-        parsedRequest = await lex.parse(mockRequest);
-        expect(parsedRequest.question).toEqual("MockIgnore1 MockIgnore2");
-        expect(parsedRequest._lexVersion).toEqual("V1");
-    });
-
-    test('should able to parse Lexv1 request with sessionAttributes successfully', async () => {
-        let parsedRequest = await lex.parse(lexFixtures.createRequestObject("What is QnABot", "LEX.LexWebUI.Text", "V1"));
-        expect(parsedRequest.question).toEqual("What is QnABot");
-        expect(parsedRequest._lexVersion).toEqual("V1");
-        expect(parsedRequest._userId).toEqual("mock_user_id");
-        expect(parsedRequest.intentname).toEqual("mockIntent");
-
-        const mockRequest = lexFixtures.createRequestObject("What is QnABot", "LEX.LexWebUI.Text", "V1");
-        mockRequest._event.sessionAttributes = { "mockField": "{\"key1\": \"val1\" }" };
-        parsedRequest = await lex.parse(mockRequest);
-        expect(parsedRequest.question).toEqual("What is QnABot");
-        expect(parsedRequest._lexVersion).toEqual("V1");
-        expect(parsedRequest.session).toEqual({ "mockField": { "key1": "val1" } });
-    });
-
     test('should able to parse Lexv2 request successfully', async () => {
         let parsedRequest = await lex.parse(lexFixtures.createRequestObject("What is QnABot", "LEX.LexWebUI.Text", "V2"));
         expect(parsedRequest.question).toEqual("What is QnABot");
@@ -126,75 +96,6 @@ describe('when calling parse function', () => {
 describe('when calling assemble function', () => {
     afterEach(() => {
         jest.clearAllMocks();
-    });
-
-    // LexV1 Tests
-    test('should be able to assemble Lexv1 response successfully', () => {
-        const assembledResponse = lex.assemble(lexFixtures.createRequestObject("What is QnABot", "LEX.LexWebUI.Text", "V1"),
-            lexFixtures.createResponseObject());
-        expect(assembledResponse.dialogAction.type).toEqual("Close");
-        expect(assembledResponse.dialogAction.fulfillmentState).toEqual("Fulfilled");
-        expect(assembledResponse.dialogAction.message.content).toEqual("The Q and A Bot uses Amazon Lex and Alexa to provide a natural language interface for your FAQ knowledge base, so your users can just ask a question and get a quick and relevant answer.");
-
-    });
-
-    test('should be able to assemble Lexv1 with _clientType as LEX.Slack.Text', () => {
-        let assembledResponse = lex.assemble(lexFixtures.createRequestObject("What is QnABot", "LEX.Slack.Text", "V1"),
-            lexFixtures.createResponseObject());
-        expect(assembledResponse.dialogAction.type).toEqual("Close");
-        expect(assembledResponse.dialogAction.fulfillmentState).toEqual("Fulfilled");
-        expect(assembledResponse.dialogAction.message.content).toEqual("*QnaBot*\n\nThe Q and A Bot uses <https://aws.amazon.com/lex|Amazon Lex> and <https://developer.amazon.com/alexa|Alexa> to provide a natural language interface for your FAQ knowledge base. Now your users can just ask a ​_question_​ and get a quick and relevant ​_answer_​.\n");
-
-        //with no markdown text
-        const mockResponse = lexFixtures.createResponseObject();
-        mockResponse.result.alt.markdown = "";
-        assembledResponse = lex.assemble(lexFixtures.createRequestObject("What is QnABot", "LEX.Slack.Text", "V1"),
-            mockResponse);
-        expect(assembledResponse.dialogAction.message.content).toEqual("The Q and A Bot uses Amazon Lex and Alexa to provide a natural language interface for your FAQ knowledge base, so your users can just ask a question and get a quick and relevant answer.");
-    });
-
-
-    test('LexV1 verify copyResponseCardtoSessionAttribute', () => {
-        const mockResponse = lexFixtures.createResponseObject(true);
-        mockResponse.card.buttons = [{ "text": "mockText", "value": "mockValue" }, { "text": "", "value": "" }];
-        const assembledResponse = lex.assemble(lexFixtures.createRequestObject("What is QnABot", "LEX.LexWebUI.Text", "V1"),
-            mockResponse);
-        expect(assembledResponse.dialogAction.fulfillmentState).toEqual("Fulfilled");
-        expect(assembledResponse.dialogAction.message.content).toEqual("The Q and A Bot uses Amazon Lex and Alexa to provide a natural language interface for your FAQ knowledge base, so your users can just ask a question and get a quick and relevant answer.");
-        expect(assembledResponse.dialogAction.responseCard).toEqual({
-            "version": "1",
-            "contentType": "application/vnd.amazonaws.card.generic",
-            "genericAttachments": [
-                {
-                    "title": "mock_title", "buttons": [{ "text": "mockText", "value": "mockValue" }]
-                }
-            ]
-        });
-    });
-
-    test('verify LexV1 buildV1InteractiveMessageResponse', () => {
-        const assembledResponse = lex.assemble(lexFixtures.createRequestObject("What is QnABot", "LEX.AmazonConnect.Text", "V1", "testIntent"),
-            lexFixtures.createResponseObject(true));
-        expect(assembledResponse.dialogAction.type).toEqual("ElicitSlot");
-        expect(assembledResponse.dialogAction.intentName).toEqual("testIntent");
-        expect(assembledResponse.dialogAction.message.content).toEqual('{\"templateType\":\"ListPicker\",\"version\":\"1.0\",\"data\":{\"content\":{\"title\":\"The Q and A Bot uses Amazon Lex and Alexa to provide a natural language interface for your FAQ knowledge base, so your users can just ask a question and get a quick and relevant answer.\",\"elements\":[{\"title\":\"mockText\"}],\"subtitle\":\"mock_title\"}}}');
-    });
-
-    test('verify LexV1 elicit Response', () => {
-        let mockResponse = lexFixtures.createResponseObject();
-        mockResponse.session.qnabotcontext = "{\"elicitResponse\": {\"responsebot\": \"mock_response_bot\", \"responsetext\": \"mock_response_text\"}}"
-        let assembledResponse = lex.assemble(lexFixtures.createRequestObject("What is QnABot", "LEX.LexWebUI.Text", "V1", "testIntent"),
-            mockResponse);
-        expect(assembledResponse.dialogAction.type).toEqual("ElicitSlot");
-        expect(assembledResponse.dialogAction.intentName).toEqual("testIntent");
-        expect(assembledResponse.dialogAction.message.content).toEqual('The Q and A Bot uses Amazon Lex and Alexa to provide a natural language interface for your FAQ knowledge base, so your users can just ask a question and get a quick and relevant answer.');
-
-        mockResponse.session.qnabotcontext = "{\"specialtyBot\": \"testBot\"}"
-        assembledResponse = lex.assemble(lexFixtures.createRequestObject("What is QnABot", "LEX.LexWebUI.Text", "V1", "testIntent"),
-            mockResponse);
-        expect(assembledResponse.dialogAction.type).toEqual("ElicitSlot");
-        expect(assembledResponse.dialogAction.intentName).toEqual("testIntent");
-        expect(assembledResponse.dialogAction.message.content).toEqual('The Q and A Bot uses Amazon Lex and Alexa to provide a natural language interface for your FAQ knowledge base, so your users can just ask a question and get a quick and relevant answer.');
     });
 
     // LexV2 Tests
@@ -325,8 +226,6 @@ describe('when calling assemble function', () => {
             }
         });
     });
-
-
 
     test('verify LexV2 ImageResponseCard response', () => {
         const mockRequest = lexFixtures.createRequestObject("What is QnABot", "LEX.LexWebUI.Text", "V2");

@@ -53,6 +53,7 @@ describe('test start function', () => {
             parts: ['part']
         };
         const expectedConfig = {
+            bucket: 'contentdesigneroutputbucket',
             index: 'index',
             filter: 'filter',
             status: 'InProgress',
@@ -78,6 +79,7 @@ describe('test start function', () => {
             parts: ['part']
         };
         const expectedConfig = {
+            bucket: 'contentdesigneroutputbucket',
             index: 'index',
             filter: null,
             status: 'InProgress',

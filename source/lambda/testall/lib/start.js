@@ -20,6 +20,7 @@ module.exports = async function (config) {
         config.status = 'InProgress';
         config.startDate = (new Date()).toString();
         config.parts = [];
+        config.bucket = process.env.OUTPUT_S3_BUCKET;
 
         return await load(config, {
             endpoint: process.env.ES_ENDPOINT,

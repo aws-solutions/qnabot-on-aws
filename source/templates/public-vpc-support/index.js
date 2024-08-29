@@ -24,10 +24,6 @@ module.exports = Promise.resolve(require('../master')).then((base) => {
         'ClientURL',
         'DashboardURL',
         'UserPoolURL',
-        'LexV1BotName',
-        'LexV1BotAlias',
-        'LexV1Intent',
-        'LexV1IntentFallback',
         'LexV2BotName',
         'LexV2BotId',
         'LexV2BotAlias',
@@ -40,6 +36,8 @@ module.exports = Promise.resolve(require('../master')).then((base) => {
         'OpenSearchEndpoint',
         'ElasticsearchIndex',
         'MetricsBucket',
+        'TestAllBucket',
+        'ContentDesignerOutputBucket'
     ]);
     base.Parameters = _.pick(base.Parameters, [
         'Email',
@@ -74,6 +72,7 @@ module.exports = Promise.resolve(require('../master')).then((base) => {
         'LLMLambdaArn',
         'BedrockKnowledgeBaseId',
         'BedrockKnowledgeBaseModel',
+        'LogRetentionPeriod',
     ]);
     base.Metadata = {
         'AWS::CloudFormation::Interface': {

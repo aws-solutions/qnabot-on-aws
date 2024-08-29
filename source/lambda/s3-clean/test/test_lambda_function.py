@@ -14,7 +14,7 @@
 import unittest
 from unittest import mock
 import boto3
-from moto import mock_s3
+from moto import mock_aws
 
 bucket_name = 'test-bucket'
 object_key = f'{bucket_name}/test-key'
@@ -42,7 +42,7 @@ def mocked_cf_event_non_existent_bucket(*args, **kwargs):
         }
     }
 
-@mock_s3
+@mock_aws
 class LambdaTest(unittest.TestCase):
 
     def setUp(self):

@@ -84,3 +84,4 @@ For an example implementation using Lambda Hook -- refer to this [example](../..
 -   The `Makefile` residing in the extensions folder creates separate zip packages for each separate Lambda hook function
 -   Lambda hook functions use nodejs18.x or python3.10 only at this time
 -   Lambda hook functions will be allocated 2048MB memory (defined in index.js)
+-   LexV2 has a timeout limit on [RecognizeText](https://w.amazon.com/bin/view/AWS/Solutions/SolutionsTeam/BuilderBestPractices/NightsWatchUserGuide) fulfillment. If the QnABot fulfillment processing (including lambda hook) exceeds this timeout limit, then LexV2 will timeout the request.

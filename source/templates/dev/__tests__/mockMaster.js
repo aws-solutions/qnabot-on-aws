@@ -30,9 +30,6 @@ module.exports = {
         AltSearchKendraIndexAuth: {
             Default: 'test',
         },
-        LexBotVersion: {
-            Default: 'test',
-        },
         FulfillmentConcurrency: {
             Default: 'test',
         },
@@ -77,6 +74,9 @@ module.exports = {
         },
         LLMLambdaArn: {
             Default: '0000000000000000000000000000000000000:function:test',
+        },
+        LogRetentionPeriod: {
+            Default: 0
         },
         VPCSubnetIdList: {
             Default: 'test',

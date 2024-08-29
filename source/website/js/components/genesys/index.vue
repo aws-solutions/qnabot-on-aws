@@ -47,22 +47,22 @@ v-container
             v-card(flat)
               v-card-title(class="text-center") {{ steps[2].title }}
               v-card-text(v-html="steps[2].text")
-              v-card-actions
-                v-btn(
-                    :id="steps[2].buttons[0].id"
-                    :loading="steps[2].buttons[0].loading"
-                    @click="copy(steps[2].buttons[0])"
-                ) {{ steps[2].buttons[0].text }}
+              img(
+                  v-if="steps[2].image"
+                  :src="steps[2].image"
+                  style="max-width:75%;display:block;margin:auto;"
+                  contain
+                )
           template(#item.4)
             v-card(flat)
               v-card-title(class="text-center") {{ steps[3].title }}
               v-card-text(v-html="steps[3].text")
-              img(
-                  v-if="steps[3].image"
-                  :src="steps[3].image"
-                  style="max-width:75%;display:block;margin:auto;"
-                  contain
-                )
+              v-card-actions
+                v-btn(
+                    :id="steps[3].buttons[0].id"
+                    :loading="steps[3].buttons[0].loading"
+                    @click="copy(steps[3].buttons[0])"
+                ) {{ steps[3].buttons[0].text }}
           template(#item.5)
             v-card(flat)
               v-card-title(class="text-center") {{ steps[4].title }}

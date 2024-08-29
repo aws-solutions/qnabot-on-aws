@@ -25,22 +25,11 @@ module.exports = {
                         Key: {
                             FilterRules: [{
                                 Name: 'prefix',
-                                Value: 'status',
+                                Value: 'status-export',
                             }],
                         },
                     },
-                }, {
-                    LambdaFunctionArn: { 'Fn::GetAtt': ['KendraSyncLambda', 'Arn'] },
-                    Events: ['s3:ObjectCreated:*'],
-                    Filter: {
-                        Key: {
-                            FilterRules: [{
-                                Name: 'prefix',
-                                Value: 'kendra-data',
-                            }],
-                        },
-                    },
-                },
+                }
                 ],
             },
         },
@@ -55,6 +44,28 @@ module.exports = {
             SourceArn: { 'Fn::Sub': 'arn:aws:s3:::${ExportBucket}' },
         },
     },
+    KendraSyncS3Trigger: {
+        Type: 'Custom::S3Lambda',
+        Properties: {
+            ServiceToken: { Ref: 'CFNLambda' },
+            Bucket: { Ref: 'ContentDesignerOutputBucket' },
+            NotificationConfiguration: {
+                LambdaFunctionConfigurations: [{
+                    LambdaFunctionArn: { 'Fn::GetAtt': ['KendraSyncLambda', 'Arn'] },
+                    Events: ['s3:ObjectCreated:*'],
+                    Filter: {
+                        Key: {
+                            FilterRules: [{
+                                Name: 'prefix',
+                                Value: 'kendra-data-export',
+                            }],
+                        },
+                    },
+                },
+                ],
+            },
+        },
+    },    
     KendraSyncPermission: {
         Type: 'AWS::Lambda::Permission',
         Properties: {
@@ -62,7 +73,7 @@ module.exports = {
             Action: 'lambda:InvokeFunction',
             Principal: 's3.amazonaws.com',
             SourceAccount: { Ref: 'AWS::AccountId' },
-            SourceArn: { 'Fn::Sub': 'arn:aws:s3:::${ExportBucket}' },
+            SourceArn: { 'Fn::Sub': 'arn:aws:s3:::${ContentDesignerOutputBucket}' },
         },
     },
 

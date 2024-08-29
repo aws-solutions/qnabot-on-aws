@@ -171,6 +171,7 @@ export default {
                     locale: this.selectedLocale,
                     token,
                 });
+                await new Promise(resolve => setTimeout(resolve, 3000));
                 await this.refresh();
             } catch (e) {
                 this.error = err;

@@ -28,7 +28,30 @@ module.exports = {
             BuildDate: (new Date()).toISOString(),
         },
     },
-
+    UtteranceLambdaLogGroup: {
+        Type: 'AWS::Logs::LogGroup',
+        Properties: {
+            LogGroupName: {
+                'Fn::Join': [
+                    '-',
+                    [
+                        { 'Fn::Sub': '/aws/lambda/${AWS::StackName}-UtteranceLambda' },
+                        { 'Fn::Select': ['2', { 'Fn::Split': ['/', { Ref: 'AWS::StackId' }] }] },
+                    ],
+                ],
+            },
+            RetentionInDays: {
+                'Fn::If': [
+                    'LogRetentionPeriodIsNotZero',
+                    { Ref: 'LogRetentionPeriod' },
+                    { Ref: 'AWS::NoValue' },
+                ],
+            },
+        },
+        Metadata: {
+            guard: util.cfnGuard('CLOUDWATCH_LOG_GROUP_ENCRYPTED', 'CW_LOGGROUP_RETENTION_PERIOD_CHECK'),
+        },
+    },
     UtteranceLambda: {
         Type: 'AWS::Lambda::Function',
         Properties: {
@@ -51,6 +74,9 @@ module.exports = {
                 },
             },
             Handler: 'index.utterances',
+            LoggingConfig: {
+                LogGroup: { Ref: 'UtteranceLambdaLogGroup' },
+            },
             MemorySize: '1408',
             Role: { 'Fn::GetAtt': ['ESProxyLambdaRole', 'Arn'] },
             Runtime: process.env.npm_package_config_lambdaRuntime,
@@ -75,6 +101,30 @@ module.exports = {
             guard: util.cfnGuard('LAMBDA_CONCURRENCY_CHECK', 'LAMBDA_INSIDE_VPC'),
         },
     },
+    ESQidLambdaLogGroup: {
+        Type: 'AWS::Logs::LogGroup',
+        Properties: {
+            LogGroupName: {
+                'Fn::Join': [
+                    '-',
+                    [
+                        { 'Fn::Sub': '/aws/lambda/${AWS::StackName}-ESQidLambda' },
+                        { 'Fn::Select': ['2', { 'Fn::Split': ['/', { Ref: 'AWS::StackId' }] }] },
+                    ],
+                ],
+            },
+            RetentionInDays: {
+                'Fn::If': [
+                    'LogRetentionPeriodIsNotZero',
+                    { Ref: 'LogRetentionPeriod' },
+                    { Ref: 'AWS::NoValue' },
+                ],
+            },
+        },
+        Metadata: {
+            guard: util.cfnGuard('CLOUDWATCH_LOG_GROUP_ENCRYPTED', 'CW_LOGGROUP_RETENTION_PERIOD_CHECK'),
+        },
+    },
     ESQidLambda: {
         Type: 'AWS::Lambda::Function',
         Properties: {
@@ -91,10 +141,13 @@ module.exports = {
                 Variables: {
                     ES_INDEX: { 'Fn::GetAtt': ['Var', 'QnaIndex'] },
                     ES_ADDRESS: { 'Fn::GetAtt': ['ESVar', 'ESAddress'] },
-                    ...util.getCommonEnvironmentVariables()
+                    ...util.getCommonEnvironmentVariables(),
                 },
             },
             Handler: 'index.qid',
+            LoggingConfig: {
+                LogGroup: { Ref: 'ESQidLambdaLogGroup' },
+            },
             MemorySize: '1408',
             Role: { 'Fn::GetAtt': ['ESProxyLambdaRole', 'Arn'] },
             Runtime: process.env.npm_package_config_lambdaRuntime,
@@ -117,6 +170,30 @@ module.exports = {
         Metadata: {
             cfn_nag: util.cfnNag(['W92']),
             guard: util.cfnGuard('LAMBDA_CONCURRENCY_CHECK', 'LAMBDA_INSIDE_VPC'),
+        },
+    },
+    ESCleaningLambdaLogGroup: {
+        Type: 'AWS::Logs::LogGroup',
+        Properties: {
+            LogGroupName: {
+                'Fn::Join': [
+                    '-',
+                    [
+                        { 'Fn::Sub': '/aws/lambda/${AWS::StackName}-ESCleaningLambda' },
+                        { 'Fn::Select': ['2', { 'Fn::Split': ['/', { Ref: 'AWS::StackId' }] }] },
+                    ],
+                ],
+            },
+            RetentionInDays: {
+                'Fn::If': [
+                    'LogRetentionPeriodIsNotZero',
+                    { Ref: 'LogRetentionPeriod' },
+                    { Ref: 'AWS::NoValue' },
+                ],
+            },
+        },
+        Metadata: {
+            guard: util.cfnGuard('CLOUDWATCH_LOG_GROUP_ENCRYPTED', 'CW_LOGGROUP_RETENTION_PERIOD_CHECK'),
         },
     },
     ESCleaningLambda: {
@@ -141,6 +218,9 @@ module.exports = {
                 },
             },
             Handler: 'index.cleanmetrics',
+            LoggingConfig: {
+                LogGroup: { Ref: 'ESCleaningLambdaLogGroup' },
+            },
             MemorySize: '1408',
             Role: { 'Fn::GetAtt': ['ESProxyLambdaRole', 'Arn'] },
             Runtime: process.env.npm_package_config_lambdaRuntime,
@@ -186,6 +266,30 @@ module.exports = {
             SourceArn: { 'Fn::GetAtt': ['ScheduledESCleaning', 'Arn'] },
         },
     },
+    ESLoggingLambdaLogGroup: {
+        Type: 'AWS::Logs::LogGroup',
+        Properties: {
+            LogGroupName: {
+                'Fn::Join': [
+                    '-',
+                    [
+                        { 'Fn::Sub': '/aws/lambda/${AWS::StackName}-ESLoggingLambda' },
+                        { 'Fn::Select': ['2', { 'Fn::Split': ['/', { Ref: 'AWS::StackId' }] }] },
+                    ],
+                ],
+            },
+            RetentionInDays: {
+                'Fn::If': [
+                    'LogRetentionPeriodIsNotZero',
+                    { Ref: 'LogRetentionPeriod' },
+                    { Ref: 'AWS::NoValue' },
+                ],
+            },
+        },
+        Metadata: {
+            guard: util.cfnGuard('CLOUDWATCH_LOG_GROUP_ENCRYPTED', 'CW_LOGGROUP_RETENTION_PERIOD_CHECK'),
+        },
+    },
     ESLoggingLambda: {
         Type: 'AWS::Lambda::Function',
         Properties: {
@@ -202,10 +306,13 @@ module.exports = {
             Environment: {
                 Variables: {
                     FIREHOSE_NAME: { Ref: 'GeneralKinesisFirehose' },
-                    ...util.getCommonEnvironmentVariables()
+                    ...util.getCommonEnvironmentVariables(),
                 },
             },
             Handler: 'index.logging',
+            LoggingConfig: {
+                LogGroup: { Ref: 'ESLoggingLambdaLogGroup' },
+            },
             MemorySize: '1408',
             Role: { 'Fn::GetAtt': ['ESLoggingLambdaRole', 'Arn'] },
             Runtime: process.env.npm_package_config_lambdaRuntime,
@@ -230,6 +337,30 @@ module.exports = {
             guard: util.cfnGuard('LAMBDA_CONCURRENCY_CHECK', 'LAMBDA_INSIDE_VPC'),
         },
     },
+    ESQueryLambdaLogGroup: {
+        Type: 'AWS::Logs::LogGroup',
+        Properties: {
+            LogGroupName: {
+                'Fn::Join': [
+                    '-',
+                    [
+                        { 'Fn::Sub': '/aws/lambda/${AWS::StackName}-ESQueryLambda' },
+                        { 'Fn::Select': ['2', { 'Fn::Split': ['/', { Ref: 'AWS::StackId' }] }] },
+                    ],
+                ],
+            },
+            RetentionInDays: {
+                'Fn::If': [
+                    'LogRetentionPeriodIsNotZero',
+                    { Ref: 'LogRetentionPeriod' },
+                    { Ref: 'AWS::NoValue' },
+                ],
+            },
+        },
+        Metadata: {
+            guard: util.cfnGuard('CLOUDWATCH_LOG_GROUP_ENCRYPTED', 'CW_LOGGROUP_RETENTION_PERIOD_CHECK'),
+        },
+    },
     ESQueryLambda: {
         Type: 'AWS::Lambda::Function',
         Properties: {
@@ -244,7 +375,7 @@ module.exports = {
                     PRIVATE_SETTINGS_PARAM: { Ref: 'PrivateQnABotSettings' },
                     CUSTOM_SETTINGS_PARAM: { Ref: 'CustomQnABotSettings' },
                     ...examples,
-                    ...util.getCommonEnvironmentVariables()
+                    ...util.getCommonEnvironmentVariables(),
                 },
             },
             Layers: [{ Ref: 'AwsSdkLayerLambdaLayer' },
@@ -252,6 +383,9 @@ module.exports = {
                 { Ref: 'EsProxyLambdaLayer' },
                 { Ref: 'QnABotCommonLambdaLayer' }],
             Handler: 'index.query',
+            LoggingConfig: {
+                LogGroup: { Ref: 'ESQueryLambdaLogGroup' },
+            },
             MemorySize: '1408',
             Role: { 'Fn::GetAtt': ['ESProxyLambdaRole', 'Arn'] },
             Runtime: process.env.npm_package_config_lambdaRuntime,
@@ -274,6 +408,30 @@ module.exports = {
         Metadata: {
             cfn_nag: util.cfnNag(['W92']),
             guard: util.cfnGuard('LAMBDA_CONCURRENCY_CHECK', 'LAMBDA_INSIDE_VPC'),
+        },
+    },
+    ESProxyLambdaLogGroup: {
+        Type: 'AWS::Logs::LogGroup',
+        Properties: {
+            LogGroupName: {
+                'Fn::Join': [
+                    '-',
+                    [
+                        { 'Fn::Sub': '/aws/lambda/${AWS::StackName}-ESProxyLambdaLogGroup' },
+                        { 'Fn::Select': ['2', { 'Fn::Split': ['/', { Ref: 'AWS::StackId' }] }] },
+                    ],
+                ],
+            },
+            RetentionInDays: {
+                'Fn::If': [
+                    'LogRetentionPeriodIsNotZero',
+                    { Ref: 'LogRetentionPeriod' },
+                    { Ref: 'AWS::NoValue' },
+                ],
+            },
+        },
+        Metadata: {
+            guard: util.cfnGuard('CLOUDWATCH_LOG_GROUP_ENCRYPTED', 'CW_LOGGROUP_RETENTION_PERIOD_CHECK'),
         },
     },
     ESProxyLambda: {
@@ -306,10 +464,13 @@ module.exports = {
                         ],
                     },
                     EMBEDDINGS_LAMBDA_ARN: { Ref: 'EmbeddingsLambdaArn' },
-                    ...util.getCommonEnvironmentVariables()
+                    ...util.getCommonEnvironmentVariables(),
                 },
             },
             Handler: 'index.handler',
+            LoggingConfig: {
+                LogGroup: { Ref: 'ESProxyLambdaLogGroup' },
+            },
             MemorySize: '1408',
             Role: { 'Fn::GetAtt': ['ESProxyLambdaRole', 'Arn'] },
             Runtime: process.env.npm_package_config_lambdaRuntime,
@@ -466,7 +627,7 @@ module.exports = {
                                                     'bedrock:InvokeModel',
                                                 ],
                                                 Resource: [
-                                                    { 'Fn::Sub': 'arn:${AWS::Partition}:bedrock:${AWS::Region}::foundation-model/${EmbeddingsBedrockModelId}' },
+                                                    { 'Fn::If': ['EmbeddingsBedrock', { 'Fn::Sub': ['arn:${AWS::Partition}:bedrock:${AWS::Region}::foundation-model/${ModelId}', {'ModelId': { 'Fn::FindInMap': ['BedrockDefaults', {'Ref' : 'EmbeddingsBedrockModelId'}, 'ModelID'] }}] }, { Ref: 'AWS::NoValue' }] },
                                                 ],
                                             },
                                             { Ref: 'AWS::NoValue' },

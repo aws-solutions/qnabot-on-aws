@@ -15,6 +15,30 @@ const fs = require('fs');
 const util = require('../../util');
 
 module.exports = {
+    LexProxyLambdaLogGroup:{
+        Type: 'AWS::Logs::LogGroup',
+        Properties: {
+            LogGroupName: {
+                'Fn::Join': [
+                    '-',
+                    [
+                        { 'Fn::Sub': '/aws/lambda/${AWS::StackName}-LexProxyLambda' },
+                        { 'Fn::Select': ['2', { 'Fn::Split': ['/', { Ref: 'AWS::StackId' }] }] },
+                    ],
+                ],
+            },
+            RetentionInDays: {
+                'Fn::If': [
+                    'LogRetentionPeriodIsNotZero',
+                    { Ref: 'LogRetentionPeriod' },
+                    { Ref: 'AWS::NoValue' },
+                ],
+            },
+        },
+        Metadata: {
+            guard: util.cfnGuard('CLOUDWATCH_LOG_GROUP_ENCRYPTED', 'CW_LOGGROUP_RETENTION_PERIOD_CHECK'),
+        },
+    },
     LexProxyLambda: {
         Type: 'AWS::Lambda::Function',
         Properties: {
@@ -23,10 +47,13 @@ module.exports = {
             },
             Environment: {
                 Variables: {
-                    ...util.getCommonEnvironmentVariables()
-                }
+                    ...util.getCommonEnvironmentVariables(),
+                },
             },
             Handler: 'index.handler',
+            LoggingConfig: {
+                LogGroup: { Ref: 'LexProxyLambdaLogGroup' },
+            },
             MemorySize: '128',
             Role: { 'Fn::GetAtt': ['LexProxyLambdaRole', 'Arn'] },
             Runtime: process.env.npm_package_config_lambdaRuntime,
@@ -43,7 +70,7 @@ module.exports = {
             },
             Layers: [
                 { Ref: 'AwsSdkLayerLambdaLayer' },
-                { Ref: 'CommonModulesLambdaLayer' }
+                { Ref: 'CommonModulesLambdaLayer' },
             ],
             Tags: [{
                 Key: 'Type',
@@ -55,6 +82,30 @@ module.exports = {
             guard: util.cfnGuard('LAMBDA_CONCURRENCY_CHECK', 'LAMBDA_INSIDE_VPC'),
         },
     },
+    LexStatusLambdaLogGroup:{
+        Type: 'AWS::Logs::LogGroup',
+        Properties: {
+            LogGroupName: {
+                'Fn::Join': [
+                    '-',
+                    [
+                        { 'Fn::Sub': '/aws/lambda/${AWS::StackName}-LexStatusLambda' },
+                        { 'Fn::Select': ['2', { 'Fn::Split': ['/', { Ref: 'AWS::StackId' }] }] },
+                    ],
+                ],
+            },
+            RetentionInDays: {
+                'Fn::If': [
+                    'LogRetentionPeriodIsNotZero',
+                    { Ref: 'LogRetentionPeriod' },
+                    { Ref: 'AWS::NoValue' },
+                ],
+            },
+        },
+        Metadata: {
+            guard: util.cfnGuard('CLOUDWATCH_LOG_GROUP_ENCRYPTED', 'CW_LOGGROUP_RETENTION_PERIOD_CHECK'),
+        },
+    },
     LexStatusLambda: {
         Type: 'AWS::Lambda::Function',
         Properties: {
@@ -64,7 +115,6 @@ module.exports = {
             Environment: {
                 Variables: {
                     STATUS_BUCKET: { Ref: 'BuildStatusBucket' },
-                    STATUS_KEY: { 'Fn::If': ['CreateLexV1Bots', 'status.json', { Ref: 'AWS::NoValue' }] },
                     LEXV2_STATUS_KEY: 'lexV2status.json',
                     FULFILLMENT_FUNCTION_ARN: {
                         'Fn::Join': [':', [
@@ -73,9 +123,6 @@ module.exports = {
                         ]],
                     },
                     FULFILLMENT_FUNCTION_ROLE: { Ref: 'FulfillmentLambdaRole' },
-                    LEXV1_BOT_NAME: { 'Fn::If': ['CreateLexV1Bots', { Ref: 'LexBot' }, { Ref: 'AWS::NoValue' }] },
-                    LEXV1_INTENT: { 'Fn::If': ['CreateLexV1Bots', { Ref: 'Intent' }, { Ref: 'AWS::NoValue' }] },
-                    LEXV1_INTENT_FALLBACK: { 'Fn::If': ['CreateLexV1Bots', { Ref: 'IntentFallback' }, { Ref: 'AWS::NoValue' }] },
                     LEXV2_BOT_NAME: { 'Fn::GetAtt': ['LexV2Bot', 'botName'] },
                     LEXV2_BOT_ID: { 'Fn::GetAtt': ['LexV2Bot', 'botId'] },
                     LEXV2_BOT_ALIAS: { 'Fn::GetAtt': ['LexV2Bot', 'botAlias'] },
@@ -83,10 +130,13 @@ module.exports = {
                     LEXV2_INTENT: { 'Fn::GetAtt': ['LexV2Bot', 'botIntent'] },
                     LEXV2_INTENT_FALLBACK: { 'Fn::GetAtt': ['LexV2Bot', 'botIntentFallback'] },
                     LEXV2_BOT_LOCALE_IDS: { 'Fn::GetAtt': ['LexV2Bot', 'botLocaleIds'] },
-                    ...util.getCommonEnvironmentVariables()
+                    ...util.getCommonEnvironmentVariables(),
                 },
             },
             Handler: 'index.handler',
+            LoggingConfig: {
+                LogGroup: { Ref: 'LexStatusLambdaLogGroup' },
+            },
             MemorySize: '128',
             Role: { 'Fn::GetAtt': ['LexProxyLambdaRole', 'Arn'] },
             Runtime: process.env.npm_package_config_lambdaRuntime,

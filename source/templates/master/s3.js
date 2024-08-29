@@ -102,6 +102,7 @@ module.exports = {
                             { 'Fn::Sub': 'arn:aws:s3:::${TestAllBucket}/*' },
                             { 'Fn::Sub': 'arn:aws:s3:::${Bucket}/*' },
                             { 'Fn::Sub': 'arn:aws:s3:::${AssetBucket}/*' },
+                            { 'Fn::Sub': 'arn:aws:s3:::${ContentDesignerOutputBucket}/*' },
                         ],
                     }, {
                         Effect: 'Allow',
@@ -111,6 +112,7 @@ module.exports = {
                         Resource: [
                             { 'Fn::Sub': 'arn:aws:s3:::${ExportBucket}/*' },
                             { 'Fn::Sub': 'arn:aws:s3:::${TestAllBucket}/*' },
+                            { 'Fn::Sub': 'arn:aws:s3:::${ContentDesignerOutputBucket}/*' },
                         ],
                     }, {
                         Effect: 'Allow',
@@ -121,6 +123,7 @@ module.exports = {
                             { 'Fn::Sub': 'arn:aws:s3:::${ImportBucket}/*' },
                             { 'Fn::Sub': 'arn:aws:s3:::${ExportBucket}/*' },
                             { 'Fn::Sub': 'arn:aws:s3:::${TestAllBucket}/*' },
+                            { 'Fn::Sub': 'arn:aws:s3:::${ContentDesignerOutputBucket}/*' },
                         ],
                     },
                     ],

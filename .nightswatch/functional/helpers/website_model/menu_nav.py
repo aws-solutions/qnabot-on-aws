@@ -33,6 +33,7 @@ SETTINGS_ID = 'page-link-settings'
 KENDRA_ID = 'page-link-kendraIndexing'
 CUSTOM_TERM_ID = 'page-link-customTranslate'
 CHAT_ID = 'page-link-client'
+TEST_ALL_ID = 'testAll-tab'
 
 class MenuNav:
     """Class representing a Menu Navigation Bar.
@@ -125,3 +126,9 @@ class MenuNav:
         time.sleep(5)
         self.operator.switch_windows()
         return ChatPage(self.operator)
+
+    def open_testall_page(self) -> None:
+        """Opens the TestAllPage through navigation bar."""
+
+        self.operator.click_element_by_id(TEST_ALL_ID, wait=10)
+        time.sleep(5)

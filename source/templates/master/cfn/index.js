@@ -16,6 +16,30 @@ const fs = require('fs');
 const util = require('../../util');
 
 module.exports = {
+    VersionLambdaLogGroup: {
+        Type: 'AWS::Logs::LogGroup',
+        Properties: {
+            LogGroupName: {
+                'Fn::Join': [
+                    '-',
+                    [
+                        { 'Fn::Sub': '/aws/lambda/${AWS::StackName}-VersionLambda' },
+                        { 'Fn::Select': ['2', { 'Fn::Split': ['/', { Ref: 'AWS::StackId' }] }] },
+                    ],
+                ],
+            },
+            RetentionInDays: {
+                'Fn::If': [
+                    'LogRetentionPeriodIsNotZero',
+                    { Ref: 'LogRetentionPeriod' },
+                    { Ref: 'AWS::NoValue' },
+                ],
+            },
+        },
+        Metadata: {
+            guard: util.cfnGuard('CLOUDWATCH_LOG_GROUP_ENCRYPTED', 'CW_LOGGROUP_RETENTION_PERIOD_CHECK'),
+        },
+    },
     VersionLambda: {
         Type: 'AWS::Lambda::Function',
         Properties: {
@@ -25,10 +49,13 @@ module.exports = {
             },
             Environment: {
                 Variables: {
-                    ...util.getCommonEnvironmentVariables()
+                    ...util.getCommonEnvironmentVariables(),
                 },
             },
             Handler: 'index.handler',
+            LoggingConfig: {
+                LogGroup: { Ref: 'VersionLambdaLogGroup' },
+            },
             MemorySize: '3008',
             Role: { 'Fn::GetAtt': ['CFNLambdaRole', 'Arn'] },
             Runtime: process.env.npm_package_config_lambdaRuntime,
@@ -62,6 +89,30 @@ module.exports = {
             BuildDate: (new Date()).toISOString(),
         },
     },
+    CFNLambdaLogGroup: {
+        Type: 'AWS::Logs::LogGroup',
+        Properties: {
+            LogGroupName: { 
+                'Fn::Join': [
+                    '-',
+                    [
+                        { 'Fn::Sub': '/aws/lambda/${AWS::StackName}-CFNLambda' },
+                        { 'Fn::Select': ['2', { 'Fn::Split': ['/', { Ref: 'AWS::StackId' }] }] },
+                    ],
+                ],
+            },
+            RetentionInDays: {
+                'Fn::If': [
+                    'LogRetentionPeriodIsNotZero',
+                    { Ref: 'LogRetentionPeriod' },
+                    { Ref: 'AWS::NoValue' },
+                ],
+            },
+        },
+        Metadata: {
+            guard: util.cfnGuard('CLOUDWATCH_LOG_GROUP_ENCRYPTED', 'CW_LOGGROUP_RETENTION_PERIOD_CHECK'),
+        },
+    },
     CFNLambda: {
         Type: 'AWS::Lambda::Function',
         Properties: {
@@ -77,10 +128,13 @@ module.exports = {
             },
             Environment: {
                 Variables: {
-                    ...util.getCommonEnvironmentVariables()
+                    ...util.getCommonEnvironmentVariables(),
                 }
             },
             Handler: 'index.handler',
+            LoggingConfig: {
+                LogGroup: { Ref: 'CFNLambdaLogGroup' },
+            },
             MemorySize: '3008',
             Role: { 'Fn::GetAtt': ['CFNLambdaRole', 'Arn'] },
             Runtime: process.env.npm_package_config_lambdaRuntime,

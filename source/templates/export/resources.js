@@ -35,6 +35,30 @@ module.exports = {
             BuildDate: new Date().toISOString(),
         },
     },
+    ConnectLambdaLogGroup: {
+        Type: 'AWS::Logs::LogGroup',
+        Properties: {
+            LogGroupName: {
+                'Fn::Join': [
+                    '-',
+                    [
+                        { 'Fn::Sub': '/aws/lambda/${AWS::StackName}-ConnectLambda' },
+                        { 'Fn::Select': ['2', { 'Fn::Split': ['/', { Ref: 'AWS::StackId' }] }] },
+                    ],
+                ],
+              },
+            RetentionInDays: {
+                'Fn::If': [
+                    'LogRetentionPeriodIsNotZero',
+                    { Ref: 'LogRetentionPeriod' },
+                    { Ref: 'AWS::NoValue' },
+                ],
+            },
+        },
+        Metadata: {
+            guard: util.cfnGuard('CLOUDWATCH_LOG_GROUP_ENCRYPTED', 'CW_LOGGROUP_RETENTION_PERIOD_CHECK'),
+        },
+    },
     ConnectLambda: {
         Type: 'AWS::Lambda::Function',
         Properties: {
@@ -50,10 +74,6 @@ module.exports = {
                     accountId: { Ref: 'AWS::AccountId' },
                     region: { Ref: 'AWS::Region' },
                     LexVersion: { Ref: 'LexVersion' },
-                    // Lex V1
-                    fallBackIntent: { Ref: 'FallbackIntent' },
-                    intent: { Ref: 'Intent' },
-                    lexBot: { Ref: 'BotName' },
                     // Lex V2
                     LexV2BotName: { Ref: 'LexV2BotName' },
                     LexV2BotId: { Ref: 'LexV2BotId' },
@@ -63,6 +83,9 @@ module.exports = {
                 },
             },
             Handler: 'index.handler',
+            LoggingConfig: {
+                LogGroup: { Ref: "ConnectLambdaLogGroup" },
+            },
             MemorySize: '1024',
             Role: { 'Fn::GetAtt': ['ExportRole', 'Arn'] },
             Runtime: process.env.npm_package_config_lambdaRuntime,
@@ -119,6 +142,30 @@ module.exports = {
             BuildDate: new Date().toISOString(),
         },
     },
+    GenesysLambdaLogGroup: {
+        Type: 'AWS::Logs::LogGroup',
+        Properties: {
+            LogGroupName: {
+                'Fn::Join': [
+                    '-',
+                    [
+                        { 'Fn::Sub': '/aws/lambda/${AWS::StackName}-GenesysLambda' },
+                        { 'Fn::Select': ['2', { 'Fn::Split': ['/', { Ref: 'AWS::StackId' }] }] },
+                    ],
+                ],
+            },
+            RetentionInDays: {
+                'Fn::If': [
+                    'LogRetentionPeriodIsNotZero',
+                    { Ref: 'LogRetentionPeriod' },
+                    { Ref: 'AWS::NoValue' },
+                ],
+            },
+        },
+        Metadata: {
+            guard: util.cfnGuard('CLOUDWATCH_LOG_GROUP_ENCRYPTED', 'CW_LOGGROUP_RETENTION_PERIOD_CHECK'),
+        },
+    },
     GenesysLambda: {
         Type: 'AWS::Lambda::Function',
         Properties: {
@@ -134,10 +181,6 @@ module.exports = {
                     accountId: { Ref: 'AWS::AccountId' },
                     region: { Ref: 'AWS::Region' },
                     LexVersion: { Ref: 'LexVersion' },
-                    // Lex V1
-                    fallBackIntent: { Ref: 'FallbackIntent' },
-                    intent: { Ref: 'Intent' },
-                    lexBot: { Ref: 'BotName' },
                     // Lex V2
                     LexV2BotName: { Ref: 'LexV2BotName' },
                     LexV2BotId: { Ref: 'LexV2BotId' },
@@ -147,6 +190,9 @@ module.exports = {
                 },
             },
             Handler: 'index.handler',
+            LoggingConfig: {
+                LogGroup: { Ref: 'GenesysLambdaLogGroup' },
+            },
             MemorySize: '1024',
             Role: { 'Fn::GetAtt': ['ExportRole', 'Arn'] },
             Runtime: process.env.npm_package_config_lambdaRuntime,
@@ -191,7 +237,7 @@ module.exports = {
             Action: 'lambda:InvokeFunction',
             FunctionName: { 'Fn::GetAtt': ['GenesysLambda', 'Arn'] },
             Principal: 'apigateway.amazonaws.com',
-            SourceAccount: { Ref: 'AWS::AccountId' }, 
+            SourceAccount: { Ref: 'AWS::AccountId' },
         },
     },
     Deployment: {
@@ -299,6 +345,30 @@ module.exports = {
             BuildDate: new Date().toISOString(),
         },
     },
+    ExportStepLambdaLogGroup: {
+        Type: 'AWS::Logs::LogGroup',
+        Properties: {
+            LogGroupName: {
+            'Fn::Join': [
+                '-',
+                [
+                { 'Fn::Sub': '/aws/lambda/${AWS::StackName}-ExportStepLambda' },
+                { 'Fn::Select': ['2', { 'Fn::Split': ['/', { Ref: 'AWS::StackId' }] }] },
+                ],
+            ],
+            },
+            RetentionInDays: {
+                'Fn::If': [
+                    'LogRetentionPeriodIsNotZero',
+                    { Ref: 'LogRetentionPeriod' },
+                    { Ref: 'AWS::NoValue' },
+                ],
+            },
+        },
+        Metadata: {
+            guard: util.cfnGuard('CLOUDWATCH_LOG_GROUP_ENCRYPTED', 'CW_LOGGROUP_RETENTION_PERIOD_CHECK'),
+        },
+    },
     ExportStepLambda: {
         Type: 'AWS::Lambda::Function',
         Properties: {
@@ -312,10 +382,14 @@ module.exports = {
                     ES_INDEX: { Ref: 'VarIndex' },
                     ES_ENDPOINT: { Ref: 'EsEndpoint' },
                     ES_PROXY: { Ref: 'EsProxyLambda' },
-                    ...util.getCommonEnvironmentVariables()
+                    OUTPUT_S3_BUCKET: { Ref: 'ContentDesignerOutputBucket' },
+                    ...util.getCommonEnvironmentVariables(),
                 },
             },
             Handler: 'index.step',
+            LoggingConfig: {
+                LogGroup: { Ref: 'ExportStepLambdaLogGroup' },
+            },
             MemorySize: '1024',
             Role: { 'Fn::GetAtt': ['ExportRole', 'Arn'] },
             Runtime: process.env.npm_package_config_lambdaRuntime,
@@ -389,7 +463,8 @@ module.exports = {
                             's3:DeleteObject',
                             's3:GetObjectVersion',
                         ],
-                        Resource: [{ 'Fn::Sub': 'arn:aws:s3:::${ExportBucket}*' }],
+                        Resource: [{ 'Fn::Sub': 'arn:aws:s3:::${ExportBucket}*' }, 
+                        { 'Fn::Sub': 'arn:aws:s3:::${ContentDesignerOutputBucket}*' }],
                     },
                     {
                         Effect: 'Allow',
@@ -408,6 +483,30 @@ module.exports = {
             Bucket: { Ref: 'ExportBucket' },
         },
     },
+    KendraSyncLambdaLogGroup: {
+        Type: 'AWS::Logs::LogGroup',
+        Properties: {
+            LogGroupName: {
+                'Fn::Join': [
+                    '-',
+                    [
+                        { 'Fn::Sub': '/aws/lambda/${AWS::StackName}-KendraSyncLambda' },
+                        { 'Fn::Select': ['2', { 'Fn::Split': ['/', { Ref: 'AWS::StackId' }] }] },
+                    ],
+                ],
+            },
+            RetentionInDays: {
+                'Fn::If': [
+                    'LogRetentionPeriodIsNotZero',
+                    { Ref: 'LogRetentionPeriod' },
+                    { Ref: 'AWS::NoValue' },
+                ],
+            },
+        },
+        Metadata: {
+            guard: util.cfnGuard('CLOUDWATCH_LOG_GROUP_ENCRYPTED', 'CW_LOGGROUP_RETENTION_PERIOD_CHECK'),
+        },
+    },
     KendraSyncLambda: {
         Type: 'AWS::Lambda::Function',
         Properties: {
@@ -421,7 +520,7 @@ module.exports = {
                     DEFAULT_SETTINGS_PARAM: { Ref: 'DefaultQnABotSettings' },
                     PRIVATE_SETTINGS_PARAM: { Ref: 'PrivateQnABotSettings' },
                     CUSTOM_SETTINGS_PARAM: { Ref: 'CustomQnABotSettings' },
-                    OUTPUT_S3_BUCKET: { Ref: 'ExportBucket' },
+                    OUTPUT_S3_BUCKET: { Ref: 'ContentDesignerOutputBucket' },
                     KENDRA_ROLE: { 'Fn::GetAtt': ['KendraS3Role', 'Arn'] },
                     REGION: { Ref: 'AWS::Region' },
                     ...util.getCommonEnvironmentVariables(),
@@ -429,6 +528,9 @@ module.exports = {
             },
             Layers: [{ Ref: 'AwsSdkLayerLambdaLayer' }, { Ref: 'QnABotCommonLambdaLayer' }],
             Handler: 'kendraSync.performSync',
+            LoggingConfig: {
+                LogGroup: { Ref: 'KendraSyncLambdaLogGroup' },
+            },
             MemorySize: '1024',
             Role: { 'Fn::GetAtt': ['KendraSyncRole', 'Arn'] },
             Runtime: process.env.npm_package_config_lambdaRuntime,
@@ -508,8 +610,8 @@ module.exports = {
                             's3:List*',
                         ],
                         Resource: [
-                            { 'Fn::Sub': 'arn:aws:s3:::${ExportBucket}' },
-                            { 'Fn::Sub': 'arn:aws:s3:::${ExportBucket}/*' },
+                            { 'Fn::Sub': 'arn:aws:s3:::${ContentDesignerOutputBucket}' },
+                            { 'Fn::Sub': 'arn:aws:s3:::${ContentDesignerOutputBucket}/*' },
                         ],
                     },
                     {
@@ -655,6 +757,30 @@ module.exports = {
             BuildDate: new Date().toISOString(),
         },
     },
+    TranslateLambdaLogGroup: {
+        Type: 'AWS::Logs::LogGroup',
+        Properties: {
+            LogGroupName: {
+            'Fn::Join': [
+                '-',
+                [
+                { 'Fn::Sub': '/aws/lambda/${AWS::StackName}-TranslateLambda' },
+                { 'Fn::Select': ['2', { 'Fn::Split': ['/', { Ref: 'AWS::StackId' }] }] },
+                ],
+            ],
+            },
+            RetentionInDays: {
+                'Fn::If': [
+                    'LogRetentionPeriodIsNotZero',
+                    { Ref: 'LogRetentionPeriod' },
+                    { Ref: 'AWS::NoValue' },
+                ],
+            },
+        },
+        Metadata: {
+            guard: util.cfnGuard('CLOUDWATCH_LOG_GROUP_ENCRYPTED', 'CW_LOGGROUP_RETENTION_PERIOD_CHECK'),
+        },
+    },
     TranslateLambda: {
         Type: 'AWS::Lambda::Function',
         Properties: {
@@ -670,6 +796,9 @@ module.exports = {
                 },
             },
             Handler: 'index.handler',
+            LoggingConfig: {
+                LogGroup: { Ref: 'TranslateLambdaLogGroup' },
+            },
             MemorySize: '1024',
             Role: { 'Fn::GetAtt': ['TranslateRole', 'Arn'] },
             Runtime: process.env.npm_package_config_lambdaRuntime,
@@ -874,8 +1003,8 @@ module.exports = {
                         Effect: 'Allow',
                         Action: ['s3:GetObject'],
                         Resource: [
-                            { 'Fn::Sub': 'arn:aws:s3:::${ExportBucket}' },
-                            { 'Fn::Sub': 'arn:aws:s3:::${ExportBucket}/*' },
+                            { 'Fn::Sub': 'arn:aws:s3:::${ContentDesignerOutputBucket}' },
+                            { 'Fn::Sub': 'arn:aws:s3:::${ContentDesignerOutputBucket}/*' },
                         ],
                     },
                     {
@@ -1021,6 +1150,30 @@ module.exports = {
             SourceAccount: { Ref: 'AWS::AccountId' }, 
         },
     },
+    KendraNativeCrawlerLambdaLogGroup: {
+        Type: 'AWS::Logs::LogGroup',
+        Properties: {
+            LogGroupName: {
+                'Fn::Join': [
+                    '-',
+                    [
+                        { 'Fn::Sub': '/aws/lambda/${AWS::StackName}-KendraNativeCrawlerLambda' },
+                        { 'Fn::Select': ['2', { 'Fn::Split': ['/', { Ref: 'AWS::StackId' }] }] },
+                    ],
+                ],
+            },
+            RetentionInDays: {
+                'Fn::If': [
+                    'LogRetentionPeriodIsNotZero',
+                    { Ref: 'LogRetentionPeriod' },
+                    { Ref: 'AWS::NoValue' },
+                ],
+            },
+        },
+        Metadata: {
+            guard: util.cfnGuard('CLOUDWATCH_LOG_GROUP_ENCRYPTED', 'CW_LOGGROUP_RETENTION_PERIOD_CHECK'),
+        },
+    },
     KendraNativeCrawlerLambda: {
         Type: 'AWS::Lambda::Function',
         Properties: {
@@ -1076,6 +1229,9 @@ module.exports = {
                 },
             },
             Handler: 'kendra_webcrawler.handler',
+            LoggingConfig: {
+                LogGroup: { Ref: 'KendraNativeCrawlerLambdaLogGroup' },
+            },
             MemorySize: '2048',
             Role: { 'Fn::GetAtt': ['KendraNativeCrawlerRole', 'Arn'] },
             Runtime: process.env.npm_package_config_pythonRuntime,
@@ -1108,6 +1264,30 @@ module.exports = {
             Bucket: { Ref: 'BootstrapBucket' },
             Key: { 'Fn::Sub': '${BootstrapPrefix}/lambda/kendra-webcrawler-schedule-updater.zip' },
             BuildDate: new Date().toISOString(),
+        },
+    },
+    KendraNativeCrawlerScheduleUpdateLambdaLogGroup: {
+        Type: 'AWS::Logs::LogGroup',
+        Properties: {
+            LogGroupName: {
+            'Fn::Join': [
+                '-',
+                [
+                { 'Fn::Sub': '/aws/lambda/${AWS::StackName}-KendraNativeCrawlerScheduleUpdateLambda' },
+                { 'Fn::Select': ['2', { 'Fn::Split': ['/', { Ref: 'AWS::StackId' }] }] },
+                ],
+            ],
+            },
+            RetentionInDays: {
+                'Fn::If': [
+                    'LogRetentionPeriodIsNotZero',
+                    { Ref: 'LogRetentionPeriod' },
+                    { Ref: 'AWS::NoValue' },
+                ],
+            },
+        },
+        Metadata: {
+            guard: util.cfnGuard('CLOUDWATCH_LOG_GROUP_ENCRYPTED', 'CW_LOGGROUP_RETENTION_PERIOD_CHECK'),
         },
     },
     KendraNativeCrawlerScheduleUpdateLambda: {
@@ -1153,6 +1333,9 @@ module.exports = {
                 },
             },
             Handler: 'kendra_webcrawler_schedule_updater.handler',
+            LoggingConfig: {
+                LogGroup: { Ref: 'KendraNativeCrawlerScheduleUpdateLambdaLogGroup' },
+            },
             MemorySize: '2048',
             Role: { 'Fn::GetAtt': ['KendraNativeCrawlerRole', 'Arn'] },
             Runtime: process.env.npm_package_config_pythonRuntime,
@@ -1167,6 +1350,30 @@ module.exports = {
         Metadata: {
             cfn_nag: util.cfnNag(['W92']),
             guard: util.cfnGuard('LAMBDA_CONCURRENCY_CHECK', 'LAMBDA_INSIDE_VPC'),
+        },
+    },
+    KendraNativeCrawlerStatusLambdaLogGroup: {
+        Type: 'AWS::Logs::LogGroup',
+        Properties: {
+            LogGroupName: {
+                'Fn::Join': [
+                    '-',
+                    [
+                        { 'Fn::Sub': '/aws/lambda/${AWS::StackName}-KendraNativeCrawlerStatusLambda' },
+                        { 'Fn::Select': ['2', { 'Fn::Split': ['/', { Ref: 'AWS::StackId' }] }] },
+                    ],
+                ],
+            },
+            RetentionInDays: {
+                'Fn::If': [
+                    'LogRetentionPeriodIsNotZero',
+                    { Ref: 'LogRetentionPeriod' },
+                    { Ref: 'AWS::NoValue' },
+                ],
+            },
+        },
+        Metadata: {
+            guard: util.cfnGuard('CLOUDWATCH_LOG_GROUP_ENCRYPTED', 'CW_LOGGROUP_RETENTION_PERIOD_CHECK'),
         },
     },
     KendraNativeCrawlerStatusLambda: {
@@ -1223,6 +1430,9 @@ module.exports = {
                 },
             },
             Handler: 'kendra_webcrawler_status.handler',
+            LoggingConfig: {
+                LogGroup: { Ref: 'KendraNativeCrawlerStatusLambdaLogGroup' },
+            },
             MemorySize: '2048',
             Role: { 'Fn::GetAtt': ['KendraNativeCrawlerRole', 'Arn'] },
             Runtime: process.env.npm_package_config_pythonRuntime,

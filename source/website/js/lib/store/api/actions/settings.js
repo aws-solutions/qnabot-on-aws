@@ -12,6 +12,7 @@
  ******************************************************************************************************************** */
 const _ = require('lodash');
 const { SSMClient, GetParameterCommand, GetParametersCommand, PutParameterCommand } = require('@aws-sdk/client-ssm');
+const { LambdaClient, InvokeCommand } = require('@aws-sdk/client-lambda');
 const util = require('../../../../capability/util');
 
 const chatbotTestingIndex = 0;
@@ -489,6 +490,22 @@ const settingsMap = {
                     },
                 ],
             },
+            bedrockGuardrails: {
+                id: 'text_generation_guardrail_subgroup',
+                label: 'Guardrail for Amazon Bedrock and Knowledge Base Integrations',
+                collapsed: true,
+                members: [
+
+                    {
+                        id: 'BEDROCK_GUARDRAIL_IDENTIFIER',
+                        hint: 'Enter a pre-configurated Bedrock Guardrail identifier (e.g. 4ojm24q0yada) that you want to be applied to the requests made to the LLM models configured in CloudFormation parameters LLMBedrockModelId and BedrockKnowledgeBaseModel. If you don\'t provide a value, no guardrail is applied to the LLM invocation. If you provide a identifier, you must also provide a BEDROCK_GUARDRAIL_VERSION',
+                    },
+                    {
+                        id: 'BEDROCK_GUARDRAIL_VERSION',
+                        hint: 'Enter the version (e.g. 1 or DRAFT) of the guardrail specifed in BEDROCK_GUARDRAIL_IDENTIFIER',
+                    },
+                ],
+            },
             kendraSettings: {
                 id: 'amazon_kendra_subgroup',
                 label: 'Retrieval Augmented Generation (RAG) with Amazon Kendra',
@@ -545,6 +562,11 @@ const settingsMap = {
                 collapsed: true,
                 members: [
                     {
+                        id: 'KNOWLEDGE_BASE_PROMPT_TEMPLATE',
+                        type: 'textarea',
+                        hint: 'The template used to construct a prompt that is sent to the model for response generation. To opt out of sending a prompt to the Knowledge Base model, simply leave this field empty. For more information, see Bedrock Knowledge base (https://docs.aws.amazon.com/bedrock/latest/userguide/knowledge-base.html)',
+                    },
+                    {
                         id: 'KNOWLEDGE_BASE_PREFIX_MESSAGE',
                         hint: 'Message used to prefix a Knowledge Base generated answer',
                     },
@@ -562,6 +584,25 @@ const settingsMap = {
                         id: 'KNOWLEDGE_BASE_S3_SIGNED_URL_EXPIRE_SECS',
                         type: 'number',
                         hint: 'Determines length of time in seconds for the validity of signed S3 Urls for Bedrock Knowledge Base answers',
+                    },
+                    {
+                        id: 'KNOWLEDGE_BASE_MODEL_PARAMS',
+                        hint: 'Customize the knowledge base model by providing inference parameters (e.g. anthropic model parameters can be customized as `{"temperature":0.1}` or `{"temperature":0.3, "maxTokens": 262, "topP":0.9, "top_k": 240 }`). For more information, please refer to Inference parameters (https://docs.aws.amazon.com/bedrock/latest/userguide/kb-test-config.html)',
+                    },
+                    {
+                        id: 'KNOWLEDGE_BASE_MAX_NUMBER_OF_RETRIEVED_RESULTS',
+                        type: 'number',
+                        hint: 'Sets maximum number of retrieved result where each result corresponds to a source chunk. When querying a knowledge base, Amazon Bedrock returns up to five results by default. For more information, please refer to Maximum number of retrieved results (https://docs.aws.amazon.com/bedrock/latest/userguide/kb-test-config.html)',
+                    },
+                    {
+                        id: 'KNOWLEDGE_BASE_SEARCH_TYPE',
+                        type: 'enum',
+                        enums: ['DEFAULT', 'HYBRID', 'SEMANTIC'],
+                        hint: 'Select the search type which defines how data sources in the knowledge base are queried. If using an Amazon OpenSearch Serverless vector store that contains a filterable text field, you can specify whether to query the knowledge base with a HYBRID search using both vector embeddings and raw text, or SEMANTIC search using only vector embeddings. For other vector store configurations, only SEMANTIC search is available. For more information, please refer to Search type (https://docs.aws.amazon.com/bedrock/latest/userguide/kb-test-config.html)',
+                    },
+                    {
+                        id: 'KNOWLEDGE_BASE_METADATA_FILTERS',
+                        hint: 'Specifies the filters to use on the metadata in the knowledge base data sources before returning results. (e.g filters can be customized as`{"filter1": { "key": "string", "value": "string" }, "filter2": { "key": "string", "value": number }}`). For more information, please refer to Metadata and filtering (https://docs.aws.amazon.com/bedrock/latest/userguide/kb-test-config.html)',
                     },
                 ],
             },
@@ -595,6 +636,37 @@ async function saveParameters(ssm, params) {
         console.log(error, error.stack);
         throw new Error(`Error back from request: ${error}`);
     }
+}
+
+async function sendAnonymizedData(params, settings){
+    const map = { event: 'UPDATE_SETTINGS' };
+    map.BEDROCK_GUARDRAIL_ENABLE = settings.BEDROCK_GUARDRAIL_IDENTIFIER && settings.BEDROCK_GUARDRAIL_VERSION ? 'true' : 'false';
+    map.ENABLE_MULTI_LANGUAGE_SUPPORT = settings.ENABLE_MULTI_LANGUAGE_SUPPORT || 'false';
+    map.LLM_GENERATE_QUERY_ENABLE = settings.LLM_GENERATE_QUERY_ENABLE || 'true';
+    map.KNOWLEDGE_BASE_SEARCH_TYPE = settings.KNOWLEDGE_BASE_SEARCH_TYPE || 'DEFAULT';
+    map.PII_REJECTION_ENABLED = settings.PII_REJECTION_ENABLED || 'false';
+    map.EMBEDDINGS_ENABLE = settings.EMBEDDINGS_ENABLE || 'true';
+    map.LLM_QA_ENABLE = settings.LLM_QA_ENABLE || 'true';
+
+
+    const payload = Buffer.from(JSON.stringify(map));
+    const client = new LambdaClient({
+        customUserAgent: util.getUserAgentString(params.version, 'C050'),
+        region: params.region, 
+        credentials: params.credentials
+    });
+
+    const input = {
+        FunctionName: params.solutionHelper,
+        InvocationType: "RequestResponse",
+        Payload: payload,
+    };
+    const command = new InvokeCommand(input);
+    const response = await client.send(command);
+    if (response.FunctionError) {
+        throw new Error('Solution Helper Function Error Occurred');
+    }
+    return response;
 }
 
 module.exports = {
@@ -638,10 +710,27 @@ module.exports = {
     async updateSettings(context, settings) {
         const credentials = context.rootState.user.credentials;
         const customParams = context.rootState.info.CustomQnABotSettings;
+        const region = context.rootState.info.region;
+        const version = context.rootState.info.Version;
+        const solutionHelper = context.rootState.info.SolutionHelper;
         const ssm = new SSMClient({
-            customUserAgent: util.getUserAgentString(context.rootState.info.Version, 'C022'),
-            region: context.rootState.info.region, credentials
+            customUserAgent: util.getUserAgentString(version, 'C022'),
+            region, 
+            credentials
         });
+    
+        try {
+            const params = {
+                region,
+                credentials,
+                version,
+                solutionHelper
+            };
+            await sendAnonymizedData(params, settings);
+        } catch (e) {
+            console.log(`Error in sending anonymized data: ${e.message}`);
+        }
+        
         // Note type is not required in params if the parameter exists. Some customers require this parameter
         // to be a SecureString and set this type post deploy of QnABot. Removing type supports
         // this setting.

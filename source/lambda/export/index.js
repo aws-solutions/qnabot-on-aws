@@ -21,48 +21,47 @@ const step = require('./lib/step');
 const join = require('./lib/join');
 const clean = require('./lib/clean');
 
+const outputBucket = process.env.OUTPUT_S3_BUCKET;
+const step_status_ignore = ['Error', 'Completed', 'Sync Complete', 'Parsing content JSON', 'Creating FAQ']
+
 exports.step=async function(event,context,cb){
-    console.log('step')
+    console.log('Initiating Export')
     console.log('Request',JSON.stringify(event,null,2))
-    const Bucket=event.Records[0].s3.bucket.name
+    const inputBucket=event.Records[0].s3.bucket.name
     const Key=decodeURI(event.Records[0].s3.object.key)
-    const VersionId=_.get(event,'Records[0].s3.object.versionId')
-    console.log(Bucket,Key) 
+    const initialVersionId=_.get(event,'Records[0].s3.object.versionId')
     try {
-        await waitUntilObjectExists({
-            client: s3,
-            maxWaitTime: 10
-        }, {Bucket,Key,VersionId})
-        const res = await s3.send(new GetObjectCommand({Bucket,Key,VersionId}))
-        const readableStream = Buffer.concat(await res.Body.toArray());
-        const config = JSON.parse(readableStream);
-        const step_status_ignore = ['Error', 'Completed', 'Sync Complete', 'Parsing content JSON', 'Creating FAQ']
-        if (step_status_ignore.includes(config.status)===false) {
-            try {
-                console.log('Config:',JSON.stringify(config,null,2))
-                switch(config.status){
-                    case 'Started':
-                        await start(config);
-                        break
-                    case 'InProgress':
-                        await step(config);
-                        break
-                    case 'Join':
-                        await join(config);
-                        break
-                    case 'Clean':
-                        await clean(config);
-                        break
-                    }         
-            } catch (err) {
-                console.log(err)
-                config.status='Error'
-                config.message=_.get(err,'message',JSON.stringify(err))
-            }
-            await s3.send(new PutObjectCommand({Bucket,Key,Body:JSON.stringify(config)}));
-        }
-    } catch (error) {
+        const startResult = await getStatusAndStartNextStep(inputBucket, Key, initialVersionId, start);
+        const stepResult = await getStatusAndStartNextStep(outputBucket, Key, startResult.VersionId, step);
+        const joinResult = await getStatusAndStartNextStep(outputBucket, Key, stepResult.VersionId, join);
+        await getStatusAndStartNextStep(outputBucket, Key, joinResult.VersionId, clean);
+    } 
+    catch (error) {
         console.error("An error occured in S3 operations: ", error)
         cb(error)
+    }
+}
+
+async function getStatusAndStartNextStep(Bucket, Key, VersionId, nextStep) {
+    await waitUntilObjectExists({
+        client: s3,
+        maxWaitTime: 10
+    }, {Bucket,Key,VersionId})
+    const res = await s3.send(new GetObjectCommand({Bucket,Key,VersionId}))
+    const readableStream = Buffer.concat(await res.Body.toArray());
+    const config = JSON.parse(readableStream);
+    if (step_status_ignore.includes(config.status)===false) {
+        try {
+            console.log(config.status)
+            console.log('Config:',JSON.stringify(config,null,2))
+            await nextStep(config);        
+        } catch (err) {
+            console.log(err)
+            config.status='Error'
+            config.message=_.get(err,'message',JSON.stringify(err))
+        }
+        const putObjOutput = await s3.send(new PutObjectCommand({Bucket: outputBucket , Key, Body:JSON.stringify(config)}));
+        console.log('putObjOutput', JSON.stringify(putObjOutput, null, 2))
+        return putObjOutput;
     }
 }

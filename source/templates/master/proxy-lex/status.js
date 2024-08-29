@@ -26,9 +26,6 @@ function getStatusResponse(response, build) {
         lambdaArn: process.env.FULFILLMENT_FUNCTION_ARN,
         lambdaRole: process.env.FULFILLMENT_FUNCTION_ROLE,
         botversion: 'live',
-        botname: process.env.LEXV1_BOT_NAME || 'LEX V1 Bot not installed',
-        intent: process.env.LEXV1_INTENT || 'LEX V1 Bot not installed',
-        intentFallback: process.env.LEXV1_INTENT_FALLBACK || 'LEX V1 Bot not installed',
         lexV2botname: process.env.LEXV2_BOT_NAME || 'LEX V2 Bot not installed',
         lexV2botid: process.env.LEXV2_BOT_ID || 'LEX V2 Bot not installed',
         lexV2botalias: process.env.LEXV2_BOT_ALIAS || 'LEX V2 Bot not installed',
@@ -46,7 +43,6 @@ exports.handler = async (event, context, callback) => {
     console.log('Received event:', JSON.stringify(event, null, 2));
 
     const bucket = process.env.STATUS_BUCKET;
-    const lexV1StatusFile = process.env.STATUS_KEY;
     const lexV2StatusFile = process.env.LEXV2_STATUS_KEY;
     let build = { status: 'READY', token: 'token' };
     let response;
@@ -56,16 +52,6 @@ exports.handler = async (event, context, callback) => {
         response = await s3.send(getObjCmd);
         const readableStreamV2 = Buffer.concat(await response.Body.toArray());
         build = JSON.parse(readableStreamV2);
-        // combine build status with v1 bot, if defined.. If both are READY then status is READY
-        if (lexV1StatusFile) {
-            const getObjCmd = new GetObjectCommand({ Bucket: bucket, Key: lexV1StatusFile });
-            response = await s3.send(getObjCmd);
-            const readableStreamV2 = Buffer.concat(await response.Body.toArray());
-            const v1build = JSON.parse(readableStreamV2);
-            if (v1build.status != 'READY' || build.status != 'READY') {
-                build.status = `LEX V2: ${build.status} / LEX V1: ${v1build.status}`;
-            }
-        }
     } catch (e) {
         console.log('Unable to read S3 lex bot status file - perhaps it doesn\'t yet exist. Returning READY');
     }
@@ -74,7 +60,6 @@ exports.handler = async (event, context, callback) => {
         botId: process.env.LEXV2_BOT_ID,
     });
     response = await lexv2.send(describeBotCmd);
-    // Match LexV1 bot status for code compatibility (Available = READY)
     const statusResponse = getStatusResponse(response, build);
     return statusResponse;
 };

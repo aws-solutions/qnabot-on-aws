@@ -15,7 +15,7 @@ import json
 import logging
 
 import pytest
-from moto import mock_s3
+from moto import mock_aws
 
 from aws_solutions.core.helpers import get_service_resource
 
@@ -72,7 +72,6 @@ def mock_export_event(*args):
 
 
 def get_s3_fixture(bucket_name=None):
-    # mock_s3 setup s3 bucket
     s3_resource = get_service_resource("s3")
     if not bucket_name:
         bucket_name = "test_bucket"
@@ -82,6 +81,6 @@ def get_s3_fixture(bucket_name=None):
 
 @pytest.fixture
 def s3_fixture():
-    with mock_s3():
+    with mock_aws():
         get_s3_fixture()
         yield

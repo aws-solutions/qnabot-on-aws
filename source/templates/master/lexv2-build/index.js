@@ -14,6 +14,30 @@
 const util = require('../../util');
 
 module.exports = {
+    LexV2BotLambdaLogGroup:{
+        Type: 'AWS::Logs::LogGroup',
+        Properties: {
+            LogGroupName: {
+                'Fn::Join': [
+                    '-',
+                    [
+                        { 'Fn::Sub': '/aws/lambda/${AWS::StackName}-LexV2BotLambda' },
+                        { 'Fn::Select': ['2', { 'Fn::Split': ['/', { Ref: 'AWS::StackId' }] }] },
+                    ],
+                ],
+            },
+            RetentionInDays: {
+                'Fn::If': [
+                    'LogRetentionPeriodIsNotZero',
+                    { Ref: 'LogRetentionPeriod' },
+                    { Ref: 'AWS::NoValue' },
+                ],
+            },
+        },
+        Metadata: {
+            guard: util.cfnGuard('CLOUDWATCH_LOG_GROUP_ENCRYPTED', 'CW_LOGGROUP_RETENTION_PERIOD_CHECK'),
+        },
+    },
     Lexv2BotLambda: lambda({
         S3Bucket: { Ref: 'BootstrapBucket' },
         S3Key: { 'Fn::Sub': '${BootstrapPrefix}/lambda/lexv2-build.zip' },
@@ -28,8 +52,11 @@ module.exports = {
         },
         LOCALES: { Ref: 'LexV2BotLocaleIds' },
         PYTHONPATH: '/var/task/py_modules:/var/runtime:/opt/python',
-        ...util.getCommonEnvironmentVariables()
-    }, process.env.npm_package_config_pythonRuntime),
+        ...util.getCommonEnvironmentVariables(),
+    }, process.env.npm_package_config_pythonRuntime,
+    {
+        LogGroup: { Ref: 'LexV2BotLambdaLogGroup' },
+    }),
     Lexv2BotCodeVersion: {
         Type: 'Custom::S3Version',
         Properties: {
@@ -142,7 +169,7 @@ module.exports = {
     },
 };
 
-function lambda(code, variable, runtime) {
+function lambda(code, variable, runtime, loggingConfig) {
     return {
         Type: 'AWS::Lambda::Function',
         Properties: {
@@ -151,6 +178,7 @@ function lambda(code, variable, runtime) {
                 Variables: variable,
             },
             Handler: 'handler.handler',
+            LoggingConfig: loggingConfig,
             MemorySize: '1024',
             Role: { 'Fn::GetAtt': ['Lexv2BotLambdaRole', 'Arn'] },
             Runtime: runtime,

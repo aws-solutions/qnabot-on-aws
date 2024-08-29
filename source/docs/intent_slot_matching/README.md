@@ -114,12 +114,4 @@ More information: https://docs.aws.amazon.com/lexv2/latest/dg/build-intents.html
 - As you are building your knowledge bank of questions, you may have a combination of FAQ based questions, Intent based questions. There may be instances where a wrong intent gets matched, or a FAQ question is matched instead. To troubleshoot this, below are couple of options that can help: 
   - Enable the `ENABLE_DEBUG_RESPONSES` setting in QnABot. This setting provides debug information to help understand what is processing the request (such as: Intent, ElasticSearch, Kendra)
 
-
-## Additional Example Implementation
-Also take a look at an example implementation showcasing the use of Intent and Slot matching. 
-- [Integration with Canvas LMS](../canvaslms_integration/README.md)
-
-__**NOTICE: Canvas LMS integration with QnABot on AWS is deprecated in this release and no longer be supported. Customers may fork the code needed for their specific use case from previous versions. The integration code will be removed in the next release.**__
-
-
 ----

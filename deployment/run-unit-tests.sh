@@ -208,9 +208,8 @@ echo "Starting Templates unit tests"
 run_templates_test
 
 echo "Running Templates Python unit tests"
-## NOTICE: Canvas LMS integration with QnABot on AWS is deprecated in this release and no longer be supported. Customers may fork the code needed for their specific use case from previous versions. The integration code will be removed in the next release.
  
-python_directories=("$source_dir/templates/examples/examples/py" "$source_dir/templates/examples/extensions/py_lambda_hooks/CustomPYHook" "$source_dir/templates/examples/extensions/py_lambda_hooks/CanvasLMSHook")
+python_directories=("$source_dir/templates/examples/examples/py" "$source_dir/templates/examples/extensions/py_lambda_hooks/CustomPYHook")
 for folder in "${python_directories[@]}" ; do
     cd "$folder"
     function_name=${PWD##*/}

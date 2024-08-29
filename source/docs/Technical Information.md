@@ -102,13 +102,14 @@
 - BuildStatusBucket - used for staging various assets during deployment
 - ExportBucket - Used for staging files exported from QnABot.  API Gateway is used a proxy for the bucket
 - ImportBucket - Used for staging files imported into QnABot
+- TestAllBucket - Used for staging files used for the TestAll functionality.
 - MetricsBucket - All captured usage data is sent to both OpenSearch and this bucket via Kinesis 
 - MainAccessLogBucket - Access log bucket for the AssetBucket, BuildStatusBucket, ExportBucket, ImportBucket and MetricsBucket
 - devBootStrapAccessLogsBucket - Access log bucket for the dev Bootstrap bucket
 - devAccessLogsBucket - Access Log bucket for the dev bucket
 
 ## Firehose
-- TestAllBucket - Results from “Test all” functionality
+- ContentDesignerOutputBucket - Results from “Test all”, "Import", and "Export" functionality
 - Bucket - HTML/CSS/Javascript used by the Content Designer
 
 ## APIGateway
@@ -193,6 +194,8 @@ e default by the user.  QnABot merges DefaultQnABotSettings and CustomQnABotSett
 S3 –  Unzips assets stored in S3
 
 *CloudFormation will not recognize that a referenced zip file for a Lambda has changed using our deployment process.  This creates a new S3 version of the object.*
+
+### S3Clear
 
 - Deletes contents of the bucket when QnABot is uninstalled so the bucket can be deleted
 
@@ -397,3 +400,8 @@ Reads status of the Lex Build process from status file S3 object and returns the
 *Supports “Test All Questions” step in the Content Designer*
 - Calls other Lambdas as needed to test questions and answers
 
+## SolutionHelperRole
+
+### SolutionHelper
+
+Handles sending anonymized operational metrics to AWS

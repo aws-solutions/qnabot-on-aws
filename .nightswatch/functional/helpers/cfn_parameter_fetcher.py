@@ -275,3 +275,40 @@ class ParameterFetcher:
         examples_stack_param_fetcher = ParameterFetcher(self.region, examples_stack_name) 
         return examples_stack_param_fetcher.__get_stack_outputs('EXTCustomJSHook')
 
+
+    def get_stack_id(self) -> Optional[str]:
+        """
+        Retrieves the stack id.
+
+        Returns:
+        -------
+            The stack id.
+        """
+        response = self.cloudformation_client.describe_stacks(
+            StackName=self.stack_name
+        )
+        stack_id = response['Stacks'][0]['StackId'].split('/')[2]
+        return stack_id
+    
+    def get_bedrock_knowledge_base_model(self) -> Optional[str]:
+        """
+        Retrieves the model of the Bedrock Knowledge Base from the stack parameters.
+
+        Returns:
+        -------
+            The Knowledge Base Model if found, otherwise None.
+        """
+
+        knowledge_base_model = self.__get_cfn_param('BedrockKnowledgeBaseModel')
+        return knowledge_base_model
+
+    def get_content_designer_output_bucket_name(self) -> Optional[str]:
+        """
+        Retrieves the name of the test all output bucket from the stack parameters.
+
+        Returns:
+        -------
+            The name of the test all bucket if found, otherwise None.
+        """
+
+        return self.__get_stack_outputs('ContentDesignerOutputBucket')

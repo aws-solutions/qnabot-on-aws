@@ -14,7 +14,6 @@
 const fs = require('fs');
 const _ = require('lodash');
 const util = require('../../util');
-const responsebots = require('./responsebots.js').resources;
 const responsebots_lexv2 = require('./responsebots-lexv2.js').resources;
 
 const js = fs.readdirSync(`${__dirname}/js`)
@@ -25,6 +24,8 @@ const js = fs.readdirSync(`${__dirname}/js`)
         return {
             name: `ExampleJSLambda${name}`,
             resource: jslambda(name),
+            logGroupName: `${name}LogGroup`,
+            logGroupResource: jsLambdaLogGroup(name),
             id: `${name}JS`,
         };
     });
@@ -38,14 +39,17 @@ const py = fs.readdirSync(`${__dirname}/py`, { withFileTypes: true })
         return {
             name: `ExamplePYTHONLambda${name}`,
             resource: pylambda(name),
+            logGroupName: `${name}LogGroup`,
+            logGroupResource: pyLambdaLogGroup(name),
             id: `${name}PY`,
         };
     });
 
 module.exports = Object.assign(
-    responsebots,
     responsebots_lexv2,
+    _.fromPairs(js.map((x) => [x.logGroupName, x.logGroupResource])),
     _.fromPairs(js.map((x) => [x.name, x.resource])),
+    _.fromPairs(py.map((x) => [x.logGroupName, x.logGroupResource])),
     _.fromPairs(py.map((x) => [x.name, x.resource])),
     {
         FeedbackSNS: {
@@ -165,6 +169,30 @@ module.exports = Object.assign(
                 BuildDate: (new Date()).toISOString(),
             },
         },
+        ExampleWriteLambdaLogGroup: {
+            Type: 'AWS::Logs::LogGroup',
+            Properties: {
+                LogGroupName: {
+                    'Fn::Join': [
+                        '-',
+                        [
+                            { 'Fn::Sub': '/aws/lambda/${AWS::StackName}-ExampleWriteLambda' },
+                            { 'Fn::Select': ['2', { 'Fn::Split': ['/', { Ref: 'AWS::StackId' }] }] },
+                        ],
+                    ],
+                },
+                RetentionInDays: {
+                    'Fn::If': [
+                        'LogRetentionPeriodIsNotZero',
+                        { Ref: 'LogRetentionPeriod' },
+                        { Ref: 'AWS::NoValue' },
+                    ],
+                },
+            },
+            Metadata: {
+                guard: util.cfnGuard('CLOUDWATCH_LOG_GROUP_ENCRYPTED', 'CW_LOGGROUP_RETENTION_PERIOD_CHECK'),
+            },
+        },
         ExampleWriteLambda: {
             Type: 'AWS::Lambda::Function',
             Properties: {
@@ -184,6 +212,9 @@ module.exports = Object.assign(
                     }
                 },
                 Handler: 'cfn.handler',
+                LoggingConfig: {
+                    LogGroup: { Ref: 'ExampleWriteLambdaLogGroup' },
+                },
                 MemorySize: '128',
                 Role: { Ref: 'CFNLambdaRole' },
                 Runtime: process.env.npm_package_config_lambdaRuntime,
@@ -285,24 +316,6 @@ module.exports = Object.assign(
                         },
                     },
                     {
-                        PolicyName: 'LexQNALambda',
-                        PolicyDocument: {
-                            Version: '2012-10-17',
-                            Statement: [
-                                {
-                                    Effect: 'Allow',
-                                    Action: [
-                                        'lex:PostText',
-                                    ],
-                                    Resource: [
-                                        { 'Fn::Join': ['', ['arn:aws:lex:', { Ref: 'AWS::Region' }, ':', { Ref: 'AWS::AccountId' }, ':bot:*', ':qna*']] },
-                                        { 'Fn::Join': ['', ['arn:aws:lex:', { Ref: 'AWS::Region' }, ':', { Ref: 'AWS::AccountId' }, ':bot:*', ':QNA*']] },
-                                    ],
-                                },
-                            ],
-                        },
-                    },
-                    {
                         PolicyName: 'LambdaQnABotStdExecution',
                         PolicyDocument: {
                             Version: '2012-10-17',
@@ -379,6 +392,9 @@ function jslambda(name) {
                 },
             },
             Handler: `js/${name}.handler`,
+            LoggingConfig: {
+                LogGroup: { Ref: `${name}LogGroup` },
+            },
             MemorySize: '128',
             Role: { 'Fn::GetAtt': ['ExampleLambdaRole', 'Arn'] },
             Runtime: process.env.npm_package_config_lambdaRuntime,
@@ -433,6 +449,9 @@ function pylambda(name) {
                 },
             },
             Handler: `py/${name}.handler`,
+            LoggingConfig: {
+                LogGroup: { Ref: `${name}LogGroup` },
+            },
             MemorySize: '128',
             Role: { 'Fn::GetAtt': ['ExampleLambdaRole', 'Arn'] },
             Runtime: process.env.npm_package_config_pythonRuntime,
@@ -455,6 +474,62 @@ function pylambda(name) {
         Metadata: {
             cfn_nag: util.cfnNag(['W92']),
             guard: util.cfnGuard('LAMBDA_CONCURRENCY_CHECK', 'LAMBDA_INSIDE_VPC'),
+        },
+    };
+}
+
+function jsLambdaLogGroup(name) {
+    return {
+        Type: 'AWS::Logs::LogGroup',
+        Properties: {
+            LogGroupName: {
+                'Fn::Join': [
+                    '-',
+                    [
+                        { 'Fn::Sub': '/aws/lambda/${AWS::StackName}' },
+                        `ExampleJSLambda${name}`,
+                        { 'Fn::Select': ['2', { 'Fn::Split': ['/', { Ref: 'AWS::StackId' }] }] },
+                    ],
+                ],
+            },
+            RetentionInDays: {
+                'Fn::If': [
+                    'LogRetentionPeriodIsNotZero',
+                    { Ref: 'LogRetentionPeriod' },
+                    { Ref: 'AWS::NoValue' },
+                ],
+            },
+        },
+        Metadata: {
+            guard: util.cfnGuard('CLOUDWATCH_LOG_GROUP_ENCRYPTED', 'CW_LOGGROUP_RETENTION_PERIOD_CHECK'),
+        },
+    };
+}
+
+function pyLambdaLogGroup(name) {
+    return {
+        Type: 'AWS::Logs::LogGroup',
+        Properties: {
+            LogGroupName: {
+                'Fn::Join': [
+                    '-',
+                    [
+                        { 'Fn::Sub': '/aws/lambda/${AWS::StackName}' },
+                        `ExamplePYTHONLambda${name}`,
+                        { 'Fn::Select': ['2', { 'Fn::Split': ['/', { Ref: 'AWS::StackId' }] }] },
+                    ],
+                ],
+            },
+            RetentionInDays: {
+                'Fn::If': [
+                    'LogRetentionPeriodIsNotZero',
+                    { Ref: 'LogRetentionPeriod' },
+                    { Ref: 'AWS::NoValue' },
+                ],
+            },
+        },
+        Metadata: {
+            guard: util.cfnGuard('CLOUDWATCH_LOG_GROUP_ENCRYPTED', 'CW_LOGGROUP_RETENTION_PERIOD_CHECK'),
         },
     };
 }

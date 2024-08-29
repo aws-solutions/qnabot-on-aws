@@ -14,9 +14,12 @@
 
 import time
 import logging
+import random
+import string
 
 from helpers.website_model.dom_operator import DomOperator
 from helpers.utils.textbox import Textbox
+from selenium.webdriver.remote.webelement import WebElement
 
 MODAL_XPATH = '//div[@id="add-question-form"]'
 EDIT_MODAL_XPATH = '//div[@class="dialog dialog--active"]'
@@ -812,10 +815,16 @@ class EditPage:
         query_textbox.set_value(query)
         self.operator.select_id(TEST_TAB_QUERY_BUTTON_ID, click=True)
 
-    def generate_test_report(self) -> str:
+    def generate_test_report(self) -> WebElement:
         """
         Generates a test report and returns the text content of the job
         """
+        filename_textbox = Textbox(self.operator.select_id("filename"))
+        random_file_name = 'TestAll_' + ''.join(random.choices(string.ascii_letters + string.digits, k=4))
+        filename_textbox.set_value(random_file_name)
         self.operator.select_id(TEST_ALL_BUTTON_ID, click=True)
-        self.operator.wait_for_element_by_id_text(TEST_ALL_JOBS_ID, 'Completed', delay=300)
-        return self.operator.select_id(TEST_ALL_JOBS_ID).text
+        self.operator.wait_for_element_by_xpath(f"//div[starts-with(@id, 'test-job-{random_file_name}')]")
+
+        last_test_execution_element = self.operator.select_xpath(f"//div[starts-with(@id, 'test-job-{random_file_name}')]")
+        self.operator.wait_for_element_by_id_text(last_test_execution_element.get_property("id"), 'Completed', delay=300)
+        return self.operator.select_id(last_test_execution_element.get_property("id"))

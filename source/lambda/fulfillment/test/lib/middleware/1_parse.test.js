@@ -38,7 +38,7 @@ describe('parse function with Lex event', () => {
         settings.get_parameter.mockReturnValue('https://cognito-idp.us-east-1.amazonaws.com/us-east-1dsfsfjl');
     });
 
-    test('when parsing request with sentimemt & multilang support disabled', async () => {
+    test('when parsing request with sentiment & multilang support disabled', async () => {
         settings.getSettings.mockReturnValue(parseFixtures.defaultSettings);
         const res = {};
         const parseResponse = await parse(

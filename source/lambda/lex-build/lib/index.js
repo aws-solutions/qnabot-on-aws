@@ -11,19 +11,10 @@
  *  and limitations under the License.                                                                                *
  *********************************************************************************************************************/
 
-const getUtterances = require('./utterances');
 const getQidsandquestions = require('./qidsandquestions');
 
 module.exports = async function (params) {
-    const lexV1Status = process.env.STATUS_KEY;
     const promises = [];
-    if (lexV1Status) {
-        const utterances = await getUtterances(params);
-        console.log('Starting Lex V1');
-        const LexV1Bot = require('./lexv1bot');
-        const lexV1 = await LexV1Bot(utterances);
-        promises.push(lexV1);
-    }
     console.log('Starting Lex V2');
     const qidsandquestions = await getQidsandquestions(params);
     const LexV2Bot = require('./lexv2bot');

@@ -14,7 +14,7 @@
 import os
 
 import pytest
-from moto import mock_sts
+from moto import mock_aws
 
 from aws_solutions.core import (
     get_aws_region,
@@ -65,6 +65,6 @@ def test_get_aws_partition(region, partition, mocker):
     assert get_aws_partition() == partition
 
 
-@mock_sts
+@mock_aws
 def test_get_aws_account_id(mocker):
     assert get_aws_account() == "1" * 12

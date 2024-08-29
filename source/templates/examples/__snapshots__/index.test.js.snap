@@ -12,21 +12,15 @@ exports[`renders examples template correctly 1`] = `
         "true",
       ],
     },
-    "CreateLexV1Bots": {
-      "Fn::Equals": [
+    "LogRetentionPeriodIsNotZero": {
+      "Fn::Not": [
         {
-          "Ref": "LexBotVersion",
-        },
-        "LexV1 and LexV2",
-      ],
-    },
-    "CreateLexV1ResponseBots": {
-      "Fn::And": [
-        {
-          "Condition": "CreateLexResponseBots",
-        },
-        {
-          "Condition": "CreateLexV1Bots",
+          "Fn::Equals": [
+            {
+              "Ref": "LogRetentionPeriod",
+            },
+            0,
+          ],
         },
       ],
     },
@@ -54,14 +48,6 @@ exports[`renders examples template correctly 1`] = `
   "Description": "(SO0189n-example) QnABot nested example resources - Version vx.x.x",
   "Mappings": {},
   "Outputs": {
-    "EXTCanvasLMSHook": {
-      "Value": {
-        "Fn::GetAtt": [
-          "EXTCanvasLMSHook",
-          "Arn",
-        ],
-      },
-    },
     "EXTCreateRecentTopicsResponse": {
       "Value": {
         "Fn::GetAtt": [
@@ -762,8 +748,8 @@ exports[`renders examples template correctly 1`] = `
     "InstallLexResponseBots": {
       "Type": "String",
     },
-    "LexBotVersion": {
-      "Type": "String",
+    "LogRetentionPeriod": {
+      "Type": "Number",
     },
     "PrivateQnABotSettings": {
       "Type": "String",
@@ -791,93 +777,53 @@ exports[`renders examples template correctly 1`] = `
     },
   },
   "Resources": {
-    "AgeAliasV2": {
-      "Condition": "CreateLexV1ResponseBots",
-      "DependsOn": "QNAAge",
-      "Properties": {
-        "ServiceToken": {
-          "Ref": "CFNLambda",
+    "BotBrokerLogGroup": {
+      "Metadata": {
+        "guard": {
+          "SuppressedRules": [
+            "CLOUDWATCH_LOG_GROUP_ENCRYPTED",
+            "CW_LOGGROUP_RETENTION_PERIOD_CHECK",
+          ],
         },
-        "botName": {
-          "Ref": "QNAAge",
-        },
-        "description": "QNA Age Alias - x.x.x - v1",
-        "name": "live",
       },
-      "Type": "Custom::LexAlias",
-    },
-    "AgeIntent": {
-      "Condition": "CreateLexV1ResponseBots",
       "Properties": {
-        "ServiceToken": {
-          "Ref": "CFNLambda",
+        "LogGroupName": {
+          "Fn::Join": [
+            "-",
+            [
+              {
+                "Fn::Sub": "/aws/lambda/\${AWS::StackName}",
+              },
+              "ExamplePYTHONLambdaBotBroker",
+              {
+                "Fn::Select": [
+                  "2",
+                  {
+                    "Fn::Split": [
+                      "/",
+                      {
+                        "Ref": "AWS::StackId",
+                      },
+                    ],
+                  },
+                ],
+              },
+            ],
+          ],
         },
-        "conclusionStatement": {
-          "messages": [
+        "RetentionInDays": {
+          "Fn::If": [
+            "LogRetentionPeriodIsNotZero",
             {
-              "content": "OK. ",
-              "contentType": "PlainText",
+              "Ref": "LogRetentionPeriod",
+            },
+            {
+              "Ref": "AWS::NoValue",
             },
           ],
         },
-        "confirmationPrompt": {
-          "maxAttempts": 1,
-          "messages": [
-            {
-              "content": "Is {Age} correct (Yes or No)?",
-              "contentType": "PlainText",
-            },
-          ],
-        },
-        "createVersion": true,
-        "description": "QNA Age Intent - x.x.x - v1",
-        "fulfillmentActivity": {
-          "type": "ReturnIntent",
-        },
-        "name": {
-          "Fn::Sub": "QNAAgeIntent-\${AWS::StackName}",
-        },
-        "rejectionStatement": {
-          "messages": [
-            {
-              "content": "Please let me know the age again.",
-              "contentType": "PlainText",
-            },
-          ],
-        },
-        "sampleUtterances": [
-          "My age is {Age}",
-          "Age is {Age}",
-          "It is {Age}",
-          "I am {Age}",
-          "I am {Age} years old",
-          "His age is {Age}",
-          "He is {Age}",
-          "He is {Age} years old",
-          "Her age is {Age}",
-          "She is {Age}",
-          "She is {Age} years old",
-          "{Age}",
-        ],
-        "slots": [
-          {
-            "name": "Age",
-            "priority": 1,
-            "slotConstraint": "Required",
-            "slotType": "AMAZON.NUMBER",
-            "valueElicitationPrompt": {
-              "maxAttempts": 2,
-              "messages": [
-                {
-                  "content": "What age?",
-                  "contentType": "PlainText",
-                },
-              ],
-            },
-          },
-        ],
       },
-      "Type": "Custom::LexIntent",
+      "Type": "AWS::Logs::LogGroup",
     },
     "BotRuntimeRole": {
       "Condition": "CreateLexResponseBots",
@@ -949,21 +895,6 @@ exports[`renders examples template correctly 1`] = `
       },
       "Type": "AWS::IAM::Role",
     },
-    "CodeVersionCanvasLMSHook": {
-      "Properties": {
-        "Bucket": {
-          "Ref": "BootstrapBucket",
-        },
-        "BuildDate": Any<String>,
-        "Key": {
-          "Fn::Sub": "\${BootstrapPrefix}/lambda/EXTCanvasLMSHook.zip",
-        },
-        "ServiceToken": {
-          "Ref": "CFNLambda",
-        },
-      },
-      "Type": "Custom::S3Version",
-    },
     "CodeVersionCreateRecentTopicsResponse": {
       "Properties": {
         "Bucket": {
@@ -1009,344 +940,45 @@ exports[`renders examples template correctly 1`] = `
       },
       "Type": "Custom::S3Version",
     },
-    "DateAliasNoConfirmV2": {
-      "Condition": "CreateLexV1ResponseBots",
-      "DependsOn": "QNADateNoConfirm",
-      "Properties": {
-        "ServiceToken": {
-          "Ref": "CFNLambda",
-        },
-        "botName": {
-          "Ref": "QNADateNoConfirm",
-        },
-        "description": "QNA Date No Confirm Alias - x.x.x - v1",
-        "name": "live",
-      },
-      "Type": "Custom::LexAlias",
-    },
-    "DateAliasV2": {
-      "Condition": "CreateLexV1ResponseBots",
-      "DependsOn": "QNADate",
-      "Properties": {
-        "ServiceToken": {
-          "Ref": "CFNLambda",
-        },
-        "botName": {
-          "Ref": "QNADate",
-        },
-        "description": "QNA Date Alias - x.x.x - v1",
-        "name": "live",
-      },
-      "Type": "Custom::LexAlias",
-    },
-    "DateIntent": {
-      "Condition": "CreateLexV1ResponseBots",
-      "Properties": {
-        "ServiceToken": {
-          "Ref": "CFNLambda",
-        },
-        "conclusionStatement": {
-          "messages": [
-            {
-              "content": "OK. ",
-              "contentType": "PlainText",
-            },
-          ],
-        },
-        "confirmationPrompt": {
-          "maxAttempts": 1,
-          "messages": [
-            {
-              "content": "Is {date} correct (Yes or No)?",
-              "contentType": "PlainText",
-            },
-          ],
-        },
-        "createVersion": true,
-        "description": "QNA DateIntent - x.x.x - v1",
-        "fulfillmentActivity": {
-          "type": "ReturnIntent",
-        },
-        "name": {
-          "Fn::Sub": "QNADateIntent-\${AWS::StackName}",
-        },
-        "rejectionStatement": {
-          "messages": [
-            {
-              "content": "Please let me know the date again.",
-              "contentType": "PlainText",
-            },
-          ],
-        },
-        "sampleUtterances": [
-          "The date is {date}",
-          "The date was {date}",
-          "I went on {date}",
-          "It is {date}",
-          "It occurred on {date}",
-          "I was born on {date}",
-          "My birthdate is {date}",
-          "My date of birth is {date}",
-          "{date}",
-        ],
-        "slots": [
-          {
-            "name": "date",
-            "priority": 1,
-            "slotConstraint": "Required",
-            "slotType": "AMAZON.DATE",
-            "valueElicitationPrompt": {
-              "maxAttempts": 2,
-              "messages": [
-                {
-                  "content": "What date?",
-                  "contentType": "PlainText",
-                },
-              ],
-            },
-          },
-        ],
-      },
-      "Type": "Custom::LexIntent",
-    },
-    "DateIntentNoConfirm": {
-      "Condition": "CreateLexV1ResponseBots",
-      "Properties": {
-        "ServiceToken": {
-          "Ref": "CFNLambda",
-        },
-        "conclusionStatement": {
-          "messages": [
-            {
-              "content": "OK. ",
-              "contentType": "PlainText",
-            },
-          ],
-        },
-        "createVersion": true,
-        "description": "QNA DateIntentNoConfirm - x.x.x - v1",
-        "fulfillmentActivity": {
-          "type": "ReturnIntent",
-        },
-        "name": {
-          "Fn::Sub": "QNADateIntentNoConfirm-\${AWS::StackName}",
-        },
-        "sampleUtterances": [
-          "The date is {date}",
-          "The date was {date}",
-          "I went on {date}",
-          "It is {date}",
-          "It occurred on {date}",
-          "I was born on {date}",
-          "My birthdate is {date}",
-          "My date of birth is {date}",
-          "{date}",
-        ],
-        "slots": [
-          {
-            "name": "date",
-            "priority": 1,
-            "slotConstraint": "Required",
-            "slotType": "AMAZON.DATE",
-            "valueElicitationPrompt": {
-              "maxAttempts": 2,
-              "messages": [
-                {
-                  "content": "What date?",
-                  "contentType": "PlainText",
-                },
-              ],
-            },
-          },
-        ],
-      },
-      "Type": "Custom::LexIntent",
-    },
-    "DayOfWeekAliasV2": {
-      "Condition": "CreateLexV1ResponseBots",
-      "DependsOn": "QNADayOfWeek",
-      "Properties": {
-        "ServiceToken": {
-          "Ref": "CFNLambda",
-        },
-        "botName": {
-          "Ref": "QNADayOfWeek",
-        },
-        "description": "QNA Day Of Week Alias - x.x.x - v1",
-        "name": "live",
-      },
-      "Type": "Custom::LexAlias",
-    },
-    "DayOfWeekIntent": {
-      "Condition": "CreateLexV1ResponseBots",
-      "Properties": {
-        "ServiceToken": {
-          "Ref": "CFNLambda",
-        },
-        "conclusionStatement": {
-          "messages": [
-            {
-              "content": "OK. ",
-              "contentType": "PlainText",
-            },
-          ],
-        },
-        "confirmationPrompt": {
-          "maxAttempts": 1,
-          "messages": [
-            {
-              "content": "Is {DayOfWeek} correct (Yes or No)?",
-              "contentType": "PlainText",
-            },
-          ],
-        },
-        "createVersion": true,
-        "description": "QNA Day Of Week Intent - x.x.x - v1",
-        "fulfillmentActivity": {
-          "type": "ReturnIntent",
-        },
-        "name": {
-          "Fn::Sub": "QNADayOfWeekIntent-\${AWS::StackName}",
-        },
-        "rejectionStatement": {
-          "messages": [
-            {
-              "content": "Please let me know the day again.",
-              "contentType": "PlainText",
-            },
-          ],
-        },
-        "sampleUtterances": [
-          "The day is {DayOfWeek}",
-          "The day was {DayOfWeek}",
-          "I went on {DayOfWeek}",
-          "It is {DayOfWeek}",
-          "It occurred on {DayOfWeek}",
-          "{DayOfWeek}",
-        ],
-        "slots": [
-          {
-            "name": "DayOfWeek",
-            "priority": 1,
-            "slotConstraint": "Required",
-            "slotType": "AMAZON.DayOfWeek",
-            "valueElicitationPrompt": {
-              "maxAttempts": 2,
-              "messages": [
-                {
-                  "content": "What day?",
-                  "contentType": "PlainText",
-                },
-              ],
-            },
-          },
-        ],
-      },
-      "Type": "Custom::LexIntent",
-    },
-    "EXTCanvasLMSHook": {
+    "ConnectCallbackLogGroup": {
       "Metadata": {
-        "cfn_nag": {
-          "rules_to_suppress": [
-            {
-              "id": "W92",
-              "reason": "This lambda function does not require to have ReservedConcurrentExecutions",
-            },
-          ],
-        },
         "guard": {
           "SuppressedRules": [
-            "LAMBDA_CONCURRENCY_CHECK",
-            "LAMBDA_INSIDE_VPC",
+            "CLOUDWATCH_LOG_GROUP_ENCRYPTED",
+            "CW_LOGGROUP_RETENTION_PERIOD_CHECK",
           ],
         },
       },
       "Properties": {
-        "Code": {
-          "S3Bucket": {
-            "Ref": "BootstrapBucket",
-          },
-          "S3Key": {
-            "Fn::Join": [
-              "",
-              [
-                {
-                  "Ref": "BootstrapPrefix",
-                },
-                "/lambda/EXTCanvasLMSHook.zip",
-              ],
+        "LogGroupName": {
+          "Fn::Join": [
+            "-",
+            [
+              {
+                "Fn::Sub": "/aws/lambda/\${AWS::StackName}",
+              },
+              "ExamplePYTHONLambdaConnectCallback",
+              {
+                "Fn::Select": [
+                  "2",
+                  {
+                    "Fn::Split": [
+                      "/",
+                      {
+                        "Ref": "AWS::StackId",
+                      },
+                    ],
+                  },
+                ],
+              },
             ],
-          },
-          "S3ObjectVersion": {
-            "Ref": "CodeVersionCanvasLMSHook",
-          },
-        },
-        "Environment": {
-          "Variables": {
-            "ES_ADDRESS": {
-              "Ref": "ESAddress",
-            },
-            "ES_INDEX": {
-              "Ref": "Index",
-            },
-            "FIREHOSE_NAME": {
-              "Ref": "FeedbackKinesisFirehoseName",
-            },
-            "PYTHONPATH": "/var/task/py_modules:/var/runtime:/opt/python",
-            "QUIZ_KMS_KEY": {
-              "Ref": "QuizKey",
-            },
-            "SOLUTION_ID": "SO0189",
-            "SOLUTION_VERSION": "vx.x.x",
-          },
-        },
-        "Handler": "CanvasLMSHook.handler",
-        "MemorySize": "2048",
-        "Role": {
-          "Fn::GetAtt": [
-            "ExtensionLambdaRole",
-            "Arn",
           ],
         },
-        "Runtime": "python",
-        "Tags": [
-          {
-            "Key": "Type",
-            "Value": "LambdaHook",
-          },
-        ],
-        "Timeout": 300,
-        "TracingConfig": {
+        "RetentionInDays": {
           "Fn::If": [
-            "XRAYEnabled",
+            "LogRetentionPeriodIsNotZero",
             {
-              "Mode": "Active",
-            },
-            {
-              "Ref": "AWS::NoValue",
-            },
-          ],
-        },
-        "VpcConfig": {
-          "Fn::If": [
-            "VPCEnabled",
-            {
-              "SecurityGroupIds": {
-                "Fn::Split": [
-                  ",",
-                  {
-                    "Ref": "VPCSecurityGroupIdList",
-                  },
-                ],
-              },
-              "SubnetIds": {
-                "Fn::Split": [
-                  ",",
-                  {
-                    "Ref": "VPCSubnetIdList",
-                  },
-                ],
-              },
+              "Ref": "LogRetentionPeriod",
             },
             {
               "Ref": "AWS::NoValue",
@@ -1354,7 +986,151 @@ exports[`renders examples template correctly 1`] = `
           ],
         },
       },
-      "Type": "AWS::Lambda::Function",
+      "Type": "AWS::Logs::LogGroup",
+    },
+    "CreateRecentTopicsResponseLogGroup": {
+      "Metadata": {
+        "guard": {
+          "SuppressedRules": [
+            "CLOUDWATCH_LOG_GROUP_ENCRYPTED",
+            "CW_LOGGROUP_RETENTION_PERIOD_CHECK",
+          ],
+        },
+      },
+      "Properties": {
+        "LogGroupName": {
+          "Fn::Join": [
+            "-",
+            [
+              {
+                "Fn::Sub": "/aws/lambda/\${AWS::StackName}",
+              },
+              "EXTCreateRecentTopicsResponse",
+              {
+                "Fn::Select": [
+                  "2",
+                  {
+                    "Fn::Split": [
+                      "/",
+                      {
+                        "Ref": "AWS::StackId",
+                      },
+                    ],
+                  },
+                ],
+              },
+            ],
+          ],
+        },
+        "RetentionInDays": {
+          "Fn::If": [
+            "LogRetentionPeriodIsNotZero",
+            {
+              "Ref": "LogRetentionPeriod",
+            },
+            {
+              "Ref": "AWS::NoValue",
+            },
+          ],
+        },
+      },
+      "Type": "AWS::Logs::LogGroup",
+    },
+    "CustomJSHookLogGroup": {
+      "Metadata": {
+        "guard": {
+          "SuppressedRules": [
+            "CLOUDWATCH_LOG_GROUP_ENCRYPTED",
+            "CW_LOGGROUP_RETENTION_PERIOD_CHECK",
+          ],
+        },
+      },
+      "Properties": {
+        "LogGroupName": {
+          "Fn::Join": [
+            "-",
+            [
+              {
+                "Fn::Sub": "/aws/lambda/\${AWS::StackName}",
+              },
+              "EXTCustomJSHook",
+              {
+                "Fn::Select": [
+                  "2",
+                  {
+                    "Fn::Split": [
+                      "/",
+                      {
+                        "Ref": "AWS::StackId",
+                      },
+                    ],
+                  },
+                ],
+              },
+            ],
+          ],
+        },
+        "RetentionInDays": {
+          "Fn::If": [
+            "LogRetentionPeriodIsNotZero",
+            {
+              "Ref": "LogRetentionPeriod",
+            },
+            {
+              "Ref": "AWS::NoValue",
+            },
+          ],
+        },
+      },
+      "Type": "AWS::Logs::LogGroup",
+    },
+    "CustomPYHookLogGroup": {
+      "Metadata": {
+        "guard": {
+          "SuppressedRules": [
+            "CLOUDWATCH_LOG_GROUP_ENCRYPTED",
+            "CW_LOGGROUP_RETENTION_PERIOD_CHECK",
+          ],
+        },
+      },
+      "Properties": {
+        "LogGroupName": {
+          "Fn::Join": [
+            "-",
+            [
+              {
+                "Fn::Sub": "/aws/lambda/\${AWS::StackName}",
+              },
+              "EXTCustomPYHook",
+              {
+                "Fn::Select": [
+                  "2",
+                  {
+                    "Fn::Split": [
+                      "/",
+                      {
+                        "Ref": "AWS::StackId",
+                      },
+                    ],
+                  },
+                ],
+              },
+            ],
+          ],
+        },
+        "RetentionInDays": {
+          "Fn::If": [
+            "LogRetentionPeriodIsNotZero",
+            {
+              "Ref": "LogRetentionPeriod",
+            },
+            {
+              "Ref": "AWS::NoValue",
+            },
+          ],
+        },
+      },
+      "Type": "AWS::Logs::LogGroup",
     },
     "EXTCreateRecentTopicsResponse": {
       "Metadata": {
@@ -1418,6 +1194,11 @@ exports[`renders examples template correctly 1`] = `
             "Ref": "JsLambdaHookSDKLambdaLayer",
           },
         ],
+        "LoggingConfig": {
+          "LogGroup": {
+            "Ref": "CreateRecentTopicsResponseLogGroup",
+          },
+        },
         "MemorySize": "2048",
         "Role": {
           "Fn::GetAtt": [
@@ -1535,6 +1316,11 @@ exports[`renders examples template correctly 1`] = `
             "Ref": "JsLambdaHookSDKLambdaLayer",
           },
         ],
+        "LoggingConfig": {
+          "LogGroup": {
+            "Ref": "CustomJSHookLogGroup",
+          },
+        },
         "MemorySize": "2048",
         "Role": {
           "Fn::GetAtt": [
@@ -1647,6 +1433,11 @@ exports[`renders examples template correctly 1`] = `
           },
         },
         "Handler": "CustomPYHook.handler",
+        "LoggingConfig": {
+          "LogGroup": {
+            "Ref": "CustomPYHookLogGroup",
+          },
+        },
         "MemorySize": "2048",
         "Role": {
           "Fn::GetAtt": [
@@ -1706,9 +1497,6 @@ exports[`renders examples template correctly 1`] = `
       "Properties": {
         "Bucket": {
           "Ref": "AssetBucket",
-        },
-        "CanvasLMSHookPY": {
-          "Ref": "EXTCanvasLMSHook",
         },
         "CreateRecentTopicsResponseJS": {
           "Ref": "EXTCreateRecentTopicsResponse",
@@ -1787,6 +1575,11 @@ exports[`renders examples template correctly 1`] = `
             "Ref": "AwsSdkLayerLambdaLayer",
           },
         ],
+        "LoggingConfig": {
+          "LogGroup": {
+            "Ref": "EXTUiImportLambdaLogGroup",
+          },
+        },
         "MemorySize": "128",
         "Role": {
           "Ref": "CFNLambdaRole",
@@ -1839,6 +1632,53 @@ exports[`renders examples template correctly 1`] = `
       },
       "Type": "AWS::Lambda::Function",
     },
+    "EXTUiImportLambdaLogGroup": {
+      "Metadata": {
+        "guard": {
+          "SuppressedRules": [
+            "CLOUDWATCH_LOG_GROUP_ENCRYPTED",
+            "CW_LOGGROUP_RETENTION_PERIOD_CHECK",
+          ],
+        },
+      },
+      "Properties": {
+        "LogGroupName": {
+          "Fn::Join": [
+            "-",
+            [
+              {
+                "Fn::Sub": "/aws/lambda/\${AWS::StackName}-EXTUiImportLambda",
+              },
+              {
+                "Fn::Select": [
+                  "2",
+                  {
+                    "Fn::Split": [
+                      "/",
+                      {
+                        "Ref": "AWS::StackId",
+                      },
+                    ],
+                  },
+                ],
+              },
+            ],
+          ],
+        },
+        "RetentionInDays": {
+          "Fn::If": [
+            "LogRetentionPeriodIsNotZero",
+            {
+              "Ref": "LogRetentionPeriod",
+            },
+            {
+              "Ref": "AWS::NoValue",
+            },
+          ],
+        },
+      },
+      "Type": "AWS::Logs::LogGroup",
+    },
     "EXTUiImportVersion": {
       "Properties": {
         "Bucket": {
@@ -1853,85 +1693,6 @@ exports[`renders examples template correctly 1`] = `
         },
       },
       "Type": "Custom::S3Version",
-    },
-    "EmailAddressAliasV2": {
-      "Condition": "CreateLexV1ResponseBots",
-      "DependsOn": "QNAEmailAddress",
-      "Properties": {
-        "ServiceToken": {
-          "Ref": "CFNLambda",
-        },
-        "botName": {
-          "Ref": "QNAEmailAddress",
-        },
-        "description": "QNA Email Address Alias - x.x.x - v1",
-        "name": "live",
-      },
-      "Type": "Custom::LexAlias",
-    },
-    "EmailAddressIntent": {
-      "Condition": "CreateLexV1ResponseBots",
-      "Properties": {
-        "ServiceToken": {
-          "Ref": "CFNLambda",
-        },
-        "conclusionStatement": {
-          "messages": [
-            {
-              "content": "OK. ",
-              "contentType": "PlainText",
-            },
-          ],
-        },
-        "confirmationPrompt": {
-          "maxAttempts": 1,
-          "messages": [
-            {
-              "content": "Is {EmailAddress} correct (Yes or No)?",
-              "contentType": "PlainText",
-            },
-          ],
-        },
-        "createVersion": true,
-        "description": "QNA Email Address Intent - x.x.x - v1",
-        "fulfillmentActivity": {
-          "type": "ReturnIntent",
-        },
-        "name": {
-          "Fn::Sub": "QNAEmailAddressIntent-\${AWS::StackName}",
-        },
-        "rejectionStatement": {
-          "messages": [
-            {
-              "content": "Please let me know the email address again.",
-              "contentType": "PlainText",
-            },
-          ],
-        },
-        "sampleUtterances": [
-          "My email address is {EmailAddress}",
-          "The email address is {EmailAddress}",
-          "{EmailAddress}",
-        ],
-        "slots": [
-          {
-            "name": "EmailAddress",
-            "priority": 1,
-            "slotConstraint": "Required",
-            "slotType": "AMAZON.EmailAddress",
-            "valueElicitationPrompt": {
-              "maxAttempts": 2,
-              "messages": [
-                {
-                  "content": "What email address?",
-                  "contentType": "PlainText",
-                },
-              ],
-            },
-          },
-        ],
-      },
-      "Type": "Custom::LexIntent",
     },
     "ExampleCodeVersion": {
       "Properties": {
@@ -2012,6 +1773,11 @@ exports[`renders examples template correctly 1`] = `
             "Ref": "AwsSdkLayerLambdaLayer",
           },
         ],
+        "LoggingConfig": {
+          "LogGroup": {
+            "Ref": "QuizLogGroup",
+          },
+        },
         "MemorySize": "128",
         "Role": {
           "Fn::GetAtt": [
@@ -2131,6 +1897,11 @@ exports[`renders examples template correctly 1`] = `
             "Ref": "AwsSdkLayerLambdaLayer",
           },
         ],
+        "LoggingConfig": {
+          "LogGroup": {
+            "Ref": "hookLogGroup",
+          },
+        },
         "MemorySize": "128",
         "Role": {
           "Fn::GetAtt": [
@@ -2445,56 +2216,6 @@ exports[`renders examples template correctly 1`] = `
               "Statement": [
                 {
                   "Action": [
-                    "lex:PostText",
-                  ],
-                  "Effect": "Allow",
-                  "Resource": [
-                    {
-                      "Fn::Join": [
-                        "",
-                        [
-                          "arn:aws:lex:",
-                          {
-                            "Ref": "AWS::Region",
-                          },
-                          ":",
-                          {
-                            "Ref": "AWS::AccountId",
-                          },
-                          ":bot:*",
-                          ":qna*",
-                        ],
-                      ],
-                    },
-                    {
-                      "Fn::Join": [
-                        "",
-                        [
-                          "arn:aws:lex:",
-                          {
-                            "Ref": "AWS::Region",
-                          },
-                          ":",
-                          {
-                            "Ref": "AWS::AccountId",
-                          },
-                          ":bot:*",
-                          ":QNA*",
-                        ],
-                      ],
-                    },
-                  ],
-                },
-              ],
-              "Version": "2012-10-17",
-            },
-            "PolicyName": "LexQNALambda",
-          },
-          {
-            "PolicyDocument": {
-              "Statement": [
-                {
-                  "Action": [
                     "lambda:InvokeFunction",
                   ],
                   "Effect": "Allow",
@@ -2626,6 +2347,11 @@ exports[`renders examples template correctly 1`] = `
           },
         },
         "Handler": "py/BotBroker.handler",
+        "LoggingConfig": {
+          "LogGroup": {
+            "Ref": "BotBrokerLogGroup",
+          },
+        },
         "MemorySize": "128",
         "Role": {
           "Fn::GetAtt": [
@@ -2743,6 +2469,11 @@ exports[`renders examples template correctly 1`] = `
           },
         },
         "Handler": "py/ConnectCallback.handler",
+        "LoggingConfig": {
+          "LogGroup": {
+            "Ref": "ConnectCallbackLogGroup",
+          },
+        },
         "MemorySize": "128",
         "Role": {
           "Fn::GetAtt": [
@@ -2860,6 +2591,11 @@ exports[`renders examples template correctly 1`] = `
           },
         },
         "Handler": "py/Feedback.handler",
+        "LoggingConfig": {
+          "LogGroup": {
+            "Ref": "FeedbackLogGroup",
+          },
+        },
         "MemorySize": "128",
         "Role": {
           "Fn::GetAtt": [
@@ -2977,6 +2713,11 @@ exports[`renders examples template correctly 1`] = `
           },
         },
         "Handler": "py/Next.handler",
+        "LoggingConfig": {
+          "LogGroup": {
+            "Ref": "NextLogGroup",
+          },
+        },
         "MemorySize": "128",
         "Role": {
           "Fn::GetAtt": [
@@ -3094,6 +2835,11 @@ exports[`renders examples template correctly 1`] = `
           },
         },
         "Handler": "py/Previous.handler",
+        "LoggingConfig": {
+          "LogGroup": {
+            "Ref": "PreviousLogGroup",
+          },
+        },
         "MemorySize": "128",
         "Role": {
           "Fn::GetAtt": [
@@ -3211,6 +2957,11 @@ exports[`renders examples template correctly 1`] = `
           },
         },
         "Handler": "py/hello.handler",
+        "LoggingConfig": {
+          "LogGroup": {
+            "Ref": "helloLogGroup",
+          },
+        },
         "MemorySize": "128",
         "Role": {
           "Fn::GetAtt": [
@@ -3319,6 +3070,11 @@ exports[`renders examples template correctly 1`] = `
             "Ref": "AwsSdkLayerLambdaLayer",
           },
         ],
+        "LoggingConfig": {
+          "LogGroup": {
+            "Ref": "ExampleWriteLambdaLogGroup",
+          },
+        },
         "MemorySize": "128",
         "Role": {
           "Ref": "CFNLambdaRole",
@@ -3370,6 +3126,53 @@ exports[`renders examples template correctly 1`] = `
         },
       },
       "Type": "AWS::Lambda::Function",
+    },
+    "ExampleWriteLambdaLogGroup": {
+      "Metadata": {
+        "guard": {
+          "SuppressedRules": [
+            "CLOUDWATCH_LOG_GROUP_ENCRYPTED",
+            "CW_LOGGROUP_RETENTION_PERIOD_CHECK",
+          ],
+        },
+      },
+      "Properties": {
+        "LogGroupName": {
+          "Fn::Join": [
+            "-",
+            [
+              {
+                "Fn::Sub": "/aws/lambda/\${AWS::StackName}-ExampleWriteLambda",
+              },
+              {
+                "Fn::Select": [
+                  "2",
+                  {
+                    "Fn::Split": [
+                      "/",
+                      {
+                        "Ref": "AWS::StackId",
+                      },
+                    ],
+                  },
+                ],
+              },
+            ],
+          ],
+        },
+        "RetentionInDays": {
+          "Fn::If": [
+            "LogRetentionPeriodIsNotZero",
+            {
+              "Ref": "LogRetentionPeriod",
+            },
+            {
+              "Ref": "AWS::NoValue",
+            },
+          ],
+        },
+      },
+      "Type": "AWS::Logs::LogGroup",
     },
     "ExtensionLambdaRole": {
       "Metadata": {
@@ -3586,106 +3389,6 @@ exports[`renders examples template correctly 1`] = `
             },
             "PolicyName": "LambdaFeedbackKinesisFirehoseQNALambda",
           },
-          {
-            "PolicyDocument": {
-              "Statement": [
-                {
-                  "Action": [
-                    "lex:PostText",
-                  ],
-                  "Effect": "Allow",
-                  "Resource": [
-                    {
-                      "Fn::Join": [
-                        "",
-                        [
-                          "arn:aws:lex:",
-                          {
-                            "Ref": "AWS::Region",
-                          },
-                          ":",
-                          {
-                            "Ref": "AWS::AccountId",
-                          },
-                          ":bot:*",
-                          ":qna*",
-                        ],
-                      ],
-                    },
-                    {
-                      "Fn::Join": [
-                        "",
-                        [
-                          "arn:aws:lex:",
-                          {
-                            "Ref": "AWS::Region",
-                          },
-                          ":",
-                          {
-                            "Ref": "AWS::AccountId",
-                          },
-                          ":bot:*",
-                          ":QNA*",
-                        ],
-                      ],
-                    },
-                  ],
-                },
-              ],
-              "Version": "2012-10-17",
-            },
-            "PolicyName": "LexQNALambda",
-          },
-          {
-            "PolicyDocument": {
-              "Statement": [
-                {
-                  "Action": [
-                    "secretsmanager:GetResourcePolicy",
-                    "secretsmanager:GetSecretValue",
-                    "secretsmanager:DescribeSecret",
-                  ],
-                  "Effect": "Allow",
-                  "Resource": [
-                    {
-                      "Fn::Join": [
-                        "",
-                        [
-                          "arn:aws:secretsmanager:",
-                          {
-                            "Ref": "AWS::Region",
-                          },
-                          ":",
-                          {
-                            "Ref": "AWS::AccountId",
-                          },
-                          ":secret:qna-*",
-                        ],
-                      ],
-                    },
-                    {
-                      "Fn::Join": [
-                        "",
-                        [
-                          "arn:aws:secretsmanager:",
-                          {
-                            "Ref": "AWS::Region",
-                          },
-                          ":",
-                          {
-                            "Ref": "AWS::AccountId",
-                          },
-                          ":secret:QNA-*",
-                        ],
-                      ],
-                    },
-                  ],
-                },
-              ],
-              "Version": "2012-10-17",
-            },
-            "PolicyName": "QNASecretsManagerLambda",
-          },
         ],
       },
       "Type": "AWS::IAM::Role",
@@ -3714,12 +3417,6 @@ exports[`renders examples template correctly 1`] = `
                 },
                 {
                   "Fn::GetAtt": [
-                    "EXTCanvasLMSHook",
-                    "Arn",
-                  ],
-                },
-                {
-                  "Fn::GetAtt": [
                     "EXTCustomPYHook",
                     "Arn",
                   ],
@@ -3736,6 +3433,54 @@ exports[`renders examples template correctly 1`] = `
         ],
       },
       "Type": "AWS::IAM::ManagedPolicy",
+    },
+    "FeedbackLogGroup": {
+      "Metadata": {
+        "guard": {
+          "SuppressedRules": [
+            "CLOUDWATCH_LOG_GROUP_ENCRYPTED",
+            "CW_LOGGROUP_RETENTION_PERIOD_CHECK",
+          ],
+        },
+      },
+      "Properties": {
+        "LogGroupName": {
+          "Fn::Join": [
+            "-",
+            [
+              {
+                "Fn::Sub": "/aws/lambda/\${AWS::StackName}",
+              },
+              "ExamplePYTHONLambdaFeedback",
+              {
+                "Fn::Select": [
+                  "2",
+                  {
+                    "Fn::Split": [
+                      "/",
+                      {
+                        "Ref": "AWS::StackId",
+                      },
+                    ],
+                  },
+                ],
+              },
+            ],
+          ],
+        },
+        "RetentionInDays": {
+          "Fn::If": [
+            "LogRetentionPeriodIsNotZero",
+            {
+              "Ref": "LogRetentionPeriod",
+            },
+            {
+              "Ref": "AWS::NoValue",
+            },
+          ],
+        },
+      },
+      "Type": "AWS::Logs::LogGroup",
     },
     "FeedbackSNS": {
       "Properties": {
@@ -3913,1508 +3658,101 @@ exports[`renders examples template correctly 1`] = `
       },
       "Type": "Custom::QnABotExamples",
     },
-    "MonthAliasNoConfirmV2": {
-      "Condition": "CreateLexV1ResponseBots",
-      "DependsOn": "QNAMonthNoConfirm",
-      "Properties": {
-        "ServiceToken": {
-          "Ref": "CFNLambda",
+    "NextLogGroup": {
+      "Metadata": {
+        "guard": {
+          "SuppressedRules": [
+            "CLOUDWATCH_LOG_GROUP_ENCRYPTED",
+            "CW_LOGGROUP_RETENTION_PERIOD_CHECK",
+          ],
         },
-        "botName": {
-          "Ref": "QNAMonthNoConfirm",
-        },
-        "description": "QNA Month Alias No Confirm - x.x.x - v1",
-        "name": "live",
       },
-      "Type": "Custom::LexAlias",
+      "Properties": {
+        "LogGroupName": {
+          "Fn::Join": [
+            "-",
+            [
+              {
+                "Fn::Sub": "/aws/lambda/\${AWS::StackName}",
+              },
+              "ExamplePYTHONLambdaNext",
+              {
+                "Fn::Select": [
+                  "2",
+                  {
+                    "Fn::Split": [
+                      "/",
+                      {
+                        "Ref": "AWS::StackId",
+                      },
+                    ],
+                  },
+                ],
+              },
+            ],
+          ],
+        },
+        "RetentionInDays": {
+          "Fn::If": [
+            "LogRetentionPeriodIsNotZero",
+            {
+              "Ref": "LogRetentionPeriod",
+            },
+            {
+              "Ref": "AWS::NoValue",
+            },
+          ],
+        },
+      },
+      "Type": "AWS::Logs::LogGroup",
     },
-    "MonthAliasV2": {
-      "Condition": "CreateLexV1ResponseBots",
-      "DependsOn": "QNAMonth",
-      "Properties": {
-        "ServiceToken": {
-          "Ref": "CFNLambda",
+    "PreviousLogGroup": {
+      "Metadata": {
+        "guard": {
+          "SuppressedRules": [
+            "CLOUDWATCH_LOG_GROUP_ENCRYPTED",
+            "CW_LOGGROUP_RETENTION_PERIOD_CHECK",
+          ],
         },
-        "botName": {
-          "Ref": "QNAMonth",
-        },
-        "description": "QNA Month Alias - x.x.x - v1",
-        "name": "live",
       },
-      "Type": "Custom::LexAlias",
-    },
-    "MonthIntent": {
-      "Condition": "CreateLexV1ResponseBots",
       "Properties": {
-        "ServiceToken": {
-          "Ref": "CFNLambda",
+        "LogGroupName": {
+          "Fn::Join": [
+            "-",
+            [
+              {
+                "Fn::Sub": "/aws/lambda/\${AWS::StackName}",
+              },
+              "ExamplePYTHONLambdaPrevious",
+              {
+                "Fn::Select": [
+                  "2",
+                  {
+                    "Fn::Split": [
+                      "/",
+                      {
+                        "Ref": "AWS::StackId",
+                      },
+                    ],
+                  },
+                ],
+              },
+            ],
+          ],
         },
-        "conclusionStatement": {
-          "messages": [
+        "RetentionInDays": {
+          "Fn::If": [
+            "LogRetentionPeriodIsNotZero",
             {
-              "content": "OK. ",
-              "contentType": "PlainText",
+              "Ref": "LogRetentionPeriod",
+            },
+            {
+              "Ref": "AWS::NoValue",
             },
           ],
         },
-        "confirmationPrompt": {
-          "maxAttempts": 1,
-          "messages": [
-            {
-              "content": "Is {Month} correct (Yes or No)?",
-              "contentType": "PlainText",
-            },
-          ],
-        },
-        "createVersion": true,
-        "description": "QNA Month Intent - x.x.x - v1",
-        "fulfillmentActivity": {
-          "type": "ReturnIntent",
-        },
-        "name": {
-          "Fn::Sub": "QNAMonthIntent-\${AWS::StackName}",
-        },
-        "rejectionStatement": {
-          "messages": [
-            {
-              "content": "Please let me know the month again.",
-              "contentType": "PlainText",
-            },
-          ],
-        },
-        "sampleUtterances": [
-          "The month is {Month}",
-          "The month was {Month}",
-          "It is {Month}",
-          "It occurred on {Month}",
-          "{Month}",
-        ],
-        "slots": [
-          {
-            "name": "Month",
-            "priority": 1,
-            "slotConstraint": "Required",
-            "slotType": "AMAZON.Month",
-            "valueElicitationPrompt": {
-              "maxAttempts": 2,
-              "messages": [
-                {
-                  "content": "What month?",
-                  "contentType": "PlainText",
-                },
-              ],
-            },
-          },
-        ],
       },
-      "Type": "Custom::LexIntent",
-    },
-    "MonthIntentNoConfirm": {
-      "Condition": "CreateLexV1ResponseBots",
-      "Properties": {
-        "ServiceToken": {
-          "Ref": "CFNLambda",
-        },
-        "conclusionStatement": {
-          "messages": [
-            {
-              "content": "OK. ",
-              "contentType": "PlainText",
-            },
-          ],
-        },
-        "createVersion": true,
-        "description": "QNA Month Intent No Confirm - x.x.x - v1",
-        "fulfillmentActivity": {
-          "type": "ReturnIntent",
-        },
-        "name": {
-          "Fn::Sub": "QNAMonthIntentNoConfirm-\${AWS::StackName}",
-        },
-        "sampleUtterances": [
-          "The month is {Month}",
-          "The month was {Month}",
-          "It is {Month}",
-          "It occurred on {Month}",
-          "{Month}",
-        ],
-        "slots": [
-          {
-            "name": "Month",
-            "priority": 1,
-            "slotConstraint": "Required",
-            "slotType": "AMAZON.Month",
-            "valueElicitationPrompt": {
-              "maxAttempts": 2,
-              "messages": [
-                {
-                  "content": "What month?",
-                  "contentType": "PlainText",
-                },
-              ],
-            },
-          },
-        ],
-      },
-      "Type": "Custom::LexIntent",
-    },
-    "NameAliasV2": {
-      "Condition": "CreateLexV1ResponseBots",
-      "DependsOn": "QNAName",
-      "Properties": {
-        "ServiceToken": {
-          "Ref": "CFNLambda",
-        },
-        "botName": {
-          "Ref": "QNAName",
-        },
-        "description": "QNA Name Alias - x.x.x - v1",
-        "name": "live",
-      },
-      "Type": "Custom::LexAlias",
-    },
-    "NameIntent": {
-      "Condition": "CreateLexV1ResponseBots",
-      "Properties": {
-        "ServiceToken": {
-          "Ref": "CFNLambda",
-        },
-        "conclusionStatement": {
-          "messages": [
-            {
-              "content": "OK. ",
-              "contentType": "PlainText",
-            },
-          ],
-        },
-        "confirmationPrompt": {
-          "maxAttempts": 1,
-          "messages": [
-            {
-              "content": "Did I get your name right (Yes or No) {FirstName} {LastName}?",
-              "contentType": "PlainText",
-            },
-          ],
-        },
-        "createVersion": true,
-        "description": "QNA Name Intent - x.x.x - v1",
-        "fulfillmentActivity": {
-          "type": "ReturnIntent",
-        },
-        "name": {
-          "Fn::Sub": "QNANameIntent-\${AWS::StackName}",
-        },
-        "rejectionStatement": {
-          "messages": [
-            {
-              "content": "Please let me know your name again.",
-              "contentType": "PlainText",
-            },
-          ],
-        },
-        "sampleUtterances": [
-          "My last name is {LastName}",
-          "My first name is {FirstName}",
-          "My first name is {FirstName} and My last name is {LastName}",
-          "My name is {FirstName} {LastName}",
-          "I am {FirstName} {LastName}",
-          "{FirstName} {LastName}",
-          "{FirstName}",
-          "{LastName}",
-        ],
-        "slots": [
-          {
-            "name": "FirstName",
-            "priority": 1,
-            "slotConstraint": "Required",
-            "slotType": "AMAZON.US_FIRST_NAME",
-            "valueElicitationPrompt": {
-              "maxAttempts": 2,
-              "messages": [
-                {
-                  "content": "What is your first name?",
-                  "contentType": "PlainText",
-                },
-              ],
-            },
-          },
-          {
-            "name": "LastName",
-            "priority": 1,
-            "slotConstraint": "Required",
-            "slotType": "AMAZON.US_LAST_NAME",
-            "valueElicitationPrompt": {
-              "maxAttempts": 2,
-              "messages": [
-                {
-                  "content": "What is your last name?",
-                  "contentType": "PlainText",
-                },
-              ],
-            },
-          },
-        ],
-      },
-      "Type": "Custom::LexIntent",
-    },
-    "NumberAliasNoConfirmV2": {
-      "Condition": "CreateLexV1ResponseBots",
-      "DependsOn": "QNANumberNoConfirm",
-      "Properties": {
-        "ServiceToken": {
-          "Ref": "CFNLambda",
-        },
-        "botName": {
-          "Ref": "QNANumberNoConfirm",
-        },
-        "description": "QNA Number Alias No Confirm - x.x.x - v1",
-        "name": "live",
-      },
-      "Type": "Custom::LexAlias",
-    },
-    "NumberAliasV2": {
-      "Condition": "CreateLexV1ResponseBots",
-      "DependsOn": "QNANumber",
-      "Properties": {
-        "ServiceToken": {
-          "Ref": "CFNLambda",
-        },
-        "botName": {
-          "Ref": "QNANumber",
-        },
-        "description": "QNA Number Alias - x.x.x - v1",
-        "name": "live",
-      },
-      "Type": "Custom::LexAlias",
-    },
-    "NumberIntent": {
-      "Condition": "CreateLexV1ResponseBots",
-      "Properties": {
-        "ServiceToken": {
-          "Ref": "CFNLambda",
-        },
-        "conclusionStatement": {
-          "messages": [
-            {
-              "content": "OK. ",
-              "contentType": "PlainText",
-            },
-          ],
-        },
-        "confirmationPrompt": {
-          "maxAttempts": 1,
-          "messages": [
-            {
-              "content": "<speak>Is <say-as interpret-as="digits">{Number}</say-as> correct (Yes or No)?</speak>",
-              "contentType": "PlainText",
-            },
-          ],
-        },
-        "createVersion": true,
-        "description": "QNA Number Intent - x.x.x - v1",
-        "fulfillmentActivity": {
-          "type": "ReturnIntent",
-        },
-        "name": {
-          "Fn::Sub": "QNANumberIntent-\${AWS::StackName}",
-        },
-        "rejectionStatement": {
-          "messages": [
-            {
-              "content": "Please let me know the number again.",
-              "contentType": "PlainText",
-            },
-          ],
-        },
-        "sampleUtterances": [
-          "The number is {Number}",
-          "The number was {Number}",
-          "It is {Number}",
-          "{Number}",
-        ],
-        "slots": [
-          {
-            "name": "Number",
-            "priority": 1,
-            "slotConstraint": "Required",
-            "slotType": "AMAZON.NUMBER",
-            "valueElicitationPrompt": {
-              "maxAttempts": 2,
-              "messages": [
-                {
-                  "content": "What number?",
-                  "contentType": "PlainText",
-                },
-              ],
-            },
-          },
-        ],
-      },
-      "Type": "Custom::LexIntent",
-    },
-    "NumberIntentNoConfirm": {
-      "Condition": "CreateLexV1ResponseBots",
-      "Properties": {
-        "ServiceToken": {
-          "Ref": "CFNLambda",
-        },
-        "conclusionStatement": {
-          "messages": [
-            {
-              "content": "OK. ",
-              "contentType": "PlainText",
-            },
-          ],
-        },
-        "createVersion": true,
-        "description": "QNA Number Intent No Confirm - x.x.x - v1",
-        "fulfillmentActivity": {
-          "type": "ReturnIntent",
-        },
-        "name": {
-          "Fn::Sub": "QNANumberIntentNoConfirm-\${AWS::StackName}",
-        },
-        "sampleUtterances": [
-          "The number is {Number}",
-          "The number was {Number}",
-          "It is {Number}",
-          "{Number}",
-        ],
-        "slots": [
-          {
-            "name": "Number",
-            "priority": 1,
-            "slotConstraint": "Required",
-            "slotType": "AMAZON.NUMBER",
-            "valueElicitationPrompt": {
-              "maxAttempts": 2,
-              "messages": [
-                {
-                  "content": "What number?",
-                  "contentType": "PlainText",
-                },
-              ],
-            },
-          },
-        ],
-      },
-      "Type": "Custom::LexIntent",
-    },
-    "PhoneNumberAliasNoConfirmV2": {
-      "Condition": "CreateLexV1ResponseBots",
-      "DependsOn": "QNAPhoneNumberNoConfirm",
-      "Properties": {
-        "ServiceToken": {
-          "Ref": "CFNLambda",
-        },
-        "botName": {
-          "Ref": "QNAPhoneNumberNoConfirm",
-        },
-        "description": "QNA Phone Number Alias No Confirm - x.x.x - v1",
-        "name": "live",
-      },
-      "Type": "Custom::LexAlias",
-    },
-    "PhoneNumberAliasV2": {
-      "Condition": "CreateLexV1ResponseBots",
-      "DependsOn": "QNAPhoneNumber",
-      "Properties": {
-        "ServiceToken": {
-          "Ref": "CFNLambda",
-        },
-        "botName": {
-          "Ref": "QNAPhoneNumber",
-        },
-        "description": "QNA Phone Number Alias - x.x.x - v1",
-        "name": "live",
-      },
-      "Type": "Custom::LexAlias",
-    },
-    "PhoneNumberIntent": {
-      "Condition": "CreateLexV1ResponseBots",
-      "Properties": {
-        "ServiceToken": {
-          "Ref": "CFNLambda",
-        },
-        "conclusionStatement": {
-          "messages": [
-            {
-              "content": "OK. ",
-              "contentType": "PlainText",
-            },
-          ],
-        },
-        "confirmationPrompt": {
-          "maxAttempts": 1,
-          "messages": [
-            {
-              "content": "<speak>Is <say-as interpret-as="telephone">{PhoneNumber}</say-as> correct (Yes or No)?</speak>",
-              "contentType": "PlainText",
-            },
-          ],
-        },
-        "createVersion": true,
-        "description": "QNA Phone Number Intent - x.x.x - v1",
-        "fulfillmentActivity": {
-          "type": "ReturnIntent",
-        },
-        "name": {
-          "Fn::Sub": "QNAPhoneNumberIntent-\${AWS::StackName}",
-        },
-        "rejectionStatement": {
-          "messages": [
-            {
-              "content": "Please let me know the phone number again.",
-              "contentType": "PlainText",
-            },
-          ],
-        },
-        "sampleUtterances": [
-          "The phone number is {PhoneNumber}",
-          "My phone number is {PhoneNumber}",
-          "It is {PhoneNumber}",
-          "{PhoneNumber}",
-        ],
-        "slots": [
-          {
-            "name": "PhoneNumber",
-            "priority": 1,
-            "slotConstraint": "Required",
-            "slotType": "AMAZON.PhoneNumber",
-            "valueElicitationPrompt": {
-              "maxAttempts": 2,
-              "messages": [
-                {
-                  "content": "What phone number?",
-                  "contentType": "PlainText",
-                },
-              ],
-            },
-          },
-        ],
-      },
-      "Type": "Custom::LexIntent",
-    },
-    "PhoneNumberIntentNoConfirm": {
-      "Condition": "CreateLexV1ResponseBots",
-      "Properties": {
-        "ServiceToken": {
-          "Ref": "CFNLambda",
-        },
-        "conclusionStatement": {
-          "messages": [
-            {
-              "content": "OK. ",
-              "contentType": "PlainText",
-            },
-          ],
-        },
-        "createVersion": true,
-        "description": "QNA Phone Number Intent No Confirm - x.x.x - v1",
-        "fulfillmentActivity": {
-          "type": "ReturnIntent",
-        },
-        "name": {
-          "Fn::Sub": "QNAPhoneNumberIntentNoConfirm-\${AWS::StackName}",
-        },
-        "sampleUtterances": [
-          "The phone number is {PhoneNumber}",
-          "My phone number is {PhoneNumber}",
-          "It is {PhoneNumber}",
-          "{PhoneNumber}",
-        ],
-        "slots": [
-          {
-            "name": "PhoneNumber",
-            "priority": 1,
-            "slotConstraint": "Required",
-            "slotType": "AMAZON.PhoneNumber",
-            "valueElicitationPrompt": {
-              "maxAttempts": 2,
-              "messages": [
-                {
-                  "content": "What phone number?",
-                  "contentType": "PlainText",
-                },
-              ],
-            },
-          },
-        ],
-      },
-      "Type": "Custom::LexIntent",
-    },
-    "PinAliasV2": {
-      "Condition": "CreateLexV1ResponseBots",
-      "Properties": {
-        "ServiceToken": {
-          "Ref": "CFNLambda",
-        },
-        "botName": {
-          "Ref": "QNAPin",
-        },
-        "description": "QNA Pin Alias - x.x.x - v1",
-        "name": "live",
-      },
-      "Type": "Custom::LexAlias",
-    },
-    "PinIntent": {
-      "Condition": "CreateLexV1ResponseBots",
-      "Properties": {
-        "ServiceToken": {
-          "Ref": "CFNLambda",
-        },
-        "conclusionStatement": {
-          "messages": [
-            {
-              "content": "OK. ",
-              "contentType": "PlainText",
-            },
-          ],
-        },
-        "confirmationPrompt": {
-          "maxAttempts": 1,
-          "messages": [
-            {
-              "content": "<speak>Is <say-as interpret-as="digits">{Pin}</say-as> correct (Yes or No)?</speak>",
-              "contentType": "PlainText",
-            },
-          ],
-        },
-        "createVersion": true,
-        "description": "QNA Pin Intent - x.x.x - v1",
-        "fulfillmentActivity": {
-          "type": "ReturnIntent",
-        },
-        "name": {
-          "Fn::Sub": "QNAPinIntent-\${AWS::StackName}",
-        },
-        "rejectionStatement": {
-          "messages": [
-            {
-              "content": "I'm sorry I did not get all the digits, please re-enter all digits.",
-              "contentType": "PlainText",
-            },
-          ],
-        },
-        "sampleUtterances": [
-          "The pin number is {Pin}",
-          "My pin number is {Pin}",
-          "It is {Pin}",
-          "{Pin}",
-        ],
-        "slots": [
-          {
-            "name": "Pin",
-            "priority": 1,
-            "slotConstraint": "Required",
-            "slotType": {
-              "Ref": "PinSlotType",
-            },
-            "slotTypeVersion": "QNABOT-AUTO-ASSIGNED",
-            "valueElicitationPrompt": {
-              "maxAttempts": 2,
-              "messages": [
-                {
-                  "content": "What are all the digits?",
-                  "contentType": "PlainText",
-                },
-              ],
-            },
-          },
-        ],
-      },
-      "Type": "Custom::LexIntent",
-    },
-    "PinIntentNoConfirm": {
-      "Condition": "CreateLexV1ResponseBots",
-      "Properties": {
-        "ServiceToken": {
-          "Ref": "CFNLambda",
-        },
-        "conclusionStatement": {
-          "messages": [
-            {
-              "content": "OK. ",
-              "contentType": "PlainText",
-            },
-          ],
-        },
-        "createVersion": true,
-        "description": "QNA Pin Intent No Confirm - x.x.x - v1",
-        "fulfillmentActivity": {
-          "type": "ReturnIntent",
-        },
-        "name": {
-          "Fn::Sub": "QNAPinIntentNoConfirm-\${AWS::StackName}",
-        },
-        "sampleUtterances": [
-          "The pin number is {Pin}",
-          "My pin number is {Pin}",
-          "It is {Pin}",
-          "{Pin}",
-        ],
-        "slots": [
-          {
-            "name": "Pin",
-            "priority": 1,
-            "slotConstraint": "Required",
-            "slotType": {
-              "Ref": "PinSlotType",
-            },
-            "slotTypeVersion": "QNABOT-AUTO-ASSIGNED",
-            "valueElicitationPrompt": {
-              "maxAttempts": 2,
-              "messages": [
-                {
-                  "content": "What are all the digits?",
-                  "contentType": "PlainText",
-                },
-              ],
-            },
-          },
-        ],
-      },
-      "Type": "Custom::LexIntent",
-    },
-    "PinNoConfirmAliasV2": {
-      "Condition": "CreateLexV1ResponseBots",
-      "Properties": {
-        "ServiceToken": {
-          "Ref": "CFNLambda",
-        },
-        "botName": {
-          "Ref": "QNAPinNoConfirm",
-        },
-        "description": "QNA Pin No Confirm Alias - x.x.x - v1",
-        "name": "live",
-      },
-      "Type": "Custom::LexAlias",
-    },
-    "PinSlotType": {
-      "Condition": "CreateLexV1ResponseBots",
-      "Properties": {
-        "ServiceToken": {
-          "Ref": "CFNLambda",
-        },
-        "createVersion": true,
-        "description": "QNA Pin Slot Type - x.x.x - v1",
-        "name": {
-          "Fn::Sub": "QNAPinSlotType-\${AWS::StackName}",
-        },
-        "parentSlotTypeSignature": "AMAZON.AlphaNumeric",
-        "slotTypeConfigurations": [
-          {
-            "regexConfiguration": {
-              "pattern": "[0-9]{4}",
-            },
-          },
-        ],
-      },
-      "Type": "Custom::LexSlotType",
-    },
-    "QNAAge": {
-      "Condition": "CreateLexV1ResponseBots",
-      "DependsOn": "AgeIntent",
-      "Properties": {
-        "ServiceToken": {
-          "Ref": "CFNLambda",
-        },
-        "abortStatement": {
-          "messages": [
-            {
-              "content": "Sorry, I could not understand. Please start again.",
-              "contentType": "PlainText",
-            },
-          ],
-        },
-        "childDirected": false,
-        "clarificationPrompt": {
-          "maxAttempts": 3,
-          "messages": [
-            {
-              "content": "Please repeat the age.",
-              "contentType": "PlainText",
-            },
-          ],
-        },
-        "createVersion": true,
-        "description": "QNA Age Bot - x.x.x - v1",
-        "intents": [
-          {
-            "intentName": {
-              "Ref": "AgeIntent",
-            },
-          },
-        ],
-        "locale": "en-US",
-        "name": {
-          "Fn::Sub": "QNAAgeBot-\${AWS::StackName}",
-        },
-        "voiceId": "Joanna",
-      },
-      "Type": "Custom::LexBot",
-    },
-    "QNADate": {
-      "Condition": "CreateLexV1ResponseBots",
-      "DependsOn": "DateIntent",
-      "Properties": {
-        "ServiceToken": {
-          "Ref": "CFNLambda",
-        },
-        "abortStatement": {
-          "messages": [
-            {
-              "content": "Sorry, I could not understand. Please start again.",
-              "contentType": "PlainText",
-            },
-          ],
-        },
-        "childDirected": false,
-        "clarificationPrompt": {
-          "maxAttempts": 3,
-          "messages": [
-            {
-              "content": "Please repeat the date.",
-              "contentType": "PlainText",
-            },
-          ],
-        },
-        "createVersion": true,
-        "description": "QNA Date Bot - x.x.x - v1",
-        "intents": [
-          {
-            "intentName": {
-              "Ref": "DateIntent",
-            },
-          },
-        ],
-        "locale": "en-US",
-        "name": {
-          "Fn::Sub": "QNADateBot-\${AWS::StackName}",
-        },
-        "voiceId": "Joanna",
-      },
-      "Type": "Custom::LexBot",
-    },
-    "QNADateNoConfirm": {
-      "Condition": "CreateLexV1ResponseBots",
-      "DependsOn": "DateIntentNoConfirm",
-      "Properties": {
-        "ServiceToken": {
-          "Ref": "CFNLambda",
-        },
-        "abortStatement": {
-          "messages": [
-            {
-              "content": "Sorry, I could not understand. Please start again.",
-              "contentType": "PlainText",
-            },
-          ],
-        },
-        "childDirected": false,
-        "clarificationPrompt": {
-          "maxAttempts": 3,
-          "messages": [
-            {
-              "content": "Please repeat the date.",
-              "contentType": "PlainText",
-            },
-          ],
-        },
-        "createVersion": true,
-        "description": "QNA Date Bot No Confirm - x.x.x - v1",
-        "intents": [
-          {
-            "intentName": {
-              "Ref": "DateIntentNoConfirm",
-            },
-          },
-        ],
-        "locale": "en-US",
-        "name": {
-          "Fn::Sub": "QNADateBotNoConfirm-\${AWS::StackName}",
-        },
-        "voiceId": "Joanna",
-      },
-      "Type": "Custom::LexBot",
-    },
-    "QNADayOfWeek": {
-      "Condition": "CreateLexV1ResponseBots",
-      "DependsOn": "DayOfWeekIntent",
-      "Properties": {
-        "ServiceToken": {
-          "Ref": "CFNLambda",
-        },
-        "abortStatement": {
-          "messages": [
-            {
-              "content": "Sorry, I could not understand. Please start again.",
-              "contentType": "PlainText",
-            },
-          ],
-        },
-        "childDirected": false,
-        "clarificationPrompt": {
-          "maxAttempts": 3,
-          "messages": [
-            {
-              "content": "Please repeat the day of the week.",
-              "contentType": "PlainText",
-            },
-          ],
-        },
-        "createVersion": true,
-        "description": "QNADayOfWeek bot - x.x.x - v1",
-        "intents": [
-          {
-            "intentName": {
-              "Ref": "DayOfWeekIntent",
-            },
-          },
-        ],
-        "locale": "en-US",
-        "name": {
-          "Fn::Sub": "QNADayOfWeekBot-\${AWS::StackName}",
-        },
-        "voiceId": "Joanna",
-      },
-      "Type": "Custom::LexBot",
-    },
-    "QNAEmailAddress": {
-      "Condition": "CreateLexV1ResponseBots",
-      "DependsOn": "EmailAddressIntent",
-      "Properties": {
-        "ServiceToken": {
-          "Ref": "CFNLambda",
-        },
-        "abortStatement": {
-          "messages": [
-            {
-              "content": "Sorry, I could not understand. Please start again.",
-              "contentType": "PlainText",
-            },
-          ],
-        },
-        "childDirected": false,
-        "clarificationPrompt": {
-          "maxAttempts": 3,
-          "messages": [
-            {
-              "content": "Please repeat the email address.",
-              "contentType": "PlainText",
-            },
-          ],
-        },
-        "createVersion": true,
-        "description": "QNA Email Address Intent - x.x.x - v1",
-        "intents": [
-          {
-            "intentName": {
-              "Ref": "EmailAddressIntent",
-            },
-          },
-        ],
-        "locale": "en-US",
-        "name": {
-          "Fn::Sub": "QNAEmailAddressBot-\${AWS::StackName}",
-        },
-        "voiceId": "Joanna",
-      },
-      "Type": "Custom::LexBot",
-    },
-    "QNAMonth": {
-      "Condition": "CreateLexV1ResponseBots",
-      "DependsOn": "MonthIntent",
-      "Properties": {
-        "ServiceToken": {
-          "Ref": "CFNLambda",
-        },
-        "abortStatement": {
-          "messages": [
-            {
-              "content": "Sorry, I could not understand. Please start again.",
-              "contentType": "PlainText",
-            },
-          ],
-        },
-        "childDirected": false,
-        "clarificationPrompt": {
-          "maxAttempts": 3,
-          "messages": [
-            {
-              "content": "Please repeat the month.",
-              "contentType": "PlainText",
-            },
-          ],
-        },
-        "createVersion": true,
-        "description": "QNA Month Bot - x.x.x - v1",
-        "intents": [
-          {
-            "intentName": {
-              "Ref": "MonthIntent",
-            },
-          },
-        ],
-        "locale": "en-US",
-        "name": {
-          "Fn::Sub": "QNAMonthBot-\${AWS::StackName}",
-        },
-        "voiceId": "Joanna",
-      },
-      "Type": "Custom::LexBot",
-    },
-    "QNAMonthNoConfirm": {
-      "Condition": "CreateLexV1ResponseBots",
-      "DependsOn": "MonthIntentNoConfirm",
-      "Properties": {
-        "ServiceToken": {
-          "Ref": "CFNLambda",
-        },
-        "abortStatement": {
-          "messages": [
-            {
-              "content": "Sorry, I could not understand. Please start again.",
-              "contentType": "PlainText",
-            },
-          ],
-        },
-        "childDirected": false,
-        "clarificationPrompt": {
-          "maxAttempts": 3,
-          "messages": [
-            {
-              "content": "Please repeat the month.",
-              "contentType": "PlainText",
-            },
-          ],
-        },
-        "createVersion": true,
-        "description": "QNA Month Bot No Confirm - x.x.x - v1",
-        "intents": [
-          {
-            "intentName": {
-              "Ref": "MonthIntentNoConfirm",
-            },
-          },
-        ],
-        "locale": "en-US",
-        "name": {
-          "Fn::Sub": "QNAMonthBotNoConfirm-\${AWS::StackName}",
-        },
-        "voiceId": "Joanna",
-      },
-      "Type": "Custom::LexBot",
-    },
-    "QNAName": {
-      "Condition": "CreateLexV1ResponseBots",
-      "DependsOn": "NameIntent",
-      "Properties": {
-        "ServiceToken": {
-          "Ref": "CFNLambda",
-        },
-        "abortStatement": {
-          "messages": [
-            {
-              "content": "Sorry, I could not understand. Please start again.",
-              "contentType": "PlainText",
-            },
-          ],
-        },
-        "childDirected": false,
-        "clarificationPrompt": {
-          "maxAttempts": 3,
-          "messages": [
-            {
-              "content": "Please repeat your first and last name?",
-              "contentType": "PlainText",
-            },
-          ],
-        },
-        "createVersion": true,
-        "description": "QNA Name Bot - x.x.x - v1",
-        "intents": [
-          {
-            "intentName": {
-              "Ref": "NameIntent",
-            },
-          },
-        ],
-        "locale": "en-US",
-        "name": {
-          "Fn::Sub": "QNANameBot-\${AWS::StackName}",
-        },
-        "voiceId": "Joanna",
-      },
-      "Type": "Custom::LexBot",
-    },
-    "QNANumber": {
-      "Condition": "CreateLexV1ResponseBots",
-      "DependsOn": "NumberIntent",
-      "Properties": {
-        "ServiceToken": {
-          "Ref": "CFNLambda",
-        },
-        "abortStatement": {
-          "messages": [
-            {
-              "content": "Sorry, I could not understand. Please start again.",
-              "contentType": "PlainText",
-            },
-          ],
-        },
-        "childDirected": false,
-        "clarificationPrompt": {
-          "maxAttempts": 3,
-          "messages": [
-            {
-              "content": "Please repeat the number.",
-              "contentType": "PlainText",
-            },
-          ],
-        },
-        "createVersion": true,
-        "description": "QNA Number Bot - x.x.x - v1",
-        "intents": [
-          {
-            "intentName": {
-              "Ref": "NumberIntent",
-            },
-          },
-        ],
-        "locale": "en-US",
-        "name": {
-          "Fn::Sub": "QNANumberBot-\${AWS::StackName}",
-        },
-        "voiceId": "Joanna",
-      },
-      "Type": "Custom::LexBot",
-    },
-    "QNANumberNoConfirm": {
-      "Condition": "CreateLexV1ResponseBots",
-      "DependsOn": "NumberIntentNoConfirm",
-      "Properties": {
-        "ServiceToken": {
-          "Ref": "CFNLambda",
-        },
-        "abortStatement": {
-          "messages": [
-            {
-              "content": "Sorry, I could not understand. Please start again.",
-              "contentType": "PlainText",
-            },
-          ],
-        },
-        "childDirected": false,
-        "clarificationPrompt": {
-          "maxAttempts": 3,
-          "messages": [
-            {
-              "content": "Please repeat the number.",
-              "contentType": "PlainText",
-            },
-          ],
-        },
-        "createVersion": true,
-        "description": "QNA Number Bot No Confirm - x.x.x - v1",
-        "intents": [
-          {
-            "intentName": {
-              "Ref": "NumberIntentNoConfirm",
-            },
-          },
-        ],
-        "locale": "en-US",
-        "name": {
-          "Fn::Sub": "QNANumberBotNoConfirm-\${AWS::StackName}",
-        },
-        "voiceId": "Joanna",
-      },
-      "Type": "Custom::LexBot",
-    },
-    "QNAPhoneNumber": {
-      "Condition": "CreateLexV1ResponseBots",
-      "DependsOn": "PhoneNumberIntent",
-      "Properties": {
-        "ServiceToken": {
-          "Ref": "CFNLambda",
-        },
-        "abortStatement": {
-          "messages": [
-            {
-              "content": "Sorry, I could not understand. Please start again.",
-              "contentType": "PlainText",
-            },
-          ],
-        },
-        "childDirected": false,
-        "clarificationPrompt": {
-          "maxAttempts": 3,
-          "messages": [
-            {
-              "content": "Please repeat the phone number.",
-              "contentType": "PlainText",
-            },
-          ],
-        },
-        "createVersion": true,
-        "description": "QNA Phone Number Bot - x.x.x - v1",
-        "intents": [
-          {
-            "intentName": {
-              "Ref": "PhoneNumberIntent",
-            },
-          },
-        ],
-        "locale": "en-US",
-        "name": {
-          "Fn::Sub": "QNAPhoneNumberBot-\${AWS::StackName}",
-        },
-        "voiceId": "Joanna",
-      },
-      "Type": "Custom::LexBot",
-    },
-    "QNAPhoneNumberNoConfirm": {
-      "Condition": "CreateLexV1ResponseBots",
-      "DependsOn": "PhoneNumberIntentNoConfirm",
-      "Properties": {
-        "ServiceToken": {
-          "Ref": "CFNLambda",
-        },
-        "abortStatement": {
-          "messages": [
-            {
-              "content": "Sorry, I could not understand. Please start again.",
-              "contentType": "PlainText",
-            },
-          ],
-        },
-        "childDirected": false,
-        "clarificationPrompt": {
-          "maxAttempts": 3,
-          "messages": [
-            {
-              "content": "Please repeat the phone number.",
-              "contentType": "PlainText",
-            },
-          ],
-        },
-        "createVersion": true,
-        "description": "QNA Phone Number Bot No Confirm - x.x.x - v1",
-        "intents": [
-          {
-            "intentName": {
-              "Ref": "PhoneNumberIntentNoConfirm",
-            },
-          },
-        ],
-        "locale": "en-US",
-        "name": {
-          "Fn::Sub": "QNAPhoneNumberBotNoConfirm-\${AWS::StackName}",
-        },
-        "voiceId": "Joanna",
-      },
-      "Type": "Custom::LexBot",
-    },
-    "QNAPin": {
-      "Condition": "CreateLexV1ResponseBots",
-      "DependsOn": "PinIntent",
-      "Properties": {
-        "ServiceToken": {
-          "Ref": "CFNLambda",
-        },
-        "abortStatement": {
-          "messages": [
-            {
-              "content": "Sorry, I could not understand. Please start again.",
-              "contentType": "PlainText",
-            },
-          ],
-        },
-        "childDirected": false,
-        "clarificationPrompt": {
-          "maxAttempts": 3,
-          "messages": [
-            {
-              "content": "I'm sorry I did not get all the digits, please re-enter all digits.",
-              "contentType": "PlainText",
-            },
-          ],
-        },
-        "createVersion": true,
-        "description": "QNA Pin elicit response - x.x.x - v1",
-        "intents": [
-          {
-            "intentName": {
-              "Ref": "PinIntent",
-            },
-          },
-        ],
-        "locale": "en-US",
-        "name": {
-          "Fn::Sub": "QNAPinBot-\${AWS::StackName}",
-        },
-        "voiceId": "Joanna",
-      },
-      "Type": "Custom::LexBot",
-    },
-    "QNAPinNoConfirm": {
-      "Condition": "CreateLexV1ResponseBots",
-      "DependsOn": "PinIntentNoConfirm",
-      "Properties": {
-        "ServiceToken": {
-          "Ref": "CFNLambda",
-        },
-        "abortStatement": {
-          "messages": [
-            {
-              "content": "Sorry, I could not understand. Please start again.",
-              "contentType": "PlainText",
-            },
-          ],
-        },
-        "childDirected": false,
-        "clarificationPrompt": {
-          "maxAttempts": 3,
-          "messages": [
-            {
-              "content": "I'm sorry I did not get all the digits, please re-enter all digits.",
-              "contentType": "PlainText",
-            },
-          ],
-        },
-        "createVersion": true,
-        "description": "QNA Pin No Confirm elicit response - x.x.x - v1",
-        "intents": [
-          {
-            "intentName": {
-              "Ref": "PinIntentNoConfirm",
-            },
-          },
-        ],
-        "locale": "en-US",
-        "name": {
-          "Fn::Sub": "QNAPinBotNoConfirm-\${AWS::StackName}",
-        },
-        "voiceId": "Joanna",
-      },
-      "Type": "Custom::LexBot",
-    },
-    "QNASocialSecurity": {
-      "Condition": "CreateLexV1ResponseBots",
-      "DependsOn": "SocialSecurityIntent",
-      "Properties": {
-        "ServiceToken": {
-          "Ref": "CFNLambda",
-        },
-        "abortStatement": {
-          "messages": [
-            {
-              "content": "Sorry, I could not understand. Please start again.",
-              "contentType": "PlainText",
-            },
-          ],
-        },
-        "childDirected": false,
-        "clarificationPrompt": {
-          "maxAttempts": 3,
-          "messages": [
-            {
-              "content": "Please repeat your social security number.",
-              "contentType": "PlainText",
-            },
-          ],
-        },
-        "createVersion": true,
-        "description": "QNA Social Security elicit response - x.x.x - v1",
-        "intents": [
-          {
-            "intentName": {
-              "Ref": "SocialSecurityIntent",
-            },
-          },
-        ],
-        "locale": "en-US",
-        "name": {
-          "Fn::Sub": "QNASocialSecurityBot-\${AWS::StackName}",
-        },
-        "voiceId": "Joanna",
-      },
-      "Type": "Custom::LexBot",
-    },
-    "QNATime": {
-      "Condition": "CreateLexV1ResponseBots",
-      "DependsOn": "TimeIntent",
-      "Properties": {
-        "ServiceToken": {
-          "Ref": "CFNLambda",
-        },
-        "abortStatement": {
-          "messages": [
-            {
-              "content": "Sorry, I could not understand. Please start again.",
-              "contentType": "PlainText",
-            },
-          ],
-        },
-        "childDirected": false,
-        "clarificationPrompt": {
-          "maxAttempts": 3,
-          "messages": [
-            {
-              "content": "Please repeat the time, specifying am or pm.",
-              "contentType": "PlainText",
-            },
-          ],
-        },
-        "createVersion": true,
-        "description": "QNA Time Bot - x.x.x - v1",
-        "intents": [
-          {
-            "intentName": {
-              "Ref": "TimeIntent",
-            },
-          },
-        ],
-        "locale": "en-US",
-        "name": {
-          "Fn::Sub": "QNATimeBot-\${AWS::StackName}",
-        },
-        "voiceId": "Joanna",
-      },
-      "Type": "Custom::LexBot",
-    },
-    "QNAWage": {
-      "Condition": "CreateLexV1ResponseBots",
-      "DependsOn": "WageIntent",
-      "Properties": {
-        "ServiceToken": {
-          "Ref": "CFNLambda",
-        },
-        "abortStatement": {
-          "messages": [
-            {
-              "content": "Sorry, I could not understand. Please start again.",
-              "contentType": "PlainText",
-            },
-          ],
-        },
-        "childDirected": false,
-        "clarificationPrompt": {
-          "maxAttempts": 3,
-          "messages": [
-            {
-              "content": "Please repeat your wage.",
-              "contentType": "PlainText",
-            },
-          ],
-        },
-        "createVersion": true,
-        "description": "QNA Wage elicit response - x.x.x - v1",
-        "intents": [
-          {
-            "intentName": {
-              "Ref": "WageIntent",
-            },
-          },
-        ],
-        "locale": "en-US",
-        "name": {
-          "Fn::Sub": "QNAWageBot-\${AWS::StackName}",
-        },
-        "voiceId": "Joanna",
-      },
-      "Type": "Custom::LexBot",
-    },
-    "QNAYesNo": {
-      "Condition": "CreateLexV1ResponseBots",
-      "DependsOn": [
-        "YesNoSlotType",
-        "YesNoIntent",
-      ],
-      "Properties": {
-        "ServiceToken": {
-          "Ref": "CFNLambda",
-        },
-        "abortStatement": {
-          "messages": [
-            {
-              "content": "Sorry, I could not understand. Please start again.",
-              "contentType": "PlainText",
-            },
-          ],
-        },
-        "childDirected": false,
-        "clarificationPrompt": {
-          "maxAttempts": 5,
-          "messages": [
-            {
-              "content": "Please repeat - say Yes or No.",
-              "contentType": "PlainText",
-            },
-          ],
-        },
-        "createVersion": true,
-        "description": "QNA Yes No Bot - x.x.x - v1",
-        "intents": [
-          {
-            "intentName": {
-              "Ref": "YesNoIntent",
-            },
-          },
-        ],
-        "locale": "en-US",
-        "name": {
-          "Fn::Sub": "QNAYesNoBot-\${AWS::StackName}",
-        },
-        "voiceId": "Joanna",
-      },
-      "Type": "Custom::LexBot",
-    },
-    "QNAYesNoExit": {
-      "Condition": "CreateLexV1ResponseBots",
-      "DependsOn": [
-        "YesNoExitSlotType",
-        "YesNoExitIntent",
-      ],
-      "Properties": {
-        "ServiceToken": {
-          "Ref": "CFNLambda",
-        },
-        "abortStatement": {
-          "messages": [
-            {
-              "content": "Sorry, I could not understand. Please start again.",
-              "contentType": "PlainText",
-            },
-          ],
-        },
-        "childDirected": false,
-        "clarificationPrompt": {
-          "maxAttempts": 5,
-          "messages": [
-            {
-              "content": "Please repeat - say Yes or No. You can also say exit, agent, quit, or bye to leave.",
-              "contentType": "PlainText",
-            },
-          ],
-        },
-        "createVersion": true,
-        "description": "QNA Yes No Exit Bot - x.x.x - v1",
-        "intents": [
-          {
-            "intentName": {
-              "Ref": "YesNoExitIntent",
-            },
-          },
-        ],
-        "locale": "en-US",
-        "name": {
-          "Fn::Sub": "QNAYesNoExitBot-\${AWS::StackName}",
-        },
-        "voiceId": "Joanna",
-      },
-      "Type": "Custom::LexBot",
+      "Type": "AWS::Logs::LogGroup",
     },
     "QuizKey": {
       "Properties": {
@@ -5463,6 +3801,54 @@ exports[`renders examples template correctly 1`] = `
         },
       },
       "Type": "AWS::KMS::Key",
+    },
+    "QuizLogGroup": {
+      "Metadata": {
+        "guard": {
+          "SuppressedRules": [
+            "CLOUDWATCH_LOG_GROUP_ENCRYPTED",
+            "CW_LOGGROUP_RETENTION_PERIOD_CHECK",
+          ],
+        },
+      },
+      "Properties": {
+        "LogGroupName": {
+          "Fn::Join": [
+            "-",
+            [
+              {
+                "Fn::Sub": "/aws/lambda/\${AWS::StackName}",
+              },
+              "ExampleJSLambdaQuiz",
+              {
+                "Fn::Select": [
+                  "2",
+                  {
+                    "Fn::Split": [
+                      "/",
+                      {
+                        "Ref": "AWS::StackId",
+                      },
+                    ],
+                  },
+                ],
+              },
+            ],
+          ],
+        },
+        "RetentionInDays": {
+          "Fn::If": [
+            "LogRetentionPeriodIsNotZero",
+            {
+              "Ref": "LogRetentionPeriod",
+            },
+            {
+              "Ref": "AWS::NoValue",
+            },
+          ],
+        },
+      },
+      "Type": "AWS::Logs::LogGroup",
     },
     "ResponseBotQNAAgeAliasV2": {
       "Condition": "CreateLexResponseBots",
@@ -9613,525 +7999,6 @@ exports[`renders examples template correctly 1`] = `
       "Type": "AWS::Lex::BotVersion",
       "UpdateReplacePolicy": "Retain",
     },
-    "SocialSecurityAliasV2": {
-      "Condition": "CreateLexV1ResponseBots",
-      "Properties": {
-        "ServiceToken": {
-          "Ref": "CFNLambda",
-        },
-        "botName": {
-          "Ref": "QNASocialSecurity",
-        },
-        "description": "QNA Social Security Alias - x.x.x - v1",
-        "name": "live",
-      },
-      "Type": "Custom::LexAlias",
-    },
-    "SocialSecurityIntent": {
-      "Condition": "CreateLexV1ResponseBots",
-      "Properties": {
-        "ServiceToken": {
-          "Ref": "CFNLambda",
-        },
-        "conclusionStatement": {
-          "messages": [
-            {
-              "content": "OK. ",
-              "contentType": "PlainText",
-            },
-          ],
-        },
-        "confirmationPrompt": {
-          "maxAttempts": 1,
-          "messages": [
-            {
-              "content": "Is {SSN} correct (Yes/No)?",
-              "contentType": "PlainText",
-            },
-          ],
-        },
-        "createVersion": true,
-        "description": "QNA Social Security Intent - x.x.x - v1",
-        "fulfillmentActivity": {
-          "type": "ReturnIntent",
-        },
-        "name": {
-          "Fn::Sub": "QNASocialSecurityIntent-\${AWS::StackName}",
-        },
-        "rejectionStatement": {
-          "messages": [
-            {
-              "content": "Please let me know the social security number again.",
-              "contentType": "PlainText",
-            },
-          ],
-        },
-        "sampleUtterances": [
-          "The social security number is {SSN}",
-          "My social security number is {SSN}",
-          "It is {SSN}",
-          "{SSN}",
-        ],
-        "slots": [
-          {
-            "name": "SSN",
-            "priority": 1,
-            "slotConstraint": "Required",
-            "slotType": {
-              "Ref": "SocialSecuritySlotType",
-            },
-            "slotTypeVersion": "QNABOT-AUTO-ASSIGNED",
-            "valueElicitationPrompt": {
-              "maxAttempts": 2,
-              "messages": [
-                {
-                  "content": "What is your social security number?",
-                  "contentType": "PlainText",
-                },
-              ],
-            },
-          },
-        ],
-      },
-      "Type": "Custom::LexIntent",
-    },
-    "SocialSecuritySlotType": {
-      "Condition": "CreateLexV1ResponseBots",
-      "Properties": {
-        "ServiceToken": {
-          "Ref": "CFNLambda",
-        },
-        "createVersion": true,
-        "description": "QNA Social Security Slot Type - x.x.x - v1",
-        "name": {
-          "Fn::Sub": "QNASocialSecuritySlotType-\${AWS::StackName}",
-        },
-        "parentSlotTypeSignature": "AMAZON.AlphaNumeric",
-        "slotTypeConfigurations": [
-          {
-            "regexConfiguration": {
-              "pattern": "[0-9]{3}-[0-9]{2}-[0-9]{4}",
-            },
-          },
-        ],
-      },
-      "Type": "Custom::LexSlotType",
-    },
-    "TimeAliasV2": {
-      "Condition": "CreateLexV1ResponseBots",
-      "DependsOn": "QNATime",
-      "Properties": {
-        "ServiceToken": {
-          "Ref": "CFNLambda",
-        },
-        "botName": {
-          "Ref": "QNATime",
-        },
-        "description": "QNA Time Alias - x.x.x - v1",
-        "name": "live",
-      },
-      "Type": "Custom::LexAlias",
-    },
-    "TimeIntent": {
-      "Condition": "CreateLexV1ResponseBots",
-      "Properties": {
-        "ServiceToken": {
-          "Ref": "CFNLambda",
-        },
-        "conclusionStatement": {
-          "messages": [
-            {
-              "content": "OK. ",
-              "contentType": "PlainText",
-            },
-          ],
-        },
-        "confirmationPrompt": {
-          "maxAttempts": 1,
-          "messages": [
-            {
-              "content": "Is {Time} correct (Yes or No)?",
-              "contentType": "PlainText",
-            },
-          ],
-        },
-        "createVersion": true,
-        "description": "QNA Time Intent - x.x.x - v1",
-        "fulfillmentActivity": {
-          "type": "ReturnIntent",
-        },
-        "name": {
-          "Fn::Sub": "QNATimeIntent-\${AWS::StackName}",
-        },
-        "rejectionStatement": {
-          "messages": [
-            {
-              "content": "Please let me know the time again.",
-              "contentType": "PlainText",
-            },
-          ],
-        },
-        "sampleUtterances": [
-          "The time was {Time}",
-          "It occurred at {Time}",
-          "At {Time}",
-          "{Time}",
-        ],
-        "slots": [
-          {
-            "name": "Time",
-            "priority": 1,
-            "slotConstraint": "Required",
-            "slotType": "AMAZON.TIME",
-            "valueElicitationPrompt": {
-              "maxAttempts": 2,
-              "messages": [
-                {
-                  "content": "What time?",
-                  "contentType": "PlainText",
-                },
-              ],
-            },
-          },
-        ],
-      },
-      "Type": "Custom::LexIntent",
-    },
-    "WageAliasV2": {
-      "Condition": "CreateLexV1ResponseBots",
-      "Properties": {
-        "ServiceToken": {
-          "Ref": "CFNLambda",
-        },
-        "botName": {
-          "Ref": "QNAWage",
-        },
-        "description": "QNA Wage Alias - x.x.x - v1",
-        "name": "live",
-      },
-      "Type": "Custom::LexAlias",
-    },
-    "WageIntent": {
-      "Condition": "CreateLexV1ResponseBots",
-      "Properties": {
-        "ServiceToken": {
-          "Ref": "CFNLambda",
-        },
-        "conclusionStatement": {
-          "messages": [
-            {
-              "content": "OK. ",
-              "contentType": "PlainText",
-            },
-          ],
-        },
-        "confirmationPrompt": {
-          "maxAttempts": 1,
-          "messages": [
-            {
-              "content": "Is {Wage} correct (Yes/No)?",
-              "contentType": "PlainText",
-            },
-          ],
-        },
-        "createVersion": true,
-        "description": "QNA Wage Intent - x.x.x - v1",
-        "fulfillmentActivity": {
-          "type": "ReturnIntent",
-        },
-        "name": {
-          "Fn::Sub": "QNAWageIntent-\${AWS::StackName}",
-        },
-        "rejectionStatement": {
-          "messages": [
-            {
-              "content": "Please let me know what your wage was again.",
-              "contentType": "PlainText",
-            },
-          ],
-        },
-        "sampleUtterances": [
-          "My salary is {Wage}",
-          "My wage is {Wage}",
-          "{Wage}",
-        ],
-        "slots": [
-          {
-            "name": "Wage",
-            "priority": 1,
-            "slotConstraint": "Required",
-            "slotType": {
-              "Ref": "WageSlotType",
-            },
-            "slotTypeVersion": "QNABOT-AUTO-ASSIGNED",
-            "valueElicitationPrompt": {
-              "maxAttempts": 2,
-              "messages": [
-                {
-                  "content": "What is your wage?",
-                  "contentType": "PlainText",
-                },
-              ],
-            },
-          },
-        ],
-      },
-      "Type": "Custom::LexIntent",
-    },
-    "WageSlotType": {
-      "Condition": "CreateLexV1ResponseBots",
-      "Properties": {
-        "ServiceToken": {
-          "Ref": "CFNLambda",
-        },
-        "createVersion": true,
-        "description": "QNA Wage Slot Type - x.x.x - v1",
-        "name": {
-          "Fn::Sub": "QNAWageSlotType-\${AWS::StackName}",
-        },
-        "parentSlotTypeSignature": "AMAZON.AlphaNumeric",
-        "slotTypeConfigurations": [
-          {
-            "regexConfiguration": {
-              "pattern": "[0-9]{1,7}",
-            },
-          },
-        ],
-      },
-      "Type": "Custom::LexSlotType",
-    },
-    "YesNoAliasV2": {
-      "Condition": "CreateLexV1ResponseBots",
-      "DependsOn": "QNAYesNo",
-      "Properties": {
-        "ServiceToken": {
-          "Ref": "CFNLambda",
-        },
-        "botName": {
-          "Ref": "QNAYesNo",
-        },
-        "description": "QNA Yes No Alias - x.x.x - v1",
-        "name": "live",
-      },
-      "Type": "Custom::LexAlias",
-    },
-    "YesNoExitAliasV2": {
-      "Condition": "CreateLexV1ResponseBots",
-      "DependsOn": "QNAYesNoExit",
-      "Properties": {
-        "ServiceToken": {
-          "Ref": "CFNLambda",
-        },
-        "botName": {
-          "Ref": "QNAYesNoExit",
-        },
-        "description": "QNA Yes No Exit Alias - x.x.x - v1",
-        "name": "live",
-      },
-      "Type": "Custom::LexAlias",
-    },
-    "YesNoExitIntent": {
-      "Condition": "CreateLexV1ResponseBots",
-      "Properties": {
-        "ServiceToken": {
-          "Ref": "CFNLambda",
-        },
-        "conclusionStatement": {
-          "messages": [
-            {
-              "content": "Ok. ",
-              "contentType": "PlainText",
-            },
-          ],
-        },
-        "createVersion": true,
-        "description": "QNA Yes No Exit Intent - x.x.x - v1",
-        "fulfillmentActivity": {
-          "type": "ReturnIntent",
-        },
-        "name": {
-          "Fn::Sub": "QNAYesNoExitIntent-\${AWS::StackName}",
-        },
-        "sampleUtterances": [
-          "{Yes_No_Exit}",
-          "I said {Yes_No_Exit}",
-        ],
-        "slots": [
-          {
-            "name": "Yes_No_Exit",
-            "priority": 1,
-            "slotConstraint": "Required",
-            "slotType": {
-              "Ref": "YesNoExitSlotType",
-            },
-            "slotTypeVersion": "QNABOT-AUTO-ASSIGNED",
-            "valueElicitationPrompt": {
-              "maxAttempts": 2,
-              "messages": [
-                {
-                  "content": "Say Yes, No, or Exit.",
-                  "contentType": "PlainText",
-                },
-              ],
-            },
-          },
-        ],
-      },
-      "Type": "Custom::LexIntent",
-    },
-    "YesNoExitSlotType": {
-      "Condition": "CreateLexV1ResponseBots",
-      "Properties": {
-        "ServiceToken": {
-          "Ref": "CFNLambda",
-        },
-        "createVersion": true,
-        "description": "QNA Yes No Exit Slot Type - x.x.x - v1",
-        "enumerationValues": [
-          {
-            "synonyms": [
-              "yes",
-              "ok",
-              "yeah",
-              "sure",
-              "yep",
-              "affirmative",
-              "aye",
-              "correct",
-              "1",
-              "one",
-            ],
-            "value": "Yes",
-          },
-          {
-            "synonyms": [
-              "no",
-              "nope",
-              "na",
-              "negative",
-              "non",
-              "2",
-              "two",
-            ],
-            "value": "No",
-          },
-          {
-            "synonyms": [
-              "exit",
-              "agent",
-              "rep",
-              "representative",
-              "stop",
-              "quit",
-              "help",
-              "bye",
-              "goodbye",
-              "3",
-              "three",
-            ],
-            "value": "Exit",
-          },
-        ],
-        "name": {
-          "Fn::Sub": "QNAYesNoExitSlotType-\${AWS::StackName}",
-        },
-        "valueSelectionStrategy": "TOP_RESOLUTION",
-      },
-      "Type": "Custom::LexSlotType",
-    },
-    "YesNoIntent": {
-      "Condition": "CreateLexV1ResponseBots",
-      "Properties": {
-        "ServiceToken": {
-          "Ref": "CFNLambda",
-        },
-        "conclusionStatement": {
-          "messages": [
-            {
-              "content": "OK. ",
-              "contentType": "PlainText",
-            },
-          ],
-        },
-        "createVersion": true,
-        "description": "QNA Yes No Intent - x.x.x - v1",
-        "fulfillmentActivity": {
-          "type": "ReturnIntent",
-        },
-        "name": {
-          "Fn::Sub": "QNAYesNoIntent-\${AWS::StackName}",
-        },
-        "sampleUtterances": [
-          "{Yes_No}",
-          "I said {Yes_No}",
-        ],
-        "slots": [
-          {
-            "name": "Yes_No",
-            "priority": 1,
-            "slotConstraint": "Required",
-            "slotType": {
-              "Ref": "YesNoSlotType",
-            },
-            "slotTypeVersion": "QNABOT-AUTO-ASSIGNED",
-            "valueElicitationPrompt": {
-              "maxAttempts": 2,
-              "messages": [
-                {
-                  "content": "Say Yes or No.",
-                  "contentType": "PlainText",
-                },
-              ],
-            },
-          },
-        ],
-      },
-      "Type": "Custom::LexIntent",
-    },
-    "YesNoSlotType": {
-      "Condition": "CreateLexV1ResponseBots",
-      "Properties": {
-        "ServiceToken": {
-          "Ref": "CFNLambda",
-        },
-        "createVersion": true,
-        "description": "QNA Yes No Slot Type - x.x.x - v1",
-        "enumerationValues": [
-          {
-            "synonyms": [
-              "yes",
-              "ok",
-              "yeah",
-              "sure",
-              "yep",
-              "affirmative",
-              "aye",
-              "correct",
-              "1",
-              "one",
-            ],
-            "value": "Yes",
-          },
-          {
-            "synonyms": [
-              "no",
-              "nope",
-              "na",
-              "negative",
-              "non",
-              "2",
-              "two",
-            ],
-            "value": "No",
-          },
-        ],
-        "name": {
-          "Fn::Sub": "QNAYesNoSlotType-\${AWS::StackName}",
-        },
-        "valueSelectionStrategy": "TOP_RESOLUTION",
-      },
-      "Type": "Custom::LexSlotType",
-    },
     "feedbacksnspolicy": {
       "Properties": {
         "PolicyDocument": {
@@ -10172,6 +8039,102 @@ exports[`renders examples template correctly 1`] = `
         ],
       },
       "Type": "AWS::SNS::TopicPolicy",
+    },
+    "helloLogGroup": {
+      "Metadata": {
+        "guard": {
+          "SuppressedRules": [
+            "CLOUDWATCH_LOG_GROUP_ENCRYPTED",
+            "CW_LOGGROUP_RETENTION_PERIOD_CHECK",
+          ],
+        },
+      },
+      "Properties": {
+        "LogGroupName": {
+          "Fn::Join": [
+            "-",
+            [
+              {
+                "Fn::Sub": "/aws/lambda/\${AWS::StackName}",
+              },
+              "ExamplePYTHONLambdahello",
+              {
+                "Fn::Select": [
+                  "2",
+                  {
+                    "Fn::Split": [
+                      "/",
+                      {
+                        "Ref": "AWS::StackId",
+                      },
+                    ],
+                  },
+                ],
+              },
+            ],
+          ],
+        },
+        "RetentionInDays": {
+          "Fn::If": [
+            "LogRetentionPeriodIsNotZero",
+            {
+              "Ref": "LogRetentionPeriod",
+            },
+            {
+              "Ref": "AWS::NoValue",
+            },
+          ],
+        },
+      },
+      "Type": "AWS::Logs::LogGroup",
+    },
+    "hookLogGroup": {
+      "Metadata": {
+        "guard": {
+          "SuppressedRules": [
+            "CLOUDWATCH_LOG_GROUP_ENCRYPTED",
+            "CW_LOGGROUP_RETENTION_PERIOD_CHECK",
+          ],
+        },
+      },
+      "Properties": {
+        "LogGroupName": {
+          "Fn::Join": [
+            "-",
+            [
+              {
+                "Fn::Sub": "/aws/lambda/\${AWS::StackName}",
+              },
+              "ExampleJSLambdahook",
+              {
+                "Fn::Select": [
+                  "2",
+                  {
+                    "Fn::Split": [
+                      "/",
+                      {
+                        "Ref": "AWS::StackId",
+                      },
+                    ],
+                  },
+                ],
+              },
+            ],
+          ],
+        },
+        "RetentionInDays": {
+          "Fn::If": [
+            "LogRetentionPeriodIsNotZero",
+            {
+              "Ref": "LogRetentionPeriod",
+            },
+            {
+              "Ref": "AWS::NoValue",
+            },
+          ],
+        },
+      },
+      "Type": "AWS::Logs::LogGroup",
     },
   },
 }

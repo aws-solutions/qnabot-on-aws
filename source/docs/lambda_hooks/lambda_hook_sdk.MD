@@ -81,7 +81,7 @@ object
 
 ### Returns
 
-- Lex V1 - [https://docs.aws.amazon.com/lex/latest/dg/lambda-input-response-format.html](https://docs.aws.amazon.com/lex/latest/dg/lambda-input-response-format.html)
+
 - Lex V2 - [https://docs.aws.amazon.com/lexv2/latest/dg/lambda.html](https://docs.aws.amazon.com/lexv2/latest/dg/lambda.html)
 
 ## get_bot

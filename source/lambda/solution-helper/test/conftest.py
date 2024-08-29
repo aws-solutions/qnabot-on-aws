@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 ######################################################################################################################
 #  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.                                                #
 #                                                                                                                    #
@@ -14,23 +13,11 @@
 
 import os
 import pytest
-import boto3
-from moto import mock_secretsmanager
 
 @pytest.fixture(autouse=True)
 def aws_environment_variables():
     """Mocked AWS evivronment variables such as AWS credentials and region"""
-    os.environ["AWS_ACCESS_KEY_ID"] = "mocked-aws-access-key-id"
-    os.environ["AWS_SECRET_ACCESS_KEY"] = "mocked-aws-secret-access-key"
-    os.environ["AWS_SESSION_TOKEN"] = "mocked-aws-session-token"
-    os.environ["AWS_REGION"] = "us-east-1"
-    os.environ["AWS_DEFAULT_REGION"] = "us-east-1"
-    os.environ["AWS_SDK_USER_AGENT"] = '{ "user_agent_extra": "solution/fakeID/fakeVersion" }'
-    os.environ["LOCALES"] = "en_US,es_US,fr_CA"
-    os.environ["SOLUTION_ID"] = "SO0189"
-    os.environ["SOLUTION_VERSION"] = "mock_version"
-
-@pytest.fixture(scope="function")
-def mock_sm():
-    with mock_secretsmanager():
-        yield boto3.client("secretsmanager", region_name="us-east-1")
+    os.environ["LAMBDA_TASK_ROOT"] = f"{os.path.dirname(os.path.realpath(__file__))}/.."
+    os.environ["SOLUTION_ID"] = "SO1234"
+    os.environ["SOLUTION_PARAMETER"] = "some-parameter"
+    os.environ["CUSTOM_SETTINGS"] = "some-custom-settings"

@@ -17,7 +17,14 @@ module.exports = {
         Type: 'AWS::Logs::LogGroup',
         Condition: 'FGACEnabled',
         Properties: {
-            LogGroupName: { 'Fn::Sub': '/aws/opensearch/${AWS::StackName}-${ESVar.ESDomain}' }
+            LogGroupName: { 'Fn::Sub': '/aws/opensearch/${AWS::StackName}-${ESVar.ESDomain}' },
+            RetentionInDays: {
+                'Fn::If': [
+                    'LogRetentionPeriodIsNotZero',
+                    { Ref: 'LogRetentionPeriod' },
+                    { Ref: 'AWS::NoValue' }
+                ]
+            },
         },
         Metadata: {
             cfn_nag: {
@@ -25,13 +32,10 @@ module.exports = {
                     {
                         id: 'W86',
                         reason: 'LogGroup is encrypted by default.',
-                    },
-                    {
-                        id: 'W84',
-                        reason: 'LogGroup needs to be retained indefinitely',
-                    },
+                    }
                 ],
             },
+            guard: util.cfnGuard('CLOUDWATCH_LOG_GROUP_ENCRYPTED', 'CW_LOGGROUP_RETENTION_PERIOD_CHECK'),
         },
     },
     OpenSearchLogGroupResourcePolicy: {

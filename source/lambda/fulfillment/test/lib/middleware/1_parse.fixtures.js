@@ -17,7 +17,15 @@ exports.createRequestObject = function (question, outputDialogMode, version, eve
         "_event": {
             "inputTranscript": question,
             "outputDialogMode": outputDialogMode,
-            "userId": "mocked_user_id"
+            "userId": "mocked_user_id",
+            "sessionState": {
+                "intent": {
+                    "name": "mock-name"
+                }
+            },
+            "request": {
+                "locale": "mock-locale"
+            }
         },
         "_setting": {
             "PROTECTED_UTTERANCES": "Thumbs up, Thumbs down"
@@ -25,7 +33,7 @@ exports.createRequestObject = function (question, outputDialogMode, version, eve
         "question": question,
     };
     if (version) {
-        request._event.version= version;
+        request._event.version = version;
     }
     if(eventRequest) {
         request._event.request = eventRequest;

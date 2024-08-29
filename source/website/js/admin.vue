@@ -51,6 +51,8 @@ v-app
             a(href="https://aws.amazon.com/blogs/machine-learning/creating-virtual-guided-navigation-using-a-question-and-answer-bot-with-amazon-lex-and-amazon-alexa/" target="_blank") Guided Navigation using QnABot
           v-list-item-title
             a(href="https://aws.amazon.com/blogs/machine-learning/create-a-questionnaire-bot-with-amazon-lex-and-amazon-alexa/" target="_blank") Create a questionnaire using QnABot
+          v-list-item-title
+            a(href="https://aws.amazon.com/blogs/machine-learning/delight-your-customers-with-great-conversational-experiences-via-qnabot-a-generative-ai-chatbot/" target="_blank") Delight your customers with great conversational experiences via QnABot, a generative AI chatbot
   v-app-bar()
     v-app-bar-nav-icon.text-primary(id="nav-open" @click.stop="drawer = !drawer")
     v-app-bar-title

@@ -253,8 +253,8 @@ async function useFallbackMethod(req, res, query_params) {
         try {
             [res, hit] = await bedrockRetrieveAndGenerate(req, res);
         } catch (e) {
-            qnabot.log('BEDROCK AGENT EXCEPTION:', e);
-            const errMsg = `Bedrock Agent exception: ${e.message.substring(0, 500)}`;
+            qnabot.log(`BEDROCK KNOWLEDGEBASE EXCEPTION: ${e.name} ${e.message.substring(0, 500)}`);
+            const errMsg = `Bedrock Knowledgebase exception: ${e.name} ${e.message.substring(0, 500)}`;
             if (!errors.includes(errMsg)) {
                 errors.push(errMsg);
             };

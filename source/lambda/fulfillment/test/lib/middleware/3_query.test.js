@@ -117,7 +117,6 @@ describe('when calling query function', () => {
         const expectedResponse = queryFixtures.createMockRoutingResponse("specialtyBot", "");
         expectedResponse.res.session.qnabotcontext.specialtyBot = "mock_specialty_bot";
         expectedResponse.res.session.qnabotcontext.specialtyBotName = "mock_specialty_bot_name";
-        expectedResponse.res.session.qnabotcontext.specialtyBotAlias = "mock_specialty_bot_alias";
         expect(util.invokeLambda).toHaveBeenCalled();
         expect(response).toEqual(expectedResponse);
     });
