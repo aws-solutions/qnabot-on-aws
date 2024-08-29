@@ -115,7 +115,7 @@ exports.performSync = async function (event, context, cb) {
 async function update_status(bucket, new_stat) {
     const status_params = {
         Bucket: bucket,
-        Key: 'status/qna-kendra-faq.txt'
+        Key: 'status-export/qna-kendra-faq.txt'
     };
 
     // NOSONAR TODO: check the return value of the object in case of an error...

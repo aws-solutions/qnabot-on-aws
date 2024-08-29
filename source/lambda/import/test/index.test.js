@@ -77,7 +77,7 @@ describe('when calling start function', () => {
     it('should call start and update status correctly', async () => {
         await start(request, null, jest.fn());
         expect(qnabot.log).toHaveBeenCalledWith('starting');
-        expect(s3Mock).toHaveReceivedCommandTimes(PutObjectCommand, 1);
+        expect(s3Mock).toHaveReceivedCommandTimes(PutObjectCommand, 2);
     });
 
     it('should handle an error', async () => {
@@ -95,6 +95,7 @@ describe('when calling step function', () => {
     const OLD_ENV = process.env;
     process.env.ES_INDEX = 'testEsIndex';
     process.env.ES_ENDPOINT = 'testEndpoint';
+    process.env.OUTPUT_S3_BUCKET = 'contentDesignerOutputBucket'
     beforeEach(() => {
         process.env = { ...OLD_ENV };
         s3Mock.reset();
@@ -201,7 +202,11 @@ describe('when calling step function', () => {
         const error = new Error('test error');
 
         const mockOptions = {
-            status: 'InProgress'
+            'progress': 0,
+            'time': {
+                'rounds': 0,
+            },
+            'status': 'InProgress'
         };
 
         const stream1 = new Readable();
@@ -209,7 +214,14 @@ describe('when calling step function', () => {
         stream1.push(null);
         const sdkStream1 = sdkStreamMixin(stream1);
 
-        s3Mock.on(GetObjectCommand).resolvesOnce({ Body: sdkStream1 }).rejects(error);
+        s3Mock.on(GetObjectCommand).resolvesOnce({ Body: sdkStream1 });
+
+        s3Mock.on(GetObjectCommand, {
+            'Bucket': undefined,
+            'Key': undefined,
+            'Range': 'bytes=undefined-undefined',
+            'VersionId': undefined
+        }).rejects(error);
 
         const mockFn = jest.fn();
         await step(request, null, mockFn);
@@ -226,14 +238,22 @@ describe('when calling step function', () => {
             'VersionId': undefined
         });
         expect(s3Mock).toHaveReceivedCommandTimes(PutObjectCommand, 1);
-        expect(s3Mock).toHaveReceivedCommandWith(PutObjectCommand, {"Body": "{\"status\":\"test error\",\"message\":\"{}\"}", "Bucket": "qna-test-importbucket", "Key": "data/import_questions.json"});
+        expect(s3Mock).toHaveReceivedCommandWith(PutObjectCommand, {"Body": "{\"progress\":0,\"time\":{\"rounds\":0},\"status\":\"test error\",\"message\":\"{}\"}", "Bucket": "contentDesignerOutputBucket", "Key": "status-import/import_questions.json"});
+        
         expect(qnabot.log).toHaveBeenCalledWith('An error occured while config status was InProgress: ', error);
         expect(mockFn).toHaveBeenCalledWith(error);
     });
 
     it('should handle an error with buffer', async () => {
+        jest.spyOn(qnabotSettings, 'getSettings').mockResolvedValue({ EMBEDDINGS_ENABLE: false });
+
+
         const mockOptions = {
-            status: 'InProgress'
+            'progress': 0,
+            'time': {
+                'rounds': 0,
+            },
+            'status': 'InProgress'
         };
 
         const errorConfig = {

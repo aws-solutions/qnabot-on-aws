@@ -55,18 +55,18 @@ module.exports = {
                         Action: 's3:PutObject',
                         Condition: {
                             ArnLike: {
-                                "aws:SourceArn" : "arn:aws:s3:::*"
+                                'aws:SourceArn': 'arn:aws:s3:::*',
                             },
                             Bool: {
                                 'aws:SecureTransport': 'true',
                             },
                             StringEquals: {
-                                "aws:SourceAccount": {Ref: 'AWS::AccountId'}
-                            }
+                                'aws:SourceAccount': { Ref: 'AWS::AccountId' },
+                            },
                         },
                         Effect: 'Allow',
                         Principal: {
-                            Service: "logging.s3.amazonaws.com"
+                            Service: 'logging.s3.amazonaws.com',
                         },
                         Resource: [
                             {
@@ -97,7 +97,7 @@ module.exports = {
                                 ],
                             },
                         ],
-                        Sid:'S3ServerAccessLogsPolicy',
+                        Sid: 'S3ServerAccessLogsPolicy',
                     },
                     {
                         Action: '*',
@@ -138,7 +138,7 @@ module.exports = {
                             },
                         ],
                         Sid: 'HttpsOnly',
-                    }
+                    },
                 ],
                 Version: '2012-10-17',
             },
@@ -147,7 +147,7 @@ module.exports = {
     ExportBucket: {
         Type: 'AWS::S3::Bucket',
         Metadata: { guard: util.cfnGuard('S3_BUCKET_NO_PUBLIC_RW_ACL') },
-        DependsOn : ['MainAccessLogBucket', 'MainAccessLogsBucketPolicy'],
+        DependsOn: ['MainAccessLogBucket', 'MainAccessLogsBucketPolicy'],
         Properties: {
             LifecycleConfiguration: {
                 Rules: [{
@@ -179,8 +179,8 @@ module.exports = {
             },
             LoggingConfiguration: {
                 DestinationBucketName: { Ref: 'MainAccessLogBucket' },
-                LogFilePrefix: {"Fn::Join": ["", [{Ref: 'MainAccessLogBucket'},"/Export/"]]},
-             }, 
+                LogFilePrefix: { 'Fn::Join': ['', [{ Ref: 'MainAccessLogBucket' }, '/Export/']] },
+            },
             PublicAccessBlockConfiguration: {
                 BlockPublicAcls: true,
                 BlockPublicPolicy: true,
@@ -247,7 +247,7 @@ module.exports = {
     ImportBucket: {
         Type: 'AWS::S3::Bucket',
         Metadata: { guard: util.cfnGuard('S3_BUCKET_NO_PUBLIC_RW_ACL') },
-        DependsOn : ['MainAccessLogBucket', 'MainAccessLogsBucketPolicy'],
+        DependsOn: ['MainAccessLogBucket', 'MainAccessLogsBucketPolicy'],
         Properties: {
             LifecycleConfiguration: {
                 Rules: [{
@@ -274,8 +274,8 @@ module.exports = {
             },
             LoggingConfiguration: {
                 DestinationBucketName: { Ref: 'MainAccessLogBucket' },
-                LogFilePrefix: {"Fn::Join": ["", [{Ref: 'MainAccessLogBucket'},"/Import/"]]},
-             }, 
+                LogFilePrefix: { 'Fn::Join': ['', [{ Ref: 'MainAccessLogBucket' }, '/Import/']] },
+            },
             PublicAccessBlockConfiguration: {
                 BlockPublicAcls: true,
                 BlockPublicPolicy: true,
@@ -340,7 +340,7 @@ module.exports = {
     TestAllBucket: {
         Type: 'AWS::S3::Bucket',
         Metadata: { guard: util.cfnGuard('S3_BUCKET_NO_PUBLIC_RW_ACL') },
-        DependsOn : ['MainAccessLogBucket', 'MainAccessLogsBucketPolicy'],
+        DependsOn: ['MainAccessLogBucket', 'MainAccessLogsBucketPolicy'],
         Properties: {
             LifecycleConfiguration: {
                 Rules: [{
@@ -367,8 +367,8 @@ module.exports = {
             },
             LoggingConfiguration: {
                 DestinationBucketName: { Ref: 'MainAccessLogBucket' },
-                LogFilePrefix: {"Fn::Join": ["", [{Ref: 'MainAccessLogBucket'},"/TestAll/"]]},
-             }, 
+                LogFilePrefix: { 'Fn::Join': ['', [{ Ref: 'MainAccessLogBucket' }, '/TestAll/']] },
+            },
             PublicAccessBlockConfiguration: {
                 BlockPublicAcls: true,
                 BlockPublicPolicy: true,
@@ -428,6 +428,114 @@ module.exports = {
                 ],
                 Version: '2012-10-17',
             },
+        },
+    },
+    ContentDesignerOutputBucket: {
+        Type: 'AWS::S3::Bucket',
+        Metadata: { guard: util.cfnGuard('S3_BUCKET_NO_PUBLIC_RW_ACL') },
+        DependsOn: ['MainAccessLogBucket', 'MainAccessLogsBucketPolicy'],
+        Properties: {
+            LifecycleConfiguration: {
+                Rules: [{
+                    ExpirationInDays: 1,
+                    Status: 'Enabled',
+                }],
+            },
+            VersioningConfiguration: {
+                Status: 'Enabled',
+            },
+            CorsConfiguration: {
+                CorsRules: [{
+                    AllowedHeaders: ['*'],
+                    AllowedMethods: ['GET'],
+                    AllowedOrigins: ['*'],
+                }],
+            },
+            BucketEncryption: {
+                ServerSideEncryptionConfiguration: [{
+                    ServerSideEncryptionByDefault: {
+                        SSEAlgorithm: 'AES256',
+                    },
+                }],
+            },
+            LoggingConfiguration: {
+                DestinationBucketName: { Ref: 'MainAccessLogBucket' },
+                LogFilePrefix: { 'Fn::Join': ['', [{ Ref: 'MainAccessLogBucket' }, '/ContentDesignerOutput/']] },
+            },
+            PublicAccessBlockConfiguration: {
+                BlockPublicAcls: true,
+                BlockPublicPolicy: true,
+                IgnorePublicAcls: true,
+                RestrictPublicBuckets: true,
+            },
+        },
+    },
+    HTTPSOnlyContentDesignerOutputBucketPolicy: {
+        Type: 'AWS::S3::BucketPolicy',
+        Properties: {
+            Bucket: {
+                Ref: 'ContentDesignerOutputBucket',
+            },
+            PolicyDocument: {
+                Statement: [
+                    {
+                        Action: '*',
+                        Condition: {
+                            Bool: {
+                                'aws:SecureTransport': 'false',
+                            },
+                        },
+                        Effect: 'Deny',
+                        Principal: '*',
+                        Resource: [
+                            {
+                                'Fn::Join': [
+                                    '',
+                                    [
+                                        {
+                                            'Fn::GetAtt': [
+                                                'ContentDesignerOutputBucket',
+                                                'Arn',
+                                            ],
+                                        },
+                                        '/*',
+                                    ],
+                                ],
+                            },
+                            {
+                                'Fn::Join': [
+                                    '',
+                                    [
+                                        {
+                                            'Fn::GetAtt': [
+                                                'ContentDesignerOutputBucket',
+                                                'Arn',
+                                            ],
+                                        },
+                                    ],
+                                ],
+                            },
+                        ],
+                        Sid: 'HttpsOnly',
+                    },
+                ],
+                Version: '2012-10-17',
+            },
+        },
+    },
+    ContentDesignerOutputClean: {
+        Type: 'Custom::S3Clean',
+        DependsOn: [
+            'CFNInvokePolicy',
+        ],
+        Properties: {
+            ServiceToken: {
+                'Fn::GetAtt': [
+                    'S3Clean',
+                    'Arn',
+                ],
+            },
+            Bucket: { Ref: 'ContentDesignerOutputBucket' },
         },
     },
 };

@@ -123,6 +123,7 @@ module.exports = {
                     name: this.filename,
                     filter: '',
                 });
+                await new Promise(resolve => setTimeout(resolve, 3000));
                 await this.refresh();
             } catch (e) {
                 // never enters this block

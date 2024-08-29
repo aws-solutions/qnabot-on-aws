@@ -113,6 +113,7 @@ module.exports = {
                     name: this.filename,
                     filter: this.filter,
                 });
+                await new Promise(resolve => setTimeout(resolve, 3000));
                 await this.refresh();
             } catch (e) {
                 this.error = e;

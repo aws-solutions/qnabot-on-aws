@@ -22,4 +22,17 @@ function sanitize(data) {
     const sanitizedData = sanitizeHtml(data, sanitizeParams);
     return sanitizedData;
 }
+
+// Escapes hash if the input text starts with one or more hashes followed by a space. 
+function escapeHashMarkdown(text) { 
+
+    const match = /^(#+)/; // Matches one ore more hashes at the start of the text
+
+    if(match.test(text)){ // If it matches the escape first hash symbol
+        text = text.replace(/^#/, '\\#')
+    };
+    return text;
+}
+
+exports.escapeHashMarkdown = escapeHashMarkdown;
 exports.sanitize = sanitize;

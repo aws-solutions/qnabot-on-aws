@@ -75,14 +75,6 @@ exports[`Verify master template is correct renders master template correctly 1`]
         "EMPTY",
       ],
     },
-    "CreateLexV1Bots": {
-      "Fn::Equals": [
-        {
-          "Ref": "LexBotVersion",
-        },
-        "LexV1 and LexV2",
-      ],
-    },
     "Domain": {
       "Fn::Not": [
         {
@@ -251,6 +243,18 @@ exports[`Verify master template is correct renders master template correctly 1`]
         "SAGEMAKER",
       ],
     },
+    "LogRetentionPeriodIsNotZero": {
+      "Fn::Not": [
+        {
+          "Fn::Equals": [
+            {
+              "Ref": "LogRetentionPeriod",
+            },
+            0,
+          ],
+        },
+      ],
+    },
     "Public": {
       "Fn::Equals": [
         {
@@ -311,14 +315,14 @@ exports[`Verify master template is correct renders master template correctly 1`]
       "ai21.j2-mid-v1": {
         "MaxTokens": 8191,
         "ModelID": "ai21.j2-mid-v1",
-        "NoHitsRegex": "(Sorry, I don't know|unable to assist you|i don't have enough context|i could not find an exact answer|no information in the search results|search results do not contain|no information in the provided search results|not find any information|search results did not contain|unable to respond|There is no mention of|documents do not mention anything|There is no information provided|reference passages do not mention)",
+        "NoHitsRegex": "(Sorry, I don't know|unable to assist you|i don't have enough context|i could not find an exact answer|no information in the search results|don't see any information in the provided search results|search results do not contain|no information in the provided search results|not find any information|search results did not contain|unable to respond|There is no mention of|documents do not mention anything|There is no information provided|reference passages do not mention|could not find an answer to this question|the model cannot answer this question)",
         "QAPromptTemplate": "The following is a friendly conversation between a human and an AI. The AI is talkative and provides lots of specific details from its context. If the AI does not know the answer to a question, it truthfully says it does not know. Documents: {context} Instruction: Based on the above documents, provide a detailed answer for {query} Answer \\"Sorry, I don't know\\" if not present in the document. Solution:",
         "QueryPromptTemplate": "<br><br>Human: Here is a chat history in <chatHistory> tags:<br><chatHistory><br>{history}<br></chatHistory><br>Human: And here is a follow up question or statement from the human in <followUpMessage> tags:<br><followUpMessage><br>{input}<br></followUpMessage><br>Human: Rephrase the follow up question or statement as a standalone question or statement that makes sense without reading the chat history.<br><br>Assistant: Here is the rephrased follow up question or statement:",
       },
       "ai21.j2-ultra-v1": {
         "MaxTokens": 8191,
         "ModelID": "ai21.j2-ultra-v1",
-        "NoHitsRegex": "(Sorry, I don't know|unable to assist you|i don't have enough context|i could not find an exact answer|no information in the search results|search results do not contain|no information in the provided search results|not find any information|search results did not contain|unable to respond|There is no mention of|documents do not mention anything|There is no information provided|reference passages do not mention)",
+        "NoHitsRegex": "(Sorry, I don't know|unable to assist you|i don't have enough context|i could not find an exact answer|no information in the search results|don't see any information in the provided search results|search results do not contain|no information in the provided search results|not find any information|search results did not contain|unable to respond|There is no mention of|documents do not mention anything|There is no information provided|reference passages do not mention|could not find an answer to this question|the model cannot answer this question)",
         "QAPromptTemplate": "The following is a friendly conversation between a human and an AI. The AI is talkative and provides lots of specific details from its context. If the AI does not know the answer to a question, it truthfully says it does not know. Documents: {context} Instruction: Based on the above documents, provide a detailed answer for {query} Answer \\"Sorry, I don't know\\" if not present in the document. Solution:",
         "QueryPromptTemplate": "<br><br>Human: Here is a chat history in <chatHistory> tags:<br><chatHistory><br>{history}<br></chatHistory><br>Human: And here is a follow up question or statement from the human in <followUpMessage> tags:<br><followUpMessage><br>{input}<br></followUpMessage><br>Human: Rephrase the follow up question or statement as a standalone question or statement that makes sense without reading the chat history.<br><br>Assistant: Here is the rephrased follow up question or statement:",
       },
@@ -327,59 +331,70 @@ exports[`Verify master template is correct renders master template correctly 1`]
         "MaxTokens": 8000,
         "ModelID": "amazon.titan-embed-text-v1",
       },
+      "amazon.titan-embed-text-v2": {
+        "EmbeddingsDimensions": 1024,
+        "MaxTokens": 8000,
+        "ModelID": "amazon.titan-embed-text-v2:0",
+      },
       "amazon.titan-text-express-v1": {
         "MaxTokens": 8000,
         "ModelID": "amazon.titan-text-express-v1",
-        "NoHitsRegex": "(Sorry, I don't know|unable to assist you|i don't have enough context|i could not find an exact answer|no information in the search results|search results do not contain|no information in the provided search results|not find any information|search results did not contain|unable to respond|There is no mention of|documents do not mention anything|There is no information provided|reference passages do not mention)",
+        "NoHitsRegex": "(Sorry, I don't know|unable to assist you|i don't have enough context|i could not find an exact answer|no information in the search results|don't see any information in the provided search results|search results do not contain|no information in the provided search results|not find any information|search results did not contain|unable to respond|There is no mention of|documents do not mention anything|There is no information provided|reference passages do not mention|could not find an answer to this question|the model cannot answer this question)",
         "QAPromptTemplate": "<br><br>Human: You are a friendly AI assistant. Answer the question in <question> tags only based on the provided reference passages. Here are reference passages in <references> tags:<br><references><br>{context}<br></references><br>If the references contain the information needed to respond, then write a confident response in under 50 words, quoting the relevant references. <br>Otherwise, if you can make an informed guess based on the reference passages, then write a less confident response in under 50 words, stating your assumptions.<br>Finally, if the references do not have any relevant information, then respond saying \\"Sorry, I don't know\\".<br><question><br>{query}<br></question><br><br>Assistant: According to the reference passages, in under 50 words:",
         "QueryPromptTemplate": "Given the following conversation and a follow up question, rephrase the follow up question to be a standalone question.<br>Chat History: <br>{history}<br>Follow up question: {input}<br>Standalone question:",
       },
       "amazon.titan-text-lite-v1": {
         "MaxTokens": 4000,
         "ModelID": "amazon.titan-text-lite-v1",
-        "NoHitsRegex": "(Sorry, I don't know|unable to assist you|i don't have enough context|i could not find an exact answer|no information in the search results|search results do not contain|no information in the provided search results|not find any information|search results did not contain|unable to respond|There is no mention of|documents do not mention anything|There is no information provided|reference passages do not mention)",
+        "NoHitsRegex": "(Sorry, I don't know|unable to assist you|i don't have enough context|i could not find an exact answer|no information in the search results|don't see any information in the provided search results|search results do not contain|no information in the provided search results|not find any information|search results did not contain|unable to respond|There is no mention of|documents do not mention anything|There is no information provided|reference passages do not mention|could not find an answer to this question|the model cannot answer this question)",
         "QAPromptTemplate": "<br><br>Human: You are a friendly AI assistant. Answer the question in <question> tags only based on the provided reference passages. Here are reference passages in <references> tags:<br><references><br>{context}<br></references><br>If the references contain the information needed to respond, then write a confident response in under 50 words, quoting the relevant references. <br>Otherwise, if you can make an informed guess based on the reference passages, then write a less confident response in under 50 words, stating your assumptions.<br>Finally, if the references do not have any relevant information, then respond saying \\"Sorry, I don't know\\".<br><question><br>{query}<br></question><br><br>Assistant: According to the reference passages, in under 50 words:",
         "QueryPromptTemplate": "Given the following conversation and a follow up question, rephrase the follow up question to be a standalone question.<br>Chat History: <br>{history}<br>Follow up question: {input}<br>Standalone question:",
       },
+      "amazon.titan-text-premier-v1": {
+        "KnowledgeBasePromptTemplate": "You are a question answering bot who gives helpful, detailed, and polite answers to the user's questions. In this session, the model has access to search results and a users question, your job is to answer the user's question using only information from the search results. Model Instructions: - You should provide concise answer to simple questions when the answer is directly contained in search results, but when comes to yes/no question, provide some details. - In case the question requires multi-hop reasoning, you should find relevant information from search results and summarize the answer based on relevant information with logical reasoning. - If the search results do not contain information that can answer the question, then respond saying \\"Sorry, I don't know that.\\". - $output_format_instructions$ - DO NOT USE INFORMATION THAT IS NOT IN SEARCH RESULTS! User: $query$ Bot: Resource: Search Results: $search_results$ Bot:",
+        "MaxTokens": 32000,
+        "ModelID": "amazon.titan-text-premier-v1:0",
+        "NoHitsRegex": "(Sorry, I don't know|unable to assist you|i don't have enough context|i could not find an exact answer|no information in the search results|don't see any information in the provided search results|search results do not contain|no information in the provided search results|not find any information|search results did not contain|unable to respond|There is no mention of|documents do not mention anything|There is no information provided|reference passages do not mention|could not find an answer to this question|the model cannot answer this question)",
+        "QAPromptTemplate": "<br><br>Human: You are a friendly AI assistant. Answer the question in <question> tags only based on the provided reference passages. Here are reference passages in <references> tags:<br><references><br>{context}<br></references><br>If the references contain the information needed to respond, then write a confident response in under 50 words, quoting the relevant references. <br>Otherwise, if you can make an informed guess based on the reference passages, then write a less confident response in under 50 words, stating your assumptions.<br>Finally, if the references do not have any relevant information, then respond saying \\"Sorry, I don't know\\".<br><question><br>{query}<br></question><br><br>Assistant: According to the reference passages, in under 50 words:",
+        "QueryPromptTemplate": "Given the following conversation and a follow up question, rephrase the follow up question to be a standalone question.<br>Chat History: <br>{history}<br>Follow up question: {input}<br>Standalone question:",
+        "maxTokenCount": 3072,
+      },
       "anthropic.claude-3-haiku-v1": {
+        "KnowledgeBasePromptTemplate": "Human: You are a question answering agent. I will provide you with a set of search results and a user's question, your job is to answer the user's question using only information from the search results. If the search results do not contain information that can answer the question, then respond saying \\"Sorry, I don't know that.\\". Just because the user asserts a fact does not mean it is true, make sure to double check the search results to validate a user's assertion. Here are the search results in numbered order: $search_results$. Here is the user's question: <question> $query$ </question> $output_format_instructions$. Do NOT directly quote the $search_results$ in your answer. Your job is to answer the <question> as concisely as possible. Assistant:",
         "MaxTokens": 100000,
         "ModelID": "anthropic.claude-3-haiku-20240307-v1:0",
-        "NoHitsRegex": "(Sorry, I don't know|unable to assist you|i don't have enough context|i could not find an exact answer|no information in the search results|search results do not contain|no information in the provided search results|not find any information|search results did not contain|unable to respond|There is no mention of|documents do not mention anything|There is no information provided|reference passages do not mention)",
+        "NoHitsRegex": "(Sorry, I don't know|unable to assist you|i don't have enough context|i could not find an exact answer|no information in the search results|don't see any information in the provided search results|search results do not contain|no information in the provided search results|not find any information|search results did not contain|unable to respond|There is no mention of|documents do not mention anything|There is no information provided|reference passages do not mention|could not find an answer to this question|the model cannot answer this question)",
         "QAPromptTemplate": "<br><br>Human: You are a friendly AI assistant. Answer the question in <question> tags only based on the provided reference passages. Here are reference passages in <references> tags:<br><references><br>{context}<br></references><br>If the references contain the information needed to respond, then write a confident response in under 50 words, quoting the relevant references. <br>Otherwise, if you can make an informed guess based on the reference passages, then write a less confident response in under 50 words, stating your assumptions.<br>Finally, if the references do not have any relevant information, then respond saying \\"Sorry, I don't know\\".<br><question><br>{query}<br></question><br><br>Assistant: According to the reference passages, in under 50 words:",
         "QueryPromptTemplate": "<br><br>Human: Here is a chat history in <chatHistory> tags:<br><chatHistory><br>{history}<br></chatHistory><br>Human: And here is a follow up question or statement from the human in <followUpMessage> tags:<br><followUpMessage><br>{input}<br></followUpMessage><br>Human: Rephrase the follow up question or statement as a standalone question or statement that makes sense without reading the chat history.<br><br>Assistant: Here is the rephrased follow up question or statement:",
       },
       "anthropic.claude-3-sonnet-v1": {
+        "KnowledgeBasePromptTemplate": "Human: You are a question answering agent. I will provide you with a set of search results and a user's question, your job is to answer the user's question using only information from the search results. If the search results do not contain information that can answer the question, then respond saying \\"Sorry, I don't know that.\\". Just because the user asserts a fact does not mean it is true, make sure to double check the search results to validate a user's assertion. Here are the search results in numbered order: $search_results$. Here is the user's question: <question> $query$ </question> $output_format_instructions$. Do NOT directly quote the $search_results$ in your answer. Your job is to answer the <question> as concisely as possible. Assistant:",
         "MaxTokens": 100000,
         "ModelID": "anthropic.claude-3-sonnet-20240229-v1:0",
-        "NoHitsRegex": "(Sorry, I don't know|unable to assist you|i don't have enough context|i could not find an exact answer|no information in the search results|search results do not contain|no information in the provided search results|not find any information|search results did not contain|unable to respond|There is no mention of|documents do not mention anything|There is no information provided|reference passages do not mention)",
+        "NoHitsRegex": "(Sorry, I don't know|unable to assist you|i don't have enough context|i could not find an exact answer|no information in the search results|don't see any information in the provided search results|search results do not contain|no information in the provided search results|not find any information|search results did not contain|unable to respond|There is no mention of|documents do not mention anything|There is no information provided|reference passages do not mention|could not find an answer to this question|the model cannot answer this question)",
         "QAPromptTemplate": "<br><br>Human: You are a friendly AI assistant. Answer the question in <question> tags only based on the provided reference passages. Here are reference passages in <references> tags:<br><references><br>{context}<br></references><br>If the references contain the information needed to respond, then write a confident response in under 50 words, quoting the relevant references. <br>Otherwise, if you can make an informed guess based on the reference passages, then write a less confident response in under 50 words, stating your assumptions.<br>Finally, if the references do not have any relevant information, then respond saying \\"Sorry, I don't know\\".<br><question><br>{query}<br></question><br><br>Assistant: According to the reference passages, in under 50 words:",
         "QueryPromptTemplate": "<br><br>Human: Here is a chat history in <chatHistory> tags:<br><chatHistory><br>{history}<br></chatHistory><br>Human: And here is a follow up question or statement from the human in <followUpMessage> tags:<br><followUpMessage><br>{input}<br></followUpMessage><br>Human: Rephrase the follow up question or statement as a standalone question or statement that makes sense without reading the chat history.<br><br>Assistant: Here is the rephrased follow up question or statement:",
       },
       "anthropic.claude-instant-v1": {
+        "KnowledgeBasePromptTemplate": "Human: You are a question answering agent. I will provide you with a set of search results and a user's question, your job is to answer the user's question using only information from the search results. If the search results do not contain information that can answer the question, then respond saying \\"Sorry, I don't know that.\\". Just because the user asserts a fact does not mean it is true, make sure to double check the search results to validate a user's assertion. Here are the search results in numbered order: $search_results$. Here is the user's question: <question> $query$ </question> $output_format_instructions$. Do NOT directly quote the $search_results$ in your answer. Your job is to answer the <question> as concisely as possible. Assistant:",
         "MaxTokens": 100000,
         "ModelID": "anthropic.claude-instant-v1",
-        "NoHitsRegex": "(Sorry, I don't know|unable to assist you|i don't have enough context|i could not find an exact answer|no information in the search results|search results do not contain|no information in the provided search results|not find any information|search results did not contain|unable to respond|There is no mention of|documents do not mention anything|There is no information provided|reference passages do not mention)",
+        "NoHitsRegex": "(Sorry, I don't know|unable to assist you|i don't have enough context|i could not find an exact answer|no information in the search results|don't see any information in the provided search results|search results do not contain|no information in the provided search results|not find any information|search results did not contain|unable to respond|There is no mention of|documents do not mention anything|There is no information provided|reference passages do not mention|could not find an answer to this question|the model cannot answer this question)",
         "QAPromptTemplate": "<br><br>Human: You are a friendly AI assistant. Answer the question in <question> tags only based on the provided reference passages. Here are reference passages in <references> tags:<br><references><br>{context}<br></references><br>If the references contain the information needed to respond, then write a confident response in under 50 words, quoting the relevant references. <br>Otherwise, if you can make an informed guess based on the reference passages, then write a less confident response in under 50 words, stating your assumptions.<br>Finally, if the references do not have any relevant information, then respond saying \\"Sorry, I don't know\\".<br><question><br>{query}<br></question><br><br>Assistant: According to the reference passages, in under 50 words:",
         "QueryPromptTemplate": "<br><br>Human: Here is a chat history in <chatHistory> tags:<br><chatHistory><br>{history}<br></chatHistory><br>Human: And here is a follow up question or statement from the human in <followUpMessage> tags:<br><followUpMessage><br>{input}<br></followUpMessage><br>Human: Rephrase the follow up question or statement as a standalone question or statement that makes sense without reading the chat history.<br><br>Assistant: Here is the rephrased follow up question or statement:",
       },
       "anthropic.claude-v2.1": {
+        "KnowledgeBasePromptTemplate": "Human: You are a question answering agent. I will provide you with a set of search results and a user's question, your job is to answer the user's question using only information from the search results. If the search results do not contain information that can answer the question, then respond saying \\"Sorry, I don't know that.\\". Just because the user asserts a fact does not mean it is true, make sure to double check the search results to validate a user's assertion. Here are the search results in numbered order: $search_results$. Here is the user's question: <question> $query$ </question> $output_format_instructions$. Do NOT directly quote the $search_results$ in your answer. Your job is to answer the <question> as concisely as possible. Assistant:",
         "MaxTokens": 100000,
         "ModelID": "anthropic.claude-v2:1",
-        "NoHitsRegex": "(Sorry, I don't know|unable to assist you|i don't have enough context|i could not find an exact answer|no information in the search results|search results do not contain|no information in the provided search results|not find any information|search results did not contain|unable to respond|There is no mention of|documents do not mention anything|There is no information provided|reference passages do not mention)",
+        "NoHitsRegex": "(Sorry, I don't know|unable to assist you|i don't have enough context|i could not find an exact answer|no information in the search results|don't see any information in the provided search results|search results do not contain|no information in the provided search results|not find any information|search results did not contain|unable to respond|There is no mention of|documents do not mention anything|There is no information provided|reference passages do not mention|could not find an answer to this question|the model cannot answer this question)",
         "QAPromptTemplate": "<br><br>Human: You are a friendly AI assistant. Answer the question in <question> tags only based on the provided reference passages. Here are reference passages in <references> tags:<br><references><br>{context}<br></references><br>If the references contain the information needed to respond, then write a confident response in under 50 words, quoting the relevant references. <br>Otherwise, if you can make an informed guess based on the reference passages, then write a less confident response in under 50 words, stating your assumptions.<br>Finally, if the references do not have any relevant information, then respond saying \\"Sorry, I don't know\\".<br><question><br>{query}<br></question><br><br>Assistant: According to the reference passages, in under 50 words:",
         "QueryPromptTemplate": "<br><br>Human: Here is a chat history in <chatHistory> tags:<br><chatHistory><br>{history}<br></chatHistory><br>Human: And here is a follow up question or statement from the human in <followUpMessage> tags:<br><followUpMessage><br>{input}<br></followUpMessage><br>Human: Rephrase the follow up question or statement as a standalone question or statement that makes sense without reading the chat history.<br><br>Assistant: Here is the rephrased follow up question or statement:",
-      },
-      "cohere.command-light-text-v14": {
-        "MaxTokens": 4000,
-        "ModelID": "cohere.command-light-text-v14",
-        "NoHitsRegex": "(Sorry, I don't know|unable to assist you|i don't have enough context|i could not find an exact answer|no information in the search results|search results do not contain|no information in the provided search results|not find any information|search results did not contain|unable to respond|There is no mention of|documents do not mention anything|There is no information provided|reference passages do not mention)",
-        "QAPromptTemplate": "<br><br>Human: You are a friendly AI assistant. Answer the question in <question> tags only based on the provided reference passages. Here are reference passages in <references> tags:<br><references><br>{context}<br></references><br>If the references contain the information needed to respond, then write a confident response in under 50 words, quoting the relevant references. <br>Otherwise, if you can make an informed guess based on the reference passages, then write a less confident response in under 50 words, stating your assumptions.<br>Finally, if the references do not have any relevant information, then respond saying \\"Sorry, I don't know\\".<br><question><br>{query}<br></question><br><br>Assistant: According to the reference passages, in under 50 words:",
-        "QueryPromptTemplate": "Given the following conversation and a follow up question, rephrase the follow up question to be a standalone question.<br>Chat History: <br>{history}<br>Follow up question: {input}<br>Standalone question:",
       },
       "cohere.command-text-v14": {
         "MaxTokens": 4000,
         "ModelID": "cohere.command-text-v14",
-        "NoHitsRegex": "(Sorry, I don't know|unable to assist you|i don't have enough context|i could not find an exact answer|no information in the search results|search results do not contain|no information in the provided search results|not find any information|search results did not contain|unable to respond|There is no mention of|documents do not mention anything|There is no information provided|reference passages do not mention)",
+        "NoHitsRegex": "(Sorry, I don't know|unable to assist you|i don't have enough context|i could not find an exact answer|no information in the search results|don't see any information in the provided search results|search results do not contain|no information in the provided search results|not find any information|search results did not contain|unable to respond|There is no mention of|documents do not mention anything|There is no information provided|reference passages do not mention|could not find an answer to this question|the model cannot answer this question)",
         "QAPromptTemplate": "<br><br>Human: You are a friendly AI assistant. Answer the question in <question> tags only based on the provided reference passages. Here are reference passages in <references> tags:<br><references><br>{context}<br></references><br>If the references contain the information needed to respond, then write a confident response in under 50 words, quoting the relevant references. <br>Otherwise, if you can make an informed guess based on the reference passages, then write a less confident response in under 50 words, stating your assumptions.<br>Finally, if the references do not have any relevant information, then respond saying \\"Sorry, I don't know\\".<br><question><br>{query}<br></question><br><br>Assistant: According to the reference passages, in under 50 words:",
         "QueryPromptTemplate": "Given the following conversation and a follow up question, rephrase the follow up question to be a standalone question.<br>Chat History: <br>{history}<br>Follow up question: {input}<br>Standalone question:",
       },
@@ -396,7 +411,7 @@ exports[`Verify master template is correct renders master template correctly 1`]
       "meta.llama3-8b-instruct-v1": {
         "MaxTokens": 8000,
         "ModelID": "meta.llama3-8b-instruct-v1:0",
-        "NoHitsRegex": "(Sorry, I don't know|unable to assist you|i don't have enough context|i could not find an exact answer|no information in the search results|search results do not contain|no information in the provided search results|not find any information|search results did not contain|unable to respond|There is no mention of|documents do not mention anything|There is no information provided|reference passages do not mention)",
+        "NoHitsRegex": "(Sorry, I don't know|unable to assist you|i don't have enough context|i could not find an exact answer|no information in the search results|don't see any information in the provided search results|search results do not contain|no information in the provided search results|not find any information|search results did not contain|unable to respond|There is no mention of|documents do not mention anything|There is no information provided|reference passages do not mention|could not find an answer to this question|the model cannot answer this question)",
         "QAPromptTemplate": "<br><br>Human: You are a friendly AI assistant. Answer the question in <question> tags only based on the provided reference passages. Here are reference passages in <references> tags:<br><references><br>{context}<br></references><br>If the references contain the information needed to respond, then write a confident response in under 50 words, quoting the relevant references. <br>Otherwise, if you can make an informed guess based on the reference passages, then write a less confident response in under 50 words, stating your assumptions.<br>Finally, if the references do not have any relevant information, then respond saying \\"Sorry, I don't know\\".<br><question><br>{query}<br></question><br><br>Assistant: According to the reference passages, in under 50 words:",
         "QueryPromptTemplate": "Given the following conversation and a follow up question, rephrase the follow up question to be a standalone question.<br>Chat History: <br>{history}<br>Follow up question: {input}<br>Standalone question:",
       },
@@ -435,7 +450,6 @@ exports[`Verify master template is correct renders master template correctly 1`]
             "OpenSearchDashboardsRetentionMinutes",
             "OpenSearchFineGrainAccessControl",
             "LexV2BotLocaleIds",
-            "LexBotVersion",
             "InstallLexResponseBots",
             "FulfillmentConcurrency",
             "XraySetting",
@@ -497,6 +511,7 @@ exports[`Verify master template is correct renders master template correctly 1`]
             "BootstrapBucket",
             "BootstrapPrefix",
             "BuildExamples",
+            "LogRetentionPeriod",
           ],
         },
       ],
@@ -514,25 +529,6 @@ exports[`Verify master template is correct renders master template correctly 1`]
     "ApiId": {
       "Value": {
         "Ref": "API",
-      },
-    },
-    "BotConsoleUrl": {
-      "Condition": "CreateLexV1Bots",
-      "Value": {
-        "Fn::Join": [
-          "",
-          [
-            "https://console.aws.amazon.com/lex/home?",
-            "region=",
-            {
-              "Ref": "AWS::Region",
-            },
-            "#bot-editor:bot=",
-            {
-              "Ref": "LexBot",
-            },
-          ],
-        ],
       },
     },
     "Bucket": {
@@ -586,6 +582,11 @@ exports[`Verify master template is correct renders master template correctly 1`]
           "DesignerLogin",
           "Domain",
         ],
+      },
+    },
+    "ContentDesignerOutputBucket": {
+      "Value": {
+        "Ref": "ContentDesignerOutputBucket",
       },
     },
     "ContentDesignerURL": {
@@ -674,36 +675,6 @@ exports[`Verify master template is correct renders master template correctly 1`]
     "ImportBucket": {
       "Value": {
         "Ref": "ImportBucket",
-      },
-    },
-    "LexV1BotAlias": {
-      "Condition": "CreateLexV1Bots",
-      "Value": {
-        "Ref": "VersionAlias",
-      },
-    },
-    "LexV1BotName": {
-      "Condition": "CreateLexV1Bots",
-      "Value": {
-        "Ref": "LexBot",
-      },
-    },
-    "LexV1Intent": {
-      "Condition": "CreateLexV1Bots",
-      "Value": {
-        "Ref": "Intent",
-      },
-    },
-    "LexV1IntentFallback": {
-      "Condition": "CreateLexV1Bots",
-      "Value": {
-        "Ref": "IntentFallback",
-      },
-    },
-    "LexV1SlotType": {
-      "Condition": "CreateLexV1Bots",
-      "Value": {
-        "Ref": "SlotType",
       },
     },
     "LexV2BotAlias": {
@@ -796,6 +767,11 @@ exports[`Verify master template is correct renders master template correctly 1`]
         "Ref": "PrivateQnABotSettings",
       },
     },
+    "TestAllBucket": {
+      "Value": {
+        "Ref": "TestAllBucket",
+      },
+    },
     "UserPool": {
       "Value": {
         "Ref": "UserPool",
@@ -874,6 +850,7 @@ exports[`Verify master template is correct renders master template correctly 1`]
     },
     "BedrockKnowledgeBaseModel": {
       "AllowedValues": [
+        "amazon.titan-text-premier-v1",
         "anthropic.claude-instant-v1",
         "anthropic.claude-v2.1",
         "anthropic.claude-3-sonnet-v1",
@@ -924,6 +901,7 @@ exports[`Verify master template is correct renders master template correctly 1`]
     "EmbeddingsBedrockModelId": {
       "AllowedValues": [
         "amazon.titan-embed-text-v1",
+        "amazon.titan-embed-text-v2",
         "cohere.embed-english-v3",
         "cohere.embed-multilingual-v3",
       ],
@@ -988,6 +966,7 @@ exports[`Verify master template is correct renders master template correctly 1`]
       "AllowedValues": [
         "amazon.titan-text-express-v1",
         "amazon.titan-text-lite-v1",
+        "amazon.titan-text-premier-v1",
         "ai21.j2-ultra-v1",
         "ai21.j2-mid-v1",
         "anthropic.claude-instant-v1",
@@ -1062,21 +1041,43 @@ exports[`Verify master template is correct renders master template correctly 1`]
       "Description": "Choose the primary Language for your QnABot deployment. Note: Picking non-English may correspond with limited functionalities",
       "Type": "String",
     },
-    "LexBotVersion": {
-      "AllowedValues": [
-        "LexV1 and LexV2",
-        "LexV2 Only",
-      ],
-      "Default": "LexV2 Only",
-      "Description": "Amazon Lex version to use for QnABot on AWS. Select 'LexV2 Only' to install QnABot in AWS regions where LexV1 is not supported.",
-      "Type": "String",
-    },
     "LexV2BotLocaleIds": {
       "AllowedPattern": "[^ ]+",
       "ConstraintDescription": "Must be a valid comma separated list of Locale IDs",
       "Default": "en_US,es_US,fr_CA",
       "Description": "Languages for QnABot on AWS voice interaction using LexV2. Specify as a comma separated list of valid Locale IDs without empty spaces - see https://github.com/aws-solutions/qnabot-on-aws/blob/main/source/docs/multilanguage_support/README.md#supported-languages",
       "Type": "String",
+    },
+    "LogRetentionPeriod": {
+      "AllowedValues": [
+        0,
+        1,
+        3,
+        5,
+        7,
+        14,
+        30,
+        60,
+        90,
+        120,
+        150,
+        180,
+        365,
+        400,
+        545,
+        731,
+        1096,
+        1827,
+        2192,
+        2557,
+        2922,
+        3288,
+        3653,
+      ],
+      "Default": 0,
+      "Description": "Optional: The number of days to keep logs before expiring. If you would like your logs to never expire, leave this value as 0.",
+      "MinValue": 0,
+      "Type": "Number",
     },
     "OpenSearchDashboardsRetentionMinutes": {
       "Default": 43200,
@@ -1292,7 +1293,10 @@ exports[`Verify master template is correct renders master template correctly 1`]
                       "Fn::Sub": "arn:aws:s3:::\${ExportBucket}/data/*",
                     },
                     {
-                      "Fn::Sub": "arn:aws:s3:::\${TestAllBucket}/data/*",
+                      "Fn::Sub": "arn:aws:s3:::\${ContentDesignerOutputBucket}/data-testall/*",
+                    },
+                    {
+                      "Fn::Sub": "arn:aws:s3:::\${ContentDesignerOutputBucket}/data-export/*",
                     },
                   ],
                 },
@@ -1325,6 +1329,17 @@ exports[`Verify master template is correct renders master template correctly 1`]
                     },
                     {
                       "Fn::Sub": "arn:aws:ssm:\${AWS::Region}:\${AWS::AccountId}:parameter/\${CustomQnABotSettings}",
+                    },
+                  ],
+                },
+                {
+                  "Action": [
+                    "lambda:InvokeFunction",
+                  ],
+                  "Effect": "Allow",
+                  "Resource": [
+                    {
+                      "Fn::Sub": "arn:aws:lambda:\${AWS::Region}:\${AWS::AccountId}:function:\${SolutionHelper}",
                     },
                   ],
                 },
@@ -2685,6 +2700,11 @@ exports[`Verify master template is correct renders master template correctly 1`]
           },
         },
         "Handler": "index.handler",
+        "LoggingConfig": {
+          "LogGroup": {
+            "Ref": "CFNLambdaLogGroup",
+          },
+        },
         "MemorySize": "3008",
         "Role": {
           "Fn::GetAtt": [
@@ -2729,6 +2749,53 @@ exports[`Verify master template is correct renders master template correctly 1`]
         },
       },
       "Type": "AWS::Lambda::Function",
+    },
+    "CFNLambdaLogGroup": {
+      "Metadata": {
+        "guard": {
+          "SuppressedRules": [
+            "CLOUDWATCH_LOG_GROUP_ENCRYPTED",
+            "CW_LOGGROUP_RETENTION_PERIOD_CHECK",
+          ],
+        },
+      },
+      "Properties": {
+        "LogGroupName": {
+          "Fn::Join": [
+            "-",
+            [
+              {
+                "Fn::Sub": "/aws/lambda/\${AWS::StackName}-CFNLambda",
+              },
+              {
+                "Fn::Select": [
+                  "2",
+                  {
+                    "Fn::Split": [
+                      "/",
+                      {
+                        "Ref": "AWS::StackId",
+                      },
+                    ],
+                  },
+                ],
+              },
+            ],
+          ],
+        },
+        "RetentionInDays": {
+          "Fn::If": [
+            "LogRetentionPeriodIsNotZero",
+            {
+              "Ref": "LogRetentionPeriod",
+            },
+            {
+              "Ref": "AWS::NoValue",
+            },
+          ],
+        },
+      },
+      "Type": "AWS::Logs::LogGroup",
     },
     "CFNLambdaRole": {
       "Metadata": {
@@ -3366,9 +3433,100 @@ exports[`Verify master template is correct renders master template correctly 1`]
       },
       "Type": "Custom::S3Version",
     },
+    "ContentDesignerOutputBucket": {
+      "DependsOn": [
+        "MainAccessLogBucket",
+        "MainAccessLogsBucketPolicy",
+      ],
+      "Metadata": {
+        "guard": {
+          "SuppressedRules": [
+            "S3_BUCKET_NO_PUBLIC_RW_ACL",
+          ],
+        },
+      },
+      "Properties": {
+        "BucketEncryption": {
+          "ServerSideEncryptionConfiguration": [
+            {
+              "ServerSideEncryptionByDefault": {
+                "SSEAlgorithm": "AES256",
+              },
+            },
+          ],
+        },
+        "CorsConfiguration": {
+          "CorsRules": [
+            {
+              "AllowedHeaders": [
+                "*",
+              ],
+              "AllowedMethods": [
+                "GET",
+              ],
+              "AllowedOrigins": [
+                "*",
+              ],
+            },
+          ],
+        },
+        "LifecycleConfiguration": {
+          "Rules": [
+            {
+              "ExpirationInDays": 1,
+              "Status": "Enabled",
+            },
+          ],
+        },
+        "LoggingConfiguration": {
+          "DestinationBucketName": {
+            "Ref": "MainAccessLogBucket",
+          },
+          "LogFilePrefix": {
+            "Fn::Join": [
+              "",
+              [
+                {
+                  "Ref": "MainAccessLogBucket",
+                },
+                "/ContentDesignerOutput/",
+              ],
+            ],
+          },
+        },
+        "PublicAccessBlockConfiguration": {
+          "BlockPublicAcls": true,
+          "BlockPublicPolicy": true,
+          "IgnorePublicAcls": true,
+          "RestrictPublicBuckets": true,
+        },
+        "VersioningConfiguration": {
+          "Status": "Enabled",
+        },
+      },
+      "Type": "AWS::S3::Bucket",
+    },
+    "ContentDesignerOutputClean": {
+      "DependsOn": [
+        "CFNInvokePolicy",
+      ],
+      "Properties": {
+        "Bucket": {
+          "Ref": "ContentDesignerOutputBucket",
+        },
+        "ServiceToken": {
+          "Fn::GetAtt": [
+            "S3Clean",
+            "Arn",
+          ],
+        },
+      },
+      "Type": "Custom::S3Clean",
+    },
     "CustomQnABotSettings": {
       "Properties": {
         "Description": "Custom QnABot Settings - Modify to override defaults, or to add new settings",
+        "Tier": "Advanced",
         "Type": "String",
         "Value": "{}",
       },
@@ -3428,7 +3586,7 @@ exports[`Verify master template is correct renders master template correctly 1`]
         "Type": "String",
         "Value": {
           "Fn::Sub": [
-            "{"ENABLE_DEBUG_RESPONSES":"false","ENABLE_DEBUG_LOGGING":"false","ES_USE_KEYWORD_FILTERS":"\${ES_USE_KEYWORD_FILTERS}","ES_EXPAND_CONTRACTIONS":"{\\"you're\\":\\"you are\\",\\"I'm\\":\\"I am\\",\\"can't\\":\\"cannot\\"}","ES_KEYWORD_SYNTAX_TYPES":"NOUN,PROPN,VERB,INTJ","ES_SYNTAX_CONFIDENCE_LIMIT":0.2,"ES_MINIMUM_SHOULD_MATCH":"2<75%","ES_NO_HITS_QUESTION":"no_hits","ES_ERROR_QUESTION":"error_msg","ES_USE_FUZZY_MATCH":"false","ES_PHRASE_BOOST":4,"ES_SCORE_ANSWER_FIELD":"false","ES_SCORE_TEXT_ITEM_PASSAGES":"true","ENABLE_SENTIMENT_SUPPORT":"true","ENABLE_MULTI_LANGUAGE_SUPPORT":"false","ENABLE_CUSTOM_TERMINOLOGY":"false","MINIMUM_CONFIDENCE_SCORE":0.6,"ALT_SEARCH_KENDRA_FALLBACK_CONFIDENCE_SCORE":"HIGH","ALT_SEARCH_KENDRA_FAQ_CONFIDENCE_SCORE":"HIGH","ALT_SEARCH_KENDRA_S3_SIGNED_URLS":"true","ALT_SEARCH_KENDRA_S3_SIGNED_URL_EXPIRE_SECS":300,"ALT_SEARCH_KENDRA_MAX_DOCUMENT_COUNT":2,"ALT_SEARCH_KENDRA_TOP_ANSWER_MESSAGE":"Amazon Kendra suggested answer.","ALT_SEARCH_KENDRA_FAQ_MESSAGE":"Answer from Amazon Kendra FAQ.","ALT_SEARCH_KENDRA_ANSWER_MESSAGE":"While I did not find an exact answer, these search results from Amazon Kendra might be helpful.","ALT_SEARCH_KENDRA_RESPONSE_TYPES":"ANSWER,DOCUMENT,QUESTION_ANSWER","ALT_SEARCH_KENDRA_ABBREVIATE_MESSAGE_FOR_SSML":"true","KENDRA_FAQ_CONFIG_MAX_RETRIES":8,"KENDRA_FAQ_CONFIG_RETRY_DELAY":600,"KENDRA_FAQ_ES_FALLBACK":"true","ENABLE_KENDRA_WEB_INDEXER":"false","KENDRA_INDEXER_URLS":"","KENDRA_INDEXER_CRAWL_DEPTH":3,"KENDRA_INDEXER_CRAWL_MODE":"SUBDOMAINS","KENDRA_INDEXER_SCHEDULE":"rate(1 day)","KENDRA_INDEXED_DOCUMENTS_LANGUAGES":"en","ERRORMESSAGE":"Unfortunately I encountered an error when searching for your answer. Please ask me again later.","EMPTYMESSAGE":"You stumped me! Sadly I do not know how to answer your question.","DEFAULT_ALEXA_LAUNCH_MESSAGE":"Hello, Please ask a question","DEFAULT_ALEXA_REPROMPT":"Please either answer the question, ask another question or say Goodbye to end the conversation.","DEFAULT_ALEXA_STOP_MESSAGE":"Goodbye","SMS_HINT_REMINDER_ENABLE":"true","SMS_HINT_REMINDER":" (Feedback? Reply THUMBS UP or THUMBS DOWN. Ask HELP ME at any time)","SMS_HINT_REMINDER_INTERVAL_HRS":24,"IDENTITY_PROVIDER_JWKS_URLS":[],"ENFORCE_VERIFIED_IDENTITY":"false","NO_VERIFIED_IDENTITY_QUESTION":"no_verified_identity","ELICIT_RESPONSE_MAX_RETRIES":3,"ELICIT_RESPONSE_RETRY_MESSAGE":"Please try again.","ELICIT_RESPONSE_BOT_FAILURE_MESSAGE":"Your response was not understood. Please start again.","ELICIT_RESPONSE_DEFAULT_MSG":"Ok. ","CONNECT_IGNORE_WORDS":"","CONNECT_ENABLE_VOICE_RESPONSE_INTERRUPT":"false","CONNECT_NEXT_PROMPT_VARNAME":"connect_nextPrompt","ENABLE_REDACTING":"false","REDACTING_REGEX":"\\\\b\\\\d{4}\\\\b(?![-])|\\\\b\\\\d{9}\\\\b|\\\\b\\\\d{3}-\\\\d{2}-\\\\d{4}\\\\b","ENABLE_REDACTING_WITH_COMPREHEND":"false","COMPREHEND_REDACTING_CONFIDENCE_SCORE":0.99,"COMPREHEND_REDACTING_ENTITY_TYPES":"ADDRESS,EMAIL,SSN,PHONE,PASSWORD,BANK_ACCOUNT_NUMBER,BANK_ROUTING,CREDIT_DEBIT_NUMBER","PII_REJECTION_ENABLED":false,"PII_REJECTION_QUESTION":"pii_rejection_question","PII_REJECTION_REGEX":"\\\\b\\\\d{4}\\\\b(?![-])|\\\\b\\\\d{9}\\\\b|\\\\b\\\\d{3}-\\\\d{2}-\\\\d{4}\\\\b","PII_REJECTION_ENTITY_TYPES":"ADDRESS,EMAIL,SSN,PHONE,PASSWORD,BANK_ACCOUNT_NUMBER,BANK_ROUTING,CREDIT_DEBIT_NUMBER","PII_REJECTION_CONFIDENCE_SCORE":0.99,"DISABLE_CLOUDWATCH_LOGGING":"false","MINIMAL_ES_LOGGING":"false","S3_PUT_REQUEST_ENCRYPTION":"","BOT_ROUTER_WELCOME_BACK_MSG":"Welcome back to QnABot.","BOT_ROUTER_EXIT_MSGS":"exit,quit,goodbye,leave","RUN_LAMBDAHOOK_FROM_QUERY_STEP":"true","LAMBDA_PREPROCESS_HOOK":"","LAMBDA_POSTPROCESS_HOOK":"","SEARCH_REPLACE_QUESTION_SUBSTRINGS":"","PROTECTED_UTTERANCES":"help,help me,thumbs up,thumbs down,repeat,no_hits,no_verified_identity,reset language,detect language,english,french,spanish,german,italian,chinese,arabic,greek,repeat,can you repeat that,can you please say that again,please repeat that","EMBEDDINGS_ENABLE":"\${EMBEDDINGS_ENABLE}","EMBEDDINGS_SCORE_THRESHOLD":"\${EMBEDDINGS_SCORE_THRESHOLD}","EMBEDDINGS_SCORE_ANSWER_THRESHOLD":0.8,"EMBEDDINGS_TEXT_PASSAGE_SCORE_THRESHOLD":"\${EMBEDDINGS_TEXT_PASSAGE_SCORE_THRESHOLD}","EMBEDDINGS_MAX_TOKEN_LIMIT":"\${EMBEDDINGS_MAX_TOKEN_LIMIT}","LLM_GENERATE_QUERY_ENABLE":"\${LLM_GENERATE_QUERY_ENABLE}","LLM_GENERATE_QUERY_PROMPT_TEMPLATE":"\${LLM_GENERATE_QUERY_PROMPT_TEMPLATE}","LLM_GENERATE_QUERY_MODEL_PARAMS":"\${LLM_GENERATE_QUERY_MODEL_PARAMS}","LLM_QA_ENABLE":"\${LLM_QA_ENABLE}","LLM_QA_USE_KENDRA_RETRIEVAL_API":"\${LLM_QA_ENABLE}","LLM_QA_PROMPT_TEMPLATE":"\${LLM_QA_PROMPT_TEMPLATE}","LLM_QA_MODEL_PARAMS":"\${LLM_QA_MODEL_PARAMS}","LLM_QA_PREFIX_MESSAGE":"LLM Answer:","LLM_QA_SHOW_CONTEXT_TEXT":"true","LLM_QA_SHOW_SOURCE_LINKS":"true","LLM_CHAT_HISTORY_MAX_MESSAGES":12,"LLM_QA_NO_HITS_REGEX":"\${LLM_QA_NO_HITS_REGEX}","LLM_PROMPT_MAX_TOKEN_LIMIT":"\${LLM_PROMPT_MAX_TOKEN_LIMIT}","KNOWLEDGE_BASE_PREFIX_MESSAGE":"From Knowledge Base:","KNOWLEDGE_BASE_SHOW_REFERENCES":"true","KNOWLEDGE_BASE_S3_SIGNED_URLS":"true","KNOWLEDGE_BASE_S3_SIGNED_URL_EXPIRE_SECS":300}",
+            "{"ENABLE_DEBUG_RESPONSES":"false","ENABLE_DEBUG_LOGGING":"false","ES_USE_KEYWORD_FILTERS":"\${ES_USE_KEYWORD_FILTERS}","ES_EXPAND_CONTRACTIONS":"{\\"you're\\":\\"you are\\",\\"I'm\\":\\"I am\\",\\"can't\\":\\"cannot\\"}","ES_KEYWORD_SYNTAX_TYPES":"NOUN,PROPN,VERB,INTJ","ES_SYNTAX_CONFIDENCE_LIMIT":0.2,"ES_MINIMUM_SHOULD_MATCH":"2<75%","ES_NO_HITS_QUESTION":"no_hits","ES_ERROR_QUESTION":"error_msg","ES_USE_FUZZY_MATCH":"false","ES_PHRASE_BOOST":4,"ES_SCORE_ANSWER_FIELD":"false","ES_SCORE_TEXT_ITEM_PASSAGES":"true","ENABLE_SENTIMENT_SUPPORT":"true","ENABLE_MULTI_LANGUAGE_SUPPORT":"false","ENABLE_CUSTOM_TERMINOLOGY":"false","MINIMUM_CONFIDENCE_SCORE":0.6,"ALT_SEARCH_KENDRA_FALLBACK_CONFIDENCE_SCORE":"HIGH","ALT_SEARCH_KENDRA_FAQ_CONFIDENCE_SCORE":"HIGH","ALT_SEARCH_KENDRA_S3_SIGNED_URLS":"true","ALT_SEARCH_KENDRA_S3_SIGNED_URL_EXPIRE_SECS":300,"ALT_SEARCH_KENDRA_MAX_DOCUMENT_COUNT":2,"ALT_SEARCH_KENDRA_TOP_ANSWER_MESSAGE":"Amazon Kendra suggested answer.","ALT_SEARCH_KENDRA_FAQ_MESSAGE":"Answer from Amazon Kendra FAQ.","ALT_SEARCH_KENDRA_ANSWER_MESSAGE":"While I did not find an exact answer, these search results from Amazon Kendra might be helpful.","ALT_SEARCH_KENDRA_RESPONSE_TYPES":"ANSWER,DOCUMENT,QUESTION_ANSWER","ALT_SEARCH_KENDRA_ABBREVIATE_MESSAGE_FOR_SSML":"true","KENDRA_FAQ_CONFIG_MAX_RETRIES":8,"KENDRA_FAQ_CONFIG_RETRY_DELAY":600,"KENDRA_FAQ_ES_FALLBACK":"true","ENABLE_KENDRA_WEB_INDEXER":"false","KENDRA_INDEXER_URLS":"","KENDRA_INDEXER_CRAWL_DEPTH":3,"KENDRA_INDEXER_CRAWL_MODE":"SUBDOMAINS","KENDRA_INDEXER_SCHEDULE":"rate(1 day)","KENDRA_INDEXED_DOCUMENTS_LANGUAGES":"en","ERRORMESSAGE":"Unfortunately I encountered an error when searching for your answer. Please ask me again later.","EMPTYMESSAGE":"You stumped me! Sadly I do not know how to answer your question.","DEFAULT_ALEXA_LAUNCH_MESSAGE":"Hello, Please ask a question","DEFAULT_ALEXA_REPROMPT":"Please either answer the question, ask another question or say Goodbye to end the conversation.","DEFAULT_ALEXA_STOP_MESSAGE":"Goodbye","SMS_HINT_REMINDER_ENABLE":"true","SMS_HINT_REMINDER":" (Feedback? Reply THUMBS UP or THUMBS DOWN. Ask HELP ME at any time)","SMS_HINT_REMINDER_INTERVAL_HRS":24,"IDENTITY_PROVIDER_JWKS_URLS":[],"ENFORCE_VERIFIED_IDENTITY":"false","NO_VERIFIED_IDENTITY_QUESTION":"no_verified_identity","ELICIT_RESPONSE_MAX_RETRIES":3,"ELICIT_RESPONSE_RETRY_MESSAGE":"Please try again.","ELICIT_RESPONSE_BOT_FAILURE_MESSAGE":"Your response was not understood. Please start again.","ELICIT_RESPONSE_DEFAULT_MSG":"Ok. ","CONNECT_IGNORE_WORDS":"","CONNECT_ENABLE_VOICE_RESPONSE_INTERRUPT":"false","CONNECT_NEXT_PROMPT_VARNAME":"connect_nextPrompt","ENABLE_REDACTING":"false","REDACTING_REGEX":"\\\\b\\\\d{4}\\\\b(?![-])|\\\\b\\\\d{9}\\\\b|\\\\b\\\\d{3}-\\\\d{2}-\\\\d{4}\\\\b","ENABLE_REDACTING_WITH_COMPREHEND":"false","COMPREHEND_REDACTING_CONFIDENCE_SCORE":0.99,"COMPREHEND_REDACTING_ENTITY_TYPES":"ADDRESS,EMAIL,SSN,PHONE,PASSWORD,BANK_ACCOUNT_NUMBER,BANK_ROUTING,CREDIT_DEBIT_NUMBER","PII_REJECTION_ENABLED":false,"PII_REJECTION_QUESTION":"pii_rejection_question","PII_REJECTION_REGEX":"\\\\b\\\\d{4}\\\\b(?![-])|\\\\b\\\\d{9}\\\\b|\\\\b\\\\d{3}-\\\\d{2}-\\\\d{4}\\\\b","PII_REJECTION_ENTITY_TYPES":"ADDRESS,EMAIL,SSN,PHONE,PASSWORD,BANK_ACCOUNT_NUMBER,BANK_ROUTING,CREDIT_DEBIT_NUMBER","PII_REJECTION_CONFIDENCE_SCORE":0.99,"DISABLE_CLOUDWATCH_LOGGING":"false","MINIMAL_ES_LOGGING":"false","S3_PUT_REQUEST_ENCRYPTION":"","BOT_ROUTER_WELCOME_BACK_MSG":"Welcome back to QnABot.","BOT_ROUTER_EXIT_MSGS":"exit,quit,goodbye,leave","RUN_LAMBDAHOOK_FROM_QUERY_STEP":"true","LAMBDA_PREPROCESS_HOOK":"","LAMBDA_POSTPROCESS_HOOK":"","SEARCH_REPLACE_QUESTION_SUBSTRINGS":"","PROTECTED_UTTERANCES":"help,help me,thumbs up,thumbs down,repeat,no_hits,no_verified_identity,reset language,detect language,english,french,spanish,german,italian,chinese,arabic,greek,repeat,can you repeat that,can you please say that again,please repeat that","EMBEDDINGS_ENABLE":"\${EMBEDDINGS_ENABLE}","EMBEDDINGS_SCORE_THRESHOLD":"\${EMBEDDINGS_SCORE_THRESHOLD}","EMBEDDINGS_SCORE_ANSWER_THRESHOLD":0.8,"EMBEDDINGS_TEXT_PASSAGE_SCORE_THRESHOLD":"\${EMBEDDINGS_TEXT_PASSAGE_SCORE_THRESHOLD}","EMBEDDINGS_MAX_TOKEN_LIMIT":"\${EMBEDDINGS_MAX_TOKEN_LIMIT}","LLM_GENERATE_QUERY_ENABLE":"\${LLM_GENERATE_QUERY_ENABLE}","LLM_GENERATE_QUERY_PROMPT_TEMPLATE":"\${LLM_GENERATE_QUERY_PROMPT_TEMPLATE}","LLM_GENERATE_QUERY_MODEL_PARAMS":"\${LLM_GENERATE_QUERY_MODEL_PARAMS}","LLM_QA_ENABLE":"\${LLM_QA_ENABLE}","LLM_QA_USE_KENDRA_RETRIEVAL_API":"\${LLM_QA_ENABLE}","LLM_QA_PROMPT_TEMPLATE":"\${LLM_QA_PROMPT_TEMPLATE}","LLM_QA_MODEL_PARAMS":"\${LLM_QA_MODEL_PARAMS}","LLM_QA_PREFIX_MESSAGE":"LLM Answer:","LLM_QA_SHOW_CONTEXT_TEXT":"true","LLM_QA_SHOW_SOURCE_LINKS":"true","LLM_CHAT_HISTORY_MAX_MESSAGES":12,"LLM_QA_NO_HITS_REGEX":"\${LLM_QA_NO_HITS_REGEX}","LLM_PROMPT_MAX_TOKEN_LIMIT":"\${LLM_PROMPT_MAX_TOKEN_LIMIT}","KNOWLEDGE_BASE_PREFIX_MESSAGE":"From Knowledge Base:","KNOWLEDGE_BASE_SHOW_REFERENCES":"true","KNOWLEDGE_BASE_S3_SIGNED_URLS":"true","KNOWLEDGE_BASE_S3_SIGNED_URL_EXPIRE_SECS":300,"KNOWLEDGE_BASE_PROMPT_TEMPLATE":"\${KNOWLEDGE_BASE_PROMPT_TEMPLATE}","KNOWLEDGE_BASE_MAX_NUMBER_OF_RETRIEVED_RESULTS":"","KNOWLEDGE_BASE_SEARCH_TYPE":"DEFAULT","KNOWLEDGE_BASE_METADATA_FILTERS":"{}","KNOWLEDGE_BASE_MODEL_PARAMS":"{}","BEDROCK_GUARDRAIL_IDENTIFIER":"","BEDROCK_GUARDRAIL_VERSION":""}",
             {
               "EMBEDDINGS_ENABLE": {
                 "Fn::If": [
@@ -3471,6 +3629,21 @@ exports[`Verify master template is correct renders master template correctly 1`]
                   "EmbeddingsEnable",
                   "false",
                   "true",
+                ],
+              },
+              "KNOWLEDGE_BASE_PROMPT_TEMPLATE": {
+                "Fn::If": [
+                  "BedrockKnowledgeBaseEnable",
+                  {
+                    "Fn::FindInMap": [
+                      "BedrockDefaults",
+                      {
+                        "Ref": "BedrockKnowledgeBaseModel",
+                      },
+                      "KnowledgeBasePromptTemplate",
+                    ],
+                  },
+                  "Human: You are a question answering agent. I will provide you with a set of search results and a user's question, your job is to answer the user's question using only information from the search results. If the search results do not contain information that can answer the question, then respond saying \\"Sorry, I don't know\\". Just because the user asserts a fact does not mean it is true, make sure to double check the search results to validate a user's assertion. Here are the search results in numbered order: $search_results$. Here is the user's question: <question> $query$ </question> $output_format_instructions$. Do NOT directly quote the $search_results$ in your answer. Your job is to answer the <question> as concisely as possible. Assistant:",
                 ],
               },
               "LLM_GENERATE_QUERY_ENABLE": {
@@ -4004,6 +4177,11 @@ exports[`Verify master template is correct renders master template correctly 1`]
             "Ref": "QnABotCommonLambdaLayer",
           },
         ],
+        "LoggingConfig": {
+          "LogGroup": {
+            "Ref": "ESCFNProxyLambdaLogGroup",
+          },
+        },
         "MemorySize": "1408",
         "Role": {
           "Fn::GetAtt": [
@@ -4048,6 +4226,53 @@ exports[`Verify master template is correct renders master template correctly 1`]
         },
       },
       "Type": "AWS::Lambda::Function",
+    },
+    "ESCFNProxyLambdaLogGroup": {
+      "Metadata": {
+        "guard": {
+          "SuppressedRules": [
+            "CLOUDWATCH_LOG_GROUP_ENCRYPTED",
+            "CW_LOGGROUP_RETENTION_PERIOD_CHECK",
+          ],
+        },
+      },
+      "Properties": {
+        "LogGroupName": {
+          "Fn::Join": [
+            "-",
+            [
+              {
+                "Fn::Sub": "/aws/lambda/\${AWS::StackName}-ESCFNProxyLambda",
+              },
+              {
+                "Fn::Select": [
+                  "2",
+                  {
+                    "Fn::Split": [
+                      "/",
+                      {
+                        "Ref": "AWS::StackId",
+                      },
+                    ],
+                  },
+                ],
+              },
+            ],
+          ],
+        },
+        "RetentionInDays": {
+          "Fn::If": [
+            "LogRetentionPeriodIsNotZero",
+            {
+              "Ref": "LogRetentionPeriod",
+            },
+            {
+              "Ref": "AWS::NoValue",
+            },
+          ],
+        },
+      },
+      "Type": "AWS::Logs::LogGroup",
     },
     "ESCleaningLambda": {
       "Metadata": {
@@ -4117,6 +4342,11 @@ exports[`Verify master template is correct renders master template correctly 1`]
             "Ref": "QnABotCommonLambdaLayer",
           },
         ],
+        "LoggingConfig": {
+          "LogGroup": {
+            "Ref": "ESCleaningLambdaLogGroup",
+          },
+        },
         "MemorySize": "1408",
         "Role": {
           "Fn::GetAtt": [
@@ -4161,6 +4391,53 @@ exports[`Verify master template is correct renders master template correctly 1`]
         },
       },
       "Type": "AWS::Lambda::Function",
+    },
+    "ESCleaningLambdaLogGroup": {
+      "Metadata": {
+        "guard": {
+          "SuppressedRules": [
+            "CLOUDWATCH_LOG_GROUP_ENCRYPTED",
+            "CW_LOGGROUP_RETENTION_PERIOD_CHECK",
+          ],
+        },
+      },
+      "Properties": {
+        "LogGroupName": {
+          "Fn::Join": [
+            "-",
+            [
+              {
+                "Fn::Sub": "/aws/lambda/\${AWS::StackName}-ESCleaningLambda",
+              },
+              {
+                "Fn::Select": [
+                  "2",
+                  {
+                    "Fn::Split": [
+                      "/",
+                      {
+                        "Ref": "AWS::StackId",
+                      },
+                    ],
+                  },
+                ],
+              },
+            ],
+          ],
+        },
+        "RetentionInDays": {
+          "Fn::If": [
+            "LogRetentionPeriodIsNotZero",
+            {
+              "Ref": "LogRetentionPeriod",
+            },
+            {
+              "Ref": "AWS::NoValue",
+            },
+          ],
+        },
+      },
+      "Type": "AWS::Logs::LogGroup",
     },
     "ESCognitoRole": {
       "Metadata": {
@@ -4408,6 +4685,11 @@ exports.handler = async function (event, context) {
             "Ref": "AwsSdkLayerLambdaLayer",
           },
         ],
+        "LoggingConfig": {
+          "LogGroup": {
+            "Ref": "ESInfoLambdaLogGroup",
+          },
+        },
         "MemorySize": "128",
         "Role": {
           "Fn::GetAtt": [
@@ -4452,6 +4734,54 @@ exports.handler = async function (event, context) {
         },
       },
       "Type": "AWS::Lambda::Function",
+    },
+    "ESInfoLambdaLogGroup": {
+      "Condition": "DontCreateDomain",
+      "Metadata": {
+        "guard": {
+          "SuppressedRules": [
+            "CLOUDWATCH_LOG_GROUP_ENCRYPTED",
+            "CW_LOGGROUP_RETENTION_PERIOD_CHECK",
+          ],
+        },
+      },
+      "Properties": {
+        "LogGroupName": {
+          "Fn::Join": [
+            "-",
+            [
+              {
+                "Fn::Sub": "/aws/lambda/\${AWS::StackName}-ESInfoLambda",
+              },
+              {
+                "Fn::Select": [
+                  "2",
+                  {
+                    "Fn::Split": [
+                      "/",
+                      {
+                        "Ref": "AWS::StackId",
+                      },
+                    ],
+                  },
+                ],
+              },
+            ],
+          ],
+        },
+        "RetentionInDays": {
+          "Fn::If": [
+            "LogRetentionPeriodIsNotZero",
+            {
+              "Ref": "LogRetentionPeriod",
+            },
+            {
+              "Ref": "AWS::NoValue",
+            },
+          ],
+        },
+      },
+      "Type": "AWS::Logs::LogGroup",
     },
     "ESLoggingLambda": {
       "Metadata": {
@@ -4506,6 +4836,11 @@ exports.handler = async function (event, context) {
             "Ref": "QnABotCommonLambdaLayer",
           },
         ],
+        "LoggingConfig": {
+          "LogGroup": {
+            "Ref": "ESLoggingLambdaLogGroup",
+          },
+        },
         "MemorySize": "1408",
         "Role": {
           "Fn::GetAtt": [
@@ -4550,6 +4885,53 @@ exports.handler = async function (event, context) {
         },
       },
       "Type": "AWS::Lambda::Function",
+    },
+    "ESLoggingLambdaLogGroup": {
+      "Metadata": {
+        "guard": {
+          "SuppressedRules": [
+            "CLOUDWATCH_LOG_GROUP_ENCRYPTED",
+            "CW_LOGGROUP_RETENTION_PERIOD_CHECK",
+          ],
+        },
+      },
+      "Properties": {
+        "LogGroupName": {
+          "Fn::Join": [
+            "-",
+            [
+              {
+                "Fn::Sub": "/aws/lambda/\${AWS::StackName}-ESLoggingLambda",
+              },
+              {
+                "Fn::Select": [
+                  "2",
+                  {
+                    "Fn::Split": [
+                      "/",
+                      {
+                        "Ref": "AWS::StackId",
+                      },
+                    ],
+                  },
+                ],
+              },
+            ],
+          ],
+        },
+        "RetentionInDays": {
+          "Fn::If": [
+            "LogRetentionPeriodIsNotZero",
+            {
+              "Ref": "LogRetentionPeriod",
+            },
+            {
+              "Ref": "AWS::NoValue",
+            },
+          ],
+        },
+      },
+      "Type": "AWS::Logs::LogGroup",
     },
     "ESLoggingLambdaRole": {
       "Metadata": {
@@ -4879,6 +5261,11 @@ exports.handler = async function (event, context) {
             "Ref": "QnABotCommonLambdaLayer",
           },
         ],
+        "LoggingConfig": {
+          "LogGroup": {
+            "Ref": "ESProxyLambdaLogGroup",
+          },
+        },
         "MemorySize": "1408",
         "Role": {
           "Fn::GetAtt": [
@@ -4923,6 +5310,53 @@ exports.handler = async function (event, context) {
         },
       },
       "Type": "AWS::Lambda::Function",
+    },
+    "ESProxyLambdaLogGroup": {
+      "Metadata": {
+        "guard": {
+          "SuppressedRules": [
+            "CLOUDWATCH_LOG_GROUP_ENCRYPTED",
+            "CW_LOGGROUP_RETENTION_PERIOD_CHECK",
+          ],
+        },
+      },
+      "Properties": {
+        "LogGroupName": {
+          "Fn::Join": [
+            "-",
+            [
+              {
+                "Fn::Sub": "/aws/lambda/\${AWS::StackName}-ESProxyLambdaLogGroup",
+              },
+              {
+                "Fn::Select": [
+                  "2",
+                  {
+                    "Fn::Split": [
+                      "/",
+                      {
+                        "Ref": "AWS::StackId",
+                      },
+                    ],
+                  },
+                ],
+              },
+            ],
+          ],
+        },
+        "RetentionInDays": {
+          "Fn::If": [
+            "LogRetentionPeriodIsNotZero",
+            {
+              "Ref": "LogRetentionPeriod",
+            },
+            {
+              "Ref": "AWS::NoValue",
+            },
+          ],
+        },
+      },
+      "Type": "AWS::Logs::LogGroup",
     },
     "ESProxyLambdaRole": {
       "Metadata": {
@@ -5145,23 +5579,6 @@ exports.handler = async function (event, context) {
                   "Resource": "*",
                 },
                 {
-                  "Action": [
-                    "lex:GetBuiltinIntent",
-                    "lex:GetIntents",
-                    "lex:GetBots",
-                    "lex:GetSlotTypes",
-                    "lex:GetBotAliases",
-                    "lex:StartImport",
-                    "lex:GetMigration",
-                    "lex:GetBuiltinSlotTypes",
-                    "lex:GetBuiltinIntents",
-                    "lex:GetImport",
-                    "lex:GetMigrations",
-                  ],
-                  "Effect": "Allow",
-                  "Resource": "*",
-                },
-                {
                   "Action": "lex:*",
                   "Effect": "Allow",
                   "Resource": [
@@ -5208,23 +5625,6 @@ exports.handler = async function (event, context) {
                       "Fn::Sub": "arn:\${AWS::Partition}:lex:\${AWS::Region}:\${AWS::AccountId}:bot/*",
                     },
                   ],
-                },
-                {
-                  "Action": [
-                    "lex:GetBuiltinIntent",
-                    "lex:GetIntents",
-                    "lex:GetBots",
-                    "lex:GetSlotTypes",
-                    "lex:GetBotAliases",
-                    "lex:StartImport",
-                    "lex:GetMigration",
-                    "lex:GetBuiltinSlotTypes",
-                    "lex:GetBuiltinIntents",
-                    "lex:GetImport",
-                    "lex:GetMigrations",
-                  ],
-                  "Effect": "Allow",
-                  "Resource": "*",
                 },
                 {
                   "Action": "lex:*",
@@ -5580,7 +5980,28 @@ exports.handler = async function (event, context) {
                           "Effect": "Allow",
                           "Resource": [
                             {
-                              "Fn::Sub": "arn:\${AWS::Partition}:bedrock:\${AWS::Region}::foundation-model/\${EmbeddingsBedrockModelId}",
+                              "Fn::If": [
+                                "EmbeddingsBedrock",
+                                {
+                                  "Fn::Sub": [
+                                    "arn:\${AWS::Partition}:bedrock:\${AWS::Region}::foundation-model/\${ModelId}",
+                                    {
+                                      "ModelId": {
+                                        "Fn::FindInMap": [
+                                          "BedrockDefaults",
+                                          {
+                                            "Ref": "EmbeddingsBedrockModelId",
+                                          },
+                                          "ModelID",
+                                        ],
+                                      },
+                                    },
+                                  ],
+                                },
+                                {
+                                  "Ref": "AWS::NoValue",
+                                },
+                              ],
                             },
                           ],
                         },
@@ -5683,6 +6104,11 @@ exports.handler = async function (event, context) {
             "Ref": "QnABotCommonLambdaLayer",
           },
         ],
+        "LoggingConfig": {
+          "LogGroup": {
+            "Ref": "ESQidLambdaLogGroup",
+          },
+        },
         "MemorySize": "1408",
         "Role": {
           "Fn::GetAtt": [
@@ -5728,6 +6154,53 @@ exports.handler = async function (event, context) {
       },
       "Type": "AWS::Lambda::Function",
     },
+    "ESQidLambdaLogGroup": {
+      "Metadata": {
+        "guard": {
+          "SuppressedRules": [
+            "CLOUDWATCH_LOG_GROUP_ENCRYPTED",
+            "CW_LOGGROUP_RETENTION_PERIOD_CHECK",
+          ],
+        },
+      },
+      "Properties": {
+        "LogGroupName": {
+          "Fn::Join": [
+            "-",
+            [
+              {
+                "Fn::Sub": "/aws/lambda/\${AWS::StackName}-ESQidLambda",
+              },
+              {
+                "Fn::Select": [
+                  "2",
+                  {
+                    "Fn::Split": [
+                      "/",
+                      {
+                        "Ref": "AWS::StackId",
+                      },
+                    ],
+                  },
+                ],
+              },
+            ],
+          ],
+        },
+        "RetentionInDays": {
+          "Fn::If": [
+            "LogRetentionPeriodIsNotZero",
+            {
+              "Ref": "LogRetentionPeriod",
+            },
+            {
+              "Ref": "AWS::NoValue",
+            },
+          ],
+        },
+      },
+      "Type": "AWS::Logs::LogGroup",
+    },
     "ESQueryLambda": {
       "Metadata": {
         "cfn_nag": {
@@ -5764,12 +6237,6 @@ exports.handler = async function (event, context) {
             },
             "DEFAULT_SETTINGS_PARAM": {
               "Ref": "DefaultQnABotSettings",
-            },
-            "EXTCanvasLMSHook": {
-              "Fn::GetAtt": [
-                "ExamplesStack",
-                "Outputs.EXTCanvasLMSHook",
-              ],
             },
             "EXTCreateRecentTopicsResponse": {
               "Fn::GetAtt": [
@@ -5859,6 +6326,11 @@ exports.handler = async function (event, context) {
             "Ref": "QnABotCommonLambdaLayer",
           },
         ],
+        "LoggingConfig": {
+          "LogGroup": {
+            "Ref": "ESQueryLambdaLogGroup",
+          },
+        },
         "MemorySize": "1408",
         "Role": {
           "Fn::GetAtt": [
@@ -5903,6 +6375,53 @@ exports.handler = async function (event, context) {
         },
       },
       "Type": "AWS::Lambda::Function",
+    },
+    "ESQueryLambdaLogGroup": {
+      "Metadata": {
+        "guard": {
+          "SuppressedRules": [
+            "CLOUDWATCH_LOG_GROUP_ENCRYPTED",
+            "CW_LOGGROUP_RETENTION_PERIOD_CHECK",
+          ],
+        },
+      },
+      "Properties": {
+        "LogGroupName": {
+          "Fn::Join": [
+            "-",
+            [
+              {
+                "Fn::Sub": "/aws/lambda/\${AWS::StackName}-ESQueryLambda",
+              },
+              {
+                "Fn::Select": [
+                  "2",
+                  {
+                    "Fn::Split": [
+                      "/",
+                      {
+                        "Ref": "AWS::StackId",
+                      },
+                    ],
+                  },
+                ],
+              },
+            ],
+          ],
+        },
+        "RetentionInDays": {
+          "Fn::If": [
+            "LogRetentionPeriodIsNotZero",
+            {
+              "Ref": "LogRetentionPeriod",
+            },
+            {
+              "Ref": "AWS::NoValue",
+            },
+          ],
+        },
+      },
+      "Type": "AWS::Logs::LogGroup",
     },
     "ESVar": {
       "Properties": {
@@ -6054,6 +6573,11 @@ exports.handler = async function (event, context) {
             "Ref": "QnABotCommonLambdaLayer",
           },
         ],
+        "LoggingConfig": {
+          "LogGroup": {
+            "Ref": "ESWarmerLambdaLogGroup",
+          },
+        },
         "MemorySize": "512",
         "Role": {
           "Fn::GetAtt": [
@@ -6098,6 +6622,53 @@ exports.handler = async function (event, context) {
         },
       },
       "Type": "AWS::Lambda::Function",
+    },
+    "ESWarmerLambdaLogGroup": {
+      "Metadata": {
+        "guard": {
+          "SuppressedRules": [
+            "CLOUDWATCH_LOG_GROUP_ENCRYPTED",
+            "CW_LOGGROUP_RETENTION_PERIOD_CHECK",
+          ],
+        },
+      },
+      "Properties": {
+        "LogGroupName": {
+          "Fn::Join": [
+            "-",
+            [
+              {
+                "Fn::Sub": "/aws/lambda/\${AWS::StackName}-ESWarmerLambda",
+              },
+              {
+                "Fn::Select": [
+                  "2",
+                  {
+                    "Fn::Split": [
+                      "/",
+                      {
+                        "Ref": "AWS::StackId",
+                      },
+                    ],
+                  },
+                ],
+              },
+            ],
+          ],
+        },
+        "RetentionInDays": {
+          "Fn::If": [
+            "LogRetentionPeriodIsNotZero",
+            {
+              "Ref": "LogRetentionPeriod",
+            },
+            {
+              "Ref": "AWS::NoValue",
+            },
+          ],
+        },
+      },
+      "Type": "AWS::Logs::LogGroup",
     },
     "ESWarmerRule": {
       "Properties": {
@@ -6467,6 +7038,11 @@ exports.documents = (event, context, callback) => {
             "Ref": "AwsSdkLayerLambdaLayer",
           },
         ],
+        "LoggingConfig": {
+          "LogGroup": {
+            "Ref": "ExampleS3ListLambdaLogGroup",
+          },
+        },
         "MemorySize": "128",
         "Role": {
           "Fn::GetAtt": [
@@ -6511,6 +7087,53 @@ exports.documents = (event, context, callback) => {
         },
       },
       "Type": "AWS::Lambda::Function",
+    },
+    "ExampleS3ListLambdaLogGroup": {
+      "Metadata": {
+        "guard": {
+          "SuppressedRules": [
+            "CLOUDWATCH_LOG_GROUP_ENCRYPTED",
+            "CW_LOGGROUP_RETENTION_PERIOD_CHECK",
+          ],
+        },
+      },
+      "Properties": {
+        "LogGroupName": {
+          "Fn::Join": [
+            "-",
+            [
+              {
+                "Fn::Sub": "/aws/lambda/\${AWS::StackName}-ExampleS3ListLambda",
+              },
+              {
+                "Fn::Select": [
+                  "2",
+                  {
+                    "Fn::Split": [
+                      "/",
+                      {
+                        "Ref": "AWS::StackId",
+                      },
+                    ],
+                  },
+                ],
+              },
+            ],
+          ],
+        },
+        "RetentionInDays": {
+          "Fn::If": [
+            "LogRetentionPeriodIsNotZero",
+            {
+              "Ref": "LogRetentionPeriod",
+            },
+            {
+              "Ref": "AWS::NoValue",
+            },
+          ],
+        },
+      },
+      "Type": "AWS::Logs::LogGroup",
     },
     "ExampleS3ListPhotoLambda": {
       "Metadata": {
@@ -6626,6 +7249,11 @@ exports.documents = (event, context, callback) => {
             "Ref": "AwsSdkLayerLambdaLayer",
           },
         ],
+        "LoggingConfig": {
+          "LogGroup": {
+            "Ref": "ExampleS3ListPhotoLambdaLogGroup",
+          },
+        },
         "MemorySize": "128",
         "Role": {
           "Fn::GetAtt": [
@@ -6670,6 +7298,53 @@ exports.documents = (event, context, callback) => {
         },
       },
       "Type": "AWS::Lambda::Function",
+    },
+    "ExampleS3ListPhotoLambdaLogGroup": {
+      "Metadata": {
+        "guard": {
+          "SuppressedRules": [
+            "CLOUDWATCH_LOG_GROUP_ENCRYPTED",
+            "CW_LOGGROUP_RETENTION_PERIOD_CHECK",
+          ],
+        },
+      },
+      "Properties": {
+        "LogGroupName": {
+          "Fn::Join": [
+            "-",
+            [
+              {
+                "Fn::Sub": "/aws/lambda/\${AWS::StackName}-ExampleS3ListPhotoLambda",
+              },
+              {
+                "Fn::Select": [
+                  "2",
+                  {
+                    "Fn::Split": [
+                      "/",
+                      {
+                        "Ref": "AWS::StackId",
+                      },
+                    ],
+                  },
+                ],
+              },
+            ],
+          ],
+        },
+        "RetentionInDays": {
+          "Fn::If": [
+            "LogRetentionPeriodIsNotZero",
+            {
+              "Ref": "LogRetentionPeriod",
+            },
+            {
+              "Ref": "AWS::NoValue",
+            },
+          ],
+        },
+      },
+      "Type": "AWS::Logs::LogGroup",
     },
     "Examples": {
       "Properties": {
@@ -6808,8 +7483,8 @@ exports.documents = (event, context, callback) => {
           "InstallLexResponseBots": {
             "Ref": "InstallLexResponseBots",
           },
-          "LexBotVersion": {
-            "Ref": "LexBotVersion",
+          "LogRetentionPeriod": {
+            "Ref": "LogRetentionPeriod",
           },
           "PrivateQnABotSettings": {
             "Ref": "PrivateQnABotSettings",
@@ -6969,15 +7644,6 @@ exports.documents = (event, context, callback) => {
           "BootstrapPrefix": {
             "Ref": "BootstrapPrefix",
           },
-          "BotName": {
-            "Fn::If": [
-              "CreateLexV1Bots",
-              {
-                "Ref": "LexBot",
-              },
-              "LexV2Only_Mode",
-            ],
-          },
           "CFNInvokePolicy": {
             "Ref": "CFNInvokePolicy",
           },
@@ -6986,6 +7652,9 @@ exports.documents = (event, context, callback) => {
               "CFNLambda",
               "Arn",
             ],
+          },
+          "ContentDesignerOutputBucket": {
+            "Ref": "ContentDesignerOutputBucket",
           },
           "CustomQnABotSettings": {
             "Ref": "CustomQnABotSettings",
@@ -7007,24 +7676,6 @@ exports.documents = (event, context, callback) => {
           },
           "ExportBucket": {
             "Ref": "ExportBucket",
-          },
-          "FallbackIntent": {
-            "Fn::If": [
-              "CreateLexV1Bots",
-              {
-                "Ref": "IntentFallback",
-              },
-              "LexV2Only_Mode",
-            ],
-          },
-          "Intent": {
-            "Fn::If": [
-              "CreateLexV1Bots",
-              {
-                "Ref": "Intent",
-              },
-              "LexV2Only_Mode",
-            ],
           },
           "KendraCrawlerSnsTopic": {
             "Ref": "KendraCrawlerSnsTopic",
@@ -7065,12 +7716,9 @@ exports.documents = (event, context, callback) => {
               "botName",
             ],
           },
-          "LexVersion": {
-            "Fn::If": [
-              "CreateLexV1Bots",
-              "V1",
-              "V2",
-            ],
+          "LexVersion": "V2",
+          "LogRetentionPeriod": {
+            "Ref": "LogRetentionPeriod",
           },
           "PrivateQnABotSettings": {
             "Ref": "PrivateQnABotSettings",
@@ -7264,16 +7912,49 @@ exports.documents = (event, context, callback) => {
               "id": "W86",
               "reason": "LogGroup is encrypted by default.",
             },
-            {
-              "id": "W84",
-              "reason": "LogGroup needs to be retained indefinitely",
-            },
+          ],
+        },
+        "guard": {
+          "SuppressedRules": [
+            "CLOUDWATCH_LOG_GROUP_ENCRYPTED",
+            "CW_LOGGROUP_RETENTION_PERIOD_CHECK",
           ],
         },
       },
       "Properties": {
         "LogGroupName": {
-          "Fn::Sub": "/aws/kinesisfirehose/\${AWS::StackName}-FeedbackKinesisFirehose",
+          "Fn::Join": [
+            "-",
+            [
+              {
+                "Fn::Sub": "/aws/kinesisfirehose/\${AWS::StackName}-FeedbackKinesisFirehose",
+              },
+              {
+                "Fn::Select": [
+                  "2",
+                  {
+                    "Fn::Split": [
+                      "/",
+                      {
+                        "Ref": "AWS::StackId",
+                      },
+                    ],
+                  },
+                ],
+              },
+            ],
+          ],
+        },
+        "RetentionInDays": {
+          "Fn::If": [
+            "LogRetentionPeriodIsNotZero",
+            {
+              "Ref": "LogRetentionPeriod",
+            },
+            {
+              "Ref": "AWS::NoValue",
+            },
+          ],
         },
       },
       "Type": "AWS::Logs::LogGroup",
@@ -7703,12 +8384,6 @@ exports.documents = (event, context, callback) => {
                 "QnAType",
               ],
             },
-            "EXTCanvasLMSHook": {
-              "Fn::GetAtt": [
-                "ExamplesStack",
-                "Outputs.EXTCanvasLMSHook",
-              ],
-            },
             "EXTCreateRecentTopicsResponse": {
               "Fn::GetAtt": [
                 "ExamplesStack",
@@ -7944,6 +8619,11 @@ exports.documents = (event, context, callback) => {
             "Ref": "QnABotCommonLambdaLayer",
           },
         ],
+        "LoggingConfig": {
+          "LogGroup": {
+            "Ref": "FulfillmentLambdaLogGroup",
+          },
+        },
         "MemorySize": 1408,
         "Role": {
           "Fn::GetAtt": [
@@ -8015,6 +8695,53 @@ exports.documents = (event, context, callback) => {
         },
       },
       "Type": "AWS::Lambda::Alias",
+    },
+    "FulfillmentLambdaLogGroup": {
+      "Metadata": {
+        "guard": {
+          "SuppressedRules": [
+            "CLOUDWATCH_LOG_GROUP_ENCRYPTED",
+            "CW_LOGGROUP_RETENTION_PERIOD_CHECK",
+          ],
+        },
+      },
+      "Properties": {
+        "LogGroupName": {
+          "Fn::Join": [
+            "-",
+            [
+              {
+                "Fn::Sub": "/aws/lambda/\${AWS::StackName}-FulfillmentLambda",
+              },
+              {
+                "Fn::Select": [
+                  "2",
+                  {
+                    "Fn::Split": [
+                      "/",
+                      {
+                        "Ref": "AWS::StackId",
+                      },
+                    ],
+                  },
+                ],
+              },
+            ],
+          ],
+        },
+        "RetentionInDays": {
+          "Fn::If": [
+            "LogRetentionPeriodIsNotZero",
+            {
+              "Ref": "LogRetentionPeriod",
+            },
+            {
+              "Ref": "AWS::NoValue",
+            },
+          ],
+        },
+      },
+      "Type": "AWS::Logs::LogGroup",
     },
     "FulfillmentLambdaRole": {
       "Metadata": {
@@ -8387,7 +9114,20 @@ exports.documents = (event, context, callback) => {
                           "Fn::If": [
                             "EmbeddingsBedrock",
                             {
-                              "Fn::Sub": "arn:\${AWS::Partition}:bedrock:\${AWS::Region}::foundation-model/\${EmbeddingsBedrockModelId}",
+                              "Fn::Sub": [
+                                "arn:\${AWS::Partition}:bedrock:\${AWS::Region}::foundation-model/\${ModelId}",
+                                {
+                                  "ModelId": {
+                                    "Fn::FindInMap": [
+                                      "BedrockDefaults",
+                                      {
+                                        "Ref": "EmbeddingsBedrockModelId",
+                                      },
+                                      "ModelID",
+                                    ],
+                                  },
+                                },
+                              ],
                             },
                             {
                               "Ref": "AWS::NoValue",
@@ -8444,6 +9184,18 @@ exports.documents = (event, context, callback) => {
                         },
                       ],
                     },
+                    {
+                      "Action": [
+                        "bedrock:ApplyGuardrail",
+                      ],
+                      "Effect": "Allow",
+                      "Resource": [
+                        {
+                          "Fn::Sub": "arn:\${AWS::Partition}:bedrock:\${AWS::Region}:\${AWS::AccountId}:guardrail/*",
+                        },
+                      ],
+                      "Sid": "ApplyGuardrailsToLLMBedrock",
+                    },
                   ],
                   "Version": "2012-10-17",
                 },
@@ -8469,6 +9221,18 @@ exports.documents = (event, context, callback) => {
                       "Resource": {
                         "Fn::Sub": "arn:\${AWS::Partition}:bedrock:\${AWS::Region}:\${AWS::AccountId}:knowledge-base/\${BedrockKnowledgeBaseId}",
                       },
+                    },
+                    {
+                      "Action": [
+                        "bedrock:ApplyGuardrail",
+                      ],
+                      "Effect": "Allow",
+                      "Resource": [
+                        {
+                          "Fn::Sub": "arn:\${AWS::Partition}:bedrock:\${AWS::Region}:\${AWS::AccountId}:guardrail/*",
+                        },
+                      ],
+                      "Sid": "ApplyGuardrailsToKnowledgeBase",
                     },
                   ],
                   "Version": "2012-10-17",
@@ -8701,16 +9465,49 @@ exports.documents = (event, context, callback) => {
               "id": "W86",
               "reason": "LogGroup is encrypted by default.",
             },
-            {
-              "id": "W84",
-              "reason": "LogGroup needs to be retained indefinitely",
-            },
+          ],
+        },
+        "guard": {
+          "SuppressedRules": [
+            "CLOUDWATCH_LOG_GROUP_ENCRYPTED",
+            "CW_LOGGROUP_RETENTION_PERIOD_CHECK",
           ],
         },
       },
       "Properties": {
         "LogGroupName": {
-          "Fn::Sub": "/aws/kinesisfirehose/\${AWS::StackName}-GeneralKinesisFirehose",
+          "Fn::Join": [
+            "-",
+            [
+              {
+                "Fn::Sub": "/aws/kinesisfirehose/\${AWS::StackName}-GeneralKinesisFirehose",
+              },
+              {
+                "Fn::Select": [
+                  "2",
+                  {
+                    "Fn::Split": [
+                      "/",
+                      {
+                        "Ref": "AWS::StackId",
+                      },
+                    ],
+                  },
+                ],
+              },
+            ],
+          ],
+        },
+        "RetentionInDays": {
+          "Fn::If": [
+            "LogRetentionPeriodIsNotZero",
+            {
+              "Ref": "LogRetentionPeriod",
+            },
+            {
+              "Ref": "AWS::NoValue",
+            },
+          ],
         },
       },
       "Type": "AWS::Logs::LogGroup",
@@ -8880,6 +9677,59 @@ exports.documents = (event, context, callback) => {
                       {
                         "Fn::GetAtt": [
                           "BuildStatusBucket",
+                          "Arn",
+                        ],
+                      },
+                    ],
+                  ],
+                },
+              ],
+              "Sid": "HttpsOnly",
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+      },
+      "Type": "AWS::S3::BucketPolicy",
+    },
+    "HTTPSOnlyContentDesignerOutputBucketPolicy": {
+      "Properties": {
+        "Bucket": {
+          "Ref": "ContentDesignerOutputBucket",
+        },
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": "*",
+              "Condition": {
+                "Bool": {
+                  "aws:SecureTransport": "false",
+                },
+              },
+              "Effect": "Deny",
+              "Principal": "*",
+              "Resource": [
+                {
+                  "Fn::Join": [
+                    "",
+                    [
+                      {
+                        "Fn::GetAtt": [
+                          "ContentDesignerOutputBucket",
+                          "Arn",
+                        ],
+                      },
+                      "/*",
+                    ],
+                  ],
+                },
+                {
+                  "Fn::Join": [
+                    "",
+                    [
+                      {
+                        "Fn::GetAtt": [
+                          "ContentDesignerOutputBucket",
                           "Arn",
                         ],
                       },
@@ -9545,6 +10395,9 @@ exports.documents = (event, context, callback) => {
           "CommonModulesLambdaLayer": {
             "Ref": "CommonModulesLambdaLayer",
           },
+          "ContentDesignerOutputBucket": {
+            "Ref": "ContentDesignerOutputBucket",
+          },
           "CustomQnABotSettings": {
             "Ref": "CustomQnABotSettings",
           },
@@ -9625,6 +10478,9 @@ exports.documents = (event, context, callback) => {
           },
           "ImportBucket": {
             "Ref": "ImportBucket",
+          },
+          "LogRetentionPeriod": {
+            "Ref": "LogRetentionPeriod",
           },
           "MetricsIndex": {
             "Fn::GetAtt": [
@@ -9756,93 +10612,6 @@ exports.documents = (event, context, callback) => {
         "Version": Any<String>,
       },
       "Type": "Custom::Variable",
-    },
-    "Intent": {
-      "Condition": "CreateLexV1Bots",
-      "DependsOn": "QNAInvokePermission",
-      "Properties": {
-        "ServiceToken": {
-          "Fn::GetAtt": [
-            "CFNLambda",
-            "Arn",
-          ],
-        },
-        "createVersion": true,
-        "description": "custom intent x.x.x - v1",
-        "fulfillmentActivity": {
-          "codeHook": {
-            "messageVersion": "1.0",
-            "uri": {
-              "Fn::Join": [
-                ":",
-                [
-                  {
-                    "Fn::GetAtt": [
-                      "FulfillmentLambda",
-                      "Arn",
-                    ],
-                  },
-                  "live",
-                ],
-              ],
-            },
-          },
-          "type": "CodeHook",
-        },
-        "prefix": "fulfilment",
-        "sampleUtterances": [
-          "{slot}",
-        ],
-        "slots": [
-          {
-            "name": "slot",
-            "priority": 1,
-            "slotConstraint": "Optional",
-            "slotType": {
-              "Ref": "SlotType",
-            },
-            "slotTypeVersion": "QNABOT-AUTO-ASSIGNED",
-          },
-        ],
-      },
-      "Type": "Custom::LexIntent",
-    },
-    "IntentFallback": {
-      "Condition": "CreateLexV1Bots",
-      "DependsOn": "QNAInvokePermission",
-      "Properties": {
-        "ServiceToken": {
-          "Fn::GetAtt": [
-            "CFNLambda",
-            "Arn",
-          ],
-        },
-        "createVersion": true,
-        "description": "custom fallback intent x.x.x - v1",
-        "fulfillmentActivity": {
-          "codeHook": {
-            "messageVersion": "1.0",
-            "uri": {
-              "Fn::Join": [
-                ":",
-                [
-                  {
-                    "Fn::GetAtt": [
-                      "FulfillmentLambda",
-                      "Arn",
-                    ],
-                  },
-                  "live",
-                ],
-              ],
-            },
-          },
-          "type": "CodeHook",
-        },
-        "parentIntentSignature": "AMAZON.FallbackIntent",
-        "prefix": "qnabotfallbackfulfilment",
-      },
-      "Type": "Custom::LexIntent",
     },
     "InvokePermissionESCleaningLambda": {
       "Properties": {
@@ -10189,12 +10958,6 @@ exports.documents = (event, context, callback) => {
                 {
                   "Fn::GetAtt": [
                     "ExamplesStack",
-                    "Outputs.EXTCanvasLMSHook",
-                  ],
-                },
-                {
-                  "Fn::GetAtt": [
-                    "ExamplesStack",
                     "Outputs.EXTCustomPYHook",
                   ],
                 },
@@ -10313,8 +11076,6 @@ exports.documents = (event, context, callback) => {
           "Statement": [
             {
               "Action": [
-                "lex:PostContent",
-                "lex:PostText",
                 "lex:RecognizeText",
                 "lex:RecognizeUtterance",
               ],
@@ -10366,46 +11127,6 @@ exports.documents = (event, context, callback) => {
       },
       "Type": "AWS::IAM::ManagedPolicy",
     },
-    "LexBot": {
-      "Condition": "CreateLexV1Bots",
-      "Properties": {
-        "ServiceToken": {
-          "Fn::GetAtt": [
-            "CFNLambda",
-            "Arn",
-          ],
-        },
-        "abortStatement": {
-          "messages": [
-            {
-              "content": "Sorry, I did not understand that",
-              "contentType": "PlainText",
-            },
-          ],
-        },
-        "childDirected": false,
-        "createVersion": true,
-        "description": "QnABot primary bot x.x.x - v1",
-        "intents": [
-          {
-            "intentName": {
-              "Ref": "Intent",
-            },
-          },
-          {
-            "intentName": {
-              "Ref": "IntentFallback",
-            },
-          },
-        ],
-        "locale": "en-US",
-        "name": {
-          "Fn::Sub": "\${AWS::StackName}-Bot",
-        },
-        "voiceId": "Joanna",
-      },
-      "Type": "Custom::LexBot",
-    },
     "LexBotPolicy": {
       "Metadata": {
         "guard": {
@@ -10419,7 +11140,6 @@ exports.documents = (event, context, callback) => {
           "Statement": [
             {
               "Action": [
-                "lex:PostText",
                 "lex:RecognizeText",
               ],
               "Effect": "Allow",
@@ -10543,54 +11263,10 @@ exports.documents = (event, context, callback) => {
                 ],
               ],
             },
-            "BOTALIAS": {
-              "Fn::If": [
-                "CreateLexV1Bots",
-                {
-                  "Ref": "VersionAlias",
-                },
-                {
-                  "Ref": "AWS::NoValue",
-                },
-              ],
-            },
-            "BOTNAME": {
-              "Fn::If": [
-                "CreateLexV1Bots",
-                {
-                  "Ref": "LexBot",
-                },
-                {
-                  "Ref": "AWS::NoValue",
-                },
-              ],
-            },
             "INDEX": {
               "Fn::GetAtt": [
                 "Var",
                 "index",
-              ],
-            },
-            "INTENT": {
-              "Fn::If": [
-                "CreateLexV1Bots",
-                {
-                  "Ref": "Intent",
-                },
-                {
-                  "Ref": "AWS::NoValue",
-                },
-              ],
-            },
-            "INTENTFALLBACK": {
-              "Fn::If": [
-                "CreateLexV1Bots",
-                {
-                  "Ref": "IntentFallback",
-                },
-                {
-                  "Ref": "AWS::NoValue",
-                },
               ],
             },
             "LEXV2_BUILD_LAMBDA": {
@@ -10603,30 +11279,10 @@ exports.documents = (event, context, callback) => {
                 "Arn",
               ],
             },
-            "SLOTTYPE": {
-              "Fn::If": [
-                "CreateLexV1Bots",
-                {
-                  "Ref": "SlotType",
-                },
-                {
-                  "Ref": "AWS::NoValue",
-                },
-              ],
-            },
             "SOLUTION_ID": "SO0189",
             "SOLUTION_VERSION": "vx.x.x",
             "STATUS_BUCKET": {
               "Ref": "BuildStatusBucket",
-            },
-            "STATUS_KEY": {
-              "Fn::If": [
-                "CreateLexV1Bots",
-                "status.json",
-                {
-                  "Ref": "AWS::NoValue",
-                },
-              ],
             },
             "UTTERANCE_BUCKET": {
               "Ref": "AssetBucket",
@@ -10643,6 +11299,11 @@ exports.documents = (event, context, callback) => {
             "Ref": "CommonModulesLambdaLayer",
           },
         ],
+        "LoggingConfig": {
+          "LogGroup": {
+            "Ref": "LexBuildLambdaLogGroup",
+          },
+        },
         "MemorySize": "1024",
         "Role": {
           "Fn::GetAtt": [
@@ -10687,6 +11348,53 @@ exports.documents = (event, context, callback) => {
         },
       },
       "Type": "AWS::Lambda::Function",
+    },
+    "LexBuildLambdaLogGroup": {
+      "Metadata": {
+        "guard": {
+          "SuppressedRules": [
+            "CLOUDWATCH_LOG_GROUP_ENCRYPTED",
+            "CW_LOGGROUP_RETENTION_PERIOD_CHECK",
+          ],
+        },
+      },
+      "Properties": {
+        "LogGroupName": {
+          "Fn::Join": [
+            "-",
+            [
+              {
+                "Fn::Sub": "/aws/lambda/\${AWS::StackName}-LexBuildLambda",
+              },
+              {
+                "Fn::Select": [
+                  "2",
+                  {
+                    "Fn::Split": [
+                      "/",
+                      {
+                        "Ref": "AWS::StackId",
+                      },
+                    ],
+                  },
+                ],
+              },
+            ],
+          ],
+        },
+        "RetentionInDays": {
+          "Fn::If": [
+            "LogRetentionPeriodIsNotZero",
+            {
+              "Ref": "LogRetentionPeriod",
+            },
+            {
+              "Ref": "AWS::NoValue",
+            },
+          ],
+        },
+      },
+      "Type": "AWS::Logs::LogGroup",
     },
     "LexBuildLambdaPoll": {
       "Metadata": {
@@ -10789,30 +11497,10 @@ exports.handler = async function (event, context, callback) {
         },
         "Environment": {
           "Variables": {
-            "BOT_NAME": {
-              "Fn::If": [
-                "CreateLexV1Bots",
-                {
-                  "Ref": "LexBot",
-                },
-                {
-                  "Ref": "AWS::NoValue",
-                },
-              ],
-            },
             "SOLUTION_ID": "SO0189",
             "SOLUTION_VERSION": "vx.x.x",
             "STATUS_BUCKET": {
               "Ref": "BuildStatusBucket",
-            },
-            "STATUS_KEY": {
-              "Fn::If": [
-                "CreateLexV1Bots",
-                "status.json",
-                {
-                  "Ref": "AWS::NoValue",
-                },
-              ],
             },
           },
         },
@@ -10825,6 +11513,11 @@ exports.handler = async function (event, context, callback) {
             "Ref": "CommonModulesLambdaLayer",
           },
         ],
+        "LoggingConfig": {
+          "LogGroup": {
+            "Ref": "LexBuildLambdaPollLogGroup",
+          },
+        },
         "MemorySize": "1024",
         "Role": {
           "Fn::GetAtt": [
@@ -10869,6 +11562,53 @@ exports.handler = async function (event, context, callback) {
         },
       },
       "Type": "AWS::Lambda::Function",
+    },
+    "LexBuildLambdaPollLogGroup": {
+      "Metadata": {
+        "guard": {
+          "SuppressedRules": [
+            "CLOUDWATCH_LOG_GROUP_ENCRYPTED",
+            "CW_LOGGROUP_RETENTION_PERIOD_CHECK",
+          ],
+        },
+      },
+      "Properties": {
+        "LogGroupName": {
+          "Fn::Join": [
+            "-",
+            [
+              {
+                "Fn::Sub": "/aws/lambda/\${AWS::StackName}-LexBuildLambdaPoll",
+              },
+              {
+                "Fn::Select": [
+                  "2",
+                  {
+                    "Fn::Split": [
+                      "/",
+                      {
+                        "Ref": "AWS::StackId",
+                      },
+                    ],
+                  },
+                ],
+              },
+            ],
+          ],
+        },
+        "RetentionInDays": {
+          "Fn::If": [
+            "LogRetentionPeriodIsNotZero",
+            {
+              "Ref": "LogRetentionPeriod",
+            },
+            {
+              "Ref": "AWS::NoValue",
+            },
+          ],
+        },
+      },
+      "Type": "AWS::Logs::LogGroup",
     },
     "LexBuildLambdaRole": {
       "Metadata": {
@@ -11071,23 +11811,6 @@ exports.handler = async function (event, context, callback) {
                   "Resource": "*",
                 },
                 {
-                  "Action": [
-                    "lex:GetBuiltinIntent",
-                    "lex:GetIntents",
-                    "lex:GetBots",
-                    "lex:GetSlotTypes",
-                    "lex:GetBotAliases",
-                    "lex:StartImport",
-                    "lex:GetMigration",
-                    "lex:GetBuiltinSlotTypes",
-                    "lex:GetBuiltinIntents",
-                    "lex:GetImport",
-                    "lex:GetMigrations",
-                  ],
-                  "Effect": "Allow",
-                  "Resource": "*",
-                },
-                {
                   "Action": "lex:*",
                   "Effect": "Allow",
                   "Resource": [
@@ -11134,23 +11857,6 @@ exports.handler = async function (event, context, callback) {
                       "Fn::Sub": "arn:\${AWS::Partition}:lex:\${AWS::Region}:\${AWS::AccountId}:bot/*",
                     },
                   ],
-                },
-                {
-                  "Action": [
-                    "lex:GetBuiltinIntent",
-                    "lex:GetIntents",
-                    "lex:GetBots",
-                    "lex:GetSlotTypes",
-                    "lex:GetBotAliases",
-                    "lex:StartImport",
-                    "lex:GetMigration",
-                    "lex:GetBuiltinSlotTypes",
-                    "lex:GetBuiltinIntents",
-                    "lex:GetImport",
-                    "lex:GetMigrations",
-                  ],
-                  "Effect": "Allow",
-                  "Resource": "*",
                 },
                 {
                   "Action": "lex:*",
@@ -11427,21 +12133,9 @@ const crypto = require('crypto');
 exports.handler = async function (event, context, callback) {
     const token = crypto.randomBytes(16).toString('base64');
     const bucket = process.env.STATUS_BUCKET;
-    const lexV1StatusFile = process.env.STATUS_KEY;
     const lexV2StatusFile = process.env.LEXV2_STATUS_KEY;
     const functionName = process.env.BUILD_FUNCTION;
     const body = JSON.stringify({ status: 'Starting', token });
-
-    if (lexV1StatusFile) {
-        console.log('Initializing ', bucket, lexV1StatusFile);
-        const params = {
-            Bucket: bucket,
-            Key: lexV1StatusFile,
-            Body: body,
-        };
-        const putObjectCmdV1 = new PutObjectCommand(params);
-        await s3.send(putObjectCmdV1);
-    }
 
     console.log('Initializing ', bucket, lexV2StatusFile);
     const params = {
@@ -11452,7 +12146,7 @@ exports.handler = async function (event, context, callback) {
     const putObjectCmdV2 = new PutObjectCommand(params);
     await s3.send(putObjectCmdV2);
 
-    // The BUILD_FUNCTION takes care of rebuilding Lex V2 bot, and (unless QnABot is set to V2 only) Lex V1 bot
+    // The BUILD_FUNCTION takes care of rebuilding Lex V2 bot
     console.log('Invoking ', functionName);
     const invokeParams = {
         FunctionName: functionName,
@@ -11479,15 +12173,6 @@ exports.handler = async function (event, context, callback) {
             "STATUS_BUCKET": {
               "Ref": "BuildStatusBucket",
             },
-            "STATUS_KEY": {
-              "Fn::If": [
-                "CreateLexV1Bots",
-                "status.json",
-                {
-                  "Ref": "AWS::NoValue",
-                },
-              ],
-            },
           },
         },
         "Handler": "index.handler",
@@ -11499,6 +12184,11 @@ exports.handler = async function (event, context, callback) {
             "Ref": "CommonModulesLambdaLayer",
           },
         ],
+        "LoggingConfig": {
+          "LogGroup": {
+            "Ref": "LexBuildLambdaStartLogGroup",
+          },
+        },
         "MemorySize": "1024",
         "Role": {
           "Fn::GetAtt": [
@@ -11543,6 +12233,53 @@ exports.handler = async function (event, context, callback) {
         },
       },
       "Type": "AWS::Lambda::Function",
+    },
+    "LexBuildLambdaStartLogGroup": {
+      "Metadata": {
+        "guard": {
+          "SuppressedRules": [
+            "CLOUDWATCH_LOG_GROUP_ENCRYPTED",
+            "CW_LOGGROUP_RETENTION_PERIOD_CHECK",
+          ],
+        },
+      },
+      "Properties": {
+        "LogGroupName": {
+          "Fn::Join": [
+            "-",
+            [
+              {
+                "Fn::Sub": "/aws/lambda/\${AWS::StackName}-LexBuildLambdaStart",
+              },
+              {
+                "Fn::Select": [
+                  "2",
+                  {
+                    "Fn::Split": [
+                      "/",
+                      {
+                        "Ref": "AWS::StackId",
+                      },
+                    ],
+                  },
+                ],
+              },
+            ],
+          ],
+        },
+        "RetentionInDays": {
+          "Fn::If": [
+            "LogRetentionPeriodIsNotZero",
+            {
+              "Ref": "LogRetentionPeriod",
+            },
+            {
+              "Ref": "AWS::NoValue",
+            },
+          ],
+        },
+      },
+      "Type": "AWS::Logs::LogGroup",
     },
     "LexProxyLambda": {
       "Metadata": {
@@ -11613,6 +12350,11 @@ exports.handler = (event, context, callback) => {
             "Ref": "CommonModulesLambdaLayer",
           },
         ],
+        "LoggingConfig": {
+          "LogGroup": {
+            "Ref": "LexProxyLambdaLogGroup",
+          },
+        },
         "MemorySize": "128",
         "Role": {
           "Fn::GetAtt": [
@@ -11657,6 +12399,53 @@ exports.handler = (event, context, callback) => {
         },
       },
       "Type": "AWS::Lambda::Function",
+    },
+    "LexProxyLambdaLogGroup": {
+      "Metadata": {
+        "guard": {
+          "SuppressedRules": [
+            "CLOUDWATCH_LOG_GROUP_ENCRYPTED",
+            "CW_LOGGROUP_RETENTION_PERIOD_CHECK",
+          ],
+        },
+      },
+      "Properties": {
+        "LogGroupName": {
+          "Fn::Join": [
+            "-",
+            [
+              {
+                "Fn::Sub": "/aws/lambda/\${AWS::StackName}-LexProxyLambda",
+              },
+              {
+                "Fn::Select": [
+                  "2",
+                  {
+                    "Fn::Split": [
+                      "/",
+                      {
+                        "Ref": "AWS::StackId",
+                      },
+                    ],
+                  },
+                ],
+              },
+            ],
+          ],
+        },
+        "RetentionInDays": {
+          "Fn::If": [
+            "LogRetentionPeriodIsNotZero",
+            {
+              "Ref": "LogRetentionPeriod",
+            },
+            {
+              "Ref": "AWS::NoValue",
+            },
+          ],
+        },
+      },
+      "Type": "AWS::Logs::LogGroup",
     },
     "LexProxyLambdaRole": {
       "Metadata": {
@@ -11833,23 +12622,6 @@ exports.handler = (event, context, callback) => {
                   "Resource": "*",
                 },
                 {
-                  "Action": [
-                    "lex:GetBuiltinIntent",
-                    "lex:GetIntents",
-                    "lex:GetBots",
-                    "lex:GetSlotTypes",
-                    "lex:GetBotAliases",
-                    "lex:StartImport",
-                    "lex:GetMigration",
-                    "lex:GetBuiltinSlotTypes",
-                    "lex:GetBuiltinIntents",
-                    "lex:GetImport",
-                    "lex:GetMigrations",
-                  ],
-                  "Effect": "Allow",
-                  "Resource": "*",
-                },
-                {
                   "Action": "lex:*",
                   "Effect": "Allow",
                   "Resource": [
@@ -11896,23 +12668,6 @@ exports.handler = (event, context, callback) => {
                       "Fn::Sub": "arn:\${AWS::Partition}:lex:\${AWS::Region}:\${AWS::AccountId}:bot/*",
                     },
                   ],
-                },
-                {
-                  "Action": [
-                    "lex:GetBuiltinIntent",
-                    "lex:GetIntents",
-                    "lex:GetBots",
-                    "lex:GetSlotTypes",
-                    "lex:GetBotAliases",
-                    "lex:StartImport",
-                    "lex:GetMigration",
-                    "lex:GetBuiltinSlotTypes",
-                    "lex:GetBuiltinIntents",
-                    "lex:GetImport",
-                    "lex:GetMigrations",
-                  ],
-                  "Effect": "Allow",
-                  "Resource": "*",
                 },
                 {
                   "Action": "lex:*",
@@ -12199,9 +12954,6 @@ function getStatusResponse(response, build) {
         lambdaArn: process.env.FULFILLMENT_FUNCTION_ARN,
         lambdaRole: process.env.FULFILLMENT_FUNCTION_ROLE,
         botversion: 'live',
-        botname: process.env.LEXV1_BOT_NAME || 'LEX V1 Bot not installed',
-        intent: process.env.LEXV1_INTENT || 'LEX V1 Bot not installed',
-        intentFallback: process.env.LEXV1_INTENT_FALLBACK || 'LEX V1 Bot not installed',
         lexV2botname: process.env.LEXV2_BOT_NAME || 'LEX V2 Bot not installed',
         lexV2botid: process.env.LEXV2_BOT_ID || 'LEX V2 Bot not installed',
         lexV2botalias: process.env.LEXV2_BOT_ALIAS || 'LEX V2 Bot not installed',
@@ -12219,7 +12971,6 @@ exports.handler = async (event, context, callback) => {
     console.log('Received event:', JSON.stringify(event, null, 2));
 
     const bucket = process.env.STATUS_BUCKET;
-    const lexV1StatusFile = process.env.STATUS_KEY;
     const lexV2StatusFile = process.env.LEXV2_STATUS_KEY;
     let build = { status: 'READY', token: 'token' };
     let response;
@@ -12229,16 +12980,6 @@ exports.handler = async (event, context, callback) => {
         response = await s3.send(getObjCmd);
         const readableStreamV2 = Buffer.concat(await response.Body.toArray());
         build = JSON.parse(readableStreamV2);
-        // combine build status with v1 bot, if defined.. If both are READY then status is READY
-        if (lexV1StatusFile) {
-            const getObjCmd = new GetObjectCommand({ Bucket: bucket, Key: lexV1StatusFile });
-            response = await s3.send(getObjCmd);
-            const readableStreamV2 = Buffer.concat(await response.Body.toArray());
-            const v1build = JSON.parse(readableStreamV2);
-            if (v1build.status != 'READY' || build.status != 'READY') {
-                build.status = \`LEX V2: \${build.status} / LEX V1: \${v1build.status}\`;
-            }
-        }
     } catch (e) {
         console.log('Unable to read S3 lex bot status file - perhaps it doesn\\'t yet exist. Returning READY');
     }
@@ -12247,7 +12988,6 @@ exports.handler = async (event, context, callback) => {
         botId: process.env.LEXV2_BOT_ID,
     });
     response = await lexv2.send(describeBotCmd);
-    // Match LexV1 bot status for code compatibility (Available = READY)
     const statusResponse = getStatusResponse(response, build);
     return statusResponse;
 };
@@ -12271,39 +13011,6 @@ exports.handler = async (event, context, callback) => {
             },
             "FULFILLMENT_FUNCTION_ROLE": {
               "Ref": "FulfillmentLambdaRole",
-            },
-            "LEXV1_BOT_NAME": {
-              "Fn::If": [
-                "CreateLexV1Bots",
-                {
-                  "Ref": "LexBot",
-                },
-                {
-                  "Ref": "AWS::NoValue",
-                },
-              ],
-            },
-            "LEXV1_INTENT": {
-              "Fn::If": [
-                "CreateLexV1Bots",
-                {
-                  "Ref": "Intent",
-                },
-                {
-                  "Ref": "AWS::NoValue",
-                },
-              ],
-            },
-            "LEXV1_INTENT_FALLBACK": {
-              "Fn::If": [
-                "CreateLexV1Bots",
-                {
-                  "Ref": "IntentFallback",
-                },
-                {
-                  "Ref": "AWS::NoValue",
-                },
-              ],
             },
             "LEXV2_BOT_ALIAS": {
               "Fn::GetAtt": [
@@ -12353,15 +13060,6 @@ exports.handler = async (event, context, callback) => {
             "STATUS_BUCKET": {
               "Ref": "BuildStatusBucket",
             },
-            "STATUS_KEY": {
-              "Fn::If": [
-                "CreateLexV1Bots",
-                "status.json",
-                {
-                  "Ref": "AWS::NoValue",
-                },
-              ],
-            },
           },
         },
         "Handler": "index.handler",
@@ -12370,6 +13068,11 @@ exports.handler = async (event, context, callback) => {
             "Ref": "AwsSdkLayerLambdaLayer",
           },
         ],
+        "LoggingConfig": {
+          "LogGroup": {
+            "Ref": "LexStatusLambdaLogGroup",
+          },
+        },
         "MemorySize": "128",
         "Role": {
           "Fn::GetAtt": [
@@ -12415,6 +13118,53 @@ exports.handler = async (event, context, callback) => {
       },
       "Type": "AWS::Lambda::Function",
     },
+    "LexStatusLambdaLogGroup": {
+      "Metadata": {
+        "guard": {
+          "SuppressedRules": [
+            "CLOUDWATCH_LOG_GROUP_ENCRYPTED",
+            "CW_LOGGROUP_RETENTION_PERIOD_CHECK",
+          ],
+        },
+      },
+      "Properties": {
+        "LogGroupName": {
+          "Fn::Join": [
+            "-",
+            [
+              {
+                "Fn::Sub": "/aws/lambda/\${AWS::StackName}-LexStatusLambda",
+              },
+              {
+                "Fn::Select": [
+                  "2",
+                  {
+                    "Fn::Split": [
+                      "/",
+                      {
+                        "Ref": "AWS::StackId",
+                      },
+                    ],
+                  },
+                ],
+              },
+            ],
+          ],
+        },
+        "RetentionInDays": {
+          "Fn::If": [
+            "LogRetentionPeriodIsNotZero",
+            {
+              "Ref": "LogRetentionPeriod",
+            },
+            {
+              "Ref": "AWS::NoValue",
+            },
+          ],
+        },
+      },
+      "Type": "AWS::Logs::LogGroup",
+    },
     "LexV2Bot": {
       "Properties": {
         "BuildDate": Any<String>,
@@ -12433,6 +13183,53 @@ exports.handler = async (event, context, callback) => {
         ],
       },
       "Type": "Custom::LexV2Bot",
+    },
+    "LexV2BotLambdaLogGroup": {
+      "Metadata": {
+        "guard": {
+          "SuppressedRules": [
+            "CLOUDWATCH_LOG_GROUP_ENCRYPTED",
+            "CW_LOGGROUP_RETENTION_PERIOD_CHECK",
+          ],
+        },
+      },
+      "Properties": {
+        "LogGroupName": {
+          "Fn::Join": [
+            "-",
+            [
+              {
+                "Fn::Sub": "/aws/lambda/\${AWS::StackName}-LexV2BotLambda",
+              },
+              {
+                "Fn::Select": [
+                  "2",
+                  {
+                    "Fn::Split": [
+                      "/",
+                      {
+                        "Ref": "AWS::StackId",
+                      },
+                    ],
+                  },
+                ],
+              },
+            ],
+          ],
+        },
+        "RetentionInDays": {
+          "Fn::If": [
+            "LogRetentionPeriodIsNotZero",
+            {
+              "Ref": "LogRetentionPeriod",
+            },
+            {
+              "Ref": "AWS::NoValue",
+            },
+          ],
+        },
+      },
+      "Type": "AWS::Logs::LogGroup",
     },
     "Lexv2BotCodeVersion": {
       "Properties": {
@@ -12509,6 +13306,11 @@ exports.handler = async (event, context, callback) => {
           },
         },
         "Handler": "handler.handler",
+        "LoggingConfig": {
+          "LogGroup": {
+            "Ref": "LexV2BotLambdaLogGroup",
+          },
+        },
         "MemorySize": "1024",
         "Role": {
           "Fn::GetAtt": [
@@ -12755,23 +13557,6 @@ exports.handler = async (event, context, callback) => {
                   "Resource": "*",
                 },
                 {
-                  "Action": [
-                    "lex:GetBuiltinIntent",
-                    "lex:GetIntents",
-                    "lex:GetBots",
-                    "lex:GetSlotTypes",
-                    "lex:GetBotAliases",
-                    "lex:StartImport",
-                    "lex:GetMigration",
-                    "lex:GetBuiltinSlotTypes",
-                    "lex:GetBuiltinIntents",
-                    "lex:GetImport",
-                    "lex:GetMigrations",
-                  ],
-                  "Effect": "Allow",
-                  "Resource": "*",
-                },
-                {
                   "Action": "lex:*",
                   "Effect": "Allow",
                   "Resource": [
@@ -12818,23 +13603,6 @@ exports.handler = async (event, context, callback) => {
                       "Fn::Sub": "arn:\${AWS::Partition}:lex:\${AWS::Region}:\${AWS::AccountId}:bot/*",
                     },
                   ],
-                },
-                {
-                  "Action": [
-                    "lex:GetBuiltinIntent",
-                    "lex:GetIntents",
-                    "lex:GetBots",
-                    "lex:GetSlotTypes",
-                    "lex:GetBotAliases",
-                    "lex:StartImport",
-                    "lex:GetMigration",
-                    "lex:GetBuiltinSlotTypes",
-                    "lex:GetBuiltinIntents",
-                    "lex:GetImport",
-                    "lex:GetMigrations",
-                  ],
-                  "Effect": "Allow",
-                  "Resource": "*",
                 },
                 {
                   "Action": "lex:*",
@@ -13352,6 +14120,11 @@ function message(code, name) {
             "Ref": "AwsSdkLayerLambdaLayer",
           },
         ],
+        "LoggingConfig": {
+          "LogGroup": {
+            "Ref": "MessageLambdaLogGroup",
+          },
+        },
         "MemorySize": "128",
         "Role": {
           "Fn::GetAtt": [
@@ -13396,6 +14169,53 @@ function message(code, name) {
         },
       },
       "Type": "AWS::Lambda::Function",
+    },
+    "MessageLambdaLogGroup": {
+      "Metadata": {
+        "guard": {
+          "SuppressedRules": [
+            "CLOUDWATCH_LOG_GROUP_ENCRYPTED",
+            "CW_LOGGROUP_RETENTION_PERIOD_CHECK",
+          ],
+        },
+      },
+      "Properties": {
+        "LogGroupName": {
+          "Fn::Join": [
+            "-",
+            [
+              {
+                "Fn::Sub": "/aws/lambda/\${AWS::StackName}-MessageLambda",
+              },
+              {
+                "Fn::Select": [
+                  "2",
+                  {
+                    "Fn::Split": [
+                      "/",
+                      {
+                        "Ref": "AWS::StackId",
+                      },
+                    ],
+                  },
+                ],
+              },
+            ],
+          ],
+        },
+        "RetentionInDays": {
+          "Fn::If": [
+            "LogRetentionPeriodIsNotZero",
+            {
+              "Ref": "LogRetentionPeriod",
+            },
+            {
+              "Ref": "AWS::NoValue",
+            },
+          ],
+        },
+      },
+      "Type": "AWS::Logs::LogGroup",
     },
     "MessagePermision": {
       "Properties": {
@@ -13825,16 +14645,29 @@ function message(code, name) {
               "id": "W86",
               "reason": "LogGroup is encrypted by default.",
             },
-            {
-              "id": "W84",
-              "reason": "LogGroup needs to be retained indefinitely",
-            },
+          ],
+        },
+        "guard": {
+          "SuppressedRules": [
+            "CLOUDWATCH_LOG_GROUP_ENCRYPTED",
+            "CW_LOGGROUP_RETENTION_PERIOD_CHECK",
           ],
         },
       },
       "Properties": {
         "LogGroupName": {
           "Fn::Sub": "/aws/opensearch/\${AWS::StackName}-\${ESVar.ESDomain}",
+        },
+        "RetentionInDays": {
+          "Fn::If": [
+            "LogRetentionPeriodIsNotZero",
+            {
+              "Ref": "LogRetentionPeriod",
+            },
+            {
+              "Ref": "AWS::NoValue",
+            },
+          ],
         },
       },
       "Type": "AWS::Logs::LogGroup",
@@ -14439,6 +15272,9 @@ function message(code, name) {
         "bucket": {
           "Ref": "ExportBucket",
         },
+        "contentDesignerOutputBucket": {
+          "Ref": "ContentDesignerOutputBucket",
+        },
         "id": "ExportAll_QnABot_vx.x.x.json",
         "index": {
           "Fn::Sub": "\${Var.QnaIndex}",
@@ -14475,6 +15311,9 @@ function message(code, name) {
         },
         "bucket": {
           "Ref": "ExportBucket",
+        },
+        "contentDesignerOutputBucket": {
+          "Ref": "ContentDesignerOutputBucket",
         },
         "id": "ExportAll_QnABot_vx.x.x_feedback.json",
         "index": {
@@ -14513,6 +15352,9 @@ function message(code, name) {
         "bucket": {
           "Ref": "ExportBucket",
         },
+        "contentDesignerOutputBucket": {
+          "Ref": "ContentDesignerOutputBucket",
+        },
         "id": "ExportAll_QnABot_vx.x.x_metrics.json",
         "index": {
           "Fn::Sub": "\${Var.MetricsIndex}",
@@ -14533,7 +15375,13 @@ function message(code, name) {
                 "Fn::If": [
                   "EmbeddingsBedrock",
                   {
-                    "Ref": "EmbeddingsBedrockModelId",
+                    "Fn::FindInMap": [
+                      "BedrockDefaults",
+                      {
+                        "Ref": "EmbeddingsBedrockModelId",
+                      },
+                      "ModelID",
+                    ],
                   },
                   "",
                 ],
@@ -14922,12 +15770,6 @@ function message(code, name) {
                   "Fn::GetAtt": [
                     "ExamplesStack",
                     "Outputs.EXTCustomJSHook",
-                  ],
-                },
-                {
-                  "Fn::GetAtt": [
-                    "ExamplesStack",
-                    "Outputs.EXTCanvasLMSHook",
                   ],
                 },
                 {
@@ -16298,6 +17140,9 @@ function message(code, name) {
                     {
                       "Fn::Sub": "arn:aws:s3:::\${AssetBucket}/*",
                     },
+                    {
+                      "Fn::Sub": "arn:aws:s3:::\${ContentDesignerOutputBucket}/*",
+                    },
                   ],
                 },
                 {
@@ -16311,6 +17156,9 @@ function message(code, name) {
                     },
                     {
                       "Fn::Sub": "arn:aws:s3:::\${TestAllBucket}/*",
+                    },
+                    {
+                      "Fn::Sub": "arn:aws:s3:::\${ContentDesignerOutputBucket}/*",
                     },
                   ],
                 },
@@ -16328,6 +17176,9 @@ function message(code, name) {
                     },
                     {
                       "Fn::Sub": "arn:aws:s3:::\${TestAllBucket}/*",
+                    },
+                    {
+                      "Fn::Sub": "arn:aws:s3:::\${ContentDesignerOutputBucket}/*",
                     },
                   ],
                 },
@@ -16366,6 +17217,11 @@ function message(code, name) {
           },
         },
         "Handler": "lambda_function.handler",
+        "LoggingConfig": {
+          "LogGroup": {
+            "Ref": "S3CleanLambdaLogGroup",
+          },
+        },
         "Role": {
           "Fn::GetAtt": [
             "CFNLambdaRole",
@@ -16409,6 +17265,53 @@ function message(code, name) {
         },
       },
       "Type": "AWS::Lambda::Function",
+    },
+    "S3CleanLambdaLogGroup": {
+      "Metadata": {
+        "guard": {
+          "SuppressedRules": [
+            "CLOUDWATCH_LOG_GROUP_ENCRYPTED",
+            "CW_LOGGROUP_RETENTION_PERIOD_CHECK",
+          ],
+        },
+      },
+      "Properties": {
+        "LogGroupName": {
+          "Fn::Join": [
+            "-",
+            [
+              {
+                "Fn::Sub": "/aws/lambda/\${AWS::StackName}-S3CleanLambda",
+              },
+              {
+                "Fn::Select": [
+                  "2",
+                  {
+                    "Fn::Split": [
+                      "/",
+                      {
+                        "Ref": "AWS::StackId",
+                      },
+                    ],
+                  },
+                ],
+              },
+            ],
+          ],
+        },
+        "RetentionInDays": {
+          "Fn::If": [
+            "LogRetentionPeriodIsNotZero",
+            {
+              "Ref": "LogRetentionPeriod",
+            },
+            {
+              "Ref": "AWS::NoValue",
+            },
+          ],
+        },
+      },
+      "Type": "AWS::Logs::LogGroup",
     },
     "S3ClearCodeVersion": {
       "Properties": {
@@ -16512,6 +17415,11 @@ exports.handler = (event, context, callback) => {
             "Ref": "AwsSdkLayerLambdaLayer",
           },
         ],
+        "LoggingConfig": {
+          "LogGroup": {
+            "Ref": "S3ListLambdaLogGroup",
+          },
+        },
         "MemorySize": "128",
         "Role": {
           "Fn::GetAtt": [
@@ -16556,6 +17464,53 @@ exports.handler = (event, context, callback) => {
         },
       },
       "Type": "AWS::Lambda::Function",
+    },
+    "S3ListLambdaLogGroup": {
+      "Metadata": {
+        "guard": {
+          "SuppressedRules": [
+            "CLOUDWATCH_LOG_GROUP_ENCRYPTED",
+            "CW_LOGGROUP_RETENTION_PERIOD_CHECK",
+          ],
+        },
+      },
+      "Properties": {
+        "LogGroupName": {
+          "Fn::Join": [
+            "-",
+            [
+              {
+                "Fn::Sub": "/aws/lambda/\${AWS::StackName}-S3ListLambda",
+              },
+              {
+                "Fn::Select": [
+                  "2",
+                  {
+                    "Fn::Split": [
+                      "/",
+                      {
+                        "Ref": "AWS::StackId",
+                      },
+                    ],
+                  },
+                ],
+              },
+            ],
+          ],
+        },
+        "RetentionInDays": {
+          "Fn::If": [
+            "LogRetentionPeriodIsNotZero",
+            {
+              "Ref": "LogRetentionPeriod",
+            },
+            {
+              "Ref": "AWS::NoValue",
+            },
+          ],
+        },
+      },
+      "Type": "AWS::Logs::LogGroup",
     },
     "S3ListLambdaRole": {
       "Metadata": {
@@ -16872,6 +17827,11 @@ exports.handler = (event, context, callback) => {
             "Ref": "AwsSdkLayerLambdaLayer",
           },
         ],
+        "LoggingConfig": {
+          "LogGroup": {
+            "Ref": "SchemaLambdaLogGroup",
+          },
+        },
         "MemorySize": "128",
         "Role": {
           "Fn::GetAtt": [
@@ -16934,6 +17894,53 @@ exports.handler = (event, context, callback) => {
         },
       },
       "Type": "Custom::S3Version",
+    },
+    "SchemaLambdaLogGroup": {
+      "Metadata": {
+        "guard": {
+          "SuppressedRules": [
+            "CLOUDWATCH_LOG_GROUP_ENCRYPTED",
+            "CW_LOGGROUP_RETENTION_PERIOD_CHECK",
+          ],
+        },
+      },
+      "Properties": {
+        "LogGroupName": {
+          "Fn::Join": [
+            "-",
+            [
+              {
+                "Fn::Sub": "/aws/lambda/\${AWS::StackName}-SchemaLambda",
+              },
+              {
+                "Fn::Select": [
+                  "2",
+                  {
+                    "Fn::Split": [
+                      "/",
+                      {
+                        "Ref": "AWS::StackId",
+                      },
+                    ],
+                  },
+                ],
+              },
+            ],
+          ],
+        },
+        "RetentionInDays": {
+          "Fn::If": [
+            "LogRetentionPeriodIsNotZero",
+            {
+              "Ref": "LogRetentionPeriod",
+            },
+            {
+              "Ref": "AWS::NoValue",
+            },
+          ],
+        },
+      },
+      "Type": "AWS::Logs::LogGroup",
     },
     "SchemaLambdaRole": {
       "Metadata": {
@@ -17223,6 +18230,11 @@ exports.handler = (event, context, callback) => {
             "Ref": "AwsSdkLayerLambdaLayer",
           },
         ],
+        "LoggingConfig": {
+          "LogGroup": {
+            "Ref": "SignupLambdaLogGroup",
+          },
+        },
         "MemorySize": "128",
         "Role": {
           "Fn::GetAtt": [
@@ -17267,6 +18279,53 @@ exports.handler = (event, context, callback) => {
         },
       },
       "Type": "AWS::Lambda::Function",
+    },
+    "SignupLambdaLogGroup": {
+      "Metadata": {
+        "guard": {
+          "SuppressedRules": [
+            "CLOUDWATCH_LOG_GROUP_ENCRYPTED",
+            "CW_LOGGROUP_RETENTION_PERIOD_CHECK",
+          ],
+        },
+      },
+      "Properties": {
+        "LogGroupName": {
+          "Fn::Join": [
+            "-",
+            [
+              {
+                "Fn::Sub": "/aws/lambda/\${AWS::StackName}-SignupLambda",
+              },
+              {
+                "Fn::Select": [
+                  "2",
+                  {
+                    "Fn::Split": [
+                      "/",
+                      {
+                        "Ref": "AWS::StackId",
+                      },
+                    ],
+                  },
+                ],
+              },
+            ],
+          ],
+        },
+        "RetentionInDays": {
+          "Fn::If": [
+            "LogRetentionPeriodIsNotZero",
+            {
+              "Ref": "LogRetentionPeriod",
+            },
+            {
+              "Ref": "AWS::NoValue",
+            },
+          ],
+        },
+      },
+      "Type": "AWS::Logs::LogGroup",
     },
     "SignupLambdaRole": {
       "Metadata": {
@@ -17430,25 +18489,6 @@ exports.handler = (event, context, callback) => {
       },
       "Type": "AWS::Lambda::Permission",
     },
-    "SlotType": {
-      "Condition": "CreateLexV1Bots",
-      "Properties": {
-        "ServiceToken": {
-          "Fn::GetAtt": [
-            "CFNLambda",
-            "Arn",
-          ],
-        },
-        "createVersion": true,
-        "description": "custom slot type x.x.x - v1",
-        "enumerationValues": [
-          {
-            "value": "dummy utterance",
-          },
-        ],
-      },
-      "Type": "Custom::LexSlotType",
-    },
     "SolutionHelper": {
       "DependsOn": [
         "SolutionHelperRole",
@@ -17486,7 +18526,23 @@ exports.handler = (event, context, callback) => {
           },
         },
         "Description": "This function generates UUID for each deployment and sends anonymized data to the AWS Solutions team",
+        "Environment": {
+          "Variables": {
+            "CUSTOM_SETTINGS": {
+              "Ref": "CustomQnABotSettings",
+            },
+            "SOLUTION_ID": "SO0189",
+            "SOLUTION_PARAMETER": {
+              "Ref": "SolutionHelperParameter",
+            },
+          },
+        },
         "Handler": "lambda_function.handler",
+        "LoggingConfig": {
+          "LogGroup": {
+            "Ref": "SolutionHelperLogGroup",
+          },
+        },
         "Role": {
           "Fn::GetAtt": [
             "SolutionHelperRole",
@@ -17563,6 +18619,61 @@ exports.handler = (event, context, callback) => {
       },
       "Type": "Custom::CreateUUID",
       "UpdateReplacePolicy": "Delete",
+    },
+    "SolutionHelperLogGroup": {
+      "Metadata": {
+        "guard": {
+          "SuppressedRules": [
+            "CLOUDWATCH_LOG_GROUP_ENCRYPTED",
+            "CW_LOGGROUP_RETENTION_PERIOD_CHECK",
+          ],
+        },
+      },
+      "Properties": {
+        "LogGroupName": {
+          "Fn::Join": [
+            "-",
+            [
+              {
+                "Fn::Sub": "/aws/lambda/\${AWS::StackName}-SolutionHelper",
+              },
+              {
+                "Fn::Select": [
+                  "2",
+                  {
+                    "Fn::Split": [
+                      "/",
+                      {
+                        "Ref": "AWS::StackId",
+                      },
+                    ],
+                  },
+                ],
+              },
+            ],
+          ],
+        },
+        "RetentionInDays": {
+          "Fn::If": [
+            "LogRetentionPeriodIsNotZero",
+            {
+              "Ref": "LogRetentionPeriod",
+            },
+            {
+              "Ref": "AWS::NoValue",
+            },
+          ],
+        },
+      },
+      "Type": "AWS::Logs::LogGroup",
+    },
+    "SolutionHelperParameter": {
+      "Properties": {
+        "Description": "Solution Helper Parameter - DO NOT MODIFY",
+        "Type": "String",
+        "Value": "{}",
+      },
+      "Type": "AWS::SSM::Parameter",
     },
     "SolutionHelperRole": {
       "Metadata": {
@@ -17706,6 +18817,104 @@ exports.handler = (event, context, callback) => {
             },
             "PolicyName": "xrayDaemonWriteAccess",
           },
+          {
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Action": [
+                    "ssm:GetParameter",
+                  ],
+                  "Effect": "Allow",
+                  "Resource": [
+                    {
+                      "Fn::Join": [
+                        "",
+                        [
+                          "arn:",
+                          {
+                            "Fn::Sub": "\${AWS::Partition}:",
+                          },
+                          "ssm:",
+                          {
+                            "Fn::Sub": "\${AWS::Region}:",
+                          },
+                          {
+                            "Fn::Sub": "\${AWS::AccountId}:",
+                          },
+                          "parameter/",
+                          {
+                            "Ref": "SolutionHelperParameter",
+                          },
+                        ],
+                      ],
+                    },
+                    {
+                      "Fn::Join": [
+                        "",
+                        [
+                          "arn:",
+                          {
+                            "Fn::Sub": "\${AWS::Partition}:",
+                          },
+                          "ssm:",
+                          {
+                            "Fn::Sub": "\${AWS::Region}:",
+                          },
+                          {
+                            "Fn::Sub": "\${AWS::AccountId}:",
+                          },
+                          "parameter/",
+                          {
+                            "Ref": "CustomQnABotSettings",
+                          },
+                        ],
+                      ],
+                    },
+                  ],
+                },
+              ],
+              "Version": "2012-10-17",
+            },
+            "PolicyName": "GetParameterPolicy",
+          },
+          {
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Action": [
+                    "ssm:PutParameter",
+                  ],
+                  "Effect": "Allow",
+                  "Resource": [
+                    {
+                      "Fn::Join": [
+                        "",
+                        [
+                          "arn:",
+                          {
+                            "Fn::Sub": "\${AWS::Partition}:",
+                          },
+                          "ssm:",
+                          {
+                            "Fn::Sub": "\${AWS::Region}:",
+                          },
+                          {
+                            "Fn::Sub": "\${AWS::AccountId}:",
+                          },
+                          "parameter/",
+                          {
+                            "Ref": "SolutionHelperParameter",
+                          },
+                        ],
+                      ],
+                    },
+                  ],
+                },
+              ],
+              "Version": "2012-10-17",
+            },
+            "PolicyName": "PutParameterPolicy",
+          },
         ],
       },
       "Type": "AWS::IAM::Role",
@@ -17790,9 +18999,6 @@ exports.handler = (event, context, callback) => {
         },
         "Language": {
           "Ref": "Language",
-        },
-        "LexBotVersion": {
-          "Ref": "LexBotVersion",
         },
         "OpenSearchEBSVolumeSize": {
           "Fn::If": [
@@ -18062,6 +19268,9 @@ exports.handler = (event, context, callback) => {
           "CommonModulesLambdaLayer": {
             "Ref": "CommonModulesLambdaLayer",
           },
+          "ContentDesignerOutputBucket": {
+            "Ref": "ContentDesignerOutputBucket",
+          },
           "EsEndpoint": {
             "Fn::GetAtt": [
               "ESVar",
@@ -18085,6 +19294,9 @@ exports.handler = (event, context, callback) => {
               "LexV2Bot",
               "botId",
             ],
+          },
+          "LogRetentionPeriod": {
+            "Ref": "LogRetentionPeriod",
           },
           "S3Clean": {
             "Fn::GetAtt": [
@@ -18557,6 +19769,11 @@ exports.handler = (event, context, callback) => {
             "Ref": "QnABotCommonLambdaLayer",
           },
         ],
+        "LoggingConfig": {
+          "LogGroup": {
+            "Ref": "UtteranceLambdaLogGroup",
+          },
+        },
         "MemorySize": "1408",
         "Role": {
           "Fn::GetAtt": [
@@ -18602,6 +19819,53 @@ exports.handler = (event, context, callback) => {
       },
       "Type": "AWS::Lambda::Function",
     },
+    "UtteranceLambdaLogGroup": {
+      "Metadata": {
+        "guard": {
+          "SuppressedRules": [
+            "CLOUDWATCH_LOG_GROUP_ENCRYPTED",
+            "CW_LOGGROUP_RETENTION_PERIOD_CHECK",
+          ],
+        },
+      },
+      "Properties": {
+        "LogGroupName": {
+          "Fn::Join": [
+            "-",
+            [
+              {
+                "Fn::Sub": "/aws/lambda/\${AWS::StackName}-UtteranceLambda",
+              },
+              {
+                "Fn::Select": [
+                  "2",
+                  {
+                    "Fn::Split": [
+                      "/",
+                      {
+                        "Ref": "AWS::StackId",
+                      },
+                    ],
+                  },
+                ],
+              },
+            ],
+          ],
+        },
+        "RetentionInDays": {
+          "Fn::If": [
+            "LogRetentionPeriodIsNotZero",
+            {
+              "Ref": "LogRetentionPeriod",
+            },
+            {
+              "Ref": "AWS::NoValue",
+            },
+          ],
+        },
+      },
+      "Type": "AWS::Logs::LogGroup",
+    },
     "Var": {
       "Properties": {
         "FeedbackIndex": {
@@ -18638,24 +19902,6 @@ exports.handler = (event, context, callback) => {
         },
       },
       "Type": "Custom::Variable",
-    },
-    "VersionAlias": {
-      "Condition": "CreateLexV1Bots",
-      "DependsOn": "LexBot",
-      "Properties": {
-        "ServiceToken": {
-          "Fn::GetAtt": [
-            "CFNLambda",
-            "Arn",
-          ],
-        },
-        "botName": {
-          "Ref": "LexBot",
-        },
-        "description": "QnABot live alias x.x.x - v1",
-        "name": "live",
-      },
-      "Type": "Custom::LexAlias",
     },
     "VersionLambda": {
       "Metadata": {
@@ -18782,6 +20028,11 @@ exports.handler = async function (event, context) {
           },
         },
         "Handler": "index.handler",
+        "LoggingConfig": {
+          "LogGroup": {
+            "Ref": "VersionLambdaLogGroup",
+          },
+        },
         "MemorySize": "3008",
         "Role": {
           "Fn::GetAtt": [
@@ -18826,6 +20077,53 @@ exports.handler = async function (event, context) {
         },
       },
       "Type": "AWS::Lambda::Function",
+    },
+    "VersionLambdaLogGroup": {
+      "Metadata": {
+        "guard": {
+          "SuppressedRules": [
+            "CLOUDWATCH_LOG_GROUP_ENCRYPTED",
+            "CW_LOGGROUP_RETENTION_PERIOD_CHECK",
+          ],
+        },
+      },
+      "Properties": {
+        "LogGroupName": {
+          "Fn::Join": [
+            "-",
+            [
+              {
+                "Fn::Sub": "/aws/lambda/\${AWS::StackName}-VersionLambda",
+              },
+              {
+                "Fn::Select": [
+                  "2",
+                  {
+                    "Fn::Split": [
+                      "/",
+                      {
+                        "Ref": "AWS::StackId",
+                      },
+                    ],
+                  },
+                ],
+              },
+            ],
+          ],
+        },
+        "RetentionInDays": {
+          "Fn::If": [
+            "LogRetentionPeriodIsNotZero",
+            {
+              "Ref": "LogRetentionPeriod",
+            },
+            {
+              "Ref": "AWS::NoValue",
+            },
+          ],
+        },
+      },
+      "Type": "AWS::Logs::LogGroup",
     },
     "WarmerLambdaRole": {
       "Metadata": {
@@ -19115,7 +20413,7 @@ exports.handler = async function (event, context) {
                 },
                 ":s3:path/",
                 {
-                  "Ref": "ExportBucket",
+                  "Ref": "ContentDesignerOutputBucket",
                 },
                 "/status/{proxy}",
               ],
@@ -19189,9 +20487,9 @@ exports.handler = async function (event, context) {
                 },
                 ":s3:path/",
                 {
-                  "Ref": "ExportBucket",
+                  "Ref": "ContentDesignerOutputBucket",
                 },
-                "/status/{proxy}",
+                "/status-export/{proxy}",
               ],
             ],
           },
@@ -19262,7 +20560,7 @@ exports.handler = async function (event, context) {
     "id":"$input.params('proxy')",
     "config":"status/$input.params('proxy')",
     "tmp":"tmp/$input.params('proxy')",
-    "key":"$inputRoot.get('prefix')data/$input.params('proxy')",
+    "key":"$inputRoot.get('prefix')data-export/$input.params('proxy')",
     "filter":"$inputRoot.get('filter')",
     "status":"Started"
 }",
@@ -19281,7 +20579,7 @@ exports.handler = async function (event, context) {
                 {
                   "Ref": "ExportBucket",
                 },
-                "/status/{proxy}",
+                "/status-export/{proxy}",
               ],
             ],
           },
@@ -19420,8 +20718,8 @@ exports.handler = async function (event, context) {
               "Fn::Sub": "#set ($root="https://\${!context.domainName}/\${!context.stage}")
 
 {
-    "bucket":"\${ExportBucket}",
-    "prefix":"status/",
+    "bucket":"\${ContentDesignerOutputBucket}",
+    "prefix":"status-export/",
     "perpage":"$input.params('perpage')",
     "token":"$input.params('token')",
     "type":"exports",
@@ -19535,9 +20833,9 @@ exports.handler = async function (event, context) {
                 },
                 ":s3:path/",
                 {
-                  "Ref": "ImportBucket",
+                  "Ref": "ContentDesignerOutputBucket",
                 },
-                "/status/{proxy}",
+                "/status-import/{proxy}",
               ],
             ],
           },
@@ -19609,9 +20907,9 @@ exports.handler = async function (event, context) {
                 },
                 ":s3:path/",
                 {
-                  "Ref": "ImportBucket",
+                  "Ref": "ContentDesignerOutputBucket",
                 },
-                "/status/{proxy}",
+                "/status-import/{proxy}",
               ],
             ],
           },
@@ -19750,8 +21048,8 @@ exports.handler = async function (event, context) {
               "Fn::Sub": "#set ($root="https://\${!context.domainName}/\${!context.stage}")
 
 {
-    "bucket":"\${ImportBucket}",
-    "prefix":"status/",
+    "bucket":"\${ContentDesignerOutputBucket}",
+    "prefix":"status-import/",
     "perpage":"$input.params('perpage')",
     "token":"$input.params('token')",
     "type":"imports",
@@ -20106,6 +21404,7 @@ exports.handler = async function (event, context) {
     "PrivateQnABotSettings":"\${PrivateQnABotSettings}",
     "CustomQnABotSettings":"\${CustomQnABotSettings}",
     "KendraCrawlerSnsTopic":"\${KendraCrawlerSnsTopic}",
+    "SolutionHelper": "\${SolutionHelper}",
     "Id":"$stageVariables.Id",
     "_links":{
         "root":{
@@ -20237,9 +21536,9 @@ exports.handler = async function (event, context) {
                 },
                 ":s3:path/",
                 {
-                  "Ref": "TestAllBucket",
+                  "Ref": "ContentDesignerOutputBucket",
                 },
-                "/status/{proxy}",
+                "/status-testall/{proxy}",
               ],
             ],
           },
@@ -20311,9 +21610,9 @@ exports.handler = async function (event, context) {
                 },
                 ":s3:path/",
                 {
-                  "Ref": "TestAllBucket",
+                  "Ref": "ContentDesignerOutputBucket",
                 },
-                "/status/{proxy}",
+                "/status-testall/{proxy}",
               ],
             ],
           },
@@ -20382,9 +21681,9 @@ exports.handler = async function (event, context) {
     "bucket":"\${TestAllBucket}",
     "index":"\${Var.QnaIndex}",
     "id":"$input.params('proxy')",
-    "config":"status/$input.params('proxy')",
-    "tmp":"tmp/$input.params('proxy')",
-    "key":"data/$input.params('proxy')",
+    "config":"status-testall/$input.params('proxy')",
+    "tmp":"tmp-testall/$input.params('proxy')",
+    "key":"data-testall/$input.params('proxy')",
     "filter":"$inputRoot.get('filter')",
     "token":"$inputRoot.get('token')",
     "locale":"$inputRoot.get('locale')",
@@ -20407,7 +21706,7 @@ exports.handler = async function (event, context) {
                 {
                   "Ref": "TestAllBucket",
                 },
-                "/status/{proxy}",
+                "/status-testall/{proxy}",
               ],
             ],
           },
@@ -20546,8 +21845,8 @@ exports.handler = async function (event, context) {
               "Fn::Sub": "#set ($root="https://\${!context.domainName}/\${!context.stage}")
 
 {
-    "bucket":"\${TestAllBucket}",
-    "prefix":"status/",
+    "bucket":"\${ContentDesignerOutputBucket}",
+    "prefix":"status-testall/",
     "perpage":"$input.params('perpage')",
     "token":"$input.params('token')",
     "type":"testall",

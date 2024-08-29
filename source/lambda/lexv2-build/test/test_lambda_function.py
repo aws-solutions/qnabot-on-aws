@@ -15,10 +15,9 @@ import unittest
 import boto3
 import json
 from unittest.mock import patch, MagicMock
-from moto import mock_iam, mock_s3
+from moto import mock_aws
 
-@mock_iam
-@mock_s3
+@mock_aws
 class TestLambdaFunction(unittest.TestCase):
     def setUp(self):
         self.iam_client = boto3.client("iam")

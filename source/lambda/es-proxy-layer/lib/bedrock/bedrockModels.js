@@ -48,14 +48,14 @@ function getProviderClass(modelId) {
     }
 }
 
-async function invokeBedrockModel(modelId, parameters, prompt) {
+async function invokeBedrockModel(modelId, parameters, prompt, guardrails) {
     const modelProvider = getProviderClass(modelId);
     modelProvider.setParameters(parameters);
     modelProvider.setPrompt(prompt);
     const body = modelProvider.getParameters();
-    qnabot.log('Bedrock Invoke model body:', body);
+    qnabot.debug(`Bedrock Invoke model body: ${body}`);
 
-    const response = await bedrockClient(modelId, body);
+    const response = await bedrockClient(modelId, body, guardrails);
     const generatedText = modelProvider.getResponseBody(response);
     return generatedText;
 }

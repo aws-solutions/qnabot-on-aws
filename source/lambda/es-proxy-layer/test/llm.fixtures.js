@@ -209,6 +209,8 @@ exports.req = {
         'LLM_QA_NO_HITS_REGEX':
             'Sorry,  //remove comment to enable custom no match (no_hits) when LLM does not know the answer.',
         'LLM_PROMPT_MAX_TOKEN_LIMIT': '800',
+        'BEDROCK_GUARDRAIL_IDENTIFIER': '',
+        'BEDROCK_GUARDRAIL_VERSION': '',
         'DEFAULT_USER_POOL_JWKS_URL':
             'https://cognito-idp.us-east-1.amazonaws.com/us-east-1_MqFhpJCyo/.well-known/jwks.json'
     },

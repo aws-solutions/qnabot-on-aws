@@ -31,12 +31,14 @@ module.exports = {
         S3Clean: { Type: 'String' },
         LexV2BotId: { Type: 'String' },
         LexV2BotAliasId: { Type: 'String' },
+        LogRetentionPeriod: { Type: 'Number' },
         BootstrapBucket: { Type: 'String' },
         BootstrapPrefix: { Type: 'String' },
         VarIndex: { Type: 'String' },
         EsEndpoint: { Type: 'String' },
         EsProxyLambda: { Type: 'String' },
         TestAllBucket: { Type: 'String' },
+        ContentDesignerOutputBucket: { Type: 'String' },
         VPCSubnetIdList: { Type: 'String' },
         VPCSecurityGroupIdList: { Type: 'String' },
         XraySetting: { Type: 'String' },
@@ -46,5 +48,6 @@ module.exports = {
     Conditions: {
         VPCEnabled: { 'Fn::Not': [{ 'Fn::Equals': ['', { Ref: 'VPCSecurityGroupIdList' }] }] },
         XRAYEnabled: { 'Fn::Equals': [{ Ref: 'XraySetting' }, 'TRUE'] },
+        LogRetentionPeriodIsNotZero: { 'Fn::Not': [{ 'Fn::Equals': [{ Ref: 'LogRetentionPeriod' }, 0] }] }
     },
 };

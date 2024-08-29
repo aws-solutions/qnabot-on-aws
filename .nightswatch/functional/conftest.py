@@ -23,6 +23,7 @@ from helpers.cfn_parameter_fetcher import ParameterFetcher
 from helpers.kendra_client import KendraClient
 from helpers.lex_client import LexClient
 from helpers.iam_client import IamClient
+from helpers.s3_client import S3Client
 from helpers.translate_client import TranslateClient
 from helpers.cloud_watch_client import CloudWatchClient
 from helpers.website_model.dom_operator import DomOperator
@@ -104,6 +105,10 @@ def iam_client(region: str) -> IamClient:
     return IamClient(region)
 
 @pytest.fixture
+def s3_client(region: str) -> None:
+    return S3Client(region)
+
+@pytest.fixture
 def app_version(param_fetcher: ParameterFetcher) -> str:
     app_version = param_fetcher.get_deployment_version()
     return app_version
@@ -118,8 +123,9 @@ def skip_if_version_less_than(request, app_version):
 
 @pytest.fixture
 def cw_client(region: str, param_fetcher: ParameterFetcher) -> CloudWatchClient:
-    fulfillment_lambda_name = param_fetcher.get_fulfillment_lambda_name()
-    return CloudWatchClient(region, fulfillment_lambda_name)
+    stack_id = param_fetcher.get_stack_id()
+    stack_name = param_fetcher.stack_name
+    return CloudWatchClient(region, stack_id, stack_name)
 
 @pytest.fixture(autouse=True)
 def dom_operator():
@@ -210,3 +216,11 @@ def skip_embeddings(request, embeddings_is_enabled):
         if not embeddings_is_enabled:
             pytest.skip('Embeddings is not configured for this environment. Skipping...')
 
+
+@pytest.fixture
+def knowledge_base_model(param_fetcher: ParameterFetcher):
+    return param_fetcher.get_bedrock_knowledge_base_model()
+
+@pytest.fixture
+def content_designer_output_bucket_name(param_fetcher: ParameterFetcher):
+    return param_fetcher.get_content_designer_output_bucket_name()

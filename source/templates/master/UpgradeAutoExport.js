@@ -25,6 +25,7 @@ module.exports = {
         Properties: {
             ServiceToken: { 'Fn::GetAtt': ['CFNLambda', 'Arn'] },
             bucket: { Ref: 'ExportBucket' },
+            contentDesignerOutputBucket : { Ref: 'ContentDesignerOutputBucket' },
             id: exportfile,
             index: { 'Fn::Sub': '${Var.QnaIndex}' },
             PRE_UPGRADE_EXPORT_TRIGGERS: {
@@ -48,6 +49,7 @@ module.exports = {
         Properties: {
             ServiceToken: { 'Fn::GetAtt': ['CFNLambda', 'Arn'] },
             bucket: { Ref: 'ExportBucket' },
+            contentDesignerOutputBucket : { Ref: 'ContentDesignerOutputBucket' },
             id: exportfile_metrics,
             index: { 'Fn::Sub': '${Var.MetricsIndex}' },
             PRE_UPGRADE_EXPORT_TRIGGERS: {
@@ -71,6 +73,7 @@ module.exports = {
         Properties: {
             ServiceToken: { 'Fn::GetAtt': ['CFNLambda', 'Arn'] },
             bucket: { Ref: 'ExportBucket' },
+            contentDesignerOutputBucket : { Ref: 'ContentDesignerOutputBucket' },
             id: exportfile_feedback,
             index: { 'Fn::Sub': '${Var.FeedbackIndex}' },
             PRE_UPGRADE_EXPORT_TRIGGERS: {

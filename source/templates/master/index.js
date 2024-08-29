@@ -70,41 +70,6 @@ module.exports = {
         ImportBucket: {
             Value: { Ref: 'ImportBucket' },
         },
-        BotConsoleUrl: {
-            Condition: 'CreateLexV1Bots',
-            Value: {
-                'Fn::Join': [
-                    '',
-                    [
-                        'https://console.aws.amazon.com/lex/home?',
-                        'region=',
-                        { Ref: 'AWS::Region' },
-                        '#bot-editor:bot=',
-                        { Ref: 'LexBot' },
-                    ],
-                ],
-            },
-        },
-        LexV1BotName: {
-            Condition: 'CreateLexV1Bots',
-            Value: { Ref: 'LexBot' },
-        },
-        LexV1BotAlias: {
-            Condition: 'CreateLexV1Bots',
-            Value: { Ref: 'VersionAlias' },
-        },
-        LexV1SlotType: {
-            Condition: 'CreateLexV1Bots',
-            Value: { Ref: 'SlotType' },
-        },
-        LexV1Intent: {
-            Condition: 'CreateLexV1Bots',
-            Value: { Ref: 'Intent' },
-        },
-        LexV1IntentFallback: {
-            Condition: 'CreateLexV1Bots',
-            Value: { Ref: 'IntentFallback' },
-        },
         LexV2BotName: {
             Value: { 'Fn::GetAtt': ['LexV2Bot', 'botName'] },
         },
@@ -231,6 +196,12 @@ module.exports = {
         MetricsBucket: {
             Value: { Ref: 'MetricsBucket' },
         },
+        TestAllBucket: {
+            Value: { Ref: 'TestAllBucket' },
+        },
+        ContentDesignerOutputBucket:  {
+            Value: { Ref: 'ContentDesignerOutputBucket' },
+        }
     },
     Parameters: {
         OpenSearchName: {
@@ -388,13 +359,6 @@ module.exports = {
             AllowedPattern: '[^ ]+',
             ConstraintDescription: 'Must be a valid comma separated list of Locale IDs',
         },
-        LexBotVersion: {
-            Description:
-                'Amazon Lex version to use for QnABot on AWS. Select \'LexV2 Only\' to install QnABot in AWS regions where LexV1 is not supported.',
-            Type: 'String',
-            AllowedValues: ['LexV1 and LexV2', 'LexV2 Only'],
-            Default: 'LexV2 Only',
-        },
         InstallLexResponseBots: {
             Description:
                 'You can configure your chatbot to ask questions and process your end user\'s answers for surveys, quizzes,... (Elicit Response Feature). If the Elicit Response feature is not needed, choose \'false\' to skip the sample Lex Response Bot installation - see https://docs.aws.amazon.com/solutions/latest/qnabot-on-aws/configuring-the-chatbot-to-ask-the-questions-and-use-response-bots.html',
@@ -429,6 +393,7 @@ module.exports = {
             'Required when EmbeddingsApi is BEDROCK. Please ensure you have requested access to the LLMs in Bedrock console (https://docs.aws.amazon.com/bedrock/latest/userguide/model-access.html), before deploying.',
             AllowedValues: [
                 'amazon.titan-embed-text-v1',
+                'amazon.titan-embed-text-v2',
                 'cohere.embed-english-v3',
                 'cohere.embed-multilingual-v3',
             ],
@@ -470,6 +435,7 @@ module.exports = {
             AllowedValues: [
                 'amazon.titan-text-express-v1',
                 'amazon.titan-text-lite-v1',
+                'amazon.titan-text-premier-v1',
                 'ai21.j2-ultra-v1',
                 'ai21.j2-mid-v1',
                 'anthropic.claude-instant-v1',
@@ -494,10 +460,11 @@ module.exports = {
             Description:
                 'Required if BedrockKnowledgeBaseId is not empty. Sets the preferred LLM model to use with the Bedrock knowledge base. Please ensure you have requested access to the LLMs in Bedrock console (https://docs.aws.amazon.com/bedrock/latest/userguide/model-access.html), before deploying',
             AllowedValues: [
+                'amazon.titan-text-premier-v1',
                 'anthropic.claude-instant-v1',
                 'anthropic.claude-v2.1',
                 'anthropic.claude-3-sonnet-v1',
-                'anthropic.claude-3-haiku-v1'
+                'anthropic.claude-3-haiku-v1',
             ],
             Default: 'anthropic.claude-instant-v1',
         },
@@ -524,6 +491,15 @@ module.exports = {
             Default: '',
             ConstraintDescription: 'Must be a valid Lambda ARN or leave blank',
         },
+        LogRetentionPeriod: {
+            Type: 'Number',
+            Description: 'Optional: The number of days to keep logs before expiring. If you would like your logs to never expire, leave this value as 0.',
+            Default: 0,
+            AllowedValues: [
+                0, 1, 3, 5, 7,  14 , 30 , 60 , 90 , 120 , 150 , 180 , 365 , 400 , 545 , 731 , 1096 , 1827 , 2192 , 2557 , 2922 , 3288 , 3653
+            ],
+            MinValue: 0,
+        },
     },
     Conditions: {
         Public: { 'Fn::Equals': [{ Ref: 'PublicOrPrivate' }, 'PUBLIC'] },
@@ -534,7 +510,6 @@ module.exports = {
         BuildExamples: { 'Fn::Equals': [{ Ref: 'BuildExamples' }, 'TRUE'] },
         CreateDomain: { 'Fn::Equals': [{ Ref: 'OpenSearchName' }, 'EMPTY'] },
         DontCreateDomain: { 'Fn::Not': [{ 'Fn::Equals': [{ Ref: 'OpenSearchName' }, 'EMPTY'] }] },
-        CreateLexV1Bots: { 'Fn::Equals': [{ Ref: 'LexBotVersion' }, 'LexV1 and LexV2'] },
         VPCEnabled: {
             'Fn::Not': [
                 {
@@ -566,6 +541,7 @@ module.exports = {
                 { 'Fn::Not': [{ 'Fn::Equals': [{ Ref: 'AltSearchKendraIndexes' }, ''] }] },
             ],
         },
+        LogRetentionPeriodIsNotZero: { 'Fn::Not': [{ 'Fn::Equals': [{ Ref: 'LogRetentionPeriod' }, 0] }] }
     },
     Rules: {
         RequireLambdaArnForLambdaEmbeddingsApi: {
@@ -584,8 +560,7 @@ module.exports = {
     },
     Metadata: {
         'AWS::CloudFormation::Interface': {
-            ParameterGroups: [
-                {
+            ParameterGroups: [                {
                     Label: {
                         default: 'Step 2A: Set Basic Chatbot Parameters (required)',
                     },
@@ -601,7 +576,6 @@ module.exports = {
                         'OpenSearchDashboardsRetentionMinutes',
                         'OpenSearchFineGrainAccessControl',
                         'LexV2BotLocaleIds',
-                        'LexBotVersion',
                         'InstallLexResponseBots',
                         'FulfillmentConcurrency',
                         'XraySetting',
@@ -663,6 +637,7 @@ module.exports = {
                         'BootstrapBucket',
                         'BootstrapPrefix',
                         'BuildExamples',
+                        'LogRetentionPeriod'
                     ],
                 },
             ],

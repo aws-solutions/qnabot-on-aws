@@ -185,7 +185,10 @@
                     "Fn::Sub": "arn:aws:s3:::${ExportBucket}/data/*"
                   },
                   {
-                    "Fn::Sub": "arn:aws:s3:::${TestAllBucket}/data/*"
+                    "Fn::Sub": "arn:aws:s3:::${ContentDesignerOutputBucket}/data-testall/*"
+                  },
+                  {
+                    "Fn::Sub": "arn:aws:s3:::${ContentDesignerOutputBucket}/data-export/*"
                   }
                 ]
               },
@@ -218,6 +221,17 @@
                   },
                   {
                     "Fn::Sub": "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${CustomQnABotSettings}"
+                  }
+                ]
+              },
+              {
+                "Effect": "Allow",
+                "Action": [
+                  "lambda:InvokeFunction"
+                ],
+                "Resource": [
+                  {
+                    "Fn::Sub": "arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${SolutionHelper}"
                   }
                 ]
               }

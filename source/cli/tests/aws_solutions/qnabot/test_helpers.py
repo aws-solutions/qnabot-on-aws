@@ -16,7 +16,7 @@ import threading
 from pathlib import Path
 
 import pytest
-from moto import mock_sts, mock_s3
+from moto import mock_aws
 
 from aws_solutions.core.logging import get_logger
 from aws_solutions.qnabot.cli import qnabot_cli_helper
@@ -32,8 +32,7 @@ from tests.aws_solutions.qnabot.fixtures.s3_fixtures import (
 logger = get_logger(__name__)
 
 
-@mock_sts
-@mock_s3
+@mock_aws
 @pytest.mark.skip(reason='Test fails in pipeline; passes locally.')
 def test_qna_import_json(  # NOSONAR 
     cloudformation_stacks_fixture,
@@ -63,8 +62,7 @@ def test_qna_import_json(  # NOSONAR
     logger.debug(f"{response=}")
 
 
-@mock_sts
-@mock_s3
+@mock_aws
 @pytest.mark.skip(reason='Test fails in pipeline; passes locally.')
 def test_qna_export_json(  # NOSONAR 
     cloudformation_stacks_fixture,
@@ -97,8 +95,7 @@ def test_qna_export_json(  # NOSONAR
     os.remove(export_filename)
 
 
-@mock_sts
-@mock_s3
+@mock_aws
 @pytest.mark.skip(reason='Test fails in pipeline; passes locally.')
 def test_qna_import_invalid_stack(  # NOSONAR 
     cloudformation_stacks_fixture,

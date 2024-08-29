@@ -1,4 +1,4 @@
-# Large Language Model - Generative Question Answering (Text Generation) and Query Disambiguation for Conversational Retrieval
+# Large Language Model - Text Generation (Generative Question Answering) and Query Disambiguation for Conversational Retrieval
 
 QnABot can now use a large language model (LLM) to **(1) Disambiguate follow up questions to generate good search queries** and/or **(2) Generate answers to questions from retrieved search results or text passages**.
 
@@ -54,7 +54,7 @@ With QnABot you can use three different data sources to generate responses from:
 
     > **_NOTE:_** If you want to enable S3 presigned URLs, S3 bucket names must start with `qna` (e.g. qnabot-mydocs), otherwise make sure IAM Role *...FulfillmentLambdaRole...* has been granted S3:GetObject access to the Bedrock Knowledge Base bucket (otherwise the signed URLS will not have access). In addition, you can encrypt the transient messages using your own KMS key; ensure that when creating the KMS key that the IAM Role *...FulfillmentLambdaRole...* is a key user.
 
-![RAG using Amazon Bedrock Knowledge Base](./images/Bedrock_KB.png)
+  ![RAG using Amazon Bedrock Knowledge Base](./images/Bedrock_KB.png)
 
 
 
@@ -67,6 +67,7 @@ You can also choose which LLM to use with QnABot:
 Utilizes one of the Amazon Bedrock foundation models to generate text. Currently, the following models are supported by QnA Bot:
 - [Amazon Titan Text G1 Lite](https://us-east-1.console.aws.amazon.com/bedrock/home?region=us-east-1#/providers?model=amazon.titan-text-lite-v1)
 - [Amazon Titan Text G1 Express](https://us-east-1.console.aws.amazon.com/bedrock/home?region=us-east-1#/providers?model=amazon.titan-text-express-v1)
+- [Titan Text G1 - Premier](https://us-east-1.console.aws.amazon.com/bedrock/home?region=us-east-1#/providers?model=amazon.titan-text-premier-v1:0)
 - [Anthropic Claude Instant 1.2](https://us-east-1.console.aws.amazon.com/bedrock/home?region=us-east-1#/providers?model=anthropic.claude-instant-v1)
 - [Anthropic Claude 2.1](https://us-east-1.console.aws.amazon.com/bedrock/home?region=us-east-1#/providers?model=anthropic.claude-v2:1)
 - [Anthropic Claude 3 Sonnet](https://us-east-1.console.aws.amazon.com/bedrock/home?region=us-east-1#/providers?model=anthropic.claude-3-sonnet-20240229-v1:0)
@@ -78,7 +79,7 @@ Utilizes one of the Amazon Bedrock foundation models to generate text. Currently
 
 #### Requesting Access to Amazon Bedrock Models
 
-**NOTE: Access must be requested for the Bedrock model that you wish to use. This step needs to be performed only once per account in the region where your QnABot is deployed. To request access, go to the Model Access page in the Bedrock console: https://docs.aws.amazon.com/bedrock/latest/userguide/model-access.html. Select the models you need access to and request access.**
+**NOTE: Access must be requested for the Bedrock model that you wish to use. This step needs to be performed only once per account in the region where your QnABot is deployed. To request access, go to the [Model Access](https://docs.aws.amazon.com/bedrock/latest/userguide/model-access.html) page in the Bedrock console. Select the models you need access to and request access.**
 
 ![Model Access](./images/Request_model_access.jpeg)
 
@@ -109,7 +110,7 @@ By default a 1-node ml.g5.12xlarge endpoint is automatically provisioned. For la
 Use a custom Lambda function to experiment with LLMs of your choice. Provide your own lambda function that takes a *question*, *context*, and a QnABot *settings* object. Your Lambda function can invoke any LLM you choose, and return the prediction in a JSON object containing the key, `generated_text`. You provide the ARN for your Lambda function when you deploy or update QnABot.
 
 
-#### Deploy Stack for Embedding models invoked by a custom Lambda Function
+#### Deploy Stack for LLM models invoked by a custom Lambda Function
 
 - *(for Kendra Fallback)* set `AltSearchKendraIndexes` to the Index Id (a GUID) of your existing Kendra index containing ingested documents
 - *(for text passage queries)* set `EmbeddingsApi` to BEDROCK, SAGEMAKER, or LAMBDA (see  [Semantic Search using Text Embeddings](../semantic_matching_using_LLM_embeddings/README.md))
@@ -155,7 +156,6 @@ When QnABot stack is installed, open Content Designer **Settings** page:
 
 - **EMBEDDINGS_TEXT_PASSAGE_SCORE_THRESHOLD:** applies only when Embeddings are enabled (recommended) and if ES_SCORE_TEXT_ITEM_PASSAGES is true. If embedding similarity score on text item field is under threshold the match is rejected. Default is 0.80.
 
-- **ALT_SEARCH_KENDRA_INDEXES:**  be set to the Id (not the name) of your Kendra index where you have ingested documents of web pages that you want to use as source passages for generative answers. If you plan to use only QnABot text passages or Bedrock Knowledge Bases instead of Kendra, leave this setting blank.
 
 - **ALT_SEARCH_KENDRA_MAX_DOCUMENT_COUNT:** the number of passages from Kendra to provide in the input context for the LLM.
 
@@ -168,7 +168,7 @@ When QnABot stack is installed, open Content Designer **Settings** page:
   - `{input}` - placeholder for the current user utterance / question
 - **LLM_GENERATE_QUERY_MODEL_PARAMS:** parameters sent to the LLM model when disambiguating follow-up questions. Default: `{"temperature":0}`. Check model documentation for additional values that your model provider accepts.
 - **LLM_QA_ENABLE:** set to true or false to enable or disable generative answers from passages retrieved via embeddings or Kendra fallback (when no FAQ match its found). NOTE LLM based generative answers are not applied when an FAQ / QID matches the question.
-- **LLM_QA_USE_KENDRA_RETRIEVAL_API:** set to true or false to enable or disable the use of Kendra's retrieval API. When enabled, QnABot uses Kendra's Retrieve api to retrieve semantically relevant passages of up to 200 token words from the documents in your index (not FAQs). When disabled, QnABot use the default Kendra Query API to search documents and FAQs. Takes effect only when LLM_QA_ENABLE is true. The default is true (recommended) when LLM QA is enabled. Note: this feature will only search the first configured index. See https://docs.aws.amazon.com/kendra/latest/APIReference/API_Retrieve.html
+- **LLM_QA_USE_KENDRA_RETRIEVAL_API:** set to true or false to enable or disable the use of Kendra's retrieval API. When enabled, QnABot uses Kendra's Retrieve api to retrieve semantically relevant passages of up to 200 token words from the documents in your index (not FAQs). When disabled, QnABot use the default Kendra Query API to search documents and FAQs. Takes effect only when LLM_QA_ENABLE is true. The default is true (recommended) when LLM QA is enabled. Note: this feature will only search the first configured index. See [Retrieve API](https://docs.aws.amazon.com/kendra/latest/APIReference/API_Retrieve.html) for more details.
 - **LLM_QA_PROMPT_TEMPLATE:**  the prompt template used to construct a prompt for the LLM to generate an answer from the context of a retrieved passages (from Kendra or Embeddings). The template may use the placeholders:
   - `{context}` - placeholder for passages retrieved from the search query - either a QnABot 'Text' item passage, or the Top `ALT_SEARCH_KENDRA_MAX_DOCUMENT_COUNT` Kendra passages
   - `{history}` - placeholder for the last `LLM_CHAT_HISTORY_MAX_MESSAGES` messages in the conversational history, to provide conversational context.

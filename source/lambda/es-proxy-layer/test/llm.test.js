@@ -17,7 +17,6 @@ const { SageMakerRuntime } = require('@aws-sdk/client-sagemaker-runtime');
 const { BedrockRuntimeClient, InvokeModelCommand } = require('@aws-sdk/client-bedrock-runtime');
 const { ChatMessageHistory } = require('langchain/memory');
 const { TokenTextSplitter } = require('langchain/text_splitter');
-const { sanitize } = require('../lib/sanitizeOutput');
 
 const {
     clean_context,
@@ -412,7 +411,7 @@ describe('llm generate_query', () => {
             contentType: 'application/json',
             body: JSON.stringify({
                 textGenerationConfig: {
-                    maxTokenCount: 4096,
+                    maxTokenCount: 256,
                     stopSequences: [],
                     temperature: 0,
                     topP: 1,
@@ -676,6 +675,58 @@ describe('llm get_qa', () => {
         expect(response).toBe('sagemaker response');
     });
 
+    test('generates query when Bedrock guardrails are defined', async () => {
+        const clonedReq = _.cloneDeep(req);
+        clonedReq._settings.LLM_API = 'BEDROCK';
+        clonedReq._settings.LLM_MODEL_ID = 'amazon.titan-text-lite-v1';
+        clonedReq._settings.LLM_GENERATE_QUERY_MODEL_PARAMS = '';
+        clonedReq._settings.BEDROCK_GUARDRAIL_IDENTIFIER = 'test_id';
+        clonedReq._settings.BEDROCK_GUARDRAIL_VERSION = 1;
+        const sendMock = jest.fn().mockImplementation(() => {
+            return {
+                body: Buffer.from(JSON.stringify({
+                    results: [{
+                        outputText: 'bedrock response',
+                    }]
+                }))
+            }
+        });
+
+        BedrockRuntimeClient.mockImplementation(() => {
+            return {
+                send: sendMock,
+            };
+        });
+
+        const response = await generate_query(clonedReq);
+
+        expect(sendMock).toBeCalled();
+        expect(InvokeModelCommand).toBeCalledWith({
+            accept: 'application/json',
+            modelId: 'amazon.titan-text-lite-v1',
+            contentType: 'application/json',
+            guardrailIdentifier: "test_id",
+            guardrailVersion: "1",
+            body: JSON.stringify({
+                textGenerationConfig: {
+                    maxTokenCount: 256,
+                    stopSequences: [],
+                    temperature: 0,
+                    topP: 1,
+                },
+                inputText: 'Given the following conversation and a follow up question, rephrase the follow up question to be a standalone question.\nChat History: \n\nFollow Up Input: How can I publish Kindle books?\nStandalone question:',
+            }),
+        });
+        expect(response.question).toBe('How can I publish Kindle books? / bedrock response');
+        expect(response.llm_generated_query).toStrictEqual({
+            concatenated: 'How can I publish Kindle books? / bedrock response',
+            orig: 'How can I publish Kindle books?',
+            result: 'bedrock response',
+            timing: expect.any(String),
+        });
+    });
+
+
     test('throws error if prompt cannot be truncated smaller than max token count', async () => {
         const clonedReq = _.cloneDeep(req);
         clonedReq._settings.LLM_QA_PROMPT_TEMPLATE = 'Some very long prompt that cannot be truncated. '.repeat(100);
@@ -862,31 +913,3 @@ describe('llm isNoHits', () => {
     });
 
 });
-
-describe('should be able to sanitize LLM Outputs', () => {
-    it('should sanitize input data correctly', () => {
-      const inputData = '<script>alert("XSS attack");</script><img src=x onerror=alert(1)><p>Hello, world!</p>';
-      const expectedOutput = '<p>Hello, world!</p>';
-      const sanitizedData = sanitize(inputData);
-      expect(sanitizedData).toEqual(expectedOutput);
-    });
-
-    it('should handle empty input data', () => {
-      const inputData = '';
-      const sanitizedData = sanitize(inputData);
-      expect(sanitizedData).toEqual('');
-    });
-
-    it('should allow href', () => {
-        const inputData = '<a href="http://somelink.com">Some text</a>'; 
-        const sanitizedData = sanitize(inputData);
-        expect(sanitizedData).toEqual('<a href="http://somelink.com">Some text</a>');
-    });
-
-    it('should handle normal response', () => {
-        const inputData = '<p>Sorry I don\'t know</p>'; 
-        const sanitizedData = sanitize(inputData);
-        expect(sanitizedData).toEqual('<p>Sorry I don\'t know</p>');
-      });
-  });
-  

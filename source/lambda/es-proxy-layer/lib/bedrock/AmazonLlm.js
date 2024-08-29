@@ -19,7 +19,7 @@ class AmazonLlm extends BedrockModelProviderPrototype {
         super();
         this.body = _.cloneDeep({
             textGenerationConfig: {
-                maxTokenCount: 4096,
+                maxTokenCount: 256,
                 stopSequences: [],
                 temperature: 0,
                 topP: 1,

@@ -19,7 +19,6 @@
  */
 const _ = require('lodash');
 const { Lambda } = require('@aws-sdk/client-lambda');
-const { LexRuntimeService: LexRuntime } = require('@aws-sdk/client-lex-runtime-service');
 const { LexRuntimeV2 } = require('@aws-sdk/client-lex-runtime-v2');
 const customSdkConfig = require('sdk-config/customSdkConfig');
 const region = process.env.AWS_REGION || 'us-east-1';
@@ -176,21 +175,6 @@ async function lambdaClientRequester(name, req) {
     return obj;
 }
 
-function lexV1ClientRequester(params) {
-    const lexV1Client = new LexRuntime(customSdkConfig('C014', { apiVersion: '2016-11-28', region }));
-    return new Promise((resolve, reject) => {
-        lexV1Client.postText(params, (err, data) => {
-            if (err) {
-                qnabot.log(err, err.stack);
-                reject(`Lex client request error:${err}`);
-            } else {
-                qnabot.log(`Lex client response:${JSON.stringify(data, null, 2)}`);
-                resolve(data);
-            }
-        });
-    });
-}
-
 function lexV2ClientRequester(params) {
     const lexV2Client = new LexRuntimeV2(customSdkConfig('C014', { region }));
     return new Promise((resolve, reject) => {
@@ -233,7 +217,7 @@ function mapFromSimpleName(botName) {
  * @param botAlias
  * @returns {Promise<*>}
  */
-async function handleRequest(req, res, botName, botAlias) {
+async function handleRequest(req, res, botName) {
     if (botName.toLowerCase().startsWith('lambda::')) {
         // target bot is a Lambda Function
         const lambdaName = botName.split('::')[1];
@@ -250,38 +234,27 @@ async function handleRequest(req, res, botName, botAlias) {
     tempBotUserID = tempBotUserID.replaceAll(/[^a-zA-Z0-9\-._:]/g,'_'); // NOSONAR - javascript:S5852 - input is user controlled and we have a limit on the number of characters 
     
 
-    // Determine if we using LexV1 or LexV2.. LexV2 bot is identified by "lexv2::BotId/BotAliasId/LocaleId"
-    if (botIdentity.toLowerCase().startsWith('lexv2::')) {
-        const res = {};
-        const ids = botIdentity.split('::')[1];
-        let [botId, botAliasId, localeId] = ids.split('/');
-        localeId = localeId || 'en_US';
-        const params = {
-            botId,
-            botAliasId,
-            localeId,
-            sessionId: tempBotUserID,
-            sessionState: {
-                sessionAttributes: generateMergedAttributes(req),
-            },
-            text: _.get(req, 'question'),
-        };
-        const lexv2response = await processLexV2Response(params, res);
-
-        const slots = _.get(lexv2response, 'sessionState.intent.slots');
-        if (slots) {
-            res.slots = _.mapValues(slots, (x) => _.get(x, 'value.interpretedValue'));
-        }
-        return res;
-    }
+    // LexV2 bot is identified by "lexv2::BotId/BotAliasId/LocaleId"
+    const response = {};
+    const ids = botIdentity.split('::')[1];
+    let [botId, botAliasId, localeId] = ids.split('/');
+    localeId = localeId || 'en_US';
     const params = {
-        botAlias,
-        botName: botIdentity,
-        inputText: _.get(req, 'question'),
-        sessionAttributes: generateMergedAttributes(req),
-        userId: getBotUserId(req),
+        botId,
+        botAliasId,
+        localeId,
+        sessionId: tempBotUserID,
+        sessionState: {
+            sessionAttributes: generateMergedAttributes(req),
+        },
+        text: _.get(req, 'question'),
     };
-    const response = await lexV1ClientRequester(params);
+    const lexv2response = await processLexV2Response(params, response);
+
+    const slots = _.get(lexv2response, 'sessionState.intent.slots');
+    if (slots) {
+        response.slots = _.mapValues(slots, (x) => _.get(x, 'value.interpretedValue'));
+    }
     return response;
 }
 
@@ -337,7 +310,6 @@ function getDialogState(lexv2response) {
 function endUseOfSpecialtyBot(req, res, welcomeBackMessage) {
     delete res.session.qnabotcontext.specialtyBot;
     delete res.session.qnabotcontext.specialtyBotName;
-    delete res.session.qnabotcontext.specialtyBotAlias;
     delete res.session.qnabotcontext.specialtySessionAttributes;
     delete res.session.qnabotcontext.sBAttributesToReceive;
     delete res.session.qnabotcontext.sBAttributesToReceiveNamespace;
@@ -518,7 +490,7 @@ function getRespCard(botResp) {
  * @param hook
  * @returns {Promise<{}>}
  */
-async function processResponse(req, res, hook, alias) {
+async function processResponse(req, res, hook) {
     qnabot.log(`specialtyBotRouter request: ${JSON.stringify(req, null, 2)}`);
     qnabot.log(`specialtyBotRouter response: ${JSON.stringify(res, null, 2)}`);
 
@@ -538,7 +510,7 @@ async function processResponse(req, res, hook, alias) {
         qnabot.log(`returning resp for user requested exit: ${JSON.stringify(resp, null, 2)}`);
         return resp;
     }
-    const botResp = await handleRequest(req, res, hook, alias);
+    const botResp = await handleRequest(req, res, hook);
     qnabot.log(`specialty botResp: ${JSON.stringify(botResp, null, 2)}`);
     if (botResp.message || _.get(botResp, 'dialogState', '') === 'ReadyForFulfillment') {
         let lexBotIsFulfilled;

@@ -44,7 +44,7 @@ module.exports = {
         auth: 'AWS_IAM',
         method: 'PUT',
         bucket: { Ref: 'TestAllBucket' },
-        path: '/status/{proxy}',
+        path: '/status-testall/{proxy}',
         template: fs.readFileSync(`${__dirname}/testall-start.vm`, 'utf-8'),
         requestParams: {
             'integration.request.path.proxy': 'method.request.path.proxy',
@@ -54,8 +54,8 @@ module.exports = {
         resource: { Ref: 'testall' },
         auth: 'AWS_IAM',
         method: 'GET',
-        bucket: { Ref: 'TestAllBucket' },
-        path: '/status/{proxy}',
+        bucket: { Ref: 'ContentDesignerOutputBucket' },
+        path: '/status-testall/{proxy}',
         requestParams: {
             'integration.request.path.proxy': 'method.request.path.proxy',
         },
@@ -64,8 +64,8 @@ module.exports = {
         resource: { Ref: 'testall' },
         auth: 'AWS_IAM',
         method: 'delete',
-        bucket: { Ref: 'TestAllBucket' },
-        path: '/status/{proxy}',
+        bucket: { Ref: 'ContentDesignerOutputBucket' },
+        path: '/status-testall/{proxy}',
         requestParams: {
             'integration.request.path.proxy': 'method.request.path.proxy',
         },
@@ -89,7 +89,7 @@ module.exports = {
         auth: 'AWS_IAM',
         method: 'PUT',
         bucket: { Ref: 'ExportBucket' },
-        path: '/status/{proxy}',
+        path: '/status-export/{proxy}',
         template: fs.readFileSync(`${__dirname}/export-start.vm`, 'utf-8'),
         requestParams: {
             'integration.request.path.proxy': 'method.request.path.proxy',
@@ -99,8 +99,8 @@ module.exports = {
         resource: { Ref: 'export' },
         auth: 'AWS_IAM',
         method: 'GET',
-        bucket: { Ref: 'ExportBucket' },
-        path: '/status/{proxy}',
+        bucket: { Ref: 'ContentDesignerOutputBucket' },
+        path: '/status-export/{proxy}',
         requestParams: {
             'integration.request.path.proxy': 'method.request.path.proxy',
         },
@@ -109,7 +109,7 @@ module.exports = {
         resource: { Ref: 'export' },
         auth: 'AWS_IAM',
         method: 'delete',
-        bucket: { Ref: 'ExportBucket' },
+        bucket: { Ref: 'ContentDesignerOutputBucket' },
         path: '/status/{proxy}',
         requestParams: {
             'integration.request.path.proxy': 'method.request.path.proxy',
@@ -131,8 +131,8 @@ module.exports = {
         resource: { Ref: 'import' },
         auth: 'AWS_IAM',
         method: 'get',
-        bucket: { Ref: 'ImportBucket' },
-        path: '/status/{proxy}',
+        bucket: { Ref: 'ContentDesignerOutputBucket' },
+        path: '/status-import/{proxy}',
         requestParams: {
             'integration.request.path.proxy': 'method.request.path.proxy',
         },
@@ -141,12 +141,36 @@ module.exports = {
         resource: { Ref: 'import' },
         auth: 'AWS_IAM',
         method: 'delete',
-        bucket: { Ref: 'ImportBucket' },
-        path: '/status/{proxy}',
+        bucket: { Ref: 'ContentDesignerOutputBucket' },
+        path: '/status-import/{proxy}',
         requestParams: {
             'integration.request.path.proxy': 'method.request.path.proxy',
         },
     }),
+    S3ListLambdaLogGroup: {
+        Type: 'AWS::Logs::LogGroup',
+        Properties: {
+            LogGroupName: {
+                'Fn::Join': [
+                    '-',
+                    [
+                        { 'Fn::Sub': '/aws/lambda/${AWS::StackName}-S3ListLambda' },
+                        { 'Fn::Select': ['2', { 'Fn::Split': ['/', { Ref: 'AWS::StackId' }] }] },
+                    ],
+                ],
+            },
+            RetentionInDays: {
+                'Fn::If': [
+                    'LogRetentionPeriodIsNotZero',
+                    { Ref: 'LogRetentionPeriod' },
+                    { Ref: 'AWS::NoValue' },
+                ],
+            },
+        },
+        Metadata: {
+            guard: util.cfnGuard('CLOUDWATCH_LOG_GROUP_ENCRYPTED', 'CW_LOGGROUP_RETENTION_PERIOD_CHECK'),
+        },
+    },
     S3ListLambda: {
         Type: 'AWS::Lambda::Function',
         Properties: {
@@ -159,6 +183,9 @@ module.exports = {
                 }
             },
             Handler: 'index.handler',
+            LoggingConfig: {
+                LogGroup: { Ref: 'S3ListLambdaLogGroup' },
+            },
             MemorySize: '128',
             Role: { 'Fn::GetAtt': ['S3ListLambdaRole', 'Arn'] },
             Runtime: process.env.npm_package_config_lambdaRuntime,

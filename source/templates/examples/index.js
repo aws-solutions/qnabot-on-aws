@@ -45,12 +45,12 @@ module.exports = {
         QIDLambdaArn: { Type: 'String' },
         VPCSubnetIdList: { Type: 'String' },
         VPCSecurityGroupIdList: { Type: 'String' },
-        LexBotVersion: { Type: 'String' },
         XraySetting: { Type: 'String' },
         DefaultQnABotSettings: { Type: 'String' },
         PrivateQnABotSettings: { Type: 'String' },
         InstallLexResponseBots: { Type: 'String' },
         AwsSdkLayerLambdaLayer: { Type: 'String' },
+        LogRetentionPeriod: { Type: 'Number' },
     },
     Conditions: {
         VPCEnabled: {
@@ -59,8 +59,7 @@ module.exports = {
             ],
         },
         XRAYEnabled: { 'Fn::Equals': [{ Ref: 'XraySetting' }, 'TRUE'] },
-        CreateLexV1Bots: { 'Fn::Equals': [{ Ref: 'LexBotVersion' }, 'LexV1 and LexV2'] },
         CreateLexResponseBots: { 'Fn::Equals': [{ Ref: 'InstallLexResponseBots' }, 'true'] },
-        CreateLexV1ResponseBots: { 'Fn::And': [{ Condition: 'CreateLexResponseBots' }, { Condition: 'CreateLexV1Bots' }] },
+        LogRetentionPeriodIsNotZero: { 'Fn::Not': [{ 'Fn::Equals': [{ Ref: 'LogRetentionPeriod' }, 0] }] },
     },
 };

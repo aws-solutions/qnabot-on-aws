@@ -26,6 +26,7 @@ module.exports = {
     Description: `(SO0189n-import) QnABot nested import resources - Version v${process.env.npm_package_version}`,
     Outputs: require('./outputs'),
     Parameters: {
+        ContentDesignerOutputBucket: { Type: 'String' },
         CFNLambda: { Type: 'String' },
         CFNInvokePolicy: { Type: 'String' },
         S3Clean: { Type: 'String' },
@@ -55,6 +56,7 @@ module.exports = {
         CommonModulesLambdaLayer: { Type: 'String' },
         EsProxyLambdaLayer: { Type: 'String' },
         QnABotCommonLambdaLayer: { Type: 'String' },
+        LogRetentionPeriod: { Type: 'Number' },
     },
     Conditions: {
         VPCEnabled: {
@@ -64,5 +66,6 @@ module.exports = {
         EmbeddingsLambdaArn: { 'Fn::Not': [{ 'Fn::Equals': [{ Ref: 'EmbeddingsLambdaArn' }, ''] }] },
         EmbeddingsSagemaker: { 'Fn::Not': [{ 'Fn::Equals': [{ Ref: 'EmbeddingsSagemakerEndpointArn' }, ''] }] },
         EmbeddingsBedrock: { 'Fn::Equals': [{ Ref: 'EmbeddingsApi' }, 'BEDROCK'] },
+        LogRetentionPeriodIsNotZero: { 'Fn::Not': [{ 'Fn::Equals': [{ Ref: 'LogRetentionPeriod' }, 0] }] }
     },
 };

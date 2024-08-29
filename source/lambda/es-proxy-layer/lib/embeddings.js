@@ -70,7 +70,9 @@ async function getEmbeddingsBedrock(type_q_or_a, input, settings) {
         inputText = truncateByNumTokens(inputText, settings.EMBEDDINGS_MAX_TOKEN_LIMIT);
     }
 
-    return await invokeBedrockModel(modelId, {}, inputText);
+    const embeddings = await invokeBedrockModel(modelId, {}, inputText, {});
+    qnabot.debug(`Bedrock Embeddings Response: ${embeddings}`);
+    return embeddings;
 };
 
 module.exports = async function (type_q_or_a, input, settings) {

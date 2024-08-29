@@ -178,19 +178,6 @@ exports.createResponseObject = function (message) {
     return response;
 };
 
-exports.getLexV1Response = function (dialogState, message) {
-    const response = {
-        "botVersion": "live",
-        "dialogState": dialogState,
-        "intentName": "mockIntent",
-        "message": message ? message : "Mock Response",
-        "sentimentResponse": {
-            "sentimentLabel": "mockLabel",
-        }
-    }
-    return response;
-};
-
 exports.getLexV2Response = function (dialogState, message, intentName, state) {
     return {
         "botVersion": "live",

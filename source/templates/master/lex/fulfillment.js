@@ -34,7 +34,7 @@ module.exports = {
                 ]],
             },
             Principal: 'alexa-appkit.amazon.com',
-            SourceAccount: { Ref: 'AWS::AccountId' }, 
+            SourceAccount: { Ref: 'AWS::AccountId' },
         },
     },
     FulfillmentCodeVersion: {
@@ -44,6 +44,30 @@ module.exports = {
             Bucket: { Ref: 'BootstrapBucket' },
             Key: { 'Fn::Sub': '${BootstrapPrefix}/lambda/fulfillment.zip' },
             BuildDate: (new Date()).toISOString(),
+        },
+    },
+    FulfillmentLambdaLogGroup: {
+        Type: 'AWS::Logs::LogGroup',
+        Properties: {
+            LogGroupName: {
+                'Fn::Join': [
+                    '-',
+                    [
+                        { 'Fn::Sub': '/aws/lambda/${AWS::StackName}-FulfillmentLambda' },
+                        { 'Fn::Select': ['2', { 'Fn::Split': ['/', { Ref: 'AWS::StackId' }] }] },
+                    ],
+                ],
+            },
+            RetentionInDays: {
+                'Fn::If': [
+                    'LogRetentionPeriodIsNotZero',
+                    { Ref: 'LogRetentionPeriod' },
+                    { Ref: 'AWS::NoValue' },
+                ],
+            },
+        },
+        Metadata: {
+            guard: util.cfnGuard('CLOUDWATCH_LOG_GROUP_ENCRYPTED', 'CW_LOGGROUP_RETENTION_PERIOD_CHECK'),
         },
     },
     FulfillmentLambda: {
@@ -93,10 +117,13 @@ module.exports = {
                     LLM_LAMBDA_ARN: { Ref: 'LLMLambdaArn' },
                     ...examples,
                     ...responsebots,
-                    ...util.getCommonEnvironmentVariables()
+                    ...util.getCommonEnvironmentVariables(),
                 },
             },
             Handler: 'index.handler',
+            LoggingConfig: {
+                LogGroup: { Ref: 'FulfillmentLambdaLogGroup' },
+            },
             Layers: [
                 { Ref: 'AwsSdkLayerLambdaLayer' },
                 { Ref: 'CommonModulesLambdaLayer' },
@@ -234,7 +261,6 @@ module.exports = {
                 Statement: [{
                     Effect: 'Allow',
                     Action: [
-                        'lex:PostText',
                         'lex:RecognizeText',
                     ],
                     Resource: [
@@ -405,10 +431,18 @@ module.exports = {
                                             'bedrock:InvokeModel',
                                         ],
                                         Resource: [
-                                            { 'Fn::If': ['EmbeddingsBedrock', { 'Fn::Sub': 'arn:${AWS::Partition}:bedrock:${AWS::Region}::foundation-model/${EmbeddingsBedrockModelId}' }, { Ref: 'AWS::NoValue' }] },
-                                            { 'Fn::If': ['LLMBedrock', { 'Fn::Sub': ['arn:${AWS::Partition}:bedrock:${AWS::Region}::foundation-model/${ModelId}', {'ModelId': { 'Fn::FindInMap': ['BedrockDefaults', {'Ref' : 'LLMBedrockModelId'}, 'ModelID'] }}] }, { Ref: 'AWS::NoValue' }] },
-                                            { 'Fn::If': ['BedrockKnowledgeBaseEnable', { 'Fn::Sub': ['arn:${AWS::Partition}:bedrock:${AWS::Region}::foundation-model/${ModelId}', {'ModelId': { 'Fn::FindInMap': ['BedrockDefaults', {'Ref' : 'BedrockKnowledgeBaseModel'}, 'ModelID'] }}] }, { Ref: 'AWS::NoValue' }] },
+                                            { 'Fn::If': ['EmbeddingsBedrock', { 'Fn::Sub': ['arn:${AWS::Partition}:bedrock:${AWS::Region}::foundation-model/${ModelId}', {ModelId: { 'Fn::FindInMap': ['BedrockDefaults', {Ref : 'EmbeddingsBedrockModelId'}, 'ModelID'] }}] }, { Ref: 'AWS::NoValue' }] },
+                                            { 'Fn::If': ['LLMBedrock', { 'Fn::Sub': ['arn:${AWS::Partition}:bedrock:${AWS::Region}::foundation-model/${ModelId}', {ModelId: { 'Fn::FindInMap': ['BedrockDefaults', {Ref : 'LLMBedrockModelId'}, 'ModelID'] }}] }, { Ref: 'AWS::NoValue' }] },
+                                            { 'Fn::If': ['BedrockKnowledgeBaseEnable', { 'Fn::Sub': ['arn:${AWS::Partition}:bedrock:${AWS::Region}::foundation-model/${ModelId}', {ModelId: { 'Fn::FindInMap': ['BedrockDefaults', {Ref : 'BedrockKnowledgeBaseModel'}, 'ModelID'] }}] }, { Ref: 'AWS::NoValue' }] },
                                         ],
+                                    },
+                                    {
+                                        Sid: 'ApplyGuardrailsToLLMBedrock', // https://docs.aws.amazon.com/bedrock/latest/userguide/guardrails-permissions.html#guardrails-permissions-invoke
+                                        Effect: 'Allow',
+                                        Action: [
+                                            'bedrock:ApplyGuardrail',
+                                        ],
+                                        Resource: [{ 'Fn::Sub': 'arn:${AWS::Partition}:bedrock:${AWS::Region}:${AWS::AccountId}:guardrail/*' }],
                                     },
                                 ],
                             },
@@ -431,6 +465,14 @@ module.exports = {
                                             'bedrock:RetrieveAndGenerate',
                                         ],
                                         Resource: { 'Fn::Sub': 'arn:${AWS::Partition}:bedrock:${AWS::Region}:${AWS::AccountId}:knowledge-base/${BedrockKnowledgeBaseId}' },
+                                    },
+                                    {
+                                        Sid: 'ApplyGuardrailsToKnowledgeBase', // https://docs.aws.amazon.com/bedrock/latest/userguide/guardrails-permissions.html#guardrails-permissions-invoke
+                                        Effect: 'Allow',
+                                        Action: [
+                                            'bedrock:ApplyGuardrail',
+                                        ],
+                                        Resource: [{ 'Fn::Sub': 'arn:${AWS::Partition}:bedrock:${AWS::Region}:${AWS::AccountId}:guardrail/*' }],
                                     },
                                 ],
                             },
@@ -472,6 +514,30 @@ module.exports = {
             BuildDate: (new Date()).toISOString(),
         },
     },
+    ESWarmerLambdaLogGroup: {
+        Type: 'AWS::Logs::LogGroup',
+        Properties: {
+            LogGroupName: {
+                'Fn::Join': [
+                    '-',
+                    [
+                        { 'Fn::Sub': '/aws/lambda/${AWS::StackName}-ESWarmerLambda' },
+                        { 'Fn::Select': ['2', { 'Fn::Split': ['/', { Ref: 'AWS::StackId' }] }] },
+                    ],
+                ],
+            },
+            RetentionInDays: {
+                'Fn::If': [
+                    'LogRetentionPeriodIsNotZero',
+                    { Ref: 'LogRetentionPeriod' },
+                    { Ref: 'AWS::NoValue' },
+                ],
+            },
+        },
+        Metadata: {
+            guard: util.cfnGuard('CLOUDWATCH_LOG_GROUP_ENCRYPTED', 'CW_LOGGROUP_RETENTION_PERIOD_CHECK'),
+        },
+    },
     ESWarmerLambda: {
         DependsOn: ['ESWarmerCodeVersion'],
         Type: 'AWS::Lambda::Function',
@@ -490,10 +556,13 @@ module.exports = {
                     DEFAULT_SETTINGS_PARAM: { Ref: 'DefaultQnABotSettings' },
                     PRIVATE_SETTINGS_PARAM: { Ref: 'PrivateQnABotSettings' },
                     CUSTOM_SETTINGS_PARAM: { Ref: 'CustomQnABotSettings' },
-                    ...util.getCommonEnvironmentVariables()
+                    ...util.getCommonEnvironmentVariables(),
                 },
             },
             Handler: 'index.warmer',
+            LoggingConfig: {
+                LogGroup: { Ref: 'ESWarmerLambdaLogGroup' },
+            },
             MemorySize: '512',
             Role: { 'Fn::GetAtt': ['WarmerLambdaRole', 'Arn'] },
             Runtime: process.env.npm_package_config_lambdaRuntime,

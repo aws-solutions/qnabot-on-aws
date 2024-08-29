@@ -17,7 +17,6 @@
  * Handle response from Lex Bot and update session attributes as needed.
  */
 const _ = require('lodash');
-const { LexRuntimeService: LexRuntime } = require('@aws-sdk/client-lex-runtime-service')
 const { LexRuntimeV2 } = require('@aws-sdk/client-lex-runtime-v2');
 const customSdkConfig = require('sdk-config/customSdkConfig');
 const region = process.env.AWS_REGION || 'us-east-1';
@@ -94,25 +93,11 @@ async function translate_res(req, res) {
 }
 
 /**
- * Call postText and use promise to return data response.
+ * Call recognizeText and use promise to return data response.
  * @param lexClient
  * @param params
  * @returns {*}
  */
-function lexV1ClientRequester(params) {
-    const lexV1Client = new LexRuntime(customSdkConfig('C001', { apiVersion: '2016-11-28', region }));
-    return new Promise((resolve, reject) => {
-        lexV1Client.postText(params, (err, data) => {
-            if (err) {
-                qnabot.log(err, err.stack);
-                reject(`Lex client request error:${err}`);
-            } else {
-                qnabot.log(`Lex client response:${JSON.stringify(data, null, 2)}`);
-                resolve(data);
-            }
-        });
-    });
-}
 function lexV2ClientRequester(params) {
     const lexV2Client = new LexRuntimeV2(customSdkConfig('C002', { region }));
     return new Promise((resolve, reject) => {
@@ -203,46 +188,33 @@ async function handleRequest(req, res, botName, botAlias) {
     // Resolve bot details from environment, if using simple name for built-in bots
     const botIdentity = mapFromSimpleName(botName);
 
-    // Determine if we using LexV1 or LexV2.. LexV2 bot is identified by "lexv2::BotId/BotAliasId/LocaleId"
-    let response = {};
-    if (botIdentity.toLowerCase().startsWith('lexv2::')) {
-        // lex v2 response bot
-        const ids = botIdentity.split('::')[1];
-        let [botId, botAliasId, localeId] = ids.split('/');
-        localeId = localeId || 'en_US';
-        const params = {
-            botId,
-            botAliasId,
-            localeId,
-            sessionId: tempBotUserID,
-            text: respText,
+    const response = {};
+    // Lex V2 response bot
+    const ids = botIdentity.split('::')[1];
+    let [botId, botAliasId, localeId] = ids.split('/');
+    localeId = localeId || 'en_US';
+    const params = {
+        botId,
+        botAliasId,
+        localeId,
+        sessionId: tempBotUserID,
+        text: respText,
 
-        };
-        qnabot.log(`Lex V2 parameters: ${JSON.stringify(params)}`);
-        const lexv2response = await lexV2ClientRequester(params);
-        qnabot.log(`Lex V2 response: ${JSON.stringify(lexv2response)}`);
-        response.message = _.get(lexv2response, 'messages[0].content', '');
-        // lex v2 FallbackIntent match means it failed to fill desired slot(s).
-        if (lexv2response.sessionState.intent.name === 'FallbackIntent'
-                || lexv2response.sessionState.intent.state === 'Failed') {
-            response.dialogState = 'Failed';
-        } else {
-            response.dialogState = lexv2response.sessionState.dialogAction.type;
-        }
-        const slots = _.get(lexv2response, 'sessionState.intent.slots');
-        if (slots) {
-            response.slots = _.mapValues(slots, (x) => _.get(x, 'value.interpretedValue'));
-        }
+    };
+    qnabot.log(`Lex V2 parameters: ${JSON.stringify(params)}`);
+    const lexv2response = await lexV2ClientRequester(params);
+    qnabot.log(`Lex V2 response: ${JSON.stringify(lexv2response)}`);
+    response.message = _.get(lexv2response, 'messages[0].content', '');
+    // lex v2 FallbackIntent match means it failed to fill desired slot(s).
+    if (lexv2response.sessionState.intent.name === 'FallbackIntent'
+            || lexv2response.sessionState.intent.state === 'Failed') {
+        response.dialogState = 'Failed';
     } else {
-        // lex v1 response bot
-        const params = {
-            botAlias,
-            botName: mapFromSimpleName(botName),
-            inputText: respText,
-            userId: tempBotUserID,
-        };
-        qnabot.log(`Lex V1 parameters: ${JSON.stringify(params)}`);
-        response = await lexV1ClientRequester(params);
+        response.dialogState = lexv2response.sessionState.dialogAction.type;
+    }
+    const slots = _.get(lexv2response, 'sessionState.intent.slots');
+    if (slots) {
+        response.slots = _.mapValues(slots, (x) => _.get(x, 'value.interpretedValue'));
     }
     return response;
 }

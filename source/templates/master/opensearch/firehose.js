@@ -17,7 +17,22 @@ module.exports = {
     FeedbackKinesisFirehoseLogGroup: {
         Type: 'AWS::Logs::LogGroup',
         Properties: {
-            LogGroupName: { 'Fn::Sub': '/aws/kinesisfirehose/${AWS::StackName}-FeedbackKinesisFirehose' }
+            LogGroupName: {
+                'Fn::Join': [
+                    '-',
+                    [
+                        { 'Fn::Sub': '/aws/kinesisfirehose/${AWS::StackName}-FeedbackKinesisFirehose' },
+                        { 'Fn::Select': ['2', { 'Fn::Split': ['/', { Ref: 'AWS::StackId' }] }] },
+                    ],
+                ],
+            },
+            RetentionInDays: {
+                'Fn::If': [
+                    'LogRetentionPeriodIsNotZero',
+                    { Ref: 'LogRetentionPeriod' },
+                    { Ref: 'AWS::NoValue' },
+                ],
+            },
         },
         Metadata: {
             cfn_nag: {
@@ -26,12 +41,9 @@ module.exports = {
                         id: 'W86',
                         reason: 'LogGroup is encrypted by default.',
                     },
-                    {
-                        id: 'W84',
-                        reason: 'LogGroup needs to be retained indefinitely',
-                    },
                 ],
             },
+            guard: util.cfnGuard('CLOUDWATCH_LOG_GROUP_ENCRYPTED', 'CW_LOGGROUP_RETENTION_PERIOD_CHECK'),
         },
     },
     FeedbackKinesisFirehoseStreamOpenSearch: {
@@ -39,16 +51,16 @@ module.exports = {
         DependsOn: ['FeedbackKinesisFirehoseLogGroup'],
         Properties: {
             LogGroupName: { Ref: 'FeedbackKinesisFirehoseLogGroup' },
-            LogStreamName: 'OpenSearchDestinationDelivery'
-        }
+            LogStreamName: 'OpenSearchDestinationDelivery',
+        },
     },
     FeedbackKinesisFirehoseStreamS3: {
         Type: 'AWS::Logs::LogStream',
         DependsOn: ['FeedbackKinesisFirehoseLogGroup'],
         Properties: {
             LogGroupName: { Ref: 'FeedbackKinesisFirehoseLogGroup' },
-            LogStreamName: 'S3BackupDelivery'
-        }
+            LogStreamName: 'S3BackupDelivery',
+        },
     },
     FeedbackKinesisFirehose: {
         Type: 'AWS::KinesisFirehose::DeliveryStream',
@@ -62,23 +74,23 @@ module.exports = {
         Properties: {
             DeliveryStreamType: 'DirectPut',
             DeliveryStreamEncryptionConfigurationInput: {
-                KeyType: 'AWS_OWNED_CMK'
+                KeyType: 'AWS_OWNED_CMK',
             },
             AmazonopensearchserviceDestinationConfiguration: {
                 BufferingHints: {
                     IntervalInSeconds: 60,
-                    SizeInMBs: 5
+                    SizeInMBs: 5,
                 },
                 CloudWatchLoggingOptions: {
                     Enabled: true,
                     LogGroupName: { Ref: 'FeedbackKinesisFirehoseLogGroup' },
-                    LogStreamName: { Ref: 'FeedbackKinesisFirehoseStreamOpenSearch' }
+                    LogStreamName: { Ref: 'FeedbackKinesisFirehoseStreamOpenSearch' },
                 },
                 DomainARN: { 'Fn::GetAtt': ['ESVar', 'ESArn'] },
                 IndexName: { 'Fn::Sub': '${Var.FeedbackIndex}' },
                 IndexRotationPeriod: 'NoRotation',
                 RetryOptions: {
-                    DurationInSeconds: 300
+                    DurationInSeconds: 300,
                 },
                 RoleARN: { 'Fn::GetAtt': ['FirehoseESS3Role', 'Arn'] },
                 S3BackupMode: 'AllDocuments',
@@ -87,15 +99,15 @@ module.exports = {
                     CloudWatchLoggingOptions: {
                         Enabled: true,
                         LogGroupName: { Ref: 'FeedbackKinesisFirehoseLogGroup' },
-                        LogStreamName: { Ref: 'FeedbackKinesisFirehoseStreamS3' }
+                        LogStreamName: { Ref: 'FeedbackKinesisFirehoseStreamS3' },
                     },
                     BufferingHints: {
                         IntervalInSeconds: 60,
-                        SizeInMBs: 5
+                        SizeInMBs: 5,
                     },
                     Prefix: 'feedback/',
                     CompressionFormat: 'UNCOMPRESSED',
-                    RoleARN: { 'Fn::GetAtt': ['FirehoseESS3Role', 'Arn'] }
+                    RoleARN: { 'Fn::GetAtt': ['FirehoseESS3Role', 'Arn'] },
                 },
                 TypeName: '',
                 VpcConfiguration: {
@@ -104,18 +116,33 @@ module.exports = {
                         {
                             RoleARN: { 'Fn::GetAtt': ['FirehoseESS3Role', 'Arn'] },
                             SubnetIds: { Ref: 'VPCSubnetIdList' },
-                            SecurityGroupIds: { Ref: 'VPCSecurityGroupIdList' }
+                            SecurityGroupIds: { Ref: 'VPCSecurityGroupIdList' },
                         },
-                        { Ref: 'AWS::NoValue' }
-                    ]
-                }
+                        { Ref: 'AWS::NoValue' },
+                    ],
+                },
             },
-        }
+        },
     },
     GeneralKinesisFirehoseLogGroup: {
         Type: 'AWS::Logs::LogGroup',
         Properties: {
-            LogGroupName: { 'Fn::Sub': '/aws/kinesisfirehose/${AWS::StackName}-GeneralKinesisFirehose' }
+            LogGroupName: {
+                'Fn::Join': [
+                    '-',
+                    [
+                        { 'Fn::Sub': '/aws/kinesisfirehose/${AWS::StackName}-GeneralKinesisFirehose' },
+                        { 'Fn::Select': ['2', { 'Fn::Split': ['/', { Ref: 'AWS::StackId' }] }] },
+                    ],
+                ],
+            },
+            RetentionInDays: {
+                'Fn::If': [
+                    'LogRetentionPeriodIsNotZero',
+                    { Ref: 'LogRetentionPeriod' },
+                    { Ref: 'AWS::NoValue' },
+                ],
+            },
         },
         Metadata: {
             cfn_nag: {
@@ -124,27 +151,24 @@ module.exports = {
                         id: 'W86',
                         reason: 'LogGroup is encrypted by default.',
                     },
-                    {
-                        id: 'W84',
-                        reason: 'LogGroup needs to be retained indefinitely',
-                    },
                 ],
             },
+            guard: util.cfnGuard('CLOUDWATCH_LOG_GROUP_ENCRYPTED', 'CW_LOGGROUP_RETENTION_PERIOD_CHECK'),
         },
     },
     GeneralKinesisFirehoseStreamOpenSearch: {
         Type: 'AWS::Logs::LogStream',
         Properties: {
             LogGroupName: { Ref: 'GeneralKinesisFirehoseLogGroup' },
-            LogStreamName: 'OpenSearchDestinationDelivery'
-        }
+            LogStreamName: 'OpenSearchDestinationDelivery',
+        },
     },
     GeneralKinesisFirehoseStreamS3: {
         Type: 'AWS::Logs::LogStream',
         Properties: {
             LogGroupName: { Ref: 'GeneralKinesisFirehoseLogGroup' },
-            LogStreamName: 'S3BackupDelivery'
-        }
+            LogStreamName: 'S3BackupDelivery',
+        },
     },
     GeneralKinesisFirehose: {
         Type: 'AWS::KinesisFirehose::DeliveryStream',
@@ -158,23 +182,23 @@ module.exports = {
         Properties: {
             DeliveryStreamType: 'DirectPut',
             DeliveryStreamEncryptionConfigurationInput: {
-                KeyType: 'AWS_OWNED_CMK'
+                KeyType: 'AWS_OWNED_CMK',
             },
             AmazonopensearchserviceDestinationConfiguration: {
                 BufferingHints: {
                     IntervalInSeconds: 60,
-                    SizeInMBs: 5
+                    SizeInMBs: 5,
                 },
                 CloudWatchLoggingOptions: {
                     Enabled: true,
                     LogGroupName: { Ref: 'GeneralKinesisFirehoseLogGroup' },
-                    LogStreamName: { Ref: 'GeneralKinesisFirehoseStreamOpenSearch' }
+                    LogStreamName: { Ref: 'GeneralKinesisFirehoseStreamOpenSearch' },
                 },
                 DomainARN: { 'Fn::GetAtt': ['ESVar', 'ESArn'] },
                 IndexName: { 'Fn::Sub': '${Var.MetricsIndex}' },
                 IndexRotationPeriod: 'NoRotation',
                 RetryOptions: {
-                    DurationInSeconds: 300
+                    DurationInSeconds: 300,
                 },
                 RoleARN: { 'Fn::GetAtt': ['FirehoseESS3Role', 'Arn'] },
                 S3BackupMode: 'AllDocuments',
@@ -183,15 +207,15 @@ module.exports = {
                     CloudWatchLoggingOptions: {
                         Enabled: true,
                         LogGroupName: { Ref: 'GeneralKinesisFirehoseLogGroup' },
-                        LogStreamName: { Ref: 'GeneralKinesisFirehoseStreamS3' }
+                        LogStreamName: { Ref: 'GeneralKinesisFirehoseStreamS3' },
                     },
                     Prefix: 'metrics/',
                     BufferingHints: {
                         IntervalInSeconds: 60,
-                        SizeInMBs: 5
+                        SizeInMBs: 5,
                     },
                     CompressionFormat: 'UNCOMPRESSED',
-                    RoleARN: { 'Fn::GetAtt': ['FirehoseESS3Role', 'Arn'] }
+                    RoleARN: { 'Fn::GetAtt': ['FirehoseESS3Role', 'Arn'] },
                 },
                 TypeName: '',
                 VpcConfiguration: {
@@ -200,13 +224,13 @@ module.exports = {
                         {
                             RoleARN: { 'Fn::GetAtt': ['FirehoseESS3Role', 'Arn'] },
                             SubnetIds: { Ref: 'VPCSubnetIdList' },
-                            SecurityGroupIds: { Ref: 'VPCSecurityGroupIdList' }
+                            SecurityGroupIds: { Ref: 'VPCSecurityGroupIdList' },
                         },
-                        { Ref: 'AWS::NoValue' }
-                    ]
-                }
+                        { Ref: 'AWS::NoValue' },
+                    ],
+                },
             },
-        }
+        },
     },
     MetricsBucket: {
         Type: 'AWS::S3::Bucket',
@@ -215,7 +239,7 @@ module.exports = {
         DeletionPolicy: 'Delete',
         Properties: {
             VersioningConfiguration: {
-                Status: 'Enabled'
+                Status: 'Enabled',
             },
             BucketEncryption: {
                 ServerSideEncryptionConfiguration: [{
@@ -226,27 +250,27 @@ module.exports = {
             },
             LoggingConfiguration: {
                 DestinationBucketName: { Ref: 'MainAccessLogBucket' },
-                LogFilePrefix: { 'Fn::Join': ['', [{ Ref: 'MainAccessLogBucket' }, '/Metrics/']] }
+                LogFilePrefix: { 'Fn::Join': ['', [{ Ref: 'MainAccessLogBucket' }, '/Metrics/']] },
             },
             PublicAccessBlockConfiguration: {
                 BlockPublicAcls: true,
                 BlockPublicPolicy: true,
                 IgnorePublicAcls: true,
-                RestrictPublicBuckets: true
+                RestrictPublicBuckets: true,
             },
             Tags: [
                 {
                     Key: 'Use',
-                    Value: 'Metrics'
-                }
-            ]
-        }
+                    Value: 'Metrics',
+                },
+            ],
+        },
     },
     HTTPSOnlyMetricBucketsPolicy: {
         Type: 'AWS::S3::BucketPolicy',
         Properties: {
             Bucket: {
-                Ref: 'MetricsBucket'
+                Ref: 'MetricsBucket',
             },
             PolicyDocument: {
                 Statement: [
@@ -254,8 +278,8 @@ module.exports = {
                         Action: '*',
                         Condition: {
                             Bool: {
-                                'aws:SecureTransport': 'false'
-                            }
+                                'aws:SecureTransport': 'false',
+                            },
                         },
                         Effect: 'Deny',
                         Principal: '*',
@@ -265,37 +289,37 @@ module.exports = {
                                     '',
                                     [
                                         {
-                                            'Fn::GetAtt': ['MetricsBucket', 'Arn']
+                                            'Fn::GetAtt': ['MetricsBucket', 'Arn'],
                                         },
-                                        '/*'
-                                    ]
-                                ]
+                                        '/*',
+                                    ],
+                                ],
                             },
                             {
                                 'Fn::Join': [
                                     '',
                                     [
                                         {
-                                            'Fn::GetAtt': ['MetricsBucket', 'Arn']
-                                        }
-                                    ]
-                                ]
-                            }
+                                            'Fn::GetAtt': ['MetricsBucket', 'Arn'],
+                                        },
+                                    ],
+                                ],
+                            },
                         ],
-                        Sid: 'HttpsOnly'
-                    }
+                        Sid: 'HttpsOnly',
+                    },
                 ],
-                Version: '2012-10-17'
-            }
-        }
+                Version: '2012-10-17',
+            },
+        },
     },
     MetricsBucketClean: {
         Type: 'Custom::S3Clean',
         DependsOn: ['CFNInvokePolicy', 'HTTPSOnlyMetricBucketsPolicy'],
         Properties: {
             ServiceToken: { 'Fn::GetAtt': ['S3Clean', 'Arn'] },
-            Bucket: { Ref: 'MetricsBucket' }
-        }
+            Bucket: { Ref: 'MetricsBucket' },
+        },
     },
     FirehoseESS3Role: {
         Type: 'AWS::IAM::Role',
@@ -306,11 +330,11 @@ module.exports = {
                     {
                         Effect: 'Allow',
                         Principal: {
-                            Service: 'firehose.amazonaws.com'
+                            Service: 'firehose.amazonaws.com',
                         },
-                        Action: 'sts:AssumeRole'
-                    }
-                ]
+                        Action: 'sts:AssumeRole',
+                    },
+                ],
             },
             Path: '/',
             Policies: [
@@ -327,12 +351,12 @@ module.exports = {
                                     's3:GetObject',
                                     's3:ListBucket',
                                     's3:ListBucketMultipartUploads',
-                                    's3:PutObject'
+                                    's3:PutObject',
                                 ],
                                 Resource: [
                                     { 'Fn::GetAtt': ['MetricsBucket', 'Arn'] },
-                                    { 'Fn::Join': ['', [{ 'Fn::GetAtt': ['MetricsBucket', 'Arn'] }, '/*']] }
-                                ]
+                                    { 'Fn::Join': ['', [{ 'Fn::GetAtt': ['MetricsBucket', 'Arn'] }, '/*']] },
+                                ],
                             },
                             {
                                 Sid: 'FirehoseLambdaPermissions',
@@ -347,11 +371,11 @@ module.exports = {
                                                 { Ref: 'AWS::Region' },
                                                 ':',
                                                 { Ref: 'AWS::AccountId' },
-                                                ':function:%FIREHOSE_DEFAULT_FUNCTION%:%FIREHOSE_DEFAULT_VERSION%'
-                                            ]
-                                        ]
-                                    }
-                                ]
+                                                ':function:%FIREHOSE_DEFAULT_FUNCTION%:%FIREHOSE_DEFAULT_VERSION%',
+                                            ],
+                                        ],
+                                    },
+                                ],
                             },
                             {
                                 Sid: 'FirehoseOpenSearchDestinationPermissions',
@@ -362,12 +386,12 @@ module.exports = {
                                     'es:DescribeDomainConfig',
                                     'es:ESHttpPost',
                                     'es:ESHttpPut',
-                                    'es:ESHttpGet'
+                                    'es:ESHttpGet',
                                 ],
                                 Resource: [
                                     { 'Fn::GetAtt': ['ESVar', 'ESArn'] },
-                                    { 'Fn::Join': ['', [{ 'Fn::GetAtt': ['ESVar', 'ESArn'] }, '/*']] }
-                                ]
+                                    { 'Fn::Join': ['', [{ 'Fn::GetAtt': ['ESVar', 'ESArn'] }, '/*']] },
+                                ],
                             },
                             {
                                 Sid: 'FirehoseLogsPermissions',
@@ -382,11 +406,11 @@ module.exports = {
                                                 { Ref: 'AWS::Region' },
                                                 ':',
                                                 { Ref: 'AWS::AccountId' },
-                                                ':log-group:/aws/kinesisfirehose/*'
-                                            ]
-                                        ]
-                                    }
-                                ]
+                                                ':log-group:/aws/kinesisfirehose/*',
+                                            ],
+                                        ],
+                                    },
+                                ],
                             },
                             {
                                 Sid: 'FireHoseVPCConfiguration', // https://docs.aws.amazon.com/firehose/latest/APIReference/API_VpcConfigurationDescription.html
@@ -399,19 +423,19 @@ module.exports = {
                                     'ec2:DescribeNetworkInterfaces',
                                     'ec2:CreateNetworkInterface',
                                     'ec2:CreateNetworkInterfacePermission',
-                                    'ec2:DeleteNetworkInterface'
+                                    'ec2:DeleteNetworkInterface',
                                 ],
-                                Resource: '*' // these actions cannot be bound to resources other than *
-                            }
-                        ]
+                                Resource: '*', // these actions cannot be bound to resources other than *
+                            },
+                        ],
                     },
-                    PolicyName: 'QnAFirehose'
-                }
-            ]
+                    PolicyName: 'QnAFirehose',
+                },
+            ],
         },
         Metadata: {
             cfn_nag: util.cfnNag(['W11']),
             guard: util.cfnGuard('IAM_NO_INLINE_POLICY_CHECK'),
         },
-    }
+    },
 };

@@ -12,14 +12,17 @@
  *  and limitations under the License.                                                                                *
  *********************************************************************************************************************/
 
-const { BedrockAgentRuntimeClient, RetrieveAndGenerateCommand } = require("@aws-sdk/client-bedrock-agent-runtime");
+const { BedrockAgentRuntimeClient, RetrieveAndGenerateCommand } = require('@aws-sdk/client-bedrock-agent-runtime');
 const customSdkConfig = require('sdk-config/customSdkConfig');
 const { signUrls } = require('../signS3URL');
 const llm = require('../llm');
 const qnabot = require('qnabot/logging');
 const _ = require('lodash');
+const { sanitize, escapeHashMarkdown } = require('../sanitizeOutput');
 
 const region = process.env.AWS_REGION || 'us-east-1';
+const inferenceKeys = ['maxTokens', 'stopSequences', 'temperature', 'topP'];
+const client = new BedrockAgentRuntimeClient(customSdkConfig('C41', { region }));
 
 function isNoHitsResponse(req, response) {
     const { text } = response.output;
@@ -27,9 +30,12 @@ function isNoHitsResponse(req, response) {
     return !retrievedReferences && llm.isNoHits(req, text);
 }
 
-async function generateResponse(client, input, res) {
+async function generateResponse(input, res) {
+    qnabot.log(`Bedrock Knowledge Base Input: ${JSON.stringify(input, null, 2)}`);
+
     const response = await client.send(new RetrieveAndGenerateCommand(input));
-    const sessionId  = response.sessionId;
+
+    const sessionId = response.sessionId;
     if (res._userInfo.knowledgeBaseSessionId !== sessionId) {
         qnabot.debug(`Saving sessionId: ${sessionId}`);
         res._userInfo.knowledgeBaseSessionId = sessionId;
@@ -53,9 +59,9 @@ async function createHit(req, response) {
     const KNOWLEDGE_BASE_S3_SIGNED_URL_EXPIRE_SECS = _.get(req._settings, 'KNOWLEDGE_BASE_S3_SIGNED_URL_EXPIRE_SECS', 300);
     const KNOWLEDGE_BASE_S3_SIGNED_URLS = _.get(req._settings, 'KNOWLEDGE_BASE_S3_SIGNED_URLS', true);
     const KNOWLEDGE_BASE_SHOW_REFERENCES = _.get(req._settings, 'KNOWLEDGE_BASE_SHOW_REFERENCES');
-    const KNOWLEDGE_BASE_PREFIX_MESSAGE = _.get(req._settings, 'KNOWLEDGE_BASE_PREFIX_MESSAGE'); 
+    const KNOWLEDGE_BASE_PREFIX_MESSAGE = _.get(req._settings, 'KNOWLEDGE_BASE_PREFIX_MESSAGE');
     const helpfulLinksMsg = 'Source Link';
-    const generatedText = response.output.text;
+    const generatedText = sanitize(response.output.text);
     let plainText = generatedText;
     let markdown = generatedText;
     const ssml = `<speak> ${generatedText} </speak>`;
@@ -76,8 +82,9 @@ async function createHit(req, response) {
             markdownCitations += '***';
             markdownCitations += '\n\n <br>';
             if (reference.content.text) {
-                markdownCitations += `\n\n  ${reference.content.text}`;
-                plainTextCitations += `\n\n  ${reference.content.text}`;
+                const text = escapeHashMarkdown(reference.content.text);
+                markdownCitations += `\n\n  ${text}`;
+                plainTextCitations += `\n\n  ${text}`;
             }
 
             if (reference.location.type === 'S3') {
@@ -119,20 +126,62 @@ async function createHit(req, response) {
     return hit;
 }
 
-async function bedrockRetrieveAndGenerate(req, res) {
+function processRequest(req) {
     const {
         KNOWLEDGE_BASE_ID,
         KNOWLEDGE_BASE_MODEL_ID,
         KNOWLEDGE_BASE_KMS,
+        KNOWLEDGE_BASE_PROMPT_TEMPLATE,
+        KNOWLEDGE_BASE_MAX_NUMBER_OF_RETRIEVED_RESULTS,
+        KNOWLEDGE_BASE_SEARCH_TYPE,
+        KNOWLEDGE_BASE_METADATA_FILTERS,
+        KNOWLEDGE_BASE_MODEL_PARAMS,
+        BEDROCK_GUARDRAIL_IDENTIFIER,
+        BEDROCK_GUARDRAIL_VERSION,
     } = req._settings;
-    
-    const client = new BedrockAgentRuntimeClient(customSdkConfig('C41', { region }));
+
+    const modelArn = `arn:aws:bedrock:${region}::foundation-model/${KNOWLEDGE_BASE_MODEL_ID}`;
     let { question } = req;
-    question = question.slice(0, 1000)
+    question = question.slice(0, 1000); // No more than 1000 characters - for bedrock query compatibility
 
-    let retrieveAndGenerateInput, retrieveAndGenerateSessionInput, response;
+    const sessionConfiguration = KNOWLEDGE_BASE_KMS ? { kmsKeyArn: KNOWLEDGE_BASE_KMS } : undefined;
+    const promptTemplate = KNOWLEDGE_BASE_PROMPT_TEMPLATE.trim() ? { textPromptTemplate: KNOWLEDGE_BASE_PROMPT_TEMPLATE } : undefined;
+    const guardrailId = BEDROCK_GUARDRAIL_IDENTIFIER.trim();
+    const guardrailVersion = BEDROCK_GUARDRAIL_VERSION.toString();
 
-    retrieveAndGenerateInput = {
+    const vectorSearchConfigurationProps = {
+        ...(KNOWLEDGE_BASE_MAX_NUMBER_OF_RETRIEVED_RESULTS !== '' && { numberOfResults: KNOWLEDGE_BASE_MAX_NUMBER_OF_RETRIEVED_RESULTS }),
+        ...(KNOWLEDGE_BASE_SEARCH_TYPE !== 'DEFAULT' && { overrideSearchType: KNOWLEDGE_BASE_SEARCH_TYPE }),
+        ...(KNOWLEDGE_BASE_METADATA_FILTERS !== '{}' && { filter: JSON.parse(KNOWLEDGE_BASE_METADATA_FILTERS) })
+    };
+
+    const modelParams = JSON.parse(KNOWLEDGE_BASE_MODEL_PARAMS);
+    const textInferenceConfig = _.pick(modelParams, inferenceKeys);
+    const additionalModelRequestFields = _.omit(modelParams, inferenceKeys);
+
+    const generationConfiguration = {};
+
+    if (promptTemplate) {
+        generationConfiguration.promptTemplate = promptTemplate;
+    }
+
+    if (Object.keys(textInferenceConfig).length !== 0) {
+        generationConfiguration.inferenceConfig = { textInferenceConfig };
+    }
+
+    if (Object.keys(additionalModelRequestFields).length !== 0) {
+        generationConfiguration.additionalModelRequestFields = additionalModelRequestFields;
+    }
+
+    if (guardrailId && guardrailVersion) {
+        generationConfiguration.guardrailConfiguration = { guardrailId, guardrailVersion };
+    }
+
+    const retrievalConfiguration = {
+        ...(Object.keys(vectorSearchConfigurationProps).length > 0 && { vectorSearchConfiguration: vectorSearchConfigurationProps })
+    }
+
+    const retrieveAndGenerateInput = {
         input: {
             text: question,
         },
@@ -140,46 +189,66 @@ async function bedrockRetrieveAndGenerate(req, res) {
             type: 'KNOWLEDGE_BASE',
             knowledgeBaseConfiguration: {
                 knowledgeBaseId: KNOWLEDGE_BASE_ID,
-                modelArn: `arn:aws:bedrock:${region}::foundation-model/${KNOWLEDGE_BASE_MODEL_ID}`,
+                modelArn,
+                ...(Object.keys(retrievalConfiguration).length > 0 && { retrievalConfiguration }),
+                ...(Object.keys(generationConfiguration).length > 0 && { generationConfiguration }),
             },
         },
+        ...(sessionConfiguration && { sessionConfiguration })
     };
 
-    if (KNOWLEDGE_BASE_KMS) {
-        retrieveAndGenerateInput.sessionConfiguration = {
-            kmsKeyArn: KNOWLEDGE_BASE_KMS,
-        };
-    }
 
-    qnabot.log(`Bedrock Knowledge Base Id: ${KNOWLEDGE_BASE_ID} and Model Id: ${KNOWLEDGE_BASE_MODEL_ID}`);
+    qnabot.log(`Using Bedrock Knowledge Base Id: ${KNOWLEDGE_BASE_ID} and Model Id: ${KNOWLEDGE_BASE_MODEL_ID}`);
+    return retrieveAndGenerateInput;
+}
+
+async function bedrockRetrieveAndGenerate(req, res) {
+    let response, retrieveAndGenerateSessionInput;
+    let retrieveAndGenerateInput = processRequest(req);
+    let retries = 0;
+
     try {
         const sessionId = res._userInfo.knowledgeBaseSessionId;
         qnabot.log(`Bedrock Knowledge Base SessionId: ${sessionId}`);
         if (sessionId) {
             retrieveAndGenerateSessionInput = {
                 ...retrieveAndGenerateInput,
-                sessionId,
+                sessionId
             };
-            response = await generateResponse(client, retrieveAndGenerateSessionInput, res);
+            response = await generateResponse(retrieveAndGenerateSessionInput, res);
         } else {
-            response = await generateResponse(client, retrieveAndGenerateInput, res);
-        };
-    } catch (e) {
-        if (e.name === 'ValidationException' || e.name === 'ConflictException') {
-            response = await generateResponse(client, retrieveAndGenerateInput, res);
-        } else {
-            qnabot.log(`Bedrock Knowledge Base ${e.name}: ${e.message.substring(0, 500)}`)
-            throw e;
+            response = await generateResponse(retrieveAndGenerateInput, res);
         }
-    }   
-    qnabot.debug(`Response from bedrock knowledge base: ${JSON.stringify(response)}`);
+    } catch (e) {
+        if (retries < 3 && (e.name === 'ValidationException' || e.name === 'ConflictException')) {
+            retries += 1;
+            qnabot.log(`Retrying to due ${e.name}...tries left ${3 - retries}`)
+            response = await generateResponse(retrieveAndGenerateInput, res);
+        } else {
+            qnabot.log(`Bedrock Knowledge Base ${e.name}: ${e.message.substring(0, 500)}`);
+            throw e;
+        };
+    };
+
+    qnabot.log(`Bedrock Knowledge Base Response: ${JSON.stringify(response)}`);
+
+    const guardrailAction = response.guardrailAction;
+    if (guardrailAction) {
+        qnabot.log(`Guardrail Action in Bedrock Knowledge Base Response: ${guardrailAction}`);
+    };
 
     if (isNoHitsResponse(req, response)) {
         qnabot.log('No hits from knowledge base.');
         return [res, undefined];
-    }
+    };
 
     const hit = await createHit(req, response);
+
+    // we got a hit, let's update the session parameters
+    _.set(res, 'session.qnabot_gotanswer', true);
+    res.got_hits = 1;
+
     return [res, hit];
 }
+
 exports.bedrockRetrieveAndGenerate = bedrockRetrieveAndGenerate;

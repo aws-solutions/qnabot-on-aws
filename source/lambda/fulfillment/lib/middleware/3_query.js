@@ -50,10 +50,9 @@ const esquery = require('../../../../../../../../../../opt/lib/query.js');
 
 async function specialtyBotInvocation(req, res) {
     const specialtyBot = _.get(req, 'session.qnabotcontext.specialtyBot', undefined);
-    const specialtyBotAlias = _.get(req, 'session.qnabotcontext.specialtyBotAlias', undefined);
     const specialtyBotChainingConfig = _.get(req, 'session.qnabotcontext.sBChainingConfig', undefined);
     qnabot.log('Handling specialtyBot');
-    const resp = await specialtyBotRouter.routeRequest(req, res, specialtyBot, specialtyBotAlias);
+    const resp = await specialtyBotRouter.routeRequest(req, res, specialtyBot);
     qnabot.log(`SpecialtyBotRouterResp: ${JSON.stringify(resp, null, 2)}`);
     const isSpecialtyBotComplete = _.get(resp, 'res.session.qnabotcontext.specialtyBot', '') === '';
     if (isSpecialtyBotComplete) {
@@ -176,7 +175,6 @@ async function getPostQuery(queryLambdaArn, req, res, specialtyArn) {
     const chaining_configuration = _.get(postQuery.res, 'result.conditionalChaining', undefined);
     const specialtybot_hook = _.get(postQuery.res, 'result.botRouting.specialty_bot', undefined);
     const specialtybot_name = _.get(postQuery.res, 'result.botRouting.specialty_bot_name', undefined);
-    const specialtybot_alias = _.get(postQuery.res, 'result.botRouting.specialty_bot_alias', undefined);
     const specialtybot_attributes_to_merge = _.get(postQuery.res, 'result.botRouting.specialty_bot_session_attributes_to_merge', undefined);
     const specialtybot_start_up_text = _.get(postQuery.res, 'result.botRouting.specialty_bot_start_up_text', undefined);
     const specialtybot_attributes_to_receive = _.get(postQuery.res, 'result.botRouting.specialty_bot_session_attributes_to_receive', undefined);
@@ -193,7 +191,6 @@ async function getPostQuery(queryLambdaArn, req, res, specialtyArn) {
     } else if (specialtybot_hook && specialtybot_name) {
         _.set(postQuery, 'res.session.qnabotcontext.specialtyBot', specialtybot_hook);
         _.set(postQuery, 'res.session.qnabotcontext.specialtyBotName', specialtybot_name);
-        _.set(postQuery, 'res.session.qnabotcontext.specialtyBotAlias', specialtybot_alias);
         _.set(postQuery, 'res.session.qnabotcontext.specialtyBotMergeAttributes', specialtybot_attributes_to_merge);
         _.set(postQuery, 'res.session.qnabotcontext.sBChainingConfig', chaining_configuration);
         _.set(postQuery, 'res.session.qnabotcontext.sBAttributesToReceive', specialtybot_attributes_to_receive);
@@ -202,7 +199,6 @@ async function getPostQuery(queryLambdaArn, req, res, specialtyArn) {
         if (specialtybot_start_up_text) {
             _.set(postQuery, 'req.session.qnabotcontext.specialtyBot', specialtybot_hook);
             _.set(postQuery, 'req.session.qnabotcontext.specialtyBotName', specialtybot_name);
-            _.set(postQuery, 'req.session.qnabotcontext.specialtyBotAlias', specialtybot_alias);
             _.set(postQuery, 'req.session.qnabotcontext.sBMergeAttributes', specialtybot_attributes_to_merge);
             _.set(postQuery, 'req.session.qnabotcontext.sBChainingConfig', chaining_configuration);
             _.set(postQuery, 'req.session.qnabotcontext.sBAttributesToReceive', specialtybot_attributes_to_receive);

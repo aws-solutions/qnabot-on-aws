@@ -34,9 +34,8 @@ describe('lex poll', () => {
         process.env = { ...OLD_ENV };
     });
 
-    it('initializes lex v1 and v2 and updates s3', async () => {
+    it('initializes lex v2 and updates s3', async () => {
         process.env.STATUS_BUCKET = 'test-bucket';
-        process.env.STATUS_KEY = 'test-key';
         process.env.LEXV2_STATUS_KEY = 'test-status-key';
         process.env.BUILD_FUNCTION = 'test-lambda';
 
@@ -50,14 +49,6 @@ describe('lex poll', () => {
         await handler({}, {}, mockCallback);
 
         expect(s3ClientMock).toHaveReceivedNthCommandWith(1, PutObjectCommand, {
-            Bucket: 'test-bucket',
-            Key: process.env.STATUS_KEY,
-            Body: JSON.stringify({
-                status: 'Starting',
-                token: '',
-            }),
-        });
-        expect(s3ClientMock).toHaveReceivedNthCommandWith(2, PutObjectCommand, {
             Bucket: 'test-bucket',
             Key: process.env.LEXV2_STATUS_KEY,
             Body: JSON.stringify({

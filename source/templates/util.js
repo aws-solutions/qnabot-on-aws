@@ -263,23 +263,6 @@ exports.lexFullAccess = function () {
                     ],
                     Resource: '*', // these actions cannot be bound to resources other than *
                 },
-                { // Lex V1 policies
-                    Effect: 'Allow',
-                    Action: [
-                        'lex:GetBuiltinIntent',
-                        'lex:GetIntents',
-                        'lex:GetBots',
-                        'lex:GetSlotTypes',
-                        'lex:GetBotAliases',
-                        'lex:StartImport',
-                        'lex:GetMigration',
-                        'lex:GetBuiltinSlotTypes',
-                        'lex:GetBuiltinIntents',
-                        'lex:GetImport',
-                        'lex:GetMigrations',
-                    ],
-                    Resource: '*',   // these actions cannot be bound to resources other than *
-                },
                 {
                     Effect: 'Allow',
                     Action: 'lex:*',
@@ -311,23 +294,6 @@ exports.lexFullAccess = function () {
                         { 'Fn::Sub': 'arn:${AWS::Partition}:lex:${AWS::Region}:${AWS::AccountId}:bot-alias/*' },
                         { 'Fn::Sub': 'arn:${AWS::Partition}:lex:${AWS::Region}:${AWS::AccountId}:bot/*' },
                     ],
-                },
-                { // Lex V1 policies
-                    Effect: 'Allow',
-                    Action: [
-                        'lex:GetBuiltinIntent',
-                        'lex:GetIntents',
-                        'lex:GetBots',
-                        'lex:GetSlotTypes',
-                        'lex:GetBotAliases',
-                        'lex:StartImport',
-                        'lex:GetMigration',
-                        'lex:GetBuiltinSlotTypes',
-                        'lex:GetBuiltinIntents',
-                        'lex:GetImport',
-                        'lex:GetMigrations',
-                    ],
-                    Resource: '*',   // these actions cannot be bound to resources other than *
                 },
                 {
                     Effect: 'Allow',

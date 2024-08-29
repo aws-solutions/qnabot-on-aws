@@ -17,6 +17,7 @@ You can select from three different options:
 ## 1. Amazon Bedrock (PREFERRED)
 Utilizes one of the Amazon Bedrock foundation models to generate text embeddings. Currently, the following embeddings models are supported by QnA Bot:
 - [Amazon Titan Embeddings G1](https://us-east-1.console.aws.amazon.com/bedrock/home?region=us-east-1#/providers?model=amazon.titan-embed-text-v1)
+- [Titan Text Embeddings V2](https://us-east-1.console.aws.amazon.com/bedrock/home?region=us-east-1#/providers?model=amazon.titan-embed-text-v2:0)
 - [Cohere English](https://us-east-1.console.aws.amazon.com/bedrock/home?region=us-east-1#/providers?model=cohere.embed-english-v3)
 - [Cohere Multilingual](https://us-east-1.console.aws.amazon.com/bedrock/home?region=us-east-1#/providers?model=cohere.embed-multilingual-v3)
 

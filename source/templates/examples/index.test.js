@@ -15,18 +15,11 @@ function create() {
     const file = `${__dirname}/`;
     return require(file);
 }
-// NOTICE: Canvas LMS integration with QnABot on AWS is deprecated in this release and no longer be supported. Customers may fork the code needed for their specific use case from previous versions. The integration code will be removed in the next release.
-
 
 it('renders examples template correctly', () => {
     const template = create();
     expect(template).toMatchSnapshot({
         Resources: {
-            CodeVersionCanvasLMSHook: {
-                Properties: {
-                    BuildDate: expect.any(String),
-                },
-            },
             CodeVersionCreateRecentTopicsResponse: {
                 Properties: {
                     BuildDate: expect.any(String),

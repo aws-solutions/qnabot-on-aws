@@ -25,6 +25,7 @@ module.exports = {
     Description: `(SO0189n-export) QnABot nested export resources - Version v${process.env.npm_package_version}`,
     Outputs: require('./outputs'),
     Parameters: {
+        ContentDesignerOutputBucket: { Type: 'String' },
         CFNLambda: { Type: 'String' },
         CFNInvokePolicy: { Type: 'String' },
         S3Clean: { Type: 'String' },
@@ -35,10 +36,6 @@ module.exports = {
         EsProxyLambda: { Type: 'String' },
         ExportBucket: { Type: 'String' },
         LexVersion: { Type: 'String' },
-        // Lex V1
-        FallbackIntent: { Type: 'String' },
-        Intent: { Type: 'String' },
-        BotName: { Type: 'String' },
         // Lex V2
         LexV2BotName: { Type: 'String' },
         LexV2BotId: { Type: 'String' },
@@ -60,6 +57,7 @@ module.exports = {
         QnABotCommonLambdaLayer: { Type: 'String' },
         KendraFaqIndexId: { Type: 'String' },
         KendraWebPageIndexId: { Type: 'String' },
+        LogRetentionPeriod: { Type: 'Number' },
     },
     Conditions: {
         VPCEnabled: {
@@ -70,5 +68,6 @@ module.exports = {
         XRAYEnabled: { 'Fn::Equals': [{ Ref: 'XraySetting' }, 'TRUE'] },
         CreateKendraSyncPolicy: { 'Fn::Not': [{ 'Fn::Equals': [{ Ref: 'KendraFaqIndexId' }, ''] }] },
         CreateKendraCrawlerPolicy: { 'Fn::Not': [{ 'Fn::Equals': [{ Ref: 'KendraWebPageIndexId' }, ''] }] },
+        LogRetentionPeriodIsNotZero: { 'Fn::Not': [{ 'Fn::Equals': [{ Ref: 'LogRetentionPeriod' }, 0] }] }
     },
 };

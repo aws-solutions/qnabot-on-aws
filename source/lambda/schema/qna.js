@@ -247,7 +247,7 @@ module.exports = {
       properties: {
         responsebot_hook: {
           title: 'Elicit Response: ResponseBot Hook',
-          description: 'To capture the next utterance as a response, provide the name of a Lex bot to parse the response and return at least one slot value, e.g. (QNAYesNo, QNADate, etc.). For Lex V2 use "lexv2::Botid/BotAliasId/LocaleId". For Lex V1 use a bot name starting with "QNA".',
+          description: 'To capture the next utterance as a response, provide the name of a Lex bot to parse the response and return at least one slot value, e.g. (QNAYesNo, QNADate, etc.). For Lex V2 use "lexv2::Botid/BotAliasId/LocaleId".',
           type: 'string',
           maxLength: 100,
           propertyOrder: 0,
@@ -282,8 +282,8 @@ module.exports = {
       propertyOrder: 18,
       properties: {
         specialty_bot: {
-          title: 'Bot Routing: LexV1 BotName OR lexv2::Botid/BotAliasId/LocaleId OR Lambda Function',
-          description: 'The target specialty Lex Bot or Lambda Function to route requests to. For Lex V2 bot names use the format "lexv2::BotId/BotAliasId/LocaleId". For Lex V1 bot the names should start with "QNA". Lambda functions can be specified as "Lambda::FunctionName" or "Lambda::FunctionARN" - Lambda function names must start with "QNA-".',
+          title: 'Bot Routing: lexv2::Botid/BotAliasId/LocaleId OR Lambda Function',
+          description: 'The target specialty Lex Bot or Lambda Function to route requests to. For Lex V2 bot names use the format "lexv2::BotId/BotAliasId/LocaleId". Lambda functions can be specified as "Lambda::FunctionName" or "Lambda::FunctionARN" - Lambda function names must start with "QNA-".',
           type: 'string',
           maxLength: 100,
           propertyOrder: 0,
@@ -294,13 +294,6 @@ module.exports = {
           type: 'string',
           maxLength: 100,
           propertyOrder: 1,
-        },
-        specialty_bot_alias: {
-          title: 'The Bot alias to use for the Specialty Bot. (Required for other Lex/QnA Bot targets - Not utilized when Lambda Function is used.)',
-          description: 'For Lex V2 leave empty. For Lex V1 specialty bots, enter a string for the Specialty Bot\'s Lex alias.',
-          type: 'string',
-          maxLength: 100,
-          propertyOrder: 2,
         },
         specialty_bot_session_attributes_to_merge: {
           title: 'Session attributes to forward to a Lex specialty bot.',

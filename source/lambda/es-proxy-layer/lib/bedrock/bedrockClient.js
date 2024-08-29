@@ -31,13 +31,15 @@ const capabilityMapping = {
     'cohere.embed-english-v3': 'C038',
     'cohere.embed-multilingual-v3': 'C039',
     'meta.llama3-8b-instruct-v1': 'C041',
+    'amazon.titan-text-premier-v1': 'C042',
+    'amazon.titan-embed-text-v2': 'C043',
 };
 
 function isEmbedding(modelId) {
     return modelId.includes('embed');
 };
 
-async function bedrockClient(modelId, body) {
+async function bedrockClient(modelId, body, guardrails) {
     const invokeModelParams = {
         body,
         contentType: 'application/json',
@@ -47,11 +49,16 @@ async function bedrockClient(modelId, body) {
     let llm_result;
     const configCode = capabilityMapping[modelId] || isEmbedding(modelId) ? 'C040' : 'C036';
     const client = new BedrockRuntimeClient(customSdkConfig(configCode, { region }));
+
+    if (!isEmbedding(modelId) && guardrails.guardrailIdentifier !== '' && guardrails.guardrailVersion !== '') {
+        invokeModelParams.guardrailIdentifier = guardrails.guardrailIdentifier;
+        invokeModelParams.guardrailVersion = guardrails.guardrailVersion;
+    };
+
     qnabot.log('Bedrock Invoke Model Params: ', invokeModelParams);
     try {
         const command = new InvokeModelCommand(invokeModelParams);
         llm_result = await client.send(command);
-        qnabot.debug('Bedrock Invoke Model Response: ', llm_result);
         return llm_result;
     } catch (e) {
         let message = `Bedrock ${modelId} returned ${e.name}: ${e.message.substring(0, 500)}`;

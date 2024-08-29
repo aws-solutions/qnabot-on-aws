@@ -4,8 +4,7 @@ This feature searches a set of Kendra indexes as a fallback mechanism to provide
 
 Kendra provides a number of innovative features. This Kendra Fallback function performs a query against a
 set of Kendra indexes and will return the first answer that Kendra identifies. Kendra can return multiple
-answers however to keep responses limited in scope the first answer is provided through QnABot. Links to
-documents stored in S3 buckets that Kendra indexes are also provided. The security of the S3 bucket governs whether this link is usable. In addition Kendra can return discovered text with links to these documents as well. This function returns a default of four discovered texts/links. The maximum number of returned links is configurable.
+answers however to keep responses limited in scope the first answer is provided through QnABot. In addition to providing the generated answers, it provides [signed S3 URLs](https://docs.aws.amazon.com/AmazonS3/latest/userguide/using-presigned-url.html) to relevant documents stored in Amazon S3 buckets that Kendra return in its response. These signed URLs are a secure way to grant temporary access to specific objects or resources within an Amazon S3 bucket. This function returns a default of four discovered texts/links. The maximum number of returned links is configurable.
 
 ## Configure Kendra Fallback index using the following Cloudformation parameter
 

@@ -3,12 +3,8 @@ omit =
     test/*
     .venv-*/*
     */__init__.py
-    certifi/*
-    charset_normalizer/*
-    crhelper/*
-    idna/*
-    requests/*
-    urllib3/*
-    ./test_lambda_function.py
+    py_modules/*
+    .pytest_cache/*
+    __pycache__/*
 source =
     .
