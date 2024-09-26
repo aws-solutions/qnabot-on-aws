@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [6.1.1] - 2024-09-24
+
+### Fixed
+
+- Added back .gitignore to fix custom deployment issues through github repo
+- Improved performance of lambda invocation from frontend to save settings faster
+- Fixed bug that limited response card buttons to only 5 buttons [Issue #765](https://github.com/aws-solutions/qnabot-on-aws/issues/765)
+- Security patch for body-parser, micromatch, path-to-regexp, and webpack
+- Added support for crawled links in Bedrock Knowledge Base to be shown as referenced links
+- Fixed an issue where the context is expanded by default and can't be closed when Knowledge Base returns lists in the response
+- Fixed limit on import file sizes [Issue #766](https://github.com/aws-solutions/qnabot-on-aws/issues/766)
+
 ## [6.1.0] - 2024-08-29
 
 ### Added

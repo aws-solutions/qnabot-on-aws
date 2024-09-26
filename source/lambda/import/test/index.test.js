@@ -306,4 +306,70 @@ describe('when calling step function', () => {
         expect(s3Mock).toHaveReceivedCommandTimes(PutObjectCommand, 1);
         expect(qnabot.log).toHaveBeenCalledWith('An error occured while processing question array: ', syntaxError);
     });
+
+
+    it('should successfully execute step with xlsx', async () => {
+        jest.spyOn(qnabotSettings, 'getSettings').mockResolvedValue({ EMBEDDINGS_ENABLE: false });
+
+        let xlsxConfig = config;
+
+        xlsxConfig.key = "data/import_questions.xlsx";
+        xlsxConfig.buffer = "PK"
+        let xlsxRequest = request;
+
+        request.Records[0].s3.object.key = "data/import_questions.xlsx";
+        const mockOptions = {
+            q: ['Which file formats are supported by the QnA Bot question designer import?'],
+            a: 'JSON and xlsx.',
+            qid: 'Import.001'
+        };
+
+        const mockResponse = {
+            index: {
+                _index: 'qna-test',
+                _id: 'Import.001'
+            },
+            a: 'JSON and xlsx.',
+            qid: 'Import.001',
+            type: 'qna',
+            questions: [
+                {
+                    q: 'Which file formats are supported by the QnA Bot question designer import?'
+                }
+            ],
+            quniqueterms: 'Which file formats are supported by the QnA Bot question designer import?',
+            datetime: '2023-01-02T00:00:00.000Z'
+        };
+        delete_existing_content.delete_existing_content.mockResolvedValue(mockResponse);
+
+        const stream1 = new Readable();
+        stream1.push(JSON.stringify(xlsxConfig));
+        stream1.push(null);
+        const sdkStream1 = sdkStreamMixin(stream1);
+
+        const stream2 = new Readable();
+        stream2.push(JSON.stringify(mockOptions));
+        stream2.push(null);
+        const sdkStream2 = sdkStreamMixin(stream2);
+
+        s3Mock
+            .on(GetObjectCommand)
+            .resolvesOnce({ Body: sdkStream1, ContentRange: 'bytes 0-1299/1300' })
+            .resolvesOnce({ Body: sdkStream2, ContentRange: 'bytes 0-1299/1300' });
+        await step(xlsxRequest, null, jest.fn());
+        expect(qnabot.log).toHaveBeenCalledWith('step');
+        expect(s3Mock).toHaveReceivedCommandTimes(GetObjectCommand, 3);
+        expect(s3Mock).toHaveReceivedNthCommandWith(2, GetObjectCommand, {
+            'Bucket': 'qna-test-importbucket',
+            'Key': 'data/import_questions.xlsx'
+        });
+        expect(s3Mock).toHaveReceivedNthCommandWith(3, GetObjectCommand, {
+            'Bucket': 'qna-test-importbucket',
+            'Key': 'data/import_questions.xlsx',
+            'Range': 'bytes=0-20000',
+            'VersionId': 'testVersion'
+        });
+        expect(s3Mock).toHaveReceivedCommand(PutObjectCommand, 1);
+    });
+
 });

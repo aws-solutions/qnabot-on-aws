@@ -101,7 +101,10 @@ module.exports = Object.assign(require('./bucket'), {
             Value: "Import",
         }],
       },
-      Metadata: { cfn_nag: util.cfnNag(["W92"]) },
+      Metadata: {
+        cfn_nag: util.cfnNag(["W92"]),
+        guard: util.cfnGuard('LAMBDA_INSIDE_VPC'),
+      },
     },
     ImportStepLambdaLogGroup: {
       Type: 'AWS::Logs::LogGroup',
@@ -181,7 +184,10 @@ module.exports = Object.assign(require('./bucket'), {
             Value: "Import",
         }],
       },
-      Metadata: { cfn_nag: util.cfnNag(["W92"]) },
+      Metadata: {
+        cfn_nag: util.cfnNag(["W92"]),
+        guard: util.cfnGuard('LAMBDA_INSIDE_VPC'),
+      },
     },
     ImportRole: {
       Type: "AWS::IAM::Role",
@@ -274,7 +280,10 @@ module.exports = Object.assign(require('./bucket'), {
           { Ref: "ImportPolicy" },
         ],
       },
-      Metadata: { cfn_nag: util.cfnNag(["W11", "W12"]) },
+      Metadata: {
+        cfn_nag: util.cfnNag(["W11", "W12"]),
+        guard: util.cfnGuard('IAM_NO_INLINE_POLICY_CHECK'),
+      },
     },
     ImportPolicy: {
       Type: "AWS::IAM::ManagedPolicy",

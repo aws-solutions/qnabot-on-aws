@@ -280,6 +280,11 @@ exports[`renders import template correctly 1`] = `
             },
           ],
         },
+        "guard": {
+          "SuppressedRules": [
+            "IAM_NO_INLINE_POLICY_CHECK",
+          ],
+        },
       },
       "Properties": {
         "AssumeRolePolicyDocument": {
@@ -553,6 +558,11 @@ exports[`renders import template correctly 1`] = `
             },
           ],
         },
+        "guard": {
+          "SuppressedRules": [
+            "LAMBDA_INSIDE_VPC",
+          ],
+        },
       },
       "Properties": {
         "Code": {
@@ -749,6 +759,11 @@ exports[`renders import template correctly 1`] = `
               "id": "W92",
               "reason": "This lambda function does not require to have ReservedConcurrentExecutions",
             },
+          ],
+        },
+        "guard": {
+          "SuppressedRules": [
+            "LAMBDA_INSIDE_VPC",
           ],
         },
       },
