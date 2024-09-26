@@ -76,7 +76,7 @@ exports.step = async function (event, context, cb) {
         const res = await x.Body.transformToString();
         const config = JSON.parse(res);
         qnabot.log('Config:', JSON.stringify(config, null, 2));
-        while (config.progress < 1 && config.time.rounds < 15) {
+        while (config.progress < 1 ) {
             if (config.status === 'InProgress') {
                 // NOSONAR TODO - design a more robust way to identify target ES index for auto import of metrics and feedback
                 // Filenames must match across:
@@ -96,9 +96,10 @@ exports.step = async function (event, context, cb) {
                     const response = await result.Body.transformToString();
                     const settings = await get_settings();
                     qnabot.log('opening file');
-
-                    const {buffer, objects} = await processQuestionArray(config, response, s3, params)
-                    config.buffer = buffer;
+                    let objects = [];
+                    const arrayResults = await processQuestionArray(config.buffer, response, s3, params)
+                    config.buffer = arrayResults.buffer;
+                    objects = arrayResults.objects;
 
                     const { out, success, failed } = await processQuestionObjects(objects, settings, esindex, config);
                     config.count = success;
@@ -139,10 +140,10 @@ exports.step = async function (event, context, cb) {
             await s3.send(new PutObjectCommand({ Bucket: output_bucket, Key: output_key, Body: JSON.stringify(config) }));
             cb(null);
         }
-    } catch (err) {
-        qnabot.log('An error occured while finalizing config: ', err);
-        cb(err);
-    }
+        } catch (err) {
+            qnabot.log('An error occured while finalizing config: ', err);
+            cb(err);
+        }
     } catch (err) {
         qnabot.log('An error occured while getting parsing for config: ', err);
         cb(err);
@@ -198,11 +199,11 @@ exports.start = async function (event, context, cb) {
     }
 };
 
-async function processQuestionArray(config, response, s3, s3Params) {
+async function processQuestionArray(buffer, response, s3, s3Params) {
     let objects = [];
     try {
-        config.buffer += response;
-        if (config.buffer.startsWith('PK')) {
+        buffer += response;
+        if (buffer.startsWith('PK')) {
             qnabot.log('starts with PK, must be an xlsx');
             const s3Object = await s3.send(new GetObjectCommand(s3Params));
             const readableStreamFile = Buffer.concat(await s3Object.Body.toArray())
@@ -213,19 +214,26 @@ async function processQuestionArray(config, response, s3, s3Params) {
                 qnabot.log(questionStr);
                 objects.push(questionStr);
             });
-            config.buffer = '';
+            buffer = '';
         } else {
-            objects = config.buffer.split(/\n/);
+            objects = buffer.split(/\n/);
             JSON.parse(objects[objects.length - 1]);
-            config.buffer = '';
+            buffer = '';
         }
-        const modifiedBuffer = config.buffer
-        return {modifiedBuffer, objects};
+        const modifiedBuffer = buffer
+        return {
+            buffer:modifiedBuffer, 
+            objects:objects
+        };
+
     } catch (e) {
         qnabot.log('An error occured while processing question array: ', e);
-        config.buffer = objects.pop();
-        const modifiedBuffer = config.buffer
-        return {modifiedBuffer, objects};
+        buffer = objects.pop();
+        const modifiedBuffer = buffer
+        return {
+            buffer:modifiedBuffer, 
+            objects:objects
+        };
     }
 }
 

@@ -179,6 +179,23 @@ function isInteractiveMessage(response) {
     return (isCard(response.card) && (_.get(response.card, 'imageUrl', '').trim() || (_.get(response.card, 'buttons', []).length > 0)));
 }
 
+function buildResponseCard(response) {
+    let responseCard = null;
+    if (isCard(response.card) && (_.get(response.card, 'imageUrl', '').trim() || (_.get(response.card, 'buttons', []).length > 0))) {
+        responseCard = {
+            version: '1',
+            contentType: 'application/vnd.amazonaws.card.generic',
+            genericAttachments: [_.pickBy({
+                title: _.get(response, 'card.title', 'Title').slice(0, 80),
+                subTitle: _.get(response.card, 'subTitle')?.slice(0, 80),
+                imageUrl: _.get(response.card, 'imageUrl'),
+                buttons: _.get(response.card, 'buttons'),
+            })],
+        };
+    }
+    return responseCard;
+}
+
 function buildImageResponseCardV2(response) {
     let imageResponseCardV2 = null;
     if (isCard(response.card) && (_.get(response.card, 'imageUrl', '').trim() || (_.get(response.card, 'buttons', []).length > 0))) {
@@ -247,6 +264,23 @@ function buildV2InteractiveMessageResponse(request, response) {
     ];
 }
 
+function copyResponseCardtoSessionAttribute(response) {
+    const responseCard = buildResponseCard(response);
+    if (responseCard) {
+        // copy Lex response card to appContext session attribute used by lex-web-ui
+        //  - allows repsonse card display even when using voice with Lex
+        //  - allows Lex limit of 5 buttons to be exceeded when using lex-web-ui
+        let tmp;
+        try {
+            tmp = JSON.parse(_.get(response, 'session.appContext', '{}'));
+        } catch (e) {
+            tmp = _.get(response, 'session.appContext', '{}');
+        }
+        tmp.responseCard = responseCard;
+        response.session.appContext = JSON.stringify(tmp);
+    }
+    return response;
+}
 
 function applyLexResponseCardButtonLimits(request, response) {
     // Lex has limit of max 5 buttons in the responsecard. if we have more than 5, use the first 5 only.
@@ -379,6 +413,9 @@ exports.assemble = function (request, response) {
 
     qnabot.log('filterButtons');
     response = filterButtons(response);
+
+    qnabot.log('copyResponseCardtoSessionAttributes');
+    response = copyResponseCardtoSessionAttribute(response);
 
     const out = assembleLexV2Response(request, response);
 
