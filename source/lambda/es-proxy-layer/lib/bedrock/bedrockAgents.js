@@ -49,8 +49,12 @@ async function generateSourceLinks(urls, KNOWLEDGE_BASE_S3_SIGNED_URL_EXPIRE_SEC
     const signedUrlArr = Array.from(signedUrls);
     qnabot.debug(`signedUrls: ${JSON.stringify(signedUrlArr)}`);
     const urlListMarkdown = signedUrlArr.map((url, i) => {
-        const label = urlArr[i].split('/').pop();
-        return `<span translate=no>[${label}](${url})</span>`;
+        let label = urlArr[i].split('/').pop();
+        if (!label) { // Handle crawled URLs ending with a slash
+            label = url.split('/').slice(-2, -1)[0];
+        }
+        const link = `<span translate=no>[${label}](${url})</span>`;
+        return link;
     });
 
     return { signedUrlArr, urlListMarkdown };
@@ -65,39 +69,17 @@ async function createHit(req, response) {
     let plainText = generatedText;
     let markdown = generatedText;
     const ssml = `<speak> ${generatedText} </speak>`;
-
     if (KNOWLEDGE_BASE_PREFIX_MESSAGE) {
         plainText = `${KNOWLEDGE_BASE_PREFIX_MESSAGE}\n\n${plainText}`;
         markdown = `**${KNOWLEDGE_BASE_PREFIX_MESSAGE}**\n\n${markdown}`;
     }
 
-    const urls = new Set();
-
-    let plainTextCitations = '';
-    let markdownCitations = '';
-
-    response.citations.forEach((citation) => {
-        citation.retrievedReferences.forEach((reference) => {
-            markdownCitations += '\n\n';
-            markdownCitations += '***';
-            markdownCitations += '\n\n <br>';
-            if (reference.content.text) {
-                const text = escapeHashMarkdown(reference.content.text);
-                markdownCitations += `\n\n  ${text}`;
-                plainTextCitations += `\n\n  ${text}`;
-            }
-
-            if (reference.location.type === 'S3') {
-                const { uri } = reference.location.s3Location;
-                urls.add(uri);
-            }
-        });
-    });
+    const { plainTextCitations, markdownCitations, urls } = processCitations(response);
 
     if (KNOWLEDGE_BASE_SHOW_REFERENCES) {
         plainText += plainTextCitations;
         markdown = markdownCitations
-            ? `${markdown}<details>
+            ? `\n${markdown}\n\n<details>
             <summary>Context</summary>
             <p style="white-space: pre-line;">${markdownCitations}</p>
             </details>
@@ -124,6 +106,41 @@ async function createHit(req, response) {
 
     qnabot.log(`Returned hit from Bedrock Knowledge Base: ${JSON.stringify(hit)}`);
     return hit;
+}
+
+function processCitations(response) {
+    const urls = new Set();
+
+    let plainTextCitations = '';
+    let markdownCitations = '';
+
+    response.citations.forEach((citation) => {
+        citation.retrievedReferences.forEach((reference) => {
+            markdownCitations += '\n\n';
+            markdownCitations += '***';
+            markdownCitations += '\n\n <br>';
+            if (reference.content.text) {
+                const text = escapeHashMarkdown(reference.content.text);
+                markdownCitations += `\n\n  ${text}`;
+                plainTextCitations += `\n\n  ${text}`;
+            }
+
+            if (reference.location) {
+                const { type, s3Location, webLocation } = reference.location;
+
+                if (type === 'S3' && s3Location?.uri) {
+                    const { uri } = reference.location.s3Location;
+                    urls.add(uri);
+                };
+
+                if (type === 'WEB' && webLocation?.url) {
+                    const { url } = reference.location.webLocation;
+                    urls.add(url);
+                };
+            }
+        });
+    });
+    return { plainTextCitations, markdownCitations, urls };
 }
 
 function processRequest(req) {

@@ -1,6 +1,6 @@
 {
     "name": "cfn-lambda-layer",
-    "version": "6.1.0",
+    "version": "6.1.1",
     "description": "QnABot Cfn Lambda Layer",
     "main": "index.js",
     "scripts": {
