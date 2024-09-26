@@ -70,13 +70,13 @@ const response = {
                 },
                 {
                     content: {
-                        text: "secure Linux or Windows Server images"
+                        text: "Deploy a Web UI"
                     },
                     location: {
-                        s3Location: {
-                            uri: "s3://my-bucket/aws-overview.pdf"
+                        webLocation: {
+                          url: "https://aws.amazon.com/blogs/machine-learning/deploy-a-web-ui-for-your-chatbot/"
                         },
-                        type: "S3"
+                        type: "WEB"
                     }
                 }
             ]
@@ -94,14 +94,14 @@ const expectedResult = {
         '\n' +
         '  compute capacity in the cloud.\n' +
         '\n' +
-        '  secure Linux or Windows Server images' +
+        '  Deploy a Web UI' +
         '\n' +
         '\n' +
-        '  Source Link: https://signedurl.s3.amazonaws.com/',
+        '  Source Link: https://signedurl.s3.amazonaws.com/aws-overview.pdf, https://aws.amazon.com/blogs/machine-learning/deploy-a-web-ui-for-your-chatbot/',
     alt: {
-        markdown: '**Bedrock Agent:**\n' +
+        markdown: '\n**Bedrock Agent:**\n' +
             '\n' +
-            'Amazon EC2 (Amazon Elastic Compute Cloud) is a web service that provides secure, resizable compute capacity in the cloud.<details>' +
+            'Amazon EC2 (Amazon Elastic Compute Cloud) is a web service that provides secure, resizable compute capacity in the cloud.\n\n<details>' +
             '\n' +
             '            <summary>Context</summary>\n' +
             '            <p style="white-space: pre-line;">\n' +
@@ -116,12 +116,12 @@ const expectedResult = {
             '\n' +
             ' <br>\n' +
             '\n' +
-            '  secure Linux or Windows Server images</p>\n' +
+            '  Deploy a Web UI</p>\n' +
             '            </details>\n' +
             '            <br>' +
             '\n' +
             '\n' +
-            '  Source Link: <span translate=no>[aws-overview.pdf](https://signedurl.s3.amazonaws.com/)</span>',
+            '  Source Link: <span translate=no>[aws-overview.pdf](https://signedurl.s3.amazonaws.com/aws-overview.pdf)</span>, <span translate=no>[deploy-a-web-ui-for-your-chatbot](https://aws.amazon.com/blogs/machine-learning/deploy-a-web-ui-for-your-chatbot/)</span>',
         ssml: '<speak> Amazon EC2 (Amazon Elastic Compute Cloud) is a web service that provides secure, resizable compute capacity in the cloud. </speak>',
     },
     type: 'text',
@@ -129,7 +129,7 @@ const expectedResult = {
 };
 
 presigner.getSignedUrl.mockImplementation(() => {
-    return 'https://signedurl.s3.amazonaws.com/'
+    return 'https://signedurl.s3.amazonaws.com/aws-overview.pdf'
 });
 
 describe('bedrockAgents', () => {

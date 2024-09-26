@@ -658,7 +658,7 @@ async function sendAnonymizedData(params, settings){
 
     const input = {
         FunctionName: params.solutionHelper,
-        InvocationType: "RequestResponse",
+        InvocationType: "Event",
         Payload: payload,
     };
     const command = new InvokeCommand(input);

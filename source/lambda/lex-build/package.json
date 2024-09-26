@@ -1,6 +1,6 @@
 {
     "name": "lex-build",
-    "version": "6.1.0",
+    "version": "6.1.1",
     "description": "QnABot lambda for rebuilding Amazon Lex bots",
     "main": "handler.js",
     "scripts": {
@@ -22,5 +22,9 @@
     },
     "dependencies": {
         "@aws-sdk/client-lex-model-building-service": "^3.511.0"
+    },
+    "overrides": {
+        "micromatch": "^4.0.8",
+        "sinon": "^19.0.2"
     }
 }

@@ -1,0 +1,113 @@
+build
+
+codescan-*
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Grunt intermediate storage (http://gruntjs.com/creating-plugins#storing-task-files)
+.grunt
+
+# Bower dependency directory (https://bower.io/)
+bower_components
+
+# node-waf configuration
+.lock-wscript
+
+# Compiled binary addons (https://nodejs.org/api/addons.html)
+build/Release
+
+# Dependency directories
+node_modules/
+jspm_packages/
+py_modules/
+crhelper*/
+model_repo/
+.pytest_cache/
+__pycache__/
+
+# Typescript v1 declaration files
+typings/
+
+# Optional npm cache directory
+.npm
+
+# Optional eslint cache
+.eslintcache
+
+# Optional REPL history
+.node_repl_history
+
+# Output of 'npm pack'
+*.tgz
+
+# Yarn Integrity file
+.yarn-integrity
+
+# dotenv environment variables file
+.env
+
+build
+source/config.json
+**/.DS_Store
+.idea/
+
+# ignore VS Code specific configs and environments
+.devcontainer/
+.vscode/
+utilities/migration.md
+
+# Temporary folders and backup files
+tmp/
+temp/
+*.bak
+
+# derived build assets
+**/deployment/global-s3-assets
+**/deployment/regional-s3-assets
+**/deployment/open-source
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+**/coverage/
+**/coverage-reports/
+lcov.info
+lib-cov
+.nyc_output
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+**/.venv-test/
+
+docs/excel_import/~$sample.xlsx
+.nightswatch/functional/files/~$import-pass.xlsx
+.nightswatch/functional/files/~$import-fail.xlsx
+
+# pipenv lock files
+Pipfile
+Pipfile.lock
+
+# We are using default .viperlightrc. No need to keep this in the repo.
+.viperlightrc
