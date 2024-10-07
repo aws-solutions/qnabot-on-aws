@@ -126,6 +126,26 @@ const llmModelBodies = {
             }
         ],
     },
+    'anthropic.claude-3-5-sonnet-20240620-v1': {
+        max_tokens: 256,
+        temperature: 0,
+        top_k: 250,
+        top_p: 1,
+        stop_sequences: ['\n\nHuman:'],
+        anthropic_version: 'bedrock-2023-05-31',
+        system : 'You are a helpful AI assistant.',
+        messages : [
+            {
+                role: 'user',
+                content: [
+                    {
+                        type: 'text',
+                        text: 'test prompt'
+                    }
+                ]
+            }
+        ],
+    },
     'anthropic.claude-3-haiku-20240307-v1': {
         max_tokens: 256,
         temperature: 0,
@@ -274,6 +294,17 @@ const llmModelResponses = {
         )
     },
     'anthropic.claude-3-sonnet-20240229-v1': {
+        body: Buffer.from(
+            JSON.stringify({
+                content: [
+                    { 
+                        text: 'test response' 
+                    }
+                ]
+            })
+        )
+    },
+    'anthropic.claude-3-5-sonnet-20240620-v1': {
         body: Buffer.from(
             JSON.stringify({
                 content: [
