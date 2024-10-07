@@ -53,6 +53,7 @@ describe('user actions test', () => {
                 search: '?code=200',
                 origin: 'test.origin',
                 pathname: '/test/path',
+                replace:  jest.fn(),
             },
             localStorage: {
                 clear: jest.fn(),
@@ -430,6 +431,9 @@ describe('user actions test', () => {
                 },
                 user: {
                     name: 'some-user',
+                    credentials: {
+                        expiration: new Date(Date.now() - 1000),
+                    },
                 }
             },
             state: {
@@ -447,12 +451,16 @@ describe('user actions test', () => {
         })
 
         const expectedLogoutUrl = `${mockedContext.rootState.info._links.CognitoEndpoint.href}/logout?response_type=code&client_id=${mockedContext.rootState.info.ClientIdDesigner}&redirect_uri=test.origin/test/path`
-
         await actionsModule.logout(mockedContext);
         expect(cognitoIdentityProviderClientMock).toHaveReceivedCommandTimes(AdminUserGlobalSignOutCommand, 1);
         expect(window.sessionStorage.clear).toHaveBeenCalledTimes(1);
         expect(window.localStorage.clear).toHaveBeenCalledTimes(1);
-        expect(window.location.href).toEqual(expectedLogoutUrl);
+        expect(mockedContext.rootState.user.name).toEqual('some-user')
+        expect(mockedContext.state.credentials).toEqual(undefined)
+        expect(mockedContext.rootState.user.credentials).toEqual(undefined)
+        expect(window.location.replace).toHaveBeenCalledWith(
+            expect.stringContaining(expectedLogoutUrl)
+          );
     });
 
     test('can logout when error occurs in credentials provider', async () => {
@@ -473,6 +481,9 @@ describe('user actions test', () => {
                 },
                 user: {
                     name: 'some-user',
+                    credentials: {
+                        expiration: new Date(Date.now() - 1000),
+                    },
                 }
             },
         };
@@ -487,7 +498,12 @@ describe('user actions test', () => {
         expect(cognitoIdentityProviderClientMock).toHaveReceivedCommandTimes(AdminUserGlobalSignOutCommand, 0);
         expect(window.sessionStorage.clear).toHaveBeenCalledTimes(1);
         expect(window.localStorage.clear).toHaveBeenCalledTimes(1);
-        expect(window.location.href).toEqual(expectedLogoutUrl);
+        expect(mockedContext.rootState.user.name).toEqual('some-user')
+        expect(mockedContext.state).toEqual(undefined)
+        expect(mockedContext.rootState.user.credentials).toEqual(undefined)
+        expect(window.location.replace).toHaveBeenCalledWith(
+            expect.stringContaining(expectedLogoutUrl)
+          );
     });
 
     test('can logout when error occurs during global signout', async () => {
@@ -515,6 +531,9 @@ describe('user actions test', () => {
                 },
                 user: {
                     name: 'some-user',
+                    credentials: {
+                        expiration: new Date(Date.now() - 1000),
+                    },
                 }
             },
             state: {
@@ -532,7 +551,12 @@ describe('user actions test', () => {
         expect(cognitoIdentityProviderClientMock).toHaveReceivedCommandTimes(AdminUserGlobalSignOutCommand, 1);
         expect(window.sessionStorage.clear).toHaveBeenCalledTimes(1);
         expect(window.localStorage.clear).toHaveBeenCalledTimes(1);
-        expect(window.location.href).toEqual(expectedLogoutUrl);
+        expect(mockedContext.rootState.user.name).toEqual('some-user')
+        expect(mockedContext.state.credentials).toEqual(undefined)
+        expect(mockedContext.rootState.user.credentials).toEqual(undefined)
+        expect(window.location.replace).toHaveBeenCalledWith(
+            expect.stringContaining(expectedLogoutUrl)
+          );
     });
 
     test('login -- id_token exists', async () => {

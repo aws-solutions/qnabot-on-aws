@@ -33,6 +33,7 @@ const capabilityMapping = {
     'meta.llama3-8b-instruct-v1': 'C041',
     'amazon.titan-text-premier-v1': 'C042',
     'amazon.titan-embed-text-v2': 'C043',
+    'anthropic.claude-3.5-sonnet-v1': 'C044'
 };
 
 function isEmbedding(modelId) {

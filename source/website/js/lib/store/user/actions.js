@@ -126,10 +126,22 @@ const logout = async (context) => {
             console.log(`Error fetching credentials ${e.message.substring(0, 500)}`);
         }
 
-        const logoutUrl = `${cognitoEndpoint}/logout?response_type=code&client_id=${clientId}&redirect_uri=${redirectUrl}`;
-        window.location.href = logoutUrl;
+        // clear context state credential
+        if (context?.state?.credentials) {
+            delete context.state.credentials;
+        }
+
+        if (context?.rootState?.user?.credentials) {
+            delete context.rootState.user.credentials;
+        }
+
+        // clear session and local storage
         window.sessionStorage.clear();
         window.localStorage.clear();
+
+        // redirect to logout url
+        const logoutUrl = `${cognitoEndpoint}/logout?response_type=code&client_id=${clientId}&redirect_uri=${redirectUrl}`;
+        window.location.replace(logoutUrl);
     };
 
 const getCredentials = async (context) => {

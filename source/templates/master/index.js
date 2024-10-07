@@ -441,6 +441,7 @@ module.exports = {
                 'anthropic.claude-instant-v1',
                 'anthropic.claude-v2.1',
                 'anthropic.claude-3-sonnet-v1',
+                'anthropic.claude-3.5-sonnet-v1',
                 'anthropic.claude-3-haiku-v1',
                 'cohere.command-text-v14',
                 'meta.llama3-8b-instruct-v1'
@@ -464,6 +465,7 @@ module.exports = {
                 'anthropic.claude-instant-v1',
                 'anthropic.claude-v2.1',
                 'anthropic.claude-3-sonnet-v1',
+                'anthropic.claude-3.5-sonnet-v1',
                 'anthropic.claude-3-haiku-v1',
             ],
             Default: 'anthropic.claude-instant-v1',
