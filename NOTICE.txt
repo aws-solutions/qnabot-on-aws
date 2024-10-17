@@ -1,15 +1,11 @@
 qnabot-on-aws
+
 Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
-
-Licensed under the Apache License Version 2.0 (the 'License'). You may not use this file except in compliance
-with the License. A copy of the License is located at
-
-     http://www.apache.org/licenses/LICENSE-2.0
-
-or in the 'license' file accompanying this file. This file is distributed on an 'AS IS' BASIS, WITHOUT WARRANTIES
-OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions
-and limitations under the License.
-
+Licensed under the Apache License Version 2.0 (the "License"). You may not use this file except
+in compliance with the License. A copy of the License is located at http://www.apache.org/licenses/
+or in the "license" file accompanying this file. This file is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied. See the License for the
+specific language governing permissions and limitations under the License.
 
 **********************
 THIRD PARTY COMPONENTS
@@ -791,7 +787,7 @@ hash.js under the MIT license
 hasown under the MIT license
 he under the MIT license
 highlight.js under the BSD-3-Clause license
-hint.css under the See LICENSE.md license
+hint.css under the MIT license
 hmac-drbg under the MIT license
 hosted-git-info under the ISC license
 hpack.js under the MIT license
@@ -1510,3 +1506,93 @@ trio-websocket under the Massachusetts Institute of Technology (MIT) license
 websocket-client under the Apache License Version 2.0
 wsproto under the Massachusetts Institute of Technology (MIT) license
 xmltodict under the Massachusetts Institute of Technology (MIT) license
+uuid under the MIT license.
+@smithy/types under the Apache-2.0 license.
+@smithy/core under the Apache-2.0 license.
+@smithy/util-endpoints under the Apache-2.0 license.
+eslint under the MIT license.
+eslint-scope under the BSD-2-Clause license.
+globals under the MIT license.
+strip-json-comments under the MIT license.
+once under the ISC license.
+eslint-config-standard under the MIT license.
+is-array-buffer under the MIT license.
+json5 under the MIT license.
+minimist under the MIT license.
+strip-bom under the MIT license.
+eslint-utils under the MIT license.
+regexpp under the MIT license.
+jsdom under the MIT license.
+tough-cookie under the BSD-3-Clause license.
+ws under the MIT license.
+ieee754 under the BSD-3-Clause license.
+jsonwebtoken under the MIT license.
+util under the MIT license.
+body-parser under the MIT license.
+http-errors under the MIT license.
+qs under the BSD-3-Clause license.
+source-map under the BSD-3-Clause license.
+express under the MIT license.
+range-parser under the MIT license.
+send under the MIT license.
+mime under the MIT license.
+serve-static under the MIT license.
+@babel/types under the MIT license.
+graceful-fs under the ISC license.
+utf8 under the MIT license.
+normalize-package-data under the BSD-2-Clause license.
+parse-json under the MIT license.
+yargs-parser under the ISC license.
+utilx license unknown or missing
+@babel/core under the MIT license.
+@jest/core under the MIT license.
+istanbul-lib-coverage under the BSD-3-Clause license.
+istanbul-lib-report under the BSD-3-Clause license.
+istanbul-reports under the BSD-3-Clause license.
+@jest/types under the MIT license.
+@sinonjs/fake-timers under the BSD-3-Clause license.
+expect under the MIT license.
+jest under the MIT license.
+stack-utils under the MIT license.
+yargs under the MIT license.
+cliui under the ISC license.
+word-wrap under the MIT license.
+acorn-import-attributes under the MIT license.
+@xtuc/ieee754 under the BSD-3-Clause license.
+@jridgewell/source-map under the MIT license.
+node-fetch under the MIT license.
+prettier under the MIT license.
+address under the MIT license.
+html-minifier-terser under the MIT license.
+connect-history-api-fallback under the MIT license.
+http-proxy under the MIT license.
+retry under the MIT license.
+node-forge under the BSD-3-Clause license.
+serve-index under the MIT license.
+sockjs under the MIT license.
+sinon under the BSD-3-Clause license.
+abort-controller under the MIT license.
+url under the MIT license.
+sax under the ISC license.
+@langchain/core under the MIT license.
+openai under the Apache-2.0 license.
+
+********************
+OPEN SOURCE LICENSES
+********************
+
+0BSD - https://spdx.org/licenses/0BSD.html
+Apache-2.0 - https://spdx.org/licenses/Apache-2.0.html
+BSD-2-Clause - https://spdx.org/licenses/BSD-2-Clause.html
+BSD-3-Clause - https://spdx.org/licenses/BSD-3-Clause.html
+BlueOak-1.0.0 - https://spdx.org/licenses/BlueOak-1.0.0.html
+CC-BY-3.0 - https://spdx.org/licenses/CC-BY-3.0.html
+CC-BY-4.0 - https://spdx.org/licenses/CC-BY-4.0.html
+CC0-1.0 - https://spdx.org/licenses/CC0-1.0.html
+ISC - https://spdx.org/licenses/ISC.html
+MIT - https://spdx.org/licenses/MIT.html
+MPL-2.0 - https://spdx.org/licenses/MPL-2.0.html
+OFL-1.1 - https://spdx.org/licenses/OFL-1.1.html
+Python-2.0 - https://spdx.org/licenses/Python-2.0.html
+Unlicense - https://spdx.org/licenses/Unlicense.html
+Zlib - https://spdx.org/licenses/Zlib.html
