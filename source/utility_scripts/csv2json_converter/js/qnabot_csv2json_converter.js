@@ -1,3 +1,8 @@
+/** ************************************************************************************************
+*   Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.                             *
+*   SPDX-License-Identifier: Apache-2.0                                                            *
+ ************************************************************************************************ */
+
 // AWS QnA Bot -- CSV to JSON converter
 // more details on AWS QnA Bot project is available by following: https://www.amazon.com/qnabot
 // this javascript file contains functions to create a JSON file according to the JSON schema of QnA Bot
