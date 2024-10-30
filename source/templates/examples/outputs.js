@@ -28,7 +28,7 @@ const js_ext = fs.readdirSync(`${__dirname}/extensions/js_lambda_hooks`)
 const py_ext = fs.readdirSync(`${__dirname}/extensions/py_lambda_hooks`)
     .map((name) => `EXT${name}`);
 
-exports.names = js_example.concat(py_example).concat(js_ext).concat(py_ext);
+exports.names = js_example.concat(py_example).concat(js_ext).concat(py_ext).sort();
 
 const out = _.fromPairs(exports.names.map((x) => [x, { Value: { 'Fn::GetAtt': [x, 'Arn'] } }]));
 

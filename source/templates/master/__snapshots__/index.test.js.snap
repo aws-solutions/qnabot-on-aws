@@ -10884,6 +10884,24 @@ exports.documents = (event, context, callback) => {
                 {
                   "Fn::GetAtt": [
                     "ExamplesStack",
+                    "Outputs.EXTCreateRecentTopicsResponse",
+                  ],
+                },
+                {
+                  "Fn::GetAtt": [
+                    "ExamplesStack",
+                    "Outputs.EXTCustomJSHook",
+                  ],
+                },
+                {
+                  "Fn::GetAtt": [
+                    "ExamplesStack",
+                    "Outputs.EXTCustomPYHook",
+                  ],
+                },
+                {
+                  "Fn::GetAtt": [
+                    "ExamplesStack",
                     "Outputs.ExampleJSLambdaQuiz",
                   ],
                 },
@@ -10927,24 +10945,6 @@ exports.documents = (event, context, callback) => {
                   "Fn::GetAtt": [
                     "ExamplesStack",
                     "Outputs.ExamplePYTHONLambdahello",
-                  ],
-                },
-                {
-                  "Fn::GetAtt": [
-                    "ExamplesStack",
-                    "Outputs.EXTCreateRecentTopicsResponse",
-                  ],
-                },
-                {
-                  "Fn::GetAtt": [
-                    "ExamplesStack",
-                    "Outputs.EXTCustomJSHook",
-                  ],
-                },
-                {
-                  "Fn::GetAtt": [
-                    "ExamplesStack",
-                    "Outputs.EXTCustomPYHook",
                   ],
                 },
               ],
@@ -15661,6 +15661,24 @@ function message(code, name) {
                 {
                   "Fn::GetAtt": [
                     "ExamplesStack",
+                    "Outputs.EXTCreateRecentTopicsResponse",
+                  ],
+                },
+                {
+                  "Fn::GetAtt": [
+                    "ExamplesStack",
+                    "Outputs.EXTCustomJSHook",
+                  ],
+                },
+                {
+                  "Fn::GetAtt": [
+                    "ExamplesStack",
+                    "Outputs.EXTCustomPYHook",
+                  ],
+                },
+                {
+                  "Fn::GetAtt": [
+                    "ExamplesStack",
                     "Outputs.ExampleJSLambdaQuiz",
                   ],
                 },
@@ -15704,24 +15722,6 @@ function message(code, name) {
                   "Fn::GetAtt": [
                     "ExamplesStack",
                     "Outputs.ExamplePYTHONLambdahello",
-                  ],
-                },
-                {
-                  "Fn::GetAtt": [
-                    "ExamplesStack",
-                    "Outputs.EXTCreateRecentTopicsResponse",
-                  ],
-                },
-                {
-                  "Fn::GetAtt": [
-                    "ExamplesStack",
-                    "Outputs.EXTCustomJSHook",
-                  ],
-                },
-                {
-                  "Fn::GetAtt": [
-                    "ExamplesStack",
-                    "Outputs.EXTCustomPYHook",
                   ],
                 },
               ],
