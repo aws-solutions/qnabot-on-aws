@@ -24,7 +24,7 @@ async function get_settings() {
 // add embeddings for each QID in an add or modify item PUT query
 async function build_additem_embeddings(event, settings) {
     if (!settings.EMBEDDINGS_ENABLE) {
-        console.log('EMBEDDINGS_ENABLE is false - query not modified');
+        qnabot.log('EMBEDDINGS_ENABLE is false - query not modified');
         return event.body;
     }
     // question embeddings

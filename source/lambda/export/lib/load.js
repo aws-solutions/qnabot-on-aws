@@ -7,7 +7,6 @@ const { LambdaClient, InvokeCommand } = require('@aws-sdk/client-lambda');
 const { S3Client, PutObjectCommand } = require('@aws-sdk/client-s3');
 const region = process.env.AWS_REGION;
 const customSdkConfig = require('sdk-config/customSdkConfig');
-
 const s3 = new S3Client(customSdkConfig('C011', { region }));
 const lambda = new LambdaClient(customSdkConfig('C011', { region }));
 const _ = require('lodash');

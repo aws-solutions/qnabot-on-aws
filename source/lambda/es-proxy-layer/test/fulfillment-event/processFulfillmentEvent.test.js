@@ -37,6 +37,7 @@ jest.mock('../../lib/llm', () => ({
 
 describe('processFulfillmentEvent', () => {
     beforeEach(() => {
+        jest.spyOn(qnabot, 'redact_text').mockImplementation((text) => text);
         jest.clearAllMocks();
 
         evaluateConditionalChaining.mockImplementation(async (req, res) => {
@@ -134,9 +135,9 @@ describe('processFulfillmentEvent', () => {
         const result = response.res.result;
 
         expect(getHit).toHaveBeenCalledWith(clonedReq, clonedRes);
-        expect(result.a).toBe('[User Input: \"original\", LLM generated query (timing): \"result\", Search string: \"concatenated\", Source: test] answer');
-        expect(result.alt.markdown).toBe('*[User Input: \"original\", LLM generated query (timing): \"result\", Search string: \"concatenated\", Source: test]*  \n\nmarkdown');
-        expect(result.alt.ssml).toBe('<speak>User Input: \"original\", LLM generated query (timing): \"result\", Search string: \"concatenated\", Source: test ssml</speak>');
+        expect(result.a).toBe('[User Input: \"original\", Search string: \"concatenated\", LLM generated query (timing): \"result\", Source: test] answer');
+        expect(result.alt.markdown).toBe('*[User Input: \"original\", Search string: \"concatenated\", LLM generated query (timing): \"result\", Source: test]*  \n\nmarkdown');
+        expect(result.alt.ssml).toBe('<speak>User Input: \"original\", Search string: \"concatenated\", LLM generated query (timing): \"result\", Source: test ssml</speak>');
     });
 
     test('uses translated llm generated query', async () => {
@@ -150,9 +151,9 @@ describe('processFulfillmentEvent', () => {
         const result = response.res.result;
 
         expect(getHit).toHaveBeenCalledWith(clonedReq, clonedRes);
-        expect(result.a).toBe('[User Input: \"How can I publish Kindle books?\", Translated to: \"original\", LLM generated query (timing): \"result\", Search string: \"concatenated\", Source: test] translated answer');
-        expect(result.alt.markdown).toBe('*[User Input: "How can I publish Kindle books?", Translated to: "original", LLM generated query (timing): "result", Search string: "concatenated", Source: test]*  \n\ntranslated answer');
-        expect(result.alt.ssml).toBe('<speak>User Input: \"How can I publish Kindle books?\", Translated to: \"original\", LLM generated query (timing): \"result\", Search string: \"concatenated\", Source: test translated answer</speak>');
+        expect(result.a).toBe('[User Input: \"How can I publish Kindle books?\", Translated to: \"original\", Search string: \"concatenated\", LLM generated query (timing): \"result\", Source: test] translated answer');
+        expect(result.alt.markdown).toBe('*[User Input: "How can I publish Kindle books?", Translated to: "original", Search string: "concatenated", LLM generated query (timing): \"result\", Source: test]*  \n\ntranslated answer');
+        expect(result.alt.ssml).toBe('<speak>User Input: \"How can I publish Kindle books?\", Translated to: \"original\", Search string: \"concatenated\", LLM generated query (timing): \"result\", Source: test translated answer</speak>');
     });
 
     test('handles empty messages in chat history', async () => {
@@ -172,9 +173,9 @@ describe('processFulfillmentEvent', () => {
         const result = response.res.result;
 
         expect(getHit).toHaveBeenCalledWith(clonedReq, clonedRes);
-        expect(result.a).toBe('[User Input: \"How can I publish Kindle books?\", Translated to: \"original\", LLM generated query (timing): \"result\", Search string: \"concatenated\", Source: test] translated answer');
-        expect(result.alt.markdown).toBe('*[User Input: "How can I publish Kindle books?", Translated to: "original", LLM generated query (timing): "result", Search string: "concatenated", Source: test]*  \n\ntranslated answer');
-        expect(result.alt.ssml).toBe('<speak>User Input: \"How can I publish Kindle books?\", Translated to: \"original\", LLM generated query (timing): \"result\", Search string: \"concatenated\", Source: test translated answer</speak>');
+        expect(result.a).toBe('[User Input: \"How can I publish Kindle books?\", Translated to: \"original\", Search string: \"concatenated\", LLM generated query (timing): \"result\", Source: test] translated answer');
+        expect(result.alt.markdown).toBe('*[User Input: "How can I publish Kindle books?", Translated to: "original", Search string: "concatenated", LLM generated query (timing): \"result\", Source: test]*  \n\ntranslated answer');
+        expect(result.alt.ssml).toBe('<speak>User Input: \"How can I publish Kindle books?\", Translated to: \"original\", Search string: \"concatenated\", LLM generated query (timing): \"result\", Source: test translated answer</speak>');
     });
 
     test('skips llm generated query if qid is provided', async () => {

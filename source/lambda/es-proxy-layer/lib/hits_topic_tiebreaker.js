@@ -2,7 +2,7 @@
 *   Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.                             *
 *   SPDX-License-Identifier: Apache-2.0                                                            *
  ************************************************************************************************ */
-
+const qnabot = require('qnabot/logging');
 // returns true if score is within tolerance of top_score
 function is_score_match(score, top_score) {
     const diff_tolerance = process.env.TOPIC_TIEBREAKER_SCORE_DIFF_TOLERANCE || 0.001;
@@ -41,7 +41,7 @@ function sort_hits_by_topic_match(topic, hits) {
 }
 
 function hits_topic_tiebreaker(topic, hits) {
-    console.log(`Apply topic "${topic}" to rank order top hits with matching score`);
+    qnabot.log(`Apply topic "${topic}" to rank order top hits with matching score`);
     const equal_hits = [];
     const topHit = hits[0]._score;
     for (const hit of hits) {
