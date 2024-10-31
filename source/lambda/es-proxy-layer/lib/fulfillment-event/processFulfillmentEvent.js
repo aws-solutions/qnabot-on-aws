@@ -131,21 +131,29 @@ function prependDebugMsg(req, usrLang, nativeLangCode, hit, errors) {
     let originalInput;
     let translatedInput;
     let msg;
+    let llmQueryOutput = '';
 
     if (req.llm_generated_query && usrLang !== nativeLangCode) {
         originalInput = _.get(req, '_event.origQuestion', 'notdefined');
         const { orig, result, concatenated, timing } = req.llm_generated_query;
-        msg = `User Input: "${originalInput}", Translated to: "${orig}", LLM generated query (${timing}): "${result}", Search string: "${concatenated}"`;
+        msg = `User Input: "${originalInput}", Translated to: "${orig}", Search string: "${concatenated}"`;
+        llmQueryOutput = `LLM generated query (${timing}): "${result}"`;
     } else if (req.llm_generated_query) {
         const { orig, result, concatenated, timing } = req.llm_generated_query;
-        msg = `User Input: "${orig}", LLM generated query (${timing}): "${result}", Search string: "${concatenated}"`;
+        msg = `User Input: "${orig}", Search string: "${concatenated}"`;
+        llmQueryOutput = `LLM generated query (${timing}): "${result}"`;
     } else if (!req.llm_generated_query && usrLang !== nativeLangCode) {
         originalInput = _.get(req, '_event.origQuestion', 'notdefined');
         translatedInput = req.question;
         msg = `User Input: "${originalInput}", Translated to: "${translatedInput}"`;
     } else {
-        originalInput = req.question;
-        msg = `User Input: "${originalInput}"`;
+        msg = `User Input: "${req.question}"`;
+    }
+
+    msg = qnabot.redact_text(msg);
+
+    if (llmQueryOutput) {
+        msg += ', ' + llmQueryOutput;
     }
 
     const qid = _.get(req, 'qid');

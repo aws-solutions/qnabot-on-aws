@@ -1,6 +1,6 @@
 {
     "name": "examples",
-    "version": "6.1.3",
+    "version": "6.1.4",
     "description": "Lambda contains a collection of lambda hooks for QnABot and a custom resource to create the example documents",
     "main": "index.js",
     "scripts": {

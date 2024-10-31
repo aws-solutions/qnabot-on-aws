@@ -30,8 +30,6 @@ module.exports = class router {
     }
 
     async _walk(req, res = {}, index = 0) {
-        qnabot.debug(JSON.stringify({ req, res }, null, 2));
-
         if (this.middleware[index]) {
             qnabot.log(`middleware=${this.middleware[index].name}`);
             const result = await this.middleware[index](req, res);
