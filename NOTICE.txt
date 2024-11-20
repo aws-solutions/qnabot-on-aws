@@ -1575,7 +1575,9 @@ abort-controller under the MIT license.
 url under the MIT license.
 sax under the ISC license.
 @langchain/core under the MIT license.
+@langchain/textsplitters under the MIT license.
 openai under the Apache-2.0 license.
+mustache under the MIT license.
 
 ********************
 OPEN SOURCE LICENSES

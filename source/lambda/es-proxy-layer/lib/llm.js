@@ -12,7 +12,7 @@ const qnabot = require('qnabot/logging');
 const region = process.env.AWS_REGION || 'us-east-1';
 
 const { ChatMessageHistory, BufferMemory } = require('langchain/memory');
-const { PromptTemplate } = require('langchain/prompts');
+const { PromptTemplate } = require('@langchain/core/prompts');
 const { createTruncatedPrompt } = require('./truncate');
 const { invokeBedrockModel } = require('./bedrock/bedrockModels');
 const { sanitize } = require('./sanitizeOutput');
