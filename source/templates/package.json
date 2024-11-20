@@ -1,6 +1,6 @@
 {
     "name": "qnabot-on-aws-infrastructure",
-    "version": "6.1.4",
+    "version": "6.1.5",
     "description": "QnABot infrastructure",
     "scripts": {
         "clean": "rm -rf node_modules",
@@ -19,6 +19,7 @@
         "jest": "^29.7.0"
     },
     "overrides": {
+        "cross-spawn": "^7.0.6",
         "micromatch": "^4.0.8",
         "sinon": "^19.0.2"
     }

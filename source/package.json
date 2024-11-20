@@ -1,6 +1,6 @@
 {
     "name": "qnabot-on-aws",
-    "version": "6.1.4",
+    "version": "6.1.5",
     "engines": {
         "node": ">=18.0.0",
         "npm": ">=10.0.0"
@@ -194,6 +194,7 @@
         "zip-webpack-plugin": "^4.0.1"
     },
     "overrides": {
+        "cross-spawn": "^7.0.6",
         "minimatch": "^3.0.5",
         "micromatch": "^4.0.8",
         "word-wrap@<1.2.4": "^1.2.4",
@@ -206,7 +207,7 @@
         },
         "follow-redirects": "^1.15.6",
         "postcss": "^8.4.32",
-        "elliptic": "^6.5.7",
+        "elliptic": "^6.6.1",
         "uglify-js": "^3.19.2",
         "sinon": "^19.0.2",
         "http-proxy-middleware": "^2.0.7"

@@ -1,6 +1,6 @@
 {
     "name": "lex-build",
-    "version": "6.1.4",
+    "version": "6.1.5",
     "description": "QnABot lambda for rebuilding Amazon Lex bots",
     "main": "handler.js",
     "scripts": {
@@ -24,6 +24,7 @@
         "@aws-sdk/client-lex-model-building-service": "^3.511.0"
     },
     "overrides": {
+        "cross-spawn": "^7.0.6",
         "micromatch": "^4.0.8",
         "sinon": "^19.0.2"
     }
