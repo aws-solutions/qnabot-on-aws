@@ -98,7 +98,7 @@ class LambdaTest(unittest.TestCase):
         self.assertIn('Data', actual_payload)
     
         # Assert the payload values for the second call
-        self.assertEqual(actual_payload['Data'], {'BEDROCK_GUARDRAIL_ENABLE': 'false', 'ENABLE_MULTI_LANGUAGE_SUPPORT': 'false', 'LLM_GENERATE_QUERY_ENABLE': 'true', 'KNOWLEDGE_BASE_SEARCH_TYPE': 'DEFAULT', 'PII_REJECTION_ENABLED': 'false', 'EMBEDDINGS_ENABLE': 'true', 'LLM_QA_ENABLE': 'true', 'event': 'UPDATE_SETTINGS'})         
+        self.assertEqual(actual_payload['Data'], {'BEDROCK_GUARDRAIL_ENABLE': 'false', 'ENABLE_MULTI_LANGUAGE_SUPPORT': 'false', 'LLM_GENERATE_QUERY_ENABLE': 'true', 'KNOWLEDGE_BASE_SEARCH_TYPE': 'DEFAULT', 'PII_REJECTION_ENABLED': 'false', 'EMBEDDINGS_ENABLE': 'true', 'LLM_QA_ENABLE': 'true', 'event': 'UPDATE_SETTINGS', 'ENABLE_REDACTING': 'false', 'ENABLE_REDACTING_WITH_COMPREHEND': 'false'})         
 
     @mock.patch('requests.post')
     def test_send_metrics_connection_error(self, mock_post):
@@ -170,7 +170,9 @@ class LambdaTest(unittest.TestCase):
                  'KNOWLEDGE_BASE_SEARCH_TYPE': 'DEFAULT', 
                  'PII_REJECTION_ENABLED': 'false', 
                  'EMBEDDINGS_ENABLE': 'true',
-                 'LLM_QA_ENABLE': 'true'
+                 'LLM_QA_ENABLE': 'true',
+                 'ENABLE_REDACTING': 'true',
+                 'ENABLE_REDACTING_WITH_COMPREHEND': 'false'
                  }
 
         mock_parameter_value = "some-uuid"

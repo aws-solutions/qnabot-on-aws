@@ -5,6 +5,51 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [6.1.5] - 2024-11-20
+
+### Security
+- Patched langchain, cross-spawn & elliptic vulnerability
+
+## [6.1.4] - 2024-10-31
+
+### Fixed
+- PII usage leaks and improvements. See [README](./source/docs/PII_Detection_And_Redaction/README.md).
+
+### Security
+- Patched http-proxy-middleware vulnerability
+
+## [6.1.3] - 2024-10-17
+
+### Security
+
+- Patched async and micromatch vulnerability
+
+## [6.1.2] - 2024-10-07
+
+### Fixed
+
+- Cleared context state credential and updated the page history after logout
+
+### Changed
+
+- Added [Anthropic Claude 3.5 Sonnet](https://docs.aws.amazon.com/bedrock/latest/userguide/models-supported.html) as an additional option to the list LLM models provided through cloudformation parameters `LLMBedrockModelId` and `BedrockKnowledgeBaseModel`
+
+### Deprecated
+
+- Sagemaker support has been deprecated and will be removed in the next release
+
+## [6.1.1] - 2024-09-26
+
+### Fixed
+
+- Added back .gitignore to fix custom deployment issues through github repo
+- Improved performance of lambda invocation from frontend to save settings faster
+- Fixed bug that limited response card buttons to only 5 buttons [Issue #765](https://github.com/aws-solutions/qnabot-on-aws/issues/765)
+- Security patch for body-parser, micromatch, path-to-regexp, and webpack
+- Added support for crawled links in Bedrock Knowledge Base to be shown as referenced links
+- Fixed an issue where the context is expanded by default and can't be closed when Knowledge Base returns lists in the response
+- Fixed limit on import file sizes [Issue #766](https://github.com/aws-solutions/qnabot-on-aws/issues/766)
+
 ## [6.1.0] - 2024-08-29
 
 ### Added
@@ -162,7 +207,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed issue where settings were being evaluated as strings instead of numbers. Settings that are saved as stings that represent positive, negative, whole, or decimal numbers will be parsed as numbers.
 - Fixed issue where kendra redirect does not use redirect query when users locale matches kendra index locale
 
-## [5.4.5] - 2023-11-1
+## [5.4.5] - 2023-11-01
 ### Changed
 - Security patch for browserify-sign
 
@@ -674,7 +719,7 @@ More details in [README](https://github.com/aws-solutions/qnabot-on-aws/blob/v5.
 ### Fixed
 
 -   Bug fixes for Kendra FAQ integration
--   Fix for exception - "Cannot convert undefined or null to object" when Session Attributes are no provided during Lex input. https://github.com/aws-solutions/qnabot-on-aws/issues/229
+-   Fix for exception - "Cannot convert undefined or null to object" when Session Attributes are no provided during Lex input. [Issue #229](https://github.com/aws-solutions/qnabot-on-aws/issues/229)
 -   Package version updates to address current github dependabot alerts
 
 ## [4.3.0] - 2020-09-21

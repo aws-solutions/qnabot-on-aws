@@ -226,9 +226,9 @@ pytest -v
 Power users interested in releasing a custom QnABot can use the following instructions for publishing the deployment artifacts available to external users.
 
 Create an S3 bucket to host the templates from (see $DIST_OUTPUT_BUCKET below). You will also need regional buckets for each region your users will deploy from. The regional buckets must be named $DIST_OUTPUT_BUCKET-$AWS_REGION. You will need to provide appropriate access permissions to the buckets for your targeted users. Please refer to the below links for buckets security and access control best practices:
-- https://docs.aws.amazon.com/AmazonS3/latest/userguide/access-control-block-public-access.html#access-control-block-public-access-policy-status
-- https://docs.aws.amazon.com/AmazonS3/latest/userguide/access-control-best-practices.html
-- https://docs.aws.amazon.com/AmazonS3/latest/userguide/security.html
+- [Performing block public access operations on an access point](https://docs.aws.amazon.com/AmazonS3/latest/userguide/access-control-block-public-accesshtml#access-control-block-public-access-policy-status)
+- [Amazon S3 Access Management](https://docs.aws.amazon.com/AmazonS3/latest/userguide/access-control-best-practices.html)
+- [Amazon S3 security](https://docs.aws.amazon.com/AmazonS3/latest/userguide/security.html)
 
 **NOTE: All buckets must have versioning enabled, otherwise the stack will fail to deploy.**
 
@@ -336,6 +336,11 @@ As QnABot evolves over the years, it makes use of various services and functiona
 _Note: **Deployable solution versions** refers to the ability to deploy the version of QnABot in their AWS accounts. **Actively supported versions** for QnABot is only available for the latest version of QnABot._
 
 ### Deployable Versions
+- [v6.1.5](https://github.com/aws-solutions/qnabot-on-aws/releases/tag/v6.1.5) - [Public](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v6.1.5/qnabot-on-aws-main.template)/[VPC](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v6.1.5/qnabot-on-aws-vpc.template)
+- [v6.1.4](https://github.com/aws-solutions/qnabot-on-aws/releases/tag/v6.1.4) - [Public](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v6.1.4/qnabot-on-aws-main.template)/[VPC](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v6.1.4/qnabot-on-aws-vpc.template)
+- [v6.1.3](https://github.com/aws-solutions/qnabot-on-aws/releases/tag/v6.1.3) - [Public](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v6.1.3/qnabot-on-aws-main.template)/[VPC](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v6.1.3/qnabot-on-aws-vpc.template)
+- [v6.1.2](https://github.com/aws-solutions/qnabot-on-aws/releases/tag/v6.1.2) - [Public](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v6.1.2/qnabot-on-aws-main.template)/[VPC](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v6.1.2/qnabot-on-aws-vpc.template)
+- [v6.1.1](https://github.com/aws-solutions/qnabot-on-aws/releases/tag/v6.1.1) - [Public](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v6.1.1/qnabot-on-aws-main.template)/[VPC](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v6.1.1/qnabot-on-aws-vpc.template)
 - [v6.1.0](https://github.com/aws-solutions/qnabot-on-aws/releases/tag/v6.1.0) - [Public](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v6.1.0/qnabot-on-aws-main.template)/[VPC](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v6.1.0/qnabot-on-aws-vpc.template)
 - [v6.0.3](https://github.com/aws-solutions/qnabot-on-aws/releases/tag/v6.0.3) - [Public](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v6.0.3/qnabot-on-aws-main.template)/[VPC](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v6.0.3/qnabot-on-aws-vpc.template)
 - [v6.0.2](https://github.com/aws-solutions/qnabot-on-aws/releases/tag/v6.0.2) - [Public](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v6.0.2/qnabot-on-aws-main.template)/[VPC](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v6.0.2/qnabot-on-aws-vpc.template)

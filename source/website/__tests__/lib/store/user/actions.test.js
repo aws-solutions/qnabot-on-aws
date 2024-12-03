@@ -1,18 +1,11 @@
+/** ************************************************************************************************
+*   Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.                             *
+*   SPDX-License-Identifier: Apache-2.0                                                            *
+ ************************************************************************************************ */
+
 /**
  * @jest-environment jsdom
  */
-/** *******************************************************************************************************************
- *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.                                                *
- *                                                                                                                    *
- *  Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance    *
- *  with the License. A copy of the License is located at                                                             *
- *                                                                                                                    *
- *      http://www.apache.org/licenses/                                                                               *
- *                                                                                                                    *
- *  or in the 'license' file accompanying this file. This file is distributed on an 'AS IS' BASIS, WITHOUT WARRANTIES *
- *  OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions    *
- *  and limitations under the License.                                                                                *
- ******************************************************************************************************************** */
 
 const { fromCognitoIdentityPool } = require('@aws-sdk/credential-providers');
 const actionsModule = require('../../../../js/lib/store/user/actions');
@@ -53,6 +46,7 @@ describe('user actions test', () => {
                 search: '?code=200',
                 origin: 'test.origin',
                 pathname: '/test/path',
+                replace:  jest.fn(),
             },
             localStorage: {
                 clear: jest.fn(),
@@ -430,6 +424,9 @@ describe('user actions test', () => {
                 },
                 user: {
                     name: 'some-user',
+                    credentials: {
+                        expiration: new Date(Date.now() - 1000),
+                    },
                 }
             },
             state: {
@@ -447,12 +444,16 @@ describe('user actions test', () => {
         })
 
         const expectedLogoutUrl = `${mockedContext.rootState.info._links.CognitoEndpoint.href}/logout?response_type=code&client_id=${mockedContext.rootState.info.ClientIdDesigner}&redirect_uri=test.origin/test/path`
-
         await actionsModule.logout(mockedContext);
         expect(cognitoIdentityProviderClientMock).toHaveReceivedCommandTimes(AdminUserGlobalSignOutCommand, 1);
         expect(window.sessionStorage.clear).toHaveBeenCalledTimes(1);
         expect(window.localStorage.clear).toHaveBeenCalledTimes(1);
-        expect(window.location.href).toEqual(expectedLogoutUrl);
+        expect(mockedContext.rootState.user.name).toEqual('some-user')
+        expect(mockedContext.state.credentials).toEqual(undefined)
+        expect(mockedContext.rootState.user.credentials).toEqual(undefined)
+        expect(window.location.replace).toHaveBeenCalledWith(
+            expect.stringContaining(expectedLogoutUrl)
+          );
     });
 
     test('can logout when error occurs in credentials provider', async () => {
@@ -473,6 +474,9 @@ describe('user actions test', () => {
                 },
                 user: {
                     name: 'some-user',
+                    credentials: {
+                        expiration: new Date(Date.now() - 1000),
+                    },
                 }
             },
         };
@@ -487,7 +491,12 @@ describe('user actions test', () => {
         expect(cognitoIdentityProviderClientMock).toHaveReceivedCommandTimes(AdminUserGlobalSignOutCommand, 0);
         expect(window.sessionStorage.clear).toHaveBeenCalledTimes(1);
         expect(window.localStorage.clear).toHaveBeenCalledTimes(1);
-        expect(window.location.href).toEqual(expectedLogoutUrl);
+        expect(mockedContext.rootState.user.name).toEqual('some-user')
+        expect(mockedContext.state).toEqual(undefined)
+        expect(mockedContext.rootState.user.credentials).toEqual(undefined)
+        expect(window.location.replace).toHaveBeenCalledWith(
+            expect.stringContaining(expectedLogoutUrl)
+          );
     });
 
     test('can logout when error occurs during global signout', async () => {
@@ -515,6 +524,9 @@ describe('user actions test', () => {
                 },
                 user: {
                     name: 'some-user',
+                    credentials: {
+                        expiration: new Date(Date.now() - 1000),
+                    },
                 }
             },
             state: {
@@ -532,7 +544,12 @@ describe('user actions test', () => {
         expect(cognitoIdentityProviderClientMock).toHaveReceivedCommandTimes(AdminUserGlobalSignOutCommand, 1);
         expect(window.sessionStorage.clear).toHaveBeenCalledTimes(1);
         expect(window.localStorage.clear).toHaveBeenCalledTimes(1);
-        expect(window.location.href).toEqual(expectedLogoutUrl);
+        expect(mockedContext.rootState.user.name).toEqual('some-user')
+        expect(mockedContext.state.credentials).toEqual(undefined)
+        expect(mockedContext.rootState.user.credentials).toEqual(undefined)
+        expect(window.location.replace).toHaveBeenCalledWith(
+            expect.stringContaining(expectedLogoutUrl)
+          );
     });
 
     test('login -- id_token exists', async () => {

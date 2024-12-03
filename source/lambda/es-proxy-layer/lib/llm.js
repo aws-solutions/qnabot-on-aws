@@ -1,15 +1,7 @@
-/*********************************************************************************************************************
- *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.                                                *
- *                                                                                                                    *
- *  Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance    *
- *  with the License. A copy of the License is located at                                                             *
- *                                                                                                                    *
- *      http://www.apache.org/licenses/                                                                               *
- *                                                                                                                    *
- *  or in the 'license' file accompanying this file. This file is distributed on an 'AS IS' BASIS, WITHOUT WARRANTIES *
- *  OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions    *
- *  and limitations under the License.                                                                                *
- *********************************************************************************************************************/
+/** ************************************************************************************************
+*   Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.                             *
+*   SPDX-License-Identifier: Apache-2.0                                                            *
+ ************************************************************************************************ */
 
 /* eslint-disable max-len, no-underscore-dangle */
 const _ = require('lodash');
@@ -20,7 +12,7 @@ const qnabot = require('qnabot/logging');
 const region = process.env.AWS_REGION || 'us-east-1';
 
 const { ChatMessageHistory, BufferMemory } = require('langchain/memory');
-const { PromptTemplate } = require('langchain/prompts');
+const { PromptTemplate } = require('@langchain/core/prompts');
 const { createTruncatedPrompt } = require('./truncate');
 const { invokeBedrockModel } = require('./bedrock/bedrockModels');
 const { sanitize } = require('./sanitizeOutput');

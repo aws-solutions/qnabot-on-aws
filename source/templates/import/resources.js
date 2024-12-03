@@ -1,15 +1,7 @@
-/** *******************************************************************************************************************
- *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.                                                *
- *                                                                                                                    *
- *  Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance    *
- *  with the License. A copy of the License is located at                                                             *
- *                                                                                                                    *
- *      http://www.apache.org/licenses/                                                                               *
- *                                                                                                                    *
- *  or in the 'license' file accompanying this file. This file is distributed on an 'AS IS' BASIS, WITHOUT WARRANTIES *
- *  OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions    *
- *  and limitations under the License.                                                                                *
- ******************************************************************************************************************** */
+/** ************************************************************************************************
+*   Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.                             *
+*   SPDX-License-Identifier: Apache-2.0                                                            *
+ ************************************************************************************************ */
 
 /* eslint-disable indent */
 /* eslint-disable quotes */
@@ -101,7 +93,10 @@ module.exports = Object.assign(require('./bucket'), {
             Value: "Import",
         }],
       },
-      Metadata: { cfn_nag: util.cfnNag(["W92"]) },
+      Metadata: {
+        cfn_nag: util.cfnNag(["W92"]),
+        guard: util.cfnGuard('LAMBDA_INSIDE_VPC'),
+      },
     },
     ImportStepLambdaLogGroup: {
       Type: 'AWS::Logs::LogGroup',
@@ -181,7 +176,10 @@ module.exports = Object.assign(require('./bucket'), {
             Value: "Import",
         }],
       },
-      Metadata: { cfn_nag: util.cfnNag(["W92"]) },
+      Metadata: {
+        cfn_nag: util.cfnNag(["W92"]),
+        guard: util.cfnGuard('LAMBDA_INSIDE_VPC'),
+      },
     },
     ImportRole: {
       Type: "AWS::IAM::Role",
@@ -274,7 +272,10 @@ module.exports = Object.assign(require('./bucket'), {
           { Ref: "ImportPolicy" },
         ],
       },
-      Metadata: { cfn_nag: util.cfnNag(["W11", "W12"]) },
+      Metadata: {
+        cfn_nag: util.cfnNag(["W11", "W12"]),
+        guard: util.cfnGuard('IAM_NO_INLINE_POLICY_CHECK'),
+      },
     },
     ImportPolicy: {
       Type: "AWS::IAM::ManagedPolicy",

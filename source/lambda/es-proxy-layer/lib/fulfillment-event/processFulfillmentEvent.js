@@ -1,15 +1,7 @@
-/*********************************************************************************************************************
- *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.                                                *
- *                                                                                                                    *
- *  Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance    *
- *  with the License. A copy of the License is located at                                                             *
- *                                                                                                                    *
- *      http://www.apache.org/licenses/                                                                               *
- *                                                                                                                    *
- *  or in the 'license' file accompanying this file. This file is distributed on an 'AS IS' BASIS, WITHOUT WARRANTIES *
- *  OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions    *
- *  and limitations under the License.                                                                                *
- *********************************************************************************************************************/
+/** ************************************************************************************************
+*   Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.                             *
+*   SPDX-License-Identifier: Apache-2.0                                                            *
+ ************************************************************************************************ */
 
 /* eslint-disable no-underscore-dangle */
 const _ = require('lodash');
@@ -139,21 +131,29 @@ function prependDebugMsg(req, usrLang, nativeLangCode, hit, errors) {
     let originalInput;
     let translatedInput;
     let msg;
+    let llmQueryOutput = '';
 
     if (req.llm_generated_query && usrLang !== nativeLangCode) {
         originalInput = _.get(req, '_event.origQuestion', 'notdefined');
         const { orig, result, concatenated, timing } = req.llm_generated_query;
-        msg = `User Input: "${originalInput}", Translated to: "${orig}", LLM generated query (${timing}): "${result}", Search string: "${concatenated}"`;
+        msg = `User Input: "${originalInput}", Translated to: "${orig}", Search string: "${concatenated}"`;
+        llmQueryOutput = `LLM generated query (${timing}): "${result}"`;
     } else if (req.llm_generated_query) {
         const { orig, result, concatenated, timing } = req.llm_generated_query;
-        msg = `User Input: "${orig}", LLM generated query (${timing}): "${result}", Search string: "${concatenated}"`;
+        msg = `User Input: "${orig}", Search string: "${concatenated}"`;
+        llmQueryOutput = `LLM generated query (${timing}): "${result}"`;
     } else if (!req.llm_generated_query && usrLang !== nativeLangCode) {
         originalInput = _.get(req, '_event.origQuestion', 'notdefined');
         translatedInput = req.question;
         msg = `User Input: "${originalInput}", Translated to: "${translatedInput}"`;
     } else {
-        originalInput = req.question;
-        msg = `User Input: "${originalInput}"`;
+        msg = `User Input: "${req.question}"`;
+    }
+
+    msg = qnabot.redact_text(msg);
+
+    if (llmQueryOutput) {
+        msg += ', ' + llmQueryOutput;
     }
 
     const qid = _.get(req, 'qid');

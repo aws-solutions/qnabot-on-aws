@@ -10,4 +10,5 @@ $(DST): $(RESOURCES)
 	npm install  -production
 	mkdir ./nodejs 
 	mv node_modules ./nodejs/node_modules 
+	rm -r $(DST) || true
 	zip -r $(DST) .

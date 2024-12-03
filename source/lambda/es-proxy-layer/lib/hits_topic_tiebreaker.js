@@ -1,16 +1,8 @@
-/*********************************************************************************************************************
- *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.                                                *
- *                                                                                                                    *
- *  Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance    *
- *  with the License. A copy of the License is located at                                                             *
- *                                                                                                                    *
- *      http://www.apache.org/licenses/                                                                               *
- *                                                                                                                    *
- *  or in the 'license' file accompanying this file. This file is distributed on an 'AS IS' BASIS, WITHOUT WARRANTIES *
- *  OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions    *
- *  and limitations under the License.                                                                                *
- *********************************************************************************************************************/
-
+/** ************************************************************************************************
+*   Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.                             *
+*   SPDX-License-Identifier: Apache-2.0                                                            *
+ ************************************************************************************************ */
+const qnabot = require('qnabot/logging');
 // returns true if score is within tolerance of top_score
 function is_score_match(score, top_score) {
     const diff_tolerance = process.env.TOPIC_TIEBREAKER_SCORE_DIFF_TOLERANCE || 0.001;
@@ -49,7 +41,7 @@ function sort_hits_by_topic_match(topic, hits) {
 }
 
 function hits_topic_tiebreaker(topic, hits) {
-    console.log(`Apply topic "${topic}" to rank order top hits with matching score`);
+    qnabot.log(`Apply topic "${topic}" to rank order top hits with matching score`);
     const equal_hits = [];
     const topHit = hits[0]._score;
     for (const hit of hits) {

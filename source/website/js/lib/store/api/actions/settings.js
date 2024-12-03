@@ -1,15 +1,7 @@
-/** *******************************************************************************************************************
- *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.                                                *
- *                                                                                                                    *
- *  Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance    *
- *  with the License. A copy of the License is located at                                                             *
- *                                                                                                                    *
- *      http://www.apache.org/licenses/                                                                               *
- *                                                                                                                    *
- *  or in the 'license' file accompanying this file. This file is distributed on an 'AS IS' BASIS, WITHOUT WARRANTIES *
- *  OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions    *
- *  and limitations under the License.                                                                                *
- ******************************************************************************************************************** */
+/** ************************************************************************************************
+*   Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.                             *
+*   SPDX-License-Identifier: Apache-2.0                                                            *
+ ************************************************************************************************ */
 const _ = require('lodash');
 const { SSMClient, GetParameterCommand, GetParametersCommand, PutParameterCommand } = require('@aws-sdk/client-ssm');
 const { LambdaClient, InvokeCommand } = require('@aws-sdk/client-lambda');
@@ -125,21 +117,21 @@ const settingsMap = {
                     {
                         id: 'ENABLE_REDACTING',
                         type: 'boolean',
-                        hint: 'Enable the system to redact log output',
+                        hint: 'Enables or disables the system\'s ability to redact log output using REDACTING_REGEX',
                     },
                     {
                         id: 'REDACTING_REGEX',
-                        hint: 'Enter a regular expression. Redacts expressions matching regex from logs',
+                        hint: 'Defines patterns to be redacted from logs when ENABLE_REDACTING is true',
                     },
                     {
                         id: 'ENABLE_REDACTING_WITH_COMPREHEND',
                         type: 'boolean',
-                        hint: 'Enables Amazon Comprehend based PII Redacting. See: https://aws.amazon.com/blogs/machine-learning/detecting-and-redacting-pii-using-amazon-comprehend/',
+                        hint: 'Enables PII Redaction using Amazon Comprehend. See: https://aws.amazon.com/blogs/machine-learning/detecting-and-redacting-pii-using-amazon-comprehend/',
                     },
                     {
                         id: 'COMPREHEND_REDACTING_CONFIDENCE_SCORE',
                         type: 'number',
-                        hint: 'Enter a number between 0.0 and 1.0. Only redact PII where Amazon Comprehend\'s confidence score is greater than this number',
+                        hint: 'Enter a number between 0.0 and 1.0 to set a threshold for PII redaction. Only PII detected with Amazon Comprehend\'s confidence score higher than this value will be redacted.',
                     },
                     {
                         id: 'COMPREHEND_REDACTING_ENTITY_TYPES',
@@ -148,15 +140,15 @@ const settingsMap = {
                     {
                         id: 'PII_REJECTION_ENABLED',
                         type: 'boolean',
-                        hint: 'Enables PII Rejection',
+                        hint: 'Enables or disables the system\'s ability to reject input containing PII. It is recommended to also enable PII redaction by setting the ENABLE_REDACTING and/or the ENABLE_REDACTING_WITH_COMPREHEND if you are enabling PII rejection.',
                     },
                     {
                         id: 'PII_REJECTION_QUESTION',
-                        hint: 'If PII is found, the user\'s request (question) will change to this phrase',
+                        hint: 'If PII rejection is enabled and PII is detected, the user\'s original question will be replaced with this text.',
                     },
                     {
                         id: 'PII_REJECTION_REGEX',
-                        hint: 'Enter a regular expression. Used to find PII based on a regex',
+                        hint: 'Defines patterns to identify PII for rejection purposes.',
                     },
                     {
                         id: 'PII_REJECTION_ENTITY_TYPES',
@@ -165,7 +157,7 @@ const settingsMap = {
                     {
                         id: 'PII_REJECTION_CONFIDENCE_SCORE',
                         type: 'number',
-                        hint: 'Enter a number between 0.0 and 1.0. Only reject PII where Amazon Comprehend\'s confidence score is greater than this number',
+                        hint: 'Enter a number between 0.0 and 1.0 to set a threshold for PII rejection. Only PII detected with Amazon Comprehend\'s confidence score higher than this value will trigger rejection',
                     },
                     {
                         id: 'DISABLE_CLOUDWATCH_LOGGING',
@@ -647,7 +639,8 @@ async function sendAnonymizedData(params, settings){
     map.PII_REJECTION_ENABLED = settings.PII_REJECTION_ENABLED || 'false';
     map.EMBEDDINGS_ENABLE = settings.EMBEDDINGS_ENABLE || 'true';
     map.LLM_QA_ENABLE = settings.LLM_QA_ENABLE || 'true';
-
+    map.ENABLE_REDACTING = settings.ENABLE_REDACTING || 'false';
+    map.ENABLE_REDACTING_WITH_COMPREHEND = settings.ENABLE_REDACTING_WITH_COMPREHEND || 'false';
 
     const payload = Buffer.from(JSON.stringify(map));
     const client = new LambdaClient({
@@ -658,7 +651,7 @@ async function sendAnonymizedData(params, settings){
 
     const input = {
         FunctionName: params.solutionHelper,
-        InvocationType: "RequestResponse",
+        InvocationType: "Event",
         Payload: payload,
     };
     const command = new InvokeCommand(input);

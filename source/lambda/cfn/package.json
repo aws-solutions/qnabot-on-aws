@@ -1,6 +1,6 @@
 {
     "name": "cfn",
-    "version": "6.1.0",
+    "version": "6.1.5",
     "description": "QnABot Cfn Lambda",
     "main": "index.js",
     "scripts": {
@@ -28,12 +28,16 @@
         "@aws-sdk/client-s3": "^3.621.0",
         "@aws-sdk/credential-providers": "^3.621.0",
         "aws-sdk": "^2.1555.0",
-        "body-parser": "^1.20.2",
+        "body-parser": "^1.20.3",
         "cfn-lambda": "^5.1.0",
         "jszip": "^3.10.1",
         "lodash": "^4.17.21"
     },
     "overrides": {
-        "qs@<6.5.3": "^6.5.3"
+        "async": "^2.6.4",
+        "cross-spawn": "7.0.6",
+        "qs@<6.5.3": "^6.5.3",
+        "sinon": "^19.0.2",
+        "micromatch": "^4.0.8"
     }
 }

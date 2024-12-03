@@ -1,18 +1,11 @@
-/*********************************************************************************************************************
- *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.                                                *
- *                                                                                                                    *
- *  Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance    *
- *  with the License. A copy of the License is located at                                                             *
- *                                                                                                                    *
- *      http://www.apache.org/licenses/                                                                               *
- *                                                                                                                    *
- *  or in the 'license' file accompanying this file. This file is distributed on an 'AS IS' BASIS, WITHOUT WARRANTIES *
- *  OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions    *
- *  and limitations under the License.                                                                                *
- *********************************************************************************************************************/
+/** ************************************************************************************************
+*   Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.                             *
+*   SPDX-License-Identifier: Apache-2.0                                                            *
+ ************************************************************************************************ */
 
 const _ = require('lodash');
 const qnabot = require('qnabot/logging');
+const qna_settings = require('qnabot/settings');
 const handlebars = require('../handlebars');
 const kendra_fallback = require('../kendra');
 const kendra_retrieve = require('../kendraRetrieve');
@@ -24,6 +17,7 @@ const { encryptor } = require('./encryptor');
 const { runLlmQa } = require('./runLlmQa');
 const { updateResWithHit } = require('./updateResWithHit');
 const { bedrockRetrieveAndGenerate } = require('../bedrock/bedrockAgents');
+const { processKeysForRedact } = require('../redactHelper');
 
 async function runQuery(req, query_params, kendraIndex) {
     query_params.kendraIndex = kendraIndex;
@@ -136,6 +130,20 @@ async function invokeLambdaHook(hit, req, res) {
     const lambdaHook = _.get(hit, 'l');
     if (lambdaHook) {
         qnabot.log('Invoking Lambda Hook function: ', lambdaHook);
+        const redactEnabled = _.get(req, '_settings.ENABLE_REDACTING');
+        const redactComprehendEnabled  =_.get(req, '_settings.ENABLE_REDACTING_WITH_COMPREHEND', false);
+        if (lambdaHook.toLowerCase().includes('feedback') && (redactEnabled || redactComprehendEnabled) ) {
+            qna_settings.set_environment_variables(req._settings);
+            await qnabot.setPIIRedactionEnvironmentVars(
+                req._event.inputTranscript,
+                _.get(req, '_settings.ENABLE_REDACTING_WITH_COMPREHEND', false),
+                _.get(req, '_settings.REDACTING_REGEX', ''),
+                _.get(req, '_settings.COMPREHEND_REDACTING_ENTITY_TYPES', ''),
+                _.get(req, '_settings.COMPREHEND_REDACTING_CONFIDENCE_SCORE', 0.99),
+            );
+            processKeysForRedact(req, true)
+            processKeysForRedact(res, true)
+        }
         [req, res] = await invokeLambda(lambdaHook, req, res);
         // update hit with values returned in res by lambda hook
         _.set(hit, 'a', _.get(res, 'message', ''));

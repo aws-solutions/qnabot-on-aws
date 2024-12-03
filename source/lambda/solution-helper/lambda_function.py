@@ -89,6 +89,8 @@ def custom_map(settings):
     c_map['PII_REJECTION_ENABLED'] = settings.get('PII_REJECTION_ENABLED', 'false')
     c_map['EMBEDDINGS_ENABLE'] = settings.get('EMBEDDINGS_ENABLE', 'true')
     c_map['LLM_QA_ENABLE'] = settings.get('LLM_QA_ENABLE', 'true')
+    c_map['ENABLE_REDACTING'] = settings.get('ENABLE_REDACTING', 'false')
+    c_map['ENABLE_REDACTING_WITH_COMPREHEND'] = settings.get('ENABLE_REDACTING_WITH_COMPREHEND', 'false')
 
     return c_map
 

@@ -117,6 +117,22 @@
 					{
 						"text": "Not interested",
 						"value": "Not interested"
+					},
+					{
+						"text": "This is a placeholder button",
+						"value": "N/A"
+					},
+					{
+						"text": "This is a placeholder button",
+						"value": "N/A"
+					},
+					{
+						"text": "This is a placeholder button",
+						"value": "N/A"
+					},
+					{
+						"text": "This to test that 6 button show",
+						"value": "N/A"
 					}
 				],
 				"subTitle": "Echo Show",
