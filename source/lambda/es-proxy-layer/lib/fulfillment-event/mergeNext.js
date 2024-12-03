@@ -11,7 +11,7 @@ function mergeMarkdown(hit1, hit2) {
     const md1 = _.get(hit1, 'alt.markdown');
     let md1_to_merge = hit1.a
     if (md1) {
-        md1_to_merge = md1
+        md1_to_merge = md1.replace(/^[ \t]+/, '').replace(/[ \t]+$/, '')
     }
     qnabot.debug('markdown from first hit:', md1_to_merge)
 
@@ -19,7 +19,7 @@ function mergeMarkdown(hit1, hit2) {
     const md2 = _.get(hit2, 'alt.markdown');
     let md2_to_merge = hit2.a
     if (md2) {
-        md2_to_merge = md2
+        md2_to_merge = md2.replace(/^[ \t]+/, '').replace(/[ \t]+$/, '')
     }
     qnabot.debug('markdown from second hit:', md2_to_merge)
 
@@ -40,7 +40,7 @@ function mergeSSML(hit1, hit2) {
     if (ssml1) {
         // strip <speak> tags
         qnabot.debug('SSML from first hit:', ssml1)
-        ssml1_to_merge = ssml1.replace(/<speak>|<\/speak>/g, '');
+        ssml1_to_merge = ssml1.replace(/<speak>|<\/speak>/g, '').trim();
     }
 
     // get SSML from second item
@@ -49,7 +49,7 @@ function mergeSSML(hit1, hit2) {
     if (ssml2) {
         // strip <speak> tags
         qnabot.debug('SSML from second hit:', ssml2)
-        ssml2_to_merge = ssml2.replace(/<speak>|<\/speak>/g, '');
+        ssml2_to_merge = ssml2.replace(/<speak>|<\/speak>/g, '').trim();
     }
 
     // merge SSML, if present in either item
