@@ -375,6 +375,7 @@ module.exports = {
                     ES_ENDPOINT: { Ref: 'EsEndpoint' },
                     ES_PROXY: { Ref: 'EsProxyLambda' },
                     OUTPUT_S3_BUCKET: { Ref: 'ContentDesignerOutputBucket' },
+                    SETTINGS_TABLE: { Ref: 'SettingsTable' },
                     ...util.getCommonEnvironmentVariables(),
                 },
             },
@@ -431,6 +432,21 @@ module.exports = {
                 util.basicLambdaExecutionPolicy(),
                 util.lambdaVPCAccessExecutionRole(),
                 util.xrayDaemonWriteAccess(),
+                {
+                    PolicyName: 'SettingsTableReadAccess',
+                    PolicyDocument: {
+                        Version: '2012-10-17',
+                        Statement: [
+                            {
+                                Effect: 'Allow',
+                                Action: [
+                                    'dynamodb:Scan',
+                                ],
+                                Resource: [{  'Fn::Sub': "arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${SettingsTable}" }],
+                            },
+                        ],
+                    },
+                }
             ],
             Path: '/',
             ManagedPolicyArns: [{ Ref: 'ExportPolicy' }],
@@ -509,9 +525,7 @@ module.exports = {
             },
             Environment: {
                 Variables: {
-                    DEFAULT_SETTINGS_PARAM: { Ref: 'DefaultQnABotSettings' },
-                    PRIVATE_SETTINGS_PARAM: { Ref: 'PrivateQnABotSettings' },
-                    CUSTOM_SETTINGS_PARAM: { Ref: 'CustomQnABotSettings' },
+                    SETTINGS_TABLE: { Ref: 'SettingsTable' },
                     OUTPUT_S3_BUCKET: { Ref: 'ContentDesignerOutputBucket' },
                     KENDRA_ROLE: { 'Fn::GetAtt': ['KendraS3Role', 'Arn'] },
                     REGION: { Ref: 'AWS::Region' },
@@ -572,12 +586,28 @@ module.exports = {
                         },
                         Action: 'sts:AssumeRole',
                     },
+
                 ],
             },
             Policies: [
                 util.basicLambdaExecutionPolicy(),
                 util.lambdaVPCAccessExecutionRole(),
                 util.xrayDaemonWriteAccess(),
+                {
+                    PolicyName: "SettingsTableReadAccess",
+                    PolicyDocument: {
+                      Version: "2012-10-17",
+                      Statement: [
+                        {
+                          Effect: "Allow",
+                          Action: [
+                            "dynamodb:Scan",
+                          ],
+                          Resource: [{  'Fn::Sub': "arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${SettingsTable}" }],
+                        },
+                      ],
+                    },
+                },
             ],
             Path: '/',
             ManagedPolicyArns: [{ 'Fn::If': ['CreateKendraSyncPolicy', { Ref: 'KendraSyncPolicy' }, { Ref: 'AWS::NoValue' }] }],
@@ -863,58 +893,6 @@ module.exports = {
         },
     },
 
-    KendraTopicApiGateRole: {
-        Type: 'AWS::IAM::Role',
-        Properties: {
-            AssumeRolePolicyDocument: {
-                Version: '2012-10-17',
-                Statement: [
-                    {
-                        Effect: 'Allow',
-                        Principal: {
-                            Service: ['apigateway.amazonaws.com'],
-                        },
-                        Action: ['sts:AssumeRole'],
-                    },
-                ],
-            },
-            Path: '/',
-            Policies: [
-                {
-                    PolicyName: 'GatewayRolePolicy',
-                    PolicyDocument: {
-                        Version: '2012-10-17',
-                        Statement: [
-                            {
-                                Effect: 'Allow',
-                                Action: ['sns:Publish'],
-                                Resource: { Ref: 'KendraCrawlerSnsTopic' },
-                            },
-                            {
-                                Effect: 'Allow',
-                                Action: ['logs:PutLogEvents', 'logs:CreateLogGroup', 'logs:CreateLogStream'],
-                                Resource: [
-                                    {
-                                        'Fn::Sub':
-                                            'arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:*',
-                                    },
-                                    {
-                                        'Fn::Sub':
-                                            'arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:*:log-stream:*',
-                                    },
-                                ],
-                            },
-                        ],
-                    },
-                },
-            ],
-        },
-        Metadata: {
-            cfn_nag: util.cfnNag(['W11']),
-            guard: util.cfnGuard('IAM_NO_INLINE_POLICY_CHECK'),
-        },
-    },
-
     ParameterChangeRuleKendraCrawlerPermission: {
         Type: 'AWS::Lambda::Permission',
         Properties: {
@@ -926,31 +904,33 @@ module.exports = {
             SourceArn: {
                 'Fn::GetAtt': ['CloudWatchEventRule', 'Arn'],
             },
+
         },
+
     },
+
     CloudWatchEventRule: {
-        Type: 'AWS::Events::Rule',
-        Properties: {
-            Description: 'Parameter Setting Change',
-            EventPattern: {
-                source: ['aws.ssm'],
-                'detail-type': ['Parameter Store Change'],
-                detail: {
-                    name: [{ Ref: 'CustomQnABotSettings' }],
-                    operation: ['Update'],
-                },
-            },
-            State: 'ENABLED',
-            Targets: [
-                // Add Lambda targets here as needed
-                {
-                    Arn: {
-                        'Fn::GetAtt': ['KendraNativeCrawlerScheduleUpdateLambda', 'Arn'],
-                    },
-                    Id: 'KendraCrawler',
-                },
-            ],
+    Type: 'AWS::Events::Rule',
+    Properties: {
+        Description: 'DynamoDB Table Update',
+        EventPattern: {
+            source: ['aws.dynamodb'],
+            detail: {
+                requestParameters: {
+                    tableName: [{ Ref: 'SettingsTable' }]
+                }
+            }
         },
+        State: 'ENABLED',
+        Targets: [
+            {
+                Arn: {
+                    'Fn::GetAtt': ['KendraNativeCrawlerScheduleUpdateLambda', 'Arn']
+                },
+                Id: 'KendraCrawler'
+            }
+            ]
+        }
     },
 
     KendraNativeCrawlerRole: {
@@ -976,6 +956,23 @@ module.exports = {
                     },
                 ],
             },
+            Policies: [
+                {
+                    PolicyName: 'SettingsTableReadAccess',
+                    PolicyDocument: {
+                        Version: '2012-10-17',
+                        Statement: [
+                            {
+                                Effect: 'Allow',
+                                Action: [
+                                    'dynamodb:Scan',
+                                ],
+                                Resource: [{  'Fn::Sub': "arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${SettingsTable}" }],
+                            },
+                        ],
+                    },
+                }
+            ],
             Path: '/',
             ManagedPolicyArns: [
                 'arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole',
@@ -1189,18 +1186,14 @@ module.exports = {
             },
             Environment: {
                 Variables: {
-                    DEFAULT_SETTINGS_PARAM: { Ref: 'DefaultQnABotSettings' },
-                    PRIVATE_SETTINGS_PARAM: { Ref: 'PrivateQnABotSettings' },
-                    CUSTOM_SETTINGS_PARAM: { Ref: 'CustomQnABotSettings' },
                     ROLE_ARN: { 'Fn::GetAtt': ['KendraNativeCrawlerPassRole', 'Arn'] },
+                    SETTINGS_TABLE: { Ref: 'SettingsTable' },
                     DATASOURCE_NAME: {
                         'Fn::Join': [
                             '-',
                             [
                                 'QNABotKendraNativeCrawler',
-                                {
-                                    'Fn::Select': [2, { 'Fn::Split': ['-', { Ref: 'DefaultQnABotSettings' }] }],
-                                },
+                                { 'Fn::Select': ['0', { 'Fn::Split': ['-', { Ref: 'AWS::StackName' }] }] },
                                 'v2',
                             ],
                         ],
@@ -1210,9 +1203,7 @@ module.exports = {
                             '-',
                             [
                                 'QNABotKendraDashboard',
-                                {
-                                    'Fn::Select': [2, { 'Fn::Split': ['-', { Ref: 'DefaultQnABotSettings' }] }],
-                                },
+                                { 'Fn::Select': ['0', { 'Fn::Split': ['-', { Ref: 'AWS::StackName' }] }] },
                                 'v2',
                             ],
                         ],
@@ -1306,17 +1297,13 @@ module.exports = {
             Environment: {
                 Variables: {
                     ROLE_ARN: { 'Fn::GetAtt': ['KendraNativeCrawlerPassRole', 'Arn'] },
-                    DEFAULT_SETTINGS_PARAM: { Ref: 'DefaultQnABotSettings' },
-                    PRIVATE_SETTINGS_PARAM: { Ref: 'PrivateQnABotSettings' },
-                    CUSTOM_SETTINGS_PARAM: { Ref: 'CustomQnABotSettings' },
+                    SETTINGS_TABLE: { Ref: 'SettingsTable' },
                     DATASOURCE_NAME: {
                         'Fn::Join': [
                             '-',
                             [
                                 'QNABotKendraNativeCrawler',
-                                {
-                                    'Fn::Select': [2, { 'Fn::Split': ['-', { Ref: 'DefaultQnABotSettings' }] }],
-                                },
+                                { 'Fn::Select': ['0', { 'Fn::Split': ['-', { Ref: 'AWS::StackName' }] }] },
                                 'v2',
                             ],
                         ],
@@ -1391,17 +1378,13 @@ module.exports = {
             },
             Environment: {
                 Variables: {
-                    DEFAULT_SETTINGS_PARAM: { Ref: 'DefaultQnABotSettings' },
-                    PRIVATE_SETTINGS_PARAM: { Ref: 'PrivateQnABotSettings' },
-                    CUSTOM_SETTINGS_PARAM: { Ref: 'CustomQnABotSettings' },
+                    SETTINGS_TABLE: { Ref: 'SettingsTable' },
                     DATASOURCE_NAME: {
                         'Fn::Join': [
                             '-',
                             [
                                 'QNABotKendraNativeCrawler',
-                                {
-                                    'Fn::Select': [2, { 'Fn::Split': ['-', { Ref: 'DefaultQnABotSettings' }] }],
-                                },
+                                { 'Fn::Select': ['0', { 'Fn::Split': ['-', { Ref: 'AWS::StackName' }] }] },
                                 'v2',
                             ],
                         ],
@@ -1411,9 +1394,7 @@ module.exports = {
                             '-',
                             [
                                 'QNABotKendraDashboard',
-                                {
-                                    'Fn::Select': [2, { 'Fn::Split': ['-', { Ref: 'DefaultQnABotSettings' }] }],
-                                },
+                                { 'Fn::Select': ['0', { 'Fn::Split': ['-', { Ref: 'AWS::StackName' }] }] },
                                 'v2',
                             ],
                         ],
@@ -1498,51 +1479,6 @@ module.exports = {
                             ],
                         },
                         { Ref: 'AWS::NoValue' }],
-                    },
-                    {
-                        Effect: 'Allow',
-                        Action: ['ssm:GetParameter'],
-                        Resource: [
-                            {
-                                'Fn::Join': [
-                                    '',
-                                    [
-                                        'arn:aws:ssm:',
-                                        { Ref: 'AWS::Region' },
-                                        ':',
-                                        { Ref: 'AWS::AccountId' },
-                                        ':parameter/',
-                                        { Ref: 'CustomQnABotSettings' },
-                                    ],
-                                ],
-                            },
-                            {
-                                'Fn::Join': [
-                                    '',
-                                    [
-                                        'arn:aws:ssm:',
-                                        { Ref: 'AWS::Region' },
-                                        ':',
-                                        { Ref: 'AWS::AccountId' },
-                                        ':parameter/',
-                                        { Ref: 'DefaultQnABotSettings' },
-                                    ],
-                                ],
-                            },
-                            {
-                                'Fn::Join': [
-                                    '',
-                                    [
-                                        'arn:aws:ssm:',
-                                        { Ref: 'AWS::Region' },
-                                        ':',
-                                        { Ref: 'AWS::AccountId' },
-                                        ':parameter/',
-                                        { Ref: 'PrivateQnABotSettings' },
-                                    ],
-                                ],
-                            },
-                        ],
                     },
                     {
                         Effect: 'Allow',

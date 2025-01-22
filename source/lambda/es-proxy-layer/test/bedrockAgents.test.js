@@ -3,12 +3,13 @@
 *   SPDX-License-Identifier: Apache-2.0                                                            *
  ************************************************************************************************ */
 
-const { BedrockAgentRuntimeClient, RetrieveAndGenerateCommand } = require("@aws-sdk/client-bedrock-agent-runtime");
+const { BedrockAgentRuntimeClient, RetrieveAndGenerateCommand, RetrieveAndGenerateStreamCommand } = require("@aws-sdk/client-bedrock-agent-runtime");
 const { mockClient } = require('aws-sdk-client-mock');
 const bedRockAgentMock = mockClient(BedrockAgentRuntimeClient);
 const presigner = require('@aws-sdk/s3-request-presigner');
 const qnabot = require('qnabot/logging');
 const { bedrockRetrieveAndGenerate } = require('../lib/bedrock/bedrockAgents');
+const { getConnectionId } = require('../lib/getConnectionId');
 const _ = require('lodash');
 require('aws-sdk-client-mock-jest');
 
@@ -16,6 +17,9 @@ const region = process.env.AWS_REGION || 'us-east-1';
 
 jest.mock('qnabot/logging');
 jest.mock('@aws-sdk/s3-request-presigner');
+jest.mock('../lib/getConnectionId', () => ({
+    getConnectionId: jest.fn().mockResolvedValue('test-connection-id')
+}));
 
 const promptTemplate = 'test-bedrock-agent-prompt';
 const req = {
@@ -35,8 +39,16 @@ const req = {
         KNOWLEDGE_BASE_MODEL_PARAMS: '{"temperature":0.3, "maxTokens": 245, "topP": 0.9 }',
         BEDROCK_GUARDRAIL_IDENTIFIER: '',
         BEDROCK_GUARDRAIL_VERSION: '',
+        LLM_STREAMING_ENABLED: false,
+        STREAMING_TABLE: ''
     },
-    _preferredResponseType: 'text'
+    _preferredResponseType: 'text',
+    _event: {
+        sessionId: 'test-session-id',
+        sessionState: {
+            sessionAttributes: {}
+        }
+    }
 }
 
 const res = {
@@ -80,16 +92,7 @@ const response = {
 }
 
 const expectedResult = {
-    a: 'Bedrock Agent:\n' +
-        '\n' +
-        'Amazon EC2 (Amazon Elastic Compute Cloud) is a web service that provides secure, resizable compute capacity in the cloud.\n' +
-        '\n' +
-        '  compute capacity in the cloud.\n' +
-        '\n' +
-        '  Deploy a Web UI' +
-        '\n' +
-        '\n' +
-        '  Source Link: https://signedurl.s3.amazonaws.com/aws-overview.pdf, https://aws.amazon.com/blogs/machine-learning/deploy-a-web-ui-for-your-chatbot/',
+    a: 'Amazon EC2 (Amazon Elastic Compute Cloud) is a web service that provides secure, resizable compute capacity in the cloud.',
     alt: {
         markdown: '\n**Bedrock Agent:**\n' +
             '\n' +
@@ -175,6 +178,315 @@ describe('bedrockAgents', () => {
             expectedResult
         ]);
     });
+
+    test('bedrockRetrieveAndGenerate returns correct response when streaming response with existing sessionId', async () => {
+        const sessionId = 'testSessionId';
+        res._userInfo.knowledgeBaseSessionId = sessionId
+       
+    
+        const response = {
+            sessionId: sessionId,
+            output: {
+                text: 'This is a test response.'
+            },
+            citations: [{
+                citation: {
+                    generatedResponsePart: {
+                        textResponsePart: {
+                            span: {
+                                start: 0,
+                                end: 23
+                            },
+                            text: "This is a test response."
+                        }
+                    },
+                    retrievedReferences: [{
+                        content: {
+                            text: "Test content",
+                            type: "TEXT"
+                        },
+                        location: {
+                            type: "WEB",
+                            webLocation: {
+                                url: "test-uri"
+                            }
+                        },
+                        metadata: {
+                            title: "Test Document"
+                        }
+                    }]
+                }
+            }],
+            stream: {
+                *[Symbol.asyncIterator]() {
+                    yield {
+                        output: { text: 'This is a ' },
+                    };
+                    yield {
+                        output: { text: 'test response.' },
+                    };
+                    yield {
+                        citation: {
+                            citation: {
+                                generatedResponsePart: {
+                                    textResponsePart: {
+                                        span: {
+                                            start: 0,
+                                            end: 23
+                                        },
+                                        text: "This is a test response."
+                                    }
+                                },
+                                retrievedReferences: [{
+                                    content: {
+                                        text: "Test content",
+                                        type: "TEXT"
+                                    },
+                                    location: {
+                                        type: "WEB",
+                                        webLocation: {
+                                            url: "test-uri"
+                                        }
+                                    },
+                                    metadata: {
+                                        title: "Test Document"
+                                    }
+                                }]
+                            }
+                        }
+                    };
+                }
+            }
+        };
+        response.sessionId = sessionId
+        const modifiedReq = _.cloneDeep(req);
+        modifiedReq._settings.LLM_STREAMING_ENABLED = true;
+        modifiedReq._settings.STREAMING_TABLE = 'test-streaming-table';
+        modifiedReq._event.sessionState.sessionAttributes.streamingEndpoint = 'test-streaming-endpoint';
+    
+        bedRockAgentMock.on(RetrieveAndGenerateStreamCommand).resolves(response);
+    
+        const expectedResult = {
+            a: "This is a test response.",
+            alt: {
+                markdown: '\n**Bedrock Agent:**\n' +
+                '\n' +
+                'This is a test response.\n\n<details>' +
+                '\n' +
+                '            <summary>Context</summary>\n' +
+                '            <p style="white-space: pre-line;">\n' +
+                '\n' +
+                '***\n' +
+                '\n' +
+                ' <br>\n' +
+                '\n' +
+                '  Test content</p>\n' +
+                '            </details>\n' +
+                '            <br>' +
+                '\n' +
+                '\n' +
+                '  Source Link: <span translate=no>[test-uri](test-uri)</span>',
+            ssml: '<speak> This is a test response. </speak>',
+            },
+            answersource: "BEDROCK KNOWLEDGE BASE",
+            type: "text"
+        };
+        const result = await bedrockRetrieveAndGenerate(modifiedReq, res);
+    
+        expect(bedRockAgentMock).toHaveReceivedCommandTimes(RetrieveAndGenerateStreamCommand, 1);
+        expect(bedRockAgentMock).toHaveReceivedCommandWith(RetrieveAndGenerateStreamCommand, {
+            input: {
+                text: 'what is ec2?',
+            },
+            retrieveAndGenerateConfiguration: {
+                knowledgeBaseConfiguration: {
+                    knowledgeBaseId: 'testKnowledgeBaseId',
+                    modelArn: `arn:aws:bedrock:${region}::foundation-model/testModel`,
+                    retrievalConfiguration: {
+                        vectorSearchConfiguration: {
+                            numberOfResults: 1
+                        }
+                    },
+                    generationConfiguration: {
+                        promptTemplate: {
+                            textPromptTemplate: promptTemplate,
+                        },
+                        inferenceConfig: {
+                            textInferenceConfig: {
+                                "maxTokens": 245,
+                                "temperature": 0.3,
+                                "topP": 0.9
+                            },
+                        },
+                    },
+                },
+                type: 'KNOWLEDGE_BASE',
+            },
+        });
+    
+        expect(result).toStrictEqual([
+            {
+                _userInfo: { knowledgeBaseSessionId: "testSessionId" },
+                got_hits: 1,
+                session: { qnabot_gotanswer: true },
+            },
+            expectedResult
+        ]);
+    });
+
+    test('bedrockRetrieveAndGenerate returns correct response when streaming response', async () => {
+        const sessionId = 'newSessionId';
+    
+        const response = {
+            sessionId: sessionId,
+            output: {
+                text: 'This is a test response.'
+            },
+            citations: [{
+                citation: {
+                    generatedResponsePart: {
+                        textResponsePart: {
+                            span: {
+                                start: 0,
+                                end: 23
+                            },
+                            text: "This is a test response."
+                        }
+                    },
+                    retrievedReferences: [{
+                        content: {
+                            text: "Test content",
+                            type: "TEXT"
+                        },
+                        location: {
+                            type: "WEB",
+                            webLocation: {
+                                url: "test-uri"
+                            }
+                        },
+                        metadata: {
+                            title: "Test Document"
+                        }
+                    }]
+                }
+            }],
+            stream: {
+                *[Symbol.asyncIterator]() {
+                    yield {
+                        output: { text: 'This is a ' },
+                    };
+                    yield {
+                        output: { text: 'test response.' },
+                    };
+                    yield {
+                        citation: {
+                            citation: {
+                                generatedResponsePart: {
+                                    textResponsePart: {
+                                        span: {
+                                            start: 0,
+                                            end: 23
+                                        },
+                                        text: "This is a test response."
+                                    }
+                                },
+                                retrievedReferences: [{
+                                    content: {
+                                        text: "Test content",
+                                        type: "TEXT"
+                                    },
+                                    location: {
+                                        type: "WEB",
+                                        webLocation: {
+                                            url: "test-uri"
+                                        }
+                                    },
+                                    metadata: {
+                                        title: "Test Document"
+                                    }
+                                }]
+                            }
+                        }
+                    };
+                }
+            }
+        };
+    
+        const modifiedReq = _.cloneDeep(req);
+        modifiedReq._settings.LLM_STREAMING_ENABLED = true;
+        modifiedReq._settings.STREAMING_TABLE = 'test-streaming-table';
+        modifiedReq._event.sessionState.sessionAttributes.streamingEndpoint = 'test-streaming-endpoint';
+    
+        bedRockAgentMock.on(RetrieveAndGenerateStreamCommand).resolves(response);
+    
+        const expectedResult = {
+            a: "This is a test response.",
+            alt: {
+                markdown: '\n**Bedrock Agent:**\n' +
+                '\n' +
+                'This is a test response.\n\n<details>' +
+                '\n' +
+                '            <summary>Context</summary>\n' +
+                '            <p style="white-space: pre-line;">\n' +
+                '\n' +
+                '***\n' +
+                '\n' +
+                ' <br>\n' +
+                '\n' +
+                '  Test content</p>\n' +
+                '            </details>\n' +
+                '            <br>' +
+                '\n' +
+                '\n' +
+                '  Source Link: <span translate=no>[test-uri](test-uri)</span>',
+            ssml: '<speak> This is a test response. </speak>',
+            },
+            answersource: "BEDROCK KNOWLEDGE BASE",
+            type: "text"
+        };
+        const result = await bedrockRetrieveAndGenerate(modifiedReq, res);
+    
+        expect(bedRockAgentMock).toHaveReceivedCommandTimes(RetrieveAndGenerateStreamCommand, 1);
+        expect(bedRockAgentMock).toHaveReceivedCommandWith(RetrieveAndGenerateStreamCommand, {
+            input: {
+                text: 'what is ec2?',
+            },
+            retrieveAndGenerateConfiguration: {
+                knowledgeBaseConfiguration: {
+                    knowledgeBaseId: 'testKnowledgeBaseId',
+                    modelArn: `arn:aws:bedrock:${region}::foundation-model/testModel`,
+                    retrievalConfiguration: {
+                        vectorSearchConfiguration: {
+                            numberOfResults: 1
+                        }
+                    },
+                    generationConfiguration: {
+                        promptTemplate: {
+                            textPromptTemplate: promptTemplate,
+                        },
+                        inferenceConfig: {
+                            textInferenceConfig: {
+                                "maxTokens": 245,
+                                "temperature": 0.3,
+                                "topP": 0.9
+                            },
+                        },
+                    },
+                },
+                type: 'KNOWLEDGE_BASE',
+            },
+        });
+    
+        expect(result).toStrictEqual([
+            {
+                _userInfo: { knowledgeBaseSessionId: "newSessionId" },
+                got_hits: 1,
+                session: { qnabot_gotanswer: true },
+            },
+            expectedResult
+        ]);
+    });
+    
 
 
     test('bedrockRetrieveAndGenerate returns correct body when sessionId is existing', async () => {
@@ -598,7 +910,7 @@ describe('bedrockAgents', () => {
 
         await expect(bedrockRetrieveAndGenerate(req, res)).rejects.toThrowError(e);
         expect(bedRockAgentMock).toHaveReceivedCommandTimes(RetrieveAndGenerateCommand, 1);
-        expect(qnabot.log).toHaveBeenCalledTimes(4);
+        expect(qnabot.log).toHaveBeenCalledTimes(3);
 
     });
 

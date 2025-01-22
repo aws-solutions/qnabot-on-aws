@@ -28,7 +28,7 @@
         "Fn::Join": [
         "",
         [
-            {
+            { 
               "Fn::Select": ["0", 
               { 
                 "Fn::Split": ["-", 
@@ -195,43 +195,26 @@
               {
                 "Effect": "Allow",
                 "Action": [
-                  "ssm:GetParameters",
-                  "ssm:GetParameter"
-                ],
-                "Resource": [
-                  {
-                    "Fn::Sub": "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${DefaultQnABotSettings}"
-                  },
-                  {
-                    "Fn::Sub": "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${CustomQnABotSettings}"
-                  },
-                  {
-                    "Fn::Sub": "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${PrivateQnABotSettings}"
-                  }
-                ]
-              },
-              {
-                "Effect": "Allow",
-                "Action": [
-                  "ssm:PutParameter"
-                ],
-                "Resource": [
-                  {
-                    "Fn::Sub": "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${DefaultQnABotSettings}"
-                  },
-                  {
-                    "Fn::Sub": "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${CustomQnABotSettings}"
-                  }
-                ]
-              },
-              {
-                "Effect": "Allow",
-                "Action": [
                   "lambda:InvokeFunction"
                 ],
                 "Resource": [
                   {
                     "Fn::Sub": "arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${SolutionHelper}"
+                  }
+                ]
+              },
+              {
+                "Effect": "Allow",
+                "Action": [
+                  "dynamodb:GetItem",
+                  "dynamodb:PutItem",
+                  "dynamodb:Scan",
+                  "dynamodb:UpdateItem",
+                  "dynamodb:DeleteItem"
+                ],
+                "Resource": [
+                  {
+                    "Fn::Sub": "arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${SettingsTable}"
                   }
                 ]
               }
@@ -304,8 +287,47 @@
           },
           "-UserRole"
         ]
-    ]}
-    }
+    ]},
+    "Policies": [
+      {
+        "Fn::If": [
+          "StreamingEnabled",
+          {
+            "PolicyName": "StreamingApiAccess",
+            "PolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "execute-api:Invoke"
+                  ],
+                  "Resource": [
+                    {
+                      "Fn::Join": ["", [
+                        "arn:",
+                        { "Fn::Sub": "${AWS::Partition}" },
+                        ":execute-api:",
+                        { "Fn::Sub": "${AWS::Region}" },
+                        ":",
+                        { "Fn::Sub": "${AWS::AccountId}" },
+                        ":",
+                        { "Fn::GetAtt": ["StreamingStack", "Outputs.StreamingWebSocketApiId"] },
+                        "/Prod/*"
+                      ]]
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "Ref": "AWS::NoValue"
+          }
+        ]
+      }
+    ]   
+  }
   },
   "UnauthenticatedRole": {
     "Type": "AWS::IAM::Role",
@@ -421,16 +443,24 @@
           "PolicyName": "LambdaFunctionServiceRolePolicy"
         },
         {
-          "PolicyName": "OpenSearchAccessPolicy",
+          "PolicyName": "CFNAccess",
           "PolicyDocument": {
             "Version": "2012-10-17",
             "Statement": [
               {
                 "Effect": "Allow",
                 "Action": [
-                  "es:*"
+                  "es:ESHttp*",
+                  "es:UpdateDomainConfig",
+                  "es:DescribeDomain",
+                  "es:DescribeDomains",
+                  "es:DescribeDomainConfig"
                 ],
-                "Resource": ["*"] 
+                "Resource": [
+                  {
+                    "Fn::Sub": "arn:${AWS::Partition}:es:${AWS::Region}:${AWS::AccountId}:domain*"
+                  }
+                ]
               },
               {
                 "Effect": "Allow",
@@ -527,7 +557,8 @@
                   "s3:GetObject",
                   "s3:DeleteObjectVersion",
                   "s3:DeleteObject",
-                  "s3:GetObjectVersion"
+                  "s3:GetObjectVersion",
+                  "s3:ListBucket"
                 ],
                 "Resource": [
                   {
@@ -588,6 +619,49 @@
                 "Resource": [
                   { "Fn::Sub": "arn:${AWS::Partition}:s3:::*" }
                 ]
+              }
+            ]
+          }
+        },
+        {
+          "PolicyName": "SettingsInitializerCustomResourcePolicy",
+          "PolicyDocument": {
+            "Version": "2012-10-17",
+            "Statement": [
+              {
+                "Effect": "Allow",
+                "Action": [
+                  "dynamodb:PutItem",
+                  "dynamodb:Scan",
+                  "dynamodb:GetItem",
+                  "dynamodb:UpdateItem"
+                ],
+                "Resource": [
+                  {
+                    "Fn::GetAtt": ["SettingsTable","Arn"]
+                  }
+                ]
+              },
+              {
+                "Effect":"Allow",
+                "Action": [
+                  "ssm:DescribeParameters"
+                ],
+                "Resource": [
+                  {"Fn::Sub": "arn:${AWS::Partition}:ssm:${AWS::Region}:${AWS::AccountId}:*" }
+              ]
+              },
+              {
+                "Effect": "Allow",
+                "Action": [
+                  "ssm:GetParameter",
+                  "ssm:DeleteParameter"
+                ],
+                "Resource": [
+                  {"Fn::Sub": "arn:${AWS::Partition}:ssm:${AWS::Region}:${AWS::AccountId}:parameter/CFN-CustomQnABotSettings-*" },
+                  {"Fn::Sub": "arn:${AWS::Partition}:ssm:${AWS::Region}:${AWS::AccountId}:parameter/CFN-PrivateQnABotSettings-*" },
+                  {"Fn::Sub": "arn:${AWS::Partition}:ssm:${AWS::Region}:${AWS::AccountId}:parameter/CFN-DefaultQnABotSettings-*" }
+              ]
               }
             ]
           }

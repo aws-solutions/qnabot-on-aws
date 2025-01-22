@@ -15,9 +15,9 @@
   "license": "Apache-2.0",
   "dependencies": {
     "@aws-crypto/sha256-js": "^5.2.0",
-    "@smithy/node-http-handler": "^2.3.1",
-    "@smithy/protocol-http": "^3.1.1",
-    "@smithy/signature-v4": "^2.1.1",
-    "@smithy/util-retry": "^2.1.1"
+    "@smithy/node-http-handler": "^3.3.2",
+    "@smithy/protocol-http": "^4.1.8",
+    "@smithy/signature-v4": "^4.2.4",
+    "@smithy/util-retry": "^3.0.11"
   }
 }

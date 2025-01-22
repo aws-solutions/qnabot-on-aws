@@ -29,6 +29,14 @@
       "q": [
         "Can I have a question but no answer?"
       ]
+    },
+    {
+      "a": "Questions/Utterances with over 140 Characters cannot be imported",
+      "type": "qna",
+      "qid": "QuestionCharLimit.001",
+      "q": [
+        "What will happen if I try to import a .json and/or excel (.xlsx) file containing a question/utterance with over 140 characters like this one?"
+      ]
     }
   ]
 }

@@ -35,13 +35,13 @@ module.exports = {
     AltSearchKendraIndexAuth: 'false',
     XraySetting: 'FALSE',
     EmbeddingsLambdaArn: '',
-    LLMSagemakerInstanceType: 'ml.g5.12xlarge',
     LLMLambdaArn: '',
     devOpenSearchNodeCount: 1,
     OpenSearchInstanceType: 'm6g.large.search',
     OpenSearchFineGrainAccessControl: 'TRUE',
     VPCSubnetIdList: '',
     VPCSecurityGroupIdList: '',
+    EnableStreaming: 'FALSE'
 };
 
 if (require.main === module) {

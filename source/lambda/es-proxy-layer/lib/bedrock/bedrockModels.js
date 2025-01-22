@@ -1,16 +1,12 @@
 /** ************************************************************************************************
-*   Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.                             *
-*   SPDX-License-Identifier: Apache-2.0                                                            *
+ *   Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.                             *
+ *   SPDX-License-Identifier: Apache-2.0                                                            *
  ************************************************************************************************ */
 
 const qnabot = require('qnabot/logging');
-const { Ai21 } = require('./Ai21');
-const { AmazonLlm } = require('./AmazonLlm');
 const { AmazonEmbeddings } = require('./AmazonEmbeddings');
-const { Anthropic } = require('./Anthropic');
-const { CohereLlm } = require('./CohereLlm');
+const { BedrockLlm } = require('./bedrockLLMProvider');
 const { CohereEmbeddings } = require('./CohereEmbeddings');
-const { Meta } = require('./Meta');
 const { bedrockClient } = require('./bedrockClient');
 
 function getModelProvider(modelId) {
@@ -24,32 +20,41 @@ function isEmbedding(modelId) {
 function getProviderClass(modelId) {
     const modelProvider = getModelProvider(modelId);
     const isEmbeddingModel = isEmbedding(modelId);
-    switch (modelProvider) {
-    case 'ai21':
-        return new Ai21();
-    case 'amazon':
-        return isEmbeddingModel ? new AmazonEmbeddings() : new AmazonLlm();
-    case 'anthropic':
-        return new Anthropic();
-    case 'cohere':
-        return isEmbeddingModel ? new CohereEmbeddings() : new CohereLlm();
-    case 'meta':
-        return new Meta();
-    default:
+    const providerMap = {
+        ai21: BedrockLlm,
+        amazon: isEmbeddingModel ? AmazonEmbeddings : BedrockLlm,
+        anthropic: BedrockLlm,
+        cohere: isEmbeddingModel ? CohereEmbeddings : BedrockLlm,
+        meta: BedrockLlm,
+        mistral: BedrockLlm
+    };
+    
+    const Provider = providerMap[modelProvider];
+    
+    if (!Provider) {
         throw new Error(`Unsupported model provider: ${modelProvider}`);
     }
+    return new Provider();
 }
-
-async function invokeBedrockModel(modelId, parameters, prompt, guardrails) {
+    
+async function invokeBedrockModel(modelId, prompt, options = {}) {
+    const { parameters = {}, system, guardrails = {}, streamingAttributes, query, context } = options;
     const modelProvider = getProviderClass(modelId);
     modelProvider.setParameters(parameters);
     modelProvider.setPrompt(prompt);
-    const body = modelProvider.getParameters();
-    qnabot.debug(`Bedrock Invoke model body: ${body}`);
+    if (system) {
+        modelProvider.setSystemPrompt(system);
+    }
 
-    const response = await bedrockClient(modelId, body, guardrails);
-    const generatedText = modelProvider.getResponseBody(response);
-    return generatedText;
+    if (!isEmbedding(modelId) && Object.keys(guardrails).length > 0) {
+        modelProvider.setGuardrails(guardrails, query, context);
+    }
+    const input = modelProvider.getParameters();
+    qnabot.log(`Bedrock Model ID ${modelId} Input: ${JSON.stringify(input, null, 2)}`);
+
+    const response = await bedrockClient(modelId, input, streamingAttributes);
+    return isEmbedding(modelId) ? modelProvider.getResponseBody(response) : response;
+
 }
 
 exports.invokeBedrockModel = invokeBedrockModel;

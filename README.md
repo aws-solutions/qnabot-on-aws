@@ -26,30 +26,40 @@ The high-level process flow for the solution components deployed with the AWS Cl
 
 3. The admin configures questions and answers in the Content Designer and the UI sends requests to Amazon API Gateway to save the questions and answers.
 
-4. The `Content Designer` [AWS Lambda](http://aws.amazon.com/lambda/) function saves the input in [Amazon OpenSearch Service](http://aws.amazon.com/opensearch-service/) in a questions bank index. If using [text embeddings](source/docs/semantic_matching_using_LLM_embeddings/README.md), these requests will first pass through a LLM model hosted on [Amazon Bedrock](https://aws.amazon.com/bedrock/) or [Amazon SageMaker](https://aws.amazon.com/sagemaker/) to generate embeddings before being saved into the question bank on OpenSearch. In addition, the `Content Designer` saves default and custom [configuration settings](https://docs.aws.amazon.com/solutions/latest/qnabot-on-aws/modifying-configuration-settings.html) in [AWS Systems Manager Parameter Store](https://aws.amazon.com/systems-manager/features/#Parameter_Store). 
+4. The `Content Designer` [AWS Lambda](http://aws.amazon.com/lambda/) function saves the input in [Amazon OpenSearch Service](http://aws.amazon.com/opensearch-service/) in a questions bank index. If using [text embeddings](source/docs/semantic_matching_using_LLM_embeddings/README.md), these requests will first pass through a LLM model hosted on [Amazon Bedrock](https://aws.amazon.com/bedrock/) to generate embeddings before being saved into the question bank on OpenSearch. In addition, the `Content Designer` saves default and custom [configuration settings](https://docs.aws.amazon.com/solutions/latest/qnabot-on-aws/modifying-configuration-settings.html) in [Amazon DynamoDB](https://aws.amazon.com/dynamodb/). 
 
 5. Users of the chatbot interact with Amazon Lex via the web client UI, [Amazon Alexa](https://developer.amazon.com/en-US/alexa) or [Amazon Connect](https://aws.amazon.com/connect/). 
 
-6. Amazon Lex forwards requests to the `Bot Fulfillment` AWS Lambda function. 
-Users can also send requests to this Lambda function via Amazon Alexa devices.
+6. Amazon Lex forwards requests to the `Bot Fulfillment` AWS Lambda function. Users can also send requests to this Lambda function via Amazon Alexa devices. 
+    > **_NOTE:_** When streaming is enabled, the chat client uses Amazon Lex sessionId to establish WebSocket connections through API Gateway V2.
 
 7. The user and chat information is stored in [Amazon DynamoDB](https://aws.amazon.com/dynamodb/) to disambiguate follow up questions from previous question and answer context.
 
-8. The `Bot Fulfillment` AWS Lambda function takes the users input and uses [Amazon Comprehend](https://aws.amazon.com/comprehend/) and [Amazon Translate](https://aws.amazon.com/translate/) (if necessary) to translate non-Native Language requests to the Native Language selected by the user during the deployment and then looks up the answer in in Amazon OpenSearch Service. 
-If using LLM features such as [text generation](source/docs/LLM_Retrieval_and_generative_question_answering/README.md) and  [text embeddings](source/docs/semantic_matching_using_LLM_embeddings/README.md), these requests will first pass through various LLM model hosted on Amazon Bedrock or Amazon SageMaker to generate the search query and embeddings to compare with those saved in the question bank on OpenSearch.
+8. [Amazon Comprehend](https://aws.amazon.com/comprehend/) and [Amazon Translate](https://aws.amazon.com/translate/) (if necessary) are used by the `Bot Fulfillment` AWS Lambda function to translate non-native Language requests to the native Language selected by the user during the deployment and look up the answer in Amazon OpenSearch Service.
+9. If using LLM features such as [text generation](source/docs/LLM_Retrieval_and_generative_question_answering/README.md) and  [text embeddings](source/docs/semantic_matching_using_LLM_embeddings/README.md), these requests will first pass through various foundational models hosted on Amazon Bedrock to generate the search query and embeddings to compare with those saved in the question bank on OpenSearch.
 
-9. If no match is returned from the OpenSearch question bank, then the Bot fulfillment Lambda function forwards the request as follows: 
+    a. If pre-processing guardrails are enabled, they scan and block potentially harmful user inputs before they reach the QnABot application. This acts as the first line of defense to prevent malicious or inappropriate queries from being processed.
+    
+    b. If using Bedrock guardrails for LLMs or Knowledge Base, it can apply contextual guarding and safety controls during LLM inference to ensure appropriate answer generation.
+    
+    c. If post-processing guardrails are enabled, they scan, mask, or block potentially harmful content in the final responses before they are sent to the client through the fulfillment Lambda. This serves as the last line of defense to ensure that sensitive information (like PII) is properly masked and inappropriate content is blocked.
+
+10. If no match is returned from the OpenSearch question bank or text passages, then the Bot fulfillment Lambda function forwards the request as follows: 
 
     a. If an [Amazon Kendra](https://aws.amazon.com/kendra/) index is [configured for fallback](source/docs/Kendra_Fallback_README.md), then the `Bot Fulfillment` AWS Lambda function forwards the request to Kendra if no match is returned from the OpenSearch question bank.
     The text generation LLM can optionally be used to create the search query and to synthesize a response from the returned document excerpts.
     
     b. If a [Bedrock Knowledge Base](https://aws.amazon.com/bedrock/knowledge-bases/) ID is [configured](source/docs/LLM_Retrieval_and_generative_question_answering/README.md), then the `Bot Fulfillment` AWS Lambda function forwards the request to the Bedrock Knowledge Base. 
-    The `Bot Fulfillment` AWS Lambda function leverages the RetrieveAndGenerate API to fetch the relevant results for an user query, augment the foundational model's prompt and return the response.
+    The `Bot Fulfillment` AWS Lambda function leverages the RetrieveAndGenerate or RetrieveAndGenerateStream APIs to fetch the relevant results for an user's query, augment the foundational model's prompt and return the response.
 
-10. User interactions with the `Bot Fulfillment` function generate logs and metrics data, which is sent to [Amazon Kinesis Data Firehose](http://aws.amazon.com/kinesis/data-firehose/) then to Amazon S3 for later data analysis. 
+11. When streaming is enabled, RAG-enhanced LLM responses from text passages or external data sources is streamed via WebSocket connection using same Lex sessionId, while the final response is processed through the fulfillment Lambda.
+
+12. User interactions with the `Bot Fulfillment` function generate logs and metrics data, which is sent to [Amazon Kinesis Data Firehose](http://aws.amazon.com/kinesis/data-firehose/) then to Amazon S3 for later data analysis. 
 The [OpenSearch Dashboards](source/docs/overview/images/image9.png) can be used to view usage history, logged utterances, no hits utterances, positive user feedback, and negative user feedback and also provides the ability to create custom reports.
 
-11. The [OpenSearch Dashboards](https://docs.aws.amazon.com/opensearch-service/latest/developerguide/dashboards.html) can be used to view usage history, logged utterances, no hits utterances, positive user feedback, and negative user feedback, and also provides the ability to create custom reports.
+13. The [OpenSearch Dashboards](https://docs.aws.amazon.com/opensearch-service/latest/developerguide/dashboards.html) can be used to view usage history, logged utterances, no hits utterances, positive user feedback, and negative user feedback, and also provides the ability to create custom reports.
+
+14. Using [Amazon CloudWatch](https://aws.amazon.com/cloudwatch/), the admins can monitor service logs and use the CloudWatch dashboard created by QnABot to monitor deployment’s operational health.
 
 Refer to the [implementation guide](https://docs.aws.amazon.com/solutions/latest/qnabot-on-aws) for detailed instructions on deploying QnABot in your AWS account.
 
@@ -60,11 +70,26 @@ Alternatively, if you want to custom deploy QnABot on AWS, refer to the details 
 ### Environment Prerequisites
 
 -   Run Linux. (tested on Amazon Linux 2)
--   Install npm >10.0.0 and node >18.X.X ([instructions](https://nodejs.org/en/download/))
+-   Install npm >10.0.0 and node >20.X.X ([instructions](https://nodejs.org/en/download/))
 -   Install and configure git lfs ([instructions](https://git-lfs.com/))
 -   Clone this repo.
 -   Set up an AWS account. ([instructions](https://AWS.amazon.com/free/))
 -   Configure AWS CLI and a local credentials file. ([instructions](https://docs.AWS.amazon.com/cli/latest/userguide/cli-chap-welcome.html))
+-   Install Python >=3.10
+-   Install Poetry. Below is one of the ways to install poetry. For other ways to install poetry, refer [Poetry installation instructions](https://python-poetry.org/docs/#installation)
+
+```shell
+## Install pipx via pip
+python3 -m pip install --user pipx
+python3 -m pipx ensurepath
+
+## OR Install pipx via brew
+brew install pipx
+pipx ensurepath
+
+## Install poetry
+pipx install poetry
+```
 
 ### Build a version
 
@@ -74,12 +99,6 @@ Start from the /source directory.
 
 ```shell
 cd source
-```
-
-Install virtualenv:
-```shell
-pip3 install virtualenv
-```
 
 Install node.js modules of QnABot:
 
@@ -142,31 +161,46 @@ npm run test:update:snapshot
 
 This runs integration tests against a deployed QnABot deployment in your account. Before running the tests follow the above steps to build and deploy a version or deploy using the template from the QnABot landing page: [Launch QnABot](https://docs.aws.amazon.com/solutions/latest/qnabot-on-aws/step-1-launch-the-stack.html). 
 
+#### Prerequisites
+Before getting started, ensure you have the following dependencies installed on your system:
 
+```bash
+# Install Python 3
+brew install python@3
+
+# Install browser drivers for automated testing
+brew install geckodriver
+brew install --cask chromedriver
+pip3 install virtualenv
+
+# Install Poetry for dependency management.
+## Install pipx via pip
+python3 -m pip install --user pipx
+python3 -m pipx ensurepath
+
+## OR Install pipx via brew
+brew install pipx
+pipx ensurepath
+
+## Install poetry
+pipx install poetry
+```
+
+Follow the below steps to run the integration tests
 
 1. Start from the /.nightswatch directory:
 ```bash
 cd .nightswatch
 ```
 
-2. Install the dependencies of the automated testing:
+2. Install the project dependencies
 
 ```bash
-brew install python@3
-brew install geckodriver
-brew install --cask chromedriver
-pip3 install virtualenv
+poetry install
+source $(poetry env info --path)/bin/activate
 ```
 
-3. Set up a virtual environment for testing, and install the project dependencies into it.
-
-```bash
-python3 -m virtualenv venv
-source ./venv/bin/activate
-pip install -r requirements.txt
-```
-
-4. Ensure you are logged in to the AWS CLI.
+3. Ensure you are logged in to the AWS CLI.
 
 Set the following environment variables to point to the a QnA Bot deployment under test:
 
@@ -181,13 +215,6 @@ Optionally provide a username and password for an Admin user to test with. If th
 ```bash
 export USER='<QNA BOT existing admin user>'
 export PASSWORD='<QNA BOT existing admin password>'
-```
-
-Optionally provide Bedrock Guardrails Identifier and Version to test with. If these environment variables are not set then testing for Bedrock Guardrails in test_knowledge_base.py and test_llm.py will be skipped.
-
-```bash
-export BEDROCK_GUARDRAIL_IDENTIFIER='<Pre-configurated Guardrail Identifier in your AWS account>'
-export BEDROCK_GUARDRAIL_VERSION='<Pre-configurated Guardrail Version in your AWS account>'
 ```
 
 If you'd like to launch the browser while running tests then also set the below env variable:
@@ -208,14 +235,12 @@ If you want to use a specific AWS profile for the test. If not set, the regressi
 export TEST_ACCOUNT_PROFILE_NAMES='<AWS profile name>'
 ```
 
-5. The LLM and Kendra tests will only run if the deployed bot has these features enabled. Follow the steps in the Implementation Guide to enable these features to test them:
- - LLM
-   - Set LLMApi to SAGEMAKER. For more information, please [Enabling LLM support](https://docs.aws.amazon.com/solutions/latest/qnabot-on-aws/enabling-llm-support.html). If stack update fails, check your quota for __ml.g5.12xlarge for endpoint__ usage as mentioned in the note of this article.
+4. The Kendra tests will only run if the deployed bot has these features enabled. Follow the steps in the Implementation Guide to enable these features to test them:
  - Kendra 
    - Create an index and note the Index ID. For IAM role, you can create a custom new role for this from the dropdown. [Creating an index](https://docs.aws.amazon.com/kendra/latest/dg/create-index.html)
    - Update deployed stack's parameters KendraWebPageIndexId, KendraFaqIndexId and AltSearchKendraIndexes with Index ID created in the previous step.
 
-6. Run the regression tests from within the test folder:
+5. Run the regression tests from within the test folder:
 
 ```bash
 cd functional
@@ -336,6 +361,7 @@ As QnABot evolves over the years, it makes use of various services and functiona
 _Note: **Deployable solution versions** refers to the ability to deploy the version of QnABot in their AWS accounts. **Actively supported versions** for QnABot is only available for the latest version of QnABot._
 
 ### Deployable Versions
+- [v7.0.0](https://github.com/aws-solutions/qnabot-on-aws/releases/tag/v7.0.0) - [Public](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v7.0.0/qnabot-on-aws-main.template)/[VPC](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v7.0.0/qnabot-on-aws-vpc.template)
 - [v6.1.5](https://github.com/aws-solutions/qnabot-on-aws/releases/tag/v6.1.5) - [Public](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v6.1.5/qnabot-on-aws-main.template)/[VPC](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v6.1.5/qnabot-on-aws-vpc.template)
 - [v6.1.4](https://github.com/aws-solutions/qnabot-on-aws/releases/tag/v6.1.4) - [Public](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v6.1.4/qnabot-on-aws-main.template)/[VPC](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v6.1.4/qnabot-on-aws-vpc.template)
 - [v6.1.3](https://github.com/aws-solutions/qnabot-on-aws/releases/tag/v6.1.3) - [Public](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v6.1.3/qnabot-on-aws-main.template)/[VPC](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v6.1.3/qnabot-on-aws-vpc.template)

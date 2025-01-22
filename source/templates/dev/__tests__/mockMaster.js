@@ -74,9 +74,6 @@ module.exports = {
         EmbeddingsLambdaArn: {
             Default: '0000000000000000000000000000000000000:function:test',
         },
-        LLMSagemakerInstanceType: {
-            Default: 'test',
-        },
         LLMLambdaArn: {
             Default: '0000000000000000000000000000000000000:function:test',
         },
@@ -93,6 +90,9 @@ module.exports = {
             Default: 'test',
         },
         OpenSearchFineGrainAccessControl: {
+            Default: 'FALSE',
+        },
+        EnableStreaming: {
             Default: 'FALSE',
         }
     },

@@ -110,7 +110,7 @@ module.exports = {
         this.$nextTick(() => {
             const spanBot = document.getElementById('spnBotname');
             if (spanBot) {
-                self.$store.dispatch('api/botinfo').then((result) => spanBot.innerHTML = result.lexV2botname);
+                self.$store.dispatch('api/botinfo').then((result) => spanBot.innerText = result.lexV2botname);
             }
         });
     },

@@ -75,6 +75,12 @@ exports[`Verify master template is correct renders master template correctly 1`]
         "EMPTY",
       ],
     },
+    "DeprecatedSSMSettings": {
+      "Fn::Equals": [
+        "true",
+        "false",
+      ],
+    },
     "Domain": {
       "Fn::Not": [
         {
@@ -137,14 +143,6 @@ exports[`Verify master template is correct renders master template correctly 1`]
             "",
           ],
         },
-      ],
-    },
-    "EmbeddingsSagemaker": {
-      "Fn::Equals": [
-        {
-          "Ref": "EmbeddingsApi",
-        },
-        "SAGEMAKER",
       ],
     },
     "FGACEnabled": {
@@ -235,14 +233,6 @@ exports[`Verify master template is correct renders master template correctly 1`]
         },
       ],
     },
-    "LLMSagemaker": {
-      "Fn::Equals": [
-        {
-          "Ref": "LLMApi",
-        },
-        "SAGEMAKER",
-      ],
-    },
     "LogRetentionPeriodIsNotZero": {
       "Fn::Not": [
         {
@@ -283,6 +273,14 @@ exports[`Verify master template is correct renders master template correctly 1`]
         "Yes",
       ],
     },
+    "StreamingEnabled": {
+      "Fn::Equals": [
+        {
+          "Ref": "EnableStreaming",
+        },
+        "TRUE",
+      ],
+    },
     "VPCEnabled": {
       "Fn::Not": [
         {
@@ -312,19 +310,48 @@ exports[`Verify master template is correct renders master template correctly 1`]
   "Description": "(SO0189-ext) QnABot with admin and client websites - Version vx.x.x",
   "Mappings": {
     "BedrockDefaults": {
-      "ai21.j2-mid-v1": {
-        "MaxTokens": 8191,
-        "ModelID": "ai21.j2-mid-v1",
-        "NoHitsRegex": "(Sorry, I don't know|unable to assist you|i don't have enough context|i don't have enough information|do not contain any information|i could not find an exact answer|no information in the search results|don't see any information in the provided search results|search results do not contain|search results do not mention|search results do not provide|no information in the provided search results|not find any information|search results did not contain|unable to respond|There is no mention of|documents do not mention anything|There is no information provided|reference passages do not mention|could not find an answer to this question|the model cannot answer this question)",
+      "ai21.jamba-instruct-v1": {
+        "GenerateQuerySystemPrompt": "You are an AI assistant designed to disambiguate user queries.",
+        "MaxTokens": 256000,
+        "ModelID": "ai21.jamba-instruct-v1:0",
+        "ModelParams": "{\\"temperature\\":0, \\"maxTokens\\":300, \\"topP\\":1}",
+        "NoHitsRegex": "(Sorry, I don't know|unable to assist you|i don't have enough context|i don't have enough information|i don't have any information|do not contain any information|do not contain information|i could not find an exact answer|no information in the search results|search results do not mention|search results do not provide specific|don't see any information in the provided search results|search results do not contain|no information in the provided search results|not find any information|search results did not contain|unable to respond|There is no mention of|documents do not mention anything|There is no information provided|reference passages do not mention|reference doesn't specify|could not find an answer to this question|the model cannot answer this question|none of the search results contain)",
         "QAPromptTemplate": "The following is a friendly conversation between a human and an AI. The AI is talkative and provides lots of specific details from its context. If the AI does not know the answer to a question, it truthfully says it does not know. Documents: {context} Instruction: Based on the above documents, provide a detailed answer for {query} Answer \\"Sorry, I don't know\\" if not present in the document. Solution:",
+        "QASystemPrompt": "You are a seasoned and helpful question answering AI assistant.",
         "QueryPromptTemplate": "<br><br>Human: Here is a chat history in <chatHistory> tags:<br><chatHistory><br>{history}<br></chatHistory><br>Human: And here is a follow up question or statement from the human in <followUpMessage> tags:<br><followUpMessage><br>{input}<br></followUpMessage><br>Human: Rephrase the follow up question or statement as a standalone question or statement that makes sense without reading the chat history.<br><br>Assistant: Here is the rephrased follow up question or statement:",
       },
-      "ai21.j2-ultra-v1": {
-        "MaxTokens": 8191,
-        "ModelID": "ai21.j2-ultra-v1",
-        "NoHitsRegex": "(Sorry, I don't know|unable to assist you|i don't have enough context|i don't have enough information|do not contain any information|i could not find an exact answer|no information in the search results|don't see any information in the provided search results|search results do not contain|search results do not mention|search results do not provide|no information in the provided search results|not find any information|search results did not contain|unable to respond|There is no mention of|documents do not mention anything|There is no information provided|reference passages do not mention|could not find an answer to this question|the model cannot answer this question)",
-        "QAPromptTemplate": "The following is a friendly conversation between a human and an AI. The AI is talkative and provides lots of specific details from its context. If the AI does not know the answer to a question, it truthfully says it does not know. Documents: {context} Instruction: Based on the above documents, provide a detailed answer for {query} Answer \\"Sorry, I don't know\\" if not present in the document. Solution:",
-        "QueryPromptTemplate": "<br><br>Human: Here is a chat history in <chatHistory> tags:<br><chatHistory><br>{history}<br></chatHistory><br>Human: And here is a follow up question or statement from the human in <followUpMessage> tags:<br><followUpMessage><br>{input}<br></followUpMessage><br>Human: Rephrase the follow up question or statement as a standalone question or statement that makes sense without reading the chat history.<br><br>Assistant: Here is the rephrased follow up question or statement:",
+      "amazon.nova-lite-v1": {
+        "GenerateQuerySystemPrompt": "You are an AI assistant designed to disambiguate user queries.",
+        "KnowledgeBasePromptTemplate": "You are a question answering bot who gives helpful, detailed, and polite answers to the user's questions. In this session, the model has access to search results and a users question, your job is to answer the user's question using only information from the search results. Model Instructions: - You should provide concise answer to simple questions when the answer is directly contained in search results, but when comes to yes/no question, provide some details. - In case the question requires multi-hop reasoning, you should find relevant information from search results and summarize the answer based on relevant information with logical reasoning. - If the search results do not contain information that can answer the question, then respond saying \\"Sorry, I don't know that.\\". - $output_format_instructions$ - DO NOT USE INFORMATION THAT IS NOT IN SEARCH RESULTS! User: $query$ Bot: Resource: Search Results: $search_results$ Bot:",
+        "MaxTokens": 300000,
+        "ModelID": "amazon.nova-lite-v1:0",
+        "ModelParams": "{\\"temperature\\":0, \\"maxTokens\\":300, \\"topP\\":1}",
+        "NoHitsRegex": "(Sorry, I don't know|unable to assist you|i don't have enough context|i don't have enough information|i don't have any information|do not contain any information|do not contain information|i could not find an exact answer|no information in the search results|search results do not mention|search results do not provide specific|don't see any information in the provided search results|search results do not contain|no information in the provided search results|not find any information|search results did not contain|unable to respond|There is no mention of|documents do not mention anything|There is no information provided|reference passages do not mention|reference doesn't specify|could not find an answer to this question|the model cannot answer this question|none of the search results contain)",
+        "QAPromptTemplate": "<br><br>Human: Here are reference passages in <references> tags:<br><references><br>{context}<br></references><br>If the references contain the information needed to respond, then write a confident response in under 50 words, quoting the relevant references. <br>Otherwise, if you can make an informed guess based on the reference passages, then write a less confident response in under 50 words, stating your assumptions.<br>Finally, if the references do not have any relevant information, then respond saying \\"Sorry, I don't know\\".<br><question><br>{query}<br></question><br><br>Assistant: According to the reference passages, in under 50 words:",
+        "QASystemPrompt": "You are a seasoned and helpful question answering AI assistant.",
+        "QueryPromptTemplate": "Given the following conversation and a follow up question, rephrase the follow up question to be a standalone question.<br>Chat History: <br>{history}<br>Follow up question: {input}<br>Standalone question:",
+      },
+      "amazon.nova-micro-v1": {
+        "GenerateQuerySystemPrompt": "You are an AI assistant designed to disambiguate user queries.",
+        "KnowledgeBasePromptTemplate": "You are a question answering bot who gives helpful, detailed, and polite answers to the user's questions. In this session, the model has access to search results and a users question, your job is to answer the user's question using only information from the search results. Model Instructions: - You should provide concise answer to simple questions when the answer is directly contained in search results, but when comes to yes/no question, provide some details. - In case the question requires multi-hop reasoning, you should find relevant information from search results and summarize the answer based on relevant information with logical reasoning. - If the search results do not contain information that can answer the question, then respond saying \\"Sorry, I don't know that.\\". - $output_format_instructions$ - DO NOT USE INFORMATION THAT IS NOT IN SEARCH RESULTS! User: $query$ Bot: Resource: Search Results: $search_results$ Bot:",
+        "MaxTokens": 128000,
+        "ModelID": "amazon.nova-micro-v1:0",
+        "ModelParams": "{\\"temperature\\":0, \\"maxTokens\\":300, \\"topP\\":1}",
+        "NoHitsRegex": "(Sorry, I don't know|unable to assist you|i don't have enough context|i don't have enough information|i don't have any information|do not contain any information|do not contain information|i could not find an exact answer|no information in the search results|search results do not mention|search results do not provide specific|don't see any information in the provided search results|search results do not contain|no information in the provided search results|not find any information|search results did not contain|unable to respond|There is no mention of|documents do not mention anything|There is no information provided|reference passages do not mention|reference doesn't specify|could not find an answer to this question|the model cannot answer this question|none of the search results contain)",
+        "QAPromptTemplate": "<br><br>Human: Here are reference passages in <references> tags:<br><references><br>{context}<br></references><br>If the references contain the information needed to respond, then write a confident response in under 50 words, quoting the relevant references. <br>Otherwise, if you can make an informed guess based on the reference passages, then write a less confident response in under 50 words, stating your assumptions.<br>Finally, if the references do not have any relevant information, then respond saying \\"Sorry, I don't know\\".<br><question><br>{query}<br></question><br><br>Assistant: According to the reference passages, in under 50 words:",
+        "QASystemPrompt": "You are a seasoned and helpful question answering AI assistant.",
+        "QueryPromptTemplate": "Given the following conversation and a follow up question, rephrase the follow up question to be a standalone question.<br>Chat History: <br>{history}<br>Follow up question: {input}<br>Standalone question:",
+      },
+      "amazon.nova-pro-v1": {
+        "GenerateQuerySystemPrompt": "You are an AI assistant designed to disambiguate user queries.",
+        "KnowledgeBasePromptTemplate": "You are a question answering bot who gives helpful, detailed, and polite answers to the user's questions. In this session, the model has access to search results and a users question, your job is to answer the user's question using only information from the search results. Model Instructions: - You should provide concise answer to simple questions when the answer is directly contained in search results, but when comes to yes/no question, provide some details. - In case the question requires multi-hop reasoning, you should find relevant information from search results and summarize the answer based on relevant information with logical reasoning. - If the search results do not contain information that can answer the question, then respond saying \\"Sorry, I don't know that.\\". - $output_format_instructions$ - DO NOT USE INFORMATION THAT IS NOT IN SEARCH RESULTS! User: $query$ Bot: Resource: Search Results: $search_results$ Bot:",
+        "MaxTokens": 300000,
+        "ModelID": "amazon.nova-pro-v1:0",
+        "ModelParams": "{\\"temperature\\":0, \\"maxTokens\\":300, \\"topP\\":1}",
+        "NoHitsRegex": "(Sorry, I don't know|unable to assist you|i don't have enough context|i don't have enough information|i don't have any information|do not contain any information|do not contain information|i could not find an exact answer|no information in the search results|search results do not mention|search results do not provide specific|don't see any information in the provided search results|search results do not contain|no information in the provided search results|not find any information|search results did not contain|unable to respond|There is no mention of|documents do not mention anything|There is no information provided|reference passages do not mention|reference doesn't specify|could not find an answer to this question|the model cannot answer this question|none of the search results contain)",
+        "QAPromptTemplate": "<br><br>Human: Here are reference passages in <references> tags:<br><references><br>{context}<br></references><br>If the references contain the information needed to respond, then write a confident response in under 50 words, quoting the relevant references. <br>Otherwise, if you can make an informed guess based on the reference passages, then write a less confident response in under 50 words, stating your assumptions.<br>Finally, if the references do not have any relevant information, then respond saying \\"Sorry, I don't know\\".<br><question><br>{query}<br></question><br><br>Assistant: According to the reference passages, in under 50 words:",
+        "QASystemPrompt": "You are a seasoned and helpful question answering AI assistant.",
+        "QueryPromptTemplate": "Given the following conversation and a follow up question, rephrase the follow up question to be a standalone question.<br>Chat History: <br>{history}<br>Follow up question: {input}<br>Standalone question:",
       },
       "amazon.titan-embed-text-v1": {
         "EmbeddingsDimensions": 1536,
@@ -337,73 +364,123 @@ exports[`Verify master template is correct renders master template correctly 1`]
         "ModelID": "amazon.titan-embed-text-v2:0",
       },
       "amazon.titan-text-express-v1": {
+        "GenerateQuerySystemPrompt": "",
         "MaxTokens": 8000,
         "ModelID": "amazon.titan-text-express-v1",
-        "NoHitsRegex": "(Sorry, I don't know|unable to assist you|i don't have enough context|i don't have enough information|do not contain any information|i could not find an exact answer|no information in the search results|don't see any information in the provided search results|search results do not contain|search results do not mention|search results do not provide|no information in the provided search results|not find any information|search results did not contain|unable to respond|There is no mention of|documents do not mention anything|There is no information provided|reference passages do not mention|could not find an answer to this question|the model cannot answer this question)",
-        "QAPromptTemplate": "<br><br>Human: You are a friendly AI assistant. Answer the question in <question> tags only based on the provided reference passages. Here are reference passages in <references> tags:<br><references><br>{context}<br></references><br>If the references contain the information needed to respond, then write a confident response in under 50 words, quoting the relevant references. <br>Otherwise, if you can make an informed guess based on the reference passages, then write a less confident response in under 50 words, stating your assumptions.<br>Finally, if the references do not have any relevant information, then respond saying \\"Sorry, I don't know\\".<br><question><br>{query}<br></question><br><br>Assistant: According to the reference passages, in under 50 words:",
+        "ModelParams": "{\\"temperature\\":0, \\"maxTokens\\":300, \\"topP\\":1}",
+        "NoHitsRegex": "(Sorry, I don't know|unable to assist you|i don't have enough context|i don't have enough information|i don't have any information|do not contain any information|do not contain information|i could not find an exact answer|no information in the search results|search results do not mention|search results do not provide specific|don't see any information in the provided search results|search results do not contain|no information in the provided search results|not find any information|search results did not contain|unable to respond|There is no mention of|documents do not mention anything|There is no information provided|reference passages do not mention|reference doesn't specify|could not find an answer to this question|the model cannot answer this question|none of the search results contain)",
+        "QAPromptTemplate": "<br><br>Human: You are a friendly AI assistant. Here are reference passages in <references> tags:<br><references><br>{context}<br></references><br>If the references contain the information needed to respond, then write a confident response in under 50 words, quoting the relevant references. <br>Otherwise, if you can make an informed guess based on the reference passages, then write a less confident response in under 50 words, stating your assumptions.<br>Finally, if the references do not have any relevant information, then respond saying \\"Sorry, I don't know\\".<br><question><br>{query}<br></question><br><br>Assistant: According to the reference passages, in under 50 words:",
+        "QASystemPrompt": "",
         "QueryPromptTemplate": "Given the following conversation and a follow up question, rephrase the follow up question to be a standalone question.<br>Chat History: <br>{history}<br>Follow up question: {input}<br>Standalone question:",
       },
       "amazon.titan-text-lite-v1": {
+        "GenerateQuerySystemPrompt": "",
         "MaxTokens": 4000,
         "ModelID": "amazon.titan-text-lite-v1",
-        "NoHitsRegex": "(Sorry, I don't know|unable to assist you|i don't have enough context|i don't have enough information|do not contain any information|i could not find an exact answer|no information in the search results|don't see any information in the provided search results|search results do not contain|search results do not mention|search results do not provide|no information in the provided search results|not find any information|search results did not contain|unable to respond|There is no mention of|documents do not mention anything|There is no information provided|reference passages do not mention|could not find an answer to this question|the model cannot answer this question)",
-        "QAPromptTemplate": "<br><br>Human: You are a friendly AI assistant. Answer the question in <question> tags only based on the provided reference passages. Here are reference passages in <references> tags:<br><references><br>{context}<br></references><br>If the references contain the information needed to respond, then write a confident response in under 50 words, quoting the relevant references. <br>Otherwise, if you can make an informed guess based on the reference passages, then write a less confident response in under 50 words, stating your assumptions.<br>Finally, if the references do not have any relevant information, then respond saying \\"Sorry, I don't know\\".<br><question><br>{query}<br></question><br><br>Assistant: According to the reference passages, in under 50 words:",
+        "ModelParams": "{\\"temperature\\":0, \\"maxTokens\\":300, \\"topP\\":1}",
+        "NoHitsRegex": "(Sorry, I don't know|unable to assist you|i don't have enough context|i don't have enough information|i don't have any information|do not contain any information|do not contain information|i could not find an exact answer|no information in the search results|search results do not mention|search results do not provide specific|don't see any information in the provided search results|search results do not contain|no information in the provided search results|not find any information|search results did not contain|unable to respond|There is no mention of|documents do not mention anything|There is no information provided|reference passages do not mention|reference doesn't specify|could not find an answer to this question|the model cannot answer this question|none of the search results contain)",
+        "QAPromptTemplate": "<br><br>Human: You are a friendly AI assistant. Here are reference passages in <references> tags:<br><references><br>{context}<br></references><br>If the references contain the information needed to respond, then write a confident response in under 50 words, quoting the relevant references. <br>Otherwise, if you can make an informed guess based on the reference passages, then write a less confident response in under 50 words, stating your assumptions.<br>Finally, if the references do not have any relevant information, then respond saying \\"Sorry, I don't know\\".<br><question><br>{query}<br></question><br><br>Assistant: According to the reference passages, in under 50 words:",
+        "QASystemPrompt": "",
         "QueryPromptTemplate": "Given the following conversation and a follow up question, rephrase the follow up question to be a standalone question.<br>Chat History: <br>{history}<br>Follow up question: {input}<br>Standalone question:",
       },
       "amazon.titan-text-premier-v1": {
+        "GenerateQuerySystemPrompt": "",
         "KnowledgeBasePromptTemplate": "You are a question answering bot who gives helpful, detailed, and polite answers to the user's questions. In this session, the model has access to search results and a users question, your job is to answer the user's question using only information from the search results. Model Instructions: - You should provide concise answer to simple questions when the answer is directly contained in search results, but when comes to yes/no question, provide some details. - In case the question requires multi-hop reasoning, you should find relevant information from search results and summarize the answer based on relevant information with logical reasoning. - If the search results do not contain information that can answer the question, then respond saying \\"Sorry, I don't know that.\\". - $output_format_instructions$ - DO NOT USE INFORMATION THAT IS NOT IN SEARCH RESULTS! User: $query$ Bot: Resource: Search Results: $search_results$ Bot:",
         "MaxTokens": 32000,
         "ModelID": "amazon.titan-text-premier-v1:0",
-        "NoHitsRegex": "(Sorry, I don't know|unable to assist you|i don't have enough context|i don't have enough information|do not contain any information|i could not find an exact answer|no information in the search results|don't see any information in the provided search results|search results do not contain|search results do not mention|search results do not provide|no information in the provided search results|not find any information|search results did not contain|unable to respond|There is no mention of|documents do not mention anything|There is no information provided|reference passages do not mention|could not find an answer to this question|the model cannot answer this question)",
-        "QAPromptTemplate": "<br><br>Human: You are a friendly AI assistant. Answer the question in <question> tags only based on the provided reference passages. Here are reference passages in <references> tags:<br><references><br>{context}<br></references><br>If the references contain the information needed to respond, then write a confident response in under 50 words, quoting the relevant references. <br>Otherwise, if you can make an informed guess based on the reference passages, then write a less confident response in under 50 words, stating your assumptions.<br>Finally, if the references do not have any relevant information, then respond saying \\"Sorry, I don't know\\".<br><question><br>{query}<br></question><br><br>Assistant: According to the reference passages, in under 50 words:",
+        "ModelParams": "{\\"temperature\\":0, \\"maxTokens\\":300, \\"topP\\":1}",
+        "NoHitsRegex": "(Sorry, I don't know|unable to assist you|i don't have enough context|i don't have enough information|i don't have any information|do not contain any information|do not contain information|i could not find an exact answer|no information in the search results|search results do not mention|search results do not provide specific|don't see any information in the provided search results|search results do not contain|no information in the provided search results|not find any information|search results did not contain|unable to respond|There is no mention of|documents do not mention anything|There is no information provided|reference passages do not mention|reference doesn't specify|could not find an answer to this question|the model cannot answer this question|none of the search results contain)",
+        "QAPromptTemplate": "<br><br>Human: You are a friendly AI assistant. Here are reference passages in <references> tags:<br><references><br>{context}<br></references><br>If the references contain the information needed to respond, then write a confident response in under 50 words, quoting the relevant references. <br>Otherwise, if you can make an informed guess based on the reference passages, then write a less confident response in under 50 words, stating your assumptions.<br>Finally, if the references do not have any relevant information, then respond saying \\"Sorry, I don't know\\".<br><question><br>{query}<br></question><br><br>Assistant: According to the reference passages, in under 50 words:",
+        "QASystemPrompt": "",
         "QueryPromptTemplate": "Given the following conversation and a follow up question, rephrase the follow up question to be a standalone question.<br>Chat History: <br>{history}<br>Follow up question: {input}<br>Standalone question:",
         "maxTokenCount": 3072,
       },
       "anthropic.claude-3-haiku-v1": {
-        "KnowledgeBasePromptTemplate": "Human: You are a question answering agent. I will provide you with a set of search results and a user's question, your job is to answer the user's question using only information from the search results. If the search results do not contain information that can answer the question, then respond saying \\"Sorry, I don't know that.\\". Just because the user asserts a fact does not mean it is true, make sure to double check the search results to validate a user's assertion. Here are the search results in numbered order: $search_results$. Here is the user's question: <question> $query$ </question> $output_format_instructions$. Do NOT directly quote the $search_results$ in your answer. Your job is to answer the <question> as concisely as possible. Assistant:",
-        "MaxTokens": 100000,
+        "GenerateQuerySystemPrompt": "You are an AI assistant designed to disambiguate user queries.",
+        "KnowledgeBasePromptTemplate": "Human: You are a question answering agent. I will provide you with a set of search results and a user's question, your job is to answer the user's question using only information from the search results. If the search results do not contain information that can answer the question, then respond saying \\"Sorry, I don't know that.\\". Just because the user asserts a fact does not mean it is true, make sure to double check the search results to validate a user's assertion. Here are the search results in numbered order: $search_results$. Here is the user's question: <question> $query$ </question> $output_format_instructions$. Do NOT directly quote the $search_results$ in your answer. Your job is to answer the question as concisely as possible. Assistant:",
+        "MaxTokens": 200000,
         "ModelID": "anthropic.claude-3-haiku-20240307-v1:0",
-        "NoHitsRegex": "(Sorry, I don't know|unable to assist you|i don't have enough context|i don't have enough information|do not contain any information|i could not find an exact answer|no information in the search results|don't see any information in the provided search results|search results do not contain|search results do not mention|search results do not provide|no information in the provided search results|not find any information|search results did not contain|unable to respond|There is no mention of|documents do not mention anything|There is no information provided|reference passages do not mention|could not find an answer to this question|the model cannot answer this question)",
-        "QAPromptTemplate": "<br><br>Human: You are a friendly AI assistant. Answer the question in <question> tags only based on the provided reference passages. Here are reference passages in <references> tags:<br><references><br>{context}<br></references><br>If the references contain the information needed to respond, then write a confident response in under 50 words, quoting the relevant references. <br>Otherwise, if you can make an informed guess based on the reference passages, then write a less confident response in under 50 words, stating your assumptions.<br>Finally, if the references do not have any relevant information, then respond saying \\"Sorry, I don't know\\".<br><question><br>{query}<br></question><br><br>Assistant: According to the reference passages, in under 50 words:",
+        "ModelParams": "{\\"temperature\\":0, \\"maxTokens\\":300, \\"topP\\":1}",
+        "NoHitsRegex": "(Sorry, I don't know|unable to assist you|i don't have enough context|i don't have enough information|i don't have any information|do not contain any information|do not contain information|i could not find an exact answer|no information in the search results|search results do not mention|search results do not provide specific|don't see any information in the provided search results|search results do not contain|no information in the provided search results|not find any information|search results did not contain|unable to respond|There is no mention of|documents do not mention anything|There is no information provided|reference passages do not mention|reference doesn't specify|could not find an answer to this question|the model cannot answer this question|none of the search results contain)",
+        "QAPromptTemplate": "<br><br>Human: Here are reference passages in <references> tags:<br><references><br>{context}<br></references><br>If the references contain the information needed to respond, then write a confident response in under 50 words, quoting the relevant references. <br>Otherwise, if you can make an informed guess based on the reference passages, then write a less confident response in under 50 words, stating your assumptions.<br>Finally, if the references do not have any relevant information, then respond saying \\"Sorry, I don't know\\".<br><question><br>{query}<br></question><br><br>Assistant: According to the reference passages, in under 50 words:",
+        "QASystemPrompt": "You are a seasoned and helpful question answering AI assistant.",
         "QueryPromptTemplate": "<br><br>Human: Here is a chat history in <chatHistory> tags:<br><chatHistory><br>{history}<br></chatHistory><br>Human: And here is a follow up question or statement from the human in <followUpMessage> tags:<br><followUpMessage><br>{input}<br></followUpMessage><br>Human: Rephrase the follow up question or statement as a standalone question or statement that makes sense without reading the chat history.<br><br>Assistant: Here is the rephrased follow up question or statement:",
       },
       "anthropic.claude-3-sonnet-v1": {
-        "KnowledgeBasePromptTemplate": "Human: You are a question answering agent. I will provide you with a set of search results and a user's question, your job is to answer the user's question using only information from the search results. If the search results do not contain information that can answer the question, then respond saying \\"Sorry, I don't know that.\\". Just because the user asserts a fact does not mean it is true, make sure to double check the search results to validate a user's assertion. Here are the search results in numbered order: $search_results$. Here is the user's question: <question> $query$ </question> $output_format_instructions$. Do NOT directly quote the $search_results$ in your answer. Your job is to answer the <question> as concisely as possible. Assistant:",
-        "MaxTokens": 100000,
+        "GenerateQuerySystemPrompt": "You are an AI assistant designed to disambiguate user queries.",
+        "KnowledgeBasePromptTemplate": "Human: You are a question answering agent. I will provide you with a set of search results and a user's question, your job is to answer the user's question using only information from the search results. If the search results do not contain information that can answer the question, then respond saying \\"Sorry, I don't know that.\\". Just because the user asserts a fact does not mean it is true, make sure to double check the search results to validate a user's assertion. Here are the search results in numbered order: $search_results$. Here is the user's question: <question> $query$ </question> $output_format_instructions$. Do NOT directly quote the $search_results$ in your answer. Your job is to answer the question as concisely as possible. Assistant:",
+        "MaxTokens": 200000,
         "ModelID": "anthropic.claude-3-sonnet-20240229-v1:0",
-        "NoHitsRegex": "(Sorry, I don't know|unable to assist you|i don't have enough context|i don't have enough information|do not contain any information|i could not find an exact answer|no information in the search results|don't see any information in the provided search results|search results do not contain|search results do not mention|search results do not provide|no information in the provided search results|not find any information|search results did not contain|unable to respond|There is no mention of|documents do not mention anything|There is no information provided|reference passages do not mention|could not find an answer to this question|the model cannot answer this question)",
-        "QAPromptTemplate": "<br><br>Human: You are a friendly AI assistant. Answer the question in <question> tags only based on the provided reference passages. Here are reference passages in <references> tags:<br><references><br>{context}<br></references><br>If the references contain the information needed to respond, then write a confident response in under 50 words, quoting the relevant references. <br>Otherwise, if you can make an informed guess based on the reference passages, then write a less confident response in under 50 words, stating your assumptions.<br>Finally, if the references do not have any relevant information, then respond saying \\"Sorry, I don't know\\".<br><question><br>{query}<br></question><br><br>Assistant: According to the reference passages, in under 50 words:",
+        "ModelParams": "{\\"temperature\\":0, \\"maxTokens\\":300, \\"topP\\":1}",
+        "NoHitsRegex": "(Sorry, I don't know|unable to assist you|i don't have enough context|i don't have enough information|i don't have any information|do not contain any information|do not contain information|i could not find an exact answer|no information in the search results|search results do not mention|search results do not provide specific|don't see any information in the provided search results|search results do not contain|no information in the provided search results|not find any information|search results did not contain|unable to respond|There is no mention of|documents do not mention anything|There is no information provided|reference passages do not mention|reference doesn't specify|could not find an answer to this question|the model cannot answer this question|none of the search results contain)",
+        "QAPromptTemplate": "<br><br>Human: Here are reference passages in <references> tags:<br><references><br>{context}<br></references><br>If the references contain the information needed to respond, then write a confident response in under 50 words, quoting the relevant references. <br>Otherwise, if you can make an informed guess based on the reference passages, then write a less confident response in under 50 words, stating your assumptions.<br>Finally, if the references do not have any relevant information, then respond saying \\"Sorry, I don't know\\".<br><question><br>{query}<br></question><br><br>Assistant: According to the reference passages, in under 50 words:",
+        "QASystemPrompt": "You are a seasoned and helpful question answering AI assistant.",
+        "QueryPromptTemplate": "<br><br>Human: Here is a chat history in <chatHistory> tags:<br><chatHistory><br>{history}<br></chatHistory><br>Human: And here is a follow up question or statement from the human in <followUpMessage> tags:<br><followUpMessage><br>{input}<br></followUpMessage><br>Human: Rephrase the follow up question or statement as a standalone question or statement that makes sense without reading the chat history.<br><br>Assistant: Here is the rephrased follow up question or statement:",
+      },
+      "anthropic.claude-3.5-haiku-v1": {
+        "GenerateQuerySystemPrompt": "You are an AI assistant designed to disambiguate user queries.",
+        "KnowledgeBasePromptTemplate": "Human: You are a question answering agent. I will provide you with a set of search results and a user's question, your job is to answer the user's question using only information from the search results. If the search results do not contain information that can answer the question, then respond saying \\"Sorry, I don't know that.\\". Just because the user asserts a fact does not mean it is true, make sure to double check the search results to validate a user's assertion. Here are the search results in numbered order: $search_results$. Here is the user's question: <question> $query$ </question> $output_format_instructions$. Do NOT directly quote the $search_results$ in your answer. Your job is to answer the question as concisely as possible. Assistant:",
+        "MaxTokens": 200000,
+        "ModelID": "anthropic.claude-3-5-haiku-20241022-v1:0",
+        "ModelParams": "{\\"temperature\\":0, \\"maxTokens\\":300, \\"topP\\":1}",
+        "NoHitsRegex": "(Sorry, I don't know|unable to assist you|i don't have enough context|i don't have enough information|i don't have any information|do not contain any information|do not contain information|i could not find an exact answer|no information in the search results|search results do not mention|search results do not provide specific|don't see any information in the provided search results|search results do not contain|no information in the provided search results|not find any information|search results did not contain|unable to respond|There is no mention of|documents do not mention anything|There is no information provided|reference passages do not mention|reference doesn't specify|could not find an answer to this question|the model cannot answer this question|none of the search results contain)",
+        "QAPromptTemplate": "<br><br>Human: Here are reference passages in <references> tags:<br><references><br>{context}<br></references><br>If the references contain the information needed to respond, then write a confident response in under 50 words, quoting the relevant references. <br>Otherwise, if you can make an informed guess based on the reference passages, then write a less confident response in under 50 words, stating your assumptions.<br>Finally, if the references do not have any relevant information, then respond saying \\"Sorry, I don't know\\".<br><question><br>{query}<br></question><br><br>Assistant: According to the reference passages, in under 50 words:",
+        "QASystemPrompt": "You are a seasoned and helpful question answering AI assistant.",
         "QueryPromptTemplate": "<br><br>Human: Here is a chat history in <chatHistory> tags:<br><chatHistory><br>{history}<br></chatHistory><br>Human: And here is a follow up question or statement from the human in <followUpMessage> tags:<br><followUpMessage><br>{input}<br></followUpMessage><br>Human: Rephrase the follow up question or statement as a standalone question or statement that makes sense without reading the chat history.<br><br>Assistant: Here is the rephrased follow up question or statement:",
       },
       "anthropic.claude-3.5-sonnet-v1": {
-        "KnowledgeBasePromptTemplate": "Human: You are a question answering agent. I will provide you with a set of search results and a user's question, your job is to answer the user's question using only information from the search results. If the search results do not contain information that can answer the question, then respond saying \\"Sorry, I don't know that.\\". Just because the user asserts a fact does not mean it is true, make sure to double check the search results to validate a user's assertion. Here are the search results in numbered order: $search_results$. Here is the user's question: <question> $query$ </question> $output_format_instructions$. Do NOT directly quote the $search_results$ in your answer. Your job is to answer the <question> as concisely as possible. Assistant:",
-        "MaxTokens": 100000,
+        "GenerateQuerySystemPrompt": "You are an AI assistant designed to disambiguate user queries.",
+        "KnowledgeBasePromptTemplate": "Human: You are a question answering agent. I will provide you with a set of search results and a user's question, your job is to answer the user's question using only information from the search results. If the search results do not contain information that can answer the question, then respond saying \\"Sorry, I don't know that.\\". Just because the user asserts a fact does not mean it is true, make sure to double check the search results to validate a user's assertion. Here are the search results in numbered order: $search_results$. Here is the user's question: <question> $query$ </question> $output_format_instructions$. Do NOT directly quote the $search_results$ in your answer. Your job is to answer the question as concisely as possible. Assistant:",
+        "MaxTokens": 200000,
         "ModelID": "anthropic.claude-3-5-sonnet-20240620-v1:0",
-        "NoHitsRegex": "(Sorry, I don't know|unable to assist you|i don't have enough context|i don't have enough information|do not contain any information|i could not find an exact answer|no information in the search results|don't see any information in the provided search results|search results do not contain|search results do not mention|search results do not provide|no information in the provided search results|not find any information|search results did not contain|unable to respond|There is no mention of|documents do not mention anything|There is no information provided|reference passages do not mention|could not find an answer to this question|the model cannot answer this question)",
-        "QAPromptTemplate": "<br><br>Human: You are a friendly AI assistant. Answer the question in <question> tags only based on the provided reference passages. Here are reference passages in <references> tags:<br><references><br>{context}<br></references><br>If the references contain the information needed to respond, then write a confident response in under 50 words, quoting the relevant references. <br>Otherwise, if you can make an informed guess based on the reference passages, then write a less confident response in under 50 words, stating your assumptions.<br>Finally, if the references do not have any relevant information, then respond saying \\"Sorry, I don't know\\".<br><question><br>{query}<br></question><br><br>Assistant: According to the reference passages, in under 50 words:",
+        "ModelParams": "{\\"temperature\\":0, \\"maxTokens\\":300, \\"topP\\":1}",
+        "NoHitsRegex": "(Sorry, I don't know|unable to assist you|i don't have enough context|i don't have enough information|i don't have any information|do not contain any information|do not contain information|i could not find an exact answer|no information in the search results|search results do not mention|search results do not provide specific|don't see any information in the provided search results|search results do not contain|no information in the provided search results|not find any information|search results did not contain|unable to respond|There is no mention of|documents do not mention anything|There is no information provided|reference passages do not mention|reference doesn't specify|could not find an answer to this question|the model cannot answer this question|none of the search results contain)",
+        "QAPromptTemplate": "<br><br>Human: Here are reference passages in <references> tags:<br><references><br>{context}<br></references><br>If the references contain the information needed to respond, then write a confident response in under 50 words, quoting the relevant references. <br>Otherwise, if you can make an informed guess based on the reference passages, then write a less confident response in under 50 words, stating your assumptions.<br>Finally, if the references do not have any relevant information, then respond saying \\"Sorry, I don't know\\".<br><question><br>{query}<br></question><br><br>Assistant: According to the reference passages, in under 50 words:",
+        "QASystemPrompt": "You are a seasoned and helpful question answering AI assistant.",
+        "QueryPromptTemplate": "<br><br>Human: Here is a chat history in <chatHistory> tags:<br><chatHistory><br>{history}<br></chatHistory><br>Human: And here is a follow up question or statement from the human in <followUpMessage> tags:<br><followUpMessage><br>{input}<br></followUpMessage><br>Human: Rephrase the follow up question or statement as a standalone question or statement that makes sense without reading the chat history.<br><br>Assistant: Here is the rephrased follow up question or statement:",
+      },
+      "anthropic.claude-3.5-sonnet-v2": {
+        "GenerateQuerySystemPrompt": "You are an AI assistant designed to disambiguate user queries.",
+        "KnowledgeBasePromptTemplate": "Human: You are a question answering agent. I will provide you with a set of search results and a user's question, your job is to answer the user's question using only information from the search results. If the search results do not contain information that can answer the question, then respond saying \\"Sorry, I don't know that.\\". Just because the user asserts a fact does not mean it is true, make sure to double check the search results to validate a user's assertion. Here are the search results in numbered order: $search_results$. Here is the user's question: <question> $query$ </question> $output_format_instructions$. Do NOT directly quote the $search_results$ in your answer. Your job is to answer the question as concisely as possible. Assistant:",
+        "MaxTokens": 200000,
+        "ModelID": "anthropic.claude-3-5-sonnet-20241022-v2:0",
+        "ModelParams": "{\\"temperature\\":0, \\"maxTokens\\":300, \\"topP\\":1}",
+        "NoHitsRegex": "(Sorry, I don't know|unable to assist you|i don't have enough context|i don't have enough information|i don't have any information|do not contain any information|do not contain information|i could not find an exact answer|no information in the search results|search results do not mention|search results do not provide specific|don't see any information in the provided search results|search results do not contain|no information in the provided search results|not find any information|search results did not contain|unable to respond|There is no mention of|documents do not mention anything|There is no information provided|reference passages do not mention|reference doesn't specify|could not find an answer to this question|the model cannot answer this question|none of the search results contain)",
+        "QAPromptTemplate": "<br><br>Human: Here are reference passages in <references> tags:<br><references><br>{context}<br></references><br>If the references contain the information needed to respond, then write a confident response in under 50 words, quoting the relevant references. <br>Otherwise, if you can make an informed guess based on the reference passages, then write a less confident response in under 50 words, stating your assumptions.<br>Finally, if the references do not have any relevant information, then respond saying \\"Sorry, I don't know\\".<br><question><br>{query}<br></question><br><br>Assistant: According to the reference passages, in under 50 words:",
+        "QASystemPrompt": "You are a seasoned and helpful question answering AI assistant.",
         "QueryPromptTemplate": "<br><br>Human: Here is a chat history in <chatHistory> tags:<br><chatHistory><br>{history}<br></chatHistory><br>Human: And here is a follow up question or statement from the human in <followUpMessage> tags:<br><followUpMessage><br>{input}<br></followUpMessage><br>Human: Rephrase the follow up question or statement as a standalone question or statement that makes sense without reading the chat history.<br><br>Assistant: Here is the rephrased follow up question or statement:",
       },
       "anthropic.claude-instant-v1": {
-        "KnowledgeBasePromptTemplate": "Human: You are a question answering agent. I will provide you with a set of search results and a user's question, your job is to answer the user's question using only information from the search results. If the search results do not contain information that can answer the question, then respond saying \\"Sorry, I don't know that.\\". Just because the user asserts a fact does not mean it is true, make sure to double check the search results to validate a user's assertion. Here are the search results in numbered order: $search_results$. Here is the user's question: <question> $query$ </question> $output_format_instructions$. Do NOT directly quote the $search_results$ in your answer. Your job is to answer the <question> as concisely as possible. Assistant:",
+        "GenerateQuerySystemPrompt": "You are an AI assistant designed to disambiguate user queries.",
+        "KnowledgeBasePromptTemplate": "Human: You are a question answering agent. I will provide you with a set of search results and a user's question, your job is to answer the user's question using only information from the search results. If the search results do not contain information that can answer the question, then respond saying \\"Sorry, I don't know that.\\". Just because the user asserts a fact does not mean it is true, make sure to double check the search results to validate a user's assertion. Here are the search results in numbered order: $search_results$. Here is the user's question: <question> $query$ </question> $output_format_instructions$. Do NOT directly quote the $search_results$ in your answer. Your job is to answer the question as concisely as possible. Assistant:",
         "MaxTokens": 100000,
         "ModelID": "anthropic.claude-instant-v1",
-        "NoHitsRegex": "(Sorry, I don't know|unable to assist you|i don't have enough context|i don't have enough information|do not contain any information|i could not find an exact answer|no information in the search results|don't see any information in the provided search results|search results do not contain|search results do not mention|search results do not provide|no information in the provided search results|not find any information|search results did not contain|unable to respond|There is no mention of|documents do not mention anything|There is no information provided|reference passages do not mention|could not find an answer to this question|the model cannot answer this question)",
-        "QAPromptTemplate": "<br><br>Human: You are a friendly AI assistant. Answer the question in <question> tags only based on the provided reference passages. Here are reference passages in <references> tags:<br><references><br>{context}<br></references><br>If the references contain the information needed to respond, then write a confident response in under 50 words, quoting the relevant references. <br>Otherwise, if you can make an informed guess based on the reference passages, then write a less confident response in under 50 words, stating your assumptions.<br>Finally, if the references do not have any relevant information, then respond saying \\"Sorry, I don't know\\".<br><question><br>{query}<br></question><br><br>Assistant: According to the reference passages, in under 50 words:",
+        "ModelParams": "{\\"temperature\\":0, \\"maxTokens\\":300, \\"topP\\":1}",
+        "NoHitsRegex": "(Sorry, I don't know|unable to assist you|i don't have enough context|i don't have enough information|i don't have any information|do not contain any information|do not contain information|i could not find an exact answer|no information in the search results|search results do not mention|search results do not provide specific|don't see any information in the provided search results|search results do not contain|no information in the provided search results|not find any information|search results did not contain|unable to respond|There is no mention of|documents do not mention anything|There is no information provided|reference passages do not mention|reference doesn't specify|could not find an answer to this question|the model cannot answer this question|none of the search results contain)",
+        "QAPromptTemplate": "<br><br>Human: Here are reference passages in <references> tags:<br><references><br>{context}<br></references><br>If the references contain the information needed to respond, then write a confident response in under 50 words, quoting the relevant references. <br>Otherwise, if you can make an informed guess based on the reference passages, then write a less confident response in under 50 words, stating your assumptions.<br>Finally, if the references do not have any relevant information, then respond saying \\"Sorry, I don't know\\".<br><question><br>{query}<br></question><br><br>Assistant: According to the reference passages, in under 50 words:",
+        "QASystemPrompt": "You are a seasoned and helpful question answering AI assistant.",
         "QueryPromptTemplate": "<br><br>Human: Here is a chat history in <chatHistory> tags:<br><chatHistory><br>{history}<br></chatHistory><br>Human: And here is a follow up question or statement from the human in <followUpMessage> tags:<br><followUpMessage><br>{input}<br></followUpMessage><br>Human: Rephrase the follow up question or statement as a standalone question or statement that makes sense without reading the chat history.<br><br>Assistant: Here is the rephrased follow up question or statement:",
       },
       "anthropic.claude-v2.1": {
-        "KnowledgeBasePromptTemplate": "Human: You are a question answering agent. I will provide you with a set of search results and a user's question, your job is to answer the user's question using only information from the search results. If the search results do not contain information that can answer the question, then respond saying \\"Sorry, I don't know that.\\". Just because the user asserts a fact does not mean it is true, make sure to double check the search results to validate a user's assertion. Here are the search results in numbered order: $search_results$. Here is the user's question: <question> $query$ </question> $output_format_instructions$. Do NOT directly quote the $search_results$ in your answer. Your job is to answer the <question> as concisely as possible. Assistant:",
+        "GenerateQuerySystemPrompt": "You are an AI assistant designed to disambiguate user queries.",
+        "KnowledgeBasePromptTemplate": "Human: You are a question answering agent. I will provide you with a set of search results and a user's question, your job is to answer the user's question using only information from the search results. If the search results do not contain information that can answer the question, then respond saying \\"Sorry, I don't know that.\\". Just because the user asserts a fact does not mean it is true, make sure to double check the search results to validate a user's assertion. Here are the search results in numbered order: $search_results$. Here is the user's question: <question> $query$ </question> $output_format_instructions$. Do NOT directly quote the $search_results$ in your answer. Your job is to answer the question as concisely as possible. Assistant:",
         "MaxTokens": 100000,
         "ModelID": "anthropic.claude-v2:1",
-        "NoHitsRegex": "(Sorry, I don't know|unable to assist you|i don't have enough context|i don't have enough information|do not contain any information|i could not find an exact answer|no information in the search results|don't see any information in the provided search results|search results do not contain|search results do not mention|search results do not provide|no information in the provided search results|not find any information|search results did not contain|unable to respond|There is no mention of|documents do not mention anything|There is no information provided|reference passages do not mention|could not find an answer to this question|the model cannot answer this question)",
-        "QAPromptTemplate": "<br><br>Human: You are a friendly AI assistant. Answer the question in <question> tags only based on the provided reference passages. Here are reference passages in <references> tags:<br><references><br>{context}<br></references><br>If the references contain the information needed to respond, then write a confident response in under 50 words, quoting the relevant references. <br>Otherwise, if you can make an informed guess based on the reference passages, then write a less confident response in under 50 words, stating your assumptions.<br>Finally, if the references do not have any relevant information, then respond saying \\"Sorry, I don't know\\".<br><question><br>{query}<br></question><br><br>Assistant: According to the reference passages, in under 50 words:",
+        "ModelParams": "{\\"temperature\\":0, \\"maxTokens\\":300, \\"topP\\":1}",
+        "NoHitsRegex": "(Sorry, I don't know|unable to assist you|i don't have enough context|i don't have enough information|i don't have any information|do not contain any information|do not contain information|i could not find an exact answer|no information in the search results|search results do not mention|search results do not provide specific|don't see any information in the provided search results|search results do not contain|no information in the provided search results|not find any information|search results did not contain|unable to respond|There is no mention of|documents do not mention anything|There is no information provided|reference passages do not mention|reference doesn't specify|could not find an answer to this question|the model cannot answer this question|none of the search results contain)",
+        "QAPromptTemplate": "<br><br>Human: Here are reference passages in <references> tags:<br><references><br>{context}<br></references><br>If the references contain the information needed to respond, then write a confident response in under 50 words, quoting the relevant references. <br>Otherwise, if you can make an informed guess based on the reference passages, then write a less confident response in under 50 words, stating your assumptions.<br>Finally, if the references do not have any relevant information, then respond saying \\"Sorry, I don't know\\".<br><question><br>{query}<br></question><br><br>Assistant: According to the reference passages, in under 50 words:",
+        "QASystemPrompt": "You are a seasoned and helpful question answering AI assistant.",
         "QueryPromptTemplate": "<br><br>Human: Here is a chat history in <chatHistory> tags:<br><chatHistory><br>{history}<br></chatHistory><br>Human: And here is a follow up question or statement from the human in <followUpMessage> tags:<br><followUpMessage><br>{input}<br></followUpMessage><br>Human: Rephrase the follow up question or statement as a standalone question or statement that makes sense without reading the chat history.<br><br>Assistant: Here is the rephrased follow up question or statement:",
       },
-      "cohere.command-text-v14": {
-        "MaxTokens": 4000,
-        "ModelID": "cohere.command-text-v14",
-        "NoHitsRegex": "(Sorry, I don't know|unable to assist you|i don't have enough context|i don't have enough information|do not contain any information|i could not find an exact answer|no information in the search results|don't see any information in the provided search results|search results do not contain|search results do not mention|search results do not provide|no information in the provided search results|not find any information|search results did not contain|unable to respond|There is no mention of|documents do not mention anything|There is no information provided|reference passages do not mention|could not find an answer to this question|the model cannot answer this question)",
-        "QAPromptTemplate": "<br><br>Human: You are a friendly AI assistant. Answer the question in <question> tags only based on the provided reference passages. Here are reference passages in <references> tags:<br><references><br>{context}<br></references><br>If the references contain the information needed to respond, then write a confident response in under 50 words, quoting the relevant references. <br>Otherwise, if you can make an informed guess based on the reference passages, then write a less confident response in under 50 words, stating your assumptions.<br>Finally, if the references do not have any relevant information, then respond saying \\"Sorry, I don't know\\".<br><question><br>{query}<br></question><br><br>Assistant: According to the reference passages, in under 50 words:",
+      "cohere.command-r-plus-v1": {
+        "GenerateQuerySystemPrompt": "You are an AI assistant designed to disambiguate user queries.",
+        "KnowledgeBasePromptTemplate": "You are a question answering agent. I will provide you with a set of search results. The user will provide you with a question. Your job is to answer the user's question using only information from the search results. If the search results do not contain information that can answer the question, please state \\"Sorry, I don't know that.\\". Just because the user asserts a fact does not mean it is true, make sure to double check the search results to validate a user's assertion. Here are the search results in numbered order: $search_results$ $output_format_instructions$ - DO NOT USE INFORMATION THAT IS NOT IN SEARCH RESULTS!",
+        "MaxTokens": 128000,
+        "ModelID": "cohere.command-r-plus-v1:0",
+        "ModelParams": "{\\"temperature\\":0, \\"maxTokens\\":300, \\"topP\\":1}",
+        "NoHitsRegex": "(Sorry, I don't know|unable to assist you|i don't have enough context|i don't have enough information|i don't have any information|do not contain any information|do not contain information|i could not find an exact answer|no information in the search results|search results do not mention|search results do not provide specific|don't see any information in the provided search results|search results do not contain|no information in the provided search results|not find any information|search results did not contain|unable to respond|There is no mention of|documents do not mention anything|There is no information provided|reference passages do not mention|reference doesn't specify|could not find an answer to this question|the model cannot answer this question|none of the search results contain)",
+        "QAPromptTemplate": "<br><br>Human: Here are reference passages in <references> tags:<br><references><br>{context}<br></references><br>If the references contain the information needed to respond, then write a confident response in under 50 words, quoting the relevant references. <br>Otherwise, if you can make an informed guess based on the reference passages, then write a less confident response in under 50 words, stating your assumptions.<br>Finally, if the references do not have any relevant information, then respond saying \\"Sorry, I don't know\\".<br><question><br>{query}<br></question><br><br>Assistant: According to the reference passages, in under 50 words:",
+        "QASystemPrompt": "You are a seasoned and helpful question answering AI assistant.",
         "QueryPromptTemplate": "Given the following conversation and a follow up question, rephrase the follow up question to be a standalone question.<br>Chat History: <br>{history}<br>Follow up question: {input}<br>Standalone question:",
       },
       "cohere.embed-english-v3": {
@@ -417,10 +494,35 @@ exports[`Verify master template is correct renders master template correctly 1`]
         "ModelID": "cohere.embed-multilingual-v3",
       },
       "meta.llama3-8b-instruct-v1": {
+        "GenerateQuerySystemPrompt": "You are an AI assistant designed to disambiguate user queries.",
         "MaxTokens": 8000,
         "ModelID": "meta.llama3-8b-instruct-v1:0",
-        "NoHitsRegex": "(Sorry, I don't know|unable to assist you|i don't have enough context|i don't have enough information|do not contain any information|i could not find an exact answer|no information in the search results|don't see any information in the provided search results|search results do not contain|search results do not mention|search results do not provide|no information in the provided search results|not find any information|search results did not contain|unable to respond|There is no mention of|documents do not mention anything|There is no information provided|reference passages do not mention|could not find an answer to this question|the model cannot answer this question)",
-        "QAPromptTemplate": "<br><br>Human: You are a friendly AI assistant. Answer the question in <question> tags only based on the provided reference passages. Here are reference passages in <references> tags:<br><references><br>{context}<br></references><br>If the references contain the information needed to respond, then write a confident response in under 50 words, quoting the relevant references. <br>Otherwise, if you can make an informed guess based on the reference passages, then write a less confident response in under 50 words, stating your assumptions.<br>Finally, if the references do not have any relevant information, then respond saying \\"Sorry, I don't know\\".<br><question><br>{query}<br></question><br><br>Assistant: According to the reference passages, in under 50 words:",
+        "ModelParams": "{\\"temperature\\":0, \\"maxTokens\\":300, \\"topP\\":1}",
+        "NoHitsRegex": "(Sorry, I don't know|unable to assist you|i don't have enough context|i don't have enough information|i don't have any information|do not contain any information|do not contain information|i could not find an exact answer|no information in the search results|search results do not mention|search results do not provide specific|don't see any information in the provided search results|search results do not contain|no information in the provided search results|not find any information|search results did not contain|unable to respond|There is no mention of|documents do not mention anything|There is no information provided|reference passages do not mention|reference doesn't specify|could not find an answer to this question|the model cannot answer this question|none of the search results contain)",
+        "QAPromptTemplate": "<br><br>Human: Here are reference passages in <references> tags:<br><references><br>{context}<br></references><br>If the references contain the information needed to respond, then write a confident response in under 50 words, quoting the relevant references. <br>Otherwise, if you can make an informed guess based on the reference passages, then write a less confident response in under 50 words, stating your assumptions.<br>Finally, if the references do not have any relevant information, then respond saying \\"Sorry, I don't know\\".<br><question><br>{query}<br></question><br><br>Assistant: According to the reference passages, in under 50 words:",
+        "QASystemPrompt": "You are a seasoned and helpful question answering AI assistant.",
+        "QueryPromptTemplate": "Given the following conversation and a follow up question, rephrase the follow up question to be a standalone question.<br>Chat History: <br>{history}<br>Follow up question: {input}<br>Standalone question:",
+      },
+      "meta.llama3.1-405b-instruct-v1": {
+        "GenerateQuerySystemPrompt": "You are an AI assistant designed to disambiguate user queries.",
+        "KnowledgeBasePromptTemplate": "You are a question answering agent. I will provide you with a set of search results. The user will provide you with a question. Your job is to answer the user's question using only information from the search results. If the search results do not contain information that can answer the question, please state \\"Sorry, I don't know that.\\". Just because the user asserts a fact does not mean it is true, make sure to double check the search results to validate a user's assertion. Here are the search results in numbered order: $search_results$ $output_format_instructions$ - DO NOT USE INFORMATION THAT IS NOT IN SEARCH RESULTS!",
+        "MaxTokens": 128000,
+        "ModelID": "meta.llama3-1-405b-instruct-v1:0",
+        "ModelParams": "{\\"temperature\\":0, \\"maxTokens\\":300, \\"topP\\":1}",
+        "NoHitsRegex": "(Sorry, I don't know|unable to assist you|i don't have enough context|i don't have enough information|i don't have any information|do not contain any information|do not contain information|i could not find an exact answer|no information in the search results|search results do not mention|search results do not provide specific|don't see any information in the provided search results|search results do not contain|no information in the provided search results|not find any information|search results did not contain|unable to respond|There is no mention of|documents do not mention anything|There is no information provided|reference passages do not mention|reference doesn't specify|could not find an answer to this question|the model cannot answer this question|none of the search results contain)",
+        "QAPromptTemplate": "<br><br>Human: Here are reference passages in <references> tags:<br><references><br>{context}<br></references><br>If the references contain the information needed to respond, then write a confident response in under 50 words, quoting the relevant references. <br>Otherwise, if you can make an informed guess based on the reference passages, then write a less confident response in under 50 words, stating your assumptions.<br>Finally, if the references do not have any relevant information, then respond saying \\"Sorry, I don't know\\".<br><question><br>{query}<br></question><br><br>Assistant: According to the reference passages, in under 50 words:",
+        "QASystemPrompt": "You are a seasoned and helpful question answering AI assistant.",
+        "QueryPromptTemplate": "Given the following conversation and a follow up question, rephrase the follow up question to be a standalone question.<br>Chat History: <br>{history}<br>Follow up question: {input}<br>Standalone question:",
+      },
+      "mistral.mistral-large-2407-v1": {
+        "GenerateQuerySystemPrompt": "You are an AI assistant designed to disambiguate user queries.",
+        "KnowledgeBasePromptTemplate": "Human: You are a question answering agent. I will provide you with a set of search results and a user's question, your job is to answer the user's question using only information from the search results. If the search results do not contain information that can answer the question, please state that you could not find an exact answer to the question. Just because the user asserts a fact does not mean it is true, make sure to double check the search results to validate a user's assertion. Here are the search results in numbered order: $search_results$ Here is the user's question: <question> $query$ </question> $output_format_instructions$ - DO NOT USE INFORMATION THAT IS NOT IN SEARCH RESULTS! Assistant:",
+        "MaxTokens": 128000,
+        "ModelID": "mistral.mistral-large-2407-v1:0",
+        "ModelParams": "{\\"temperature\\":0, \\"maxTokens\\":300, \\"topP\\":1}",
+        "NoHitsRegex": "(Sorry, I don't know|unable to assist you|i don't have enough context|i don't have enough information|i don't have any information|do not contain any information|do not contain information|i could not find an exact answer|no information in the search results|search results do not mention|search results do not provide specific|don't see any information in the provided search results|search results do not contain|no information in the provided search results|not find any information|search results did not contain|unable to respond|There is no mention of|documents do not mention anything|There is no information provided|reference passages do not mention|reference doesn't specify|could not find an answer to this question|the model cannot answer this question|none of the search results contain)",
+        "QAPromptTemplate": "<br><br>Human: Here are reference passages in <references> tags:<br><references><br>{context}<br></references><br>If the references contain the information needed to respond, then write a confident response in under 50 words, quoting the relevant references. <br>Otherwise, if you can make an informed guess based on the reference passages, then write a less confident response in under 50 words, stating your assumptions.<br>Finally, if the references do not have any relevant information, then respond saying \\"Sorry, I don't know\\".<br><question><br>{query}<br></question><br><br>Assistant: According to the reference passages, in under 50 words:",
+        "QASystemPrompt": "You are a seasoned and helpful question answering AI assistant.",
         "QueryPromptTemplate": "Given the following conversation and a follow up question, rephrase the follow up question to be a standalone question.<br>Chat History: <br>{history}<br>Follow up question: {input}<br>Standalone question:",
       },
     },
@@ -479,7 +581,6 @@ exports[`Verify master template is correct renders master template correctly 1`]
           "Parameters": [
             "EmbeddingsApi",
             "EmbeddingsBedrockModelId",
-            "SagemakerInitialInstanceCount",
             "EmbeddingsLambdaArn",
             "EmbeddingsLambdaDimensions",
           ],
@@ -491,9 +592,8 @@ exports[`Verify master template is correct renders master template correctly 1`]
           "Parameters": [
             "LLMApi",
             "LLMBedrockModelId",
-            "LLMSagemakerInstanceType",
-            "LLMSagemakerInitialInstanceCount",
             "LLMLambdaArn",
+            "EnableStreaming",
           ],
         },
         {
@@ -584,6 +684,24 @@ exports[`Verify master template is correct renders master template correctly 1`]
         ],
       },
     },
+    "CloudWatchDashboardURL": {
+      "Value": {
+        "Fn::Join": [
+          "",
+          [
+            "https://console.aws.amazon.com/cloudwatch/home?",
+            "region=",
+            {
+              "Ref": "AWS::Region",
+            },
+            "#dashboards:name=",
+            {
+              "Ref": "dashboard",
+            },
+          ],
+        ],
+      },
+    },
     "CognitoEndpoint": {
       "Value": {
         "Fn::GetAtt": [
@@ -613,34 +731,6 @@ exports[`Verify master template is correct renders master template correctly 1`]
         ],
       },
     },
-    "CustomSettingsSSMParameterName": {
-      "Value": {
-        "Ref": "CustomQnABotSettings",
-      },
-    },
-    "DashboardURL": {
-      "Value": {
-        "Fn::Join": [
-          "",
-          [
-            "https://console.aws.amazon.com/cloudwatch/home?",
-            "region=",
-            {
-              "Ref": "AWS::Region",
-            },
-            "#dashboards:name=",
-            {
-              "Ref": "dashboard",
-            },
-          ],
-        ],
-      },
-    },
-    "DefaultSettingsSSMParameterName": {
-      "Value": {
-        "Ref": "DefaultQnABotSettings",
-      },
-    },
     "DefaultUserPoolJwksUrlParameterName": {
       "Value": {
         "Ref": "DefaultUserPoolJwksUrl",
@@ -659,15 +749,8 @@ exports[`Verify master template is correct renders master template correctly 1`]
         ],
       },
     },
-    "ElasticsearchIndex": {
-      "Value": {
-        "Fn::GetAtt": [
-          "Var",
-          "index",
-        ],
-      },
-    },
     "FeedbackSNSTopic": {
+      "Condition": "BuildExamples",
       "Value": {
         "Fn::GetAtt": [
           "ExamplesStack",
@@ -746,11 +829,27 @@ exports[`Verify master template is correct renders master template correctly 1`]
         "Ref": "MetricsBucket",
       },
     },
-    "OpenSearchEndpoint": {
+    "OpenSearchDomainEndpoint": {
+      "Value": {
+        "Fn::Join": [
+          "",
+          [
+            "https://",
+            {
+              "Fn::GetAtt": [
+                "ESVar",
+                "ESAddress",
+              ],
+            },
+          ],
+        ],
+      },
+    },
+    "OpenSearchIndex": {
       "Value": {
         "Fn::GetAtt": [
-          "ESVar",
-          "ESAddress",
+          "Var",
+          "index",
         ],
       },
     },
@@ -770,9 +869,18 @@ exports[`Verify master template is correct renders master template correctly 1`]
         ],
       },
     },
-    "PrivateSettingsSSMParameterName": {
+    "SettingsTable": {
       "Value": {
-        "Ref": "PrivateQnABotSettings",
+        "Ref": "SettingsTable",
+      },
+    },
+    "StreamingWebSocketEndpoint": {
+      "Condition": "StreamingEnabled",
+      "Value": {
+        "Fn::GetAtt": [
+          "StreamingStack",
+          "Outputs.StreamingWebSocketEndpoint",
+        ],
       },
     },
     "TestAllBucket": {
@@ -858,12 +966,20 @@ exports[`Verify master template is correct renders master template correctly 1`]
     },
     "BedrockKnowledgeBaseModel": {
       "AllowedValues": [
+        "amazon.nova-micro-v1",
+        "amazon.nova-lite-v1",
+        "amazon.nova-pro-v1",
         "amazon.titan-text-premier-v1",
         "anthropic.claude-instant-v1",
         "anthropic.claude-v2.1",
+        "anthropic.claude-3-haiku-v1",
+        "anthropic.claude-3.5-haiku-v1",
         "anthropic.claude-3-sonnet-v1",
         "anthropic.claude-3.5-sonnet-v1",
-        "anthropic.claude-3-haiku-v1",
+        "anthropic.claude-3.5-sonnet-v2",
+        "cohere.command-r-plus-v1",
+        "meta.llama3.1-405b-instruct-v1",
+        "mistral.mistral-large-2407-v1",
       ],
       "Default": "anthropic.claude-instant-v1",
       "Description": "Required if BedrockKnowledgeBaseId is not empty. Sets the preferred LLM model to use with the Bedrock knowledge base. Please ensure you have requested access to the LLMs in Bedrock console (https://docs.aws.amazon.com/bedrock/latest/userguide/model-access.html), before deploying",
@@ -887,7 +1003,7 @@ exports[`Verify master template is correct renders master template correctly 1`]
         "FALSE",
       ],
       "Default": "TRUE",
-      "Description": "Set to TRUE to deploy the QnABot Examples Stack",
+      "Description": "Experimental (Development ONLY): Set to TRUE to deploy the QnABot Examples Stack. Note: Selecting FALSE will not the deploy the QnABot Examples Stack. This will limit also disable the feedback functionality and there will be no predefined examples questions set.",
       "Type": "String",
     },
     "Email": {
@@ -900,11 +1016,10 @@ exports[`Verify master template is correct renders master template correctly 1`]
       "AllowedValues": [
         "DISABLED",
         "BEDROCK",
-        "SAGEMAKER",
         "LAMBDA",
       ],
       "Default": "DISABLED",
-      "Description": "Enable QnABot semantics search using Embeddings from a pre-trained Large Language Model. If set to SAGEMAKER, an ml.m5.xlarge Sagemaker endpoint is automatically provisioned with Hugging Face intfloat/e5-large-v2 model. To use a custom LAMBDA function, provide additional parameters below.",
+      "Description": "Enable QnABot semantics search using Embeddings from a pre-trained Large Language Model. To use a custom LAMBDA function, provide additional parameters below.",
       "Type": "String",
     },
     "EmbeddingsBedrockModelId": {
@@ -930,6 +1045,15 @@ exports[`Verify master template is correct renders master template correctly 1`]
       "Description": "Required when EmbeddingsApi is LAMBDA. Provide number of dimensions for embeddings returned by the EmbeddingsLambda function specified above.",
       "MinValue": 1,
       "Type": "Number",
+    },
+    "EnableStreaming": {
+      "AllowedValues": [
+        "TRUE",
+        "FALSE",
+      ],
+      "Default": "FALSE",
+      "Description": "Set to TRUE to deploy the streaming resources using for LLMs.",
+      "Type": "String",
     },
     "FulfillmentConcurrency": {
       "Default": 0,
@@ -963,28 +1087,33 @@ exports[`Verify master template is correct renders master template correctly 1`]
     "LLMApi": {
       "AllowedValues": [
         "DISABLED",
-        "SAGEMAKER",
         "LAMBDA",
         "BEDROCK",
       ],
       "Default": "DISABLED",
-      "Description": "Optionally enable QnABot on AWS question disambiguation and generative question answering using an LLM. If set to SAGEMAKER, a Sagemaker endpoint is automatically provisioned. Selecting the LAMBDA option allows for configuration with other LLMs.",
+      "Description": "Optionally enable QnABot on AWS question disambiguation and generative question answering using an LLM. Selecting the LAMBDA option allows for configuration with other LLMs.",
       "Type": "String",
     },
     "LLMBedrockModelId": {
       "AllowedValues": [
+        "amazon.nova-micro-v1",
+        "amazon.nova-lite-v1",
+        "amazon.nova-pro-v1",
         "amazon.titan-text-express-v1",
         "amazon.titan-text-lite-v1",
         "amazon.titan-text-premier-v1",
-        "ai21.j2-ultra-v1",
-        "ai21.j2-mid-v1",
+        "ai21.jamba-instruct-v1",
         "anthropic.claude-instant-v1",
         "anthropic.claude-v2.1",
+        "anthropic.claude-3-haiku-v1",
+        "anthropic.claude-3.5-haiku-v1",
         "anthropic.claude-3-sonnet-v1",
         "anthropic.claude-3.5-sonnet-v1",
-        "anthropic.claude-3-haiku-v1",
-        "cohere.command-text-v14",
+        "anthropic.claude-3.5-sonnet-v2",
+        "cohere.command-r-plus-v1",
         "meta.llama3-8b-instruct-v1",
+        "meta.llama3.1-405b-instruct-v1",
+        "mistral.mistral-large-2407-v1",
       ],
       "Default": "anthropic.claude-instant-v1",
       "Description": "Required when LLMApi is BEDROCK. Please ensure you have requested access to the LLMs in Bedrock console (https://docs.aws.amazon.com/bedrock/latest/userguide/model-access.html), before deploying.",
@@ -995,19 +1124,6 @@ exports[`Verify master template is correct renders master template correctly 1`]
       "ConstraintDescription": "Must be a valid Lambda ARN or leave blank",
       "Default": "",
       "Description": "Required if LLMApi is LAMBDA. Provide ARN for a Lambda function that takes JSON {"prompt":"string", "settings":{key:value,..}}, and returns JSON {"generated_text":"string"}",
-      "Type": "String",
-    },
-    "LLMSagemakerInitialInstanceCount": {
-      "Default": 1,
-      "Description": "Required if LLMApi is SAGEMAKER. Provide initial instance count. Serverless Inference is not currently available for the built-in LLM model.",
-      "MinValue": 1,
-      "Type": "Number",
-    },
-    "LLMSagemakerInstanceType": {
-      "AllowedPattern": "^ml.*$",
-      "ConstraintDescription": "Must be a valid SageMaker instance type",
-      "Default": "ml.g5.12xlarge",
-      "Description": "Required if LLMApi is SAGEMAKER. Provide the SageMaker endpoint instance type. Defaults to ml.g5.12xlarge. Check account and region availability through the Service Quotas service before deploying",
       "Type": "String",
     },
     "Language": {
@@ -1143,12 +1259,6 @@ exports[`Verify master template is correct renders master template correctly 1`]
       "Default": "PRIVATE",
       "Description": "Choose whether access to the QnABot client should be publicly available or restricted to users in QnABot UserPool.",
       "Type": "String",
-    },
-    "SagemakerInitialInstanceCount": {
-      "Default": 1,
-      "Description": "Optional: If EmbeddingsApi is SAGEMAKER, provide initial instance count. Serverless Inference is not currently available for the built-in Embedding model.",
-      "MinValue": 1,
-      "Type": "Number",
     },
     "Username": {
       "AllowedPattern": "[^ ]+",
@@ -1312,44 +1422,27 @@ exports[`Verify master template is correct renders master template correctly 1`]
                 },
                 {
                   "Action": [
-                    "ssm:GetParameters",
-                    "ssm:GetParameter",
-                  ],
-                  "Effect": "Allow",
-                  "Resource": [
-                    {
-                      "Fn::Sub": "arn:aws:ssm:\${AWS::Region}:\${AWS::AccountId}:parameter/\${DefaultQnABotSettings}",
-                    },
-                    {
-                      "Fn::Sub": "arn:aws:ssm:\${AWS::Region}:\${AWS::AccountId}:parameter/\${CustomQnABotSettings}",
-                    },
-                    {
-                      "Fn::Sub": "arn:aws:ssm:\${AWS::Region}:\${AWS::AccountId}:parameter/\${PrivateQnABotSettings}",
-                    },
-                  ],
-                },
-                {
-                  "Action": [
-                    "ssm:PutParameter",
-                  ],
-                  "Effect": "Allow",
-                  "Resource": [
-                    {
-                      "Fn::Sub": "arn:aws:ssm:\${AWS::Region}:\${AWS::AccountId}:parameter/\${DefaultQnABotSettings}",
-                    },
-                    {
-                      "Fn::Sub": "arn:aws:ssm:\${AWS::Region}:\${AWS::AccountId}:parameter/\${CustomQnABotSettings}",
-                    },
-                  ],
-                },
-                {
-                  "Action": [
                     "lambda:InvokeFunction",
                   ],
                   "Effect": "Allow",
                   "Resource": [
                     {
                       "Fn::Sub": "arn:aws:lambda:\${AWS::Region}:\${AWS::AccountId}:function:\${SolutionHelper}",
+                    },
+                  ],
+                },
+                {
+                  "Action": [
+                    "dynamodb:GetItem",
+                    "dynamodb:PutItem",
+                    "dynamodb:Scan",
+                    "dynamodb:UpdateItem",
+                    "dynamodb:DeleteItem",
+                  ],
+                  "Effect": "Allow",
+                  "Resource": [
+                    {
+                      "Fn::Sub": "arn:aws:dynamodb:\${AWS::Region}:\${AWS::AccountId}:table/\${SettingsTable}",
                     },
                   ],
                 },
@@ -1864,22 +1957,6 @@ exports[`Verify master template is correct renders master template correctly 1`]
       },
       "Type": "AWS::ServiceCatalogAppRegistry::ResourceAssociation",
     },
-    "AppRegistryApplicationStackAssociationSagemakerEmbeddings": {
-      "Condition": "EmbeddingsSagemaker",
-      "Properties": {
-        "Application": {
-          "Fn::GetAtt": [
-            "Application",
-            "Id",
-          ],
-        },
-        "Resource": {
-          "Ref": "SagemakerEmbeddingsStack",
-        },
-        "ResourceType": "CFN_STACK",
-      },
-      "Type": "AWS::ServiceCatalogAppRegistry::ResourceAssociation",
-    },
     "AppRegistryApplicationStackAssociationTestAll": {
       "Properties": {
         "Application": {
@@ -2008,7 +2085,6 @@ exports[`Verify master template is correct renders master template correctly 1`]
       "Type": "AWS::S3::Bucket",
     },
     "AssetClean": {
-      "Condition": "BuildExamples",
       "DependsOn": [
         "CFNInvokePolicy",
         "HTTPSOnlyAssetBucketPolicy",
@@ -2027,7 +2103,6 @@ exports[`Verify master template is correct renders master template correctly 1`]
       "Type": "Custom::S3Clean",
     },
     "AssetUnzip": {
-      "Condition": "BuildExamples",
       "DependsOn": [
         "AssetClean",
       ],
@@ -2062,7 +2137,6 @@ exports[`Verify master template is correct renders master template correctly 1`]
       "Type": "Custom::S3Unzip",
     },
     "AssetZipVersion": {
-      "Condition": "BuildExamples",
       "Properties": {
         "Bucket": {
           "Ref": "BootstrapBucket",
@@ -2129,12 +2203,12 @@ exports[`Verify master template is correct renders master template correctly 1`]
               "AwsSdk",
               {
                 "Fn::Select": [
-                  2,
+                  "0",
                   {
                     "Fn::Split": [
                       "-",
                       {
-                        "Ref": "DefaultQnABotSettings",
+                        "Ref": "AWS::StackName",
                       },
                     ],
                   },
@@ -2892,11 +2966,17 @@ exports[`Verify master template is correct renders master template correctly 1`]
               "Statement": [
                 {
                   "Action": [
-                    "es:*",
+                    "es:ESHttp*",
+                    "es:UpdateDomainConfig",
+                    "es:DescribeDomain",
+                    "es:DescribeDomains",
+                    "es:DescribeDomainConfig",
                   ],
                   "Effect": "Allow",
                   "Resource": [
-                    "*",
+                    {
+                      "Fn::Sub": "arn:\${AWS::Partition}:es:\${AWS::Region}:\${AWS::AccountId}:domain*",
+                    },
                   ],
                 },
                 {
@@ -3006,6 +3086,7 @@ exports[`Verify master template is correct renders master template correctly 1`]
                     "s3:DeleteObjectVersion",
                     "s3:DeleteObject",
                     "s3:GetObjectVersion",
+                    "s3:ListBucket",
                   ],
                   "Effect": "Allow",
                   "Resource": [
@@ -3029,7 +3110,7 @@ exports[`Verify master template is correct renders master template correctly 1`]
               ],
               "Version": "2012-10-17",
             },
-            "PolicyName": "OpenSearchAccessPolicy",
+            "PolicyName": "CFNAccess",
           },
           {
             "PolicyDocument": {
@@ -3076,6 +3157,60 @@ exports[`Verify master template is correct renders master template correctly 1`]
             },
             "PolicyName": "LambdaFunctionCustomResourcePollingPolicy",
           },
+          {
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Action": [
+                    "dynamodb:PutItem",
+                    "dynamodb:Scan",
+                    "dynamodb:GetItem",
+                    "dynamodb:UpdateItem",
+                  ],
+                  "Effect": "Allow",
+                  "Resource": [
+                    {
+                      "Fn::GetAtt": [
+                        "SettingsTable",
+                        "Arn",
+                      ],
+                    },
+                  ],
+                },
+                {
+                  "Action": [
+                    "ssm:DescribeParameters",
+                  ],
+                  "Effect": "Allow",
+                  "Resource": [
+                    {
+                      "Fn::Sub": "arn:\${AWS::Partition}:ssm:\${AWS::Region}:\${AWS::AccountId}:*",
+                    },
+                  ],
+                },
+                {
+                  "Action": [
+                    "ssm:GetParameter",
+                    "ssm:DeleteParameter",
+                  ],
+                  "Effect": "Allow",
+                  "Resource": [
+                    {
+                      "Fn::Sub": "arn:\${AWS::Partition}:ssm:\${AWS::Region}:\${AWS::AccountId}:parameter/CFN-CustomQnABotSettings-*",
+                    },
+                    {
+                      "Fn::Sub": "arn:\${AWS::Partition}:ssm:\${AWS::Region}:\${AWS::AccountId}:parameter/CFN-PrivateQnABotSettings-*",
+                    },
+                    {
+                      "Fn::Sub": "arn:\${AWS::Partition}:ssm:\${AWS::Region}:\${AWS::AccountId}:parameter/CFN-DefaultQnABotSettings-*",
+                    },
+                  ],
+                },
+              ],
+              "Version": "2012-10-17",
+            },
+            "PolicyName": "SettingsInitializerCustomResourcePolicy",
+          },
         ],
       },
       "Type": "AWS::IAM::Role",
@@ -3121,12 +3256,12 @@ exports[`Verify master template is correct renders master template correctly 1`]
               "CfnLambdaModule",
               {
                 "Fn::Select": [
-                  2,
+                  "0",
                   {
                     "Fn::Split": [
                       "-",
                       {
-                        "Ref": "DefaultQnABotSettings",
+                        "Ref": "AWS::StackName",
                       },
                     ],
                   },
@@ -3408,12 +3543,12 @@ exports[`Verify master template is correct renders master template correctly 1`]
               "CommonModules",
               {
                 "Fn::Select": [
-                  2,
+                  "0",
                   {
                     "Fn::Split": [
                       "-",
                       {
-                        "Ref": "DefaultQnABotSettings",
+                        "Ref": "AWS::StackName",
                       },
                     ],
                   },
@@ -3534,6 +3669,7 @@ exports[`Verify master template is correct renders master template correctly 1`]
       "Type": "Custom::S3Clean",
     },
     "CustomQnABotSettings": {
+      "Condition": "DeprecatedSSMSettings",
       "Properties": {
         "Description": "Custom QnABot Settings - Modify to override defaults, or to add new settings",
         "Tier": "Advanced",
@@ -3590,6 +3726,7 @@ exports[`Verify master template is correct renders master template correctly 1`]
       "Type": "AWS::ServiceCatalogAppRegistry::AttributeGroup",
     },
     "DefaultQnABotSettings": {
+      "Condition": "DeprecatedSSMSettings",
       "Properties": {
         "Description": "Default QnABot Settings - DO NOT MODIFY",
         "Tier": "Advanced",
@@ -4156,14 +4293,8 @@ exports[`Verify master template is correct renders master template correctly 1`]
         },
         "Environment": {
           "Variables": {
-            "CUSTOM_SETTINGS_PARAM": {
-              "Ref": "CustomQnABotSettings",
-            },
-            "DEFAULT_SETTINGS_PARAM": {
-              "Ref": "DefaultQnABotSettings",
-            },
-            "PRIVATE_SETTINGS_PARAM": {
-              "Ref": "PrivateQnABotSettings",
+            "SETTINGS_TABLE": {
+              "Ref": "SettingsTable",
             },
             "SOLUTION_ID": "SO0189",
             "SOLUTION_VERSION": "vx.x.x",
@@ -5199,29 +5330,11 @@ exports.handler = async function (event, context) {
         },
         "Environment": {
           "Variables": {
-            "CUSTOM_SETTINGS_PARAM": {
-              "Ref": "CustomQnABotSettings",
-            },
-            "DEFAULT_SETTINGS_PARAM": {
-              "Ref": "DefaultQnABotSettings",
-            },
             "EMBEDDINGS_API": {
               "Ref": "EmbeddingsApi",
             },
             "EMBEDDINGS_LAMBDA_ARN": {
               "Ref": "EmbeddingsLambdaArn",
-            },
-            "EMBEDDINGS_SAGEMAKER_ENDPOINT": {
-              "Fn::If": [
-                "EmbeddingsSagemaker",
-                {
-                  "Fn::GetAtt": [
-                    "SagemakerEmbeddingsStack",
-                    "Outputs.EmbeddingsSagemakerEndpoint",
-                  ],
-                },
-                "",
-              ],
             },
             "ES_ADDRESS": {
               "Fn::GetAtt": [
@@ -5241,8 +5354,8 @@ exports.handler = async function (event, context) {
                 "QnAType",
               ],
             },
-            "PRIVATE_SETTINGS_PARAM": {
-              "Ref": "PrivateQnABotSettings",
+            "SETTINGS_TABLE": {
+              "Ref": "SettingsTable",
             },
             "SOLUTION_ID": "SO0189",
             "SOLUTION_VERSION": "vx.x.x",
@@ -5849,72 +5962,6 @@ exports.handler = async function (event, context) {
                           },
                           "parameter/",
                           {
-                            "Ref": "DefaultQnABotSettings",
-                          },
-                        ],
-                      ],
-                    },
-                    {
-                      "Fn::Join": [
-                        "",
-                        [
-                          "arn:",
-                          {
-                            "Fn::Sub": "\${AWS::Partition}:",
-                          },
-                          "ssm:",
-                          {
-                            "Fn::Sub": "\${AWS::Region}:",
-                          },
-                          {
-                            "Fn::Sub": "\${AWS::AccountId}:",
-                          },
-                          "parameter/",
-                          {
-                            "Ref": "PrivateQnABotSettings",
-                          },
-                        ],
-                      ],
-                    },
-                    {
-                      "Fn::Join": [
-                        "",
-                        [
-                          "arn:",
-                          {
-                            "Fn::Sub": "\${AWS::Partition}:",
-                          },
-                          "ssm:",
-                          {
-                            "Fn::Sub": "\${AWS::Region}:",
-                          },
-                          {
-                            "Fn::Sub": "\${AWS::AccountId}:",
-                          },
-                          "parameter/",
-                          {
-                            "Ref": "CustomQnABotSettings",
-                          },
-                        ],
-                      ],
-                    },
-                    {
-                      "Fn::Join": [
-                        "",
-                        [
-                          "arn:",
-                          {
-                            "Fn::Sub": "\${AWS::Partition}:",
-                          },
-                          "ssm:",
-                          {
-                            "Fn::Sub": "\${AWS::Region}:",
-                          },
-                          {
-                            "Fn::Sub": "\${AWS::AccountId}:",
-                          },
-                          "parameter/",
-                          {
                             "Ref": "DefaultUserPoolJwksUrl",
                           },
                         ],
@@ -5933,26 +5980,6 @@ exports.handler = async function (event, context) {
               {
                 "PolicyDocument": {
                   "Statement": [
-                    {
-                      "Fn::If": [
-                        "EmbeddingsSagemaker",
-                        {
-                          "Action": [
-                            "sagemaker:InvokeEndpoint",
-                          ],
-                          "Effect": "Allow",
-                          "Resource": {
-                            "Fn::GetAtt": [
-                              "SagemakerEmbeddingsStack",
-                              "Outputs.EmbeddingsSagemakerEndpointArn",
-                            ],
-                          },
-                        },
-                        {
-                          "Ref": "AWS::NoValue",
-                        },
-                      ],
-                    },
                     {
                       "Fn::If": [
                         "EmbeddingsLambdaArn",
@@ -6028,6 +6055,7 @@ exports.handler = async function (event, context) {
                 {
                   "Action": [
                     "s3:GetObject",
+                    "s3:ListBucket",
                   ],
                   "Effect": "Allow",
                   "Resource": [
@@ -6039,6 +6067,28 @@ exports.handler = async function (event, context) {
               "Version": "2012-10-17",
             },
             "PolicyName": "S3QNABucketReadAccess",
+          },
+          {
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Action": [
+                    "dynamodb:Scan",
+                  ],
+                  "Effect": "Allow",
+                  "Resource": [
+                    {
+                      "Fn::GetAtt": [
+                        "SettingsTable",
+                        "Arn",
+                      ],
+                    },
+                  ],
+                },
+              ],
+              "Version": "2012-10-17",
+            },
+            "PolicyName": "SettingsTableReadAccess",
           },
         ],
       },
@@ -6234,83 +6284,86 @@ exports.handler = async function (event, context) {
         },
         "Environment": {
           "Variables": {
-            "CUSTOM_SETTINGS_PARAM": {
-              "Ref": "CustomQnABotSettings",
-            },
-            "DEFAULT_SETTINGS_PARAM": {
-              "Ref": "DefaultQnABotSettings",
-            },
-            "EXTCreateRecentTopicsResponse": {
-              "Fn::GetAtt": [
-                "ExamplesStack",
-                "Outputs.EXTCreateRecentTopicsResponse",
-              ],
-            },
-            "EXTCustomJSHook": {
-              "Fn::GetAtt": [
-                "ExamplesStack",
-                "Outputs.EXTCustomJSHook",
-              ],
-            },
-            "EXTCustomPYHook": {
-              "Fn::GetAtt": [
-                "ExamplesStack",
-                "Outputs.EXTCustomPYHook",
-              ],
-            },
-            "ExampleJSLambdaQuiz": {
-              "Fn::GetAtt": [
-                "ExamplesStack",
-                "Outputs.ExampleJSLambdaQuiz",
-              ],
-            },
-            "ExampleJSLambdahook": {
-              "Fn::GetAtt": [
-                "ExamplesStack",
-                "Outputs.ExampleJSLambdahook",
-              ],
-            },
-            "ExamplePYTHONLambdaBotBroker": {
-              "Fn::GetAtt": [
-                "ExamplesStack",
-                "Outputs.ExamplePYTHONLambdaBotBroker",
-              ],
-            },
-            "ExamplePYTHONLambdaConnectCallback": {
-              "Fn::GetAtt": [
-                "ExamplesStack",
-                "Outputs.ExamplePYTHONLambdaConnectCallback",
-              ],
-            },
-            "ExamplePYTHONLambdaFeedback": {
-              "Fn::GetAtt": [
-                "ExamplesStack",
-                "Outputs.ExamplePYTHONLambdaFeedback",
-              ],
-            },
-            "ExamplePYTHONLambdaNext": {
-              "Fn::GetAtt": [
-                "ExamplesStack",
-                "Outputs.ExamplePYTHONLambdaNext",
-              ],
-            },
-            "ExamplePYTHONLambdaPrevious": {
-              "Fn::GetAtt": [
-                "ExamplesStack",
-                "Outputs.ExamplePYTHONLambdaPrevious",
-              ],
-            },
-            "ExamplePYTHONLambdahello": {
-              "Fn::GetAtt": [
-                "ExamplesStack",
-                "Outputs.ExamplePYTHONLambdahello",
-              ],
-            },
-            "PRIVATE_SETTINGS_PARAM": {
-              "Ref": "PrivateQnABotSettings",
-            },
-            "SOLUTION_ID": "SO0189",
-            "SOLUTION_VERSION": "vx.x.x",
+            "Fn::If": [
+              "BuildExamples",
+              {
+                "EXTCreateRecentTopicsResponse": {
+                  "Fn::GetAtt": [
+                    "ExamplesStack",
+                    "Outputs.EXTCreateRecentTopicsResponse",
+                  ],
+                },
+                "EXTCustomJSHook": {
+                  "Fn::GetAtt": [
+                    "ExamplesStack",
+                    "Outputs.EXTCustomJSHook",
+                  ],
+                },
+                "EXTCustomPYHook": {
+                  "Fn::GetAtt": [
+                    "ExamplesStack",
+                    "Outputs.EXTCustomPYHook",
+                  ],
+                },
+                "ExampleJSLambdaQuiz": {
+                  "Fn::GetAtt": [
+                    "ExamplesStack",
+                    "Outputs.ExampleJSLambdaQuiz",
+                  ],
+                },
+                "ExampleJSLambdahook": {
+                  "Fn::GetAtt": [
+                    "ExamplesStack",
+                    "Outputs.ExampleJSLambdahook",
+                  ],
+                },
+                "ExamplePYTHONLambdaBotBroker": {
+                  "Fn::GetAtt": [
+                    "ExamplesStack",
+                    "Outputs.ExamplePYTHONLambdaBotBroker",
+                  ],
+                },
+                "ExamplePYTHONLambdaConnectCallback": {
+                  "Fn::GetAtt": [
+                    "ExamplesStack",
+                    "Outputs.ExamplePYTHONLambdaConnectCallback",
+                  ],
+                },
+                "ExamplePYTHONLambdaFeedback": {
+                  "Fn::GetAtt": [
+                    "ExamplesStack",
+                    "Outputs.ExamplePYTHONLambdaFeedback",
+                  ],
+                },
+                "ExamplePYTHONLambdaNext": {
+                  "Fn::GetAtt": [
+                    "ExamplesStack",
+                    "Outputs.ExamplePYTHONLambdaNext",
+                  ],
+                },
+                "ExamplePYTHONLambdaPrevious": {
+                  "Fn::GetAtt": [
+                    "ExamplesStack",
+                    "Outputs.ExamplePYTHONLambdaPrevious",
+                  ],
+                },
+                "ExamplePYTHONLambdahello": {
+                  "Fn::GetAtt": [
+                    "ExamplesStack",
+                    "Outputs.ExamplePYTHONLambdahello",
+                  ],
+                },
+                "SETTINGS_TABLE": {
+                  "Ref": "SettingsTable",
+                },
+                "SOLUTION_ID": "SO0189",
+                "SOLUTION_VERSION": "vx.x.x",
+              },
+              {
+                "SOLUTION_ID": "SO0189",
+                "SOLUTION_VERSION": "vx.x.x",
+              },
+            ],
           },
         },
         "Handler": "index.query",
@@ -6533,16 +6586,10 @@ exports.handler = async function (event, context) {
         },
         "Environment": {
           "Variables": {
-            "CUSTOM_SETTINGS_PARAM": {
-              "Ref": "CustomQnABotSettings",
-            },
-            "DEFAULT_SETTINGS_PARAM": {
-              "Ref": "DefaultQnABotSettings",
-            },
-            "PRIVATE_SETTINGS_PARAM": {
-              "Ref": "PrivateQnABotSettings",
-            },
             "REPEAT_COUNT": "4",
+            "SETTINGS_TABLE": {
+              "Ref": "SettingsTable",
+            },
             "SOLUTION_ID": "SO0189",
             "SOLUTION_VERSION": "vx.x.x",
             "TARGET_INDEX": {
@@ -6731,12 +6778,12 @@ exports.handler = async function (event, context) {
               "EsProxy",
               {
                 "Fn::Select": [
-                  2,
+                  "0",
                   {
                     "Fn::Split": [
                       "-",
                       {
-                        "Ref": "DefaultQnABotSettings",
+                        "Ref": "AWS::StackName",
                       },
                     ],
                   },
@@ -7439,9 +7486,6 @@ exports.documents = (event, context, callback) => {
               "Arn",
             ],
           },
-          "DefaultQnABotSettings": {
-            "Ref": "DefaultQnABotSettings",
-          },
           "ESAddress": {
             "Fn::GetAtt": [
               "ESVar",
@@ -7471,9 +7515,6 @@ exports.documents = (event, context, callback) => {
           },
           "LogRetentionPeriod": {
             "Ref": "LogRetentionPeriod",
-          },
-          "PrivateQnABotSettings": {
-            "Ref": "PrivateQnABotSettings",
           },
           "QIDLambdaArn": {
             "Fn::GetAtt": [
@@ -7642,12 +7683,6 @@ exports.documents = (event, context, callback) => {
           "ContentDesignerOutputBucket": {
             "Ref": "ContentDesignerOutputBucket",
           },
-          "CustomQnABotSettings": {
-            "Ref": "CustomQnABotSettings",
-          },
-          "DefaultQnABotSettings": {
-            "Ref": "DefaultQnABotSettings",
-          },
           "EsEndpoint": {
             "Fn::GetAtt": [
               "ESVar",
@@ -7662,9 +7697,6 @@ exports.documents = (event, context, callback) => {
           },
           "ExportBucket": {
             "Ref": "ExportBucket",
-          },
-          "KendraCrawlerSnsTopic": {
-            "Ref": "KendraCrawlerSnsTopic",
           },
           "KendraFaqIndexId": {
             "Ref": "KendraFaqIndexId",
@@ -7706,9 +7738,6 @@ exports.documents = (event, context, callback) => {
           "LogRetentionPeriod": {
             "Ref": "LogRetentionPeriod",
           },
-          "PrivateQnABotSettings": {
-            "Ref": "PrivateQnABotSettings",
-          },
           "QnABotCommonLambdaLayer": {
             "Ref": "QnABotCommonLambdaLayer",
           },
@@ -7717,6 +7746,9 @@ exports.documents = (event, context, callback) => {
               "S3Clean",
               "Arn",
             ],
+          },
+          "SettingsTable": {
+            "Ref": "SettingsTable",
           },
           "Stage": {
             "Ref": "Stage",
@@ -8313,281 +8345,305 @@ exports.documents = (event, context, callback) => {
         },
         "Environment": {
           "Variables": {
-            "CUSTOM_SETTINGS_PARAM": {
-              "Ref": "CustomQnABotSettings",
-            },
-            "DEFAULT_SETTINGS_PARAM": {
-              "Ref": "DefaultQnABotSettings",
-            },
-            "DEFAULT_USER_POOL_JWKS_PARAM": {
-              "Ref": "DefaultUserPoolJwksUrl",
-            },
-            "DYNAMODB_USERSTABLE": {
-              "Ref": "UsersTable",
-            },
-            "EMBEDDINGS_API": {
-              "Ref": "EmbeddingsApi",
-            },
-            "EMBEDDINGS_LAMBDA_ARN": {
-              "Ref": "EmbeddingsLambdaArn",
-            },
-            "EMBEDDINGS_SAGEMAKER_ENDPOINT": {
-              "Fn::If": [
-                "EmbeddingsSagemaker",
-                {
+            "Fn::If": [
+              "BuildExamples",
+              {
+                "DEFAULT_USER_POOL_JWKS_PARAM": {
+                  "Ref": "DefaultUserPoolJwksUrl",
+                },
+                "DYNAMODB_USERSTABLE": {
+                  "Ref": "UsersTable",
+                },
+                "EMBEDDINGS_API": {
+                  "Ref": "EmbeddingsApi",
+                },
+                "EMBEDDINGS_LAMBDA_ARN": {
+                  "Ref": "EmbeddingsLambdaArn",
+                },
+                "ES_ADDRESS": {
                   "Fn::GetAtt": [
-                    "SagemakerEmbeddingsStack",
-                    "Outputs.EmbeddingsSagemakerEndpoint",
+                    "ESVar",
+                    "ESAddress",
                   ],
                 },
-                "",
-              ],
-            },
-            "EMBEDDINGS_SAGEMAKER_INSTANCECOUNT": {
-              "Ref": "SagemakerInitialInstanceCount",
-            },
-            "ES_ADDRESS": {
-              "Fn::GetAtt": [
-                "ESVar",
-                "ESAddress",
-              ],
-            },
-            "ES_INDEX": {
-              "Fn::GetAtt": [
-                "Var",
-                "QnaIndex",
-              ],
-            },
-            "ES_SERVICE_PROXY": {
-              "Ref": "ESProxyLambda",
-            },
-            "ES_SERVICE_QID": {
-              "Ref": "ESQidLambda",
-            },
-            "ES_TYPE": {
-              "Fn::GetAtt": [
-                "Var",
-                "QnAType",
-              ],
-            },
-            "EXTCreateRecentTopicsResponse": {
-              "Fn::GetAtt": [
-                "ExamplesStack",
-                "Outputs.EXTCreateRecentTopicsResponse",
-              ],
-            },
-            "EXTCustomJSHook": {
-              "Fn::GetAtt": [
-                "ExamplesStack",
-                "Outputs.EXTCustomJSHook",
-              ],
-            },
-            "EXTCustomPYHook": {
-              "Fn::GetAtt": [
-                "ExamplesStack",
-                "Outputs.EXTCustomPYHook",
-              ],
-            },
-            "ExampleJSLambdaQuiz": {
-              "Fn::GetAtt": [
-                "ExamplesStack",
-                "Outputs.ExampleJSLambdaQuiz",
-              ],
-            },
-            "ExampleJSLambdahook": {
-              "Fn::GetAtt": [
-                "ExamplesStack",
-                "Outputs.ExampleJSLambdahook",
-              ],
-            },
-            "ExamplePYTHONLambdaBotBroker": {
-              "Fn::GetAtt": [
-                "ExamplesStack",
-                "Outputs.ExamplePYTHONLambdaBotBroker",
-              ],
-            },
-            "ExamplePYTHONLambdaConnectCallback": {
-              "Fn::GetAtt": [
-                "ExamplesStack",
-                "Outputs.ExamplePYTHONLambdaConnectCallback",
-              ],
-            },
-            "ExamplePYTHONLambdaFeedback": {
-              "Fn::GetAtt": [
-                "ExamplesStack",
-                "Outputs.ExamplePYTHONLambdaFeedback",
-              ],
-            },
-            "ExamplePYTHONLambdaNext": {
-              "Fn::GetAtt": [
-                "ExamplesStack",
-                "Outputs.ExamplePYTHONLambdaNext",
-              ],
-            },
-            "ExamplePYTHONLambdaPrevious": {
-              "Fn::GetAtt": [
-                "ExamplesStack",
-                "Outputs.ExamplePYTHONLambdaPrevious",
-              ],
-            },
-            "ExamplePYTHONLambdahello": {
-              "Fn::GetAtt": [
-                "ExamplesStack",
-                "Outputs.ExamplePYTHONLambdahello",
-              ],
-            },
-            "LAMBDA_DEFAULT_QUERY": {
-              "Ref": "ESQueryLambda",
-            },
-            "LAMBDA_LOG": {
-              "Ref": "ESLoggingLambda",
-            },
-            "LLM_API": {
-              "Ref": "LLMApi",
-            },
-            "LLM_LAMBDA_ARN": {
-              "Ref": "LLMLambdaArn",
-            },
-            "LLM_SAGEMAKERENDPOINT": {
-              "Fn::If": [
-                "LLMSagemaker",
-                {
+                "ES_INDEX": {
                   "Fn::GetAtt": [
-                    "SageMakerQASummarizeLLMStack",
-                    "Outputs.LLMSagemakerEndpoint",
+                    "Var",
+                    "QnaIndex",
                   ],
                 },
-                "",
-              ],
-            },
-            "LLM_SAGEMAKERINSTANCECOUNT": {
-              "Ref": "LLMSagemakerInitialInstanceCount",
-            },
-            "PRIVATE_SETTINGS_PARAM": {
-              "Ref": "PrivateQnABotSettings",
-            },
-            "QNAAge": {
-              "Fn::GetAtt": [
-                "ExamplesStack",
-                "Outputs.QNAAge",
-              ],
-            },
-            "QNAAgeNoConfirm": {
-              "Fn::GetAtt": [
-                "ExamplesStack",
-                "Outputs.QNAAgeNoConfirm",
-              ],
-            },
-            "QNADate": {
-              "Fn::GetAtt": [
-                "ExamplesStack",
-                "Outputs.QNADate",
-              ],
-            },
-            "QNADateNoConfirm": {
-              "Fn::GetAtt": [
-                "ExamplesStack",
-                "Outputs.QNADateNoConfirm",
-              ],
-            },
-            "QNADayOfWeek": {
-              "Fn::GetAtt": [
-                "ExamplesStack",
-                "Outputs.QNADayOfWeek",
-              ],
-            },
-            "QNAEmailAddress": {
-              "Fn::GetAtt": [
-                "ExamplesStack",
-                "Outputs.QNAEmailAddress",
-              ],
-            },
-            "QNAMonth": {
-              "Fn::GetAtt": [
-                "ExamplesStack",
-                "Outputs.QNAMonth",
-              ],
-            },
-            "QNAMonthNoConfirm": {
-              "Fn::GetAtt": [
-                "ExamplesStack",
-                "Outputs.QNAMonthNoConfirm",
-              ],
-            },
-            "QNAName": {
-              "Fn::GetAtt": [
-                "ExamplesStack",
-                "Outputs.QNAName",
-              ],
-            },
-            "QNANumber": {
-              "Fn::GetAtt": [
-                "ExamplesStack",
-                "Outputs.QNANumber",
-              ],
-            },
-            "QNANumberNoConfirm": {
-              "Fn::GetAtt": [
-                "ExamplesStack",
-                "Outputs.QNANumberNoConfirm",
-              ],
-            },
-            "QNAPhoneNumber": {
-              "Fn::GetAtt": [
-                "ExamplesStack",
-                "Outputs.QNAPhoneNumber",
-              ],
-            },
-            "QNAPhoneNumberNoConfirm": {
-              "Fn::GetAtt": [
-                "ExamplesStack",
-                "Outputs.QNAPhoneNumberNoConfirm",
-              ],
-            },
-            "QNAPin": {
-              "Fn::GetAtt": [
-                "ExamplesStack",
-                "Outputs.QNAPin",
-              ],
-            },
-            "QNAPinNoConfirm": {
-              "Fn::GetAtt": [
-                "ExamplesStack",
-                "Outputs.QNAPinNoConfirm",
-              ],
-            },
-            "QNASocialSecurity": {
-              "Fn::GetAtt": [
-                "ExamplesStack",
-                "Outputs.QNASocialSecurity",
-              ],
-            },
-            "QNATime": {
-              "Fn::GetAtt": [
-                "ExamplesStack",
-                "Outputs.QNATime",
-              ],
-            },
-            "QNAWage": {
-              "Fn::GetAtt": [
-                "ExamplesStack",
-                "Outputs.QNAWage",
-              ],
-            },
-            "QNAYesNo": {
-              "Fn::GetAtt": [
-                "ExamplesStack",
-                "Outputs.QNAYesNo",
-              ],
-            },
-            "QNAYesNoExit": {
-              "Fn::GetAtt": [
-                "ExamplesStack",
-                "Outputs.QNAYesNoExit",
-              ],
-            },
-            "SOLUTION_ID": "SO0189",
-            "SOLUTION_VERSION": "vx.x.x",
+                "ES_SERVICE_PROXY": {
+                  "Ref": "ESProxyLambda",
+                },
+                "ES_SERVICE_QID": {
+                  "Ref": "ESQidLambda",
+                },
+                "ES_TYPE": {
+                  "Fn::GetAtt": [
+                    "Var",
+                    "QnAType",
+                  ],
+                },
+                "EXTCreateRecentTopicsResponse": {
+                  "Fn::GetAtt": [
+                    "ExamplesStack",
+                    "Outputs.EXTCreateRecentTopicsResponse",
+                  ],
+                },
+                "EXTCustomJSHook": {
+                  "Fn::GetAtt": [
+                    "ExamplesStack",
+                    "Outputs.EXTCustomJSHook",
+                  ],
+                },
+                "EXTCustomPYHook": {
+                  "Fn::GetAtt": [
+                    "ExamplesStack",
+                    "Outputs.EXTCustomPYHook",
+                  ],
+                },
+                "ExampleJSLambdaQuiz": {
+                  "Fn::GetAtt": [
+                    "ExamplesStack",
+                    "Outputs.ExampleJSLambdaQuiz",
+                  ],
+                },
+                "ExampleJSLambdahook": {
+                  "Fn::GetAtt": [
+                    "ExamplesStack",
+                    "Outputs.ExampleJSLambdahook",
+                  ],
+                },
+                "ExamplePYTHONLambdaBotBroker": {
+                  "Fn::GetAtt": [
+                    "ExamplesStack",
+                    "Outputs.ExamplePYTHONLambdaBotBroker",
+                  ],
+                },
+                "ExamplePYTHONLambdaConnectCallback": {
+                  "Fn::GetAtt": [
+                    "ExamplesStack",
+                    "Outputs.ExamplePYTHONLambdaConnectCallback",
+                  ],
+                },
+                "ExamplePYTHONLambdaFeedback": {
+                  "Fn::GetAtt": [
+                    "ExamplesStack",
+                    "Outputs.ExamplePYTHONLambdaFeedback",
+                  ],
+                },
+                "ExamplePYTHONLambdaNext": {
+                  "Fn::GetAtt": [
+                    "ExamplesStack",
+                    "Outputs.ExamplePYTHONLambdaNext",
+                  ],
+                },
+                "ExamplePYTHONLambdaPrevious": {
+                  "Fn::GetAtt": [
+                    "ExamplesStack",
+                    "Outputs.ExamplePYTHONLambdaPrevious",
+                  ],
+                },
+                "ExamplePYTHONLambdahello": {
+                  "Fn::GetAtt": [
+                    "ExamplesStack",
+                    "Outputs.ExamplePYTHONLambdahello",
+                  ],
+                },
+                "LAMBDA_DEFAULT_QUERY": {
+                  "Ref": "ESQueryLambda",
+                },
+                "LAMBDA_LOG": {
+                  "Ref": "ESLoggingLambda",
+                },
+                "LLM_API": {
+                  "Ref": "LLMApi",
+                },
+                "LLM_LAMBDA_ARN": {
+                  "Ref": "LLMLambdaArn",
+                },
+                "QNAAge": {
+                  "Fn::GetAtt": [
+                    "ExamplesStack",
+                    "Outputs.QNAAge",
+                  ],
+                },
+                "QNAAgeNoConfirm": {
+                  "Fn::GetAtt": [
+                    "ExamplesStack",
+                    "Outputs.QNAAgeNoConfirm",
+                  ],
+                },
+                "QNADate": {
+                  "Fn::GetAtt": [
+                    "ExamplesStack",
+                    "Outputs.QNADate",
+                  ],
+                },
+                "QNADateNoConfirm": {
+                  "Fn::GetAtt": [
+                    "ExamplesStack",
+                    "Outputs.QNADateNoConfirm",
+                  ],
+                },
+                "QNADayOfWeek": {
+                  "Fn::GetAtt": [
+                    "ExamplesStack",
+                    "Outputs.QNADayOfWeek",
+                  ],
+                },
+                "QNAEmailAddress": {
+                  "Fn::GetAtt": [
+                    "ExamplesStack",
+                    "Outputs.QNAEmailAddress",
+                  ],
+                },
+                "QNAMonth": {
+                  "Fn::GetAtt": [
+                    "ExamplesStack",
+                    "Outputs.QNAMonth",
+                  ],
+                },
+                "QNAMonthNoConfirm": {
+                  "Fn::GetAtt": [
+                    "ExamplesStack",
+                    "Outputs.QNAMonthNoConfirm",
+                  ],
+                },
+                "QNAName": {
+                  "Fn::GetAtt": [
+                    "ExamplesStack",
+                    "Outputs.QNAName",
+                  ],
+                },
+                "QNANumber": {
+                  "Fn::GetAtt": [
+                    "ExamplesStack",
+                    "Outputs.QNANumber",
+                  ],
+                },
+                "QNANumberNoConfirm": {
+                  "Fn::GetAtt": [
+                    "ExamplesStack",
+                    "Outputs.QNANumberNoConfirm",
+                  ],
+                },
+                "QNAPhoneNumber": {
+                  "Fn::GetAtt": [
+                    "ExamplesStack",
+                    "Outputs.QNAPhoneNumber",
+                  ],
+                },
+                "QNAPhoneNumberNoConfirm": {
+                  "Fn::GetAtt": [
+                    "ExamplesStack",
+                    "Outputs.QNAPhoneNumberNoConfirm",
+                  ],
+                },
+                "QNAPin": {
+                  "Fn::GetAtt": [
+                    "ExamplesStack",
+                    "Outputs.QNAPin",
+                  ],
+                },
+                "QNAPinNoConfirm": {
+                  "Fn::GetAtt": [
+                    "ExamplesStack",
+                    "Outputs.QNAPinNoConfirm",
+                  ],
+                },
+                "QNASocialSecurity": {
+                  "Fn::GetAtt": [
+                    "ExamplesStack",
+                    "Outputs.QNASocialSecurity",
+                  ],
+                },
+                "QNATime": {
+                  "Fn::GetAtt": [
+                    "ExamplesStack",
+                    "Outputs.QNATime",
+                  ],
+                },
+                "QNAWage": {
+                  "Fn::GetAtt": [
+                    "ExamplesStack",
+                    "Outputs.QNAWage",
+                  ],
+                },
+                "QNAYesNo": {
+                  "Fn::GetAtt": [
+                    "ExamplesStack",
+                    "Outputs.QNAYesNo",
+                  ],
+                },
+                "QNAYesNoExit": {
+                  "Fn::GetAtt": [
+                    "ExamplesStack",
+                    "Outputs.QNAYesNoExit",
+                  ],
+                },
+                "SETTINGS_TABLE": {
+                  "Ref": "SettingsTable",
+                },
+                "SOLUTION_ID": "SO0189",
+                "SOLUTION_VERSION": "vx.x.x",
+              },
+              {
+                "DEFAULT_USER_POOL_JWKS_PARAM": {
+                  "Ref": "DefaultUserPoolJwksUrl",
+                },
+                "DYNAMODB_USERSTABLE": {
+                  "Ref": "UsersTable",
+                },
+                "EMBEDDINGS_API": {
+                  "Ref": "EmbeddingsApi",
+                },
+                "EMBEDDINGS_LAMBDA_ARN": {
+                  "Ref": "EmbeddingsLambdaArn",
+                },
+                "ES_ADDRESS": {
+                  "Fn::GetAtt": [
+                    "ESVar",
+                    "ESAddress",
+                  ],
+                },
+                "ES_INDEX": {
+                  "Fn::GetAtt": [
+                    "Var",
+                    "QnaIndex",
+                  ],
+                },
+                "ES_SERVICE_PROXY": {
+                  "Ref": "ESProxyLambda",
+                },
+                "ES_SERVICE_QID": {
+                  "Ref": "ESQidLambda",
+                },
+                "ES_TYPE": {
+                  "Fn::GetAtt": [
+                    "Var",
+                    "QnAType",
+                  ],
+                },
+                "LAMBDA_DEFAULT_QUERY": {
+                  "Ref": "ESQueryLambda",
+                },
+                "LAMBDA_LOG": {
+                  "Ref": "ESLoggingLambda",
+                },
+                "LLM_API": {
+                  "Ref": "LLMApi",
+                },
+                "LLM_LAMBDA_ARN": {
+                  "Ref": "LLMLambdaArn",
+                },
+                "SETTINGS_TABLE": {
+                  "Ref": "SettingsTable",
+                },
+                "SOLUTION_ID": "SO0189",
+                "SOLUTION_VERSION": "vx.x.x",
+              },
+            ],
           },
         },
         "Handler": "index.handler",
@@ -8917,6 +8973,72 @@ exports.documents = (event, context, callback) => {
             "PolicyName": "AWSQnaBotComprehendReadOnly",
           },
           {
+            "Fn::If": [
+              "StreamingEnabled",
+              {
+                "PolicyDocument": {
+                  "Statement": [
+                    {
+                      "Action": [
+                        "execute-api:Invoke",
+                        "execute-api:ManageConnections",
+                      ],
+                      "Effect": "Allow",
+                      "Resource": [
+                        {
+                          "Fn::Join": [
+                            "",
+                            [
+                              "arn:",
+                              {
+                                "Fn::Sub": "\${AWS::Partition}",
+                              },
+                              ":execute-api:",
+                              {
+                                "Fn::Sub": "\${AWS::Region}",
+                              },
+                              ":",
+                              {
+                                "Fn::Sub": "\${AWS::AccountId}",
+                              },
+                              ":",
+                              {
+                                "Fn::GetAtt": [
+                                  "StreamingStack",
+                                  "Outputs.StreamingWebSocketApiId",
+                                ],
+                              },
+                              "/Prod/*",
+                            ],
+                          ],
+                        },
+                      ],
+                    },
+                    {
+                      "Action": [
+                        "dynamodb:GetItem",
+                      ],
+                      "Effect": "Allow",
+                      "Resource": [
+                        {
+                          "Fn::GetAtt": [
+                            "StreamingStack",
+                            "Outputs.StreamingDynamoDbTableArn",
+                          ],
+                        },
+                      ],
+                    },
+                  ],
+                  "Version": "2012-10-17",
+                },
+                "PolicyName": "StreamingPermissions",
+              },
+              {
+                "Ref": "AWS::NoValue",
+              },
+            ],
+          },
+          {
             "PolicyDocument": {
               "Statement": [
                 {
@@ -8926,60 +9048,6 @@ exports.documents = (event, context, callback) => {
                   ],
                   "Effect": "Allow",
                   "Resource": [
-                    {
-                      "Fn::Join": [
-                        "",
-                        [
-                          "arn:aws:ssm:",
-                          {
-                            "Fn::Sub": "\${AWS::Region}:",
-                          },
-                          {
-                            "Fn::Sub": "\${AWS::AccountId}:",
-                          },
-                          "parameter/",
-                          {
-                            "Ref": "DefaultQnABotSettings",
-                          },
-                        ],
-                      ],
-                    },
-                    {
-                      "Fn::Join": [
-                        "",
-                        [
-                          "arn:aws:ssm:",
-                          {
-                            "Fn::Sub": "\${AWS::Region}:",
-                          },
-                          {
-                            "Fn::Sub": "\${AWS::AccountId}:",
-                          },
-                          "parameter/",
-                          {
-                            "Ref": "PrivateQnABotSettings",
-                          },
-                        ],
-                      ],
-                    },
-                    {
-                      "Fn::Join": [
-                        "",
-                        [
-                          "arn:aws:ssm:",
-                          {
-                            "Fn::Sub": "\${AWS::Region}:",
-                          },
-                          {
-                            "Fn::Sub": "\${AWS::AccountId}:",
-                          },
-                          "parameter/",
-                          {
-                            "Ref": "CustomQnABotSettings",
-                          },
-                        ],
-                      ],
-                    },
                     {
                       "Fn::Join": [
                         "",
@@ -9030,62 +9098,6 @@ exports.documents = (event, context, callback) => {
           },
           {
             "Fn::If": [
-              "EmbeddingsSagemaker",
-              {
-                "PolicyDocument": {
-                  "Statement": [
-                    {
-                      "Action": [
-                        "sagemaker:InvokeEndpoint",
-                      ],
-                      "Effect": "Allow",
-                      "Resource": {
-                        "Fn::GetAtt": [
-                          "SagemakerEmbeddingsStack",
-                          "Outputs.EmbeddingsSagemakerEndpointArn",
-                        ],
-                      },
-                    },
-                  ],
-                  "Version": "2012-10-17",
-                },
-                "PolicyName": "EmbeddingsSagemakerInvokeEndpointAccess",
-              },
-              {
-                "Ref": "AWS::NoValue",
-              },
-            ],
-          },
-          {
-            "Fn::If": [
-              "LLMSagemaker",
-              {
-                "PolicyDocument": {
-                  "Statement": [
-                    {
-                      "Action": [
-                        "sagemaker:InvokeEndpoint",
-                      ],
-                      "Effect": "Allow",
-                      "Resource": {
-                        "Fn::GetAtt": [
-                          "SageMakerQASummarizeLLMStack",
-                          "Outputs.LLMSagemakerEndpointArn",
-                        ],
-                      },
-                    },
-                  ],
-                  "Version": "2012-10-17",
-                },
-                "PolicyName": "LLMSagemakerInvokeEndpointAccess",
-              },
-              {
-                "Ref": "AWS::NoValue",
-              },
-            ],
-          },
-          {
-            "Fn::If": [
               "BedrockEnable",
               {
                 "PolicyDocument": {
@@ -9093,6 +9105,7 @@ exports.documents = (event, context, callback) => {
                     {
                       "Action": [
                         "bedrock:InvokeModel",
+                        "bedrock:InvokeModelWithResponseStream",
                       ],
                       "Effect": "Allow",
                       "Resource": [
@@ -9248,6 +9261,28 @@ exports.documents = (event, context, callback) => {
             },
             "PolicyName": "S3QNABucketReadAccess",
           },
+          {
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Action": [
+                    "dynamodb:Scan",
+                  ],
+                  "Effect": "Allow",
+                  "Resource": [
+                    {
+                      "Fn::GetAtt": [
+                        "SettingsTable",
+                        "Arn",
+                      ],
+                    },
+                  ],
+                },
+              ],
+              "Version": "2012-10-17",
+            },
+            "PolicyName": "SettingsTableReadAccess",
+          },
         ],
       },
       "Type": "AWS::IAM::Role",
@@ -9268,21 +9303,6 @@ exports.documents = (event, context, callback) => {
           "EmbeddingsTrigger": [
             {
               "Ref": "EmbeddingsApi",
-            },
-            {
-              "Ref": "SagemakerInitialInstanceCount",
-            },
-            {
-              "Fn::If": [
-                "EmbeddingsSagemaker",
-                {
-                  "Fn::GetAtt": [
-                    "SagemakerEmbeddingsStack",
-                    "Outputs.EmbeddingsSagemakerEndpoint",
-                  ],
-                },
-                "",
-              ],
             },
             {
               "Ref": "EmbeddingsLambdaArn",
@@ -9310,21 +9330,6 @@ exports.documents = (event, context, callback) => {
           "QASummarizeTrigger": [
             {
               "Ref": "LLMApi",
-            },
-            {
-              "Ref": "SagemakerInitialInstanceCount",
-            },
-            {
-              "Fn::If": [
-                "LLMSagemaker",
-                {
-                  "Fn::GetAtt": [
-                    "SageMakerQASummarizeLLMStack",
-                    "Outputs.LLMSagemakerEndpoint",
-                  ],
-                },
-                "",
-              ],
             },
             {
               "Ref": "LLMLambdaArn",
@@ -10384,12 +10389,6 @@ exports.documents = (event, context, callback) => {
           "ContentDesignerOutputBucket": {
             "Ref": "ContentDesignerOutputBucket",
           },
-          "CustomQnABotSettings": {
-            "Ref": "CustomQnABotSettings",
-          },
-          "DefaultQnABotSettings": {
-            "Ref": "DefaultQnABotSettings",
-          },
           "EmbeddingsApi": {
             "Ref": "EmbeddingsApi",
           },
@@ -10407,30 +10406,6 @@ exports.documents = (event, context, callback) => {
           },
           "EmbeddingsLambdaDimensions": {
             "Ref": "EmbeddingsLambdaDimensions",
-          },
-          "EmbeddingsSagemakerEndpoint": {
-            "Fn::If": [
-              "EmbeddingsSagemaker",
-              {
-                "Fn::GetAtt": [
-                  "SagemakerEmbeddingsStack",
-                  "Outputs.EmbeddingsSagemakerEndpoint",
-                ],
-              },
-              "",
-            ],
-          },
-          "EmbeddingsSagemakerEndpointArn": {
-            "Fn::If": [
-              "EmbeddingsSagemaker",
-              {
-                "Fn::GetAtt": [
-                  "SagemakerEmbeddingsStack",
-                  "Outputs.EmbeddingsSagemakerEndpointArn",
-                ],
-              },
-              "",
-            ],
           },
           "EsArn": {
             "Fn::GetAtt": [
@@ -10474,9 +10449,6 @@ exports.documents = (event, context, callback) => {
               "MetricsIndex",
             ],
           },
-          "PrivateQnABotSettings": {
-            "Ref": "PrivateQnABotSettings",
-          },
           "QnABotCommonLambdaLayer": {
             "Ref": "QnABotCommonLambdaLayer",
           },
@@ -10485,6 +10457,9 @@ exports.documents = (event, context, callback) => {
               "S3Clean",
               "Arn",
             ],
+          },
+          "SettingsTable": {
+            "Ref": "SettingsTable",
           },
           "VPCSecurityGroupIdList": {
             "Fn::Join": [
@@ -10539,29 +10514,23 @@ exports.documents = (event, context, callback) => {
                     "EmbeddingsEnable",
                     {
                       "Fn::If": [
-                        "EmbeddingsSagemaker",
-                        "1024",
+                        "EmbeddingsLambda",
+                        {
+                          "Ref": "EmbeddingsLambdaDimensions",
+                        },
                         {
                           "Fn::If": [
-                            "EmbeddingsLambda",
+                            "EmbeddingsBedrock",
                             {
-                              "Ref": "EmbeddingsLambdaDimensions",
-                            },
-                            {
-                              "Fn::If": [
-                                "EmbeddingsBedrock",
+                              "Fn::FindInMap": [
+                                "BedrockDefaults",
                                 {
-                                  "Fn::FindInMap": [
-                                    "BedrockDefaults",
-                                    {
-                                      "Ref": "EmbeddingsBedrockModelId",
-                                    },
-                                    "EmbeddingsDimensions",
-                                  ],
+                                  "Ref": "EmbeddingsBedrockModelId",
                                 },
-                                "INVALID EMBEDDINGS API - Cannot determine dimensions",
+                                "EmbeddingsDimensions",
                               ],
                             },
+                            "INVALID EMBEDDINGS API - Cannot determine dimensions",
                           ],
                         },
                       ],
@@ -10826,131 +10795,197 @@ exports.documents = (event, context, callback) => {
     "InvokePolicy": {
       "Properties": {
         "PolicyDocument": {
-          "Statement": [
+          "Fn::If": [
+            "BuildExamples",
             {
-              "Action": [
-                "lambda:InvokeFunction",
+              "Statement": [
+                {
+                  "Action": [
+                    "lambda:InvokeFunction",
+                  ],
+                  "Effect": "Allow",
+                  "Resource": [
+                    "arn:aws:lambda:*:*:function:qna-*",
+                    "arn:aws:lambda:*:*:function:QNA-*",
+                    {
+                      "Fn::GetAtt": [
+                        "ESQueryLambda",
+                        "Arn",
+                      ],
+                    },
+                    {
+                      "Fn::GetAtt": [
+                        "ESProxyLambda",
+                        "Arn",
+                      ],
+                    },
+                    {
+                      "Fn::GetAtt": [
+                        "ESLoggingLambda",
+                        "Arn",
+                      ],
+                    },
+                    {
+                      "Fn::GetAtt": [
+                        "ESQidLambda",
+                        "Arn",
+                      ],
+                    },
+                    {
+                      "Fn::If": [
+                        "EmbeddingsLambdaArn",
+                        {
+                          "Ref": "EmbeddingsLambdaArn",
+                        },
+                        {
+                          "Ref": "AWS::NoValue",
+                        },
+                      ],
+                    },
+                    {
+                      "Fn::If": [
+                        "LLMLambdaArn",
+                        {
+                          "Ref": "LLMLambdaArn",
+                        },
+                        {
+                          "Ref": "AWS::NoValue",
+                        },
+                      ],
+                    },
+                    {
+                      "Fn::GetAtt": [
+                        "ExamplesStack",
+                        "Outputs.ExampleJSLambdaQuiz",
+                      ],
+                    },
+                    {
+                      "Fn::GetAtt": [
+                        "ExamplesStack",
+                        "Outputs.ExampleJSLambdahook",
+                      ],
+                    },
+                    {
+                      "Fn::GetAtt": [
+                        "ExamplesStack",
+                        "Outputs.ExamplePYTHONLambdaBotBroker",
+                      ],
+                    },
+                    {
+                      "Fn::GetAtt": [
+                        "ExamplesStack",
+                        "Outputs.ExamplePYTHONLambdaConnectCallback",
+                      ],
+                    },
+                    {
+                      "Fn::GetAtt": [
+                        "ExamplesStack",
+                        "Outputs.ExamplePYTHONLambdaFeedback",
+                      ],
+                    },
+                    {
+                      "Fn::GetAtt": [
+                        "ExamplesStack",
+                        "Outputs.ExamplePYTHONLambdaNext",
+                      ],
+                    },
+                    {
+                      "Fn::GetAtt": [
+                        "ExamplesStack",
+                        "Outputs.ExamplePYTHONLambdaPrevious",
+                      ],
+                    },
+                    {
+                      "Fn::GetAtt": [
+                        "ExamplesStack",
+                        "Outputs.ExamplePYTHONLambdahello",
+                      ],
+                    },
+                    {
+                      "Fn::GetAtt": [
+                        "ExamplesStack",
+                        "Outputs.EXTCreateRecentTopicsResponse",
+                      ],
+                    },
+                    {
+                      "Fn::GetAtt": [
+                        "ExamplesStack",
+                        "Outputs.EXTCustomJSHook",
+                      ],
+                    },
+                    {
+                      "Fn::GetAtt": [
+                        "ExamplesStack",
+                        "Outputs.EXTCustomPYHook",
+                      ],
+                    },
+                  ],
+                },
               ],
-              "Effect": "Allow",
-              "Resource": [
-                "arn:aws:lambda:*:*:function:qna-*",
-                "arn:aws:lambda:*:*:function:QNA-*",
+              "Version": "2012-10-17",
+            },
+            {
+              "Statement": [
                 {
-                  "Fn::GetAtt": [
-                    "ESQueryLambda",
-                    "Arn",
+                  "Action": [
+                    "lambda:InvokeFunction",
                   ],
-                },
-                {
-                  "Fn::GetAtt": [
-                    "ESProxyLambda",
-                    "Arn",
-                  ],
-                },
-                {
-                  "Fn::GetAtt": [
-                    "ESLoggingLambda",
-                    "Arn",
-                  ],
-                },
-                {
-                  "Fn::GetAtt": [
-                    "ESQidLambda",
-                    "Arn",
-                  ],
-                },
-                {
-                  "Fn::If": [
-                    "EmbeddingsLambdaArn",
+                  "Effect": "Allow",
+                  "Resource": [
+                    "arn:aws:lambda:*:*:function:qna-*",
+                    "arn:aws:lambda:*:*:function:QNA-*",
                     {
-                      "Ref": "EmbeddingsLambdaArn",
+                      "Fn::GetAtt": [
+                        "ESQueryLambda",
+                        "Arn",
+                      ],
                     },
                     {
-                      "Ref": "AWS::NoValue",
-                    },
-                  ],
-                },
-                {
-                  "Fn::If": [
-                    "LLMLambdaArn",
-                    {
-                      "Ref": "LLMLambdaArn",
+                      "Fn::GetAtt": [
+                        "ESProxyLambda",
+                        "Arn",
+                      ],
                     },
                     {
-                      "Ref": "AWS::NoValue",
+                      "Fn::GetAtt": [
+                        "ESLoggingLambda",
+                        "Arn",
+                      ],
                     },
-                  ],
-                },
-                {
-                  "Fn::GetAtt": [
-                    "ExamplesStack",
-                    "Outputs.ExampleJSLambdaQuiz",
-                  ],
-                },
-                {
-                  "Fn::GetAtt": [
-                    "ExamplesStack",
-                    "Outputs.ExampleJSLambdahook",
-                  ],
-                },
-                {
-                  "Fn::GetAtt": [
-                    "ExamplesStack",
-                    "Outputs.ExamplePYTHONLambdaBotBroker",
-                  ],
-                },
-                {
-                  "Fn::GetAtt": [
-                    "ExamplesStack",
-                    "Outputs.ExamplePYTHONLambdaConnectCallback",
-                  ],
-                },
-                {
-                  "Fn::GetAtt": [
-                    "ExamplesStack",
-                    "Outputs.ExamplePYTHONLambdaFeedback",
-                  ],
-                },
-                {
-                  "Fn::GetAtt": [
-                    "ExamplesStack",
-                    "Outputs.ExamplePYTHONLambdaNext",
-                  ],
-                },
-                {
-                  "Fn::GetAtt": [
-                    "ExamplesStack",
-                    "Outputs.ExamplePYTHONLambdaPrevious",
-                  ],
-                },
-                {
-                  "Fn::GetAtt": [
-                    "ExamplesStack",
-                    "Outputs.ExamplePYTHONLambdahello",
-                  ],
-                },
-                {
-                  "Fn::GetAtt": [
-                    "ExamplesStack",
-                    "Outputs.EXTCreateRecentTopicsResponse",
-                  ],
-                },
-                {
-                  "Fn::GetAtt": [
-                    "ExamplesStack",
-                    "Outputs.EXTCustomJSHook",
-                  ],
-                },
-                {
-                  "Fn::GetAtt": [
-                    "ExamplesStack",
-                    "Outputs.EXTCustomPYHook",
+                    {
+                      "Fn::GetAtt": [
+                        "ESQidLambda",
+                        "Arn",
+                      ],
+                    },
+                    {
+                      "Fn::If": [
+                        "EmbeddingsLambdaArn",
+                        {
+                          "Ref": "EmbeddingsLambdaArn",
+                        },
+                        {
+                          "Ref": "AWS::NoValue",
+                        },
+                      ],
+                    },
+                    {
+                      "Fn::If": [
+                        "LLMLambdaArn",
+                        {
+                          "Ref": "LLMLambdaArn",
+                        },
+                        {
+                          "Ref": "AWS::NoValue",
+                        },
+                      ],
+                    },
                   ],
                 },
               ],
+              "Version": "2012-10-17",
             },
           ],
-          "Version": "2012-10-17",
         },
         "Roles": [
           {
@@ -11039,12 +11074,6 @@ exports.documents = (event, context, callback) => {
         },
       },
       "Type": "AWS::ApiGateway::Method",
-    },
-    "KendraCrawlerSnsTopic": {
-      "Properties": {
-        "KmsMasterKeyId": "alias/aws/sns",
-      },
-      "Type": "AWS::SNS::Topic",
     },
     "LexAccessPolicy": {
       "Metadata": {
@@ -15138,7 +15167,7 @@ function message(code, name) {
           "VolumeSize": {
             "Ref": "OpenSearchEBSVolumeSize",
           },
-          "VolumeType": "gp2",
+          "VolumeType": "gp3",
         },
         "EncryptionAtRestOptions": {
           "Enabled": true,
@@ -15191,23 +15220,7 @@ function message(code, name) {
     "PreUpgradeExport": {
       "Properties": {
         "PRE_UPGRADE_EXPORT_TRIGGERS": {
-          "Fn::Sub": [
-            "\${EmbeddingsApi} \${EmbeddingsBedrockModelId} \${EmbeddingsLambdaDimensions} \${EmbeddingsLambdaArn} \${SMEmbeddingEndpoint}",
-            {
-              "SMEmbeddingEndpoint": {
-                "Fn::If": [
-                  "EmbeddingsSagemaker",
-                  {
-                    "Fn::GetAtt": [
-                      "SagemakerEmbeddingsStack",
-                      "Outputs.EmbeddingsSagemakerEndpoint",
-                    ],
-                  },
-                  "",
-                ],
-              },
-            },
-          ],
+          "Fn::Sub": "\${EmbeddingsApi} \${EmbeddingsBedrockModelId} \${EmbeddingsLambdaDimensions} \${EmbeddingsLambdaArn}",
         },
         "ServiceToken": {
           "Fn::GetAtt": [
@@ -15231,23 +15244,7 @@ function message(code, name) {
     "PreUpgradeExportFeedback": {
       "Properties": {
         "PRE_UPGRADE_EXPORT_TRIGGERS": {
-          "Fn::Sub": [
-            "\${EmbeddingsApi} \${EmbeddingsBedrockModelId} \${EmbeddingsLambdaDimensions} \${EmbeddingsLambdaArn} \${SMEmbeddingEndpoint}",
-            {
-              "SMEmbeddingEndpoint": {
-                "Fn::If": [
-                  "EmbeddingsSagemaker",
-                  {
-                    "Fn::GetAtt": [
-                      "SagemakerEmbeddingsStack",
-                      "Outputs.EmbeddingsSagemakerEndpoint",
-                    ],
-                  },
-                  "",
-                ],
-              },
-            },
-          ],
+          "Fn::Sub": "\${EmbeddingsApi} \${EmbeddingsBedrockModelId} \${EmbeddingsLambdaDimensions} \${EmbeddingsLambdaArn}",
         },
         "ServiceToken": {
           "Fn::GetAtt": [
@@ -15271,23 +15268,7 @@ function message(code, name) {
     "PreUpgradeExportMetrics": {
       "Properties": {
         "PRE_UPGRADE_EXPORT_TRIGGERS": {
-          "Fn::Sub": [
-            "\${EmbeddingsApi} \${EmbeddingsBedrockModelId} \${EmbeddingsLambdaDimensions} \${EmbeddingsLambdaArn} \${SMEmbeddingEndpoint}",
-            {
-              "SMEmbeddingEndpoint": {
-                "Fn::If": [
-                  "EmbeddingsSagemaker",
-                  {
-                    "Fn::GetAtt": [
-                      "SagemakerEmbeddingsStack",
-                      "Outputs.EmbeddingsSagemakerEndpoint",
-                    ],
-                  },
-                  "",
-                ],
-              },
-            },
-          ],
+          "Fn::Sub": "\${EmbeddingsApi} \${EmbeddingsBedrockModelId} \${EmbeddingsLambdaDimensions} \${EmbeddingsLambdaArn}",
         },
         "ServiceToken": {
           "Fn::GetAtt": [
@@ -15309,6 +15290,7 @@ function message(code, name) {
       "Type": "Custom::PreUpgradeExport",
     },
     "PrivateQnABotSettings": {
+      "Condition": "DeprecatedSSMSettings",
       "Properties": {
         "Description": "Private QnABot Settings - DO NOT MODIFY",
         "Tier": "Advanced",
@@ -15611,12 +15593,12 @@ function message(code, name) {
               "QnABotCommon",
               {
                 "Fn::Select": [
-                  2,
+                  "0",
                   {
                     "Fn::Split": [
                       "-",
                       {
-                        "Ref": "DefaultQnABotSettings",
+                        "Ref": "AWS::StackName",
                       },
                     ],
                   },
@@ -15649,85 +15631,105 @@ function message(code, name) {
     "QueryLambdaInvokePolicy": {
       "Properties": {
         "PolicyDocument": {
-          "Statement": [
+          "Fn::If": [
+            "BuildExamples",
             {
-              "Action": [
-                "lambda:InvokeFunction",
+              "Statement": [
+                {
+                  "Action": [
+                    "lambda:InvokeFunction",
+                  ],
+                  "Effect": "Allow",
+                  "Resource": [
+                    "arn:aws:lambda:*:*:function:qna*",
+                    "arn:aws:lambda:*:*:function:QNA*",
+                    {
+                      "Fn::GetAtt": [
+                        "ExamplesStack",
+                        "Outputs.ExampleJSLambdaQuiz",
+                      ],
+                    },
+                    {
+                      "Fn::GetAtt": [
+                        "ExamplesStack",
+                        "Outputs.ExampleJSLambdahook",
+                      ],
+                    },
+                    {
+                      "Fn::GetAtt": [
+                        "ExamplesStack",
+                        "Outputs.ExamplePYTHONLambdaBotBroker",
+                      ],
+                    },
+                    {
+                      "Fn::GetAtt": [
+                        "ExamplesStack",
+                        "Outputs.ExamplePYTHONLambdaConnectCallback",
+                      ],
+                    },
+                    {
+                      "Fn::GetAtt": [
+                        "ExamplesStack",
+                        "Outputs.ExamplePYTHONLambdaFeedback",
+                      ],
+                    },
+                    {
+                      "Fn::GetAtt": [
+                        "ExamplesStack",
+                        "Outputs.ExamplePYTHONLambdaNext",
+                      ],
+                    },
+                    {
+                      "Fn::GetAtt": [
+                        "ExamplesStack",
+                        "Outputs.ExamplePYTHONLambdaPrevious",
+                      ],
+                    },
+                    {
+                      "Fn::GetAtt": [
+                        "ExamplesStack",
+                        "Outputs.ExamplePYTHONLambdahello",
+                      ],
+                    },
+                    {
+                      "Fn::GetAtt": [
+                        "ExamplesStack",
+                        "Outputs.EXTCreateRecentTopicsResponse",
+                      ],
+                    },
+                    {
+                      "Fn::GetAtt": [
+                        "ExamplesStack",
+                        "Outputs.EXTCustomJSHook",
+                      ],
+                    },
+                    {
+                      "Fn::GetAtt": [
+                        "ExamplesStack",
+                        "Outputs.EXTCustomPYHook",
+                      ],
+                    },
+                  ],
+                },
               ],
-              "Effect": "Allow",
-              "Resource": [
-                "arn:aws:lambda:*:*:function:qna*",
-                "arn:aws:lambda:*:*:function:QNA*",
+              "Version": "2012-10-17",
+            },
+            {
+              "Statement": [
                 {
-                  "Fn::GetAtt": [
-                    "ExamplesStack",
-                    "Outputs.ExampleJSLambdaQuiz",
+                  "Action": [
+                    "lambda:InvokeFunction",
                   ],
-                },
-                {
-                  "Fn::GetAtt": [
-                    "ExamplesStack",
-                    "Outputs.ExampleJSLambdahook",
-                  ],
-                },
-                {
-                  "Fn::GetAtt": [
-                    "ExamplesStack",
-                    "Outputs.ExamplePYTHONLambdaBotBroker",
-                  ],
-                },
-                {
-                  "Fn::GetAtt": [
-                    "ExamplesStack",
-                    "Outputs.ExamplePYTHONLambdaConnectCallback",
-                  ],
-                },
-                {
-                  "Fn::GetAtt": [
-                    "ExamplesStack",
-                    "Outputs.ExamplePYTHONLambdaFeedback",
-                  ],
-                },
-                {
-                  "Fn::GetAtt": [
-                    "ExamplesStack",
-                    "Outputs.ExamplePYTHONLambdaNext",
-                  ],
-                },
-                {
-                  "Fn::GetAtt": [
-                    "ExamplesStack",
-                    "Outputs.ExamplePYTHONLambdaPrevious",
-                  ],
-                },
-                {
-                  "Fn::GetAtt": [
-                    "ExamplesStack",
-                    "Outputs.ExamplePYTHONLambdahello",
-                  ],
-                },
-                {
-                  "Fn::GetAtt": [
-                    "ExamplesStack",
-                    "Outputs.EXTCreateRecentTopicsResponse",
-                  ],
-                },
-                {
-                  "Fn::GetAtt": [
-                    "ExamplesStack",
-                    "Outputs.EXTCustomJSHook",
-                  ],
-                },
-                {
-                  "Fn::GetAtt": [
-                    "ExamplesStack",
-                    "Outputs.EXTCustomPYHook",
+                  "Effect": "Allow",
+                  "Resource": [
+                    "arn:aws:lambda:*:*:function:qna*",
+                    "arn:aws:lambda:*:*:function:QNA*",
                   ],
                 },
               ],
+              "Version": "2012-10-17",
             },
           ],
-          "Version": "2012-10-17",
         },
         "Roles": [
           {
@@ -17612,105 +17614,6 @@ exports.handler = (event, context, callback) => {
       },
       "Type": "AWS::IAM::Role",
     },
-    "SageMakerQASummarizeLLMStack": {
-      "Condition": "LLMSagemaker",
-      "Properties": {
-        "Parameters": {
-          "BootstrapBucket": {
-            "Ref": "BootstrapBucket",
-          },
-          "BootstrapPrefix": {
-            "Ref": "BootstrapPrefix",
-          },
-          "CFNLambda": {
-            "Fn::GetAtt": [
-              "CFNLambda",
-              "Arn",
-            ],
-          },
-          "S3Clean": {
-            "Fn::GetAtt": [
-              "S3Clean",
-              "Arn",
-            ],
-          },
-          "SagemakerInitialInstanceCount": {
-            "Ref": "LLMSagemakerInitialInstanceCount",
-          },
-          "SagemakerInstanceType": {
-            "Ref": "LLMSagemakerInstanceType",
-          },
-          "VPCSecurityGroupIdList": {
-            "Fn::Join": [
-              ",",
-              {
-                "Ref": "VPCSecurityGroupIdList",
-              },
-            ],
-          },
-          "VPCSubnetIdList": {
-            "Fn::Join": [
-              ",",
-              {
-                "Ref": "VPCSubnetIdList",
-              },
-            ],
-          },
-        },
-        "TemplateURL": {
-          "Fn::Sub": "https://\${BootstrapBucket}.s3.\${AWS::Region}.amazonaws.com/\${BootstrapPrefix}/templates/sagemaker-qa-summarize-llm.json",
-        },
-      },
-      "Type": "AWS::CloudFormation::Stack",
-    },
-    "SagemakerEmbeddingsStack": {
-      "Condition": "EmbeddingsSagemaker",
-      "Properties": {
-        "Parameters": {
-          "BootstrapBucket": {
-            "Ref": "BootstrapBucket",
-          },
-          "BootstrapPrefix": {
-            "Ref": "BootstrapPrefix",
-          },
-          "CFNLambda": {
-            "Fn::GetAtt": [
-              "CFNLambda",
-              "Arn",
-            ],
-          },
-          "S3Clean": {
-            "Fn::GetAtt": [
-              "S3Clean",
-              "Arn",
-            ],
-          },
-          "SagemakerInitialInstanceCount": {
-            "Ref": "SagemakerInitialInstanceCount",
-          },
-          "VPCSecurityGroupIdList": {
-            "Fn::Join": [
-              ",",
-              {
-                "Ref": "VPCSecurityGroupIdList",
-              },
-            ],
-          },
-          "VPCSubnetIdList": {
-            "Fn::Join": [
-              ",",
-              {
-                "Ref": "VPCSubnetIdList",
-              },
-            ],
-          },
-        },
-        "TemplateURL": {
-          "Fn::Sub": "https://\${BootstrapBucket}.s3.\${AWS::Region}.amazonaws.com/\${BootstrapPrefix}/templates/sagemaker-embeddings.json",
-        },
-      },
-      "Type": "AWS::CloudFormation::Stack",
-    },
     "ScheduledESCleaning": {
       "Properties": {
         "Description": "",
@@ -18094,6 +17997,355 @@ exports.handler = (event, context, callback) => {
       },
       "Type": "AWS::ApiGateway::Method",
     },
+    "SettingsInitializer": {
+      "Properties": {
+        "ALT_SEARCH_KENDRA_INDEXES": {
+          "Ref": "AltSearchKendraIndexes",
+        },
+        "ALT_SEARCH_KENDRA_INDEX_AUTH": {
+          "Ref": "AltSearchKendraIndexAuth",
+        },
+        "EMBEDDINGS_ENABLE": {
+          "Fn::If": [
+            "EmbeddingsEnable",
+            "true",
+            "false",
+          ],
+        },
+        "EMBEDDINGS_MAX_TOKEN_LIMIT": {
+          "Fn::If": [
+            "EmbeddingsBedrock",
+            {
+              "Fn::FindInMap": [
+                "BedrockDefaults",
+                {
+                  "Ref": "EmbeddingsBedrockModelId",
+                },
+                "MaxTokens",
+              ],
+            },
+            "",
+          ],
+        },
+        "EMBEDDINGS_MODEL_ID": {
+          "Fn::If": [
+            "EmbeddingsBedrock",
+            {
+              "Fn::FindInMap": [
+                "BedrockDefaults",
+                {
+                  "Ref": "EmbeddingsBedrockModelId",
+                },
+                "ModelID",
+              ],
+            },
+            "",
+          ],
+        },
+        "EMBEDDINGS_SCORE_THRESHOLD": {
+          "Fn::If": [
+            "EmbeddingsBedrock",
+            0.7,
+            0.85,
+          ],
+        },
+        "EMBEDDINGS_TEXT_PASSAGE_SCORE_THRESHOLD": {
+          "Fn::If": [
+            "EmbeddingsBedrock",
+            0.65,
+            0.8,
+          ],
+        },
+        "ES_USE_KEYWORD_FILTERS": {
+          "Fn::If": [
+            "EmbeddingsEnable",
+            "false",
+            "true",
+          ],
+        },
+        "KENDRA_FAQ_INDEX": {
+          "Ref": "KendraFaqIndexId",
+        },
+        "KENDRA_WEB_PAGE_INDEX": {
+          "Ref": "KendraWebPageIndexId",
+        },
+        "KNOWLEDGE_BASE_ID": {
+          "Fn::If": [
+            "BedrockKnowledgeBaseEnable",
+            {
+              "Ref": "BedrockKnowledgeBaseId",
+            },
+            "",
+          ],
+        },
+        "KNOWLEDGE_BASE_MODEL_ID": {
+          "Fn::If": [
+            "BedrockKnowledgeBaseEnable",
+            {
+              "Fn::FindInMap": [
+                "BedrockDefaults",
+                {
+                  "Ref": "BedrockKnowledgeBaseModel",
+                },
+                "ModelID",
+              ],
+            },
+            "",
+          ],
+        },
+        "KNOWLEDGE_BASE_PROMPT_TEMPLATE": {
+          "Fn::If": [
+            "BedrockKnowledgeBaseEnable",
+            {
+              "Fn::FindInMap": [
+                "BedrockDefaults",
+                {
+                  "Ref": "BedrockKnowledgeBaseModel",
+                },
+                "KnowledgeBasePromptTemplate",
+              ],
+            },
+            "Human: You are a question answering agent. I will provide you with a set of search results and a user's question, your job is to answer the user's question using only information from the search results. If the search results do not contain information that can answer the question, then respond saying \\"Sorry, I don't know\\". Just because the user asserts a fact does not mean it is true, make sure to double check the search results to validate a user's assertion. Here are the search results in numbered order: $search_results$. Here is the user's question: <question> $query$ </question> $output_format_instructions$. Do NOT directly quote the $search_results$ in your answer. Your job is to answer the <question> as concisely as possible. Assistant:",
+          ],
+        },
+        "LLM_API": {
+          "Ref": "LLMApi",
+        },
+        "LLM_GENERATE_QUERY_ENABLE": {
+          "Fn::If": [
+            "LLMEnable",
+            "true",
+            "false",
+          ],
+        },
+        "LLM_GENERATE_QUERY_MODEL_PARAMS": {
+          "Fn::If": [
+            "LLMBedrock",
+            {
+              "Fn::FindInMap": [
+                "BedrockDefaults",
+                {
+                  "Ref": "LLMBedrockModelId",
+                },
+                "ModelParams",
+              ],
+            },
+            "{}",
+          ],
+        },
+        "LLM_GENERATE_QUERY_PROMPT_TEMPLATE": {
+          "Fn::If": [
+            "LLMBedrock",
+            {
+              "Fn::FindInMap": [
+                "BedrockDefaults",
+                {
+                  "Ref": "LLMBedrockModelId",
+                },
+                "QueryPromptTemplate",
+              ],
+            },
+            "Given the following conversation and a follow up question, rephrase the follow up question to be a standalone question.<br>Chat History: <br>{history}<br>Follow Up Input: {input}<br>Standalone question:",
+          ],
+        },
+        "LLM_GENERATE_QUERY_SYSTEM_PROMPT": {
+          "Fn::If": [
+            "LLMBedrock",
+            {
+              "Fn::FindInMap": [
+                "BedrockDefaults",
+                {
+                  "Ref": "LLMBedrockModelId",
+                },
+                "GenerateQuerySystemPrompt",
+              ],
+            },
+            "",
+          ],
+        },
+        "LLM_MODEL_ID": {
+          "Fn::If": [
+            "LLMBedrock",
+            {
+              "Fn::FindInMap": [
+                "BedrockDefaults",
+                {
+                  "Ref": "LLMBedrockModelId",
+                },
+                "ModelID",
+              ],
+            },
+            "",
+          ],
+        },
+        "LLM_PROMPT_MAX_TOKEN_LIMIT": {
+          "Fn::If": [
+            "LLMBedrock",
+            {
+              "Fn::FindInMap": [
+                "BedrockDefaults",
+                {
+                  "Ref": "LLMBedrockModelId",
+                },
+                "MaxTokens",
+              ],
+            },
+            "",
+          ],
+        },
+        "LLM_QA_ENABLE": {
+          "Fn::If": [
+            "LLMEnable",
+            "true",
+            "false",
+          ],
+        },
+        "LLM_QA_MODEL_PARAMS": {
+          "Fn::If": [
+            "LLMBedrock",
+            {
+              "Fn::FindInMap": [
+                "BedrockDefaults",
+                {
+                  "Ref": "LLMBedrockModelId",
+                },
+                "ModelParams",
+              ],
+            },
+            "{}",
+          ],
+        },
+        "LLM_QA_NO_HITS_REGEX": {
+          "Fn::If": [
+            "LLMBedrock",
+            {
+              "Fn::FindInMap": [
+                "BedrockDefaults",
+                {
+                  "Ref": "LLMBedrockModelId",
+                },
+                "NoHitsRegex",
+              ],
+            },
+            "Sorry,  //remove comment to enable custom no match (no_hits) when LLM does not know the answer.",
+          ],
+        },
+        "LLM_QA_PROMPT_TEMPLATE": {
+          "Fn::If": [
+            "LLMBedrock",
+            {
+              "Fn::FindInMap": [
+                "BedrockDefaults",
+                {
+                  "Ref": "LLMBedrockModelId",
+                },
+                "QAPromptTemplate",
+              ],
+            },
+            "Use the following pieces of context to answer the question at the end. If you don't know the answer, just say that you don't know, don't try to make up an answer. Write the answer in up to 5 complete sentences.<br><br>{context}<br><br>Question: {query}<br>Helpful Answer:",
+          ],
+        },
+        "LLM_QA_SYSTEM_PROMPT": {
+          "Fn::If": [
+            "LLMBedrock",
+            {
+              "Fn::FindInMap": [
+                "BedrockDefaults",
+                {
+                  "Ref": "LLMBedrockModelId",
+                },
+                "QASystemPrompt",
+              ],
+            },
+            "",
+          ],
+        },
+        "LLM_STREAMING_ENABLED": {
+          "Fn::If": [
+            "StreamingEnabled",
+            "true",
+            "false",
+          ],
+        },
+        "NATIVE_LANGUAGE": {
+          "Ref": "Language",
+        },
+        "STREAMING_TABLE": {
+          "Fn::If": [
+            "StreamingEnabled",
+            {
+              "Fn::GetAtt": [
+                "StreamingStack",
+                "Outputs.StreamingDynamoDbTable",
+              ],
+            },
+            "",
+          ],
+        },
+        "ServiceToken": {
+          "Fn::GetAtt": [
+            "CFNLambda",
+            "Arn",
+          ],
+        },
+        "SettingsTable": {
+          "Ref": "SettingsTable",
+        },
+      },
+      "Type": "Custom::SettingsInitializer",
+    },
+    "SettingsTable": {
+      "Metadata": {
+        "cfn_nag": {
+          "rules_to_suppress": [
+            {
+              "id": "W74",
+              "reason": "This DynamoDB table does not require CMK encryption store in KMS",
+            },
+          ],
+        },
+      },
+      "Properties": {
+        "AttributeDefinitions": [
+          {
+            "AttributeName": "SettingName",
+            "AttributeType": "S",
+          },
+          {
+            "AttributeName": "SettingCategory",
+            "AttributeType": "S",
+          },
+        ],
+        "BillingMode": "PAY_PER_REQUEST",
+        "GlobalSecondaryIndexes": [
+          {
+            "IndexName": "SettingCategoryIndex",
+            "KeySchema": [
+              {
+                "AttributeName": "SettingCategory",
+                "KeyType": "HASH",
+              },
+            ],
+            "Projection": {
+              "ProjectionType": "ALL",
+            },
+          },
+        ],
+        "KeySchema": [
+          {
+            "AttributeName": "SettingName",
+            "KeyType": "HASH",
+          },
+        ],
+        "PointInTimeRecoverySpecification": {
+          "PointInTimeRecoveryEnabled": true,
+        },
+        "SSESpecification": {
+          "SSEEnabled": true,
+        },
+      },
+      "Type": "AWS::DynamoDB::Table",
+    },
     "SignupLambda": {
       "Metadata": {
         "cfn_nag": {
@@ -18458,8 +18710,8 @@ exports.handler = (event, context, callback) => {
         "Description": "This function generates UUID for each deployment and sends anonymized data to the AWS Solutions team",
         "Environment": {
           "Variables": {
-            "CUSTOM_SETTINGS": {
-              "Ref": "CustomQnABotSettings",
+            "SETTINGS_TABLE": {
+              "Ref": "SettingsTable",
             },
             "SOLUTION_ID": "SO0189",
             "SOLUTION_PARAMETER": {
@@ -18752,6 +19004,25 @@ exports.handler = (event, context, callback) => {
               "Statement": [
                 {
                   "Action": [
+                    "dynamodb:Scan",
+                  ],
+                  "Effect": "Allow",
+                  "Resource": [
+                    {
+                      "Fn::Sub": "arn:aws:dynamodb:\${AWS::Region}:\${AWS::AccountId}:table/\${SettingsTable}",
+                    },
+                  ],
+                },
+              ],
+              "Version": "2012-10-17",
+            },
+            "PolicyName": "SettingsTableReadAccess",
+          },
+          {
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Action": [
                     "ssm:GetParameter",
                   ],
                   "Effect": "Allow",
@@ -18774,28 +19045,6 @@ exports.handler = (event, context, callback) => {
                           "parameter/",
                           {
                             "Ref": "SolutionHelperParameter",
-                          },
-                        ],
-                      ],
-                    },
-                    {
-                      "Fn::Join": [
-                        "",
-                        [
-                          "arn:",
-                          {
-                            "Fn::Sub": "\${AWS::Partition}:",
-                          },
-                          "ssm:",
-                          {
-                            "Fn::Sub": "\${AWS::Region}:",
-                          },
-                          {
-                            "Fn::Sub": "\${AWS::AccountId}:",
-                          },
-                          "parameter/",
-                          {
-                            "Ref": "CustomQnABotSettings",
                           },
                         ],
                       ],
@@ -18878,6 +19127,9 @@ exports.handler = (event, context, callback) => {
             },
           ],
         },
+        "EnableStreaming": {
+          "Ref": "EnableStreaming",
+        },
         "FulfillmentConcurrency": {
           "Ref": "FulfillmentConcurrency",
         },
@@ -18905,28 +19157,6 @@ exports.handler = (event, context, callback) => {
             },
           ],
         },
-        "LLMSagemakerInitialInstanceCount": {
-          "Fn::If": [
-            "LLMSagemaker",
-            {
-              "Ref": "LLMSagemakerInitialInstanceCount",
-            },
-            {
-              "Ref": "AWS::NoValue",
-            },
-          ],
-        },
-        "LLMSagemakerInstanceType": {
-          "Fn::If": [
-            "LLMSagemaker",
-            {
-              "Ref": "LLMSagemakerInstanceType",
-            },
-            {
-              "Ref": "AWS::NoValue",
-            },
-          ],
-        },
         "Language": {
           "Ref": "Language",
         },
@@ -18940,6 +19170,9 @@ exports.handler = (event, context, callback) => {
               "Ref": "AWS::NoValue",
             },
           ],
+        },
+        "OpenSearchFineGrainAccessControl": {
+          "Ref": "OpenSearchFineGrainAccessControl",
         },
         "OpenSearchInstanceType": {
           "Fn::If": [
@@ -18970,17 +19203,6 @@ exports.handler = (event, context, callback) => {
           "Ref": "AWS::Region",
         },
         "Resource": "AnonymizedMetric",
-        "SagemakerInitialInstanceCount": {
-          "Fn::If": [
-            "EmbeddingsSagemaker",
-            {
-              "Ref": "SagemakerInitialInstanceCount",
-            },
-            {
-              "Ref": "AWS::NoValue",
-            },
-          ],
-        },
         "ServiceToken": {
           "Fn::GetAtt": [
             "SolutionHelper",
@@ -19082,6 +19304,18 @@ exports.handler = (event, context, callback) => {
           "Region": {
             "Ref": "AWS::Region",
           },
+          "StreamingWebSocketEndpoint": {
+            "Fn::If": [
+              "StreamingEnabled",
+              {
+                "Fn::GetAtt": [
+                  "StreamingStack",
+                  "Outputs.StreamingWebSocketEndpoint",
+                ],
+              },
+              "",
+            ],
+          },
         },
       },
       "Type": "AWS::ApiGateway::Stage",
@@ -19100,6 +19334,60 @@ exports.handler = (event, context, callback) => {
         },
       },
       "Type": "AWS::ApiGateway::Resource",
+    },
+    "StreamingStack": {
+      "Condition": "StreamingEnabled",
+      "Properties": {
+        "Parameters": {
+          "BootstrapBucket": {
+            "Ref": "BootstrapBucket",
+          },
+          "BootstrapPrefix": {
+            "Ref": "BootstrapPrefix",
+          },
+          "CFNInvokePolicy": {
+            "Ref": "CFNInvokePolicy",
+          },
+          "CFNLambda": {
+            "Fn::GetAtt": [
+              "CFNLambda",
+              "Arn",
+            ],
+          },
+          "LogRetentionPeriod": {
+            "Ref": "LogRetentionPeriod",
+          },
+          "S3Clean": {
+            "Fn::GetAtt": [
+              "S3Clean",
+              "Arn",
+            ],
+          },
+          "VPCSecurityGroupIdList": {
+            "Fn::Join": [
+              ",",
+              {
+                "Ref": "VPCSecurityGroupIdList",
+              },
+            ],
+          },
+          "VPCSubnetIdList": {
+            "Fn::Join": [
+              ",",
+              {
+                "Ref": "VPCSubnetIdList",
+              },
+            ],
+          },
+          "XraySetting": {
+            "Ref": "XraySetting",
+          },
+        },
+        "TemplateURL": {
+          "Fn::Sub": "https://\${BootstrapBucket}.s3.\${AWS::Region}.amazonaws.com/\${BootstrapPrefix}/templates/streaming.json",
+        },
+      },
+      "Type": "AWS::CloudFormation::Stack",
     },
     "TestAllBucket": {
       "DependsOn": [
@@ -19537,6 +19825,59 @@ exports.handler = (event, context, callback) => {
           "Version": "2012-10-17",
         },
         "Path": "/",
+        "Policies": [
+          {
+            "Fn::If": [
+              "StreamingEnabled",
+              {
+                "PolicyDocument": {
+                  "Statement": [
+                    {
+                      "Action": [
+                        "execute-api:Invoke",
+                      ],
+                      "Effect": "Allow",
+                      "Resource": [
+                        {
+                          "Fn::Join": [
+                            "",
+                            [
+                              "arn:",
+                              {
+                                "Fn::Sub": "\${AWS::Partition}",
+                              },
+                              ":execute-api:",
+                              {
+                                "Fn::Sub": "\${AWS::Region}",
+                              },
+                              ":",
+                              {
+                                "Fn::Sub": "\${AWS::AccountId}",
+                              },
+                              ":",
+                              {
+                                "Fn::GetAtt": [
+                                  "StreamingStack",
+                                  "Outputs.StreamingWebSocketApiId",
+                                ],
+                              },
+                              "/Prod/*",
+                            ],
+                          ],
+                        },
+                      ],
+                    },
+                  ],
+                  "Version": "2012-10-17",
+                },
+                "PolicyName": "StreamingApiAccess",
+              },
+              {
+                "Ref": "AWS::NoValue",
+              },
+            ],
+          },
+        ],
         "RoleName": {
           "Fn::Join": [
             "",
@@ -19621,6 +19962,10 @@ exports.handler = (event, context, callback) => {
         ],
         "PointInTimeRecoverySpecification": {
           "PointInTimeRecoveryEnabled": true,
+        },
+        "TimeToLiveSpecification": {
+          "AttributeName": "ttl",
+          "Enabled": true,
         },
       },
       "Type": "AWS::DynamoDB::Table",
@@ -20189,69 +20534,6 @@ exports.handler = async function (event, context) {
           {
             "PolicyDocument": {
               "Statement": [
-                {
-                  "Action": [
-                    "ssm:GetParameter",
-                    "ssm:GetParameters",
-                  ],
-                  "Effect": "Allow",
-                  "Resource": [
-                    {
-                      "Fn::Join": [
-                        "",
-                        [
-                          "arn:aws:ssm:",
-                          {
-                            "Fn::Sub": "\${AWS::Region}:",
-                          },
-                          {
-                            "Fn::Sub": "\${AWS::AccountId}:",
-                          },
-                          "parameter/",
-                          {
-                            "Ref": "DefaultQnABotSettings",
-                          },
-                        ],
-                      ],
-                    },
-                    {
-                      "Fn::Join": [
-                        "",
-                        [
-                          "arn:aws:ssm:",
-                          {
-                            "Fn::Sub": "\${AWS::Region}:",
-                          },
-                          {
-                            "Fn::Sub": "\${AWS::AccountId}:",
-                          },
-                          "parameter/",
-                          {
-                            "Ref": "PrivateQnABotSettings",
-                          },
-                        ],
-                      ],
-                    },
-                    {
-                      "Fn::Join": [
-                        "",
-                        [
-                          "arn:aws:ssm:",
-                          {
-                            "Fn::Sub": "\${AWS::Region}:",
-                          },
-                          {
-                            "Fn::Sub": "\${AWS::AccountId}:",
-                          },
-                          "parameter/",
-                          {
-                            "Ref": "CustomQnABotSettings",
-                          },
-                        ],
-                      ],
-                    },
-                  ],
-                },
                 {
                   "Action": [
                     "es:ESHttpGet",
@@ -21322,11 +21604,9 @@ exports.handler = async function (event, context) {
     "ClientIdClient":"\${ClientClient}",
     "ClientIdDesigner":"\${ClientDesigner}",
     "UserPool":"\${UserPool}",
-    "DefaultQnABotSettings":"\${DefaultQnABotSettings}",
-    "PrivateQnABotSettings":"\${PrivateQnABotSettings}",
-    "CustomQnABotSettings":"\${CustomQnABotSettings}",
-    "KendraCrawlerSnsTopic":"\${KendraCrawlerSnsTopic}",
+    "StreamingWebSocketEndpoint": "$stageVariables.StreamingWebSocketEndpoint",
     "SolutionHelper": "\${SolutionHelper}",
+    "SettingsTable": "\${SettingsTable}",
     "Id":"$stageVariables.Id",
     "_links":{
         "root":{

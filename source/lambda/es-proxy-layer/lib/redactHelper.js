@@ -7,7 +7,7 @@
 const _ = require('lodash');
 const qnabot = require('qnabot/logging');
 
-const excludedKeys = ['FirstSeen', 'LastSeen'];
+const excludedKeys = ['_settings','dateTime', 'FirstSeen', 'LastSeen', 'TimeSinceLastInteraction','UserId', 'originatingRequestId', 'sessionId', 'knowledgeBaseSessionId', '_userId', 'timing', '_lexVersion'];
 function processKeysForRedact(obj, fullRedaction = false) {
     Object.keys(obj).forEach((key) => {
         const val = obj[key];

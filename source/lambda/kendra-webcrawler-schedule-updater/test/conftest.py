@@ -22,3 +22,4 @@ def aws_environment_variables():
     os.environ["CUSTOM_SETTINGS_PARAM"] = "test_custom_setting_param"
     os.environ["SOLUTION_ID"] = "SO0189"
     os.environ["SOLUTION_VERSION"] = "mock_version"
+    os.environ["SETTINGS_TABLE"] = "mock_settings_table"

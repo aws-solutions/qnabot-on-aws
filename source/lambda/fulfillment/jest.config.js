@@ -9,14 +9,24 @@ module.exports = {
     collectCoverage: true,
     collectCoverageFrom: ['**/*.js', '!jest.config.js', '!test/*.js', '!coverage/**/*.js'],
     coverageReporters: ['text', ['lcov', { projectRoot: '../../../' }]],
-    moduleDirectories: ['node_modules', 'nodejs/node_modules','lambda/aws-sdk-layer/node_modules', 'lambda/aws-sdk-layer/nodejs/node_modules'],
+    moduleDirectories: [
+        'node_modules',
+        'nodejs/node_modules',
+        'lambda/aws-sdk-layer/node_modules', 
+        'lambda/aws-sdk-layer/nodejs/node_modules', 
+        'lambda/es-proxy-layer/node_modules', 
+        'lambda/es-proxy-layer/nodejs/node_modules'
+    ],
     moduleNameMapper: {
         "../../../../../../../../../../opt/lib/query.js": "<rootDir>/test/lib/middleware/__mocks__/esQueryMock.js",
         "../../../../../../../../../../opt/lib/supportedLanguages": "<rootDir>/../es-proxy-layer/lib/supportedLanguages.js",
-        "../../../../../../../../../../opt/lib/fulfillment-event/utterance": "<rootDir>/../es-proxy-layer/lib/fulfillment-event/utterance.js"
+        "../../../../../../../../../../opt/lib/fulfillment-event/utterance": "<rootDir>/../es-proxy-layer/lib/fulfillment-event/utterance.js",
+        "/opt/lib/bedrock/applyGuardrail.js": "<rootDir>/../es-proxy-layer/lib/bedrock/applyGuardrail.js",
+
       },
     modulePaths: [
         "<rootDir>/../qnabot-common-layer/",
-        "<rootDir>/../aws-sdk-layer/"
+        "<rootDir>/../aws-sdk-layer/",
+        "<rootDir>/../es-proxy-layer/"
     ]
 };

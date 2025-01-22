@@ -3,9 +3,11 @@
 *   SPDX-License-Identifier: Apache-2.0                                                            *
  ************************************************************************************************ */
 const _ = require('lodash');
-const { SSMClient, GetParameterCommand, GetParametersCommand, PutParameterCommand } = require('@aws-sdk/client-ssm');
+const { DynamoDBClient, DeleteItemCommand, GetItemCommand, PutItemCommand, ScanCommand, UpdateItemCommand } = require('@aws-sdk/client-dynamodb');
+const { marshall, unmarshall } = require('@aws-sdk/util-dynamodb');
 const { LambdaClient, InvokeCommand } = require('@aws-sdk/client-lambda');
 const util = require('../../../../capability/util');
+const defaultSettings = require('../../../../../../../source/lambda/cfn/lib/DefaultSettings.json');
 
 const chatbotTestingIndex = 0;
 const languageSettingsIndex = 1;
@@ -211,17 +213,21 @@ const settingsMap = {
                     {
                         id: 'LLM_GENERATE_QUERY_ENABLE',
                         type: 'boolean',
-                        hint: 'Enables query disambiguation',
+                        hint: 'Enables query disambiguation feature which generates a query when disambiguating follow-up questions',
                     },
                     {
                         id: 'LLM_GENERATE_QUERY_PROMPT_TEMPLATE',
                         type: 'textarea',
-                        hint: 'Template to send to the LLM to generate a query from',
+                        hint: 'Customize the prompt template to send to the LLM to generate a query when disambiguating follow-up questions',
                     },
                     {
                         id: 'LLM_GENERATE_QUERY_MODEL_PARAMS',
-                        hint: 'Parameters sent to the LLM model when disambiguating follow-up questions (e.g anthropic model parameters can be customized as `{"temperature":0.1}` or `{"temperature":0.3, "max_tokens": 262, "top_k": 240, "top_p":0.9 }`). Please check LLM model documentation for values that your model provider accepts',
+                        hint: 'Customize the inference parameters sent to the LLM model specified for LLMApi when disambiguating follow-up questions (e.g. When selecting LLMApi as BEDROCK and LLMBedrockModelId as an Anthropic model, the inference parameters can be customized as `{"temperature":0.1}` or `{"temperature":0.3, "maxTokens": 262, "topP":0.9, "top_k": 240 }`). To find more details on supported parameters for your model provider, please check the LLM model documentation for values that your specific model accepts.',
                     },
+                    {
+                        id: 'LLM_GENERATE_QUERY_SYSTEM_PROMPT',
+                        hint: 'Customize the system prompt for LLMBedrockModelId when disambiguating user\'s question based on the chat history. A system prompt is a type of prompt that provides instructions or context to the model about the task it should perform, or the persona it should adopt during the conversation. For more information on models that support system prompt, please refer to (https://docs.aws.amazon.com/bedrock/latest/userguide/conversation-inference-supported-models-features.html)',
+                    }
                 ],
             },
             advancedSettings: {
@@ -229,6 +235,11 @@ const settingsMap = {
                 label: 'Advanced',
                 collapsed: true,
                 members: [
+                    {
+                        id: 'USER_HISTORY_TTL_DAYS',
+                        type: 'number',
+                        hint: 'The number of days to keep user and chat history in DynamoDB before expiring. If you would like your user/chat history to never expire, leave this value as 0.',
+                    },
                     {
                         id: 'ES_EXPAND_CONTRACTIONS',
                         hint: 'Expand contractions to resolve problems with keyword filters',
@@ -451,11 +462,11 @@ const settingsMap = {
                     {
                         id: 'LLM_QA_PROMPT_TEMPLATE',
                         type: 'textarea',
-                        hint: 'The template used to construct a prompt for LLM to generate an answer from the context of retrieved passages (from Kendra or Text Item passages)',
+                        hint: 'Customize the prompt template used to construct a prompt for LLM to generate an answer from the context of retrieved passages (applicable for  Text Item passages or RAG with Kendra)',
                     },
                     {
                         id: 'LLM_QA_MODEL_PARAMS',
-                        hint: 'Parameters sent to the LLM model when generating answers to questions (e.g. anthropic model parameters can be customized as `{"temperature":0.1}` or `{"temperature":0.3, "max_tokens": 262, "top_k": 240, "top_p":0.9 }`). Please check LLM model documentation for values that your model provider accepts',
+                        hint: 'Customize the inference parameters sent to the LLM model specified for LLMApi when generating answers to questions (e.g. When selecting LLMApi as BEDROCK and LLMBedrockModelId as an Anthropic model, the inference parameters can be customized as `{"temperature":0.1}` or `{"temperature":0.3, "maxTokens": 262, "topP":0.9, "top_k": 240 }`). To find more details on supported parameters for your model provider, please check the LLM model documentation for values that your specific model accepts.',
                     },
                     {
                         id: 'LLM_QA_PREFIX_MESSAGE',
@@ -477,24 +488,50 @@ const settingsMap = {
                         hint: 'Specifies the maximum number of previous messages maintained in the QnABot DynamoDB UserTable for conversational context and follow-up question disambiguation',
                     },
                     {
+                        id: 'LLM_QA_SYSTEM_PROMPT',
+                        hint: 'Customize the system prompt for LLMBedrockModelId when generating an answer to the user\'s question. A system prompt is a type of prompt that provides instructions or context to the model about the task it should perform, or the persona it should adopt during the conversation. For more information on models that support system prompt, please refer to (https://docs.aws.amazon.com/bedrock/latest/userguide/conversation-inference-supported-models-features.html)',
+                    },
+                    {
                         id: 'LLM_QA_NO_HITS_REGEX',
                         hint: 'Enter a regular expression. If the LLM response matches the specified pattern (e.g., "Sorry, I don\'t know"), the response is treated as no_hits, and the default EMPTYMESSAGE or a custom \'no_hits\' item is returned instead. Disabled by default, since enabling it prevents easy debugging of LLM don\'t know responses',
+                    },
+                    {
+                        id: 'FALLBACK_ORDER',
+                        type: 'enum',
+                        enums: ['KNOWLEDGEBASE-FIRST', 'KENDRA-FIRST'],
+                        hint: 'Specifies the order in which the fallback mechanisms (Amazon Kendra and Amazon Bedrock Knowledge Base) should be tried. By default, the QnABot will try RAG with Amazon Bedrock Knowledge Base first, and if no hits are returned, it will then try RAG with Amazon Kendra. This setting only takes effect when both BedrockKnowledgeBaseId and AltSearchKendraIndexes are provided in the CloudFormation deployment.',
                     },
                 ],
             },
             bedrockGuardrails: {
                 id: 'text_generation_guardrail_subgroup',
-                label: 'Guardrail for Amazon Bedrock and Knowledge Base Integrations',
+                label: 'Amazon Bedrock Guardrails Integration',
                 collapsed: true,
                 members: [
 
                     {
                         id: 'BEDROCK_GUARDRAIL_IDENTIFIER',
-                        hint: 'Enter a pre-configurated Bedrock Guardrail identifier (e.g. 4ojm24q0yada) that you want to be applied to the requests made to the LLM models configured in CloudFormation parameters LLMBedrockModelId and BedrockKnowledgeBaseModel. If you don\'t provide a value, no guardrail is applied to the LLM invocation. If you provide a identifier, you must also provide a BEDROCK_GUARDRAIL_VERSION',
+                        hint: 'Enter a pre-configurated Amazon Bedrock Guardrail identifier (e.g. 4ojm24q0yada) that you want to be applied to the requests made to the LLM models configured in CloudFormation parameters LLMBedrockModelId and BedrockKnowledgeBaseModel. If you don\'t provide a value, no guardrail is applied to the LLM invocation. If you provide a identifier, you must also provide a BEDROCK_GUARDRAIL_VERSION',
                     },
                     {
                         id: 'BEDROCK_GUARDRAIL_VERSION',
                         hint: 'Enter the version (e.g. 1 or DRAFT) of the guardrail specifed in BEDROCK_GUARDRAIL_IDENTIFIER',
+                    },
+                    {
+                        id: 'PREPROCESS_GUARDRAIL_IDENTIFIER',
+                        hint: 'Enter a pre-configurated Amazon Bedrock Guardrail identifier (e.g. 4ojm24q0yada) that you want to be applied to the input query to block harmful content or detected PII entities before processing (PREPROCESS) user\'s utterance in the fulfillment. If you don\'t provide a value, no guardrail is applied in the preprocessing step. If you provide a identifier, you must also provide a PREPROCESS_GUARDRAIL_VERSION',
+                    },
+                    {
+                        id: 'PREPROCESS_GUARDRAIL_VERSION',
+                        hint: 'Enter the version (e.g. 1 or DRAFT) of the guardrail specifed in PREPROCESS_GUARDRAIL_IDENTIFIER',
+                    },
+                    {
+                        id: 'POSTPROCESS_GUARDRAIL_IDENTIFIER',
+                        hint: 'Enter a pre-configurated Amazon Bedrock Guardrail identifier (e.g. 4ojm24q0yada) that you want to be applied to the final answer after processing of the user\'s utterance has completed in the postprocessing step of fulfillment. If you don\'t provide a value, no guardrail is applied in the postprocessing step. If you provide a identifier, you must also provide a POSTPROCESS_GUARDRAIL_VERSION',
+                    },
+                    {
+                        id: 'POSTPROCESS_GUARDRAIL_VERSION',
+                        hint: 'Enter the version (e.g. 1 or DRAFT) of the guardrail specifed in POSTPROCESS_GUARDRAIL_IDENTIFIER',
                     },
                 ],
             },
@@ -579,7 +616,7 @@ const settingsMap = {
                     },
                     {
                         id: 'KNOWLEDGE_BASE_MODEL_PARAMS',
-                        hint: 'Customize the knowledge base model by providing inference parameters (e.g. anthropic model parameters can be customized as `{"temperature":0.1}` or `{"temperature":0.3, "maxTokens": 262, "topP":0.9, "top_k": 240 }`). For more information, please refer to Inference parameters (https://docs.aws.amazon.com/bedrock/latest/userguide/kb-test-config.html)',
+                        hint: 'Customize the inference parameters sent to the LLM model specified in cloudformation parameter BedrockKnowledgeBaseModel (e.g. anthropic model parameters can be customized as `{"temperature":0.1}` or `{"temperature":0.3, "maxTokens": 262, "topP":0.9, "top_k": 240 }`). For more information, please refer to Inference parameters (https://docs.aws.amazon.com/bedrock/latest/userguide/kb-test-config.html)',
                     },
                     {
                         id: 'KNOWLEDGE_BASE_MAX_NUMBER_OF_RETRIEVED_RESULTS',
@@ -602,45 +639,224 @@ const settingsMap = {
     },
 };
 
+async function getParameters(context, dynamodb) {
+    const tableName = context.rootState.info.SettingsTable;
 
-async function getParameters(ssm, params) {
-    const getParametersCommand = new GetParametersCommand(params);
-    try {
-        const data = await ssm.send(getParametersCommand);
-        const custom_settings = JSON.parse(data.Parameters[0].Value);
-        const default_settings = JSON.parse(data.Parameters[1].Value);
-        const cloned_default = _.clone(default_settings);
-        const merged_settings = _.merge(cloned_default, custom_settings);
-        const settings = [default_settings, custom_settings, merged_settings];
-        return settings;
-    } catch (error) {
-        console.log(error, error.stack);
-        throw new Error(`Error back from request: ${error}`);
-    }
+    const params = {
+        TableName: tableName,
+        FilterExpression: "SettingCategory <> :private",
+        ExpressionAttributeValues: {
+            ":private": {
+                "S": "Private"
+            }
+        }
+    };
+
+    const custom_settings = {};
+    const default_settings = {}
+    let lastEvaluatedKey = null;
+
+    do {
+        if (lastEvaluatedKey) {
+            params.ExclusiveStartKey = lastEvaluatedKey;
+        }
+
+        try {
+            const command = new ScanCommand(params);
+            const response = await dynamodb.send(command);
+            response.Items.forEach(item => {
+                const unmarshalledItem = unmarshall(item);
+                const settingName = unmarshalledItem.SettingName;
+                const settingValue = unmarshalledItem.SettingValue;
+                const defaultValue = unmarshalledItem.DefaultValue;
+                const settingCategory = unmarshalledItem.SettingCategory;
+
+                if (settingValue != "") {
+                    custom_settings[settingName] = settingValue;
+                }
+
+                if (settingCategory == "Custom") {
+                    custom_settings[settingName] = settingValue;
+                }
+
+                default_settings[settingName] = defaultValue;
+            });
+
+            lastEvaluatedKey = response.LastEvaluatedKey;
+        } catch (error) {
+            console.error('Error scanning DynamoDB table:', error);
+            throw error;
+        }
+    } while (lastEvaluatedKey);
+
+    let cloned_default = _.clone(default_settings)
+    let merged_settings = _.merge(cloned_default, custom_settings)
+    return [default_settings, custom_settings, merged_settings];
 }
 
-async function saveParameters(ssm, params) {
-    const putParameterCommand = new PutParameterCommand(params);
-    try {
-        const ssmResponse = await ssm.send(putParameterCommand);
-        return ssmResponse;
-    } catch (error) {
-        console.log(error, error.stack);
-        throw new Error(`Error back from request: ${error}`);
+async function saveParameters(context, dynamodb, settings) {
+    const tableName = context.rootState.info.SettingsTable;
+    let changedSettings = []
+    Object.entries(settings).forEach(async ([settingName, settingValue]) => {
+        let settingCategory;
+        if (defaultSettings[settingName]) {
+            settingCategory = defaultSettings[settingName]["SettingCategory"]
+        } else
+            settingCategory = "Custom"
+        console.log(`Setting Name ${settingName}, Setting Value ${settingValue}`)   
+        const getParams = {
+            TableName: tableName,
+            Key: marshall({ SettingName: settingName }),
+        };
+        const getCommand = new GetItemCommand(getParams);
+        const currentSetting = await dynamodb.send(getCommand);
+        if(!currentSetting.Item && settingCategory == "Custom") {
+            const item = {
+                SettingName: settingName,
+                SettingValue: settingValue,
+                SettingCategory: "Custom",
+                nonce: 0
+            };
+
+            const putParams = {
+                TableName: tableName,
+                Item: marshall(item)
+            };
+
+            const putCommand = new PutItemCommand(putParams);
+            const result = await dynamodb.send(putCommand);
+            changedSettings.push(settingName)
+            return result;
+        } else if (!currentSetting.Item) {
+            throw new Error(`Setting ${settingName} not found`);
+        }
+
+        const unmarshalledItem = unmarshall(currentSetting.Item);
+        const currentNonce = unmarshalledItem.nonce;
+
+        const updateParams = {
+            TableName: context.rootState.info.SettingsTable,
+            Key: marshall({ SettingName: settingName }),
+            UpdateExpression: "SET #value = :value, #nonce = :newNonce",
+            ConditionExpression: "#nonce = :currentNonce",
+            ExpressionAttributeNames: {
+                "#value": "SettingValue",
+                "#nonce": "nonce"
+            },
+            ExpressionAttributeValues: marshall({
+                ":value": settingValue,
+                ":currentNonce": currentNonce,
+                ":newNonce": currentNonce + 1 // Increment the nonce
+            }),
+            ReturnValues: "UPDATED_NEW"
+        };
+
+        const updateCommand = new UpdateItemCommand(updateParams);
+        let result;
+        try {
+            result = await dynamodb.send(updateCommand);
+        } catch(error) {
+            console.error(`Failed to update setting ${settingName}`);
+            throw error; 
+        }
+        changedSettings.push(settingName)
+        console.log(`Successfully updated ${settingName}: ${JSON.stringify(result)}`);
+        
+    });
+    return changedSettings;
+}
+
+async function checkForRestoredSettings(context, dynamodb, settings){
+    const tableName = context.rootState.info.SettingsTable;
+    const modified_settings = await getParameters(context,dynamodb);
+    const restoredSettings = _.omit(modified_settings[1], Object.keys(settings));
+    let restoredSettingsList = [];
+    Object.keys(restoredSettings).forEach(async (settingName) => {
+        let settingCategory;
+        if (defaultSettings[settingName]) {
+            settingCategory = defaultSettings[settingName]["SettingCategory"]
+        } else
+            settingCategory = "Custom"
+
+        if (settingCategory == "Custom") {
+            const params = {
+                TableName: tableName,
+                Key: marshall({ SettingName: settingName })
+            };
+            try {
+                const updateCommand = new DeleteItemCommand(params);
+                await dynamodb.send(updateCommand);
+            }
+            catch {
+                throw new Error(`Failed to delete custom setting ${settingName}`);
+            }
+            restoredSettingsList.push(settingName)
+        } else {
+            const getParams = {
+                TableName: tableName,
+                Key: marshall({ SettingName: settingName }),
+            };
+            const getCommand = new GetItemCommand(getParams);
+            const currentSetting = await dynamodb.send(getCommand);
+            
+            if (!currentSetting.Item) {
+                throw new Error(`Setting ${settingName} not found`);
+            }
+    
+            const unmarshalledItem = unmarshall(currentSetting.Item);
+            const currentNonce = unmarshalledItem.nonce;
+
+            const params = {
+                TableName: tableName,
+                Key: marshall({ SettingName: settingName }),
+                UpdateExpression: 'SET SettingValue = :emptyValue, #nonce = :newNonce',
+                ConditionExpression: "#nonce = :currentNonce",
+                ExpressionAttributeNames: {
+                    "#nonce": "nonce"
+                },
+                ExpressionAttributeValues: marshall({
+                    ':emptyValue': "", // Set to empty string
+                    ":currentNonce": currentNonce,
+                    ":newNonce": currentNonce + 1 // Increment the nonce
+                }),
+                ReturnValues: 'NONE'
+            };
+            const updateCommand = new UpdateItemCommand(params);
+            let result;
+            try {
+                result = await dynamodb.send(updateCommand);
+            } catch {
+                throw new Error(`Failed to restore setting ${settingName}`);
+            }
+            restoredSettingsList.push(settingName)
+            console.log(`Successfully restored ${settingName}: ${JSON.stringify(result)}`);
+        }
+    });
+    return restoredSettingsList;
     }
+
+
+function createSettingsMap(settings) {  // NOSONAR - javascript:S3776 - settings map needs to be anonymized 
+    return {
+        event: 'UPDATE_SETTINGS',
+        BEDROCK_GUARDRAIL_ENABLE: settings.BEDROCK_GUARDRAIL_IDENTIFIER && settings.BEDROCK_GUARDRAIL_VERSION ? 'true' : 'false',
+        PREPROCESS_GUARDRAIL_ENABLE: settings.PREPROCESS_GUARDRAIL_IDENTIFIER && settings.PREPROCESS_GUARDRAIL_VERSION ? 'true' : 'false',
+        POSTPROCESS_GUARDRAIL_ENABLE: settings.POSTPROCESS_GUARDRAIL_IDENTIFIER && settings.POSTPROCESS_GUARDRAIL_VERSION ? 'true' : 'false',
+        ENABLE_MULTI_LANGUAGE_SUPPORT: settings.ENABLE_MULTI_LANGUAGE_SUPPORT || 'false',
+        LLM_GENERATE_QUERY_ENABLE: settings.LLM_GENERATE_QUERY_ENABLE || 'true',
+        KNOWLEDGE_BASE_SEARCH_TYPE: settings.KNOWLEDGE_BASE_SEARCH_TYPE || 'DEFAULT',
+        KNOWLEDGE_BASE_METADATA_FILTERS_ENABLE: settings.KNOWLEDGE_BASE_METADATA_FILTERS && settings.KNOWLEDGE_BASE_METADATA_FILTERS !== "{}" ? 'true' : 'false',
+        PII_REJECTION_ENABLED: settings.PII_REJECTION_ENABLED || 'false',
+        EMBEDDINGS_ENABLE: settings.EMBEDDINGS_ENABLE || 'true',
+        LLM_QA_ENABLE: settings.LLM_QA_ENABLE || 'true',
+        FALLBACK_ORDER: settings.FALLBACK_ORDER || 'KNOWLEDGEBASE-FIRST',
+        ENABLE_REDACTING: settings.ENABLE_REDACTING || 'false',
+        ENABLE_REDACTING_WITH_COMPREHEND: settings.ENABLE_REDACTING_WITH_COMPREHEND || 'false'
+    };
 }
 
 async function sendAnonymizedData(params, settings){
-    const map = { event: 'UPDATE_SETTINGS' };
-    map.BEDROCK_GUARDRAIL_ENABLE = settings.BEDROCK_GUARDRAIL_IDENTIFIER && settings.BEDROCK_GUARDRAIL_VERSION ? 'true' : 'false';
-    map.ENABLE_MULTI_LANGUAGE_SUPPORT = settings.ENABLE_MULTI_LANGUAGE_SUPPORT || 'false';
-    map.LLM_GENERATE_QUERY_ENABLE = settings.LLM_GENERATE_QUERY_ENABLE || 'true';
-    map.KNOWLEDGE_BASE_SEARCH_TYPE = settings.KNOWLEDGE_BASE_SEARCH_TYPE || 'DEFAULT';
-    map.PII_REJECTION_ENABLED = settings.PII_REJECTION_ENABLED || 'false';
-    map.EMBEDDINGS_ENABLE = settings.EMBEDDINGS_ENABLE || 'true';
-    map.LLM_QA_ENABLE = settings.LLM_QA_ENABLE || 'true';
-    map.ENABLE_REDACTING = settings.ENABLE_REDACTING || 'false';
-    map.ENABLE_REDACTING_WITH_COMPREHEND = settings.ENABLE_REDACTING_WITH_COMPREHEND || 'false';
+    const map = createSettingsMap(settings);
 
     const payload = Buffer.from(JSON.stringify(map));
     const client = new LambdaClient({
@@ -649,12 +865,12 @@ async function sendAnonymizedData(params, settings){
         credentials: params.credentials
     });
 
-    const input = {
+    const command = new InvokeCommand({
         FunctionName: params.solutionHelper,
         InvocationType: "Event",
         Payload: payload,
-    };
-    const command = new InvokeCommand(input);
+    });
+    
     const response = await client.send(command);
     if (response.FunctionError) {
         throw new Error('Solution Helper Function Error Occurred');
@@ -665,51 +881,59 @@ async function sendAnonymizedData(params, settings){
 module.exports = {
     async listSettings(context) {
         const credentials = context.rootState.user.credentials;
-        const customParams = context.rootState.info.CustomQnABotSettings;
-        const defaultParams = context.rootState.info.DefaultQnABotSettings;
-        const ssm = new SSMClient({
+        
+        const dynamodb = new DynamoDBClient({
             customUserAgent: util.getUserAgentString(context.rootState.info.Version, 'C022'),
             region: context.rootState.info.region, credentials
         });
-        const query = {
-            Names: [customParams, defaultParams],
-            WithDecryption: true,
-        };
-        const response = await getParameters(ssm, query);
 
+        const response = await getParameters(context, dynamodb);
         return response;
     },
     async listPrivateSettings(context) {
         const { credentials } = context.rootState.user;
-        const privateSettings = context.rootState.info.PrivateQnABotSettings;
-        const ssm = new SSMClient({
+        const dynamodb = new DynamoDBClient({
             customUserAgent: util.getUserAgentString(context.rootState.info.Version, 'C022'),
-            region: context.rootState.info.region,
-            credentials,
+            region: context.rootState.info.region, credentials
         });
+
         try {
-            const getParameterCommand = new GetParameterCommand({
-                Name: privateSettings,
-                WithDecryption: true,
+            const params = {
+                TableName: context.rootState.info.SettingsTable,
+                FilterExpression: "SettingCategory = :private",
+                ExpressionAttributeValues: {
+                    ":private": {
+                        "S": "Private"
+                    }
+                }
+            }
+            const scanCommand = new ScanCommand(params)
+            const response = await dynamodb.send(scanCommand);
+            let privateSettings = {}
+            response.Items.forEach(item => {
+                const unmarshalledItem = unmarshall(item);
+                const settingName = unmarshalledItem.SettingName;
+                const settingValue = unmarshalledItem.SettingValue;
+                privateSettings[settingName] = settingValue;
+
             });
-            const ssmResponse = await ssm.send(getParameterCommand);
-            const settingsResponse = JSON.parse(ssmResponse.Parameter.Value);
-            return settingsResponse;
+
+            return privateSettings;
         } catch (error) {
-            console.error(`Error while fetching ssm paramter ${error}`);
+            console.error(`Error while fetching custom parameters ${error}`);
             return {};
         }
     },
     async updateSettings(context, settings) {
         const credentials = context.rootState.user.credentials;
-        const customParams = context.rootState.info.CustomQnABotSettings;
         const region = context.rootState.info.region;
         const version = context.rootState.info.Version;
         const solutionHelper = context.rootState.info.SolutionHelper;
-        const ssm = new SSMClient({
+
+        const dynamodb = new DynamoDBClient({ 
             customUserAgent: util.getUserAgentString(version, 'C022'),
             region, 
-            credentials
+            credentials 
         });
     
         try {
@@ -723,17 +947,13 @@ module.exports = {
         } catch (e) {
             console.log(`Error in sending anonymized data: ${e.message}`);
         }
-        
-        // Note type is not required in params if the parameter exists. Some customers require this parameter
-        // to be a SecureString and set this type post deploy of QnABot. Removing type supports
-        // this setting.
-        const params = {
-            Name: customParams,
-            Value: JSON.stringify(settings),
-            Overwrite: true,
-        };
-        const response = await saveParameters(ssm, params);
-        return response;
+        try {
+            const changedSettings = await saveParameters(context, dynamodb, settings);
+            const restoredSettings = await checkForRestoredSettings(context, dynamodb, settings);
+            return {changedSettings, restoredSettings};
+        } catch (error) {
+            throw new Error('Failed to update or restore settings: '+ error);
+        }
     },
     getSettingsMap() {
         return settingsMap;

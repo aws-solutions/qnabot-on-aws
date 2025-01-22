@@ -24,6 +24,15 @@ Resources:
           SSEAlgorithm: AES256
     VersioningConfiguration:
       Status: Enabled
+  ContentDesignerOutputBucket:
+    Type: AWS::S3::Bucket
+    BucketName: test_content_designer_output_bucket
+    BucketEncryption:
+      ServerSideEncryptionConfiguration:
+        ServerSideEncryptionByDefault:
+          SSEAlgorithm: AES256
+    VersioningConfiguration:
+      Status: Enabled
   ESProxyLambdaRole:
     Type: AWS::IAM::Role
     Properties:
@@ -54,3 +63,6 @@ Outputs:
   ExportBucket:
     Description: Use for testing
     Value: !Ref ExportBucket
+  ContentDesignerOutputBucket:
+    Description: Use for testing
+    Value: !Ref ContentDesignerOutputBucket

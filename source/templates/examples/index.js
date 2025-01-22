@@ -38,8 +38,6 @@ module.exports = {
         VPCSubnetIdList: { Type: 'String' },
         VPCSecurityGroupIdList: { Type: 'String' },
         XraySetting: { Type: 'String' },
-        DefaultQnABotSettings: { Type: 'String' },
-        PrivateQnABotSettings: { Type: 'String' },
         InstallLexResponseBots: { Type: 'String' },
         AwsSdkLayerLambdaLayer: { Type: 'String' },
         LogRetentionPeriod: { Type: 'Number' },

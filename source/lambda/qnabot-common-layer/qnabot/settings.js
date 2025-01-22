@@ -4,12 +4,15 @@
  ************************************************************************************************ */
 
 const _ = require('lodash');
+const { DynamoDBClient, ScanCommand } = require('@aws-sdk/client-dynamodb');
+const { unmarshall } = require('@aws-sdk/util-dynamodb');
 const { SSMClient, GetParameterCommand } = require('@aws-sdk/client-ssm');
 const customSdkConfig = require('sdk-config/customSdkConfig');
 const qnabot = require('./logging');
 const region = process.env.AWS_REGION;
 
 const ssm = new SSMClient(customSdkConfig('C022', { region }));
+const dynamodb = new DynamoDBClient(customSdkConfig('C022', { region }));
 
 function str2bool(settings) {
     const new_settings = _.mapValues(settings, (x) => {
@@ -66,20 +69,40 @@ async function get_parameter(param_name) {
 }
 
 async function getSettings() {
-    const default_settings_param = process.env.DEFAULT_SETTINGS_PARAM;
-    const private_settings_param = process.env.PRIVATE_SETTINGS_PARAM;
-    const custom_settings_param = process.env.CUSTOM_SETTINGS_PARAM;
 
-    qnabot.log('Getting Default QnABot settings from SSM Parameter Store: ', default_settings_param);
-    const default_settings = await get_parameter(default_settings_param);
+    qnabot.log('Checking for QnABot Settings in DynamoDB Table: ', process.env.SETTINGS_TABLE);
 
-    qnabot.log('Getting Private QnABot settings from SSM Parameter Store: ', private_settings_param);
-    const private_settings = await get_parameter(private_settings_param);
+    const params = {
+        TableName: process.env.SETTINGS_TABLE
+    };
+    let settings = {}
+    let response;
+    try {
+        const command = new ScanCommand(params);
+        response = await dynamodb.send(command);
 
-    qnabot.log('Getting Custom QnABot settings from SSM Parameter Store: ', custom_settings_param);
-    const custom_settings = await get_parameter(custom_settings_param);
+    } catch (error) {
+        console.log(error, error.stack);
+        throw new Error(`Error back from DynamoDB request: ${error}`);
+    }
 
-    const settings = _.merge(_.merge(default_settings, private_settings), custom_settings);
+    response.Items.forEach(item => {
+        const unmarshalledItem = unmarshall(item);
+        const settingName = unmarshalledItem.SettingName;
+        const settingValue = unmarshalledItem.SettingValue;
+        const defaultValue = unmarshalledItem.DefaultValue;
+
+        if (settingValue != "") {
+            settings[settingName] = settingValue;
+        } else {
+            settings[settingName] = defaultValue;
+        }
+        settings = str2bool(settings);
+        settings = str2int(settings);       
+    });
+
+    qnabot.log('Found settings: ', settings);
+
     return settings;
 }
 

@@ -1,0 +1,268 @@
+######################################################################################################################
+#  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.                                                #
+#  SPDX-License-Identifier: Apache-2.0                                                                               #
+######################################################################################################################
+
+AWSTemplateFormatVersion: "2010-09-09"
+Description: >
+  Amazon Q (Business) Lambda Hook function for using with 'QnABot on AWS'. 
+  Use with the 'no_hits' (CustomNoMatches) item to use Amazon Q when no good answers are found by other methods - v0.1.17
+
+Parameters:
+  AmazonQAppId:
+    Type: String
+    AllowedPattern: "^[a-zA-Z0-9][a-zA-Z0-9-]{35}$"
+    Description: Amazon Q Application ID
+
+  BootstrapBucket:
+    Type: String
+    Description: Name of bootstrap bucket created via QnABot.
+
+  IDCApplicationARN:
+    Type: String
+    Description: ARN of the Identity Center customer managed application created for QBusiness
+
+  DynamoDBTableName:
+    Type: String
+    Description: DynamoDB Table Name used for caching QBusiness credentials
+
+  AmazonQRegion:
+    Type: String
+    Default: "us-east-1"
+    AllowedPattern: "^[a-z]{2}-[a-z]+-[0-9]+$"
+    Description: Amazon Q Region
+
+  AmazonQEndpointUrl:
+    Type: String
+    Default: ""
+    Description: (Optional) Amazon Q Endpoint (leave empty for default endpoint)
+
+  VPCSubnetIdList:
+    Type: CommaDelimitedList
+    Default: ""
+    AllowedPattern: "[^ ]*"
+    ConstraintDescription: Must be a list of valid subnet IDs
+    Description: (Optional) Set to a list of Subnet IDs belonging to the target VPC you want to deploy your Q Business Lambda Hook in.
+
+  VPCSecurityGroupIdList:
+    Type: CommaDelimitedList
+    Description: (Optional) Set to a list of Security Group IDs used by Q Business Lambda Hook when deployed within a VPC.
+    AllowedPattern: "[^ ]*"
+    ConstraintDescription: Must be a list of valid security group IDs
+    Default: ""
+
+Conditions:
+  VPCEnabled:
+    !Not [!Equals ["", !Join ["", !Ref VPCSecurityGroupIdList]]]
+
+Resources:
+  QManagedPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Sid: AllowQChat
+            Effect: Allow
+            Action:
+              - "qbusiness:ChatSync"
+            Resource: !Sub "arn:${AWS::Partition}:qbusiness:${AWS::Region}:${AWS::AccountId}:application/${AmazonQAppId}"
+
+  QServiceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              AWS:
+                - !Sub arn:${AWS::Partition}:iam::${AWS::AccountId}:root
+            Action:
+              - sts:AssumeRole
+              - sts:SetContext
+      Path: /
+      ManagedPolicyArns:
+        - !Ref QManagedPolicy
+
+  KMSKey:
+    Type: "AWS::KMS::Key"
+    Properties:
+      KeySpec: "SYMMETRIC_DEFAULT"
+      KeyUsage: "ENCRYPT_DECRYPT"
+      EnableKeyRotation: True
+      KeyPolicy:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              AWS: !Sub "arn:aws:iam::${AWS::AccountId}:root"
+            Action: "kms:*"
+            Resource: "*"
+
+  CredentialsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      AttributeDefinitions:
+        - AttributeName: "jti"
+          AttributeType: "S"
+      KeySchema:
+        - AttributeName: "jti"
+          KeyType: "HASH"
+      BillingMode: PAY_PER_REQUEST
+      SSESpecification:
+        SSEEnabled: True
+      TableName: !Ref DynamoDBTableName
+      TimeToLiveSpecification:
+        AttributeName: ExpiresAt
+        Enabled: true
+      PointInTimeRecoverySpecification:
+        PointInTimeRecoveryEnabled: True
+    Metadata:
+      cfn_nag:
+        rules_to_suppress:
+        - id: W28
+          reason: No requirement to not use an explicit name.
+
+  LambdaFunctionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      Policies:
+        - PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - "qbusiness:ChatSync"
+                Resource: !Sub "arn:aws:qbusiness:${AWS::Region}:${AWS::AccountId}:application/${AmazonQAppId}"
+          PolicyName: QBusinessPolicy
+        - PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - "s3:GetObject"
+                Resource: "arn:aws:s3:::*/*"
+          PolicyName: S3ImportBucketPolicy
+        - PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - "dynamodb:PutItem"
+                  - "dynamodb:GetItem"
+                Resource:
+                  - !Sub "arn:${AWS::Partition}:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${DynamoDBTableName}"
+          PolicyName: DynamoDbPolicy
+        - PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - "kms:Decrypt"
+                  - "kms:Encrypt"
+                Resource:
+                  - !Sub "arn:${AWS::Partition}:kms:${AWS::Region}:${AWS::AccountId}:key/${KMSKey}"
+          PolicyName: KmsPolicy
+        - PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - "sso-oauth:CreateTokenWithIAM"
+                Resource: "*"
+          PolicyName: OICDPolicy
+        - PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - "sts:AssumeRole"
+                  - "sts:SetContext"
+                Resource:
+                  - !GetAtt QServiceRole.Arn
+          PolicyName: AllowAssumeQRole
+        - PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action: ["ec2:CreateNetworkInterface", "ec2:DescribeNetworkInterfaces", "ec2:DeleteNetworkInterface"]
+                Resource: "*"
+          PolicyName: AllowVPCConfigPolicy
+    Metadata:
+      cfn_nag:
+        rules_to_suppress:
+        - id: W11
+          reason: Needed for VPC Config.
+
+  QnaItemLambdaHookFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      # LambdaHook name must start with 'QNA-' to match QnAbot invoke policy
+      FunctionName: !Sub "QNA-LAMBDAHOOK-${AWS::StackName}"
+      Handler: lambdahook.lambda_handler
+      Role: !GetAtt "LambdaFunctionRole.Arn"
+      Runtime: python3.12
+      Timeout: 60
+      MemorySize: 128
+      Environment:
+        Variables:
+          AWS_DATA_PATH: /opt/model
+          AMAZONQ_APP_ID: !Ref AmazonQAppId
+          AMAZONQ_ROLE_ARN: !GetAtt QServiceRole.Arn
+          DYNAMODB_CACHE_TABLE_NAME: !Ref CredentialsTable
+          KMS_KEY_ID: !Ref KMSKey
+          IDC_CLIENT_ID: !Ref IDCApplicationARN
+          AMAZONQ_REGION: !Ref AmazonQRegion
+          AMAZONQ_ENDPOINT_URL: !Ref AmazonQEndpointUrl
+      LoggingConfig:
+        LogGroup: !Ref QnaItemLambdaHookLogGroup
+      Code:
+        S3Bucket: !Ref BootstrapBucket
+        S3Key: artifacts/aws-ai-qna-bot/lambda/q-business-lambda-hook.zip
+      VpcConfig:
+        !If 
+        - VPCEnabled
+        - SubnetIds: !Ref VPCSubnetIdList
+          SecurityGroupIds: !Ref VPCSecurityGroupIdList
+        - !Ref AWS::NoValue
+    Metadata:
+      cfn_nag:
+        rules_to_suppress:
+        - id: W92
+          reason: No requirements to set reserved concurrencies.
+  
+  QnaItemLambdaHookLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub "/aws/lambda/QNA-LAMBDAHOOK-${AWS::StackName}"
+    Metadata:
+      cfn_nag:
+        rules_to_suppress:
+        - id: W84
+          reason: Log group data is always encrypted in CloudWatch
+        - id: W86
+          reason: RetentionInDays can be set by user in LogGroups
+
+
+Outputs:
+  QnAItemLambdaHookFunctionName:
+    Description: QnA Item Lambda Hook Function Name (use with no_hits item for optional ask-Amazon-Q-Business fallback)
+    Value: !Ref "QnaItemLambdaHookFunction"
+
+  QnAItemLambdaHookArgs:
+    Description: QnA Item Lambda Hook Args (use with no_hits item for optional ask-the-LLM fallback)
+    Value: '{"Prefix":"Amazon Q Answer:", "ShowContextText":true, "ShowSourceLinks":true}'
+
+  QnAItemLambdaFunctionRoleArn:
+    Description: ARN of the Role created for executing the Lambda function
+    Value: !GetAtt LambdaFunctionRole.Arn

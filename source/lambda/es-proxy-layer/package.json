@@ -1,6 +1,6 @@
 {
     "name": "proxy-es",
-    "version": "6.1.5",
+    "version": "7.0.0",
     "description": "QnABot Lambda managing querying of data store",
     "main": "index.js",
     "scripts": {
@@ -14,11 +14,11 @@
     },
     "license": "Apache-2.0",
     "dependencies": {
-        "@aws-sdk/client-bedrock-agent-runtime": "^3.616.0",
-        "@aws-sdk/client-bedrock-runtime": "^3.616.0",
-        "@aws-sdk/client-firehose": "^3.511.0",
-        "@aws-sdk/client-sagemaker-runtime": "^3.511.0",
-        "@aws-sdk/s3-request-presigner": "^3.511.0",
+        "@aws-sdk/client-apigatewaymanagementapi": "^3.699.0",
+        "@aws-sdk/client-bedrock-agent-runtime": "^3.706.0",
+        "@aws-sdk/client-bedrock-runtime": "^3.706.0",
+        "@aws-sdk/client-firehose": "^3.699.0",
+        "@aws-sdk/s3-request-presigner": "^3.705.0",
         "@dqbd/tiktoken": "^1.0.7",
         "aws4": "^1.6.0",
         "axios": "^1.7.4",
@@ -31,8 +31,9 @@
         "static-eval": "^2.1.0"
     },
     "devDependencies": {
-        "aws-sdk-client-mock": "^3.0.1",
-        "aws-sdk-client-mock-jest": "^3.0.1",
+        "@aws-sdk/client-dynamodb": "^3.705.0",
+        "aws-sdk-client-mock": "^4.1.0",
+        "aws-sdk-client-mock-jest": "^4.1.0",
         "cfn-lambda": "^5.1.0",
         "jest": "^29.7.0"
     },
@@ -42,6 +43,7 @@
         "fast-xml-parser": "^4.4.1",
         "uglify-js": "^3.19.2",
         "micromatch": "^4.0.8",
-        "sinon": "^19.0.2"    
+        "sinon": "^19.0.2",
+        "postcss": "^8.5.1"
     }
 }

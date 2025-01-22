@@ -4,13 +4,15 @@
 *   SPDX-License-Identifier: Apache-2.0                                                            *
  ************************************************************************************************ */
 
-const { BedrockAgentRuntimeClient, RetrieveAndGenerateCommand } = require('@aws-sdk/client-bedrock-agent-runtime');
+const { BedrockAgentRuntimeClient, RetrieveAndGenerateCommand, RetrieveAndGenerateStreamCommand } = require('@aws-sdk/client-bedrock-agent-runtime');
+const { ApiGatewayManagementApiClient, PostToConnectionCommand } = require('@aws-sdk/client-apigatewaymanagementapi');
 const customSdkConfig = require('sdk-config/customSdkConfig');
 const { signUrls } = require('../signS3URL');
 const llm = require('../llm');
 const qnabot = require('qnabot/logging');
 const _ = require('lodash');
 const { sanitize, escapeHashMarkdown } = require('../sanitizeOutput');
+const { getConnectionId } = require('../getConnectionId');
 
 const region = process.env.AWS_REGION || 'us-east-1';
 const inferenceKeys = ['maxTokens', 'stopSequences', 'temperature', 'topP'];
@@ -22,10 +24,16 @@ function isNoHitsResponse(req, response) {
     return !retrievedReferences && llm.isNoHits(req, text);
 }
 
-async function generateResponse(input, res) {
+async function generateResponse(input, streamingAttributes, res) {
     qnabot.log(`Bedrock Knowledge Base Input: ${JSON.stringify(input, null, 2)}`);
+    let response;
+    const streamingEnable = streamingAttributes?.streamingEndpoint && streamingAttributes?.streamingDynamoDbTable && streamingAttributes?.sessionId || false;
 
-    const response = await client.send(new RetrieveAndGenerateCommand(input));
+    if (streamingEnable) {
+        response =  await retrieveAndGenerateStream(input, streamingAttributes);
+    } else {
+        response = await client.send(new RetrieveAndGenerateCommand(input));
+    }
 
     const sessionId = response.sessionId;
     if (res._userInfo.knowledgeBaseSessionId !== sessionId) {
@@ -49,8 +57,57 @@ async function generateSourceLinks(urls, KNOWLEDGE_BASE_S3_SIGNED_URL_EXPIRE_SEC
         return link;
     });
 
-    return { signedUrlArr, urlListMarkdown };
+    return { urlListMarkdown };
 }
+
+async function retrieveAndGenerateStream(input, streamingAttributes) {
+    const command = new RetrieveAndGenerateStreamCommand(input);
+    const response = await client.send(command);
+
+    qnabot.debug(`RetrieveAndGenerateStream API Response: ${JSON.stringify(response, null, 2)}`)
+    const endpoint = streamingAttributes.streamingEndpoint;
+    const tableName = streamingAttributes.streamingDynamoDbTable;
+    const sessionId = streamingAttributes.sessionId;
+    const connectionId = await getConnectionId(sessionId, tableName);
+
+    const apiClient = new ApiGatewayManagementApiClient(customSdkConfig( 'C053', { region, endpoint }));
+
+    let result = {
+        output: {
+            text: ''
+        },
+        sessionId: response?.sessionId,
+        citations: []
+    };
+
+    for await (const stream of response.stream) {
+        if (stream?.output) {
+            const part = stream.output?.text;
+            result.output.text +=  part;
+            try {
+                const input = {
+                    Data: part, 
+                    ConnectionId: connectionId, 
+                }
+                const command = new PostToConnectionCommand(input);
+                await apiClient.send(command);
+
+            } catch (error) {
+                qnabot.error(`${error.name}: ${error.message.substring(0, 500)} while posting to stream connection`);
+            }
+        }
+
+        if (stream?.citation) {
+            result.citations.push(stream.citation.citation);
+        }
+
+        if (stream?.guardrail?.action) {
+            qnabot.log(`Guardrail Action in Bedrock Knowledge Base Response: ${stream?.guardrail.action}`);
+        }
+    }
+    return result;
+}
+
 async function createHit(req, response) {
     const KNOWLEDGE_BASE_S3_SIGNED_URL_EXPIRE_SECS = _.get(req._settings, 'KNOWLEDGE_BASE_S3_SIGNED_URL_EXPIRE_SECS', 300);
     const KNOWLEDGE_BASE_S3_SIGNED_URLS = _.get(req._settings, 'KNOWLEDGE_BASE_S3_SIGNED_URLS', true);
@@ -62,14 +119,12 @@ async function createHit(req, response) {
     let markdown = generatedText;
     const ssml = `<speak> ${generatedText} </speak>`;
     if (KNOWLEDGE_BASE_PREFIX_MESSAGE) {
-        plainText = `${KNOWLEDGE_BASE_PREFIX_MESSAGE}\n\n${plainText}`;
         markdown = `**${KNOWLEDGE_BASE_PREFIX_MESSAGE}**\n\n${markdown}`;
     }
 
-    const { plainTextCitations, markdownCitations, urls } = processCitations(response);
+    const { markdownCitations, urls } = processCitations(response);
 
     if (KNOWLEDGE_BASE_SHOW_REFERENCES) {
-        plainText += plainTextCitations;
         markdown = markdownCitations
             ? `\n${markdown}\n\n<details>
             <summary>Context</summary>
@@ -80,9 +135,7 @@ async function createHit(req, response) {
     }
 
     if (KNOWLEDGE_BASE_S3_SIGNED_URLS && urls.size !== 0) {
-        const { signedUrlArr, urlListMarkdown } = await generateSourceLinks(urls, KNOWLEDGE_BASE_S3_SIGNED_URL_EXPIRE_SECS);
-
-        plainText += `\n\n  ${helpfulLinksMsg}: ${signedUrlArr.join(', ')}`;
+        const { urlListMarkdown } = await generateSourceLinks(urls, KNOWLEDGE_BASE_S3_SIGNED_URL_EXPIRE_SECS);
         markdown += `\n\n  ${helpfulLinksMsg}: ${urlListMarkdown.join(', ')}`;
     }
 
@@ -103,7 +156,6 @@ async function createHit(req, response) {
 function processCitations(response) {
     const urls = new Set();
 
-    let plainTextCitations = '';
     let markdownCitations = '';
 
     response.citations.forEach((citation) => {
@@ -114,7 +166,6 @@ function processCitations(response) {
             if (reference.content.text) {
                 const text = escapeHashMarkdown(reference.content.text);
                 markdownCitations += `\n\n  ${text}`;
-                plainTextCitations += `\n\n  ${text}`;
             }
 
             if (reference.location) {
@@ -132,7 +183,7 @@ function processCitations(response) {
             }
         });
     });
-    return { plainTextCitations, markdownCitations, urls };
+    return { markdownCitations, urls };
 }
 
 function processRequest(req) {
@@ -212,6 +263,25 @@ function processRequest(req) {
 }
 
 async function bedrockRetrieveAndGenerate(req, res) {
+
+    const { LLM_STREAMING_ENABLED, STREAMING_TABLE } = req._settings;
+    const sessionAttributes = req._event?.sessionState?.sessionAttributes;
+    let streamingAttributes = {};
+
+    const sessionId = req._event.sessionId;
+    const streamingEndpoint = sessionAttributes?.streamingEndpoint;
+    let streamingDynamoDbTable = sessionAttributes?.streamingDynamoDbTable;
+
+    if (LLM_STREAMING_ENABLED && streamingEndpoint && !streamingDynamoDbTable) {
+        streamingDynamoDbTable = STREAMING_TABLE;
+        qnabot.log(`Streaming enabled, using ${streamingEndpoint} and table ${streamingDynamoDbTable} for session ${sessionId}`);
+        streamingAttributes = {
+            sessionId,
+            streamingEndpoint,
+            streamingDynamoDbTable
+        };
+    }
+
     let response, retrieveAndGenerateSessionInput;
     let retrieveAndGenerateInput = processRequest(req);
     let retries = 0;
@@ -224,17 +294,16 @@ async function bedrockRetrieveAndGenerate(req, res) {
                 ...retrieveAndGenerateInput,
                 sessionId
             };
-            response = await generateResponse(retrieveAndGenerateSessionInput, res);
+            response = await generateResponse(retrieveAndGenerateSessionInput, streamingAttributes, res);
         } else {
-            response = await generateResponse(retrieveAndGenerateInput, res);
+            response = await generateResponse(retrieveAndGenerateInput, streamingAttributes, res);
         }
     } catch (e) {
         if (retries < 3 && (e.name === 'ValidationException' || e.name === 'ConflictException')) {
             retries += 1;
             qnabot.log(`Retrying to due ${e.name}...tries left ${3 - retries}`)
-            response = await generateResponse(retrieveAndGenerateInput, res);
+            response = await generateResponse(retrieveAndGenerateInput, streamingAttributes, res);
         } else {
-            qnabot.log(`Bedrock Knowledge Base ${e.name}: ${e.message.substring(0, 500)}`);
             throw e;
         };
     };

@@ -6,6 +6,39 @@
 const _ = require('lodash');
 const qnabot = require('qnabot/logging');
 const util = require('./util');
+const { applyGuardrail } = require('/opt/lib/bedrock/applyGuardrail.js');
+
+async function runPostProcessGuardrail(req, res) {
+    const POSTPROCESS_GUARDRAIL_IDENTIFIER = _.get(req, '_settings.POSTPROCESS_GUARDRAIL_IDENTIFIER');
+    const POSTPROCESS_GUARDRAIL_VERSION = _.get(req, '_settings.POSTPROCESS_GUARDRAIL_VERSION');
+    const errorMessage = _.get(req, '_settings.ERRORMESSAGE');
+    const postprocessGuardrailId = POSTPROCESS_GUARDRAIL_IDENTIFIER.trim();
+    const postprocessGuardrailVersion = POSTPROCESS_GUARDRAIL_VERSION.toString();
+
+    if (!postprocessGuardrailId || !postprocessGuardrailVersion) {
+        return { req, res };
+    }
+    const { text, guardrailAction, piiEntityAction } = await applyGuardrail(postprocessGuardrailId, postprocessGuardrailVersion, 'OUTPUT', res.message, errorMessage);
+
+    if (guardrailAction === 'GUARDRAIL_INTERVENED' || guardrailAction === 'ERROR') {
+        qnabot.log(`Bedrock Post-process Guardrail Response: ${text}`);
+
+        _.set(res, 'message', text);
+        _.set(res, 'session.appContext.altMessages.markdown', text);
+        _.set(res, 'session.appContext.altMessages.ssml', text);
+        _.set(res, 'appContext.altMessages.markdown', text);
+        _.set(res, 'appContext.altMessages.ssml', text);
+        _.set(res, 'result.alt.markdown', text);
+        _.set(res, 'result.alt.ssml', text);
+        _.set(res, 'plainMessage', text);
+        _.set(res, 'answerSource', 'POSTPROCESS GUARDRAIL');
+
+        if (piiEntityAction !== 'ANONYMIZED') {
+            _.set(res, 'got_hits', 0);
+        }
+    }
+    return { req, res };
+}
 
 module.exports = async function hook(req, res) {
     // handle list of lambda hooks, from possible qid merge after conditional chaining
@@ -63,8 +96,13 @@ module.exports = async function hook(req, res) {
             qnabot.log(JSON.stringify(e));
         }
     }
-
+    
     _.set(req, '_fulfillment.step', '');
+
+    const result = await runPostProcessGuardrail(event.req, event.res);
+    event.req = result.req;
+    event.res = result.res;
+
 
     return event;
 };

@@ -26,6 +26,21 @@ module.exports = {
                 util.lambdaVPCAccessExecutionRole(),
                 util.xrayDaemonWriteAccess(),
                 {
+                    PolicyName: 'SettingsTableReadAccess',
+                    PolicyDocument: {
+                        Version: '2012-10-17',
+                        Statement: [
+                            {
+                                Effect: 'Allow',
+                                Action: [
+                                    'dynamodb:Scan',
+                                ],
+                                Resource: [{  'Fn::Sub': "arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${SettingsTable}" }],
+                            },
+                        ],
+                    },
+                },
+                {
                     PolicyName: 'GetParameterPolicy',
                     PolicyDocument: {
                         Version: '2012-10-17',
@@ -43,18 +58,6 @@ module.exports = {
                                             { 'Fn::Sub': '${AWS::AccountId}:' },
                                             'parameter/',
                                             { Ref: 'SolutionHelperParameter' },
-                                        ],
-                                    ],
-                                },                                {
-                                    'Fn::Join': [
-                                        '', [
-                                            'arn:',
-                                            { 'Fn::Sub': '${AWS::Partition}:' },
-                                            'ssm:',
-                                            { 'Fn::Sub': '${AWS::Region}:' },
-                                            { 'Fn::Sub': '${AWS::AccountId}:' },
-                                            'parameter/',
-                                            { Ref: 'CustomQnABotSettings' },
                                         ],
                                     ],
                                 },
@@ -146,7 +149,7 @@ module.exports = {
             Environment: {
                 Variables: {
                     SOLUTION_PARAMETER: { Ref: 'SolutionHelperParameter' },
-                    CUSTOM_SETTINGS: { Ref: 'CustomQnABotSettings' },
+                    SETTINGS_TABLE: { Ref: 'SettingsTable' },
                     SOLUTION_ID : util.getCommonEnvironmentVariables().SOLUTION_ID,
                 },
             },
@@ -249,13 +252,6 @@ module.exports = {
                     { Ref: 'AWS::NoValue' },
                 ],
             },
-            SagemakerInitialInstanceCount: {
-                'Fn::If': [
-                    'EmbeddingsSagemaker',
-                    { Ref: 'SagemakerInitialInstanceCount' },
-                    { Ref: 'AWS::NoValue' },
-                ],
-            },
             LLMApi: { Ref: 'LLMApi' },
             LLMBedrockModelId: {
                 'Fn::If': [
@@ -271,20 +267,6 @@ module.exports = {
                     { Ref: 'AWS::NoValue' },
                 ],
             },
-            LLMSagemakerInstanceType: {
-                'Fn::If': [
-                    'LLMSagemaker',
-                    { Ref: 'LLMSagemakerInstanceType' },
-                    { Ref: 'AWS::NoValue' },
-                ],
-            },
-            LLMSagemakerInitialInstanceCount: {
-                'Fn::If': [
-                    'LLMSagemaker',
-                    { Ref: 'LLMSagemakerInitialInstanceCount' },
-                    { Ref: 'AWS::NoValue' },
-                ],
-            },
             KendraPluginsEnabled: {
                 'Fn::If': [
                     'KendraPluginsEnabled',
@@ -292,6 +274,8 @@ module.exports = {
                     'NO',
                 ],
             },
+            OpenSearchFineGrainAccessControl: { Ref: 'OpenSearchFineGrainAccessControl'},
+            EnableStreaming: { Ref: 'EnableStreaming' }
         },
         UpdateReplacePolicy: 'Delete',
         DeletionPolicy: 'Delete',

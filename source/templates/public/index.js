@@ -14,7 +14,7 @@ module.exports = Promise.resolve(require('../master')).then((base) => {
     base.Outputs = _.pick(base.Outputs, [
         'ContentDesignerURL',
         'ClientURL',
-        'DashboardURL',
+        'CloudWatchDashboardURL',
         'UserPoolURL',
         'LexV2BotName',
         'LexV2BotId',
@@ -25,8 +25,8 @@ module.exports = Promise.resolve(require('../master')).then((base) => {
         'LexV2BotLocaleIds',
         'FeedbackSNSTopic',
         'ESProxyLambda',
-        'OpenSearchEndpoint',
-        'ElasticsearchIndex',
+        'OpenSearchDomainEndpoint',
+        'OpenSearchIndex',
         'MetricsBucket',
         'TestAllBucket',
         'ContentDesignerOutputBucket'
@@ -52,17 +52,15 @@ module.exports = Promise.resolve(require('../master')).then((base) => {
         'XraySetting',
         'EmbeddingsApi',
         'EmbeddingsBedrockModelId',
-        'SagemakerInitialInstanceCount',
         'EmbeddingsLambdaArn',
         'EmbeddingsLambdaDimensions',
         'LLMApi',
         'LLMBedrockModelId',
-        'LLMSagemakerInstanceType',
-        'LLMSagemakerInitialInstanceCount',
         'LLMLambdaArn',
         'BedrockKnowledgeBaseId',
         'BedrockKnowledgeBaseModel',
-        'LogRetentionPeriod'
+        'LogRetentionPeriod',
+        'EnableStreaming',
     ]);
     base.Metadata = {
         'AWS::CloudFormation::Interface': {
@@ -95,7 +93,6 @@ module.exports = Promise.resolve(require('../master')).then((base) => {
                     Parameters: [
                         'EmbeddingsApi',
                         'EmbeddingsBedrockModelId',
-                        'SagemakerInitialInstanceCount',
                         'EmbeddingsLambdaArn',
                         'EmbeddingsLambdaDimensions',
                     ],
@@ -107,9 +104,8 @@ module.exports = Promise.resolve(require('../master')).then((base) => {
                     Parameters: [
                         'LLMApi',
                         'LLMBedrockModelId',
-                        'LLMSagemakerInstanceType',
-                        'LLMSagemakerInitialInstanceCount',
                         'LLMLambdaArn',
+                        'EnableStreaming',
                     ],
                 },
                 {
@@ -139,7 +135,6 @@ module.exports = Promise.resolve(require('../master')).then((base) => {
     base.Conditions.BedrockEnable = { 'Fn::Or': [{ 'Fn::Equals': [{ Ref: 'LLMApi' }, 'BEDROCK'] }, { 'Fn::Equals': [{ Ref: 'EmbeddingsApi' }, 'BEDROCK'] }] };
     base.Conditions.EmbeddingsEnable = { 'Fn::Not': [{ 'Fn::Equals': [{ Ref: 'EmbeddingsApi' }, 'DISABLED'] }] };
     base.Conditions.EmbeddingsBedrock = { 'Fn::Equals': [{ Ref: 'EmbeddingsApi' }, 'BEDROCK'] };
-    base.Conditions.EmbeddingsSagemaker = { 'Fn::Equals': [{ Ref: 'EmbeddingsApi' }, 'SAGEMAKER'] };
     base.Conditions.EmbeddingsLambda = { 'Fn::Equals': [{ Ref: 'EmbeddingsApi' }, 'LAMBDA'] };
     base.Conditions.EmbeddingsLambdaArn = { 'Fn::Not': [{ 'Fn::Equals': [{ Ref: 'EmbeddingsLambdaArn' }, ''] }] };
 
@@ -198,4 +193,3 @@ module.exports = Promise.resolve(require('../master')).then((base) => {
     return JSON.parse(out);
 });
 
-// "VPCSubnetIdList" : { "Fn::Join" : [ ",", {"Ref":"VPCSubnetIdList"} ] }

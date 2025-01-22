@@ -14,19 +14,15 @@ from helpers.website_model.chat_page import ChatPage
 
 QUESTION_FILEPATH = './question_bank/llm_questions.json'
 
-g5_instance_regions = ['ca-central-1', 'eu-west-1']
 guardrail_regions = ['us-east-1', 'us-west-2', 'eu-west-2', 'ap-northeast-1']
 
 region = os.environ.get('CURRENT_STACK_REGION')
 guardrail_identifier = os.getenv('BEDROCK_GUARDRAIL_IDENTIFIER')
 guardrail_version = os.getenv('BEDROCK_GUARDRAIL_VERSION')
 
-llm_multilanguage_unsupported_reason = 'Non-English not supported via SageMaker'
 custom_no_hits_response = 'You stumped me, I don\'t currently know the answer to that question'
 guardrail_default_response = 'Sorry, the model cannot answer this question'
 unsupported_region_reason = 'This test is not supported in this region'
-
-@pytest.mark.skipif(region in g5_instance_regions, reason=unsupported_region_reason)
 @pytest.mark.skipif_llm_not_enabled()
 class TestLlm:
 
@@ -159,7 +155,6 @@ class TestLlm:
         assert custom_no_hits_response in answer
         cw_client.print_fulfillment_lambda_logs()
 
-    @pytest.mark.skipif(region in g5_instance_regions, reason=llm_multilanguage_unsupported_reason)
     def test_translation(self, client_login, dom_operator: DomOperator, cw_client: CloudWatchClient):
         """
         Test LLM answers are translated into the preferred language.

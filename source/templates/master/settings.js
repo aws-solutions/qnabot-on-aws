@@ -111,6 +111,7 @@ const defaultSettings = {
     KNOWLEDGE_BASE_MODEL_PARAMS: '{}', // Customize the knowledge base model by providing inference parameters
     BEDROCK_GUARDRAIL_IDENTIFIER: '', // A unique identifier for the guardrail that provides additional safeguards on top of the native protections of foundational models specified through cloudformation parameters LLMBedrockModelId and BedrockKnowledgeBaseModel
     BEDROCK_GUARDRAIL_VERSION: '', // A version of the guardrail which takes effect only when specifying BEDROCK_GUARDRAIL_IDENTIFIER
+
 };
 
 const privateSettings = {
@@ -151,9 +152,10 @@ module.exports = {
                 ],
             },
         },
-    },
+    }, 
     DefaultQnABotSettings: {
         Type: 'AWS::SSM::Parameter',
+        Condition: 'DeprecatedSSMSettings',
         Properties: {
             Description: 'Default QnABot Settings - DO NOT MODIFY',
             Type: 'String',
@@ -183,6 +185,7 @@ module.exports = {
     },
     PrivateQnABotSettings: {
         Type: 'AWS::SSM::Parameter',
+        Condition: 'DeprecatedSSMSettings',
         Properties: {
             Description: 'Private QnABot Settings - DO NOT MODIFY',
             Type: 'String',
@@ -202,6 +205,7 @@ module.exports = {
     },
     CustomQnABotSettings: {
         Type: 'AWS::SSM::Parameter',
+        Condition: 'DeprecatedSSMSettings',
         Properties: {
             Description: 'Custom QnABot Settings - Modify to override defaults, or to add new settings',
             Type: 'String',

@@ -727,9 +727,6 @@ exports[`renders examples template correctly 1`] = `
     "CFNLambdaRole": {
       "Type": "String",
     },
-    "DefaultQnABotSettings": {
-      "Type": "String",
-    },
     "ESAddress": {
       "Type": "String",
     },
@@ -750,9 +747,6 @@ exports[`renders examples template correctly 1`] = `
     },
     "LogRetentionPeriod": {
       "Type": "Number",
-    },
-    "PrivateQnABotSettings": {
-      "Type": "String",
     },
     "QIDLambdaArn": {
       "Type": "String",
@@ -3582,12 +3576,12 @@ exports[`renders examples template correctly 1`] = `
               "JsLambdaHookSDK",
               {
                 "Fn::Select": [
-                  2,
+                  "0",
                   {
                     "Fn::Split": [
                       "-",
                       {
-                        "Ref": "DefaultQnABotSettings",
+                        "Ref": "AWS::StackName",
                       },
                     ],
                   },
@@ -3931,7 +3925,7 @@ exports[`renders examples template correctly 1`] = `
                       {
                         "Message": {
                           "PlainTextMessage": {
-                            "Value": "OK. ",
+                            "Value": "OK.",
                           },
                         },
                       },
@@ -4076,7 +4070,7 @@ exports[`renders examples template correctly 1`] = `
                       {
                         "Message": {
                           "PlainTextMessage": {
-                            "Value": "OK. ",
+                            "Value": "OK.",
                           },
                         },
                       },
@@ -4310,7 +4304,7 @@ exports[`renders examples template correctly 1`] = `
                       {
                         "Message": {
                           "PlainTextMessage": {
-                            "Value": "OK. ",
+                            "Value": "OK.",
                           },
                         },
                       },
@@ -4446,7 +4440,7 @@ exports[`renders examples template correctly 1`] = `
                       {
                         "Message": {
                           "PlainTextMessage": {
-                            "Value": "OK. ",
+                            "Value": "OK.",
                           },
                         },
                       },
@@ -4639,7 +4633,7 @@ exports[`renders examples template correctly 1`] = `
                       {
                         "Message": {
                           "PlainTextMessage": {
-                            "Value": "OK. ",
+                            "Value": "OK.",
                           },
                         },
                       },
@@ -4939,7 +4933,7 @@ exports[`renders examples template correctly 1`] = `
                       {
                         "Message": {
                           "PlainTextMessage": {
-                            "Value": "OK. ",
+                            "Value": "OK.",
                           },
                         },
                       },
@@ -5146,7 +5140,7 @@ exports[`renders examples template correctly 1`] = `
                       {
                         "Message": {
                           "PlainTextMessage": {
-                            "Value": "OK. ",
+                            "Value": "OK.",
                           },
                         },
                       },
@@ -5436,7 +5430,7 @@ exports[`renders examples template correctly 1`] = `
                       {
                         "Message": {
                           "PlainTextMessage": {
-                            "Value": "OK. ",
+                            "Value": "OK.",
                           },
                         },
                       },
@@ -5783,7 +5777,7 @@ exports[`renders examples template correctly 1`] = `
                       {
                         "Message": {
                           "PlainTextMessage": {
-                            "Value": "OK. ",
+                            "Value": "OK.",
                           },
                         },
                       },
@@ -6029,7 +6023,7 @@ exports[`renders examples template correctly 1`] = `
                       {
                         "Message": {
                           "PlainTextMessage": {
-                            "Value": "OK. ",
+                            "Value": "OK.",
                           },
                         },
                       },
@@ -6150,7 +6144,7 @@ exports[`renders examples template correctly 1`] = `
                       {
                         "Message": {
                           "PlainTextMessage": {
-                            "Value": "OK. ",
+                            "Value": "OK.",
                           },
                         },
                       },
@@ -6360,7 +6354,7 @@ exports[`renders examples template correctly 1`] = `
                       {
                         "Message": {
                           "PlainTextMessage": {
-                            "Value": "OK. ",
+                            "Value": "OK.",
                           },
                         },
                       },
@@ -6481,7 +6475,7 @@ exports[`renders examples template correctly 1`] = `
                       {
                         "Message": {
                           "PlainTextMessage": {
-                            "Value": "OK. ",
+                            "Value": "OK.",
                           },
                         },
                       },
@@ -6691,7 +6685,7 @@ exports[`renders examples template correctly 1`] = `
                       {
                         "Message": {
                           "PlainTextMessage": {
-                            "Value": "OK. ",
+                            "Value": "OK.",
                           },
                         },
                       },
@@ -6823,7 +6817,7 @@ exports[`renders examples template correctly 1`] = `
                       {
                         "Message": {
                           "PlainTextMessage": {
-                            "Value": "OK. ",
+                            "Value": "OK.",
                           },
                         },
                       },
@@ -7009,7 +7003,7 @@ exports[`renders examples template correctly 1`] = `
                       {
                         "Message": {
                           "PlainTextMessage": {
-                            "Value": "OK. ",
+                            "Value": "OK.",
                           },
                         },
                       },
@@ -7196,7 +7190,7 @@ exports[`renders examples template correctly 1`] = `
                       {
                         "Message": {
                           "PlainTextMessage": {
-                            "Value": "OK. ",
+                            "Value": "OK.",
                           },
                         },
                       },
@@ -7375,7 +7369,7 @@ exports[`renders examples template correctly 1`] = `
                       {
                         "Message": {
                           "PlainTextMessage": {
-                            "Value": "OK. ",
+                            "Value": "OK.",
                           },
                         },
                       },
@@ -7593,7 +7587,7 @@ exports[`renders examples template correctly 1`] = `
                       {
                         "Message": {
                           "PlainTextMessage": {
-                            "Value": "OK. ",
+                            "Value": "OK.",
                           },
                         },
                       },
@@ -7823,7 +7817,7 @@ exports[`renders examples template correctly 1`] = `
                       {
                         "Message": {
                           "PlainTextMessage": {
-                            "Value": "OK. ",
+                            "Value": "OK.",
                           },
                         },
                       },

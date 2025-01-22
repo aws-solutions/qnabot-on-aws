@@ -19,7 +19,6 @@ const files = [
     require('./examples'),
     require('./exportstack'),
     require('./importstack'),
-    require('./kendrasns'),
     require('./lambda-layers'),
     require('./lambda'),
     require('./lex'),
@@ -33,12 +32,11 @@ const files = [
     require('./routes'),
     require('./s3'),
     require('./s3-clean'),
-    require('./sagemaker-embeddings-stack'),
-    require('./sagemaker-qa-summarize-llm-stack'),
     require('./schemaLambda'),
     require('./settings'),
     require('./signup'),
     require('./solution-helper'),
+    require('./streamingstack'),
     require('./tstallstack'),
     require('./var'),
 ];
@@ -83,7 +81,7 @@ module.exports = {
         LexV2BotLocaleIds: {
             Value: { 'Fn::GetAtt': ['LexV2Bot', 'botLocaleIds'] },
         },
-        DashboardURL: {
+        CloudWatchDashboardURL: {
             Value: {
                 'Fn::Join': [
                     '',
@@ -155,8 +153,13 @@ module.exports = {
         ClientClientId: {
             Value: { Ref: 'ClientClient' },
         },
-        OpenSearchEndpoint: {
-            Value: { 'Fn::GetAtt': ['ESVar', 'ESAddress'] },
+        OpenSearchDomainEndpoint: {
+            Value: { 
+                'Fn::Join': [
+                    '', 
+                    ['https://', { 'Fn::GetAtt': ['ESVar', 'ESAddress'] }]
+                ]
+            },
         },
         OpenSearchQnAType: {
             Value: { 'Fn::GetAtt': ['Var', 'QnAType'] },
@@ -164,25 +167,17 @@ module.exports = {
         OpenSearchQuizType: {
             Value: { 'Fn::GetAtt': ['Var', 'QuizType'] },
         },
-        ElasticsearchIndex: {
+        OpenSearchIndex: {
             Value: { 'Fn::GetAtt': ['Var', 'index'] },
         },
         UsersTable: {
             Value: { Ref: 'UsersTable' },
         },
-        DefaultSettingsSSMParameterName: {
-            Value: { Ref: 'DefaultQnABotSettings' },
-        },
-        PrivateSettingsSSMParameterName: {
-            Value: { Ref: 'PrivateQnABotSettings' },
-        },
-        CustomSettingsSSMParameterName: {
-            Value: { Ref: 'CustomQnABotSettings' },
-        },
         DefaultUserPoolJwksUrlParameterName: {
             Value: { Ref: 'DefaultUserPoolJwksUrl' },
         },
         FeedbackSNSTopic: {
+            Condition: 'BuildExamples',
             Value: { 'Fn::GetAtt': ['ExamplesStack', 'Outputs.FeedbackSNSTopic'] },
         },
         MetricsBucket: {
@@ -193,7 +188,14 @@ module.exports = {
         },
         ContentDesignerOutputBucket:  {
             Value: { Ref: 'ContentDesignerOutputBucket' },
-        }
+        },
+        StreamingWebSocketEndpoint: {
+            Condition: 'StreamingEnabled',
+            Value: { 'Fn::GetAtt': ['StreamingStack', 'Outputs.StreamingWebSocketEndpoint'] }
+        },
+        SettingsTable: {
+            Value: { Ref: 'SettingsTable' },
+        },
     },
     Parameters: {
         OpenSearchName: {
@@ -292,7 +294,7 @@ module.exports = {
         },
         BuildExamples: {
             Type: 'String',
-            Description: 'Set to TRUE to deploy the QnABot Examples Stack',
+            Description: 'Experimental (Development ONLY): Set to TRUE to deploy the QnABot Examples Stack. Note: Selecting FALSE will not the deploy the QnABot Examples Stack. This will limit also disable the feedback functionality and there will be no predefined examples questions set.',
             Default: 'TRUE',
             AllowedValues: ['TRUE', 'FALSE'],
         },
@@ -375,8 +377,8 @@ module.exports = {
         EmbeddingsApi: {
             Type: 'String',
             Description:
-                'Enable QnABot semantics search using Embeddings from a pre-trained Large Language Model. If set to SAGEMAKER, an ml.m5.xlarge Sagemaker endpoint is automatically provisioned with Hugging Face intfloat/e5-large-v2 model. To use a custom LAMBDA function, provide additional parameters below.',
-            AllowedValues: ['DISABLED', 'BEDROCK', 'SAGEMAKER', 'LAMBDA'],
+                'Enable QnABot semantics search using Embeddings from a pre-trained Large Language Model. To use a custom LAMBDA function, provide additional parameters below.',
+            AllowedValues: ['DISABLED', 'BEDROCK', 'LAMBDA'],
             Default: 'DISABLED',
         },
         EmbeddingsBedrockModelId: {
@@ -390,13 +392,6 @@ module.exports = {
                 'cohere.embed-multilingual-v3',
             ],
             Default: 'amazon.titan-embed-text-v1',
-        },
-        SagemakerInitialInstanceCount: {
-            Type: 'Number',
-            MinValue: 1,
-            Description:
-                'Optional: If EmbeddingsApi is SAGEMAKER, provide initial instance count. Serverless Inference is not currently available for the built-in Embedding model.',
-            Default: 1,
         },
         EmbeddingsLambdaArn: {
             Type: 'String',
@@ -416,8 +411,8 @@ module.exports = {
         LLMApi: {
             Type: 'String',
             Description:
-                'Optionally enable QnABot on AWS question disambiguation and generative question answering using an LLM. If set to SAGEMAKER, a Sagemaker endpoint is automatically provisioned. Selecting the LAMBDA option allows for configuration with other LLMs.',
-            AllowedValues: ['DISABLED', 'SAGEMAKER', 'LAMBDA', 'BEDROCK'],
+                'Optionally enable QnABot on AWS question disambiguation and generative question answering using an LLM. Selecting the LAMBDA option allows for configuration with other LLMs.',
+            AllowedValues: ['DISABLED', 'LAMBDA', 'BEDROCK'],
             Default: 'DISABLED',
         },
         LLMBedrockModelId: {
@@ -425,20 +420,32 @@ module.exports = {
             Description:
             'Required when LLMApi is BEDROCK. Please ensure you have requested access to the LLMs in Bedrock console (https://docs.aws.amazon.com/bedrock/latest/userguide/model-access.html), before deploying.',
             AllowedValues: [
+                'amazon.nova-micro-v1',
+                'amazon.nova-lite-v1',
+                'amazon.nova-pro-v1',
                 'amazon.titan-text-express-v1',
                 'amazon.titan-text-lite-v1',
                 'amazon.titan-text-premier-v1',
-                'ai21.j2-ultra-v1',
-                'ai21.j2-mid-v1',
+                'ai21.jamba-instruct-v1',
                 'anthropic.claude-instant-v1',
                 'anthropic.claude-v2.1',
+                'anthropic.claude-3-haiku-v1',
+                'anthropic.claude-3.5-haiku-v1',
                 'anthropic.claude-3-sonnet-v1',
                 'anthropic.claude-3.5-sonnet-v1',
-                'anthropic.claude-3-haiku-v1',
-                'cohere.command-text-v14',
-                'meta.llama3-8b-instruct-v1'
+                'anthropic.claude-3.5-sonnet-v2',
+                'cohere.command-r-plus-v1',
+                'meta.llama3-8b-instruct-v1',
+                'meta.llama3.1-405b-instruct-v1',
+                'mistral.mistral-large-2407-v1'
             ],
             Default: 'anthropic.claude-instant-v1',
+        },
+        EnableStreaming: {
+            Type: 'String',
+            Description: 'Set to TRUE to deploy the streaming resources using for LLMs.',
+            Default: 'FALSE',
+            AllowedValues: ['TRUE', 'FALSE'],
         },
         BedrockKnowledgeBaseId: {
             Type: 'String',
@@ -453,29 +460,22 @@ module.exports = {
             Description:
                 'Required if BedrockKnowledgeBaseId is not empty. Sets the preferred LLM model to use with the Bedrock knowledge base. Please ensure you have requested access to the LLMs in Bedrock console (https://docs.aws.amazon.com/bedrock/latest/userguide/model-access.html), before deploying',
             AllowedValues: [
+                'amazon.nova-micro-v1',
+                'amazon.nova-lite-v1',
+                'amazon.nova-pro-v1',
                 'amazon.titan-text-premier-v1',
                 'anthropic.claude-instant-v1',
                 'anthropic.claude-v2.1',
+                'anthropic.claude-3-haiku-v1',
+                'anthropic.claude-3.5-haiku-v1',
                 'anthropic.claude-3-sonnet-v1',
                 'anthropic.claude-3.5-sonnet-v1',
-                'anthropic.claude-3-haiku-v1',
+                'anthropic.claude-3.5-sonnet-v2',
+                'cohere.command-r-plus-v1',
+                'meta.llama3.1-405b-instruct-v1',
+                'mistral.mistral-large-2407-v1'
             ],
             Default: 'anthropic.claude-instant-v1',
-        },
-        LLMSagemakerInstanceType: {
-            Type: 'String',
-            AllowedPattern: '^ml.*$',
-            Description:
-                'Required if LLMApi is SAGEMAKER. Provide the SageMaker endpoint instance type. Defaults to ml.g5.12xlarge. Check account and region availability through the Service Quotas service before deploying',
-            Default: 'ml.g5.12xlarge',
-            ConstraintDescription: 'Must be a valid SageMaker instance type',
-        },
-        LLMSagemakerInitialInstanceCount: {
-            Type: 'Number',
-            MinValue: 1,
-            Description:
-                'Required if LLMApi is SAGEMAKER. Provide initial instance count. Serverless Inference is not currently available for the built-in LLM model.',
-            Default: 1,
         },
         LLMLambdaArn: {
             Type: 'String',
@@ -499,6 +499,7 @@ module.exports = {
         Public: { 'Fn::Equals': [{ Ref: 'PublicOrPrivate' }, 'PUBLIC'] },
         AdminSignUp: { 'Fn::Equals': [{ Ref: 'AdminUserSignUp' }, 'TRUE'] },
         XRAYEnabled: { 'Fn::Equals': [{ Ref: 'XraySetting' }, 'TRUE'] },
+        StreamingEnabled: { 'Fn::Equals': [{ Ref: 'EnableStreaming' }, 'TRUE'] },
         FGACEnabled: { 'Fn::Equals': [{ Ref: 'OpenSearchFineGrainAccessControl' }, 'TRUE'] },
         Domain: { 'Fn::Not': [{ 'Fn::Equals': [{ Ref: 'ApprovedDomain' }, 'NONE'] }] },
         BuildExamples: { 'Fn::Equals': [{ Ref: 'BuildExamples' }, 'TRUE'] },
@@ -519,12 +520,10 @@ module.exports = {
         BedrockEnable: { 'Fn::Or': [{ 'Fn::Equals': [{ Ref: 'LLMApi' }, 'BEDROCK'] }, { 'Fn::Equals': [{ Ref: 'EmbeddingsApi' }, 'BEDROCK'] }, { Condition: 'BedrockKnowledgeBaseEnable' }] },
         EmbeddingsEnable: { 'Fn::Not': [{ 'Fn::Equals': [{ Ref: 'EmbeddingsApi' }, 'DISABLED'] }] },
         EmbeddingsBedrock: { 'Fn::Equals': [{ Ref: 'EmbeddingsApi' }, 'BEDROCK'] },
-        EmbeddingsSagemaker: { 'Fn::Equals': [{ Ref: 'EmbeddingsApi' }, 'SAGEMAKER'] },
         EmbeddingsLambda: { 'Fn::Equals': [{ Ref: 'EmbeddingsApi' }, 'LAMBDA'] },
         EmbeddingsLambdaArn: { 'Fn::Not': [{ 'Fn::Equals': [{ Ref: 'EmbeddingsLambdaArn' }, ''] }] },
         LLMEnable: { 'Fn::Not': [{ 'Fn::Equals': [{ Ref: 'LLMApi' }, 'DISABLED'] }] },
         LLMBedrock: { 'Fn::Equals': [{ Ref: 'LLMApi' }, 'BEDROCK'] },
-        LLMSagemaker: { 'Fn::Equals': [{ Ref: 'LLMApi' }, 'SAGEMAKER'] },
         LLMLambda: { 'Fn::Equals': [{ Ref: 'LLMApi' }, 'LAMBDA'] },
         LLMLambdaArn: { 'Fn::Not': [{ 'Fn::Equals': [{ Ref: 'LLMLambdaArn' }, ''] }] },
         SolutionHelperSendAnonymizedDataToAWS: { 'Fn::Equals': [{ 'Fn::FindInMap': ['SolutionHelperAnonymizedData', 'SendAnonymizedData', 'Data'] }, 'Yes'] },
@@ -535,7 +534,8 @@ module.exports = {
                 { 'Fn::Not': [{ 'Fn::Equals': [{ Ref: 'AltSearchKendraIndexes' }, ''] }] },
             ],
         },
-        LogRetentionPeriodIsNotZero: { 'Fn::Not': [{ 'Fn::Equals': [{ Ref: 'LogRetentionPeriod' }, 0] }] }
+        LogRetentionPeriodIsNotZero: { 'Fn::Not': [{ 'Fn::Equals': [{ Ref: 'LogRetentionPeriod' }, 0] }] },
+        DeprecatedSSMSettings: { "Fn::Equals": [ "true", "false"] },
     },
     Rules: {
         RequireLambdaArnForLambdaEmbeddingsApi: {
@@ -554,7 +554,8 @@ module.exports = {
     },
     Metadata: {
         'AWS::CloudFormation::Interface': {
-            ParameterGroups: [                {
+            ParameterGroups: [
+                {
                     Label: {
                         default: 'Step 2A: Set Basic Chatbot Parameters (required)',
                     },
@@ -591,7 +592,6 @@ module.exports = {
                     Parameters: [
                         'EmbeddingsApi',
                         'EmbeddingsBedrockModelId',
-                        'SagemakerInitialInstanceCount',
                         'EmbeddingsLambdaArn',
                         'EmbeddingsLambdaDimensions',
                     ],
@@ -603,9 +603,8 @@ module.exports = {
                     Parameters: [
                         'LLMApi',
                         'LLMBedrockModelId',
-                        'LLMSagemakerInstanceType',
-                        'LLMSagemakerInitialInstanceCount',
                         'LLMLambdaArn',
+                        'EnableStreaming'
                     ],
                 },
                 {
@@ -631,10 +630,10 @@ module.exports = {
                         'BootstrapBucket',
                         'BootstrapPrefix',
                         'BuildExamples',
-                        'LogRetentionPeriod'
+                        'LogRetentionPeriod',
                     ],
                 },
             ],
         },
     },
-};
+}

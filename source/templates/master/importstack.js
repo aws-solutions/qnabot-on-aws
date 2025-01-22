@@ -24,9 +24,6 @@ module.exports = {
                 VarIndex: { 'Fn::GetAtt': ['Var', 'QnaIndex'] },
                 MetricsIndex: { 'Fn::GetAtt': ['Var', 'MetricsIndex'] },
                 FeedbackIndex: { 'Fn::GetAtt': ['Var', 'FeedbackIndex'] },
-                DefaultQnABotSettings: { Ref: 'DefaultQnABotSettings' },
-                PrivateQnABotSettings: { Ref: 'PrivateQnABotSettings' },
-                CustomQnABotSettings: { Ref: 'CustomQnABotSettings' },
                 VPCSubnetIdList: { 'Fn::Join': [',', { Ref: 'VPCSubnetIdList' }] },
                 VPCSecurityGroupIdList: { 'Fn::Join': [',', { Ref: 'VPCSecurityGroupIdList' }] },
                 XraySetting: { Ref: 'XraySetting' },
@@ -37,22 +34,9 @@ module.exports = {
                 EmbeddingsLambdaArn: { Ref: 'EmbeddingsLambdaArn' },
                 EmbeddingsApi: { Ref: 'EmbeddingsApi' },
                 EmbeddingsLambdaDimensions: { Ref: 'EmbeddingsLambdaDimensions' },
-                EmbeddingsSagemakerEndpoint: {
-                    'Fn::If': [
-                        'EmbeddingsSagemaker',
-                        { 'Fn::GetAtt': ['SagemakerEmbeddingsStack', 'Outputs.EmbeddingsSagemakerEndpoint'] },
-                        '',
-                    ],
-                },
-                EmbeddingsSagemakerEndpointArn: {
-                    'Fn::If': [
-                        'EmbeddingsSagemaker',
-                        { 'Fn::GetAtt': ['SagemakerEmbeddingsStack', 'Outputs.EmbeddingsSagemakerEndpointArn'] },
-                        '',
-                    ],
-                },
                 EmbeddingsBedrockModelId: { 'Fn::FindInMap': ['BedrockDefaults', {'Ref' : 'EmbeddingsBedrockModelId'}, 'ModelID'] },
                 LogRetentionPeriod: { Ref: 'LogRetentionPeriod' },
+                SettingsTable: { Ref: 'SettingsTable'},
             },
         },
     },

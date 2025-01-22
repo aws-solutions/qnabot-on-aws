@@ -38,10 +38,6 @@ module.exports = {
         ApiRootResourceId: { Type: 'String' },
         Stage: { Type: 'String' },
         ApiDeploymentId: { Type: 'String' },
-        DefaultQnABotSettings: { Type: 'String' },
-        PrivateQnABotSettings: { Type: 'String' },
-        CustomQnABotSettings: { Type: 'String' },
-        KendraCrawlerSnsTopic: { Type: 'String' },
         VPCSubnetIdList: { Type: 'String' },
         VPCSecurityGroupIdList: { Type: 'String' },
         XraySetting: { Type: 'String' },
@@ -50,6 +46,7 @@ module.exports = {
         KendraFaqIndexId: { Type: 'String' },
         KendraWebPageIndexId: { Type: 'String' },
         LogRetentionPeriod: { Type: 'Number' },
+        SettingsTable: { Type: 'String' },
     },
     Conditions: {
         VPCEnabled: {

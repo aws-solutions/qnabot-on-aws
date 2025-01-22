@@ -52,7 +52,6 @@ describe('master template with config', () => {
                 BedrockKnowledgeBaseId: { Default: 'test' },
                 BedrockKnowledgeBaseModel: { Default: 'anthropic.claude-instant-v1' },
                 EmbeddingsLambdaArn : { Default: 'arn:aws:lambda:us-east-1:12345678910:function:qna-test' },
-                LLMSagemakerInstanceType : { Default: 'ml.g5.12xlarge' },
                 LLMLambdaArn : { Default: 'arn:aws:lambda:us-east-1:12345678910:function:qna-test' },
                 VPCSubnetIdList : { Default: 'vpc-subnet-test' },
                 VPCSecurityGroupIdList : { Default: 'sg-test' },
@@ -60,10 +59,11 @@ describe('master template with config', () => {
                 FulfillmentConcurrency: { Default: 1 },
                 LexV2BotLocaleIds: { Default: 'en_US,es_US,fr_CA' },
                 LogRetentionPeriod: { Default: 0 },
-                EmbeddingsApi: { Default: 'SAGEMAKER' },
-                LLMApi: { Default: 'SAGEMAKER' },
+                EmbeddingsApi: { Default: 'BEDROCK' },
+                LLMApi: { Default: 'BEDROCK' },
                 InstallLexResponseBots: { Default: true },
                 OpenSearchFineGrainAccessControl: { Default: 'FALSE' },
+                EnableStreaming: { Default: 'FALSE' },
             },
         };
 

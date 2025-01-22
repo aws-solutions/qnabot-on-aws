@@ -766,7 +766,7 @@ class EditPage:
         self.select_sub_menu()
         self.operator.select_id(REBUILD_LEX_ID, click=True)
 
-        success_status = self.operator.wait_for_element_by_id(REBUILD_LEX_SUCCESS_ID, delay=360).text
+        success_status = self.operator.wait_for_element_by_id(REBUILD_LEX_SUCCESS_ID, delay=600).text
         self.operator.select_id(REBUILD_LEX_CLOSE_ID, click=True)
         time.sleep(1)
         return success_status

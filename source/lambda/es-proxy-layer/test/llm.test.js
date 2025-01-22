@@ -5,8 +5,7 @@
 
 const _ = require('lodash');
 const { Lambda } = require('@aws-sdk/client-lambda');
-const { SageMakerRuntime } = require('@aws-sdk/client-sagemaker-runtime');
-const { BedrockRuntimeClient, InvokeModelCommand } = require('@aws-sdk/client-bedrock-runtime');
+const { BedrockRuntimeClient, ConverseCommand } = require('@aws-sdk/client-bedrock-runtime');
 const { ChatMessageHistory } = require('langchain/memory');
 const { TokenTextSplitter } = require('langchain/text_splitter');
 
@@ -21,7 +20,6 @@ const {
 } = require('../lib/llm');
 
 jest.mock('@aws-sdk/client-lambda');
-jest.mock('@aws-sdk/client-sagemaker-runtime');
 jest.mock('@aws-sdk/client-bedrock-runtime');
 jest.mock('qnabot/settings');
 jest.mock('qnabot/logging');
@@ -220,117 +218,6 @@ describe('llm generate_query', () => {
 
     });
 
-    test('generates query using sagemaker', async () => {
-        const clonedReq = _.cloneDeep(req);
-        const invokeEndpointMock = jest.fn().mockImplementation(() => {
-            return {
-                Body: JSON.stringify([{
-                    generated_text: 'sagemaker response',
-                }]),
-            }
-        })
-
-        SageMakerRuntime.mockImplementation(() => {
-            return {
-                invokeEndpoint: invokeEndpointMock,
-            };
-        });
-
-        process.env.LLM_SAGEMAKERENDPOINT = 'test'
-
-        const response = await generate_query(clonedReq);
-
-        expect(invokeEndpointMock).toBeCalledWith({
-            Body: JSON.stringify({
-                inputs: 'Given the following conversation and a follow up question, rephrase the follow up question to be a standalone question.\nChat History: \n\nFollow Up Input: How can I publish Kindle books?\nStandalone question:',
-                parameters: {
-                    temperature: 0.01,
-                    return_full_text: false,
-                    max_new_tokens: 150,
-                },
-            }),
-            ContentType: 'application/json',
-            EndpointName: 'test'
-        });
-        expect(response.question).toBe('How can I publish Kindle books? / sagemaker response');
-        expect(response.llm_generated_query).toStrictEqual({
-            concatenated: 'How can I publish Kindle books? / sagemaker response',
-            orig: 'How can I publish Kindle books?',
-            result: 'sagemaker response',
-            timing: expect.any(String),
-        });
-    });
-
-    test('cleans query from runaway answers', async () => {
-        const clonedReq = _.cloneDeep(req);
-        const invokeEndpointMock = jest.fn().mockImplementation(() => {
-            return {
-                Body: JSON.stringify([{
-                    generated_text: 'question 1? question 2?',
-                }]),
-            }
-        })
-
-        SageMakerRuntime.mockImplementation(() => {
-            return {
-                invokeEndpoint: invokeEndpointMock,
-            };
-        });
-
-        process.env.LLM_SAGEMAKERENDPOINT = 'test'
-
-        const response = await generate_query(clonedReq);
-
-        expect(response.question).toBe('How can I publish Kindle books? / question 1?');
-        expect(response.llm_generated_query).toStrictEqual({
-            concatenated: 'How can I publish Kindle books? / question 1?',
-            orig: 'How can I publish Kindle books?',
-            result: 'question 1?',
-            timing: expect.any(String),
-        });
-    });
-
-
-    test('truncates history before truncating input from max token', async () => {
-        const clonedReq = _.cloneDeep(req);
-        clonedReq._settings.LLM_PROMPT_MAX_TOKEN_LIMIT = 100;
-        clonedReq._settings.LLM_CHAT_HISTORY_MAX_MESSAGES = 50;
-        clonedReq._settings.LLM_GENERATE_QUERY_MODEL_PARAMS = '';
-        clonedReq._settings.LLM_GENERATE_QUERY_PROMPT_TEMPLATE = '';
-        const history = new Array(50).fill({Human: 'Some very long history that will trigger truncation.'});
-        clonedReq._userInfo.chatMessageHistory = JSON.stringify(history);
-
-        const invokeEndpointMock = jest.fn().mockImplementation(() => {
-            return {
-                Body: JSON.stringify([{
-                    generated_text: 'sagemaker response',
-                }]),
-            }
-        })
-
-        SageMakerRuntime.mockImplementation(() => {
-            return {
-                invokeEndpoint: invokeEndpointMock,
-            };
-        });
-
-        process.env.LLM_SAGEMAKERENDPOINT = 'test'
-
-        await generate_query(clonedReq);
-
-        expect(invokeEndpointMock).toBeCalledWith({
-            Body: JSON.stringify({
-                inputs: '\n\nHuman: Given the following conversation and a follow up input, if the follow up input is a question please rephrase that question to be a standalone question, otherwise return the input unchanged.\n\nChat History:\ntruncated response\n\nFollow Up Input: How can I publish Kindle books?\n\nAssistant:',
-                parameters: {
-                    temperature: 0,
-                },
-            }),
-            ContentType: 'application/json',
-            EndpointName: 'test'
-        });
-    });
-
-
     test('generates query using lambda', async () => {
         const clonedReq = _.cloneDeep(req);
         clonedReq._settings.LLM_API = 'LAMBDA';
@@ -378,13 +265,19 @@ describe('llm generate_query', () => {
         clonedReq._settings.LLM_API = 'BEDROCK';
         clonedReq._settings.LLM_MODEL_ID = 'amazon.titan-text-lite-v1';
         clonedReq._settings.LLM_GENERATE_QUERY_MODEL_PARAMS = '';
+        clonedReq._settings.LLM_GENERATE_QUERY_SYSTEM_PROMPT = 'test_system_prompt';
         const sendMock = jest.fn().mockImplementation(() => {
             return {
-                body: Buffer.from(JSON.stringify({
-                    results: [{
-                        outputText: 'bedrock response',
-                    }]
-                }))
+                output: {
+                    message: {
+                        content: [
+                            {
+                                type: 'text',
+                                text: 'bedrock response'
+                            }
+                        ]
+                    }
+                }
             }
         });
 
@@ -394,23 +287,26 @@ describe('llm generate_query', () => {
             };
         });
 
+        const expectedCall = {
+            modelId: 'amazon.titan-text-lite-v1' ,
+            system: [
+                {
+                    text: 'test_system_prompt'
+                }
+            ], 
+            messages:  [
+                {
+                    role: "user",
+                    content: [{ text: 'Given the following conversation and a follow up question, rephrase the follow up question to be a standalone question.\nChat History: \n\nFollow Up Input: How can I publish Kindle books?\nStandalone question:',  type: "text" }],
+                },
+            ],
+            inferenceConfig: { maxTokens: 300, temperature: 0, topP: 1 },
+        };
+
         const response = await generate_query(clonedReq);
 
         expect(sendMock).toBeCalled();
-        expect(InvokeModelCommand).toBeCalledWith({
-            accept: 'application/json',
-            modelId: 'amazon.titan-text-lite-v1',
-            contentType: 'application/json',
-            body: JSON.stringify({
-                textGenerationConfig: {
-                    maxTokenCount: 256,
-                    stopSequences: [],
-                    temperature: 0,
-                    topP: 1,
-                },
-                inputText: 'Given the following conversation and a follow up question, rephrase the follow up question to be a standalone question.\nChat History: \n\nFollow Up Input: How can I publish Kindle books?\nStandalone question:',
-            }),
-        });
+        expect(ConverseCommand).toBeCalledWith(expectedCall);
         expect(response.question).toBe('How can I publish Kindle books? / bedrock response');
         expect(response.llm_generated_query).toStrictEqual({
             concatenated: 'How can I publish Kindle books? / bedrock response',
@@ -445,42 +341,7 @@ describe('llm get_qa', () => {
 
     })
 
-    test('generates response using sagemaker', async () => {
-        const clonedReq = _.cloneDeep(req);
-        const invokeEndpointMock = jest.fn().mockImplementation(() => {
-            return {
-                Body: JSON.stringify([{
-                    generated_text: 'sagemaker response',
-                }]),
-            }
-        })
-
-        SageMakerRuntime.mockImplementation(() => {
-            return {
-                invokeEndpoint: invokeEndpointMock,
-            };
-        });
-
-        process.env.LLM_SAGEMAKERENDPOINT = 'test'
-
-        const response = await get_qa(clonedReq, 'test context');
-
-        expect(invokeEndpointMock).toBeCalledWith({
-            Body: JSON.stringify({
-                inputs: "Use the following pieces of context to answer the question at the end. If you don't know the answer, just say that you don't know, don't try to make up an answer. Write the answer in up to 5 complete sentences.\n\ntest context\n\nQuestion: How can I publish Kindle books?\nHelpful Answer:",
-                parameters: {
-                    temperature: 0.01,
-                    return_full_text: false,
-                    max_new_tokens: 150,
-                },
-            }),
-            ContentType: 'application/json',
-            EndpointName: 'test'
-        });
-        expect(response).toBe('sagemaker response');
-    });
-
-    test('generates query using lambda', async () => {
+    test('generates qa using lambda', async () => {
         const clonedReq = _.cloneDeep(req);
         clonedReq._settings.LLM_API = 'LAMBDA';
         const invokeMock = jest.fn().mockImplementation(() => {
@@ -510,6 +371,7 @@ describe('llm get_qa', () => {
                     max_new_tokens: 150,
                 },
                 settings: clonedReq._settings,
+                streamingAttributes: {},
             }),
             InvocationType: 'RequestResponse',
             FunctionName: 'test'
@@ -517,19 +379,28 @@ describe('llm get_qa', () => {
         expect(response).toBe('lambda response');
     });
 
-    test('generates query using bedrock', async () => {
+    test('generates qa using bedrock', async () => {
         const clonedReq = _.cloneDeep(req);
+        clonedReq.question = "How can I publish Kindle books?";
         clonedReq._settings.LLM_API = 'BEDROCK';
         clonedReq._settings.LLM_MODEL_ID = 'anthropic.claude-3-haiku-v1';
+        clonedReq._settings.LLM_QA_MODEL_PARAMS = '{"temperature": 0.2}';
+        clonedReq._settings.LLM_QA_SYSTEM_PROMPT = 'test_system_prompt';
+        clonedReq._settings.BEDROCK_GUARDRAIL_IDENTIFIER = 'test_id';
+        clonedReq._settings.BEDROCK_GUARDRAIL_VERSION = 1;
+
         const sendMock = jest.fn().mockImplementation(() => {
             return {
-                body: Buffer.from(JSON.stringify({
-                    content: [
-                        { 
-                            text: 'bedrock response' 
-                        }
-                    ]
-                }))
+                output: {
+                    message: {
+                        content: [
+                            {
+                                type: 'text',
+                                text: 'bedrock response'
+                            }
+                        ]
+                    }
+                }
             }
         });
 
@@ -538,149 +409,78 @@ describe('llm get_qa', () => {
                 send: sendMock,
             };
         });
+
+        const expectedCall = {
+            modelId: 'anthropic.claude-3-haiku-v1' ,
+            system: [
+                {
+                    text: 'test_system_prompt'
+                }
+            ], 
+            messages:  [
+                {
+                    role: "user",
+                    content: [
+                        { 
+                            text: "Use the following pieces of context to answer the question at the end. If you don't know the answer, just say that you don't know, don't try to make up an answer. Write the answer in up to 5 complete sentences.\n\ntest context\n\nQuestion: How can I publish Kindle books?\nHelpful Answer:",
+                            type: "text" 
+                        },
+                        {
+                            guardContent: {
+                                text: { 
+                                    text: "How can I publish Kindle books?",
+                                    qualifiers: ["query"],
+                                },
+                            },
+                        },
+                        {
+                            guardContent: {
+                                text: { 
+                                    text: "test context",
+                                    qualifiers: [ "grounding_source" ],
+                                },
+                            },
+                        }
+                    ],
+                },
+            ],
+            inferenceConfig: { maxTokens: 300, temperature: 0.2, topP: 1 },
+            guardrailConfig: {
+                guardrailIdentifier: "test_id",
+                guardrailVersion: '1',
+                trace: 'enabled'
+            }
+        };
 
         process.env.LLM_LAMBDA_ARN = 'test'
 
         const response = await get_qa(clonedReq, 'test context');
 
         expect(sendMock).toBeCalled();
-        expect(InvokeModelCommand).toBeCalledWith({
-            accept: 'application/json',
-            modelId: 'anthropic.claude-3-haiku-v1',
-            contentType: 'application/json',
-            body: JSON.stringify({
-                max_tokens: 256,
-                temperature: 0.01,
-                top_k: 250,
-                top_p: 1,
-                stop_sequences: ['\n\nHuman:'],
-                anthropic_version: 'bedrock-2023-05-31',
-                return_full_text: false,
-                max_new_tokens: 150,
-                system: 'You are a helpful AI assistant.',
-                messages : [
-                    {
-                        role: 'user',
-                        content: [
-                            {
-                                type: 'text',
-                                text: "Use the following pieces of context to answer the question at the end. If you don't know the answer, just say that you don't know, don't try to make up an answer. Write the answer in up to 5 complete sentences.\n\ntest context\n\nQuestion: How can I publish Kindle books?\nHelpful Answer:"
-                            }
-                        ]
-                    }
-                ]
-            }),
-        });
+        expect(ConverseCommand).toBeCalledWith(expectedCall);
         expect(response).toBe('bedrock response');
     });
 
-    test('truncates context from max token', async () => {
-        const clonedReq = _.cloneDeep(req);
-        clonedReq._settings.LLM_PROMPT_MAX_TOKEN_LIMIT = 100;
-        clonedReq._settings.LLM_QA_PROMPT_TEMPLATE = '';
-        const invokeEndpointMock = jest.fn().mockImplementation(() => {
-            return {
-                Body: JSON.stringify([{
-                    generated_text: 'sagemaker response',
-                }]),
-            }
-        })
-
-        SageMakerRuntime.mockImplementation(() => {
-            return {
-                invokeEndpoint: invokeEndpointMock,
-            };
-        });
-
-        process.env.LLM_SAGEMAKERENDPOINT = 'test'
-
-        const context = 'Some very long context that will trigger truncation.'.repeat(100);
-
-        const response = await get_qa(clonedReq, context);
-
-        expect(textSplitterMock).toBeCalledWith({
-            chunkOverlap: 0,
-            chunkSize: 20,
-            encodingName: 'gpt2'
-        });
-        expect(createDocumentsMock).toBeCalledWith([context]);
-        expect(invokeEndpointMock).toBeCalledWith({
-            Body: JSON.stringify({
-                inputs: "\n\nHuman: You are an AI chatbot. Carefully read the following context and conversation history and then provide a short answer to question at the end. If the answer cannot be determined from the history or the context, reply saying \"Sorry, I don't know\". \n\nContext: truncated response\n\nHistory: \n\n\nHuman: How can I publish Kindle books?\n\nAssistant:",
-                parameters: {
-                    temperature: 0.01,
-                    return_full_text: false,
-                    max_new_tokens: 150,
-                },
-            }),
-            ContentType: 'application/json',
-            EndpointName: 'test'
-        });
-        expect(response).toBe('sagemaker response');
-    });
-
-    test('truncates history before truncating context from max token', async () => {
-        const clonedReq = _.cloneDeep(req);
-        clonedReq._settings.LLM_PROMPT_MAX_TOKEN_LIMIT = 100;
-        clonedReq._settings.LLM_CHAT_HISTORY_MAX_MESSAGES = 50;
-        clonedReq._settings.LLM_QA_MODEL_PARAMS = '';
-        clonedReq._settings.LLM_QA_PROMPT_TEMPLATE = "History: {history}<br><br>Context: {context}<br><br>Question: {query}<br>Helpful Answer:";
-        const history = new Array(50).fill({Human: 'Some very long history that will trigger truncation.'});
-        clonedReq._userInfo.chatMessageHistory = JSON.stringify(history);
-
-        const invokeEndpointMock = jest.fn().mockImplementation(() => {
-            return {
-                Body: JSON.stringify([{
-                    generated_text: 'sagemaker response',
-                }]),
-            }
-        })
-
-        SageMakerRuntime.mockImplementation(() => {
-            return {
-                invokeEndpoint: invokeEndpointMock,
-            };
-        });
-
-        process.env.LLM_SAGEMAKERENDPOINT = 'test'
-
-        const context = 'Some short context that will not trigger truncation.';
-
-        const response = await get_qa(clonedReq, context);
-
-        expect(textSplitterMock).toBeCalledWith({
-            chunkOverlap: 0,
-            chunkSize: 68,
-            encodingName: 'gpt2'
-        });
-        expect(createDocumentsMock).toBeCalledWith([history.reduce((acc, msg, i) => `Human: ${msg.Human}${i === 0 ? '' : '\n'}${acc}`, '')]);
-        expect(invokeEndpointMock).toBeCalledWith({
-            Body: JSON.stringify({
-                inputs: "History: truncated response\n\nContext: Some short context that will not trigger truncation.\n\nQuestion: How can I publish Kindle books?\nHelpful Answer:",
-                parameters: {
-                    temperature: 0,
-                },
-            }),
-            ContentType: 'application/json',
-            EndpointName: 'test'
-        });
-        expect(response).toBe('sagemaker response');
-    });
-
-    test('generates query when Bedrock guardrails are defined', async () => {
+    test('generates query when Bedrock guardrails are defined and system prompt is blank', async () => {
         const clonedReq = _.cloneDeep(req);
         clonedReq._settings.LLM_API = 'BEDROCK';
         clonedReq._settings.LLM_MODEL_ID = 'amazon.titan-text-lite-v1';
         clonedReq._settings.LLM_GENERATE_QUERY_MODEL_PARAMS = '';
+        clonedReq._settings.LLM_GENERATE_QUERY_SYSTEM_PROMPT = '';
         clonedReq._settings.BEDROCK_GUARDRAIL_IDENTIFIER = 'test_id';
         clonedReq._settings.BEDROCK_GUARDRAIL_VERSION = 1;
         const sendMock = jest.fn().mockImplementation(() => {
             return {
-                body: Buffer.from(JSON.stringify({
-                    results: [{
-                        outputText: 'bedrock response',
-                    }]
-                }))
+                output: {
+                    message: {
+                        content: [
+                            {
+                                type: 'text',
+                                text: 'bedrock response'
+                            }
+                        ]
+                    }
+                }
             }
         });
 
@@ -689,26 +489,21 @@ describe('llm get_qa', () => {
                 send: sendMock,
             };
         });
+        const expectedCall = {
+            modelId: 'amazon.titan-text-lite-v1' ,
+            messages:  [
+                {
+                    role: "user",
+                    content: [{ text: 'Given the following conversation and a follow up question, rephrase the follow up question to be a standalone question.\nChat History: \n\nFollow Up Input: How can I publish Kindle books?\nStandalone question:',  type: "text" }],
+                },
+            ],
+            inferenceConfig: { maxTokens: 300, temperature: 0, topP: 1},
+        };
 
         const response = await generate_query(clonedReq);
 
         expect(sendMock).toBeCalled();
-        expect(InvokeModelCommand).toBeCalledWith({
-            accept: 'application/json',
-            modelId: 'amazon.titan-text-lite-v1',
-            contentType: 'application/json',
-            guardrailIdentifier: "test_id",
-            guardrailVersion: "1",
-            body: JSON.stringify({
-                textGenerationConfig: {
-                    maxTokenCount: 256,
-                    stopSequences: [],
-                    temperature: 0,
-                    topP: 1,
-                },
-                inputText: 'Given the following conversation and a follow up question, rephrase the follow up question to be a standalone question.\nChat History: \n\nFollow Up Input: How can I publish Kindle books?\nStandalone question:',
-            }),
-        });
+        expect(ConverseCommand).toBeCalledWith(expectedCall);
         expect(response.question).toBe('How can I publish Kindle books? / bedrock response');
         expect(response.llm_generated_query).toStrictEqual({
             concatenated: 'How can I publish Kindle books? / bedrock response',
@@ -716,56 +511,6 @@ describe('llm get_qa', () => {
             result: 'bedrock response',
             timing: expect.any(String),
         });
-    });
-
-
-    test('throws error if prompt cannot be truncated smaller than max token count', async () => {
-        const clonedReq = _.cloneDeep(req);
-        clonedReq._settings.LLM_QA_PROMPT_TEMPLATE = 'Some very long prompt that cannot be truncated. '.repeat(100);
-        clonedReq._settings.LLM_PROMPT_MAX_TOKEN_LIMIT = 10;
-        const invokeEndpointMock = jest.fn().mockImplementation(() => {
-            return {
-                Body: JSON.stringify([{
-                    generated_text: 'sagemaker response',
-                }]),
-            }
-        })
-
-        SageMakerRuntime.mockImplementation(() => {
-            return {
-                invokeEndpoint: invokeEndpointMock,
-            };
-        });
-
-        process.env.LLM_SAGEMAKERENDPOINT = 'test'
-
-        try {
-            response = await get_qa(clonedReq, '');
-            expect(true).toBe(false);
-        } catch (e) {
-            expect(e.message).toBe(`Unable to truncate prompt to be less than ${clonedReq._settings.LLM_PROMPT_MAX_TOKEN_LIMIT} tokens long. Please check your prompt template and settings.`);
-        }
-    });
-
-    test('handles errors from sagemaker', async () => {
-        const invokeEndpointMock = jest.fn().mockImplementation(() => {
-            throw new Error('sagemaker error')
-        })
-
-        SageMakerRuntime.mockImplementation(() => {
-            return {
-                invokeEndpoint: invokeEndpointMock,
-            };
-        });
-
-        process.env.LLM_SAGEMAKERENDPOINT = 'test'
-
-        try {
-            response = await get_qa(req, '');
-            expect(true).toBe(false);
-        } catch (e) {
-            expect(e.message).toBe(`Sagemaker exception: sagemaker error...`);
-        }
     });
 
     test('handles errors invoking lambda', async () => {

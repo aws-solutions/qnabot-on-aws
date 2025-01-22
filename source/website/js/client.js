@@ -82,6 +82,10 @@ document.addEventListener('DOMContentLoaded', () => {
             config.lex.v2BotId = result.v2BotId;
             config.lex.v2BotAliasId = result.v2BotAliasId;
             config.lex.v2BotLocaleId = result.v2BotLocaleId;
+            if (result?.StreamingWebSocketEndpoint) {
+                config.lex.allowStreamingResponses = true
+                config.lex.streamingWebSocketEndpoint = result.StreamingWebSocketEndpoint
+            }
             return config;
         });
 

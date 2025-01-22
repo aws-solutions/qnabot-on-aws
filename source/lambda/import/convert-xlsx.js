@@ -89,7 +89,7 @@ function addQuestionCard(question) {
         delete question.imageurl;
     }
     if (question.cardsubtitle) {
-        question.r.subTitle = question.subtitle;
+        question.r.subTitle = question.cardsubtitle;
         delete question.cardsubtitle;
     }
 
@@ -162,6 +162,14 @@ function questionIsValid(question, excelRowNumber) {
             `Warning: No questions found for QID: ${question.qid}. The question will be skipped.`,
         );
         return false;
+    }
+    // Questions must be 140 characters or less
+    for (const q of question.q) {
+        if (q.length > 140) {
+            self.addError(
+                `Warning: QID: "${question.qid}" has a question that is over 140 characters in length. The question will be skipped.`,
+            )
+        }
     }
     // answer must exist and include valid characters
     if (!question.a || question.a.replace(/\s/g, '').length == 0) {

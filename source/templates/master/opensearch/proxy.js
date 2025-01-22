@@ -40,9 +40,7 @@ module.exports = {
             },
             Environment: {
                 Variables: {
-                    DEFAULT_SETTINGS_PARAM: { Ref: 'DefaultQnABotSettings' },
-                    PRIVATE_SETTINGS_PARAM: { Ref: 'PrivateQnABotSettings' },
-                    CUSTOM_SETTINGS_PARAM: { Ref: 'CustomQnABotSettings' },
+                    SETTINGS_TABLE: { Ref: 'SettingsTable' },
                     ...util.getCommonEnvironmentVariables(),
                 },
             },
@@ -131,19 +129,13 @@ module.exports = {
                                     'EmbeddingsEnable',
                                     {
                                         'Fn::If': [
-                                            'EmbeddingsSagemaker',
-                                            '1024',
+                                            'EmbeddingsLambda',
+                                            { Ref: 'EmbeddingsLambdaDimensions' },
                                             {
                                                 'Fn::If': [
-                                                    'EmbeddingsLambda',
-                                                    { Ref: 'EmbeddingsLambdaDimensions' },
-                                                    {
-                                                        'Fn::If': [
-                                                            'EmbeddingsBedrock',
-                                                            { 'Fn::FindInMap': ['BedrockDefaults', {Ref : 'EmbeddingsBedrockModelId'}, 'EmbeddingsDimensions'] },
-                                                            'INVALID EMBEDDINGS API - Cannot determine dimensions',
-                                                        ],
-                                                    },
+                                                    'EmbeddingsBedrock',
+                                                    { 'Fn::FindInMap': ['BedrockDefaults', {Ref : 'EmbeddingsBedrockModelId'}, 'EmbeddingsDimensions'] },
+                                                    'INVALID EMBEDDINGS API - Cannot determine dimensions',
                                                 ],
                                             },
                                         ],

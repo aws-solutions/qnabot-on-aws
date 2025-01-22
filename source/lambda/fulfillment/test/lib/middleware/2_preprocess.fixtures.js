@@ -70,7 +70,11 @@ exports.createRequestObject = function (question, removeIdTokensFromSession, req
             "DEFAULT_USER_POOL_JWKS_URL": "https://cognito-idp.us-east-1.amazonaws.com/us-east-1dsfsfjl/.well-known/jwks.json",
             "IDENTITY_PROVIDER_JWKS_URLS": [],
             "NO_VERIFIED_IDENTITY_QUESTION": "no_verified_identity",
-            "PII_REJECTION_QUESTION": "pii_rejection_question"
+            "PII_REJECTION_QUESTION": "pii_rejection_question",
+            "USER_HISTORY_TTL_DAYS": 1,
+            "PREPROCESS_GUARDRAIL_IDENTIFIER": "",
+            "PREPROCESS_GUARDRAIL_VERSION": "",
+            "ERRORMESSAGE": "Unexpected error occurred while processing request."
         },
         "session": {
             "qnabotcontext": {

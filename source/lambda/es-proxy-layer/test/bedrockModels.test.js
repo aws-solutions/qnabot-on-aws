@@ -3,174 +3,27 @@
 *   SPDX-License-Identifier: Apache-2.0                                                            *
  ************************************************************************************************ */
 
-const { BedrockRuntimeClient, InvokeModelCommand } = require('@aws-sdk/client-bedrock-runtime');
+const { BedrockRuntimeClient, InvokeModelCommand, ConverseCommand, ConverseStreamCommand } = require('@aws-sdk/client-bedrock-runtime');
+const { ApiGatewayManagementApiClient, PostToConnectionCommand } = require('@aws-sdk/client-apigatewaymanagementapi');
+const { DynamoDBClient, GetItemCommand } = require("@aws-sdk/client-dynamodb");
 const qnabot = require('qnabot/logging');
 const { invokeBedrockModel } = require('../lib/bedrock/bedrockModels');
 const { mockClient } = require('aws-sdk-client-mock');
 const bedRockMock = mockClient(BedrockRuntimeClient);
+const apiMock = mockClient(ApiGatewayManagementApiClient)
+const ddbMock = mockClient(DynamoDBClient);
 require('aws-sdk-client-mock-jest');
 
 jest.mock('qnabot/settings');
 jest.mock('qnabot/logging');
 jest.mock('@aws-sdk/client-bedrock-runtime');
 
-const guardrails = { 
-    guardrailIdentifier: 'test_id',
-    guardrailVersion: 1
-};
-
-const llmModelBodies = {
-    'amazon.titan-text-express-v1': {
-        textGenerationConfig: { maxTokenCount: 256, stopSequences: [], temperature: 0, topP: 1 },
-        inputText: 'test prompt',
-    },
-    'amazon.titan-text-lite-v1': {
-        textGenerationConfig: { maxTokenCount: 256, stopSequences: [], temperature: 0, topP: 1 },
-        inputText: 'test prompt',
-    },
+const embeddingModelBodies = {
     'amazon.titan-embed-text-v1': {
         inputText: 'test prompt',
     },
     'amazon.titan-embed-text-v2': {
         inputText: 'test prompt',
-    },
-    'amazon.titan-text-premier-v1': {
-        textGenerationConfig: { maxTokenCount: 256, stopSequences: [], temperature: 0, topP: 1 },
-        inputText: 'test prompt',
-    },
-    'ai21.j2-ultra-v1': {
-        maxTokens: 200,
-        temperature: 0,
-        topP: 1,
-        stopSequences: [],
-        countPenalty: { scale: 0 },
-        presencePenalty: { scale: 0 },
-        frequencyPenalty: { scale: 0 },
-        prompt: 'test prompt',
-    },
-    'ai21.j2-mid-v1': {
-        maxTokens: 200,
-        temperature: 0,
-        topP: 1,
-        stopSequences: [],
-        countPenalty: { scale: 0 },
-        presencePenalty: { scale: 0 },
-        frequencyPenalty: { scale: 0 },
-        prompt: 'test prompt',
-    },
-    'anthropic.claude-instant-v1': {
-        max_tokens: 256,
-        temperature: 0,
-        top_k: 250,
-        top_p: 1,
-        stop_sequences: ['\n\nHuman:'],
-        anthropic_version: 'bedrock-2023-05-31',
-        system : 'You are a helpful AI assistant.',
-        messages : [
-            {
-                role: 'user',
-                content: [
-                    {
-                        type: 'text',
-                        text: 'test prompt'
-                    }
-                ]
-            }
-        ],
-    },
-    'anthropic.claude-v2:1': {
-        max_tokens: 256,
-        temperature: 0,
-        top_k: 250,
-        top_p: 1,
-        stop_sequences: ['\n\nHuman:'],
-        anthropic_version: 'bedrock-2023-05-31',
-        system : 'You are a helpful AI assistant.',
-        messages : [
-            {
-                role: 'user',
-                content: [
-                    {
-                        type: 'text',
-                        text: 'test prompt'
-                    }
-                ]
-            }
-        ],
-    },
-    'anthropic.claude-3-sonnet-20240229-v1': {
-        max_tokens: 256,
-        temperature: 0,
-        top_k: 250,
-        top_p: 1,
-        stop_sequences: ['\n\nHuman:'],
-        anthropic_version: 'bedrock-2023-05-31',
-        system : 'You are a helpful AI assistant.',
-        messages : [
-            {
-                role: 'user',
-                content: [
-                    {
-                        type: 'text',
-                        text: 'test prompt'
-                    }
-                ]
-            }
-        ],
-    },
-    'anthropic.claude-3-5-sonnet-20240620-v1': {
-        max_tokens: 256,
-        temperature: 0,
-        top_k: 250,
-        top_p: 1,
-        stop_sequences: ['\n\nHuman:'],
-        anthropic_version: 'bedrock-2023-05-31',
-        system : 'You are a helpful AI assistant.',
-        messages : [
-            {
-                role: 'user',
-                content: [
-                    {
-                        type: 'text',
-                        text: 'test prompt'
-                    }
-                ]
-            }
-        ],
-    },
-    'anthropic.claude-3-haiku-20240307-v1': {
-        max_tokens: 256,
-        temperature: 0,
-        top_k: 250,
-        top_p: 1,
-        stop_sequences: ['\n\nHuman:'],
-        anthropic_version: 'bedrock-2023-05-31',
-        system : 'You are a helpful AI assistant.',
-        messages : [
-            {
-                role: 'user',
-                content: [
-                    {
-                        type: 'text',
-                        text: 'test prompt'
-                    }
-                ]
-            }
-        ],
-    },
-    'cohere.command-text-v14': {
-        max_tokens: 100,
-        temperature: 0,
-        return_likelihoods: 'GENERATION',
-        p: 0.01,
-        k: 0,
-        prompt: 'test prompt',
-    },
-    'meta.llama3-8b-instruct-v1': {
-        max_gen_len: 512,
-        temperature: 0,
-        top_p: 0.9,
-        prompt: 'test prompt',
     },
     'cohere.embed-english-v3': {
         texts: ['test prompt'],
@@ -182,7 +35,47 @@ const llmModelBodies = {
     },
 };
 
-const llmModelResponses = {
+
+const llmModelBodies = {
+    'amazon.titan-text-premier-v1': {
+        maxTokens: 300,
+        temperature: 0,
+        topP: 0.9,
+    },
+    'ai21.jamba-instruct-v1': {
+        maxTokens: 300,
+        temperature: 0,
+        topP: 0.9,
+    },
+    'anthropic.claude-3-sonnet-20240229-v1:0': {
+        maxTokens: 300,
+        temperature: 0,
+        topP: 0.9,
+    },
+    'anthropic.claude-3-5-sonnet-20240620-v1:0': {
+        maxTokens: 300,
+        temperature: 0,
+        topP: 0.9,
+        top_k: 250,
+    },
+    'cohere.command-r-plus-v1:0': {
+        maxTokens: 300,
+        temperature: 0,
+        topP: 0.9,
+    },
+    'meta.llama3-8b-instruct-v1:0': {
+        maxTokens: 300,
+        temperature: 0,
+        topP: 0.9,
+    },
+    'mistral.mistral-large-2407-v1:0': {
+        maxTokens: 300,
+        temperature: 0,
+        topP: 0.9,
+    },
+};
+
+const embeddingModelResponses = {
     'amazon.titan-embed-text-v1': {
         body: Buffer.from(
             JSON.stringify({
@@ -197,134 +90,6 @@ const llmModelResponses = {
             })
         )
     },
-    'amazon.titan-text-express-v1': {
-        body: Buffer.from(
-            JSON.stringify({
-                results: [
-                    {
-                        outputText: 'test response'
-                    }
-                ]
-            })
-        )
-    },
-    'amazon.titan-text-lite-v1': {
-        body: Buffer.from(
-            JSON.stringify({
-                results: [
-                    {
-                        outputText: 'test response'
-                    }
-                ]
-            })
-        )
-    },
-    'amazon.titan-text-premier-v1': {
-        body: Buffer.from(
-            JSON.stringify({
-                results: [
-                    {
-                        outputText: 'test response'
-                    }
-                ]
-            })
-        )
-    },
-    'ai21.j2-ultra-v1': {
-        body: Buffer.from(
-            JSON.stringify({
-                completions: [
-                    {
-                        data: { text: 'test response' }
-                    }
-                ]
-            })
-        )
-    },
-    'ai21.j2-mid-v1': {
-        body: Buffer.from(
-            JSON.stringify({
-                completions: [
-                    {
-                        data: { text: 'test response' }
-                    }
-                ]
-            })
-        )
-    },
-    'anthropic.claude-instant-v1': {
-        body: Buffer.from(
-            JSON.stringify({
-                content: [
-                    { 
-                        text: 'test response' 
-                    }
-                ]
-            })
-        )
-    },
-    'anthropic.claude-v2:1': {
-        body: Buffer.from(
-            JSON.stringify({
-                content: [
-                    { 
-                        text: 'test response' 
-                    }
-                ]
-            })
-        )
-    },
-    'anthropic.claude-3-haiku-20240307-v1': {
-        body: Buffer.from(
-            JSON.stringify({
-                content: [
-                    { 
-                        text: 'test response' 
-                    }
-                ]
-            })
-        )
-    },
-    'anthropic.claude-3-sonnet-20240229-v1': {
-        body: Buffer.from(
-            JSON.stringify({
-                content: [
-                    { 
-                        text: 'test response' 
-                    }
-                ]
-            })
-        )
-    },
-    'anthropic.claude-3-5-sonnet-20240620-v1': {
-        body: Buffer.from(
-            JSON.stringify({
-                content: [
-                    { 
-                        text: 'test response' 
-                    }
-                ]
-            })
-        )
-    },
-    'cohere.command-text-v14': {
-        body: Buffer.from(
-            JSON.stringify({
-                generations: [
-                    {
-                        text: 'test response'
-                    }
-                ]
-            })
-        )
-    },
-    'meta.llama3-8b-instruct-v1': {
-        body: Buffer.from(
-            JSON.stringify({
-                generation: 'test response'
-            })
-        )
-    },
     'cohere.embed-english-v3': {
         body: Buffer.from(
             JSON.stringify({
@@ -341,21 +106,33 @@ const llmModelResponses = {
     },
 };
 
-function isEmbedding(modelId) {
-    return modelId.includes('embed');
+const llmModelResponse = {
+    output: {
+        message: {
+            content: [
+                {
+                    type: 'text',
+                    text: 'test response'
+                }
+            ]
+        }
+    }
 };
 
+describe('Invoke Bedrock Models', () => {
 
-describe('bedrockModels', () => {
     beforeEach(() => {
-        jest.clearAllMocks();
         bedRockMock.reset();
+    });
+
+    afterEach(() => {
+        jest.clearAllMocks();
+        bedRockMock.restore();
     });
 
     test('invokeBedrockModel throws error if model is not supported', async () => {
         const modelId = 'anthropic.claude-v1'; // test with the model that was deprecated
-        const inputText = 'test prompt';
-        const textGenerationConfig = {
+        const input = {
             maxTokenCount: 4096,
             stopSequences: [],
             temperature: 0,
@@ -363,28 +140,23 @@ describe('bedrockModels', () => {
         };
         const e = new Error('Could not resolve the foundation model from the provided model identifier.');
         e.name = 'ResourceNotFoundException';
-        bedRockMock.on(InvokeModelCommand).rejects(e);
+        bedRockMock.on(ConverseCommand).rejects(e);
         const error = new Error('{\"message\":\"Bedrock anthropic.claude-v1 returned ResourceNotFoundException: Could not resolve the foundation model from the provided model identifier. Please retry after selecting different Bedrock model in Cloudformation stack.\",\"type\":\"Error\"}')
-        await expect(invokeBedrockModel(modelId, textGenerationConfig, inputText, guardrails)).rejects.toThrowError(error);
+        await expect(invokeBedrockModel(modelId, input)).rejects.toThrowError(error);
     });
 
-    test('invokeBedrockModel returns correct body', async () => {
+    test('invokeBedrockModel returns correct body with Embedding models', async () => {
         const prompt = 'test prompt';
-        for (const modelId in llmModelBodies) {
+        for (const modelId in embeddingModelBodies) {
             const expectedCall = {
                 accept: 'application/json',
-                body: JSON.stringify(llmModelBodies[modelId]),
+                body: JSON.stringify(embeddingModelBodies[modelId]),
                 contentType: 'application/json',
                 modelId,
             }
 
-            if (!isEmbedding(modelId)) { 
-                expectedCall.guardrailIdentifier = "test_id",
-                expectedCall.guardrailVersion = 1
-            }
-
             const sendMock = jest.fn().mockImplementation(() => {
-                const body = llmModelResponses[modelId].body;
+                const body = embeddingModelResponses[modelId].body;
                 return {
                     body
                 };
@@ -396,7 +168,7 @@ describe('bedrockModels', () => {
                 };
             });
 
-            const response = await invokeBedrockModel(modelId, {}, prompt, guardrails);
+            const response = await invokeBedrockModel(modelId, prompt);
 
             expect(response).toEqual('test response');
             expect(InvokeModelCommand).toHaveBeenCalledWith(expectedCall);
@@ -404,63 +176,105 @@ describe('bedrockModels', () => {
         }
     });
 
-    test('invokeBedrockModel with parameter overrides', async () => {
+    test('invokeBedrockModel returns correct body with LLM models when using Converse API', async () => {
         const prompt = 'test prompt';
-        const modelId = 'amazon.titan-text-lite-v1';
-        const params = { maxTokenCount: 1000, temperature: 0.5, topP: 0.5 };
-        const expectedCall = {
-            accept: 'application/json',
-            body: JSON.stringify({...llmModelBodies[modelId], textGenerationConfig:{...llmModelBodies[modelId].textGenerationConfig, ...params}}),
-            contentType: 'application/json',
-            modelId,
-            guardrailIdentifier: "test_id",
-            guardrailVersion: 1,
-        }
-        const body = llmModelResponses[modelId].body;
-
-        const sendMock = jest.fn().mockImplementation(() => {
-            return {
-                body
-            };
-        });
-        
-        BedrockRuntimeClient.mockImplementation(() => {
-            return {
-                send: sendMock,
-            };
-        });
-
-        const response = await invokeBedrockModel(modelId, params, prompt, guardrails);
-        
-        expect(response).toEqual('test response');
-        expect(InvokeModelCommand).toHaveBeenCalledWith(expectedCall);
-        expect(sendMock).toHaveBeenCalled();
+        for (const modelId in llmModelBodies) {
+            const system = 'test system';
+            const expectedCall = {
+                modelId,
+                system: [
+                    {
+                        text: system
+                    }
+                ], 
+                messages:  [
+                    {
+                        role: "user",
+                        content: [{ text: prompt,  type: "text" }],
+                    },
+                ],
+                inferenceConfig: { maxTokens: 300, temperature: 0, topP: 1 },
+            }
+            const sendMock = jest.fn().mockImplementation(() => {
+                return llmModelResponse
+            });
+            
+            BedrockRuntimeClient.mockImplementation(() => {
+                return {
+                    send: sendMock,
+                };
+            });
+    
+            
+            
+            const response = await invokeBedrockModel(modelId, prompt, { system });
+            expect(ConverseCommand).toHaveBeenCalledWith(expectedCall);
+            expect(response).toEqual("test response");
+            expect(sendMock).toHaveBeenCalled();
+            
+        };
     });
 
     test('invokeBedrockModel with parameter overrides', async () => {
-        const prompt = 'test prompt';
-        const modelId = 'anthropic.claude-v2:1';
-        const params = {
-            max_tokens: 100,
-            temperature: 0.1,
-            top_k: 100,
-            top_p: 0.5,
-            stop_sequences: ['\nPerson:']
+        const modelId = 'anthropic.claude-3-5-sonnet-20240620-v1:0';
+        const parameters = {
+                maxTokens: 100,
+                temperature: 0.1,
+                topP: 0.5,
+                top_k: 100,
+                stopSequences: ['Human'],
         };
-        const expectedCall = {
-            accept: 'application/json',
-            body: JSON.stringify({...llmModelBodies[modelId], ...params}),
-            contentType: 'application/json',
-            modelId,
-            guardrailIdentifier: "test_id",
-            guardrailVersion: 1,
+        const prompt = 'test prompt';
+        const system = 'test system';
+        const query = 'test-query';
+        const context = 'test-context';
+        const guardrails = {
+            guardrailIdentifier: 'test_id',
+            guardrailVersion: '1',
+            trace: 'enabled'
         }
-        const body = llmModelResponses[modelId].body;
 
+        const expectedCall = {
+            modelId: "anthropic.claude-3-5-sonnet-20240620-v1:0",
+            system: [
+                {
+                    text: system
+                }
+            ], 
+            messages:  [
+                {
+                    role: "user",
+                    content: [
+                        { 
+                            text: prompt,
+                            type: "text"
+                        },
+                        {
+                            guardContent: {
+                                text: { 
+                                    text: query,
+                                    qualifiers: ["query"],
+                                },
+                            },
+                        },
+                        {
+                            guardContent: {
+                                text: { 
+                                    text: context,
+                                    qualifiers: [ "grounding_source" ],
+                                },
+                            },
+                        }
+
+                    ],
+                },
+            ],
+            inferenceConfig: { maxTokens: 100, temperature: 0.1, topP: 0.5, stopSequences: ['Human'] },
+            additionalModelRequestFields: { top_k : 100},
+            guardrailConfig: { guardrailIdentifier: 'test_id', guardrailVersion: '1', trace: 'enabled' }
+        }
         const sendMock = jest.fn().mockImplementation(() => {
-            return {
-                body
-            };
+            return llmModelResponse
         });
         
         BedrockRuntimeClient.mockImplementation(() => {
@@ -469,10 +283,11 @@ describe('bedrockModels', () => {
             };
         });
 
-        const response = await invokeBedrockModel(modelId, params, prompt, guardrails);
         
-        expect(response).toEqual('test response');
-        expect(InvokeModelCommand).toHaveBeenCalledWith(expectedCall);
+        
+        const response = await invokeBedrockModel(modelId, prompt, { parameters, system, guardrails, query, context });
+        expect(ConverseCommand).toHaveBeenCalledWith(expectedCall);
+        expect(response).toEqual("test response");
         expect(sendMock).toHaveBeenCalled();
 
     });
@@ -482,7 +297,8 @@ describe('bedrockModels', () => {
         const modelId = 'unsupported.provider';
 
         try {
-            await invokeBedrockModel(modelId, {}, prompt, guardrails);
+
+            await invokeBedrockModel(modelId, prompt);
             expect(true).toEqual(false);
         } catch (err) {
             expect(err.message).toEqual(`Unsupported model provider: unsupported`);
@@ -490,7 +306,7 @@ describe('bedrockModels', () => {
     });
 
     test('invokeBedrockModel throws error if body cannot be parsed', async () => {
-        const modelId = 'amazon.titan-text-lite-v1';
+        const modelId = 'amazon.titan-embed-text-v2';
 
         const sendMock = jest.fn().mockImplementation(() => {
             return {};
@@ -503,12 +319,314 @@ describe('bedrockModels', () => {
         });
 
         try {
-            await invokeBedrockModel(modelId, {}, guardrails);
+            await invokeBedrockModel(modelId, null);
             expect(true).toEqual(false);
         } catch (err) {
             expect(err.message).toEqual(
-                `Cannot read properties of undefined (reading 'guardrailIdentifier')`
+                `Exception parsing response body: The first argument must be of type string or an instance of Buffer, ArrayBuffer, or Array or an Array-like Object. Received undefined`
             );
+        }
+    });
+});
+
+describe('Test Converse Stream', () => {
+    beforeEach(() => {
+        bedRockMock.reset();
+        apiMock.reset();
+        ddbMock.reset();
+    });
+
+    afterEach(() => {
+        jest.clearAllMocks();
+        bedRockMock.restore();
+        apiMock.restore();
+        ddbMock.restore();
+    });
+
+    test('invokeBedrockModel returns correct body with LLM models when using ConverseStream API', async () => {
+        const prompt = 'test prompt';
+        for (const modelId in llmModelBodies) {
+            const system = 'test system';
+            const streamingAttributes = {
+                streamingEndpoint : 'test-endpoint',
+                streamingDynamoDbTable: 'test-table',
+                sessionId: 'test-sessionId'
+            }
+
+            const expectedCall = {
+                modelId,
+                system: [
+                    {
+                        text: system
+                    }
+                ], 
+                messages:  [
+                    {
+                        role: "user",
+                        content: [{ text: prompt,  type: "text" }],
+                    },
+                ],
+                inferenceConfig: { maxTokens: 300, temperature: 0, topP: 1 },
+            }
+
+            const generateStream = (prompt) => {
+                return {
+                    [Symbol.asyncIterator]() {
+                        let index = 0;
+            
+                        return {
+                            next: async () => {
+                                if (index < prompt.length) {
+                                    return { value: prompt[index++], done: false };
+                                }
+                                return { value: null, done: true };
+                            }
+                        };
+                    }
+                };
+            };
+            
+
+            const converseStreamOutput = [
+                {
+                  contentBlockDelta: {
+                    delta: {
+                      text: 'test response',
+                    },
+                    contentBlockIndex: 0,
+                  },
+                },
+              ];
+            
+            const commandOutput  = {
+                stream: generateStream(converseStreamOutput),
+                $metadata: {},
+            };
+
+            const sendMock = jest.fn().mockImplementation(() => {
+                return commandOutput
+            });
+            
+            BedrockRuntimeClient.mockImplementation(() => {
+                return {
+                    send: sendMock,
+                };
+            });
+
+            const mockDbResponse = {
+                Item: {
+                    connectionId: {
+                        S: "test-id"
+                    }
+                }
+            };
+
+            apiMock.on(PostToConnectionCommand).resolves({});
+            ddbMock.on(GetItemCommand).resolves(mockDbResponse);
+    
+                    
+            const response = await invokeBedrockModel(modelId, prompt, { system, streamingAttributes });
+            expect(ConverseStreamCommand).toHaveBeenCalledWith(expectedCall);
+            expect(response).toEqual("test response");
+            expect(sendMock).toHaveBeenCalled();
+            
+        };
+    });
+
+    test('invokeBedrockModel returns valid response if API Gateway throws error', async () => {
+        const prompt = 'test prompt';
+        for (const modelId in llmModelBodies) {
+            const system = 'test system';
+            const streamingAttributes = {
+                streamingEndpoint : 'test-endpoint',
+                streamingDynamoDbTable: 'test-table',
+                sessionId: 'test-sessionId'
+            }
+
+            const expectedCall = {
+                modelId,
+                system: [
+                    {
+                        text: system
+                    }
+                ], 
+                messages:  [
+                    {
+                        role: "user",
+                        content: [{ text: prompt,  type: "text" }],
+                    },
+                ],
+                inferenceConfig: { maxTokens: 300, temperature: 0, topP: 1 },
+            }
+
+            const generateStream = (prompt) => {
+                return {
+                    [Symbol.asyncIterator]() {
+                        let index = 0;
+            
+                        return {
+                            next: async () => {
+                                if (index < prompt.length) {
+                                    return { value: prompt[index++], done: false };
+                                }
+                                return { value: null, done: true };
+                            }
+                        };
+                    }
+                };
+            };
+            
+
+            const converseStreamOutput = [
+                {
+                  contentBlockDelta: {
+                    delta: {
+                      text: 'test response',
+                    },
+                    contentBlockIndex: 0,
+                  },
+                },
+              ];
+            
+            const commandOutput  = {
+                stream: generateStream(converseStreamOutput),
+                $metadata: {},
+            };
+
+            const sendMock = jest.fn().mockImplementation(() => {
+                return commandOutput
+            });
+            
+            BedrockRuntimeClient.mockImplementation(() => {
+                return {
+                    send: sendMock,
+                };
+            });
+
+            const mockDbResponse = {
+                Item: {
+                    connectionId: {
+                        S: "test-id"
+                    }
+                }
+            };
+            
+            const e = new Error('API Connection Error');
+
+            apiMock.on(PostToConnectionCommand).rejects(e);
+            ddbMock.on(GetItemCommand).resolves(mockDbResponse)
+    
+                    
+            const response = await invokeBedrockModel(modelId, prompt, { system, streamingAttributes });
+            expect(ConverseStreamCommand).toHaveBeenCalledWith(expectedCall);
+            expect(response).toEqual('test response');
+            expect(sendMock).toHaveBeenCalled();
+            
+        };
+    });
+
+
+    test('invokeBedrockModel returns valid response if DynamoDB throws error', async () => {
+        const prompt = 'test prompt';
+        for (const modelId in llmModelBodies) {
+            const system = 'test system';
+            const streamingAttributes = {
+                streamingEndpoint : 'test-endpoint',
+                streamingDynamoDbTable: 'test-table',
+                sessionId: 'test-sessionId'
+            }
+
+            const expectedCall = {
+                modelId,
+                system: [
+                    {
+                        text: system
+                    }
+                ], 
+                messages:  [
+                    {
+                        role: "user",
+                        content: [{ text: prompt,  type: "text" }],
+                    },
+                ],
+                inferenceConfig: { maxTokens: 300, temperature: 0, topP: 1 },
+            }
+
+            const generateStream = (prompt) => {
+                return {
+                    [Symbol.asyncIterator]() {
+                        let index = 0;
+            
+                        return {
+                            next: async () => {
+                                if (index < prompt.length) {
+                                    return { value: prompt[index++], done: false };
+                                }
+                                return { value: null, done: true };
+                            }
+                        };
+                    }
+                };
+            };
+            
+
+            const converseStreamOutput = [
+                {
+                  contentBlockDelta: {
+                    delta: {
+                      text: 'test response',
+                    },
+                    contentBlockIndex: 0,
+                  },
+                },
+              ];
+            
+            const commandOutput  = {
+                stream: generateStream(converseStreamOutput),
+                $metadata: {},
+            };
+
+            const sendMock = jest.fn().mockImplementation(() => {
+                return commandOutput
+            });
+            
+            BedrockRuntimeClient.mockImplementation(() => {
+                return {
+                    send: sendMock,
+                };
+            });
+
+            
+            const e = new Error('Unexpected DB Error');
+            bedRockMock.on(ConverseCommand).rejects(e);
+            apiMock.on(PostToConnectionCommand).resolves({});
+            ddbMock.on(GetItemCommand).rejects(e)
+                    
+            const response = await invokeBedrockModel(modelId, prompt, { system, streamingAttributes });
+            expect(ConverseStreamCommand).toHaveBeenCalledWith(expectedCall);
+            expect(response).toEqual("test response");
+            expect(sendMock).toHaveBeenCalled();
+            
+        };
+    });
+
+    test('invokeBedrockModel returns errpr response if ConverseStream API throws error on invalid error', async () => {
+        const prompt = 'test prompt';
+        const system = 'test system';
+
+        const streamingAttributes = {
+            streamingEndpoint : 'test-endpoint',
+            streamingDynamoDbTable: 'test-table',
+            sessionId: 'test-sessionId'
+        }
+        
+        const modelId = 'unsupported.provider';
+
+        try {
+            await invokeBedrockModel(modelId, prompt, { system, streamingAttributes });
+            expect(true).toEqual(false);
+        } catch (err) {
+            expect(err.message).toEqual(`Unsupported model provider: unsupported`);
         }
     });
 });

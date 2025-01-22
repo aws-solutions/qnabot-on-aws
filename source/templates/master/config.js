@@ -101,6 +101,13 @@ function stage(name) {
                         },
                     ],
                 },
+                StreamingWebSocketEndpoint: { 
+                    'Fn::If': [
+                        'StreamingEnabled',
+                        { 'Fn::GetAtt': ['StreamingStack', 'Outputs.StreamingWebSocketEndpoint'] },
+                        ''
+                    ]
+                },
             },
         },
         Metadata: { cfn_nag: util.cfnNag(['W64', 'W69']) },

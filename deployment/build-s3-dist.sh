@@ -19,6 +19,16 @@
 [ "$DEBUG" == 'true' ] && set -x
 set -e
 
+# Check if poetry is available in the shell
+if command -v poetry >/dev/null 2>&1; then
+    export POETRY_COMMAND="poetry"
+elif [ -n "$POETRY_HOME" ] && [ -x "$POETRY_HOME/bin/poetry" ]; then
+    export POETRY_COMMAND="$POETRY_HOME/bin/poetry"
+else
+    echo "Poetry is not available. Aborting script." >&2
+    exit 1
+fi
+
 sedi()
 {
     # cross-platform for sed -i
@@ -93,9 +103,8 @@ cp build/templates/master.json $template_dist_dir/qnabot-on-aws-extended.templat
 cp build/templates/examples.json $template_dist_dir/examples.template
 cp build/templates/export.json $template_dist_dir/export.template
 cp build/templates/import.json $template_dist_dir/import.template
-cp build/templates/sagemaker-embeddings.json $template_dist_dir/sagemaker-embeddings.template
 cp build/templates/testall.json $template_dist_dir/testall.template
-
+cp build/templates/streaming.json $template_dist_dir/streaming.template
 echo "------------------------------------------------------------------------------"
 echo "[Init] Copying lambda assets to regional-s3-assets/"
 echo "------------------------------------------------------------------------------"

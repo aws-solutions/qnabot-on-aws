@@ -244,34 +244,97 @@ function getQuestion(req) {
     return question;
 }
 
-async function useFallbackMethod(req, res, query_params) {
-    const {
-        KNOWLEDGE_BASE_ID,
-        KNOWLEDGE_BASE_MODEL_ID,
-    } = req._settings;
+const useFallbackMethod = async (req, res, query_params) => {
+    const { KNOWLEDGE_BASE_ID, KNOWLEDGE_BASE_MODEL_ID, FALLBACK_ORDER } = req._settings;
 
     let errors = [];
     let hit;
 
-    if (query_params.kendra_indexes.length != 0) {
-        // If enabled, try Kendra Retrieval API
+    const useFallbackOptions = determineFallbackOptions(KNOWLEDGE_BASE_ID, KNOWLEDGE_BASE_MODEL_ID, query_params);
+    const fallbackOrder = FALLBACK_ORDER || 'KNOWLEDGEBASE-FIRST'; // 'KENDRA-FIRST' or 'KNOWLEDGEBASE-FIRST'
+
+    const invokeKendra = async () => {
         [req, res, hit, errors] = await kendraFallback(req, res);
-    } else if (KNOWLEDGE_BASE_ID && KNOWLEDGE_BASE_MODEL_ID) {
-        // If enabled, try Bedrock knowledge base
+        return hit != null;
+    };
+
+    const invokeKnowledgeBase = async () => {
         try {
             [res, hit] = await bedrockRetrieveAndGenerate(req, res);
+            return hit != null;
         } catch (e) {
-            qnabot.log(`BEDROCK KNOWLEDGEBASE EXCEPTION: ${e.name} ${e.message.substring(0, 500)}`);
             const errMsg = `Bedrock Knowledgebase exception: ${e.name} ${e.message.substring(0, 500)}`;
+            qnabot.log(`BEDROCK KNOWLEDGEBASE EXCEPTION: ${errMsg}`);
+
             if (!errors.includes(errMsg)) {
                 errors.push(errMsg);
-            };
+            }
         }
-    }
+    };
+
+    await fallbackOrchaestration(useFallbackOptions, invokeKendra, invokeKnowledgeBase, fallbackOrder);
 
     return [req, res, hit, errors];
-}
+};
 
+const fallbackOrchaestration = async (useFallbackOptions, invokeKendra, invokeKnowledgeBase, fallbackOrder) => {
+
+    if (useFallbackOptions === 'KENDRA') {
+        qnabot.log('Using Kendra as a fallback option');
+        await invokeKendra();
+
+    } else if (useFallbackOptions === 'KNOWLEDGEBASE') {
+
+        qnabot.log('Using KnowledgeBase as a fallback option');
+        await invokeKnowledgeBase();
+
+    } else if (useFallbackOptions === 'MULTIPLE') {
+        if (fallbackOrder === 'KENDRA-FIRST') {
+
+            qnabot.log('Using Kendra as a first fallback option');
+            if (!(await invokeKendra())) {
+                qnabot.log('Using KnowledgeBase as a second fallback option');
+                await invokeKnowledgeBase();
+            }
+
+        } else {
+            qnabot.log('Using KnowledgeBase as a first fallback option');
+            if (!(await invokeKnowledgeBase())) {
+
+                qnabot.log('Using Kendra as a second fallback option');
+                await invokeKendra();
+            }
+        }
+    } else {
+        qnabot.log('Skipping fallback as there are no fallback data sources configured');
+    }
+};
+
+const determineFallbackOptions = (KNOWLEDGE_BASE_ID, KNOWLEDGE_BASE_MODEL_ID, query_params) => {
+    const fallbackOptions = [];
+
+    // Check if Kendra is configured
+    if (query_params.kendra_indexes.length !== 0) {
+        fallbackOptions.push('KENDRA');
+    }
+
+    // Check if Knowledge Base is configured
+    if (KNOWLEDGE_BASE_ID && KNOWLEDGE_BASE_MODEL_ID) {
+        fallbackOptions.push('KNOWLEDGEBASE');
+    }
+
+    // Check if Multiple Options are configured
+    if (fallbackOptions.length > 1) {
+        fallbackOptions.push('MULTIPLE');
+    }
+
+    // Check if no fallback options are configured, default to DISABLED
+    if (fallbackOptions.length === 0) {
+        fallbackOptions.push('DISABLED');
+    }
+
+    return fallbackOptions[fallbackOptions.length - 1];
+};
 async function getHit(req, res) {
     const question = getQuestion(req);
     let size = 1;

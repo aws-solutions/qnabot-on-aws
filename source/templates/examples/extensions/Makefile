@@ -25,9 +25,10 @@ $(PY_LAMBDAS):
 	@echo "--> Building py_lambda_hooks/$@"
 	cd ./py_lambda_hooks/$@ ; \
 	rm -fr py_modules $(DSTDIR)/EXT$@.zip ; \
-	[ -f requirements.txt ] && \
-		python3 -m pip install --upgrade -r requirements.txt -t ./py_modules ; \
-	zip -r -q $(DSTDIR)/EXT$@.zip *.py requirements.txt py_modules --exclude __tests__/*
+	[ -f pyproject.toml ] && \
+		$(POETRY_COMMAND) export --without dev -f requirements.txt --output requirements.txt --without-hashes && \
+		python3 -m pip install --upgrade -r requirements.txt -t ./py_modules && rm -f requirements.txt ; \
+	zip -r -q $(DSTDIR)/EXT$@.zip *.py requirements.txt py_modules -x "*__pycache__/*" "*.pytest_cache/*" "__tests__/*"
 
 pkg_imports:
 	cd ui_imports; \

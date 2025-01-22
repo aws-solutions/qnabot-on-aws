@@ -34,8 +34,7 @@ async function truncateByNumTokens(message, chunkSize) {
     });
 
     const output = await splitter.createDocuments([message]);
-    qnabot.log(output);
-    qnabot.log(output[0].pageContent);
+    qnabot.debug('Token Splitter:', { fullOutput: output, pageContent: output[0].pageContent });
     return output[0].pageContent;
 }
 

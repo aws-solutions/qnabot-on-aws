@@ -21,18 +21,7 @@ module.exports = {
             id: exportfile,
             index: { 'Fn::Sub': '${Var.QnaIndex}' },
             PRE_UPGRADE_EXPORT_TRIGGERS: {
-                'Fn::Sub': [
-                    '${EmbeddingsApi} ${EmbeddingsBedrockModelId} ${EmbeddingsLambdaDimensions} ${EmbeddingsLambdaArn} ${SMEmbeddingEndpoint}',
-                    {
-                        SMEmbeddingEndpoint: {
-                            'Fn::If': [
-                                'EmbeddingsSagemaker',
-                                { 'Fn::GetAtt': ['SagemakerEmbeddingsStack', 'Outputs.EmbeddingsSagemakerEndpoint'] },
-                                '',
-                            ],
-                        },
-                    },
-                ],
+                'Fn::Sub': '${EmbeddingsApi} ${EmbeddingsBedrockModelId} ${EmbeddingsLambdaDimensions} ${EmbeddingsLambdaArn}',
             },
         },
     },
@@ -45,18 +34,7 @@ module.exports = {
             id: exportfile_metrics,
             index: { 'Fn::Sub': '${Var.MetricsIndex}' },
             PRE_UPGRADE_EXPORT_TRIGGERS: {
-                'Fn::Sub': [
-                    '${EmbeddingsApi} ${EmbeddingsBedrockModelId} ${EmbeddingsLambdaDimensions} ${EmbeddingsLambdaArn} ${SMEmbeddingEndpoint}',
-                    {
-                        SMEmbeddingEndpoint: {
-                            'Fn::If': [
-                                'EmbeddingsSagemaker',
-                                { 'Fn::GetAtt': ['SagemakerEmbeddingsStack', 'Outputs.EmbeddingsSagemakerEndpoint'] },
-                                '',
-                            ],
-                        },
-                    },
-                ],
+                'Fn::Sub': '${EmbeddingsApi} ${EmbeddingsBedrockModelId} ${EmbeddingsLambdaDimensions} ${EmbeddingsLambdaArn}',
             },
         },
     },
@@ -69,18 +47,7 @@ module.exports = {
             id: exportfile_feedback,
             index: { 'Fn::Sub': '${Var.FeedbackIndex}' },
             PRE_UPGRADE_EXPORT_TRIGGERS: {
-                'Fn::Sub': [
-                    '${EmbeddingsApi} ${EmbeddingsBedrockModelId} ${EmbeddingsLambdaDimensions} ${EmbeddingsLambdaArn} ${SMEmbeddingEndpoint}',
-                    {
-                        SMEmbeddingEndpoint: {
-                            'Fn::If': [
-                                'EmbeddingsSagemaker',
-                                { 'Fn::GetAtt': ['SagemakerEmbeddingsStack', 'Outputs.EmbeddingsSagemakerEndpoint'] },
-                                '',
-                            ],
-                        },
-                    },
-                ],
+                'Fn::Sub': '${EmbeddingsApi} ${EmbeddingsBedrockModelId} ${EmbeddingsLambdaDimensions} ${EmbeddingsLambdaArn}',
             },
         },
     },

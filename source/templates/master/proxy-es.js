@@ -363,11 +363,17 @@ module.exports = {
             },
             Environment: {
                 Variables: {
-                    DEFAULT_SETTINGS_PARAM: { Ref: 'DefaultQnABotSettings' },
-                    PRIVATE_SETTINGS_PARAM: { Ref: 'PrivateQnABotSettings' },
-                    CUSTOM_SETTINGS_PARAM: { Ref: 'CustomQnABotSettings' },
-                    ...examples,
-                    ...util.getCommonEnvironmentVariables(),
+                    'Fn::If': [
+                        'BuildExamples',
+                        {
+                            SETTINGS_TABLE: { Ref: 'SettingsTable' },
+                            ...examples,
+                            ...util.getCommonEnvironmentVariables(),
+                        },
+                        {
+                            ...util.getCommonEnvironmentVariables(),
+                        },
+                    ],
                 },
             },
             Layers: [{ Ref: 'AwsSdkLayerLambdaLayer' },
@@ -444,17 +450,8 @@ module.exports = {
                     ES_TYPE: { 'Fn::GetAtt': ['Var', 'QnAType'] },
                     ES_INDEX: { 'Fn::GetAtt': ['Var', 'QnaIndex'] },
                     ES_ADDRESS: { 'Fn::GetAtt': ['ESVar', 'ESAddress'] },
-                    DEFAULT_SETTINGS_PARAM: { Ref: 'DefaultQnABotSettings' },
-                    PRIVATE_SETTINGS_PARAM: { Ref: 'PrivateQnABotSettings' },
-                    CUSTOM_SETTINGS_PARAM: { Ref: 'CustomQnABotSettings' },
+                    SETTINGS_TABLE: { Ref: 'SettingsTable' },
                     EMBEDDINGS_API: { Ref: 'EmbeddingsApi' },
-                    EMBEDDINGS_SAGEMAKER_ENDPOINT: {
-                        'Fn::If': [
-                            'EmbeddingsSagemaker',
-                            { 'Fn::GetAtt': ['SagemakerEmbeddingsStack', 'Outputs.EmbeddingsSagemakerEndpoint'] },
-                            '',
-                        ],
-                    },
                     EMBEDDINGS_LAMBDA_ARN: { Ref: 'EmbeddingsLambdaArn' },
                     ...util.getCommonEnvironmentVariables(),
                 },
@@ -529,45 +526,6 @@ module.exports = {
                                             { 'Fn::Sub': '${AWS::Region}:' },
                                             { 'Fn::Sub': '${AWS::AccountId}:' },
                                             'parameter/',
-                                            { Ref: 'DefaultQnABotSettings' },
-                                        ],
-                                    ],
-                                },
-                                {
-                                    'Fn::Join': [
-                                        '', [
-                                            'arn:',
-                                            { 'Fn::Sub': '${AWS::Partition}:' },
-                                            'ssm:',
-                                            { 'Fn::Sub': '${AWS::Region}:' },
-                                            { 'Fn::Sub': '${AWS::AccountId}:' },
-                                            'parameter/',
-                                            { Ref: 'PrivateQnABotSettings' },
-                                        ],
-                                    ],
-                                },
-                                {
-                                    'Fn::Join': [
-                                        '', [
-                                            'arn:',
-                                            { 'Fn::Sub': '${AWS::Partition}:' },
-                                            'ssm:',
-                                            { 'Fn::Sub': '${AWS::Region}:' },
-                                            { 'Fn::Sub': '${AWS::AccountId}:' },
-                                            'parameter/',
-                                            { Ref: 'CustomQnABotSettings' },
-                                        ],
-                                    ],
-                                },
-                                {
-                                    'Fn::Join': [
-                                        '', [
-                                            'arn:',
-                                            { 'Fn::Sub': '${AWS::Partition}:' },
-                                            'ssm:',
-                                            { 'Fn::Sub': '${AWS::Region}:' },
-                                            { 'Fn::Sub': '${AWS::AccountId}:' },
-                                            'parameter/',
                                             { Ref: 'DefaultUserPoolJwksUrl' },
                                         ],
                                     ],
@@ -584,19 +542,6 @@ module.exports = {
                             PolicyDocument: {
                                 Version: '2012-10-17',
                                 Statement: [
-                                    {
-                                        'Fn::If': [
-                                            'EmbeddingsSagemaker',
-                                            {
-                                                Effect: 'Allow',
-                                                Action: [
-                                                    'sagemaker:InvokeEndpoint',
-                                                ],
-                                                Resource: { 'Fn::GetAtt': ['SagemakerEmbeddingsStack', 'Outputs.EmbeddingsSagemakerEndpointArn'] },
-                                            },
-                                            { Ref: 'AWS::NoValue' },
-                                        ],
-                                    },
                                     {
                                         'Fn::If': [
                                             'EmbeddingsLambdaArn',
@@ -640,6 +585,7 @@ module.exports = {
                                 Effect: 'Allow',
                                 Action: [
                                     's3:GetObject',
+                                    's3:ListBucket',
                                 ],
                                 Resource: [
                                     'arn:aws:s3:::QNA*/*',
@@ -649,6 +595,21 @@ module.exports = {
                         ],
                     },
                 },
+                {
+                    PolicyName: 'SettingsTableReadAccess',
+                    PolicyDocument: {
+                        Version: '2012-10-17',
+                        Statement: [
+                            {
+                                Effect: 'Allow',
+                                Action: [
+                                    'dynamodb:Scan',
+                                ],
+                                Resource: [{ 'Fn::GetAtt': ['SettingsTable', 'Arn'] }],
+                            },
+                        ],
+                    },
+                }
             ],
         },
         Metadata: {
@@ -660,16 +621,32 @@ module.exports = {
         Type: 'AWS::IAM::ManagedPolicy',
         Properties: {
             PolicyDocument: {
-                Version: '2012-10-17',
-                Statement: [{
-                    Effect: 'Allow',
-                    Action: ['lambda:InvokeFunction'],
-                    Resource: [
-                        'arn:aws:lambda:*:*:function:qna*',
-                        'arn:aws:lambda:*:*:function:QNA*',
-                    ].concat(require('../examples/outputs').names
-                        .map((x) => ({ 'Fn::GetAtt': ['ExamplesStack', `Outputs.${x}`] }))),
-                }],
+                'Fn::If': [
+                    'BuildExamples',
+                    {
+                        Version: '2012-10-17',
+                        Statement: [{
+                            Effect: 'Allow',
+                            Action: ['lambda:InvokeFunction'],
+                            Resource: [
+                                'arn:aws:lambda:*:*:function:qna*',
+                                'arn:aws:lambda:*:*:function:QNA*',
+                            ].concat(require('../examples/outputs').names
+                                .map((x) => ({ 'Fn::GetAtt': ['ExamplesStack', `Outputs.${x}`] }))),
+                        }],
+                    },
+                    {
+                        Version: '2012-10-17',
+                        Statement: [{
+                            Effect: 'Allow',
+                            Action: ['lambda:InvokeFunction'],
+                            Resource: [
+                                'arn:aws:lambda:*:*:function:qna*',
+                                'arn:aws:lambda:*:*:function:QNA*',
+                            ],
+                        }],
+                    },
+                ],
             },
             Roles: [{ Ref: 'ESProxyLambdaRole' }],
         },
