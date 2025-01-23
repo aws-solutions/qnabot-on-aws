@@ -175,8 +175,7 @@ When deploying the AWS QnABot solution (version 5.5.0 and higher) CloudFormation
 
 Some other Information about the addition:
 - Custom Terminology will also support your Native Language
-- For the SageMaker LLM, Llama-2-13b-chat is supported in English. If you wish to use the multi-language feature with an LLM, we encourage you to use Bedrock with a model that can support other languages. If you are using a language other than English as your core language, then make sure to change your LLM Prompt settings to match your core Language. If your preferred core Language is not supported by any Bedrock model, then you will need to use your own lambda and LLM. 
-- For the embeddings, intfloat/e5-large-v2 model only supports English, If you are using a non-English Native language then you should use your own embeddings model and provide the Lambda in your deployment.
+- If you are using a non-English Native language then you should use your own embeddings model and provide the Lambda in your deployment.
 - If using the Thumbs up and down feature, you should translate Thumbs up and down into your native language and put that phrase in the PROTECTED_UTTERANCES setting. This is to prevent that to be treated as a question by the qnabot. to do this you can do the following steps:
 
     1. Use the AWS translate API to translate Thumbs up and Thumbs down to your deployment Language if it is not English

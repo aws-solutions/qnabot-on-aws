@@ -10,6 +10,7 @@ $(DST): index.js package.json cfn.js examples/* js/* py/*
 py_build:
 		cd ./py ; \
 		rm -fr py_modules $(DST) ; \
-		[ -f requirements.txt ] && \
-			python3 -m pip install --upgrade -r requirements.txt -t ./py_modules || true ; \
+		[ -f pyproject.toml ] && \
+			$(POETRY_COMMAND) export --without dev -f requirements.txt --output requirements.txt --without-hashes && \
+			python3 -m pip install --upgrade -r requirements.txt -t ./py_modules && rm -f requirements.txt || true ; \
 

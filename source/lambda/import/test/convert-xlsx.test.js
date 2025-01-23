@@ -29,6 +29,7 @@ const obj1 = {
     r: {
       title: 'Alexa',
       imageUrl: 'https://images-na.ssl-images-amazon.com/images/I/61bze1WJhfL._AC_SL1024_.jpg',
+      subTitle: 'Alexa',
       buttons: [
         { text: 'Tell me about the Alexa Show.', value: 'The Echo Show' },
         { text: 'Tell me about the Echo Dot', value: 'The Echo Dot' }

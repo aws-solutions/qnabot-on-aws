@@ -103,7 +103,72 @@ describe('when calling step function', () => {
     it('should successfully execute step', async () => {
         jest.spyOn(qnabotSettings, 'getSettings').mockResolvedValue({ EMBEDDINGS_ENABLE: false });
 
-        const mockOptions = {
+        const mockQuestion = {
+            q: ['Which file formats are supported by the QnA Bot question designer import?'],
+            a: 'JSON and xlsx.',
+            qid: 'Import.001'
+        };
+
+        const mockTextItem = {
+            passage: ['Test passage'],
+            a: 'Test answer',
+            qid: 'text.001',
+            type: 'text'
+        };
+
+        const mockResponse = {
+            index: {
+                _index: 'qna-test',
+                _id: 'Import.001'
+            },
+            a: 'JSON and xlsx.',
+            qid: 'Import.001',
+            type: 'qna',
+            questions: [
+                {
+                    q: 'Which file formats are supported by the QnA Bot question designer import?'
+                }
+            ],
+            quniqueterms: 'Which file formats are supported by the QnA Bot question designer import?',
+            datetime: '2023-01-02T00:00:00.000Z'
+        };
+        delete_existing_content.delete_existing_content.mockResolvedValue(mockResponse);
+
+        const stream1 = new Readable();
+        stream1.push(JSON.stringify(config));
+        stream1.push(null);
+        const sdkStream1 = sdkStreamMixin(stream1);
+
+        const stream2 = new Readable();
+        stream2.push(JSON.stringify(mockQuestion) + '\n');
+        stream2.push(JSON.stringify(mockTextItem) + '\n');
+        stream2.push(null);
+        const sdkStream2 = sdkStreamMixin(stream2);
+
+        s3Mock
+            .on(GetObjectCommand)
+            .resolvesOnce({ Body: sdkStream1, ContentRange: 'bytes 0-1299/1300' })
+            .resolvesOnce({ Body: sdkStream2, ContentRange: 'bytes 0-1299/1300' });
+        await step(request, null, jest.fn());
+        expect(qnabot.log).toHaveBeenCalledWith('step');
+        expect(s3Mock).toHaveReceivedCommandTimes(GetObjectCommand, 2);
+        expect(s3Mock).toHaveReceivedNthCommandWith(2, GetObjectCommand, {
+            'Bucket': 'qna-test-importbucket',
+            'Key': 'data/import_questions.json'
+        });
+        expect(s3Mock).toHaveReceivedNthCommandWith(3, GetObjectCommand, {
+            'Bucket': 'qna-test-importbucket',
+            'Key': 'data/import_questions.json',
+            'Range': 'bytes=0-20000',
+            'VersionId': 'testVersion'
+        });
+        expect(s3Mock).toHaveReceivedCommand(PutObjectCommand);
+    });
+
+    it('should successfully process data containing invalid/partial chracter', async () => {
+        jest.spyOn(qnabotSettings, 'getSettings').mockResolvedValue({ EMBEDDINGS_ENABLE: false });
+
+        const mockQuestion = {
             q: ['Which file formats are supported by the QnA Bot question designer import?'],
             a: 'JSON and xlsx.',
             qid: 'Import.001'
@@ -133,7 +198,7 @@ describe('when calling step function', () => {
         const sdkStream1 = sdkStreamMixin(stream1);
 
         const stream2 = new Readable();
-        stream2.push(JSON.stringify(mockOptions));
+        stream2.push(`${JSON.stringify(mockQuestion)}{q: ['Test�`);
         stream2.push(null);
         const sdkStream2 = sdkStreamMixin(stream2);
 
@@ -143,6 +208,7 @@ describe('when calling step function', () => {
             .resolvesOnce({ Body: sdkStream2, ContentRange: 'bytes 0-1299/1300' });
         await step(request, null, jest.fn());
         expect(qnabot.log).toHaveBeenCalledWith('step');
+        expect(qnabot.log).toHaveBeenCalledWith('next content range: 133 - 20133');
         expect(s3Mock).toHaveReceivedCommandTimes(GetObjectCommand, 2);
         expect(s3Mock).toHaveReceivedNthCommandWith(2, GetObjectCommand, {
             'Bucket': 'qna-test-importbucket',
@@ -154,7 +220,7 @@ describe('when calling step function', () => {
             'Range': 'bytes=0-20000',
             'VersionId': 'testVersion'
         });
-        expect(s3Mock).toHaveReceivedCommand(PutObjectCommand, 1);
+        expect(s3Mock).toHaveReceivedCommand(PutObjectCommand);
     });
 
     it('should handle config status not InProgress', async () => {
@@ -265,7 +331,7 @@ describe('when calling step function', () => {
             'key': 'data/import_questions.json',
             'version': 'testVersion'
         };
-        const syntaxError = new SyntaxError('Unexpected token u in JSON at position 0');
+        const syntaxError = new SyntaxError('Unexpected token \'u\', "undefined{"... is not valid JSON');
         const stream1 = new Readable();
         stream1.push(JSON.stringify(mockOptions));
         stream1.push(null);
@@ -361,7 +427,7 @@ describe('when calling step function', () => {
             'Range': 'bytes=0-20000',
             'VersionId': 'testVersion'
         });
-        expect(s3Mock).toHaveReceivedCommand(PutObjectCommand, 1);
+        expect(s3Mock).toHaveReceivedCommand(PutObjectCommand);
     });
 
 });

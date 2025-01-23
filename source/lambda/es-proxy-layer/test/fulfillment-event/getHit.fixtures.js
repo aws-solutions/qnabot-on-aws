@@ -178,7 +178,7 @@ exports.req = {
         'EMBEDDINGS_SCORE_THRESHOLD': 0.85,
         'EMBEDDINGS_SCORE_ANSWER_THRESHOLD': 0.8,
         'EMBEDDINGS_TEXT_PASSAGE_SCORE_THRESHOLD': 0.8,
-        'LLM_API': 'SAGEMAKER',
+        'LLM_API': 'BEDROCK',
         'LLM_GENERATE_QUERY_ENABLE': false,
         'LLM_GENERATE_QUERY_PROMPT_TEMPLATE':
             'Given the following conversation and a follow up question, rephrase the follow up question to be a standalone question.<br>Chat History: <br>{history}<br>Follow Up Input: {input}<br>Standalone question:',
@@ -394,3 +394,17 @@ exports.kendraFallbackResult = {
     "hit_count": 1,
     "debug": []
 }
+
+exports.bedrockResult = {
+    a: 'Amazon EC2',
+    alt: {
+        markdown: '\n**Bedrock Agent:**\n' +
+            '\n' +
+            'Amazon EC2 (Amazon Elastic Compute Cloud) is a web service that provides secure, resizable compute capacity in the cloud.\n\n<details>' +
+            '\n' +
+            '  Source Link: <span translate=no>[aws-overview.pdf](https://signedurl.s3.amazonaws.com/aws-overview.pdf)</span>',
+        ssml: '<speak> Amazon EC2</speak>',
+    },
+    type: 'text',
+    answersource: 'BEDROCK KNOWLEDGE BASE'
+};

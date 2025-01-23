@@ -1,14 +1,14 @@
 {
     "name": "common-modules-layer",
-    "version": "6.1.5",
+    "version": "7.0.0",
     "description": "QnABot Common-modules-layer lambda",
     "main": "index.js",
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1"
     },
     "dependencies": {
-        "@aws-sdk/credential-providers": "^3.511.0",
-        "@opensearch-project/opensearch": "^2.5.0",
+        "@aws-sdk/credential-providers": "^3.699.0",
+        "@opensearch-project/opensearch": "^2.13.0",
         "bodybuilder": "^2.4.0",
         "intercept-stdout": "^0.1.2",
         "lodash": "^4.17.21"

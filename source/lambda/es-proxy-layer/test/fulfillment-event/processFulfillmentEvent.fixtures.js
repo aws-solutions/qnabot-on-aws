@@ -183,7 +183,7 @@ exports.req = {
         'EMBEDDINGS_SCORE_THRESHOLD': 0.85,
         'EMBEDDINGS_SCORE_ANSWER_THRESHOLD': 0.8,
         'EMBEDDINGS_TEXT_PASSAGE_SCORE_THRESHOLD': 0.8,
-        'LLM_API': 'SAGEMAKER',
+        'LLM_API': 'BEDROCK',
         'LLM_GENERATE_QUERY_ENABLE': false,
         'LLM_GENERATE_QUERY_PROMPT_TEMPLATE':
             'Given the following conversation and a follow up question, rephrase the follow up question to be a standalone question.<br>Chat History: <br>{history}<br>Follow Up Input: {input}<br>Standalone question:',

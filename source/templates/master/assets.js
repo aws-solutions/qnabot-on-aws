@@ -45,14 +45,12 @@ module.exports = {
     AssetClean: {
         Type: 'Custom::S3Clean',
         DependsOn: ['CFNInvokePolicy', 'HTTPSOnlyAssetBucketPolicy'],
-        Condition: 'BuildExamples',
         Properties: {
             ServiceToken: { 'Fn::GetAtt': ['S3Clean', 'Arn'] },
             Bucket: { Ref: 'AssetBucket' },
         },
     },
     AssetZipVersion: {
-        Condition: 'BuildExamples',
         Type: 'Custom::S3Version',
         Properties: {
             ServiceToken: { 'Fn::GetAtt': ['CFNLambda', 'Arn'] },
@@ -68,7 +66,6 @@ module.exports = {
     },
     AssetUnzip: {
         Type: 'Custom::S3Unzip',
-        Condition: 'BuildExamples',
         DependsOn: ['AssetClean'],
         Properties: {
             ServiceToken: { 'Fn::GetAtt': ['CFNLambda', 'Arn'] },

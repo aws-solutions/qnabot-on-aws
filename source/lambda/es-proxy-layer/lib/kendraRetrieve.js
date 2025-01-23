@@ -67,7 +67,7 @@ function getQuery(req) {
         'KENDRA_INDEXED_DOCUMENTS_LANGUAGES',
         [backupLangCode],
     );
-    qnabot.log(`Retrieved Kendra multi-language settings: ${kendraIndexedLanguages}`);
+    qnabot.debug(`Retrieved Kendra multi-language settings: ${kendraIndexedLanguages}`);
 
     let useOriginalLanguageQuery = kendraIndexedLanguages.includes(userDetectedLocale, 0)
         && origQuestion && question && origQuestion != question;

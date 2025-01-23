@@ -105,6 +105,8 @@ class TestImport:
         assert 'Warning: No answer found for QID:"NoAnswerWarning". The question will be skipped.' in error
         assert 'Warning: No QID found for line 4. The question will be skipped.' in error
         assert 'Warning: QID found for line 5 must have no spaces. The question will be skipped.' in error
+        assert 'Warning: QID: "QuestionCharLimitWarning" has a question that is over 140 characters in length. The question will be skipped.' in error
+        assert 'Warning: QID: "QuestionCharLimitWarning" has a question that is over 140 characters in length. The question will be skipped.' in error
 
     def test_designer_import_questions_qna(self, designer_login, dom_operator: DomOperator):
         """
@@ -147,6 +149,7 @@ class TestImport:
         assert 'Error: QID: "No Spaces.001", found for question number: 2 must have no spaces. The JSON file will not be imported. Please fix and import the file again.' in error
         assert 'Error: No questions found for QID: "NoQuestion.001". The JSON file will not be imported. Please fix and import the file again.' in error
         assert 'Error: No answer found for QID: "NoAnswer.001". Make sure that it also includes valid characters (/[^a-zA-Z0-9-_]/g). The JSON file will not be imported. Please fix and import the file again.' in error
+        assert 'Warning: QID: "QuestionCharLimit.001" has a question that is over 140 characters in length. The question will be skipped.' in error
 
     @pytest.mark.skip(reason='Bug in import page')
     def test_designer_import_questions_quiz(self, designer_login, dom_operator: DomOperator):

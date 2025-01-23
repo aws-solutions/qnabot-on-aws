@@ -5,6 +5,42 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [7.0.0] - 2025-01-23
+
+### Added
+- Streaming responses feature that enhances QnABot responses by providing real-time streaming from Large Language Models (LLMs) to the chat interface. This introduces a cloudformation parameter `EnableStreaming` to optionally create resources needed for streaming through a nested stack. See [README](./source/docs/llm_streaming_responses/README.md). 
+- Enhanced Guardrail Integration that implements pre-processing and post-processing guardrails to provide improved content control and broader security for your chatbot application. See [README](./source/docs/bedrock_guardrails/README.md). 
+- Implemented Converse API to simplify LLM workflows by providing a consistent interface for different LLM providers, role prompting and eliminating the need for input tagging for Bedrock Guardrails. This introduces customizable system prompts `LLM_GENERATE_QUERY_SYSTEM_PROMPT` and `LLM_QA_SYSTEM_PROMPT` in content designer to support role-based prompting. For more information, see system prompts in [supported models and model features](https://docs.aws.amazon.com/bedrock/latest/userguide/conversation-inference-supported-models-features.html) and [using Converse API](https://docs.aws.amazon.com/bedrock/latest/userguide/conversation-inference-call.html).
+- Ability to use both RAG with Bedrock KnowledgeBase and Kendra as fallback options. A new setting `FALLBACK_ORDER` in the content designer allows users to specify the fallback order of these options.
+- Ability to set a TTL on records added to the DynamoDB UsersTable. ([PR #671](https://github.com/aws-solutions/qnabot-on-aws/pull/671)) - contributed by ([@richhaase](https://github.com/richhaase))
+- Mistral as a new LLM provider option and support for [latest Anthropic Sonnet 3.5 V2, Haiku 3.5 V1, Amazon Nova Models, Ai21 Jambda Instruct, Cohere R plus and Meta Llama 3.1 models.](https://docs.aws.amazon.com/bedrock/latest/userguide/models-supported.html)
+
+### Changed
+- Upgraded to Node 20.
+- Upgraded AWS SDK dependencies.
+- Migrated Settings to DynamoDB store rather than SSM, allowing for longer custom settings and prompts.
+- Moved Amazon Q Business Plugin from samples repo to QnABot repo as an example lambda hook
+- Reduced the size of Bedrock KnowledgeBase output by removing citations from plaintext response.
+- Updated OpenSearch EBSOptions VolumeType to `gp3` from `gp2`.
+- Updated IAM permissions and cloudformation outputs.
+- Added additional non-user input fields to OpenSearch metrics data redaction exclusion list.
+- Migrated to Poetry for Python dependency management
+- Updated innerHTML usages to innerText per security best practices
+
+### Fixed
+- Fixed issues with Excel file import and character handling when reading questions import file
+- Improvements for merging of chained items ([PR #720](https://github.com/aws-solutions/qnabot-on-aws/pull/720)) - contributed by ([@amendlik](https://github.com/amendlik))
+
+### Deprecated
+
+- Settings stored in SSM Parameters. These will automatically be moved to DynamoDB when you upgrade.
+- Sagemaker embeddings and LLM workflows.
+- KendraCrawlerSNS Topic workflow [Issue #742](https://github.com/aws-solutions/qnabot-on-aws/issues/742)
+- Bedrock LLM Models Cohere Command Text, Jurassic-2 Mid and Ultra per [Amazon Bedrock Model Lifefycle](https://docs.aws.amazon.com/bedrock/latest/userguide/model-lifecycle.html#versions-for-eol)
+
+### Security
+- Patched Jinja2, nanoid, path-to-regexp vulnerability
+
 ## [6.1.5] - 2024-11-20
 
 ### Security

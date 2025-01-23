@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "python example modules"
+description = "Example Python lambda"
+package-mode = false
+
+[tool.poetry.dependencies]
+python = "^3.10"
+
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.3.3"
+pytest-cov = "^6.0.0"
+mock = "^5.1.0"
+boto3 = "^1.35.54"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

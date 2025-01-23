@@ -8,8 +8,8 @@ const S3Plugin = require('webpack-s3-plugin');
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 const ProgressBarPlugin = require('progress-bar-webpack-plugin');
 const _ = require('lodash');
-const LodashModuleReplacementPlugin = require('lodash-webpack-plugin');
 const { fromEnv } = require('@aws-sdk/credential-providers');
+
 const { credentials } = fromEnv();
 let assetBucketName;
 if (process.env.ASSET_BUCKET_NAME === '') {
@@ -18,25 +18,24 @@ if (process.env.ASSET_BUCKET_NAME === '') {
     assetBucketName = process.env.ASSET_BUCKET_NAME;
 }
 
-
 module.exports = {
     mode: 'development',
     watch: true,
-    watchOptions:{
-        aggregateTimeout:500
+    watchOptions: {
+        aggregateTimeout: 500,
     },
     plugins:_.compact([
         new BundleAnalyzerPlugin(),
         new S3Plugin({
             s3Options: {
                 credentials,
-                region:config.region
+                region: config.region,
             },
-            s3UploadOptions:{
+            s3UploadOptions: {
                 Bucket: assetBucketName,
-                ACL: 'private'
-            }
+                ACL: '',
+            },
         }),
         new ProgressBarPlugin(),
     ]),
-}
+};

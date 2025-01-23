@@ -131,7 +131,7 @@
 - The chatbot engine
 
 ## SNS
-- APIGW has a 30 second timeout. The Kendra web crawler takes longer than 30 seconds.  The Content Designer calls the Crawler API to trigger an SNS message that starts the crawler Lambda
+- FeedbackSNS can generate notifications (text, email, etc.) for positive/negative feedback
 
 ## KMS
 - There is an optional utility script which adds KMS/CMK encryption to many resources.  The list below is for the default use cases

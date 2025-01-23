@@ -65,6 +65,12 @@ BEDROCK_GUARDRAIL_IDENTIFIER_ID = 'BEDROCK_GUARDRAIL_IDENTIFIER'
 BEDROCK_GUARDRAIL_VERSION_ID = 'BEDROCK_GUARDRAIL_VERSION'
 BEDROCK_GUARDRAIL_SUBGROUP_ID = 'text_generation_guardrail_subgroup'
 
+PREPROCESS_GUARDRAIL_IDENTIFIER_ID = 'PREPROCESS_GUARDRAIL_IDENTIFIER'
+PREPROCESS_GUARDRAIL_VERSION_ID = 'PREPROCESS_GUARDRAIL_VERSION'
+
+POSTPROCESS_GUARDRAIL_IDENTIFIER_ID = 'POSTPROCESS_GUARDRAIL_IDENTIFIER'
+POSTPROCESS_GUARDRAIL_VERSION_ID = 'POSTPROCESS_GUARDRAIL_VERSION'
+
 class SettingsPage:
     """
     Class representing a Settings Page.
@@ -332,7 +338,7 @@ class SettingsPage:
 
         return self.save_settings()
     
-    def enable_bedrock_guardrail(self, region, guardrail_identifier, guardrail_version):
+    def enable_bedrock_guardrail(self, region, guardrail_identifier, guardrail_version, selector='bedrock'):
         """
         Enables the Bedrock guardrail for functional tests based on the nightswatch or local environment. 
 
@@ -347,7 +353,11 @@ class SettingsPage:
             'us-east-1': ('6wptcgn6mi7x', 2),
             'us-west-2': ('nnbn5202wy5g', 2),
             'eu-west-2': ('jsj81qgv3ky5', 2),
-            'ap-northeast-1': ('672yn8u1u3v5', 1)
+            'ap-northeast-1': ('672yn8u1u3v5', 1),
+            'ap-southeast-1': ('9svj21mhvizz', 1),
+            'ap-southeast-2': ('8t3dz616x886', 1),
+            'ca-central-1': ('vci2abppnly8', 1),
+            'eu-central-1': ('kxzczv00h33w', 1),
         }
 
         if os.getenv('NIGHTSWATCH_TEST_DIR'):
@@ -357,10 +367,25 @@ class SettingsPage:
         if not guardrail_identifier or not guardrail_version:
             return self.save_settings()
         
-        get_guardrail_identifier = self.operator.select_id(BEDROCK_GUARDRAIL_IDENTIFIER_ID)
+        valid_selectors = ['bedrock', 'preprocess', 'postprocess']
+        
+        if selector not in valid_selectors:
+            raise ValueError(f"Invalid selector. Must be one of {valid_selectors}")
+    
+        selector_id = BEDROCK_GUARDRAIL_IDENTIFIER_ID
+        selector_version_id = BEDROCK_GUARDRAIL_VERSION_ID
+        
+        if selector == 'preprocess':
+            selector_id = PREPROCESS_GUARDRAIL_IDENTIFIER_ID
+            selector_version_id = PREPROCESS_GUARDRAIL_VERSION_ID
+        if selector == 'postprocess':
+            selector_id = POSTPROCESS_GUARDRAIL_IDENTIFIER_ID
+            selector_version_id = POSTPROCESS_GUARDRAIL_VERSION_ID
+            
+        get_guardrail_identifier = self.operator.select_id(selector_id)
         self.__set_element_value(get_guardrail_identifier, guardrail_identifier)
 
-        get_guardrail_version = self.operator.select_id(BEDROCK_GUARDRAIL_VERSION_ID)
+        get_guardrail_version = self.operator.select_id(selector_version_id)
         self.__set_element_value(get_guardrail_version, guardrail_version)
 
         return self.save_settings()
@@ -482,12 +507,12 @@ class SettingsPage:
 
         if knowledge_base_model.startswith('anthropic'):
             self.__set_element_value(kb_search_type, 'HYBRID')
-            self.__set_element_value(kb_max_results, 3)
-            self.__set_element_value(kb_model_params, '{"temperature": 0.3, "maxTokens": 245, "topP": 0.9, "top_k": 240 }')
+            self.__set_element_value(kb_max_results, 4)
+            self.__set_element_value(kb_model_params, '{"temperature": 0.1, "maxTokens": 300, "topP": 0.9, "top_k": 240 }')
         else:
             self.__set_element_value(kb_search_type, 'HYBRID')
             self.__set_element_value(kb_max_results, 5)
-            self.__set_element_value(kb_model_params, '{"temperature": 0.1, "maxTokens": 264, "topP": 0.9 }')
+            self.__set_element_value(kb_model_params, '{"temperature": 0.1, "maxTokens": 300, "topP": 0.9 }')
             
 
         return self.save_settings()

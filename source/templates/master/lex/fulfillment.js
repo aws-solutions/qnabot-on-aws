@@ -75,41 +75,45 @@ module.exports = {
             // if making changes here, be sure to update FulfillmentLambdaVersionGenerator as appropriate
             Environment: {
                 Variables: {
-                    ES_TYPE: { 'Fn::GetAtt': ['Var', 'QnAType'] },
-                    ES_INDEX: { 'Fn::GetAtt': ['Var', 'QnaIndex'] },
-                    ES_ADDRESS: { 'Fn::GetAtt': ['ESVar', 'ESAddress'] },
-                    LAMBDA_DEFAULT_QUERY: { Ref: 'ESQueryLambda' },
-                    LAMBDA_LOG: { Ref: 'ESLoggingLambda' },
-                    ES_SERVICE_QID: { Ref: 'ESQidLambda' },
-                    ES_SERVICE_PROXY: { Ref: 'ESProxyLambda' },
-                    DYNAMODB_USERSTABLE: { Ref: 'UsersTable' },
-                    DEFAULT_USER_POOL_JWKS_PARAM: { Ref: 'DefaultUserPoolJwksUrl' },
-                    DEFAULT_SETTINGS_PARAM: { Ref: 'DefaultQnABotSettings' },
-                    PRIVATE_SETTINGS_PARAM: { Ref: 'PrivateQnABotSettings' },
-                    CUSTOM_SETTINGS_PARAM: { Ref: 'CustomQnABotSettings' },
-                    EMBEDDINGS_API: { Ref: 'EmbeddingsApi' },
-                    EMBEDDINGS_SAGEMAKER_ENDPOINT: {
-                        'Fn::If': [
-                            'EmbeddingsSagemaker',
-                            { 'Fn::GetAtt': ['SagemakerEmbeddingsStack', 'Outputs.EmbeddingsSagemakerEndpoint'] },
-                            '',
-                        ],
-                    },
-                    EMBEDDINGS_SAGEMAKER_INSTANCECOUNT: { Ref: 'SagemakerInitialInstanceCount' },
-                    EMBEDDINGS_LAMBDA_ARN: { Ref: 'EmbeddingsLambdaArn' },
-                    LLM_API: { Ref: 'LLMApi' },
-                    LLM_SAGEMAKERENDPOINT: {
-                        'Fn::If': [
-                            'LLMSagemaker',
-                            { 'Fn::GetAtt': ['SageMakerQASummarizeLLMStack', 'Outputs.LLMSagemakerEndpoint'] },
-                            '',
-                        ],
-                    },
-                    LLM_SAGEMAKERINSTANCECOUNT: { Ref: 'LLMSagemakerInitialInstanceCount' }, // force new fn version when instance count changes
-                    LLM_LAMBDA_ARN: { Ref: 'LLMLambdaArn' },
-                    ...examples,
-                    ...responsebots,
-                    ...util.getCommonEnvironmentVariables(),
+                    'Fn::If': [
+                        'BuildExamples',
+                        {
+                            ES_TYPE: { 'Fn::GetAtt': ['Var', 'QnAType'] },
+                            ES_INDEX: { 'Fn::GetAtt': ['Var', 'QnaIndex'] },
+                            ES_ADDRESS: { 'Fn::GetAtt': ['ESVar', 'ESAddress'] },
+                            LAMBDA_DEFAULT_QUERY: { Ref: 'ESQueryLambda' },
+                            LAMBDA_LOG: { Ref: 'ESLoggingLambda' },
+                            ES_SERVICE_QID: { Ref: 'ESQidLambda' },
+                            ES_SERVICE_PROXY: { Ref: 'ESProxyLambda' },
+                            DYNAMODB_USERSTABLE: { Ref: 'UsersTable' },
+                            DEFAULT_USER_POOL_JWKS_PARAM: { Ref: 'DefaultUserPoolJwksUrl' },
+                            SETTINGS_TABLE: { Ref: 'SettingsTable' },
+                            EMBEDDINGS_API: { Ref: 'EmbeddingsApi' },
+                            EMBEDDINGS_LAMBDA_ARN: { Ref: 'EmbeddingsLambdaArn' },
+                            LLM_API: { Ref: 'LLMApi' },
+                            LLM_LAMBDA_ARN: { Ref: 'LLMLambdaArn' },
+                            ...examples,
+                            ...responsebots,
+                            ...util.getCommonEnvironmentVariables(),
+                        },
+                        {
+                            ES_TYPE: { 'Fn::GetAtt': ['Var', 'QnAType'] },
+                            ES_INDEX: { 'Fn::GetAtt': ['Var', 'QnaIndex'] },
+                            ES_ADDRESS: { 'Fn::GetAtt': ['ESVar', 'ESAddress'] },
+                            LAMBDA_DEFAULT_QUERY: { Ref: 'ESQueryLambda' },
+                            LAMBDA_LOG: { Ref: 'ESLoggingLambda' },
+                            ES_SERVICE_QID: { Ref: 'ESQidLambda' },
+                            ES_SERVICE_PROXY: { Ref: 'ESProxyLambda' },
+                            DYNAMODB_USERSTABLE: { Ref: 'UsersTable' },
+                            DEFAULT_USER_POOL_JWKS_PARAM: { Ref: 'DefaultUserPoolJwksUrl' },
+                            SETTINGS_TABLE: { Ref: 'SettingsTable' },
+                            EMBEDDINGS_API: { Ref: 'EmbeddingsApi' },
+                            EMBEDDINGS_LAMBDA_ARN: { Ref: 'EmbeddingsLambdaArn' },
+                            LLM_API: { Ref: 'LLMApi' },
+                            LLM_LAMBDA_ARN: { Ref: 'LLMLambdaArn' },
+                            ...util.getCommonEnvironmentVariables(),
+                        },
+                    ],
                 },
             },
             Handler: 'index.handler',
@@ -178,26 +182,10 @@ module.exports = {
                 ],
                 EmbeddingsTrigger: [
                     { Ref: 'EmbeddingsApi' },
-                    { Ref: 'SagemakerInitialInstanceCount' },
-                    {
-                        'Fn::If': [
-                            'EmbeddingsSagemaker',
-                            { 'Fn::GetAtt': ['SagemakerEmbeddingsStack', 'Outputs.EmbeddingsSagemakerEndpoint'] },
-                            '',
-                        ],
-                    },
                     { Ref: 'EmbeddingsLambdaArn' },
                 ],
                 QASummarizeTrigger: [
                     { Ref: 'LLMApi' },
-                    { Ref: 'SagemakerInitialInstanceCount' },
-                    {
-                        'Fn::If': [
-                            'LLMSagemaker',
-                            { 'Fn::GetAtt': ['SageMakerQASummarizeLLMStack', 'Outputs.LLMSagemakerEndpoint'] },
-                            '',
-                        ],
-                    },
                     { Ref: 'LLMLambdaArn' },
                 ],
             },
@@ -223,24 +211,48 @@ module.exports = {
         Type: 'AWS::IAM::ManagedPolicy',
         Properties: {
             PolicyDocument: {
-                Version: '2012-10-17',
-                Statement: [{
-                    Effect: 'Allow',
-                    Action: [
-                        'lambda:InvokeFunction',
-                    ],
-                    Resource: [
-                        'arn:aws:lambda:*:*:function:qna-*',
-                        'arn:aws:lambda:*:*:function:QNA-*',
-                        { 'Fn::GetAtt': ['ESQueryLambda', 'Arn'] },
-                        { 'Fn::GetAtt': ['ESProxyLambda', 'Arn'] },
-                        { 'Fn::GetAtt': ['ESLoggingLambda', 'Arn'] },
-                        { 'Fn::GetAtt': ['ESQidLambda', 'Arn'] },
-                        { 'Fn::If': ['EmbeddingsLambdaArn', { Ref: 'EmbeddingsLambdaArn' }, { Ref: 'AWS::NoValue' }] },
-                        { 'Fn::If': ['LLMLambdaArn', { Ref: 'LLMLambdaArn' }, { Ref: 'AWS::NoValue' }] },
-                    ].concat(require('../../examples/outputs').names
-                        .map((x) => ({ 'Fn::GetAtt': ['ExamplesStack', `Outputs.${x}`] }))),
-                }],
+                'Fn::If': [
+                    'BuildExamples',
+                    {
+                        Version: '2012-10-17',
+                        Statement: [{
+                            Effect: 'Allow',
+                            Action: [
+                                'lambda:InvokeFunction',
+                            ],
+                            Resource: [
+                                'arn:aws:lambda:*:*:function:qna-*',
+                                'arn:aws:lambda:*:*:function:QNA-*',
+                                { 'Fn::GetAtt': ['ESQueryLambda', 'Arn'] },
+                                { 'Fn::GetAtt': ['ESProxyLambda', 'Arn'] },
+                                { 'Fn::GetAtt': ['ESLoggingLambda', 'Arn'] },
+                                { 'Fn::GetAtt': ['ESQidLambda', 'Arn'] },
+                                { 'Fn::If': ['EmbeddingsLambdaArn', { Ref: 'EmbeddingsLambdaArn' }, { Ref: 'AWS::NoValue' }] },
+                                { 'Fn::If': ['LLMLambdaArn', { Ref: 'LLMLambdaArn' }, { Ref: 'AWS::NoValue' }] },
+                            ].concat(require('../../examples/outputs').names
+                                .map((x) => ({ 'Fn::GetAtt': ['ExamplesStack', `Outputs.${x}`] }))),
+                        }],
+                    },
+                    {
+                        Version: '2012-10-17',
+                        Statement: [{
+                            Effect: 'Allow',
+                            Action: [
+                                'lambda:InvokeFunction',
+                            ],
+                            Resource: [
+                                'arn:aws:lambda:*:*:function:qna-*',
+                                'arn:aws:lambda:*:*:function:QNA-*',
+                                { 'Fn::GetAtt': ['ESQueryLambda', 'Arn'] },
+                                { 'Fn::GetAtt': ['ESProxyLambda', 'Arn'] },
+                                { 'Fn::GetAtt': ['ESLoggingLambda', 'Arn'] },
+                                { 'Fn::GetAtt': ['ESQidLambda', 'Arn'] },
+                                { 'Fn::If': ['EmbeddingsLambdaArn', { Ref: 'EmbeddingsLambdaArn' }, { Ref: 'AWS::NoValue' }] },
+                                { 'Fn::If': ['LLMLambdaArn', { Ref: 'LLMLambdaArn' }, { Ref: 'AWS::NoValue' }] },
+                            ],
+                        }],
+                    },
+                ],
             },
             Roles: [{ Ref: 'FulfillmentLambdaRole' }],
         },
@@ -292,6 +304,7 @@ module.exports = {
                 util.xrayDaemonWriteAccess(),
                 util.translateReadOnly(),
                 util.comprehendReadOnly(),
+                util.streamingPermissions(),
                 {
                     PolicyName: 'ParamStorePolicy',
                     PolicyDocument: {
@@ -303,39 +316,6 @@ module.exports = {
                                 'ssm:GetParameters',
                             ],
                             Resource: [
-                                {
-                                    'Fn::Join': [
-                                        '', [
-                                            'arn:aws:ssm:',
-                                            { 'Fn::Sub': '${AWS::Region}:' },
-                                            { 'Fn::Sub': '${AWS::AccountId}:' },
-                                            'parameter/',
-                                            { Ref: 'DefaultQnABotSettings' },
-                                        ],
-                                    ],
-                                },
-                                {
-                                    'Fn::Join': [
-                                        '', [
-                                            'arn:aws:ssm:',
-                                            { 'Fn::Sub': '${AWS::Region}:' },
-                                            { 'Fn::Sub': '${AWS::AccountId}:' },
-                                            'parameter/',
-                                            { Ref: 'PrivateQnABotSettings' },
-                                        ],
-                                    ],
-                                },
-                                {
-                                    'Fn::Join': [
-                                        '', [
-                                            'arn:aws:ssm:',
-                                            { 'Fn::Sub': '${AWS::Region}:' },
-                                            { 'Fn::Sub': '${AWS::AccountId}:' },
-                                            'parameter/',
-                                            { Ref: 'CustomQnABotSettings' },
-                                        ],
-                                    ],
-                                },
                                 {
                                     'Fn::Join': [
                                         '', [
@@ -369,48 +349,6 @@ module.exports = {
                 },
                 {
                     'Fn::If': [
-                        'EmbeddingsSagemaker',
-                        {
-                            PolicyName: 'EmbeddingsSagemakerInvokeEndpointAccess',
-                            PolicyDocument: {
-                                Version: '2012-10-17',
-                                Statement: [
-                                    {
-                                        Effect: 'Allow',
-                                        Action: [
-                                            'sagemaker:InvokeEndpoint',
-                                        ],
-                                        Resource: { 'Fn::GetAtt': ['SagemakerEmbeddingsStack', 'Outputs.EmbeddingsSagemakerEndpointArn'] },
-                                    },
-                                ],
-                            },
-                        },
-                        { Ref: 'AWS::NoValue' },
-                    ],
-                },
-                {
-                    'Fn::If': [
-                        'LLMSagemaker',
-                        {
-                            PolicyName: 'LLMSagemakerInvokeEndpointAccess',
-                            PolicyDocument: {
-                                Version: '2012-10-17',
-                                Statement: [
-                                    {
-                                        Effect: 'Allow',
-                                        Action: [
-                                            'sagemaker:InvokeEndpoint',
-                                        ],
-                                        Resource: { 'Fn::GetAtt': ['SageMakerQASummarizeLLMStack', 'Outputs.LLMSagemakerEndpointArn'] },
-                                    },
-                                ],
-                            },
-                        },
-                        { Ref: 'AWS::NoValue' },
-                    ],
-                },
-                {
-                    'Fn::If': [
                         'BedrockEnable',
                         {
                             PolicyName: 'BedrockInvokeModelAccess',
@@ -421,6 +359,7 @@ module.exports = {
                                         Effect: 'Allow',
                                         Action: [
                                             'bedrock:InvokeModel',
+                                            'bedrock:InvokeModelWithResponseStream'
                                         ],
                                         Resource: [
                                             { 'Fn::If': ['EmbeddingsBedrock', { 'Fn::Sub': ['arn:${AWS::Partition}:bedrock:${AWS::Region}::foundation-model/${ModelId}', {ModelId: { 'Fn::FindInMap': ['BedrockDefaults', {Ref : 'EmbeddingsBedrockModelId'}, 'ModelID'] }}] }, { Ref: 'AWS::NoValue' }] },
@@ -490,6 +429,21 @@ module.exports = {
                         ],
                     },
                 },
+                {
+                    PolicyName: 'SettingsTableReadAccess',
+                    PolicyDocument: {
+                        Version: '2012-10-17',
+                        Statement: [
+                            {
+                                Effect: 'Allow',
+                                Action: [
+                                    'dynamodb:Scan',
+                                ],
+                                Resource: [{ 'Fn::GetAtt': ['SettingsTable', 'Arn'] }],
+                            },
+                        ],
+                    },
+                }
             ],
         },
         Metadata: {
@@ -545,9 +499,7 @@ module.exports = {
                     TARGET_PATH: '_search',
                     TARGET_INDEX: { 'Fn::GetAtt': ['Var', 'QnaIndex'] },
                     TARGET_URL: { 'Fn::GetAtt': ['ESVar', 'ESAddress'] },
-                    DEFAULT_SETTINGS_PARAM: { Ref: 'DefaultQnABotSettings' },
-                    PRIVATE_SETTINGS_PARAM: { Ref: 'PrivateQnABotSettings' },
-                    CUSTOM_SETTINGS_PARAM: { Ref: 'CustomQnABotSettings' },
+                    SETTINGS_TABLE: { Ref: 'SettingsTable' },
                     ...util.getCommonEnvironmentVariables(),
                 },
             },
@@ -609,48 +561,7 @@ module.exports = {
                     PolicyName: 'ParamStorePolicy',
                     PolicyDocument: {
                         Version: '2012-10-17',
-                        Statement: [{
-                            Effect: 'Allow',
-                            Action: [
-                                'ssm:GetParameter',
-                                'ssm:GetParameters',
-                            ],
-                            Resource: [
-                                {
-                                    'Fn::Join': [
-                                        '', [
-                                            'arn:aws:ssm:',
-                                            { 'Fn::Sub': '${AWS::Region}:' },
-                                            { 'Fn::Sub': '${AWS::AccountId}:' },
-                                            'parameter/',
-                                            { Ref: 'DefaultQnABotSettings' },
-                                        ],
-                                    ],
-                                },
-                                {
-                                    'Fn::Join': [
-                                        '', [
-                                            'arn:aws:ssm:',
-                                            { 'Fn::Sub': '${AWS::Region}:' },
-                                            { 'Fn::Sub': '${AWS::AccountId}:' },
-                                            'parameter/',
-                                            { Ref: 'PrivateQnABotSettings' },
-                                        ],
-                                    ],
-                                },
-                                {
-                                    'Fn::Join': [
-                                        '', [
-                                            'arn:aws:ssm:',
-                                            { 'Fn::Sub': '${AWS::Region}:' },
-                                            { 'Fn::Sub': '${AWS::AccountId}:' },
-                                            'parameter/',
-                                            { Ref: 'CustomQnABotSettings' },
-                                        ],
-                                    ],
-                                },
-                            ],
-                        },
+                        Statement: [
                         {
                             Sid: 'AllowES',
                             Effect: 'Allow',

@@ -14,11 +14,9 @@
     "ClientIdClient":"${ClientClient}",
     "ClientIdDesigner":"${ClientDesigner}",
     "UserPool":"${UserPool}",
-    "DefaultQnABotSettings":"${DefaultQnABotSettings}",
-    "PrivateQnABotSettings":"${PrivateQnABotSettings}",
-    "CustomQnABotSettings":"${CustomQnABotSettings}",
-    "KendraCrawlerSnsTopic":"${KendraCrawlerSnsTopic}",
+    "StreamingWebSocketEndpoint": "$stageVariables.StreamingWebSocketEndpoint",
     "SolutionHelper": "${SolutionHelper}",
+    "SettingsTable": "${SettingsTable}",
     "Id":"$stageVariables.Id",
     "_links":{
         "root":{

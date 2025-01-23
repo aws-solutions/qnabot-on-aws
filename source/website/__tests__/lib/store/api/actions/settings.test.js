@@ -5,12 +5,12 @@
 import settingsModule from '../../../../../js/lib/store/api/actions/settings';
 
 const awsMock = require('aws-sdk-client-mock');
-const { SSMClient, GetParametersCommand, GetParameterCommand, PutParameterCommand } = require('@aws-sdk/client-ssm');
-const ssmMock = awsMock.mockClient(SSMClient);
+const { DynamoDBClient, DeleteItemCommand, GetItemCommand, PutItemCommand, ScanCommand, UpdateItemCommand } = require('@aws-sdk/client-dynamodb');
+const dynamodbMock = awsMock.mockClient(DynamoDBClient);
 
 describe('settings action', () => {
     beforeEach(() => {
-        ssmMock.reset();
+        dynamodbMock.reset();
     });
 
     test('listSettings', async () => {
@@ -23,15 +23,14 @@ describe('settings action', () => {
                     CustomQnABotSettings: 'mockedValue',
                     DefaultQnABotSettings: 'mockedValue',
                     PrivateQnABotSettings: 'mockedValue',
+                    SettingsTable: 'mockedTableName'
                 },
+
             },
         };
-        ssmMock.on(GetParametersCommand).resolves({Parameters: [
-            { Value: '{}' },
-            { Value: '{}' },
-        ]});
+        dynamodbMock.on(ScanCommand).resolves({ Items: [{"SettingCategory":{"S":"Advanced"},"nonce":{"N":"0"},"DefaultValue":{"N":"4"},"SettingName":{"S":"ES_PHRASE_BOOST"}}] })
         const result = await settingsModule.listSettings(mockedContext);
-        expect(result).toEqual([{}, {}, {}]);
+        expect(result).toEqual([{ES_PHRASE_BOOST:4}, {}, {ES_PHRASE_BOOST:4}]);
     });
 
     test('listSettings -- error thrown', async () => {
@@ -43,14 +42,15 @@ describe('settings action', () => {
                 info: {
                     CustomQnABotSettings: {},
                     DefaultQnABotSettings: {},
+                    SettingsTable: 'mockedTableName'
                 },
             },
         };
-        ssmMock.on(GetParametersCommand).rejects('mocked rejection');
-        await expect(settingsModule.listSettings(mockedContext)).rejects.toThrow('Error back from request: Error: mocked rejection');
+        dynamodbMock.on(ScanCommand).rejects('mocked rejection');
+        await expect(settingsModule.listSettings(mockedContext)).rejects.toThrow('mocked rejection');
     });
 
-    test('updateSettings', async () => {
+    test('Update and Restore Settings', async () => {
         const mockedContext = {
             rootState: {
                 user: {
@@ -59,15 +59,20 @@ describe('settings action', () => {
                 info: {
                     CustomQnABotSettings: {},
                     DefaultQnABotSettings: {},
+                    SettingsTable: 'mockedTableName'
                 },
             },
         };
-        ssmMock.on(PutParameterCommand).resolves({ Tier: 'Standard', Version: 1 });
-        const result = await settingsModule.updateSettings(mockedContext, { key: 'value' });
-        expect(result).toEqual({ Tier: 'Standard', Version: 1 });
+        dynamodbMock.on(GetItemCommand).resolves({ Item: {"SettingCategory":{"S":"Advanced"},"nonce":{"N":"0"},"DefaultValue":{"N":"4"},"SettingName":{"S":"ES_PHRASE_BOOST"}} })
+        dynamodbMock.on(UpdateItemCommand).resolves({ Attributes: { SettingName: { S: 'ES_PHRASE_BOOST' }, SettingValue: { N: 3 }, SettingCategory: { S: 'Advanced' }, DefaultValue: { N: '4' }, nonce: { N: '0' } } })
+        // GetParameters shows that there's one setting left out of the new settings JSON that was just saved
+        dynamodbMock.on(ScanCommand).resolves({ Items: [{"SettingCategory":{"S":"Advanced"}, "SettingValue": {"N":4},"nonce":{"N":"0"},"DefaultValue":{"N":"4"},"SettingName":{"S":"ES_PHRASE_BOOST"}}, {"SettingCategory":{"S":"Advanced"}, "SettingValue": {"N":4},"nonce":{"N":"0"},"DefaultValue":{"N":"4"},"SettingName":{"S":"LAMBDA_POSTPROCESS_HOOK"}}] })
+        dynamodbMock.on(GetItemCommand, {TableName: mockedContext.rootState.info.SettingsTable, Key: {"SettingName": {"S": "LAMBDA_POSTPROCESS_HOOK"}, "SettingCategory": {"S": "Advanced"}}}).resolves({ Item: {"SettingCategory":{"S":"Advanced"},"nonce":{"N":"0"},"DefaultValue":{"N":"4"},"SettingName":{"S":"ES_PHRASE_BOOST"}} })
+        const result = await settingsModule.updateSettings(mockedContext, { ES_PHRASE_BOOST: 3 });
+        expect(result).toEqual({"changedSettings":["ES_PHRASE_BOOST",],"restoredSettings":["LAMBDA_POSTPROCESS_HOOK",]});
     });
 
-    test('updateSettings -- error thrown', async () => {
+    test('Update and Restore Custom Settings', async () => {
         const mockedContext = {
             rootState: {
                 user: {
@@ -76,11 +81,25 @@ describe('settings action', () => {
                 info: {
                     CustomQnABotSettings: {},
                     DefaultQnABotSettings: {},
+                    SettingsTable: 'mockedTableName'
                 },
             },
-        };
-        ssmMock.on(PutParameterCommand).rejects('mocked rejection');
-        await expect(settingsModule.updateSettings(mockedContext, {})).rejects.toThrow('Error back from request: Error: mocked rejection');
+        };        
+        dynamodbMock.on(GetItemCommand, {
+            TableName: mockedContext.rootState.info.SettingsTable,
+            Key: {
+                SettingName: {"S":'Test1'},
+                SettingCategory: {"S":'Custom'},
+            },
+        }).resolves({})
+        dynamodbMock.on(GetItemCommand).resolves({ Item: {"SettingCategory":{"S":"Custom"},"nonce":{"N":"0"},"DefaultValue":{"N":"4"},"SettingName":{"S":"Test1"}} })
+        dynamodbMock.on(PutItemCommand).resolves({ Attributes: { SettingName: { S: 'Test1' }, SettingValue: { N: 3 }, SettingCategory: { S: 'Custom' }, DefaultValue: { N: '4' }, nonce: { N: '0' } } })
+        // GetParameters shows that there's one setting left out of the new settings JSON that was just saved
+        dynamodbMock.on(ScanCommand).resolves({ Items: [{"SettingCategory":{"S":"Custom"}, "SettingValue": {"N":4},"nonce":{"N":"0"},"DefaultValue":{"N":"4"},"SettingName":{"S":"Test1"}}, {"SettingCategory":{"S":"Custom"}, "SettingValue": {"N":4},"nonce":{"N":"0"},"DefaultValue":{"N":"4"},"SettingName":{"S":"Test2"}}] })
+        dynamodbMock.on(DeleteItemCommand, {TableName: mockedContext.rootState.info.SettingsTable, Key: {"SettingName": {"S": "Test2"}, "SettingCategory": {"S": "Custom"}}}).resolves({})
+
+        const result = await settingsModule.updateSettings(mockedContext, { Test1: 3 });
+        expect(result).toEqual({"changedSettings":["Test1",],"restoredSettings":["Test2",]});
     });
 
     test('listPrivateSettings', async () => {
@@ -93,12 +112,13 @@ describe('settings action', () => {
                     CustomQnABotSettings: 'mockedValue',
                     DefaultQnABotSettings: 'mockedValue',
                     PrivateQnABotSettings: 'mockedValue',
+                    SettingsTable: 'mockedTableName'
                 },
             },
         };
-        ssmMock.on(GetParameterCommand).resolves({Parameter: { Value: "{\"ALT_SEARCH_KENDRA_INDEXES\":\"mockIndex\",\"KENDRA_FAQ_INDEX\":\"mockIndex\",\"KENDRA_WEB_PAGE_INDEX\":\"mockIndex\"}" } });
+        dynamodbMock.on(ScanCommand).resolves({ Items: [{"SettingCategory":{"S":"Custom"}, "SettingValue": {"N":4},"nonce":{"N":"0"},"DefaultValue":{"N":"4"},"SettingName":{"S":"Test1"}}, {"SettingCategory":{"S":"Custom"}, "SettingValue": {"N":4},"nonce":{"N":"0"},"DefaultValue":{"N":"4"},"SettingName":{"S":"Test2"}}] })
         const result = await settingsModule.listPrivateSettings(mockedContext);
-        expect(result).toEqual({"ALT_SEARCH_KENDRA_INDEXES": "mockIndex", "KENDRA_FAQ_INDEX": "mockIndex", "KENDRA_WEB_PAGE_INDEX": "mockIndex"});
+        expect(result).toEqual({"Test1":4,"Test2":4});
     });
 
     test('listPrivateSettings - error thrown', async () => {
@@ -115,7 +135,7 @@ describe('settings action', () => {
             },
         };
         
-        ssmMock.on(GetParameterCommand).rejects('mocked rejection');
+        dynamodbMock.on(ScanCommand).rejects('mocked rejection');
         const result = await settingsModule.listPrivateSettings(mockedContext, {});
         expect(result).toEqual({});
     });

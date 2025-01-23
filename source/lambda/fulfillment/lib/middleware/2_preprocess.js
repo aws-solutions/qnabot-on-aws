@@ -10,6 +10,7 @@ const region = process.env.AWS_REGION || 'us-east-1';
 const qnabot = require('qnabot/logging');
 const util = require('./util');
 const jwt = require('./jwt');
+const { applyGuardrail } = require('/opt/lib/bedrock/applyGuardrail.js');
 const customSdkConfig = require('sdk-config/customSdkConfig');
 
 async function get_userInfo(userId, idattrs, userPrefs = undefined) {
@@ -68,12 +69,19 @@ async function get_userInfo(userId, idattrs, userPrefs = undefined) {
     return req_userInfo;
 }
 
-async function update_userInfo(userId, req_userInfo) {
+async function update_userInfo(userId, req_userInfo, ttlDays) {
     const res_userInfo = _.cloneDeep(req_userInfo);
     const dt = new Date();
     res_userInfo.FirstSeen = req_userInfo.FirstSeen || dt.toString();
     res_userInfo.LastSeen = dt.toString();
     res_userInfo.InteractionCount = req_userInfo.InteractionCount + 1;
+
+    if (ttlDays > 0) {
+        const ttlSeconds = ttlDays * 86400;
+        const ttlDate = new Date(dt.getTime() + ttlSeconds * 1000);
+        res_userInfo.ttl = Math.floor(ttlDate.getTime() / 1000);
+    }
+    
     return res_userInfo;
 }
 
@@ -93,6 +101,44 @@ async function runPreProcessLambda(req, res) {
         } catch (e) {
             qnabot.log(`Error invoking pre-processing lambda: ${arn}`);
             qnabot.log(JSON.stringify(e));
+        }
+    }
+    return { req, res };
+}
+
+async function runPreProcessGuardrail(req, res) {
+    const PREPROCESS_GUARDRAIL_IDENTIFIER = _.get(req, '_settings.PREPROCESS_GUARDRAIL_IDENTIFIER');
+    const PREPROCESS_GUARDRAIL_VERSION = _.get(req, '_settings.PREPROCESS_GUARDRAIL_VERSION');
+    const errorMessage = _.get(req, '_settings.ERRORMESSAGE');
+    const preprocessGuardrailId = PREPROCESS_GUARDRAIL_IDENTIFIER.trim();
+    const preprocessGuardrailVersion = PREPROCESS_GUARDRAIL_VERSION.toString();
+
+    if (!preprocessGuardrailId || !preprocessGuardrailVersion) {
+        return { req, res };
+    }
+
+    qnabot.log('Applying Pre-process Guardail')
+    const { text, guardrailAction, piiEntityAction } = await applyGuardrail(
+        preprocessGuardrailId, 
+        preprocessGuardrailVersion, 
+        'INPUT', 
+        req.question, 
+        errorMessage
+    );
+    
+    if (guardrailAction === 'GUARDRAIL_INTERVENED' || guardrailAction === 'ERROR') {
+        qnabot.log(`Bedrock Pre-process Guardrail Response: ${text}`);
+    
+        req.question = text;
+
+        if (piiEntityAction !== 'ANONYMIZED') {
+            _.set(res, 'message', text);
+            _.set(res, 'plainMessage', text);
+            _.set(res, 'session', req.session);
+            _.set(res, 'card', undefined);
+            _.set(res, 'answerSource', 'PREPROCESS GUARDRAIL');
+            _.set(res, 'got_hits', 0);
+            _.set(req, '_skipSteps', 3);
         }
     }
     return { req, res };
@@ -157,6 +203,8 @@ async function replaceQuestionIfPiiDetected(req) {
 module.exports = async function preprocess(req, res) {
     _.set(req, '_fulfillment.step', 'preprocess');
 
+    ({ req, res } = await runPreProcessGuardrail(req, res));
+
     ({ req, res } = await runPreProcessLambda(req, res));
 
     _.set(req, '_fulfillment.step', undefined);
@@ -208,7 +256,8 @@ module.exports = async function preprocess(req, res) {
     // Add _userInfo to res, with updated timestamps
     // May be further modified by lambda hooks
     // Will be saved back to DynamoDB in userInfo.js
-    const res_userInfo = await update_userInfo(userId, req_userInfo);
+    const ttlDays = _.get(req, '_settings.USER_HISTORY_TTL_DAYS', 0);
+    const res_userInfo = await update_userInfo(userId, req_userInfo, ttlDays);
     _.set(res, '_userInfo', res_userInfo);
 
     if (_.get(req, '_settings.REMOVE_ID_TOKENS_FROM_SESSION', false)) {

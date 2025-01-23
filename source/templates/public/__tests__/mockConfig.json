@@ -14,13 +14,12 @@
   "multiBucketDeployment": false,
   "buildType": "AWSSolutions",
   "FulfillmentConcurrency": 1,
-  "EmbeddingsApi": "SAGEMAKER",
-  "QASummarizeApi": "SAGEMAKER",
+  "EmbeddingsApi": "BEDROCK",
   "InstallLexResponseBots": true,
   "KendraWebPageIndexId": "",
   "KendraFaqIndexId": "",
   "AltSearchKendraIndexes": "",
   "devOpenSearchNodeCount": 1,
-  "LLMApi": "SAGEMAKER",
+  "LLMApi": "BEDROCK",
   "OpenSearchFineGrainAccessControl": "FALSE"
 }

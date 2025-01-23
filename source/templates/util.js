@@ -581,7 +581,6 @@ exports.advancedSecurityOptions = function (){
             },
         };
     };
-
 exports.openSearchLogResourcePolicy = function(){
     return {
             Version: '2012-10-17',
@@ -600,7 +599,48 @@ exports.openSearchLogResourcePolicy = function(){
             ]
         }
     }
-
+exports.streamingPermissions = function () {
+    return { 'Fn::If': ['StreamingEnabled',
+        {
+            PolicyName: 'StreamingPermissions',
+            PolicyDocument: {
+                Version: '2012-10-17',
+                Statement: [
+                    {
+                        Effect: 'Allow',
+                        Action: [
+                            'execute-api:Invoke',
+                            'execute-api:ManageConnections',
+                        ],
+                        Resource: [{
+                            'Fn::Join': ['', [
+                                'arn:',
+                                { 'Fn::Sub': '${AWS::Partition}' },
+                                ':execute-api:',
+                                { 'Fn::Sub': '${AWS::Region}' },
+                                ':',
+                                { 'Fn::Sub': '${AWS::AccountId}' },
+                                ':',
+                                { 'Fn::GetAtt': ['StreamingStack', 'Outputs.StreamingWebSocketApiId'] },
+                                '/Prod/*'
+                            ]]
+                        }],
+                    },
+                    {
+                        Effect: 'Allow',
+                        Action: [
+                            'dynamodb:GetItem',
+                        ],
+                        Resource: [{ 'Fn::GetAtt': ['StreamingStack', 'Outputs.StreamingDynamoDbTableArn'] }],
+                    }
+                ],
+            },
+        },
+        { Ref: 'AWS::NoValue' }
+    ]};
+}
+    
+    
 exports.cfnNagXray = function () {
     return {
         cfn_nag: {

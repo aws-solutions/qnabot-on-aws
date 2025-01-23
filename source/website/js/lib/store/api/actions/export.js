@@ -4,40 +4,72 @@
  ************************************************************************************************ */
 const _ = require('lodash');
 const { S3Client, GetObjectCommand } = require('@aws-sdk/client-s3');
-const { SSM } = require('@aws-sdk/client-ssm');
+const { DynamoDBClient, ScanCommand } = require('@aws-sdk/client-dynamodb');
+const { unmarshall } = require('@aws-sdk/util-dynamodb');
 const util = require('./../../../../capability/util');
 
-function getParameters(ssm, params) {
-    return new Promise((resolve, reject) => {
-        ssm.getParameters(params, (err, data) => {
-            if (err) {
-                console.log(err, err.stack);
-                reject(`Error back from request: ${err}`);
-            } else {
-                const custom_settings = JSON.parse(data.Parameters[0].Value);
-                const default_settings = JSON.parse(data.Parameters[1].Value);
-                const cloned_default = _.clone(default_settings);
-                const merged_settings = _.merge(cloned_default, custom_settings);
-                const settings = [default_settings, custom_settings, merged_settings];
-                resolve(settings);
+async function getParameters(context, dynamodb) {
+    const tableName = context.rootState.info.SettingsTable;
+
+    const params = {
+        TableName: tableName,
+        FilterExpression: "SettingCategory <> :private",
+        ExpressionAttributeValues: {
+            ":private": {
+                "S": "Private"
             }
-        });
-    });
+        }
+    };
+
+    const custom_settings = {};
+    const default_settings = {}
+    let lastEvaluatedKey = null;
+    do {
+        if (lastEvaluatedKey) {
+            params.ExclusiveStartKey = lastEvaluatedKey;
+        }
+
+        try {
+            const command = new ScanCommand(params);
+            const response = await dynamodb.send(command);
+            response.Items.forEach(item => {
+                const unmarshalledItem = unmarshall(item);
+                const settingName = unmarshalledItem.SettingName;
+                const settingValue = unmarshalledItem.SettingValue;
+                const defaultValue = unmarshalledItem.DefaultValue;
+                const settingCategory = unmarshalledItem.SettingCategory;
+
+                if (settingValue != "") {
+                    custom_settings[settingName] = settingValue;
+                }
+
+                if (settingCategory == "Custom") {
+                    custom_settings[settingName] = settingValue;
+                }
+
+                default_settings[settingName] = defaultValue;
+            });
+
+            lastEvaluatedKey = response.LastEvaluatedKey;
+        } catch (error) {
+            console.error('Error scanning DynamoDB table:', error);
+            throw error;
+        }
+    } while (lastEvaluatedKey);
+
+    let cloned_default = _.clone(default_settings)
+    let merged_settings = _.merge(cloned_default, custom_settings)
+    return [default_settings, custom_settings, merged_settings];
 }
 
 async function listSettings(context) {
     const credentials = context.rootState.user.credentials;
-    const customParams = context.rootState.info.CustomQnABotSettings;
-    const defaultParams = context.rootState.info.DefaultQnABotSettings;
-    const ssm = new SSM({
-        customUserAgent : util.getUserAgentString(context.rootState.info.Version, 'C011'),
+    
+    const dynamodb = new DynamoDBClient({
+        customUserAgent: util.getUserAgentString(context.rootState.info.Version, 'C022'),
         region: context.rootState.info.region, credentials
     });
-    const query = {
-        Names: [customParams, defaultParams],
-        WithDecryption: true,
-    };
-    const response = await getParameters(ssm, query);
+    const response = await getParameters(context, dynamodb);
     return response;
 }
 

@@ -57,13 +57,13 @@ describe('master template with config', () => {
                 BedrockKnowledgeBaseId: { Default: 'test' },
                 BedrockKnowledgeBaseModel: { Default: 'anthropic.claude-instant-v1' },
                 LLMLambdaArn: { Default: '0000000000000000000000000000000000000:function:test' },
-                LLMSagemakerInstanceType: { Default: 'test' },
                 InstallLexResponseBots: { Default: 'test' },
                 Username: { Default: 'test' },
                 VPCSecurityGroupIdList: { Default: 'sg-0000000000000000,sg-0000000000000000' },
                 VPCSubnetIdList: { Default: 'test' },
                 XraySetting: { Default: 'test' },
                 OpenSearchFineGrainAccessControl: { Default: 'FALSE' },
+                EnableStreaming: { Default: 'FALSE' },
             },
         };
         expect(templateFile).toEqual(expectResult);

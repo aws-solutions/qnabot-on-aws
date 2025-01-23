@@ -60,23 +60,28 @@ With QnABot you can use three different data sources to generate responses from:
 
 You can also choose which LLM to use with QnABot:
 1. BEDROCK: Select from several LLM models provided by Amazon Bedrock using the LLMBedrockModelId Cloudformation parameter. These models provide the best performance and operate on a pay-per-request model. For more information, please refer to [Bedrock Supported AWS Regions](https://docs.aws.amazon.com/bedrock/latest/userguide/bedrock-regions.html).
-2. SAGEMAKER: Deploys a dedicated SageMaker Jumpstart model hosted on an Amazon SageMaker endpoint - see https://llama.meta.com/llama2. This option provides the best compatibility with all Lex supported regions, except for ap-southeast-1 where the default ml.g5.12xlarge instance is not available. Pricing is determined by the number and types of instances that are deployed.
-3. LAMBDA: LLM model from a user provided Lambda function. This option provides a custom option for advanced users who wish to deploy their own model.
+2. LAMBDA: LLM model from a user provided Lambda function. This option provides a custom option for advanced users who wish to deploy their own model.
 
 ### 1. Amazon Bedrock (PREFERRED)
 Utilizes one of the Amazon Bedrock foundation models to generate text. Currently, the following models are supported by QnA Bot:
+- [Amazon Nova Micro](https://us-east-1.console.aws.amazon.com/bedrock/home?region=us-east-1#/model-catalog/serverless/amazon.nova-micro-v1:0)
+- [Amazon Nova Lite](https://us-east-1.console.aws.amazon.com/bedrock/home?region=us-east-1#/model-catalog/serverless/amazon.nova-lite-v1:0)
+- [Amazon Nova Pro](https://us-east-1.console.aws.amazon.com/bedrock/home?region=us-east-1#/model-catalog/serverless/amazon.nova-pro-v1:0)
 - [Amazon Titan Text G1 Lite](https://us-east-1.console.aws.amazon.com/bedrock/home?region=us-east-1#/providers?model=amazon.titan-text-lite-v1)
 - [Amazon Titan Text G1 Express](https://us-east-1.console.aws.amazon.com/bedrock/home?region=us-east-1#/providers?model=amazon.titan-text-express-v1)
-- [Titan Text G1 - Premier](https://us-east-1.console.aws.amazon.com/bedrock/home?region=us-east-1#/providers?model=amazon.titan-text-premier-v1:0)
+- [Amazon Titan Text G1 - Premier](https://us-east-1.console.aws.amazon.com/bedrock/home?region=us-east-1#/providers?model=amazon.titan-text-premier-v1:0)
 - [Anthropic Claude Instant 1.2](https://us-east-1.console.aws.amazon.com/bedrock/home?region=us-east-1#/providers?model=anthropic.claude-instant-v1)
 - [Anthropic Claude 2.1](https://us-east-1.console.aws.amazon.com/bedrock/home?region=us-east-1#/providers?model=anthropic.claude-v2:1)
 - [Anthropic Claude 3 Sonnet](https://us-east-1.console.aws.amazon.com/bedrock/home?region=us-east-1#/providers?model=anthropic.claude-3-sonnet-20240229-v1:0)
 - [Anthropic Claude 3.5 Sonnet](https://us-east-1.console.aws.amazon.com/bedrock/home?region=us-east-1#/providers?model=anthropic.claude-3-5-sonnet-20240620-v1:0)
+- [Anthropic Claude 3.5 Sonnet V2](https://us-east-1.console.aws.amazon.com/bedrock/home?region=us-east-1#/providers?model=anthropic.claude-3-5-sonnet-20241022-v2:0)
 - [Anthropic Claude 3 Haiku](https://us-east-1.console.aws.amazon.com/bedrock/home?region=us-east-1#/providers?model=anthropic.claude-3-haiku-20240307-v1:0)
-- [AI21 Jurassic-2 Ultra](https://us-east-1.console.aws.amazon.com/bedrock/home?region=us-east-1#/providers?model=ai21.j2-ultra-v1)
-- [AI21 Jurassic-2 Mid](https://us-east-1.console.aws.amazon.com/bedrock/home?region=us-east-1#/providers?model=ai21.j2-mid-v1)
-- [Cohere Command](https://us-east-1.console.aws.amazon.com/bedrock/home?region=us-east-1#/providers?model=cohere.command-text-v14)
+- [Anthropic Claude 3.5 Haiku V1](https://us-east-1.console.aws.amazon.com/bedrock/home?region=us-east-1#/model-catalog/serverless/anthropic.claude-3-5-haiku-20241022-v1:0)
+- [AI21 Jambda Instruct](https://us-east-1.console.aws.amazon.com/bedrock/home?region=us-east-1#/providers?model=ai21.jamba-instruct-v1:0)
 - [Meta Llama 3 8B Instruct](https://us-east-1.console.aws.amazon.com/bedrock/home?region=us-east-1#/providers?model=meta.llama3-8b-instruct-v1:0)
+- [Meta Llama 3.1 405B Instruct](https://us-east-1.console.aws.amazon.com/bedrock/home?region=us-east-1#/providers?model=meta.llama3-1-405b-instruct-v1:0)
+- [Command R+](https://us-east-1.console.aws.amazon.com/bedrock/home?region=us-east-1#/providers?model=cohere.command-r-plus-v1:0)
+- [Mistral Large 2 (24.07)](https://us-east-1.console.aws.amazon.com/bedrock/home?region=us-east-1#/providers?model=mistral.mistral-large-2407-v1:0)
 
 #### Requesting Access to Amazon Bedrock Models
 
@@ -92,21 +97,7 @@ From the Cloudformation console, set the following parameters:
 
 ![CFN Params](./images/CF_Params_Bedrock.jpeg)
 
-### 2. Amazon SAGEMAKER
-
-QnABot provisions a Sagemaker endpoint running the SageMaker Jumpstart [llama-2-13b-chat](https://llama.meta.com/llama2) model
-
-By default a 1-node ml.g5.12xlarge endpoint is automatically provisioned. For large volume deployments, add additional nodes by setting the parameter `LLMSagemakerInitialInstanceCount`. Please check [SageMaker pricing documentation](https://aws.amazon.com/sagemaker/pricing/) for relevant costs and information on Free Tier eligibility.
-
-#### Deploy Stack for SAGEMAKER
-
-- *(for Kendra Fallback)* set `AltSearchKendraIndexes` to the Index Id (a GUID) of your existing Kendra index containing ingested documents
-- *(for text passage queries)* set `EmbeddingsApi` to BEDROCK, SAGEMAKER, or LAMBDA (see  [Semantic Search using Text Embeddings](../semantic_matching_using_LLM_embeddings/README.md))
-- set `LLMApi` to SAGEMAKER
-
-![CFN Params](./images/CF_Params_SageMaker.png)
-
-### 3. Lambda function
+### 2. Lambda function
 
 Use a custom Lambda function to experiment with LLMs of your choice. Provide your own lambda function that takes a *question*, *context*, and a QnABot *settings* object. Your Lambda function can invoke any LLM you choose, and return the prediction in a JSON object containing the key, `generated_text`. You provide the ARN for your Lambda function when you deploy or update QnABot.
 
@@ -114,7 +105,7 @@ Use a custom Lambda function to experiment with LLMs of your choice. Provide you
 #### Deploy Stack for LLM models invoked by a custom Lambda Function
 
 - *(for Kendra Fallback)* set `AltSearchKendraIndexes` to the Index Id (a GUID) of your existing Kendra index containing ingested documents
-- *(for text passage queries)* set `EmbeddingsApi` to BEDROCK, SAGEMAKER, or LAMBDA (see  [Semantic Search using Text Embeddings](../semantic_matching_using_LLM_embeddings/README.md))
+- *(for text passage queries)* set `EmbeddingsApi` to BEDROCK or LAMBDA (see  [Semantic Search using Text Embeddings](../semantic_matching_using_LLM_embeddings/README.md))
 - set `LLMApi` to LAMBDA
 - set `LLMLambdaArn` to the ARN of your Lambda function
 
@@ -162,7 +153,7 @@ When QnABot stack is installed, open Content Designer **Settings** page:
 
 *Scroll to the bottom of the settings page and observe the new LLM settings:*
 
-- **LLM_API:** one of BEDROCK, SAGEMAKER, or LAMBDA - based on the value chosen when you last deployed or updated the QnABot Stack.
+- **LLM_API:** BEDROCK or LAMBDA - based on the value chosen when you last deployed or updated the QnABot Stack.
 - **LLM_GENERATE_QUERY_ENABLE:** set to true or false to enable or disable question disambiguation.
 - **LLM_GENERATE_QUERY_PROMPT_TEMPLATE:** the prompt template used to construct a prompt for the LLM to disambiguate a followup question. The template may use the placeholders:
   - `{history}` - placeholder for the last `LLM_CHAT_HISTORY_MAX_MESSAGES` messages in the conversational history, to provide conversational context.
@@ -182,3 +173,4 @@ When QnABot stack is installed, open Content Designer **Settings** page:
 - **LLM_QA_SHOW_SOURCE_LINKS:** set to true or false to enable or disable Kendra Source Links or passage refMarkdown links (doc references) in markdown answers.
 - **LLM_CHAT_HISTORY_MAX_MESSAGES:** the number of previous questions and answers (chat history) to maintain (in the QnABot DynamoDB UserTable). Chat History is necessary for QnABot to disambiguate follow up questions from previous question and answer context.
 - **LLM_PROMPT_MAX_TOKEN_LIMIT:** the maximum number of tokens that can be sent to the LLM. QnABot will selectively truncate the prompt by chat history (first) and context (second) to shorten the prompt length. **NOTE:** The tokenizer uses gt2 encoding to estimate the token count and is only an approximation. The value for this setting should be set lower than the max number of tokens supported by the LLM model and may require calibration.
+- **FALLBACK_ORDER:** Specifies the order in which the fallback mechanisms (Amazon Kendra and Amazon Bedrock Knowledge Base) should be tried. By default, the QnABot will try RAG with Amazon Bedrock Knowledge Base first, and if no hits are returned, it will then try RAG with Amazon Kendra. This setting only takes effect when both BedrockKnowledgeBaseId and AltSearchKendraIndexes are provided in the CloudFormation deployment. 

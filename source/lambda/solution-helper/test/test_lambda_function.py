@@ -19,6 +19,63 @@ from unittest.mock import patch
 from moto import mock_aws
 from botocore.exceptions import ClientError
 
+mocked_settings = [
+    {
+        "SettingName": "ENABLE_MULTI_LANGUAGE_SUPPORT", 
+        "SettingCategory": "LanguageID", 
+        "SettingValue": "", 
+        "DefaultValue": "false"
+    },
+    {
+        "SettingName": "LLM_GENERATE_QUERY_ENABLE", 
+        "SettingCategory": "QueryMatching", 
+        "SettingValue": "", 
+        "DefaultValue": "true"
+    },
+    {
+        "SettingName": "KNOWLEDGE_BASE_SEARCH_TYPE", 
+        "SettingCategory": "BedrockRag", 
+        "SettingValue": "", 
+        "DefaultValue": "DEFAULT"
+    },
+    {
+        "SettingName": "PII_REJECTION_ENABLED", 
+        "SettingCategory": "Security", 
+        "SettingValue": "", 
+        "DefaultValue": "false"
+    },
+    {
+        "SettingName": "EMBEDDINGS_ENABLE", 
+        "SettingCategory": "Security", 
+        "SettingValue": "", 
+        "DefaultValue": "true"
+    },
+    {
+       "SettingName": "LLM_QA_ENABLE", 
+       "SettingCategory": "LLMSettings", 
+       "SettingValue": "", 
+       "DefaultValue": "true"
+    },
+    {
+        "SettingName": "FALLBACK_ORDER", 
+        "SettingCategory": "LLMSettings", 
+        "SettingValue": "", 
+        "DefaultValue": "KNOWLEDGEBASE-FIRST"
+    },
+    {
+        "SettingName": "ENABLE_REDACTING", 
+        "SettingCategory": "Security", 
+        "SettingValue": "", 
+        "DefaultValue": "false"
+    },
+    {
+        "SettingName": "ENABLE_REDACTING_WITH_COMPREHEND", 
+        "SettingCategory": "Security", 
+        "SettingValue": "", 
+        "DefaultValue": "false"
+    }
+        ]
+
 def mocked_requests_post(*args, **kwargs):
     class MockResponse:
         def __init__(self, status_code, reason):
@@ -28,14 +85,50 @@ def mocked_requests_post(*args, **kwargs):
     return MockResponse(200, 'OK')
 @mock_aws
 class LambdaTest(unittest.TestCase):
+
     def setUp(self):
         self.mock_aws = mock_aws()
         self.mock_aws.start()
         self.ssm_client = boto3.client('ssm')
+        self.dynamodb_client = boto3.client('dynamodb')
         self.ssm_client.put_parameter(Name=os.environ["SOLUTION_PARAMETER"], Type="SecureString", Value='some-uuid', Overwrite=True)
-
+        self.dynamodb_client.create_table(
+            BillingMode='PAY_PER_REQUEST',
+            TableName=os.environ['SETTINGS_TABLE'],
+            KeySchema=[
+                {
+                    'AttributeName': 'SettingName',
+                    'KeyType': 'HASH'  # Partition key
+                },
+                {
+                    'AttributeName': 'SettingCategory',
+                    'KeyType': 'RANGE'  # Sort key
+                }
+            ],
+            AttributeDefinitions=[
+                {
+                    'AttributeName': 'SettingName',
+                    'AttributeType': 'S'
+                },
+                {
+                    'AttributeName': 'SettingCategory',
+                    'AttributeType': 'S'  # Sort key
+                }
+            ]
+        )
         #send an empty custom settings to test the default values
-        self.ssm_client.put_parameter(Name=os.environ["CUSTOM_SETTINGS"], Overwrite=True, Type="String", Value='{}')
+        for setting in mocked_settings:
+            self.dynamodb_client.put_item(TableName=os.environ["SETTINGS_TABLE"], 
+            Item={ 
+                'SettingName': {'S': setting["SettingName"]}, 
+                'SettingCategory': {'S': setting["SettingCategory"]}, 
+                'SettingValue': {'S': setting["SettingValue"]},
+                'DefaultValue': {'S': setting["DefaultValue"]} 
+                }
+            )
+
+    def tearDown(self):
+        self.dynamodb_client.delete_table(TableName=os.environ['SETTINGS_TABLE'])
     def test_create_unique_id(self):
         import lambda_function
 
@@ -98,7 +191,7 @@ class LambdaTest(unittest.TestCase):
         self.assertIn('Data', actual_payload)
     
         # Assert the payload values for the second call
-        self.assertEqual(actual_payload['Data'], {'BEDROCK_GUARDRAIL_ENABLE': 'false', 'ENABLE_MULTI_LANGUAGE_SUPPORT': 'false', 'LLM_GENERATE_QUERY_ENABLE': 'true', 'KNOWLEDGE_BASE_SEARCH_TYPE': 'DEFAULT', 'PII_REJECTION_ENABLED': 'false', 'EMBEDDINGS_ENABLE': 'true', 'LLM_QA_ENABLE': 'true', 'event': 'UPDATE_SETTINGS', 'ENABLE_REDACTING': 'false', 'ENABLE_REDACTING_WITH_COMPREHEND': 'false'})         
+        self.assertEqual(actual_payload['Data'], {'BEDROCK_GUARDRAIL_ENABLE': 'false', 'PREPROCESS_GUARDRAIL_ENABLE': 'false', 'POSTPROCESS_GUARDRAIL_ENABLE': 'false', 'ENABLE_MULTI_LANGUAGE_SUPPORT': 'false', 'LLM_GENERATE_QUERY_ENABLE': 'true', 'KNOWLEDGE_BASE_SEARCH_TYPE': 'DEFAULT', 'PII_REJECTION_ENABLED': 'false', 'EMBEDDINGS_ENABLE': 'true', 'LLM_QA_ENABLE': 'true', 'FALLBACK_ORDER': 'KNOWLEDGEBASE-FIRST', 'event': 'UPDATE_SETTINGS', 'ENABLE_REDACTING': 'false', 'ENABLE_REDACTING_WITH_COMPREHEND': 'false', 'KNOWLEDGE_BASE_METADATA_FILTERS_ENABLE': 'false'})         
 
     @mock.patch('requests.post')
     def test_send_metrics_connection_error(self, mock_post):
@@ -165,6 +258,8 @@ class LambdaTest(unittest.TestCase):
         event = {
                  'event': 'UPDATE_SETTINGS', 
                  'BEDROCK_GUARDRAIL_ENABLE': 'true',
+                 'PREPROCESS_GUARDRAIL_ENABLE': 'true',
+                 'POSTPROCESS_GUARDRAIL_ENABLE': 'true',
                  'ENABLE_MULTI_LANGUAGE_SUPPORT': 'false',
                  'LLM_GENERATE_QUERY_ENABLE': 'true', 
                  'KNOWLEDGE_BASE_SEARCH_TYPE': 'DEFAULT', 
@@ -172,7 +267,8 @@ class LambdaTest(unittest.TestCase):
                  'EMBEDDINGS_ENABLE': 'true',
                  'LLM_QA_ENABLE': 'true',
                  'ENABLE_REDACTING': 'true',
-                 'ENABLE_REDACTING_WITH_COMPREHEND': 'false'
+                 'ENABLE_REDACTING_WITH_COMPREHEND': 'false',
+                 'KNOWLEDGE_BASE_METADATA_FILTERS_ENABLE': 'false'
                  }
 
         mock_parameter_value = "some-uuid"

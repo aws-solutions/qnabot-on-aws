@@ -108,5 +108,66 @@ describe('when calling lambda handler function', () => {
         });
         fulfillment.handler(indexFixtures.mockRequest, null, callback);
     });
+    test('should skip middleware when _skipSteps and _skipSteps are set', done => {
+
+        preprocess.mockImplementation((req, res) => ({
+            req: { 
+                ...req,
+                _skipSteps: 3
+            },
+            res: { ...res }
+        }));
+    
+        function callback(error, data) {
+            try {
+                expect(parse).toHaveBeenCalled();
+                expect(preprocess).toHaveBeenCalled();
+                expect(query).not.toHaveBeenCalled();  // Query should be skipped
+                expect(hook).not.toHaveBeenCalled();  // Hook should be skipped
+                expect(assemble).toHaveBeenCalled();
+                expect(cache).toHaveBeenCalled();
+                expect(userInfo).toHaveBeenCalled();
+                expect(data).toEqual(indexFixtures.mockResponse.out);
+
+                done();
+            } catch (error) {
+                done(error);
+            }
+        }
+        
+        const request = {
+            _event: "mock event",
+            _settings: {},
+            _fulfillment: {},
+        };
+        
+        fulfillment.handler(request, null, callback);
+    });
+    
+    
+    
+
+    test('should not skip if _skipSteps is missing', done => {
+        function callback(error, data) {
+            try {
+                expect(parse).toHaveBeenCalled();
+                expect(preprocess).toHaveBeenCalled();
+                expect(query).toHaveBeenCalled();
+                expect(hook).toHaveBeenCalled();
+                expect(cache).toHaveBeenCalled();
+                expect(userInfo).toHaveBeenCalled();
+                expect(data).toEqual(indexFixtures.mockResponse.out);
+                done();
+            } catch (error) {
+                done(error);
+            }
+        }
+        
+        const requestWithIncompleteSkip = {
+            ...indexFixtures.mockRequest,
+        };
+        
+        fulfillment.handler(requestWithIncompleteSkip, null, callback);
+    });
 
 });

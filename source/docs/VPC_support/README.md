@@ -22,11 +22,6 @@ In order to deploy QnABot within a VPC two requirements must be met:
 1. A fully functioning VPC with a minimum of two private subnets spread over two availability zones is required.
    These private VPC subnets should have access to AWS services. 
    This can be accomplished using NAT Gateway with proper IGW configuration / routing. Other third party gateway implementations can be used that provide access to AWS services.
-     - if using Sagemaker based [text embeddings](docs/semantic_matching_using_LLM_embeddings/README.md) or [text generation](docs/LLM_Retrieval_and_generative_question_answering/README.md) you will need to create a VPC Gateway Endpoint for S3 (this is __required__ to enable SageMaker to download the model) and a VPC Interface Endpoint for SageMaker (this is _optional_; however, enables invocations of the SageMaker Runtime endpoint to remain on the VPC). 
-     Additional resources to help with configuration can be found at:
-       - [Give SageMaker Hosted Endpoints Access to Resources in Your Amazon VPC](https://docs.aws.amazon.com/sagemaker/latest/dg/host-vpc.html)
-       - [Connect to SageMaker Through a VPC Interface Endpoint](https://docs.aws.amazon.com/sagemaker/latest/dg/interface-vpc-endpoint.html)
-       - [AWS PrivateLink pricing](https://aws.amazon.com/privatelink/pricing/)
 
 2. A pre-configured VPC security group that
     1. allows inbound connections on port 443 from other addresses in the VPC CIDR block. 

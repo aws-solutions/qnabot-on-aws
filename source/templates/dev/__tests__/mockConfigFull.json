@@ -16,9 +16,9 @@
   "multiBucketDeployment": false,
   "buildType": "Custom",
   "FulfillmentConcurrency": 1,
-  "EmbeddingsApi": "SAGEMAKER",
+  "EmbeddingsApi": "BEDROCK",
   "EmbeddingsBedrockModelId": "test",
-  "LLMApi": "SAGEMAKER",
+  "LLMApi": "BEDROCK",
   "LLMBedrockModelId": "test",
   "LogRetentionPeriod": 0,
   "BedrockKnowledgeBaseId": "test",
@@ -30,10 +30,10 @@
   "AltSearchKendraIndexAuth": "test",
   "devOpenSearchNodeCount": 1,
   "EmbeddingsLambdaArn": "arn:aws:lambda:us-east-1:12345678910:function:qna-test",
-  "LLMSagemakerInstanceType": "ml.g5.12xlarge",
   "LLMLambdaArn": "arn:aws:lambda:us-east-1:12345678910:function:qna-test",
   "OpenSearchInstanceType": "m6g.large.search",
   "VPCSubnetIdList": "vpc-subnet-test",
   "VPCSecurityGroupIdList": "sg-test",
-  "XraySetting": "TRUE"
+  "XraySetting": "TRUE",
+  "EnableStreaming": "FALSE"
 }

@@ -5,19 +5,70 @@
 import os
 import unittest
 import boto3
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch, MagicMock, Mock
 from moto import mock_aws
 from datetime import datetime
 from botocore.exceptions import ClientError
+import json
 
 @mock_aws
 class TestLambdaFunction(unittest.TestCase):
+    def putDynamoDB(self, settings_object, dynamodb_client):
+
+        with open('../../lambda/cfn/lib/DefaultSettings.json', 'r') as f:
+            default_settings = json.load(f)
+            
+        
+        table_name = os.environ['SETTINGS_TABLE']
+        
+        # Process each setting
+        for setting_name, setting_value in settings_object.items():
+            # Look up default values from JSON, use Custom/blank if not found
+            default_setting = default_settings.get(setting_name, {})
+            category = default_setting.get('Category', 'Custom')
+            default_value = default_setting.get('DefaultValue', '')
+            
+            # Construct DynamoDB item
+            item = {
+                'SettingName': {'S': setting_name},
+                'SettingValue': {'S': str(setting_value)},
+                'SettingCategory': {'S': category},
+                'DefaultValue': {'S': str(default_value)}
+            }
+            
+            # Put item into DynamoDB
+            dynamodb_client.put_item(
+                TableName=table_name,
+                Item=item
+            )
+
     def setUp(self):
-        self.ssm_client = boto3.client("ssm")
-        self.ssm_client.put_parameter(Name=os.environ["CUSTOM_SETTINGS_PARAM"], Type="String", 
-                                    Value='{"ALT_SEARCH_KENDRA_MAX_DOCUMENT_COUNT":"5","ENABLE_KENDRA_WEB_INDEXER":"true"}')
-        self.ssm_client.put_parameter(Name=os.environ["DEFAULT_SETTINGS_PARAM"], Type="String", Value='{"KENDRA_WEB_PAGE_INDEX":"mock_kendra_index"}')
-        self.ssm_client.put_parameter(Name=os.environ["PRIVATE_SETTINGS_PARAM"], Type="String", Value='{"PRIVATE_SETTING":"private"}')
+        self.dynamodb_client = boto3.client("dynamodb")
+        self.dynamodb_client.create_table(
+            BillingMode='PAY_PER_REQUEST',
+            TableName=os.environ['SETTINGS_TABLE'],
+            KeySchema=[
+                {
+                    'AttributeName': 'SettingName',
+                    'KeyType': 'HASH'  # Partition key
+                },
+                {
+                    'AttributeName': 'SettingCategory',
+                    'KeyType': 'RANGE'  # Sort key
+                }
+            ],
+            AttributeDefinitions=[
+                {
+                    'AttributeName': 'SettingName',
+                    'AttributeType': 'S'
+                },
+                {
+                    'AttributeName': 'SettingCategory',
+                    'AttributeType': 'S'  # Sort key
+                }
+            ]
+        )
+        self.putDynamoDB({"ALT_SEARCH_KENDRA_MAX_DOCUMENT_COUNT":"5","ENABLE_KENDRA_WEB_INDEXER":"true", "KENDRA_WEB_PAGE_INDEX":"mock_kendra_index", "PRIVATE_SETTING":"private"}, self.dynamodb_client)
         patcher = patch('kendra_webcrawler_status.client')
         self.addCleanup(patcher.stop)
         self.kendra_client_mock = patcher.start()
@@ -63,9 +114,15 @@ class TestLambdaFunction(unittest.TestCase):
 
     def test_get_settings_parameter_not_found(self):
         from kendra_webcrawler_status import get_settings
-        with patch('kendra_webcrawler_status.ssm.get_parameter') as mock_get_parameter:
-            mock_get_parameter.side_effect = ClientError(
-                {'Error': {'Code': 'ParameterNotFound', 'Message': 'Parameter not found'}}, 'GetParameter')
+        with patch('boto3.client') as mock_client:
+            mock_dynamodb = Mock()
+            mock_client.return_value = mock_dynamodb
+            
+            # Set up the error to be raised when scan is called
+            mock_dynamodb.get_paginator.return_value.paginate.side_effect = ClientError(
+                {'Error': {'Code': 'ParameterNotFound', 'Message': 'Parameter not found'}}, 
+                'GetParameter'
+            )
             with self.assertRaises(ClientError) as context:
                 get_settings()
             self.assertEqual(context.exception.response['Error']['Code'], 'ParameterNotFound')
@@ -73,9 +130,11 @@ class TestLambdaFunction(unittest.TestCase):
 
     def test_handler_exception_throttling(self):
         from kendra_webcrawler_status import handler, CrawlerException
-        with patch('kendra_webcrawler_status.ssm.get_parameter') as mock_get_parameter:
-            mock_get_parameter.side_effect = ClientError(
-                {'Error': {'Code': 'ThrottlingException', 'Message': 'Request rate exceeded'}}, 'GetParameter')
+        with patch('boto3.client') as mock_client:
+            mock_dynamodb = Mock()
+            mock_client.return_value = mock_dynamodb
+            mock_dynamodb.get_paginator.return_value.paginate.side_effect = ClientError(
+                {'Error': {'Code': 'ParameterNotFound', 'Message': 'Request rate exceeded'}}, 'GetParameter')
             with self.assertRaises(CrawlerException) as context:
                 handler(MagicMock, MagicMock())
             self.assertEqual(str(context.exception), 'Exception: Failed to process this request. Please check the lambda logs for more further details.')

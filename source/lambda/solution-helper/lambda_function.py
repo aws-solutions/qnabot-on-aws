@@ -30,8 +30,9 @@ REQUST_TIMEOUT = 10  # in seconds
 
 
 ssm_client = boto3.client('ssm')
+dynamodb_client = boto3.client('dynamodb')
 solution_parameter = os.environ["SOLUTION_PARAMETER"]
-custom_settings_parameter = os.environ["CUSTOM_SETTINGS"]
+settings_table_name = os.environ["SETTINGS_TABLE"]
 
 def get_parameter(parameter_name):
     try:
@@ -47,6 +48,38 @@ def get_parameter(parameter_name):
         code = e.response['Error']['Code']
         logger.exception(f"Error while getting parameter {parameter_name}: {code}:{message}")
         raise e
+
+def get_settings():
+    settings = {}
+    
+    try:
+        paginator = dynamodb_client.get_paginator('scan')
+        pages = paginator.paginate(
+            TableName=os.environ['SETTINGS_TABLE'],
+            FilterExpression='SettingCategory <> :private AND SettingCategory <> :custom',
+            ExpressionAttributeValues={
+                ':private': {'S': 'private'},
+                ':custom': {'S': 'custom'},
+            }
+        )
+
+        items = []
+        for page in pages:
+            items.extend(page['Items'])
+        
+    except ClientError as error:
+        print(f"Error: {error}")
+        raise error
+
+    for item in items:
+        setting_name = item['SettingName']['S']
+        setting_value = item['SettingValue'].get('S') or item['SettingValue'].get('N')
+        default_value = item['DefaultValue'].get('S') or item['DefaultValue'].get('N')
+        
+        # Use setting_value if not empty, otherwise use default_value
+        settings[setting_name] = setting_value if setting_value is not None else default_value
+            
+    return settings
     
 def update_parameter(parameter_name, new_parameter_value):
     try:
@@ -82,6 +115,16 @@ def custom_map(settings):
         c_map['BEDROCK_GUARDRAIL_ENABLE'] = 'true'
     else:
         c_map['BEDROCK_GUARDRAIL_ENABLE'] = 'false'
+        
+    if settings.get('PREPROCESS_GUARDRAIL_IDENTIFIER') and settings.get('PREPROCESS_GUARDRAIL_VERSION'):
+        c_map['PREPROCESS_GUARDRAIL_ENABLE'] = 'true'
+    else:
+        c_map['PREPROCESS_GUARDRAIL_ENABLE'] = 'false'
+        
+    if settings.get('POSTPROCESS_GUARDRAIL_IDENTIFIER') and settings.get('POSTPROCESS_GUARDRAIL_VERSION'):
+        c_map['POSTPROCESS_GUARDRAIL_ENABLE'] = 'true'
+    else:
+        c_map['POSTPROCESS_GUARDRAIL_ENABLE'] = 'false'
 
     c_map['ENABLE_MULTI_LANGUAGE_SUPPORT'] = settings.get('ENABLE_MULTI_LANGUAGE_SUPPORT', 'false')
     c_map['LLM_GENERATE_QUERY_ENABLE'] = settings.get('LLM_GENERATE_QUERY_ENABLE', 'true')
@@ -89,8 +132,13 @@ def custom_map(settings):
     c_map['PII_REJECTION_ENABLED'] = settings.get('PII_REJECTION_ENABLED', 'false')
     c_map['EMBEDDINGS_ENABLE'] = settings.get('EMBEDDINGS_ENABLE', 'true')
     c_map['LLM_QA_ENABLE'] = settings.get('LLM_QA_ENABLE', 'true')
+    c_map['FALLBACK_ORDER'] = settings.get('FALLBACK_ORDER', 'KNOWLEDGEBASE-FIRST')
     c_map['ENABLE_REDACTING'] = settings.get('ENABLE_REDACTING', 'false')
     c_map['ENABLE_REDACTING_WITH_COMPREHEND'] = settings.get('ENABLE_REDACTING_WITH_COMPREHEND', 'false')
+    if settings.get('KNOWLEDGE_BASE_METADATA_FILTERS') and settings.get('KNOWLEDGE_BASE_METADATA_FILTERS') != "{}":
+        c_map['KNOWLEDGE_BASE_METADATA_FILTERS_ENABLE'] = 'true'
+    else:
+        c_map['KNOWLEDGE_BASE_METADATA_FILTERS_ENABLE'] = 'false'
 
     return c_map
 
@@ -113,18 +161,17 @@ def custom_resource(event, _):
             metrics_data = _sanitize_data(copy(resource_properties))
             metrics_data["RequestType"] = request_type
 
-            solutionId = resource_properties["SolutionId"]
+            solution_id = resource_properties["SolutionId"]
             solution_uuid = resource_properties["UUID"]
             update_parameter(solution_parameter, solution_uuid)
-            send_metrics_request(metrics_data, solutionId, solution_uuid)
+            send_metrics_request(metrics_data, solution_id, solution_uuid)
 
             # also send the settings as 'event': 'UPDATE_SETTINGS'
             try:
-                custom_settings = get_parameter(custom_settings_parameter)
-                custom_settings_data = json.loads(custom_settings)
-                custom_data = custom_map(custom_settings_data)
+                custom_settings = get_settings()
+                custom_data = custom_map(custom_settings)
                 custom_data["event"]="UPDATE_SETTINGS"
-                send_metrics_request(custom_data, solutionId, solution_uuid)
+                send_metrics_request(custom_data, solution_id, solution_uuid)
             except (ValueError, TypeError):
                 print("Error parsing custom settings, skipping custom data sending.")
             
@@ -135,10 +182,10 @@ def custom_resource(event, _):
     else:
         raise ValueError(f"Unknown resource: {resource}")
 
-def send_metrics_request(metrics_data, solutionId, solution_uuid):
+def send_metrics_request(metrics_data, solution_id, solution_uuid):
     headers = {"Content-Type": "application/json"}
     payload = {
-                "Solution": solutionId,
+                "Solution": solution_id,
                 "UUID": solution_uuid,
                 "TimeStamp": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%S.%f"),
                 "Data": metrics_data,
@@ -157,6 +204,6 @@ def handler(event, context):
         helper(event, context)
     else:
         if "event" in event:
-            solutionId = os.environ["SOLUTION_ID"]
+            solution_id = os.environ["SOLUTION_ID"]
             solution_uuid = get_parameter(solution_parameter)
-            send_metrics_request(event, solutionId, solution_uuid)
+            send_metrics_request(event, solution_id, solution_uuid)

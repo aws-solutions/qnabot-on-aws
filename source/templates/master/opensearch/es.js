@@ -21,7 +21,7 @@ const properties = {
   EBSOptions: {
     EBSEnabled: true,
     VolumeSize: { Ref: 'OpenSearchEBSVolumeSize' },
-    VolumeType: 'gp2',
+    VolumeType: 'gp3',
   },
   EngineVersion: 'OpenSearch_2.11',
   SnapshotOptions: {

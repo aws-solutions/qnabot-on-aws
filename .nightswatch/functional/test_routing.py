@@ -157,7 +157,7 @@ class TestRouting:
 
         chat_page.send_message(question['q'][0])
         answer = chat_page.get_messages()
-        assert 'HERE IS A SESSION ATTRIBUTE. Welcome back to QnABot.You just received a session attribute from test bot.' in answer
+        assert 'HERE IS A SESSION ATTRIBUTE. Welcome back to QnABot. You just received a session attribute from test bot.' in answer
         cw_client.print_fulfillment_lambda_logs()
 
     def test_bot_cleanup(self, lex_client: LexClient, iam_client: IamClient):

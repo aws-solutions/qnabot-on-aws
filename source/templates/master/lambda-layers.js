@@ -21,12 +21,7 @@ module.exports = {
                     '-',
                     [
                         'CommonModules',
-                        {
-                            'Fn::Select': [
-                                2,
-                                { 'Fn::Split': ['-', { Ref: 'DefaultQnABotSettings' }] },
-                            ],
-                        },
+                        { 'Fn::Select': ['0', { 'Fn::Split': ['-', { Ref: 'AWS::StackName' }] }] }
                     ],
                 ],
             },
@@ -57,12 +52,7 @@ module.exports = {
                     '-',
                     [
                         'QnABotCommon',
-                        {
-                            'Fn::Select': [
-                                2,
-                                { 'Fn::Split': ['-', { Ref: 'DefaultQnABotSettings' }] },
-                            ],
-                        },
+                        { 'Fn::Select': ['0', { 'Fn::Split': ['-', { Ref: 'AWS::StackName' }] }] },
                     ],
                 ],
             },
@@ -98,12 +88,7 @@ module.exports = {
                     '-',
                     [
                         'AwsSdk',
-                        {
-                            'Fn::Select': [
-                                2,
-                                { 'Fn::Split': ['-', { Ref: 'DefaultQnABotSettings' }] },
-                            ],
-                        },
+                        { 'Fn::Select': ['0', { 'Fn::Split': ['-', { Ref: 'AWS::StackName' }] }] },
                     ],
                 ],
             },
@@ -127,12 +112,7 @@ module.exports = {
                     '-',
                     [
                         'CfnLambdaModule',
-                        {
-                            'Fn::Select': [
-                                2,
-                                { 'Fn::Split': ['-', { Ref: 'DefaultQnABotSettings' }] },
-                            ],
-                        },
+                        { 'Fn::Select': ['0', { 'Fn::Split': ['-', { Ref: 'AWS::StackName' }] }] },
                     ],
                 ],
             },
@@ -161,12 +141,7 @@ module.exports = {
                     '-',
                     [
                         'EsProxy',
-                        {
-                            'Fn::Select': [
-                                2,
-                                { 'Fn::Split': ['-', { Ref: 'DefaultQnABotSettings' }] },
-                            ],
-                        },
+                        { 'Fn::Select': ['0', { 'Fn::Split': ['-', { Ref: 'AWS::StackName' }] }] }
                     ],
                 ],
             },

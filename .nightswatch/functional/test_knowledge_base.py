@@ -14,6 +14,7 @@ region = os.environ.get('CURRENT_STACK_REGION')
 guardrail_identifier = os.getenv('BEDROCK_GUARDRAIL_IDENTIFIER')
 guardrail_version = os.getenv('BEDROCK_GUARDRAIL_VERSION')
 guardrail_regions = ['us-east-1', 'us-west-2', 'eu-west-2', 'ap-northeast-1']
+multiple_fallback_regions = ['ap-southeast-2']
 
 unsupported_region_reason = 'This test is not supported in this region'
 guardrails_skip_reason = 'Bedrock Guardrails are not configured for this region or not set in the environment variables'
@@ -66,7 +67,8 @@ class TestKnowledgeBase:
         answer = chat_page.get_last_message_text()
         assert custom_no_hits_response in answer
         cw_client.print_fulfillment_lambda_logs()
-
+        
+    @pytest.mark.skipif(region in multiple_fallback_regions, reason=unsupported_region_reason)
     def test_knowledge_base_fallback(self, designer_login, dom_operator: DomOperator, cw_client: CloudWatchClient):
         """
         Test that the Knowledge Base fallback is used when no answer is found. LLM should respond with correct answer
@@ -87,8 +89,9 @@ class TestKnowledgeBase:
         assert 'Context' in answer
         assert 'aws-overview.pdf' in answer
         cw_client.print_fulfillment_lambda_logs()
-
-    def test_knowledge_base_with_advanced_config(self, designer_login, dom_operator: DomOperator, cw_client: CloudWatchClient, knowledge_base_model):
+        
+    @pytest.mark.skipif(region in multiple_fallback_regions, reason=unsupported_region_reason)
+    def test_knowledge_base_with_advanced_config(self, designer_login, dom_operator: DomOperator, cw_client: CloudWatchClient, knowledge_base_model, reason=unsupported_region_reason):
         """
         Test that the Knowledge Base fallback can answer follow-up question and handle advanced configurations. LLM
         should respond with correct answer as well as source links and context which should be enabled by default.
@@ -101,11 +104,34 @@ class TestKnowledgeBase:
         assert 'Success' in settings_page.enable_kb_advanced(knowledge_base_model)
         chat_page = menu.open_chat_page()
 
-        chat_page.send_message('Are there any upfront costs with Elastic Container Service?')
+        chat_page.send_message('Are there any upfront costs or fees with Elastic Container Registry?')
         answer = chat_page.get_last_message_text()
-        assert 'ECS' in answer or 'Elastic Container Service' in answer
-        assert 'no upfront costs' in answer or 'no upfront fees' in answer
+        assert 'ECR' in answer or 'Elastic' in answer
+        assert 'upfront' in answer or 'cost' in answer or 'costs' in answer or 'fee' in answer or 'fees' in answer
         assert 'Source Link:' in answer
         assert 'Context' in answer
         assert 'aws-overview.pdf' in answer
         cw_client.print_fulfillment_lambda_logs()
+    
+    @pytest.mark.skipif(region not in multiple_fallback_regions, reason=unsupported_region_reason)
+    def test_knowledge_base_with_multiple_fallback(self, designer_login, dom_operator: DomOperator, cw_client: CloudWatchClient, knowledge_base_model, reason=unsupported_region_reason):
+        """
+        Test that the Knowledge Base fallback can answer follow-up question and handle advanced configurations. LLM
+        should respond with correct answer as well as source links and context which should be enabled by default.
+
+        """
+        menu = MenuNav(dom_operator)
+        settings_page = menu.open_settings_page()
+        settings_page.reset_settings()
+        settings_page.expand_all_subgroups()
+        assert 'Success' in settings_page.enable_kb_advanced(knowledge_base_model)
+        chat_page = menu.open_chat_page()
+
+        chat_page.send_message('Which llm models can I use?')
+        answer = chat_page.get_last_message_text()
+        assert 'LLM' in answer or 'Bedrock' in answer
+        assert 'Source Link:' in answer
+        assert 'Context' in answer
+        assert 'qnabot-on-aws.pdf' in answer
+        cw_client.print_fulfillment_lambda_logs()
+

@@ -156,12 +156,7 @@ module.exports = Object.assign(
                         '-',
                         [
                             'JsLambdaHookSDK',
-                            {
-                                'Fn::Select': [
-                                    2,
-                                    { 'Fn::Split': ['-', { Ref: 'DefaultQnABotSettings' }] },
-                                ],
-                            },
+                            { 'Fn::Select': ['0', { 'Fn::Split': ['-', { Ref: 'AWS::StackName' }] }] }
                         ],
                     ],
                 },

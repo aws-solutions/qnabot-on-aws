@@ -13,13 +13,15 @@ const { runKendraQuery } = require('../../lib/fulfillment-event/runKendraQuery')
 const { encryptor } = require('../../lib/fulfillment-event/encryptor');
 const { runLlmQa } = require('../../lib/fulfillment-event/runLlmQa');
 const { getHit } = require('../../lib/fulfillment-event/getHit');
+const { bedrockRetrieveAndGenerate } = require('../../lib/bedrock/bedrockAgents');
 
 const { 
     req,
     res,
     kendraQueryResponse,
     esQueryResponse,
-    kendraFallbackResult
+    kendraFallbackResult,
+    bedrockResult,
 } = require('./getHit.fixtures')
 
 jest.mock('qnabot/settings');
@@ -35,6 +37,7 @@ jest.mock('../../lib/fulfillment-event/invokeLambda');
 jest.mock('../../lib/fulfillment-event/runKendraQuery');
 jest.mock('../../lib/fulfillment-event/runLlmQa');
 jest.mock('../../lib/fulfillment-event/encryptor');
+jest.mock('../../lib/bedrock/bedrockAgents');
 
 describe('getHit', () => {
     beforeEach(() => {
@@ -471,5 +474,157 @@ describe('getHit', () => {
         expect(responseHit).toBe(undefined);
         expect(responseErrors).toStrictEqual([{msg: 'error'}]);
         expect(kendra_fallback.handler).toHaveBeenCalledTimes(1);
+    });
+
+    test('kendra as first fallback', async () => {
+        open_es.isESonly.mockImplementation(() => {
+            return false;
+        });
+        open_es.run_query_es.mockImplementation(() => {
+            return esQueryResponse;
+        });
+        open_es.isQuestionAllStopwords.mockImplementation(() => {
+            return false;
+        });
+        runKendraQuery.mockImplementation(() => {
+            return kendraQueryResponse;
+        });
+        kendra_retrieve.handler.mockImplementation(() => {
+            return kendraFallbackResult;
+        });
+        runLlmQa.mockImplementation((req, hit) => {
+            return [hit, []];
+        });
+
+        bedrockRetrieveAndGenerate.mockImplementation((req, res) => {
+            return [bedrockResult,    {
+                _userInfo: { knowledgeBaseSessionId: "newSessionId" },
+                got_hits: 1,
+                session: { qnabot_gotanswer: true },
+            }];
+        });
+
+        const expectedResult = _.cloneDeep(kendraFallbackResult);
+        req._settings.KNOWLEDGE_BASE_ID = 'kb-id'
+        req._settings.KNOWLEDGE_BASE_MODEL_ID = 'model-id'
+        req._settings.FALLBACK_ORDER = 'KENDRA-FIRST'
+
+        const [responseReq, responseRes, responseHit, responseErrors] = await getHit(req, res);
+        expect(responseHit).toStrictEqual(expectedResult);
+        expect(responseErrors).toStrictEqual([]);
+        expect(kendra_retrieve.handler).toHaveBeenCalledTimes(1);
+        expect(bedrockRetrieveAndGenerate).toHaveBeenCalledTimes(0);
+    });
+
+    test('kendra as second fallback', async () => {
+        open_es.isESonly.mockImplementation(() => {
+            return false;
+        });
+        open_es.run_query_es.mockImplementation(() => {
+            return esQueryResponse;
+        });
+        open_es.isQuestionAllStopwords.mockImplementation(() => {
+            return false;
+        });
+        runKendraQuery.mockImplementation(() => {
+            return kendraQueryResponse;
+        });
+        kendra_retrieve.handler.mockImplementation(() => {
+            return kendraFallbackResult;
+        });
+        runLlmQa.mockImplementation((req, hit) => {
+            return [hit, []];
+        });
+
+        bedrockRetrieveAndGenerate.mockImplementation((req, res) => {
+            return [bedrockResult, undefined];
+        });
+
+        const expectedResult = _.cloneDeep(kendraFallbackResult);
+        req._settings.KNOWLEDGE_BASE_ID = 'kb-id'
+        req._settings.KNOWLEDGE_BASE_MODEL_ID = 'model-id'
+        req._settings.FALLBACK_ORDER = 'KNOWLEDGEBASE-FIRST'
+
+        const [responseReq, responseRes, responseHit, responseErrors] = await getHit(req, res);
+        expect(responseHit).toStrictEqual(expectedResult);
+        expect(responseErrors).toStrictEqual([]);
+        expect(kendra_retrieve.handler).toHaveBeenCalledTimes(1);
+        expect(bedrockRetrieveAndGenerate).toHaveBeenCalledTimes(1);
+    });
+
+    test('knowledgebase as first fallback', async () => {
+        open_es.isESonly.mockImplementation(() => {
+            return false;
+        });
+        open_es.run_query_es.mockImplementation(() => {
+            return esQueryResponse;
+        });
+        open_es.isQuestionAllStopwords.mockImplementation(() => {
+            return false;
+        });
+        runKendraQuery.mockImplementation(() => {
+            return kendraQueryResponse;
+        });
+        kendra_retrieve.handler.mockImplementation(() => {
+            return kendraFallbackResult;
+        });
+        runLlmQa.mockImplementation((req, hit) => {
+            return [hit, []];
+        });
+
+        bedrockRetrieveAndGenerate.mockImplementation((req, res) => {
+            return [bedrockResult, {
+                _userInfo: { knowledgeBaseSessionId: "newSessionId" },
+                got_hits: 1,
+                session: { qnabot_gotanswer: true },
+            }];
+        });
+
+        const expectedResult = _.cloneDeep(bedrockResult);
+        req._settings.KNOWLEDGE_BASE_ID = 'kb-id'
+        req._settings.KNOWLEDGE_BASE_MODEL_ID = 'model-id'
+        req._settings.FALLBACK_ORDER = 'KNOWLEDGEBASE-FIRST'
+
+        const [responseReq, responseRes, responseHit, responseErrors] = await getHit(req, res);
+        expect(responseHit).toStrictEqual({"_userInfo": {"knowledgeBaseSessionId": "newSessionId"}, "args": [], "got_hits": 1, "l": "", "session": {"qnabot_gotanswer": true}});
+        expect(responseErrors).toStrictEqual([]);
+        expect(kendra_retrieve.handler).toHaveBeenCalledTimes(0);
+        expect(bedrockRetrieveAndGenerate).toHaveBeenCalledTimes(1);
+    });
+
+    test('knowledgebase as second fallback', async () => {
+        open_es.isESonly.mockImplementation(() => {
+            return false;
+        });
+        open_es.run_query_es.mockImplementation(() => {
+            return esQueryResponse;
+        });
+        open_es.isQuestionAllStopwords.mockImplementation(() => {
+            return false;
+        });
+        runKendraQuery.mockImplementation(() => {
+            return kendraQueryResponse;
+        });
+        kendra_retrieve.handler.mockImplementation(() => {
+            return kendraFallbackResult;
+        });
+        runLlmQa.mockImplementation((req, hit) => {
+            return [hit, []];
+        });
+
+        bedrockRetrieveAndGenerate.mockImplementation((req, res) => {
+            return [bedrockResult, undefined];
+        });
+
+        const expectedResult = _.cloneDeep(kendraFallbackResult);
+        req._settings.KNOWLEDGE_BASE_ID = 'kb-id'
+        req._settings.KNOWLEDGE_BASE_MODEL_ID = 'model-id'
+        req._settings.FALLBACK_ORDER = 'KNOWLEDGEBASE-FIRST'
+
+        const [responseReq, responseRes, responseHit, responseErrors] = await getHit(req, res);
+        expect(responseHit).toStrictEqual(expectedResult);
+        expect(responseErrors).toStrictEqual([]);
+        expect(kendra_retrieve.handler).toHaveBeenCalledTimes(1);
+        expect(bedrockRetrieveAndGenerate).toHaveBeenCalledTimes(1);
     });
 })

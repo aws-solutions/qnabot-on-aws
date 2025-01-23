@@ -28,8 +28,6 @@ module.exports = {
                 VPCSubnetIdList: { 'Fn::Join': [',', { Ref: 'VPCSubnetIdList' }] },
                 VPCSecurityGroupIdList: { 'Fn::Join': [',', { Ref: 'VPCSecurityGroupIdList' }] },
                 XraySetting: { Ref: 'XraySetting' },
-                DefaultQnABotSettings: { Ref: 'DefaultQnABotSettings' },
-                PrivateQnABotSettings: { Ref: 'PrivateQnABotSettings' },
                 InstallLexResponseBots: { Ref: 'InstallLexResponseBots' },
                 AwsSdkLayerLambdaLayer: { Ref: 'AwsSdkLayerLambdaLayer' },
                 LogRetentionPeriod: { Ref: 'LogRetentionPeriod' },

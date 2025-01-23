@@ -81,7 +81,6 @@ module.exports = {
             }
 
             async function poll() {
-                // console.log('poll starting');
                 // get status file
                 const status = await self.$store.dispatch('api/getExportByJobId', 'qna-kendra-faq.txt');
                 console.log(status.status);

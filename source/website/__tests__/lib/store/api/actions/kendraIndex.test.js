@@ -12,15 +12,6 @@ describe('kendraIndex action test', () => {
         jest.spyOn(console, 'log').mockImplementation(jest.fn());
     });
 
-    test('startKendraIndexing', () => {
-        kendraIndexModule.startKendraIndexing(mockedContext, {});
-        expect(mockedContext.dispatch).toHaveBeenCalledTimes(1);
-        expect(mockedContext.dispatch).toHaveBeenCalledWith('_request', {
-            url: `${mockedContext.rootState.info._links.crawler.href}/start?message=start&topic=${mockedContext.rootState.info.KendraCrawlerSnsTopic}`,
-            method: 'post',
-        });
-    });
-
     test('startKendraV2Indexing', () => {
         kendraIndexModule.startKendraV2Indexing(mockedContext, {});
         expect(mockedContext.dispatch).toHaveBeenCalledTimes(1);

@@ -26,20 +26,14 @@
 [ "$DEBUG" == 'true' ] && set -x
 set -e
 
-venv_folder="./.venv-test"
-
-setup_python_env() {
-    if [ -d "$venv_folder" ]; then
-        echo "Re-using Python venv in $venv_folder"
-        return
-    fi
-    python3 -m venv $venv_folder
-    source $venv_folder/bin/activate
-	[ -e "requirements.txt" ] && pip3 install -q -r requirements.txt
-	[ -e "requirements-test.txt" ] && pip3 install -q -r requirements-test.txt
-	[ -e "requirements-dev.txt" ] && pip3 install -q -r requirements-dev.txt
-    deactivate
-}
+if command -v poetry >/dev/null 2>&1; then
+    POETRY_COMMAND="poetry"
+elif [ -n "$POETRY_HOME" ] && [ -x "$POETRY_HOME/bin/poetry" ]; then
+    POETRY_COMMAND="$POETRY_HOME/bin/poetry"
+else
+    echo "Poetry is not available. Aborting script." >&2
+    exit 1
+fi
 
 run_python_unit_test() {
 	directory=$1
@@ -48,12 +42,8 @@ run_python_unit_test() {
 	echo "[Test] Python : $directory, $description"
 	echo "------------------------------------------------------------------------------"
 
-	[ "${CLEAN:-true}" = "true" ] && rm -fr .venv-test
-
-	setup_python_env
-
-	echo "Initiating virtual environment"
-	source .venv-test/bin/activate
+	"$POETRY_COMMAND" install
+	source $("$POETRY_COMMAND" env info --path)/bin/activate
 
 	# setup coverage report path
 	mkdir -p $source_dir/test/coverage-reports
@@ -73,7 +63,6 @@ run_python_unit_test() {
 	deactivate
 
 	if [ "${CLEAN:-true}" = "true" ]; then
-		rm -fr .venv-test
 		# Note: leaving $source_dir/test/coverage-reports to allow further processing of coverage reports
 		rm -fr coverage
 		rm .coverage
@@ -174,7 +163,7 @@ for folder in */ ; do
     cd "$folder"
     function_name=${PWD##*/}
 
-    if [ -e "requirements.txt" ]; then
+    if [ -e "pyproject.toml" ]; then
         run_python_unit_test $function_name
     fi
 
@@ -192,8 +181,8 @@ run_javascript_lambda_test js_lambda_hook_sdk "JS Lambda Hook SDK Unit Tests"
 run_javascript_lambda_test qnabot-common-layer "QnaBot Common Layer Lambda Unit Tests"
 run_javascript_lambda_test schema "Schema Lambda Unit Tests"
 run_javascript_lambda_test translate "Translate Lambda Unit Tests"
-run_javascript_lambda_test fulfillment "Fulfillment Lambda Unit Tests"
 run_javascript_lambda_test es-proxy-layer "ES Proxy Layer Unit Tests"
+run_javascript_lambda_test fulfillment "Fulfillment Lambda Unit Tests"
 run_javascript_lambda_test cfn "CFN Lambda Unit Tests"
 run_javascript_lambda_test lex-build "Lex Build unit tests"
 run_javascript_lambda_test testall "Testall Lambda Unit Tests"
@@ -211,9 +200,9 @@ echo "Running Templates Python unit tests"
  
 python_directories=("$source_dir/templates/examples/examples/py" "$source_dir/templates/examples/extensions/py_lambda_hooks/CustomPYHook")
 for folder in "${python_directories[@]}" ; do
-    cd "$folder"
-    function_name=${PWD##*/}
-	run_python_unit_test $function_name
+cd "$folder"
+function_name=${PWD##*/}
+run_python_unit_test $function_name
 done
 
 echo "Running website unit tests"

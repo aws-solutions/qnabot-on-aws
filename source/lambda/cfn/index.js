@@ -26,7 +26,8 @@ const targets = {
     S3Unzip: require('./lib/S3Unzip'),
     S3Version: require('./lib/S3Version'),
     Variable: require('./lib/Variable'),
-    OpenSearchUpdates: require('./lib/OpenSearchUpdates')
+    OpenSearchUpdates: require('./lib/OpenSearchUpdates'),
+    SettingsInitializer: require('./lib/SettingsInitializer')
 };
 const Lex = require('./lib/lex');
 

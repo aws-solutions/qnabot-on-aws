@@ -1578,6 +1578,63 @@ sax under the ISC license.
 @langchain/textsplitters under the MIT license.
 openai under the Apache-2.0 license.
 mustache under the MIT license.
+jwt-decode under the MIT license.
+@vitest/expect under the MIT license.
+@vitest/spy under the MIT license.
+@vitest/utils under the MIT license.
+@vitest/pretty-format under the MIT license.
+tinyspy under the MIT license.
+tinyrainbow under the MIT license.
+loupe under the MIT license.
+chai under the MIT license.
+assertion-error under the MIT license.
+check-error under the MIT license.
+deep-eql under the MIT license.
+pathval under the MIT license.
+component-emitter under the MIT license.
+lodash.includes under the MIT license.
+lodash.isboolean under the MIT license.
+lodash.isinteger under the MIT license.
+lodash.isnumber under the MIT license.
+lodash.isstring under the MIT license.
+lodash.once under the MIT license.
+json11 under the MIT license.
+charset-normalizer under the MIT license.
+exceptiongroup under the MIT license.
+six under the MIT license.
+tomli under the MIT license.
+urllib3 under the MIT license.
+attrs under the MIT license.
+et-xmlfile under the MIT license.
+openpyxl under the MIT license.
+jsonschema-specifications under the MIT license.
+pytz under the MIT license.
+referencing under the MIT license.
+rpds-py under the MIT license.
+utilx under the MIT license.
+@aws-sdk/client-apigatewaymanagementapi under the Apache-2.0 license.
+cryptography under the Apache-2.0 license.
+responses under the Apache-2.0 license.
+s3transfer under the Apache-2.0 license.
+jsonschema-path under the Apache-2.0 license.
+tzdata under the Apache-2.0 license.
+pathable under the Apache-2.0 license.
+websocket-client under the Apache-2.0 license.
+certifi under the MPL-2.0 license.
+colorama under the BSD license.
+idna under the BSD license.
+jinja2 under the BSD license.
+werkzeug under the BSD license.
+markupsafe under the BSD license.
+packaging under the BSD license.
+pycparser under the BSD license.
+python-dateutil under the BSD license.
+click under the BSD license.
+lazy-object-proxy under the BSD license.
+numpy under the BSD license.
+openapi-schema-validator under the BSD license.
+pandas under the BSD license.
+pywin32 under the PSF-2.0 license.
 
 ********************
 OPEN SOURCE LICENSES
@@ -1585,6 +1642,7 @@ OPEN SOURCE LICENSES
 
 0BSD - https://spdx.org/licenses/0BSD.html
 Apache-2.0 - https://spdx.org/licenses/Apache-2.0.html
+Artistic-2.0 - https://spdx.org/licenses/Artistic-2.0.html
 BSD-2-Clause - https://spdx.org/licenses/BSD-2-Clause.html
 BSD-3-Clause - https://spdx.org/licenses/BSD-3-Clause.html
 BlueOak-1.0.0 - https://spdx.org/licenses/BlueOak-1.0.0.html
@@ -1595,6 +1653,7 @@ ISC - https://spdx.org/licenses/ISC.html
 MIT - https://spdx.org/licenses/MIT.html
 MPL-2.0 - https://spdx.org/licenses/MPL-2.0.html
 OFL-1.1 - https://spdx.org/licenses/OFL-1.1.html
+PSF-2.0 - https://spdx.org/licenses/PSF-2.0.html
 Python-2.0 - https://spdx.org/licenses/Python-2.0.html
 Unlicense - https://spdx.org/licenses/Unlicense.html
 Zlib - https://spdx.org/licenses/Zlib.html

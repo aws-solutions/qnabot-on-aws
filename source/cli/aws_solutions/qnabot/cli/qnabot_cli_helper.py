@@ -9,6 +9,7 @@ import datetime
 import time
 import sys
 from enum import Enum
+import pandas as pd
 
 import click
 from botocore.exceptions import ClientError
@@ -75,12 +76,16 @@ def initiate_import(
         response = s3_client.put_object(
             Bucket=str_import_bucket_name, Key=f"options/{os.path.basename(source_filename)}", Body=str_import_options
         )
-
         if file_format == "JSON":
             str_file_contents = convert_json_to_jsonl(
                 source_filename
             )  # convert to JSON Lines format (if input is JSON format)
             # upload the contents of the converted json file to S3
+            response = s3_client.put_object(
+                Bucket=str_import_bucket_name, Key=f"data/{os.path.basename(source_filename)}", Body=str_file_contents
+            )
+        elif file_format == "XLSX":
+            str_file_contents= convert_xlsx_to_jsonl(source_filename)
             response = s3_client.put_object(
                 Bucket=str_import_bucket_name, Key=f"data/{os.path.basename(source_filename)}", Body=str_file_contents
             )
@@ -275,7 +280,6 @@ def get_import_status(bucket: str, source_filename: str, importdatetime: datetim
         key = f"status-import/{os.path.basename(source_filename)}"
         #logger.debug(f"Getting import status for {bucket=} {key=}")
         response = s3_client.get_object(Bucket=bucket, Key=key, IfModifiedSince=importdatetime)
-
         obj_status_details = json.loads(response["Body"].read().decode("utf-8"))  # read object body
 
         return_response = {
@@ -311,7 +315,6 @@ def get_import_status(bucket: str, source_filename: str, importdatetime: datetim
             status="Error",
             show_error=True,
         )
-
 
 def get_export_status(bucket: str, export_filename: str, exportdatetime: datetime):
     """
@@ -370,7 +373,7 @@ def convert_json_to_jsonl(source_filename: str):
             str_file_contents = json.loads(str_file_contents)
             str_lines = ""
             for entry in str_file_contents["qna"]:
-                str_lines = str_lines + json.dumps(entry) + "\n"
+                str_lines = str_lines + json.dumps(entry, ensure_ascii=False) + "\n"
             return str_lines
         except json.decoder.JSONDecodeError as err_exception:
             return error_response(
@@ -405,6 +408,150 @@ def convert_json_to_jsonl(source_filename: str):
             show_error=True,
         )
 
+def convert_xlsx_to_jsonl(source_filename: str):
+    """
+    Convert to JSON Lines format
+    :param source_filename: import directory and filename
+    :return: file contents
+    """
+
+    error_msg = f"There was an error reading the file. {source_filename}. Check the file format and try again."
+    # Header mapping for friendly names
+    try:
+        xl = pd.ExcelFile(source_filename)
+        sheet_names = xl.sheet_names
+        logger.info(f'sheetNames:: {sheet_names}')
+
+        jsonl_string = ""
+        for sheet_name in sheet_names:
+            logger.info(f'Reading data from sheet:: {sheet_name}')
+            df = pd.read_excel(source_filename, sheet_name=sheet_name)
+            jsonl_string += process_excel_data_frame(df)
+        return jsonl_string
+    except FileNotFoundError as err:
+        return error_response(
+                error_code="",
+                message=str(err),
+                comments=error_msg,
+                status="Error",
+                show_error=True,
+            )
+    except Exception as err:
+        return error_response(
+                error_code="",
+                message=str(err),
+                comments=f"There was an error processing file {source_filename}",
+                status="Error",
+                show_error=True,
+            )
+
+def process_excel_data_frame(df):
+    jsonl_string = ""
+    for excel_row_number, row in df.iterrows():
+        try:
+            question = row.dropna().to_dict()
+            logger.debug(f'Processing record:: {question}')
+
+            # Map friendly names to actual property names
+            map_excel_headers_to_question_fields(question)
+
+            extract_questions(question)
+
+            # Validate question
+            if not question.get('qid'):
+                logger.warning(f'Warning: No QID found for line {excel_row_number + 2}. Skipping.')
+                continue
+            if ' ' in str(question['qid']):
+                logger.warning(f'Warning: QID in line {excel_row_number + 2} must have no spaces. Skipping.')
+                continue
+            if not question.get('q'):
+                logger.warning(f'Warning: No questions found for QID: {question["qid"]}. Skipping.')
+                continue
+            if not question.get('a') or not str(question['a']).strip():
+                logger.warning(f'Warning: No answer found for QID: {question["qid"]}. Skipping.')
+                continue
+
+            # Process card if present
+            process_card_properties(question)
+                    
+            # Handle nested properties (dots)
+            props_to_process = [prop for prop in question if '.' in prop]
+            handle_dot_properties(question, props_to_process)
+            logger.debug(f'Processed {question}')
+            jsonl_string += json.dumps(question, ensure_ascii=False) + "\n"
+        except Exception as row_err:
+            logger.error(f'Error processing row {excel_row_number + 2}: {str(row_err)}')
+            continue
+    return jsonl_string
+
+def map_excel_headers_to_question_fields(question):
+    header_mapping = {
+        'question': 'q',
+        'topic': 't',
+        'markdown': 'alt.markdown',
+        'answer': 'a',
+        'Answer': 'a',
+        'ssml': 'alt.ssml',
+    }
+    for prop, dest_prop in header_mapping.items():
+        if prop in question and dest_prop not in question:
+            question[dest_prop] = question[prop]
+            del question[prop]
+
+def process_card_properties(question):
+    if 'cardtitle' in question:
+        question['r'] = {'title': question['cardtitle']}
+        del question['cardtitle']
+        if 'imageurl' in question:
+            question['r']['imageUrl'] = question['imageurl']
+            del question['imageurl']
+        if 'cardsubtitle' in question:
+            question['r']['subTitle'] = question['cardsubtitle']
+            del question['cardsubtitle']
+
+def extract_questions(question):
+    questions = [question.get('q', '')] if 'q' in question else []
+    counter = 1
+    while True:
+        question_key = f'question{counter}'
+        if question_key not in question:
+            break
+        user_question = question[question_key]
+        if user_question:
+            questions.append(str(user_question).replace('\r\n', ' ').replace('\n', ' ').replace('\r', ' '))
+        del question[question_key]
+        counter += 1
+    question['q'] = [q for q in questions if q]
+
+def handle_dot_properties(question, props_to_process):
+    for prop in props_to_process:
+        handle_dot_property(question, prop)
+
+def handle_dot_property(question, prop):
+    value = question[prop]
+    del question[prop]
+    if value is None:
+        return
+    parts = prop.split('.')
+    current = question
+    # Process all parts except the last one
+    for i, part in enumerate(parts[:-1]):
+        # Check if the next part is a numeric index
+        next_part = parts[i + 1]
+        if next_part.isdigit():
+            current = current.setdefault(part, [])
+            while len(current) <= int(next_part):
+                current.append(None)
+        else:
+            # If next part is not numeric, use a dictionary
+            current = current.setdefault(part, {})
+    last_part = parts[-1]
+    if last_part.isdigit():
+        idx = int(last_part)
+        current[idx] = value
+    else:
+        # Normal dictionary assignment
+        current[last_part] = value
 
 def convert_jsonl_to_json(str_file_contents: str):
     """
@@ -426,7 +573,6 @@ def convert_jsonl_to_json(str_file_contents: str):
         str_output = '{"qna": [' + str_output + "]}"
 
     return str_output
-
 
 def error_response(error_code: str, message: str, comments: str, status: str, show_error: bool):
     """

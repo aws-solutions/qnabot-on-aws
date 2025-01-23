@@ -6,7 +6,6 @@
 /* eslint-disable max-len, no-underscore-dangle */
 const _ = require('lodash');
 const { Lambda } = require('@aws-sdk/client-lambda');
-const { SageMakerRuntime } = require('@aws-sdk/client-sagemaker-runtime');
 const customSdkConfig = require('sdk-config/customSdkConfig');
 const qnabot = require('qnabot/logging');
 const region = process.env.AWS_REGION || 'us-east-1';
@@ -76,38 +75,15 @@ async function make_qenerate_query_prompt(req, promptTemplateStr) {
     return [memory, history, promptTemplate, prompt];
 }
 
-// Invoke LLM via SageMaker endpoint running Sagemaker Jumpstart llama-2-13b-chat
-async function invoke_sagemaker(prompt, model_params) {
-    const sm = new SageMakerRuntime(customSdkConfig('C005', { region }));
-    const body = JSON.stringify({
-        inputs: prompt,
-        parameters: model_params
-    });
-    let response;
-    qnabot.log(`Invoking SageMaker endpoint: ${process.env.LLM_SAGEMAKERENDPOINT}`);
-    try {
-        const smres = await sm.invokeEndpoint({
-            EndpointName: process.env.LLM_SAGEMAKERENDPOINT,
-            ContentType: 'application/json',
-            Body: body,
-        });
-        const sm_body = JSON.parse(Buffer.from(smres.Body, 'utf-8').toString());
-        qnabot.log('SM response body:', sm_body);
-        response = sm_body[0].generated_text;
-    } catch (e) {
-        qnabot.warn('EXCEPTION:', e.stack);
-        throw new Error(`Sagemaker exception: ${e.message.substring(0, 500)}...`);
-    }
-    return sanitize(response);
-}
-
 // Invoke LLM via custom Lambda abstraction
-async function invoke_lambda(prompt, model_params, settings) {
+async function invoke_lambda(prompt, parameters, settings, options = {}) {
+    const { streamingAttributes, ..._ } = options;
     const lambda = new Lambda(customSdkConfig('C006', { region }));
     const body = JSON.stringify({
         prompt,
-        parameters: model_params,
+        parameters,
         settings,
+        streamingAttributes
     });
 
     qnabot.log(`Invoking Lambda: ${process.env.LLM_LAMBDA_ARN}`);
@@ -137,18 +113,10 @@ async function invoke_lambda(prompt, model_params, settings) {
     }
 }
 
-async function invoke_bedrock(prompt, model_params, settings) {
-    const modelId = settings.LLM_MODEL_ID;
-    const guardrails = {};
-    const guardrailIdentifier = settings.BEDROCK_GUARDRAIL_IDENTIFIER.trim();
-    const guardrailVersion = settings.BEDROCK_GUARDRAIL_VERSION.toString();
-
-    if (guardrailIdentifier !== '' && guardrailVersion !== '') {
-        guardrails.guardrailIdentifier = guardrailIdentifier;
-        guardrails.guardrailVersion = guardrailVersion;
-    };  
-    const response = await invokeBedrockModel(modelId, model_params, prompt, guardrails);
-    qnabot.log(`Bedrock Invoke LLM Response: ${response}`);
+async function invoke_bedrock(prompt, modelId, parameters, options = {}) {
+    const { system, guardrails, streamingAttributes, query, context } = options;
+    const response = await invokeBedrockModel(modelId, prompt, { parameters, system, guardrails, streamingAttributes, query, context  });
+    qnabot.log(`Bedrock LLM Response: ${response}`);
     return sanitize(response);
 };
 
@@ -236,14 +204,12 @@ function get_query(req) {
     return query;
 }
 
-async function invokeLlm(llmType, prompt, model_params, settings) {
+async function invokeLlm(llmType, prompt, modelId, parameters, settings, options = {}) {
     switch (llmType) {
         case 'BEDROCK':
-            return invoke_bedrock(prompt, model_params, settings);
-        case 'SAGEMAKER':
-            return invoke_sagemaker(prompt, model_params);
+            return invoke_bedrock(prompt, modelId, parameters, options);
         case 'LAMBDA':
-            return invoke_lambda(prompt, model_params, settings);
+            return invoke_lambda(prompt, parameters, settings, options);
         default:
             throw new Error(`Error: Unsupported LLM_API type: ${llmType}`);
     }
@@ -261,14 +227,19 @@ const generate_query = async function generate_query(req) {
         req._settings.LLM_GENERATE_QUERY_PROMPT_TEMPLATE ||
         '<br><br>Human: Given the following conversation and a follow up input, if the follow up input is a question please rephrase that question to be a standalone question, otherwise return the input unchanged.<br><br>Chat History:<br>{history}<br><br>Follow Up Input: {input}<br><br>Assistant:';
     promptTemplateStr = promptTemplateStr.replace(/<br>/gm, '\n');
-
-    const model_params = JSON.parse(req._settings.LLM_GENERATE_QUERY_MODEL_PARAMS || default_params_stg);
+    const parameters = JSON.parse(req._settings.LLM_GENERATE_QUERY_MODEL_PARAMS.replace(/\\"/g, '"') || default_params_stg);
     const settings = req._settings;
     const [, , , prompt] = await make_qenerate_query_prompt(req, promptTemplateStr);
     qnabot.log(`Prompt: \nGENERATE QUERY PROMPT==>\n${prompt}\n<==PROMPT`);
 
     const start = Date.now();
-    let newQuery = await invokeLlm(llmType, prompt, model_params, settings);
+    const {
+        LLM_GENERATE_QUERY_SYSTEM_PROMPT: system,
+        LLM_MODEL_ID: modelId,
+    } = req._settings;
+
+    const options = { system };
+    let newQuery = await invokeLlm(llmType, prompt, modelId, parameters, settings, options);
     const end = Date.now();
     const timing = `${end - start} ms`;
 
@@ -289,6 +260,7 @@ const generate_query = async function generate_query(req) {
 };
 
 const get_qa = async function get_qa(req, context) {
+
     qnabot.log(
         `LLM (${req._settings.LLM_API}) Retrieval Augmented Generation (RAG) to answer user's question from search result context.`
     );
@@ -297,7 +269,7 @@ const get_qa = async function get_qa(req, context) {
         '<br><br>Human: You are an AI chatbot. Carefully read the following context and conversation history and then provide a short answer to question at the end. If the answer cannot be determined from the history or the context, reply saying "Sorry, I don\'t know". <br><br>Context: {context}<br><br>History: <br>{history}<br><br>Human: {input}<br><br>Assistant:';
     promptTemplateStr = promptTemplateStr.replace(/<br>/gm, '\n');
     context = clean_context(context, req);
-    const model_params = JSON.parse(req._settings.LLM_QA_MODEL_PARAMS || default_params_stg);
+    const parameters = JSON.parse(req._settings.LLM_QA_MODEL_PARAMS.replace(/\\"/g, '"') || default_params_stg);
     const settings = req._settings;
     // parse and serialise chat history to manage max messages
     const input = get_question(req);
@@ -305,8 +277,37 @@ const get_qa = async function get_qa(req, context) {
     const llmType = req._settings.LLM_API;
     const [, , , prompt] = await make_qa_prompt(req, promptTemplateStr, context, input, query);
     qnabot.log(`QUESTION ANSWERING PROMPT: \nPROMPT==>\n${prompt}\n<==PROMPT`);
+    const {
+        BEDROCK_GUARDRAIL_IDENTIFIER,
+        BEDROCK_GUARDRAIL_VERSION,
+        LLM_QA_SYSTEM_PROMPT: system,
+        LLM_MODEL_ID: modelId,
+        LLM_STREAMING_ENABLED,
+        STREAMING_TABLE,
+    } = req._settings;
 
-    const answer = await invokeLlm(llmType, prompt, model_params, settings);
+    const guardrailIdentifier = BEDROCK_GUARDRAIL_IDENTIFIER?.trim();
+    const guardrailVersion = BEDROCK_GUARDRAIL_VERSION?.toString()
+
+    const guardrails = guardrailIdentifier && guardrailVersion ? {  guardrailIdentifier, guardrailVersion } : {};
+    const sessionAttributes = req._event.sessionState.sessionAttributes;
+    let streamingAttributes = {};
+
+    const sessionId = req._event.sessionId;
+    const streamingEndpoint = sessionAttributes?.streamingEndpoint;
+    let streamingDynamoDbTable = sessionAttributes?.streamingDynamoDbTable;
+    if (LLM_STREAMING_ENABLED && streamingEndpoint && !streamingDynamoDbTable) {
+        streamingDynamoDbTable = STREAMING_TABLE;
+        qnabot.log(`Streaming enabled, using ${streamingEndpoint} and table ${streamingDynamoDbTable} for session ${sessionId}`);
+        streamingAttributes = {
+            sessionId,
+            streamingEndpoint,
+            streamingDynamoDbTable
+        };
+    }
+
+    const options = { system, guardrails, streamingAttributes, query, context };
+    const answer = await invokeLlm(llmType, prompt, modelId, parameters, settings, options);
 
     qnabot.log(`Question: ${req.question}`);
     qnabot.log(`Context: ${context}`);

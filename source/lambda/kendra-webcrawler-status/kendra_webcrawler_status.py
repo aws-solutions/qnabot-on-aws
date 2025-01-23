@@ -18,7 +18,7 @@ logger.setLevel(logging.INFO)
 sdk_config = Config(user_agent_extra = f"AWSSOLUTION/{os.environ['SOLUTION_ID']}/{os.environ['SOLUTION_VERSION']} AWSSOLUTION-CAPABILITY/{os.environ['SOLUTION_ID']}-C007/{os.environ['SOLUTION_VERSION']}")
 
 client = boto3.client('kendra', config=sdk_config)
-ssm = boto3.client('ssm', config=sdk_config)
+dynamodb = boto3.client('dynamodb', config=sdk_config)
 
 class CrawlerException(Exception):
     pass
@@ -42,27 +42,34 @@ def handler(event, handler):  # NOSONAR Need these 2 params
 
 
 def get_settings():
+    print(f"Checking for QnABot Settings in DynamoDB Table: {os.environ['SETTINGS_TABLE']}")
+    
+    dynamodb = boto3.client('dynamodb')
+    settings = {}
+    
     try:
-        default_settings_key = os.environ.get("DEFAULT_SETTINGS_PARAM")
-        private_settings_key = os.environ.get("PRIVATE_SETTINGS_PARAM")
-        custom_settings_key = os.environ.get("CUSTOM_SETTINGS_PARAM")
+        paginator = dynamodb.get_paginator('scan')
+        pages = paginator.paginate(
+            TableName=os.environ['SETTINGS_TABLE']
+        )
 
-        default_settings = ssm.get_parameter(Name=default_settings_key, WithDecryption=True)
-        default_settings = json.loads(default_settings['Parameter']['Value'])
-        private_settings = ssm.get_parameter(Name=private_settings_key, WithDecryption=True)
-        private_settings = json.loads(private_settings['Parameter']['Value'])
-        default_settings.update(private_settings)
-        custom_settings = ssm.get_parameter(Name=custom_settings_key, WithDecryption=True)
-        custom_settings = json.loads(custom_settings['Parameter']['Value'])
-        default_settings.update(private_settings)
-        default_settings.update(custom_settings)
+        items = []
+        for page in pages:
+            items.extend(page['Items'])
         
-        return default_settings
-    except ClientError as e:
-        message = e.response['Error']['Message']
-        code = e.response['Error']['Code']
-        logger.info(f"Error while getting settings {code}:{message}")
-        raise e
+    except ClientError as error:
+        print(f"Error: {error}")
+        raise error
+    
+    for item in items:
+        setting_name = item['SettingName']['S']
+        setting_value = item['SettingValue'].get('S') or item['SettingValue'].get('N')
+        default_value = item['DefaultValue'].get('S') or item['DefaultValue'].get('N')
+        
+        # Use setting_value if not empty, otherwise use default_value
+        settings[setting_name] = setting_value if setting_value is not None else default_value
+    
+    return settings
 
 def get_data_source_id(index_id, data_source_name):
     if not index_id:

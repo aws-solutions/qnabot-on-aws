@@ -9,6 +9,7 @@ module.exports = {
         Properties: {
             TemplateURL: { 'Fn::Sub': 'https://${BootstrapBucket}.s3.${AWS::Region}.amazonaws.com/${BootstrapPrefix}/templates/export.json' },
             Parameters: {
+                SettingsTable: { Ref: 'SettingsTable' },
                 ContentDesignerOutputBucket: { Ref: 'ContentDesignerOutputBucket' },
                 CFNLambda: { 'Fn::GetAtt': ['CFNLambda', 'Arn'] },
                 CFNInvokePolicy: { Ref: 'CFNInvokePolicy' },
@@ -26,10 +27,6 @@ module.exports = {
                 ApiRootResourceId: { 'Fn::GetAtt': ['API', 'RootResourceId'] },
                 Stage: { Ref: 'Stage' },
                 ApiDeploymentId: { Ref: 'Deployment' },
-                KendraCrawlerSnsTopic: { Ref: 'KendraCrawlerSnsTopic' },
-                DefaultQnABotSettings: { Ref: 'DefaultQnABotSettings' },
-                PrivateQnABotSettings: { Ref: 'PrivateQnABotSettings' },
-                CustomQnABotSettings: { Ref: 'CustomQnABotSettings' },
                 AwsSdkLayerLambdaLayer: { Ref: 'AwsSdkLayerLambdaLayer' },
                 QnABotCommonLambdaLayer: { Ref: 'QnABotCommonLambdaLayer' },
                 LexVersion: 'V2',

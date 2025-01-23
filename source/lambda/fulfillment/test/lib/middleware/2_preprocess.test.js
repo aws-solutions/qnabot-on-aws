@@ -12,9 +12,17 @@ const jwt = require('../../../lib/middleware/jwt');
 const { DynamoDBDocumentClient, GetCommand } = require('@aws-sdk/lib-dynamodb');
 const dynamoDbMock = awsMock.mockClient(DynamoDBDocumentClient);
 const originalEnv = process.env;
+const { applyGuardrail } = require('/opt/lib/bedrock/applyGuardrail.js');
+
 jest.mock('../../../lib/middleware/util');
 jest.mock('../../../lib/middleware/jwt');
 jest.mock('qnabot/logging');
+jest.mock('/opt/lib/bedrock/applyGuardrail.js', () => ({
+    applyGuardrail: jest.fn().mockResolvedValue({
+        text: 'mocked guardrail response',
+        action: 'NONE'
+    })
+}));
 
 
 describe('when calling preprocess function', () => {
@@ -29,6 +37,7 @@ describe('when calling preprocess function', () => {
             ES_SERVICE_PROXY: 'mock_es_proxy',
             DYNAMODB_USERSTABLE: 'mock_user_table'
         };
+        jest.clearAllMocks();
     });
 
     test('should preprocess request and return it', async () => {
@@ -188,6 +197,90 @@ describe('when calling preprocess function', () => {
         preProcessResponse = await preprocess(request,
             preprocessFixtures.createResponseObject("Test Answer"));
         expect(preProcessResponse.req.question).toEqual('Test Question');
+    });
+
+    test('should apply guardrail with ANONYMIZED PII action', async () => {
+        const request = preprocessFixtures.createRequestObject("Test Question");
+        request._settings.PREPROCESS_GUARDRAIL_IDENTIFIER = 'test-id';
+        request._settings.PREPROCESS_GUARDRAIL_VERSION = '1.0';
+        applyGuardrail.mockImplementationOnce(async () => ({
+            text: 'anonymized question',
+            guardrailAction: 'GUARDRAIL_INTERVENED',
+            piiEntityAction: 'ANONYMIZED'
+        }));
+        const preProcessResponse = await preprocess(request,
+            preprocessFixtures.createResponseObject("Test Answer"));
+
+        expect(applyGuardrail).toHaveBeenCalledWith(
+            'test-id',
+            '1.0',
+            'INPUT',
+            "Test Question",
+            'Unexpected error occurred while processing request.'
+        );
+        expect(preProcessResponse.req.question).toBe("anonymized question");
+    });
+
+    test('should block and modify response for non-ANONYMIZED PII action', async () => {
+        const request = preprocessFixtures.createRequestObject("Test Question");
+        request._settings.PREPROCESS_GUARDRAIL_IDENTIFIER = 'test-id';
+        request._settings.PREPROCESS_GUARDRAIL_VERSION = '1.0';
+
+        applyGuardrail.mockImplementationOnce(async () => ({
+            text: 'blocked message',
+            guardrailAction: 'GUARDRAIL_INTERVENED',
+            piiEntityAction: 'BLOCKED'
+        }));
+
+        const response = preprocessFixtures.createResponseObject("Test Answer");
+        const preProcessResponse = await preprocess(request, response);
+
+        expect(preProcessResponse.res.message).toBe("blocked message");
+        expect(preProcessResponse.res.plainMessage).toBe("blocked message");
+        expect(preProcessResponse.res.card).toBeUndefined();
+        expect(preProcessResponse.res.answerSource).toBe("PREPROCESS GUARDRAIL");
+        expect(preProcessResponse.req._skipSteps).toBe(3);
+    });
+
+    test('should pass through when guardrail action is not GUARDRAIL_INTERVENED', async () => {
+        const request = preprocessFixtures.createRequestObject("Test Question");
+        request._settings.PREPROCESS_GUARDRAIL_IDENTIFIER = 'test-id';
+        request._settings.PREPROCESS_GUARDRAIL_VERSION = '1.0';
+
+        applyGuardrail.mockImplementationOnce(async () => ({
+            text: 'original question',
+            guardrailAction: 'ALLOW',
+            piiEntityAction: 'NONE'
+        }));
+
+        const preProcessResponse = await preprocess(request,
+            preprocessFixtures.createResponseObject("Test Answer"));
+
+        expect(preProcessResponse.req.question).toBe("Test Question");
+    });
+
+    test('should skip guardrail when identifiers are missing', async () => {
+        const request = preprocessFixtures.createRequestObject("Test Question");
+        request._settings.PREPROCESS_GUARDRAIL_IDENTIFIER = '';
+        request._settings.PREPROCESS_GUARDRAIL_VERSION = '';
+
+        const preProcessResponse = await preprocess(request,
+            preprocessFixtures.createResponseObject("Test Answer"));
+
+        expect(applyGuardrail).not.toHaveBeenCalled();
+        expect(preProcessResponse.req.question).toBe("Test Question");
+    });
+
+    test('should handle guardrail errors', async () => {
+        const request = preprocessFixtures.createRequestObject("Test Question");
+        request._settings.PREPROCESS_GUARDRAIL_IDENTIFIER = 'test-id';
+        request._settings.PREPROCESS_GUARDRAIL_VERSION = '1.0';
+
+        applyGuardrail.mockRejectedValue(new Error('Guardrail error'));
+
+        await expect(preprocess(request,
+            preprocessFixtures.createResponseObject("Test Answer")))
+            .rejects.toThrow('Guardrail error');
     });
 
 });

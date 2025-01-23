@@ -11,8 +11,7 @@ As a best practice, you should try LLM models on non-production instances initia
 
 You can select from three different options:
 1. BEDROCK: Select from several embeddings models provided by Amazon Bedrock using the EmbeddingsBedrockModelId Cloudformation parameter. These models provide the best performance and operate on a pay-per-request model. Bedrock is currently only supported in the following regions: us-east-1, us-west-2, ap-southeast-1, ap-northeast-1, eu-central-1.
-1. SAGEMAKER: Deploys a dedicated text embedding model hosted on an Amazon SageMaker endpoint - see https://huggingface.co/intfloat/e5-large-v2. This option provides the best compatibility with all Lex supported regions. Pricing is determined by the number and types of instances that are deployed.
-1. LAMBDA: Embeddings from a user provided Lambda function - explore alternate pre-trained and/or fine tuned embeddings models. This option provides a custom option for advanced users who wish to deploy their own embeddings model.
+2. LAMBDA: Embeddings from a user provided Lambda function - explore alternate pre-trained and/or fine tuned embeddings models. This option provides a custom option for advanced users who wish to deploy their own embeddings model.
 
 ## 1. Amazon Bedrock (PREFERRED)
 Utilizes one of the Amazon Bedrock foundation models to generate text embeddings. Currently, the following embeddings models are supported by QnA Bot:
@@ -35,24 +34,9 @@ From the Cloudformation console, set the following parameters:
 
 ![CFN Params](./images/CF_Params_Bedrock.jpeg)
 
-## 2. Amazon Sagemaker
+## 2. Lambda function
 
-QnABot provisions a Sagemaker endpoint running the Hugging Face intfloat/e5-large-v2 model - see https://huggingface.co/intfloat/e5-large-v2. 
-  
-By default a 1-node ml.m5.xlarge endpoint is automatically provisioned. For large volume deployments, add additional nodes by setting the parameter `SagemakerInitialInstanceCount`. Please check [SageMaker pricing documentation](https://aws.amazon.com/sagemaker/pricing/) for relevant costs and information on Free Tier eligibility. 
-
-
-### Deploy Stack for SageMaker Embeddings
-
-- set `EmbeddingsAPI` to SAGEMAKER
-- set `SagemakerInitialInstanceCount` - default is '1'. Set to a larger number for high volume deployments. 
-
-![CFN Params](./images/CF_Params_Sagemaker.png)
-
-
-## 3. Lambda function
-
-Use a custom Lambda function to use any Embedding API or embedding model on Sagemaker to generate embeddings.
+Use a custom Lambda function to use any Embedding API or embedding model to generate embeddings.
 
 ### Deploy Stack for Embedding models invoked by a custom Lambda Function
 
@@ -101,7 +85,7 @@ When QnABot stack is installed, open Content Designer **Settings** page:
      - Kendra fallback 
      - or no_hits
   - Use the Content Designer TEST tab to see the hits ranked by score for your query results.
-  - The default is 0.7 for `BEDROCK` and 0.85 for `SAGEMAKER` for now but you will likely need to modify this based on your embedding model and your experiments.
+  - The default is 0.7 for `BEDROCK` for now but you will likely need to modify this based on your embedding model and your experiments.
 
 **EMBEDDINGS_SCORE_ANSWER_THRESHOLD:** to customize the answer score threshold, used only when ES_SCORE_ANSWER_FIELD is true (see above), change the value of `EMBEDDINGS_SCORE_ANSWER_THRESHOLD`. 
   - If embedding similarity score for answer field query is under threshold the match it's rejected and QnABot reverts to Text item passage query, Kendra fallback or no_hits
@@ -111,4 +95,4 @@ When QnABot stack is installed, open Content Designer **Settings** page:
 **EMBEDDINGS_TEXT_PASSAGE_SCORE_THRESHOLD:** to customize the passage score threshold, change the value of `EMBEDDINGS_TEXT_PASSAGE_SCORE_THRESHOLD`. 
   - If embedding similarity score for text item passage field query is under threshold the match it's rejected and QnABot reverts to Kendra fallback or no_hits
   - Use the Content Designer TEST tab to see the hits ranked by score for your answer field query results. For **Match on**, choose *text item passage* to see passage field scores.
-  - The default is 0.65 for `BEDROCK` and 0.8 for `SAGEMAKER` for now but you will need likely to modify this based on your embedding model and your experiments.
+  - The default is 0.65 for `BEDROCK` for now but you will need likely to modify this based on your embedding model and your experiments.

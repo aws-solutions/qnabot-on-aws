@@ -45,6 +45,19 @@ async function es_store_doc(index, id, body) {
     return es_response;
 }
 
+function isCompleteChar(str, pos) {
+    try {
+        const charCode = str.charCodeAt(pos);
+        // If we see the replacement character (�), it's not a complete char
+        if (charCode === 0xFFFD) {
+            return false;
+        }
+        return charCode !== undefined && !Number.isNaN(charCode);
+    } catch (e) {
+        return false;
+    }
+}
+
 exports.step = async function (event, context, cb) {
     try {
         qnabot.log('step');
@@ -85,18 +98,24 @@ exports.step = async function (event, context, cb) {
                         Range: `bytes=${config.start}-${config.end}`
                     };
                     const result = await s3.send(new GetObjectCommand(params));
-                    const response = await result.Body.transformToString();
+                    const originalChunk = await result.Body.transformToString();
+                    let lastComplete = originalChunk.length;
+                    while (lastComplete > 0 && !isCompleteChar(originalChunk, lastComplete - 1)) {
+                        lastComplete--;
+                    }
+                    const modifiedChunkData = originalChunk.slice(0, lastComplete);
+                    const encoder = new TextEncoder();
+                    const byteLength = encoder.encode(modifiedChunkData).length;
                     const settings = await get_settings();
-                    qnabot.log('opening file');
                     let objects = [];
-                    const arrayResults = await processQuestionArray(config.buffer, response, s3, params)
+                    const arrayResults = await processQuestionArray(config.buffer, modifiedChunkData, s3, params);
                     config.buffer = arrayResults.buffer;
                     objects = arrayResults.objects;
 
                     const { out, success, failed } = await processQuestionObjects(objects, settings, esindex, config);
                     config.count = success;
                     config.failed = failed;
-                    qnabot.log('ContentRange: ', result.ContentRange);
+                    qnabot.log('Current contentRange: ', result.ContentRange);
                     const tmp = result.ContentRange.match(/bytes (.*)-(.*)\/(.*)/); // NOSONAR - javascript:S5852 - input is user controlled and we have a limit on the number of characters
                     progress = (parseInt(tmp[2]) + 1) / parseInt(tmp[3]);
                     const ES_formatted_content = `${out.join('\n')}\n`;
@@ -110,10 +129,11 @@ exports.step = async function (event, context, cb) {
                                 })
                         })
                         */
-                    config.start = config.end + 1;
+                    config.start = config.start + byteLength;
                     config.end = config.start + config.stride;
                     config.progress = progress;
                     config.time.rounds += 1;
+                    qnabot.log(`next content range: ${config.start} - ${config.end}`);
             } catch (error) {
                 qnabot.log('An error occured while config status was InProgress: ', error);
                 config.status = error.message || 'Error'
@@ -246,7 +266,7 @@ async function processQuestionObjects(objects, settings, esindex, config) {
             } else {
                 docid = obj._id || `${obj.qid}_upgrade_restore_${timestamp}`;
                 stringifySessionAttributes(obj);
-            }
+            } 
             delete obj._id;
             out.push(
                 JSON.stringify({

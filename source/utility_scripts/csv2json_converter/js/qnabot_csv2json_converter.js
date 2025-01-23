@@ -135,7 +135,7 @@ function saveConvertedFile(strJSONOutput) {
 
     const downloadLink = document.createElement('a');
     downloadLink.download = fileNameToSaveAs;
-    downloadLink.innerHTML = 'Download File';
+    downloadLink.innerText = 'Download File';
     downloadLink.href = textToSaveAsURL;
     downloadLink.style.display = 'none';
     document.body.appendChild(downloadLink);
@@ -176,5 +176,5 @@ function create_QnA_alt_markdown(strInputCSVValue) {
 
 // function to show progress message
 function updateProgress(strProgressMsg) {
-    document.getElementById('divProgress').innerHTML = document.getElementById('divProgress').innerHTML + strProgressMsg;
+    document.getElementById('divProgress').innerText = document.getElementById('divProgress').innerText + strProgressMsg;
 }

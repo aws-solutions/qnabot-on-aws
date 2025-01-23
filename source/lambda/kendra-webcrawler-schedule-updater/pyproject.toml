@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "kendra-webcrawler-schedule-updater"
+description = "Lambda function to update Amazon Kendra web crawler scheduling configuration"
+package-mode = false
+
+[tool.poetry.dependencies]
+python = "^3.10"
+
+
+[tool.poetry.group.dev.dependencies]
+moto = "^5.0.18"
+pytest = "^8.3.3"
+pytest-cov = "^6.0.0"
+mock = "^5.1.0"
+Jinja2 = "^3.1.5"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

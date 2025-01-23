@@ -172,12 +172,14 @@ module.exports = {
                                 .then(() => {
                                     btnImportQuestions.disabled = false;
                                     btnImportQuestions.style.opacity = '1';
-                                    ImportQuestionsStatus.innerHTML = 'Complete';
-
-                                    btnImportQuestions.innerHTML = 'Import Sample Questions and Answers';
+                                    ImportQuestionsStatus.innerText = 'Complete';
+                                    btnImportQuestions.innerText = 'Import Sample Questions and Answers';
                                 })
                                 .catch((e) => {
-                                    ImportQuestionsStatus.innerHTML = `Error Rebuilding LexBot. Please return to the Content Designer, correct the errors and REBUILD LEXBOT </br> LexBot Rebuild Error ${e}`;
+                                    const errMsg = `${e.name}: ${e.message}`;
+                                    ImportQuestionsStatus.innerText = 
+                                        `Error Rebuilding LexBot. Please return to the Content Designer, correct the errors and REBUILD LEXBOT
+                                        LexBot Rebuild Error ${errMsg}`;
                                 })
                                 .then((result) => {
                                     btn.loading = false;
@@ -185,22 +187,22 @@ module.exports = {
                         }
                     });
             }
-            document.getElementById('stsLabel').innerHTML = 'Status:';
-            ImportQuestionsStatus.innerHTML = 'Importing Questions (Step 1)...';
+            document.getElementById('stsLabel').innerText = 'Status:';
+            ImportQuestionsStatus.innerText = 'Importing Questions (Step 1)...';
             self.$store.dispatch('api/getContactFlow')
                 .then((result) => {
                     self.contactFlow = result;
-                    ImportQuestionsStatus.innerHTML = 'Importing Questions (Step 2)...';
+                    ImportQuestionsStatus.innerText = 'Importing Questions (Step 2)...';
 
                     return self.$store.dispatch('api/listExamples');
                 })
                 .then((result) => {
-                    ImportQuestionsStatus.innerHTML = 'Importing Questions (Step 3)...';
+                    ImportQuestionsStatus.innerText = 'Importing Questions (Step 3)...';
                     const exampleUrl = result.filter((example) => self.contactFlow.QnaFile === example.document.href.split('/').slice(-1)[0])[0];
                     return self.$store.dispatch('api/getImport', { href: exampleUrl.document.href });
                 })
                 .then((result) => {
-                    ImportQuestionsStatus.innerHTML = 'Importing Questions (Step 4)...';
+                    ImportQuestionsStatus.innerText = 'Importing Questions (Step 4)...';
 
                     return self.$store.dispatch('api/startImport', {
                         qa: result.qna,
@@ -209,12 +211,12 @@ module.exports = {
                     });
                 })
                 .then((results) => {
-                    ImportQuestionsStatus.innerHTML = 'Importing Questions (Step 5)...';
+                    ImportQuestionsStatus.innerText = 'Importing Questions (Step 5)...';
                     return self.$store.dispatch('api/waitForImport', { id: self.contactFlow.QnaFile });
                 })
                 .then((res) => {
                     console.log(JSON.stringify(res));
-                    ImportQuestionsStatus.innerHTML = 'Rebuilding Lex Bot.';
+                    ImportQuestionsStatus.innerText = 'Rebuilding Lex Bot.';
                     self.pollUrl = res.href;
                     return poll(self.pollUrl);
                 })

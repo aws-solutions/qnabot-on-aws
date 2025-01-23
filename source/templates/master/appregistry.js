@@ -93,15 +93,6 @@ module.exports = {
             ResourceType: 'CFN_STACK',
         },
     },
-    AppRegistryApplicationStackAssociationSagemakerEmbeddings: {
-        Type: 'AWS::ServiceCatalogAppRegistry::ResourceAssociation',
-        Condition: 'EmbeddingsSagemaker',
-        Properties: {
-            Application: { 'Fn::GetAtt': ['Application', 'Id'] },
-            Resource: { Ref: 'SagemakerEmbeddingsStack' },
-            ResourceType: 'CFN_STACK',
-        },
-    },
     AppRegistryApplicationStackAssociationTestAll: {
         Type: 'AWS::ServiceCatalogAppRegistry::ResourceAssociation',
         Properties: {

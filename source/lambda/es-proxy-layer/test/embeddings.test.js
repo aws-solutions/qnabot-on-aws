@@ -5,14 +5,12 @@
 const _ = require('lodash');
 const { Lambda } = require('@aws-sdk/client-lambda');
 const { BedrockRuntimeClient, InvokeModelCommand } = require('@aws-sdk/client-bedrock-runtime');
-const { SageMakerRuntime } = require('@aws-sdk/client-sagemaker-runtime');
 const qnabot = require('qnabot/logging');
 const { truncateByNumTokens, countTokens } = require('../lib/truncate');
 const embeddings = require('../lib/embeddings');
 
 jest.mock('@aws-sdk/client-lambda');
 jest.mock('@aws-sdk/client-bedrock-runtime');
-jest.mock('@aws-sdk/client-sagemaker-runtime');
 jest.mock('../lib/truncate')
 jest.mock('qnabot/settings');
 jest.mock('qnabot/logging');
@@ -46,12 +44,6 @@ const mockInvokeEndpoint = jest.fn().mockImplementation(() => {
             embedding: ['test embedding']
         }))
 
-    }
-});
-
-SageMakerRuntime.mockImplementation(() => {
-    return {
-        invokeEndpoint: mockInvokeEndpoint,
     }
 });
 
@@ -147,87 +139,6 @@ describe('embeddings', () => {
         });
         expect(mockSend).not.toHaveBeenCalled();
         expect(mockInvokeEndpoint).not.toHaveBeenCalled();
-        expect(result).toStrictEqual(['test embedding'])
-    });
-
-    test('sagemaker', async () => {
-        process.env.EMBEDDINGS_API = 'SAGEMAKER';
-        process.env.EMBEDDINGS_SAGEMAKER_ENDPOINT = 'test-sagemaker'
-
-        const type_q_or_a = 'q';
-        const input = 'text';
-        const settings = {
-            EMBEDDINGS_ENABLE: true,
-            EMBEDDINGS_MAX_TOKEN_LIMIT: 100,
-            EMBEDDINGS_MODEL_ID: 'test',
-            EMBEDDINGS_QUERY_PASSAGE_PREFIX_STRINGS: true,
-        }
-
-        const result = await embeddings(type_q_or_a, input, settings);
-        expect(mockInvokeEndpoint).toHaveBeenCalledWith({
-            Body: JSON.stringify({
-                text_inputs:'query: text',
-                mode:'embedding'
-            }),
-            ContentType: 'application/json',
-            EndpointName: 'test-sagemaker',
-        });
-        expect(mockSend).not.toHaveBeenCalled();
-        expect(mockInvoke).not.toHaveBeenCalled();
-        expect(result).toStrictEqual(['test embedding'])
-    });
-
-    test('sagemaker - answer type', async () => {
-        process.env.EMBEDDINGS_API = 'SAGEMAKER';
-        process.env.EMBEDDINGS_SAGEMAKER_ENDPOINT = 'test-sagemaker'
-
-        const type_q_or_a = 'a';
-        const input = 'text';
-        const settings = {
-            EMBEDDINGS_ENABLE: true,
-            EMBEDDINGS_MAX_TOKEN_LIMIT: 100,
-            EMBEDDINGS_MODEL_ID: 'test',
-            EMBEDDINGS_QUERY_PASSAGE_PREFIX_STRINGS: true,
-        }
-
-        const result = await embeddings(type_q_or_a, input, settings);
-        expect(mockInvokeEndpoint).toHaveBeenCalledWith({
-            Body: JSON.stringify({
-                text_inputs:'passage: text',
-                mode:'embedding'
-            }),
-            ContentType: 'application/json',
-            EndpointName: 'test-sagemaker',
-        });
-        expect(mockSend).not.toHaveBeenCalled();
-        expect(mockInvoke).not.toHaveBeenCalled();
-        expect(result).toStrictEqual(['test embedding'])
-    });
-
-    test('sagemaker - no prefix', async () => {
-        process.env.EMBEDDINGS_API = 'SAGEMAKER';
-        process.env.EMBEDDINGS_SAGEMAKER_ENDPOINT = 'test-sagemaker'
-
-        const type_q_or_a = 'a';
-        const input = 'text';
-        const settings = {
-            EMBEDDINGS_ENABLE: true,
-            EMBEDDINGS_MAX_TOKEN_LIMIT: 100,
-            EMBEDDINGS_MODEL_ID: 'test',
-            EMBEDDINGS_QUERY_PASSAGE_PREFIX_STRINGS: false,
-        }
-
-        const result = await embeddings(type_q_or_a, input, settings);
-        expect(mockInvokeEndpoint).toHaveBeenCalledWith({
-            Body: JSON.stringify({
-                text_inputs:'text',
-                mode:'embedding'
-            }),
-            ContentType: 'application/json',
-            EndpointName: 'test-sagemaker',
-        });
-        expect(mockSend).not.toHaveBeenCalled();
-        expect(mockInvoke).not.toHaveBeenCalled();
         expect(result).toStrictEqual(['test embedding'])
     });
 

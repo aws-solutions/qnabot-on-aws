@@ -6,8 +6,11 @@
 const awsMock = require('aws-sdk-client-mock');
 const settings = require('../qnabot/settings');
 const settingsFixture = require('./settings.fixtures');
-const { SSMClient, GetParameterCommand } = require('@aws-sdk/client-ssm');
+const { SSMClient, GetParameterCommand, PatchSourceFilterSensitiveLog } = require('@aws-sdk/client-ssm');
 const ssmMock = awsMock.mockClient(SSMClient);
+const { DynamoDBClient, ScanCommand } = require('@aws-sdk/client-dynamodb');
+const dynamoMock = awsMock.mockClient(DynamoDBClient);
+
 describe('when calling set_environment_variables', () => {
     afterEach(() => {
         ssmMock.restore();
@@ -55,24 +58,18 @@ describe('when calling set_environment_variables', () => {
 
 describe('when calling getSettings function', () => {
     beforeAll(() => {
-        ssmMock.reset();
-        ssmMock.on(GetParameterCommand).callsFake((params) => {
-            let result = settingsFixture.defaultSettingsMock;
-            if (params.Name === 'custom') {
-                result = settingsFixture.customSettingsMock;
-            }
-            return { Parameter: { Value: result } };
+        dynamoMock.reset();
+        dynamoMock.on(ScanCommand).callsFake(() => {
+            return {Items: [{SettingName: {"S": "Test_Setting"}, SettingValue:{"S": "Test_Value"}, DefaultValue:{"S":"Test_Not_Chosen"}},{SettingName: {"S": "Test_Default_Setting"}, SettingValue:{"S": ""}, DefaultValue:{"S":"Test_Chosen"}}]};
         });
     });
 
     it('should return a properly merged settings object', async () => {
-        process.env.DEFAULT_SETTINGS_PARAM = 'default';
-        process.env.PRIVATE_SETTINGS_PARAM = 'private';
-        process.env.CUSTOM_SETTINGS_PARAM = 'custom';
+        process.env.SETTINGS_TABLE = 'mock_settings_table'
 
         let result = await settings.getSettings();
 
-        expect(result).toEqual(settingsFixture.mergedSettings);
+        expect(result).toEqual({"Test_Setting":"Test_Value", "Test_Default_Setting":"Test_Chosen"});
     });
 
     afterAll(() => {

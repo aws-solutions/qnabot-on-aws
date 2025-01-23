@@ -23,7 +23,7 @@ module.exports = {
             id: exportfile,
             index: { Ref: 'VarIndex' },
             es_endpoint: { Ref: 'EsEndpoint' },
-            POST_UPGRADE_IMPORT_TRIGGERS: { 'Fn::Sub': '${EmbeddingsApi} ${EmbeddingsBedrockModelId} ${EmbeddingsLambdaDimensions} ${EmbeddingsLambdaArn} ${EmbeddingsSagemakerEndpoint}' },
+            POST_UPGRADE_IMPORT_TRIGGERS: { 'Fn::Sub': '${EmbeddingsApi} ${EmbeddingsBedrockModelId} ${EmbeddingsLambdaDimensions} ${EmbeddingsLambdaArn}' },
         },
     },
     PostUpgradeImportMetrics: {

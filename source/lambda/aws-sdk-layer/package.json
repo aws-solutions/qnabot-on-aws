@@ -1,6 +1,6 @@
 {
     "name": "aws-layer",
-    "version": "6.1.5",
+    "version": "7.0.0",
     "description": "QnABot Lambda aws-sdk-layer",
     "main": "index.js",
     "scripts": {
@@ -12,10 +12,10 @@
     },
     "license": "Apache-2.0",
     "dependencies": {
-        "@aws-sdk/client-comprehend": "^3.621.0",
-        "@aws-sdk/client-kendra": "^3.621.0",
-        "@aws-sdk/client-lambda": "^3.621.0",
-        "@aws-sdk/client-s3": "^3.621.0",
-        "@aws-sdk/client-translate": "^3.621.0"
+        "@aws-sdk/client-comprehend": "^3.699.0",
+        "@aws-sdk/client-kendra": "^3.706.0",
+        "@aws-sdk/client-lambda": "^3.699.0",
+        "@aws-sdk/client-s3": "^3.705.0",
+        "@aws-sdk/client-translate": "^3.699.0"
     }
 }

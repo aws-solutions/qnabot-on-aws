@@ -83,14 +83,6 @@ module.exports = {
                 'BEDROCK',
             ],
         },
-        EmbeddingsSagemaker: {
-            'Fn::Equals': [
-                {
-                    Ref: 'EmbeddingsApi',
-                },
-                'SAGEMAKER',
-            ],
-        },
         Public: {
             'Fn::Equals': [
                 {
@@ -158,7 +150,6 @@ module.exports = {
                     Parameters: [
                         'EmbeddingsApi',
                         'EmbeddingsBedrockModelId',
-                        'SagemakerInitialInstanceCount',
                         'EmbeddingsLambdaArn',
                         'EmbeddingsLambdaDimensions',
                     ],
@@ -170,9 +161,8 @@ module.exports = {
                     Parameters: [
                         'LLMApi',
                         'LLMBedrockModelId',
-                        'LLMSagemakerInstanceType',
-                        'LLMSagemakerInitialInstanceCount',
                         'LLMLambdaArn',
+                        'EnableStreaming'
                     ],
                 },
                 {

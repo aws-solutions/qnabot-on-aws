@@ -57,9 +57,7 @@ module.exports = Object.assign(require('./bucket'), {
                 ES_FEEDBACKINDEX: { Ref: "FeedbackIndex" },
                 ES_ENDPOINT: { Ref: "EsEndpoint" },
                 ES_PROXY: { Ref: "EsProxyLambda" },
-                DEFAULT_SETTINGS_PARAM: { Ref: "DefaultQnABotSettings" },
-                PRIVATE_SETTINGS_PARAM: { Ref: "PrivateQnABotSettings" },
-                CUSTOM_SETTINGS_PARAM: { Ref: "CustomQnABotSettings" },
+                SETTINGS_TABLE: { Ref: 'SettingsTable' },
                 OUTPUT_S3_BUCKET: { Ref: "ContentDesignerOutputBucket"},
                 ...util.getCommonEnvironmentVariables(),
             },
@@ -137,13 +135,10 @@ module.exports = Object.assign(require('./bucket'), {
                 ES_FEEDBACKINDEX: { Ref: "FeedbackIndex" },
                 ES_ENDPOINT: { Ref: "EsEndpoint" },
                 ES_PROXY: { Ref: "EsProxyLambda" },
-                DEFAULT_SETTINGS_PARAM: { Ref: "DefaultQnABotSettings" },
-                PRIVATE_SETTINGS_PARAM: { Ref: "PrivateQnABotSettings" },
-                CUSTOM_SETTINGS_PARAM: { Ref: "CustomQnABotSettings" },
                 EMBEDDINGS_API: { Ref: "EmbeddingsApi" },
-                EMBEDDINGS_SAGEMAKER_ENDPOINT: { Ref: "EmbeddingsSagemakerEndpoint" },
                 EMBEDDINGS_LAMBDA_ARN: { Ref: "EmbeddingsLambdaArn" },
                 OUTPUT_S3_BUCKET: { Ref: "ContentDesignerOutputBucket"},
+                SETTINGS_TABLE: { Ref: 'SettingsTable' },
                 ...util.getCommonEnvironmentVariables(),
             },
         },
@@ -202,46 +197,6 @@ module.exports = Object.assign(require('./bucket'), {
           util.lambdaVPCAccessExecutionRole(),
           util.xrayDaemonWriteAccess(),
           {
-            PolicyName: "SSMGetParameterAccess",
-            PolicyDocument: {
-              Version: "2012-10-17",
-              Statement: [
-                {
-                  Effect: "Allow",
-                  Action: [
-                    "ssm:GetParameter",
-                  ],
-                  Resource: [
-                    { "Fn::Join": ["", ["arn:aws:ssm:", { Ref: "AWS::Region" }, ":", { Ref: "AWS::AccountId" }, ":parameter/", { Ref: "CustomQnABotSettings" }]] },
-                    { "Fn::Join": ["", ["arn:aws:ssm:", { Ref: "AWS::Region" }, ":", { Ref: "AWS::AccountId" }, ":parameter/", { Ref: "DefaultQnABotSettings" }]] },
-                    { "Fn::Join": ["", ["arn:aws:ssm:", { Ref: "AWS::Region" }, ":", { Ref: "AWS::AccountId" }, ":parameter/", { Ref: "PrivateQnABotSettings" }]] },
-                  ],
-                },
-              ],
-            },
-          },
-          {
-            "Fn::If": [
-              "EmbeddingsSagemaker",
-              {
-                PolicyName: "SagemakerEmbeddingsPolicy",
-                PolicyDocument: {
-                Version: "2012-10-17",
-                  Statement: [
-                    {
-                        Effect: "Allow",
-                        Action: [
-                            "sagemaker:InvokeEndpoint",
-                        ],
-                        Resource: { Ref: "EmbeddingsSagemakerEndpointArn" },
-                    },
-                  ],
-                },
-              },
-              { Ref: "AWS::NoValue" },
-            ],
-          },
-          {
             "Fn::If": [
               "EmbeddingsBedrock",
               {
@@ -266,6 +221,21 @@ module.exports = Object.assign(require('./bucket'), {
               },
               { Ref: "AWS::NoValue" },
             ],
+          },
+          {
+            PolicyName: "SettingsTableReadAccess",
+            PolicyDocument: {
+              Version: "2012-10-17",
+              Statement: [
+                {
+                  Effect: "Allow",
+                  Action: [
+                    "dynamodb:Scan",
+                  ],
+                  Resource: [{  'Fn::Sub': "arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${SettingsTable}" }],
+                },
+              ],
+            },
           },
         ],
         ManagedPolicyArns: [
