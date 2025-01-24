@@ -29,7 +29,9 @@ module.exports = Promise.resolve(require('../master')).then((base) => {
         'OpenSearchIndex',
         'MetricsBucket',
         'TestAllBucket',
-        'ContentDesignerOutputBucket'
+        'ContentDesignerOutputBucket',
+        'StreamingWebSocketEndpoint',
+        'SettingsTable'
     ]);
     base.Parameters = _.pick(base.Parameters, [
         'Email',
