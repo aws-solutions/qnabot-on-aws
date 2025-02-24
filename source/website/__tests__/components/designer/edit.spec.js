@@ -176,4 +176,66 @@ describe('designer edit module', () => {
         wrapper.vm.update();
         expect(wrapper.vm.update).not.toThrow();
     });
+
+    test('update -- markdown sanitized', async () => {
+        const data = {
+            qid:"test",
+            q:["test"],
+            a:"test",
+            alt:{
+                markdown:"<p style='white-space'>Testing Markdown Sanitization</p><test></test>"
+            },
+            type:"qna",
+        };
+
+        const store = {
+            state: {
+                data: {
+                    schema: {
+                        qna: {
+                            key: 'value',
+                            required: true,
+                        },
+                    },
+                },
+                tmp: {
+                    quniqueterms: 'some-test-terms',
+                },
+            },
+            dispatch: jest.fn().mockReturnValue(false),
+        };
+
+        const wrapper = shallowMount(editModule, {
+            props: {
+                data,
+            },
+            global: {
+                mocks: {
+                    $store: store,
+                },
+            },
+        });
+        wrapper.vm.$data.tmp = {
+            quniqueterms: 'some-test-terms',
+            qid:"test",
+            q:["test"],
+            a:"test",
+            alt:{
+                markdown:"<p style='white-space'>Testing Markdown Sanitization</p><test></test>"
+            },
+            type:"qna",
+        };
+
+        await wrapper.vm.update();
+
+        expect(store.dispatch).toHaveBeenCalledWith('data/update', { 
+            qid:"test",
+            q:["test"],
+            a:"test",
+            alt:{
+                markdown:"<p>Testing Markdown Sanitization</p>"
+            },
+            type:"qna",
+         });
+    });
 });

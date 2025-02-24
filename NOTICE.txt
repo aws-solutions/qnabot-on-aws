@@ -1635,6 +1635,7 @@ numpy under the BSD license.
 openapi-schema-validator under the BSD license.
 pandas under the BSD license.
 pywin32 under the PSF-2.0 license.
+fast-uri under the BSD-3-Clause license.
 
 ********************
 OPEN SOURCE LICENSES

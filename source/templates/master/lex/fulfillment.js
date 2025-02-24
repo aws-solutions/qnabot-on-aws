@@ -25,8 +25,7 @@ module.exports = {
                     'live',
                 ]],
             },
-            Principal: 'alexa-appkit.amazon.com',
-            SourceAccount: { Ref: 'AWS::AccountId' },
+            Principal: 'alexa-appkit.amazon.com'
         },
     },
     FulfillmentCodeVersion: {

@@ -361,7 +361,9 @@ As QnABot evolves over the years, it makes use of various services and functiona
 _Note: **Deployable solution versions** refers to the ability to deploy the version of QnABot in their AWS accounts. **Actively supported versions** for QnABot is only available for the latest version of QnABot._
 
 ### Deployable Versions
+- [v7.0.1](https://github.com/aws-solutions/qnabot-on-aws/releases/tag/v7.0.1) - [Public](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v7.0.1/qnabot-on-aws-main.template)/[VPC](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v7.0.1/qnabot-on-aws-vpc.template)
 - [v7.0.0](https://github.com/aws-solutions/qnabot-on-aws/releases/tag/v7.0.0) - [Public](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v7.0.0/qnabot-on-aws-main.template)/[VPC](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v7.0.0/qnabot-on-aws-vpc.template)
+  - _Note: Lambda Runtimes have been updated this release. Solution now uses: [**nodejs20** and python3.10]_
 - [v6.1.5](https://github.com/aws-solutions/qnabot-on-aws/releases/tag/v6.1.5) - [Public](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v6.1.5/qnabot-on-aws-main.template)/[VPC](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v6.1.5/qnabot-on-aws-vpc.template)
 - [v6.1.4](https://github.com/aws-solutions/qnabot-on-aws/releases/tag/v6.1.4) - [Public](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v6.1.4/qnabot-on-aws-main.template)/[VPC](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v6.1.4/qnabot-on-aws-vpc.template)
 - [v6.1.3](https://github.com/aws-solutions/qnabot-on-aws/releases/tag/v6.1.3) - [Public](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v6.1.3/qnabot-on-aws-main.template)/[VPC](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v6.1.3/qnabot-on-aws-vpc.template)
@@ -408,6 +410,7 @@ _Note: **Deployable solution versions** refers to the ability to deploy the vers
 - All solutions less than `v5.2.1` are no longer deployable due to Lambda Runtime deprecations. This information is provided as is and you are strongly encouraged to check the deprecation calendar and end of life of the frameworks used in the solution.
 
 ### Upcoming/Recent deprecations
+- nodejs18 is scheduled to enter [deprecation](https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtimes.html#runtimes-supported) on Sep 1, 2025.
 - nodejs16 has entered [Phase 1 deprecation](https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtimes.html#runtime-support-policy) on Jun 12, 2024.
 
 ### Why would a solution version no longer be deployable?
