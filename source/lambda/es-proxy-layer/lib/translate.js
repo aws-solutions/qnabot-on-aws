@@ -54,6 +54,7 @@ async function get_translation(userText, targetLang, req) {
         const regex = /\s\*\s+$/m;
         translation.TranslatedText = translation.TranslatedText.replace(regex, '*\n\n'); // Translate adds a space between the "*" causing incorrect Markdown
         translation.TranslatedText = translation.TranslatedText.replace(/<\/?span[^>]*>/g, ''); // removes span tag used to keep Translate from translating URLs
+        translation.TranslatedText = translation.TranslatedText.replaceAll('] (', ']('); // Removes space between markdown links that is added after translation
         return translation.TranslatedText;
     } catch (err) {
         qnabot.log('warning - error during translation: ', err);

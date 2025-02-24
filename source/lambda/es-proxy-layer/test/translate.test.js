@@ -61,7 +61,7 @@ describe('translate', () => {
 
         const translateTextMock = jest.fn().mockImplementation(() => {
             return {
-                TranslatedText: 'translated text'
+                TranslatedText: 'Translated Text'
             }
         });
 
@@ -83,7 +83,48 @@ describe('translate', () => {
             Text: 'answer',
         });
         translatedFields.forEach((field) => {
-            expect( _.get(response, field)).toBe('translated text')
+            expect( _.get(response, field)).toBe('Translated Text')
+        });
+    });
+
+    test('translates all fields with correct markdown', async () => {
+        const clonedHit = _.cloneDeep(hit);
+        const clonedReq = _.cloneDeep(req);
+        const usrLang = 'es';
+
+        const listTerminologiesMock = jest.fn().mockImplementation(() => {
+            return {
+                TerminologyPropertiesList: [
+                    {SourceLanguageCode: 'en', Name: 'test'}
+                ]
+            }
+        });
+
+        const translateTextMock = jest.fn().mockImplementation(() => {
+            return {
+                TranslatedText: 'Markdown links [should not have spaces] (between parentheses and brackets). Should be no span <span> tags.'
+            }
+        });
+
+        Translate.mockImplementation(() => {
+            return {
+                listTerminologies: listTerminologiesMock,
+                translateText: translateTextMock,
+            }
+        });
+
+        const response = await translate_hit(clonedHit, usrLang, clonedReq);
+
+        expect(listTerminologiesMock).toBeCalledWith({});
+        expect(translateTextMock).toBeCalledTimes(9);
+        expect(translateTextMock).toBeCalledWith({
+            SourceLanguageCode: 'auto',
+            TargetLanguageCode: 'es',
+            TerminologyNames: ['test'],
+            Text: 'answer',
+        });
+        translatedFields.forEach((field) => {
+            expect( _.get(response, field)).toBe('Markdown links [should not have spaces](between parentheses and brackets). Should be no span  tags.')
         });
     });
 

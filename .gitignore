@@ -111,3 +111,6 @@ Pipfile.lock
 
 # We are using default .viperlightrc. No need to keep this in the repo.
 .viperlightrc
+
+# Lambda requirements.txt files
+**/requirements.txt
