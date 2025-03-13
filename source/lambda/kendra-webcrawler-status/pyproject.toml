@@ -11,7 +11,7 @@ moto = "^5.0.18"
 pytest = "^8.3.3"
 pytest-cov = "^6.0.0"
 mock = "^5.1.0"
-Jinja2 = "^3.1.5"
+Jinja2 = "^3.1.6"
 
 [build-system]
 requires = ["poetry-core"]

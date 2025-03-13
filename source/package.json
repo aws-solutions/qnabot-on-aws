@@ -1,6 +1,6 @@
 {
     "name": "qnabot-on-aws",
-    "version": "7.0.1",
+    "version": "7.0.2",
     "engines": {
         "node": ">=20.0.0",
         "npm": ">=10.0.0"
@@ -82,7 +82,7 @@
         "autosize": "^3.0.21",
         "aws-lex-web-ui": "git+https://github.com/aws-samples/aws-lex-web-ui.git#feature/qnabot-v7.0.0",
         "aws4": "^1.7.0",
-        "axios": "^1.7.4",
+        "axios": "^1.8.2",
         "body-parser": "^1.20.3",
         "bowser": "^1.9.3",
         "cfn-response": "^1.0.1",
@@ -144,7 +144,7 @@
         "vuex-router-sync": "^5.0.0"
     },
     "devDependencies": {
-        "@babel/core": "^7.23.2",
+        "@babel/core": "^7.26.10",
         "@babel/plugin-transform-runtime": "^7.23.2",
         "@babel/preset-env": "^7.23.2",
         "@fontsource/material-icons": "^5.0.7",
