@@ -5,14 +5,26 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [7.0.2] - 2025-03-13
+
+### Security
+
+- Updated axios to `1.8.2`
+- Updated jinja2 to `3.1.6`
+- Updated @babel/core to `7.26.10`
+- Updated @babel/helpers to `7.26.10`
+- Updated @babel/runtime to `7.26.10`
+
 ## [7.0.1] - 2025-02-24
 
 ### Fixed
+
 - Alexa Skill Kit issue where trigger would not get created in the lambda function during CFN deployment [Issue #804](https://github.com/aws-solutions/qnabot-on-aws/issues/804)
 - Sanitization change to allow `<details>` and `<summary>` tags [Issue #751](https://github.com/aws-solutions/qnabot-on-aws/issues/751)
 - Fixed Amazon Translate breaking markdown links from added spaces [Issue #805](https://github.com/aws-solutions/qnabot-on-aws/issues/805)
 
 ### Security
+
 - Patched serialize-javascript, cryptography, & certifi vulnerability
 
 ## [7.0.0] - 2025-01-23
