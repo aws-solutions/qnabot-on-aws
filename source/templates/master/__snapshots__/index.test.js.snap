@@ -75,12 +75,6 @@ exports[`Verify master template is correct renders master template correctly 1`]
         "EMPTY",
       ],
     },
-    "DeprecatedSSMSettings": {
-      "Fn::Equals": [
-        "true",
-        "false",
-      ],
-    },
     "Domain": {
       "Fn::Not": [
         {
@@ -3176,30 +3170,18 @@ exports[`Verify master template is correct renders master template correctly 1`]
                 },
                 {
                   "Action": [
-                    "ssm:DescribeParameters",
-                  ],
-                  "Effect": "Allow",
-                  "Resource": [
-                    {
-                      "Fn::Sub": "arn:\${AWS::Partition}:ssm:\${AWS::Region}:\${AWS::AccountId}:*",
-                    },
-                  ],
-                },
-                {
-                  "Action": [
                     "ssm:GetParameter",
-                    "ssm:DeleteParameter",
                   ],
                   "Effect": "Allow",
                   "Resource": [
                     {
-                      "Fn::Sub": "arn:\${AWS::Partition}:ssm:\${AWS::Region}:\${AWS::AccountId}:parameter/CFN-CustomQnABotSettings-*",
+                      "Fn::Sub": "arn:\${AWS::Partition}:ssm:\${AWS::Region}:\${AWS::AccountId}:parameter/\${CustomQnABotSettings}",
                     },
                     {
-                      "Fn::Sub": "arn:\${AWS::Partition}:ssm:\${AWS::Region}:\${AWS::AccountId}:parameter/CFN-PrivateQnABotSettings-*",
+                      "Fn::Sub": "arn:\${AWS::Partition}:ssm:\${AWS::Region}:\${AWS::AccountId}:parameter/\${PrivateQnABotSettings}",
                     },
                     {
-                      "Fn::Sub": "arn:\${AWS::Partition}:ssm:\${AWS::Region}:\${AWS::AccountId}:parameter/CFN-DefaultQnABotSettings-*",
+                      "Fn::Sub": "arn:\${AWS::Partition}:ssm:\${AWS::Region}:\${AWS::AccountId}:parameter/\${DefaultQnABotSettings}",
                     },
                   ],
                 },
@@ -3666,7 +3648,6 @@ exports[`Verify master template is correct renders master template correctly 1`]
       "Type": "Custom::S3Clean",
     },
     "CustomQnABotSettings": {
-      "Condition": "DeprecatedSSMSettings",
       "Properties": {
         "Description": "Custom QnABot Settings - Modify to override defaults, or to add new settings",
         "Tier": "Advanced",
@@ -3723,7 +3704,6 @@ exports[`Verify master template is correct renders master template correctly 1`]
       "Type": "AWS::ServiceCatalogAppRegistry::AttributeGroup",
     },
     "DefaultQnABotSettings": {
-      "Condition": "DeprecatedSSMSettings",
       "Properties": {
         "Description": "Default QnABot Settings - DO NOT MODIFY",
         "Tier": "Advanced",
@@ -3797,13 +3777,7 @@ exports[`Verify master template is correct renders master template correctly 1`]
                   "false",
                 ],
               },
-              "LLM_GENERATE_QUERY_MODEL_PARAMS": {
-                "Fn::If": [
-                  "LLMSagemaker",
-                  "{\\"temperature\\":0.01, \\"return_full_text\\":false, \\"max_new_tokens\\": 150}",
-                  "{}",
-                ],
-              },
+              "LLM_GENERATE_QUERY_MODEL_PARAMS": "{}",
               "LLM_GENERATE_QUERY_PROMPT_TEMPLATE": {
                 "Fn::If": [
                   "LLMBedrock",
@@ -3831,13 +3805,7 @@ exports[`Verify master template is correct renders master template correctly 1`]
                       "MaxTokens",
                     ],
                   },
-                  {
-                    "Fn::If": [
-                      "LLMSagemaker",
-                      800,
-                      "",
-                    ],
-                  },
+                  "",
                 ],
               },
               "LLM_QA_ENABLE": {
@@ -3847,13 +3815,7 @@ exports[`Verify master template is correct renders master template correctly 1`]
                   "false",
                 ],
               },
-              "LLM_QA_MODEL_PARAMS": {
-                "Fn::If": [
-                  "LLMSagemaker",
-                  "{\\"temperature\\":0.01, \\"return_full_text\\":false, \\"max_new_tokens\\": 150}",
-                  "{}",
-                ],
-              },
+              "LLM_QA_MODEL_PARAMS": "{}",
               "LLM_QA_NO_HITS_REGEX": {
                 "Fn::If": [
                   "LLMBedrock",
@@ -15287,7 +15249,6 @@ function message(code, name) {
       "Type": "Custom::PreUpgradeExport",
     },
     "PrivateQnABotSettings": {
-      "Condition": "DeprecatedSSMSettings",
       "Properties": {
         "Description": "Private QnABot Settings - DO NOT MODIFY",
         "Tier": "Advanced",
@@ -18002,6 +17963,12 @@ exports.handler = (event, context, callback) => {
         "ALT_SEARCH_KENDRA_INDEX_AUTH": {
           "Ref": "AltSearchKendraIndexAuth",
         },
+        "CustomSettingsParameter": {
+          "Ref": "CustomQnABotSettings",
+        },
+        "DefaultSettingsParameter": {
+          "Ref": "DefaultQnABotSettings",
+        },
         "EMBEDDINGS_ENABLE": {
           "Fn::If": [
             "EmbeddingsEnable",
@@ -18266,6 +18233,9 @@ exports.handler = (event, context, callback) => {
         },
         "NATIVE_LANGUAGE": {
           "Ref": "Language",
+        },
+        "PrivateSettingsParameter": {
+          "Ref": "PrivateQnABotSettings",
         },
         "STREAMING_TABLE": {
           "Fn::If": [

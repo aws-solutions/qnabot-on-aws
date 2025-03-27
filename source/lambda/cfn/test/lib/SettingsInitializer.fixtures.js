@@ -34,6 +34,9 @@ exports.SettingsInitializerObject = function() {
         LLM_MODEL_ID: 'Test',
         KNOWLEDGE_BASE_MODEL_ID: 'Test',
         KNOWLEDGE_BASE_ID: 'Test',
+        DefaultSettingsParameter: 'CFN-DefaultQnABotSettings',
+        PrivateSettingsParameter: 'CFN-PrivateQnABotSettings',
+        CustomSettingsParameter: 'CFN-CustomQnABotSettings',
     }
 
     return params;

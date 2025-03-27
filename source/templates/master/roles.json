@@ -643,24 +643,14 @@
                 ]
               },
               {
-                "Effect":"Allow",
-                "Action": [
-                  "ssm:DescribeParameters"
-                ],
-                "Resource": [
-                  {"Fn::Sub": "arn:${AWS::Partition}:ssm:${AWS::Region}:${AWS::AccountId}:*" }
-              ]
-              },
-              {
                 "Effect": "Allow",
                 "Action": [
-                  "ssm:GetParameter",
-                  "ssm:DeleteParameter"
+                  "ssm:GetParameter"
                 ],
                 "Resource": [
-                  {"Fn::Sub": "arn:${AWS::Partition}:ssm:${AWS::Region}:${AWS::AccountId}:parameter/CFN-CustomQnABotSettings-*" },
-                  {"Fn::Sub": "arn:${AWS::Partition}:ssm:${AWS::Region}:${AWS::AccountId}:parameter/CFN-PrivateQnABotSettings-*" },
-                  {"Fn::Sub": "arn:${AWS::Partition}:ssm:${AWS::Region}:${AWS::AccountId}:parameter/CFN-DefaultQnABotSettings-*" }
+                  {"Fn::Sub": "arn:${AWS::Partition}:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${CustomQnABotSettings}" },
+                  {"Fn::Sub": "arn:${AWS::Partition}:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${PrivateQnABotSettings}" },
+                  {"Fn::Sub": "arn:${AWS::Partition}:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${DefaultQnABotSettings}" }
               ]
               }
             ]
