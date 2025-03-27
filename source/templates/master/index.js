@@ -535,7 +535,6 @@ module.exports = {
             ],
         },
         LogRetentionPeriodIsNotZero: { 'Fn::Not': [{ 'Fn::Equals': [{ Ref: 'LogRetentionPeriod' }, 0] }] },
-        DeprecatedSSMSettings: { "Fn::Equals": [ "true", "false"] },
     },
     Rules: {
         RequireLambdaArnForLambdaEmbeddingsApi: {

@@ -155,7 +155,6 @@ module.exports = {
     }, 
     DefaultQnABotSettings: {
         Type: 'AWS::SSM::Parameter',
-        Condition: 'DeprecatedSSMSettings',
         Properties: {
             Description: 'Default QnABot Settings - DO NOT MODIFY',
             Type: 'String',
@@ -173,9 +172,9 @@ module.exports = {
                         LLM_QA_ENABLE: { 'Fn::If': ['LLMEnable', 'true', 'false'] },
                         LLM_GENERATE_QUERY_PROMPT_TEMPLATE: { 'Fn::If': ['LLMBedrock', { 'Fn::FindInMap': ['BedrockDefaults', {'Ref' : 'LLMBedrockModelId'}, 'QueryPromptTemplate'] }, defaultGenerateQueryPromptTemplate] },
                         LLM_QA_PROMPT_TEMPLATE: { 'Fn::If': ['LLMBedrock', { 'Fn::FindInMap': ['BedrockDefaults', {'Ref' : 'LLMBedrockModelId'}, 'QAPromptTemplate'] }, defaultQAPromptTemplate] },
-                        LLM_GENERATE_QUERY_MODEL_PARAMS: { 'Fn::If': ['LLMSagemaker', defaultModelParams, '{}'] },
-                        LLM_QA_MODEL_PARAMS: { 'Fn::If': ['LLMSagemaker', defaultModelParams, '{}'] },
-                        LLM_PROMPT_MAX_TOKEN_LIMIT: { 'Fn::If': ['LLMBedrock', { 'Fn::FindInMap': ['BedrockDefaults', {'Ref' : 'LLMBedrockModelId'}, 'MaxTokens'] }, { 'Fn::If': ['LLMSagemaker', 800, ''] }] },
+                        LLM_GENERATE_QUERY_MODEL_PARAMS: '{}',
+                        LLM_QA_MODEL_PARAMS: '{}',
+                        LLM_PROMPT_MAX_TOKEN_LIMIT: { 'Fn::If': ['LLMBedrock', { 'Fn::FindInMap': ['BedrockDefaults', {'Ref' : 'LLMBedrockModelId'}, 'MaxTokens'] }, ''] },
                         LLM_QA_NO_HITS_REGEX: { 'Fn::If': ['LLMBedrock', { 'Fn::FindInMap': ['BedrockDefaults', {'Ref' : 'LLMBedrockModelId'}, 'NoHitsRegex'] }, defaultLlmNoHitsRegex] },
                         KNOWLEDGE_BASE_PROMPT_TEMPLATE: { 'Fn::If': ['BedrockKnowledgeBaseEnable', { 'Fn::FindInMap': ['BedrockDefaults', {'Ref' : 'BedrockKnowledgeBaseModel'}, 'KnowledgeBasePromptTemplate'] }, defaultKnowledgeBaseTemplate] },
                     },
@@ -185,7 +184,6 @@ module.exports = {
     },
     PrivateQnABotSettings: {
         Type: 'AWS::SSM::Parameter',
-        Condition: 'DeprecatedSSMSettings',
         Properties: {
             Description: 'Private QnABot Settings - DO NOT MODIFY',
             Type: 'String',
@@ -205,7 +203,6 @@ module.exports = {
     },
     CustomQnABotSettings: {
         Type: 'AWS::SSM::Parameter',
-        Condition: 'DeprecatedSSMSettings',
         Properties: {
             Description: 'Custom QnABot Settings - Modify to override defaults, or to add new settings',
             Type: 'String',

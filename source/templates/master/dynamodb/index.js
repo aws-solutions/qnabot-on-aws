@@ -112,6 +112,9 @@ module.exports = {
             KNOWLEDGE_BASE_ID: { 'Fn::If': ['BedrockKnowledgeBaseEnable', {'Ref' : 'BedrockKnowledgeBaseId'}, ''] },
             LLM_STREAMING_ENABLED: { 'Fn::If': ['StreamingEnabled', 'true', 'false'] },
             STREAMING_TABLE: { 'Fn::If': ['StreamingEnabled', { 'Fn::GetAtt': ['StreamingStack', 'Outputs.StreamingDynamoDbTable'] }, ''] },
+            DefaultSettingsParameter: { Ref: 'DefaultQnABotSettings' },
+            PrivateSettingsParameter: { Ref: 'PrivateQnABotSettings' },
+            CustomSettingsParameter: { Ref: 'CustomQnABotSettings' },
         },
     },
 };

@@ -4,7 +4,7 @@
  ************************************************************************************************ */
 
 const { DynamoDBClient, PutItemCommand, UpdateItemCommand, GetItemCommand } = require('@aws-sdk/client-dynamodb');
-const { SSMClient, GetParameterCommand, DeleteParameterCommand ,DescribeParametersCommand } = require('@aws-sdk/client-ssm');
+const { SSMClient, GetParameterCommand } = require('@aws-sdk/client-ssm');
 const { marshall } = require('@aws-sdk/util-dynamodb');
 const customSdkConfig = require('./util/customSdkConfig');
 const settingsJson = require('./DefaultSettings.json');
@@ -227,11 +227,6 @@ async function migrateFromSSM(tableName, ssmParameters) {
                         }
                 }
             }
-            const deleteParams = {
-                Name: ssmParameter
-            };
-            const deleteCommand = new DeleteParameterCommand(deleteParams)
-            await ssm.send(deleteCommand);
         }
         catch(error) {
             throw new Error(`Error migrating from SSM: ${error}`);
@@ -239,39 +234,6 @@ async function migrateFromSSM(tableName, ssmParameters) {
 
     }
 }
-
-async function getSSMParameters() {
-    const prefixes = [
-        'CFN-CustomQnABotSettings',
-        'CFN-DefaultQnABotSettings',
-        'CFN-PrivateQnABotSettings'
-    ];
-
-    let ssmParameters = []
-
-    for (const prefix of prefixes) {
-        const describeParams = {
-            ParameterFilters: [
-                {
-                    Key: "Name",
-                    Option: "BeginsWith",
-                    Values: [prefix]
-                }
-            ],
-            MaxResults: 1
-        };
-        const describeCommand = new DescribeParametersCommand(describeParams);
-        const describeResponse = await ssm.send(describeCommand);
-
-        if (describeResponse.Parameters.length > 0) {
-            ssmParameters = ssmParameters.concat(describeResponse.Parameters[0].Name);
-        }
-    }
-
-    return ssmParameters;
-}
-
-
 
 module.exports = class SettingsInitializer {
 
@@ -281,12 +243,18 @@ module.exports = class SettingsInitializer {
             let writePrivateSettings = true;
             // Initialize settings (will only add new settings if table is not empty)
             await writeSettingsToDynamoDB(SettingsTable, settingsJson);
-            const ssmParameters = await getSSMParameters();
+            
+            // Only migrate parameters that were explicitly passed to this function
+            const ssmParameters = [
+                params.DefaultSettingsParameter,
+                params.PrivateSettingsParameter,
+                params.CustomSettingsParameter
+            ]
 
             if (ssmParameters.length > 0) {
-                console.log('Legacy SSM parameters found. Performing migration from SSM to DynamoDB');
+                console.log(`Migrating specific SSM parameters: ${ssmParameters.join(', ')}`);
                 await migrateFromSSM(SettingsTable, ssmParameters);
-                writePrivateSettings = false
+                writePrivateSettings = false;
             } 
 
             await updatePrivateSettings(params, SettingsTable, writePrivateSettings);
@@ -323,5 +291,3 @@ module.exports = class SettingsInitializer {
         reply(null, ID, { FnGetAttrsDataObj: { Settings: "Deleted" } });
     }
 }
-
-
