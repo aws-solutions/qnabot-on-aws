@@ -531,7 +531,6 @@ character-reference-invalid under the MIT license
 charenc under the BSD-3-Clause license
 chokidar under the MIT license
 chownr under the ISC license
-chrome-aws-lambda under the MIT license
 chrome-trace-event under the MIT license
 ci-info under the MIT license
 cipher-base under the MIT license
@@ -941,7 +940,6 @@ jws under the MIT license
 kind-of under the MIT license
 kleur under the MIT license
 klona under the MIT license
-lambdafs under the MIT license
 langchain under the MIT license
 langchainhub under the MIT license
 langsmith under the MIT license
@@ -1333,7 +1331,6 @@ supports-preserve-symlinks-flag under the MIT license
 svgo under the MIT license
 symbol-tree under the MIT license
 tapable under the MIT license
-tar-fs under the MIT license
 tar-stream under the MIT license
 terminal-link under the MIT license
 terser-webpack-plugin under the MIT license

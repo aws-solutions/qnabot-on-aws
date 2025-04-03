@@ -1,6 +1,6 @@
 {
     "name": "cfn",
-    "version": "7.0.3",
+    "version": "7.0.4",
     "description": "QnABot Cfn Lambda",
     "main": "index.js",
     "scripts": {
