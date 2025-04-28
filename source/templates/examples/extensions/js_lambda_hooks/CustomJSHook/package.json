@@ -1,6 +1,6 @@
 {
     "name": "examples",
-    "version": "7.0.4",
+    "version": "7.0.5",
     "description": "Creates custom JS Lambda Hooks",
     "main": "index.js",
     "scripts": {

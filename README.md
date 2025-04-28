@@ -361,6 +361,7 @@ As QnABot evolves over the years, it makes use of various services and functiona
 _Note: **Deployable solution versions** refers to the ability to deploy the version of QnABot in their AWS accounts. **Actively supported versions** for QnABot is only available for the latest version of QnABot._
 
 ### Deployable Versions
+- [v7.0.5](https://github.com/aws-solutions/qnabot-on-aws/releases/tag/v7.0.5) - [Public](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v7.0.5/qnabot-on-aws-main.template)/[VPC](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v7.0.5/qnabot-on-aws-vpc.template)
 - [v7.0.4](https://github.com/aws-solutions/qnabot-on-aws/releases/tag/v7.0.4) - [Public](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v7.0.4/qnabot-on-aws-main.template)/[VPC](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v7.0.4/qnabot-on-aws-vpc.template)
 - [v7.0.3](https://github.com/aws-solutions/qnabot-on-aws/releases/tag/v7.0.3) - [Public](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v7.0.3/qnabot-on-aws-main.template)/[VPC](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v7.0.3/qnabot-on-aws-vpc.template)
   - _Note: Lambda Runtimes have been updated in the v7.0.0 release. Solution now uses: [**nodejs20** and python3.10]_
@@ -435,6 +436,7 @@ Some additional precautions you can take are:
  - backup DynamoDB table ([instructions](https://docs.aws.amazon.com/solutions/latest/qnabot-on-aws/amazon-dynamodb-backups.html)) 
  - create a manual snapshot of your OpenSearch Domain ([instructions](https://docs.aws.amazon.com/opensearch-service/latest/developerguide/managedomains-snapshots.html))
 
+> Note: For a more detailed steps, see [update or migrate deployment](/source/docs/update_or_migrate_deployment/README.md).
  ---
 ## Collection of operational metrics
 This solution collects anonymized operational metrics to help AWS improve the quality and features of the solution. For more information, including how to disable this capability, please see the [implementation guide](https://docs.aws.amazon.com/solutions/latest/qnabot-on-aws/general-reference.html).

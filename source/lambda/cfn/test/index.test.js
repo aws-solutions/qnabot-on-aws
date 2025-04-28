@@ -9,11 +9,6 @@ const Stream = require('stream');
 const originalEnv = process.env;
 const { handler } = require('../index');
 const indexFixtures = require('./index.fixtures');
-jest.mock('@smithy/node-http-handler');
-
-jest.mock('https', () => ({
-    methodToMock: {},
-}));
 
 const emitter = new EventEmitter();
 emitter.write = indexFixtures.writeMock;
