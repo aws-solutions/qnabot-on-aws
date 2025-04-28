@@ -13,10 +13,6 @@ const esMock = mockClient(OpenSearchClient);
 const { handler } = require('../handler');
 const { event, endMock, writeMock, doneMock } = require('./handler.fixtures');
 
-jest.mock('https', () => ({
-    methodToMock: {},
-}));
-
 const context = {
     logStreamName: 'mock log stream name',
     done: doneMock,
