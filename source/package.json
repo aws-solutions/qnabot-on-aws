@@ -1,6 +1,6 @@
 {
     "name": "qnabot-on-aws",
-    "version": "7.0.5",
+    "version": "7.0.6",
     "engines": {
         "node": ">=20.0.0",
         "npm": ">=10.0.0"
@@ -39,7 +39,7 @@
         "countUserInteractions": "./utilities/count_user_interactions.js",
         "code-linter": "./node_modules/eslint/bin/eslint.js . --ext .vue",
         "code-formatter": "./node_modules/prettier/bin-prettier.js --config .prettierrc.yml '**/*.js' --write",
-        "dev-mode": "cd website && export NODE_ENV=dev && export ASSET_BUCKET_NAME='' && npx webpack-cli --config ./config/webpack.config.js",
+        "dev-mode": "cd website && export NODE_ENV=dev && export ASSET_BUCKET_NAME='qna-dev-dev-master-19-bucket-uxpwcodflrdi' && npx webpack-cli --config ./config/webpack.config.js",
         "test:website": "jest",
         "test-watch:website": "jest --watch",
         "test:clear-cache": "jest --clearCache"
@@ -189,14 +189,14 @@
         "webpack": "^5.94.0",
         "webpack-bundle-analyzer": "^4.9.1",
         "webpack-cli": "^5.1.4",
-        "webpack-dev-server": "^4.15.2",
+        "webpack-dev-server": "^5.2.2",
         "webpack-merge": "^5.10.0",
         "webpack-s3-plugin": "^1.2.0-rc.0",
         "zip-webpack-plugin": "^4.0.1"
     },
     "overrides": {
         "cross-spawn": "^7.0.6",
-        "minimatch": "^3.0.5",
+        "minimatch": "^3.1.2",
         "micromatch": "^4.0.8",
         "word-wrap@<1.2.4": "^1.2.4",
         "tough-cookie@<4.1.3": "^4.1.3",
@@ -210,7 +210,8 @@
         "postcss": "^8.5.1",
         "elliptic": "^6.6.1",
         "uglify-js": "^3.19.2",
-        "sinon": "^19.0.2"
+        "sinon": "^19.0.2",
+        "webpack-dev-server": "^5.2.2"
     },
     "jest": {
         "globals": {

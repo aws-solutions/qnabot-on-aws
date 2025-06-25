@@ -1633,6 +1633,25 @@ openapi-schema-validator under the BSD license.
 pandas under the BSD license.
 pywin32 under the PSF-2.0 license.
 fast-uri under the BSD-3-Clause license.
+call-bind-apply-helpers under the MIT license.
+es-object-atoms under the MIT license.
+get-proto under the MIT license.
+dunder-proto under the MIT license.
+math-intrinsics under the MIT license.
+call-bound under the MIT license.
+is-inside-container under the MIT license.
+default-browser under the MIT license.
+bundle-name under the MIT license.
+run-applescript under the MIT license.
+default-browser-id under the MIT license.
+is-network-error under the MIT license.
+@jsonjoy.com/base64 under the Apache-2.0 license.
+@jsonjoy.com/json-pack under the Apache-2.0 license.
+hyperdyperid under the MIT license.
+@jsonjoy.com/util under the Apache-2.0 license.
+thingies under the Unlicense license.
+tree-dump under the Apache-2.0 license.
+to-buffer under the MIT license.
 
 ********************
 OPEN SOURCE LICENSES
