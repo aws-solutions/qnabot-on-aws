@@ -205,10 +205,10 @@ module.exports = {
             AllowedPattern: '([^ ]+)|(EMPTY)',
             ConstraintDescription: 'Must be a valid Amazon OpenSearch domain name or \'EMPTY\'',
         },
-        OpenSearchInstanceType: {
+        OpenSearchNodeInstanceType: {
             Type: 'String',
             Description:
-                'OpenSearch instance type to use for the domain. Default recommendation for production deployments is m6g.large.search (see https://docs.aws.amazon.com/opensearch-service/latest/developerguide/supported-instance-types.html for other options).',
+                'OpenSearch instance type for data nodes in the domain. Default recommendation for production deployments is m6g.large.search (see https://docs.aws.amazon.com/opensearch-service/latest/developerguide/supported-instance-types.html for other options).',
             Default: 'm6g.large.search',
             AllowedPattern: '^\\w+\\.\\w+\\.search$',
             ConstraintDescription: 'Must be a valid OpenSearch instance type',
@@ -314,7 +314,7 @@ module.exports = {
         OpenSearchNodeCount: {
             Type: 'String',
             Description:
-                'Number of nodes in Amazon OpenSearch Service domain - \'4\' is recommended for fault tolerant production deployments.',
+                'Number of data nodes in Amazon OpenSearch Service domain - \'4\' is recommended for fault tolerant production deployments.',
             AllowedValues: ['1', '2', '4'],
             Default: '4',
         },
@@ -494,6 +494,27 @@ module.exports = {
             ],
             MinValue: 0,
         },
+        OpenSearchDedicatedMasterNodes: {
+            Type: 'String',
+            Description: 'Enable OpenSearch add dedicated master nodes to increase cluster stability. Please note that deploying additional nodes will increase cost, see - https://aws.amazon.com/opensearch-service/pricing/',
+            Default: 'DISABLED',
+            AllowedValues: ['DISABLED', 'ENABLED'],
+        },
+        OpenSearchMasterNodeInstanceType: {
+            Type: 'String',
+            Description:
+                'Required when OpenSearchDedicatedMasterNodes is ENABLED. OpenSearch instance type for master nodes in the domain. Default recommendation for production deployments is m6g.large.search (see https://docs.aws.amazon.com/opensearch-service/latest/developerguide/supported-instance-types.html for other options).',
+            Default: 'm6g.large.search',
+            AllowedPattern: '^\\w+\\.\\w+\\.search$',
+            ConstraintDescription: 'Must be a valid OpenSearch instance type',
+        },
+        OpenSearchMasterNodeCount: {
+            Type: 'String',
+            Description:
+                'Required when OpenSearchDedicatedMasterNodes is ENABLED. Number of dedicated master nodes to add in your Amazon OpenSearch Service domain. \'3\' is the minimum default value. See - https://docs.aws.amazon.com/opensearch-service/latest/developerguide/managedomains-dedicatedmasternodes.html#dedicatedmasternodes-number',
+            AllowedValues: ['3', '5'],
+            Default: '3',
+        },
     },
     Conditions: {
         Public: { 'Fn::Equals': [{ Ref: 'PublicOrPrivate' }, 'PUBLIC'] },
@@ -516,6 +537,7 @@ module.exports = {
             'Fn::Not': [{ 'Fn::Equals': [{ Ref: 'FulfillmentConcurrency' }, '0'] }],
         },
         SingleNode: { 'Fn::Equals': [{ Ref: 'OpenSearchNodeCount' }, '1'] },
+        MasterNodesEnabled: { 'Fn::Equals': [{ Ref: 'OpenSearchDedicatedMasterNodes' }, 'ENABLED'] },
         BedrockKnowledgeBaseEnable: { 'Fn::Not': [{ 'Fn::Equals': [{ Ref: 'BedrockKnowledgeBaseId' }, ''] }] },
         BedrockEnable: { 'Fn::Or': [{ 'Fn::Equals': [{ Ref: 'LLMApi' }, 'BEDROCK'] }, { 'Fn::Equals': [{ Ref: 'EmbeddingsApi' }, 'BEDROCK'] }, { Condition: 'BedrockKnowledgeBaseEnable' }] },
         EmbeddingsEnable: { 'Fn::Not': [{ 'Fn::Equals': [{ Ref: 'EmbeddingsApi' }, 'DISABLED'] }] },
@@ -564,7 +586,10 @@ module.exports = {
                         'PublicOrPrivate',
                         'Language',
                         'OpenSearchName',
-                        'OpenSearchInstanceType',
+                        'OpenSearchDedicatedMasterNodes',
+                        'OpenSearchMasterNodeInstanceType',
+                        'OpenSearchMasterNodeCount',
+                        'OpenSearchNodeInstanceType',
                         'OpenSearchNodeCount',
                         'OpenSearchEBSVolumeSize',
                         'OpenSearchDashboardsRetentionMinutes',

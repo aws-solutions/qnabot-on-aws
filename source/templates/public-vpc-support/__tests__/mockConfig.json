@@ -18,6 +18,7 @@
   "InstallLexResponseBots": true,
   "DefaultKendraIndexId": "",
   "devOpenSearchNodeCount": 1,
+  "devOpenSearchMasterNodeCount": 1,
   "LLMApi": "BEDROCK",
   "OpenSearchFineGrainAccessControl": "FALSE",
   "EnableStreaming": "FALSE"

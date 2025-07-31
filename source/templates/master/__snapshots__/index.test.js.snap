@@ -239,6 +239,14 @@ exports[`Verify master template is correct renders master template correctly 1`]
         },
       ],
     },
+    "MasterNodesEnabled": {
+      "Fn::Equals": [
+        {
+          "Ref": "OpenSearchDedicatedMasterNodes",
+        },
+        "ENABLED",
+      ],
+    },
     "Public": {
       "Fn::Equals": [
         {
@@ -548,7 +556,10 @@ exports[`Verify master template is correct renders master template correctly 1`]
             "PublicOrPrivate",
             "Language",
             "OpenSearchName",
-            "OpenSearchInstanceType",
+            "OpenSearchDedicatedMasterNodes",
+            "OpenSearchMasterNodeInstanceType",
+            "OpenSearchMasterNodeCount",
+            "OpenSearchNodeInstanceType",
             "OpenSearchNodeCount",
             "OpenSearchEBSVolumeSize",
             "OpenSearchDashboardsRetentionMinutes",
@@ -1205,6 +1216,15 @@ exports[`Verify master template is correct renders master template correctly 1`]
       "MinValue": 0,
       "Type": "Number",
     },
+    "OpenSearchDedicatedMasterNodes": {
+      "AllowedValues": [
+        "DISABLED",
+        "ENABLED",
+      ],
+      "Default": "DISABLED",
+      "Description": "Enable OpenSearch add dedicated master nodes to increase cluster stability. Please note that deploying additional nodes will increase cost, see - https://aws.amazon.com/opensearch-service/pricing/",
+      "Type": "String",
+    },
     "OpenSearchEBSVolumeSize": {
       "Default": 10,
       "Description": "Size in GB of each EBS volume attached to OpenSearch node instances - '10' is the minimum default volume size.",
@@ -1221,11 +1241,20 @@ exports[`Verify master template is correct renders master template correctly 1`]
       "Description": "Set to FALSE if Fine-grained access control does not need to be enabled by default. Once fine-grained access control is enabled, it cannot be disabled. Please note that it may take an additional 30-60 minutes for AWS OpenSearch Service to apply these settings to the OpenSearch domain after the stack has been deployed. (see https://docs.aws.amazon.com/opensearch-service/latest/developerguide/fgac.html for additional details).",
       "Type": "String",
     },
-    "OpenSearchInstanceType": {
+    "OpenSearchMasterNodeCount": {
+      "AllowedValues": [
+        "3",
+        "5",
+      ],
+      "Default": "3",
+      "Description": "Required when OpenSearchDedicatedMasterNodes is ENABLED. Number of dedicated master nodes to add in your Amazon OpenSearch Service domain. '3' is the minimum default value. See - https://docs.aws.amazon.com/opensearch-service/latest/developerguide/managedomains-dedicatedmasternodes.html#dedicatedmasternodes-number",
+      "Type": "String",
+    },
+    "OpenSearchMasterNodeInstanceType": {
       "AllowedPattern": "^\\w+\\.\\w+\\.search$",
       "ConstraintDescription": "Must be a valid OpenSearch instance type",
       "Default": "m6g.large.search",
-      "Description": "OpenSearch instance type to use for the domain. Default recommendation for production deployments is m6g.large.search (see https://docs.aws.amazon.com/opensearch-service/latest/developerguide/supported-instance-types.html for other options).",
+      "Description": "Required when OpenSearchDedicatedMasterNodes is ENABLED. OpenSearch instance type for master nodes in the domain. Default recommendation for production deployments is m6g.large.search (see https://docs.aws.amazon.com/opensearch-service/latest/developerguide/supported-instance-types.html for other options).",
       "Type": "String",
     },
     "OpenSearchName": {
@@ -1242,7 +1271,14 @@ exports[`Verify master template is correct renders master template correctly 1`]
         "4",
       ],
       "Default": "4",
-      "Description": "Number of nodes in Amazon OpenSearch Service domain - '4' is recommended for fault tolerant production deployments.",
+      "Description": "Number of data nodes in Amazon OpenSearch Service domain - '4' is recommended for fault tolerant production deployments.",
+      "Type": "String",
+    },
+    "OpenSearchNodeInstanceType": {
+      "AllowedPattern": "^\\w+\\.\\w+\\.search$",
+      "ConstraintDescription": "Must be a valid OpenSearch instance type",
+      "Default": "m6g.large.search",
+      "Description": "OpenSearch instance type for data nodes in the domain. Default recommendation for production deployments is m6g.large.search (see https://docs.aws.amazon.com/opensearch-service/latest/developerguide/supported-instance-types.html for other options).",
       "Type": "String",
     },
     "PublicOrPrivate": {
@@ -15083,77 +15119,161 @@ function message(code, name) {
         },
       },
       "Properties": {
-        "AdvancedOptions": {
-          "rest.action.multi.allow_explicit_index": "true",
-        },
-        "ClusterConfig": {
-          "DedicatedMasterEnabled": false,
-          "InstanceCount": {
-            "Ref": "OpenSearchNodeCount",
-          },
-          "InstanceType": {
-            "Ref": "OpenSearchInstanceType",
-          },
-          "ZoneAwarenessEnabled": {
-            "Fn::If": [
-              "SingleNode",
-              false,
-              true,
-            ],
-          },
-        },
-        "CognitoOptions": {
-          "Enabled": true,
-          "IdentityPoolId": {
-            "Ref": "OpenSearchDashboardsIdPool",
-          },
-          "RoleArn": {
-            "Fn::GetAtt": [
-              "ESCognitoRole",
-              "Arn",
-            ],
-          },
-          "UserPoolId": {
-            "Ref": "UserPool",
-          },
-        },
-        "DomainEndpointOptions": {
-          "EnforceHTTPS": true,
-          "TLSSecurityPolicy": "Policy-Min-TLS-1-2-2019-07",
-        },
-        "EBSOptions": {
-          "EBSEnabled": true,
-          "VolumeSize": {
-            "Ref": "OpenSearchEBSVolumeSize",
-          },
-          "VolumeType": "gp3",
-        },
-        "EncryptionAtRestOptions": {
-          "Enabled": true,
-        },
-        "EngineVersion": "OpenSearch_2.11",
-        "NodeToNodeEncryptionOptions": {
-          "Enabled": true,
-        },
-        "SnapshotOptions": {
-          "AutomatedSnapshotStartHour": "0",
-        },
-        "VPCOptions": {
-          "Fn::If": [
-            "VPCEnabled",
-            {
-              "SecurityGroupIds": {
-                "Ref": "VPCSecurityGroupIdList",
+        "Fn::If": [
+          "MasterNodesEnabled",
+          {
+            "AdvancedOptions": {
+              "rest.action.multi.allow_explicit_index": "true",
+            },
+            "ClusterConfig": {
+              "DedicatedMasterCount": {
+                "Ref": "OpenSearchMasterNodeCount",
               },
-              "SubnetIds": {
-                "Ref": "VPCSubnetIdList",
+              "DedicatedMasterEnabled": "true",
+              "DedicatedMasterType": {
+                "Ref": "OpenSearchMasterNodeInstanceType",
+              },
+              "InstanceCount": {
+                "Ref": "OpenSearchNodeCount",
+              },
+              "InstanceType": {
+                "Ref": "OpenSearchNodeInstanceType",
+              },
+              "ZoneAwarenessEnabled": {
+                "Fn::If": [
+                  "SingleNode",
+                  false,
+                  true,
+                ],
               },
             },
-            {
-              "Ref": "AWS::NoValue",
+            "CognitoOptions": {
+              "Enabled": true,
+              "IdentityPoolId": {
+                "Ref": "OpenSearchDashboardsIdPool",
+              },
+              "RoleArn": {
+                "Fn::GetAtt": [
+                  "ESCognitoRole",
+                  "Arn",
+                ],
+              },
+              "UserPoolId": {
+                "Ref": "UserPool",
+              },
             },
-          ],
-        },
+            "DomainEndpointOptions": {
+              "EnforceHTTPS": true,
+              "TLSSecurityPolicy": "Policy-Min-TLS-1-2-2019-07",
+            },
+            "EBSOptions": {
+              "EBSEnabled": true,
+              "VolumeSize": {
+                "Ref": "OpenSearchEBSVolumeSize",
+              },
+              "VolumeType": "gp3",
+            },
+            "EncryptionAtRestOptions": {
+              "Enabled": true,
+            },
+            "EngineVersion": "OpenSearch_2.19",
+            "NodeToNodeEncryptionOptions": {
+              "Enabled": true,
+            },
+            "SnapshotOptions": {
+              "AutomatedSnapshotStartHour": "0",
+            },
+            "VPCOptions": {
+              "Fn::If": [
+                "VPCEnabled",
+                {
+                  "SecurityGroupIds": {
+                    "Ref": "VPCSecurityGroupIdList",
+                  },
+                  "SubnetIds": {
+                    "Ref": "VPCSubnetIdList",
+                  },
+                },
+                {
+                  "Ref": "AWS::NoValue",
+                },
+              ],
+            },
+          },
+          {
+            "AdvancedOptions": {
+              "rest.action.multi.allow_explicit_index": "true",
+            },
+            "ClusterConfig": {
+              "DedicatedMasterEnabled": "false",
+              "InstanceCount": {
+                "Ref": "OpenSearchNodeCount",
+              },
+              "InstanceType": {
+                "Ref": "OpenSearchNodeInstanceType",
+              },
+              "ZoneAwarenessEnabled": {
+                "Fn::If": [
+                  "SingleNode",
+                  false,
+                  true,
+                ],
+              },
+            },
+            "CognitoOptions": {
+              "Enabled": true,
+              "IdentityPoolId": {
+                "Ref": "OpenSearchDashboardsIdPool",
+              },
+              "RoleArn": {
+                "Fn::GetAtt": [
+                  "ESCognitoRole",
+                  "Arn",
+                ],
+              },
+              "UserPoolId": {
+                "Ref": "UserPool",
+              },
+            },
+            "DomainEndpointOptions": {
+              "EnforceHTTPS": true,
+              "TLSSecurityPolicy": "Policy-Min-TLS-1-2-2019-07",
+            },
+            "EBSOptions": {
+              "EBSEnabled": true,
+              "VolumeSize": {
+                "Ref": "OpenSearchEBSVolumeSize",
+              },
+              "VolumeType": "gp3",
+            },
+            "EncryptionAtRestOptions": {
+              "Enabled": true,
+            },
+            "EngineVersion": "OpenSearch_2.19",
+            "NodeToNodeEncryptionOptions": {
+              "Enabled": true,
+            },
+            "SnapshotOptions": {
+              "AutomatedSnapshotStartHour": "0",
+            },
+            "VPCOptions": {
+              "Fn::If": [
+                "VPCEnabled",
+                {
+                  "SecurityGroupIds": {
+                    "Ref": "VPCSecurityGroupIdList",
+                  },
+                  "SubnetIds": {
+                    "Ref": "VPCSubnetIdList",
+                  },
+                },
+                {
+                  "Ref": "AWS::NoValue",
+                },
+              ],
+            },
+          },
+        ],
       },
       "Type": "AWS::OpenSearchService::Domain",
       "UpdatePolicy": {
@@ -19141,22 +19261,22 @@ exports.handler = (event, context, callback) => {
         "OpenSearchFineGrainAccessControl": {
           "Ref": "OpenSearchFineGrainAccessControl",
         },
-        "OpenSearchInstanceType": {
+        "OpenSearchNodeCount": {
           "Fn::If": [
             "CreateDomain",
             {
-              "Ref": "OpenSearchInstanceType",
+              "Ref": "OpenSearchNodeCount",
             },
             {
               "Ref": "AWS::NoValue",
             },
           ],
         },
-        "OpenSearchNodeCount": {
+        "OpenSearchNodeInstanceType": {
           "Fn::If": [
             "CreateDomain",
             {
-              "Ref": "OpenSearchNodeCount",
+              "Ref": "OpenSearchNodeInstanceType",
             },
             {
               "Ref": "AWS::NoValue",

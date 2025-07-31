@@ -219,10 +219,10 @@ module.exports = {
             Region: { Ref: 'AWS::Region' },
             SolutionId: util.getCommonEnvironmentVariables().SOLUTION_ID,
             Version: util.getCommonEnvironmentVariables().SOLUTION_VERSION,
-            OpenSearchInstanceType: {
+            OpenSearchNodeInstanceType: {
                 'Fn::If': [
                     'CreateDomain',
-                    { Ref: 'OpenSearchInstanceType' },
+                    { Ref: 'OpenSearchNodeInstanceType' },
                     { Ref: 'AWS::NoValue' },
                 ],
             },

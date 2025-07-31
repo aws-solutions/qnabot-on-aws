@@ -55,7 +55,7 @@ describe('master template with config', () => {
                 LLMLambdaArn : { Default: 'arn:aws:lambda:us-east-1:12345678910:function:qna-test' },
                 VPCSubnetIdList : { Default: 'vpc-subnet-test' },
                 VPCSecurityGroupIdList : { Default: 'sg-test' },
-                OpenSearchInstanceType : { Default: 'm6g.large.search' },
+                OpenSearchNodeInstanceType: { Default: 'm6g.large.search' },
                 FulfillmentConcurrency: { Default: 1 },
                 LexV2BotLocaleIds: { Default: 'en_US,es_US,fr_CA' },
                 LogRetentionPeriod: { Default: 0 },
@@ -64,6 +64,10 @@ describe('master template with config', () => {
                 InstallLexResponseBots: { Default: true },
                 OpenSearchFineGrainAccessControl: { Default: 'FALSE' },
                 EnableStreaming: { Default: 'FALSE' },
+                OpenSearchDedicatedMasterNodes: { Default: 'DISABLED' },
+                OpenSearchMasterNodeCount: { Default: 3 },
+                OpenSearchMasterNodeInstanceType: { Default: 'm6g.large.search' },
+
             },
         };
 

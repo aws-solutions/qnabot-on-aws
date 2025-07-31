@@ -86,11 +86,20 @@ module.exports = {
         VPCSecurityGroupIdList: {
             Default: 'sg-0000000000000000,sg-0000000000000000',
         },
-        OpenSearchInstanceType : {
+        OpenSearchNodeInstanceType: {
             Default: 'test',
         },
         OpenSearchFineGrainAccessControl: {
             Default: 'FALSE',
+        },
+        OpenSearchDedicatedMasterNodes: {
+            Default: 'DISABLED',
+        },
+        OpenSearchMasterNodeInstanceType: {
+            Default: 'test',
+        },
+        OpenSearchMasterNodeCount: {
+            Default: 'test',
         },
         EnableStreaming: {
             Default: 'FALSE',

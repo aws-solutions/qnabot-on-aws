@@ -20,6 +20,7 @@
   "KendraFaqIndexId": "",
   "AltSearchKendraIndexes": "",
   "devOpenSearchNodeCount": 1,
+  "devOpenSearchMasterNodeCount": 3,
   "LLMApi": "BEDROCK",
   "OpenSearchFineGrainAccessControl": "FALSE"
 }
