@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [7.1.0] - 2025-07-31
+
+### Added
+
+- Ability to enable dedicated master nodes for Amazon OpenSearch domain. `OpenSearchDedicatedMasterNodes`, `OpenSearchMasterNodeCount` & `OpenSearchMasterNodeInstanceType` CloudFormation parameters have been added
+
+### Changed
+
+- Updated Amazon OpenSearch version to `2.19`
+
+### Security
+
+- Updated linkifyjs to `4.3.2`
+
 ## [7.0.7] - 2025-07-24
 
 ### Security

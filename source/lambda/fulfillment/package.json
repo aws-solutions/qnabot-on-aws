@@ -1,6 +1,6 @@
 {
     "name": "fulfillment",
-    "version": "7.0.7",
+    "version": "7.1.0",
     "description": "QnABot Lambda handling fulfillment of user requests",
     "main": "handler.js",
     "scripts": {

@@ -37,8 +37,11 @@ module.exports = {
     EmbeddingsLambdaArn: '',
     LLMLambdaArn: '',
     devOpenSearchNodeCount: 1,
-    OpenSearchInstanceType: 'm6g.large.search',
+    OpenSearchNodeInstanceType: 'm6g.large.search',
+    OpenSearchMasterNodeInstanceType: 'm6g.large.search',
     OpenSearchFineGrainAccessControl: 'TRUE',
+    OpenSearchDedicatedMasterNodes: 'DISABLED',
+    devOpenSearchMasterNodeCount: 3,
     VPCSubnetIdList: '',
     VPCSecurityGroupIdList: '',
     EnableStreaming: 'FALSE'

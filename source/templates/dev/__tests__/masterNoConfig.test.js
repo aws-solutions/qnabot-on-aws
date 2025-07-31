@@ -41,7 +41,7 @@ describe('master template with config', () => {
                 PublicOrPrivate: { Default: 'test' },
                 Language: { Default: 'test' },
                 OpenSearchNodeCount: { Default: 'test' },
-                OpenSearchInstanceType: { Default: 'test' },
+                OpenSearchNodeInstanceType: { Default: 'test' },
                 EmbeddingsLambdaArn: { Default: '0000000000000000000000000000000000000:function:test' },
                 KendraWebPageIndexId: { Default: 'test' },
                 KendraFaqIndexId: { Default: 'test' },
@@ -64,6 +64,9 @@ describe('master template with config', () => {
                 XraySetting: { Default: 'test' },
                 OpenSearchFineGrainAccessControl: { Default: 'FALSE' },
                 EnableStreaming: { Default: 'FALSE' },
+                OpenSearchDedicatedMasterNodes: { Default: 'DISABLED' },
+                OpenSearchMasterNodeCount: { Default: 'test' },
+                OpenSearchMasterNodeInstanceType: { Default: 'test' },
             },
         };
         expect(templateFile).toEqual(expectResult);
