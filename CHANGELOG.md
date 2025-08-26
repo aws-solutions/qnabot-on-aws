@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Updated sha.js to `2.4.12`
 - Updated cipher-base to `1.0.6`
+- Mitigated security findings from Amazon Inspector
 
 ## [7.1.0] - 2025-07-31
 
