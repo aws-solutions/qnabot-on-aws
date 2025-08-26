@@ -185,8 +185,8 @@ def custom_resource(event, _):
 def send_metrics_request(metrics_data, solution_id, solution_uuid):
     headers = {"Content-Type": "application/json"}
     payload = {
-                "Solution": solution_id,
-                "UUID": solution_uuid,
+                "Solution": solution_id.encode(),
+                "UUID": solution_uuid.encode(),
                 "TimeStamp": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%S.%f"),
                 "Data": metrics_data,
             }
