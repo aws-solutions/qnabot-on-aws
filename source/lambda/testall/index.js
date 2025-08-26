@@ -40,6 +40,12 @@ async function getStatusAndStartNextStep(Bucket, Key, VersionId, nextStep) {
     const getObjCmd = new GetObjectCommand({ Bucket, Key, VersionId });
     const s3GetObj = await s3.send(getObjCmd);
     const readableStream = Buffer.concat(await s3GetObj.Body.toArray());
+
+    /**
+     * False Positive - CWE 502,1321: Deserialization of untrusted object
+     * Attackers can modify unexpected objects or data that was assumed to be safe from modification
+     * Deserialized data or code could be modified without using the provided accessor functions,
+     * or unexpected functions could be invoked */
     const config = JSON.parse(readableStream);
 
     if (config.status !== 'Error' && config.status !== 'Completed') {

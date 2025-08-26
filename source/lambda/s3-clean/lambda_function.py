@@ -25,6 +25,7 @@ def delete_bucket_objects(event, _):
     '''
     resource_properties = event["ResourceProperties"]
     bucket = resource_properties["Bucket"]
+    bucket_name = bucket.encode()
 
     s3_client = boto3.client('s3', config=sdk_config)
 
@@ -41,13 +42,13 @@ def delete_bucket_objects(event, _):
         object_list = object_versions.get('Versions', []) + object_versions.get('DeleteMarkers', [])
     except botocore.exceptions.ClientError as err:
         if err.response['Error']['Code'] == 'NoSuchBucket':
-            logger.info(f"Bucket {bucket} does not exist")
+            logger.info(f"Bucket {bucket_name} does not exist")
             return
         else:
             raise err
 
     if len(object_list) > 0:
-        logger.info(f"There are {len(object_list)} objects to delete in {bucket}")
+        logger.info(f"There are {len(object_list)} objects to delete in {bucket_name}")
         
         s3_client.put_bucket_versioning(
             Bucket=f'{bucket}',
@@ -55,7 +56,7 @@ def delete_bucket_objects(event, _):
                 'Status': 'Suspended'
             }
         )
-        logger.info(f"Suspended bucket versioning in {bucket}")
+        logger.info(f"Suspended bucket versioning in {bucket_name}")
 
         delete_objects_response = s3_client.delete_objects(
             Bucket=bucket,
@@ -75,7 +76,7 @@ def delete_bucket_objects(event, _):
             raise RuntimeError(f"Error deleting objects: {errors}")
         
     else:
-        logger.info(f"There are no objects to delete in {bucket}")
+        logger.info(f"There are no objects to delete in {bucket_name}")
         return True
 
 @helper.create
