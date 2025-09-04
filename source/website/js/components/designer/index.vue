@@ -187,43 +187,43 @@ module.exports = {
             { value: 10, title: '10' },
             { value: 25, title: '25' },
             { value: 50, title: '50' },
-            { value: 100, title: '100' },
+            { value: 100, title: '100' }
         ],
         pagination: {
             page: 1,
             rowsPerPage: '100',
-            sortBy: 'qid',
+            sortBy: 'qid'
         },
         headers: [
             {
                 title: 'SelectAll',
                 align: 'left',
-                sortable: false,
+                sortable: false
             },
             {
                 title: 'Id',
                 value: 'qid',
                 align: 'left',
-                sortable: true,
+                sortable: true
             },
             {
                 title: 'Type',
                 value: 'type',
                 align: 'left',
-                sortable: false,
+                sortable: false
             },
             {
                 title: 'First Question',
                 value: 'q[0] || a',
                 align: 'left',
-                sortable: false,
+                sortable: false
             },
             {
                 title: 'RowOptions',
                 align: 'left',
-                sortable: false,
-            },
-        ],
+                sortable: false
+            }
+        ]
     }),
     components: {
         qa: require('./qa.vue').default,
@@ -234,8 +234,7 @@ module.exports = {
         edit: require('./edit.vue').default,
         build: require('./rebuild.vue').default,
         alexa: require('./alexa.vue').default,
-        sync: require('./synckendra.vue').default,
-
+        sync: require('./synckendra.vue').default
     },
     computed: {
         empty() {
@@ -252,7 +251,7 @@ module.exports = {
         },
         selectedMultiple() {
             return this.QAs.map((x) => x.select).includes(true);
-        },
+        }
     },
     async created() {
         await this.$store.dispatch('data/schema');
@@ -262,12 +261,12 @@ module.exports = {
     watch: {
         active(tab) {
             if (tab === 'test') {
-                this.sortBy = [{ key: 'score', order: 'desc'}];
+                this.sortBy = [{ key: 'score', order: 'desc' }];
             } else {
                 this.sortBy = [{ key: 'qid', order: 'asc' }];
                 this.get();
             }
-        },
+        }
     },
     methods: {
         loadItems({ page, sortBy }) {
@@ -292,7 +291,13 @@ module.exports = {
             }
         }, 100, { trailing: true, leading: false }),
         checkSelect(value) {
-            this.selectAll = this.selectAll && value;
+            // If unchecking an item, selectAll should be false
+            if (!value) {
+                this.selectAll = false;
+            } else {
+                // If checking an item, only set selectAll to true if all items are now selected
+                this.selectAll = this.QAs.every((qa) => qa.select);
+            }
         },
         toggleSelectAll() {
             this.$store.commit('data/selectAll', this.selectAll);
@@ -304,14 +309,12 @@ module.exports = {
             this.deleteIds = [];
         },
         handleDelete(questions) {
-          const self = this;
-          this.deleteLoading = true;
-          this.deleteIds = questions.map((x) => x.qid);
-          return (async () => {
+            const self = this;
+            this.deleteLoading = true;
+            this.deleteIds = questions.map((x) => x.qid);
+            return (async () => {
                 if (self.selectAll) {
-                    return self.$store
-                        .dispatch('data/removeFilter')
-                        .then(() => self.selectAll = false);
+                    return self.$store.dispatch('data/removeFilter').then(() => (self.selectAll = false));
                 }
                 return (async () => {
                     if (questions.length === 1) {
@@ -322,45 +325,44 @@ module.exports = {
                 })();
             })()
                 .then(() => self.$store.commit('data/selectAll', false))
-                .then(() => this.deleteSuccess = 'Success!')
-                .catch((error) => this.deleteError = error);
+                .then(() => (this.deleteSuccess = 'Success!'))
+                .catch((error) => (this.deleteError = error));
         },
-        edit: console.log,
-    },
+        edit: console.log
+    }
 };
 </script>
-<style lang='scss'>
-  .tabs__item {
-    color:white !important;
-  }
+<style lang="scss">
+.tabs__item {
+    color: white !important;
+}
 </style>
-<style lang='scss' scoped>
-
-  .shrink {
-    width:10%;
-  }
-  .root-card {
-    margin:auto;
-  }
-  .icon {
-    cursor:pointer;
-  }
-  .datatable thead th.title {
+<style lang="scss" scoped>
+.shrink {
+    width: 10%;
+}
+.root-card {
+    margin: auto;
+}
+.icon {
+    cursor: pointer;
+}
+.datatable thead th.title {
     .icon {
-      font-size:inherit;
+        font-size: inherit;
     }
-  }
-  .buttons {
-    position:absolute;
-    right:0;
-  }
-  tr {
-    position:relative;
-  }
-  .icon-button {
+}
+.buttons {
+    position: absolute;
+    right: 0;
+}
+tr {
+    position: relative;
+}
+.icon-button {
     background: transparent;
     box-shadow: none !important;
     border-radius: 50%;
     justify-content: center;
-  }
+}
 </style>

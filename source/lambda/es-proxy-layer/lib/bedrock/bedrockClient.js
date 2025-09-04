@@ -1,15 +1,34 @@
 /** ************************************************************************************************
-*   Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.                             *
-*   SPDX-License-Identifier: Apache-2.0                                                            *
+ *   Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.                             *
+ *   SPDX-License-Identifier: Apache-2.0                                                            *
  ************************************************************************************************ */
 
-const { BedrockRuntimeClient, InvokeModelCommand, ConverseCommand, ConverseStreamCommand } = require('@aws-sdk/client-bedrock-runtime');
+const {
+    BedrockRuntimeClient,
+    InvokeModelCommand,
+    ConverseCommand,
+    ConverseStreamCommand
+} = require('@aws-sdk/client-bedrock-runtime');
 const { ApiGatewayManagementApiClient, PostToConnectionCommand } = require('@aws-sdk/client-apigatewaymanagementapi');
 const qnabot = require('qnabot/logging');
 const customSdkConfig = require('sdk-config/customSdkConfig');
 const { getConnectionId } = require('../getConnectionId');
 
 const region = process.env.AWS_REGION || 'us-east-1';
+
+// Cache for BedrockRuntimeClient instances to prevent resource exhaustion
+const clientCache = new Map();
+
+function getBedrockClient(configCode) {
+    const cacheKey = `${configCode}-${region}`;
+
+    if (!clientCache.has(cacheKey)) {
+        const client = new BedrockRuntimeClient(customSdkConfig(configCode, { region }));
+        clientCache.set(cacheKey, client);
+    }
+
+    return clientCache.get(cacheKey);
+}
 
 const capabilityMapping = {
     'amazon.titan-text-express-v1': 'C025',
@@ -38,9 +57,9 @@ const capabilityMapping = {
 
 function isEmbedding(modelId) {
     return modelId.includes('embed');
-};
+}
 
-function guardrailResponse(stopReason){
+function guardrailResponse(stopReason) {
     if (stopReason === 'guardrail_intervened') {
         qnabot.log(`Bedrock Guardrail Action: INTERVENED`);
     }
@@ -48,7 +67,7 @@ function guardrailResponse(stopReason){
 
 async function bedrockClient(modelId, input, streamingAttributes) {
     const configCode = capabilityMapping[modelId] || isEmbedding(modelId) ? 'C040' : 'C036';
-    const client = new BedrockRuntimeClient(customSdkConfig(configCode, { region }));
+    const client = getBedrockClient(configCode);
     const contentType = 'application/json';
     const accept = 'application/json';
 
@@ -59,53 +78,55 @@ async function bedrockClient(modelId, input, streamingAttributes) {
             command = new InvokeModelCommand({ body, contentType, accept, modelId });
             const invokeResponse = await client.send(command);
             return invokeResponse;
-
         } else {
-            
-            const streamingEnable = streamingAttributes?.streamingEndpoint && streamingAttributes?.streamingDynamoDbTable && streamingAttributes?.sessionId || false;
+            const streamingEnable =
+                (streamingAttributes?.streamingEndpoint &&
+                    streamingAttributes?.streamingDynamoDbTable &&
+                    streamingAttributes?.sessionId) ||
+                false;
 
             if (streamingEnable) {
-                qnabot.debug('Using ConverseStream API')
-                const converseStreamResponse = await converseStream(modelId, client, input, streamingAttributes)
-                qnabot.log(`ConverseStream API Response: ${converseStreamResponse}`)
+                qnabot.debug('Using ConverseStream API');
+                const converseStreamResponse = await converseStream(modelId, client, input, streamingAttributes);
+                qnabot.log(`ConverseStream API Response: ${converseStreamResponse}`);
                 return converseStreamResponse;
-
             } else {
-                qnabot.debug('Streaming is not enabled, using Converse API')
+                qnabot.debug('Streaming is not enabled, using Converse API');
                 command = new ConverseCommand({ modelId, ...input });
                 const llmResponse = await client.send(command);
-                qnabot.log(`Converse API Response: ${JSON.stringify(llmResponse, null, 2)}`)
+                qnabot.log(`Converse API Response: ${JSON.stringify(llmResponse, null, 2)}`);
                 guardrailResponse(llmResponse?.['stopReason']);
-                const final = llmResponse?.output?.message?.content[0]?.text
+                const final = llmResponse?.output?.message?.content[0]?.text;
                 return final;
-            };
-        };
+            }
+        }
     } catch (e) {
         qnabot.log(`Bedrock Error: ${e}`);
         let message = `Bedrock ${modelId} returned ${e.name}: ${e.message.substring(0, 500)}`;
         if (e.name === 'ResourceNotFoundException') {
             message = `${message} Please retry after selecting different Bedrock model in Cloudformation stack.`;
-        };
+        }
         if (e.name === 'AccessDeniedException') {
             message = `${message} Please ensure you have requested access to the LLMs in Amazon Bedrock console.`;
-        };
-        throw new Error(JSON.stringify({
-            message,
-            type: 'Error',
-        }));
+        }
+        throw new Error(
+            JSON.stringify({
+                message,
+                type: 'Error'
+            })
+        );
     }
 }
 
 async function converseStream(modelId, client, input, streamingAttributes) {
-    qnabot.log(`Found Streaming Attributes: ${JSON.stringify(streamingAttributes, null, 2)}`)
+    qnabot.log(`Found Streaming Attributes: ${JSON.stringify(streamingAttributes, null, 2)}`);
     const command = new ConverseStreamCommand({ modelId, ...input });
     const llmResponse = await client.send(command);
-    qnabot.debug(`Converse Stream Response: ${JSON.stringify(llmResponse, null, 2)}`)
+    qnabot.debug(`Converse Stream Response: ${JSON.stringify(llmResponse, null, 2)}`);
 
     const endpoint = streamingAttributes.streamingEndpoint;
-    const apiClient = new ApiGatewayManagementApiClient(customSdkConfig( 'C052', { region, endpoint }));
-    let completeMessage = ''
-
+    const apiClient = new ApiGatewayManagementApiClient(customSdkConfig('C052', { region, endpoint }));
+    let completeMessage = '';
 
     const tableName = streamingAttributes.streamingDynamoDbTable;
     const sessionId = streamingAttributes.sessionId;
@@ -119,12 +140,11 @@ async function converseStream(modelId, client, input, streamingAttributes) {
 
             try {
                 const input = {
-                    Data: text, 
-                    ConnectionId: connectionId, 
-                }
+                    Data: text,
+                    ConnectionId: connectionId
+                };
                 const command = new PostToConnectionCommand(input);
                 await apiClient.send(command);
-
             } catch (error) {
                 qnabot.error(`${error.name}: ${error.message.substring(0, 500)} while posting to stream connection`);
             }
