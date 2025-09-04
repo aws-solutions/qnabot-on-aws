@@ -15,7 +15,7 @@ CONTEXT_SETTINGS = dict(help_option_names=["-h", "--help"])
 @click.pass_context
 def cli(ctx) -> None:
     os.environ["SOLUTION_ID"] = "SO0189"
-    os.environ["SOLUTION_VERSION"] = "v7.1.1"
+    os.environ["SOLUTION_VERSION"] = "v7.1.2"
 
 
 @cli.command("import")
@@ -54,7 +54,11 @@ def cli(ctx) -> None:
 )
 @click.pass_context
 def qna_import(
-    ctx, cloudformation_stack_name: str, source_filename: str, file_format: str, delete_existing_content: bool
+    ctx,
+    cloudformation_stack_name: str,
+    source_filename: str,
+    file_format: str,
+    delete_existing_content: bool,
 ):
     """
     Import QnABot questions and answers to your QnABot setup.\n
@@ -114,7 +118,13 @@ def qna_import(
     show_default=True,
 )
 @click.pass_context
-def qna_export(ctx, cloudformation_stack_name: str, export_filename: str, export_filter: str, file_format: str):
+def qna_export(
+    ctx,
+    cloudformation_stack_name: str,
+    export_filename: str,
+    export_filter: str,
+    file_format: str,
+):
     """
     Export QnABot questions and answers from your QnABot setup.\n
     This command requires two (2) parameters: <cloudformation-stack-name>, and <export-filename>.
@@ -135,7 +145,9 @@ def qna_export(ctx, cloudformation_stack_name: str, export_filename: str, export
         qnabot_cli_helper.error_response(
             error_code=err_exception.errno,
             message=err_exception.strerror,
-            comments="There was an issue using: " + export_filename + " Check the path and try again.",
+            comments="There was an issue using: "
+            + export_filename
+            + " Check the path and try again.",
             status="Error",
             show_error=True,
         )

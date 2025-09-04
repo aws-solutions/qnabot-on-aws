@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [7.1.2] - 2025-09-04
+
+### Changed
+
+- Cached BedrockRuntimeClient instances to prevent resource exhaustion
+
+### Fixed
+
+- Fixed an issue where using the "Select All" toggle would incorrectly delete all questions, even after individual questions were deselected.
+
 ## [7.1.1] - 2025-08-26
 
 ### Security
@@ -25,6 +35,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Security
 
+- Updated linkifyjs to `4.3.2`
+
+## [7.0.8] - 2025-09-04
+
+### Fixed
+
+- Cached BedrockRuntimeClient instances to prevent resource exhaustion
+
+### Security
+
+- Updated sha.js to `2.4.12`
+- Updated cipher-base to `1.0.6`
+- Mitigated security findings from Amazon Inspector
 - Updated linkifyjs to `4.3.2`
 
 ## [7.0.7] - 2025-07-24

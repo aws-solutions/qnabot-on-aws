@@ -1,9 +1,9 @@
 /** ************************************************************************************************
-*   Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.                             *
-*   SPDX-License-Identifier: Apache-2.0                                                            *
+ *   Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.                             *
+ *   SPDX-License-Identifier: Apache-2.0                                                            *
  ************************************************************************************************ */
 const indexModule = require('../../../js/components/designer/index.vue');
-import { shallowMount } from '@vue/test-utils'
+import { shallowMount } from '@vue/test-utils';
 
 describe('designer index component', () => {
     beforeEach(() => {
@@ -12,12 +12,12 @@ describe('designer index component', () => {
 
     test('it mounted', () => {
         const store = {
-            dispatch: jest.fn().mockImplementation(() => Promise.resolve({})),
+            dispatch: jest.fn().mockImplementation(() => Promise.resolve({}))
         };
         const wrapper = shallowMount(indexModule, {
             global: {
                 mocks: {
-                    $store: store,
+                    $store: store
                 }
             }
         });
@@ -30,17 +30,17 @@ describe('designer index component', () => {
             state: {
                 data: {
                     loading: true,
-                    QAs: [{ select: true }],
+                    QAs: [{ select: true }]
                 },
                 page: {
-                    total: 100,
-                },
+                    total: 100
+                }
             }
-        }
+        };
         const wrapper = shallowMount(indexModule, {
             global: {
                 mocks: {
-                    $store: store,
+                    $store: store
                 }
             }
         });
@@ -58,17 +58,17 @@ describe('designer index component', () => {
             state: {
                 data: {
                     loading: true,
-                    QAs: [{ select: true }],
+                    QAs: [{ select: true }]
                 },
                 page: {
-                    total: 100,
-                },
+                    total: 100
+                }
             }
-        }
+        };
         const wrapper = shallowMount(indexModule, {
             global: {
                 mocks: {
-                    $store: store,
+                    $store: store
                 }
             }
         });
@@ -84,17 +84,17 @@ describe('designer index component', () => {
             state: {
                 data: {
                     loading: true,
-                    QAs: [{ select: true }],
+                    QAs: [{ select: true }]
                 },
                 page: {
-                    total: 100,
-                },
+                    total: 100
+                }
             }
-        }
+        };
         const wrapper = shallowMount(indexModule, {
             global: {
                 mocks: {
-                    $store: store,
+                    $store: store
                 }
             }
         });
@@ -106,40 +106,117 @@ describe('designer index component', () => {
         expect(wrapper.vm.$data.sortBy).toEqual([]);
     });
 
-    test('checkSelect', () => {
-        const store = {
-            dispatch: jest.fn().mockImplementation(() => Promise.resolve({})),
-        };
-        const wrapper = shallowMount(indexModule, {
-            global: {
-                mocks: {
-                    $store: store,
+    describe('checkSelect', () => {
+        test('should keep selectAll false when checking an item but not all items are selected', () => {
+            const store = {
+                dispatch: jest.fn().mockImplementation(() => Promise.resolve({})),
+                state: {
+                    data: {
+                        QAs: [{ select: false }, { select: false }, { select: false }]
+                    },
+                    page: {
+                        total: 3
+                    }
                 }
-            }
+            };
+            const wrapper = shallowMount(indexModule, {
+                global: {
+                    mocks: {
+                        $store: store
+                    }
+                }
+            });
+
+            wrapper.vm.$data.selectAll = false;
+            wrapper.vm.checkSelect(true);
+            expect(wrapper.vm.$data.selectAll).toBe(false);
         });
 
-        wrapper.vm.$data.selectAll = false;
-        wrapper.vm.checkSelect(true);
-        expect(wrapper.vm.$data.selectAll).toBe(false);
-        
-        wrapper.vm.$data.selectAll = true;
-        wrapper.vm.checkSelect(true);
-        expect(wrapper.vm.$data.selectAll).toBe(true);
+        test('should set selectAll to true when checking an item and all items are selected', () => {
+            const store = {
+                dispatch: jest.fn().mockImplementation(() => Promise.resolve({})),
+                state: {
+                    data: {
+                        QAs: [{ select: true }, { select: true }, { select: true }]
+                    },
+                    page: {
+                        total: 3
+                    }
+                }
+            };
+            const wrapper = shallowMount(indexModule, {
+                global: {
+                    mocks: {
+                        $store: store
+                    }
+                }
+            });
 
-        wrapper.vm.$data.selectAll = true;
-        wrapper.vm.checkSelect(false);
-        expect(wrapper.vm.$data.selectAll).toBe(false);
+            wrapper.vm.$data.selectAll = false;
+            wrapper.vm.checkSelect(true);
+            expect(wrapper.vm.$data.selectAll).toBe(true);
+        });
+
+        test('should keep selectAll false when checking an item but some items are unselected', () => {
+            const store = {
+                dispatch: jest.fn().mockImplementation(() => Promise.resolve({})),
+                state: {
+                    data: {
+                        QAs: [{ select: true }, { select: false }, { select: true }]
+                    },
+                    page: {
+                        total: 3
+                    }
+                }
+            };
+            const wrapper = shallowMount(indexModule, {
+                global: {
+                    mocks: {
+                        $store: store
+                    }
+                }
+            });
+
+            wrapper.vm.$data.selectAll = false;
+            wrapper.vm.checkSelect(true);
+            expect(wrapper.vm.$data.selectAll).toBe(false);
+        });
+
+        test('should set selectAll to false when unchecking any item', () => {
+            const store = {
+                dispatch: jest.fn().mockImplementation(() => Promise.resolve({})),
+                state: {
+                    data: {
+                        QAs: [{ select: true }, { select: true }, { select: true }]
+                    },
+                    page: {
+                        total: 3
+                    }
+                }
+            };
+            const wrapper = shallowMount(indexModule, {
+                global: {
+                    mocks: {
+                        $store: store
+                    }
+                }
+            });
+
+            wrapper.vm.$data.selectAll = true;
+            wrapper.vm.checkSelect(false);
+            expect(wrapper.vm.$data.selectAll).toBe(false);
+        });
     });
 
     test('toggleSelectAll', () => {
         const store = {
             dispatch: jest.fn().mockImplementation(() => Promise.resolve({})),
-            commit: jest.fn(),
+            commit: jest.fn()
         };
         const wrapper = shallowMount(indexModule, {
             global: {
                 mocks: {
-                    $store: store,
+                    $store: store
                 }
             }
         });
@@ -150,12 +227,12 @@ describe('designer index component', () => {
 
     test('deleteClose', () => {
         const store = {
-            dispatch: jest.fn().mockImplementation(() => Promise.resolve({})),
+            dispatch: jest.fn().mockImplementation(() => Promise.resolve({}))
         };
         const wrapper = shallowMount(indexModule, {
             global: {
                 mocks: {
-                    $store: store,
+                    $store: store
                 }
             }
         });
@@ -170,18 +247,16 @@ describe('designer index component', () => {
     test('handleDelete', async () => {
         const store = {
             dispatch: jest.fn().mockImplementation(() => Promise.resolve({})),
-            commit: jest.fn().mockImplementation(() => Promise.resolve({})),
+            commit: jest.fn().mockImplementation(() => Promise.resolve({}))
         };
         const wrapper = shallowMount(indexModule, {
             global: {
                 mocks: {
-                    $store: store,
+                    $store: store
                 }
             }
         });
-        const questions = [
-            { qid: 1 },
-        ];
+        const questions = [{ qid: 1 }];
 
         await wrapper.vm.handleDelete(questions);
         expect(wrapper.vm.deleteSuccess).toEqual('Success!');

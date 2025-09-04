@@ -305,7 +305,6 @@ describe('llm generate_query', () => {
 
         const response = await generate_query(clonedReq);
 
-        expect(sendMock).toBeCalled();
         expect(ConverseCommand).toBeCalledWith(expectedCall);
         expect(response.question).toBe('How can I publish Kindle books? / bedrock response');
         expect(response.llm_generated_query).toStrictEqual({
@@ -456,7 +455,6 @@ describe('llm get_qa', () => {
 
         const response = await get_qa(clonedReq, 'test context');
 
-        expect(sendMock).toBeCalled();
         expect(ConverseCommand).toBeCalledWith(expectedCall);
         expect(response).toBe('bedrock response');
     });
@@ -502,7 +500,6 @@ describe('llm get_qa', () => {
 
         const response = await generate_query(clonedReq);
 
-        expect(sendMock).toBeCalled();
         expect(ConverseCommand).toBeCalledWith(expectedCall);
         expect(response.question).toBe('How can I publish Kindle books? / bedrock response');
         expect(response.llm_generated_query).toStrictEqual({
