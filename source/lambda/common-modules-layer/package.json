@@ -1,6 +1,6 @@
 {
     "name": "common-modules-layer",
-    "version": "7.0.7",
+    "version": "7.0.8",
     "description": "QnABot Common-modules-layer lambda",
     "main": "index.js",
     "scripts": {

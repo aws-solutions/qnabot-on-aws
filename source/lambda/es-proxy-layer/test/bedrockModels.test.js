@@ -1,16 +1,21 @@
 /** ************************************************************************************************
-*   Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.                             *
-*   SPDX-License-Identifier: Apache-2.0                                                            *
+ *   Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.                             *
+ *   SPDX-License-Identifier: Apache-2.0                                                            *
  ************************************************************************************************ */
 
-const { BedrockRuntimeClient, InvokeModelCommand, ConverseCommand, ConverseStreamCommand } = require('@aws-sdk/client-bedrock-runtime');
+const {
+    BedrockRuntimeClient,
+    InvokeModelCommand,
+    ConverseCommand,
+    ConverseStreamCommand
+} = require('@aws-sdk/client-bedrock-runtime');
 const { ApiGatewayManagementApiClient, PostToConnectionCommand } = require('@aws-sdk/client-apigatewaymanagementapi');
-const { DynamoDBClient, GetItemCommand } = require("@aws-sdk/client-dynamodb");
+const { DynamoDBClient, GetItemCommand } = require('@aws-sdk/client-dynamodb');
 const qnabot = require('qnabot/logging');
 const { invokeBedrockModel } = require('../lib/bedrock/bedrockModels');
 const { mockClient } = require('aws-sdk-client-mock');
 const bedRockMock = mockClient(BedrockRuntimeClient);
-const apiMock = mockClient(ApiGatewayManagementApiClient)
+const apiMock = mockClient(ApiGatewayManagementApiClient);
 const ddbMock = mockClient(DynamoDBClient);
 require('aws-sdk-client-mock-jest');
 
@@ -20,90 +25,89 @@ jest.mock('@aws-sdk/client-bedrock-runtime');
 
 const embeddingModelBodies = {
     'amazon.titan-embed-text-v1': {
-        inputText: 'test prompt',
+        inputText: 'test prompt'
     },
     'amazon.titan-embed-text-v2': {
-        inputText: 'test prompt',
+        inputText: 'test prompt'
     },
     'cohere.embed-english-v3': {
         texts: ['test prompt'],
-        input_type: 'search_document',
+        input_type: 'search_document'
     },
     'cohere.embed-multilingual-v3': {
         texts: ['test prompt'],
-        input_type: 'search_document',
-    },
+        input_type: 'search_document'
+    }
 };
-
 
 const llmModelBodies = {
     'amazon.titan-text-premier-v1': {
         maxTokens: 300,
         temperature: 0,
-        topP: 0.9,
+        topP: 0.9
     },
     'ai21.jamba-instruct-v1': {
         maxTokens: 300,
         temperature: 0,
-        topP: 0.9,
+        topP: 0.9
     },
     'anthropic.claude-3-sonnet-20240229-v1:0': {
         maxTokens: 300,
         temperature: 0,
-        topP: 0.9,
+        topP: 0.9
     },
     'anthropic.claude-3-5-sonnet-20240620-v1:0': {
         maxTokens: 300,
         temperature: 0,
         topP: 0.9,
-        top_k: 250,
+        top_k: 250
     },
     'cohere.command-r-plus-v1:0': {
         maxTokens: 300,
         temperature: 0,
-        topP: 0.9,
+        topP: 0.9
     },
     'meta.llama3-8b-instruct-v1:0': {
         maxTokens: 300,
         temperature: 0,
-        topP: 0.9,
+        topP: 0.9
     },
     'mistral.mistral-large-2407-v1:0': {
         maxTokens: 300,
         temperature: 0,
-        topP: 0.9,
-    },
+        topP: 0.9
+    }
 };
 
 const embeddingModelResponses = {
     'amazon.titan-embed-text-v1': {
         body: Buffer.from(
             JSON.stringify({
-                embedding: 'test response',
+                embedding: 'test response'
             })
         )
-    },    
+    },
     'amazon.titan-embed-text-v2': {
         body: Buffer.from(
             JSON.stringify({
-                embedding: 'test response',
+                embedding: 'test response'
             })
         )
     },
     'cohere.embed-english-v3': {
         body: Buffer.from(
             JSON.stringify({
-                embeddings: ['test response'],
+                embeddings: ['test response']
             })
         )
     },
     'cohere.embed-multilingual-v3': {
         body: Buffer.from(
             JSON.stringify({
-                embeddings: ['test response'],
+                embeddings: ['test response']
             })
         )
-    },
+    }
 };
 
 const llmModelResponse = {
@@ -120,7 +124,6 @@ const llmModelResponse = {
 };
 
 describe('Invoke Bedrock Models', () => {
-
     beforeEach(() => {
         bedRockMock.reset();
     });
@@ -136,12 +139,14 @@ describe('Invoke Bedrock Models', () => {
             maxTokenCount: 4096,
             stopSequences: [],
             temperature: 0,
-            topP: 1,
+            topP: 1
         };
         const e = new Error('Could not resolve the foundation model from the provided model identifier.');
         e.name = 'ResourceNotFoundException';
         bedRockMock.on(ConverseCommand).rejects(e);
-        const error = new Error('{\"message\":\"Bedrock anthropic.claude-v1 returned ResourceNotFoundException: Could not resolve the foundation model from the provided model identifier. Please retry after selecting different Bedrock model in Cloudformation stack.\",\"type\":\"Error\"}')
+        const error = new Error(
+            '{"message":"Bedrock anthropic.claude-v1 returned ResourceNotFoundException: Could not resolve the foundation model from the provided model identifier. Please retry after selecting different Bedrock model in Cloudformation stack.","type":"Error"}'
+        );
         await expect(invokeBedrockModel(modelId, input)).rejects.toThrowError(error);
     });
 
@@ -152,27 +157,16 @@ describe('Invoke Bedrock Models', () => {
                 accept: 'application/json',
                 body: JSON.stringify(embeddingModelBodies[modelId]),
                 contentType: 'application/json',
-                modelId,
-            }
+                modelId
+            };
 
-            const sendMock = jest.fn().mockImplementation(() => {
-                const body = embeddingModelResponses[modelId].body;
-                return {
-                    body
-                };
-            });
-            
-            BedrockRuntimeClient.mockImplementation(() => {
-                return {
-                    send: sendMock,
-                };
-            });
+            bedRockMock.on(InvokeModelCommand).resolves(embeddingModelResponses[modelId]);
 
             const response = await invokeBedrockModel(modelId, prompt);
 
             expect(response).toEqual('test response');
             expect(InvokeModelCommand).toHaveBeenCalledWith(expectedCall);
-            expect(sendMock).toHaveBeenCalled();
+            expect(bedRockMock).toHaveReceivedCommand(InvokeModelCommand);
         }
     });
 
@@ -186,43 +180,33 @@ describe('Invoke Bedrock Models', () => {
                     {
                         text: system
                     }
-                ], 
-                messages:  [
-                    {
-                        role: "user",
-                        content: [{ text: prompt,  type: "text" }],
-                    },
                 ],
-                inferenceConfig: { maxTokens: 300, temperature: 0, topP: 1 },
-            }
-            const sendMock = jest.fn().mockImplementation(() => {
-                return llmModelResponse
-            });
-            
-            BedrockRuntimeClient.mockImplementation(() => {
-                return {
-                    send: sendMock,
-                };
-            });
-    
-            
-            
+                messages: [
+                    {
+                        role: 'user',
+                        content: [{ text: prompt, type: 'text' }]
+                    }
+                ],
+                inferenceConfig: { maxTokens: 300, temperature: 0, topP: 1 }
+            };
+
+            bedRockMock.on(ConverseCommand).resolves(llmModelResponse);
+
             const response = await invokeBedrockModel(modelId, prompt, { system });
             expect(ConverseCommand).toHaveBeenCalledWith(expectedCall);
-            expect(response).toEqual("test response");
-            expect(sendMock).toHaveBeenCalled();
-            
-        };
+            expect(response).toEqual('test response');
+            expect(bedRockMock).toHaveReceivedCommand(ConverseCommand);
+        }
     });
 
     test('invokeBedrockModel with parameter overrides', async () => {
         const modelId = 'anthropic.claude-3-5-sonnet-20240620-v1:0';
         const parameters = {
-                maxTokens: 100,
-                temperature: 0.1,
-                topP: 0.5,
-                top_k: 100,
-                stopSequences: ['Human'],
+            maxTokens: 100,
+            temperature: 0.1,
+            topP: 0.5,
+            top_k: 100,
+            stopSequences: ['Human']
         };
         const prompt = 'test prompt';
         const system = 'test system';
@@ -232,64 +216,53 @@ describe('Invoke Bedrock Models', () => {
             guardrailIdentifier: 'test_id',
             guardrailVersion: '1',
             trace: 'enabled'
-        }
+        };
 
         const expectedCall = {
-            modelId: "anthropic.claude-3-5-sonnet-20240620-v1:0",
+            modelId: 'anthropic.claude-3-5-sonnet-20240620-v1:0',
             system: [
                 {
                     text: system
                 }
-            ], 
-            messages:  [
+            ],
+            messages: [
                 {
-                    role: "user",
+                    role: 'user',
                     content: [
-                        { 
+                        {
                             text: prompt,
-                            type: "text"
+                            type: 'text'
                         },
                         {
                             guardContent: {
-                                text: { 
+                                text: {
                                     text: query,
-                                    qualifiers: ["query"],
-                                },
-                            },
+                                    qualifiers: ['query']
+                                }
+                            }
                         },
                         {
                             guardContent: {
-                                text: { 
+                                text: {
                                     text: context,
-                                    qualifiers: [ "grounding_source" ],
-                                },
-                            },
+                                    qualifiers: ['grounding_source']
+                                }
+                            }
                         }
-
-                    ],
-                },
+                    ]
+                }
             ],
             inferenceConfig: { maxTokens: 100, temperature: 0.1, topP: 0.5, stopSequences: ['Human'] },
-            additionalModelRequestFields: { top_k : 100},
+            additionalModelRequestFields: { top_k: 100 },
             guardrailConfig: { guardrailIdentifier: 'test_id', guardrailVersion: '1', trace: 'enabled' }
-        }
-        const sendMock = jest.fn().mockImplementation(() => {
-            return llmModelResponse
-        });
-        
-        BedrockRuntimeClient.mockImplementation(() => {
-            return {
-                send: sendMock,
-            };
-        });
+        };
 
-        
-        
+        bedRockMock.on(ConverseCommand).resolves(llmModelResponse);
+
         const response = await invokeBedrockModel(modelId, prompt, { parameters, system, guardrails, query, context });
         expect(ConverseCommand).toHaveBeenCalledWith(expectedCall);
-        expect(response).toEqual("test response");
-        expect(sendMock).toHaveBeenCalled();
-
+        expect(response).toEqual('test response');
+        expect(bedRockMock).toHaveReceivedCommand(ConverseCommand);
     });
 
     test('invokeBedrockModel throws error if provider is not supported', async () => {
@@ -297,7 +270,6 @@ describe('Invoke Bedrock Models', () => {
         const modelId = 'unsupported.provider';
 
         try {
-
             await invokeBedrockModel(modelId, prompt);
             expect(true).toEqual(false);
         } catch (err) {
@@ -308,15 +280,7 @@ describe('Invoke Bedrock Models', () => {
     test('invokeBedrockModel throws error if body cannot be parsed', async () => {
         const modelId = 'amazon.titan-embed-text-v2';
 
-        const sendMock = jest.fn().mockImplementation(() => {
-            return {};
-        });
-        
-        BedrockRuntimeClient.mockImplementation(() => {
-            return {
-                send: sendMock,
-            };
-        });
+        bedRockMock.on(InvokeModelCommand).resolves({});
 
         try {
             await invokeBedrockModel(modelId, null);
@@ -348,10 +312,10 @@ describe('Test Converse Stream', () => {
         for (const modelId in llmModelBodies) {
             const system = 'test system';
             const streamingAttributes = {
-                streamingEndpoint : 'test-endpoint',
+                streamingEndpoint: 'test-endpoint',
                 streamingDynamoDbTable: 'test-table',
                 sessionId: 'test-sessionId'
-            }
+            };
 
             const expectedCall = {
                 modelId,
@@ -359,21 +323,21 @@ describe('Test Converse Stream', () => {
                     {
                         text: system
                     }
-                ], 
-                messages:  [
-                    {
-                        role: "user",
-                        content: [{ text: prompt,  type: "text" }],
-                    },
                 ],
-                inferenceConfig: { maxTokens: 300, temperature: 0, topP: 1 },
-            }
+                messages: [
+                    {
+                        role: 'user',
+                        content: [{ text: prompt, type: 'text' }]
+                    }
+                ],
+                inferenceConfig: { maxTokens: 300, temperature: 0, topP: 1 }
+            };
 
             const generateStream = (prompt) => {
                 return {
                     [Symbol.asyncIterator]() {
                         let index = 0;
-            
+
                         return {
                             next: async () => {
                                 if (index < prompt.length) {
@@ -385,52 +349,41 @@ describe('Test Converse Stream', () => {
                     }
                 };
             };
-            
 
             const converseStreamOutput = [
                 {
-                  contentBlockDelta: {
-                    delta: {
-                      text: 'test response',
-                    },
-                    contentBlockIndex: 0,
-                  },
-                },
-              ];
-            
-            const commandOutput  = {
+                    contentBlockDelta: {
+                        delta: {
+                            text: 'test response'
+                        },
+                        contentBlockIndex: 0
+                    }
+                }
+            ];
+
+            const commandOutput = {
                 stream: generateStream(converseStreamOutput),
-                $metadata: {},
+                $metadata: {}
             };
 
-            const sendMock = jest.fn().mockImplementation(() => {
-                return commandOutput
-            });
-            
-            BedrockRuntimeClient.mockImplementation(() => {
-                return {
-                    send: sendMock,
-                };
-            });
+            bedRockMock.on(ConverseStreamCommand).resolves(commandOutput);
 
             const mockDbResponse = {
                 Item: {
                     connectionId: {
-                        S: "test-id"
+                        S: 'test-id'
                     }
                 }
             };
 
             apiMock.on(PostToConnectionCommand).resolves({});
             ddbMock.on(GetItemCommand).resolves(mockDbResponse);
-    
-                    
+
             const response = await invokeBedrockModel(modelId, prompt, { system, streamingAttributes });
             expect(ConverseStreamCommand).toHaveBeenCalledWith(expectedCall);
-            expect(response).toEqual("test response");
-            expect(sendMock).toHaveBeenCalled();
-            
-        };
+            expect(response).toEqual('test response');
+            expect(bedRockMock).toHaveReceivedCommand(ConverseStreamCommand);
+        }
     });
 
     test('invokeBedrockModel returns valid response if API Gateway throws error', async () => {
@@ -438,10 +391,10 @@ describe('Test Converse Stream', () => {
         for (const modelId in llmModelBodies) {
             const system = 'test system';
             const streamingAttributes = {
-                streamingEndpoint : 'test-endpoint',
+                streamingEndpoint: 'test-endpoint',
                 streamingDynamoDbTable: 'test-table',
                 sessionId: 'test-sessionId'
-            }
+            };
 
             const expectedCall = {
                 modelId,
@@ -449,21 +402,21 @@ describe('Test Converse Stream', () => {
                     {
                         text: system
                     }
-                ], 
-                messages:  [
-                    {
-                        role: "user",
-                        content: [{ text: prompt,  type: "text" }],
-                    },
                 ],
-                inferenceConfig: { maxTokens: 300, temperature: 0, topP: 1 },
-            }
+                messages: [
+                    {
+                        role: 'user',
+                        content: [{ text: prompt, type: 'text' }]
+                    }
+                ],
+                inferenceConfig: { maxTokens: 300, temperature: 0, topP: 1 }
+            };
 
             const generateStream = (prompt) => {
                 return {
                     [Symbol.asyncIterator]() {
                         let index = 0;
-            
+
                         return {
                             next: async () => {
                                 if (index < prompt.length) {
@@ -475,66 +428,54 @@ describe('Test Converse Stream', () => {
                     }
                 };
             };
-            
 
             const converseStreamOutput = [
                 {
-                  contentBlockDelta: {
-                    delta: {
-                      text: 'test response',
-                    },
-                    contentBlockIndex: 0,
-                  },
-                },
-              ];
-            
-            const commandOutput  = {
+                    contentBlockDelta: {
+                        delta: {
+                            text: 'test response'
+                        },
+                        contentBlockIndex: 0
+                    }
+                }
+            ];
+
+            const commandOutput = {
                 stream: generateStream(converseStreamOutput),
-                $metadata: {},
+                $metadata: {}
             };
 
-            const sendMock = jest.fn().mockImplementation(() => {
-                return commandOutput
-            });
-            
-            BedrockRuntimeClient.mockImplementation(() => {
-                return {
-                    send: sendMock,
-                };
-            });
+            bedRockMock.on(ConverseStreamCommand).resolves(commandOutput);
 
             const mockDbResponse = {
                 Item: {
                     connectionId: {
-                        S: "test-id"
+                        S: 'test-id'
                     }
                 }
             };
-            
+
             const e = new Error('API Connection Error');
 
             apiMock.on(PostToConnectionCommand).rejects(e);
-            ddbMock.on(GetItemCommand).resolves(mockDbResponse)
-    
-                    
+            ddbMock.on(GetItemCommand).resolves(mockDbResponse);
+
             const response = await invokeBedrockModel(modelId, prompt, { system, streamingAttributes });
             expect(ConverseStreamCommand).toHaveBeenCalledWith(expectedCall);
             expect(response).toEqual('test response');
-            expect(sendMock).toHaveBeenCalled();
-            
-        };
+            expect(bedRockMock).toHaveReceivedCommand(ConverseStreamCommand);
+        }
     });
-
 
     test('invokeBedrockModel returns valid response if DynamoDB throws error', async () => {
         const prompt = 'test prompt';
         for (const modelId in llmModelBodies) {
             const system = 'test system';
             const streamingAttributes = {
-                streamingEndpoint : 'test-endpoint',
+                streamingEndpoint: 'test-endpoint',
                 streamingDynamoDbTable: 'test-table',
                 sessionId: 'test-sessionId'
-            }
+            };
 
             const expectedCall = {
                 modelId,
@@ -542,21 +483,21 @@ describe('Test Converse Stream', () => {
                     {
                         text: system
                     }
-                ], 
-                messages:  [
-                    {
-                        role: "user",
-                        content: [{ text: prompt,  type: "text" }],
-                    },
                 ],
-                inferenceConfig: { maxTokens: 300, temperature: 0, topP: 1 },
-            }
+                messages: [
+                    {
+                        role: 'user',
+                        content: [{ text: prompt, type: 'text' }]
+                    }
+                ],
+                inferenceConfig: { maxTokens: 300, temperature: 0, topP: 1 }
+            };
 
             const generateStream = (prompt) => {
                 return {
                     [Symbol.asyncIterator]() {
                         let index = 0;
-            
+
                         return {
                             next: async () => {
                                 if (index < prompt.length) {
@@ -568,46 +509,34 @@ describe('Test Converse Stream', () => {
                     }
                 };
             };
-            
 
             const converseStreamOutput = [
                 {
-                  contentBlockDelta: {
-                    delta: {
-                      text: 'test response',
-                    },
-                    contentBlockIndex: 0,
-                  },
-                },
-              ];
-            
-            const commandOutput  = {
+                    contentBlockDelta: {
+                        delta: {
+                            text: 'test response'
+                        },
+                        contentBlockIndex: 0
+                    }
+                }
+            ];
+
+            const commandOutput = {
                 stream: generateStream(converseStreamOutput),
-                $metadata: {},
+                $metadata: {}
             };
 
-            const sendMock = jest.fn().mockImplementation(() => {
-                return commandOutput
-            });
-            
-            BedrockRuntimeClient.mockImplementation(() => {
-                return {
-                    send: sendMock,
-                };
-            });
+            bedRockMock.on(ConverseStreamCommand).resolves(commandOutput);
 
-            
             const e = new Error('Unexpected DB Error');
-            bedRockMock.on(ConverseCommand).rejects(e);
             apiMock.on(PostToConnectionCommand).resolves({});
-            ddbMock.on(GetItemCommand).rejects(e)
-                    
+            ddbMock.on(GetItemCommand).rejects(e);
+
             const response = await invokeBedrockModel(modelId, prompt, { system, streamingAttributes });
             expect(ConverseStreamCommand).toHaveBeenCalledWith(expectedCall);
-            expect(response).toEqual("test response");
-            expect(sendMock).toHaveBeenCalled();
-            
-        };
+            expect(response).toEqual('test response');
+            expect(bedRockMock).toHaveReceivedCommand(ConverseStreamCommand);
+        }
     });
 
     test('invokeBedrockModel returns errpr response if ConverseStream API throws error on invalid error', async () => {
@@ -615,11 +544,11 @@ describe('Test Converse Stream', () => {
         const system = 'test system';
 
         const streamingAttributes = {
-            streamingEndpoint : 'test-endpoint',
+            streamingEndpoint: 'test-endpoint',
             streamingDynamoDbTable: 'test-table',
             sessionId: 'test-sessionId'
-        }
-        
+        };
+
         const modelId = 'unsupported.provider';
 
         try {
