@@ -1,6 +1,6 @@
 {
     "name": "connect",
-    "version": "7.1.2",
+    "version": "7.1.3",
     "description": "Lambda function used to support the Connect setup wizard",
     "repository": {
         "type": "git",
