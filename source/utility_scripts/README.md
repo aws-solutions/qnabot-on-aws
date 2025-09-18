@@ -16,3 +16,10 @@ python3 configureCMK.py us-west-2 QnABotDevStack arn:aws:kms:us-west-2:nnnnnnnnn
 
 ## CSV2JSON Converter
 Utility to help with ingestion of your content in CSV format. See [CSV2JSON_README](./csv2json_converter/CSV2JSON_README.md).
+
+## Create a Minimum Permissive Policy for IAM Role
+Utility script to create and add a lesser privileged IAM policy to role. See [create-min-policy.sh](./create-min-policy.sh)
+
+```
+./create-min-policy.sh <Role Name>
+```
