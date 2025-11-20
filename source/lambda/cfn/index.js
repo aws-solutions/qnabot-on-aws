@@ -13,6 +13,7 @@ exports.handler = function (event, context, cb) {
 
 const targets = {
     ApiDeployment: require('./lib/ApiDeployment'),
+    ModelAccess: require('./lib/ModelAccess'),
     CognitoDomain: require('./lib/CognitoDomain'),
     CognitoLogin: require('./lib/CognitoLogin'),
     CognitoRole: require('./lib/CognitoRole'),

@@ -24,6 +24,7 @@ module.exports = {
         QnAType: { Type: 'String' },
         QuizType: { Type: 'String' },
         Index: { Type: 'String' },
+        ResponseBotStackName: { Type: 'String' },
         ESAddress: { Type: 'String' },
         BootstrapBucket: { Type: 'String' },
         BootstrapPrefix: { Type: 'String' },

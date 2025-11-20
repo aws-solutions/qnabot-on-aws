@@ -493,6 +493,14 @@
               {
                 "Effect": "Allow",
                 "Action": [
+                  "bedrock:GetInferenceProfile",
+                  "bedrock:GetFoundationModel"
+                ],
+                "Resource": ["*"]
+              },
+              {
+                "Effect": "Allow",
+                "Action": [
                   "iam:PassRole"
                 ],
                 "Resource": {

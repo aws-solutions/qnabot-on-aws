@@ -8,7 +8,6 @@ const _ = require('lodash');
 
 const files = [
     require('./UpgradeAutoExport'),
-    require('./appregistry'),
     require('./assets'),
     require('./bucket'),
     require('./cfn'),

@@ -5,6 +5,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [7.2.0] - 2025-11-20
+
+__*Note: we recommend that you first deploy these changes in a non-production environment. This is true for all releases, but especially important for minor and major releases.*__
+
+### Added
+
+- Cross-region inference profile support for LLMs and Embeddings. `LLMBedrockModelId` and `BedrockKnowledgeBaseModel` now support all `TEXT` input/output modality-based [foundation](https://docs.aws.amazon.com/bedrock/latest/userguide/models-supported.html) and [cross-region inference models](https://docs.aws.amazon.com/bedrock/latest/userguide/inference-profiles-support.html)
+- `EmbeddingsBedrockModelId` now supports [Global Cohere Embed V4 and Amazon Nova Multimodal Embeddings Models](https://docs.aws.amazon.com/bedrock/latest/userguide/models-supported.html)
+
+### Removed
+
+- [AppRegistry](https://docs.aws.amazon.com/servicecatalog/latest/arguide/intro-app-registry.html) removal from solution
+
+### Security
+
+- Updated glob to `10.5.0`
+- Updated js-yaml to `4.1.1`
+
 ## [7.1.3] - 2025-09-18
 
 ### Security

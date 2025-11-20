@@ -26,6 +26,7 @@ This software includes third party software subject to the following copyrights:
 @aws-crypto/supports-web-crypto under the Apache-2.0 license
 @aws-crypto/util under the Apache-2.0 license
 @aws-sdk/client-api-gateway under the Apache-2.0 license
+@aws-sdk/client-bedrock under the Apache-2.0 license
 @aws-sdk/client-bedrock-agent-runtime under the Apache-2.0 license
 @aws-sdk/client-bedrock-runtime under the Apache-2.0 license
 @aws-sdk/client-cloudformation under the Apache-2.0 license
@@ -63,6 +64,7 @@ This software includes third party software subject to the following copyrights:
 @aws-sdk/credential-providers under the Apache-2.0 license
 @aws-sdk/endpoint-cache under the Apache-2.0 license
 @aws-sdk/eventstream-handler-node under the Apache-2.0 license
+@aws/lambda-invoke-store under the Apache-2.0 license
 @aws-sdk/lib-dynamodb under the Apache-2.0 license
 @aws-sdk/middleware-bucket-endpoint under the Apache-2.0 license
 @aws-sdk/middleware-endpoint-discovery under the Apache-2.0 license
@@ -79,6 +81,7 @@ This software includes third party software subject to the following copyrights:
 @aws-sdk/middleware-signing under the Apache-2.0 license
 @aws-sdk/middleware-ssec under the Apache-2.0 license
 @aws-sdk/middleware-user-agent under the Apache-2.0 license
+@aws-sdk/nested-clients under the Apache-2.0 license
 @aws-sdk/region-config-resolver under the Apache-2.0 license
 @aws-sdk/s3-request-presigner under the Apache-2.0 license
 @aws-sdk/signature-v4-multi-region under the Apache-2.0 license
@@ -302,6 +305,7 @@ This software includes third party software subject to the following copyrights:
 @smithy/util-uri-escape under the Apache-2.0 license
 @smithy/util-utf8 under the Apache-2.0 license
 @smithy/util-waiter under the Apache-2.0 license
+@smithy/uuid under the Apache-2.0 license
 @soda/friendly-errors-webpack-plugin under the MIT license
 @soda/get-current-script under the MIT license
 @tootallnate/once under the MIT license

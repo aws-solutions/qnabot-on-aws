@@ -1,6 +1,6 @@
 {
     "name": "proxy-es",
-    "version": "7.1.3",
+    "version": "7.2.0",
     "description": "QnABot Lambda managing querying of data store",
     "main": "index.js",
     "scripts": {

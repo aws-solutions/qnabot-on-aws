@@ -13,6 +13,7 @@ module.exports = {
                 QnAType: { 'Fn::GetAtt': ['Var', 'QnAType'] },
                 QuizType: { 'Fn::GetAtt': ['Var', 'QuizType'] },
                 Index: { 'Fn::GetAtt': ['Var', 'QnaIndex'] },
+                ResponseBotStackName: { 'Fn::GetAtt': ['Var', 'ResponseBotStackName'] },
                 ESAddress: { 'Fn::GetAtt': ['ESVar', 'ESAddress'] },
                 BootstrapBucket: { Ref: 'BootstrapBucket' },
                 BootstrapPrefix: { Ref: 'BootstrapPrefix' },

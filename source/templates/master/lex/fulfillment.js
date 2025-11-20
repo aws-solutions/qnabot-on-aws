@@ -91,6 +91,7 @@ module.exports = {
                             EMBEDDINGS_LAMBDA_ARN: { Ref: 'EmbeddingsLambdaArn' },
                             LLM_API: { Ref: 'LLMApi' },
                             LLM_LAMBDA_ARN: { Ref: 'LLMLambdaArn' },
+                            AWS_ACCOUNT_ID: { Ref: 'AWS::AccountId' },
                             ...examples,
                             ...responsebots,
                             ...util.getCommonEnvironmentVariables(),
@@ -110,6 +111,7 @@ module.exports = {
                             EMBEDDINGS_LAMBDA_ARN: { Ref: 'EmbeddingsLambdaArn' },
                             LLM_API: { Ref: 'LLMApi' },
                             LLM_LAMBDA_ARN: { Ref: 'LLMLambdaArn' },
+                            AWS_ACCOUNT_ID: { Ref: 'AWS::AccountId' },
                             ...util.getCommonEnvironmentVariables(),
                         },
                     ],
@@ -278,6 +280,15 @@ module.exports = {
             guard: util.cfnGuard('IAM_POLICY_NON_COMPLIANT_ARN'),
         },
     },
+    BedrockInvokeModelAccessPolicyResources: {
+        Type: 'Custom::ModelAccess',
+        Properties: {
+            ServiceToken: { 'Fn::GetAtt': ['CFNLambda', 'Arn'] },
+            EmbeddingsBedrockModelId: {'Fn::If': ['EmbeddingsBedrock', { 'Fn::FindInMap': ['BedrockDefaults', {'Ref' : 'EmbeddingsBedrockModelId'}, 'ModelID'] }, { Ref: 'AWS::NoValue' }] },
+            LLMBedrockModelId: {'Fn::If': ['LLMBedrock', {Ref: 'LLMBedrockModelId'}, { Ref: 'AWS::NoValue' }] },
+            BedrockKnowledgeBaseModelId: {'Fn::If': ['BedrockKnowledgeBaseEnable', {Ref: 'BedrockKnowledgeBaseModel'}, { Ref: 'AWS::NoValue' }] },
+        },
+    },
     FulfillmentLambdaRole: {
         Type: 'AWS::IAM::Role',
         Properties: {
@@ -360,11 +371,7 @@ module.exports = {
                                             'bedrock:InvokeModel',
                                             'bedrock:InvokeModelWithResponseStream'
                                         ],
-                                        Resource: [
-                                            { 'Fn::If': ['EmbeddingsBedrock', { 'Fn::Sub': ['arn:${AWS::Partition}:bedrock:${AWS::Region}::foundation-model/${ModelId}', {ModelId: { 'Fn::FindInMap': ['BedrockDefaults', {Ref : 'EmbeddingsBedrockModelId'}, 'ModelID'] }}] }, { Ref: 'AWS::NoValue' }] },
-                                            { 'Fn::If': ['LLMBedrock', { 'Fn::Sub': ['arn:${AWS::Partition}:bedrock:${AWS::Region}::foundation-model/${ModelId}', {ModelId: { 'Fn::FindInMap': ['BedrockDefaults', {Ref : 'LLMBedrockModelId'}, 'ModelID'] }}] }, { Ref: 'AWS::NoValue' }] },
-                                            { 'Fn::If': ['BedrockKnowledgeBaseEnable', { 'Fn::Sub': ['arn:${AWS::Partition}:bedrock:${AWS::Region}::foundation-model/${ModelId}', {ModelId: { 'Fn::FindInMap': ['BedrockDefaults', {Ref : 'BedrockKnowledgeBaseModel'}, 'ModelID'] }}] }, { Ref: 'AWS::NoValue' }] },
-                                        ],
+                                        Resource: { 'Fn::GetAtt': ['BedrockInvokeModelAccessPolicyResources', 'modelArn'] }
                                     },
                                     {
                                         Sid: 'ApplyGuardrailsToLLMBedrock', // https://docs.aws.amazon.com/bedrock/latest/userguide/guardrails-permissions.html#guardrails-permissions-invoke
@@ -403,6 +410,14 @@ module.exports = {
                                             'bedrock:ApplyGuardrail',
                                         ],
                                         Resource: [{ 'Fn::Sub': 'arn:${AWS::Partition}:bedrock:${AWS::Region}:${AWS::AccountId}:guardrail/*' }],
+                                    },
+                                    {
+                                        Sid: 'GetInferenceProfileForKnowledgeBase',
+                                        Effect: 'Allow',
+                                        Action: [
+                                            'bedrock:GetInferenceProfile',
+                                        ],
+                                        Resource: [{ 'Fn::Sub': 'arn:${AWS::Partition}:bedrock:${AWS::Region}:${AWS::AccountId}:inference-profile/*' }],
                                     },
                                 ],
                             },

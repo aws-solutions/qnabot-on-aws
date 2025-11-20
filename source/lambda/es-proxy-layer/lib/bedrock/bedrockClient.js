@@ -13,6 +13,7 @@ const { ApiGatewayManagementApiClient, PostToConnectionCommand } = require('@aws
 const qnabot = require('qnabot/logging');
 const customSdkConfig = require('sdk-config/customSdkConfig');
 const { getConnectionId } = require('../getConnectionId');
+const { applyModelIdMapping } = require('./bedrockModelConstants');
 
 const region = process.env.AWS_REGION || 'us-east-1';
 
@@ -70,6 +71,9 @@ async function bedrockClient(modelId, input, streamingAttributes) {
     const client = getBedrockClient(configCode);
     const contentType = 'application/json';
     const accept = 'application/json';
+
+    // Apply backward compatibility mapping if available
+    modelId = applyModelIdMapping(modelId);
 
     let command;
     try {

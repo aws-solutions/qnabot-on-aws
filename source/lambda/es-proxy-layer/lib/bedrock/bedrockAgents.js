@@ -13,6 +13,7 @@ const qnabot = require('qnabot/logging');
 const _ = require('lodash');
 const { sanitize, escapeHashMarkdown } = require('../sanitizeOutput');
 const { getConnectionId } = require('../getConnectionId');
+const { applyModelIdMapping } = require('./bedrockModelConstants');
 
 const region = process.env.AWS_REGION || 'us-east-1';
 const inferenceKeys = ['maxTokens', 'stopSequences', 'temperature', 'topP'];
@@ -186,6 +187,19 @@ function processCitations(response) {
     return { markdownCitations, urls };
 }
 
+function createModelArn(modelId) {
+    // Construct the proper ARN based on whether it's an inference profile or foundation model
+    // Inference profiles have 3 dot-separated parts: <region>.<provider>.<model>
+    // Foundation models have 2 parts: <provider>.<model>
+    const isInferenceProfile = modelId.split('.').length === 3;
+    
+    if (isInferenceProfile) {
+        const accountId = process.env.AWS_ACCOUNT_ID;
+        return `arn:aws:bedrock:${region}:${accountId}:inference-profile/${modelId}`;
+    }
+    return `arn:aws:bedrock:${region}::foundation-model/${modelId}`;
+}
+
 function processRequest(req) {
     const {
         KNOWLEDGE_BASE_ID,
@@ -200,7 +214,11 @@ function processRequest(req) {
         BEDROCK_GUARDRAIL_VERSION,
     } = req._settings;
 
-    const modelArn = `arn:aws:bedrock:${region}::foundation-model/${KNOWLEDGE_BASE_MODEL_ID}`;
+    // Apply backward compatibility mapping if available
+    const modelId = applyModelIdMapping(KNOWLEDGE_BASE_MODEL_ID);
+    
+    const modelArn = createModelArn(modelId);
+    
     let { question } = req;
     question = question.slice(0, 1000); // No more than 1000 characters - for bedrock query compatibility
 
@@ -257,8 +275,7 @@ function processRequest(req) {
         ...(sessionConfiguration && { sessionConfiguration })
     };
 
-
-    qnabot.log(`Using Bedrock Knowledge Base Id: ${KNOWLEDGE_BASE_ID} and Model Id: ${KNOWLEDGE_BASE_MODEL_ID}`);
+    qnabot.log(`Bedrock Knowledge Base Request - KB ID: ${KNOWLEDGE_BASE_ID}, Model ID: ${KNOWLEDGE_BASE_MODEL_ID}, Model ARN: ${modelArn}`);
     return retrieveAndGenerateInput;
 }
 
