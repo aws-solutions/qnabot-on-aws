@@ -384,14 +384,16 @@ module.exports = {
         EmbeddingsBedrockModelId: {
             Type: 'String',
             Description:
-            'Required when EmbeddingsApi is BEDROCK. Please ensure you have requested access to the LLMs in Bedrock console (https://docs.aws.amazon.com/bedrock/latest/userguide/model-access.html), before deploying.',
+                'Required when EmbeddingsApi is BEDROCK.',
             AllowedValues: [
                 'amazon.titan-embed-text-v1',
                 'amazon.titan-embed-text-v2',
+                'amazon.nova-2-multimodal-embeddings-v1',
                 'cohere.embed-english-v3',
                 'cohere.embed-multilingual-v3',
+                'global.cohere.embed-v4'
             ],
-            Default: 'amazon.titan-embed-text-v1',
+            Default: 'amazon.nova-2-multimodal-embeddings-v1',
         },
         EmbeddingsLambdaArn: {
             Type: 'String',
@@ -418,28 +420,12 @@ module.exports = {
         LLMBedrockModelId: {
             Type: 'String',
             Description:
-            'Required when LLMApi is BEDROCK. Please ensure you have requested access to the LLMs in Bedrock console (https://docs.aws.amazon.com/bedrock/latest/userguide/model-access.html), before deploying.',
-            AllowedValues: [
-                'amazon.nova-micro-v1',
-                'amazon.nova-lite-v1',
-                'amazon.nova-pro-v1',
-                'amazon.titan-text-express-v1',
-                'amazon.titan-text-lite-v1',
-                'amazon.titan-text-premier-v1',
-                'ai21.jamba-instruct-v1',
-                'anthropic.claude-instant-v1',
-                'anthropic.claude-v2.1',
-                'anthropic.claude-3-haiku-v1',
-                'anthropic.claude-3.5-haiku-v1',
-                'anthropic.claude-3-sonnet-v1',
-                'anthropic.claude-3.5-sonnet-v1',
-                'anthropic.claude-3.5-sonnet-v2',
-                'cohere.command-r-plus-v1',
-                'meta.llama3-8b-instruct-v1',
-                'meta.llama3.1-405b-instruct-v1',
-                'mistral.mistral-large-2407-v1'
-            ],
-            Default: 'anthropic.claude-instant-v1',
+                'Required when LLMApi is BEDROCK. Provide a valid foundation model ID or inference profile ID. See (https://docs.aws.amazon.com/bedrock/latest/userguide/models-supported.html) and (https://docs.aws.amazon.com/bedrock/latest/userguide/inference-profiles-support.html).',
+            AllowedPattern:
+                '^([\\w\\.-]+:[0-9]+|[\\w\\.-]+)$',
+            ConstraintDescription:
+                'Must be a valid Bedrock foundation model ID or inference profile ID.',
+            Default: 'global.anthropic.claude-haiku-4-5-20251001-v1:0',
         },
         EnableStreaming: {
             Type: 'String',
@@ -458,24 +444,12 @@ module.exports = {
         BedrockKnowledgeBaseModel: {
             Type: 'String',
             Description:
-                'Required if BedrockKnowledgeBaseId is not empty. Sets the preferred LLM model to use with the Bedrock knowledge base. Please ensure you have requested access to the LLMs in Bedrock console (https://docs.aws.amazon.com/bedrock/latest/userguide/model-access.html), before deploying',
-            AllowedValues: [
-                'amazon.nova-micro-v1',
-                'amazon.nova-lite-v1',
-                'amazon.nova-pro-v1',
-                'amazon.titan-text-premier-v1',
-                'anthropic.claude-instant-v1',
-                'anthropic.claude-v2.1',
-                'anthropic.claude-3-haiku-v1',
-                'anthropic.claude-3.5-haiku-v1',
-                'anthropic.claude-3-sonnet-v1',
-                'anthropic.claude-3.5-sonnet-v1',
-                'anthropic.claude-3.5-sonnet-v2',
-                'cohere.command-r-plus-v1',
-                'meta.llama3.1-405b-instruct-v1',
-                'mistral.mistral-large-2407-v1'
-            ],
-            Default: 'anthropic.claude-instant-v1',
+                'Required if BedrockKnowledgeBaseId is not empty. Provide a valid foundation model ID or inference profile id to use with the Bedrock knowledge base. See (https://docs.aws.amazon.com/bedrock/latest/userguide/models-supported.html) and (https://docs.aws.amazon.com/bedrock/latest/userguide/inference-profiles-support.html).',
+            AllowedPattern:
+                '^([\\w\\.-]+:[0-9]+|[\\w\\.-]+)$',
+            ConstraintDescription:
+                'Must be a valid Bedrock foundation model ID or inference profile ID.',
+            Default: 'global.anthropic.claude-haiku-4-5-20251001-v1:0',
         },
         LLMLambdaArn: {
             Type: 'String',

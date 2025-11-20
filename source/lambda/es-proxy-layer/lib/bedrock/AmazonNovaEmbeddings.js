@@ -5,21 +5,28 @@
 
 const { BedrockModelProviderPrototype } = require('./BedrockModelProviderPrototype');
 
-class CohereEmbeddings extends BedrockModelProviderPrototype {
+class AmazonNovaEmbeddings extends BedrockModelProviderPrototype {
     constructor() {
         super();
         this.body = {
-            input_type: 'search_document',
-            texts: [],
+            taskType: 'SINGLE_EMBEDDING',
+            singleEmbeddingParams: {
+                embeddingPurpose: 'GENERIC_RETRIEVAL',
+                text: {
+                    truncationMode: 'END',
+                    value: ''
+                }
+            }
         };
     }
 
     setPrompt(prompt) {
-        this.body.texts.push(prompt);
+        this.body.singleEmbeddingParams.text.value = prompt;
     }
 
     getResponseBody(response) {
-        return this.parseResponseBody(response).embeddings[0] || this.parseResponseBody(response).embeddings.float[0];
+        return this.parseResponseBody(response).embeddings[0].embedding;
     }
 }
-exports.CohereEmbeddings = CohereEmbeddings;
+
+exports.AmazonNovaEmbeddings = AmazonNovaEmbeddings;

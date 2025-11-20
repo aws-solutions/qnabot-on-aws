@@ -73,7 +73,7 @@ describe('keywords', () => {
         const response = await keywords(params);
         expect(detectSyntaxMock).toBeCalledWith({
             LanguageCode: 'en',
-            Text: ' QnA Bot is great',
+            Text: 'QnA Bot is great',
         });
         expect(response).toBe('great ');
     });
@@ -327,7 +327,7 @@ describe('keywords', () => {
         const response = await keywords(params);
         expect(detectSyntaxMock).toBeCalledWith({
             LanguageCode: 'en',
-            Text: ' I cannot believe it!',
+            Text: 'I cannot believe it!',
         });
         expect(response).toBe('cannot believe it! ');
     });

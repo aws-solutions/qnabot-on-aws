@@ -34,7 +34,7 @@ module.exports = {
                 EmbeddingsLambdaArn: { Ref: 'EmbeddingsLambdaArn' },
                 EmbeddingsApi: { Ref: 'EmbeddingsApi' },
                 EmbeddingsLambdaDimensions: { Ref: 'EmbeddingsLambdaDimensions' },
-                EmbeddingsBedrockModelId: { 'Fn::FindInMap': ['BedrockDefaults', {'Ref' : 'EmbeddingsBedrockModelId'}, 'ModelID'] },
+                EmbeddingsBedrockModelId: { Ref : 'EmbeddingsBedrockModelId' },
                 LogRetentionPeriod: { Ref: 'LogRetentionPeriod' },
                 SettingsTable: { Ref: 'SettingsTable'},
             },

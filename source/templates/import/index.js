@@ -16,6 +16,7 @@ module.exports = {
     Resources: _.assign.apply({}, files),
     AWSTemplateFormatVersion: '2010-09-09',
     Description: `(SO0189n-import) QnABot nested import resources - Version v${process.env.npm_package_version}`,
+    Mappings: require('../master/mappings/bedrock-defaults'),
     Outputs: require('./outputs'),
     Parameters: {
         ContentDesignerOutputBucket: { Type: 'String' },

@@ -484,6 +484,13 @@ module.exports = {
             guard: util.cfnGuard('LAMBDA_CONCURRENCY_CHECK', 'LAMBDA_INSIDE_VPC'),
         },
     },
+    ESProxyEmbeddingsPolicyResources: {
+        Type: 'Custom::ModelAccess',
+        Properties: {
+            ServiceToken: { 'Fn::GetAtt': ['CFNLambda', 'Arn'] },
+            EmbeddingsBedrockModelId: { 'Fn::If': ['EmbeddingsBedrock', { 'Fn::FindInMap': ['BedrockDefaults', {'Ref' : 'EmbeddingsBedrockModelId'}, 'ModelID'] }, { Ref: 'AWS::NoValue' }] },
+        },
+    },
     ESProxyLambdaRole: {
         Type: 'AWS::IAM::Role',
         Properties: {
@@ -563,9 +570,7 @@ module.exports = {
                                                 Action: [
                                                     'bedrock:InvokeModel',
                                                 ],
-                                                Resource: [
-                                                    { 'Fn::If': ['EmbeddingsBedrock', { 'Fn::Sub': ['arn:${AWS::Partition}:bedrock:${AWS::Region}::foundation-model/${ModelId}', {'ModelId': { 'Fn::FindInMap': ['BedrockDefaults', {'Ref' : 'EmbeddingsBedrockModelId'}, 'ModelID'] }}] }, { Ref: 'AWS::NoValue' }] },
-                                                ],
+                                                Resource: { 'Fn::GetAtt': ['ESProxyEmbeddingsPolicyResources', 'modelArn'] },
                                             },
                                             { Ref: 'AWS::NoValue' },
                                         ],

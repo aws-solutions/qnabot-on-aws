@@ -1,6 +1,6 @@
 {
     "name": "genesys",
-    "version": "7.0.8",
+    "version": "7.0.8-modelBackport",
     "description": "Lambda function used to support the Genesys setup wizard",
     "repository": {
         "type": "git",
