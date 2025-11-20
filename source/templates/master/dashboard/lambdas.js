@@ -9,7 +9,6 @@ const util = require('./util');
 
 const files = [
     require('../UpgradeAutoExport'),
-    require('../appregistry'),
     require('../assets'),
     require('../bucket'),
     require('../cfn'),

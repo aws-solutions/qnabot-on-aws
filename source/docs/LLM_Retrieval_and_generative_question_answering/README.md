@@ -59,41 +59,23 @@ With QnABot you can use three different data sources to generate responses from:
 
 
 You can also choose which LLM to use with QnABot:
-1. BEDROCK: Select from several LLM models provided by Amazon Bedrock using the LLMBedrockModelId Cloudformation parameter. These models provide the best performance and operate on a pay-per-request model. For more information, please refer to [Bedrock Supported AWS Regions](https://docs.aws.amazon.com/bedrock/latest/userguide/bedrock-regions.html).
+1. BEDROCK: Provide any valid Bedrock foundation model ID or inference profile ID using the LLMBedrockModelId. These models provide the best performance and operate on a pay-per-request model. For more information, please refer to [Bedrock Supported AWS Regions](https://docs.aws.amazon.com/bedrock/latest/userguide/bedrock-regions.html).
 2. LAMBDA: LLM model from a user provided Lambda function. This option provides a custom option for advanced users who wish to deploy their own model.
 
 ### 1. Amazon Bedrock (PREFERRED)
-Utilizes one of the Amazon Bedrock foundation models to generate text. Currently, the following models are supported by QnA Bot:
-- [Amazon Nova Micro](https://us-east-1.console.aws.amazon.com/bedrock/home?region=us-east-1#/model-catalog/serverless/amazon.nova-micro-v1:0)
-- [Amazon Nova Lite](https://us-east-1.console.aws.amazon.com/bedrock/home?region=us-east-1#/model-catalog/serverless/amazon.nova-lite-v1:0)
-- [Amazon Nova Pro](https://us-east-1.console.aws.amazon.com/bedrock/home?region=us-east-1#/model-catalog/serverless/amazon.nova-pro-v1:0)
-- [Amazon Titan Text G1 Lite](https://us-east-1.console.aws.amazon.com/bedrock/home?region=us-east-1#/providers?model=amazon.titan-text-lite-v1)
-- [Amazon Titan Text G1 Express](https://us-east-1.console.aws.amazon.com/bedrock/home?region=us-east-1#/providers?model=amazon.titan-text-express-v1)
-- [Amazon Titan Text G1 - Premier](https://us-east-1.console.aws.amazon.com/bedrock/home?region=us-east-1#/providers?model=amazon.titan-text-premier-v1:0)
-- [Anthropic Claude Instant 1.2](https://us-east-1.console.aws.amazon.com/bedrock/home?region=us-east-1#/providers?model=anthropic.claude-instant-v1)
-- [Anthropic Claude 2.1](https://us-east-1.console.aws.amazon.com/bedrock/home?region=us-east-1#/providers?model=anthropic.claude-v2:1)
-- [Anthropic Claude 3 Sonnet](https://us-east-1.console.aws.amazon.com/bedrock/home?region=us-east-1#/providers?model=anthropic.claude-3-sonnet-20240229-v1:0)
-- [Anthropic Claude 3.5 Sonnet](https://us-east-1.console.aws.amazon.com/bedrock/home?region=us-east-1#/providers?model=anthropic.claude-3-5-sonnet-20240620-v1:0)
-- [Anthropic Claude 3.5 Sonnet V2](https://us-east-1.console.aws.amazon.com/bedrock/home?region=us-east-1#/providers?model=anthropic.claude-3-5-sonnet-20241022-v2:0)
-- [Anthropic Claude 3 Haiku](https://us-east-1.console.aws.amazon.com/bedrock/home?region=us-east-1#/providers?model=anthropic.claude-3-haiku-20240307-v1:0)
-- [Anthropic Claude 3.5 Haiku V1](https://us-east-1.console.aws.amazon.com/bedrock/home?region=us-east-1#/model-catalog/serverless/anthropic.claude-3-5-haiku-20241022-v1:0)
-- [AI21 Jambda Instruct](https://us-east-1.console.aws.amazon.com/bedrock/home?region=us-east-1#/providers?model=ai21.jamba-instruct-v1:0)
-- [Meta Llama 3 8B Instruct](https://us-east-1.console.aws.amazon.com/bedrock/home?region=us-east-1#/providers?model=meta.llama3-8b-instruct-v1:0)
-- [Meta Llama 3.1 405B Instruct](https://us-east-1.console.aws.amazon.com/bedrock/home?region=us-east-1#/providers?model=meta.llama3-1-405b-instruct-v1:0)
-- [Command R+](https://us-east-1.console.aws.amazon.com/bedrock/home?region=us-east-1#/providers?model=cohere.command-r-plus-v1:0)
-- [Mistral Large 2 (24.07)](https://us-east-1.console.aws.amazon.com/bedrock/home?region=us-east-1#/providers?model=mistral.mistral-large-2407-v1:0)
+Utilizes one of the Amazon Bedrock foundation models or inference profiles to generate text. QnABot supports any valid Bedrock foundation model ID or inference profile ID. For the complete list of supported models and their availability by region, see:
 
-#### Requesting Access to Amazon Bedrock Models
+- [Bedrock Supported Foundation Models](https://docs.aws.amazon.com/bedrock/latest/userguide/models-supported.html)
+- [Bedrock Inference Profiles](https://docs.aws.amazon.com/bedrock/latest/userguide/inference-profiles-support.html)
 
-**NOTE: Access must be requested for the Bedrock model that you wish to use. This step needs to be performed only once per account in the region where your QnABot is deployed. To request access, go to the [Model Access](https://docs.aws.amazon.com/bedrock/latest/userguide/model-access.html) page in the Bedrock console. Select the models you need access to and request access.**
-
-![Model Access](./images/Request_model_access.jpeg)
+> **_NOTE:_** 
+Cross-region inference profiles are not supported when deploying QnABot via VPC template 
 
 #### Configuring Amazon Bedrock
 
 From the Cloudformation console, set the following parameters:
 - set `LLMApi` to BEDROCK
-- set `LLMBedrockModelId` to one of the options. 
+- set `LLMBedrockModelId` to a valid model ID or inference profile ID. 
 
 ![CFN Params](./images/CF_Params_Bedrock.jpeg)
 
@@ -158,7 +140,7 @@ When QnABot stack is installed, open Content Designer **Settings** page:
 - **LLM_GENERATE_QUERY_PROMPT_TEMPLATE:** the prompt template used to construct a prompt for the LLM to disambiguate a followup question. The template may use the placeholders:
   - `{history}` - placeholder for the last `LLM_CHAT_HISTORY_MAX_MESSAGES` messages in the conversational history, to provide conversational context.
   - `{input}` - placeholder for the current user utterance / question
-- **LLM_GENERATE_QUERY_MODEL_PARAMS:** parameters sent to the LLM model when disambiguating follow-up questions. Default: `{"temperature":0}`. Check model documentation for additional values that your model provider accepts.
+- **LLM_GENERATE_QUERY_MODEL_PARAMS:** parameters sent to the LLM model when disambiguating follow-up questions. Default: `{"temperature":0, "maxTokens":300, "topP":1}`. Check model documentation for additional values that your model provider accepts.
 - **LLM_QA_ENABLE:** set to true or false to enable or disable generative answers from passages retrieved via embeddings or Kendra fallback (when no FAQ match its found). NOTE LLM based generative answers are not applied when an FAQ / QID matches the question.
 - **LLM_QA_USE_KENDRA_RETRIEVAL_API:** set to true or false to enable or disable the use of Kendra's retrieval API. When enabled, QnABot uses Kendra's Retrieve api to retrieve semantically relevant passages of up to 200 token words from the documents in your index (not FAQs). When disabled, QnABot use the default Kendra Query API to search documents and FAQs. Takes effect only when LLM_QA_ENABLE is true. The default is true (recommended) when LLM QA is enabled. Note: this feature will only search the first configured index. See [Retrieve API](https://docs.aws.amazon.com/kendra/latest/APIReference/API_Retrieve.html) for more details.
 - **LLM_QA_PROMPT_TEMPLATE:**  the prompt template used to construct a prompt for the LLM to generate an answer from the context of a retrieved passages (from Kendra or Embeddings). The template may use the placeholders:
@@ -167,7 +149,7 @@ When QnABot stack is installed, open Content Designer **Settings** page:
   - `{input}` - placeholder for the current user utterance / question
   - `{query}` - placeholder for the generated (disambiguated) query created by the generate query feature. NOTE the default prompt does not use `query` in the qa prompt, as it provides the conversation history and current user input instead, but you can change the prompt to use `query` instead of, or in addition to `input` and `history` to tune the LLM answers.
 - **LLM_QA_NO_HITS_REGEX:** when the pattern specified matches the response from the LLM, e.g. `Sorry, I don't know`, then the response is treated as no_hits, and the default `EMPTYMESSAGE` or Custom Don't Know ('no_hits') item is returned instead. Disabled by default, since enabling it prevents easy debugging of LLM don't know responses.
-- **LLM_QA_MODEL_PARAMS:** parameters sent to the LLM model when generating answers to questions. Default: `{"temperature":0}`. Check model documentation for additional values that your model provider accepts.
+- **LLM_QA_MODEL_PARAMS:** parameters sent to the LLM model when generating answers to questions. Default: `{"temperature":0, "maxTokens":300, "topP":1}`. Check model documentation for additional values that your model provider accepts.
 - **LLM_QA_PREFIX_MESSAGE:** Message use to prefix LLM generated answer. May be be empty.
 - **LLM_QA_SHOW_CONTEXT_TEXT:** set to true or false to enable or disable inclusion of the passages (from Kendra or Embeddings) used as context for LLM generated answers.
 - **LLM_QA_SHOW_SOURCE_LINKS:** set to true or false to enable or disable Kendra Source Links or passage refMarkdown links (doc references) in markdown answers.

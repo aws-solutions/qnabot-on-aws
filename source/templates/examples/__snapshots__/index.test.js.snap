@@ -757,6 +757,9 @@ exports[`renders examples template correctly 1`] = `
     "QuizType": {
       "Type": "String",
     },
+    "ResponseBotStackName": {
+      "Type": "String",
+    },
     "S3Clean": {
       "Type": "String",
     },
@@ -4019,7 +4022,15 @@ exports[`renders examples template correctly 1`] = `
         "Description": "QNA Age No Confirm Bot - x.x.x - v2",
         "IdleSessionTTLInSeconds": "300",
         "Name": {
-          "Fn::Sub": "ResponseBot-QNAAgeNoConfirmV2-\${AWS::StackName}",
+          "Fn::Join": [
+            "",
+            [
+              "QNAAgeNoConfirmV2-",
+              {
+                "Ref": "ResponseBotStackName",
+              },
+            ],
+          ],
         },
         "RoleArn": {
           "Fn::GetAtt": [
@@ -4189,7 +4200,15 @@ exports[`renders examples template correctly 1`] = `
         "Description": "QNA Age Bot - x.x.x - v2",
         "IdleSessionTTLInSeconds": "300",
         "Name": {
-          "Fn::Sub": "ResponseBot-QNAAgeV2-\${AWS::StackName}",
+          "Fn::Join": [
+            "",
+            [
+              "QNAAgeV2-",
+              {
+                "Ref": "ResponseBotStackName",
+              },
+            ],
+          ],
         },
         "RoleArn": {
           "Fn::GetAtt": [
@@ -4389,7 +4408,15 @@ exports[`renders examples template correctly 1`] = `
         "Description": "QNA Date Bot (NoConfirm) - x.x.x - v2",
         "IdleSessionTTLInSeconds": "300",
         "Name": {
-          "Fn::Sub": "ResponseBot-QNADateNoConfirmV2-\${AWS::StackName}",
+          "Fn::Join": [
+            "",
+            [
+              "QNADateNoConfirmV2-",
+              {
+                "Ref": "ResponseBotStackName",
+              },
+            ],
+          ],
         },
         "RoleArn": {
           "Fn::GetAtt": [
@@ -4550,7 +4577,15 @@ exports[`renders examples template correctly 1`] = `
         "Description": "QNA Date Bot - x.x.x - v2",
         "IdleSessionTTLInSeconds": "300",
         "Name": {
-          "Fn::Sub": "ResponseBot-QNADateV2-\${AWS::StackName}",
+          "Fn::Join": [
+            "",
+            [
+              "QNADateV2-",
+              {
+                "Ref": "ResponseBotStackName",
+              },
+            ],
+          ],
         },
         "RoleArn": {
           "Fn::GetAtt": [
@@ -4850,7 +4885,15 @@ exports[`renders examples template correctly 1`] = `
         "Description": "QNA DayOfWeek Bot - x.x.x - v2",
         "IdleSessionTTLInSeconds": "300",
         "Name": {
-          "Fn::Sub": "ResponseBot-QNADayOfWeekV2-\${AWS::StackName}",
+          "Fn::Join": [
+            "",
+            [
+              "QNADayOfWeekV2-",
+              {
+                "Ref": "ResponseBotStackName",
+              },
+            ],
+          ],
         },
         "RoleArn": {
           "Fn::GetAtt": [
@@ -5025,7 +5068,15 @@ exports[`renders examples template correctly 1`] = `
         "Description": "QNA Email Address Bot - x.x.x - v2",
         "IdleSessionTTLInSeconds": "300",
         "Name": {
-          "Fn::Sub": "ResponseBot-QNAEmailAddressV2-\${AWS::StackName}",
+          "Fn::Join": [
+            "",
+            [
+              "QNAEmailAddressV2-",
+              {
+                "Ref": "ResponseBotStackName",
+              },
+            ],
+          ],
         },
         "RoleArn": {
           "Fn::GetAtt": [
@@ -5379,7 +5430,15 @@ exports[`renders examples template correctly 1`] = `
         "Description": "QNA Month Bot (NoConfirm) - x.x.x - v2",
         "IdleSessionTTLInSeconds": "300",
         "Name": {
-          "Fn::Sub": "ResponseBot-QNAMonthNoConfirmV2-\${AWS::StackName}",
+          "Fn::Join": [
+            "",
+            [
+              "QNAMonthNoConfirmV2-",
+              {
+                "Ref": "ResponseBotStackName",
+              },
+            ],
+          ],
         },
         "RoleArn": {
           "Fn::GetAtt": [
@@ -5694,7 +5753,15 @@ exports[`renders examples template correctly 1`] = `
         "Description": "QNA Month Bot - x.x.x - v2",
         "IdleSessionTTLInSeconds": "300",
         "Name": {
-          "Fn::Sub": "ResponseBot-QNAMonthV2-\${AWS::StackName}",
+          "Fn::Join": [
+            "",
+            [
+              "QNAMonthV2-",
+              {
+                "Ref": "ResponseBotStackName",
+              },
+            ],
+          ],
         },
         "RoleArn": {
           "Fn::GetAtt": [
@@ -5908,7 +5975,15 @@ exports[`renders examples template correctly 1`] = `
         "Description": "QNA Name Bot - x.x.x - v2",
         "IdleSessionTTLInSeconds": "300",
         "Name": {
-          "Fn::Sub": "ResponseBot-QNANameV2-\${AWS::StackName}",
+          "Fn::Join": [
+            "",
+            [
+              "QNANameV2-",
+              {
+                "Ref": "ResponseBotStackName",
+              },
+            ],
+          ],
         },
         "RoleArn": {
           "Fn::GetAtt": [
@@ -6093,7 +6168,15 @@ exports[`renders examples template correctly 1`] = `
         "Description": "QNA Number Bot (NoConfirm) - x.x.x - v2",
         "IdleSessionTTLInSeconds": "300",
         "Name": {
-          "Fn::Sub": "ResponseBot-QNANumberNoConfirmV2-\${AWS::StackName}",
+          "Fn::Join": [
+            "",
+            [
+              "QNANumberNoConfirmV2-",
+              {
+                "Ref": "ResponseBotStackName",
+              },
+            ],
+          ],
         },
         "RoleArn": {
           "Fn::GetAtt": [
@@ -6239,7 +6322,15 @@ exports[`renders examples template correctly 1`] = `
         "Description": "QNA Number Bot - x.x.x - v2",
         "IdleSessionTTLInSeconds": "300",
         "Name": {
-          "Fn::Sub": "ResponseBot-QNANumberV2-\${AWS::StackName}",
+          "Fn::Join": [
+            "",
+            [
+              "QNANumberV2-",
+              {
+                "Ref": "ResponseBotStackName",
+              },
+            ],
+          ],
         },
         "RoleArn": {
           "Fn::GetAtt": [
@@ -6424,7 +6515,15 @@ exports[`renders examples template correctly 1`] = `
         "Description": "QNA Phone Number Bot (NoConfirm) - x.x.x - v2",
         "IdleSessionTTLInSeconds": "300",
         "Name": {
-          "Fn::Sub": "ResponseBot-QNAPhoneNumberNoConfirmV2-\${AWS::StackName}",
+          "Fn::Join": [
+            "",
+            [
+              "QNAPhoneNumberNoConfirmV2-",
+              {
+                "Ref": "ResponseBotStackName",
+              },
+            ],
+          ],
         },
         "RoleArn": {
           "Fn::GetAtt": [
@@ -6570,7 +6669,15 @@ exports[`renders examples template correctly 1`] = `
         "Description": "QNA Phone Number Bot - x.x.x - v2",
         "IdleSessionTTLInSeconds": "300",
         "Name": {
-          "Fn::Sub": "ResponseBot-QNAPhoneNumberV2-\${AWS::StackName}",
+          "Fn::Join": [
+            "",
+            [
+              "QNAPhoneNumberV2-",
+              {
+                "Ref": "ResponseBotStackName",
+              },
+            ],
+          ],
         },
         "RoleArn": {
           "Fn::GetAtt": [
@@ -6767,7 +6874,15 @@ exports[`renders examples template correctly 1`] = `
         "Description": "QNA PIN Bot (NoConfirm) - x.x.x - v2",
         "IdleSessionTTLInSeconds": "300",
         "Name": {
-          "Fn::Sub": "ResponseBot-QNAPinNoConfirmV2-\${AWS::StackName}",
+          "Fn::Join": [
+            "",
+            [
+              "QNAPinNoConfirmV2-",
+              {
+                "Ref": "ResponseBotStackName",
+              },
+            ],
+          ],
         },
         "RoleArn": {
           "Fn::GetAtt": [
@@ -6924,7 +7039,15 @@ exports[`renders examples template correctly 1`] = `
         "Description": "QNA PIN Bot - x.x.x - v2",
         "IdleSessionTTLInSeconds": "300",
         "Name": {
-          "Fn::Sub": "ResponseBot-QNAPinV2-\${AWS::StackName}",
+          "Fn::Join": [
+            "",
+            [
+              "QNAPinV2-",
+              {
+                "Ref": "ResponseBotStackName",
+              },
+            ],
+          ],
         },
         "RoleArn": {
           "Fn::GetAtt": [
@@ -7110,7 +7233,15 @@ exports[`renders examples template correctly 1`] = `
         "Description": "QNA SocialSecurity Bot - x.x.x - v2",
         "IdleSessionTTLInSeconds": "300",
         "Name": {
-          "Fn::Sub": "ResponseBot-QNASocialSecurityV2-\${AWS::StackName}",
+          "Fn::Join": [
+            "",
+            [
+              "QNASocialSecurityV2-",
+              {
+                "Ref": "ResponseBotStackName",
+              },
+            ],
+          ],
         },
         "RoleArn": {
           "Fn::GetAtt": [
@@ -7288,7 +7419,15 @@ exports[`renders examples template correctly 1`] = `
         "Description": "QNA Time Bot - x.x.x - v2",
         "IdleSessionTTLInSeconds": "300",
         "Name": {
-          "Fn::Sub": "ResponseBot-QNATimeV2-\${AWS::StackName}",
+          "Fn::Join": [
+            "",
+            [
+              "QNATimeV2-",
+              {
+                "Ref": "ResponseBotStackName",
+              },
+            ],
+          ],
         },
         "RoleArn": {
           "Fn::GetAtt": [
@@ -7473,7 +7612,15 @@ exports[`renders examples template correctly 1`] = `
         "Description": "QNA Wage Bot - x.x.x - v2",
         "IdleSessionTTLInSeconds": 300,
         "Name": {
-          "Fn::Sub": "ResponseBot-QNAWageV2-\${AWS::StackName}",
+          "Fn::Join": [
+            "",
+            [
+              "QNAWageV2-",
+              {
+                "Ref": "ResponseBotStackName",
+              },
+            ],
+          ],
         },
         "RoleArn": {
           "Fn::GetAtt": [
@@ -7766,7 +7913,15 @@ exports[`renders examples template correctly 1`] = `
         "Description": "QNA Yes No Exit Bot - x.x.x - v2",
         "IdleSessionTTLInSeconds": "300",
         "Name": {
-          "Fn::Sub": "ResponseBot-QNAYesNoExitV2-\${AWS::StackName}",
+          "Fn::Join": [
+            "",
+            [
+              "QNAYesNoExitV2-",
+              {
+                "Ref": "ResponseBotStackName",
+              },
+            ],
+          ],
         },
         "RoleArn": {
           "Fn::GetAtt": [
@@ -7959,7 +8114,15 @@ exports[`renders examples template correctly 1`] = `
         "Description": "QNA Yes No Bot - x.x.x - v2",
         "IdleSessionTTLInSeconds": "300",
         "Name": {
-          "Fn::Sub": "ResponseBot-QNAYesNoV2-\${AWS::StackName}",
+          "Fn::Join": [
+            "",
+            [
+              "QNAYesNoV2-",
+              {
+                "Ref": "ResponseBotStackName",
+              },
+            ],
+          ],
         },
         "RoleArn": {
           "Fn::GetAtt": [

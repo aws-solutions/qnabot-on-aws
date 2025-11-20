@@ -30,6 +30,16 @@ const embeddingModelBodies = {
     'amazon.titan-embed-text-v2': {
         inputText: 'test prompt'
     },
+    'amazon.nova-2-multimodal-embeddings-v1:0': {
+        taskType: 'SINGLE_EMBEDDING',
+        singleEmbeddingParams: {
+            embeddingPurpose: 'GENERIC_RETRIEVAL',
+            text: {
+                truncationMode: 'END',
+                value: 'test prompt'
+            }
+        }
+    },
     'cohere.embed-english-v3': {
         texts: ['test prompt'],
         input_type: 'search_document'
@@ -41,12 +51,12 @@ const embeddingModelBodies = {
 };
 
 const llmModelBodies = {
-    'amazon.titan-text-premier-v1': {
+    'amazon.titan-text-premier-v1:0': {
         maxTokens: 300,
         temperature: 0,
         topP: 0.9
     },
-    'ai21.jamba-instruct-v1': {
+    'ai21.jamba-instruct-v1:0': {
         maxTokens: 300,
         temperature: 0,
         topP: 0.9
@@ -91,6 +101,18 @@ const embeddingModelResponses = {
         body: Buffer.from(
             JSON.stringify({
                 embedding: 'test response'
+            })
+        )
+    },
+    'amazon.nova-2-multimodal-embeddings-v1:0': {
+        body: Buffer.from(
+            JSON.stringify({
+                embeddings: [
+                    {
+                        embeddingType: 'TEXT',
+                        embedding: 'test response'
+                    }
+                ]
             })
         )
     },
@@ -153,19 +175,31 @@ describe('Invoke Bedrock Models', () => {
     test('invokeBedrockModel returns correct body with Embedding models', async () => {
         const prompt = 'test prompt';
         for (const modelId in embeddingModelBodies) {
-            const expectedCall = {
-                accept: 'application/json',
-                body: JSON.stringify(embeddingModelBodies[modelId]),
-                contentType: 'application/json',
-                modelId
-            };
+            // Reset mocks before each iteration
+            bedRockMock.reset();
+            jest.clearAllMocks();
 
             bedRockMock.on(InvokeModelCommand).resolves(embeddingModelResponses[modelId]);
 
             const response = await invokeBedrockModel(modelId, prompt);
-
+            
             expect(response).toEqual('test response');
-            expect(InvokeModelCommand).toHaveBeenCalledWith(expectedCall);
+            
+            // Verify the command was called with correct parameters
+            expect(InvokeModelCommand).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    accept: 'application/json',
+                    contentType: 'application/json',
+                    modelId,
+                    body: expect.any(String)
+                })
+            );
+            
+            // Verify the body content matches expected structure
+            const callArgs = InvokeModelCommand.mock.calls[0][0];
+            const actualBody = JSON.parse(callArgs.body);
+            expect(actualBody).toEqual(embeddingModelBodies[modelId]);
+            
             expect(bedRockMock).toHaveReceivedCommand(InvokeModelCommand);
         }
     });
@@ -268,13 +302,16 @@ describe('Invoke Bedrock Models', () => {
     test('invokeBedrockModel throws error if provider is not supported', async () => {
         const prompt = 'test prompt';
         const modelId = 'unsupported.provider';
-
-        try {
-            await invokeBedrockModel(modelId, prompt);
-            expect(true).toEqual(false);
-        } catch (err) {
-            expect(err.message).toEqual(`Unsupported model provider: unsupported`);
-        }
+        
+        const e = new Error('Could not resolve the foundation model from the provided model identifier.');
+        e.name = 'ResourceNotFoundException';
+        bedRockMock.on(ConverseCommand).rejects(e);
+        
+        const error = new Error(
+            '{"message":"Bedrock unsupported.provider returned ResourceNotFoundException: Could not resolve the foundation model from the provided model identifier. Please retry after selecting different Bedrock model in Cloudformation stack.","type":"Error"}'
+        );
+        
+        await expect(invokeBedrockModel(modelId, prompt)).rejects.toThrowError(error);
     });
 
     test('invokeBedrockModel throws error if body cannot be parsed', async () => {
@@ -539,7 +576,7 @@ describe('Test Converse Stream', () => {
         }
     });
 
-    test('invokeBedrockModel returns errpr response if ConverseStream API throws error on invalid error', async () => {
+    test('invokeBedrockModel returns error response if ConverseStream API throws error on invalid model', async () => {
         const prompt = 'test prompt';
         const system = 'test system';
 
@@ -550,12 +587,15 @@ describe('Test Converse Stream', () => {
         };
 
         const modelId = 'unsupported.provider';
+        
+        const e = new Error('Could not resolve the foundation model from the provided model identifier.');
+        e.name = 'ResourceNotFoundException';
+        bedRockMock.on(ConverseStreamCommand).rejects(e);
+        
+        const error = new Error(
+            '{"message":"Bedrock unsupported.provider returned ResourceNotFoundException: Could not resolve the foundation model from the provided model identifier. Please retry after selecting different Bedrock model in Cloudformation stack.","type":"Error"}'
+        );
 
-        try {
-            await invokeBedrockModel(modelId, prompt, { system, streamingAttributes });
-            expect(true).toEqual(false);
-        } catch (err) {
-            expect(err.message).toEqual(`Unsupported model provider: unsupported`);
-        }
+        await expect(invokeBedrockModel(modelId, prompt, { system, streamingAttributes })).rejects.toThrowError(error);
     });
 });

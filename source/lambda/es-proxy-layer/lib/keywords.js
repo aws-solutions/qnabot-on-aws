@@ -130,7 +130,7 @@ async function get_keywords(params) {
         new_question += ` ${new_word != '' ? new_word : word}`;
     }
     qnabot.log(`Question after expanding contractions${new_question}`);
-    params.question = new_question;
+    params.question = new_question.trim();
 
     if (_.get(params, 'use_keyword_filters')) {
         qnabot.log('use_keyword_filters is true; detecting keywords from question using Comprehend');

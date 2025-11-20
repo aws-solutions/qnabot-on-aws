@@ -134,7 +134,7 @@ module.exports = {
                                             {
                                                 'Fn::If': [
                                                     'EmbeddingsBedrock',
-                                                    { 'Fn::FindInMap': ['BedrockDefaults', {Ref : 'EmbeddingsBedrockModelId'}, 'EmbeddingsDimensions'] },
+                                                    { 'Fn::FindInMap': ['BedrockDefaults', { Ref : 'EmbeddingsBedrockModelId' }, 'EmbeddingsDimensions'] },
                                                     'INVALID EMBEDDINGS API - Cannot determine dimensions',
                                                 ],
                                             },

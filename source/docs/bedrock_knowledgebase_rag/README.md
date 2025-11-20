@@ -14,21 +14,14 @@ With this integration, QnABot on AWS can answer a question and its follow-up fro
 
 
 ## Amazon Bedrock Knowledge Base Models:
-- [Amazon Nova Micro](https://us-east-1.console.aws.amazon.com/bedrock/home?region=us-east-1#/model-catalog/serverless/amazon.nova-micro-v1:0)
-- [Amazon Nova Lite](https://us-east-1.console.aws.amazon.com/bedrock/home?region=us-east-1#/model-catalog/serverless/amazon.nova-lite-v1:0)
-- [Amazon Nova Pro](https://us-east-1.console.aws.amazon.com/bedrock/home?region=us-east-1#/model-catalog/serverless/amazon.nova-pro-v1:0)
-- [Amazon Titan Text G1 - Premier](https://us-east-1.console.aws.amazon.com/bedrock/home?region=us-east-1#/providers?model=amazon.titan-text-premier-v1:0)
-- [Anthropic Claude Instant 1.2](https://us-east-1.console.aws.amazon.com/bedrock/home?region=us-east-1#/providers?model=anthropic.claude-instant-v1)
-- [Anthropic Claude 2.1](https://us-east-1.console.aws.amazon.com/bedrock/home?region=us-east-1#/providers?model=anthropic.claude-v2:1)
-- [Anthropic Claude 3 Haiku](https://us-east-1.console.aws.amazon.com/bedrock/home?region=us-east-1#/providers?model=anthropic.claude-3-haiku-20240307-v1:0)
-- [Anthropic Claude 3.5 Haiku V1](https://us-east-1.console.aws.amazon.com/bedrock/home?region=us-east-1#/model-catalog/serverless/anthropic.claude-3-5-haiku-20241022-v1:0)
-- [Anthropic Claude 3 Sonnet](https://us-east-1.console.aws.amazon.com/bedrock/home?region=us-east-1#/providers?model=anthropic.claude-3-sonnet-20240229-v1:0)
-- [Anthropic Claude 3.5 Sonnet V1](https://us-east-1.console.aws.amazon.com/bedrock/home?region=us-east-1#/providers?model=anthropic.claude-3-5-sonnet-20240620-v1:0)
-- [Anthropic Claude 3.5 Sonnet V2](https://us-east-1.console.aws.amazon.com/bedrock/home?region=us-east-1#/providers?model=anthropic.claude-3-5-sonnet-20241022-v2:0)
-- [Meta Llama 3.1 405B Instruct](https://us-east-1.console.aws.amazon.com/bedrock/home?region=us-east-1#/providers?model=meta.llama3-1-405b-instruct-v1:0)
-- [Command R+](https://us-east-1.console.aws.amazon.com/bedrock/home?region=us-east-1#/providers?model=cohere.command-r-plus-v1:0)
-- [Mistral Large 2 (24.07)](https://us-east-1.console.aws.amazon.com/bedrock/home?region=us-east-1#/providers?model=mistral.mistral-large-2407-v1:0)
 
+QnABot supports any valid Bedrock foundation model ID or inference profile ID for Knowledge Base integration. For the complete list of supported models and their availability by region, see:
+
+- [Bedrock Supported Foundation Models](https://docs.aws.amazon.com/bedrock/latest/userguide/models-supported.html)
+- [Bedrock Inference Profiles](https://docs.aws.amazon.com/bedrock/latest/userguide/inference-profiles-support.html)
+
+> **_NOTE:_** 
+Cross-region inference profiles are not supported when deploying QnABot via VPC template 
 
 ## Amazon Bedrock Knowledge Base Quick Setup:
 > **_NOTE:_** 
@@ -59,10 +52,7 @@ Before getting started, please verify [supported regions and models for Knowledg
 
 ### BedrockKnowledgeBaseModel
 
-**Optional** -  Required if BedrockKnowledgeBaseId is not empty. Sets the preferred LLM model to use with the Bedrock knowledge base. Please ensure you have [requested model access](https://docs.aws.amazon.com/bedrock/latest/userguide/model-access.html) in Bedrock console, before deploying.
-
-![Enable Model Access](./images/model_access_for_kb.png)
-
+**Optional** -  Required if BedrockKnowledgeBaseId is not empty. Sets the preferred LLM model to use with the Bedrock knowledge base. Access to all Amazon Bedrock foundation models is enabled by default, however selecting Anthropic models requires customers to submit use case details [once per account](https://docs.aws.amazon.com/bedrock/latest/userguide/model-access.html).
 
 
 ## Configure settings for RAG with Amazon Bedrock Knowledge Base in Content Designer:

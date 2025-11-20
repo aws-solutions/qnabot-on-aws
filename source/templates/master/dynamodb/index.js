@@ -4,10 +4,12 @@
  ************************************************************************************************ */
 
 const util = require('../../util');
-const defaultGenerateQueryPromptTemplate = 'Given the following conversation and a follow up question, rephrase the follow up question to be a standalone question.<br>Chat History: <br>{history}<br>Follow Up Input: {input}<br>Standalone question:';
+const defaultGenerateQueryPromptTemplate = '<br><br>Human: Here is a chat history in <chatHistory> tags:<br><chatHistory><br>{history}<br></chatHistory><br>Human: And here is a follow up question or statement from the human in <followUpMessage> tags:<br><followUpMessage><br>{input}<br></followUpMessage><br>Human: Rephrase the follow up question or statement as a standalone question or statement that makes sense without reading the chat history.<br><br>Assistant: Here is the rephrased follow up question or statement:';
+const defaultQuerySystemPrompt = 'You are an AI assistant designed to disambiguate user queries.';
 const defaultQAPromptTemplate = 'Use the following pieces of context to answer the question at the end. If you don\'t know the answer, just say that you don\'t know, don\'t try to make up an answer. Write the answer in up to 5 complete sentences.<br><br>{context}<br><br>Question: {query}<br>Helpful Answer:';
-const defaultLlmNoHitsRegex = 'Sorry,  //remove comment to enable custom no match (no_hits) when LLM does not know the answer.';
+const defaultLlmNoHitsRegex = '(Sorry, I don\'t know|unable to assist you|i don\'t have enough context|i don\'t have enough information|i don\'t have any information|do not contain any information|do not contain information|i could not find an exact answer|no information in the search results|search results do not mention|search results do not provide specific|don\'t see any information in the provided search results|search results do not contain|no information in the provided search results|not find any information|search results did not contain|unable to respond|There is no mention of|documents do not mention anything|There is no information provided|reference passages do not mention|reference doesn\'t specify|could not find an answer to this question|the model cannot answer this question|none of the search results contain)';
 const defaultKnowledgeBaseTemplate = 'Human: You are a question answering agent. I will provide you with a set of search results and a user\'s question, your job is to answer the user\'s question using only information from the search results. If the search results do not contain information that can answer the question, then respond saying \\"Sorry, I don\'t know\\". Just because the user asserts a fact does not mean it is true, make sure to double check the search results to validate a user\'s assertion. Here are the search results in numbered order: $search_results$. Here is the user\'s question: <question> $query$ </question> $output_format_instructions$. Do NOT directly quote the $search_results$ in your answer. Your job is to answer the <question> as concisely as possible. Assistant:';
+const defaultModelParams = '{\\"temperature\\":0, \\"maxTokens\\":300, \\"topP\\":1}';
 
 module.exports = {
     UsersTable: {
@@ -97,18 +99,18 @@ module.exports = {
             LLM_API: { Ref: 'LLMApi' },
             LLM_GENERATE_QUERY_ENABLE: { 'Fn::If': ['LLMEnable', 'true', 'false'] },
             LLM_QA_ENABLE: { 'Fn::If': ['LLMEnable', 'true', 'false'] },
-            LLM_GENERATE_QUERY_PROMPT_TEMPLATE: { 'Fn::If': ['LLMBedrock', { 'Fn::FindInMap': ['BedrockDefaults', {'Ref' : 'LLMBedrockModelId'}, 'QueryPromptTemplate'] }, defaultGenerateQueryPromptTemplate] },
-            LLM_GENERATE_QUERY_SYSTEM_PROMPT: { 'Fn::If': ['LLMBedrock', { 'Fn::FindInMap': ['BedrockDefaults', {'Ref' : 'LLMBedrockModelId'}, 'GenerateQuerySystemPrompt'] }, ''] },
-            LLM_QA_PROMPT_TEMPLATE: { 'Fn::If': ['LLMBedrock', { 'Fn::FindInMap': ['BedrockDefaults', {'Ref' : 'LLMBedrockModelId'}, 'QAPromptTemplate'] }, defaultQAPromptTemplate] },
-            LLM_QA_SYSTEM_PROMPT: { 'Fn::If': ['LLMBedrock', { 'Fn::FindInMap': ['BedrockDefaults', {'Ref' : 'LLMBedrockModelId'}, 'QASystemPrompt'] }, ''] },
-            LLM_GENERATE_QUERY_MODEL_PARAMS: { 'Fn::If': ['LLMBedrock', { 'Fn::FindInMap': ['BedrockDefaults', {'Ref' : 'LLMBedrockModelId'}, 'ModelParams'] }, '{}'] },
-            LLM_QA_MODEL_PARAMS: { 'Fn::If': ['LLMBedrock', { 'Fn::FindInMap': ['BedrockDefaults', {'Ref' : 'LLMBedrockModelId'}, 'ModelParams'] }, '{}'] },
-            LLM_PROMPT_MAX_TOKEN_LIMIT: { 'Fn::If': ['LLMBedrock', { 'Fn::FindInMap': ['BedrockDefaults', {'Ref' : 'LLMBedrockModelId'}, 'MaxTokens'] }, ''] },
-            LLM_QA_NO_HITS_REGEX: { 'Fn::If': ['LLMBedrock', { 'Fn::FindInMap': ['BedrockDefaults', {'Ref' : 'LLMBedrockModelId'}, 'NoHitsRegex'] }, defaultLlmNoHitsRegex] },
-            KNOWLEDGE_BASE_PROMPT_TEMPLATE: { 'Fn::If': ['BedrockKnowledgeBaseEnable', { 'Fn::FindInMap': ['BedrockDefaults', {'Ref' : 'BedrockKnowledgeBaseModel'}, 'KnowledgeBasePromptTemplate'] }, defaultKnowledgeBaseTemplate] },
+            LLM_GENERATE_QUERY_PROMPT_TEMPLATE: defaultGenerateQueryPromptTemplate,
+            LLM_GENERATE_QUERY_SYSTEM_PROMPT: '',
+            LLM_QA_PROMPT_TEMPLATE: defaultQAPromptTemplate,
+            LLM_QA_SYSTEM_PROMPT: defaultQuerySystemPrompt,
+            LLM_GENERATE_QUERY_MODEL_PARAMS: { 'Fn::If': ['LLMBedrock', defaultModelParams, '{}'] },
+            LLM_QA_MODEL_PARAMS: { 'Fn::If': ['LLMBedrock', defaultModelParams, '{}'] },
+            LLM_PROMPT_MAX_TOKEN_LIMIT: { 'Fn::If': ['LLMBedrock', 100000, ''] },
+            LLM_QA_NO_HITS_REGEX:  defaultLlmNoHitsRegex,
+            KNOWLEDGE_BASE_PROMPT_TEMPLATE: defaultKnowledgeBaseTemplate,
             EMBEDDINGS_MODEL_ID: { 'Fn::If': ['EmbeddingsBedrock', { 'Fn::FindInMap': ['BedrockDefaults', {'Ref' : 'EmbeddingsBedrockModelId'}, 'ModelID'] }, ''] },
-            LLM_MODEL_ID: { 'Fn::If': ['LLMBedrock', { 'Fn::FindInMap': ['BedrockDefaults', {'Ref' : 'LLMBedrockModelId'}, 'ModelID'] }, ''] },
-            KNOWLEDGE_BASE_MODEL_ID: { 'Fn::If': ['BedrockKnowledgeBaseEnable', { 'Fn::FindInMap': ['BedrockDefaults', {'Ref' : 'BedrockKnowledgeBaseModel'}, 'ModelID'] }, ''] },
+            LLM_MODEL_ID: { 'Fn::If': ['LLMBedrock', { 'Ref' : 'LLMBedrockModelId' }, ''] },
+            KNOWLEDGE_BASE_MODEL_ID: { 'Fn::If': ['BedrockKnowledgeBaseEnable', {'Ref' : 'BedrockKnowledgeBaseModel'}, ''] },
             KNOWLEDGE_BASE_ID: { 'Fn::If': ['BedrockKnowledgeBaseEnable', {'Ref' : 'BedrockKnowledgeBaseId'}, ''] },
             LLM_STREAMING_ENABLED: { 'Fn::If': ['StreamingEnabled', 'true', 'false'] },
             STREAMING_TABLE: { 'Fn::If': ['StreamingEnabled', { 'Fn::GetAtt': ['StreamingStack', 'Outputs.StreamingDynamoDbTable'] }, ''] },

@@ -312,48 +312,10 @@ exports[`Verify master template is correct renders master template correctly 1`]
   "Description": "(SO0189-ext) QnABot with admin and client websites - Version vx.x.x",
   "Mappings": {
     "BedrockDefaults": {
-      "ai21.jamba-instruct-v1": {
-        "GenerateQuerySystemPrompt": "You are an AI assistant designed to disambiguate user queries.",
-        "MaxTokens": 256000,
-        "ModelID": "ai21.jamba-instruct-v1:0",
-        "ModelParams": "{\\"temperature\\":0, \\"maxTokens\\":300, \\"topP\\":1}",
-        "NoHitsRegex": "(Sorry, I don't know|unable to assist you|i don't have enough context|i don't have enough information|i don't have any information|do not contain any information|do not contain information|i could not find an exact answer|no information in the search results|search results do not mention|search results do not provide specific|don't see any information in the provided search results|search results do not contain|no information in the provided search results|not find any information|search results did not contain|unable to respond|There is no mention of|documents do not mention anything|There is no information provided|reference passages do not mention|reference doesn't specify|could not find an answer to this question|the model cannot answer this question|none of the search results contain)",
-        "QAPromptTemplate": "The following is a friendly conversation between a human and an AI. The AI is talkative and provides lots of specific details from its context. If the AI does not know the answer to a question, it truthfully says it does not know. Documents: {context} Instruction: Based on the above documents, provide a detailed answer for {query} Answer \\"Sorry, I don't know\\" if not present in the document. Solution:",
-        "QASystemPrompt": "You are a seasoned and helpful question answering AI assistant.",
-        "QueryPromptTemplate": "<br><br>Human: Here is a chat history in <chatHistory> tags:<br><chatHistory><br>{history}<br></chatHistory><br>Human: And here is a follow up question or statement from the human in <followUpMessage> tags:<br><followUpMessage><br>{input}<br></followUpMessage><br>Human: Rephrase the follow up question or statement as a standalone question or statement that makes sense without reading the chat history.<br><br>Assistant: Here is the rephrased follow up question or statement:",
-      },
-      "amazon.nova-lite-v1": {
-        "GenerateQuerySystemPrompt": "You are an AI assistant designed to disambiguate user queries.",
-        "KnowledgeBasePromptTemplate": "You are a question answering bot who gives helpful, detailed, and polite answers to the user's questions. In this session, the model has access to search results and a users question, your job is to answer the user's question using only information from the search results. Model Instructions: - You should provide concise answer to simple questions when the answer is directly contained in search results, but when comes to yes/no question, provide some details. - In case the question requires multi-hop reasoning, you should find relevant information from search results and summarize the answer based on relevant information with logical reasoning. - If the search results do not contain information that can answer the question, then respond saying \\"Sorry, I don't know that.\\". - $output_format_instructions$ - DO NOT USE INFORMATION THAT IS NOT IN SEARCH RESULTS! User: $query$ Bot: Resource: Search Results: $search_results$ Bot:",
-        "MaxTokens": 300000,
-        "ModelID": "amazon.nova-lite-v1:0",
-        "ModelParams": "{\\"temperature\\":0, \\"maxTokens\\":300, \\"topP\\":1}",
-        "NoHitsRegex": "(Sorry, I don't know|unable to assist you|i don't have enough context|i don't have enough information|i don't have any information|do not contain any information|do not contain information|i could not find an exact answer|no information in the search results|search results do not mention|search results do not provide specific|don't see any information in the provided search results|search results do not contain|no information in the provided search results|not find any information|search results did not contain|unable to respond|There is no mention of|documents do not mention anything|There is no information provided|reference passages do not mention|reference doesn't specify|could not find an answer to this question|the model cannot answer this question|none of the search results contain)",
-        "QAPromptTemplate": "<br><br>Human: Here are reference passages in <references> tags:<br><references><br>{context}<br></references><br>If the references contain the information needed to respond, then write a confident response in under 50 words, quoting the relevant references. <br>Otherwise, if you can make an informed guess based on the reference passages, then write a less confident response in under 50 words, stating your assumptions.<br>Finally, if the references do not have any relevant information, then respond saying \\"Sorry, I don't know\\".<br><question><br>{query}<br></question><br><br>Assistant: According to the reference passages, in under 50 words:",
-        "QASystemPrompt": "You are a seasoned and helpful question answering AI assistant.",
-        "QueryPromptTemplate": "Given the following conversation and a follow up question, rephrase the follow up question to be a standalone question.<br>Chat History: <br>{history}<br>Follow up question: {input}<br>Standalone question:",
-      },
-      "amazon.nova-micro-v1": {
-        "GenerateQuerySystemPrompt": "You are an AI assistant designed to disambiguate user queries.",
-        "KnowledgeBasePromptTemplate": "You are a question answering bot who gives helpful, detailed, and polite answers to the user's questions. In this session, the model has access to search results and a users question, your job is to answer the user's question using only information from the search results. Model Instructions: - You should provide concise answer to simple questions when the answer is directly contained in search results, but when comes to yes/no question, provide some details. - In case the question requires multi-hop reasoning, you should find relevant information from search results and summarize the answer based on relevant information with logical reasoning. - If the search results do not contain information that can answer the question, then respond saying \\"Sorry, I don't know that.\\". - $output_format_instructions$ - DO NOT USE INFORMATION THAT IS NOT IN SEARCH RESULTS! User: $query$ Bot: Resource: Search Results: $search_results$ Bot:",
-        "MaxTokens": 128000,
-        "ModelID": "amazon.nova-micro-v1:0",
-        "ModelParams": "{\\"temperature\\":0, \\"maxTokens\\":300, \\"topP\\":1}",
-        "NoHitsRegex": "(Sorry, I don't know|unable to assist you|i don't have enough context|i don't have enough information|i don't have any information|do not contain any information|do not contain information|i could not find an exact answer|no information in the search results|search results do not mention|search results do not provide specific|don't see any information in the provided search results|search results do not contain|no information in the provided search results|not find any information|search results did not contain|unable to respond|There is no mention of|documents do not mention anything|There is no information provided|reference passages do not mention|reference doesn't specify|could not find an answer to this question|the model cannot answer this question|none of the search results contain)",
-        "QAPromptTemplate": "<br><br>Human: Here are reference passages in <references> tags:<br><references><br>{context}<br></references><br>If the references contain the information needed to respond, then write a confident response in under 50 words, quoting the relevant references. <br>Otherwise, if you can make an informed guess based on the reference passages, then write a less confident response in under 50 words, stating your assumptions.<br>Finally, if the references do not have any relevant information, then respond saying \\"Sorry, I don't know\\".<br><question><br>{query}<br></question><br><br>Assistant: According to the reference passages, in under 50 words:",
-        "QASystemPrompt": "You are a seasoned and helpful question answering AI assistant.",
-        "QueryPromptTemplate": "Given the following conversation and a follow up question, rephrase the follow up question to be a standalone question.<br>Chat History: <br>{history}<br>Follow up question: {input}<br>Standalone question:",
-      },
-      "amazon.nova-pro-v1": {
-        "GenerateQuerySystemPrompt": "You are an AI assistant designed to disambiguate user queries.",
-        "KnowledgeBasePromptTemplate": "You are a question answering bot who gives helpful, detailed, and polite answers to the user's questions. In this session, the model has access to search results and a users question, your job is to answer the user's question using only information from the search results. Model Instructions: - You should provide concise answer to simple questions when the answer is directly contained in search results, but when comes to yes/no question, provide some details. - In case the question requires multi-hop reasoning, you should find relevant information from search results and summarize the answer based on relevant information with logical reasoning. - If the search results do not contain information that can answer the question, then respond saying \\"Sorry, I don't know that.\\". - $output_format_instructions$ - DO NOT USE INFORMATION THAT IS NOT IN SEARCH RESULTS! User: $query$ Bot: Resource: Search Results: $search_results$ Bot:",
-        "MaxTokens": 300000,
-        "ModelID": "amazon.nova-pro-v1:0",
-        "ModelParams": "{\\"temperature\\":0, \\"maxTokens\\":300, \\"topP\\":1}",
-        "NoHitsRegex": "(Sorry, I don't know|unable to assist you|i don't have enough context|i don't have enough information|i don't have any information|do not contain any information|do not contain information|i could not find an exact answer|no information in the search results|search results do not mention|search results do not provide specific|don't see any information in the provided search results|search results do not contain|no information in the provided search results|not find any information|search results did not contain|unable to respond|There is no mention of|documents do not mention anything|There is no information provided|reference passages do not mention|reference doesn't specify|could not find an answer to this question|the model cannot answer this question|none of the search results contain)",
-        "QAPromptTemplate": "<br><br>Human: Here are reference passages in <references> tags:<br><references><br>{context}<br></references><br>If the references contain the information needed to respond, then write a confident response in under 50 words, quoting the relevant references. <br>Otherwise, if you can make an informed guess based on the reference passages, then write a less confident response in under 50 words, stating your assumptions.<br>Finally, if the references do not have any relevant information, then respond saying \\"Sorry, I don't know\\".<br><question><br>{query}<br></question><br><br>Assistant: According to the reference passages, in under 50 words:",
-        "QASystemPrompt": "You are a seasoned and helpful question answering AI assistant.",
-        "QueryPromptTemplate": "Given the following conversation and a follow up question, rephrase the follow up question to be a standalone question.<br>Chat History: <br>{history}<br>Follow up question: {input}<br>Standalone question:",
+      "amazon.nova-2-multimodal-embeddings-v1": {
+        "EmbeddingsDimensions": 3072,
+        "MaxTokens": 8172,
+        "ModelID": "amazon.nova-2-multimodal-embeddings-v1:0",
       },
       "amazon.titan-embed-text-v1": {
         "EmbeddingsDimensions": 1536,
@@ -365,126 +327,6 @@ exports[`Verify master template is correct renders master template correctly 1`]
         "MaxTokens": 8000,
         "ModelID": "amazon.titan-embed-text-v2:0",
       },
-      "amazon.titan-text-express-v1": {
-        "GenerateQuerySystemPrompt": "",
-        "MaxTokens": 8000,
-        "ModelID": "amazon.titan-text-express-v1",
-        "ModelParams": "{\\"temperature\\":0, \\"maxTokens\\":300, \\"topP\\":1}",
-        "NoHitsRegex": "(Sorry, I don't know|unable to assist you|i don't have enough context|i don't have enough information|i don't have any information|do not contain any information|do not contain information|i could not find an exact answer|no information in the search results|search results do not mention|search results do not provide specific|don't see any information in the provided search results|search results do not contain|no information in the provided search results|not find any information|search results did not contain|unable to respond|There is no mention of|documents do not mention anything|There is no information provided|reference passages do not mention|reference doesn't specify|could not find an answer to this question|the model cannot answer this question|none of the search results contain)",
-        "QAPromptTemplate": "<br><br>Human: You are a friendly AI assistant. Here are reference passages in <references> tags:<br><references><br>{context}<br></references><br>If the references contain the information needed to respond, then write a confident response in under 50 words, quoting the relevant references. <br>Otherwise, if you can make an informed guess based on the reference passages, then write a less confident response in under 50 words, stating your assumptions.<br>Finally, if the references do not have any relevant information, then respond saying \\"Sorry, I don't know\\".<br><question><br>{query}<br></question><br><br>Assistant: According to the reference passages, in under 50 words:",
-        "QASystemPrompt": "",
-        "QueryPromptTemplate": "Given the following conversation and a follow up question, rephrase the follow up question to be a standalone question.<br>Chat History: <br>{history}<br>Follow up question: {input}<br>Standalone question:",
-      },
-      "amazon.titan-text-lite-v1": {
-        "GenerateQuerySystemPrompt": "",
-        "MaxTokens": 4000,
-        "ModelID": "amazon.titan-text-lite-v1",
-        "ModelParams": "{\\"temperature\\":0, \\"maxTokens\\":300, \\"topP\\":1}",
-        "NoHitsRegex": "(Sorry, I don't know|unable to assist you|i don't have enough context|i don't have enough information|i don't have any information|do not contain any information|do not contain information|i could not find an exact answer|no information in the search results|search results do not mention|search results do not provide specific|don't see any information in the provided search results|search results do not contain|no information in the provided search results|not find any information|search results did not contain|unable to respond|There is no mention of|documents do not mention anything|There is no information provided|reference passages do not mention|reference doesn't specify|could not find an answer to this question|the model cannot answer this question|none of the search results contain)",
-        "QAPromptTemplate": "<br><br>Human: You are a friendly AI assistant. Here are reference passages in <references> tags:<br><references><br>{context}<br></references><br>If the references contain the information needed to respond, then write a confident response in under 50 words, quoting the relevant references. <br>Otherwise, if you can make an informed guess based on the reference passages, then write a less confident response in under 50 words, stating your assumptions.<br>Finally, if the references do not have any relevant information, then respond saying \\"Sorry, I don't know\\".<br><question><br>{query}<br></question><br><br>Assistant: According to the reference passages, in under 50 words:",
-        "QASystemPrompt": "",
-        "QueryPromptTemplate": "Given the following conversation and a follow up question, rephrase the follow up question to be a standalone question.<br>Chat History: <br>{history}<br>Follow up question: {input}<br>Standalone question:",
-      },
-      "amazon.titan-text-premier-v1": {
-        "GenerateQuerySystemPrompt": "",
-        "KnowledgeBasePromptTemplate": "You are a question answering bot who gives helpful, detailed, and polite answers to the user's questions. In this session, the model has access to search results and a users question, your job is to answer the user's question using only information from the search results. Model Instructions: - You should provide concise answer to simple questions when the answer is directly contained in search results, but when comes to yes/no question, provide some details. - In case the question requires multi-hop reasoning, you should find relevant information from search results and summarize the answer based on relevant information with logical reasoning. - If the search results do not contain information that can answer the question, then respond saying \\"Sorry, I don't know that.\\". - $output_format_instructions$ - DO NOT USE INFORMATION THAT IS NOT IN SEARCH RESULTS! User: $query$ Bot: Resource: Search Results: $search_results$ Bot:",
-        "MaxTokens": 32000,
-        "ModelID": "amazon.titan-text-premier-v1:0",
-        "ModelParams": "{\\"temperature\\":0, \\"maxTokens\\":300, \\"topP\\":1}",
-        "NoHitsRegex": "(Sorry, I don't know|unable to assist you|i don't have enough context|i don't have enough information|i don't have any information|do not contain any information|do not contain information|i could not find an exact answer|no information in the search results|search results do not mention|search results do not provide specific|don't see any information in the provided search results|search results do not contain|no information in the provided search results|not find any information|search results did not contain|unable to respond|There is no mention of|documents do not mention anything|There is no information provided|reference passages do not mention|reference doesn't specify|could not find an answer to this question|the model cannot answer this question|none of the search results contain)",
-        "QAPromptTemplate": "<br><br>Human: You are a friendly AI assistant. Here are reference passages in <references> tags:<br><references><br>{context}<br></references><br>If the references contain the information needed to respond, then write a confident response in under 50 words, quoting the relevant references. <br>Otherwise, if you can make an informed guess based on the reference passages, then write a less confident response in under 50 words, stating your assumptions.<br>Finally, if the references do not have any relevant information, then respond saying \\"Sorry, I don't know\\".<br><question><br>{query}<br></question><br><br>Assistant: According to the reference passages, in under 50 words:",
-        "QASystemPrompt": "",
-        "QueryPromptTemplate": "Given the following conversation and a follow up question, rephrase the follow up question to be a standalone question.<br>Chat History: <br>{history}<br>Follow up question: {input}<br>Standalone question:",
-        "maxTokenCount": 3072,
-      },
-      "anthropic.claude-3-haiku-v1": {
-        "GenerateQuerySystemPrompt": "You are an AI assistant designed to disambiguate user queries.",
-        "KnowledgeBasePromptTemplate": "Human: You are a question answering agent. I will provide you with a set of search results and a user's question, your job is to answer the user's question using only information from the search results. If the search results do not contain information that can answer the question, then respond saying \\"Sorry, I don't know that.\\". Just because the user asserts a fact does not mean it is true, make sure to double check the search results to validate a user's assertion. Here are the search results in numbered order: $search_results$. Here is the user's question: <question> $query$ </question> $output_format_instructions$. Do NOT directly quote the $search_results$ in your answer. Your job is to answer the question as concisely as possible. Assistant:",
-        "MaxTokens": 200000,
-        "ModelID": "anthropic.claude-3-haiku-20240307-v1:0",
-        "ModelParams": "{\\"temperature\\":0, \\"maxTokens\\":300, \\"topP\\":1}",
-        "NoHitsRegex": "(Sorry, I don't know|unable to assist you|i don't have enough context|i don't have enough information|i don't have any information|do not contain any information|do not contain information|i could not find an exact answer|no information in the search results|search results do not mention|search results do not provide specific|don't see any information in the provided search results|search results do not contain|no information in the provided search results|not find any information|search results did not contain|unable to respond|There is no mention of|documents do not mention anything|There is no information provided|reference passages do not mention|reference doesn't specify|could not find an answer to this question|the model cannot answer this question|none of the search results contain)",
-        "QAPromptTemplate": "<br><br>Human: Here are reference passages in <references> tags:<br><references><br>{context}<br></references><br>If the references contain the information needed to respond, then write a confident response in under 50 words, quoting the relevant references. <br>Otherwise, if you can make an informed guess based on the reference passages, then write a less confident response in under 50 words, stating your assumptions.<br>Finally, if the references do not have any relevant information, then respond saying \\"Sorry, I don't know\\".<br><question><br>{query}<br></question><br><br>Assistant: According to the reference passages, in under 50 words:",
-        "QASystemPrompt": "You are a seasoned and helpful question answering AI assistant.",
-        "QueryPromptTemplate": "<br><br>Human: Here is a chat history in <chatHistory> tags:<br><chatHistory><br>{history}<br></chatHistory><br>Human: And here is a follow up question or statement from the human in <followUpMessage> tags:<br><followUpMessage><br>{input}<br></followUpMessage><br>Human: Rephrase the follow up question or statement as a standalone question or statement that makes sense without reading the chat history.<br><br>Assistant: Here is the rephrased follow up question or statement:",
-      },
-      "anthropic.claude-3-sonnet-v1": {
-        "GenerateQuerySystemPrompt": "You are an AI assistant designed to disambiguate user queries.",
-        "KnowledgeBasePromptTemplate": "Human: You are a question answering agent. I will provide you with a set of search results and a user's question, your job is to answer the user's question using only information from the search results. If the search results do not contain information that can answer the question, then respond saying \\"Sorry, I don't know that.\\". Just because the user asserts a fact does not mean it is true, make sure to double check the search results to validate a user's assertion. Here are the search results in numbered order: $search_results$. Here is the user's question: <question> $query$ </question> $output_format_instructions$. Do NOT directly quote the $search_results$ in your answer. Your job is to answer the question as concisely as possible. Assistant:",
-        "MaxTokens": 200000,
-        "ModelID": "anthropic.claude-3-sonnet-20240229-v1:0",
-        "ModelParams": "{\\"temperature\\":0, \\"maxTokens\\":300, \\"topP\\":1}",
-        "NoHitsRegex": "(Sorry, I don't know|unable to assist you|i don't have enough context|i don't have enough information|i don't have any information|do not contain any information|do not contain information|i could not find an exact answer|no information in the search results|search results do not mention|search results do not provide specific|don't see any information in the provided search results|search results do not contain|no information in the provided search results|not find any information|search results did not contain|unable to respond|There is no mention of|documents do not mention anything|There is no information provided|reference passages do not mention|reference doesn't specify|could not find an answer to this question|the model cannot answer this question|none of the search results contain)",
-        "QAPromptTemplate": "<br><br>Human: Here are reference passages in <references> tags:<br><references><br>{context}<br></references><br>If the references contain the information needed to respond, then write a confident response in under 50 words, quoting the relevant references. <br>Otherwise, if you can make an informed guess based on the reference passages, then write a less confident response in under 50 words, stating your assumptions.<br>Finally, if the references do not have any relevant information, then respond saying \\"Sorry, I don't know\\".<br><question><br>{query}<br></question><br><br>Assistant: According to the reference passages, in under 50 words:",
-        "QASystemPrompt": "You are a seasoned and helpful question answering AI assistant.",
-        "QueryPromptTemplate": "<br><br>Human: Here is a chat history in <chatHistory> tags:<br><chatHistory><br>{history}<br></chatHistory><br>Human: And here is a follow up question or statement from the human in <followUpMessage> tags:<br><followUpMessage><br>{input}<br></followUpMessage><br>Human: Rephrase the follow up question or statement as a standalone question or statement that makes sense without reading the chat history.<br><br>Assistant: Here is the rephrased follow up question or statement:",
-      },
-      "anthropic.claude-3.5-haiku-v1": {
-        "GenerateQuerySystemPrompt": "You are an AI assistant designed to disambiguate user queries.",
-        "KnowledgeBasePromptTemplate": "Human: You are a question answering agent. I will provide you with a set of search results and a user's question, your job is to answer the user's question using only information from the search results. If the search results do not contain information that can answer the question, then respond saying \\"Sorry, I don't know that.\\". Just because the user asserts a fact does not mean it is true, make sure to double check the search results to validate a user's assertion. Here are the search results in numbered order: $search_results$. Here is the user's question: <question> $query$ </question> $output_format_instructions$. Do NOT directly quote the $search_results$ in your answer. Your job is to answer the question as concisely as possible. Assistant:",
-        "MaxTokens": 200000,
-        "ModelID": "anthropic.claude-3-5-haiku-20241022-v1:0",
-        "ModelParams": "{\\"temperature\\":0, \\"maxTokens\\":300, \\"topP\\":1}",
-        "NoHitsRegex": "(Sorry, I don't know|unable to assist you|i don't have enough context|i don't have enough information|i don't have any information|do not contain any information|do not contain information|i could not find an exact answer|no information in the search results|search results do not mention|search results do not provide specific|don't see any information in the provided search results|search results do not contain|no information in the provided search results|not find any information|search results did not contain|unable to respond|There is no mention of|documents do not mention anything|There is no information provided|reference passages do not mention|reference doesn't specify|could not find an answer to this question|the model cannot answer this question|none of the search results contain)",
-        "QAPromptTemplate": "<br><br>Human: Here are reference passages in <references> tags:<br><references><br>{context}<br></references><br>If the references contain the information needed to respond, then write a confident response in under 50 words, quoting the relevant references. <br>Otherwise, if you can make an informed guess based on the reference passages, then write a less confident response in under 50 words, stating your assumptions.<br>Finally, if the references do not have any relevant information, then respond saying \\"Sorry, I don't know\\".<br><question><br>{query}<br></question><br><br>Assistant: According to the reference passages, in under 50 words:",
-        "QASystemPrompt": "You are a seasoned and helpful question answering AI assistant.",
-        "QueryPromptTemplate": "<br><br>Human: Here is a chat history in <chatHistory> tags:<br><chatHistory><br>{history}<br></chatHistory><br>Human: And here is a follow up question or statement from the human in <followUpMessage> tags:<br><followUpMessage><br>{input}<br></followUpMessage><br>Human: Rephrase the follow up question or statement as a standalone question or statement that makes sense without reading the chat history.<br><br>Assistant: Here is the rephrased follow up question or statement:",
-      },
-      "anthropic.claude-3.5-sonnet-v1": {
-        "GenerateQuerySystemPrompt": "You are an AI assistant designed to disambiguate user queries.",
-        "KnowledgeBasePromptTemplate": "Human: You are a question answering agent. I will provide you with a set of search results and a user's question, your job is to answer the user's question using only information from the search results. If the search results do not contain information that can answer the question, then respond saying \\"Sorry, I don't know that.\\". Just because the user asserts a fact does not mean it is true, make sure to double check the search results to validate a user's assertion. Here are the search results in numbered order: $search_results$. Here is the user's question: <question> $query$ </question> $output_format_instructions$. Do NOT directly quote the $search_results$ in your answer. Your job is to answer the question as concisely as possible. Assistant:",
-        "MaxTokens": 200000,
-        "ModelID": "anthropic.claude-3-5-sonnet-20240620-v1:0",
-        "ModelParams": "{\\"temperature\\":0, \\"maxTokens\\":300, \\"topP\\":1}",
-        "NoHitsRegex": "(Sorry, I don't know|unable to assist you|i don't have enough context|i don't have enough information|i don't have any information|do not contain any information|do not contain information|i could not find an exact answer|no information in the search results|search results do not mention|search results do not provide specific|don't see any information in the provided search results|search results do not contain|no information in the provided search results|not find any information|search results did not contain|unable to respond|There is no mention of|documents do not mention anything|There is no information provided|reference passages do not mention|reference doesn't specify|could not find an answer to this question|the model cannot answer this question|none of the search results contain)",
-        "QAPromptTemplate": "<br><br>Human: Here are reference passages in <references> tags:<br><references><br>{context}<br></references><br>If the references contain the information needed to respond, then write a confident response in under 50 words, quoting the relevant references. <br>Otherwise, if you can make an informed guess based on the reference passages, then write a less confident response in under 50 words, stating your assumptions.<br>Finally, if the references do not have any relevant information, then respond saying \\"Sorry, I don't know\\".<br><question><br>{query}<br></question><br><br>Assistant: According to the reference passages, in under 50 words:",
-        "QASystemPrompt": "You are a seasoned and helpful question answering AI assistant.",
-        "QueryPromptTemplate": "<br><br>Human: Here is a chat history in <chatHistory> tags:<br><chatHistory><br>{history}<br></chatHistory><br>Human: And here is a follow up question or statement from the human in <followUpMessage> tags:<br><followUpMessage><br>{input}<br></followUpMessage><br>Human: Rephrase the follow up question or statement as a standalone question or statement that makes sense without reading the chat history.<br><br>Assistant: Here is the rephrased follow up question or statement:",
-      },
-      "anthropic.claude-3.5-sonnet-v2": {
-        "GenerateQuerySystemPrompt": "You are an AI assistant designed to disambiguate user queries.",
-        "KnowledgeBasePromptTemplate": "Human: You are a question answering agent. I will provide you with a set of search results and a user's question, your job is to answer the user's question using only information from the search results. If the search results do not contain information that can answer the question, then respond saying \\"Sorry, I don't know that.\\". Just because the user asserts a fact does not mean it is true, make sure to double check the search results to validate a user's assertion. Here are the search results in numbered order: $search_results$. Here is the user's question: <question> $query$ </question> $output_format_instructions$. Do NOT directly quote the $search_results$ in your answer. Your job is to answer the question as concisely as possible. Assistant:",
-        "MaxTokens": 200000,
-        "ModelID": "anthropic.claude-3-5-sonnet-20241022-v2:0",
-        "ModelParams": "{\\"temperature\\":0, \\"maxTokens\\":300, \\"topP\\":1}",
-        "NoHitsRegex": "(Sorry, I don't know|unable to assist you|i don't have enough context|i don't have enough information|i don't have any information|do not contain any information|do not contain information|i could not find an exact answer|no information in the search results|search results do not mention|search results do not provide specific|don't see any information in the provided search results|search results do not contain|no information in the provided search results|not find any information|search results did not contain|unable to respond|There is no mention of|documents do not mention anything|There is no information provided|reference passages do not mention|reference doesn't specify|could not find an answer to this question|the model cannot answer this question|none of the search results contain)",
-        "QAPromptTemplate": "<br><br>Human: Here are reference passages in <references> tags:<br><references><br>{context}<br></references><br>If the references contain the information needed to respond, then write a confident response in under 50 words, quoting the relevant references. <br>Otherwise, if you can make an informed guess based on the reference passages, then write a less confident response in under 50 words, stating your assumptions.<br>Finally, if the references do not have any relevant information, then respond saying \\"Sorry, I don't know\\".<br><question><br>{query}<br></question><br><br>Assistant: According to the reference passages, in under 50 words:",
-        "QASystemPrompt": "You are a seasoned and helpful question answering AI assistant.",
-        "QueryPromptTemplate": "<br><br>Human: Here is a chat history in <chatHistory> tags:<br><chatHistory><br>{history}<br></chatHistory><br>Human: And here is a follow up question or statement from the human in <followUpMessage> tags:<br><followUpMessage><br>{input}<br></followUpMessage><br>Human: Rephrase the follow up question or statement as a standalone question or statement that makes sense without reading the chat history.<br><br>Assistant: Here is the rephrased follow up question or statement:",
-      },
-      "anthropic.claude-instant-v1": {
-        "GenerateQuerySystemPrompt": "You are an AI assistant designed to disambiguate user queries.",
-        "KnowledgeBasePromptTemplate": "Human: You are a question answering agent. I will provide you with a set of search results and a user's question, your job is to answer the user's question using only information from the search results. If the search results do not contain information that can answer the question, then respond saying \\"Sorry, I don't know that.\\". Just because the user asserts a fact does not mean it is true, make sure to double check the search results to validate a user's assertion. Here are the search results in numbered order: $search_results$. Here is the user's question: <question> $query$ </question> $output_format_instructions$. Do NOT directly quote the $search_results$ in your answer. Your job is to answer the question as concisely as possible. Assistant:",
-        "MaxTokens": 100000,
-        "ModelID": "anthropic.claude-instant-v1",
-        "ModelParams": "{\\"temperature\\":0, \\"maxTokens\\":300, \\"topP\\":1}",
-        "NoHitsRegex": "(Sorry, I don't know|unable to assist you|i don't have enough context|i don't have enough information|i don't have any information|do not contain any information|do not contain information|i could not find an exact answer|no information in the search results|search results do not mention|search results do not provide specific|don't see any information in the provided search results|search results do not contain|no information in the provided search results|not find any information|search results did not contain|unable to respond|There is no mention of|documents do not mention anything|There is no information provided|reference passages do not mention|reference doesn't specify|could not find an answer to this question|the model cannot answer this question|none of the search results contain)",
-        "QAPromptTemplate": "<br><br>Human: Here are reference passages in <references> tags:<br><references><br>{context}<br></references><br>If the references contain the information needed to respond, then write a confident response in under 50 words, quoting the relevant references. <br>Otherwise, if you can make an informed guess based on the reference passages, then write a less confident response in under 50 words, stating your assumptions.<br>Finally, if the references do not have any relevant information, then respond saying \\"Sorry, I don't know\\".<br><question><br>{query}<br></question><br><br>Assistant: According to the reference passages, in under 50 words:",
-        "QASystemPrompt": "You are a seasoned and helpful question answering AI assistant.",
-        "QueryPromptTemplate": "<br><br>Human: Here is a chat history in <chatHistory> tags:<br><chatHistory><br>{history}<br></chatHistory><br>Human: And here is a follow up question or statement from the human in <followUpMessage> tags:<br><followUpMessage><br>{input}<br></followUpMessage><br>Human: Rephrase the follow up question or statement as a standalone question or statement that makes sense without reading the chat history.<br><br>Assistant: Here is the rephrased follow up question or statement:",
-      },
-      "anthropic.claude-v2.1": {
-        "GenerateQuerySystemPrompt": "You are an AI assistant designed to disambiguate user queries.",
-        "KnowledgeBasePromptTemplate": "Human: You are a question answering agent. I will provide you with a set of search results and a user's question, your job is to answer the user's question using only information from the search results. If the search results do not contain information that can answer the question, then respond saying \\"Sorry, I don't know that.\\". Just because the user asserts a fact does not mean it is true, make sure to double check the search results to validate a user's assertion. Here are the search results in numbered order: $search_results$. Here is the user's question: <question> $query$ </question> $output_format_instructions$. Do NOT directly quote the $search_results$ in your answer. Your job is to answer the question as concisely as possible. Assistant:",
-        "MaxTokens": 100000,
-        "ModelID": "anthropic.claude-v2:1",
-        "ModelParams": "{\\"temperature\\":0, \\"maxTokens\\":300, \\"topP\\":1}",
-        "NoHitsRegex": "(Sorry, I don't know|unable to assist you|i don't have enough context|i don't have enough information|i don't have any information|do not contain any information|do not contain information|i could not find an exact answer|no information in the search results|search results do not mention|search results do not provide specific|don't see any information in the provided search results|search results do not contain|no information in the provided search results|not find any information|search results did not contain|unable to respond|There is no mention of|documents do not mention anything|There is no information provided|reference passages do not mention|reference doesn't specify|could not find an answer to this question|the model cannot answer this question|none of the search results contain)",
-        "QAPromptTemplate": "<br><br>Human: Here are reference passages in <references> tags:<br><references><br>{context}<br></references><br>If the references contain the information needed to respond, then write a confident response in under 50 words, quoting the relevant references. <br>Otherwise, if you can make an informed guess based on the reference passages, then write a less confident response in under 50 words, stating your assumptions.<br>Finally, if the references do not have any relevant information, then respond saying \\"Sorry, I don't know\\".<br><question><br>{query}<br></question><br><br>Assistant: According to the reference passages, in under 50 words:",
-        "QASystemPrompt": "You are a seasoned and helpful question answering AI assistant.",
-        "QueryPromptTemplate": "<br><br>Human: Here is a chat history in <chatHistory> tags:<br><chatHistory><br>{history}<br></chatHistory><br>Human: And here is a follow up question or statement from the human in <followUpMessage> tags:<br><followUpMessage><br>{input}<br></followUpMessage><br>Human: Rephrase the follow up question or statement as a standalone question or statement that makes sense without reading the chat history.<br><br>Assistant: Here is the rephrased follow up question or statement:",
-      },
-      "cohere.command-r-plus-v1": {
-        "GenerateQuerySystemPrompt": "You are an AI assistant designed to disambiguate user queries.",
-        "KnowledgeBasePromptTemplate": "You are a question answering agent. I will provide you with a set of search results. The user will provide you with a question. Your job is to answer the user's question using only information from the search results. If the search results do not contain information that can answer the question, please state \\"Sorry, I don't know that.\\". Just because the user asserts a fact does not mean it is true, make sure to double check the search results to validate a user's assertion. Here are the search results in numbered order: $search_results$ $output_format_instructions$ - DO NOT USE INFORMATION THAT IS NOT IN SEARCH RESULTS!",
-        "MaxTokens": 128000,
-        "ModelID": "cohere.command-r-plus-v1:0",
-        "ModelParams": "{\\"temperature\\":0, \\"maxTokens\\":300, \\"topP\\":1}",
-        "NoHitsRegex": "(Sorry, I don't know|unable to assist you|i don't have enough context|i don't have enough information|i don't have any information|do not contain any information|do not contain information|i could not find an exact answer|no information in the search results|search results do not mention|search results do not provide specific|don't see any information in the provided search results|search results do not contain|no information in the provided search results|not find any information|search results did not contain|unable to respond|There is no mention of|documents do not mention anything|There is no information provided|reference passages do not mention|reference doesn't specify|could not find an answer to this question|the model cannot answer this question|none of the search results contain)",
-        "QAPromptTemplate": "<br><br>Human: Here are reference passages in <references> tags:<br><references><br>{context}<br></references><br>If the references contain the information needed to respond, then write a confident response in under 50 words, quoting the relevant references. <br>Otherwise, if you can make an informed guess based on the reference passages, then write a less confident response in under 50 words, stating your assumptions.<br>Finally, if the references do not have any relevant information, then respond saying \\"Sorry, I don't know\\".<br><question><br>{query}<br></question><br><br>Assistant: According to the reference passages, in under 50 words:",
-        "QASystemPrompt": "You are a seasoned and helpful question answering AI assistant.",
-        "QueryPromptTemplate": "Given the following conversation and a follow up question, rephrase the follow up question to be a standalone question.<br>Chat History: <br>{history}<br>Follow up question: {input}<br>Standalone question:",
-      },
       "cohere.embed-english-v3": {
         "EmbeddingsDimensions": 1024,
         "MaxTokens": 512,
@@ -495,46 +337,10 @@ exports[`Verify master template is correct renders master template correctly 1`]
         "MaxTokens": 512,
         "ModelID": "cohere.embed-multilingual-v3",
       },
-      "meta.llama3-8b-instruct-v1": {
-        "GenerateQuerySystemPrompt": "You are an AI assistant designed to disambiguate user queries.",
-        "MaxTokens": 8000,
-        "ModelID": "meta.llama3-8b-instruct-v1:0",
-        "ModelParams": "{\\"temperature\\":0, \\"maxTokens\\":300, \\"topP\\":1}",
-        "NoHitsRegex": "(Sorry, I don't know|unable to assist you|i don't have enough context|i don't have enough information|i don't have any information|do not contain any information|do not contain information|i could not find an exact answer|no information in the search results|search results do not mention|search results do not provide specific|don't see any information in the provided search results|search results do not contain|no information in the provided search results|not find any information|search results did not contain|unable to respond|There is no mention of|documents do not mention anything|There is no information provided|reference passages do not mention|reference doesn't specify|could not find an answer to this question|the model cannot answer this question|none of the search results contain)",
-        "QAPromptTemplate": "<br><br>Human: Here are reference passages in <references> tags:<br><references><br>{context}<br></references><br>If the references contain the information needed to respond, then write a confident response in under 50 words, quoting the relevant references. <br>Otherwise, if you can make an informed guess based on the reference passages, then write a less confident response in under 50 words, stating your assumptions.<br>Finally, if the references do not have any relevant information, then respond saying \\"Sorry, I don't know\\".<br><question><br>{query}<br></question><br><br>Assistant: According to the reference passages, in under 50 words:",
-        "QASystemPrompt": "You are a seasoned and helpful question answering AI assistant.",
-        "QueryPromptTemplate": "Given the following conversation and a follow up question, rephrase the follow up question to be a standalone question.<br>Chat History: <br>{history}<br>Follow up question: {input}<br>Standalone question:",
-      },
-      "meta.llama3.1-405b-instruct-v1": {
-        "GenerateQuerySystemPrompt": "You are an AI assistant designed to disambiguate user queries.",
-        "KnowledgeBasePromptTemplate": "You are a question answering agent. I will provide you with a set of search results. The user will provide you with a question. Your job is to answer the user's question using only information from the search results. If the search results do not contain information that can answer the question, please state \\"Sorry, I don't know that.\\". Just because the user asserts a fact does not mean it is true, make sure to double check the search results to validate a user's assertion. Here are the search results in numbered order: $search_results$ $output_format_instructions$ - DO NOT USE INFORMATION THAT IS NOT IN SEARCH RESULTS!",
+      "global.cohere.embed-v4": {
+        "EmbeddingsDimensions": 1536,
         "MaxTokens": 128000,
-        "ModelID": "meta.llama3-1-405b-instruct-v1:0",
-        "ModelParams": "{\\"temperature\\":0, \\"maxTokens\\":300, \\"topP\\":1}",
-        "NoHitsRegex": "(Sorry, I don't know|unable to assist you|i don't have enough context|i don't have enough information|i don't have any information|do not contain any information|do not contain information|i could not find an exact answer|no information in the search results|search results do not mention|search results do not provide specific|don't see any information in the provided search results|search results do not contain|no information in the provided search results|not find any information|search results did not contain|unable to respond|There is no mention of|documents do not mention anything|There is no information provided|reference passages do not mention|reference doesn't specify|could not find an answer to this question|the model cannot answer this question|none of the search results contain)",
-        "QAPromptTemplate": "<br><br>Human: Here are reference passages in <references> tags:<br><references><br>{context}<br></references><br>If the references contain the information needed to respond, then write a confident response in under 50 words, quoting the relevant references. <br>Otherwise, if you can make an informed guess based on the reference passages, then write a less confident response in under 50 words, stating your assumptions.<br>Finally, if the references do not have any relevant information, then respond saying \\"Sorry, I don't know\\".<br><question><br>{query}<br></question><br><br>Assistant: According to the reference passages, in under 50 words:",
-        "QASystemPrompt": "You are a seasoned and helpful question answering AI assistant.",
-        "QueryPromptTemplate": "Given the following conversation and a follow up question, rephrase the follow up question to be a standalone question.<br>Chat History: <br>{history}<br>Follow up question: {input}<br>Standalone question:",
-      },
-      "mistral.mistral-large-2407-v1": {
-        "GenerateQuerySystemPrompt": "You are an AI assistant designed to disambiguate user queries.",
-        "KnowledgeBasePromptTemplate": "Human: You are a question answering agent. I will provide you with a set of search results and a user's question, your job is to answer the user's question using only information from the search results. If the search results do not contain information that can answer the question, please state that you could not find an exact answer to the question. Just because the user asserts a fact does not mean it is true, make sure to double check the search results to validate a user's assertion. Here are the search results in numbered order: $search_results$ Here is the user's question: <question> $query$ </question> $output_format_instructions$ - DO NOT USE INFORMATION THAT IS NOT IN SEARCH RESULTS! Assistant:",
-        "MaxTokens": 128000,
-        "ModelID": "mistral.mistral-large-2407-v1:0",
-        "ModelParams": "{\\"temperature\\":0, \\"maxTokens\\":300, \\"topP\\":1}",
-        "NoHitsRegex": "(Sorry, I don't know|unable to assist you|i don't have enough context|i don't have enough information|i don't have any information|do not contain any information|do not contain information|i could not find an exact answer|no information in the search results|search results do not mention|search results do not provide specific|don't see any information in the provided search results|search results do not contain|no information in the provided search results|not find any information|search results did not contain|unable to respond|There is no mention of|documents do not mention anything|There is no information provided|reference passages do not mention|reference doesn't specify|could not find an answer to this question|the model cannot answer this question|none of the search results contain)",
-        "QAPromptTemplate": "<br><br>Human: Here are reference passages in <references> tags:<br><references><br>{context}<br></references><br>If the references contain the information needed to respond, then write a confident response in under 50 words, quoting the relevant references. <br>Otherwise, if you can make an informed guess based on the reference passages, then write a less confident response in under 50 words, stating your assumptions.<br>Finally, if the references do not have any relevant information, then respond saying \\"Sorry, I don't know\\".<br><question><br>{query}<br></question><br><br>Assistant: According to the reference passages, in under 50 words:",
-        "QASystemPrompt": "You are a seasoned and helpful question answering AI assistant.",
-        "QueryPromptTemplate": "Given the following conversation and a follow up question, rephrase the follow up question to be a standalone question.<br>Chat History: <br>{history}<br>Follow up question: {input}<br>Standalone question:",
-      },
-    },
-    "Solution": {
-      "Data": {
-        "AppRegistryApplicationName": "qnabot",
-        "ApplicationType": "AWS-Solutions",
-        "ID": "SO0189",
-        "SolutionName": "QnABot on AWS",
-        "Version": "x.x.x",
+        "ModelID": "global.cohere.embed-v4:0",
       },
     },
     "SolutionHelperAnonymizedData": {
@@ -970,24 +776,10 @@ exports[`Verify master template is correct renders master template correctly 1`]
       "Type": "String",
     },
     "BedrockKnowledgeBaseModel": {
-      "AllowedValues": [
-        "amazon.nova-micro-v1",
-        "amazon.nova-lite-v1",
-        "amazon.nova-pro-v1",
-        "amazon.titan-text-premier-v1",
-        "anthropic.claude-instant-v1",
-        "anthropic.claude-v2.1",
-        "anthropic.claude-3-haiku-v1",
-        "anthropic.claude-3.5-haiku-v1",
-        "anthropic.claude-3-sonnet-v1",
-        "anthropic.claude-3.5-sonnet-v1",
-        "anthropic.claude-3.5-sonnet-v2",
-        "cohere.command-r-plus-v1",
-        "meta.llama3.1-405b-instruct-v1",
-        "mistral.mistral-large-2407-v1",
-      ],
-      "Default": "anthropic.claude-instant-v1",
-      "Description": "Required if BedrockKnowledgeBaseId is not empty. Sets the preferred LLM model to use with the Bedrock knowledge base. Please ensure you have requested access to the LLMs in Bedrock console (https://docs.aws.amazon.com/bedrock/latest/userguide/model-access.html), before deploying",
+      "AllowedPattern": "^([\\w\\.-]+:[0-9]+|[\\w\\.-]+)$",
+      "ConstraintDescription": "Must be a valid Bedrock foundation model ID or inference profile ID.",
+      "Default": "global.anthropic.claude-haiku-4-5-20251001-v1:0",
+      "Description": "Required if BedrockKnowledgeBaseId is not empty. Provide a valid foundation model ID or inference profile id to use with the Bedrock knowledge base. See (https://docs.aws.amazon.com/bedrock/latest/userguide/models-supported.html) and (https://docs.aws.amazon.com/bedrock/latest/userguide/inference-profiles-support.html).",
       "Type": "String",
     },
     "BootstrapBucket": {
@@ -1031,11 +823,13 @@ exports[`Verify master template is correct renders master template correctly 1`]
       "AllowedValues": [
         "amazon.titan-embed-text-v1",
         "amazon.titan-embed-text-v2",
+        "amazon.nova-2-multimodal-embeddings-v1",
         "cohere.embed-english-v3",
         "cohere.embed-multilingual-v3",
+        "global.cohere.embed-v4",
       ],
-      "Default": "amazon.titan-embed-text-v1",
-      "Description": "Required when EmbeddingsApi is BEDROCK. Please ensure you have requested access to the LLMs in Bedrock console (https://docs.aws.amazon.com/bedrock/latest/userguide/model-access.html), before deploying.",
+      "Default": "amazon.nova-2-multimodal-embeddings-v1",
+      "Description": "Required when EmbeddingsApi is BEDROCK.",
       "Type": "String",
     },
     "EmbeddingsLambdaArn": {
@@ -1100,28 +894,10 @@ exports[`Verify master template is correct renders master template correctly 1`]
       "Type": "String",
     },
     "LLMBedrockModelId": {
-      "AllowedValues": [
-        "amazon.nova-micro-v1",
-        "amazon.nova-lite-v1",
-        "amazon.nova-pro-v1",
-        "amazon.titan-text-express-v1",
-        "amazon.titan-text-lite-v1",
-        "amazon.titan-text-premier-v1",
-        "ai21.jamba-instruct-v1",
-        "anthropic.claude-instant-v1",
-        "anthropic.claude-v2.1",
-        "anthropic.claude-3-haiku-v1",
-        "anthropic.claude-3.5-haiku-v1",
-        "anthropic.claude-3-sonnet-v1",
-        "anthropic.claude-3.5-sonnet-v1",
-        "anthropic.claude-3.5-sonnet-v2",
-        "cohere.command-r-plus-v1",
-        "meta.llama3-8b-instruct-v1",
-        "meta.llama3.1-405b-instruct-v1",
-        "mistral.mistral-large-2407-v1",
-      ],
-      "Default": "anthropic.claude-instant-v1",
-      "Description": "Required when LLMApi is BEDROCK. Please ensure you have requested access to the LLMs in Bedrock console (https://docs.aws.amazon.com/bedrock/latest/userguide/model-access.html), before deploying.",
+      "AllowedPattern": "^([\\w\\.-]+:[0-9]+|[\\w\\.-]+)$",
+      "ConstraintDescription": "Must be a valid Bedrock foundation model ID or inference profile ID.",
+      "Default": "global.anthropic.claude-haiku-4-5-20251001-v1:0",
+      "Description": "Required when LLMApi is BEDROCK. Provide a valid foundation model ID or inference profile ID. See (https://docs.aws.amazon.com/bedrock/latest/userguide/models-supported.html) and (https://docs.aws.amazon.com/bedrock/latest/userguide/inference-profiles-support.html).",
       "Type": "String",
     },
     "LLMLambdaArn": {
@@ -1906,153 +1682,6 @@ exports[`Verify master template is correct renders master template correctly 1`]
       },
       "Type": "Custom::Variable",
     },
-    "AppRegistryApplicationAttributeAssociation": {
-      "Properties": {
-        "Application": {
-          "Fn::GetAtt": [
-            "Application",
-            "Id",
-          ],
-        },
-        "AttributeGroup": {
-          "Fn::GetAtt": [
-            "DefaultApplicationAttributes",
-            "Id",
-          ],
-        },
-      },
-      "Type": "AWS::ServiceCatalogAppRegistry::AttributeGroupAssociation",
-    },
-    "AppRegistryApplicationStackAssociation": {
-      "Properties": {
-        "Application": {
-          "Fn::GetAtt": [
-            "Application",
-            "Id",
-          ],
-        },
-        "Resource": {
-          "Ref": "AWS::StackId",
-        },
-        "ResourceType": "CFN_STACK",
-      },
-      "Type": "AWS::ServiceCatalogAppRegistry::ResourceAssociation",
-    },
-    "AppRegistryApplicationStackAssociationExamples": {
-      "Condition": "BuildExamples",
-      "Properties": {
-        "Application": {
-          "Fn::GetAtt": [
-            "Application",
-            "Id",
-          ],
-        },
-        "Resource": {
-          "Ref": "ExamplesStack",
-        },
-        "ResourceType": "CFN_STACK",
-      },
-      "Type": "AWS::ServiceCatalogAppRegistry::ResourceAssociation",
-    },
-    "AppRegistryApplicationStackAssociationExport": {
-      "Properties": {
-        "Application": {
-          "Fn::GetAtt": [
-            "Application",
-            "Id",
-          ],
-        },
-        "Resource": {
-          "Ref": "ExportStack",
-        },
-        "ResourceType": "CFN_STACK",
-      },
-      "Type": "AWS::ServiceCatalogAppRegistry::ResourceAssociation",
-    },
-    "AppRegistryApplicationStackAssociationImport": {
-      "Properties": {
-        "Application": {
-          "Fn::GetAtt": [
-            "Application",
-            "Id",
-          ],
-        },
-        "Resource": {
-          "Ref": "ImportStack",
-        },
-        "ResourceType": "CFN_STACK",
-      },
-      "Type": "AWS::ServiceCatalogAppRegistry::ResourceAssociation",
-    },
-    "AppRegistryApplicationStackAssociationTestAll": {
-      "Properties": {
-        "Application": {
-          "Fn::GetAtt": [
-            "Application",
-            "Id",
-          ],
-        },
-        "Resource": {
-          "Ref": "TestAllStack",
-        },
-        "ResourceType": "CFN_STACK",
-      },
-      "Type": "AWS::ServiceCatalogAppRegistry::ResourceAssociation",
-    },
-    "Application": {
-      "Properties": {
-        "Description": "Service Catalog application to track and manage all your resources for the solution qnabot-on-aws",
-        "Name": {
-          "Fn::Join": [
-            "-",
-            [
-              "App",
-              {
-                "Ref": "AWS::StackName",
-              },
-              {
-                "Fn::FindInMap": [
-                  "Solution",
-                  "Data",
-                  "AppRegistryApplicationName",
-                ],
-              },
-            ],
-          ],
-        },
-        "Tags": {
-          "Solutions:ApplicationType": {
-            "Fn::FindInMap": [
-              "Solution",
-              "Data",
-              "ApplicationType",
-            ],
-          },
-          "Solutions:SolutionID": {
-            "Fn::FindInMap": [
-              "Solution",
-              "Data",
-              "ID",
-            ],
-          },
-          "Solutions:SolutionName": {
-            "Fn::FindInMap": [
-              "Solution",
-              "Data",
-              "SolutionName",
-            ],
-          },
-          "Solutions:SolutionVersion": {
-            "Fn::FindInMap": [
-              "Solution",
-              "Data",
-              "Version",
-            ],
-          },
-        },
-      },
-      "Type": "AWS::ServiceCatalogAppRegistry::Application",
-    },
     "AssetBucket": {
       "DependsOn": [
         "MainAccessLogBucket",
@@ -2246,6 +1875,56 @@ exports[`Verify master template is correct renders master template correctly 1`]
         },
       },
       "Type": "AWS::Lambda::LayerVersion",
+    },
+    "BedrockInvokeModelAccessPolicyResources": {
+      "Properties": {
+        "BedrockKnowledgeBaseModelId": {
+          "Fn::If": [
+            "BedrockKnowledgeBaseEnable",
+            {
+              "Ref": "BedrockKnowledgeBaseModel",
+            },
+            {
+              "Ref": "AWS::NoValue",
+            },
+          ],
+        },
+        "EmbeddingsBedrockModelId": {
+          "Fn::If": [
+            "EmbeddingsBedrock",
+            {
+              "Fn::FindInMap": [
+                "BedrockDefaults",
+                {
+                  "Ref": "EmbeddingsBedrockModelId",
+                },
+                "ModelID",
+              ],
+            },
+            {
+              "Ref": "AWS::NoValue",
+            },
+          ],
+        },
+        "LLMBedrockModelId": {
+          "Fn::If": [
+            "LLMBedrock",
+            {
+              "Ref": "LLMBedrockModelId",
+            },
+            {
+              "Ref": "AWS::NoValue",
+            },
+          ],
+        },
+        "ServiceToken": {
+          "Fn::GetAtt": [
+            "CFNLambda",
+            "Arn",
+          ],
+        },
+      },
+      "Type": "Custom::ModelAccess",
     },
     "Bot": {
       "Properties": {
@@ -3040,6 +2719,16 @@ exports[`Verify master template is correct renders master template correctly 1`]
                 },
                 {
                   "Action": [
+                    "bedrock:GetInferenceProfile",
+                    "bedrock:GetFoundationModel",
+                  ],
+                  "Effect": "Allow",
+                  "Resource": [
+                    "*",
+                  ],
+                },
+                {
+                  "Action": [
                     "iam:PassRole",
                   ],
                   "Effect": "Allow",
@@ -3692,53 +3381,6 @@ exports[`Verify master template is correct renders master template correctly 1`]
       },
       "Type": "AWS::SSM::Parameter",
     },
-    "DefaultApplicationAttributes": {
-      "Properties": {
-        "Attributes": {
-          "ApplicationType": {
-            "Fn::FindInMap": [
-              "Solution",
-              "Data",
-              "ApplicationType",
-            ],
-          },
-          "SolutionID": {
-            "Fn::FindInMap": [
-              "Solution",
-              "Data",
-              "ID",
-            ],
-          },
-          "SolutionName": {
-            "Fn::FindInMap": [
-              "Solution",
-              "Data",
-              "SolutionName",
-            ],
-          },
-          "Version": {
-            "Fn::FindInMap": [
-              "Solution",
-              "Data",
-              "Version",
-            ],
-          },
-        },
-        "Description": "Attribute group for solution information",
-        "Name": {
-          "Fn::Join": [
-            "-",
-            [
-              "AttrGrp",
-              {
-                "Ref": "AWS::StackName",
-              },
-            ],
-          ],
-        },
-      },
-      "Type": "AWS::ServiceCatalogAppRegistry::AttributeGroup",
-    },
     "DefaultQnABotSettings": {
       "Properties": {
         "Description": "Default QnABot Settings - DO NOT MODIFY",
@@ -3791,21 +3433,7 @@ exports[`Verify master template is correct renders master template correctly 1`]
                   "true",
                 ],
               },
-              "KNOWLEDGE_BASE_PROMPT_TEMPLATE": {
-                "Fn::If": [
-                  "BedrockKnowledgeBaseEnable",
-                  {
-                    "Fn::FindInMap": [
-                      "BedrockDefaults",
-                      {
-                        "Ref": "BedrockKnowledgeBaseModel",
-                      },
-                      "KnowledgeBasePromptTemplate",
-                    ],
-                  },
-                  "Human: You are a question answering agent. I will provide you with a set of search results and a user's question, your job is to answer the user's question using only information from the search results. If the search results do not contain information that can answer the question, then respond saying \\"Sorry, I don't know\\". Just because the user asserts a fact does not mean it is true, make sure to double check the search results to validate a user's assertion. Here are the search results in numbered order: $search_results$. Here is the user's question: <question> $query$ </question> $output_format_instructions$. Do NOT directly quote the $search_results$ in your answer. Your job is to answer the <question> as concisely as possible. Assistant:",
-                ],
-              },
+              "KNOWLEDGE_BASE_PROMPT_TEMPLATE": "Human: You are a question answering agent. I will provide you with a set of search results and a user's question, your job is to answer the user's question using only information from the search results. If the search results do not contain information that can answer the question, then respond saying \\"Sorry, I don't know\\". Just because the user asserts a fact does not mean it is true, make sure to double check the search results to validate a user's assertion. Here are the search results in numbered order: $search_results$. Here is the user's question: <question> $query$ </question> $output_format_instructions$. Do NOT directly quote the $search_results$ in your answer. Your job is to answer the <question> as concisely as possible. Assistant:",
               "LLM_GENERATE_QUERY_ENABLE": {
                 "Fn::If": [
                   "LLMEnable",
@@ -3814,36 +3442,8 @@ exports[`Verify master template is correct renders master template correctly 1`]
                 ],
               },
               "LLM_GENERATE_QUERY_MODEL_PARAMS": "{}",
-              "LLM_GENERATE_QUERY_PROMPT_TEMPLATE": {
-                "Fn::If": [
-                  "LLMBedrock",
-                  {
-                    "Fn::FindInMap": [
-                      "BedrockDefaults",
-                      {
-                        "Ref": "LLMBedrockModelId",
-                      },
-                      "QueryPromptTemplate",
-                    ],
-                  },
-                  "Given the following conversation and a follow up question, rephrase the follow up question to be a standalone question.<br>Chat History: <br>{history}<br>Follow Up Input: {input}<br>Standalone question:",
-                ],
-              },
-              "LLM_PROMPT_MAX_TOKEN_LIMIT": {
-                "Fn::If": [
-                  "LLMBedrock",
-                  {
-                    "Fn::FindInMap": [
-                      "BedrockDefaults",
-                      {
-                        "Ref": "LLMBedrockModelId",
-                      },
-                      "MaxTokens",
-                    ],
-                  },
-                  "",
-                ],
-              },
+              "LLM_GENERATE_QUERY_PROMPT_TEMPLATE": "Given the following conversation and a follow up question, rephrase the follow up question to be a standalone question.<br>Chat History: <br>{history}<br>Follow Up Input: {input}<br>Standalone question:",
+              "LLM_PROMPT_MAX_TOKEN_LIMIT": 100000,
               "LLM_QA_ENABLE": {
                 "Fn::If": [
                   "LLMEnable",
@@ -3852,36 +3452,8 @@ exports[`Verify master template is correct renders master template correctly 1`]
                 ],
               },
               "LLM_QA_MODEL_PARAMS": "{}",
-              "LLM_QA_NO_HITS_REGEX": {
-                "Fn::If": [
-                  "LLMBedrock",
-                  {
-                    "Fn::FindInMap": [
-                      "BedrockDefaults",
-                      {
-                        "Ref": "LLMBedrockModelId",
-                      },
-                      "NoHitsRegex",
-                    ],
-                  },
-                  "Sorry,  //remove comment to enable custom no match (no_hits) when LLM does not know the answer.",
-                ],
-              },
-              "LLM_QA_PROMPT_TEMPLATE": {
-                "Fn::If": [
-                  "LLMBedrock",
-                  {
-                    "Fn::FindInMap": [
-                      "BedrockDefaults",
-                      {
-                        "Ref": "LLMBedrockModelId",
-                      },
-                      "QAPromptTemplate",
-                    ],
-                  },
-                  "Use the following pieces of context to answer the question at the end. If you don't know the answer, just say that you don't know, don't try to make up an answer. Write the answer in up to 5 complete sentences.<br><br>{context}<br><br>Question: {query}<br>Helpful Answer:",
-                ],
-              },
+              "LLM_QA_NO_HITS_REGEX": "Sorry,  //remove comment to enable custom no match (no_hits) when LLM does not know the answer.",
+              "LLM_QA_PROMPT_TEMPLATE": "Use the following pieces of context to answer the question at the end. If you don't know the answer, just say that you don't know, don't try to make up an answer. Write the answer in up to 5 complete sentences.<br><br>{context}<br><br>Question: {query}<br>Helpful Answer:",
             },
           ],
         },
@@ -5294,6 +4866,34 @@ exports.handler = async function (event, context) {
       },
       "Type": "Custom::S3Version",
     },
+    "ESProxyEmbeddingsPolicyResources": {
+      "Properties": {
+        "EmbeddingsBedrockModelId": {
+          "Fn::If": [
+            "EmbeddingsBedrock",
+            {
+              "Fn::FindInMap": [
+                "BedrockDefaults",
+                {
+                  "Ref": "EmbeddingsBedrockModelId",
+                },
+                "ModelID",
+              ],
+            },
+            {
+              "Ref": "AWS::NoValue",
+            },
+          ],
+        },
+        "ServiceToken": {
+          "Fn::GetAtt": [
+            "CFNLambda",
+            "Arn",
+          ],
+        },
+      },
+      "Type": "Custom::ModelAccess",
+    },
     "ESProxyLambda": {
       "Metadata": {
         "cfn_nag": {
@@ -6002,32 +5602,12 @@ exports.handler = async function (event, context) {
                             "bedrock:InvokeModel",
                           ],
                           "Effect": "Allow",
-                          "Resource": [
-                            {
-                              "Fn::If": [
-                                "EmbeddingsBedrock",
-                                {
-                                  "Fn::Sub": [
-                                    "arn:\${AWS::Partition}:bedrock:\${AWS::Region}::foundation-model/\${ModelId}",
-                                    {
-                                      "ModelId": {
-                                        "Fn::FindInMap": [
-                                          "BedrockDefaults",
-                                          {
-                                            "Ref": "EmbeddingsBedrockModelId",
-                                          },
-                                          "ModelID",
-                                        ],
-                                      },
-                                    },
-                                  ],
-                                },
-                                {
-                                  "Ref": "AWS::NoValue",
-                                },
-                              ],
-                            },
-                          ],
+                          "Resource": {
+                            "Fn::GetAtt": [
+                              "ESProxyEmbeddingsPolicyResources",
+                              "modelArn",
+                            ],
+                          },
                         },
                         {
                           "Ref": "AWS::NoValue",
@@ -7529,6 +7109,12 @@ exports.documents = (event, context, callback) => {
               "QuizType",
             ],
           },
+          "ResponseBotStackName": {
+            "Fn::GetAtt": [
+              "Var",
+              "ResponseBotStackName",
+            ],
+          },
           "S3Clean": {
             "Fn::GetAtt": [
               "S3Clean",
@@ -8343,6 +7929,9 @@ exports.documents = (event, context, callback) => {
             "Fn::If": [
               "BuildExamples",
               {
+                "AWS_ACCOUNT_ID": {
+                  "Ref": "AWS::AccountId",
+                },
                 "DEFAULT_USER_POOL_JWKS_PARAM": {
                   "Ref": "DefaultUserPoolJwksUrl",
                 },
@@ -8584,6 +8173,9 @@ exports.documents = (event, context, callback) => {
                 "SOLUTION_VERSION": "vx.x.x",
               },
               {
+                "AWS_ACCOUNT_ID": {
+                  "Ref": "AWS::AccountId",
+                },
                 "DEFAULT_USER_POOL_JWKS_PARAM": {
                   "Ref": "DefaultUserPoolJwksUrl",
                 },
@@ -9103,80 +8695,12 @@ exports.documents = (event, context, callback) => {
                         "bedrock:InvokeModelWithResponseStream",
                       ],
                       "Effect": "Allow",
-                      "Resource": [
-                        {
-                          "Fn::If": [
-                            "EmbeddingsBedrock",
-                            {
-                              "Fn::Sub": [
-                                "arn:\${AWS::Partition}:bedrock:\${AWS::Region}::foundation-model/\${ModelId}",
-                                {
-                                  "ModelId": {
-                                    "Fn::FindInMap": [
-                                      "BedrockDefaults",
-                                      {
-                                        "Ref": "EmbeddingsBedrockModelId",
-                                      },
-                                      "ModelID",
-                                    ],
-                                  },
-                                },
-                              ],
-                            },
-                            {
-                              "Ref": "AWS::NoValue",
-                            },
-                          ],
-                        },
-                        {
-                          "Fn::If": [
-                            "LLMBedrock",
-                            {
-                              "Fn::Sub": [
-                                "arn:\${AWS::Partition}:bedrock:\${AWS::Region}::foundation-model/\${ModelId}",
-                                {
-                                  "ModelId": {
-                                    "Fn::FindInMap": [
-                                      "BedrockDefaults",
-                                      {
-                                        "Ref": "LLMBedrockModelId",
-                                      },
-                                      "ModelID",
-                                    ],
-                                  },
-                                },
-                              ],
-                            },
-                            {
-                              "Ref": "AWS::NoValue",
-                            },
-                          ],
-                        },
-                        {
-                          "Fn::If": [
-                            "BedrockKnowledgeBaseEnable",
-                            {
-                              "Fn::Sub": [
-                                "arn:\${AWS::Partition}:bedrock:\${AWS::Region}::foundation-model/\${ModelId}",
-                                {
-                                  "ModelId": {
-                                    "Fn::FindInMap": [
-                                      "BedrockDefaults",
-                                      {
-                                        "Ref": "BedrockKnowledgeBaseModel",
-                                      },
-                                      "ModelID",
-                                    ],
-                                  },
-                                },
-                              ],
-                            },
-                            {
-                              "Ref": "AWS::NoValue",
-                            },
-                          ],
-                        },
-                      ],
+                      "Resource": {
+                        "Fn::GetAtt": [
+                          "BedrockInvokeModelAccessPolicyResources",
+                          "modelArn",
+                        ],
+                      },
                     },
                     {
                       "Action": [
@@ -9227,6 +8751,18 @@ exports.documents = (event, context, callback) => {
                         },
                       ],
                       "Sid": "ApplyGuardrailsToKnowledgeBase",
+                    },
+                    {
+                      "Action": [
+                        "bedrock:GetInferenceProfile",
+                      ],
+                      "Effect": "Allow",
+                      "Resource": [
+                        {
+                          "Fn::Sub": "arn:\${AWS::Partition}:bedrock:\${AWS::Region}:\${AWS::AccountId}:inference-profile/*",
+                        },
+                      ],
+                      "Sid": "GetInferenceProfileForKnowledgeBase",
                     },
                   ],
                   "Version": "2012-10-17",
@@ -10388,13 +9924,7 @@ exports.documents = (event, context, callback) => {
             "Ref": "EmbeddingsApi",
           },
           "EmbeddingsBedrockModelId": {
-            "Fn::FindInMap": [
-              "BedrockDefaults",
-              {
-                "Ref": "EmbeddingsBedrockModelId",
-              },
-              "ModelID",
-            ],
+            "Ref": "EmbeddingsBedrockModelId",
           },
           "EmbeddingsLambdaArn": {
             "Ref": "EmbeddingsLambdaArn",
@@ -15405,13 +14935,7 @@ function message(code, name) {
                 "Fn::If": [
                   "BedrockKnowledgeBaseEnable",
                   {
-                    "Fn::FindInMap": [
-                      "BedrockDefaults",
-                      {
-                        "Ref": "BedrockKnowledgeBaseModel",
-                      },
-                      "ModelID",
-                    ],
+                    "Ref": "BedrockKnowledgeBaseModel",
                   },
                   "",
                 ],
@@ -15420,13 +14944,7 @@ function message(code, name) {
                 "Fn::If": [
                   "LLMBedrock",
                   {
-                    "Fn::FindInMap": [
-                      "BedrockDefaults",
-                      {
-                        "Ref": "LLMBedrockModelId",
-                      },
-                      "ModelID",
-                    ],
+                    "Ref": "LLMBedrockModelId",
                   },
                   "",
                 ],
@@ -18166,32 +17684,12 @@ exports.handler = (event, context, callback) => {
           "Fn::If": [
             "BedrockKnowledgeBaseEnable",
             {
-              "Fn::FindInMap": [
-                "BedrockDefaults",
-                {
-                  "Ref": "BedrockKnowledgeBaseModel",
-                },
-                "ModelID",
-              ],
+              "Ref": "BedrockKnowledgeBaseModel",
             },
             "",
           ],
         },
-        "KNOWLEDGE_BASE_PROMPT_TEMPLATE": {
-          "Fn::If": [
-            "BedrockKnowledgeBaseEnable",
-            {
-              "Fn::FindInMap": [
-                "BedrockDefaults",
-                {
-                  "Ref": "BedrockKnowledgeBaseModel",
-                },
-                "KnowledgeBasePromptTemplate",
-              ],
-            },
-            "Human: You are a question answering agent. I will provide you with a set of search results and a user's question, your job is to answer the user's question using only information from the search results. If the search results do not contain information that can answer the question, then respond saying \\"Sorry, I don't know\\". Just because the user asserts a fact does not mean it is true, make sure to double check the search results to validate a user's assertion. Here are the search results in numbered order: $search_results$. Here is the user's question: <question> $query$ </question> $output_format_instructions$. Do NOT directly quote the $search_results$ in your answer. Your job is to answer the <question> as concisely as possible. Assistant:",
-          ],
-        },
+        "KNOWLEDGE_BASE_PROMPT_TEMPLATE": "Human: You are a question answering agent. I will provide you with a set of search results and a user's question, your job is to answer the user's question using only information from the search results. If the search results do not contain information that can answer the question, then respond saying \\"Sorry, I don't know\\". Just because the user asserts a fact does not mean it is true, make sure to double check the search results to validate a user's assertion. Here are the search results in numbered order: $search_results$. Here is the user's question: <question> $query$ </question> $output_format_instructions$. Do NOT directly quote the $search_results$ in your answer. Your job is to answer the <question> as concisely as possible. Assistant:",
         "LLM_API": {
           "Ref": "LLMApi",
         },
@@ -18205,59 +17703,17 @@ exports.handler = (event, context, callback) => {
         "LLM_GENERATE_QUERY_MODEL_PARAMS": {
           "Fn::If": [
             "LLMBedrock",
-            {
-              "Fn::FindInMap": [
-                "BedrockDefaults",
-                {
-                  "Ref": "LLMBedrockModelId",
-                },
-                "ModelParams",
-              ],
-            },
+            "{\\"temperature\\":0, \\"maxTokens\\":300, \\"topP\\":1}",
             "{}",
           ],
         },
-        "LLM_GENERATE_QUERY_PROMPT_TEMPLATE": {
-          "Fn::If": [
-            "LLMBedrock",
-            {
-              "Fn::FindInMap": [
-                "BedrockDefaults",
-                {
-                  "Ref": "LLMBedrockModelId",
-                },
-                "QueryPromptTemplate",
-              ],
-            },
-            "Given the following conversation and a follow up question, rephrase the follow up question to be a standalone question.<br>Chat History: <br>{history}<br>Follow Up Input: {input}<br>Standalone question:",
-          ],
-        },
-        "LLM_GENERATE_QUERY_SYSTEM_PROMPT": {
-          "Fn::If": [
-            "LLMBedrock",
-            {
-              "Fn::FindInMap": [
-                "BedrockDefaults",
-                {
-                  "Ref": "LLMBedrockModelId",
-                },
-                "GenerateQuerySystemPrompt",
-              ],
-            },
-            "",
-          ],
-        },
+        "LLM_GENERATE_QUERY_PROMPT_TEMPLATE": "<br><br>Human: Here is a chat history in <chatHistory> tags:<br><chatHistory><br>{history}<br></chatHistory><br>Human: And here is a follow up question or statement from the human in <followUpMessage> tags:<br><followUpMessage><br>{input}<br></followUpMessage><br>Human: Rephrase the follow up question or statement as a standalone question or statement that makes sense without reading the chat history.<br><br>Assistant: Here is the rephrased follow up question or statement:",
+        "LLM_GENERATE_QUERY_SYSTEM_PROMPT": "",
         "LLM_MODEL_ID": {
           "Fn::If": [
             "LLMBedrock",
             {
-              "Fn::FindInMap": [
-                "BedrockDefaults",
-                {
-                  "Ref": "LLMBedrockModelId",
-                },
-                "ModelID",
-              ],
+              "Ref": "LLMBedrockModelId",
             },
             "",
           ],
@@ -18265,15 +17721,7 @@ exports.handler = (event, context, callback) => {
         "LLM_PROMPT_MAX_TOKEN_LIMIT": {
           "Fn::If": [
             "LLMBedrock",
-            {
-              "Fn::FindInMap": [
-                "BedrockDefaults",
-                {
-                  "Ref": "LLMBedrockModelId",
-                },
-                "MaxTokens",
-              ],
-            },
+            100000,
             "",
           ],
         },
@@ -18287,63 +17735,13 @@ exports.handler = (event, context, callback) => {
         "LLM_QA_MODEL_PARAMS": {
           "Fn::If": [
             "LLMBedrock",
-            {
-              "Fn::FindInMap": [
-                "BedrockDefaults",
-                {
-                  "Ref": "LLMBedrockModelId",
-                },
-                "ModelParams",
-              ],
-            },
+            "{\\"temperature\\":0, \\"maxTokens\\":300, \\"topP\\":1}",
             "{}",
           ],
         },
-        "LLM_QA_NO_HITS_REGEX": {
-          "Fn::If": [
-            "LLMBedrock",
-            {
-              "Fn::FindInMap": [
-                "BedrockDefaults",
-                {
-                  "Ref": "LLMBedrockModelId",
-                },
-                "NoHitsRegex",
-              ],
-            },
-            "Sorry,  //remove comment to enable custom no match (no_hits) when LLM does not know the answer.",
-          ],
-        },
-        "LLM_QA_PROMPT_TEMPLATE": {
-          "Fn::If": [
-            "LLMBedrock",
-            {
-              "Fn::FindInMap": [
-                "BedrockDefaults",
-                {
-                  "Ref": "LLMBedrockModelId",
-                },
-                "QAPromptTemplate",
-              ],
-            },
-            "Use the following pieces of context to answer the question at the end. If you don't know the answer, just say that you don't know, don't try to make up an answer. Write the answer in up to 5 complete sentences.<br><br>{context}<br><br>Question: {query}<br>Helpful Answer:",
-          ],
-        },
-        "LLM_QA_SYSTEM_PROMPT": {
-          "Fn::If": [
-            "LLMBedrock",
-            {
-              "Fn::FindInMap": [
-                "BedrockDefaults",
-                {
-                  "Ref": "LLMBedrockModelId",
-                },
-                "QASystemPrompt",
-              ],
-            },
-            "",
-          ],
-        },
+        "LLM_QA_NO_HITS_REGEX": "(Sorry, I don't know|unable to assist you|i don't have enough context|i don't have enough information|i don't have any information|do not contain any information|do not contain information|i could not find an exact answer|no information in the search results|search results do not mention|search results do not provide specific|don't see any information in the provided search results|search results do not contain|no information in the provided search results|not find any information|search results did not contain|unable to respond|There is no mention of|documents do not mention anything|There is no information provided|reference passages do not mention|reference doesn't specify|could not find an answer to this question|the model cannot answer this question|none of the search results contain)",
+        "LLM_QA_PROMPT_TEMPLATE": "Use the following pieces of context to answer the question at the end. If you don't know the answer, just say that you don't know, don't try to make up an answer. Write the answer in up to 5 complete sentences.<br><br>{context}<br><br>Question: {query}<br>Helpful Answer:",
+        "LLM_QA_SYSTEM_PROMPT": "You are an AI assistant designed to disambiguate user queries.",
         "LLM_STREAMING_ENABLED": {
           "Fn::If": [
             "StreamingEnabled",
@@ -20250,6 +19648,12 @@ exports.handler = (event, context, callback) => {
           },
         },
         "QuizType": "quiz",
+        "ResponseBotStackName": {
+          "op": "toLowerCase",
+          "value": {
+            "Fn::Sub": "\${AWS::StackName}-examples",
+          },
+        },
         "ServiceToken": {
           "Fn::GetAtt": [
             "CFNLambda",

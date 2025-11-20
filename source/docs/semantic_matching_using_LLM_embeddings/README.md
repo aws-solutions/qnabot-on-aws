@@ -10,27 +10,30 @@ Example: With semantic matching enabled, *"What's the address of the White House
 As a best practice, you should try LLM models on non-production instances initially, to validate expected accuracy improvements, and to test for any regression issues.
 
 You can select from three different options:
-1. BEDROCK: Select from several embeddings models provided by Amazon Bedrock using the EmbeddingsBedrockModelId Cloudformation parameter. These models provide the best performance and operate on a pay-per-request model. Bedrock is currently only supported in the following regions: us-east-1, us-west-2, ap-southeast-1, ap-northeast-1, eu-central-1.
+1. BEDROCK: Select from several embeddings models provided by Amazon Bedrock using the EmbeddingsBedrockModelId Cloudformation parameter. These models provide the best performance and operate on a pay-per-request model.
 2. LAMBDA: Embeddings from a user provided Lambda function - explore alternate pre-trained and/or fine tuned embeddings models. This option provides a custom option for advanced users who wish to deploy their own embeddings model.
 
 ## 1. Amazon Bedrock (PREFERRED)
-Utilizes one of the Amazon Bedrock foundation models to generate text embeddings. Currently, the following embeddings models are supported by QnA Bot:
+Utilizes one of the Amazon Bedrock foundation models or inference profiles to generate text embeddings. Currently, the following embeddings models are supported by QnA Bot:
+
+### Foundation Models
 - [Amazon Titan Embeddings G1](https://us-east-1.console.aws.amazon.com/bedrock/home?region=us-east-1#/providers?model=amazon.titan-embed-text-v1)
 - [Titan Text Embeddings V2](https://us-east-1.console.aws.amazon.com/bedrock/home?region=us-east-1#/providers?model=amazon.titan-embed-text-v2:0)
+- [Amazon Nova Multimodal Embeddings](https://us-east-1.console.aws.amazon.com/bedrock/home?region=us-east-1#/model-catalog/serverless/amazon.nova-2-multimodal-embeddings-v1:0)
 - [Cohere English](https://us-east-1.console.aws.amazon.com/bedrock/home?region=us-east-1#/providers?model=cohere.embed-english-v3)
 - [Cohere Multilingual](https://us-east-1.console.aws.amazon.com/bedrock/home?region=us-east-1#/providers?model=cohere.embed-multilingual-v3)
 
-### Requesting Access to Amazon Bedrock Models
+### Inference Profiles
+- [Global Cohere Embed V4](https://us-east-1.console.aws.amazon.com/bedrock/home?region=us-east-1#/model-catalog/serverless/cohere.embed-v4:0)
 
-**NOTE: Access must be requested for the Bedrock embeddings model that you wish to use. This step needs to be performed only once per account in the region where your QnABot is deployed. To request access, go to the Model Access page in the Bedrock console: https://docs.aws.amazon.com/bedrock/latest/userguide/model-access.html. Select the models you need access to and request access.**
-
-![Model Access](./images/Request_model_access.jpeg)
+> **_NOTE:_** 
+Cross-region inference profiles are not supported when deploying QnABot via VPC template 
 
 ### Configuring Amazon Bedrock Embeddings
 
 From the Cloudformation console, set the following parameters:
 - set `EmbeddingsAPI` to BEDROCK
-- set `EmbeddingsBedrockModelId` to one of the three options. 
+- set `EmbeddingsBedrockModelId` to one of the options provided. 
 
 ![CFN Params](./images/CF_Params_Bedrock.jpeg)
 

@@ -1,6 +1,6 @@
 {
     "name": "translate",
-    "version": "7.1.3",
+    "version": "7.2.0",
     "description": "Lambda function used to import custom terminologies into AWS Translate",
     "repository": {
         "type": "git",

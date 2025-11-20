@@ -149,7 +149,14 @@ exports.resources = {
             DataPrivacy: { ChildDirected: false },
             Description: `QNA Wage Bot - ${botDateVersion}`,
             IdleSessionTTLInSeconds: 300,
-            Name: { 'Fn::Sub': 'ResponseBot-QNAWageV2-${AWS::StackName}' },
+            Name: {
+                'Fn::Join': [
+                    '', [
+                        'QNAWageV2-',
+                        { Ref: 'ResponseBotStackName' },
+                    ],
+                ],
+            },
             RoleArn: { 'Fn::GetAtt': ['BotRuntimeRole', 'Arn'] },
         },
     },
@@ -197,7 +204,14 @@ exports.resources = {
         DependsOn: ['BotRuntimeRole'],
         Condition: 'CreateLexResponseBots',
         Properties: {
-            Name: { 'Fn::Sub': 'ResponseBot-QNASocialSecurityV2-${AWS::StackName}' },
+            Name: {
+                'Fn::Join': [
+                    '', [
+                        'QNASocialSecurityV2-',
+                        { Ref: 'ResponseBotStackName' },
+                    ],
+                ],
+            },
             DataPrivacy: { ChildDirected: false },
             Description: `QNA SocialSecurity Bot - ${botDateVersion}`,
             IdleSessionTTLInSeconds: '300',
@@ -317,7 +331,14 @@ exports.resources = {
         DependsOn: ['BotRuntimeRole'],
         Condition: 'CreateLexResponseBots',
         Properties: {
-            Name: { 'Fn::Sub': 'ResponseBot-QNAPinV2-${AWS::StackName}' },
+            Name: {
+                'Fn::Join': [
+                    '', [
+                        'QNAPinV2-',
+                        { Ref: 'ResponseBotStackName' },
+                    ],
+                ],
+            },
             DataPrivacy: { ChildDirected: false },
             Description: `QNA PIN Bot - ${botDateVersion}`,
             IdleSessionTTLInSeconds: '300',
@@ -437,7 +458,14 @@ exports.resources = {
         DependsOn: ['BotRuntimeRole', 'ResponseBotQNAPinV2'],
         Condition: 'CreateLexResponseBots',
         Properties: {
-            Name: { 'Fn::Sub': 'ResponseBot-QNAPinNoConfirmV2-${AWS::StackName}' },
+            Name: {
+                'Fn::Join': [
+                    '', [
+                        'QNAPinNoConfirmV2-',
+                        { Ref: 'ResponseBotStackName' },
+                    ],
+                ],
+            },
             DataPrivacy: { ChildDirected: false },
             Description: `QNA PIN Bot (NoConfirm) - ${botDateVersion}`,
             IdleSessionTTLInSeconds: '300',
@@ -544,7 +572,14 @@ exports.resources = {
         DependsOn: ['BotRuntimeRole', 'ResponseBotQNAPinV2'],
         Condition: 'CreateLexResponseBots',
         Properties: {
-            Name: { 'Fn::Sub': 'ResponseBot-QNAYesNoV2-${AWS::StackName}' },
+            Name: {
+                'Fn::Join': [
+                    '', [
+                        'QNAYesNoV2-',
+                        { Ref: 'ResponseBotStackName' },
+                    ],
+                ],
+            },
             DataPrivacy: { ChildDirected: false },
             Description: `QNA Yes No Bot - ${botDateVersion}`,
             IdleSessionTTLInSeconds: '300',
@@ -675,7 +710,14 @@ exports.resources = {
         DependsOn: ['BotRuntimeRole', 'ResponseBotQNAPinV2'],
         Condition: 'CreateLexResponseBots',
         Properties: {
-            Name: { 'Fn::Sub': 'ResponseBot-QNAYesNoExitV2-${AWS::StackName}' },
+            Name: {
+                'Fn::Join': [
+                    '', [
+                        'QNAYesNoExitV2-',
+                        { Ref: 'ResponseBotStackName' },
+                    ],
+                ],
+            },
             DataPrivacy: { ChildDirected: false },
             Description: `QNA Yes No Exit Bot - ${botDateVersion}`,
             IdleSessionTTLInSeconds: '300',
@@ -820,7 +862,14 @@ exports.resources = {
         Condition: 'CreateLexResponseBots',
         DependsOn: ['BotRuntimeRole', 'ResponseBotQNAYesNoExitV2'],
         Properties: {
-            Name: { 'Fn::Sub': 'ResponseBot-QNADateV2-${AWS::StackName}' },
+            Name: {
+                'Fn::Join': [
+                    '', [
+                        'QNADateV2-',
+                        { Ref: 'ResponseBotStackName' },
+                    ],
+                ],
+            },
             DataPrivacy: { ChildDirected: false },
             Description: `QNA Date Bot - ${botDateVersion}`,
             IdleSessionTTLInSeconds: '300',
@@ -933,7 +982,14 @@ exports.resources = {
         Condition: 'CreateLexResponseBots',
         DependsOn: ['BotRuntimeRole', 'ResponseBotQNAYesNoExitV2'],
         Properties: {
-            Name: { 'Fn::Sub': 'ResponseBot-QNADateNoConfirmV2-${AWS::StackName}' },
+            Name: {
+                'Fn::Join': [
+                    '', [
+                        'QNADateNoConfirmV2-',
+                        { Ref: 'ResponseBotStackName' },
+                    ],
+                ],
+            },
             DataPrivacy: { ChildDirected: false },
             Description: `QNA Date Bot (NoConfirm) - ${botDateVersion}`,
             IdleSessionTTLInSeconds: '300',
@@ -1033,7 +1089,14 @@ exports.resources = {
         Condition: 'CreateLexResponseBots',
         DependsOn: ['BotRuntimeRole', 'ResponseBotQNAYesNoExitV2'],
         Properties: {
-            Name: { 'Fn::Sub': 'ResponseBot-QNADayOfWeekV2-${AWS::StackName}' },
+            Name: {
+                'Fn::Join': [
+                    '', [
+                        'QNADayOfWeekV2-',
+                        { Ref: 'ResponseBotStackName' },
+                    ],
+                ],
+            },
             DataPrivacy: { ChildDirected: false },
             Description: `QNA DayOfWeek Bot - ${botDateVersion}`,
             IdleSessionTTLInSeconds: '300',
@@ -1201,7 +1264,14 @@ exports.resources = {
         Condition: 'CreateLexResponseBots',
         DependsOn: ['BotRuntimeRole', 'ResponseBotQNADayOfWeekV2'],
         Properties: {
-            Name: { 'Fn::Sub': 'ResponseBot-QNAMonthV2-${AWS::StackName}' },
+            Name: {
+                'Fn::Join': [
+                    '', [
+                        'QNAMonthV2-',
+                        { Ref: 'ResponseBotStackName' },
+                    ],
+                ],
+            },
             DataPrivacy: { ChildDirected: false },
             Description: `QNA Month Bot - ${botDateVersion}`,
             IdleSessionTTLInSeconds: '300',
@@ -1394,7 +1464,14 @@ exports.resources = {
         Condition: 'CreateLexResponseBots',
         DependsOn: ['BotRuntimeRole', 'ResponseBotQNADayOfWeekV2'],
         Properties: {
-            Name: { 'Fn::Sub': 'ResponseBot-QNAMonthNoConfirmV2-${AWS::StackName}' },
+            Name: {
+                'Fn::Join': [
+                    '', [
+                        'QNAMonthNoConfirmV2-',
+                        { Ref: 'ResponseBotStackName' },
+                    ],
+                ],
+            },
             DataPrivacy: { ChildDirected: false },
             Description: `QNA Month Bot (NoConfirm) - ${botDateVersion}`,
             IdleSessionTTLInSeconds: '300',
@@ -1574,7 +1651,14 @@ exports.resources = {
         Condition: 'CreateLexResponseBots',
         DependsOn: ['BotRuntimeRole', 'ResponseBotQNADayOfWeekV2'],
         Properties: {
-            Name: { 'Fn::Sub': 'ResponseBot-QNANumberV2-${AWS::StackName}' },
+            Name: {
+                'Fn::Join': [
+                    '', [
+                        'QNANumberV2-',
+                        { Ref: 'ResponseBotStackName' },
+                    ],
+                ],
+            },
             DataPrivacy: { ChildDirected: false },
             Description: `QNA Number Bot - ${botDateVersion}`,
             IdleSessionTTLInSeconds: '300',
@@ -1682,7 +1766,14 @@ exports.resources = {
         Condition: 'CreateLexResponseBots',
         DependsOn: ['BotRuntimeRole', 'ResponseBotQNANumberV2'],
         Properties: {
-            Name: { 'Fn::Sub': 'ResponseBot-QNANumberNoConfirmV2-${AWS::StackName}' },
+            Name: {
+                'Fn::Join': [
+                    '', [
+                        'QNANumberNoConfirmV2-',
+                        { Ref: 'ResponseBotStackName' },
+                    ],
+                ],
+            },
             DataPrivacy: { ChildDirected: false },
             Description: `QNA Number Bot (NoConfirm) - ${botDateVersion}`,
             IdleSessionTTLInSeconds: '300',
@@ -1777,7 +1868,14 @@ exports.resources = {
         Condition: 'CreateLexResponseBots',
         DependsOn: ['BotRuntimeRole', 'ResponseBotQNANumberV2'],
         Properties: {
-            Name: { 'Fn::Sub': 'ResponseBot-QNAAgeV2-${AWS::StackName}' },
+            Name: {
+                'Fn::Join': [
+                    '', [
+                        'QNAAgeV2-',
+                        { Ref: 'ResponseBotStackName' },
+                    ],
+                ],
+            },
             DataPrivacy: { ChildDirected: false },
             Description: `QNA Age Bot - ${botDateVersion}`,
             IdleSessionTTLInSeconds: '300',
@@ -1893,7 +1991,14 @@ exports.resources = {
         DependsOn: ['BotRuntimeRole', 'ResponseBotQNANumberV2'],
         Condition: 'CreateLexResponseBots',
         Properties: {
-            Name: { 'Fn::Sub': 'ResponseBot-QNAAgeNoConfirmV2-${AWS::StackName}' },
+            Name: {
+                'Fn::Join': [
+                    '', [
+                        'QNAAgeNoConfirmV2-',
+                        { Ref: 'ResponseBotStackName' },
+                    ],
+                ],
+            },
             DataPrivacy: { ChildDirected: false },
             Description: `QNA Age No Confirm Bot - ${botDateVersion}`,
             IdleSessionTTLInSeconds: '300',
@@ -1996,7 +2101,14 @@ exports.resources = {
         Condition: 'CreateLexResponseBots',
         DependsOn: ['BotRuntimeRole', 'ResponseBotQNAAgeNoConfirmV2'],
         Properties: {
-            Name: { 'Fn::Sub': 'ResponseBot-QNAPhoneNumberV2-${AWS::StackName}' },
+            Name: {
+                'Fn::Join': [
+                    '', [
+                        'QNAPhoneNumberV2-',
+                        { Ref: 'ResponseBotStackName' },
+                    ],
+                ],
+            },
             DataPrivacy: { ChildDirected: false },
             Description: `QNA Phone Number Bot - ${botDateVersion}`,
             IdleSessionTTLInSeconds: '300',
@@ -2104,7 +2216,14 @@ exports.resources = {
         Condition: 'CreateLexResponseBots',
         DependsOn: ['BotRuntimeRole', 'ResponseBotQNAAgeNoConfirmV2'],
         Properties: {
-            Name: { 'Fn::Sub': 'ResponseBot-QNAPhoneNumberNoConfirmV2-${AWS::StackName}' },
+            Name: {
+                'Fn::Join': [
+                    '', [
+                        'QNAPhoneNumberNoConfirmV2-',
+                        { Ref: 'ResponseBotStackName' },
+                    ],
+                ],
+            },
             DataPrivacy: { ChildDirected: false },
             Description: `QNA Phone Number Bot (NoConfirm) - ${botDateVersion}`,
             IdleSessionTTLInSeconds: '300',
@@ -2199,7 +2318,14 @@ exports.resources = {
         Condition: 'CreateLexResponseBots',
         DependsOn: ['BotRuntimeRole', 'ResponseBotQNAAgeNoConfirmV2'],
         Properties: {
-            Name: { 'Fn::Sub': 'ResponseBot-QNATimeV2-${AWS::StackName}' },
+            Name: {
+                'Fn::Join': [
+                    '', [
+                        'QNATimeV2-',
+                        { Ref: 'ResponseBotStackName' },
+                    ],
+                ],
+            },
             DataPrivacy: { ChildDirected: false },
             Description: `QNA Time Bot - ${botDateVersion}`,
             IdleSessionTTLInSeconds: '300',
@@ -2308,7 +2434,14 @@ exports.resources = {
         DependsOn: ['BotRuntimeRole', 'ResponseBotQNATimeV2'],
         Condition: 'CreateLexResponseBots',
         Properties: {
-            Name: { 'Fn::Sub': 'ResponseBot-QNAEmailAddressV2-${AWS::StackName}' },
+            Name: {
+                'Fn::Join': [
+                    '', [
+                        'QNAEmailAddressV2-',
+                        { Ref: 'ResponseBotStackName' },
+                    ],
+                ],
+            },
             DataPrivacy: { ChildDirected: false },
             Description: `QNA Email Address Bot - ${botDateVersion}`,
             IdleSessionTTLInSeconds: '300',
@@ -2415,7 +2548,14 @@ exports.resources = {
         Condition: 'CreateLexResponseBots',
         DependsOn: ['BotRuntimeRole', 'ResponseBotQNATimeV2'],
         Properties: {
-            Name: { 'Fn::Sub': 'ResponseBot-QNANameV2-${AWS::StackName}' },
+            Name: {
+                'Fn::Join': [
+                    '', [
+                        'QNANameV2-',
+                        { Ref: 'ResponseBotStackName' },
+                    ],
+                ],
+            },
             DataPrivacy: { ChildDirected: false },
             Description: `QNA Name Bot - ${botDateVersion}`,
             IdleSessionTTLInSeconds: '300',

@@ -176,6 +176,13 @@ module.exports = Object.assign(require('./bucket'), {
         guard: util.cfnGuard('LAMBDA_INSIDE_VPC'),
       },
     },
+    ImportBedrockEmbeddingsPolicyResources: {
+      Type: "Custom::ModelAccess",
+      Properties: {
+          ServiceToken: { Ref: "CFNLambda" },
+          EmbeddingsBedrockModelId: { "Fn::If": ["EmbeddingsBedrock", { 'Fn::FindInMap': ['BedrockDefaults', {'Ref' : 'EmbeddingsBedrockModelId'}, 'ModelID'] }, { Ref: "AWS::NoValue" }] },
+      },
+    },
     ImportRole: {
       Type: "AWS::IAM::Role",
       Properties: {
@@ -209,12 +216,7 @@ module.exports = Object.assign(require('./bucket'), {
                         Action: [
                             "bedrock:InvokeModel",
                         ],
-                        Resource: [
-                          { 'Fn::Sub': 'arn:${AWS::Partition}:bedrock:${AWS::Region}::foundation-model/amazon.titan-embed-text-v1' },
-                          { 'Fn::Sub': 'arn:${AWS::Partition}:bedrock:${AWS::Region}::foundation-model/cohere.embed-english-v3' },
-                          { 'Fn::Sub': 'arn:${AWS::Partition}:bedrock:${AWS::Region}::foundation-model/cohere.embed-multilingual-v3' },
-                          { 'Fn::Sub': 'arn:${AWS::Partition}:bedrock:${AWS::Region}::foundation-model/amazon.titan-embed-text-v2:0' },
-                      ],
+                        Resource: { "Fn::GetAtt": ["ImportBedrockEmbeddingsPolicyResources", "modelArn"] },
                     },
                   ],
                 },

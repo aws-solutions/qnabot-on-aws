@@ -58,6 +58,40 @@ exports[`renders import template correctly 1`] = `
     },
   },
   "Description": "(SO0189n-import) QnABot nested import resources - Version vx.x.x",
+  "Mappings": {
+    "BedrockDefaults": {
+      "amazon.nova-2-multimodal-embeddings-v1": {
+        "EmbeddingsDimensions": 3072,
+        "MaxTokens": 8172,
+        "ModelID": "amazon.nova-2-multimodal-embeddings-v1:0",
+      },
+      "amazon.titan-embed-text-v1": {
+        "EmbeddingsDimensions": 1536,
+        "MaxTokens": 8000,
+        "ModelID": "amazon.titan-embed-text-v1",
+      },
+      "amazon.titan-embed-text-v2": {
+        "EmbeddingsDimensions": 1024,
+        "MaxTokens": 8000,
+        "ModelID": "amazon.titan-embed-text-v2:0",
+      },
+      "cohere.embed-english-v3": {
+        "EmbeddingsDimensions": 1024,
+        "MaxTokens": 512,
+        "ModelID": "cohere.embed-english-v3",
+      },
+      "cohere.embed-multilingual-v3": {
+        "EmbeddingsDimensions": 1024,
+        "MaxTokens": 512,
+        "ModelID": "cohere.embed-multilingual-v3",
+      },
+      "global.cohere.embed-v4": {
+        "EmbeddingsDimensions": 1536,
+        "MaxTokens": 128000,
+        "ModelID": "global.cohere.embed-v4:0",
+      },
+    },
+  },
   "Outputs": {},
   "Parameters": {
     "AwsSdkLayerLambdaLayer": {
@@ -143,6 +177,31 @@ exports[`renders import template correctly 1`] = `
     },
   },
   "Resources": {
+    "ImportBedrockEmbeddingsPolicyResources": {
+      "Properties": {
+        "EmbeddingsBedrockModelId": {
+          "Fn::If": [
+            "EmbeddingsBedrock",
+            {
+              "Fn::FindInMap": [
+                "BedrockDefaults",
+                {
+                  "Ref": "EmbeddingsBedrockModelId",
+                },
+                "ModelID",
+              ],
+            },
+            {
+              "Ref": "AWS::NoValue",
+            },
+          ],
+        },
+        "ServiceToken": {
+          "Ref": "CFNLambda",
+        },
+      },
+      "Type": "Custom::ModelAccess",
+    },
     "ImportClean": {
       "DependsOn": [
         "ImportPolicy",
@@ -397,20 +456,12 @@ exports[`renders import template correctly 1`] = `
                         "bedrock:InvokeModel",
                       ],
                       "Effect": "Allow",
-                      "Resource": [
-                        {
-                          "Fn::Sub": "arn:\${AWS::Partition}:bedrock:\${AWS::Region}::foundation-model/amazon.titan-embed-text-v1",
-                        },
-                        {
-                          "Fn::Sub": "arn:\${AWS::Partition}:bedrock:\${AWS::Region}::foundation-model/cohere.embed-english-v3",
-                        },
-                        {
-                          "Fn::Sub": "arn:\${AWS::Partition}:bedrock:\${AWS::Region}::foundation-model/cohere.embed-multilingual-v3",
-                        },
-                        {
-                          "Fn::Sub": "arn:\${AWS::Partition}:bedrock:\${AWS::Region}::foundation-model/amazon.titan-embed-text-v2:0",
-                        },
-                      ],
+                      "Resource": {
+                        "Fn::GetAtt": [
+                          "ImportBedrockEmbeddingsPolicyResources",
+                          "modelArn",
+                        ],
+                      },
                     },
                   ],
                   "Version": "2012-10-17",

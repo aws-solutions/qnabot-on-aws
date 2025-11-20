@@ -19,6 +19,10 @@ module.exports = {
                 value: { 'Fn::Sub': '${AWS::StackName}' },
                 op: 'toLowerCase',
             },
+            ResponseBotStackName: {
+                value: { 'Fn::Sub': '${AWS::StackName}-examples' },
+                op: 'toLowerCase',
+            },
             MetricsIndex: {
                 value: { 'Fn::Sub': '${AWS::StackName}-metrics' },
                 op: 'toLowerCase',

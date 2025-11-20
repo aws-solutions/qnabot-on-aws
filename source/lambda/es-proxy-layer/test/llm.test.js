@@ -410,7 +410,7 @@ describe('llm get_qa', () => {
         });
 
         const expectedCall = {
-            modelId: 'anthropic.claude-3-haiku-v1' ,
+            modelId: 'anthropic.claude-3-haiku-20240307-v1:0' ,
             system: [
                 {
                     text: 'test_system_prompt'
