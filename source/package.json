@@ -1,6 +1,6 @@
 {
     "name": "qnabot-on-aws",
-    "version": "7.2.2",
+    "version": "7.2.3",
     "engines": {
         "node": ">=20.0.0",
         "npm": ">=10.0.0"
@@ -214,7 +214,8 @@
         "elliptic": "^6.6.1",
         "uglify-js": "^3.19.2",
         "sinon": "^19.0.2",
-        "webpack-dev-server": "^5.2.2"
+        "webpack-dev-server": "^5.2.2",
+        "qs": "^6.14.1"
     },
     "jest": {
         "globals": {
