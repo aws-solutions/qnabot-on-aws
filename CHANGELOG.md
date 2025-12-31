@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [7.2.3] - 2025-12-31
+
+### Security
+
+- Updated langchain to `0.3.37`
+- Updated qs to `6.14.1`
+
 ## [7.2.2] - 2025-12-11
 
 ### Security
@@ -79,6 +86,7 @@ __*Note: we recommend that you first deploy these changes in a non-production en
 ## [7.0.8] - 2025-09-04
 
 ### Fixed
+
 - Cached BedrockRuntimeClient instances to prevent resource exhaustion
 
 ### Security
@@ -150,8 +158,8 @@ __*Note: we recommend that you first deploy these changes in a non-production en
 
 ### Added
 
-- Streaming responses feature that enhances QnABot responses by providing real-time streaming from Large Language Models (LLMs) to the chat interface. This introduces a cloudformation parameter `EnableStreaming` to optionally create resources needed for streaming through a nested stack. See [README](./source/docs/llm_streaming_responses/README.md). 
-- Enhanced Guardrail Integration that implements pre-processing and post-processing guardrails to provide improved content control and broader security for your chatbot application. See [README](./source/docs/bedrock_guardrails/README.md). 
+- Streaming responses feature that enhances QnABot responses by providing real-time streaming from Large Language Models (LLMs) to the chat interface. This introduces a cloudformation parameter `EnableStreaming` to optionally create resources needed for streaming through a nested stack. See [README](./source/docs/llm_streaming_responses/README.md).
+- Enhanced Guardrail Integration that implements pre-processing and post-processing guardrails to provide improved content control and broader security for your chatbot application. See [README](./source/docs/bedrock_guardrails/README.md).
 - Implemented Converse API to simplify LLM workflows by providing a consistent interface for different LLM providers, role prompting and eliminating the need for input tagging for Bedrock Guardrails. This introduces customizable system prompts `LLM_GENERATE_QUERY_SYSTEM_PROMPT` and `LLM_QA_SYSTEM_PROMPT` in content designer to support role-based prompting. For more information, see system prompts in [supported models and model features](https://docs.aws.amazon.com/bedrock/latest/userguide/conversation-inference-supported-models-features.html) and [using Converse API](https://docs.aws.amazon.com/bedrock/latest/userguide/conversation-inference-call.html).
 - Ability to use both RAG with Bedrock KnowledgeBase and Kendra as fallback options. A new setting `FALLBACK_ORDER` in the content designer allows users to specify the fallback order of these options.
 - Ability to set a TTL on records added to the DynamoDB UsersTable. ([PR #671](https://github.com/aws-solutions/qnabot-on-aws/pull/671)) - contributed by ([@richhaase](https://github.com/richhaase))
@@ -294,7 +302,7 @@ __*Note: we recommend that you first deploy these changes in a non-production en
 - Removed aws-sdk (JavaScript V2) from dependency list.
 - Updated parameter description for elicit response bot settings in the content designer settings. [Issue #745](https://github.com/aws-solutions/qnabot-on-aws/issues/745)
 - Removed LLM models `meta.llama2-70b-chat-v1` and `meta.llama2-13b-chat-v1` from the list of models in the Cloudformation parameter `LLMBedrockModelId` since these models will be [unavailable on Amazon Bedrock](https://docs.aws.amazon.com/bedrock/latest/userguide/model-lifecycle.html#versions-for-eol) starting from August 12, 2024.
-- Updated the setting `LLM_QA_NO_HITS_REGEX` in the Content Designer to include a default pattern `Sorry, I don't know` in prompts specified through the setting `LLM_QA_PROMPT_TEMPLATE` and other patterns returned by LLMs in their responses. 
+- Updated the setting `LLM_QA_NO_HITS_REGEX` in the Content Designer to include a default pattern `Sorry, I don't know` in prompts specified through the setting `LLM_QA_PROMPT_TEMPLATE` and other patterns returned by LLMs in their responses.
 - Constrainted the query made to Bedrock Knowledge Base to maximum of 1000 characters input query as per the [input requirements](https://docs.aws.amazon.com/bedrock/latest/APIReference/API_agent-runtime_RetrieveAndGenerateInput.html#API_agent-runtime_RetrieveAndGenerateInput_Contents).
 
 ## [6.0.1] - 2024-06-26
@@ -307,7 +315,7 @@ __*Note: we recommend that you first deploy these changes in a non-production en
 
 ### Changed
 
-- Security patches for braces, urllib3, and ws.  
+- Security patches for braces, urllib3, and ws.
 - Improved latency of IAM policy propagation when switching the Bedrock embedding model.
 
 ## [6.0.0] - 2024-06-07
@@ -341,7 +349,7 @@ __*Note: we recommend that you first deploy these changes in a non-production en
 - Added case conversion handlebars helpers([PR #719](https://github.com/aws-solutions/qnabot-on-aws/pull/719)) - contributed by ([@amendlik](https://github.com/amendlik))
 - Consolidated common AWS SDK dependencies to reduce overall solution artifact size and lambdas deployment package size
 - Patched security vulnerabilities and and integrated with CloudFormation Guard evaluation tool
-- Added ability to TestAll in a selected locale, the locales to be tested should be defined in the template parameter `LexV2BotLocaleIds` 
+- Added ability to TestAll in a selected locale, the locales to be tested should be defined in the template parameter `LexV2BotLocaleIds`
 - Improved security for LLM inputs and outputs
 
 ### Fixed
@@ -390,10 +398,10 @@ __*Note: we recommend that you first deploy these changes in a non-production en
 - Added 'PROTECTED_UTTERANCES' setting which allows the user to configure a comma-separated list of utterances that will be ignored by LLM query disambiguation and translation. This fixes a bug where feedback (thumbs up/thumbs down) and language selection would be disambiguated instead of triggering the respective workflow
 - Added 'getQuestion' handlebar that returns the original matched question without hard-coding ([issue #397](https://github.com/aws-solutions/qnabot-on-aws/issues/397))
 - Added functional test collection for verifying deployed QnABots
-- Added Service API Usage Tracking 
-- Added deployment parameter to enable selection of opensearch instance type ([issue #599](https://github.com/aws-solutions/qnabot-on-aws/issues/599)) 
+- Added Service API Usage Tracking
+- Added deployment parameter to enable selection of opensearch instance type ([issue #599](https://github.com/aws-solutions/qnabot-on-aws/issues/599))
 
-### Changed 
+### Changed
 
 - Migrated out of Bluebird promises to native promises
 - Migrated to AWS SDK for JavaScript v3
@@ -649,18 +657,18 @@ __*Note: we recommend that you first deploy these changes in a non-production en
 
 ### Added
 
-- Intent and Slot matching (an early implementation). This new capability supports creating dedicated custom Intents for a QnABot {Item ID}. You can extend QnABot to support one or more related intents. 
-For example, you might create an intent that makes a car reservation, or assists an agent during a live chat or call (via Amazon Connect). 
+- Intent and Slot matching (an early implementation). This new capability supports creating dedicated custom Intents for a QnABot {Item ID}. You can extend QnABot to support one or more related intents.
+For example, you might create an intent that makes a car reservation, or assists an agent during a live chat or call (via Amazon Connect).
 More details in [README](https://github.com/aws-solutions/qnabot-on-aws/blob/v5.2.0/docs/intent_slot_matching/README.md)
-- Support for using custom domain names for QnABot Designer and Client interfaces. 
+- Support for using custom domain names for QnABot Designer and Client interfaces.
 More details in [README](https://github.com/aws-solutions/qnabot-on-aws/blob/v5.2.0/docs/custom_domain_name_setup/README.md)
-- AWS QnABot Command Line Interface (CLI) - the AWS QnABot CLI supports the capability to import and export questions and answers via command line. 
+- AWS QnABot Command Line Interface (CLI) - the AWS QnABot CLI supports the capability to import and export questions and answers via command line.
 More details in [README](https://github.com/aws-solutions/qnabot-on-aws/blob/v5.2.0/docs/qnabot_cli.md)
-- Kendra Redirect - with the Kendra Redirect feature, you can now include a Kendra query within a Item ID. 
+- Kendra Redirect - with the Kendra Redirect feature, you can now include a Kendra query within a Item ID.
 More details in [README](https://github.com/aws-solutions/qnabot-on-aws/blob/v5.2.0/docs/kendra_redirect/README.md)
-- Integration with Canvas LMS (an early example implementation). 
-Students use their schools' learning management system (LMS) to keep track of their assignments, grades, and their course work. 
-With this integration, students will be able to ask QnABot about their grades, syllabus, enrollments, assignments, and announcements. 
+- Integration with Canvas LMS (an early example implementation).
+Students use their schools' learning management system (LMS) to keep track of their assignments, grades, and their course work.
+With this integration, students will be able to ask QnABot about their grades, syllabus, enrollments, assignments, and announcements.
 More details in [README](https://github.com/aws-solutions/qnabot-on-aws/blob/v5.2.0/docs/canvaslms_integration.md)
 - Changed import functionality to support importing of QnABot questions and answers from a Excel file when uploaded to S3 data folder.
 - Added support for importing session attributes via Excel.
