@@ -1,6 +1,6 @@
 {
     "name": "cfn",
-    "version": "7.2.3",
+    "version": "7.2.4",
     "description": "QnABot Cfn Lambda",
     "main": "index.js",
     "scripts": {
@@ -28,7 +28,6 @@
         "@aws-sdk/client-opensearch": "^3.703.0",
         "@aws-sdk/client-s3": "^3.705.0",
         "@aws-sdk/credential-providers": "^3.699.0",
-        "aws-sdk": "^2.1692.0",
         "@aws-sdk/util-dynamodb": "^3.699.0",
         "@aws-sdk/client-dynamodb": "^3.699.0",
         "body-parser": "^1.20.3",
