@@ -24,7 +24,7 @@ cloudwatch = boto3.client('cloudwatch', config=sdk_config)
 
 
 def create_cron_expression(schedule):
-    rate_regex = "(rate\()(\d\s(?:day|week|month)s?)(\))"
+    rate_regex = r"(rate\()(\d\s(?:day|week|month)s?)(\))"
     match = re.match(rate_regex, schedule)
     if match is not None:
         schedule = match.group(2)

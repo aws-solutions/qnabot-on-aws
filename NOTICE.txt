@@ -1314,7 +1314,6 @@ sprintf-js under the BSD-3-Clause license
 ssri under the ISC license
 stable under the MIT license
 stackframe under the MIT license
-static-eval under the MIT license
 statuses under the MIT license
 stream-browserify under the MIT license
 stream-http under the MIT license

@@ -9,7 +9,7 @@ const customSdkConfig = require('sdk-config/customSdkConfig');
 const qnabot = require('qnabot/logging');
 const region = process.env.AWS_REGION || 'us-east-1';
 
-function signS3URL(url, expireSecs, callback) {
+async function signS3URL(url, expireSecs) {
     let bucket;
     let key;
     if (url.search(/\/s3[.-](\w{2}-\w{4,9}-\d\.)?amazonaws\.com/) != -1) {
@@ -30,35 +30,27 @@ function signS3URL(url, expireSecs, callback) {
     }
     if (bucket && key) {
         qnabot.debug('Convert S3 url to a signed URL: ', url, 'Bucket: ', bucket, ' Key: ', key);
-        try { // NOSONAR - javascript:S4822 - this is standard javascript IIFE function and no await needed in outer scope but has an async/await in inner scope
-            (async () => {
-                const s3 = new S3Client(customSdkConfig('C007', { region }));
-                url = await getSignedUrl(s3, new GetObjectCommand({
-                    Bucket: bucket,
-                    Key: key,
-                }), {
-                    expiresIn: expireSecs,
-                });
-                callback(url);
-            })();
+        try {
+            const s3 = new S3Client(customSdkConfig('C007', { region }));
+            const signedUrl = await getSignedUrl(s3, new GetObjectCommand({
+                Bucket: bucket,
+                Key: key,
+            }), {
+                expiresIn: expireSecs,
+            });
+            return signedUrl;
         } catch (err) {
             qnabot.log('Error signing S3 URL (returning original URL): ', err);
-            callback(url);
+            return url;
         }
     } else {
         qnabot.log('URL is not an S3 url - return unchanged: ', url);
-        callback(url);
+        return url;
     }
 }
 
 async function signUrls(urlArr, expireSecs) {
-    const signedUrls = urlArr.map((url) => {
-        const prom = new Promise((resolve) => {
-            signS3URL(url, expireSecs, (signedUrl) => resolve(signedUrl));
-        });
-        return prom;
-    });
-
+    const signedUrls = urlArr.map((url) => signS3URL(url, expireSecs));
     return Promise.all(signedUrls);
 }
 

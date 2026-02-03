@@ -31,7 +31,7 @@ function getStatusResponse(response, build) {
     return statusResponse;
 }
 
-exports.handler = async (event, context, callback) => {
+exports.handler = async (event, context) => {
     console.log('Received event:', JSON.stringify(event, null, 2));
 
     const bucket = process.env.STATUS_BUCKET;

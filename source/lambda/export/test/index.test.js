@@ -142,7 +142,7 @@ describe('when calling index function', () => {
         const inProgressStepInfo = initializeInProgressStepMocks(startStepInfo.versionId);
         const joinStepInfo = initializeJoinStepMocks(inProgressStepInfo.versionId);
         const cleanStepInfo = initializeCleanStepMocks(joinStepInfo.versionId);
-        await index.step(event, null, jest.fn());
+        await index.step(event, null);
         expect(start).toHaveBeenCalledTimes(1);
         expect(start).toHaveBeenCalledWith(startStepInfo.config);
         expect(s3Mock).toHaveReceivedNthSpecificCommandWith(1,GetObjectCommand, {"Bucket": "exportBucket", "Key": "status-export/Export.csv", "VersionId": "tLkWAhY8v2rsaSPWqg2m"});
@@ -164,9 +164,6 @@ describe('when calling index function', () => {
     it('should handle an error', async () => {
         const error = new Error('test error');
         s3Mock.on(GetObjectCommand).rejects(error);
-        const mockFn = jest.fn();
-        await index.step(event, null, mockFn);
-        expect(mockFn).toHaveBeenCalledTimes(1);
-        expect(mockFn).toHaveBeenCalledWith(error);
+        await expect(index.step(event, null)).rejects.toThrow('test error');
     });
 });

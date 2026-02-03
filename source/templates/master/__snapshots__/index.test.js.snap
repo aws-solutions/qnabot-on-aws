@@ -6577,68 +6577,73 @@ const customSdkConfig = require('sdk-config/customSdkConfig');
 const region = process.env.AWS_REGION;
 const s3 = new S3Client(customSdkConfig('C018', { region }));
 
-exports.photos = (event, context, callback) => {
+exports.photos = async (event, context) => {
     console.log('Received event:', JSON.stringify(event, null, 2));
 
-    return s3.send(new ListObjectsCommand({
-        Bucket: event.bucket,
-        Prefix: event.prefix,
-        MaxKeys: event.perpage || 100,
-        Marker: event.token || null,
-    }))
-        .then((x) => {
-            console.log('s3 response for photos:', JSON.stringify(x, null, 2));
-            const photos = x?.Contents?.map((value) => {
-                const key = value.Key.split('/').pop();
-                return \`\${event.root}/examples/photos/\${key}\`;
-            }, []);
-            callback(null, {
-                token: x.NextMarker,
-                photos,
-            });
-        })
-        .catch((e) => callback(JSON.stringify({
+    try {
+        const result = await s3.send(new ListObjectsCommand({
+            Bucket: event.bucket,
+            Prefix: event.prefix,
+            MaxKeys: event.perpage || 100,
+            Marker: event.token || null,
+        }));
+        
+        console.log('s3 response for photos:', JSON.stringify(result, null, 2));
+        const photos = result?.Contents?.map((value) => {
+            const key = value.Key.split('/').pop();
+            return \`\${event.root}/examples/photos/\${key}\`;
+        }, []);
+        
+        return {
+            token: result.NextMarker,
+            photos,
+        };
+    } catch (error) {
+        throw JSON.stringify({
             type: '[InternalServiceError]',
-            data: e,
-        })));
+            data: error,
+        });
+    }
 };
 
-exports.documents = (event, context, callback) => {
+exports.documents = async (event, context) => {
     console.log('Received event:', JSON.stringify(event, null, 2));
 
-    return s3.send(new ListObjectsCommand({
-        Bucket: event.bucket,
-        Prefix: event.prefix,
-        MaxKeys: event.perpage || 100,
-        Marker: event.token || null,
-    }))
-        .then((x) => {
-            console.log('s3 response for documents:', JSON.stringify(x, null, 2));
-            const examples = x?.Contents?.reduce((accum, value) => {
-                let key = value.Key.split('/').pop().split('.');
-                const ext = key.length > 1 ? key.pop() : 'txt';
-                key = key[0];
-                const href = \`\${event.root}/examples/documents/\${key}.\${ext}\`;
-                if (!accum[key]) {
-                    accum[key] = { id: key };
-                }
-                if (ext === 'json') {
-                    accum[key].document = { href };
-                } else {
-                    accum[key].description = { href };
-                }
-                return accum;
-            }, []);
+    try {
+        const result = await s3.send(new ListObjectsCommand({
+            Bucket: event.bucket,
+            Prefix: event.prefix,
+            MaxKeys: event.perpage || 100,
+            Marker: event.token || null,
+        }));
+        
+        console.log('s3 response for documents:', JSON.stringify(result, null, 2));
+        const examples = result?.Contents?.reduce((accum, value) => {
+            let key = value.Key.split('/').pop().split('.');
+            const ext = key.length > 1 ? key.pop() : 'txt';
+            key = key[0];
+            const href = \`\${event.root}/examples/documents/\${key}.\${ext}\`;
+            if (!accum[key]) {
+                accum[key] = { id: key };
+            }
+            if (ext === 'json') {
+                accum[key].document = { href };
+            } else {
+                accum[key].description = { href };
+            }
+            return accum;
+        }, {});
 
-            callback(null, {
-                token: x.NextMarker,
-                examples: examples ? Object.keys(examples).map((x) => examples[x]) : [],
-            });
-        })
-        .catch((e) => callback(JSON.stringify({
+        return {
+            token: result.NextMarker,
+            examples: examples ? Object.keys(examples).map((x) => examples[x]) : [],
+        };
+    } catch (error) {
+        throw JSON.stringify({
             type: '[InternalServiceError]',
-            data: e,
-        })));
+            data: error,
+        });
+    }
 };
 ",
         },
@@ -6780,68 +6785,73 @@ const customSdkConfig = require('sdk-config/customSdkConfig');
 const region = process.env.AWS_REGION;
 const s3 = new S3Client(customSdkConfig('C018', { region }));
 
-exports.photos = (event, context, callback) => {
+exports.photos = async (event, context) => {
     console.log('Received event:', JSON.stringify(event, null, 2));
 
-    return s3.send(new ListObjectsCommand({
-        Bucket: event.bucket,
-        Prefix: event.prefix,
-        MaxKeys: event.perpage || 100,
-        Marker: event.token || null,
-    }))
-        .then((x) => {
-            console.log('s3 response for photos:', JSON.stringify(x, null, 2));
-            const photos = x?.Contents?.map((value) => {
-                const key = value.Key.split('/').pop();
-                return \`\${event.root}/examples/photos/\${key}\`;
-            }, []);
-            callback(null, {
-                token: x.NextMarker,
-                photos,
-            });
-        })
-        .catch((e) => callback(JSON.stringify({
+    try {
+        const result = await s3.send(new ListObjectsCommand({
+            Bucket: event.bucket,
+            Prefix: event.prefix,
+            MaxKeys: event.perpage || 100,
+            Marker: event.token || null,
+        }));
+        
+        console.log('s3 response for photos:', JSON.stringify(result, null, 2));
+        const photos = result?.Contents?.map((value) => {
+            const key = value.Key.split('/').pop();
+            return \`\${event.root}/examples/photos/\${key}\`;
+        }, []);
+        
+        return {
+            token: result.NextMarker,
+            photos,
+        };
+    } catch (error) {
+        throw JSON.stringify({
             type: '[InternalServiceError]',
-            data: e,
-        })));
+            data: error,
+        });
+    }
 };
 
-exports.documents = (event, context, callback) => {
+exports.documents = async (event, context) => {
     console.log('Received event:', JSON.stringify(event, null, 2));
 
-    return s3.send(new ListObjectsCommand({
-        Bucket: event.bucket,
-        Prefix: event.prefix,
-        MaxKeys: event.perpage || 100,
-        Marker: event.token || null,
-    }))
-        .then((x) => {
-            console.log('s3 response for documents:', JSON.stringify(x, null, 2));
-            const examples = x?.Contents?.reduce((accum, value) => {
-                let key = value.Key.split('/').pop().split('.');
-                const ext = key.length > 1 ? key.pop() : 'txt';
-                key = key[0];
-                const href = \`\${event.root}/examples/documents/\${key}.\${ext}\`;
-                if (!accum[key]) {
-                    accum[key] = { id: key };
-                }
-                if (ext === 'json') {
-                    accum[key].document = { href };
-                } else {
-                    accum[key].description = { href };
-                }
-                return accum;
-            }, []);
+    try {
+        const result = await s3.send(new ListObjectsCommand({
+            Bucket: event.bucket,
+            Prefix: event.prefix,
+            MaxKeys: event.perpage || 100,
+            Marker: event.token || null,
+        }));
+        
+        console.log('s3 response for documents:', JSON.stringify(result, null, 2));
+        const examples = result?.Contents?.reduce((accum, value) => {
+            let key = value.Key.split('/').pop().split('.');
+            const ext = key.length > 1 ? key.pop() : 'txt';
+            key = key[0];
+            const href = \`\${event.root}/examples/documents/\${key}.\${ext}\`;
+            if (!accum[key]) {
+                accum[key] = { id: key };
+            }
+            if (ext === 'json') {
+                accum[key].document = { href };
+            } else {
+                accum[key].description = { href };
+            }
+            return accum;
+        }, {});
 
-            callback(null, {
-                token: x.NextMarker,
-                examples: examples ? Object.keys(examples).map((x) => examples[x]) : [],
-            });
-        })
-        .catch((e) => callback(JSON.stringify({
+        return {
+            token: result.NextMarker,
+            examples: examples ? Object.keys(examples).map((x) => examples[x]) : [],
+        };
+    } catch (error) {
+        throw JSON.stringify({
             type: '[InternalServiceError]',
-            data: e,
-        })));
+            data: error,
+        });
+    }
 };
 ",
         },
@@ -8673,6 +8683,12 @@ exports.documents = (event, context, callback) => {
                     {
                       "Fn::GetAtt": [
                         "UsersTable",
+                        "Arn",
+                      ],
+                    },
+                    {
+                      "Fn::GetAtt": [
+                        "SettingsTable",
                         "Arn",
                       ],
                     },
@@ -10991,7 +11007,7 @@ const invokeLambda = async function invokeLambda(event) {
     });
 };
 
-exports.handler = async function (event, context, callback) {
+exports.handler = async function (event, context) {
     try {
         const getObjCmd = new GetObjectCommand({
             Bucket: process.env.STATUS_BUCKET,
@@ -11654,7 +11670,7 @@ const lambda = new LambdaClient(customSdkConfig('C002', { region }));
 const s3 = new S3Client(customSdkConfig('C022', { region }));
 const crypto = require('crypto');
 
-exports.handler = async function (event, context, callback) {
+exports.handler = async function (event, context) {
     const token = crypto.randomBytes(16).toString('base64');
     const bucket = process.env.STATUS_BUCKET;
     const lexV2StatusFile = process.env.LEXV2_STATUS_KEY;
@@ -11679,7 +11695,7 @@ exports.handler = async function (event, context, callback) {
     };
     const invokeCmd = new InvokeCommand(invokeParams);
     await lambda.send(invokeCmd);
-    callback(null, { token });
+    return { token };
 };
 ",
         },
@@ -11834,20 +11850,19 @@ const customSdkConfig = require('sdk-config/customSdkConfig');
 const region = process.env.AWS_REGION;
 const lex = new LexModelBuildingService(customSdkConfig('C001', { region }));
 
-exports.handler = (event, context, callback) => {
+exports.handler = async (event, context) => {
     console.log('Received event:', JSON.stringify(event, null, 2));
-    lex[event.fnc](event.params)
-        .then((x) => {
-            console.log(\`Response: \${JSON.stringify(x, null, 2)}\`);
-            callback(null, x);
-        })
-        .catch((y) => {
-            console.log(\`Error: \${y}\`);
-            callback(JSON.stringify({
-                type: '[InternalServiceError]',
-                data: y,
-            }));
+    try {
+        const result = await lex[event.fnc](event.params);
+        console.log(\`Response: \${JSON.stringify(result, null, 2)}\`);
+        return result;
+    } catch (error) {
+        console.log(\`Error: \${error}\`);
+        throw JSON.stringify({
+            type: '[InternalServiceError]',
+            data: error,
         });
+    }
 };
 ",
         },
@@ -12475,7 +12490,7 @@ function getStatusResponse(response, build) {
     return statusResponse;
 }
 
-exports.handler = async (event, context, callback) => {
+exports.handler = async (event, context) => {
     console.log('Received event:', JSON.stringify(event, null, 2));
 
     const bucket = process.env.STATUS_BUCKET;
@@ -13569,34 +13584,54 @@ exports.handler = async (event, context, callback) => {
 *   SPDX-License-Identifier: Apache-2.0                                                            *
  ************************************************************************************************ */
 
-exports.handler = (event, context, callback) => {
-    console.log('Received event:', JSON.stringify(event, null, 2));
-    const approvedDomain = process.env.APPROVED_DOMAIN;
-
-    if (approvedDomain) {
-        const regex = new RegExp(\`^[A-Za-z0-9._%+-]+@\${approvedDomain}$\`);
-        if (event.request.userAttributes.email.match(regex)) {
-            event.response.emailSubject = subject;
-            event.response.emailMessage = message(
-                event.request.codeParameter,
-                event.request.usernameParameter,
-            );
-            context.done(null, event);
-        } else {
-            const error = new Error('EMAIL_DOMAIN_DENIED_ERR');
-            context.done(error, event);
-        }
-    } else {
-        event.response.emailSubject = subject;
-        event.response.emailMessage = message(event.request.codeParameter);
-        context.done(null, event);
-    }
-};
-
 const subject = 'QnABot Signup Verification Code';
-function message(code, name) {
+
+function message(code) {
     return \`Hello, Your QnABot verification code is: \${code}\`;
 }
+
+function complete(context, error, event) {
+    if (context.done) {
+        context.done(error, event);
+    } else if (error) {
+        throw error;
+    } else {
+        return event;
+    }
+}
+
+function isEmailApproved(email, approvedDomain) {
+    if (!approvedDomain) return true;
+    
+    // Escape special regex characters in the domain
+    const escapedDomain = approvedDomain.replace(/[.*+?^\${}()|[\\]\\\\]/g, '\\\\$&');
+    const regex = new RegExp(\`^[A-Za-z0-9._%+-]+@\${escapedDomain}$\`);
+    return email.match(regex);
+}
+
+function setEmailResponse(event) {
+    event.response.emailSubject = subject;
+    event.response.emailMessage = message(event.request.codeParameter);
+}
+
+exports.handler = async (event, context) => {
+    console.log('Received event:', JSON.stringify(event, null, 2));
+
+    try {
+        const approvedDomain = process.env.APPROVED_DOMAIN;
+        const email = event.request.userAttributes.email;
+        
+        if (!isEmailApproved(email, approvedDomain)) {
+            const error = new Error('EMAIL_DOMAIN_DENIED_ERR');
+            return complete(context, error, event);
+        }
+        
+        setEmailResponse(event);
+        return complete(context, null, event);
+    } catch (error) {
+        return complete(context, error, event);
+    }
+};
 ",
         },
         "Environment": {
@@ -15355,11 +15390,13 @@ function message(code, name) {
           "Statement": [
             {
               "Action": [
-                "es:*",
+                "es:ESHttp*",
               ],
               "Effect": "Allow",
               "Resource": [
-                "*",
+                {
+                  "Fn::Sub": "\${ESVar.ESArn}/*",
+                },
               ],
             },
             {
@@ -16904,38 +16941,41 @@ const customSdkConfig = require('sdk-config/customSdkConfig');
 const region = process.env.AWS_REGION;
 const s3 = new S3Client(customSdkConfig('C022', { region }));
 
-exports.handler = (event, context, callback) => {
+exports.handler = async (event, context) => {
     console.log('Received event:', JSON.stringify(event, null, 2));
 
-    return s3.send(new ListObjectsCommand({
-        Bucket: event.bucket,
-        Prefix: event.prefix,
-        MaxKeys: event.perpage || 100,
-        Marker: event.token || null,
-    }))
-        .then((x) => {
-            console.log('s3 response for routes:', JSON.stringify(x, null, 2));
-            if (x.Contents) {
-                x.Contents?.sort((a, b) => {
-                    if (a.LastModified && b.LastModified) {
-                        return new Date(b.LastModified).getTime() - new Date(a.LastModified).getTime();
-                    }
-                    return 0;
-                });
-            }
-            const mapJobs = x?.Contents?.map((y) => ({
-                id: y.Key.split('/').pop(),
-                href: \`\${event.root}/jobs/\${event.type}/\${encodeURI(y.Key.split('/').pop())}\`,
-            }));
-            callback(null, {
-                token: x.NextMarker,
-                jobs: x.Contents ? mapJobs : [],
-            })
-        })
-        .catch((e) => callback(JSON.stringify({
+    try {
+        const result = await s3.send(new ListObjectsCommand({
+            Bucket: event.bucket,
+            Prefix: event.prefix,
+            MaxKeys: event.perpage || 100,
+            Marker: event.token || null,
+        }));
+        
+        console.log('s3 response for routes:', JSON.stringify(result, null, 2));
+        if (result.Contents) {
+            result.Contents?.sort((a, b) => {
+                if (a.LastModified && b.LastModified) {
+                    return new Date(b.LastModified).getTime() - new Date(a.LastModified).getTime();
+                }
+                return 0;
+            });
+        }
+        const mapJobs = result?.Contents?.map((y) => ({
+            id: y.Key.split('/').pop(),
+            href: \`\${event.root}/jobs/\${event.type}/\${encodeURI(y.Key.split('/').pop())}\`,
+        }));
+        
+        return {
+            token: result.NextMarker,
+            jobs: result.Contents ? mapJobs : [],
+        };
+    } catch (error) {
+        throw JSON.stringify({
             type: '[InternalServiceError]',
-            data: e,
-        })));
+            data: error,
+        });
+    }
 };
 ",
         },
@@ -17855,23 +17895,47 @@ exports.handler = (event, context, callback) => {
 *   SPDX-License-Identifier: Apache-2.0                                                            *
  ************************************************************************************************ */
 
-exports.handler = (event, context, callback) => {
-    console.log('Received event:', JSON.stringify(event, null, 2));
-    const approvedDomain = process.env.APPROVED_DOMAIN;
-
-    if (approvedDomain) {
-        const regex = new RegExp(\`^[A-Za-z0-9._%+-]+@\${approvedDomain}$\`);
-        if (event.request.userAttributes.email.match(regex)) {
-            if (event.request.userAttributes.email_verified == 'True') {
-                event.response.autoVerifyUser = true;
-            }
-            context.done(null, event);
-        } else {
-            const error = new Error('EMAIL_DOMAIN_DENIED_ERR');
-            context.done(error, event);
-        }
+function complete(context, error, event) {
+    if (context.done) {
+        context.done(error, event);
+    } else if (error) {
+        throw error;
     } else {
-        context.done(null, event);
+        return event;
+    }
+}
+
+function isEmailApproved(email, approvedDomain) {
+    if (!approvedDomain) return true;
+    
+    // Escape special regex characters in the domain
+    const escapedDomain = approvedDomain.replace(/[.*+?^\${}()|[\\]\\\\]/g, '\\\\$&');
+    const regex = new RegExp(\`^[A-Za-z0-9._%+-]+@\${escapedDomain}$\`);
+    return email.match(regex);
+}
+
+function handleAutoVerify(event) {
+    if (event.request.userAttributes.email_verified === 'True') {
+        event.response.autoVerifyUser = true;
+    }
+}
+
+exports.handler = async (event, context) => {
+    console.log('Received event:', JSON.stringify(event, null, 2));
+
+    try {
+        const approvedDomain = process.env.APPROVED_DOMAIN;
+        const email = event.request.userAttributes.email;
+        
+        if (!isEmailApproved(email, approvedDomain)) {
+            const error = new Error('EMAIL_DOMAIN_DENIED_ERR');
+            return complete(context, error, event);
+        }
+        
+        handleAutoVerify(event);
+        return complete(context, null, event);
+    } catch (error) {
+        return complete(context, error, event);
     }
 };
 ",

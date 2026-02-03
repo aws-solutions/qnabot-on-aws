@@ -86,4 +86,133 @@ describe('designer input module', () => {
         wrapper.vm.setValid(true);
         expect(wrapper.vm.$data.valid).toEqual(false);
     });
+
+    describe('validation rules', () => {
+        test('maxLength rule returns true when under limit', () => {
+            const wrapper = shallowMountWithDefaults();
+            wrapper.vm.$data.schema = { maxLength: 100 };
+            const result = wrapper.vm.$data.rules.maxLength('short text');
+            expect(result).toBe(true);
+        });
+
+        test('maxLength rule returns error string when over limit', () => {
+            const wrapper = shallowMountWithDefaults();
+            wrapper.vm.$data.schema = { maxLength: 10 };
+            const longText = 'this is a very long text that exceeds the limit';
+            const result = wrapper.vm.$data.rules.maxLength(longText);
+            expect(result).toBe('Maximum 10 characters allowed');
+        });
+
+        test('maxLength rule returns true when no maxLength defined', () => {
+            const wrapper = shallowMountWithDefaults();
+            wrapper.vm.$data.schema = {};
+            const result = wrapper.vm.$data.rules.maxLength('any text');
+            expect(result).toBe(true);
+        });
+
+        test('maxLength rule returns true when value is empty', () => {
+            const wrapper = shallowMountWithDefaults();
+            wrapper.vm.$data.schema = { maxLength: 10 };
+            const result = wrapper.vm.$data.rules.maxLength('');
+            expect(result).toBe(true);
+        });
+
+        test('schema rule returns true when validation passes', () => {
+            const wrapper = shallowMountWithDefaults();
+            wrapper.vm.$data.schema = { type: 'string', maxLength: 100 };
+            const result = wrapper.vm.$data.rules.schema('valid text');
+            expect(result).toBe(true);
+        });
+
+        test('schema rule returns error string when maxLength exceeded', () => {
+            const wrapper = shallowMountWithDefaults();
+            wrapper.vm.$data.schema = { type: 'string', maxLength: 10 };
+            const longText = 'this is a very long text that exceeds the limit';
+            const result = wrapper.vm.$data.rules.schema(longText);
+            expect(result).toContain('Maximum 10 characters allowed');
+        });
+
+        test('schema rule converts AJV errors to readable strings', () => {
+            const wrapper = shallowMountWithDefaults();
+            wrapper.vm.$data.schema = { type: 'string', maxLength: 5 };
+            const result = wrapper.vm.$data.rules.schema('too long');
+            expect(typeof result).toBe('string');
+            expect(result).not.toBe(true);
+        });
+
+        test('required rule returns true for valid non-empty string', () => {
+            const wrapper = shallowMount(inputModule, {
+                props: {
+                    modelValue: 'test',
+                    required: true,
+                    schema: { type: 'string' },
+                },
+            });
+            const result = wrapper.vm.$data.rules.required('valid text');
+            expect(result).toBe(true);
+        });
+
+        test('required rule returns error for empty string when required', () => {
+            const wrapper = shallowMount(inputModule, {
+                props: {
+                    modelValue: '',
+                    required: true,
+                    schema: { type: 'string' },
+                },
+            });
+            const result = wrapper.vm.$data.rules.required('');
+            expect(result).toBe('Required');
+        });
+
+        test('required rule returns true for empty string when not required', () => {
+            const wrapper = shallowMount(inputModule, {
+                props: {
+                    modelValue: '',
+                    required: false,
+                    schema: { type: 'string' },
+                },
+            });
+            const result = wrapper.vm.$data.rules.required('');
+            expect(result).toBe(true);
+        });
+
+        test('required rule returns true for boolean values', () => {
+            const wrapper = shallowMountWithDefaults();
+            const result = wrapper.vm.$data.rules.required(false);
+            expect(result).toBe(true);
+        });
+
+        test('noSpace rule returns error when qid contains spaces', () => {
+            const wrapper = shallowMount(inputModule, {
+                props: {
+                    modelValue: 'test id',
+                    schema: { type: 'string', name: 'qid' },
+                },
+            });
+            const result = wrapper.vm.$data.rules.noSpace('test id');
+            expect(result).toBe('No Spaces Allowed');
+        });
+
+        test('noSpace rule returns true when qid has no spaces', () => {
+            const wrapper = shallowMount(inputModule, {
+                props: {
+                    modelValue: 'testid',
+                    schema: { type: 'string', name: 'qid' },
+                },
+            });
+            const result = wrapper.vm.$data.rules.noSpace('testid');
+            expect(result).toBe(true);
+        });
+
+        test('noSpace rule returns true for non-qid fields', () => {
+            const wrapper = shallowMount(inputModule, {
+                props: {
+                    modelValue: 'test value',
+                    schema: { type: 'string', name: 'other' },
+                },
+            });
+            const result = wrapper.vm.$data.rules.noSpace('test value');
+            expect(result).toBe(true);
+        });
+    });
 });

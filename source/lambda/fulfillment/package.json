@@ -1,6 +1,6 @@
 {
     "name": "fulfillment",
-    "version": "7.2.4",
+    "version": "7.3.0",
     "description": "QnABot Lambda handling fulfillment of user requests",
     "main": "handler.js",
     "scripts": {
@@ -33,6 +33,6 @@
     "overrides": {
         "cross-spawn": "^7.0.6",
         "jose": "^4.15.5",
-        "sinon": "^19.0.2"
+        "sinon": "^21.0.1"
     }
 }

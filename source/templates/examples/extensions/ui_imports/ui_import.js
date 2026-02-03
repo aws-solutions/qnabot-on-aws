@@ -12,49 +12,65 @@ const handlebars = require('handlebars');
 const region = process.env.AWS_REGION;
 const s3 = new S3Client(customSdkConfig('C018', { region }));
 
-exports.handler = function (event, context, cb) {
+async function sendCfnResponse(event, context, status) {
+    if (!event.ResponseURL) return;
+    
+    return new Promise((resolve, reject) => {
+        response.send(event, context, status, {}, undefined, (error) => {
+            if (error) {
+                console.error('Error sending response:', error);
+                reject(error);
+            } else {
+                console.log('Response sent successfully');
+                resolve();
+            }
+        });
+    });
+}
+
+function processFileContent(content, properties) {
+    // Only process handlebars if {{photos}} is referenced
+    // This avoids breaking imports that contain handlebars syntax
+    if (content.indexOf('{{photos}}') >= 0) {
+        const template = handlebars.compile(content);
+        return template(properties);
+    }
+    return content;
+}
+
+async function uploadUIImports(bucket, properties) {
+    const files = fs.readdirSync(`${__dirname}/content`);
+    const uploads = files.map((filename) => {
+        const rawContent = fs.readFileSync(`${__dirname}/content/${filename}`, 'utf-8');
+        const processedContent = processFileContent(rawContent, properties);
+        
+        const params = {
+            Bucket: bucket,
+            Key: `examples/documents/${filename}`,
+            Body: processedContent,
+        };
+        return s3.send(new PutObjectCommand(params));
+    });
+    
+    return Promise.all(uploads);
+}
+
+exports.handler = async (event, context) => {
     console.log(JSON.stringify(event, null, 2));
 
     try {
         if (event.RequestType !== 'Delete') {
-            const files = fs.readdirSync(`${__dirname}/content`);
-            Promise.all(files.map((x) => {
-                const name = x;
-                const temp_text = fs.readFileSync(`${__dirname}/content/${x}`, 'utf-8');
-                let text = temp_text;
-                // by parsing handlebars during an import of json, it rules out being able to import handlebar syntax.
-                // the only know case of using handlebars to change content of an import is using {{photos}}
-                // only run handlebars processing if {{photos}} is referenced. All other handlebars syntax should
-                // just be imported as handlebars.
-                if (temp_text.indexOf('{{photos}}') >= 0) {
-                    const temp = handlebars.compile(temp_text);
-                    text = temp(event.ResourceProperties);
-                }
-                const params = {
-                    Bucket: event.ResourceProperties.Bucket,
-                    Key: `examples/documents/${name}`,
-                    Body: text,
-                };
-                const putObjectCmd = new PutObjectCommand(params);
-                return s3.send(putObjectCmd);
-            }))
-                .then((result) => {
-                    console.log(result);
-                    if (event.ResponseURL) {
-                        response.send(event, context, response.SUCCESS);
-                    } else {
-                        cb(null);
-                    }
-                })
-                .catch((e) => {
-                    console.log(e);
-                    response.send(event, context, response.FAILED);
-                });
-        } else {
-            response.send(event, context, response.SUCCESS);
+            const results = await uploadUIImports(
+                event.ResourceProperties.Bucket,
+                event.ResourceProperties
+            );
+            console.log(results);
         }
+        
+        await sendCfnResponse(event, context, response.SUCCESS);
     } catch (e) {
         console.log(e);
-        response.send(event, context, response.FAILED);
+        await sendCfnResponse(event, context, response.FAILED);
+        throw e;
     }
 };

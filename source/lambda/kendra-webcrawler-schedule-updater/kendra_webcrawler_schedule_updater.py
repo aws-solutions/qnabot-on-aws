@@ -24,7 +24,7 @@ logger.setLevel(logging.INFO)
 
 
 def create_cron_expression(schedule):
-    rate_regex = "(rate\()(\d\s(?:day|week|month)s?)(\))"
+    rate_regex = r"(rate\()(\d\s(?:day|week|month)s?)(\))"
     match = re.match(rate_regex, schedule)
     if match is not None:
         schedule = match.group(2)
@@ -34,7 +34,7 @@ def create_cron_expression(schedule):
     elif schedule is None or schedule == "":
         return ""
     else:
-        logger.warn("The schedule must be specified as either rate(day(s) | week(s) | month(s)) or daily | weekly | monthly")
+        logger.warning("The schedule must be specified as either rate(day(s) | week(s) | month(s)) or daily | weekly | monthly")
         return "INVALID"
 
     now = datetime.datetime.now()
@@ -79,7 +79,7 @@ def handler(event, context):  # NOSONAR Lambda handler
 
     schedule = create_cron_expression(schedule)
     if schedule == "INVALID":
-        logger.warn("The cron schedule specified by KENDRA_INDEXER_SCHEDULE " +
+        logger.warning("The cron schedule specified by KENDRA_INDEXER_SCHEDULE " +
                      "is invalid. Schedule: ${schedule}. Crawling will not be done on a schedule/")
         schedule = ""
     data_source_id = get_data_source_id(index_id, name)

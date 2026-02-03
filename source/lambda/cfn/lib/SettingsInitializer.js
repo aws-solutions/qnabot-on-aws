@@ -10,8 +10,24 @@ const customSdkConfig = require('./util/customSdkConfig');
 const settingsJson = require('./DefaultSettings.json');
 
 const region = process.env.AWS_REGION || 'us-east-1';
-const dynamodb = new DynamoDBClient(customSdkConfig({ region }));
-const ssm = new SSMClient(customSdkConfig({ region }));
+
+// Lazy-load SDK clients to avoid Smithy v4 initialization issues
+let dynamodb;
+let ssm;
+
+function getDynamoDBClient() {
+    if (!dynamodb) {
+        dynamodb = new DynamoDBClient(customSdkConfig({ region }));
+    }
+    return dynamodb;
+}
+
+function getSSMClient() {
+    if (!ssm) {
+        ssm = new SSMClient(customSdkConfig({ region }));
+    }
+    return ssm;
+}
 
 async function updateDefaultSettingsFromParams(params, tableName) {
     // This function writes default settings based on the parameters that were passed in on template creation/update
@@ -46,7 +62,7 @@ async function updateDefaultSettingsFromParams(params, tableName) {
                 ExpressionAttributeValues: marshall({ ':val': value })
             };
             const updateCommand = new UpdateItemCommand(updateParams);
-            await dynamodb.send(updateCommand);
+            await getDynamoDBClient().send(updateCommand);
         } catch(error) {
             throw new Error(`Error updating default settings from params: ${error}`);
         }
@@ -84,7 +100,7 @@ async function updatePrivateSettings(params, tableName, writePrivateSettings) {
                 };
 
                 const putCommand = new PutItemCommand(putParams);
-                await dynamodb.send(putCommand);
+                await getDynamoDBClient().send(putCommand);
             }
             else {
                 const updateParams = {
@@ -94,7 +110,7 @@ async function updatePrivateSettings(params, tableName, writePrivateSettings) {
                     ExpressionAttributeValues: marshall({ ':val': value })
                 };
                 const updateCommand = new UpdateItemCommand(updateParams);
-                await dynamodb.send(updateCommand);
+                await getDynamoDBClient().send(updateCommand);
             }
         }
         catch(error) {
@@ -109,13 +125,24 @@ async function writeSettingsToDynamoDB(tableName, settings) {
 
     Object.entries(settings).forEach(([settingName, valueAndCategory]) => {
         try {
-            const { SettingCategory, DefaultValue } = valueAndCategory;
+            if (!valueAndCategory || typeof valueAndCategory !== 'object') {
+                console.warn(`Skipping malformed setting: ${settingName}`);
+                return;
+            }
+
+            const SettingCategory = valueAndCategory.SettingCategory;
+            const DefaultValue = valueAndCategory.DefaultValue;
+
+            if (!SettingCategory) {
+                console.warn(`Skipping setting with missing SettingCategory: ${settingName}`);
+                return;
+            }
 
             const item = {
                 SettingName: settingName,
                 SettingValue: "",
                 SettingCategory: SettingCategory,
-                DefaultValue: DefaultValue,
+                DefaultValue: DefaultValue !== undefined ? DefaultValue : "",
                 nonce: 0
             };
 
@@ -126,10 +153,10 @@ async function writeSettingsToDynamoDB(tableName, settings) {
 
             const putCommand = new PutItemCommand(putParams);
             // Push the promise into the array
-            writePromises.push(dynamodb.send(putCommand));
+            writePromises.push(getDynamoDBClient().send(putCommand));
         }
         catch(error) {
-            throw new Error(`Error writing settings to DynamoDB: ${error}`);
+            console.error(`Error processing setting ${settingName}:`, error);
         }
     });
 
@@ -139,12 +166,22 @@ async function writeSettingsToDynamoDB(tableName, settings) {
 async function addNewSettings(tableName, defaultSettings) {
     for (const [settingName, valueAndCategory] of Object.entries(defaultSettings)) {
         try {
+            if (!valueAndCategory || typeof valueAndCategory !== 'object') {
+                console.warn(`Skipping malformed setting during add: ${settingName}`, valueAndCategory);
+                continue;
+            }
+
+            if (!valueAndCategory.SettingCategory) {
+                console.warn(`Skipping setting with missing SettingCategory during add: ${settingName}`);
+                continue;
+            }
+
             const getParams = {
                 TableName: tableName,
                 Key: marshall({ SettingName: settingName })
             };
             const getCommand = new GetItemCommand(getParams);
-            const getResult = await dynamodb.send(getCommand);
+            const getResult = await getDynamoDBClient().send(getCommand);
 
             if (!getResult.Item) {
                 console.log(`Adding new setting: ${settingName}`);
@@ -152,7 +189,7 @@ async function addNewSettings(tableName, defaultSettings) {
                     SettingName: settingName,
                     SettingValue: "",
                     SettingCategory: valueAndCategory.SettingCategory,
-                    DefaultValue: valueAndCategory.DefaultValue,
+                    DefaultValue: valueAndCategory.DefaultValue || "",
                     nonce: 0
                 };
 
@@ -162,13 +199,13 @@ async function addNewSettings(tableName, defaultSettings) {
                 };
 
                 const putCommand = new PutItemCommand(putParams);
-                await dynamodb.send(putCommand);
-
-                }
-            } catch (error) {
-                throw new Error(`Error adding new settings: ${error}`);
+                await getDynamoDBClient().send(putCommand);
             }
+        } catch (error) {
+            console.error(`Error adding new setting ${settingName}:`, error);
+            throw new Error(`Error adding new settings: ${error}`);
         }
+    }
 }
 
 
@@ -179,7 +216,7 @@ async function migrateFromSSM(tableName, ssmParameters) {
             WithDecryption: true
         };
         const getCommand = new GetParameterCommand(getParams);
-        const getResponse = await ssm.send(getCommand);
+        const getResponse = await getSSMClient().send(getCommand);
         const ssmValue = JSON.parse(getResponse.Parameter.Value);
         try {
             for (const [key,value] of Object.entries(ssmValue)) {
@@ -198,7 +235,7 @@ async function migrateFromSSM(tableName, ssmParameters) {
                         };
 
                         const putCommand = new PutItemCommand(putParams);
-                        await dynamodb.send(putCommand);
+                        await getDynamoDBClient().send(putCommand);
                 } else if(ssmParameter.includes('CustomQnABotSettings')) {
                         if (settingsJson[key]) {
                             const updateParams = {
@@ -208,7 +245,7 @@ async function migrateFromSSM(tableName, ssmParameters) {
                                 ExpressionAttributeValues: marshall({ ':val': value })
                             };
                             const updateCommand = new UpdateItemCommand(updateParams);
-                            await dynamodb.send(updateCommand);
+                            await getDynamoDBClient().send(updateCommand);
                         } else {
                                 const item = {
                                 SettingName: key,
@@ -223,7 +260,7 @@ async function migrateFromSSM(tableName, ssmParameters) {
                                 };
 
                                 const putCommand = new PutItemCommand(putParams);
-                                await dynamodb.send(putCommand);
+                                await getDynamoDBClient().send(putCommand);
                         }
                 }
             }
@@ -284,6 +321,7 @@ module.exports = class SettingsInitializer {
 
         } catch (error) {
             console.error('Error updating settings:', error);
+            reply(error);
         }
     }
 

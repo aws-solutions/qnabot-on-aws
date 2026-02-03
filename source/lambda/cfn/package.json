@@ -1,6 +1,6 @@
 {
     "name": "cfn",
-    "version": "7.2.4",
+    "version": "7.3.0",
     "description": "QnABot Cfn Lambda",
     "main": "index.js",
     "scripts": {
@@ -33,13 +33,13 @@
         "body-parser": "^1.20.3",
         "cfn-lambda": "^5.1.0",
         "jszip": "^3.10.1",
-        "lodash": "^4.17.21"
+        "lodash": "^4.17.23"
     },
     "overrides": {
         "async": "^2.6.4",
         "cross-spawn": "7.0.6",
         "qs@<6.5.3": "^6.5.3",
-        "sinon": "^19.0.2",
+        "sinon": "^21.0.1",
         "micromatch": "^4.0.8",
         "qs": "^6.14.1"
     }

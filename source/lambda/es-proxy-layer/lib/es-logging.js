@@ -22,7 +22,7 @@ function stringifySessionAttribues(res) {
     }
 }
 
-module.exports = async function (event, context, callback) {
+module.exports = async function (event, context) {
     // data to send to general metrics logging
     const date = new Date();
     const now = date.toISOString();

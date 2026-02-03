@@ -11,13 +11,15 @@ const _ = require('lodash');
 const qnabot = require('qnabot/logging');
 const request = require('./request');
 
-module.exports = function (event, context, callback) {
-    sendDelete('metrics', process.env.METRICS_DELETE_RANGE_MINUTES, callback);
-    sendDelete('feedback', process.env.FEEDBACK_DELETE_RANGE_MINUTES, callback);
+module.exports = async function (event, context) {
+    await Promise.all([
+        sendDelete('metrics', process.env.METRICS_DELETE_RANGE_MINUTES),
+        sendDelete('feedback', process.env.FEEDBACK_DELETE_RANGE_MINUTES)
+    ]);
     return event;
 };
 
-function sendDelete(indexName, timeBack, callback) {
+async function sendDelete(indexName, timeBack) {
     const query = bodybuilder()
         .query(
             'range',
@@ -29,14 +31,16 @@ function sendDelete(indexName, timeBack, callback) {
         .build();
     qnabot.debug('OpenSearch Query', JSON.stringify(query, null, 2));
     qnabot.log('Got Here cleanmetrics');
-    return request({
-        url: url.resolve(`https://${process.env.ES_ADDRESS}`, `/${process.env.ES_INDEX}-${indexName}/_delete_by_query`),
-        method: 'POST',
-        body: query,
-    })
-        .then((result) => {
-            qnabot.log(`ES result:${JSON.stringify(result, null, 2)}`);
-            callback(null, _.get(result, 'hits.hits[0]._source', {}));
-        })
-        .catch(callback);
+    try {
+        const result = await request({
+            url: url.resolve(`https://${process.env.ES_ADDRESS}`, `/${process.env.ES_INDEX}-${indexName}/_delete_by_query`),
+            method: 'POST',
+            body: query,
+        });
+        qnabot.log(`ES result:${JSON.stringify(result, null, 2)}`);
+        return _.get(result, 'hits.hits[0]._source', {});
+    } catch (error) {
+        qnabot.error('Error in sendDelete:', error);
+        throw error;
+    }
 }

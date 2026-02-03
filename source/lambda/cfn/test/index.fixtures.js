@@ -5,6 +5,7 @@
 
 exports.event = function() {
     const response = {
+        RequestType: 'Create',
         ResourceType: 'Custom::LexBot',
         StackId: 'mock_stack_id',
         RequestId: 'mock_request_id',

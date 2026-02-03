@@ -12,7 +12,7 @@ const lambda = new LambdaClient(customSdkConfig('C002', { region }));
 const s3 = new S3Client(customSdkConfig('C022', { region }));
 const crypto = require('crypto');
 
-exports.handler = async function (event, context, callback) {
+exports.handler = async function (event, context) {
     const token = crypto.randomBytes(16).toString('base64');
     const bucket = process.env.STATUS_BUCKET;
     const lexV2StatusFile = process.env.LEXV2_STATUS_KEY;
@@ -37,5 +37,5 @@ exports.handler = async function (event, context, callback) {
     };
     const invokeCmd = new InvokeCommand(invokeParams);
     await lambda.send(invokeCmd);
-    callback(null, { token });
+    return { token };
 };

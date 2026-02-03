@@ -68,7 +68,7 @@ class TestLambdaFunction(unittest.TestCase):
                 }
             ]
         )
-        self.putDynamoDB({"ALT_SEARCH_KENDRA_MAX_DOCUMENT_COUNT":"5","ENABLE_KENDRA_WEB_INDEXER":"true", "KENDRA_WEB_PAGE_INDEX":"mock_kendra_index", "PRIVATE_SETTING":"private"}, self.dynamodb_client)
+        self.putDynamoDB({"ALT_SEARCH_KENDRA_MAX_DOCUMENT_COUNT":"5","ENABLE_KENDRA_WEB_INDEXER":"true", "KENDRA_WEB_PAGE_INDEX":"12345678-1234-1234-1234-123456789012", "PRIVATE_SETTING":"private"}, self.dynamodb_client)
         patcher = patch('kendra_webcrawler_status.client')
         self.addCleanup(patcher.stop)
         self.kendra_client_mock = patcher.start()

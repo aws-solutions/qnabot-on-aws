@@ -11,10 +11,7 @@ const text = require('../text.js');
 
 describe('when invoking lambda to obtain schema', () => {
     it("should return a correctly formatted object", async () => {
-        let result;
-        lambda.handler(null, null, (error, response) => {
-            result = response
-        });
+        const result = await lambda.handler(null, null);
 
         expect(result).toEqual({
             quiz: quiz,

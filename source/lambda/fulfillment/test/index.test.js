@@ -35,80 +35,44 @@ describe('when calling lambda handler function', () => {
         jest.clearAllMocks();
     });
 
-    test('should successfully return request response', done => {
-        function callback(error, data) {
-            if (error) {
-                done();
-                return;
-            }
-            try {
-                expect(data).toEqual(indexFixtures.mockResponse.out);
-                done();
-            } catch (error) {
-                done(error);
-            }
-        }
-        fulfillment.handler(indexFixtures.mockRequest, null, callback);
+    test('should successfully return request response', async () => {
+        const result = await fulfillment.handler(indexFixtures.mockRequest, null);
+        expect(result).toEqual(indexFixtures.mockResponse.out);
     });
 
-    test('processing throws error and action is END', done => {
-        function callback(error, data) {
-            try {
-                expect(error).toBe(null);
-                done();
-            }
-            catch (error) {
-                done(error);
-            }
-        };
+    test('processing throws error and action is END', async () => {
         parse.mockImplementation(() => {
             throw {
                 "action": "END",
                 "error": "Mock error"
             };
         });
-        fulfillment.handler(indexFixtures.mockRequest, null, callback);
+        const result = await fulfillment.handler(indexFixtures.mockRequest, null);
+        expect(result).toBe(null);
     });
 
-    test('processing throws error and action is RESPOND', done => {
-        function callback(error, data) {
-            try {
-                expect(data).toBe("Test error message");
-                done();
-            }
-            catch (error) {
-                done(error);
-            }
-        };
+    test('processing throws error and action is RESPOND', async () => {
         parse.mockImplementation(() => {
             throw {
                 "action": "RESPOND",
                 "message": "Test error message"
             };
         });
-        fulfillment.handler(indexFixtures.mockRequest, null, callback);
+        const result = await fulfillment.handler(indexFixtures.mockRequest, null);
+        expect(result).toBe("Test error message");
     });
 
-    test('processing throws generic error', done => {
-        function callback(error, data) {
-            try {
-                expect(error).toEqual({
-                    "error": "Test error"
-                });
-                done();
-            }
-            catch (error) {
-                done(error);
-            }
-        };
+    test('processing throws generic error', async () => {
         parse.mockImplementation(() => {
             throw {
                 "error": "Test error"
             };
         });
-        fulfillment.handler(indexFixtures.mockRequest, null, callback);
+        await expect(fulfillment.handler(indexFixtures.mockRequest, null)).rejects.toEqual({
+            "error": "Test error"
+        });
     });
-    test('should skip middleware when _skipSteps and _skipSteps are set', done => {
+    test('should skip middleware when _skipSteps and _skipSteps are set', async () => {
 
         preprocess.mockImplementation((req, res) => ({
             req: { 
@@ -118,56 +82,41 @@ describe('when calling lambda handler function', () => {
             res: { ...res }
         }));
     
-        function callback(error, data) {
-            try {
-                expect(parse).toHaveBeenCalled();
-                expect(preprocess).toHaveBeenCalled();
-                expect(query).not.toHaveBeenCalled();  // Query should be skipped
-                expect(hook).not.toHaveBeenCalled();  // Hook should be skipped
-                expect(assemble).toHaveBeenCalled();
-                expect(cache).toHaveBeenCalled();
-                expect(userInfo).toHaveBeenCalled();
-                expect(data).toEqual(indexFixtures.mockResponse.out);
-
-                done();
-            } catch (error) {
-                done(error);
-            }
-        }
-        
         const request = {
             _event: "mock event",
             _settings: {},
             _fulfillment: {},
         };
         
-        fulfillment.handler(request, null, callback);
+        const result = await fulfillment.handler(request, null);
+        
+        expect(parse).toHaveBeenCalled();
+        expect(preprocess).toHaveBeenCalled();
+        expect(query).not.toHaveBeenCalled();  // Query should be skipped
+        expect(hook).not.toHaveBeenCalled();  // Hook should be skipped
+        expect(assemble).toHaveBeenCalled();
+        expect(cache).toHaveBeenCalled();
+        expect(userInfo).toHaveBeenCalled();
+        expect(result).toEqual(indexFixtures.mockResponse.out);
     });
     
     
     
 
-    test('should not skip if _skipSteps is missing', done => {
-        function callback(error, data) {
-            try {
-                expect(parse).toHaveBeenCalled();
-                expect(preprocess).toHaveBeenCalled();
-                expect(query).toHaveBeenCalled();
-                expect(hook).toHaveBeenCalled();
-                expect(cache).toHaveBeenCalled();
-                expect(userInfo).toHaveBeenCalled();
-                expect(data).toEqual(indexFixtures.mockResponse.out);
-                done();
-            } catch (error) {
-                done(error);
-            }
-        }
-        
+    test('should not skip if _skipSteps is missing', async () => {
         const requestWithIncompleteSkip = {
             ...indexFixtures.mockRequest,
         };
         
-        fulfillment.handler(requestWithIncompleteSkip, null, callback);
+        const result = await fulfillment.handler(requestWithIncompleteSkip, null);
+        
+        expect(parse).toHaveBeenCalled();
+        expect(preprocess).toHaveBeenCalled();
+        expect(query).toHaveBeenCalled();
+        expect(hook).toHaveBeenCalled();
+        expect(cache).toHaveBeenCalled();
+        expect(userInfo).toHaveBeenCalled();
+        expect(result).toEqual(indexFixtures.mockResponse.out);
     });
 
 });

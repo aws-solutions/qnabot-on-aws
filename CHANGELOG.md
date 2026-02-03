@@ -5,6 +5,34 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [7.3.0] - 2026-02-03
+
+__*Note: we recommend that you first deploy these changes in a non-production environment. This is true for all releases, but especially important for minor and major releases.*__
+
+### Added
+
+- New conditional chaining evaluation process [Issue #855](https://github.com/aws-solutions/qnabot-on-aws/issues/855)
+- Operational metrics for conditional chaining
+
+### Changed
+
+- Updated Lambda runtimes to Node.js 24 and Python 3.14 [Issue #848](https://github.com/aws-solutions/qnabot-on-aws/issues/848)
+- Updated AWS SDK v3 dependencies
+- Scoped Fulfillment Lambda IAM policy to least privilege for OpenSearch access
+
+### Fixed
+
+- Fixed UI bug where existing questions showed original data when user cancels updates
+- Fixed character validation checks for adding and editing fields in Content Designer
+
+### Security
+
+- Removed static-eval usage and replaced with limited, custom expression evaluator [Issue #855](https://github.com/aws-solutions/qnabot-on-aws/issues/855)
+- Updated lodash to `4.17.23`
+- Updated diff to `8.0.3`
+- Updated eslint to `9.39.2`
+- Updated fast-xml-parser to `5.3.4`
+
 ## [7.2.4] - 2026-01-14
 
 ### Security

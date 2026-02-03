@@ -10,6 +10,6 @@ jest.mock('../lib');
 describe('when calling lambda handler function', () => {
     test('processing throws error and action is END', async () => {
         warmer.perform.mockReturnValue(('success'));
-        expect(await osWarmer.warmer({}, null, null)).toEqual("complete");
+        expect(await osWarmer.warmer({}, null)).toEqual("complete");
     });
 });

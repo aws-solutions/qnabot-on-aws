@@ -34,7 +34,7 @@ const invokeLambda = async function invokeLambda(event) {
     });
 };
 
-exports.handler = async function (event, context, callback) {
+exports.handler = async function (event, context) {
     try {
         const getObjCmd = new GetObjectCommand({
             Bucket: process.env.STATUS_BUCKET,

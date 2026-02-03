@@ -13,8 +13,8 @@ const middleware = fs.readdirSync(`${__dirname}/${lib}`)
         router.add(require(`${lib}/${name}`));
     });
 
-exports.handler = function (event, context, callback) {
-    router.start(event, callback);
+exports.handler = async (event, context) => {
+    return await router.start(event);
 };
 
 // Increment the return value to force a new version on update and adjust alias to the use the new version

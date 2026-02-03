@@ -11,20 +11,20 @@ module.exports = class router {
         this.middleware = [];
     }
 
-    async start(event, callback) {
+    async start(event) {
         qnabot.debug(`Request:${JSON.stringify(event, null, 2)}`);
         try {
             const res = await this._walk({ _event: event });
             qnabot.log('final:', JSON.stringify(res, null, 2));
-            callback(null, res);
+            return res;
         } catch (e) {
             qnabot.log('throwing response:', JSON.stringify(e));
             if (e.action === 'END') {
-                callback(null);
+                return null;
             } else if (e.action === 'RESPOND') {
-                callback(null, e.message);
+                return e.message;
             } else {
-                callback(e);
+                throw e;
             }
         }
     }

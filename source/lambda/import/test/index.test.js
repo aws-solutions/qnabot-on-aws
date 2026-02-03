@@ -67,7 +67,7 @@ describe('when calling start function', () => {
     });
 
     it('should call start and update status correctly', async () => {
-        await start(request, null, jest.fn());
+        await start(request, null);
         expect(qnabot.log).toHaveBeenCalledWith('starting');
         expect(s3Mock).toHaveReceivedCommandTimes(PutObjectCommand, 2);
     });
@@ -75,11 +75,8 @@ describe('when calling start function', () => {
     it('should handle an error', async () => {
         const error = new Error('test error');
         s3Mock.on(PutObjectCommand).rejects(error);
-        const mockFn = jest.fn();
-        await start(request, null, mockFn);
-        expect(mockFn).toHaveBeenCalledTimes(1);
+        await expect(start(request, null)).rejects.toThrow();
         expect(qnabot.log).toHaveBeenCalledWith('An error occured in start function: ', error);
-        expect(mockFn).toHaveBeenCalledWith('{"type":"[InternalServiceError]","data":{}}');
     });
 });
 
@@ -149,7 +146,7 @@ describe('when calling step function', () => {
             .on(GetObjectCommand)
             .resolvesOnce({ Body: sdkStream1, ContentRange: 'bytes 0-1299/1300' })
             .resolvesOnce({ Body: sdkStream2, ContentRange: 'bytes 0-1299/1300' });
-        await step(request, null, jest.fn());
+        await step(request, null);
         expect(qnabot.log).toHaveBeenCalledWith('step');
         expect(s3Mock).toHaveReceivedCommandTimes(GetObjectCommand, 2);
         expect(s3Mock).toHaveReceivedNthCommandWith(2, GetObjectCommand, {
@@ -206,7 +203,7 @@ describe('when calling step function', () => {
             .on(GetObjectCommand)
             .resolvesOnce({ Body: sdkStream1, ContentRange: 'bytes 0-1299/1300' })
             .resolvesOnce({ Body: sdkStream2, ContentRange: 'bytes 0-1299/1300' });
-        await step(request, null, jest.fn());
+        await step(request, null);
         expect(qnabot.log).toHaveBeenCalledWith('step');
         expect(qnabot.log).toHaveBeenCalledWith('next content range: 133 - 20133');
         expect(s3Mock).toHaveReceivedCommandTimes(GetObjectCommand, 2);
@@ -235,9 +232,7 @@ describe('when calling step function', () => {
 
         s3Mock.on(GetObjectCommand).resolvesOnce({ Body: sdkStream1 });
 
-        const mockFn = jest.fn();
-        await step(request, null, mockFn);
-        expect(mockFn).toHaveBeenCalledTimes(0);
+        await step(request, null);
         expect(s3Mock).toHaveReceivedCommandTimes(GetObjectCommand, 1);
         expect(s3Mock).toHaveReceivedNthCommandWith(2, GetObjectCommand, {
             'Bucket': 'qna-test-importbucket',
@@ -248,12 +243,9 @@ describe('when calling step function', () => {
     it('should handle an error with first GetObjectCommand', async () => {
         const error = new Error('test error');
         s3Mock.on(GetObjectCommand).rejects(error);
-        const mockFn = jest.fn();
-        await step(request, null, mockFn);
-        expect(mockFn).toHaveBeenCalledTimes(1);
+        await expect(step(request, null)).rejects.toThrow('test error');
         expect(s3Mock).toHaveReceivedCommandTimes(GetObjectCommand, 1);
         expect(qnabot.log).toHaveBeenCalledWith('An error occured while getting parsing for config: ', error);
-        expect(mockFn).toHaveBeenCalledWith(error);
     });
 
     it('should handle an error with second GetObjectCommand', async () => {
@@ -281,9 +273,7 @@ describe('when calling step function', () => {
             'VersionId': undefined
         }).rejects(error);
 
-        const mockFn = jest.fn();
-        await step(request, null, mockFn);
-        expect(mockFn).toHaveBeenCalledTimes(1);
+        await expect(step(request, null)).rejects.toThrow('test error');
         expect(s3Mock).toHaveReceivedCommandTimes(GetObjectCommand, 2);
         expect(s3Mock).toHaveReceivedNthCommandWith(2, GetObjectCommand, {
             'Bucket': 'qna-test-importbucket',
@@ -299,12 +289,10 @@ describe('when calling step function', () => {
         expect(s3Mock).toHaveReceivedCommandWith(PutObjectCommand, {"Body": "{\"progress\":0,\"time\":{\"rounds\":0},\"status\":\"test error\",\"message\":\"{}\"}", "Bucket": "contentDesignerOutputBucket", "Key": "status-import/import_questions.json"});
         
         expect(qnabot.log).toHaveBeenCalledWith('An error occured while config status was InProgress: ', error);
-        expect(mockFn).toHaveBeenCalledWith(error);
     });
 
     it('should handle an error with buffer', async () => {
         jest.spyOn(qnabotSettings, 'getSettings').mockResolvedValue({ EMBEDDINGS_ENABLE: false });
-
 
         const mockOptions = {
             'progress': 0,
@@ -331,7 +319,6 @@ describe('when calling step function', () => {
             'key': 'data/import_questions.json',
             'version': 'testVersion'
         };
-        const syntaxError = new SyntaxError('Unexpected token \'u\', "undefined{"... is not valid JSON');
         const stream1 = new Readable();
         stream1.push(JSON.stringify(mockOptions));
         stream1.push(null);
@@ -347,9 +334,7 @@ describe('when calling step function', () => {
             .resolvesOnce({ Body: sdkStream1 })
             .resolvesOnce({ Body: sdkStream2, ContentRange: 'bytes 0-2525/2526' });
 
-        const mockFn = jest.fn();
-        await step(request, null, mockFn);
-        expect(mockFn).toHaveBeenCalledTimes(1);
+        await step(request, null);
         expect(s3Mock).toHaveReceivedCommandTimes(GetObjectCommand, 2);
         expect(s3Mock).toHaveReceivedNthCommandWith(2, GetObjectCommand, {
             'Bucket': 'qna-test-importbucket',
@@ -362,7 +347,6 @@ describe('when calling step function', () => {
             'VersionId': undefined
         });
         expect(s3Mock).toHaveReceivedCommandTimes(PutObjectCommand, 1);
-        expect(qnabot.log).toHaveBeenCalledWith('An error occured while processing question array: ', syntaxError);
     });
 
 
@@ -414,7 +398,7 @@ describe('when calling step function', () => {
             .on(GetObjectCommand)
             .resolvesOnce({ Body: sdkStream1, ContentRange: 'bytes 0-1299/1300' })
             .resolvesOnce({ Body: sdkStream2, ContentRange: 'bytes 0-1299/1300' });
-        await step(xlsxRequest, null, jest.fn());
+        await step(xlsxRequest, null);
         expect(qnabot.log).toHaveBeenCalledWith('step');
         expect(s3Mock).toHaveReceivedCommandTimes(GetObjectCommand, 3);
         expect(s3Mock).toHaveReceivedNthCommandWith(2, GetObjectCommand, {

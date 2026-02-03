@@ -1,6 +1,6 @@
 {
     "name": "qnabot-common-layer",
-    "version": "7.2.4",
+    "version": "7.3.0",
     "description": "Lambda layers used to provide common logging and utility functions",
     "repository": {
         "type": "git",
@@ -24,7 +24,7 @@
         "@aws-sdk/client-ssm": "^3.699.0",
         "@aws-sdk/client-dynamodb": "^3.699.0",
         "@aws-sdk/util-dynamodb": "^3.699.0",
-        "lodash": "^4.17.21"
+        "lodash": "^4.17.23"
     },
     "devDependencies": {
         "aws-sdk-client-mock": "^4.1.0",
@@ -33,6 +33,6 @@
     "overrides": {
         "cross-spawn": "^7.0.6",
         "micromatch": "^4.0.8",
-        "sinon": "^19.0.2"
+        "sinon": "^21.0.1"
     }
 }

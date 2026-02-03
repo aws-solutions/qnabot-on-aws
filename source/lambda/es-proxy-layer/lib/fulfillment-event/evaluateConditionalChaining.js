@@ -5,12 +5,11 @@
 
 const _ = require('lodash');
 const qnabot = require('qnabot/logging');
-const staticEval = require('static-eval');
+const { safeEvaluate } = require('./safeExpressionEvaluator');
 const { invokeLambda } = require('./invokeLambda');
 const { mergeNext } = require('./mergeNext');
 const { encryptor } = require('./encryptor');
 const { getHit } = require('./getHit');
-const esprimaParse = require('esprima').parse;
 
 
 function handleErrors(message, errors) {
@@ -68,12 +67,11 @@ async function evaluateNextQuestion(conditionalChaining, req, res, errors, next_
         };
         qnabot.log('Evaluating:', conditionalChaining);
         qnabot.debug('Sandbox:', JSON.stringify(sandbox, null, 2));
-        // safely evaluate conditionalChaining expression.. throws an exception if there is a syntax error
-        const ast = esprimaParse(conditionalChaining).body[0].expression;
+        // safely evaluate conditionalChaining expression using custom parser
         try {
-            next_q = staticEval(ast, sandbox);
+            next_q = safeEvaluate(conditionalChaining, sandbox);
         } catch (e) {
-            const message = `Syntax Error evaluating conditional chaining rule: ${conditionalChaining}`;
+            const message = `Error evaluating conditional chaining rule: ${conditionalChaining} - ${e.message}`;
             handleErrors(message, errors);
         }
     }

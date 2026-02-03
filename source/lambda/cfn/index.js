@@ -7,8 +7,23 @@ const cfnLambda = require('cfn-lambda');
 const _ = require('lodash');
 const response = require('./lib/util/response');
 
-exports.handler = function (event, context, cb) {
-    dispatch(event, context, cb);
+exports.handler = async (event, context) => {
+    return new Promise((resolve, reject) => {
+        // Override context.done to resolve our Promise
+        context.done = (error, result) => {
+            if (error) {
+                reject(error);
+            } else {
+                resolve(result);
+            }
+        };
+        
+        try {
+            dispatch(event, context);
+        } catch (error) {
+            reject(error);
+        }
+    });
 };
 
 const targets = {
@@ -32,7 +47,7 @@ const targets = {
 };
 const Lex = require('./lib/lex');
 
-function dispatch(event, context, cb) {
+function dispatch(event, context) {
     console.log('event', JSON.stringify(event, null, 2));
     const type = event.ResourceType.match(/Custom::(.*)/);
     const Lextype = event.ResourceType.match(/Custom::Lex(Bot|Alias|SlotType|Intent)/);
@@ -59,9 +74,9 @@ function dispatch(event, context, cb) {
                 _.set(event, 'OldResourceProperties.rejectionStatement.messages[0].content', v);
             }
         }
-        cfnLambda(new Lex(Lextype[1]))(event, context, cb);
+        cfnLambda(new Lex(Lextype[1]))(event, context);
     } else if (targets[type[1]]) {
-        return cfnLambda(new targets[type[1]]())(event, context, cb);
+        return cfnLambda(new targets[type[1]]())(event, context);
     } else {
         response.send({
             event,
@@ -69,7 +84,11 @@ function dispatch(event, context, cb) {
             reason: `Invalid resource type:${event.ResourceType}`,
             responseStatus: response.FAILED,
         })
-            .then(() => cb(`Invalid resource type:${event.ResourceType}`))
-            .catch(cb);
+            .then(() => {
+                throw new Error(`Invalid resource type:${event.ResourceType}`);
+            })
+            .catch(error => {
+                throw error;
+            });
     }
 }

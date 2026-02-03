@@ -6,7 +6,7 @@
 exports.SUCCESS = 'SUCCESS';
 exports.FAILED = 'FAILED';
 
-exports.send = function (params, cb) {
+exports.send = function (params) {
     return new Promise((res, rej) => {
         const responseBody = JSON.stringify({
             Status: params.responseStatus,

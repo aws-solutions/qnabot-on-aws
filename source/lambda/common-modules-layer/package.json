@@ -1,6 +1,6 @@
 {
     "name": "common-modules-layer",
-    "version": "7.2.4",
+    "version": "7.3.0",
     "description": "QnABot Common-modules-layer lambda",
     "main": "index.js",
     "scripts": {
@@ -11,7 +11,7 @@
         "@opensearch-project/opensearch": "^2.13.0",
         "bodybuilder": "^2.4.0",
         "intercept-stdout": "^0.1.2",
-        "lodash": "^4.17.21"
+        "lodash": "^4.17.23"
     },
     "author": {
         "name": "Amazon Web Services",

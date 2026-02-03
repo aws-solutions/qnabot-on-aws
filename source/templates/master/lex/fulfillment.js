@@ -353,6 +353,7 @@ module.exports = {
                             ],
                             Resource: [
                                 { 'Fn::GetAtt': ['UsersTable', 'Arn'] },
+                                { 'Fn::GetAtt': ['SettingsTable', 'Arn'] },
                             ],
                         }],
                     },

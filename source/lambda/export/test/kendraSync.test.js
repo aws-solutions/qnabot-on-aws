@@ -97,7 +97,7 @@ describe('when calling performSync function', () => {
             .resolvesOnce({ Body: sdkStream4 });
         s3Mock.on(PutObjectCommand).resolves({});
 
-        const result = await performSync(event, null, null);
+        const result = await performSync(event, null);
         expect(result).toBe('Synced');
         expect(s3Mock).toHaveReceivedCommandTimes(GetObjectCommand, 4);
         expect(s3Mock).toHaveReceivedNthCommandWith(2, GetObjectCommand, {
@@ -181,7 +181,7 @@ describe('when calling performSync function', () => {
         s3Mock.on(PutObjectCommand).resolves({});
 
         const error = new Error(`No FAQ Index set: `);
-        await expect(performSync(event, null, null)).resolves.toThrowError(error);
+        await expect(performSync(event, null)).resolves.toThrowError(error);
         expect(s3Mock).toHaveReceivedCommandTimes(GetObjectCommand, 3);
         expect(s3Mock).toHaveReceivedNthCommandWith(2, GetObjectCommand, {
             'Bucket': 'exportBucket',
@@ -214,6 +214,6 @@ describe('when calling performSync function', () => {
     it('should handle an error', async () => {
         const error = new Error('error');
         s3Mock.on(GetObjectCommand).rejects(error);
-        await expect(performSync(event, null, null)).rejects.toThrowError(error);
+        await expect(performSync(event, null)).rejects.toThrowError(error);
     });
 });

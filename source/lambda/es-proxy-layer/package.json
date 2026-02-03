@@ -1,6 +1,6 @@
 {
     "name": "proxy-es",
-    "version": "7.2.4",
+    "version": "7.3.0",
     "description": "QnABot Lambda managing querying of data store",
     "main": "index.js",
     "scripts": {
@@ -27,8 +27,7 @@
         "langchain": "^0.3.37",
         "linkifyjs": "^4.3.2",
         "sanitize-html": "^2.13.0",
-        "simple-encryptor": "^3.0.0",
-        "static-eval": "^2.1.0"
+        "simple-encryptor": "^3.0.0"
     },
     "devDependencies": {
         "@aws-sdk/client-dynamodb": "^3.705.0",
@@ -40,10 +39,10 @@
     "overrides": {
         "async": "2.6.4",
         "cross-spawn": "^7.0.6",
-        "fast-xml-parser": "^4.4.1",
+        "fast-xml-parser": "^5.3.4",
         "uglify-js": "^3.19.2",
         "micromatch": "^4.0.8",
-        "sinon": "^19.0.2",
+        "sinon": "^21.0.1",
         "postcss": "^8.5.1"
     }
 }

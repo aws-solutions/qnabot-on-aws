@@ -4,7 +4,7 @@
  ************************************************************************************************ */
 const osWarmer = new (require('./lib'))();
 
-exports.warmer = async function (event, context, callback) {
-    await osWarmer.perform(event, context, callback);
+exports.warmer = async function (event, context) {
+    await osWarmer.perform(event, context);
     return 'complete';
 };
