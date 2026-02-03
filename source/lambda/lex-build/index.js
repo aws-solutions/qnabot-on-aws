@@ -5,9 +5,14 @@
 
 const lib = require('./lib');
 
-exports.handler = function (event, context, callback) {
+exports.handler = async (event, context) => {
     console.log('Event:', JSON.stringify(event, null, 2));
 
-    return lib(event).then(() => callback(null, 'success'))
-        .catch(callback);
+    try {
+        await lib(event);
+        return 'success';
+    } catch (error) {
+        console.error('Handler error:', error);
+        throw error;
+    }
 };

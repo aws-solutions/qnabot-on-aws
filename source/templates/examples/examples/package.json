@@ -1,6 +1,6 @@
 {
     "name": "examples",
-    "version": "7.2.4",
+    "version": "7.3.0",
     "description": "Lambda contains a collection of lambda hooks for QnABot and a custom resource to create the example documents",
     "main": "index.js",
     "scripts": {
@@ -14,7 +14,7 @@
     "dependencies": {
         "cfn-response": "^1.0.1",
         "handlebars": "^4.7.8",
-        "lodash": "^4.17.21"
+        "lodash": "^4.17.23"
     },
     "overrides": {
         "uglify-js": "^3.19.2"

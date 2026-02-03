@@ -24,8 +24,10 @@ describe('designer edit module', () => {
                 data: {
                     schema: {
                         qna: {
-                            key: 'value',
-                            required: true,
+                            type: 'object',
+                            properties: {
+                                key: { type: 'string' },
+                            },
                         },
                     },
                 },
@@ -119,8 +121,65 @@ describe('designer edit module', () => {
     test('cancel', () => {
         const wrapper = shallowMount(editModule);
         wrapper.vm.$data.dialog = true;
+        wrapper.vm.$data.opened = true;
+        wrapper.vm.$data.error = 'Some error';
         wrapper.vm.cancel();
         expect(wrapper.vm.$data.dialog).toBe(false);
+        expect(wrapper.vm.$data.opened).toBe(false);
+        expect(wrapper.vm.$data.error).toBe('');
+    });
+
+    test('cancel resets opened flag so data refreshes on next open', () => {
+        const data = {
+            type: 'qna',
+            qid: 'original-id',
+            q: ['original question'],
+            a: 'original answer',
+        };
+        const store = {
+            state: {
+                data: {
+                    schema: {
+                        qna: {
+                            type: 'object',
+                            properties: {
+                                qid: { type: 'string' },
+                                q: { type: 'array', items: { type: 'string' } },
+                                a: { type: 'string' },
+                                type: { type: 'string' },
+                            },
+                        },
+                    },
+                },
+            },
+        };
+
+        const wrapper = shallowMount(editModule, {
+            props: { data },
+            global: {
+                mocks: {
+                    $store: store,
+                },
+            },
+        });
+
+        // First open - should initialize tmp
+        wrapper.vm.refresh();
+        expect(wrapper.vm.$data.opened).toBe(true);
+        expect(wrapper.vm.$data.tmp.qid).toBe('original-id');
+
+        // User makes edits
+        wrapper.vm.$data.tmp.qid = 'modified-id';
+        expect(wrapper.vm.$data.tmp.qid).toBe('modified-id');
+
+        // User cancels
+        wrapper.vm.cancel();
+        expect(wrapper.vm.$data.opened).toBe(false);
+
+        // User reopens - should refresh from original data
+        wrapper.vm.refresh();
+        expect(wrapper.vm.$data.opened).toBe(true);
+        expect(wrapper.vm.$data.tmp.qid).toBe('original-id');
     });
 
     test('close', () => {
@@ -193,8 +252,14 @@ describe('designer edit module', () => {
                 data: {
                     schema: {
                         qna: {
-                            key: 'value',
-                            required: true,
+                            type: 'object',
+                            properties: {
+                                qid: { type: 'string' },
+                                q: { type: 'array', items: { type: 'string' } },
+                                a: { type: 'string' },
+                                alt: { type: 'object' },
+                                type: { type: 'string' },
+                            },
                         },
                     },
                 },
@@ -237,5 +302,210 @@ describe('designer edit module', () => {
             },
             type:"qna",
          });
+    });
+
+    describe('validation in update method', () => {
+        test('update prevents submission when validation fails', async () => {
+            const data = {
+                qid: 'test',
+                q: ['test'],
+                a: 'test',
+                type: 'qna',
+            };
+
+            const store = {
+                state: {
+                    data: {
+                        schema: {
+                            qna: {
+                                type: 'object',
+                                properties: {
+                                    qid: { type: 'string', maxLength: 100 },
+                                    q: { type: 'array', items: { type: 'string' } },
+                                    a: { type: 'string', maxLength: 8000 },
+                                    type: { type: 'string' },
+                                },
+                            },
+                        },
+                    },
+                },
+                dispatch: jest.fn().mockReturnValue(false),
+            };
+
+            const wrapper = shallowMount(editModule, {
+                props: { data },
+                global: {
+                    mocks: {
+                        $store: store,
+                    },
+                },
+            });
+
+            wrapper.vm.$data.tmp = {
+                qid: 'test',
+                q: ['test'],
+                a: 'x'.repeat(8001), // Exceeds 8000 character limit
+                type: 'qna',
+            };
+
+            await wrapper.vm.update();
+
+            // Should set error and not dispatch update
+            expect(wrapper.vm.$data.error).toBeTruthy();
+            expect(store.dispatch).not.toHaveBeenCalledWith('data/update', expect.anything());
+        });
+
+        test('update allows submission when validation passes', async () => {
+            const data = {
+                qid: 'test',
+                q: ['test'],
+                a: 'test',
+                type: 'qna',
+            };
+
+            const store = {
+                state: {
+                    data: {
+                        schema: {
+                            qna: {
+                                type: 'object',
+                                properties: {
+                                    qid: { type: 'string', maxLength: 100 },
+                                    q: { type: 'array', items: { type: 'string' } },
+                                    a: { type: 'string', maxLength: 8000 },
+                                    type: { type: 'string' },
+                                },
+                            },
+                        },
+                    },
+                },
+                dispatch: jest.fn().mockReturnValue(false),
+            };
+
+            const wrapper = shallowMount(editModule, {
+                props: { data },
+                global: {
+                    mocks: {
+                        $store: store,
+                    },
+                },
+            });
+
+            wrapper.vm.$data.tmp = {
+                qid: 'test',
+                q: ['test'],
+                a: 'valid answer text',
+                type: 'qna',
+            };
+
+            await wrapper.vm.update();
+
+            // Should not set error and should dispatch update
+            expect(wrapper.vm.$data.error).toBe('');
+            expect(store.dispatch).toHaveBeenCalledWith('data/update', expect.objectContaining({
+                qid: 'test',
+                a: 'valid answer text',
+            }));
+        });
+
+        test('update shows error message when character limit exceeded', async () => {
+            const data = {
+                qid: 'test',
+                q: ['test'],
+                a: 'test',
+                type: 'qna',
+            };
+
+            const store = {
+                state: {
+                    data: {
+                        schema: {
+                            qna: {
+                                type: 'object',
+                                properties: {
+                                    qid: { type: 'string', maxLength: 10 },
+                                    q: { type: 'array', items: { type: 'string' } },
+                                    a: { type: 'string', maxLength: 8000 },
+                                    type: { type: 'string' },
+                                },
+                            },
+                        },
+                    },
+                },
+                dispatch: jest.fn().mockReturnValue(false),
+            };
+
+            const wrapper = shallowMount(editModule, {
+                props: { data },
+                global: {
+                    mocks: {
+                        $store: store,
+                    },
+                },
+            });
+
+            wrapper.vm.$data.tmp = {
+                qid: 'this_is_a_very_long_qid_that_exceeds_limit',
+                q: ['test'],
+                a: 'test',
+                type: 'qna',
+            };
+
+            await wrapper.vm.update();
+
+            // Should set error message
+            expect(wrapper.vm.$data.error).toBeTruthy();
+            expect(typeof wrapper.vm.$data.error).toBe('string');
+        });
+
+        test('update respects valid flag from form', async () => {
+            const data = {
+                qid: 'test',
+                q: ['test'],
+                a: 'test',
+                type: 'qna',
+            };
+
+            const store = {
+                state: {
+                    data: {
+                        schema: {
+                            qna: {
+                                type: 'object',
+                                properties: {
+                                    qid: { type: 'string', maxLength: 100 },
+                                    q: { type: 'array', items: { type: 'string' } },
+                                    a: { type: 'string', maxLength: 8000 },
+                                    type: { type: 'string' },
+                                },
+                            },
+                        },
+                    },
+                },
+                dispatch: jest.fn().mockReturnValue(false),
+            };
+
+            const wrapper = shallowMount(editModule, {
+                props: { data },
+                global: {
+                    mocks: {
+                        $store: store,
+                    },
+                },
+            });
+
+            wrapper.vm.$data.valid = false;
+            wrapper.vm.$data.tmp = {
+                qid: 'test',
+                q: ['test'],
+                a: 'test',
+                type: 'qna',
+            };
+
+            await wrapper.vm.update();
+
+            // Should not proceed when valid is false
+            expect(store.dispatch).not.toHaveBeenCalledWith('data/update', expect.anything());
+        });
     });
 });

@@ -1,6 +1,6 @@
 {
     "name": "createrecenttopicsresponse",
-    "version": "7.2.4",
+    "version": "7.3.0",
     "description": "Lambda hook that creates recent topic response",
     "main": "CreateRecentTopicResponse.js",
     "scripts": {
@@ -12,6 +12,6 @@
     },
     "license": "Apache-2.0",
     "dependencies": {
-        "lodash": "^4.17.21"
+        "lodash": "^4.17.23"
     }
 }

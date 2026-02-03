@@ -23,22 +23,34 @@ describe('evaluateConditionalChaining', () => {
 
   test('evaluates a chaining rule', async () => {
     const question = "What is the capital of Georgia?";
+    const nextQuestion = "Tell me more about Atlanta";
     const req = { 
         question,
         qid: 'Text.003' 
     };
     const res = { session: {} };
     const hit = { 
-        a: 'test chaining',
-        conditionalChaining: 'testConditionalChaining' 
+        qid: 'Text.003',
+        a: 'Atlanta',
+        conditionalChaining: 'encrypted_chaining_rule' 
     };
-    encryptor.decrypt.mockReturnValue('testChain');
+    const chainedHit = {
+        qid: 'Text.004',
+        q: 'Tell me more about Atlanta',
+        a: 'Atlanta is the capital and most populous city of Georgia, with a population of over 500,000.'
+    };
+    
+    encryptor.decrypt.mockReturnValue(`"${nextQuestion}"`);
+    getHit.mockResolvedValue([req, res, chainedHit, []]);
+    
     const [updatedReq, updatedRes, updatedHit, errors] = await evaluateConditionalChaining(req, res, hit, hit.conditionalChaining);
-    expect(updatedReq.question).toStrictEqual(question);
+    
+    expect(encryptor.decrypt).toHaveBeenCalledWith('encrypted_chaining_rule');
+    expect(updatedReq.question).toStrictEqual(nextQuestion);
     expect(errors).toEqual([]);
-    expect(invokeLambda).toHaveBeenCalledTimes(0)
-    expect(getHit).toHaveBeenCalledTimes(0)
-    expect(updatedReq.qid).toStrictEqual(undefined)
+    expect(invokeLambda).toHaveBeenCalledTimes(0);
+    expect(getHit).toHaveBeenCalledTimes(1);
+    expect(updatedHit).toEqual(chainedHit);
   });
 
   test('evaluates a Lambda-based chaining rule', async () => {

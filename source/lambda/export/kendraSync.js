@@ -35,7 +35,7 @@ async function get_settings() {
  * @param cb
  * @returns 'Synced' if successful
  */
-exports.performSync = async function (event, context, cb) {
+exports.performSync = async function (event, context) {
     try {
         qnabot.log('Request', JSON.stringify(event, null, 2));
         const Bucket = event.Records[0].s3.bucket.name;

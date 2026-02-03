@@ -3,7 +3,7 @@
 *   SPDX-License-Identifier: Apache-2.0                                                            *
  ************************************************************************************************ */
 
-exports.handler = (event, context, callback) => {
+exports.handler = async (event, context) => {
     console.log('Received event:', JSON.stringify(event, null, 2));
     const schema = {
         quiz: require('./quiz.js'),
@@ -12,5 +12,5 @@ exports.handler = (event, context, callback) => {
         text: require('./text.js'),
     };
     console.log('Returned schema:', JSON.stringify(schema, null, 2));
-    callback(null, schema);
+    return schema;
 };

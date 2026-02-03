@@ -94,7 +94,7 @@ const main = async function () {
 };
 
 module.exports = class warmer {
-    async perform(event, context, callback) {
+    async perform(event, context) {
         const count = process.env.REPEAT_COUNT ? parseInt(process.env.REPEAT_COUNT) : 4;
         qnabot.log(`ESWarmer Incoming payload: ${JSON.stringify(event, null, 2)}`);
         try {

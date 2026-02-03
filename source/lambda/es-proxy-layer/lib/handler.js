@@ -129,7 +129,7 @@ async function run_query_kendra(event, kendra_index, language) {
     return kendra_response;
 }
 
-module.exports = async (event, context, callback) => {
+module.exports = async (event, context) => {
     const settings = await get_settings();
     qna_settings.set_environment_variables(settings);
     qnabot.log('Received event:', JSON.stringify(event, null, 2));
@@ -166,5 +166,5 @@ module.exports = async (event, context, callback) => {
         response = await run_query_es(event, settings);
     }
     qnabot.debug('Query response: ', JSON.stringify(response, null, 2));
-    return callback(null, response);
+    return response;
 };

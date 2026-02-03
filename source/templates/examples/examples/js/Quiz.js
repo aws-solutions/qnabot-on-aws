@@ -28,7 +28,7 @@ const text = handlebars.compile(
     fs.readFileSync(`${__dirname}/templates/quiz-response.hbs`, 'utf-8'),
 );
 
-exports.handler = async function (event, context, callback) {
+exports.handler = async function (event, context) {
     console.log(JSON.stringify(event, null, 2));
     let prevDocument; let nextDocument; let
         quizBot;
@@ -152,8 +152,8 @@ exports.handler = async function (event, context, callback) {
         }
     } finally {
         console.log(JSON.stringify(event, null, 2));
-        callback(null, event);
     }
+    return event;
 };
 async function getPrevDoc(event, quizBot) {
     const params = {

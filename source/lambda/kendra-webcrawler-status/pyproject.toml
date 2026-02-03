@@ -4,7 +4,7 @@ description = ""
 package-mode = false
 
 [tool.poetry.dependencies]
-python = "^3.10"
+python = "^3.14"
 
 [tool.poetry.group.dev.dependencies]
 moto = "^5.0.18"

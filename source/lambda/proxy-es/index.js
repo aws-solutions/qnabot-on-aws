@@ -16,14 +16,20 @@ const filter = (text) => {
 
 require('intercept-stdout')(filter, filter);
 
+const qnabot = require('qnabot/logging');
+
 exports.qid = require('../../../../../../../../opt/lib/qid');
 exports.logging = require('../../../../../../../../opt/lib/es-logging');
 exports.cleanmetrics = require('../../../../../../../../opt/lib/cleanmetrics');
 exports.utterances = require('../../../../../../../../opt/lib/utterances');
 exports.handler = require('../../../../../../../../opt/lib/handler');
 
-exports.query = function (event, context, callback) {
-    require('./lib/query')(event.req, event.res)
-        .then((x) => callback(null, x))
-        .catch(callback);
+exports.query = async function (event, context) {
+    try {
+        const result = await require('./lib/query')(event.req, event.res);
+        return result;
+    } catch (error) {
+        qnabot.error('Query error:', error);
+        throw error;
+    }
 };

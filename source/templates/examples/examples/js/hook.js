@@ -3,7 +3,7 @@
 *   SPDX-License-Identifier: Apache-2.0                                                            *
  ************************************************************************************************ */
 
-exports.handler = function (event, context, cb) {
+exports.handler = async (event, context) => {
     const today = new Date();
     const curHr = (today.getHours() - 8 + 24) % 24;
     let message;
@@ -17,5 +17,5 @@ exports.handler = function (event, context, cb) {
         message = 'good evening, ';
     }
     event.res.message = message + event.res.message;
-    cb(null, event);
+    return event;
 };

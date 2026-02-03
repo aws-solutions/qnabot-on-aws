@@ -36,9 +36,7 @@ describe('lex poll', () => {
             .resolves({});
         lambdaClientMock.on(InvokeCommand).resolves({});
 
-        const mockCallback = jest.fn();
-
-        await handler({}, {}, mockCallback);
+        const result = await handler({}, {});
 
         expect(s3ClientMock).toHaveReceivedNthCommandWith(1, PutObjectCommand, {
             Bucket: 'test-bucket',
@@ -53,7 +51,7 @@ describe('lex poll', () => {
             InvocationType: 'Event',
             Payload: '{}',
         });
-        expect(mockCallback).toHaveBeenCalledWith(null, { token: '' });
+        expect(result).toEqual({ token: '' });
     });
 
     it('only initializes lex v2 if v2 status key not set', async () => {
@@ -67,9 +65,7 @@ describe('lex poll', () => {
             .resolves({});
         lambdaClientMock.on(InvokeCommand).resolves({});
 
-        const mockCallback = jest.fn();
-
-        await handler({}, {}, mockCallback);
+        const result = await handler({}, {});
 
         expect(s3ClientMock).toHaveReceivedCommandTimes(PutObjectCommand, 1);
         expect(lambdaClientMock).toHaveReceivedCommandWith(InvokeCommand, {
@@ -77,7 +73,7 @@ describe('lex poll', () => {
             InvocationType: 'Event',
             Payload: '{}',
         });
-        expect(mockCallback).toHaveBeenCalledWith(null, { token: '' });
+        expect(result).toEqual({ token: '' });
     });
 
     afterAll(() => {

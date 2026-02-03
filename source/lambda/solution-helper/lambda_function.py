@@ -139,6 +139,9 @@ def custom_map(settings):
         c_map['KNOWLEDGE_BASE_METADATA_FILTERS_ENABLE'] = 'true'
     else:
         c_map['KNOWLEDGE_BASE_METADATA_FILTERS_ENABLE'] = 'false'
+    
+    # Track conditional chaining usage
+    c_map['CONDITIONAL_CHAINING_ENABLE'] = settings.get('CONDITIONAL_CHAINING_USED', 'false')
 
     return c_map
 

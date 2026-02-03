@@ -16,7 +16,7 @@ const clean = require('./lib/clean');
 const outputBucket = process.env.OUTPUT_S3_BUCKET;
 const step_status_ignore = ['Error', 'Completed', 'Sync Complete', 'Parsing content JSON', 'Creating FAQ']
 
-exports.step=async function(event,context,cb){
+exports.step = async function(event, context) {
     console.log('Initiating Export')
     console.log('Request',JSON.stringify(event,null,2))
     const inputBucket=event.Records[0].s3.bucket.name
@@ -30,7 +30,7 @@ exports.step=async function(event,context,cb){
     } 
     catch (error) {
         console.error("An error occured in S3 operations: ", error)
-        cb(error)
+        throw error;
     }
 }
 

@@ -23,9 +23,9 @@ module.exports = {
                 Code: {
                     ZipFile: {
                         'Fn::Join': ['\n', [
-                            'exports.handler=function(event,context,callback){',
+                            'exports.handler=async function(event,context){',
                             '   console.log(JSON.stringify(event,null,2))',
-                            '   callback(null,event)',
+                            '   return event',
                             '}',
                         ]],
                     },

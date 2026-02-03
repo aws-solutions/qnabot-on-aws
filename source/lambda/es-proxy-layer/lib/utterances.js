@@ -10,7 +10,7 @@ const s3 = new S3Client(customSdkConfig('C021', { region, logger: console  }));
 const qnabot = require('qnabot/logging');
 const { con } = require('/opt/opensearch-client/connection');
 
-module.exports = async function (event, context, callback) {
+module.exports = async function (event, context) {
     try {
         const es = con(process.env.ES_ADDRESS);
         const esUtterances = es.search({
@@ -56,6 +56,6 @@ module.exports = async function (event, context, callback) {
             .then(([esResults, s3Results]) => ({ utterances: _.compact(_.uniq(_.flatten([esResults, s3Results]))) }));
     } catch (e) {
         qnabot.log(e);
-        callback(e);
+        throw e;
     }
 };

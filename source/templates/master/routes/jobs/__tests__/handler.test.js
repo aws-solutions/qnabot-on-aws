@@ -45,9 +45,7 @@ describe('lex poll', () => {
             ],
         });
 
-        const mockCallback = jest.fn();
-
-        await handler(event, {}, mockCallback);
+        const result = await handler(event, {});
 
         expect(s3ClientMock).toHaveReceivedNthCommandWith(1, ListObjectsCommand, {
             Bucket: 'test-bucket',
@@ -56,7 +54,7 @@ describe('lex poll', () => {
             MaxKeys: 10,
         });
 
-        expect(mockCallback).toHaveBeenCalledWith(null, {
+        expect(result).toEqual({
             jobs: [
                 {
                     id: 'doc4.rtf',
@@ -106,9 +104,7 @@ describe('lex poll', () => {
             ],
         });
 
-        const mockCallback = jest.fn();
-
-        await handler(event, {}, mockCallback);
+        const result = await handler(event, {});
 
         expect(s3ClientMock).toHaveReceivedNthCommandWith(1, ListObjectsCommand, {
             Bucket: 'test-bucket',
@@ -117,7 +113,7 @@ describe('lex poll', () => {
             MaxKeys: 100,
         });
 
-        expect(mockCallback).toHaveBeenCalledWith(null, {
+        expect(result).toEqual({
             jobs: [
                 {
                     id: 'doc4.rtf',
@@ -151,9 +147,10 @@ describe('lex poll', () => {
 
         s3ClientMock.on(ListObjectsCommand).rejects('mocked rejection');
 
-        const mockCallback = jest.fn();
-
-        await handler(event, {}, mockCallback);
+        await expect(handler(event, {})).rejects.toEqual(JSON.stringify({
+            type: '[InternalServiceError]',
+            data: {},
+        }));
 
         expect(s3ClientMock).toHaveReceivedNthCommandWith(1, ListObjectsCommand, {
             Bucket: 'test-bucket',
@@ -161,10 +158,5 @@ describe('lex poll', () => {
             Prefix: 'test-prefix',
             MaxKeys: 10,
         });
-
-        expect(mockCallback).toHaveBeenCalledWith(JSON.stringify({
-            type: '[InternalServiceError]',
-            data: {},
-        }));
     });
 });

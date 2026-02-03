@@ -133,6 +133,8 @@ module.exports = {
         cancel() {
             this.dialog = false;
             this.loading = false;
+            this.opened = false;
+            this.error = '';
         },
         close() {
             this.cancel();
@@ -146,6 +148,19 @@ module.exports = {
         },
         async update() {
             const self = this;
+            
+            const Ajv = require('ajv');
+            const ajv = new Ajv();
+            const data = clean(_.cloneDeep(self.tmp));
+            const validate = ajv.compile(this.schema || true);
+            const valid = validate(data);
+            
+            if (!valid) {
+                const err = validate.errors.map((x) => x.message).join('. ');
+                this.error = err;
+                return;
+            }
+            
             if (this.valid) {
                 self.loading = true;
                 self.dialog = false;

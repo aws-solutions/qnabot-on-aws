@@ -70,12 +70,12 @@ Alternatively, if you want to custom deploy QnABot on AWS, refer to the details 
 ### Environment Prerequisites
 
 -   Run Linux. (tested on Amazon Linux 2)
--   Install npm >10.0.0 and node >20.X.X ([instructions](https://nodejs.org/en/download/))
+-   Install npm >11.0.0 and node >24.X.X ([instructions](https://nodejs.org/en/download/))
 -   Install and configure git lfs ([instructions](https://git-lfs.com/))
 -   Clone this repo.
 -   Set up an AWS account. ([instructions](https://AWS.amazon.com/free/))
 -   Configure AWS CLI and a local credentials file. ([instructions](https://docs.AWS.amazon.com/cli/latest/userguide/cli-chap-welcome.html))
--   Install Python >=3.10
+-   Install Python >=3.14
 -   Install Poetry. Below is one of the ways to install poetry. For other ways to install poetry, refer [Poetry installation instructions](https://python-poetry.org/docs/#installation)
 
 ```shell
@@ -89,6 +89,9 @@ pipx ensurepath
 
 ## Install poetry
 pipx install poetry
+
+## Install poetry export plugin (required for build process)
+poetry self add poetry-plugin-export
 ```
 
 ### Build a version
@@ -184,6 +187,9 @@ pipx ensurepath
 
 ## Install poetry
 pipx install poetry
+
+## Install poetry export plugin (required for build process)
+poetry self add poetry-plugin-export
 ```
 
 Follow the below steps to run the integration tests
@@ -361,6 +367,7 @@ As QnABot evolves over the years, it makes use of various services and functiona
 _Note: **Deployable solution versions** refers to the ability to deploy the version of QnABot in their AWS accounts. **Actively supported versions** for QnABot is only available for the latest version of QnABot._
 
 ### Deployable Versions
+- [v7.3.0](https://github.com/aws-solutions/qnabot-on-aws/releases/tag/v7.3.0) - [Public](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v7.3.0/qnabot-on-aws-main.template)/[VPC](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v7.3.0/qnabot-on-aws-vpc.template)
 - [v7.2.4](https://github.com/aws-solutions/qnabot-on-aws/releases/tag/v7.2.4) - [Public](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v7.2.4/qnabot-on-aws-main.template)/[VPC](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v7.2.4/qnabot-on-aws-vpc.template)
 - [v7.2.3](https://github.com/aws-solutions/qnabot-on-aws/releases/tag/v7.2.3) - [Public](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v7.2.3/qnabot-on-aws-main.template)/[VPC](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v7.2.3/qnabot-on-aws-vpc.template)
 - [v7.2.2](https://github.com/aws-solutions/qnabot-on-aws/releases/tag/v7.2.2) - [Public](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v7.2.2/qnabot-on-aws-main.template)/[VPC](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v7.2.2/qnabot-on-aws-vpc.template)
@@ -396,10 +403,10 @@ _Note: **Deployable solution versions** refers to the ability to deploy the vers
 - All solutions less than `v6.0.0` are no longer recommended to be deployed due to Lambda Runtime & other package deprecations. This information is provided as is and you are strongly encouraged to check the deprecation calendar and end of life of the frameworks used in the solution.
 
 ### Upcoming/Recent deprecations
+- python3.10 is scheduled to enter [deprecation](https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtimes.html#runtimes-supported) on Jun 30, 2026.
+- nodejs20 is scheduled to enter [deprecation](https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtimes.html#runtimes-supported) on Apr 30, 2026.
 - AWS SDK for JavaScript v2 is scheduled to enter end-of-support phase on Sep 8, 2025.
-- nodejs18 is scheduled to enter [deprecation](https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtimes.html#runtimes-supported) on Sep 1, 2025.
-- nodejs16 has entered [Phase 1 deprecation](https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtimes.html#runtime-support-policy) on Jun 12, 2024.
-
+- nodejs18 has entered [deprecation](https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtimes.html#runtimes-supported) on Sep 1, 2025.
 
 ### Why would a solution version no longer be deployable?
 For QnABot, the most common reason is due to [AWS Lambda Runtimes being deprecated](https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtimes.html#runtime-support-policy). When a Lambda runtime has been marked as deprecated, customers can no longer create new Lambda functions in their AWS account. This means that older versions of our solutions that make use of those runtimes will fail to deploy. This makes it hard for the community to provide support as we are unable to deploy a similar environment to investigate issues and reproduce bug reports.

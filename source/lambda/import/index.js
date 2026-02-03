@@ -58,7 +58,7 @@ function isCompleteChar(str, pos) {
     }
 }
 
-exports.step = async function (event, context, cb) {
+exports.step = async function (event, context) {
     try {
         qnabot.log('step');
         qnabot.log('Request', JSON.stringify(event, null, 2));
@@ -134,35 +134,33 @@ exports.step = async function (event, context, cb) {
                     config.progress = progress;
                     config.time.rounds += 1;
                     qnabot.log(`next content range: ${config.start} - ${config.end}`);
-            } catch (error) {
-                qnabot.log('An error occured while config status was InProgress: ', error);
-                config.status = error.message || 'Error'
-                config.message = JSON.stringify(error);
-                await s3.send(new PutObjectCommand({ Bucket: output_bucket, Key: output_key, Body: JSON.stringify(config) }));
-                cb(error);
-                break;
+                } catch (error) {
+                    qnabot.log('An error occured while config status was InProgress: ', error);
+                    config.status = error.message || 'Error'
+                    config.message = JSON.stringify(error);
+                    await s3.send(new PutObjectCommand({ Bucket: output_bucket, Key: output_key, Body: JSON.stringify(config) }));
+                    throw error;
+                }
             }
         }
-    }
-    try {
-        if (config.progress >= 1 && config.status == "InProgress") {
-            config.status = 'Complete';
-            config.time.end = new Date().toISOString();
-            qnabot.log('EndConfig:', JSON.stringify(config, null, 2));
-            await s3.send(new PutObjectCommand({ Bucket: output_bucket, Key: output_key, Body: JSON.stringify(config) }));
-            cb(null);
-        }
+        try {
+            if (config.progress >= 1 && config.status == "InProgress") {
+                config.status = 'Complete';
+                config.time.end = new Date().toISOString();
+                qnabot.log('EndConfig:', JSON.stringify(config, null, 2));
+                await s3.send(new PutObjectCommand({ Bucket: output_bucket, Key: output_key, Body: JSON.stringify(config) }));
+            }
         } catch (err) {
             qnabot.log('An error occured while finalizing config: ', err);
-            cb(err);
+            throw err;
         }
     } catch (err) {
         qnabot.log('An error occured while getting parsing for config: ', err);
-        cb(err);
+        throw err;
     }
 };
 
-exports.start = async function (event, context, cb) {
+exports.start = async function (event, context) {
     try {
         qnabot.log('starting');
         qnabot.log('Request', JSON.stringify(event, null, 2));
@@ -199,15 +197,12 @@ exports.start = async function (event, context, cb) {
         putParams.Bucket = process.env.OUTPUT_S3_BUCKET;
         putParams.Key = `status-import/${decodeURI(event.Records[0].s3.object.key.split('/').pop())}`;
         await s3.send(new PutObjectCommand(putParams));
-        cb(null);
     } catch (x) {
         qnabot.log('An error occured in start function: ', x);
-        cb(
-            JSON.stringify({
-                type: '[InternalServiceError]',
-                data: x
-            })
-        );
+        throw new Error(JSON.stringify({
+            type: '[InternalServiceError]',
+            data: x
+        }));
     }
 };
 

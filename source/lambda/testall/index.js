@@ -15,7 +15,7 @@ const clean = require('./lib/clean');
 
 const outputBucket = process.env.OUTPUT_S3_BUCKET;
 
-exports.step = async function (event, context, cb) {
+exports.step = async function (event, context) {
     console.log('Initiating TestAll');
     console.log('Request', JSON.stringify(event, null, 2));
     const inputBucket = event.Records[0].s3.bucket.name;
@@ -28,7 +28,7 @@ exports.step = async function (event, context, cb) {
         await getStatusAndStartNextStep(outputBucket, Key, lexResult.VersionId, clean);
     } catch (error) {
         console.error('An error occured in S3 operations: ', error);
-        cb(error);
+        throw error;
     }
 };
 

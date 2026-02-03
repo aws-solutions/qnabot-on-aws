@@ -3,8 +3,8 @@
 *   SPDX-License-Identifier: Apache-2.0                                                            *
  ************************************************************************************************ */
 
-exports.handler = function (event, context, cb) {
+exports.handler = async (event, context) => {
     console.log(JSON.stringify(event, null, 2));
     event.res.message = 'Hi! This is your Custom Javascript Hook speaking!';
-    cb(null, event);
+    return event;
 };

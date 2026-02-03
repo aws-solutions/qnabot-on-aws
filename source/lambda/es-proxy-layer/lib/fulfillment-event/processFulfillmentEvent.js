@@ -15,6 +15,38 @@ const { evaluateConditionalChaining } = require('./evaluateConditionalChaining')
 const { inIgnoreUtterances } = require('./utterance');
 const { utteranceIsQid } = require('./qid');
 const { getSupportedLanguages } = require('../supportedLanguages');
+const { DynamoDBClient, PutItemCommand } = require('@aws-sdk/client-dynamodb');
+const customSdkConfig = require('sdk-config/customSdkConfig');
+
+async function markConditionalChainingUsed(req) {
+    const alreadyMarked = _.get(req, '_settings.CONDITIONAL_CHAINING_USED', 'false');
+    if (alreadyMarked === 'true') {
+        return;
+    }
+    
+    try {
+        const region = process.env.AWS_REGION || 'us-east-1';
+        
+        const dynamodb = new DynamoDBClient(customSdkConfig('C010', { region }));
+        
+        const params = {
+            TableName: process.env.SETTINGS_TABLE,
+            Item: {
+                SettingName: { S: 'CONDITIONAL_CHAINING_USED' },
+                SettingValue: { S: 'true' },
+                SettingCategory: { S: 'Private' },
+                DefaultValue: { S: 'false' },
+                nonce: { N: '0' }
+            }
+        };
+        
+        await dynamodb.send(new PutItemCommand(params));
+        
+        _.set(req, '_settings.CONDITIONAL_CHAINING_USED', 'true');
+    } catch (err) {
+        qnabot.log('Error marking conditional chaining usage:', err);
+    }
+}
 
 async function executeConditionalChaining(hit, req, res) {
     let c = 0;
@@ -24,6 +56,11 @@ async function executeConditionalChaining(hit, req, res) {
         && _.get(hit, 'elicitResponse.responsebot_hook', '') === ''
         && _.get(hit, 'botRouting.specialty_bot', '') === ''
     ) {
+        // On first iteration, mark that conditional chaining is being used
+        if (c === 0) {
+            await markConditionalChainingUsed(req);
+        }
+        
         c++;
         // ElicitResponse and SpecialtyBot is not involved and this document has conditionalChaining defined. Process the
         // conditionalChaining in this case.

@@ -23,11 +23,16 @@ dynamodb = boto3.client('dynamodb', config=sdk_config)
 class CrawlerException(Exception):
     pass
 
-def handler(event, handler):  # NOSONAR Need these 2 params
+def handler(event, context):  # NOSONAR Need these 2 params
     try:
         name = os.environ.get('DATASOURCE_NAME')
         settings = get_settings()
-        index_id = settings['KENDRA_WEB_PAGE_INDEX']
+        index_id = settings.get('KENDRA_WEB_PAGE_INDEX')
+        
+        # Validate index_id format - Kendra index IDs should be at least 36 characters (UUID format)
+        if not index_id or len(str(index_id)) < 36:
+            logger.warning(f"Invalid or missing KENDRA_WEB_PAGE_INDEX: {index_id}. Kendra index may not be configured.")
+            return {"Status": 'NOTCONFIGURED', "Message": "Kendra index not configured or invalid"}
 
         data_source_id = get_data_source_id(index_id, name)
 
@@ -36,14 +41,12 @@ def handler(event, handler):  # NOSONAR Need these 2 params
         else:
             return kendra_list_data_source_sync_jobs(index_id, data_source_id)
     except Exception as e:
-        logger.info(e)
+        logger.error(f"Error in handler: {str(e)}")
         sys.tracebacklimit = 0
         raise CrawlerException('Exception: Failed to process this request. Please check the lambda logs for more further details.')
 
 
 def get_settings():
-    print(f"Checking for QnABot Settings in DynamoDB Table: {os.environ['SETTINGS_TABLE']}")
-    
     dynamodb = boto3.client('dynamodb')
     settings = {}
     
@@ -58,7 +61,7 @@ def get_settings():
             items.extend(page['Items'])
         
     except ClientError as error:
-        print(f"Error: {error}")
+        logger.error(f"Error scanning settings table: {error}")
         raise error
     
     for item in items:
@@ -67,19 +70,25 @@ def get_settings():
         default_value = item['DefaultValue'].get('S') or item['DefaultValue'].get('N')
         
         # Use setting_value if not empty, otherwise use default_value
-        settings[setting_name] = setting_value if setting_value is not None else default_value
+        final_value = setting_value if setting_value is not None else default_value
+        settings[setting_name] = final_value
     
     return settings
 
 def get_data_source_id(index_id, data_source_name):
-    if not index_id:
+    if not index_id or len(str(index_id)) < 36:
+        logger.warning(f"Invalid index_id provided: {index_id}")
         return None
-    response = client.list_data_sources(IndexId=index_id, MaxResults=5)
-
-    for item in response['SummaryItems']:
-        if item['Name'] == data_source_name:
-            return item['Id']
-    return None
+    
+    try:
+        response = client.list_data_sources(IndexId=index_id, MaxResults=5)
+        for item in response['SummaryItems']:
+            if item['Name'] == data_source_name:
+                return item['Id']
+        return None
+    except ClientError as e:
+        logger.error(f"Error listing data sources for index {index_id}: {str(e)}")
+        return None
 
 
 def kendra_list_data_source_sync_jobs(index_id, data_source_id):

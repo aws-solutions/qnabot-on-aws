@@ -12,7 +12,7 @@ div.input
         :hint="schema.description"
         persistent-hint
         :required="required"
-        :rules="[rules.required,rules.schema,rules.noSpace]"
+        :rules="[rules.required,rules.schema,rules.maxLength,rules.noSpace]"
         :data-vv-name="id"
         :data-path="path"
         auto-grow
@@ -20,6 +20,7 @@ div.input
         color="primary"
         :counter="schema.maxLength"
         persistent-counter
+        validate-on="input"
         @update:error="setValid"
     )
         template(#label)
@@ -32,7 +33,7 @@ div.input
         :hint="schema.description"
         persistent-hint
         :required="required"
-        :rules="[rules.required,rules.schema]"
+        :rules="[rules.required,rules.schema,rules.maxLength]"
         :data-vv-name="id"
         :textarea="schema.maxLength>'5001'"
         :data-path="path"
@@ -41,6 +42,7 @@ div.input
         color="primary"
         :counter="schema.maxLength"
         persistent-counter
+        validate-on="input"
         @update:error="setValid"
     )
         template(#label)
@@ -138,7 +140,25 @@ module.exports = {
                 },
                 schema(value) {
                     const validate = ajv.compile(self.schema || true);
-                    return !!validate(value) || validate.errors;
+                    if (validate(value)) {
+                        return true;
+                    }
+                    // Convert AJV errors to a readable string
+                    const errorMessages = validate.errors.map(err => {
+                        if (err.keyword === 'maxLength') {
+                            return `Maximum ${err.params.limit} characters allowed`;
+                        }
+                        return err.message || 'Validation error';
+                    }).join(', ');
+                    return errorMessages || 'Validation error';
+                },
+                // rule javascript:S3800 - Vue validation rules expect true or string (https://vuetifyjs.com/en/components/text-fields/#validation-26-rules)
+                maxLength(value) { // NOSONAR
+                    if (self.schema.maxLength && value) {
+                        const length = typeof value === 'string' ? value.length : 0;
+                        return length <= self.schema.maxLength || `Maximum ${self.schema.maxLength} characters allowed`;
+                    }
+                    return true;
                 },
                 // rule javascript:S3800 - Vue validation rules expect true or string (https://vuetifyjs.com/en/components/text-fields/#validation-26-rules)
                 noSpace(value) { // NOSONAR

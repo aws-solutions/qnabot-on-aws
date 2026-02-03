@@ -728,9 +728,11 @@ module.exports = {
                     {
                         Effect: 'Allow',
                         Action: [
-                            'es:*',
+                            'es:ESHttp*',
                         ],
-                        Resource: ['*'], // these actions cannot be bound to resources other than *
+                        Resource: [
+                            { 'Fn::Sub': '${ESVar.ESArn}/*' },
+                        ],
                     }, {
                         Effect: 'Allow',
                         Action: [
