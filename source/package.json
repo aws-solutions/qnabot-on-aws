@@ -1,6 +1,6 @@
 {
     "name": "qnabot-on-aws",
-    "version": "7.3.0",
+    "version": "7.3.1",
     "engines": {
         "node": ">=24.0.0",
         "npm": ">=11.0.0"
@@ -82,7 +82,7 @@
         "autosize": "^3.0.21",
         "aws-lex-web-ui": "git+https://github.com/aws-samples/aws-lex-web-ui.git#feature/qnabot-v7.0.0",
         "aws4": "^1.7.0",
-        "axios": "^1.12.2",
+        "axios": "^1.13.5",
         "body-parser": "^1.20.3",
         "bowser": "^1.9.3",
         "cfn-response": "^1.0.1",
@@ -104,7 +104,7 @@
         "jsheader": "0.0.2",
         "json-parse-better-errors": "^1.0.2",
         "json-stringify-pretty-compact": "^1.2.0",
-        "JSONPath": "^0.11.2",
+        "jsonpath-plus": "^10.2.0",
         "jsonschema": "^1.2.4",
         "jsonwebtoken": "^9.0.0",
         "lodash": "^4.17.23",
@@ -213,7 +213,7 @@
         "uglify-js": "^3.19.2",
         "sinon": "^21.0.1",
         "webpack-dev-server": "^5.2.2",
-        "qs": "^6.14.1"
+        "qs": "^6.14.2"
     },
     "jest": {
         "globals": {

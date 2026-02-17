@@ -115,3 +115,5 @@ Pipfile.lock
 # Lambda requirements.txt files
 **/requirements.txt
 .aider*
+
+.kiro

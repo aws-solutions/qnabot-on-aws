@@ -1,6 +1,6 @@
 {
     "name": "proxy-es",
-    "version": "7.3.0",
+    "version": "7.3.1",
     "description": "QnABot Lambda managing querying of data store",
     "main": "index.js",
     "scripts": {
@@ -21,7 +21,7 @@
         "@aws-sdk/s3-request-presigner": "^3.705.0",
         "@dqbd/tiktoken": "^1.0.7",
         "aws4": "^1.6.0",
-        "axios": "^1.12.2",
+        "axios": "^1.13.5",
         "bodybuilder": "^2.5.1",
         "handlebars": "^4.7.8",
         "langchain": "^0.3.37",
@@ -43,6 +43,7 @@
         "uglify-js": "^3.19.2",
         "micromatch": "^4.0.8",
         "sinon": "^21.0.1",
-        "postcss": "^8.5.1"
+        "postcss": "^8.5.1",
+        "langsmith": "^0.4.6"
     }
 }
