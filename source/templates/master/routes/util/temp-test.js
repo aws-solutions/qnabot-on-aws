@@ -4,7 +4,7 @@
  ************************************************************************************************ */
 
 const Velocity = require('velocity');
-const jsonpath = require('jsonpath');
+const { JSONPath } = require('jsonpath-plus');
 
 exports.run = function (name, context, test) {
     const temp = new Velocity.Engine({
@@ -29,8 +29,8 @@ exports.input = function (body) {
     return {
         input: {
             params: (x) => body[x],
-            path: (x) => jsonpath({ json: body, path: x })[0],
-            json: (x) => JSON.stringify(jsonpath({ json: body, path: x })[0]),
+            path: (x) => JSONPath({ path: x, json: body })[0],
+            json: (x) => JSON.stringify(JSONPath({ path: x, json: body })[0]),
         },
     };
 };

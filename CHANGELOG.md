@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [7.3.1] - 2026-02-17
+
+### Security
+
+- Updated axios to `1.13.5`
+- Updated cryptography to `46.0.5`
+- Updated langsmith to `0.4.12`
+- Updated qs to `6.14.2`
+- Updated JSONPath `0.11.2` to jsonpath-plus `10.3.0`
+
+
 ## [7.3.0] - 2026-02-03
 
 __*Note: we recommend that you first deploy these changes in a non-production environment. This is true for all releases, but especially important for minor and major releases.*__
