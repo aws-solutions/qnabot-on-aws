@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [7.3.2] - 2026-02-24
+
+### Security
+
+- Updated ajv to `6.14.0`
+- Updated bn.js to `5.2.3`
+- Updated fast-xml-parser to `5.3.6`
+- Updated minimatch to `3.1.3`
+- Updated werkzeug to `3.1.6` 
+
 ## [7.3.1] - 2026-02-17
 
 ### Security
@@ -14,7 +24,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Updated langsmith to `0.4.12`
 - Updated qs to `6.14.2`
 - Updated JSONPath `0.11.2` to jsonpath-plus `10.3.0`
-
 
 ## [7.3.0] - 2026-02-03
 

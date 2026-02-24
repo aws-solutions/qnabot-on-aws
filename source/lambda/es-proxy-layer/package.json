@@ -1,6 +1,6 @@
 {
     "name": "proxy-es",
-    "version": "7.3.1",
+    "version": "7.3.2",
     "description": "QnABot Lambda managing querying of data store",
     "main": "index.js",
     "scripts": {
@@ -39,7 +39,7 @@
     "overrides": {
         "async": "2.6.4",
         "cross-spawn": "^7.0.6",
-        "fast-xml-parser": "^5.3.4",
+        "fast-xml-parser": "^5.3.6",
         "uglify-js": "^3.19.2",
         "micromatch": "^4.0.8",
         "sinon": "^21.0.1",

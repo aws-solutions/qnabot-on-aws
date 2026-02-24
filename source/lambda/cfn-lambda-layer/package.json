@@ -1,6 +1,6 @@
 {
     "name": "cfn-lambda-layer",
-    "version": "7.3.1",
+    "version": "7.3.2",
     "description": "QnABot Cfn Lambda Layer",
     "main": "index.js",
     "scripts": {
@@ -16,6 +16,6 @@
     },
     "overrides": {
         "async": "^2.6.4",
-        "minimatch@<3.0.5": "^3.0.5"
+        "minimatch": "^3.1.3"
     }
 }
