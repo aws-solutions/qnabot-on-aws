@@ -9,16 +9,6 @@ function message(code) {
     return `Hello, Your QnABot verification code is: ${code}`;
 }
 
-function complete(context, error, event) {
-    if (context.done) {
-        context.done(error, event);
-    } else if (error) {
-        throw error;
-    } else {
-        return event;
-    }
-}
-
 function isEmailApproved(email, approvedDomain) {
     if (!approvedDomain) return true;
     
@@ -37,17 +27,26 @@ exports.handler = async (event, context) => {
     console.log('Received event:', JSON.stringify(event, null, 2));
 
     try {
+        // Ensure response object exists
+        if (!event.response) {
+            event.response = {};
+        }
+        
         const approvedDomain = process.env.APPROVED_DOMAIN;
         const email = event.request.userAttributes.email;
         
         if (!isEmailApproved(email, approvedDomain)) {
-            const error = new Error('EMAIL_DOMAIN_DENIED_ERR');
-            return complete(context, error, event);
+            // Throw error to reject user signup
+            throw new Error('EMAIL_DOMAIN_DENIED_ERR');
         }
         
         setEmailResponse(event);
-        return complete(context, null, event);
+        
+        // Return the event object for Cognito
+        return event;
     } catch (error) {
-        return complete(context, error, event);
+        console.log('Error in handler:', error);
+        // Re-throw to let Cognito handle the rejection
+        throw error;
     }
 };

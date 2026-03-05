@@ -113,8 +113,7 @@ module.exports={
                         use: ['pug-plain-loader'],
                     },
                     {
-                        type: 'asset/source',
-                        loader: 'pug-plain-loader'
+                        use: ['pug-loader']
                     }
                 ]
             },

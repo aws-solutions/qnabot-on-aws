@@ -3,16 +3,6 @@
 *   SPDX-License-Identifier: Apache-2.0                                                            *
  ************************************************************************************************ */
 
-function complete(context, error, event) {
-    if (context.done) {
-        context.done(error, event);
-    } else if (error) {
-        throw error;
-    } else {
-        return event;
-    }
-}
-
 function isEmailApproved(email, approvedDomain) {
     if (!approvedDomain) return true;
     
@@ -24,7 +14,8 @@ function isEmailApproved(email, approvedDomain) {
 
 function handleAutoVerify(event) {
     if (event.request.userAttributes.email_verified === 'True') {
-        event.response.autoVerifyUser = true;
+        event.response.autoVerifyEmail = true;
+        event.response.autoConfirmUser = true;
     }
 }
 
@@ -32,17 +23,28 @@ exports.handler = async (event, context) => {
     console.log('Received event:', JSON.stringify(event, null, 2));
 
     try {
+        // Ensure response object exists
+        if (!event.response) {
+            event.response = {};
+        }
+        
         const approvedDomain = process.env.APPROVED_DOMAIN;
         const email = event.request.userAttributes.email;
         
         if (!isEmailApproved(email, approvedDomain)) {
-            const error = new Error('EMAIL_DOMAIN_DENIED_ERR');
-            return complete(context, error, event);
+            // Throw error to reject user signup
+            throw new Error('EMAIL_DOMAIN_DENIED_ERR');
         }
         
         handleAutoVerify(event);
-        return complete(context, null, event);
+        
+        console.log('Returning event:', JSON.stringify(event, null, 2));
+        
+        // Return the event object for Cognito
+        return event;
     } catch (error) {
-        return complete(context, error, event);
+        console.log('Error in handler:', error);
+        // Re-throw to let Cognito handle the rejection
+        throw error;
     }
 };

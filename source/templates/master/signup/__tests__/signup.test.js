@@ -14,86 +14,45 @@ describe('signup handler', () => {
         process.env = { ...OLD_ENV };
     });
 
-    it('should return an error if the email domain is not approved', () => {
+    it('should return an error if the email domain is not approved', async () => {
         process.env.APPROVED_DOMAIN = 'notamazon.com';
         const clonedEvent = JSON.parse(JSON.stringify(event));
-        const done = jest.fn();
-        const context = {
-            done,
-        };
-        handler(
-            clonedEvent,
-            context,
-            () => {},
-        );
-
-        expect(done).toHaveBeenCalledWith(
-            new Error('EMAIL_DOMAIN_DENIED_ERR'),
-            clonedEvent,
-        );
+        const context = {};
+        
+        await expect(handler(clonedEvent, context)).rejects.toThrow('EMAIL_DOMAIN_DENIED_ERR');
     });
 
-    it('closes context if approved domain is not set', () => {
+    it('closes context if approved domain is not set', async () => {
         process.env.APPROVED_DOMAIN = '';
         const clonedEvent = JSON.parse(JSON.stringify(event));
-        const done = jest.fn();
-        const context = {
-            done,
-        };
-        handler(
-            clonedEvent,
-            context,
-            () => {},
-        );
+        const context = {};
 
-        expect(done).toHaveBeenCalledWith(
-            null,
-            clonedEvent,
-        );
+        const result = await handler(clonedEvent, context);
+        
+        expect(result).toEqual(clonedEvent);
     });
 
-    it('closes context if email matches domain and is verified', () => {
+    it('closes context if email matches domain and is verified', async () => {
         process.env.APPROVED_DOMAIN = 'amazon.com';
         const clonedEvent = JSON.parse(JSON.stringify(event));
-        const done = jest.fn();
-        const context = {
-            done,
-        };
+        const context = {};
 
-        handler(
-            clonedEvent,
-            context,
-            () => {},
-        );
+        const result = await handler(clonedEvent, context);
 
-        expect(done).toHaveBeenCalledWith(
-            null,
-            clonedEvent,
-        );
-
-        expect(clonedEvent.response.autoVerifyUser).toEqual(true);
+        expect(result).toEqual(clonedEvent);
+        expect(clonedEvent.response.autoVerifyEmail).toEqual(true);
+        expect(clonedEvent.response.autoConfirmUser).toEqual(true);
     });
 
-    it('closes context if email matches domain and is not verified', () => {
+    it('closes context if email matches domain and is not verified', async () => {
         process.env.APPROVED_DOMAIN = 'amazon.com';
         const clonedEvent = JSON.parse(JSON.stringify(event));
         clonedEvent.request.userAttributes.email_verified = 'False';
-        const done = jest.fn();
-        const context = {
-            done,
-        };
+        const context = {};
 
-        handler(
-            clonedEvent,
-            context,
-            () => {},
-        );
+        const result = await handler(clonedEvent, context);
 
-        expect(done).toHaveBeenCalledWith(
-            null,
-            clonedEvent,
-        );
-
+        expect(result).toEqual(clonedEvent);
         expect(clonedEvent.response.autoVerifyUser).toEqual(undefined);
     });
 
