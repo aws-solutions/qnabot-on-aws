@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [7.3.3] - 2026-03-05
+
+### Security
+
+- Updated fast-xml-parser to `5.4.2`
+- Updated minimatch to `3.1.5`, `9.0.9`, and `10.2.4`
+- Updated serialize-javascript to `7.0.4`
+- Updated underscore to `1.13.8`
+
 ## [7.3.2] - 2026-02-24
 
 ### Security

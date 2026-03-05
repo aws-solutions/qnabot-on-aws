@@ -804,6 +804,7 @@ fast-diff under the Apache-2.0 license
 fast-glob under the MIT license
 fast-json-stable-stringify under the MIT license
 fast-levenshtein under the MIT license
+fast-xml-builder under the MIT license
 fast-xml-parser under the MIT license
 fastest-levenshtein under the MIT license
 fastparse under the MIT license
@@ -1365,6 +1366,7 @@ require-from-string under the MIT license
 requires-port under the MIT license
 resolve-cwd under the MIT license
 resolve-from under the MIT license
+resolve-pkg-maps under the MIT license
 resolve.exports under the MIT license
 resolve under the MIT license
 restore-cursor under the MIT license
