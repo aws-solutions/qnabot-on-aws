@@ -9,6 +9,8 @@ const { LambdaClient, InvokeCommand } = require('@aws-sdk/client-lambda');
 const util = require('../../../../capability/util');
 const defaultSettings = require('../../../../../../../source/lambda/cfn/lib/DefaultSettings.json');
 
+const EMPTY_SENTINEL = 'EMPTY_STRING_BY_USER';
+
 const chatbotTestingIndex = 0;
 const languageSettingsIndex = 1;
 const opensearchSettingsIndex = 2;
@@ -671,7 +673,9 @@ async function getParameters(context, dynamodb) {
                 const defaultValue = unmarshalledItem.DefaultValue;
                 const settingCategory = unmarshalledItem.SettingCategory;
 
-                if (settingValue != "") {
+                if (settingValue === EMPTY_SENTINEL) {
+                    custom_settings[settingName] = "";
+                } else if (settingValue !== "") {
                     custom_settings[settingName] = settingValue;
                 }
 

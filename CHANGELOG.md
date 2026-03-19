@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [7.3.4] - 2026-03-19
+
+### Fixed
+
+- Empty string settings now correctly persist instead of falling back to defaults [Issue #818](https://github.com/aws-solutions/qnabot-on-aws/issues/818)
+
+### Security
+
+- Updated flatted to `3.4.1`
+- Updated fast-xml-parser to `5.5.6`
+
 ## [7.3.3] - 2026-03-05
 
 ### Security

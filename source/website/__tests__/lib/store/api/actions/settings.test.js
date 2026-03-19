@@ -33,6 +33,32 @@ describe('settings action', () => {
         expect(result).toEqual([{ES_PHRASE_BOOST:4}, {}, {ES_PHRASE_BOOST:4}]);
     });
 
+    test('listSettings -- sentinel value converts to empty string', async () => {
+        const mockedContext = {
+            rootState: {
+                user: {
+                    credentials: '',
+                },
+                info: {
+                    CustomQnABotSettings: 'mockedValue',
+                    DefaultQnABotSettings: 'mockedValue',
+                    PrivateQnABotSettings: 'mockedValue',
+                    SettingsTable: 'mockedTableName'
+                },
+            },
+        };
+        dynamodbMock.on(ScanCommand).resolves({ Items: [
+            {"SettingCategory":{"S":"BedrockRag"},"nonce":{"N":"1"},"DefaultValue":{"S":"From Knowledge Base:"},"SettingName":{"S":"KNOWLEDGE_BASE_PREFIX_MESSAGE"},"SettingValue":{"S":"EMPTY_STRING_BY_USER"}}
+        ] });
+        const result = await settingsModule.listSettings(mockedContext);
+        // Sentinel should be converted to empty string in both custom and merged
+        expect(result).toEqual([
+            {KNOWLEDGE_BASE_PREFIX_MESSAGE: "From Knowledge Base:"},
+            {KNOWLEDGE_BASE_PREFIX_MESSAGE: ""},
+            {KNOWLEDGE_BASE_PREFIX_MESSAGE: ""}
+        ]);
+    });
+
     test('listSettings -- error thrown', async () => {
         const mockedContext = {
             rootState: {
