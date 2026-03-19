@@ -148,6 +148,8 @@ const Vuex = require('vuex');
 const _ = require('lodash');
 const sanitizeHtml = require('sanitize-html');
 
+const EMPTY_SENTINEL = 'EMPTY_STRING_BY_USER';
+
 module.exports = {
     data() {
         return {
@@ -190,6 +192,12 @@ module.exports = {
             for (const key in this.customSettings) {
                 if (this.customSettings[key] === this.defaultSettings[key]) {
                     delete this.customSettings[key];
+                }
+            }
+
+            for (const key in this.customSettings) {
+                if (this.customSettings[key] === "" && this.defaultSettings[key] !== "") {
+                    this.customSettings[key] = EMPTY_SENTINEL;
                 }
             }
 

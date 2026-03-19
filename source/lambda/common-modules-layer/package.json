@@ -1,6 +1,6 @@
 {
     "name": "common-modules-layer",
-    "version": "7.3.3",
+    "version": "7.3.4",
     "description": "QnABot Common-modules-layer lambda",
     "main": "index.js",
     "scripts": {
@@ -17,5 +17,8 @@
         "name": "Amazon Web Services",
         "url": "https://aws.amazon.com/solutions"
     },
-    "license": "Apache-2.0"
+    "license": "Apache-2.0",
+    "overrides": {
+        "fast-xml-parser": "^5.5.6"
+    }
 }

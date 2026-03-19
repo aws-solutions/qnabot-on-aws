@@ -57,23 +57,37 @@ describe('when calling set_environment_variables', () => {
 });
 
 describe('when calling getSettings function', () => {
-    beforeAll(() => {
-        dynamoMock.reset();
-        dynamoMock.on(ScanCommand).callsFake(() => {
-            return {Items: [{SettingName: {"S": "Test_Setting"}, SettingValue:{"S": "Test_Value"}, DefaultValue:{"S":"Test_Not_Chosen"}},{SettingName: {"S": "Test_Default_Setting"}, SettingValue:{"S": ""}, DefaultValue:{"S":"Test_Chosen"}}]};
-        });
+    afterAll(() => {
+        ssmMock.restore();
     });
 
-    it('should return a properly merged settings object', async () => {
+    it('should preserve empty string when SettingValue is the sentinel value', async () => {
+        dynamoMock.reset();
+        dynamoMock.on(ScanCommand).callsFake(() => {
+            return {Items: [
+                {SettingName: {"S": "Test_Setting"}, SettingValue:{"S": "Test_Value"}, DefaultValue:{"S":"Test_Not_Chosen"}},
+                {SettingName: {"S": "Test_Sentinel_Setting"}, SettingValue:{"S": "EMPTY_STRING_BY_USER"}, DefaultValue:{"S":"Should_Not_Be_Used"}}
+            ]};
+        });
         process.env.SETTINGS_TABLE = 'mock_settings_table'
 
         let result = await settings.getSettings();
 
-        expect(result).toEqual({"Test_Setting":"Test_Value", "Test_Default_Setting":"Test_Chosen"});
+        expect(result).toEqual({"Test_Setting":"Test_Value", "Test_Sentinel_Setting":""});
     });
 
-    afterAll(() => {
-        ssmMock.restore();
+    it('should fall back to DefaultValue when SettingValue is empty string (never customized)', async () => {
+        dynamoMock.reset();
+        dynamoMock.on(ScanCommand).callsFake(() => {
+            return {Items: [
+                {SettingName: {"S": "Test_Setting"}, SettingValue:{"S": ""}, DefaultValue:{"S":"Fallback_Value"}}
+            ]};
+        });
+        process.env.SETTINGS_TABLE = 'mock_settings_table'
+
+        let result = await settings.getSettings();
+
+        expect(result).toEqual({"Test_Setting":"Fallback_Value"});
     });
 });
 

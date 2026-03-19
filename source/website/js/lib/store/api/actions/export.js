@@ -8,6 +8,8 @@ const { DynamoDBClient, ScanCommand } = require('@aws-sdk/client-dynamodb');
 const { unmarshall } = require('@aws-sdk/util-dynamodb');
 const util = require('./../../../../capability/util');
 
+const EMPTY_SENTINEL = 'EMPTY_STRING_BY_USER';
+
 async function getParameters(context, dynamodb) {
     const tableName = context.rootState.info.SettingsTable;
 
@@ -39,7 +41,9 @@ async function getParameters(context, dynamodb) {
                 const defaultValue = unmarshalledItem.DefaultValue;
                 const settingCategory = unmarshalledItem.SettingCategory;
 
-                if (settingValue != "") {
+                if (settingValue === EMPTY_SENTINEL) {
+                    custom_settings[settingName] = "";
+                } else if (settingValue !== "") {
                     custom_settings[settingName] = settingValue;
                 }
 

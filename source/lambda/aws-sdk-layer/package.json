@@ -1,6 +1,6 @@
 {
     "name": "aws-layer",
-    "version": "7.3.3",
+    "version": "7.3.4",
     "description": "QnABot Lambda aws-sdk-layer",
     "main": "index.js",
     "scripts": {
@@ -17,5 +17,8 @@
         "@aws-sdk/client-lambda": "^3.699.0",
         "@aws-sdk/client-s3": "^3.705.0",
         "@aws-sdk/client-translate": "^3.699.0"
+    },
+    "overrides": {
+        "fast-xml-parser": "^5.5.6"
     }
 }

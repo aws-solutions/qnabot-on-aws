@@ -9,6 +9,10 @@ const { unmarshall } = require('@aws-sdk/util-dynamodb');
 const { SSMClient, GetParameterCommand } = require('@aws-sdk/client-ssm');
 const customSdkConfig = require('sdk-config/customSdkConfig');
 const qnabot = require('./logging');
+
+// Sentinel value to distinguish "user cleared to empty" from "never customized" in DynamoDB.
+const EMPTY_SENTINEL = 'EMPTY_STRING_BY_USER';
+
 const region = process.env.AWS_REGION;
 
 const ssm = new SSMClient(customSdkConfig('C022', { region }));
@@ -92,7 +96,9 @@ async function getSettings() {
         const settingValue = unmarshalledItem.SettingValue;
         const defaultValue = unmarshalledItem.DefaultValue;
 
-        if (settingValue != "") {
+        if (settingValue === EMPTY_SENTINEL) {
+            settings[settingName] = "";
+        } else if (settingValue !== "") {
             settings[settingName] = settingValue;
         } else {
             settings[settingName] = defaultValue;
