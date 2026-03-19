@@ -1,0 +1,34 @@
+{
+	"qna": [
+		{
+			"a": "I have set \"Amazon\" as your session attribute.",
+			"type": "qna",
+			"qid": "Session.002",
+			"sa": [
+				{
+					"text": "myAttribute",
+					"value": "Amazon"
+				}
+			],
+			"q": ["Set session attribute as Amazon"]
+		},
+		{
+			"a": "I have set a session attribute for \"AWS\".\n\n\"{{setSessionAttr 'myAttribute' 'AWS'}}\"",
+			"type": "qna",
+			"qid": "Session.003",
+			"q": ["Set session attribute as AWS"]
+		},
+		{
+			"a": "Here is your session attribute: \"{{getSessionAttr 'missingAttribute' 'default'}}\"",
+			"type": "qna",
+			"qid": "Session.001",
+			"q": ["Get empty session attribute"]
+		},
+		{
+			"a": "Here is your session attribute: \"{{getSessionAttr 'myAttribute' 'empty'}}\"",
+			"type": "qna",
+			"qid": "Session.004",
+			"q": ["Get session attribute"]
+		}
+	]
+}

@@ -1,0 +1,52 @@
+{
+    "qna": [
+      {
+        "passage": "Passage",
+        "kendraRedirectQueryText": "KendraRedirect",
+        "refMarkdown": "ReferenceLinks",
+        "conditionalChaining": "ChainingRule",
+        "l": "LambdaHook",
+        "type": "text",
+        "qid": "Import.007",
+        "sa": [
+          {
+            "enableTranslate": true,
+            "text": "SessionAttributeName1",
+            "value": "SessionAttributeValue1"
+          },
+          {
+            "text": "SessionAttributeName2",
+            "value": "SessionAttributeValue2"
+          }
+        ],
+        "kendraRedirectQueryConfidenceThreshold": "LOW",
+        "clientFilterValues": "ClientFilter",
+        "tags": "Tags",
+        "args": [
+          "Arg1",
+          "Arg2"
+        ],
+        "r": {
+          "buttons": [
+            {
+              "text": "ButtonText1",
+              "value": "ButtonValue1"
+            },
+            {
+              "text": "ButtonText2",
+              "value": "ButtonValue2"
+            }
+          ],
+          "subTitle": "CardSubtitle",
+          "imageUrl": "CardUrl",
+          "title": "CardTitle"
+        },
+        "t": "Topic",
+        "kendraRedirectQueryArgs": [
+          "KendraQuery1",
+          "KendraQuery2"
+        ],
+        "rp": "AlexReprompt"
+      }
+    ]
+}

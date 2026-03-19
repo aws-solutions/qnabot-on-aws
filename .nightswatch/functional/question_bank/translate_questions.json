@@ -1,0 +1,22 @@
+{
+	"qna": [
+		{
+			"qid": "Translate.001",
+			"type": "qna",
+			"q": ["Can you tell me why I should use custom terminology?"],
+			"a": "Using custom terminology enables you to ensure your brand names aren't modified during translation."
+		},
+		{
+			"a": "{{#ifLang 'es'}}\n          Significa mucho para mí\n{{/ifLang}}\n\n{{#defaultLang}}\n          It means a lot to them\n{{/defaultLang}}",
+			"type": "qna",
+			"qid": "Translate.002",
+			"q": ["Why should you say mucho when talking to your Hispanic friends?"]
+		},
+		{
+			"qid": "Translate.003",
+			"type": "qna",
+			"q": ["Test fees translation"],
+			"a": "You can import this product without incurring any fees or custom duties."
+		}
+	]
+}

@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "Functional tests"
+description = "Functional tests"
+package-mode = false
+
+[tool.poetry.dependencies]
+python = "^3.10"
+pytest = "^8.3.3"
+pytest-json = "^0.4.0"
+boto3 = "^1.35.58"
+selenium = "4.16"
+pyyaml = "^6.0.2"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

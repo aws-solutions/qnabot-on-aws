@@ -1,0 +1,20 @@
+{
+    "qna": [
+      {
+        "descr": "Description",
+        "resolutionStrategyRestrict": true,
+        "type": "slottype",
+        "qid": "Import.006",
+        "slotTypeValues": [
+          {
+            "synonyms": "Synonyms",
+            "samplevalue": "Value1"
+          },
+          {
+            "synonyms": "Synonyms2",
+            "samplevalue": "Value2"
+          }
+        ]
+      }
+    ]
+}

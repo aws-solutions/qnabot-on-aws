@@ -1,0 +1,11 @@
+{
+    "qna": [
+      {
+        "q": [
+          "Which file formats are supported by the QnA Bot question designer import?"
+        ],
+        "a": "JSON and xlsx.",
+        "qid": "Import.001"
+      }
+    ]
+}
