@@ -9,6 +9,9 @@ import random
 import string
 import uuid
 import boto3
+from botocore.config import Config
+
+BOTO3_CONFIG = Config(connect_timeout=5, read_timeout=30)
 
 AMAZONQ_APP_ID = os.environ.get("AMAZONQ_APP_ID")
 AMAZONQ_REGION = os.environ.get("AMAZONQ_REGION") or os.environ["AWS_REGION"]
@@ -74,7 +77,7 @@ def get_args_from_lambdahook_args(event):
 def get_s3_file(s3_path):
     if s3_path.startswith("s3://"):
         s3_path = s3_path[5:]
-    s3 = boto3.resource('s3')
+    s3 = boto3.resource('s3', config=BOTO3_CONFIG)
     bucket, key = s3_path.split("/", 1)
     obj = s3.Object(bucket, key)
     return obj.get()['Body'].read()
@@ -161,7 +164,7 @@ def format_show_source_links(amazonq_response):
         markdown = f'{markdown}<br>Sources: ' + ", ".join(source_links)
 
 def get_idc_iam_credentials(jwt):
-    sso_oidc_client = boto3.client('sso-oidc')
+    sso_oidc_client = boto3.client('sso-oidc', config=BOTO3_CONFIG)
     idc_sso_resp = sso_oidc_client.create_token_with_iam(
         clientId=os.environ.get("IDC_CLIENT_ID"),
         grantType="urn:ietf:params:oauth:grant-type:jwt-bearer",
@@ -172,7 +175,7 @@ def get_idc_iam_credentials(jwt):
     idc_sso_id_token_jwt = json.loads(base64.b64decode(idc_sso_resp['idToken'].split('.')[1] + '==').decode())
 
     sts_context = idc_sso_id_token_jwt["sts:identity_context"]
-    sts_client = boto3.client('sts')
+    sts_client = boto3.client('sts', config=BOTO3_CONFIG)
     session_name = "qbusiness-idc-" + "".join(
         random.choices(string.ascii_letters + string.digits, k=32) # NOSONAR
     )
@@ -204,10 +207,10 @@ def lambda_handler(event, context): # NOSONAR Lambda Handler
     decoded_token = json.loads(base64.b64decode(token.split('.')[1] + '==').decode())
     jti = decoded_token['jti']
 
-    dynamo_resource = boto3.resource('dynamodb')
+    dynamo_resource = boto3.resource('dynamodb', config=BOTO3_CONFIG)
     dynamo_table = dynamo_resource.Table(os.environ.get('DYNAMODB_CACHE_TABLE_NAME'))
 
-    kms_client = boto3.client('kms')
+    kms_client = boto3.client('kms', config=BOTO3_CONFIG)
     kms_key_id = os.environ.get("KMS_KEY_ID")
 
     # Check if JTI exists in caching DB
@@ -234,7 +237,7 @@ def lambda_handler(event, context): # NOSONAR Lambda Handler
         aws_session_token=creds['SessionToken']
     )
 
-    qbusiness_client = assumed_session.client("qbusiness")
+    qbusiness_client = assumed_session.client("qbusiness", config=BOTO3_CONFIG)
     amazonq_response = get_amazonq_response(user_input, amazonq_context, attachments, qbusiness_client)
     event = format_response(event, amazonq_response)
     print("Returning response: %s" % json.dumps(event))

@@ -44,7 +44,7 @@ async function getSigningKey(kid, url) {
 function verifyToken(idtoken, signingKey) {
     // verify that the token is valid and not expired
     try {
-        jwt.verify(idtoken, signingKey);
+        jwt.verify(idtoken, signingKey); // NOSONAR javascript:S6437 - signingKey is fetched dynamically from JWKS endpoint, not a hardcoded credential
         return true;
     } catch (e) {
         qnabot.log('idaccesstoken is not valid:', e);

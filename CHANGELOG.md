@@ -5,6 +5,26 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [7.3.6] - 2026-04-02
+
+### Fixed
+
+- Fixed `.sort()` without comparator in fulfillment Lambda
+- Fixed duplicate HTML IDs in Cognito login template
+- Added explicit boto3 timeout config to Q Business Lambda hook
+
+### Security
+
+- Updated handlebars to `4.7.9`
+- Updated path-to-regexp to `0.1.13`
+- Updated fast-xml-parser to `5.5.9`
+- Updated node-forge to `1.4.0`
+- Updated picomatch to `2.3.2`
+- Updated brace-expansion to `5.0.5`
+- Updated yaml to `1.10.3`
+- Updated @xmldom/xmldom to `0.8.12`
+- Updated lodash to `4.18.1`
+
 ## [7.3.5] - 2026-03-24
 
 ### Security
