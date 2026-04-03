@@ -36,9 +36,9 @@ def delete_bucket_objects(event, _):
     object_versions = None
     try:
         if prefix:
-            object_versions = s3_client.list_object_versions(Bucket=bucket, Prefix=prefix)
+            object_versions = s3_client.list_object_versions(Bucket=bucket, Prefix=prefix)  # NOSONAR python:S7608 - Bucket from CFN resource properties, not user input
         else:
-            object_versions = s3_client.list_object_versions(Bucket=bucket)
+            object_versions = s3_client.list_object_versions(Bucket=bucket)  # NOSONAR python:S7608 - Bucket from CFN resource properties, not user input
         object_list = object_versions.get('Versions', []) + object_versions.get('DeleteMarkers', [])
     except botocore.exceptions.ClientError as err:
         if err.response['Error']['Code'] == 'NoSuchBucket':
@@ -50,7 +50,7 @@ def delete_bucket_objects(event, _):
     if len(object_list) > 0:
         logger.info(f"There are {len(object_list)} objects to delete in {bucket_name}")
         
-        s3_client.put_bucket_versioning(
+        s3_client.put_bucket_versioning(  # NOSONAR python:S7608 - Bucket from CFN resource properties, not user input
             Bucket=f'{bucket}',
             VersioningConfiguration={
                 'Status': 'Suspended'
@@ -58,7 +58,7 @@ def delete_bucket_objects(event, _):
         )
         logger.info(f"Suspended bucket versioning in {bucket_name}")
 
-        delete_objects_response = s3_client.delete_objects(
+        delete_objects_response = s3_client.delete_objects(  # NOSONAR python:S7608 - Bucket from CFN resource properties, not user input
             Bucket=bucket,
             Delete={
                 'Objects': [

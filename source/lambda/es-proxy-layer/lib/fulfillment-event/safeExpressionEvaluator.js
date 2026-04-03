@@ -326,7 +326,7 @@ function evaluateExpression(expression, context) {
         // Use Function constructor with explicit parameters
         // This is safe because we've validated the expression tokens
         const evaluator = new Function(...contextKeys, `'use strict'; return (${expression});`); // NOSONAR javascript:S1523 - Function constructor used safely with validated expression
-        return evaluator(...contextValues);
+        return evaluator(...contextValues); // NOSONAR javascript:S1523 - Invocation of validated expression evaluator
     } catch (error) {
         throw new Error(`Expression evaluation failed: ${error.message}`);
     }

@@ -1,6 +1,6 @@
 {
     "name": "proxy-es",
-    "version": "7.3.5",
+    "version": "7.3.6",
     "description": "QnABot Lambda managing querying of data store",
     "main": "index.js",
     "scripts": {
@@ -23,7 +23,7 @@
         "aws4": "^1.6.0",
         "axios": "^1.13.5",
         "bodybuilder": "^2.5.1",
-        "handlebars": "^4.7.8",
+        "handlebars": "^4.7.9",
         "langchain": "^0.3.37",
         "linkifyjs": "^4.3.2",
         "sanitize-html": "^2.13.0",
