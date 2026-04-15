@@ -97,7 +97,7 @@ function tokenize(expression) {
     //    - Make the tokenization logic harder to understand (scattered across multiple patterns)
     //    - Increase the risk of bugs (more complex control flow and state management)
     //
-    const regex = /\s*(===|!==|==|!=|<=|>=|&&|\|\||'[^']*'|"[^"]*"|\d+\.\d+|\d+|[+\-<>!?:().]|\w+)\s*/g; // NOSONAR javascript:S5843 - Regex complexity justified for tokenization use case
+    const regex = /\s*(===|!==|==|!=|<=|>=|&&|\|\||'[^']*'|"[^"]*"|\d+\.\d+|\d+|[+\-<>!?:().[\]]|\w+)\s*/g; // NOSONAR javascript:S5843 - Regex complexity justified for tokenization use case
     
     let match;
     while ((match = regex.exec(expression)) !== null) {

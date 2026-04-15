@@ -367,10 +367,12 @@ module.exports = {
                         'BuildExamples',
                         {
                             SETTINGS_TABLE: { Ref: 'SettingsTable' },
+                            DEFAULT_SETTINGS_PARAM: { Ref: 'DefaultQnABotSettings' },
                             ...examples,
                             ...util.getCommonEnvironmentVariables(),
                         },
                         {
+                            DEFAULT_SETTINGS_PARAM: { Ref: 'DefaultQnABotSettings' },
                             ...util.getCommonEnvironmentVariables(),
                         },
                     ],
@@ -453,6 +455,7 @@ module.exports = {
                     SETTINGS_TABLE: { Ref: 'SettingsTable' },
                     EMBEDDINGS_API: { Ref: 'EmbeddingsApi' },
                     EMBEDDINGS_LAMBDA_ARN: { Ref: 'EmbeddingsLambdaArn' },
+                    DEFAULT_SETTINGS_PARAM: { Ref: 'DefaultQnABotSettings' },
                     ...util.getCommonEnvironmentVariables(),
                 },
             },
