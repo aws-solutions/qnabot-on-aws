@@ -94,6 +94,10 @@ async function evaluateConditionalChaining(req, res, hit, conditionalChaining) {
     qnabot.log('evaluateConditionalChaining hit: ', JSON.stringify(hit, null, 2));
     // decrypt conditionalChaining
     conditionalChaining = encryptor.decrypt(conditionalChaining);
+    if (!conditionalChaining) {
+        qnabot.log('WARNING: Failed to decrypt conditional chaining rule — skipping chaining');
+        return [req, res, hit, [{ message: 'Failed to decrypt conditional chaining rule' }]];
+    }
     qnabot.log('Decrypted Chained document rule specified:', conditionalChaining);
     let next_q;
     let errors = [];

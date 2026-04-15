@@ -4925,6 +4925,9 @@ exports.handler = async function (event, context) {
         },
         "Environment": {
           "Variables": {
+            "DEFAULT_SETTINGS_PARAM": {
+              "Ref": "DefaultQnABotSettings",
+            },
             "EMBEDDINGS_API": {
               "Ref": "EmbeddingsApi",
             },
@@ -5862,6 +5865,9 @@ exports.handler = async function (event, context) {
             "Fn::If": [
               "BuildExamples",
               {
+                "DEFAULT_SETTINGS_PARAM": {
+                  "Ref": "DefaultQnABotSettings",
+                },
                 "EXTCreateRecentTopicsResponse": {
                   "Fn::GetAtt": [
                     "ExamplesStack",
@@ -5935,6 +5941,9 @@ exports.handler = async function (event, context) {
                 "SOLUTION_VERSION": "vx.x.x",
               },
               {
+                "DEFAULT_SETTINGS_PARAM": {
+                  "Ref": "DefaultQnABotSettings",
+                },
                 "SOLUTION_ID": "SO0189",
                 "SOLUTION_VERSION": "vx.x.x",
               },
@@ -7942,6 +7951,9 @@ exports.documents = async (event, context) => {
                 "AWS_ACCOUNT_ID": {
                   "Ref": "AWS::AccountId",
                 },
+                "DEFAULT_SETTINGS_PARAM": {
+                  "Ref": "DefaultQnABotSettings",
+                },
                 "DEFAULT_USER_POOL_JWKS_PARAM": {
                   "Ref": "DefaultUserPoolJwksUrl",
                 },
@@ -8185,6 +8197,9 @@ exports.documents = async (event, context) => {
               {
                 "AWS_ACCOUNT_ID": {
                   "Ref": "AWS::AccountId",
+                },
+                "DEFAULT_SETTINGS_PARAM": {
+                  "Ref": "DefaultQnABotSettings",
                 },
                 "DEFAULT_USER_POOL_JWKS_PARAM": {
                   "Ref": "DefaultUserPoolJwksUrl",
