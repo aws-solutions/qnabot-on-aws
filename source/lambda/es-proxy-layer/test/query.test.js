@@ -3,6 +3,8 @@
 *   SPDX-License-Identifier: Apache-2.0                                                            *
  ************************************************************************************************ */
 
+process.env.DEFAULT_SETTINGS_PARAM = 'test-settings-param-key';
+
 const query = require('../lib/query');
 const awsMock = require('aws-sdk-client-mock');
 const logging = require('qnabot/logging');

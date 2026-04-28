@@ -3,6 +3,8 @@
 *   SPDX-License-Identifier: Apache-2.0                                                            *
  ************************************************************************************************ */
 
+process.env.DEFAULT_SETTINGS_PARAM = 'test-settings-param-key';
+
 const _ = require('lodash');
 const handlebars = require('../../lib/handlebars');
 const kendra_fallback = require('../../lib/kendra');

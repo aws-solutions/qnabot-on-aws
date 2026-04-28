@@ -265,6 +265,30 @@ function checkTopLevelIdentifier(token, prevToken, contextKeys) {
 }
 
 /**
+ * Validate that the tokenizer fully represents the original expression.
+ * 
+ * If the tokenizer silently drops characters (e.g., backticks, semicolons, curly braces),
+ * those characters could enable bypass attacks (tagged template literals, statement injection).
+ * This check ensures no characters were lost during tokenization.
+ * 
+ * @param {string} expression - The original expression
+ * @param {Array<string>} tokens - The tokenized output
+ * @throws {Error} If the expression contains characters not captured by the tokenizer
+ */
+function validateTokensCoverExpression(expression, tokens) {
+    // Strip whitespace outside string literals only
+    const stripped = expression.replace(/'[^']*'|"[^"]*"|\s+/g, (match) => {
+        return match[0] === "'" || match[0] === '"' ? match : '';
+    });
+    const joined = tokens.join('');
+    if (stripped !== joined) {
+        throw new Error(
+            'Security violation: Expression contains characters not recognized by the tokenizer'
+        );
+    }
+}
+
+/**
  * Validate tokens against security allowlist
  * 
  * Runs all security checks on the token stream to ensure:
@@ -372,6 +396,9 @@ function safeEvaluate(expression, context) {
     const tokens = tokenize(expression);
     qnabot.debug('Safe evaluation - Tokens:', JSON.stringify(tokens));
     
+    // Stage 1.5: Verify tokenizer captured all characters
+    validateTokensCoverExpression(expression, tokens);
+    
     // Stage 2: Validate
     validateTokens(tokens, context);
     
@@ -386,6 +413,7 @@ module.exports = {
     safeEvaluate,
     tokenize,
     validateTokens,
+    validateTokensCoverExpression,
     evaluateExpression,
     ALLOWED_METHODS,
     BLOCKED_PROPERTIES,

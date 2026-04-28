@@ -3,10 +3,16 @@
 *   SPDX-License-Identifier: Apache-2.0                                                            *
  ************************************************************************************************ */
 
-const _ = require('lodash');
-
-// use DEFAULT_SETTINGS_PARAM as random encryption key unique to this QnABot installation
-const key = _.get(process.env, 'DEFAULT_SETTINGS_PARAM', 'fdsjhf98fd98fjh9 du98fjfd 8ud8fjdf');
+// use DEFAULT_SETTINGS_PARAM as encryption key unique to this QnABot installation
+const key = process.env.DEFAULT_SETTINGS_PARAM;
+if (!key) {
+    throw new Error(
+        'DEFAULT_SETTINGS_PARAM environment variable is not set. '
+        + 'This variable must be configured in the FulfillmentLambda and ESQueryLambda '
+        + 'environment variables, referencing the DefaultQnABotSettings SSM parameter '
+        + "(e.g., { Ref: 'DefaultQnABotSettings' })."
+    );
+}
 const encryptor = require('simple-encryptor')(key);
 
 exports.encryptor = encryptor;
