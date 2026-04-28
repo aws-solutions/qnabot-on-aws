@@ -522,6 +522,54 @@ describe('Safe Expression Evaluator', () => {
         });
     });
 
+    describe('validateTokensCoverExpression - Post-tokenization validation', () => {
+        const { validateTokensCoverExpression } = require('../../lib/fulfillment-event/safeExpressionEvaluator');
+
+        test('blocks tagged template literal bypass (backticks)', () => {
+            expect(() => safeEvaluate("SessionAttributes.topic.endsWith`test`", mockContext))
+                .toThrow('characters not recognized by the tokenizer');
+        });
+
+        test('blocks semicolons', () => {
+            expect(() => safeEvaluate("SessionAttributes.topic; malicious()", mockContext))
+                .toThrow('characters not recognized by the tokenizer');
+        });
+
+        test('blocks curly braces', () => {
+            expect(() => safeEvaluate("SessionAttributes.topic; {}", mockContext))
+                .toThrow('characters not recognized by the tokenizer');
+        });
+
+        test('blocks backslashes', () => {
+            expect(() => safeEvaluate("SessionAttributes.topic\\n", mockContext))
+                .toThrow('characters not recognized by the tokenizer');
+        });
+
+        test('allows valid expressions with spaces in strings', () => {
+            expect(safeEvaluate("'Hello ' + UserInfo.userName", mockContext))
+                .toBe('Hello testuser');
+        });
+
+        test('allows valid expressions with tabs and newlines', () => {
+            expect(safeEvaluate("SessionAttributes.topic\t===\n'weather'", mockContext))
+                .toBe(true);
+        });
+
+        test('passes for simple valid expression', () => {
+            expect(() => validateTokensCoverExpression(
+                "SessionAttributes.topic === 'weather'",
+                ['SessionAttributes', '.', 'topic', '===', "'weather'"]
+            )).not.toThrow();
+        });
+
+        test('fails when backtick is dropped', () => {
+            expect(() => validateTokensCoverExpression(
+                "SessionAttributes.topic.endsWith`test`",
+                ['SessionAttributes', '.', 'topic', '.', 'endsWith', 'test']
+            )).toThrow('characters not recognized by the tokenizer');
+        });
+    });
+
     describe('constants', () => {
         test('ALLOWED_METHODS contains expected methods', () => {
             expect(ALLOWED_METHODS.has('includes')).toBe(true);

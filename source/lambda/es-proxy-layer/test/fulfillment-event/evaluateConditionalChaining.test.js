@@ -3,6 +3,8 @@
 *   SPDX-License-Identifier: Apache-2.0                                                            *
  ************************************************************************************************ */
 
+process.env.DEFAULT_SETTINGS_PARAM = 'test-settings-param-key';
+
 const { evaluateConditionalChaining } = require('../../lib/fulfillment-event/evaluateConditionalChaining');
 const { encryptor } = require('../../lib/fulfillment-event/encryptor');
 const { invokeLambda } = require('../../lib/fulfillment-event/invokeLambda');
