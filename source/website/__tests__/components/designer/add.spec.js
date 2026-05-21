@@ -158,5 +158,45 @@ describe('add vue', () => {
         
     }); 
 
+    test('add -- iframe stripped from alt.markdown', async () => {
+        store.dispatch.mockReturnValueOnce(Promise.resolve(false));
+        const wrapper = mount(add, { global: { mocks: { $store: store } } });
+        wrapper.vm.$data.data = { qna: { qid: 'test', q: ['test'], a: 'test',
+            alt: { markdown: '<iframe src="https://example.com"></iframe>' }, type: 'qna' } };
+        await wrapper.vm.add();
+        expect(store.dispatch).toHaveBeenNthCalledWith(2, 'data/add',
+            expect.objectContaining({ alt: { markdown: '' } }));
+    });
+
+    test('add -- https img preserved in alt.markdown', async () => {
+        store.dispatch.mockReturnValueOnce(Promise.resolve(false));
+        const wrapper = mount(add, { global: { mocks: { $store: store } } });
+        wrapper.vm.$data.data = { qna: { qid: 'test', q: ['test'], a: 'test',
+            alt: { markdown: '<img src="https://aws.amazon.com/favicon.ico" alt="AWS">' }, type: 'qna' } };
+        await wrapper.vm.add();
+        expect(store.dispatch).toHaveBeenNthCalledWith(2, 'data/add',
+            expect.objectContaining({ alt: { markdown: '<img src="https://aws.amazon.com/favicon.ico" alt="AWS" />' } }));
+    });
+
+    test('add -- p style white-space preserved, color stripped in alt.markdown', async () => {
+        store.dispatch.mockReturnValueOnce(Promise.resolve(false));
+        const wrapper = mount(add, { global: { mocks: { $store: store } } });
+        wrapper.vm.$data.data = { qna: { qid: 'test', q: ['test'], a: 'test',
+            alt: { markdown: '<p style="color:red;white-space:pre-line;">text</p>' }, type: 'qna' } };
+        await wrapper.vm.add();
+        expect(store.dispatch).toHaveBeenNthCalledWith(2, 'data/add',
+            expect.objectContaining({ alt: { markdown: '<p style="white-space:pre-line">text</p>' } }));
+    });
+
+    test('add -- span translate preserved in alt.markdown', async () => {
+        store.dispatch.mockReturnValueOnce(Promise.resolve(false));
+        const wrapper = mount(add, { global: { mocks: { $store: store } } });
+        wrapper.vm.$data.data = { qna: { qid: 'test', q: ['test'], a: 'test',
+            alt: { markdown: '<span translate="no">AWS Lambda</span>' }, type: 'qna' } };
+        await wrapper.vm.add();
+        expect(store.dispatch).toHaveBeenNthCalledWith(2, 'data/add',
+            expect.objectContaining({ alt: { markdown: '<span translate="no">AWS Lambda</span>' } }));
+    });
+
 
 });

@@ -8,7 +8,7 @@ const { sanitize, escapeHashMarkdown } = require('../lib/sanitizeOutput');
 describe('should be able to sanitize LLM Outputs', () => {
     it('should sanitize input data correctly', () => {
         const inputData = '<script>alert("XSS attack");</script><img src=x onerror=alert(1)><p>Hello, world!</p>';
-        const expectedOutput = '<p>Hello, world!</p>';
+        const expectedOutput = '<img src="x" /><p>Hello, world!</p>';
         const sanitizedData = sanitize(inputData);
         expect(sanitizedData).toEqual(expectedOutput);
     });

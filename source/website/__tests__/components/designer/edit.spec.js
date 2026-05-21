@@ -508,4 +508,51 @@ describe('designer edit module', () => {
             expect(store.dispatch).not.toHaveBeenCalledWith('data/update', expect.anything());
         });
     });
+
+    describe('sanitize allowlist', () => {
+        const baseData = {
+            qid: 'test', q: ['test'], a: 'test', alt: { markdown: '' }, type: 'qna',
+        };
+        const makeStore = () => ({
+            state: {
+                data: { schema: { qna: { type: 'object', properties: {
+                    qid: { type: 'string' }, q: { type: 'array', items: { type: 'string' } },
+                    a: { type: 'string' }, alt: { type: 'object' }, type: { type: 'string' },
+                } } } },
+                tmp: { quniqueterms: 'test' },
+            },
+            dispatch: jest.fn().mockReturnValue(false),
+        });
+
+        async function testMarkdown(input, expected) {
+            const store = makeStore();
+            const wrapper = shallowMount(editModule, {
+                props: { data: { ...baseData, alt: { markdown: input } } },
+                global: { mocks: { $store: store } },
+            });
+            wrapper.vm.$data.tmp = { ...baseData, quniqueterms: 'test', alt: { markdown: input } };
+            await wrapper.vm.update();
+            expect(store.dispatch).toHaveBeenCalledWith('data/update',
+                expect.objectContaining({ alt: { markdown: expected } }));
+        }
+
+        test('update -- iframe stripped from alt.markdown', async () => {
+            await testMarkdown('<iframe src="https://example.com"></iframe>', '');
+        });
+
+        test('update -- https img preserved in alt.markdown', async () => {
+            await testMarkdown('<img src="https://aws.amazon.com/favicon.ico" alt="AWS">',
+                '<img src="https://aws.amazon.com/favicon.ico" alt="AWS" />');
+        });
+
+        test('update -- p style white-space preserved, color stripped in alt.markdown', async () => {
+            await testMarkdown('<p style="color:red;white-space:pre-line;">text</p>',
+                '<p style="white-space:pre-line">text</p>');
+        });
+
+        test('update -- span translate preserved in alt.markdown', async () => {
+            await testMarkdown('<span translate="no">AWS Lambda</span>',
+                '<span translate="no">AWS Lambda</span>');
+        });
+    });
 });

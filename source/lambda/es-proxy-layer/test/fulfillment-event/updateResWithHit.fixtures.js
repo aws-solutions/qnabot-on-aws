@@ -270,6 +270,7 @@ exports.hit = {
     'alt': {
         'markdown': 'markdown',
         'ssml': 'ssml',
+        'html': '<p>safe html</p>',
     },
     'autotranslate': true,
     'rp': '<speak>rp<speak>',
