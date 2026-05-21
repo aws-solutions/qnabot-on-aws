@@ -5,6 +5,7 @@
 
 const _ = require('lodash');
 const qnabot = require('qnabot/logging');
+const { sanitize } = require('../sanitizeOutput');
 
 function updateSessionNavigation(res, req) {
     const previousQid = _.get(res, 'session.qnabotcontext.previous.qid', false);
@@ -91,7 +92,16 @@ function addAltMessages(res) {
     } catch (e) {
         tmp = _.get(res, 'session.appContext', '{}');
     }
-    tmp.altMessages = _.get(res, 'result.alt', {});
+    const alt = _.cloneDeep(_.get(res, 'result.alt', {}));
+    if (alt.html) {
+        alt.html = sanitize(alt.html);
+    }
+    if (alt.markdown) {
+        alt.markdown = sanitize(alt.markdown);
+    }
+    // Note: alt.ssml is intentionally not sanitized — it is consumed only by
+    // Amazon Polly (text-to-speech) and never rendered in a browser DOM context.
+    tmp.altMessages = alt;
     _.set(res, 'session.appContext', tmp);
 
     return res;

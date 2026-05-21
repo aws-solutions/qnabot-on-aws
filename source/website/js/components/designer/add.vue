@@ -105,6 +105,7 @@ const _ = require('lodash');
 const Ajv = require('ajv');
 const empty = require('./empty');
 const sanitizeHtml = require('sanitize-html');
+const { sanitize: sanitizeMarkdown } = require('./sanitizeOutput');
 
 const ajv = new Ajv();
 
@@ -215,10 +216,7 @@ function clean(obj) {
 function sanitize(data, type) {
     const sanitizedData = { ...data };
     if (type === 'qna' && sanitizedData.alt?.markdown) {
-        sanitizedData.alt.markdown = sanitizeHtml(sanitizedData.alt.markdown, {
-            allowedTags: sanitizeHtml.defaults.allowedTags.concat(['iframe', 'details', 'summary']),
-            allowedAttributes: { ...sanitizeHtml.defaults.allowedAttributes, iframe: ['src']   },
-        });
+        sanitizedData.alt.markdown = sanitizeMarkdown(sanitizedData.alt.markdown);
         sanitizedData.alt.markdown = sanitizedData.alt.markdown.replace('&gt;', '>');
     }
     if (type === 'text' && sanitizedData.passage) {

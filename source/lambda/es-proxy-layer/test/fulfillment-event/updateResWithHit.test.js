@@ -147,4 +147,51 @@ describe('updateResWithHit', () => {
         expect(response.session.qnabotcontext.navigation.hasParent).toBe(false);
     });
 
+    test('sanitizes XSS from alt.html field', () => {
+        const clonedReq = _.cloneDeep(req);
+        const clonedRes = _.cloneDeep(res);
+        const clonedHit = _.cloneDeep(hit);
+        clonedHit.alt.html = '<img src=x onerror="alert(document.domain)">';
+
+        const response = updateResWithHit(clonedReq, clonedRes, clonedHit);
+
+        expect(response.session.appContext.altMessages.html).not.toContain('onerror');
+        expect(response.session.appContext.altMessages.html).not.toContain('alert');
+    });
+
+    test('sanitizes script tags from alt.html field', () => {
+        const clonedReq = _.cloneDeep(req);
+        const clonedRes = _.cloneDeep(res);
+        const clonedHit = _.cloneDeep(hit);
+        clonedHit.alt.html = '<p>Hello</p><script>steal(document.cookie)</script>';
+
+        const response = updateResWithHit(clonedReq, clonedRes, clonedHit);
+
+        expect(response.session.appContext.altMessages.html).toBe('<p>Hello</p>');
+    });
+
+    test('sanitizes XSS from alt.markdown field', () => {
+        const clonedReq = _.cloneDeep(req);
+        const clonedRes = _.cloneDeep(res);
+        const clonedHit = _.cloneDeep(hit);
+        clonedHit.alt.markdown = '<img src=x onerror="alert(1)">Some text';
+
+        const response = updateResWithHit(clonedReq, clonedRes, clonedHit);
+
+        expect(response.session.appContext.altMessages.markdown).not.toContain('onerror');
+    });
+
+    test('preserves safe HTML in alt.html field', () => {
+        const clonedReq = _.cloneDeep(req);
+        const clonedRes = _.cloneDeep(res);
+        const clonedHit = _.cloneDeep(hit);
+        clonedHit.alt.html = '<p>Safe <b>content</b> with <a href="https://example.com">link</a></p>';
+
+        const response = updateResWithHit(clonedReq, clonedRes, clonedHit);
+
+        expect(response.session.appContext.altMessages.html).toBe(
+            '<p>Safe <b>content</b> with <a href="https://example.com">link</a></p>'
+        );
+    });
+
 })

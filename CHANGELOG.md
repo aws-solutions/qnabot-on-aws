@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [7.3.12] - 2026-05-21
+
+### Security
+
+- Fixed stored XSS vulnerability in `alt.html` and `alt.markdown` Q&A response fields by adding server-side sanitization and aligning the Content Designer allowlist. Custom HTML tags and attributes outside the default allowlist will be excluded from Q&A responses and from content saved in the Content Designer. See [Server-side sanitization and using custom tags and attributes in responses](https://docs.aws.amazon.com/solutions/latest/qnabot-on-aws/server-side-html-sanitization.html) in the Implementation Guide for details on the default allowlist and customization instructions.
+
+### Fixed
+
+- Fixed fresh stack CREATE failure by removing the `aws-sdk: npm:dry-uninstall@*` override from `cfn-lambda-layer`.
+
 ## [7.3.11] - 2026-05-18
 
 ### Security

@@ -3,6 +3,8 @@
 *   SPDX-License-Identifier: Apache-2.0                                                            *
  ************************************************************************************************ */
 
+// Mirrors source/lambda/es-proxy-layer/lib/sanitizeOutput.js
+// To add custom tags or attributes, update BOTH this file and the Lambda version.
 const sanitizeHtml = require('sanitize-html');
 
 // Sanitize outputs to prevent malicious attacks
@@ -18,20 +20,7 @@ function sanitize(data) {
             a: ['http', 'https', 'mailto', 'tel'],
         },
     };
-    const sanitizedData = sanitizeHtml(data, sanitizeParams);
-    return sanitizedData;
+    return sanitizeHtml(data, sanitizeParams);
 }
 
-// Escapes hash if the input text starts with one or more hashes followed by a space. 
-function escapeHashMarkdown(text) { 
-
-    const match = /^(#+)/; // Matches one ore more hashes at the start of the text
-
-    if(match.test(text)){ // If it matches the escape first hash symbol
-        text = text.replace(/^#/, '\\#')
-    };
-    return text;
-}
-
-exports.escapeHashMarkdown = escapeHashMarkdown;
-exports.sanitize = sanitize;
+module.exports = { sanitize };
