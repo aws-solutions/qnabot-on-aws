@@ -15,7 +15,7 @@ CONTEXT_SETTINGS = dict(help_option_names=["-h", "--help"])
 @click.pass_context
 def cli(ctx) -> None:
     os.environ["SOLUTION_ID"] = "SO0189"
-    os.environ["SOLUTION_VERSION"] = "v7.3.13"
+    os.environ["SOLUTION_VERSION"] = "v7.3.14"
 
 
 @cli.command("import")

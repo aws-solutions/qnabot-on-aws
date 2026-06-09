@@ -4,7 +4,6 @@
  ************************************************************************************************ */
 
 // start connection
-const url = require('url');
 const bodybuilder = require('bodybuilder');
 const _ = require('lodash');
 
@@ -31,7 +30,7 @@ module.exports = async function (event, context) {
     qnabot.debug('OpenSearch Query', JSON.stringify(query, null, 2));
     try {
         const result = await request({
-            url: url.resolve(`https://${process.env.ES_ADDRESS}`, `/${process.env.ES_INDEX}/_search`),
+            url: new URL(`/${process.env.ES_INDEX}/_search`, `https://${process.env.ES_ADDRESS}`).href,
             method: 'GET',
             body: query,
         });
