@@ -3,7 +3,6 @@
 *   SPDX-License-Identifier: Apache-2.0                                                            *
  ************************************************************************************************ */
 
-const Url = require('url');
 const cfnLambda = require('cfn-lambda');
 const qnabot = require('qnabot/logging');
 const request = require('./request');
@@ -11,7 +10,7 @@ const request = require('./request');
 async function run_es_query(event) {
     qnabot.log('Received event:', JSON.stringify(event, null, 2));
     const res = await request({
-        url: Url.resolve(`https://${event.endpoint}`, event.path),
+        url: new URL(event.path, `https://${event.endpoint}`).href,
         method: event.method,
         headers: event.headers,
         body: event.body,

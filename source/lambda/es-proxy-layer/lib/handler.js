@@ -3,7 +3,6 @@
 *   SPDX-License-Identifier: Apache-2.0                                                            *
  ************************************************************************************************ */
 
-const Url = require('url');
 const _ = require('lodash');
 const qnabot = require('qnabot/logging');
 const qna_settings = require('qnabot/settings');
@@ -93,7 +92,7 @@ async function get_es_query(event, settings) {
 async function run_query_es(event, settings) {
     const es_query = await get_es_query(event, settings);
     const es_response = await request({
-        url: Url.resolve(`https://${event.endpoint}`, event.path),
+        url: new URL(event.path, `https://${event.endpoint}`).href,
         method: event.method,
         headers: event.headers,
         body: es_query
