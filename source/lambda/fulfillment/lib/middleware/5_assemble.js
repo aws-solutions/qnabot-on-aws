@@ -8,6 +8,7 @@ const qnabot = require('qnabot/logging');
 const lex = require('./lex');
 const alexa = require('./alexa');
 const util = require('./util');
+const { sanitize } = require('../../../../../../../../../../opt/lib/sanitizeOutput');
 const {get_translation} = require('./multilanguage.js');
 
 function sms_hint(req, res) {
@@ -128,6 +129,22 @@ module.exports = async function assemble(req, res) {
 
         // enable interruptable bot response for Connect
         res = await connect_response(req, res);
+
+        // Sanitize altMessages at egress
+        // Note: ssml is intentionally not sanitized — consumed only by Amazon Polly (TTS), never rendered in browser DOM.
+        const appContext = _.get(res, 'session.appContext');
+        if (appContext) {
+            const parsedAppContext = _.isString(appContext) ? JSON.parse(appContext) : appContext;
+            if (parsedAppContext.altMessages) {
+                if (parsedAppContext.altMessages.html) {
+                    parsedAppContext.altMessages.html = sanitize(parsedAppContext.altMessages.html);
+                }
+                if (parsedAppContext.altMessages.markdown) {
+                    parsedAppContext.altMessages.markdown = sanitize(parsedAppContext.altMessages.markdown);
+                }
+                _.set(res, 'session.appContext', parsedAppContext);
+            }
+        }
 
         res.session = _.mapValues(
             _.get(res, 'session', {}),

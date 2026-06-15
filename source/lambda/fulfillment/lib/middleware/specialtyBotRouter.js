@@ -17,6 +17,7 @@ const region = process.env.AWS_REGION || 'us-east-1';
 const qnabot = require('qnabot/logging');
 const {get_userLanguages , get_translation} = require('./multilanguage.js');
 const helper = require('../../../../../../../../../../opt/lib/supportedLanguages');
+const { sanitize } = require('../../../../../../../../../../opt/lib/sanitizeOutput');
 
 const DEFAULT_SPECIALTY_BOT_RECEIVING_NAMESPACE = 'specialtyBotSessionAttributes';
 
@@ -311,7 +312,7 @@ function endUseOfSpecialtyBot(req, res, welcomeBackMessage) {
         const htmlResp = `${_.get(res, 'message', '')} <i> ${welcomeBackMessage} </i>`;
         _.set(res, 'message', plaintextResp);
         const altMessages = {
-            html: htmlResp,
+            html: sanitize(htmlResp),
         };
         _.set(res.session, 'appContext.altMessages', altMessages);
     }
@@ -434,6 +435,15 @@ function processAttributes(botResp, originalAppContext, res, originalMessage, _p
             ssmlMessage = `<speak>${extractSSMLContent(originalAppContext.altMessages.ssml)} ${extractSSMLContent(appContext.altMessages.ssml)}</speak>`;
             // need to concatenate the ssml tags within the <speak> tags if supplied
             appContext.altMessages.ssml = ssmlMessage;
+        }
+        // Sanitize HTML and markdown to prevent XSS
+        if (appContext.altMessages) {
+            if (appContext.altMessages.html) {
+                appContext.altMessages.html = sanitize(appContext.altMessages.html);
+            }
+            if (appContext.altMessages.markdown) {
+                appContext.altMessages.markdown = sanitize(appContext.altMessages.markdown);
+            }
         }
         _.set(res.session, 'appContext.altMessages', appContext.altMessages);
     }

@@ -222,3 +222,150 @@ describe('when calling assemble function', () => {
         expect(assembled.res.session.qnabotcontext.kendra).not.toBeDefined();
     });
 });
+
+describe('egress point sanitization of altMessages', () => {
+    beforeEach(() => {
+        process.env = {
+            ...originalEnv,
+        };
+    });
+    afterEach(() => {
+        jest.clearAllMocks();
+    });
+
+    test('should sanitize XSS from altMessages.html at egress', async () => {
+        lex.assemble.mockReturnValue({});
+        util.invokeLambda.mockReturnValue({});
+
+        const req = assembleFixtures.createRequestObject("test", "LEX");
+        const res = assembleFixtures.createMockResponse("PlainText");
+        res.session = {
+            qnabotcontext: {},
+            appContext: {
+                altMessages: {
+                    html: '<img src=x onerror="alert(document.domain)"><p>Safe content</p>',
+                    markdown: 'Safe markdown',
+                }
+            }
+        };
+
+        const result = await assemble(req, res);
+        const appContext = JSON.parse(result.res.session.appContext);
+        expect(appContext.altMessages.html).not.toContain('onerror');
+        expect(appContext.altMessages.html).not.toContain('alert');
+        expect(appContext.altMessages.html).toContain('<p>Safe content</p>');
+    });
+
+    test('should sanitize script tags from altMessages.html at egress', async () => {
+        lex.assemble.mockReturnValue({});
+        util.invokeLambda.mockReturnValue({});
+
+        const req = assembleFixtures.createRequestObject("test", "LEX");
+        const res = assembleFixtures.createMockResponse("PlainText");
+        res.session = {
+            qnabotcontext: {},
+            appContext: {
+                altMessages: {
+                    html: '<p>Hello</p><script>steal(document.cookie)</script>',
+                    markdown: 'Hello',
+                }
+            }
+        };
+
+        const result = await assemble(req, res);
+        const appContext = JSON.parse(result.res.session.appContext);
+        expect(appContext.altMessages.html).toBe('<p>Hello</p>');
+    });
+
+    test('should sanitize XSS from altMessages.markdown at egress', async () => {
+        lex.assemble.mockReturnValue({});
+        util.invokeLambda.mockReturnValue({});
+
+        const req = assembleFixtures.createRequestObject("test", "LEX");
+        const res = assembleFixtures.createMockResponse("PlainText");
+        res.session = {
+            qnabotcontext: {},
+            appContext: {
+                altMessages: {
+                    html: '<p>Safe</p>',
+                    markdown: '<img src=x onerror="alert(1)"><script>steal()</script>Some text',
+                }
+            }
+        };
+
+        const result = await assemble(req, res);
+        const appContext = JSON.parse(result.res.session.appContext);
+        expect(appContext.altMessages.markdown).not.toContain('onerror');
+        expect(appContext.altMessages.markdown).not.toContain('<script>');
+        expect(appContext.altMessages.markdown).toContain('Some text');
+    });
+
+    test('should not double-sanitize already safe HTML content', async () => {
+        lex.assemble.mockReturnValue({});
+        util.invokeLambda.mockReturnValue({});
+
+        const req = assembleFixtures.createRequestObject("test", "LEX");
+        const res = assembleFixtures.createMockResponse("PlainText");
+        const safeHtml = '<p>Safe <b>content</b> with <a href="https://example.com">link</a></p>';
+        res.session = {
+            qnabotcontext: {},
+            appContext: {
+                altMessages: {
+                    html: safeHtml,
+                    markdown: '**Bold** and [link](https://example.com)',
+                }
+            }
+        };
+
+        const result = await assemble(req, res);
+        const appContext = JSON.parse(result.res.session.appContext);
+        expect(appContext.altMessages.html).toBe(safeHtml);
+    });
+
+    test('should not double-sanitize when sanitize is called multiple times', async () => {
+        lex.assemble.mockReturnValue({});
+        util.invokeLambda.mockReturnValue({});
+
+        const req = assembleFixtures.createRequestObject("test", "LEX");
+        const res = assembleFixtures.createMockResponse("PlainText");
+        // Content that has already been sanitized once (e.g., by specialtyBotRouter)
+        const preSanitizedHtml = '<h2>Heading</h2><p>Already <em>sanitized</em> content with <a href="https://example.com">link</a></p>';
+        res.session = {
+            qnabotcontext: {},
+            appContext: {
+                altMessages: {
+                    html: preSanitizedHtml,
+                    markdown: 'Already sanitized markdown',
+                }
+            }
+        };
+
+        const result = await assemble(req, res);
+        const appContext = JSON.parse(result.res.session.appContext);
+        // Running sanitize on already-sanitized content should produce identical output
+        expect(appContext.altMessages.html).toBe(preSanitizedHtml);
+        expect(appContext.altMessages.markdown).toBe('Already sanitized markdown');
+    });
+
+    test('should handle appContext as string (pre-serialized)', async () => {
+        lex.assemble.mockReturnValue({});
+        util.invokeLambda.mockReturnValue({});
+
+        const req = assembleFixtures.createRequestObject("test", "LEX");
+        const res = assembleFixtures.createMockResponse("PlainText");
+        res.session = {
+            qnabotcontext: {},
+            appContext: JSON.stringify({
+                altMessages: {
+                    html: '<img src=x onerror="alert(1)"><p>Text</p>',
+                    markdown: 'Safe',
+                }
+            })
+        };
+
+        const result = await assemble(req, res);
+        const appContext = JSON.parse(result.res.session.appContext);
+        expect(appContext.altMessages.html).not.toContain('onerror');
+        expect(appContext.altMessages.html).toContain('<p>Text</p>');
+    });
+});
