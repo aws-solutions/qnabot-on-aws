@@ -20,6 +20,7 @@ module.exports = {
     moduleNameMapper: {
         "../../../../../../../../../../opt/lib/query.js": "<rootDir>/test/lib/middleware/__mocks__/esQueryMock.js",
         "../../../../../../../../../../opt/lib/supportedLanguages": "<rootDir>/../es-proxy-layer/lib/supportedLanguages.js",
+        "../../../../../../../../../../opt/lib/sanitizeOutput": "<rootDir>/../es-proxy-layer/lib/sanitizeOutput.js",
         "../../../../../../../../../../opt/lib/fulfillment-event/utterance": "<rootDir>/../es-proxy-layer/lib/fulfillment-event/utterance.js",
         "/opt/lib/bedrock/applyGuardrail.js": "<rootDir>/../es-proxy-layer/lib/bedrock/applyGuardrail.js",
 

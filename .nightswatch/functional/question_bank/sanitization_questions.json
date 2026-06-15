@@ -1,0 +1,14 @@
+{
+	"qna": [
+		{
+			"a": "This is a safe answer.",
+			"type": "qna",
+			"qid": "Sanitization.001",
+			"q": ["sanitization xss test"],
+			"alt": {
+				"markdown": "This is a safe answer.",
+				"html": "<img src=x onerror=\"alert(document.domain)\"><script>steal(document.cookie)</script><p>This is a safe answer.</p>"
+			}
+		}
+	]
+}

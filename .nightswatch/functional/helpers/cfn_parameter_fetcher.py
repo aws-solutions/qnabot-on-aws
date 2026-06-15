@@ -169,6 +169,29 @@ class ParameterFetcher:
                 designer_client_id = StackResourceSummary['PhysicalResourceId']
                 return designer_client_id
 
+    def get_identity_pool_id(self) -> Optional[str]:
+        """
+        Retrieves the Cognito Identity Pool ID from the stack resources.
+
+        Returns:
+        -------
+            The Identity Pool ID if found, otherwise None.
+        """
+        response = self.cloudformation_client.list_stack_resources(
+            StackName=self.stack_name
+        )
+        while True:
+            for resource in response['StackResourceSummaries']:
+                if resource['LogicalResourceId'] == 'IdPool':
+                    return resource['PhysicalResourceId']
+            if 'NextToken' in response:
+                response = self.cloudformation_client.list_stack_resources(
+                    StackName=self.stack_name,
+                    NextToken=response['NextToken']
+                )
+            else:
+                raise RuntimeError('Identity Pool ID not found.')
+
     def get_designer_url(self) -> Optional[str]:
         """
         Retrieves the Content Designer URL from the stack outputs.
