@@ -18,10 +18,13 @@ function filter_comprehend_pii(text) {
         return text;
     }
 
-    const regex = process.env.found_comprehend_pii.split(',').map((pii) => `(${pii})`).join('|');
-
-    const re = new RegExp(regex, 'g');
-    return text.replace(re, 'XXXXXX');
+    try {
+        process.env.found_comprehend_pii.split(',').map((pii) => (text = text.split(pii).join('XXXXXX')));
+        return text;
+    } catch (e) {
+        process.env['found_comprehend_pii'] = '';
+        return text;
+    }
 }
 
 function filter(text) {
