@@ -1,6 +1,6 @@
 {
     "name": "genesys",
-    "version": "7.3.14",
+    "version": "7.3.15",
     "description": "Lambda function used to support the Genesys setup wizard",
     "repository": {
         "type": "git",
