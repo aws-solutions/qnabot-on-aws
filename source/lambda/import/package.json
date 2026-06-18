@@ -1,6 +1,6 @@
 {
     "name": "import",
-    "version": "7.3.15",
+    "version": "7.3.16",
     "description": "QnABot Lambda handling import of QIDs",
     "main": "index.js",
     "scripts": {
