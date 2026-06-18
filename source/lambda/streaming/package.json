@@ -1,6 +1,6 @@
 {
   "name": "streaming",
-  "version": "7.3.15",
+  "version": "7.3.16",
   "description": "Lambda function used to provide for streaming response",
   "repository": {
     "type": "git",

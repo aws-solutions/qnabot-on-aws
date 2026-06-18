@@ -1,6 +1,6 @@
 {
     "name": "createrecenttopicsresponse",
-    "version": "7.3.15",
+    "version": "7.3.16",
     "description": "Lambda hook that creates recent topic response",
     "main": "CreateRecentTopicResponse.js",
     "scripts": {
