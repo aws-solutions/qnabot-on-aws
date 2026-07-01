@@ -2,15 +2,17 @@
 *   Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.                             *
 *   SPDX-License-Identifier: Apache-2.0                                                            *
  ************************************************************************************************ */
-const menuTestModule = require('../../../js/components/designer/menu-test.vue');
+import { describe, test, expect, vi } from 'vitest';
 import { shallowMount } from '@vue/test-utils';
+
+const menuTestModule = await import('../../../js/components/designer/menu-test.vue');
 
 describe('designer menu test module', () => {
     test('mounted', () => {
         const store = {
-            dispatch: jest.fn(),
+            dispatch: vi.fn(),
         };
-        const wrapper = shallowMount(menuTestModule, {
+        const wrapper = shallowMount(menuTestModule.default, {
             global: {
                 mocks: {
                     $store: store,
@@ -22,9 +24,9 @@ describe('designer menu test module', () => {
 
     test('simulate', () => {
         const store = {
-            dispatch: jest.fn(),
+            dispatch: vi.fn(),
         };
-        const wrapper = shallowMount(menuTestModule, {
+        const wrapper = shallowMount(menuTestModule.default, {
             global: {
                 mocks: {
                     $store: store,

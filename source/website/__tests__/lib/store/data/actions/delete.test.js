@@ -2,15 +2,16 @@
 *   Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.                             *
 *   SPDX-License-Identifier: Apache-2.0                                                            *
  ************************************************************************************************ */
-const deleteModule = require('../../../../../js/lib/store/data/actions/delete');
-const util = require('../../../../../js/lib/store/data/actions//util');
+import { vi } from 'vitest';
+import deleteModule from '../../../../../js/lib/store/data/actions/delete';
+import util from '../../../../../js/lib/store/data/actions//util';
 
-jest.mock('../../../../../js/lib/store/data/actions//util');
+vi.mock('../../../../../js/lib/store/data/actions//util');
 
 describe('delete data action', () => {
     const mockedContext = {
-        dispatch: jest.fn(),
-        commit: jest.fn(),
+        dispatch: vi.fn(),
+        commit: vi.fn(),
         state: {
             QAs: [
                 { qid: 'the-one-you-want' },
@@ -31,8 +32,8 @@ describe('delete data action', () => {
     };
 
     beforeEach(() => {
-        jest.resetAllMocks();
-        jest.spyOn(console, 'log').mockImplementation(jest.fn());
+        vi.resetAllMocks();
+        vi.spyOn(console, 'log').mockImplementation(vi.fn());
     });
 
     test('removeQ success', async () => {
@@ -49,8 +50,8 @@ describe('delete data action', () => {
     });
 
     test('removeQ failure', async () => {
-        const resFunction = jest.fn();
-        const rejFunction = jest.fn().mockImplementationOnce((err) => err.message);
+        const resFunction = vi.fn();
+        const rejFunction = vi.fn().mockImplementationOnce((err) => err.message);
         const expectedError = new Error('Failed to remove');
         mockedContext.dispatch.mockImplementationOnce(() => {
             throw new Error('Error');
@@ -135,8 +136,8 @@ describe('delete data action', () => {
     });
 
     test('removeFilter throws an error', async () => {
-        const resFunction = jest.fn();
-        const rejFunction = jest.fn().mockImplementationOnce((err) => err.message);
+        const resFunction = vi.fn();
+        const rejFunction = vi.fn().mockImplementationOnce((err) => err.message);
         const expectedError = new Error('Failed to remove');
         util.api.mockImplementationOnce(() => {
             throw new Error('test error');

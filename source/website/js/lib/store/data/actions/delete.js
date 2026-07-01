@@ -3,11 +3,11 @@
 *   SPDX-License-Identifier: Apache-2.0                                                            *
  ************************************************************************************************ */
 
-const util = require('./util');
+import util from './util';
 
 const { api } = util;
 
-module.exports = {
+export default {
     async removeQ(context, { index, item }) {
         try {
             item.questions.splice(index, 1);

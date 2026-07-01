@@ -3,5 +3,6 @@
 *   SPDX-License-Identifier: Apache-2.0                                                            *
  ************************************************************************************************ */
 
-exports.router = require('./router.js');
-exports.store = require('./store');
+export { default as router } from './router.js';
+export { default as store } from './store';
+

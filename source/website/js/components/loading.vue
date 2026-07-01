@@ -8,10 +8,9 @@ v-card
 </template>
 
 <script>
+import 'vuex';
 
-require('vuex');
-
-module.exports = {
+export default {
     data() {
         return {};
     },

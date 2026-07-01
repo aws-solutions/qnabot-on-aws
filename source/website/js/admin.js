@@ -5,23 +5,26 @@
  ************************************************************************************************ */
 
 import app from './admin.vue';
-const Idle = require('idle-js');
+import Idle from 'idle-js';
+import { createApp } from 'vue';
+import 'highlight.js/styles/solarized-light.css';
+import { createRouter } from 'vue-router';
+import { sync } from 'vuex-router-sync';
+import { createVuetify } from 'vuetify';
+import * as components from 'vuetify/components';
+import * as directives from 'vuetify/directives';
+import { aliases, md } from 'vuetify/iconsets/md';
+import 'vuetify/styles';
+import '@fontsource/roboto/300.css';
+import '@fontsource/roboto/400.css';
+import '@fontsource/roboto/500.css';
+import '@fontsource/roboto/700.css';
+import '@fontsource/material-icons';
+import '../styles/app.css';
+import { router as libRouter } from './lib';
+import store from './lib/store';
 
-const { createApp } = require('vue');
-require('highlight.js/styles/solarized-light.css');
-
-const { createRouter } = require('vue-router');
-const { sync } = require('vuex-router-sync');
-const { createVuetify } = require('vuetify');
-const components = require('vuetify/components');
-const directives = require('vuetify/directives');
-const { aliases, md } = require('vuetify/iconsets/md');
-require('vuetify/styles');
-require('../styles/app.css');
-const lib = require('./lib');
-const store = require('./lib/store');
-
-const router = createRouter(lib.router);
+const router = createRouter(libRouter);
 
 sync(store, router);
 

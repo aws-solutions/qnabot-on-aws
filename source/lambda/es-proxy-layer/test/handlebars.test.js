@@ -272,6 +272,13 @@ describe('handlebars', () => {
         expect(response.a).toBe("HELLO, WORLD!");
     });
 
+    test('evaluate toUpperCase with null returns false', async () => {
+        const clonedHit = _.cloneDeep(hit);
+        clonedHit.a = '{{toUpperCase null}}';
+        const response = await handlebars(req, res, clonedHit);
+        expect(response.a).toBe('false');
+    });
+
     test('evaluate toLowerCase condition', async () => {
         const clonedHit = _.cloneDeep(hit);
         clonedHit.a = "{{toLowerCase 'HELLO, WORLD!'}}";
@@ -279,11 +286,25 @@ describe('handlebars', () => {
         expect(response.a).toBe("hello, world!");
     });
 
+    test('evaluate toLowerCase with null returns false', async () => {
+        const clonedHit = _.cloneDeep(hit);
+        clonedHit.a = '{{toLowerCase null}}';
+        const response = await handlebars(req, res, clonedHit);
+        expect(response.a).toBe('false');
+    });
+
     test('evaluate toTitleCase condition', async () => {
         const clonedHit = _.cloneDeep(hit);
         clonedHit.a = "{{toTitleCase 'hello, world!'}}";
         const response = await handlebars(req, res, clonedHit);
         expect(response.a).toBe("Hello, World!");
+    });
+
+    test('evaluate toTitleCase with null returns false', async () => {
+        const clonedHit = _.cloneDeep(hit);
+        clonedHit.a = '{{toTitleCase null}}';
+        const response = await handlebars(req, res, clonedHit);
+        expect(response.a).toBe('false');
     });
 
     test('evaluate randomPick condition', async () => {
@@ -400,6 +421,57 @@ describe('handlebars', () => {
         clonedHit.r = {};
         const response = await handlebars(req, res, clonedHit);
         expect(response.a).toBe("test");
+    });
+
+    describe('security - prototype traversal protection', () => {
+        test('getSessionAttr blocks prototype traversal - toString.constructor does not return Function', async () => {
+            const clonedHit = _.cloneDeep(hit);
+            clonedHit.a = '{{getSessionAttr "toString.constructor" ""}}';
+            const response = await handlebars(req, res, clonedHit);
+            expect(response.a).toBe('');
+            expect(response.a).not.toContain('Function');
+        });
+
+        test('getSessionAttr returns own session property normally', async () => {
+            const clonedRes = _.cloneDeep(res);
+            clonedRes.session.userName = 'testuser';
+            const clonedHit = _.cloneDeep(hit);
+            clonedHit.a = '{{getSessionAttr "userName" ""}}';
+            const response = await handlebars(req, clonedRes, clonedHit);
+            expect(response.a).toBe('testuser');
+        });
+
+        test('getSlot blocks prototype traversal - toString.constructor does not return Function', async () => {
+            const clonedHit = _.cloneDeep(hit);
+            clonedHit.a = '{{getSlot "toString.constructor" ""}}';
+            const response = await handlebars(req, res, clonedHit);
+            expect(response.a).toBe('');
+            expect(response.a).not.toContain('Function');
+        });
+
+        test('setSessionAttr blocks __proto__ key', async () => {
+            const clonedHit = _.cloneDeep(hit);
+            clonedHit.a = '{{setSessionAttr "__proto__.polluted" "yes"}}';
+            const response = await handlebars(req, res, clonedHit);
+            expect(response.a).toBe('');
+            expect(({}).polluted).toBeUndefined();
+        });
+
+        test('setSessionAttr blocks constructor key', async () => {
+            const clonedHit = _.cloneDeep(hit);
+            clonedHit.a = '{{setSessionAttr "constructor.prototype.polluted" "yes"}}';
+            const response = await handlebars(req, res, clonedHit);
+            expect(response.a).toBe('');
+        });
+
+        test('setSessionAttr allows legitimate keys that contain blocked words as substrings', async () => {
+            const clonedRes = _.cloneDeep(res);
+            const clonedHit = _.cloneDeep(hit);
+            clonedHit.a = '{{setSessionAttr "deconstructorMode" "on"}}';
+            await handlebars(req, clonedRes, clonedHit);
+            // setSessionAttr always returns '' but should set the session attr
+            expect(clonedRes.session.deconstructorMode).toBe('on');
+        });
     });
 });
 

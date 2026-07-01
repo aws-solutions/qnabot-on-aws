@@ -970,4 +970,39 @@ describe('Safe Expression Evaluator', () => {
             });
         });
     });
+
+    describe('Optional chaining security', () => {
+        const ctx = { SessionAttributes: { topic: 'weather' }, Question: 'test' };
+
+        test('blocks optional chaining call (?.()', () => {
+            expect(() => safeEvaluate(
+                'SessionAttributes.qnabotcontext.navigation.previous.push?.(Question.includes.call)',
+                ctx
+            )).toThrow('Optional chaining');
+        });
+
+        test('blocks optional chaining bind (bind?.()', () => {
+            expect(() => safeEvaluate(
+                'Question.includes.call.bind?.(Question.includes.apply)',
+                ctx
+            )).toThrow('Optional chaining');
+        });
+
+        test('allows ternary operator (? is not optional chaining when followed by identifier)', () => {
+            expect(safeEvaluate("SessionAttributes.topic === 'weather' ? 'yes' : 'no'", ctx))
+                .toBe('yes');
+        });
+
+        test('allows ternary operator with parenthesized consequent (? followed by open paren)', () => {
+            expect(safeEvaluate("Sentiment > 0.5 ? (Sentiment > 0.3 ? 'a' : 'b') : 'c'",
+                { Sentiment: 0.8 })).toBe('a');
+        });
+
+        test('still blocks optional chaining (?. pattern)', () => {
+            expect(() => safeEvaluate(
+                'SessionAttributes.qnabotcontext.navigation.previous.push?.(Question.includes.call)',
+                ctx
+            )).toThrow('Optional chaining');
+        });
+    });
 });

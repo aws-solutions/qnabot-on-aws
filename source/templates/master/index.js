@@ -488,6 +488,13 @@ module.exports = {
             AllowedValues: ['3', '5'],
             Default: '3',
         },
+        AlexaSkillIds: {
+            Type: 'String',
+            Default: '',
+            AllowedPattern: String.raw`(^$|^amzn1\.ask\.skill\.[a-zA-Z0-9-]+(,amzn1\.ask\.skill\.[a-zA-Z0-9-]+){0,29}$)`,
+            ConstraintDescription: 'Comma-separated list of up to 30 Alexa Skill IDs with no spaces (e.g. amzn1.ask.skill.xxx,amzn1.ask.skill.yyy), or blank to disable.',
+            Description: 'Comma-separated list of up to 30 Alexa Skill IDs. Leave blank to disable Alexa integration. To find your Skill ID: open the Alexa Developer Console, select your skill, and copy the Skill ID shown on the main page (e.g. amzn1.ask.skill.xxx-xxx-xxx,amzn1.ask.skill.yyy-yyy-yyy).',
+        },
     },
     Conditions: {
         Public: { 'Fn::Equals': [{ Ref: 'PublicOrPrivate' }, 'PUBLIC'] },
@@ -530,6 +537,10 @@ module.exports = {
             ],
         },
         LogRetentionPeriodIsNotZero: { 'Fn::Not': [{ 'Fn::Equals': [{ Ref: 'LogRetentionPeriod' }, 0] }] },
+        ...Object.fromEntries(Array.from({ length: 30 }, (_, i) => [ // supports up to 30 Alexa skill IDs (limited by Lambda 20KB resource-based policy size)
+            `AlexaSkill${i}Enabled`,
+            { 'Fn::Not': [{ 'Fn::Equals': [{ 'Fn::Select': [i, { 'Fn::Split': [',', { 'Fn::Join': [',', [{ Ref: 'AlexaSkillIds' }, ',,,,,,,,,,,,,,,,,,,,,,,,,,,,,']] }] }] }, ''] }] },
+        ])),
     },
     Rules: {
         RequireLambdaArnForLambdaEmbeddingsApi: {
@@ -628,6 +639,14 @@ module.exports = {
                         'BootstrapPrefix',
                         'BuildExamples',
                         'LogRetentionPeriod',
+                    ],
+                },
+                {
+                    Label: {
+                        default: 'Step 2G: Set Alexa integration parameters (optional)',
+                    },
+                    Parameters: [
+                        'AlexaSkillIds',
                     ],
                 },
             ],

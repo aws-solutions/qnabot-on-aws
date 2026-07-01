@@ -2,43 +2,27 @@
 *   Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.                             *
 *   SPDX-License-Identifier: Apache-2.0                                                            *
  ************************************************************************************************ */
-const mutationsModule = require('../../../../js/lib/store/user/mutations');
-const { set } = require('vue');
+import { describe, it, expect } from 'vitest';
+import mutations from '../../../../js/lib/store/user/mutations';
 
-jest.mock('vue');
-
-describe('user mutations', () => {
-    beforeEach(() => {
-        jest.resetAllMocks();
+describe('user/mutations', () => {
+    it('credentials sets loggedin and credentials on state', () => {
+        const state = { loggedin: false, credentials: null };
+        const payload = { accessKeyId: 'key', secretAccessKey: 'secret' };
+        mutations.credentials(state, payload);
+        expect(state.loggedin).toBe(true);
+        expect(state.credentials).toEqual(payload);
     });
 
-    test('credentials', () => {
-        const mockedState = {
-            loggedin: false,
-            creddentials: {},
-        };
-        const payload = {
-            key: 'value',
-        };
-        mutationsModule.credentials(mockedState, payload);
-        expect(mockedState.credentials).toEqual(payload);
-        expect(mockedState.loggedin).toBe(true);
+    it('login sets loggedIn on state', () => {
+        const state = { loggedIn: false };
+        mutations.login(state);
+        expect(state.loggedIn).toBe(true);
     });
 
-    test('login', () => {
-        const mockedState = {
-            loggedIn: false,
-        };
-        mutationsModule.login(mockedState);
-        expect(mockedState.loggedIn).toBe(true);
-    });
-
-    test('setId', () => {
-        const mockedState = {
-            Id: '',
-        };
-        const newId = 'newId';
-        mutationsModule.setId(mockedState, newId);
-        expect(mockedState.Id).toBe(newId);
+    it('setId sets Id on state', () => {
+        const state = { Id: null };
+        mutations.setId(state, 'user-123');
+        expect(state.Id).toBe('user-123');
     });
 });

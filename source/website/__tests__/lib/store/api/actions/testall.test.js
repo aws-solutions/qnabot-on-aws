@@ -2,11 +2,12 @@
 *   Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.                             *
 *   SPDX-License-Identifier: Apache-2.0                                                            *
  ************************************************************************************************ */
+import { vi } from 'vitest';
 import mockedContext from './mockedContext';
 
-const testallModule = require('../../../../../js/lib/store/api/actions/testall');
-const { S3Client, GetObjectCommand } = require('@aws-sdk/client-s3');
-const { mockClient } = require('aws-sdk-client-mock');
+import testallModule from '../../../../../js/lib/store/api/actions/testall';
+import { S3Client, GetObjectCommand } from '@aws-sdk/client-s3';
+import { mockClient } from 'aws-sdk-client-mock';
 
 const s3ClientMock = mockClient(S3Client);
 
@@ -28,9 +29,9 @@ describe('testall action test', () => {
     };
 
     beforeEach(() => {
-        jest.resetAllMocks();
+        vi.resetAllMocks();
         s3ClientMock.reset();
-        jest.spyOn(console, 'log').mockImplementation(jest.fn());
+        vi.spyOn(console, 'log').mockImplementation(vi.fn());
     });
 
     test('startTestAll with filter', async () => {
@@ -106,8 +107,8 @@ describe('testall action test', () => {
             { id: 'the-one-you-want' },
             { id: 'not-the-one-you-want' },
         ];
-        const resFunction = jest.fn().mockImplementation((job) => job);
-        const rejFunction = jest.fn();
+        const resFunction = vi.fn().mockImplementation((job) => job);
+        const rejFunction = vi.fn();
         mockedContext.dispatch
             .mockReturnValueOnce(testResponse)
             .mockReturnValueOnce({ jobs });
@@ -132,8 +133,8 @@ describe('testall action test', () => {
             { id: 'the-one-you-want' },
             { id: 'not-the-one-you-want' },
         ];
-        const resFunction = jest.fn();
-        const rejFunction = jest.fn((err) => err);
+        const resFunction = vi.fn();
+        const rejFunction = vi.fn((err) => err);
         mockedContext.dispatch
             .mockReturnValueOnce(testResponse)
             .mockReturnValueOnce({ jobs })
@@ -181,8 +182,8 @@ describe('testall action test', () => {
             { id: 'not-the-one-you-want' },
         ];
         const mockedError = new Error('test-error');
-        const resFunction = jest.fn();
-        const rejFunction = jest.fn((err) => err);
+        const resFunction = vi.fn();
+        const rejFunction = vi.fn((err) => err);
         mockedContext.dispatch.mockImplementationOnce(() => { throw mockedError; });
         await testallModule.waitForTestAll(mockedContext, opts).then(resFunction, rejFunction);
         expect(mockedContext.dispatch).toHaveBeenCalledWith('_request', {

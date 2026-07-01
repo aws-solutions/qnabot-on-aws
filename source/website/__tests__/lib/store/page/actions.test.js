@@ -2,13 +2,14 @@
 /** ************************************************************************************************
 *   Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.                             *
 *   SPDX-License-Identifier: Apache-2.0                                                            *
+import { vi } from 'vitest';
  ************************************************************************************************ */
-const actionsModule = require('../../../../js/lib/store/page/actions');
+import actionsModule from '../../../../js/lib/store/page/actions';
 
 describe('actions page test', () => {
     const mockedContext = {
-        commit: jest.fn(),
-        dispatch: jest.fn(),
+        commit: vi.fn(),
+        dispatch: vi.fn(),
         state: {},
     };
 
@@ -19,8 +20,8 @@ describe('actions page test', () => {
             perpage: 1,
         };
         mockedContext.state = { ...stateDefault };
-        jest.resetAllMocks();
-        jest.spyOn(console, 'log').mockImplementation(jest.fn());
+        vi.resetAllMocks();
+        vi.spyOn(console, 'log').mockImplementation(vi.fn());
     });
 
     test('setMode mode == questions', () => {

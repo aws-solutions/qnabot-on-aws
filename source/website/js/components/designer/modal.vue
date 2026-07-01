@@ -73,7 +73,7 @@
     VUE template to present test all results in a modal view
     */
 
-module.exports = {
+export default {
     name: 'Modal',
     props: {
         tableContent: String,

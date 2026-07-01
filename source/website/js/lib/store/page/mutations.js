@@ -3,7 +3,7 @@
 *   SPDX-License-Identifier: Apache-2.0                                                            *
  ************************************************************************************************ */
 
-module.exports = {
+export default {
     setMode(store, mode) {
         store.mode = mode;
     },

@@ -4,8 +4,8 @@
  ************************************************************************************************ */
 import settingsModule from '../../../../../js/lib/store/api/actions/settings';
 
-const awsMock = require('aws-sdk-client-mock');
-const { DynamoDBClient, DeleteItemCommand, GetItemCommand, PutItemCommand, ScanCommand, UpdateItemCommand } = require('@aws-sdk/client-dynamodb');
+import awsMock from 'aws-sdk-client-mock';
+import { DynamoDBClient, DeleteItemCommand, GetItemCommand, PutItemCommand, ScanCommand, UpdateItemCommand } from '@aws-sdk/client-dynamodb';
 const dynamodbMock = awsMock.mockClient(DynamoDBClient);
 
 describe('settings action', () => {

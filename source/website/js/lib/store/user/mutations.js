@@ -2,11 +2,11 @@
 *   Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.                             *
 *   SPDX-License-Identifier: Apache-2.0                                                            *
  ************************************************************************************************ */
-const _ = require('lodash');
-const query = require('query-string');
-const jwt = require('jsonwebtoken');
+import _ from 'lodash';
+import query from 'query-string';
+import jwt from 'jsonwebtoken';
 
-module.exports = {
+export default {
     credentials(state, payload) {
         state.loggedin = true;
         state.credentials = payload;

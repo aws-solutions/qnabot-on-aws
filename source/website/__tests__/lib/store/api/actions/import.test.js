@@ -2,19 +2,20 @@
 *   Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.                             *
 *   SPDX-License-Identifier: Apache-2.0                                                            *
  ************************************************************************************************ */
+import { vi } from 'vitest';
 import mockedContext from './mockedContext';
 
-const importModule = require('../../../../../js/lib/store/api/actions/import');
-const { S3Client } = require('@aws-sdk/client-s3');
-const { mockClient } = require('aws-sdk-client-mock');
+import importModule from '../../../../../js/lib/store/api/actions/import';
+import { S3Client } from '@aws-sdk/client-s3';
+import { mockClient } from 'aws-sdk-client-mock';
 
 const s3ClientMock = mockClient(S3Client);
 
 describe('import action test', () => {
     beforeEach(() => {
-        jest.resetAllMocks();
+        vi.resetAllMocks();
         s3ClientMock.reset();
-        jest.spyOn(console, 'log').mockImplementation(jest.fn());
+        vi.spyOn(console, 'log').mockImplementation(vi.fn());
     });
 
     test('listExamples', async () => {
@@ -114,8 +115,8 @@ describe('import action test', () => {
         const opts = {
             id: 'test-id',
         };
-        const resFunction = jest.fn().mockImplementation((job) => job);
-        const rejFunction = jest.fn().mockImplementation((error) => error);
+        const resFunction = vi.fn().mockImplementation((job) => job);
+        const rejFunction = vi.fn().mockImplementation((error) => error);
 
         mockedContext.dispatch
             .mockReturnValueOnce(mockedResponse)
@@ -143,8 +144,8 @@ describe('import action test', () => {
         const opts = {
             id: 'test-id-not-in-the-job-list',
         };
-        const resFunction = jest.fn().mockImplementation((job) => job);
-        const rejFunction = jest.fn().mockImplementation((error) => error);
+        const resFunction = vi.fn().mockImplementation((job) => job);
+        const rejFunction = vi.fn().mockImplementation((error) => error);
 
         mockedContext.dispatch
             .mockReturnValueOnce(mockedResponse)
@@ -172,8 +173,8 @@ describe('import action test', () => {
         const opts = {
             id: 'test-id-not-in-the-job-list',
         };
-        const resFunction = jest.fn().mockImplementation((job) => job);
-        const rejFunction = jest.fn().mockImplementation((error) => error);
+        const resFunction = vi.fn().mockImplementation((job) => job);
+        const rejFunction = vi.fn().mockImplementation((error) => error);
         const mockedError = new Error('test error -- a valid error');
 
         mockedContext.dispatch.mockImplementationOnce(() => {

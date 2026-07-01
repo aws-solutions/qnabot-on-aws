@@ -8,7 +8,7 @@ div(id="qna-client")
 </template>
 
 <script>
-module.exports = {
+export default {
     data: () => ({}),
     components: {},
     computed: {

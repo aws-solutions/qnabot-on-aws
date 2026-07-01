@@ -140,7 +140,8 @@ module.exports = async function assemble(req, res) {
                     parsedAppContext.altMessages.html = sanitize(parsedAppContext.altMessages.html);
                 }
                 if (parsedAppContext.altMessages.markdown) {
-                    parsedAppContext.altMessages.markdown = sanitize(parsedAppContext.altMessages.markdown);
+                    // Restore > after sanitization to preserve markdown blockquote syntax.
+                    parsedAppContext.altMessages.markdown = sanitize(parsedAppContext.altMessages.markdown).replaceAll('&gt;', '>');
                 }
                 _.set(res, 'session.appContext', parsedAppContext);
             }

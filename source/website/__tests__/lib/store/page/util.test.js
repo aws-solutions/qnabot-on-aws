@@ -2,13 +2,14 @@
 /** ************************************************************************************************
 *   Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.                             *
 *   SPDX-License-Identifier: Apache-2.0                                                            *
+import { vi } from 'vitest';
  ************************************************************************************************ */
-const utilModule = require('../../../../js/lib/store/page/util');
+import utilModule from '../../../../js/lib/store/page/util';
 
 describe('util page', () => {
     const mockedContext = {
-        dispatch: jest.fn(),
-        commit: jest.fn(),
+        dispatch: vi.fn(),
+        commit: vi.fn(),
         handle: utilModule.handle,
         load: utilModule.load,
         state: {
@@ -18,8 +19,8 @@ describe('util page', () => {
     };
 
     beforeEach(() => {
-        jest.resetAllMocks();
-        jest.spyOn(console, 'log').mockImplementation(jest.fn());
+        vi.resetAllMocks();
+        vi.spyOn(console, 'log').mockImplementation(vi.fn());
     });
 
     test('api', () => {
@@ -153,10 +154,19 @@ describe('util page', () => {
 
     test('load fails to access qa', async () => {
         const expectedError = new Error('Failed to load');
-        jest.spyOn(Promise, 'resolve').mockResolvedValueOnce({});
+        vi.spyOn(Promise, 'resolve').mockResolvedValueOnce({});
         await expect(mockedContext.load([])).rejects.toEqual(expectedError);
         expect(mockedContext.commit).toHaveBeenCalledTimes(2);
         expect(mockedContext.commit).toHaveBeenCalledWith('startLoading');
         expect(mockedContext.commit).toHaveBeenCalledWith('stopLoading');
+    });
+
+    test('load success commits addQA for each result and sets total', async () => {
+        const mockQa = [{ body: { qid: 'q1', a: 'answer', q: ['question'], r: { title: '', imageUrl: '' } } }];
+        vi.spyOn(Promise, 'resolve').mockResolvedValueOnce({ qa: mockQa });
+        await mockedContext.load([]);
+        expect(mockedContext.commit).toHaveBeenCalledWith('addQA', expect.any(Object));
+        // setTotal is called with self.state.QAs.length — commit is a no-op mock so QAs stays at initial length (1)
+        expect(mockedContext.commit).toHaveBeenCalledWith('setTotal', 1);
     });
 });

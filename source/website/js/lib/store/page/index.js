@@ -3,9 +3,11 @@
 *   SPDX-License-Identifier: Apache-2.0                                                            *
  ************************************************************************************************ */
 
-const Vuex = require('vuex');
+import mutations from './mutations';
+import getters from './getters';
+import actions from './actions';
 
-module.exports = {
+export default {
     namespaced: true,
     state: {
         loaded: 0,
@@ -14,7 +16,7 @@ module.exports = {
         perpage: 15,
         total: 0,
     },
-    mutations: require('./mutations'),
-    getters: require('./getters'),
-    actions: require('./actions'),
+    mutations,
+    getters,
+    actions,
 };

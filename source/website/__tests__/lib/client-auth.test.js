@@ -2,37 +2,38 @@
 *   Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.                             *
 *   SPDX-License-Identifier: Apache-2.0                                                            *
  ************************************************************************************************ */
-const axios = require('axios');
-const jwt = require('jsonwebtoken');
-const queryString = require('query-string');
-const clientAuth = require('../../js/lib/client-auth');
-const awsMock = require('aws-sdk-client-mock');
-const { fromCognitoIdentityPool } = require('@aws-sdk/credential-providers');
-const { CognitoIdentityClient, GetCredentialsForIdentityCommand } = require('@aws-sdk/client-cognito-identity');
+import { vi } from 'vitest';
+import axios from 'axios';
+import jwt from 'jsonwebtoken';
+import queryString from 'query-string';
+import clientAuth from '../../js/lib/client-auth';
+import awsMock from 'aws-sdk-client-mock';
+import { fromCognitoIdentityPool } from '@aws-sdk/credential-providers';
+import { CognitoIdentityClient, GetCredentialsForIdentityCommand } from '@aws-sdk/client-cognito-identity';
 
 const CognitoClientMock = awsMock.mockClient(CognitoIdentityClient);
 
-jest.mock('axios');
-jest.mock('@aws-sdk/credential-providers');
-jest.mock('@aws-sdk/client-cognito-identity');
-jest.mock('@aws-sdk/client-lex-runtime-service');
-jest.mock('@aws-sdk/client-lex-runtime-v2');
-jest.mock('@aws-sdk/client-polly');
-jest.mock('jsonwebtoken');
-jest.mock('query-string');
+vi.mock('axios');
+vi.mock('@aws-sdk/credential-providers');
+vi.mock('@aws-sdk/client-cognito-identity');
+vi.mock('@aws-sdk/client-lex-runtime-service');
+vi.mock('@aws-sdk/client-lex-runtime-v2');
+vi.mock('@aws-sdk/client-polly');
+vi.mock('jsonwebtoken');
+vi.mock('query-string');
 
 describe('clientAuth', () => {
   let windowMock;
   beforeEach(() => {
     CognitoClientMock.reset();
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     windowMock = {
-      alert: jest.fn(),
-      confirm: jest.fn(),
+      alert: vi.fn(),
+      confirm: vi.fn(),
       sessionStorage: {
-        getItem: jest.fn(),
-        setItem: jest.fn(),
-        clear: jest.fn(),
+        getItem: vi.fn(),
+        setItem: vi.fn(),
+        clear: vi.fn(),
       },
       location: {
         href: 'http://localhost/',
@@ -206,7 +207,7 @@ describe('clientAuth', () => {
     axios.head.mockResolvedValue(mockHeadResponse);
     axios.get.mockResolvedValue(mockGetResponse);
 
-    fromCognitoIdentityPool.mockReturnValueOnce(jest.fn().mockReturnValueOnce({}));
+    fromCognitoIdentityPool.mockReturnValueOnce(vi.fn().mockReturnValueOnce({}));
     const result = await clientAuth().catch(() => {});
 
     expect(axios.head).toHaveBeenCalledWith('http://localhost/');

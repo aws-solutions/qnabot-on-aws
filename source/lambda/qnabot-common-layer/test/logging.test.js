@@ -87,6 +87,11 @@ describe('when calling filter_comprehend_pii function', () => {
         let result = logger.filter_comprehend_pii(testText)
         expect(result).toEqual(testText);
 	});
+    it("should redact PII containing regex special characters without throwing", () => {
+        process.env.found_comprehend_pii = '+1 (123) 456-7890';
+        const result = logger.filter_comprehend_pii('Please call me at +1 (123) 456-7890 thanks');
+        expect(result).toEqual('Please call me at XXXXXX thanks');
+    });
     it("should return back with input text if found_comprehend_pii is empty/undefined", async () => {
         process.env.found_comprehend_pii = "" //test empty string
 

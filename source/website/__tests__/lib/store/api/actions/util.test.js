@@ -2,6 +2,7 @@
 *   Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.                             *
 *   SPDX-License-Identifier: Apache-2.0                                                            *
  ************************************************************************************************ */
+import { describe, test, expect } from 'vitest';
 import { getUserAgentString } from "../../../../../js/capability/util";
 
 describe("getUserAgentString", () => {

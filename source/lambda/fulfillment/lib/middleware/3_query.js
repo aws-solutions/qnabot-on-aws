@@ -21,7 +21,6 @@ const esquery = require('../../../../../../../../../../opt/lib/query.js');
  *
  * The three potential ARNs are identified first based on current state
  *
- * specialtyArn - indicates that a specialtyBot is active from the last input
  * specialtyBot - indicates botRouting is used to pass requests to either another LexBot or to third party Bot
  * queryLambdaArn - indicates that a quiz bot is active
  * arn - the default Arn to handle input
@@ -30,10 +29,9 @@ const esquery = require('../../../../../../../../../../opt/lib/query.js');
  * provide the answer and resets properties to use a new specialty Bot if one is identified via a local
  * query to the ES cluster.
  *
- * Now that the three Arns have been identified the following precedence is used
+ * Now that the Arns have been identified the following precedence is used
  * 1) queryLambda takes precedence and is used if defined.
- * 2) specialtyLambda has the next highest priority.
- * 3) default Lambda arn is used if neither queryLambda or specialtyLambda is present.
+ * 2) default Lambda arn is used if queryLambda is not present.
  *
  * @param req
  * @param res
@@ -76,15 +74,17 @@ module.exports = async function query(req, res) {
        used to control behavior of this function and divert the function away from the normal
        behavior of using an OpenSearch Query.
 
-       - specialtyArn - calls to specialty bot for bot routing
        - queryLambdaArn - calls normally used by the quiz functionality
        - elicitResponse - indicates a lex bot should be used for processing
        - chainingConfig - from a prior elicitResponse based question. Used to conditionally
                           chain to another question when elicitResponse completes
      */
-    const specialtyArn = _.get(req, 'session.specialtyLambda', undefined);
     const specialtyBot = _.get(req, 'session.qnabotcontext.specialtyBot', undefined);
-    const queryLambdaArn = _.get(req, 'session.queryLambda', undefined);
+    let queryLambdaArn = _.get(req, 'session.queryLambda', undefined);
+    if (queryLambdaArn && !util.isSameAccountArn(queryLambdaArn)) {
+        qnabot.log(`Blocked cross-account queryLambda: ${queryLambdaArn}`);
+        queryLambdaArn = undefined;
+    }
     const elicitResponse = _.get(req, 'session.qnabotcontext.elicitResponse.responsebot', undefined);
     const chainingConfig = _.get(req, 'session.qnabotcontext.elicitResponse.chainingConfig', undefined);
     let arn;
@@ -119,38 +119,16 @@ module.exports = async function query(req, res) {
     }
 
     arn = util.getLambdaArn(process.env.LAMBDA_DEFAULT_QUERY);  // NOSONAR Intentions for arn not completely understood, may be needed for future implementations
-    if (specialtyArn) {
-        const localEsQueryResults = await esquery(req, res);
-
-        if (switchToNewBot(localEsQueryResults)) {
-            /**
-             * A number of session state attributes need to be removed as we switch away to another
-             * specialty bot.
-             */
-            delete localEsQueryResults.res.session.brokerUID;
-            delete localEsQueryResults.res.session.botAlias;
-            delete localEsQueryResults.res.session.botName;
-            delete localEsQueryResults.res.session.nohits;
-            delete localEsQueryResults.res.session.specialtyLambda;
-            return localEsQueryResults;
-        }
-    }
-    const postQuery = await getPostQuery(queryLambdaArn, req, res, specialtyArn);
+    const postQuery = await getPostQuery(queryLambdaArn, req, res);
 
     qnabot.debug(`Standard path return from 3_query: ${JSON.stringify(postQuery, null, 2)}`);
     return postQuery;
 };
-async function getPostQuery(queryLambdaArn, req, res, specialtyArn) {
+async function getPostQuery(queryLambdaArn, req, res) {
     let postQuery;
     if (queryLambdaArn) {
         postQuery = await util.invokeLambda({
             FunctionName: queryLambdaArn,
-            req,
-            res,
-        });
-    } else if (specialtyArn) {
-        postQuery = await util.invokeLambda({
-            FunctionName: specialtyArn,
             req,
             res,
         });
@@ -207,17 +185,6 @@ async function getPostQuery(queryLambdaArn, req, res, specialtyArn) {
     return postQuery;
 }
 
-function switchToNewBot(localEsQueryResults) {
-    return localEsQueryResults.res.got_hits > 0 && localEsQueryResults.res.result.qid.startsWith('specialty')
-        && (localEsQueryResults.req.session.botName
-            !== localEsQueryResults.res.result.args[0]);
-}
-
 function botIsFulfilled(progress) {
     return progress === 'Fulfilled' || progress === 'ReadyForFulfillment' || progress === 'Close' || progress === 'Failed';
-}
-
-function specialtyBotIsComplete(resp) {
-    return resp.res.session.specialtyBotProgress === 'Complete'
-        || resp.res.session.specialtyBotProgress === 'Failed';
 }

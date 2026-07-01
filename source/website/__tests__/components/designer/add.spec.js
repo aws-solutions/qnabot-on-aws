@@ -2,12 +2,15 @@
 *   Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.                             *
 *   SPDX-License-Identifier: Apache-2.0                                                            *
  ************************************************************************************************ */
+import { vi } from 'vitest';
+import { describe, test, expect } from 'vitest';
 import add from '../../../js/components/designer/add.vue';
 import { mount } from '@vue/test-utils';
 
 describe('add vue', () => {
     const store = {
-        dispatch: jest.fn(),
+        dispatch: vi.fn(),
+        commit: vi.fn(),
         state: {
             data: {
                 schema: {
@@ -18,7 +21,7 @@ describe('add vue', () => {
     };
 
     beforeEach(() => {
-        jest.resetAllMocks();
+        vi.resetAllMocks();
     });
 
     test('It is there', () => {
@@ -107,7 +110,6 @@ describe('add vue', () => {
 
         await wrapper.vm.add();
 
-        wrapper.vm.$data.data.qna.alt.markdown = "<p>Testing Markdown Sanitization</p>";
         expect(store.dispatch).toHaveBeenNthCalledWith(1, 'api/check', 'test');
         expect(store.dispatch).toHaveBeenNthCalledWith(2, 'data/add', {
                 "a": "test",
@@ -144,7 +146,6 @@ describe('add vue', () => {
         };
         await wrapper.vm.add();
 
-        wrapper.vm.$data.data.qna.alt.markdown = "";
         expect(store.dispatch).toHaveBeenNthCalledWith(1, 'api/check', 'test');
         expect(store.dispatch).toHaveBeenNthCalledWith(2, 'data/add', {
                 "a": "test",

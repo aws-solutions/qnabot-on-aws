@@ -4,7 +4,7 @@
  ************************************************************************************************ */
 import mockedContext from './mockedContext';
 
-const genesysModule = require('../../../../../js/lib/store/api/actions/genesys');
+import genesysModule from '../../../../../js/lib/store/api/actions/genesys';
 
 describe('genesys action test', () => {
     test('getGenesysCallFlow is called.', () => {

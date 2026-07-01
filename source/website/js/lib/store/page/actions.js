@@ -3,13 +3,14 @@
 *   SPDX-License-Identifier: Apache-2.0                                                            *
  ************************************************************************************************ */
 
-const validator = new (require('jsonschema').Validator)();
-const axios = require('axios');
-const util = require('./util');
+import { Validator } from 'jsonschema';
+import axios from 'axios';
+import util from './util';
 
+const validator = new Validator();
 const { api } = util;
 
-module.exports = {
+export default {
     setMode(context, mode) {
         context.commit('setMode', mode);
         if (mode === 'questions') {

@@ -2,19 +2,30 @@
  *   Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.                             *
  *   SPDX-License-Identifier: Apache-2.0                                                            *
  ************************************************************************************************ */
-const indexModule = require('../../../js/components/designer/index.vue');
+import { describe, test, expect, beforeEach, vi } from 'vitest';
 import { shallowMount } from '@vue/test-utils';
+
+const indexModule = await import('../../../js/components/designer/index.vue');
 
 describe('designer index component', () => {
     beforeEach(() => {
-        jest.resetAllMocks();
+        vi.resetAllMocks();
     });
 
     test('it mounted', () => {
         const store = {
-            dispatch: jest.fn().mockImplementation(() => Promise.resolve({}))
+            dispatch: vi.fn().mockImplementation(() => Promise.resolve({})),
+            state: {
+                data: {
+                    loading: false,
+                    QAs: [],
+                },
+                page: {
+                    total: 0,
+                },
+            },
         };
-        const wrapper = shallowMount(indexModule, {
+        const wrapper = shallowMount(indexModule.default, {
             global: {
                 mocks: {
                     $store: store
@@ -26,7 +37,7 @@ describe('designer index component', () => {
 
     test('computed properties', () => {
         const store = {
-            dispatch: jest.fn().mockImplementation(() => Promise.resolve({})),
+            dispatch: vi.fn().mockImplementation(() => Promise.resolve({})),
             state: {
                 data: {
                     loading: true,
@@ -37,7 +48,7 @@ describe('designer index component', () => {
                 }
             }
         };
-        const wrapper = shallowMount(indexModule, {
+        const wrapper = shallowMount(indexModule.default, {
             global: {
                 mocks: {
                     $store: store
@@ -54,7 +65,7 @@ describe('designer index component', () => {
 
     test('loadItems & refresh', () => {
         const store = {
-            dispatch: jest.fn().mockImplementation(() => Promise.resolve({})),
+            dispatch: vi.fn().mockImplementation(() => Promise.resolve({})),
             state: {
                 data: {
                     loading: true,
@@ -65,7 +76,7 @@ describe('designer index component', () => {
                 }
             }
         };
-        const wrapper = shallowMount(indexModule, {
+        const wrapper = shallowMount(indexModule.default, {
             global: {
                 mocks: {
                     $store: store
@@ -80,7 +91,7 @@ describe('designer index component', () => {
 
     test('refresh', () => {
         const store = {
-            dispatch: jest.fn().mockImplementation(() => Promise.resolve({})),
+            dispatch: vi.fn().mockImplementation(() => Promise.resolve({})),
             state: {
                 data: {
                     loading: true,
@@ -91,7 +102,7 @@ describe('designer index component', () => {
                 }
             }
         };
-        const wrapper = shallowMount(indexModule, {
+        const wrapper = shallowMount(indexModule.default, {
             global: {
                 mocks: {
                     $store: store
@@ -109,7 +120,7 @@ describe('designer index component', () => {
     describe('checkSelect', () => {
         test('should keep selectAll false when checking an item but not all items are selected', () => {
             const store = {
-                dispatch: jest.fn().mockImplementation(() => Promise.resolve({})),
+                dispatch: vi.fn().mockImplementation(() => Promise.resolve({})),
                 state: {
                     data: {
                         QAs: [{ select: false }, { select: false }, { select: false }]
@@ -119,7 +130,7 @@ describe('designer index component', () => {
                     }
                 }
             };
-            const wrapper = shallowMount(indexModule, {
+            const wrapper = shallowMount(indexModule.default, {
                 global: {
                     mocks: {
                         $store: store
@@ -134,7 +145,7 @@ describe('designer index component', () => {
 
         test('should set selectAll to true when checking an item and all items are selected', () => {
             const store = {
-                dispatch: jest.fn().mockImplementation(() => Promise.resolve({})),
+                dispatch: vi.fn().mockImplementation(() => Promise.resolve({})),
                 state: {
                     data: {
                         QAs: [{ select: true }, { select: true }, { select: true }]
@@ -144,7 +155,7 @@ describe('designer index component', () => {
                     }
                 }
             };
-            const wrapper = shallowMount(indexModule, {
+            const wrapper = shallowMount(indexModule.default, {
                 global: {
                     mocks: {
                         $store: store
@@ -159,7 +170,7 @@ describe('designer index component', () => {
 
         test('should keep selectAll false when checking an item but some items are unselected', () => {
             const store = {
-                dispatch: jest.fn().mockImplementation(() => Promise.resolve({})),
+                dispatch: vi.fn().mockImplementation(() => Promise.resolve({})),
                 state: {
                     data: {
                         QAs: [{ select: true }, { select: false }, { select: true }]
@@ -169,7 +180,7 @@ describe('designer index component', () => {
                     }
                 }
             };
-            const wrapper = shallowMount(indexModule, {
+            const wrapper = shallowMount(indexModule.default, {
                 global: {
                     mocks: {
                         $store: store
@@ -184,7 +195,7 @@ describe('designer index component', () => {
 
         test('should set selectAll to false when unchecking any item', () => {
             const store = {
-                dispatch: jest.fn().mockImplementation(() => Promise.resolve({})),
+                dispatch: vi.fn().mockImplementation(() => Promise.resolve({})),
                 state: {
                     data: {
                         QAs: [{ select: true }, { select: true }, { select: true }]
@@ -194,7 +205,7 @@ describe('designer index component', () => {
                     }
                 }
             };
-            const wrapper = shallowMount(indexModule, {
+            const wrapper = shallowMount(indexModule.default, {
                 global: {
                     mocks: {
                         $store: store
@@ -210,10 +221,19 @@ describe('designer index component', () => {
 
     test('toggleSelectAll', () => {
         const store = {
-            dispatch: jest.fn().mockImplementation(() => Promise.resolve({})),
-            commit: jest.fn()
+            dispatch: vi.fn().mockImplementation(() => Promise.resolve({})),
+            commit: vi.fn(),
+            state: {
+                data: {
+                    loading: false,
+                    QAs: [],
+                },
+                page: {
+                    total: 0,
+                },
+            },
         };
-        const wrapper = shallowMount(indexModule, {
+        const wrapper = shallowMount(indexModule.default, {
             global: {
                 mocks: {
                     $store: store
@@ -227,9 +247,18 @@ describe('designer index component', () => {
 
     test('deleteClose', () => {
         const store = {
-            dispatch: jest.fn().mockImplementation(() => Promise.resolve({}))
+            dispatch: vi.fn().mockImplementation(() => Promise.resolve({})),
+            state: {
+                data: {
+                    loading: false,
+                    QAs: [],
+                },
+                page: {
+                    total: 0,
+                },
+            },
         };
-        const wrapper = shallowMount(indexModule, {
+        const wrapper = shallowMount(indexModule.default, {
             global: {
                 mocks: {
                     $store: store
@@ -246,10 +275,19 @@ describe('designer index component', () => {
 
     test('handleDelete', async () => {
         const store = {
-            dispatch: jest.fn().mockImplementation(() => Promise.resolve({})),
-            commit: jest.fn().mockImplementation(() => Promise.resolve({}))
+            dispatch: vi.fn().mockImplementation(() => Promise.resolve({})),
+            commit: vi.fn().mockImplementation(() => Promise.resolve({})),
+            state: {
+                data: {
+                    loading: false,
+                    QAs: [],
+                },
+                page: {
+                    total: 0,
+                },
+            },
         };
-        const wrapper = shallowMount(indexModule, {
+        const wrapper = shallowMount(indexModule.default, {
             global: {
                 mocks: {
                     $store: store

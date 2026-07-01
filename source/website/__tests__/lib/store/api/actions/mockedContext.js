@@ -2,9 +2,11 @@
 *   Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.                             *
 *   SPDX-License-Identifier: Apache-2.0                                                            *
  ************************************************************************************************ */
+import { vi } from 'vitest';
+
 const mockedContext = {
-    commit: jest.fn(),
-    dispatch: jest.fn(),
+    commit: vi.fn(),
+    dispatch: vi.fn().mockResolvedValue({}),
     rootState: {
         info: {
             _links: {

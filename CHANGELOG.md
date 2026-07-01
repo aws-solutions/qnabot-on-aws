@@ -5,6 +5,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [7.4.0] - 2026-07-01
+
+### Changed
+
+- Migrated website build tooling from Webpack/Jest to Vite/Vitest. See the [README](./README.md) for updated dev commands.
+
+### Security
+
+- Fixed Arbitrary Code Execution via Handlebars sandbox bypass.
+- Fixed Lex session attribute injection enabling cross-account Lambda invocation.
+- Fixed missing Alexa Skill authorization. New `AlexaSkillIds` CloudFormation parameter restricts Alexa invocations to registered skill IDs only. **Existing Alexa users must provide their Alexa Skill ID(s) during stack update to restore Alexa functionality.** See [Getting answers using Amazon Alexa](https://docs.aws.amazon.com/solutions/latest/qnabot-on-aws/step-4-interact-with-the-chatbot.html#getting-answers-using-amazon-alexa) in the Implementation Guide for details.
+
+### Fixed
+
+- Replaced deprecated `cfn-lambda` npm package with native CloudFormation SDK calls, eliminating aws-sdk v2 dependency.
+- Fixed Claude `topP`/`temperature` parameter conflict for Bedrock LLM (Issue [#892](https://github.com/aws-solutions/qnabot-on-aws/issues/892)).
+- Fixed Comprehend PII regex causing Lambda outage on large payloads; added `span[translate]` to sanitization allowlist to restore span color rendering (Issue [#895](https://github.com/aws-solutions/qnabot-on-aws/issues/895)).
+
 ## [7.3.16] - 2026-06-18
 
 ### Security
@@ -140,7 +158,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Updated bn.js to `5.2.3`
 - Updated fast-xml-parser to `5.3.6`
 - Updated minimatch to `3.1.3`
-- Updated werkzeug to `3.1.6` 
+- Updated werkzeug to `3.1.6`
 
 ## [7.3.1] - 2026-02-17
 
@@ -154,7 +172,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [7.3.0] - 2026-02-03
 
-__*Note: we recommend that you first deploy these changes in a non-production environment. This is true for all releases, but especially important for minor and major releases.*__
+**Note: we recommend that you first deploy these changes in a non-production environment. This is true for all releases, but especially important for minor and major releases.**
 
 ### Added
 
@@ -211,7 +229,7 @@ __*Note: we recommend that you first deploy these changes in a non-production en
 
 ## [7.2.0] - 2025-11-20
 
-__*Note: we recommend that you first deploy these changes in a non-production environment. This is true for all releases, but especially important for minor and major releases.*__
+**Note: we recommend that you first deploy these changes in a non-production environment. This is true for all releases, but especially important for minor and major releases.**
 
 ### Added
 
@@ -662,7 +680,7 @@ __*Note: we recommend that you first deploy these changes in a non-production en
 
 ## [5.4.0] - 2023-07-27
 
-__*Note: we recommend that you first deploy these changes in a non-production environment. This is true for all releases, but especially important for minor and major releases.*__
+**Note: we recommend that you first deploy these changes in a non-production environment. This is true for all releases, but especially important for minor and major releases.**
 
 ### Added
 
@@ -733,7 +751,7 @@ __*Note: we recommend that you first deploy these changes in a non-production en
 
 ## [5.3.0] - 2023-02-23
 
-__*Note: we recommend that you first deploy these changes in a non-production environment. This is true for all releases, but especially important for minor and major releases.*__
+**Note: we recommend that you first deploy these changes in a non-production environment. This is true for all releases, but especially important for minor and major releases.**
 
 ### Added
 
@@ -1183,7 +1201,7 @@ More details in [README](https://github.com/aws-solutions/qnabot-on-aws/blob/v5.
 
 ### Changed
 
-- Enhanced handlebars to support string concatenation including handlevar 'variables' like Session Attributes and UserInfo, etc. Use case, e.g. to build a url containing a users email, eg a google calendar URL. Example of syntax now supported - in this case to dynamically build a personalized URL based on user info. {{setSessionAttr 'link' 'https://calendar.google.com/calendar/embed?src=' UserInfo.Email '&ctz=America%2FNew_York'}}
+- Enhanced handlebars to support string concatenation including handlevar 'variables' like Session Attributes and UserInfo, etc. Use case, e.g. to build a url containing a users email, eg a google calendar URL. Example of syntax now supported - in this case to dynamically build a personalized URL based on user info. `{{setSessionAttr 'link' 'https://calendar.google.com/calendar/embed?src=' UserInfo.Email '&ctz=America%2FNew_York'}}`
 - Moved 'previous' and 'navigation' session attributes under a new 'qnabotcontext' session attribute so that Connect (and other) clients have fewer session attributes to preserve.
 - Allows Chaining rule Lambda function to return a modified session object in addition to the string for chaining.
 - Allows Chaining of up to 10 documents. Each document's Lambda hooks will also be invoked in sequence if defined.
@@ -1369,14 +1387,14 @@ More details in [README](https://github.com/aws-solutions/qnabot-on-aws/blob/v5.
 - link parsing
 - cloudfront distributions
 
-## [1.1] - 2018-01-05
+## [1.1.0] - 2018-01-05
 
 ### Fixed
 
 - spelling in documentation
 - small bugs
 
-## [1.0] - 2017-11-06
+## [1.0.0] - 2017-11-06
 
 ### Added
 

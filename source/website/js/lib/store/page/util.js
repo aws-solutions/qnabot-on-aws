@@ -3,13 +3,15 @@
 *   SPDX-License-Identifier: Apache-2.0                                                            *
  ************************************************************************************************ */
 
-const validator = new (require('jsonschema').Validator)();
-const axios = require('axios');
+import { Validator } from 'jsonschema';
+import axios from 'axios';
 
-exports.api = function (context, name, args) {
+const validator = new Validator();
+
+export const api = function (context, name, args) {
     return context.dispatch(`api/${name}`, args, { root: true });
 };
-exports.parse = function (item, context) {
+export const parse = function (item, context) {
     if (!item.body.r) {
         item.body.r = {
             title: '',
@@ -49,7 +51,7 @@ exports.parse = function (item, context) {
     };
 };
 
-exports.handle = function (reason) {
+export const handle = function (reason) {
     const self = this;
     return function (err) {
         console.log('Error:', err);
@@ -57,7 +59,7 @@ exports.handle = function (reason) {
         return Promise.reject(reason);
     };
 };
-exports.load = async function (list) {
+export const load = async function (list) {
     const self = this;
     self.commit('startLoading');
     try {
@@ -73,4 +75,11 @@ exports.load = async function (list) {
     } finally {
         self.commit('stopLoading');
     }
+};
+
+export default {
+    api,
+    parse,
+    handle,
+    load
 };

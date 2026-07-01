@@ -3,7 +3,8 @@
 *   SPDX-License-Identifier: Apache-2.0                                                            *
  ************************************************************************************************ */
 
-const util = require('./util');
+import _ from 'lodash';
+import util from './util';
 
 const { api } = util;
 
@@ -31,7 +32,7 @@ async function next(count, res, rej, context, result) {
     }
 }
 
-module.exports = {
+export default {
     async build(context) {
         context.rootState.bot.status = 'Submitting';
         context.rootState.bot.build.message = '';

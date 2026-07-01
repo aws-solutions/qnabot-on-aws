@@ -1,6 +1,6 @@
 {
     "name": "proxy-es",
-    "version": "7.3.16",
+    "version": "7.4.0",
     "description": "QnABot Lambda managing querying of data store",
     "main": "index.js",
     "scripts": {
@@ -33,7 +33,6 @@
         "@aws-sdk/client-dynamodb": "^3.705.0",
         "aws-sdk-client-mock": "^4.1.0",
         "aws-sdk-client-mock-jest": "^4.1.0",
-        "cfn-lambda": "^5.1.0",
         "jest": "^29.7.0"
     },
     "overrides": {

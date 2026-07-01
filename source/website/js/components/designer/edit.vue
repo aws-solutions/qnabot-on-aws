@@ -44,15 +44,15 @@ span(class="wrapper")
   )
     template(v-slot:activator="{ props }")
       v-btn(
-        v-if="!label"
         v-bind="props"
+        v-if="!label"
         variant="text"
         icon="edit"
         @click="refresh"
       )
       v-btn(
-        v-if="label"
         v-bind="props"
+        v-if="label"
         @click="refresh"
       ) {{ label }}
     v-card(id="edit-form")
@@ -95,15 +95,15 @@ span(class="wrapper")
 </template>
 
 <script>
+import _ from 'lodash';
+import empty from './empty';
+import sanitizeHtml from 'sanitize-html';
+import { sanitize as sanitizeMarkdown } from './sanitizeOutput';
+import 'vuex';
+import schemaInput from './input.vue';
+import Ajv from 'ajv';
 
-require('vuex');
-const _ = require('lodash');
-const empty = require('./empty');
-const sanitizeHtml = require('sanitize-html');
-const { sanitize: sanitizeMarkdown } = require('./sanitizeOutput');
-
-
-module.exports = {
+export default {
     props: ['data', 'label'],
     data() {
         return {
@@ -117,7 +117,7 @@ module.exports = {
         };
     },
     components: {
-        'schema-input': require('./input.vue').default,
+        'schema-input': schemaInput,
     },
     computed: {
         type() {
@@ -150,7 +150,6 @@ module.exports = {
         async update() {
             const self = this;
             
-            const Ajv = require('ajv');
             const ajv = new Ajv();
             const data = clean(_.cloneDeep(self.tmp));
             const validate = ajv.compile(this.schema || true);
@@ -192,6 +191,9 @@ module.exports = {
 };
 
 function clean(obj) {
+    if (obj === null || obj === undefined) {
+        return null;
+    }
     let out;
     if (Array.isArray(obj)) {
         for (let i = 0; i < obj.length; i++) {
@@ -213,7 +215,7 @@ function clean(obj) {
         return obj;
     }
 
-    if (obj.trim) {
+    if (typeof obj === 'string') {
         return obj.trim() || null;
     }
 
@@ -228,7 +230,7 @@ function sanitize(data, type) {
     const sanitizedData = { ...data };
     if (type === 'qna' && sanitizedData.alt?.markdown) {
         sanitizedData.alt.markdown = sanitizeMarkdown(sanitizedData.alt.markdown);
-        sanitizedData.alt.markdown = sanitizedData.alt.markdown.replace('&gt;', '>');
+        sanitizedData.alt.markdown = sanitizedData.alt.markdown.replaceAll('&gt;', '>'); // NOSONAR
     }
     if (type === 'text' && sanitizedData.passage) {
         sanitizedData.passage = sanitizeHtml(sanitizedData.passage);

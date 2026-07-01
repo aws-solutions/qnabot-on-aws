@@ -63,13 +63,12 @@ v-container(id="page-import")
 </template>
 
 <script>
-require('vuex');
-require('axios');
-require('json-parse-better-errors');
+import _ from 'lodash';
+import 'vuex';
+import 'axios';
+import 'json-parse-better-errors';
 
-const _ = require('lodash');
-
-module.exports = {
+export default {
     data() {
         return {
             importWarning: 'Warning: Importing will over write existing translations with the same ID',

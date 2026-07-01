@@ -39,12 +39,11 @@ v-container
 </template>
 
 <script>
+import { saveAs } from 'file-saver';
+import { reactive } from 'vue';
+import 'vuex';
 
-require('vuex');
-const { saveAs } = require('file-saver');
-const { reactive } = require('vue');
-
-module.exports = {
+export default {
     data() {
         return {
             loading: false,

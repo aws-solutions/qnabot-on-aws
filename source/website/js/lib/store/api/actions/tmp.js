@@ -2,7 +2,7 @@
 *   Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.                             *
 *   SPDX-License-Identifier: Apache-2.0                                                            *
  ************************************************************************************************ */
-const { S3Client, GetObjectCommand } = require('@aws-sdk/client-s3');
+import {  S3Client, GetObjectCommand  } from '@aws-sdk/client-s3';
 const region = 'us-east-1';
 const s3 = new S3Client({ region });
 

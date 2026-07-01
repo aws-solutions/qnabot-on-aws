@@ -2,7 +2,8 @@
 *   Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.                             *
 *   SPDX-License-Identifier: Apache-2.0                                                            *
  ************************************************************************************************ */
-const gettersModule = require('../../../../js/lib/store/data/getters');
+import { describe, test, expect } from 'vitest';
+import gettersModule from '../../../../js/lib/store/data/getters.js';
 
 describe('getters data', () => {
     const testState = {

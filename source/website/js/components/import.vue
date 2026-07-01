@@ -84,12 +84,13 @@ span.wrapper
 </template>
 
 <script>
-const parseJson = require('json-parse-better-errors');
-const XLSX = require('read-excel-file');
-const _ = require('lodash');
-const { reactive } = require('vue');
+import parseJson from 'json-parse-better-errors';
+import XLSX from 'read-excel-file';
+import _ from 'lodash';
+import { reactive } from 'vue';
 
-module.exports = {
+
+export default {
     data() {
         return {
             importWarning:

@@ -318,9 +318,9 @@ echo https://$DIST_OUTPUT_BUCKET.s3.amazonaws.com/$SOLUTION_NAME/$VERSION/qnabot
 1. Never overwrite a published artifact when it is available to external users. Increment the version to upload new artifacts and keep previous versions immutable. Enable bucket versioning to recover artifacts. You may also decide to have a 'latest' version which will always contain the latest version of your bot.
 1. After uploading the artifacts, deploy and test from the S3 URL before releasing to any external users.
 
-## Run Webpack in Development Mode
+## Run Vite in Development Mode
 
-In order to run Webpack in Development Mode, make sure to have the following
+In order to run Vite in Development Mode, make sure to have the following:
 - Existing deployment of QnABot on AWS
 
 Navigate to the root directory of QnABot (directory will be created once you have cloned this repo).
@@ -329,14 +329,36 @@ Navigate to the root directory of QnABot (directory will be created once you hav
 npm install
 ```
 
-Next, assign the environment variable, `ASSET_BUCKET_NAME` located in package.json in the npm script `dev mode`. This is the name of the bucket QnABot loads ./website assets to and is usually named \<stack-name\>-bucket-\<randomly-generated-chars\>.
+### Local Development with API Proxy
 
-Once set up correctly, run
+> ⚠️ **Security Warning:** This script adds `http://localhost:8080` as an allowed callback URL to your Cognito User Pool App Client. Only use this against development/test stacks — adding localhost callback URLs to a production environment creates an open redirect vulnerability. Always run `--cleanup` when you're done, and never leave localhost URLs configured on production deployments.
+
+For local development with Hot Module Replacement (HMR) and API proxy to your deployed QnABot stack:
+
 ```shell
-npm run dev-mode
+npm run dev:proxy -- --stack-name <my-qnabot-stack> --region <region>
 ```
 
-This should set Webpack to development mode and upload assets in ./website/build to `ASSET_BUCKET_NAME`. This will also watch for any changes in ./website and reload assets into your bucket if the assets change.
+Or provide the API URL directly:
+
+```shell
+npm run dev:proxy -- --api-url <https://abc123.execute-api.region.amazonaws.com> --stage prod
+```
+
+> **Note:** When using `--stack-name`, the script automatically fetches the Cognito User Pool configuration from CloudFormation and offers to add `http://localhost:8080` to the allowed callback/logout URLs (with a confirmation prompt). When using `--api-url`, this automatic Cognito configuration is not available — you will need to manually add `http://localhost:8080` to the callback and logout URLs in the Cognito User Pool App Client settings.
+
+To remove localhost callback URLs from Cognito after development:
+
+```shell
+npm run dev:proxy -- --cleanup --stack-name <my-qnabot-stack> --region <region>
+```
+
+This starts the Vite dev server at `http://localhost:8080` with:
+- Hot Module Replacement (HMR) for instant updates as you edit files
+- API proxy configured to forward requests to your deployed QnABot backend
+- Automatic Cognito App Client configuration for localhost callbacks
+
+The dev server provides fast refresh and improved developer experience while connecting to your deployed backend services.
 
 ## Designer UI Compatibility
 
@@ -348,7 +370,8 @@ Currently the only browsers supported are:
 ## Built With
 
 -   [Vue](https://vuejs.org/)
--   [Webpack](https://webpack.github.io/)
+-   [Vite](https://vitejs.dev/)
+-   [Vitest](https://vitest.dev/)
 
 ## License
 
@@ -367,6 +390,8 @@ As QnABot evolves over the years, it makes use of various services and functiona
 _Note: **Deployable solution versions** refers to the ability to deploy the version of QnABot in their AWS accounts. **Actively supported versions** for QnABot is only available for the latest version of QnABot._
 
 ### Deployable Versions
+- [v7.4.0](https://github.com/aws-solutions/qnabot-on-aws/releases/tag/v7.4.0) - [Public](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v7.4.0/qnabot-on-aws-main.template)/[VPC](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v7.4.0/qnabot-on-aws-vpc.template)
+  - _Note: Alexa Skill authorization is now enforced via the new `AlexaSkillIds` CloudFormation parameter. **Existing Alexa users must provide their Alexa Skill ID(s) during stack update** to restore Alexa functionality. New deployments have Alexa disabled by default. See [Getting answers using Amazon Alexa](https://docs.aws.amazon.com/solutions/latest/qnabot-on-aws/step-4-interact-with-the-chatbot.html#getting-answers-using-amazon-alexa) in the Implementation Guide for details._
 - [v7.3.16](https://github.com/aws-solutions/qnabot-on-aws/releases/tag/v7.3.16) - [Public](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v7.3.16/qnabot-on-aws-main.template)/[VPC](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v7.3.16/qnabot-on-aws-vpc.template)
 - [v7.3.15](https://github.com/aws-solutions/qnabot-on-aws/releases/tag/v7.3.15) - [Public](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v7.3.15/qnabot-on-aws-main.template)/[VPC](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v7.3.15/qnabot-on-aws-vpc.template)
 - [v7.3.14](https://github.com/aws-solutions/qnabot-on-aws/releases/tag/v7.3.14) - [Public](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v7.3.14/qnabot-on-aws-main.template)/[VPC](https://solutions-reference.s3.amazonaws.com/qnabot-on-aws/v7.3.14/qnabot-on-aws-vpc.template)
@@ -451,7 +476,7 @@ Some additional precautions you can take are:
 > Note: For a more detailed steps, see [update or migrate deployment](/source/docs/update_or_migrate_deployment/README.md).
  ---
 ## Collection of operational metrics
-This solution collects anonymized operational metrics to help AWS improve the quality and features of the solution. For more information, including how to disable this capability, please see the [implementation guide](https://docs.aws.amazon.com/solutions/latest/qnabot-on-aws/general-reference.html).
+This solution sends operational metrics to AWS (the "Data") about the use of this solution. We use this Data to better understand how customers use this solution and related services and products. AWS's collection of this Data is subject to the [AWS Privacy Notice](https://aws.amazon.com/privacy/).
 
 ---
 

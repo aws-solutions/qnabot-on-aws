@@ -4,43 +4,47 @@
  ************************************************************************************************ */
 <template lang='pug'>
 v-card(flat class="pa-0")
-span(v-show="false" :data-path="data.qid+'-.qid'") {{data.qid}}
-display(
-    :schema="schema"
-    :path='data.qid+"-"'
-    row
-    v-model="topitems"
-)
-v-divider(v-if="extra")
-display(
-    v-if="extra"
-    :schema="schema"
-    :path='data.qid+"-"'
-    column
-    v-model="bottomitems"
-)
+  .text-error(v-if="!data") No data provided
+  .text-error(v-else-if="!schema || Object.keys(schema).length === 0") Schema not loaded (type: {{ type }})
+  span(v-else)
+    span(v-show="false" :data-path="data.qid+'-.qid'") {{data.qid}}
+    display(
+        :schema="schema"
+        :path='data.qid+"-"'
+        row
+        v-model="topitems"
+    )
+    v-divider(v-if="extra")
+    display(
+        v-if="extra"
+        :schema="schema"
+        :path='data.qid+"-"'
+        column
+        v-model="bottomitems"
+    )
 </template>
 
 <script>
+import Vuex from 'vuex';
+import _ from 'lodash';
+import display from './display.vue';
 
-const Vuex = require('vuex');
-const _ = require('lodash');
-
-module.exports = {
+export default {
     props: ['data'],
     data: () => ({
         advanced: false,
         top: ['q', 'a'],
     }),
     components: {
-        display: require('./display.vue').default,
+        display,
     },
     computed: {
         type() {
             return this.data.type || 'qna';
         },
         schema() {
-            return this.$store.state.data.schema[this.type];
+            const schema = this.$store.state.data.schema[this.type];
+            return schema || {};
         },
         extra() {
             return _.values(_.pick(this.items, this.top)).length > 0;

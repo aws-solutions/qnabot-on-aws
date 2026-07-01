@@ -14,7 +14,7 @@ module.exports = {
         auth: 'NONE',
         resource: { Ref: 'ImagesProxy' },
         method: 'get',
-        path: '/assets/{proxy}',
+        path: '/images/{proxy}',
         requestParams: {
             'integration.request.path.proxy': 'method.request.path.proxy',
         },

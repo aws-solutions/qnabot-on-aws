@@ -41,8 +41,8 @@ span(class="wrapper")
   )
     template(v-slot:activator="{ props }")
       v-btn.ma-2(
-        id="add-question-btn"
         v-bind="props"
+        id="add-question-btn"
         @click="reset"
       ) Add
     v-card(id="add-question-form")
@@ -99,17 +99,17 @@ span(class="wrapper")
 </template>
 
 <script>
-
-require('vuex');
-const _ = require('lodash');
-const Ajv = require('ajv');
-const empty = require('./empty');
-const sanitizeHtml = require('sanitize-html');
-const { sanitize: sanitizeMarkdown } = require('./sanitizeOutput');
+import _ from 'lodash';
+import Ajv from 'ajv';
+import empty from './empty';
+import sanitizeHtml from 'sanitize-html';
+import { sanitize as sanitizeMarkdown } from './sanitizeOutput';
+import 'vuex';
+import schemaInput from './input.vue';
 
 const ajv = new Ajv();
 
-module.exports = {
+export default {
     data() {
         return {
             title: 'Add New Item',
@@ -126,7 +126,7 @@ module.exports = {
         };
     },
     components: {
-        'schema-input': require('./input.vue').default,
+        'schema-input': schemaInput,
     },
     computed: {
         types() {
@@ -189,6 +189,9 @@ module.exports = {
 };
 
 function clean(obj) {
+    if (obj === null || obj === undefined) {
+        return null;
+    }
     if (Array.isArray(obj)) {
         for (let i = 0; i < obj.length; i++) {
             obj[i] = clean(obj[i]);
@@ -203,7 +206,7 @@ function clean(obj) {
         const out = _.pickBy(obj);
         return _.keys(out).length ? out : null;
     }
-    if (obj.trim) {
+    if (typeof obj === 'string') {
         return obj.trim() || null;
     }
     return obj;
@@ -217,7 +220,7 @@ function sanitize(data, type) {
     const sanitizedData = { ...data };
     if (type === 'qna' && sanitizedData.alt?.markdown) {
         sanitizedData.alt.markdown = sanitizeMarkdown(sanitizedData.alt.markdown);
-        sanitizedData.alt.markdown = sanitizedData.alt.markdown.replace('&gt;', '>');
+        sanitizedData.alt.markdown = sanitizedData.alt.markdown.replaceAll('&gt;', '>'); // NOSONAR
     }
     if (type === 'text' && sanitizedData.passage) {
         sanitizedData.passage = sanitizeHtml(sanitizedData.passage);

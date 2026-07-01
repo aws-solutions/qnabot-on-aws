@@ -9,4 +9,4 @@ import '@fontsource/roboto/700.css';
 import '@fontsource/varela-round';
 import '@fontsource/material-icons';
 
-const js = require('./js/admin.js');
+import './js/admin.js';

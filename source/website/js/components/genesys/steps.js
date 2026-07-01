@@ -4,7 +4,7 @@
 *   SPDX-License-Identifier: Apache-2.0                                                            *
  ************************************************************************************************ */
 
-module.exports = [
+export default [
     {
         title: 'Connecting QnABot on AWS to Genesys Cloud CX',
         text: `

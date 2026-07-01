@@ -3,7 +3,7 @@
 *   SPDX-License-Identifier: Apache-2.0                                                            *
  ************************************************************************************************ */
 
-const cfnLambda = require('cfn-lambda');
+const cfnHandler = require('./lib/cfnHandler');
 const _ = require('lodash');
 const response = require('./lib/util/response');
 
@@ -74,9 +74,9 @@ function dispatch(event, context) {
                 _.set(event, 'OldResourceProperties.rejectionStatement.messages[0].content', v);
             }
         }
-        cfnLambda(new Lex(Lextype[1]))(event, context);
+        cfnHandler(new Lex(Lextype[1]), event, context);
     } else if (targets[type[1]]) {
-        return cfnLambda(new targets[type[1]]())(event, context);
+        return cfnHandler(new targets[type[1]](), event, context);
     } else {
         response.send({
             event,

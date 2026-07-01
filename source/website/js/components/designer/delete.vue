@@ -19,7 +19,7 @@ span(class="wrapper")
           v-btn(@click='cancel' flat) close
   v-dialog(persistent v-model='dialog' max-width='60%')
     template(v-slot:activator="{ props }")
-      v-btn(variant="text" v-bind="props" icon="delete")
+      v-btn(v-bind="props" variant="text" icon="delete")
     v-card(title="Delete Selection")
       v-card-text
         span(v-if="!selectAll")
@@ -38,10 +38,9 @@ span(class="wrapper")
 </template>
 
 <script>
+import 'vuex';
 
-require('vuex');
-
-module.exports = {
+export default {
     props: ['data', 'selectAll', 'selected'],
     data() {
         return {

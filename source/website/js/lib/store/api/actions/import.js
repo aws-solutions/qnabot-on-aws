@@ -2,11 +2,11 @@
 *   Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.                             *
 *   SPDX-License-Identifier: Apache-2.0                                                            *
  ************************************************************************************************ */
-const _ = require('lodash');
-const { S3Client, PutObjectCommand } = require('@aws-sdk/client-s3');
-const util = require('./../../../../capability/util');
+import _ from 'lodash';
+import {  S3Client, PutObjectCommand  } from '@aws-sdk/client-s3';
+import util from './../../../../capability/util';
 
-module.exports = {
+export default {
     async listExamples(context) {
         const response = await context.dispatch('_request', {
             url: context.rootState.info._links.examples.href,

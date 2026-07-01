@@ -3,7 +3,11 @@
 *   SPDX-License-Identifier: Apache-2.0                                                            *
  ************************************************************************************************ */
 
-exports.getUserAgentString = function (version, capability) {
+export function getUserAgentString(version, capability) {
     const userAgent = [[`AWSSOLUTION/SO0189/v${version}`], [`AWSSOLUTION-CAPABILITY/SO0189-${capability}/v${version}`]];
     return userAgent;
 }
+
+export default {
+    getUserAgentString
+};

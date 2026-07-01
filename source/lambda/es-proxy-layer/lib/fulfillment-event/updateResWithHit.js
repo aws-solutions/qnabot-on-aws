@@ -97,7 +97,8 @@ function addAltMessages(res) {
         alt.html = sanitize(alt.html);
     }
     if (alt.markdown) {
-        alt.markdown = sanitize(alt.markdown);
+        // Restore > after sanitization to preserve markdown blockquote syntax.
+        alt.markdown = sanitize(alt.markdown).replaceAll('&gt;', '>');
     }
     // Note: alt.ssml is intentionally not sanitized — it is consumed only by
     // Amazon Polly (text-to-speech) and never rendered in a browser DOM context.

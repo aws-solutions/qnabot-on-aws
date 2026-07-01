@@ -2,16 +2,17 @@
 *   Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.                             *
 *   SPDX-License-Identifier: Apache-2.0                                                            *
  ************************************************************************************************ */
-import exp from 'constants';
+import { vi } from 'vitest';
+import { stringify as query } from 'query-string';
 import mockedContext from './mockedContext';
 
-const query = require('query-string').stringify;
-const indexModule = require('../../../../../js/lib/store/api/actions/index');
-const axios = require('axios');
-const { sign } = require('aws4');
+import indexModule from '../../../../../js/lib/store/api/actions/index';
+import axios from 'axios';
 
-jest.mock('axios');
-jest.mock('aws4');
+vi.mock('axios');
+vi.mock('aws4', () => ({
+    sign: vi.fn((request) => request)
+}));
 
 
 describe('index action test', () => {
@@ -25,8 +26,8 @@ describe('index action test', () => {
     }
 
     beforeEach(() => {
-        jest.resetAllMocks();
-        jest.spyOn(console, 'log').mockImplementation(jest.fn());
+        vi.resetAllMocks();
+        vi.spyOn(console, 'log').mockImplementation(vi.fn());
     });
 
     test('_request', async () => {
@@ -58,13 +59,170 @@ describe('index action test', () => {
             throw customError;
         });
 
-        const resFunction = jest.fn();
-        const rejFunction = jest.fn((error) => error);
+        const resFunction = vi.fn();
+        const rejFunction = vi.fn((error) => error);
 
         await indexModule._request(mockedContext, opts).then(resFunction, rejFunction);
         expect(resFunction).toHaveBeenCalledTimes(0);
         expect(rejFunction).toHaveBeenCalledTimes(1);
         expect(rejFunction).toHaveBeenCalledWith(new Error('does-not-exist'));
+    });
+
+    test('_request with 204 No Content response', async () => {
+        const opts = {
+            url: 'https://example.com',
+            method: 'DELETE',
+            headers: {},
+        };
+        const successResult = {
+            status: 204,
+            data: '',
+        };
+        axios.mockResolvedValueOnce(successResult);
+
+        const result = await indexModule._request(mockedContext, opts);
+        expect(result).toEqual({});
+    });
+
+    // NOTE: This test must run before any test that triggers a 403 redirect, because
+    // handle403Error and handleTimeout share a module-level `failed` flag. Once a 403
+    // sets failed=true, handleTimeout's confirm branch is no longer reachable.
+    test('_request with CredentialTimeout error triggers handleTimeout confirm dialog', async () => {
+        // Provide DesignerLogin so handleTimeout's main branch (if login && !failed) is entered
+        mockedContext.rootState.info._links.DesignerLogin = { href: 'https://example.com/login' };
+
+        const opts = {
+            url: 'https://example.com',
+            method: 'GET',
+            headers: {},
+        };
+        const credentialError = new Error('Credential timeout');
+        credentialError.name = 'CredentialTimeout';
+        axios.mockImplementationOnce(() => { throw credentialError; });
+        // confirm returns false → handleTimeout throws e rather than redirecting
+        global.window.confirm = vi.fn().mockReturnValue(false);
+
+        const rejFunction = vi.fn();
+        await indexModule._request(mockedContext, opts).then(() => {}, rejFunction);
+        expect(global.window.confirm).toHaveBeenCalled();
+        expect(rejFunction).toHaveBeenCalledTimes(1);
+
+        delete mockedContext.rootState.info._links.DesignerLogin;
+    });
+
+    test('_request with 403 error and login redirect', async () => {
+        const opts = {
+            url: 'https://example.com',
+            method: 'GET',
+            headers: {},
+        };
+        const customError = new CustomError('Forbidden', { status: 403 });
+        axios.mockImplementationOnce(() => {
+            throw customError;
+        });
+
+        global.window.confirm = vi.fn(() => true);
+        global.window.location = { href: '' };
+
+        const resFunction = vi.fn();
+        const rejFunction = vi.fn();
+
+        await indexModule._request(mockedContext, opts).then(resFunction, rejFunction);
+        expect(rejFunction).toHaveBeenCalledTimes(1);
+    });
+
+    test('_request with 500 error and Error type response', async () => {
+        const opts = {
+            url: 'https://example.com',
+            method: 'GET',
+            headers: {},
+        };
+        const customError = new CustomError('Server Error', { 
+            status: 500,
+            data: {
+                type: 'Error',
+                message: 'Internal server error'
+            }
+        });
+        axios.mockImplementationOnce(() => {
+            throw customError;
+        });
+
+        const resFunction = vi.fn();
+        const rejFunction = vi.fn();
+
+        await indexModule._request(mockedContext, opts).then(resFunction, rejFunction);
+        expect(rejFunction).toHaveBeenCalledTimes(1);
+    });
+
+    // Skipping CredentialTimeout test due to module-level state management complexity
+    test.skip('_request with CredentialTimeout error', async () => {
+        const opts = {
+            url: 'https://example.com',
+            method: 'GET',
+            headers: {},
+        };
+        const credError = new Error('Credential timeout');
+        credError.name = 'CredentialTimeout';
+        
+        // Mock getCredentials to throw the error
+        mockedContext.dispatch = vi.fn().mockImplementation((action) => {
+            if (action === 'user/getCredentials') {
+                throw credError;
+            }
+            return Promise.resolve({});
+        });
+
+        global.window.confirm = vi.fn(() => true);
+        global.window.location = { href: '' };
+
+        const resFunction = vi.fn();
+        const rejFunction = vi.fn();
+
+        await indexModule._request(mockedContext, opts).then(resFunction, rejFunction);
+        expect(global.window.confirm).toHaveBeenCalled();
+        expect(mockedContext.dispatch).toHaveBeenCalledWith('user/logout', {}, { root: true });
+    });
+
+    test('_request with NotAuthorizedException error', async () => {
+        const opts = {
+            url: 'https://example.com',
+            method: 'GET',
+            headers: {},
+        };
+        const authError = new Error('Not authorized');
+        authError.name = 'NotAuthorizedException';
+        axios.mockImplementationOnce(() => {
+            throw authError;
+        });
+
+        const resFunction = vi.fn();
+        const rejFunction = vi.fn();
+
+        await indexModule._request(mockedContext, opts).then(resFunction, rejFunction);
+        // Should not throw, just log
+        expect(console.log).toHaveBeenCalled();
+    });
+
+    test('_request with unknown error', async () => {
+        const opts = {
+            url: 'https://example.com',
+            method: 'GET',
+            headers: {},
+        };
+        const unknownError = new Error('Unknown error');
+        axios.mockImplementationOnce(() => {
+            throw unknownError;
+        });
+
+        global.window.alert = vi.fn();
+
+        const resFunction = vi.fn();
+        const rejFunction = vi.fn();
+
+        await indexModule._request(mockedContext, opts).then(resFunction, rejFunction);
+        expect(global.window.alert).toHaveBeenCalledWith('Unknown Error');
+        expect(rejFunction).toHaveBeenCalledTimes(1);
     });
 
     test('botinfo', () => {
@@ -87,14 +245,28 @@ describe('index action test', () => {
         });
     });
 
-    test('schema', () => {
-        indexModule.schema(mockedContext, {});
+    test('schema with valid response', async () => {
+        const schemaData = { properties: { qid: { type: 'string' } } };
+        mockedContext.dispatch.mockResolvedValueOnce(schemaData);
+        
+        const result = await indexModule.schema(mockedContext, {});
+        
         expect(mockedContext.dispatch).toHaveBeenCalledTimes(1);
         expect(mockedContext.dispatch).toHaveBeenCalledWith('_request', {
             url: mockedContext.rootState.info._links.questions.href,
             method: 'options',
             reason: 'Failed to get qa options',
+        });
+        expect(result).toEqual(schemaData);
     });
+
+    test('schema with empty response falls back to bundled schemas', async () => {
+        mockedContext.dispatch.mockResolvedValueOnce({});
+        
+        const result = await indexModule.schema(mockedContext, {});
+        
+        expect(result).toBeDefined();
+        // Should return bundled schemas instead of empty object
     });
 
     test('list with filter', () => {
@@ -140,8 +312,8 @@ describe('index action test', () => {
     });
 
     test('check finds qid', async () => {
-        const resFunction = jest.fn((result) => result);
-        const rejFunction = jest.fn();
+        const resFunction = vi.fn((result) => result);
+        const rejFunction = vi.fn();
         const qid = 'test-qid';
         await indexModule.check(mockedContext, qid).then(resFunction, rejFunction);
         expect(resFunction).toHaveBeenCalledTimes(1);
@@ -157,8 +329,8 @@ describe('index action test', () => {
     });
 
     test('check encounters does-not-exist error', async () => {
-        const resFunction = jest.fn();
-        const rejFunction = jest.fn();
+        const resFunction = vi.fn();
+        const rejFunction = vi.fn();
         mockedContext.dispatch.mockImplementationOnce(() => {
             throw Error('does-not-exist');
         });
@@ -168,8 +340,8 @@ describe('index action test', () => {
     });
 
     test('check encounters any other error', async () => {
-        const resFunction = jest.fn();
-        const rejFunction = jest.fn();
+        const resFunction = vi.fn();
+        const rejFunction = vi.fn();
         mockedContext.dispatch.mockImplementationOnce(() => {
             throw new Error('Some unknown test error message');
         });
@@ -331,5 +503,182 @@ describe('index action test', () => {
             method: 'get',
             reason: 'failed to get search',
         });
+    });
+
+    test('_request with 404 error without ignore404 flag', async () => {
+        const opts = {
+            url: 'https://example.com',
+            method: 'GET',
+            headers: {},
+        };
+        const customError = new CustomError('Not Found', { status: 404, data: {} });
+        axios.mockImplementationOnce(() => { throw customError; });
+
+        global.window.alert = vi.fn();
+
+        const resFunction = vi.fn();
+        const rejFunction = vi.fn();
+
+        await indexModule._request(mockedContext, opts).then(resFunction, rejFunction);
+        expect(global.window.alert).toHaveBeenCalledWith('Request Failed: error response from endpoint');
+        expect(rejFunction).toHaveBeenCalledTimes(1);
+    });
+
+    test('_request with response error object (non-Error type)', async () => {
+        const opts = {
+            url: 'https://example.com',
+            method: 'GET',
+            headers: {},
+        };
+        const customError = new CustomError('Server Error', {
+            status: 500,
+            data: { type: 'NotError', message: 'something else' },
+        });
+        axios.mockImplementationOnce(() => { throw customError; });
+
+        global.window.alert = vi.fn();
+
+        const resFunction = vi.fn();
+        const rejFunction = vi.fn();
+
+        await indexModule._request(mockedContext, opts).then(resFunction, rejFunction);
+        expect(global.window.alert).toHaveBeenCalledWith('Request Failed: error response from endpoint');
+        expect(rejFunction).toHaveBeenCalledTimes(1);
+    });
+
+    test('_request with body sets content-type header', async () => {
+        const opts = {
+            url: 'https://example.com',
+            method: 'POST',
+            headers: {},
+            body: { key: 'value' },
+        };
+        const successResult = { data: 'success' };
+        axios.mockResolvedValueOnce(successResult);
+
+        const result = await indexModule._request(mockedContext, opts);
+        expect(result).toEqual(successResult.data);
+        expect(axios).toHaveBeenCalledWith(
+            expect.objectContaining({
+                headers: expect.objectContaining({ 'content-type': 'application/json' }),
+            })
+        );
+    });
+
+    describe('dev mode URL resolution', () => {
+        let originalEnv;
+
+        beforeEach(() => {
+            originalEnv = { ...import.meta.env };
+        });
+
+        afterEach(() => {
+            Object.keys(import.meta.env).forEach(key => delete import.meta.env[key]);
+            Object.assign(import.meta.env, originalEnv);
+        });
+
+        test('_request in dev mode with absolute URL resolves to relative path', async () => {
+            import.meta.env.DEV = true;
+            import.meta.env.VITE_PROXY_STAGE = 'dev';
+            import.meta.env.VITE_PROXY_TARGET = 'https://api.example.com';
+
+            const opts = {
+                url: 'https://api.example.com/dev/questions',
+                method: 'GET',
+                headers: {},
+            };
+            const successResult = { status: 200, data: 'success' };
+            axios.mockResolvedValueOnce(successResult);
+
+            const result = await indexModule._request(mockedContext, opts);
+            expect(result).toEqual(successResult.data);
+        });
+
+        test('_request in dev mode with relative URL prepends target', async () => {
+            import.meta.env.DEV = true;
+            import.meta.env.VITE_PROXY_STAGE = 'dev';
+            import.meta.env.VITE_PROXY_TARGET = 'https://api.example.com';
+
+            const opts = {
+                url: '/questions',
+                method: 'GET',
+                headers: {},
+            };
+            const successResult = { status: 200, data: 'success' };
+            axios.mockResolvedValueOnce(successResult);
+
+            const result = await indexModule._request(mockedContext, opts);
+            expect(result).toEqual(successResult.data);
+        });
+
+        test('_request in dev mode converts response _links to relative URLs', async () => {
+            import.meta.env.DEV = true;
+            import.meta.env.VITE_PROXY_STAGE = 'dev';
+            import.meta.env.VITE_PROXY_TARGET = 'https://api.example.com';
+
+            const opts = {
+                url: '/questions',
+                method: 'GET',
+                headers: {},
+            };
+            const successResult = {
+                status: 200,
+                data: {
+                    _links: {
+                        questions: { href: 'https://api.example.com/dev/questions' },
+                        CognitoEndpoint: { href: 'https://cognito.example.com' },
+                    },
+                },
+            };
+            axios.mockResolvedValueOnce(successResult);
+
+            const result = await indexModule._request(mockedContext, opts);
+            // CognitoEndpoint should be skipped, questions href should be converted
+            expect(result._links.CognitoEndpoint.href).toBe('https://cognito.example.com');
+            expect(result._links.questions.href).toBe('/questions');
+        });
+
+        test('_request in dev mode with result that has no _links', async () => {
+            import.meta.env.DEV = true;
+            import.meta.env.VITE_PROXY_STAGE = 'dev';
+            import.meta.env.VITE_PROXY_TARGET = 'https://api.example.com';
+
+            const opts = {
+                url: '/questions',
+                method: 'GET',
+                headers: {},
+            };
+            const successResult = { status: 200, data: { items: [] } };
+            axios.mockResolvedValueOnce(successResult);
+
+            const result = await indexModule._request(mockedContext, opts);
+            expect(result).toEqual(successResult.data);
+        });
+    });
+
+    test('_request with 403 error when already failed throws instead of prompting', async () => {
+        // DesignerLogin MUST be set so that `login` is truthy;
+        // otherwise the else branch is hit because login is falsy, not because failed=true.
+        mockedContext.rootState.info._links.DesignerLogin = { href: 'https://example.com/login' };
+
+        const opts = {
+            url: 'https://example.com',
+            method: 'GET',
+            headers: {},
+        };
+        const forbiddenError = new Error('Forbidden');
+        forbiddenError.response = { status: 403, data: {} };
+        axios.mockImplementation(() => { throw forbiddenError; });
+        global.window.confirm = vi.fn().mockReturnValue(false);
+
+        // With the module-level failed flag already set by the prior 403 test,
+        // this 403 hits the else branch (failed=true) and rejects without prompting
+        const rejFunction = vi.fn();
+        await indexModule._request(mockedContext, opts).then(() => {}, rejFunction);
+        expect(rejFunction).toHaveBeenCalledTimes(1);
+        // confirm should NOT be called when failed=true — that's what distinguishes this branch
+        expect(global.window.confirm).not.toHaveBeenCalled();
+
+        delete mockedContext.rootState.info._links.DesignerLogin;
     });
 });

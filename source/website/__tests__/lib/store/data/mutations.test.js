@@ -2,16 +2,17 @@
 *   Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.                             *
 *   SPDX-License-Identifier: Apache-2.0                                                            *
  ************************************************************************************************ */
-const mutationsModule = require('../../../../js/lib/store/data/mutations');
+import { vi } from 'vitest';
+import mutationsModule from '../../../../js/lib/store/data/mutations';
 
 describe('mutations data', () => {
     beforeEach(() => {
-        jest.resetAllMocks();
+        vi.resetAllMocks();
     });
 
     test('close success', () => {
         const testStore = {
-            commit: jest.fn(),
+            commit: vi.fn(),
             QAs: [
                 {
                     open: true,
@@ -48,7 +49,7 @@ describe('mutations data', () => {
 
     test('close fail', () => {
         const testStore = {
-            commit: jest.fn(),
+            commit: vi.fn(),
             QAs: [
                 {
                     open: true,
@@ -158,5 +159,22 @@ describe('mutations data', () => {
         const newResult = 'new-result';
         mutationsModule.results(testState, newResult);
         expect(testState.results).toEqual(newResult);
+    });
+
+    test('addQA prepends qa with selected=false to QAs', () => {
+        const testState = { QAs: [] };
+        const qa = { qid: 'test-1', answer: { text: 'answer' } };
+        mutationsModule.addQA(testState, qa);
+        expect(testState.QAs.length).toBe(1);
+        expect(testState.QAs[0].qid).toBe('test-1');
+        expect(testState.QAs[0].selected).toBe(false);
+    });
+
+    test('loading sets loading state', () => {
+        const testState = { loading: false };
+        mutationsModule.loading(testState, true);
+        expect(testState.loading).toBe(true);
+        mutationsModule.loading(testState, false);
+        expect(testState.loading).toBe(false);
     });
 });

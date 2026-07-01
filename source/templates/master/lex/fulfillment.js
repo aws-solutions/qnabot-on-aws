@@ -14,20 +14,22 @@ const responsebots = _.fromPairs(require('../../examples/examples/responsebots-l
     .map((x) => [x, { 'Fn::GetAtt': ['ExamplesStack', `Outputs.${x}`] }]));
 
 module.exports = {
-    Alexa: {
-        Type: 'AWS::Lambda::Permission',
-        DependsOn: 'FulfillmentLambdaAliaslive',
-        Properties: {
-            Action: 'lambda:InvokeFunction',
-            FunctionName: {
-                'Fn::Join': [':', [
-                    { 'Fn::GetAtt': ['FulfillmentLambda', 'Arn'] },
-                    'live',
-                ]],
+    ...Object.fromEntries(Array.from({ length: 30 }, (_, i) => [ // supports up to 30 Alexa skill IDs (limited by Lambda 20KB resource-based policy size)
+        `Alexa${i}`,
+        {
+            Type: 'AWS::Lambda::Permission',
+            Condition: `AlexaSkill${i}Enabled`,
+            DependsOn: 'FulfillmentLambdaAliaslive',
+            Properties: {
+                Action: 'lambda:InvokeFunction',
+                FunctionName: {
+                    'Fn::Join': [':', [{ 'Fn::GetAtt': ['FulfillmentLambda', 'Arn'] }, 'live']],
+                },
+                Principal: 'alexa-appkit.amazon.com',
+                EventSourceToken: { 'Fn::Select': [i, { 'Fn::Split': [',', { 'Fn::Join': [',', [{ Ref: 'AlexaSkillIds' }, ',,,,,,,,,,,,,,,,,,,,,,,,,,,,,']] }] }] },
             },
-            Principal: 'alexa-appkit.amazon.com'
         },
-    },
+    ])),
     FulfillmentCodeVersion: {
         Type: 'Custom::S3Version',
         Properties: {
@@ -224,8 +226,8 @@ module.exports = {
                                 'lambda:InvokeFunction',
                             ],
                             Resource: [
-                                'arn:aws:lambda:*:*:function:qna-*',
-                                'arn:aws:lambda:*:*:function:QNA-*',
+                                { 'Fn::Sub': 'arn:${AWS::Partition}:lambda:${AWS::Region}:${AWS::AccountId}:function:qna-*' },
+                                { 'Fn::Sub': 'arn:${AWS::Partition}:lambda:${AWS::Region}:${AWS::AccountId}:function:QNA-*' },
                                 { 'Fn::GetAtt': ['ESQueryLambda', 'Arn'] },
                                 { 'Fn::GetAtt': ['ESProxyLambda', 'Arn'] },
                                 { 'Fn::GetAtt': ['ESLoggingLambda', 'Arn'] },
@@ -244,8 +246,8 @@ module.exports = {
                                 'lambda:InvokeFunction',
                             ],
                             Resource: [
-                                'arn:aws:lambda:*:*:function:qna-*',
-                                'arn:aws:lambda:*:*:function:QNA-*',
+                                { 'Fn::Sub': 'arn:${AWS::Partition}:lambda:${AWS::Region}:${AWS::AccountId}:function:qna-*' },
+                                { 'Fn::Sub': 'arn:${AWS::Partition}:lambda:${AWS::Region}:${AWS::AccountId}:function:QNA-*' },
                                 { 'Fn::GetAtt': ['ESQueryLambda', 'Arn'] },
                                 { 'Fn::GetAtt': ['ESProxyLambda', 'Arn'] },
                                 { 'Fn::GetAtt': ['ESLoggingLambda', 'Arn'] },

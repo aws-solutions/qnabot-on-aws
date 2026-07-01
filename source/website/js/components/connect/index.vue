@@ -89,11 +89,14 @@ v-container
 </template>
 
 <script>
-const Vuex = require('vuex');
-const markdown = require('marked');
-const axios = require('axios');
+import stepsData from './steps.js';
+import Vuex from 'vuex';
+import { marked } from 'marked';
+import axios from 'axios';
+import handlebars from 'handlebars';
+import _ from 'lodash';
 
-const renderer = new markdown.Renderer();
+const renderer = new marked.Renderer();
 renderer.link = function (href, title, text) {
     return `<a href="${href}" title="${title}" target="_blank">${text}</a>`;
 };
@@ -101,15 +104,15 @@ renderer.table = function (header, body) {
     return `<table class="pure-table"><thead>${header}</thead><tbody>${body}</tbody></table>`;
 };
 
-const handlebars = require('handlebars');
-const _ = require('lodash');
 
-module.exports = {
+
+
+export default {
     data() {
         return {
             visible: false,
             stepNumber: 1,
-            stepsRaw: require('./steps.js'),
+            stepsRaw: stepsData,
         };
     },
     components: {
@@ -125,7 +128,7 @@ module.exports = {
                     const y = Object.assign({},x);
                     if (x.text) {
                         const temp = handlebars.compile(x.text);
-                        y.text = markdown.parse(temp(self.$store.state.bot), { renderer });
+                        y.text = marked.parse(temp(self.$store.state.bot), { renderer });
                     }
                     return y;
                 });

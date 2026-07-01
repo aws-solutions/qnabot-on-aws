@@ -42,3 +42,13 @@
     </v-dialog>
   </div>
 </template>
+
+<script>
+export default {
+    data() {
+        return {
+            dialog: false,
+        };
+    },
+};
+</script>

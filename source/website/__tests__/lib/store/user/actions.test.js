@@ -2,40 +2,36 @@
 *   Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.                             *
 *   SPDX-License-Identifier: Apache-2.0                                                            *
  ************************************************************************************************ */
+import { vi } from 'vitest';
 
-/**
- * @jest-environment jsdom
- */
-
-const { fromCognitoIdentityPool } = require('@aws-sdk/credential-providers');
-const actionsModule = require('../../../../js/lib/store/user/actions');
-const axios = require('axios');
-const query = require('query-string');
-const jwt = require('jsonwebtoken');
-const { mockClient } = require('aws-sdk-client-mock');
-const { CognitoIdentityProviderClient, AdminUserGlobalSignOutCommand } = require('@aws-sdk/client-cognito-identity-provider');
+import { fromCognitoIdentityPool } from '@aws-sdk/credential-providers';
+import actionsModule from '../../../../js/lib/store/user/actions';
+import axios from 'axios';
+import query from 'query-string';
+import jwt from 'jsonwebtoken';
+import { mockClient } from 'aws-sdk-client-mock';
+import { CognitoIdentityProviderClient, AdminUserGlobalSignOutCommand } from '@aws-sdk/client-cognito-identity-provider';
 const cognitoIdentityProviderClientMock = mockClient(CognitoIdentityProviderClient);
-require('aws-sdk-client-mock-jest');
 
-jest.mock('@aws-sdk/credential-providers');
-jest.mock('@aws-sdk/client-cognito-identity-provider')
-jest.mock('axios');
-jest.mock('jsonwebtoken');
+vi.mock('@aws-sdk/credential-providers');
+vi.mock('@aws-sdk/client-cognito-identity-provider')
+vi.mock('axios');
+vi.mock('jsonwebtoken');
 
 describe('user actions test', () => {
     let windowSpy;
 
     beforeEach(() => {
-        jest.resetAllMocks();
-        jest.spyOn(console, 'log').mockImplementation(jest.fn());
-        windowSpy = jest.spyOn(window, 'window', 'get');
+        vi.resetAllMocks();
+        vi.spyOn(console, 'log').mockImplementation(vi.fn());
+        windowSpy = vi.spyOn(window, 'window', 'get');
         windowSpy.mockReturnValue({
-            alert: jest.fn(),
-            confirm: jest.fn(),
+            alert: vi.fn(),
+            confirm: vi.fn(),
             sessionStorage: {
-                getItem: jest.fn(),
-                setItem: jest.fn(),
-                clear: jest.fn(),
+                getItem: vi.fn(),
+                setItem: vi.fn(),
+                clear: vi.fn(),
             },
             window: {
                 location: {
@@ -46,10 +42,10 @@ describe('user actions test', () => {
                 search: '?code=200',
                 origin: 'test.origin',
                 pathname: '/test/path',
-                replace:  jest.fn(),
+                replace:  vi.fn(),
             },
             localStorage: {
-                clear: jest.fn(),
+                clear: vi.fn(),
             },
         });
         cognitoIdentityProviderClientMock.reset();
@@ -57,7 +53,7 @@ describe('user actions test', () => {
 
     afterEach(() => {
         windowSpy.mockRestore();
-        jest.resetAllMocks();
+        vi.resetAllMocks();
         cognitoIdentityProviderClientMock.restore();
     });
 
@@ -114,7 +110,7 @@ describe('user actions test', () => {
 
     test('refresh tokens -- expired credentials 1', async () => {
         const mockedContext = {
-            dispatch: jest.fn(),
+            dispatch: vi.fn(),
             rootState: {
                 info: {
                     _links: {
@@ -148,7 +144,7 @@ describe('user actions test', () => {
 
     test('refresh tokens -- expired credentials 2', async () => {
         const mockedContext = {
-            dispatch: jest.fn(),
+            dispatch: vi.fn(),
             rootState: {
                 info: {
                     _links: {
@@ -197,7 +193,7 @@ describe('user actions test', () => {
             '.amazonaws.com/',
             mockedContext.rootState.info.UserPool,
         ].join('')] = mockedContext.state.token;
-        fromCognitoIdentityPool.mockReturnValueOnce(jest.fn().mockReturnValueOnce({}));
+        fromCognitoIdentityPool.mockReturnValueOnce(vi.fn().mockReturnValueOnce({}));
         await expect(actionsModule.getCredentials(mockedContext)).resolves.toEqual({});
         expect(fromCognitoIdentityPool).toHaveBeenCalledTimes(1);
         expect(fromCognitoIdentityPool).toHaveBeenCalledWith({
@@ -232,7 +228,7 @@ describe('user actions test', () => {
             '.amazonaws.com/',
             mockedContext.rootState.info.UserPool,
         ].join('')] = mockedContext.state.token;
-        fromCognitoIdentityPool.mockReturnValueOnce(jest.fn().mockReturnValueOnce(mockedNewCredentials));
+        fromCognitoIdentityPool.mockReturnValueOnce(vi.fn().mockReturnValueOnce(mockedNewCredentials));
         await expect(actionsModule.getCredentials(mockedContext))
             .resolves.toEqual(mockedNewCredentials);
         expect(fromCognitoIdentityPool).toHaveBeenCalledTimes(1);
@@ -268,7 +264,7 @@ describe('user actions test', () => {
             '.amazonaws.com/',
             mockedContext.rootState.info.UserPool,
         ].join('')] = mockedContext.state.token;
-        fromCognitoIdentityPool.mockReturnValueOnce(jest.fn().mockReturnValueOnce(expectedCredentials));
+        fromCognitoIdentityPool.mockReturnValueOnce(vi.fn().mockReturnValueOnce(expectedCredentials));
         await expect(actionsModule.getCredentials(mockedContext))
             .resolves.toEqual(expectedCredentials);
         expect(fromCognitoIdentityPool).toHaveBeenCalledTimes(0);
@@ -276,7 +272,7 @@ describe('user actions test', () => {
 
     test('get credentials -- throws expired token error', async () => {
         const mockedContext = {
-            dispatch: jest.fn(),
+            dispatch: vi.fn(),
             rootState: {
                 info: {
                     region: 'us-weast-1',
@@ -301,10 +297,10 @@ describe('user actions test', () => {
             mockedContext.rootState.info.UserPool,
         ].join('')] = mockedContext.state.token;
         fromCognitoIdentityPool
-            .mockReturnValueOnce(jest.fn().mockImplementation(() => {
+            .mockReturnValueOnce(vi.fn().mockImplementation(() => {
                 throw new Error('Token expired');
             }))
-            .mockReturnValueOnce(jest.fn().mockReturnValueOnce(mockedNewCredentials));
+            .mockReturnValueOnce(vi.fn().mockReturnValueOnce(mockedNewCredentials));
         await expect(actionsModule.getCredentials(mockedContext))
             .resolves.toEqual(mockedNewCredentials);
         expect(fromCognitoIdentityPool).toHaveBeenCalledTimes(2);
@@ -319,7 +315,7 @@ describe('user actions test', () => {
 
     test('get credentials -- throws inactive token error', async () => {
         const mockedContext = {
-            dispatch: jest.fn(),
+            dispatch: vi.fn(),
             rootState: {
                 info: {
                     region: 'us-weast-1',
@@ -344,10 +340,10 @@ describe('user actions test', () => {
             mockedContext.rootState.info.UserPool,
         ].join('')] = mockedContext.state.token;
         fromCognitoIdentityPool
-            .mockReturnValueOnce(jest.fn().mockImplementation(() => {
+            .mockReturnValueOnce(vi.fn().mockImplementation(() => {
                 throw new Error('inactive');
             }))
-            .mockReturnValueOnce(jest.fn().mockReturnValueOnce(mockedNewCredentials));
+            .mockReturnValueOnce(vi.fn().mockReturnValueOnce(mockedNewCredentials));
         await expect(actionsModule.getCredentials(mockedContext))
             .resolves.toEqual(mockedNewCredentials);
         expect(fromCognitoIdentityPool).toHaveBeenCalledTimes(2);
@@ -362,7 +358,7 @@ describe('user actions test', () => {
 
     test('get credentials -- throws unknown error', async () => {
         const mockedContext = {
-            dispatch: jest.fn(),
+            dispatch: vi.fn(),
             rootState: {
                 info: {
                     region: 'us-weast-1',
@@ -385,7 +381,7 @@ describe('user actions test', () => {
             mockedContext.rootState.info.UserPool,
         ].join('')] = mockedContext.state.token;
         fromCognitoIdentityPool
-            .mockReturnValueOnce(jest.fn().mockImplementation(() => {
+            .mockReturnValueOnce(vi.fn().mockImplementation(() => {
                 throw unexpectedError;
             }))
         await expect(actionsModule.getCredentials(mockedContext))
@@ -436,7 +432,7 @@ describe('user actions test', () => {
                 },
             }
         };
-        fromCognitoIdentityPool.mockReturnValueOnce(jest.fn().mockReturnValueOnce(expectedCredentials));
+        fromCognitoIdentityPool.mockReturnValueOnce(vi.fn().mockReturnValueOnce(expectedCredentials));
         cognitoIdentityProviderClientMock.on(AdminUserGlobalSignOutCommand).resolvesOnce({
             $metadata: {
               httpStatusCode: 200, // successful response
@@ -445,7 +441,8 @@ describe('user actions test', () => {
 
         const expectedLogoutUrl = `${mockedContext.rootState.info._links.CognitoEndpoint.href}/logout?response_type=code&client_id=${mockedContext.rootState.info.ClientIdDesigner}&redirect_uri=test.origin/test/path`
         await actionsModule.logout(mockedContext);
-        expect(cognitoIdentityProviderClientMock).toHaveReceivedCommandTimes(AdminUserGlobalSignOutCommand, 1);
+        const calls = cognitoIdentityProviderClientMock.calls();
+        expect(calls).toHaveLength(1);
         expect(window.sessionStorage.clear).toHaveBeenCalledTimes(1);
         expect(window.localStorage.clear).toHaveBeenCalledTimes(1);
         expect(mockedContext.rootState.user.name).toEqual('some-user')
@@ -479,20 +476,26 @@ describe('user actions test', () => {
                     },
                 }
             },
+            state: {
+                token: 'test-token',
+                credentials: {
+                    expiration: new Date(Date.now() - 1000),
+                },
+            },
         };
         fromCognitoIdentityPool
-        .mockReturnValueOnce(jest.fn().mockImplementation(() => {
+        .mockReturnValueOnce(vi.fn().mockImplementation(() => {
             throw new Error('unexpected credentials error');
         }))
 
         const expectedLogoutUrl = `${mockedContext.rootState.info._links.CognitoEndpoint.href}/logout?response_type=code&client_id=${mockedContext.rootState.info.ClientIdDesigner}&redirect_uri=test.origin/test/path`
 
         await actionsModule.logout(mockedContext);
-        expect(cognitoIdentityProviderClientMock).toHaveReceivedCommandTimes(AdminUserGlobalSignOutCommand, 0);
+        expect(cognitoIdentityProviderClientMock.calls()).toHaveLength(0);
         expect(window.sessionStorage.clear).toHaveBeenCalledTimes(1);
         expect(window.localStorage.clear).toHaveBeenCalledTimes(1);
         expect(mockedContext.rootState.user.name).toEqual('some-user')
-        expect(mockedContext.state).toEqual(undefined)
+        expect(mockedContext.state.credentials).toEqual(undefined)
         expect(mockedContext.rootState.user.credentials).toEqual(undefined)
         expect(window.location.replace).toHaveBeenCalledWith(
             expect.stringContaining(expectedLogoutUrl)
@@ -536,12 +539,13 @@ describe('user actions test', () => {
                 },
             }
         };
-        fromCognitoIdentityPool.mockReturnValueOnce(jest.fn().mockReturnValueOnce(expectedCredentials));
+        fromCognitoIdentityPool.mockReturnValueOnce(vi.fn().mockReturnValueOnce(expectedCredentials));
         cognitoIdentityProviderClientMock.on(AdminUserGlobalSignOutCommand).rejectsOnce(new Error('unexpected global signout error'));
 
         const expectedLogoutUrl = `${mockedContext.rootState.info._links.CognitoEndpoint.href}/logout?response_type=code&client_id=${mockedContext.rootState.info.ClientIdDesigner}&redirect_uri=test.origin/test/path`
         await actionsModule.logout(mockedContext);
-        expect(cognitoIdentityProviderClientMock).toHaveReceivedCommandTimes(AdminUserGlobalSignOutCommand, 1);
+        const calls = cognitoIdentityProviderClientMock.calls();
+        expect(calls).toHaveLength(1);
         expect(window.sessionStorage.clear).toHaveBeenCalledTimes(1);
         expect(window.localStorage.clear).toHaveBeenCalledTimes(1);
         expect(mockedContext.rootState.user.name).toEqual('some-user')
@@ -670,7 +674,7 @@ describe('user actions test', () => {
 
     test('login -- unable to fetch credentials 1', async () => {
         const mockedContext = {
-            dispatch: jest.fn(),
+            dispatch: vi.fn(),
             state: {
                 token: '',
                 name: '',
@@ -724,7 +728,7 @@ describe('user actions test', () => {
 
     test('login -- unable to fetch credentials 2', async () => {
         const mockedContext = {
-            dispatch: jest.fn(),
+            dispatch: vi.fn(),
             state: {
                 token: '',
                 name: '',

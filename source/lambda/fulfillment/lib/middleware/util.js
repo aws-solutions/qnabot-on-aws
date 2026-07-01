@@ -18,6 +18,18 @@ exports.getLambdaArn = function (name) {
     return name;
 };
 
+exports.isSameAccountArn = function (arn) {
+    // Bare function names (no 'arn:' prefix) are passed by legitimate callers
+    // (e.g. Quiz.js sets session.queryLambda = process.env.AWS_LAMBDA_FUNCTION_NAME).
+    // The cross-account injection attack requires a full ARN to route invocation
+    // to attacker-controlled infrastructure — that case is verified below.
+    if (!arn.startsWith('arn:')) {
+        return true;
+    }
+    const match = arn.match(/^arn:aws:lambda:[^:]+:(\d{12}):/);
+    return match && match[1] === process.env.AWS_ACCOUNT_ID;
+};
+
 exports.invokeLambda = async function (params) {
     qnabot.log(`Invoking ${params.FunctionName}`);
     const payload = params.Payload || JSON.stringify({

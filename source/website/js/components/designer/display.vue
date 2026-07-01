@@ -5,7 +5,12 @@
  ************************************************************************************************ */
 <template lang="pug">
 span
-  span(v-if="schema.type==='string' && !empty")
+  span(v-if="!schema || !schema.type")
+    v-container.pa-0.fluid
+      v-row
+        v-col
+          .text-error Schema not loaded or invalid
+  span(v-else-if="schema.type==='string' && !empty")
     v-container.pa-0.fluid
       v-row
         v-col
@@ -43,11 +48,11 @@ span
 </template>
 
 <script>
-require('vuex');
-const _ = require('lodash');
-require('./empty');
+import _ from 'lodash';
+import 'vuex';
+import './empty';
 
-module.exports = {
+export default {
     props: ['schema', 'modelValue', 'name', 'row', 'column', 'path'],
     name: 'display',
     data() {

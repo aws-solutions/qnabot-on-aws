@@ -78,16 +78,16 @@ v-container
 </template>
 
 <script>
+import stepsData from './steps.js';
+import Vuex from 'vuex';
+import _ from 'lodash';
 
-const Vuex = require('vuex');
-const _ = require('lodash');
-
-module.exports = {
+export default {
     data() {
         return {
             visible: false,
             stepNumber: 1,
-            stepsRaw: require('./steps'),
+            stepsRaw: stepsData,
         };
     },
     components: {

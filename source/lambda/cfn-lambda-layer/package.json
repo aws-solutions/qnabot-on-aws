@@ -1,6 +1,6 @@
 {
     "name": "cfn-lambda-layer",
-    "version": "7.3.16",
+    "version": "7.4.0",
     "description": "QnABot Cfn Lambda Layer",
     "main": "index.js",
     "scripts": {
@@ -11,9 +11,7 @@
         "url": "https://aws.amazon.com/solutions"
     },
     "license": "Apache-2.0",
-    "dependencies": {
-        "cfn-lambda": "^5.1.0"
-    },
+    "dependencies": {},
     "overrides": {
         "async": "^2.6.4",
         "minimatch": "^3.1.3"

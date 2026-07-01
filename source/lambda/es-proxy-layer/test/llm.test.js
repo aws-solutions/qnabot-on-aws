@@ -300,7 +300,7 @@ describe('llm generate_query', () => {
                     content: [{ text: 'Given the following conversation and a follow up question, rephrase the follow up question to be a standalone question.\nChat History: \n\nFollow Up Input: How can I publish Kindle books?\nStandalone question:',  type: "text" }],
                 },
             ],
-            inferenceConfig: { maxTokens: 300, temperature: 0, topP: 1 },
+            inferenceConfig: { maxTokens: 300, temperature: 0 },
         };
 
         const response = await generate_query(clonedReq);
@@ -443,7 +443,7 @@ describe('llm get_qa', () => {
                     ],
                 },
             ],
-            inferenceConfig: { maxTokens: 300, temperature: 0.2, topP: 1 },
+            inferenceConfig: { maxTokens: 300, temperature: 0.2 },
             guardrailConfig: {
                 guardrailIdentifier: "test_id",
                 guardrailVersion: '1',
@@ -495,7 +495,7 @@ describe('llm get_qa', () => {
                     content: [{ text: 'Given the following conversation and a follow up question, rephrase the follow up question to be a standalone question.\nChat History: \n\nFollow Up Input: How can I publish Kindle books?\nStandalone question:',  type: "text" }],
                 },
             ],
-            inferenceConfig: { maxTokens: 300, temperature: 0, topP: 1},
+            inferenceConfig: { maxTokens: 300, temperature: 0 },
         };
 
         const response = await generate_query(clonedReq);

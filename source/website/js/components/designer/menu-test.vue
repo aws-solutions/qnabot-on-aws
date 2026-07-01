@@ -60,11 +60,10 @@ v-container(fluid)
 </template>
 
 <script>
+import _ from 'lodash';
+import 'vuex';
 
-require('vuex');
-const _ = require('lodash');
-
-module.exports = {
+export default {
     data() {
         return {
             query: '',

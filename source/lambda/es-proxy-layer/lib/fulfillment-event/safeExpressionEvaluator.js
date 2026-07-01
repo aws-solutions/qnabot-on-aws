@@ -318,6 +318,9 @@ function validateTokens(tokens, context) {
         checkMethodCall(token, prevToken, nextToken);
         checkStandaloneFunctionCall(token, prevToken, nextToken);
         checkTopLevelIdentifier(token, prevToken, contextKeys);
+        if (token === '?' && nextToken === '.') {
+            throw new Error(`Security violation: Optional chaining (?.) is not allowed`);
+        }
     }
 }
 

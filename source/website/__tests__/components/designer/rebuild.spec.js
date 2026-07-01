@@ -2,12 +2,14 @@
 *   Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.                             *
 *   SPDX-License-Identifier: Apache-2.0                                                            *
  ************************************************************************************************ */
-const rebuildModule = require('../../../js/components/designer/rebuild.vue');
+import { describe, test, expect, vi } from 'vitest';
 import { shallowMount } from '@vue/test-utils';
+
+const rebuildModule = await import('../../../js/components/designer/rebuild.vue');
 
 describe('designer rebuild module', () => {
     test('mounted', () => {
-        const wrapper = shallowMount(rebuildModule);
+        const wrapper = shallowMount(rebuildModule.default);
         expect(wrapper.exists()).toBe(true);
     });
 
@@ -22,7 +24,7 @@ describe('designer rebuild module', () => {
                 },
             },
         };
-        const wrapper = shallowMount(rebuildModule, {
+        const wrapper = shallowMount(rebuildModule.default, {
             global: {
                 mocks: {
                     $store: store,
@@ -36,9 +38,9 @@ describe('designer rebuild module', () => {
 
     test('build & cancel mthods', () => {
         const store = {
-            dispatch: jest.fn().mockImplementation(() => Promise.resolve({})),
+            dispatch: vi.fn().mockImplementation(() => Promise.resolve({})),
         };
-        const wrapper = shallowMount(rebuildModule, {
+        const wrapper = shallowMount(rebuildModule.default, {
             global: {
                 mocks: {
                     $store: store,

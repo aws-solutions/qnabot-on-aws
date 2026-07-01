@@ -18,10 +18,16 @@ function filter_comprehend_pii(text) {
         return text;
     }
 
-    const regex = process.env.found_comprehend_pii.split(',').map((pii) => `(${pii})`).join('|');
-
-    const re = new RegExp(regex, 'g');
-    return text.replace(re, 'XXXXXX');
+    try {
+        process.env.found_comprehend_pii.split(',').forEach((pii) => { text = text.split(pii).join('XXXXXX'); });
+        return text;
+    } catch (e) {
+        // Clear found_comprehend_pii to prevent a corrupt value from making this Lambda instance
+        // unresponsive — a bad value causes every subsequent log call to throw (GitHub #895)
+        console.warn('Warning: error filtering comprehend PII from log message. Clearing found_comprehend_pii.', e);
+        process.env['found_comprehend_pii'] = '';
+        return text;
+    }
 }
 
 function filter(text) {

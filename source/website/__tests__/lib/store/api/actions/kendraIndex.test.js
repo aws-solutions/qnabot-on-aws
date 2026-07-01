@@ -2,14 +2,15 @@
 *   Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.                             *
 *   SPDX-License-Identifier: Apache-2.0                                                            *
  ************************************************************************************************ */
+import { vi } from 'vitest';
 import mockedContext from "./mockedContext";
 
-const kendraIndexModule = require('../../../../../js/lib/store/api/actions/kendraIndex');
+import kendraIndexModule from '../../../../../js/lib/store/api/actions/kendraIndex';
 
 describe('kendraIndex action test', () => {
     beforeEach(() => {
-        jest.resetAllMocks();
-        jest.spyOn(console, 'log').mockImplementation(jest.fn());
+        vi.resetAllMocks();
+        vi.spyOn(console, 'log').mockImplementation(vi.fn());
     });
 
     test('startKendraV2Indexing', () => {

@@ -2,12 +2,14 @@
 *   Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.                             *
 *   SPDX-License-Identifier: Apache-2.0                                                            *
  ************************************************************************************************ */
-const qaModule = require('../../../js/components/designer/qa.vue');
+import { describe, test, expect } from 'vitest';
 import { shallowMount } from '@vue/test-utils';
+
+const qaModule = await import('../../../js/components/designer/qa.vue');
 
 describe('designer qa module', () => {
     test('mounted', () => {
-        const wrapper = shallowMount(qaModule);
+        const wrapper = shallowMount(qaModule.default);
         expect(wrapper.exists()).toBe(true);
     });
 
@@ -22,7 +24,7 @@ describe('designer qa module', () => {
             }
         }
         const data = {};
-        const wrapper = shallowMount(qaModule, {
+        const wrapper = shallowMount(qaModule.default, {
             props: {
                 data,
             },

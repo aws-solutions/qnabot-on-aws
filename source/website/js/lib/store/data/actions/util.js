@@ -3,14 +3,16 @@
 *   SPDX-License-Identifier: Apache-2.0                                                            *
  ************************************************************************************************ */
 
-const validator = new (require('jsonschema').Validator)();
-const axios = require('axios');
-const _ = require('lodash');
+import { Validator } from 'jsonschema';
+import axios from 'axios';
+import _ from 'lodash';
 
-exports.api = function (context, name, args) {
+const validator = new Validator();
+
+export const api = function (context, name, args) {
     return context.dispatch(`api/${name}`, args, { root: true });
 };
-exports.parse = function (item, context) {
+export const parse = function (item, context) {
     _.defaults(item, {
         _score: 0,
         q: [],
@@ -25,7 +27,7 @@ exports.parse = function (item, context) {
     return item;
 };
 
-exports.handle = function (reason) {
+export const handle = function (reason) {
     const self = this;
     return function (err) {
         console.log('Error:', err);
@@ -33,7 +35,7 @@ exports.handle = function (reason) {
         return Promise.reject(reason);
     };
 };
-exports.load = async function (list) {
+export const load = async function (list) {
     const self = this;
     try {
         const results = await Promise.resolve(list);
@@ -41,11 +43,18 @@ exports.load = async function (list) {
             throw new Error('Failed to access qa in the list');
         }
         results.qa.forEach((result) => {
-            self.commit('addQA', exports.parse(result, self));
+            self.commit('addQA', parse(result, self));
             self.commit('page/setTotal', self.state.QAs.length, { root: true });
         });
     } catch (e) {
         console.log('Error:', e);
         throw new Error('Failed to load');
     }
+};
+
+export default {
+    api,
+    parse,
+    handle,
+    load
 };
